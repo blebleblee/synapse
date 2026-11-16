@@ -24,52 +24,23 @@ The Access Vector Cache dramatically reduces the performance overhead of this po
 
 The mechanical flow of an enforcement decision proceeds through these components in a precisely orchestrated sequence:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Userspace Process                         │
-│                    (domain: httpd_t)                             │
-└────────────────────────────┬────────────────────────────────────┘
-                             │ open("/var/www/html/index.html")
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                         VFS Layer                                │
-│  1. Path resolution                                              │
-│  2. DAC permission check (mode bits, ownership)                  │
-└────────────────────────────┬────────────────────────────────────┘
-                             │ security_inode_permission()
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    LSM Hook: selinux_inode_permission            │
-│  • Extract source SID from task->security                        │
-│  • Extract target SID from inode->i_security                     │
-│  • Determine object class (file) and permission (read, open)     │
-└────────────────────────────┬────────────────────────────────────┘
-                             │ avc_has_perm(httpd_t, httpd_sys_content_t, file, {read open})
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Access Vector Cache                         │
-│  Hash lookup: (source_sid, target_sid, tclass)                   │
-│  Cache hit? ─Yes─> Return cached permissions ───────────────┐   │
-│      │                                                       │   │
-│      No                                                      │   │
-│      ▼                                                       │   │
-│  ┌──────────────────────────────────────────────┐          │   │
-│  │         Security Server                       │          │   │
-│  │  • Policy database query                      │          │   │
-│  │  • Type enforcement rule matching             │          │   │
-│  │  • Constraint evaluation                      │          │   │
-│  │  • Compute access vector                      │          │   │
-│  └──────────────────────┬───────────────────────┘          │   │
-│                         │                                   │   │
-│                         └─> Insert into AVC cache ─────────┘   │
-└────────────────────────────┬────────────────────────────────────┘
-                             │ Return decision (GRANT/DENY)
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   LSM Hook Return                                │
-│  Grant: Continue operation, return fd to userspace               │
-│  Deny:  Return -EACCES, log AVC denial                           │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Userspace Process<br/>(domain: httpd_t)"]
+    B["VFS Layer<br/>1. Path resolution<br/>2. DAC permission check (mode bits, ownership)"]
+    C["LSM Hook: selinux_inode_permission<br/>• Extract source SID from task->security<br/>• Extract target SID from inode->i_security<br/>• Determine object class (file) and permission (read, open)"]
+    D["Access Vector Cache<br/>Hash lookup: (source_sid, target_sid, tclass)"]
+    E["Security Server<br/>• Policy database query<br/>• Type enforcement rule matching<br/>• Constraint evaluation<br/>• Compute access vector"]
+    F["LSM Hook Return<br/>Grant: Continue operation, return fd to userspace<br/>Deny: Return -EACCES, log AVC denial"]
+    G["Return cached permissions"]
+    
+    A -->|"open('/var/www/html/index.html')"| B
+    B -->|"security_inode_permission()"| C
+    C -->|"avc_has_perm(httpd_t, httpd_sys_content_t, file, {read open})"| D
+    D -->|"Cache hit? Yes"| G
+    D -->|"Cache miss? No"| E
+    E -->|"Insert into AVC cache"| G
+    G -->|"Return decision (GRANT/DENY)"| F
 ```
 
 The security identifier abstraction plays a critical role in this architecture, serving as an integer handle that represents a complete security context string. When the kernel needs to associate a security context with an object, SELinux allocates a SID and maintains the bidirectional mapping between SIDs and context strings in the security server's SID table. This indirection allows the kernel to perform rapid integer comparisons and hash table lookups rather than manipulating variable-length security context strings throughout the enforcement path, while centralizing string parsing and validation logic within the security server.

@@ -19,18 +19,23 @@ To ground these concepts, consider the design of a sequence detector that assert
 For the Moore machine, the output is tied to the state. We need five states to detect "1011" and assert the output.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> S0
-    S0 --> S1: 1
-    S0 --> S0: 0
-    S1 --> S1: 1
-    S1 --> S2: 0
-    S2 --> S3: 1
-    S2 --> S0: 0
-    S3 --> S4: 1 (Output=1)
-    S3 --> S2: 0
-    S4 --> S1: 1
-    S4 --> S2: 0
+flowchart LR
+    INIT((" ")) --> S0["S0"]
+
+    S0["S0"] -->|"0"| S0
+    S0["S0"] -->|"1"| S1["S1"]
+
+    S1["S1"] -->|"1"| S1
+    S1["S1"] -->|"0"| S2["S2"]
+
+    S2["S2"] -->|"0"| S0
+    S2["S2"] -->|"1"| S3["S3"]
+
+    S3["S3"] -->|"0"| S2
+    S3["S3"] -->|"1 / Output=1"| S4["S4"]
+
+    S4["S4"] -->|"0"| S2
+    S4["S4"] -->|"1"| S1
 ```
 
 State `S0` is the reset state (Output=0). `S1` indicates we have seen a '1'. `S2` indicates '10'. `S3` indicates '101'. `S4` indicates '1011', and is the only state where the output is high.
@@ -38,16 +43,16 @@ State `S0` is the reset state (Output=0). `S1` indicates we have seen a '1'. `S2
 For the Mealy machine, the output is associated with the transition. We only need four states (`S0` through `S3`), and the output asserts on the transition from `S3` to `S1` when the input is '1'.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> S0
-    S0 --> S1: 1 / 0
-    S0 --> S0: 0 / 0
-    S1 --> S1: 1 / 0
-    S1 --> S2: 0 / 0
-    S2 --> S3: 1 / 0
-    S2 --> S0: 0 / 0
-    S3 --> S1: 1 / 1 (Output=1)
-    S3 --> S2: 0 / 0
+flowchart TD
+    Start(["Start"]) --> S0["S0"]
+    S0 -->|"1 / 0"| S1["S1"]
+    S0 -->|"0 / 0"| S0
+    S1 -->|"1 / 0"| S1
+    S1 -->|"0 / 0"| S2["S2"]
+    S2 -->|"1 / 0"| S3["S3"]
+    S2 -->|"0 / 0"| S0
+    S3 -->|"1 / 1 (Output=1)"| S1
+    S3 -->|"0 / 0"| S2
 ```
 
 ### State Encoding and Logic Synthesis

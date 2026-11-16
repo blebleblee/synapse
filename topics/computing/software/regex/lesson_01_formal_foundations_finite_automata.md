@@ -30,16 +30,17 @@ Transitions:
   δ(q2, 'a') = q1    δ(q2, 'b') = q0
 ```
 
-```
-        a           b
-  ┌───────────────────────────────────┐
-  │                                   ↓
-(q0) ──a──→ (q1) ──b──→ ((q2))
-  ↑           │             │
-  └────b───── ┘   a         │ a
-                   ↑         │
-                   └─────────┘
-  b from q2 → q0 (back to start)
+```mermaid
+flowchart LR
+    q0(["q0"])
+    q1(["q1"])
+    q2([["q2"]])
+
+    q0 -->|"a"| q1
+    q1 -->|"b"| q2
+    q1 -->|"b"| q0
+    q2 -->|"a"| q1
+    q2 -->|"b"| q0
 ```
 
 Every string over `{a, b}` that ends in `ab` will land on *q2* after consuming its last character. Every other string will not. No backtracking, no stack, no ambiguity. The automaton consumes each character exactly once.
@@ -202,17 +203,15 @@ A **lazy DFA** goes one step further: it caches the DFA state corresponding to e
 
 **Stage 4: Matching.** The matching stage is not simply running the automaton on the input. For substring search (find the first occurrence of a match, rather than testing whether the whole input matches), the engine must simulate starting the NFA at every input position—or equivalently, run the automaton in a mode where it can "restart" at any character. The standard trick is to add a universal start loop: prefix the NFA with a state that can either start the actual pattern NFA or consume one character and loop back to itself, modeling the implicit `.*` prefix of a search rather than a full-string match.
 
-```
-Mermaid diagram: Thompson NFA simulation data flow
-
+```mermaid
 flowchart TD
-    A[Regex String] --> B[Parser → AST]
-    B --> C[Thompson Construction → NFA]
-    C --> D{Engine Mode?}
-    D -->|Backtracking| E[PCRE / re / JS\nNFA interpreter\nBacktrack stack]
-    D -->|Thompson Sim| F[RE2 / Rust regex\nNFA state-set simulation\nO(m·n) guaranteed]
-    D -->|Lazy DFA| G[Cached DFA states\nNFA fallback on overflow\nAmortized O(n)]
-    E --> H[Match Result\nMay catastrophically backtrack]
+    A["Regex String"] --> B["Parser → AST"]
+    B --> C["Thompson Construction → NFA"]
+    C --> D{"Engine Mode?"}
+    D -->|"Backtracking"| E["PCRE / re / JS<br/>NFA interpreter<br/>Backtrack stack"]
+    D -->|"Thompson Sim"| F["RE2 / Rust regex<br/>NFA state-set simulation<br/>O(m·n) guaranteed"]
+    D -->|"Lazy DFA"| G["Cached DFA states<br/>NFA fallback on overflow<br/>Amortized O(n)"]
+    E --> H["Match Result<br/>May catastrophically backtrack"]
     F --> H
     G --> H
 ```

@@ -28,48 +28,55 @@ A/B testing, shadow variants, and canary deployments constitute the progressive 
 
 The SageMaker endpoint architecture begins with the control plane's declarative resource model, where operators define Models, EndpointConfigs, and Endpoints as immutable configuration resources. A Model resource binds a container image URI (referencing ECR repositories for pre-built framework containers or custom inference images), model data S3 location, and IAM execution role. The EndpointConfig resource composes one or more ProductionVariants, each specifying a Model, instance type and count, traffic weight, and variant name. The Endpoint resource materializes this specification into running infrastructure, triggering the deployment orchestration workflow.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     SageMaker Control Plane                      │
-│  ┌────────────┐      ┌──────────────────┐      ┌─────────────┐ │
-│  │   Model    │──────│ EndpointConfig   │──────│  Endpoint   │ │
-│  │  Resource  │      │   (Variants)     │      │  Resource   │ │
-│  └────────────┘      └──────────────────┘      └─────────────┘ │
-│         │                     │                        │         │
-│         │ Container Image     │ Instance Types         │ DNS     │
-│         │ Model Data S3       │ Traffic Weights        │ Name    │
-│         │ IAM Role            │ Auto-scaling           │         │
-└─────────┼─────────────────────┼────────────────────────┼─────────┘
-          │                     │                        │
-          ▼                     ▼                        ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Data Plane (VPC)                            │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │              Application Load Balancer                    │  │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │  │
-│  │  │ Target Group │  │ Target Group │  │ Target Group │   │  │
-│  │  │  (Variant A) │  │  (Variant B) │  │   (Shadow)   │   │  │
-│  │  │   Weight: 90 │  │   Weight: 10 │  │   Weight: 0  │   │  │
-│  │  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘   │  │
-│  └─────────┼──────────────────┼──────────────────┼───────────┘  │
-│            │                  │                  │               │
-│  ┌─────────▼─────────┐ ┌─────▼──────────┐ ┌────▼──────────┐   │
-│  │   ECS Task Group  │ │  ECS Task Grp  │ │  ECS Task Grp │   │
-│  │  ┌──────────────┐ │ │ ┌────────────┐ │ │ ┌────────────┐│   │
-│  │  │ Inference    │ │ │ │ Inference  │ │ │ │ Inference  ││   │
-│  │  │ Container    │ │ │ │ Container  │ │ │ │ Container  ││   │
-│  │  │ (TorchServe) │ │ │ │ (TFServing)│ │ │ │ (Triton)   ││   │
-│  │  │              │ │ │ │            │ │ │ │            ││   │
-│  │  │ Model v1.3   │ │ │ │ Model v2.0 │ │ │ │ Model v2.0 ││   │
-│  │  └──────────────┘ │ │ └────────────┘ │ │ └────────────┘│   │
-│  └───────────────────┘ └────────────────┘ └───────────────┘   │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │          CloudWatch Metrics & Logs                      │    │
-│  │  ModelLatency, Invocations, InvocationsPerInstance     │    │
-│  │  CPUUtilization, MemoryUtilization, DiskUtilization    │    │
-│  └────────────────────────────────────────────────────────┘    │
-└──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph CP["SageMaker Control Plane"]
+        direction LR
+        Model["Model Resource"]
+        EPC["EndpointConfig (Variants)"]
+        EP["Endpoint Resource"]
+        Model -->|creates| EPC
+        EPC -->|deploys| EP
+    end
+
+    subgraph DP["Data Plane (VPC)"]
+        subgraph ALB["Application Load Balancer"]
+            direction LR
+            TGA["Target Group (Variant A)<br/>Weight: 90"]
+            TGB["Target Group (Variant B)<br/>Weight: 10"]
+            TGS["Target Group (Shadow)<br/>Weight: 0"]
+        end
+
+        subgraph ECSA["ECS Task Group"]
+            ICA["Inference Container (TorchServe)<br/>Model v1.3"]
+        end
+        subgraph ECSB["ECS Task Group"]
+            ICB["Inference Container (TFServing)<br/>Model v2.0"]
+        end
+        subgraph ECSS["ECS Task Group"]
+            ICS["Inference Container (Triton)<br/>Model v2.0"]
+        end
+
+        subgraph CW["CloudWatch Metrics & Logs"]
+            CWM["ModelLatency, Invocations, InvocationsPerInstance<br/>CPUUtilization, MemoryUtilization, DiskUtilization"]
+        end
+    end
+
+    Model -.->|"Container Image, Model Data S3, IAM Role"| ICA
+    Model -.->|"Container Image, Model Data S3, IAM Role"| ICB
+    Model -.->|"Container Image, Model Data S3, IAM Role"| ICS
+    EPC -.->|"Instance Types, Traffic Weights, Auto-scaling"| TGA
+    EPC -.->|"Instance Types, Traffic Weights, Auto-scaling"| TGB
+    EPC -.->|"Instance Types, Traffic Weights, Auto-scaling"| TGS
+    EP -.->|"DNS Name"| ALB
+
+    TGA --> ECSA
+    TGB --> ECSB
+    TGS --> ECSS
+
+    ICA -.->|"metrics & logs"| CWM
+    ICB -.->|"metrics & logs"| CWM
+    ICS -.->|"metrics & logs"| CWM
 ```
 
 When a client invokes the endpoint via the `InvokeEndpoint` API, the request traverses the Application Load Balancer, which applies weighted random routing according to the configured traffic distribution. Each production variant maintains an independent target group containing the container instances serving that model version. Shadow variants register with weight zero, causing the load balancer to duplicate incoming requests to shadow targets without incorporating their responses into the client-facing result. This duplication occurs at the load balancer tier through request mirroring, eliminating application-layer coordination overhead.

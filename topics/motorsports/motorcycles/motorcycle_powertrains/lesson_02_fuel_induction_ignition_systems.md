@@ -46,30 +46,31 @@ The air metering signal feeding the ECU's fuel calculation comes from one of two
 
 The signal path from throttle input to injector fire event in a typical speed-density EFI system follows a coherent logic chain:
 
-```
-Throttle Position Sensor (TPS)
-         │
-         ▼
-    MAP + IAT Sensors
-         │
-         ▼
-   ECU: VE Table Lookup ──► Base Fuel Pulse Width (ms)
-         │
-         ▼
-   Correction Multipliers:
-   ┌─────────────────────────────────────────────────┐
-   │  Coolant Temp (Cold Start Enrichment)           │
-   │  IAT Density Correction                         │
-   │  Closed-Loop Lambda Trim (±%)                   │
-   │  Gear / RPM Fuel Cut (overrun)                  │
-   │  Acceleration Enrichment (dTPS/dt)              │
-   └─────────────────────────────────────────────────┘
-         │
-         ▼
-   Final Injector Pulse Width
-         │
-         ▼
-   Injection Event (synchronized to intake cam signal)
+```mermaid
+flowchart TD
+    TPS["Throttle Position Sensor (TPS)"]
+    MAP_IAT["MAP + IAT Sensors"]
+    ECU["ECU: VE Table Lookup"]
+    BASE["Base Fuel Pulse Width (ms)"]
+    CORR["Correction Multipliers"]
+    FINAL["Final Injector Pulse Width"]
+    INJ["Injection Event<br/>(synchronized to intake cam signal)"]
+    
+    TPS --> MAP_IAT
+    MAP_IAT --> ECU
+    ECU --> BASE
+    BASE --> CORR
+    
+    subgraph CORR["Correction Multipliers"]
+        C1["Coolant Temp (Cold Start Enrichment)"]
+        C2["IAT Density Correction"]
+        C3["Closed-Loop Lambda Trim (±%)"]
+        C4["Gear / RPM Fuel Cut (overrun)"]
+        C5["Acceleration Enrichment (dTPS/dt)"]
+    end
+    
+    CORR --> FINAL
+    FINAL --> INJ
 ```
 
 The VE table itself is the heart of the calibration. It is a two-dimensional lookup table indexed by engine rpm on one axis and throttle position or MAP on the other, with each cell containing a volumetric efficiency percentage that the ECU uses to scale the theoretical air mass into a real-world charge mass estimate. A freshly built engine will require a full VE table calibration run on a chassis dynamometer or engine dyno before it is race-ready. The process involves holding steady-state operating points across the rpm-load matrix, using a wideband lambda sensor to measure actual AFR, and adjusting each VE cell until the measured lambda matches the target lambda stored in the separate target-AFR table.

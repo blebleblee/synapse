@@ -56,40 +56,48 @@ Carbon pricing mechanisms translate NDC commitments into operational price signa
 
 The social cost of carbon (SCC) provides the analytical bridge between the physical science of climate change and the economic logic of carbon pricing. The SCC represents the present-value marginal damage of emitting one additional ton of CO₂, calculated through an integrated assessment model (IAM) that links emissions trajectories, carbon cycle dynamics, temperature response, economic damage functions, and discounting. The three IAMs most commonly used for regulatory analysis are DICE (Dynamic Integrated Climate-Economy, Nordhaus), FUND (Climate Framework for Uncertainty, Negotiation and Distribution, Tol), and PAGE (Policy Analysis of the Greenhouse Effect, Hope). The calculation follows a structured pipeline:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│              Social Cost of Carbon — Calculation Pipeline        │
-│                                                                 │
-│  Emissions Pulse (1 ton CO₂)                                   │
-│        │                                                        │
-│        ▼                                                        │
-│  Carbon Cycle Module ──► Atmospheric CO₂ Concentration          │
-│        │                   (Decay function: ~20% persists       │
-│        ▼                    for millennia)                     │
-│  Climate Response ──► Temperature Increase (ΔT)                 │
-│        │               (Climate sensitivity: ECS ≈ 2.5–4.5°C)   │
-│        ▼                                                        │
-│  Damage Function ──► Economic Damages D(T)                      │
-│        │              (DICE: D = 1/(1 + π₁T + π₂T²))            │
-│        ▼                                                        │
-│  Discounting ──► Present Value                                  │
-│        │          (Ramsey: r = ρ + η·g)                        │
-│        ▼                                                        │
-│  SCC = Σₜ Dₜ / (1 + r)ᵗ                                        │
-│                                                                 │
-│  Key Parameters & Sensitivity:                                  │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │ ρ (pure time pref.)  │ Stern: 0.1% │ Nordhaus: 1.5%      │  │
-│  │ η (elasticity of MU) │ Stern: 1.0  │ Nordhaus: 2.0      │  │
-│  │ g (consumption growth)│ ~1.4–2.0%/yr                     │  │
-│  │ → r (consumption DR) │ Stern: ~1.4% │ Nordhaus: ~5.5%   │  │
-│  │ → SCC                │ Stern: ~$85  │ Nordhaus: ~$30    │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│  US EPA (2023): ~$190/ton CO₂ (at 2% discount rate)             │
-│  US IWG (2021): ~$51/ton CO₂ (at 3% discount rate)             │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start["Emissions Pulse<br/>(1 ton CO₂)"]
+    
+    Start --> Carbon["Carbon Cycle Module"]
+    Carbon --> Conc["Atmospheric CO₂ Concentration<br/><i>Decay function: ~20% persists for millennia</i>"]
+    
+    Conc --> Climate["Climate Response"]
+    Climate --> Temp["Temperature Increase (ΔT)<br/><i>Climate sensitivity: ECS ≈ 2.5–4.5°C</i>"]
+    
+    Temp --> Damage["Damage Function"]
+    Damage --> EconDmg["Economic Damages D(T)<br/><i>DICE: D = 1/(1 + π₁T + π₂T²)</i>"]
+    
+    EconDmg --> Discount["Discounting"]
+    Discount --> PV["Present Value<br/><i>Ramsey: r = ρ + η·g</i>"]
+    
+    PV --> SCC["SCC = Σₜ Dₜ / (1 + r)ᵗ"]
+    
+    SCC --> Params
+    
+    subgraph Params ["Key Parameters & Sensitivity"]
+        direction TB
+        P1["ρ (pure time pref.) | Stern: 0.1% | Nordhaus: 1.5%"]
+        P2["η (elasticity of MU) | Stern: 1.0 | Nordhaus: 2.0"]
+        P3["g (consumption growth) | ~1.4–2.0%/yr"]
+        P4["→ r (consumption DR) | Stern: ~1.4% | Nordhaus: ~5.5%"]
+        P5["→ SCC | Stern: ~$85 | Nordhaus: ~$30"]
+        
+        P1 --> P2 --> P3 --> P4 --> P5
+    end
+    
+    Params --> Results
+    
+    subgraph Results ["Recent SCC Estimates"]
+        R1["US EPA (2023): ~$190/ton CO₂<br/>(at 2% discount rate)"]
+        R2["US IWG (2021): ~$51/ton CO₂<br/>(at 3% discount rate)"]
+    end
+    
+    style Start fill:#e1f5ff
+    style SCC fill:#fff4e1
+    style Params fill:#f0f0f0
+    style Results fill:#e8f5e9
 ```
 
 The Ramsey discounting formula $r = \rho + \eta g$ encodes two distinct ethical parameters: $\rho$ is the pure rate of social time preference (the rate at which future utility is discounted simply because it occurs in the future, independent of consumption levels), and $\eta$ is the elasticity of the marginal utility of consumption (which captures the diminishing marginal utility of wealth—future generations that are richer should have their damages discounted because an additional dollar means less to them). The product $\eta g$ represents the "growth discounting" component, where $g$ is the expected growth rate of per-capita consumption. The Stern Review (2006) used $\rho = 0.1\%$, $\eta = 1.0$, and $g \approx 1.3\%$, yielding $r \approx 1.4\%$ and an SCC of roughly $85/ton. Nordhaus used $\rho = 1.5\%$, $\eta = 2.0$, and $g \approx 2.0\%$, yielding $r \approx 5.5\%$ and an SCC of roughly $30/ton. The US EPA's 2023 update, reflecting revised damage functions and a lower discount rate of 2%, produced an SCC estimate of approximately $190/ton. The sensitivity of the SCC to the discount rate is not a calibration nuisance—it is the central ethical question in climate economics, because it determines how much weight current policy gives to damages suffered by people who do not yet exist.

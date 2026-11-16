@@ -20,40 +20,25 @@ The internal architecture of a NURBS surface in Fusion 360 or similar parametric
 
 The following diagram illustrates how surface construction operations chain together from input curves through the surface kernel to the final solid body:
 
-```
-Input Curves (splines, interpolated profiles, extracted edges)
-           │
-           ▼
-   ┌───────────────────────┐
-   │  Curve Quality Check  │  ← G2 continuity, control point density, degree
-   └───────────┬───────────┘
-               │
-       ┌───────┴────────┐
-       │                │
-       ▼                ▼
-  Rail/Path Curves   Profile/Section Curves
-       │                │
-       └───────┬────────┘
-               ▼
-   ┌───────────────────────┐
-   │  Surface Constructor  │  Loft / Sweep / Patch / Network
-   └───────────┬───────────┘
-               │
-               ▼
-   ┌───────────────────────┐
-   │  Continuity Solver    │  Match tangency/curvature to adjacent surfaces
-   └───────────┬───────────┘
-               │
-               ▼
-   ┌───────────────────────┐
-   │  Diagnostic Analysis  │  Zebra stripes, curvature map, draft analysis
-   └───────────┬───────────┘
-               │
-               ▼
-   ┌───────────────────────┐
-   │  Stitch / Thicken /   │  Surface → Solid body, ready for parametric ops
-   │  Intersect & Trim     │
-   └───────────────────────┘
+```mermaid
+flowchart TD
+    InputCurves["Input Curves<br>(splines, interpolated profiles, extracted edges)"]
+    CurveQuality["Curve Quality Check<br>G2 continuity, control point density, degree"]
+    RailPath["Rail/Path Curves"]
+    ProfileSection["Profile/Section Curves"]
+    SurfaceConstructor["Surface Constructor<br>Loft / Sweep / Patch / Network"]
+    ContinuitySolver["Continuity Solver<br>Match tangency/curvature to adjacent surfaces"]
+    DiagnosticAnalysis["Diagnostic Analysis<br>Zebra stripes, curvature map, draft analysis"]
+    SolidOps["Stitch / Thicken / Intersect & Trim<br>Surface → Solid body, ready for parametric ops"]
+
+    InputCurves --> CurveQuality
+    CurveQuality --> RailPath
+    CurveQuality --> ProfileSection
+    RailPath --> SurfaceConstructor
+    ProfileSection --> SurfaceConstructor
+    SurfaceConstructor --> ContinuitySolver
+    ContinuitySolver --> DiagnosticAnalysis
+    DiagnosticAnalysis --> SolidOps
 ```
 
 Each stage in this chain has its own mechanics worth dissecting in detail.

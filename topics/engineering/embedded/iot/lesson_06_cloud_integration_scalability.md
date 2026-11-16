@@ -336,3 +336,4 @@ void mqtt_connection_task(MQTTContext *ctx) {
                 ctx->current_backoff = ctx->config.reconnect_backoff_min;
                 ctx->reconnect_attempts = 0;
             } el
+```

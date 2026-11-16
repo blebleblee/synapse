@@ -104,23 +104,43 @@ The wage ratio $w^A/w^B = p^* a_{L2}^B/a_{L1}^A$ reflects both the terms of trad
 
 The graphical representation of the Ricardian model employs the relative supply-relative demand diagram in $(Q_1/Q_2, p_1/p_2)$ space. The relative supply curve exhibits a step function structure: at prices below Country A's autarkic ratio, both countries produce good 2 exclusively (infinite relative supply). At prices between the two autarkic ratios, Country A specializes in good 1 and Country B in good 2, generating a vertical relative supply segment at $Q_1^A/Q_2^B$. At prices above Country B's autarkic ratio, both specialize in good 1 (zero relative supply). The relative demand curve slopes downward, intersecting the vertical specialization segment to determine equilibrium terms of trade.
 
-```
-p₁/p₂
-  │
-  │     RS curve (step function)
-  │          │
-  │          │
-B's autarky ─┤──────────┐
-  │          │          │
-  │          │          │
-p*───────────┼──────────┤ RD curve
-  │          │        ╱ │
-A's autarky ─┤       ╱  │
-  │          │      ╱   │
-  │          │     ╱    │
-  │          │    ╱     │
-  └──────────┴───┴──────┴─────► Q₁/Q₂
-             0   Q₁ᴬ/Q₂ᴮ
+```mermaid
+flowchart TD
+    classDef label fill:none,stroke:none,color:#333;
+    classDef axis fill:none,stroke:#333,stroke-width:2px;
+    classDef curve fill:none,stroke:#0055ff,stroke-width:2px,color:#0055ff;
+
+    YAxisLabel["p₁/p₂"]:::label
+    BAutarky["B's autarky"]:::label
+    PStar["p*"]:::label
+    AAutarky["A's autarky"]:::label
+    Origin["0"]:::label
+
+    Q1AQ2B["Q₁ᴬ/Q₂ᴮ"]:::label
+    Q1Q2["Q₁/Q₂"]:::label
+
+    RS_H1["RS curve (step function)"]:::curve
+    RS_V["RS curve (step function)"]:::curve
+    RS_H2["RS curve (step function)"]:::curve
+    RD_Curve["RD curve"]:::curve
+
+    %% Axes structure
+    YAxisLabel --- BAutarky --- PStar --- AAutarky --- Origin
+    Origin --- Q1AQ2B --- Q1Q2
+
+    %% RS Curve structure
+    BAutarky --- RS_H1 --- Q1AQ2B
+    Q1AQ2B --- RS_V --- AAutarky
+    AAutarky --- RS_H2
+
+    %% RD Curve structure
+    Origin --- RD_Curve --- PStar
+
+    %% Layout alignment
+    { rank=same; BAutarky; RS_H1; }
+    { rank=same; PStar; RS_V; RD_Curve; }
+    { rank=same; AAutarky; RS_H2; }
+    { rank=same; Origin; Q1AQ2B; Q1Q2; }
 ```
 
 The intersection at $p^*$ and $Q_1^A/Q_2^B$ represents the unique free trade equilibrium with complete specialization. Shifts in relative demand (preference changes favoring good 1) push the RD curve rightward, raising $p^*$ and improving Country A's terms of trade. Changes in labor endowments or productivity alter the relative supply, shifting the vertical segment and adjusting both terms of trade and trade volumes.

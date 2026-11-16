@@ -30,20 +30,40 @@ The Virtual Private Cloud architecture begins with address space allocation and 
 
 Subnet creation couples IP address ranges with availability zone placement, embedding fault tolerance directly into the network topology. You might allocate 10.0.1.0/24 and 10.0.2.0/24 as public subnets in us-east-1a and us-east-1b respectively, each with a route to an Internet Gateway, while 10.0.11.0/24 and 10.0.12.0/24 serve as private subnets in the same zones, routing outbound traffic through a NAT Gateway in one of the public subnets. This topology ensures that failure of an entire availability zone impacts only half of your capacity, as instances in the surviving zone continue serving traffic. The mapping between subnet and availability zone remains immutable after creation—you cannot move a subnet between zones without recreating it—reflecting the physical reality that the subnet's IP range associates with specific racks and switches within a datacenter.
 
-```
-VPC: 10.0.0.0/16
-│
-├─ Public Subnet A (10.0.1.0/24)  [us-east-1a]
-│   └─ Route: 0.0.0.0/0 → Internet Gateway
-│
-├─ Public Subnet B (10.0.2.0/24)  [us-east-1b]
-│   └─ Route: 0.0.0.0/0 → Internet Gateway
-│
-├─ Private Subnet A (10.0.11.0/24) [us-east-1a]
-│   └─ Route: 0.0.0.0/0 → NAT Gateway (in Public Subnet A)
-│
-└─ Private Subnet B (10.0.12.0/24) [us-east-1b]
-    └─ Route: 0.0.0.0/0 → NAT Gateway (in Public Subnet A)
+```mermaid
+flowchart TD
+    VPC["VPC: 10.0.0.0/16"]
+    IGW["Internet Gateway"]
+    NATGW["NAT Gateway"]
+    
+    subgraph PubA ["Public Subnet A (10.0.1.0/24) [us-east-1a]"]
+        PubA_Route["Route: 0.0.0.0/0 → Internet Gateway"]
+    end
+    
+    subgraph PubB ["Public Subnet B (10.0.2.0/24) [us-east-1b]"]
+        PubB_Route["Route: 0.0.0.0/0 → Internet Gateway"]
+    end
+    
+    subgraph PrivA ["Private Subnet A (10.0.11.0/24) [us-east-1a]"]
+        PrivA_Route["Route: 0.0.0.0/0 → NAT Gateway"]
+    end
+    
+    subgraph PrivB ["Private Subnet B (10.0.12.0/24) [us-east-1b]"]
+        PrivB_Route["Route: 0.0.0.0/0 → NAT Gateway"]
+    end
+    
+    VPC --> PubA
+    VPC --> PubB
+    VPC --> PrivA
+    VPC --> PrivB
+    
+    PubA_Route -.-> IGW
+    PubB_Route -.-> IGW
+    
+    NATGW -.->|located in| PubA
+    
+    PrivA_Route -.-> NATGW
+    PrivB_Route -.-> NATGW
 ```
 
 Routing tables govern traffic forwarding between subnets and external networks. Each route table contains an ordered list of destination CIDR blocks paired with target gateways. The implicit local route—10.0.0.0/16 → local—ensures that a packet from 10.0.1.5 destined for 10.0.11.8 forwards directly through the VPC's virtual switch without traversing an external gateway. This local route takes precedence over all other routes through longest-prefix matching: a /16 is less specific than any /24 subnet, so the route table evaluates the local route before considering narrower prefixes. Additional routes might include 0.0.0.0/0 → igw-abc123 for internet-bound traffic, or 192.168.0.0/16 → vgw-def456 for VPN-connected on-premises networks. Route table evaluation occurs in the VPC's virtual router, a distributed forwarding engine that exists as software running on the hypervisors hosting your instances, processing routing decisions at line rate before packets ever reach the instance's network interface.

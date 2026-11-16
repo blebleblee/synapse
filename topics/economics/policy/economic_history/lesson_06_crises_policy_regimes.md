@@ -24,53 +24,33 @@ The fifth invariant governs the interaction between fiscal and monetary regimes.
 
 The mechanical architecture of a financial crisis is best understood as a cascade through interconnected balance sheets. Each institution's assets are another institution's liabilities, and when a shock forces mark-to-market losses or triggers margin calls on one node of the network, the fire-sale spillovers and counterparty exposures transmit distress across the entire system before regulators can map the exposure graph. The following diagram traces the propagation path from an initial shock through the banking system to the real economy:
 
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                     CRISIS PROPAGATION ARCHITECTURE                       │
-└──────────────────────────────────────────────────────────────────────────┘
-
-  INITIAL SHOCK
-  (Asset price decline │ Credit event │ FX pressure │ Sovereign stress)
-         │
-         ▼
-┌─────────────────────┐       Mark-to-market losses reduce
-│  FINANCIAL SECTOR   │◄───── regulatory capital ratios below
-│  BALANCE SHEETS     │       minimum thresholds
-│                     │
-│  Assets:            │       Fire-sale of illiquid assets
-│   Loans   ↓↓        │──────► depresses prices further
-│   Securities ↓↓     │       (Amplification Loop I)
-│  Liabilities:       │
-│   Short-term        │       Wholesale funding (repo, CP,
-│   funding  ↑↑ cost  │◄───── interbank) withdraws as
-└─────────┬───────────┘       counterparty risk rises
-          │                   (Amplification Loop II)
-          ▼
-┌─────────────────────┐
-│  CREDIT CHANNEL     │       Credit supply contracts:
-│  CONTRACTION        │       • New loans ↓
-│                     │       • Loan renewals denied
-│  External Finance   │       • Collateral haircuts ↑
-│  Premium φ ↑↑       │       • Lending standards tighten
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐       Real Economy Transmission:
-│  REAL ECONOMY       │       • Investment ↓↓ (small firms
-│  IMPACT             │         and households hardest hit)
-│                     │       • Employment ↓↓
-│  Aggregate Demand   │       • Consumer confidence collapses
-│  Collapses          │       • Import demand ↓ → global
-└─────────┬───────────┘         spillovers
-          │
-          ▼
-┌─────────────────────┐       Feedback to Balance Sheets:
-│  SECOND-ROUND       │       • Loan default rates ↑↑
-│  FEEDBACK           │       • Collateral values ↓ further
-│                     │       • Net worth N_t ↓↓
-│  Returns to         │       • Financial accelerator
-│  FINANCIAL SECTOR   │         re-activates
-└─────────────────────┘
+```mermaid
+flowchart TD
+    SHOCK["INITIAL SHOCK<br/>Asset price decline | Credit event<br/>FX pressure | Sovereign stress"]
+    
+    SHOCK --> FINANCIAL["FINANCIAL SECTOR<br/>BALANCE SHEETS<br/><br/>Assets:<br/>Loans ↓↓<br/>Securities ↓↓<br/>Liabilities:<br/>Short-term funding ↑↑ cost"]
+    
+    FINANCIAL -->|"Mark-to-market losses reduce<br/>regulatory capital ratios below<br/>minimum thresholds"| CREDIT["CREDIT CHANNEL<br/>CONTRACTION<br/><br/>External Finance<br/>Premium φ ↑↑"]
+    
+    FINANCIAL -->|"Fire-sale of illiquid assets<br/>depresses prices further"| AMP1["Amplification Loop I"]
+    AMP1 -->|"Feedback"| FINANCIAL
+    
+    WHOLESALE["Wholesale funding withdraws<br/>repo, CP, interbank<br/>counterparty risk rises<br/>Amplification Loop II"] -->|"Feedback"| FINANCIAL
+    FINANCIAL -.->|"Triggers"| WHOLESALE
+    
+    CREDIT -->|"Credit supply contracts:<br/>• New loans ↓<br/>• Loan renewals denied<br/>• Collateral haircuts ↑<br/>• Lending standards tighten"| REAL["REAL ECONOMY<br/>IMPACT<br/><br/>Aggregate Demand<br/>Collapses"]
+    
+    REAL -->|"Real Economy Transmission:<br/>• Investment ↓↓ small firms & households<br/>• Employment ↓↓<br/>• Consumer confidence collapses<br/>• Import demand ↓ → global spillovers"| FEEDBACK["SECOND-ROUND<br/>FEEDBACK<br/><br/>Returns to<br/>FINANCIAL SECTOR"]
+    
+    FEEDBACK -->|"Feedback to Balance Sheets:<br/>• Loan default rates ↑↑<br/>• Collateral values ↓ further<br/>• Net worth N_t ↓↓<br/>• Financial accelerator re-activates"| FINANCIAL
+    
+    style SHOCK fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
+    style FINANCIAL fill:#4ecdc4,stroke:#0a9396,stroke-width:2px
+    style CREDIT fill:#ffe66d,stroke:#f4a261,stroke-width:2px
+    style REAL fill:#ff9f1c,stroke:#e07a5f,stroke-width:2px
+    style FEEDBACK fill:#95e1d3,stroke:#38a3a5,stroke-width:2px
+    style AMP1 fill:#f4a6d7,stroke:#d946a6,stroke-width:2px
+    style WHOLESALE fill:#f4a6d7,stroke:#d946a6,stroke-width:2px
 ```
 
 This architecture explains why standard countercyclical fiscal policy, though necessary, is insufficient on its own to arrest a financial crisis. Stimulus spending increases aggregate demand at the bottom of the diagram, but it does not break the amplification loops at the top where credit supply has collapsed. Effective crisis intervention must simultaneously address both the balance sheet repair problem and the demand shortfall.

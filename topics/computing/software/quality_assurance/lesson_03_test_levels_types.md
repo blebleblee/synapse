@@ -162,40 +162,19 @@ For compiler and systems engineers, acceptance testing often means conformance t
 
 Understanding how test frameworks execute tests internally is not academic knowledge for a systems programmer—it determines how you design for testability, how you manage shared state, and how you diagnose intermittent failures. The following diagram captures the execution model that underlies Rust's built-in test harness, Python's `pytest`, and Java's JUnit 5 at an architectural level.
 
-```
-Test Discovery Phase
-┌────────────────────────────────────────────────────────────────┐
-│  Source Tree / Binary → Collect #[test] / @Test annotations    │
-│  Build test registry: Vec<TestFn { name, fn_ptr, metadata }>   │
-└──────────────────────────┬─────────────────────────────────────┘
-                           │
-                           ▼
-Test Filtering Phase
-┌────────────────────────────────────────────────────────────────┐
-│  Apply --test-filter, category tags, focus flags               │
-│  Partition: [ Unit ] [ Integration ] [ Ignored ] [ Benches ]   │
-└──────────────────────────┬─────────────────────────────────────┘
-                           │
-                           ▼
-Execution Phase (per test)
-┌────────────────────────────────────────────────────────────────┐
-│  For each TestFn in filtered set:                              │
-│    1. Run @BeforeEach / fixture setup (fresh state)            │
-│    2. Spawn test in isolated context (thread or process)       │
-│    3. Execute test body                                        │
-│    4. Capture stdout/stderr                                    │
-│    5. Observe: PASS | FAIL | PANIC | TIMEOUT                   │
-│    6. Run @AfterEach / fixture teardown (even on failure)      │
-│    7. Record result in TestReport                              │
-└──────────────────────────┬─────────────────────────────────────┘
-                           │
-                           ▼
-Reporting Phase
-┌────────────────────────────────────────────────────────────────┐
-│  Aggregate TestReport entries                                  │
-│  Emit: JUnit XML / TAP / JSON / terminal summary               │
-│  Exit code: 0 (all pass) | non-zero (any failure)             │
-└────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Test Discovery Phase<br/>──────────────────────────────────<br/>Source Tree / Binary → Collect #[test] / @Test annotations<br/>Build test registry: Vec&lt;TestFn { name, fn_ptr, metadata }&gt;"]
+    
+    B["Test Filtering Phase<br/>──────────────────────────────────<br/>Apply --test-filter, category tags, focus flags<br/>Partition: [ Unit ] [ Integration ] [ Ignored ] [ Benches ]"]
+    
+    C["Execution Phase (per test)<br/>──────────────────────────────────<br/>For each TestFn in filtered set:<br/>1. Run @BeforeEach / fixture setup (fresh state)<br/>2. Spawn test in isolated context (thread or process)<br/>3. Execute test body<br/>4. Capture stdout/stderr<br/>5. Observe: PASS | FAIL | PANIC | TIMEOUT<br/>6. Run @AfterEach / fixture teardown (even on failure)<br/>7. Record result in TestReport"]
+    
+    D["Reporting Phase<br/>──────────────────────────────────<br/>Aggregate TestReport entries<br/>Emit: JUnit XML / TAP / JSON / terminal summary<br/>Exit code: 0 (all pass) | non-zero (any failure)"]
+    
+    A --> B
+    B --> C
+    C --> D
 ```
 
 The critical invariant in the execution phase is fixture lifecycle. Each test must receive a fresh fixture instance. When frameworks violate this—allowing a shared mutable fixture across tests—they produce order-dependent test suites where test A's side effects corrupt test B's preconditions. In Rust, this is surfaced directly: the test harness runs tests in parallel by default across threads sharing the same process address space. Static mutable state (`static mut`, `lazy_static!` with interior mutability) will produce data races unless protected by a `Mutex`, and even then, the locking creates ordering dependencies that can cause non-parallelizable test suites. The idiomatic Rust solution is to pass state explicitly through function parameters rather than relying on global singletons—an architectural choice that the borrow checker enforces naturally.
@@ -204,34 +183,27 @@ The critical invariant in the execution phase is fixture lifecycle. Each test mu
 
 The internal mechanics of Pact-style contract testing deserve precise exposition because they differ fundamentally from the stub-based integration tests most engineers default to. The workflow involves four actors: the consumer test, the Pact mock server, the Pact broker, and the provider verification run.
 
-```
-Consumer Side                        Provider Side
-─────────────────                    ─────────────────────────────
-                                     
- Consumer Test                        Provider CI Pipeline
-      │                                      │
-      │  1. Define interactions               │
-      ▼                                      │
- Pact Mock Server ◄──────────────────────────┤
-  (HTTP stub that                            │
-   records calls)                            │
-      │                                      │
-      │  2. Assertions pass                   │
-      │                                      │
-      ▼                                      │
- Pact File (JSON)   ──── push ────►  Pact Broker
-  { consumer,                           │
-    provider,                           │  3. Fetch pact
-    interactions: [                     │     for verification
-      { request,                        ▼
-        response }              Provider Verifier
-      ]                          (Runs each interaction
-  }                               against real provider)
-                                        │
-                                        │  4. Publish result
-                                        ▼
-                                   Pact Broker
-                                 (can-i-deploy check)
+```mermaid
+flowchart TD
+    subgraph consumer_side ["Consumer Side"]
+        CT["Consumer Test"]
+        PMS["Pact Mock Server\n(HTTP stub that records calls)"]
+        PF["Pact File (JSON)\n{ consumer,\n  provider,\n  interactions: [\n    { request, response }\n  ] }"]
+    end
+
+    subgraph provider_side ["Provider Side"]
+        PCP["Provider CI Pipeline"]
+        PB1["Pact Broker"]
+        PV["Provider Verifier\n(Runs each interaction\nagainst real provider)"]
+        PB2["Pact Broker\n(can-i-deploy check)"]
+    end
+
+    CT -->|"1. Define interactions"| PMS
+    PMS -->|"2. Assertions pass"| PF
+    PCP --> PMS
+    PF -->|"push"| PB1
+    PB1 -->|"3. Fetch pact for verification"| PV
+    PV -->|"4. Publish result"| PB2
 ```
 
 The critical mechanical property is that the consumer's test suite never touches the real provider. It runs against the Pact mock server, which records the interactions the consumer actually made. That recording becomes a contract artifact. The provider's verification run then replays those exact interactions against the real provider implementation. If the provider's response diverges from what it promised the consumer, verification fails. This architecture allows the consumer and provider to be deployed and tested independently while preserving interface correctness—a property that stub-based integration tests cannot provide because the stub is maintained by the consumer and is therefore never independently verified.

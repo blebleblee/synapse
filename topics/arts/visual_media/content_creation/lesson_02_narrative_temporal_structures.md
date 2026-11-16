@@ -124,4 +124,21 @@ Test with fresh viewers. Do not rely on your sense after editing for hours. Watc
 
 **Symmetry failure in character arcs.** A character arc requires visible evidence of transformation. If the protagonist begins Act One timid and ends Act Three confident but no scenes demonstrate the journey, the arc feels imposed rather than earned. The fix: plant specific behavioral moments in Act One that the protagonist revisits in Act Three, now executing them differently. A character who flinches from confrontation in Act One must eventually *seek* confrontation, and this shift must be shown through action, not narration. The visual and behavioral symmetry makes the arc legible.
 
-**Montage without meaning.** Rapid cutting to music with no thematic progression feels empty. A training mo
+**Montage without meaning.** Rapid cutting to music with no thematic progression feels empty.
+
+The fix: give each montage shot a narrative through-line. If showing a character's descent into addiction, each shot should show *progression*—a harder drug, a worse location, a more degraded appearance—not just variety. The shots must build causally or thematically. Similarly, training montages must show increasing difficulty, mastery of new techniques, or escalating stakes. Without progression, the montage is just decoration. The editor must ask: what does shot 5 show that shot 1 could not? If the answer is "nothing," the montage is redundant.
+
+**Temporal disorientation without payoff.** Non-linear structures (flashbacks, flash-forwards, fragmented timelines) impose cognitive load on the viewer. This cost is justified only if the disorder itself generates meaning—if the *experience* of temporal confusion mirrors the protagonist's psychological state, or if the revelation of chronology *is* the narrative climax. If the structure is merely stylistic, it exhausts the audience without reward. The fix: anchor non-linear timelines with consistent visual or audio motifs. Use color grading, aspect ratio, or music to instantly signal temporal location. Ensure that the final assembly of the timeline delivers emotional or cognitive insight that linear presentation could not. If reordering the film chronologically would lose nothing, the non-linear structure is unjustified.
+
+Temporal structure is not a stylistic flourish. It is the narrative's skeleton. Every cut, every duration, every sequence order is a claim about causality, significance, and meaning. The editor who masters temporal structure does not manipulate time—they reveal it.
+
+## Summary & Verification Matrix
+
+| **Invariant Principle** | **Core Mechanism** | **Diagnostic Test** | **Failure Mode** |
+|-------------------------|-------------------|---------------------|------------------|
+| **Scene duration must reflect narrative weight** | Length signals importance; compression indicates passage or insignificance | Does the runtime allocation match the emotional or plot significance of each scene? | Crucial scenes rushed; trivial scenes linger, violating audience expectation |
+| **Transitions must encode causal/temporal relationships** | Cut = continuity; dissolve = time passage; fade = chapter break; match cut = thematic link | Can the viewer infer time elapsed and causal connection from transition type alone? | Arbitrary transitions; viewer cannot reconstruct timeline or logic |
+| **Non-linear structures require anchoring systems** | Visual/audio motifs, color grading, aspect ratio consistently mark temporal zones | Remove all dialogue: can the viewer still identify which timeline each shot belongs to? | Temporal disorientation without payoff; structure becomes obstacle not tool |
+| **Montage must show progression, not variety** | Each shot must demonstrate advancement (skill, degradation, stakes) relative to prior shot | Does removing any shot from the montage weaken the arc, or is it interchangeable decoration? | Montage feels decorative; no narrative momentum or transformation visible |
+| **Character arcs require behavioral symmetry** | Protagonist must visibly execute transformed behavior in situations mirroring Act One setup | Do Act Three behaviors directly contrast Act One behaviors in parallel scenarios? | Character change asserted by dialogue, not demonstrated through action |
+| **Causal chains must remain unbroken** | Each scene's ending state must logically permit the next scene's beginning state | Can the sequence play without narration and still communicate cause-effect? | Inexplicable character decisions; plot leaps that break believability |

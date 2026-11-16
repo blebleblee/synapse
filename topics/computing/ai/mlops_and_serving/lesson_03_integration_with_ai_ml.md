@@ -955,20 +955,25 @@ class ProductionDriftMonitor:
 A model registry is not a file server. It is a **state machine** that enforces the promotion lifecycle of model artifacts from experimentation to production. The canonical state transitions are:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Registered : artifact logged by training job
+flowchart TD
+    START((" ")):::terminal
+    REG["Registered"]
+    STG["Staging"]
+    PRD["Production"]
+    ARC["Archived"]
+    END((" ")):::terminal
 
-    Registered --> Staging : automated validation gate passes\n(schema check, performance threshold, drift gate)
+    START -->|"artifact logged by training job"| REG
+    REG -->|"automated validation gate passes\n(schema check, performance threshold, drift gate)"| STG
+    STG -->|"manual approval OR\nautomated canary analysis passes"| PRD
+    STG -->|"validation failure\n(rolled back, flagged for investigation)"| REG
+    PRD -->|"new Production version promoted\n(previous version archived, not deleted)"| ARC
+    PRD -->|"performance regression detected\n(automated rollback triggered)"| STG
+    ARC -->|"retention policy enforcement\n(after N days or N versions)"| END
 
-    Staging --> Production : manual approval OR\nautomated canary analysis passes
-
-    Staging --> Registered : validation failure\n(rolled back, flagged for investigation)
-
-    Production --> Archived : new Production version promoted\n(previous version archived, not deleted)
-
-    Production --> Staging : performance regression detected\n(automated rollback triggered)
-
-    Archived --> [*] : retention policy enforcement\n(after N days or N versions)
+    classDef terminal fill:#111,stroke:#111,color:#111,width:12px,height:12px
+    classDef state fill:#1e3a5f,stroke:#4a90d9,stroke-width:2px,color:#e8f0fe,rx:6,ry:6
+    class REG,STG,PRD,ARC state
 ```
 
 No model should ever transition from `Registered` directly to `Production`. The `Staging` state exists specifically to enforce that every production deployment was preceded by an automated validation run against a held-out evaluation set, with explicit human or automated approval. This is the enforcement mechanism for the "fail-closed validation gate" invariant established in Section 1.

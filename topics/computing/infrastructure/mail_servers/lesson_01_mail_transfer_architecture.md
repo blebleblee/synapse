@@ -22,40 +22,79 @@ An SMTP session is a strict, stateful protocol exchange. Each session follows a 
 
 The session proceeds through the following phases, which map precisely to server state transitions:
 
-```
-Client                                  Server
-  |                                       |
-  |  <--- 220 mail.example.com ESMTP -----|  (Server greeting)
-  |                                       |
-  |---- EHLO client.example.com -------->|  (Capability request)
-  |  <--- 250-mail.example.com           |
-  |  <--- 250-SIZE 52428800              |
-  |  <--- 250-STARTTLS                   |
-  |  <--- 250-AUTH PLAIN LOGIN           |
-  |  <--- 250 ENHANCEDSTATUSCODES -------|
-  |                                       |
-  |---- STARTTLS ------------------------>|  (Upgrade to TLS)
-  |  <--- 220 Go ahead ------------------|
-  |  [TLS handshake]                      |
-  |---- EHLO client.example.com -------->|  (Re-negotiate post-TLS)
-  |  <--- 250 ... ----------------------->|
-  |                                       |
-  |---- MAIL FROM:<sender@example.com> ->|  (Envelope sender)
-  |  <--- 250 OK ----------------------->|
-  |                                       |
-  |---- RCPT TO:<alice@remote.com> ----->|  (Envelope recipient 1)
-  |  <--- 250 OK ----------------------->|
-  |---- RCPT TO:<bob@remote.com> ------->|  (Envelope recipient 2)
-  |  <--- 250 OK ----------------------->|
-  |                                       |
-  |---- DATA ---------------------------->|
-  |  <--- 354 Start mail input ----------|
-  |  [RFC 5322 message headers + body]    |
-  |---- . (CRLF.CRLF) ------------------>|  (End-of-data marker)
-  |  <--- 250 OK: queued as 1a2b3c4d ---->|  (Durability commit)
-  |                                       |
-  |---- QUIT ---------------------------->|
-  |  <--- 221 Bye ----------------------->|
+```mermaid
+flowchart TD
+    subgraph connection ["TCP Connection"]
+        A["Client"] 
+        B["Server"]
+    end
+
+    S0["Server: 220 mail.example.com ESMTP\n(Server Greeting)"]
+    S1["Client: EHLO client.example.com\n(Capability Request)"]
+    S2["Server: 250-mail.example.com\n250-SIZE 52428800\n250-STARTTLS\n250-AUTH PLAIN LOGIN\n250 ENHANCEDSTATUSCODES\n(Server Capabilities)"]
+    S3["Client: STARTTLS\n(Upgrade to TLS)"]
+    S4["Server: 220 Go ahead"]
+    S5["TLS Handshake"]
+    S6["Client: EHLO client.example.com\n(Re-negotiate post-TLS)"]
+    S7["Server: 250 ...\n(Post-TLS Capabilities)"]
+    S8["Client: MAIL FROM:<sender@example.com>\n(Envelope Sender)"]
+    S9["Server: 250 OK"]
+    S10["Client: RCPT TO:<alice@remote.com>\n(Envelope Recipient 1)"]
+    S11["Server: 250 OK"]
+    S12["Client: RCPT TO:<bob@remote.com>\n(Envelope Recipient 2)"]
+    S13["Server: 250 OK"]
+    S14["Client: DATA"]
+    S15["Server: 354 Start mail input"]
+    S16["RFC 5322 Message Headers + Body"]
+    S17["Client: . CRLF.CRLF\n(End-of-Data Marker)"]
+    S18["Server: 250 OK: queued as 1a2b3c4d\n(Durability Commit)"]
+    S19["Client: QUIT"]
+    S20["Server: 221 Bye"]
+
+    A -->|"connects to"| B
+    B --> S0
+    S0 --> S1
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 --> S5
+    S5 --> S6
+    S6 --> S7
+    S7 --> S8
+    S8 --> S9
+    S9 --> S10
+    S10 --> S11
+    S11 --> S12
+    S12 --> S13
+    S13 --> S14
+    S14 --> S15
+    S15 --> S16
+    S16 --> S17
+    S17 --> S18
+    S18 --> S19
+    S19 --> S20
+
+    style S5 fill:#e8f4f8,stroke:#2196F3,stroke-width:2px
+    style S16 fill:#e8f4f8,stroke:#2196F3,stroke-width:2px
+    style S0 fill:#f0fff0,stroke:#4CAF50
+    style S2 fill:#f0fff0,stroke:#4CAF50
+    style S4 fill:#f0fff0,stroke:#4CAF50
+    style S7 fill:#f0fff0,stroke:#4CAF50
+    style S9 fill:#f0fff0,stroke:#4CAF50
+    style S11 fill:#f0fff0,stroke:#4CAF50
+    style S13 fill:#f0fff0,stroke:#4CAF50
+    style S15 fill:#f0fff0,stroke:#4CAF50
+    style S18 fill:#f0fff0,stroke:#4CAF50
+    style S20 fill:#f0fff0,stroke:#4CAF50
+    style S1 fill:#fff8e1,stroke:#FF9800
+    style S3 fill:#fff8e1,stroke:#FF9800
+    style S6 fill:#fff8e1,stroke:#FF9800
+    style S8 fill:#fff8e1,stroke:#FF9800
+    style S10 fill:#fff8e1,stroke:#FF9800
+    style S12 fill:#fff8e1,stroke:#FF9800
+    style S14 fill:#fff8e1,stroke:#FF9800
+    style S17 fill:#fff8e1,stroke:#FF9800
+    style S19 fill:#fff8e1,stroke:#FF9800
 ```
 
 The `EHLO` command (Extended HELO, introduced in RFC 1869) replaces the original `HELO` and triggers the server to advertise its capability extensions — the `250-` prefixed lines before the final `250` terminator. Each capability line represents a protocol extension the client may use: `SIZE` lets the client announce the message size upfront so the server can reject oversized messages before the data transfer begins; `STARTTLS` advertises in-session TLS upgrade capability; `AUTH` lists supported authentication mechanisms for the MSA role. A systems operator who never inspects these capability lines by hand is operating mail infrastructure blind.
@@ -68,36 +107,22 @@ The `354` response to `DATA` and the subsequent `250 OK` after the end-of-data m
 
 The following diagram shows the complete message path from MUA to final mailbox, with each role boundary labeled:
 
-```
-+----------+     587/TCP      +-----------+     25/TCP       +-----------+
-|   MUA    |--- SMTP+AUTH --->|    MSA    |--- SMTP (MTA) -->|   MTA     |
-| Thunderb.|                  | (Postfix  |                  | (Remote   |
-| Outlook  |                  |  submiss.)|                  |  Domain)  |
-+----------+                  +-----------+                  +-----------+
-                                    |                               |
-                              Policy Check:                   MX Lookup:
-                              - Auth required                 DNS -> MX RR
-                              - Rate limiting                 Connect port 25
-                              - Header rewrite                TLS negotiation
-                              - DKIM signing                  Envelope delivery
-                                    |                               |
-                                    v                               v
-                              +-----------+                  +-----------+
-                              |  Queue    |                  |    MDA    |
-                              | (spool/)  |                  | (Dovecot  |
-                              +-----------+                  |  LMTP)    |
-                                                            +-----------+
-                                                                  |
-                                                            +-----------+
-                                                            | Maildir/  |
-                                                            | mbox on   |
-                                                            | disk      |
-                                                            +-----------+
-                                                                  |
-                                                            +-----------+
-                                                            |   IMAP    |
-                                                            |   POP3    |
-                                                            +-----------+
+```mermaid
+flowchart TD
+    MUA["MUA<br/>(Thunderbird, Outlook)"]
+    MSA["MSA<br/>(Postfix submission)"]
+    MTA["MTA<br/>(Remote Domain)"]
+    Queue["Queue<br/>(spool/)"]
+    MDA["MDA<br/>(Dovecot LMTP)"]
+    Storage["Maildir/<br/>mbox on disk"]
+    IMAP["IMAP / POP3"]
+
+    MUA -->|"587/TCP<br/>SMTP+AUTH"| MSA
+    MSA -->|"25/TCP<br/>SMTP MTA"| MTA
+    MSA -->|"Policy Check:<br/>- Auth required<br/>- Rate limiting<br/>- Header rewrite<br/>- DKIM signing"| Queue
+    MTA -->|"MX Lookup:<br/>DNS → MX RR<br/>Connect port 25<br/>TLS negotiation<br/>Envelope delivery"| MDA
+    MDA --> Storage
+    Storage --> IMAP
 ```
 
 In production deployments, the MSA and the outbound MTA are often the same Postfix process, differentiated only by listening port and the `master.cf` service configuration that applies distinct policy sets. The final delivery step from the inbound MTA to the MDA typically uses LMTP (Local Mail Transfer Protocol, RFC 2033) rather than SMTP, because LMTP is designed for the specific case of delivering to a local store that cannot guarantee all recipients simultaneously — it allows per-recipient success and failure responses, which is critical when delivering to a large multi-user Dovecot installation where individual mailboxes may be over-quota.

@@ -38,49 +38,32 @@ A stacking context is created by any of the following conditions: an element wit
 
 A browser rendering engine processes a document through a pipeline that transforms markup into pixels. The stages are roughly: parse HTML into a DOM tree, resolve CSS into a computed style tree, combine them into a render tree (excluding invisible nodes like `display: none`), perform layout, composite into paint layers, and rasterize to the screen. Modern engines — Blink (Chrome, Edge), Gecko (Firefox), and WebKit (Safari) — have all evolved toward threaded and GPU-accelerated variants of this pipeline, but the logical stages remain consistent.
 
-```
-HTML Source
-    │
-    ▼
-┌──────────────┐
-│  HTML Parser │  → DOM Tree (Node, Element, Text)
-└──────────────┘
-    │
-    ▼
-┌──────────────────┐
-│  CSS Parser      │  → CSSOM (StyleSheet, Rule, Declaration)
-└──────────────────┘
-    │
-    ▼
-┌──────────────────────────┐
-│  Style Resolution        │  → Computed Style Tree
-│  (cascade, specificity,  │     (every property resolved to
-│   inheritance, custom    │      a concrete computed value)
-│   properties)            │
-└──────────────────────────┘
-    │
-    ▼
-┌──────────────────────────┐
-│  Layout (Reflow)         │  → Layout Tree with geometry
-│  (box generation, BFC,   │     (x, y, width, height per box)
-│   IFC, flex, grid)       │
-└──────────────────────────┘
-    │
-    ▼
-┌──────────────────────────┐
-│  Compositing / Layering  │  → Layer tree (paint layers,
-│                          │     stacking contexts, GPU tiles)
-└──────────────────────────┘
-    │
-    ▼
-┌──────────────────────────┐
-│  Paint & Rasterize       │  → Pixel buffers (per layer)
-└──────────────────────────┘
-    │
-    ▼
-┌──────────────────────────┐
-│  GPU Composite           │  → Final screen output
-└──────────────────────────┘
+```mermaid
+flowchart TD
+    SRC["HTML Source"]
+
+    SRC --> HTMLP
+
+    HTMLP["HTML Parser"]
+    HTMLP --> |"DOM Tree\n(Node, Element, Text)"| CSSP
+
+    CSSP["CSS Parser"]
+    CSSP --> |"CSSOM\n(StyleSheet, Rule, Declaration)"| STYLE
+
+    STYLE["Style Resolution\n(cascade, specificity,\ninheritance, custom properties)"]
+    STYLE --> |"Computed Style Tree\n(every property resolved to\na concrete computed value)"| LAYOUT
+
+    LAYOUT["Layout · Reflow\n(box generation, BFC,\nIFC, flex, grid)"]
+    LAYOUT --> |"Layout Tree with geometry\n(x, y, width, height per box)"| COMP
+
+    COMP["Compositing / Layering"]
+    COMP --> |"Layer tree\n(paint layers, stacking contexts, GPU tiles)"| PAINT
+
+    PAINT["Paint & Rasterize"]
+    PAINT --> |"Pixel buffers (per layer)"| GPU
+
+    GPU["GPU Composite"]
+    GPU --> |"Final screen output"| SCREEN["🖥 Screen"]
 ```
 
 Layout is where box model arithmetic happens. The engine walks the layout tree and computes, for each box, its position and dimensions. The two primary formatting contexts in CSS 2.1 are the Block Formatting Context (BFC) and the Inline Formatting Context (IFC). A BFC is established by the root element, floats, absolutely positioned elements, inline-blocks, table cells, `overflow` values other than `visible`, and elements with `display: flow-root`. Inside a BFC, block boxes stack vertically, one per line. Each block's left edge touches the left edge of its containing block by default.

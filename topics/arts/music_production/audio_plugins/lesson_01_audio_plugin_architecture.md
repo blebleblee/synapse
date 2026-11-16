@@ -102,7 +102,7 @@ void DriveShaperAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 }
 ```
 
-**Why `ScopedNoDenormals` matters in practice:** when a signal decays toward silence (reverb tail, released envelope), float values can drop into the denormal range (<1.18e-38). x86 CPUs process denormals in microcode, which is 10-100x slower than normal float ops. Without this guard, a plugin that's silent except for a dying reverb tail can spike CPU and cause dropouts — a famous, hard-to-reproduce bug class. One line fixes it permanently.
+**Why `ScopedNoDenormals` matters in practice:** when a signal decays toward silence (reverb tail, released envelope), float values can drop into the denormal range (< 1.18e-38). x86 CPUs process denormals in microcode, which is 10-100x slower than normal float ops. Without this guard, a plugin that's silent except for a dying reverb tail can spike CPU and cause dropouts — a famous, hard-to-reproduce bug class. One line fixes it permanently.
 
 **Why `.load()` on an atomic instead of a plain member:** the GUI thread (user dragging a knob) and the audio thread (processing samples) run concurrently. If the GUI thread writes a `float driveDb` while the audio thread reads it mid-write, you get a torn read — undefined behavior, audible garbage. `std::atomic<float>` guarantees the read/write is indivisible. JUCE's `AudioParameterFloat` wraps this for you; the raw pattern above is what's happening underneath.
 

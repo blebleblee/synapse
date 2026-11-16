@@ -1381,17 +1381,19 @@ A production inference service must degrade gracefully under failure conditions 
 The state machine has three states:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> CLOSED: initial state
-
-    CLOSED --> OPEN: failure_count >= threshold\n(consecutive failures)
-    CLOSED --> CLOSED: request succeeds\n(reset failure_count = 0)
-
-    OPEN --> HALF_OPEN: recovery_timeout elapsed\n(probe one request)
-    OPEN --> OPEN: request arrives\n(fast-fail: return fallback)
-
-    HALF_OPEN --> CLOSED: probe request succeeds\n(service recovered)
-    HALF_OPEN --> OPEN: probe request fails\n(reset timer)
+flowchart TD
+    Start(["[*]"])
+    CLOSED["CLOSED"]
+    OPEN["OPEN"]
+    HALF_OPEN["HALF_OPEN"]
+    
+    Start -->|"initial state"| CLOSED
+    CLOSED -->|"failure_count >= threshold<br/>consecutive failures"| OPEN
+    CLOSED -->|"request succeeds<br/>reset failure_count = 0"| CLOSED
+    OPEN -->|"recovery_timeout elapsed<br/>probe one request"| HALF_OPEN
+    OPEN -->|"request arrives<br/>fast-fail: return fallback"| OPEN
+    HALF_OPEN -->|"probe request succeeds<br/>service recovered"| CLOSED
+    HALF_OPEN -->|"probe request fails<br/>reset timer"| OPEN
 ```
 
 **CLOSED** — normal operation. Requests pass through. Failures increment a counter; success resets it to zero.

@@ -30,53 +30,42 @@ Signal frame construction represents one of the kernel's most intricate user-spa
 
 The signal return path via `sigreturn()` reverses this process through a carefully crafted system call stub. When the signal handler executes a `return` statement, control flows to the signal trampoline code that the kernel pushed onto the stack. This trampoline consists of just two instructions: loading `RAX` with the system call number for `rt_sigreturn()` (139 on x86-64) and invoking `syscall`. The kernel's `sys_rt_sigreturn()` handler reads the `ucontext_t` structure from the user stack, validates that the signal frame is intact (checking magic numbers and stack alignment), restores the saved signal mask via `set_current_blocked()`, and copies the saved register state back into the kernel's `pt_regs` structure. It then returns to user space using the standard system call exit path, but because the kernel overwrote the saved `RIP` and `RSP`, execution resumes at the exact instruction that was interrupted when the signal arrived, with all registers restored to their pre-signal state. This return-through-kernel design prevents user space from directly manipulating the signal stack frame, which would create severe security vulnerabilities allowing privilege escalation through register state forgery.
 
-```
-Signal Delivery State Machine
-==============================
+```mermaid
+flowchart TD
+    USER["Process executing in user space"]
+    KEVENT["[1] Kernel event\nsyscall return / timer IRQ / page fault"]
+    DOSIG["[2] do_signal() checks pending signal queues"]
+    RESUME["Resume user space execution"]
+    FINDPRI["[3] Find highest-priority unblocked signal S"]
+    DISPOSITION["[4] Examine disposition table[S]"]
+    IGNORED["SIG_IGN: Dequeue signal"]
+    DEFAULT["SIG_DFL: Execute default action\nterm / core / stop / ign"]
+    HANDLER["[5] User handler registered"]
+    FRAME["[6] Allocate signal frame on user stack\nor alternate signal stack"]
+    SAVECTX["[7] Save full register context to ucontext_t"]
+    SETRIP["[8] Set RIP = handler address\nRSP = signal frame"]
+    EXECHANDLER["[9] Return to user mode\nhandler executes"]
+    TRAMPOLINE["[10] Handler returns\ntrampoline executes rt_sigreturn()"]
+    RESTORE["[11] Kernel restores context from ucontext_t"]
+    RETURNUSER["[12] Return to user space at interrupted RIP"]
 
-Process executing in user space
-         |
-         v
-[1] Kernel event: syscall return, timer IRQ, page fault
-         |
-         v
-[2] do_signal() checks pending signal queues
-         |
-         +---> No pending signals ---> Resume user space execution
-         |
-         v
-[3] Find highest-priority unblocked signal S
-         |
-         v
-[4] Examine disposition table[S]
-         |
-         +---> SIG_IGN ---> Dequeue signal, goto [2]
-         |
-         +---> SIG_DFL ---> Execute default action (term, core, stop, ign)
-         |
-         v
-[5] User handler registered
-         |
-         v
-[6] Allocate signal frame on user stack (or altstack)
-         |
-         v
-[7] Save full register context to ucontext_t
-         |
-         v
-[8] Set RIP = handler address, RSP = signal frame
-         |
-         v
-[9] Return to user mode -> handler executes
-         |
-         v
-[10] Handler returns -> trampoline executes rt_sigreturn()
-         |
-         v
-[11] Kernel restores context from ucontext_t
-         |
-         v
-[12] Return to user space at interrupted RIP
+    USER --> KEVENT
+    KEVENT --> DOSIG
+    DOSIG -->|"No pending signals"| RESUME
+    DOSIG -->|"Pending signal found"| FINDPRI
+    FINDPRI --> DISPOSITION
+    DISPOSITION -->|"SIG_IGN"| IGNORED
+    IGNORED -->|"goto [2]"| DOSIG
+    DISPOSITION -->|"SIG_DFL"| DEFAULT
+    DISPOSITION -->|"User handler"| HANDLER
+    HANDLER --> FRAME
+    FRAME --> SAVECTX
+    SAVECTX --> SETRIP
+    SETRIP --> EXECHANDLER
+    EXECHANDLER --> TRAMPOLINE
+    TRAMPOLINE --> RESTORE
+    RESTORE --> RETURNUSER
+    RETURNUSER -->|"Resumed"| USER
 ```
 
 The signal blocking mask operates through bitwise operations on a 64-bit unsigned long on most 64-bit architectures, with higher signal numbers stored in adjacent words for systems supporting more than 64 signals. The `sigprocmask()` system call accepts three operations: `SIG_BLOCK` performs bitwise OR with the current mask, adding signals to the blocked set; `SIG_UNBLOCK` performs bitwise AND with the complement, removing signals from the blocked set; and `SIG_SETMASK` replaces the mask entirely. The kernel represents the mask as a `sigset_t` structure, which on Linux is a struct containing an array of unsigned longs, allowing efficient atomic operations on signal groups. Special signals `SIGKILL` (9) and `SIGSTOP` (19) are hardcoded in the kernel to ignore any blocking attempts: even if user space sets the corresponding bits in the blocking mask, the kernel's `sigmask()` and `sigismember()` macros forcibly clear these bits before checking deliverability. This invariant ensures that the system administrator can always terminate runaway processes and that job control always functions, but it means these two signals cannot be caught or blocked under any circumstances.

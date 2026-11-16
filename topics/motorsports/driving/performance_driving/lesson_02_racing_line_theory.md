@@ -34,20 +34,37 @@ A **late apex** delays the tangent point with the inside curb to the second half
 
 The following diagram captures the relationship:
 
-```
-Track Edge (Outer)
-╔══════════════════════════════════════════════════════╗
-║                                                      ║
-║  Turn-in ──────────────────────────────────────────► ║ Exit (Outer)
-║      \         Early Apex (BAD)                      ║
-║       \        ●  ← apex here, car tightens on exit  ║
-║        \      /                      Straight         ║
-║         \    /                                        ║
-║          \  /  Late Apex (CORRECT)                    ║
-║           \●  ← apex here, car opens on exit  ──────►║
-║            ╚═══════════════╝                         ║
-║         Inside Edge (Curbing)                        ║
-╚══════════════════════════════════════════════════════╝
+```mermaid
+flowchart LR
+    TurnIn["Turn-in Point"]
+    EarlyApex["⚠️ Early Apex (BAD)\nCar tightens on exit"]
+    LateApex["✅ Late Apex (CORRECT)\nCar opens on exit"]
+    ExitOuter["Exit — Outer Edge / Straight"]
+
+    subgraph track ["Racing Line — Corner Geometry"]
+        direction LR
+
+        subgraph outer ["Track Edge (Outer)"]
+            TurnIn
+            ExitOuter
+        end
+
+        subgraph inner ["Inside Edge (Curbing)"]
+            EarlyApex
+            LateApex
+        end
+
+        TurnIn -->|"early turn-in path"| EarlyApex
+        EarlyApex -->|"car tightens — runs wide"| ExitOuter
+
+        TurnIn -->|"late turn-in path"| LateApex
+        LateApex -->|"car unwinds — tracks out cleanly"| ExitOuter
+    end
+
+    style EarlyApex fill:#c0392b,color:#fff,stroke:#922b21
+    style LateApex  fill:#27ae60,color:#fff,stroke:#1e8449
+    style TurnIn    fill:#2980b9,color:#fff,stroke:#1a5276
+    style ExitOuter fill:#8e44ad,color:#fff,stroke:#6c3483
 ```
 
 The minimum curvature path for a single constant-radius corner—solved formally as a constrained optimization—places the apex at approximately 60–70% of the corner's arc length from turn-in for a standard 90-degree bend. The exact percentage shifts with corner angle: a hairpin (180 degrees) demands a later apex, often at the 70–75% mark, while a fast sweeper (45 degrees or less) can be treated more geometrically, with the apex near 55–60%.

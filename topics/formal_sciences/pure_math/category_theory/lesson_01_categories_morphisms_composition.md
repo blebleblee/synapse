@@ -56,13 +56,20 @@ There is at most one morphism between any two objects. Composition is defined by
 
 The following diagram summarizes the composition law for a generic triple of objects, which is the operative structure every practitioner must internalize:
 
-```
-         f               g               h
-    A --------> B --------> C --------> D
-
-    g ∘ f : A ──────────> C
-    h ∘ g : B ──────────────────> D
-    h ∘ (g ∘ f) = (h ∘ g) ∘ f : A ──────────────────────> D
+```mermaid
+flowchart TD
+    A["A"]
+    B["B"]
+    C["C"]
+    D["D"]
+    
+    A -->|f| B
+    B -->|g| C
+    C -->|h| D
+    
+    A -->|"g ∘ f"| C
+    B -->|"h ∘ g"| D
+    A -->|"h ∘ (g ∘ f) = (h ∘ g) ∘ f"| D
 ```
 
 The associativity axiom states that the two paths from $A$ to $D$ — composing $f$ with $g$ first, or composing $g$ with $h$ first — produce identical morphisms. This is not a commutativity condition (which would require $g \circ f = f \circ g$, a much stronger and generally false statement); it is a bracketing-independence condition.

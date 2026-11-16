@@ -732,22 +732,28 @@ rm -f "${TEST_FILE}"
 Fault injection tests the system's ability to detect, isolate, and recover from failure modes. Linux provides several controlled injection mechanisms: `tc netem`, `iptables`, `cgroups` resource limits, `libfaketime`, and the kernel's own `CONFIG_FAULT_INJECTION` framework.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Normal : system boot
-    Normal --> DegradedNetwork : tc netem / iptables
-    Normal --> MemoryPressure : cgroup memory.max
-    Normal --> CPUStarvation : cgroup cpu.max
-    Normal --> IOError : dm-flakey / scsi_debug
-    DegradedNetwork --> Normal : remove tc / iptables rule
-    MemoryPressure --> OOMKill : OOM killer fires
-    MemoryPressure --> Normal : process exits / reclaim succeeds
-    OOMKill --> Normal : system recovers
-    CPUStarvation --> Normal : remove cgroup limit
-    IOError --> FilesystemError : EIO propagated to VFS
-    FilesystemError --> ReadOnly : ext4/xfs remounts r/o
-    ReadOnly --> [*] : requires fsck + remount
-    Normal --> KernelPanic : sysrq-trigger 'c'
-    KernelPanic --> [*] : kdump → reboot
+flowchart TD
+    Start([System Boot]) --> Normal["Normal"]
+    Normal -->|"tc netem / iptables"| DegradedNetwork["Degraded Network"]
+    Normal -->|"cgroup memory.max"| MemoryPressure["Memory Pressure"]
+    Normal -->|"cgroup cpu.max"| CPUStarvation["CPU Starvation"]
+    Normal -->|"dm-flakey / scsi_debug"| IOError["I/O Error"]
+    Normal -->|"sysrq-trigger 'c'"| KernelPanic["Kernel Panic"]
+    
+    DegradedNetwork -->|"remove tc / iptables rule"| Normal
+    
+    MemoryPressure -->|"OOM killer fires"| OOMKill["OOM Kill"]
+    MemoryPressure -->|"process exits / reclaim succeeds"| Normal
+    
+    OOMKill -->|"system recovers"| Normal
+    
+    CPUStarvation -->|"remove cgroup limit"| Normal
+    
+    IOError -->|"EIO propagated to VFS"| FilesystemError["Filesystem Error"]
+    FilesystemError -->|"ext4/xfs remounts r/o"| ReadOnly["Read-Only"]
+    ReadOnly -->|"requires fsck + remount"| End1([Terminated])
+    
+    KernelPanic -->|"kdump → reboot"| End2([Terminated])
 ```
 
 ### 3.1 Controlled Network Fault Injection

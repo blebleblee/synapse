@@ -78,29 +78,20 @@ The arithmetic formula $\mathsf{WO}_{<\varepsilon_0}(x)$ then says: "there is no
 
 The following diagram illustrates the layered architecture of Gentzen's consistency proof, from raw $\mathsf{PA}$-proofs through ordinal assignment to cut elimination and well-foundedness:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│          PA-Proof  π  of  sequent  Γ                    │
-│               │                                         │
-│               ▼                                         │
-│    Ordinal assignment:  │π│ < ε₀                        │
-│    (Cantor normal form encoding of proof structure)     │
-│               │                                         │
-│               ▼                                         │
-│    Cut-elimination step:  π  ──► π'                     │
-│    Invariant:  │π'│  <  │π│   (strict ordinal decrease) │
-│               │                                         │
-│               ▼                                         │
-│    Termination by well-foundedness of ε₀                │
-│    (no infinite descending sequence below ε₀)           │
-│               │                                         │
-│               ▼                                         │
-│    Cut-free proof  π_cf  of  Γ                          │
-│    (subformula property holds; Γ ≠ ⊥  if  Γ = ∅)        │
-│               │                                         │
-│               ▼                                         │
-│    Consistency:  PA ⊬ (⊥)                               │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["PA-Proof π of sequent Γ"]
+    B["Ordinal assignment: |π| &lt; ε₀<br/>(Cantor normal form encoding<br/>of proof structure)"]
+    C["Cut-elimination step: π ──► π'<br/>Invariant: |π'| &lt; |π|<br/>(strict ordinal decrease)"]
+    D["Termination by well-foundedness of ε₀<br/>(no infinite descending<br/>sequence below ε₀)"]
+    E["Cut-free proof π_cf of Γ<br/>(subformula property holds;<br/>Γ ≠ ⊥ if Γ = ∅)"]
+    F["Consistency: PA ⊬ ⊥"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 The critical structural invariant throughout this pipeline is that the ordinal assignment is *primitive recursively computable* from the proof tree, so the entire argument can be formalised in $\mathsf{PRA}$ augmented with $\mathsf{TI}(\varepsilon_0)$. This is not circular: the meta-theory is $\mathsf{PRA} + \mathsf{TI}(\varepsilon_0)$, which is strictly weaker than $\mathsf{PA}$ in many respects, yet strong enough to verify the termination of the cut-elimination rewriting system.

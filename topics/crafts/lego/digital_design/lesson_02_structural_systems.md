@@ -32,30 +32,42 @@ The **tertiary skin** is the cosmetic shell: panels, tiles, fairings, and claddi
 
 The internal mechanics of a Technic joint can be visualized clearly when you map the degrees of freedom at each connection type:
 
-```
-CONNECTION TYPES AND DEGREES OF FREEDOM
-─────────────────────────────────────────────────────────────────────
-  Axle through liftarm hole    │ 1 rotational DOF (spin)
-                               │ 0 translational DOF (fully constrained
-                               │   in X/Y/Z by liftarm bore geometry)
-─────────────────────────────────────────────────────────────────────
-  Pin (friction) through hole  │ 1 rotational DOF (loosen with age)
-                               │ Transmits shear; resists pull-out via
-                               │   collar geometry
-─────────────────────────────────────────────────────────────────────
-  Pin (smooth/blue) thru hole  │ 1 rotational DOF (by design, free-spin)
-                               │ Intentional compliance for pivots,
-                               │   gear mesh, and linkage joints
-─────────────────────────────────────────────────────────────────────
-  Perpendicular axle connector │ Transmits torque across 90° bend
-                               │ Subject to bending moment at junction
-                               │ Needs secondary bracing for heavy loads
-─────────────────────────────────────────────────────────────────────
-  Stud-to-tube (System)        │ Friction only; no mechanical lock
-                               │ Resists pull-out ~8–10 N per stud
-                               │ Negligible shear capacity; DO NOT
-                               │   use in structural load paths
-─────────────────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    subgraph connections ["CONNECTION TYPES AND DEGREES OF FREEDOM"]
+
+        subgraph axle_group ["Axle Through Liftarm Hole"]
+            A1["1 rotational DOF (spin)"]
+            A2["0 translational DOF\n(fully constrained in X/Y/Z\nby liftarm bore geometry)"]
+        end
+
+        subgraph friction_pin_group ["Pin (Friction) Through Hole"]
+            B1["1 rotational DOF\n(loosens with age)"]
+            B2["Transmits shear;\nresists pull-out via\ncollar geometry"]
+        end
+
+        subgraph smooth_pin_group ["Pin (Smooth / Blue) Through Hole"]
+            C1["1 rotational DOF\n(by design — free-spin)"]
+            C2["Intentional compliance for\npivots, gear mesh,\nand linkage joints"]
+        end
+
+        subgraph perp_group ["Perpendicular Axle Connector"]
+            D1["Transmits torque\nacross 90° bend"]
+            D2["Subject to bending moment\nat junction"]
+            D3["⚠ Needs secondary bracing\nfor heavy loads"]
+            D1 --> D2 --> D3
+        end
+
+        subgraph stud_group ["Stud-to-Tube (System)"]
+            E1["Friction only —\nno mechanical lock"]
+            E2["Resists pull-out\n~8–10 N per stud"]
+            E3["⛔ Negligible shear capacity\nDO NOT use in\nstructural load paths"]
+            E1 --> E2 --> E3
+        end
+
+    end
+
+    axle_group ~~~ friction_pin_group ~~~ smooth_pin_group ~~~ perp_group ~~~ stud_group
 ```
 
 ### Frame Topology Patterns
@@ -74,39 +86,36 @@ In BrickLink Studio, working parametrically with Pythagorean triangle geometry i
 
 The following diagram illustrates how triangulation converts a racking-vulnerable rectangular frame into a stiff truss, and shows load path directionality:
 
-```
-RECTANGULAR FRAME (UNSTABLE — shears under lateral load)
-─────────────────────────────────────────────────────────────
-  A ●───────────────────────● B
-    │                       │
-    │   ← shear force        │
-    │                       │
-  D ●───────────────────────● C
-
-  Lateral force at A shears A→B top rail while D→C
-  bottom rail stays fixed. Frame collapses to parallelogram.
-  Pins at A, B, C, D rotate freely → ZERO lateral stiffness.
-─────────────────────────────────────────────────────────────
-
-TRIANGULATED FRAME (STABLE — diagonal carries axial load)
-─────────────────────────────────────────────────────────────
-  A ●───────────────────────● B
-    │╲                      │
-    │  ╲  diagonal brace    │
-    │    ╲  (axial tension) │
-    │      ╲                │
-  D ●───────●───────────────● C
-            diagonal endpoint (virtual, inside grid)
-
-  Lateral force at A is now resolved: horizontal component
-  at top rail, vertical component at side post, and the
-  diagonal carries the resultant as pure axial tension.
-  Triangle cannot deform without changing member length.
-─────────────────────────────────────────────────────────────
-
-LOAD PATH LEGEND:
-  ══► Axial compression    ──► Axial tension    ~~► Shear
-─────────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    subgraph unstable ["UNSTABLE FRAME — Shears Under Lateral Load"]
+        A1["A"] ---|"top rail"| B1["B"]
+        A1 ---|"side post"| D1["D"]
+        B1 ---|"side post"| C1["C"]
+        D1 ---|"bottom rail"| C1
+        
+        A1 -.->|"← shear force"| A1
+        
+        note1["Lateral force at A shears A→B top rail<br/>while D→C bottom rail stays fixed.<br/>Frame collapses to parallelogram.<br/>Pins at A,B,C,D rotate freely<br/>→ ZERO lateral stiffness"]
+    end
+    
+    subgraph stable ["TRIANGULATED FRAME — Diagonal Carries Axial Load"]
+        A2["A"] ---|"top rail"| B2["B"]
+        A2 ---|"side post"| D2["D"]
+        B2 ---|"side post"| C2["C"]
+        D2 ---|"bottom rail"| C2
+        A2 -.->|"diagonal brace<br/>(axial tension)"| C2
+        
+        note2["Lateral force at A resolved:<br/>horizontal component at top rail,<br/>vertical component at side post,<br/>diagonal carries resultant as pure axial tension.<br/>Triangle cannot deform without changing member length"]
+    end
+    
+    subgraph legend ["LOAD PATH LEGEND"]
+        L1["══►"] -.->|"Axial compression"| L1
+        L2["──►"] -.->|"Axial tension"| L2
+        L3["~~►"] -.->|"Shear"| L3
+    end
+    
+    unstable --> stable
 ```
 
 ### Center of Gravity Computation for Lego Assemblies

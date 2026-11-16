@@ -50,43 +50,20 @@ Route groups—directories whose names are wrapped in parentheses, like `(market
 
 The segment rendering pipeline, from inbound request to streamed HTTP response, proceeds as follows:
 
-```
-Incoming Request: GET /blog/how-rscs-work
-        │
-        ▼
-┌───────────────────────────┐
-│   Next.js Request Handler │
-│   (Node.js / Edge Runtime)│
-└────────────┬──────────────┘
-             │  match against compiled routing tree
-             ▼
-┌──────────────────────────────────────────────┐
-│  Matched Segment Tree                        │
-│  app/layout.tsx           ← Root Layout      │
-│  └── app/(marketing)/blog/layout.tsx         │
-│       └── app/(marketing)/blog/[slug]/page.tsx│
-│            params = { slug: "how-rscs-work" } │
-└────────────────────┬─────────────────────────┘
-                     │  React concurrent render (server)
-                     ▼
-         ┌──────────────────────┐
-         │  RSC Render Pass     │
-         │  - Root Layout       │  (suspends if needed)
-         │  - Blog Layout       │  (suspends if needed)
-         │  - BlogPost Page     │  ← awaits fetchPost(slug)
-         └──────────┬───────────┘
-                    │  React Flight protocol (RSC payload)
-                    ▼
-         ┌──────────────────────┐
-         │  HTML Streaming      │
-         │  (Transfer-Encoding: │
-         │   chunked)           │
-         └──────────────────────┘
-                    │
-                    ▼
-              Browser receives
-              incremental HTML +
-              RSC payload chunks
+```mermaid
+flowchart TD
+    A["Incoming Request: GET /blog/how-rscs-work"]
+    B["Next.js Request Handler<br/>(Node.js / Edge Runtime)"]
+    C["Matched Segment Tree<br/>app/layout.tsx ← Root Layout<br/>└── app/(marketing)/blog/layout.tsx<br/>    └── app/(marketing)/blog/[slug]/page.tsx<br/>       params = { slug: 'how-rscs-work' }"]
+    D["RSC Render Pass<br/>- Root Layout (suspends if needed)<br/>- Blog Layout (suspends if needed)<br/>- BlogPost Page ← awaits fetchPost(slug)"]
+    E["HTML Streaming<br/>(Transfer-Encoding: chunked)"]
+    F["Browser receives<br/>incremental HTML +<br/>RSC payload chunks"]
+    
+    A --> B
+    B -->|"match against compiled routing tree"| C
+    C -->|"React concurrent render (server)"| D
+    D -->|"React Flight protocol (RSC payload)"| E
+    E --> F
 ```
 
 The RSC payload is a compact, React-specific serialization format (sometimes called the React Flight wire format) that describes the component tree in terms of component references, props, and rendered output. It is not HTML; it is transmitted alongside the HTML stream and used by the React client runtime to construct the virtual DOM, enable client-side navigation without a full page reload, and correctly reconcile any Client Components embedded in the tree.

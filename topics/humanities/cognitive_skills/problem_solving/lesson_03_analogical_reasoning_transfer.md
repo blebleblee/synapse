@@ -50,30 +50,48 @@ The mapping phase establishes systematic correspondences between source and targ
 
 The mapping proceeds incrementally, starting with anchor mappings based on highly salient or explicitly marked correspondences, then propagating these anchings through the relational network. If source entity A₁ maps to target entity B₁, and source entity A₂ relates to A₁ through relation R, then the algorithm searches for a target entity B₂ that relates to B₁ through an analogous relation R'. This spreading activation continues until either all elements find correspondences or constraints cannot be satisfied.
 
-```
-Mapping Construction Process:
-
-Source Relational Graph        Target Relational Graph
-    S₁ ─R₁→ S₂                     T₁ ─?→ T₂
-    ↓ R₂    ↓ R₃                   ↓ ?    ↓ ?
-    S₃ ─R₄→ S₄                     T₃ ─?→ T₄
-
-Step 1: Establish Anchor
-    S₁ ↔ T₁  (highest structural similarity)
-
-Step 2: Propagate via Relations
-    If S₁ ↔ T₁ and S₁─R₁→S₂
-    Then search for T₂ where T₁─R₁'→T₂
-    Establish S₂ ↔ T₂
-
-Step 3: Verify Consistency
-    Check all mapped relations preserve structure
-    If S₁─R₂→S₃ and S₁↔T₁, S₃↔T₃
-    Then T₁─R₂'→T₃ must exist
-
-Step 4: Resolve Conflicts
-    If multiple candidates for S₂ exist,
-    Select mapping that maximizes systematicity
+```mermaid
+flowchart TD
+    A["Source Relational Graph"]
+    B["Target Relational Graph"]
+    
+    subgraph source["Source Structure"]
+        S1["S₁"]
+        S2["S₂"]
+        S3["S₃"]
+        S4["S₄"]
+        S1 -->|R₁| S2
+        S1 -->|R₂| S3
+        S2 -->|R₃| S4
+        S3 -->|R₄| S4
+    end
+    
+    subgraph target["Target Structure"]
+        T1["T₁"]
+        T2["T₂"]
+        T3["T₃"]
+        T4["T₄"]
+        T1 -->|R₁'| T2
+        T1 -->|R₂'| T3
+        T2 -->|R₃'| T4
+        T3 -->|R₄'| T4
+    end
+    
+    step1["Step 1: Establish Anchor<br/>S₁ ↔ T₁<br/>highest structural similarity"]
+    step2["Step 2: Propagate via Relations<br/>S₁─R₁→S₂ and S₁↔T₁<br/>Then S₂ ↔ T₂ where T₁─R₁'→T₂"]
+    step3["Step 3: Verify Consistency<br/>Check all mapped relations<br/>preserve structure"]
+    step4["Step 4: Resolve Conflicts<br/>Select mapping maximizing<br/>systematicity"]
+    
+    source --> step1
+    target --> step1
+    step1 --> step2
+    step2 --> step3
+    step3 --> step4
+    
+    S1 -.->|maps to| T1
+    S2 -.->|maps to| T2
+    S3 -.->|maps to| T3
+    S4 -.->|maps to| T4
 ```
 
 The systematicity principle serves as the decisive selection criterion when multiple potential mappings exist. A systematic mapping preserves entire causal chains and embedded relational structures, while a fragmentary mapping preserves only isolated correspondences. Given a choice between mapping that aligns three isolated feature pairs versus mapping that aligns a connected causal chain of three elements, the algorithm selects the latter because it preserves explanatory coherence.

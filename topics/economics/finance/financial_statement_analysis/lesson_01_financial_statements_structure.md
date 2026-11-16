@@ -108,47 +108,97 @@ Interest expense reflects the cost of debt financing. Its placement below operat
 
 The cash flow statement reconciles accrual-based net income to actual cash generation through a systematic series of adjustments. The operating section begins with net income and adds back non-cash expenses—depreciation, amortization, stock-based compensation, deferred taxes—while subtracting non-cash income. It then adjusts for changes in working capital components. An increase in accounts receivable reduces cash flow because revenue was recognized but cash not yet collected. An increase in inventory reduces cash flow because cash was expended to build inventory that has not yet been sold. An increase in accounts payable increases cash flow because expenses were recognized but cash not yet disbursed.
 
-```
-CASH FLOW STATEMENT STRUCTURE (Indirect Method)
-
-OPERATING ACTIVITIES
-Net Income
-  Adjustments to reconcile NI to Operating Cash Flow:
-    (+) Depreciation & Amortization
-    (+) Stock-Based Compensation Expense
-    (+) Deferred Tax Expense
-    (+) Losses on Asset Disposals / (-) Gains on Asset Disposals
-  Changes in Working Capital:
-    (-) Increase in Accounts Receivable / (+) Decrease in A/R
-    (-) Increase in Inventory / (+) Decrease in Inventory
-    (+) Increase in Accounts Payable / (-) Decrease in A/P
-    (+) Increase in Accrued Expenses / (-) Decrease in Accrued Exp
-    (+) Increase in Deferred Revenue / (-) Decrease in Def Revenue
-─────────────────────────────────────────────────────────────────
-= Cash Flow from Operating Activities (CFO)
-
-INVESTING ACTIVITIES
-  (-) Capital Expenditures (CapEx) on PP&E
-  (-) Acquisitions of Businesses (net of cash acquired)
-  (-) Purchases of Marketable Securities / Investments
-  (+) Proceeds from Sale of PP&E
-  (+) Proceeds from Sale of Investments
-─────────────────────────────────────────────────────────────────
-= Cash Flow from Investing Activities (CFI)
-
-FINANCING ACTIVITIES
-  (+) Proceeds from Issuance of Debt
-  (-) Repayment of Debt Principal
-  (+) Proceeds from Issuance of Equity (Stock)
-  (-) Repurchases of Stock (Buybacks)
-  (-) Dividends Paid
-─────────────────────────────────────────────────────────────────
-= Cash Flow from Financing Activities (CFF)
-
-NET CHANGE IN CASH = CFO + CFI + CFF
-Cash at Beginning of Period
-─────────────────────────────────────────────────────────────────
-Cash at End of Period (must match Balance Sheet)
+```mermaid
+flowchart TD
+    Start["<b>CASH FLOW STATEMENT</b><br/>(Indirect Method)"]
+    
+    subgraph Operating["<b>OPERATING ACTIVITIES</b>"]
+        NI["Net Income"]
+        
+        subgraph Adjustments["Adjustments to reconcile NI to Operating CF"]
+            DA["(+) Depreciation & Amortization"]
+            SBC["(+) Stock-Based Compensation"]
+            DT["(+) Deferred Tax Expense"]
+            LOD["(+/-) Losses/Gains on Asset Disposals"]
+        end
+        
+        subgraph WorkingCap["Changes in Working Capital"]
+            AR["(-/+) Change in Accounts Receivable"]
+            INV["(-/+) Change in Inventory"]
+            AP["(+/-) Change in Accounts Payable"]
+            AE["(+/-) Change in Accrued Expenses"]
+            DR["(+/-) Change in Deferred Revenue"]
+        end
+        
+        CFO["<b>= Cash Flow from Operating Activities</b><br/><b>(CFO)</b>"]
+    end
+    
+    subgraph Investing["<b>INVESTING ACTIVITIES</b>"]
+        CAPEX["(-) Capital Expenditures on PP&E"]
+        ACQ["(-) Acquisitions of Businesses"]
+        PURCINV["(-) Purchases of Securities/Investments"]
+        SALPPE["(+) Proceeds from Sale of PP&E"]
+        SALINV["(+) Proceeds from Sale of Investments"]
+        
+        CFI["<b>= Cash Flow from Investing Activities</b><br/><b>(CFI)</b>"]
+    end
+    
+    subgraph Financing["<b>FINANCING ACTIVITIES</b>"]
+        DEBT["(+) Proceeds from Issuance of Debt"]
+        DEBTPAY["(-) Repayment of Debt Principal"]
+        EQUITY["(+) Proceeds from Issuance of Equity"]
+        BUYBACK["(-) Repurchases of Stock"]
+        DIV["(-) Dividends Paid"]
+        
+        CFF["<b>= Cash Flow from Financing Activities</b><br/><b>(CFF)</b>"]
+    end
+    
+    subgraph Summary["<b>CASH RECONCILIATION</b>"]
+        SUM["<b>Net Change in Cash</b><br/>CFO + CFI + CFF"]
+        BEGIN["Cash at Beginning of Period"]
+        END["<b>Cash at End of Period</b><br/>(must match Balance Sheet)"]
+    end
+    
+    Start --> NI
+    NI --> Adjustments
+    Adjustments --> DA
+    Adjustments --> SBC
+    Adjustments --> DT
+    Adjustments --> LOD
+    DA --> WorkingCap
+    SBC --> WorkingCap
+    DT --> WorkingCap
+    LOD --> WorkingCap
+    WorkingCap --> AR
+    WorkingCap --> INV
+    WorkingCap --> AP
+    WorkingCap --> AE
+    WorkingCap --> DR
+    AR --> CFO
+    INV --> CFO
+    AP --> CFO
+    AE --> CFO
+    DR --> CFO
+    
+    CFO --> CAPEX
+    CAPEX --> Investing
+    CAPEX --> ACQ
+    ACQ --> PURCINV
+    PURCINV --> SALPPE
+    SALPPE --> SALINV
+    SALINV --> CFI
+    
+    CFI --> DEBT
+    DEBT --> Financing
+    DEBT --> DEBTPAY
+    DEBTPAY --> EQUITY
+    EQUITY --> BUYBACK
+    BUYBACK --> DIV
+    DIV --> CFF
+    
+    CFF --> SUM
+    SUM --> BEGIN
+    BEGIN --> END
 ```
 
 The investing section captures capital allocation decisions. Capital expenditures on property, plant, and equipment appear as negative cash flows—investments in future operating capacity. Acquisitions of other businesses similarly consume cash. Proceeds from asset sales generate positive cash flows. The algebraic sum of investing activities typically runs negative for growing firms, reflecting net capital deployment. The financing section captures interactions with capital providers. Debt issuance generates cash inflows; debt repayment generates outflows. Equity issuance generates inflows; share repurchases and dividend payments generate outflows. The net change in cash across all three sections must precisely match the difference between ending and beginning cash on the balance sheet—a mechanical linkage that serves as an internal consistency check.

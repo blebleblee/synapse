@@ -428,33 +428,34 @@ int main(void) {
 
 The following diagram shows how the ECS, Behavior Tree, and Difficulty systems interact across a single game tick.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         GAME TICK  (16ms)                       │
-│                                                                 │
-│  ┌──────────────┐    component query     ┌───────────────────┐  │
-│  │  Input       │ ──────────────────────▶│  Movement System  │  │
-│  │  Subsystem   │                        │  (Position+Input) │  │
-│  └──────────────┘                        └─────────┬─────────┘  │
-│                                                    │ write      │
-│  ┌──────────────┐    component query     ┌─────────▼─────────┐  │
-│  │  DDA Engine  │ ──── difficulty ──────▶│  AI System        │  │
-│  │  (Observer)  │      parameters        │  (BT tick per     │  │
-│  └──────┬───────┘                        │   AIBrain entity) │  │
-│         │                                └─────────┬─────────┘  │
-│         │ observe                                  │ write      │
-│         │                                ┌─────────▼─────────┐  │
-│  ┌──────▼───────┐                        │  Physics System   │  │
-│  │  Metrics     │◀── performance ────────│  (Pos+Vel+        │  │
-│  │  Accumulator │    signals             │   Collider)       │  │
-│  └──────┬───────┘                        └─────────┬─────────┘  │
-│         │                                          │ write      │
-│         │ update                        ┌──────────▼──────────┐ │
-│  ┌──────▼───────┐                       │  Reward System      │ │
-│  │  Difficulty  │                       │  (XP, drops, skill  │ │
-│  │  Parameters  │                       │   unlock events)    │ │
-│  └──────────────┘                       └─────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Input Subsystem"]
+    B["Movement System<br/>(Position + Input)"]
+    C["DDA Engine<br/>(Observer)"]
+    D["AI System<br/>(BT tick per AIBrain entity)"]
+    E["Physics System<br/>(Pos + Vel + Collider)"]
+    F["Reward System<br/>(XP, drops, skill unlock events)"]
+    G["Metrics Accumulator"]
+    H["Difficulty Parameters"]
+    
+    A -->|"component query"| B
+    B -->|write| D
+    C -->|"difficulty parameters"| D
+    D -->|write| E
+    E -->|write| F
+    E -->|"performance signals"| G
+    C -->|observe| G
+    G -->|update| H
+    
+    style A fill:#f9f9f9
+    style B fill:#f9f9f9
+    style C fill:#f9f9f9
+    style D fill:#f9f9f9
+    style E fill:#f9f9f9
+    style F fill:#f9f9f9
+    style G fill:#f9f9f9
+    style H fill:#f9f9f9
 ```
 
 Each system in this pipeline is a pure function over component arrays. The Difficulty Parameters table is the only shared mutable state between the DDA Engine and the AI System, and it is written by exactly one system (the DDA Engine) per tick, eliminating the need for locks in a single-threaded update model.

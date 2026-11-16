@@ -24,29 +24,19 @@ SawStop represents a qualitatively different category of active braking, one bas
 
 The mechanical architecture of a standard table saw's safety envelope can be visualized as a set of concentric zones, each managed by a different subsystem:
 
-```
-         OPERATOR ZONE
-              |
-    ┌─────────┴──────────┐
-    │   FENCE & MITER     │  ← Guidance & constraint layer
-    │   GAUGE SYSTEM      │
-    └─────────┬──────────┘
-              |
-    ┌─────────┴──────────┐
-    │  BLADE GUARD &      │  ← Physical exclusion layer
-    │  ANTI-KICKBACK      │
-    │  PAWLS / SPLITTER   │
-    └─────────┬──────────┘
-              |
-    ┌─────────┴──────────┐
-    │   BLADE / ARBOR     │  ← Energy transfer zone
-    │   ASSEMBLY          │
-    └─────────┬──────────┘
-              |
-    ┌─────────┴──────────┐
-    │  BRAKING & POWER    │  ← Energy termination layer
-    │  CIRCUIT            │
-    └─────────────────────┘
+```mermaid
+flowchart TD
+    OZ["OPERATOR ZONE"]
+
+    FMG["FENCE & MITER GAUGE SYSTEM\nGuidance & constraint layer"]
+
+    BGA["BLADE GUARD & ANTI-KICKBACK\nPAWLS / SPLITTER\nPhysical exclusion layer"]
+
+    BAA["BLADE / ARBOR ASSEMBLY\nEnergy transfer zone"]
+
+    BPC["BRAKING & POWER CIRCUIT\nEnergy termination layer"]
+
+    OZ --> FMG --> BGA --> BAA --> BPC
 ```
 
 Each layer must maintain its integrity independently of the others because real-world accidents frequently involve the simultaneous compromise of multiple layers. The operator who removes the blade guard to cut a dado also loses the anti-kickback pawls in the same assembly, which is precisely why dado cuts demand the greatest attentiveness to riving knife height, fence-to-blade parallelism, and feed direction.

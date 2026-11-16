@@ -186,3 +186,4 @@ void dma_transfer_with_cache_sync(uint32_t src, uint32_t dst, size_t count) {
     // Flush CPU cache for source region if CPU wrote the source data
     // (This is a simplified example; real code would flush cache lines)
     if (SCB->CCR & SCB_CCR_DC_Msk) {  // If D-Cache is enabled
+```

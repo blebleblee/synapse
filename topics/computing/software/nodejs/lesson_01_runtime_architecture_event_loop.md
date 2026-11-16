@@ -20,65 +20,58 @@ V8's memory model divides the heap into distinct spaces. The **new space** (also
 
 libuv's event loop is not a simple "while true, check for events" loop. It is a structured state machine with discrete phases executed in a fixed sequence on each iteration, commonly called a **tick**. The sequence is deterministic and ordered, and understanding which phase each type of callback executes in is essential for predicting the behavior of any non-trivial asynchronous program.
 
-```
-┌──────────────────────────────────────────────────────┐
-│                   Node.js Process Start               │
-│                                                        │
-│  ┌─────────────────────────────────────────────────┐  │
-│  │          Synchronous Initialization Code         │  │
-│  │  (top-level module evaluation, require() calls)  │  │
-│  └───────────────────┬─────────────────────────────┘  │
-│                       │                                │
-│                       ▼                                │
-│  ┌─────────────────────────────────────────────────┐  │
-│  │               TIMERS PHASE                       │  │
-│  │  Executes callbacks for setTimeout / setInterval │  │
-│  │  whose threshold has elapsed                     │  │
-│  └───────────────────┬─────────────────────────────┘  │
-│                       │                                │
-│                       ▼                                │
-│  ┌─────────────────────────────────────────────────┐  │
-│  │           PENDING CALLBACKS PHASE                │  │
-│  │  Executes I/O callbacks deferred from last tick  │  │
-│  │  (e.g., TCP errors reported by OS)               │  │
-│  └───────────────────┬─────────────────────────────┘  │
-│                       │                                │
-│                       ▼                                │
-│  ┌─────────────────────────────────────────────────┐  │
-│  │           IDLE / PREPARE PHASE                   │  │
-│  │  Internal libuv housekeeping only                │  │
-│  └───────────────────┬─────────────────────────────┘  │
-│                       │                                │
-│                       ▼                                │
-│  ┌─────────────────────────────────────────────────┐  │
-│  │               POLL PHASE                         │  │
-│  │  Blocks on epoll_wait / kqueue, retrieving new   │  │
-│  │  I/O events. Executes their callbacks inline.    │  │
-│  │  Blocks until: timer threshold reached OR        │  │
-│  │  setImmediate callbacks are queued               │  │
-│  └───────────────────┬─────────────────────────────┘  │
-│                       │                                │
-│                       ▼                                │
-│  ┌─────────────────────────────────────────────────┐  │
-│  │               CHECK PHASE                        │  │
-│  │  Executes setImmediate() callbacks               │  │
-│  └───────────────────┬─────────────────────────────┘  │
-│                       │                                │
-│                       ▼                                │
-│  ┌─────────────────────────────────────────────────┐  │
-│  │           CLOSE CALLBACKS PHASE                  │  │
-│  │  Executes close event handlers (socket.destroy,  │  │
-│  │  handle.close)                                   │  │
-│  └───────────────────┬─────────────────────────────┘  │
-│                       │                                │
-│      ◄────────────────┘  (next tick, if handles remain)│
-└──────────────────────────────────────────────────────┘
-
-   Between EVERY phase transition:
-   ┌──────────────────────────────────────────────────┐
-   │  process.nextTick queue drains completely         │
-   │  Promise microtask queue drains completely        │
-   └──────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start["Node.js Process Start"]
+    Sync["Synchronous Initialization Code<br/>(top-level module evaluation, require calls)"]
+    
+    Timers["TIMERS PHASE<br/>Executes callbacks for setTimeout / setInterval<br/>whose threshold has elapsed"]
+    
+    Pending["PENDING CALLBACKS PHASE<br/>Executes I/O callbacks deferred from last tick<br/>(e.g., TCP errors reported by OS)"]
+    
+    Idle["IDLE / PREPARE PHASE<br/>Internal libuv housekeeping only"]
+    
+    Poll["POLL PHASE<br/>Blocks on epoll_wait / kqueue, retrieving new<br/>I/O events. Executes their callbacks inline.<br/>Blocks until: timer threshold reached OR<br/>setImmediate callbacks are queued"]
+    
+    Check["CHECK PHASE<br/>Executes setImmediate callbacks"]
+    
+    Close["CLOSE CALLBACKS PHASE<br/>Executes close event handlers<br/>(socket.destroy, handle.close)"]
+    
+    NextTick["Microtask Queue Drain<br/>process.nextTick queue drains completely<br/>Promise microtask queue drains completely"]
+    
+    Start --> Sync
+    Sync --> NextTick1["Microtask Queue Drain"]
+    NextTick1 --> Timers
+    Timers --> NextTick2["Microtask Queue Drain"]
+    NextTick2 --> Pending
+    Pending --> NextTick3["Microtask Queue Drain"]
+    NextTick3 --> Idle
+    Idle --> NextTick4["Microtask Queue Drain"]
+    NextTick4 --> Poll
+    Poll --> NextTick5["Microtask Queue Drain"]
+    NextTick5 --> Check
+    Check --> NextTick6["Microtask Queue Drain"]
+    NextTick6 --> Close
+    Close --> NextTick7["Microtask Queue Drain"]
+    NextTick7 --> Decision{More handles<br/>remaining?}
+    Decision -->|Yes| Timers
+    Decision -->|No| End["Event Loop Exit"]
+    
+    style Start fill:#e1f5ff
+    style Sync fill:#fff3e0
+    style Timers fill:#f3e5f5
+    style Pending fill:#f3e5f5
+    style Idle fill:#f3e5f5
+    style Poll fill:#f3e5f5
+    style Check fill:#f3e5f5
+    style Close fill:#f3e5f5
+    style NextTick1 fill:#e8f5e9
+    style NextTick2 fill:#e8f5e9
+    style NextTick3 fill:#e8f5e9
+    style NextTick4 fill:#e8f5e9
+    style NextTick5 fill:#e8f5e9
+    style NextTick6 fill:#e8f5e9
+    style NextTick7 fill:#e8f5e9
 ```
 
 The **timers phase** does not execute a callback "at" the specified delay — it executes callbacks whose minimum delay threshold has elapsed. `setTimeout(fn, 1)` guarantees that `fn` will not execute before 1 millisecond has passed, but makes no upper-bound guarantee. The actual delay depends on what work was executing when the timer threshold was crossed. This distinction matters: if the poll phase is blocked processing I/O callbacks when a timer's threshold elapses, the timer callback will not run until the poll phase completes and the loop cycles back to the timers phase.
@@ -106,23 +99,31 @@ The event loop's non-blocking model works directly for I/O that the OS can repre
 
 libuv's solution is the **thread pool**: a fixed-size pool of OS threads, default size 4, configurable via the `UV_THREADPOOL_SIZE` environment variable up to a maximum of 1024 threads. File system operations, DNS resolution via `getaddrinfo(3)` (not the c-ares async resolver), and certain cryptographic operations from the Node.js `crypto` module execute on thread pool workers. The event loop thread dispatches the work, blocks nothing, and receives a completion notification via libuv's internal pipe-based wakeup mechanism when a worker thread finishes. The result is then packaged as a callback and queued for execution in the poll phase of the next appropriate event loop iteration.
 
-```
-Main Thread (Event Loop)              libuv Thread Pool (default: 4 workers)
-─────────────────────────────         ────────────────────────────────────────
-                                       Worker 0  │ Worker 1 │ Worker 2 │ Worker 3
-  js: fs.readFile('x', cb)            ──────────────────────────────────────────
-       │                                          │
-       ▼                                          │
-  libuv: uv_fs_read() ──── dispatch ────────────►│ blocking read(2) syscall
-       │                                          │   (page fault → disk I/O)
-       │  (event loop continues)                  │
-       │  (other callbacks execute)               │
-       │                                          │ read() returns
-       │                                          │ result written to req struct
-       │◄─── internal pipe wakeup ───────────────┘
-       │
-       ▼
-  poll phase: cb(null, buffer) executes on main thread
+```mermaid
+flowchart TD
+    subgraph main ["Main Thread (Event Loop)"]
+        A["fs.readFile('x', cb)"]
+        B["libuv: uv_fs_read()"]
+        C["event loop continues\n(other callbacks execute)"]
+        D["poll phase: cb(null, buffer)\nexecutes on main thread"]
+    end
+
+    subgraph pool ["libuv Thread Pool (default: 4 workers)"]
+        subgraph w0 ["Worker 0"]
+            E["blocking read(2) syscall\n(page fault → disk I/O)"]
+            F["read() returns\nresult written to req struct"]
+        end
+        W1["Worker 1"]
+        W2["Worker 2"]
+        W3["Worker 3"]
+    end
+
+    A --> B
+    B -- "dispatch" --> E
+    B --> C
+    C --> C
+    E --> F
+    F -- "internal pipe wakeup" --> D
 ```
 
 The thread pool size is a critical tuning parameter that most Node.js deployments leave at its default of 4. For a service that is I/O-bound on file system operations — an asset server, a log processor, a file format transformer — 4 workers means that only 4 file system operations can proceed concurrently regardless of how many are queued. The remaining requests block in libuv's work queue, adding latency. Setting `UV_THREADPOOL_SIZE=16` or higher in the process environment before the event loop starts (it cannot be changed at runtime) is often the correct fix when `fs` latency is anomalously high under load. However, increasing the thread pool size increases memory consumption and OS scheduler pressure proportionally, and for services whose I/O is dominated by sockets and network (the common case for HTTP APIs), increasing the thread pool size provides no benefit because socket I/O does not use the thread pool at all.

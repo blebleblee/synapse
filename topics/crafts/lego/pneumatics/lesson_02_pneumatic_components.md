@@ -28,45 +28,51 @@ The motorized pump assembly pairs the same reciprocating mechanism with a cam-dr
 
 A pressure relief valve is essential in any motorized pump configuration. Without one, a motor-driven system will continue building pressure until something in the circuit fails—tubing pops off, a connector extrudes, or the motor stalls under load. Lego's pressure relief valve (available in older Technic sets from the late 1990s and early 2000s) is a spring-loaded ball check valve preset to open at approximately 30 to 40 PSI, venting excess pressure to atmosphere. Its placement matters: position it as close to the pump outlet as possible, not at the far end of a long tubing run, so that pressure spikes at the pump head are relieved immediately rather than propagating through the full circuit.
 
+```mermaid
+flowchart TD
+    Motor["Motor + Cam"]
+    Pump["Pump Piston"]
+    Outlet["Outlet Port"]
+    Relief["Pressure Relief<br/>(vents to atmos.)"]
+    Tank["Accumulator Tank"]
+    Valve["Directional Valve<br/>(3-port, 2-position)"]
+    PortA["Cyl. Port A"]
+    Exhaust["Exhaust Port"]
+    Cylinder["Single-Acting Cylinder<br/>(spring return on retract)"]
+    
+    Motor -->|drives| Pump
+    Pump --> Outlet
+    Outlet --> Relief
+    Outlet --> Tank
+    Tank --> Valve
+    Valve --> PortA
+    Valve --> Exhaust
+    PortA --> Cylinder
 ```
-PNEUMATIC CIRCUIT TOPOLOGY (Single-Acting, Motorized)
 
-  [Motor + Cam] ──► [Pump Piston]
-                          │
-                     [Outlet Port]
-                          │
-               ┌──────────┴──────────┐
-               │                     │
-       [Pressure Relief]      [Accumulator Tank]
-       (vents to atmos.)             │
-                                     │
-                             [Directional Valve]
-                            (3-port, 2-position)
-                            /                \
-                     [Cyl. Port A]      [Exhaust Port]
-                           │
-                   [Single-Acting Cylinder]
-                   (spring return on retract)
-```
+```mermaid
+flowchart TD
+    HP["Hand Pump"]
+    OP["Outlet Port"]
+    AT["Accumulator Tank"]
+    FCV_E["Flow Control Valve\n(restricts extend speed)"]
+    FCV_R["Flow Control Valve\n(restricts retract speed)"]
+    DVA["Directional Valve Port A"]
+    DVB["Directional Valve Port B"]
+    CYL_A["Cylinder Port A\n(extend side)"]
+    CYL_B["Cylinder Port B\n(retract side)"]
+    CYL["Double-Acting Cylinder"]
 
-```
-PNEUMATIC CIRCUIT TOPOLOGY (Double-Acting, Hand Pump)
-
-  [Hand Pump]
-       │
-  [Outlet Port]
-       │
-  [Accumulator Tank]  ──────────────────────────────────┐
-       │                                                 │
-  [Flow Control Valve]                        [Flow Control Valve]
-  (restricts extend speed)                 (restricts retract speed)
-       │                                                 │
-  [Directional Valve Port A]           [Directional Valve Port B]
-       └──────────┬──────────────────────────┬───────────┘
-                  │                          │
-           [Cyl. Port A]              [Cyl. Port B]
-           (extend side)              (retract side)
-                  └──────────[Double-Acting Cylinder]────┘
+    HP --> OP
+    OP --> AT
+    AT --> FCV_E
+    AT --> FCV_R
+    FCV_E --> DVA
+    FCV_R --> DVB
+    DVA --> CYL_A
+    DVB --> CYL_B
+    CYL_A --> CYL
+    CYL_B --> CYL
 ```
 
 ### Cylinders: Single-Acting and Double-Acting

@@ -20,7 +20,7 @@ Poison and overdose management introduces a fourth invariant: **the toxidrome is
 
 The body's thermoregulatory architecture relies on a feedback loop anchored in the hypothalamus. Peripheral thermoreceptors relay temperature signals centrally; the hypothalamus compares incoming data against its set-point (approximately 37°C core) and deploys effector responses — shivering, vasodilation, sweating, vasoconstriction, piloerection — to correct the deviation. When environmental demand exceeds the effector capacity, core temperature drifts and the system enters crisis.
 
-**Hypothermia** is classified by core temperature into mild (32–35°C), moderate (28–32°C), and severe (<28°C). In the mild stage, shivering is vigorous and the patient remains conscious and communicative, though judgment is impaired earlier than most people expect. The practitioner should remove wet clothing immediately, insulate from the ground (ground conduction accounts for the largest continuous heat loss in a supine casualty), and apply active external warming to core areas — axillae, groin, neck — using chemical heat packs or warm water bottles wrapped in cloth to prevent contact burns. The critical technique error at this stage is wrapping the periphery before the core, which causes peripheral vasodilation and flushes cold blood centrally, precipitating afterdrop: a paradoxical further decline in core temperature.
+**Hypothermia** is classified by core temperature into mild (32–35°C), moderate (28–32°C), and severe (< 28°C). In the mild stage, shivering is vigorous and the patient remains conscious and communicative, though judgment is impaired earlier than most people expect. The practitioner should remove wet clothing immediately, insulate from the ground (ground conduction accounts for the largest continuous heat loss in a supine casualty), and apply active external warming to core areas — axillae, groin, neck — using chemical heat packs or warm water bottles wrapped in cloth to prevent contact burns. The critical technique error at this stage is wrapping the periphery before the core, which causes peripheral vasodilation and flushes cold blood centrally, precipitating afterdrop: a paradoxical further decline in core temperature.
 
 In moderate hypothermia, shivering ceases as the muscles run out of glycogen substrate, consciousness depresses, and cardiac arrhythmias — initially bradycardia and atrial fibrillation — become the dominant threat. The patient must be handled with extreme gentleness; any physical jarring can trigger ventricular fibrillation. The hypothermic wrap (a moisture-resistant vapor barrier around the torso, insulating sleeping bag material, and a reflective outer layer) should be constructed around the patient while they remain as horizontal as possible. In severe hypothermia, the patient may appear dead — no palpable pulse, apneic, unresponsive — and the invariant here is the clinical aphorism: **the patient is not dead until they are warm and dead.** CPR is indicated if no pulse is detected after a 60-second assessment, but the rescuer must anticipate that ROSC is unlikely without hospital rewarming.
 
@@ -51,55 +51,116 @@ The clinical signature of hypoglycemia is rapid onset of sympathoadrenal symptom
 The following state-transition diagram maps the responder's decision logic across the acute crises covered in this lesson.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> PatientAssessment : Scene safe, PPE on
+flowchart TD
+    START((" ")) -->|"Scene safe, PPE on"| PA["Patient Assessment"]
 
-    PatientAssessment --> ThermalCrisis : Abnormal core temp / environment
-    PatientAssessment --> AnaphylaxisPath : Hives + respiratory / hypotension
-    PatientAssessment --> SeizurePath : Active convulsions
-    PatientAssessment --> ToxidromeScreen : Suspected ingestion / exposure
-    PatientAssessment --> DiabeticScreen : Known DM / altered mental status
+    PA -->|"Abnormal core temp / environment"| TC["Thermal Crisis"]
+    PA -->|"Hives + respiratory / hypotension"| AN["Anaphylaxis Path"]
+    PA -->|"Active convulsions"| SZ["Seizure Path"]
+    PA -->|"Suspected ingestion / exposure"| TX["Toxidrome Screen"]
+    PA -->|"Known DM / altered mental status"| DB["Diabetic Screen"]
 
-    ThermalCrisis --> Hypothermia : Core temp below 35°C
-    ThermalCrisis --> Hyperthermia : Core temp above 40°C + AMS
+    subgraph thermal ["🌡️ Thermal Crisis"]
+        TC --> HY["Hypothermia\nCore temp below 35°C"]
+        TC --> HT["Hyperthermia\nCore temp above 40°C + AMS"]
 
-    Hypothermia --> WarmingProtocol : Remove wet clothing, insulate core, avoid jostling
-    WarmingProtocol --> MonitorRhythm : Moderate/severe → watch for VF
-    MonitorRhythm --> CPR_Transport : No pulse after 60s assessment
+        HY --> WP["Warming Protocol\nRemove wet clothing, insulate core,\navoid jostling"]
+        WP --> MR["Monitor Rhythm\nModerate/severe → watch for VF"]
+        MR --> CT["CPR + Transport\nNo pulse after 60s assessment"]
 
-    Hyperthermia --> RapidCooling : Cold immersion or ice packs axillae/groin/neck
-    RapidCooling --> TargetBelow39 : Goal < 39°C within 30 min
-    TargetBelow39 --> Transport
+        HT --> RC["Rapid Cooling\nCold immersion or ice packs\naxillae / groin / neck"]
+        RC --> TB["Target below 39°C\nwithin 30 min"]
+    end
 
-    AnaphylaxisPath --> EpiIM : 0.3 mg epi mid-outer thigh IM
-    EpiIM --> SupinePosition : Legs elevated unless vomiting
-    SupinePosition --> RepeatEpi : Symptoms persist after 5–15 min
-    RepeatEpi --> Transport : Observe minimum 4–6 hrs biphasic risk
+    subgraph anaphylaxis ["💉 Anaphylaxis"]
+        AN --> EP["Epinephrine IM\n0.3 mg mid-outer thigh"]
+        EP --> SP["Supine Position\nLegs elevated unless vomiting"]
+        SP --> RE["Repeat Epi\nSymptoms persist after 5–15 min"]
+        RE --> TRA_AN["Transport\nObserve minimum 4–6 hrs\nbiphasic risk"]
+    end
 
-    SeizurePath --> ClearEnvironment : Remove hazards, cushion head, time seizure
-    ClearEnvironment --> StatusEpilepticus : Duration > 5 min → activate EMS
-    ClearEnvironment --> RecoveryPosition : Seizure stops → protect airway
-    RecoveryPosition --> AssessMetabolic : Rule out hypoglycemia as cause
+    subgraph seizure ["⚡ Seizure"]
+        SZ --> CE["Clear Environment\nRemove hazards, cushion head,\ntime seizure"]
+        CE -->|"Duration > 5 min"| SE["Status Epilepticus\nActivate EMS"]
+        CE -->|"Seizure stops"| RP["Recovery Position\nProtect airway"]
+        RP --> AM["Assess Metabolic\nRule out hypoglycemia as cause"]
+    end
 
-    ToxidromeScreen --> OpioidToxidrome : Miosis + respiratory depression
-    ToxidromeScreen --> CholinergicToxidrome : SLUDGE + bradycardia
-    ToxidromeScreen --> SympathomimeticToxidrome : Tachycardia + hyperthermia + mydriasis
+    subgraph toxidrome ["☠️ Toxidrome Screen"]
+        TX -->|"Miosis + respiratory depression"| OT["Opioid Toxidrome"]
+        TX -->|"SLUDGE + bradycardia"| CT2["Cholinergic Toxidrome"]
+        TX -->|"Tachycardia + hyperthermia + mydriasis"| ST["Sympathomimetic Toxidrome"]
 
-    OpioidToxidrome --> NaloxoneAdmin : 0.4–2 mg IN/IM/IV, repeat PRN
-    NaloxoneAdmin --> MonitorResedation : Half-life shorter than opioid
-    CholinergicToxidrome --> SupportiveCare : Atropine in clinical setting
-    SympathomimeticToxidrome --> ThermoControl : Cooling + agitation management
+        OT --> NA["Naloxone Admin\n0.4–2 mg IN / IM / IV, repeat PRN"]
+        NA --> MRS["Monitor for Resedation\nHalf-life shorter than opioid"]
+        CT2 --> SC["Supportive Care\nAtropine in clinical setting"]
+        ST --> TC2["Thermo Control\nCooling + agitation management"]
+    end
 
-    DiabeticScreen --> Hypoglycemia : Rapid onset diaphoresis/confusion
-    DiabeticScreen --> DKA_HHS : Slow onset, fruity breath, Kussmaul breathing
+    subgraph diabetic ["🩸 Diabetic Emergency"]
+        DB -->|"Rapid onset diaphoresis / confusion"| HG["Hypoglycemia"]
+        DB -->|"Slow onset, fruity breath,\nKussmaul breathing"| DK["DKA / HHS"]
 
-    Hypoglycemia --> OralGlucose : Conscious → 15–20g fast-acting glucose
-    Hypoglycemia --> GlucagonIM : Unconscious → 1 mg glucagon IM or IN
-    DKA_HHS --> Transport : IV fluids + insulin in clinical setting
+        HG -->|"Conscious"| OG["Oral Glucose\n15–20 g fast-acting glucose"]
+        HG -->|"Unconscious"| GI["Glucagon IM\n1 mg IM or IN"]
+        DK --> TRA_DK["Transport\nIV fluids + insulin in clinical setting"]
+    end
 
-    Transport --> [*]
-    OralGlucose --> [*]
-    GlucagonIM --> [*]
+    TB --> TRANSPORT[/"Transport"/]
+    CT --> TRANSPORT
+    TRA_AN --> TRANSPORT
+    SE --> TRANSPORT
+    MRS --> TRANSPORT
+    SC --> TRANSPORT
+    TC2 --> TRANSPORT
+    TRA_DK --> TRANSPORT
+    AM --> TRANSPORT
+
+    TRANSPORT --> END((" "))
+    OG --> END
+    GI --> END
+
+    style START fill:#2d2d2d,stroke:#2d2d2d,color:#fff
+    style END fill:#2d2d2d,stroke:#2d2d2d,color:#fff
+    style TRANSPORT fill:#1a5276,stroke:#1a5276,color:#fff,font-weight:bold
+    style PA fill:#117a65,stroke:#0e6655,color:#fff,font-weight:bold
+
+    style TC fill:#6e2f10,stroke:#5d2708,color:#fff
+    style HY fill:#1a5276,stroke:#154360,color:#fff
+    style HT fill:#7b241c,stroke:#641e16,color:#fff
+    style WP fill:#1f618d,stroke:#1a5276,color:#fff
+    style MR fill:#1f618d,stroke:#1a5276,color:#fff
+    style CT fill:#922b21,stroke:#7b241c,color:#fff
+    style RC fill:#922b21,stroke:#7b241c,color:#fff
+    style TB fill:#1e8449,stroke:#196f3d,color:#fff
+
+    style AN fill:#6e2f10,stroke:#5d2708,color:#fff
+    style EP fill:#7d6608,stroke:#6d5a07,color:#fff
+    style SP fill:#7d6608,stroke:#6d5a07,color:#fff
+    style RE fill:#7d6608,stroke:#6d5a07,color:#fff
+    style TRA_AN fill:#1a5276,stroke:#154360,color:#fff
+
+    style SZ fill:#4a235a,stroke:#3b1c47,color:#fff
+    style CE fill:#6c3483,stroke:#5b2c6f,color:#fff
+    style SE fill:#922b21,stroke:#7b241c,color:#fff
+    style RP fill:#6c3483,stroke:#5b2c6f,color:#fff
+    style AM fill:#6c3483,stroke:#5b2c6f,color:#fff
+
+    style TX fill:#1b4f72,stroke:#154360,color:#fff
+    style OT fill:#1f618d,stroke:#1a5276,color:#fff
+    style CT2 fill:#1f618d,stroke:#1a5276,color:#fff
+    style ST fill:#1f618d,stroke:#1a5276,color:#fff
+    style NA fill:#117a65,stroke:#0e6655,color:#fff
+    style MRS fill:#117a65,stroke:#0e6655,color:#fff
+    style SC fill:#117a65,stroke:#0e6655,color:#fff
+    style TC2 fill:#117a65,stroke:#0e6655,color:#fff
+
+    style DB fill:#4d6016,stroke:#3d4d12,color:#fff
+    style HG fill:#7d6608,stroke:#6d5a07,color:#fff
+    style DK fill:#7d6608,stroke:#6d5a07,color:#fff
+    style OG fill:#1e8449,stroke:#196f3d,color:#fff
+    style GI fill:#1e8449,stroke:#196f3d,color:#fff
+    style TRA_DK fill:#1a5276,stroke:#154360,color:#fff
 ```
 
 ---
@@ -136,11 +197,11 @@ The overlap between opioid and sedative-hypnotic toxidromes creates a practical 
 
 | Crisis | Identification Criteria | Primary Intervention | Critical Failure Mode | Verification Endpoint |
 |---|---|---|---|---|
-| **Hypothermia** | Core temp <35°C; shivering (mild) or absent (moderate/severe); cold, pale skin; bradycardia | Remove wet clothing; insulate core from ground; chemical heat packs to axillae/groin; handle gently to prevent VF | Peripheral rewarming before core; aggressive movement triggering VF; premature pronouncement of death | Gradual core temp rise; return of shivering; improved GCS; stable cardiac rhythm |
-| **Heat Stroke** | Core temp >40°C + altered mental status; hot, flushed skin; anhidrosis or profuse sweating; rapid progression | Cold water immersion or ice packs axillae/groin/neck; fan and mist; target <39°C within 30 min; IV saline if available | Withholding cooling to await transport; oral fluids in altered patient (aspiration risk); underestimating exertional onset speed | Core temp below 39°C; improved GCS; cessation of Kussmaul-pattern breathing (DKA differential) |
+| **Hypothermia** | Core temp < 35°C; shivering (mild) or absent (moderate/severe); cold, pale skin; bradycardia | Remove wet clothing; insulate core from ground; chemical heat packs to axillae/groin; handle gently to prevent VF | Peripheral rewarming before core; aggressive movement triggering VF; premature pronouncement of death | Gradual core temp rise; return of shivering; improved GCS; stable cardiac rhythm |
+| **Heat Stroke** | Core temp >40°C + altered mental status; hot, flushed skin; anhidrosis or profuse sweating; rapid progression | Cold water immersion or ice packs axillae/groin/neck; fan and mist; target < 39°C within 30 min; IV saline if available | Withholding cooling to await transport; oral fluids in altered patient (aspiration risk); underestimating exertional onset speed | Core temp below 39°C; improved GCS; cessation of Kussmaul-pattern breathing (DKA differential) |
 | **Anaphylaxis** | Two-system involvement + plausible exposure; urticaria + dyspnea or hypotension | Epinephrine 0.3 mg IM mid-outer thigh; supine with legs elevated; second dose at 5–15 min if no improvement | Administering antihistamine first; allowing patient to stand upright; discharging after apparent resolution without 4–6 hr observation | Systolic BP recovery; reduced bronchospasm; fading urticaria; absence of biphasic recurrence at 4–6 hr |
-| **Seizure** | Tonic-clonic movements; loss of consciousness; post-ictal unresponsiveness; >5 min duration = status epilepticus | Clear hazards; cushion head; time duration; recovery position post-ictally; activate EMS if >5 min | Physical restraint causing fractures; objects placed in mouth; failure to test glucose as metabolic cause | Seizure terminates <5 min; patent airway in recovery position; return of consciousness; blood glucose within normal range |
-| **Opioid Overdose** | Miosis; respiratory rate <8/min; decreased or absent consciousness; cyanosis | Naloxone 0.4–2 mg IM/IN/IV; repeat every 2–3 min up to 10 mg; recovery position; oxygenation support | Single dose without monitoring for re-sedation; misidentifying as sedative-hypnotic and expecting naloxone reversal; early discharge | Respiratory rate >12/min; return of consciousness; sustained oxygenation; no re-sedation within naloxone window |
+| **Seizure** | Tonic-clonic movements; loss of consciousness; post-ictal unresponsiveness; >5 min duration = status epilepticus | Clear hazards; cushion head; time duration; recovery position post-ictally; activate EMS if >5 min | Physical restraint causing fractures; objects placed in mouth; failure to test glucose as metabolic cause | Seizure terminates < 5 min; patent airway in recovery position; return of consciousness; blood glucose within normal range |
+| **Opioid Overdose** | Miosis; respiratory rate < 8/min; decreased or absent consciousness; cyanosis | Naloxone 0.4–2 mg IM/IN/IV; repeat every 2–3 min up to 10 mg; recovery position; oxygenation support | Single dose without monitoring for re-sedation; misidentifying as sedative-hypnotic and expecting naloxone reversal; early discharge | Respiratory rate >12/min; return of consciousness; sustained oxygenation; no re-sedation within naloxone window |
 | **Diabetic Emergency** | Hypoglycemia: rapid onset diaphoresis, tremor, confusion; DKA: slow onset, fruity breath, Kussmaul respiration, dehydration | Conscious hypoglycemia: 15–20 g oral glucose; unconscious: glucagon 1 mg IM/IN; DKA/HHS: transport for IV fluids + insulin | Giving oral glucose to an unconscious patient (aspiration); administering glucose to DKA without fluid replacement; delaying glucagon in unconscious hypoglycemia | Blood glucose 70–140 mg/dL; resolution of diaphoresis and confusion; conscious patient able to tolerate oral intake; GCS return to baseline |
 
 The unifying discipline across every emergency in this lesson is the same: identify the failing physiological system, rank the intervention by urgency and reversibility, deploy the correct countermeasure with precision, and monitor the system's response as feedback. Practitioners who internalize this loop — assess, identify, intervene, verify — carry a framework that scales from wilderness anaphylaxis to urban overdose response, independent of the specific agent or environment they encounter.

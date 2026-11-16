@@ -32,34 +32,35 @@ Bone placement follows anatomical landmarks adapted to the character's stylized 
 
 The parent-child hierarchy encodes dependency through transformation matrix concatenation. Each bone stores a local transformation matrix composed of translation, rotation, and scale components. When evaluating the world-space position of a bone, the system multiplies the bone's local matrix by its parent's world matrix, propagating transformations from root to leaf. This recursive multiplication means that rotating a shoulder bone by forty-five degrees applies that rotation to the local coordinate frames of all descendant bones, causing the entire arm to swing as a rigid unit until individual child bones apply their own local rotations.
 
-```
-Skeletal Hierarchy Traversal (Depth-First):
-
-Pelvis (Root)
-│
-├─ Lumbar_Spine
-│  ├─ Chest
-│  │  ├─ Neck
-│  │  │  └─ Head
-│  │  ├─ Clavicle_L
-│  │  │  └─ UpperArm_L
-│  │  │     └─ Forearm_L
-│  │  │        └─ Hand_L
-│  │  └─ Clavicle_R
-│  │     └─ UpperArm_R
-│  │        └─ Forearm_R
-│  │           └─ Hand_R
-│
-├─ Thigh_L
-│  └─ Shin_L
-│     └─ Foot_L
-│
-└─ Thigh_R
-   └─ Shin_R
-      └─ Foot_R
-
-Matrix Propagation:
-World_Hand_L = World_Pelvis × Local_Lumbar × Local_Chest × Local_Clavicle_L × Local_UpperArm_L × Local_Forearm_L × Local_Hand_L
+```mermaid
+flowchart TD
+    Pelvis["Pelvis<br/>(Root)"]
+    
+    Pelvis --> Lumbar["Lumbar_Spine"]
+    Pelvis --> ThighL["Thigh_L"]
+    Pelvis --> ThighR["Thigh_R"]
+    
+    Lumbar --> Chest["Chest"]
+    
+    Chest --> Neck["Neck"]
+    Chest --> ClavicleL["Clavicle_L"]
+    Chest --> ClavicleR["Clavicle_R"]
+    
+    Neck --> Head["Head"]
+    
+    ClavicleL --> UpperArmL["UpperArm_L"]
+    UpperArmL --> ForearmL["Forearm_L"]
+    ForearmL --> HandL["Hand_L"]
+    
+    ClavicleR --> UpperArmR["UpperArm_R"]
+    UpperArmR --> ForearmR["Forearm_R"]
+    ForearmR --> HandR["Hand_R"]
+    
+    ThighL --> ShinL["Shin_L"]
+    ShinL --> FootL["Foot_L"]
+    
+    ThighR --> ShinR["Shin_R"]
+    ShinR --> FootR["Foot_R"]
 ```
 
 Weight painting assigns per-vertex influence coefficients that determine how much each bone affects each vertex during deformation. The sum of all bone weights influencing a single vertex must equal one to preserve the vertex's rest position when no bones are transformed. A vertex at the elbow joint typically receives blended influence from both the upper arm and forearm bones, with the weight gradient transitioning smoothly across the joint region. Painting these weights is both an art and a science: automatic weight generation algorithms compute initial weights based on proximity and bone heat diffusion, but artists must manually refine the weights to eliminate artifacts like elbow candy-wrapping, where the inner elbow mesh collapses inward during ninety-degree bends, or shoulder tearing, where the deltoid mesh detaches from the clavicle during overhead reaches.

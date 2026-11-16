@@ -49,30 +49,18 @@ For OpenLDAP in environments not running Active Directory, the NAS node queries 
 
 Kerberos is the authentication substrate that transforms "this client claims to be alice" into "this client cryptographically proved to the KDC that it holds alice's secret, and the KDC issued a time-limited proof." Understanding Kerberos from first principles requires tracing the three-phase exchange precisely.
 
-```
-Client                        KDC (AS + TGS)              NAS Server (Service Principal)
-  |                                |                               |
-  |--AS-REQ (pre-auth)------------>|                               |
-  |  [timestamp encrypted with    |                               |
-  |   client's long-term key]      |                               |
-  |                                |                               |
-  |<--AS-REP (TGT)-----------------|                               |
-  |  [TGT encrypted with TGS key] |                               |
-  |  [Session key enc. w/ client] |                               |
-  |                                |                               |
-  |--TGS-REQ (TGT + SPN)--------->|                               |
-  |  [AP-REQ authenticator enc.   |                               |
-  |   with TGT session key]        |                               |
-  |                                |                               |
-  |<--TGS-REP (Service Ticket)-----|                               |
-  |  [ST encrypted with svc key]  |                               |
-  |  [New session key enc w/ TGT] |                               |
-  |                                |                               |
-  |--AP-REQ (Service Ticket)---------------------------------->|   |
-  |  [Authenticator enc. w/        |                               |
-  |   service session key]         |                               |
-  |                                |                               |
-  |<--AP-REP (mutual auth)-------------------------------------------
+```mermaid
+flowchart LR
+    Client["Client"]
+    KDC["KDC (AS + TGS)"]
+    NAS["NAS Server<br/>(Service Principal)"]
+    
+    Client -->|"AS-REQ (pre-auth)<br/>[timestamp encrypted with<br/>client's long-term key]"| KDC
+    KDC -->|"AS-REP (TGT)<br/>[TGT encrypted with TGS key]<br/>[Session key enc. w/ client]"| Client
+    Client -->|"TGS-REQ (TGT + SPN)<br/>[AP-REQ authenticator enc.<br/>with TGT session key]"| KDC
+    KDC -->|"TGS-REP (Service Ticket)<br/>[ST encrypted with svc key]<br/>[New session key enc w/ TGT]"| Client
+    Client -->|"AP-REQ (Service Ticket)<br/>[Authenticator enc. w/<br/>service session key]"| NAS
+    NAS -->|"AP-REP (mutual auth)"| Client
 ```
 
 The critical security property here is that the NAS server never contacts the KDC during the AP-REQ phase. It decrypts the service ticket using its own long-term key (the keytab), extracts the session key, and uses that to verify the authenticator's freshness timestamp. The 5-minute clock skew tolerance is not arbitrary; it closes replay attack windows while accommodating real-world NTP drift. If the NAS node's clock drifts beyond this window, all Kerberos authentication silently fails with `KRB5KRB_AP_ERR_SKEW`, which is why NTP synchronization to the same stratum as the KDC is a hard operational dependency.

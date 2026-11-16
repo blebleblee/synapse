@@ -747,11 +747,11 @@ print('All imports OK')
 | Exercise | Measurement | Expected Range | Failure Indicator |
 |---|---|---|---|
 | Ex. 1 | Fitted $H_0$ | $68$–$76$ km/s/Mpc | Outside range → outlier contamination |
-| Ex. 1 | Reduced $\chi^2$ | $0.7$–$1.5$ | $>2$: underestimated errors; $<0.5$: overestimated |
+| Ex. 1 | Reduced $\chi^2$ | $0.7$–$1.5$ | $>2$: underestimated errors; $< 0.5$: overestimated |
 | Ex. 2 | First peak $\ell_1$ | $218$–$225$ | Deviation $>5$ → smoothing over-broadened peak |
 | Ex. 2 | Sound horizon $r_s$ | $145$–$150$ Mpc | Incorrect $\Omega_b h^2$ input |
 | Ex. 3 | Tension at $f=1$ | $4.0$–$5.5\sigma$ | Outside range → incorrect sigma_combined formula |
-| Ex. 3 | Outlier bias at 20% | $<3$ km/s/Mpc shift | Larger shift → outlier amplitude too large |
+| Ex. 3 | Outlier bias at 20% | $< 3$ km/s/Mpc shift | Larger shift → outlier amplitude too large |
 
 ### Common Failure Modes and Remediation
 

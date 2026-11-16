@@ -112,34 +112,42 @@ The parameters $(\phi, \delta, \lambda)$ are estimated via maximum likelihood ov
 
 The graphical representation of game structures employs extensive-form trees for sequential games and normal-form matrices for simultaneous games. The Trust Game extensive form is drawn as:
 
-```
-Sender
-  |
-  ├─ Send t
-  |    |
-  |    Receiver
-  |      |
-  |      ├─ Return r
-  |      |    (E - t + r, 3t - r)
-  |      └─ Return 0
-  |           (E - t, 3t)
-  └─ Send 0
-       (E, 0)
+```mermaid
+flowchart TD
+    Sender["Sender"]
+    SendT["Send t"]
+    Send0["Send 0"]
+    Receiver["Receiver"]
+    ReturnR["Return r"]
+    Return0["Return 0"]
+    OutcomeR["(E - t + r, 3t - r)"]
+    Outcome0T["(E - t, 3t)"]
+    OutcomeE["(E, 0)"]
+    
+    Sender --> SendT
+    Sender --> Send0
+    SendT --> Receiver
+    Receiver --> ReturnR
+    Receiver --> Return0
+    ReturnR --> OutcomeR
+    Return0 --> Outcome0T
+    Send0 --> OutcomeE
 ```
 
 The Ultimatum Game tree is:
 
-```
-Proposer
-  |
-  ├─ Offer x
-  |    |
-  |    Responder
-  |      |
-  |      ├─ Accept
-  |      |    (S - x, x)
-  |      └─ Reject
-  |           (0, 0)
+```mermaid
+flowchart TD
+    A["Proposer"]
+    B["Offer x"]
+    C["Responder"]
+    D["Accept<br/>S - x, x"]
+    E["Reject<br/>0, 0"]
+    
+    A --> B
+    B --> C
+    C --> D
+    C --> E
 ```
 
 Normal-form matrix games are represented as payoff tables. The Prisoner's Dilemma appears as:

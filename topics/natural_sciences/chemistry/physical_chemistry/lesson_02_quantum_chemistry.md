@@ -184,37 +184,29 @@ where $X$ is the cardinal number of the basis set (2 for DZ, 3 for TZ, etc.) and
 
 The SCF cycle is iterative by necessity and can fail in ways that are instructive to understand mechanically.
 
-```
-Initial Guess
-(SAD, core Hamiltonian, or previous geometry)
-         │
-         ▼
-   Build Density Matrix
-   P_μν = 2 Σ_i C_μi C_νi   (sum over occupied MOs)
-         │
-         ▼
-   Compute Fock Matrix
-   F_μν = H_μν^core + Σ_λσ P_λσ [(μν|λσ) - ½(μλ|νσ)]
-         │
-         ▼
-   Diagonalize  FC = SCε
-   (after Löwdin orthogonalization)
-         │
-         ▼
-   Extract New Orbital Coefficients C
-         │
-         ▼
-   Compute New Density Matrix P'
-         │
-         ▼
-   Convergence Check
-   ||P' - P|| < threshold  ?
-        /         \
-      YES          NO
-       │            │
-       ▼            └──► DIIS extrapolation ──► Update P
-  Converged
-  E_HF, {ψ_i}, {ε_i}
+```mermaid
+flowchart TD
+    A["Initial Guess<br/>(SAD, core Hamiltonian, or previous geometry)"]
+    B["Build Density Matrix<br/>P_μν = 2 Σ_i C_μi C_νi<br/>(sum over occupied MOs)"]
+    C["Compute Fock Matrix<br/>F_μν = H_μν^core + Σ_λσ P_λσ [(μν|λσ) - ½(μλ|νσ)]"]
+    D["Diagonalize FC = SCε<br/>(after Löwdin orthogonalization)"]
+    E["Extract New Orbital Coefficients C"]
+    F["Compute New Density Matrix P'"]
+    G{"Convergence Check<br/>||P' - P|| < threshold ?"}
+    H["Converged<br/>E_HF, {ψ_i}, {ε_i}"]
+    I["DIIS extrapolation"]
+    J["Update P"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G -->|YES| H
+    G -->|NO| I
+    I --> J
+    J --> C
 ```
 
 The DIIS (Direct Inversion in the Iterative Subspace) algorithm of Pulay dramatically accelerates SCF convergence by constructing the next density matrix as a weighted linear combination of several previous iterates, minimizing the norm of the DIIS error vector. Without DIIS or similar acceleration, SCF convergence for systems with low-lying excited states or near-degenerate frontier orbitals can oscillate indefinitely.

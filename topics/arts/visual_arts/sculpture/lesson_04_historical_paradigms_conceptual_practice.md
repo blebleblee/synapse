@@ -66,23 +66,19 @@ The viewer's relationship to contemporary sculpture became even more complex. Yo
 
 To work across these three paradigms, it is useful to think of sculpture as organized around three nested layers of meaning:
 
-```
-┌─────────────────────────────────────────────────┐
-│      CONCEPTUAL/INSTITUTIONAL FRAME             │
-│  (What does this work mean in this context?)    │
-│                                                 │
-│  ┌───────────────────────────────────────────┐ │
-│  │   PHENOMENOLOGICAL/SPATIAL EXPERIENCE    │ │
-│  │ (How do I move through and perceive this?)│ │
-│  │                                           │ │
-│  │  ┌─────────────────────────────────────┐ │ │
-│  │  │  MATERIAL/FORMAL EXECUTION          │ │ │
-│  │  │ (What is this made of? How is it    │ │ │
-│  │  │  constructed? What are its formal   │ │ │
-│  │  │  relationships?)                    │ │ │
-│  │  └─────────────────────────────────────┘ │ │
-│  └───────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph conceptual ["CONCEPTUAL / INSTITUTIONAL FRAME"]
+        direction TD
+        subgraph phenomenological ["PHENOMENOLOGICAL / SPATIAL EXPERIENCE"]
+            direction TD
+            material["MATERIAL / FORMAL EXECUTION\n\nWhat is this made of? How is it constructed?\nWhat are its formal relationships?"]
+        end
+    end
+
+    style conceptual fill:#e8f4f8,stroke:#4a90b8,stroke-width:2px,color:#1a1a1a
+    style phenomenological fill:#d4ecd4,stroke:#4a9b4a,stroke-width:2px,color:#1a1a1a
+    style material fill:#fff9e6,stroke:#c8a000,stroke-width:2px,color:#1a1a1a
 ```
 
 In representational sculpture, all three layers are aligned in service of mimesis. The material execution demonstrates mastery of anatomy and proportion. The spatial experience positions you before an idealized form. The conceptual frame tells you this is a noble or sacred subject worthy of contemplation.
@@ -133,4 +129,19 @@ Certain recognizable problems emerge when sculptors fail to integrate their chos
 
 **Representational Incoherence:** A representational work that demonstrates poor anatomical understanding or weak proportions fails to deliver on the paradigm's central promise. The viewer expects the sculpture to convince them of the idealized form, and if the anatomy is clumsy or distorted (unintentionally), the work reads as amateurish rather than as a deliberate stylistic choice. This is different from contemporary figuration, which might distort anatomy deliberately to make a conceptual point.
 
-**Formalist Confusion:** An abstract work that seems to want to represent something but doesn't quite, or that abandons its formal investigation halfway through, often reads as confused. The viewer is left
+**Formalist Confusion:** An abstract work that seems to want to represent something but doesn't quite, or that abandons its formal investigation halfway through, often reads as confused.
+
+If the formal logic isn't internally consistent—if compositional decisions appear arbitrary or contradict each other—the work fails to sustain the viewer's engagement. The difference between successful abstraction and formalist confusion lies in the presence of a coherent visual argument: every curve, plane, and mass should feel necessary within the work's own logic, even if that logic is non-representational.
+
+**Conceptual Hollowness:** A contemporary work that deploys materials, site-specificity, or participatory elements without a clear conceptual anchor often reads as gimmicky or superficial. The paradigm demands that material and process choices be legible as ideas, not merely as aesthetic effects. If a work uses unconventional materials but offers no conceptual reason for those choices—if the artist cannot articulate why rust, felt, or found objects are necessary to the work's meaning—the piece collapses into novelty. Similarly, if a work invites participation but the participation feels arbitrary or decorative, the conceptual claim is undermined. Successful contemporary sculpture requires that every formal decision be defensible as part of the work's larger conceptual architecture. The viewer should be able to reconstruct the artist's reasoning from the work itself, even if they ultimately disagree with the conclusion. When this coherence is absent, the work fails not because it is radical, but because it has not done the intellectual work required by its chosen paradigm.
+
+## Summary & Verification Matrix
+
+| **Criterion** | **Representational Paradigm** | **Abstract Paradigm** | **Contemporary Paradigm** | **Diagnostic Question** |
+|---------------|-------------------------------|----------------------|---------------------------|-------------------------|
+| **Primary Intent** | Idealize and depict recognizable forms (body, figure, narrative) | Investigate formal relationships (line, plane, volume, composition) | Embed ideas in material, context, and process; challenge object-primacy | What is the work trying to accomplish? Representation, formal exploration, or conceptual critique? |
+| **Material Logic** | Material serves mimetic accuracy; bronze, marble, clay chosen for detail and permanence | Material chosen for formal qualities (weight, texture, reflectivity) that serve compositional goals | Material is semantically loaded; choice of material *is* part of the conceptual argument | Does the material choice feel decorative, structurally necessary, or conceptually justified? |
+| **Spatial Contract** | Sculpture occupies bounded space; viewer remains outside, observing the idealized form | Sculpture reshapes perceptual space; viewer navigates formal relationships dynamically | Sculpture may be site-specific, ephemeral, or participatory; space is part of the work's meaning | Does the work assume a fixed viewing position, invite movement, or require contextual knowledge to decode? |
+| **Success Condition** | Anatomical coherence, proportional refinement, convincing idealization of form | Internal formal consistency; compositional logic that sustains visual interest without representational anchor | Conceptual clarity; material and process choices legible as ideas, not mere novelty | Can the viewer reconstruct the work's governing logic? Does it fulfill the paradigm's implicit contract? |
+| **Failure Mode** | Representational incoherence: poor anatomy, weak proportion, unintentional distortion | Formalist confusion: arbitrary decisions, contradictory compositional logic, lack of visual argument | Conceptual hollowness: gimmicky materials, decorative participation, inability to articulate necessity of choices | Does the work betray its paradigm by failing to deliver on its core promise? |
+| **Historical Positioning** | Dominant from antiquity through 19th century; basis for academic training and public monuments | Emerges early 20th century (Brancusi, Arp); ascendant mid-century (Smith, Caro); formalizes sculpture-as-object | Consolidates 1960s onward (Judd, Serra, Hesse); expands to dematerialization, installation, social practice | Does the work operate within its historical moment's technical and conceptual resources, or does it import later paradigms anachronistically? |

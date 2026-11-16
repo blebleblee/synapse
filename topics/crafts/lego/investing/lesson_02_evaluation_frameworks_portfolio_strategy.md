@@ -64,25 +64,47 @@ Direct peer-to-peer sales through collector forums, Discord communities, and Fac
 
 Liquidity in the Lego market is not instantaneous. Unlike equity markets, where a market order fills in seconds, selling a sealed Lego set at a target price requires a buyer to be present at that price point at the time of listing, and the pool of such buyers for any given set is thin. The following diagram illustrates the typical liquidity curve for a sealed Lego set listed on BrickLink at fair market value:
 
-```
-Time-to-Exit Probability at Fair Market Price (Sealed Set)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
- Sale Probability │
-   100% ┤                              ████
-        │                         ██████
-    80% ┤                    █████
-        │               ████
-    60% ┤           ████
-        │        ███
-    40% ┤     ███
-        │   ██
-    20% ┤  ██
-        │ █
-     0% ┤█
-        └──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──
-           1  2  3  4  5  6  7  8  9  10
-                 Weeks Listed
+```mermaid
+flowchart TD
+    title["Time-to-Exit Probability at Fair Market Price (Sealed Set)"]
+    
+    subgraph chart [" "]
+        direction LR
+        
+        w1["Week 1<br/>~5% Sale Probability"]
+        w2["Week 2<br/>~15% Sale Probability"]
+        w3["Week 3<br/>~25% Sale Probability"]
+        w4["Week 4<br/>~40% Sale Probability"]
+        w5["Week 5<br/>~55% Sale Probability"]
+        w6["Week 6<br/>~65% Sale Probability"]
+        w7["Week 7<br/>~75% Sale Probability"]
+        w8["Week 8<br/>~85% Sale Probability"]
+        w9["Week 9<br/>~95% Sale Probability"]
+        w10["Week 10<br/>~100% Sale Probability"]
+        
+        w1 --> w2
+        w2 --> w3
+        w3 --> w4
+        w4 --> w5
+        w5 --> w6
+        w6 --> w7
+        w7 --> w8
+        w8 --> w9
+        w9 --> w10
+    end
+    
+    title --> chart
+    
+    style w1 fill:#e8e8e8
+    style w2 fill:#d4d4d4
+    style w3 fill:#c0c0c0
+    style w4 fill:#a0a0a0
+    style w5 fill:#808080
+    style w6 fill:#6a6a6a
+    style w7 fill:#545454
+    style w8 fill:#3e3e3e
+    style w9 fill:#282828
+    style w10 fill:#121212
 ```
 
 The median time-to-sale for a sealed set priced at the BrickLink six-month average is approximately three to six weeks. Pricing 10 percent above the average extends median time-to-sale to eight to twelve weeks. Pricing 20 percent above the average can extend time-to-sale to three to six months or result in no sale at all during the listing window. Pricing 10 percent below the average typically produces a sale within one to two weeks. This price-velocity tradeoff is the primary lever the seller controls, and it must be exercised deliberately based on the portfolio's capital recovery requirements, not left to default pricing behavior.
@@ -95,47 +117,52 @@ A Lego investment portfolio is a collection of positions across themes, set size
 
 The core consists of positions in blue-chip sets: Star Wars UCS models, Creator Expert modular buildings, flagship Technic models, and high-recognition Ideas sets. These positions have the deepest historical data, the most predictable post-retirement demand curves, and the most liquid secondary markets. They are the ballast of the portfolio. Core positions should represent 50 to 65 percent of total portfolio capital. The satellite consists of speculative positions: recently retired themes whose post-EOL trajectory is not yet established, smaller licensed sets with strong minifigure value, Architecture sets with cultural recognition, and opportunistic clearance purchases. Satellite positions carry higher risk and higher potential return. They should represent 20 to 35 percent of portfolio capital. The remaining 5 to 15 percent is held as cash reserves for opportunistic acquisition, particularly during LEGO Group clearance events, Black Friday discounting, and post-retirement fire sales at retailers liquidating remaining stock.
 
-```
-Portfolio Capital Allocation: Core-Satellite Model
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```mermaid
+flowchart TD
+    TOTAL["💼 TOTAL PORTFOLIO CAPITAL"]
 
-┌─────────────────────────────────────────────────┐
-│              TOTAL PORTFOLIO CAPITAL              │
-│                                                  │
-│  ┌────────────────────────────┐                  │
-│  │         CORE (55-65%)       │                  │
-│  │  ┌──────────┐ ┌──────────┐  │                  │
-│  │  │Star Wars │ │Creator   │  │                  │
-│  │  │UCS (20%) │ │Expert    │  │                  │
-│  │  │          │ │Modulars  │  │                  │
-│  │  │          │ │(15%)     │  │                  │
-│  │  └──────────┘ └──────────┘  │                  │
-│  │  ┌──────────┐ ┌──────────┐  │                  │
-│  │  │Technic   │ │Ideas     │  │                  │
-│  │  │Flagship  │ │(Flagship)│  │                  │
-│  │  │(12%)     │ │(8%)      │  │                  │
-│  │  └──────────┘ └──────────┘  │                  │
-│  └────────────────────────────┘                  │
-│                                                  │
-│  ┌────────────────────────────┐                  │
-│  │      SATELLITE (25-35%)    │                  │
-│  │  ┌────────┐ ┌───────────┐ │                  │
-│  │  │Specula-│ │Architecture│ │                  │
-│  │  │tive    │ │Selective   │ │                  │
-│  │  │Themes  │ │(8%)        │ │                  │
-│  │  │(12%)   │ │            │ │                  │
-│  │  └────────┘ └───────────┘ │                  │
-│  │  ┌────────┐ ┌───────────┐ │                  │
-│  │  │Minifig │ │Clearance  │ │                  │
-│  │  │Value   │ │Opportunism│ │                  │
-│  │  │Sets(7%)│ │(8%)       │ │                  │
-│  │  └────────┘ └───────────┘ │                  │
-│  └────────────────────────────┘                  │
-│                                                  │
-│  ┌──────────┐                                    │
-│  │CASH (10%)│                                    │
-│  └──────────┘                                    │
-└─────────────────────────────────────────────────┘
+    subgraph core ["CORE (55–65%)"]
+        SW["Star Wars UCS\n20%"]
+        CE["Creator Expert\nModulars\n15%"]
+        TF["Technic Flagship\n12%"]
+        ID["Ideas Flagship\n8%"]
+    end
+
+    subgraph satellite ["SATELLITE (25–35%)"]
+        ST["Speculative\nThemes\n12%"]
+        AS["Architecture\nSelective\n8%"]
+        MV["Minifig Value\nSets\n7%"]
+        CO["Clearance\nOpportunism\n8%"]
+    end
+
+    CASH["💵 CASH\n10%"]
+
+    TOTAL --> core
+    TOTAL --> satellite
+    TOTAL --> CASH
+
+    core --- SW
+    core --- CE
+    core --- TF
+    core --- ID
+
+    satellite --- ST
+    satellite --- AS
+    satellite --- MV
+    satellite --- CO
+
+    style TOTAL fill:#1a1a2e,color:#ffffff,stroke:#4a90d9,stroke-width:2px
+    style core fill:#0d3b66,color:#ffffff,stroke:#4a90d9,stroke-width:2px
+    style satellite fill:#1b4332,color:#ffffff,stroke:#52b788,stroke-width:2px
+    style CASH fill:#3d2b1f,color:#ffffff,stroke:#d4a373,stroke-width:2px
+    style SW fill:#1e3a5f,color:#cce4ff,stroke:#4a90d9
+    style CE fill:#1e3a5f,color:#cce4ff,stroke:#4a90d9
+    style TF fill:#1e3a5f,color:#cce4ff,stroke:#4a90d9
+    style ID fill:#1e3a5f,color:#cce4ff,stroke:#4a90d9
+    style ST fill:#1a3d2b,color:#b7e4c7,stroke:#52b788
+    style AS fill:#1a3d2b,color:#b7e4c7,stroke:#52b788
+    style MV fill:#1a3d2b,color:#b7e4c7,stroke:#52b788
+    style CO fill:#1a3d2b,color:#b7e4c7,stroke:#52b788
 ```
 
 Diversification across retirement timelines is the dimension most often neglected by novice investors and most critical to managing liquidity. If every position in a portfolio retires in the same twelve-month window, the entire portfolio becomes available for sale simultaneously, flooding the investor's own exit pipeline and forcing price concessions to move volume. The remedy is to track the LEGO Group's production cycle and stagger acquisitions so that positions retire across a three-to-five-year horizon. The LEGO Group typically refreshes product lines on eighteen-to-thirty-six-month cycles, with larger sets running longer. Monitoring retirement indicators, such as the "Retiring Soon" tags on LEGO Shop at Home, inventory depletion patterns at major retailers, and the Brickset retirement tracker, allows the investor to construct a staggered exit timeline rather than a concentrated one.
@@ -152,34 +179,24 @@ Minifigure value contribution assesses whether a set's secondary market value is
 
 The buy/hold/sell decision tree integrates these metrics with retirement status, holding period, and portfolio context:
 
-```
-Decision Framework: Buy / Hold / Sell
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-                 ┌──────────────┐
-                 │  Position    │
-                 │  Evaluation  │
-                 └──────┬───────┘
-                        │
-              ┌─────────┴─────────┐
-              │  Set Retired?      │
-              └────┬────────┬──────┘
-                  │Yes     │No
-           ┌──────┴──┐  ┌──┴──────────┐
-           │Hold/Sell │  │ Buy Monitor  │
-           └────┬────┘  └─────┬────────┘
-                │              │
-     ┌──────────┴───┐    ┌─────┴──────┐
-     │ CAGR vs.     │    │ PPR <0.08? │
-     │ Target Met?  │    │ IP Strong? │
-     └──┬───────┬───┘    │ Excl. Figs?│
-       │Yes    │No      └──┬─────┬───┘
-   ┌───┴──┐  ┌─┴────┐      │Yes   │No
-   │Sell  │  │Hold  │   ┌──┴──┐  │Pass│
-   │(staged│  │until │   │ BUY │  └────┘
-   │ or   │  │target│   │     │
-   │full)  │  │met   │   └─────┘
-   └──────┘  └──────┘
+```mermaid
+flowchart TD
+    Start["Position Evaluation"]
+    
+    Start --> SetRetired{"Set Retired?"}
+    
+    SetRetired -->|Yes| HoldSell["Hold/Sell"]
+    SetRetired -->|No| BuyMonitor["Buy Monitor"]
+    
+    HoldSell --> CAGRCheck{"CAGR vs.<br/>Target Met?"}
+    
+    CAGRCheck -->|Yes| Sell["Sell<br/>(staged or full)"]
+    CAGRCheck -->|No| Hold["Hold<br/>until target met"]
+    
+    BuyMonitor --> BuyChecks{"PPR < 0.08?<br/>IP Strong?<br/>Excl. Figs?"}
+    
+    BuyChecks -->|Yes| Buy["BUY"]
+    BuyChecks -->|No| Pass["Pass"]
 ```
 
 The decision framework is not static. It is re-evaluated at defined intervals: quarterly for active positions, at retirement announcement for pre-retirement positions, and immediately upon any LEGO Group announcement of a re-release, theme cancellation, or major product line restructuring that affects a held position.

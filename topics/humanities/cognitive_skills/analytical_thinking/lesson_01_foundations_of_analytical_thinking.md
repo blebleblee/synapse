@@ -58,51 +58,28 @@ Problem representation constitutes the first critical architectural component of
 
 Effective problem representation requires identifying the essential structure of the problem while abstracting away irrelevant surface details. When analyzing customer churn, the essential structure involves the relationship between customer attributes, engagement patterns, competitive alternatives, and retention outcomes. Surface details like customer names, specific dates, or idiosyncratic personal circumstances matter for individual cases but obscure structural patterns when analyzing aggregate behavior. The analytical challenge lies in determining which details constitute signal versus noise—a judgment that requires domain knowledge and often iterative refinement as analysis proceeds.
 
-```
-ANALYTICAL THINKING ARCHITECTURE
-
-Problem Framing
-      ↓
-┌─────────────────────────────────────┐
-│  Working Memory (Active Processing) │
-│                                     │
-│  ┌──────────────────────────────┐  │
-│  │ Current Hypothesis Set       │  │
-│  │ • Candidate explanations     │  │
-│  │ • Distinguishing predictions │  │
-│  └──────────────────────────────┘  │
-│              ↕                      │
-│  ┌──────────────────────────────┐  │
-│  │ Evidence Buffer              │  │
-│  │ • Observations               │  │
-│  │ • Test results               │  │
-│  │ • Logical premises           │  │
-│  └──────────────────────────────┘  │
-│              ↕                      │
-│  ┌──────────────────────────────┐  │
-│  │ Inference Engine             │  │
-│  │ • Hypothesis evaluation      │  │
-│  │ • Constraint propagation     │  │
-│  │ • Causal reasoning           │  │
-│  └──────────────────────────────┘  │
-│              ↕                      │
-│  ┌──────────────────────────────┐  │
-│  │ Mechanistic Model            │  │
-│  │ • Component relationships    │  │
-│  │ • Causal pathways            │  │
-│  │ • Emergent predictions       │  │
-│  └──────────────────────────────┘  │
-└─────────────────────────────────────┘
-         ↕             ↕
-┌──────────────┐  ┌──────────────┐
-│  Long-Term   │  │  External    │
-│  Memory      │  │  Memory      │
-│              │  │              │
-│ • Domain     │  │ • Notes      │
-│   knowledge  │  │ • Diagrams   │
-│ • Procedures │  │ • References │
-│ • Episodes   │  │ • Data       │
-└──────────────┘  └──────────────┘
+```mermaid
+flowchart TD
+    PF["Problem Framing"]
+    
+    PF --> WM
+    
+    subgraph WM ["Working Memory (Active Processing)"]
+        CHS["Current Hypothesis Set<br/>• Candidate explanations<br/>• Distinguishing predictions"]
+        EB["Evidence Buffer<br/>• Observations<br/>• Test results<br/>• Logical premises"]
+        IE["Inference Engine<br/>• Hypothesis evaluation<br/>• Constraint propagation<br/>• Causal reasoning"]
+        MM["Mechanistic Model<br/>• Component relationships<br/>• Causal pathways<br/>• Emergent predictions"]
+        
+        CHS <--> EB
+        EB <--> IE
+        IE <--> MM
+    end
+    
+    WM <--> LTM
+    WM <--> EM
+    
+    LTM["Long-Term Memory<br/>• Domain knowledge<br/>• Procedures<br/>• Episodes"]
+    EM["External Memory<br/>• Notes<br/>• Diagrams<br/>• References<br/>• Data"]
 ```
 
 Decomposition strategies form the second architectural component, providing systematic methods for fragmenting complex problems into tractable sub-problems. Functional decomposition divides systems according to distinct functions or purposes: a business process decomposes into customer acquisition, order fulfillment, and customer support; a software application decomposes into user interface, business logic, and data persistence. Structural decomposition follows physical or organizational boundaries: a supply chain decomposes into suppliers, manufacturers, distributors, and retailers; an electrical circuit decomposes into power supply, signal processing, and output stages.

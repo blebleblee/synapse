@@ -90,36 +90,46 @@ Parasitic draw testing identifies electrical loads that remain active with the v
 
 The following diagram illustrates a simplified automotive power distribution and CAN network architecture:
 
-```
-                           Battery (12.6V nominal)
-                                    |
-                                    |
-                    +---------------+---------------+
-                    |                               |
-              [Mega Fuse 150A]               [Fuse 10A]
-                    |                               |
-                    |                               |
-         +----------+----------+             [Body Control Module]
-         |                     |                    |
-    [Starter Motor]    [Alternator Output]         |
-                              |                     |
-                              |          +----------+----------+
-                              |          |                     |
-                    +---------+-------[Power Distribution]    |
-                    |                    Module               |
-                    |                         |                |
-       [Fuse 20A]  [Fuse 30A]        [Fuse 15A]              |
-            |           |                  |                   |
-      [Fuel Pump]  [Headlamps]  [HVAC Blower Motor]          |
-                                                               |
-                                                               |
-    CAN High  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                   ║               ║               ║
-    CAN Low   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                   ║               ║               ║
-              [ECM Module]   [TCM Module]   [ABS Module]
-                   ║               ║               ║
-            120Ω Termination    (modules)    120Ω Termination
+```mermaid
+flowchart TD
+    BAT["🔋 Battery\n12.6V Nominal"]
+
+    BAT --> MEGAFUSE["Mega Fuse 150A"]
+    BAT --> FUSE10["Fuse 10A"]
+
+    MEGAFUSE --> STARTER["Starter Motor"]
+    MEGAFUSE --> ALT["Alternator Output"]
+
+    FUSE10 --> BCM["Body Control Module"]
+
+    ALT --> PDM["Power Distribution Module"]
+    BCM --> PDM
+
+    PDM --> FUSE20["Fuse 20A"]
+    PDM --> FUSE30["Fuse 30A"]
+    PDM --> FUSE15["Fuse 15A"]
+
+    FUSE20 --> FUEL["Fuel Pump"]
+    FUSE30 --> HEAD["Headlamps"]
+    FUSE15 --> HVAC["HVAC Blower Motor"]
+
+    subgraph CAN_BUS ["CAN Bus Network"]
+        direction LR
+        TERM1["120Ω Termination"]
+        ECM["ECM Module"]
+        TCM["TCM Module"]
+        ABS["ABS Module"]
+        TERM2["120Ω Termination"]
+
+        TERM1 --- ECM
+        ECM --- TCM
+        TCM --- ABS
+        ABS --- TERM2
+    end
+
+    BCM -.->|"CAN High / CAN Low"| ECM
+    BCM -.->|"CAN High / CAN Low"| TCM
+    BCM -.->|"CAN High / CAN Low"| ABS
 ```
 
 This architecture shows power flowing from the battery through fuses to various loads, with the alternator replenishing charge. The CAN bus connects multiple control modules in parallel, with 120-ohm termination resistors at each physical end of the bus ensuring proper impedance matching.

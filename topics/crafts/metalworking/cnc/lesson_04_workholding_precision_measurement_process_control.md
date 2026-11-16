@@ -34,16 +34,18 @@ The bridge between physical workpiece position and the machine's coordinate syst
 
 The process of establishing this offset is called **datum establishment** or **probing the datum**, and it proceeds through a hierarchy of measurements beginning with the most critical axis. On a vertical mill, Z is typically established first because tool length offset errors in Z cause crash risk; X and Y are established second and third through edge-finding or center-finding. The Z datum is almost always the top face of the workpiece or the top of a fixture surface, since the program's Z-zero is conventionally placed there in CAM software.
 
-```
-Machine Coordinate System (G53)
-        │
-        │  ← Work Coordinate Offset (G54 values in X, Y, Z)
-        │
-Workpiece Datum (Program Zero)
-        │
-        │  ← Tool Length Offset (Hxx value, stored per tool)
-        │
-Tool Tip (actual cutting point)
+```mermaid
+flowchart TD
+    MCS["Machine Coordinate System (G53)"]
+    WCO["Work Coordinate Offset\n(G54 values in X, Y, Z)"]
+    WPD["Workpiece Datum\n(Program Zero)"]
+    TLO["Tool Length Offset\n(Hxx value, stored per tool)"]
+    TTP["Tool Tip\n(actual cutting point)"]
+
+    MCS -->|"offset applied"| WCO
+    WCO -->|"defines"| WPD
+    WPD -->|"offset applied"| TLO
+    TLO -->|"defines"| TTP
 ```
 
 This chain of transformations means that an error in any link propagates to the cutting edge. If the G54 Z-offset is wrong by 0.1 mm, every Z-depth in the program is wrong by 0.1 mm. If the tool length offset is wrong by 0.5 mm and the program calls a 0.3 mm Z-depth, the tool will plunge 0.2 mm into the fixture.

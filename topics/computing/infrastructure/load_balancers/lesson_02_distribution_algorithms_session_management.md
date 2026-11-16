@@ -263,18 +263,15 @@ Timeout-based expiration introduces the problem of stale entry accumulation. If 
 
 Connection draining during backend decommissioning requires state machine coordination between the control plane (configuration management) and data plane (request forwarding). When a backend enters draining state, the load balancer stops selecting it for new connections but continues forwarding traffic on existing connections. The draining timeout (typically 30-300 seconds) bounds the maximum wait before forcibly closing remaining connections.
 
-```
-Backend State Machine:
+```mermaid
+flowchart TD
+    ACTIVE["ACTIVE"]
+    DRAINING["DRAINING"]
+    REMOVED["REMOVED"]
 
-    ACTIVE ──┐
-      ▲      │ health_check_fail / admin_disable
-      │      ▼
-      │   DRAINING ──────────────┐
-      │      │                   │ all_connections_closed / timeout
-      │      │                   ▼
-      │      └──────────────> REMOVED
-      │
-      └── health_check_pass / admin_enable ──────┘
+    ACTIVE -->|"health_check_fail / admin_disable"| DRAINING
+    DRAINING -->|"all_connections_closed / timeout"| REMOVED
+    REMOVED -->|"health_check_pass / admin_enable"| ACTIVE
 ```
 
 The draining state maintains two counters: the number of active connections and a timestamp marking when draining began. Every connection termination decrements the connection count and checks whether it reached zero. Every second, a timer checks whether the draining duration exceeded the configured timeout. Either condition triggers the transition to REMOVED state, at which point the backend descriptor is freed and the configuration update completes.

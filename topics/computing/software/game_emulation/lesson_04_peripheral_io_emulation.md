@@ -162,23 +162,72 @@ static inline void ppu_tick(NES_PPU *ppu, NES_Mapper *mapper)
 
 The SNES PPU scales this complexity considerably. It introduces eight distinct background modes (Mode 7 being the affine-transformed pseudo-3D floor used in F-Zero and Super Mario Kart), hardware windows that can mask layers with any boolean combination, color math that blends layers using per-pixel add or subtract operations, and a high-resolution mode that doubles horizontal resolution to 512 pixels using alternating fields. Each of these features must be modeled as a continuation of the same dot-by-dot state machine approach, with the HDMA (Horizontal DMA) system layered on top to allow the CPU to update PPU registers once per scanline from a table in RAM, enabling per-scanline scroll values, color math coefficients, and window positions that produce effects impossible through direct CPU writes.
 
-```
-NES PPU Rendering Pipeline (per dot, visible region)
-
-  VRAM                       Shift Registers              Pixel Output
-  ────                       ───────────────              ────────────
-  NT fetch ──► nt_byte ──┐
-  AT fetch ──► at_byte ──┤
-  PT_lo fetch ──► pt_lo ─┤──► reload at dot&7==7 ──► bg_shift_lo[15:0] ──┐
-  PT_hi fetch ──► pt_hi ─┘                            bg_shift_hi[15:0] ──┤
-                                                       at_shift_lo[7:0]  ──┤──► Mux(fine_x) ──► bg_pixel (2+2 bit)
-                                                       at_shift_hi[7:0]  ──┘
-
-  OAM secondary ──► sp_shift_lo[7:0] [0..7] ──┐
-                    sp_shift_hi[7:0] [0..7] ──┤──► X counter expire ──► sp_pixel (2+2 bit)
-                    sp_attribute[7]  [0..7] ──┘
-
-  bg_pixel + sp_pixel ──► Priority Mux ──► Palette RAM index ──► RGBA output
+```mermaid
+flowchart LR
+    subgraph VRAM["VRAM Fetches"]
+        NT["NT fetch"]
+        AT["AT fetch"]
+        PT_LO["PT_lo fetch"]
+        PT_HI["PT_hi fetch"]
+    end
+    
+    subgraph Latches["Intermediate Latches"]
+        NTB["nt_byte"]
+        ATB["at_byte"]
+        PTLO["pt_lo"]
+        PTHI["pt_hi"]
+    end
+    
+    subgraph ShiftRegs["Background Shift Registers"]
+        BGLO["bg_shift_lo[15:0]"]
+        BGHI["bg_shift_hi[15:0]"]
+        ATLO["at_shift_lo[7:0]"]
+        ATHI["at_shift_hi[7:0]"]
+    end
+    
+    subgraph SpriteRegs["Sprite Shift Registers (8 sprites)"]
+        SPLO["sp_shift_lo[7:0] [0..7]"]
+        SPHI["sp_shift_hi[7:0] [0..7]"]
+        SPAT["sp_attribute[7] [0..7]"]
+    end
+    
+    NT --> NTB
+    AT --> ATB
+    PT_LO --> PTLO
+    PT_HI --> PTHI
+    
+    NTB --> RELOAD["Reload at dot&7==7"]
+    ATB --> RELOAD
+    PTLO --> RELOAD
+    PTHI --> RELOAD
+    
+    RELOAD --> BGLO
+    RELOAD --> BGHI
+    RELOAD --> ATLO
+    RELOAD --> ATHI
+    
+    BGLO --> BGMUX["Mux(fine_x)"]
+    BGHI --> BGMUX
+    ATLO --> BGMUX
+    ATHI --> BGMUX
+    
+    BGMUX --> BGPX["bg_pixel (2+2 bit)"]
+    
+    OAM["OAM secondary"] --> SPLO
+    OAM --> SPHI
+    OAM --> SPAT
+    
+    SPLO --> XCTR["X counter expire"]
+    SPHI --> XCTR
+    SPAT --> XCTR
+    
+    XCTR --> SPPX["sp_pixel (2+2 bit)"]
+    
+    BGPX --> PMUX["Priority Mux"]
+    SPPX --> PMUX
+    
+    PMUX --> PRAM["Palette RAM index"]
+    PRAM --> RGBA["RGBA output"]
 ```
 
 ### The Audio Subsystem: Continuous Waveform Generation

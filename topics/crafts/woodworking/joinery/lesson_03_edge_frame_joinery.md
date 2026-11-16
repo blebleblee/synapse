@@ -146,22 +146,41 @@ The mitigation for coverage voids is consistent adhesive application to both fac
 
 The second failure mode specific to panels with breadboard ends is seasonal fracture through the panel width. A breadboard end is a cross-grain member attached perpendicular to the long grain of a panel to prevent cupping. The fundamental problem is that the long-grain panel will expand and contract across its width with seasonal humidity change while the breadboard end, running cross-grain, resists that movement. If the breadboard end is glued across its full length, the panel will split within a few seasons. The correct construction allows the panel to move beneath the breadboard by elongating the fastener holes (typically slot-cut mortises for drawbore pins or slotted screw holes for wood screws) so that the breadboard is glued only at its center—approximately 50–75 mm at the midpoint—and mechanically fastened with no glue at the outer zones. The center glue point fixes the reference position of the panel relative to the breadboard; the slotted fastenings at the ends allow the panel to move in both directions from that midpoint without stressing the cross-grain connection.
 
-```
-Breadboard End: Slotted Fastener Layout
-
-Panel width (W):     ├─────────── W ─────────────┤
-                     │                            │
-Center glue zone:    │    ├── 60 mm ──┤           │
-                     │                            │
-Pin/screw spacing:   ● ○──────────●──────────○ ●
-                     ↑            ↑            ↑
-               Slotted slot    Glued center  Slotted slot
-               (8 mm slot,     (round hole,  (8 mm slot,
-               4 mm pin)       glued)        4 mm pin)
-
-Movement allowance per 300 mm panel width:
-  Flat-sawn hardwood at 50% RH swing: ±3.5 – 4.5 mm
-  Slot length minimum = movement allowance × 1.5 (safety factor)
+```mermaid
+flowchart TD
+    subgraph panel ["Breadboard End: Slotted Fastener Layout"]
+        direction TB
+        
+        width["Panel Width: W"]
+        
+        subgraph center ["Center Glue Zone: 60 mm"]
+            glued["Glued Center<br/>Round hole<br/>Fixed attachment"]
+        end
+        
+        subgraph left ["Left Edge"]
+            slot_left["Slotted Slot<br/>8 mm slot length<br/>4 mm pin/screw<br/>Allows lateral movement"]
+        end
+        
+        subgraph right ["Right Edge"]
+            slot_right["Slotted Slot<br/>8 mm slot length<br/>4 mm pin/screw<br/>Allows lateral movement"]
+        end
+        
+        width --> left
+        width --> center
+        width --> right
+        
+        slot_left -.movement.-> glued
+        slot_right -.movement.-> glued
+    end
+    
+    subgraph specs ["Movement Allowance per 300 mm Panel Width"]
+        hardwood["Flat-sawn hardwood at 50% RH swing:<br/>±3.5 – 4.5 mm"]
+        safety["Slot length minimum = movement allowance × 1.5<br/>Safety factor"]
+        
+        hardwood --> safety
+    end
+    
+    panel -.design basis.-> specs
 ```
 
 Structural edging—solid wood banding applied to the edge of a veneered or plywood substrate—presents a related movement problem. Solid wood edging glued to plywood along the long grain dimension is stable because the edging and the plywood face veneers share approximately the same expansion axis. However, mitered solid wood edging at corners, where end grain meets long grain at the substrate corner, is susceptible to telegraphing as the edging thickness changes seasonally. The mitigation is to use species with low coefficient of movement for edging (quarter-sawn stock, again, is ideal), to keep edging thickness below 6 mm on dimensionally sensitive applications, or to use a splined miter joint at corners that provides a continuous long-grain-to-long-grain bond at the miter rather than relying on end-grain adhesion alone.

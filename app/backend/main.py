@@ -1396,7 +1396,7 @@ async def terminal_websocket(websocket: WebSocket):
             shell = os.environ.get("COMSPEC", "powershell.exe")
             args = []
         else:
-            shell = os.environ.get("SHELL", "/bin/zsh" if os.path.exists("/bin/zsh") else "/bin/bash")
+            shell = "/bin/bash" if os.path.exists("/bin/bash") else "/bin/sh"
             args = ["-i"]
 
         proc = await asyncio.create_subprocess_exec(
@@ -1700,18 +1700,27 @@ async def terminal_websocket(websocket: WebSocket):
                 os.write(master, raw_bytes)
             except OSError:
                 break
-    except WebSocketDisconnect:
-        pass
-    except Exception as e:
-        print(f"TERMINAL WS EXCEPTION: {type(e)}: {e}", flush=True)
-        import traceback
-        traceback.print_exc()
+    except (WebSocketDisconnect, Exception) as e:
+        if "WebSocketDisconnect" in type(e).__name__:
+            pass
+        else:
+            print(f"TERMINAL WS EXCEPTION: {type(e)}: {e}", flush=True)
     finally:
         read_task.cancel()
         try:
-            os.close(master)
-            os.kill(pid, 9)
-            os.waitpid(pid, 0)
+            if master != -1:
+                os.close(master)
+        except Exception:
+            pass
+        try:
+            if slave != -1:
+                os.close(slave)
+        except Exception:
+            pass
+        try:
+            if pid > 0:
+                os.kill(pid, 9)
+                os.waitpid(pid, 0)
         except Exception:
             pass
 

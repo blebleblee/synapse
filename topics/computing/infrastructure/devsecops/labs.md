@@ -308,3 +308,4 @@ spec:
         - containerPort: 3000
         securityContext:
           runAsUser: 0
+```

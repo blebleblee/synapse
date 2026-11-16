@@ -1505,9 +1505,9 @@ graph TB
     bronze_pool --> osd1
     bronze_pool --> osd3
     
-    style gold_pod fill:#ffd700
-    style silver_pod fill:#c0c0c0
-    style bronze_pod fill:#cd7f32
+    style gold_pod fill:#ffd700,color:#0f172a
+    style silver_pod fill:#c0c0c0,color:#0f172a
+    style bronze_pod fill:#cd7f32,color:#0f172a
 ```
 
 **Verification Checklist:**
@@ -1614,10 +1614,10 @@ ceph mon remove <mon-name>
 |--------|---------|---------------|-----------------|
 | Cluster Health | `ceph -s` | HEALTH_OK | HEALTH_WARN |
 | Mon Quorum | `ceph quorum_status` | All mons in quorum | <N/2+1 mons |
-| OSD Utilization | `ceph osd df` | <80% full | >85% full |
+| OSD Utilization | `ceph osd df` | < 80% full | >85% full |
 | PG State | `ceph pg stat` | 100% active+clean | Any inactive PGs |
-| Commit Latency | `ceph osd perf` | <10ms (SSD) | >50ms |
-| Network Throughput | `iperf3` | >8 Gbps (10GbE) | <5 Gbps |
+| Commit Latency | `ceph osd perf` | < 10ms (SSD) | >50ms |
+| Network Throughput | `iperf3` | >8 Gbps (10GbE) | < 5 Gbps |
 | Recovery Rate | `ceph -s` | >100 MB/s | Stalled >1 hour |
 
 ---
@@ -1629,3 +1629,22 @@ ceph mon remove <mon-name>
 - Rook Operator: https://rook.io/docs/rook/latest/
 - BlueStore Internals: https://docs.ceph.com/en/latest/rados/configuration/bluestore-config-ref/
 - fio User Guide: https://fio.readthedocs.io/
+
+## Conclusion
+
+This lab establishes the foundational operational patterns required to deploy and sustain production-grade Ceph storage clusters in hyperconverged environments. The deliberate emphasis on verification workflows—from CRUSH map validation and placement group distribution analysis to OSD failure injection and monitor quorum testing—reinforces that distributed storage reliability emerges not from vendor abstractions but from engineering rigor applied to consensus protocols, replication topologies, and failure domain isolation. The progression from single-node deployment through multi-node cluster expansion, RBD provisioning, and CephFS integration mirrors real-world adoption paths while exposing critical decision points: journal placement strategies that determine write latency floors, replication factor selections that govern durability-performance tradeoffs, and scrubbing schedules that balance data integrity verification against I/O contention. Practitioners who internalize these verification patterns—particularly the diagnostic primacy of `ceph -s`, `ceph osd tree`, and `ceph pg dump`—will distinguish transient degradation from systemic design flaws and respond with surgical precision rather than trial-and-error remediation.
+
+The production readiness checklist codifies the non-negotiable infrastructure hygiene that separates proof-of-concept deployments from mission-critical storage fabrics. Time synchronization tolerances below 50ms, monitor placement across physical failure domains, dedicated storage networks isolated from management traffic, and the 80% utilization threshold for capacity planning are not aspirational guidelines but operational boundaries derived from Paxos consensus requirements, network partition risks, and performance degradation curves observed across thousands of production clusters. The performance metrics reference table provides quantitative success criteria—commit latencies under 10ms for SSD-backed OSDs, recovery rates exceeding 100 MB/s, placement group states converging to 100% active+clean—that enable objective assessment of cluster health independent of vendor dashboards or heuristic interpretations. Mastery of Ceph's operational model, particularly CRUSH's deterministic placement algorithm and the relationship between replication factor, failure domain scope, and minimum cluster size (`N ≥ R × F` where R is replicas and F is failure domains), equips infrastructure engineers to architect storage systems that satisfy both application SLAs and total cost of ownership constraints in hyperconverged deployments.
+
+---
+
+## Summary & Verification Matrix
+
+| Invariant/Mechanism | Governing Principle | Diagnostic Command | Success Criterion | Failure Indicator |
+|---------------------|---------------------|-------------------|-------------------|-------------------|
+| **Monitor Quorum** | Paxos consensus requires `N/2 + 1` agreement; < 50ms clock skew mandatory | `ceph quorum_status`, `chronyc tracking` | All monitors in quorum, rank assigned, time delta < 0.05s | `HEALTH_WARN`, mon_status shows "out of quorum", clock skew >50ms |
+| **OSD Replication & CRUSH** | Objects replicated across failure domains per CRUSH rules; min cluster size = replicas × failure domains | `ceph osd tree`, `ceph pg dump`, `ceph osd crush rule dump` | PGs distributed evenly across hosts/racks, no single-host replica colocation | Uneven PG distribution (>20% variance), replicas on same failure domain, `incomplete` PG state |
+| **Placement Group States** | PGs must converge to `active+clean`; backfilling/recovery expected during OSD changes | `ceph pg stat`, `ceph -w` | 100% `active+clean`, no `degraded/incomplete/stale` for >15min post-event | Persistent `degraded` (>1 hour), `incomplete` (unfound objects), `stale` (unreachable primary) |
+| **Storage Performance** | Commit latency dominated by journal/WAL device; sequential throughput bound by network & disk spindle count | `ceph osd perf`, `fio`, `rados bench` | Commit latency < 10ms (SSD), IOPS >10k (RBD), throughput >500 MB/s (3-replica 10GbE) | Latency >50ms, throughput < 100 MB/s on idle cluster, PG log indicates slow requests |
+| **Capacity & Balancing** | OSDs should remain < 80% full; CRUSH weight determines data distribution proportional to size | `ceph osd df`, `ceph osd reweight` | Variance < 15% across OSDs, no OSD >85% full, reweight factors near 1.0 | Any OSD >85% triggers backfill/rebalance, `nearfull` or `full` ratio exceeded, cluster writes blocked |
+| **Data Durability** | Scrubbing detects bit rot; snapshots enable point-in-time recovery; min_size prevents split-brain | `ceph pg dump \| grep scrub`, `rbd snap ls` | Deep scrub completed < 7 days ago per PG, snapshots exist for critical RBDs, `min_size ≥ 2` | Scrub errors (inconsistent objects), no snapshots for >24h on prod volumes, `min_size = 1` risks data loss on dual failure |

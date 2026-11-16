@@ -92,7 +92,7 @@ Conduct accelerated wear testing using a Taber abraser or improvised rotary abra
 
 Chemical resistance evaluation exposes specimens to acetone, isopropyl alcohol, gasoline, and household cleaners for 10-minute immersions. Uncoated PLA dissolves in acetone, primer-only softens, primer-color resists short exposures, and two-component clear coats exhibit no damage after 30-minute immersion. This data informs coating system selection: decorative indoor parts require only primer-color, outdoor applications demand UV-resistant clear, and automotive or chemical exposure environments necessitate catalyzed polyurethane top coats.
 
-Develop spray technique mastery by practicing on scrap cardboard before coating actual parts. Common failures include orange peel from excessive spray distance (>300mm), runs from slow sweep speed (<200mm/s), and dry spray from insufficient solvent (expired paint or low ambient humidity). Optimal technique produces mirror-smooth gloss surfaces or controlled matte finishes via flattening agents in final clear coats, indistinguishable from factory-applied finishes.
+Develop spray technique mastery by practicing on scrap cardboard before coating actual parts. Common failures include orange peel from excessive spray distance (>300mm), runs from slow sweep speed (< 200mm/s), and dry spray from insufficient solvent (expired paint or low ambient humidity). Optimal technique produces mirror-smooth gloss surfaces or controlled matte finishes via flattening agents in final clear coats, indistinguishable from factory-applied finishes.
 
 ### Lab 2.3: Epoxy Resin Coating for Structural Reinforcement and Waterproofing
 
@@ -138,7 +138,7 @@ Place the first plate flat on a ceramic tile and anneal unconstrained at 70°C f
 
 Design a basic compression fixture for the third plate: sandwich between two 5mm aluminum plates, bolt at four corners with M4 screws torqued to 3 N⋅m. Anneal at 70°C for 2 hours. The aluminum distributes clamping forces and conducts heat uniformly, reducing thermal gradients that drive warping. Post-anneal measurement reveals the plate remains flat within 0.5mm over the 100mm span—acceptable for most applications. However, bolt-hole stress concentrations may initiate cracks in brittle annealed PLA. Inspect corners with magnification for radial crack propagation from holes.
 
-Improve fixturing for the fourth plate using compliant pressure distribution. Replace rigid aluminum with 10mm MDF boards that accommodate minor dimensional changes without stress concentration. Insert 3mm silicone rubber pads between MDF and specimen, distributing clamping pressure uniformly across the surface rather than at discrete bolt points. Clamp with spring-loaded toggle clamps pre-loaded to 100N—springs maintain constant pressure as thermal expansion and annealing shrinkage alter plate thickness. This fixture achieves <0.2mm flatness with zero cracking, representing optimal constrained annealing.
+Improve fixturing for the fourth plate using compliant pressure distribution. Replace rigid aluminum with 10mm MDF boards that accommodate minor dimensional changes without stress concentration. Insert 3mm silicone rubber pads between MDF and specimen, distributing clamping pressure uniformly across the surface rather than at discrete bolt points. Clamp with spring-loaded toggle clamps pre-loaded to 100N—springs maintain constant pressure as thermal expansion and annealing shrinkage alter plate thickness. This fixture achieves < 0.2mm flatness with zero cracking, representing optimal constrained annealing.
 
 Design a perimeter constraint fixture for the fifth plate to manage edge curl while leaving top and bottom surfaces free. Fabricate a picture-frame style jig from steel angle stock, clamping the plate's perimeter between inner and outer angle pieces. This fixture prevents edge lifting while allowing thickness reduction from shrinkage. Effective for plates and panels, but fails for complex 3D geometries where simple perimeter constraint cannot counteract multi-axis shrinkage vectors.
 
@@ -170,10 +170,10 @@ Validate remediation success using quantitative metrics: crosshatch adhesion mus
 
 | Geometry Type | Primary Method | Secondary Cleanup | Expected Scarring | Time Estimate |
 |---------------|----------------|-------------------|-------------------|---------------|
-| External vertical supports | Flush cutters + spatula leverage | 220-grit wet sand | Minimal, <0.2mm proud nubs | 3-5 min |
-| Tree supports, fine dendritic | Thermal assist at 60°C, 8-10s pulses | Deburring blade scrape | <0.1mm, often pristine | 5-7 min |
+| External vertical supports | Flush cutters + spatula leverage | 220-grit wet sand | Minimal, < 0.2mm proud nubs | 3-5 min |
+| Tree supports, fine dendritic | Thermal assist at 60°C, 8-10s pulses | Deburring blade scrape | < 0.1mm, often pristine | 5-7 min |
 | Internal cavity supports | Wire hook tool + needle-nose pliers | Rotary abrasive (Dremel 320-grit) | Moderate, 0.3-0.5mm roughness | 7-12 min |
-| Interface layers on critical surfaces | Thermal assist + spatula | 320-grit wet sand, circular motion | Minimal with care, <0.15mm | 4-6 min |
+| Interface layers on critical surfaces | Thermal assist + spatula | 320-grit wet sand, circular motion | Minimal with care, < 0.15mm | 4-6 min |
 | Raft or brim adhesion | Metal scraper at 15° angle | 220-grit dry sand | None if scraped cleanly | 2-3 min |
 
 ### Chemical Smoothing Exposure Schedule
@@ -198,7 +198,7 @@ Validate remediation success using quantitative metrics: crosshatch adhesion mus
 | 600 | Intermediate polish | 45° to prior direction | 60-80 | Moderate, 2-3 N | Water | 1.5-2.5 μm |
 | 800 | Fine polish | Opposite 45° | 50-60 | Light, 1-2 N | Water | 0.8-1.5 μm |
 | 1000 | Pre-finishing | Circular, 50mm diameter motions | 40-50 | Light, 1 N | Water | 0.4-0.8 μm |
-| 1500 | Mirror prep | Circular, 30mm diameter motions | 30-40 | Minimal, <1 N | Water or dry | 0.2-0.4 μm |
+| 1500 | Mirror prep | Circular, 30mm diameter motions | 30-40 | Minimal, < 1 N | Water or dry | 0.2-0.4 μm |
 | 2000 | Mirror finish | Circular, burnishing strokes | 20-30 | Minimal | Dry or polishing compound | 0.1-0.2 μm |
 
 ### Annealing Temperature and Duration Schedule
@@ -223,7 +223,7 @@ Validate remediation success using quantitative metrics: crosshatch adhesion mus
 | Basic Decorative | Filler, 2 coats | Acrylic, 3 coats | None | 80-100 | 24 hr | N/A | Low (5mg Taber loss) | Poor (alcohols OK, acetone fails) |
 | Standard Protective | Filler, 2 coats | Acrylic, 3 coats | 1K clear, 2 coats | 130-160 | 48 hr | 6 hr | Moderate (3mg loss) | Moderate (most solvents 10 min) |
 | High-Durability | Epoxy, 2 coats | Urethane, 3 coats | 2K poly clear, 3 coats | 180-220 | 72 hr | 8 hr | High (1.5mg loss) | Excellent (acetone 30 min OK) |
-| Automotive Grade | 2K epoxy primer | Urethane base/clear | 2K urethane clear, 4 coats | 200-280 | 5 days (7 for full) | 24 hr | Very High (<1mg loss) | Excellent (gasoline, brake fluid OK) |
+| Automotive Grade | 2K epoxy primer | Urethane base/clear | 2K urethane clear, 4 coats | 200-280 | 5 days (7 for full) | 24 hr | Very High (< 1mg loss) | Excellent (gasoline, brake fluid OK) |
 
 *Flash-off time between coats: 10 minutes for lacquers, 15 minutes for enamels, 30 minutes for catalyzed systems.*
 
@@ -232,7 +232,7 @@ Validate remediation success using quantitative metrics: crosshatch adhesion mus
 | Epoxy Type | Viscosity (cps @ 25°C) | Working Time (min) | Coat Thickness (mm) | Penetration into 20% Infill | Vacuum Required | Typical Applications |
 |------------|------------------------|--------------------|---------------------|----------------------------|-----------------|----------------------|
 | Low-viscosity marine | 300-500 | 30-45 | 0.15-0.25 | Partial, surface only | No | Waterproofing, light reinforcement |
-| Medium-viscosity laminating | 800-1200 | 20-30 | 0.25-0.40 | Limited, <2mm depth | Recommended | Structural reinforcement |
+| Medium-viscosity laminating | 800-1200 | 20-30 | 0.25-0.40 | Limited, < 2mm depth | Recommended | Structural reinforcement |
 | Bar-top/casting epoxy | 2000-4000 | 40-60 | 0.50-1.00 | None | Yes, essential | Heavy encapsulation, thick coats |
 | Fast-cure 5-min epoxy | 500-800 | 3-5 | 0.10-0.20 | None | No | Repairs, spot bonding |
 
@@ -255,18 +255,18 @@ Validate remediation success using quantitative metrics: crosshatch adhesion mus
 **Annealing Warping:**
 - *Symptoms:* Potato-chip curl, corner lifting, saddle deformation, dimensional growth, cracking at constraint points.
 - *Cause Analysis:* Insufficient fixturing, thermal gradients, constraint-induced stress concentration, over-temperature.
-- *Remediation:* If warp <2mm, re-anneal in improved fixture with compliant pressure; if >2mm, non-recoverable, re-print with +1% scaling compensation.
+- *Remediation:* If warp < 2mm, re-anneal in improved fixture with compliant pressure; if >2mm, non-recoverable, re-print with +1% scaling compensation.
 - *Prevention:* Compliant silicone pads, perimeter constraint for flat panels, reduced temperature (Tg - 15°C) with extended duration.
 
 **Coating Adhesion Failure:**
-- *Symptoms:* Peeling in sheets, crosshatch adhesion <80%, blistering.
+- *Symptoms:* Peeling in sheets, crosshatch adhesion < 80%, blistering.
 - *Cause Analysis:* Surface contamination (oils, mold release), insufficient mechanical tooth, incompatible chemistry.
 - *Remediation:* Strip with appropriate solvent (acetone for lacquer, methylene chloride for catalyzed), sand to 400-grit, degrease with IPA, prime with adhesion promoter.
 - *Prevention:* Nitrile glove handling only post-sanding; IPA wipe immediately before coating; 400-grit sanding mandatory.
 
 **Coating Orange Peel:**
 - *Symptoms:* Textured matte surface, low gloss (15-30 units), grainy tactile feel.
-- *Cause Analysis:* Excessive spray distance (>300mm), low ambient temperature (<15°C), fast-dry solvent evaporation.
+- *Cause Analysis:* Excessive spray distance (>300mm), low ambient temperature (< 15°C), fast-dry solvent evaporation.
 - *Remediation:* Wet sand with 800-grit then 1500-grit, apply leveling clear coat at 200-250mm distance.
 - *Prevention:* Maintain 200-250mm spray distance, 20-25°C ambient, use retarder additive in fast-evaporating conditions.
 
@@ -279,7 +279,7 @@ Validate remediation success using quantitative metrics: crosshatch adhesion mus
 **Epoxy Coating Non-Wetting:**
 - *Symptoms:* Beading, poor flow, visible dry spots, voids at layer lines.
 - *Cause Analysis:* Surface contamination, excessive viscosity (cold epoxy), insufficient working time (fast gel).
-- *Remediation:* Strip if uncured (<6hr), sand and degrease; if cured, apply second coat with vacuum assist.
+- *Remediation:* Strip if uncured (< 6hr), sand and degrease; if cured, apply second coat with vacuum assist.
 - *Prevention:* Pre-warm epoxy to 25-30°C for 30min, degrease surface, use low-viscosity formulation, vacuum infiltration for porous parts.
 
 ### Material Removal Rates and Feature Size Constraints

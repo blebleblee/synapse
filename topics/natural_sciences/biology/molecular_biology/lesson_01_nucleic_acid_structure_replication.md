@@ -46,29 +46,45 @@ The lagging strand presents a more complex synthesis problem. As the fork progre
 
 Each Okazaki fragment is extended by the lagging-strand polymerase (Pol III in prokaryotes, Pol δ in eukaryotes) until it encounters the 5'-RNA-DNA end of the preceding fragment. At this point, a remarkable maturation process ensues to convert the discontinuous, RNA-primed fragments into continuous duplex DNA. The key enzyme here is RNase H, which degrades most of the RNA primer, leaving only the 5'-terminal ribonucleotide attached to DNA. In E. coli, the 5'-to-3' exonuclease activity of Pol I removes this final ribonucleotide while simultaneously synthesizing replacement DNA in a process called nick translation. In eukaryotes, the flap endonuclease FEN1 excises the displaced 5'-RNA-DNA flap structures generated when Pol δ synthesizes into the preceding fragment, creating a ligatable nick. DNA ligase then seals the nick, covalently joining adjacent Okazaki fragments into continuous lagging-strand duplex.
 
-```
-Replication Fork Architecture (5' → 3' synthesis direction)
-
-                   Leading Strand Synthesis (continuous)
-                           ↓ Pol III/ε + β-clamp/PCNA
-    5'═══════════════════●─────────────────────────── 3'  (parental template)
-    3'─────────────────────────────────●═══════════ 5'  (parental template)
-                                       ↑
-                           Lagging Strand Synthesis (discontinuous)
-                           
-         Helicase (DnaB/CMG) ────→  Fork progression direction
-              ║
-              ║  Primase synthesizes RNA primers
-              ↓
+```mermaid
+flowchart TD
+    A["Replication Fork Architecture<br/>5' → 3' Synthesis Direction"]
     
-    Okazaki Fragment Maturation:
+    subgraph leading["Leading Strand Synthesis"]
+        B["Pol III/ε + β-clamp/PCNA<br/>(Continuous)"]
+        C["5'═══════●─────────────3'<br/>Parental Template"]
+    end
     
-    Fragment n:   5'-RNA●●●●DNA────────────────── 3'
-    Fragment n+1:         5'-RNA●●●●DNA──────── 3'
+    subgraph lagging["Lagging Strand Synthesis"]
+        D["Helicase DnaB/CMG<br/>Fork Progression →"]
+        E["Primase<br/>RNA Primer Synthesis"]
+        F["(Discontinuous)"]
+    end
     
-    After RNase H + FEN1/Pol I + Ligase:
+    subgraph parental["Parental Template Strands"]
+        G["3'─────────●═════════5'<br/>Parental Template"]
+    end
     
-    5'═══════════════════════════════════════════ 3'  (continuous lagging strand)
+    subgraph okazaki["Okazaki Fragment Maturation"]
+        H["Fragment n<br/>5'-RNA●●●●DNA─────3'"]
+        I["Fragment n+1<br/>5'-RNA●●●●DNA───3'"]
+    end
+    
+    subgraph processing["Post-Synthesis Processing"]
+        J["RNase H + FEN1/Pol I + Ligase"]
+        K["5'═══════════════════════3'<br/>Continuous Lagging Strand"]
+    end
+    
+    A --> leading
+    A --> lagging
+    A --> parental
+    B --> C
+    D --> E
+    E --> F
+    lagging --> okazaki
+    H --> J
+    I --> J
+    J --> K
 ```
 
 The coordination between leading- and lagging-strand synthesis is achieved through the replisome—a multi-protein assembly that physically couples the two polymerases, the helicase, and accessory factors into a single processive machine. In E. coli, the two Pol III cores are linked through shared contact with the DnaX clamp-loader subunit and the DnaB helicase, forming a dimeric polymerase that replicates both strands in a coordinated fashion. The lagging-strand template loops out (forming a structure called the trombone loop) to allow the lagging-strand polymerase to synthesize in the same overall direction as fork movement, despite template polarity reversal. When the lagging-strand polymerase completes an Okazaki fragment and encounters the preceding fragment's 5'-end, it dissociates, the trombone loop is released, and a new primer site on the newly exposed lagging-strand template is engaged, restarting the cycle.

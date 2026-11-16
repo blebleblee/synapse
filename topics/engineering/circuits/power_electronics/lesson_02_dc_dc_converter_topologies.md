@@ -18,13 +18,31 @@ Understanding conduction modes is equally foundational. In **Continuous Conducti
 
 The buck converter steps voltage down. Its essential structure places a switch (typically a MOSFET) in series between the input and an LC filter, with a diode (or synchronous MOSFET) providing a freewheeling path when the switch opens.
 
-```
-       Q1
-Vin ---/---+---L---+--- Vout
-           |       |
-          D1      C1    Load
-           |       |
-          GND----GND
+```mermaid
+flowchart LR
+    Vin["Vin"]
+    Q1["Q1<br/>Switch"]
+    J1[" "]
+    L["L<br/>Inductor"]
+    J2[" "]
+    Vout["Vout"]
+    D1["D1<br/>Diode"]
+    C1["C1<br/>Capacitor"]
+    Load["Load"]
+    GND1["GND"]
+    GND2["GND"]
+    
+    Vin --> Q1
+    Q1 --> J1
+    J1 --> L
+    L --> J2
+    J2 --> Vout
+    Vout --> Load
+    J1 --> D1
+    D1 --> GND1
+    J2 --> C1
+    C1 --> GND2
+    Load --> GND2
 ```
 
 When Q1 conducts for time $t_{on}$, the voltage across the inductor is $V_{in} - V_{out}$, and current ramps upward according to $\Delta I_L = (V_{in} - V_{out}) \cdot t_{on} / L$. When Q1 turns off, D1 clamps the switching node to ground, and the inductor voltage becomes $-V_{out}$, ramping current downward by $\Delta I_L = V_{out} \cdot t_{off} / L$. Applying volt-second balance—setting the two $\Delta I_L$ expressions equal—yields the CCM voltage conversion ratio immediately:
@@ -45,13 +63,23 @@ Choose the nearest standard value: 5.6 µH or 6.8 µH, depending on the preferre
 
 The boost converter steps voltage up. The switch is now connected between the inductor's output node and ground, and the diode points from that node toward the output.
 
-```
-       L          D1
-Vin ---+---+----->|---+--- Vout
-           |          |
-          Q1         C1    Load
-           |          |
-          GND--------GND
+```mermaid
+flowchart LR
+    Vin["Vin"]
+    Junction["Junction"]
+    D1["D1 (Diode)"]
+    Q1["Q1 (Transistor)"]
+    C1["C1 (Capacitor)"]
+    Load["Load"]
+    GND["GND"]
+
+    Vin --> Junction
+    Junction --> D1
+    Junction --> Q1
+    D1 --> C1
+    D1 --> Load
+    Q1 --> GND
+    C1 --> GND
 ```
 
 When Q1 is on, the diode is reverse-biased, and the inductor charges from $V_{in}$ with a current slope of $V_{in}/L$. When Q1 turns off, the inductor's stored energy forces current through D1 into the output capacitor and load. Volt-second balance over the full cycle gives:
@@ -108,24 +136,29 @@ For the 500 kHz buck example with 0.9 A ripple and 10 mV capacitive ripple targe
 
 The following diagram captures the essential waveform sequence in a CCM buck converter across one switching period, correlating switch state with inductor voltage and current:
 
-```
-Gate Drive  ___________           ___________
-(Q1)       |           |         |           |
-           |  t_on     |  t_off  |           |
-___________             _________             ___
-
-V_L         (Vin - Vout)         (-Vout)
-           +___________+        +___________+
-           |           |        |           |
------------+           +--------+           +---
-
-I_L                  /\                  /\
-                    /  \                /  \
-I_avg   ----------/----\--------------/----\----
-                 /      \            /      \
-________________/        \__________/        \__
-
-           |<---  T_s  --->|
+```mermaid
+flowchart TD
+    subgraph timing ["Timing Diagram - One Switching Period Ts"]
+        direction TB
+        
+        subgraph gate ["Gate Drive Signal (Q1)"]
+            G1["t_on: HIGH"] --> G2["t_off: LOW"] --> G3["t_on: HIGH"]
+        end
+        
+        subgraph voltage ["Inductor Voltage (V_L)"]
+            V1["+(Vin - Vout)"] --> V2["-Vout"] --> V3["+(Vin - Vout)"]
+        end
+        
+        subgraph current ["Inductor Current (I_L)"]
+            C1["Rises during t_on"] --> C2["Falls during t_off"] --> C3["Rises during t_on"]
+            C4["I_avg: Average Current Level"]
+        end
+        
+        gate -.-> voltage
+        voltage -.-> current
+        
+        note1["Switching Period: Ts = t_on + t_off"]
+    end
 ```
 
 The inductor current's triangular ripple sits atop the DC load current. Probe the switching node (the junction of Q1 drain, D1 anode, and L1 input) with a 10× passive probe to observe the rectangular waveform whose duty cycle the control IC is regulating. Use a current probe around the inductor to verify the ripple magnitude matches the design equation and to catch the onset of DCM—visible as the current waveform's lower envelope touching zero before the next gate pulse.

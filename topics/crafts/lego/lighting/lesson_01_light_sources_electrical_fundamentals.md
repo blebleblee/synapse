@@ -56,14 +56,23 @@ The wiring architecture inside a Lego build is a physical routing problem as muc
 
 The diagram below maps a minimal parallel lighting network for a modular building:
 
-```
-USB 5V ──────────────────────────────────── (+) Bus Rail
-                |           |           |
-              [150Ω]      [150Ω]      [120Ω]
-                |           |           |
-             [LED W]     [LED W]     [LED B]
-                |           |           |
-GND ─────────────────────────────────────── (−) Bus Rail
+```mermaid
+flowchart TD
+    USB["USB 5V"] --> POS["(+) Bus Rail"]
+    
+    POS --> R1["150Ω"]
+    POS --> R2["150Ω"]
+    POS --> R3["120Ω"]
+    
+    R1 --> LED1["LED W"]
+    R2 --> LED2["LED W"]
+    R3 --> LED3["LED B"]
+    
+    LED1 --> NEG["(−) Bus Rail"]
+    LED2 --> NEG
+    LED3 --> NEG
+    
+    NEG --> GND["GND"]
 ```
 
 Each branch runs from the positive bus through its resistor, through its LED, and returns to the common ground rail. The LED polarity — anode to the resistor side, cathode to ground — must be consistent across every branch.

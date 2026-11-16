@@ -22,36 +22,37 @@ The practical implication for the LP's internal operations is a commitment pacin
 
 A production-grade private equity fund is not a single entity. It is a carefully constructed stack of legal vehicles designed to accommodate the tax, regulatory, and domicile requirements of a heterogeneous LP base. The core structure typically consists of a master fund or parallel fund set, with onshore and offshore feeders that allow US tax-exempt investors, US taxable investors, and non-US investors to participate through the most efficient structure for their circumstances.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        GENERAL PARTNER                          │
-│              (Delaware LLC — GP Entity, 1-2% commit)            │
-│            Management Company (Receives Mgmt. Fee)              │
-└───────────────────────┬─────────────────────────────────────────┘
-                        │ Controls & manages
-          ┌─────────────▼──────────────┐
-          │    MASTER FUND / MAIN LP   │
-          │  (Delaware Limited         │
-          │   Partnership — Onshore)   │
-          └────────────┬───────────────┘
-         ┌─────────────┼─────────────────┐
-         ▼             ▼                 ▼
-  ┌─────────────┐  ┌──────────────┐  ┌───────────────────┐
-  │ US Taxable  │  │ US Tax-Exempt│  │ Non-US Investors  │
-  │   LPs       │  │ LPs (Pension,│  │ (Cayman Islands   │
-  │ (Direct into│  │ Endowment —  │  │ Feeder LP or      │
-  │ Master Fund)│  │ Direct or via│  │ Blockers for      │
-  │             │  │ Blocker Corp)│  │ UBTI exposure)    │
-  └─────────────┘  └──────────────┘  └───────────────────┘
-         │                │                   │
-         └────────────────▼───────────────────┘
-                   Capital flows into
-          ┌─────────────────────────────┐
-          │   PORTFOLIO COMPANY SPVs    │
-          │  (Deal-level holding cos,   │
-          │   often Delaware or         │
-          │   jurisdiction-specific)    │
-          └─────────────────────────────┘
+```mermaid
+flowchart TD
+    GP["**GENERAL PARTNER**
+    Delaware LLC — GP Entity, 1–2% commit
+    Management Company (Receives Mgmt. Fee)"]
+
+    MF["**MASTER FUND / MAIN LP**
+    Delaware Limited Partnership — Onshore"]
+
+    US_T["**US Taxable LPs**
+    Direct into Master Fund"]
+
+    US_TE["**US Tax-Exempt LPs**
+    Pension, Endowment —
+    Direct or via Blocker Corp"]
+
+    NON_US["**Non-US Investors**
+    Cayman Islands Feeder LP
+    or Blockers for UBTI exposure"]
+
+    SPV["**PORTFOLIO COMPANY SPVs**
+    Deal-level holding cos,
+    often Delaware or jurisdiction-specific"]
+
+    GP -->|"Controls & manages"| MF
+    MF --> US_T
+    MF --> US_TE
+    MF --> NON_US
+    US_T -->|"Capital flows into"| SPV
+    US_TE -->|"Capital flows into"| SPV
+    NON_US -->|"Capital flows into"| SPV
 ```
 
 The Cayman Islands feeder exists primarily to shield non-US investors and US tax-exempt investors from Unrelated Business Taxable Income (UBTI), which arises when a partnership uses debt financing — as LBO transactions always do — to generate returns. The income flowing through a leveraged buyout is effectively debt-financed income, which triggers UBTI rules for US tax-exempts investing directly in a partnership. Routing those LPs through a Cayman blocker corporation converts partnership income into corporate dividends, eliminating the UBTI taint.

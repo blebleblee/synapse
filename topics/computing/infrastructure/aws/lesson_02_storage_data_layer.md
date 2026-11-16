@@ -52,29 +52,24 @@ This forces every block on the volume to be fetched from the snapshot store befo
 
 The EBS encryption model uses AES-256 with keys managed by AWS KMS. Encryption is applied at the volume level, meaning every read and write is transparently encrypted and decrypted by the Nitro hypervisor — the EC2 instance and its operating system see plaintext data, but nothing crossing the network fabric between the instance and EBS storage is unencrypted. Snapshots of encrypted volumes are themselves encrypted with the same KMS key, and copying a snapshot to another region requires re-encrypting it with a key accessible in the target region.
 
-```
-EBS I/O Path on Nitro:
-┌─────────────────────────────────────────────────────────────┐
-│                      EC2 Instance                           │
-│  Application                                                │
-│      │  write(fd, buf, n)                                   │
-│      ▼                                                      │
-│  Linux VFS / Page Cache                                     │
-│      │  block I/O request                                   │
-│      ▼                                                      │
-│  NVMe Driver (virtio-blk / NVMe over Nitro fabric)          │
-└──────────────────────┬──────────────────────────────────────┘
-                       │  NVMe Command over Nitro Network
-┌──────────────────────▼──────────────────────────────────────┐
-│                   Nitro Card (Host Hardware)                 │
-│  AES-256 Encryption                                         │
-│      │                                                      │
-│      ▼                                                      │
-│  EBS Storage Node (NVMe SSD Fleet)                          │
-│      │  Write acknowledged after landing on SSD             │
-│      ▼                                                      │
-│  Acknowledgment → EC2 Instance                              │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph ec2["EC2 Instance"]
+        app["Application"]
+        vfs["Linux VFS / Page Cache"]
+        nvme["NVMe Driver (virtio-blk / NVMe over Nitro fabric)"]
+    end
+    
+    subgraph nitro["Nitro Card (Host Hardware)"]
+        encrypt["AES-256 Encryption"]
+        ebs["EBS Storage Node (NVMe SSD Fleet)"]
+    end
+    
+    app -->|"write(fd, buf, n)"| vfs
+    vfs -->|"block I/O request"| nvme
+    nvme -->|"NVMe Command over Nitro Network"| encrypt
+    encrypt --> ebs
+    ebs -->|"Write acknowledged after landing on SSD"| nvme
 ```
 
 The key insight in this diagram is that the acknowledgment fires after the write lands on the EBS storage node's NVMe SSD, not after any replication to a second node. EBS durability comes from the redundancy built into the SSD fleet itself — multiple copies of each block exist within the EBS storage layer — not from synchronous cross-AZ replication. For AZ-level fault tolerance, that must come from the application layer: RDS Multi-AZ, application-level replication, or EBS snapshot-based recovery.
@@ -150,32 +145,42 @@ RDS abstracts a relational database engine — PostgreSQL, MySQL, Oracle, SQL Se
 
 The replication topology in RDS Multi-AZ (not to be confused with Multi-AZ DB Cluster, which is a different product) is synchronous block-level replication. The primary instance writes to its EBS volume, and that write is synchronously replicated to a standby instance in a different Availability Zone using Amazon's internal replication protocol before the transaction is acknowledged to the application. This is not logical replication at the SQL level; it is physical block-level mirroring, which means the standby is an exact block-for-block copy of the primary at all times.
 
-```
-RDS Multi-AZ Synchronous Replication:
+```mermaid
+flowchart TD
+    subgraph AZ_A ["AZ-A"]
+        APP["Application Write"]
+        ENGINE["InnoDB / PG Engine"]
+        EBS_A["EBS Volume (gp3)"]
+        ACK["ACK to App\n(after standby confirms write)"]
 
-AZ-A                                    AZ-B
-┌─────────────────────┐                ┌─────────────────────┐
-│   RDS Primary       │                │   RDS Standby       │
-│                     │                │                     │
-│  Application Write  │                │                     │
-│         │           │                │                     │
-│         ▼           │                │                     │
-│  InnoDB/PG Engine   │                │  Block-Level Mirror │
-│         │           │                │         │           │
-│         ▼           │                │         ▼           │
-│  EBS Volume (gp3)   │◄──sync repl───►│  EBS Volume (gp3)  │
-│                     │                │                     │
-│  ACK to App only    │                │  Write confirmed    │
-│  after standby      │                │  before primary     │
-│  confirms write     │                │  ACKs               │
-└─────────────────────┘                └─────────────────────┘
-         │
-         │  Automated Failover (60-120 seconds)
-         │  DNS CNAME flips to standby endpoint
-         ▼
-  Application reconnects to same endpoint hostname
-  Standby promoted to primary
-  New standby provisioned in AZ-A
+        APP --> ENGINE
+        ENGINE --> EBS_A
+        EBS_A --> ACK
+    end
+
+    subgraph AZ_B ["AZ-B"]
+        MIRROR["Block-Level Mirror"]
+        EBS_B["EBS Volume (gp3)"]
+        CONFIRMED["Write confirmed\nbefore primary ACKs"]
+
+        MIRROR --> EBS_B
+        EBS_B --> CONFIRMED
+    end
+
+    EBS_A <-->|"Synchronous Replication"| EBS_B
+
+    subgraph FAILOVER ["Automated Failover (60–120 seconds)"]
+        DNS["DNS CNAME flips to standby endpoint"]
+        PROMOTED["Standby promoted to Primary"]
+        RECONNECT["Application reconnects to same endpoint hostname"]
+        NEW_STANDBY["New Standby provisioned in AZ-A"]
+
+        DNS --> RECONNECT
+        RECONNECT --> PROMOTED
+        PROMOTED --> NEW_STANDBY
+    end
+
+    ACK -->|"Failover triggered"| DNS
 ```
 
 The failover timeline is the invariant that determines whether RDS Multi-AZ meets an application's recovery time objective. AWS guarantees failover completion in under two minutes in typical cases, though the actual observable impact on a connected application is determined by the JDBC/psql connection timeout settings, the DNS TTL on the RDS endpoint (which is 5 seconds), and whether the application implements proper connection retry logic. An application that opens a connection pool at startup and never reconnects will hang until TCP keepalive times out — which on a default Linux kernel configuration can take over ten minutes. Connection pool configuration is therefore a correctness requirement for Multi-AZ deployments, not a performance tuning detail.

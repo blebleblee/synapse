@@ -482,7 +482,7 @@ This reference section consolidates critical procedures, command sequences, and 
 
 1. **Visual PCB Inspection**: Photograph all board layers at 5MP minimum resolution. Identify processor (largest BGA/QFP), flash memory (8-pin SOIC near processor), voltage regulators (inductors + capacitors), and test points (unpopulated headers, labeled vias).
 
-2. **Power Characterization**: Measure supply voltage at multiple test points with a multimeter. Verify 3.3V and 5V rails. Observe current draw at idle (typical <100mA for microcontroller-based devices) and during boot transients (may spike 2-5×).
+2. **Power Characterization**: Measure supply voltage at multiple test points with a multimeter. Verify 3.3V and 5V rails. Observe current draw at idle (typical < 100mA for microcontroller-based devices) and during boot transients (may spike 2-5×).
 
 3. **UART Discovery**: Probe suspected serial pads with a logic analyzer in continuous capture mode. Power-cycle the target and scan for characteristic UART idle-high states and start-bit transitions. Test standard baud rates: 115200, 57600, 38400, 19200, 9600.
 

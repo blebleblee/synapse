@@ -54,47 +54,128 @@ The **Amerindian lexical layer** was deposited beginning in 1492 with extraordin
 
 The practitioner needs a functional mental model of this layering, which can be represented in terms of the sequence, semantic density, and phonological signature of each stratum:
 
-```
-─────────────────────────────────────────────────────────────────────
-STRATUM         PERIOD            SEMANTIC DENSITY   PHONOLOGICAL MARKER
-─────────────────────────────────────────────────────────────────────
-Latin-Romance   218 BCE–ongoing   Maximal (grammar,  Regular sound changes
-                                  HF vocabulary)     (f>h>∅, lenition)
-
-Pre-Roman       Pre-218 BCE       Minimal (terrain,  No clear phonological
-Substrate       (residual)        pastoral life)     signature; lexically
-                                                     conservative
-
-Visigothic      ~400–711 CE       Low (~500 items)   Initial gu- < Gmc w-
-Germanic                          (war, law, names)
-
-Arabic          711–1492 CE       High (~4000 items) al-/a-/az- prefix
-                                  (science, agri-    clusters; /x/ from
-                                  culture, trade)    Ar. pharyngeals
-
-Amerindian      1492–present      Medium-High        Phonotactic sequences
-                                  (flora, fauna,     unusual in Latin-
-                                  culture, food)     Romance (e.g., -tl-)
-─────────────────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    subgraph Stratum1 ["Latin-Romance<br/>218 BCE–ongoing"]
+        A1["<b>Semantic Density:</b><br/>Maximal<br/>(grammar, HF vocabulary)"]
+        A2["<b>Phonological Marker:</b><br/>Regular sound changes<br/>(f>h>∅, lenition)"]
+    end
+    
+    subgraph Stratum2 ["Pre-Roman Substrate<br/>Pre-218 BCE (residual)"]
+        B1["<b>Semantic Density:</b><br/>Minimal<br/>(terrain, pastoral life)"]
+        B2["<b>Phonological Marker:</b><br/>No clear phonological signature;<br/>lexically conservative"]
+    end
+    
+    subgraph Stratum3 ["Visigothic Germanic<br/>~400–711 CE"]
+        C1["<b>Semantic Density:</b><br/>Low (~500 items)<br/>(war, law, names)"]
+        C2["<b>Phonological Marker:</b><br/>Initial gu- < Gmc w-"]
+    end
+    
+    subgraph Stratum4 ["Arabic<br/>711–1492 CE"]
+        D1["<b>Semantic Density:</b><br/>High (~4000 items)<br/>(science, agriculture, trade)"]
+        D2["<b>Phonological Marker:</b><br/>al-/a-/az- prefix clusters;<br/>/x/ from Ar. pharyngeals"]
+    end
+    
+    subgraph Stratum5 ["Amerindian<br/>1492–present"]
+        E1["<b>Semantic Density:</b><br/>Medium-High<br/>(flora, fauna, culture, food)"]
+        E2["<b>Phonological Marker:</b><br/>Phonotactic sequences unusual<br/>in Latin-Romance (e.g., -tl-)"]
+    end
+    
+    Stratum2 --> Stratum1
+    Stratum3 --> Stratum1
+    Stratum1 --> Stratum4
+    Stratum4 --> Stratum5
 ```
 
 ### Sound Correspondences: The Practitioner's Diagnostic Table
 
 For analysts working across Romance languages or reconstructing Spanish vocabulary from Latin sources, the following systematic correspondences function as a diagnostic toolkit. Each row represents a productive rule — not an occasional pattern but a regular correspondence that holds across a large class of lexical items.
 
-```
-──────────────────────────────────────────────────────────────────────
-LATIN               SPANISH          ITALIAN (contrast)   EXAMPLE
-──────────────────────────────────────────────────────────────────────
-F- (initial)        h- (silent)      f-                   filium > hijo / figlio
--P- (interv.)       -b-              -p-                  lupum > lobo / lupo
--T- (interv.)       -d- [ð]          -t-                  vitam > vida / vita
--C- (interv.)       -g-              -c(h)- [k]           amicum > amigo / amico
--CT-                -ch-             -tt-                 noctem > noche / notte
--LJ-, -C'L-         -j- [x]          -gli- [ʎ]            filium > hijo / figlio
-PL-, CL-, FL-       ll- [ʎ/j]        pi-/chi-/fi-         plorare > llorar / piangere
--MN-                -mbr-            -mm-                 hominiem > hombre / uomo
-──────────────────────────────────────────────────────────────────────
+```mermaid
+flowchart LR
+    subgraph latin ["Latin (Source)"]
+        L1["F- (initial)"]
+        L2["-P- (intervocalic)"]
+        L3["-T- (intervocalic)"]
+        L4["-C- (intervocalic)"]
+        L5["-CT-"]
+        L6["-LJ-, -C'L-"]
+        L7["PL-, CL-, FL-"]
+        L8["-MN-"]
+    end
+
+    subgraph spanish ["Spanish (Result)"]
+        S1["h- (silent)"]
+        S2["-b-"]
+        S3["-d- [ð]"]
+        S4["-g-"]
+        S5["-ch-"]
+        S6["-j- [x]"]
+        S7["ll- [ʎ/j]"]
+        S8["-mbr-"]
+    end
+
+    subgraph italian ["Italian (Contrast)"]
+        I1["f-"]
+        I2["-p-"]
+        I3["-t-"]
+        I4["-c(h)- [k]"]
+        I5["-tt-"]
+        I6["-gli- [ʎ]"]
+        I7["pi- / chi- / fi-"]
+        I8["-mm-"]
+    end
+
+    subgraph examples ["Example"]
+        E1["filium → hijo / figlio"]
+        E2["lupum → lobo / lupo"]
+        E3["vitam → vida / vita"]
+        E4["amicum → amigo / amico"]
+        E5["noctem → noche / notte"]
+        E6["filium → hijo / figlio"]
+        E7["plorare → llorar / piangere"]
+        E8["hominem → hombre / uomo"]
+    end
+
+    L1 --> S1
+    L1 --> I1
+    S1 --> E1
+    I1 --> E1
+
+    L2 --> S2
+    L2 --> I2
+    S2 --> E2
+    I2 --> E2
+
+    L3 --> S3
+    L3 --> I3
+    S3 --> E3
+    I3 --> E3
+
+    L4 --> S4
+    L4 --> I4
+    S4 --> E4
+    I4 --> E4
+
+    L5 --> S5
+    L5 --> I5
+    S5 --> E5
+    I5 --> E5
+
+    L6 --> S6
+    L6 --> I6
+    S6 --> E6
+    I6 --> E6
+
+    L7 --> S7
+    L7 --> I7
+    S7 --> E7
+    I7 --> E7
+
+    L8 --> S8
+    L8 --> I8
+    S8 --> E8
+    I8 --> E8
 ```
 
 The *-CT- > -ch-* correspondence deserves particular emphasis because it is highly productive and frequently overlooked by learners. Latin *noctem* ("night") > Spanish *noche*, Latin *pectum* ("chest") > *pecho*, Latin *lactem* ("milk") > *leche*, Latin *dictum* ("said") > *dicho*, Latin *factum* ("done/made") > *hecho*. The sequence of events was: /kt/ > /jt/ (the velar stop palatalized before the front environment) > /tʃ/ (the palatal glide and alveolar stop merged into an affricate). This is a convergent development with similar processes in French (*nuit* from *noctem*, *lait* from *lactem*) and Italian (*notte*, *latte*), but the Spanish output differs because the affricate retained its full palatal character rather than devoicing or simplifying.

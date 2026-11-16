@@ -20,52 +20,64 @@ These three invariants, fixed addressing, universal executability, and memory-ma
 
 The NES presents the most constrained and instructive memory model for studying glitch mechanics. Its 6502-derived CPU core addresses a 64KB space spanning $0000 to $FFFF, but only 2KB of actual static RAM exists within that space, mapped at $0000 through $07FF and mirrored three times across $0800 through $1FFF. Any write to $0800 is physically identical to a write to $0000, and the hardware simply duplicates the address lines. The first 256 bytes, $0000 through $00FF, constitute the zero page, which the 6502 can access with shorter, faster instructions using a single-byte address operand. The next 256 bytes, $0100 through $01FF, serve as the hardware stack, where the CPU pushes and pulls return addresses during subroutine calls and interrupts. The remaining 1.5KB from $0200 to $07FF is general-purpose working memory where games store the bulk of their runtime state: player position arrays, inventory tables, enemy attributes, tile map buffers, and temporary calculation variables.
 
-```
-NES CPU Memory Map ($0000 - $FFFF)
-+----------------------------------------+ $FFFF
-|                                        |
-|        Cartridge Space                |
-|    (PRG-ROM, SRAM, mappers)            |
-|                                        |
-+----------------------------------------+ $4020
-|    APU / I/O Registers ($4000-$4017)   |
-+----------------------------------------+ $4000
-|    PPU Register Mirrors                |
-+----------------------------------------+ $2008
-|    PPU Registers ($2000-$2007)         |
-+----------------------------------------+ $2000
-|    RAM Mirrors (3x copies of $0000)    |
-+----------------------------------------+ $0800
-|    2KB Internal RAM                    |
-|    $0200-$07FF: General Purpose        |
-|    $0100-$01FF: Stack (256 bytes)      |
-|    $0000-$00FF: Zero Page (256 bytes)  |
-+----------------------------------------+ $0000
+```mermaid
+flowchart TD
+    FFFF["$FFFF"]
+    CART["Cartridge Space<br/>(PRG-ROM, SRAM, mappers)"]
+    4020["$4020"]
+    APU["APU / I/O Registers<br/>($4000-$4017)"]
+    4000["$4000"]
+    PPU_MIRROR["PPU Register Mirrors"]
+    2008["$2008"]
+    PPU["PPU Registers<br/>($2000-$2007)"]
+    2000["$2000"]
+    RAM_MIRROR["RAM Mirrors<br/>(3x copies of $0000)"]
+    0800["$0800"]
+    RAM["2KB Internal RAM"]
+    GP["$0200-$07FF: General Purpose"]
+    STACK["$0100-$01FF: Stack (256 bytes)"]
+    ZPAGE["$0000-$00FF: Zero Page (256 bytes)"]
+    0000["$0000"]
+
+    FFFF --> CART
+    CART --> 4020
+    4020 --> APU
+    APU --> 4000
+    4000 --> PPU_MIRROR
+    PPU_MIRROR --> 2008
+    2008 --> PPU
+    PPU --> 2000
+    2000 --> RAM_MIRROR
+    RAM_MIRROR --> 0800
+    0800 --> RAM
+    RAM --> GP
+    GP --> STACK
+    STACK --> ZPAGE
+    ZPAGE --> 0000
 ```
 
 The Game Boy's LR35902 CPU, a modified Z80 derivative, maps its 8KB of working RAM across $C000 through $DFFF, with an echo region at $E000 through $FDFF that mirrors the lower portion. The high RAM region at $FF80 through $FFFE provides 127 bytes of fast-access storage, and the entire I/O subsystem, including the serial transfer register, timer, and audio channels, occupies $FF00 through $FF7F. The Game Boy's relatively generous 8KB of RAM compared to the NES reflects its later design era, but the same flat, unprotected model applies.
 
-```
-Game Boy Memory Map ($0000 - $FFFF)
-+----------------------------------------+ $FFFF
-|    Interrupt Enable Register           |
-+----------------------------------------+ $FF80
-|    High RAM (127 bytes)                |
-+----------------------------------------+ $FF00
-|    I/O Registers                       |
-+----------------------------------------+ $FE00
-|    Echo RAM (mirror of $C000-$DDFF)    |
-+----------------------------------------+ $E000
-|    Work RAM (8KB)                      |
-+----------------------------------------+ $C000
-|    External RAM (cartridge battery)    |
-+----------------------------------------+ $A000
-|    VRAM (8KB)                          |
-+----------------------------------------+ $8000
-|    Switchable ROM Bank                 |
-+----------------------------------------+ $4000
-|    ROM Bank 0 (fixed)                  |
-+----------------------------------------+ $0000
+```mermaid
+flowchart TD
+    A["ROM Bank 0 - Fixed<br/>$0000 - $3FFF"]
+    B["Switchable ROM Bank<br/>$4000 - $7FFF"]
+    C["VRAM - 8KB<br/>$8000 - $9FFF"]
+    D["External RAM - Cartridge Battery<br/>$A000 - $BFFF"]
+    E["Work RAM - 8KB<br/>$C000 - $DFFF"]
+    F["Echo RAM - Mirror of $C000-$DDFF<br/>$E000 - $FDFF"]
+    G["I/O Registers<br/>$FE00 - $FEFF"]
+    H["High RAM - 127 bytes<br/>$FF80 - $FFFE"]
+    I["Interrupt Enable Register<br/>$FFFF"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
 ```
 
 The SNES introduces the most complex address space of the four major retro platforms. Its 65816 CPU extends the 6502's 16-bit address bus to 24 bits, creating a 16MB space divided into 256 banks of 64KB each. The system's 128KB of general-purpose WRAM spans banks $7E and $7F, with the lower 32KB of bank $7E also accessible through the traditional $0000-$7FFF range in banks $00 through $3F and $80 through $BF for backward compatibility with 6502-era addressing conventions. The 65816 can operate in 8-bit emulation mode, where it behaves exactly like a 6502, or in 16-bit native mode, where accumulator and index registers expand to 16 bits and new addressing modes become available. Games switch between these modes constantly using the REP and SEP instructions, which set and clear the M and X flags in the processor status register.
@@ -91,20 +103,31 @@ A true write overflow occurs when a game mechanic causes a store instruction to 
 
 Every retro platform except the Genesis stores multi-byte values in little-endian order: the least significant byte occupies the lower address. On the NES, a 16-bit pointer to address $D010 stored at zero page locations $80 and $81 appears in memory as $10 at $0080 and $D0 at $0081. This byte-swapping convention is not a mere implementation detail. It is the single most common source of errors when constructing arbitrary code execution payloads, because the human reading a hex editor sees $10 before $D0 and must mentally reconstruct the actual address as $D010 rather than $10D0.
 
-```
-Little-Endian Storage (NES, SNES, Game Boy)
-Address:   $0080    $0081
-           +--------+--------+
-           |  $10   |  $D0   |   Represents pointer to $D010
-           +--------+--------+
-           LSB first          MSB second
-
-Big-Endian Storage (Genesis)
-Address:   $FF0000  $FF0001
-           +--------+--------+
-           |  $D0   |  $10   |   Represents pointer to $D010
-           +--------+--------+
-           MSB first          LSB second
+```mermaid
+flowchart TD
+    subgraph little ["Little-Endian Storage (NES, SNES, Game Boy)"]
+        direction LR
+        LE_Addr["Address: $0080"]
+        LE_LSB["$10<br/>(LSB first)"]
+        LE_MSB["$D0<br/>(MSB second)"]
+        LE_Result["Represents pointer to $D010"]
+        
+        LE_Addr --> LE_LSB
+        LE_LSB --> LE_MSB
+        LE_MSB --> LE_Result
+    end
+    
+    subgraph big ["Big-Endian Storage (Genesis)"]
+        direction LR
+        BE_Addr["Address: $FF0000"]
+        BE_MSB["$D0<br/>(MSB first)"]
+        BE_LSB["$10<br/>(LSB second)"]
+        BE_Result["Represents pointer to $D010"]
+        
+        BE_Addr --> BE_MSB
+        BE_MSB --> BE_LSB
+        BE_LSB --> BE_Result
+    end
 ```
 
 The SNES 65816 extends this to 24-bit addresses by appending a bank byte. A long pointer to $7E1234 stored at address $0000 occupies three bytes: $34 at $0000, $12 at $0001, and $7E at $0002. The bank byte comes last in memory, following the low and high bytes. When constructing payloads that the 65816 will interpret as addresses, this three-byte little-endian convention must be respected throughout.

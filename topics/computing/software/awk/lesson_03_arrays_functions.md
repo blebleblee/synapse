@@ -26,35 +26,31 @@ The invariant governing all of these mechanisms is that Awk operates as a data-f
 
 To reason precisely about Awk's array mechanics, consider the execution path that processes a simple frequency-counting program across a multi-gigabyte log file.
 
-```
-                       ┌─────────────────────────────────────┐
-                       │        Awk Program (Parsed AST)       │
-                       └──────────────┬──────────────────────┘
-                                      │
-                             ┌────────▼────────┐
-                             │  Record Scanner  │  ← RS-delimited input
-                             │  (getline loop)  │
-                             └────────┬─────────┘
-                                      │  NR, NF, $0..$N set
-                             ┌────────▼─────────┐
-                             │  Pattern Dispatch │  ← /regex/, expr, BEGIN/END
-                             └────────┬──────────┘
-                                      │
-                        ┌─────────────▼──────────────┐
-                        │       Action Execution       │
-                        │                              │
-                        │  count[$1]++                 │
-                        │       │                      │
-                        │  ┌────▼────────────────┐    │
-                        │  │  Hash($1) → bucket   │    │
-                        │  │  if absent: init = 0  │    │
-                        │  │  bucket.value += 1    │    │
-                        │  └───────────────────────┘   │
-                        └──────────────────────────────┘
-                                      │
-                             ┌────────▼─────────┐
-                             │   END block       │  ← iterate array, emit
-                             └───────────────────┘
+```mermaid
+flowchart TD
+    A["Awk Program (Parsed AST)"]
+    B["Record Scanner<br/>(getline loop)"]
+    C["Pattern Dispatch"]
+    D["Action Execution"]
+    E["END block"]
+    
+    A --> B
+    B -->|"NR, NF, $0..$N set"| C
+    C -->|"/regex/, expr, BEGIN/END"| D
+    D --> E
+    
+    Input["RS-delimited input"] -.-> B
+    
+    subgraph D
+        D1["count[$1]++"]
+        D2["Hash($1) → bucket<br/>if absent: init = 0<br/>bucket.value += 1"]
+        D1 --> D2
+    end
+    
+    E -->|"iterate array, emit"| Output[" "]
+    
+    style Input fill:none,stroke:none
+    style Output fill:none,stroke:none
 ```
 
 The critical property of the hash on the `count` array is that every distinct value of `$1` produces an independent bucket. The array grows monotonically as new keys arrive. There is no rehashing pause visible at the Awk level—this is an implementation detail of the underlying C runtime—but memory growth is linear in the number of distinct keys, which is the dominant resource constraint when processing streams with high-cardinality key spaces.

@@ -776,181 +776,239 @@ The culmination of the three diagnostic exercises produces a comprehensive race 
 
 The diagnostic cheat sheet organizes information hierarchically by symptom category, mapping observed vehicle behaviors to root cause hypotheses and actionable tuning interventions. The primary symptom categories include understeer (inability to rotate the vehicle into corners despite steering input), oversteer (excessive rear slip angle producing unstable yaw behavior), pitch instability (longitudinal weight transfer oscillations during brake and throttle transitions), and tire degradation (rapid grip loss or uneven wear patterns). Each symptom category expands into a decision tree that evaluates telemetry signatures, correlates them with setup parameters, and prescribes specific click adjustments, pressure changes, or anti-roll bar swaps.
 
-```
-═══════════════════════════════════════════════════════════════
-                 RACE ENGINEERING DIAGNOSTIC CHEAT SHEET
-═══════════════════════════════════════════════════════════════
+```mermaid
+flowchart TD
+    ROOT["🏎️ Race Engineering Diagnostic Cheat Sheet"]
 
-UNDERSTEER DIAGNOSIS & CORRECTION
-─────────────────────────────────────────────────────────────
-Symptoms:
-  - Lateral acceleration plateau below driver steering demand
-  - Prolonged corner entry phase with delayed apex approach
-  - Driver reports "pushing" or "washing out" at turn-in
+    ROOT --> US["Understeer"]
+    ROOT --> OS["Oversteer"]
+    ROOT --> PI["Pitch Instability"]
+    ROOT --> TD["Tire Degradation"]
 
-Telemetry Signatures:
-  - Steering angle exceeds 1.5x nominal for corner radius
-  - Lateral acceleration correlation < 0.90 vs. reference lap
-  - Front damper compression velocity > rear compression velocity
+    %% ─── UNDERSTEER ───
+    subgraph sg_us ["UNDERSTEER — Diagnosis & Correction"]
+        direction TB
 
-Root Causes & Corrections:
-  1. Excessive front roll stiffness
-     → Reduce front ARB diameter by 2mm OR soften front dampers 2 clicks
-  2. Insufficient front tire pressure
-     → Increase front cold pressure by 1-2 psi (validate hot pressure)
-  3. Excessive negative front camber
-     → Reduce front camber by 0.3° toward zero (improve straight-line patch)
-  4. Rear grip excess (relative imbalance)
-     → Increase rear ARB diameter OR stiffen rear dampers 2 clicks
+        US_SYM["Symptoms
+        • Lateral acceleration plateau below steering demand
+        • Prolonged corner entry / delayed apex
+        • Driver reports pushing or washing out"]
 
-═══════════════════════════════════════════════════════════════
+        US_TEL["Telemetry Signatures
+        • Steering angle > 1.5× nominal
+        • Lateral accel correlation < 0.90 vs reference
+        • Front damper compression velocity > rear"]
 
-OVERSTEER DIAGNOSIS & CORRECTION
-─────────────────────────────────────────────────────────────
-Symptoms:
-  - Sudden yaw angle increase mid-corner
-  - Driver reports "loose" or "snappy" rear end
-  - Corrective counter-steering visible in steering angle trace
+        US_C1["① Excessive Front Roll Stiffness
+        → Reduce front ARB diameter 2 mm
+           OR soften front dampers 2 clicks"]
+        US_C2["② Insufficient Front Tire Pressure
+        → Increase front cold pressure 1–2 psi
+           (validate hot pressure)"]
+        US_C3["③ Excessive Negative Front Camber
+        → Reduce front camber 0.3° toward zero"]
+        US_C4["④ Rear Grip Excess — Relative Imbalance
+        → Increase rear ARB diameter
+           OR stiffen rear dampers 2 clicks"]
 
-Telemetry Signatures:
-  - Yaw rate spike exceeds steady-state cornering value by >20%
-  - Rear damper rebound velocity exhibits high-frequency oscillation
-  - Throttle position shows hesitation/modulation at corner exit
+        US_SYM --> US_TEL
+        US_TEL --> US_C1
+        US_TEL --> US_C2
+        US_TEL --> US_C3
+        US_TEL --> US_C4
+    end
 
-Root Causes & Corrections:
-  1. Insufficient rear roll stiffness
-     → Increase rear ARB diameter by 2mm OR stiffen rear dampers 2 clicks
-  2. Excessive rear tire pressure
-     → Reduce rear cold pressure by 1-2 psi (enlarge contact patch)
-  3. Insufficient rear damper rebound control
-     → Increase rear rebound damping by 3-4 clicks
-  4. Front grip deficiency (relative imbalance)
-     → Soften front ARB OR reduce front damper compression 2 clicks
+    %% ─── OVERSTEER ───
+    subgraph sg_os ["OVERSTEER — Diagnosis & Correction"]
+        direction TB
 
-═══════════════════════════════════════════════════════════════
+        OS_SYM["Symptoms
+        • Sudden yaw angle increase mid-corner
+        • Driver reports loose or snappy rear
+        • Counter-steering visible in steering trace"]
 
-PITCH INSTABILITY DIAGNOSIS & CORRECTION
-─────────────────────────────────────────────────────────────
-Symptoms:
-  - Nose dive during brake application (excessive front compression)
-  - Rear squat during throttle application (excessive rear compression)
-  - Porpoising oscillation on straightaways
+        OS_TEL["Telemetry Signatures
+        • Yaw rate spike > 20% above steady-state
+        • Rear damper rebound high-frequency oscillation
+        • Throttle hesitation/modulation at corner exit"]
 
-Telemetry Signatures:
-  - Front damper velocity histogram median > 40 mm/s compression
-  - Rear damper velocity histogram median > 35 mm/s compression
-  - Longitudinal acceleration trace exhibits damped oscillation
+        OS_C1["① Insufficient Rear Roll Stiffness
+        → Increase rear ARB diameter 2 mm
+           OR stiffen rear dampers 2 clicks"]
+        OS_C2["② Excessive Rear Tire Pressure
+        → Reduce rear cold pressure 1–2 psi
+           (enlarge contact patch)"]
+        OS_C3["③ Insufficient Rear Damper Rebound Control
+        → Increase rear rebound damping 3–4 clicks"]
+        OS_C4["④ Front Grip Deficiency — Relative Imbalance
+        → Soften front ARB
+           OR reduce front damper compression 2 clicks"]
 
-Root Causes & Corrections:
-  1. Insufficient front bump damping (dive)
-     → Increase front compression damping by 3-4 clicks
-  2. Insufficient rear rebound damping (squat)
-     → Increase rear rebound damping by 3-4 clicks
-  3. Soft springs (excessive suspension travel)
-     → Increase front/rear spring rates by 10-15% (requires re-corner weight)
-  4. Aerodynamic pitch sensitivity
-     → Raise front ride height 5mm OR reduce front wing angle 1°
+        OS_SYM --> OS_TEL
+        OS_TEL --> OS_C1
+        OS_TEL --> OS_C2
+        OS_TEL --> OS_C3
+        OS_TEL --> OS_C4
+    end
 
-═══════════════════════════════════════════════════════════════
+    %% ─── PITCH INSTABILITY ───
+    subgraph sg_pi ["PITCH INSTABILITY — Diagnosis & Correction"]
+        direction TB
 
-TIRE DEGRADATION DIAGNOSIS & CORRECTION
-─────────────────────────────────────────────────────────────
-Symptoms:
-  - Lap time degradation > 0.5 sec per lap
-  - Pyrometer readings exceed 110°C
-  - Uneven tread wear (inner shoulder vs. outer shoulder > 1mm)
+        PI_SYM["Symptoms
+        • Nose dive under braking — excessive front compression
+        • Rear squat on throttle — excessive rear compression
+        • Porpoising oscillation on straights"]
 
-Telemetry Signatures:
-  - Cumulative tire work exceeds 500 G^2-seconds per stint
-  - Tire temperature model predicts overheating in specific corners
-  - Slip angle estimate exceeds 8° sustained duration
+        PI_TEL["Telemetry Signatures
+        • Front damper velocity histogram median > 40 mm/s compression
+        • Rear damper velocity histogram median > 35 mm/s compression
+        • Longitudinal accel trace shows damped oscillation"]
 
-Root Causes & Corrections:
-  1. Excessive camber (inner shoulder overheating)
-     → Reduce negative camber by 0.5° (move toward zero)
-  2. Insufficient tire pressure (center tread underheating)
-     → Increase cold pressure by 2 psi (validate hot pressure rise)
-  3. Overdriving (excessive slip angle generation)
-     → Coach driver to reduce corner entry speed OR reduce ARB stiffness
-  4. High ambient temperature
-     → Reduce tire pressure by 1 psi OR increase cooling duct opening
+        PI_C1["① Insufficient Front Bump Damping — Dive
+        → Increase front compression damping 3–4 clicks"]
+        PI_C2["② Insufficient Rear Rebound Damping — Squat
+        → Increase rear rebound damping 3–4 clicks"]
+        PI_C3["③ Soft Springs — Excessive Suspension Travel
+        → Increase front/rear spring rates 10–15%
+           (requires re-corner weight)"]
+        PI_C4["④ Aerodynamic Pitch Sensitivity
+        → Raise front ride height 5 mm
+           OR reduce front wing angle 1°"]
 
-═══════════════════════════════════════════════════════════════
+        PI_SYM --> PI_TEL
+        PI_TEL --> PI_C1
+        PI_TEL --> PI_C2
+        PI_TEL --> PI_C3
+        PI_TEL --> PI_C4
+    end
+
+    %% ─── TIRE DEGRADATION ───
+    subgraph sg_td ["TIRE DEGRADATION — Diagnosis & Correction"]
+        direction TB
+
+        TD_SYM["Symptoms
+        • Lap time degradation > 0.5 sec per lap
+        • Pyrometer readings exceed 110 °C
+        • Tread wear delta inner vs outer shoulder > 1 mm"]
+
+        TD_TEL["Telemetry Signatures
+        • Cumulative tire work > 500 G²·s per stint
+        • Temperature model predicts overheating in specific corners
+        • Slip angle estimate > 8° sustained duration"]
+
+        TD_C1["① Excessive Camber — Inner Shoulder Overheating
+        → Reduce negative camber 0.5° toward zero"]
+        TD_C2["② Insufficient Tire Pressure — Center Tread Underheating
+        → Increase cold pressure 2 psi
+           (validate hot pressure rise)"]
+        TD_C3["③ Overdriving — Excessive Slip Angle Generation
+        → Coach driver to reduce corner entry speed
+           OR reduce ARB stiffness"]
+        TD_C4["④ High Ambient Temperature
+        → Reduce tire pressure 1 psi
+           OR increase cooling duct opening"]
+
+        TD_SYM --> TD_TEL
+        TD_TEL --> TD_C1
+        TD_TEL --> TD_C2
+        TD_TEL --> TD_C3
+        TD_TEL --> TD_C4
+    end
+
+    US --> sg_us
+    OS --> sg_os
+    PI --> sg_pi
+    TD --> sg_td
+
+    %% ─── Styling ───
+    classDef rootNode fill:#1a1a2e,stroke:#e94560,color:#ffffff,font-weight:bold
+    classDef categoryNode fill:#16213e,stroke:#0f3460,color:#e0e0e0,font-weight:bold
+    classDef symptomNode fill:#0f3460,stroke:#533483,color:#ffffff
+    classDef telemetryNode fill:#533483,stroke:#e94560,color:#ffffff
+    classDef correctionNode fill:#1b4332,stroke:#52b788,color:#d8f3dc
+
+    class ROOT rootNode
+    class US,OS,PI,TD categoryNode
+    class US_SYM,OS_SYM,PI_SYM,TD_SYM symptomNode
+    class US_TEL,OS_TEL,PI_TEL,TD_TEL telemetryNode
+    class US_C1,US_C2,US_C3,US_C4 correctionNode
+    class OS_C1,OS_C2,OS_C3,OS_C4 correctionNode
+    class PI_C1,PI_C2,PI_C3,PI_C4 correctionNode
+    class TD_C1,TD_C2,TD_C3,TD_C4 correctionNode
 ```
 
 The cheat sheet condenses hundreds of pages of vehicle dynamics theory and empirical tuning experience into an actionable decision matrix that enables rapid diagnosis and correction cycles during limited practice time windows. Each symptom category provides multiple correction pathways because real-world vehicle behavior arises from interactions between multiple chassis parameters, and the optimal correction depends on the specific vehicle configuration, circuit characteristics, and driver preferences. The engineer applies domain expertise to select the most appropriate correction path based on the telemetry signature details and prior tuning history.
 
 Supplement the symptom-based cheat sheet with a setup matrix that documents the current chassis configuration across all adjustable parameters. The setup matrix functions as the single source of truth for the vehicle's mechanical state, ensuring that all team members reference identical parameter values and that setup changes are traceable through version-controlled records. The matrix includes damper click positions, anti-roll bar diameters, spring rates, ride heights, camber angles, toe angles, tire pressures, and aerodynamic wing angles, organized by corner position and updated after every tuning iteration.
 
-```
-═══════════════════════════════════════════════════════════════
-                      VEHICLE SETUP MATRIX
-                      Circuit: Club Raceway
-                      Date: 2025-05-15
-                      Session: Practice 2
-═══════════════════════════════════════════════════════════════
+```mermaid
+flowchart TD
+    Header["VEHICLE SETUP MATRIX<br/>Circuit: Club Raceway &nbsp;|&nbsp; Date: 2025-05-15 &nbsp;|&nbsp; Session: Practice 2"]
 
-SUSPENSION DAMPERS (clicks from full soft)
-─────────────────────────────────────────────────────────────
-Corner    Compression    Rebound    Notes
-FL        14             16         +2 clicks from baseline
-FR        14             16         +2 clicks from baseline
-RL        12             14         +2 clicks from baseline
-RR        12             14         +2 clicks from baseline
+    subgraph dampers["SUSPENSION DAMPERS — clicks from full soft"]
+        D_FL["FL — Compression: 14 &nbsp; Rebound: 16<br/>+2 clicks from baseline"]
+        D_FR["FR — Compression: 14 &nbsp; Rebound: 16<br/>+2 clicks from baseline"]
+        D_RL["RL — Compression: 12 &nbsp; Rebound: 14<br/>+2 clicks from baseline"]
+        D_RR["RR — Compression: 12 &nbsp; Rebound: 14<br/>+2 clicks from baseline"]
+    end
 
-ANTI-ROLL BARS
-─────────────────────────────────────────────────────────────
-Front ARB diameter:     22.0 mm (medium stiffness)
-Rear ARB diameter:      18.0 mm (soft)
-Balance (F/R ratio):    1.22 (mild understeer tendency)
+    subgraph arb["ANTI-ROLL BARS"]
+        ARB_F["Front ARB: 22.0 mm — medium stiffness"]
+        ARB_R["Rear ARB: 18.0 mm — soft"]
+        ARB_B["Balance F/R ratio: 1.22 — mild understeer tendency"]
+    end
 
-SPRINGS
-─────────────────────────────────────────────────────────────
-Corner    Rate (lbf/in)    Free Length (in)    Installed Length (in)
-FL        500              10.0                8.5
-FR        500              10.0                8.5
-RL        450              10.0                8.7
-RR        450              10.0                8.7
+    subgraph springs["SPRINGS"]
+        S_FL["FL — Rate: 500 lbf/in &nbsp;|&nbsp; Free: 10.0 in &nbsp;|&nbsp; Installed: 8.5 in"]
+        S_FR["FR — Rate: 500 lbf/in &nbsp;|&nbsp; Free: 10.0 in &nbsp;|&nbsp; Installed: 8.5 in"]
+        S_RL["RL — Rate: 450 lbf/in &nbsp;|&nbsp; Free: 10.0 in &nbsp;|&nbsp; Installed: 8.7 in"]
+        S_RR["RR — Rate: 450 lbf/in &nbsp;|&nbsp; Free: 10.0 in &nbsp;|&nbsp; Installed: 8.7 in"]
+    end
 
-RIDE HEIGHT (measured at rocker pickup point)
-─────────────────────────────────────────────────────────────
-Front:    95 mm
-Rear:     105 mm
-Rake:     10 mm (rear higher, mild nose-down aero platform)
+    subgraph ride["RIDE HEIGHT — measured at rocker pickup point"]
+        RH_F["Front: 95 mm"]
+        RH_R["Rear: 105 mm"]
+        RH_Rake["Rake: 10 mm — rear higher, mild nose-down aero platform"]
+    end
 
-ALIGNMENT
-─────────────────────────────────────────────────────────────
-Corner    Camber (deg)    Toe (deg)    Caster (deg)
-FL        -2.5            +0.05        +4.0
-FR        -2.5            +0.05        +4.0
-RL        -1.8            +0.10        N/A
-RR        -1.8            +0.10        N/A
+    subgraph align["ALIGNMENT"]
+        A_FL["FL — Camber: -2.5° &nbsp; Toe: +0.05° &nbsp; Caster: +4.0°"]
+        A_FR["FR — Camber: -2.5° &nbsp; Toe: +0.05° &nbsp; Caster: +4.0°"]
+        A_RL["RL — Camber: -1.8° &nbsp; Toe: +0.10° &nbsp; Caster: N/A"]
+        A_RR["RR — Camber: -1.8° &nbsp; Toe: +0.10° &nbsp; Caster: N/A"]
+        A_TF["Total front toe-in: 0.10°"]
+        A_TR["Total rear toe-in: 0.20°"]
+    end
 
-Total front toe-in:  0.10°
-Total rear toe-in:   0.20°
+    subgraph tires["TIRE PRESSURES — psi"]
+        T_FL["FL — Cold: 32.0 &nbsp;|&nbsp; Hot target: 35.0 &nbsp;|&nbsp; Measured: 35.5"]
+        T_FR["FR — Cold: 32.0 &nbsp;|&nbsp; Hot target: 35.0 &nbsp;|&nbsp; Measured: 35.0"]
+        T_RL["RL — Cold: 30.0 &nbsp;|&nbsp; Hot target: 33.0 &nbsp;|&nbsp; Measured: 33.5"]
+        T_RR["RR — Cold: 30.0 &nbsp;|&nbsp; Hot target: 33.0 &nbsp;|&nbsp; Measured: 33.0"]
+    end
 
-TIRE PRESSURES (psi)
-─────────────────────────────────────────────────────────────
-Corner    Cold (pit)    Hot (target)    Measured (post-session)
-FL        32.0          35.0            35.5
-FR        32.0          35.0            35.0
-RL        30.0          33.0            33.5
-RR        30.0          33.0            33.0
+    subgraph aero["AERODYNAMICS"]
+        AE_F["Front wing: 8° — medium downforce"]
+        AE_R["Rear wing: 12° — medium-high downforce"]
+        AE_B["Aero balance: 52% rear — mild understeer on high-speed corners"]
+    end
 
-AERODYNAMICS
-─────────────────────────────────────────────────────────────
-Front wing angle:       8° (medium downforce)
-Rear wing angle:        12° (medium-high downforce)
-Aero balance:           52% rear (mild understeer on high-speed corners)
+    subgraph driver["DRIVER NOTES"]
+        DN1["Turn 3 entry: car pushing, requires earlier brake release"]
+        DN2["Turn 8 exit: good rear traction, confident throttle application"]
+        DN3["Straightaway stability: excellent, no porpoising"]
+        DN4["Overall balance: 7/10 — needs slight front-end responsiveness improvement"]
+    end
 
-DRIVER NOTES
-─────────────────────────────────────────────────────────────
-- Turn 3 entry: car pushing, requires earlier brake release
-- Turn 8 exit: good rear traction, confident throttle application
-- Straightaway stability: excellent, no porpoising
-- Overall balance: 7/10, needs slight front end responsiveness improvement
-
-═══════════════════════════════════════════════════════════════
+    Header --> dampers
+    Header --> arb
+    Header --> springs
+    Header --> ride
+    Header --> align
+    Header --> tires
+    Header --> aero
+    Header --> driver
 ```
 
 The setup matrix documents not only the numerical parameter values but also the contextual notes that capture qualitative driver feedback and engineer observations. This combination of quantitative setup data and qualitative behavioral descriptions enables future engineers to understand the reasoning behind specific configuration choices, preserving institutional knowledge across personnel changes and multi-year vehicle development programs. The matrix version control stamps each configuration with date, circuit, and session identifiers, facilitating regression analysis when the team returns to previously visited circuits and seeks to replicate successful setups from prior years.

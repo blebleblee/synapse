@@ -22,30 +22,16 @@ The actual mechanics operated through a hierarchical administrative structure. G
 
 In schematic form, the information and decision flow looked approximately as follows:
 
-```
-┌─────────────────────────────────────────┐
-│        Gosplan (Central Authority)      │
-│  - Aggregate supply-demand forecasts    │
-│  - Construct material balances          │
-│  - Set output targets (physical units)  │
-└──────────────┬──────────────────────────┘
-               │ Cascades targets downward
-               ▼
-┌──────────────────────────────────────────┐
-│    Sector Ministries                     │
-│  - Receive aggregate targets             │
-│  - Disaggregate to enterprise level      │
-│  - Coordinate supply allocations         │
-└──────────────┬──────────────────────────┘
-               │ Issues directives
-               ▼
-┌──────────────────────────────────────────┐
-│    Individual Enterprises                │
-│  - Receive production targets (physical) │
-│  - Receive input allocations             │
-│  - Hire workers (wage administered)      │
-│  - Deliver output to state warehouses    │
-└──────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["<b>Gosplan</b><br/>(Central Authority)<br/>━━━━━━━━━━━━━━<br/>• Aggregate supply-demand forecasts<br/>• Construct material balances<br/>• Set output targets (physical units)"]
+    
+    B["<b>Sector Ministries</b><br/>━━━━━━━━━━━━━━<br/>• Receive aggregate targets<br/>• Disaggregate to enterprise level<br/>• Coordinate supply allocations"]
+    
+    C["<b>Individual Enterprises</b><br/>━━━━━━━━━━━━━━<br/>• Receive production targets (physical)<br/>• Receive input allocations<br/>• Hire workers (wage administered)<br/>• Deliver output to state warehouses"]
+    
+    A -->|"Cascades targets downward"| B
+    B -->|"Issues directives"| C
 ```
 
 This cascade created several mechanical problems. First, Gosplan's material balance exercise was mathematically intractable at the scale attempted. In the 1960s and 1970s, Gosplan worked with input-output tables describing relationships between perhaps 2,000 sectors. But the full Soviet economy involved millions of distinct products. The input-output model assumed fixed technical coefficients—a ton of steel required exactly X tons of iron ore and Y tons of coal—but in reality, enterprises could substitute inputs if relative scarcities shifted. The system could not dynamically recompute equilibrium. Instead, Gosplan produced plans that were internally inconsistent: total claimed output exceeded feasible input supplies in some sectors, while other sectors faced excess supply. Enterprises received conflicting signals: they could not simultaneously fulfill all their target obligations with the inputs allocated to them.
@@ -66,31 +52,14 @@ In principle, this addressed some of Mises's critique: if enterprises face real 
 
 The Yugoslav system's information and decision flow differed fundamentally from the Soviet model:
 
-```
-┌─────────────────────────────────────┐
-│     Worker Council (Enterprise)      │
-│  - Collectively decides production   │
-│  - Sets prices for outputs           │
-│  - Retains and distributes net income│
-│  - Hires/fires workers subject to    │
-│    constraints on new hiring         │
-└──────────────┬──────────────────────┘
-               │ Exchanges in markets
-               ▼
-┌──────────────────────────────────────┐
-│   Market-Clearing Prices             │
-│  - Negotiated between enterprises    │
-│  - Set by supply and demand          │
-│  - Reflect scarcity                  │
-└──────────────┬──────────────────────┘
-               │ Coordinates allocation
-               ▼
-┌──────────────────────────────────────┐
-│   Other Enterprises & Consumers      │
-│  - Respond to prices                 │
-│  - Buy and sell as profit-seeking    │
-│  - Adjust production to demand       │
-└──────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Worker Council (Enterprise)<br/>- Collectively decides production<br/>- Sets prices for outputs<br/>- Retains and distributes net income<br/>- Hires/fires workers subject to<br/>  constraints on new hiring"]
+    B["Market-Clearing Prices<br/>- Negotiated between enterprises<br/>- Set by supply and demand<br/>- Reflect scarcity"]
+    C["Other Enterprises & Consumers<br/>- Respond to prices<br/>- Buy and sell as profit-seeking<br/>- Adjust production to demand"]
+    
+    A -->|"Exchanges in markets"| B
+    B -->|"Coordinates allocation"| C
 ```
 
 The Yugoslav system operated with genuine price signals and enterprise autonomy in ways the Soviet system did not. Enterprises that were unprofitable faced pressure to either improve efficiency or close. New enterprises could form if opportunities existed. Worker councils, in theory, could reward workers based on enterprise profitability. The system was more dynamic than the Soviet alternative.
@@ -115,34 +84,35 @@ This agricultural success created confidence that market-oriented reforms could 
 
 The information and decision flow in reformed China evolved from pure command toward mixed:
 
-```
-┌─────────────────────────────────────────┐
-│  Strategic State Assets (SOEs)          │
-│  - Energy, heavy industry, rail, telecom│
-│  - Central planning for key targets     │
-│  - Managers given profit incentives     │
-│  - Graduates toward market pricing      │
-└──────────────┬──────────────────────────┘
-               │ Coexist with
-               ▼
-┌──────────────────────────────────────────┐
-│  Market-Oriented Enterprises            │
-│  - TVEs, private firms, joint ventures  │
-│  - Set own prices, production levels    │
-│  - Face market competition              │
-│  - Retain residual profits              │
-└──────────────┬──────────────────────────┘
-               │ Operating in
-               ▼
-┌──────────────────────────────────────────┐
-│  Dual-Track Price Systems               │
-│  - Planned allocation at fixed prices   │
-│  - Market transactions at market prices │
-│  - Gradual transition toward unified    │
-│    market pricing                       │
-└──────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Strategic State Assets (SOEs)<br/>- Energy, heavy industry, rail, telecom<br/>- Central planning for key targets<br/>- Managers given profit incentives<br/>- Graduates toward market pricing"]
+    B["Market-Oriented Enterprises<br/>- TVEs, private firms, joint ventures<br/>- Set own prices, production levels<br/>- Face market competition<br/>- Retain residual profits"]
+    C["Dual-Track Price Systems<br/>- Planned allocation at fixed prices<br/>- Market transactions at market prices<br/>- Gradual transition toward unified<br/>  market pricing"]
+    
+    A -->|"Coexist with"| B
+    B -->|"Operating in"| C
 ```
 
 The Chinese reform model maintained state ownership of land and major productive assets but decentralized control and introduced market pricing. This created efficiency gains: enterprises responding to prices and profit incentives became more responsive to demand and more cost-conscious. Technological adoption accelerated. Consumer goods became more available. The system retained the state's ability to direct resources toward strategic objectives—maintaining energy security, building infrastructure, managing macroeconomic cycles—while allowing market mechanisms to allocate resources in less strategic sectors.
 
-However, the dual-track system (planned allocation coexisting with market pricing) generated distinct distortions. Privileged enterprises or administrators could access goods at planned prices and resell them at market prices, capturing rents. Corruption emerged as a significant problem. State-owned enterprises, even with profit incentives, faced soft budget constraints: if they be
+However, the dual-track system (planned allocation coexisting with market pricing) generated distinct distortions. Privileged enterprises or administrators could access goods at planned prices and resell them at market prices, capturing rents. Corruption emerged as a significant problem.
+
+## Conclusion
+
+The empirical record of socialist economies reveals a fundamental governance tension: centralized coordination can mobilize resources toward strategic objectives and manage systemic risks, but information asymmetries and incentive misalignments produce chronic inefficiencies in production and allocation. Market-socialist hybrids—most prominently China's dual-track reforms—demonstrate that introducing price signals and residual claimancy can unlock productivity gains while preserving state capacity for macroeconomic management and industrial policy. Yet these hybrid systems generate their own pathologies: rent-seeking at the interface between plan and market, uneven distribution of reform gains, and regulatory capture by enterprise managers or local officials. The transition mechanisms matter profoundly—gradual liberalization allowed incumbents to adapt but prolonged distortions, while rapid privatization in the former Soviet bloc produced asset stripping and institutional collapse before market-supporting institutions could emerge.
+
+Across all implementations, outcome variance depended less on ideological commitment than on institutional quality, administrative capacity, and the sequencing of reforms. Economies that developed transparent legal frameworks, meritocratic bureaucracies, and accountability mechanisms—whether through competitive elections, intra-party discipline, or civil society pressure—achieved better allocative efficiency and more equitable distribution than those where concentrated power enabled elite extraction. The socialist calculation debate thus resolves empirically: pure central planning cannot replicate market efficiency in complex economies, but state capacity remains essential for correcting market failures, managing coordination problems, and ensuring that growth translates into broad-based welfare improvements. The frontier question is not whether to use markets or states, but how to design institutions that harness market information while constraining rent-seeking and aligning incentives toward socially productive ends.
+
+---
+
+## Summary & Verification Matrix
+
+| **Dimension** | **Core Mechanism** | **Empirical Diagnostic** | **Key Tradeoff** |
+|---------------|-------------------|--------------------------|------------------|
+| **Information Aggregation** | Central planners lack distributed knowledge of local conditions, preferences, and production possibilities; prices aggregate dispersed information | Persistent shortages, quality degradation, and misallocation in centrally planned economies vs. responsive supply in market systems | Coordination on strategic priorities vs. allocative efficiency in granular markets |
+| **Incentive Alignment** | State ownership and plan targets decouple effort from reward; profit retention and residual claimancy focus attention on cost minimization and demand responsiveness | Soft budget constraints and low productivity growth under pure socialism; productivity acceleration following profit reforms and ownership clarification | Managerial autonomy and innovation vs. rent extraction and inequality |
+| **Transition Architecture** | Dual-track systems create arbitrage opportunities between plan and market prices; gradual liberalization preserves incumbents but prolongs distortions; rapid privatization risks institutional collapse | Corruption indices and asset concentration during dual-track periods; output collapse and mortality spikes in shock therapy cases | Minimizing transition costs vs. eliminating distortions quickly |
+| **Institutional Quality** | Rule of law, bureaucratic competence, and accountability mechanisms determine whether state intervention corrects market failures or enables extraction | Growth and welfare outcomes correlate with governance indicators (corruption control, regulatory quality) more than with ownership structure | State capacity for collective action vs. constraints on predatory behavior |
+| **Distributional Outcomes** | Public ownership and redistributive policies can ensure broad access to essentials; marketization generates efficiency gains but concentrates rewards | Gini coefficients, poverty rates, and access to education/healthcare before and after reforms; intergenerational mobility patterns | Equity and security vs. incentives for effort and risk-taking |
+| **Dynamic Adaptation** | Technological change and preference evolution require decentralized experimentation; path dependencies and sunk costs in planning infrastructure constrain reform | Innovation rates, total factor productivity growth, and speed of sectoral reallocation in response to demand shifts | Stability and long-term investment vs. flexibility and creative destruction |

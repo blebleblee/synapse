@@ -60,22 +60,32 @@ Linked lists present the opposite profile. Each node contains a data payload and
 
 The following ASCII diagram illustrates the memory layout contrast:
 
-```
-Array Layout (cache-friendly):
-┌───┬───┬───┬───┬───┬───┬───┬───┐
-│ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │   ← One 64-byte cache line, 8 × i64
-└───┴───┴───┴───┴───┴───┴───┴───┘
-  ↑ Sequential access, one miss per 8 elements
-
-Linked List Layout (cache-hostile):
- ┌───────┐       ┌───────┐       ┌───────┐
- │  1    │  -->  │  2    │  -->  │  3    │  ...
- │ *next─┼──┐    │ *next─┼──┐    │ *next─┼──...
- └───────┘  │    └───────┘  │    └───────┘
-            ↓               ↓
-       Random DRAM     Random DRAM
-       address         address
-  ↑ One cache miss per node traversal
+```mermaid
+flowchart TD
+    subgraph array ["Array Layout (cache-friendly)"]
+        direction LR
+        A1["1"] --- A2["2"]
+        A2 --- A3["3"]
+        A3 --- A4["4"]
+        A4 --- A5["5"]
+        A5 --- A6["6"]
+        A6 --- A7["7"]
+        A7 --- A8["8"]
+        
+        CacheLine["64-byte cache line<br/>8 × i64"]
+        CacheMiss["Sequential access<br/>One miss per 8 elements"]
+    end
+    
+    subgraph linked ["Linked List Layout (cache-hostile)"]
+        direction LR
+        L1["1<br/>*next"] -->|"Random DRAM<br/>address"| L2["2<br/>*next"]
+        L2 -->|"Random DRAM<br/>address"| L3["3<br/>*next"]
+        L3 -.->|"..."| L4["..."]
+        
+        ListMiss["One cache miss<br/>per node traversal"]
+    end
+    
+    array ~~~ linked
 ```
 
 This disparity explains why high-performance queues in production systems—from LMAX Disruptor to kernel ring buffers—are built on contiguous arrays, not linked lists, despite linked lists offering O(1) insertion and deletion without shifting elements. The asymptotic advantage of O(1) insertion is overwhelmed by the cache miss penalty on every access in a throughput-sensitive system.
@@ -90,18 +100,29 @@ Open addressing stores all entries directly in the backing array. On collision, 
 
 The load factor at which a hash table is resized has an outsized impact on both time and space performance. A load factor of 0.5 halves memory efficiency but minimizes collisions and maximizes lookup speed. A load factor of 0.9 packs the table densely, saving memory but dramatically increasing the probe length for the last 10% of entries inserted, pushing the worst-case lookup cost toward O(n) in degenerate cases.
 
-```
-Open-Addressing Hash Table Internal Layout (load factor ~0.6):
-
-Index:  0    1    2    3    4    5    6    7
-       ┌────┬────┬────┬────┬────┬────┬────┬────┐
-       │ K3 │    │ K1 │ K5 │ K2 │    │    │ K4 │
-       └────┴────┴────┴────┴────┴────┴────┴────┘
-              ↑         ↑
-         Empty slot  K5 collided with K1,
-                     placed at next slot (linear probe)
-
-Probe sequence for K5 lookup: hash(K5) → 2, slot 2 ≠ K5, probe slot 3 → K5 found (2 probes)
+```mermaid
+flowchart LR
+    subgraph table["Hash Table (Load Factor ~0.6)"]
+        idx0["Index 0<br/>K3"]
+        idx1["Index 1<br/>Empty"]
+        idx2["Index 2<br/>K1"]
+        idx3["Index 3<br/>K5"]
+        idx4["Index 4<br/>K2"]
+        idx5["Index 5<br/>Empty"]
+        idx6["Index 6<br/>Empty"]
+        idx7["Index 7<br/>K4"]
+    end
+    
+    subgraph collision["Collision Resolution<br/>Linear Probing"]
+        hash["hash(K5) → 2"]
+        probe1["Slot 2: K1 ≠ K5"]
+        probe2["Slot 3: K5 Found✓<br/>2 probes"]
+    end
+    
+    hash --> probe1
+    probe1 --> probe2
+    probe1 -.-> idx2
+    probe2 -.-> idx3
 ```
 
 Rust's standard `HashMap` uses `hashbrown`, an implementation of Swiss Tables developed at Google. Swiss Tables maintain a parallel array of one-byte "control bytes" alongside the main entry array. Each control byte encodes either a sentinel (empty or deleted) or the top 7 bits of the entry's hash. A SIMD probe loads 16 consecutive control bytes in a single instruction and compares all 16 against the target hash's top 7 bits simultaneously, producing a bitmask of candidate slots. This reduces the average number of cache lines touched per lookup to approximately one for typical workloads, making `hashbrown`'s constant factors significantly better than a naive open-addressing table.
@@ -118,26 +139,23 @@ B-trees address this directly by storing multiple keys per node, where the node 
 
 ### Algorithm Selection Decision Framework
 
-```
-                    Workload Characteristics
-                           │
-              ┌────────────┼────────────┐
-         Ordered?       Exact         Bounded
-         Range scan?    lookup?       integer keys?
-              │            │               │
-              ▼            ▼               ▼
-        Balanced BST   Hash Table     Counting/Radix Sort
-        (B-Tree if    (hashbrown /    (O(n) time, O(k) space)
-         disk-backed)  Swiss Table)
-              │            │
-        Θ(log n)        O(1) avg
-        ops, O(n)       O(n) worst
-        space           case
-              │            │
-         Cache:          Cache:
-         ~log n          ~1–2
-         misses          misses
-         per op          per op
+```mermaid
+flowchart TD
+    A["Workload Characteristics"]
+    
+    A --> B{Ordered?<br/>Range scan?}
+    A --> C{Exact<br/>lookup?}
+    A --> D{Bounded<br/>integer keys?}
+    
+    B --> E["Balanced BST<br/>(B-Tree if<br/>disk-backed)"]
+    C --> F["Hash Table<br/>(hashbrown /<br/>Swiss Table)"]
+    D --> G["Counting/Radix Sort<br/>(O(n) time, O(k) space)"]
+    
+    E --> H["Θ(log n) ops<br/>O(n) space"]
+    F --> I["O(1) avg<br/>O(n) worst case"]
+    
+    H --> J["Cache:<br/>~log n misses<br/>per op"]
+    I --> K["Cache:<br/>~1–2 misses<br/>per op"]
 ```
 
 ---

@@ -199,3 +199,4 @@ With a typical $\beta = 0.9$, the velocity is an exponentially weighted moving a
 # SGD with Nesterov momentum — appropriate for fine-tuning pretrained models
 # where a well-tuned constant LR with momentum often outperforms Adam
 sgd_optimizer
+```

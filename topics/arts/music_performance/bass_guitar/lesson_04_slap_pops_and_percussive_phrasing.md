@@ -2,13 +2,13 @@
 
 ## 1. Why It Sounds Like That (First-Principles, Brief)
 
-Slapping drives the string into the fretboard with the side of the thumb, producing a percussive collision rich in upper harmonics (2–8 kHz) — a completely different excitation from plucking. Popping snaps the string away from the fretboard with a finger and lets it rebound into the frets, adding a sharp metallic transient (3–10 kHz). Three things govern how that attack sounds:
+Slapping drives the string into the fretboard with the side of the thumb, producing a percussive collision rich in upper harmonics (2–8 kHz) — a completely different excitation from plucking, which mostly favors the fundamental and low overtones. Popping snaps the string away from the fretboard with a finger and lets it rebound into the frets, adding a sharp metallic transient (3–10 kHz) on top of the plucked fundamental. Three things govern how that attack sounds:
 
-1. **Strike speed sets brightness.** A faster thumb motion drives the string harder against the fret, exciting more high harmonics. You don't need brute force — a quick, relaxed strike at a controlled angle beats a hard, stiff one.
-2. **Strike location sets tonal color.** Hit the string near the end of the fretboard (over the bridge pickup) for cutting brightness; move toward the neck pickup for warmth and fundamental weight. You're changing where the string divides as it vibrates, which changes which harmonics get emphasized.
-3. **String gauge and action set feel.** Heavier strings (.105 A, .130 E) store more energy and punch louder but take more force. Lower action (2.0–2.5 mm at the 12th fret) makes slapping easier but increases buzz risk — there's a real tradeoff here, not a universal "lower is better."
+1. **Strike speed sets brightness.** A faster thumb motion drives the string harder against the fret, exciting more high harmonics. You don't need brute force — a quick, relaxed strike at a controlled angle beats a hard, stiff one every time, and it's easier on the joints.
+2. **Strike location sets tonal color.** Hit the string near the end of the fretboard (over where a bridge pickup would sit) for cutting brightness; move toward the neck for warmth and fundamental weight. You're changing where along its length the string first gets disturbed, which changes which harmonics get emphasized the most strongly.
+3. **String gauge and action set feel.** Heavier strings (.105 A, .130 E) store more energy and punch louder but take more force to drive. Lower action (2.0–2.5 mm at the 12th fret) makes slapping easier but increases buzz risk — there's a real tradeoff here, not a universal "lower is better."
 
-The motion itself comes from **forearm rotation (pronation/supination)**, not thumb-joint bending. The thumb is a rigid striking surface; the forearm supplies the swing. Treat the thumb like a drumstick tip and the forearm like the arm swinging it — that mental model fixes 90% of slap technique problems before you even touch dynamics or speed.
+The motion itself comes from **forearm rotation (pronation/supination)**, not thumb-joint bending. The thumb is a rigid striking surface; the forearm supplies the swing. Treat the thumb like a drumstick tip and the forearm like the arm swinging it — that mental model fixes most slap technique problems before you even touch dynamics or speed.
 
 ---
 
@@ -33,7 +33,7 @@ The motion itself comes from **forearm rotation (pronation/supination)**, not th
 graph LR
     subgraph sub_prep ["Phase 1: Rest"]
         A["Thumb floats past fretboard end"]
-        B["Wrist near-neutral, 10-15° ext"]
+        B["Wrist near-neutral, 10-15deg ext"]
     end
     subgraph sub_attack ["Phase 2: Strike"]
         C["Forearm pronates"]
@@ -152,6 +152,15 @@ A|-----S----------------|
 ```
 S = slap (open E), P = pop. Slap E on 1, pop A on &, slap open E on 2, pop fretted 3rd-fret E on &, and so on — the point of the exercise is switching cleanly between open-string slaps and fretted pops without losing the pocket.
 
+**Extended box, 7th–10th fret zone (same key, octave up):**
+```
+G|--------9-10-----------|
+D|--------9-10-----------|
+A|-----7--9--------------|
+E|--7--9-----------------|
+```
+Use this box once the open-position groove is solid at 100 BPM — the 1-2-4 rule relaxes above the 7th fret because the frets are narrower, so one-finger-per-fret (OFPF) becomes the natural choice: index on 7, middle on 8 (if needed), ring on 9, pinky on 10.
+
 ---
 
 ## 5. Ergonomics & Injury Prevention
@@ -171,6 +180,25 @@ S = slap (open E), P = pop. Slap E on 1, pop A on &, slap open E on 2, pop frett
 3. Forearm pronation/supination with a light weight (or none), slow full-range rotation.
 
 Stop immediately on sharp pain — not soreness, pain. Ice for 15 minutes if discomfort shows up after a session, and if it persists more than a week, see a hand specialist before it becomes chronic. Tendons don't negotiate.
+
+```mermaid
+graph TD
+    subgraph sub_warmup ["Before Playing"]
+        A["Arm circles 3-5 min"]
+        B["Wrist/finger ROM 3-5 min"]
+        C["40 BPM priming slaps 5 min"]
+    end
+    subgraph sub_session ["During Session"]
+        D["10 min play / 2 min full rest cycle"]
+        E["Stop on sharp pain, not soreness"]
+    end
+    subgraph sub_cooldown ["After Playing"]
+        F["Flexor stretch 15-20s"]
+        G["Extensor stretch 15-20s"]
+        H["Pronation/supination stretch"]
+    end
+    A --> B --> C --> D --> E --> F --> G --> H
+```
 
 ---
 
@@ -222,6 +250,23 @@ If you have a phone recorder or DAW, record a pass and eyeball the waveform — 
 - **Improvise** over a 12-bar blues in E, a ii–V–I (Dm7–G7–Cmaj7), and a one-chord funk vamp, using only slap-pop articulation.
 - **Compose** an original 8- or 16-bar slap line weekly, record it, and critique: is it locked to the groove, does it serve the harmony, is the tone consistent bar to bar?
 
+```mermaid
+graph LR
+    subgraph sub_p1 ["Phase 1: Weeks 1-4"]
+        A["Single-string reps, 60 BPM"]
+    end
+    subgraph sub_p2 ["Phase 2: Weeks 5-8"]
+        B["Dynamics, accents, ghosts"]
+    end
+    subgraph sub_p3 ["Phase 3: Weeks 9-16"]
+        C["Tempo pyramid, bursts, odd meters"]
+    end
+    subgraph sub_p4 ["Phase 4: Weeks 17-24"]
+        D["Transcription, improv, composition"]
+    end
+    A --> B --> C --> D
+```
+
 ---
 
 ## 7. Troubleshooting
@@ -240,6 +285,12 @@ Stop immediately. Film yourself slapping at a moderate tempo: if the forearm loo
 
 ### Ghost notes too loud or inaudible
 You need a deliberately shallower strike angle (20–25°) with minimal forearm rotation for ghosts — they're a different gesture, not just "slap softer" with the same motion. Practice four force levels deliberately (25/50/75/100%) until you can recall each one on demand.
+
+### Thumb nail clicking against the string
+The nail is catching the string on the way past instead of the bony edge making first contact. Trim the thumbnail short and check your contact angle — the bony edge should lead, not the nail corner.
+
+### Pop finger buzzing instead of snapping cleanly
+Usually a shallow pull (less than 5mm lift) or a lateral rather than vertical pull. Exaggerate the vertical lift in slow practice (10–12 mm at 50 BPM) until the string-to-fret snap is audible and consistent, then dial the lift back down to normal size once the vertical path is locked in.
 
 ---
 

@@ -485,3 +485,4 @@ static Vec3 lerp3(Vec3 a, Vec3 b, float t) {
 
 void pose_blend(const Pose *a, const Pose *b, float t, Pose *out) {
     for
+```

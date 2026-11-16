@@ -68,37 +68,45 @@ Quadrature Amplitude Modulation (QAM) generalizes phase modulation by varying bo
 
 Orthogonal Frequency Division Multiplexing (OFDM) partitions a wideband channel into $N$ narrowband subcarriers, each individually modulated with BPSK, QPSK, or QAM. Subcarrier spacing $\Delta f = 1/T_s$, where $T_s$ is the symbol duration, ensures orthogonality despite spectral overlap: when integrated over a symbol period, cross-correlation between any two subcarriers vanishes. The OFDM modulator maps data symbols to frequency-domain subcarriers, applies the inverse Fast Fourier Transform (IFFT) to generate time-domain samples, and prepends a cyclic prefix (CP) to mitigate inter-symbol interference (ISI) from multipath propagation. The cyclic prefix, a copy of the last portion of the OFDM symbol, absorbs delayed multipath replicas, preserving orthogonality as long as the delay spread remains shorter than the CP duration.
 
-```
-OFDM Transmitter Signal Flow:
-┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│ Serial-to-   │───▶│  Subcarrier  │───▶│   N-point    │───▶│ Add Cyclic   │
-│ Parallel     │    │  Mapping     │    │    IFFT      │    │  Prefix      │
-│ (S/P)        │    │ (QAM/PSK)    │    │              │    │              │
-└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
-       │                                                              │
-    Data In                                                    OFDM Symbol Out
-                                                                      │
-                                                                      ▼
-                                                              ┌──────────────┐
-                                                              │ DAC & Upconv │
-                                                              │ (I/Q Mixer)  │
-                                                              └──────────────┘
-                                                                      │
-                                                                   RF Out
+```mermaid
+flowchart TD
+    subgraph TX["OFDM Transmitter"]
+        direction LR
+        DataIn(["Data In"])
+        SP["Serial-to-Parallel\n(S/P)"]
+        SubMap["Subcarrier Mapping\n(QAM/PSK)"]
+        IFFT["N-point\nIFFT"]
+        AddCP["Add Cyclic\nPrefix"]
+        DAC["DAC & Upconvert\n(I/Q Mixer)"]
+        RFOut(["RF Out"])
 
-OFDM Receiver Signal Flow:
-┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│ Downconvert  │───▶│ Remove       │───▶│   N-point    │───▶│ Subcarrier   │
-│ & ADC        │    │ Cyclic       │    │    FFT       │    │ Demapping    │
-│ (I/Q)        │    │ Prefix       │    │              │    │ & Equalize   │
-└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
-       │                                                              │
-    RF In                                                       ┌──────────────┐
-                                                                │ Parallel-to- │
-                                                                │ Serial (P/S) │
-                                                                └──────────────┘
-                                                                      │
-                                                                   Data Out
+        DataIn --> SP
+        SP --> SubMap
+        SubMap --> IFFT
+        IFFT --> AddCP
+        AddCP --> DAC
+        DAC --> RFOut
+    end
+
+    subgraph RX["OFDM Receiver"]
+        direction LR
+        RFIn(["RF In"])
+        ADC["Downconvert & ADC\n(I/Q)"]
+        RemCP["Remove Cyclic\nPrefix"]
+        FFT["N-point\nFFT"]
+        SubDemap["Subcarrier Demapping\n& Equalize"]
+        PS["Parallel-to-Serial\n(P/S)"]
+        DataOut(["Data Out"])
+
+        RFIn --> ADC
+        ADC --> RemCP
+        RemCP --> FFT
+        FFT --> SubDemap
+        SubDemap --> PS
+        PS --> DataOut
+    end
+
+    RFOut -. "RF Channel" .-> RFIn
 ```
 
 The FFT length $N$ and subcarrier spacing $\Delta f$ determine the OFDM symbol duration $T_s = N / B$, where $B$ is the total bandwidth. WiFi's 802.11a/g standard employs 64 subcarriers (48 data, 4 pilots, 12 null) with $\Delta f = 312.5$ kHz, yielding $T_s = 3.2$ μs. The cyclic prefix, typically one-quarter of the symbol duration (0.8 μs), tolerates delay spreads up to 800 ns, sufficient for most indoor environments. LTE extends OFDM to mobile channels with variable FFT sizes (128, 256, 512, 1024, 2048) and subcarrier spacings (15 kHz or 7.5 kHz), adapting to diverse propagation conditions. The OFDM receiver performs FFT after removing the cyclic prefix, transforming the time-domain signal back to frequency-domain subcarriers. Single-tap frequency-domain equalization corrects each subcarrier's amplitude and phase distortion independently, an elegant simplification compared to time-domain equalization's complexity.

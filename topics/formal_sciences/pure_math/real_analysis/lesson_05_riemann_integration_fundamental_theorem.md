@@ -75,13 +75,13 @@ Darboux's formulation is equivalent to Riemann's original definition via tagged 
 
 Let $P$ be any partition with $\|P\|<\delta$, and set $Q=P\cup P_0$. By the refinement lemma, $U(Q,f)-L(Q,f)\le U(P_0,f)-L(P_0,f)<\varepsilon/2$. We now bound the gap $U(P,f)-U(Q,f)$. Going from $P$ to $Q$ adds the $N$ interior points of $P_0$. Each added point $z$ falls in some subinterval $[x_{i-1},x_i]$ of $P$ with $\Delta x_i<\delta$. As computed in the refinement lemma, the decrease in the upper sum from splitting this interval is:
 
-$$(M_i-M_i')(z-x_{i-1})+(M_i-M_i'')(x_i-z)\le 2M\,\Delta x_i<2M\delta.$$
+$$(M_i-M_i')(z-x_{i-1})+(M_i-M_i'')(x_i-z)\le 2M\,\Delta x_i< 2M\delta.$$
 
-Summing over all $N$ added points: $U(P,f)-U(Q,f)<2MN\delta$. Similarly, $L(Q,f)-L(P,f)<2MN\delta$. Therefore:
+Summing over all $N$ added points: $U(P,f)-U(Q,f)< 2MN\delta$. Similarly, $L(Q,f)-L(P,f)< 2MN\delta$. Therefore:
 
 $$U(P,f)-L(P,f)=\bigl[U(P,f)-U(Q,f)\bigr]+\bigl[U(Q,f)-L(Q,f)\bigr]+\bigl[L(Q,f)-L(P,f)\bigr]$$
 
-$$<2MN\delta+\frac{\varepsilon}{2}+2MN\delta=4MN\delta+\frac{\varepsilon}{2}=\frac{\varepsilon}{2}+\frac{\varepsilon}{2}=\varepsilon.$$
+$$< 2MN\delta+\frac{\varepsilon}{2}+2MN\delta=4MN\delta+\frac{\varepsilon}{2}=\frac{\varepsilon}{2}+\frac{\varepsilon}{2}=\varepsilon.$$
 
 Since $L(P,f)\le S(P,f,\{t_i\})\le U(P,f)$ and $L(P,f)\le I\le U(P,f)$ for any tags, we conclude $|S(P,f,\{t_i\})-I|\le U(P,f)-L(P,f)<\varepsilon$. $\blacksquare$
 
@@ -89,33 +89,40 @@ This theorem is the linchpin connecting the Darboux framework (technically conve
 
 A conceptually powerful reformulation uses the notion of **oscillation**. For a bounded function $f$ on an interval $I$, the oscillation is $\omega(f,I)=\sup_I f-\inf_I f$. At a point $x$, the oscillation of $f$ is $\omega_f(x)=\inf_{\delta>0}\omega\bigl(f,(x-\delta,x+\delta)\bigr)$. The function $f$ is continuous at $x$ if and only if $\omega_f(x)=0$, and the discontinuity set decomposes as $D_f=\{x:\omega_f(x)>0\}=\bigcup_{n=1}^\infty\{x:\omega_f(x)\ge 1/n\}$. Darboux's criterion can be restated: $f$ is integrable if and only if for every $\varepsilon>0$ there exists a partition $P$ with $\sum_{i=1}^n\omega\bigl(f,[x_{i-1},x_i]\bigr)\,\Delta x_i<\varepsilon$. This decomposition of the discontinuity set into a countable union of controlled-oscillation sets is the key to Lebesgue's complete characterization of integrability, which we prove in the next section.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│            Darboux Integrability Framework                   │
-│                                                             │
-│  Partition P = {x₀, x₁, ..., xₙ}                            │
-│                                                             │
-│  U(P,f) = Σ Mᵢ Δxᵢ  ←── overestimate (outer rectangles)    │
-│                                                             │
-│  L(P,f) = Σ mᵢ Δxᵢ  ←── underestimate (inner rectangles)    │
-│                                                             │
-│  Gap: U(P,f) - L(P,f) = Σ (Mᵢ - mᵢ) Δxᵢ = total oscillation │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Darboux Criterion:                                   │   │
-│  │  f integrable ⟺ ∀ε>0 ∃P: U(P,f) - L(P,f) < ε      │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                                                             │
-│  Refinement P ⊆ Q:                                          │
-│    L(P,f) ≤ L(Q,f) ≤ U(Q,f) ≤ U(P,f)                       │
-│                                                             │
-│  Any two partitions P, Q:                                    │
-│    L(P,f) ≤ U(Q,f)                                         │
-│                                                             │
-│  Lower integral:  ∫̲f = sup_P L(P,f)                        │
-│  Upper integral:  ∫̄f = inf_P U(P,f)                        │
-│  f integrable ⟺ ∫̲f = ∫̄f = ∫f                             │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Darboux Integrability Framework"]
+    
+    B["Partition P = {x₀, x₁, ..., xₙ}"]
+    
+    C["Upper Sum: U(P,f) = Σ Mᵢ Δxᵢ<br/>(overestimate - outer rectangles)"]
+    D["Lower Sum: L(P,f) = Σ mᵢ Δxᵢ<br/>(underestimate - inner rectangles)"]
+    
+    E["Oscillation Gap:<br/>U(P,f) - L(P,f) = Σ (Mᵢ - mᵢ) Δxᵢ"]
+    
+    F["Darboux Criterion:<br/>f integrable ⟺ ∀ε&gt;0 ∃P: U(P,f) - L(P,f) &lt; ε"]
+    
+    G["Refinement Property:<br/>If P ⊆ Q then<br/>L(P,f) ≤ L(Q,f) ≤ U(Q,f) ≤ U(P,f)"]
+    
+    H["Partition Comparison:<br/>For any P, Q: L(P,f) ≤ U(Q,f)"]
+    
+    I["Lower Integral: ∫̲f = sup_P L(P,f)"]
+    J["Upper Integral: ∫̄f = inf_P U(P,f)"]
+    
+    K["Integrability Condition:<br/>f integrable ⟺ ∫̲f = ∫̄f = ∫f"]
+    
+    A --> B
+    B --> C
+    B --> D
+    C --> E
+    D --> E
+    E --> F
+    F --> G
+    F --> H
+    G --> I
+    H --> J
+    I --> K
+    J --> K
 ```
 
 ## 2. Core Architecture & Mechanics
@@ -194,7 +201,7 @@ $$\int_a^b(\alpha f+\beta g)=\alpha\int_a^b f+\beta\int_a^b g.$$
 
 *Proof.* We prove the two parts separately.
 
-**Scalar multiplication.** For $\alpha>0$ and any partition $P$, $U(P,\alpha f)=\alpha\,U(P,f)$ and $L(P,\alpha f)=\alpha\,L(P,f)$, since $\sup(\alpha f)=\alpha\sup f$ and $\inf(\alpha f)=\alpha\inf f$ for $\alpha>0$. Thus $U(P,\alpha f)-L(P,\alpha f)=\alpha\bigl(U(P,f)-L(P,f)\bigr)$, which can be made arbitrarily small, proving integrability, and $\int\alpha f=\alpha\int f$. For $\alpha<0$, multiplication by $\alpha$ reverses order, so $U(P,\alpha f)=\alpha\,L(P,f)$ and $L(P,\alpha f)=\alpha\,U(P,f)$. Then $U(P,\alpha f)-L(P,\alpha f)=|\alpha|\bigl(U(P,f)-L(P,f)\bigr)$, again proving integrability, and $\int\alpha f=\alpha\int f$ (the upper and lower integrals swap, but the common value is $\alpha$ times the original). The case $\alpha=0$ is trivial.
+**Scalar multiplication.** For $\alpha>0$ and any partition $P$, $U(P,\alpha f)=\alpha\,U(P,f)$ and $L(P,\alpha f)=\alpha\,L(P,f)$, since $\sup(\alpha f)=\alpha\sup f$ and $\inf(\alpha f)=\alpha\inf f$ for $\alpha>0$. Thus $U(P,\alpha f)-L(P,\alpha f)=\alpha\bigl(U(P,f)-L(P,f)\bigr)$, which can be made arbitrarily small, proving integrability, and $\int\alpha f=\alpha\int f$. For $\alpha< 0$, multiplication by $\alpha$ reverses order, so $U(P,\alpha f)=\alpha\,L(P,f)$ and $L(P,\alpha f)=\alpha\,U(P,f)$. Then $U(P,\alpha f)-L(P,\alpha f)=|\alpha|\bigl(U(P,f)-L(P,f)\bigr)$, again proving integrability, and $\int\alpha f=\alpha\int f$ (the upper and lower integrals swap, but the common value is $\alpha$ times the original). The case $\alpha=0$ is trivial.
 
 **Addition.** For any partition $P$ and subinterval $I_i=[x_{i-1},x_i]$, the inequality $\inf_{I_i}(f+g)\ge\inf_{I_i}f+\inf_{I_i}g$ gives $L(P,f)+L(P,g)\le L(P,f+g)$, and $\sup_{I_i}(f+g)\le\sup_{I_i}f+\sup_{I_i}g$ gives $U(P,f+g)\le U(P,f)+U(P,g)$. Therefore:
 
@@ -248,7 +255,7 @@ For $0<h<\delta$: every $t\in[c,c+h]$ satisfies $|t-c|\le h<\delta$, so:
 
 $$\left|\frac{F(c+h)-F(c)}{h}-f(c)\right|\le\frac{1}{h}\int_c^{c+h}|f(t)-f(c)|\,dt\le\frac{1}{h}\cdot\varepsilon\cdot h=\varepsilon.$$
 
-For $-\delta<h<0$: every $t\in[c+h,c]$ satisfies $|t-c|\le|h|<\delta$, and reversing the integration limits:
+For $-\delta<h< 0$: every $t\in[c+h,c]$ satisfies $|t-c|\le|h|<\delta$, and reversing the integration limits:
 
 $$\frac{F(c+h)-F(c)}{h}-f(c)=\frac{-1}{|h|}\int_{c+h}^{c}\bigl[f(t)-f(c)\bigr]\,dt,$$
 
@@ -306,19 +313,19 @@ provided the limit exists and is finite. Similarly, $\int_{-\infty}^b f=\lim_{a\
 
 The most fundamental convergence test is the **$p$-test**, which classifies the convergence of power-function integrals.
 
-**Theorem ($p$-test).** *The integral $\int_1^\infty x^{-p}\,dx$ converges if and only if $p>1$, and $\int_0^1 x^{-p}\,dx$ converges if and only if $p<1$.*
+**Theorem ($p$-test).** *The integral $\int_1^\infty x^{-p}\,dx$ converges if and only if $p>1$, and $\int_0^1 x^{-p}\,dx$ converges if and only if $p< 1$.*
 
 *Proof.* For $\int_1^\infty x^{-p}\,dx$ with $p\neq 1$:
 
 $$\int_1^b x^{-p}\,dx=\frac{x^{1-p}}{1-p}\bigg|_1^b=\frac{b^{1-p}-1}{1-p}.$$
 
-If $p>1$, then $1-p<0$ and $b^{1-p}\to 0$, so the integral converges to $\frac{1}{p-1}$. If $p<1$, then $1-p>0$ and $b^{1-p}\to\infty$, so the integral diverges. For $p=1$: $\int_1^b x^{-1}\,dx=\ln b\to\infty$.
+If $p>1$, then $1-p< 0$ and $b^{1-p}\to 0$, so the integral converges to $\frac{1}{p-1}$. If $p< 1$, then $1-p>0$ and $b^{1-p}\to\infty$, so the integral diverges. For $p=1$: $\int_1^b x^{-1}\,dx=\ln b\to\infty$.
 
 For $\int_0^1 x^{-p}\,dx$ with $p\neq 1$:
 
 $$\int_\varepsilon^1 x^{-p}\,dx=\frac{1-\varepsilon^{1-p}}{1-p}.$$
 
-If $p<1$, then $1-p>0$ and $\varepsilon^{1-p}\to 0$, so the integral converges to $\frac{1}{1-p}$. If $p>1$, then $1-p<0$ and $\varepsilon^{1-p}\to\infty$, so the integral diverges. For $p=1$: $\int_\varepsilon^1 x^{-1}\,dx=-\ln\varepsilon\to\infty$. $\blacksquare$
+If $p< 1$, then $1-p>0$ and $\varepsilon^{1-p}\to 0$, so the integral converges to $\frac{1}{1-p}$. If $p>1$, then $1-p< 0$ and $\varepsilon^{1-p}\to\infty$, so the integral diverges. For $p=1$: $\int_\varepsilon^1 x^{-1}\,dx=-\ln\varepsilon\to\infty$. $\blacksquare$
 
 The borderline case $p=1$ diverges in both settings—a manifestation of the harmonic series' divergence.
 

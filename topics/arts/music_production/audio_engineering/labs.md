@@ -434,7 +434,7 @@ FreqScope.new;                       // real-time FFT display
 | Parameter | Safe range | Failure mode above/below |
 |---|---|---|
 | Feedback coefficient | 0.0 – 0.85 | ≥1.0 = runaway buildup, clipping |
-| Delay time (chorus) | 15–35 ms | <10ms starts flanging (comb filtering audible) |
+| Delay time (chorus) | 15–35 ms | < 10ms starts flanging (comb filtering audible) |
 | Delay time (flanger) | 1–15 ms | >20ms becomes a discrete echo, not a flange |
 | ADSR sustain | 0.0 – 1.0 (level, not time) | >1.0 causes downstream clipping |
 

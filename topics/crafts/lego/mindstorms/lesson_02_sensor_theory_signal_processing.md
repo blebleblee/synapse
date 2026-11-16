@@ -38,27 +38,18 @@ Understanding *what* the sensors measure is insufficient without understanding *
 
 The path from physical event to program variable runs through four distinct stages:
 
-```
-Physical Phenomenon
-        │
-        ▼
-  Transducer Element          ← mechanical, acoustic, optical, or MEMS
-  (force→voltage, echo→time,
-   photon→current, Coriolis→C)
-        │
-        ▼
-  Sensor Processor / ADC      ← on-sensor MCU (EV3 UART sensors) or
-  (EV3 digital sensors have     brick-side ADC (legacy analog sensors)
-   their own ARM Cortex-M)
-        │
-        ▼
-  EV3 Sensor Port Driver      ← UART/I²C/analog demux, running
-  (Linux kernel, lmsensors    on the EV3's AM1808 ARM processor
-   module, 1 ms base rate)
-        │
-        ▼
-  EV3 Firmware / Runtime      ← EV3-G block, ev3dev Python
-  Variable                      micropython, or ROS node
+```mermaid
+flowchart TD
+    A["Physical Phenomenon"]
+    B["Transducer Element<br/><small>mechanical, acoustic, optical, or MEMS<br/>force→voltage, echo→time, photon→current, Coriolis→C</small>"]
+    C["Sensor Processor / ADC<br/><small>on-sensor MCU (EV3 UART sensors) or<br/>brick-side ADC (legacy analog sensors)<br/>EV3 digital sensors have their own ARM Cortex-M</small>"]
+    D["EV3 Sensor Port Driver<br/><small>UART/I²C/analog demux<br/>Linux kernel, lmsensors module, 1 ms base rate<br/>running on EV3's AM1808 ARM processor</small>"]
+    E["EV3 Firmware / Runtime Variable<br/><small>EV3-G block, ev3dev Python, micropython, or ROS node</small>"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 For EV3-generation UART sensors (gyro, color, infrared), the sensor itself contains a microcontroller that handles first-stage signal conditioning, ADC conversion, and linearization before transmitting a formatted digital packet to the brick over the 460.8 kbaud UART link. This architecture moves the analog-to-digital conversion as close as possible to the sensor element, minimizing the length of the unshielded analog signal path and dramatically reducing susceptibility to electromagnetic interference from motor drive currents. It is worth noting that the EV3's brushed DC motors draw several hundred milliamps of pulsed current when switching direction, and that pulsed current produces magnetic fields that couple inductively into any nearby conductor. Running sensor cables parallel and adjacent to motor cables over their full routing length is one of the most reliable ways to inject noise into an analog measurement chain.
@@ -108,28 +99,24 @@ where $\dot{\theta}_{gyro}$ is the gyroscope angular rate, $\theta_{odom}$ is th
 
 The architectural structure of a complete sensor fusion loop on the EV3 is shown below:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    10 ms Control Loop Tick                   │
-│                                                              │
-│  Gyro Port (UART)         Encoder Ports (EV3 Tacho)         │
-│       │                           │                          │
-│       ▼                           ▼                          │
-│  raw_rate (°/s)         left_ticks, right_ticks             │
-│       │                           │                          │
-│       ▼                           ▼                          │
-│   EMA Filter              Differential Kinematics           │
-│  α = 0.3                  θ_odom = (R - L) / wheel_base    │
-│       │                           │                          │
-│       └──────────┬────────────────┘                          │
-│                  ▼                                           │
-│       Complementary Filter                                   │
-│       α_comp = 0.98                                          │
-│       θ̂ = α·(θ̂_prev + ω·Δt) + (1-α)·θ_odom              │
-│                  │                                           │
-│                  ▼                                           │
-│           Heading Estimate → PID Heading Controller         │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph control_loop["10 ms Control Loop Tick"]
+        gyro["Gyro Port (UART)"]
+        encoder["Encoder Ports (EV3 Tacho)"]
+        
+        gyro --> raw_rate["raw_rate (°/s)"]
+        encoder --> ticks["left_ticks, right_ticks"]
+        
+        raw_rate --> ema["EMA Filter<br/>α = 0.3"]
+        ticks --> kinematics["Differential Kinematics<br/>θ_odom = (R - L) / wheel_base"]
+        
+        ema --> comp_filter["Complementary Filter<br/>α_comp = 0.98<br/>θ̂ = α·(θ̂_prev + ω·Δt) + (1-α)·θ_odom"]
+        kinematics --> comp_filter
+        
+        comp_filter --> heading["Heading Estimate"]
+        heading --> pid["PID Heading Controller"]
+    end
 ```
 
 ---

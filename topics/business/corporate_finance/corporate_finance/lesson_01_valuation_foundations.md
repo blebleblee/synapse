@@ -86,52 +86,46 @@ You collect the levered betas of comparable public companies, unlever each one u
 
 The following diagram captures the signal flow of a complete DCF model, from raw revenue projections through to equity value per share:
 
-```
-Revenue Projections (by segment, by year)
-            │
-            ▼
-    Operating Expense Build
-    (COGS, SG&A, R&D as % of revenue)
-            │
-            ▼
-         EBITDA
-            │
-    Less: D&A (from PP&E schedule)
-            │
-            ▼
-         EBIT  ──────────────────────────────────────────┐
-            │                                            │
-    Less: Taxes (EBIT × τ)                               │
-            │                                        Tax Shield
-            ▼                                        (from Debt)
-        NOPAT (Net Operating Profit After Tax)            │
-            │                                            │
-    Plus: D&A                                            │
-    Less: ΔWorking Capital                               │
-    Less: Capital Expenditures                           │
-            │                                            │
-            ▼                                            │
-    Unlevered Free Cash Flow (UFCF)         WACC embeds this implicitly
-            │
-            ▼
-    Discount at WACC: PV(UFCF) for years 1–n
-            │
-    Plus: Terminal Value discounted at WACC
-            │
-            ▼
-      Enterprise Value (EV)
-            │
-    Less: Net Debt
-    Less: Minority Interest
-    Plus: Associates / Investments
-            │
-            ▼
-       Equity Value
-            │
-    Divide by: Diluted Shares Outstanding
-            │
-            ▼
-    Intrinsic Value Per Share
+```mermaid
+flowchart TD
+    A["Revenue Projections\n(by segment, by year)"]
+    B["Operating Expense Build\n(COGS, SG&A, R&D as % of revenue)"]
+    C["EBITDA"]
+    D["Less: D&A\n(from PP&E schedule)"]
+    E["EBIT"]
+    F["Less: Taxes\n(EBIT × τ)"]
+    G["NOPAT\n(Net Operating Profit After Tax)"]
+    H["Plus: D&A\nLess: ΔWorking Capital\nLess: Capital Expenditures"]
+    I["Unlevered Free Cash Flow\n(UFCF)"]
+    J["Discount at WACC:\nPV(UFCF) for years 1–n"]
+    K["Plus: Terminal Value\ndiscounted at WACC"]
+    L["Enterprise Value\n(EV)"]
+    M["Less: Net Debt\nLess: Minority Interest\nPlus: Associates / Investments"]
+    N["Equity Value"]
+    O["Divide by: Diluted Shares Outstanding"]
+    P["Intrinsic Value Per Share"]
+    TS["Tax Shield\n(from Debt)"]
+    WACC["WACC embeds Tax Shield\nimplicitly"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+    J --> K
+    K --> L
+    L --> M
+    M --> N
+    N --> O
+    O --> P
+
+    E --> TS
+    TS --> WACC
+    WACC --> J
 ```
 
 Each arrow in this flow represents a modeling dependency that must be maintained with live cell references in a spreadsheet model. Hard-coding interim outputs is the most common execution error in analyst work and renders sensitivity analysis impossible.

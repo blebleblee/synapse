@@ -26,7 +26,7 @@ Observability systems must maintain their own invariants to provide trustworthy 
 
 2. **Completeness under sampling**: When sampling is necessary for performance, the sampling strategy must preserve statistical properties. Tail-based sampling must not systematically exclude rare errors or high-latency outliers.
 
-3. **Non-invasiveness**: Instrumentation overhead must not alter system behavior significantly. The observer effect—where measurement perturbs the measured system—must be bounded. Typical targets: <1% CPU overhead, <5% memory overhead.
+3. **Non-invasiveness**: Instrumentation overhead must not alter system behavior significantly. The observer effect—where measurement perturbs the measured system—must be bounded. Typical targets: < 1% CPU overhead, < 5% memory overhead.
 
 4. **Schema stability with evolution**: Telemetry schemas must evolve backward-compatibly. Versioned schemas or schemaless formats with semantic conventions prevent data loss during schema changes.
 
@@ -1304,7 +1304,7 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 
 ## 6. Emerging Directions
 
-**Continuous Profiling**: Extend observability to CPU, memory, and I/O profiles collected continuously in production. Tools like Parca and Pyroscope provide always-on profiling with <1% overhead, enabling performance optimization based on production workloads rather than synthetic benchmarks.
+**Continuous Profiling**: Extend observability to CPU, memory, and I/O profiles collected continuously in production. Tools like Parca and Pyroscope provide always-on profiling with < 1% overhead, enabling performance optimization based on production workloads rather than synthetic benchmarks.
 
 **eBPF-Based Observability**: Kernel-level instrumentation without agent deployment. eBPF programs instrument system calls, network packets, and function entries, providing observability for unmodified binaries and polyglot environments.
 

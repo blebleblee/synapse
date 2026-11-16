@@ -50,75 +50,79 @@ The undo system interacts subtly with layers. When a layer is in Record mode, sc
 
 The memory budget consumed by the undo history is **multiplicative across subdivision levels**. If you sculpt at level 7 (four million vertices), each undo entry stores 48 megabytes. A 30-step undo buffer consumes 1.4 gigabytes per subtool. If you then subdivide to level 8 (eight million vertices), the per-entry cost doubles to 96 megabytes, and a 30-step buffer requires 2.8 gigabytes. ZBrush automatically adjusts the undo depth based on available memory, truncating the buffer when subdivision increases push memory consumption beyond safe thresholds. On systems with limited RAM, aggressive subdivision reduces undo depth to as few as five or ten steps, dramatically narrowing your temporal safety net. This tradeoff forces sculptors to choose between fine detail resolution and undo history depth, often necessitating manual morph target storage before subdividing to preserve fallback states when undo depth collapses.
 
-```
-Non-Destructive Workflow Data Flow
-===================================
-
-                    ┌─────────────────┐
-                    │  Base Mesh (L0) │  ← Coarse subdivision (blocking)
-                    └────────┬────────┘
-                             │
-                    ┌────────▼────────┐
-                    │ Subdivide (L1)  │  ← Medium subdivision (secondary forms)
-                    └────────┬────────┘
-                             │
-                    ┌────────▼────────┐
-                    │ Subdivide (L2)  │  ← High subdivision (fine detail)
-                    └────────┬────────┘
-                             │
-        ┌────────────────────┼────────────────────┐
-        │                    │                    │
-        ▼                    ▼                    ▼
-   ┌─────────┐        ┌─────────┐        ┌─────────┐
-   │ Layer 1 │        │ Layer 2 │        │ Layer 3 │  ← Delta offsets (ΔX, ΔY, ΔZ)
-   │ +/- Δ   │        │ +/- Δ   │        │ +/- Δ   │
-   └────┬────┘        └────┬────┘        └────┬────┘
-        │                  │                  │
-        └──────────────────┼──────────────────┘
-                           │
-                    ┌──────▼──────┐
-                    │  Compositor │  ← Sequential delta application
-                    └──────┬──────┘
-                           │
-                    ┌──────▼──────┐
-                    │   Viewport  │  ← Final rendered mesh
-                    └─────────────┘
-
-Morph Target System (Parallel Snapshots):
-
-   Time T0          Time T1          Time T2          Time T3
-      │                │                │                │
-      ▼                ▼                ▼                ▼
- ┌─────────┐      ┌─────────┐      ┌─────────┐      ┌─────────┐
- │ Morph A │      │ Morph B │      │ Morph C │      │ Current │
- │ (pose1) │      │ (pose2) │      │ (pose3) │      │  State  │
- └─────────┘      └─────────┘      └─────────┘      └─────────┘
-      │                │                │                │
-      └────────────────┴────────────────┴────────────────┘
-                           │
-                    ┌──────▼──────┐
-                    │  Blend Wgt  │  ← Linear interpolation (0-100%)
-                    └──────┬──────┘
-                           │
-                    ┌──────▼──────┐
-                    │   Viewport  │
-                    └─────────────┘
-
-Undo History (Circular Buffer):
-
-   Oldest                                    Newest
-      ↓                                         ↓
-   ┌────┬────┬────┬────┬────┬────┬────┬────┬────┐
-   │ S1 │ S2 │ S3 │ ... │S27│S28│S29│S30│ ←─ │  ← Buffer head (next write)
-   └────┴────┴────┴────┴────┴────┴────┴────┴────┘
-      ↑                                         ↑
-   Discarded when buffer full            Current state
-
-   Each entry stores:
-   - Vertex positions (X, Y, Z × vertex_count)
-   - Polygroup IDs (per-face integer)
-   - Polypaint data (RGBA per-vertex)
-   Total per-entry size ≈ 12–16 bytes × vertex_count
+```mermaid
+flowchart TD
+    L0["Base Mesh (L0)<br/>Coarse subdivision (blocking)"]
+    L1["Subdivide (L1)<br/>Medium subdivision (secondary forms)"]
+    L2["Subdivide (L2)<br/>High subdivision (fine detail)"]
+    
+    Layer1["Layer 1<br/>+/- Δ<br/>Delta offsets (ΔX, ΔY, ΔZ)"]
+    Layer2["Layer 2<br/>+/- Δ<br/>Delta offsets (ΔX, ΔY, ΔZ)"]
+    Layer3["Layer 3<br/>+/- Δ<br/>Delta offsets (ΔX, ΔY, ΔZ)"]
+    
+    Compositor["Compositor<br/>Sequential delta application"]
+    Viewport1["Viewport<br/>Final rendered mesh"]
+    
+    L0 --> L1
+    L1 --> L2
+    L2 --> Layer1
+    L2 --> Layer2
+    L2 --> Layer3
+    Layer1 --> Compositor
+    Layer2 --> Compositor
+    Layer3 --> Compositor
+    Compositor --> Viewport1
+    
+    subgraph MorphSystem["Morph Target System (Parallel Snapshots)"]
+        T0["Time T0"]
+        T1["Time T1"]
+        T2["Time T2"]
+        T3["Time T3"]
+        
+        MorphA["Morph A<br/>(pose1)"]
+        MorphB["Morph B<br/>(pose2)"]
+        MorphC["Morph C<br/>(pose3)"]
+        Current["Current<br/>State"]
+        
+        BlendWgt["Blend Wgt<br/>Linear interpolation (0-100%)"]
+        Viewport2["Viewport"]
+        
+        T0 --> MorphA
+        T1 --> MorphB
+        T2 --> MorphC
+        T3 --> Current
+        
+        MorphA --> BlendWgt
+        MorphB --> BlendWgt
+        MorphC --> BlendWgt
+        Current --> BlendWgt
+        
+        BlendWgt --> Viewport2
+    end
+    
+    subgraph UndoHistory["Undo History (Circular Buffer)"]
+        direction LR
+        S1["S1<br/>Oldest"]
+        S2["S2"]
+        S3["S3"]
+        SDots["..."]
+        S27["S27"]
+        S28["S28"]
+        S29["S29"]
+        S30["S30<br/>Newest"]
+        Head["Buffer head<br/>(next write)"]
+        
+        S1 --> S2
+        S2 --> S3
+        S3 --> SDots
+        SDots --> S27
+        S27 --> S28
+        S28 --> S29
+        S29 --> S30
+        S30 -.-> Head
+        
+        Info["Each entry stores:<br/>- Vertex positions (X, Y, Z × vertex_count)<br/>- Polygroup IDs (per-face integer)<br/>- Polypaint data (RGBA per-vertex)<br/>Total: ≈ 12–16 bytes × vertex_count"]
+    end
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

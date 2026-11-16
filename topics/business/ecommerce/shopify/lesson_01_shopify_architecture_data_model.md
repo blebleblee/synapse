@@ -20,24 +20,48 @@ The Shopify data model roots itself in a directed acyclic graph where products s
 
 Variants inherit the product's context but introduce combinatorial complexity through option axes. A product defines up to three option dimensions—size, color, material—and each unique combination of option values instantiates a distinct variant. Variant entities persist their own SKU, barcode, inventory quantity, price, and weight fields, enabling per-variant inventory tracking and differential pricing strategies. The critical architectural decision here involves Shopify's enforcement of option constraints: every variant must specify a value for each option defined at the product level, preventing incomplete or malformed variant configurations from entering the system.
 
-```
-Product: Classic Oxford Shirt (ID: 123456789)
-├─ Options: [Size, Color, Material]
-├─ Variants:
-│  ├─ Variant (ID: 987654321)
-│  │  ├─ Option1: Small
-│  │  ├─ Option2: White
-│  │  ├─ Option3: Cotton
-│  │  ├─ SKU: OXF-S-WHT-COT
-│  │  ├─ Price: 89.00
-│  │  └─ Inventory: 42 units
-│  └─ Variant (ID: 987654322)
-│     ├─ Option1: Medium
-│     ├─ Option2: Blue
-│     ├─ Option3: Linen
-│     ├─ SKU: OXF-M-BLU-LIN
-│     ├─ Price: 110.00
-│     └─ Inventory: 18 units
+```mermaid
+flowchart TD
+    Product["🛍️ Classic Oxford Shirt<br/>ID: 123456789"]
+    
+    Options["Options<br/>Size | Color | Material"]
+    
+    VariantsGroup["Variants"]
+    
+    Variant1["Variant 987654321"]
+    V1O1["Option1: Small"]
+    V1O2["Option2: White"]
+    V1O3["Option3: Cotton"]
+    V1SKU["SKU: OXF-S-WHT-COT"]
+    V1Price["Price: $89.00"]
+    V1Inv["Inventory: 42 units"]
+    
+    Variant2["Variant 987654322"]
+    V2O1["Option1: Medium"]
+    V2O2["Option2: Blue"]
+    V2O3["Option3: Linen"]
+    V2SKU["SKU: OXF-M-BLU-LIN"]
+    V2Price["Price: $110.00"]
+    V2Inv["Inventory: 18 units"]
+    
+    Product --> Options
+    Product --> VariantsGroup
+    VariantsGroup --> Variant1
+    VariantsGroup --> Variant2
+    
+    Variant1 --> V1O1
+    Variant1 --> V1O2
+    Variant1 --> V1O3
+    Variant1 --> V1SKU
+    Variant1 --> V1Price
+    Variant1 --> V1Inv
+    
+    Variant2 --> V2O1
+    Variant2 --> V2O2
+    Variant2 --> V2O3
+    Variant2 --> V2SKU
+    Variant2 --> V2Price
+    Variant2 --> V2Inv
 ```
 
 Collections operate through two distinct mechanisms: manual collections where merchants explicitly assign products, and smart collections governed by rule predicates evaluated against product attributes. Smart collection rules combine boolean logic—product type equals "Shirts" AND vendor equals "Premium Brands" AND tag contains "summer"—enabling dynamic inventory categorization that scales beyond manual curation. Shopify evaluates smart collection membership asynchronously; adding a product tag that satisfies a smart collection rule does not instantly surface that product in the collection's storefront presentation until background indexing jobs propagate the change.
@@ -48,27 +72,47 @@ The storefront rendering pipeline begins when a browser requests a page URL. Sho
 
 Theme structure organizes templates into a hierarchical directory schema:
 
-```
-theme/
-├─ layout/
-│  └─ theme.liquid          # Master layout wrapper
-├─ templates/
-│  ├─ product.liquid        # Product detail page template
-│  ├─ collection.liquid     # Collection listing template
-│  ├─ cart.liquid           # Shopping cart interface
-│  └─ page.contact.liquid   # Contact page (alternate template)
-├─ sections/
-│  ├─ header.liquid         # Header section component
-│  ├─ product-grid.liquid   # Reusable product grid
-│  └─ footer.liquid         # Footer section component
-├─ snippets/
-│  ├─ product-card.liquid   # Atomic product card template
-│  └─ icon-cart.liquid      # SVG icon snippet
-├─ assets/
-│  ├─ theme.css             # Compiled stylesheet
-│  └─ theme.js              # JavaScript bundle
-└─ config/
-   └─ settings_schema.json  # Theme configuration schema
+```mermaid
+flowchart TD
+    root["📁 theme/"]
+
+    subgraph layout_sg ["layout/"]
+        theme_liquid["theme.liquid\nMaster layout wrapper"]
+    end
+
+    subgraph templates_sg ["templates/"]
+        product_liquid["product.liquid\nProduct detail page"]
+        collection_liquid["collection.liquid\nCollection listing"]
+        cart_liquid["cart.liquid\nShopping cart interface"]
+        contact_liquid["page.contact.liquid\nContact page"]
+    end
+
+    subgraph sections_sg ["sections/"]
+        header_liquid["header.liquid\nHeader component"]
+        product_grid_liquid["product-grid.liquid\nReusable product grid"]
+        footer_liquid["footer.liquid\nFooter component"]
+    end
+
+    subgraph snippets_sg ["snippets/"]
+        product_card_liquid["product-card.liquid\nAtomic product card"]
+        icon_cart_liquid["icon-cart.liquid\nSVG icon snippet"]
+    end
+
+    subgraph assets_sg ["assets/"]
+        theme_css["theme.css\nCompiled stylesheet"]
+        theme_js["theme.js\nJavaScript bundle"]
+    end
+
+    subgraph config_sg ["config/"]
+        settings_schema["settings_schema.json\nTheme configuration schema"]
+    end
+
+    root --> layout_sg
+    root --> templates_sg
+    root --> sections_sg
+    root --> snippets_sg
+    root --> assets_sg
+    root --> config_sg
 ```
 
 The rendering engine loads the appropriate template from the `templates/` directory based on the requested resource type, then wraps it with the `layout/theme.liquid` master layout. Liquid interpolation occurs through object notation: `{{ product.title }}` outputs the product's title string, while `{{ product.variants[0].price | money }}` applies the `money` filter to format the first variant's price as currency. Liquid supports control flow through `{% if %}`, `{% for %}`, and `{% case %}` tags, enabling conditional rendering and iteration over collections without exposing full programming language capabilities.

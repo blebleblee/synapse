@@ -114,11 +114,12 @@ Custom Resource Definitions use the following scheme, where the plural resource 
 
 The value stored at each key is **not** JSON but a protobuf-encoded `runtime.Unknown` envelope wrapping the resource's protobuf representation. The envelope carries a magic prefix (`k8s\x00`) followed by a protobuf-encoded `Unknown` message that embeds the TypeMeta (API version and kind) and the actual protobuf payload.
 
-```
-+------------------+-------------------------------+
-| Magic prefix     | Protobuf-encoded Unknown msg  |
-| "k8s\x00"        | (TypeMeta + serialized object)|
-+------------------+-------------------------------+
+```mermaid
+flowchart LR
+    A["Magic Prefix\n'k8s\\x00'"] --- B["Protobuf-encoded Unknown msg\n(TypeMeta + serialized object)"]
+
+    style A fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style B fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
 ```
 
 Protobuf encoding provides two critical advantages over JSON: it is roughly 3–10x more compact for typical Kubernetes objects, and it deserializes 5–10x faster. This matters because the API server decodes every resource it reads from etcd, and in large clusters this decoding CPU cost is non-trivial. JSON is used exclusively for the API server's external HTTP interface, Custom Resources (which lack generated protobuf schemas), and certain internal diagnostics paths.

@@ -29,24 +29,32 @@ All three device classes follow a common registration pattern: allocate major/mi
 
 **Character Device Registration Flow:**
 
-```
-User Space                Kernel Space
-    │                          │
-    │                     alloc_chrdev_region()
-    │                          │
-    │                     cdev_alloc()
-    │                          │
-    │                     cdev_init(&cdev, &fops)
-    │                          │
-    │                     cdev_add(&cdev, dev, 1)
-    │                          │
-    │                     device_create()
-    │                          │
-    ├──────── open() ──────────┤
-    │                          │
-    │                     fops->open()
-    │                          │
-    │◄────── return fd ────────┤
+```mermaid
+flowchart TD
+    subgraph UserSpace["User Space"]
+        U1["User Process"]
+        U2["open() syscall"]
+        U3["File Descriptor Returned"]
+    end
+    
+    subgraph KernelSpace["Kernel Space"]
+        K1["alloc_chrdev_region()"]
+        K2["cdev_alloc()"]
+        K3["cdev_init(&cdev, &fops)"]
+        K4["cdev_add(&cdev, dev, 1)"]
+        K5["device_create()"]
+        K6["fops->open()"]
+        K7["Return fd"]
+    end
+    
+    K1 --> K2
+    K2 --> K3
+    K3 --> K4
+    K4 --> K5
+    K5 --> U2
+    U2 --> K6
+    K6 --> K7
+    K7 --> U3
 ```
 
 Character devices require explicit major/minor number allocation, cdev structure initialization with file_operations dispatch table, and udev integration for automatic device node creation. Block devices add request queue allocation and disk registration. Network devices bypass device nodes entirely, registering through netdev notifier chains.
@@ -388,32 +396,42 @@ Block devices operate through the I/O scheduler layer, aggregating requests into
 
 **Block Layer Architecture:**
 
-```
-Application
-    │
-    ├── write(fd, buf, 4096)
-    │
-VFS Layer
-    │
-    ├── generic_make_request()
-    │
-Block Layer
-    │
-    ├── bio allocation
-    ├── bio → request merging
-    ├── I/O scheduling (mq-deadline, BFQ, kyber)
-    │
-Request Queue (struct request_queue)
-    │
-    ├── Plug/Unplug mechanism
-    ├── Request dispatch
-    │
-Driver Request Function
-    │
-    ├── DMA setup
-    ├── Hardware command submission
-    │
-Hardware Controller
+```mermaid
+flowchart TD
+    A["Application"]
+    B["write(fd, buf, 4096)"]
+    C["VFS Layer"]
+    D["generic_make_request()"]
+    E["Block Layer"]
+    F["bio allocation"]
+    G["bio → request merging"]
+    H["I/O scheduling (mq-deadline, BFQ, kyber)"]
+    I["Request Queue (struct request_queue)"]
+    J["Plug/Unplug mechanism"]
+    K["Request dispatch"]
+    L["Driver Request Function"]
+    M["DMA setup"]
+    N["Hardware command submission"]
+    O["Hardware Controller"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    E --> G
+    E --> H
+    F --> I
+    G --> I
+    H --> I
+    I --> J
+    I --> K
+    J --> L
+    K --> L
+    L --> M
+    L --> N
+    M --> O
+    N --> O
 ```
 
 **Production Block Driver Implementation:**
@@ -673,50 +691,33 @@ Network devices bypass the VFS layer entirely, implementing packet transmission 
 
 **Network Stack Data Flow:**
 
-```
-Application
-    │
-    ├── send(sock, buf, len, flags)
-    │
-Socket Layer
-    │
-    ├── TCP/UDP protocol processing
-    │
-Network Layer (IP)
-    │
-    ├── Routing decision
-    ├── sk_buff allocation
-    │
-Device Layer (net_device)
-    │
-    ├── ndo_start_xmit()
-    │
-Driver TX Ring
-    │
-    ├── DMA mapping
-    ├── Hardware descriptor programming
-    │
-Hardware NIC
-    │
-    ├── Packet transmission
-    │
-    [Incoming Packet Path - Reverse Flow]
-    │
-Hardware NIC
-    │
-    ├── RX interrupt / MSI-X
-    │
-NAPI Poll Handler
-    │
-    ├── napi_schedule()
-    ├── Driver poll function
-    ├── netif_receive_skb()
-    │
-Network Layer
-    │
-Socket Layer
-    │
-Application (recv)
+```mermaid
+flowchart TD
+    APP_SEND["Application\nsend(sock, buf, len, flags)"]
+    SOCK_TX["Socket Layer\nTCP/UDP protocol processing"]
+    NET_TX["Network Layer (IP)\nRouting decision · sk_buff allocation"]
+    DEV_TX["Device Layer (net_device)\nndo_start_xmit()"]
+    DRV_TX["Driver TX Ring\nDMA mapping · Hardware descriptor programming"]
+    NIC_TX["Hardware NIC\nPacket transmission"]
+
+    NIC_RX["Hardware NIC\nRX interrupt / MSI-X"]
+    NAPI["NAPI Poll Handler\nnapi_schedule() · Driver poll function · netif_receive_skb()"]
+    NET_RX["Network Layer"]
+    SOCK_RX["Socket Layer"]
+    APP_RECV["Application\nrecv()"]
+
+    APP_SEND --> SOCK_TX
+    SOCK_TX --> NET_TX
+    NET_TX --> DEV_TX
+    DEV_TX --> DRV_TX
+    DRV_TX --> NIC_TX
+
+    NIC_TX -. "Incoming Packet Path\n(Reverse Flow)" .-> NIC_RX
+
+    NIC_RX --> NAPI
+    NAPI --> NET_RX
+    NET_RX --> SOCK_RX
+    SOCK_RX --> APP_RECV
 ```
 
 **Production Network Driver Implementation:**
@@ -1175,22 +1176,25 @@ Interrupt overhead dominates high-throughput scenarios. Modern drivers implement
 
 **Interrupt Mitigation Hierarchy:**
 
-```
-High Interrupt Rate Scenario:
-────────────────────────────
-[Hardware IRQ] → [Disable IRQ] → [Schedule NAPI] → [Process N packets] → [Re-enable IRQ]
-                                                   ↓
-                                            napi_poll(budget=64)
-                                                   ↓
-                                            Process packets until:
-                                            - Processed 64 packets, OR
-                                            - No more packets available
-                                                   ↓
-                                            if (work < budget):
-                                                napi_complete()
-                                                Enable IRQ
-                                            else:
-                                                Reschedule NAPI
+```mermaid
+flowchart TD
+    IRQ["Hardware IRQ"]
+    DISABLE["Disable IRQ"]
+    SCHEDULE["Schedule NAPI"]
+    POLL["napi_poll(budget = 64)"]
+    PROCESS["Process packets until:\n• Processed 64 packets, OR\n• No more packets available"]
+    CHECK{"work < budget?"}
+    COMPLETE["napi_complete()\nEnable IRQ"]
+    RESCHEDULE["Reschedule NAPI"]
+
+    IRQ --> DISABLE
+    DISABLE --> SCHEDULE
+    SCHEDULE --> POLL
+    POLL --> PROCESS
+    PROCESS --> CHECK
+    CHECK -- "Yes" --> COMPLETE
+    CHECK -- "No" --> RESCHEDULE
+    RESCHEDULE --> POLL
 ```
 
 **Advanced NAPI Implementation with Adaptive IRQ Coalescing:**

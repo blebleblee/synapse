@@ -62,26 +62,21 @@ The Clausius-Clapeyron equation governs phase boundary slopes on pressure-temper
 
 Thermodynamic cycles formalize the state function property that net changes around closed paths vanish. For a Born-Haber cycle analyzing sodium chloride formation, the standard enthalpy of formation $\Delta H_f^\circ[\text{NaCl(s)}]$ equals the sum of atomization enthalpies for sodium and chlorine, ionization energy of sodium, electron affinity of chlorine, and lattice energy: $\Delta H_f^\circ = \Delta H_{\text{at}}[\text{Na}] + \frac{1}{2}\Delta H_{\text{at}}[\text{Cl}_2] + IE[\text{Na}] + EA[\text{Cl}] + U_{\text{lattice}}$. Since all terms except lattice energy can be measured directly, the cycle enables lattice energy calculation from formation enthalpy and gas-phase ion energies.
 
-```
-Born-Haber Cycle for NaCl:
-
-Na(s) + ½Cl₂(g) ────────────→ NaCl(s)     [ΔHf°]
-  │                               ▲
-  │ΔHat[Na]                       │Ulattice
-  ↓                               │
-Na(g) + ½Cl₂(g)                   │
-  │                               │
-  │½ΔHat[Cl₂]                     │
-  ↓                               │
-Na(g) + Cl(g)                     │
-  │                               │
-  │IE[Na]                         │
-  ↓                               │
-Na⁺(g) + Cl(g)                    │
-  │                               │
-  │EA[Cl]                         │
-  ↓                               │
-Na⁺(g) + Cl⁻(g) ─────────────────┘
+```mermaid
+flowchart TD
+    A["Na(s) + ½Cl₂(g)"]
+    B["Na(g) + ½Cl₂(g)"]
+    C["Na(g) + Cl(g)"]
+    D["Na⁺(g) + Cl(g)"]
+    E["Na⁺(g) + Cl⁻(g)"]
+    F["NaCl(s)"]
+    
+    A -->|ΔHat[Na]| B
+    B -->|½ΔHat[Cl₂]| C
+    C -->|IE[Na]| D
+    D -->|EA[Cl]| E
+    E -->|Ulattice| F
+    A -->|ΔHf°| F
 ```
 
 Carnot cycle analysis reveals fundamental efficiency limits for heat engines. The cycle consists of four reversible steps: isothermal expansion at temperature $T_H$ absorbing heat $q_H$, adiabatic expansion cooling the system to $T_C$, isothermal compression at $T_C$ rejecting heat $q_C$, and adiabatic compression returning to the initial state. Net work extracted equals $w = q_H - q_C$, yielding efficiency $\eta = \frac{w}{q_H} = 1 - \frac{T_C}{T_H}$. This result proves independent of the working substance, depending solely on reservoir temperatures, and represents the maximum possible efficiency for any heat engine operating between these temperatures.

@@ -26,36 +26,24 @@ When an organization registers a self-hosted runner, the process generates a uni
 
 The job assignment protocol operates through a bidirectional message queue. GitHub's orchestration layer maintains a priority queue of pending jobs, ordered by workflow trigger time and job dependencies declared through `needs` clauses. When a runner connects and signals availability, the backend performs runner matching against job requirements: operating system (`runs-on: ubuntu-latest`), architecture (x64, ARM64), and label constraints for self-hosted pools. The assignment algorithm prefers idle runners over busy ones and implements fairness policies to prevent starvation of low-priority jobs.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    GitHub Workflow Orchestration                 │
-│  ┌──────────────┐      ┌──────────────┐      ┌──────────────┐  │
-│  │  Trigger     │─────▶│  Job Queue   │─────▶│  Runner      │  │
-│  │  Event       │      │  (Priority)  │      │  Matcher     │  │
-│  └──────────────┘      └──────────────┘      └──────────────┘  │
-└────────────────────────────────┬────────────────────────────────┘
-                                 │ WebSocket (TLS 1.3)
-                                 │ Runner Assignment Message
-                                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                         Runner Agent Process                     │
-│  ┌──────────────┐      ┌──────────────┐      ┌──────────────┐  │
-│  │  Message     │─────▶│  Job         │─────▶│  Execution   │  │
-│  │  Handler     │      │  Dispatcher  │      │  Context     │  │
-│  └──────────────┘      └──────────────┘      └──────────────┘  │
-│         │                                            │           │
-│         │                                            ▼           │
-│         │                                   ┌──────────────┐    │
-│         └──────────────────────────────────▶│  Log Stream  │    │
-│                                             │  Uploader    │    │
-│                                             └──────────────┘    │
-└─────────────────────────────────────────────────────────────────┘
-                                 │
-                                 ▼
-                    ┌───────────────────────────┐
-                    │  Isolated Execution Env   │
-                    │  (Docker / VM / Bare)     │
-                    └───────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph orchestration ["GitHub Workflow Orchestration"]
+        A["Trigger Event"] --> B["Job Queue (Priority)"]
+        B --> C["Runner Matcher"]
+    end
+
+    subgraph runner_agent ["Runner Agent Process"]
+        D["Message Handler"] --> E["Job Dispatcher"]
+        E --> F["Execution Context"]
+        F --> G["Log Stream Uploader"]
+        D --> G
+    end
+
+    H["Isolated Execution Env\n(Docker / VM / Bare)"]
+
+    orchestration -->|"WebSocket (TLS 1.3)\nRunner Assignment Message"| runner_agent
+    runner_agent --> H
 ```
 
 Upon receiving a job assignment, the runner agent downloads the workflow definition and action metadata from GitHub's artifact storage. Actions can execute through three runtime models: JavaScript actions run directly in the Node.js runtime embedded in the runner agent; Docker container actions spawn an isolated container with the action's Dockerfile; composite actions expand into a sequence of sub-steps executed within the same job context. The runner maintains a working directory hierarchy for each job, typically structured as `_work/<repo>/<repo>` to isolate filesystem state between concurrent jobs on the same runner.

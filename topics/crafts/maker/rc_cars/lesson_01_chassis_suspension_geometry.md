@@ -18,36 +18,34 @@ The chassis architecture begins with the mainplate, a flat structural element ty
 
 Suspension towers mount vertically to the mainplate, establishing the upper pivot points for suspension arms and determining critical geometry parameters including kingpin inclination angle, camber gain rate, and roll center height. Independent front suspension geometry positions the upper pivot outboard and elevated relative to the lower pivot, creating a positive kingpin inclination angle typically ranging from 10 to 25 degrees measured from vertical. This inclination generates a steering axis that intersects the ground plane inboard of the tire contact patch, creating a mechanical trail dimension that produces self-centering torque during cornering. As the wheel deflects in bump, the angled kingpin axis forces the wheel to move through an arc, introducing camber change as a function of vertical displacement. The relationship between vertical travel and camber change, known as the camber curve, depends on the geometric arrangement of upper and lower arm lengths and their relative angles in side view and front view. A suspension with equal-length upper and lower arms positioned parallel in front view exhibits zero camber gain, maintaining constant camber through suspension travel. Shortening the upper arm relative to the lower arm introduces negative camber gain in compression, tilting the top of the tire inward as the suspension compresses, which compensates for body roll-induced positive camber change and maintains optimal tire contact patch alignment during cornering.
 
-```
-Front Suspension Geometry (Front View):
-
-                    Upper Pivot (Outboard)
-                           o
-                          /|
-                         / | 
-            Upper Arm   /  | Kingpin Inclination
-                       /   | Angle (15°)
-                      /    |
-                     /     |
-                    /      |
-        Spindle    o       | Vertical Reference
-        (Upright) /|       |
-                 / |       |
-                /  |       |
-   Lower Arm   /   |       |
-              /    |       |
-             /     |       |
-            o      |       |
-    Lower Pivot    |       |
-    (Inboard)      |       |
-                   |       |
-         __________|_______|__________
-                Ground Plane
-                   
-                   |<----->| Mechanical Trail
-                   
-Roll Center Height = Intersection point of instant centers
-                     from left and right suspensions
+```mermaid
+flowchart TD
+    subgraph suspension["Front Suspension Geometry - Front View"]
+        UP["Upper Pivot<br/>(Outboard)"]
+        SP["Spindle<br/>(Upright)"]
+        LP["Lower Pivot<br/>(Inboard)"]
+        VR["Vertical<br/>Reference"]
+        GP["Ground Plane"]
+        
+        UP -->|"Upper Arm"| SP
+        SP -->|"Lower Arm"| LP
+        UP -.->|"Kingpin Inclination<br/>Angle (15°)"| VR
+        LP -.-> GP
+        VR -.-> GP
+        
+        MT["Mechanical Trail<br/>(Horizontal Distance)"]
+        GP -.-> MT
+        
+        RC["Roll Center Height<br/>(Intersection point of instant centers<br/>from left and right suspensions)"]
+    end
+    
+    style UP fill:#e1f5ff
+    style SP fill:#fff4e1
+    style LP fill:#e1f5ff
+    style VR fill:#f0f0f0
+    style GP fill:#d0d0d0
+    style MT fill:#ffe1e1
+    style RC fill:#e1ffe1
 ```
 
 The suspension arms themselves, typically injection-molded from glass-filled nylon or CNC-machined from aluminum, must resist bending and deflection under cornering loads while maintaining dimensional stability across temperature extremes. A front suspension arm experiences combined loading: vertical force from road surface irregularities, lateral force from cornering acceleration, and longitudinal force from braking. The arm acts as a cantilever beam with the chassis mounting point as the fixed end and the wheel hub as the loaded end. For a 1/10 scale touring car cornering at 2G lateral acceleration, the outside front suspension arm experiences approximately 15N lateral load at the hub, generating a bending moment equal to the force multiplied by the arm length from pivot to ball cup, typically 40-50mm. Glass-filled nylon arms with rectangular cross-section 8mm wide by 3mm thick exhibit flexural rigidity sufficient to limit tip deflection to approximately 0.3-0.5mm under this loading, introducing minimal geometry change. Aluminum arms of similar dimensions reduce deflection to under 0.1mm but increase unsprung mass, raising the natural frequency of the suspension system and potentially reducing compliance over high-frequency surface irregularities.

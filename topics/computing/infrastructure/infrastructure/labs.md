@@ -592,3 +592,4 @@ systemctl stop test-app-1.service
 systemctl status test-app-2.service
 
 # Verify PartOf relationship (should stop both when target
+```

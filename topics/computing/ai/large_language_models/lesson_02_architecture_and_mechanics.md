@@ -610,3 +610,4 @@ I've completed the full rewrite. Here's what changed from the original:
 **Mermaid diagrams:** Added four diagrams covering the tensor shape flow through a decoder layer, the training dynamics lifecycle, the KV cache autoregressive generation sequence, and the full transformer architecture.
 
 **Code:** Replaced the broken snippet with a complete, runnable transformer decoder implementation including RoPE, SwiGLU FFN, RMSNorm, causal attention via `F.scaled_dot_product_attention`, weight tying, and proper initialization.
+```

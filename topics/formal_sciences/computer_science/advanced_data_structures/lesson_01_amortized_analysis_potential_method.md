@@ -66,36 +66,49 @@ $$\hat{c}_i = (n + 1) + (2 - n) = 3$$
 
 In both cases, the amortized cost is exactly $3 = O(1)$. The potential function $2n - m$ measures how much deferred work is stored in the array: each of the $m/2$ elements added since the last resize has deposited 2 units of potential, and the resize spends all of it at once. The balance sheet clears perfectly.
 
-```
-State before push (no resize):
-
-  [ e1 | e2 | e3 | e4 | __ | __ | __ | __ ]
-    n=4                      m=8
-    Φ = 2(4) - 8 = 0
-
-After push:
-
-  [ e1 | e2 | e3 | e4 | e5 | __ | __ | __ ]
-    n=5                      m=8
-    Φ = 2(5) - 8 = 2
-
-ΔΦ = +2,  actual cost = 1,  amortized cost = 3
-
-─────────────────────────────────────────────
-
-State before push (resize):
-
-  [ e1 | e2 | e3 | e4 ]
-    n=4               m=4
-    Φ = 2(4) - 4 = 4
-
-Resize: allocate m'=8, copy 4 elements, write e5
-
-  [ e1 | e2 | e3 | e4 | e5 | __ | __ | __ ]
-    n=5                      m=8
-    Φ = 2(5) - 8 = 2
-
-ΔΦ = 2 - 4 = -2,  actual cost = 5,  amortized cost = 3
+```mermaid
+flowchart TD
+    A["State Before Push<br/>No Resize"]
+    B["Array: e1 | e2 | e3 | e4 | __ | __ | __ | __"]
+    C["n=4, m=8"]
+    D["Φ = 2(4) - 8 = 0"]
+    
+    E["After Push"]
+    F["Array: e1 | e2 | e3 | e4 | e5 | __ | __ | __"]
+    G["n=5, m=8"]
+    H["Φ = 2(5) - 8 = 2"]
+    I["ΔΦ = +2"]
+    J["Actual Cost = 1"]
+    K["Amortized Cost = 3"]
+    
+    L["State Before Push<br/>Resize Required"]
+    M["Array: e1 | e2 | e3 | e4"]
+    N["n=4, m=4"]
+    O["Φ = 2(4) - 4 = 4"]
+    
+    P["Resize Operation"]
+    Q["Allocate m'=8"]
+    R["Copy 4 Elements"]
+    S["Write e5"]
+    
+    T["After Resize"]
+    U["Array: e1 | e2 | e3 | e4 | e5 | __ | __ | __"]
+    V["n=5, m=8"]
+    W["Φ = 2(5) - 8 = 2"]
+    X["ΔΦ = 2 - 4 = -2"]
+    Y["Actual Cost = 5"]
+    Z["Amortized Cost = 3"]
+    
+    A --> B --> C --> D
+    D --> E --> F --> G --> H
+    H --> I --> J --> K
+    
+    K -.->|contrast| L
+    L --> M --> N --> O
+    O --> P
+    P --> Q --> R --> S
+    S --> T --> U --> V --> W
+    W --> X --> Y --> Z
 ```
 
 ### Splay Trees: Potential as Total Rank
@@ -169,32 +182,40 @@ The amortized costs of the core operations are:
 
 The structure of this analysis illustrates the full power of the potential method: the actual cost of `decrease-key` varies from $O(1)$ to $O(n)$ in the worst case depending on cascading cuts, yet the potential function $\Phi = t + 2m$ precisely absorbs this variance. The 2 in front of $m$ is not arbitrary — it is the unique coefficient that makes the cascade's potential drop offset its actual cost exactly. Any smaller coefficient fails to cover the work; any larger coefficient inflates the amortized bound on `extract-min`.
 
-```
-Fibonacci Heap structure (schematic):
-
-min
- ↓
-[17]──[24]──[7]──[3]  ← root list (doubly linked)
-       |     |    |
-      [26]  [18] [30]──[52]
-                  |
-                 [41]*   (* = marked)
-
-t(H) = 4 trees
-m(H) = 1 marked node
-Φ(H) = 4 + 2(1) = 6
-
-After decrease-key(41, 1) → triggers cut of 41 from 30,
-then cascading cut of 30 from 7 (30 was marked):
-
-[17]──[24]──[7]──[3]──[41]──[30]
-       |     |    |
-      [26]  [18] [52]
-
-t(H) = 6,  m(H) = 0 (30 unmarked on cut)
-Φ(H) = 6 + 0 = 6
-
-ΔΦ = 0,  actual cost = 2,  amortized cost = O(1)
+```mermaid
+flowchart TD
+    subgraph before ["Initial State: Φ(H) = 4 + 2(1) = 6"]
+        min1["min"] -.-> n17_1["17"]
+        n17_1 <--> n24_1["24"]
+        n24_1 <--> n7_1["7"]
+        n7_1 <--> n3_1["3"]
+        n24_1 --> n26_1["26"]
+        n7_1 --> n18_1["18"]
+        n3_1 --> n30_1["30"]
+        n30_1 <--> n52_1["52"]
+        n30_1 --> n41_1["41*<br/>(marked)"]
+        
+        stats1["t(H) = 4 trees<br/>m(H) = 1 marked<br/>Φ(H) = 6"]
+    end
+    
+    operation["decrease-key(41, 1)<br/>↓<br/>Cut 41 from 30<br/>Cascading cut 30 from 7"]
+    
+    subgraph after ["After Operation: Φ(H) = 6 + 2(0) = 6"]
+        min2["min"] -.-> n17_2["17"]
+        n17_2 <--> n24_2["24"]
+        n24_2 <--> n7_2["7"]
+        n7_2 <--> n3_2["3"]
+        n3_2 <--> n41_2["1 (was 41)"]
+        n41_2 <--> n30_2["30<br/>(unmarked)"]
+        n24_2 --> n26_2["26"]
+        n7_2 --> n18_2["18"]
+        n3_2 --> n52_2["52"]
+        
+        stats2["t(H) = 6 trees<br/>m(H) = 0<br/>ΔΦ = 0<br/>actual cost = 2<br/>amortized = O(1)"]
+    end
+    
+    before --> operation
+    operation --> after
 ```
 
 ---

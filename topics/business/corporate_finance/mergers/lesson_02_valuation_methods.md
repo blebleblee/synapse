@@ -70,19 +70,36 @@ The cost of debt is estimated as the yield to maturity on the target's outstandi
 
 Having computed WACC, the analyst discounts each year's unlevered free cash flow and the terminal value to present value. The sum of these present values equals enterprise value. Subtracting net debt and adding back excess cash yields equity value, which can be compared to the outputs from comparable company and precedent transaction analyses.
 
-```
-Valuation Reconciliation Table
-
-Method                        Enterprise Value    Net Debt    Equity Value
-─────────────────────────────────────────────────────────────────────────
-Comparable Company Analysis      $1,620M           $280M       $1,340M
-  (Median EV/EBITDA 11.2x)
-
-Precedent Transactions           $1,955M           $280M       $1,675M
-  (Median EV/EBITDA 13.5x)
-
-Discounted Cash Flow             $1,780M           $280M       $1,500M
-  (WACC 8.5%, Perp Growth 2.5%)
+```mermaid
+flowchart TD
+    title["Valuation Reconciliation Table"]
+    
+    title --> CCA
+    title --> PT
+    title --> DCF
+    
+    CCA["Comparable Company Analysis<br/>Median EV/EBITDA 11.2x"]
+    PT["Precedent Transactions<br/>Median EV/EBITDA 13.5x"]
+    DCF["Discounted Cash Flow<br/>WACC 8.5%, Perp Growth 2.5%"]
+    
+    CCA --> CCA_EV["Enterprise Value: $1,620M"]
+    CCA --> CCA_ND["Net Debt: $280M"]
+    CCA --> CCA_EQ["Equity Value: $1,340M"]
+    
+    PT --> PT_EV["Enterprise Value: $1,955M"]
+    PT --> PT_ND["Net Debt: $280M"]
+    PT --> PT_EQ["Equity Value: $1,675M"]
+    
+    DCF --> DCF_EV["Enterprise Value: $1,780M"]
+    DCF --> DCF_ND["Net Debt: $280M"]
+    DCF --> DCF_EQ["Equity Value: $1,500M"]
+    
+    CCA_EV -.-> CCA_EQ
+    CCA_ND -.-> CCA_EQ
+    PT_EV -.-> PT_EQ
+    PT_ND -.-> PT_EQ
+    DCF_EV -.-> DCF_EQ
+    DCF_ND -.-> DCF_EQ
 ```
 
 The range of equity values—$1.34 billion to $1.68 billion—provides the acquirer with a negotiating envelope. The floor is typically set by the comparable company analysis, representing the value the target could achieve as a standalone public entity. The ceiling is informed by precedent transactions, reflecting the premiums historically paid by acquirers with synergy opportunities. The DCF serves as an internal sanity check, revealing whether the acquirer's own cash flow projections and return requirements can justify a price within the market-derived range.

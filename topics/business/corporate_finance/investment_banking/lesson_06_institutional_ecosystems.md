@@ -42,40 +42,30 @@ The third pillar is Asset & Wealth Management (AWM), which manages external capi
 
 The following diagram illustrates the information flows, revenue streams, and regulatory boundaries within this topology:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    UNIVERSAL BANK                               │
-│                                                                 │
-│  ┌──────────────────┐    Chinese Wall    ┌──────────────────┐  │
-│  │  INVESTMENT       │◄ ─ ─ ─ ─ ─ ─ ─ ─►│  MARKETS          │  │
-│  │  BANKING (IBD)    │                   │  (Sales & Trading)│  │
-│  │                   │                   │                   │  │
-│  │  M&A Advisory     │  Mandate flow     │  Equities         │  │
-│  │  ECM / DCM        │──────────────────►│  FICC             │  │
-│  │  LevFin           │  (new issuance    │  Structured Prods │  │
-│  │  Restructuring    │   syndication)    │  Prime Brokerage  │  │
-│  │                   │                   │                   │  │
-│  │  Revenue: Fees    │                   │  Revenue: Spread  │  │
-│  │  Risk: Low        │                   │  Risk: High       │  │
-│  │  Reg: Sec Act '33 │                   │  Reg: Volcker /   │  │
-│  │                   │                   │  Basel III RWA    │  │
-│  └──────────────────┘                   └──────────────────┘  │
-│           │                                        │            │
-│           │        ┌──────────────────┐            │            │
-│           └───────►│  ASSET & WEALTH  │◄───────────┘            │
-│           Client   │  MANAGEMENT      │  Distribution           │
-│           referrals│                  │  channel for new        │
-│                    │  Revenue: Mgmt   │  issues                 │
-│                    │  fee + carry     │                         │
-│                    │  Reg: IA Act '40 │                         │
-│                    │  Fiduciary duty  │                         │
-│                    └──────────────────┘                         │
-│                                                                 │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │  RISK & CAPITAL MANAGEMENT (Firmwide)                  │    │
-│  │  CET1 ≥ 11.5% RWA │ DFAST / CCAR │ Volcker compliance │    │
-│  └────────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph BANK["UNIVERSAL BANK"]
+        subgraph IBD["INVESTMENT BANKING (IBD)"]
+            IBD_CONTENT["<b>Services:</b><br/>M&A Advisory<br/>ECM / DCM<br/>LevFin<br/>Restructuring<br/><br/><b>Revenue:</b> Fees<br/><b>Risk:</b> Low<br/><b>Reg:</b> Sec Act '33"]
+        end
+        
+        subgraph MKT["MARKETS (Sales & Trading)"]
+            MKT_CONTENT["<b>Products:</b><br/>Equities<br/>FICC<br/>Structured Prods<br/>Prime Brokerage<br/><br/><b>Revenue:</b> Spread<br/><b>Risk:</b> High<br/><b>Reg:</b> Volcker / Basel III RWA"]
+        end
+        
+        subgraph AWM["ASSET & WEALTH MANAGEMENT"]
+            AWM_CONTENT["<b>Revenue:</b> Mgmt fee + carry<br/><b>Reg:</b> IA Act '40<br/>Fiduciary duty"]
+        end
+        
+        subgraph RISK["RISK & CAPITAL MANAGEMENT (Firmwide)"]
+            RISK_CONTENT["CET1 ≥ 11.5% RWA | DFAST / CCAR | Volcker compliance"]
+        end
+        
+        IBD_CONTENT -.->|"Chinese Wall"| MKT_CONTENT
+        IBD_CONTENT -->|"Mandate flow<br/>(new issuance<br/>syndication)"| MKT_CONTENT
+        IBD_CONTENT -->|"Client referrals"| AWM_CONTENT
+        MKT_CONTENT -->|"Distribution channel<br/>for new issues"| AWM_CONTENT
+    end
 ```
 
 ### Market Microstructure: Price Discovery and Order Flow

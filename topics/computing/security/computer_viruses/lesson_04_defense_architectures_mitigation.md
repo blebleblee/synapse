@@ -88,66 +88,47 @@ Indirect branch tracking (IBT) addresses forward-edge control flow hijacking by 
 
 Capability-based security architectures replace ambient authority with unforgeable tokens. In the CHERI (Capability Hardware Enhanced RISC Instructions) model, pointers are extended to 128 bits (on a 64-bit architecture) and include not only the virtual address but also bounds, permissions, and a validity tag stored in spare physical memory bits. The hardware enforces that capabilities cannot be forged—arithmetic operations on capabilities preserve the tag only if the result remains within bounds, and permission bits cannot be escalated. A buffer overflow that corrupts a capability produces an invalid capability rather than a dangerous one, causing a hardware exception rather than a security violation.
 
-```
-CHERI Capability Structure (128-bit, conceptual):
-┌────────┬─────────┬──────────┬──────────────────────────────────┐
-│  Valid │ Perms   │  Bounds  │      Virtual Address (64-bit)    │
-│ (1 bit)│ (15 bit)│ (variable)│                                  │
-└────────┴─────────┴──────────┴──────────────────────────────────┘
-        │         │           │                     │
-        │         │           │                     └─> Target address
-        │         │           └─> Base + Length encoding
-        │         └─> Load, Store, Execute, Seal, Unseal...  
-        └─> Maintained by hardware; cleared on invalid operation
-
-Operations:
-  CLoad    cap, offset       ; Load via capability, checks bounds + perms
-  CStore   cap, offset, val  ; Store via capability, checks W permission
-  CIncAddr cap, cap, imm     ; Add to address, preserves validity if in bounds
-  CSeal    cap, cap, type    ; Make capability immutable, typed for delegation
+```mermaid
+flowchart TD
+    Cap["CHERI Capability Structure (128-bit)"]
+    
+    Cap --> Valid["Valid (1 bit)"]
+    Cap --> Perms["Permissions (15 bit)"]
+    Cap --> Bounds["Bounds (variable)"]
+    Cap --> Addr["Virtual Address (64-bit)"]
+    
+    Valid --> ValidDesc["Maintained by hardware;<br/>cleared on invalid operation"]
+    
+    Perms --> PermList["Load, Store, Execute,<br/>Seal, Unseal, etc."]
+    
+    Bounds --> BoundsDesc["Base + Length encoding"]
+    
+    Addr --> AddrDesc["Target address"]
+    
+    subgraph Operations["Hardware Operations"]
+        CLoad["CLoad cap, offset<br/>Load via capability,<br/>checks bounds + perms"]
+        CStore["CStore cap, offset, val<br/>Store via capability,<br/>checks W permission"]
+        CIncAddr["CIncAddr cap, cap, imm<br/>Add to address,<br/>preserves validity if in bounds"]
+        CSeal["CSeal cap, cap, type<br/>Make capability immutable,<br/>typed for delegation"]
+    end
 ```
 
 This approach eliminates entire classes of memory safety vulnerabilities—buffer overflows produce out-of-bounds exceptions rather than memory corruption, use-after-free is prevented by revoking capabilities when memory is freed, and type confusion is mitigated by sealing capabilities with type tags that restrict their use. The hardware enforcement ensures that even if application code contains bugs, the security invariants hold.
 
 Mandatory access control systems like SELinux instantiate the reference monitor concept at the operating system level. SELinux labels every subject (process) and object (file, socket, shared memory segment) with a security context consisting of user, role, type, and sensitivity level. A policy, typically compiled into a binary format and loaded at boot, specifies which subject types can perform which operations on which object types. Before any operation proceeds, the kernel invokes SELinux hooks that query the policy engine and either permit or deny the access. This mediation is complete—SELinux hooks are placed at every security-relevant system call entry point—and tamperproof, since the policy and enforcement engine reside in kernel space.
 
-```
-SELinux Access Decision Flow:
-┌──────────────┐
-│ Process      │ syscall(open, "/etc/shadow", O_RDONLY)
-│ (httpd_t)    │────┐
-└──────────────┘    │
-                    V
-         ┌──────────────────────┐
-         │ Kernel syscall entry │
-         └──────────┬───────────┘
-                    │
-                    V
-         ┌──────────────────────────┐
-         │ SELinux hook:            │
-         │ security_inode_permission│
-         └──────────┬───────────────┘
-                    │
-                    V
-         ┌───────────────────────────────────────┐
-         │ Policy Decision (AVC - Access Vector  │
-         │ Cache, backed by security server)     │
-         │                                       │
-         │ Subject: httpd_t                      │
-         │ Object:  shadow_t                     │
-         │ Class:   file                         │
-         │ Perm:    read                         │
-         │                                       │
-         │ Policy rule:                          │
-         │   allow httpd_t shadow_t:file read;   │
-         │   → Decision: DENY (no such rule)     │
-         └───────────────┬───────────────────────┘
-                         │
-                         V
-                ┌─────────────────┐
-                │ Return -EACCES  │
-                │ to process      │
-                └─────────────────┘
+```mermaid
+flowchart TD
+    A["Process (httpd_t)<br/>syscall(open, '/etc/shadow', O_RDONLY)"]
+    B["Kernel syscall entry"]
+    C["SELinux hook:<br/>security_inode_permission"]
+    D["Policy Decision<br/>(AVC - Access Vector Cache,<br/>backed by security server)<br/><br/>Subject: httpd_t<br/>Object: shadow_t<br/>Class: file<br/>Perm: read<br/><br/>Policy rule:<br/>allow httpd_t shadow_t:file read;<br/>→ Decision: DENY (no such rule)"]
+    E["Return -EACCES<br/>to process"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 The policy itself can express complex invariants through type enforcement and multi-level security (MLS) constraints. Type enforcement groups similar objects and subjects into domains, allowing policies to be written at the granularity of application roles rather than individual files. MLS constraints implement the Bell-LaPadula model, which enforces that data cannot flow from high sensitivity to low sensitivity without explicit downgrade operations. This prevents a compromised low-privilege process from reading classified data, even if file permissions would otherwise allow it.

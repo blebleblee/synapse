@@ -54,19 +54,31 @@ The port interface is synchronous: write operations latch data on the rising clo
 
 Consider a dual-port block RAM configured as 512×32 (512 addresses, 32-bit words), clocked at 250 MHz:
 
-```
-Port A (Read Channel):
-  Clock ──→ [Address Register] ──→ [Array] ──→ [Output Register] ──→ Data_A
-  EN_A ──→ └──────────────────────────────────────────────────────┘
-  
-Port B (Write Channel):
-  Clock ──→ [Address Register] ──→ [Array] ──→ [Collision Logic]
-  EN_B ──→
-  WE_B ──→
-  Data_B_In ──────────────────→ [Write Drivers]
+```mermaid
+flowchart TD
+    subgraph PortA["Port A (Read Channel)"]
+        ClkA["Clock"] --> AddrRegA["Address Register"]
+        ENA["EN_A"] --> AddrRegA
+        AddrRegA --> ArrayA["Array"]
+        ArrayA --> OutRegA["Output Register"]
+        OutRegA --> DataA["Data_A"]
+    end
 
-Per-Byte Write Enables: Allows writes to selective bytes (8-bit granularity) 
-while leaving other bytes unchanged, critical for non-blocking cache line updates.
+    subgraph PortB["Port B (Write Channel)"]
+        ClkB["Clock"] --> AddrRegB["Address Register"]
+        ENB["EN_B"] --> AddrRegB
+        WEB["WE_B"] --> AddrRegB
+        AddrRegB --> ArrayB["Array"]
+        ArrayB --> CollLogic["Collision Logic"]
+        DataBIn["Data_B_In"] --> WrDrivers["Write Drivers"]
+        WrDrivers --> ArrayB
+    end
+
+    subgraph ByteWE["Per-Byte Write Enables"]
+        ByteDesc["Allows writes to selective bytes (8-bit granularity)<br/>while leaving other bytes unchanged,<br/>critical for non-blocking cache line updates"]
+    end
+
+    ByteWE -.-> WrDrivers
 ```
 
 A practical pattern is **ping-pong buffering for streaming data**: port A continuously writes incoming data to address 0–255 while port B reads from addresses 256–511. On a buffer-full interrupt, the ports swap ranges, avoiding data loss during CPU reads. This pattern scales naturally to multi-block BRAM hierarchies and is the foundation of high-throughput image processing, audio DSP, and network packet buffering.
@@ -125,47 +137,41 @@ The key mechanical invariant is **isolation without deadlock**. A naive approach
 
 Here is a practical state machine for reconfiguration orchestration:
 
-```
-┌─────────────────┐
-│ NORMAL_OPERATION│ (dynamic module active, requests flowing)
-└────────┬────────┘
-         │ [APP_RECONFIG_REQ asserted]
-         ↓
-┌─────────────────────────────────┐
-│ DRAIN_IN_FLIGHT (Quiescence)    │
-│                                 │
-│ - Assert RM halt signal         │
-│ - Poll for idle_ack from RM     │
-│ - Monitor timeout               │
-└────────┬────────────────────────┘
-         │ [idle_ack received]
-         ↓
-┌─────────────────────────────────┐
-│ RECONFIGURE                      │
-│                                 │
-│ - Tristate outputs of old RM   │
-│ - Assert system reset           │
-│ - Load bitstream via ICAP       │
-│ - Release system reset          │
-└────────┬────────────────────────┘
-         │ [bitstream loaded]
-         ↓
-┌─────────────────────────────────┐
-│ VALIDATE_NEW_MODULE             │
-│                                 │
-│ - Perform quick sanity checks   │
-│ - (optional: loopback test)     │
-└────────┬────────────────────────┘
-         │ [validation passed]
-         ↓
-┌─────────────────────────────────┐
-│ ENABLE_OUTPUTS                  │
-│                                 │
-│ - De-assert tristate            │
-│ - Resume data flow to new RM    │
-└────────┬────────────────────────┘
-         │
-         ↓ [return to NORMAL_OPERATION]
+```mermaid
+flowchart TD
+    A["NORMAL_OPERATION
+    ─────────────────
+    Dynamic module active
+    Requests flowing"]
+
+    B["DRAIN_IN_FLIGHT · Quiescence
+    ─────────────────────────────
+    • Assert RM halt signal
+    • Poll for idle_ack from RM
+    • Monitor timeout"]
+
+    C["RECONFIGURE
+    ─────────────────────────────
+    • Tristate outputs of old RM
+    • Assert system reset
+    • Load bitstream via ICAP
+    • Release system reset"]
+
+    D["VALIDATE_NEW_MODULE
+    ─────────────────────────────
+    • Perform quick sanity checks
+    • Optional: loopback test"]
+
+    E["ENABLE_OUTPUTS
+    ─────────────────────────────
+    • De-assert tristate
+    • Resume data flow to new RM"]
+
+    A -->|"APP_RECONFIG_REQ asserted"| B
+    B -->|"idle_ack received"| C
+    C -->|"bitstream loaded"| D
+    D -->|"validation passed"| E
+    E -->|"return to normal operation"| A
 ```
 
 The interface between static and dynamic regions must be **CDC-safe**: data crossing the boundary between clock domains (or going tristate during reconfiguration) must be synchronized using proper gray-coded handshakes, FIFOs with dual-port RAMs, or pipelined synchronizers. A naive direct connection of RM outputs to fabric logic invites metastability violations and intermittent glitches when reconfiguration is triggered.
@@ -200,4 +206,21 @@ The metric for this decision is **utilization balance**: if DSP slices run at 70
 
 Maximizing DSP throughput requires understanding the cascading rules. When multiple DSP slices are chained (the P output of one feeds the D input of the next), they form a **systolic pipeline** in which data propagates monotonically through stages. The key constraint is **clock-to-clock setup and hold time**: the P register's output must meet setup time at the receiving slice's D input, and the receiving slice's clock must arrive before the Q output violates hold time.
 
-In modern UltraScale+ silicon, cascaded paths have sub-nanosecond delays, allowing designs to chain 20+ DSP slices at 500+ MHz without slack violations. However, this requires the routing engine to recognize the cascade and avoid introducing buffer delays. The Vivado placer must be directed (via `CASCADED_ADDER_CARRY` or `DSP_CASCADED_MULTIPLIER` properties) to respect the cascade path; otherwise, routing inserts spurious buffers and Fmax
+In modern UltraScale+ silicon, cascaded paths have sub-nanosecond delays, allowing designs to chain 20+ DSP slices at 500+ MHz without slack violations. However, this requires the routing engine to recognize the cascade and avoid introducing buffer delays.
+
+**Explicit cascade constraints** are enforced by setting the `USE_PATTERN_DETECT` and `USE_SIMD` attributes and ensuring the placer collocates adjacent slices within the same clock region. Failure to meet these constraints manifests as **timing violations on cascaded paths** (slack < 0 ns on P→D arcs) or **functional errors** where intermediate products are corrupted by clock skew. The diagnostic is to inspect the timing report for critical paths labeled `DSP48E2/P[47:0] → DSP48E2/D[26:0]` and verify that all cascaded slices share the same `CLOCK_REGION` in the utilization report. If slices are scattered across regions, the placer has failed to honor the cascade; the solution is to add `RLOC` or `BEL` constraints to force adjacency, or reduce the cascade depth and insert pipeline registers at region boundaries.
+
+The second failure mode is **arithmetic overflow in fixed-point systolic arrays**. When accumulating products over N cycles, the accumulator width must be `log₂(N) + input_width + coeff_width` to prevent wraparound. Underprovisioning by even one bit causes silent data corruption (the MSB alias wraps to the LSB), visible only as statistical noise in output histograms or unexpected discontinuities in frequency-domain plots. The verification is to instrument the accumulator's MSB with an overflow flag (`P[47]` XOR `P[46]` for signed arithmetic) and assert in simulation or on-chip with an ILA trigger. If overflow occurs, widen the accumulator or scale inputs, but never mask the flag—overflow in production is a requirements failure, not a signal processing decision.
+
+---
+
+## Summary & Verification Matrix
+
+| **Invariant/Mechanism** | **Governing Rule** | **Diagnostic Criterion** | **Failure Mode & Recovery** |
+|-------------------------|-------------------|-------------------------|----------------------------|
+| **DSP Slice Cascading** | P→D paths must be in same clock region; setup/hold < 1 ns | Timing report shows slack ≥ 0 ns on `P[47:0] → D[26:0]` arcs; `CLOCK_REGION` matches in utilization | Timing violation or data corruption; add `RLOC`/`BEL` constraints to enforce adjacency or insert pipeline registers at region boundaries |
+| **BRAM True Dual-Port Collision** | Read/write to same address in same cycle is undefined; must enforce read-after-write or write-after-read protocol | Functional simulation with simultaneous R/W to same address must show deterministic priority or error flag | Non-deterministic read data; insert arbitration logic or use READ_FIRST/WRITE_FIRST modes with explicit address comparison |
+| **Partial Reconfiguration Timing Closure** | Static region must meet timing independently; reconfigurable region must meet worst-case slack across all personas | WNS ≥ 0 ns for static logic in all configurations; reconfigurable partition has no negative slack in any bitstream variant | Timing failure in specific persona; repartition to move critical paths to static region or reduce reconfigurable region clock frequency |
+| **Fixed-Point Accumulator Width** | Width = `log₂(N) + input_width + coeff_width` for N accumulations | MSB overflow flag (`P[47] XOR P[46]`) never asserts in simulation or ILA capture; output histogram shows no aliasing artifacts | Silent wraparound corruption; widen accumulator or scale inputs; never mask overflow without requirements justification |
+| **Hardened-vs-Fabric Partitioning** | DSP/BRAM utilization 60–80%; fabric LUT utilization < 75%; Fmax meets target with margin | Resource utilization report shows balanced usage; timing summary shows positive slack on all clock domains | DSP underutilization or fabric congestion; move irregular control to fabric, move regular dataflow to hardened blocks; verify with profiling |
+| **Clock Domain Crossing in Systolic Arrays** | All DSP slices in cascade share single clock; cross-domain only at array boundaries with async FIFOs | Clock report shows single clock domain for cascaded DSPs; no `ASYNC_REG` warnings on intra-cascade signals | Metastability or data corruption; consolidate cascade to single clock domain or insert proper CDC synchronizers with constraint exceptions at boundaries |

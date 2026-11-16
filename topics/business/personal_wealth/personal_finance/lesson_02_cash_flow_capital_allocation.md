@@ -53,41 +53,91 @@ Expenses are not monolithic. The structure of spending—not just the total amou
 
 A comprehensive expense taxonomy for a household might look like this:
 
-```
-EXPENSE TAXONOMY & ALLOCATION MODEL
+```mermaid
+flowchart TD
+    ROOT["💰 Expense Taxonomy & Allocation Model\nNet Income Baseline: ~$7,000/mo"]
 
-Category                    Monthly Amount    % of Net Income    Behavioral Driver
-─────────────────────────────────────────────────────────────────────────────────
-ESSENTIAL FIXED
-  Mortgage/Rent                $2,500             35%            Contractual
-  Insurance (All)                $600              8%            Regulatory/Risk
-  Utilities                       $250              4%            Usage-based
-  Debt Service                    $400              6%            Contractual
-  SUBTOTAL FIXED               $3,750             53%
+    ROOT --> EF
+    ROOT --> EV
+    ROOT --> DI
+    ROOT --> TA
 
-ESSENTIAL VARIABLE
-  Groceries                       $700             10%            Consumption
-  Transportation (Fuel/Transit)   $400              6%            Usage-based
-  Medical/Healthcare              $200              3%            Need-based
-  Home Maintenance                $150              2%            Preventive
-  SUBTOTAL VARIABLE             $1,450             21%
+    subgraph EF ["📌 Essential Fixed — $3,750 / 53%"]
+        EF1["Mortgage / Rent\n$2,500 · 35% · Contractual"]
+        EF2["Insurance (All)\n$600 · 8% · Regulatory/Risk"]
+        EF3["Utilities\n$250 · 4% · Usage-based"]
+        EF4["Debt Service\n$400 · 6% · Contractual"]
+        EF_SUB["Subtotal Fixed\n$3,750 · 53%"]
+        EF1 --> EF_SUB
+        EF2 --> EF_SUB
+        EF3 --> EF_SUB
+        EF4 --> EF_SUB
+    end
 
-DISCRETIONARY
-  Dining Out                      $400              6%            Behavioral
-  Entertainment/Subscriptions     $200              3%            Behavioral
-  Apparel                         $150              2%            Behavioral
-  Travel/Leisure                  $300              4%            Behavioral
-  SUBTOTAL DISCRETIONARY         $1,050             15%
+    subgraph EV ["🛒 Essential Variable — $1,450 / 21%"]
+        EV1["Groceries\n$700 · 10% · Consumption"]
+        EV2["Transportation (Fuel/Transit)\n$400 · 6% · Usage-based"]
+        EV3["Medical / Healthcare\n$200 · 3% · Need-based"]
+        EV4["Home Maintenance\n$150 · 2% · Preventive"]
+        EV_SUB["Subtotal Variable\n$1,450 · 21%"]
+        EV1 --> EV_SUB
+        EV2 --> EV_SUB
+        EV3 --> EV_SUB
+        EV4 --> EV_SUB
+    end
 
-TAXES & CAPITAL ALLOCATION
-  Income Tax (After-tax planning) $800             11%            Legal obligation
-  Retirement Contributions        $500              7%            Wealth-building
-  Investment Purchases            $300              4%            Wealth-building
-  SUBTOTAL ALLOCATION           $1,600             23%
+    subgraph DI ["🎭 Discretionary — $1,050 / 15%"]
+        DI1["Dining Out\n$400 · 6% · Behavioral"]
+        DI2["Entertainment / Subscriptions\n$200 · 3% · Behavioral"]
+        DI3["Apparel\n$150 · 2% · Behavioral"]
+        DI4["Travel / Leisure\n$300 · 4% · Behavioral"]
+        DI_SUB["Subtotal Discretionary\n$1,050 · 15%"]
+        DI1 --> DI_SUB
+        DI2 --> DI_SUB
+        DI3 --> DI_SUB
+        DI4 --> DI_SUB
+    end
 
-─────────────────────────────────────────────────────────────────────────────────
-TOTAL MONTHLY OUTFLOW           $7,850            112%
-SURPLUS / (DEFICIT)             ($150)            (2%)
+    subgraph TA ["📈 Taxes & Capital Allocation — $1,600 / 23%"]
+        TA1["Income Tax (After-tax Planning)\n$800 · 11% · Legal Obligation"]
+        TA2["Retirement Contributions\n$500 · 7% · Wealth-building"]
+        TA3["Investment Purchases\n$300 · 4% · Wealth-building"]
+        TA_SUB["Subtotal Allocation\n$1,600 · 23%"]
+        TA1 --> TA_SUB
+        TA2 --> TA_SUB
+        TA3 --> TA_SUB
+    end
+
+    EF_SUB --> TOTAL
+    EV_SUB --> TOTAL
+    DI_SUB --> TOTAL
+    TA_SUB --> TOTAL
+
+    TOTAL["📊 Total Monthly Outflow\n$7,850 · 112% of Net Income"]
+    TOTAL --> DEFICIT["⚠️ Surplus / (Deficit)\n($150) · (2%) — Overspend"]
+
+    style ROOT fill:#1e3a5f,color:#ffffff,stroke:#0d2137
+    style EF_SUB fill:#2c5f8a,color:#ffffff,stroke:#1a3f5f
+    style EV_SUB fill:#2c7a4b,color:#ffffff,stroke:#1a4f30
+    style DI_SUB fill:#7a4f2c,color:#ffffff,stroke:#4f3018
+    style TA_SUB fill:#5a2c7a,color:#ffffff,stroke:#3a1a50
+    style TOTAL fill:#1e3a5f,color:#ffffff,stroke:#0d2137
+    style DEFICIT fill:#8b1a1a,color:#ffffff,stroke:#5f0d0d
+    style EF1 fill:#d6e8f7,stroke:#2c5f8a
+    style EF2 fill:#d6e8f7,stroke:#2c5f8a
+    style EF3 fill:#d6e8f7,stroke:#2c5f8a
+    style EF4 fill:#d6e8f7,stroke:#2c5f8a
+    style EV1 fill:#d6f0e0,stroke:#2c7a4b
+    style EV2 fill:#d6f0e0,stroke:#2c7a4b
+    style EV3 fill:#d6f0e0,stroke:#2c7a4b
+    style EV4 fill:#d6f0e0,stroke:#2c7a4b
+    style DI1 fill:#f7e8d6,stroke:#7a4f2c
+    style DI2 fill:#f7e8d6,stroke:#7a4f2c
+    style DI3 fill:#f7e8d6,stroke:#7a4f2c
+    style DI4 fill:#f7e8d6,stroke:#7a4f2c
+    style TA1 fill:#ead6f7,stroke:#5a2c7a
+    style TA2 fill:#ead6f7,stroke:#5a2c7a
+    style TA3 fill:#ead6f7,stroke:#5a2c7a
 ```
 
 This example reveals a critical insight: even a household with $7,000 in gross monthly income ($84,000 annualized) that allocates 35% to housing, 8% to insurance, and reasonable amounts to other categories can easily slip into deficit. The practitioner in this scenario has minimal margin for error, no buffer for unexpected expenses, and insufficient capital allocation to build wealth systematically. The architecture is brittle. This is the cash flow reality for a substantial portion of the employed population in developed economies.
@@ -126,38 +176,68 @@ The appropriate size of an emergency fund depends on several factors: income sta
 
 The mechanics of emergency fund sizing can be calculated as follows:
 
-```
-EMERGENCY FUND SIZING MODEL
-
-Essential Monthly Obligations (Fixed + Essential Variable):
-  Housing                              $2,500
-  Insurance                              $600
-  Utilities & Transportation              $650
-  Essential Maintenance & Medical        $350
-  ─────────────────────────────────────────
-  TOTAL MONTHLY OBLIGATIONS            $4,100
-
-Emergency Fund Scenarios:
-─────────────────────────────────────────────────
-Income Stability & Circumstances → Target Fund Size
-
-Stable Employment, No Dependents, Good Health
-  3 months × $4,100 = $12,300 (minimum)
-  6 months × $4,100 = $24,600 (comfortable)
-
-Stable Employment, Dependents, Mortgage
-  6 months × $4,100 = $24,600 (minimum)
-  9 months × $4,100 = $36,900 (comfortable)
-
-Variable Business Income, Dependents, Mortgage
-  12 months × $4,100 = $49,200 (minimum)
-  18 months × $4,100 = $73,800 (recommended)
-
-Freelance / Gig Work, Dependents, Chronic Illness
-  18 months × $4,100 = $73,800 (minimum)
-  24 months × $4,100 = $98,400 (recommended)
+```mermaid
+flowchart TD
+    Title["<b>EMERGENCY FUND SIZING MODEL</b>"]
+    
+    Title --> Obligations
+    
+    subgraph Obligations ["Essential Monthly Obligations"]
+        direction TB
+        Housing["Housing: $2,500"]
+        Insurance["Insurance: $600"]
+        Utilities["Utilities & Transportation: $650"]
+        Medical["Essential Maintenance & Medical: $350"]
+        Total["<b>TOTAL MONTHLY OBLIGATIONS: $4,100</b>"]
+        
+        Housing --> Total
+        Insurance --> Total
+        Utilities --> Total
+        Medical --> Total
+    end
+    
+    Obligations --> Scenarios
+    
+    subgraph Scenarios ["Emergency Fund Scenarios"]
+        direction TB
+        
+        subgraph S1 ["Stable Employment, No Dependents, Good Health"]
+            S1Min["3 months × $4,100 = <b>$12,300</b><br/>(minimum)"]
+            S1Comfort["6 months × $4,100 = <b>$24,600</b><br/>(comfortable)"]
+        end
+        
+        subgraph S2 ["Stable Employment, Dependents, Mortgage"]
+            S2Min["6 months × $4,100 = <b>$24,600</b><br/>(minimum)"]
+            S2Comfort["9 months × $4,100 = <b>$36,900</b><br/>(comfortable)"]
+        end
+        
+        subgraph S3 ["Variable Business Income, Dependents, Mortgage"]
+            S3Min["12 months × $4,100 = <b>$49,200</b><br/>(minimum)"]
+            S3Rec["18 months × $4,100 = <b>$73,800</b><br/>(recommended)"]
+        end
+        
+        subgraph S4 ["Freelance / Gig Work, Dependents, Chronic Illness"]
+            S4Min["18 months × $4,100 = <b>$73,800</b><br/>(minimum)"]
+            S4Rec["24 months × $4,100 = <b>$98,400</b><br/>(recommended)"]
+        end
+    end
 ```
 
 The emergency fund must be stored in a location that is *accessible* (can be withdrawn within one to three business days) but *separated* from your primary checking account (to reduce the behavioral temptation to spend it on non-emergencies). The optimal vehicle is a high-yield savings account (currently offering 4–5% annual yield as of 2024) at a different bank than your primary checking account, giving you physical and psychological separation. You access the account infrequently enough that you are unlikely to impulsively withdraw from it, but easily enough to address genuine emergencies without selling long-term investments or paying credit card interest.
 
-The most common failure mode in emergency fund management is conflating the emergency fund with a sinking fund. A sinking fund is capital set aside for known future expenses (car maintenance, home repairs, insurance premiums due once annually, vacation). An emergency fund is for true emergencies—unexpected expenses or temporary income loss. Many practitioners deplete their emergency fund for discretionary expenses (vacation, vehicle upgrade, home renovation) and then never rebuild it
+The most common failure mode in emergency fund management is conflating the emergency fund with a sinking fund. A sinking fund is capital set aside for known future expenses (car maintenance, home repairs, insurance premiums due once annually, vacation). An emergency fund is for true emergencies—unexpected expenses or temporary income loss.
+
+Separating these two categories is critical: sinking funds are predictable, scheduled allocations that should be incorporated into your monthly cash flow planning, while the emergency fund is a true reserve that should only be touched when income is disrupted or an unforeseeable expense occurs. Mixing the two creates a dangerous illusion of preparedness—you may believe you have $25,000 in emergency reserves, but if $10,000 of that is earmarked for a roof replacement you've been planning for months, your actual emergency capacity is only $15,000. The discipline required here is treating the emergency fund as untouchable infrastructure, not as a general-purpose savings account. Once the target threshold is reached, monthly contributions to the emergency fund should cease, and those cash flows should be redirected to debt elimination, investment accounts, or sinking funds for known future obligations. The emergency fund is not designed to grow indefinitely—it is designed to exist at a stable equilibrium that matches your risk profile, providing a financial airbag that allows you to navigate temporary disruptions without structural damage to your long-term financial position.
+
+The behavioral architecture of emergency fund management is as important as the numerical target. Automatic monthly transfers from checking to a high-yield savings account eliminate willpower as a dependency and ensure consistent fund growth during the accumulation phase. After a withdrawal due to genuine emergency, the priority hierarchy must temporarily shift: replenishing the emergency fund takes precedence over discretionary spending, accelerated debt repayment, or new investment contributions until the fund is restored to its target level. This ensures that you are never operating without a safety margin for an extended period. The psychological benefit of a fully funded emergency reserve cannot be overstated—it transforms financial decision-making from reactive scrambling to proactive optimization, because you are no longer forced to accept suboptimal outcomes (high-interest debt, liquidating investments at a loss, skipping necessary medical care) when temporary cash flow disruptions occur.
+
+## Summary & Verification Matrix
+
+| **Invariant / Mechanism** | **Governing Principle** | **Diagnostic Criteria** | **Failure Mode** |
+|---------------------------|-------------------------|-------------------------|------------------|
+| **Emergency Fund Target** | 3–24 months of non-discretionary expenses, scaled to income volatility and dependent obligations | Fund size ≥ (monthly obligations × stability multiplier); separate account with < 3-day access | Fund conflated with sinking funds; stored in illiquid investments; undersized relative to risk profile |
+| **Cash Flow Equation** | Net Cash Flow = Income - (Fixed + Variable + Discretionary) | Positive net flow sustained >3 consecutive months; surplus allocated to priority hierarchy | Chronic negative flow; discretionary spending exceeds available surplus; no systematic surplus allocation |
+| **Expense Classification** | Fixed: immutable short-term; Variable: usage-dependent; Discretionary: eliminable without consequence | Each expense categorized into exactly one bucket; fixed + variable < 70% of after-tax income | Variable expenses misclassified as fixed; discretionary spending treated as non-negotiable; lifestyle inflation untracked |
+| **Savings Rate Benchmark** | Minimum 15–20% of gross income allocated to non-discretionary savings/investment | (Emergency fund contributions + retirement + debt principal) / gross income ≥ 0.15 | Savings treated as residual after spending; periodic windfalls fully consumed; net worth stagnant despite income growth |
+| **Fund Replenishment Protocol** | After emergency withdrawal, fund restoration takes priority over discretionary and accelerated debt payoff | Time to restore fund to target ≤ 6 months; automated replenishment transfers active during restoration | Extended operation below target threshold; new discretionary spending initiated before fund restoration complete |
+| **Account Separation Architecture** | Emergency fund physically isolated from checking; high-yield vehicle; intentional friction to access | Fund held at different institution than primary checking; yields ≥ 4%; requires 1–3 day transfer to access | Fund in checking account; stored in volatile investments; no yield optimization; impulsive non-emergency withdrawals common |

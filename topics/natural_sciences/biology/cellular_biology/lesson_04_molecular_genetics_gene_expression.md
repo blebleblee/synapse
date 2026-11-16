@@ -32,30 +32,53 @@ Single-strand DNA-binding proteins (SSB in bacteria, RPA in eukaryotes) coat the
 
 The lagging strand presents a geometric challenge: the template runs $5' \to 3'$ toward the fork, but polymerase can only synthesize $5' \to 3'$ away from the fork. Resolution occurs through repeated cycles of Okazaki fragment synthesis—short segments ($\sim 1{-}2 \, \text{kb}$ in bacteria, $\sim 100{-}200 \, \text{nt}$ in eukaryotes) initiated by new RNA primers every few hundred nucleotides. Each Okazaki fragment is extended until the polymerase encounters the $5'$ end of the previous fragment. The RNA primer is then removed by RNase H (which degrades the RNA portion of RNA-DNA hybrids) and the $5' \to 3'$ exonuclease activity of DNA polymerase I (bacteria) or FEN1 nuclease (eukaryotes). The resulting nick is sealed by DNA ligase, which catalyzes formation of a phosphodiester bond using ATP (eukaryotes) or NAD$^+$ (bacteria) as a cofactor to adenylate the $5'$ phosphate, facilitating nucleophilic attack by the adjacent $3'$ hydroxyl.
 
-```
-Replication Fork Architecture (Leading & Lagging Strand Synthesis)
+```mermaid
+flowchart TD
+    H["Helicase (3'→5' translocation)"]
 
-            Helicase (3'→5' translocation)
-                    ↓
-         ═════════════════════════════  Leading strand template (3'→5')
-                   /  \
-                  /    \
-                 /      \  SSB/RPA coating ssDNA
-     ___________/        \___________
-    |                                |
-    |  Pol III/ε →→→→→→→→→→→→→→ (continuous synthesis)
-    |  + sliding clamp (β/PCNA)
-    |
-    |          Lagging strand template (5'→3')
-    └──────────────────────────────────────────
-          ↓         ↓         ↓
-       Primer 1  Primer 2  Primer 3  ← Primase (DnaG/Pol α-primase)
-       ←─────    ←─────    ←─────    ← Okazaki fragments
-        Pol III/δ synthesizes 5'→3' away from fork
+    subgraph Leading["Leading Strand Synthesis (Continuous)"]
+        LT["Leading strand template (3'→5')"]
+        SSB["SSB/RPA coating ssDNA"]
+        PolE["Pol III/ε + sliding clamp (β/PCNA)<br/>continuous synthesis →→→→→"]
+    end
 
-Post-synthesis:
-  RNase H + Pol I/FEN1: remove RNA primers & fill gaps
-  DNA Ligase: seal nicks (ATP/NAD⁺-dependent)
+    subgraph Lagging["Lagging Strand Synthesis (Discontinuous)"]
+        LGT["Lagging strand template (5'→3')"]
+        Primase["Primase (DnaG / Pol α-primase)"]
+        P1["Primer 1"]
+        P2["Primer 2"]
+        P3["Primer 3"]
+        OF1["Okazaki fragment 1<br/>(Pol III/δ, 5'→3' away from fork)"]
+        OF2["Okazaki fragment 2<br/>(Pol III/δ, 5'→3' away from fork)"]
+        OF3["Okazaki fragment 3<br/>(Pol III/δ, 5'→3' away from fork)"]
+    end
+
+    subgraph PostSyn["Post-synthesis Processing"]
+        RNase["RNase H + Pol I / FEN1<br/>remove RNA primers & fill gaps"]
+        Ligase["DNA Ligase<br/>seal nicks (ATP / NAD⁺-dependent)"]
+    end
+
+    H --> LT
+    H --> LGT
+
+    LT --> SSB
+    SSB --> PolE
+
+    LGT --> P1
+    LGT --> P2
+    LGT --> P3
+    Primase --> P1
+    Primase --> P2
+    Primase --> P3
+
+    P1 --> OF1
+    P2 --> OF2
+    P3 --> OF3
+
+    OF1 --> RNase
+    OF2 --> RNase
+    OF3 --> RNase
+    RNase --> Ligase
 ```
 
 Topological stress management is critical. As helicase unwinds $\sim 1000$ bp/s (bacteria), positive supercoiling accumulates ahead at a rate that, if unresolved, would stall the fork within seconds. Type I topoisomerases (e.g., topoisomerase I) relieve tension by transiently nicking one strand, allowing controlled rotation around the intact strand, then religating the break. Type II topoisomerases (e.g., DNA gyrase in bacteria, topoisomerase II in eukaryotes) cleave both strands, pass another DNA segment through the break, then religate, changing $Lk$ by ±2; gyrase uniquely introduces negative supercoils in an ATP-dependent reaction, maintaining the genome in a supercoiled state favorable for replication and transcription initiation.

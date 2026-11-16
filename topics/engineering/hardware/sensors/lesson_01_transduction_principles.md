@@ -40,58 +40,40 @@ Piezoelectric accelerometers exploit Newton's second law by coupling a proof mas
 
 Thermoelectric transduction relies on the Seebeck effect, where a temperature gradient across a junction of dissimilar conductors generates an electromotive force proportional to the temperature difference. The Seebeck coefficient S, measured in microvolts per Kelvin, quantifies this thermoelectric voltage V = S × ΔT. Type K thermocouples pair chromel (nickel-chromium alloy) and alumel (nickel-aluminum-manganese alloy) to achieve 41 μV/°C sensitivity across a -200°C to +1350°C operating range. Type T copper-constantan junctions provide higher sensitivity near room temperature but limited high-temperature capability. Type R platinum-rhodium configurations enable measurements to 1750°C in oxidizing atmospheres at the expense of lower Seebeck coefficient and higher cost. The thermocouple junction itself requires no external power, but accurate measurement demands a known reference junction temperature maintained by isothermal terminal blocks or active cold-junction compensation circuits employing precision thermistors and analog temperature-to-voltage converters.
 
-```
-Resistive Transduction Signal Chain:
-
-Physical       Geometric/Material      Resistance       Bridge          Instrumentation      ADC
-Stimulus  →    Deformation        →    Modulation  →    Circuit    →    Amplifier       →    Digitization
-(strain,       (ΔL, Δρ)               (ΔR/R)           (Vdiff)         (Vout)              (counts)
-temp, etc)
-                                       
-                ┌────────┐              ┌───R1───┐
-                │Sensing │              │        │
-  ε, ΔT    →   │Element │    →        Vex      R2       →    INA      →    12-24 bit ADC
-                │(gauge, │              │        │            (G=100-1000)
-                │RTD)    │              └───R3───┘
-                └────────┘                   R4
-                
-Governing Equation: ΔR/R = GF × ε  (strain gauge)
-                    R(T) = R₀[1 + α(T-T₀)]  (RTD linear approx)
-
-
-Capacitive Transduction Signal Chain:
-
-Physical       Geometry/Dielectric     Capacitance      CDC/Charge       Processing      Digital
-Stimulus  →    Modulation         →    Change      →    Readout     →    & Comp     →    Output
-(displacement, (Δd, Δε, ΔA)            (ΔC)             (Vratio)         (lookup)        (position)
-pressure)
-
-                ┌─────────┐             ┌─||─ Cs ─┐
-                │Parallel │             │         │
-  Δd, ΔP   →   │Plate or │    →       Vac      Cref      →   Σ-Δ CDC   →   Linearization
-                │Diaphragm│             │         │           (24-bit)
-                └─────────┘             └─────────┘
-                
-Governing Equation: C = ε₀εᵣA/d
-                    Sensitivity: dC/dd = -ε₀εᵣA/d²
-
-
-Piezoelectric Transduction Signal Chain:
-
-Physical       Crystal Stress/        Charge           Charge           Filtering       Digital
-Stimulus  →    Strain            →    Generation  →    Amplifier   →    & Gain     →    Acquisition
-(accel,        (σ, ε)                 (Q = d×F)        (Vout)           (bandpass)      (g, Pa)
-pressure)
-
-                ┌──────────┐           ┌─┤├─ Cp ─┐          ┌─Cf──┐
-                │PZT/Quartz│           │         │          │     │
-  a, F     →   │Crystal + │    →      Q ~~~~   Rp      →  ─┤ Op  ├─  →  Anti-alias  →  ADC
-                │Proof Mass│           │         │         +└─Amp─┘
-                └──────────┘           └─────────┘          Charge→V
-                
-Governing Equation: Q = d × F × N  (N = # of crystal layers)
-                    Vout = -Q/Cf  (charge amp ideal gain)
-                    Resonance: f₀ = (1/2π)√(k/m)
+```mermaid
+flowchart TD
+    subgraph resistive ["Resistive Transduction Signal Chain"]
+        R1["Physical Stimulus<br/>(strain, temp, etc)<br/>ε, ΔT"]
+        R2["Geometric/Material<br/>Deformation<br/>(ΔL, Δρ)<br/><br/>Sensing Element<br/>(gauge, RTD)"]
+        R3["Resistance<br/>Modulation<br/>(ΔR/R)<br/><br/>ΔR/R = GF × ε<br/>R(T) = R₀[1 + α(T-T₀)]"]
+        R4["Bridge Circuit<br/>(Vdiff)<br/><br/>Wheatstone Bridge<br/>R1, R2, R3, R4<br/>Vex"]
+        R5["Instrumentation<br/>Amplifier<br/>(Vout)<br/><br/>INA<br/>G=100-1000"]
+        R6["ADC Digitization<br/>(counts)<br/><br/>12-24 bit ADC"]
+        
+        R1 --> R2 --> R3 --> R4 --> R5 --> R6
+    end
+    
+    subgraph capacitive ["Capacitive Transduction Signal Chain"]
+        C1["Physical Stimulus<br/>(displacement, pressure)<br/>Δd, ΔP"]
+        C2["Geometry/Dielectric<br/>Modulation<br/>(Δd, Δε, ΔA)<br/><br/>Parallel Plate or<br/>Diaphragm"]
+        C3["Capacitance Change<br/>(ΔC)<br/><br/>C = ε₀εᵣA/d<br/>dC/dd = -ε₀εᵣA/d²"]
+        C4["CDC/Charge Readout<br/>(Vratio)<br/><br/>Cs vs Cref<br/>Vac excitation"]
+        C5["Processing & Comp<br/>(lookup)<br/><br/>Σ-Δ CDC<br/>24-bit"]
+        C6["Digital Output<br/>(position)<br/><br/>Linearization"]
+        
+        C1 --> C2 --> C3 --> C4 --> C5 --> C6
+    end
+    
+    subgraph piezoelectric ["Piezoelectric Transduction Signal Chain"]
+        P1["Physical Stimulus<br/>(accel, pressure)<br/>a, F"]
+        P2["Crystal Stress/Strain<br/>(σ, ε)<br/><br/>PZT/Quartz Crystal<br/>+ Proof Mass"]
+        P3["Charge Generation<br/>(Q = d×F)<br/><br/>Q = d × F × N<br/>Cp, Rp equivalent"]
+        P4["Charge Amplifier<br/>(Vout)<br/><br/>Op-Amp with Cf<br/>Vout = -Q/Cf"]
+        P5["Filtering & Gain<br/>(bandpass)<br/><br/>Anti-alias filter"]
+        P6["Digital Acquisition<br/>(g, Pa)<br/><br/>ADC<br/>f₀ = (1/2π)√(k/m)"]
+        
+        P1 --> P2 --> P3 --> P4 --> P5 --> P6
+    end
 ```
 
 ## 3. High-Performance Optimization & Failure Modes
@@ -108,7 +90,7 @@ Electromagnetic interference mitigation begins with proper sensor cable selectio
 
 Calibration procedures must characterize and compensate multiple error sources including offset, gain error, nonlinearity, and cross-axis sensitivity across the full operating temperature and input stimulus ranges. Offset nulling applies a known zero-input condition and records the transducer output, storing this value in non-volatile memory for subsequent subtraction from all measurements. Gain calibration exercises the sensor across two or more known stimulus points spanning the measurement range, fitting a linear or polynomial correction curve through least-squares regression. Multi-point calibration captures nonlinearity by evaluating the transducer at five to twenty stimulus values and constructing a lookup table or polynomial fit with sufficient degrees of freedom to reduce residual errors below the target accuracy specification. Temperature compensation employs auxiliary temperature sensing and correction coefficients derived from thermal characterization in a programmable oven, applying polynomial or piecewise-linear correction factors in firmware to cancel thermal drift of sensitivity and offset.
 
-Cross-sensitivity errors arise from transducer response to orthogonal stimuli such as an accelerometer's sensitivity to transverse acceleration components or a pressure sensor's response to thermal gradients. Datasheet specifications quantify cross-axis sensitivity as a percentage of the primary axis sensitivity, typically 2-5% for machined metal diaphragm pressure sensors and <1% for MEMS capacitive accelerometers employing differential sense electrode pairs. Mechanical isolation through compliant mounting or thermal buffering with low-thermal-conductivity washers mitigates these parasitic couplings in critical applications. Digital filtering techniques such as Kalman estimation can fuse measurements from multiple sensors to decorrelate cross-coupled stimulus components when kinematic constraints are known.
+Cross-sensitivity errors arise from transducer response to orthogonal stimuli such as an accelerometer's sensitivity to transverse acceleration components or a pressure sensor's response to thermal gradients. Datasheet specifications quantify cross-axis sensitivity as a percentage of the primary axis sensitivity, typically 2-5% for machined metal diaphragm pressure sensors and < 1% for MEMS capacitive accelerometers employing differential sense electrode pairs. Mechanical isolation through compliant mounting or thermal buffering with low-thermal-conductivity washers mitigates these parasitic couplings in critical applications. Digital filtering techniques such as Kalman estimation can fuse measurements from multiple sensors to decorrelate cross-coupled stimulus components when kinematic constraints are known.
 
 Mechanical failure modes in transducers subjected to shock, vibration, and environmental extremants demand attention to packaging, mounting, and mechanical design margins. Fatigue life calculations for strain gauges bonded to flexural elements employ Miner's cumulative damage rule, summing fractional damage ratios Di = ni/Ni where ni is the number of applied cycles at stress level σi and Ni is the cycles-to-failure at that stress from the material's S-N curve. Hermetic sealing through glass-to-metal feedthroughs and laser-welded housings prevents moisture ingress and contamination that would degrade resistive element stability and corrode bond pads. Conformal coating of PCB assemblies with parylene or silicone provides a diffusion barrier against humidity while maintaining dimensional stability over -55°C to +125°C thermal cycling. Belleville spring washers and controlled torque mounting procedures ensure consistent preload and stress distribution, avoiding creep and hysteresis artifacts in load cells and pressure sensors.
 

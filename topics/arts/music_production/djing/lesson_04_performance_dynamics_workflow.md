@@ -22,18 +22,18 @@ Act Two, the development section, constitutes the middle 40-50% of the set and o
 
 The transition mechanics during Act Two become more aggressive and visible as energy rises. Extended blends give way to quicker cuts—mixing over 16 or 32 bars instead of 64—and the DJ may employ more dramatic transition techniques: echo-out effects on the outgoing track while slam-cutting the incoming track on the one, filter sweeps that gradually remove low-end from the outgoing track while simultaneously introducing the low-end of the incoming track, or stutter edits that fragment the end of the outgoing track into rhythmic chunks that dissolve into the incoming track's intro. The technical execution must remain precise even as transitions become more assertive: beatmatching tolerances tighten, and phrase alignment becomes critical. A transition that lands a major melodic element or vocal hook one bar early or late disrupts the narrative momentum and forces the DJ to execute corrective actions—quick EQ cuts, tempo nudges, or emergency cue point jumps.
 
-```
-Energy Flow Timeline (120-minute set example):
+```mermaid
+flowchart LR
+    A["Opening\n00:00 – 25:00\n60–75 BPM\nEstablish Groove"]
+    B["Development\n25:00 – 70:00\n75–85 BPM\nMultiple Micro-peaks\nBuild Tension"]
+    C["Peak Zone\n70:00 – 90:00\n90–100 BPM\n3–5 min Sustained\nClimax"]
+    D["Resolution\n90:00 – 120:00\n70–80 BPM\nEmotional Wind-down\nRelease"]
+    E["Closure\nat 120:00\n60–70 BPM"]
 
-00:00 ──────────── 25:00 ──────────── 70:00 ────── 90:00 ───── 120:00
-  │                  │                  │            │           │
-  │                  │                  │            │           │
-Opening          Development        Peak Zone    Resolution   Closure
-(60-75 BPM)      (75-85 BPM)       (90-100 BPM)  (70-80 BPM) (60-70 BPM)
-  │                  │                  │            │           │
-  └─Establish────────┴─Build Tension───┴─Climax─────┴─Release───┘
-   Groove                Multiple         3-5 min    Emotional
-                        Micro-peaks       Sustained   Wind-down
+    A -->|"Build Tension"| B
+    B -->|"Climax"| C
+    C -->|"Release"| D
+    D -->|"Wind-down"| E
 ```
 
 Act Three comprises two distinct phases: the peak zone and the resolution. The peak zone, occupying perhaps 10-15 minutes of the set, represents the moment of maximum energy expenditure where all prior tension culminates in cathartic release. Track selection during this window favors anthems—tracks with universally recognizable hooks, sing-along vocals, euphoric chord progressions, and explosive drop structures. The DJ's technical role shifts from architect to conductor: rather than constructing energy, they channel and amplify it. Transitions become sparse and clean, allowing each peak track to breathe and deliver its full emotional payload without interruption. The temptation to layer multiple peak tracks simultaneously must be resisted; this creates sonic mud and dilutes impact. Instead, the DJ should sequence peak tracks with brief transitional bridges—perhaps 8 to 16 bars—that maintain momentum while clearly delineating individual moments.

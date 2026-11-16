@@ -552,7 +552,7 @@ This rapid-reference guide consolidates critical equations, measurement protocol
 3. Unit Consistency: All intermediate calculations must preserve dimensional correctness; use `.decompose()` to verify SI equivalence
 4. Numerical Stability: Check for NaN or Inf values in array operations; common sources include divide-by-zero in inverse-square laws or exp() overflow in Planck function
 5. Calibration Linearity: Detector response must be linear within ±2% across dynamic range; measure via neutral density filter series
-6. Wavelength Calibration RMS: Fit residuals to emission line standards should be <0.1 nm for visible spectroscopy, <1 cm⁻¹ for infrared
+6. Wavelength Calibration RMS: Fit residuals to emission line standards should be < 0.1 nm for visible spectroscopy, < 1 cm⁻¹ for infrared
 7. Monte Carlo Convergence: Increase sampling iterations until parameter distributions stabilize (typically N > 500 for 1% convergence)
 
 **Common Failure Modes & Diagnostics:**
@@ -564,11 +564,11 @@ This rapid-reference guide consolidates critical equations, measurement protocol
 - **Overfitting in Spectral Fits:** Reduce polynomial baseline order or apply regularization; Bayesian information criterion (BIC) guides model complexity selection
 
 **Performance Benchmarks:**
-- Blackbody temperature fitting: <5 seconds for 500 wavelength bins on modern CPU
-- HZ boundary calculation: <1 second for 50-point temperature grid with vectorized NumPy operations
-- Transmission spectrum simulation: <10 seconds for 500 wavelength bins × 50 mixing ratios grid
-- Monte Carlo uncertainty analysis (N = 1000): <30 seconds for single-parameter scan
-- Multi-panel figure generation: <5 seconds including I/O for 300 DPI PNG output
+- Blackbody temperature fitting: < 5 seconds for 500 wavelength bins on modern CPU
+- HZ boundary calculation: < 1 second for 50-point temperature grid with vectorized NumPy operations
+- Transmission spectrum simulation: < 10 seconds for 500 wavelength bins × 50 mixing ratios grid
+- Monte Carlo uncertainty analysis (N = 1000): < 30 seconds for single-parameter scan
+- Multi-panel figure generation: < 5 seconds including I/O for 300 DPI PNG output
 
 **Data Archiving & Reproducibility:**
 - Save all calibration files (dark frames, flat fields, wavelength solutions) with ISO 8601 timestamps

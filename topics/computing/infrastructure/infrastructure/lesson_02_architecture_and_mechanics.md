@@ -1,237 +1,115 @@
 # Lesson 2: Core Architecture & Memory/Execution Models
 
-## 1. Process, Threading & Execution Lifecycles
+## 1. First-Principles Intuition & Invariants
 
-### The Process Abstraction
+An operating system kernel's primary architectural responsibility is resource virtualization: transforming raw, physically constrained CPU cores, DRAM banks, and I/O buses into clean, isolated execution and memory spaces. Every modern operating system executes under a fundamental physical invariant:
 
-A process is the fundamental unit of resource isolation and execution in Unix-like operating systems. At the kernel level, a process is represented by a `task_struct` (in Linux) containing all state required to manage program execution: memory mappings, open file descriptors, signal handlers, scheduling parameters, and processor context. Threads, often called lightweight processes (LWPs), share the same memory address space and most resources with their siblings, but maintain independent execution contexts (program counter, stack, registers).
+> *No user-space instruction can directly access hardware registers, physical memory addresses, or interrupt lines without passing through the processor's hardware-enforced privilege rings (Ring 0 / Supervisor Mode).*
 
-The distinction is crucial: process creation via `fork()` duplicates the entire address space (copy-on-write optimization notwithstanding), while thread creation via `clone()` or `pthread_create()` shares the address space but allocates separate stacks and thread-local storage. This design trades isolation for efficiency—threads communicate through shared memory with minimal overhead, while processes require explicit inter-process communication (IPC) mechanisms.
-
-### Process Control Block Architecture
-
-The `task_struct` in Linux (typically 1.7KB on x86-64) serves as the process descriptor. Key fields include:
-
-```c
-struct task_struct {
-    volatile long state;              // Process state: TASK_RUNNING, TASK_INTERRUPTIBLE, etc.
-    void *stack;                      // Kernel stack pointer
-    struct mm_struct *mm;             // Memory descriptor
-    struct mm_struct *active_mm;      // Active address space (used by kernel threads)
-    pid_t pid;                        // Process ID
-    pid_t tgid;                       // Thread group ID
-    struct task_struct *parent;       // Parent process
-    struct list_head children;        // Child process list
-    struct list_head sibling;         // Sibling list entry
-    
-    // Scheduling
-    int prio, static_prio, normal_prio;
-    unsigned int policy;
-    struct sched_entity se;
-    struct sched_rt_entity rt;
-    
-    // Filesystem context
-    struct fs_struct *fs;
-    struct files_struct *files;       // Open file descriptors
-    struct nsproxy *nsproxy;          // Namespace proxy
-    
-    // Signal handling
-    struct signal_struct *signal;
-    struct sighand_struct *sighand;
-    sigset_t blocked, real_blocked;
-    
-    // CPU context
-    struct thread_struct thread;      // Arch-specific register state
-};
-```
-
-The `mm_struct` encapsulates the virtual address space:
-
-```c
-struct mm_struct {
-    pgd_t *pgd;                       // Page global directory (top-level page table)
-    atomic_t mm_users;                // Address space users
-    atomic_t mm_count;                // Primary reference count
-    
-    unsigned long start_code, end_code;
-    unsigned long start_data, end_data;
-    unsigned long start_brk, brk;     // Heap boundaries
-    unsigned long start_stack;
-    unsigned long arg_start, arg_end;
-    unsigned long env_start, env_end;
-    
-    struct vm_area_struct *mmap;      // VMA list
-    struct rb_root mm_rb;             // VMA red-black tree
-    unsigned long mmap_base;          // Base of mmap region
-    unsigned long task_size;          // User-space size limit
-    
-    spinlock_t page_table_lock;
-    struct list_head mmlist;          // Global mmlist
-};
-```
-
-### Execution Lifecycle States
-
-A process transitions through well-defined states managed by the scheduler:
+This isolation relies on two cooperative hardware-software mechanisms:
+1. **The Execution Model**: Preemptive timesharing through timer interrupts, hardware context saving, and scheduling state machines that maintain the illusion of continuous, dedicated CPU ownership.
+2. **The Memory Model**: Hardware-enforced virtual memory addressing mediated by the Memory Management Unit (MMU), multi-level page tables, and Translation Lookaside Buffers (TLB).
 
 ```mermaid
-stateDiagram-v2
-    [*] --> TASK_NEW: fork()/clone()
-    TASK_NEW --> TASK_RUNNING: wake_up_new_task()
-    TASK_RUNNING --> TASK_RUNNING: schedule()
-    TASK_RUNNING --> TASK_INTERRUPTIBLE: wait_event()
-    TASK_RUNNING --> TASK_UNINTERRUPTIBLE: mutex_lock()
-    TASK_INTERRUPTIBLE --> TASK_RUNNING: wake_up()
-    TASK_UNINTERRUPTIBLE --> TASK_RUNNING: wake_up()
-    TASK_RUNNING --> TASK_STOPPED: SIGSTOP
-    TASK_STOPPED --> TASK_RUNNING: SIGCONT
-    TASK_RUNNING --> TASK_TRACED: ptrace()
-    TASK_TRACED --> TASK_RUNNING: ptrace(PTRACE_CONT)
-    TASK_RUNNING --> EXIT_ZOMBIE: exit()
-    EXIT_ZOMBIE --> EXIT_DEAD: parent wait()
-    EXIT_DEAD --> [*]
+flowchart TD
+    subgraph execution ["1. Execution & Context Switching"]
+        USER_P["User Process\n(Ring 3 / CPL=3)"] -->|Syscall / Timer Interrupt| TRAP["Hardware Trap Handler\n(Saves Registers to Kernel Stack)"]
+        TRAP --> RING0["Kernel Scheduler\n(Ring 0 / Supervisor)"]
+        RING0 --> SCHED["schedule() State Evaluation\n(Select Next task_struct)"]
+        SCHED --> CTX["context_switch()\n1. switch_mm() (Reload CR3/Page Table)\n2. switch_to() (Swap SP, IP, GPRs)"]
+        CTX --> NEXT_P["Next Process Execution\n(Restore Context & iretq)"]
+    end
+
+    subgraph memory ["2. Virtual Memory Address Translation"]
+        VA["Virtual Address\n(PGD -> P4D -> PUD -> PMD -> PTE)"] --> MMU["Hardware MMU Walk"]
+        MMU -->|TLB Hit (1-2 cycles)| PA["Physical RAM Frame"]
+        MMU -->|TLB Miss| WALK["Page Table Walk\n(Page Fault if Present=0)"]
+        WALK --> PA
+    end
+
+    style execution fill:#1e293b,stroke:#38bdf8,color:#f8fafc
+    style memory fill:#0f172a,stroke:#a855f7,color:#f8fafc
 ```
 
-**State semantics:**
+---
 
-- **TASK_RUNNING**: On a CPU or in the run queue, eligible for scheduling
-- **TASK_INTERRUPTIBLE**: Blocked waiting for an event, can be interrupted by signals
-- **TASK_UNINTERRUPTIBLE**: Blocked in kernel code, uninterruptible (counted in load average)
-- **TASK_STOPPED**: Stopped by job control signals (SIGSTOP, SIGTTIN, SIGTTOU)
-- **TASK_TRACED**: Stopped by a debugger via `ptrace()`
-- **EXIT_ZOMBIE**: Terminated but awaiting parent to collect exit status via `wait()`
-- **EXIT_DEAD**: Final state after parent reaps the zombie
+## 2. Process, Threading & Execution Lifecycles
 
-### Process Creation: fork() Implementation
+### 2.1 The Process and Task Abstraction
 
-Process creation via `fork()` is a multi-stage operation:
-
-1. **Clone task_struct**: `dup_task_struct()` allocates and copies the parent's task structure
-2. **Copy resources**: Depending on flags, duplicate or share file descriptors, signal handlers, memory maps
-3. **Copy address space**: `dup_mm()` duplicates `mm_struct` and marks pages copy-on-write
-4. **Allocate PID**: Obtain unique process identifier from PID namespace
-5. **Initialize scheduling entity**: Set up CFS (Completely Fair Scheduler) or RT scheduling parameters
-6. **Wake new task**: `wake_up_new_task()` places the child on the run queue
+In the Linux kernel, processes and threads are unified under the `struct task_struct` representation. A thread is simply a task that shares its virtual address space (`mm_struct`), file descriptor table (`files_struct`), and signal handlers (`sighand_struct`) with its parent process via flags passed to `clone()` (`CLONE_VM`, `CLONE_FS`, `CLONE_FILES`):
 
 ```c
-// Simplified fork() kernel path (kernel/fork.c)
-long do_fork(unsigned long clone_flags,
-             unsigned long stack_start,
-             unsigned long stack_size,
-             int __user *parent_tidptr,
-             int __user *child_tidptr)
-{
-    struct task_struct *p;
-    struct pid *pid;
-    int trace = 0;
-    long nr;
-
-    // Allocate and initialize task_struct
-    p = copy_process(clone_flags, stack_start, stack_size,
-                     parent_tidptr, child_tidptr, NULL, trace, NULL, NULL);
-
-    if (IS_ERR(p))
-        return PTR_ERR(p);
-
-    // Get PID structure
-    pid = get_task_pid(p, PIDTYPE_PID);
-    nr = pid_vnr(pid);
-
-    // Wake up the new process
-    wake_up_new_task(p);
-
-    // Return child PID to parent, 0 to child (in separate context)
-    return nr;
-}
-
-static struct task_struct *copy_process(unsigned long clone_flags, ...)
-{
-    struct task_struct *p;
-    
-    // Duplicate task_struct
-    p = dup_task_struct(current);
-    
-    // Copy/share memory descriptor
-    if (clone_flags & CLONE_VM) {
-        // Thread: share address space
-        p->mm = current->mm;
-        atomic_inc(&p->mm->mm_users);
-    } else {
-        // Process: duplicate address space
-        p->mm = dup_mm(current);
-    }
-    
-    // Copy/share file descriptor table
-    if (clone_flags & CLONE_FILES)
-        p->files = current->files;
-    else
-        p->files = dup_fd(current->files);
-    
-    // Copy/share signal handlers
-    if (clone_flags & CLONE_SIGHAND)
-        p->sighand = current->sighand;
-    else
-        copy_sighand(p, current);
-    
-    // Allocate PID
-    p->pid = alloc_pid(p->nsproxy->pid_ns_for_children);
-    
-    // Initialize scheduling entity
-    sched_fork(clone_flags, p);
-    
-    return p;
-}
+// Simplified representation of task_struct memory and credential linkage
+struct task_struct {
+    volatile long state;               /* -1 unrunnable, 0 runnable, >0 stopped */
+    void *stack;                       /* Kernel execution stack */
+    pid_t pid;                         /* Thread ID (POSIX TID) */
+    pid_t tgid;                        /* Thread Group ID (POSIX PID) */
+    struct mm_struct *mm;              /* Virtual memory descriptor */
+    struct mm_struct *active_mm;       /* Active page table (for kernel threads) */
+    struct files_struct *files;        /* Open file descriptor table */
+    struct signal_struct *signal;      /* Shared signal handlers */
+    struct thread_struct thread;       /* CPU-specific hardware context (SP, IP) */
+};
 ```
 
-### Copy-on-Write Optimization
+### 2.2 Process Creation: fork(), exec(), and Copy-on-Write (COW)
 
-To avoid expensive full address space duplication, Linux marks all parent pages read-only and shares them with the child. When either process writes to a shared page, a page fault occurs:
+Spawning a new process via `fork()` avoids expensive full-memory cloning through hardware Copy-on-Write (COW):
+1. `clone()` duplicates the parent's `task_struct` and page tables, but marks all writable page table entries (PTEs) in both parent and child as **Read-Only** (`Present=1, Writable=0`) with their reference counts incremented.
+2. Execution proceeds immediately with near-zero allocation latency.
+3. When either process attempts to write to a page, the MMU traps a **Page Fault** (`CR2` contains faulting address, error code bit 1 = write access).
+4. The kernel's page fault handler (`do_wp_page()`) allocates a new physical frame, copies the 4KB data, updates the faulting process's PTE to point to the new frame with `Writable=1`, flushes the local TLB, and resumes execution.
 
-```c
-// arch/x86/mm/fault.c (simplified)
-static noinline int do_wp_page(struct vm_fault *vmf)
-{
-    struct vm_area_struct *vma = vmf->vma;
-    
-    // Get the old page
-    struct page *old_page = vmf->page;
-    
-    // If page has single reference, just make it writable
-    if (page_mapcount(old_page) == 1 && PageLRU(old_page)) {
-        wp_page_reuse(vmf);
-        return VM_FAULT_WRITE;
-    }
-    
-    // Allocate new page and copy contents
-    struct page *new_page = alloc_page_vma(GFP_HIGHUSER_MOVABLE, vma, vmf->address);
-    copy_user_highpage(new_page, old_page, vmf->address, vma);
-    
-    // Update page table to point to new page with write permission
-    entry = mk_pte(new_page, vma->vm_page_prot);
-    entry = maybe_mkwrite(pte_mkdirty(entry), vma);
-    set_pte_at(vma->vm_mm, vmf->address, vmf->pte, entry);
-    
-    return VM_FAULT_WRITE;
-}
+### 2.3 Preemptive Context Switching Mechanics
+
+When the scheduler switches from `prev` to `next`, `context_switch()` carries out two discrete transitions:
+- `switch_mm()`: Replaces the virtual memory map by writing the physical address of the next process's top-level page table (PGD) into control register `CR3`. This invalidates non-global TLB entries.
+- `switch_to()`: Swaps the kernel stack pointer (`RSP`), base pointer (`RBP`), and callee-saved registers. Loading `RSP` causes the subsequent `RET` instruction to pop the next task's instruction pointer (`RIP`), resuming its execution stream seamlessly.
+
+---
+
+## 3. Memory Architecture: Paging, Demand Faults & Address Spaces
+
+Modern 64-bit architectures (x86-64 / ARM64) employ 4-level or 5-level hierarchical page tables to translate a 48-bit or 57-bit virtual address into a physical memory address:
+
+```
+Virtual Address [47:0]:
+[47:39] Page Global Directory (PGD) - 9 bits (512 entries)
+[38:30] Page Upper Directory (PUD)   - 9 bits (512 entries)
+[29:21] Page Middle Directory (PMD)  - 9 bits (512 entries)
+[20:12] Page Table Entry (PTE)       - 9 bits (512 entries)
+[11:0]  Physical Offset              - 12 bits (4096 bytes per page)
 ```
 
-### Context Switching
+### 3.1 Demand Paging and Page Fault Handling
 
-When the scheduler selects a new task, `context_switch()` performs the transition:
+When a process requests memory via `mmap()` or `brk()`, the kernel merely creates or expands a Virtual Memory Area (`vm_area_struct`) without allocating physical DRAM. Physical memory is allocated on demand:
 
-1. **Switch memory context**: Load new process's page table base (CR3 on x86-64) via `switch_mm()`
-2. **Switch execution context**: Save/restore registers, stack pointer, instruction pointer via `switch_to()`
+```mermaid
+flowchart TD
+    subgraph HW ["Hardware Execution"]
+        A["User Memory Read/Write"] --> B["Virtual Address Accessed"]
+        B --> C["MMU finds PTE Present bit = 0"]
+        C --> D["Hardware triggers Interrupt 14 (Page Fault Exception)"]
+    end
 
-```c
-// kernel/sched/core.c (simplified)
-static __always_inline struct rq *
-context_switch(struct rq *rq, struct task_struct *prev, struct task_struct *next)
-{
-    struct mm_struct *mm, *oldmm;
-    
-    prepare_task_switch(rq, prev, next);
-    
-    mm = next->mm;
-    oldmm = prev->active_mm;
-    
-    //
+    subgraph SW ["OS Software Handling"]
+        D --> E["handle_mm_fault() allocates physical struct page"]
+        E --> F["PTE populated with Physical Frame Base | Flags"]
+    end
+
+    F --> G["Execution resumes at original faulting instruction"]
+```
+
+---
+
+## 4. Summary & Verification Matrix
+
+| Architectural Subsystem | Primary Abstraction | Key Kernel Data Structure | Hardware Enforcement Point |
+|:---|:---|:---|:---|
+| **Process State** | Thread / Task Execution | `struct task_struct` | Ring 0 / Ring 3 Privilege Levels |
+| **Memory Isolation** | Virtual Address Space | `struct mm_struct` + Page Tables | MMU + CR3 Register |
+| **Dynamic Allocation** | Memory Areas | `struct vm_area_struct` | Interrupt 14 (Page Fault) |
+| **Context Transition** | Preemptive Switch | `switch_to()` + `switch_mm()` | Stack Pointer + TLB Invalidation |

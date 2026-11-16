@@ -230,8 +230,8 @@ graph TB
         K --> L[Application Process]
     end
     
-    style E fill:#ff9999
-    style K fill:#99ccff
+    style E fill:#ff9999,color:#0f172a
+    style K fill:#99ccff,color:#0f172a
 ```
 
 The `containerd-shim` serves a critical role: it persists after `runc` exits, allowing containerd to restart without disrupting running containers. The shim:
@@ -270,8 +270,8 @@ graph LR
         B2 -->|veth| B1[Container B]
     end
     
-    style A2 fill:#ffcc99
-    style B2 fill:#ffcc99
+    style A2 fill:#ffcc99,color:#0f172a
+    style B2 fill:#ffcc99,color:#0f172a
 ```
 
 **CNI (Container Network Interface)**: A specification and library for configuring network interfaces in Linux containers. CNI plugins are executables that configure networking based on JSON input:
@@ -362,7 +362,7 @@ Total cold-start latency typically ranges 50-200ms, orders of magnitude faster t
 - **Large images**: Pulling multi-GB images over network dominates startup time
 - **Registry latency**: Distant or rate-limited registries create bottlenecks
 
-**Runtime Overhead**: Namespace and cgroup overhead is typically <2% CPU and <1% memory compared to bare-metal execution. The primary costs are:
+**Runtime Overhead**: Namespace and cgroup overhead is typically < 2% CPU and < 1% memory compared to bare-metal execution. The primary costs are:
 - **Syscall filtering** (seccomp): ~5-10% overhead for syscall-heavy workloads
 - **Network address translation** (iptables MASQUERADE): ~1-5% throughput reduction for bridge-mode networking
 - **Filesystem indirection** (OverlayFS): ~2-8% I/O latency increase for write-heavy workloads due to copy-on-write
@@ -759,9 +759,9 @@ graph TB
         N -->|external| O[Internet]
     end
     
-    style E fill:#ffcccc
-    style I fill:#ccffcc
-    style K fill:#ccccff
+    style E fill:#ffcccc,color:#0f172a
+    style I fill:#ccffcc,color:#0f172a
+    style K fill:#ccccff,color:#0f172a
 ```
 
 This architecture demonstrates the complete stack from user command to isolated process execution, showing how kernel primitives combine to provide containerization's security and resource isolation guarantees. The system maintains strict separation between control plane (Docker/containerd) and data plane (runc/kernel), enabling daemon restarts without container disruption through the containerd-shim persistence layer.

@@ -131,24 +131,26 @@ The most common failure mode in anomaly-based NIDS is not false negatives but fa
 
 The geometric question of where to place sensors in a network topology is a constrained optimization problem with no universal solution, but several governing principles reduce the solution space significantly. The first principle is that sensors must observe traffic at points of maximum coverage per sensor, which typically means ingress/egress boundaries rather than internal segments. A sensor at the perimeter firewall's inside interface sees all external traffic entering and leaving the organization. A sensor at the datacenter core switch sees all east-west traffic between servers. These two populations of traffic have fundamentally different threat profiles — perimeter traffic is dominated by exploitation attempts, C2 beaconing, and exfiltration; east-west traffic is dominated by lateral movement, internal reconnaissance, and privilege escalation.
 
-```
-                         Internet
-                             │
-                    ┌────────┴────────┐
-                    │  Edge Firewall  │
-                    └────────┬────────┘
-                             │
-                    ┌────────┴────────┐  ◄── Sensor A (perimeter NIDS)
-                    │   Core Switch   │       Sees all N/S traffic
-                    └───┬────────┬───┘
-                        │        │
-              ┌─────────┴──┐  ┌──┴─────────┐
-              │  DMZ VLAN  │  │  Corp VLAN │
-              └─────┬──────┘  └──────┬─────┘
-                    │                │
-           ┌────────┴───┐   ┌───────┴────┐
-           │  Web Tier  │   │  DC Fabric │◄── Sensor B (internal NIDS)
-           └────────────┘   └────────────┘    Sees E/W lateral movement
+```mermaid
+flowchart TD
+    Internet["Internet"]
+    EdgeFW["Edge Firewall"]
+    CoreSwitch["Core Switch"]
+    SensorA["Sensor A<br/>(perimeter NIDS)<br/>Sees all N/S traffic"]
+    DMZVLAN["DMZ VLAN"]
+    CorpVLAN["Corp VLAN"]
+    WebTier["Web Tier"]
+    DCFabric["DC Fabric"]
+    SensorB["Sensor B<br/>(internal NIDS)<br/>Sees E/W lateral movement"]
+    
+    Internet --> EdgeFW
+    EdgeFW --> CoreSwitch
+    SensorA -.->|monitors| CoreSwitch
+    CoreSwitch --> DMZVLAN
+    CoreSwitch --> CorpVLAN
+    DMZVLAN --> WebTier
+    CorpVLAN --> DCFabric
+    SensorB -.->|monitors| DCFabric
 ```
 
 Encrypted traffic fundamentally changes the sensor placement calculus. TLS 1.3 with forward secrecy prevents passive decryption; a sensor on a mirrored port sees only ciphertext and can inspect only metadata (certificate SNI, JA3/JA3S fingerprints, flow byte patterns). Meaningful content inspection of encrypted traffic requires either TLS interception at a termination proxy (introducing a trusted root CA on all endpoints) or deployment of the sensor on the decrypted side of that proxy. TLS interception at scale introduces its own security risks — the interception proxy becomes a high-value target — and is frequently prohibited by compliance frameworks for encrypted healthcare or financial data.

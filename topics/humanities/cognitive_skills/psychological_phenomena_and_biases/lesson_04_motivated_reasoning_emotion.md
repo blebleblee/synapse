@@ -30,36 +30,63 @@ To effectively diagnose and counteract motivated reasoning biases, practitioners
 
 Confirmation bias operates through four distinct but interrelated mechanisms. The search asymmetry mechanism drives individuals to preferentially seek out evidence supporting their hypothesis while failing to search for or attend to potentially disconfirming evidence. An intelligence analyst convinced that a foreign power intends hostile action will actively search classified databases for signs of military buildup or threatening rhetoric while failing to search for evidence of diplomatic overtures or domestic political constraints limiting aggressive action. The interpretation asymmetry mechanism processes ambiguous evidence through hypothesis-congruent lenses. A manager believing that a particular employee lacks competence will interpret mixed performance data as confirming incompetence, attributing successes to external factors while attributing failures to dispositional inadequacy. The memory asymmetry mechanism preferentially encodes and retrieves hypothesis-consistent information. When later asked to recall evidence bearing on the hypothesis, individuals disproportionately remember supporting instances while forgetting or minimizing contradictory cases. The weighting asymmetry mechanism subjects uncongenial evidence to intense methodological scrutiny while accepting congenial evidence with minimal verification, creating what Philip Tetlock termed "asymmetric skepticism."
 
-```
-CONFIRMATION BIAS OPERATIONAL FLOW
+```mermaid
+flowchart TD
+    H["Initial Hypothesis (H)"]
+    I["Emotional / Identity Investment"]
+    H --> I
 
-Initial Hypothesis (H) → Emotional/Identity Investment (I)
-                              ↓
-            ┌─────────────────┴─────────────────┐
-            ↓                                   ↓
-    Search Asymmetry                    Attention Filter
-    - Seek H-confirming sources        - Notice H-confirming details
-    - Avoid H-disconfirming sources    - Overlook H-disconfirming details
-            ↓                                   ↓
-            └─────────────────┬─────────────────┘
-                              ↓
-                    Evidence Encountered (E)
-                              ↓
-            ┌─────────────────┴─────────────────┐
-            ↓                                   ↓
-    If E confirms H:                    If E contradicts H:
-    - Accept uncritically               - Scrutinize methodology
-    - Encode strongly in memory         - Search for alternative explanations
-    - Weight heavily in judgment        - Minimize or dismiss
-    - Retrieve readily later            - Encode weakly or not at all
-            ↓                                   ↓
-            └─────────────────┬─────────────────┘
-                              ↓
-                 Strengthened Belief in H
-                              ↓
-                    Increased Investment (I)
-                              ↓
-                      [Loop reinforces]
+    I --> SA
+    I --> AF
+
+    subgraph acquisition ["Information Acquisition Bias"]
+        SA["Search Asymmetry
+        • Seek H-confirming sources
+        • Avoid H-disconfirming sources"]
+        AF["Attention Filter
+        • Notice H-confirming details
+        • Overlook H-disconfirming details"]
+    end
+
+    SA --> E
+    AF --> E
+
+    E["Evidence Encountered (E)"]
+
+    E --> EC
+    E --> ED
+
+    subgraph processing ["Evidence Processing Bias"]
+        EC["E Confirms H
+        • Accept uncritically
+        • Encode strongly in memory
+        • Weight heavily in judgment
+        • Retrieve readily later"]
+        ED["E Contradicts H
+        • Scrutinize methodology
+        • Search for alternative explanations
+        • Minimize or dismiss
+        • Encode weakly or not at all"]
+    end
+
+    EC --> SB
+    ED --> SB
+
+    SB["Strengthened Belief in H"]
+    SB --> II["Increased Investment in H"]
+    II -->|"Loop reinforces"| I
+
+    style H fill:#4A90D9,color:#fff,stroke:#2c5f8a
+    style I fill:#7B68EE,color:#fff,stroke:#4a3fa0
+    style II fill:#7B68EE,color:#fff,stroke:#4a3fa0
+    style SA fill:#E8F4FD,stroke:#4A90D9
+    style AF fill:#E8F4FD,stroke:#4A90D9
+    style E fill:#F0F0F0,stroke:#888,color:#222
+    style EC fill:#D4EDDA,stroke:#28a745,color:#155724
+    style ED fill:#F8D7DA,stroke:#dc3545,color:#721c24
+    style SB fill:#FFF3CD,stroke:#e0a800,color:#333
+    style acquisition fill:#EAF4FC,stroke:#4A90D9,color:#2c5f8a
+    style processing fill:#FCF3F3,stroke:#c0a0a0,color:#5a2020
 ```
 
 Belief perseverance mechanisms operate through the construction of self-sustaining causal narratives. When individuals encounter initial evidence for a proposition, they do not merely encode the evidence itself but immediately begin generating explanatory stories connecting the evidence to broader schemas and causal models. These explanations proliferate rapidly through associative memory networks, linking the focal belief to related concepts, personal experiences, and general theories. Once constructed, these narrative structures become psychologically real and accessible independent of the original evidence. When that evidence is later discredited, individuals have difficulty dismantling the intricate web of explanations, counterfactual scenarios, and causal attributions they constructed. The belief becomes embedded in a rich cognitive context that survives the destruction of its original foundation.
@@ -70,32 +97,35 @@ Cognitive dissonance reduction exhibits a characteristic temporal and strategic 
 
 When these strategies fail, individuals engage in more elaborate rationalization, adding new cognitions that bridge the inconsistency without genuinely resolving it. The smoker might adopt beliefs about the stress-reduction benefits of smoking outweighing health costs, or embrace fatalistic beliefs about mortality making health-protective behavior pointless. Only when all these strategies prove inadequate do individuals undertake the most psychologically costly strategy: genuine belief or behavior change aligned with reality. The asymmetry is striking—cognitive dissonance motivates change, but the change is overwhelmingly directed toward belief adjustment, rationalization, and defensive information processing rather than behavioral adaptation or accurate belief updating.
 
-```
-COGNITIVE DISSONANCE REDUCTION HIERARCHY
+```mermaid
+flowchart TD
+    A["Inconsistency Detected\n(Behavior contradicts Belief)"]
+    B["Physiological Arousal\n(Aversive State)"]
 
-Inconsistency Detected (Behavior contradicts Belief)
-            ↓
-Physiological Arousal (Aversive State)
-            ↓
-┌───────────┴──────────────────────────────────────┐
-│ STRATEGY DEPLOYMENT (Minimum Cost → Maximum Cost)│
-└───────────┬──────────────────────────────────────┘
-            ↓
-    LEVEL 1: Trivialization
-    └─ Reframe inconsistent elements as unimportant
-    └─ "It doesn't really matter"
-            ↓ [If arousal persists]
-    LEVEL 2: Selective Exposure
-    └─ Avoid dissonance-intensifying information
-    └─ Seek consonant information
-            ↓ [If arousal persists]
-    LEVEL 3: Rationalization / Add Bridging Cognitions
-    └─ Generate new beliefs that reconcile inconsistency
-    └─ "Actually, there are hidden benefits that justify this"
-            ↓ [If arousal persists]
-    LEVEL 4: Genuine Change (RARE)
-    └─ Modify behavior to match belief
-    └─ Update belief to match reality
+    subgraph strategy ["STRATEGY DEPLOYMENT (Minimum Cost → Maximum Cost)"]
+        L1["Level 1: Trivialization"]
+        L1a["Reframe inconsistent elements as unimportant\n'It doesn't really matter'"]
+
+        L2["Level 2: Selective Exposure"]
+        L2a["Avoid dissonance-intensifying information\nSeek consonant information"]
+
+        L3["Level 3: Rationalization / Add Bridging Cognitions"]
+        L3a["Generate new beliefs that reconcile inconsistency\n'Actually, there are hidden benefits that justify this'"]
+
+        L4["Level 4: Genuine Change (RARE)"]
+        L4a["Modify behavior to match belief\nUpdate belief to match reality"]
+
+        L1 --> L1a
+        L1a -->|"If arousal persists"| L2
+        L2 --> L2a
+        L2a -->|"If arousal persists"| L3
+        L3 --> L3a
+        L3a -->|"If arousal persists"| L4
+        L4 --> L4a
+    end
+
+    A --> B
+    B --> strategy
 ```
 
 Emotional reasoning operates through a process of affect-as-information, where emotional states serve as heuristic cues about external reality. The mechanism begins with automatic emotional reactions triggered by stimuli—a proposal, a person, a scenario. These reactions occur rapidly, often before conscious awareness or deliberative analysis. The critical step involves misattributing these emotional reactions: instead of recognizing them as information about our internal state, values, or past experiences, we interpret them as evidence about the external stimulus itself. Fear about air travel becomes evidence that air travel is dangerous, despite statistical evidence of its safety. Moral disgust toward a policy becomes evidence of the policy's objective wrongness, independent of consequentialist analysis of its effects.
@@ -108,31 +138,28 @@ Second, individuals engage in essentialist thinking about emotional impacts, tre
 
 Third, individuals neglect their own psychological immune system—the constellation of rationalization, reframing, and coping mechanisms that will activate post-event. We predict feeling devastated by rejection but fail to anticipate that we will generate explanations minimizing the rejection's significance, discover hidden benefits in the alternative path, and recruit social support that buffers the emotional impact. These forecasting errors systematically distort decision-making whenever expected emotional consequences factor into cost-benefit analysis, which is almost always.
 
-```
-AFFECTIVE FORECASTING ERROR ARCHITECTURE
-
-Decision Point → Simulate Future Emotional State (E_predicted)
-                          ↓
-            ┌─────────────┴─────────────────┐
-            ↓                               ↓
-      FOCALISM                      ESSENTIALIST THINKING
-      - Overweight focal event      - Treat event as having
-      - Underweight other factors     intrinsic emotional value
-      - Imagine peak moment only    - Ignore construal dependence
-            ↓                               ↓
-            └─────────────┬─────────────────┘
-                          ↓
-              IMMUNE NEGLECT
-              - Fail to anticipate rationalization
-              - Fail to anticipate adaptation (hedonic treadmill)
-              - Fail to anticipate reframing and coping
-                          ↓
-            E_predicted >> E_actual (Impact Bias)
-            T_predicted >> T_actual (Durability Bias)
-                          ↓
-          Distorted Cost-Benefit Analysis
-          - Overvalue emotionally positive outcomes
-          - Overweight emotionally negative outcomes
+```mermaid
+flowchart TD
+    A["Decision Point"]
+    B["Simulate Future Emotional State<br/>(E_predicted)"]
+    
+    C["FOCALISM<br/>• Overweight focal event<br/>• Underweight other factors<br/>• Imagine peak moment only"]
+    
+    D["ESSENTIALIST THINKING<br/>• Treat event as having<br/>intrinsic emotional value<br/>• Ignore construal dependence"]
+    
+    E["IMMUNE NEGLECT<br/>• Fail to anticipate rationalization<br/>• Fail to anticipate adaptation<br/>(hedonic treadmill)<br/>• Fail to anticipate reframing<br/>and coping"]
+    
+    F["E_predicted ≫ E_actual<br/>(Impact Bias)<br/><br/>T_predicted ≫ T_actual<br/>(Durability Bias)"]
+    
+    G["Distorted Cost-Benefit Analysis<br/>• Overvalue emotionally<br/>positive outcomes<br/>• Overweight emotionally<br/>negative outcomes"]
+    
+    A --> B
+    B --> C
+    B --> D
+    C --> E
+    D --> E
+    E --> F
+    F --> G
 ```
 
 Optimism and pessimism biases exhibit characteristic signatures in probability estimation and risk assessment. Unrealistic optimism manifests as systematically lower risk estimates for oneself compared to statistical base rates for similar individuals. When asked to estimate the likelihood of divorce, job loss, serious illness, or accident, optimistically biased individuals provide estimates well below actuarial frequencies, particularly for negative events perceived as controllable. The mechanism involves an illusion of control: individuals overweight the influence of their own skill, effort, and intentionality while underweighting situational factors, random variation, and base rates. This creates a predictable asymmetry: I am less likely than others to experience negative controllable events because I am more careful, skilled, or attentive, while statistical others suffer misfortune due to their carelessness or inadequacy.

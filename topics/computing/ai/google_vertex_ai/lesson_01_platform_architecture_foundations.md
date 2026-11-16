@@ -26,55 +26,52 @@ The separation of control plane from data plane manifests physically in network 
 
 The internal architecture of Vertex AI decomposes into seven primary subsystems, each implementing a bounded context with well-defined API contracts and failure domain isolation. These subsystems communicate through asynchronous message queues backed by Pub/Sub for loose coupling, enabling independent scaling and fault tolerance. The orchestration layer coordinates multi-step workflows—such as hyperparameter tuning jobs that spawn dozens of parallel training trials—without holding open synchronous connections that could cascade failures.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      Client Layer                                │
-│  (Python SDK, REST API, gcloud CLI, Terraform Provider)          │
-└────────────────┬────────────────────────────────────────────────┘
-                 │
-                 ┼ HTTPS + IAM AuthN/AuthZ
-                 │
-┌────────────────▼────────────────────────────────────────────────┐
-│              API Gateway & Control Plane                         │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  Resource State Machine (Spanner-backed ACID semantics)  │  │
-│  │  - Dataset, Model, Endpoint, TrainingPipeline, etc.      │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  IAM Policy Evaluation Engine                             │  │
-│  │  (Zanzibar-derived relationship graph traversal)          │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  Quota Management (hierarchical token bucket)             │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└────────────────┬────────────────────────────────────────────────┘
-                 │
-                 ┼ Internal RPC (gRPC + Protocol Buffers)
-                 │
-┌────────────────┴────────────────────────────────────────────────┐
-│                  Execution Substrate                             │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │   Training   │  │  Prediction  │  │   Feature    │          │
-│  │   Runtime    │  │   Serving    │  │    Store     │          │
-│  │              │  │              │  │              │          │
-│  │ • GPU/TPU    │  │ • TF Serving │  │ • Bigtable   │          │
-│  │   provisioner│  │ • Custom     │  │   point      │          │
-│  │ • Distributed│  │   containers │  │   lookups    │          │
-│  │   checkpoints│  │ • Autoscaling│  │ • BigQuery   │          │
-│  └──────────────┘  └──────────────┘  │   batch      │          │
-│                                       │   serving    │          │
-│                                       └──────────────┘          │
-└─────────────────────────────────────────────────────────────────┘
-                 │
-                 ┼ Data Plane
-                 │
-┌────────────────▼────────────────────────────────────────────────┐
-│              Storage & Metadata Layer                            │
-│  • Cloud Storage (model artifacts, training data)                │
-│  • ML Metadata (experiment lineage, artifact tracking)           │
-│  • Cloud Logging (structured audit trails)                       │
-│  • Cloud Monitoring (time-series metrics, alerting)              │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph client ["Client Layer"]
+        CL["Python SDK · REST API · gcloud CLI · Terraform Provider"]
+    end
+
+    subgraph control ["API Gateway & Control Plane"]
+        RSM["Resource State Machine
+        (Spanner-backed ACID semantics)
+        — Dataset, Model, Endpoint, TrainingPipeline, etc."]
+        IAM["IAM Policy Evaluation Engine
+        (Zanzibar-derived relationship graph traversal)"]
+        QM["Quota Management
+        (hierarchical token bucket)"]
+    end
+
+    subgraph execution ["Execution Substrate"]
+        TR["Training Runtime
+        ───────────────
+        • GPU/TPU provisioner
+        • Distributed checkpoints"]
+        PS["Prediction Serving
+        ───────────────
+        • TF Serving
+        • Custom containers
+        • Autoscaling"]
+        FS["Feature Store
+        ───────────────
+        • Bigtable point lookups
+        • BigQuery batch serving"]
+    end
+
+    subgraph storage ["Storage & Metadata Layer"]
+        GCS["Cloud Storage
+        (model artifacts, training data)"]
+        MLMD["ML Metadata
+        (experiment lineage, artifact tracking)"]
+        LOG["Cloud Logging
+        (structured audit trails)"]
+        MON["Cloud Monitoring
+        (time-series metrics, alerting)"]
+    end
+
+    client -->|"HTTPS + IAM AuthN/AuthZ"| control
+    control -->|"Internal RPC (gRPC + Protocol Buffers)"| execution
+    execution -->|"Data Plane"| storage
 ```
 
 The **API Gateway** component implements Google's standard API management infrastructure—rate limiting via distributed token bucket algorithms, request logging for audit compliance, and protocol translation between REST/JSON and internal gRPC services. Every API request undergoes a multi-stage validation pipeline. First, the TLS certificate chain is verified against Google Trust Services' root certificate authority. Second, the OAuth2 bearer token or service account JWT is validated, and the associated principal identity is extracted. Third, IAM policy evaluation occurs by querying the Zanzibar-derived authorization database, which represents permissions as a directed acyclic graph of role bindings, group memberships, and Org Policy constraints. This evaluation typically completes in single-digit milliseconds due to aggressive caching and batched policy evaluation, but under extreme load—such as a batch job querying permissions for 10,000 models—the cache miss penalty can escalate to hundreds of milliseconds per request.

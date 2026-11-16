@@ -38,37 +38,24 @@ The practical consequence for the programmer is that synapse density and sparsit
 
 The following diagram illustrates the internal signal path from a spike event to a membrane potential update on a single Loihi 2 core:
 
-```
-Incoming Spike Packet (from mesh router)
-           │
-           ▼
-  ┌─────────────────────┐
-  │   Spike Scheduler   │  ◄── Delay buffer (ring buffer, 1–62 timestep slots)
-  └─────────┬───────────┘
-            │  (after delay elapses)
-            ▼
-  ┌─────────────────────┐
-  │  Synaptic Fan-Out   │  ◄── Reads CSR synapse table from local SRAM
-  │      Engine         │      (presynaptic neuron ID → weight × compartment pairs)
-  └─────────┬───────────┘
-            │  (weighted input current)
-            ▼
-  ┌─────────────────────────────────────┐
-  │   Compartment Accumulator Array     │  ◄── 8,192 compartment registers
-  │   (one entry per neuron per core)   │      updated via atomic add
-  └─────────┬───────────────────────────┘
-            │
-            ▼  (at timestep boundary)
-  ┌─────────────────────┐
-  │   Neuron Dynamics   │  ◄── LIF update: decay V, add I_syn, check threshold
-  │      Processor      │
-  └─────────┬───────────┘
-            │  (if V > V_threshold)
-            ▼
-  ┌─────────────────────┐
-  │   Spike Generation  │  ◄── Emits spike packet: (dest_core, neuron_id, delay)
-  │   & Mesh Routing    │      injected into on-chip network
-  └─────────────────────┘
+```mermaid
+flowchart TD
+    A["Incoming Spike Packet<br/>(from mesh router)"]
+    B["Spike Scheduler"]
+    C["Delay buffer<br/>(ring buffer, 1–62 timestep slots)"]
+    D["Synaptic Fan-Out Engine"]
+    E["CSR synapse table from local SRAM<br/>(presynaptic neuron ID → weight × compartment pairs)"]
+    F["Compartment Accumulator Array<br/>(8,192 compartment registers)<br/>one entry per neuron per core<br/>updated via atomic add"]
+    G["Neuron Dynamics Processor<br/>LIF update: decay V, add I_syn, check threshold"]
+    H["Spike Generation & Mesh Routing<br/>Emits spike packet: (dest_core, neuron_id, delay)<br/>injected into on-chip network"]
+    
+    A --> B
+    C -.-> B
+    B -->|"after delay elapses"| D
+    E -.-> D
+    D -->|"weighted input current"| F
+    F -->|"at timestep boundary"| G
+    G -->|"if V > V_threshold"| H
 ```
 
 This pipeline runs in lockstep across all cores, synchronized by a global timestep barrier. Every core advances together, which eliminates the race conditions that would otherwise arise when spikes cross core boundaries mid-timestep. The barrier is implemented as a hardware synchronization tree rooted at the mesh controller; the latency of a full timestep on Loihi 2 is on the order of 10–100 microseconds of wall-clock time depending on network activity.
@@ -131,28 +118,38 @@ The host-neuromorphic boundary is managed through two hardware mechanisms: spike
 
 For a sensory processing pipeline—say, processing events from a Dynamic Vision Sensor (DVS) camera—the data flow looks like this:
 
-```
-DVS Camera (USB3)
-      │  raw event stream: (x, y, polarity, timestamp) tuples at ~1M events/sec
-      ▼
-Host CPU (preprocessing)
-      │  bin events into 1ms timestep windows
-      │  map (x,y,polarity) → neuron ID
-      │  pack spike list: array of uint16 neuron IDs
-      ▼
-PCIe DMA → Spike Injector Channel → Mesh Router → Input Population
-                                                         │
-                                              Neuromorphic cores process
-                                              N timesteps of inference
-                                                         │
-                                              Output Population fires
-                                                         │
-                                        Spike Probe → DMA → Host memory
-      ▼
-Host CPU (decode)
-      │  classify output spike population activity
-      ▼
-Application
+```mermaid
+flowchart TD
+    DVS["DVS Camera (USB3)"]
+    CPU_PRE["Host CPU\n(Preprocessing)"]
+    DMA_IN["PCIe DMA"]
+    SPIKE_INJ["Spike Injector Channel"]
+    ROUTER["Mesh Router"]
+
+    subgraph neuromorphic ["Neuromorphic Chip"]
+        INPUT_POP["Input Population"]
+        CORES["Neuromorphic Cores\n(N timesteps of inference)"]
+        OUTPUT_POP["Output Population"]
+        PROBE["Spike Probe"]
+    end
+
+    DMA_OUT["PCIe DMA"]
+    HOST_MEM["Host Memory"]
+    CPU_DEC["Host CPU\n(Decode)"]
+    APP["Application"]
+
+    DVS -->|"raw event stream\n(x, y, polarity, timestamp)\n~1M events/sec"| CPU_PRE
+    CPU_PRE -->|"bin events into 1ms timestep windows\nmap (x,y,polarity) → neuron ID\npack spike list: uint16 neuron IDs"| DMA_IN
+    DMA_IN --> SPIKE_INJ
+    SPIKE_INJ --> ROUTER
+    ROUTER --> INPUT_POP
+    INPUT_POP --> CORES
+    CORES --> OUTPUT_POP
+    OUTPUT_POP --> PROBE
+    PROBE --> DMA_OUT
+    DMA_OUT --> HOST_MEM
+    HOST_MEM --> CPU_DEC
+    CPU_DEC -->|"classify output spike\npopulation activity"| APP
 ```
 
 The key performance constraint is that the entire round-trip—inject spikes, run N timesteps, read output spikes—must complete before the next batch of DVS events overflows the input buffer. At 1M events per second with 1ms timestep windows, the host has 1ms of wall-clock time per timestep iteration. On Loihi 2, a single-chip inference timestep for a moderately sized SNN (around 65,000 neurons) runs in approximately 50–80 microseconds, leaving substantial headroom. The host preprocessing and DMA transfer typically account for 200–400 microseconds, making them the dominant latency contributor—a fact that motivates keeping preprocessing on-chip or using FPGA-based spike encoding that bypasses the host CPU entirely.

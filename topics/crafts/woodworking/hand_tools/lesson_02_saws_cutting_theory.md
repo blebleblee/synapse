@@ -45,22 +45,37 @@ The kerf is not simply a slot. It is a dynamic channel whose geometry changes th
 
 The ASCII diagram below models a crosscut tooth pair in cross-section relative to the kerf walls.
 
-```
-Direction of Cut →
-
-   Left tooth set        Right tooth set
-   ◄── scores left ──    ── scores right ──►
-
-       /\      /\
-      /  \    /  \
-─────/    \──/    \─────   ← wood surface
-    |      ||      |
-    | ←set→||←set→ |
-    |      ||      |
-    └──────┘└──────┘        ← kerf floor
-      plate thickness
-      ←────────────→
-      kerf width (wider due to set)
+```mermaid
+flowchart TD
+    A["Direction of Cut →"]
+    
+    subgraph teeth["Tooth Configuration"]
+        B["Left Tooth Set<br/>◄── scores left ──"]
+        C["Right Tooth Set<br/>── scores right ──►"]
+    end
+    
+    subgraph cutting["Cutting Profile"]
+        D["Wood Surface"]
+        E["Kerf Floor"]
+    end
+    
+    subgraph measurements["Dimensions"]
+        F["Plate Thickness"]
+        G["Kerf Width<br/>wider due to set"]
+        H["Set Offset<br/>left ←set→ right"]
+    end
+    
+    A --> teeth
+    teeth --> cutting
+    D -->|"scores with set"| H
+    H -->|creates| G
+    F -->|defines| G
+    G -->|"bounded by"| E
+    
+    style A fill:#e1f5ff
+    style D fill:#fff3e0
+    style E fill:#f3e5f5
+    style G fill:#e8f5e9
 ```
 
 Each tooth's set puts it in contact with one wall of the kerf only. The plate itself contacts neither wall during a correctly set saw. This geometry means the saw steers like a boat with two outriggers: tiny lateral imbalances in the cut are corrected by increasing engagement on one wall. When you feel a saw "want to drift," it is communicating that one side of the kerf is offering more resistance than the other, and you should respond with posture correction rather than force.

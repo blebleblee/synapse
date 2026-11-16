@@ -20,32 +20,20 @@ Key scheduling is the mechanism by which a human-scale secret — 128 or 256 bit
 
 AES (Rijndael) operates on a 4×4 matrix of bytes called the **state**, representing the 128-bit block. Each of the 10 rounds (for AES-128) applies four transformations in sequence: SubBytes, ShiftRows, MixColumns, and AddRoundKey. The final round omits MixColumns to preserve the cipher's invertibility without additional complexity. Understanding the mechanical purpose of each layer is essential for both implementation and attack analysis.
 
-```
-AES-128 Round Function (Rounds 1–9)
-
-State (4×4 byte matrix)
-        │
-        ▼
-  ┌─────────────┐
-  │  SubBytes   │  ← S-box substitution (non-linear, GF(2⁸) inversion)
-  └──────┬──────┘
-         │
-         ▼
-  ┌─────────────┐
-  │  ShiftRows  │  ← Row i cyclically shifted left by i bytes (diffusion)
-  └──────┬──────┘
-         │
-         ▼
-  ┌─────────────┐
-  │ MixColumns  │  ← Matrix multiply over GF(2⁸) (inter-byte diffusion)
-  └──────┬──────┘
-         │
-         ▼
-  ┌─────────────┐
-  │ AddRoundKey │  ← XOR with 128-bit round subkey (key injection)
-  └─────────────┘
-         │
-       (next round)
+```mermaid
+flowchart TD
+    Start["State (4×4 byte matrix)"]
+    SubBytes["SubBytes<br/><small>S-box substitution (non-linear, GF(2⁸) inversion)</small>"]
+    ShiftRows["ShiftRows<br/><small>Row i cyclically shifted left by i bytes (diffusion)</small>"]
+    MixColumns["MixColumns<br/><small>Matrix multiply over GF(2⁸) (inter-byte diffusion)</small>"]
+    AddRoundKey["AddRoundKey<br/><small>XOR with 128-bit round subkey (key injection)</small>"]
+    Next["(next round)"]
+    
+    Start --> SubBytes
+    SubBytes --> ShiftRows
+    ShiftRows --> MixColumns
+    MixColumns --> AddRoundKey
+    AddRoundKey --> Next
 ```
 
 SubBytes applies the AES S-box to each of the 16 bytes independently. The S-box is constructed as the composition of a multiplicative inverse in GF(2⁸) (with 0 mapping to itself) followed by an affine transformation over GF(2). The multiplicative inverse is the nonlinear heart of the cipher: no affine function over GF(2⁸) can approximate it closely, which directly defeats linear cryptanalysis. The affine layer then ensures the S-box has no fixed points and no opposite fixed points (bytes mapping to their own complement), eliminating trivially exploitable algebraic structure.
@@ -58,29 +46,99 @@ MixColumns treats each column as a four-element vector over GF(2⁸) and multipl
 
 A block cipher is a building block, not a protocol. Encrypting messages longer than 128 bits requires a **mode of operation** that specifies how the block cipher is applied across multiple blocks. The mode determines whether the scheme achieves IND-CPA security, whether it supports parallel processing, and what failure modes emerge from nonce or IV reuse.
 
-```
-CBC Mode (Cipher Block Chaining)
-
-Encrypt:                        Decrypt:
- IV ──┐                          IV ──┐
-      ▼                               ▼
-P₁ → XOR → AES_K → C₁ → ──► C₁ → AES_K⁻¹ → XOR → P₁
-                   │                           │
-P₂ → XOR ─────────┘    C₁ ─► C₂ → AES_K⁻¹ → XOR → P₂
-         → AES_K → C₂
+```mermaid
+flowchart LR
+    subgraph encrypt ["CBC Mode - Encrypt"]
+        direction LR
+        IV1["IV"]
+        P1["P₁"]
+        XOR1["⊕"]
+        AES1["AES_K"]
+        C1["C₁"]
+        P2["P₂"]
+        XOR2["⊕"]
+        AES2["AES_K"]
+        C2["C₂"]
+        
+        IV1 --> XOR1
+        P1 --> XOR1
+        XOR1 --> AES1
+        AES1 --> C1
+        C1 --> XOR2
+        P2 --> XOR2
+        XOR2 --> AES2
+        AES2 --> C2
+    end
+    
+    subgraph decrypt ["CBC Mode - Decrypt"]
+        direction LR
+        IV2["IV"]
+        C1D["C₁"]
+        AESD1["AES_K⁻¹"]
+        XOR3["⊕"]
+        P1D["P₁"]
+        C1D2["C₁"]
+        C2D["C₂"]
+        AESD2["AES_K⁻¹"]
+        XOR4["⊕"]
+        P2D["P₂"]
+        
+        IV2 --> XOR3
+        C1D --> AESD1
+        AESD1 --> XOR3
+        XOR3 --> P1D
+        C1D2 --> XOR4
+        C2D --> AESD2
+        AESD2 --> XOR4
+        XOR4 --> P2D
+    end
 ```
 
 In CBC mode, each plaintext block is XOR'd with the previous ciphertext block before encryption. The IV randomizes the first block, ensuring that two encryptions of the same message under the same key produce different ciphertexts. CBC achieves IND-CPA security when the IV is chosen uniformly at random and kept secret until after encryption begins — which is the precise source of the BEAST attack against TLS 1.0, where predictable IVs broke CBC's security in a chosen-plaintext context. CBC decryption is parallelizable (each C_i block can be decrypted independently given C_{i−1}), but encryption is strictly sequential. For firmware update pipelines and embedded flash programming, this sequentiality is a real throughput constraint.
 
 CTR mode eliminates the sequential dependency entirely by transforming the block cipher into a stream cipher. A counter value concatenated with a nonce is encrypted to produce keystream blocks, which are XOR'd with plaintext blocks.
 
-```
-CTR Mode
-
-Nonce‖Counter₀ → AES_K → K₀ ─► XOR P₀ → C₀
-Nonce‖Counter₁ → AES_K → K₁ ─► XOR P₁ → C₁
-Nonce‖Counter₂ → AES_K → K₂ ─► XOR P₂ → C₂
-         (all AES_K calls are independent — fully parallelizable)
+```mermaid
+flowchart LR
+    subgraph block0 ["Block 0"]
+        N0["Nonce‖Counter₀"]
+        AES0["AES_K"]
+        K0["K₀"]
+        XOR0["⊕"]
+        P0["P₀"]
+        C0["C₀"]
+        
+        N0 --> AES0 --> K0 --> XOR0
+        P0 --> XOR0 --> C0
+    end
+    
+    subgraph block1 ["Block 1"]
+        N1["Nonce‖Counter₁"]
+        AES1["AES_K"]
+        K1["K₁"]
+        XOR1["⊕"]
+        P1["P₁"]
+        C1["C₁"]
+        
+        N1 --> AES1 --> K1 --> XOR1
+        P1 --> XOR1 --> C1
+    end
+    
+    subgraph block2 ["Block 2"]
+        N2["Nonce‖Counter₂"]
+        AES2["AES_K"]
+        K2["K₂"]
+        XOR2["⊕"]
+        P2["P₂"]
+        C2["C₂"]
+        
+        N2 --> AES2 --> K2 --> XOR2
+        P2 --> XOR2 --> C2
+    end
+    
+    style block0 fill:none,stroke:#999,stroke-dasharray: 5 5
+    style block1 fill:none,stroke:#999,stroke-dasharray: 5 5
+    style block2 fill:none,stroke:#999,stroke-dasharray: 5 5
 ```
 
 Both encryption and decryption in CTR mode are identical operations (keystream XOR), and both are fully parallelizable. Random access decryption — seeking to byte offset *n* in a ciphertext without decrypting preceding blocks — is trivially supported by computing the counter value for the target block directly. This property is exploited in full-disk encryption (dm-crypt, VeraCrypt) and embedded firmware storage where random read access to encrypted flash is required. The catastrophic failure mode of CTR is nonce reuse: if the same (key, nonce) pair generates the same keystream for two distinct plaintexts P₁ and P₂, an adversary who observes both ciphertexts C₁ and C₂ recovers C₁ XOR C₂ = P₁ XOR P₂, which leaks substantial plaintext information through statistical analysis and known-plaintext correlation.

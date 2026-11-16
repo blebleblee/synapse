@@ -22,27 +22,39 @@ The fundamental pricing relationship that ties all these instruments together is
 
 The structural anatomy of the forex market is best visualized as a tiered hierarchy where credit quality and transaction size determine at which layer a participant can access liquidity.
 
-```
-╔══════════════════════════════════════════════════════════════╗
-║              TIER 1: INTERDEALER MARKET                      ║
-║   JP Morgan │ Citi │ Deutsche Bank │ UBS │ HSBC │ Barclays   ║
-║   ─────────────────────────────────────────────────────────  ║
-║   EBS (CME Group) │ Reuters (Refinitiv) Matching            ║
-║   Bilateral Credit Lines │ ISDA Master Agreements           ║
-╠══════════════════════════════════════════════════════════════╣
-║              TIER 2: PRIME BROKERAGE LAYER                   ║
-║   Hedge Funds │ Asset Managers │ Institutional Prop Desks    ║
-║   Credit given via Prime Broker → access Tier 1 prices      ║
-║   FX ECNs: Currenex │ FXall │ 360T │ FX Connect             ║
-╠══════════════════════════════════════════════════════════════╣
-║              TIER 3: RETAIL AGGREGATION                      ║
-║   Retail FX Brokers (IG, OANDA, Saxo, Interactive Brokers)   ║
-║   Spread marked up 2–20x over interbank                      ║
-║   Internal matching (B-Book) or STP to Tier 2 (A-Book)      ║
-╠══════════════════════════════════════════════════════════════╣
-║              TIER 4: END RETAIL CLIENT                       ║
-║   Individual traders, small corporates, travel money         ║
-╚══════════════════════════════════════════════════════════════╝
+```mermaid
+flowchart TD
+    subgraph tier1["TIER 1: INTERDEALER MARKET"]
+        banks["JP Morgan | Citi | Deutsche Bank | UBS | HSBC | Barclays"]
+        infra["EBS CME Group | Reuters Refinitiv Matching"]
+        agreements["Bilateral Credit Lines | ISDA Master Agreements"]
+        banks --> infra
+        banks --> agreements
+    end
+
+    subgraph tier2["TIER 2: PRIME BROKERAGE LAYER"]
+        clients["Hedge Funds | Asset Managers | Institutional Prop Desks"]
+        pb["Prime Broker Credit Access → Tier 1 Prices"]
+        ecns["FX ECNs: Currenex | FXall | 360T | FX Connect"]
+        clients --> pb
+        clients --> ecns
+    end
+
+    subgraph tier3["TIER 3: RETAIL AGGREGATION"]
+        brokers["Retail FX Brokers: IG | OANDA | Saxo | Interactive Brokers"]
+        markup["Spread Markup: 2-20x over Interbank"]
+        routing["Internal Matching B-Book | STP to Tier 2 A-Book"]
+        brokers --> markup
+        brokers --> routing
+    end
+
+    subgraph tier4["TIER 4: END RETAIL CLIENT"]
+        retail["Individual Traders | Small Corporates | Travel Money"]
+    end
+
+    tier1 --> tier2
+    tier2 --> tier3
+    tier3 --> tier4
 ```
 
 Tier-1 banks are both liquidity providers and consumers. Deutsche Bank's FX desk might simultaneously be quoting EUR/USD to a hedge fund while itself trading through EBS to cover its resulting position. This dual role is fundamental to understanding how market makers actually operate: they are not passive order-takers but active position managers who internalize flow, net offsetting client orders against each other, and only externalize residual risk to the broader interdealer market.
@@ -53,22 +65,22 @@ The electronic broking systems at Tier 1—primarily EBS (now owned by CME Group
 
 A large macro hedge fund executing a $500 million USD/JPY order operates through a prime broker—say, Goldman Sachs Prime Services. Goldman extends the fund a credit line and effectively stands between the fund and the market. When the fund wants to execute, it sends orders to executing dealers (which may include non-Goldman banks), but those orders are novated through Goldman. The executing dealer sees Goldman as the counterparty—not the hedge fund—so the fund's ability to access deep interbank liquidity depends entirely on the reputation and balance sheet of its prime broker.
 
-```
-Hedge Fund Order ($500M USD/JPY)
-           │
-           ▼
-  Prime Broker (Goldman Sachs)
-  Novation / Credit Intermediation
-     │             │             │
-     ▼             ▼             ▼
-Exec Dealer A  Exec Dealer B  ECN (FXall)
-(Citi FX)     (Barclays FX)   (Market depth)
-     │             │             │
-     └─────────────┴─────────────┘
-                   │
-                   ▼
-         Interdealer Market / EBS
-         Residual position netting
+```mermaid
+flowchart TD
+    HF["Hedge Fund Order<br/>($500M USD/JPY)"]
+    PB["Prime Broker (Goldman Sachs)<br/>Novation / Credit Intermediation"]
+    EDA["Exec Dealer A<br/>(Citi FX)"]
+    EDB["Exec Dealer B<br/>(Barclays FX)"]
+    ECN["ECN (FXall)<br/>(Market depth)"]
+    IDM["Interdealer Market / EBS<br/>Residual position netting"]
+    
+    HF --> PB
+    PB --> EDA
+    PB --> EDB
+    PB --> ECN
+    EDA --> IDM
+    EDB --> IDM
+    ECN --> IDM
 ```
 
 The hedge fund's trading desk sees a consolidated position and a single margin account with Goldman. The executing dealers see Goldman as the credit principal. The interdealer market sees order flow from Goldman. This layering simultaneously enables access and obscures ultimate beneficial ownership, which is why regulators developed the reporting regimes under MiFIR and Dodd-Frank Title VII requiring trade reporting to swap data repositories.
@@ -85,23 +97,33 @@ For practitioners trading in size, the concept of **market impact** matters far 
 
 The T+2 settlement convention—delivery of the purchased currency two business days after trade date—is not an arbitrary convention but a reflection of the operational reality of correspondent banking. When a US counterparty buys euros from a French bank, the settlement requires the US party's dollar correspondent bank to send dollars to the French bank's dollar correspondent, while simultaneously the French bank's euro correspondent sends euros to the US party's euro correspondent. This four-cornered flow must be coordinated across time zones, payment systems (Fedwire in the US, TARGET2 in the eurozone, CHAPS in the UK), and clearing networks.
 
-```
-Trade Date (T):  Buyer and Seller agree: 10M EUR/USD at 1.0854
+```mermaid
+flowchart TD
+    TradeDate["<b>Trade Date (T)</b><br/>Buyer &amp; Seller agree:<br/>10M EUR/USD at 1.0854"]
 
-Settlement Date (T+2):
+    TradeDate --> SettlementDate
 
-   USD Flow:                        EUR Flow:
-   Buyer's USD                      Seller's EUR
-   Correspondent  ──$10.854M──▶    Correspondent
-   (New York)                       (Frankfurt)
-         │                                │
-         ▼                                ▼
-   Seller's USD                      Buyer's EUR
-   Correspondent                     Correspondent
-         │                                │
-         ▼                                ▼
-         Settlement via Fedwire          Settlement via TARGET2
-         (Fedwire Funds Service)         (ECB Real-Time Gross Settlement)
+    subgraph SettlementDate ["Settlement Date (T+2)"]
+
+        subgraph usd_flow ["USD Flow"]
+            BuyerUSDCorr["Buyer's USD Correspondent<br/>(New York)"]
+            SellerUSDCorr["Seller's USD Correspondent"]
+            Fedwire["Settlement via Fedwire<br/>(Fedwire Funds Service)"]
+
+            BuyerUSDCorr -- "$10.854M" --> SellerUSDCorr
+            SellerUSDCorr --> Fedwire
+        end
+
+        subgraph eur_flow ["EUR Flow"]
+            SellerEURCorr["Seller's EUR Correspondent<br/>(Frankfurt)"]
+            BuyerEURCorr["Buyer's EUR Correspondent"]
+            TARGET2["Settlement via TARGET2<br/>(ECB Real-Time Gross Settlement)"]
+
+            SellerEURCorr -- "€10M" --> BuyerEURCorr
+            BuyerEURCorr --> TARGET2
+        end
+
+    end
 ```
 
 The systemic risk embedded in this arrangement—that one leg of the exchange might fail even after the other has settled—is called Herstatt risk, named after the 1974 failure of Bankhaus Herstatt, a German bank that received Deutsche Marks from its counterparties but was closed by regulators before it could deliver the corresponding dollars. CLS Bank International (Continuous Linked Settlement) was created specifically to eliminate this risk through payment-versus-payment settlement, where both legs of a trade settle simultaneously across CLS's books. CLS now settles over $6 trillion daily across eighteen currencies, and participation in CLS is a prerequisite for any institution that wants to manage settlement risk at scale.

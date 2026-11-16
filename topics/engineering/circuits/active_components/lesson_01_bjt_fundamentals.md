@@ -38,25 +38,29 @@ The physical structure of a modern planar BJT emerges from sophisticated fabrica
 
 Cross-sectional examination reveals critical geometric relationships. The emitter-base junction forms parallel to the silicon surface, with junction depth typically 0.2 to 0.5 micrometers. The base region, defined by the P-type diffusion depth, must remain thin enough (0.1 to 1 micrometer) to minimize recombination yet thick enough to avoid punch-through—a catastrophic condition where the collector-base depletion region extends completely through the base, shorting emitter to collector. The collector depth extends several micrometers, providing breakdown voltage capability through reduced electric field strength. Metallization connects to surface regions via ohmic contacts, with the emitter typically occupying the smallest area (high current density), base forming a ring around the emitter (minimizing base resistance), and collector contacted through the substrate or a buried N+ layer.
 
-```
-Cross-Section View (NPN BJT):
-                                
-    E (N+)           B (P)                C (N)
-     |                |                    |
-     |                |                    |
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  │  N+ (emitter)                         │
-  │  ─────────────                        │  ← Surface
-  │      ↓                                │
-  │  P (base)  ←── ~0.5 µm thin          │
-  │  ═════════════════════════════        │
-  │          ↓                            │
-  │  N (collector epitaxial layer)        │
-  │  ───────────────────────────────      │
-  │                                       │
-  │  N+ (buried layer, low resistance)    │
-  └───────────────────────────────────────┘
-           N (substrate, bulk collector)
+```mermaid
+flowchart TD
+    E["E (N+)<br/>Emitter Terminal"]
+    B["B (P)<br/>Base Terminal"]
+    C["C (N)<br/>Collector Terminal"]
+    
+    E --> NP["N+ Emitter Region<br/>(Heavily Doped)"]
+    B --> PBase["P Base Region<br/>(~0.5 µm thin)"]
+    C --> NCol["N Collector Epitaxial Layer"]
+    
+    NP --> PBase
+    PBase --> NCol
+    NCol --> NBuried["N+ Buried Layer<br/>(Low Resistance)"]
+    NBuried --> NSub["N Substrate<br/>(Bulk Collector)"]
+    
+    style E fill:#ffcccc
+    style B fill:#ccffcc
+    style C fill:#ccccff
+    style NP fill:#ff9999
+    style PBase fill:#99ff99
+    style NCol fill:#9999ff
+    style NBuried fill:#ff6666
+    style NSub fill:#6666ff
 ```
 
 Carrier dynamics within this structure determine transistor performance. When forward bias V_BE exceeds the built-in potential (approximately 0.6 to 0.7 V at room temperature), the emitter-base junction injects electrons into the base. The minority carrier concentration at the emitter edge of the base rises exponentially: n_p(0) = n_p0 e^(V_BE/V_T), where n_p0 represents the thermal equilibrium minority concentration. At the collector edge, the reverse-biased CBJ maintains near-zero minority carrier concentration: n_p(W_B) ≈ 0, where W_B denotes the neutral base width. This boundary condition forces a linear concentration gradient across the base (assuming low-level injection where minority carriers remain negligible compared to majority holes).

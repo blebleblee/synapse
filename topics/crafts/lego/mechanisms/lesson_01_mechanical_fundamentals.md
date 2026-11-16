@@ -38,19 +38,29 @@ The Technic pin system introduces a fundamentally different connection type: the
 
 The Technic axle introduces torque transfer capability. The axle has a nominal diameter of 4.8mm but is not cylindrical—it has a cross-shaped splined cross-section. The four splines engage with matching internal splines in gears, bushings, and liftarm axle holes. This design is a precision engineering choice that resolves a fundamental tension in shaft design. A fully cylindrical shaft would require a tight fit to transmit torque without slipping, but a tight fit creates high friction and makes assembly difficult. A loose fit reduces friction but introduces backlash and allows the shaft to rock within its bearing. The splined cross-section solves this by transmitting torque through four line contacts at the spline tips while maintaining clearance in the valleys between splines. The result is a shaft that transmits torque efficiently while rotating with minimal friction and without perceptible backlash.
 
-```
-    Technic Axle Cross-Section (end view)
-    
-           ╱╲
-          ╱  ╲
-         │  ✕  │        Four splines transmit torque
-          ╲  ╱          Valleys provide clearance
-           ╲╱           Nominal Ø: ~4.8mm
-    
-    Contact: 4 line contacts at spline tips
-    Bushing inner Ø: ~4.9mm
-    Torque transmission: via spline tip engagement
-    Rotational friction: low (small contact area)
+```mermaid
+flowchart TD
+    Title["Technic Axle Cross-Section — End View"]
+
+    subgraph sub_axle ["Axle Geometry"]
+        Spline["Four Splines — Transmit Torque"]
+        Valley["Valleys — Provide Clearance"]
+        AxleDia["Nominal Ø: ~4.8 mm"]
+    end
+
+    subgraph sub_interface ["Contact Interface"]
+        Contact["4 Line Contacts at Spline Tips"]
+        Bushing["Bushing Inner Ø: ~4.9 mm"]
+        Torque["Torque Transmission: Spline Tip Engagement"]
+        Friction["Rotational Friction: Low (Small Contact Area)"]
+    end
+
+    Title --> sub_axle
+    Title --> sub_interface
+    Spline --> Contact
+    Contact --> Torque
+    Contact --> Friction
+    AxleDia --> Bushing
 ```
 
 The torsional stiffness of a LEGO axle is finite and consequential. An axle behaves as a torsional spring with stiffness $k = GJ/L$, where $G$ is the shear modulus of ABS (approximately 0.8 GPa), $J$ is the polar moment of inertia of the splined cross-section (approximately 60–80 mm⁴ for a 4.8mm splined axle), and $L$ is the axle length. For a standard 6-stud (48mm) axle, the torsional stiffness works out to approximately 20 N·cm per degree of twist. Under a torque of 20 N·cm, this axle will twist approximately one degree. For a 12-stud (96mm) axle under the same load, the twist doubles to two degrees. In precision mechanisms—synchronized liftarms, multi-axis steering linkages, or timing-critical valve gear—this torsion produces measurable phase errors. The practical implication is straightforward: use the shortest axle that fits the application, and when torque is high, use parallel axles to split the load rather than a single long shaft.
@@ -59,21 +69,21 @@ The LEGO gear system is built on a single module: every standard spur gear has 8
 
 The gear ratio $R = N_{\text{driven}} / N_{\text{driver}}$ determines torque multiplication and speed reduction. An 8-tooth driver turning a 24-tooth driven gear produces $R = 3$, tripling the output torque and dividing the output speed by three. The torque multiplication is not free: the force at the gear mesh increases in inverse proportion to the pitch radius. For an input torque $T_{\text{in}}$ applied to an 8-tooth gear (pitch radius 4mm, half of the 8mm pitch diameter), the tangential force at the mesh is $F = T_{\text{in}} / 4\text{mm}$. This same force acts on the 24-tooth gear at its pitch radius of 12mm, producing an output torque of $T_{\text{out}} = F \times 12\text{mm} = (T_{\text{in}} / 4\text{mm}) \times 12\text{mm} = 3 \times T_{\text{in}}$, confirming the 3:1 ratio. The practical consequence is that the 8-tooth gear teeth carry three times the force per unit torque that the 24-tooth gear teeth carry, making the 8-tooth gear the limiting component in high-torque applications. With only four teeth in mesh at any instant and the smallest tooth cross-section of any standard gear, the 8-tooth gear is the weakest link. In high-load gear trains, always place 8-tooth gears on the low-torque (high-speed, input) side and use larger gears on the high-torque (low-speed, output) side.
 
-```
-    Gear Mesh: 8T driving 24T (2-stud center distance)
-
-              ╭───────╮
-         ╱────│  24T  │────╲
-        │     ╰───────╯     │
-    8T  │←───── 16mm ──────→│  (2 studs)
-    ╭─╮ │                     │
-    │8T│ │                     │
-    ╰─╯ │                     │
-         ╲───────────────────╱
-
-    R = 24/8 = 3:1
-    T_out = 3 × T_in × η   (η ≈ 0.95)
-    F_mesh = T_in / r_pitch = T_in / 4mm
+```mermaid
+flowchart TD
+    subgraph mesh ["Gear Mesh System"]
+        drive["8T Driving Gear<br/>r = 4mm"]
+        driven["24T Driven Gear<br/>r = 12mm"]
+        drive ---|"16mm center distance<br/>(2 studs)"| driven
+    end
+    
+    subgraph ratios ["Mechanical Parameters"]
+        gear_ratio["Gear Ratio<br/>R = 24/8 = 3:1"]
+        torque["Output Torque<br/>T_out = 3 × T_in × η<br/>(η ≈ 0.95)"]
+        mesh_force["Mesh Force<br/>F_mesh = T_in / r_pitch<br/>r_pitch = 4mm"]
+    end
+    
+    mesh --> ratios
 ```
 
 Force path analysis is the discipline of tracing how a load travels through a structure from its point of application to its point of reaction. In a LEGO structure, force paths run through studs in compression and shear, through pins in shear, through axles in torsion and bending, and through the ABS material of beams and liftarms in tension, compression, and bending. The integrity of a structure depends on every element in the force path being adequate for the load it carries, and on the path being continuous—unbroken by gaps, loose connections, or missing cross-bracing.
@@ -110,24 +120,45 @@ The most powerful structural technique in the LEGO system is triangulation using
 
 The challenge in LEGO triangulation is that the three vertices must land on the 8.0mm stud grid. Not all triangles achieve this; only right triangles whose legs are integer multiples of the stud pitch produce vertices that fall on grid points. These are the Pythagorean triples, and only two are practical within typical LEGO build scales: the 3-4-5 triple and the 5-12-13 triple. A 3-4-5 triangle has legs of 3 studs (24mm), 4 studs (32mm), and a hypotenuse of 5 studs (40mm). A 5-12-13 triangle has legs of 5 studs (40mm), 12 studs (96mm), and a hypotenuse of 13 studs (104mm). When you pin three liftarms of these lengths at their corners, the pins engage with Technic holes at the vertices and the resulting triangle is dimensionally perfect with zero gap and zero stress in the members at rest.
 
-```
-    Pythagorean Bracing in LEGO Technic
+```mermaid
+flowchart TD
+    subgraph concept ["Pythagorean Bracing in LEGO Technic"]
+        direction TB
+        intro["Grid-aligned right triangles using Pythagorean triples<br/>Pin at each vertex with Technic friction pins"]
+    end
 
-    3-4-5 Triangle:                      5-12-13 Triangle:
+    subgraph triangle_3_4_5 ["3-4-5 Triangle"]
+        direction TB
+        a1["Leg A: 3 studs (24mm)"]
+        a2["Leg B: 4 studs (32mm)"]
+        a3["Hypotenuse: 5 studs (40mm)"]
+        a1 ---|Right Angle| a2
+        a2 ---|Forms Triangle| a3
+        a3 ---|Closes| a1
+    end
 
-       4 studs (32mm)                       12 studs (96mm)
-    ┌──────────────┐                    ┌────────────────────────┐
-    │             5│                    │                      13│
-    │          studs│                    │                   studs │
-    │     (40mm)    │                    │  (104mm)               │
-    │               │                    │                        │
-    └─── 3 studs ──┘                    └────── 5 studs ────────┘
-       (24mm)                                (40mm)
+    subgraph triangle_5_12_13 ["5-12-13 Triangle"]
+        direction TB
+        b1["Leg A: 5 studs (40mm)"]
+        b2["Leg B: 12 studs (96mm)"]
+        b3["Hypotenuse: 13 studs (104mm)"]
+        b1 ---|Right Angle| b2
+        b2 ---|Forms Triangle| b3
+        b3 ---|Closes| b1
+    end
 
-    Both produce grid-aligned right triangles.
-    Pin at each vertex with Technic friction pins.
-    Frame is rigid under shear and torsional loads.
-    Zero gap, zero preload stress at assembly.
+    subgraph properties ["Structural Properties"]
+        direction TB
+        p1["Rigid under shear loads"]
+        p2["Rigid under torsional loads"]
+        p3["Zero gap at assembly"]
+        p4["Zero preload stress"]
+    end
+
+    concept --> triangle_3_4_5
+    concept --> triangle_5_12_13
+    triangle_3_4_5 --> properties
+    triangle_5_12_13 --> properties
 ```
 
 The 3-4-5 triangle is the workhorse of Technic bracing. It appears in chassis frames, in steering linkages, in gearbox housings, and in any structure that must resist torsion or shear. A rectangular frame made of four liftarms pinned at the corners is a parallelogram: it can shear into a rhombus under load. Add a single diagonal liftarm forming a 3-4-5 triangle across one corner, and the frame becomes rigid. This is the most efficient rigidity improvement in the LEGO system: one additional beam and two pins convert a floppy parallelogram into a rigid frame.

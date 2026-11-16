@@ -36,33 +36,65 @@ Bits [11:0]   →  Page offset    (12 bits, 4096 bytes)
 
 Each level is a 4 KiB table of 512 eight-byte entries. The root PML4 table's physical address is stored in the `CR3` register, which the kernel loads on every context switch to swap address spaces. Each entry at every level holds the physical base address of the next-level table (or the final physical frame at the PT level), along with control bits: Present (P), Read/Write (R/W), User/Supervisor (U/S), Execute-Disable (NX), Accessed (A), and Dirty (D).
 
-```
-Virtual Address (48-bit):
-┌──────────┬──────────┬──────────┬──────────┬────────────┐
-│ PML4[9b] │  PDP[9b] │  PD[9b]  │  PT[9b]  │ Offset[12] │
-└──────────┴──────────┴──────────┴──────────┴────────────┘
-     │            │         │         │
-     ▼            ▼         ▼         ▼
-   CR3──►PML4──►PDP──►PD──►PT──►Physical Frame
-                                        │
-                                        ▼
-                               Physical Address = Frame Base + Offset
+```mermaid
+flowchart TD
+    VA["Virtual Address (48-bit)"]
+    
+    subgraph va_parts ["Virtual Address Components"]
+        PML4["PML4 (9b)"]
+        PDP["PDP (9b)"]
+        PD["PD (9b)"]
+        PT["PT (9b)"]
+        OFFSET["Offset (12b)"]
+    end
+    
+    VA --> va_parts
+    
+    CR3["CR3 Register"]
+    PML4_TABLE["PML4 Table"]
+    PDP_TABLE["PDP Table"]
+    PD_TABLE["PD Table"]
+    PT_TABLE["PT Table"]
+    PHYS_FRAME["Physical Frame"]
+    PHYS_ADDR["Physical Address = Frame Base + Offset"]
+    
+    CR3 --> PML4_TABLE
+    PML4 --> PML4_TABLE
+    PML4_TABLE --> PDP_TABLE
+    PDP --> PDP_TABLE
+    PDP_TABLE --> PD_TABLE
+    PD --> PD_TABLE
+    PD_TABLE --> PT_TABLE
+    PT --> PT_TABLE
+    PT_TABLE --> PHYS_FRAME
+    OFFSET --> PHYS_ADDR
+    PHYS_FRAME --> PHYS_ADDR
 ```
 
 The MMU performs this walk autonomously in hardware, caching the result in the Translation Lookaside Buffer (TLB). The TLB is a small, fully-associative cache—typically 64 entries for the L1 iTLB, 64 for L1 dTLB, and a 1024-entry L2 stlb on recent Intel microarchitectures—that maps recently used virtual-to-physical page translations. On a TLB hit, translation costs zero cycles beyond the normal cache access. On a miss, the hardware page table walker performs a full four-level walk, touching four distinct cache lines from four tables scattered across physical memory, costing tens to hundreds of cycles depending on whether those entries are in the L2/L3 cache or require DRAM access.
 
 The kernel manages the page tables it creates per process. In Linux, the top of this structure is `mm_struct`, the memory management descriptor embedded (by pointer) in every `task_struct`. The `mm_struct` holds the PGD (Page Global Directory, the kernel's name for the PML4 root), the VMA (Virtual Memory Area) red-black tree, memory statistics, and the reference count for shared address spaces (threads sharing the same `mm_struct`). The VMA tree maps contiguous ranges of the virtual address space to their backing: anonymous memory, file-backed mappings, device memory, or special regions like the vDSO.
 
-```
-task_struct
-  └─► mm_struct
-        ├─ pgd              ← physical address of PML4 (loaded into CR3)
-        ├─ mmap            ← linked list head of VMAs
-        ├─ mm_rb            ← red-black tree root for O(log n) VMA lookup
-        ├─ start_code / end_code
-        ├─ start_data / end_data
-        ├─ start_brk / brk ← heap boundaries
-        └─ start_stack
+```mermaid
+flowchart TD
+    task["task_struct"]
+    mm["mm_struct"]
+    pgd["pgd<br/><i>physical address of PML4<br/>(loaded into CR3)</i>"]
+    mmap["mmap<br/><i>linked list head of VMAs</i>"]
+    mmrb["mm_rb<br/><i>red-black tree root<br/>for O(log n) VMA lookup</i>"]
+    code["start_code / end_code"]
+    data["start_data / end_data"]
+    brk["start_brk / brk<br/><i>heap boundaries</i>"]
+    stack["start_stack"]
+    
+    task --> mm
+    mm --> pgd
+    mm --> mmap
+    mm --> mmrb
+    mm --> code
+    mm --> data
+    mm --> brk
+    mm --> stack
 ```
 
 Each `vm_area_struct` (VMA) records the virtual start and end address, the `vm_flags` (VM_READ, VM_WRITE, VM_EXEC, VM_SHARED), and a pointer to a `vm_operations_struct` that provides the fault handler called when a page in that region is accessed without a valid PTE. This layering—MMU raises fault, kernel looks up VMA, VMA's fault handler resolves the backing—is the architecture that makes demand paging, copy-on-write, and memory-mapped files all composable on the same code path.
@@ -189,24 +221,46 @@ A context switch is the act of suspending one thread's execution and resuming an
 
 `switch_to()` saves and restores the general-purpose registers, the instruction pointer (via the `ret` trick on the kernel stack), the stack pointer, and the FPU/SSE/AVX state (lazily, using the TS bit in CR0 to trap on first FP instruction after a switch). The full register context is not stored in a monolithic struct; instead, the kernel stack itself encodes the return point. When `switch_to()` suspends thread A, it pushes `RIP` onto A's kernel stack and saves `RSP` into `task_struct->thread.sp`. When A is next scheduled, `switch_to()` restores `RSP` and executes `ret`, which pops `RIP` and resumes A exactly where it left off in `__schedule()`.
 
-```
-Thread A kernel stack                Thread B kernel stack
-(suspended mid-schedule)            (about to be resumed)
+```mermaid
+flowchart TD
+    subgraph stackA ["Thread A kernel stack — suspended mid-schedule"]
+        direction TB
+        A_rip["saved RIP"]
+        A_rbp["saved RBP"]
+        A_rbx["saved RBX"]
+        A_r12["saved R12–R15"]
+        A_etc["..."]
+        A_rip --> A_rbp --> A_rbx --> A_r12 --> A_etc
+    end
 
-   ┌───────────────────┐               ┌───────────────────┐
-   │  saved RIP        │◄── RSP(A)     │  saved RIP        │◄── RSP(B)
-   │  saved RBP        │               │  saved RBP        │
-   │  saved RBX        │               │  saved RBX        │
-   │  saved R12–R15    │               │  saved R12–R15    │
-   │  ...              │               │  ...              │
-   └───────────────────┘               └───────────────────┘
+    subgraph stackB ["Thread B kernel stack — about to be resumed"]
+        direction TB
+        B_rip["saved RIP"]
+        B_rbp["saved RBP"]
+        B_rbx["saved RBX"]
+        B_r12["saved R12–R15"]
+        B_etc["..."]
+        B_rip --> B_rbp --> B_rbx --> B_r12 --> B_etc
+    end
 
-switch_to(A, B):
-  1. Push callee-saved regs onto A's kernel stack
-  2. Save RSP → task_struct(A)->thread.sp
-  3. Load RSP ← task_struct(B)->thread.sp
-  4. Pop callee-saved regs from B's kernel stack
-  5. ret  →  resumes execution in B at its saved RIP
+    RSP_A["RSP(A)"]
+    RSP_B["RSP(B)"]
+
+    RSP_A -.-> A_rip
+    RSP_B -.-> B_rip
+
+    subgraph sw ["switch_to(A, B)"]
+        direction TB
+        S1["1. Push callee-saved regs onto A's kernel stack"]
+        S2["2. Save RSP → task_struct(A)->thread.sp"]
+        S3["3. Load RSP ← task_struct(B)->thread.sp"]
+        S4["4. Pop callee-saved regs from B's kernel stack"]
+        S5["5. ret → resumes execution in B at its saved RIP"]
+        S1 --> S2 --> S3 --> S4 --> S5
+    end
+
+    A_etc ~~~ S1
+    B_etc ~~~ S1
 ```
 
 The user-visible register state (all general-purpose registers, `RFLAGS`, segment registers, and the FPU context) is captured on the kernel stack in a `pt_regs` structure when the process enters the kernel via a syscall, interrupt, or exception. When the kernel returns to user space, it restores these registers and executes `sysretq` or `iretq`. This means the kernel never needs to know the user process's register state during scheduling—it only needs to manage the kernel-mode execution context. The user registers are preserved on the per-thread kernel stack, insulated from scheduler activity.

@@ -50,39 +50,35 @@ The net investment income tax (NIIT) adds a 3.8% surtax on investment income—i
 
 Pass-through business income—from sole proprietorships, partnerships, S corporations, and LLCs taxed as partnerships—flows to individual returns and faces personal rates, but the qualified business income deduction under Section 199A allows eligible taxpayers to deduct 20% of qualified pass-through income, subject to phase-ins, wage limitations, and service business restrictions. For a taxpayer in the 37% marginal bracket claiming the full 20% deduction, the effective rate on pass-through income falls to 29.6% (37% × 80%), narrowing but not eliminating the rate advantage of C corporate income taxed at the flat 21% corporate rate. The interaction between individual rates, the QBI deduction, and corporate rates creates arbitrage opportunities around entity choice, income characterization, and profit distribution timing.
 
-```
-Income Tax Computation Flow:
-
-Gross Income
-  ├─ Wages (W-2)
-  ├─ Business Income (Schedule C)
-  ├─ Capital Gains (Schedule D)
-  ├─ Dividends & Interest (1099-DIV, 1099-INT)
-  ├─ Rental Income (Schedule E)
-  └─ Other Income Streams
-       ↓
-  [Subtract Statutory Exclusions]
-       ↓
-  [Subtract Above-the-Line Deductions]
-       ↓
-Adjusted Gross Income (AGI)
-       ↓
-  [Subtract Standard or Itemized Deduction]
-       ↓
-Taxable Income
-       ↓
-  [Apply Bracket Rates to Ordinary Income]
-  [Apply Preferential Rates to LTCG/Qualified Dividends]
-       ↓
-Tentative Tax Liability
-       ↓
-  [Apply Alternative Minimum Tax]
-  [Apply Net Investment Income Tax 3.8%]
-       ↓
-  [Subtract Nonrefundable Credits]
-  [Subtract Refundable Credits]
-       ↓
-Net Tax Liability (or Refund)
+```mermaid
+flowchart TD
+    GI["Gross Income"]
+    W2["Wages (W-2)"]
+    SCHC["Business Income (Schedule C)"]
+    SCHD["Capital Gains (Schedule D)"]
+    DIV["Dividends & Interest (1099-DIV, 1099-INT)"]
+    SCHE["Rental Income (Schedule E)"]
+    OTHER["Other Income Streams"]
+    
+    W2 --> GI
+    SCHC --> GI
+    SCHD --> GI
+    DIV --> GI
+    SCHE --> GI
+    OTHER --> GI
+    
+    GI --> EXCL["Subtract Statutory Exclusions"]
+    EXCL --> ATL["Subtract Above-the-Line Deductions"]
+    ATL --> AGI["Adjusted Gross Income (AGI)"]
+    AGI --> DED["Subtract Standard or Itemized Deduction"]
+    DED --> TI["Taxable Income"]
+    
+    TI --> RATES["Apply Bracket Rates to Ordinary Income<br/>Apply Preferential Rates to LTCG/Qualified Dividends"]
+    RATES --> TENT["Tentative Tax Liability"]
+    
+    TENT --> ADD["Apply Alternative Minimum Tax<br/>Apply Net Investment Income Tax 3.8%"]
+    ADD --> CRED["Subtract Nonrefundable Credits<br/>Subtract Refundable Credits"]
+    CRED --> NET["Net Tax Liability (or Refund)"]
 ```
 
 The mechanical architecture of income taxation thus consists of sequential filters and rate applications, each governed by statutory thresholds, phase-outs, and computational rules embedded in thousands of pages of Internal Revenue Code provisions and Treasury regulations. Sophisticated taxpayers navigate this architecture through entity choice, income timing, expense characterization, and credit optimization to minimize effective tax rates—often legally and within the boundaries of legislative intent, sometimes through aggressive positions testing regulatory ambiguities and audit risk tolerances.

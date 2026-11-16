@@ -90,24 +90,44 @@ The structural mechanics of monopsony wage determination can be visualized by co
 
 Under monopsony, the firm recognizes that hiring an additional worker requires raising the wage for all existing workers. The marginal cost of labor schedule $MCL(L)$ lies above the supply curve, with the vertical distance between them proportional to the slope of the supply curve and the current employment level. The monopsonist hires workers until $MRP_L = MCL$, which occurs at employment level $L_m < L_c$. The monopsony wage $w_m$ is read off the supply curve at $L_m$, strictly below the competitive wage $w_c$. The wedge between $MRP_L$ at $L_m$ and the wage $w_m$ represents the markdown—the difference between what the marginal worker produces and what they are paid.
 
-```
-Wage
-  ^
-  |
-  |        MCL
-  |       /
-  |      /  D (MRP_L)
-  |     /  /
-  |    /  /
-  |   /  /
-w_c| ----*----- Competitive equilibrium
-  | /  / |
-w_m|*--/--|--- Monopsony equilibrium
-  |  S   |  |
-  |     L_m L_c  
-  +----------------> Employment
-  
-DWL: Triangle between D, S, from L_m to L_c
+```mermaid
+flowchart TD
+    subgraph axes["Labor Market Graph"]
+        yaxis["Wage (W)"]
+        xaxis["Employment (L)"]
+    end
+    
+    subgraph curves["Market Curves"]
+        D["Demand Curve D (MRP_L)"]
+        S["Supply Curve S"]
+        MCL["Marginal Cost of Labor MCL"]
+    end
+    
+    subgraph equilibria["Equilibrium Points"]
+        comp["Competitive Equilibrium<br/>(L_c, w_c)"]
+        mono["Monopsony Equilibrium<br/>(L_m, w_m)"]
+    end
+    
+    subgraph welfare["Welfare Loss"]
+        DWL["Deadweight Loss Triangle<br/>Between D and S<br/>From L_m to L_c"]
+    end
+    
+    yaxis --> comp
+    yaxis --> mono
+    xaxis --> comp
+    xaxis --> mono
+    
+    D --> comp
+    S --> comp
+    S --> mono
+    MCL --> mono
+    
+    comp -.DWL Region.-> DWL
+    mono -.DWL Region.-> DWL
+    
+    style comp fill:#90EE90
+    style mono fill:#FFB6C1
+    style DWL fill:#FFD700
 ```
 
 The deadweight loss is the triangular area between the demand and supply curves from $L_m$ to $L_c$, representing the surplus from mutually beneficial employment relationships that are not realized under monopsony. The size of this deadweight loss depends on the elasticity of labor supply and the curvature of the demand curve. If labor supply is highly inelastic, the monopsonist can suppress employment significantly without raising wages much, leading to a large markdown and substantial allocative inefficiency.

@@ -34,9 +34,9 @@ flowchart LR
     A --> B --> C --> D --> E --> F
     F -->|"Radiated sound"| G["Audience / Mic"]
 
-    style sub_power fill:#e8f4fd,stroke:#3498db
-    style sub_oscillator fill:#fdecea,stroke:#e74c3c
-    style sub_filter fill:#eafaf1,stroke:#27ae60
+    style sub_power fill:#e8f4fd,stroke:#3498db,color:#0f172a
+    style sub_oscillator fill:#fdecea,stroke:#e74c3c,color:#0f172a
+    style sub_filter fill:#eafaf1,stroke:#27ae60,color:#0f172a
 ```
 
 **Why this matters on the practice room floor:** a "tight" or "thin" tone is almost always a System 1 (breath) or System 3 (tract shape) problem, not a throat problem. A cracking register break is a System 2 coordination issue. Diagnose which system is failing before you drill anything — singers waste months fixing resonance when the real problem is a collapsed breath support, or fixing breath when the real problem is jaw tension choking the filter.
@@ -154,9 +154,9 @@ flowchart LR
 
     A -->|"Primo passaggio"| B -->|"Secondo passaggio"| C
 
-    style sub_chest fill:#fdecea,stroke:#e74c3c
-    style sub_mix fill:#fef9e7,stroke:#f39c12
-    style sub_head fill:#e8f8f5,stroke:#1abc9c
+    style sub_chest fill:#fdecea,stroke:#e74c3c,color:#0f172a
+    style sub_mix fill:#fef9e7,stroke:#f39c12,color:#0f172a
+    style sub_head fill:#e8f8f5,stroke:#1abc9c,color:#0f172a
 ```
 
 ### 3.3 Register Bridging Drills
@@ -244,9 +244,9 @@ graph TB
     V5 -->|"Raise tongue"| V6
     V6 -.->|"Advance tongue"| V1
 
-    style V4 fill:#fff3cd,stroke:#f0ad4e
-    style V1 fill:#d1ecf1,stroke:#17a2b8
-    style V6 fill:#f8d7da,stroke:#dc3545
+    style V4 fill:#fff3cd,stroke:#f0ad4e,color:#0f172a
+    style V1 fill:#d1ecf1,stroke:#17a2b8,color:#0f172a
+    style V6 fill:#f8d7da,stroke:#dc3545,color:#0f172a
 ```
 
 **On-the-fly fixes:**
@@ -307,8 +307,8 @@ flowchart TD
 
     A --> B --> C --> D --> E --> F
 
-    style A fill:#d6eaf8,stroke:#2980b9
-    style F fill:#d5f5e3,stroke:#27ae60
+    style A fill:#d6eaf8,stroke:#2980b9,color:#0f172a
+    style F fill:#d5f5e3,stroke:#27ae60,color:#0f172a
 ```
 
 ### 5.1 The 15-Minute SOVTE Sequence
@@ -351,13 +351,13 @@ flowchart TD
     Q5 -->|"Throat tight"| A5["Extrinsic laryngeal tension<br/>→ Drill 8 jaw release<br/>→ reduce breath pressure<br/>→ SOVTE first"]
     Q5 -->|"Neck/shoulder"| A6["Postural loading<br/>→ alignment check<br/>→ reduce head-forward posture"]
 
-    style A1 fill:#d5f5e3,stroke:#27ae60
-    style A2 fill:#d5f5e3,stroke:#27ae60
-    style A3 fill:#d6eaf8,stroke:#2980b9
-    style A4 fill:#fdecea,stroke:#e74c3c
-    style A5 fill:#fef9e7,stroke:#f39c12
-    style A6 fill:#fef9e7,stroke:#f39c12
-    style A7 fill:#fdecea,stroke:#e74c3c
+    style A1 fill:#d5f5e3,stroke:#27ae60,color:#0f172a
+    style A2 fill:#d5f5e3,stroke:#27ae60,color:#0f172a
+    style A3 fill:#d6eaf8,stroke:#2980b9,color:#0f172a
+    style A4 fill:#fdecea,stroke:#e74c3c,color:#0f172a
+    style A5 fill:#fef9e7,stroke:#f39c12,color:#0f172a
+    style A6 fill:#fef9e7,stroke:#f39c12,color:#0f172a
+    style A7 fill:#fdecea,stroke:#e74c3c,color:#0f172a
 ```
 
 ---

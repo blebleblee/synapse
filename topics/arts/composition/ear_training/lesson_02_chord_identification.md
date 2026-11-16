@@ -1,217 +1,224 @@
-# Lesson 2: Chord Identification
+# Lesson 2: Chord Identification by Ear
 
-## 1. First-Principles Intuition & Invariants
+## 1. Why This Works: The Acoustic Basis of Harmonic Hearing
 
-Chord identification is the skill of hearing simultaneously sounding notes and recognizing their harmonic identity—major, minor, diminished, augmented, seventh chords, and their inversions. This skill underpins transcription, improvisation, composition, and harmonic analysis across all genres.
+Every pitched tone you've ever heard a piano, guitar, or voice produce is already a chord. When a string or air column vibrates at a fundamental frequency, it simultaneously radiates overtones at 2x, 3x, 4x, 5x the fundamental. Your ear has been decoding stacked harmonic content since the first lullaby you heard — chord identification trains a skill your auditory system already runs constantly, just below conscious awareness.
 
-### The Harmonic Series Foundation
+A vibrating C string radiates partials C–C–G–C–E–G–Bb–C as you go up the series. The major triad (C-E-G) is literally overtones 4, 5, and 6 compressed into one octave. This is why a major triad sounds "resolved" and "locked in" — it matches the resonance pattern already present inside a single note. The dominant seventh (C-E-G-Bb) adds the flat, slightly-out-of-tune-sounding 7th partial, which is exactly why dominant 7ths sound restless and want to move. You are not memorizing arbitrary labels; you're learning to name sensations your ear already registers.
 
-Chords emerge from the natural overtone series. When a string vibrates at a fundamental frequency *f*, it simultaneously produces overtones at integer multiples: 2*f*, 3*f*, 4*f*, 5*f*, and so on. The intervals between these partials—octave (2:1), perfect fifth (3:2), major third (5:4)—form the building blocks of Western harmony.
+**Construction reference (build these on your instrument before drilling by ear):**
 
-A C fundamental produces overtones:
-- C (1×), C' (2×), G' (3×), C'' (4×), E'' (5×), G'' (6×), Bb''' (7×), C''' (8×)...
+| Chord | Formula | C example | Character |
+|---|---|---|---|
+| Major triad | R – M3 – P5 | C–E–G | bright, stable |
+| Minor triad | R – m3 – P5 | C–Eb–G | dark, soft |
+| Diminished triad | R – m3 – d5 | C–Eb–Gb | tense, claustrophobic |
+| Augmented triad | R – M3 – A5 | C–E–G# | floating, directionless |
+| Dominant 7 | Maj triad + m7 | C–E–G–Bb | pulls hard to I |
+| Major 7 | Maj triad + M7 | C–E–G–B | dreamy, stable |
+| Minor 7 | Min triad + m7 | C–Eb–G–Bb | mellow, bluesy |
+| Half-diminished 7 | Dim triad + m7 | C–Eb–Gb–Bb | ii° in minor, unresolved |
+| Fully diminished 7 | Dim triad + d7 | C–Eb–Gb–A | symmetrical, maximally tense |
 
-The major triad (C-E-G) mirrors the 4th, 5th, and 6th partials. The dominant seventh chord (C-E-G-Bb) adds the 7th partial. This acoustic basis explains why major triads sound stable and consonant—they align with the natural resonance of vibrating bodies.
+Inversions keep the chord's *identity* but change its *bass* and its *gravitational pull*:
 
-### Chord Construction Invariants
+- **Root position** (C-E-G): grounded, final.
+- **1st inversion** (E-G-C): lighter, passing — common mid-phrase.
+- **2nd inversion** (G-C-E): unstable, wants to resolve down to root position (classic cadential 6/4 in classical music).
 
-All chords are built by stacking intervals above a root:
-- **Major triad**: Root + major 3rd + perfect 5th (C-E-G)
-- **Minor triad**: Root + minor 3rd + perfect 5th (C-Eb-G)
-- **Diminished triad**: Root + minor 3rd + diminished 5th (C-Eb-Gb)
-- **Augmented triad**: Root + major 3rd + augmented 5th (C-E-G#)
-- **Dominant seventh**: Major triad + minor 7th (C-E-G-Bb)
-- **Major seventh**: Major triad + major 7th (C-E-G-B)
-- **Minor seventh**: Minor triad + minor 7th (C-Eb-G-Bb)
+```mermaid
+flowchart TD
+    subgraph chord_id_pipeline ["Chord ID Listening Pipeline"]
+        A["Hear chord (stop toggling, let it ring)"]
+        B["Isolate bass note - sing it"]
+        C["Identify triad quality: maj / min / dim / aug"]
+        D["Check for 7th: is there added tension/color?"]
+        E["Determine inversion from bass-to-root distance"]
+        F["Confirm with function if in a progression"]
+        
+        A --> B
+        B --> C
+        C --> D
+        D --> E
+        E --> F
+    end
+```
 
-Inversions rearrange these notes without changing harmonic identity:
-- **Root position**: Root in bass (C-E-G)
-- **First inversion**: Third in bass (E-G-C)
-- **Second inversion**: Fifth in bass (G-C-E)
+## 2. The Four-Step Listening Procedure
 
-The inversion changes the chord's gravitational pull—second inversions typically resolve downward by step, while first inversions have a lighter, passing quality.
+This is the exact sequence to run, in order, every single time you hear an unknown chord. Don't skip steps even when you think you already know the answer — the sequence itself is what builds automaticity.
 
-## 2. Perceptual Recognition Architecture
+### Step 1 — Isolate the Bass Note
 
-### Step 1: Isolate the Bass Note
+The bass note is your anchor. Everything else is interpreted relative to it.
 
-The lowest sounding note anchors your perception. Play the chord repeatedly and focus exclusively on the bass. Sing this note aloud to confirm. The bass note determines whether the chord is in root position or inverted.
+**Drill 1A — Bass Lock-In**
+- Play any triad on piano or guitar, hold it.
+- Sing the lowest note on "la," matching pitch exactly.
+- Play just that note alone on the instrument to verify you matched it.
+- Repeat with 20 random triads (root position only, to start).
+- **Target:** 95% pitch-match accuracy, response within 4 seconds, before moving on.
 
-**Drill:** Have a partner or software play random triads. Identify only the bass note. Target: 95% accuracy at 4-second intervals.
+If you keep grabbing the loudest or most melodic note instead of the lowest, mute the top two notes on your keyboard controller (or play the bass note isolated first, then add the chord) until your ear reflexively drops to the bottom.
 
-### Step 2: Identify the Chord Quality
+### Step 2 — Identify Triad Quality (Major / Minor / Diminished / Augmented)
 
-With the bass note anchored, shift focus to the chord's overall color:
-- **Major**: Bright, stable, final
-- **Minor**: Dark, introspective, softer
-- **Diminished**: Tense, unstable, urgent
-- **Augmented**: Floating, ambiguous, slightly harsh
+With the bass anchored, shift attention to the *interval between bass and the next note up* — in root position, that's the third, and it's the single most informative interval in the chord.
 
-**Quality Comparison Drill:**
-1. Play C major (C-E-G), then C minor (C-Eb-G). Toggle between them 10 times. Notice the emotional shift.
-2. Play C diminished (C-Eb-Gb), then C augmented (C-E-G#). Hear the distinct tension profiles.
-3. Randomize major/minor triads. Identify quality only. Start at 60 BPM (one chord every 4 beats), increase to 90 BPM.
+**Drill 2A — Toggle Drill (the fastest way to burn in major vs minor)**
+1. On piano: play C-E-G, hold 2 seconds, then C-Eb-G, hold 2 seconds. Alternate 10 times without stopping.
+2. Say "major" or "minor" out loud *before* you play each one, then confirm after.
+3. Repeat starting on a different root (F, then Bb, then D) so you're not just pattern-matching finger shapes.
 
-### Step 3: Determine Inversion
+**Drill 2B — Isolated Third (fixes the #1 beginner confusion)**
+- Play root + third only, omit the fifth entirely: C-E (major 3rd) vs C-Eb (minor 3rd).
+- The fifth is harmonic "glue" that doesn't change quality — stripping it out forces your ear onto the interval that actually matters.
+- Drill 50 isolated thirds, mixed major/minor, before reintroducing the fifth.
 
-Once quality is confirmed, determine the root and inversion by analyzing intervals above the bass:
+**Drill 2C — Diminished vs Augmented**
+- Play C-Eb-Gb (diminished): both thirds stacked are minor, the whole chord feels like it's collapsing inward.
+- Play C-E-G# (augmented): both thirds are major, the chord feels like it's stretching outward with no gravity.
+- Toggle 10 times, naming the quality before you check.
 
-**Root Position Recognition:**
-- Bass note = root
-- Intervals above bass: M3 or m3, then P5
-- Example: E-G-C has bass E; intervals above E are m3 (E-G) and M6 (E-C) → **first inversion C major**
+**Metronome-paced quality drill:**
+| Week | Tempo (one chord per 4 beats) | Chord set | Target accuracy |
+|---|---|---|---|
+| 1 | 60 BPM | Major / minor only | 70% |
+| 2 | 75 BPM | + diminished / augmented | 85% |
+| 3 | 90 BPM | All four, random inversions | 90% |
 
-**First Inversion Recognition:**
-- Third in bass
-- Intervals above bass: m3 or M3, then P4
-- Sounds less stable, often passing
+### Step 3 — Determine Inversion
 
-**Second Inversion Recognition:**
-- Fifth in bass
-- Intervals above bass: P4, then M3 or m3
-- Sounds suspended, gravitates downward
+Once quality is locked, ask: *is the bass note the root, or something else?*
 
-**Inversion Drill:**
-1. Play all inversions of C major: C-E-G (root), E-G-C (1st), G-C-E (2nd).
-2. Randomize. Identify inversion by singing the bass and feeling the pull toward resolution.
-3. Repeat with minor triads.
+**Fast heuristic — the "gap and squeeze" test:**
+- Root position: the two intervals above the bass are a 3rd then a 4th (stacked as 3rd+5th from the root) — sounds "stacked evenly."
+- 1st inversion: bass-to-next is a 3rd, then a 4th up to the octave of the bass — has a "leaning forward" quality, common in walking bass lines and pop ballad verses.
+- 2nd inversion: bass-to-next is a 4th (the widest, most open-sounding gap at the bottom) — sounds suspended, like it's hovering and needs to drop.
 
-### Step 4: Seventh Chord Extensions
+**Drill 3A — Inversion Ladder**
+1. Play C-E-G (root), E-G-C (1st inv), G-C-E (2nd inv) in sequence, slowly, on piano.
+2. For each, sing the bass note, then sing "root... third... fifth" ascending from it to locate where the root actually sits.
+3. Randomize order. Identify inversion by ear before replaying to check.
+4. Repeat the entire drill in a minor key (Cm, Eb-G-C, G-C-Eb).
 
-Add the seventh and identify:
-- **Dominant 7th (C7)**: Major triad + minor 7th → strong pull to resolve down a fifth
-- **Major 7th (Cmaj7)**: Major triad + major 7th → dreamy, jazzy, stable
-- **Minor 7th (Cm7)**: Minor triad + minor 7th → mellow, bluesy
-- **Half-diminished 7th (Cø7)**: Diminished triad + minor 7th → ii° in minor keys
-- **Fully diminished 7th (C°7)**: Diminished triad + diminished 7th → symmetrical, tense
+**Guitarist-specific version:** practice this on a single string set using CAGED-derived triad shapes. A "C-shape" triad on strings 2-3-4 gives you root position; sliding to the adjacent "A-shape" triad on the same strings gives you an inversion with a different note on top. Play through all three inversions of a C major triad across the top three strings before testing by ear.
 
-**Seventh Chord Drill:**
-1. Play Cmaj7 (C-E-G-B), then C7 (C-E-G-Bb). Toggle 10 times. Hear the urgency difference.
-2. Play Cm7 (C-Eb-G-Bb), then Cø7 (C-Eb-Gb-Bb). Notice the additional tension.
-3. Randomize seventh chords. Identify quality at 80 BPM.
+### Step 4 — Seventh Chord Extensions
 
-## 3. Systematic Training Protocol
+Add the 7th only after quality and inversion are solid. The 7th is color and function, not a separate skill — think of it as "triad quality, plus one more decision."
 
-### Week 1-2: Triad Quality Mastery
+**Drill 4A — Isolated 7th Interval (critical fix for "everything sounds jazzy")**
+- Play root + 7th only, no triad: C-B (major 7th, very close, almost clashing), C-Bb (minor 7th, slightly looser), C-A (major 6th, for contrast — NOT a 7th, trains against false positives).
+- Do 30 reps mixing these three, naming the interval before checking.
 
-**Daily 15-Minute Routine:**
-1. **Warm-up (3 min):** Play major/minor triads on keyboard or guitar. Sing root notes.
-2. **Quality Recognition (7 min):** Use app (Teoria.com, EarMaster, or custom Max/MSP patch) to drill 40 random triads. Target 90% accuracy.
-3. **Inversion Recognition (5 min):** Drill root vs. first vs. second inversion. Start with major only, add minor in Week 2.
+**Drill 4B — Seventh Chord Toggle**
+1. Cmaj7 (C-E-G-B) vs C7 (C-E-G-Bb): toggle 10x. Maj7 = dreamy/settled; dom7 = urgent, wants to resolve down a 5th.
+2. Cm7 (C-Eb-G-Bb) vs Cø7/half-dim (C-Eb-Gb-Bb): toggle 10x. The half-diminished adds a flat 5th, making it sound "unstable minor" rather than "bluesy minor."
+3. C°7 (C-Eb-Gb-A, fully diminished): note it's built entirely of stacked minor 3rds — maximally symmetrical, maximally tense, and (ear-training shortcut) any note in it can function as the "root" depending on context.
 
-**Target Progression:**
-- Week 1: 70% accuracy, major/minor only, 4-second response time
-- Week 2: 85% accuracy, add diminished/augmented, 3-second response time
+**Target:** 80% accuracy identifying maj7/dom7/min7/half-dim7/fully-dim7 at 80 BPM (one chord per 2 beats), randomized root.
 
-### Week 3-4: Seventh Chords & Context
+## 3. Six-Week Systematic Training Protocol
 
-**Daily 20-Minute Routine:**
-1. **Warm-up (3 min):** Review triad inversions.
-2. **Seventh Quality Drill (10 min):** Randomize maj7, 7, m7, ø7, °7. Target 80% accuracy.
-3. **Functional Context (7 min):** Identify chord progressions (ii-V-I, I-vi-IV-V). Recognize function from sound alone.
+### Weeks 1–2: Triad Quality Mastery (15 min/day)
 
-**Progression Drill:**
-Play common progressions in C major:
-- Dm7 - G7 - Cmaj7 (ii-V-I)
-- Cmaj7 - Am7 - Fmaj7 - G7 (I-vi-IV-V)
+1. **Warm-up (3 min):** Play major and minor triads on your instrument, sing the root of each before playing.
+2. **Quality drill (7 min):** Use EarMaster, Teoria.com, or a simple MIDI-triggered random chord generator. 40 trials/session.
+3. **Inversion drill (5 min):** Root vs. 1st vs. 2nd inversion, major only in Week 1, add minor in Week 2.
 
-Randomize starting key. Identify each chord's quality and root. Target 85% accuracy by Week 4.
+Progress gate: don't move to Week 3 content until you hit 85% accuracy at 3-second response time on major/minor/diminished/augmented triads, all inversions mixed.
 
-### Week 5-6: Real Music Transcription
+### Weeks 3–4: Seventh Chords & Functional Context (20 min/day)
 
-**Application Exercises:**
-1. **Simple Songs (Days 1-3):** Transcribe basic pop/folk progressions (4 chords, diatonic). Examples: "Let It Be," "Lean on Me."
-2. **Jazz Standards (Days 4-6):** Transcribe 8-bar sections with dominant 7ths and ii-V-I. Examples: "Autumn Leaves," "Blue Bossa."
-3. **Classical Excerpts (Day 7):** Analyze Bach chorales. Identify cadences and inversions.
+1. **Warm-up (3 min):** Review triad inversions cold, no repeats.
+2. **Seventh quality drill (10 min):** Randomize maj7, dom7, min7, half-dim7, fully-dim7. Target 80%.
+3. **Functional context (7 min):** Play and identify ii-V-I and I-vi-IV-V progressions by function, not just by chord name.
 
-### Advanced: Chromatic & Extended Voicings
+**Progression drill, key of C:**
+```
+Dm7 - G7 - Cmaj7           (ii - V - I)
+Cmaj7 - Am7 - Fmaj7 - G7   (I - vi - IV - V)
+```
+Transpose to a random key each session (use a cycle-of-fifths rotation: C, G, D, A, E...). Target 85% accuracy identifying root + quality of every chord by Week 4.
 
-**Secondary Dominants:**
-Recognize V7/x patterns (G7 resolving to Cmaj7 is V7/IV in key of G). Train by playing cycle of fifths with dominant 7ths: C7→F7→Bb7→Eb7...
+### Weeks 5–6: Real Music Transcription
 
-**Altered Dominants:**
-Identify b9, #9, #11, b13 extensions in jazz contexts. Example: G7(b9) → Cmaj7.
+1. **Days 1–3 — Simple diatonic songs:** Transcribe the chord changes to "Let It Be" or "Stand By Me" by ear only, then check against a lead sheet. Focus on catching inversions in the bass line (these songs use plenty of 1st-inversion passing chords).
+2. **Days 4–6 — Jazz standards:** Transcribe 8 bars of "Autumn Leaves" or "Blue Bossa." These are built almost entirely from ii-V-I cells — once you hear the cell, you can predict the next two chords before they play.
+3. **Day 7 — Bach chorales:** Pick any four-part chorale (freely available as public domain scores/recordings). Identify every cadence (authentic, half, deceptive) and flag every 2nd-inversion chord — Bach uses them almost exclusively as passing or cadential devices, never as a resting point.
 
-**Quartal & Cluster Voicings:**
-Recognize stacked fourths (C-F-Bb) and tone clusters in modern/atonal music.
+### Beyond Week 6: Chromatic & Extended Harmony
 
-## 4. Common Failure Modes & Corrections
+**Secondary dominants:** A dominant 7th that resolves to something other than the tonic. G7 resolving to Cmaj7 inside the key of F is "V7 of IV." Drill recognition by playing a cycle-of-fifths dominant chain — C7→F7→Bb7→Eb7→Ab7 — and noticing each chord briefly feels like "the V" before the next one steals that role.
 
-### Problem: Confusing Major and Minor
-**Symptom:** Flip-flopping on triad quality.
-**Fix:** Focus on the third. Play root + third only, isolating the quality-defining interval. Drill isolated thirds (M3 vs m3) 50 times before adding the fifth.
+**Altered dominants:** G7(b9) resolving to Cmaj7 — listen for the extra half-step dissonance sitting just above the root. Common in bebop and Latin jazz cadences.
 
-### Problem: Missing Inversions
-**Symptom:** Always hearing root position.
-**Fix:** Sing the bass note and the root separately. If they differ, the chord is inverted. Practice singing bass-root pairs.
+**Quartal/cluster voicings:** Stacked 4ths (C-F-Bb) instead of stacked 3rds. Common in modal jazz (McCoy Tyner, late-60s Herbie Hancock) and film scoring. These resist major/minor labeling entirely — train yourself to recognize "this is built in 4ths" as its own category rather than forcing a tertian label onto it.
 
-### Problem: Seventh Chord Overload
-**Symptom:** Hearing all seventh chords as "jazzy" without distinction.
-**Fix:** Isolate the seventh interval. Play root + seventh only: C-B (M7), C-Bb (m7), C-Bbb (dim7). Drill these dyads before adding the triad.
+## 4. Common Failure Modes & Corrective Drills
 
-### Problem: Tempo Dependence
-**Symptom:** Accurate at slow tempos, collapse at performance speed.
-**Fix:** Use immediate chunking. Hear chord as single gestalt, not sequential intervals. Drill with decreasing response windows: 4s → 3s → 2s → 1s.
+**Problem: Flip-flopping between major and minor.**
+Fix: You're listening to the whole chord instead of the third. Strip the chord to root+third only (Drill 2B) and run 50 reps before reintroducing the fifth or any extension.
 
-### Problem: Contextual Bias
-**Symptom:** Identifying chords correctly in progressions but failing in isolation.
-**Fix:** Train both modes. Drill isolated chords 60% of time, progressions 40%. Your ear must recognize chords without functional crutches.
+**Problem: Always hearing root position, even when it's inverted.**
+Fix: Sing the bass note, then sing up through the chord tones (root, third, fifth) starting from wherever the root actually is. If the bass note isn't the first note you sing, it's inverted. Practice singing "bass pitch → root pitch" as a two-note pair until the gap between them becomes audible as its own shape.
 
-## 5. Reference Intervals for Self-Testing
+**Problem: All seventh chords sound generically "jazzy."**
+Fix: Isolate the 7th as a dyad against the root (Drill 4A) before judging the full chord. The 7th interval alone (half-step vs. whole-step below the root's octave) carries most of the chord's character.
 
-**Major Triad Sound-Alikes:**
-- Happy Birthday (first two notes = M3)
-- Star Wars Theme (fifth interval jump = P5)
+**Problem: Accurate slow, falls apart at performance tempo.**
+Fix: You're still parsing the chord note-by-note instead of hearing it as one gestalt sound. Drill with a shrinking response window — 4s → 3s → 2s → 1s — forcing your brain to commit to pattern recognition instead of sequential analysis.
 
-**Minor Triad Sound-Alikes:**
-- Greensleeves opening (minor tonality)
-- Für Elise (minor quality, note the Eb)
+**Problem: Nails chords inside a progression, fails on isolated chords.**
+Fix: You're using context (voice leading, expectation) as a crutch instead of hearing the chord itself. Split practice time 60% isolated chords / 40% progressions until isolated accuracy catches up.
 
-**Diminished Triad Sound-Alikes:**
-- West Side Story "Maria" (dim5 leap in melody)
-- Jaws Theme (tension of minor seconds)
+## 5. Reference Anchors for Self-Testing
 
-**Dominant 7th Sound-Alikes:**
-- Dominant chord in any blues (strong pull to I chord)
-- "I Got Rhythm" bridge (circle of fifths with 7ths)
+Use these as instant quality checks when you're unsure what you just heard:
 
-## 6. Technology-Assisted Training Tools
+| Sound | Reference |
+|---|---|
+| Major 3rd (bright) | "Happy Birthday," first two notes |
+| Perfect 5th | "Star Wars" main theme opening leap |
+| Minor tonality | "Greensleeves" opening phrase |
+| Diminished 5th tension | "Maria" from *West Side Story* (the leap IS the tritone) |
+| Dominant 7th pull | any 12-bar blues turnaround, bar 10 to bar 11 |
+| ii-V-I cell | "Autumn Leaves," first four bars |
 
-**Software Recommendations:**
-- **EarMaster 7**: Structured curriculum, MIDI input, progress tracking
-- **Teoria.com**: Free web-based interval/chord drills
-- **Functional Ear Trainer (app)**: Focus on functional relationships
-- **Max/MSP or Pure Data**: Build custom random chord generators with MIDI output
+## 6. Technology & Practice Logging
 
-**Hardware Setup:**
-- MIDI keyboard connected to training software for immediate feedback
-- Ableton Live or Logic Pro with Chord Trigger plugin for progression practice
-- Loop pedal for guitarists: record progressions, solo over them, identify chords in real-time
+**Software:**
+- **EarMaster 7** — structured curriculum with MIDI input and progress tracking.
+- **Teoria.com** — free browser-based interval/chord drills, no install needed.
+- **Functional Ear Trainer** (mobile app) — drills scale-degree function rather than absolute chord names, useful for Step 4 onward.
+- **Max/MSP or Pure Data** — if you want a custom random-chord MIDI generator, a patch as simple as `random 12 -> makenote -> noteout` with a metro-driven trigger gives you an infinite, non-repeating drill partner.
 
-**Practice Log Template:**
+**Hardware setup:** MIDI keyboard into your DAW or ear-training app for instant visual feedback on misses. Guitarists: loop pedal to record a progression, then solo over your own loop and call out each chord as it comes back around.
 
+**Practice log (copy this block daily):**
 ```
 Date: _______
-Duration: ____
-Drill Type: [ ] Triads [ ] Sevenths [ ] Progressions
+Duration: ____ min
+Drill type: [ ] Triads  [ ] Sevenths  [ ] Progressions  [ ] Transcription
 Accuracy: _____%
-Response Time: ____ seconds
-Notes: ______________________________
+Avg response time: ____ sec
+Misses (what confused you): ______________________________
 ```
 
-Track weekly improvement. Expect 5-10% accuracy gains per week with consistent 15-20 minute daily practice.
+Expect 5–10% accuracy gains per week with consistent daily practice. Plateaus after week 3 are normal — push through by shortening response time rather than adding new chord types.
 
-## 7. Integration with Functional Harmony
+## 7. Functional Hearing: The Real Goal
 
-Chord identification is not isolated pattern recognition—it's inseparable from functional hearing. A G7 chord in C major pulls to C because of its dominant function, not just its sound. Train your ear to recognize:
+Naming a chord "G7" is a parlor trick. Hearing that G7 *wants* to resolve to C, and feeling that pull in your gut before the resolution arrives, is the actual skill that makes you musical. Three functional categories cover almost all tonal harmony:
 
-**Tonic Function (I, vi):** Stable, home, resolved
-**Dominant Function (V, vii°):** Tension, pull, forward motion
-**Subdominant Function (IV, ii):** Preparation, departure from tonic
+- **Tonic function (I, vi):** home, stable, resolved.
+- **Dominant function (V, vii°):** tension, forward motion, demands resolution.
+- **Subdominant function (IV, ii):** departure from home, sets up the dominant.
 
-**Functional Progression Drill:**
-1. Play I-IV-V-I in C major.
-2. Randomize chord order. Identify not only quality but function.
-3. Sing scale degree of each root (1, 4, 5, 1).
+**Final integration drill:**
+1. Play I-IV-V-I in C major slowly, several times, until the *motion* feels as familiar as the chord names.
+2. Randomize the order (e.g., IV-I-V-IV). Identify both the chord quality/root AND its function.
+3. Sing the scale degree of each root as you hear it (1, 4, 5, 1) rather than the letter name — this locks function, not just pitch, into your ear.
 
-This functional layer transforms chord identification from academic exercise to musical intuition, the real goal of ear training.
+When you can sing "that's scale degree 5, it's dominant, it's about to resolve to 1" before the resolution actually happens, chord identification has stopped being analysis and become musical intuition — which is the only reason to train it.

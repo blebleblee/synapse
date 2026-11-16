@@ -60,34 +60,26 @@ The standard revealed preference approach infers utility from consumption behavi
 
 The welfare measurement architecture for a distributional policy analysis typically flows through the following logical structure:
 
-```
-Individual household survey data (income, consumption, demographics)
-            │
-            ▼
-    Equivalization adjustment
-    (OECD modified scale: 1.0 / 0.5 / 0.3)
-            │
-            ▼
-    Choice of welfare metric
-    (consumption per capita / equivalized income / HDI composite)
-            │
-            ▼
-    Choice of SWF and inequality aversion parameter ε
-            │
-            ▼
-    Compute baseline W(ε) for pre-policy distribution
-            │
-            ▼
-    Apply policy shock (tax schedule, transfer program, price change)
-            │
-            ▼
-    Recompute W(ε) for post-policy distribution
-            │
-            ▼
-    Compute ΔW(ε) and decompose into efficiency gain and equity gain
-            │
-            ▼
-    Sensitivity analysis across ε ∈ {0, 0.5, 1, 2, ∞}
+```mermaid
+flowchart TD
+    A["Individual household survey data<br/>(income, consumption, demographics)"]
+    B["Equivalization adjustment<br/>(OECD modified scale: 1.0 / 0.5 / 0.3)"]
+    C["Choice of welfare metric<br/>(consumption per capita / equivalized income / HDI composite)"]
+    D["Choice of SWF and inequality aversion parameter ε"]
+    E["Compute baseline W(ε) for pre-policy distribution"]
+    F["Apply policy shock<br/>(tax schedule, transfer program, price change)"]
+    G["Recompute W(ε) for post-policy distribution"]
+    H["Compute ΔW(ε) and decompose into<br/>efficiency gain and equity gain"]
+    I["Sensitivity analysis across ε ∈ {0, 0.5, 1, 2, ∞}"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
 ```
 
 The equivalization step is critical and frequently underweighted in analyses produced outside dedicated welfare units. A household of four does not need four times the income of a single person to achieve the same living standard, because of economies of scale in consumption. The OECD modified equivalence scale assigns weight 1.0 to the first adult, 0.5 to each additional adult, and 0.3 to each child. The equivalized household income is then:
@@ -162,21 +154,39 @@ Reporting welfare conclusions for a single parameterization of the social welfar
 
 The correct practice is to present a welfare dominance analysis. A policy reform $P$ is said to dominate the status quo under the Atkinson family of SWFs for all $\varepsilon \geq 0$ if and only if the Lorenz curve of the post-reform distribution lies nowhere below the Lorenz curve of the pre-reform distribution. This condition — Lorenz dominance — is distribution-free in the sense that it holds regardless of which $\varepsilon$ is chosen. When Lorenz dominance obtains, the analyst can report unambiguously that the reform is welfare-improving for any degree of inequality aversion. When it does not — when the Lorenz curves cross — the welfare conclusion depends on $\varepsilon$, and the analyst must report the threshold value of $\varepsilon$ at which the welfare ranking reverses.
 
-```
-Lorenz Curve Dominance Check:
-
-           1.0 ┤                              ╭────
-               │                         ╭───
-               │                    ╭────          ← Reform distribution
-Cumulative │               ╭────                  (Lorenz dominates)
- welfare   │          ╭────
-share      │     ╭────                            ← Baseline distribution
-               │╭──
-           0.0 ┼──────────────────────────────
-              0.0    Population quantile    1.0
-
-If reform Lorenz ≥ baseline Lorenz at all points: welfare-improving ∀ε
-If curves cross: welfare ranking depends on ε; report reversal threshold
+```mermaid
+flowchart TD
+    title["<b>Lorenz Curve Dominance Check</b>"]
+    
+    subgraph chart [" "]
+        direction TB
+        yaxis["Cumulative<br/>welfare share<br/>(0.0 → 1.0)"]
+        reform["Reform distribution<br/>(Lorenz dominates)"]
+        baseline["Baseline distribution"]
+        xaxis["Population quantile (0.0 → 1.0)"]
+    end
+    
+    subgraph interpretation ["Interpretation Rules"]
+        cond1["Reform Lorenz ≥ Baseline Lorenz<br/>at all points"]
+        result1["⇒ Welfare-improving ∀ε"]
+        
+        cond2["Curves cross"]
+        result2["⇒ Welfare ranking depends on ε<br/>Report reversal threshold"]
+    end
+    
+    title --> chart
+    chart --> interpretation
+    
+    reform -.->|"always above or equal"| baseline
+    
+    cond1 --> result1
+    cond2 --> result2
+    
+    style title fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style reform fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    style baseline fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+    style result1 fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    style result2 fill:#fce4ec,stroke:#e91e63,stroke-width:2px
 ```
 
 ### Failure Mode 4: Arrow's Theorem in Committee Decisions

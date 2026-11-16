@@ -24,45 +24,23 @@ Within the CPU module, the scan engine executes as a firmware loop managing dist
 
 The program scan executes ladder logic from rung zero to the final rung, evaluating each contact and coil sequentially. Ladder logic rungs compile to Boolean algebra operations stored as bytecode or native machine instructions. A simple rung with two normally-open contacts in series driving an output coil compiles to load input A, AND input B, store to output C. Contacts in parallel compile to OR operations. Nesting branches require temporary stack storage for intermediate Boolean results. Timers and counters invoke firmware subroutines that increment accumulated values, compare against preset thresholds, and set done bits. The scan engine maintains internal flags for edge detection: one-shot rising pulses trigger on false-to-true transitions, one-shot falling pulses trigger on true-to-false transitions, implemented by comparing current scan Boolean state against previous scan state stored in shadow registers.
 
-```
-Scan Cycle Execution Flow:
-
-┌─────────────────────────────────────────────┐
-│  Watchdog Timer Reset (1)                   │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│  Input Image Table Update (2)               │
-│  - Read all local/remote I/O modules        │
-│  - Sample analog inputs via ADC             │
-│  - Apply input filters and diagnostics      │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│  Program Logic Execution (3)                │
-│  - Execute rung 0 → rung N sequentially     │
-│  - Evaluate contacts, coils, timers         │
-│  - Update internal memory and flags         │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│  Output Image Table Transfer (4)            │
-│  - Write computed states to output modules  │
-│  - Drive physical terminals via transistors │
-│  - Perform output forcing and overrides     │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│  Housekeeping & Diagnostics (5)             │
-│  - Service communication requests           │
-│  - Update HMI data tables                   │
-│  - Log faults and perform self-test         │
-└──────────────────┬──────────────────────────┘
-                   │
-                   └──────► Loop back to (1)
-
-Typical scan period: 5-20 ms
-Watchdog timeout: 200-500 ms (fault if exceeded)
+```mermaid
+flowchart TD
+    A["Watchdog Timer Reset (1)"]
+    B["Input Image Table Update (2)<br/>- Read all local/remote I/O modules<br/>- Sample analog inputs via ADC<br/>- Apply input filters and diagnostics"]
+    C["Program Logic Execution (3)<br/>- Execute rung 0 → rung N sequentially<br/>- Evaluate contacts, coils, timers<br/>- Update internal memory and flags"]
+    D["Output Image Table Transfer (4)<br/>- Write computed states to output modules<br/>- Drive physical terminals via transistors<br/>- Perform output forcing and overrides"]
+    E["Housekeeping & Diagnostics (5)<br/>- Service communication requests<br/>- Update HMI data tables<br/>- Log faults and perform self-test"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> A
+    
+    F["Typical scan period: 5-20 ms<br/>Watchdog timeout: 200-500 ms<br/>Fault if exceeded"]
+    
+    style F fill:#f0f0f0,stroke:#999,color:#333
 ```
 
 Ladder logic syntax follows strict conventions that preserve relay schematic semantics. Each rung begins at the left power rail, proceeds through a series or parallel combination of contacts, and terminates at an output coil or other output instruction adjacent to the right power rail. Contacts represent input conditions: normally-open contacts close when their associated memory bit is true, allowing logic flow; normally-closed contacts open when true, blocking flow. Output coils write to memory locations, setting the bit true when logic flow reaches the coil or leaving it false when flow is blocked. A single rung can drive multiple coils by placing them in parallel at the right side, but contacts cannot appear to the right of coils due to power flow semantics. Vertical connections represent parallel branches, allowing OR logic where any path conducts.

@@ -61,7 +61,7 @@ Don't count sharps/flats one by one under tempo. Memorize the **shape**:
 - **Sharp keys** (order of sharps: F♯ C♯ G♯ D♯ A♯ E♯ B♯) — the last sharp in the key signature is the **leading tone**; the key is a half step above it. 2 sharps → last sharp is C♯ → key is D major.
 - **Flat keys** (order of flats: B♭ E♭ A♭ D♭ G♭ C♭ F♭) — the **second-to-last flat** names the key (except F major = one flat, memorize separately). 3 flats → B♭ E♭ A♭ → second-to-last is E♭ → key is E♭ major.
 
-**Drill:** Flash 12 key signatures, name major key in <2 seconds each, then name the relative minor (down a minor 3rd) in the same breath.
+**Drill:** Flash 12 key signatures, name major key in < 2 seconds each, then name the relative minor (down a minor 3rd) in the same breath.
 
 ---
 

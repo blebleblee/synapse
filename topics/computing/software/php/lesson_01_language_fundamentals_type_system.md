@@ -33,44 +33,25 @@ The third invariant is the execution model itself: PHP compiles source text to a
 
 When PHP receives a request for `index.php`, the Zend Engine does not interpret source text directly. It executes a multi-stage compilation pipeline that transforms source bytes into an in-memory opcode array, which the virtual machine then executes. If OPcache is enabled — and in any production deployment it must be — the opcode array is serialized to shared memory after the first compilation, and subsequent requests skip the entire compilation pipeline by deserializing the cached opcode array directly. The pipeline is worth dissecting in full because every performance optimization, every profiling decision, and every understanding of class loading order flows from it.
 
-```
-Request arrives (SAPI: FPM, CLI, Apache mod_php)
-        │
-        ▼
-┌───────────────────┐
-│   Lexical Scanner  │  re2c tokenizer
-│   (zend_language_  │  Produces token stream:
-│    scanner.l)      │  T_ECHO, T_STRING, T_VARIABLE, etc.
-└────────┬──────────┘
-         │
-         ▼
-┌───────────────────┐
-│   Parser           │  Bison LALR(1) grammar
-│   (zend_language_  │  Produces Abstract Syntax Tree (AST)
-│    parser.y)       │  zend_ast nodes
-└────────┬──────────┘
-         │
-         ▼
-┌───────────────────┐
-│   AST Compiler     │  zend_compile_top_statement()
-│   (zend_compile.c) │  Walks AST, emits zend_op structs
-│                    │  Resolves function/class names
-│                    │  Builds op_array per function scope
-└────────┬──────────┘
-         │
-         ▼
-┌───────────────────┐
-│   OPcache          │  Writes op_array to shared memory mmap
-│   (ext/opcache)    │  Keys: realpath + mtime + file size
-│                    │  Subsequent requests: mmap read-only
-└────────┬──────────┘
-         │
-         ▼
-┌───────────────────┐
-│   Zend VM          │  execute_ex() dispatch loop
-│   (zend_vm_def.h)  │  OPCODE handler per instruction
-│                    │  Optional JIT tier (PHP 8+)
-└───────────────────┘
+```mermaid
+flowchart TD
+    REQUEST["Request arrives\nSAPI: FPM · CLI · Apache mod_php"]
+
+    LEXER["**Lexical Scanner**\nzend_language_scanner.l\n─────────────────────\nre2c tokenizer\nProduces token stream:\nT_ECHO · T_STRING · T_VARIABLE · …"]
+
+    PARSER["**Parser**\nzend_language_parser.y\n─────────────────────\nBison LALR(1) grammar\nProduces Abstract Syntax Tree\nzend_ast nodes"]
+
+    COMPILER["**AST Compiler**\nzend_compile.c\n─────────────────────\nzend_compile_top_statement()\nWalks AST · emits zend_op structs\nResolves function / class names\nBuilds op_array per function scope"]
+
+    OPCACHE["**OPcache**\next/opcache\n─────────────────────\nWrites op_array to shared memory mmap\nKeys: realpath + mtime + file size\nSubsequent requests: mmap read-only"]
+
+    VM["**Zend VM**\nzend_vm_def.h\n─────────────────────\nexecute_ex() dispatch loop\nOPCODE handler per instruction\nOptional JIT tier (PHP 8+)"]
+
+    REQUEST --> LEXER
+    LEXER   --> PARSER
+    PARSER  --> COMPILER
+    COMPILER --> OPCACHE
+    OPCACHE --> VM
 ```
 
 Each function and method in PHP compiles to a `zend_op_array` structure, which is conceptually equivalent to a bytecode method in the JVM. It contains the opcode array itself, a literals table (constants embedded in the source: strings, integer literals, class names), a variable table mapping PHP variable names to CV (compiled variable) slots, and try-catch block descriptors. The literals table is what makes OPcache's preloading feature so valuable: by preloading all application files at FPM worker startup, the engine resolves class and function name references once and stores the resolved pointers in the shared memory segment, eliminating hash table lookups on the hot path.
@@ -141,50 +122,44 @@ PHP's superglobals — `$_GET`, `$_POST`, `$_COOKIE`, `$_SESSION`, `$_SERVER`, `
 
 The PHP-FPM execution model is worth tracing from TCP accept to script completion, because every performance characteristic of a PHP application is a consequence of where in this lifecycle work is done.
 
-```
-Upstream (nginx) sends FastCGI request over Unix socket
-        │
-        ▼
-php-fpm master process (listening, pre-forked workers)
-        │
-        ▼
-Worker process selected from idle pool
-        │
-        ▼
-  SAPI request_init:
-  ┌─────────────────────────────────────────────────────┐
-  │ 1. zend_activate(): reset executor globals          │
-  │ 2. Populate $_SERVER from FastCGI params            │
-  │ 3. Parse query string → $_GET                       │
-  │ 4. Read stdin → parse body → $_POST / $_FILES       │
-  │ 5. Parse Cookie header → $_COOKIE                   │
-  │ 6. Build $_REQUEST (order: request_order directive) │
-  └─────────────────────────────────────────────────────┘
-        │
-        ▼
-  OPcache lookup (realpath → shared memory segment)
-  Hit: deserialize op_array, skip compile
-  Miss: compile pipeline → store in SHM → execute
-        │
-        ▼
-  php_execute_script() / execute_ex() VM loop
-        │
-        ▼
-  Script completes, output buffer flushed to FastCGI
-        │
-        ▼
-  SAPI request_shutdown:
-  ┌─────────────────────────────────────────────────────┐
-  │ 1. Call registered shutdown functions                │
-  │ 2. Flush and clean output buffers                   │
-  │ 3. Close database connections (unless persistent)   │
-  │ 4. zend_deactivate(): destroy symbol tables         │
-  │ 5. Run GC, free reference cycle memory              │
-  │ 6. Reset executor state for next request            │
-  └─────────────────────────────────────────────────────┘
-        │
-        ▼
-Worker returns to idle pool
+```mermaid
+flowchart TD
+    A["Upstream (nginx)<br/>Sends FastCGI request over Unix socket"]
+    B["php-fpm master process<br/>(listening, pre-forked workers)"]
+    C["Worker process selected<br/>from idle pool"]
+    
+    D["SAPI request_init"]
+    D1["1. zend_activate():<br/>reset executor globals"]
+    D2["2. Populate $_SERVER<br/>from FastCGI params"]
+    D3["3. Parse query string → $_GET"]
+    D4["4. Read stdin →<br/>parse body → $_POST / $_FILES"]
+    D5["5. Parse Cookie header → $_COOKIE"]
+    D6["6. Build $_REQUEST<br/>(order: request_order directive)"]
+    
+    E["OPcache lookup<br/>(realpath → shared memory segment)"]
+    E1["Hit: deserialize op_array,<br/>skip compile"]
+    E2["Miss: compile pipeline →<br/>store in SHM → execute"]
+    F["Merge: Continue execution"]
+    
+    G["php_execute_script() /<br/>execute_ex() VM loop"]
+    H["Script completes,<br/>output buffer flushed to FastCGI"]
+    
+    I["SAPI request_shutdown"]
+    I1["1. Call registered<br/>shutdown functions"]
+    I2["2. Flush and clean<br/>output buffers"]
+    I3["3. Close database connections<br/>(unless persistent)"]
+    I4["4. zend_deactivate():<br/>destroy symbol tables"]
+    I5["5. Run GC,<br/>free reference cycle memory"]
+    I6["6. Reset executor state<br/>for next request"]
+    
+    J["Worker returns to idle pool"]
+    
+    A --> B --> C --> D
+    D --> D1 --> D2 --> D3 --> D4 --> D5 --> D6 --> E
+    E --> E1 --> F
+    E --> E2 --> F
+    F --> G --> H --> I
+    I --> I1 --> I2 --> I3 --> I4 --> I5 --> I6 --> J
 ```
 
 Notice that steps 1 through 6 of `request_shutdown` happen on **every request**. The destructor cascade for all objects, the reference cycle collector, the symbol table teardown — these are fixed costs that PHP-FPM absorbs once per request. This is the fundamental overhead that persistent-process servers like Swoole eliminate: by keeping the process alive and manually resetting only what needs resetting, they amortize the initialization and teardown cost across thousands of requests. But this requires that every library in the application be "coroutine-safe" and explicitly manage its state between requests, which is why naive adoption of Swoole with frameworks designed for FPM produces state corruption.

@@ -34,44 +34,65 @@ Torque characteristics differ markedly between brushless and universal motor imp
 
 The control system architecture reveals itself through operational behavior. Brushless tool controllers implement closed-loop speed regulation by monitoring motor speed (via commutation frequency) and adjusting voltage through pulse-width modulation (PWM) to maintain the setpoint despite load variations. The rapid switching—typically 10-20 kilohertz, above human hearing range—delivers average voltage proportional to duty cycle: 50% duty cycle yields half voltage, 80% yields four-fifths voltage. Under constant load, this regulation maintains speed within 2-5% of the setpoint; as load increases, the controller increases PWM duty cycle to compensate, up to 100% duty cycle where full battery voltage is continuously applied. Beyond this point, speed must decrease as torque demand increases, but the initial regulation range provides noticeably more consistent performance than unregulated universal motors.
 
-```
-Universal Motor (Series-Wound) Architecture:
-
-    AC/DC Supply
-         |
-    [Brush Assembly]───→ [Commutator] (rotating)
-         |                     |
-    [Field Coils]────────[Armature Coils]────→ Mechanical Shaft
-         |                     |
-    (Series Connection)   (Back-EMF Generation)
-         |                     
-    [Phase-Angle           Speed ∝ (V - I·R) / Φ
-     Speed Control]        Torque ∝ Φ · I ≈ I²
-                           (High starting torque,
-                            speed droops under load)
-
-
-Brushless DC Motor Architecture:
-
-    DC Battery Supply
-         |
-    [Electronic Speed Controller]
-         |
-    [6-FET Inverter Bridge]
-         |    |    |
-      Phase-A  B   C  ────→ [3-Phase Stator Windings]
-         |                         (stationary)
-    [Hall Sensors]                      |
-         ↑                      Rotating Magnetic Field
-         |                              ↓
-    [Permanent Magnet Rotor]────→ Mechanical Shaft
-     (Back-EMF generation,
-      position feedback)
-      
-      Speed Regulation: PWM duty cycle adjusted
-                        to maintain setpoint
-      Torque: Flat across speed range,
-              current-limited
+```mermaid
+flowchart TD
+    subgraph universal ["Universal Motor (Series-Wound) Architecture"]
+        A["AC/DC Supply"]
+        B["Brush Assembly"]
+        C["Commutator<br/>(rotating)"]
+        D["Field Coils"]
+        E["Armature Coils"]
+        F["Mechanical Shaft"]
+        G["Phase-Angle<br/>Speed Control"]
+        H["Series Connection"]
+        I["Back-EMF Generation"]
+        J["Speed ∝ (V - I·R) / Φ<br/>Torque ∝ Φ · I ≈ I²<br/>(High starting torque,<br/>speed droops under load)"]
+        
+        A --> B
+        B --> C
+        B --> D
+        C --> E
+        D --> E
+        E --> F
+        D -.-> H
+        E -.-> H
+        E -.-> I
+        G -.-> B
+        H -.-> J
+        I -.-> J
+    end
+    
+    subgraph brushless ["Brushless DC Motor Architecture"]
+        K["DC Battery Supply"]
+        L["Electronic Speed Controller"]
+        M["6-FET Inverter Bridge"]
+        N["Phase-A"]
+        O["Phase-B"]
+        P["Phase-C"]
+        Q["3-Phase Stator Windings<br/>(stationary)"]
+        R["Rotating Magnetic Field"]
+        S["Permanent Magnet Rotor"]
+        T["Mechanical Shaft"]
+        U["Hall Sensors"]
+        V["Back-EMF generation,<br/>position feedback"]
+        W["Speed Regulation: PWM duty cycle<br/>adjusted to maintain setpoint<br/>Torque: Flat across speed range,<br/>current-limited"]
+        
+        K --> L
+        L --> M
+        M --> N
+        M --> O
+        M --> P
+        N --> Q
+        O --> Q
+        P --> Q
+        Q --> R
+        R --> S
+        S --> T
+        S -.-> V
+        V -.-> U
+        U -.-> L
+        S -.-> W
+    end
 ```
 
 Induction motors, the workhorses of industrial machinery, appear in stationary woodworking equipment—table saws, jointers, planers, dust collectors—where durability and minimal maintenance justify their larger size and lower power density. Unlike universal and brushless motors that require rotor electrical connections (brushes or permanent magnets), induction motors transfer energy entirely through electromagnetic induction across an air gap. The stator contains polyphase windings (typically three-phase in industrial settings, split-phase or capacitor-start in single-phase implementations) that generate a rotating magnetic field when energized with AC power. This rotating field sweeps past conductive bars embedded in the rotor (the "squirrel cage" assembly, named for its resemblance to exercise wheels), inducing currents through electromagnetic induction—exactly the principle by which a transformer couples primary to secondary windings, except the "secondary" rotates.

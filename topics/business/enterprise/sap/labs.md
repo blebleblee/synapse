@@ -387,7 +387,7 @@ The cutover steering committee convenes to review validation results against pre
 - GL financial balance variance exceeds $50,000 with unexplained root cause
 - ≥2 severity-1 defects remain unresolved
 - Critical interface failures prevent order processing or financial posting
-- User acceptance validation reveals <70% successful transaction completion rate
+- User acceptance validation reveals < 70% successful transaction completion rate
 - System performance testing shows transaction response times exceeding 5 seconds for standard operations (degradation preventing user productivity)
 
 Rollback execution plan: Restore legacy ERP from Friday 6:00 PM backup, reactivate legacy interfaces, notify user community of 1-week postponement, conduct root cause analysis, remediate identified defects, and reschedule cutover for the following weekend.
@@ -511,13 +511,13 @@ Contingency budget recommendation: $850K (midpoint between expected loss and res
 Proceed with cutover if ALL of the following conditions are satisfied:
 
 1. Overall weighted readiness score ≥85%
-2. No individual readiness dimension scoring <75%
+2. No individual readiness dimension scoring < 75%
 3. Zero unresolved severity-1 defects (system unavailable, data corruption, financial posting errors)
 4. ≤5 unresolved severity-2 defects with documented workarounds
 5. GL financial balance reconciliation variance ≤$5,000
 6. Critical integration interfaces (P0/P1 priority) achieving 100% smoke test success
 7. User acceptance validation success rate ≥80%
-8. System performance benchmarks: Dialog response time <2 seconds, batch processing within scheduled windows
+8. System performance benchmarks: Dialog response time < 2 seconds, batch processing within scheduled windows
 9. Hypercare staffing and incident management infrastructure operational
 10. Executive steering committee unanimous approval
 
@@ -531,7 +531,7 @@ Track weekly during 12-week intensive hypercare phase:
 |--------|----------------|---------------|----------------|-------------------|
 | Total incident volume | 285 | 170 (40% reduction) | 140 (50% reduction) | Week-over-week increase for 3 consecutive weeks |
 | Severity-1 incident count | 12 | 3 | 1 | >5 per week after Week 4 |
-| First-time transaction success rate | 65% | 80% | 90% | <75% after Week 6 |
+| First-time transaction success rate | 65% | 80% | 90% | < 75% after Week 6 |
 | Average dialog response time | 2.8 sec | 1.8 sec | 1.2 sec | >3.0 sec sustained |
 | Month-end close cycle time | 7 days | 6 days | 5 days | Regression to 8+ days |
 | Open defects aged >30 days | 18 | 8 | 3 | >10 after Week 8 |
@@ -556,7 +556,7 @@ $$\text{Realization Rate} = \frac{\text{Actual Measured Benefits}}{\text{Busines
 Governance response thresholds:
 - Realization rate 80-100%: On-track, continue planned optimization roadmap
 - Realization rate 60-79%: At-risk, accelerate remediation initiatives, quarterly executive reviews
-- Realization rate <60%: Critical, convene emergency steering committee, evaluate major corrective actions or investment write-down
+- Realization rate < 60%: Critical, convene emergency steering committee, evaluate major corrective actions or investment write-down
 
 **SAP Program Governance Operating Model**
 

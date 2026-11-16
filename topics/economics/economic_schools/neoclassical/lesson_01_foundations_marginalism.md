@@ -58,21 +58,24 @@ This condition encodes the equimarginal principle in precise mathematical form: 
 
 The geometric representation of this optimization illuminates the underlying logic. Indifference curves—loci of consumption bundles yielding identical utility—form a family of downward-sloping, convex curves in $(x, y)$ space. The slope of an indifference curve at any point equals the negative of the marginal rate of substitution, $-\frac{\partial U / \partial x}{\partial U / \partial y}$. The budget constraint appears as a linear boundary with slope $-\frac{P_x}{P_y}$, defining the edge of the feasible region. The consumer's optimum occurs where an indifference curve touches the budget line tangentially—the highest attainable indifference curve given the constraint. At this tangency point, the subjective willingness to substitute (the indifference curve slope) exactly matches the objective market trade-off (the budget line slope).
 
-```
-Utility (U)
-    │
-    │     Indifference Curves (U₃ > U₂ > U₁)
-    │         ╱╲
-    │       ╱    ╲  U₃ (unattainable)
-    │     ╱   ╱╲   ╲
-    │   ╱   ╱    ╲   ╲
-    │ ╱   ╱   ●    ╲   ╲  ← Optimal point: tangency
-    │   ╱  U₂        ╲   ╲    MRS = Px/Py
-    │ ╱                ╲   ╲
-    │╱      U₁           ╲   ╲
-    │━━━━━━━━━━━━━━━━━━━━━━━━━╲━━━━━━━ Budget Line: Px·x + Py·y = M
-    │                              ╲
-    └────────────────────────────────────── Quantity of Good x
+```mermaid
+flowchart TD
+    A["Utility U"]
+    B["Indifference Curves<br/>U₃ > U₂ > U₁"]
+    C["U₃<br/>unattainable"]
+    D["Optimal Point<br/>● Tangency<br/>MRS = Px/Py"]
+    E["U₂"]
+    F["U₁"]
+    G["Budget Line<br/>Px·x + Py·y = M"]
+    H["Quantity of Good x"]
+    
+    A --> B
+    B --> C
+    B --> D
+    B --> E
+    B --> F
+    D -.->|tangent to| G
+    G --> H
 ```
 
 The Lagrange multiplier $\lambda$ emerging from this optimization carries its own economic interpretation: it represents the marginal utility of income, the additional utility obtained from a small increase in the budget. When the consumer is optimally allocated across goods, $\lambda$ equals $\frac{\partial U / \partial x}{P_x} = \frac{\partial U / \partial y}{P_y}$, indicating that the last dollar spent on each good yields the same marginal utility increment. This common ratio measures how tightly the budget constraint binds the consumer's choices.
@@ -105,23 +108,38 @@ The symmetry between consumer and producer optimization reveals the architectura
 
 Market equilibrium emerges when aggregate quantity demanded equals aggregate quantity supplied at the prevailing price. Summing individual demand curves horizontally generates the market demand curve $Q^D(P)$, while summing individual firm supply curves (derived from marginal cost curves above minimum average variable cost) generates market supply $Q^S(P)$. The equilibrium price $P^*$ satisfies $Q^D(P^*) = Q^S(P^*)$, and the market clears without persistent excess demand or supply. At this price, the marginal valuation of the last unit consumed (reflected in willingness to pay) equals the marginal cost of producing that unit (reflected in supply price). No further mutually beneficial exchanges remain unexploited.
 
-```
-Price (P)
-    │
-    │         Supply: S(P) = ΣMC
-    │              ╱
-    │            ╱
-    │          ╱
-    │        ╱
-    │    ╱ ╱
-    │  ╱ ╱ ● ← Equilibrium: Qᴰ(P*) = Qˢ(P*)
-    │╱ ╱       Marginal buyer valuation = Marginal seller cost
-    ╱ ╱
-  ╱ ╱
-╱ ╱           Demand: D(P) = Σ(MU/P)
-│
-└────────────────────────────────────── Quantity (Q)
-         Q*
+```mermaid
+flowchart TD
+    Origin["Origin (0,0)"]
+    
+    PAxis["Price (P)<br/>↑"]
+    QAxis["Quantity (Q) →"]
+    
+    Demand["Demand Curve<br/>D(P) = Σ(MU/P)<br/>↘"]
+    Supply["Supply Curve<br/>S(P) = ΣMC<br/>↗"]
+    
+    Equilibrium["● Equilibrium Point<br/>Q<sup>D</sup>(P*) = Q<sup>S</sup>(P*)<br/>Marginal buyer valuation =<br/>Marginal seller cost"]
+    
+    QStar["Q* (Equilibrium Quantity)"]
+    PStar["P* (Equilibrium Price)"]
+    
+    Origin --> PAxis
+    Origin --> QAxis
+    
+    PAxis -.-> Equilibrium
+    QAxis -.-> Equilibrium
+    
+    Demand --> Equilibrium
+    Supply --> Equilibrium
+    
+    Equilibrium -.-> QStar
+    Equilibrium -.-> PStar
+    
+    style Equilibrium fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
+    style Demand fill:#4dabf7,stroke:#1971c2,stroke-width:2px
+    style Supply fill:#51cf66,stroke:#2f9e44,stroke-width:2px
+    style QStar fill:#ffd43b,stroke:#f59f00
+    style PStar fill:#ffd43b,stroke:#f59f00
 ```
 
 The equilibrium price performs an informational aggregation function that classical economists had intuited but could not rigorously formalize. Each consumer's demand reflects their subjective marginal utility; each producer's supply reflects their objective marginal cost. The market price synthesizes these dispersed subjective valuations and technological constraints into a single summary statistic that coordinates decentralized plans. Hayek would later emphasize this informational property as the defining advantage of market systems over centralized planning: prices encode knowledge about local conditions, individual preferences, and technological possibilities that no central planner could feasibly collect and process.

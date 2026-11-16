@@ -28,17 +28,37 @@ The practical starting point for any LEGO robotic drivetrain is mapping the comp
 
 Consider a canonical two-motor differential drive chassis. Each motor drives one side of the chassis independently, and steering is achieved by varying the relative speeds of the two drive sides — the same principle used in tank treads and wheelchair bases. The mechanical path for one side looks like this:
 
-```
-[L Motor] ──(axle)──► [8T Driver] ──mesh──► [24T Driven / 8T Driver on same axle]
-         ──mesh──► [24T Driven] ──(axle)──► [Drive Wheel]
+```mermaid
+flowchart LR
+    subgraph stage1 ["Stage 1 — Reduction 3.0 : 1"]
+        MOTOR["L Motor\n~175 RPM @ 9V"]
+        D1["8T Driver"]
+        DN1["24T Driven\n(+ 8T Driver on same axle)"]
+        MOTOR -->|axle| D1
+        D1 -->|mesh| DN1
+    end
 
-Stage 1: 8T → 24T  (R₁ = 3.0)
-Stage 2: 8T → 24T  (R₂ = 3.0)
-Total Reduction: 9.0 : 1
-Motor no-load speed (L Motor): ~175 RPM @ 9V
-Output shaft speed: ~19.4 RPM
-Wheel diameter (62.4mm): ~3.8 cm/rev
-Linear chassis speed: ~74 cm/min ≈ 12.3 mm/s
+    subgraph stage2 ["Stage 2 — Reduction 3.0 : 1"]
+        DN1
+        D2["8T Driver"]
+        DN2["24T Driven"]
+        DN1 -->|axle| D2
+        D2 -->|mesh| DN2
+    end
+
+    subgraph output ["Output"]
+        WHEEL["Drive Wheel\nØ 62.4 mm"]
+        SPEED["Output\n~19.4 RPM\n~74 cm/min ≈ 12.3 mm/s"]
+        DN2 -->|axle| WHEEL
+        WHEEL --> SPEED
+    end
+
+    subgraph summary ["Total Reduction: 9.0 : 1"]
+        R1["Stage 1: 8T → 24T\nR₁ = 3.0"]
+        R2["Stage 2: 8T → 24T\nR₂ = 3.0"]
+        RTOTAL["Total: R₁ × R₂ = 9.0"]
+        R1 --> R2 --> RTOTAL
+    end
 ```
 
 This kind of back-of-envelope calculation, carried out before placing a single brick, tells you immediately whether the design will be fast enough for a timed competition task or whether you need to revise the ratio. The LEGO Large Angular Motor (used in SPIKE Prime and Mindstorms Robot Inventor) has a stall torque of approximately 25 N·cm and a no-load speed of roughly 175 RPM at the nominal supply voltage. At a 9:1 reduction, the output shaft delivers up to 225 N·cm of torque — more than enough to drive a mid-weight chassis up a 15-degree ramp, but potentially more than the plastic gear teeth can survive at hard stall. Knowing this, an experienced builder adds a clutch gear (the LEGO friction clutch element) in the drivetrain to cap transmitted torque at the mechanical limit of the weakest link, preventing tooth shear.

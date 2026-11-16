@@ -28,20 +28,20 @@ The sequence of play introduces timing asymmetry. The player who leads a trick h
 
 In many trick-taking games, the concept of the *bid* or *contract* adds a layer of pre-play negotiation. In Bridge, players auction for the right to specify trump and a target number of tricks. This auction itself becomes a game-within-the-game: players signal hand strength through bidding sequences, and opponents must decide whether to compete or concede. The losing bidders (those who do not secure the contract) still play the hand but with reduced strategic agency—they are defending against, not directing, play.
 
-```
-TRICK-TAKING ARCHITECTURE
-
-Lead Player → Card Played (Suit Established)
-     ↓
-Following Players (in sequence) → Play Decision
-     ├─ Have Suit? → Must Follow (or Play Trump/Discard if house rules allow)
-     └─ No Suit? → May Trump or Discard
-     ↓
-Highest Legal Card (by Rank + Trump Rule) → Wins Trick
-     ↓
-Winner → Leads Next Trick
-     ↓
-Process Repeats Until All Cards Played
+```mermaid
+flowchart TD
+    A["Lead Player"] --> B["Card Played<br/>(Suit Established)"]
+    B --> C["Following Players<br/>(in sequence)"]
+    C --> D{Have Suit?}
+    D -->|Yes| E["Must Follow<br/>(or Play Trump/Discard<br/>if house rules allow)"]
+    D -->|No| F["May Trump or Discard"]
+    E --> G["Highest Legal Card<br/>(by Rank + Trump Rule)"]
+    F --> G
+    G --> H["Winner"]
+    H --> I["Leads Next Trick"]
+    I --> J{All Cards Played?}
+    J -->|No| C
+    J -->|Yes| K["End"]
 ```
 
 The tension in trick-taking games arises from the disconnect between *winning tricks* and *winning the game*. In many variants, you do not simply count tricks won; instead, specific tricks (often the last few) carry disproportionate weight, or your target is to win exactly a predetermined number. This creates a sophistication layer: a player who has already won enough tricks faces the inverse problem—they must now *lose* tricks strategically, surrendering cards to opponents without wasting high cards that might be needed defensively.
@@ -70,22 +70,33 @@ The matching condition in shedding games is typically simple (same rank or suit)
 
 Many shedding games introduce *penalties* for specific card plays. In some variants, playing a 2 forces the next player to draw two cards; playing a 4 forces a skip (that player's turn is skipped). This creates a secondary decision layer: do you play a penalty card strategically to disrupt opponents, or do you play a safe card to progress your own hand reduction? The tradeoff is acute: penalty cards are powerful but reveal your remaining hand composition to observant opponents.
 
-```
-SHEDDING GAME FLOW
-
-Player Turn → Valid Play Exists?
-     ├─ YES → Select Card to Play
-     │   ├─ Safe Play (Non-Penalty)
-     │   │   └─ Card Played, Discard Pile Updated
-     │   └─ Penalty Play (2s, 4s, etc.)
-     │       └─ Card Played, Next Player Draws (Penalty Applied)
-     ├─ NO → Draw Card from Deck
-     │   └─ Playable? → Play Drawn Card
-     │   └─ Not Playable? → Continue Drawing or Skip Turn
-     ↓
-Hand Empty? → WIN
-     ↓
-Otherwise → Next Player's Turn
+```mermaid
+flowchart TD
+    Start["Player Turn"] --> ValidPlay{"Valid Play Exists?"}
+    
+    ValidPlay -->|YES| SelectCard["Select Card to Play"]
+    
+    SelectCard --> SafePlay{"Safe Play (Non-Penalty)"}
+    SelectCard --> PenaltyPlay{"Penalty Play (2s, 4s, etc.)"}
+    
+    SafePlay --> SafeResult["Card Played, Discard Pile Updated"]
+    PenaltyPlay --> PenaltyResult["Card Played, Next Player Draws (Penalty Applied)"]
+    
+    ValidPlay -->|NO| DrawCard["Draw Card from Deck"]
+    
+    DrawCard --> CheckPlayable{"Playable?"}
+    CheckPlayable -->|YES| PlayDrawn["Play Drawn Card"]
+    CheckPlayable -->|NO| SkipTurn["Continue Drawing or Skip Turn"]
+    
+    SafeResult --> CheckWin{"Hand Empty?"}
+    PenaltyResult --> CheckWin
+    PlayDrawn --> CheckWin
+    SkipTurn --> CheckWin
+    
+    CheckWin -->|YES| Win["WIN"]
+    CheckWin -->|NO| NextTurn["Next Player's Turn"]
+    
+    NextTurn --> Start
 ```
 
 Shedding games also often incorporate *stack reversal* or *direction-change* mechanics. If the discard pile contains multiple cards of the same rank (say, three Kings were played in sequence), the direction of play might reverse, sending the turn back to the previous player. This mechanic solves a fairness problem: without reversal, the player who gains an early advantage (reduces their hand) can maintain it simply by playing cards faster than opponents recover. Reversal creates comeback dynamics—a player who is behind can suddenly become advantaged if the right cards are played in the right sequence.
@@ -114,23 +125,40 @@ This creates a meta-layer absent in other card game families: the *format metaga
 
 The resource system in CCGs introduces economic constraints. In Magic, players accumulate *mana* (magical energy) each turn, which limits how many spells can be cast. This mana system creates a natural curve: early turns have limited mana, so players play weak creatures; mid-game mana allows more complex plays; late-game mana allows powerful spells. Deck construction revolves around optimizing this curve—ensuring you have plays available at each mana level without wasting slots on redundant effects.
 
-```
-CCG STRATEGIC LAYERS
-
-Layer 1: Deck Construction (Pre-Game)
-     ├─ Card Selection from Available Pool
-     ├─ Mana Curve Optimization
-     └─ Archetype Definition (Aggro, Control, Combo, etc.)
-
-Layer 2: Game Play (Tactical)
-     ├─ Resource Management (Mana, Card Advantage)
-     ├─ Threat Assessment (What does opponent's board state pose?)
-     └─ Sequencing (In what order should I cast spells?)
-
-Layer 3: Metagame (Ecological)
-     ├─ Popular Archetypes in Current Format
-     ├─ Deck Construction Adjusted to Counter Meta
-     └─ Equilibrium Maintenance Through Format Rotation
+```mermaid
+flowchart TD
+    Title["CCG STRATEGIC LAYERS"]
+    
+    Layer1["Layer 1: Deck Construction (Pre-Game)"]
+    Layer1_1["Card Selection from Available Pool"]
+    Layer1_2["Mana Curve Optimization"]
+    Layer1_3["Archetype Definition (Aggro, Control, Combo, etc.)"]
+    
+    Layer2["Layer 2: Game Play (Tactical)"]
+    Layer2_1["Resource Management (Mana, Card Advantage)"]
+    Layer2_2["Threat Assessment (What does opponent's board state pose?)"]
+    Layer2_3["Sequencing (In what order should I cast spells?)"]
+    
+    Layer3["Layer 3: Metagame (Ecological)"]
+    Layer3_1["Popular Archetypes in Current Format"]
+    Layer3_2["Deck Construction Adjusted to Counter Meta"]
+    Layer3_3["Equilibrium Maintenance Through Format Rotation"]
+    
+    Title --> Layer1
+    Title --> Layer2
+    Title --> Layer3
+    
+    Layer1 --> Layer1_1
+    Layer1 --> Layer1_2
+    Layer1 --> Layer1_3
+    
+    Layer2 --> Layer2_1
+    Layer2 --> Layer2_2
+    Layer2 --> Layer2_3
+    
+    Layer3 --> Layer3_1
+    Layer3 --> Layer3_2
+    Layer3 --> Layer3_3
 ```
 
 The draw problem in CCGs is solved through controlled randomization. You draw cards from your constructed deck, which means you have some predictability (you built the deck, so you know what might appear) but not perfect information (shuffling ensures you do not know the exact order). This creates a balance: unlike trick-taking games where hidden information is absolute, CCGs provide semi-transparent information—you know what *types* of cards opponent might play but not their exact hand.
@@ -161,4 +189,19 @@ For practitioners optimizing card game experiences, this computational reality h
 
 ### Information Asymmetry and Player Agency
 
-The relationship between information and decision-making is non-linear. More information does not always improve decisio
+The relationship between information and decision-making is non-linear.
+
+In card games, information asymmetry creates what game theorists call a "fog of war" effect—players must make optimal decisions under uncertainty about opponent holdings, future draws, or hidden community information. This asymmetry is not merely a gameplay feature; it fundamentally determines the skill ceiling and the nature of expertise. In perfect-information games like open-hand Bridge variants, optimal play is theoretically determinable (though computationally expensive). In imperfect-information games like Poker or Hearts, optimal play requires modeling opponents' beliefs, which in turn requires modeling their model of your beliefs—an infinite regress that game theory resolves through Nash equilibria and mixed strategies. The practical consequence is that player agency in asymmetric-information games involves both strategic reasoning (what is the mathematically correct play given probabilities) and psychological reasoning (what will my opponent *believe* I will do). This dual layer is why games like Poker remain compelling: the optimal strategy is not just to maximize expected value, but to be unpredictable, which paradoxically requires *sometimes making suboptimal plays* to prevent exploitation. For designers and operators, this means that information structure is not decorative—it determines whether a game rewards pure calculation, psychological insight, or some mixture of both, and whether computational approaches can achieve superhuman performance or merely competent play.
+
+The entropy of hidden information also governs fairness and engagement dynamics. In games where luck dominates (high entropy, low skill influence), weaker players can win through variance, sustaining engagement but limiting depth. In games where skill dominates (low entropy, high information availability), stronger players win reliably, creating depth but risking discouragement for novices. The sweet spot—games like Bridge, Skat, or competitive Poker formats—calibrates information asymmetry such that skill advantage compounds over many hands (the law of large numbers ensures better players win in aggregate) while individual hands retain enough variance to feel winnable for all participants. This is why professional card game design involves extensive playtesting to tune the ratio of hidden cards, hand size, and decision frequency: these parameters directly control the slope of the skill curve and the number of hands required for skill to overcome luck. When optimizing for engagement versus competitive integrity, you are fundamentally engineering the rate at which information entropy decays across rounds.
+
+## Summary & Verification Matrix
+
+| **Game Family** | **Core Mechanism** | **Information Structure** | **Skill Determinants** | **Diagnostic Test** |
+|-----------------|-------------------|---------------------------|------------------------|---------------------|
+| **Trick-Taking** | Sequential card plays; highest card (or trump) wins trick; scoring from tricks won or specific cards captured | Partial observability: own hand visible, played cards revealed, remaining cards hidden | Card counting, probability estimation, signaling (partnerships), tempo control, inferring distributions | Does winning require tracking played cards and inferring opponents' remaining holdings? Can partnerships signal legally? |
+| **Rummy / Melding** | Collect sets/runs, discard unwanted cards; first to meld all cards (or achieve target) wins | Asymmetric: own hand visible, discard pile partially visible, draw pile hidden | Pattern recognition (meld potential), discarding safety, probability of drawing needed cards, opponent hand inference from discards | Does optimal play require tracking discards to estimate opponents' collection goals? Is there tension between advancing own melds and denying opponents? |
+| **Shedding** | Play cards matching rank/suit/sequence; first to empty hand wins | Symmetric information about plays; hidden information about remaining hands | Sequencing (avoiding dead-end positions), timing (when to use power cards), defensive blocking, counting outs | Can a player be forced into unwinnable positions based on card sequencing? Do special cards create complex chain reactions? |
+| **Vying / Betting** | Wager on relative hand strength; best hand or last remaining bettor wins pot | Hidden hand strength; visible community cards (Texas Hold'em) or none (Draw Poker); opponent behavior provides signals | Hand strength evaluation, pot odds calculation, bet sizing, bluffing equilibria, opponent modeling | Does equilibrium strategy require randomized (mixed) actions to prevent exploitation? Can strong players profit from weak players even with identical cards over time? |
+| **Patience / Solitaire** | Arrange cards according to ruleset constraints; win by clearing tableau or building foundations | Perfect information (after initial deal) or partial (hidden stock/reserves) | Constraint satisfaction, lookahead planning, recognizing dead positions, maximizing option preservation | Is success deterministic given perfect play, or does initial deal determine winnability? Are there critical decision points with irreversible consequences? |
+| **Climbing / Shedding-Climbing Hybrids** | Play progressively stronger combinations; pass if unable/unwilling; control passes to strongest play | Symmetric (all plays visible), asymmetric (own hand hidden), bomb/rocket cards create nonlinear power spikes | Combination optimization, tempo control (taking control vs. conserving strength), hand management, passing strategy | Does the game reward controlling the round (playing last) versus conserving powerful combinations for later? Can weaker hands win through strategic passing? |

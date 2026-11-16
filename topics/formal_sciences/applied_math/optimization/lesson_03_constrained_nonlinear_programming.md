@@ -82,38 +82,36 @@ The convergence properties of the augmented Lagrangian are substantially superio
 
 The computational flow of the augmented Lagrangian method is captured in the following diagram.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│              Augmented Lagrangian Outer Loop                    │
-│                                                                 │
-│  Initialize: x₀, λ₀, μ₀ ≥ 0, ρ₀ > 0                          │
-│         │                                                       │
-│         ▼                                                       │
-│  ┌─────────────────────────────────────────────────────┐        │
-│  │          Inner Solver (Unconstrained NLP)           │        │
-│  │                                                     │        │
-│  │  x_{k+1} = argmin_x L_ρ(x, λ_k, μ_k)             │        │
-│  │                                                     │        │
-│  │  Solver: L-BFGS / Truncated Newton                 │        │
-│  │  Termination: ‖∇_x L_ρ‖ ≤ ε_inner                 │        │
-│  └─────────────────────┬───────────────────────────────┘        │
-│                        │                                       │
-│                        ▼                                       │
-│           Multiplier Update                                     │
-│           λ_{k+1} = λ_k + ρ·h(x_{k+1})                        │
-│           μ_{k+1} = max(0, μ_k + ρ·g(x_{k+1}))                │
-│                        │                                       │
-│                        ▼                                       │
-│           Feasibility Check                                     │
-│           ‖h(x_{k+1})‖ ≤ ε_feas  AND                          │
-│           ‖∇_x L‖ ≤ ε_opt  ?                                   │
-│            /               \                                   │
-│          YES                NO                                 │
-│           │                  │                                 │
-│        CONVERGED        Update ρ if stagnating                 │
-│                         ρ_{k+1} = τ·ρ_k  (τ ∈ [5, 10])       │
-│                         Return to Inner Solver                 │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    INIT["Initialize: x₀, λ₀, μ₀ ≥ 0, ρ₀ > 0"]
+
+    subgraph inner ["Inner Solver (Unconstrained NLP)"]
+        SOLVE["x_{k+1} = argmin_x L_ρ(x, λ_k, μ_k)
+        ─────────────────────────────
+        Solver: L-BFGS / Truncated Newton
+        Termination: ‖∇_x L_ρ‖ ≤ ε_inner"]
+    end
+
+    MULT["Multiplier Update
+    λ_{k+1} = λ_k + ρ · h(x_{k+1})
+    μ_{k+1} = max(0, μ_k + ρ · g(x_{k+1}))"]
+
+    FEAS{"Feasibility Check
+    ‖h(x_{k+1})‖ ≤ ε_feas
+    AND ‖∇_x L‖ ≤ ε_opt ?"}
+
+    CONV(["CONVERGED"])
+
+    UPDATE["Update ρ if stagnating
+    ρ_{k+1} = τ · ρ_k,  τ ∈ [5, 10]"]
+
+    INIT --> inner
+    inner --> MULT
+    MULT --> FEAS
+    FEAS -->|YES| CONV
+    FEAS -->|NO| UPDATE
+    UPDATE --> inner
 ```
 
 ### Sequential Quadratic Programming
@@ -182,49 +180,34 @@ where $\gamma \in (0,1)$ (typically $\gamma = 0.99$) prevents iterates from touc
 
 The computational pipeline of the primal-dual IPM is architecturally distinct from SQP:
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                    Primal-Dual Interior Point Loop                   │
-│                                                                      │
-│  Initialize: x₀ strictly feasible, s₀ > 0, λ₀, μ₀ > 0, τ₀ > 0    │
-│         │                                                            │
-│         ▼                                                            │
-│  Compute Residuals:                                                  │
-│    r_d = ∇f + Aₕᵀλ + Aᵍᵀμ                                          │
-│    r_p = h(x)                                                        │
-│    r_c = Sμ - τ·e                                                    │
-│         │                                                            │
-│         ▼                                                            │
-│  ┌────────────────────────────────────────────────────────┐          │
-│  │  Solve KKT Linear System (MA57/MA97 factorization)     │          │
-│  │                                                        │          │
-│  │  [∇²L   Aₕᵀ   Aᵍᵀ ] [Δx ]   [ r_d ]                 │          │
-│  │  [Aₕ     0     0  ] [Δλ ] = -[ r_p ]                 │          │
-│  │  [Aᵍ     0  -S⁻¹M ] [Δμ ]   [ r_c ]                 │          │
-│  └────────────────────────────────────────────────────────┘          │
-│         │                                                            │
-│         ▼                                                            │
-│  Fraction-to-Boundary Step Length                                   │
-│    α_p = max{α : s + α·Δs ≥ (1-γ)s}                                │
-│    α_d = max{α : μ + α·Δμ ≥ (1-γ)μ}                                │
-│         │                                                            │
-│         ▼                                                            │
-│  Update:                                                             │
-│    x  ← x + α_p·Δx                                                 │
-│    s  ← s + α_p·Δs                                                 │
-│    λ  ← λ + α_d·Δλ                                                 │
-│    μ  ← μ + α_d·Δμ                                                 │
-│         │                                                            │
-│         ▼                                                            │
-│  Update barrier:  τ_{k+1} = σ·(sᵀμ/p),  σ ∈ (0.1, 0.5)            │
-│         │                                                            │
-│         ▼                                                            │
-│  Convergence: ‖r_d‖, ‖r_p‖, ‖sᵀμ/p‖ ≤ ε_tol ?                     │
-│            /        \                                                │
-│           YES         NO → Repeat                                   │
-│           │                                                          │
-│        OPTIMAL                                                       │
-└──────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    INIT["<b>Initialize</b><br/>x₀ strictly feasible, s₀ &gt; 0<br/>λ₀, μ₀ &gt; 0, τ₀ &gt; 0"]
+
+    RESIDUALS["<b>Compute Residuals</b><br/>r_d = ∇f + Aₕᵀλ + Aᵍᵀμ<br/>r_p = h(x)<br/>r_c = Sμ − τ·e"]
+
+    subgraph KKT ["Solve KKT Linear System (MA57/MA97 factorization)"]
+        KKTSYS["[∇²L &nbsp; Aₕᵀ &nbsp; Aᵍᵀ] [Δx]&nbsp;&nbsp;&nbsp;[r_d]<br/>[Aₕ &nbsp;&nbsp; 0 &nbsp;&nbsp;&nbsp; 0 &nbsp;] [Δλ] = −[r_p]<br/>[Aᵍ &nbsp;&nbsp; 0 &nbsp; −S⁻¹M] [Δμ]&nbsp;&nbsp;&nbsp;[r_c]"]
+    end
+
+    STEPLENGTH["<b>Fraction-to-Boundary Step Length</b><br/>α_p = max{α : s + α·Δs ≥ (1−γ)s}<br/>α_d = max{α : μ + α·Δμ ≥ (1−γ)μ}"]
+
+    UPDATE["<b>Update Variables</b><br/>x ← x + α_p·Δx<br/>s ← s + α_p·Δs<br/>λ ← λ + α_d·Δλ<br/>μ ← μ + α_d·Δμ"]
+
+    BARRIER["<b>Update Barrier Parameter</b><br/>τₖ₊₁ = σ·(sᵀμ / p),&nbsp;&nbsp;σ ∈ (0.1, 0.5)"]
+
+    CONVERGE{"<b>Convergence Check</b><br/>‖r_d‖, ‖r_p‖, ‖sᵀμ/p‖ ≤ ε_tol ?"}
+
+    OPTIMAL(["<b>OPTIMAL</b>"])
+
+    INIT --> RESIDUALS
+    RESIDUALS --> KKT
+    KKT --> STEPLENGTH
+    STEPLENGTH --> UPDATE
+    UPDATE --> BARRIER
+    BARRIER --> CONVERGE
+    CONVERGE -- YES --> OPTIMAL
+    CONVERGE -- NO --> RESIDUALS
 ```
 
 A central result of IPM theory is that for linear programs, primal-dual IPMs achieve *polynomial* complexity: the number of iterations to reduce duality gap by a factor $\epsilon$ is $O(\sqrt{n} \log(1/\epsilon))$. For nonlinear programs, global convergence results are more delicate; modern implementations like IPOPT supplement the pure Newton direction with a *filter method* due to Fletcher and Leyffer to handle the nonconvex case, using a two-dimensional acceptability criterion in the $(f, \theta)$-plane (where $\theta = \|h\| + \|\max(0,g)\|$ is the infeasibility measure) rather than a scalar merit function.

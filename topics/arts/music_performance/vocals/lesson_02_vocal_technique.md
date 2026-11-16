@@ -34,8 +34,8 @@ graph TB
     E --> G
     G --> H
 
-    style sub_source fill:#e1f5ff
-    style sub_filter fill:#fff4e1
+    style sub_source fill:#e1f5ff,color:#0f172a
+    style sub_filter fill:#fff4e1,color:#0f172a
 ```
 
 ---
@@ -160,11 +160,11 @@ flowchart TD
     I --> I1["Voice Therapy"]
     I --> I2["Surgical: Microlaryngoscopy"]
 
-    style C fill:#90EE90
-    style D fill:#FFB6C1
-    style F1 fill:#FF6B6B
-    style G fill:#87CEEB
-    style H fill:#DDA0DD
+    style C fill:#90EE90,color:#0f172a
+    style D fill:#FFB6C1,color:#0f172a
+    style F1 fill:#FF6B6B,color:#0f172a
+    style G fill:#87CEEB,color:#0f172a
+    style H fill:#DDA0DD,color:#0f172a
 ```
 
 - **Nodules:** Bilateral calluses from repeated hard fold collisions without adequate breath support — typically from yelling or belting on too little air pressure, forcing the folds to slam together. Voice sounds hoarse, breathy, loses top range.

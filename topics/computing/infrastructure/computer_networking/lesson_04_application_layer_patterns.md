@@ -216,18 +216,20 @@ The client-server model imposes a fundamental asymmetry: clients initiate, serve
 
 Connection pooling inverts the connection-per-request model by maintaining a set of pre-established TCP connections that multiple request-response cycles share. An HTTP client library with a connection pool of size 10 to a given upstream will never hold more than 10 concurrent TCP connections open, amortizing the three-way handshake cost and avoiding TIME_WAIT accumulation. The pool must manage two concerns simultaneously: liveness (detecting when a pooled connection has been silently closed by a firewall or the server's idle timeout, before the application attempts to reuse it) and saturation (deciding what to do when all connections are in use — queue the request, open a new connection, or return an error immediately).
 
-```
-Client                     Load Balancer              Backend Pool
-  │                             │                           │
-  │── POST /api/pay ──────────► │                           │
-  │                             │── pick idle conn ────────►│
-  │                             │                           │── process ──►
-  │                             │◄── 200 OK ───────────────│
-  │◄── 200 OK ─────────────────│                           │
-  │                             │   [conn returned to pool] │
-  │                             │                           │
-  │── GET /api/status ────────► │                           │
-  │                             │── reuse same conn ───────►│
+```mermaid
+flowchart LR
+    Client["Client"]
+    LB["Load Balancer"]
+    Backend["Backend Pool"]
+    
+    Client -->|"POST /api/pay"| LB
+    LB -->|"pick idle conn"| Backend
+    Backend -->|"process"| Backend
+    Backend -->|"200 OK"| LB
+    LB -->|"200 OK"| Client
+    LB -.->|"conn returned to pool"| LB
+    Client -->|"GET /api/status"| LB
+    LB -->|"reuse same conn"| Backend
 ```
 
 HTTP/2 addresses the head-of-line blocking inherent in HTTP/1.1 pipelining by multiplexing independent request-response cycles as *streams* within a single TCP connection. Each stream is identified by a 31-bit integer and carries its own flow control window. A slow response on stream 7 does not block a fast response on stream 11 from reaching the client. The HPACK header compression scheme maintains a shared dynamic table between client and server, encoding repeated header names and values as single-byte indexed references — a 40-byte `Authorization` header on the first request becomes a 1-byte reference on the second. These properties make HTTP/2 especially effective in service-mesh environments where high-frequency RPC calls between services would otherwise require many parallel TCP connections with the attendant TLS handshake overhead.

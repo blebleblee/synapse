@@ -35,20 +35,10 @@ def get_process_status():
     except Exception:
         return []
 
-def get_recent_commits(limit=5):
+def get_last_published_commit():
     try:
         res = subprocess.run(
-            ["git", "log", "--grep=^enhance(", f"-n{limit}", "--format=%h | %cr | %s"],
-            capture_output=True, text=True, cwd=GIT_CWD, timeout=5
-        )
-        return [l for l in res.stdout.strip().splitlines() if l.strip()]
-    except Exception:
-        return []
-
-def get_current_diff_stat():
-    try:
-        res = subprocess.run(
-            ["git", "diff", "--stat", "topics/"],
+            ["git", "log", "-n", "1", "--grep=^gen(", "--format=%h (%cr): %s"],
             capture_output=True, text=True, cwd=GIT_CWD, timeout=5
         )
         return res.stdout.strip()
@@ -68,7 +58,7 @@ def get_batch_progress():
         pass
     return 0, 0, "Scanning queue..."
 
-def get_latest_log_lines(n=8):
+def get_latest_log_lines(n=14):
     if not LOG_FILE.exists():
         return ["(No generator.log found yet)"]
     try:
@@ -81,7 +71,7 @@ def get_latest_log_lines(n=8):
 def get_engine_info():
     """Dynamically extracts active model and concurrency details from the engine logs."""
     if os.environ.get("VNAIPRO_API_KEY"):
-        return "Anthropic Claude [claude-sonnet-5] (6x Parallel Pool: 4 VNAIPRO + 2 AIAPIFLOW)"
+        return "Anthropic Claude [claude-sonnet-5] (Multi-Gateway Parallel Pool)"
     if not LOG_FILE.exists():
         return "Anthropic Claude [claude-sonnet-5] (Sequential Cloud Stream)"
     try:
@@ -97,17 +87,16 @@ def get_engine_info():
 def render():
     procs = get_process_status()
     curr, total, topic_from_log = get_batch_progress()
-    target_count = total if total > 0 else 45
-    enhanced_count = curr if total > 0 else 0
+    target_count = total if total > 0 else 21
+    completed_count = curr if total > 0 else 0
 
     active_topic = topic_from_log if procs else "Pipeline complete & pushed to remote!"
-    diff_stat = get_current_diff_stat()
-    commits = get_recent_commits()
-    log_tail = get_latest_log_lines(8)
+    last_commit = get_last_published_commit()
+    log_tail = get_latest_log_lines(14)
 
     output = []
     output.append("=" * 70)
-    output.append(" 🧠 SYNAPSE CURRICULUM PIPELINE MONITOR (LIVE DETAIL)")
+    output.append(" 🧠 SYNAPSE CURRICULUM PIPELINE MONITOR")
     output.append("=" * 70)
 
     if procs:
@@ -117,33 +106,19 @@ def render():
     else:
         output.append(" Engine Status:  🏁 COMPLETE / IDLE")
 
-    pct = min(100.0, (enhanced_count / target_count) * 100) if target_count > 0 else 0
+    pct = min(100.0, (completed_count / target_count) * 100) if target_count > 0 else 0
     bar_len = 25
-    filled = int(bar_len * (enhanced_count / target_count)) if target_count > 0 else 0
+    filled = int(bar_len * (completed_count / target_count)) if target_count > 0 else 0
     bar = "█" * filled + "░" * (bar_len - filled)
-    output.append(f" Progress:       [{bar}] {enhanced_count}/{target_count} ({pct:.1f}%)")
+    output.append(f" Batch Progress: [{bar}] {completed_count}/{target_count} ({pct:.1f}%)")
     output.append(f" Current Topic:  {active_topic}")
+    if last_commit:
+        output.append(f" Last Published: ✔ {last_commit}")
     output.append("-" * 70)
 
     output.append(" 📡 Live Engine Output (generator.log):")
     for line in log_tail:
         output.append(f"   │ {line}")
-
-    output.append("-" * 70)
-    output.append(" 📝 Live File Insertions & Line Expansion:")
-    if diff_stat:
-        for line in diff_stat.splitlines()[-5:]:
-            output.append(f"   │ {line}")
-    else:
-        output.append("   │ (No unstaged modifications right now)")
-
-    output.append("-" * 70)
-    output.append(" 🏆 Published Enhanced Topics:")
-    if commits:
-        for c in commits:
-            output.append(f"   ✔ {c}")
-    else:
-        output.append("   (Awaiting first topic completion...)")
 
     output.append("=" * 70)
     output.append(" Tip: Run 'tail -f generator.log' in any terminal for raw stream.")

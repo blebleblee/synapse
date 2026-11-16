@@ -129,21 +129,29 @@ The notation $\mathcal{D}^{\mathcal{C}}$ is deliberately suggestive of exponenti
 
 The following diagram captures the architecture of vertical and horizontal composition:
 
-```
-Vertical Composition (same source, same target):
-                                                                                       
-  C ===F===> D        alpha : F => G          C ===F===> D
-             |        beta  : G => H                     |
-  C ===G===> D   ─►   beta∘alpha : F => H     C ===H===> D
-             |                                                                        
-  C ===H===> D                                                                        
-                                                                                       
-Horizontal Composition (chained functors):
-                                                                                       
-  C ==F==> D ==H==> E    alpha : F => G       C ==H∘F==> E
-  C ==G==> D ==K==> E    beta  : H => K  ─►              |
-                         beta*alpha : H∘F => K∘G         |
-                                             C ==K∘G==> E
+```mermaid
+flowchart TD
+    subgraph vertical ["Vertical Composition (same source, same target)"]
+        direction LR
+        v_left["C ===F===> D<br/>C ===G===> D<br/>C ===H===> D"]
+        v_transform["alpha : F => G<br/>beta  : G => H<br/>beta∘alpha : F => H"]
+        v_right["C ===F===> D<br/>C ===H===> D"]
+        
+        v_left -.->|"composition"| v_transform
+        v_transform -.->|"result"| v_right
+    end
+    
+    subgraph horizontal ["Horizontal Composition (chained functors)"]
+        direction LR
+        h_left["C ==F==> D ==H==> E<br/>C ==G==> D ==K==> E"]
+        h_transform["alpha : F => G<br/>beta  : H => K<br/>beta*alpha : H∘F => K∘G"]
+        h_right["C ==H∘F==> E<br/>C ==K∘G==> E"]
+        
+        h_left -.->|"composition"| h_transform
+        h_transform -.->|"result"| h_right
+    end
+    
+    vertical ~~~ horizontal
 ```
 
 A worked derivation makes the functor category concrete. Consider $\mathcal{C} = \mathbf{2}$, the category with two objects $0$ and $1$ and a single non-identity morphism $\delta : 0 \to 1$. A functor $F : \mathbf{2} \to \mathcal{D}$ is precisely a morphism in $\mathcal{D}$: $F$ must specify $F(0), F(1) \in \mathcal{D}$ and a morphism $F(\delta) : F(0) \to F(1)$. The functor category $[\mathbf{2}, \mathcal{D}]$ is therefore the **arrow category** $\mathcal{D}^{\to}$: its objects are morphisms in $\mathcal{D}$, and a morphism from $f : A \to B$ to $g : C \to D$ in $\mathcal{D}^{\to}$ is a pair of morphisms $h : A \to C$ and $k : B \to D$ in $\mathcal{D}$ such that $k \circ f = g \circ h$. This is a commutative square, and it is precisely what a natural transformation $\alpha : F \Rightarrow G$ (for $F(\delta) = f$ and $G(\delta) = g$) requires: the naturality square at $\delta$ is exactly this commuting square. The arrow category is therefore not an ad hoc construction but a canonical instance of a functor category over the simplest non-trivial index category.

@@ -38,17 +38,54 @@ The computational cascade for a single depreciable asset acquired for $1 million
 
 Loss carryforward mechanics operate through a cumulative tracking algorithm maintaining a running balance of utilized and unutilized losses. When current-year taxable income before NOL deduction turns negative, that loss enters the NOL pool. In subsequent profit years, the firm calculates tentative taxable income, then applies NOL deduction subject to the 80-percent limitation: the deduction cannot exceed 80 percent of tentative taxable income, ensuring at least 20 percent of current profit remains taxable even when substantial loss carryforwards exist. The remaining 20 percent of income bears tax at the full statutory rate, while the offset 80 percent effectively receives zero-rate treatment. This creates a marginal effective tax rate of $0.2t$ rather than zero for firms with NOL carryforwards, preserving some revenue even when past losses shelter most current income.
 
-```
-NOL Utilization Algorithm:
-─────────────────────────────────────────────────────────
-Year    Tentative Income    NOL Pool    80% Limit    NOL Used    Final Income    Tax
-─────────────────────────────────────────────────────────
-1       -500,000           500,000      —            —           0               0
-2       200,000            500,000      160,000      160,000     40,000          8,400
-3       300,000            340,000      240,000      240,000     60,000          12,600
-4       400,000            100,000      320,000      100,000     300,000         63,000
-─────────────────────────────────────────────────────────
-(Assumes 21% statutory rate)
+```mermaid
+flowchart TD
+    Start["NOL Utilization Algorithm"]
+    
+    subgraph Year1 ["Year 1"]
+        Y1_TentInc["Tentative Income: -$500,000"]
+        Y1_NOLPool["NOL Pool: $500,000"]
+        Y1_Used["NOL Used: —"]
+        Y1_FinalInc["Final Income: $0"]
+        Y1_Tax["Tax: $0"]
+    end
+    
+    subgraph Year2 ["Year 2"]
+        Y2_TentInc["Tentative Income: $200,000"]
+        Y2_NOLPool["NOL Pool: $500,000"]
+        Y2_Limit["80% Limit: $160,000"]
+        Y2_Used["NOL Used: $160,000"]
+        Y2_FinalInc["Final Income: $40,000"]
+        Y2_Tax["Tax: $8,400"]
+    end
+    
+    subgraph Year3 ["Year 3"]
+        Y3_TentInc["Tentative Income: $300,000"]
+        Y3_NOLPool["NOL Pool: $340,000"]
+        Y3_Limit["80% Limit: $240,000"]
+        Y3_Used["NOL Used: $240,000"]
+        Y3_FinalInc["Final Income: $60,000"]
+        Y3_Tax["Tax: $12,600"]
+    end
+    
+    subgraph Year4 ["Year 4"]
+        Y4_TentInc["Tentative Income: $400,000"]
+        Y4_NOLPool["NOL Pool: $100,000"]
+        Y4_Limit["80% Limit: $320,000"]
+        Y4_Used["NOL Used: $100,000"]
+        Y4_FinalInc["Final Income: $300,000"]
+        Y4_Tax["Tax: $63,000"]
+    end
+    
+    Rate["Statutory Rate: 21%"]
+    
+    Start --> Year1
+    Year1 --> Year2
+    Year2 --> Year3
+    Year3 --> Year4
+    Rate -.-> Year2
+    Rate -.-> Year3
+    Rate -.-> Year4
 ```
 
 This stylized sequence demonstrates the mechanical flow: Year 1 generates a $500,000 loss entering the NOL pool with zero tax liability. Year 2 produces $200,000 tentative income; 80 percent equals $160,000 maximum deduction, consuming $160,000 from the pool and leaving $40,000 taxable income subject to $8,400 tax. The pool carries forward $340,000. By Year 4, only $100,000 NOL remains, insufficient to hit the 80-percent cap, so the full remaining loss offsets income. The asymmetry becomes evident: summing all four years yields $400,000 cumulative income ($-500k + $200k + $300k + $400k$), which in a symmetric system would generate $84,000 total tax, but the actual liability reaches only $84,000 due to time-value erosion if we account for discounting, or potentially more due to the 80-percent cap preventing full immediate utilization.
@@ -59,54 +96,37 @@ The computational implementation requires building comparable company sets throu
 
 The strategic architecture of profit shifting combines entity structuring with pricing and financing optimization. A simplified multinational structure might position a holding company in a treaty-favorable jurisdiction like Luxembourg, which in turn owns operating subsidiaries in high-tax manufacturing jurisdictions (Germany, United States, Japan) and low-tax intellectual property holding subsidiaries (Ireland, Singapore, Switzerland). The IP subsidiary holds patents, trademarks, and proprietary technology, licensing these intangibles to operating subsidiaries in exchange for royalty payments. The royalty rate becomes the critical planning variable: aggressive pricing produces large deductible payments in high-tax jurisdictions and corresponding income in the low-tax haven. Meanwhile, the holding company extends intercompany loans to operating subsidiaries, generating deductible interest expense in high-tax locations and interest income in the Luxembourg entity (which may receive favorable treatment under a participation exemption or ruling).
 
-```
-Simplified Multinational Structure for Profit Shifting:
-════════════════════════════════════════════════════════
-
-                     ┌─────────────────────────┐
-                     │  Parent (US/UK/etc.)    │
-                     │   Statutory Rate: 21%   │
-                     └───────────┬─────────────┘
-                                 │ Equity
-                                 ▼
-                     ┌─────────────────────────┐
-                     │ Holding Co (Luxembourg) │
-                     │   Effective Rate: ~1%   │
-                     └─┬─────────────────────┬─┘
-                       │                     │
-          Equity + Loan│                     │Equity
-                       ▼                     ▼
-         ┌─────────────────────┐   ┌──────────────────────┐
-         │ IP Co (Ireland)     │   │ OpCo (Germany)       │
-         │  Rate: 12.5%        │   │  Rate: 30%           │
-         │  Holds patents,     │   │  Manufacturing,      │
-         │  trademarks         │   │  Sales               │
-         └──────────┬──────────┘   └──────────┬───────────┘
-                    │                          │
-                    │  Royalties (5% revenue) │
-                    │◄─────────────────────────┘
-                    │  Interest on loan        │
-                    │◄─────────────────────────┘
-                                               
-Income Allocation Outcome:
-─────────────────────────────────────────────────────────
-OpCo Germany revenue:        €1,000M
-  Royalty deduction:          -€50M  (5% revenue)
-  Interest deduction:         -€20M  
-  Taxable income:             €400M
-  Tax at 30%:                 €120M
-
-IP Co Ireland income:
-  Royalty income:             €50M
-  Tax at 12.5%:               €6.25M
-
-Holding Co Luxembourg:
-  Interest income:            €20M
-  Tax at ~1%:                 €0.2M
-
-Total group tax:              €126.45M
-Without shifting (all in Germany): €300M at 30% = €300M
-Tax savings:                  €173.55M (58% reduction)
+```mermaid
+flowchart TD
+    Parent["<b>Parent</b><br/>(US/UK/etc.)<br/>Statutory Rate: 21%"]
+    
+    Holding["<b>Holding Co</b><br/>(Luxembourg)<br/>Effective Rate: ~1%"]
+    
+    IPCO["<b>IP Co</b><br/>(Ireland)<br/>Rate: 12.5%<br/>Holds patents,<br/>trademarks"]
+    
+    OpCo["<b>OpCo</b><br/>(Germany)<br/>Rate: 30%<br/>Manufacturing,<br/>Sales"]
+    
+    Parent -->|Equity| Holding
+    
+    Holding -->|"Equity + Loan"| IPCO
+    Holding -->|Equity| OpCo
+    
+    OpCo -->|"Royalties<br/>5% revenue"| IPCO
+    OpCo -->|"Interest on loan"| Holding
+    
+    subgraph fin ["Financial Outcome"]
+        OpCoTax["<b>OpCo Germany</b><br/>Revenue: €1,000M<br/>Royalty deduction: -€50M<br/>Interest deduction: -€20M<br/>Taxable income: €400M<br/>Tax at 30%: €120M"]
+        
+        IPCoTax["<b>IP Co Ireland</b><br/>Royalty income: €50M<br/>Tax at 12.5%: €6.25M"]
+        
+        HoldingTax["<b>Holding Co Luxembourg</b><br/>Interest income: €20M<br/>Tax at ~1%: €0.2M"]
+        
+        Result["<b>Total Group Tax: €126.45M</b><br/>Without shifting: €300M<br/>Tax savings: €173.55M (58% reduction)"]
+    end
+    
+    IPCO -.-> fin
+    OpCo -.-> fin
+    Holding -.-> fin
 ```
 
 This architecture illustrates the compounding effect of multiple mechanisms: royalty payments shift €50 million from 30 percent Germany to 12.5 percent Ireland (saving €8.75 million annually), while interest payments shift €20 million to ~1 percent Luxembourg (saving €5.8 million). The critical enforcement challenge involves substantiating the arm's-length nature of the 5 percent royalty rate and the interest rate on intercompany loans. Tax authorities scrutinize whether the IP company possesses sufficient substance—employees, decision-makers, functional capacity—to justify its ownership of valuable intangibles, or whether it constitutes a mere conduit lacking economic purpose beyond tax avoidance.

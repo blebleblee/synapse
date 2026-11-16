@@ -40,26 +40,14 @@ Understanding the uniform interface at the wire level requires grounding REST's 
 
 The conceptual model REST operates on is a three-layer stack. At the base is the **resource** — an abstract, named concept with identity but no prescribed form. Above it is the **representation** — a concrete, format-specific serialization of that resource's state at a point in time. At the top is **application state** — the client's current position in the hypermedia graph, determined by which links the server has made available.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                   APPLICATION STATE                     │
-│    (client's position in the hypermedia graph)          │
-│    driven entirely by links in server responses         │
-└────────────────────┬────────────────────────────────────┘
-                     │  HATEOAS links drive transitions
-┌────────────────────▼────────────────────────────────────┐
-│                  REPRESENTATION                         │
-│   JSON / XML / HAL / Siren / HTML payload               │
-│   carries current state + available transitions         │
-│   identified by Content-Type, versioned via Accept      │
-└────────────────────┬────────────────────────────────────┘
-                     │  serialized from / applied to
-┌────────────────────▼────────────────────────────────────┐
-│                    RESOURCE                             │
-│   Conceptual entity identified by URI                   │
-│   Storage-agnostic: RDBMS, graph DB, event log          │
-│   Exists independently of any representation            │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    AppState["APPLICATION STATE<br/>(client's position in the hypermedia graph)<br/>driven entirely by links in server responses"]
+    Representation["REPRESENTATION<br/>JSON / XML / HAL / Siren / HTML payload<br/>carries current state + available transitions<br/>identified by Content-Type, versioned via Accept"]
+    Resource["RESOURCE<br/>Conceptual entity identified by URI<br/>Storage-agnostic: RDBMS, graph DB, event log<br/>Exists independently of any representation"]
+    
+    AppState -->|"HATEOAS links drive transitions"| Representation
+    Representation -->|"serialized from / applied to"| Resource
 ```
 
 ### HTTP Method Semantics and Idempotency Contracts
@@ -171,26 +159,19 @@ The `Vary: Accept` header is critical for correctness in caching infrastructure.
 
 The engineering implementation of statelessness means moving all session state from the server into the token the client carries. The standard production pattern uses a JWT (JSON Web Token) as a signed bearer token encoding the authenticated principal's identity, roles, and token expiry. The server verifies the JWT signature on every request using its signing key and extracts the session state from the token claims — it never touches a session store.
 
-```
-Client                          API Server                    Auth Server
-  │                                   │                            │
-  │  POST /auth/token                 │                            │
-  │  {username, password}             │                            │
-  │──────────────────────────────────►│                            │
-  │                                   │  Validate credentials      │
-  │                                   │───────────────────────────►│
-  │                                   │  {access_token, refresh}   │
-  │                                   │◄───────────────────────────│
-  │  200 OK {access_token, refresh}   │                            │
-  │◄──────────────────────────────────│                            │
-  │                                   │                            │
-  │  GET /orders                      │                            │
-  │  Authorization: Bearer <JWT>      │                            │
-  │──────────────────────────────────►│                            │
-  │                                   │  Verify JWT signature      │
-  │                                   │  Extract claims (no DB hit)│
-  │  200 OK [orders...]               │                            │
-  │◄──────────────────────────────────│                            │
+```mermaid
+flowchart LR
+    Client["Client"]
+    API["API Server"]
+    Auth["Auth Server"]
+    
+    Client -->|"POST /auth/token<br/>{username, password}"| API
+    API -->|"Validate credentials"| Auth
+    Auth -->|"{access_token, refresh}"| API
+    API -->|"200 OK<br/>{access_token, refresh}"| Client
+    Client -->|"GET /orders<br/>Authorization: Bearer &lt;JWT&gt;"| API
+    API -->|"Verify JWT signature<br/>Extract claims (no DB hit)"| API
+    API -->|"200 OK<br/>[orders...]"| Client
 ```
 
 The server verifies the JWT's signature cryptographically without any network call to a session store, satisfying the statelessness constraint. The token carries all state the server needs: principal identity, authorization scopes, and expiry time. This is what makes horizontal scaling trivial — any server in the cluster can verify any token using the same public key, with zero inter-node coordination.

@@ -120,50 +120,63 @@ The internet enabled new distribution models outside gallery and museum systems.
 
 Social media platforms became primary sites for art dissemination and discourse. Instagram's image-centric format privileged photogenic work—bright colors, clear compositions, visually striking forms—creating feedback where artists optimized for Instagram legibility. This flattening effect, where artworks were experienced primarily as phone-screen thumbnails rather than physical encounters, raised concerns about how digital mediation shapes artistic production and reception.
 
-```
-Postwar Art Systems Architecture
-
-PRODUCTION LAYER
-┌──────────────────────────────────────────────────────────────┐
-│  Materials & Processes                                       │
-│  ┌────────────────┐  ┌──────────────┐  ┌─────────────────┐ │
-│  │ Traditional    │  │ Industrial    │  │ Immaterial      │ │
-│  │ (paint, canvas)│→│ (fabrication) │→│ (instructions)  │ │
-│  └────────────────┘  └──────────────┘  └─────────────────┘ │
-│         ↓                    ↓                    ↓          │
-│    Hand gesture       Outsourced work      Documentation     │
-└──────────────────────────────────────────────────────────────┘
-                              ↓
-INSTITUTIONAL LAYER
-┌──────────────────────────────────────────────────────────────┐
-│  Validation & Display Systems                                │
-│  ┌────────────┐  ┌──────────────┐  ┌────────────────────┐  │
-│  │ White Cube │→│ Museum/Gallery│→│ Biennial/Art Fair  │  │
-│  │ (neutral?) │  │ (gatekeeper)  │  │ (market platform)  │  │
-│  └────────────┘  └──────────────┘  └────────────────────┘  │
-│         ↓                ↓                      ↓            │
-│   Spatial framing   Historical canon    Economic validation  │
-└──────────────────────────────────────────────────────────────┘
-                              ↓
-ECONOMIC LAYER
-┌──────────────────────────────────────────────────────────────┐
-│  Value Circuits                                              │
-│  ┌────────────────┐  ┌──────────────┐  ┌─────────────────┐ │
-│  │ Primary Market │→│ Auction House │→│ Speculative     │ │
-│  │ (gallery sale) │  │ (resale)      │  │ Asset Class     │ │
-│  └────────────────┘  └──────────────┘  └─────────────────┘ │
-│    Artist + 50%         Commission          Investment      │
-└──────────────────────────────────────────────────────────────┘
-                              ↓
-DISCOURSE LAYER
-┌──────────────────────────────────────────────────────────────┐
-│  Meaning Production                                          │
-│  ┌────────────────┐  ┌──────────────┐  ┌─────────────────┐ │
-│  │ Artist         │→│ Critic/       │→│ Academic        │ │
-│  │ Statement      │  │ Curator       │  │ Canon           │ │
-│  └────────────────┘  └──────────────┘  └─────────────────┘ │
-│    Intention          Interpretation      Historicization   │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph production ["PRODUCTION LAYER: Materials & Processes"]
+        trad["Traditional<br/>(paint, canvas)"]
+        indust["Industrial<br/>(fabrication)"]
+        immat["Immaterial<br/>(instructions)"]
+        
+        trad --> indust
+        indust --> immat
+        
+        trad -.-> gesture["Hand gesture"]
+        indust -.-> outsourced["Outsourced work"]
+        immat -.-> docs["Documentation"]
+    end
+    
+    subgraph institutional ["INSTITUTIONAL LAYER: Validation & Display Systems"]
+        cube["White Cube<br/>(neutral?)"]
+        museum["Museum/Gallery<br/>(gatekeeper)"]
+        biennial["Biennial/Art Fair<br/>(market platform)"]
+        
+        cube --> museum
+        museum --> biennial
+        
+        cube -.-> spatial["Spatial framing"]
+        museum -.-> canon["Historical canon"]
+        biennial -.-> econval["Economic validation"]
+    end
+    
+    subgraph economic ["ECONOMIC LAYER: Value Circuits"]
+        primary["Primary Market<br/>(gallery sale)"]
+        auction["Auction House<br/>(resale)"]
+        speculative["Speculative<br/>Asset Class"]
+        
+        primary --> auction
+        auction --> speculative
+        
+        primary -.-> artist50["Artist + 50%"]
+        auction -.-> commission["Commission"]
+        speculative -.-> investment["Investment"]
+    end
+    
+    subgraph discourse ["DISCOURSE LAYER: Meaning Production"]
+        statement["Artist<br/>Statement"]
+        critic["Critic/<br/>Curator"]
+        academic["Academic<br/>Canon"]
+        
+        statement --> critic
+        critic --> academic
+        
+        statement -.-> intention["Intention"]
+        critic -.-> interpretation["Interpretation"]
+        academic -.-> historicization["Historicization"]
+    end
+    
+    production --> institutional
+    institutional --> economic
+    economic --> discourse
 ```
 
 This four-layer architecture reveals that postwar art operates as a complex system where formal properties are only one component among institutional validation, economic exchange, and discursive framing. Understanding any individual artwork requires analyzing how it functions across all four layers simultaneously.

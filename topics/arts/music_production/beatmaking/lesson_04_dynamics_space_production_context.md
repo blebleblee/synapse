@@ -170,9 +170,9 @@ graph TD
     D --> E["Output Mix"]
     A --> E
     
-    style B fill:#e1f5ff
-    style C fill:#ffe1f5
-    style D fill:#f5ffe1
+    style B fill:#e1f5ff,color:#0f172a
+    style C fill:#ffe1f5,color:#0f172a
+    style D fill:#f5ffe1,color:#0f172a
 ```
 
 ### Reverb Parameters and Production Applications
@@ -348,9 +348,9 @@ graph TD
     E --> G["Club Master (-8 LUFS)"]
     E --> H["Radio Master (-10 LUFS)"]
     
-    style A fill:#e1f5ff
-    style D fill:#ffe1f5
-    style E fill:#f5ffe1
+    style A fill:#e1f5ff,color:#0f172a
+    style D fill:#ffe1f5,color:#0f172a
+    style E fill:#f5ffe1,color:#0f172a
 ```
 
 The discipline of beatmaking synthesizes engineering rigor with artistic intuition. Every compressor threshold setting, every reverb decay time, every sidechain release curve encodes both technical knowledge and creative intent. The tools are objective—decibels, milliseconds, frequency bands—but their application remains deeply subjective, guided by genre conventions, reference material, and the producer's evolving aesthetic vision. Mastery emerges not from memorizing parameter values, but from understanding the principles that govern dynamics, space, and perception, then wielding those principles with purpose and restraint.

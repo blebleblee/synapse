@@ -120,7 +120,7 @@ This reference section is the persistent companion to your audit spreadsheet. Ke
 
 | Repair Type | Compound | Max Single-Coat Thickness | Drying Time (20°C, 50% RH) | Surface Tolerance (Pass) |
 |---|---|---|---|---|
-| Hairline crack (<3.2 mm) | All-purpose lightweight | 2.0 mm | 24 hr | ≤0.5 mm proud or proud |
+| Hairline crack (< 3.2 mm) | All-purpose lightweight | 2.0 mm | 24 hr | ≤0.5 mm proud or proud |
 | Tape bond failure | All-purpose + paper tape | 2.0 mm per coat | 24 hr per coat | ≤0.5 mm |
 | Structural crack (>3.2 mm) | Durabond 45 + mesh tape | 3.0 mm | 45–60 min set | ≤0.5 mm |
 | Feathering coat | All-purpose lightweight | 1.5 mm | 24 hr | 0 mm (flush) |
@@ -144,7 +144,7 @@ A dripping faucet after washer replacement indicates either an undersized replac
 
 | Tile Size | Trowel Notch | Coverage Target | Cure Before Grout | Cure Before Load |
 |---|---|---|---|---|
-| <100 mm | 6×6×6 mm V-notch | 80% dry / 95% wet | 24 hr | 24 hr |
+| < 100 mm | 6×6×6 mm V-notch | 80% dry / 95% wet | 24 hr | 24 hr |
 | 100–300 mm | 10×10×10 mm square | 80% dry / 95% wet | 24 hr | 72 hr |
 | >300 mm | 12×12×12 mm square | 95% all locations | 24 hr | 72 hr |
 

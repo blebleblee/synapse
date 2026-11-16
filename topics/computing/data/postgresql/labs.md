@@ -83,10 +83,18 @@ FROM page_header(get_raw_page('accounts', 0));
 ```
 
 **Expected Output:**
-```
-     lsn     | checksum | flags | lower | upper | special | pagesize | version 
--------------+----------+-------+-------+-------+---------+----------+---------
- 0/193E5C8   |        0 |     0 |    56 |  7968 |    8192 |     8192 |       4
+```mermaid
+flowchart TD
+    Header["Page Header Structure"]
+    
+    Header --> LSN["lsn<br/>0/193E5C8"]
+    Header --> Checksum["checksum<br/>0"]
+    Header --> Flags["flags<br/>0"]
+    Header --> Lower["lower<br/>56"]
+    Header --> Upper["upper<br/>7968"]
+    Header --> Special["special<br/>8192"]
+    Header --> PageSize["pagesize<br/>8192"]
+    Header --> Version["version<br/>4"]
 ```
 
 **Field Interpretation:**
@@ -116,12 +124,33 @@ FROM heap_page_items(get_raw_page('accounts', 0));
 ```
 
 **Expected Output:**
-```
- lp | lp_off | lp_flags | lp_len | t_xmin | t_xmax | t_cid | t_ctid | t_data_preview          
-----+--------+----------+--------+--------+--------+-------+--------+-------------------------
-  1 |   8152 |        1 |     40 |    735 |      0 |     0 | (0,1)  | \x01000000010f416c69...
-  2 |   8112 |        1 |     40 |    735 |      0 |     0 | (0,2)  | \x02000000010e426f62...
-  3 |   8064 |        1 |     48 |    735 |      0 |     0 | (0,3)  | \x03000000011143686...
+```mermaid
+flowchart TD
+    PAGE["PostgreSQL Heap Page"]
+
+    subgraph header ["Page Header"]
+        PH["Page Header Metadata"]
+    end
+
+    subgraph line_pointers ["Line Pointer Array"]
+        LP1["LP 1 | offset: 8152 | flags: 1 | len: 40"]
+        LP2["LP 2 | offset: 8112 | flags: 1 | len: 40"]
+        LP3["LP 3 | offset: 8064 | flags: 1 | len: 48"]
+    end
+
+    subgraph tuples ["Tuple Data (grows from end of page)"]
+        T3["Tuple 3\nt_xmin: 735 | t_xmax: 0 | t_cid: 0\nt_ctid: (0,3)\ndata: \\x030000000111436865..."]
+        T2["Tuple 2\nt_xmin: 735 | t_xmax: 0 | t_cid: 0\nt_ctid: (0,2)\ndata: \\x02000000010e426f62..."]
+        T1["Tuple 1\nt_xmin: 735 | t_xmax: 0 | t_cid: 0\nt_ctid: (0,1)\ndata: \\x01000000010f416c69..."]
+    end
+
+    PAGE --> header
+    PAGE --> line_pointers
+    PAGE --> tuples
+
+    LP1 -- "points to" --> T1
+    LP2 -- "points to" --> T2
+    LP3 -- "points to" --> T3
 ```
 
 **Field Interpretation:**
@@ -166,13 +195,56 @@ ORDER BY lp;
 ```
 
 **Expected Output:**
-```
- lp | lp_flags | lp_len | t_xmin | t_xmax | t_ctid | t_infomask | t_data_preview          
-----+----------+--------+--------+--------+--------+------------+-------------------------
-  1 |        1 |     40 |    735 |    736 | (0,4)  |       2304 | \x01000000010f416c69...
-  2 |        1 |     40 |    735 |      0 | (0,2)  |       2304 | \x02000000010e426f62...
-  3 |        1 |     48 |    735 |      0 | (0,3)  |       2304 | \x03000000011143686...
-  4 |        1 |     40 |    736 |      0 | (0,4)  |      10496 | \x01000000010f416c69...
+```mermaid
+flowchart TD
+    subgraph header ["PostgreSQL Heap Page — Line Pointer Table"]
+        cols["lp | lp_flags | lp_len | t_xmin | t_xmax | t_ctid | t_infomask | t_data_preview"]
+    end
+
+    subgraph row1 ["Tuple 1 (lp=1)"]
+        r1["lp_flags: 1 | lp_len: 40
+t_xmin: 735 | t_xmax: 736
+t_ctid: (0,4) | t_infomask: 2304
+t_data: \\x01000000010f416c69..."]
+    end
+
+    subgraph row2 ["Tuple 2 (lp=2)"]
+        r2["lp_flags: 1 | lp_len: 40
+t_xmin: 735 | t_xmax: 0
+t_ctid: (0,2) | t_infomask: 2304
+t_data: \\x02000000010e426f62..."]
+    end
+
+    subgraph row3 ["Tuple 3 (lp=3)"]
+        r3["lp_flags: 1 | lp_len: 48
+t_xmin: 735 | t_xmax: 0
+t_ctid: (0,3) | t_infomask: 2304
+t_data: \\x03000000011143686..."]
+    end
+
+    subgraph row4 ["Tuple 4 (lp=4)"]
+        r4["lp_flags: 1 | lp_len: 40
+t_xmin: 736 | t_xmax: 0
+t_ctid: (0,4) | t_infomask: 10496
+t_data: \\x01000000010f416c69..."]
+    end
+
+    note1["⚑ t_xmax=736 → updated by xact 736"]
+    note2["✓ Live tuple (xmax=0)"]
+    note3["✓ Live tuple (xmax=0)"]
+    note4["✓ Current version of Tuple 1\n(infomask=10496 → HOT updated)"]
+
+    header --> row1
+    header --> row2
+    header --> row3
+    header --> row4
+
+    row1 --> note1
+    row2 --> note2
+    row3 --> note3
+    row4 --> note4
+
+    r1 -- "t_ctid points to (0,4)" --> r4
 ```
 
 **Key Observations:**
@@ -202,10 +274,14 @@ WHERE relname = 'accounts';
 ```
 
 **Expected Output:**
-```
- relname  | n_dead_tup | n_live_tup | last_vacuum | last_autovacuum 
-----------+------------+------------+-------------+-----------------
- accounts |          1 |          3 |             | 
+```mermaid
+flowchart TD
+    TABLE["📋 Table: accounts"]
+
+    TABLE --> DEAD["n_dead_tup: 1"]
+    TABLE --> LIVE["n_live_tup: 3"]
+    TABLE --> LV["last_vacuum: —"]
+    TABLE --> LAV["last_autovacuum: —"]
 ```
 
 Manually trigger vacuum:
@@ -229,13 +305,35 @@ ORDER BY lp;
 ```
 
 **Expected Output:**
-```
- lp | lp_flags | lp_len | t_xmin | t_xmax | t_ctid 
-----+----------+--------+--------+--------+--------
-  1 |        0 |      0 |        |        | 
-  2 |        1 |     40 |    735 |      0 | (0,2)
-  3 |        1 |     48 |    735 |      0 | (0,3)
-  4 |        1 |     40 |    736 |      0 | (0,4)
+```mermaid
+flowchart TD
+    header["<b>PostgreSQL Heap Page — Line Pointer Table</b>"]
+
+    subgraph lp1 ["Line Pointer 1"]
+        lp1_data["lp: 1 | lp_flags: 0 | lp_len: 0\nt_xmin: — | t_xmax: — | t_ctid: —"]
+    end
+
+    subgraph lp2 ["Line Pointer 2"]
+        lp2_data["lp: 2 | lp_flags: 1 | lp_len: 40\nt_xmin: 735 | t_xmax: 0 | t_ctid: (0,2)"]
+    end
+
+    subgraph lp3 ["Line Pointer 3"]
+        lp3_data["lp: 3 | lp_flags: 1 | lp_len: 48\nt_xmin: 735 | t_xmax: 0 | t_ctid: (0,3)"]
+    end
+
+    subgraph lp4 ["Line Pointer 4"]
+        lp4_data["lp: 4 | lp_flags: 1 | lp_len: 40\nt_xmin: 736 | t_xmax: 0 | t_ctid: (0,4)"]
+    end
+
+    header --> lp1
+    header --> lp2
+    header --> lp3
+    header --> lp4
+
+    lp1 -->|"lp_flags: 0 — unused/dead"| note1["No tuple data"]
+    lp2 -->|"lp_flags: 1 — normal"| note2["Live tuple, xmin: 735"]
+    lp3 -->|"lp_flags: 1 — normal"| note3["Live tuple, xmin: 735"]
+    lp4 -->|"lp_flags: 1 — normal"| note4["Live tuple, xmin: 736"]
 ```
 
 Line pointer 1 now has `lp_flags = 0` (unused). The dead tuple has been removed, and its 40 bytes are reclaimed. However, the line pointer itself persists to avoid breaking tuple identifiers in indexes. Index entries pointing to `(0,1)` remain valid; when dereferenced, PostgreSQL follows the version chain via `t_ctid` to find the current tuple at `(0,4)`.
@@ -270,8 +368,8 @@ graph TB
     CP -->|"Checkpoint sync"| D1
     CP -->|"Checkpoint sync"| D2
     
-    style B2 fill:#ffcccc
-    style B4 fill:#cccccc
+    style B2 fill:#ffcccc,color:#0f172a
+    style B4 fill:#cccccc,color:#0f172a
 ```
 
 ### Step 3.1: Enable `pg_buffercache`
@@ -302,14 +400,58 @@ LIMIT 10;
 ```
 
 **Expected Output:**
-```
-       relname        | buffered_pages | buffer_pool_pct | buffered_mb | dirty_pages | avg_usagecount 
-----------------------+----------------+-----------------+-------------+-------------+----------------
- pg_class             |             15 |            0.09 |        0.12 |           0 |           5.00
- accounts             |              1 |            0.01 |        0.01 |           1 |           5.00
- accounts_pkey        |              1 |            0.01 |        0.01 |           0 |           3.00
- pg_attribute         |              9 |            0.05 |        0.07 |           0 |           4.22
- pg_proc              |              7 |            0.04 |        0.05 |           0 |           3.71
+```mermaid
+flowchart TD
+    A["PostgreSQL Buffer Analysis"]
+    
+    subgraph relations ["Relations"]
+        B["pg_class"]
+        C["accounts"]
+        D["accounts_pkey"]
+        E["pg_attribute"]
+        F["pg_proc"]
+    end
+    
+    subgraph metrics ["Buffer Pool Metrics"]
+        G["Buffered Pages"]
+        H["Buffer Pool %"]
+        I["Buffered MB"]
+        J["Dirty Pages"]
+        K["Avg Usage Count"]
+    end
+    
+    B --> G
+    B --> H
+    B --> I
+    B --> J
+    B --> K
+    
+    C --> G
+    C --> H
+    C --> I
+    C --> J
+    C --> K
+    
+    D --> G
+    D --> H
+    D --> I
+    D --> J
+    D --> K
+    
+    E --> G
+    E --> H
+    E --> I
+    E --> J
+    E --> K
+    
+    F --> G
+    F --> H
+    F --> I
+    F --> J
+    F --> K
+    
+    A --> relations
+    A --> metrics
 ```
 
 **Field Interpretation:**
@@ -347,11 +489,10 @@ ORDER BY buffered_pages DESC;
 ```
 
 **Expected Output:**
-```
-    relname    | buffered_pages | dirty_pages 
----------------+----------------+-------------
- large_table   |            443 |         443
- accounts      |              1 |           1
+```mermaid
+flowchart LR
+    A["large_table<br/>buffered_pages: 443<br/>dirty_pages: 443"]
+    B["accounts<br/>buffered_pages: 1<br/>dirty_pages: 1"]
 ```
 
 The `large_table` scan allocated 443 buffers. System catalogs (`pg_class`, `pg_attribute`) with low `usagecount` were evicted. `accounts` persisted due to its high usage counter.
@@ -495,12 +636,11 @@ SELECT * FROM accounts ORDER BY id;
 ```
 
 **Expected Output:**
-```
- id | owner_name | balance  
-----+------------+----------
-  1 | Alice      |  1200.00
-  2 | Bob        |  2600.50
-  3 | Charlie    |     0.00
+```mermaid
+flowchart TD
+    A["id: 1<br/>Alice<br/>$1200.00"]
+    B["id: 2<br/>Bob<br/>$2600.50"]
+    C["id: 3<br/>Charlie<br/>$0.00"]
 ```
 
 Note the current WAL LSN:
@@ -556,12 +696,17 @@ SELECT * FROM accounts ORDER BY id;
 ```
 
 **Expected Output:**
-```
- id | owner_name | balance  
-----+------------+----------
-  1 | Alice      |  1200.00
-  2 | Bob        |  2600.50
-  3 | Charlie    |     0.00
+```mermaid
+flowchart TD
+    Table["Account Records"]
+    
+    subgraph accounts["Accounts"]
+        Row1["ID: 1 | Owner: Alice | Balance: $1,200.00"]
+        Row2["ID: 2 | Owner: Bob | Balance: $2,600.50"]
+        Row3["ID: 3 | Owner: Charlie | Balance: $0.00"]
+    end
+    
+    Table --> accounts
 ```
 
 All committed transactions (XID ≤ 737) are preserved. Uncommitted transactions are discarded.
@@ -605,12 +750,19 @@ ORDER BY lp;
 ```
 
 **Expected Output:**
-```
- lp | lp_flags | t_xmin | t_xmax | t_ctid | t_infomask | t_infomask2 
-----+----------+--------+--------+--------+------------+-------------
-  1 |        1 |    740 |    741 | (0,3)  |       9472 |       16386
-  2 |        1 |    740 |      0 | (0,2)  |      10496 |           2
-  3 |        1 |    741 |      0 | (0,3)  |      10496 |       24578
+```mermaid
+flowchart TD
+    Header["<b>Tuple Layout Metadata</b><br/>lp | lp_flags | t_xmin | t_xmax | t_ctid | t_infomask | t_infomask2"]
+    
+    Row1["<b>Row 1</b><br/>lp: 1<br/>lp_flags: 1<br/>t_xmin: 740<br/>t_xmax: 741<br/>t_ctid: (0,3)<br/>t_infomask: 9472<br/>t_infomask2: 16386"]
+    
+    Row2["<b>Row 2</b><br/>lp: 2<br/>lp_flags: 1<br/>t_xmin: 740<br/>t_xmax: 0<br/>t_ctid: (0,2)<br/>t_infomask: 10496<br/>t_infomask2: 2"]
+    
+    Row3["<b>Row 3</b><br/>lp: 3<br/>lp_flags: 1<br/>t_xmin: 741<br/>t_xmax: 0<br/>t_ctid: (0,3)<br/>t_infomask: 10496<br/>t_infomask2: 24578"]
+    
+    Header --> Row1
+    Header --> Row2
+    Header --> Row3
 ```
 
 **Key Observations:**
@@ -644,13 +796,50 @@ ORDER BY lp;
 ```
 
 **Expected Output:**
-```
- lp | lp_flags | t_xmin | t_xmax | t_ctid | t_infomask | t_infomask2 
-----+----------+--------+--------+--------+------------+-------------
-  1 |        1 |    740 |    741 | (0,3)  |       9472 |       16386
-  2 |        1 |    740 |      0 | (0,2)  |      10496 |           2
-  3 |        1 |    741 |    742 | (0,4)  |      10496 |       24578
-  4 |        1 |    742 |      0 | (0,4)  |      10496 |           2
+```mermaid
+flowchart TD
+    subgraph heap_page ["Heap Page 0"]
+        subgraph tuple1 ["Tuple lp=1"]
+            T1["t_xmin: 740
+t_xmax: 741
+t_ctid: (0,3)
+t_infomask: 9472
+t_infomask2: 16386"]
+        end
+        subgraph tuple2 ["Tuple lp=2"]
+            T2["t_xmin: 740
+t_xmax: 0
+t_ctid: (0,2)
+t_infomask: 10496
+t_infomask2: 2"]
+        end
+        subgraph tuple3 ["Tuple lp=3"]
+            T3["t_xmin: 741
+t_xmax: 742
+t_ctid: (0,4)
+t_infomask: 10496
+t_infomask2: 24578"]
+        end
+        subgraph tuple4 ["Tuple lp=4"]
+            T4["t_xmin: 742
+t_xmax: 0
+t_ctid: (0,4)
+t_infomask: 10496
+t_infomask2: 2"]
+        end
+    end
+
+    T1 -->|"updated by xid 741 → ctid (0,3)"| T3
+    T3 -->|"updated by xid 742 → ctid (0,4)"| T4
+
+    XID740["Transaction 740\n(INSERT)"]
+    XID741["Transaction 741\n(UPDATE)"]
+    XID742["Transaction 742\n(UPDATE)"]
+
+    XID740 -->|"inserts"| T1
+    XID740 -->|"inserts"| T2
+    XID741 -->|"updates lp=1"| T3
+    XID742 -->|"updates lp=3"| T4
 ```
 
 **Key Observations:**

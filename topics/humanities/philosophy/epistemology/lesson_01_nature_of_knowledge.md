@@ -66,44 +66,38 @@ This reveals a fundamental architectural gap in the traditional tripartite struc
 
 ### Diagrammatic Representation of the Problem Space
 
-```
-CLASSICAL JTB ARCHITECTURE:
-
-Knowledge = {S believes p} ∩ {p is true} ∩ {S is justified in believing p}
-
-FAILURE MODE - GETTIER CASES:
-
-                ┌─────────────────────────────────┐
-                │   S's Justification Set         │
-                │  (S's Reasons & Evidence)       │
-                │                                 │
-                │  • Perceptual experiences       │
-                │  • Testimony                    │
-                │  • Inference from other beliefs │
-                │  • Rational insight             │
-                └─────────────────────────────────┘
-                              │
-                              │ TRACKING RELATION
-                              │ (Should connect to)
-                              │
-                              ▼
-                ┌─────────────────────────────────┐
-                │   The Fact that Makes p True    │
-                │  (The Truth-Maker)              │
-                │                                 │
-                │  • State of the world           │
-                │  • Actual state of affairs      │
-                │  • Reality as it is             │
-                └─────────────────────────────────┘
-
-GETTIER FAILURE:
-
-Justification Set ────X──── Truth-Maker
-      (disconnected)
-                
-• Case I: Justification points to Jones; Truth made by Smith
-• Case II: Justification points to dog; Truth made to sheep
-• In both: JTB ✓ but Knowledge ✗
+```mermaid
+flowchart TD
+    JTB["CLASSICAL JTB ARCHITECTURE:<br/>Knowledge = {S believes p} ∩ {p is true} ∩ {S is justified in believing p}"]
+    
+    subgraph justification ["S's Justification Set<br/>(S's Reasons & Evidence)"]
+        J1["• Perceptual experiences"]
+        J2["• Testimony"]
+        J3["• Inference from other beliefs"]
+        J4["• Rational insight"]
+    end
+    
+    subgraph truthmaker ["The Fact that Makes p True<br/>(The Truth-Maker)"]
+        T1["• State of the world"]
+        T2["• Actual state of affairs"]
+        T3["• Reality as it is"]
+    end
+    
+    JTB --> justification
+    JTB --> truthmaker
+    
+    justification -->|"TRACKING RELATION<br/>(Should connect to)"| truthmaker
+    
+    subgraph failure ["GETTIER FAILURE MODE"]
+        direction LR
+        JSF["Justification Set"] -.->|"X DISCONNECTED"| TMF["Truth-Maker"]
+    end
+    
+    truthmaker --> failure
+    
+    cases["<b>Gettier Cases:</b><br/>• Case I: Justification points to Jones; Truth made by Smith<br/>• Case II: Justification points to dog; Truth made by sheep<br/>• In both: JTB ✓ but Knowledge ✗"]
+    
+    failure --> cases
 ```
 
 ## 3. High-Performance Optimization & Failure Modes
@@ -154,4 +148,19 @@ A third response, championed by Robert Nozick and others, proposes that knowledg
 
 The tracking theory captures an important intuition: knowledge involves a kind of reliable responsiveness to the truth. In the broken-clock case, your belief-forming method (reading the clock) would not track the actual time under counterfactual variations—if the time were different, you would still believe whatever the broken clock displayed. The theory handles Gettier cases by requiring not merely that your belief is true and justified, but that the mechanism generating your belief would reliably respond to changes in the actual truth-value.
 
-However, tracking accounts face difficulties with certain types of knowledge that seem to involve necessary truths or stable facts unlikely to be false under realistic counterfactuals. If you know that 2 + 2 = 4, the counterfactual conditions might seem trivially satisfied in an uninformative way. Moreover, tracking accounts must specify the relevant counterfactual circumstances with precision—over what range of possible worlds must your belief-forming method remain relia
+However, tracking accounts face difficulties with certain types of knowledge that seem to involve necessary truths or stable facts unlikely to be false under realistic counterfactuals. If you know that 2 + 2 = 4, the counterfactual conditions might seem trivially satisfied in an uninformative way.
+
+Despite this limitation, the tracking theory has proven influential precisely because it shifts attention from the static relationship between belief and evidence toward the dynamic, counterfactual-sensitive process by which beliefs are formed. Contemporary reliabilist and virtue epistemology frameworks have extended this core insight, arguing that what distinguishes knowledge from mere true belief is not some additional internal justificatory state but the external reliability of the cognitive process or faculty involved. On this view, perception, memory, testimony, and rational intuition each constitute legitimate epistemic sources when they reliably produce true beliefs across the range of conditions in which they are deployed. This does not dissolve the Gettier problem so much as reframe it: Gettier cases reveal that accidental truth is insufficient not because justification is missing, but because the connection between the believer's cognitive process and the truth-making facts is severed in the wrong way. The philosophical work then shifts to characterizing what "the right kind of connection" requires, a project that continues to occupy epistemologists and that connects directly to debates about epistemic luck, safety conditions, and the proper individuation of belief-forming methods.
+
+Taken together, the classical analysis and its successors reveal a stable pattern in epistemological inquiry: each proposed account of knowledge captures genuine intuitions while generating cases that expose its limits. The JTB analysis codifies the evidential norms implicit in ordinary practice; Gettier cases show that justification and truth can come apart in ways that undermine cognitive achievement; causal and tracking theories respond by grounding knowledge in the right kind of nomological or counterfactual connection to the facts. What emerges from this dialectic is not a finished definition but a sharper map of the theoretical landscape. Knowledge appears to require at minimum true belief, some appropriate epistemic basis for that belief, and a non-accidental connection between the belief and the truth—a connection robust enough to survive relevant counterfactual variations and not merely the product of epistemic luck. These three desiderata form the core of any serious theory of knowledge and serve as the diagnostic framework for evaluating the cases and thought experiments that follow throughout this unit.
+
+## Summary & Verification Matrix
+
+| Concept | Governing Invariant | Core Mechanism | Diagnostic Criteria | Common Failure Mode |
+|---|---|---|---|---|
+| Classical JTB Analysis | Knowledge = justified true belief (necessary and sufficient conditions) | A believer S knows p iff S believes p, p is true, and S has adequate justification for p | Does the subject have truth, belief, and a recognized justificatory basis? | Conflates epistemic luck with knowledge; overthrown by Gettier-style counterexamples |
+| Gettier Problem | Justified true belief is not sufficient for knowledge | Constructs cases where JTB conditions are met yet knowledge is intuitively absent due to accidental coincidence | Is the truth of the belief connected to the subject's justification, or coincidental? | Assuming that internally coherent justification guarantees the right belief-world relationship |
+| Causal Theory | Knowledge requires an appropriate causal chain linking the fact to the belief | The truth-making fact must causally produce the belief via a continuous and appropriate process | Is there a traceable causal pathway from the fact p to the subject's belief that p? | Excludes a priori knowledge (mathematical, logical) where no causal interaction occurs |
+| Tracking Theory (Nozick) | Belief must counterfactually covary with the truth of p | Sensitivity condition: if p were false, S would not believe p; adherence condition: if p were true, S would believe p | Would the subject's belief-forming method respond correctly under relevant counterfactual variations? | Struggles with necessary truths where the false-antecedent counterfactual is trivially or vacuously satisfied |
+| Reliabilism / Virtue Epistemology | Knowledge is produced by a reliable or truth-conducive cognitive faculty or process | Epistemic legitimacy derives from the external track record and proper functioning of faculties (perception, memory, reason) | Does the belief-forming process reliably produce true beliefs across the relevant range of conditions? | The generality problem: difficulty in precisely individuating which process type to evaluate for reliability |
+| Epistemic Luck | Accidental truth undermines knowledge even when other conditions are met | A belief is epistemically lucky when it is true in the actual world but false in many nearby possible worlds | Could the subject easily have held the same justified belief while it was false? | Conflating safety (the belief could not easily have been false) with mere statistical reliability of the source |

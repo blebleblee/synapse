@@ -935,26 +935,26 @@ if __name__ == "__main__":
 The following state machine shows how the validated pipeline handles all input paths. Any deviation from this graph indicates a defect.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> TypeCheck : receive input
-
-    TypeCheck --> EmptyCheck : is str
-    TypeCheck --> INVALID_TYPE : not str
-
-    EmptyCheck --> TokenCountCheck : non-empty after strip
-    EmptyCheck --> EMPTY_INPUT : empty / whitespace
-
-    TokenCountCheck --> ModelInference : token_count < context_limit
-    TokenCountCheck --> CONTEXT_OVERFLOW : token_count >= context_limit
-
-    ModelInference --> SUCCESS : generation completes
-    ModelInference --> GENERATION_FAILED : RuntimeError / OOM
-
-    INVALID_TYPE --> [*] : return StressResult
-    EMPTY_INPUT --> [*] : return StressResult
-    CONTEXT_OVERFLOW --> [*] : return StressResult
-    SUCCESS --> [*] : return StressResult
-    GENERATION_FAILED --> [*] : return StressResult
+flowchart TD
+    Start([Start]) --> TypeCheck{"Type Check:<br/>is str?"}
+    
+    TypeCheck -->|Yes| EmptyCheck{"Empty Check:<br/>non-empty after strip?"}
+    TypeCheck -->|No| InvalidType["INVALID_TYPE"]
+    
+    EmptyCheck -->|Yes| TokenCountCheck{"Token Count Check:<br/>token_count < context_limit?"}
+    EmptyCheck -->|No| EmptyInput["EMPTY_INPUT"]
+    
+    TokenCountCheck -->|Yes| ModelInference["Model Inference:<br/>generate output"]
+    TokenCountCheck -->|No| ContextOverflow["CONTEXT_OVERFLOW"]
+    
+    ModelInference -->|Success| Success["SUCCESS"]
+    ModelInference -->|"RuntimeError/OOM"| GenerationFailed["GENERATION_FAILED"]
+    
+    InvalidType --> End([Return StressResult])
+    EmptyInput --> End
+    ContextOverflow --> End
+    Success --> End
+    GenerationFailed --> End
 ```
 
 ---
@@ -977,11 +977,22 @@ This linear memory growth is why context window size is a hard engineering const
 The following diagram shows the KV-cache growth pattern:
 
 ```mermaid
-xychart-beta
-    title "GPT-2 KV-Cache Memory vs. Sequence Length (fp32)"
-    x-axis ["128", "256", "512", "768", "1024"]
-    y-axis "Memory (MiB)" 0 --> 80
-    line [9.4, 18.9, 37.7, 56.6, 75.5]
+flowchart TD
+    title["GPT-2 KV-Cache Memory vs. Sequence Length (fp32)"]
+
+    subgraph data ["Memory Usage by Sequence Length"]
+        s128["Seq Len 128\n9.4 MiB"]
+        s256["Seq Len 256\n18.9 MiB"]
+        s512["Seq Len 512\n37.7 MiB"]
+        s768["Seq Len 768\n56.6 MiB"]
+        s1024["Seq Len 1024\n75.5 MiB"]
+    end
+
+    title --> data
+    s128 --> s256
+    s256 --> s512
+    s512 --> s768
+    s768 --> s1024
 ```
 
 ---

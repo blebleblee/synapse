@@ -101,20 +101,22 @@ Each dependency declaration establishes a directed edge in the module dependency
 
 The build system translates these dependency declarations into a concrete build order through topological sort. Given a directed acyclic graph of modules, the topological sort produces a linear ordering where each module appears after all its dependencies. This ordering enables incremental compilation—when source files in `customer-domain` change, only `customer-domain` and its downstream consumers (`billing-service`) require recompilation, while independent modules remain cached. The Rust compiler generates `.rlib` static library artifacts for each crate, containing compiled machine code and metadata about exported symbols, enabling separate compilation and avoiding full-program rebuilds.
 
-```
-Dependency Graph (DAG):
-
-payment-gateway (external, v3.1)
-        ↓
-customer-domain (v1.2) → common-types (v1.0)
-        ↓                      ↓
-billing-service (v2.3.0) ──────┘
-
-Topological Sort (Build Order):
-1. common-types
-2. payment-gateway (external, pre-built)
-3. customer-domain  
-4. billing-service
+```mermaid
+flowchart TD
+    pg["payment-gateway<br/><sub>external, v3.1</sub>"]
+    ct["common-types<br/><sub>v1.0</sub>"]
+    cd["customer-domain<br/><sub>v1.2</sub>"]
+    bs["billing-service<br/><sub>v2.3.0</sub>"]
+    
+    pg --> cd
+    ct --> cd
+    ct --> bs
+    cd --> bs
+    
+    style pg fill:#e1f5ff
+    style ct fill:#f3e5f5
+    style cd fill:#f3e5f5
+    style bs fill:#f3e5f5
 ```
 
 Interface versioning requires explicit strategy when modules evolve under production constraints. The **expand-contract pattern** enables non-breaking evolution through deliberate sequencing. To add a new required field to a data structure, we first expand the interface to accept the field optionally, deploy that version across all consumers, then contract by making the field mandatory once all call sites provide it. This two-phase migration avoids the atomic coordination problem inherent in breaking changes.

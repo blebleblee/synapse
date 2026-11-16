@@ -29,7 +29,7 @@ That's the theory ceiling. Everything below is hands-on.
 |---|---|---|
 | **Threshold** | Level above which compression begins | Set so GR meter shows 3–6 dB on loudest peaks |
 | **Ratio** | How hard it compresses above threshold | 2:1–4:1 (gentle leveling), 8:1+ (limiting character) |
-| **Attack** | Delay before full gain reduction engages | 10–30 ms lets transient punch through; <3 ms squashes it |
+| **Attack** | Delay before full gain reduction engages | 10–30 ms lets transient punch through; < 3 ms squashes it |
 | **Release** | Time to return to unity gain after signal drops | Match to tempo/decay — too fast causes pumping artifacts, too slow smothers the next note |
 | **Knee** | How abruptly ratio engages at threshold | Soft knee = transparent, musical; hard knee = obvious, aggressive |
 | **Makeup Gain** | Compensates for level lost to compression | Gain-match before/after so loudness bias doesn't fool your ears |

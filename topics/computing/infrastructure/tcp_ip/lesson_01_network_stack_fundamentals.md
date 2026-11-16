@@ -20,20 +20,24 @@ Before examining the layers mechanically, engineers must fix one more invariant 
 
 To understand what actually happens when a process calls `send()`, it helps to trace a packet through the kernel's network stack from top to bottom, examining the data structures and transformations at each stage.
 
-```
-Application (userspace)
-     │  write() / send() / sendmsg()
-     ▼
-┌─────────────────────────────┐
-│  Socket Layer (AF_INET)     │  struct socket, struct sock
-│  TCP / UDP                  │  struct tcp_sock, sk_buff allocation
-│  IP (inet_output)           │  struct iphdr prepended, routing lookup
-│  Netfilter / Traffic Ctrl   │  iptables hooks, tc qdisc
-│  Device Driver (net_device) │  struct ethhdr prepended, DMA ring
-└─────────────────────────────┘
-     │  NIC hardware transmit
-     ▼
-Physical medium (wire / fiber / radio)
+```mermaid
+flowchart TD
+    A["Application (userspace)<br/>write() / send() / sendmsg()"]
+    B["Socket Layer (AF_INET)<br/>struct socket, struct sock"]
+    C["TCP / UDP<br/>struct tcp_sock, sk_buff allocation"]
+    D["IP (inet_output)<br/>struct iphdr prepended, routing lookup"]
+    E["Netfilter / Traffic Control<br/>iptables hooks, tc qdisc"]
+    F["Device Driver (net_device)<br/>struct ethhdr prepended, DMA ring"]
+    G["NIC hardware transmit"]
+    H["Physical medium<br/>(wire / fiber / radio)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
 ```
 
 The kernel's central data structure for this entire journey is the `sk_buff` — the socket buffer, defined in `<linux/skbuff.h>`. Every packet in the Linux network stack is represented as an `sk_buff`. It is not merely a byte array; it is a complex control structure containing a pointer to the actual packet data (`sk_buff->data`), pointers to the head and tail of the allocated buffer, metadata about which protocol owns it, timestamps, checksums, and a linked-list pointer for queue management. Understanding `sk_buff` layout is prerequisite to understanding every performance characteristic of the Linux network stack.
@@ -178,3 +182,4 @@ For socket-level state inspection, `ss` (socket statistics) is the successor to 
 
 ```bash
 # Show
+```

@@ -177,22 +177,33 @@ The proof invokes the exchange axiom: if greedy chose $e$ before $e'$ with $w(e'
 
 The computational core of bipartite matching is the alternating path search. Given the current matching $M$, we construct an **alternating BFS tree** rooted at unmatched vertices in $A$, where odd levels traverse unmatched edges and even levels traverse matched edges. The structure of this search is illustrated below.
 
-```
-Bipartite Graph: A = {a1, a2, a3}, B = {b1, b2, b3}
-Edges: (a1,b1), (a1,b2), (a2,b2), (a2,b3), (a3,b3)
-Current matching M: {(a1,b1), (a2,b2)}
-
-Augmenting path search from unmatched a3:
-  a3 --[unmatched]--> b3 --[matched: b3-a2]--> a2 --[unmatched]--> b2
-                                                      ↑ but b2 is matched to a1
-  Actually trace: a3 --(a3,b3)unmatched--> b3 --(b3,a2)matched--> a2 --(a2,b2)?
-
-Correct augmenting path: a3 → b3 → a2 → b2 → a1 → b1 (not needed here)
-
-Simpler augmenting path: a3 --unmatched--> b3
-  b3 is unmatched! So (a3, b3) is itself an augmenting path.
-
-Updated matching M: {(a1,b1), (a2,b2), (a3,b3)}  ← perfect matching
+```mermaid
+flowchart TD
+    subgraph SetA ["Set A"]
+        a1["a1"]
+        a2["a2"]
+        a3["a3"]
+    end
+    
+    subgraph SetB ["Set B"]
+        b1["b1"]
+        b2["b2"]
+        b3["b3"]
+    end
+    
+    a1 -.->|"unmatched"| b2
+    a1 ==>|"matched"| b1
+    a2 -.->|"unmatched"| b3
+    a2 ==>|"matched"| b2
+    a3 -.->|"augmenting path"| b3
+    
+    classDef setAStyle fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
+    classDef setBStyle fill:#fff4e1,stroke:#cc6600,stroke-width:2px
+    classDef matched fill:#d4edda,stroke:#28a745,stroke-width:3px
+    classDef unmatched fill:#f8d7da,stroke:#dc3545,stroke-width:2px
+    
+    class a1,a2,a3 setAStyle
+    class b1,b2,b3 setBStyle
 ```
 
 For general (non-bipartite) graphs, Edmonds' Blossom algorithm handles odd cycles (blossoms) that the alternating path search must "shrink" before continuing, running in $O(n^3)$ overall.

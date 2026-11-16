@@ -64,29 +64,54 @@ Hash-to-curve is a critical operation when you need to deterministically map arb
 
 The Fiat-Shamir transform converts an interactive zero-knowledge proof into a non-interactive one by replacing the verifier's random challenges with hash function outputs. The prover computes the transcript of the protocol, which includes the statement being proved and the prover's commitments, and hashes this transcript to derive the challenge. The key insight is that the prover cannot predict the challenge before committing, because the hash function is modeled as a random oracle. In practice, this means using a cryptographic hash function like SHA-256 or BLAKE2b with careful domain separation to avoid collision attacks across different protocol instances.
 
-```
-Interactive Sigma Protocol (3 moves):
-  Prover                    Verifier
-    |                          |
-    |--- Commitment (t) -----> |
-    |                          |
-    | <--- Challenge (c) ----- | (random c)
-    |                          |
-    |--- Response (s) -------> |
-    |                          |
-         Verifier checks relation
+```mermaid
+flowchart TD
+    subgraph interactive ["Interactive Sigma Protocol (3 moves)"]
+        direction TB
 
-Fiat-Shamir Transform (non-interactive):
-  Prover:
-    Compute commitment t
-    c = H(statement || t)  // Challenge from hash
-    Compute response s
-    Output proof: (t, s)
+        subgraph prover_col ["Prover"]
+            P1["Compute Commitment (t)"]
+            P2["Receive Challenge (c)"]
+            P3["Compute Response (s)"]
+        end
 
-  Verifier:
-    Parse proof (t, s)
-    c = H(statement || t)  // Recompute challenge
-    Check relation with c, s
+        subgraph verifier_col ["Verifier"]
+            V1["Receive Commitment (t)"]
+            V2["Sample Random Challenge (c)"]
+            V3["Receive Response (s)"]
+            V4["Check Verification Relation"]
+        end
+
+        P1 -- "Commitment (t) →" --> V1
+        V1 --> V2
+        V2 -- "← Challenge (c)" --> P2
+        P2 --> P3
+        P3 -- "Response (s) →" --> V3
+        V3 --> V4
+    end
+
+    subgraph fiat_shamir ["Fiat-Shamir Transform (Non-Interactive)"]
+        direction TB
+
+        subgraph fs_prover ["Prover"]
+            FP1["Compute Commitment (t)"]
+            FP2["c = H(statement ‖ t)"]
+            FP3["Compute Response (s)"]
+            FP4["Output Proof (t, s)"]
+
+            FP1 --> FP2 --> FP3 --> FP4
+        end
+
+        subgraph fs_verifier ["Verifier"]
+            FV1["Parse Proof (t, s)"]
+            FV2["c = H(statement ‖ t)"]
+            FV3["Check Relation with c, s"]
+
+            FV1 --> FV2 --> FV3
+        end
+
+        FP4 -- "Proof (t, s)" --> FV1
+    end
 ```
 
 Domain separation is the practice of ensuring that hash function invocations in different contexts produce uncorrelated outputs even for the same input data. Without domain separation, an attacker might replay commitments or challenges from one protocol instance in a different context, violating security. The standard approach is to prepend a unique label to each hash input: `H("commitment" || data)` for commitments and `H("challenge" || transcript)` for challenges. This simple technique prevents cross-protocol attacks and should be applied uniformly throughout your implementation.

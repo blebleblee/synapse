@@ -22,29 +22,27 @@ The hip and upper-leg assembly in Tahu Nuva uses a Y-shaped connector piece (par
 
 The mask attachment system deserves particular attention because it sits at the intersection of function and narrative meaning. Kanohi masks connect to the head via a single TECHNIC axle, and the head itself is a half-stud offset component, meaning that the mask and head form a compound structure that, if misaligned by even one plate's thickness, creates a visible gap at the chin or crown that destroys the figure's visual coherence. When scratch-building heads for original characters, maintaining the half-stud offset is not optional if you intend to use canonical Kanohi; it is an engineering invariant enforced by the mask's internal geometry.
 
-```
-TAHU NUVA TORSO STRUCTURAL DIAGRAM (Sagittal Cross-Section)
-
-           [Hau Nuva Mask]
-                │
-         [Axle Head Peg]
-                │
-    ┌───────────┴────────────┐
-    │  Shoulder Axle (6L)   │
-    │  ┌─────────────────┐  │
-    │  │  Armor Shell A  │  │
-    │  │  ┌───────────┐  │  │
-    │  │  │ Core Beam │  │  │  ← Primary load path (compression)
-    │  │  │  (TECHNIC)│  │  │
-    │  │  └───────────┘  │  │
-    │  │  Armor Shell B  │  │
-    │  └─────────────────┘  │
-    └───────────┬────────────┘
-                │
-         [Y-Connector]        ← Single-stud interface (failure point)
-          /         \
-    [L-Hip]        [R-Hip]
-    Socket         Socket
+```mermaid
+flowchart TD
+    A["Hau Nuva Mask"]
+    B["Axle Head Peg"]
+    C["Shoulder Axle (6L)"]
+    D["Armor Shell A"]
+    E["Core Beam (TECHNIC)"]
+    F["Armor Shell B"]
+    G["Y-Connector<br/><i>Single-stud interface (failure point)</i>"]
+    H["L-Hip Socket"]
+    I["R-Hip Socket"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E -.Primary load path<br/>(compression).-> E
+    E --> F
+    F --> G
+    G --> H
+    G --> I
 ```
 
 The diagram above represents where force concentrates. Any custom work that increases the mass of the leg assembly without reinforcing the Y-connector interface is borrowing structural integrity on a loan that will eventually default into a figure that cannot hold a standing pose.

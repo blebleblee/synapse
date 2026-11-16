@@ -20,26 +20,21 @@ The invariant underlying all sequential logic is that time becomes a first-class
 
 The SR latch, constructed from two cross-coupled NOR gates, represents the minimal bistable memory element in digital logic. In the NOR-gate implementation, each gate's output feeds back to the other gate's input, creating a symmetric topology where asserting the Set input forces the Q output high, and asserting the Reset input forces Q low. When both Set and Reset return to logic zero, the latch retains its previous state indefinitely, as the feedback path sustains the output voltage through regenerative action. The forbidden condition arises when both Set and Reset are asserted simultaneously, driving both NOR gate outputs low and leaving the next state ambiguous once the inputs release. This race condition, dependent on minute manufacturing variations in gate threshold voltages and load capacitances, makes the SR latch unsuitable for automated synthesis in modern ASIC flows, though it remains a valuable teaching artifact for understanding feedback dynamics.
 
-```
-SR NOR Latch Topology:
-
-     S ──┐
-         NOR ──┬── Q
-     ┌───┘     │
-     │         │
-     │   ┌─────┘
-     │   │
-     └───┼───┐
-         │   NOR ──── Q̅
-     R ──┘
-     
-Truth Table (NOR implementation):
-S  R  │ Q(t+1)  Q̅(t+1) │ Operation
-─────────────────────────────────
-0  0  │ Q(t)    Q̅(t)   │ Hold (memory retention)
-0  1  │ 0       1      │ Reset
-1  0  │ 1       0      │ Set
-1  1  │ 0       0      │ Forbidden (metastable)
+```mermaid
+flowchart TD
+    S["S (Set)"]
+    R["R (Reset)"]
+    NOR1["NOR Gate 1"]
+    NOR2["NOR Gate 2"]
+    Q["Q"]
+    Qbar["Q̅ (Q-bar)"]
+    
+    S --> NOR1
+    R --> NOR2
+    NOR1 --> Q
+    NOR2 --> Qbar
+    Qbar --> NOR1
+    Q --> NOR2
 ```
 
 The NAND-gate SR latch inverts the active polarity, requiring active-low inputs for set and reset operations. In CMOS technology, NAND gates consume lower transistor counts than NOR gates, making the NAND latch marginally more area-efficient in integrated circuits. The topology remains identical, with outputs cross-coupled to inputs, but the truth table reflects complementary logic levels. When both inputs rest at logic high, the latch holds its state; asserting Set low drives Q high; asserting Reset low drives Q low. The forbidden state now occurs with both inputs low, producing both outputs high—a logically inconsistent condition that again leads to race-dependent behavior upon input release.
@@ -81,20 +76,57 @@ Modern CMOS flip-flops typically implement edge-triggering through transmission-
 
 Setup and hold times emerge from the physics of charge redistribution in the flip-flop's internal nodes. During the setup interval before the clock edge, the input data must drive the transmission gate's storage node to a voltage level that unambiguously resolves to logic high or low after the transmission gate opens. If the input transitions too close to the clock edge, the storage node voltage may settle in the metastable region near the CMOS inverter's switching threshold, where both PMOS and PMOS transistors conduct simultaneously, leaving the output voltage indeterminate. The hold time requirement ensures that input data remains stable after the clock edge long enough for internal feedback paths to latch the sampled value, preventing subsequent input transitions from corrupting the stored state before the transmission gate fully closes.
 
-```
-Setup and Hold Timing Constraints:
-
-        ┌───── Setup Time ────┐  ┌─ Hold Time ─┐
-        │                     │  │             │
-D   ────────┐         ┌───────────────────────────
-            └─────────┘       stable window
-                              
-CLK ────────────────┐ ← sampling edge
-                    └───────────────
-
-Violation Consequences:
-- Setup violation → metastability, extended C-Q delay, possible error
-- Hold violation → immediate data corruption, wrong state captured
+```mermaid
+flowchart TD
+    subgraph timing ["Setup and Hold Timing Constraints"]
+        D1["D Signal: Logic High"]
+        D2["D Signal: Transition"]
+        D3["D Signal: Logic Low"]
+        D4["D Signal: Stable Window"]
+        D5["D Signal: Continues"]
+        
+        CLK1["CLK: Logic Low"]
+        CLK2["CLK: Rising Edge (Sampling Point)"]
+        CLK3["CLK: Logic High"]
+        
+        ST["Setup Time Window"]
+        HT["Hold Time Window"]
+        
+        D1 --> D2
+        D2 --> D3
+        D3 --> D4
+        D4 --> D5
+        
+        CLK1 --> CLK2
+        CLK2 --> CLK3
+        
+        ST -.-> D3
+        ST -.-> D4
+        HT -.-> D4
+        
+        D4 -.->|"Data must be stable"| CLK2
+    end
+    
+    subgraph violations ["Violation Consequences"]
+        SV["Setup Violation"]
+        SV_C1["Metastability"]
+        SV_C2["Extended Clock-to-Q Delay"]
+        SV_C3["Possible Bit Error"]
+        
+        HV["Hold Violation"]
+        HV_C1["Immediate Data Corruption"]
+        HV_C2["Wrong State Captured"]
+        
+        SV --> SV_C1
+        SV --> SV_C2
+        SV --> SV_C3
+        
+        HV --> HV_C1
+        HV --> HV_C2
+    end
+    
+    timing -.->|"If setup time insufficient"| SV
+    timing -.->|"If hold time insufficient"| HV
 ```
 
 The JK flip-flop extends D flip-flop functionality by introducing toggle capability. With J and K inputs both low, the flip-flop holds its current state. J high and K low sets the output; J low and K high resets the output. The unique behavior emerges when both J and K assert high: the flip-flop toggles, complementing its previous state on each clock edge. This toggle mode enables binary counters and frequency dividers, where a chain of JK flip-flops in toggle configuration divides the input clock frequency by successive powers of two. Internally, the JK flip-flop implements a D flip-flop with combinational feedback logic: the D input derives from `D = J·Q̅ + K̅·Q`, ensuring that the next state either sets, resets, holds, or toggles based on the J, K, and current Q values.
@@ -134,21 +166,78 @@ Metastability failure rates scale exponentially with the resolving time budget a
 
 Gray code sequencing in multi-bit counter transitions eliminates the glitch hazards inherent in binary counting across clock domain boundaries. A binary counter transitioning from `0111` (7) to `1000` (8) temporarily produces spurious intermediate values like `0110`, `0100`, or `1100` as different bits switch at slightly different times due to routing skew and gate delay mismatches. If an asynchronous receiving circuit samples the counter during this glitch window, it captures a transient incorrect value. Gray code counters modify the state encoding such that only one bit changes per increment, guaranteeing that even if the sample instant falls during a bit transition, the captured value is either the previous or next state, never a spurious intermediate.
 
-```
-4-Bit Binary vs. Gray Code Counter Sequences:
+```mermaid
+flowchart LR
+    subgraph binary_col ["Binary (4-bit)"]
+        B0["0000"]
+        B1["0001"]
+        B2["0010"]
+        B3["0011"]
+        B4["0100"]
+        B5["0101"]
+        B6["0110"]
+        B7["0111"]
+        B8["1000"]
+        B9["1001"]
+    end
 
-Decimal  Binary  Gray    (only 1 bit changes per Gray increment)
-───────────────────────
-   0     0000    0000
-   1     0001    0001
-   2     0010    0011
-   3     0011    0010
-   4     0100    0110
-   5     0101    0111
-   6     0110    0101
-   7     0111    0100
-   8     1000    1100    ← Binary: 4 bits toggle simultaneously
-   9     1001    1101        Gray: only MSB toggles
+    subgraph gray_col ["Gray Code (4-bit)"]
+        G0["0000"]
+        G1["0001"]
+        G2["0011"]
+        G3["0010"]
+        G4["0110"]
+        G5["0111"]
+        G6["0101"]
+        G7["0100"]
+        G8["1100"]
+        G9["1101"]
+    end
+
+    D0["0"] --> B0
+    D1["1"] --> B1
+    D2["2"] --> B2
+    D3["3"] --> B3
+    D4["4"] --> B4
+    D5["5"] --> B5
+    D6["6"] --> B6
+    D7["7"] --> B7
+    D8["8"] --> B8
+    D9["9"] --> B9
+
+    B0 --> G0
+    B1 --> G1
+    B2 --> G2
+    B3 --> G3
+    B4 --> G4
+    B5 --> G5
+    B6 --> G6
+    B7 --> G7
+    B8 -->|"4 bits toggle"| G8
+    B9 -->|"only MSB toggles"| G9
+
+    G0 -->|"Δ1 bit"| G1
+    G1 -->|"Δ1 bit"| G2
+    G2 -->|"Δ1 bit"| G3
+    G3 -->|"Δ1 bit"| G4
+    G4 -->|"Δ1 bit"| G5
+    G5 -->|"Δ1 bit"| G6
+    G6 -->|"Δ1 bit"| G7
+    G7 -->|"Δ1 bit"| G8
+    G8 -->|"Δ1 bit"| G9
+
+    subgraph decimal_col ["Decimal"]
+        D0
+        D1
+        D2
+        D3
+        D4
+        D5
+        D6
+        D7
+        D8
+        D9
+    end
 ```
 
 Clock skew, the spatial variation in clock arrival times across a chip due to routing parasitics and buffer delays, directly subtracts from setup and hold timing margins. In a synchronous system where all flip-flops nominally clock simultaneously, a 100-picosecond skew between the source flip-flop's clock and the destination flip-flop's clock effectively reduces the combinational logic budget by 100 picoseconds, as the destination samples earlier relative to the source's launch edge. Modern SoCs mitigate skew through hierarchical clock tree synthesis, where H-tree or X-tree topologies balance routing lengths to minimize skew, and through clock mesh networks that distribute the clock via a fine-grained grid, allowing local currents to average out spatial variations.

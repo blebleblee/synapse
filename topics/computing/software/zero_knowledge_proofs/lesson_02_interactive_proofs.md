@@ -38,19 +38,19 @@ The canonical instantiation for discrete log knowledge, known as the Schnorr ide
 
 **Verification.** The verifier checks that g^s = R · Y^c. This equation holds because g^s = g^(r + cx) = g^r · g^(cx) = R · Y^c when the prover is honest. If the prover does not know x, it cannot construct a valid response s for a challenge c it has not seen in advance, except with probability 1/q (the soundness error), because doing so would require solving the discrete logarithm.
 
-```
-Prover                              Verifier
-------                              --------
-x (secret witness)                  Y = g^x (public)
-
-r ← Zq (uniform random nonce)
-R = g^r
-              ──── R ────►
-                                    c ← Zq (uniform random)
-              ◄─── c ────
-s = r + c·x (mod q)
-              ──── s ────►
-                                    Accept if g^s == R · Y^c
+```mermaid
+flowchart LR
+    P1["Prover<br/>x (secret witness)<br/>r ← Zq (uniform random nonce)<br/>R = g^r"]
+    P2["Prover<br/>s = r + c·x (mod q)"]
+    V1["Verifier<br/>Y = g^x (public)"]
+    V2["Verifier<br/>c ← Zq (uniform random)"]
+    V3["Verifier<br/>Accept if g^s == R · Y^c"]
+    
+    P1 -- "R" --> V1
+    V2 -- "c" --> P2
+    P2 -- "s" --> V3
+    
+    V1 --> V2
 ```
 
 The zero-knowledge property follows from the existence of a simulator that works by running time backwards. The simulator first samples a random challenge c and a random response s, then *computes* R = g^s · Y^(-c). The transcript (R, c, s) satisfies the verification equation by construction, and because c and s are drawn uniformly, the distribution of simulated transcripts is identical to the distribution of real transcripts produced by an honest prover. This is perfect zero-knowledge: the simulator needs no witness, and the two distributions are equal, not merely computationally close.
@@ -105,34 +105,50 @@ The *AND composition* of two sigma protocols (Π₁, Π₂) proves simultaneous 
 
 The *OR composition* is more powerful and less obvious. It allows the prover to prove knowledge of a witness for *at least one of two* statements without revealing which one. This is a disjunctive proof: "I know x such that Y₁ = g^x, OR I know x such that Y₂ = g^x." The prover, who holds a witness for statement 1 but not statement 2, simulates a transcript for the statement it cannot prove (using the simulator it knows exists because the protocol is zero-knowledge), then uses the remaining challenge budget to produce a real response for statement 1. The key insight is that the prover commits to both sub-transcripts simultaneously, then splits the verifier challenge c into c₁ and c₂ such that c₁ XOR c₂ = c (or c₁ + c₂ = c mod q), so the verifier can check both. The prover's freedom to choose how to split the challenge only exists for the statement whose transcript it simulated in advance. This construction, due to Cramer, Damgård, and Schoenmakers, is the basis for ring signatures, anonymous credential schemes, and several voting protocols.
 
-```
- ┌─────────────────────────────────────────────────────────────────┐
- │                   OR-Proof Transcript Structure                  │
- │                                                                  │
- │  Prover holds witness for Statement 1 (index = 0)               │
- │                                                                  │
- │  Phase 1: Simulate transcript for Statement 2                   │
- │    - Choose c2, s2 at random                                    │
- │    - Compute R2 = g^s2 · Y2^(-c2)   [simulator construction]   │
- │                                                                  │
- │  Phase 2: Real commitment for Statement 1                       │
- │    - Choose r ← Zq                                              │
- │    - Compute R1 = g^r                                           │
- │                                                                  │
- │  Send: (R1, R2) to verifier                                     │
- │                                                                  │
- │  Receive: global challenge c from verifier (or via Fiat-Shamir) │
- │                                                                  │
- │  Phase 3: Split challenge and respond                           │
- │    - Set c1 = c XOR c2                                          │
- │    - Compute s1 = r + c1·x1 (mod q)                            │
- │                                                                  │
- │  Send: (c1, s1, c2, s2)                                         │
- │                                                                  │
- │  Verifier checks:                                               │
- │    g^s1 == R1 · Y1^c1  AND  g^s2 == R2 · Y2^c2                 │
- │    c1 XOR c2 == c                                               │
- └─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start["OR-Proof Transcript Structure<br/>Prover holds witness for Statement 1 (index = 0)"]
+    
+    subgraph Phase1["Phase 1: Simulate transcript for Statement 2"]
+        P1A["Choose c2, s2 at random"]
+        P1B["Compute R2 = g^s2 · Y2^(-c2)<br/>[simulator construction]"]
+        P1A --> P1B
+    end
+    
+    subgraph Phase2["Phase 2: Real commitment for Statement 1"]
+        P2A["Choose r ← Zq"]
+        P2B["Compute R1 = g^r"]
+        P2A --> P2B
+    end
+    
+    Send1["Send: (R1, R2) to verifier"]
+    
+    Receive["Receive: global challenge c from verifier<br/>(or via Fiat-Shamir)"]
+    
+    subgraph Phase3["Phase 3: Split challenge and respond"]
+        P3A["Set c1 = c XOR c2"]
+        P3B["Compute s1 = r + c1·x1 (mod q)"]
+        P3A --> P3B
+    end
+    
+    Send2["Send: (c1, s1, c2, s2)"]
+    
+    subgraph Verify["Verifier checks"]
+        V1["g^s1 == R1 · Y1^c1"]
+        V2["g^s2 == R2 · Y2^c2"]
+        V3["c1 XOR c2 == c"]
+        V1 -.-> V2
+        V2 -.-> V3
+    end
+    
+    Start --> Phase1
+    Start --> Phase2
+    Phase1 --> Send1
+    Phase2 --> Send1
+    Send1 --> Receive
+    Receive --> Phase3
+    Phase3 --> Send2
+    Send2 --> Verify
 ```
 
 ### Proof of Knowledge: The Extractor and Its Role

@@ -190,7 +190,7 @@ Anchoring (0-10): Was my estimate influenced by an initial numerical value, even
 
 Base Rate Neglect (0-10): Did I incorporate statistical frequency information (prior probabilities), or did I focus exclusively on case-specific details? Evidence: Identify relevant reference class; calculate Bayesian posterior; compare to intuitive estimate.
 
-Overconfidence (0-10): Is my subjective certainty calibrated to my objective accuracy, or am I claiming higher confidence than my track record warrants? Evidence: Compare confidence level to historical accuracy in similar judgments; check for confidence exceeding 80% in domains with <60% base success rate.
+Overconfidence (0-10): Is my subjective certainty calibrated to my objective accuracy, or am I claiming higher confidence than my track record warrants? Evidence: Compare confidence level to historical accuracy in similar judgments; check for confidence exceeding 80% in domains with < 60% base success rate.
 
 Sunk Cost Influence (0-10): Is this decision driven by forward-looking value, or am I continuing because of unrecoverable past investments? Evidence: Apply zero-based decision protocol; compare rational choice (ignoring sunk costs) to emotional pull toward continuation.
 
@@ -232,7 +232,7 @@ When making any consequential decision under time pressure, execute this sequent
 
 **Step 4: Prospective Regret Analysis (5 minutes)**: For each option, imagine the decision has been made and you are reviewing it one year later. Rate anticipated regret if the outcome is negative. Distinguish two regret types: outcome regret (regretting the result) versus process regret (regretting the decision quality). Minimize process regret by ensuring the decision process is defensible regardless of outcome. High-quality decisions occasionally yield bad outcomes; accept outcome risk when process is sound.
 
-**Step 5: Reversibility Assessment (2 minutes)**: Rate decision reversibility (1-10 scale, 1 = completely irreversible, 10 = easily reversible). For low-reversibility decisions (scores <4), increase scrutiny and require higher confidence threshold. For high-reversibility decisions (scores >7), reduce deliberation time and accept experimental mindset ("try and adjust"). Calibrate analysis intensity to reversibility.
+**Step 5: Reversibility Assessment (2 minutes)**: Rate decision reversibility (1-10 scale, 1 = completely irreversible, 10 = easily reversible). For low-reversibility decisions (scores < 4), increase scrutiny and require higher confidence threshold. For high-reversibility decisions (scores >7), reduce deliberation time and accept experimental mindset ("try and adjust"). Calibrate analysis intensity to reversibility.
 
 **Step 6: Sunk Cost Quarantine (5 minutes)**: List all resources already invested in this domain. Explicitly exclude these from the decision calculus by completing zero-based decision audit: "If I were encountering this opportunity fresh today with no prior investments, would I commit the required prospective resources?" If no, seriously consider stopping regardless of sunk costs. If yes, confirm that continuation is forward-looking rational.
 
@@ -244,7 +244,7 @@ Implement this 12-week structured training program to achieve measurable, durabl
 
 **Weeks 3-6 (Protocol Implementation)**: Apply debiasing protocols to all new decisions during this period. Mandatory procedures: Bayesian probability calculation for any probabilistic judgment, considered alternative anchors for any numerical estimate, dual-frame analysis for any consequential choice, situational factor checklist for any behavioral evaluation, zero-based decision audit for any continuation decision. Maintain decision log documenting protocol application. Target: 20+ protocol applications.
 
-**Weeks 7-8 (Mid-Point Reassessment)**: Re-administer the baseline battery (calibration curve, base rate audit, framing scenarios, attribution log). Compare Week 8 scores to Week 1 baseline. Calculate improvement metrics: calibration error reduction, base rate neglect index reduction, framing reversal rate reduction, attribution asymmetry reduction. Typical mid-point improvements: 20-30% bias reduction. If improvement is <15%, increase protocol compliance or seek external coaching.
+**Weeks 7-8 (Mid-Point Reassessment)**: Re-administer the baseline battery (calibration curve, base rate audit, framing scenarios, attribution log). Compare Week 8 scores to Week 1 baseline. Calculate improvement metrics: calibration error reduction, base rate neglect index reduction, framing reversal rate reduction, attribution asymmetry reduction. Typical mid-point improvements: 20-30% bias reduction. If improvement is < 15%, increase protocol compliance or seek external coaching.
 
 **Weeks 9-12 (Habit Formation and Stress Testing)**: Continue protocol application with focus on automation—execute debiasing procedures without conscious deliberation. Introduce stress testing: make protocol-based decisions under time pressure (decisions completed in 30 minutes or less), social pressure (decisions requiring disagreement with authority or consensus), or emotional arousal (decisions involving personal stakes or identity-relevant outcomes). Document stress scenarios where protocols broke down; these reveal boundary conditions requiring reinforcement.
 

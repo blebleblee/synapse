@@ -194,54 +194,57 @@ $$\hat{\rho}_S(t) = |c_\uparrow|^2 |\uparrow\rangle\langle\uparrow| + |c_\downar
 
 The off-diagonal coherence terms are suppressed by the overlap $\langle E_\downarrow(t) | E_\uparrow(t) \rangle$, which decays exponentially with time as the environment states become orthogonal. The coherence decay rate $\gamma_\phi$ depends on the spectral density of environmental fluctuations and temperature. For an Ohmic bath at temperature $T$, the dephasing time $T_2 = 1/\gamma_\phi$ scales as $T_2 \sim \hbar/(\alpha k_B T)$, where $\alpha$ is the dimensionless coupling strength. At cryogenic temperatures ($T \sim 10$ mK) typical for superconducting qubits, $T_2$ reaches microseconds to milliseconds for carefully engineered systems.
 
-```
-Entanglement Measurement Architecture (Two-Qubit System)
+```mermaid
+flowchart TD
+    ESG["Entangled State Generator
+    (e.g., SPDC, ion coupling,
+    microwave two-qubit gate)"]
 
-Source Preparation Stage:
-                                    ┌─────────────────────────────┐
-                                    │  Entangled State Generator   │
-                                    │  (e.g., SPDC, ion coupling,  │
-                                    │   microwave two-qubit gate)  │
-                                    └─────────────────────────────┘
-                                                │
-                                                │ |Ψ⁻⟩ = (|↑↓⟩ - |↓↑⟩)/√2
-                                                ▼
-                        ┌───────────────────────────────────────────────┐
-                        │         Qubit A         │         Qubit B      │
-                        └───────────────────────────────────────────────┘
-                                   │                           │
-                                   │                           │
-                          ┌────────▼────────┐        ┌────────▼────────┐
-                          │  Local Basis    │        │  Local Basis     │
-                          │  Rotation       │        │  Rotation        │
-                          │  U_A(θ_a, φ_a)  │        │  U_B(θ_b, φ_b)  │
-                          └────────┬────────┘        └────────┬────────┘
-                                   │                           │
-                          ┌────────▼────────┐        ┌────────▼────────┐
-                          │  Projective     │        │  Projective      │
-                          │  Measurement    │        │  Measurement     │
-                          │  {|↑⟩, |↓⟩}    │        │  {|↑⟩, |↓⟩}     │
-                          └────────┬────────┘        └────────┬────────┘
-                                   │                           │
-                          ┌────────▼────────┐        ┌────────▼────────┐
-                          │  Detector A     │        │  Detector B      │
-                          │  (outcome a_i)  │        │  (outcome b_j)   │
-                          └────────┬────────┘        └────────┬────────┘
-                                   │                           │
-                                   └───────────┬───────────────┘
-                                               │
-                                    ┌──────────▼──────────┐
-                                    │  Coincidence Logic   │
-                                    │  & Correlation       │
-                                    │  Analysis            │
-                                    └──────────┬──────────┘
-                                               │
-                                    ┌──────────▼──────────┐
-                                    │  Bell Inequality    │
-                                    │  S = |E(a,b) + ...| │
-                                    │  Classical: S ≤ 2   │
-                                    │  Quantum: S = 2√2   │
-                                    └─────────────────────┘
+    ESG -->|"|Ψ⁻⟩ = (|↑↓⟩ − |↓↑⟩)/√2"| SPLIT
+
+    SPLIT:::invisible
+
+    subgraph QUBITS ["Two-Qubit System"]
+        direction LR
+
+        subgraph SIDE_A ["Qubit A"]
+            direction TB
+            BRA["Local Basis Rotation
+            U_A(θ_a, φ_a)"]
+            PMA["Projective Measurement
+            {|↑⟩, |↓⟩}"]
+            DA["Detector A
+            (outcome a_i)"]
+            BRA --> PMA --> DA
+        end
+
+        subgraph SIDE_B ["Qubit B"]
+            direction TB
+            BRB["Local Basis Rotation
+            U_B(θ_b, φ_b)"]
+            PMB["Projective Measurement
+            {|↑⟩, |↓⟩}"]
+            DB["Detector B
+            (outcome b_j)"]
+            BRB --> PMB --> DB
+        end
+    end
+
+    SPLIT --> BRA
+    SPLIT --> BRB
+
+    DA --> CL
+    DB --> CL
+
+    CL["Coincidence Logic
+    & Correlation Analysis"]
+
+    CL --> BI["Bell Inequality
+    S = |E(a,b) + E(a,b') + E(a',b) − E(a',b')|
+    Classical bound:  S ≤ 2
+    Quantum maximum: S = 2√2"]
+
+    classDef invisible fill:none,stroke:none,color:none
 ```
 
 The measurement architecture separates into four stages: state preparation, basis transformation, projection, and correlation analysis. State preparation produces the entangled two-qubit state via platform-specific mechanisms—spontaneous parametric down-conversion for photons, laser-mediated spin-motion coupling for ions, microwave pulses for superconducting qubits. The entangled state propagates to spatially separated measurement stations, maintaining quantum coherence during transit.

@@ -32,20 +32,44 @@ Epigenetic modifications introduce memory into these networks by altering the ba
 
 The canonical bacterial heat shock response illustrates the minimal regulatory architecture required for rapid stress adaptation. In *Escherichia coli*, cytoplasmic temperature elevation causes protein unfolding, exposing hydrophobic residues normally buried in protein cores. The RNA polymerase sigma factor σ³² (RpoH), which directs transcription of heat shock genes encoding chaperones (DnaK, DnaJ, GroEL, GroES) and proteases (Lon, ClpP), is normally maintained at low levels through three mechanisms: translational repression of its own mRNA by secondary structure that occludes the ribosome binding site at physiological temperatures, rapid degradation by the FtsH protease, and sequestration by the DnaK chaperone system. When heat shock occurs, the secondary structure in the σ³² mRNA melts, increasing translation. Simultaneously, the flood of misfolded substrate proteins titrates DnaK away from σ³², stabilizing the sigma factor and allowing it to accumulate. The liberated σ³² associates with core RNA polymerase and initiates transcription from heat shock promoters, which contain a conserved −35/−10 motif recognized specifically by σ³². The newly synthesized chaperones refold or degrade the misfolded proteins, eventually sequestering σ³² again and returning the system to basal state.
 
-```
-Homeostasis:           Heat Shock:            Recovery:
-                                             
-DnaK─σ³²               misfolded proteins    DnaK─σ³²
-  ↓                          ↓                  ↑
-FtsH degradation      DnaK sequesters        chaperones
-  ↓                    substrate              refold proteins
-Low σ³²                     ↓                      ↓
-  ↓                    σ³² released           substrate cleared
-Basal chaperone            ↓                      ↓
-expression            σ³²-RNAP → HSP genes    σ³² re-sequestered
-                            ↓
-                      High chaperone
-                      expression
+```mermaid
+flowchart TD
+    subgraph homeostasis ["Homeostasis"]
+        A["DnaK─σ³²"]
+        B["FtsH degradation"]
+        C["Low σ³²"]
+        D["Basal chaperone<br/>expression"]
+        
+        A --> B
+        B --> C
+        C --> D
+    end
+    
+    subgraph heat_shock ["Heat Shock"]
+        E["Misfolded proteins"]
+        F["DnaK sequesters<br/>substrate"]
+        G["σ³² released"]
+        H["σ³²-RNAP → HSP genes"]
+        I["High chaperone<br/>expression"]
+        
+        E --> F
+        F --> G
+        G --> H
+        H --> I
+    end
+    
+    subgraph recovery ["Recovery"]
+        J["Chaperones<br/>refold proteins"]
+        K["Substrate cleared"]
+        L["σ³² re-sequestered"]
+        M["DnaK─σ³²"]
+        
+        J --> K
+        K --> L
+        L --> M
+    end
+    
+    M --> A
 ```
 
 This architecture contains all the essential elements of a stress response network: a dedicated sensor (thermolabile RNA structure, chaperone-binding interface), signal amplification (transcriptional activation of multiple genes), negative feedback (chaperones sequester σ³²), and substrate depletion as the natural shutdown mechanism (once misfolded proteins are cleared, DnaK is free to inactivate σ³²). The response is self-limiting and proportional—the more severe the heat shock, the more substrate proteins accumulate, the more σ³² is liberated, and the more chaperones are synthesized.

@@ -108,7 +108,7 @@ Measure leak rate using the protocol from Exercise 2. Leak rates exceeding 1.5 m
 Verify equal tubing lengths between valve and each cylinder. Replace any kinked or compressed tubing segments. Check for partial blockage by disconnecting tubes and blowing through them manually; airflow should be unrestricted. Measure piston friction by manually sliding each piston through full stroke; resistance should be smooth and comparable between cylinders. If one cylinder exhibits noticeably higher friction, disassemble and inspect for internal debris or seal misalignment.
 
 **Symptom: Pump requires excessive force or fails to build pressure**  
-Disassemble pump plunger assembly and inspect the O-ring seal for tears, flattening, or hardening. Nitrile seals harden after 2–3 years of storage; replace the pump assembly if seal compression set exceeds 20% (measure seal thickness with calipers: new seals are 2.0 mm; degraded seals measure <1.6 mm). Check pump outlet check valve (if applicable; not all Lego pumps use check valves) for debris or reversed installation. Verify pump plunger travels full stroke by observing handle motion relative to pump body travel stops.
+Disassemble pump plunger assembly and inspect the O-ring seal for tears, flattening, or hardening. Nitrile seals harden after 2–3 years of storage; replace the pump assembly if seal compression set exceeds 20% (measure seal thickness with calipers: new seals are 2.0 mm; degraded seals measure < 1.6 mm). Check pump outlet check valve (if applicable; not all Lego pumps use check valves) for debris or reversed installation. Verify pump plunger travels full stroke by observing handle motion relative to pump body travel stops.
 
 ### Performance Specification Table
 

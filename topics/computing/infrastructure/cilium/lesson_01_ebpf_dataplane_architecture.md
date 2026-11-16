@@ -48,58 +48,34 @@ The kernel's eBPF runtime provides helper functions that serve as the system cal
 
 The diagram below illustrates the complete dataplane architecture for an ingress packet in Cilium:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Physical NIC                              │
-│                 (DMA packet into memory)                     │
-└───────────────────────┬─────────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│              XDP Hook (Driver Layer)                         │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │ eBPF Program: from-netdev                            │   │
-│  │ • Extract 5-tuple (sIP, dIP, sPort, dPort, proto)   │   │
-│  │ • Lookup in per-CPU CT map (connection tracking)     │   │
-│  │ • If CT hit: apply cached verdict → XDP_PASS/DROP   │   │
-│  │ • If CT miss: tail-call to policy program            │   │
-│  └──────────────────────────────────────────────────────┘   │
-│                    BPF Maps:                                 │
-│         ┌───────────────────┐  ┌──────────────────┐         │
-│         │ CT_MAP (per-CPU)  │  │ IDENTITY_MAP     │         │
-│         │ Key: 5-tuple      │  │ Key: IP          │         │
-│         │ Val: CT state     │  │ Val: sec_identity│         │
-│         └───────────────────┘  └──────────────────┘         │
-└───────────────────────┬─────────────────────────────────────┘
-                        │ XDP_PASS
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│        Kernel Stack (sk_buff allocation, L3/L4 parse)       │
-└───────────────────────┬─────────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│           TC Ingress Hook (qdisc layer)                      │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │ eBPF Program: from-container                         │   │
-│  │ • Service load balancing (DNAT backend selection)    │   │
-│  │ • Lookup service VIP in LB4_MAP                      │   │
-│  │ • Consistent hash to backend pod                     │   │
-│  │ • Rewrite dIP, dPort, update CT map                  │   │
-│  │ • Network policy enforcement (if CT miss)            │   │
-│  └──────────────────────────────────────────────────────┘   │
-│                    BPF Maps:                                 │
-│    ┌──────────────────┐  ┌─────────────────────────────┐    │
-│    │ LB4_MAP          │  │ POLICY_MAP                  │    │
-│    │ Key: VIP:port    │  │ Key: (src_id, dst_id, port) │    │
-│    │ Val: backend[]   │  │ Val: allow/deny             │    │
-│    └──────────────────┘  └─────────────────────────────┘    │
-└───────────────────────┬─────────────────────────────────────┘
-                        │ TC_ACT_OK
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│         Socket Layer (application delivery)                  │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Physical NIC<br/>(DMA packet into memory)"]
+    
+    subgraph XDP["XDP Hook (Driver Layer)"]
+        B["eBPF Program: from-netdev<br/>• Extract 5-tuple (sIP, dIP, sPort, dPort, proto)<br/>• Lookup in per-CPU CT map (connection tracking)<br/>• If CT hit: apply cached verdict → XDP_PASS/DROP<br/>• If CT miss: tail-call to policy program"]
+        C["CT_MAP (per-CPU)<br/>Key: 5-tuple<br/>Val: CT state"]
+        D["IDENTITY_MAP<br/>Key: IP<br/>Val: sec_identity"]
+        B -.-> C
+        B -.-> D
+    end
+    
+    E["Kernel Stack<br/>(sk_buff allocation, L3/L4 parse)"]
+    
+    subgraph TC["TC Ingress Hook (qdisc layer)"]
+        F["eBPF Program: from-container<br/>• Service load balancing (DNAT backend selection)<br/>• Lookup service VIP in LB4_MAP<br/>• Consistent hash to backend pod<br/>• Rewrite dIP, dPort, update CT map<br/>• Network policy enforcement (if CT miss)"]
+        G["LB4_MAP<br/>Key: VIP:port<br/>Val: backend[]"]
+        H["POLICY_MAP<br/>Key: (src_id, dst_id, port)<br/>Val: allow/deny"]
+        F -.-> G
+        F -.-> H
+    end
+    
+    I["Socket Layer<br/>(application delivery)"]
+    
+    A --> B
+    B -->|XDP_PASS| E
+    E --> F
+    F -->|TC_ACT_OK| I
 ```
 
 This architecture demonstrates the principle of progressive refinement: the XDP layer handles the common case (existing connections) with minimal overhead, while TC programs handle the exceptional cases (new connections, load balancing) that require richer context and more complex transformations. The separation of connection tracking from policy enforcement through tail calls enables independent scaling: connection tracking state is per-CPU for lock-free updates, while policy maps are shared across CPUs since policy changes are rare and can tolerate occasional cache misses.

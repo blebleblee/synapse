@@ -28,24 +28,23 @@ The double-plate foundation solves most of this. Two baseplates stud-connected f
 
 A Technic frame base uses Technic liftarms as a structural grid beneath the visible surface layer. The liftarms are connected by Technic bricks and cross-axles to form a rigid lattice, and the display surface — standard plates or tiles — is built on top of this lattice. The liftarms act as the flanges and webs of a composite beam, and their connectivity through axle-pinned joints prevents the in-plane racking that plagues plate-only bases. The effective depth of the structural section — the vertical distance between the bottom liftarm layer and the top surface — determines the base's resistance to bending, and even a 3-stud (24 mm) structural depth produces a base that feels nearly solid compared to a double plate alone.
 
-```
-Top view — Technic Frame Base (schematic, 16-stud span shown):
-
-  [===========]  <-- Surface plates (tiles/bricks)
-  |           |
-  |--[LA]--[LA]|  <-- Liftarm cross-members at 4-stud spacing
-  |     X     |  <-- Diagonal bracing liftarms (5-12-13 geometry)
-  |--[LA]--[LA]|
-  |           |
-  [===========]
-
-Side section view:
-
-  Surface tiles
-  ══════════════
-  ║ Technic BK ║   <- 3-stud height structural zone
-  ═══════════════
-  Half-plate / feet
+```mermaid
+flowchart TD
+    subgraph top_view ["Top View — Technic Frame Base (16-stud span)"]
+        SP["Surface Plates (tiles/bricks)"]
+        SP --> LA1["Liftarm Cross-Members (4-stud spacing)"]
+        LA1 --> DIAG["Diagonal Bracing Liftarms (5-12-13 geometry)"]
+        DIAG --> LA2["Liftarm Cross-Members (4-stud spacing)"]
+        LA2 --> BASE["Base Structure"]
+    end
+    
+    subgraph side_view ["Side Section View"]
+        ST["Surface Tiles<br/>(Top Layer)"]
+        ST --> SZ["Technic Brick Zone<br/>(3-stud height)"]
+        SZ --> FEET["Half-Plate / Feet<br/>(Bottom Layer)"]
+    end
+    
+    top_view -.relates to.-> side_view
 ```
 
 For display pieces that will be transported, the frame base also solves the floor-contact problem elegantly. Rather than resting the entire bottom surface on a table, the frame base can be designed with corner feet or perimeter contact rails, ensuring three- or four-point predictable contact regardless of surface variation — the same principle used in precision machine tool leveling.

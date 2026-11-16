@@ -127,22 +127,38 @@ The smallest fields are the **finite fields** $\mathbb{F}_p = \mathbb{Z}/p\mathb
 
 The complete structural relationship between these three levels is best seen in the following diagram:
 
-```
-Group
-└─ Set + 1 binary operation
-   satisfying: Closure, Associativity,
-               Identity, Inverses
+```mermaid
+flowchart TD
+    G["<b>Group</b>"]
+    G_DEF["Set + 1 binary operation"]
+    G_AX["✔ Closure\n✔ Associativity\n✔ Identity\n✔ Inverses"]
 
-Ring
-└─ Set + 2 binary operations (+, ×)
-   satisfying: (R, +) is abelian group,
-               × is associative with identity,
-               Distributivity links + and ×
+    R["<b>Ring</b>"]
+    R_DEF["Set + 2 binary operations ( + , × )"]
+    R_AX1["(R, +) is an abelian group"]
+    R_AX2["× is associative with identity"]
+    R_AX3["Distributivity links + and ×"]
 
-Field
-└─ Commutative Ring
-   where (R\{0}, ×) is also an abelian group
-   i.e., every nonzero element is a unit
+    F["<b>Field</b>"]
+    F_DEF["Commutative Ring"]
+    F_AX["(R \\ {0}, ×) is also an abelian group\ni.e., every nonzero element is a unit"]
+
+    subgraph group_block ["Group"]
+        G_DEF --> G_AX
+    end
+
+    subgraph ring_block ["Ring"]
+        R_DEF --> R_AX1
+        R_DEF --> R_AX2
+        R_DEF --> R_AX3
+    end
+
+    subgraph field_block ["Field"]
+        F_DEF --> F_AX
+    end
+
+    group_block --> ring_block
+    ring_block --> field_block
 ```
 
 Each level adds structure. Each addition makes the theory richer, the proofs harder, and the arithmetic more expressive. The integers live at the ring level. The rationals ascend to the field level by adjoining multiplicative inverses. The reals and complex numbers are fields with additional analytic or algebraic completeness properties layered on top of the field axioms.

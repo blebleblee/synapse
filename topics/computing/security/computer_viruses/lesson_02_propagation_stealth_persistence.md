@@ -231,31 +231,27 @@ The code above is complete and compilable. It demonstrates ELF structure manipul
 
 A self-propagating network worm decomposes into four cooperating subsystems: a scanner, an exploit delivery engine, a dropper, and a coordination layer. The architecture is best understood as a pipeline in which each stage's output is the next stage's input.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                   WORM PROPAGATION PIPELINE                         │
-│                                                                     │
-│  ┌──────────┐    ┌──────────────┐    ┌──────────┐    ┌──────────┐  │
-│  │          │    │              │    │          │    │          │  │
-│  │ SCANNER  │───▶│  FINGERPRINT │───▶│ EXPLOIT  │───▶│ DROPPER  │  │
-│  │          │    │   & TRIAGE   │    │ ENGINE   │    │          │  │
-│  │  SYN     │    │              │    │          │    │ stage0   │  │
-│  │  sweep   │    │ banner grab  │    │ vuln     │    │ shellcode│  │
-│  │  ICMP    │    │ OS detection │    │ selector │    │ fetches  │  │
-│  │  probe   │    │ service ver  │    │ payload  │    │ stage1   │  │
-│  │          │    │              │    │  send    │    │ binary   │  │
-│  └──────────┘    └──────────────┘    └──────────┘    └──────────┘  │
-│       │                                                    │        │
-│       │          ┌──────────────────────────────┐         │        │
-│       └──────────│   TARGET QUEUE               │─────────┘        │
-│                  │   (ip:port:service:version)   │                  │
-│                  └──────────────────────────────┘                  │
-│                                                                     │
-│  ┌────────────────────────────────────────────────────────────────┐ │
-│  │             COORDINATION LAYER                                 │ │
-│  │  peer list exchange │ rate throttle │ already-infected check   │ │
-│  └────────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph pipeline ["WORM PROPAGATION PIPELINE"]
+        scanner["SCANNER<br/>SYN sweep<br/>ICMP probe"]
+        fingerprint["FINGERPRINT & TRIAGE<br/>banner grab<br/>OS detection<br/>service ver"]
+        exploit["EXPLOIT ENGINE<br/>vuln selector<br/>payload send"]
+        dropper["DROPPER<br/>stage0 shellcode fetches<br/>stage1 binary"]
+        target_queue["TARGET QUEUE<br/>(ip:port:service:version)"]
+
+        subgraph coordination ["COORDINATION LAYER"]
+            peer["peer list exchange"]
+            throttle["rate throttle"]
+            infected["already-infected check"]
+        end
+
+        scanner --> fingerprint
+        fingerprint --> exploit
+        exploit --> dropper
+        scanner --> target_queue
+        target_queue --> dropper
+    end
 ```
 
 The scanner subsystem is the most resource-intensive component and the most likely to trigger network-based intrusion detection. High-performance worm scanners use raw sockets and a custom TCP/IP stack to send SYN packets without completing the three-way handshake, achieving scan rates on the order of millions of packets per second from a single host. The classic approach, exemplified by tools like `masscan`, allocates a transmit thread per NIC queue and a receive thread for SYN-ACK harvesting, maintaining a fixed-size stateless hash table keyed on `(source_port, dest_ip, dest_port)` to match responses to outstanding probes. The critical performance insight is that the kernel TCP stack is a liability here: the kernel will respond to incoming SYN-ACKs with RST packets because no socket is listening. The raw-socket worm solves this by either using a dedicated source IP not assigned to any interface (bypassing the kernel's TCP state machine entirely) or by installing a BPF classic filter on the raw socket to drop all incoming packets before they reach the kernel's protocol processing path.

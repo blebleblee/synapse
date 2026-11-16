@@ -121,28 +121,30 @@ The I/O driver sits at the foundation. It wraps `epoll` on Linux, `kqueue` on ma
 
 Above the I/O driver sits the task scheduler. Tokio's multi-threaded runtime implements a work-stealing scheduler with one queue per worker thread. Each spawned task becomes an `Arc`-wrapped heap allocation containing the future and a reference to the scheduler. When a waker fires, it atomically enqueues the task handle into the owning thread's local run queue. If that thread's queue is full or the thread is parked, the task may be migrated to another thread's queue. Worker threads that run out of local work steal from the back of a sibling thread's queue, maintaining load balance without a central lock.
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                     Tokio Runtime                          │
-│                                                            │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │                   Task Scheduler                     │  │
-│  │  Thread 0 RunQ  Thread 1 RunQ  Thread 2 RunQ  ...   │  │
-│  │  [Task A]       [Task C]       [Task E]              │  │
-│  │  [Task B]       [Task D]       [Task F]              │  │
-│  │        ↑ work-steal ←──────────────────────          │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                          │ wake()                          │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │                     I/O Driver                       │  │
-│  │   epoll_wait() → fd ready → lookup Waker → wake()   │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                          │ register/deregister             │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │               OS Event Queue (epoll)                 │  │
-│  │   fd 7 (readable)   fd 12 (writable)   fd 31 (HUP)  │  │
-│  └──────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph runtime ["Tokio Runtime"]
+        subgraph scheduler ["Task Scheduler"]
+            t0["Thread 0 RunQ<br/>[Task A]<br/>[Task B]"]
+            t1["Thread 1 RunQ<br/>[Task C]<br/>[Task D]"]
+            t2["Thread 2 RunQ<br/>[Task E]<br/>[Task F]"]
+            t3["..."]
+            
+            t1 -.->|work-steal| t0
+            t2 -.->|work-steal| t0
+        end
+        
+        subgraph driver ["I/O Driver"]
+            io["epoll_wait() → fd ready → lookup Waker → wake()"]
+        end
+        
+        subgraph osqueue ["OS Event Queue (epoll)"]
+            events["fd 7 (readable)<br/>fd 12 (writable)<br/>fd 31 (HUP)"]
+        end
+        
+        driver -->|"wake()"| scheduler
+        osqueue -->|"register/deregister"| driver
+    end
 ```
 
 Each spawned task is an independent unit of concurrency. `tokio::spawn` moves a future onto the heap, wraps it in an allocation Tokio calls a `Harness`, and places it in the scheduler. The harness stores the future, an atomic state word (tracking whether the task is currently running, idle, or complete), and a reference count. When the scheduler picks up a task, it pins the future in place and calls `poll` through the harness. If `poll` returns `Pending`, the harness atomically transitions the task back to idle; if `Ready`, it drops the future, runs any `JoinHandle` notification, and deallocates the harness.

@@ -26,64 +26,31 @@ When the controller determines that a release must be installed or upgraded, it 
 
 The three-way strategic merge patch that Helm applies during upgrades deserves careful examination because it directly impacts how updates propagate to live resources. When upgrading a release, Helm compares three manifest sets: the previously rendered templates from the last successful release, the newly rendered templates incorporating updated values or chart versions, and the live state of resources as returned by the API server. For each resource, Helm computes a patch that preserves fields modified outside of Helm's control—such as replica counts adjusted by horizontal pod autoscalers or annotations added by admission webhooks—while applying changes specified in the new templates. This merge strategy differs from kubectl's server-side apply, which tracks field ownership through managed fields metadata and resolves conflicts based on explicit manager identities. The practical consequence is that Helm-managed resources can accumulate out-of-band modifications that persist across upgrades unless explicitly reset through the `spec.upgrade.force` flag, which triggers a full resource replacement cycle.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         Flux HelmRelease Reconciliation              │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    GIT["Git Commit\n(HelmRelease manifest)\n\nFlux Kustomization watches path,\nmaterializes HelmRelease into cluster"]
 
-    ┌───────────────┐
-    │  Git Commit   │  Flux Kustomization watches path,
-    │  (HelmRelease │  materializes HelmRelease into cluster
-    │    manifest)  │
-    └───────┬───────┘
-            │
-            ▼
-    ┌───────────────────────────────────────────────────────┐
-    │ helm-controller observes HelmRelease CRD              │
-    │ Extracts: chart ref, version, values sources          │
-    └───────┬───────────────────────────────────────────────┘
-            │
-            ▼
-    ┌───────────────────────────────────────────────────────┐
-    │ Query source-controller artifact API                  │
-    │ Resolve chart version → download tarball → verify sig │
-    └───────┬───────────────────────────────────────────────┘
-            │
-            ▼
-    ┌───────────────────────────────────────────────────────┐
-    │ Values Resolution: Merge hierarchy                    │
-    │ 1. Chart defaults (values.yaml)                       │
-    │ 2. ValuesFrom (ConfigMap/Secret refs)                 │
-    │ 3. Inline spec.values (highest precedence)            │
-    └───────┬───────────────────────────────────────────────┘
-            │
-            ▼
-    ┌───────────────────────────────────────────────────────┐
-    │ Template Rendering (Go templates + Sprig)             │
-    │ Compute SHA-256 digest of rendered manifests          │
-    └───────┬───────────────────────────────────────────────┘
-            │
-            ├─ Digest matches previous? ──YES──> Skip upgrade
-            │                                     (report Ready)
-            └─ NO
-               │
-               ▼
-    ┌───────────────────────────────────────────────────────┐
-    │ Invoke Helm Action (Install or Upgrade)               │
-    │ - Execute pre-upgrade hooks                           │
-    │ - Apply three-way strategic merge patches             │
-    │ - Wait for resource readiness (timeout configured)    │
-    │ - Execute post-upgrade hooks                          │
-    │ - Persist release metadata (Secret/ConfigMap)         │
-    └───────┬───────────────────────────────────────────────┘
-            │
-            ▼
-    ┌───────────────────────────────────────────────────────┐
-    │ Update HelmRelease Status                             │
-    │ - Set Ready condition                                 │
-    │ - Record last applied revision                        │
-    │ - Emit Kubernetes Event                               │
-    └───────────────────────────────────────────────────────┘
+    HC["helm-controller observes HelmRelease CRD\nExtracts: chart ref, version, values sources"]
+
+    SC["Query source-controller artifact API\nResolve chart version → download tarball → verify sig"]
+
+    VR["Values Resolution: Merge hierarchy\n1. Chart defaults (values.yaml)\n2. ValuesFrom (ConfigMap/Secret refs)\n3. Inline spec.values (highest precedence)"]
+
+    TR["Template Rendering (Go templates + Sprig)\nCompute SHA-256 digest of rendered manifests"]
+
+    SKIP["Skip upgrade\n(report Ready)"]
+
+    HA["Invoke Helm Action (Install or Upgrade)\n- Execute pre-upgrade hooks\n- Apply three-way strategic merge patches\n- Wait for resource readiness (timeout configured)\n- Execute post-upgrade hooks\n- Persist release metadata (Secret/ConfigMap)"]
+
+    SU["Update HelmRelease Status\n- Set Ready condition\n- Record last applied revision\n- Emit Kubernetes Event"]
+
+    GIT --> HC
+    HC --> SC
+    SC --> VR
+    VR --> TR
+    TR -->|"Digest matches previous? YES"| SKIP
+    TR -->|"Digest changed (NO)"| HA
+    HA --> SU
 ```
 
 Multi-tenancy enforcement begins with namespace-scoped RBAC policies that restrict what resources a HelmRelease controller can manipulate. In a typical deployment, each tenant receives a dedicated namespace where their workloads and HelmReleases reside. The flux-system namespace—or whatever namespace hosts the Flux controllers—contains ServiceAccounts with carefully scoped permissions. The helm-controller ServiceAccount requires cluster-wide permissions to watch HelmRelease CRDs and manage release storage Secrets across namespaces, but it should not possess unrestricted privileges to create arbitrary ClusterRoles or modify kube-system resources. Instead, the controller impersonates tenant-specific ServiceAccounts when applying Helm releases, using Kubernetes' user impersonation feature to evaluate RBAC policies as if the tenant's identity initiated the request.

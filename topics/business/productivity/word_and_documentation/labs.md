@@ -272,7 +272,7 @@ Execute this checklist before marking any document as "Final" or distributing to
 
 ☐ **Track Changes Consolidation**: Review > Changes > Show Markup > All Markup. If any tracked changes remain visible, Review > Changes > Accept/Reject all changes as appropriate. Verify Reviewing Pane shows zero pending changes. File size should decrease by 10-30% after accepting all changes if significant edit history existed.
 
-☐ **Accessibility Compliance Verification**: Review > Check Accessibility. Target: zero errors. Address any flagged issues: add alt text to images, ensure tables have header rows designated, verify heading levels are not skipped, confirm no text has insufficient color contrast (<4.5:1 ratio). Re-run checker until clean.
+☐ **Accessibility Compliance Verification**: Review > Check Accessibility. Target: zero errors. Address any flagged issues: add alt text to images, ensure tables have header rows designated, verify heading levels are not skipped, confirm no text has insufficient color contrast (< 4.5:1 ratio). Re-run checker until clean.
 
 ☐ **Document Inspector Clean**: File > Info > Check for Issues > Inspect Document. Check all boxes, click Inspect. Review results. For final distribution, remove: Comments (unless specifically needed for recipient action), Revision marks (should already be gone after track changes consolidation), Document properties (only if distributing outside organization and metadata is sensitive), Hidden text. Do NOT remove Custom XML data if your organization uses it for workflow automation.
 

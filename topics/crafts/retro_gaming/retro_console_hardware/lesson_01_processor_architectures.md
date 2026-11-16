@@ -98,23 +98,30 @@ The fixed 32-bit instruction width is not merely an aesthetic choice; it is what
 
 The pipeline creates a consequence that every PSX developer had to internalize: the load delay slot. When a `lw` (load word) instruction reads from memory into a register, the data is not available until two cycles later because memory access occupies stage four of the five-stage pipe. The instruction immediately following the load executes before the loaded value is ready. Early MIPS implementations (including the R3000A) did not stall the pipeline automatically on a load-use hazard — they expected the programmer or compiler to place a useful instruction in that "delay slot" or insert an explicit `nop`. Code that read a value and immediately used it in the next instruction would silently read a stale value. This was a frequent source of bugs in early PSX development and a key reason Sony's official SDK included a compiler (a GCC-derived toolchain targeting the MIPS ABI) rather than expecting hand-written assembly for most code.
 
-```
-MIPS R3000A Five-Stage Pipeline
-╔════════╗  ╔════════╗  ╔════════╗  ╔════════╗  ╔════════╗
-║   IF   ║→ ║   ID   ║→ ║   EX   ║→ ║   MEM  ║→ ║   WB   ║
-║ Fetch  ║  ║ Decode ║  ║Execute ║  ║ Memory ║  ║Write   ║
-║ inst.  ║  ║ regs   ║  ║ ALU op ║  ║ load / ║  ║ result ║
-╚════════╝  ╚════════╝  ╚════════╝  ║ store  ║  ║to reg  ║
-                                     ╚════════╝  ╚════════╝
-
-Load Delay Slot Example:
-  lw   $t0, 0($a0)     ; load from memory into $t0
-  nop                   ; delay slot: $t0 not yet valid here
-  add  $t1, $t0, $t2   ; $t0 is valid here
-
-Without the nop (incorrect):
-  lw   $t0, 0($a0)
-  add  $t1, $t0, $t2   ; reads STALE value of $t0 — silent bug
+```mermaid
+flowchart LR
+    IF["IF<br/>Instruction Fetch"]
+    ID["ID<br/>Instruction Decode<br/>Read Registers"]
+    EX["EX<br/>Execute<br/>ALU Operation"]
+    MEM["MEM<br/>Memory Access<br/>Load/Store"]
+    WB["WB<br/>Write Back<br/>Result to Register"]
+    
+    IF --> ID --> EX --> MEM --> WB
+    
+    subgraph example1 ["Load Delay Slot Example (Correct)"]
+        direction TB
+        E1A["lw $t0, 0($a0)<br/><i>load from memory into $t0</i>"]
+        E1B["nop<br/><i>delay slot: $t0 not yet valid</i>"]
+        E1C["add $t1, $t0, $t2<br/><i>$t0 is valid here</i>"]
+        E1A --> E1B --> E1C
+    end
+    
+    subgraph example2 ["Without nop (Incorrect)"]
+        direction TB
+        E2A["lw $t0, 0($a0)"]
+        E2B["add $t1, $t0, $t2<br/><i>reads STALE value of $t0 — silent bug</i>"]
+        E2A --> E2B
+    end
 ```
 
 The MIPS register file comprises 32 general-purpose 32-bit registers (R0–R31), with R0 hardwired to zero. This zero register is not wasted silicon — it enables common operations to be encoded without special instruction variants. A `move` between registers is a add with R0: `add $t1, $t0, $zero`. A branch-if-zero needs no special instruction because comparison against the zero register is implicit. The calling convention assigns specific semantic roles to registers: R4–R7 carry function arguments, R2–R3 carry return values, R8–R15 and R24–R25 are caller-saved temporaries, and R16–R23 are callee-saved variables. PSX developers who hand-tuned inner loops had to respect this ABI carefully when mixing assembly with C, or accept the overhead of pure assembly functions with no stack frame.

@@ -46,51 +46,25 @@ What survives scrutiny is using payback as a first-pass filter for liquidity-con
 
 The practical execution of investment analysis flows through a sequence of analytical stages that are logically dependent on one another. Getting the architecture of this workflow right matters as much as getting the formula right, because errors introduced early cascade through every downstream calculation. The sequence moves from cash flow identification to discount rate validation to NPV computation to comparative ranking, with each stage producing an output that becomes the input for the next.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                INVESTMENT DECISION ANALYTICAL PIPELINE               │
-└─────────────────────────────────────────────────────────────────────┘
-
-  ┌──────────────────────┐
-  │  1. Cash Flow Build  │  Identify incremental, after-tax, unlevered
-  │                      │  free cash flows. Strip financing effects.
-  └──────────┬───────────┘
-             │
-             ▼
-  ┌──────────────────────┐
-  │  2. Discount Rate    │  Validate WACC or project-specific hurdle.
-  │     Calibration      │  Adjust beta for leverage if necessary.
-  └──────────┬───────────┘
-             │
-             ▼
-  ┌──────────────────────┐
-  │  3. NPV Computation  │  Discount each period's CF. Sum to PV.
-  │                      │  NPV = PV(inflows) - |CF₀|
-  └──────────┬───────────┘
-             │
-             ▼
-  ┌──────────────────────┐
-  │  4. IRR Solve        │  Iterative root-find. Flag non-conventional
-  │                      │  flows. Check for multiple roots.
-  └──────────┬───────────┘
-             │
-             ▼
-  ┌──────────────────────┐
-  │  5. PI Rank          │  PV(inflows) ÷ |CF₀|. Useful under
-  │                      │  capital constraints only.
-  └──────────┬───────────┘
-             │
-             ▼
-  ┌──────────────────────┐
-  │  6. Payback / DPP    │  Liquidity screen. Not a ranking criterion.
-  │                      │  Flag, don't decide.
-  └──────────┬───────────┘
-             │
-             ▼
-  ┌──────────────────────┐
-  │  7. Decision &       │  NPV dominates. IRR confirms. PI ranks
-  │     Rationale        │  under scarcity. Document assumptions.
-  └──────────────────────┘
+```mermaid
+flowchart TD
+    Header["INVESTMENT DECISION ANALYTICAL PIPELINE"]
+    
+    A["1. Cash Flow Build<br/>Identify incremental, after-tax, unlevered<br/>free cash flows. Strip financing effects."]
+    B["2. Discount Rate Calibration<br/>Validate WACC or project-specific hurdle.<br/>Adjust beta for leverage if necessary."]
+    C["3. NPV Computation<br/>Discount each period's CF. Sum to PV.<br/>NPV = PV(inflows) - |CF₀|"]
+    D["4. IRR Solve<br/>Iterative root-find. Flag non-conventional<br/>flows. Check for multiple roots."]
+    E["5. PI Rank<br/>PV(inflows) ÷ |CF₀|. Useful under<br/>capital constraints only."]
+    F["6. Payback / DPP<br/>Liquidity screen. Not a ranking criterion.<br/>Flag, don't decide."]
+    G["7. Decision & Rationale<br/>NPV dominates. IRR confirms. PI ranks<br/>under scarcity. Document assumptions."]
+    
+    Header --> A
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
 ```
 
 **Building the Cash Flow Schedule.** The most consequential discipline in this entire architecture is constructing cash flows correctly. The fundamental rule is that project cash flows must be incremental, after-tax, and unlevered. Incremental means only cash flows that exist because the project exists: sunk costs, already spent and irreversible, are excluded entirely. If the firm paid $500,000 for a market study before the investment decision point, that money is gone regardless of what is decided today, and including it in the analysis will mechanically bias the NPV downward, potentially causing the firm to reject a value-creating investment to avoid psychologically "losing" money it has already lost. This is the sunk cost fallacy encoded in a spreadsheet, and it is surprisingly common.

@@ -26,21 +26,31 @@ Transition mechanics between effects operate on three simultaneous channels: phy
 
 The architecture of attention management operates through deliberate **focus channeling**, where the performer's physical position, gaze direction, verbal emphasis, and prop handling create a narrow beam of audience attention that can be precisely directed or diffused. Close-up magic exploits this through table geometry: positioning critical props in the attention center while relegating prepared items to peripheral zones. Stage illusions use lighting, costume contrast, and movement vectors to create attention funnels. The architectural principle is that attention is a finite resource with specific reload times—attempting to direct attention to a new focus immediately after a climax moment results in attention lag, where the audience is still processing the previous impossibility rather than engaging with new information.
 
-```
-ATTENTION ARCHITECTURE FLOW
-
-Baseline State → Setup Phase → Build Phase → Climax → Resolution → Reset
-    |              |             |            |          |           |
-    |              |             |            |          |           |
-Neutral         Focus       Intensify    Peak       Allow      Return to
-Distributed     Channel     Focus       Experience  Processing  Neutral
-                           (Narrow)     (Flash)     (Diffuse)   
-                                                                  
-                <---- Rising Tension ---->          <-- Recovery -->
-
-Timing:         15-30s      20-45s      2-5s       8-15s       10-20s
-Gaze:          Distributed  Fixed       Locked     Broken      Soft
-Verbal:        Context      Guide       Silence    React       Bridge
+```mermaid
+flowchart LR
+    A["Baseline State<br/>Neutral<br/>Distributed<br/><br/>Gaze: Distributed<br/>Verbal: Context"]
+    B["Setup Phase<br/>Focus<br/>Channel<br/><br/>15-30s<br/>Gaze: Fixed<br/>Verbal: Guide"]
+    C["Build Phase<br/>Intensify<br/>Focus (Narrow)<br/><br/>20-45s<br/>Gaze: Locked<br/>Verbal: Silence"]
+    D["Climax<br/>Peak<br/>Experience (Flash)<br/><br/>2-5s<br/>Gaze: Broken<br/>Verbal: React"]
+    E["Resolution<br/>Allow<br/>Processing (Diffuse)<br/><br/>8-15s<br/>Gaze: Broken<br/>Verbal: React"]
+    F["Reset<br/>Return to<br/>Neutral<br/><br/>10-20s<br/>Gaze: Soft<br/>Verbal: Bridge"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    
+    subgraph tension ["Rising Tension"]
+        B
+        C
+        D
+    end
+    
+    subgraph recovery ["Recovery"]
+        E
+        F
+    end
 ```
 
 Pacing theory in performance architecture distinguishes between **beat pacing** (the internal rhythm of a single effect) and **macro pacing** (the overall tempo across the full performance). Beat pacing follows the principle of syncopation—moments of action punctuated by moments of stillness, creating rhythmic interest through variation rather than monotonous consistency. A coin vanish executed in steady, predictable motion carries less impact than the same vanish performed with deliberate hesitation before the critical move, creating anticipatory tension. Macro pacing typically follows a three-act structure borrowed from classical drama: the opening sequence establishes the performer's competence and the performance's tone (ten to fifteen percent of total duration), the developmental middle section explores variations and complications (sixty to seventy percent), and the climactic final sequence delivers the strongest impossibilities with minimal setup (fifteen to twenty-five percent).

@@ -184,11 +184,24 @@ Data pipelines decouple synchronous request-response flows from asynchronous, du
 
 A concrete pipeline might look like:
 
-```
-[HTTP API] --enqueue--> [RabbitMQ: raw_events] 
-    --> [Validator Worker] --validate--> [RabbitMQ: validated_events]
-    --> [Enrichment Worker] --enrich--> [RabbitMQ: enriched_events]
-    --> [Aggregator Worker] --aggregate--> [TimescaleDB: metrics]
+```mermaid
+flowchart LR
+    A["HTTP API"]
+    B["RabbitMQ\nraw_events"]
+    C["Validator Worker"]
+    D["RabbitMQ\nvalidated_events"]
+    E["Enrichment Worker"]
+    F["RabbitMQ\nenriched_events"]
+    G["Aggregator Worker"]
+    H[("TimescaleDB\nmetrics")]
+
+    A -->|"enqueue"| B
+    B -->|"consume"| C
+    C -->|"validate"| D
+    D -->|"consume"| E
+    E -->|"enrich"| F
+    F -->|"consume"| G
+    G -->|"aggregate"| H
 ```
 
 Each stage is an independent process or pod, horizontally scalable, reading from an input queue and writing to an output queue. Messages carry immutable payloads, often serialized as JSON, Protocol Buffers, or Avro, with metadata headers for correlation IDs, timestamps, and schema versions.

@@ -363,8 +363,8 @@ graph LR
     E -->|"BLAS/LAPACK"| F["CPU SIMD instructions"]
     F -->|"~100x faster"| G["Result"]
     
-    style D fill:#90EE90
-    style A fill:#FFB6C1
+    style D fill:#90EE90,color:#0f172a
+    style A fill:#FFB6C1,color:#0f172a
 ```
 
 **Key optimization principles:**
@@ -805,9 +805,9 @@ graph TD
     L --> M["Export Processed Data"]
     M --> N["Model Training or Further Analysis"]
     
-    style A fill:#FFE4B5
-    style N fill:#90EE90
-    style D fill:#FFB6C1
+    style A fill:#FFE4B5,color:#0f172a
+    style N fill:#90EE90,color:#0f172a
+    style D fill:#FFB6C1,color:#0f172a
 ```
 
 ### Common Pitfalls and Solutions

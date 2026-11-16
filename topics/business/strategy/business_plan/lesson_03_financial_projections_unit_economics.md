@@ -36,73 +36,89 @@ Investing cash flow captures capital expenditures and asset acquisitions. PP&E p
 
 Financing cash flow tracks capital raising and distribution activities. Equity issuance generates positive cash flow as investors inject capital. Debt proceeds provide cash inflow, while principal repayments create cash outflow. Dividend payments and share buybacks represent cash distributions to equity holders. The net of these three sections equals the period change in Cash, which must match the difference between the ending Cash balance and beginning Cash balance on the Balance Sheet. This circular linkage enforces internal consistency: if the model balances, the mathematics correctly represent the flow of value through the business.
 
-```
-INTEGRATED THREE-STATEMENT MODEL ARCHITECTURE
-
-Income Statement (Period View)
-┌─────────────────────────────────────┐
-│ Revenue                             │
-│   - COGS                            │
-│ = Gross Profit                      │
-│   - Operating Expenses              │
-│     • Sales & Marketing             │
-│     • R&D                           │
-│     • G&A                           │
-│ = EBITDA                            │
-│   - Depreciation & Amortization  ────┼──> Non-cash: add back in Cash Flow
-│ = EBIT                              │
-│   - Interest Expense             ────┼──> Linked to Debt Balance
-│ = EBT                               │
-│   - Taxes                           │
-│ = Net Income                     ────┼──> Flows to Retained Earnings
-└─────────────────────────────────────┘
-                │
-                ▼
-Balance Sheet (Point-in-Time Snapshot)
-┌─────────────────────────────────────┐
-│ ASSETS                              │
-│   Cash  ◄──────────────────────────┼──┐ Links from Cash Flow Statement
-│   Accounts Receivable               │  │
-│   Inventory                         │  │
-│   PP&E (net of Depreciation)        │  │
-│                                     │  │
-│ LIABILITIES                         │  │
-│   Accounts Payable                  │  │
-│   Accrued Expenses                  │  │
-│   Debt  ───────────────────────────┼──┼──> Interest expense calc
-│                                     │  │
-│ EQUITY                              │  │
-│   Common Stock                      │  │
-│   Retained Earnings  ◄───Net Income │  │
-│                                     │  │
-│ Assets = Liabilities + Equity       │  │
-└─────────────────────────────────────┘  │
-                                          │
-Cash Flow Statement (Period Reconciliation)
-┌─────────────────────────────────────┐  │
-│ Operating Activities                │  │
-│   Net Income (from I/S)             │  │
-│   + Depreciation & Amortization     │  │
-│   +/- Changes in Working Capital    │  │
-│     • Δ Accounts Receivable         │  │
-│     • Δ Inventory                   │  │
-│     • Δ Accounts Payable            │  │
-│ = Cash from Operations              │  │
-│                                     │  │
-│ Investing Activities                │  │
-│   - Capital Expenditures            │  │
-│   +/- Asset Sales/Purchases         │  │
-│ = Cash from Investing               │  │
-│                                     │  │
-│ Financing Activities                │  │
-│   + Equity Issuance                 │  │
-│   + Debt Proceeds                   │  │
-│   - Debt Repayment                  │  │
-│   - Dividends                       │  │
-│ = Cash from Financing               │  │
-│                                     │  │
-│ NET CHANGE IN CASH  ────────────────┼──┘
-└─────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph IS["Income Statement (Period View)"]
+        REV["Revenue"]
+        COGS["- COGS"]
+        GP["= Gross Profit"]
+        OPEX["- Operating Expenses<br/>• Sales & Marketing<br/>• R&D<br/>• G&A"]
+        EBITDA["= EBITDA"]
+        DA["- Depreciation & Amortization"]
+        EBIT["= EBIT"]
+        INT["- Interest Expense"]
+        EBT["= EBT"]
+        TAX["- Taxes"]
+        NI["= Net Income"]
+        
+        REV --> COGS --> GP --> OPEX --> EBITDA --> DA --> EBIT --> INT --> EBT --> TAX --> NI
+    end
+    
+    subgraph BS["Balance Sheet (Point-in-Time Snapshot)"]
+        subgraph ASSETS["ASSETS"]
+            CASH["Cash"]
+            AR["Accounts Receivable"]
+            INV["Inventory"]
+            PPE["PP&E (net of Depreciation)"]
+        end
+        
+        subgraph LIAB["LIABILITIES"]
+            AP["Accounts Payable"]
+            ACCR["Accrued Expenses"]
+            DEBT["Debt"]
+        end
+        
+        subgraph EQ["EQUITY"]
+            CS["Common Stock"]
+            RE["Retained Earnings"]
+        end
+        
+        BAL["Assets = Liabilities + Equity"]
+        ASSETS -.-> BAL
+        LIAB -.-> BAL
+        EQ -.-> BAL
+    end
+    
+    subgraph CFS["Cash Flow Statement (Period Reconciliation)"]
+        subgraph OPS["Operating Activities"]
+            NI_CF["Net Income (from I/S)"]
+            DA_CF["+ Depreciation & Amortization"]
+            WC["+/- Changes in Working Capital<br/>• Δ Accounts Receivable<br/>• Δ Inventory<br/>• Δ Accounts Payable"]
+            CFO["= Cash from Operations"]
+            
+            NI_CF --> DA_CF --> WC --> CFO
+        end
+        
+        subgraph INV_ACT["Investing Activities"]
+            CAPEX["- Capital Expenditures"]
+            ASSETS_CHG["+/- Asset Sales/Purchases"]
+            CFI["= Cash from Investing"]
+            
+            CAPEX --> ASSETS_CHG --> CFI
+        end
+        
+        subgraph FIN_ACT["Financing Activities"]
+            EQ_ISS["+ Equity Issuance"]
+            DEBT_PROC["+ Debt Proceeds"]
+            DEBT_REP["- Debt Repayment"]
+            DIV["- Dividends"]
+            CFF["= Cash from Financing"]
+            
+            EQ_ISS --> DEBT_PROC --> DEBT_REP --> DIV --> CFF
+        end
+        
+        NET_CASH["NET CHANGE IN CASH"]
+        CFO --> NET_CASH
+        CFI --> NET_CASH
+        CFF --> NET_CASH
+    end
+    
+    NI -->|"Flows to Retained Earnings"| RE
+    DA -->|"Non-cash: add back in Cash Flow"| DA_CF
+    INT -->|"Linked to Debt Balance"| DEBT
+    DEBT -->|"Interest expense calc"| INT
+    NET_CASH -->|"Links from Cash Flow Statement"| CASH
+    NI -->|"from I/S"| NI_CF
 ```
 
 Revenue modeling for a subscription business decomposes into cohort-based expansion mathematics. Define cohorts by acquisition period (monthly or quarterly) and track each cohort's lifecycle independently. The cohort revenue formula equals Beginning Subscribers multiplied by Monthly Recurring Revenue (MRR) per subscriber, adjusted for churn and expansion. Churn represents the percentage of subscribers who cancel each period, typically expressed as monthly or annual rates. Expansion captures increases in MRR from existing customers through upsells, cross-sells, or usage-based billing growth.

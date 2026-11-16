@@ -205,14 +205,29 @@ The `count` column in `wp_term_taxonomy` implements a denormalized cache of how 
 
 The meta system architecture implements vertical partitioning across multiple tables sharing an identical schema pattern. Each meta table follows this structure:
 
-```
-wp_postmeta / wp_usermeta / wp_termmeta / wp_commentmeta
-├── meta_id    BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY
-├── {entity}_id BIGINT UNSIGNED (FK to parent entity)
-├── meta_key   VARCHAR(255)
-├── meta_value LONGTEXT
-    INDEX (entity_id)
-    INDEX (meta_key(191))
+```mermaid
+flowchart TD
+    META["wp_postmeta / wp_usermeta\nwp_termmeta / wp_commentmeta"]
+
+    subgraph columns ["Columns"]
+        COL1["meta_id\nBIGINT UNSIGNED\nAUTO_INCREMENT PRIMARY KEY"]
+        COL2["{entity}_id\nBIGINT UNSIGNED\nFK → parent entity"]
+        COL3["meta_key\nVARCHAR(255)"]
+        COL4["meta_value\nLONGTEXT"]
+    end
+
+    subgraph indexes ["Indexes"]
+        IDX1["INDEX (entity_id)"]
+        IDX2["INDEX (meta_key(191))"]
+    end
+
+    META --> COL1
+    META --> COL2
+    META --> COL3
+    META --> COL4
+
+    COL2 --> IDX1
+    COL3 --> IDX2
 ```
 
 The `meta_key` index uses a 191-character prefix rather than the full 255 characters due to MySQL's index length limitations with utf8mb4 encoding, where each character consumes four bytes. The InnoDB maximum index key length is 767 bytes for compact row format and 3072 bytes for dynamic row format, so a 191-character utf8mb4 string fits within the 764-byte threshold (191 × 4 = 764). This indexing strategy enables efficient lookups by meta key but fails to optimize composite queries filtering on both key and value simultaneously.

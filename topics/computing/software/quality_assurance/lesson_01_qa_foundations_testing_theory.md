@@ -46,32 +46,29 @@ For systems-level code, a taxonomy aligned with the error–fault–failure chai
 
 The defect lifecycle is not an administrative formality — it is a formal state machine whose transitions define the information flow that enables a quality-managed process. Understanding it mechanically helps you identify where defects stall, age, and silently expire without resolution.
 
-```
-                        ┌─────────────────────────────────────────────────────────┐
-                        │                   DEFECT LIFECYCLE                       │
-                        └─────────────────────────────────────────────────────────┘
-
-   ┌──────────┐   report    ┌──────────┐  triage    ┌──────────┐  assign    ┌──────────┐
-   │  Latent  │ ──────────► │   New    │ ─────────► │ Triaged  │ ─────────► │  Open /  │
-   │  (Fault) │             │          │             │          │             │  Active  │
-   └──────────┘             └──────────┘             └──────────┘             └────┬─────┘
-                                 │                        │                        │
-                             duplicate              reject / WONTFIX           fix applied
-                             not repro              out of scope                   │
-                                 │                        │                        ▼
-                                 ▼                        ▼                   ┌──────────┐
-                            ┌──────────┐            ┌──────────┐             │  Fixed / │
-                            │  Closed  │◄───────────│ Rejected │             │  Pending │
-                            │(Duplicate│            │          │             │  Verify  │
-                            │ /Invalid)│            └──────────┘             └────┬─────┘
-                            └──────────┘                                          │
-                                                                        verify passes │ verify fails
-                                                                                  │         │
-                                                                                  ▼         ▼
-                                                                             ┌────────┐ ┌────────┐
-                                                                             │ Closed │ │Reopened│
-                                                                             │Verified│ │        │
-                                                                             └────────┘ └────────┘
+```mermaid
+flowchart TD
+    Latent["Latent<br/>(Fault)"]
+    New["New"]
+    Triaged["Triaged"]
+    Open["Open /<br/>Active"]
+    Fixed["Fixed /<br/>Pending<br/>Verify"]
+    Closed["Closed<br/>(Duplicate<br/>/Invalid)"]
+    Rejected["Rejected"]
+    ClosedVerified["Closed<br/>Verified"]
+    Reopened["Reopened"]
+    
+    Latent -->|report| New
+    New -->|triage| Triaged
+    Triaged -->|assign| Open
+    Open -->|"fix applied"| Fixed
+    
+    New -->|"duplicate<br/>not repro"| Closed
+    Triaged -->|"reject / WONTFIX<br/>out of scope"| Rejected
+    Rejected --> Closed
+    
+    Fixed -->|"verify passes"| ClosedVerified
+    Fixed -->|"verify fails"| Reopened
 ```
 
 Each state transition carries a constraint. A defect moves from **New** to **Triaged** only after a human (or automated classifier) has confirmed it is reproducible and belongs to this codebase's scope. The triage step is a gate against noise: without it, engineers spend time on duplicate reports, misconfigured environments, and user errors. A defect moves from **Active** to **Fixed / Pending Verify** when the developer believes the fault has been corrected and a fix has been integrated — critically, the fault is removed but the failure has not yet been confirmed absent. The transition to **Closed Verified** requires a verifier, ideally independent of the developer who made the fix, to confirm that the original failure-producing test case now passes and that no regression has been introduced. The **Reopened** transition is not a failure of process — it is evidence that the fix was incomplete, introduced a secondary fault, or that the test coverage was insufficient to confirm the fix. Tracking reopened-defect rate is one of the most informative process metrics a team can collect.
@@ -187,17 +184,51 @@ Running `cargo mutants --workspace` against a production allocator or parser wil
 
 The highest-value QA process improvement a senior engineering team can make is treating defect escape rates as a continuous control system. A **defect escape** is a fault that passes through one phase of testing and is found in a later phase or in production. Tracking escapes by origin phase and detection phase creates the **defect detection matrix**, and the off-diagonal entries (faults originating in phase N but found in phase M > N) are the signal.
 
-```
-Defect Detection Matrix (example, 90-day period)
-
-                   │ Found in Unit │ Found in Integ │ Found in System │ Found in Prod │
-───────────────────┼───────────────┼────────────────┼─────────────────┼───────────────┤
-Originated in Req  │      0        │       3        │        5        │       2       │
-Originated in Arch │      1        │       4        │        2        │       1       │
-Originated in Code │     22        │       8        │        3        │       4       │
-Originated in Test │      3        │       1        │        0        │       0       │
-───────────────────┼───────────────┼────────────────┼─────────────────┼───────────────┤
-Totals             │     26        │      16        │       10        │       7       │
+```mermaid
+flowchart TD
+    title["<b>Defect Detection Matrix</b><br/>(90-day period)"]
+    
+    subgraph origin ["Defect Origin"]
+        req["Requirements"]
+        arch["Architecture"]
+        code["Code"]
+        test["Test"]
+    end
+    
+    subgraph detection ["Detection Phase"]
+        unit["Unit Testing"]
+        integ["Integration Testing"]
+        system["System Testing"]
+        prod["Production"]
+    end
+    
+    req -->|0| unit
+    req -->|3| integ
+    req -->|5| system
+    req -->|2| prod
+    
+    arch -->|1| unit
+    arch -->|4| integ
+    arch -->|2| system
+    arch -->|1| prod
+    
+    code -->|22| unit
+    code -->|8| integ
+    code -->|3| system
+    code -->|4| prod
+    
+    test -->|3| unit
+    test -->|1| integ
+    test -->|0| system
+    test -->|0| prod
+    
+    unit -.->|Total: 26| summary["Summary"]
+    integ -.->|Total: 16| summary
+    system -.->|Total: 10| summary
+    prod -.->|Total: 7| summary
+    
+    style title fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
+    style summary fill:#fff4e6,stroke:#ff9800,stroke-width:2px
 ```
 
 Reading this matrix: the 4 code-origin defects found in production represent the highest-cost failures — these are the ones that escaped unit testing (22 caught), integration testing (8 more caught), and system testing (3 more caught). The root cause question is not "why were these 4 defects in the code?" but "what property of these 4 defects caused them to be invisible to the previous three test phases?" Answering that question requires examining the specific faults, classifying them by the ODC defect type taxonomy, and asking whether the test design for each phase had the coverage to detect their trigger conditions.

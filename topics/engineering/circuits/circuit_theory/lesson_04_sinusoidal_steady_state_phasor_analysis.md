@@ -36,26 +36,32 @@ Instantaneous power $p(t) = v(t) i(t)$ oscillates at twice the source frequency.
 
 The following ASCII diagram illustrates the relationships among impedance, admittance, voltage, and current phasors in the complex plane for a series RL circuit with $\mathbf{Z} = R + j\omega L$:
 
-```
-        Imaginary Axis
-             ↑
-             |
-             |  𝐙 = R + jωL
-             |  /
-             | /θ_Z
-    ---------+---------> Real Axis
-             |         R
-             |
-             
-        Voltage Phasor 𝐕 leads Current Phasor 𝐈 by θ_Z
+```mermaid
+flowchart TD
+    subgraph complex_plane ["Complex Impedance Plane"]
+        origin["Origin (0,0)"]
+        real_axis["Real Axis (R)"]
+        imag_axis["Imaginary Axis (jωL)"]
+        impedance["Z = R + jωL"]
+        angle_z["θ_Z = arctan(ωL/R)"]
         
-        𝐕 = V_m ∠θ_v
-             ↗
-            /  ) θ_Z
-           /___) 
-        𝐈 = I_m ∠θ_i
+        origin -->|"R (Resistance)"| real_axis
+        origin -->|"jωL (Reactance)"| imag_axis
+        origin -.->|"θ_Z"| impedance
+    end
+    
+    subgraph phasor_diagram ["Phasor Relationship"]
+        voltage["V = V_m ∠θ_v<br/>(Voltage Phasor)"]
+        current["I = I_m ∠θ_i<br/>(Current Phasor)"]
+        phase_diff["Phase Difference:<br/>θ_v - θ_i = θ_Z"]
         
-        θ_v - θ_i = θ_Z = arctan(ωL/R)
+        voltage -.->|"Leads by θ_Z"| current
+        voltage --> phase_diff
+        current --> phase_diff
+    end
+    
+    complex_plane -->|"Impedance angle defines"| phasor_diagram
+    angle_z -.->|"Same angle"| phase_diff
 ```
 
 For a parallel RC circuit driven by a current source, admittance $\mathbf{Y} = \frac{1}{R} + j\omega C$ governs the voltage response $\mathbf{V} = \frac{\mathbf{I}_s}{\mathbf{Y}}$, and the voltage leads the source current by angle $\arctan(\omega RC)$.

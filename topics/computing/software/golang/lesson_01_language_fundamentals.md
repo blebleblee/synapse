@@ -32,35 +32,45 @@ Panic and recover implement Go's exception mechanism, but the language strongly 
 
 The Go runtime scheduler implements an M:N threading model where M goroutines multiplex onto N OS threads, with the runtime dynamically adjusting N to match available parallelism. This architecture rests on three core structures: G, the goroutine descriptor; M, the machine thread; and P, the processor, an abstract execution context that mediates between goroutines and threads. The scheduler maintains per-P run queues of runnable goroutines and a global queue for overflow, employing work stealing to balance load when local queues drain.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Go Runtime Scheduler                     │
-│                                                               │
-│  Global Run Queue                                             │
-│  ┌──┐ ┌──┐ ┌──┐                                             │
-│  │G │→│G │→│G │  (Overflow & newly spawned goroutines)      │
-│  └──┘ └──┘ └──┘                                             │
-│                                                               │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │   P (CPU 0)  │  │   P (CPU 1)  │  │   P (CPU 2)  │      │
-│  │              │  │              │  │              │      │
-│  │ Local Queue  │  │ Local Queue  │  │ Local Queue  │      │
-│  │ ┌──┐┌──┐┌──┐│  │ ┌──┐┌──┐    │  │ ┌──┐         │      │
-│  │ │G ││G ││G ││  │ │G ││G │    │  │ │G │         │      │
-│  │ └──┘└──┘└──┘│  │ └──┘└──┘    │  │ └──┘         │      │
-│  │              │  │              │  │              │      │
-│  │  Current G   │  │  Current G   │  │  Current G   │      │
-│  │  executing   │  │  executing   │  │  executing   │      │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘      │
-│         │                 │                 │              │
-│         ↓                 ↓                 ↓              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │   M (OS Th)  │  │   M (OS Th)  │  │   M (OS Th)  │      │
-│  │   Thread 1   │  │   Thread 2   │  │   Thread 3   │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
-│         ↓                 ↓                 ↓              │
-│    Kernel Scheduler                                          │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph runtime ["Go Runtime Scheduler"]
+        subgraph grq ["Global Run Queue (Overflow & newly spawned goroutines)"]
+            GRQ1["G"]
+            GRQ2["G"]
+            GRQ3["G"]
+            GRQ1 --> GRQ2 --> GRQ3
+        end
+
+        subgraph p0 ["P (CPU 0)"]
+            P0Q["Local Queue: G · G · G"]
+            P0C["Current G executing"]
+        end
+
+        subgraph p1 ["P (CPU 1)"]
+            P1Q["Local Queue: G · G"]
+            P1C["Current G executing"]
+        end
+
+        subgraph p2 ["P (CPU 2)"]
+            P2Q["Local Queue: G"]
+            P2C["Current G executing"]
+        end
+
+        M0["M (OS Thread 1)"]
+        M1["M (OS Thread 2)"]
+        M2["M (OS Thread 3)"]
+
+        KS["Kernel Scheduler"]
+    end
+
+    P0C --> M0
+    P1C --> M1
+    P2C --> M2
+
+    M0 --> KS
+    M1 --> KS
+    M2 --> KS
 ```
 
 Each P maintains a bounded local run queue holding up to 256 goroutines, and when that queue fills, the scheduler pushes half the entries to the global queue to redistribute work. When a P's local queue empties, the scheduler attempts work stealing by randomly selecting another P and transferring half of its queue, ensuring that idle threads quickly discover work without centralized coordination. This decentralized design minimizes lock contention and scales to hundreds of cores, but it trades strict fairness for throughput: a goroutine might wait in the global queue while others execute repeatedly if local queues remain populated.

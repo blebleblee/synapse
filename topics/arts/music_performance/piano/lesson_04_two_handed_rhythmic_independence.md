@@ -137,17 +137,17 @@ graph TB
     TOUCH --> RH_CB
     TOUCH --> LH_CB
 
-    style SCORE fill:#e8f4f8
-    style SMA fill:#fff4e1
-    style METER fill:#fffde7
-    style BG fill:#fce4ec
-    style RH_M1 fill:#e8f5e9
-    style LH_M1 fill:#e8f5e9
-    style RH_CB fill:#f3e5f5
-    style LH_CB fill:#f3e5f5
-    style ACTION fill:#e3f2fd
-    style STRING fill:#e3f2fd
-    style SOUND fill:#e3f2fd
+    style SCORE fill:#e8f4f8,color:#0f172a
+    style SMA fill:#fff4e1,color:#0f172a
+    style METER fill:#fffde7,color:#0f172a
+    style BG fill:#fce4ec,color:#0f172a
+    style RH_M1 fill:#e8f5e9,color:#0f172a
+    style LH_M1 fill:#e8f5e9,color:#0f172a
+    style RH_CB fill:#f3e5f5,color:#0f172a
+    style LH_CB fill:#f3e5f5,color:#0f172a
+    style ACTION fill:#e3f2fd,color:#0f172a
+    style STRING fill:#e3f2fd,color:#0f172a
+    style SOUND fill:#e3f2fd,color:#0f172a
 ```
 
 The practical takeaway: both hands answer to **one** shared beat, but each runs its own independent motor program. Your practice job splits in two — make the shared beat rock-solid, and make each hand's program automatic enough to run without supervision.
@@ -371,15 +371,15 @@ graph LR
     F --> H
     G --> I
 
-    style A fill:#e8f5e9
-    style B fill:#e8f5e9
-    style C fill:#fff9c4
-    style D fill:#fff9c4
-    style E fill:#ffe0b2
-    style F fill:#ffe0b2
-    style G fill:#ffe0b2
-    style H fill:#fce4ec
-    style I fill:#fce4ec
+    style A fill:#e8f5e9,color:#0f172a
+    style B fill:#e8f5e9,color:#0f172a
+    style C fill:#fff9c4,color:#0f172a
+    style D fill:#fff9c4,color:#0f172a
+    style E fill:#ffe0b2,color:#0f172a
+    style F fill:#ffe0b2,color:#0f172a
+    style G fill:#ffe0b2,color:#0f172a
+    style H fill:#fce4ec,color:#0f172a
+    style I fill:#fce4ec,color:#0f172a
 ```
 
 ---
@@ -589,18 +589,18 @@ graph TB
     L3C --> L4C
     L3B --> L4D
 
-    style L1A fill:#e8f5e9
-    style L1B fill:#e8f5e9
-    style L2A fill:#fff9c4
-    style L2B fill:#fff9c4
-    style L2C fill:#fff9c4
-    style L3A fill:#ffe0b2
-    style L3B fill:#ffe0b2
-    style L3C fill:#ffe0b2
-    style L4A fill:#fce4ec
-    style L4B fill:#fce4ec
-    style L4C fill:#fce4ec
-    style L4D fill:#fce4ec
+    style L1A fill:#e8f5e9,color:#0f172a
+    style L1B fill:#e8f5e9,color:#0f172a
+    style L2A fill:#fff9c4,color:#0f172a
+    style L2B fill:#fff9c4,color:#0f172a
+    style L2C fill:#fff9c4,color:#0f172a
+    style L3A fill:#ffe0b2,color:#0f172a
+    style L3B fill:#ffe0b2,color:#0f172a
+    style L3C fill:#ffe0b2,color:#0f172a
+    style L4A fill:#fce4ec,color:#0f172a
+    style L4B fill:#fce4ec,color:#0f172a
+    style L4C fill:#fce4ec,color:#0f172a
+    style L4D fill:#fce4ec,color:#0f172a
 ```
 
 ---
@@ -639,12 +639,12 @@ graph TD
     Q4 -->|Yes| FIX4
     Q5 -->|Yes| FIX5
 
-    style START fill:#e3f2fd
-    style FIX1 fill:#fff9c4
-    style FIX2 fill:#ffe0b2
-    style FIX3 fill:#e8f5e9
-    style FIX4 fill:#f3e5f5
-    style FIX5 fill:#fce4ec
+    style START fill:#e3f2fd,color:#0f172a
+    style FIX1 fill:#fff9c4,color:#0f172a
+    style FIX2 fill:#ffe0b2,color:#0f172a
+    style FIX3 fill:#e8f5e9,color:#0f172a
+    style FIX4 fill:#f3e5f5,color:#0f172a
+    style FIX5 fill:#fce4ec,color:#0f172a
 ```
 
 ### Common Errors & Instant Fixes

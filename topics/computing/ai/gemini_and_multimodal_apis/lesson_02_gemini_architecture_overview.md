@@ -97,7 +97,7 @@ classDiagram
     }
 
     class Content {
-        +String role  %% "user" or "model"
+        +String role
         +List~Part~ parts
     }
 
@@ -112,12 +112,12 @@ classDiagram
 
     class Blob {
         +String mimeType
-        +String data  %% base64-encoded
+        +String data
     }
 
     class FileData {
         +String mimeType
-        +String fileUri  %% gs:// or File API URI
+        +String fileUri
     }
 
     class GenerationConfig {
@@ -448,8 +448,8 @@ flowchart LR
 
     SYS --> HIST --> DOC --> PROMPT --> RESERVED
 
-    style RESERVED fill:#f96,stroke:#c00
-    style DOC fill:#69f,stroke:#339
+    style RESERVED fill:#f96,stroke:#c00,color:#0f172a
+    style DOC fill:#69f,stroke:#339,color:#0f172a
 ```
 
 The model's output is bounded by `maxOutputTokens` (up to 8192 for most variants). The *effective* input budget is `context_window_size - maxOutputTokens`. Exceeding the input budget causes the API to return a `400 INVALID_ARGUMENT` error with a token count mismatch message.

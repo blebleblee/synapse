@@ -52,34 +52,42 @@ Maintaining **design intent** through iterative refinement requires deliberate f
 
 Failure modes proliferate when feature trees grow deep (>50 features) or wide (complex branching dependencies). **Circular dependencies** arise when Feature A references geometry from Feature B, and Feature B references geometry from Feature A, deadlocking the regeneration engine. **Over-constrained assemblies** emerge when multiple features attempt to control the same geometric entities through conflicting constraints—e.g., two extrusions independently setting the height of the same face. **Solver divergence** occurs when constraint equations admit multiple solutions or no solutions, causing the Newton-Raphson iterator to oscillate without converging.
 
-```
-Feature Tree Architecture (Parametric Bracket Example)
-
-Root
- ├─ Master_Sketch (base_width=60, base_length=80, hole_diameter=5)
- │   └─ Dimensions: base_width, base_length, hole_diameter
- ├─ Extrude_Base (depth=10, input=Master_Sketch.Profile_1)
- │   └─ Output: Solid_Body_1
- ├─ Sketch_Holes (plane=Extrude_Base.Top_Face)
- │   ├─ Hole_1 (position=[10, 10], diameter=hole_diameter)
- │   ├─ Hole_2 (position=[base_width-10, 10], diameter=hole_diameter)
- │   ├─ Hole_3 (position=[10, base_length-10], diameter=hole_diameter)
- │   └─ Hole_4 (position=[base_width-10, base_length-10], diameter=hole_diameter)
- ├─ Extrude_Cut_Holes (depth=through_all, input=Sketch_Holes.All_Circles)
- │   └─ Output: Solid_Body_1 (modified)
- ├─ Fillet_Corners (radius=2, edges=Extrude_Base.Bottom_Edges)
- │   └─ Output: Solid_Body_1 (modified)
- └─ Shell (thickness=2, remove_faces=Extrude_Base.Top_Face)
-     └─ Output: Solid_Body_1 (modified, now hollow)
-
-Parameter Propagation Example:
-  User changes base_width from 60 → 70
-  → Master_Sketch regenerates (solver updates X-coordinates)
-  → Extrude_Base regenerates (new boundary from updated sketch)
-  → Sketch_Holes regenerates (Hole_2 and Hole_4 reposition via expressions)
-  → Extrude_Cut_Holes regenerates (new hole locations)
-  → Fillet_Corners regenerates (edge selection criteria re-evaluated)
-  → Shell regenerates (offset from updated geometry)
+```mermaid
+flowchart TD
+    Root["Root"]
+    
+    Root --> MasterSketch["Master_Sketch<br/>base_width=60<br/>base_length=80<br/>hole_diameter=5"]
+    MasterSketch --> MSDims["Dimensions:<br/>base_width, base_length, hole_diameter"]
+    
+    Root --> ExtrudeBase["Extrude_Base<br/>depth=10<br/>input=Master_Sketch.Profile_1"]
+    ExtrudeBase --> EBOutput["Output: Solid_Body_1"]
+    
+    Root --> SketchHoles["Sketch_Holes<br/>plane=Extrude_Base.Top_Face"]
+    SketchHoles --> Hole1["Hole_1<br/>position=[10, 10]<br/>diameter=hole_diameter"]
+    SketchHoles --> Hole2["Hole_2<br/>position=[base_width-10, 10]<br/>diameter=hole_diameter"]
+    SketchHoles --> Hole3["Hole_3<br/>position=[10, base_length-10]<br/>diameter=hole_diameter"]
+    SketchHoles --> Hole4["Hole_4<br/>position=[base_width-10, base_length-10]<br/>diameter=hole_diameter"]
+    
+    Root --> ExtrudeCut["Extrude_Cut_Holes<br/>depth=through_all<br/>input=Sketch_Holes.All_Circles"]
+    ExtrudeCut --> ECOutput["Output: Solid_Body_1 (modified)"]
+    
+    Root --> FilletCorners["Fillet_Corners<br/>radius=2<br/>edges=Extrude_Base.Bottom_Edges"]
+    FilletCorners --> FCOutput["Output: Solid_Body_1 (modified)"]
+    
+    Root --> Shell["Shell<br/>thickness=2<br/>remove_faces=Extrude_Base.Top_Face"]
+    Shell --> ShellOutput["Output: Solid_Body_1 (modified, now hollow)"]
+    
+    subgraph Propagation ["Parameter Propagation Example"]
+        P1["User changes base_width: 60 → 70"]
+        P2["Master_Sketch regenerates<br/>(solver updates X-coordinates)"]
+        P3["Extrude_Base regenerates<br/>(new boundary from updated sketch)"]
+        P4["Sketch_Holes regenerates<br/>(Hole_2 and Hole_4 reposition)"]
+        P5["Extrude_Cut_Holes regenerates<br/>(new hole locations)"]
+        P6["Fillet_Corners regenerates<br/>(edge selection re-evaluated)"]
+        P7["Shell regenerates<br/>(offset from updated geometry)"]
+        
+        P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7
+    end
 ```
 
 Direct modeling environments replace the feature tree with **transient operation stacks** that discard intermediate history. When you push-pull a face in a direct modeler, the kernel performs an immediate B-rep perturbation: it identifies the face's bounding edges, extends or contracts adjacent faces to maintain tangency, and heals gaps through surface blending. The operation completes in milliseconds because the kernel avoids constraint solving and dependency tracking, but the result is **history-free geometry**—you cannot retrieve the original face position or revert to a pre-modification state without undo buffers.

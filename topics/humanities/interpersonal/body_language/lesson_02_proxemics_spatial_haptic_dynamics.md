@@ -30,34 +30,32 @@ The proxemic system operates through three interconnected regulatory mechanisms:
 
 When an individual approaches closer than the zone-appropriate distance for their relationship category, the violation triggers a cascade of physiological and behavioral responses. Initial violation generates increased skin conductance and heart rate elevation as the sympathetic nervous system engages preparatory arousal. Behavioral compensation attempts follow immediately: the invaded individual will typically increase backward lean, angle their torso away, reduce eye contact, or if space permits, physically step backward to restore appropriate distance. If the violator continues to advance or physical retreat is impossible (elevator, subway car, crowded room), the invaded individual shifts into tolerance protocols: they freeze body movement, minimize eye contact, and adopt neutral facial expressions to signal non-engagement. This tolerance state creates significant cognitive load and stress hormone elevation if sustained beyond brief periods.
 
-```
-Distance Violation Response Cascade:
+```mermaid
+flowchart TD
+    A["Approach Detection<br/>(peripheral vision)"]
+    B["Relationship Classification<br/>(known/unknown, threat assessment)"]
+    C["Zone Boundary Comparison<br/>(is approach distance < permitted distance?)"]
+    D["VIOLATION DETECTED"]
+    E["Physiological Arousal<br/>(↑ heart rate, ↑ skin conductance, ↑ cortisol)"]
+    F["Behavioral Compensation Attempt"]
+    F1["• Backward lean (5-15° torso angle shift)<br/>• Postural angle shift (shoulder turn 15-45°)<br/>• Gaze aversion (reduce eye contact 40-60%)<br/>• Physical retreat (if space available)"]
+    G["VIOLATION PERSISTS &<br/>RETREAT IMPOSSIBLE"]
+    H["Tolerance Protocol Activation"]
+    H1["• Movement freeze<br/>• Gaze fixation away from violator<br/>• Neutral affect mask<br/>• Shallow breathing pattern"]
+    I["VIOLATION CONTINUES<br/>> 3-5 minutes"]
+    J["Stress Accumulation &<br/>Negative Association Formation"]
 
-Approach Detection (peripheral vision) 
-    ↓
-Relationship Classification (known/unknown, threat assessment)
-    ↓
-Zone Boundary Comparison (is approach distance < permitted distance?)
-    ↓
-[IF VIOLATION DETECTED]
-    ↓
-    ├─→ Physiological Arousal (↑ heart rate, ↑ skin conductance, ↑ cortisol)
-    ↓
-    ├─→ Behavioral Compensation Attempt
-    │       • Backward lean (5-15° torso angle shift)
-    │       • Postural angle shift (shoulder turn 15-45°)
-    │       • Gaze aversion (reduce eye contact 40-60%)
-    │       • Physical retreat (if space available)
-    ↓
-    ├─→ [IF VIOLATION PERSISTS & RETREAT IMPOSSIBLE]
-    │       Tolerance Protocol Activation
-    │           • Movement freeze
-    │           • Gaze fixation away from violator
-    │           • Neutral affect mask
-    │           • Shallow breathing pattern
-    ↓
-    └─→ [IF VIOLATION CONTINUES > 3-5 minutes]
-            Stress Accumulation & Negative Association Formation
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    D --> F
+    F -.-> F1
+    D --> G
+    G --> H
+    H -.-> H1
+    G --> I
+    I --> J
 ```
 
 Strategic proxemic management exploits these response cascades in both directions. Approaching closer than social norms permit while simultaneously displaying high-status calm creates an implicit dominance assertion: the message reads as "I can violate your boundaries and you will tolerate it because I hold higher status." Sales professionals, law enforcement interrogators, and competitive negotiators employ tactical space invasion to generate subtle stress responses that reduce cognitive performance and increase compliance likelihood. The approach must be calibrated precisely—too aggressive and the target shifts from tolerance to active defense or escape; too gradual and the target adapts without triggering the desired arousal response.

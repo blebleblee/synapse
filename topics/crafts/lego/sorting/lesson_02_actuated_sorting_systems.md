@@ -24,18 +24,16 @@ The motor driving this diverter is almost always an M-Motor or Small Angular Mot
 
 The pivot geometry of the diverter plate matters enormously. Mounting the pivot axle at the leading edge of the plate means the tip of the plate sweeps a large arc as it rotates, potentially clipping objects that are still in transit. The correct placement is at approximately 40% of the plate's length from its upstream end, which minimizes tip-arc radius while keeping the deflection surface long enough to intercept objects reliably across the full width of the input chute.
 
-```
-Top View — Diverter Plate Junction
+```mermaid
+flowchart TD
+    INPUT["INPUT FEED"]
+    DIVERTER["Diverter Plate\n(Pivot 40%)"]
+    LEFT["LEFT OUT"]
+    RIGHT["RIGHT OUT"]
 
-         INPUT FEED
-              │
-              ▼
-    ┌─────────┴─────────┐
-    │   ╱               │
-    │  ╱  Pivot (40%)   │
-    │ ╱                 │
-    └────────────────────
-     LEFT OUT   RIGHT OUT
+    INPUT --> DIVERTER
+    DIVERTER -->|"40%"| LEFT
+    DIVERTER -->|"60%"| RIGHT
 ```
 
 For a Lego-native implementation, the axle carrying the diverter plate sits in two 2×2 Technic beam segments flanking the chute walls, braced with 1×3 liftarms running perpendicular to the axle to prevent the walls from racking under the lateral force that the deflected objects will exert every cycle.

@@ -38,21 +38,31 @@ Layer adhesion in resin printing is fundamentally different from FDM. In FDM, yo
 
 The mechanism works as follows. When the build plate lifts and allows fresh resin to flow over the previously cured layer, that previous layer's surface is partially uncured due to oxygen inhibition and incomplete conversion during the initial exposure. When the next exposure fires, UV light penetrates through the new resin layer and into the top few microns of the previous layer. Free radicals generated in the new layer and at the interface propagate into the unreacted surface of the previous layer, forming crosslinks that bridge the two layers. The result is not a mechanical bond or an adhesive joint — it is a covalent continuation of the same polymer network. A well-printed resin part has no discernible interlayer boundary under a microscope; the interface is chemically seamless.
 
-```
-┌─────────────────────────────────────────────────────┐
-│                  Layer Adhesion Model                │
-│                                                     │
-│  Build Plate (rising ↑)                             │
-│  ════════════════════════════════════════            │
-│  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  Layer N+1 (fresh cure)   │
-│  ░░░░░░░░░░░░░░░░░░░░░░░░░  Uncured interface zone   │
-│  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  Layer N (partial cure)  │
-│  ════════════════════════════════════════            │
-│                                                     │
-│  ▓ = crosslinked network (solid)                    │
-│  ░ = unreacted monomer/oligomer (liquid, mobile)    │
-│      ← radicals bridge here during next exposure     │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph model["Layer Adhesion Model"]
+        direction TB
+        plate["Build Plate (rising ↑)<br/>════════════════════════════════════════"]
+        
+        layerN1["▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br/>Layer N+1 (fresh cure)"]
+        
+        interface["░░░░░░░░░░░░░░░░░░░░░░░░░<br/>Uncured interface zone"]
+        
+        layerN["▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br/>Layer N (partial cure)"]
+        
+        separator["════════════════════════════════════════"]
+        
+        plate --> layerN1
+        layerN1 --> interface
+        interface --> layerN
+        layerN --> separator
+    end
+    
+    legend1["▓ = crosslinked network (solid)"]
+    legend2["░ = unreacted monomer/oligomer (liquid, mobile)<br/>← radicals bridge here during next exposure"]
+    
+    model -.-> legend1
+    model -.-> legend2
 ```
 
 The implication is that exposure time must be sufficient to cure the new layer fully AND to drive radicals into the previous layer's surface, but not so long that it over-cures the previous layer and causes dimensional swelling. The optimal exposure creates a cure depth slightly greater than the layer thickness — typically 1.2× to 1.5× the layer height. For a 50-micron layer, you want a cure depth of 60–75 microns. This overlap ensures the interface is fully bonded without bloating the part.
@@ -63,23 +73,25 @@ If exposure is too low, the new layer does not fully cure and the interface zone
 
 Most MSLA printers use 405 nm LED arrays. This is not arbitrary — it reflects the absorption peak of TPO-based photoinitiators, which absorb strongly between 365 and 410 nm. A 405 nm LED produces photons at 3.06 eV, sufficient to cleave the acylphosphine oxide bond in TPO (bond dissociation energy approximately 2.8 eV). The emission spectrum of the LED must overlap with the absorption spectrum of the photoinitiator for efficient radical generation.
 
-```
-┌─────────────────────────────────────────────────────┐
-│         UV Absorption Spectrum — TPO Photoinitiator  │
-│                                                     │
-│  Absorption                                         │
-│  (%)  │      ╭─╮                                    │
-│  100  │     ╭╯ ╰╮                                   │
-│   80  │    ╭╯   ╰╮                                  │
-│   60  │   ╭╯     ╰─                                 │
-│   40  │  ╭╯                                        │
-│   20  │ ╭╯                                         │
-│    0  └─────────────────────────────────────── λ(nm)│
-│       350  370  390  410  430  450  470            │
-│                  ▲                                   │
-│                  │ 405 nm LED emission              │
-│                  │ (MSLA light engine)              │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Title["UV Absorption Spectrum — TPO Photoinitiator"]
+    
+    subgraph Spectrum ["Absorption Spectrum"]
+        direction LR
+        Y_Axis["Absorption (%)<br/>100<br/>80<br/>60<br/>40<br/>20<br/>0"]
+        Curve["╭─╮<br/>╭╯ ╰╮<br/>╭╯   ╰╮<br/>╭╯     ╰─<br/>╭╯<br/>╭╯"]
+        X_Axis["λ (nm)<br/>350  370  390  410  430  450  470"]
+    end
+    
+    Peak["Peak Absorption<br/>~380-390 nm"]
+    LED["405 nm LED emission<br/>(MSLA light engine)"]
+    Overlap["Overlap zone enables<br/>photoinitiator activation"]
+    
+    Title --> Spectrum
+    Spectrum --> Peak
+    LED --> Overlap
+    Peak --> Overlap
 ```
 
 A resin formulated for 405 nm will underperform on a 385 nm printer and vice versa, because the photoinitiator package is tuned for a specific wavelength window. Some industrial printers (notably the Asiga series) use 385 nm LEDs, which offer higher photon energy and can cure some resins faster, but require resins specifically formulated with photoinitiators that absorb efficiently at that wavelength. Using a 405 nm resin on a 385 nm printer typically results in slow curing or partial curing; using a 385 nm resin on a 405 nm printer can result in over-curing because the photoinitiator may absorb broadly enough that the higher intensity causes excessive radical generation.

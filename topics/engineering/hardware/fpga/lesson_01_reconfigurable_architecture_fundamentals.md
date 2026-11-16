@@ -26,91 +26,178 @@ The interplay between configuration memory architecture and physical layout mani
 
 The anatomy of a lookup table reveals the elegance of SRAM-based reconfigurable logic. Consider a four-input LUT, the most common granularity in modern FPGAs. Sixteen SRAM cells store the truth table outputs for all sixteen possible input combinations. The four input signals serve as address lines to a 16-to-1 multiplexer tree, which selects one of the sixteen stored bits and presents it at the LUT output. The propagation delay through this structure consists of the SRAM access time (negligible, since the cells are continuously read) plus the multiplexer tree delay—typically two to four stages of 2-to-1 multiplexers cascaded to implement the 16-to-1 selection. In a 7 nm FinFET process, this delay might measure 80 to 120 picoseconds, fast enough to support logic operating at several hundred megahertz before routing delays dominate.
 
-```
-LUT-4 Internal Structure (Simplified):
-
-Configuration SRAM Cells:
-[bit 0] [bit 1] [bit 2] [bit 3] ... [bit 15]
-   |       |       |       |           |
-   +-------+-------+-------+-----------+
-                   |
-              16:1 Multiplexer Tree
-                   |
-            Stage 1: Four 4:1 MUXes
-                   |
-            Stage 2: One 4:1 MUX
-                   |
-              LUT Output (O)
-
-Input Address Lines: I[3:0]
-- I[3:2] select between four Stage-1 MUXes
-- I[1:0] select within each 4:1 MUX
-- Final MUX controlled by Stage-1 outputs
-
-Propagation Delay = t_MUX_stage1 + t_MUX_stage2
-                  ≈ 50 ps + 40 ps = 90 ps (typical 7nm)
+```mermaid
+flowchart TD
+    subgraph config ["Configuration SRAM Cells"]
+        bit0["bit 0"]
+        bit1["bit 1"]
+        bit2["bit 2"]
+        bit3["bit 3"]
+        bitdot["..."]
+        bit15["bit 15"]
+    end
+    
+    subgraph inputs ["Input Address Lines I[3:0]"]
+        I32["I[3:2]<br/>Select Stage-1 MUX"]
+        I10["I[1:0]<br/>Select within 4:1 MUX"]
+    end
+    
+    subgraph stage1 ["Stage 1: Four 4:1 MUXes"]
+        mux1["4:1 MUX 0"]
+        mux2["4:1 MUX 1"]
+        mux3["4:1 MUX 2"]
+        mux4["4:1 MUX 3"]
+    end
+    
+    bit0 --> mux1
+    bit1 --> mux1
+    bit2 --> mux1
+    bit3 --> mux1
+    
+    bit3 --> mux2
+    bitdot --> mux2
+    bitdot --> mux3
+    bitdot --> mux4
+    bit15 --> mux4
+    
+    I10 --> mux1
+    I10 --> mux2
+    I10 --> mux3
+    I10 --> mux4
+    
+    subgraph stage2 ["Stage 2: Final 4:1 MUX"]
+        finalMux["4:1 MUX"]
+    end
+    
+    mux1 --> finalMux
+    mux2 --> finalMux
+    mux3 --> finalMux
+    mux4 --> finalMux
+    
+    I32 --> finalMux
+    
+    finalMux --> output["LUT Output (O)"]
+    
+    subgraph timing ["Propagation Delay"]
+        delay["t_MUX_stage1 + t_MUX_stage2<br/>≈ 50 ps + 40 ps = 90 ps<br/>(typical 7nm)"]
+    end
 ```
 
 The configuration memory within each logic block extends beyond the LUT contents to control flip-flop behavior, multiplexer settings, and local routing. A typical Xilinx 7-Series slice contains four six-input LUTs, eight flip-flops, carry chain logic, and several layers of internal multiplexers. Each LUT can function as a 64-bit memory (requiring 64 SRAM configuration cells) or as two independent five-input LUTs sharing common inputs. The flip-flops feature configurable clock enable, synchronous set/reset, and output polarity control—each configuration option consuming additional SRAM bits. A conservative estimate places the configuration memory requirement for a single slice at approximately 400 to 600 bits, with the majority allocated to LUT contents and routing multiplexer control.
 
 The programmable interconnect hierarchy begins with local routing resources that connect outputs of LUTs to inputs of neighboring LUTs within the same configurable logic block (CLB) or adaptive logic module (ALM). These local wires incur minimal delay because they traverse only the physical dimensions of a single logic tile—perhaps 20 to 40 micrometers in a modern process node. At the next level, general routing matrix (GRM) resources provide connections between logic blocks through switch boxes. Each switch box presents a crossbar-like structure, though rarely a full crossbar due to transistor count constraints. A partial crossbar might allow any of six incoming wires to connect to any of six outgoing wires, but not all thirty-six possible connections simultaneously. The switch box implements these connections using pass transistors—NMOS devices whose gates are controlled by configuration SRAM cells.
 
-```
-Switch Box Topology (Wilton Architecture):
+```mermaid
+flowchart TD
+    subgraph north_wires ["North Wires N[0:5]"]
+        N0["N[0]"]
+        N1["N[1]"]
+        N2["N[2]"]
+        N3["N[3]"]
+        N4["N[4]"]
+        N5["N[5]"]
+    end
 
-         North Wires (N[0:5])
-               |  |  |
-         +-----+--+--+-----+
-         |     |  |  |     |
-West ----+ Crossbar Matrix +---- East
-Wires    |                 |    Wires
-W[0:5]   +-----+--+--+-----+   E[0:5]
-               |  |  |
-         South Wires (S[0:5])
+    subgraph south_wires ["South Wires S[0:5]"]
+        S0["S[0]"]
+        S1["S[1]"]
+        S2["S[2]"]
+        S3["S[3]"]
+        S4["S[4]"]
+        S5["S[5]"]
+    end
 
-Each intersection contains a pass transistor:
-  - Source: incoming wire
-  - Drain: outgoing wire
-  - Gate: configuration SRAM cell
+    subgraph west_wires ["West Wires W[0:5]"]
+        W0["W[0]"]
+        W1["W[1]"]
+        W2["W[2]"]
+        W3["W[3]"]
+        W4["W[4]"]
+        W5["W[5]"]
+    end
 
-Pass Transistor Sizing:
-  W/L = 2.0 μm / 0.18 μm (older nodes)
-  R_on ≈ 500 Ω
-  C_parasitic ≈ 30 fF per switch
+    subgraph east_wires ["East Wires E[0:5]"]
+        E0["E[0]"]
+        E1["E[1]"]
+        E2["E[2]"]
+        E3["E[3]"]
+        E4["E[4]"]
+        E5["E[5]"]
+    end
 
-Critical Path Through Routing:
-  - Wire capacitance: 0.2 fF/μm
-  - Wire resistance: 0.1 Ω/μm
-  - RC delay per segment: τ = R × C
+    subgraph switch_box ["Switch Box — Wilton Architecture"]
+        subgraph crossbar ["Crossbar Matrix"]
+            CB["Crossbar Switching Fabric"]
+        end
+
+        subgraph pass_transistors ["Pass Transistor Model (per intersection)"]
+            PT_SRC["Source: Incoming Wire"]
+            PT_GATE["Gate: Configuration SRAM Cell"]
+            PT_DRN["Drain: Outgoing Wire"]
+            PT_SRC -->|"controlled by"| PT_GATE
+            PT_GATE -->|"enables"| PT_DRN
+        end
+
+        subgraph sizing ["Pass Transistor Sizing"]
+            SZ["W/L = 2.0 μm / 0.18 μm\nR_on ≈ 500 Ω\nC_parasitic ≈ 30 fF per switch"]
+        end
+
+        subgraph rc_delay ["Critical Path — RC Delay"]
+            RC_WIRE["Wire Capacitance: 0.2 fF/μm\nWire Resistance: 0.1 Ω/μm"]
+            RC_FORMULA["Segment Delay: τ = R × C"]
+            RC_WIRE --> RC_FORMULA
+        end
+    end
+
+    N0 & N1 & N2 & N3 & N4 & N5 --> CB
+    W0 & W1 & W2 & W3 & W4 & W5 --> CB
+    CB --> S0 & S1 & S2 & S3 & S4 & S5
+    CB --> E0 & E1 & E2 & E3 & E4 & E5
+    CB --> pass_transistors
+    pass_transistors --> sizing
+    pass_transistors --> rc_delay
 ```
 
 The resistive and capacitive properties of programmable interconnect dominate timing analysis in FPGA designs. A signal traversing multiple switch boxes accumulates delay through each pass transistor's on-resistance and the capacitive loading of wire segments and unprogrammed switch transistors. A path requiring five routing hops might incur 2 to 3 nanoseconds of interconnect delay—an order of magnitude greater than the LUT delay itself. This reality drives the importance of placement optimization: the place-and-route tool must position communicating logic blocks in close proximity to minimize routing distance, ideally confining critical paths to short wires and avoiding congested regions where routing resources become scarce.
 
 Carry chain implementation exemplifies the benefits of hard-wired bypass structures. Within a single logic slice, each LUT generates a sum bit and a carry-generate signal. The carry chain consists of a dedicated multiplexer—often called a MUXCY primitive in Xilinx terminology—that selects between the carry-generate signal and the carry-propagate signal based on the carry-in from the previous stage. These multiplexers are connected vertically through metal wires that span only the height of a single logic tile, ensuring minimal parasitic capacitance. The carry-out from one slice feeds directly into the carry-in of the slice above it, creating a contiguous chain that can extend across dozens of logic blocks without ever entering the general routing fabric.
 
-```
-Carry Chain Vertical Propagation:
+```mermaid
+flowchart TD
+    subgraph sliceN1 ["Slice N+1"]
+        LUT1["LUT"]
+        FF1["FF"]
+        CG1["carry_gen"]
+        MUX1["MUXCY"]
+        LUT1 -->|"sum"| FF1
+        LUT1 --> CG1
+        CG1 --> MUX1
+    end
 
-Slice N+1:  [LUT] --sum--> [FF]
-              |
-         [carry_gen]
-              |
-         [MUXCY] <-- carry_in from Slice N
-              |
-         carry_out (to Slice N+2)
+    subgraph sliceN ["Slice N"]
+        LUT0["LUT"]
+        FF0["FF"]
+        CG0["carry_gen"]
+        MUX0["MUXCY"]
+        LUT0 -->|"sum"| FF0
+        LUT0 --> CG0
+        CG0 --> MUX0
+    end
 
-Slice N:    [LUT] --sum--> [FF]
-              |
-         [carry_gen]
-              |
-         [MUXCY] <-- carry_in from Slice N-1
-              |
-         carry_out (to Slice N+1)
+    subgraph timing ["Timing Parameters"]
+        T1["t_carry = 50 ps per stage (typical)"]
+        T2["32-bit adder: 32 × 50 ps = 1.6 ns"]
+        T3["Routed implementation: ~10 ns"]
+        T1 --> T2
+        T2 --> T3
+    end
 
-Timing Parameters:
-  - t_carry = 50 ps per stage (typical)
-  - 32-bit adder: 32 × 50 ps = 1.6 ns
-  - Compare to routed implementation: ~10 ns
+    CIN_PREV["carry_in (from Slice N-1)"]
+    COUT_FINAL["carry_out (to Slice N+2)"]
+
+    CIN_PREV -->|"carry_in"| MUX0
+    MUX0 -->|"carry_out"| MUX1
+    MUX1 -->|"carry_out"| COUT_FINAL
 ```
 
 Block RAM architecture introduces a different configuration paradigm, because embedded memories serve dual roles as both data storage and potential lookup table expansion. A typical BRAM tile in a Xilinx Virtex device contains 36 kilobits of true dual-port SRAM, configurable in various aspect ratios from 32K×1 to 512×72 bits. Each port features independent address, data, write-enable, and clock inputs, allowing simultaneous read and write operations on different addresses. The BRAM configuration memory controls aspect ratio, output pipeline stages, byte-enable granularity, and collision behavior when both ports access the same address simultaneously. Unlike the distributed SRAM within logic slices—where configuration bits define logic function—BRAM tiles store user data that can change every clock cycle during operation. However, the BRAM's initial contents at power-up are defined by the configuration bitstream, enabling applications like firmware storage or waveform generation from preloaded coefficients.

@@ -72,22 +72,34 @@ It helps to visualize the structure of four-momentum through the lens of Minkows
 
 The following diagram illustrates the energy-momentum relationship and the structure of Minkowski momentum space in 1+1 dimensions (suppressing two spatial components for clarity):
 
-```
-E/c
-│          ╱ light cone (m=0, E=pc)
-│       ╱  
-│    ╱     ◀─── photon worldline
-│ ╱
-│ ─────────────────────────── p
-│\
-│  \  ╲    mass hyperboloid E² = (pc)² + (mc²)²
-│    \  ╲        
-│      ╲   ◀─── massive particle states
-│        ╲
-│         (m²c²= invariant)
+```mermaid
+flowchart TD
+    Origin["Origin (p=0, E=0)"]
 
-   p = 0 : rest frame → E₀ = mc²
-   |p| → ∞ : ultrarelativistic → E ≈ pc  (kinetic dominates)
+    subgraph axes ["Coordinate System"]
+        E_axis["E/c — Energy axis"]
+        P_axis["p — Momentum axis"]
+    end
+
+    subgraph massless ["Massless States — m = 0"]
+        LightCone["Light Cone: E = pc<br/>Photon worldline"]
+    end
+
+    subgraph massive ["Massive States — m > 0"]
+        Hyperboloid["Mass Hyperboloid<br/>E² = (pc)² + (mc²)²<br/>Massive particle states"]
+        Rest["Rest Frame<br/>p = 0 → E₀ = mc²"]
+        Ultra["Ultrarelativistic Limit<br/>|p| → ∞ → E ≈ pc<br/>(kinetic dominates)"]
+        Inv["Invariant: m²c²"]
+    end
+
+    Origin --- E_axis
+    Origin --- P_axis
+    Origin --> LightCone
+    Origin --> Hyperboloid
+    LightCone -.->|"asymptote at |p|→∞"| Ultra
+    Hyperboloid --> Rest
+    Hyperboloid --> Ultra
+    Hyperboloid --> Inv
 ```
 
 The critical physical insight encoded in this diagram: a Lorentz boost moves a point *along* the hyperboloid — it changes the apparent energy and momentum but cannot move a state off its mass shell. This is what it means for $m^2c^2$ to be a Lorentz invariant.

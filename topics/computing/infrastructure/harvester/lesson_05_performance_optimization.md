@@ -158,17 +158,16 @@ The Engine awaits **all** ACKs before responding. If any replica is `ERR` state,
 
 The replica's on-disk layout is a differencing chain:
 
-```
-volume-head-000.img           ← live writes land here (sparse file)
-       │
-       ▼ (parent pointer in .meta file)
-volume-snap-<uuid-1>.img      ← snapshot 1 (frozen, read-only)
-       │
-       ▼
-volume-snap-<uuid-2>.img      ← snapshot 2 (frozen, read-only)
-       │
-       ▼
-volume-snap-<uuid-3>.img      ← (oldest, may be backing image)
+```mermaid
+flowchart TD
+    HEAD["volume-head-000.img<br/><i>live writes land here (sparse file)</i>"]
+    SNAP1["volume-snap-&lt;uuid-1&gt;.img<br/><i>snapshot 1 (frozen, read-only)</i>"]
+    SNAP2["volume-snap-&lt;uuid-2&gt;.img<br/><i>snapshot 2 (frozen, read-only)</i>"]
+    SNAP3["volume-snap-&lt;uuid-3&gt;.img<br/><i>oldest, may be backing image</i>"]
+    
+    HEAD -->|"parent pointer<br/>in .meta file"| SNAP1
+    SNAP1 --> SNAP2
+    SNAP2 --> SNAP3
 ```
 
 A read of block X must walk the chain from head toward the oldest ancestor until a layer that contains a write to block X is found. In the worst case (block never written since volume creation), the read walks the entire chain length. This is the primary reason **snapshot accumulation degrades read performance** — not because of snapshot metadata overhead, but because of chain walk depth.

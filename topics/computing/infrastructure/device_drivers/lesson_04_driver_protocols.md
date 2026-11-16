@@ -488,13 +488,20 @@ The correct model depends on target latency and system load:
 **Device timeout and recovery.** When a device fails to generate a completion within a deadline, the driver must reset the device and resubmit in-flight commands. The recovery sequence must be atomic from the application's perspective: in-flight I/Os must return `-EIO`, the device must be re-initialized to a known state, and new I/Os must be queued rather than rejected until recovery completes. Linux's block layer `blk-mq` timeout infrastructure handles this via `blk_mq_ops.timeout`.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Operational
-    Operational --> TimedOut : command deadline exceeded
-    TimedOut --> Resetting : driver calls hw_reset()
-    Resetting --> Operational : reset + reprobe succeeds
-    Resetting --> Failed : reset fails (N retries exhausted)
-    Failed --> [*] : device_del(), user sees -EIO permanently
+flowchart TD
+    Start(["Start"])
+    Operational["Operational"]
+    TimedOut["TimedOut"]
+    Resetting["Resetting"]
+    Failed["Failed"]
+    End(["End"])
+    
+    Start --> Operational
+    Operational -->|"command deadline exceeded"| TimedOut
+    TimedOut -->|"driver calls hw_reset()"| Resetting
+    Resetting -->|"reset + reprobe succeeds"| Operational
+    Resetting -->|"reset fails<br/>N retries exhausted"| Failed
+    Failed -->|"device_del()<br/>user sees -EIO permanently"| End
 ```
 
 **Interrupt storms.** An interrupt storm occurs when a device repeatedly asserts its interrupt line faster than the ISR can service it. The classic cause is a driver that forgets to acknowledge the interrupt in the ISR — the hardware sees the line still asserted and re-delivers immediately after the IRQ handler returns. Linux's IRQ core detects storms via `irq_work_queue`: if an interrupt fires more than a configurable threshold per second (default: 100,000), it is auto-disabled with a `IRQD_IRQ_DISABLED` flag and a kernel warning is emitted. The driver's interrupt acknowledge sequence must be verified against the device datasheet and must include a readback of the status register to ensure the write has committed (a "posted write" flush).

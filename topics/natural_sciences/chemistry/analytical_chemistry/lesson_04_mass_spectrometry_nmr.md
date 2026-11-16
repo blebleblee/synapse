@@ -92,27 +92,29 @@ The power of chemical shift lies in its exquisite sensitivity to electronic stru
 
 The physical architecture of a mass spectrometer can be described as a linear signal path: sample introduction and ionization, ion transfer into vacuum, mass analysis, and detection. These stages are separated by differential pumping — each stage is maintained at a progressively lower pressure, from atmospheric pressure at the ESI source through intermediate pressures in ion transfer optics to pressures of $10^{-7}$ to $10^{-9}$ mbar at the analyzer and detector. This pressure gradient serves a critical function: it ensures that ions travel through the analyzer without colliding with residual gas molecules, which would scatter them and destroy the $m/z$ resolution.
 
-```
-┌───────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                              MASS SPECTROMETER SIGNAL PATH                                                │
-└───────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph SRC ["Ion Source · Atmospheric"]
+        A["LC / GC /\nDirect Infusion"]
+        B["ESI / EI /\nCI / MALDI"]
+    end
 
-  SAMPLE IN          ION SOURCE         ION TRANSFER         MASS ANALYZER          DETECTOR
-      │                   │                   │                    │                    │
-      ▼                   ▼                   ▼                    ▼                    ▼
-  ┌───────┐         ┌──────────┐        ┌──────────┐         ┌──────────┐         ┌────────┐
-  │ LC,GC │──────▶  │ ESI/EI/  │──────▶ │ Ion      │──────▶  │ Quad /   │──────▶  │  TIC / │
-  │Direct │         │ CI/MALDI │        │ Transfer │         │ TOF /    │         │  SIM / │
-  │ Infus │         │          │        │  Optics  │         │ Orbitrap │         │  SRM   │
-  └───────┘         └──────────┘        │ (skimmer,│         └──────────┘         └────────┘
-                                        │  octopole│
-                                        │  ion lens│
-                                        └──────────┘
+    subgraph XFER ["Ion Transfer · ~1–10 mbar"]
+        C["Ion Transfer Optics\n(skimmer, octopole,\nion lens)"]
+    end
 
-  Pressure:         Atmospheric          ~1–10 mbar           ~10⁻⁵ mbar           ~10⁻⁷ – 10⁻⁹ mbar
+    subgraph ANLZ ["Mass Analyzer · ~10⁻⁵ mbar"]
+        D["Quadrupole /\nTOF /\nOrbitrap"]
+    end
 
-  Signal:           Neutral              Gas-phase            m/z-separated          Ion current → 
-                    molecules            ions                  ion packets            digital spectrum
+    subgraph DET ["Detector · ~10⁻⁷–10⁻⁹ mbar"]
+        E["TIC / SIM / SRM\n→ Digital Spectrum"]
+    end
+
+    A -- "neutral\nmolecules" --> B
+    B -- "gas-phase\nions" --> C
+    C -- "m/z-separated\nion packets" --> D
+    D -- "ion current" --> E
 ```
 
 **The Quadrupole Analyzer** operates by applying a combined DC voltage $U$ and RF voltage $V_\text{rf}\cos(\omega t)$ to four parallel rod electrodes arranged symmetrically around the ion beam axis. The electric potential inside the quadrupole is:
@@ -149,49 +151,22 @@ High-resolution mass spectrometry adds the dimension of **exact mass**. Because 
 
 The modern NMR spectrometer centers on a persistent superconducting magnet — a solenoid wound from niobium-titanium alloy, immersed in liquid helium at 4.2 K, and enclosed in a liquid nitrogen jacket for thermal insulation. At 11.74 T (500 MHz proton frequency), the magnetic flux density must be maintained to better than 1 part in $10^9$ per hour to avoid line broadening. The sample, dissolved in a deuterated solvent (CDCl$_3$, D$_2$O, DMSO-$d_6$, CD$_3$OD) and loaded into a 5 mm OD glass tube, is inserted into the bore of the magnet and spun (or, in modern cryoprobe instruments, held static) inside a cylindrical radiofrequency coil that serves as both transmitter and receiver.
 
-```
-┌────────────────────────────────────────────────────────────────────────────┐
-│                        NMR SPECTROMETER ARCHITECTURE                       │
-└────────────────────────────────────────────────────────────────────────────┘
-
-                        ┌─────────────────────────┐
-                        │   Superconducting Magnet │
-                        │      B₀ (11.74 T)        │
-                        │  ┌───────────────────┐   │
-                        │  │   Sample in NMR   │   │
-                        │  │   tube + solvent  │   │
-                        │  │   ┌───────────┐   │   │
-                        │  │   │  RF Coil  │   │   │
-                        │  │   │ (Tx / Rx) │   │   │
-                        │  │   └───────────┘   │   │
-                        │  └───────────────────┘   │
-                        └────────────┬────────────-┘
-                                     │
-                     ┌───────────────▼───────────────┐
-                     │        RF Transmitter          │
-                     │   Pulse: 90° flip angle        │
-                     │   Duration: ~10 μs (¹H)        │
-                     │   Frequency: 500 MHz           │
-                     └───────────────┬───────────────┘
-                                     │
-                     ┌───────────────▼───────────────┐
-                     │       FID Detection            │
-                     │   Free Induction Decay         │
-                     │   Time domain: s(t)            │
-                     └───────────────┬───────────────┘
-                                     │
-                     ┌───────────────▼───────────────┐
-                     │       Fourier Transform        │
-                     │   s(t) → S(ν) = spectrum       │
-                     │   Chemical shift axis (ppm)    │
-                     └───────────────┬───────────────┘
-                                     │
-                     ┌───────────────▼───────────────┐
-                     │        Phase Correction        │
-                     │        Baseline Correction     │
-                     │        Integration             │
-                     │        Peak Picking            │
-                     └───────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Superconducting Magnet<br/>B₀ (11.74 T)"]
+    B["Sample in NMR<br/>tube + solvent"]
+    C["RF Coil<br/>(Tx / Rx)"]
+    D["RF Transmitter<br/>Pulse: 90° flip angle<br/>Duration: ~10 μs (¹H)<br/>Frequency: 500 MHz"]
+    E["FID Detection<br/>Free Induction Decay<br/>Time domain: s(t)"]
+    F["Fourier Transform<br/>s(t) → S(ν) = spectrum<br/>Chemical shift axis (ppm)"]
+    G["Phase Correction<br/>Baseline Correction<br/>Integration<br/>Peak Picking"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
 ```
 
 The key experimental step in pulsed FT-NMR is the application of a **hard pulse** — a short, high-power RF burst at the Larmor frequency. A 90° pulse tips the net magnetization vector, which at equilibrium points along $B_0$ (the $z$-axis), into the transverse $xy$-plane. Once in the $xy$-plane, this magnetization precesses at the Larmor frequency of each chemically distinct nucleus and induces a voltage in the receiver coil. The resulting time-domain signal, the free induction decay (FID), is a superposition of all resonance frequencies in the sample, decaying exponentially as the transverse magnetization dephases. Fourier transformation decomposes this composite decay into its frequency components, producing the frequency-domain NMR spectrum with peaks at each resonance frequency.

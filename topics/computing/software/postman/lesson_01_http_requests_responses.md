@@ -34,54 +34,32 @@ The request body in Postman is typed, not free-form. The `body` object in the re
 
 The following diagram models the full lifecycle of a request from Postman through the network to the server and back:
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         POSTMAN CLIENT                              │
-│                                                                     │
-│  ┌──────────────┐   Pre-Request Script   ┌──────────────────────┐  │
-│  │  Request     │ ─────────────────────► │  Sandbox (Node.js    │  │
-│  │  (Method,    │ ◄───────────────────── │  vm module, isolated │  │
-│  │   URL, Hdrs, │   pm.environment.set() │  scope)              │  │
-│  │   Body)      │   pm.variables.set()   └──────────────────────┘  │
-│  └──────┬───────┘                                                   │
-│         │  Variable substitution: {{baseUrl}}, {{authToken}}        │
-│         ▼                                                           │
-│  ┌──────────────┐                                                   │
-│  │  Serialized  │  POST /v2/orders HTTP/1.1                        │
-│  │  Wire Format │  Host: api.example.com                           │
-│  │              │  Authorization: Bearer eyJ...                    │
-│  │              │  Content-Type: application/json                  │
-│  │              │  Content-Length: 87                              │
-│  │              │                                                   │
-│  │              │  {"item_id":"sku-99","qty":2,"currency":"USD"}   │
-│  └──────┬───────┘                                                   │
-└─────────┼───────────────────────────────────────────────────────────┘
-          │  TLS 1.3 over TCP (or QUIC for HTTP/3)
-          ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                         SERVER / API GATEWAY                        │
-│                                                                     │
-│  Route match → Auth middleware → Handler → Response serializer      │
-└─────────────────────────────────────────────────────────────────────┘
-          │
-          │  HTTP/1.1 201 Created
-          │  Content-Type: application/json
-          │  Location: /v2/orders/ord-5541
-          │  X-Request-Id: 7f3a9c1d
-          │
-          │  {"order_id":"ord-5541","status":"pending"}
-          ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                         POSTMAN CLIENT                              │
-│                                                                     │
-│  ┌──────────────┐   Response Object    ┌───────────────────────┐   │
-│  │  Response    │ ──────────────────► │  Test Script Sandbox  │   │
-│  │  (Status,    │                     │  pm.test(...)          │   │
-│  │   Headers,   │                     │  pm.expect(...)        │   │
-│  │   Body,      │                     │  pm.environment.set()  │   │
-│  │   Timing)    │                     └───────────────────────┘   │
-│  └──────────────┘                                                   │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["POSTMAN CLIENT"]
+    B["Request<br/>(Method, URL, Headers, Body)"]
+    C["Pre-Request Script Sandbox<br/>(Node.js vm module, isolated scope)"]
+    D["pm.environment.set()<br/>pm.variables.set()"]
+    E["Variable Substitution<br/>{{baseUrl}}, {{authToken}}"]
+    F["Serialized Wire Format<br/>POST /v2/orders HTTP/1.1<br/>Host: api.example.com<br/>Authorization: Bearer eyJ...<br/>Content-Type: application/json<br/>Content-Length: 87<br/><br/>JSON Body"]
+    G["TLS 1.3 over TCP<br/>(or QUIC for HTTP/3)"]
+    H["SERVER / API GATEWAY<br/>Route match → Auth middleware<br/>→ Handler → Response serializer"]
+    I["HTTP/1.1 201 Created<br/>Content-Type: application/json<br/>Location: /v2/orders/ord-5541<br/>X-Request-Id: 7f3a9c1d<br/><br/>JSON Response"]
+    J["POSTMAN CLIENT"]
+    K["Response Object<br/>(Status, Headers, Body, Timing)"]
+    L["Test Script Sandbox<br/>pm.test(...)<br/>pm.expect(...)<br/>pm.environment.set()"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+    J --> K
+    K --> L
 ```
 
 Variable substitution is the mechanism that makes Collections reusable across environments. Before serializing the wire-format request, Postman performs a string substitution pass over the method, URL, all header values, and the raw body, replacing any `{{variable_name}}` token with the value resolved from the active scope chain. That scope chain has a defined resolution order: request-local variables override collection variables, which override environment variables, which override global variables, which override Postman Vault secrets. This is not arbitrary. It mirrors the precedence semantics of environment variable resolution in Unix shells and configuration systems like Kubernetes: narrowest scope wins. When a `{{authToken}}` reference resolves to an empty string in production but to a valid JWT in development, the cause is almost always a missing or stale value at the wrong scope level.

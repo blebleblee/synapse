@@ -119,14 +119,22 @@ The traceparent header encodes the trace identifier, parent span identifier, and
 
 When the pricing API receives this request, its instrumented HTTP server framework extracts the trace context, creates a child span with the received parent identifier, and continues the causal chain. This parent-child linkage forms the trace tree structure that backend aggregation reconstructs:
 
-```
-Root Span: inventory-api.request [2.3ms - 87.4ms] (85.1ms)
-├─ Child Span: postgres.query [3.1ms - 51.2ms] (48.1ms)
-├─ Child Span: redis.set [52.0ms - 54.3ms] (2.3ms)
-└─ Child Span: http.request [55.1ms - 86.7ms] (31.6ms)
-   └─ Remote Child Span: pricing-api.calculate [56.3ms - 85.9ms] (29.6ms)
-      ├─ Child Span: mysql.query [57.1ms - 80.2ms] (23.1ms)
-      └─ Child Span: kafka.produce [81.0ms - 84.5ms] (3.5ms)
+```mermaid
+flowchart TD
+    A["Root Span: inventory-api.request<br/>[2.3ms - 87.4ms] (85.1ms)"]
+    B["Child Span: postgres.query<br/>[3.1ms - 51.2ms] (48.1ms)"]
+    C["Child Span: redis.set<br/>[52.0ms - 54.3ms] (2.3ms)"]
+    D["Child Span: http.request<br/>[55.1ms - 86.7ms] (31.6ms)"]
+    E["Remote Child Span: pricing-api.calculate<br/>[56.3ms - 85.9ms] (29.6ms)"]
+    F["Child Span: mysql.query<br/>[57.1ms - 80.2ms] (23.1ms)"]
+    G["Child Span: kafka.produce<br/>[81.0ms - 84.5ms] (3.5ms)"]
+    
+    A --> B
+    A --> C
+    A --> D
+    D --> E
+    E --> F
+    E --> G
 ```
 
 The timestamps represent wall-clock time offsets from the trace root, reconstructed by correlating local span timestamps with Network Time Protocol synchronized clocks across the distributed fleet. Clock skew remains a fundamental challenge in distributed tracing—if the pricing service's system clock leads the inventory service by 500 milliseconds, the reconstructed timeline may show child spans starting before their parents, violating causality. Datadog's backend trace processor applies heuristic clock skew correction by analyzing parent-child timestamp relationships and adjusting for consistent offsets, though pathological clock drift can still produce nonsensical timelines.
@@ -201,30 +209,18 @@ This query translates into a distributed scan across the trace index, filtering 
 
 The service dependency graph emerges as a byproduct of trace aggregation, constructed by analyzing the parent-child relationships and network boundaries crossed within each trace. When a span's service differs from its parent's service and carries span.kind=client on the parent and span.kind=server on the child, the backend infers a network hop and increments the edge weight in the directed graph between those two services. Over time, this aggregation builds a weighted dependency graph where edge weights represent request volumes and average latencies:
 
-```
-┌─────────────────┐
-│   web-frontend  │
-│   (nginx)       │
-└────────┬────────┘
-         │ 15K req/s, 45ms p50
-         ▼
-┌─────────────────┐
-│  inventory-api  │──────────────┐
-│   (Python)      │              │ 8K req/s, 12ms p50
-└────────┬────────┘              ▼
-         │ 12K req/s, 23ms p50   ┌─────────────────┐
-         ▼                       │  pricing-api    │
-┌─────────────────┐              │   (Go)          │
-│  inventory-db   │              └─────────────────┘
-│  (PostgreSQL)   │
-└─────────────────┘
-         ▲
-         │ 3K req/s, 18ms p50
-         │
-┌─────────────────┐
-│ background-sync │
-│   (Python)      │
-└─────────────────┘
+```mermaid
+flowchart TD
+    A["web-frontend<br/>(nginx)"]
+    B["inventory-api<br/>(Python)"]
+    C["inventory-db<br/>(PostgreSQL)"]
+    D["pricing-api<br/>(Go)"]
+    E["background-sync<br/>(Python)"]
+    
+    A -->|"15K req/s, 45ms p50"| B
+    B -->|"12K req/s, 23ms p50"| C
+    B -->|"8K req/s, 12ms p50"| D
+    E -->|"3K req/s, 18ms p50"| C
 ```
 
 This graph visualization reveals not only the direct dependencies between services but also the request volume distribution and latency contribution of each edge, enabling operators to identify bottleneck services and optimize critical paths. When the inventory database p99 latency spikes to 500ms, the dependency graph immediately shows the blast radius—which upstream services are affected and by what request volume multiplier.

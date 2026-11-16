@@ -109,33 +109,18 @@ We verify this for $\mathrm{DLO}$. Let $\mathcal{A}$ be a common substructure of
 
 The flow of inference in a typical QE proof can be traced through the following diagram, which shows how the existence of a quantifier-free equivalent propagates through the layers of model-theoretic structure.
 
-```
- Formula φ(x, ā)                    Quantifier-Free ψ(ā)
-  (existential form)                (Boolean combination
-   ∃x θ(x, ā)                        of atomic formulas)
-        │                                    │
-        │  T ⊨ ∃x θ(x,ā) ↔ ψ(ā)            │
-        └────────────────────────────────────┘
-                        │
-         ┌──────────────▼──────────────┐
-         │   Model Completeness Test   │
-         │                             │
-         │  For all M, N ⊨ T and      │
-         │  common substructure A:     │
-         │                             │
-         │  M ⊨ ∃x θ(x,ā)            │
-         │      ⟺                     │
-         │  N ⊨ ∃x θ(x,ā)            │
-         │      ⟺                     │
-         │  T ⊨ ψ(ā)                  │
-         └─────────────────────────────┘
-                        │
-         ┌──────────────▼──────────────┐
-         │  Consequence: Definable     │
-         │  sets = Boolean combinations│
-         │  of atomic relations in     │
-         │  all models of T            │
-         └─────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Formula φ(x, ā)<br/>(existential form)<br/>∃x θ(x, ā)"]
+    B["Quantifier-Free ψ(ā)<br/>(Boolean combination<br/>of atomic formulas)"]
+    C["Equivalence Relation<br/>T ⊨ ∃x θ(x,ā) ↔ ψ(ā)"]
+    D["Model Completeness Test<br/><br/>For all M, N ⊨ T and<br/>common substructure A:<br/><br/>M ⊨ ∃x θ(x,ā)<br/>⟺<br/>N ⊨ ∃x θ(x,ā)<br/>⟺<br/>T ⊨ ψ(ā)"]
+    E["Consequence: Definable<br/>sets = Boolean combinations<br/>of atomic relations in<br/>all models of T"]
+    
+    A --> C
+    B --> C
+    C --> D
+    D --> E
 ```
 
 ### Complete Types and Saturated Models

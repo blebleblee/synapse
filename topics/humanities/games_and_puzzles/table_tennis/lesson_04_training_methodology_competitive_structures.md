@@ -56,36 +56,100 @@ Statistical tracking quantifies tactical patterns and outcome distributions acro
 
 Biomechanical measurement employs force plates, motion capture systems, and electromyography to analyze the kinetic chain's efficiency and identify injury risk factors. Force plate data reveals ground reaction forces during strokes—elite players generate vertical forces exceeding 1.5 times body weight during powerful forehand loops, with the force peaking just before racket-ball contact. Motion capture quantifies joint angles, segment velocities, and temporal coordination between body parts. EMG recordings measure muscle activation patterns, potentially revealing compensations where secondary muscles activate excessively to compensate for primary mover weakness or timing errors.
 
-```
-Table Tennis Training Periodization Structure (12-Week Mesocycle)
+```mermaid
+flowchart TD
+    ROOT["🏓 Table Tennis Training Periodization\n12-Week Mesocycle"]
 
-Phase 1: General Preparation (Weeks 1-3)
-├─ Volume: 18-22 hours/week
-├─ Technical focus: Stroke consistency, footwork foundations
-├─ Physical focus: Aerobic base, general strength
-├─ Intensity: 60-70% maximum
-└─ Assessment: Technical proficiency tests, fitness benchmarks
+    subgraph P1["Phase 1: General Preparation — Weeks 1–3"]
+        P1_VOL["📊 Volume: 18–22 hrs/week"]
+        P1_TECH["🎯 Technical: Stroke consistency,\nfootwork foundations"]
+        P1_PHYS["💪 Physical: Aerobic base,\ngeneral strength"]
+        P1_INT["⚡ Intensity: 60–70% maximum"]
+        P1_ASSESS["📋 Assessment: Technical proficiency tests,\nfitness benchmarks"]
+    end
 
-Phase 2: Specific Preparation (Weeks 4-7)
-├─ Volume: 16-20 hours/week
-├─ Technical focus: Tactical patterns, serve/receive development
-├─ Physical focus: Power endurance, explosive strength
-├─ Intensity: 75-85% maximum
-└─ Assessment: Practice match statistics, tactical pattern success rates
+    subgraph P2["Phase 2: Specific Preparation — Weeks 4–7"]
+        P2_VOL["📊 Volume: 16–20 hrs/week"]
+        P2_TECH["🎯 Technical: Tactical patterns,\nserve/receive development"]
+        P2_PHYS["💪 Physical: Power endurance,\nexplosive strength"]
+        P2_INT["⚡ Intensity: 75–85% maximum"]
+        P2_ASSESS["📋 Assessment: Practice match statistics,\ntactical pattern success rates"]
+    end
 
-Phase 3: Pre-Competition (Weeks 8-10)
-├─ Volume: 14-16 hours/week
-├─ Technical focus: Competition simulation, pattern refinement
-├─ Physical focus: Peak power, speed maintenance
-├─ Intensity: 85-95% maximum
-└─ Assessment: Tournament simulation results, psychological readiness
+    subgraph P3["Phase 3: Pre-Competition — Weeks 8–10"]
+        P3_VOL["📊 Volume: 14–16 hrs/week"]
+        P3_TECH["🎯 Technical: Competition simulation,\npattern refinement"]
+        P3_PHYS["💪 Physical: Peak power,\nspeed maintenance"]
+        P3_INT["⚡ Intensity: 85–95% maximum"]
+        P3_ASSESS["📋 Assessment: Tournament simulation results,\npsychological readiness"]
+    end
 
-Phase 4: Competition (Weeks 11-12)
-├─ Volume: 10-12 hours/week
-├─ Technical focus: Sharpness maintenance, opponent-specific preparation
-├─ Physical focus: Recovery optimization, injury prevention
-├─ Intensity: 90-100% maximum (competition only)
-└─ Assessment: Tournament results, performance analysis review
+    subgraph P4["Phase 4: Competition — Weeks 11–12"]
+        P4_VOL["📊 Volume: 10–12 hrs/week"]
+        P4_TECH["🎯 Technical: Sharpness maintenance,\nopponent-specific preparation"]
+        P4_PHYS["💪 Physical: Recovery optimization,\ninjury prevention"]
+        P4_INT["⚡ Intensity: 90–100% maximum\n(competition only)"]
+        P4_ASSESS["📋 Assessment: Tournament results,\nperformance analysis review"]
+    end
+
+    ROOT --> P1
+    ROOT --> P2
+    ROOT --> P3
+    ROOT --> P4
+
+    P1 -->|"Progressive load ↑"| P2
+    P2 -->|"Specificity ↑"| P3
+    P3 -->|"Peak & taper"| P4
+
+    P1_VOL --- P1_TECH
+    P1_TECH --- P1_PHYS
+    P1_PHYS --- P1_INT
+    P1_INT --- P1_ASSESS
+
+    P2_VOL --- P2_TECH
+    P2_TECH --- P2_PHYS
+    P2_PHYS --- P2_INT
+    P2_INT --- P2_ASSESS
+
+    P3_VOL --- P3_TECH
+    P3_TECH --- P3_PHYS
+    P3_PHYS --- P3_INT
+    P3_INT --- P3_ASSESS
+
+    P4_VOL --- P4_TECH
+    P4_TECH --- P4_PHYS
+    P4_PHYS --- P4_INT
+    P4_INT --- P4_ASSESS
+
+    style ROOT fill:#1a1a2e,stroke:#e94560,color:#ffffff,font-weight:bold
+    style P1 fill:#0f3460,stroke:#16213e,color:#ffffff
+    style P2 fill:#16213e,stroke:#0f3460,color:#ffffff
+    style P3 fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style P4 fill:#e94560,stroke:#c73652,color:#ffffff
+
+    style P1_VOL fill:#1e4d8c,stroke:#2563eb,color:#e2e8f0
+    style P1_TECH fill:#1e4d8c,stroke:#2563eb,color:#e2e8f0
+    style P1_PHYS fill:#1e4d8c,stroke:#2563eb,color:#e2e8f0
+    style P1_INT fill:#1e4d8c,stroke:#2563eb,color:#e2e8f0
+    style P1_ASSESS fill:#1e4d8c,stroke:#2563eb,color:#e2e8f0
+
+    style P2_VOL fill:#1e3a5f,stroke:#3b82f6,color:#e2e8f0
+    style P2_TECH fill:#1e3a5f,stroke:#3b82f6,color:#e2e8f0
+    style P2_PHYS fill:#1e3a5f,stroke:#3b82f6,color:#e2e8f0
+    style P2_INT fill:#1e3a5f,stroke:#3b82f6,color:#e2e8f0
+    style P2_ASSESS fill:#1e3a5f,stroke:#3b82f6,color:#e2e8f0
+
+    style P3_VOL fill:#2d1b4e,stroke:#8b5cf6,color:#e2e8f0
+    style P3_TECH fill:#2d1b4e,stroke:#8b5cf6,color:#e2e8f0
+    style P3_PHYS fill:#2d1b4e,stroke:#8b5cf6,color:#e2e8f0
+    style P3_INT fill:#2d1b4e,stroke:#8b5cf6,color:#e2e8f0
+    style P3_ASSESS fill:#2d1b4e,stroke:#8b5cf6,color:#e2e8f0
+
+    style P4_VOL fill:#7f1d1d,stroke:#ef4444,color:#fef2f2
+    style P4_TECH fill:#7f1d1d,stroke:#ef4444,color:#fef2f2
+    style P4_PHYS fill:#7f1d1d,stroke:#ef4444,color:#fef2f2
+    style P4_INT fill:#7f1d1d,stroke:#ef4444,color:#fef2f2
+    style P4_ASSESS fill:#7f1d1d,stroke:#ef4444,color:#fef2f2
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

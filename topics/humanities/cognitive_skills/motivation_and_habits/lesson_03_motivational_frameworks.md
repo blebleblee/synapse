@@ -44,32 +44,16 @@ The helplessness framework illuminates why traditional motivational intervention
 
 The psychological architecture implementing motivated behavior consists of hierarchically organized control systems operating at multiple timescales. At the lowest level, millisecond-resolution sensorimotor control loops manage immediate action execution—reaching for a coffee cup, typing a sentence, maintaining postural stability. These loops operate largely automatically, requiring minimal conscious attention once skill has been acquired. The middle level consists of hour-to-day goal pursuit systems that sequence actions toward intermediate objectives—completing a work assignment, preparing a meal, conducting a literature review. The highest level encompasses month-to-year identity-level goals and life projects that provide overarching purpose and direction.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Identity-Level Goals                      │
-│              (Years: "Become a physician")                   │
-│                   Autonomy / Competence / Relatedness Needs  │
-└────────────────────────────┬────────────────────────────────┘
-                             │ Provides meaning & direction
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  Instrumental Goal Systems                   │
-│         (Months: "Master organic chemistry")                 │
-│              Expectancy × Value → Effort Allocation          │
-└────────────────────────────┬────────────────────────────────┘
-                             │ Specifies proximate objectives
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 Proximate Action Regulation                  │
-│    (Hours: "Complete problem set #7")                        │
-│         Goal Specificity × Self-Efficacy → Persistence       │
-└────────────────────────────┬────────────────────────────────┘
-                             │ Deploys concrete behaviors
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Automatic Sensorimotor Execution                │
-│     (Seconds: Read problem, retrieve schema, write answer)   │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Identity-Level Goals<br/>(Years: 'Become a physician')<br/>Autonomy / Competence / Relatedness Needs"]
+    B["Instrumental Goal Systems<br/>(Months: 'Master organic chemistry')<br/>Expectancy × Value → Effort Allocation"]
+    C["Proximate Action Regulation<br/>(Hours: 'Complete problem set #7')<br/>Goal Specificity × Self-Efficacy → Persistence"]
+    D["Automatic Sensorimotor Execution<br/>(Seconds: Read problem, retrieve schema, write answer)"]
+    
+    A -->|"Provides meaning & direction"| B
+    B -->|"Specifies proximate objectives"| C
+    C -->|"Deploys concrete behaviors"| D
 ```
 
 Effective motivation requires coherent alignment across these hierarchical levels. When proximate goals clearly serve instrumental goals that authentically reflect identity-level values, the entire system operates in resonance, producing effortless persistence that subjectively feels like "flow." When these levels become decoupled—when daily actions feel disconnected from meaningful purpose—the system experiences internal conflict, manifesting as procrastination, ambivalence, and motivational fragility.
@@ -100,40 +84,21 @@ The practical implication is that extrinsic incentives must be designed to prese
 
 Goal-setting mechanics operate through the Test-Operate-Test-Exit (TOTE) feedback loop, a foundational model of human self-regulation. The initial Test phase compares current state to goal standard, computing a discrepancy. If discrepancy exceeds threshold, the Operate phase initiates action designed to reduce discrepancy. The subsequent Test phase reassesses discrepancy—if reduced sufficiently, the loop Exits; if not, it cycles back to Operate with potentially modified strategies. This TOTE architecture requires both goal specificity (clear Test criteria) and self-efficacy (belief that Operate actions can successfully reduce discrepancy).
 
-```
-                    ┌──────────────┐
-                    │   Set Goal   │
-                    │  (Specific,  │
-                    │  Difficult)  │
-                    └──────┬───────┘
-                           │
-                           ▼
-                    ┌──────────────┐
-                    │  Test Phase  │
-                    │ Compare State│
-                    │  to Standard │
-                    └──────┬───────┘
-                           │
-                    Discrepancy?
-                    /            \
-                 Yes              No
-                  │                │
-                  ▼                ▼
-           ┌──────────────┐   ┌──────────┐
-           │Operate Phase │   │   Exit   │
-           │Deploy Action │   │ (Goal    │
-           │  Strategy    │   │ Achieved)│
-           └──────┬───────┘   └──────────┘
-                  │
-                  │
-                  ▼
-           ┌──────────────┐
-           │  Test Phase  │
-           │  Reassess    │
-           │  Progress    │
-           └──────┬───────┘
-                  │
-          Loop until Exit
+```mermaid
+flowchart TD
+    A["Set Goal\n(Specific, Difficult)"]
+    B["Test Phase\nCompare State to Standard"]
+    C{Discrepancy?}
+    D["Operate Phase\nDeploy Action Strategy"]
+    E["Exit\n(Goal Achieved)"]
+    F["Test Phase\nReassess Progress"]
+
+    A --> B
+    B --> C
+    C -- Yes --> D
+    C -- No --> E
+    D --> F
+    F -- Loop until Exit --> C
 ```
 
 Goal proximity effects arise from differential engagement of this regulatory loop at various temporal distances. Proximal goals (achievable today or this week) enable continuous TOTE cycling with frequent feedback, maintaining high regulatory engagement. Distal goals (achievable months or years away) permit extended periods without feedback, causing regulatory attention to lapse. The solution involves hierarchical goal decomposition: distal outcome goals are decomposed into proximal process goals that permit daily regulation. A student with the distal goal "achieve A grade in organic chemistry" implements proximal process goals like "complete five practice problems daily" that enable continuous self-monitoring and adjustment.

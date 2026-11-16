@@ -54,15 +54,20 @@ $$\text{DNA-}3'\text{-OH} + \text{dNTP} \xrightarrow{\text{Mg}^{2+}} \text{DNA-d
 
 Pyrophosphate release is highly exergonic ($\Delta G^\circ \approx -33$ kJ/mol), thermodynamically driving the polymerization forward. High-fidelity polymerases (Q5, Phusion, *Pfu*) incorporate 3'→5' exonuclease proofreading domains that excise misincorporated nucleotides, reducing error rates from *Taq*'s ~$10^{-4}$ per base to ~$10^{-6}$ per base. This 100-fold accuracy improvement is critical for cloning applications where sequence fidelity is mandatory.
 
-```
-PCR Thermal Cycling Profile:
-
-Cycle:    |<---- Initial ---->|<-------- 25-35 Cycles -------->|<-- Final -->|
-          |   Denaturation    | Denature | Anneal | Extend     | Extension   |
-Temp:     |      94-98°C      |  94-98°C | 50-65°C|   72°C     |    72°C     |
-Time:     |     2-5 min       |  15-30s  | 15-60s | 1min/kb    |   5-10 min  |
-Purpose:  | Complete strand   | Melt     | Primer | Synthesis  | Complete    |
-          | separation        | dsDNA    | binding| elongation | unfinished  |
+```mermaid
+flowchart LR
+    A["Initial Denaturation<br/>94-98°C<br/>2-5 min<br/>Complete strand separation"]
+    
+    subgraph cycles ["25-35 Cycles"]
+        B["Denaturation<br/>94-98°C<br/>15-30s<br/>Melt dsDNA"]
+        C["Annealing<br/>50-65°C<br/>15-60s<br/>Primer binding"]
+        D["Extension<br/>72°C<br/>1 min/kb<br/>Synthesis elongation"]
+        B --> C --> D --> B
+    end
+    
+    E["Final Extension<br/>72°C<br/>5-10 min<br/>Complete unfinished"]
+    
+    A --> cycles --> E
 ```
 
 Quantitative PCR (qPCR) extends this framework by monitoring amplification in real-time using fluorescent reporters. SYBR Green intercalates into double-stranded DNA, producing fluorescence proportional to product accumulation. Alternatively, TaqMan probes—oligonucleotides with 5' fluorophore and 3' quencher—hybridize to internal target sequences; during extension, *Taq*'s 5'→3' exonuclease activity cleaves the probe, physically separating fluorophore from quencher and generating signal. Amplification is tracked through cycle threshold ($C_t$) values, defined as the cycle number where fluorescence crosses a detection threshold. Since $C_t$ is inversely proportional to initial template quantity:
@@ -113,7 +118,7 @@ Western blotting introduces SDS-PAGE for protein separation. SDS is an anionic d
 
 $$\text{Acrylamide} + \text{Bis} \xrightarrow{\text{APS, TEMED}} \text{Polyacrylamide gel}$$
 
-Acrylamide percentage dictates resolution range: 6–8% gels separate 50–200 kDa proteins, 10–12% resolve 20–100 kDa, and 15–20% optimize for <20 kDa peptides. After electrophoresis, proteins are transferred to PVDF or nitrocellulose membranes via electroblotting (wet transfer in buffer-filled tank) or semi-dry transfer (membrane and gel sandwiched between buffer-soaked filter papers with electrodes in direct contact). Transfer efficiency is verified by Ponceau S staining, a reversible red dye that binds proteins.
+Acrylamide percentage dictates resolution range: 6–8% gels separate 50–200 kDa proteins, 10–12% resolve 20–100 kDa, and 15–20% optimize for < 20 kDa peptides. After electrophoresis, proteins are transferred to PVDF or nitrocellulose membranes via electroblotting (wet transfer in buffer-filled tank) or semi-dry transfer (membrane and gel sandwiched between buffer-soaked filter papers with electrodes in direct contact). Transfer efficiency is verified by Ponceau S staining, a reversible red dye that binds proteins.
 
 Antibody incubations follow blocking steps to saturate non-specific binding sites with inert proteins (5% nonfat milk or bovine serum albumin in Tris-buffered saline with Tween-20, TBST). Primary antibody (raised against target protein, typically in rabbit or mouse) binds specific epitopes; secondary antibody (anti-rabbit or anti-mouse IgG conjugated to HRP or AP, raised in goat or donkey) amplifies signal. HRP catalyzes luminol oxidation in the presence of hydrogen peroxide, producing chemiluminescence:
 
@@ -147,7 +152,7 @@ RNAi efficacy depends on siRNA design rules: optimal thermodynamic asymmetry (we
 
 Off-target effects in RNAi arise from partial complementarity between the siRNA seed region (nucleotides 2–8 from the 5' end of the guide strand) and unintended mRNA targets. Microarray or RNA-seq profiling of siRNA-transfected cells often reveals hundreds of off-target transcripts downregulated by seed-mediated repression. Pooling multiple siRNAs targeting different regions of the same gene reduces false positives (true on-target effects should appear with all siRNAs; off-targets are likely distinct for each siRNA), and rescue experiments expressing siRNA-resistant cDNA (with synonymous codon changes disrupting siRNA binding sites) verify specificity.
 
-Quantitative PCR troubleshooting demands systematic diagnosis of failure modes. Absent amplification (no fluorescence increase) indicates primer design failure (mispriming, primer-dimers, failure to anneal), template degradation (RNase contamination for RT-qPCR), or polymerase inhibition (carryover of EDTA, SDS, or ethanol from purification). Primer-dimer artifacts appear as low-molecular-weight products (<100 bp) on melt curves or gels, generating premature fluorescence that distorts $C_t$ calculations. This is mitigated by redesigning primers to eliminate 3' complementarity, increasing annealing temperatures, or using hot-start polymerases that remain inactive until initial denaturation completes.
+Quantitative PCR troubleshooting demands systematic diagnosis of failure modes. Absent amplification (no fluorescence increase) indicates primer design failure (mispriming, primer-dimers, failure to anneal), template degradation (RNase contamination for RT-qPCR), or polymerase inhibition (carryover of EDTA, SDS, or ethanol from purification). Primer-dimer artifacts appear as low-molecular-weight products (< 100 bp) on melt curves or gels, generating premature fluorescence that distorts $C_t$ calculations. This is mitigated by redesigning primers to eliminate 3' complementarity, increasing annealing temperatures, or using hot-start polymerases that remain inactive until initial denaturation completes.
 
 Uneven amplification efficiency across samples biases relative quantification. Amplification efficiency $E$ is empirically measured from standard curve slopes ($E = 10^{-1/\text{slope}}$), ideally 90–110% (slope −3.1 to −3.6). Efficiencies deviating from this range indicate co-purified inhibitors, suboptimal primer concentrations, or secondary structures in the template. Reference gene stability is validated by comparing variability (standard deviation of $C_t$ values) across experimental conditions; unstable reference genes (affected by the experimental treatment) introduce systematic bias. GeNorm and NormFinder algorithms rank candidate reference genes by stability.
 

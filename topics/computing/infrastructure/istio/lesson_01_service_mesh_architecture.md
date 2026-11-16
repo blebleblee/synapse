@@ -38,39 +38,41 @@ Envoy's internal architecture deserves careful examination because its design di
 
 Traffic flows through Envoy via a **listener → filter chain → cluster → endpoint** pipeline. A listener is a bound socket address. When a connection arrives on a listener, Envoy evaluates the listener's filter chain match criteria—which may include the destination port, the SNI value from a TLS ClientHello, or an application protocol detected via ALPN—to select the appropriate filter chain. The filter chain contains an ordered sequence of network filters and HTTP filters. For mesh traffic, the most important filter is the **HTTP Connection Manager (HCM)**, which terminates HTTP/1.1 or HTTP/2, parses the request, and routes it through a chain of HTTP filters including `router`, `cors`, `fault`, `ratelimit`, and Istio's custom telemetry and authorization filters. The HCM's route configuration selects a **cluster**, which represents an upstream service and contains load balancing policy, circuit breaker thresholds, and outlier detection configuration. The cluster resolves to a set of **endpoints**—the actual IP:port pairs of upstream instances—and uses a load balancing algorithm (round-robin, least-request, random, or ring hash) to select one for each request.
 
-```
-Inbound Connection (Transparent Interception via iptables)
-│
-▼
-┌─────────────────────────────────────────────┐
-│              Envoy Sidecar                  │
-│                                             │
-│  Listener (0.0.0.0:15006 inbound)           │
-│      │                                      │
-│      ▼                                      │
-│  Filter Chain Match                         │
-│  (SNI / ALPN / DestPort)                   │
-│      │                                      │
-│      ▼                                      │
-│  Network Filters                            │
-│  ┌──────────────────────────────┐           │
-│  │ TLS Inspector                │           │
-│  │ HTTP Connection Manager      │           │
-│  │  ├─ Fault Injection Filter   │           │
-│  │  ├─ RBAC Authorization Filter│           │
-│  │  ├─ Telemetry Filter         │           │
-│  │  └─ Router Filter            │           │
-│  └──────────────────────────────┘           │
-│      │                                      │
-│      ▼                                      │
-│  Route → Cluster → Endpoint Selection       │
-│      │                                      │
-│      ▼                                      │
-│  Upstream Connection Pool (HTTP/2 mux)      │
-└─────────────────────────────────────────────┘
-│
-▼
-Application Process (127.0.0.1:<app-port>)
+```mermaid
+flowchart TD
+    A["Inbound Connection<br/>(Transparent Interception via iptables)"]
+    
+    B["Envoy Sidecar"]
+    
+    C["Listener<br/>(0.0.0.0:15006 inbound)"]
+    
+    D["Filter Chain Match<br/>(SNI / ALPN / DestPort)"]
+    
+    E["Network Filters"]
+    
+    subgraph filters ["Network Filters Stack"]
+        F["TLS Inspector"]
+        G["HTTP Connection Manager"]
+        H["Fault Injection Filter"]
+        I["RBAC Authorization Filter"]
+        J["Telemetry Filter"]
+        K["Router Filter"]
+    end
+    
+    L["Route → Cluster → Endpoint Selection"]
+    
+    M["Upstream Connection Pool<br/>(HTTP/2 mux)"]
+    
+    N["Application Process<br/>(127.0.0.1:&lt;app-port&gt;)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> filters
+    filters --> L
+    L --> M
+    M --> N
 ```
 
 The critical implementation detail here is that Envoy maintains **separate listener configurations for inbound and outbound traffic**. Inbound traffic, intercepted by `iptables` rule `ISTIO_IN_REDIRECT` and redirected to port 15006, is processed by inbound listeners that enforce authorization policy and generate inbound telemetry. Outbound traffic, intercepted by `iptables` rule `ISTIO_OUTPUT` and redirected to port 15001, is processed by virtual outbound listeners that perform service discovery-based routing, enforce egress policy, and initiate mTLS connections to the destination sidecar's inbound listener. This two-sidecar-hop model means that a single application-to-application request traverses four Envoy filter chains total: through the client's outbound sidecar, through the wire, and through the server's inbound sidecar.
@@ -91,30 +93,26 @@ The mechanism by which Istiod distributes configuration to Envoy sidecars is the
 
 The protocol operates in one of two modes: **State of the World (SoTW)**, where each response contains the complete current set of resources, and **Incremental (Delta xDS)**, where responses contain only added, modified, or removed resources since the last ACK. For large meshes with hundreds of services, Delta xDS is critical for reducing control plane CPU and network overhead, since a change to a single `VirtualService` should not require retransmitting the entire route table to every proxy in the mesh.
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                        Istiod                            │
-│                                                          │
-│  ┌────────────────┐    ┌──────────────────────────────┐  │
-│  │ K8s API Watch  │───▶│  Internal Mesh Model          │  │
-│  │ (Informers)    │    │  (Services, Endpoints, Cfg)   │  │
-│  └────────────────┘    └──────────────┬───────────────┘  │
-│                                       │                  │
-│                              xDS Config Compiler        │
-│                                       │                  │
-│                       ┌───────────────▼──────────────┐  │
-│                       │      xDS gRPC Server          │  │
-│                       │  (LDS / RDS / CDS / EDS / SDS)│  │
-│                       └───────────────┬───────────────┘  │
-└───────────────────────────────────────┼──────────────────┘
-                                        │ Bidirectional gRPC Stream
-              ┌─────────────────────────┼──────────────────────┐
-              │                         │                      │
-              ▼                         ▼                      ▼
-     ┌──────────────┐        ┌──────────────┐        ┌──────────────┐
-     │ Envoy Sidecar│        │ Envoy Sidecar│        │ Envoy Sidecar│
-     │  (svc-a pod) │        │  (svc-b pod) │        │  (svc-c pod) │
-     └──────────────┘        └──────────────┘        └──────────────┘
+```mermaid
+flowchart TD
+    subgraph Istiod["Istiod"]
+        K8S["K8s API Watch<br/>(Informers)"]
+        MODEL["Internal Mesh Model<br/>(Services, Endpoints, Cfg)"]
+        COMPILER["xDS Config Compiler"]
+        XDS["xDS gRPC Server<br/>(LDS / RDS / CDS / EDS / SDS)"]
+        
+        K8S -->|watches| MODEL
+        MODEL --> COMPILER
+        COMPILER --> XDS
+    end
+    
+    ENVOY_A["Envoy Sidecar<br/>(svc-a pod)"]
+    ENVOY_B["Envoy Sidecar<br/>(svc-b pod)"]
+    ENVOY_C["Envoy Sidecar<br/>(svc-c pod)"]
+    
+    XDS <-->|"Bidirectional gRPC Stream"| ENVOY_A
+    XDS <-->|"Bidirectional gRPC Stream"| ENVOY_B
+    XDS <-->|"Bidirectional gRPC Stream"| ENVOY_C
 ```
 
 Each Envoy sidecar initiates a persistent bidirectional gRPC stream to Istiod at startup. It sends a `DiscoveryRequest` naming the resource type it wants (using the type URL as the discriminator, e.g., `type.googleapis.com/envoy.config.listener.v3.Listener`) and the version of the last configuration it successfully applied. Istiod responds with a `DiscoveryResponse` containing the current configuration. The sidecar applies the configuration, ACKs the response with the version nonce, and waits for push notifications of changes. If the sidecar fails to apply the configuration, it NACKs the response with an error message, causing Istiod to retain the previous version for that proxy. This ACK/NACK mechanism means Istiod has real-time visibility into which configuration version each proxy has successfully applied—a property that becomes essential for debugging configuration propagation failures.

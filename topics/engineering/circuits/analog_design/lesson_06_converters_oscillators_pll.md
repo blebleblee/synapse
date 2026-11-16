@@ -30,24 +30,42 @@ The SAR ADC is the workhorse of medium-to-high resolution, medium-to-high speed 
 
 The conversion sequence begins when the sample phase ends and the hold begins. The MSB capacitor ($2^{N-1}C$) is switched to the reference voltage $V_{REF}$, all others to ground, and the comparator determines whether the DAC output is above or below the held input. If above, the MSB is set to zero and that capacitor returns to ground; if below, the MSB stays set. This trial-and-decision process repeats down to the LSB. The total conversion time is $N+1$ clock cycles: one for sampling, $N$ for bit trials.
 
-```
-SAR ADC Internal Architecture:
-┌─────────────────────────────────────────────────────────┐
-│  VIN ──► [S/H Switch] ──► [Charge-Redistribution DAC]   │
-│                                │                         │
-│         ┌──────────────────────▼──────────────┐         │
-│         │   C/2  C/4  C/8  C/16 ... C/2^N     │         │
-│         │  [MSB]─────────────────────[LSB]     │         │
-│         │   │     │    │    │           │      │         │
-│         │  VREF/GND switch array (SAR ctrl)    │         │
-│         └──────────────────┬──────────────────┘         │
-│                            │                             │
-│                      [Comparator]                        │
-│                            │                             │
-│                      [SAR Logic]  ◄──── Clock            │
-│                            │                             │
-│                      [Output Register]  D[N-1:0]         │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph ADC["SAR ADC Internal Architecture"]
+        VIN["VIN<br/>Analog Input"]
+        SH["S/H Switch<br/>(Sample &amp; Hold)"]
+        DAC["Charge-Redistribution DAC"]
+
+        subgraph CapArray["Binary-Weighted Capacitor Array"]
+            direction LR
+            CMSB["C/2<br/>(MSB)"]
+            C2["C/4"]
+            C3["C/8"]
+            C4["C/16"]
+            CLSB["C/2^N<br/>(LSB)"]
+        end
+
+        SW["VREF/GND Switch Array<br/>(SAR Controlled)"]
+        CMP["Comparator"]
+        SAR["SAR Logic"]
+        CLK["Clock"]
+        OUT["Output Register<br/>D[N-1:0]"]
+
+        VIN --> SH
+        SH --> DAC
+        DAC --> CapArray
+        CMSB --> SW
+        C2 --> SW
+        C3 --> SW
+        C4 --> SW
+        CLSB --> SW
+        SW --> CMP
+        CMP --> SAR
+        SAR -.->|"Switch Control"| SW
+        CLK --> SAR
+        SAR --> OUT
+    end
 ```
 
 The critical design constraint in the charge redistribution DAC is capacitor matching. A 1-LSB error at any bit position produces a differential nonlinearity (DNL) error that causes missing codes or non-monotonic behavior. For a 12-bit SAR, the capacitor ratio accuracy required is $1/2^{12} \approx 0.024\%$ — well within reach for matched poly capacitors in a modern CMOS process, but requiring careful layout with common-centroid geometry and dummy capacitors at the array periphery to cancel gradient effects. Parasitic capacitance at the comparator input node ($C_{par}$) also degrades accuracy; it appears in parallel with the LSB capacitor, perturbing the binary weighting. Many designs add a small attenuation capacitor to the array's bottom plate to absorb this effect.
@@ -100,14 +118,15 @@ Ring oscillators replace the high-Q resonator with a cascade of inverting delay 
 
 A phase-locked loop is a feedback control system that minimizes the phase difference between a reference signal and the output of a voltage-controlled oscillator divided by an integer ratio $N$. The standard integer-N PLL topology contains four subsystems: the phase-frequency detector (PFD), the charge pump (CP), the loop filter (LF), and the VCO.
 
-```
-Integer-N PLL Signal Flow:
-                    ┌──────────────────────────────────────┐
-                    │                                      │
-  FREF ──► [PFD] ──► [Charge Pump] ──► [Loop Filter] ──► [VCO] ──► FOUT
-            ▲                                                │
-            │               ÷N                              │
-            └──────────── [Divider] ◄───────────────────────┘
+```mermaid
+flowchart LR
+    FREF["FREF"] --> PFD["PFD"]
+    PFD --> CP["Charge Pump"]
+    CP --> LF["Loop Filter"]
+    LF --> VCO["VCO"]
+    VCO --> FOUT["FOUT"]
+    VCO --> DIV["Divider<br/>÷N"]
+    DIV --> PFD
 ```
 
 The phase-frequency detector compares the rising edges of the reference $F_{REF}$ and the divided feedback $F_{FB}$, asserting a UP pulse if $F_{FB}$ lags, or a DOWN pulse if it leads. These pulse widths are proportional to phase error. The charge pump converts these digital pulses into analog current impulses: the UP path sources current $I_{CP}$ into the loop filter, and the DOWN path sinks $I_{CP}$ from it. The loop filter integrates these impulses into a smooth control voltage $V_{CTRL}$, which tunes the VCO.

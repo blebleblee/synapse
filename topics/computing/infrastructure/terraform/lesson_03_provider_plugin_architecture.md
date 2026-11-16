@@ -20,22 +20,16 @@ When you run `terraform init`, the CLI resolves provider requirements from your 
 
 When `terraform plan` or `terraform apply` runs, Terraform core launches each required provider binary as a child process. The launch sequence follows a precise handshake defined by `go-plugin`. The core process sets the environment variable `PLUGIN_PROTOCOL_VERSIONS` to the set of protocol versions it supports and writes a JSON-encoded `ReattachConfig` structure to the subprocess's stdin. The provider process reads this, starts a gRPC server on a randomly selected local port or Unix socket, and writes the server's address back to its stdout in a specific format that `go-plugin` parses. After this handshake, the core process holds a gRPC client stub connected to the provider's server and all subsequent communication is RPC over that connection.
 
-```
-Terraform Core Process
-        │
-        │  fork/exec provider binary
-        ▼
-Provider Subprocess
-        │
-        │  stdin: PLUGIN_PROTOCOL_VERSIONS, magic cookie
-        │  stdout: gRPC server address (host:port or unix socket path)
-        ▼
-        │
-        │  gRPC channel (local TCP or Unix domain socket)
-        │  wire format: Protocol Buffers (tfplugin6.proto)
-        │
-        ▼
-Terraform Core gRPC Client Stub
+```mermaid
+flowchart TD
+    A["Terraform Core Process"]
+    B["Provider Subprocess"]
+    C["Terraform Core gRPC Client Stub"]
+    
+    A -->|"fork/exec provider binary"| B
+    B -->|"stdin: PLUGIN_PROTOCOL_VERSIONS, magic cookie<br/>stdout: gRPC server address (host:port or unix socket path)"| C
+    
+    C -.->|"gRPC channel (local TCP or Unix domain socket)<br/>wire format: Protocol Buffers (tfplugin6.proto)"| B
 ```
 
 The magic cookie is a critical detail: it is a hardcoded environment variable (`TF_PLUGIN_MAGIC_COOKIE`) that the provider binary checks at startup. If the variable is absent or incorrect, the provider refuses to start and prints an error message explaining that it is a Terraform plugin and cannot be run directly. This prevents accidental direct execution of provider binaries by operators who might confuse them with standalone CLI tools.
@@ -62,15 +56,43 @@ The `Attribute` descriptor inside a schema block carries several flags that gove
 
 The `Sensitive` flag on an attribute instructs Terraform to redact its value in plan and apply output and to mark it as sensitive in state. Terraform state is not encrypted at rest by default in the open-source CLI — sensitive flag is a display-time redaction, not a storage-time encryption. This is a critical operational distinction: you must still use remote state backends with appropriate access controls for secrets.
 
-```
-Schema Attribute Flags — Planning Behavior Matrix
+```mermaid
+flowchart TD
+    FLAGS["Schema Attribute Flags\nPlanning Behavior Matrix"]
 
-Attribute Flag Combination        | Config Settable | Provider Fills Default | Preserved in State
-─────────────────────────────────────────────────────────────────────────────────────────────────
-Required only                     | Yes             | No                     | From config
-Optional only                     | Yes             | No                     | From config or null
-Computed only                     | No              | Yes                    | From provider
-Optional + Computed               | Yes             | Yes (if omitted)       | From provider if omitted
+    subgraph required ["Required Only"]
+        R_CS["Config Settable: Yes"]
+        R_PF["Provider Fills Default: No"]
+        R_PS["Preserved in State: From config"]
+    end
+
+    subgraph optional ["Optional Only"]
+        O_CS["Config Settable: Yes"]
+        O_PF["Provider Fills Default: No"]
+        O_PS["Preserved in State: From config or null"]
+    end
+
+    subgraph computed ["Computed Only"]
+        C_CS["Config Settable: No"]
+        C_PF["Provider Fills Default: Yes"]
+        C_PS["Preserved in State: From provider"]
+    end
+
+    subgraph optional_computed ["Optional + Computed"]
+        OC_CS["Config Settable: Yes"]
+        OC_PF["Provider Fills Default: Yes (if omitted)"]
+        OC_PS["Preserved in State: From provider if omitted"]
+    end
+
+    FLAGS --> required
+    FLAGS --> optional
+    FLAGS --> computed
+    FLAGS --> optional_computed
+
+    R_CS --> R_PF --> R_PS
+    O_CS --> O_PF --> O_PS
+    C_CS --> C_PF --> C_PS
+    OC_CS --> OC_PF --> OC_PS
 ```
 
 ### Building a Provider from Scratch: The terraform-plugin-framework
@@ -495,26 +517,17 @@ The `~> 1.0` constraint uses the pessimistic constraint operator, which allows p
 
 Protocol version negotiation happens during the subprocess handshake. Terraform core announces the protocol versions it supports (currently `[5, 6]`). The provider binary announces which versions it implements. Core selects the highest mutually supported version. If there is no overlap — for instance, a very old provider binary that only speaks protocol 4 running against a modern Terraform core that dropped protocol 4 support — the handshake fails and Terraform prints an explicit incompatibility error. This is why the `.terraform.lock.hcl` file is so important to commit to version control: it prevents an operator from inadvertently upgrading a provider to a version that speaks a protocol the installed Terraform binary no longer supports, or vice versa.
 
-```
-Terraform Core                         Provider Binary
-     │                                       │
-     │  PLUGIN_PROTOCOL_VERSIONS=[5,6]       │
-     │ ─────────────────────────────────────►│
-     │                                       │
-     │  stdout: protocol=6,addr=127.0.0.1:N  │
-     │ ◄─────────────────────────────────────│
-     │                                       │
-     │  gRPC: GetProviderSchema()            │
-     │ ─────────────────────────────────────►│
-     │                                       │
-     │  Response: resource schemas, etc.     │
-     │ ◄─────────────────────────────────────│
-     │                                       │
-     │  gRPC: ConfigureProvider()            │
-     │ ─────────────────────────────────────►│
-     │                                       │
-     │  Response: diagnostics (empty=OK)     │
-     │ ◄─────────────────────────────────────│
+```mermaid
+flowchart LR
+    TF["Terraform Core"]
+    PB["Provider Binary"]
+    
+    TF -->|"PLUGIN_PROTOCOL_VERSIONS=[5,6]"| PB
+    PB -->|"stdout: protocol=6,addr=127.0.0.1:N"| TF
+    TF -->|"gRPC: GetProviderSchema()"| PB
+    PB -->|"Response: resource schemas, etc."| TF
+    TF -->|"gRPC: ConfigureProvider()"| PB
+    PB -->|"Response: diagnostics (empty=OK)"| TF
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

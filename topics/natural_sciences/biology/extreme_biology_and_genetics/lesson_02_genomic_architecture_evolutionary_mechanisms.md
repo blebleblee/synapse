@@ -32,54 +32,40 @@ To move from principle to practice, consider the architecture of a canonical ext
 
 The following diagram captures the high-level flow of genomic information and adaptive change through a prokaryotic extremophile lineage:
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    EXTREMOPHILE GENOME DYNAMICS                      │
-└─────────────────────────────────────────────────────────────────────┘
-
-  ENVIRONMENTAL STRESS
-        │
-        ▼
-  ┌─────────────────┐    DNA Damage / Starvation / ROS
-  │  Stress Sensor  │───────────────────────────────────────┐
-  │  (RecA, LexA,   │                                       │
-  │   σ factors)    │                                       ▼
-  └────────┬────────┘                          ┌───────────────────────┐
-           │                                   │  SOS / Stress Regulon │
-           │  Transcriptional                  │  Derepression         │
-           │  Reprogramming                    │  PolIV (DinB)         │
-           ▼                                   │  PolV (UmuCD)         │
-  ┌─────────────────┐                          │  ↑ Mutation Rate      │
-  │  Core Genome    │◄─────────────────────────└───────────────────────┘
-  │  (Conserved:    │
-  │  rRNA, ribos.,  │      VERTICAL INHERITANCE
-  │  DNA Pol III)   │──────────────────────────────────────────────►
-  └────────┬────────┘
-           │
-           │  Recombination / Integration
-           ▼
-  ┌─────────────────────────────────────────────────────────────────┐
-  │                    ACCESSORY GENOME                              │
-  │  ┌───────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
-  │  │ Genomic       │  │   Plasmids   │  │ Transposable         │  │
-  │  │ Islands (GI)  │  │  (pHV1,      │  │ Elements             │  │
-  │  │ Metal resist. │  │   pNOB8)     │  │ (IS elements,        │  │
-  │  │ Efflux pumps  │  │              │  │  Insertion Seqs.)    │  │
-  │  └───────┬───────┘  └──────┬───────┘  └──────────┬───────────┘  │
-  └──────────┼────────────────┼────────────────────── ┼─────────────┘
-             │                │                        │
-             └────────────────┴────────────────────────┘
-                                      │
-                              HGT CHANNELS
-                 ┌────────────────────┼─────────────────────┐
-                 ▼                    ▼                      ▼
-        ┌─────────────┐      ┌──────────────┐      ┌─────────────────┐
-        │Transformation│      │  Transduction │      │  Conjugation    │
-        │             │      │              │      │                 │
-        │Naked DNA +  │      │ Phage-packed │      │ T4SS pilus +    │
-        │ ComB/T4P    │      │ generalized  │      │ ICE/plasmid     │
-        │ RecA/SSB    │      │ or specialized│      │ relaxase-oriT  │
-        └─────────────┘      └──────────────┘      └─────────────────┘
+```mermaid
+flowchart TD
+    EnvStress["ENVIRONMENTAL STRESS"]
+    
+    EnvStress --> StressSensor["Stress Sensor<br/>(RecA, LexA, σ factors)"]
+    
+    StressSensor -->|"DNA Damage / Starvation / ROS"| SOSRegulon["SOS / Stress Regulon<br/>Derepression<br/>PolIV (DinB)<br/>PolV (UmuCD)<br/>↑ Mutation Rate"]
+    
+    StressSensor -->|"Transcriptional<br/>Reprogramming"| CoreGenome["Core Genome<br/>(Conserved:<br/>rRNA, ribos.,<br/>DNA Pol III)"]
+    
+    SOSRegulon --> CoreGenome
+    
+    CoreGenome -->|"VERTICAL INHERITANCE"| VerticalInheritance[(" ")]
+    
+    CoreGenome -->|"Recombination / Integration"| AccessoryGenome
+    
+    subgraph AccessoryGenome["ACCESSORY GENOME"]
+        GI["Genomic Islands (GI)<br/>Metal resist.<br/>Efflux pumps"]
+        Plasmids["Plasmids<br/>(pHV1, pNOB8)"]
+        TE["Transposable Elements<br/>(IS elements,<br/>Insertion Seqs.)"]
+    end
+    
+    GI --> HGTChannels["HGT CHANNELS"]
+    Plasmids --> HGTChannels
+    TE --> HGTChannels
+    
+    HGTChannels --> Transformation["Transformation<br/><br/>Naked DNA +<br/>ComB/T4P<br/>RecA/SSB"]
+    HGTChannels --> Transduction["Transduction<br/><br/>Phage-packed<br/>generalized<br/>or specialized"]
+    HGTChannels --> Conjugation["Conjugation<br/><br/>T4SS pilus +<br/>ICE/plasmid<br/>relaxase-oriT"]
+    
+    style EnvStress fill:#e1f5ff
+    style CoreGenome fill:#fff4e6
+    style AccessoryGenome fill:#f0f0f0
+    style SOSRegulon fill:#ffe6e6
 ```
 
 ### Measuring Mutation Rates: The Luria-Delbrück Fluctuation Assay
@@ -110,7 +96,7 @@ Measuring evolutionary rate variation and mapping the architecture of genomic pl
 
 **Sequencing and Assembly.** For short-read assemblies, Illumina paired-end sequencing at 100× coverage depth provides sufficient resolution for SNP calling and structural variant detection in genomes under 10 Mb. For capturing mobile genetic elements and long repetitive insertion sequences accurately, PacBio HiFi or Oxford Nanopore long-read sequencing is essential: IS elements are typically 1–2.5 kb, and short reads cannot resolve the repetitive sequences flanking them. A hybrid assembly combining Illumina short reads for high base accuracy with Nanopore long reads for repeat resolution — using tools like **Unicycler** (which wraps SPAdes for the short-read graph, then uses long reads to resolve ambiguous nodes) — produces near-complete circular chromosome assemblies that accurately reflect mobile element architecture.
 
-Assembly quality is assessed with **CheckM2**, which estimates completeness and contamination by comparing the assembly against a marker gene database using machine learning, and **BUSCO**, which measures the fraction of conserved single-copy orthologs recovered. For extremophile genomes, where reference databases are sparse, CheckM2 lineage-specific mode is preferred over universal marker set mode. A finished assembly should achieve >99% completeness and <1% contamination before proceeding to annotation.
+Assembly quality is assessed with **CheckM2**, which estimates completeness and contamination by comparing the assembly against a marker gene database using machine learning, and **BUSCO**, which measures the fraction of conserved single-copy orthologs recovered. For extremophile genomes, where reference databases are sparse, CheckM2 lineage-specific mode is preferred over universal marker set mode. A finished assembly should achieve >99% completeness and < 1% contamination before proceeding to annotation.
 
 **Annotation.** Prokaryotic genome annotation is performed with **Prokka**, which uses a hierarchical evidence weighting system: trusted curated protein databases (UniProtKB/Swiss-Prot) are queried first, followed by species-specific databases, then genus-level matches, and finally general databases (HAMAP, Pfam, TIGRFAMs). For extremophile genomes where large fractions of the proteome may be novel — in some deep-sea hydrothermal vent organisms, 40–60% of predicted ORFs have no functional annotation — supplement Prokka with **EggNOG-mapper** using the DIAMOND ultra-sensitive alignment mode to assign COG categories and KEGG pathway identifiers to hypothetical proteins. Run:
 

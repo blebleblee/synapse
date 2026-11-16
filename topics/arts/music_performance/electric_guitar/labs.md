@@ -352,12 +352,12 @@ graph LR
 
     E --> F --> G
 
-    style A fill:#d4e8ff
-    style B fill:#fff4cc
-    style D fill:#ffd4d4
-    style F fill:#e8e8e8
-    style G fill:#d4ffd4
-    style J fill:#d4ffd4
+    style A fill:#d4e8ff,color:#0f172a
+    style B fill:#fff4cc,color:#0f172a
+    style D fill:#ffd4d4,color:#0f172a
+    style F fill:#e8e8e8,color:#0f172a
+    style G fill:#d4ffd4,color:#0f172a
+    style J fill:#d4ffd4,color:#0f172a
 ```
 
 ### 3.3 Volume and Tone Controls — What They Actually Do
@@ -480,10 +480,10 @@ graph LR
     F --> G
     H --> I
 
-    style A fill:#d4e8ff
-    style E fill:#ffd4d4
-    style G fill:#fff4cc
-    style K fill:#d4ffd4
+    style A fill:#d4e8ff,color:#0f172a
+    style E fill:#ffd4d4,color:#0f172a
+    style G fill:#fff4cc,color:#0f172a
+    style K fill:#d4ffd4,color:#0f172a
 ```
 
 **Three rules behind the order:**
@@ -580,7 +580,7 @@ graph TD
 
 | Pickup Type | Normal DC Resistance | Fault Indicator |
 |-------------|------------------------|-------------------|
-| Strat single-coil | 5.6–7.5 kΩ | >100 kΩ open, <1 kΩ short |
+| Strat single-coil | 5.6–7.5 kΩ | >100 kΩ open, < 1 kΩ short |
 | Tele bridge single-coil | 6.0–8.5 kΩ | Same thresholds |
 | P-90 | 7.5–9.5 kΩ | Same thresholds |
 | PAF-style humbucker | 7.0–9.0 kΩ | Same thresholds |
@@ -590,7 +590,7 @@ A coil can read in-spec resistance but still have a partial turns-short, showing
 
 ### 5.7 Solder Joint Quality
 
-**Good joint:** shiny, smooth, concave volcano-cone fillet. Doesn't flex when poked with a toothpick. <0.1 Ω continuity.
+**Good joint:** shiny, smooth, concave volcano-cone fillet. Doesn't flex when poked with a toothpick. < 0.1 Ω continuity.
 
 **Cold joint:** dull, grainy, gray, often balled or convex. Causes crackling and intermittent dropouts when the guitar is handled — usually from moving the joint before the solder solidified, insufficient heat, or an oxidized surface.
 
@@ -612,7 +612,7 @@ A coil can read in-spec resistance but still have a partial turns-short, showing
 1. Remove controls and the cavity cover/pickguard.
 2. Cut foil to line the cavity walls and floor, overlapping pieces by 5 mm minimum for continuity.
 3. Press foil firmly onto every surface, including pickup routes if accessible.
-4. Verify continuity: probe two foil sections with a multimeter, should read <1 Ω.
+4. Verify continuity: probe two foil sections with a multimeter, should read < 1 Ω.
 5. Solder a short ground wire from the foil to the existing ground bus (pot casing or common ground wire).
 6. Reassemble. The foil forms a Faraday cage around the cavity wiring, cutting hum pickup from external EMI fields dramatically.
 

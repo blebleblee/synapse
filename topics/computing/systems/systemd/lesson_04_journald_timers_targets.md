@@ -20,36 +20,31 @@ The journal file, stored at `/var/log/journal/<machine-id>/system.journal` for p
 
 The indexing architecture is the key to the journal's query performance. Each unique field name, such as `_SYSTEMD_UNIT` or `MESSAGE`, is stored once as an `OBJECT_FIELD`. Each unique field-value pair, such as `_SYSTEMD_UNIT=sshd.service`, is stored once as an `OBJECT_DATA` object. The data object is hashed and inserted into the data hash table. A journal entry, stored as an `OBJECT_ENTRY`, does not contain inline field data. It contains an array of offsets pointing to the `OBJECT_DATA` objects that constitute its fields. This design means that if ten thousand log entries all share the same `_SYSTEMD_UNIT=nginx.service` field, the string `nginx.service` is stored once in the file, and each entry references it by offset. The entry array object provides a contiguous, append-ordered index of all entry offsets, enabling `journalctl --reverse` and sequential traversal without hash table traversal.
 
-```
-+----------------------------------------------------------+
-|  Journal File Header (page 0)                            |
-|  signature, machine_id, boot_id, seqnum,                 |
-|  offsets to: data_hash_table, field_hash_table,          |
-|  entry_array, tail_entry_array,                          |
-|  arena_offset, arena_size                                |
-+----------------------------------------------------------+
-|  OBJECT_FIELD: "_SYSTEMD_UNIT"                           |
-|  OBJECT_FIELD: "MESSAGE"                                 |
-|  OBJECT_FIELD: "PRIORITY"                                |
-+----------------------------------------------------------+
-|  OBJECT_DATA: "_SYSTEMD_UNIT=nginx.service"              |
-|     hash table entry -> next pointer (chaining)          |
-|  OBJECT_DATA: "MESSAGE=worker process exited"            |
-|  OBJECT_DATA: "PRIORITY=6"                               |
-+----------------------------------------------------------+
-|  OBJECT_ENTRY: entry #1                                  |
-|     [offset->DATA, offset->DATA, offset->DATA, ...]     |
-|  OBJECT_ENTRY: entry #2                                  |
-|     [offset->DATA, offset->DATA, offset->DATA, ...]     |
-+----------------------------------------------------------+
-|  OBJECT_ENTRY_ARRAY: [offset->ENTRY#1, offset->ENTRY#2] |
-|     next_array -> (chained for large files)              |
-+----------------------------------------------------------+
-|  OBJECT_DATA_HASH_TABLE                                  |
-|     bucket[hash] -> chain of OBJECT_DATA offsets          |
-|  OBJECT_FIELD_HASH_TABLE                                  |
-|     bucket[hash] -> chain of OBJECT_FIELD offsets        |
-+----------------------------------------------------------+
+```mermaid
+flowchart TD
+    subgraph header ["Journal File Header (page 0)"]
+        HDR["signature, machine_id, boot_id, seqnum
+        offsets → data_hash_table, field_hash_table,
+        entry_array, tail_entry_array,
+        arena_offset, arena_size"]
+    end
+
+    subgraph fields ["Field Objects"]
+        F1["OBJECT_FIELD: '_SYSTEMD_UNIT'"]
+        F2["OBJECT_FIELD: 'MESSAGE'"]
+        F3["OBJECT_FIELD: 'PRIORITY'"]
+    end
+
+    subgraph data_objects ["Data Objects"]
+        D1["OBJECT_DATA: '_SYSTEMD_UNIT=nginx.service'
+        hash table entry → next pointer (chaining)"]
+        D2["OBJECT_DATA: 'MESSAGE=worker process exited'"]
+        D3["OBJECT_DATA: 'PRIORITY=6'"]
+    end
+
+    subgraph entries ["Entry Objects"]
+        E1["OBJECT_ENTRY: entry #1
+        [offset→DATA, offset→DATA, offset→DATA, …
 ```
 
 The hash table uses chaining with open addressing fallback. When a hash collision occurs, the journal implementation walks the chain of data objects linked through the `next_hash_offset` field. The hash function is a Jenkins hash variant, chosen for its uniform distribution and incremental computation properties. When the hash table load factor exceeds a threshold, `journald` allocates a new, larger hash table and rehashes, updating the header offsets atomically. The file is designed for concurrent append-only writes with a single writer, and crash consistency is maintained through the `seqnum` counter and the `tail_entry_array_offset` pointer, which allows recovery to the last consistent entry on unclean shutdown.
@@ -218,30 +213,18 @@ The systemd boot process begins when the kernel executes `/sbin/init` (symlinked
 
 The boot dependency graph is layered through a hierarchy of targets, each serving as a synchronization barrier:
 
-```
-+------------------+
-|  initrd.target   |  (dracut/initramfs phase, if applicable)
-+--------+---------+
-         |
-+--------v---------+
-| sysinit.target    |  udev coldplug, kernel module loading,
-|                   |  file system mounts, swap activation,
-|                   |  /tmp mount, machine-id setup
-+--------+---------+
-         |
-+--------v---------+
-| basic.target      |  socket activation, D-Bus, timer activation,
-|                   |  paths, slices, systemd-journald
-+--------+---------+
-         |
-+--------v---------+
-| multi-user.target |  sshd, cron replacement, getty login,
-|                   |  networking services, database services
-+--------+---------+
-         |
-+--------v---------+
-| graphical.target  |  display manager, user session services
-+------------------+
+```mermaid
+flowchart TD
+    initrd["initrd.target<br/><small>dracut/initramfs phase, if applicable</small>"]
+    sysinit["sysinit.target<br/><small>udev coldplug, kernel module loading,<br/>file system mounts, swap activation,<br/>/tmp mount, machine-id setup</small>"]
+    basic["basic.target<br/><small>socket activation, D-Bus, timer activation,<br/>paths, slices, systemd-journald</small>"]
+    multiuser["multi-user.target<br/><small>sshd, cron replacement, getty login,<br/>networking services, database services</small>"]
+    graphical["graphical.target<br/><small>display manager, user session services</small>"]
+    
+    initrd --> sysinit
+    sysinit --> basic
+    basic --> multiuser
+    multiuser --> graphical
 ```
 
 Each target in this chain declares `Requires=` and `After=` on the target below it, enforcing the cascade. Services that should run in the `sysinit` phase declare `After=sysinit.target` implicitly through their placement in `sysinit.target.wants/` or explicitly via `Requires=sysinit.target`. The `systemd` generator programs, located at `/lib/systemd/system-generators/`, translate legacy configuration formats like `/etc/fstab` and `/etc/crypttab` into transient unit files at boot, injecting mount and crypto units into the dependency graph dynamically.
@@ -274,16 +257,20 @@ The `critical-chain` subcommand shows the ordering dependency chain for a given 
 systemd-analyze critical-chain multi-user.target
 ```
 
-```
-The time when unit became active or started is printed after the "@" character.
-The time the unit took to start is printed after the "+" character.
+```mermaid
+flowchart TD
+    A["multi-user.target\n@ 8.234s"]
+    B["plymouth-quit-wait.service\n@ 102ms | took +8.123s"]
+    C["systemd-user-sessions.service\n@ 98ms | took +2ms"]
+    D["network.target\n@ 95ms | took +1ms"]
+    E["systemd-networkd-wait-online.service\n@ 50ms | took +45ms"]
+    F["systemd-networkd.service\n@ 20ms | took +29ms"]
 
-multi-user.target @8.234s
-└─plymouth-quit-wait.service @102ms +8.123s
-└─systemd-user-sessions.service @98ms +2ms
-└─network.target @95ms +1ms
-└─systemd-networkd-wait-online.service @50ms +45ms
-└─systemd-networkd.service @20ms +29ms
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 The `plot` subcommand generates an SVG timeline showing every unit's activation window, which is the definitive diagnostic for understanding parallelism and serialization in the boot:

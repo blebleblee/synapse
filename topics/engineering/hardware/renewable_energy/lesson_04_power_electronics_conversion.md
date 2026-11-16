@@ -26,16 +26,41 @@ The choice between string inverters, central inverters, and microinverters embod
 
 The synchronous buck converter represents the canonical DC-DC topology for photovoltaic applications, replacing the freewheeling diode with a second MOSFET to eliminate diode forward voltage drop losses and enable bidirectional power flow for battery charging systems. The power stage comprises two switches $Q_1$ and $Q_2$ arranged in a half-bridge configuration with the switch node connecting to an inductor $L$, which filters the pulsed switch-node voltage into a continuous output current. An output capacitor $C_o$ attenuates the inductor current ripple, maintaining a stable output voltage against load transients.
 
-```
-              SW Node
-    Vin ──┬─── Q1 ───┬──── L ────┬──── Vout
-          │    ▲     │           │
-          │    │     │           C_o
-          │   Gate   │           │
-         ===   Drv   Q2          Load
-         ─┬─         │           │
-          │          │           │
-         GND ────────┴───────────┴──── GND
+```mermaid
+flowchart LR
+    Vin["Vin"]
+    Q1["Q1"]
+    L["L"]
+    Vout["Vout"]
+    Cin["C_in"]
+    GateDrv["Gate Driver"]
+    Q2["Q2"]
+    Co["C_o"]
+    Load["Load"]
+    GND1["GND"]
+    GND2["GND"]
+    GND3["GND"]
+    GND4["GND"]
+    
+    Vin --> Junction1{ }
+    Junction1 --> Q1
+    Junction1 --> Cin
+    Cin --> GND1
+    
+    Q1 --> Junction2{ }
+    GateDrv --> Q1
+    
+    Junction2 --> L
+    Junction2 --> Q2
+    Q2 --> GND2
+    
+    L --> Junction3{ }
+    Junction3 --> Vout
+    Junction3 --> Co
+    Junction3 --> Load
+    
+    Co --> GND3
+    Load --> GND4
 ```
 
 During the on-time, the controller's gate driver charges $Q_1$'s gate capacitance to 10 or 12 volts above its source potential, closing the channel and connecting the input voltage to the switch node. Current flows through $Q_1$'s channel resistance, through the inductor, to the load and output capacitor. The inductor voltage equals $V_{in} - V_{out} - I_L R_{Q1}$, causing inductor current to ramp upward with slope $(V_{in} - V_{out})/L$. After the on-time $DT_s$ elapses, the controller discharges $Q_1$'s gate and charges $Q_2$'s gate, connecting the switch node to ground. The inductor current continues flowing through $Q_2$ into the output, now decreasing with slope $-V_{out}/L$ as the magnetic field collapses. The ripple current magnitude, defined as half the peak-to-peak inductor current swing, equals $(V_{in} - V_{out})DT_s / (2L)$, directly informing inductor selection.
@@ -48,15 +73,31 @@ The control loop that regulates output voltage comprises an error amplifier, pul
 
 Boost converter operation for MPPT inverts the switching sequence, storing energy in the inductor during the on-time when the switch connects the inductor to ground, then releasing energy to the output during the off-time through the catch diode. The inductor sits between the PV array and the switch node, experiencing the full array voltage during the off-time and zero voltage minus the switch drop during the on-time. This arrangement forces continuous inductor current even at light loads when the buck converter would enter discontinuous conduction mode, eliminating the DCM-related subharmonic oscillation that plagues current-mode controlled buck converters but introducing the right-half-plane zero that limits control bandwidth.
 
-```
-  Array(+) ──── L ────┬──── D1 ────┬──── Vout(+)
-                      │      ▲     │
-                     SW     │     C_o
-                     Node   │      │
-                      │     │     Load
-                      Q1    │      │
-                      │     │      │
-  Array(−) ───────────┴─────┴──────┴──── Vout(−)
+```mermaid
+flowchart LR
+    ArrayPos["Array(+)"]
+    ArrayNeg["Array(−)"]
+    L["L"]
+    SW["SW Node"]
+    Q1["Q1"]
+    D1["D1"]
+    Co["C_o"]
+    Load["Load"]
+    VoutPos["Vout(+)"]
+    VoutNeg["Vout(−)"]
+    
+    ArrayPos --> L
+    L --> SW
+    L --> D1
+    SW --> Q1
+    D1 --> VoutPos
+    D1 -.feedback.-> SW
+    VoutPos --> Co
+    Co --> Load
+    Q1 --> ArrayNeg
+    SW --> ArrayNeg
+    Load --> VoutNeg
+    VoutNeg --> ArrayNeg
 ```
 
 The boost converter's output voltage capability enables direct grid-tie inverter architectures without a bulky line-frequency transformer. A single-stage boost inverter elevates the PV array voltage to 400 or 450 volts DC, providing sufficient headroom above the 240-volt RMS grid voltage to synthesize sinusoidal current waveforms through PWM. The DC bus capacitor—typically several hundred microfarads of film or electrolytic capacitance—absorbs the double-line-frequency power pulsation inherent in single-phase systems, where instantaneous power varies as $P = V_{grid} I_{grid} \cos \phi (1 - \cos 2\omega t)$. This 120-hertz component stresses the capacitor with RMS ripple current equal to the output power divided by the DC bus voltage, demanding careful derating and thermal management to achieve 20-year design lifetimes.

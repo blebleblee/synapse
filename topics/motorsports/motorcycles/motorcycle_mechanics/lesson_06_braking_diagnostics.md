@@ -48,46 +48,18 @@ Piston material in performance applications has evolved from stainless steel thr
 
 Caliper bleed nipple placement and caliper orientation are installation details that carry significant diagnostic weight. The bleed nipple must sit at the highest point of the caliper fluid volume when installed on the motorcycle. Any vapor or air in the system will migrate upward, and if the bleed point is not at the apex of the fluid path, air pockets will remain trapped regardless of how thoroughly the system is bled. Incorrect caliper orientation — a problem that can arise when aftermarket calipers are fitted to non-standard fork configurations — is a frequent source of persistent air retention that defeats conventional bleeding procedures.
 
-```
-FRONT BRAKE HYDRAULIC CIRCUIT — SIGNAL AND FORCE PATH
-
-                    ┌─────────────────────────────────────┐
-                    │         BRAKE LEVER                 │
-                    │   Input Force: F_lever (kg)         │
-                    └───────────────┬─────────────────────┘
-                                    │ Mechanical pivot / radial linkage
-                                    ▼
-                    ┌─────────────────────────────────────┐
-                    │      MASTER CYLINDER                │
-                    │  Bore: Ø 14–16 mm                   │
-                    │  Primary cup seal → pressure chamber│
-                    │  Bypass port → reservoir bleed      │
-                    │  P = F / A_mc  (bar)                │
-                    └───────────────┬─────────────────────┘
-                                    │ Braided stainless line
-                                    │ (incompressible fluid column)
-                                    ▼
-                    ┌─────────────────────────────────────┐
-                    │     BRAKE LINE / ABS MODULATOR      │
-                    │  (If ABS-equipped: valve block,     │
-                    │   accumulator, return pump)         │
-                    └───────────────┬─────────────────────┘
-                                    │
-                                    ▼
-                    ┌─────────────────────────────────────┐
-                    │         CALIPER                     │
-                    │  4-piston monobloc, radial mount    │
-                    │  Staggered bore (trail / lead)      │
-                    │  F_clamp = P × A_caliper_total      │
-                    └───────────────┬─────────────────────┘
-                                    │ Pad-to-rotor normal force
-                                    ▼
-                    ┌─────────────────────────────────────┐
-                    │         ROTOR                       │
-                    │  Cast iron / stainless floating     │
-                    │  F_brake = F_clamp × μ_pad          │
-                    │  Torque = F_brake × R_rotor         │
-                    └─────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["BRAKE LEVER<br/>Input Force: F_lever (kg)"]
+    B["MASTER CYLINDER<br/>Bore: Ø 14–16 mm<br/>Primary cup seal → pressure chamber<br/>Bypass port → reservoir bleed<br/>P = F / A_mc (bar)"]
+    C["BRAKE LINE / ABS MODULATOR<br/>(If ABS-equipped: valve block,<br/>accumulator, return pump)"]
+    D["CALIPER<br/>4-piston monobloc, radial mount<br/>Staggered bore (trail / lead)<br/>F_clamp = P × A_caliper_total"]
+    E["ROTOR<br/>Cast iron / stainless floating<br/>F_brake = F_clamp × μ_pad<br/>Torque = F_brake × R_rotor"]
+    
+    A -->|"Mechanical pivot /<br/>radial linkage"| B
+    B -->|"Braided stainless line<br/>(incompressible fluid column)"| C
+    C -->|"Hydraulic pressure"| D
+    D -->|"Pad-to-rotor<br/>normal force"| E
 ```
 
 ### Rotor Design and Thermal Management

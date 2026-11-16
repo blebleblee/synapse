@@ -43,24 +43,33 @@ The shift was not instantaneous or uniform. It began in the south and southeast 
 
 The dialect geography of English is best understood not as a set of discrete boxes but as a set of **isogloss bundles** — lines on a map where one or more linguistic features change. Where many isoglosses cluster together, we perceive a dialect boundary; where they are dispersed, we see a dialect continuum. The major structural divisions in British English fall along a north-south axis, with the **Humber-Ribble line** (the old boundary of the Danelaw) functioning as a persistent phonological and lexical fault line. North of this line, the distinction between /ʊ/ and /ʌ/ is largely absent — *foot* and *strut* share the vowel /ʊ/ — and vocabulary shows higher rates of Scandinavian borrowing (*lake*, *beck*, *gill* for geographic features, versus Southern English *pond*, *stream*).
 
-```
-BRITISH ISOGLOSS SCHEMATIC (Simplified)
+```mermaid
+flowchart TD
+    ScottishEnglish["Scottish English\n(Scots Lowlands)"]
+    FootStrut(["— FOOT-STRUT merger persists above this line —"])
+    NorthernEnglish["Northern English\n(Yorkshire · Lancashire · Durham · Geordie)"]
+    HumberRibble(["— Humber-Ribble Line · Danelaw boundary ~865 CE —"])
+    EastMidlands["East Midlands\n(Transition zone · mixed features)"]
+    WestMidlands["West Midlands\n(Black Country · Birmingham · Brummie)"]
+    SouthernEnglish["Southern English\n(Home Counties · East Anglia)"]
+    London["London\n(RP prestige core · Cockney · Multicultural London English)"]
 
-[Scottish English] ─────────── Scots Lowlands
-        │
-   FOOT-STRUT merger persists above this line
-        │
-[Northern English] ── Yorkshire, Lancashire, Durham, Geordie
-        │
-   Humber-Ribble Line (Danelaw boundary ~865 CE)
-        │
-[East Midlands]  ── Transition zone, mixed features
-        │
-[West Midlands]  ── Black Country, Birmingham (Brummie)
-        │
-[Southern English] ── Home Counties, East Anglia
-        │
-   London (RP prestige core + Cockney/Multicultural London English)
+    ScottishEnglish --> FootStrut
+    FootStrut --> NorthernEnglish
+    NorthernEnglish --> HumberRibble
+    HumberRibble --> EastMidlands
+    EastMidlands --> WestMidlands
+    WestMidlands --> SouthernEnglish
+    SouthernEnglish --> London
+
+    style FootStrut  fill:#f5f0e8,stroke:#a89070,stroke-dasharray:6 4,color:#5a4a30
+    style HumberRibble fill:#f5f0e8,stroke:#a89070,stroke-dasharray:6 4,color:#5a4a30
+    style ScottishEnglish  fill:#d0e8f5,stroke:#4a7a9b,color:#1a3a5c
+    style NorthernEnglish  fill:#d5ecd5,stroke:#4a8a4a,color:#1a3c1a
+    style EastMidlands     fill:#ede8f5,stroke:#7a5a9b,color:#3a1a5c
+    style WestMidlands     fill:#f5e8ed,stroke:#9b4a6a,color:#5c1a3a
+    style SouthernEnglish  fill:#f5f0d5,stroke:#9b8a30,color:#5c4a10
+    style London           fill:#fde8cc,stroke:#c0702a,color:#6b3010
 ```
 
 In the United States, the dialectal architecture is shaped by settlement patterns and the sociolinguistic consequences of migration waves. The **Northern Cities Vowel Shift** (NCVS), documented extensively by Labov, Ash, and Boberg in *The Atlas of North American English* (2006), shows cities along the Great Lakes — Chicago, Detroit, Cleveland, Buffalo — undergoing a rotation of vowel nuclei quite unlike anything in British English. The vowel in *caught* lowers and fronts toward /æ/; the vowel in *cat* raises toward /eɪ/; the vowel in *bus* fronts. The result is that a speaker from Chicago saying "The boss got a lot of hot coffee" sounds, to an outsider, as though several vowels have swapped positions. This is not sloppy speech. It is a systematically innovative dialect that is diverging from, rather than converging toward, standard American English — a fact that challenges the folk-linguistic assumption that mass media produces dialect leveling.

@@ -255,4 +255,22 @@ Recovery from these failure modes is difficult in bare-metal systems because the
 
 ### Optimization Patterns: Polling vs. Interrupts, Busy-Waiting, and DMA Integration
 
-Embedded systems often face a choice between polling and interrupt-driven designs. Polling means the main loop repeatedly checks whether an event has occurred (e.g., reading a GPIO input
+Embedded systems often face a choice between polling and interrupt-driven designs.
+
+**Polling** is appropriate when latency requirements are relaxed, CPU utilization is low, or the event rate is predictable (e.g., sampling a sensor every 100ms). Polling eliminates interrupt overhead and simplifies timing analysis but wastes CPU cycles and increases response latency. **Interrupts** are necessary when latency must be bounded (sub-microsecond response) or when multiple asynchronous events must be serviced concurrently. The tradeoff is determinism versus efficiency: polling yields predictable execution but poor resource utilization; interrupts maximize efficiency but introduce jitter and priority inversion risk.
+
+**Busy-waiting** inside an ISR—spinning on a hardware flag or shared variable—is almost always incorrect. It blocks lower-priority ISRs, wastes CPU cycles, and can cause deadlock if the condition depends on another ISR. The correct pattern is to signal the condition (via flag or semaphore) and return immediately, allowing the application or a deferred handler to poll or block on the condition outside interrupt context.
+
+**DMA integration** offloads bulk data transfers (UART RX buffers, SPI transactions, ADC sample arrays) from the CPU to hardware, reducing interrupt frequency and freeing CPU cycles for application logic. The typical pattern is to configure a circular DMA buffer, enable transfer-complete and half-transfer interrupts, and process data in chunks within the ISR or a deferred task. DMA eliminates per-byte interrupts (reducing overhead by 10–100×) but requires careful cache coherency management on systems with data caches: invalidate cache lines before reading DMA-written data, flush cache lines before DMA reads application-written data. Failure to manage coherency results in stale or corrupted data.
+
+The optimization hierarchy is: prefer DMA for bulk transfers, use interrupts for low-latency events, reserve polling for low-rate or non-critical events, and never busy-wait in ISR context.
+
+## 4. Summary & Verification Matrix
+
+| **Invariant/Mechanism** | **Purpose** | **Verification Criteria** |
+|-------------------------|-------------|---------------------------|
+| ISR execution time ≤ worst-case deadline | Ensure no interrupt is starved by a long-running ISR | Measure ISR duration with logic analyzer; compute WCET including preemption overhead; verify Σ(ISR_time × rate) < CPU budget |
+| Priority inversion bounded by priority ceiling | Prevent unbounded blocking of high-priority tasks | Audit all shared resources; assign locks priority = max(task priorities); test with simultaneous interrupt load |
+| Lock-free queues or double-buffering for ISR↔task communication | Eliminate deadlock and reduce ISR overhead | Verify all ISR→task paths use atomic operations or DMA; no mutex/semaphore acquisition in ISR context |
+| Stack depth = max nesting depth + safety margin | Prevent stack overflow under maximum preemption | Compute call tree depth for all ISR paths; measure actual stack usage with canary or MPU; stress-test with simultaneous interrupts |
+| DMA cache coherency management | Ensure correct data visibility between CPU and DMA | Validate cache invalidate/flush on all DMA buffers; test on hardware with cache enabled; verify with bus analyzer or memory dump |

@@ -40,22 +40,32 @@ The legal and economic mechanics of M&A execution resolve into three structural 
 
 The **form of combination** determines what legal entity survives and how the target's assets, liabilities, contracts, and employees transfer. In a **forward merger**, the target merges into the acquirer, with the target's legal existence extinguished and all of its assets and liabilities absorbed by the acquirer by operation of law. This is the simplest structure but requires shareholder votes from both sides and triggers contract assignment clauses in the target's key agreements. In a **reverse triangular merger**—the most common structure for public company acquisitions—the acquirer creates a new wholly owned merger subsidiary, that subsidiary merges into the target, and the target survives as a wholly owned subsidiary of the acquirer. This preserves the target's legal existence (and therefore its contracts, licenses, and regulatory approvals) while still transferring economic ownership to the acquirer. The merger subsidiary is dissolved in the transaction, leaving the target as the surviving entity.
 
-```
-Reverse Triangular Merger Mechanics
-
-Before Close:                        After Close:
-
-Acquirer                             Acquirer
-   |                                    |
-   |---(creates)--> MergerSub            |---(owns 100%)---> Target (surviving)
-                        |
-                   merges into
-                        |
-                     Target
-                   (survives)
-
-Target shareholders receive Consideration
-(cash / stock / mix) and exit the cap table.
+```mermaid
+flowchart TD
+    subgraph before["Before Close"]
+        A1["Acquirer"]
+        MS["MergerSub"]
+        T1["Target"]
+        A1 -->|creates| MS
+        MS -->|"merges into"| T1
+        T1["Target<br/>(survives)"]
+    end
+    
+    subgraph after["After Close"]
+        A2["Acquirer"]
+        T2["Target<br/>(surviving entity)"]
+        A2 -->|"owns 100%"| T2
+    end
+    
+    subgraph consideration["Consideration Flow"]
+        TS["Target Shareholders"]
+        C["Receive Consideration<br/>(cash / stock / mix)"]
+        E["Exit Cap Table"]
+        TS --> C --> E
+    end
+    
+    before -.->|transaction closes| after
+    before -.->|simultaneous| consideration
 ```
 
 An **asset acquisition** bypasses the merger structure entirely: the acquirer purchases specific assets (and assumes specific liabilities) of the target rather than acquiring its equity. This is common in distressed situations, where a buyer wants a target's productive assets without inheriting its legacy liabilities (pension obligations, environmental claims, undisclosed contingent liabilities). The legal transfer of each individual asset requires a separate conveyance, making asset deals operationally cumbersome for companies with large portfolios of contracts and intellectual property.

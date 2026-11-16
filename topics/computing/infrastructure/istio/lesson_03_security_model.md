@@ -33,54 +33,44 @@ The SPIFFE identity framework provides a portable identity representation that s
 
 Authorization policy evaluation executes within the Envoy proxy's filter chain as an external authorization module. When a request arrives, Envoy extracts the client's SPIFFE ID from the mTLS connection state and evaluates it against configured `AuthorizationPolicy` resources compiled into Envoy's runtime configuration by `istiod`. The policy engine constructs a decision context containing source identity, destination service, TCP or HTTP attributes, and custom metadata, then walks the policy rule tree testing each condition expression. Conditions support rich matching semantics: string exact match, prefix, suffix, and glob patterns for identities and paths; numeric comparisons for ports; list membership for HTTP methods; and JWT claim extraction for user-level authorization.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      Istio Control Plane                         │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │                         istiod                              │ │
-│  │  ┌──────────────────┐      ┌──────────────────────┐        │ │
-│  │  │  Certificate CA  │      │  Policy Distribution │        │ │
-│  │  │  ┌────────────┐  │      │                      │        │ │
-│  │  │  │ Root Cert  │  │      │ AuthorizationPolicy  │        │ │
-│  │  │  │  (24-48h)  │  │      │ PeerAuthentication   │        │ │
-│  │  │  └────────────┘  │      │ RequestAuthentication│        │ │
-│  │  │  Signs Workload  │      └──────────────────────┘        │ │
-│  │  │  Certificates    │               │                       │ │
-│  │  └──────────────────┘               │                       │ │
-│  └───────────┬──────────────────────────┼───────────────────────┘ │
-│              │ CSR/Certificate          │ xDS Config Push         │
-└──────────────┼──────────────────────────┼─────────────────────────┘
-               │                          │
-               │ gRPC/mTLS                │
-               ▼                          ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                        Data Plane Pod                             │
-│  ┌────────────────┐              ┌──────────────────────────┐    │
-│  │  istio-agent   │              │     envoy-proxy          │    │
-│  │                │  Private Key │                          │    │
-│  │ ┌────────────┐ │──────────────▶  ┌────────────────────┐ │    │
-│  │ │  CSR Gen   │ │  Certificate │  │  mTLS Termination  │ │    │
-│  │ └────────────┘ │──────────────▶  │                    │ │    │
-│  │                │              │  │  SPIFFE ID:        │ │    │
-│  │ Mounted Token: │              │  │  spiffe://mesh/    │ │    │
-│  │ /var/run/      │              │  │  ns/prod/sa/svc    │ │    │
-│  │ secrets/tokens/│              │  └────────────────────┘ │    │
-│  │ istio-token    │              │           │             │    │
-│  └────────────────┘              │           ▼             │    │
-│                                  │  ┌────────────────────┐ │    │
-│                                  │  │ AuthZ Policy Eval  │ │    │
-│                                  │  │                    │ │    │
-│                                  │  │ Check Source ID    │ │    │
-│                                  │  │ Match Rules        │ │    │
-│                                  │  │ ALLOW/DENY         │ │    │
-│  ┌────────────────────────────┐ │  └────────────────────┘ │    │
-│  │   Application Container    │ │           │             │    │
-│  │                            │◀┼───────────┘             │    │
-│  │   Receives Decrypted       │ │  Forwarded Request      │    │
-│  │   Authorized Traffic       │ │  with Headers:          │    │
-│  │                            │ │  X-Forwarded-Client-Cert│    │
-│  └────────────────────────────┘ └──────────────────────────┘    │
-└──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph ControlPlane["Istio Control Plane"]
+        subgraph istiod["istiod"]
+            CA["Certificate CA<br/>Root Cert 24-48h<br/>Signs Workload Certificates"]
+            Policy["Policy Distribution<br/>AuthorizationPolicy<br/>PeerAuthentication<br/>RequestAuthentication"]
+        end
+    end
+
+    subgraph DataPlane["Data Plane Pod"]
+        subgraph Agent["istio-agent"]
+            CSR["CSR Generation"]
+            Token["Mounted Token<br/>/var/run/secrets/tokens/istio-token"]
+        end
+
+        subgraph Envoy["envoy-proxy"]
+            mTLS["mTLS Termination<br/>SPIFFE ID:<br/>spiffe://mesh/ns/prod/sa/svc"]
+            AuthZ["AuthZ Policy Evaluation<br/>Check Source ID<br/>Match Rules<br/>ALLOW/DENY"]
+        end
+
+        AppContainer["Application Container<br/>Receives Decrypted<br/>Authorized Traffic"]
+    end
+
+    CA -->|"CSR/Certificate"| CSR
+    CA -->|"Private Key"| mTLS
+    Policy -->|"xDS Config Push"| AuthZ
+
+    CSR -->|"Certificate"| mTLS
+    Token -->|"Service Account"| CSR
+
+    mTLS -->|"Forwarded Request<br/>X-Forwarded-Client-Cert"| AuthZ
+    AuthZ -->|"Authorized Traffic"| AppContainer
+
+    style ControlPlane fill:#e1f5ff
+    style DataPlane fill:#f3e5f5
+    style istiod fill:#b3e5fc
+    style Agent fill:#e1bee7
+    style Envoy fill:#e1bee7
 ```
 
 The mutual TLS handshake sequence reveals the cryptographic protocol mechanics underlying workload authentication. When the client initiates a connection to an upstream service, Envoy intercepts the outbound TCP socket through iptables `REDIRECT` target rules that transparently capture port 15001. The client-side Envoy establishes a TLS connection to the server-side Envoy, presenting its workload certificate during the ClientHello exchange. The server Envoy validates the client certificate chain against the mesh root CA bundle loaded from the `istio-ca-root-cert` ConfigMap, verifying the certificate signature, expiration timestamp, and revocation status. Upon successful validation, the server extracts the SPIFFE ID from the certificate's SAN extension and stores it in the connection metadata for authorization evaluation.

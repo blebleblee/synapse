@@ -144,10 +144,17 @@ For α = 0.05 and ν = 29 degrees of freedom, t_{0.025, 29} ≈ 2.045. This valu
 The following diagram illustrates the full anatomy of a two-tailed t-test at α = 0.05:
 
 ```mermaid
-xychart-beta
-    title "t-Distribution: Rejection Regions (α = 0.05, ν = 29)"
-    x-axis [-4, -3, -2, -1, 0, 1, 2, 3, 4]
-    y-axis "Density" 0 --> 0.45
+flowchart TD
+    A["t-Distribution: Rejection Regions (α = 0.05, ν = 29)"]
+    A --> B["X-axis Range: -4 to 4"]
+    A --> C["Y-axis: Density (0 to 0.45)"]
+    B --> D["Critical Values"]
+    D --> E["Left Tail: t < -2.045"]
+    D --> F["Right Tail: t > 2.045"]
+    C --> G["Peak Density at t = 0"]
+    E --> H["Rejection Region (2.5%)"]
+    F --> I["Rejection Region (2.5%)"]
+    G --> J["Acceptance Region (95%)"]
 ```
 
 Since Mermaid's xychart-beta has limited curve rendering, the conceptual structure is better represented architecturally:
@@ -752,3 +759,4 @@ flowchart TD
     K -->|"No"| M["Fail to reject H₀\nReport: power, MDE,\nCI includes δ=0"]
     L --> N["Pre-register &\nreplicate"]
     M --> N
+```

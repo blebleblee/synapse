@@ -20,35 +20,64 @@ The voltage-second balance principle governs inductor current in PWM-driven syst
 
 The half-bridge topology forms the atomic building block of virtually all motor drive circuits. Two power transistors—designated as the high-side switch Q1 and the low-side switch Q2—connect in series between the positive DC bus voltage and ground, with their junction forming the output node that drives one motor terminal. When Q1 conducts and Q2 remains off, the output node connects to the positive rail, delivering the full bus voltage. When Q2 conducts and Q1 remains off, the output connects to ground. By modulating the duty cycle of these complementary switching states, the half-bridge synthesizes any average voltage between zero and the bus voltage.
 
-```
-        +Vbus
-          |
-          |
-         Q1 (High-Side MOSFET/IGBT)
-          |
-          +-------> Motor Phase Output
-          |
-         Q2 (Low-Side MOSFET/IGBT)
-          |
-         GND
+```mermaid
+flowchart TD
+    Vbus["<b>+Vbus</b>"]
+    Q1["Q1<br/>(High-Side MOSFET/IGBT)"]
+    Q2["Q2<br/>(Low-Side MOSFET/IGBT)"]
+    Output["Motor Phase Output"]
+    GND["<b>GND</b>"]
+    
+    Vbus --> Q1
+    Q1 --> Output
+    Q1 --> Q2
+    Q2 --> GND
+    Output -.-> Q2
 ```
 
 For brushed DC motors requiring bidirectional current control, the full H-bridge extends this architecture by mirroring the half-bridge topology, creating four switches arranged in an H configuration. The motor connects across the center nodes of two half-bridge legs. By activating Q1 and Q4 while keeping Q2 and Q3 off, current flows through the motor in the forward direction. Reversing the switch states to activate Q2 and Q3 while keeping Q1 and Q4 off drives current in the reverse direction, implementing bidirectional torque control without mechanical reversing contactors. The H-bridge also enables four-quadrant operation: motoring in both directions and regenerative braking in both directions, with energy recovery back to the DC bus capacitor during deceleration.
 
 Three-phase brushless DC motors and permanent magnet synchronous motors require six switches arranged as three half-bridge legs, each driving one of the motor's three stator phases. This three-phase inverter topology represents the workhorse of modern motor control, appearing in everything from hard disk drive spindle motors to megawatt industrial compressors. Each phase leg operates independently under microcontroller supervision, synthesizing the sinusoidal voltage waveforms necessary to rotate the stator magnetic field and drag the rotor's permanent magnets into synchronous rotation.
 
-```
-     +Vbus
-       |
-   ----+--------+--------+----
-       |        |        |
-      Q1       Q3       Q5    (High-Side Switches)
-       |        |        |
-       +---A    +---B    +---C  (Motor Phase Outputs)
-       |        |        |
-      Q2       Q4       Q6    (Low-Side Switches)
-       |        |        |
-      GND      GND      GND
+```mermaid
+flowchart TD
+    Vbus["Vbus<br/>(+)"]
+    
+    subgraph HighSide ["High-Side Switches"]
+        Q1["Q1"]
+        Q3["Q3"]
+        Q5["Q5"]
+    end
+    
+    subgraph Phases ["Motor Phase Outputs"]
+        PhaseA["A"]
+        PhaseB["B"]
+        PhaseC["C"]
+    end
+    
+    subgraph LowSide ["Low-Side Switches"]
+        Q2["Q2"]
+        Q4["Q4"]
+        Q6["Q6"]
+    end
+    
+    GND["GND"]
+    
+    Vbus --> Q1
+    Vbus --> Q3
+    Vbus --> Q5
+    
+    Q1 --> PhaseA
+    Q3 --> PhaseB
+    Q5 --> PhaseC
+    
+    PhaseA --> Q2
+    PhaseB --> Q4
+    PhaseC --> Q6
+    
+    Q2 --> GND
+    Q4 --> GND
+    Q6 --> GND
 ```
 
 The most prevalent PWM strategy for three-phase inverters is space vector modulation (SVM), which treats the three phase voltages as components of a rotating voltage vector in the complex plane. Unlike sinusoidal PWM that modulates each phase independently against a triangular carrier, SVM recognizes that only eight switch state combinations are possible in a three-phase inverter: six active vectors corresponding to energizing different phase pairs, plus two zero vectors where all three phases connect to either the positive rail or ground. By time-averaging appropriate combinations of adjacent active vectors and zero vectors during each PWM period, SVM synthesizes any desired voltage vector within the hexagonal boundary defined by the six active states. This approach delivers approximately 15% higher DC bus utilization compared to sinusoidal PWM and produces lower harmonic distortion in the phase currents.

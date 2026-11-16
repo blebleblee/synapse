@@ -28,24 +28,27 @@ Ultrasonic testing (UT) exploits acoustic wave propagation and reflection at mat
 
 Ultrasonic inspection distinguishes itself by providing depth information—the time delay between the initial pulse and the echo directly measures the round-trip distance to the reflector. Angle beam shear wave inspection uses a wedge to introduce transverse waves at a specific angle, typically 45°, 60°, or 70°, that propagate parallel to the weld interface and reflect from vertically oriented discontinuities that would be invisible to normal beam incidence. The skip distance—the lateral distance traveled before the beam reflects off the back wall—is calculated from the wedge angle and material thickness, allowing precise positioning to interrogate the weld root or cap regions. Phased array ultrasonic testing (PAUT) extends this capability by using an array of transducer elements with programmable time delays to electronically steer and focus the beam, enabling rapid volumetric scanning without mechanical manipulation.
 
-```
-Angle Beam Ultrasonic Inspection Geometry
-
-     Transducer
-         |
-    [Wedge]───╲
-              ╲ 
-              ╲   Shear wave at angle θ
-  Surface     ╲
-══════════════════════════════════════
-              ▼  
-            [Weld]      ▲ Reflected echo
-                        │
-                     [Discontinuity]
-
-Skip distance S = 2T tan(θ)
-Where T = material thickness
-      θ = refracted shear wave angle
+```mermaid
+flowchart TD
+    T["Transducer"]
+    W["Wedge"]
+    S["Surface"]
+    WD["Weld"]
+    D["Discontinuity"]
+    SW["Shear wave at angle θ"]
+    RE["Reflected echo"]
+    
+    T -->|"Ultrasonic beam"| W
+    W -->|"Refracted beam"| SW
+    SW --> S
+    S -.->|"Propagates through material"| WD
+    WD -.->|"Reflects from"| D
+    D -->|"Returns"| RE
+    RE -.->|"Detected by"| T
+    
+    subgraph formula ["Skip Distance Formula"]
+        F["S = 2T tan(θ)<br/>T = material thickness<br/>θ = refracted shear wave angle"]
+    end
 ```
 
 Magnetic particle testing (MT) detects surface-breaking and near-surface discontinuities in ferromagnetic materials by observing magnetic flux leakage. When a magnetizing current or external field establishes magnetic flux density $\vec{B}$ in the component, a discontinuity perpendicular to the flux lines creates a high-reluctance path that forces flux to leak into the surrounding air. Ferromagnetic particles applied as a dry powder or wet suspension concentrate at the leakage field, rendering the discontinuity visible. The method's sensitivity depends on achieving sufficient magnetizing force—typically 3000–6000 ampere-turns per meter for circular magnetization using prods or a coil—and orienting the field perpendicular to the suspected crack orientation. Longitudinal cracks require circumferential magnetization, while transverse cracks require longitudinal magnetization, necessitating sequential magnetization in orthogonal directions for comprehensive inspection.

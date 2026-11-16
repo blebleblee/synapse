@@ -189,41 +189,29 @@ The `statusCapture` wrapper deserves attention. Go's `http.ResponseWriter` does 
 
 The following diagram represents the execution path of a single authenticated request through the pipeline defined above.
 
-```
-  Client TCP Connection
-         │
-         ▼
-  ┌─────────────────────────────────────────────────────┐
-  │  net/http Runtime: accept() → TLS → header parse    │
-  └────────────────────┬────────────────────────────────┘
-                       │  *http.Request
-                       ▼
-  ┌─────────────────────────────────────────────────────┐
-  │  RecoveryMiddleware (defer/recover installed)        │
-  │                                                     │
-  │  ┌───────────────────────────────────────────────┐  │
-  │  │  LoggingMiddleware (start timer, wrap writer) │  │
-  │  │                                               │  │
-  │  │  ┌─────────────────────────────────────────┐ │  │
-  │  │  │  AuthMiddleware                         │ │  │
-  │  │  │  - Parse Authorization header           │ │  │
-  │  │  │  - Validate JWT → Claims{}              │ │  │
-  │  │  │  - context.WithValue(r.Context(), ...)  │ │  │
-  │  │  │                                         │ │  │
-  │  │  │  ┌───────────────────────────────────┐  │ │  │
-  │  │  │  │  ProfileHandler                   │  │ │  │
-  │  │  │  │  - ctx.Value(claimsKey)            │  │ │  │
-  │  │  │  │  - json.Encode(claims) → w         │  │ │  │
-  │  │  │  └───────────────────────────────────┘  │ │  │
-  │  │  │                                         │ │  │
-  │  │  └─────────────────────────────────────────┘ │  │
-  │  │  (log: method, path, status, latency)         │  │
-  │  └───────────────────────────────────────────────┘  │
-  │  (recover any panic from inner layers)              │
-  └─────────────────────────────────────────────────────┘
-         │
-         ▼
-  HTTP Response → TCP → Client
+```mermaid
+flowchart TD
+    Client["Client TCP Connection"]
+    Client --> Runtime["net/http Runtime: accept() → TLS → header parse"]
+    Runtime -->|"*http.Request"| Recovery["RecoveryMiddleware<br/>(defer/recover installed)"]
+    
+    subgraph Recovery
+        Logging["LoggingMiddleware<br/>(start timer, wrap writer)"]
+        
+        subgraph Logging
+            Auth["AuthMiddleware<br/>- Parse Authorization header<br/>- Validate JWT → Claims{}<br/>- context.WithValue(r.Context(), ...)"]
+            
+            subgraph Auth
+                Handler["ProfileHandler<br/>- ctx.Value(claimsKey)<br/>- json.Encode(claims) → w"]
+            end
+        end
+        
+        LogNote["(log: method, path, status, latency)"]
+        Logging -.-> LogNote
+        RecoveryNote["(recover any panic from inner layers)"]
+    end
+    
+    Recovery --> Response["HTTP Response → TCP → Client"]
 ```
 
 ### Routing Architecture

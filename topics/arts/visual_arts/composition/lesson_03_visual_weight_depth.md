@@ -20,42 +20,37 @@ Constructing accurate perspective demands methodical procedure. First, establish
 
 Two-point perspective requires left and right vanishing points positioned outside the composition frame for natural convergence angles—placing them too close flattens the illusion, while excessive separation exaggerates distortion. Each vertical edge remains truly vertical, but all horizontals converge toward one of the two lateral vanishing points depending on their orientation. To construct a rectilinear form such as a building corner, establish the corner vertical first, then draw orthogonals from its top and bottom toward both vanishing points, creating the convergence framework for front and side planes. Measure heights along verticals only—perspective foreshortening affects horizontal and depth dimensions but preserves vertical proportions when the picture plane is vertical.
 
-```
-Single-Point Perspective (Side View):
-                        VP (Vanishing Point)
-                          ●
-                         /|\
-                        / | \
-                       /  |  \
-                      /   |   \
-                     /    |    \
-        ___________/_____|_____\___________  Horizon Line
-               /         |         \
-              /          |          \
-             /           |           \
-            /            |            \
-       Front Plane   Orthogonals   Recession
-
-Two-Point Perspective (Plan View):
-        VP Left                            VP Right
-           ●──────────────────────────────────●
-            \                                /
-             \                              /
-              \                            /
-               \                          /
-                \                        /
-                 \                      /
-                  \    Vertical Edge  /
-                   \        |        /
-                    \       |       /
-                     \      |      /
-                      \     |     /
-                       \    |    /
-                        \   |   /
-                         \  |  /
-                          \ | /
-                           \|/
-                         Corner
+```mermaid
+flowchart TD
+    subgraph single["Single-Point Perspective (Side View)"]
+        VP["VP (Vanishing Point)"]
+        HL["Horizon Line"]
+        FP["Front Plane"]
+        OG["Orthogonals"]
+        RC["Recession"]
+        
+        VP -.->|"Converging Lines"| HL
+        HL --- FP
+        HL --- OG
+        HL --- RC
+        VP --> FP
+        VP --> OG
+        VP --> RC
+    end
+    
+    subgraph two["Two-Point Perspective (Plan View)"]
+        VPL["VP Left"]
+        VPR["VP Right"]
+        VE["Vertical Edge"]
+        CN["Corner"]
+        
+        VPL -.->|"Horizon Line"| VPR
+        VPL -->|"Convergence"| CN
+        VPR -->|"Convergence"| CN
+        VE --- CN
+    end
+    
+    single ~~~ two
 ```
 
 Atmospheric perspective manipulates four primary variables to encode depth: value contrast, color temperature, edge definition, and detail density. Foreground elements employ the full value range from pure black to pure white, maximizing local contrast. Middleground elements compress this range, restricting darks to mid-tones and lights to upper-mid values. Background elements collapse further toward the horizon value—typically a desaturated blue-gray matching atmospheric haze color. Color temperature shifts follow the Rayleigh scattering model: shorter blue wavelengths scatter more effectively through particulate atmosphere, tinting distant forms toward cool hues, while foreground retains warm local color. Edge definition degrades with distance as atmospheric diffusion blurs contours; render foreground edges with sharp, high-frequency transitions, middleground with moderate softness, and background with soft, low-contrast boundaries. Detail density follows a logarithmic decay: foreground tolerates fine texture—individual leaves, brick mortar, fabric weave—while middleground simplifies to clustered masses and background reduces to silhouetted shapes.
@@ -64,26 +59,47 @@ Visual weight distribution requires calibrating multiple perceptual channels sim
 
 Compositional balance arranges these weights across the frame according to classical principles adapted from physics. Symmetrical balance mirrors weight distribution across a central vertical axis, creating stable, formal compositions appropriate for hierarchical subjects—religious icons, governmental portraiture, architectural facades. Asymmetrical balance distributes unequal weights at varying distances from the fulcrum, analogous to a lever: a small, high-contrast element far from center can balance a larger, lower-contrast mass near center. The rule-of-thirds grid provides a heuristic framework: divide the frame into horizontal and vertical thirds, placing primary focal weights at the four intersection points approximately 1/3 from edges. This asymmetric positioning feels more dynamic than centered placement while maintaining coherent balance.
 
-```
-Rule of Thirds Grid with Weight Distribution:
+```mermaid
+flowchart TD
+    subgraph grid["Rule of Thirds Grid with Weight Distribution"]
+        subgraph top["Top Row"]
+            TL["<b>◆ High Weight</b><br/>Saturated<br/>High Contrast<br/><i>(Top-Left)</i>"]
+            TM["<b>○ Medium Weight</b><br/>Balanced Saturation<br/><i>(Top-Center)</i>"]
+            TR["<b>◆ High Weight</b><br/>Saturated<br/>High Contrast<br/><i>(Top-Right)</i>"]
+        end
+        
+        subgraph middle["Middle Row"]
+            ML["<b>· Low Weight</b><br/>Desaturated<br/>Low Contrast<br/><i>(Middle-Left)</i>"]
+            MM["<b>Center Point</b><br/><i>(Neutral Zone)</i>"]
+            MR["<b>◆ High Weight</b><br/>Saturated<br/>High Contrast<br/><i>(Middle-Right)</i>"]
+        end
+        
+        subgraph bottom["Bottom Row"]
+            BL["<b>· Low Weight</b><br/>Desaturated<br/>Low Contrast<br/><i>(Bottom-Left)</i>"]
+            BM["<b>○ Medium Weight</b><br/>Balanced Saturation<br/><i>(Bottom-Center)</i>"]
+            BR["<b>◆ High Weight</b><br/>Saturated<br/>High Contrast<br/><i>(Bottom-Right)</i>"]
+        end
+        
+        balance["<b>Asymmetric Balance</b><br/>Top-Left ↔ Bottom-Right<br/>Heavy counterweights<br/>Medium & Light fill remaining"]
+    end
+    
+    TL -.→ balance
+    BR -.→ balance
+    TM → MM
+    ML → MM
+    MR → MM
+    BM → MM
 
-    |           |           |
-────┼───────────┼───────────┼────
-    |           |           |
-    |    ◆      |      ○    |     ◆ = High weight (saturated, high contrast)
-    |  (Heavy)  | (Medium)  |     ○ = Medium weight
-    |           |           |     · = Low weight (desaturated, low contrast)
-────┼───────────┼───────────┼────
-    |           |           |
-    |     ·     |     ◆     |
-    | (Light)   |  (Heavy)  |
-    |           |           |
-────┼───────────┼───────────┼────
-    |           |           |
-
-Asymmetric balance: Heavy top-left counterbalanced by
-heavy bottom-right; medium and light weights fill
-remaining quadrants to prevent deadspace.
+    style TL fill:#d32f2f,stroke:#000,stroke-width:2px,color:#fff
+    style TR fill:#d32f2f,stroke:#000,stroke-width:2px,color:#fff
+    style MR fill:#d32f2f,stroke:#000,stroke-width:2px,color:#fff
+    style BR fill:#d32f2f,stroke:#000,stroke-width:2px,color:#fff
+    style TM fill:#90caf9,stroke:#666,stroke-width:1px,color:#000
+    style BM fill:#90caf9,stroke:#666,stroke-width:1px,color:#000
+    style ML fill:#e0e0e0,stroke:#999,stroke-width:1px,color:#666
+    style BL fill:#e0e0e0,stroke:#999,stroke-width:1px,color:#666
+    style MM fill:#fff,stroke:#ccc,stroke-width:1px,color:#999
+    style balance fill:#fffde7,stroke:#fbc02d,stroke-width:2px,color:#000
 ```
 
 Focal point hierarchy constructs a multi-tiered attention pathway. The primary focal point receives maximum emphasis through converged depth cues, peak contrast, sharpest edges, and warmest or most saturated color. Secondary focal points employ moderate emphasis, supporting the primary through complementary positioning or narrative connection—a figure's gaze direction pointing toward the primary, or a compositional line leading the eye from secondary to primary. Tertiary elements recede into supporting roles with minimal weight, providing context without competing for attention. This hierarchy must be tested through squint analysis: when viewing the composition through narrowed eyes that blur detail and compress value range, the primary focal point should remain the most visible element, secondary points should read as distinct but subordinate, and tertiary elements should merge into undifferentiated background.

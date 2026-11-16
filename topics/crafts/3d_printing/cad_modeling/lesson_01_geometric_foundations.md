@@ -26,26 +26,28 @@ A solid in a B-Rep kernel is not a mesh. It is a hierarchical data structure con
 
 The propagation of a parametric change through a model follows a directed acyclic graph (DAG) commonly called the feature tree or model history. Each feature — a sketch extrusion, a Boolean operation, a fillet — is a node in this graph, taking the output B-Rep of its parent nodes as input and producing a new B-Rep as output. When you change a parameter, the kernel marks the affected node as stale and re-evaluates all downstream nodes in topological sort order.
 
-```
-Origin Planes
-     │
-     ▼
- Sketch 1 (Base Profile, fully constrained)
-     │
-     ▼
- Extrude 1 (height = 20 mm) ─────────────────────── B-Rep Solid A
-     │
-     ▼
- Sketch 2 (Hole Profile, coaxial constraint)
-     │
-     ▼
- Extrude 2 / Cut (depth = through-all) ──────────── B-Rep Solid B
-     │
-     ▼
- Fillet 1 (radius = 1.5 mm on 4 edges) ─────────── B-Rep Solid C
-     │
-     ▼
- Export: Mesh (STL/3MF, chord tol = 0.01 mm)
+```mermaid
+flowchart TD
+    A["Origin Planes"]
+    B["Sketch 1<br/>(Base Profile, fully constrained)"]
+    C["Extrude 1<br/>(height = 20 mm)"]
+    D["B-Rep Solid A"]
+    E["Sketch 2<br/>(Hole Profile, coaxial constraint)"]
+    F["Extrude 2 / Cut<br/>(depth = through-all)"]
+    G["B-Rep Solid B"]
+    H["Fillet 1<br/>(radius = 1.5 mm on 4 edges)"]
+    I["B-Rep Solid C"]
+    J["Export: Mesh<br/>(STL/3MF, chord tol = 0.01 mm)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
 ```
 
 The fillet node is the most topologically fragile node in this chain. A fillet requires the kernel to construct an offset surface at radius r from each selected edge, then trim and stitch those offset surfaces into the existing B-Rep. If the edge curvature is too tight (another feature has already created a sharp re-entrant corner smaller than the fillet radius), or if two fillets are applied to adjacent edges in an order that creates an ambiguous vertex condition, the kernel will throw a topological failure. The error message in Fusion 360 — "Fillet failed" — is not a bug; it is the kernel reporting a genuine geometric impossibility. The mitigation is to apply fillets from largest radius to smallest, fillet interior concave edges before exterior convex edges, and never apply a fillet radius larger than the smallest wall thickness it borders.

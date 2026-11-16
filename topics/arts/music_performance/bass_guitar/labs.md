@@ -227,10 +227,10 @@ A thumb parked on the pickup forever creates sympathetic ringing problems: play 
 ```mermaid
 graph LR
     subgraph sub_floating ["Floating Thumb Position Map"]
-        A["Playing G string"] --> B["Thumb rests on D\n(mutes D sympathetics)"]
-        C["Playing D string"] --> D["Thumb rests on A\n(mutes A sympathetics)"]
-        E["Playing A string"] --> F["Thumb rests on E\n(mutes E sympathetics)"]
-        G["Playing E string"] --> H["Thumb rests on\npickup housing"]
+        A["Playing G string"] --> B["Thumb rests on D (mutes D sympathetics)"]
+        C["Playing D string"] --> D["Thumb rests on A (mutes A sympathetics)"]
+        E["Playing A string"] --> F["Thumb rests on E (mutes E sympathetics)"]
+        G["Playing E string"] --> H["Thumb rests on pickup housing"]
     end
 ```
 
@@ -455,18 +455,18 @@ x = left hand releases fretting pressure while staying in contact with the strin
 ```mermaid
 graph TD
     subgraph sub_right_hand ["Right Hand Techniques"]
-        RT1["Fingerstyle - i/m alternating\nFull sustain, floating thumb mute"]
-        RT2["Palm Mute + Fingerstyle\nPosition = continuous tonal dial"]
-        RT3["Slap - forearm rotation\nKnuckle strike, 2-8 kHz transient"]
-        RT4["Pop - index perpendicular pull\n5-8mm pull, G string standard"]
-        RT5["Plectrum\nBright, consistent attack"]
+        RT1["Fingerstyle - i/m alternating - Full sustain, floating thumb mute"]
+        RT2["Palm Mute + Fingerstyle - Position = continuous tonal dial"]
+        RT3["Slap - forearm rotation - Knuckle strike, 2-8 kHz transient"]
+        RT4["Pop - index perpendicular pull - 5-8mm pull, G string standard"]
+        RT5["Plectrum - Bright, consistent attack"]
     end
 
     subgraph sub_tonal ["Tonal Outcome"]
         T1["Full harmonic series, long sustain"]
         T2["Compressed, mid-forward, defined"]
-        T3["Percussive crack + fundamental"]
-        T4["Sharp crack + bright sustain"]
+        T3["Percussive crack plus fundamental"]
+        T4["Sharp crack plus bright sustain"]
         T5["Bright, articulate, pick noise present"]
     end
 
@@ -610,11 +610,11 @@ Correct: C  Eb  G    Bb
 ```mermaid
 graph LR
     subgraph sub_tempo ["Tempo Consolidation Arc"]
-        A["60 BPM\nFull conscious control\nFix every error here"]
-        B["80 BPM\nTransitions start to automate\nMost practice time goes here"]
-        C["100 BPM\nConsistency test under light pressure"]
-        D["120 BPM\nFunctional performance tempo"]
-        E["140+ BPM\nFast swing, fusion, bop"]
+        A["60 BPM - Full conscious control - Fix every error here"]
+        B["80 BPM - Transitions start to automate - Most practice time goes here"]
+        C["100 BPM - Consistency test under light pressure"]
+        D["120 BPM - Functional performance tempo"]
+        E["140+ BPM - Fast swing, fusion, bop"]
     end
 
     A -->|"Errors rare"| B
@@ -638,6 +638,49 @@ graph LR
 | Review | 5–10 min | Listen back critically. Pick one specific thing to fix next session. |
 
 Total: 35–55 minutes. Past 90 minutes, returns drop fast and injury risk climbs. Five 45-minute sessions a week beats two 3-hour marathons every time.
+
+---
+
+## Part 4: Repertoire Application — Three Bass Lines Worth Stealing
+
+Technique only matters once it shows up in real music. These three lines each isolate one skill from this lab inside a recognizable style context. Learn them by ear against a recording first, then use the tab as a cross-check.
+
+### 4A — Motown-style quarter-note line (heavy palm mute, Box 1/Box 3)
+
+Styled after the James Jamerson approach to a I-vi-IV-V in C, quarter notes, heavy thumb-over-the-pickup-style mute (approximate with the floating thumb or a foam mute under the strings at the bridge):
+
+```
+Bar 1 (C):   C(A3) E(A7) G(D5) C(D8... use D5+oct, or G string fret 0 oct up)
+Simplify to single-octave box:
+Bar 1 (C):   E:3   A:0   A:4   A:2     (C  E  G  B — outlines Cmaj7 color tone)
+Bar 2 (Am):  A:0   A:3   D:2   D:0     (A  C  E  D)
+Bar 3 (F):   E:1   E:0   A:3   A:2     (F  E  C  B — chromatic walk-up into G)
+Bar 4 (G):   E:3   A:0   A:2   A:4     (G  A  B  C — stepwise climb back to I)
+```
+Palm position: 20–30 mm from the bridge throughout. This is section 1C's Motown setting in direct musical use — the thud has to be present on every note, not just the downbeats.
+
+### 4B — Funk octave-slap groove (Box 3, Pattern 3 vocabulary)
+
+16th-note funk in G, built from Box 3's root/octave relationship plus Pattern 3's hammer-on move:
+
+```
+16th:  1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
+Tech:  T  .  H  .  .  .  P  .  T  .  .  x  H  .  P  .
+Fret:  3  .  7  .  .  .  5   .  3  .  .  x  5  .  5   .
+String: E  .  E  .  .  .  G  .  E  .  .  G  D  .  G  .
+```
+T on fret 3 (G, root) of the E string, H hammers to fret 7 (B), P pops the G string fret 5 (C), ghost note x on the G string between hits. Loop bar-length at 70 BPM before looping as a continuous groove.
+
+### 4C — Jazz ballad walking line with encirclement (Box 5, section 1D vocabulary)
+
+ii–V–I in C major, quarter notes, demonstrating the encircle approach (diatonic from above, chromatic from below) into each new root:
+
+```
+Bar 1 (Dm7):  D(A5)  F(A8... or D string 3)  A(A10 or D string 5)  Eb(E string 6, chromatic approach)
+Bar 2 (G7):   G(E3)  B(A2)  D(A5)             F#(A4, chromatic approach from below into G)
+Bar 3 (Cmaj7):C(A3)  E(A7)  G(D5)             Db(A4, chromatic approach from above into C... loop back)
+```
+Play this against a recorded ii-V-I backing track (search "jazz ii V I backing track in C") at 70 BPM with heavy swing lay-back on beats 2 and 4, per drill 2B.
 
 ---
 
@@ -726,4 +769,4 @@ Walking bass lines are voice-leading structures: root on 1, chord tones on 2–3
 
 Slap tone comes from a split-second of string-fret contact during a rotational thumb strike — knuckle, not pad; rebound, not rest. Force beyond medium degrades tone instead of enhancing it.
 
-The practice architecture here — 60 BPM for diagnosis, incremental tempo increases, one technique isolated per session, recording for review — is the template for every lab that follows.
+The repertoire lines in Part 4 exist to prove the point: none of this technique matters in isolation. A Motown line is palm-muting applied with intent. A funk slap groove is Box 3 plus the thumb/pop mechanics from 1E. A jazz walking line with encirclement is 1D's voice-leading rules played at tempo with swing feel. Every lab from here forward builds directly on this foundation — the practice architecture (60 BPM for diagnosis, incremental tempo increases, one technique isolated per session, recording for review) is the template you'll reuse every time.

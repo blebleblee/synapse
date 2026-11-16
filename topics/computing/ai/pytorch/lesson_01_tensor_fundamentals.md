@@ -22,31 +22,14 @@ Autograd — the automatic differentiation engine — is the third invisible dim
 
 The relationship between a `torch.Tensor` Python object and the physical bytes that back it involves three distinct layers: the Python wrapper, the C++ `TensorImpl`, and the `StorageImpl`.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                  Python torch.Tensor                    │
-│  (PyObject wrapping an intrusive_ptr<TensorImpl>)       │
-└──────────────────────┬──────────────────────────────────┘
-                       │  owns
-                       ▼
-┌─────────────────────────────────────────────────────────┐
-│                     TensorImpl                          │
-│  shape:   [4, 3, 224, 224]                              │
-│  strides: [150528, 50176, 224, 1]                       │
-│  storage_offset: 0                                      │
-│  dtype:   float32                                       │
-│  device:  cuda:0                                        │
-│  requires_grad: true                                    │
-│  grad_fn: ConvolutionBackward0*                         │
-└──────────────────────┬──────────────────────────────────┘
-                       │  shared_ptr
-                       ▼
-┌─────────────────────────────────────────────────────────┐
-│                    StorageImpl                          │
-│  data_ptr: 0x7f3c2a000000 (device VRAM)                 │
-│  nbytes:   4 × 4 × 3 × 224 × 224 = 2,408,448 bytes     │
-│  allocator: CUDACachingAllocator                        │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["<b>Python torch.Tensor</b><br/>PyObject wrapping an intrusive_ptr&lt;TensorImpl&gt;"]
+    B["<b>TensorImpl</b><br/>shape: [4, 3, 224, 224]<br/>strides: [150528, 50176, 224, 1]<br/>storage_offset: 0<br/>dtype: float32<br/>device: cuda:0<br/>requires_grad: true<br/>grad_fn: ConvolutionBackward0*"]
+    C["<b>StorageImpl</b><br/>data_ptr: 0x7f3c2a000000 (device VRAM)<br/>nbytes: 4 × 4 × 3 × 224 × 224 = 2,408,448 bytes<br/>allocator: CUDACachingAllocator"]
+
+    A -->|"owns"| B
+    B -->|"shared_ptr"| C
 ```
 
 The critical insight this diagram conveys is that multiple `TensorImpl` objects can share a single `StorageImpl` through reference counting — that is precisely how slicing, transposing, `expand`, and `as_strided` produce views rather than copies. When you write `x = tensor[2:5]`, a new `TensorImpl` is allocated with an updated `storage_offset` and shape, but the `StorageImpl` reference count increments rather than any bytes being copied. The storage is freed only when every view pointing to it is destroyed — which means a small slice of a large tensor keeps the entire original allocation alive, a fact that bites engineers who cache output slices without first calling `.clone()`.

@@ -102,94 +102,76 @@ Radiotracer incubations directly measure transformation rates. ¹⁴C-labeled su
 
 Denitrification measurements employ acetylene inhibition or ¹⁵N tracer methods. Acetylene at 10 kPa partial pressure inhibits nitrous oxide reductase, causing N₂O accumulation from denitrification. Sediment slurries amended with nitrate and acetylene produce N₂O measured by gas chromatography with electron capture detection (GC-ECD), with accumulation rates proportional to total denitrification. The ¹⁵N isotope pairing technique (IPT) distinguishes N₂ production from added ¹⁵NO₃⁻ versus native ¹⁴NO₃⁻, resolving denitrification driven by water column nitrate versus coupled nitrification-denitrification. Mass spectrometric analysis of N₂ isotopomers (²⁸N₂, ²⁹N₂, ³⁰N₂) quantifies ¹⁴N¹⁴N, ¹⁴N¹⁵N, and ¹⁵N¹⁵N production, from which labeled and unlabeled nitrate contributions calculate.
 
-```
-Nitrogen Cycle Process Flow and Measurement Framework:
-
-Atmosphere (N₂ pool: 3.9 × 10²¹ g N)
-    ↓ N₂ fixation (nitrogenase)
-    │ [Measured: acetylene reduction, ¹⁵N₂ incorporation]
-    │ Free-living: cyanobacteria, Azotobacter
-    │ Symbiotic: Rhizobium-legume, Frankia-actinorhizal
-    ↓
-Ammonia/Ammonium (NH₃/NH₄⁺)
-    ↓ Nitrification step 1 (AOB/AOA: AMO, HAO)
-    │ [Measured: ¹⁵NH₄⁺ oxidation, nitrapyrin inhibition]
-    ↓
-Nitrite (NO₂⁻)
-    ↓ Nitrification step 2 (NOB: NXR)
-    │ [Measured: ¹⁵NO₂⁻ oxidation, chlorate inhibition]
-    ↓
-Nitrate (NO₃⁻) ←─ Dissolved inorganic N pool
-    │
-    ├─→ Assimilation into biomass
-    │   [Measured: ¹⁵NO₃⁻ uptake, biomass N content]
-    │
-    ├─→ DNRA (dissimilatory nitrate reduction to ammonia)
-    │   [Measured: ¹⁵NO₃⁻ → ¹⁵NH₄⁺ conversion]
-    │
-    └─→ Denitrification
-        NO₃⁻ → NO₂⁻ → NO → N₂O → N₂
-        [Measured: acetylene inhibition (blocks N₂O→N₂),
-         ¹⁵N-IPT method, GC-ECD for N₂O]
-        ↓
-    Atmosphere (N₂ return)
-
-Competing pathways at NO₃⁻ node determined by:
-- C:N ratio (high C:N favors DNRA over denitrification)
-- O₂ concentration (anoxia required for both)
-- NO₃⁻ concentration (high favors denitrification)
-- Electron donor availability
+```mermaid
+flowchart TD
+    ATM1["Atmosphere<br/>N₂ pool: 3.9 × 10²¹ g N"]
+    
+    ATM1 -->|"N₂ fixation<br/>nitrogenase"| FIX["N₂ Fixation Process<br/><br/>Measured: acetylene reduction, ¹⁵N₂ incorporation<br/><br/>Free-living: cyanobacteria, Azotobacter<br/>Symbiotic: Rhizobium-legume, Frankia-actinorhizal"]
+    
+    FIX --> NH4["Ammonia/Ammonium<br/>NH₃/NH₄⁺"]
+    
+    NH4 -->|"Nitrification step 1<br/>AOB/AOA: AMO, HAO"| NIT1["Measured: ¹⁵NH₄⁺ oxidation,<br/>nitrapyrin inhibition"]
+    
+    NIT1 --> NO2["Nitrite<br/>NO₂⁻"]
+    
+    NO2 -->|"Nitrification step 2<br/>NOB: NXR"| NIT2["Measured: ¹⁵NO₂⁻ oxidation,<br/>chlorate inhibition"]
+    
+    NIT2 --> NO3["Nitrate NO₃⁻<br/>Dissolved inorganic N pool"]
+    
+    NO3 -->|Assimilation| ASSIM["Biomass<br/><br/>Measured: ¹⁵NO₃⁻ uptake,<br/>biomass N content"]
+    
+    NO3 -->|DNRA| DNRA["Dissimilatory nitrate<br/>reduction to ammonia<br/><br/>Measured: ¹⁵NO₃⁻ → ¹⁵NH₄⁺<br/>conversion"]
+    
+    DNRA --> NH4
+    
+    NO3 -->|Denitrification| DENIT["Denitrification Pathway<br/>NO₃⁻ → NO₂⁻ → NO → N₂O → N₂<br/><br/>Measured: acetylene inhibition (blocks N₂O→N₂),<br/>¹⁵N-IPT method, GC-ECD for N₂O"]
+    
+    DENIT --> ATM2["Atmosphere<br/>N₂ return"]
+    
+    NO3 -.->|Competing pathways<br/>determined by| FACTORS["• C:N ratio (high C:N favors DNRA)<br/>• O₂ concentration (anoxia required)<br/>• NO₃⁻ concentration (high favors denitrification)<br/>• Electron donor availability"]
+    
+    style ATM1 fill:#e1f5ff
+    style ATM2 fill:#e1f5ff
+    style NO3 fill:#fff4e1
+    style FACTORS fill:#f0f0f0,stroke-dasharray: 5 5
 ```
 
 Nitrogen fixation measurements in aquatic systems employ ¹⁵N₂ dissolution techniques or acetylene reduction on water samples. ¹⁵N₂ enriched seawater prepared through vacuum degassing and re-equilibration with ¹⁵N₂ gas provides labeled substrate for dissolved diazotrophs. Incubation times of 12-24 hours followed by particulate collection on GF/F filters and ¹⁵N analysis via isotope-ratio mass spectrometry quantifies N₂ fixation rates. For acetylene reduction, whole water or phytoplankton net tow concentrates sealed in bottles with 10% C₂H₂ produce ethylene proportional to nitrogenase activity. Cyanobacterial blooms dominated by Trichodesmium exhibit peak rates during daylight hours, revealing diel rhythms in N₂ fixation coupled to photosynthetic energy generation.
 
-```
-Carbon Cycle Integration Across Redox Zones:
+```mermaid
+flowchart TD
+    subgraph Oxic["Oxic Zone (O₂ > 20 μM)"]
+        PS["Photosynthesis<br/>6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂<br/><i>Measured: ¹⁴C-bicarbonate uptake, O₂ evolution</i>"]
+        AR["Aerobic Respiration<br/>C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O<br/><i>Measured: O₂ consumption, CO₂ production</i><br/>ΔG°′ = -2870 kJ/mol glucose"]
+    end
 
-Oxic Zone (O₂ > 20 μM)
-├─ Photosynthesis: 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂
-│  [Measured: ¹⁴C-bicarbonate uptake, O₂ evolution]
-│
-└─ Aerobic respiration: C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O
-   [Measured: O₂ consumption, CO₂ production]
-   ΔG°′ = -2870 kJ/mol glucose
+    subgraph Suboxic["Suboxic Zone (O₂ < 20 μM, NO₃⁻ present)"]
+        DN["Denitrification<br/>5C₆H₁₂O₆ + 24NO₃⁻ → 30CO₂ + 12N₂ + 42H₂O<br/><i>Measured: NO₃⁻ depletion, N₂ production</i><br/>ΔG°′ ≈ -2600 kJ/mol glucose"]
+    end
 
-Suboxic Zone (O₂ < 20 μM, NO₃⁻ present)
-└─ Denitrification: 5C₆H₁₂O₆ + 24NO₃⁻ → 30CO₂ + 12N₂ + 42H₂O
-   [Measured: NO₃⁻ depletion, N₂ production]
-   ΔG°′ ≈ -2600 kJ/mol glucose
+    subgraph Anoxic["Anoxic Zone (O₂ absent, multiple pathways compete)"]
+        IR["Iron Reduction<br/>C₆H₁₂O₆ + 24Fe(OH)₃ → 6CO₂ + 24Fe²⁺ + 42H₂O<br/><i>Measured: Fe²⁺ accumulation, ferrozine colorimetry</i><br/>ΔG°′ ≈ -1300 kJ/mol glucose (pH dependent)"]
+        SR["Sulfate Reduction<br/>2C₆H₁₂O₆ + 3SO₄²⁻ → 3HS⁻ + 6CO₂ + 6H₂O<br/><i>Measured: ³⁵SO₄²⁻ reduction, AVS precipitation</i><br/>ΔG°′ ≈ -380 kJ/mol glucose"]
+        FM["Fermentation<br/>C₆H₁₂O₆ → 2CH₃CH₂OH + 2CO₂<br/>(or lactate, butyrate, propionate, H₂ + acetate)<br/><i>Measured: HPLC organic acids, GC-FID alcohols</i><br/>ΔG°′ ≈ -235 kJ/mol glucose (ethanol pathway)"]
+        
+        subgraph Methano["Methanogenesis"]
+            AC["Acetoclastic<br/>CH₃COOH → CH₄ + CO₂<br/>ΔG°′ = -31 kJ/mol acetate"]
+            HG["Hydrogenotrophic<br/>4H₂ + CO₂ → CH₄ + 2H₂O<br/>ΔG°′ = -131 kJ/mol CH₄ (at 10 Pa H₂)<br/><i>Measured: ¹⁴C-acetate or ¹⁴C-CO₂ → ¹⁴CH₄,<br/>GC-FID headspace analysis</i>"]
+        end
+    end
 
-Anoxic Zone (O₂ absent, multiple pathways compete)
-│
-├─ Iron reduction: C₆H₁₂O₆ + 24Fe(OH)₃ → 6CO₂ + 24Fe²⁺ + 42H₂O
-│  [Measured: Fe²⁺ accumulation, ferrozine colorimetry]
-│  ΔG°′ ≈ -1300 kJ/mol glucose (pH dependent)
-│
-├─ Sulfate reduction: 2C₆H₁₂O₆ + 3SO₄²⁻ → 3HS⁻ + 6CO₂ + 6H₂O
-│  [Measured: ³⁵SO₄²⁻ reduction, AVS precipitation]
-│  ΔG°′ ≈ -380 kJ/mol glucose
-│
-├─ Fermentation: C₆H₁₂O₆ → 2CH₃CH₂OH + 2CO₂
-│  (or lactate, butyrate, propionate, H₂ + acetate)
-│  [Measured: HPLC organic acids, GC-FID alcohols]
-│  ΔG°′ ≈ -235 kJ/mol glucose (ethanol pathway)
-│
-└─ Methanogenesis:
-    ├─ Acetoclastic: CH₃COOH → CH₄ + CO₂
-    │  ΔG°′ = -31 kJ/mol acetate
-    │
-    └─ Hydrogenotrophic: 4H₂ + CO₂ → CH₄ + 2H₂O
-       ΔG°′ = -131 kJ/mol CH₄ (at 10 Pa H₂)
-       [Measured: ¹⁴C-acetate or ¹⁴C-CO₂ → ¹⁴CH₄,
-        GC-FID headspace analysis]
+    subgraph Syntrophy["Syntrophy Coupling"]
+        PO["Propionate Oxidation<br/>C₃H₇COO⁻ + 2H₂O → CH₃COO⁻ + 3H₂ + CO₂<br/>ΔG°′ = +76 kJ/mol (thermodynamically unfavorable)<br/>(proceeds only when H₂ maintained < 10 Pa by methanogens)"]
+        HM["Hydrogenotrophic Methanogenesis<br/>consumes H₂"]
+        Net["Net Reaction<br/>C₃H₇COO⁻ + 2H₂O → CH₃COO⁻ + CH₄ + CO₂<br/>ΔG°′ = -55 kJ/mol (favorable when coupled)"]
+        
+        PO --> HM
+        HM --> Net
+    end
 
-Syntrophy coupling:
-Propionate oxidation: C₃H₇COO⁻ + 2H₂O → CH₃COO⁻ + 3H₂ + CO₂
-ΔG°′ = +76 kJ/mol (thermodynamically unfavorable)
-  ↓ (proceeds only when H₂ maintained < 10 Pa by methanogens)
-Hydrogenotrophic methanogenesis consumes H₂
-Net: C₃H₇COO⁻ + 2H₂O → CH₃COO⁻ + CH₄ + CO₂
-ΔG°′ = -55 kJ/mol (favorable when coupled)
+    PS --> AR
+    FM --> AC
+    FM --> HG
 ```
 
 Extremophile isolation requires replicating natural extreme conditions in laboratory culture. Thermophile enrichment from geothermal springs employs high-temperature incubation (70-90°C) in reduced medium containing sulfide as reductant and CO₂ as carbon source. Strict anaerobic technique—boiling medium, cooling under N₂/CO₂ atmosphere, and sealed anaerobic tubes—prevents oxygen contamination lethal to obligate anaerobes. Hyperthermophiles above 90°C require specialized equipment: pressure vessels preventing boiling, high-temperature incubators with precise control, and thermostable growth substrates resisting degradation.
@@ -222,9 +204,9 @@ DNA extraction from soil and sediment faces cell lysis challenges from clay part
 
 Metagenomic assembly quality depends on sequencing depth and community complexity. Low-diversity communities (acid mine drainage, hypersaline systems) assemble into near-complete genomes from 1-5 Gb of sequence data, while high-diversity soil communities require 50-100 Gb for comparable completeness. Co-assembly across multiple samples from the same environment increases coverage of shared taxa, enabling recovery of MAGs from organisms present at 0.1-1% relative abundance. However, strain variation within species creates assembly fragmentation—assemblers cannot distinguish sequencing error from genuine polymorphism, terminating contigs at variable sites. Long-read sequencing (PacBio HiFi, Oxford Nanopore) spanning repetitive regions and resolving strain variation improves assembly contiguity, though lower per-base accuracy requires polishing with short-read data.
 
-Stable isotope probing experiments require careful baleling percentage optimization. Insufficient label incorporation (<20 atom% ¹³C) produces incomplete density shifts, causing heavy DNA to overlap the light fraction and preventing clean separation. Excessive labeling (>80 atom% ¹³C) during prolonged incubations allows cross-feeding to label non-target organisms consuming metabolites from primary consumers, eroding specificity. Optimizing incubation time through pilot experiments balances incorporation levels against secondary labeling, typically targeting 40-60 atom% ¹³C in target populations.
+Stable isotope probing experiments require careful baleling percentage optimization. Insufficient label incorporation (< 20 atom% ¹³C) produces incomplete density shifts, causing heavy DNA to overlap the light fraction and preventing clean separation. Excessive labeling (>80 atom% ¹³C) during prolonged incubations allows cross-feeding to label non-target organisms consuming metabolites from primary consumers, eroding specificity. Optimizing incubation time through pilot experiments balances incorporation levels against secondary labeling, typically targeting 40-60 atom% ¹³C in target populations.
 
-NanoSIMS analysis confronts the tradeoff between spatial resolution and sensitivity. Small primary beam diameters (<100 nm) achieve subcellular resolution but reduce secondary ion yield, increasing counting time required for statistical precision. Each pixel requires sufficient counts (>1000 ions) to accurately measure isotope ratios with <5% uncertainty. Complete image acquisition at 50 nm resolution over 20 × 20 μm fields takes 4-8 hours, limiting throughput to 3-5 cells per session. Pre-screening with fluorescence microscopy targeting regions of interest optimizes analysis time on high-value targets.
+NanoSIMS analysis confronts the tradeoff between spatial resolution and sensitivity. Small primary beam diameters (< 100 nm) achieve subcellular resolution but reduce secondary ion yield, increasing counting time required for statistical precision. Each pixel requires sufficient counts (>1000 ions) to accurately measure isotope ratios with < 5% uncertainty. Complete image acquisition at 50 nm resolution over 20 × 20 μm fields takes 4-8 hours, limiting throughput to 3-5 cells per session. Pre-screening with fluorescence microscopy targeting regions of interest optimizes analysis time on high-value targets.
 
 Sediment core collection and handling determines data quality for geochemical profiles. Piston cores or gravity cores that penetrate 1-2 meters into sediment preserve stratigraphy and minimize disturbance of the oxic-anoxic interface, but require ship-based operations limiting spatial coverage. Push cores (transparent acrylic tubes inserted by diver or ROV) access shallower sediments (10-30 cm depth) with minimal compaction, enabling dense spatial sampling. Core storage temperature critically affects microbial activity—transport at in situ temperature (typically 4°C for temperate waters) prevents metabolic rate artifacts from warming, while excessive chilling below ambient temperature slows processes of interest.
 
@@ -242,7 +224,7 @@ Extremophile cultivation optimization requires systematic variation of multiple 
 
 Barophile cultivation suffers from decompression artifacts during sample collection. Microbial cells experiencing rapid pressure release undergo damage from dissolved gas bubble formation (analogous to decompression sickness) and membrane phase transitions, reducing viability and selecting for pressure-tolerant but not pressure-requiring organisms. Pressure-retaining samplers maintaining in situ pressure from collection through transfer into laboratory pressure vessels preserve obligate barophile viability, though these specialized instruments remain rare limiting deep-biosphere research access.
 
-Contamination represents the ultimate failure mode in microbial ecology, particularly for low-biomass samples (deep subsurface, ultra-oligotrophic waters). Rigorous negative controls—sterile medium processed identically to samples, blank DNA extractions, PCR no-template controls—expose contamination sources. The "kitome" (microbial DNA contaminating extraction kits and reagents) generates spurious low-abundance sequences in blank controls, requiring bioinformatic filtering of OTUs present in negatives before interpreting sample data. Quantitative thresholds (removing OTUs with higher abundance in negatives than samples, or present in samples at <10× negative abundance) balance false-positive exclusion against over-aggressive filtering of genuine low-abundance taxa.
+Contamination represents the ultimate failure mode in microbial ecology, particularly for low-biomass samples (deep subsurface, ultra-oligotrophic waters). Rigorous negative controls—sterile medium processed identically to samples, blank DNA extractions, PCR no-template controls—expose contamination sources. The "kitome" (microbial DNA contaminating extraction kits and reagents) generates spurious low-abundance sequences in blank controls, requiring bioinformatic filtering of OTUs present in negatives before interpreting sample data. Quantitative thresholds (removing OTUs with higher abundance in negatives than samples, or present in samples at < 10× negative abundance) balance false-positive exclusion against over-aggressive filtering of genuine low-abundance taxa.
 
 Experimental reproducibility across laboratories and time points remains challenging due to microbial community drift and protocol variations. Standardized mock communities (defined mixtures of known strains) provide positive controls assessing protocol fidelity—observed compositional distortions reveal extraction biases, amplification artifacts, or taxonomic classification errors. Cryopreserved soil and sediment standards (provided by repositories like NIST) enable inter-laboratory comparisons, though natural sample variability exceeds mock community precision, requiring statistical frameworks (permutational MANOVA, linear discriminant analysis) distinguishing biological effects from technical noise.
 

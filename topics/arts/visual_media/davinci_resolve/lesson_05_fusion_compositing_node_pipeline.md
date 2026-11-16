@@ -26,28 +26,24 @@ Macro encapsulation allows compositors to collapse entire node subgraphs into si
 
 The Fusion node graph editor visualizes the dataflow topology as a two-dimensional canvas where nodes appear as labeled rectangles and connections manifest as lines drawn between input and output ports. Each node declares its interface through a set of typed input ports—typically including a primary image input, a mask input for regional application of effects, and an effects mask for modulating effect strength—and one or more output ports carrying the processed result. The fundamental rule governing node connections states that each input port accepts exactly one connection, preventing ambiguity about which upstream node provides data, while output ports can fan out to multiple destinations, enabling a single processing result to feed multiple downstream operations without recomputation.
 
-```
-Source Media Node (Loader/MediaIn)
-         |
-         | [RGBA + Metadata]
-         v
-    Transform2D Node
-    (Scale, Rotate, Position)
-         |
-         | [Transformed Image]
-         v
-      Blur Node -----> [Mask Input] <---- Ellipse Mask Node
-         |
-         | [Blurred Image]
-         v
-    Merge Node [Foreground Input]
-         ^
-         | [Background Input]
-         |
-    Color Corrector Node
-         |
-         v
-    MediaOut/Saver Node
+```mermaid
+flowchart TD
+    source["Source Media Node\n(Loader / MediaIn)"]
+    transform["Transform2D Node\n(Scale, Rotate, Position)"]
+    blur["Blur Node"]
+    ellipse["Ellipse Mask Node"]
+    mask["Mask Input"]
+    merge["Merge Node"]
+    colorcorrect["Color Corrector Node"]
+    mediaout["MediaOut / Saver Node"]
+
+    source -->|"RGBA + Metadata"| transform
+    transform -->|"Transformed Image"| blur
+    ellipse --> mask
+    mask -->|"Mask Input"| blur
+    blur -->|"Blurred Image"| merge
+    colorcorrect -->|"Background Input"| merge
+    merge --> mediaout
 ```
 
 The rendering engine evaluates this graph through a recursive traversal beginning at the output nodes and working backward through dependencies. When MediaOut requests the final frame, it queries its input connection, which propagates the request upstream through the Merge node. The Merge node, requiring both foreground and background inputs, simultaneously requests data from the Blur node and the Color Corrector node. The Blur node queries the Transform2D node, which ultimately requests the original frame from the Loader node. As each node receives the data from its dependencies, it executes its processing algorithm and passes the result downstream, with the final composite emerging at the MediaOut node only after all upstream dependencies have completed their computations.
@@ -58,25 +54,24 @@ Understanding the distinction between premultiplied and straight alpha proves es
 
 The 3D workspace fundamentally alters the compositing paradigm by introducing a virtual camera, world coordinate system, and true depth sorting of elements. Creating a 3D merge requires replacing standard Merge nodes with Merge3D nodes, which accept 3D scene inputs rather than flat image streams. An ImagePlane3D node converts a 2D image into a 3D card—a rectangular polygon positioned in 3D space—with transform controls for XYZ position, rotation on all three axes, and independent XY scale. Multiple ImagePlane3D nodes feed into a Merge3D node, which performs depth-sorted compositing based on each element's Z-distance from the camera, with nearer elements automatically occluding farther ones regardless of connection order in the node graph. The Camera3D node defines the viewpoint from which the scene renders, with adjustable field of view, near and far clipping planes, and depth of field parameters that simulate realistic lens optics.
 
-```
-Loader Node (Foreground)          Loader Node (Background)
-       |                                    |
-       v                                    v
- ImagePlane3D                         ImagePlane3D
- [Z = 0]                              [Z = -10]
-       |                                    |
-       +-----------> Merge3D <--------------+
-                        |
-                        | [3D Scene]
-                        v
-                    Camera3D
-                        |
-                        | [2D Render]
-                        v
-                    Renderer3D
-                        |
-                        v
-                    MediaOut
+```mermaid
+flowchart TD
+    LN_FG["Loader Node (Foreground)"]
+    LN_BG["Loader Node (Background)"]
+    IP_FG["ImagePlane3D<br/>[Z = 0]"]
+    IP_BG["ImagePlane3D<br/>[Z = -10]"]
+    M3D["Merge3D"]
+    CAM["Camera3D"]
+    REN["Renderer3D"]
+    OUT["MediaOut"]
+    
+    LN_FG --> IP_FG
+    LN_BG --> IP_BG
+    IP_FG -->|"[3D Scene]"| M3D
+    IP_BG -->|"[3D Scene]"| M3D
+    M3D -->|"[2D Render]"| CAM
+    CAM --> REN
+    REN --> OUT
 ```
 
 Tracker nodes extract motion data from source footage through pattern matching algorithms that localize and follow visual features across frames. A standard Tracker node allows the placement of multiple tracking points within the viewer, each defined by a pattern rectangle (the reference image to track) and a search rectangle (the region in subsequent frames where the algorithm hunts for the pattern). The tracking operation proceeds either forward from the current frame or backward, computing XY position offsets for each tracked point at every frame and storing this data as an animated path. The Operation Mode dropdown determines what transform the tracker derives from the point data: a single-point track extracts only translation (XY position), two-point tracking adds rotation and uniform scale by analyzing how the distance and angle between points change, and four-point tracking computes a full corner-pin perspective transform suitable for replacing flat surfaces like signs or screens.

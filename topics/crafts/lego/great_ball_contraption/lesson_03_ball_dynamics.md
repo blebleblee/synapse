@@ -22,28 +22,23 @@ The third invariant governs *separation timing* in motorized switching mechanism
 
 A complete ball path from module intake to module output can be decomposed into five distinct mechanical zones, each with its own geometry constraints and failure modes. Understanding these zones as a system rather than as independent components is what separates a practitioner who builds reliable chains from one who spends event hours clearing jams.
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                     GBC BALL PATH ARCHITECTURE                          │
-│                                                                         │
-│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐          │
-│  │  INTAKE  │───▶│  LIFT /  │───▶│  TRANSIT │───▶│SEPARATION│          │
-│  │  ZONE    │    │  DRIVE   │    │  CHUTE   │    │  GATE    │          │
-│  └──────────┘    └──────────┘    └──────────┘    └──────────┘          │
-│       │                                                │                │
-│       │            Ball arrives with                  │                │
-│       │            inherited velocity                 ▼                │
-│       │                                      ┌────────────────┐        │
-│       │                                      │   PATH A       │        │
-│       └──────────────────────────────────────│   PATH B       │        │
-│                                              └────────────────┘        │
-│                                                        │                │
-│                                                        ▼                │
-│                                               ┌──────────────┐         │
-│                                               │   OUTPUT /   │         │
-│                                               │   HANDOFF    │         │
-│                                               └──────────────┘         │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph gbc["GBC BALL PATH ARCHITECTURE"]
+        intake["INTAKE<br/>ZONE"]
+        lift["LIFT /<br/>DRIVE"]
+        transit["TRANSIT<br/>CHUTE"]
+        separation["SEPARATION<br/>GATE"]
+        pathAB["PATH A<br/>PATH B"]
+        output["OUTPUT /<br/>HANDOFF"]
+        
+        intake -->|"Ball arrives with<br/>inherited velocity"| lift
+        lift --> transit
+        transit --> separation
+        separation --> pathAB
+        intake -.-> pathAB
+        pathAB --> output
+    end
 ```
 
 The **intake zone** sets the entry condition for every downstream event. Its critical dimension is the mouth width: for 32mm balls, a minimum clear width of 36mm (four and a half studs, achievable with a half-stud-offset bracket on one wall) prevents jamming on entry while still constraining lateral drift. The floor of the intake should slope inward at 15–20 degrees toward the lift mechanism—shallow enough that multiple balls do not avalanche simultaneously, steep enough that a resting ball will roll under gravity alone without motor assistance. This angle, in Lego geometry, corresponds to a rise of 1 plate (3.2mm) over a run of approximately 2 studs (16mm), giving a natural 11-degree slope. Achieving the target 15–20 degrees requires either a 2-plate rise over 2 studs (21 degrees—acceptable) or a 1-plate rise over 1.5 studs (12 degrees—marginal but functional for smooth-floored channels).
@@ -56,20 +51,18 @@ The sidewall treatment of the chute matters more than most builders initially re
 
 The simplest and most reliable separation mechanism requires no motor, no sensor, and no timing logic. It exploits the fact that a ball approaching a ridge along its centerline is in an unstable equilibrium: any lateral asymmetry in the approach vector commits it to one side. In practice, a staggered alternating-deflection wedge can achieve 50/50 distribution across two lanes without any active control, using nothing more than a carefully placed 1×2 Technic brick with a hole, oriented perpendicular to the ball path, with a half-stud offset toward one lane. The first ball deflects left; its passage slightly disturbs the wedge surface, biasing the second ball right. Over hundreds of balls, this passive stochastic system converges to near-equal distribution, provided the ball approach velocity is consistent.
 
-```
-           BALL APPROACH DIRECTION
-                     │
-                     ▼
-         ════════════╪════════════  ← chute floor (tiled)
-                     │
-                  ┌──┴──┐
-                  │ridge│  ← 1-stud-wide divider
-                  └──┬──┘
-                     │
-           ┌─────────┴─────────┐
-           ▼                   ▼
-         LANE A              LANE B
-      (left path)         (right path)
+```mermaid
+flowchart TD
+    approach["BALL APPROACH DIRECTION"]
+    floor["chute floor (tiled)"]
+    ridge["ridge<br/>(1-stud-wide divider)"]
+    laneA["LANE A<br/>(left path)"]
+    laneB["LANE B<br/>(right path)"]
+    
+    approach --> floor
+    floor --> ridge
+    ridge --> laneA
+    ridge --> laneB
 ```
 
 The divider must be positioned so that the ball contacts the ridge *before* it decelerates to below 0.15 m/s. Below this velocity threshold, surface friction dominates over momentum, and the ball will seek the nearest concavity rather than be deflected by the ridge—meaning it will jam against the divider instead of splitting from it. If your chute exit velocity is marginal, raising the chute's upstream angle by 3–4 degrees (one plate of rise added to the support structure) is preferable to any attempt to reduce divider friction, since the ball's momentum budget must be solved at the energy input stage.

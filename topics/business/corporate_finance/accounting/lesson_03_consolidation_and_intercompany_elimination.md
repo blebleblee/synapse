@@ -131,54 +131,19 @@ The consolidation worksheet for a complex group with multiple subsidiaries and l
 
 A visual representation of the consolidation flow for a two-entity group is:
 
-```
-ParentCo Standalone           SubCo Standalone
-Balance Sheet                 Balance Sheet
-┌─────────────────┐          ┌─────────────────┐
-│ Assets          │          │ Assets          │
-│ - Cash          │          │ - Cash          │
-│ - A/R           │          │ - Inventory     │
-│ - Investment    │          │ - Fixed Assets  │
-│   in SubCo      │          │                 │
-│                 │          │                 │
-│ Liabilities     │          │ Liabilities     │
-│ - A/P           │          │ - A/P           │
-│ - Debt          │          │ - Debt          │
-│                 │          │                 │
-│ Equity          │          │ Equity          │
-│ - Common Stock  │          │ - Common Stock  │
-│ - Retained      │          │ - Retained      │
-│   Earnings      │          │   Earnings      │
-└─────────────────┘          └─────────────────┘
-         │                            │
-         └────────────┬───────────────┘
-                      ↓
-            Consolidation Worksheet
-            ┌─────────────────────────┐
-            │ Elimination Entries:    │
-            │ 1. Investment vs Equity │
-            │ 2. Fair Value Adj       │
-            │ 3. Goodwill             │
-            │ 4. Intercompany Txns    │
-            │ 5. Unrealized Profit    │
-            │ 6. Intercompany Debt    │
-            └─────────────────────────┘
-                      ↓
-            Consolidated Balance Sheet
-            ┌─────────────────────────┐
-            │ Assets (aggregated)     │
-            │ + Fair Value Adj        │
-            │ + Goodwill              │
-            │ - Unrealized Profit     │
-            │ - Intercompany Debt     │
-            │                         │
-            │ Liabilities (aggregated)│
-            │ - Intercompany Debt     │
-            │                         │
-            │ Equity                  │
-            │ - Controlling Interest  │
-            │ - Noncontrolling Int.   │
-            └─────────────────────────┘
+```mermaid
+flowchart TD
+    ParentCo["<b>ParentCo Standalone</b><br/>Balance Sheet<br/>---<br/>Assets:<br/>• Cash<br/>• A/R<br/>• Investment in SubCo<br/>---<br/>Liabilities:<br/>• A/P<br/>• Debt<br/>---<br/>Equity:<br/>• Common Stock<br/>• Retained Earnings"]
+    
+    SubCo["<b>SubCo Standalone</b><br/>Balance Sheet<br/>---<br/>Assets:<br/>• Cash<br/>• Inventory<br/>• Fixed Assets<br/>---<br/>Liabilities:<br/>• A/P<br/>• Debt<br/>---<br/>Equity:<br/>• Common Stock<br/>• Retained Earnings"]
+    
+    Worksheet["<b>Consolidation Worksheet</b><br/>---<br/>Elimination Entries:<br/>1. Investment vs Equity<br/>2. Fair Value Adj<br/>3. Goodwill<br/>4. Intercompany Txns<br/>5. Unrealized Profit<br/>6. Intercompany Debt"]
+    
+    Consolidated["<b>Consolidated Balance Sheet</b><br/>---<br/>Assets aggregated<br/>+ Fair Value Adj<br/>+ Goodwill<br/>− Unrealized Profit<br/>− Intercompany Debt<br/>---<br/>Liabilities aggregated<br/>− Intercompany Debt<br/>---<br/>Equity:<br/>• Controlling Interest<br/>• Noncontrolling Interest"]
+    
+    ParentCo --> Worksheet
+    SubCo --> Worksheet
+    Worksheet --> Consolidated
 ```
 
 The consolidation process is not merely additive; it is reconstructive, transforming legal form into economic substance through systematic elimination of intra-enterprise transactions and fair-value revaluation of acquired assets and liabilities.

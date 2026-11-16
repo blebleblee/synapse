@@ -54,39 +54,30 @@ A third category, **Mixture of Experts with Expert Prototypes** (from BASE Layer
 
 The concrete data-flow through a MoE transformer layer is worth tracing precisely, because the shape transformations reveal why routing interacts so heavily with distributed memory layout.
 
-```
-Input Tensor:  [B, T, D]
-                 │
-                 ▼
-         ┌──────────────┐
-         │   Gate (Wg)  │   Linear: [D → E], Softmax over E
-         └──────────────┘
-                 │
-         g ∈ [B, T, E]  (dense logits)
-                 │
-                 ▼
-         ┌──────────────┐
-         │  Top-K Select│   Produces: indices [B, T, K],
-         │              │             weights [B, T, K]
-         └──────────────┘
-                 │
-         ┌───────┴────────────────────────────────────┐
-         │  Dispatch: scatter tokens to expert buffers │
-         │  Buffer per expert: [capacity C, D]         │
-         └───────┬────────────────────────────────────┘
-                 │
-     ┌───────────┼───────────┐
-     ▼           ▼           ▼
-  Expert_1    Expert_2  ... Expert_E
-  FFN([C,D]) FFN([C,D])    FFN([C,D])
-     │           │           │
-     └───────────┼───────────┘
-                 │
-         ┌───────┴────────────────────────────────────┐
-         │  Combine: gather expert outputs, weight sum │
-         └───────┬────────────────────────────────────┘
-                 │
-         Output: [B, T, D]
+```mermaid
+flowchart TD
+    A["Input Tensor: [B, T, D]"]
+    B["Gate (Wg)<br/>Linear: [D → E], Softmax over E"]
+    C["g ∈ [B, T, E]<br/>(dense logits)"]
+    D["Top-K Select<br/>Produces: indices [B, T, K]<br/>weights [B, T, K]"]
+    E["Dispatch: scatter tokens to expert buffers<br/>Buffer per expert: [capacity C, D]"]
+    F1["Expert_1<br/>FFN([C,D])"]
+    F2["Expert_2<br/>FFN([C,D])"]
+    F3["Expert_E<br/>FFN([C,D])"]
+    G["Combine: gather expert outputs, weight sum"]
+    H["Output: [B, T, D]"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F1
+    E --> F2
+    E --> F3
+    F1 --> G
+    F2 --> G
+    F3 --> G
+    G --> H
 ```
 
 The dispatch and combine steps are the architecturally expensive operations. In a single-device setting, dispatch is a scatter operation: for each token, write its hidden state into the input buffer of each expert it was routed to. In a multi-device setting where experts are distributed across devices (Expert Parallelism), dispatch becomes an all-to-all collective communication: each device holds a subset of experts and must receive tokens from all other devices that were routed to its experts. The all-to-all over $E$ experts on $N$ devices transfers $O(B \cdot T \cdot D)$ bytes and is typically the dominant communication cost in a MoE training run.

@@ -32,33 +32,54 @@ The connectivity requirement translates into a graph traversal problem. Construc
 
 Word segmentation emerges from black square placement through a two-pass scanning algorithm. The horizontal pass proceeds left-to-right through each row, accumulating consecutive WHITE cells into word slots until encountering a BLACK cell or grid boundary. Any accumulated sequence of three or more WHITE cells constitutes a valid across word slot. The vertical pass executes identically in column-major order, producing the down word slots. Each slot stores its start coordinates (r, c), direction (ACROSS or DOWN), and length, forming the fundamental units that must later be filled with actual vocabulary.
 
-```
-Example 15×15 grid with rotational symmetry (■ = BLACK, □ = WHITE):
-
-    0 1 2 3 4 5 6 7 8 9 A B C D E
-  ┌───────────────────────────────┐
-0 │ □ □ □ ■ □ □ □ ■ □ □ □ ■ □ □ □ │
-1 │ □ □ □ ■ □ □ □ ■ □ □ □ ■ □ □ □ │
-2 │ □ □ □ □ □ □ □ ■ □ □ □ □ □ □ □ │
-3 │ ■ ■ □ □ □ ■ □ □ □ ■ □ □ □ ■ ■ │
-4 │ □ □ □ □ ■ □ □ □ □ □ ■ □ □ □ □ │
-5 │ □ □ □ ■ □ □ □ ■ □ □ □ ■ □ □ □ │
-6 │ □ □ □ □ □ □ ■ □ ■ □ □ □ □ □ □ │
-7 │ ■ ■ ■ □ □ ■ □ □ □ ■ □ □ ■ ■ ■ │
-8 │ □ □ □ □ □ □ ■ □ ■ □ □ □ □ □ □ │
-9 │ □ □ □ ■ □ □ □ ■ □ □ □ ■ □ □ □ │
-A │ □ □ □ □ ■ □ □ □ □ □ ■ □ □ □ □ │
-B │ ■ ■ □ □ □ ■ □ □ □ ■ □ □ □ ■ ■ │
-C │ □ □ □ □ □ □ □ ■ □ □ □ □ □ □ □ │
-D │ □ □ □ ■ □ □ □ ■ □ □ □ ■ □ □ □ │
-E │ □ □ □ ■ □ □ □ ■ □ □ □ ■ □ □ □ │
-  └───────────────────────────────┘
-
-Symmetry verification: 
-  G[0][3] ■ ↔ G[14][11] ■  ✓
-  G[0][7] ■ ↔ G[14][7] ■   ✓
-  G[3][0] ■ ↔ G[11][14] ■  ✓
-  Center G[7][7] □ (self-symmetric)
+```mermaid
+flowchart TD
+    Grid["15×15 Grid with Rotational Symmetry"]
+    
+    subgraph Legend["Legend"]
+        Black["■ = BLACK cell"]
+        White["□ = WHITE cell"]
+    end
+    
+    subgraph Structure["Grid Structure"]
+        Rows["15 rows (0-E)"]
+        Cols["15 columns (0-E)"]
+        Center["Center: G[7][7] = □"]
+    end
+    
+    subgraph Symmetry["Rotational Symmetry Properties"]
+        Rule["180° rotation around center"]
+        Mapping["G[r][c] ↔ G[14-r][14-c]"]
+    end
+    
+    subgraph Examples["Verified Symmetry Pairs"]
+        Pair1["G[0][3] ■ ↔ G[14][11] ■"]
+        Pair2["G[0][7] ■ ↔ G[14][7] ■"]
+        Pair3["G[3][0] ■ ↔ G[11][14] ■"]
+        SelfSym["G[7][7] □ (self-symmetric)"]
+    end
+    
+    subgraph BlackPattern["Black Cell Positions"]
+        Row0["Row 0: cols 3, 7, 11"]
+        Row1["Row 1: cols 3, 7, 11"]
+        Row2["Row 2: col 7"]
+        Row3["Row 3: cols 0, 1, 5, 9, 13, 14"]
+        Row4["Row 4: cols 4, 10"]
+        Row5["Row 5: cols 3, 7, 11"]
+        Row6["Row 6: cols 6, 8"]
+        Row7["Row 7: cols 0, 1, 2, 5, 9, 12, 13, 14"]
+        Row8["Row 8: cols 6, 8"]
+        RowMirror["Rows 9-E mirror rows 5-0"]
+    end
+    
+    Grid --> Legend
+    Grid --> Structure
+    Structure --> Symmetry
+    Symmetry --> Examples
+    Grid --> BlackPattern
+    
+    Center --> SelfSym
+    Rule --> Mapping
 ```
 
 The constraint propagation engine forms the computational heart of modern construction software. When a constructor assigns a word to a slot, every letter in that word constrains the crossing slots at each position. Consider slot 1-ACROSS starting at (0,0) with length 3. Assigning the word CAT forces position (0,0) to 'C', (0,1) to 'A', and (0,2) to 'T'. Any DOWN slot passing through these cells must now accommodate these fixed letters. If 1-DOWN starts at (0,0) with length 5, its pattern becomes C____, dramatically reducing the candidate word list from all 5-letter words to only those beginning with 'C'. Modern crossword databases contain approximately 200,000-500,000 entries depending on quality thresholds, and efficient pattern matching requires trie-based or hash-indexed data structures that support wildcard queries.

@@ -56,17 +56,23 @@ The linearized system is $\dot{\xi} = A\xi$ with $A = Df(x^*)$. This is a consta
 
 The classification of hyperbolic equilibria in the plane is elegant and complete. If both eigenvalues have negative real part, $x^*$ is a **stable node** (real eigenvalues) or **stable spiral** (complex conjugate pair). If both have positive real part, the equilibrium is an **unstable node** or **unstable spiral**. If the eigenvalues are real with opposite signs, the equilibrium is a **saddle**: trajectories converge along the stable manifold (the eigenspace of the negative eigenvalue) and diverge along the unstable manifold (the eigenspace of the positive eigenvalue). These five cases, depicted below in terms of phase portrait topology, exhaust the classification.
 
-```
-Eigenvalue Configuration          Phase Portrait Type       Stability
-─────────────────────────────────────────────────────────────────────
-λ₁ < λ₂ < 0                       Stable node               AS
-λ₁ > λ₂ > 0                       Unstable node             Unstable
-λ₁ < 0 < λ₂                       Saddle point              Unstable
-α ± iβ,  α < 0, β ≠ 0             Stable spiral             AS
-α ± iβ,  α > 0, β ≠ 0             Unstable spiral           Unstable
-±iβ      (α = 0)                   Center (nonlinear!)       Indeterminate
-─────────────────────────────────────────────────────────────────────
-AS = Asymptotically Stable
+```mermaid
+flowchart TD
+    root["Linear System Eigenvalue Classification"]
+    
+    root --> case1["λ₁ &lt; λ₂ &lt; 0<br/>Stable Node<br/>Asymptotically Stable"]
+    root --> case2["λ₁ &gt; λ₂ &gt; 0<br/>Unstable Node<br/>Unstable"]
+    root --> case3["λ₁ &lt; 0 &lt; λ₂<br/>Saddle Point<br/>Unstable"]
+    root --> case4["α ± iβ, α &lt; 0, β ≠ 0<br/>Stable Spiral<br/>Asymptotically Stable"]
+    root --> case5["α ± iβ, α &gt; 0, β ≠ 0<br/>Unstable Spiral<br/>Unstable"]
+    root --> case6["±iβ (α = 0)<br/>Center (Nonlinear)<br/>Indeterminate"]
+    
+    style case1 fill:#90EE90
+    style case2 fill:#FFB6C6
+    style case3 fill:#FFB6C6
+    style case4 fill:#90EE90
+    style case5 fill:#FFB6C6
+    style case6 fill:#FFE5B4
 ```
 
 The final row is the critical warning: a linearization with purely imaginary eigenvalues tells us almost nothing about the nonlinear system. The nonlinear system might have a center (stable but not asymptotically stable), a stable spiral, or an unstable spiral — all three are compatible with a linear center. This is the domain where Lyapunov's direct method becomes essential.
@@ -87,15 +93,23 @@ The proof proceeds by constructing $h$ as the composition of two maps. First, on
 
 The structure of the conjugacy near a hyperbolic equilibrium can be visualized as follows, where the arrows indicate the direction of the conjugating map:
 
-```
-Nonlinear System                    Linear System
-φ(t, x₀) near x*     ←── h ───→   e^{At} ξ₀ near 0
-     │                                   │
-     │  t-flow                           │  t-flow
-     ▼                                   ▼
-φ(t+s, x₀) near x*   ←── h ───→   e^{A(t+s)} ξ₀ near 0
-
-Commutativity: h(φ(t, x)) = e^{At} h(x)
+```mermaid
+flowchart TD
+    A["φ(t, x₀) near x*<br/>(Nonlinear System)"]
+    B["e^{At} ξ₀ near 0<br/>(Linear System)"]
+    C["φ(t+s, x₀) near x*<br/>(Nonlinear System)"]
+    D["e^{A(t+s)} ξ₀ near 0<br/>(Linear System)"]
+    E["Commutativity:<br/>h(φ(t, x)) = e^{At} h(x)"]
+    
+    A -->|h| B
+    A -->|t-flow| C
+    B -->|t-flow| D
+    C -->|h| D
+    
+    A -.-> E
+    B -.-> E
+    C -.-> E
+    D -.-> E
 ```
 
 The significance of Hartman–Grobman for the practitioner is this: for a hyperbolic equilibrium, stability analysis of the nonlinear system reduces entirely to computing eigenvalues of a matrix. One need not solve the nonlinear ODE, construct a Lyapunov function, or perform any further nonlinear analysis. The classification of the linear system is the classification of the nonlinear system, up to continuous deformation of phase space. This reduction from infinite-dimensional function space analysis to finite-dimensional linear algebra is the geometric miracle at the heart of local stability theory.

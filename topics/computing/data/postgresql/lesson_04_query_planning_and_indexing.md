@@ -303,23 +303,34 @@ Standard B-Tree implementations require a **top-down split protocol**: before de
 
 The PostgreSQL implementation (`nbtree`) uses this to implement **bottom-up splits with no parent locking:**
 
-```
-Before split of leaf node L (full):
-┌─────────────────────────┐       ┌─────────────────────────┐
-│ L: [10, 20, 30, 40, 50] │──────►│ R_sibling               │
-│ high_key = ∞            │       └─────────────────────────┘
-└─────────────────────────┘
-
-Step 1: Allocate new node L' (right half of L)
-Step 2: Move [40, 50] to L', set L'.right_link = R_sibling
-Step 3: Set L.high_key = 40, L.right_link = L'
-Step 4: (Lock only L and L', not parent P)
-
-After:
-┌──────────────────┐       ┌──────────────────┐       ┌────────────┐
-│ L: [10, 20, 30]  │──────►│ L': [40, 50]     │──────►│ R_sibling  │
-│ high_key = 40    │       │ high_key = ∞     │       └────────────┘
-└──────────────────┘       └──────────────────┘
+```mermaid
+flowchart TD
+    subgraph before ["Before split of leaf node L (full)"]
+        L_before["L: [10, 20, 30, 40, 50]<br/>high_key = ∞"]
+        R_before["R_sibling"]
+        L_before -->|right_link| R_before
+    end
+    
+    subgraph steps ["Split Steps"]
+        step1["Step 1: Allocate new node L' (right half of L)"]
+        step2["Step 2: Move [40, 50] to L', set L'.right_link = R_sibling"]
+        step3["Step 3: Set L.high_key = 40, L.right_link = L'"]
+        step4["Step 4: (Lock only L and L', not parent P)"]
+        step1 --> step2
+        step2 --> step3
+        step3 --> step4
+    end
+    
+    subgraph after ["After split"]
+        L_after["L: [10, 20, 30]<br/>high_key = 40"]
+        Lprime_after["L': [40, 50]<br/>high_key = ∞"]
+        R_after["R_sibling"]
+        L_after -->|right_link| Lprime_after
+        Lprime_after -->|right_link| R_after
+    end
+    
+    before --> steps
+    steps --> after
 ```
 
 A concurrent reader traversing for key `45` descends to `L`, reads `high_key = 40`, recognizes that `45 > 40`, follows the right-link to `L'`, and finds the key — without having held a lock on the parent or stalled behind the split. The parent's downlink to `L'` is inserted asynchronously, in a separate step, with only a brief write lock on the parent. This design is why B-Tree indexes in PostgreSQL maintain high insert throughput under heavy concurrent write workloads.

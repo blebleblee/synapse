@@ -76,20 +76,20 @@ Incident response is a control system operating on the state space of system hea
 The incident lifecycle is a finite state machine with well-defined transitions:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> NormalOperation
-
-    NormalOperation --> Detection : "Anomaly / SLO breach detected"
-    Detection --> Triage : "On-call acknowledged"
-    Triage --> Containment : "Severity assessed, responders assembled"
-    Containment --> Remediation : "Blast radius limited"
-    Remediation --> Postmortem : "Root cause eliminated, service restored"
-    Postmortem --> NormalOperation : "Controls installed, runbooks updated"
-
-    Triage --> Escalation : "Severity exceeds on-call authority"
-    Escalation --> Containment : "Executive / cross-team engaged"
-
-    Remediation --> Triage : "Rollback introduced new failure"
+flowchart TD
+    Start([Start]) --> NormalOperation["Normal Operation"]
+    
+    NormalOperation -->|"Anomaly / SLO breach detected"| Detection["Detection"]
+    Detection -->|"On-call acknowledged"| Triage["Triage"]
+    Triage -->|"Severity assessed, responders assembled"| Containment["Containment"]
+    Containment -->|"Blast radius limited"| Remediation["Remediation"]
+    Remediation -->|"Root cause eliminated, service restored"| Postmortem["Postmortem"]
+    Postmortem -->|"Controls installed, runbooks updated"| NormalOperation
+    
+    Triage -->|"Severity exceeds on-call authority"| Escalation["Escalation"]
+    Escalation -->|"Executive / cross-team engaged"| Containment
+    
+    Remediation -->|"Rollback introduced new failure"| Triage
 ```
 
 The fundamental tension in incident response lies between the need for rapid action under uncertainty and the requirement for causal rigor in remediation. When a production database begins rejecting connections, operators face incomplete information: is this a query planner regression causing lock contention, a connection pool exhaustion from a traffic spike, a full filesystem on the primary replica, or a Byzantine fault from memory corruption? Initial response must proceed with partial observability, applying heuristics and pattern matching from prior incidents while simultaneously expanding the observation space through targeted instrumentation. This mirrors the reinforcement learning problem of exploration versus exploitation: exploitation applies known fixes to familiar symptoms (restarting a service, failing over to a replica, rate-limiting suspect clients), while exploration instruments new signals and tests hypotheses about causal mechanisms.
@@ -464,32 +464,19 @@ Chaos experiments in production require explicit blast radius controls:
 The circuit breaker pattern prevents cascading failures by monitoring the error rate of calls to a downstream dependency and transitioning through three states. The state machine provides adaptive control that trades temporary functionality loss for system stability.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Closed
-
-    Closed --> Open : "Error rate > threshold\n(e.g., >50% in 10s window)"
-    Open --> HalfOpen : "Probe timeout elapsed\n(e.g., 30s)"
-    HalfOpen --> Closed : "Probe request succeeded"
-    HalfOpen --> Open : "Probe request failed"
-
-    note right of Closed
-        All requests pass through.
-        Count successes and failures.
-        Latency and error metrics collected.
-    end note
-
-    note right of Open
-        All requests fail immediately
-        without attempting the call.
-        Downstream service gets
-        recovery time under zero load.
-    end note
-
-    note right of HalfOpen
-        One probe request allowed through.
-        Success = service recovered.
-        Failure = still unavailable.
-    end note
+flowchart TD
+    Start([Start]) --> Closed
+    
+    Closed["Closed<br/><br/>All requests pass through.<br/>Count successes and failures.<br/>Latency and error metrics collected."]
+    
+    Open["Open<br/><br/>All requests fail immediately<br/>without attempting the call.<br/>Downstream service gets<br/>recovery time under zero load."]
+    
+    HalfOpen["Half-Open<br/><br/>One probe request allowed through.<br/>Success = service recovered.<br/>Failure = still unavailable."]
+    
+    Closed -->|"Error rate > threshold<br/>(e.g., >50% in 10s window)"| Open
+    Open -->|"Probe timeout elapsed<br/>(e.g., 30s)"| HalfOpen
+    HalfOpen -->|"Probe request succeeded"| Closed
+    HalfOpen -->|"Probe request failed"| Open
 ```
 
 The mathematical basis derives from queuing theory. When a downstream service is overloaded, additional requests increase queue depth without improving throughput, consuming threads and memory in the calling service. By failing fast when a dependency is known to be unavailable, the circuit breaker prevents thread pool exhaustion and frees resources for alternative code paths (fallbacks, cached responses, degraded-mode functionality).
@@ -822,3 +809,4 @@ def compute_timeout_recommendation(
         "min_safe_timeout_ms": round(min_safe_timeout, 0),
         "note": (
             f"Timeout set at p{normal_percentile} × {degraded_multiplier}× degrad
+```

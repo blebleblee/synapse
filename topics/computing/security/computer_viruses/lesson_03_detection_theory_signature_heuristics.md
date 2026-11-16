@@ -26,38 +26,25 @@ The signature database itself employs hierarchical indexing structures optimized
 
 Modern engines augment Aho-Corasick with Bloom filters and hash-based indexing to eliminate impossible signature candidates before automaton traversal. The scanner first computes rolling hashes over fixed-width windows (e.g., 32-byte blocks) and queries a Bloom filter representing the hash space of all signature prefixes. A negative Bloom filter response guarantees no signature match exists in that window, allowing the scanner to skip forward without examining intermediate bytes. This optimization reduces expected-case scanning complexity by orders of magnitude when signature density is low.
 
-```
-Signature Matching Pipeline:
+```mermaid
+flowchart TD
+    A["File Buffer\n(executable bytes)"]
 
-File Buffer: [................executable bytes................]
-                    |
-                    v
-          +-------------------+
-          | Rolling Hash (32B)|
-          | Window Extraction |
-          +-------------------+
-                    |
-                    v
-          +-------------------+
-          |   Bloom Filter    |
-          | (Signature Prefix)|
-          +-------------------+
-                |           |
-         Negative       Positive
-            |               |
-        Skip Window         v
-                   +-------------------+
-                   |  Aho-Corasick DFA |
-                   | State Transitions |
-                   +-------------------+
-                            |
-                    Match Detected
-                            |
-                            v
-                   +-------------------+
-                   | Signature Context |
-                   | Validation (±64B) |
-                   +-------------------+
+    B["Rolling Hash\n32-byte Window Extraction"]
+
+    C["Bloom Filter\nSignature Prefix Check"]
+
+    D["Skip Window"]
+
+    E["Aho-Corasick DFA\nState Transitions"]
+
+    F["Signature Context Validation\n±64 bytes"]
+
+    A --> B
+    B --> C
+    C -->|"Negative"| D
+    C -->|"Positive"| E
+    E -->|"Match Detected"| F
 ```
 
 Signature context validation introduces wildcards and positional constraints that tolerate minor code variations. A wildcard signature might specify `E8 ?? ?? ?? ?? 68 [4-byte address] FF 15 [API import]` to match a call instruction followed by a push and indirect call, where the exact offsets and addresses vary across infections but the instruction sequence pattern remains invariant. The pattern matching engine tracks wildcard ranges and validates that matched bytes fall within specified bounds or reference valid memory addresses in the executable's import address table.
@@ -110,46 +97,19 @@ The emulation engine implements a lightweight virtual machine that simulates the
 
 The emulation architecture operates in three phases: initialization, execution, and behavior classification. During initialization, the emulator loads the suspicious executable into a virtual address space, parsing PE headers to resolve import tables and set up the initial stack frame. The instruction pointer begins at the executable's declared entry point, and the emulator starts single-stepping through x86/x64 instructions, updating virtual CPU registers and memory state after each operation.
 
-```
-Emulation State Machine:
-
-+------------------+     Load PE Headers      +-----------------+
-| Idle Emulator    | --------------------->  | Initialized VM  |
-|                  |     Map Virtual Memory   | - CS:EIP set    |
-|                  |     Resolve IAT Stubs    | - Stack frame   |
-+------------------+                          | - Hooked APIs   |
-                                              +-----------------+
-                                                      |
-                                              Execute instruction
-                                                      |
-                                                      v
-                                              +-----------------+
-                                              | Running State   |<----+
-                                              | - Decode opcode |     |
-                                              | - Update regs   |     |
-                                              | - Check hooks   |     |
-                                              +-----------------+     |
-                                                  |     |             |
-                                        API Call  |     | Normal      |
-                                                  |     | instruction |
-                                                  v     +-------------+
-                                          +-----------------+
-                                          | API Intercept   |
-                                          | - Log params    |
-                                          | - Detect pattern|
-                                          | - Return stub   |
-                                          +-----------------+
-                                                  |
-                                          Threshold reached
-                                          or timeout
-                                                  |
-                                                  v
-                                          +-----------------+
-                                          | Behavior Verdict|
-                                          | - Malicious     |
-                                          | - Suspicious    |
-                                          | - Benign        |
-                                          +-----------------+
+```mermaid
+flowchart TD
+    A["Idle Emulator"]
+    B["Initialized VM<br/>- CS:EIP set<br/>- Stack frame<br/>- Hooked APIs"]
+    C["Running State<br/>- Decode opcode<br/>- Update regs<br/>- Check hooks"]
+    D["API Intercept<br/>- Log params<br/>- Detect pattern<br/>- Return stub"]
+    E["Behavior Verdict<br/>- Malicious<br/>- Suspicious<br/>- Benign"]
+    
+    A -->|"Load PE Headers<br/>Map Virtual Memory<br/>Resolve IAT Stubs"| B
+    B -->|"Execute instruction"| C
+    C -->|"Normal instruction"| C
+    C -->|"API Call"| D
+    D -->|"Threshold reached<br/>or timeout"| E
 ```
 
 API interception occurs when the emulated instruction pointer reaches an import address table entry or when call instructions target known system DLL base addresses. The emulator maintains a hook table mapping API function addresses to instrumentation handlers. When malware calls VirtualProtect to change memory page permissions—a common precursor to self-modifying code or shellcode injection—the hook handler logs the target address, size, and requested protection flags. When CreateProcess spawns a child process, the handler records the command line and determines whether the malware attempts to inject code into the new process address space through subsequent WriteProcessMemory calls.

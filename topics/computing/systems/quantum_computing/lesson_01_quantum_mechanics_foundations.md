@@ -74,36 +74,49 @@ The CNOT is the gate that creates entanglement from product states. Applying a H
 
 The circuit model of quantum computation follows a precise execution pipeline. Understanding this pipeline at the mechanical level is essential before working with any quantum SDK or simulator.
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                     QUANTUM CIRCUIT EXECUTION PIPELINE                       │
-│                                                                               │
-│  ┌──────────┐   ┌──────────────┐   ┌────────────────┐   ┌────────────────┐  │
-│  │  State   │   │   Unitary    │   │  Measurement   │   │  Classical     │  │
-│  │  Prep    │──▶│  Evolution   │──▶│   (Collapse)   │──▶│  Post-Process  │  │
-│  │  |0...0⟩ │   │  U₁U₂...Uₙ  │   │  Born Rule     │   │  (Bitstring)   │  │
-│  └──────────┘   └──────────────┘   └────────────────┘   └────────────────┘  │
-│                                                                               │
-│  PHYSICAL LAYER:                                                              │
-│                                                                               │
-│  Qubit 0: ──H──────●──────────────────────M──                                │
-│                    │                      │                                   │
-│  Qubit 1: ─────────⊕──────Rφ─────────────M──                                │
-│                    │                      │                                   │
-│  Qubit 2: ─────────────────────●──────────M──                                │
-│                                │                                              │
-│  Qubit 3: ─────────────────────⊕──────────M──                                │
-│                                                                               │
-│  AMPLITUDE VECTOR (4 qubits = 16 complex numbers):                           │
-│                                                                               │
-│  |ψ⟩ = Σ αᵢ|i⟩,  i ∈ {0000,...,1111},  Σ|αᵢ|² = 1                         │
-│                                                                               │
-│  DECOHERENCE PRESSURE:                                                        │
-│                                                                               │
-│  Gate depth 0──────────────────────────────────▶ T₂ limit                   │
-│  Fidelity  1.0 ════════════════╗                                             │
-│                                 ╚══════════════▶ 0.0  (exponential decay)   │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+
+    subgraph pipeline ["QUANTUM CIRCUIT EXECUTION PIPELINE"]
+
+        subgraph logical ["Logical Pipeline"]
+            direction LR
+            SP["State Prep<br/>|0...0⟩"]
+            UE["Unitary Evolution<br/>U₁U₂...Uₙ"]
+            MC["Measurement (Collapse)<br/>Born Rule"]
+            PP["Classical Post-Process<br/>(Bitstring)"]
+            SP --> UE --> MC --> PP
+        end
+
+        subgraph physical ["Physical Layer — Qubit Circuit"]
+            direction LR
+            Q0["Qubit 0: ──H──●──────────M──"]
+            Q1["Qubit 1: ─────⊕──Rφ─────M──"]
+            Q2["Qubit 2: ─────────●──────M──"]
+            Q3["Qubit 3: ─────────⊕──────M──"]
+            Q0 -->|CNOT| Q1
+            Q2 -->|CNOT| Q3
+        end
+
+        subgraph amplitude ["Amplitude Vector  (4 qubits = 16 complex numbers)"]
+            AV["<b>|ψ⟩ = Σ αᵢ|i⟩</b><br/>i ∈ {0000, ..., 1111}<br/>Σ|αᵢ|² = 1"]
+        end
+
+        subgraph decoherence ["Decoherence Pressure"]
+            direction LR
+            GD["Gate Depth 0"]
+            T2["T₂ Limit"]
+            F1["Fidelity 1.0"]
+            F0["Fidelity 0.0<br/>(exponential decay)"]
+            GD -->|"increasing depth"| T2
+            F1 -->|"exponential decay"| F0
+        end
+
+    end
+
+    logical --> physical
+    physical --> amplitude
+    amplitude --> decoherence
 ```
 
 State preparation initializes all physical qubits to $|0\rangle$, which on superconducting devices means waiting for the qubits to relax to their ground state or applying an active reset pulse. Unitary evolution then applies the gate sequence, each gate consuming coherence time from the budget. Physical devices do not implement arbitrary two-qubit gates between all qubit pairs; the **connectivity graph** (or coupling map) defines which pairs of physical qubits can interact natively. Transpilation, the process of compiling a logical circuit to a physical circuit that respects the connectivity graph, is one of the central engineering challenges in current quantum software stacks, directly analogous to register allocation and instruction scheduling in classical compilers.

@@ -32,25 +32,26 @@ This wrapper is not theoretical — it is the actual mechanism that creates per-
 
 The module cache is the mechanism that makes circular dependencies survivable in CommonJS. The first time a module is `require()`d, Node adds it to `Module._cache` keyed by its resolved absolute path, then begins evaluating it. If module A requires module B, and module B requires module A during its own evaluation, `require('./a')` inside B will find the partially evaluated cache entry for A and return whatever has been exported so far — which may be an incomplete object. This is not a bug in the design; it is a documented invariant that shifts the burden of reasoning about circular dependencies onto the developer.
 
-```
-require('./a')
-      │
-      ▼
-  Module._cache lookup
-      │
-  ┌───┴──────────────┐
-  │  Miss             │  Hit
-  │                  │
-  ▼                  ▼
-Allocate module    Return cached
-object, begin      module.exports
-evaluation         (possibly partial)
-      │
-  Execute wrapper function
-      │
-  module.exports populated
-      │
-  Cache entry finalized
+```mermaid
+flowchart TD
+    A["require('./a')"]
+    B["Module._cache lookup"]
+    C["Miss"]
+    D["Hit"]
+    E["Allocate module object,<br/>begin evaluation"]
+    F["Return cached module.exports<br/>(possibly partial)"]
+    G["Execute wrapper function"]
+    H["module.exports populated"]
+    I["Cache entry finalized"]
+    
+    A --> B
+    B --> C
+    B --> D
+    C --> E
+    D --> F
+    E --> G
+    G --> H
+    H --> I
 ```
 
 The synchronous nature of `require()` has a critical performance implication: every `require()` call at module load time is a blocking file system operation. In a large Node.js application with hundreds of dependencies, startup latency is dominated by the time spent resolving, reading, and evaluating modules. This is why tools like `--require` hooks and bundlers that inline all dependencies into a single file can dramatically reduce cold-start time.
@@ -90,27 +91,31 @@ Node.js wraps V8 with libuv, a cross-platform asynchronous I/O library written i
 
 The loop executes through six ordered phases on each tick. The **timers** phase executes callbacks scheduled by `setTimeout` and `setInterval` whose threshold has been reached. The **pending callbacks** phase executes I/O callbacks deferred from a previous iteration. The **idle/prepare** phases are internal. The **poll** phase is where the loop blocks, waiting for new I/O events, and executes their callbacks when they arrive — this is the phase where most of your application's time is spent. The **check** phase executes `setImmediate` callbacks. The **close callbacks** phase executes callbacks for closed sockets and handles.
 
-```
-   ┌─────────────────────────────────────────────┐
-   │               Event Loop Tick               │
-   │                                             │
-   │  ┌──────────┐    ┌────────────┐             │
-   │  │  timers  │───▶│  pending   │             │
-   │  └──────────┘    │  callbacks │             │
-   │                  └─────┬──────┘             │
-   │                        │                    │
-   │                  ┌─────▼──────┐             │
-   │                  │    poll    │◀────────┐   │
-   │                  └─────┬──────┘         │   │
-   │                        │                │   │
-   │                  ┌─────▼──────┐    ┌────┴─┐ │
-   │                  │   check    │    │close │ │
-   │                  │(setImmed.) │───▶│ cbs  │ │
-   │                  └────────────┘    └──────┘ │
-   │                                             │
-   │  microtask queues (Promises, queueMicrotask)│
-   │  drain completely between every phase       │
-   └─────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Event Loop Tick"]
+    
+    subgraph phases["Event Loop Phases"]
+        B["timers"]
+        C["pending callbacks"]
+        D["poll"]
+        E["check<br/>(setImmediate)"]
+        F["close callbacks"]
+    end
+    
+    subgraph microtask["Microtask Queue"]
+        G["Promises<br/>queueMicrotask<br/>drain between every phase"]
+    end
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F -.drain.-> G
+    C -.drain.-> G
+    D -.drain.-> G
+    E -.drain.-> G
 ```
 
 Microtasks — resolved Promise callbacks and `queueMicrotask` calls — are not part of the libuv phase structure. They execute between every phase transition, and they drain completely before the next phase begins. This creates a strict priority ordering: microtasks have higher priority than any macro-task callback. If you recursively resolve Promises, you can starve the timer and I/O phases entirely, because the microtask queue never empties. This is a real failure mode in production systems.

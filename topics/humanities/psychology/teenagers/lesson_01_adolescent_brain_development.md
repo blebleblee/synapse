@@ -30,33 +30,50 @@ The hormonal influences on neural architecture operate through multiple mechanis
 
 The following diagram illustrates the temporal dynamics and functional relationships between key neural systems during adolescent development:
 
-```
-ADOLESCENT BRAIN DEVELOPMENT TIMELINE (Ages 10-25)
-
-Limbic System Activation:
-[Childhood]────▲▲▲▲▲▲▲▲─────────[Peak Mid-Adolescence]────────▼───[Young Adult]
-                    Reward Sensitivity, Emotional Reactivity
-
-Prefrontal Cortex Maturation:
-[Childhood]────────────────▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲───[Young Adult Complete]
-                    Executive Function, Impulse Control, Planning
-
-Synaptic Density (Gray Matter):
-[Childhood Peak]───▼▼▼▼▼▼▼▼▼▼▼───────[Adult Baseline]
-                    Pruning, Specialization
-
-Myelination (White Matter):
-[Childhood]────▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲───────[Young Adult]
-                    Connectivity, Processing Speed
-
-Hormonal Surge:
-[Pre-Puberty]──▲▲▲▲▲▲─[Mid-Puberty Peak]──▼──[Adult Stability]
-                    Sex Steroids, Neuromodulation
-
-IMBALANCE WINDOW (High Risk Period):
-[═══════════════════════════════]
-Age 12-18: Maximum disparity between limbic activation 
-and prefrontal control capacity
+```mermaid
+flowchart TD
+    subgraph timeline["ADOLESCENT BRAIN DEVELOPMENT TIMELINE (Ages 10-25)"]
+        direction LR
+        
+        subgraph limbic["Limbic System Activation"]
+            L1["Childhood<br/>Low Activity"]
+            L2["Peak Mid-Adolescence<br/>High Reward Sensitivity<br/>Emotional Reactivity"]
+            L3["Young Adult<br/>Normalized"]
+            L1 -->|▲▲▲▲▲| L2 -->|▼| L3
+        end
+        
+        subgraph prefrontal["Prefrontal Cortex Maturation"]
+            P1["Childhood<br/>Developing"]
+            P2["Adolescence<br/>Gradual Development"]
+            P3["Young Adult<br/>Complete<br/>Executive Function<br/>Impulse Control"]
+            P1 -->|▲▲▲▲▲▲▲▲▲▲| P2 -->|▲▲▲▲▲| P3
+        end
+        
+        subgraph synaptic["Synaptic Density - Gray Matter"]
+            S1["Childhood Peak<br/>High Density"]
+            S2["Adolescence<br/>Pruning & Specialization"]
+            S3["Adult Baseline<br/>Optimized"]
+            S1 -->|▼▼▼▼▼▼▼▼▼▼| S2 -->|▼| S3
+        end
+        
+        subgraph myelination["Myelination - White Matter"]
+            M1["Childhood<br/>Low Myelination"]
+            M2["Adolescence & Young Adult<br/>Increasing Connectivity"]
+            M3["Young Adult<br/>Complete<br/>Optimized Processing Speed"]
+            M1 -->|▲▲▲▲▲▲▲▲▲▲| M2 -->|▲▲| M3
+        end
+        
+        subgraph hormonal["Hormonal Surge"]
+            H1["Pre-Puberty<br/>Low Levels"]
+            H2["Mid-Puberty Peak<br/>Sex Steroids<br/>Neuromodulation"]
+            H3["Adult Stability<br/>Regulated Levels"]
+            H1 -->|▲▲▲▲▲▲| H2 -->|▼| H3
+        end
+        
+        subgraph imbalance["⚠ IMBALANCE WINDOW - HIGH RISK PERIOD"]
+            I["Ages 12-18<br/>Maximum Disparity Between<br/>Limbic Activation & Prefrontal Control"]
+        end
+    end
 ```
 
 This temporal architecture creates the characteristic adolescent psychological profile. The imbalance between early-maturing limbic systems and late-maturing prefrontal systems produces a neurobiological vulnerability window where sensation-seeking increases, risk assessment accuracy decreases, and peer influence reaches maximum potency. Practitioners must recognize this is not a failure of the individual adolescent but an inherent feature of the developmental trajectory shared across cultures and, in modified form, across mammalian species including rodents and non-human primates.

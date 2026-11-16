@@ -22,26 +22,20 @@ The physical architecture of a CNC machine tool is described by its kinematic ch
 
 The most common CNC machine tool in job shops worldwide is the 3-axis vertical machining center. Its kinematic chain is straightforward: the bed is the ground frame. The X-axis saddle rides on linear guideways bolted to the bed. The Y-axis saddle rides on the X-axis saddle. The column rises from the bed, and the Z-axis head — carrying the spindle — rides on the column. The workpiece is clamped to the table, which is the topmost moving element on the X and Y stack. The tool is held in the spindle, which is the topmost moving element on the Z stack. The kinematic chain from ground to workpiece is: bed → X saddle → Y saddle → table → workpiece. The kinematic chain from ground to tool is: bed → column → Z head → spindle → tool. The intersection point where the tool meets the workpiece is where the cutting happens, and the controller manages the relative position of these two stacks to achieve the commanded coordinates.
 
-```
-       ┌─────────────────────┐
-       │      SPINDLE / TOOL  │
-       │          ▲ Z-axis    │
-       │     ┌──────────────┐ │
-       │     │  Z-HEAD CAST  │ │
-       │     │  (quill/slide)│ │
-       │     └──────┬───────┘ │
-       │            │         │
-  ┌────┴────────────┴─────────┐
-  │          COLUMN            │
-  │                            │
-  │  ┌──────────────────────┐ │
-  │  │   TABLE (workpiece)   │ │
-  │  │        ▲ Y-axis       │ │
-  │  │  ◄──── X-axis ────►   │ │
-  │  └──────────────────────┘ │
-  │           SADDLE           │
-  │           BASE / BED       │
-  └────────────────────────────┘
+```mermaid
+flowchart TD
+    Spindle["SPINDLE / TOOL<br/>↑ Z-axis"]
+    ZHead["Z-HEAD CAST<br/>(quill/slide)"]
+    Column["COLUMN"]
+    Table["TABLE (workpiece)<br/>↑ Y-axis<br/>← X-axis →"]
+    Saddle["SADDLE"]
+    Base["BASE / BED"]
+    
+    Spindle --> ZHead
+    ZHead --> Column
+    Column --> Table
+    Table --> Saddle
+    Saddle --> Base
 ```
 
 In this configuration, the tool only moves in Z and the workpiece moves in X and Y. This has practical consequences for cutting dynamics: during a heavy X-axis contouring cut, the table mass (which includes the workpiece, vise, and saddle) is in motion, and the inertia of that mass affects the servo loop's ability to maintain commanded position. On a machine with linear motors and lightweight composite tables, this is manageable. On an older machine with heavy cast-iron tables and ballscrew drives, the X-axis acceleration is limited by the servo motor's torque curve and the ballscrew's torsional stiffness. The programmer who understands this will avoid aggressive high-frequency direction changes in X on a heavy machine, because the table mass will overshoot, the servo will correct, and the surface finish will show visible chatter marks at every corner.

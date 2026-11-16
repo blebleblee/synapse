@@ -98,15 +98,19 @@ This is not a convention but a theorem: matrix multiplication was *defined* to m
 
 The relationship between the abstract map $T$, its coordinate representation, and the resulting matrix algebra can be organized as a commutative diagram. The commutativity of this square is the content of the representation theorem.
 
-```
-         T
-  V ──────────────────▶ W
-  │                      │
-  │ [·]_B                │ [·]_C
-  │                      │
-  ▼                      ▼
- F^n ──────────────────▶ F^m
-      [T]_B^C · (–)
+```mermaid
+flowchart TD
+    T["T"]
+    V["V"]
+    W["W"]
+    F_n["F^n"]
+    F_m["F^m"]
+    
+    T --> V
+    T --> W
+    V -->|[·]_B| F_n
+    W -->|[·]_C| F_m
+    F_n -->|"[T]_B^C · (–)"| F_m
 ```
 
 The two paths from $V$ to $\mathbb{F}^m$ produce the same result: apply $T$ then coordinatize, or coordinatize then multiply by $[T]_\mathcal{B}^\mathcal{C}$. The diagram commutes, meaning:

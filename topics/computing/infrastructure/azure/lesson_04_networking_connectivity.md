@@ -48,24 +48,29 @@ Every physical server in Azure's fleet runs a hypervisor host agent that impleme
 
 The VFP consults local policy tables maintained by the Azure Host Networking Service (HNS), a control plane agent that receives configuration updates from the Azure fabric controller. These policy tables encode the complete network topology relevant to VMs on this host: VNet CIDR ranges, peering relationships, NSG rules, UDR entries, and load balancer backends. For every egressing packet, VFP performs a longest-prefix match on the destination IP against the routing table, determines the encapsulation type (VXLAN or NVGRE), and wraps the original packet in an outer header containing the physical destination host's IP address.
 
-```
-Original VM Packet (Inner):
-┌─────────────────────────────────────────────────────────────┐
-│ Ethernet Header (VM's MAC, Gateway MAC)                      │
-│ IP Header (VM's Private IP → Destination Private IP)         │
-│ TCP/UDP Header                                                │
-│ Payload                                                       │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph outer ["After VFP Encapsulation (Outer)"]
+        direction TD
+        OEth["Outer Ethernet Header\n(Physical Host MACs)"]
+        OIP["Outer IP Header\n(Physical Host IP → Physical Dest Host IP)"]
+        VXLAN["VXLAN Header\n(VNI: Tenant/VNet Identifier, Flags)"]
 
-After VFP Encapsulation (Outer):
-┌─────────────────────────────────────────────────────────────┐
-│ Outer Ethernet Header (Physical Host MACs)                   │
-│ Outer IP Header (Physical Host IP → Physical Dest Host IP)   │
-│ VXLAN Header (VNI: Tenant/VNet Identifier, Flags)            │
-│   ┌─────────────────────────────────────────────────────┐   │
-│   │ Original VM Packet (Inner) - Complete L2 Frame      │   │
-│   └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+        subgraph inner ["Original VM Packet (Inner) — Complete L2 Frame"]
+            direction TD
+            IEth["Ethernet Header\n(VM's MAC, Gateway MAC)"]
+            IIP["IP Header\n(VM's Private IP → Destination Private IP)"]
+            ITCP["TCP/UDP Header"]
+            IPayload["Payload"]
+        end
+
+        OEth --> OIP
+        OIP --> VXLAN
+        VXLAN --> IEth
+        IEth --> IIP
+        IIP --> ITCP
+        ITCP --> IPayload
+    end
 ```
 
 The VXLAN Network Identifier (VNI) in the encapsulation header serves as the tenant isolation boundary. Azure assigns a unique 24-bit VNI to every VNet, ensuring packets from different customers remain cryptographically separated even when sharing physical network paths. The physical switches treat encapsulated packets as opaque UDP datagrams (VXLAN uses UDP port 4789) and forward them based solely on the outer IP header. Upon arrival at the destination host, the receiving VFP examines the VNI, validates it against allowed VNets for the destination VM, strips the outer headers, and delivers the original packet to the VM's virtual NIC.
@@ -119,28 +124,49 @@ The Private Link service maintains a mapping table of private IPs to backend ser
 
 ExpressRoute circuit provisioning establishes a complex chain of BGP peering relationships. The customer's edge router peers with Microsoft Enterprise Edge (MSEE) routers at the peering location, exchanging routes via eBGP (typically using private AS numbers in the 64512-65535 range). MSEE routers propagate customer-learned routes into Azure's internal BGP fabric, which distributes them to Virtual Network Gateways in subscribed regions. The gateway then injects these routes into VNet routing tables, enabling VM-to-on-premises connectivity.
 
-```
-ExpressRoute BGP Hierarchy:
+```mermaid
+flowchart TD
+    CE["Customer Edge Router\nAS 65001"]
 
-Customer Edge Router (AS 65001)
-  │
-  ├─ BGP Peering Path 1 ─→ MSEE-1 (Primary)
-  │                           │
-  │                           └─→ Azure Internal BGP Fabric
-  │                                 │
-  └─ BGP Peering Path 2 ─→ MSEE-2 (Secondary)  ├─→ VNet Gateway (East US)
-                              │                 │     │
-                              └─────────────────┘     └─→ VNet Routing Tables
-                                                      
-                                                     ├─→ VNet Gateway (West Europe)
-                                                           │
-                                                           └─→ VNet Routing Tables
+    subgraph msee_layer ["Microsoft Enterprise Edge Layer"]
+        MSEE1["MSEE-1\n(Primary)"]
+        MSEE2["MSEE-2\n(Secondary)"]
+    end
 
-Route Advertisement Example:
-Customer announces: 10.50.0.0/16 via AS 65001
-MSEE receives: 10.50.0.0/16, AS-Path: 65001
-Azure Fabric: 10.50.0.0/16, AS-Path: 12076 65001 (prepended Microsoft AS)
-VNet Gateway: Installs route 10.50.0.0/16 → ExpressRoute Gateway
+    subgraph azure_fabric ["Azure Internal BGP Fabric\n10.50.0.0/16 · AS-Path: 12076 65001"]
+        direction TD
+
+        subgraph east_us ["VNet — East US"]
+            GW_EAST["VNet Gateway\n(East US)"]
+            RT_EAST["VNet Routing Tables\n10.50.0.0/16 → ER Gateway"]
+        end
+
+        subgraph west_eu ["VNet — West Europe"]
+            GW_WEST["VNet Gateway\n(West Europe)"]
+            RT_WEST["VNet Routing Tables\n10.50.0.0/16 → ER Gateway"]
+        end
+    end
+
+    subgraph route_advert ["Route Advertisement Flow"]
+        direction LR
+        RA1["Customer announces\n10.50.0.0/16 via AS 65001"]
+        RA2["MSEE receives\n10.50.0.0/16\nAS-Path: 65001"]
+        RA3["Azure Fabric propagates\n10.50.0.0/16\nAS-Path: 12076 65001"]
+        RA4["VNet Gateway installs\n10.50.0.0/16 → ER Gateway"]
+
+        RA1 --> RA2 --> RA3 --> RA4
+    end
+
+    CE -- "BGP Peering Path 1\n(Primary)" --> MSEE1
+    CE -- "BGP Peering Path 2\n(Secondary)" --> MSEE2
+
+    MSEE1 --> azure_fabric
+    MSEE2 --> azure_fabric
+
+    GW_EAST --> RT_EAST
+    GW_WEST --> RT_WEST
+
+    azure_fabric -.-> route_advert
 ```
 
 Traffic engineering across ExpressRoute circuits relies on AS-path prepending and BGP communities. Customers can influence inbound traffic (Azure to on-premises) by announcing routes from their preferred circuit with a shorter AS-path, causing MSEE routers to prefer that path via standard BGP best-path selection. For outbound traffic (on-premises to Azure), customers configure local preference on their edge routers or use route filtering to prevent less-preferred paths from learning Azure routes entirely.
@@ -149,32 +175,34 @@ VPN gateway architecture implements high availability through active-active or a
 
 The IPsec tunnel establishment sequence follows IKEv2 protocol phases:
 
-```
-Phase 1: IKE_SA_INIT (Establish IKE Security Association)
-Customer VPN Device                Azure VPN Gateway
-      │                                   │
-      ├─ IKE_SA_INIT Request ───────────→│
-      │  (DH Group, Crypto Proposals)     │
-      │                                   │
-      │←─ IKE_SA_INIT Response ───────────┤
-      │  (Selected DH Group, Cookie)      │
-      │                                   │
-
-Phase 2: IKE_AUTH (Authenticate and Create Child SA)
-      │                                   │
-      ├─ IKE_AUTH Request ───────────────→│
-      │  (PSK/Certificate, ID, SA Proposal)│
-      │                                   │
-      │←─ IKE_AUTH Response ───────────────┤
-      │  (Auth Success, Child SA Created) │
-      │                                   │
-
-Child SA (IPsec ESP Tunnel) Established
-      │                                   │
-      ├─ Encrypted Traffic (ESP) ───────→│
-      │                                   │
-      │←─ Encrypted Traffic (ESP) ────────┤
-      │                                   │
+```mermaid
+flowchart TD
+    subgraph phase1["Phase 1: IKE_SA_INIT (Establish IKE Security Association)"]
+        A["Customer VPN Device"]
+        B["Azure VPN Gateway"]
+        
+        A -->|"IKE_SA_INIT Request<br/>(DH Group, Crypto Proposals)"| B
+        B -->|"IKE_SA_INIT Response<br/>(Selected DH Group, Cookie)"| A
+    end
+    
+    subgraph phase2["Phase 2: IKE_AUTH (Authenticate and Create Child SA)"]
+        C["Customer VPN Device"]
+        D["Azure VPN Gateway"]
+        
+        C -->|"IKE_AUTH Request<br/>(PSK/Certificate, ID, SA Proposal)"| D
+        D -->|"IKE_AUTH Response<br/>(Auth Success, Child SA Created)"| C
+    end
+    
+    subgraph childsa["Child SA (IPsec ESP Tunnel) Established"]
+        E["Customer VPN Device"]
+        F["Azure VPN Gateway"]
+        
+        E -->|"Encrypted Traffic (ESP)"| F
+        F -->|"Encrypted Traffic (ESP)"| E
+    end
+    
+    phase1 --> phase2
+    phase2 --> childsa
 ```
 
 Each Child SA contains bidirectional Security Associations with negotiated encryption (typically AES-256-GCM) and integrity algorithms (SHA-256 HMAC). The gateway applies these algorithms to every packet traversing the tunnel, encapsulating it in ESP format with an authentication tag covering the entire ESP packet. This cryptographic overhead reduces effective throughput—a 1 Gbps gateway SKU delivers approximately 700-800 Mbps of usable bandwidth after accounting for encryption processing and ESP header overhead.

@@ -358,15 +358,15 @@ Consumer groups operate via a coordination protocol:
 Offset commits are stored in the internal `__consumer_offsets` topic (default 50 partitions, compacted). Each consumer group-partition pair has a committed offset representing the last successfully processed record.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Discovering: Consumer starts
-    Discovering --> Joining: Find coordinator
-    Joining --> Syncing: Send JoinGroup
-    Syncing --> Heartbeating: Receive assignment
-    Heartbeating --> Heartbeating: Process records + heartbeat
-    Heartbeating --> Rebalancing: Heartbeat timeout or member change
-    Rebalancing --> Syncing: Re-join group
-    Heartbeating --> [*]: LeaveGroup (shutdown)
+flowchart TD
+    Start([Start]) --> Discovering["Discovering"]
+    Discovering -->|"Find coordinator"| Joining["Joining"]
+    Joining -->|"Send JoinGroup"| Syncing["Syncing"]
+    Syncing -->|"Receive assignment"| Heartbeating["Heartbeating"]
+    Heartbeating -->|"Process records + heartbeat"| Heartbeating
+    Heartbeating -->|"Heartbeat timeout or member change"| Rebalancing["Rebalancing"]
+    Rebalancing -->|"Re-join group"| Syncing
+    Heartbeating -->|"LeaveGroup (shutdown)"| End([End])
 ```
 
 ### Step 1: Create a Consumer Group

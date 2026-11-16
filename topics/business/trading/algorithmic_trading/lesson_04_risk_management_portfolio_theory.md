@@ -30,25 +30,34 @@ This three-zone architecture reflects practical experience: the warning zone cat
 
 The implementation requires precision in data flow and liveness guarantees. Market data arrives asynchronously from exchange feeds (equities exchanges update roughly every 1–10 milliseconds; futures contracts update every 5–50 milliseconds depending on liquidity). The position monitoring system must buffer incoming market updates, snapshot the current portfolio state, recompute all risk metrics, evaluate limits, and trigger any necessary actions (alert, reduce position, flatten position) within a bounded latency envelope—typically 50–200 milliseconds for systematic strategies operating at minute-to-second horizons. If the monitoring system lags by more than this threshold, it risks operating on stale prices and issuing stale trading signals that might be suboptimal or counterproductive when executed.
 
-```
-Market Data Feed (Exchange)
-          ↓
-    [Buffer 100ms]
-          ↓
-   Position Snapshot
-          ↓
-    Mark-to-Market P&L
-    Greeks Calculation
-    Limit Comparison
-          ↓
-         ├─→ [Normal Zone] → Log Metrics
-         ├─→ [Warning Zone] → Alert + Reduce 25-50%
-         └─→ [Critical Zone] → Force Liquidate
-          ↓
-     Trade Signal (if needed)
-          ↓
-   Execution Algorithm
-    (VWAP, TWAP, Algo)
+```mermaid
+flowchart TD
+    A["Market Data Feed (Exchange)"]
+    B["Buffer 100ms"]
+    C["Position Snapshot"]
+    D["Mark-to-Market P&L<br/>Greeks Calculation<br/>Limit Comparison"]
+    E["Normal Zone"]
+    F["Warning Zone"]
+    G["Critical Zone"]
+    H["Log Metrics"]
+    I["Alert + Reduce 25-50%"]
+    J["Force Liquidate"]
+    K["Trade Signal (if needed)"]
+    L["Execution Algorithm<br/>(VWAP, TWAP, Algo)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    D --> F
+    D --> G
+    E --> H
+    F --> I
+    G --> J
+    H --> K
+    I --> K
+    J --> K
+    K --> L
 ```
 
 **The Intraday Drawdown Circuit Breaker** operates at hourly resolution and monitors cumulative loss thresholds. If a strategy has generated $500K in profit year-to-date and has lost $50K so far today (a 10% daily loss), the system compares this daily loss against the intraday maximum loss threshold (often set at 15–25% of YTD profits or 1–2% of total capital under management, whichever is more conservative). When intraday losses exceed this threshold, the system disables all trading until the next trading day, locking in the loss and preventing the "chase losses through escalating risk" trap that ensnares traders emotionally. This circuit breaker is not optional psychology; it is a hard operational constraint written into the trading system's code. Humans cannot override it. The circuit breaker reflects an empirical observation: when a strategy is losing significantly intraday, it often means market conditions have shifted away from the strategy's historical regime, and continued trading at full scale is likely to deepen losses. The optimal response is to stop, investigate, and resume only after regaining confidence.
@@ -100,4 +109,19 @@ Total portfolio return: $+0.80\% + 0.15\% + 0.04\% + 0.15\% = +1.14\%$
 
 This decomposition reveals exactly which systematic risk drivers contributed to the day's gain and allows traders to assess whether the performance is consistent with strategy conviction. If the strategy is designed to capture momentum but value is providing most of the return, this signals that the strategy is under-exposed to its intended factor and may be taking unintended value factor bets.
 
-**Stress Testing and Scenario Analysis** projects portfolio losses under hypothetical market moves: "If the S&P 500 falls 10%, how much does our portfolio lose?" or "If the VIX spikes to 80 (consistent with the 2008 financial crisis), what are expected losses?" Stress testing proceeds in three steps. First, define scenarios (S&P 500 down 10%, US Treasury yields up 200 basis points, crude oil down 30%, credit spreads up 300 basis points). Second, use historical factor loadings to project each position's response to these m
+**Stress Testing and Scenario Analysis** projects portfolio losses under hypothetical market moves: "If the S&P 500 falls 10%, how much does our portfolio lose?" or "If the VIX spikes to 80 (consistent with the 2008 financial crisis), what are expected losses?" Stress testing proceeds in three steps. First, define scenarios (S&P 500 down 10%, US Treasury yields up 200 basis points, crude oil down 30%, credit spreads up 300 basis points).
+
+Second, compute the portfolio's sensitivity to each scenario factor by regressing historical portfolio returns against the factor returns (e.g., S&P 500 daily returns, VIX level changes, Treasury yield changes). These regressions yield scenario betas: if the portfolio has a beta of 1.2 to the S&P 500, a 10% S&P decline implies an expected 12% portfolio loss. Third, apply the scenario shocks to the fitted betas to compute projected P&L: if the portfolio beta to credit spreads is -0.4, a 300 basis point widening in credit spreads projects a -1.2% portfolio loss (assuming the spread beta is calibrated in percentage terms). The final scenario P&L is the sum of contributions from all shocked factors plus any residual term. Stress testing is forward-looking and model-dependent—it depends critically on the accuracy of the fitted factor exposures and the assumption that historical relationships hold under extreme conditions. For this reason, stress tests are best interpreted as conditional estimates ("given current exposures and historical correlations, if X happens, we expect Y") rather than deterministic predictions. Complementary tail risk measures such as expected shortfall and historical worst-case drawdowns provide additional context for extreme loss potential.
+
+Risk management in algorithmic trading is a continuous process of measurement, decomposition, and control. VaR and expected shortfall quantify tail risk and ensure that capital is allocated with awareness of extreme loss probabilities. Factor attribution decomposes returns into systematic exposures and residual alpha, revealing whether performance is driven by intended factor bets or unintended tilts. Stress testing projects losses under hypothetical shocks and validates that the portfolio can withstand adverse scenarios without catastrophic capital loss. Together, these tools form the foundation of a disciplined risk management framework that aligns portfolio construction with risk appetite, ensuring that strategies operate within defined risk limits and that risk-taking is transparent, deliberate, and measurable.
+
+## Summary & Verification Matrix
+
+| **Concept** | **Core Mechanism** | **Governing Invariant** | **Diagnostic Check** |
+|-------------|-------------------|------------------------|---------------------|
+| **Value at Risk (VaR)** | Quantile of the portfolio P&L distribution estimated via historical simulation, parametric (variance-covariance), or Monte Carlo methods | VaR at confidence level $\alpha$ satisfies $P(L > \text{VaR}_\alpha) = 1 - \alpha$; assumes stationarity of return distributions | Compare realized exceedances to expected frequency; backtest 1% VaR should be exceeded ~2-3 days per year in a 250-day sample |
+| **Expected Shortfall (CVaR)** | Mean portfolio loss conditional on exceeding VaR; captures tail severity beyond the VaR threshold | $\text{ES}_\alpha = \mathbb{E}[L \mid L > \text{VaR}_\alpha]$; sub-additive and coherent, satisfying diversification properties | ES should exceed VaR; ES(portfolio) $\leq$ $\sum$ ES(components) confirms sub-additivity; validate tail thickness against empirical loss distribution |
+| **Factor Attribution** | Decompose portfolio returns into systematic factor exposures via multi-factor regression: $r_t = \alpha + \sum \beta_i f_{i,t} + \epsilon_t$ | Residual $\epsilon_t$ orthogonal to factors; $R^2$ measures fraction of variance explained by systematic risk | High $R^2$ (>0.7) indicates factor model captures most risk; persistent positive $\alpha$ suggests genuine skill; check residuals for autocorrelation and heteroskedasticity |
+| **Stress Testing** | Project portfolio losses under hypothetical market shocks by applying scenario factor moves to fitted factor betas | Scenario P&L = $\sum \beta_i \times \Delta f_i$; assumes linear factor exposures and stable correlations under stress | Compare projected losses to worst historical drawdowns; validate that scenario betas match realized sensitivity during past crises; ensure coverage of tail events (e.g., 2008, 2020) |
+| **Portfolio Construction under Constraints** | Optimize expected return subject to VaR or volatility limits and position size constraints using convex optimization (quadratic programming) | For target return $\mu^T w \geq r_{\text{target}}$ and risk limit $\sqrt{w^T \Sigma w} \leq \sigma_{\text{max}}$, optimal $w$ satisfies Lagrangian first-order conditions | Verify optimized portfolio satisfies all constraints; recompute realized volatility and Sharpe ratio ex-post; ensure diversification (no single position > 20% unless justified) |
+| **Risk Budgeting & Marginal Risk Contribution** | Allocate risk across assets proportional to marginal contribution to portfolio volatility: $\text{MRC}_i = \frac{\partial \sigma_p}{\partial w_i} = \frac{(\Sigma w)_i}{\sigma_p}$ | Total portfolio risk decomposes as $\sigma_p = \sum w_i \cdot \text{MRC}_i$; equal risk contribution (ERC) sets $w_i \cdot \text{MRC}_i = \sigma_p / n$ | Sum of risk contributions equals portfolio volatility; ERC portfolio should exhibit more balanced weight distribution than market-cap weighting; validate MRC estimates with numerical perturbations |

@@ -22,19 +22,52 @@ Beginning with the labials, Czech contrasts the stops /p b/, the labiodental fri
 
 The voicing assimilation mechanism operates as a regressive spreading rule triggered at every obstruent cluster boundary. The algorithm evaluates each sequence of adjacent obstruents from right to left, copying the voicing specification of the rightmost obstruent backward through the entire cluster. In the sequence */vstup/* (entry), the underlying /v/ (voiced) precedes /s/ (voiceless), which precedes /t/ (voiceless). The rightmost obstruent /t/ is voiceless; this voiceless specification spreads leftward, devoicing /s/ (which is already voiceless, creating no change) and then devoicing /v/ to [f], yielding the surface form [*fstup*]. In the reverse configuration */prosba/* (request), the underlying /s/ (voiceless) precedes /b/ (voiced). The rightmost obstruent /b/ is voiced; this voicing spreads leftward, voicing /s/ to [z], producing [*prozba*]. The rule applies iteratively across morpheme boundaries: the prefix */roz-/* (dis-, apart) surfaces as [*roz*] before voiced obstruents (*rozbit* [*rozbit*], to break apart) but as [*ros*] before voiceless obstruents (*rozpad* [*rospad*], disintegration). Word-final obstruents devoice only when followed by a pause or a voiceless segment across the word boundary; before voiced segments in connected speech, they assimilate to voicing: *sad* (orchard) is [*sat*] in isolation but [*sad velký*] (large orchard) maintains voicing before the voiced /v/ of *velký*.
 
-```
-Regressive Voicing Assimilation Architecture:
+```mermaid
+flowchart TD
+    subgraph input ["Input Phonemes"]
+        I1["/v/"]
+        I2["/s/"]
+        I3["/t/"]
+        I4["/u/"]
+        I5["/p/"]
+    end
 
-Input:     / v  s  t  u  p /
-           │  │  │
-           V  V  V
-Feature:   +v -v -v     (underlying voicing)
-           │  ┌──┘
-           │  │  ┌──────┘
-           V  V  V
-Spread:    -v -v -v     (regressive assimilation)
-           │  │  │
-Output:   [f  s  t  u  p]
+    subgraph features ["Underlying Voicing Features"]
+        F1["+voiced"]
+        F2["-voiced"]
+        F3["-voiced"]
+    end
+
+    subgraph spread ["Regressive Assimilation"]
+        S1["-voiced"]
+        S2["-voiced"]
+        S3["-voiced"]
+    end
+
+    subgraph output ["Output Phonemes"]
+        O1["[f]"]
+        O2["[s]"]
+        O3["[t]"]
+        O4["[u]"]
+        O5["[p]"]
+    end
+
+    I1 --> F1
+    I2 --> F2
+    I3 --> F3
+
+    F3 -->|"spreads leftward"| F2
+    F2 -->|"spreads leftward"| F1
+
+    F1 --> S1
+    F2 --> S2
+    F3 --> S3
+
+    S1 --> O1
+    S2 --> O2
+    S3 --> O3
+    I4 --> O4
+    I5 --> O5
 ```
 
 Vowel length operates as a phonemic contrast independent of stress or syllable position. Short vowels /a e i o u/ and their long counterparts /aː eː iː oː uː/ occupy identical positions in the vowel space; the acoustic distinction lies purely in durational ratio, with long vowels approximately 1.5 to 2 times the duration of short vowels. This length contrast persists in all prosodic positions, including unstressed syllables, unlike the quantity systems of Latin or Sanskrit where length neutralizes in certain environments. The length distinction creates a dense network of minimal pairs: *drahý* [*draɦiː*] (expensive, dear) versus *drahý* [*draɦiː*] showing length on the adjective suffix, *pás* (waist, zone) versus *pas* (belt), *vím* (I know) versus *vim* (I twist). Morphologically, length signals inflectional categories: the instrumental singular of masculine animate nouns takes the ending *-em* with short /e/ (*student* → *studentem*), while the instrumental plural takes *-ími* with long /iː/ (*studenti* → *studentími*). Derivational morphology exploits length alternations: the root *kráva* (cow) contains a long /aː/, but the derived adjective *kravský* (bovine) shortens to /a/ through a morphophonological rule that applies in specific derivational contexts.

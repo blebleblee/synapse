@@ -186,7 +186,7 @@ Adult voice fundamentals run roughly 85Hz (low male) to 255Hz (high female). A 1
 
 **Why attack 15-30ms:** this lets the initial consonant transient pass through uncompressed, which is what keeps diction intelligible. Drop attack below 5ms and you squash the consonants along with the sustained vowels — the vocal goes soft and mumbly even though it's technically "controlled."
 
-**Why release ~200ms:** this roughly matches how quickly vocal tract resonances naturally decay. Too fast (<100ms) and you hear the compressor "breathing" — audible pumping, gain visibly riding up and down with each syllable. Too slow (>500ms) and the compressor never fully lets go between phrases, so by the second half of a verse everything's artificially flat.
+**Why release ~200ms:** this roughly matches how quickly vocal tract resonances naturally decay. Too fast (< 100ms) and you hear the compressor "breathing" — audible pumping, gain visibly riding up and down with each syllable. Too slow (>500ms) and the compressor never fully lets go between phrases, so by the second half of a verse everything's artificially flat.
 
 **Setup:**
 1. Insert compressor after the HPF.
@@ -281,7 +281,7 @@ The fastest way to internalize what a knob does is to move it to an extreme, the
 
 **Cause:** preamp gain too hot, signal exceeds 0dBFS, samples get truncated.
 
-**Fix:** there isn't a good one after the fact. Soft-clip/saturation plugins can round off the harshness slightly but cannot restore the lost waveform information. Spectral repair tools (iZotope RX De-clip) can interpolate mild clipping (<3dB over) with partial success. The real fix is prevention: before recording, have the vocalist sing their loudest passage first, set gain against that with -12dBFS peak headroom, *then* record the take.
+**Fix:** there isn't a good one after the fact. Soft-clip/saturation plugins can round off the harshness slightly but cannot restore the lost waveform information. Spectral repair tools (iZotope RX De-clip) can interpolate mild clipping (< 3dB over) with partial success. The real fix is prevention: before recording, have the vocalist sing their loudest passage first, set gain against that with -12dBFS peak headroom, *then* record the take.
 
 ### Fault: High Noise Floor
 
@@ -298,7 +298,7 @@ The fastest way to internalize what a knob does is to move it to an extreme, the
 
 ### Fault: Excessive Proximity Bass
 
-**Symptom:** boomy, bass-heavy vocal, especially on sustained low notes, recorded with the mic very close (<2 inches).
+**Symptom:** boomy, bass-heavy vocal, especially on sustained low notes, recorded with the mic very close (< 2 inches).
 
 **Fix:** low-shelf cut at 200Hz (-6 to -8dB) or raise the HPF cutoff, plus a narrow bell cut around 120Hz (-3 to -4dB) to tame the specific proximity peak. Or — simpler — just back the mic off to 6-8 inches and re-record if the take allows it.
 

@@ -190,16 +190,23 @@ $$G(f) \circ \eta_A = \eta_B \circ F(f).$$
 
 The **forgetful functor** $U: \mathbf{Rep}_\mathbb{F}(G) \to \mathbf{Vect}_\mathbb{F}$ sends a representation $(V, \rho)$ to the underlying vector space $V$ and forgets the $G$-action. This is a faithful functor (injective on morphism sets) but not full (not every linear map is $G$-linear). Its left adjoint is the **free module functor** $\mathbb{F}[G] \otimes_\mathbb{F} -$.
 
-```
-Rep_F(G)   ---[U]---->   Vect_F
-   |                        |
-   |  (G-linear maps)       |  (linear maps)
-   |                        |
-   V          eta           V
- (V, rho)  ---------->     V
-
-Adjunction:
-  Hom_{Rep}(F[G] ⊗ W, V)  ≅  Hom_{Vect}(W, U(V))
+```mermaid
+flowchart TD
+    RepFG["Rep_F(G)"]
+    VectF["Vect_F"]
+    VRho["(V, ρ)"]
+    V["V"]
+    
+    RepFG -->|U| VectF
+    RepFG -->|"G-linear maps"| VRho
+    VectF -->|"linear maps"| V
+    VRho -->|η| V
+    
+    subgraph adjunction ["Adjunction"]
+        HomRep["Hom_Rep(F[G] ⊗ W, V)"]
+        HomVect["Hom_Vect(W, U(V))"]
+        HomRep -.->|≅| HomVect
+    end
 ```
 
 The key categorical reformulation of a group representation is itself illuminating. A group $G$ can be viewed as a category $\mathbf{B}G$ with a single object $\star$ and morphism set $\mathrm{Hom}(\star, \star) = G$, where composition is group multiplication. A representation of $G$ on a vector space $V$ is then exactly a functor $\rho: \mathbf{B}G \to \mathbf{Vect}_\mathbb{F}$: the single object $\star$ maps to $V$, and each group element (morphism in $\mathbf{B}G$) maps to a linear automorphism of $V$. A morphism of representations is exactly a natural transformation between the corresponding functors. This reformulation:

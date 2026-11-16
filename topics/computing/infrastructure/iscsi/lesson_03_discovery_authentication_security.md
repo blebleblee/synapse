@@ -63,17 +63,19 @@ iSNS also implements State Change Notifications (SCN). When a target registers o
 
 The following diagram shows the iSNS registration and query flow:
 
-```
-Initiator                    iSNS Server                    Target
-    |                             |                             |
-    |<-- DevAttrReg (Node Reg) -->|<-- DevAttrReg (Node Reg) --|
-    |                             |                             |
-    |-- DevGetNext (Query DD) --->|                             |
-    |<-- DevAttrQryRsp ----------|                             |
-    |   [TargetName, PortalAddr]  |                             |
-    |                             |                             |
-    |====== iSCSI Login ==========================================>|
-    |          (now using discovered portal address)              |
+```mermaid
+flowchart TD
+    INI["Initiator"]
+    ISNS["iSNS Server"]
+    TGT["Target"]
+
+    INI -- "DevAttrReg (Node Registration)" --> ISNS
+    TGT -- "DevAttrReg (Node Registration)" --> ISNS
+
+    INI -- "DevGetNext (Query Discovery Domain)" --> ISNS
+    ISNS -- "DevAttrQryRsp\n[TargetName, PortalAddr]" --> INI
+
+    INI -- "iSCSI Login\n(using discovered portal address)" --> TGT
 ```
 
 Registering an initiator with an iSNS server using the `iscsiadm` toolchain:
@@ -214,39 +216,44 @@ Transport mode (not tunnel mode) is the correct choice here because the initiato
 
 The full session security parameter set that is established by the time the Full Feature Phase begins can be visualized as follows:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    iSCSI Session                        │
-│                                                         │
-│  Discovery Layer                                        │
-│  ┌──────────────────────────────────────────────────┐   │
-│  │  SendTargets  │  iSNS  │  Static Node Config     │   │
-│  └──────────────────────────────────────────────────┘   │
-│                          │                              │
-│  Login Phase             ▼                              │
-│  ┌──────────────────────────────────────────────────┐   │
-│  │  Stage 0: Security Negotiation                   │   │
-│  │   AuthMethod=CHAP                                │   │
-│  │   CHAP_A / CHAP_I / CHAP_C / CHAP_R (bidirect.) │   │
-│  │  Stage 1: Operational Negotiation                │   │
-│  │   HeaderDigest=CRC32C                            │   │
-│  │   DataDigest=CRC32C                              │   │
-│  │   MaxRecvDataSegmentLength=262144                │   │
-│  │   ImmediateData=Yes                              │   │
-│  └──────────────────────────────────────────────────┘   │
-│                          │                              │
-│  Network Layer           ▼                              │
-│  ┌──────────────────────────────────────────────────┐   │
-│  │  IPsec ESP (AES-256-GCM) over TCP port 3260      │   │
-│  │  IKEv2 with PSK or X.509 certificate auth        │   │
-│  └──────────────────────────────────────────────────┘   │
-│                          │                              │
-│  Full Feature Phase      ▼                              │
-│  ┌──────────────────────────────────────────────────┐   │
-│  │  SCSI Command PDUs with CRC32C header + data     │   │
-│  │  digests on every PDU for the session lifetime   │   │
-│  └──────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph session ["iSCSI Session"]
+        subgraph discovery ["Discovery Layer"]
+            ST["SendTargets"]
+            iSNS["iSNS"]
+            SNC["Static Node Config"]
+        end
+
+        subgraph login ["Login Phase"]
+            S0["Stage 0: Security Negotiation
+─────────────────────────────
+AuthMethod = CHAP
+CHAP_A / CHAP_I / CHAP_C / CHAP_R
+(bidirectional)"]
+            S1["Stage 1: Operational Negotiation
+─────────────────────────────
+HeaderDigest = CRC32C
+DataDigest = CRC32C
+MaxRecvDataSegmentLength = 262144
+ImmediateData = Yes"]
+        end
+
+        subgraph network ["Network Layer"]
+            NET["IPsec ESP (AES-256-GCM) over TCP port 3260
+IKEv2 with PSK or X.509 certificate auth"]
+        end
+
+        subgraph ffp ["Full Feature Phase"]
+            FFP["SCSI Command PDUs with CRC32C header + data
+digests on every PDU for the session lifetime"]
+        end
+    end
+
+    ST & iSNS & SNC --> S0
+    S0 --> S1
+    S1 --> NET
+    NET --> FFP
 ```
 
 ---

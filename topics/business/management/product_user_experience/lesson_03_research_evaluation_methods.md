@@ -112,50 +112,23 @@ This means 8,284 users total must be randomized before the test has the statisti
 
 The pipeline for a well-governed A/B test has a specific structural flow:
 
-```
-A/B Test Execution Pipeline
-─────────────────────────────────────────────────────────────────────────────
-
-  [1. Pre-Registration]
-       │
-       │  Define: primary metric, baseline rate, MDE, α, power
-       │  Calculate: required n per variant
-       │  Duration: estimated test runtime at observed traffic rate
-       ▼
-  [2. Randomization Check]
-       │
-       │  Verify: assignment algorithm independence
-       │  A/A test: run control vs. control → expect p > 0.05 on primary metric
-       │  SRM check: compare actual traffic split to expected 50/50
-       ▼
-  [3. Traffic Allocation]
-       │
-       │  Allocate: users to A or B via hash of user ID + experiment ID
-       │  Log: variant assignment, timestamp, user segment
-       ▼
-  [4. Instrumentation Validation]
-       │
-       │  Verify: event logging fires correctly for both variants
-       │  Check: no data gaps, no double-counting, no attribution errors
-       ▼
-  [5. Run Period]
-       │
-       │  Monitor: SRM, guardrail metrics (error rate, latency, support volume)
-       │  Do NOT: check primary metric against hypothesis until n is reached
-       ▼
-  [6. Analysis]
-       │
-       │  Compute: observed conversion rates p_A, p_B
-       │  Compute: z-statistic, p-value, 95% confidence interval for δ
-       │  Decision: reject H₀ if p < 0.05 AND CI excludes zero
-       ▼
-  [7. Rollout or Rollback]
-       │
-       │  Win: ship variant B; document effect size and 95% CI for metric log
-       │  Loss: document null result; archive for future meta-analysis
-       └── No decision: extend test to reach n; do not widen MDE post-hoc
-
-─────────────────────────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    A["1. Pre-Registration"]
+    B["2. Randomization Check"]
+    C["3. Traffic Allocation"]
+    D["4. Instrumentation Validation"]
+    E["5. Run Period"]
+    F["6. Analysis"]
+    G["7. Rollout or Rollback"]
+    
+    A -->|"Define: primary metric, baseline rate, MDE, α, power<br/>Calculate: required n per variant<br/>Duration: estimated test runtime"| B
+    B -->|"Verify: assignment algorithm independence<br/>A/A test: control vs. control → p > 0.05<br/>SRM check: actual vs. expected 50/50 split"| C
+    C -->|"Allocate: users via hash of user ID + experiment ID<br/>Log: variant assignment, timestamp, user segment"| D
+    D -->|"Verify: event logging for both variants<br/>Check: no data gaps, double-counting, attribution errors"| E
+    E -->|"Monitor: SRM, guardrail metrics<br/>latency, error rate, support volume<br/>Do NOT check primary metric until n reached"| F
+    F -->|"Compute: conversion rates p_A, p_B<br/>Compute: z-statistic, p-value, 95% CI<br/>Decision: reject H₀ if p < 0.05 AND CI excludes zero"| G
+    G -->|"Win: ship variant B; document effect size and CI<br/>Loss: document null result; archive for meta-analysis<br/>No decision: extend test to reach n"| H["End"]
 ```
 
 ### Qualitative-Quantitative Integration

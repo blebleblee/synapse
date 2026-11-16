@@ -56,14 +56,17 @@ The quotient topology is the **finest topology on $X/{\sim}$** making $q$ contin
 
 The relationship between the quotient map, the induced map, and the original map is best expressed in the following commutative diagram:
 
-```
-        q
-X ───────────► X/~
-│                │
-│ f            ∃! f̄
-│                │
-▼                ▼
-Z ═══════════════ Z
+```mermaid
+flowchart TD
+    X["X"]
+    XTilde["X/~"]
+    Z1["Z"]
+    Z2["Z"]
+    
+    X -->|q| XTilde
+    X -->|f| Z1
+    XTilde -.->|"∃! f̄"| Z2
+    Z1 ===|identity| Z2
 ```
 
 Here $f : X \to Z$ is continuous and constant on equivalence classes, $q : X \to X/{\sim}$ is the quotient map, and $\bar{f} : X/{\sim} \to Z$ is the unique continuous map making the triangle commute, defined explicitly by $\bar{f}([x]) = f(x)$. Well-definedness follows from the constancy condition: if $[x] = [y]$, then $x \sim y$, so $f(x) = f(y)$, confirming $\bar{f}([x])$ does not depend on the choice of representative.
@@ -80,28 +83,46 @@ Concrete computation with quotient spaces follows a fixed pattern: identify the 
 
 The following diagram summarizes the logical architecture of the three canonical topological constructions and their universal properties:
 
-```
-INITIAL TOPOLOGIES (coarsest making maps continuous)
-─────────────────────────────────────────────────────────────────────────
-                        [Subspace A ↪ X]
-   Z ──────f──────► A                  g : Z → A continuous
-                    ↓ ι                ⟺
-                    X                  ι ∘ g : Z → X continuous
-
-                   [Product X × Y]
-   Z ──────f──────► X × Y             f : Z → X × Y continuous
-                   / \                ⟺
-                  /   \               π_X ∘ f : Z → X  continuous
-                X       Y             π_Y ∘ f : Z → Y  continuous
-
-FINAL TOPOLOGY (finest making map continuous)
-─────────────────────────────────────────────────────────────────────────
-                   [Quotient X/~]
-   X ──────q──────► X/~               f̄ : X/~ → Z continuous
-                    |                 ⟺
-                    f̄                 f̄ ∘ q : X → Z  continuous
-                    ↓
-                    Z
+```mermaid
+flowchart TD
+    subgraph initial ["INITIAL TOPOLOGIES (coarsest making maps continuous)"]
+        direction TB
+        
+        subgraph subspace ["Subspace A ↪ X"]
+            direction LR
+            Z1["Z"] -->|f| A1["A"]
+            A1 -->|ι| X1["X"]
+            
+            eq1["g : Z → A continuous<br/>⟺<br/>ι ∘ g : Z → X continuous"]
+            
+            style eq1 fill:none,stroke:none
+        end
+        
+        subgraph product ["Product X × Y"]
+            direction TB
+            Z2["Z"] -->|f| XY["X × Y"]
+            XY -->|π_X| X2["X"]
+            XY -->|π_Y| Y2["Y"]
+            
+            eq2["f : Z → X × Y continuous<br/>⟺<br/>π_X ∘ f : Z → X continuous<br/>π_Y ∘ f : Z → Y continuous"]
+            
+            style eq2 fill:none,stroke:none
+        end
+    end
+    
+    subgraph final ["FINAL TOPOLOGY (finest making map continuous)"]
+        direction TB
+        
+        subgraph quotient ["Quotient X/~"]
+            direction TB
+            X3["X"] -->|q| Q["X/~"]
+            Q -->|f̄| Z3["Z"]
+            
+            eq3["f̄ : X/~ → Z continuous<br/>⟺<br/>f̄ ∘ q : X → Z continuous"]
+            
+            style eq3 fill:none,stroke:none
+        end
+    end
 ```
 
 ### Saturated Sets and the Mechanics of Quotient Maps

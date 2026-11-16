@@ -24,39 +24,18 @@ These three invariants collectively define the design space. Latency sensitivity
 
 Before dissecting individual components, it is useful to establish a concrete reference topology. The following diagram represents the canonical five-tier edge/fog hierarchy that most production deployments approximate, even when they do not name it explicitly.
 
-```
-┌─────────────────────────────────────────────────────┐
-│               Hyperscale Cloud (AWS / GCP / Azure)  │
-│         Global Model Training, Long-Term Analytics  │
-│              Latency: 40–200ms | BW: 10+ Gbps       │
-└──────────────────────────┬──────────────────────────┘
-                           │  WAN / Internet Backbone
-┌──────────────────────────▼──────────────────────────┐
-│              Regional Cloud / CDN PoP               │
-│        Aggregated State, Model Distribution         │
-│              Latency: 5–40ms | BW: 1–10 Gbps        │
-└──────────────────────────┬──────────────────────────┘
-                           │  Dedicated Fiber / MPLS
-┌──────────────────────────▼──────────────────────────┐
-│                 Fog Node Cluster                    │
-│    (MEC Server, Factory Gateway, Hospital Server)   │
-│    Local Orchestration, Stateful Aggregation        │
-│              Latency: 1–5ms | BW: 1 Gbps            │
-└──────────────────────────┬──────────────────────────┘
-                           │  LAN / 5G / Wi-Fi 6
-┌──────────────────────────▼──────────────────────────┐
-│               Near-Edge Devices                     │
-│   (Jetson Orin, x86 Gateway, Smart NIC Offload)     │
-│   Real-Time Inference, Local Filtering, Buffering   │
-│              Latency: 100µs–1ms | BW: 100 Mbps      │
-└──────────────────────────┬──────────────────────────┘
-                           │  Serial / CAN Bus / BLE
-┌──────────────────────────▼──────────────────────────┐
-│                   Device Edge                       │
-│   (MCU, Sensor, Camera, Robot Joint Controller)     │
-│         Raw Data Production, Actuator Control       │
-│              Latency: <100µs | BW: <1 Mbps          │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Hyperscale Cloud (AWS / GCP / Azure)<br/>Global Model Training, Long-Term Analytics<br/>Latency: 40–200ms | BW: 10+ Gbps"]
+    B["Regional Cloud / CDN PoP<br/>Aggregated State, Model Distribution<br/>Latency: 5–40ms | BW: 1–10 Gbps"]
+    C["Fog Node Cluster<br/>(MEC Server, Factory Gateway, Hospital Server)<br/>Local Orchestration, Stateful Aggregation<br/>Latency: 1–5ms | BW: 1 Gbps"]
+    D["Near-Edge Devices<br/>(Jetson Orin, x86 Gateway, Smart NIC Offload)<br/>Real-Time Inference, Local Filtering, Buffering<br/>Latency: 100µs–1ms | BW: 100 Mbps"]
+    E["Device Edge<br/>(MCU, Sensor, Camera, Robot Joint Controller)<br/>Raw Data Production, Actuator Control<br/>Latency: <100µs | BW: <1 Mbps"]
+    
+    A -->|"WAN / Internet Backbone"| B
+    B -->|"Dedicated Fiber / MPLS"| C
+    C -->|"LAN / 5G / Wi-Fi 6"| D
+    D -->|"Serial / CAN Bus / BLE"| E
 ```
 
 Each tier boundary represents a contract: a maximum tolerable latency, an expected bandwidth, a power budget, and a set of reliability guarantees. When you partition a workload across tiers, you are essentially writing a distributed systems contract at every boundary crossing.
@@ -313,26 +292,24 @@ Compute offloading — migrating a computation from a resource-constrained devic
 
 The following diagram captures the state machine for a resilient offloading protocol:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Offloading State Machine                     │
-│                                                                 │
-│  ┌──────────┐  serialize   ┌──────────┐  ack_timeout  ┌──────┐ │
-│  │  READY   │─────────────▶│ PENDING  │──────────────▶│RETRY │ │
-│  └──────────┘              └────┬─────┘               └──┬───┘ │
-│                                 │ ack_received            │     │
-│                                 ▼                         │     │
-│                          ┌──────────┐    max_retries      │     │
-│                          │EXECUTING │◀───exceeded─────────┘     │
-│                          └────┬─────┘                           │
-│                               │                                 │
-│               ┌───────────────┼──────────────────┐             │
-│               ▼               ▼                  ▼             │
-│         ┌──────────┐   ┌──────────┐       ┌──────────┐         │
-│         │COMPLETED │   │  FAILED  │       │LOCAL_    │         │
-│         │          │   │(remote)  │──────▶│FALLBACK  │         │
-│         └──────────┘   └──────────┘       └──────────┘         │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    READY["READY"]
+    PENDING["PENDING"]
+    RETRY["RETRY"]
+    EXECUTING["EXECUTING"]
+    COMPLETED["COMPLETED"]
+    FAILED["FAILED\n(remote)"]
+    LOCAL_FALLBACK["LOCAL_FALLBACK"]
+
+    READY -->|"serialize"| PENDING
+    PENDING -->|"ack_timeout"| RETRY
+    PENDING -->|"ack_received"| EXECUTING
+    RETRY -->|"max_retries exceeded"| EXECUTING
+    EXECUTING --> COMPLETED
+    EXECUTING --> FAILED
+    EXECUTING --> LOCAL_FALLBACK
+    FAILED -->|"fallback"| LOCAL_FALLBACK
 ```
 
 The critical path through this state machine is the transition from `PENDING` to `EXECUTING`: the moment the fog node sends an acknowledgment, the device edge can release its local copy of the input payload (freeing memory) while the fog node processes the result. If the acknowledgment never arrives — because the network partitioned — the device retries up to a configured maximum and then falls back to local execution with degraded quality. This fallback path is not optional; it is the invariant that makes edge systems tolerable in the face of infrastructure failures.

@@ -34,23 +34,32 @@ Glue application tools are the final link in this chain, and their role is to ap
 
 Understanding the brace as a mechanical system requires tracing the force path from palm to bit tip. The craftsman's palm presses down on the head bearing while the fingers grip the sweep handle. The head bearing is a ball-race or plain-bushing pivot that allows the head to remain stationary under vertical pressure while the entire brace body rotates below it — this decoupling of axial force from rotational effort is what allows sustained boring without fatiguing the wrist. The sweep arm translates the grip's tangential force into torque, and the chuck transmits that torque to the bit shank through a set of jaws (either alligator-type for square tapered shanks or three-jaw for round shanks).
 
-```
-         [Head Bearing]  ← Palm presses here (axial load)
-               │
-         [Chuck Neck]
-        /             \
-  [Sweep            [Sweep
-   Handle]           Handle]
-        \             /
-         [Chuck Jaws] ← Bit shank seated here
-               │
-         [Auger Bit]
-         ┌─────────────┐
-         │  Lead Screw  │ ← Pulls bit axially into wood
-         │  Spurs (2)   │ ← Severs fibers on circle
-         │  Lips (2)    │ ← Cuts and lifts chips
-         │  Flutes (2)  │ ← Evacuates chips upward
-         └─────────────┘
+```mermaid
+flowchart TD
+    A["Head Bearing<br/><i>Palm presses here (axial load)</i>"]
+    B["Chuck Neck"]
+    C["Sweep Handle"]
+    D["Sweep Handle"]
+    E["Chuck Jaws<br/><i>Bit shank seated here</i>"]
+    F["Auger Bit"]
+    
+    subgraph bit_components ["Auger Bit Components"]
+        G["Lead Screw<br/><i>Pulls bit axially into wood</i>"]
+        H["Spurs (2)<br/><i>Severs fibers on circle</i>"]
+        I["Lips (2)<br/><i>Cuts and lifts chips</i>"]
+        J["Flutes (2)<br/><i>Evacuates chips upward</i>"]
+    end
+    
+    A --> B
+    B --> C
+    B --> D
+    C --> E
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
 ```
 
 The ratchet mechanism sits at the chuck neck and consists of a toothed collar fixed to the chuck body and a spring-loaded double pawl that can be set for clockwise drive, counterclockwise drive, or locked for direct boring. When the ratchet is engaged, the sweep need only travel as far as the available arc allows before reversing direction — the pawl disengages on the return stroke and re-engages on the drive stroke. The click interval between ratchet teeth defines the minimum arc required per power stroke; a 24-tooth ratchet requires only 15° of arc to advance, which is sufficient to bore in a corner with as little as 4 inches of clearance.
@@ -59,41 +68,42 @@ The ratchet mechanism sits at the chuck neck and consists of a toothed collar fi
 
 The relationship between the lead screw, spurs, and lips can be visualized as three concentric cutting events occurring simultaneously at different radii:
 
-```
-    ← Bore Diameter (1½") →
-
-    ○ ─── Spur cuts here ────── ○    (outer circle, severs fibers)
-         ↑
-    ○ ── Lip cuts here ──── ○        (mid-radius, removes core chip)
-              ↑
-           Lead screw                (center, pulls axially)
+```mermaid
+flowchart TD
+    subgraph bore ["Bore Diameter (1½″)"]
+        direction TB
+        outer["○ Spur cuts here ○<br/>(outer circle, severs fibers)"]
+        mid["○ Lip cuts here ○<br/>(mid-radius, removes core chip)"]
+        center["Lead screw<br/>(center, pulls axially)"]
+        
+        outer -->|↓| mid
+        mid -->|↓| center
+    end
 ```
 
 The spur cuts approximately 1/32 inch ahead of the lips in the depth direction, which means the fiber circle is severed before the lips try to shear through it laterally. Without this sequencing, the lips would tear rather than cut the outer-diameter fibers, leaving a ragged bore wall — exactly what hollow-chisel mortisers produce when their chisels are dull and their bits are sharp, or vice versa.
 
 ### Clamp Force Transmission Diagram
 
-```
-Clamp Screw
-     │
-     ↓  (Compressive Force F)
- ┌───────────────┐
- │   Fixed Jaw   │
- └───────┬───────┘
-         │
-    [Caul / Pad]      ← Distributes point load
-         │
- ┌───────┴───────────────────────────────┐
- │          Glue Line                   │  ← Target: uniform pressure
- └───────┬───────────────────────────────┘
-         │
-    [Caul / Pad]
-         │
- ┌───────┴───────┐
- │  Sliding Jaw  │
- └───────────────┘
-         │
-         ↑  (Reaction Force F, equal and opposite)
+```mermaid
+flowchart TD
+    CS["Clamp Screw"]
+    CF["Compressive Force F"]
+    FJ["Fixed Jaw"]
+    CP1["Caul / Pad<br/><i>Distributes point load</i>"]
+    GL["Glue Line<br/><i>Target: uniform pressure</i>"]
+    CP2["Caul / Pad"]
+    SJ["Sliding Jaw"]
+    RF["Reaction Force F<br/><i>equal and opposite</i>"]
+    
+    CS -->|↓| CF
+    CF --> FJ
+    FJ --> CP1
+    CP1 --> GL
+    GL --> CP2
+    CP2 --> SJ
+    SJ --> RF
+    RF -->|↑| SJ
 ```
 
 The critical variable is clamp placement relative to the glue line's centroid. A jaw positioned directly over the glue line centroid produces pure compression. A jaw offset laterally from the centroid introduces a bending moment $M = F \times d$, where $d$ is the offset distance. In a 24-inch panel glue-up with three pipe clamps, alternating them above and below the panel plane at the same horizontal positions produces opposing bending moments that sum to near-zero, maintaining the panel flat as the glue cures.
@@ -102,23 +112,14 @@ The critical variable is clamp placement relative to the glue line's centroid. A
 
 The screwdriver's functional chain moves from grip diameter to blade tip through a simple lever relationship. The larger the grip diameter, the greater the torque a given hand force produces — which is why cabinetmaker's screwdrivers have bulbous, palm-filling handles rather than the slim cylindrical handles of electrical screwdrivers. The blade tip geometry at the slot or recess determines how efficiently that torque transfers to the screw head without camming out.
 
-```
-Hand Force (F)
-      │
-      ↓
-  [Grip Radius r₂]        ← Larger r₂ = more torque
-      │
-  [Handle Ferrule]        ← Prevents splitting under torque
-      │
-  [Blade Shoulder]
-      │
-  [Blade Tip]             ← Must fully seat in screw recess
-      │
-      ↓
-  Torque T = F × r₂
-      │
-      ↓
-  Axial Force via thread: F_axial = 2πT / λ
+```mermaid
+flowchart TD
+    F["Hand Force (F)"] --> R["Grip Radius r₂<br>Larger r₂ = more torque"]
+    R --> HF["Handle Ferrule<br>Prevents splitting under torque"]
+    HF --> BS["Blade Shoulder"]
+    BS --> BT["Blade Tip<br>Must fully seat in screw recess"]
+    BT --> T["Torque T = F × r₂"]
+    T --> Fa["Axial Force via thread: F_axial = 2πT / λ"]
 ```
 
 The common failure mode — cam-out, where the blade tip rides out of the slot under load — is a function of the tip's geometry and seating depth relative to the applied torque. A properly prepared slot-head screw should have clean, square slot walls (not rounded from previous cam-outs), and the blade tip must fully span the slot width to distribute the contact stress across the full slot wall area rather than concentrating it at two narrow contact points.

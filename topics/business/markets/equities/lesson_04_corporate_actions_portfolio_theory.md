@@ -36,22 +36,41 @@ $$
 
 where $P_{\text{close, cum-div}}$ is the closing price on the last cum-dividend date and $D$ is the gross dividend per share. All historical prices prior to the ex-date are multiplied by this factor (or equivalently, the ex-date price is used as the base, and historical prices are scaled down). The cumulative adjustment factor is the product of all individual adjustment factors applied since the start of the series. A stock that has paid dividends and split multiple times over twenty years carries a cumulative factor that may reduce today's $150 price to an adjusted inception price of $4.
 
-```
-RAW PRICE SERIES          CORPORATE ACTION EVENTS         ADJUSTED PRICE SERIES
-(exchange feed)           (CA processor)                  (time series database)
-
-P_t (unadjusted) ──────►  Dividend: factor = (P-D)/P ──►  P_t × ∏ CF_i
-P_{t-1}          ──────►  Split 2:1: factor = 0.50   ──►  P_{t-1} × ∏ CF_i
-P_{t-2}          ──────►  Rights: TERP adjustment    ──►  P_{t-2} × ∏ CF_i
-...                        Merger: forced termination      ...
-                                   │
-                           ┌───────▼────────┐
-                           │  Audit Log     │
-                           │  CA Type       │
-                           │  Effective Date│
-                           │  Factor        │
-                           │  Source        │
-                           └────────────────┘
+```mermaid
+flowchart LR
+    subgraph raw ["RAW PRICE SERIES<br/>(exchange feed)"]
+        P0["P_t (unadjusted)"]
+        P1["P_{t-1}"]
+        P2["P_{t-2}"]
+        P3["..."]
+    end
+    
+    subgraph ca ["CORPORATE ACTION EVENTS<br/>(CA processor)"]
+        div["Dividend: factor = (P-D)/P"]
+        split["Split 2:1: factor = 0.50"]
+        rights["Rights: TERP adjustment"]
+        merger["Merger: forced termination"]
+    end
+    
+    subgraph adj ["ADJUSTED PRICE SERIES<br/>(time series database)"]
+        A0["P_t × ∏ CF_i"]
+        A1["P_{t-1} × ∏ CF_i"]
+        A2["P_{t-2} × ∏ CF_i"]
+        A3["..."]
+    end
+    
+    audit["Audit Log<br/>• CA Type<br/>• Effective Date<br/>• Factor<br/>• Source"]
+    
+    P0 --> div
+    P1 --> split
+    P2 --> rights
+    
+    div --> A0
+    split --> A1
+    rights --> A2
+    
+    merger --> audit
+    ca -.-> audit
 ```
 
 The rights issue adjustment requires computing the TERP explicitly. If a company with $N$ existing shares at market price $P_M$ issues $n$ new shares at subscription price $P_S$, the TERP is:
@@ -76,23 +95,36 @@ $$
 
 Float adjustment is critical. The raw market capitalization of a company includes shares held by insiders, strategic cross-holders, and governments that are effectively illiquid and not available to ordinary investors. Including these shares in the index weight would force index-replicating funds to hold positions they cannot actually buy, creating artificial demand pressure in a small float. Float adjustment removes these locked-up shares from the denominator, ensuring that the index weight reflects only investable supply.
 
-```
-INDEX REBALANCING CYCLE (Semi-Annual)
+```mermaid
+flowchart TD
+    subgraph recon ["Reconstitution — Month T, Day 1"]
+        R1["1. Apply eligibility filter"]
+        R2["2. Compute float-adjusted caps"]
+        R3["3. Rank and select constituents"]
+        R4["4. Compute initial weights"]
+        R5["5. Publish change list\n(adds / deletes / weight changes)"]
+        R6["6. Effective date =\nlast business day of Month T"]
 
-   Reconstitution                    Daily Weight Drift
-   ──────────────                    ─────────────────
-   Month T, Day 1:                   Day T+1 to T+n:
-   
-   1. Apply eligibility filter       w_i(t+1) = w_i(t) × (1 + r_i(t))
-   2. Compute float-adj caps                    ─────────────────────
-   3. Rank and select constituents              ∑_j w_j(t) × (1 + r_j(t))
-   4. Compute initial weights
-   5. Publish change list            No rebalancing transactions
-      (adds/deletes/weight changes)  Cap-weight self-adjusts with prices
-   6. Effective date = last
-      business day of month T        Buffer zone: stocks within 5% of
-                                     add/delete threshold held in place
-                                     to reduce turnover
+        R1 --> R2 --> R3 --> R4 --> R5 --> R6
+    end
+
+    subgraph drift ["Daily Weight Drift — Day T+1 to T+n"]
+        D1["Price return received:\nr_i(t) for each constituent i"]
+        D2["Apply drift formula:\nw_i(t+1) = w_i(t) × (1 + r_i(t))\n─────────────────────────────\n∑_j  w_j(t) × (1 + r_j(t))"]
+        D3["No rebalancing transactions —\ncap-weight self-adjusts with prices"]
+        D4["Buffer zone active:\nstocks within 5% of add/delete\nthreshold held in place\nto reduce turnover"]
+
+        D1 --> D2 --> D3
+        D2 --> D4
+    end
+
+    subgraph cycle ["INDEX REBALANCING CYCLE (Semi-Annual)"]
+        recon
+        drift
+    end
+
+    R6 -->|"Next trading day\npost effective date"| D1
+    D3 -->|"At next semi-annual\nreconstitution"| R1
 ```
 
 Equal-weight rebalancing mechanics work differently. The index provider must rebalance every constituent back to weight $1/N$ at each rebalancing date. The gross turnover at each rebalance equals twice the total absolute weight deviation across all constituents:
@@ -133,26 +165,32 @@ where $r_f$ is the risk-free rate. Every efficient portfolio is a linear combina
 
 The covariance matrix construction is the most operationally sensitive part of the pipeline. For a universe of $N = 500$ equities, the sample covariance matrix requires estimating $N(N+1)/2 = 125,250$ unique parameters from a time series that, with five years of daily data, provides only 1,260 observations. The system is severely underdetermined — far more parameters to estimate than data points to estimate them from. The resulting matrix is poorly conditioned, meaning its smallest eigenvalues are very close to zero and its inverse amplifies noise dramatically.
 
-```
-COVARIANCE MATRIX CONDITIONING CHECK
-
-Compute eigenvalues λ_1 ≥ λ_2 ≥ ... ≥ λ_N of Σ_sample
-
-Condition number κ = λ_1 / λ_N
-
-κ < 30         → Well-conditioned, inversion reliable
-30 < κ < 1000  → Moderate ill-conditioning, shrinkage advised
-κ > 1000       → Severely ill-conditioned, factor model required
-
-Ledoit-Wolf Shrinkage Target:
-Σ_shrunk = (1 - α) × Σ_sample + α × Σ_target
-
-Where Σ_target is typically the scaled identity matrix (I × mean_variance)
-and α is the optimal shrinkage intensity, analytically derived as:
-
-       ∑_i ∑_j Var(σ̂_ij)
-α* = ─────────────────────────────────────
-     ‖Σ_sample - Σ_target‖_F²  ×  T
+```mermaid
+flowchart TD
+    Start["Covariance Matrix Conditioning Check"]
+    
+    Start --> Compute["Compute eigenvalues λ₁ ≥ λ₂ ≥ ... ≥ λₙ of Σ_sample"]
+    
+    Compute --> CondNum["Calculate condition number<br/>κ = λ₁ / λₙ"]
+    
+    CondNum --> Check{Evaluate κ}
+    
+    Check -->|"κ < 30"| Well["Well-conditioned<br/>Inversion reliable"]
+    Check -->|"30 < κ < 1000"| Moderate["Moderate ill-conditioning<br/>Shrinkage advised"]
+    Check -->|"κ > 1000"| Severe["Severely ill-conditioned<br/>Factor model required"]
+    
+    Moderate --> Shrinkage["Apply Ledoit-Wolf Shrinkage"]
+    
+    Shrinkage --> Formula["Σ_shrunk = (1 - α) × Σ_sample + α × Σ_target"]
+    
+    Formula --> Target["Σ_target = I × mean_variance<br/>(scaled identity matrix)"]
+    
+    Formula --> Alpha["α* = ∑ᵢ ∑ⱼ Var(σ̂ᵢⱼ) / (‖Σ_sample - Σ_target‖²_F × T)<br/>(optimal shrinkage intensity)"]
+    
+    Target --> Output["Conditioned covariance matrix"]
+    Alpha --> Output
+    Well --> Output
+    Severe --> Output
 ```
 
 Factor models offer a more structured alternative. The Barra-style risk model decomposes the covariance of equity returns into a factor component and an idiosyncratic component:

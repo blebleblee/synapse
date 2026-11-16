@@ -24,71 +24,26 @@ The container storage interface specification decouples Kubernetes from cloud-pr
 
 The lifecycle of a dynamically provisioned volume begins when a StatefulSet controller creates a PersistentVolumeClaim from its volumeClaimTemplate. The claim specifies requested capacity through the resources.requests.storage field, access mode through accessModes array, and provisioning policy through the storageClassName reference. The persistent volume controller, running as part of kube-controller-manager, watches for unbound claims and attempts to satisfy them through existing unbound volumes matching size, access mode, and label selector constraints. When no suitable volume exists and the StorageClass enables dynamic provisioning (allowVolumeExpansion defaults true), the controller triggers the external-provisioner component through a Provision event.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  StatefulSet Controller (kube-controller-manager)               │
-│                                                                   │
-│  1. Generate PVC from volumeClaimTemplate for each replica      │
-│     metadata.name: data-postgresql-0                            │
-│     spec.resources.requests.storage: 100Gi                      │
-│     spec.storageClassName: fast-ssd                             │
-│     spec.accessModes: [ReadWriteOnce]                           │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  PersistentVolume Controller (kube-controller-manager)          │
-│                                                                   │
-│  2. Watch for unbound PVCs with storageClassName set            │
-│  3. No matching PV found → trigger dynamic provisioning         │
-│  4. Annotate PVC: volume.beta.kubernetes.io/storage-provisioner │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  CSI External-Provisioner (sidecar for pd.csi.storage.gke.io)  │
-│                                                                   │
-│  5. Receive Provision request with StorageClass parameters:     │
-│     parameters:                                                  │
-│       type: pd-ssd                                               │
-│       replication-type: regional-pd                              │
-│       disk-encryption-kms-key: projects/.../cryptoKeys/key1     │
-│  6. Invoke CSI Driver CreateVolume RPC with topology prefs      │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  GCE PD CSI Driver (DaemonSet pod on node)                      │
-│                                                                   │
-│  7. Compute Engine API: disks.insert                            │
-│     {                                                            │
-│       "name": "pvc-a3f9d8e7-4b2c-11ef-9c8a-42010a8a0002",      │
-│       "type": "pd-ssd",                                         │
-│       "sizeGb": 100,                                            │
-│       "replicaZones": ["us-central1-a", "us-central1-b"]       │
-│     }                                                            │
-│  8. Poll for disk READY state                                   │
-│  9. Return CreateVolumeResponse with volumeId and topology      │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  CSI External-Provisioner                                        │
-│                                                                   │
-│  10. Create PersistentVolume object:                            │
-│      spec.csi.driver: pd.csi.storage.gke.io                     │
-│      spec.csi.volumeHandle: projects/.../disks/pvc-a3f9...      │
-│      spec.capacity.storage: 100Gi                               │
-│      spec.claimRef: {name: data-postgresql-0, ...}              │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  PersistentVolume Controller                                    │
-│                                                                   │
-│  11. Bind PVC to PV by setting pv.spec.claimRef and            │
-│      pvc.spec.volumeName, updating phase to Bound               │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["StatefulSet Controller<br/>(kube-controller-manager)"]
+    B["PersistentVolume Controller<br/>(kube-controller-manager)"]
+    C["CSI External-Provisioner<br/>(sidecar for pd.csi.storage.gke.io)"]
+    D["GCE PD CSI Driver<br/>(DaemonSet pod on node)"]
+    E["CSI External-Provisioner"]
+    F["PersistentVolume Controller"]
+    
+    A -->|"1. Generate PVC from volumeClaimTemplate<br/>metadata.name: data-postgresql-0<br/>spec.resources.requests.storage: 100Gi<br/>spec.storageClassName: fast-ssd<br/>spec.accessModes: [ReadWriteOnce]"| B
+    
+    B -->|"2. Watch for unbound PVCs with storageClassName<br/>3. No matching PV → trigger dynamic provisioning<br/>4. Annotate PVC: volume.beta.kubernetes.io/storage-provisioner"| C
+    
+    C -->|"5. Receive Provision request with StorageClass parameters:<br/>type: pd-ssd<br/>replication-type: regional-pd<br/>disk-encryption-kms-key: projects/.../cryptoKeys/key1<br/>6. Invoke CSI Driver CreateVolume RPC with topology prefs"| D
+    
+    D -->|"7. Compute Engine API: disks.insert<br/>name: pvc-a3f9d8e7-4b2c-11ef-9c8a-42010a8a0002<br/>type: pd-ssd, sizeGb: 100<br/>replicaZones: [us-central1-a, us-central1-b]<br/>8. Poll for disk READY state<br/>9. Return CreateVolumeResponse with volumeId and topology"| E
+    
+    E -->|"10. Create PersistentVolume object:<br/>spec.csi.driver: pd.csi.storage.gke.io<br/>spec.csi.volumeHandle: projects/.../disks/pvc-a3f9...<br/>spec.capacity.storage: 100Gi<br/>spec.claimRef: {name: data-postgresql-0, ...}"| F
+    
+    F -->|"11. Bind PVC to PV by setting pv.spec.claimRef<br/>and pvc.spec.volumeName, updating phase to Bound"| G["Bound PVC and PV"]
 ```
 
 Once the PersistentVolumeClaim enters Bound phase, the Kubernetes scheduler can place the StatefulSet pod on a node that satisfies topology constraints. Regional Persistent Disks replicate synchronously across two zones within a region, and the CSI driver populates the PersistentVolume's allowedTopologies field with the replica zone list. The scheduler filters nodes to those residing in allowed zones, preventing a pod from landing on a node in us-central1-c when its disk replicas exist only in us-central1-a and us-central1-b. This topology-aware scheduling prevents attachment failures that would leave pods in ContainerCreating state indefinitely.

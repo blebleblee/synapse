@@ -42,18 +42,28 @@ Anti-aliasing filters preceding the ADC must suppress out-of-band content to lev
 
 Grounding architecture is foundational to noise mitigation in instrumentation systems. Ground is not a universal zero-potential reference but rather a collection of interconnected conductors carrying return currents and exhibiting finite impedance. When multiple circuits share a common ground conductor, return currents from one circuit induce voltage drops across the ground impedance, which appear as noise voltages in other circuits—a phenomenon known as ground loop interference. Single-point grounding establishes one location as the system ground reference, with all circuit returns connected to this single node, minimizing ground loop area. Star grounding extends this concept by connecting each subsystem's ground return directly to the central ground point via individual conductors, preventing shared return paths. Multi-point grounding connects each subsystem's ground to the nearest low-impedance ground plane, reducing ground inductance at high frequencies but potentially creating multiple current paths and ground loops.
 
-```
-Single-Point Star Ground Topology:
-
-     Sensor 1                Sensor 2                ADC
-        |                       |                     |
-     [Gnd]                   [Gnd]                 [Gnd]
-        |                       |                     |
-        └───────────────────────┴─────────────────────┘
-                                |
-                         [System Ground]
-                                |
-                          [Earth Ground]
+```mermaid
+flowchart TD
+    S1["Sensor 1"]
+    S2["Sensor 2"]
+    ADC["ADC"]
+    
+    G1["Gnd"]
+    G2["Gnd"]
+    G3["Gnd"]
+    
+    SG["System Ground"]
+    EG["Earth Ground"]
+    
+    S1 --> G1
+    S2 --> G2
+    ADC --> G3
+    
+    G1 --> SG
+    G2 --> SG
+    G3 --> SG
+    
+    SG --> EG
 ```
 
 In this topology, all ground return currents flow back to a single system ground node, preventing return currents from one circuit from affecting another. The system ground is then connected to earth ground at a single point to establish a safety ground and reference potential without creating ground loops.

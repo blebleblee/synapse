@@ -30,57 +30,35 @@ The quantum execution phase receives this parameterization as a sequence of gate
 
 Circuit depth becomes the critical performance metric because errors accumulate multiplicatively: a 100-gate circuit with 99% per-gate fidelity yields overall fidelity $(0.99)^{100} \approx 36.6\%$, meaning nearly two-thirds of executions produce garbage results. Quantum algorithm designers combat this through circuit optimization techniques: gate fusion combines consecutive single-qubit rotations $R_z(\alpha) R_x(\beta) R_z(\gamma)$ into a single Euler-decomposed operation; gate cancellation eliminates sequences like CNOT-CNOT that compose to identity; and topology-aware routing minimizes SWAP gate overhead when mapping logical qubit connectivity to physical device topologies.
 
-```
-Quantum-Classical Hybrid Execution Flow:
-
-┌─────────────────────────────────────────────────────────────┐
-│ Classical Host (Python/C++ Runtime)                         │
-│                                                               │
-│  ┌──────────────────┐         ┌─────────────────────┐      │
-│  │ Problem Encoding │────────>│ Circuit Generation   │      │
-│  │ • QUBO Matrix    │         │ • Parameterized      │      │
-│  │ • Feature Vector │         │   Ansatz (VQE)       │      │
-│  │ • Hamiltonian    │         │ • Gate Sequence      │      │
-│  └──────────────────┘         └──────────┬──────────┘      │
-│                                           │                  │
-│                                           v                  │
-│                              ┌────────────────────────┐     │
-│                              │ Circuit Optimization   │     │
-│                              │ • Gate Fusion          │     │
-│                              │ • SWAP Minimization    │     │
-│                              │ • Error Mitigation     │     │
-│                              └───────────┬────────────┘     │
-└──────────────────────────────────────────┼──────────────────┘
-                                           │
-                        Submit via QISA    │
-                                           v
-┌─────────────────────────────────────────────────────────────┐
-│ Quantum Processor (Isolated at ~20 mK)                      │
-│                                                               │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  │
-│  │ State Init   │───>│ Gate Seq     │───>│ Measurement  │  │
-│  │ |0...0⟩      │    │ U₁U₂...Uₙ    │    │ Collapse to  │  │
-│  │ (Ground)     │    │ (Unitary)    │    │ Bitstring    │  │
-│  └──────────────┘    └──────────────┘    └──────┬───────┘  │
-│                                                   │           │
-│                       Coherence Time Budget       │           │
-│                       T₁ ~ 100 μs (Relaxation)   │           │
-│                       T₂ ~ 50 μs (Dephasing)     │           │
-└───────────────────────────────────────────────────┼─────────┘
-                                                    │
-                        Measurement Outcomes        │
-                        (Repeated 1000-10000 shots) │
-                                                    v
-┌─────────────────────────────────────────────────────────────┐
-│ Classical Post-Processing                                   │
-│                                                               │
-│  ┌────────────────┐    ┌──────────────┐    ┌─────────────┐ │
-│  │ Statistics     │───>│ Error        │───>│ Optimizer   │ │
-│  │ Aggregate      │    │ Mitigation   │    │ Update θ    │ │
-│  │ • Expectation  │    │ • Readout    │    │ (Classical  │ │
-│  │   Values       │    │ • Zero Noise │    │  Gradient)  │ │
-│  └────────────────┘    └──────────────┘    └─────────────┘ │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph classical ["Classical Host (Python/C++ Runtime)"]
+        A["Problem Encoding<br/>• QUBO Matrix<br/>• Feature Vector<br/>• Hamiltonian"]
+        B["Circuit Generation<br/>• Parameterized Ansatz (VQE)<br/>• Gate Sequence"]
+        C["Circuit Optimization<br/>• Gate Fusion<br/>• SWAP Minimization<br/>• Error Mitigation"]
+        A -->|"Direct"| B
+        B -->|"Optimize"| C
+    end
+    
+    subgraph quantum ["Quantum Processor (Isolated at ~20 mK)"]
+        D["State Init<br/>|0...0⟩<br/>(Ground)"]
+        E["Gate Sequence<br/>U₁U₂...Uₙ<br/>(Unitary)"]
+        F["Measurement<br/>Collapse to<br/>Bitstring"]
+        D -->|"Execute"| E
+        E -->|"Measure"| F
+        G["Coherence Budget<br/>T₁ ~ 100 μs<br/>T₂ ~ 50 μs"]
+    end
+    
+    subgraph classical_post ["Classical Post-Processing"]
+        H["Statistics<br/>Aggregate<br/>• Expectation Values"]
+        I["Error Mitigation<br/>• Readout<br/>• Zero Noise"]
+        J["Optimizer<br/>Update θ<br/>Classical Gradient"]
+        H -->|"Mitigate"| I
+        I -->|"Optimize"| J
+    end
+    
+    C -->|"Submit via QISA"| D
+    F -->|"Measurement Outcomes<br/>1000-10000 shots"| H
 ```
 
 Measurement extracts classical information from quantum states but at the cost of irreversible collapse. A qubit in superposition $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$ collapses to $|0\rangle$ with probability $|\alpha|^2$ or $|1\rangle$ with probability $|\beta|^2$, yielding a single classical bit. To reconstruct probability distributions or estimate expectation values $\langle H \rangle = \langle\psi|H|\psi\rangle$, the quantum circuit must be executed thousands of times—a process called shot sampling. The statistical uncertainty scales as $\sigma \sim 1/\sqrt{N_{shots}}$, meaning achieving 1% precision requires 10,000 shots, each necessitating full state reinitialization and circuit re-execution.
@@ -107,50 +85,51 @@ Modern neuromorphic chips like Intel's Loihi 2 or IBM's TrueNorth implement this
 
 Bridging conventional deep learning to spiking neural networks requires encoding schemes that map continuous-valued activations into spike trains. Rate coding encodes activation magnitude as spike frequency: an activation $a = 0.7$ in a normalized range $[0,1]$ might map to 70 Hz firing over a 100 ms inference window, requiring 7 spikes on average. This encoding is robust to noise and biologically plausible but sacrifices temporal resolution. Temporal coding encodes information in precise spike timing: a time-to-first-spike code where higher activations trigger earlier spikes, or phase coding where spike timing relative to a reference oscillation encodes analog values. These schemes achieve lower latency—potentially single-spike inference—but demand tighter timing precision and complicate gradient-based training.
 
-```
-Neuromorphic Processing Pipeline:
-
-┌─────────────────────────────────────────────────────────────┐
-│ Input Encoding Layer (Event Camera / Rate Coding)          │
-│                                                               │
-│  Continuous Input                  Spike Train Output       │
-│  Pixel Intensities    ───────────> Event Packets            │
-│  [0.2, 0.8, 0.1, ...]              [(ID, t), (ID, t), ...]  │
-│                                                               │
-│  Encoding: f_spike = f_max × activation                     │
-└────────────────────────────┬────────────────────────────────┘
-                             │ Spike Events via AER Protocol
-                             v
-┌─────────────────────────────────────────────────────────────┐
-│ Spiking Neural Network (Neuromorphic Chip)                 │
-│                                                               │
-│  ┌─────────────┐         ┌─────────────┐         ┌────────┐│
-│  │ Layer 1     │ spikes  │ Layer 2     │ spikes  │ Layer N││
-│  │ N₁ Neurons  │────────>│ N₂ Neurons  │────────>│ Softmax││
-│  │ • LIF       │         │ • LIF       │         │ Decode ││
-│  │ • Synapses  │         │ • Synapses  │         │        ││
-│  └──────┬──────┘         └──────┬──────┘         └────┬───┘│
-│         │ V(t) Updates          │ V(t) Updates        │     │
-│         │ Only on Spike         │ Only on Spike       │     │
-│         │ Events                │ Events              │     │
-│                                                        │     │
-│  Energy: E_spike × spike_count << E_MAC × MAC_count   │     │
-└────────────────────────────────────────────────────────┼─────┘
-                                                         │
-                              Classification Output      │
-                              (Accumulated Spike Counts) │
-                                                         v
-┌─────────────────────────────────────────────────────────────┐
-│ Inference Result Post-Processing                            │
-│                                                               │
-│  Spike Count Histogram  ──> Softmax ──> Class Prediction    │
-│  [125, 8, 3, ..., 210]      Normalize    Class = argmax     │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Input Encoding Layer<br/>Event Camera / Rate Coding"]
+    
+    A1["Continuous Input<br/>Pixel Intensities<br/>[0.2, 0.8, 0.1, ...]"]
+    A2["Spike Train Output<br/>Event Packets<br/>[(ID, t), (ID, t), ...]"]
+    A3["Encoding: f_spike = f_max × activation"]
+    
+    A1 -->|"Rate Coding"| A2
+    A3 -.-> A2
+    
+    A -->|"Spike Events via AER Protocol"| B
+    
+    B["Spiking Neural Network<br/>Neuromorphic Chip"]
+    
+    B1["Layer 1<br/>N₁ Neurons<br/>• LIF Model<br/>• Synapses"]
+    B2["Layer 2<br/>N₂ Neurons<br/>• LIF Model<br/>• Synapses"]
+    BN["Layer N<br/>Softmax Decode"]
+    
+    B1 -->|Spikes| B2
+    B2 -->|Spikes| BN
+    
+    B1 -.->|V(t) Updates<br/>Only on Spike Events| B1
+    B2 -.->|V(t) Updates<br/>Only on Spike Events| B2
+    
+    B3["Energy: E_spike × spike_count<br/>≪ E_MAC × MAC_count"]
+    B3 -.-> B
+    
+    B -->|"Classification Output<br/>Accumulated Spike Counts"| C
+    
+    C["Inference Result Post-Processing"]
+    
+    C1["Spike Count Histogram<br/>[125, 8, 3, ..., 210]"]
+    C2["Softmax Normalize"]
+    C3["Class Prediction<br/>Class = argmax"]
+    
+    C1 --> C2
+    C2 --> C3
+    
+    C --> C1
 ```
 
 Training spiking neural networks confronts the non-differentiability of spike generation. The Heaviside step function defining spike emission—spike if $V \geq V_{th}$, else no spike—has zero gradient almost everywhere, breaking backpropagation. Surrogate gradient methods resolve this by substituting a smooth function approximation during backward passes: replacing the step derivative with a sigmoid, exponential, or piecewise linear function that approximates the spike dynamics while providing non-zero gradients for weight updates. This approach enables end-to-end gradient descent training of deep spiking networks using frameworks like Norse or snnTorch that extend PyTorch's autograd with surrogate gradient implementations.
 
-Alternatively, ANN-to-SNN conversion methods train networks using conventional backpropagation then convert trained weights to spiking equivalents. This process maps ReLU activations to spike rates, batch normalization parameters to threshold adjustments, and trained weights directly to synaptic weights after rescaling. Conversion accuracy depends on inference time: longer windows permit better spike rate approximation of continuous activations but increase latency. State-of-the-art conversion achieves <1% accuracy loss on ImageNet with 100-millisecond inference windows, translating to 10× lower energy than GPU inference for the same classification task.
+Alternatively, ANN-to-SNN conversion methods train networks using conventional backpropagation then convert trained weights to spiking equivalents. This process maps ReLU activations to spike rates, batch normalization parameters to threshold adjustments, and trained weights directly to synaptic weights after rescaling. Conversion accuracy depends on inference time: longer windows permit better spike rate approximation of continuous activations but increase latency. State-of-the-art conversion achieves < 1% accuracy loss on ImageNet with 100-millisecond inference windows, translating to 10× lower energy than GPU inference for the same classification task.
 
 The neuromorphic-AI convergence sweet spot targets event-driven sensory processing where input sparsity is intrinsic. Event cameras like the Dynamic Vision Sensor (DVS) output asynchronous pixel-level brightness change events rather than dense frames, producing 1000× fewer events than conventional cameras for natural scenes. Feeding these events directly into spiking networks eliminates frame-based batching overhead and enables microsecond-latency visual processing for applications like drone navigation, robotic manipulation, and automotive collision avoidance. Similarly, audio processing with cochlear-inspired encoders generates sparse spike trains from acoustic input, enabling ultra-low-power keyword spotting and voice activity detection for always-on edge devices.
 
@@ -197,62 +176,75 @@ This policy routes realtime transcoding requests to edge GPU nodes with 500ms ti
 
 Workload placement optimization becomes a multidimensional constraint satisfaction problem. Consider a video analytics pipeline: object detection requires GPU inference (20W per frame at 30 FPS), feature extraction demands memory bandwidth (10 GB/s), and result aggregation needs network capacity (50 Mbps uplink). Placing detection on constrained edge devices drains battery and throttles performance; placing it in the cloud incurs 50+ ms network latency plus bandwidth costs. The optimal placement deploys detection on edge GPUs collocated with camera sources, streams compressed feature vectors (1/10th the bandwidth of raw frames) to regional edge servers for aggregation, and performs bulk analytics on cost-optimized cloud spot instances operating on hourly batches.
 
-```
-Edge-Cloud Service Mesh Topology:
+```mermaid
+flowchart TD
+    subgraph cloud ["☁️ Cloud Region (Virginia · us-east-1)"]
+        CP["**Control Plane**
+        • API Server
+        • Scheduler
+        • ETCD Cluster"]
 
-┌─────────────────────────────────────────────────────────────┐
-│ Cloud Region (Virginia us-east-1)                           │
-│                                                               │
-│  ┌──────────────────┐        ┌──────────────────┐          │
-│  │ Control Plane    │◄──────►│ Data Analytics   │          │
-│  │ • API Server     │ sync   │ • Batch ML       │          │
-│  │ • Scheduler      │        │ • Long-term Store│          │
-│  │ • ETCD Cluster   │        │ (S3, BigQuery)   │          │
-│  └──────────────────┘        └──────────────────┘          │
-└───────────────┬─────────────────────────────────────────────┘
-                │ WAN (40-100 ms RTT)
-                v
-┌─────────────────────────────────────────────────────────────┐
-│ Regional Edge (San Francisco)                               │
-│                                                               │
-│  ┌──────────────────┐        ┌──────────────────┐          │
-│  │ Edge Control     │◄──────►│ Aggregation      │          │
-│  │ • Cached State   │        │ • Stream Join    │          │
-│  │ • Local Schedule │        │ • Hot Data Cache │          │
-│  └──────────────────┘        └──────────────────┘          │
-└───────────────┬─────────────────────────────────────────────┘
-                │ Metro Fiber (1-5 ms RTT)
-                v
-┌─────────────────────────────────────────────────────────────┐
-│ Edge Node Cluster (Cell Tower / Base Station)              │
-│                                                               │
-│  ┌──────────────────┐        ┌──────────────────┐          │
-│  │ Video Ingest     │───────>│ Object Detection │          │
-│  │ • Decode         │ frames │ • YOLOv8 GPU     │          │
-│  │ • Preprocessing  │        │ • Feature Extract│          │
-│  └──────────────────┘        └─────────┬────────┘          │
-│                                         │ Features           │
-│                                         v                    │
-│                              ┌──────────────────┐           │
-│                              │ Local Actions    │           │
-│                              │ • Alerts         │           │
-│                              │ • Cache Updates  │           │
-│                              └──────────────────┘           │
-└───────────────┬─────────────────────────────────────────────┘
-                │ 5G/LTE (10-30 ms RTT)
-                v
-┌─────────────────────────────────────────────────────────────┐
-│ Edge Devices (Cameras, Drones, Vehicles)                    │
-│                                                               │
-│  Sensing ──> Local Filtering ──> Upstream (Selective)       │
-│  • Raw Capture  • Threshold    • Event-Triggered Upload     │
-│  • Buffering    • Sampling     • Bandwidth-Aware Adaptation │
-└─────────────────────────────────────────────────────────────┘
+        DA["**Data Analytics**
+        • Batch ML
+        • Long-term Store
+        • (S3, BigQuery)"]
+
+        CP <-->|sync| DA
+    end
+
+    subgraph regional ["🏙️ Regional Edge (San Francisco)"]
+        EC["**Edge Control**
+        • Cached State
+        • Local Scheduler"]
+
+        AGG["**Aggregation**
+        • Stream Join
+        • Hot Data Cache"]
+
+        EC <--> AGG
+    end
+
+    subgraph cluster ["📡 Edge Node Cluster (Cell Tower / Base Station)"]
+        VI["**Video Ingest**
+        • Decode
+        • Preprocessing"]
+
+        OD["**Object Detection**
+        • YOLOv8 GPU
+        • Feature Extraction"]
+
+        LA["**Local Actions**
+        • Alerts
+        • Cache Updates"]
+
+        VI -->|frames| OD
+        OD -->|Features| LA
+    end
+
+    subgraph devices ["📷 Edge Devices (Cameras, Drones, Vehicles)"]
+        SEN["**Sensing**
+        • Raw Capture
+        • Buffering"]
+
+        LF["**Local Filtering**
+        • Threshold
+        • Sampling"]
+
+        UP["**Upstream (Selective)**
+        • Event-Triggered Upload
+        • Bandwidth-Aware Adaptation"]
+
+        SEN --> LF --> UP
+    end
+
+    cloud -->|"WAN · 40–100 ms RTT"| regional
+    regional -->|"Metro Fiber · 1–5 ms RTT"| cluster
+    cluster -->|"5G / LTE · 10–30 ms RTT"| devices
 ```
 
 Resource management in this continuum requires telemetry aggregation spanning multiple administrative domains. Prometheus and OpenTelemetry provide standardized metric collection where each node exports resource utilization (CPU, memory, GPU, network), application latency histograms, and error rates. A centralized or hierarchical time-series database ingests these metrics, enabling queries like "99th percentile video decode latency across all edge nodes in the past hour" to inform scaling decisions. Autoscaling policies trigger pod replica adjustments when metrics breach thresholds: horizontal pod autoscaling (HPA) adds replicas when CPU exceeds 70%; vertical pod autoscaling (VPA) adjusts resource requests when memory pressure increases.
 
-Edge-specific resource constraints demand custom scheduling policies. The Kubernetes scheduler scores nodes using plugin-based filters and priority functions, but default scoring prioritizes bin-packing for datacenter efficiency. Edge schedulers must incorporate latency topology (prefer nodes <10ms from data source), energy budgets (avoid oversubscribing solar-powered remote nodes), and connectivity reliability (spread replicas across nodes with independent uplinks). The Volcano scheduler and KEDA (Kubernetes Event-Driven Autoscaling) extend scheduling to consider external metrics—queue depth, event rates, custom application signals—enabling event-driven scale-to-zero for idle services that consume no resources until triggered.
+Edge-specific resource constraints demand custom scheduling policies. The Kubernetes scheduler scores nodes using plugin-based filters and priority functions, but default scoring prioritizes bin-packing for datacenter efficiency. Edge schedulers must incorporate latency topology (prefer nodes < 10ms from data source), energy budgets (avoid oversubscribing solar-powered remote nodes), and connectivity reliability (spread replicas across nodes with independent uplinks). The Volcano scheduler and KEDA (Kubernetes Event-Driven Autoscaling) extend scheduling to consider external metrics—queue depth, event rates, custom application signals—enabling event-driven scale-to-zero for idle services that consume no resources until triggered.
 
 Security in federated edge-cloud systems confronts a vastly expanded attack surface. Traditional datacenter security assumes a trusted network perimeter with centralized policy enforcement; edge deployments expose services across untrusted wireless links and physically accessible hardware. Zero-trust architectures mandate mutual TLS authentication for all service-to-service communication, short-lived certificate rotation (hourly or more frequently), and workload identity verification at every hop. Projects like SPIFFE (Secure Production Identity Framework For Everyone) provide identity attestation where workloads receive cryptographic identities embedded in X.509 certificates tied to their deployment context (namespace, service account, node). Envoy proxies in the service mesh validate these identities on every request, rejecting connections from unverified sources regardless of network origin.
 

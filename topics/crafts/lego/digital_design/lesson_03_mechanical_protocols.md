@@ -38,19 +38,20 @@ Differential gearboxes implement a planetary gear arrangement that allows two in
 
 Pneumatic actuation introduces fluid dynamics into the mechanical protocol stack. The pneumatic pump accumulates compressed air in a reservoir tank, from which it is distributed through flexible tubing to cylinders and valves. A two-position valve routes pressurized air to one side of a double-acting cylinder, causing the piston to extend, while simultaneously venting the opposite chamber to atmosphere. Reversing the valve position retracts the piston. The protocol for pneumatic routing is to minimize tubing length and bends, as each meter of tubing and every 90-degree elbow introduces pressure drop and slows response time. Cylinders should be mounted with their axis of motion aligned with the primary load vector, and hard mechanical stops should be positioned to arrest the piston before it reaches the end of its stroke, preventing impact damage to the cylinder internals. Pneumatic systems are inherently slower than electric actuators but deliver superior force density and inherent compliance, making them ideal for gripping and impact-absorbing applications.
 
-```
-[Power Flow in a Compound Gear Train]
-
- Motor Shaft          Stage 1               Stage 2              Output
- (High Speed)      (3:1 Reduction)     (5:1 Reduction)      (Low Speed)
- 
-    100 RPM  ────>  [12t -> 36t]  ───>  [8t -> 40t]  ───>   6.67 RPM
-    0.3 Nm           0.9 Nm                4.5 Nm
+```mermaid
+flowchart LR
+    A["Motor Shaft<br/>(High Speed)<br/>100 RPM<br/>0.3 Nm"]
+    B["Stage 1<br/>(3:1 Reduction)<br/>12t → 36t<br/>33.33 RPM<br/>0.9 Nm"]
+    C["Stage 2<br/>(5:1 Reduction)<br/>8t → 40t<br/>6.67 RPM<br/>4.5 Nm"]
+    D["Output<br/>(Low Speed)<br/>6.67 RPM<br/>4.5 Nm"]
     
-    ↓ Torque increases, Speed decreases at each stage
+    A -->|"Speed ↓<br/>Torque ↑"| B
+    B -->|"Speed ↓<br/>Torque ↑"| C
+    C --> D
     
-    Efficiency ≈ 85% per gear mesh (neglecting friction)
-    Overall efficiency ≈ 72% (0.85 × 0.85)
+    E["Efficiency: ~85% per mesh<br/>Overall: ~72% (0.85 × 0.85)"]
+    
+    style E fill:#f9f9f9,stroke:#666,stroke-dasharray: 5 5
 ```
 
 The constraint hierarchy in a multi-axis robotic arm illustrates the importance of ordered kinematic chains. A typical arm consists of a base rotation (yaw), a shoulder pivot (pitch), an elbow pivot (pitch), and a wrist rotation (roll). Each joint must be driven independently while ensuring that motion at a proximal joint (closer to the base) does not disturb the alignment of distal joints. This is achieved through coaxial drive shafts, slip rings, or offset bevel gear arrangements that route actuator power through the rotation axes of preceding joints. The protocol is to solve the kinematics in reverse: start by positioning the end effector in the desired location and orientation, then work backward to determine the required angle at each joint. This inverse kinematics approach ensures that the arm configuration is achievable within the mechanical constraints of each joint's range of motion.

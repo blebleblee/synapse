@@ -80,11 +80,11 @@ graph LR
     E -->|"+2 frets"| D
     D -->|"+3 frets"| C
 
-    style C fill:#d4eeff,stroke:#2277aa
-    style A fill:#ffe4d4,stroke:#aa5522
-    style G fill:#d4ffd4,stroke:#227722
-    style E fill:#ffd4ff,stroke:#882288
-    style D fill:#ffffd4,stroke:#888822
+    style C fill:#d4eeff,stroke:#2277aa,color:#0f172a
+    style A fill:#ffe4d4,stroke:#aa5522,color:#0f172a
+    style G fill:#d4ffd4,stroke:#227722,color:#0f172a
+    style E fill:#ffd4ff,stroke:#882288,color:#0f172a
+    style D fill:#ffffd4,stroke:#888822,color:#0f172a
 ```
 
 ### C Major Across the Full Neck (Same Pitches, Five Locations)
@@ -178,14 +178,23 @@ F major at the 1st fret is the technical wall most players hit. It's purely mech
 
 Roll the index finger slightly toward the headstock so the firmer, bony edge of the finger contacts the strings instead of the soft fingerprint pad. The bony edge transmits pressure more efficiently, meaning less total squeeze for the same clean note.
 
-```
-Index finger, viewed from the headstock end:
-
-   Soft pad (avoid)         Bony edge (use this)
-        ⌒                         |
-       /  \                       |  ← roll finger 10–15°
-      /    \                      |     toward headstock until
-     └──────┘                     |     this edge meets the strings
+```mermaid
+flowchart LR
+    A["Index Finger<br/>viewed from headstock end"]
+    
+    subgraph zones ["Finger Zones"]
+        B["Soft Pad<br/><br/>⌒<br/>avoid this"]
+        C["Bony Edge<br/><br/>|<br/>use this"]
+    end
+    
+    D["Roll finger 10–15°<br/>toward headstock<br/>until edge meets strings"]
+    
+    A --> zones
+    C --> D
+    
+    style B fill:#ffcccc
+    style C fill:#ccffcc
+    style D fill:#e6f3ff
 ```
 
 **Clean F checklist:**
@@ -385,24 +394,27 @@ G → Cadd9, using the pinky G voicing (320004):
 ### Chord Change Map (Common Transitions)
 
 ```mermaid
-stateDiagram-v2
-    direction LR
-    [*] --> C_shape
-
-    state "C (x32010)" as C_shape
-    state "G (320003)" as G_shape
-    state "Am (x02210)" as Am_shape
-    state "Em (022000)" as Em_shape
-    state "D (xx0232)" as D_shape
-    state "F (133211)" as F_shape
-
-    C_shape --> Am_shape : Pivot idx+mid, ring shifts A3→A2
-    C_shape --> G_shape : Full reform, use pinky-G shape
-    C_shape --> F_shape : Index rolls into barre position
-    G_shape --> D_shape : Full reform, triangle shape strings 1-3
-    G_shape --> Em_shape : Release ring+pinky, keep middle on A2
-    Am_shape --> Em_shape : Release ring, keep idx+mid
-    D_shape --> C_shape : Pivot middle on D2, ring rotates to A3
+flowchart LR
+    Start(["Start"])
+    C["C<br/>x32010"]
+    G["G<br/>320003"]
+    Am["Am<br/>x02210"]
+    Em["Em<br/>022000"]
+    D["D<br/>xx0232"]
+    F["F<br/>133211"]
+    
+    Start --> C
+    
+    C -->|"Pivot idx+mid, ring shifts A3→A2"| Am
+    C -->|"Full reform, use pinky-G shape"| G
+    C -->|"Index rolls into barre position"| F
+    
+    G -->|"Full reform, triangle shape strings 1-3"| D
+    G -->|"Release ring+pinky, keep middle on A2"| Em
+    
+    Am -->|"Release ring, keep idx+mid"| Em
+    
+    D -->|"Pivot middle on D2, ring rotates to A3"| C
 ```
 
 ---
@@ -544,12 +556,14 @@ Two players on the same guitar sound different because of three variables entire
 
 ### Attack Position
 
-```
-←── Neck ──┤ Soundhole ├── Bridge ──→
-
-Dark, woody     Full, balanced     Bright, cutting
-(fingerstyle,    (default —         (leads, anything
-ballads)         most strumming)    needing to cut a mix)
+```mermaid
+flowchart LR
+    Neck["Neck<br/>Dark, woody<br/>(fingerstyle, ballads)"]
+    Soundhole["Soundhole<br/>Full, balanced<br/>(default — most strumming)"]
+    Bridge["Bridge<br/>Bright, cutting<br/>(leads, anything needing to cut a mix)"]
+    
+    Neck ---|←| Soundhole
+    Soundhole ---|→| Bridge
 ```
 
 ### Pick Angle
@@ -644,13 +658,13 @@ graph TD
         F --> G
     end
 
-    style A fill:#d4eeff,stroke:#2277aa
-    style B fill:#ffe4d4,stroke:#aa5522
-    style C fill:#d4ffd4,stroke:#227722
-    style D fill:#ffd4ff,stroke:#882288
-    style E fill:#ffffd4,stroke:#888822
-    style F fill:#ffd4d4,stroke:#aa2222
-    style G fill:#d4d4ff,stroke:#2222aa
+    style A fill:#d4eeff,stroke:#2277aa,color:#0f172a
+    style B fill:#ffe4d4,stroke:#aa5522,color:#0f172a
+    style C fill:#d4ffd4,stroke:#227722,color:#0f172a
+    style D fill:#ffd4ff,stroke:#882288,color:#0f172a
+    style E fill:#ffffd4,stroke:#888822,color:#0f172a
+    style F fill:#ffd4d4,stroke:#aa2222,color:#0f172a
+    style G fill:#d4d4ff,stroke:#2222aa,color:#0f172a
 ```
 
 The two highest-leverage next moves after open chords:

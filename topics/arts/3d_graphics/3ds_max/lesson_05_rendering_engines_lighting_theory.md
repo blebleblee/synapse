@@ -38,43 +38,20 @@ Rasterization proceeds by iterating over horizontal scanlines from top to bottom
 
 Visibility determination occurs through z-buffer comparison. Each framebuffer pixel stores both a color value and a depth value. When rasterizing a triangle fragment at screen coordinate (x, y), the renderer compares the fragment's interpolated depth z against the value currently stored in the depth buffer at that location. If z is closer to the camera than the stored depth, the fragment is visible: the renderer writes the fragment's shaded color to the framebuffer and updates the depth buffer with z. If z is farther, the fragment is occluded by geometry already processed, and both buffers remain unchanged. This single-pass, per-fragment depth test resolves visibility for arbitrary scene complexity without requiring global spatial sorting.
 
-```
-Scanline Rasterization Pipeline:
-┌─────────────────────────────────────────────────────────┐
-│ Scene Geometry (Triangles in World Space)               │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│ Vertex Transformation (MVP Matrix)                      │
-│ World → View → Clip → Normalized Device Coordinates     │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│ Clipping & Perspective Division                         │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│ Scanline Iteration (Top → Bottom)                       │
-│  ├─ Active Edge Table Management                        │
-│  ├─ Span Filling (Left Edge → Right Edge)              │
-│  └─ Attribute Interpolation (z, color, UV, normal)     │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│ Per-Fragment Operations                                 │
-│  ├─ Z-Buffer Test (depth comparison)                    │
-│  ├─ Shading (Blinn-Phong local illumination)           │
-│  └─ Framebuffer Write (if visible)                     │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│ Final Image (Framebuffer Output)                        │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Scene Geometry<br/>(Triangles in World Space)"]
+    B["Vertex Transformation (MVP Matrix)<br/>World → View → Clip → Normalized Device Coordinates"]
+    C["Clipping & Perspective Division"]
+    D["Scanline Iteration (Top → Bottom)<br/>├─ Active Edge Table Management<br/>├─ Span Filling (Left Edge → Right Edge)<br/>└─ Attribute Interpolation (z, color, UV, normal)"]
+    E["Per-Fragment Operations<br/>├─ Z-Buffer Test (depth comparison)<br/>├─ Shading (Blinn-Phong local illumination)<br/>└─ Framebuffer Write (if visible)"]
+    F["Final Image<br/>(Framebuffer Output)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 Shading within the scanline pipeline applies local illumination models that compute color based solely on light sources, surface properties at the fragment, and the camera direction—deliberately ignoring light reflected from other surfaces. The Blinn-Phong model, the default for 3ds Max Scanline materials, decomposes surface reflection into ambient, diffuse, and specular components. The ambient term contributes a constant color scaled by ambient light intensity, approximating indirect illumination through a uniform offset. The diffuse term implements Lambertian reflectance by multiplying surface color by the cosine of the angle between the surface normal and the light direction, yielding matte shading that appears equally bright from all viewing angles. The specular term adds glossy highlights by raising the cosine of the angle between the half-vector—the normalized sum of light direction and view direction—and the surface normal to a shininess exponent, producing highlights that tighten as shininess increases.
@@ -83,46 +60,18 @@ Ray tracing replaces rasterization's screen-space traversal with geometric inter
 
 A bounding volume hierarchy organizes geometry into a tree of axis-aligned bounding boxes. Each internal node stores a box that encloses all geometry in its subtree. Ray intersection begins at the root, testing whether the ray intersects the root box using the slab method, which reduces box intersection to six plane intersection tests and a min-max comparison of the resulting t values. If the ray misses the root box, it misses all geometry in the scene, and intersection testing terminates. If the ray hits the root box, the renderer descends recursively into child nodes, testing each child's bounding box before descending further. Leaf nodes contain small sets of triangles that undergo precise ray-triangle intersection testing using barycentric coordinate computation or Möller-Trumbore algorithm. The traversal maintains the closest intersection found so far, allowing it to prune subtrees whose bounding boxes lie farther than the current closest hit.
 
-```
-Ray-BVH Intersection Traversal:
-┌────────────────────────────────────────────────────────┐
-│ Cast Primary Ray from Camera through Pixel (x,y)      │
-│ Ray: r(t) = origin + t * direction                    │
-└───────────────────┬────────────────────────────────────┘
-                    │
-                    ▼
-┌────────────────────────────────────────────────────────┐
-│ BVH Root Node                                          │
-│ Test ray against root bounding box                     │
-│  Hit? → Descend to children                            │
-│  Miss? → Ray misses all geometry, return background    │
-└───────────────────┬────────────────────────────────────┘
-                    │
-                    ▼
-┌────────────────────────────────────────────────────────┐
-│ Internal Nodes (Recursive Descent)                     │
-│ For each child box:                                    │
-│   Test intersection                                    │
-│   If hit && t_near < t_closest:                        │
-│     Descend into child                                 │
-│   If t_near >= t_closest:                              │
-│     Prune subtree (already found closer hit)           │
-└───────────────────┬────────────────────────────────────┘
-                    │
-                    ▼
-┌────────────────────────────────────────────────────────┐
-│ Leaf Nodes (Triangle Intersection)                     │
-│ Test ray against each triangle in leaf set             │
-│ Compute barycentric coordinates (u,v,w)                │
-│ If 0 ≤ u,v,w ≤ 1 and u+v+w=1 → Hit                    │
-│ Update t_closest if this hit is nearer                 │
-└───────────────────┬────────────────────────────────────┘
-                    │
-                    ▼
-┌────────────────────────────────────────────────────────┐
-│ Return Closest Intersection (if any)                   │
-│ Surface point, normal, material, UV coordinates        │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Cast Primary Ray from Camera through Pixel (x,y)<br/>Ray: r(t) = origin + t * direction"]
+    B["BVH Root Node<br/>Test ray against root bounding box<br/>Hit? → Descend to children<br/>Miss? → Ray misses all geometry, return background"]
+    C["Internal Nodes (Recursive Descent)<br/>For each child box:<br/>  Test intersection<br/>  If hit && t_near < t_closest:<br/>    Descend into child<br/>  If t_near >= t_closest:<br/>    Prune subtree (already found closer hit)"]
+    D["Leaf Nodes (Triangle Intersection)<br/>Test ray against each triangle in leaf set<br/>Compute barycentric coordinates (u,v,w)<br/>If 0 ≤ u,v,w ≤ 1 and u+v+w=1 → Hit<br/>Update t_closest if this hit is nearer"]
+    E["Return Closest Intersection (if any)<br/>Surface point, normal, material, UV coordinates"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 Upon finding the closest intersection, the ray tracer spawns secondary rays to accumulate reflected and transmitted light. Reflection rays originate at the intersection point, directed according to the law of specular reflection where the outgoing angle equals the incident angle relative to the surface normal. Refraction rays bend according to Snell's law, with the direction determined by the ratio of refractive indices between the media on either side of the interface. Each secondary ray undergoes full intersection testing against the scene geometry, potentially spawning further rays recursively until a maximum recursion depth is reached or rays escape the scene.
@@ -145,52 +94,37 @@ Caustics demand separate handling because their sharp spatial variation defeats 
 
 Volumetric rendering integrates light transport through participating media by sampling density, absorption, and scattering coefficients along ray paths. Homogeneous media have constant coefficients, allowing analytic integration of Beer's law attenuation: transmitted radiance decays exponentially with distance as exp(-density × distance). Heterogeneous media require numerical integration by subdividing the ray into segments, sampling coefficients at segment midpoints, and accumulating opacity and in-scattering contributions. Each segment computes in-scattering by casting shadow rays toward lights, multiplying light intensity by the scattering coefficient and phase function (which describes angular scattering distribution), and attenuating by the absorption along both the camera-to-sample and sample-to-light paths.
 
-```
-Volumetric Path Segment Integration:
-┌──────────────────────────────────────────────────────┐
-│ Camera Ray through Participating Medium              │
-│ Subdivide ray into N segments: t_0 ... t_N          │
-└────────────────┬─────────────────────────────────────┘
-                 │
-                 ▼
-         ┌───────────────┐
-         │ Segment i     │
-         │ [t_i, t_i+1]  │
-         └───────┬───────┘
-                 │
-    ┌────────────┼────────────┐
-    ▼            ▼            ▼
-┌────────┐  ┌─────────┐  ┌────────────┐
-│Sample  │  │Compute  │  │Sample      │
-│density │  │opacity  │  │scattering  │
-│σ_t at  │  │α_i =    │  │coefficient │
-│t_mid   │  │1-e^(-σΔt)│ │σ_s         │
-└────┬───┘  └────┬────┘  └─────┬──────┘
-     │           │              │
-     └───────────┴──────────────┘
-                 │
-                 ▼
-    ┌────────────────────────────┐
-    │ In-Scattering Computation  │
-    │ For each light source:     │
-    │   Cast shadow ray          │
-    │   Attenuate by absorption  │
-    │   Multiply by phase fn     │
-    │   Accumulate L_in          │
-    └────────────┬───────────────┘
-                 │
-                 ▼
-    ┌────────────────────────────┐
-    │ Accumulate Over Segments   │
-    │ T_i = T_i-1 * (1 - α_i)    │ ← transparency
-    │ L_out += T_i-1 * α_i * L_in│ ← in-scattered light
-    └────────────┬───────────────┘
-                 │
-                 ▼
-    ┌────────────────────────────┐
-    │ Final Radiance             │
-    │ L_out + T_N * L_surface    │ ← surface contribution attenuated by fog
-    └────────────────────────────┘
+```mermaid
+flowchart TD
+    RAY["Camera Ray through Participating Medium\nSubdivide ray into N segments: t₀ … t_N"]
+
+    RAY --> SEG["Segment i\n[tᵢ, tᵢ₊₁]"]
+
+    SEG --> DENSITY["Sample density\nσ_t at t_mid"]
+    SEG --> OPACITY["Compute opacity\nαᵢ = 1 − e^(−σΔt)"]
+    SEG --> SCATTER["Sample scattering\ncoefficient σ_s"]
+
+    DENSITY --> INSCATTER
+    OPACITY --> INSCATTER
+    SCATTER --> INSCATTER
+
+    subgraph INSCATTER ["In-Scattering Computation"]
+        IS1["Cast shadow ray per light source"]
+        IS2["Attenuate by absorption"]
+        IS3["Multiply by phase function"]
+        IS4["Accumulate L_in"]
+        IS1 --> IS2 --> IS3 --> IS4
+    end
+
+    subgraph ACCUM ["Accumulate Over Segments"]
+        AC1["Transmittance: Tᵢ = Tᵢ₋₁ × (1 − αᵢ)"]
+        AC2["Radiance: L_out += Tᵢ₋₁ × αᵢ × L_in"]
+        AC1 --> AC2
+    end
+
+    INSCATTER --> ACCUM
+
+    ACCUM --> FINAL["Final Radiance\nL_out + T_N × L_surface\n(surface contribution attenuated by participating medium)"]
 ```
 
 Render passes extract intermediate signals by storing per-fragment or per-sample contributions into separate buffers during rendering. The diffuse pass writes only the Lambertian BRDF component multiplied by direct lighting, omitting specular terms. The specular pass writes glossy reflections and highlights. The lighting pass stores raw illumination before material multiplication. Shadow passes compute visibility separately, storing binary or fractional occlusion values. Ambient occlusion passes cast rays into the hemisphere above each surface point, counting occluded versus unoccluded rays to approximate the accessibility of indirect lighting—a geometric approximation of diffuse interreflection that captures contact shadows and crevice darkening without full global illumination.

@@ -38,28 +38,38 @@ Transaction feature extraction begins with raw event logs capturing the atomic e
 
 The enrichment pipeline transforms raw values into derived features that capture behavioral deviations and anomaly signals. Velocity metrics measure transaction rates over sliding time windows: count of transactions in the past hour, past day, past week, segmented by channel, merchant category, or counterparty. Velocity features detect burst activity that may indicate account takeover or synthetic identity testing. Deviation features quantify distance from historical norms: the ratio of current transaction amount to 30-day rolling median, the geographic distance from the centroid of the past 90 days of activity, the time elapsed since last transaction of similar type, and the entropy of merchant category distribution compared to historical baseline.
 
-```
-Feature Engineering Pipeline:
+```mermaid
+flowchart TD
+    RTE["Raw Transaction Event"]
 
-Raw Transaction Event
-         |
-         v
-[Account Profile Join] ──> Historical behavior metrics (mean, median, percentiles)
-         |
-         v
-[Velocity Aggregation] ──> Rolling window counts by time/channel/category
-         |
-         v
-[External Data Join] ──> Fraud intelligence, IP reputation, device risk scores
-         |
-         v
-[Deviation Calculation] ──> Distance from personal baseline, population baseline
-         |
-         v
-[Behavioral Sequence] ──> Session path analysis, event ordering patterns
-         |
-         v
-Enriched Feature Vector (dimensionality: 200-2000 features)
+    APJ["Account Profile Join"]
+    HBM["Historical behavior metrics\n(mean, median, percentiles)"]
+
+    VA["Velocity Aggregation"]
+    RWC["Rolling window counts\nby time / channel / category"]
+
+    EDJ["External Data Join"]
+    FID["Fraud intelligence, IP reputation,\ndevice risk scores"]
+
+    DC["Deviation Calculation"]
+    DBP["Distance from personal baseline,\npopulation baseline"]
+
+    BS["Behavioral Sequence"]
+    SPA["Session path analysis,\nevent ordering patterns"]
+
+    EFV["Enriched Feature Vector\n(dimensionality: 200 – 2000 features)"]
+
+    RTE --> APJ
+    APJ --> HBM
+    APJ --> VA
+    VA --> RWC
+    VA --> EDJ
+    EDJ --> FID
+    EDJ --> DC
+    DC --> DBP
+    DC --> BS
+    BS --> SPA
+    BS --> EFV
 ```
 
 The enriched feature vector feeds into scoring models that produce probabilistic fraud risk estimates. Modern detection architectures employ ensembles of heterogeneous models to capture different aspects of fraud patterns and improve robustness against adversarial adaptation. Logistic regression models trained on labeled historical fraud examples provide interpretable baseline scores with explicit coefficient weights for each feature, enabling regulatory auditability and explanation requirements. Gradient boosted decision trees (XGBoost, LightGBM) capture nonlinear feature interactions and conditional dependencies without requiring explicit feature engineering of interaction terms. Deep neural networks with embedding layers for categorical variables and attention mechanisms for sequential transaction history can learn complex representation spaces, though at the cost of reduced interpretability and increased training data requirements.
@@ -70,32 +80,28 @@ The rule evaluation layer operates in parallel with statistical models, applying
 
 The interaction between models and rules creates complex decisioning logic that must balance multiple objectives: minimize fraud losses, limit false positive friction on legitimate customers, satisfy regulatory requirements for authentication and verification, and maintain operational cost constraints on manual review capacity. The decisioning engine maps fraud scores and rule flags to transaction dispositions: approve automatically, decline automatically, or route to manual review queue with priority ranking.
 
-```
-Decisioning Flow:
-
-Enriched Feature Vector
-         |
-         +─────────────────────────────────┐
-         |                                 |
-         v                                 v
-[Model Ensemble Scoring]          [Rule Evaluation Engine]
-   - Logistic Regression              - Negative Lists
-   - Gradient Boosted Trees           - Velocity Limits
-   - Neural Network                   - Geographic Rules
-         |                                 |
-         v                                 v
-   Fraud Probability Score            Rule Flag Array
-         |                                 |
-         └─────────────┬─────────────────┘
-                       v
-            [Decisioning Logic]
-        - Score thresholds by segment
-        - Rule override hierarchy
-        - Review capacity constraints
-                       |
-         +─────────────┼─────────────+
-         v             v             v
-      APPROVE       REVIEW        DECLINE
+```mermaid
+flowchart TD
+    A["Enriched Feature Vector"]
+    
+    A --> B["Model Ensemble Scoring"]
+    A --> C["Rule Evaluation Engine"]
+    
+    B --> D["Fraud Probability Score"]
+    C --> E["Rule Flag Array"]
+    
+    D --> F["Decisioning Logic"]
+    E --> F
+    
+    F --> G["APPROVE"]
+    F --> H["REVIEW"]
+    F --> I["DECLINE"]
+    
+    B1["Logistic Regression<br/>Gradient Boosted Trees<br/>Neural Network"]:::subtext
+    C1["Negative Lists<br/>Velocity Limits<br/>Geographic Rules"]:::subtext
+    F1["Score thresholds by segment<br/>Rule override hierarchy<br/>Review capacity constraints"]:::subtext
+    
+    classDef subtext font-size:12px,fill:none,stroke:none
 ```
 
 The feedback integration mechanism closes the loop between decisioning outcomes and model training, but introduces significant challenges due to label bias and verification incompleteness. Approved transactions generate implicit negative labels (assumed legitimate) unless later disputed through chargeback or fraud reporting, creating label delay and censoring. Declined transactions never complete and thus cannot be definitively labeled—the transaction may have been legitimate but was blocked, or it may have been fraudulent and was correctly prevented. Transactions routed to manual review receive explicit investigator labels, but these represent a biased sample selected by the existing detection system rather than a random sample of the full transaction population.

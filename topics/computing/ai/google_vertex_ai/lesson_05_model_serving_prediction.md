@@ -30,44 +30,20 @@ The Vertex AI Prediction architecture decomposes into several interacting subsys
 
 The control plane exposes the Endpoint resource as the primary abstraction for model deployment. An endpoint represents a stable HTTPS URL bound to a specific GCP region, capable of hosting multiple deployed models with independent traffic allocations. Creating an endpoint provisions the necessary networking infrastructure—load balancers, SSL certificates, and OAuth2 authentication policies—but allocates no compute resources until model deployment occurs. This separation allows endpoint URLs to remain stable across model version updates, preventing client applications from hardcoding version-specific URLs.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         CLIENT APPLICATION                       │
-│                  (REST/gRPC Prediction Request)                  │
-└────────────────────────────┬────────────────────────────────────┘
-                             │ HTTPS (OAuth2 Bearer Token)
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   CLOUD LOAD BALANCER (GCLB)                     │
-│              SSL Termination, Request Routing                    │
-└────────────────────────────┬────────────────────────────────────┘
-                             │ Internal mTLS
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      ENDPOINT TRAFFIC ROUTER                     │
-│          Traffic Splitting (90% v2, 10% v3), A/B Testing        │
-└─────────┬──────────────────────────────────────────┬────────────┘
-          │ 90%                                       │ 10%
-          ▼                                           ▼
-┌──────────────────────────┐              ┌──────────────────────────┐
-│   MODEL v2 REPLICA POOL  │              │   MODEL v3 REPLICA POOL  │
-│   ┌────────────────────┐ │              │   ┌────────────────────┐ │
-│   │ Prediction Server  │ │              │   │ Prediction Server  │ │
-│   │ - Model Loaded     │ │              │   │ - Model Loaded     │ │
-│   │ - Request Batching │ │              │   │ - Request Batching │ │
-│   │ - GPU Acceleration │ │              │   │ - GPU Acceleration │ │
-│   └────────────────────┘ │              │   └────────────────────┘ │
-│   Replicas: 3/3          │              │   Replicas: 1/1          │
-│   Autoscaling: Enabled   │              │   Autoscaling: Enabled   │
-└──────────────────────────┘              └──────────────────────────┘
-          │                                           │
-          └───────────────────┬───────────────────────┘
-                              │ Model Artifacts
-                              ▼
-                    ┌──────────────────────┐
-                    │   CLOUD STORAGE      │
-                    │   gs://models/...    │
-                    └──────────────────────┘
+```mermaid
+flowchart TD
+    Client["CLIENT APPLICATION<br/>REST/gRPC Prediction Request"]
+    
+    Client -->|"HTTPS<br/>OAuth2 Bearer Token"| LB["CLOUD LOAD BALANCER (GCLB)<br/>SSL Termination, Request Routing"]
+    
+    LB -->|"Internal mTLS"| Router["ENDPOINT TRAFFIC ROUTER<br/>Traffic Splitting (90% v2, 10% v3), A/B Testing"]
+    
+    Router -->|90%| V2Pool["MODEL v2 REPLICA POOL<br/>Prediction Server<br/>- Model Loaded<br/>- Request Batching<br/>- GPU Acceleration<br/>Replicas: 3/3<br/>Autoscaling: Enabled"]
+    
+    Router -->|10%| V3Pool["MODEL v3 REPLICA POOL<br/>Prediction Server<br/>- Model Loaded<br/>- Request Batching<br/>- GPU Acceleration<br/>Replicas: 1/1<br/>Autoscaling: Enabled"]
+    
+    V2Pool -->|"Model Artifacts"| Storage["CLOUD STORAGE<br/>gs://models/..."]
+    V3Pool -->|"Model Artifacts"| Storage
 ```
 
 Deploying a model to an endpoint creates a DeployedModel resource that specifies the model artifact location, machine type, accelerator configuration, and traffic allocation. The control plane translates this declarative specification into an imperative sequence: provision compute instances of the specified machine type in the target region, attach GPU accelerators if configured, install the prediction server runtime (TensorFlow Serving, TorchServe, or custom container), download model artifacts from Cloud Storage, load model into server memory, register the replica pool with the traffic router, and begin serving traffic according to the allocated percentage.

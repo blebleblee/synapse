@@ -22,18 +22,21 @@ The containerd CNI library (`github.com/containerd/go-cni`) wraps the raw plugin
 
 Here is the exact directory and configuration layout a production containerd node expects:
 
-```
-/etc/cni/net.d/
-├── 10-calico.conflist          ← Primary network (lexicographically first)
-├── 99-loopback.conf            ← Loopback plugin
-
-/opt/cni/bin/
-├── calico
-├── calico-ipam
-├── loopback
-├── portmap
-├── bandwidth
-├── host-local
+```mermaid
+flowchart TD
+    subgraph netd ["/etc/cni/net.d/"]
+        A["10-calico.conflist<br/><i>Primary network (lexicographically first)</i>"]
+        B["99-loopback.conf<br/><i>Loopback plugin</i>"]
+    end
+    
+    subgraph bin ["/opt/cni/bin/"]
+        C["calico"]
+        D["calico-ipam"]
+        E["loopback"]
+        F["portmap"]
+        G["bandwidth"]
+        H["host-local"]
+    end
 ```
 
 A `conflist` file encodes an ordered chain. The following is a production-grade Calico conflist demonstrating a full plugin chain with IPAM, loopback, port mapping, and bandwidth shaping:
@@ -313,54 +316,39 @@ spec:
 
 The following diagram captures the complete invocation sequence from kubelet through the runtime to CNI, showing the namespace lifecycle and the dataplane programming steps:
 
-```
-kubelet                 containerd/CRI-O         Linux Kernel          CNI Plugin Chain
-   │                          │                       │                       │
-   │── RunPodSandbox ────────>│                       │                       │
-   │                          │── clone(CLONE_NEWNET)─>│                       │
-   │                          │<── netns fd ──────────│                       │
-   │                          │── bind mount netns ──>│                       │
-   │                          │   /var/run/netns/cni-XYZ                      │
-   │                          │                       │                       │
-   │                          │── fork plugin #1 ─────────────────────────── >│ (calico)
-   │                          │   CNI_COMMAND=ADD      │                      │
-   │                          │   CNI_NETNS=/var/run/netns/cni-XYZ            │
-   │                          │   CNI_IFNAME=eth0      │                      │
-   │                          │   stdin: conflist[0]   │                      │
-   │                          │                        │                      │
-   │                          │                        │<── setns(netns_fd) ──│
-   │                          │                        │<── ip link add veth0 │
-   │                          │                        │    type veth         │
-   │                          │                        │    peer name eth0    │
-   │                          │                        │<── ip link set eth0  │
-   │                          │                        │    netns <cni-XYZ>   │
-   │                          │                        │<── ip addr add       │
-   │                          │                        │    192.168.1.5/32    │
-   │                          │                        │    dev eth0          │
-   │                          │                        │<── ip route add      │
-   │                          │                        │    169.254.1.1       │
-   │                          │                        │    dev eth0          │
-   │                          │                        │<── arp set           │
-   │                          │                        │    169.254.1.1 proxy │
-   │                          │<── stdout: result JSON ─────────────────────  │
-   │                          │   (IPs, routes, interfaces)                   │
-   │                          │                        │                      │
-   │                          │── fork plugin #2 ─────────────────────────── >│ (bandwidth)
-   │                          │   stdin: conf + prevResult                    │
-   │                          │                        │<── tc qdisc add      │
-   │                          │                        │    dev veth0 tbf     │
-   │                          │<── stdout: result JSON ─────────────────────  │
-   │                          │                        │                      │
-   │                          │── fork plugin #3 ─────────────────────────── >│ (portmap)
-   │                          │   stdin: conf + prevResult                    │
-   │                          │                        │<── iptables -t nat   │
-   │                          │                        │    -A CNI-HOSTPORT-  │
-   │                          │                        │    DNAT ...          │
-   │                          │<── stdout: result JSON ─────────────────────  │
-   │                          │                        │                      │
-   │                          │── start pause process ─>│                     │
-   │<── RunPodSandbox OK ─────│                        │                      │
-   │                          │                        │                      │
+```mermaid
+flowchart TD
+    K["kubelet"]
+    C["containerd/CRI-O"]
+    L["Linux Kernel"]
+    CNI["CNI Plugin Chain"]
+    
+    K -->|"RunPodSandbox"| C
+    C -->|"clone(CLONE_NEWNET)"| L
+    L -->|"netns fd"| C
+    C -->|"bind mount netns<br/>/var/run/netns/cni-XYZ"| L
+    
+    C -->|"fork plugin #1 (calico)<br/>CNI_COMMAND=ADD<br/>CNI_NETNS=/var/run/netns/cni-XYZ<br/>CNI_IFNAME=eth0<br/>stdin: conflist[0]"| CNI
+    
+    CNI -->|"setns(netns_fd)"| L
+    CNI -->|"ip link add veth0<br/>type veth peer name eth0"| L
+    CNI -->|"ip link set eth0<br/>netns <cni-XYZ>"| L
+    CNI -->|"ip addr add<br/>192.168.1.5/32 dev eth0"| L
+    CNI -->|"ip route add<br/>169.254.1.1 dev eth0"| L
+    CNI -->|"arp set<br/>169.254.1.1 proxy"| L
+    
+    CNI -->|"stdout: result JSON<br/>(IPs, routes, interfaces)"| C
+    
+    C -->|"fork plugin #2 (bandwidth)<br/>stdin: conf + prevResult"| CNI
+    CNI -->|"tc qdisc add<br/>dev veth0 tbf"| L
+    CNI -->|"stdout: result JSON"| C
+    
+    C -->|"fork plugin #3 (portmap)<br/>stdin: conf + prevResult"| CNI
+    CNI -->|"iptables -t nat<br/>-A CNI-HOSTPORT-DNAT ..."| L
+    CNI -->|"stdout: result JSON"| C
+    
+    C -->|"start pause process"| L
+    C -->|"RunPodSandbox OK"| K
 ```
 
 ### kube-proxy Integration and Its Relationship to CNI

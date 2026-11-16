@@ -20,60 +20,39 @@ The representation of input state bifurcates into two orthogonal concerns: discr
 
 The canonical game loop structure decomposes into five sequential phases executed each frame, with control flow returning to the top after output presentation:
 
-```
-┌─────────────────────────────────────────────┐
-│          FRAME N START (t=N*16.67ms)        │
-└─────────────────────────────────────────────┘
-                      │
-                      ▼
-         ┌────────────────────────┐
-         │  1. Input Acquisition  │◄──── OS Event Queue
-         │   - Poll Device State  │      (keyboard, mouse,
-         │   - Generate Events    │       gamepad, touch)
-         │   - Update Input Maps  │
-         └────────────────────────┘
-                      │
-                      ▼
-         ┌────────────────────────┐
-         │   2. Event Dispatch    │
-         │   - Route to Handlers  │
-         │   - UI System          │
-         │   - Game Logic         │◄──── Prioritized Handlers
-         └────────────────────────┘      (UI > gameplay > debug)
-                      │
-                      ▼
-         ┌────────────────────────┐
-         │ 3. Fixed-Step Simulate │
-         │   while(acc >= dt):    │
-         │     - Physics Update   │◄──── Accumulated Time Debt
-         │     - AI Update        │      (drain in 16.67ms chunks)
-         │     - Animation        │
-         │     acc -= dt          │
-         └────────────────────────┘
-                      │
-                      ▼
-         ┌────────────────────────┐
-         │   4. Render Prepare    │
-         │   - Interpolate States │
-         │   - Cull Geometry      │◄──── α = acc / dt
-         │   - Sort Transparents  │      (remaining fractional time)
-         └────────────────────────┘
-                      │
-                      ▼
-         ┌────────────────────────┐
-         │   5. Present Output    │
-         │   - Submit GPU Cmds    │
-         │   - Swap Buffers       │◄──── VSync Signal
-         │   - Measure Frame Time │      (display refresh)
-         └────────────────────────┘
-                      │
-                      ▼
-         ┌────────────────────────┐
-         │  Calculate Frame Delta │
-         │  acc += measure()      │
-         └────────────────────────┘
-                      │
-                      └──────────► Loop Back to Phase 1
+```mermaid
+flowchart TD
+    Start["FRAME N START (t=N*16.67ms)"]
+    
+    Input["1. Input Acquisition<br/>- Poll Device State<br/>- Generate Events<br/>- Update Input Maps"]
+    OSQueue["OS Event Queue<br/>(keyboard, mouse,<br/>gamepad, touch)"]
+    
+    Dispatch["2. Event Dispatch<br/>- Route to Handlers<br/>- UI System<br/>- Game Logic"]
+    Handlers["Prioritized Handlers<br/>(UI > gameplay > debug)"]
+    
+    Simulate["3. Fixed-Step Simulate<br/>while(acc >= dt):<br/>- Physics Update<br/>- AI Update<br/>- Animation<br/>acc -= dt"]
+    TimeDebt["Accumulated Time Debt<br/>(drain in 16.67ms chunks)"]
+    
+    Render["4. Render Prepare<br/>- Interpolate States<br/>- Cull Geometry<br/>- Sort Transparents"]
+    Alpha["α = acc / dt<br/>(remaining fractional time)"]
+    
+    Present["5. Present Output<br/>- Submit GPU Cmds<br/>- Swap Buffers<br/>- Measure Frame Time"]
+    VSync["VSync Signal<br/>(display refresh)"]
+    
+    Delta["Calculate Frame Delta<br/>acc += measure()"]
+    
+    Start --> Input
+    OSQueue -.-> Input
+    Input --> Dispatch
+    Handlers -.-> Dispatch
+    Dispatch --> Simulate
+    TimeDebt -.-> Simulate
+    Simulate --> Render
+    Alpha -.-> Render
+    Render --> Present
+    VSync -.-> Present
+    Present --> Delta
+    Delta --> Start
 ```
 
 Input acquisition begins by querying device state through platform-specific APIs. On Windows, this involves calling `GetAsyncKeyState` or processing `WM_INPUT` messages from the Win32 message pump. On Linux, we read input events from `/dev/input/eventX` character devices or consume XInput2 events from the X11 event queue. Console SDKs provide vendor-specific APIs like `scePadReadState` on PlayStation or `XInputGetState` on Xbox. The commonality across all platforms is the transformation of raw hardware state into normalized input abstractions: binary button states, analog axis values in [-1, 1] range, and pointer positions in screen or viewport coordinates.

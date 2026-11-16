@@ -26,31 +26,37 @@ After successful authentication, the connection moves to the `TRANSACTION` state
 
 The critical behavior of the `TRANSACTION` state is that *no changes are committed until the session terminates normally*. `DELE` commands mark messages for deletion but do not execute them. The `QUIT` command triggers the transition to the `UPDATE` state, where the server processes all pending deletions atomically and closes the connection. If the TCP connection drops before `QUIT` is issued, the server discards all pending `DELE` marks and the mailbox is left unmodified. This is a correct and intentional behavior: it prevents partial deletions from corrupting the maildrop when the network fails mid-session. The implication for operators is that a POP3 client that crashes after downloading all messages but before issuing `QUIT` will re-download the entire maildrop on its next connection. Mail delivery systems that feed into POP3 drops must be designed to handle this duplicate-delivery behavior idempotently at the application layer.
 
-```
-POP3 TCP Session on Port 995 (Implicit TLS):
-
-  CLIENT                        SERVER
-    |                             |
-    |<--- TLS Handshake --------->|
-    |<--- +OK Greeting -----------|
-    |---- AUTH PLAIN <base64> --->|
-    |<--- +OK Authenticated ------|  [AUTHORIZATION → TRANSACTION]
-    |---- STAT ------------------>|
-    |<--- +OK 3 8192 -------------|
-    |---- UIDL ------------------>|
-    |<--- +OK                     |
-    |     1 abc123def             |
-    |     2 xyz789ghi             |
-    |     3 qwe456jkl             |
-    |     . ----------------------|
-    |---- RETR 2 --------------->|
-    |<--- +OK 2730 octets --------|
-    |<--- [RFC 5322 message] -----|
-    |     . ----------------------|
-    |---- DELE 2 --------------->|
-    |<--- +OK Message deleted ----|
-    |---- QUIT ------------------>|
-    |<--- +OK Goodbye ------------|  [TRANSACTION → UPDATE → closed]
+```mermaid
+flowchart TD
+    Start(["POP3 TCP Session on Port 995 (Implicit TLS)"])
+    
+    Client["CLIENT"]
+    Server["SERVER"]
+    
+    Start --> TLS["TLS Handshake"]
+    TLS --> Greeting["Server sends: +OK Greeting"]
+    Greeting --> Auth["Client sends: AUTH PLAIN &lt;base64&gt;"]
+    Auth --> AuthOK["Server sends: +OK Authenticated"]
+    
+    AuthOK --> StateAuth["[AUTHORIZATION → TRANSACTION]"]
+    
+    StateAuth --> Stat["Client sends: STAT"]
+    Stat --> StatResp["Server sends: +OK 3 8192"]
+    StatResp --> UIDL["Client sends: UIDL"]
+    UIDL --> UIDLResp["Server sends: +OK<br/>1 abc123def<br/>2 xyz789ghi<br/>3 qwe456jkl<br/>."]
+    
+    UIDLResp --> Retr["Client sends: RETR 2"]
+    Retr --> RetrResp["Server sends: +OK 2730 octets"]
+    RetrResp --> Message["Server sends: [RFC 5322 message]<br/>."]
+    
+    Message --> Dele["Client sends: DELE 2"]
+    Dele --> DeleOK["Server sends: +OK Message deleted"]
+    
+    DeleOK --> Quit["Client sends: QUIT"]
+    Quit --> Goodbye["Server sends: +OK Goodbye"]
+    Goodbye --> StateUpdate["[TRANSACTION → UPDATE → closed]"]
+    
+    StateUpdate --> End(["Connection Closed"])
 ```
 
 ### The IMAP State Machine
@@ -59,39 +65,49 @@ IMAP's state machine is substantially more complex. A connection passes through 
 
 The `SELECTED` state is where the meaningful work occurs. When a client issues `SELECT INBOX` or `SELECT "Sent"`, the server responds with a set of untagged responses that describe the current mailbox state: the number of messages (`* N EXISTS`), the number of recent messages (`* N RECENT`), the UID validity value, the UID next value (the UID that will be assigned to the next arriving message), and the flags the mailbox supports. The client must process all of these before issuing any further commands, because they establish the reference frame against which all subsequent sequence number and UID references are interpreted.
 
-```
-IMAP4rev1 Session Flow (Post-TLS):
+```mermaid
+flowchart TD
+    Start([Client Initiates Connection])
+    S1["* OK [CAPABILITY ...] Ready<br/><small>← SERVER</small>"]
+    C1["A001 LOGIN user pass<br/><small>CLIENT →</small>"]
+    S2["A001 OK LOGIN completed<br/><small>← SERVER</small>"]
+    Auth["⚡ AUTHENTICATED STATE"]
+    C2["A002 SELECT INBOX<br/><small>CLIENT →</small>"]
+    S3["* 247 EXISTS<br/>* 3 RECENT<br/>* OK [UNSEEN 244]<br/>* OK [UIDVALIDITY 1704067200]<br/>* OK [UIDNEXT 2891]<br/>* FLAGS (\Answered \Flagged \Deleted \Seen \Draft)<br/><small>← SERVER</small>"]
+    S4["A002 OK [READ-WRITE] SELECT<br/><small>← SERVER</small>"]
+    Sel["⚡ SELECTED STATE"]
+    C3["A003 UID FETCH 2888:2890<br/>(FLAGS BODY.PEEK[])<br/><small>CLIENT →</small>"]
+    S5["* 245 FETCH (UID 2888 FLAGS (\Seen) ...)<br/>* 246 FETCH (UID 2889 FLAGS () ...)<br/>* 247 FETCH (UID 2890 FLAGS (\Recent) ...)<br/><small>← SERVER</small>"]
+    S6["A003 OK UID FETCH completed<br/><small>← SERVER</small>"]
+    C4["A004 UID STORE 2889<br/>+FLAGS (\Seen)<br/><small>CLIENT →</small>"]
+    S7["* 246 FETCH (FLAGS (\Seen))<br/><small>← SERVER</small>"]
+    S8["A004 OK STORE completed<br/><small>← SERVER</small>"]
+    C5["A005 LOGOUT<br/><small>CLIENT →</small>"]
+    S9["* BYE IMAP4rev1 server<br/><small>← SERVER</small>"]
+    S10["A005 OK LOGOUT completed<br/><small>← SERVER</small>"]
+    End([Connection Closed])
 
-  CLIENT                              SERVER
-    |                                   |
-    |<--- * OK [CAPABILITY ...] Ready---|
-    |---- A001 LOGIN user pass -------->|
-    |<--- A001 OK LOGIN completed ------|  [→ AUTHENTICATED]
-    |---- A002 SELECT INBOX ----------->|
-    |<--- * 247 EXISTS                  |
-    |<--- * 3 RECENT                    |
-    |<--- * OK [UNSEEN 244]             |
-    |<--- * OK [UIDVALIDITY 1704067200] |
-    |<--- * OK [UIDNEXT 2891]           |
-    |<--- * FLAGS (\Answered \Flagged   |
-    |             \Deleted \Seen \Draft)|
-    |<--- A002 OK [READ-WRITE] SELECT   |  [→ SELECTED]
-    |---- A003 UID FETCH 2888:2890      |
-    |          (FLAGS BODY.PEEK[]  ---->|
-    |<--- * 245 FETCH (UID 2888         |
-    |           FLAGS (\Seen) ...)      |
-    |<--- * 246 FETCH (UID 2889         |
-    |           FLAGS () ...)           |
-    |<--- * 247 FETCH (UID 2890         |
-    |           FLAGS (\Recent) ...)    |
-    |<--- A003 OK UID FETCH completed --|
-    |---- A004 UID STORE 2889           |
-    |          +FLAGS (\Seen) --------->|
-    |<--- * 246 FETCH (FLAGS (\Seen)) --|
-    |<--- A004 OK STORE completed ------|
-    |---- A005 LOGOUT ----------------->|
-    |<--- * BYE IMAP4rev1 server -------|
-    |<--- A005 OK LOGOUT completed -----|
+    Start --> S1
+    S1 --> C1
+    C1 --> S2
+    S2 --> Auth
+    Auth --> C2
+    C2 --> S3
+    S3 --> S4
+    S4 --> Sel
+    Sel --> C3
+    C3 --> S5
+    S5 --> S6
+    S6 --> C4
+    C4 --> S7
+    S7 --> S8
+    S8 --> C5
+    C5 --> S9
+    S9 --> S10
+    S10 --> End
+
+    style Auth fill:#e1f5ff,stroke:#0288d1,stroke-width:2px
+    style Sel fill:#e1f5ff,stroke:#0288d1,stroke-width:2px
 ```
 
 The `FETCH` command is IMAP's workhorse. It accepts either sequence number sets or, with the `UID FETCH` variant, UID sets, and returns structured message data items. The data item grammar is rich: `ENVELOPE` returns parsed header fields as a parenthesized list; `BODY.PEEK[HEADER.FIELDS (From Subject Date)]` returns specific header fields without setting the `\Seen` flag; `BODY[]` returns the complete RFC 5322 message and implicitly sets `\Seen`; `BODY[TEXT]` returns only the body without headers; and `RFC822.SIZE` returns the message's octet count. For high-performance clients that need to synchronize large mailboxes efficiently, `BODY.PEEK[HEADER]` combined with `FLAGS` and `UID` in a single `FETCH` command reduces round trips dramatically — the client fetches enough metadata to render a message list without downloading any message bodies.
@@ -237,42 +253,52 @@ Storage I/O scaling for `Maildir` backends typically hits the directory enumerat
 
 For the highest-throughput deployments — multi-tenant mail services handling hundreds of thousands of active users — the architecture shifts from monolithic Dovecot installations to director proxy clusters. Dovecot Director (or its successor, Dovecot Pro's `director` process) provides consistent hashing across a pool of IMAP backend nodes, ensuring that all sessions for a given user are routed to the same backend server. This matters because IMAP's guarantee of consistent session state depends on all concurrent connections for a user sharing the same in-memory index. Routing the same user's IMAP sessions to different backends without shared locking would produce index corruption. The director layer enforces the invariant that a user's sessions converge to a single backend, while still allowing the backend pool to grow horizontally as the user base scales.
 
-```
-Dovecot Director Architecture:
+```mermaid
+flowchart TD
+    LB["**Load Balancer**
+    HAProxy / F5 / Cloud LB
+    Port 993 (IMAPS) / Port 143 (IMAP)"]
 
-  ┌─────────────────────────────────────────────────────┐
-  │                   Load Balancer                      │
-  │            (HAProxy / F5 / Cloud LB)                 │
-  │         Port 993 (IMAPS) / Port 143 (IMAP)           │
-  └───────────────────┬─────────────────────────────────┘
-                      │
-        ┌─────────────┼─────────────┐
-        │             │             │
-  ┌──────────┐  ┌──────────┐  ┌──────────┐
-  │ Director │  │ Director │  │ Director │
-  │  Proxy 1 │  │  Proxy 2 │  │  Proxy 3 │
-  │ (Active) │  │ (Active) │  │ (Active) │
-  └────┬─────┘  └────┬─────┘  └────┬─────┘
-       │              │              │
-       └──────────────┼──────────────┘
-                      │
-        (Consistent Hash Ring: user→backend)
-                      │
-        ┌─────────────┼─────────────┐
-        │             │             │
-  ┌──────────┐  ┌──────────┐  ┌──────────┐
-  │  IMAP    │  │  IMAP    │  │  IMAP    │
-  │ Backend 1│  │ Backend 2│  │ Backend 3│
-  │ (dbox)   │  │ (dbox)   │  │ (dbox)   │
-  └────┬─────┘  └────┬─────┘  └────┬─────┘
-       │              │              │
-       └──────────────┼──────────────┘
-                      │
-  ┌────────────────────────────────────────┐
-  │      Shared Storage Layer              │
-  │   (Ceph RBD / NFS v4.1 / GlusterFS)   │
-  │   Maildir++ or mdbox per-user stores   │
-  └────────────────────────────────────────┘
+    subgraph directors ["Director Proxy Layer (Active–Active)"]
+        D1["Director Proxy 1
+        (Active)"]
+        D2["Director Proxy 2
+        (Active)"]
+        D3["Director Proxy 3
+        (Active)"]
+    end
+
+    HASH[/"Consistent Hash Ring
+    user → backend"\]
+
+    subgraph backends ["IMAP Backend Layer"]
+        B1["IMAP Backend 1
+        (dbox)"]
+        B2["IMAP Backend 2
+        (dbox)"]
+        B3["IMAP Backend 3
+        (dbox)"]
+    end
+
+    STORE["**Shared Storage Layer**
+    Ceph RBD / NFS v4.1 / GlusterFS
+    Maildir++ or mdbox per-user stores"]
+
+    LB --> D1
+    LB --> D2
+    LB --> D3
+
+    D1 --> HASH
+    D2 --> HASH
+    D3 --> HASH
+
+    HASH --> B1
+    HASH --> B2
+    HASH --> B3
+
+    B1 --> STORE
+    B2 --> STORE
+    B3 --> STORE
 ```
 
 The key operational test for a director cluster is verifying that the consistent hash ring correctly reassigns users when a backend is added or removed. When a backend fails, Dovecot Director redistributes its user assignments to the remaining backends. The first connection after redistribution will find a cold index on the new backend and must rebuild it from the filesystem. This index cold-start latency — which can be several seconds for large mailboxes on NFS — is the primary SLA concern during backend failures. Maintaining warm standbys with pre-built indexes via `dovecot-replicator` service (which uses a custom replication protocol to push index updates between backends) reduces this cold-start penalty to near zero for the highest-tier users.

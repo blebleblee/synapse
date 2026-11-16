@@ -78,17 +78,17 @@ flowchart TB
 The model lifecycle is a state machine with guarded transitions. The states and transitions are not arbitrary; they encode organizational approval workflows and safety properties. The following state machine reflects the lifecycle used by MLflow Model Registry and similar systems:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> "Draft\n(training in progress)"
-    "Draft\n(training in progress)" --> "Registered\n(metadata committed)"
-    "Registered\n(metadata committed)" --> "Staging\n(validation environment)"
-    "Registered\n(metadata committed)" --> "Archived\n(superseded or deprecated)"
-    "Staging\n(validation environment)" --> "Production\n(serving live traffic)"
-    "Staging\n(validation environment)" --> "Archived\n(superseded or deprecated)"
-    "Staging\n(validation environment)" --> "Registered\n(metadata committed)"
-    "Production\n(serving live traffic)" --> "Archived\n(superseded or deprecated)"
-    "Production\n(serving live traffic)" --> "Staging\n(validation environment)"
-    "Archived\n(superseded or deprecated)" --> [*]
+flowchart TD
+    Start([Start]) --> Draft["Draft<br/>(training in progress)"]
+    Draft --> Registered["Registered<br/>(metadata committed)"]
+    Registered --> Staging["Staging<br/>(validation environment)"]
+    Registered --> Archived["Archived<br/>(superseded or deprecated)"]
+    Staging --> Production["Production<br/>(serving live traffic)"]
+    Staging --> Archived
+    Staging --> Registered
+    Production --> Archived
+    Production --> Staging
+    Archived --> End([End])
 ```
 
 Each transition is an auditable event. The "Registered → Staging" transition typically requires validation metrics to exceed a threshold. The "Staging → Production" transition often requires human approval (a model approver role) and may trigger a canary deployment. The "Production → Archived" transition occurs when a model is superseded or decommissioned. These transitions are recorded as entries in an append-only event log, not as in-place updates to a status field. This ensures the full transition history is preserved and queryable for audit purposes.
@@ -611,7 +611,7 @@ func main() {
 
 ### 2.8 Storage Architecture and the Metadata-Artifact Boundary
 
-The separation between metadata storage and artifact storage is a deliberate architectural choice driven by access patterns and consistency requirements. Metadata records are small (typically <10 KB), frequently queried, and require transactional consistency (e.g., a lifecycle transition must be atomic with the audit log entry). They belong in a relational database with ACID guarantees. Artifacts are large (megabytes to gigabytes), accessed infrequently (only on load or deployment), and require only eventual consistency. They belong in object storage optimized for large blob retrieval.
+The separation between metadata storage and artifact storage is a deliberate architectural choice driven by access patterns and consistency requirements. Metadata records are small (typically < 10 KB), frequently queried, and require transactional consistency (e.g., a lifecycle transition must be atomic with the audit log entry). They belong in a relational database with ACID guarantees. Artifacts are large (megabytes to gigabytes), accessed infrequently (only on load or deployment), and require only eventual consistency. They belong in object storage optimized for large blob retrieval.
 
 The registry server sits between these two stores and enforces invariants:
 

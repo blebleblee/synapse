@@ -20,24 +20,24 @@ Three invariants govern every system discussed in this lesson. First, the addres
 
 To understand banking, one must first understand the address map: the complete layout of what the CPU sees at every address it can generate. The map is divided into regions, each permanently assigned to a specific device. On the NES, the 6502's 64-kilobyte address space breaks down as follows.
 
-```
-NES CPU Address Space ($0000–$FFFF, 64 KB Total)
-┌────────────────────────────────────────────────────────┐
-│ $0000–$07FF  │ Internal WRAM (2 KB)                    │
-│              │   Stack: $0100–$01FF                     │
-│              │   Zero Page: $0000–$00FF                │
-│ $0800–$1FFF  │ WRAM Mirrors (3 copies, 6 KB)            │
-│ $2000–$2007  │ PPU Registers (8 registers)             │
-│ $2008–$3FFF  │ PPU Register Mirrors (repeats every 8 B) │
-│ $4000–$4017  │ APU + I/O Registers (Joypad, OAM DMA)     │
-│ $4018–$401F  │ APU/I/O Test Mode Registers              │
-│ $4020–$FFFF  │ Cartridge Space (48,896 bytes)           │
-│  ┌───────────┴───────────────────────────────────────  │
-│  │ $4020–$7FFF │ Mapper Registers + PRG-RAM (if any)   │
-│  │ $8000–$BFFF │ PRG-ROM Bank (switchable)              │
-│  │ $C000–$FFFF │ PRG-ROM Bank (fixed or switchable)     │
-│  └───────────────────────────────────────────────────  │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    ADDR["NES CPU Address Space<br/>$0000–$FFFF (64 KB Total)"]
+    
+    ADDR --> WRAM["$0000–$07FF<br/>Internal WRAM (2 KB)"]
+    ADDR --> MIRROR["$0800–$1FFF<br/>WRAM Mirrors (3 copies, 6 KB)"]
+    ADDR --> PPU["$2000–$2007<br/>PPU Registers (8 registers)"]
+    ADDR --> PPUMIRROR["$2008–$3FFF<br/>PPU Register Mirrors<br/>(repeats every 8 B)"]
+    ADDR --> APU["$4000–$4017<br/>APU + I/O Registers<br/>(Joypad, OAM DMA)"]
+    ADDR --> TEST["$4018–$401F<br/>APU/I/O Test Mode Registers"]
+    ADDR --> CART["$4020–$FFFF<br/>Cartridge Space (48,896 bytes)"]
+    
+    WRAM --> STACK["Stack: $0100–$01FF"]
+    WRAM --> ZEROPAGE["Zero Page: $0000–$00FF"]
+    
+    CART --> MAPPER["$4020–$7FFF<br/>Mapper Registers + PRG-RAM"]
+    CART --> PRGROM1["$8000–$BFFF<br/>PRG-ROM Bank (switchable)"]
+    CART --> PRGROM2["$C000–$FFFF<br/>PRG-ROM Bank (fixed or switchable)"]
 ```
 
 The critical observation is that the cartridge directly controls 48,896 bytes of the address space, from $4020 to $FFFF. On a cartridge with 32 kilobytes of PRG-ROM and no mapper, the ROM is hard-wired to $8000 through $FFFF. The CPU reads the same bytes every time. This is Mapper 0 in the iNES classification, used by launch titles like Super Mario Bros. and Donkey Kong. The game code cannot exceed 32 kilobytes because there is no mechanism to swap in new data.

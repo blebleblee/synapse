@@ -158,19 +158,45 @@ Every nondegenerate bilinear form $B$ establishes a canonical isomorphism $\flat
 
 The following diagram captures the canonical relationships among a space, its dual, and the transpose of a linear map:
 
-```
-         T                 T*
-    V ───────► W      V* ◄─────── W*
-    │           │      │           │
-    │ ι         │ ι    │  (ι*)     │ (ι*)
-    ▼           ▼      ▼           ▼
-   V** ──────► W**    V** ◄───── W***
-         T**              (T*)*
-
-  For finite-dimensional V, W:
-  ι is an isomorphism (natural),
-  V ≅ V** canonically,
-  V ≅ V* non-canonically (requires a basis or a nondegenerate form).
+```mermaid
+flowchart TD
+    subgraph top ["Top Level: Natural Transformation T"]
+        V["V"]
+        W["W"]
+        V -->|T| W
+    end
+    
+    subgraph top_dual ["Dual Space: Natural Transformation T*"]
+        V_star["V*"]
+        W_star["W*"]
+        W_star -->|T*| V_star
+    end
+    
+    subgraph bottom ["Double Dual: Natural Transformation T**"]
+        V_dual_dual["V**"]
+        W_dual_dual["W**"]
+        V_dual_dual -->|T**| W_dual_dual
+    end
+    
+    subgraph bottom_dual ["Dual of Dual: Natural Transformation (T*)*"]
+        V_dual_dual_2["V**"]
+        W_dual_dual_2["W***"]
+        W_dual_dual_2 -->|"<br/>ι*"| V_dual_dual_2
+    end
+    
+    V -->|ι| V_dual_dual
+    W -->|ι| W_dual_dual
+    V_star -->|ι*| V_dual_dual_2
+    W_star -->|ι*| W_dual_dual_2
+    
+    style V fill:#e1f5ff
+    style W fill:#e1f5ff
+    style V_star fill:#fff3e0
+    style W_star fill:#fff3e0
+    style V_dual_dual fill:#f3e5f5
+    style W_dual_dual fill:#f3e5f5
+    style V_dual_dual_2 fill:#fce4ec
+    style W_dual_dual_2 fill:#fce4ec
 ```
 
 The transpose reverses arrows, and the double transpose restores them. The naturality of $\iota$ means the following square commutes for every linear map $T$:

@@ -40,44 +40,49 @@ Flutter's rendering architecture eliminates platform UI dependencies by implemen
 
 Flutter's layering strategy optimizes rendering by caching static content in raster cache entries. When a subtree contains complex drawing operations—gradients, rounded corners, shadows—that don't change across frames, Flutter rasterizes that subtree once into a cached image and reuses the texture on subsequent frames. The framework heuristically decides cache eligibility based on painting complexity and predicted reuse frequency, balancing texture memory consumption against CPU rendering cost. This automatic optimization explains Flutter's consistent performance on mid-range devices where React Native might struggle: by controlling the entire rendering pipeline, Flutter applies caching, layer merging, and texture atlasing without relying on platform-specific optimizations.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     Display Hardware (60Hz VSYNC)                │
-└────────────────────────────────┬────────────────────────────────┘
-                                 │
-                    ┌────────────┴─────────────┐
-                    │   Platform Compositor    │
-                    │  (SurfaceFlinger/Metal)  │
-                    └────────────┬─────────────┘
-                                 │
-        ┌────────────────────────┼────────────────────────┐
-        │                        │                        │
-┌───────▼────────┐     ┌────────▼────────┐     ┌────────▼────────┐
-│   UIKit/View   │     │  React Native   │     │     Flutter     │
-│                │     │                 │     │                 │
-│ ┌────────────┐ │     │ ┌─────────────┐│     │ ┌─────────────┐ │
-│ │  UIView    │ │     │ │   Bridge    ││     │ │Widget Tree  │ │
-│ │  Hierarchy │ │     │ │  (Async)    ││     │ │(Immutable)  │ │
-│ └──────┬─────┘ │     │ └──────┬──────┘│     │ └──────┬──────┘ │
-│        │       │     │        │       │     │        │        │
-│ ┌──────▼─────┐ │     │ ┌──────▼──────┐│     │ ┌──────▼──────┐ │
-│ │ CALayer    │ │     │ │   Native    ││     │ │Element Tree │ │
-│ │ Tree       │ │     │ │   Modules   ││     │ │  (Mutable)  │ │
-│ └──────┬─────┘ │     │ └──────┬──────┘│     │ └──────┬──────┘ │
-│        │       │     │        │       │     │        │        │
-│ ┌──────▼─────┐ │     │ ┌──────▼──────┐│     │ ┌──────▼──────┐ │
-│ │Core Anim   │ │     │ │  Platform   ││     │ │Render Tree  │ │
-│ │Transaction │ │     │ │   Views     ││     │ │  (Layout)   │ │
-│ └──────┬─────┘ │     │ └──────┬──────┘│     │ └──────┬──────┘ │
-│        │       │     │        │       │     │        │        │
-│ ┌──────▼─────┐ │     │ ┌──────▼──────┐│     │ ┌──────▼──────┐ │
-│ │Metal/GPU   │ │     │ │  Skia/GPU   ││     │ │  Skia/GPU   │ │
-│ │Command Buf │ │     │ │             ││     │ │             │ │
-│ └────────────┘ │     │ └─────────────┘│     │ └─────────────┘ │
-└────────────────┘     └─────────────────┘     └─────────────────┘
-
-     Native iOS           Cross-Platform JS        Native Dart
-   (Imperative OOP)       (Async Bridge)       (Declarative FRP)
+```mermaid
+flowchart TD
+    Display["Display Hardware (60Hz VSYNC)"]
+    Compositor["Platform Compositor<br/>(SurfaceFlinger/Metal)"]
+    
+    Display --> Compositor
+    
+    subgraph UIKit["UIKit/View<br/>Native iOS (Imperative OOP)"]
+        UIView["UIView<br/>Hierarchy"]
+        CALayer["CALayer<br/>Tree"]
+        CoreAnim["Core Animation<br/>Transaction"]
+        MetalGPU["Metal/GPU<br/>Command Buffer"]
+        
+        UIView --> CALayer
+        CALayer --> CoreAnim
+        CoreAnim --> MetalGPU
+    end
+    
+    subgraph RN["React Native<br/>Cross-Platform JS (Async Bridge)"]
+        Bridge["Bridge<br/>(Async)"]
+        NativeModules["Native<br/>Modules"]
+        PlatformViews["Platform<br/>Views"]
+        SkiaRN["Skia/GPU"]
+        
+        Bridge --> NativeModules
+        NativeModules --> PlatformViews
+        PlatformViews --> SkiaRN
+    end
+    
+    subgraph Flutter["Flutter<br/>Native Dart (Declarative FRP)"]
+        WidgetTree["Widget Tree<br/>(Immutable)"]
+        ElementTree["Element Tree<br/>(Mutable)"]
+        RenderTree["Render Tree<br/>(Layout)"]
+        SkiaFlutter["Skia/GPU"]
+        
+        WidgetTree --> ElementTree
+        ElementTree --> RenderTree
+        RenderTree --> SkiaFlutter
+    end
+    
+    Compositor --> UIKit
+    Compositor --> RN
+    Compositor --> Flutter
 ```
 
 Memory management in native frameworks revolves around reference counting semantics and ownership annotations. Swift's ARC automatically inserts retain and release calls at compile time based on object lifetime analysis. When a UIViewController holds a strong reference to a child view, the compiler generates a retain when assigning the reference and a release when the controller deallocates. However, delegate patterns and closure captures create bidirectional references that ARC cannot break automatically. Consider a UIViewController that assigns itself as a delegate to a custom view: the view holds a strong reference to the controller through the delegate property, while the controller holds a strong reference to the view. Without intervention, neither object ever reaches zero reference count. Swift solves this with weak references: marking the delegate property as `weak var delegate: MyDelegate?` instructs ARC to not increment the reference count, allowing the controller to deallocate and break the cycle. Closures require explicit capture lists: `[weak self] in ...` prevents the closure from strongly retaining self, avoiding leaks in asynchronous callback contexts.

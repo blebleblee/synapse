@@ -10,20 +10,32 @@ The string vibrates as a stack of harmonics, not a single pure tone. Partial 7 i
 
 **Bow mechanics (Helmholtz motion):** The bow doesn't saw the string sinusoidally. It drags the string forward (stick phase) until a kink traveling along the string arrives back at the contact point and the string slips free, snapping back (slip phase) — one full cycle per fundamental period, repeating hundreds of times a second. Scratching means you exceeded the upper force boundary (too much pressure, too slow a bow). Surface/flautando sound means you fell below the lower boundary (too fast, too light). Both limits rise sharply as the contact point moves toward the bridge:
 
-```
-Bow Force (F) ▲
-              │  ░░ SCRATCH / CRUNCH ░░░░░░░░░░░
-              │─ ─ ─ ─ ─ ─ upper limit (rises near bridge)
-              │
-              │      ██ HELMHOLTZ ZONE ██
-              │      (clean, sustained tone)
-              │
-              │─ ─ ─ ─ ─ ─ lower limit (rises near bridge)
-              │  ░░ SURFACE SOUND / FLAUTANDO ░░
-              └───────────────────────────────► Bow Speed (v)
+```mermaid
+flowchart TD
+    subgraph ponticello ["Sul Ponticello — entire zone shifts UP (more force + more speed)"]
+        SP["⬆ Higher Force & Speed Required"]
+    end
 
-Sul ponticello: entire diagram shifts UP — demands more force AND more speed.
-Sul tasto:      entire diagram shifts DOWN — tolerates lighter, faster bow.
+    subgraph helmholtz_zone ["HELMHOLTZ ZONE\n(clean, sustained tone)"]
+        HZ["██ Stable Bow Zone ██\nBow Speed (v) ↔  Bow Force (F)"]
+    end
+
+    subgraph tasto ["Sul Tasto — entire zone shifts DOWN (lighter, faster bow tolerated)"]
+        ST["⬇ Lower Force & Speed Tolerated"]
+    end
+
+    SCRATCH["░░ SCRATCH / CRUNCH ░░\nAbove upper limit\n(limit rises near bridge)"]
+    FLAUTANDO["░░ SURFACE SOUND / FLAUTANDO ░░\nBelow lower limit\n(limit rises near bridge)"]
+
+    SCRATCH -->|"Reduce force or increase speed\nto enter clean zone"| HZ
+    HZ -->|"Exceeds upper force limit"| SCRATCH
+    HZ -->|"Falls below lower force limit"| FLAUTANDO
+    FLAUTANDO -->|"Increase force or reduce speed\nto enter clean zone"| HZ
+
+    ponticello -->|"Raises both limits"| SCRATCH
+    ponticello -->|"Raises both limits"| HZ
+    tasto -->|"Lowers both limits"| HZ
+    tasto -->|"Lowers both limits"| FLAUTANDO
 ```
 
 **What this means at the stand:** if a passage scratches when you play loud and fast near the bridge, you're not using *too much* bow — you likely need *more* speed relative to force, or you need to move the contact point slightly away from the bridge to buy headroom.
@@ -252,22 +264,40 @@ Two strings vibrating together generate **difference tones** at |f₂ − f₁| 
 
 ### 5.2 Double Stop Fingering Patterns (Violin, First Position)
 
-```
-Standard first-position thirds (D major scale in thirds):
-   Low note (A str) | High note (E str) | Fingering
-   ─────────────────────────────────────────────────
-   D (open)         | F#                | 0 & 2
-   E (1)            | G                 | 1 & 3   ← most common pattern
-   F# (2)           | A (open)          | 2 & 0
-   G (3)            | B                 | 3 & 1 (slight extension)
-   A (open)         | C#                | 0 & 2
-   B (1)            | D (1)             | 1 & 1 (offset across strings)
-
-Octaves (most demanding):
-   Always finger 1 (lower string) and 4 (upper string) — never 1 & 3.
-   Calibrate the hand frame: octave flat → stretch finger 4 back toward the bridge;
-   octave sharp → bring finger 1 forward toward the nut.
-   Move only one finger at a time while diagnosing — moving both hides the cause.
+```mermaid
+flowchart TD
+    title["Standard First-Position Thirds & Octaves<br/>D Major Scale"]
+    
+    subgraph thirds ["Standard First-Position Thirds (D Major Scale)"]
+        direction TB
+        t1["D (open A) → F# (E str)<br/>Fingering: 0 & 2"]
+        t2["E (A str, 1) → G (E str, 3)<br/>Fingering: 1 & 3<br/><b>← Most Common Pattern</b>"]
+        t3["F# (A str, 2) → A (open E)<br/>Fingering: 2 & 0"]
+        t4["G (A str, 3) → B (E str, 1)<br/>Fingering: 3 & 1 (slight extension)"]
+        t5["A (open A) → C# (E str, 2)<br/>Fingering: 0 & 2"]
+        t6["B (A str, 1) → D (E str, 1)<br/>Fingering: 1 & 1 (offset across strings)"]
+        
+        t1 --> t2 --> t3 --> t4 --> t5 --> t6
+    end
+    
+    subgraph octaves ["Octaves (Most Demanding)"]
+        direction TB
+        rule1["<b>Fingering Rule:</b><br/>Always use 1 (lower string) & 4 (upper string)<br/>Never 1 & 3"]
+        
+        subgraph calibration ["Hand Frame Calibration"]
+            direction LR
+            flat["Octave Flat?<br/>→ Stretch finger 4 back<br/>toward bridge"]
+            sharp["Octave Sharp?<br/>→ Bring finger 1 forward<br/>toward nut"]
+        end
+        
+        rule2["<b>Diagnosis Protocol:</b><br/>Move only ONE finger at a time<br/>Moving both hides the cause"]
+        
+        rule1 --> calibration
+        calibration --> rule2
+    end
+    
+    title --> thirds
+    title --> octaves
 ```
 
 **Drill:** play a one-octave D major scale in octaves, whole notes, ♩ = 50. After each note, stop and sing the lower note aloud to check the frame is centered on correct pitch, not just "close enough together."
@@ -301,15 +331,48 @@ Carl Flesch's *Scale System* covers every major and minor key across one-, two-,
 
 **Three-octave G major scale fingering (violin):**
 
-```
-Position map:
-G string:   G(0)  A(1)  B(2)  C(3)  D(4)         [1st position]
-D string:   D(0)  E(1)  F#(2) G(3)                [1st position, shift]
-A string:   [shift to 2nd] A(0) B(1) C#(2) D(3)
-            [shift to 3rd] E(1) F#(2) G(3)
-E string:   [shift to 5th] G(1) A(2) B(3) ─ G(4) [optional high G]
-
-Bow: 2 notes per bow at ♩ = 60; 4 per bow at ♩ = 80; 8 per bow (smooth) at ♩ = 100.
+```mermaid
+flowchart TD
+    subgraph strings ["String Position Map"]
+        direction TB
+        
+        subgraph g_string ["G String - 1st Position"]
+            G0["G(0)"] --> A1["A(1)"]
+            A1 --> B2["B(2)"]
+            B2 --> C3["C(3)"]
+            C3 --> D4["D(4)"]
+        end
+        
+        subgraph d_string ["D String - 1st Position, Shift"]
+            D0["D(0)"] --> E1["E(1)"]
+            E1 --> F2["F#(2)"]
+            F2 --> G3["G(3)"]
+        end
+        
+        subgraph a_string ["A String"]
+            direction TB
+            a_2nd["2nd Position: A(0) → B(1) → C#(2) → D(3)"]
+            a_3rd["3rd Position: E(1) → F#(2) → G(3)"]
+        end
+        
+        subgraph e_string ["E String - 5th Position"]
+            E_G1["G(1)"] --> E_A2["A(2)"]
+            E_A2 --> E_B3["B(3)"]
+            E_B3 -.optional.-> E_G4["G(4) - High G"]
+        end
+    end
+    
+    subgraph bowing ["Bowing Technique"]
+        direction LR
+        tempo60["♩ = 60<br/>2 notes per bow"]
+        tempo80["♩ = 80<br/>4 notes per bow"]
+        tempo100["♩ = 100<br/>8 notes per bow (smooth)"]
+        
+        tempo60 --> tempo80
+        tempo80 --> tempo100
+    end
+    
+    strings --> bowing
 ```
 
 **The 7-step scale practice sequence (apply to any key):**
@@ -326,16 +389,43 @@ Bow: 2 notes per bow at ♩ = 60; 4 per bow at ♩ = 80; 8 per bow (smooth) at �
 
 In lower positions, the 1–2–4 frame covers three semitones per hand position. A three-octave C major scale requires at minimum five position shifts:
 
-```
-C major, 3 octaves (C2 → C5), cello:
-
-String  | Notes          | Fingers | Position
-─────────────────────────────────────────────
-C str   | C–D–E–F        | 0–1–2–4 | 1st pos
-G str   | G–A–B–C        | 0–1–2–4 | 1st pos (open G)
-D str   | D–E–F          | 1–2–4   | 1st pos
-        | G–A–B–C        | ─shift─ | 4th pos: 1–2–4–(thumb)
-A str   | D–E–F–G–A–B–C  | thumb pos, all 4 fingers active
+```mermaid
+flowchart TD
+    title["C Major Scale - 3 Octaves (C2 → C5) - Cello"]
+    
+    subgraph c_string ["C String"]
+        c1["C–D–E–F"]
+        c1_detail["Fingers: 0–1–2–4<br/>Position: 1st"]
+    end
+    
+    subgraph g_string ["G String"]
+        g1["G–A–B–C"]
+        g1_detail["Fingers: 0–1–2–4<br/>Position: 1st (open G)"]
+    end
+    
+    subgraph d_string ["D String"]
+        d1["D–E–F"]
+        d1_detail["Fingers: 1–2–4<br/>Position: 1st"]
+        d2["G–A–B–C"]
+        d2_detail["Position: 4th<br/>Fingers: 1–2–4–(thumb)<br/>[shift required]"]
+    end
+    
+    subgraph a_string ["A String"]
+        a1["D–E–F–G–A–B–C"]
+        a1_detail["Thumb position<br/>All 4 fingers active"]
+    end
+    
+    title --> c_string
+    title --> g_string
+    title --> d_string
+    title --> a_string
+    
+    c1 --> c1_detail
+    g1 --> g1_detail
+    d1 --> d1_detail
+    d1_detail -.shift.-> d2
+    d2 --> d2_detail
+    a1 --> a1_detail
 ```
 
 **Thumb position entry drill:** when the thumb crosses onto the string (typically around G on the D string or A on the A string), isolate the placement alone — rest the thumb lightly, check pitch, release, repeat 10 times — before integrating it into the running scale.

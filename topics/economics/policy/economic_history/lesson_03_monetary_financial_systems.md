@@ -58,29 +58,24 @@ This monetary base contraction transmitted through the fractional reserve bankin
 
 The price-level adjustment would then trigger expenditure switching through several concurrent channels. Domestic goods became cheaper relative to foreign goods in both absolute terms and after adjusting for exchange rate parity, improving export competitiveness and reducing import demand. Simultaneously, the monetary contraction elevated domestic interest rates as banks competed for scarce reserves, attracting capital inflows that provided additional balance of payments financing through the financial account. The adjustment process would continue until the trade balance equilibrated at the prevailing exchange rate, with gold flows reversing direction once the current account moved into surplus.
 
-```
-Gold Standard Adjustment Mechanism:
-
-Trade Deficit → Gold Outflow → Monetary Base Contraction
-                                         ↓
-                              Reserve Ratio Binding
-                                         ↓
-                              Commercial Bank Credit Contraction
-                                         ↓
-                              Broad Money Supply Reduction
-                                         ↓
-                    ┌───────────────────┴───────────────────┐
-                    ↓                                       ↓
-            Deflationary Pressure                   Interest Rate Increase
-                    ↓                                       ↓
-         Relative Price Adjustment                   Capital Inflow
-                    ↓                                       ↓
-            Export Competitiveness ↗              Financial Account Surplus
-                    ↓                                       ↓
-            Import Demand ↘                        Reserve Replenishment
-                    └───────────────────┬───────────────────┘
-                                        ↓
-                              Trade Balance Equilibrium
+```mermaid
+flowchart TD
+    A["Trade Deficit"] --> B["Gold Outflow"]
+    B --> C["Monetary Base Contraction"]
+    C --> D["Reserve Ratio Binding"]
+    D --> E["Commercial Bank Credit Contraction"]
+    E --> F["Broad Money Supply Reduction"]
+    F --> G["Deflationary Pressure"]
+    F --> H["Interest Rate Increase"]
+    G --> I["Relative Price Adjustment"]
+    H --> J["Capital Inflow"]
+    I --> K["Export Competitiveness ↗"]
+    I --> L["Import Demand ↘"]
+    J --> M["Financial Account Surplus"]
+    M --> N["Reserve Replenishment"]
+    K --> O["Trade Balance Equilibrium"]
+    L --> O
+    N --> O
 ```
 
 The quantitative magnitudes of this adjustment mechanism reveal why the system generated such severe macroeconomic instability during the interwar period. Empirical estimates from the 1920s British economy suggest that restoring external balance after the 1925 return to gold at the pre-war parity required approximately 10-15% domestic deflation to offset the real appreciation embedded in the exchange rate choice. With nominal wages exhibiting substantial downward rigidity, this deflation necessitated prolonged unemployment to reduce labor costs through quantity adjustment rather than price adjustment. The required unemployment rate to generate 10% cumulative wage deflation over a five-year period exceeded 15% on average, creating politically intolerable social costs that undermined public support for gold standard maintenance.

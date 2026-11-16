@@ -255,12 +255,27 @@ The classic error is rolling the flute inward to "help" reach high notes — thi
 
 Pick a middle-register note (written G4 clarinet/sax, A4 flute, A3 oboe).
 
-```
-Shape:     ppp --crescendo--> fff --diminuendo--> ppp
-Duration:  20 seconds, metronome in quarter notes at ♩ = 60
-Beats 1-5:   grow from barely audible
-Beats 5-15:  continue growing to peak
-Beats 15-20: shrink back to ppp without a break in tone
+```mermaid
+flowchart TD
+    start["ppp<br/>(Barely Audible)"]
+    crescendo["Crescendo<br/>(Beats 1-15)<br/>20 Quarter Notes"]
+    peak["fff<br/>(Peak Volume)"]
+    diminuendo["Diminuendo<br/>(Beats 15-20)<br/>5 Quarter Notes"]
+    end_state["ppp<br/>(Barely Audible)<br/>Continuous Tone"]
+    
+    start -->|"Beats 1-5: Grow"| crescendo
+    crescendo -->|"Beats 5-15: Continue Growing"| peak
+    peak -->|"Beats 15-20: Shrink"| diminuendo
+    diminuendo -->|"No Break in Tone"| end_state
+    
+    meta["♩ = 60 BPM<br/>Duration: 20 seconds"]
+    
+    style start fill:#e1f5ff
+    style crescendo fill:#fff3e0
+    style peak fill:#ffebee
+    style diminuendo fill:#fff3e0
+    style end_state fill:#e1f5ff
+    style meta fill:#f5f5f5
 ```
 
 **What to listen for:**

@@ -581,7 +581,7 @@ This approach performs all aggregation in kernel space, dramatically reducing da
 
 - **Kretprobes**: When you need return values, execution timing, or must correlate entry/exit events
 - **eBPF Kprobes**: For production environments requiring safety guarantees and high performance
-- **Traditional Kprobes**: For kernel module development, complex handlers requiring kernel APIs not available in eBPF, or when targeting very old kernel versions (<4.x)
+- **Traditional Kprobes**: For kernel module development, complex handlers requiring kernel APIs not available in eBPF, or when targeting very old kernel versions (< 4.x)
 - **Ftrace Integration**: When correlating Kprobe data with other kernel tracing events or leveraging existing Ftrace-based tooling
 
 Advanced Kprobes provide surgical precision in observing kernel behavior, but require careful design to maintain system stability and performance. Always validate probe placement, test handlers thoroughly, and monitor overhead in production deployments.

@@ -144,7 +144,7 @@ Consolidate the verification procedures into a rapid diagnostic protocol for rou
 - Host veth statistics: Zero RX/TX errors and drops under normal load
 - Iptables KUBE-SERVICES: One chain per ClusterIP service, packet counters incrementing
 - Same-node throughput: Near line rate (e.g., 9+ Gbps on 10GbE for large transfers)
-- Inter-node RTT: 0.1–0.5 ms on local Ethernet, <5 ms across availability zones
+- Inter-node RTT: 0.1–0.5 ms on local Ethernet, < 5 ms across availability zones
 - Conntrack count: Below 80% of `nf_conntrack_max` to avoid table saturation
 - CNI plugin pods: All pods `Running`, recent restarts indicate instability
 

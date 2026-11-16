@@ -120,26 +120,57 @@ The difficulty is fundamental: the designer cannot observe types directly. Each 
 
 The design challenge is therefore: construct $\Gamma$ such that, when agents play their equilibrium strategies $\sigma^*_i : \Theta_i \to M_i$, the resulting outcome $g(\sigma^*_1(\theta_1), \ldots, \sigma^*_n(\theta_n))$ coincides with $f(\boldsymbol{\theta})$ for all type profiles $\boldsymbol{\theta}$. We say the mechanism **implements** $f$.
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        MECHANISM DESIGN ARCHITECTURE                        │
-│                                                                             │
-│   TYPE SPACE           AGENTS              MECHANISM           OUTCOME      │
-│                                                                             │
-│   θ₁ ∈ Θ₁  ──────►  Agent 1  ──► m₁ ──┐                                   │
-│                                         │                                   │
-│   θ₂ ∈ Θ₂  ──────►  Agent 2  ──► m₂ ──┼──► g(m₁,...,mₙ) ──► x ∈ X        │
-│       ⋮                   ⋮        ⋮   │          ↑                        │
-│   θₙ ∈ Θₙ  ──────►  Agent n  ──► mₙ ──┘          │                        │
-│                                                    │                        │
-│   Prior F over Θ        (private)      Outcome Rule (public)               │
-│                                                                             │
-│   Designer's Goal: Choose g such that equilibrium of induced game          │
-│   yields g(σ*(θ)) = f(θ) for all θ ∈ Θ                                    │
-│                                                                             │
-│   DIRECT MECHANISM SPECIAL CASE: Mᵢ = Θᵢ (agents report types directly)   │
-│   STRATEGY-PROOF: Truth-telling σᵢ*(θᵢ) = θᵢ is a dominant strategy      │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph TypeSpace ["TYPE SPACE"]
+        T1["θ₁ ∈ Θ₁"]
+        T2["θ₂ ∈ Θ₂"]
+        Tn["θₙ ∈ Θₙ"]
+        Prior["Prior F over Θ"]
+    end
+    
+    subgraph Agents ["AGENTS (private)"]
+        A1["Agent 1"]
+        A2["Agent 2"]
+        An["Agent n"]
+    end
+    
+    subgraph Mechanism ["MECHANISM"]
+        M1["m₁"]
+        M2["m₂"]
+        Mn["mₙ"]
+        G["g(m₁,...,mₙ)<br/>Outcome Rule (public)"]
+    end
+    
+    subgraph Outcome ["OUTCOME"]
+        X["x ∈ X"]
+    end
+    
+    T1 --> A1
+    T2 --> A2
+    Tn --> An
+    
+    A1 --> M1
+    A2 --> M2
+    An --> Mn
+    
+    M1 --> G
+    M2 --> G
+    Mn --> G
+    
+    G --> X
+    
+    subgraph Goal ["Designer's Goal"]
+        DG["Choose g such that equilibrium of induced game<br/>yields g(σ*(θ)) = f(θ) for all θ ∈ Θ"]
+    end
+    
+    subgraph DirectMechanism ["DIRECT MECHANISM SPECIAL CASE"]
+        DM["Mᵢ = Θᵢ (agents report types directly)"]
+    end
+    
+    subgraph StrategyProof ["STRATEGY-PROOF"]
+        SP["Truth-telling σᵢ*(θᵢ) = θᵢ is a dominant strategy"]
+    end
 ```
 
 ### Social Choice Functions and Incentive Compatibility
@@ -178,35 +209,32 @@ We claim truth-telling is a Bayes-Nash equilibrium of $\Gamma'$. Suppose agent $
 
 The implication is transformative. Without loss of generality, the designer can restrict attention to direct, incentive-compatible mechanisms when searching for implementable social choice functions. The entire space of indirect mechanisms—sealed-bid auctions, ascending clock auctions, negotiation protocols, trading platforms—collapses to a canonical direct mechanism for the purpose of characterizing what is achievable.
 
-```
-┌───────────────────────────────────────────────────────────────────────────────┐
-│                         THE REVELATION PRINCIPLE                              │
-│                                                                               │
-│   SPACE OF ALL MECHANISMS                                                     │
-│                                                                               │
-│   ┌─────────────────────────────────────────────────────┐                    │
-│   │   Indirect Mechanisms (ascending auctions, sealed   │                    │
-│   │   bid, negotiation protocols, trading rules, ...)   │                    │
-│   │                                                     │                    │
-│   │   ┌─────────────────────────────────────────────┐   │                    │
-│   │   │   Direct Mechanisms  (Mᵢ = Θᵢ)             │   │                    │
-│   │   │                                             │   │                    │
-│   │   │   ┌─────────────────────────────────────┐   │   │                    │
-│   │   │   │  BIC Direct Mechanisms              │   │   │                    │
-│   │   │   │  (truth-telling is BNE)             │   │   │                    │
-│   │   │   │                                     │   │   │                    │
-│   │   │   │  ┌───────────────────────────────┐  │   │   │                    │
-│   │   │   │  │  DSIC Direct Mechanisms       │  │   │   │                    │
-│   │   │   │  │  (truth-telling dominant)     │  │   │   │                    │
-│   │   │   │  └───────────────────────────────┘  │   │   │                    │
-│   │   │   └─────────────────────────────────────┘   │   │                    │
-│   │   └─────────────────────────────────────────────┘   │                    │
-│   └─────────────────────────────────────────────────────┘                    │
-│                                                                               │
-│   Revelation Principle: Every implementable SCF by any mechanism is          │
-│   also implementable by a BIC direct mechanism.                               │
-│   For dominant strategy implementation: BIC tightens to DSIC.                │
-└───────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Space of All Mechanisms"]
+    
+    B["Indirect Mechanisms<br/>(ascending auctions, sealed bid,<br/>negotiation protocols, trading rules, ...)"]
+    
+    C["Direct Mechanisms<br/>(Mᵢ = Θᵢ)"]
+    
+    D["BIC Direct Mechanisms<br/>(truth-telling is BNE)"]
+    
+    E["DSIC Direct Mechanisms<br/>(truth-telling dominant)"]
+    
+    F["Revelation Principle<br/>Every implementable SCF by any mechanism<br/>is also implementable by a BIC direct mechanism.<br/>For dominant strategy implementation:<br/>BIC tightens to DSIC."]
+    
+    A --> B
+    A --> C
+    C --> D
+    D --> E
+    A -.-> F
+    
+    style A fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style B fill:#e8f4f8,stroke:#333,stroke-width:1px
+    style C fill:#e8f4f8,stroke:#333,stroke-width:1px
+    style D fill:#e8f4f8,stroke:#333,stroke-width:1px
+    style E fill:#e8f4f8,stroke:#333,stroke-width:1px
+    style F fill:#fff9e6,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5
 ```
 
 ### Vickrey-Clarke-Groves Mechanisms: Constructing DSIC for Quasilinear Environments
@@ -309,4 +337,23 @@ For the rock-paper-scissors game with payoff matrix:
 
 $$A = \begin{pmatrix} 0 & -1 & 1 \\ 1 & 0 & -1 \\ -1 & 1 & 0 \end{pmatrix}$$
 
-the unique Nash equilibrium $\mathbf{p}^* = (1/3, 1/3, 1/3)$ is not an ESS—it fails condition ESS-2 because all mutant strategies earn the same payoff against $\mathbf{p}^*$. Under the replicator dynamics, this interior fixed point is stable but not asymptotically stable: traject
+the unique Nash equilibrium $\mathbf{p}^* = (1/3, 1/3, 1/3)$ is not an ESS—it fails condition ESS-2 because all mutant strategies earn the same payoff against $\mathbf{p}^*$.
+
+## Conclusion: Integrating Mechanism Design with Evolutionary Stability
+
+The apparent tension between Myerson's revenue-optimal mechanism and evolutionary stability reflects a deeper principle: both frameworks optimize over constrained strategy spaces, and both identify equilibria that are fragile to perturbations outside their respective domains. In mechanism design, the revelation principle collapses the strategy space to truthful reports, and incentive compatibility ensures no agent benefits from misreporting given others' truthfulness. In evolutionary game theory, an ESS is stable against small-mass invasions, but the basin of attraction depends critically on the game structure and initial conditions. The rock-paper-scissors example demonstrates that cyclic games admit no strict ESS in interior points—the unique symmetric Nash equilibrium $(1/3, 1/3, 1/3)$ is neutrally stable, meaning mutants do not invade but also do not decline, and the population exhibits perpetual cycling in finite samples. This limitation is not pathological but diagnostic: it reveals that replicator dynamics in zero-sum games cannot converge to a rest point except at the boundary. When mechanism design principles are embedded in evolutionary settings—as in repeated auctions or multi-agent resource allocation—the designer must account for the fact that truthful revelation, while incentive-compatible in static games, may not constitute an evolutionary stable strategy if agents can condition strategies on history or signal type through costly actions. The integration of these frameworks requires specifying not only the static incentive structure but the evolutionary timescale, the mutation process, and the informational feedback that allows agents to learn the distribution of types in the population.
+
+The practical implication is that high-stakes mechanism design in decentralized or multi-generational settings must embed robustness checks: (1) verify that the desired outcome remains incentive-compatible under misspecification of the type distribution; (2) confirm that the allocation rule is monotone and satisfies regularity to ensure BIC is necessary and sufficient; and (3) test stability by simulating replicator dynamics or empirical best-response dynamics to identify whether the target equilibrium lies in a basin of attraction robust to small perturbations and realistic mutation rates. When cyclic structures emerge—as they do in competitive markets with strategic complementarities—the system may not converge; instead, the designer should shift objectives from fixed-point stability to cycle detection and amplitude control, ensuring that oscillations remain bounded and predictable.
+
+---
+
+## Summary & Verification Matrix
+
+| **Concept** | **Governing Invariant** | **Core Mechanism** | **Failure Mode** | **Diagnostic Criterion** |
+|---|---|---|---|---|
+| **Incentive Compatibility (IC)** | Truthful report maximizes payoff given others' truthfulness | Allocation rule must be monotone in agent's own type; payment rule satisfies Myerson's differential equation | Agent prefers misreporting or strategic silence | $u_i(\theta_i, \theta_{-i}) \geq u_i(\theta'_i, \theta_{-i})$ for all $\theta'_i$ |
+| **Bayesian Incentive Compatibility (BIC)** | Ex-ante expected payoff from truthfulness exceeds any deviation | Regularity of CDF ensures monotonicity is necessary and sufficient for BIC | Virtual valuation becomes negative (reserve price withholds trade) | Monotone allocation + payment satisfying Myerson equation ⟹ BIC |
+| **Evolutionarily Stable Strategy (ESS)** | Strategy $\sigma^*$ is stable against small-mass mutant invasions | Payoff against residents exceeds payoff against mutants; strict inequality on the support of mutant | Cyclic or neutrally stable games admit no interior strict ESS | ESS-1: $u(\sigma^*, \sigma^*) \geq u(\sigma, \sigma^*)$; ESS-2: $u(\sigma^*, \sigma) > u(\sigma, \sigma)$ for $\sigma \neq \sigma^*$ |
+| **Replicator Dynamics Convergence** | Faces of simplex are invariant; stable rest points determine selection | Growth rate of strategy proportional to payoff relative to population mean | Path-dependent equilibrium selection; interior cycles in zero-sum games | Eigenvalues of Jacobian; basin of attraction determined by invariant manifolds |
+| **Rock-Paper-Scissors Pathology** | Zero-sum symmetric game with unique symmetric Nash $(1/3, 1/3, 1/3)$ | Neutral stability: mutants do not invade but do not decline; population cycles | No convergence to rest point; perpetual oscillation in finite populations | All mutant strategies earn identical payoff against $\mathbf{p}^*$; fails ESS-2 |
+| **Integration Challenge** | Static IC and dynamic stability are orthogonal constraints | Mechanism must be IC *and* rest-point stable under realistic mutation/learning processes | Truthful revelation is IC but not evolutionarily stable if agents signal type through costly actions or condition on history | Verify BIC holds; simulate replicator or empirical best-response dynamics; confirm basin of attraction is robust to initial conditions |

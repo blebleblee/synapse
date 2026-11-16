@@ -26,34 +26,43 @@ Understanding the invariants that govern all three systems simultaneously is wha
 
 When any PHP operation raises an error, control passes through a deterministic sequence of checks before the error is either displayed, logged, suppressed, or handed to user code. Understanding this pipeline at the opcode level clarifies why certain combinations of `error_reporting`, `@` suppression, and custom handlers produce surprising results.
 
-```
-PHP opcode execution
-       │
-       │ Error condition detected (e.g., undefined variable, fopen failure)
-       ▼
-┌──────────────────────────────────────────────────────────┐
-│          zend_error_cb (Zend Engine internal C hook)      │
-│                                                          │
-│  1. Check error_reporting bitmask                        │
-│     └─ If (error_type & current_error_reporting) == 0    │
-│        └─ Discard silently                               │
-│                                                          │
-│  2. Check @ operator (error_reporting == 0 inline)       │
-│     └─ Suppressed? Skip user handler, skip display       │
-│                                                          │
-│  3. Invoke user error handler (set_error_handler)        │
-│     └─ Handler returns false? Fall through to default    │
-│     └─ Handler returns true? Suppress default output     │
-│                                                          │
-│  4. Default handler: log and/or display                  │
-│     └─ log_errors → error_log destination                │
-│     └─ display_errors → SAPI output buffer               │
-│                                                          │
-│  5. Fatal? (E_ERROR, E_PARSE, E_CORE_ERROR)              │
-│     └─ Execute register_shutdown_function callbacks      │
-│     └─ Call error_get_last() to retrieve final error     │
-│     └─ Terminate executor                                │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    OPCODE["PHP opcode execution"]
+    OPCODE -->|"Error condition detected\ne.g. undefined variable, fopen failure"| ZEND
+
+    subgraph ZEND ["zend_error_cb — Zend Engine internal C hook"]
+        direction TD
+
+        S1["1. Check error_reporting bitmask"]
+        S1 --> S1A{"(error_type & error_reporting) == 0?"}
+        S1A -->|"Yes"| DISCARD["Discard silently"]
+        S1A -->|"No"| S2
+
+        S2["2. Check @ operator\nerror_reporting == 0 inline"]
+        S2 --> S2A{"Suppressed?"}
+        S2A -->|"Yes"| SUPPRESS["Skip user handler\nSkip display"]
+        S2A -->|"No"| S3
+
+        S3["3. Invoke user error handler\nset_error_handler"]
+        S3 --> S3A{"Handler return value?"}
+        S3A -->|"Returns false"| FALLTHROUGH["Fall through to default handler"]
+        S3A -->|"Returns true"| SUPPRESSOUT["Suppress default output"]
+        FALLTHROUGH --> S4
+
+        S4["4. Default handler: log and/or display"]
+        S4 --> S4A["log_errors → error_log destination"]
+        S4 --> S4B["display_errors → SAPI output buffer"]
+
+        S4A --> S5
+        S4B --> S5
+
+        S5{"5. Fatal error?\nE_ERROR, E_PARSE,\nE_CORE_ERROR"}
+        S5 -->|"Yes"| S5A["Execute register_shutdown_function callbacks"]
+        S5A --> S5B["Call error_get_last() to retrieve final error"]
+        S5B --> S5C["Terminate executor"]
+        S5 -->|"No"| RESUME["Return control to executor"]
+    end
 ```
 
 A critical subtlety: when you install a custom error handler via `set_error_handler`, passing `null` as the second argument installs a handler that receives all error types including `E_STRICT` and `E_DEPRECATED`. Passing a bitmask as the second argument restricts delivery. But the handler is never called for `E_ERROR`, `E_PARSE`, `E_CORE_ERROR`, or `E_CORE_WARNING` regardless, because these are generated before or during executor initialization when no user code can run. The practical implication is that your custom error handler should convert non-fatal errors to exceptions where appropriate, and separately a shutdown function should handle the fatal case:
@@ -195,25 +204,26 @@ final class InsufficientInventoryException extends DomainException
 
 PHP's stream subsystem is implemented in `main/streams/` in the PHP source tree and exposes a uniform I/O interface regardless of the underlying transport. Each stream is internally a `php_stream` struct containing a pointer to a `php_stream_ops` vtable, which is essentially a set of function pointers for read, write, seek, flush, close, and stat operations. When you call `fopen('https://example.com/data.json', 'r')`, the stream wrapper registry is consulted for a handler registered to the `https://` scheme, and the HTTP wrapper's `open` function is called to establish the connection and return a `php_stream` backed by a socket. From that point, `fread` calls operate identically whether the stream is backed by a file descriptor, a socket, a compressed archive, or an in-memory buffer.
 
-```
-fopen('compress.zlib://data.gz', 'r')
-          │
-          ▼
-Stream Wrapper Registry lookup: 'compress.zlib'
-          │
-          ▼
-php_stream allocated, ops vtable = zlib_stream_ops
-          │
-          ▼
-Underlying fd opened: data.gz
-          │
-          ▼
-php_stream returned as resource to user code
-          │
-   fread($handle, 8192)
-          │
-          ▼
-zlib_stream_ops.read() ──► inflate chunk ──► return decompressed bytes
+```mermaid
+flowchart TD
+    A["fopen('compress.zlib://data.gz', 'r')"]
+    B["Stream Wrapper Registry lookup: 'compress.zlib'"]
+    C["php_stream allocated<br/>ops vtable = zlib_stream_ops"]
+    D["Underlying fd opened: data.gz"]
+    E["php_stream returned as resource to user code"]
+    F["fread($handle, 8192)"]
+    G["zlib_stream_ops.read()"]
+    H["inflate chunk"]
+    I["return decompressed bytes"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
 ```
 
 Stream filters sit between the stream and the caller, transforming bytes as they flow through. They are attached via `stream_filter_append` or `stream_filter_prepend`, forming a pipeline. PHP ships with the `string.rot13`, `string.toupper`, `string.tolower`, `string.strip_tags`, `convert.base64-encode`, `convert.base64-decode`, `zlib.inflate`, and `zlib.deflate` filters. Custom filters are registered by extending `php_user_filter` and calling `stream_filter_register`.

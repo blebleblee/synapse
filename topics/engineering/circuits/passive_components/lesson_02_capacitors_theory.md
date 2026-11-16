@@ -72,13 +72,23 @@ This is a critical result for high-voltage capacitor design. The energy density 
 
 No physical capacitor behaves as the ideal $C = \varepsilon_r \varepsilon_0 A/d$ element above a few hundred kilohertz. The practitioner's model must include three elements: the ideal capacitance $C$, the equivalent series resistance $\text{ESR}$, and the equivalent series inductance $\text{ESL}$, all in a series RLC string. A shunt leakage resistance $R_{leak}$ completes the model for DC behavior, but its effect is negligible in most AC circuit analysis.
 
-```
-         ESL          ESR
-  o---[LLLL]---[RRRR]---+---o
-                        |
-                       [C]
-                        |
-  o---------------------+---o
+```mermaid
+flowchart LR
+    ESL(["ESL"])
+    L["LLLL"]
+    R["RRRR"]
+    junction((" "))
+    C["C"]
+    ESR(["ESR"])
+    GND(["GND"])
+
+    ESL --- L
+    L --- R
+    R --- junction
+    junction --- ESR
+    junction --- C
+    C --- GND
+    ESL --- GND
 ```
 
 The origins of each parasitic element are distinct and each calls for a different mitigation strategy.

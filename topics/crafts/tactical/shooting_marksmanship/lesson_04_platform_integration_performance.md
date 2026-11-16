@@ -22,26 +22,33 @@ The impulse delivered to the rifle equals the integral of the pressure-time curv
 
 The vertical moment arm between bore centerline and shoulder contact point creates rotational torque that pitches the muzzle upward during recoil. For an AR-15 with 2.6 inches of offset and 5 pounds of rearward impulse, this generates approximately 1.1 foot-pounds of angular momentum that must be countered by downward pressure from the support hand on the handguard. The effectiveness of this counter-torque depends critically on grip geometry—a C-clamp grip with the support hand extended forward on a slim-profile handguard maximizes moment arm length, while a traditional support hand grip beneath the magazine well reduces mechanical advantage by 60% and shifts load-bearing responsibility to the firing hand.
 
-```
-Recoil Force Decomposition (Side View)
-
-        ↑ Muzzle rise torque
-        |
-    ____●____ ← Bore centerline
-   |         |
-   |  Rifle  |
-   |_________|
-        |
-        ↓ Recoil impulse F_r
-        |
-    ████████ ← Shoulder interface
-    ║      ║
-    ║ Body ║ → Absorbs impulse through
-    ║      ║   skeletal chain compliance
-    ████████
-
-Counter-torque applied by support hand:
-τ_counter = F_support × L_handguard
+```mermaid
+flowchart TD
+    subgraph rifle_system ["Rifle System (Side View)"]
+        muzzle["↑ Muzzle Rise Torque"]
+        bore["Bore Centerline (●)"]
+        rifle["Rifle Body"]
+        recoil["↓ Recoil Impulse F_r"]
+        shoulder["Shoulder Interface ████████"]
+    end
+    
+    subgraph body_system ["Shooter Body"]
+        body["Body Mass ║ ║"]
+        absorb["Absorbs impulse through<br/>skeletal chain compliance"]
+    end
+    
+    subgraph support_hand ["Support Hand Counter-Torque"]
+        counter["τ_counter = F_support × L_handguard"]
+    end
+    
+    muzzle --> bore
+    bore --> rifle
+    rifle --> recoil
+    recoil --> shoulder
+    shoulder --> body
+    body --> absorb
+    
+    support_hand -.-> rifle
 ```
 
 ### Firing Position Biomechanics

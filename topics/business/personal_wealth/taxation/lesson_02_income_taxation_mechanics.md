@@ -50,67 +50,100 @@ The alternative minimum tax applies a two-tier rate structure of twenty-six perc
 
 When a taxpayer pays AMT, they generate an AMT credit that represents the portion of AMT attributable to deferral preferences rather than permanent exclusions. This credit carries forward indefinitely and can offset regular tax liability in future years when regular tax exceeds tentative minimum tax, effectively providing a mechanism to recover AMT paid on timing differences such as ISO exercises or depreciation adjustments. The calculation of the AMT credit requires segregating deferral items from exclusion items, a complex computational exercise that few taxpayers perform correctly without professional assistance. The credit does not carry interest and provides value only in years when the taxpayer returns to the regular tax system with sufficient tax liability to absorb the credit, creating scenarios where taxpayers carry AMT credits for decades without realization when they remain perpetually in AMT status.
 
-```
-TAX CALCULATION WATERFALL
+```mermaid
+flowchart TD
+    subgraph income_sources ["Gross Income — All Sources"]
+        W["Wages, Salaries, Tips\nSchedule 1 / Form W-2"]
+        B["Business Income / Loss\nSchedule C"]
+        CG["Capital Gains / Losses\nSchedule D / Form 8949"]
+        DI["Dividends & Interest\nSchedule B"]
+        RE["Rental Income / Loss\nSchedule E"]
+        RD["Retirement Distributions\nForm 1099-R"]
+        SS["Social Security (Taxable Portion)\nWorksheet"]
+        OI["Other Income\nVarious"]
+    end
 
-Gross Income (all sources)
-    Wages, salaries, tips                           Schedule 1 / Form W-2
-    Business income/loss                             Schedule C
-    Capital gains/losses                             Schedule D / Form 8949
-    Dividends, interest                              Schedule B
-    Rental income/loss                               Schedule E
-    Retirement distributions                         Form 1099-R
-    Social Security (taxable portion)                Worksheet
-    Other income                                     Various
+    GI["💰 Gross Income"]
 
-LESS: Above-the-Line Deductions (Schedule 1)
-    IRA contributions                                Limit: $6,500 / $7,500 if 50+
-    HSA contributions                                Limit: $4,150 / $8,300 family
-    Self-employment tax (50%)                        Schedule SE
-    Self-employed health insurance
-    SEP / SIMPLE / Solo 401(k) contributions
-    Student loan interest                            Limit: $2,500
-    Alimony paid (pre-2019 agreements)
+    W & B & CG & DI & RE & RD & SS & OI --> GI
 
-= Adjusted Gross Income (AGI) ←────── Critical threshold for phase-outs
+    subgraph above_line ["Above-the-Line Deductions — Schedule 1"]
+        IRA["IRA Contributions\nLimit: $6,500 / $7,500 if age 50+"]
+        HSA["HSA Contributions\nLimit: $4,150 single / $8,300 family"]
+        SE_TAX["Self-Employment Tax (50%)\nSchedule SE"]
+        SE_HI["Self-Employed Health Insurance"]
+        SEP["SEP / SIMPLE / Solo 401(k) Contributions"]
+        SLI["Student Loan Interest\nLimit: $2,500"]
+        ALI["Alimony Paid\nPre-2019 Agreements Only"]
+    end
 
-LESS: Standard Deduction or Itemized Deductions (Schedule A)
-    
-    Standard: $14,600 / $29,200 / $21,900 (single/MFJ/HoH)
-    
-    OR Itemized:
-        Medical > 7.5% AGI
-        SALT (state/local tax)                       Cap: $10,000
-        Mortgage interest                            Limit: $750k acquisition debt
-        Charitable contributions                     Various AGI % limits
-        Casualty losses (federal disasters)
+    GI -->|"LESS"| above_line
 
-= Taxable Income
+    AGI["📊 Adjusted Gross Income (AGI)\n⬅ Critical Threshold for Phase-Outs"]
 
-APPLY: Rate Schedule (7 brackets: 10%, 12%, 22%, 24%, 32%, 35%, 37%)
+    above_line --> AGI
 
-= Regular Tax Liability
+    subgraph deductions ["Standard Deduction OR Itemized Deductions — Schedule A"]
+        STD["Standard Deduction\n$14,600 Single / $29,200 MFJ / $21,900 HoH"]
+        subgraph itemized ["Itemized Deductions"]
+            MED["Medical Expenses\nAmount exceeding 7.5% of AGI"]
+            SALT["State & Local Taxes (SALT)\nCap: $10,000"]
+            MTG["Mortgage Interest\nLimit: $750k Acquisition Debt"]
+            CHAR["Charitable Contributions\nVarious AGI % Limits"]
+            CAS["Casualty Losses\nFederal Disaster Declarations Only"]
+        end
+    end
 
-PARALLEL: Alternative Minimum Tax Calculation
-    Taxable Income
-    ADD: AMT adjustments & preferences
-        Standard/itemized deduction add-back
-        SALT add-back
-        ISO exercise bargain element
-        Depreciation adjustments
-        Private activity bond interest
-    
-    = AMTI
-    LESS: AMT Exemption (phases out)
-    APPLY: AMT rates (26% / 28%)
-    = Tentative Minimum Tax
-    
-    IF TMT > Regular Tax → Pay AMT (difference)
-                          → Generate AMT Credit (deferral portion)
+    AGI -->|"LESS"| deductions
 
-LESS: Tax Credits (child tax credit, education credits, etc.)
+    TI["📋 Taxable Income"]
 
-= Total Tax Liability
+    deductions --> TI
+
+    RATES["Apply Rate Schedule\n7 Brackets: 10% · 12% · 22% · 24% · 32% · 35% · 37%"]
+
+    TI --> RATES
+
+    REG["📄 Regular Tax Liability"]
+
+    RATES --> REG
+
+    subgraph amt_calc ["Alternative Minimum Tax (AMT) Calculation"]
+        AMT_START["Taxable Income (starting point)"]
+        subgraph amt_adj ["AMT Adjustments & Preferences"]
+            ADJ1["Standard / Itemized Deduction Add-Back"]
+            ADJ2["SALT Add-Back"]
+            ADJ3["ISO Exercise Bargain Element"]
+            ADJ4["Depreciation Adjustments"]
+            ADJ5["Private Activity Bond Interest"]
+        end
+        AMTI["= AMTI\n(Alternative Minimum Taxable Income)"]
+        AMT_EX["LESS: AMT Exemption\n(Phases Out at Higher Income)"]
+        AMT_RATE["Apply AMT Rates\n26% / 28%"]
+        TMT["= Tentative Minimum Tax (TMT)"]
+        AMT_COMPARE{"TMT > Regular Tax?"}
+        PAY_AMT["Pay AMT\n(Difference Added to Liability)"]
+        AMT_CREDIT["Generate AMT Credit\n(Deferral Portion — Carry Forward)"]
+    end
+
+    TI --> AMT_START
+    AMT_START --> amt_adj
+    amt_adj --> AMTI
+    AMTI --> AMT_EX
+    AMT_EX --> AMT_RATE
+    AMT_RATE --> TMT
+    TMT --> AMT_COMPARE
+    AMT_COMPARE -->|"Yes"| PAY_AMT
+    AMT_COMPARE -->|"No"| AMT_CREDIT
+
+    REG --> CREDITS
+    PAY_AMT --> CREDITS
+
+    CREDITS["LESS: Tax Credits\nChild Tax Credit · Education Credits · Others"]
+
+    TOTAL["✅ Total Tax Liability"]
+
+    CREDITS --> TOTAL
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

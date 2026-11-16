@@ -751,47 +751,59 @@ The physical placement of the IDS on the in-vehicle network fundamentally determ
 
 **Centralized gateway monitoring** places the IDS on the vehicle's central gateway ECU, which bridges multiple CAN sub-networks (powertrain, body, chassis, infotainment, and diagnostics). Every inter-segment message passes through the gateway, giving the IDS visibility into cross-network attacks such as a compromised telematics unit injecting frames onto the powertrain bus. The gateway is typically the most powerful ECU in the vehicle, with sufficient CPU headroom for complex statistical models. The limitation is that the gateway has no visibility into traffic that stays within a single sub-network. An attacker who compromises a brake controller on the chassis bus and injects frames that remain on that bus will never be seen by the gateway IDS. Additionally, the gateway is a single point of failure: if an attacker disables or bypasses the gateway, all monitoring ceases.
 
-```
-  ┌──────────────────────────────────────────────────────┐
-  │              Centralized Gateway IDS                 │
-  │  ┌─────────────────────────────────────────────┐    │
-  │  │  Anomaly Engine  │  Signature Engine  │ Log │    │
-  │  └──────────┬───────┴────────┬──────────────┬──┘    │
-  │             │                │              │        │
-  │  ┌──────────▼──┐  ┌─────────▼──┐  ┌───────▼────┐    │
-  │  │ CAN-FD #1   │  │ CAN-FD #2   │  │ CAN #3     │    │
-  │  │ Powertrain  │  │ Chassis     │  │ Body/Comfort│   │
-  │  └──────────┬──┘  └─────────┬──┘  └───────┬────┘    │
-  │             │                │              │        │
-  └─────────────┼────────────────┼──────────────┼────────┘
-                │                │              │
-         ┌──────▼──────┐  ┌──────▼──────┐  ┌─────▼──────┐
-         │ Engine ECU  │  │ ABS/ESC     │  │ BCM        │
-         │ Trans ECU   │  │ Airbag      │  │ Lights     │
-         │ TCU         │  │ Steering    │  │ Wipers     │
-         └─────────────┘  └─────────────┘  └────────────┘
+```mermaid
+flowchart TD
+    subgraph gateway ["Centralized Gateway IDS"]
+        AnomalyEngine["Anomaly Engine"]
+        SignatureEngine["Signature Engine"]
+        Log["Log"]
+
+        subgraph canfd1 ["CAN-FD #1 · Powertrain"]
+            AnomalyEngine --> CANFD1["CAN-FD #1\nPowertrain"]
+        end
+
+        subgraph canfd2 ["CAN-FD #2 · Chassis"]
+            SignatureEngine --> CANFD2["CAN-FD #2\nChassis"]
+        end
+
+        subgraph can3 ["CAN #3 · Body/Comfort"]
+            Log --> CAN3["CAN #3\nBody/Comfort"]
+        end
+    end
+
+    CANFD1 --> PowertrainECUs["Engine ECU\nTrans ECU\nTCU"]
+    CANFD2 --> ChassisECUs["ABS/ESC\nAirbag\nSteering"]
+    CAN3 --> BodyECUs["BCM\nLights\nWipers"]
 ```
 
 **Distributed in-ECU monitoring** embeds a lightweight detection agent into each ECU, typically as a low-priority task within the ECU's RTOS (AUTOSAR Basic Software layer or a bare-metal scheduler). Each agent monitors only the traffic on its own bus segment, giving it complete visibility into all local communication. The agent can also correlate observed CAN traffic with the ECU's own internal state, enabling detection of attacks that would be invisible to an external observer: a brake ECU can detect that a received brake-pressure command disagrees with its own locally read pressure sensor, a cross-check no external IDS could perform. The cost is the requirement to modify every ECU's firmware, which is infeasible for legacy components and introduces validation burden across the supply chain. Communication overhead between agents is also a concern, as each agent must report alerts to a central aggregator without consuming excessive bus bandwidth.
 
-```
-  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
-  │ Engine   │   │ ABS/ESC  │   │ BCM      │   │ Telematics│
-  │ ECU      │   │ ECU      │   │          │   │ Unit     │
-  │┌────────┐│   │┌────────┐│   │┌────────┐│   │┌────────┐│
-  ││IDS     ││   ││IDS     ││   ││IDS     ││   ││IDS     ││
-  ││Agent   ││   ││Agent   ││   ││Agent   ││   ││Agent   ││
-  ││(local) ││   ││(local) ││   ││(local) ││   ││(local) ││
-  │└───┬────┘│   │└───┬────┘│   │└───┬────┘│   │└───┬────┘│
-  └────┼─────┘   └────┼─────┘   └────┼─────┘   └────┼─────┘
-       │                │              │              │
-       ═══════════════ CAN Backbone ══════════════════
-                            │
-                    ┌───────▼───────┐
-                    │  Alert        │
-                    │  Aggregator   │
-                    │  (Gateway)    │
-                    └───────────────┘
+```mermaid
+flowchart TD
+    EngineECU["Engine<br/>ECU"]
+    ABSECU["ABS/ESC<br/>ECU"]
+    BCM["BCM"]
+    Telematic["Telematics<br/>Unit"]
+    
+    EngineIDS["IDS<br/>Agent<br/>(local)"]
+    ABSIDS["IDS<br/>Agent<br/>(local)"]
+    BCMIDS["IDS<br/>Agent<br/>(local)"]
+    TelematicIDS["IDS<br/>Agent<br/>(local)"]
+    
+    CANBackbone["CAN Backbone"]
+    Gateway["Alert<br/>Aggregator<br/>(Gateway)"]
+    
+    EngineECU --> EngineIDS
+    ABSECU --> ABSIDS
+    BCM --> BCMIDS
+    Telematic --> TelematicIDS
+    
+    EngineIDS --> CANBackbone
+    ABSIDS --> CANBackbone
+    BCMIDS --> CANBackbone
+    TelematicIDS --> CANBackbone
+    
+    CANBackbone --> Gateway
 ```
 
 **Hybrid tiered monitoring** combines the two approaches: a centralized IDS on the gateway handles cross-network traffic and serves as the alert aggregator, while lightweight agents on critical ECUs (brakes, steering, powertrain) provide deep local visibility. Alerts from distributed agents are forwarded to the gateway over a dedicated diagnostic or out-of-band channel, and the gateway correlates them with its own observations. This is the architecture used in production vehicles from several manufacturers as of the 2023-2024 model years, though the specifics vary significantly. The following code implements a distributed alert agent designed to run as a low-priority AUTOSAR-like task within an ECU, forwarding alerts to a central aggregator over CAN using a dedicated alert arbitration ID.
@@ -1847,57 +1859,36 @@ static void execute_response(response_action_t action,
 
 The complete IDS pipeline ties together the signature engine, anomaly engine, distributed agents, and tiered logging into a single processing chain. The following diagram shows the data flow from CAN bus reception through alert generation and incident response.
 
-```
-  ┌─────────────────────────────────────────────────────────────┐
-  │                     CAN Bus (500 kbps / CAN-FD)             │
-  └────────────────────────────┬────────────────────────────────┘
-                               │
-                    ┌──────────▼──────────┐
-                    │  SocketCAN / Driver  │
-                    │  recvmmsg batch      │
-                    │  (64 frames/syscall)  │
-                    └──────────┬──────────┘
-                               │
-                    ┌──────────▼──────────┐
-                    │  Lock-Free Ring Buf  │  ← Tier 1: RAM
-                    │  (4096 frame window) │    (pre-event)
-                    └──────────┬──────────┘
-                               │
-              ┌────────────────┼────────────────┐
-              │                │                │
-     ┌────────▼───────┐ ┌─────▼──────┐ ┌──────▼───────┐
-     │ Signature      │ │ Anomaly    │ │ Distributed  │
-     │ Engine         │ │ Engine     │ │ Agent Alerts │
-     │ (known attacks)│ │ (IAT,rate, │ │ (from ECUs)  │
-     │                │ │  payload)  │ │              │
-     └───────┬────────┘ └─────┬──────┘ └──────┬───────┘
-             │                │               │
-             └────────────────┼───────────────┘
-                              │
-                    ┌─────────▼─────────┐
-                    │  Alert Correlator  │
-                    │  (FP mitigation,  │
-                    │   consensus,      │
-                    │   contextual gate) │
-                    └─────────┬─────────┘
-                              │
-                    ┌─────────▼─────────┐
-                    │ Response Policy   │
-                    │ Engine            │
-                    │ (log / rate-limit  │
-                    │  / isolate /      │
-                    │  disable)          │
-                    └─────────┬─────────┘
-                              │
-              ┌───────────────┼───────────────┐
-              │               │               │
-     ┌────────▼──────┐ ┌─────▼─────┐ ┌───────▼──────┐
-     │ Tier 2: Flash │ │ Tier 3:   │ │ Incident     │
-     │ Structured   │ │ NVRAM     │ │ Response     │
-     │ Alert Log    │ │ Critical  │ │ Actions      │
-     │ (UDS-extract)│ │ Events    │ │ (bus isol.,  │
-     └──────────────┘ └───────────┘ │ ECU reset)   │
-                                      └──────────────┘
+```mermaid
+flowchart TD
+    CAN["CAN Bus\n(500 kbps / CAN-FD)"]
+    SCAN["SocketCAN / Driver\nrecvmmsg batch\n(64 frames/syscall)"]
+    RING["Lock-Free Ring Buffer\n(4096 frame window)\n← Tier 1: RAM (pre-event)"]
+
+    SIG["Signature Engine\n(known attacks)"]
+    ANOM["Anomaly Engine\n(IAT, rate, payload)"]
+    DIST["Distributed Agent Alerts\n(from ECUs)"]
+
+    CORR["Alert Correlator\n(FP mitigation, consensus,\ncontextual gate)"]
+
+    RPE["Response Policy Engine\n(log / rate-limit / isolate / disable)"]
+
+    FLASH["Tier 2: Flash\nStructured Alert Log\n(UDS-extract)"]
+    NVRAM["Tier 3: NVRAM\nCritical Events"]
+    IR["Incident Response Actions\n(bus isolation, ECU reset)"]
+
+    CAN --> SCAN
+    SCAN --> RING
+    RING --> SIG
+    RING --> ANOM
+    RING --> DIST
+    SIG --> CORR
+    ANOM --> CORR
+    DIST --> CORR
+    CORR --> RPE
+    RPE --> FLASH
+    RPE --> NVRAM
+    RPE --> IR
 ```
 
 The pipeline demonstrates the fundamental trade-off in automotive IDS design. Each stage adds detection capability but also adds latency. A frame that passes through signature matching, anomaly detection, correlation, and policy evaluation may accumulate 200-500 microseconds of processing time, which at maximum bus load leaves no budget for the gateway's primary routing function. The solution is to run signature and anomaly engines in parallel, with the correlation stage merging their outputs asynchronously. Signature alerts, which require only a single hash lookup and comparison, complete in under 5 microseconds and can trigger immediate response without waiting for the anomaly engine. Anomaly alerts, which require statistical computation, take 20-50 microseconds per frame and are processed on a best-effort basis with a slightly longer response latency.

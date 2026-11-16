@@ -44,23 +44,27 @@ The architecture of a robotic AR pipeline decomposes into four tightly coupled s
 
 The perception front-end ingests raw sensor streams and produces geometric primitives. For a monocular camera, this begins with image preprocessing: undistortion to remove lens aberrations, histogram equalization or adaptive histogram equalization (CLAHE) to normalize lighting, and optionally Gaussian smoothing to suppress noise. Feature detection then marks salient points using a detector appropriate to the scene structure—FAST for texture-rich environments, ORB for real-time constraints, or learned detectors like SuperPoint for robustness under extreme viewpoint changes. Descriptor extraction computes a compact representation of the local image patch around each feature, balancing discriminative power against computational cost and memory bandwidth. For stereo or RGB-D cameras, the front-end additionally computes dense or semi-dense depth maps, often leveraging GPU-accelerated block matching or neural disparity estimation networks.
 
-```
-[ Raw Image Stream @ 30–60 Hz ]
-          |
-          v
-[ Undistortion & Preprocessing ]
-          |
-          v
-[ Feature Detection (FAST/ORB) ] ---> [ Descriptor Extraction ]
-          |                                     |
-          v                                     v
-[ Feature Matching (KLT/BoW) ] <-----[ Descriptor Database ]
-          |
-          v
-[ Outlier Rejection (RANSAC) ]
-          |
-          v
-[ 2D-3D Correspondences ] ----> [ Pose Estimation Module ]
+```mermaid
+flowchart TD
+    A["Raw Image Stream @ 30–60 Hz"]
+    B["Undistortion & Preprocessing"]
+    C["Feature Detection (FAST/ORB)"]
+    D["Descriptor Extraction"]
+    E["Descriptor Database"]
+    F["Feature Matching (KLT/BoW)"]
+    G["Outlier Rejection (RANSAC)"]
+    H["2D-3D Correspondences"]
+    I["Pose Estimation Module"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    C --> F
+    F --> G
+    G --> H
+    H --> I
 ```
 
 Feature matching establishes correspondences between the current frame and either the previous frame (for tracking) or keyframes in the map (for localization). Tracking employs KLT optical flow to propagate features forward, predicting their current location using a constant-velocity motion model and refining via the Lucas-Kanade iterative solver. For each feature, the algorithm computes the spatial gradient at the predicted location and solves a 2×2 linear system to estimate the optical flow displacement. If the residual after convergence exceeds a threshold (typically 5–10 pixels for 640×480 images), the feature is marked as lost. Localization against the map uses descriptor matching: for each descriptor in the current frame, find the *k* nearest neighbors in the keyframe descriptor database using a kD-tree or hierarchical k-means vocabulary, then apply a ratio test (Lowe's criterion: discard matches where the closest descriptor is less than 0.7× the distance to the second-closest) to reject ambiguous matches.

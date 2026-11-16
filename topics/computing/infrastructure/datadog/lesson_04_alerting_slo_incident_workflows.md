@@ -26,28 +26,20 @@ A Datadog monitor is a persistent object in the Datadog control plane that runs 
 
 The monitor state machine has four primary states and several composite states for multi-alert monitors:
 
-```
-                   ┌─────────────────────────────────────────────────────────┐
-                   │                  MONITOR STATE MACHINE                  │
-                   └─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    OK["OK"]
+    WARN["WARN"]
+    ALERT["ALERT"]
+    NODATA["NO DATA"]
+    ACTION["Notify or Ignore<br/>(configured per monitor)"]
 
-         ┌──────────┐   threshold      ┌───────────┐   threshold    ┌───────────┐
-         │          │   exceeded       │           │   exceeded     │           │
-         │    OK    │ ─────────────► │   WARN    │ ───────────► │   ALERT   │
-         │          │                 │           │               │           │
-         └──────────┘ ◄───────────── └───────────┘ ◄──────────── └───────────┘
-              ▲        below warn                   below alert          │
-              │                                                          │
-              │             recovery threshold met                       │
-              └──────────────────────────────────────────────────────────┘
-
-         ┌──────────────┐
-         │   NO DATA    │  ◄── query window returns no metric samples
-         └──────────────┘
-                │
-                ▼
-        notify or ignore
-        (configured per monitor)
+    OK -->|"threshold exceeded"| WARN
+    WARN -->|"threshold exceeded"| ALERT
+    WARN -->|"below warn"| OK
+    ALERT -->|"below alert"| WARN
+    ALERT -->|"recovery threshold met"| OK
+    NODATA -->|"query window returns<br/>no metric samples"| ACTION
 ```
 
 The transition from OK to WARN to ALERT is intuitive, but the recovery transition is where most practitioners make errors. By default, a monitor recovers from ALERT back to OK when the metric drops below the alert threshold. This means that for a threshold of 500 ms, a monitor oscillates between ALERT and OK if the metric fluctuates around 490–510 ms, producing alert flapping. Datadog's **recovery threshold** parameter addresses this directly: you can configure a separate, lower value that the metric must fall below before the monitor transitions out of ALERT. If your alert threshold is 500 ms and your recovery threshold is 400 ms, the monitor will not recover until the metric sustainably falls 100 ms below the trigger point, introducing hysteresis into the state machine. This is the alerting equivalent of a Schmitt trigger in electronics: the asymmetric switching thresholds eliminate oscillation around a single boundary.
@@ -261,29 +253,24 @@ The recovery threshold discussed in section 2 is the first line of defense again
 
 Datadog Incident Management models an incident as an explicit state machine with defined transitions, properties, and integration hooks. An incident transitions through the following lifecycle:
 
-```
-                ┌────────────────────────────────────────────────────────────┐
-                │                   INCIDENT LIFECYCLE                       │
-                └────────────────────────────────────────────────────────────┘
-
-   Alert fires          Engineer declares    Root cause      Post-mortem
-   in Datadog           incident             identified      complete
-       │                     │                   │               │
-       ▼                     ▼                   ▼               ▼
-  ┌─────────┐          ┌──────────┐         ┌────────┐     ┌──────────┐
-  │TRIGGERED│─────────►│  ACTIVE  │────────►│STABLE  │────►│ RESOLVED │
-  └─────────┘  declare └──────────┘ stabilize└────────┘     └──────────┘
-                            │                                     ▲
-                            │         ◄── auto-resolve ───────────┘
-                            │         if monitor recovers
-                            │         and no manual override
-                            ▼
-                    ┌──────────────────┐
-                    │ Timeline entries │
-                    │ Responder roster │
-                    │ Linked monitors  │
-                    │ Linked dashboards│
-                    └──────────────────┘
+```mermaid
+flowchart LR
+    subgraph lifecycle["INCIDENT LIFECYCLE"]
+        direction LR
+        T["TRIGGERED"]
+        A["ACTIVE"]
+        S["STABLE"]
+        R["RESOLVED"]
+        
+        T -->|"declare<br/>(Engineer declares incident)"| A
+        A -->|"stabilize<br/>(Root cause identified)"| S
+        S -->|"(Post-mortem complete)"| R
+        R -.->|"auto-resolve<br/>if monitor recovers<br/>and no manual override"| A
+        
+        A --> Details["Timeline entries<br/>Responder roster<br/>Linked monitors<br/>Linked dashboards"]
+    end
+    
+    Alert["Alert fires<br/>in Datadog"] --> T
 ```
 
 An incident in Datadog carries several fields that are set at creation time or updated as the investigation progresses: severity (SEV1 through SEV5), customer impact statement, incident commander, affected services, and a live timeline. The timeline is the operational record of the incident: every monitor transition, every comment left by a responder, every command output pasted into the timeline becomes a timestamped entry that feeds the post-mortem process. Teams that treat the timeline as a first-class artifact during the incident produce significantly better post-mortems because they are not reconstructing a sequence of events from memory and log timestamps.

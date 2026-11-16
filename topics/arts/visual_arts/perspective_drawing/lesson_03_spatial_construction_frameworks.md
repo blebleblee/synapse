@@ -28,35 +28,44 @@ The mechanical process of constructing volumetric forms in perspective begins wi
 
 The diagonal measuring method provides the solution. Beginning with a true-height line positioned at the front edge of the picture plane, the artist marks equal vertical divisions representing the desired grid spacing—for example, one-foot increments if constructing architectural space. From each division point, an orthogonal line is drawn converging to the vanishing point, creating a fan of recession lines. To determine where the next vertical division should occur along any of these recession lines, a diagonal line is drawn at 45 degrees from the base point through the first orthogonal intersection. Where this diagonal crosses the next orthogonal line defines the correct proportional spacing for the second grid division. This process repeats, with each diagonal intersection automatically calculating the harmonic compression of the grid as it recedes.
 
-```
-Picture Plane View (Single-Point Perspective Grid Construction)
-
-                                          VP (Vanishing Point on Horizon)
-                                            •
-                                           /|\
-                                          / | \
-                                         /  |  \
-                                        /   |   \
-                     Orthogonals       /    |    \
-                     converging ———→  /     |     \
-                                     /      |      \
-                                    /       |       \
-                                   /        |        \
-                                  /         |         \
-     True-height    ═════════════╬══════════╬══════════╬═════  Grid horizontal
-     reference line              │          │          │
-     (parallel to               │          │          │
-     picture plane)              │          │          │
-                                ╱│         ╱│         ╱│
-                      Diagonal ╱ │        ╱ │        ╱ │  ← 45° measuring diagonal
-                      measuring  │       ╱  │       ╱  │    creates proportional
-                               ╱ │      ╱   │      ╱   │    spacing compression
-                              ╱  │     ╱    │     ╱    │
-     Ground plane ════════════╬═══════╬══════════╬═════════
-     base line               1st    2nd        3rd
-                           interval interval  interval
-                           (equal in        (compressed
-                           real space)      in projection)
+```mermaid
+flowchart TD
+    VP["VP<br/>(Vanishing Point<br/>on Horizon)"]
+    
+    subgraph perspective ["Picture Plane View: Single-Point Perspective Grid Construction"]
+        VP
+        
+        OR1["Orthogonal 1"]
+        OR2["Orthogonal 2"]
+        OR3["Orthogonal 3"]
+        
+        VP --> OR1
+        VP --> OR2
+        VP --> OR3
+        
+        TH["True-Height Reference Line<br/>(Parallel to Picture Plane)"]
+        
+        GH["Grid Horizontal Line"]
+        
+        TH -.->|"converging"| OR1
+        
+        DM["Diagonal Measuring Line<br/>(45° angle)"]
+        GB["Ground Plane Base Line"]
+        
+        INT1["1st Interval<br/>(Equal in Real Space)"]
+        INT2["2nd Interval<br/>(Equal in Real Space)"]
+        INT3["3rd Interval<br/>(Compressed in Projection)"]
+        
+        OR1 --> INT1
+        OR2 --> INT2
+        OR3 --> INT3
+        
+        DM -.->|"creates proportional<br/>spacing compression"| INT3
+        
+        GB --> INT1
+        GB --> INT2
+        GB --> INT3
+    end
 ```
 
 The construction of a cube within this grid system proceeds by first establishing the cube's footprint on the ground plane. If the cube measures one grid unit per side, its base occupies a single grid square. The four corners of this square become the foundation points from which vertical edges rise. Because the picture plane is transparent—a conceptual window through which we view the scene—these vertical edges must be drawn as truly vertical lines, perpendicular to the horizon, extending upward to the height of one grid unit as measured against the true-height reference.

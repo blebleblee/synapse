@@ -319,7 +319,7 @@ Arcade systems comprise components with vastly differing failure rates and aging
 |-----------|------------------|-------------------|------------------------|
 | Electrolytic capacitors (power supply) | 5,000–10,000 hours | Electrolyte evaporation, ESR increase | Voltage ripple >100 mV, bulging case, leakage |
 | Electrolytic capacitors (PCB signal path) | 10,000–20,000 hours | Capacitance loss | Sync instability, audio distortion |
-| CRT phosphor | 20,000–50,000 hours | Phosphor aging, cathode emission decline | Brightness <50% of specification, color shift |
+| CRT phosphor | 20,000–50,000 hours | Phosphor aging, cathode emission decline | Brightness < 50% of specification, color shift |
 | Switching power supply MOSFET | 50,000+ hours | Gate oxide degradation, thermal cycling | Overheating, regulation failure, audible switching noise |
 | Microswitches (control panel) | 1,000,000–5,000,000 actuations | Contact wear, spring fatigue | Inconsistent actuation force, contact bounce >20 ms |
 | Joystick assembly (mechanical) | 500,000 cycles | Pivot bearing wear, spring set | Excess play (>1 mm), binding, non-centering |
@@ -349,7 +349,7 @@ Alternatively, extract SRAM data via ROM programmer before battery removal. Iden
 
 **Watchdog Timer Reset Recovery:** CPU lockup due to software bugs or DRAM soft errors triggers the hardware watchdog timer, asserting the CPU reset line to force restart. The watchdog expects periodic "keep-alive" signals from software; absence of keep-alive for >100 ms indicates lockup. Chronic watchdog resets indicate unstable RAM, failing CPU, or corrupted program ROM. Diagnose by:
 1. Monitoring the watchdog reset line (typically connected to CPU reset pin) with oscilloscope; observe reset pulse frequency.
-2. If resets occur <5 seconds after boot, suspect ROM corruption: extract and verify all program ROMs.
+2. If resets occur < 5 seconds after boot, suspect ROM corruption: extract and verify all program ROMs.
 3. If resets occur during gameplay (irregular intervals), suspect DRAM failure: execute RAM test mode via service menu, replace failing RAM chip.
 4. If resets correlate with thermal conditions (occurring after 15+ minutes operation), suspect inadequate cooling or thermally-sensitive component failure: apply freeze spray to suspected ICs while monitoring for reset cessation.
 

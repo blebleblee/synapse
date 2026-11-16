@@ -26,25 +26,16 @@ A systematic analysis of clip-stud interference reveals optimal engagement geome
 
 The structural diagram of a clip-to-stud connection reveals the load paths:
 
-```
-         Applied Load
-              ↓
-    ╔═════════▼═════════╗
-    ║   Target Stud     ║
-    ║    ⌀4.85mm        ║
-    ╚═══════╤═══════════╝
-            │ Contact patches
-       ╭────┴────╮
-       │ Clip    │← Cantilever bending
-       │ Arm     │  moment from eccentric
-       │ 0.8mm   │  load application
-       │ thick   │
-       └────┬────┘
-            │
-    ┌───────▼────────┐
-    │  Base Plate    │
-    │  Connection    │
-    └────────────────┘
+```mermaid
+flowchart TD
+    LOAD["Applied Load"]
+    STUD["Target Stud\n⌀4.85mm"]
+    CLIP["Clip Arm\n0.8mm thick\nCantilever bending moment\nfrom eccentric load application"]
+    BASE["Base Plate\nConnection"]
+
+    LOAD -->|"↓"| STUD
+    STUD -->|"Contact patches"| CLIP
+    CLIP --> BASE
 ```
 
 The cantilever equation governs deflection at the clip tip: $\delta = \frac{PL^3}{3EI}$, where $P$ represents the applied load, $L$ the cantilever length (approximately 6mm), $E$ the elastic modulus of ABS (2.3 GPa), and $I$ the second moment of area for the rectangular cross-section ($I = \frac{bh^3}{12}$). For the 0.8mm thick clip arm with 3mm width, this yields $I \approx 0.128 \text{ mm}^4$. A 1N lateral load produces roughly 0.3mm deflection—sufficient to accommodate the stud diameter mismatch while maintaining adequate contact pressure.

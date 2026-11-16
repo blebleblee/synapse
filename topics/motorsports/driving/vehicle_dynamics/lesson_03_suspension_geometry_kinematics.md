@@ -24,34 +24,37 @@ The instant center location is conventionally described by two coordinates: late
 
 The roll center height is determined by projecting the instant center position onto the vehicle centerline plane. Construct a line from the tire contact patch center through the transverse plane instant center; the intersection of this line with the vehicle vertical centerline plane defines the roll center height. Front and rear roll centers define the roll axis, the longitudinal axis about which the sprung mass rotates during steady-state cornering. The roll axis is rarely parallel to the ground; most racing vehicles exhibit a forward-sloping roll axis with the front roll center lower than the rear, producing understeer-biased roll stiffness distribution that enhances directional stability. The vertical distance between the center of gravity and the roll axis defines the moment arm through which lateral acceleration generates roll moment. A lower roll axis increases this moment arm, amplifying geometric lateral load transfer and reducing the roll angle required to achieve load transfer equilibrium. However, excessively low roll centers introduce geometric anti-roll effects where the suspension linkage geometry itself resists body roll, coupling lateral and vertical dynamics in undesirable ways.
 
-```
-Front View Instant Center Construction (Double Wishbone):
-
-Chassis ──────────────────────────────────────── Centerline
-    │                                              │
-    │  Upper Control Arm                           │
-    ●━━━━━━━━━━━━━━━━━●  Upper Ball Joint          │
-    │ Inner Pivot      \                           │
-    │                   \                          │
-    │                    \                         │
-    │                     ●  Upright               │
-    │                    /                         │
-    │                   /                          │
-    │  Lower Control Arm                           │
-    ●━━━━━━━━━━━━━━━━━●  Lower Ball Joint          │
-    │ Inner Pivot                                  │
-    │                                              │
-Ground ══════════════●═══════════════════════════════
-                Contact Patch
-                
-Instant Center (IC):
-    Located at intersection of upper/lower arm extension lines
-    Typically 200-600mm outboard, 0-150mm above ground
+```mermaid
+flowchart TD
+    subgraph chassis ["Chassis"]
+        centerline["Centerline"]
+        upper_inner["● Upper Control Arm<br/>Inner Pivot"]
+        lower_inner["● Lower Control Arm<br/>Inner Pivot"]
+    end
     
-Roll Center (RC):
-    Intersection of (Contact Patch → IC) line with centerline
-    Front: typically 25-75mm above ground
-    Rear: typically 75-150mm above ground
+    upper_inner ---|"Upper Control Arm"| upper_ball["● Upper Ball Joint"]
+    lower_inner ---|"Lower Control Arm"| lower_ball["● Lower Ball Joint"]
+    
+    upper_ball --> upright["● Upright"]
+    lower_ball --> upright
+    
+    upright --> contact["● Contact Patch"]
+    
+    contact --> ground["Ground"]
+    
+    upper_ball -.-|"Extension Line"| ic["★ Instant Center (IC)<br/>200-600mm outboard<br/>0-150mm above ground"]
+    lower_ball -.-|"Extension Line"| ic
+    
+    contact -.->|"Line to IC"| ic
+    ic -.->|"Intersects Centerline"| rc["★ Roll Center (RC)<br/>Front: 25-75mm above ground<br/>Rear: 75-150mm above ground"]
+    
+    rc --> centerline
+    
+    style ic fill:#ffeb99,stroke:#ff9900,stroke-width:3px
+    style rc fill:#99ccff,stroke:#0066cc,stroke-width:3px
+    style chassis fill:#f0f0f0,stroke:#666,stroke-width:2px
+    style contact fill:#90EE90,stroke:#228B22,stroke-width:2px
+    style ground fill:#8B4513,stroke:#654321,stroke-width:2px
 ```
 
 Camber curve optimization represents the primary suspension geometry tuning variable available to the race engineer. Camber angle describes the inclination of the wheel plane relative to vertical, with negative camber indicating the top of the wheel tilted inward toward the chassis centerline. Static camber angles for racing applications typically range from negative 2.0 to negative 4.5 degrees depending on circuit characteristics, tire construction, and suspension geometry. The camber curve describes how camber angle evolves as the suspension moves through its travel range. An ideal camber curve maintains the tire contact patch perpendicular to the road surface as the chassis rolls during cornering, compensating for the geometric camber loss that occurs as the outside suspension compresses and the inside suspension extends. The required camber gain rate depends on roll stiffness distribution, center of gravity height, and track width, but typical racing suspensions target camber gain rates between 0.5 and 1.2 degrees of negative camber per 25 millimeters of bump travel.

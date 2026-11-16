@@ -22,43 +22,36 @@ Modern equity exchanges operate as real-time auction systems where continuous pr
 
 The canonical exchange architecture follows a hub-and-spoke topology where market participants connect to the central matching engine via dedicated gateway servers that enforce message rate limits, perform pre-trade risk checks, and serialize incoming orders into a deterministic processing sequence. This architecture ensures fairness through strict time-priority matching: among orders at the same price level, the first order to reach the matching engine receives execution priority. Co-location services emerged as exchanges recognized that network propagation delays create execution advantages for participants physically proximate to the matching engine, and rather than allowing unregulated proximity races, exchanges formalized co-location with standardized cabinet space and equidistant network cables.
 
-```
-Exchange Matching Engine Architecture
-
-┌─────────────────────────────────────────────────────────────┐
-│                    Market Participants                       │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │ HFT Firm │  │  Broker  │  │Institution│  │Market Maker│  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │
-└───────┼─────────────┼─────────────┼─────────────┼──────────┘
-        │             │             │             │
-        └─────────────┴─────────────┴─────────────┘
-                      │
-        ┌─────────────▼──────────────┐
-        │   Gateway Layer (FIX/SBE)  │
-        │   • Rate Limiting          │
-        │   • Pre-trade Risk Checks  │
-        │   • Order Normalization    │
-        └─────────────┬──────────────┘
-                      │
-        ┌─────────────▼──────────────┐
-        │   Matching Engine Core     │
-        │                            │
-        │   Buy Book    Sell Book    │
-        │   Price│Qty   Price│Qty    │
-        │   180.00│500 180.01│300    │
-        │   179.99│200 180.02│800    │
-        │   179.98│350 180.05│450    │
-        │                            │
-        │   FIFO Price-Time Priority │
-        └─────────────┬──────────────┘
-                      │
-        ┌─────────────▼──────────────┐
-        │   Market Data Distribution │
-        │   • Trade Reports          │
-        │   • Order Book Updates     │
-        │   • NBBO Calculation       │
-        └────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph participants ["Market Participants"]
+        HFT["HFT Firm"]
+        BROKER["Broker"]
+        INST["Institution"]
+        MM["Market Maker"]
+    end
+    
+    HFT --> GATEWAY
+    BROKER --> GATEWAY
+    INST --> GATEWAY
+    MM --> GATEWAY
+    
+    GATEWAY["Gateway Layer (FIX/SBE)<br/>• Rate Limiting<br/>• Pre-trade Risk Checks<br/>• Order Normalization"]
+    
+    GATEWAY --> ENGINE
+    
+    subgraph ENGINE ["Matching Engine Core"]
+        direction LR
+        BUYBOOK["Buy Book<br/>───────────<br/>Price │ Qty<br/>180.00 │ 500<br/>179.99 │ 200<br/>179.98 │ 350"]
+        SELLBOOK["Sell Book<br/>───────────<br/>Price │ Qty<br/>180.01 │ 300<br/>180.02 │ 800<br/>180.05 │ 450"]
+        ALGO["FIFO Price-Time Priority"]
+        BUYBOOK ~~~ SELLBOOK
+        SELLBOOK ~~~ ALGO
+    end
+    
+    ENGINE --> MARKET
+    
+    MARKET["Market Data Distribution<br/>• Trade Reports<br/>• Order Book Updates<br/>• NBBO Calculation"]
 ```
 
 The order book itself represents the current state of supply and demand as a two-sided auction. The bid side contains all outstanding buy limit orders ranked from highest to lowest price, while the ask side holds sell limit orders from lowest to highest. The spread—the difference between the best bid and best ask—represents the cost of immediacy and compensates liquidity providers for the risk of adverse selection. When spreads widen, liquidity has deteriorated and execution costs rise. When spreads tighten to the minimum tick size, the market exhibits maximum liquidity at that moment.

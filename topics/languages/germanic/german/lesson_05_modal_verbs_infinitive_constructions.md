@@ -62,15 +62,29 @@ Modal verbs prohibit *zu* with their infinitival complements: *Ich muss gehen* i
 
 The double infinitive construction in subordinate clauses further exemplifies the syntactic complexity of modal verb phrases. In main clauses, the finite modal occupies V2 position and the infinitive anchors the right bracket: *Er kann gut schwimmen*. In subordinate clauses, the finite modal moves to clause-final position following the infinitive: *..., dass er gut schwimmen kann*. When the perfect auxiliary *haben* combines with a modal governing an infinitive, the subordinate clause exhibits a three-verb cluster: *..., dass er gut hat schwimmen können*. The auxiliary *haben* inverts with the double infinitive *schwimmen können*, yielding the order *haben + lexical infinitive + modal infinitive* rather than the expected *lexical infinitive + modal infinitive + haben*. This inversion, known as the Oberfeldumstellung or IPP (Infinitivus Pro Participio) inversion, is obligatory in standard German and marks a parametric point of variation among German dialects, with some southern varieties maintaining the non-inverted order.
 
-```
-Main clause perfect with modal:
-[CP [SpecCP Er] [C' hat [IP [VP das Buch lesen] müssen]]]
-  Subject  AUX                Object  INF     MOD(INF)
+```mermaid
+flowchart TD
+    subgraph main ["Main clause perfect with modal"]
+        MCP["CP"] --> MSpec["SpecCP<br/>Er<br/><i>Subject</i>"]
+        MCP --> MCbar["C'"]
+        MCbar --> MC["C<br/>hat<br/><i>AUX</i>"]
+        MCbar --> MIP["IP"]
+        MIP --> MVP["VP"]
+        MIP --> MMOD["müssen<br/><i>MOD(INF)</i>"]
+        MVP --> MOBJ["das Buch<br/><i>Object</i>"]
+        MVP --> MINF["lesen<br/><i>INF</i>"]
+    end
 
-Subordinate clause perfect with modal:
-[CP dass [IP [VP das Buch lesen] [AUX hat] [MOD müssen]]]
-     COMP     Object      INF         AUX        MOD(INF)
-                              └─ IPP inversion ─┘
+    subgraph sub ["Subordinate clause perfect with modal"]
+        SCP["CP"] --> SCOMP["dass<br/><i>COMP</i>"]
+        SCP --> SIP["IP"]
+        SIP --> SVP["VP"]
+        SIP --> SAUX["hat<br/><i>AUX</i>"]
+        SIP --> SMOD["müssen<br/><i>MOD(INF)</i>"]
+        SVP --> SOBJ["das Buch<br/><i>Object</i>"]
+        SVP --> SINF["lesen<br/><i>INF</i>"]
+        SAUX -. "IPP inversion" .-> SMOD
+    end
 ```
 
 This inversion disrupts the canonical OV order where the auxiliary should appear in final position, generating a verb cluster where the auxiliary precedes the infinitives despite German's underlying verb-final typology. The phenomenon extends beyond modals to any verb exhibiting Ersatzinfinitiv, including causative *lassen* and perception verbs in AcI constructions.

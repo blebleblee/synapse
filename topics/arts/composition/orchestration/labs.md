@@ -77,17 +77,19 @@ If you draw a straight-line crescendo in CC11 (expression) from 40 to 100 over f
 
 **Fix:** use an S-curve, not a straight ramp. In most DAWs you can right-click an automation ramp and select an S-curve or exponential curve shape. If your DAW only allows straight ramps, draw it manually with more breakpoints bunched toward the loud end:
 
-```
-CC11
-127 |                              ●
-100 |                        ●
- 80 |                   ●
- 60 |              ●
- 40 |         ●
- 20 |   ●
-  0 |●
-    +---+---+---+---+---+---+---+---+
-     beat1    beat2    beat3    beat4
+```mermaid
+flowchart TD
+    subgraph cc11["CC11"]
+        p0["Beat 1: 0"]
+        p1["Beat 2: 20"]
+        p2["Beat 3: 40"]
+        p3["Beat 4: 60"]
+        p4["Beat 5: 80"]
+        p5["Beat 6: 100"]
+        p6["Beat 7: 127"]
+    end
+    
+    p0 --> p1 --> p2 --> p3 --> p4 --> p5 --> p6
 ```
 
 Dense points near the bottom, sparse near the top — this compensates for the ear's compression and produces an audibly even crescendo. Verify with a LUFS meter in short-term mode: measure loudness every 0.5 seconds across the swell; the LUFS values should increase in roughly equal steps if your curve is shaped correctly. If the measured steps are uneven (big jumps early, tiny moves late), adjust the curve further.
@@ -275,3 +277,24 @@ You're operating at a competent working level when you can, without stopping to 
 - **Extended and divisi string writing** — splitting a section into independent sub-parts for denser harmonic textures
 - **Percussion and color instruments** — harp, celesta, tuned percussion, and how they cut through or blend with the rest of the orchestra
 - **Mixing and mastering orchestral mockups** — convolution reverb for hall placement, EQ matching against reference recordings, and gain-staging a full virtual orchestra so nothing clips at the final mixdown
+
+---
+
+## Conclusion
+
+Orchestration is not decoration applied after the fact—it is the structural decision that determines whether a musical idea will land with clarity or dissolve into mud. Every choice you make—register, doubling, articulation, panning—either reinforces the contrapuntal architecture or obscures it. The competent orchestrator does not guess; they predict masking, anticipate phase issues, and shape dynamics with an understanding of how human hearing integrates intensity over time. This requires equal fluency in the physics of sound (frequency content, attack transients, spatial separation) and the idiomatic constraints of real instruments (breath capacity, bow speed, embouchure endurance). Your mockup is not a placeholder for a future recording; it is a testable hypothesis about what will work when live players sit down with your parts. If it does not sound balanced and clear in your studio, no amount of "they'll figure it out in the session" will save it.
+
+The gap between competent and masterful orchestration is closed not by acquiring more sample libraries, but by developing ruthless diagnostic instincts. You must be able to hear a muddy texture and isolate the cause—too many voices in the same octave, a trombone buried under horns, a violin line fighting a flute for the same frequency band—and apply the minimum effective intervention without rewriting the entire cue. This requires building a mental model of the ensemble as a frequency-domain object, where every instrument occupies not just a pitch but a spectral footprint, and every doubling either reinforces or cancels depending on phase alignment and attack synchronization. The exercises in this unit are not academic drills; they are the diagnostic workflows that separate orchestrators who produce usable parts from those who produce notation that looks plausible but collapses under the reality of bows, breath, and room acoustics.
+
+---
+
+## Summary & Verification Matrix
+
+| **Invariant / Principle** | **Mechanism** | **Diagnostic Criterion** | **Failure Mode** |
+|---|---|---|---|
+| **Wide bass, moderate middle, close top** | Low frequencies mask more easily; tight bass voicing creates mud, while wide treble spacing sounds thin | Solo each voice and verify at least a 4th–5th between lowest two parts, 3rd in middle, 2nd or unison at top | Bass notes less than a major 3rd apart sound blurred; treble notes more than a 5th apart lose blend |
+| **Masking hierarchy: low obscures high, loud obscures soft, same-timbre obscures different-timbre** | Overlapping fundamental and overtone regions cause perceptual fusion or cancellation; louder source dominates attention | Check spectrogram for frequency overlap; solo suspected masked voice to confirm it disappears in the mix | Critical melody or counterpoint line is inaudible despite correct notation and dynamics |
+| **Curved (exponential) dynamics beat linear ramps** | Human loudness perception follows a logarithmic scale (dB), so linear MIDI CC ramps sound back-loaded | Draw automation with accelerating slope for crescendo, decelerating for diminuendo; A/B test against straight ramp | Linear crescendo sounds like nothing is happening until the last 20%, then suddenly too loud |
+| **Phase alignment matters for doubled lines** | Identical pitches from different sources sum constructively only if wavefronts arrive in phase; slight timing/tuning offsets cause comb filtering | Use correlation meter (should read +0.7 to +1.0 for intended doubling); check for hollow/filtered tone quality | Doubled line sounds weaker or spectrally thin compared to single instrument, or has a "phaser" quality |
+| **Attack alignment (not just start time) determines ensemble tightness** | Bowed/blown instruments have variable attack slopes; faster attacks need velocity adjustments, slower attacks need earlier starts | Align transient peaks within ~10 ms window; use velocity to match attack intensity, not just start time | Section sounds ragged or out-of-sync despite quantized note starts; brass entries sound staggered |
+| **Panning strategy follows texture: blend homophony, spread polyphony** | Homophonic textures benefit from centered mono/narrow stereo for power; contrapuntal lines need spatial separation to remain distinct | If all voices move in rhythm, pan narrow (±15°); if independent rhythms, pan wider (±30–60°) per voice | Counterpoint becomes unintelligible mush when panned center; chordal brass loses impact when spread too wide |

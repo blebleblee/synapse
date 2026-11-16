@@ -36,24 +36,18 @@ Cryptographic protocols provide the mathematical foundation for confidentiality,
 
 The operational model for network security begins with the network stack itself, where every layer introduces distinct attack vectors and defensive opportunities. At Layer 1, physical security controls prevent unauthorized cable taps, fiber optic splitters, or rogue device insertion. Layer 2 switching environments are vulnerable to ARP spoofing attacks where an attacker broadcasts fraudulent ARP replies associating their MAC address with the IP address of the default gateway, causing all victim traffic to route through the attacker's machine for inspection or manipulation. Dynamic ARP Inspection mitigates this by validating ARP packets against a trusted binding database maintained via DHCP snooping, dropping frames with inconsistent IP-to-MAC mappings.
 
-```
-+-----------------+         ARP Spoofing Attack         +-----------------+
-|   Victim Host   |<---------------------------------->|   Attacker MAC  |
-|  10.0.1.50      |   "10.0.1.1 is at aa:bb:cc:dd"   |   aa:bb:cc:dd   |
-+-----------------+                                     +-----------------+
-        |                                                       |
-        |  Intended Gateway Path                               |  Intercepted Path
-        v                                                       v
-+-----------------+                                     +-----------------+
-|   Real Gateway  |                                     |   Attacker Box  |
-|   10.0.1.1      |                                     |   10.0.1.200    |
-|   00:11:22:33   |                                     |                 |
-+-----------------+                                     +-----------------+
-                                                               |
-                                                               v
-                                                        [ Traffic Forwarded
-                                                          to Real Gateway
-                                                          After Inspection ]
+```mermaid
+flowchart TD
+    Victim["Victim Host<br/>10.0.1.50"]
+    AttackerMAC["Attacker MAC<br/>aa:bb:cc:dd"]
+    Gateway["Real Gateway<br/>10.0.1.1<br/>00:11:22:33"]
+    AttackerBox["Attacker Box<br/>10.0.1.200"]
+    Forward["Traffic Forwarded<br/>to Real Gateway<br/>After Inspection"]
+    
+    Victim <-->|"ARP Spoofing Attack<br/>'10.0.1.1 is at aa:bb:cc:dd'"| AttackerMAC
+    Victim -.->|"Intended Gateway Path"| Gateway
+    Victim -->|"Intercepted Path"| AttackerBox
+    AttackerBox --> Forward
 ```
 
 Virtual LAN hopping exploits switch misconfigurations where access ports are configured in trunking mode or where the native VLAN is improperly secured. An attacker sends double-tagged 802.1Q frames where the outer tag matches the native VLAN and the inner tag specifies the target restricted VLAN. The first switch strips the outer tag and forwards the frame, and the second switch processes the inner tag, delivering the frame to the restricted segment. Mitigation requires disabling DTP negotiation, explicitly configuring access ports, and assigning an unused VLAN as the native VLAN on trunk links.
@@ -62,50 +56,100 @@ At Layer 3, IP spoofing attacks forge source addresses to evade filtering, impli
 
 The TCP three-way handshake is a stateful negotiation vulnerable to SYN flood attacks where an attacker transmits a high volume of SYN packets with spoofed source addresses, causing the server to allocate connection state and await responses that never arrive. The server's backlog queue fills with half-open connections, exhausting memory and preventing legitimate clients from establishing sessions. SYN cookies defend against this by encoding connection state into the initial sequence number using a cryptographic hash of the client address, server address, port numbers, and a time-varying secret. The server discards state immediately after replying with SYN-ACK, reconstructing it only when the client returns a valid ACK containing the derived sequence number.
 
-```
-Normal Handshake:
-Client                    Server
-   |----SYN seq=x---------->|  Server allocates TCB, stores state
-   |<---SYN-ACK seq=y-------|  Server binds memory and resources
-   |----ACK seq=x+1-------->|  Connection established
-   
-SYN Flood Attack:
-Attacker (Spoofed IPs)     Server
-   |----SYN (IP A)--------->|  Allocate TCB
-   |----SYN (IP B)--------->|  Allocate TCB
-   |----SYN (IP C)--------->|  Allocate TCB
-   |----SYN (IP D)--------->|  Backlog queue fills
-   |----SYN (IP E)--------->|  Memory exhaustion, service denial
-   
-SYN Cookie Defense:
-Client                    Server
-   |----SYN seq=x---------->|  Compute cookie = hash(IPs, ports, secret, time)
-   |<---SYN-ACK seq=cookie--|  Send cookie, discard state
-   |----ACK seq=cookie+1--->|  Validate cookie, reconstruct state, accept
+```mermaid
+flowchart TD
+
+subgraph normal ["Normal TCP Handshake"]
+    direction LR
+    N_C["Client"]
+    N_S["Server"]
+
+    N_C -->|"SYN seq=x"| N_S1["Server: Allocate TCB, store state"]
+    N_S1 -->|"SYN-ACK seq=y"| N_C1["Client: Receives SYN-ACK\n(memory & resources bound)"]
+    N_C1 -->|"ACK seq=x+1"| N_S2["Server: Connection Established"]
+end
+
+subgraph flood ["SYN Flood Attack"]
+    direction LR
+    A_ATK["Attacker\n(Spoofed IPs)"]
+
+    A_ATK -->|"SYN IP-A"| F_S1["Server: Allocate TCB"]
+    A_ATK -->|"SYN IP-B"| F_S2["Server: Allocate TCB"]
+    A_ATK -->|"SYN IP-C"| F_S3["Server: Allocate TCB"]
+    A_ATK -->|"SYN IP-D"| F_S4["Server: Backlog Queue Fills"]
+    A_ATK -->|"SYN IP-E"| F_S5["Server: Memory Exhaustion\n⚠ Service Denied"]
+end
+
+subgraph cookie ["SYN Cookie Defense"]
+    direction LR
+    D_C["Client"]
+
+    D_C -->|"SYN seq=x"| D_S1["Server: Compute cookie =\nhash(IPs, ports, secret, time)"]
+    D_S1 -->|"SYN-ACK seq=cookie\n(state discarded)"| D_C1["Client: Receives SYN-ACK\nwith cookie"]
+    D_C1 -->|"ACK seq=cookie+1"| D_S2["Server: Validate cookie →\nReconstruct state → Accept"]
+end
+
+normal ~~~ flood
+flood ~~~ cookie
 ```
 
 The Domain Name System translates human-readable domain names into IP addresses through a hierarchical distributed database. DNS queries are typically transmitted over UDP port 53 without authentication, enabling cache poisoning attacks where an attacker injects fraudulent resource records into a resolver's cache. The Kaminsky attack exploits the birthday paradox to efficiently match the 16-bit transaction ID and ephemeral source port, allowing attackers to spoof authoritative responses before legitimate replies arrive. DNSSEC mitigates cache poisoning by cryptographically signing DNS records using RSASHA256 or ECDSAP256SHA256, allowing resolvers to validate the authenticity and integrity of responses via a chain of trust rooted in the DNS root zone's trust anchors.
 
 Transport Layer Security provides a secure channel over an untrusted network through a multi-phase handshake that negotiates protocol version, cipher suite, and cryptographic keys while authenticating the server and optionally the client. The TLS 1.3 handshake begins with a ClientHello message containing supported cipher suites, extensions, and an ephemeral key share for elliptic curve Diffie-Hellman. The server responds with ServerHello selecting the cipher suite, followed by EncryptedExtensions, CertificateVerify proving possession of the private key corresponding to the certificate, and Finished containing an HMAC over the handshake transcript. All messages after ServerHello are encrypted using keys derived from the shared secret.
 
-```
-TLS 1.3 Handshake (1-RTT):
+```mermaid
+flowchart LR
+    subgraph client_col ["Client"]
+        C1((" "))
+        C2((" "))
+        C3((" "))
+    end
 
-Client                                             Server
-   |                                                   |
-   |-------ClientHello + KeyShare------------------>  |
-   |  [cipher suites, extensions, ECDHE public key]   |
-   |                                                   |
-   |  <------ServerHello + KeyShare------------------| 
-   |  <------EncryptedExtensions---------------------| 
-   |  <------Certificate-----------------------------| 
-   |  <------CertificateVerify-----------------------| 
-   |  <------Finished (HMAC of transcript)-----------| 
-   |                                                   |
-   |-------Finished (HMAC of transcript)----------->  |
-   |                                                   |
-   |========Encrypted Application Data=============>  |
-   |<========Encrypted Application Data==============|
+    subgraph server_col ["Server"]
+        S1((" "))
+        S2((" "))
+        S3((" "))
+    end
+
+    subgraph flight1 ["Flight 1 → Client to Server"]
+        CH["ClientHello + KeyShare\n[cipher suites, extensions, ECDHE public key]"]
+    end
+
+    subgraph flight2 ["Flight 2 ← Server to Client"]
+        SH["ServerHello + KeyShare"]
+        EE["EncryptedExtensions"]
+        CERT["Certificate"]
+        CV["CertificateVerify"]
+        SF["Finished\n(HMAC of transcript)"]
+    end
+
+    subgraph flight3 ["Flight 3 → Client to Server"]
+        CF["Finished\n(HMAC of transcript)"]
+    end
+
+    subgraph appdata ["Encrypted Application Data"]
+        AD1["Client → Server\n(Encrypted Application Data)"]
+        AD2["Server → Client\n(Encrypted Application Data)"]
+    end
+
+    client_col --> CH
+    CH --> server_col
+    server_col --> SH
+    server_col --> EE
+    server_col --> CERT
+    server_col --> CV
+    server_col --> SF
+    SH --> client_col
+    EE --> client_col
+    CERT --> client_col
+    CV --> client_col
+    SF --> client_col
+    client_col --> CF
+    CF --> server_col
+    client_col --> AD1
+    AD1 --> server_col
+    server_col --> AD2
+    AD2 --> client_col
 ```
 
 Firewalls enforce network security policy by filtering packets based on header fields, connection state, and application-layer semantics. A stateless packet filter examines each packet in isolation, applying access control lists that specify source address, destination address, protocol, and port numbers. A stateful firewall tracks TCP connection state, permitting return traffic for established sessions while blocking unsolicited inbound packets. Next-generation firewalls integrate deep packet inspection, intrusion prevention signatures, TLS decryption, and application identification to enforce granular policies beyond transport-layer ports. An enterprise firewall policy typically implements a default-deny posture, explicitly permitting HTTP/HTTPS to web servers, SMTP to mail relays, SSH to bastion hosts, and DNS to resolvers while logging all denied connections for anomaly analysis.

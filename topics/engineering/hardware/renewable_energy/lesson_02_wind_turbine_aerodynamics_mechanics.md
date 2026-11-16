@@ -62,34 +62,40 @@ Yaw control algorithms face competing objectives: aggressive yaw tracking improv
 
 The control system architecture distributes processing across multiple embedded controllers connected via industrial networks: a turbine master controller coordinates overall state machine logic; pitch controllers, typically one per blade, manage individual pitch actuators; a converter controller commands the power electronics; and condition monitoring systems process sensor data from accelerometers, temperature sensors, oil debris monitors, and strain gauges. CAN bus or industrial Ethernet protocols link these controllers with deterministic real-time communication.
 
-```
-Tower & Nacelle Mechanical Assembly
-                    
-                        ╔════════════════════════════╗
-                        ║   NACELLE COMPONENTS       ║
-                        ╠════════════════════════════╣
-    Rotor Hub ──→ Main Shaft ──→ Gearbox ──→ Generator ──→ Power Converter
-         │              │            │            │               │
-         │              │            │            │               ↓
-    Pitch System    Main Brgs   Oil System   Slip Rings      Grid Connection
-         │              │            │            │
-         │              │            │            │
-         └──────────────┴────────────┴────────────┘
-                        │
-                   Yaw Bearing
-                        │
-                   Yaw Drives
-                        │
-                  ══════╪══════  ← Tower Top Flange
-                  ║     │     ║
-                  ║   Tower   ║  ← Tubular Steel, 80-120m
-                  ║   Tube    ║     Conical sections
-                  ║     │     ║     Bolted flanges
-                  ║     │     ║
-                  ══════╪══════  ← Foundation Interface
-                        │
-                    Foundation
-                  (Gravity or Pile)
+```mermaid
+flowchart TD
+    subgraph nacelle ["NACELLE COMPONENTS"]
+        RH["Rotor Hub"]
+        MS["Main Shaft"]
+        GB["Gearbox"]
+        GEN["Generator"]
+        PC["Power Converter"]
+
+        PS["Pitch System"]
+        MB["Main Bearings"]
+        OS["Oil System"]
+        SR["Slip Rings"]
+        GC["Grid Connection"]
+
+        RH --> MS --> GB --> GEN --> PC
+        PC --> GC
+
+        RH --- PS
+        MS --- MB
+        GB --- OS
+        GEN --- SR
+    end
+
+    nacelle --> YB["Yaw Bearing"]
+    YB --> YD["Yaw Drives"]
+    YD --> TF["Tower Top Flange"]
+
+    subgraph tower ["TOWER  —  Tubular Steel, 80–120 m"]
+        TF --> TT["Tower Tube\n(Conical sections, bolted flanges)"]
+        TT --> FI["Foundation Interface"]
+    end
+
+    FI --> FOUND["Foundation\n(Gravity or Pile)"]
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

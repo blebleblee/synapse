@@ -22,20 +22,30 @@ The newer Technic gear system introduced in the 2010s adds the 12-tooth double-b
 
 The following diagram illustrates a two-stage compound reduction feeding a rear-axle differential, which is the backbone layout of most Technic four-wheeled drive models:
 
-```
-[Motor Shaft]
-     │
-   [8t Spur]
-     │ 3:1 reduction
-   [24t Spur]──[Shared Axle]──[12t Bevel]
-                                    │ 90° turn, 1.67:1 reduction
-                               [20t Bevel]
-                                    │
-                            [Differential Housing]
-                           ┌────────┴────────┐
-                      [Left Halfshaft]   [Right Halfshaft]
-                           │                       │
-                     [Left Wheel]           [Right Wheel]
+```mermaid
+flowchart TD
+    A["Motor Shaft"]
+    B["8t Spur Gear"]
+    C["24t Spur Gear<br/>3:1 reduction"]
+    D["Shared Axle"]
+    E["12t Bevel Gear"]
+    F["20t Bevel Gear<br/>90° turn, 1.67:1 reduction"]
+    G["Differential Housing"]
+    H["Left Halfshaft"]
+    I["Right Halfshaft"]
+    J["Left Wheel"]
+    K["Right Wheel"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    G --> I
+    H --> J
+    I --> K
 ```
 
 The compound 3:1 spur reduction followed by the 1.67:1 bevel drive delivers a combined 5:1 overall reduction from motor to wheel. If the motor turns at 180 RPM under load, the wheels turn at 36 RPM. With a 56mm wheel (circumference ≈ 176mm), that produces a ground speed of roughly 6.3 meters per minute — appropriate for a heavy hauler, far too slow for a racing car, but tunable by adjusting the spur stage ratio without touching the bevel geometry.

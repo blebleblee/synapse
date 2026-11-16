@@ -42,28 +42,36 @@ The two concepts share the same connection topology (client → proxy → backen
 
 To understand the internal mechanics of a load balancer, it is most instructive to trace a single HTTP request from the moment a client's kernel sends a TCP SYN to the moment the client receives the final byte of the response body. The trace reveals the data structures and decision points that make the system work.
 
-```
-Client                   Load Balancer (L7)           Backend Pool
-  |                            |                     [B1] [B2] [B3]
-  |------- TCP SYN ----------->|                       |    |    |
-  |<------ SYN-ACK ------------|                       |    |    |
-  |------- ACK --------------->|  (TCP conn established to LB)
-  |                            |
-  |------- TLS ClientHello --->|
-  |<------ TLS ServerHello ----|  (TLS terminated at LB)
-  |        (Certificate)       |
-  |------- TLS Finished ------>|
-  |                            |
-  |------- HTTP GET /api/v1 -->|
-  |                            |------ SELECT BACKEND (policy) ------>
-  |                            |             [B2 selected]
-  |                            |------ TCP SYN ---------------------->|B2|
-  |                            |<----- SYN-ACK ---------------------|B2|
-  |                            |------ ACK ------------------------->|B2|
-  |                            |------ HTTP GET /api/v1 (+ headers)->|B2|
-  |                            |<----- HTTP 200 OK + body ----------|B2|
-  |<------ HTTP 200 OK + body--|
-  |                            |
+```mermaid
+flowchart TD
+    Client["Client"]
+    LB["Load Balancer (L7)"]
+
+    subgraph pool ["Backend Pool"]
+        B1["B1"]
+        B2["B2"]
+        B3["B3"]
+    end
+
+    Client -- "TCP SYN" --> LB
+    LB -- "SYN-ACK" --> Client
+    Client -- "ACK\n(TCP established to LB)" --> LB
+
+    Client -- "TLS ClientHello" --> LB
+    LB -- "TLS ServerHello + Certificate" --> Client
+    Client -- "TLS Finished\n(TLS terminated at LB)" --> LB
+
+    Client -- "HTTP GET /api/v1" --> LB
+
+    LB -- "Select backend\n(policy → B2 selected)" --> B2
+
+    LB -- "TCP SYN" --> B2
+    B2 -- "SYN-ACK" --> LB
+    LB -- "ACK\n(TCP established to B2)" --> B2
+
+    LB -- "HTTP GET /api/v1\n(+ forwarded headers)" --> B2
+    B2 -- "HTTP 200 OK + body" --> LB
+    LB -- "HTTP 200 OK + body" --> Client
 ```
 
 When the client's SYN arrives at the load balancer's NIC, the kernel's network stack processes it through the socket receive path. The load balancer process (or kernel module) has a listening socket bound to the VIP. The kernel completes the TCP three-way handshake and delivers the new socket file descriptor to the load balancer's accept loop. At this point, the load balancer owns a fully established TCP connection with the client but has not yet made any routing decision — it cannot, because HTTP routing requires reading the request headers, and those have not arrived yet.
@@ -110,14 +118,23 @@ For databases and other stateful services, the health check may need to execute 
 
 The state machine governing a backend member's health transitions is straightforward but its parameters require careful tuning:
 
-```
-         check_interval = 5s
-         rise = 2 (consecutive passes to go HEALTHY)
-         fall = 3 (consecutive failures to go UNHEALTHY)
+```mermaid
+flowchart TD
+    CONFIG["⚙️ Health Check Config\ncheck_interval = 5s\nrise = 2 (passes → HEALTHY)\nfall = 3 (failures → UNHEALTHY)"]
 
-  HEALTHY ──(3 consecutive failures)──> UNHEALTHY
-  UNHEALTHY ──(2 consecutive passes)──> HEALTHY
-  HEALTHY/UNHEALTHY ──(first check)──> STARTING (warmup state)
+    STARTING["🔄 STARTING\n(Warmup State)"]
+    HEALTHY["✅ HEALTHY"]
+    UNHEALTHY["❌ UNHEALTHY"]
+
+    CONFIG -.->|"governs"| STARTING
+    CONFIG -.->|"governs"| HEALTHY
+    CONFIG -.->|"governs"| UNHEALTHY
+
+    HEALTHY -->|"first check"| STARTING
+    UNHEALTHY -->|"first check"| STARTING
+
+    HEALTHY -->|"3 consecutive failures"| UNHEALTHY
+    UNHEALTHY -->|"2 consecutive passes"| HEALTHY
 ```
 
 The `rise` and `fall` thresholds exist to prevent flapping: a backend that oscillates between passing and failing checks should not be continuously added to and removed from the pool, as that would create request-distribution instability. The `fall` threshold of 3 means a backend must fail three consecutive checks before being removed, providing hysteresis against transient failures.

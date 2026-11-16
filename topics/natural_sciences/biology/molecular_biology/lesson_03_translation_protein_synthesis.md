@@ -40,29 +40,39 @@ Quality control pathways surveil the proteome for misfolded species. The ubiquit
 
 The ribosome's functional architecture emerges from the interplay of its RNA scaffold and protein cofactors. The small subunit contains a single rRNA molecule—16S in bacteria, 18S in eukaryotes—folded into a complex three-dimensional structure stabilized by approximately thirty ribosomal proteins. The small subunit's body, platform, and head domains undergo dynamic motions during the elongation cycle, with the head rotating relative to the body during translocation. The decoding center, located in the neck region between head and body, comprises highly conserved rRNA nucleotides that interrogate codon-anticodon helix geometry.
 
-```
-Prokaryotic Ribosome Architecture (E. coli 70S)
-
-Small Subunit (30S):                Large Subunit (50S):
-16S rRNA (1542 nt)                  23S rRNA (2904 nt)
-21 ribosomal proteins               5S rRNA (120 nt)
-                                    31 ribosomal proteins
-
-                    ┌──────────────┐
-                    │     Head     │ (rotation during translocation)
-                    └──────┬───────┘
-                           │
-         ┌─────────────────┼─────────────────┐
-         │    Decoding     │  Peptidyl        │
-         │    Center       │  Transferase     │
-         │   (A-site       │    Center        │
-         │    codon        │  (catalytic      │
-         │  recognition)   │   ribozyme)      │
-         └─────────────────┴─────────────────┘
-                ▲                    ▲
-                │                    │
-            mRNA path           Nascent chain
-           (5'→3' motion)       exit tunnel
+```mermaid
+flowchart TD
+    subgraph small["Small Subunit (30S)"]
+        S1["16S rRNA (1542 nt)"]
+        S2["21 ribosomal proteins"]
+    end
+    
+    subgraph large["Large Subunit (50S)"]
+        L1["23S rRNA (2904 nt)"]
+        L2["5S rRNA (120 nt)"]
+        L3["31 ribosomal proteins"]
+    end
+    
+    Head["Head<br/>(rotation during translocation)"]
+    
+    DC["Decoding Center<br/>(A-site codon recognition)"]
+    PTC["Peptidyl Transferase Center<br/>(catalytic ribozyme)"]
+    
+    mRNA["mRNA path<br/>(5'→3' motion)"]
+    Exit["Nascent chain<br/>exit tunnel"]
+    
+    small -.-> Head
+    large -.-> Head
+    
+    Head --> DC
+    Head --> PTC
+    
+    mRNA --> DC
+    Exit --> PTC
+    
+    style Head fill:#e1f5ff
+    style DC fill:#fff4e1
+    style PTC fill:#ffe1f5
 ```
 
 The large subunit houses two rRNA species—23S and 5S in bacteria, 28S, 5.8S, and 5S in eukaryotes—along with thirty or more ribosomal proteins. The peptidyl transferase center resides in a deep cleft formed by 23S rRNA domain V, where the 3′ ends of A-site and P-site tRNAs converge. The active site contains no protein components within a 20 Å radius of the reaction center; catalysis depends entirely on rRNA functional groups. Crystallographic studies identified a universally conserved adenine residue (A2451 in E. coli) positioned to stabilize the tetrahedral transition state through hydrogen bonding, though the precise catalytic mechanism—whether involving proton shuttling or electrostatic stabilization—remains debated.

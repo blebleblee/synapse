@@ -64,25 +64,40 @@ The partition model enables horizontal scaling by distributing partitions across
 
 Consumer group semantics enable parallel processing with exactly-once delivery guarantees. A consumer group consists of multiple consumer instances cooperating to process a topic. The broker assigns each partition to exactly one consumer in the group, ensuring that each event is processed by precisely one consumer instance. When a consumer joins or leaves the group, the broker triggers a rebalance operation that redistributes partition assignments. This automatic load balancing allows scaling consumer throughput by adding instances to the group, up to the number of partitions in the topic.
 
-```
-Consumer Group Partition Assignment
-════════════════════════════════════════════════════════════════
+```mermaid
+flowchart TD
+    subgraph topic ["Topic: orders (6 partitions)"]
+        P0["P0"]
+        P1["P1"]
+        P2["P2"]
+        P3["P3"]
+        P4["P4"]
+        P5["P5"]
+    end
 
-Topic: orders (6 partitions)
-┌─────┬─────┬─────┬─────┬─────┬─────┐
-│ P0  │ P1  │ P2  │ P3  │ P4  │ P5  │
-└──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┘
-   │     │     │     │     │     │
-   │     │     │     │     │     │
-   ▼     ▼     ▼     ▼     ▼     ▼
+    subgraph group ["Consumer Group: order-processors (3 instances)"]
+        CA["Consumer A
+Assigned: P0, P1
+Offset P0: 847
+Offset P1: 901"]
 
-Consumer Group: order-processors (3 instances)
-┌────────────────┐  ┌────────────────┐  ┌────────────────┐
-│  Consumer A    │  │  Consumer B    │  │  Consumer C    │
-│  Assigned: P0,P1│  │  Assigned: P2,P3│  │  Assigned: P4,P5│
-│  Offset P0: 847│  │  Offset P2: 923│  │  Offset P4: 1102│
-│  Offset P1: 901│  │  Offset P3: 856│  │  Offset P5: 1087│
-└────────────────┘  │────────────────│  │────────────────│
+        CB["Consumer B
+Assigned: P2, P3
+Offset P2: 923
+Offset P3: 856"]
+
+        CC["Consumer C
+Assigned: P4, P5
+Offset P4: 1102
+Offset P5: 1087"]
+    end
+
+    P0 --> CA
+    P1 --> CA
+    P2 --> CB
+    P3 --> CB
+    P4 --> CC
+    P5 --> CC
 ```
 
 Exactly-once semantics—the guarantee that each event is processed precisely once despite failures and retries—requires careful coordination between event processing and offset commits. The naive approach of processing an event and then committing its offset to the broker suffers from a race condition: if the consumer crashes after processing but before committing, the event will be reprocessed on restart, yielding at-least-once semantics. If the consumer commits the offset before processing and then crashes, the event is lost, yielding at-most-once semantics. True exactly-once requires transactional coupling of business logic side effects and offset commits. Modern stream processors achieve this through two-phase commit protocols: business logic writes are staged in a transaction, the offset commit is added to the same transaction, and the entire transaction is atomically committed. If any component fails, the entire transaction rolls back and replay proceeds from the last committed offset.

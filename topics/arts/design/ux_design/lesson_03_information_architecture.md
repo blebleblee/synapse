@@ -26,61 +26,67 @@ Information architecture operates through four primary structural models: hierar
 
 Hierarchical trees organize content into parent-child relationships where each item has exactly one parent. This structure excels when content exhibits natural taxonomic boundaries. A music education platform might organize lessons into a hierarchy: instrument family at the top level, specific instruments at the second level, technique categories at the third level, and individual lessons at the leaves. Users navigate by progressively narrowing scope, a pattern that maps cleanly to how humans categorize knowledge. The tree structure guarantees that users can always answer "where am I?" by tracing the path from root to current node. This spatial certainty is the tree's primary cognitive advantage.
 
-```
-Music Education Platform — Hierarchical Tree
+```mermaid
+flowchart TD
+    root["All Instruments"]
 
-Root: All Instruments
-├─ Strings
-│  ├─ Bass Guitar
-│  │  ├─ Technique Fundamentals
-│  │  │  ├─ Lesson: Floating Thumb Muting
-│  │  │  ├─ Lesson: Simandl 1-2-4 Fingering
-│  │  │  └─ Lesson: String Crossing Economy
-│  │  ├─ Theory & Harmony
-│  │  │  ├─ Lesson: Walking Bass Lines
-│  │  │  └─ Lesson: Modal Fingerings
-│  │  └─ Rhythm & Time Feel
-│  │     └─ Lesson: Subdividing Odd Meters
-│  └─ Guitar
-│     ├─ Fingerstyle Technique
-│     └─ CAGED System Theory
-└─ Keyboards
-   ├─ Piano
-   │  ├─ Hand Position Mechanics
-   │  ├─ Chord Voicings
-   │  └─ Sight Reading Drills
-   └─ Synthesizers
-      ├─ Subtractive Synthesis
-      └─ Modular Eurorack Patching
+    root --> strings["Strings"]
+    root --> keyboards["Keyboards"]
+
+    strings --> bass_guitar["Bass Guitar"]
+    strings --> guitar["Guitar"]
+
+    bass_guitar --> technique_fundamentals["Technique Fundamentals"]
+    bass_guitar --> theory_harmony["Theory & Harmony"]
+    bass_guitar --> rhythm_time["Rhythm & Time Feel"]
+
+    technique_fundamentals --> lesson_floating_thumb["Lesson: Floating Thumb Muting"]
+    technique_fundamentals --> lesson_simandl["Lesson: Simandl 1-2-4 Fingering"]
+    technique_fundamentals --> lesson_string_crossing["Lesson: String Crossing Economy"]
+
+    theory_harmony --> lesson_walking_bass["Lesson: Walking Bass Lines"]
+    theory_harmony --> lesson_modal["Lesson: Modal Fingerings"]
+
+    rhythm_time --> lesson_odd_meters["Lesson: Subdividing Odd Meters"]
+
+    guitar --> fingerstyle["Fingerstyle Technique"]
+    guitar --> caged["CAGED System Theory"]
+
+    keyboards --> piano["Piano"]
+    keyboards --> synths["Synthesizers"]
+
+    piano --> hand_position["Hand Position Mechanics"]
+    piano --> chord_voicings["Chord Voicings"]
+    piano --> sight_reading["Sight Reading Drills"]
+
+    synths --> subtractive["Subtractive Synthesis"]
+    synths --> modular["Modular Eurorack Patching"]
 ```
 
 The failure modes of hierarchical architecture emerge when content relationships resist strict categorization. A lesson on "syncopated slap bass rhythms" could reasonably live under "Technique Fundamentals" or "Rhythm & Time Feel." Forcing a single hierarchical position requires the architect to predict which path users will most likely follow, a prediction that may diverge from actual user behavior. Cross-referencing—placing the same content in multiple branches—appears to solve this problem but violates the tree structure and introduces maintenance burden. If the lesson is updated, every instance must be synchronized. Alternatively, the architect can place the lesson in one location and provide a link from the other, but this transforms the pure tree into a hybrid structure and introduces the "where is the canonical version?" ambiguity.
 
 Network graphs abandon strict hierarchy in favor of many-to-many relationships. Each node can connect to any other node, and users navigate by following links between related content. Wikipedia exemplifies this structure: articles link bidirectionally to related concepts, allowing users to explore knowledge associatively rather than taxonomically. For creative disciplines, network navigation maps naturally to conceptual relationships. A lesson on "modal interchange" might link to lessons on "functional harmony," "borrowed chords," "parallel major-minor tonality," and "Bill Evans voicings," reflecting the actual conceptual web that musicians navigate when learning this topic. Network architectures excel at supporting exploratory learning and serendipitous discovery.
 
-```
-Network Graph — Modal Harmony Concepts
-
-         ┌──────────────────┐
-         │ Modal Interchange│
-         │   (Current Node) │
-         └─────────┬────────┘
-                   │
-         ┌─────────┼─────────┬─────────────────┐
-         │         │         │                 │
-         ▼         ▼         ▼                 ▼
-    ┌────────┐ ┌─────────┐ ┌──────────┐ ┌──────────────┐
-    │Borrowed│ │Secondary│ │Parallel  │ │Bill Evans    │
-    │Chords  │ │Dominants│ │Major/Min.│ │Voicings      │
-    └────┬───┘ └────┬────┘ └────┬─────┘ └───────┬──────┘
-         │          │           │                │
-         └──────────┴───────────┴────────────────┘
-                          │
-                    ┌─────▼─────────┐
-                    │Functional     │
-                    │Harmony        │
-                    │(Root Context) │
-                    └───────────────┘
+```mermaid
+flowchart TD
+    A["Modal Interchange<br/>(Current Node)"]
+    
+    B["Borrowed Chords"]
+    C["Secondary Dominants"]
+    D["Parallel Major/Minor"]
+    E["Bill Evans Voicings"]
+    
+    F["Functional Harmony<br/>(Root Context)"]
+    
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    
+    B --> F
+    C --> F
+    D --> F
+    E --> F
 ```
 
 The cognitive cost of network architectures is disorientation. Without a fixed hierarchical position, users can lose track of how they arrived at the current node and struggle to return to a starting point. Breadcrumb trails—visual indicators showing the path traversed—mitigate this by providing a linear history, but they only work for sequential exploration. If a user follows links in a branching pattern, the breadcrumb collapses into a single linear path that omits alternate branches explored. Effective network architectures must provide persistent orientation landmarks: a fixed navigation menu, a visible site map, or a "home" anchor that remains accessible from any node. Without these landmarks, users experience the "lost in hyperspace" phenomenon, where they know content exists but cannot construct a mental map of how to reach it reliably.
@@ -119,21 +125,34 @@ The failure mode of sequential architecture is rigidity. Expert users who alread
 
 Matrix organizations structure content along two orthogonal dimensions, creating a grid where users navigate by selecting coordinates. A sample library browser might organize sounds along a vertical axis of instrument families and a horizontal axis of articulation types. Users scan the matrix to find the intersection of desired attributes: "Strings + Staccato" or "Brass + Sustained Legato." Matrix navigation works exceptionally well when content naturally decomposes into two dominant facets and when the resulting grid remains small enough to display in a single view. Beyond approximately fifty cells, matrix layouts become visually dense and require scrolling or pagination, which undermines their spatial clarity advantage.
 
-```
-Matrix Organization — Sample Library Browser
-
-                │ Staccato │ Legato │ Pizzicato │ Tremolo │
-────────────────┼──────────┼────────┼───────────┼─────────┤
-Strings Section │   [48]   │  [72]  │   [36]    │  [24]   │
-────────────────┼──────────┼────────┼───────────┼─────────┤
-Brass Section   │   [32]   │  [56]  │    —      │  [16]   │
-────────────────┼──────────┼────────┼───────────┼─────────┤
-Woodwinds       │   [28]   │  [44]  │    —      │   —     │
-────────────────┼──────────┼────────┼───────────┼─────────┤
-Percussion      │   [64]   │   —    │    —      │  [12]   │
-────────────────┴──────────┴────────┴───────────┴─────────┘
-
-(Numbers indicate available sample count per cell)
+```mermaid
+flowchart TD
+    Title["Matrix Organization — Sample Library Browser"]
+    
+    Title --> StringsSection["Strings Section"]
+    Title --> BrassSection["Brass Section"]
+    Title --> Woodwinds["Woodwinds"]
+    Title --> Percussion["Percussion"]
+    
+    StringsSection --> S_Staccato["Staccato<br/>48 samples"]
+    StringsSection --> S_Legato["Legato<br/>72 samples"]
+    StringsSection --> S_Pizzicato["Pizzicato<br/>36 samples"]
+    StringsSection --> S_Tremolo["Tremolo<br/>24 samples"]
+    
+    BrassSection --> B_Staccato["Staccato<br/>32 samples"]
+    BrassSection --> B_Legato["Legato<br/>56 samples"]
+    BrassSection --> B_Pizzicato["Pizzicato<br/>—"]
+    BrassSection --> B_Tremolo["Tremolo<br/>16 samples"]
+    
+    Woodwinds --> W_Staccato["Staccato<br/>28 samples"]
+    Woodwinds --> W_Legato["Legato<br/>44 samples"]
+    Woodwinds --> W_Pizzicato["Pizzicato<br/>—"]
+    Woodwinds --> W_Tremolo["Tremolo<br/>—"]
+    
+    Percussion --> P_Staccato["Staccato<br/>64 samples"]
+    Percussion --> P_Legato["Legato<br/>—"]
+    Percussion --> P_Pizzicato["Pizzicato<br/>—"]
+    Percussion --> P_Tremolo["Tremolo<br/>12 samples"]
 ```
 
 Hybrid architectures combine multiple models to leverage their respective strengths. A music streaming service typically employs a hierarchical top-level navigation (Home, Browse, Library, Search), network-style content relationships within playlists (algorithmically linked songs, "listeners also enjoyed"), sequential flows for onboarding new users, and matrix layouts for browsing grid-based content like album covers. The challenge in hybrid design is maintaining consistency at transition boundaries. When a user moves from a hierarchical section to a network-linked recommendation, do they maintain positional context? Does the back button return them to the hierarchical position or to the previous network node? Inconsistent behavior at these boundaries fragments the user's mental model and forces them to relearn navigation rules contextually.

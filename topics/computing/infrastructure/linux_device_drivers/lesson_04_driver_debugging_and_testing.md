@@ -21,19 +21,29 @@ The kernel enforces some of these invariants at runtime (via `might_sleep()`, `B
 The following diagram captures the actual lifecycle of a platform/PCI driver, including the often-overlooked runtime PM transitions that are a frequent source of bugs in power-managed systems.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Registered : driver_register()
-    Registered --> Probing : bus match succeeds
-    Probing --> Active : probe() returns 0
-    Probing --> Registered : probe() returns error
-    Active --> Suspending : system suspend / rpm_suspend()
-    Suspending --> Suspended : suspend() returns 0
-    Suspended --> Resuming : system resume / rpm_resume()
-    Resuming --> Active : resume() returns 0
-    Active --> Removing : device unbind / hot-unplug
-    Suspended --> Removing : device unbind during suspend
-    Removing --> Registered : remove() completes
-    Registered --> [*] : driver_unregister()
+flowchart TD
+    Start(["[*]"])
+    Registered["Registered"]
+    Probing["Probing"]
+    Active["Active"]
+    Suspending["Suspending"]
+    Suspended["Suspended"]
+    Resuming["Resuming"]
+    Removing["Removing"]
+    End(["[*]"])
+    
+    Start -->|driver_register| Registered
+    Registered -->|"bus match succeeds"| Probing
+    Probing -->|"probe returns 0"| Active
+    Probing -->|"probe returns error"| Registered
+    Active -->|"system suspend / rpm_suspend"| Suspending
+    Suspending -->|"suspend returns 0"| Suspended
+    Suspended -->|"system resume / rpm_resume"| Resuming
+    Resuming -->|"resume returns 0"| Active
+    Active -->|"device unbind / hot-unplug"| Removing
+    Suspended -->|"device unbind during suspend"| Removing
+    Removing -->|"remove completes"| Registered
+    Registered -->|driver_unregister| End
 ```
 
 The transition from `Suspended → Removing` deserves special attention. If a USB device is physically unplugged while the system is asleep, the kernel may call `remove()` without first calling `resume()`. Drivers that hold DMA buffers or hardware register mappings mapped via `ioremap()` must handle this path explicitly, or they will attempt to access resources that the hardware has already torn down.
@@ -731,3 +741,4 @@ def find_device_sysfs():
         base = os.path.dirname(vendor_path)
         try:
             vendor =
+```

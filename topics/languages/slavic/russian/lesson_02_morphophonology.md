@@ -104,24 +104,24 @@ The practitioner-critical insight here is that Russian verbal morphology operate
 
 The following diagram maps the derivational architecture of a typical mutating verb:
 
-```
-Underlying Lexical Entry: /pis-/ + conjugation class marker
+```mermaid
+flowchart TD
+    ROOT["Underlying Lexical Entry\n/pis-/ + conjugation class marker"]
 
-           ┌─────────────────────────────────────────┐
-           │             VERBAL PARADIGM              │
-           └─────────────────────────────────────────┘
-                              │
-           ┌──────────────────┴──────────────────┐
-           │                                     │
-    INFINITIVE STEM                        PRESENT STEM
-    /pis-/ (base)                          /piš-/ (iotation)
-           │                                     │
-    ┌──────┼──────┐                   ┌──────┬───┴───┐
-    │      │      │                   │      │       │
- Past   Past   Verbal            Present  Imper-  Present
- Tense  Pass.  Noun              Tense    ative   Participle
- писал  Ptcp.  писание           пишу     пиши    пишущий
-        писан-                   пишешь
+    ROOT --> PARADIGM
+
+    subgraph PARADIGM ["VERBAL PARADIGM"]
+        INF_STEM["INFINITIVE STEM\n/pis-/ (base)"]
+        PRES_STEM["PRESENT STEM\n/piš-/ (iotation)"]
+
+        INF_STEM --> PAST_TENSE["Past Tense\nписал"]
+        INF_STEM --> PAST_PASS["Past Passive\nParticiple\nписан-"]
+        INF_STEM --> VERBAL_NOUN["Verbal Noun\nписание"]
+
+        PRES_STEM --> PRES_TENSE["Present Tense\nпишу\nпишешь"]
+        PRES_STEM --> IMPERATIVE["Imperative\nпиши"]
+        PRES_STEM --> PRES_PART["Present\nParticiple\nпишущий"]
+    end
 ```
 
 This two-stem architecture is the master key to predicting surface forms across the entire verbal system. Any apparent irregularity in conjugation almost always resolves to either (a) an unpredictable present stem that must be memorized, or (b) a productive mutation rule applying to a known present stem.

@@ -32,38 +32,42 @@ Third declension feminine nouns ending in *-ь* such as *ночь* (night) prese
 
 The first declension paradigm governs the majority of Russian feminine nouns and a small but high-frequency set of masculine nouns denoting male persons. The declension operates under a hard/soft dichotomy determined by stem-final consonant quality. Hard-stem variants take back-vowel suffixes (*-а, -ы, -е, -у, -ой*) while soft stems select front-vowel alternants (*-я, -и, -е, -ю, -ей*). The paradigmatic template distributes case-number exponents across twelve cells (six cases in singular and plural), though syncretism collapses several distinctions.
 
-```
-Singular Declension (Hard Stem: книга "book")
-├─ Nominative:    книга      (subject, predicate nominal)
-├─ Accusative:    книгу      (direct object, motion goal)
-├─ Genitive:      книги      (possession, partitive, negation)
-├─ Dative:        книге      (indirect object, beneficiary)
-├─ Instrumental:  книгой     (means, accompaniment)
-└─ Prepositional: книге      (location, topic with prepositions)
-
-Singular Declension (Soft Stem: земля "earth/land")
-├─ Nominative:    земля
-├─ Accusative:    землю
-├─ Genitive:      земли
-├─ Dative:        земле
-├─ Instrumental:  землёй/землёю
-└─ Prepositional: земле
-
-Plural Declension (Hard Stem: книги "books")
-├─ Nominative:    книги
-├─ Accusative:    книги      (inanimate = nominative)
-├─ Genitive:      книг       (zero ending with fleeting vowel rules)
-├─ Dative:        книгам
-├─ Instrumental:  книгами
-└─ Prepositional: книгах
-
-Plural Declension (Soft Stem: земли "lands")
-├─ Nominative:    земли
-├─ Accusative:    земли
-├─ Genitive:      земель     (inserted fleeting vowel е/о)
-├─ Dative:        землям
-├─ Instrumental:  землями
-└─ Prepositional: землях
+```mermaid
+flowchart TD
+    Root["Russian Feminine Noun Declension"]
+    
+    Root --> SingHard["Singular Declension<br/>Hard Stem: книга 'book'"]
+    Root --> SingSoft["Singular Declension<br/>Soft Stem: земля 'earth/land'"]
+    Root --> PlurHard["Plural Declension<br/>Hard Stem: книги 'books'"]
+    Root --> PlurSoft["Plural Declension<br/>Soft Stem: земли 'lands'"]
+    
+    SingHard --> SH_Nom["Nominative: книга<br/>(subject, predicate nominal)"]
+    SingHard --> SH_Acc["Accusative: книгу<br/>(direct object, motion goal)"]
+    SingHard --> SH_Gen["Genitive: книги<br/>(possession, partitive, negation)"]
+    SingHard --> SH_Dat["Dative: книге<br/>(indirect object, beneficiary)"]
+    SingHard --> SH_Ins["Instrumental: книгой<br/>(means, accompaniment)"]
+    SingHard --> SH_Pre["Prepositional: книге<br/>(location, topic with prepositions)"]
+    
+    SingSoft --> SS_Nom["Nominative: земля"]
+    SingSoft --> SS_Acc["Accusative: землю"]
+    SingSoft --> SS_Gen["Genitive: земли"]
+    SingSoft --> SS_Dat["Dative: земле"]
+    SingSoft --> SS_Ins["Instrumental: землёй/землёю"]
+    SingSoft --> SS_Pre["Prepositional: земле"]
+    
+    PlurHard --> PH_Nom["Nominative: книги"]
+    PlurHard --> PH_Acc["Accusative: книги<br/>(inanimate = nominative)"]
+    PlurHard --> PH_Gen["Genitive: книг<br/>(zero ending with fleeting vowel rules)"]
+    PlurHard --> PH_Dat["Dative: книгам"]
+    PlurHard --> PH_Ins["Instrumental: книгами"]
+    PlurHard --> PH_Pre["Prepositional: книгах"]
+    
+    PlurSoft --> PS_Nom["Nominative: земли"]
+    PlurSoft --> PS_Acc["Accusative: земли"]
+    PlurSoft --> PS_Gen["Genitive: земель<br/>(inserted fleeting vowel е/о)"]
+    PlurSoft --> PS_Dat["Dative: землям"]
+    PlurSoft --> PS_Ins["Instrumental: землями"]
+    PlurSoft --> PS_Pre["Prepositional: землях"]
 ```
 
 Critical syncretism patterns emerge in this declension: dative and prepositional collapse in the singular, while nominative and accusative merge in both singular inanimate and all plural forms. The genitive plural presents maximum allomorphic complexity due to zero-ending realization triggering fleeting vowel insertion (*книг-∅ → книг* but *сестра → сестёр* with inserted *-ё-*) to satisfy Russian phonotactic prohibition against certain consonant clusters. Stress mobility further complicates the picture, with some nouns shifting stress between stem and ending across paradigmatic cells (*стена́/сте́ны* "wall/walls").
@@ -72,70 +76,97 @@ Critical syncretism patterns emerge in this declension: dative and prepositional
 
 The second declension encompasses two morphologically distinct gender classes that share similar case-marking patterns. Masculine nouns appear in zero, *-й*, or soft-sign variants, while neuter nouns uniformly terminate in *-о* or *-е*. The animacy distinction activates critically in this declension, creating accusative-genitive syncretism for animate masculine singulars and all animate plurals regardless of gender.
 
-```
-Singular Masculine Hard (стол "table" - inanimate)
-├─ Nominative:    стол       (zero ending)
-├─ Accusative:    стол       (= nominative for inanimates)
-├─ Genitive:      стола
-├─ Dative:        столу
-├─ Instrumental:  столом
-└─ Prepositional: столе
+```mermaid
+flowchart TD
+    ROOT(["Russian Noun Declension"])
 
-Singular Masculine Hard (студент "student" - animate)
-├─ Nominative:    студент
-├─ Accusative:    студента   (= genitive for animates)
-├─ Genitive:      студента
-├─ Dative:        студенту
-├─ Instrumental:  студентом
-└─ Prepositional: студенте
+    subgraph SG_MASC ["Singular Masculine"]
+        subgraph SG_MASC_HARD_INANIM ["Hard · Inanimate — стол (table)"]
+            SMI_NOM["Nominative: стол (zero ending)"]
+            SMI_ACC["Accusative: стол (= Nom, inanimate)"]
+            SMI_GEN["Genitive: стола"]
+            SMI_DAT["Dative: столу"]
+            SMI_INS["Instrumental: столом"]
+            SMI_PRE["Prepositional: столе"]
+        end
+        subgraph SG_MASC_HARD_ANIM ["Hard · Animate — студент (student)"]
+            SMA_NOM["Nominative: студент"]
+            SMA_ACC["Accusative: студента (= Gen, animate)"]
+            SMA_GEN["Genitive: студента"]
+            SMA_DAT["Dative: студенту"]
+            SMA_INS["Instrumental: студентом"]
+            SMA_PRE["Prepositional: студенте"]
+        end
+        subgraph SG_MASC_SOFT ["Soft — музей (museum)"]
+            SMS_NOM["Nominative: музей"]
+            SMS_ACC["Accusative: музей"]
+            SMS_GEN["Genitive: музея"]
+            SMS_DAT["Dative: музею"]
+            SMS_INS["Instrumental: музеем"]
+            SMS_PRE["Prepositional: музее"]
+        end
+    end
 
-Singular Masculine Soft (музей "museum")
-├─ Nominative:    музей
-├─ Accusative:    музей
-├─ Genitive:      музея
-├─ Dative:        музею
-├─ Instrumental:  музеем
-└─ Prepositional: музее
+    subgraph SG_NEUT ["Singular Neuter"]
+        subgraph SG_NEUT_HARD ["Hard — окно (window)"]
+            SNH_NOM["Nominative: окно"]
+            SNH_ACC["Accusative: окно (no animacy effect)"]
+            SNH_GEN["Genitive: окна"]
+            SNH_DAT["Dative: окну"]
+            SNH_INS["Instrumental: окном"]
+            SNH_PRE["Prepositional: окне"]
+        end
+        subgraph SG_NEUT_SOFT ["Soft — море (sea)"]
+            SNS_NOM["Nominative: море"]
+            SNS_ACC["Accusative: море"]
+            SNS_GEN["Genitive: моря"]
+            SNS_DAT["Dative: морю"]
+            SNS_INS["Instrumental: морем"]
+            SNS_PRE["Prepositional: море"]
+        end
+    end
 
-Singular Neuter Hard (окно "window")
-├─ Nominative:    окно
-├─ Accusative:    окно       (neuters never show animacy effects)
-├─ Genitive:      окна
-├─ Dative:        окну
-├─ Instrumental:  окном
-└─ Prepositional: окне
+    subgraph PL ["Plural"]
+        subgraph PL_MASC_INANIM ["Masculine · Inanimate — столы (tables)"]
+            PMI_NOM["Nominative: столы"]
+            PMI_ACC["Accusative: столы (= Nom, inanimate)"]
+            PMI_GEN["Genitive: столов"]
+            PMI_DAT["Dative: столам"]
+            PMI_INS["Instrumental: столами"]
+            PMI_PRE["Prepositional: столах"]
+        end
+        subgraph PL_MASC_ANIM ["Masculine · Animate — студенты (students)"]
+            PMA_NOM["Nominative: студенты"]
+            PMA_ACC["Accusative: студентов (= Gen, animate)"]
+            PMA_GEN["Genitive: студентов"]
+            PMA_DAT["Dative: студентам"]
+            PMA_INS["Instrumental: студентами"]
+            PMA_PRE["Prepositional: студентах"]
+        end
+        subgraph PL_NEUT ["Neuter — окна (windows)"]
+            PN_NOM["Nominative: окна"]
+            PN_ACC["Accusative: окна"]
+            PN_GEN["Genitive: окон (zero ending)"]
+            PN_DAT["Dative: окнам"]
+            PN_INS["Instrumental: окнами"]
+            PN_PRE["Prepositional: окнах"]
+        end
+    end
 
-Singular Neuter Soft (море "sea")
-├─ Nominative:    море
-├─ Accusative:    море
-├─ Genitive:      моря
-├─ Dative:        морю
-├─ Instrumental:  морем
-└─ Prepositional: море
+    ROOT --> SG_MASC
+    ROOT --> SG_NEUT
+    ROOT --> PL
 
-Plural Masculine (столы "tables" - inanimate)
-├─ Nominative:    столы
-├─ Accusative:    столы      (= nominative for inanimates)
-├─ Genitive:      столов
-├─ Dative:        столам
-├─ Instrumental:  столами
-└─ Prepositional: столах
+    SG_MASC_HARD_INANIM --> SMI_NOM & SMI_ACC & SMI_GEN & SMI_DAT & SMI_INS & SMI_PRE
+    SG_MASC_HARD_ANIM  --> SMA_NOM & SMA_ACC & SMA_GEN & SMA_DAT & SMA_INS & SMA_PRE
+    SG_MASC_SOFT       --> SMS_NOM & SMS_ACC & SMS_GEN & SMS_DAT & SMS_INS & SMS_PRE
 
-Plural Masculine (студенты "students" - animate)
-├─ Nominative:    студенты
-├─ Accusative:    студентов  (= genitive for animates)
-├─ Genitive:      студентов
-├─ Dative:        студентам
-├─ Instrumental:  студентами
-└─ Prepositional: студентах
+    SG_NEUT_HARD --> SNH_NOM & SNH_ACC & SNH_GEN & SNH_DAT & SNH_INS & SNH_PRE
+    SG_NEUT_SOFT --> SNS_NOM & SNS_ACC & SNS_GEN & SNS_DAT & SNS_INS & SNS_PRE
 
-Plural Neuter (окна "windows")
-├─ Nominative:    окна
-├─ Accusative:    окна
-├─ Genitive:      окон       (zero ending)
-├─ Dative:        окнам
-├─ Instrumental:  окнами
-└─ Prepositional: окнах
+    PL_MASC_INANIM --> PMI_NOM & PMI_ACC & PMI_GEN & PMI_DAT & PMI_INS & PMI_PRE
+    PL_MASC_ANIM   --> PMA_NOM & PMA_ACC & PMA_GEN & PMA_DAT & PMA_INS & PMA_PRE
+    PL_NEUT        --> PN_NOM  & PN_ACC  & PN_GEN  & PN_DAT  & PN_INS  & PN_PRE
 ```
 
 The nominative plural formation follows stem-type sensitivity: hard masculine stems take *-ы* while soft stems select *-и*, but spelling rules override this distribution after velars (*г, к, х*), sibilants (*ш, щ, ж, ч*), and *ц*, forcing *-и* even on phonologically hard stems (*друг → друзья* with consonant mutation, but *карандаш → карандаши* "pencils"). Neuter plurals uniformly take *-а* for hard stems and *-я* for soft, creating surface identity with feminine genitive singular forms but distinguished by agreement patterns.
@@ -146,22 +177,26 @@ The genitive plural again constitutes the morphological complexity peak. Masculi
 
 The third declension represents a relatively small but morphologically conservative class of feminine nouns characterized by stem-final palatalized consonants marked orthographically with *-ь*. This declension exhibits maximum case syncretism, collapsing nominative-accusative, genitive-dative-prepositional in the singular, and nominative-accusative in the plural. The paradigm employs uniformly soft endings with minimal allomorphy.
 
-```
-Singular (ночь "night")
-├─ Nominative:    ночь
-├─ Accusative:    ночь       (= nominative always)
-├─ Genitive:      ночи
-├─ Dative:        ночи       (= genitive)
-├─ Instrumental:  ночью      (distinctive -ью ending)
-└─ Prepositional: ночи       (= genitive = dative)
-
-Plural (ночи "nights")
-├─ Nominative:    ночи
-├─ Accusative:    ночи
-├─ Genitive:      ночей      (standard -ей ending)
-├─ Dative:        ночам
-├─ Instrumental:  ночами
-└─ Prepositional: ночах
+```mermaid
+flowchart TD
+    Root["ночь (night)"]
+    
+    Root --> Singular["Singular"]
+    Root --> Plural["Plural"]
+    
+    Singular --> SingNom["Nominative: ночь"]
+    Singular --> SingAcc["Accusative: ночь<br/><i>(= nominative always)</i>"]
+    Singular --> SingGen["Genitive: ночи"]
+    Singular --> SingDat["Dative: ночи<br/><i>(= genitive)</i>"]
+    Singular --> SingInst["Instrumental: ночью<br/><i>(distinctive -ью ending)</i>"]
+    Singular --> SingPrep["Prepositional: ночи<br/><i>(= genitive = dative)</i>"]
+    
+    Plural --> PlurNom["Nominative: ночи"]
+    Plural --> PlurAcc["Accusative: ночи"]
+    Plural --> PlurGen["Genitive: ночей<br/><i>(standard -ей ending)</i>"]
+    Plural --> PlurDat["Dative: ночам"]
+    Plural --> PlurInst["Instrumental: ночами"]
+    Plural --> PlurPrep["Prepositional: ночах"]
 ```
 
 The instrumental singular *-ью* serves as the diagnostic case for third declension membership, providing a unique morphological signature absent from other paradigms. The genitive-dative-prepositional syncretism in *-и* creates interpretive ambiguity resolvable only through prepositional government or broader syntactic context. Third declension nouns show minimal stress mobility, typically maintaining stem stress throughout the paradigm, though exceptions like *любо́вь/любви́* "love" exhibit accent shifts.
@@ -170,40 +205,42 @@ The instrumental singular *-ью* serves as the diagnostic case for third declen
 
 Russian adjectives decline through a parallel but more regular paradigm than nominals, with hard and soft variants determined by stem-final consonant quality. Adjectives must agree with their head nouns in gender (singular only), number, case, and animacy, creating a four-way concord requirement enforced across all attributive positions. The adjectival paradigm exhibits transparent case marking with minimal syncretism outside the accusative, making adjectives more reliable case indicators than the nouns they modify.
 
-```
-Hard-Stem Adjective: новый "new" (masculine nominative citation form)
-
-Singular Masculine
-├─ Nominative:    новый      (subject)
-├─ Accusative:    новый/нового (inanimate/animate)
-├─ Genitive:      нового
-├─ Dative:        новому
-├─ Instrumental:  новым
-└─ Prepositional: новом
-
-Singular Feminine
-├─ Nominative:    новая
-├─ Accusative:    новую
-├─ Genitive:      новой
-├─ Dative:        новой      (= genitive)
-├─ Instrumental:  новой      (= genitive = dative)
-└─ Prepositional: новой      (= genitive = dative = instrumental)
-
-Singular Neuter
-├─ Nominative:    новое
-├─ Accusative:    новое      (= nominative always)
-├─ Genitive:      нового
-├─ Dative:        новому
-├─ Instrumental:  новым
-└─ Prepositional: новом
-
-Plural (all genders)
-├─ Nominative:    новые
-├─ Accusative:    новые/новых (inanimate/animate)
-├─ Genitive:      новых
-├─ Dative:        новым
-├─ Instrumental:  новыми
-└─ Prepositional: новых
+```mermaid
+flowchart TD
+    Root["новый 'new'<br/>(Hard-Stem Adjective)"]
+    
+    Root --> SingMasc["Singular Masculine"]
+    Root --> SingFem["Singular Feminine"]
+    Root --> SingNeut["Singular Neuter"]
+    Root --> Plural["Plural (all genders)"]
+    
+    SingMasc --> SM_Nom["Nominative: новый"]
+    SingMasc --> SM_Acc["Accusative: новый/нового<br/>(inanimate/animate)"]
+    SingMasc --> SM_Gen["Genitive: нового"]
+    SingMasc --> SM_Dat["Dative: новому"]
+    SingMasc --> SM_Ins["Instrumental: новым"]
+    SingMasc --> SM_Pre["Prepositional: новом"]
+    
+    SingFem --> SF_Nom["Nominative: новая"]
+    SingFem --> SF_Acc["Accusative: новую"]
+    SingFem --> SF_Gen["Genitive: новой"]
+    SingFem --> SF_Dat["Dative: новой"]
+    SingFem --> SF_Ins["Instrumental: новой"]
+    SingFem --> SF_Pre["Prepositional: новой"]
+    
+    SingNeut --> SN_Nom["Nominative: новое"]
+    SingNeut --> SN_Acc["Accusative: новое<br/>(= nominative)"]
+    SingNeut --> SN_Gen["Genitive: нового"]
+    SingNeut --> SN_Dat["Dative: новому"]
+    SingNeut --> SN_Ins["Instrumental: новым"]
+    SingNeut --> SN_Pre["Prepositional: новом"]
+    
+    Plural --> P_Nom["Nominative: новые"]
+    Plural --> P_Acc["Accusative: новые/новых<br/>(inanimate/animate)"]
+    Plural --> P_Gen["Genitive: новых"]
+    Plural --> P_Dat["Dative: новым"]
+    Plural --> P_Ins["Instrumental: новыми"]
+    Plural --> P_Pre["Prepositional: новых"]
 ```
 
 The soft-stem adjectival paradigm follows an identical structural template but substitutes front vowels for back vowels: *синий/синяя/синее/синие* "blue" parallels *новый/новая/новое/новые* with systematic vowel fronting. Adjectives in *-ой* like *большой* "big" carry stem stress throughout the paradigm, while most adjectives exhibit ending stress in the short-form predicative variants (*краси́в/красива́/краси́во/краси́вы* "beautiful").
@@ -214,18 +251,31 @@ Animacy agreement operates mechanically: if the head noun is animate, the accusa
 
 Russian nominal morphology admits stem-internal alternations that create surface allomorphy across the paradigm. The most productive pattern involves fleeting vowels (*беглые гласные*)—specifically *е* and *о*—that appear in certain stem-final consonant clusters when zero endings attach but delete before overt vowel suffixes. This process maintains phonotactic legality by breaking up impermissible consonant sequences.
 
-```
-Fleeting Vowel Pattern (masculine)
-├─ Nominative Singular:  сон    "sleep" (о appears before zero)
-├─ Genitive Singular:    сна    (о deletes before -а)
-├─ Nominative Plural:    сны    (о deletes before -ы)
-└─ Genitive Plural:      снов   (о reappears before zero)
+```mermaid
+flowchart TD
+    subgraph masc ["Fleeting Vowel Pattern (masculine)"]
+        M_root["сон 'sleep'"]
+        M_NS["Nominative Singular<br/>сон<br/>(о appears before zero)"]
+        M_GS["Genitive Singular<br/>сна<br/>(о deletes before -а)"]
+        M_NP["Nominative Plural<br/>сны<br/>(о deletes before -ы)"]
+        M_GP["Genitive Plural<br/>снов<br/>(о reappears before zero)"]
+        M_root --> M_NS
+        M_root --> M_GS
+        M_root --> M_NP
+        M_root --> M_GP
+    end
 
-Fleeting Vowel Pattern (feminine genitive plural)
-├─ Nominative Singular:  сестра́  "sister"
-├─ Genitive Singular:    сестры́
-├─ Nominative Plural:    сёстры
-└─ Genitive Plural:      сестёр  (ё inserted before zero ending)
+    subgraph fem ["Fleeting Vowel Pattern (feminine genitive plural)"]
+        F_root["сестра́ 'sister'"]
+        F_NS["Nominative Singular<br/>сестра́"]
+        F_GS["Genitive Singular<br/>сестры́"]
+        F_NP["Nominative Plural<br/>сёстры"]
+        F_GP["Genitive Plural<br/>сестёр<br/>(ё inserted before zero ending)"]
+        F_root --> F_NS
+        F_root --> F_GS
+        F_root --> F_NP
+        F_root --> F_GP
+    end
 ```
 
 Consonant mutations accompany certain case formations, particularly in nominative plural where velars undergo palatalization before front vowels: *к → ч* (*рука́ → ру́ки* "hand/hands"), *г → ж* (*нога́ → но́ги* "leg/legs"), *х → ш* (*му́ха → му́хи* "fly/flies"). These alternations reflect historical Proto-Slavic palatalization processes now lexicalized as paradigmatic irregularities requiring lexeme-specific memorization.
@@ -236,38 +286,76 @@ Mobile stress constitutes another dimension of stem allomorphy. Some noun classe
 
 Personal pronouns in Russian follow suppletive declension patterns that preserve archaic stem alternations absent from regular nominal paradigms. The first and second person pronouns exhibit stem suppletion across cases, while third person forms derive historically from demonstrative stems and maintain gender distinctions in the singular.
 
-```
-First Person Singular (я "I")
-├─ Nominative:    я
-├─ Accusative:    меня
-├─ Genitive:      меня      (= accusative)
-├─ Dative:        мне
-├─ Instrumental:  мной/мною
-└─ Prepositional: мне       (= dative)
+```mermaid
+flowchart TD
 
-Second Person Singular (ты "you-informal")
-├─ Nominative:    ты
-├─ Accusative:    тебя
-├─ Genitive:      тебя      (= accusative)
-├─ Dative:        тебе
-├─ Instrumental:  тобой/тобою
-└─ Prepositional: тебе      (= dative)
+    subgraph sg1 ["First Person Singular — я (I)"]
+        sg1_root["я"]
+        sg1_nom["Nominative: я"]
+        sg1_acc["Accusative: меня"]
+        sg1_gen["Genitive: меня  (= Accusative)"]
+        sg1_dat["Dative: мне"]
+        sg1_ins["Instrumental: мной / мною"]
+        sg1_pre["Prepositional: мне  (= Dative)"]
 
-Third Person Singular Masculine (он "he/it")
-├─ Nominative:    он
-├─ Accusative:    его       (= genitive)
-├─ Genitive:      его
-├─ Dative:        ему
-├─ Instrumental:  им
-└─ Prepositional: нём       (prepositional case triggers н- augment)
+        sg1_root --> sg1_nom
+        sg1_root --> sg1_acc
+        sg1_root --> sg1_gen
+        sg1_root --> sg1_dat
+        sg1_root --> sg1_ins
+        sg1_root --> sg1_pre
+    end
 
-Third Person Singular Feminine (она "she/it")
-├─ Nominative:    она
-├─ Accusative:    её        (= genitive)
-├─ Genitive:      её
-├─ Dative:        ей
-├─ Instrumental:  ей        (= dative, or ею in high register)
-└─ Prepositional: ней       (prepositional triggers н- augment)
+    subgraph sg2 ["Second Person Singular — ты (you-informal)"]
+        sg2_root["ты"]
+        sg2_nom["Nominative: ты"]
+        sg2_acc["Accusative: тебя"]
+        sg2_gen["Genitive: тебя  (= Accusative)"]
+        sg2_dat["Dative: тебе"]
+        sg2_ins["Instrumental: тобой / тобою"]
+        sg2_pre["Prepositional: тебе  (= Dative)"]
+
+        sg2_root --> sg2_nom
+        sg2_root --> sg2_acc
+        sg2_root --> sg2_gen
+        sg2_root --> sg2_dat
+        sg2_root --> sg2_ins
+        sg2_root --> sg2_pre
+    end
+
+    subgraph sg3 ["Third Person Singular Masculine — он (he / it)"]
+        sg3_root["он"]
+        sg3_nom["Nominative: он"]
+        sg3_acc["Accusative: его  (= Genitive)"]
+        sg3_gen["Genitive: его"]
+        sg3_dat["Dative: ему"]
+        sg3_ins["Instrumental: им"]
+        sg3_pre["Prepositional: нём  (н- augment)"]
+
+        sg3_root --> sg3_nom
+        sg3_root --> sg3_acc
+        sg3_root --> sg3_gen
+        sg3_root --> sg3_dat
+        sg3_root --> sg3_ins
+        sg3_root --> sg3_pre
+    end
+
+    subgraph sg4 ["Third Person Singular Feminine — она (she / it)"]
+        sg4_root["она"]
+        sg4_nom["Nominative: она"]
+        sg4_acc["Accusative: её  (= Genitive)"]
+        sg4_gen["Genitive: её"]
+        sg4_dat["Dative: ей"]
+        sg4_ins["Instrumental: ей  (= Dative, or ею high register)"]
+        sg4_pre["Prepositional: ней  (н- augment)"]
+
+        sg4_root --> sg4_nom
+        sg4_root --> sg4_acc
+        sg4_root --> sg4_gen
+        sg4_root --> sg4_dat
+        sg4_root --> sg4_ins
+        sg4_root --> sg4_pre
+    end
 ```
 
 The prepositional forms of third person pronouns obligatorily take an initial *н-* (*его → него*, *их → них*) when governed by prepositions, a morphophonological process preventing vowel-initial forms in post-prepositional position. This *н-* augmentation applies consistently across all prepositional government contexts but never appears in non-prepositional oblique cases, creating a diagnostic alternation: *у него́* "at his place" versus *его́ дом* "his house".

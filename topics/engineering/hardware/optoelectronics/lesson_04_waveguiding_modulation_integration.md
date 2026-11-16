@@ -35,30 +35,57 @@ Grating couplers provide an alternative interface technology, diffracting normal
 
 Waveguide bending introduces radiation loss through two distinct mechanisms that constrain photonic circuit layout density. The classical ray-optics picture predicts that curved trajectories increase the effective incident angle at the outer waveguide boundary, eventually violating total internal reflection conditions and permitting light to escape into the cladding. A more rigorous electromagnetic treatment reveals that modal fields extend beyond the geometric core boundary by distances comparable to the wavelength, and these evanescent tails couple to radiation modes when the local radius of curvature becomes comparable to the decay length. For standard single-mode fiber with its weak index contrast and loosely confined modes, radiation loss becomes significant for bend radii below five centimeters. Silicon photonics, with its extreme confinement, tolerates bend radii approaching one micron before radiation loss exceeds 0.1 dB per 90-degree turn, enabling ultra-compact spiral delay lines and serpentine router geometries.
 
-```
-Mach-Zehnder Modulator Architecture (Cross-Section View)
-
-                 RF Electrode (+)                   RF Electrode (−)
-                      |                                  |
-                      ↓                                  ↓
-         ═════════════■══════════════      ═════════════■══════════════
-         ║                          ║      ║                          ║
-         ║  SiO₂ Cladding (n=1.44) ║      ║  SiO₂ Cladding (n=1.44) ║
-         ╟──────────────────────────╢      ╟──────────────────────────╢
-         ║   p-doped Si (p⁺)        ║      ║   n-doped Si (n⁺)        ║
-         ╟──────────────────────────╢      ╟──────────────────────────╢
-         ║   Intrinsic Si Core      ║      ║   Intrinsic Si Core      ║
-         ║   (n=3.48, 450×220 nm)   ║      ║   (n=3.48, 450×220 nm)   ║
-         ╟──────────────────────────╢      ╟──────────────────────────╢
-         ║   n-doped Si (n⁺)        ║      ║   p-doped Si (p⁺)        ║
-         ╚══════════════════════════╝      ╚══════════════════════════╝
-              Si Substrate (n-type)            Si Substrate (n-type)
-
-                Arm 1 (Reference)              Arm 2 (Phase Shifter)
-
-        Phase shift: Δφ = (2π/λ) Δn_eff L_phase
-        Carrier-induced index change: Δn ≈ −8.8×10⁻²² ΔN_e (cm³)
-        Extinction ratio: ER = 10 log₁₀[(1+contrast)/(1−contrast)]
+```mermaid
+flowchart TD
+    subgraph MZM["Mach-Zehnder Modulator Architecture (Cross-Section View)"]
+        direction TB
+        
+        subgraph ARM1["Arm 1 (Reference)"]
+            direction TB
+            RF1["RF Electrode (+)"]
+            CLad1["SiO₂ Cladding (n=1.44)"]
+            PDoped1["p-doped Si (p⁺)"]
+            Core1["Intrinsic Si Core<br/>(n=3.48, 450×220 nm)"]
+            NDoped1["n-doped Si (n⁺)"]
+            Sub1["Si Substrate (n-type)"]
+            
+            RF1 --> CLad1
+            CLad1 --> PDoped1
+            PDoped1 --> Core1
+            Core1 --> NDoped1
+            NDoped1 --> Sub1
+        end
+        
+        subgraph ARM2["Arm 2 (Phase Shifter)"]
+            direction TB
+            RF2["RF Electrode (−)"]
+            CLad2["SiO₂ Cladding (n=1.44)"]
+            NDoped2["n-doped Si (n⁺)"]
+            Core2["Intrinsic Si Core<br/>(n=3.48, 450×220 nm)"]
+            PDoped2["p-doped Si (p⁺)"]
+            Sub2["Si Substrate (n-type)"]
+            
+            RF2 --> CLad2
+            CLad2 --> NDoped2
+            NDoped2 --> Core2
+            Core2 --> PDoped2
+            PDoped2 --> Sub2
+        end
+        
+        ARM1 -.parallel operation.- ARM2
+    end
+    
+    subgraph FORMULAS["Key Parameters"]
+        direction TB
+        F1["Phase shift: Δφ = (2π/λ) Δn_eff L_phase"]
+        F2["Carrier-induced index change: Δn ≈ −8.8×10⁻²² ΔN_e (cm³)"]
+        F3["Extinction ratio: ER = 10 log₁₀[(1+contrast)/(1−contrast)]"]
+        
+        F1 ~~~ F2
+        F2 ~~~ F3
+    end
+    
+    MZM -.governed by.- FORMULAS
 ```
 
 The traveling-wave electrode architecture addresses the bandwidth limitations inherent to lumped-element modulators by synchronizing RF electrical and optical phase velocities along the modulator length. Conventional lumped designs treat the entire phase shifter as a single capacitive element, creating RC time constants that limit modulation bandwidth below 10 GHz for millimeter-scale devices. Traveling-wave electrodes, in contrast, form a transmission line structure where the RF signal propagates collinearly with the optical mode. Velocity matching—ensuring the RF phase velocity *v*_RF matches the optical group velocity *v*_g—maintains constructive phase accumulation across the entire interaction length, permitting modulation bandwidths exceeding 100 GHz in optimized lithium niobate designs. The characteristic impedance of the RF transmission line must also match the driver circuit output impedance, typically 50 ohms, to prevent reflections that generate frequency-dependent nulls in the electro-optic response.

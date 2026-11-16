@@ -58,31 +58,36 @@ Glycosphingolipids, particularly abundant in the plasma membrane outer leaflet, 
 
 Membrane protein function depends critically on the match between protein hydrophobic thickness and bilayer hydrophobic thickness, a principle termed hydrophobic matching. Proteins with transmembrane domains shorter than the bilayer induce local membrane thinning, while proteins exceeding bilayer thickness induce local thickening. These perturbations carry energetic costs (estimated at several kilocalories per mole for significant mismatches), driving sorting of proteins between membranes of different thickness and contributing to organization of the secretory pathway, where ER membranes are thinner than Golgi membranes, which are in turn thinner than the plasma membrane.
 
-```
-Membrane Organization (Cross-Section View)
-
-Extracellular Space
-═══════════════════════════════════════════════════════
-    ○~~~~~○    ○~~~~~○         ○~~~~~○
-   Polar     Polar            Polar    
-   Heads     Heads            Heads    (Outer Leaflet)
-    │ │ │     │ │ │            │ │ │
-    │ │ │     │ │ │            │ │ │   Hydrophobic
-    ┴─┴─┴     ┴─┴─┴            ┴─┴─┴   Core (~30Å)
-────────────[Integral Protein]─────────
-    ┬─┬─┬     ┬─┬─┬            ┬─┬─┬
-    │ │ │     │ │ │            │ │ │
-   Polar     Polar            Polar    (Inner Leaflet)
-   Heads     Heads            Heads
-    ○~~~~~○    ○~~~~~○         ○~~~~~○
-═══════════════════════════════════════════════════════
-Cytoplasm
-    [Peripheral Proteins]  [Cytoskeleton Anchors]
-
-Legend:
-○ = Phospholipid headgroup
-│ = Acyl chain (hydrophobic tail)
-~ = Glycocalyx carbohydrates
+```mermaid
+flowchart TD
+    A["Extracellular Space"]
+    
+    subgraph outer_leaflet["Outer Leaflet"]
+        B1["Polar Heads (Phospholipids)"]
+        B2["Glycocalyx Carbohydrates"]
+    end
+    
+    subgraph hydrophobic["Hydrophobic Core ~30Å"]
+        C1["Acyl Chains"]
+        C2["Integral Protein"]
+    end
+    
+    subgraph inner_leaflet["Inner Leaflet"]
+        D1["Polar Heads (Phospholipids)"]
+    end
+    
+    subgraph cytoplasm_components["Cytoplasm"]
+        E1["Peripheral Proteins"]
+        E2["Cytoskeleton Anchors"]
+    end
+    
+    F["Cytoplasm"]
+    
+    A --> outer_leaflet
+    outer_leaflet --> hydrophobic
+    hydrophobic --> inner_leaflet
+    inner_leaflet --> cytoplasm_components
+    cytoplasm_components --> F
 ```
 
 Protein insertion into membranes during biosynthesis exploits the translocon's lateral gate mechanism, where transmembrane helices partition directly into the lipid bilayer from within the Sec61 channel. The partitioning decision depends on the hydrophobicity of the nascent sequence: highly hydrophobic segments spontaneously partition into lipid, while marginally hydrophobic segments may require additional topogenic signals or interactions with the translocon machinery. This process has been quantified through systematic mutagenesis studies, revealing that the free energy difference between membrane insertion and aqueous exposure follows the Wimley-White hydrophobicity scale, which assigns each amino acid a transfer free energy based on its partitioning between water and membrane-like environments.

@@ -42,30 +42,38 @@ Proportional distribution determines whether a multi-hue palette reads as harmon
 
 The practical workflow for constructing harmonious palettes begins with strategic sampling rather than arbitrary selection. Identify the primary emotional goal (calm, energetic, luxurious, playful) and select a dominant hue corresponding to that mood: blues for trust and stability, reds for urgency and passion, greens for growth and balance, purples for creativity and luxury. Extract this dominant hue at multiple saturation and value levels to construct a tonal family—five shades ranging from near-white tints to near-black shades. Next, apply geometric harmony rules (complementary, analogous, triadic) to derive supporting hues, again extracting tonal families for each. Finally, designate one hue at high saturation as the accent color, ensuring it contrasts strongly with the dominant tone in both hue and value. This systematic approach produces palettes with built-in hierarchy and proportional logic before any design execution begins.
 
-```
-Color Harmony Decision Tree
+```mermaid
+flowchart TD
+    A["Emotional Goal Assessment"]
+    B["Dominant Hue Selection\n(Primary Mood Anchor)"]
+    C["Tonal Family Extraction\n(5–7 Lightness Steps)"]
+    D["Geometric Harmony Application"]
+    D1["Complementary\n(Maximum Contrast)"]
+    D2["Analogous\n(Cohesion & Calm)"]
+    D3["Triadic\n(Balanced Variety)"]
+    D4["Tetradic\n(Maximum Complexity)"]
+    E["Supporting Hue Tonal Families"]
+    F["Accent Hue Designation\n(High Saturation Focal Point)"]
+    G["Proportional Allocation\n(60-30-10 Distribution)"]
+    H["Value Contrast Verification\n(Grayscale Squint Test)"]
+    I["Iteration & Refinement"]
 
-Emotional Goal Assessment
-    ↓
-Dominant Hue Selection (Primary Mood Anchor)
-    ↓
-Tonal Family Extraction (5-7 Lightness Steps)
-    ↓
-Geometric Harmony Application
-    ├─ Complementary (Maximum Contrast)
-    ├─ Analogous (Cohesion & Calm)
-    ├─ Triadic (Balanced Variety)
-    └─ Tetradic (Maximum Complexity)
-    ↓
-Supporting Hue Tonal Families
-    ↓
-Accent Hue Designation (High Saturation Focal Point)
-    ↓
-Proportional Allocation (60-30-10 Distribution)
-    ↓
-Value Contrast Verification (Grayscale Squint Test)
-    ↓
-Iteration & Refinement
+    A --> B
+    B --> C
+    C --> D
+    D --> D1
+    D --> D2
+    D --> D3
+    D --> D4
+    D1 --> E
+    D2 --> E
+    D3 --> E
+    D4 --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> A
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

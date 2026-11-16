@@ -76,7 +76,7 @@ This part tests the dose-response relationship between static hold duration and 
 
 On session day 1, perform Uttanasana with a 15-second hold, rest in standing for 30 seconds, and repeat for a total of 5 repetitions. Measure fingertip-to-floor distance after the 1st, 3rd, and 5th repetition. Record all three values. On session day 2, repeat the same protocol with 45-second holds and 60-second rest intervals (rest must scale with hold to control for time-under-tension total). On session day 3, use 90-second holds with 90-second rest intervals.
 
-You will generate a small dataset with three rows and three columns: Hold Duration (15s, 45s, 90s) × Measurement Point (Rep 1, Rep 3, Rep 5) × Fingertip-to-Floor Distance. Enter this into your spreadsheet and calculate the within-session change score (Rep 5 minus Rep 1 value) for each duration condition. The expected finding, consistent with Magnusson et al.'s repeated-loading studies on passive tissue, is that 15-second holds produce minimal within-session change (<1 cm average gain), 45-second holds produce moderate change (2–4 cm), and 90-second holds produce the largest within-session gain but with proportionally elevated post-session soreness in the proximal hamstring and hip capsule. The practical implication is that 45-second holds represent the best dose efficiency for a standard practice session, while 90-second holds are reserved for dedicated flexibility-focused sessions with reduced pose density.
+You will generate a small dataset with three rows and three columns: Hold Duration (15s, 45s, 90s) × Measurement Point (Rep 1, Rep 3, Rep 5) × Fingertip-to-Floor Distance. Enter this into your spreadsheet and calculate the within-session change score (Rep 5 minus Rep 1 value) for each duration condition. The expected finding, consistent with Magnusson et al.'s repeated-loading studies on passive tissue, is that 15-second holds produce minimal within-session change (< 1 cm average gain), 45-second holds produce moderate change (2–4 cm), and 90-second holds produce the largest within-session gain but with proportionally elevated post-session soreness in the proximal hamstring and hip capsule. The practical implication is that 45-second holds represent the best dose efficiency for a standard practice session, while 90-second holds are reserved for dedicated flexibility-focused sessions with reduced pose density.
 
 **Part B: Ankle Dorsiflexion Differential Diagnosis — Bony vs. Soft-Tissue Restriction**
 
@@ -94,7 +94,7 @@ The balance system under yoga loading engages three neural subsystems: the vesti
 
 Perform Vrksasana (Tree Pose) under three successive conditions: eyes open with a fixed focal point at eye level (baseline, all three systems functional); eyes closed (vestibular and proprioceptive input only, visual removed); eyes open but standing on a folded blanket 2–3 cm thick (proprioceptive noise added, destabilizing somatosensory afference). Time how long you can hold each condition before the lifted foot returns to the floor, with a maximum cap of 60 seconds. Record all three times for both legs.
 
-If eyes-closed performance drops by more than 50% compared to eyes-open (e.g., 40 seconds open vs. <20 seconds closed), vestibular-visual dependency is high and the proprioceptive system is under-trained. This pattern is associated with reduced tibialis anterior and peroneals co-contraction rate and predicts higher ankle sprain risk during dynamic yoga transitions. The corrective is a 4-week single-leg balance training protocol: 3 sets × 30 seconds of single-leg standing on an unstable surface (folded blanket or Airex pad) with eyes closed, 5 days per week. Re-test at week 4 to verify adaptation — the target outcome is eyes-closed hold time reaching 80% or greater of the eyes-open value.
+If eyes-closed performance drops by more than 50% compared to eyes-open (e.g., 40 seconds open vs. < 20 seconds closed), vestibular-visual dependency is high and the proprioceptive system is under-trained. This pattern is associated with reduced tibialis anterior and peroneals co-contraction rate and predicts higher ankle sprain risk during dynamic yoga transitions. The corrective is a 4-week single-leg balance training protocol: 3 sets × 30 seconds of single-leg standing on an unstable surface (folded blanket or Airex pad) with eyes closed, 5 days per week. Re-test at week 4 to verify adaptation — the target outcome is eyes-closed hold time reaching 80% or greater of the eyes-open value.
 
 Log all three conditions and the eyes-closed/eyes-open ratio in your spreadsheet. This ratio is your proprioceptive competency index for single-leg stance.
 
@@ -145,15 +145,15 @@ This reference section serves as the practitioner's standing operating procedure
 | Pose | Joint | Target Angle/Metric | Failure Threshold | Primary Compensation |
 |---|---|---|---|---|
 | Tadasana | Cervical (ear-to-acromion) | 0 cm anterior translation | >2.5 cm forward | Thoracic kyphosis |
-| Tadasana | Lumbar lordosis | 30–35° | >40° or <20° | Anterior/posterior pelvic tilt |
-| Uttanasana | Hip flexion (pelvis neutral) | 90–110° hip angle | <70° with lumbar flex | Lumbar rounding |
+| Tadasana | Lumbar lordosis | 30–35° | >40° or < 20° | Anterior/posterior pelvic tilt |
+| Uttanasana | Hip flexion (pelvis neutral) | 90–110° hip angle | < 70° with lumbar flex | Lumbar rounding |
 | Uttanasana | Fingertip-to-floor | 0–10 cm | >15 cm | Hamstring restriction |
-| Down Dog | Shoulder flexion | 170–180° | <160° | Thoracic kyphosis |
-| Down Dog | Ankle dorsiflexion | 110–120° (tibia-to-foot) | <100° | Heel rise, lumbar flex |
+| Down Dog | Shoulder flexion | 170–180° | < 160° | Thoracic kyphosis |
+| Down Dog | Ankle dorsiflexion | 110–120° (tibia-to-foot) | < 100° | Heel rise, lumbar flex |
 | Warrior II | Knee tracking (sagittal) | 0–5° medial of 2nd met | >10° medial | Hip abductor weakness |
-| Chaturanga | Elbow angle at hold | 90° | <70° or >110° | Shoulder collapse |
+| Chaturanga | Elbow angle at hold | 90° | < 70° or >110° | Shoulder collapse |
 | Trikonasana | Pelvis (frontal plane) | Horizontal ±3° | >5° hip hike | Gluteus medius failure |
-| Tree Pose | Eyes-closed hold | >80% of eyes-open time | <50% ratio | Vestibular dependency |
+| Tree Pose | Eyes-closed hold | >80% of eyes-open time | < 50% ratio | Vestibular dependency |
 
 ### Session Readiness Decision Gate
 

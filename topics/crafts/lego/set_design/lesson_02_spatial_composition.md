@@ -22,32 +22,36 @@ Within this established grid, vertical composition follows a rhythmic structure 
 
 Depth layering implementation requires systematic attention to connection geometry and structural load paths. When projecting elements forward from the primary façade plane, builders must ensure continuous load transfer through techniques such as cantilever bracketing (inverted bracket pieces placed beneath projecting balconies), vertical pilaster supports (1×1 bricks or profile bricks forming pseudo-columns beneath overhangs), or horizontal beam structures (plates spanning between load-bearing points). A balcony projecting 3 studs forward without support reads as structurally implausible; the same balcony supported by decorative corbels or thin pilasters registers as architecturally coherent. This principle extends to recessed elements: a window set back 1 stud from the façade plane requires surrounding brickwork to form a reveal box, with header bricks spanning the top of the opening and sill plates defining the bottom threshold.
 
-```
-DEPTH LAYERING SCHEMATIC (Side Section View)
-═══════════════════════════════════════════════════
-
-Recess Layer (-2 studs):
-    Door alcove interior
-    └─ Creates shadow depth
+```mermaid
+flowchart TD
+    subgraph light["Light Angle Analysis"]
+        L["Overhead Light (45°)"]
+        LS["Shadow cast = 1.4× projection depth"]
+        L --> LS
+    end
     
-Primary Façade Plane (datum):
-█████████████████████  ← Main structural wall
-    ║                  
-    ║                  
+    subgraph overhang["Shadow-creating Overhang (+3 studs)"]
+        O["PLATE<br/>Eave projection"]
+    end
     
-Detail Layer (+2 studs):
-    ┌─────┐
-    │TILES│  ← Window trim, cornices
-    └─────┘
+    subgraph detail["Detail Layer (+2 studs)"]
+        D["TILES<br/>Window trim, cornices"]
+    end
     
-Shadow-creating overhang (+3 studs):
-      ╔═══════╗
-      ║ PLATE ║  ← Eave projection
-      ╚═══════╝
-      
-Light Angle Analysis:
-   ↘ ↘ ↘  (45° overhead)
-      Shadow cast = 1.4× projection depth
+    subgraph facade["Primary Façade Plane (datum)"]
+        F["Main structural wall"]
+    end
+    
+    subgraph recess["Recess Layer (-2 studs)"]
+        R["Door alcove interior"]
+        RS["Creates shadow depth"]
+        R --> RS
+    end
+    
+    light -.projects onto.-> overhang
+    overhang --> detail
+    detail --> facade
+    facade --> recess
 ```
 
 Focal point establishment operates through a combinatorial system of geometric, chromatic, and textural differentiation. At the geometric level, the primary focal element should violate the established modular rhythm: if windows repeat at 6-stud intervals, the focal window spans 8 studs. If the façade consists primarily of flat 1×n brick courses, the focal area incorporates projecting headers or recessed panels. Chromatic differentiation exploits Lego's constrained palette strategically—a primarily tan building gains a focal accent through dark red or dark blue door surrounds, creating 40-60% luminance contrast that draws the eye immediately. Textural differentiation layers in part variety: while the bulk of the façade might employ standard bricks and plates, the focal zone introduces printed tiles, textured bricks (log bricks, masonry bricks), or specialized molded elements (arches, lattice panels, barrel components) that register as unique within the visual field.

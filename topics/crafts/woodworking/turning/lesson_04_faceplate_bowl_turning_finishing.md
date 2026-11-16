@@ -22,29 +22,34 @@ Modern scroll chuck systems replace the faceplate for work requiring access to t
 
 Bowl gouge presentation mechanics operate through a three-axis control system integrating rotation, translation, and angular orientation. The fundamental cutting geometry positions the tool with its flute oriented toward the direction of travel, presenting the lower wing of the fingernail grind to the wood surface. The bevel rubs behind the cutting edge, establishing a reference surface that guides the tool and prevents dig-ins. The practitioner controls cut depth by adjusting the angle between tool shaft and work surface: lifting the handle pivots the cutting edge deeper into the wood, while lowering the handle reduces engagement. This angular control operates continuously throughout each pass, with the turner making micro-adjustments in response to changing grain conditions and cut resistance.
 
-```
-BOWL GOUGE CUTTING GEOMETRY (CROSS-SECTION VIEW)
+```mermaid
+flowchart TD
+    direction_of_travel["Direction of Travel →"]
 
-            Direction of Travel →
-                    
-     Flute Opening (45-55°)
-            ↓
-        ╱────────╲        ← Upper Wing
-    ╱──────────────╲
-   │   ████████████  │     ████ = Tool Steel
-   │   ████████████  │     
-    ╲──────────────╱
-        ╲────────╱        ← Lower Wing (Cutting Edge)
-            │
-            └─── Bevel Angle (40-45°)
-                 │
-                 ▼
-         ════════════     ← Wood Surface
-         
-Angular Presentation Controls:
-- Handle Height: Adjusts cut depth (higher = deeper)
-- Tool Rotation: Changes which portion of edge cuts
-- Bevel Contact: Maintains reference surface, prevents dig-in
+    subgraph cross_section ["Bowl Gouge Cross-Section View"]
+        upper_wing["Upper Wing\n(Flute Opening 45–55°)"]
+        tool_steel["Tool Steel Body\n(High-Speed Steel)"]
+        lower_wing["Lower Wing\n(Cutting Edge)"]
+    end
+
+    bevel["Bevel Angle\n(40–45°)"]
+    wood_surface["════════════\nWood Surface"]
+
+    subgraph angular_controls ["Angular Presentation Controls"]
+        handle_height["Handle Height\nAdjusts cut depth\n(Higher = Deeper)"]
+        tool_rotation["Tool Rotation\nSelects active\nportion of edge"]
+        bevel_contact["Bevel Contact\nMaintains reference surface\nPrevents dig-in"]
+    end
+
+    direction_of_travel --> upper_wing
+    upper_wing --> tool_steel
+    tool_steel --> lower_wing
+    lower_wing --> bevel
+    bevel --> wood_surface
+
+    wood_surface --> handle_height
+    wood_surface --> tool_rotation
+    wood_surface --> bevel_contact
 ```
 
 The cutting sequence for bowl interiors follows a systematic progression from rim to base, with tool presentation adapting to grain orientation changes. Beginning at the rim, the gouge enters with the flute at 45 degrees to the blank face, cutting across the end grain with the lower wing. As the tool arcs toward the center, the turner rotates the tool handle around the longitudinal axis, progressively opening the flute until it faces nearly perpendicular to the lathe axis at the bowl's nadir. This rotation keeps the cutting edge slicing rather than scraping, maintaining the favorable shear angle as grain direction transitions from perpendicular to parallel relative to the cut surface. The tool path describes a smooth arc from entry to exit, with the bevel maintaining constant contact throughout. Deviation from this arc—particularly straightening the curve—causes the bevel to lift off the work surface, eliminating the reference that prevents catch and allowing the cutting edge to dig uncontrollably into the wood.

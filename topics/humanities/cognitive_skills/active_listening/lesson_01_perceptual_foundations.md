@@ -36,97 +36,43 @@ The duplex theory of speech perception, proposed by Liberman and Mattingly, sugg
 
 The sensory attention mechanism that enables selective listening can be modeled as a three-component architecture consisting of bottom-up salience detection, top-down goal-directed control, and a dynamic gating system that adjudicates between competing attentional demands. This architecture operates continuously and largely automatically, though skilled listeners learn to exert strategic control over its parameters.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    ACOUSTIC ENVIRONMENT                      │
-│  [Speaker Voice] [Background Noise] [Competing Speakers]     │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│               COCHLEAR TRANSDUCTION                          │
-│  Basilar membrane frequency decomposition                    │
-│  Hair cell neural encoding (20 Hz - 20 kHz)                  │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│          PRE-ATTENTIVE FILTERING LAYER                       │
-│                                                              │
-│  ┌──────────────────┐  ┌──────────────────┐                │
-│  │ Sensory Adaptation│  │ Novelty Detection│                │
-│  │ (habituates to    │  │ (∆ pitch, volume,│                │
-│  │  constant stimuli)│  │  timbre → alert) │                │
-│  └──────────────────┘  └──────────────────┘                │
-│                                                              │
-│  ┌──────────────────────────────────────┐                   │
-│  │   Automatic Grouping (Gestalt)       │                   │
-│  │   - Proximity: temporally close      │                   │
-│  │   - Similarity: similar pitch/timbre │                   │
-│  │   - Continuity: smooth trajectories  │                   │
-│  └──────────────────────────────────────┘                   │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│              ATTENTIONAL SELECTION GATE                      │
-│                                                              │
-│  ┌─────────────────────┐    ┌────────────────────────┐     │
-│  │ Bottom-up Salience  │    │ Top-down Goal Control  │     │
-│  │ (loud, novel, or    │◄──►│ (consciously directed  │     │
-│  │  emotionally salient│    │  focus on target       │     │
-│  │  stimuli capture    │    │  speaker/topic)        │     │
-│  │  attention)         │    │                        │     │
-│  └─────────────────────┘    └────────────────────────┘     │
-│              │                        │                      │
-│              └────────┬───────────────┘                      │
-│                       ▼                                      │
-│            [Winner-Take-All Gate]                            │
-│     Selected auditory stream proceeds →                      │
-│     Unselected streams attenuated                            │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│        PHONOLOGICAL WORKING MEMORY (Phonological Loop)       │
-│                                                              │
-│  Capacity: ~2 seconds of speech material                     │
-│  Maintenance: subvocal rehearsal refreshes buffer            │
-│  Decay rate: 2-5 seconds without rehearsal                   │
-│                                                              │
-│  [Speech Input] → [Phonological Store] → [Rehearsal]        │
-│                           │                                  │
-│                           ▼                                  │
-│                   (if not rehearsed: DECAY)                  │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│           LEXICAL-SEMANTIC PROCESSING                        │
-│                                                              │
-│  Phoneme sequence → Lexical access (~200-250ms)              │
-│  Semantic feature retrieval from long-term memory            │
-│  Contextual prediction generation (anticipatory)             │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│         SYNTACTIC-PROPOSITIONAL INTEGRATION                  │
-│                                                              │
-│  Parse tree construction (real-time incremental parsing)     │
-│  Working memory integration (holding multiple clauses)       │
-│  Propositional representation formation                      │
-│                                                              │
-│  Capacity constraint: 3-5 propositions simultaneously        │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│              COMPREHENSION OUTPUT                            │
-│  → Semantic representation in episodic buffer                │
-│  → Long-term memory consolidation (if rehearsed/significant) │
-│  → Response generation preparation                           │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["ACOUSTIC ENVIRONMENT<br/>Speaker Voice | Background Noise | Competing Speakers"]
+    
+    B["COCHLEAR TRANSDUCTION<br/>Basilar membrane frequency decomposition<br/>Hair cell neural encoding (20 Hz - 20 kHz)"]
+    
+    subgraph C ["PRE-ATTENTIVE FILTERING LAYER"]
+        C1["Sensory Adaptation<br/>(habituates to constant stimuli)"]
+        C2["Novelty Detection<br/>(∆ pitch, volume, timbre → alert)"]
+        C3["Automatic Grouping (Gestalt)<br/>- Proximity: temporally close<br/>- Similarity: similar pitch/timbre<br/>- Continuity: smooth trajectories"]
+    end
+    
+    subgraph D ["ATTENTIONAL SELECTION GATE"]
+        D1["Bottom-up Salience<br/>(loud, novel, or emotionally<br/>salient stimuli capture attention)"]
+        D2["Top-down Goal Control<br/>(consciously directed focus<br/>on target speaker/topic)"]
+        D3["Winner-Take-All Gate<br/>Selected auditory stream proceeds →<br/>Unselected streams attenuated"]
+        
+        D1 <--> D2
+        D1 --> D3
+        D2 --> D3
+    end
+    
+    E["PHONOLOGICAL WORKING MEMORY<br/>(Phonological Loop)<br/>Capacity: ~2 seconds of speech material<br/>Maintenance: subvocal rehearsal refreshes buffer<br/>Decay rate: 2-5 seconds without rehearsal<br/>Speech Input → Phonological Store → Rehearsal<br/>(if not rehearsed: DECAY)"]
+    
+    F["LEXICAL-SEMANTIC PROCESSING<br/>Phoneme sequence → Lexical access (~200-250ms)<br/>Semantic feature retrieval from long-term memory<br/>Contextual prediction generation (anticipatory)"]
+    
+    G["SYNTACTIC-PROPOSITIONAL INTEGRATION<br/>Parse tree construction (real-time incremental parsing)<br/>Working memory integration (holding multiple clauses)<br/>Propositional representation formation<br/>Capacity constraint: 3-5 propositions simultaneously"]
+    
+    H["COMPREHENSION OUTPUT<br/>→ Semantic representation in episodic buffer<br/>→ Long-term memory consolidation (if rehearsed/significant)<br/>→ Response generation preparation"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
 ```
 
 The cochlear transduction stage operates as a mechanical frequency analyzer. The basilar membrane within the cochlea is structured such that high-frequency sounds cause maximal displacement at the base, while low-frequency sounds cause maximal displacement at the apex. This tonotopic organization is preserved throughout the ascending auditory pathway, with different neural populations tuned to different frequency ranges. Inner hair cells transduce mechanical displacement into neural action potentials with remarkable temporal precision, capable of phase-locking to stimulus frequencies up to approximately 4-5 kHz. This temporal coding, combined with place coding from tonotopic organization, allows the auditory system to achieve extraordinary frequency discrimination on the order of 0.2% for pure tones in the mid-frequency range.

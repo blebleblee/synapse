@@ -28,39 +28,30 @@ Information source acquisition encompasses the techniques and tooling required t
 
 The mechanics of DNS reconnaissance exploit the hierarchical delegation model inherent to the protocol's architecture. Consider the resolution path for discovering infrastructure associated with target.example.com. The attacker queries root name servers for .com authority, then queries .com servers for example.com authority, obtaining the authoritative name servers for the target domain. Directly querying these authoritative servers yields current, definitive records without intermediary caching, though this direct interaction generates logs at the target's DNS infrastructure. To remain passive, sophisticated attackers instead leverage DNS aggregation services like DNSDumpster, SecurityTrails, or the Common Crawl dataset that continuously spider and index DNS records, providing historical zone data without the attacker directly querying target infrastructure. Certificate Transparency logs maintained by organizations like Google, Cloudflare, and DigiCert provide another rich passive source: since all public SSL/TLS certificates issued by trusted certificate authorities must be logged to CT infrastructure, attackers query these logs using the target domain as a search parameter, discovering every subdomain for which a certificate was ever issued, including internal subdomains that may have been briefly exposed during development or certificate renewal processes.
 
-```
-DNS Reconnaissance Flow:
-Target: example.com
-
-┌─────────────────────────────────────────────────────────────┐
-│ Phase 1: Authoritative NS Discovery                         │
-│ dig +short NS example.com                                   │
-│ → ns1.dnsprovider.com, ns2.dnsprovider.com                 │
-└─────────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────────┐
-│ Phase 2: Zone Transfer Attempt (rarely succeeds)            │
-│ dig AXFR @ns1.dnsprovider.com example.com                   │
-│ → Transfer failed (REFUSED)                                 │
-└─────────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────────┐
-│ Phase 3: Subdomain Enumeration (active)                     │
-│ for sub in admin api dev staging vpn mail remote; do        │
-│   dig +short A $sub.example.com                            │
-│ done                                                         │
-│ → admin.example.com → 203.0.113.15                         │
-│ → api.example.com → 203.0.113.22                           │
-│ → vpn.example.com → 203.0.113.8                            │
-└─────────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────────┐
-│ Phase 4: Certificate Transparency (passive alternative)     │
-│ Query CT logs: crt.sh?q=%.example.com                       │
-│ → Discovers: internal-api.example.com (never advertised)    │
-│              legacy-vpn.example.com (forgotten)             │
-│              jenkins-dev.example.com (vulnerable)           │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start["DNS Reconnaissance Flow<br/>Target: example.com"]
+    
+    Phase1["Phase 1: Authoritative NS Discovery<br/>dig +short NS example.com"]
+    Phase1Result["Result:<br/>ns1.dnsprovider.com<br/>ns2.dnsprovider.com"]
+    
+    Phase2["Phase 2: Zone Transfer Attempt<br/>dig AXFR @ns1.dnsprovider.com example.com"]
+    Phase2Result["Result:<br/>Transfer failed (REFUSED)"]
+    
+    Phase3["Phase 3: Subdomain Enumeration (active)<br/>for sub in admin api dev staging vpn mail remote; do<br/>dig +short A $sub.example.com<br/>done"]
+    Phase3Result["Results:<br/>admin.example.com → 203.0.113.15<br/>api.example.com → 203.0.113.22<br/>vpn.example.com → 203.0.113.8"]
+    
+    Phase4["Phase 4: Certificate Transparency (passive alternative)<br/>Query CT logs: crt.sh?q=%.example.com"]
+    Phase4Result["Discovered:<br/>internal-api.example.com (never advertised)<br/>legacy-vpn.example.com (forgotten)<br/>jenkins-dev.example.com (vulnerable)"]
+    
+    Start --> Phase1
+    Phase1 --> Phase1Result
+    Phase1Result --> Phase2
+    Phase2 --> Phase2Result
+    Phase2Result --> Phase3
+    Phase3 --> Phase3Result
+    Phase3Result --> Phase4
+    Phase4 --> Phase4Result
 ```
 
 Network scanning implements active reconnaissance at the transport and application layers, directly probing target systems to enumerate open ports, identify running services, fingerprint operating systems, and detect security controls. The fundamental primitive for network scanning remains the TCP three-way handshake: the attacker sends a SYN packet to a target IP and port, and the response reveals port state—SYN-ACK indicates an open port with a listening service, RST indicates a closed port, and silence indicates a filtered port where a firewall drops packets without response. Nmap, the canonical network scanning tool, implements over a dozen scan types optimized for different scenarios: SYN scans avoid completing the TCP handshake to minimize logging on target systems, UDP scans probe connectionless services like DNS and SNMP, ACK scans map firewall rulesets by observing which packets traverse filtering devices, and NULL/FIN/XMAS scans exploit ambiguities in TCP specification to evade primitive intrusion detection systems.

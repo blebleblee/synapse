@@ -72,19 +72,32 @@ The structure of the ideal lattice of $R/I$ is controlled by the **Correspondenc
 
 The following diagram captures the relationships among the central constructions:
 
-```
-         φ: R → S  (ring homomorphism)
-         |
-         |  ker φ = ideal I ⊆ R
-         ↓
-    R ——π——→ R/I ——ι——→ im(φ) ⊆ S
-              ≅ (by First Isomorphism Theorem)
-
-Ideal hierarchy in R:        Corresponding quotient ring property:
-─────────────────────────────────────────────────────────────────
-I is prime                   R/I is an integral domain
-I is maximal                 R/I is a field
-I₁ ⊆ I₂ ⊆ R                 R/I₂ is a quotient of R/I₁
+```mermaid
+flowchart TD
+    R["R (ring)"]
+    S["S (ring)"]
+    I["ker φ = ideal I ⊆ R"]
+    RmodI["R/I (quotient ring)"]
+    imPhi["im(φ) ⊆ S"]
+    
+    R -->|"φ (ring homomorphism)"| S
+    R -->|"π (canonical projection)"| RmodI
+    RmodI -.->|"≅ (First Isomorphism Theorem)"| imPhi
+    RmodI -->|"ι (inclusion)"| imPhi
+    
+    subgraph props ["Ideal-Quotient Correspondence"]
+        direction TB
+        prime["I is prime<br/>⇒<br/>R/I is an integral domain"]
+        maximal["I is maximal<br/>⇒<br/>R/I is a field"]
+        chain["I₁ ⊆ I₂ ⊆ R<br/>⇒<br/>R/I₂ is a quotient of R/I₁"]
+        
+        prime ~~~ maximal ~~~ chain
+    end
+    
+    style I fill:#fff4e6
+    style RmodI fill:#e6f3ff
+    style imPhi fill:#e6ffe6
+    style props fill:#f9f9f9,stroke:#666,stroke-dasharray: 5 5
 ```
 
 ### Domains of Factorization: EDs, PIDs, UFDs

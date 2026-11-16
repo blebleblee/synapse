@@ -75,37 +75,58 @@ An individual table relation is broken into **1GB segment files** on disk: `base
 
 PostgreSQL uses a classical **slotted page** architecture (also called a directory page) to accommodate variable-length rows, in-place logical deletes, and HOT (Heap-Only Tuple) chain rewrites without requiring full-page compaction on every change.
 
-```text
-Byte Offset
-0       +-----------------------------------------------------------------------+
-        | PageHeaderData (24 bytes)                                             |
-        |   pd_lsn        [8 bytes] : LSN of last WAL record modifying page    |
-        |   pd_checksum   [2 bytes] : Page-level CRC-32C checksum (if enabled) |
-        |   pd_flags      [2 bytes] : PD_HAS_FREE_LINES, PD_PAGE_FULL, etc.    |
-        |   pd_lower      [2 bytes] : Byte offset → end of ItemId array        |
-        |   pd_upper      [2 bytes] : Byte offset → start of lowest tuple      |
-        |   pd_special    [2 bytes] : Offset to special space (0 on heap pages)|
-        |   pd_pagesize_version [2 bytes] : Encodes page size + format version |
-        |   pd_prune_xid  [4 bytes] : Oldest non-frozen XID on page (for prune)|
-24      +-----------------------------------------------------------------------+
-        | ItemIdData Array (line pointer directory, 4 bytes each)               |
-        |   ItemId[1] : lp_off=7900, lp_flags=LP_NORMAL, lp_len=92             |
-        |   ItemId[2] : lp_off=7800, lp_flags=LP_NORMAL, lp_len=97             |
-        |   ItemId[3] : lp_off=0,    lp_flags=LP_DEAD,   lp_len=0  (vacuumable)|
-        |   ItemId[4] : lp_off=7700, lp_flags=LP_REDIRECT, lp_len=0 (HOT head)|
-        |               ↓  pd_lower grows downward as items are added           |
-        +-----------------------------------------------------------------------+
-        |                                                                       |
-        |                       FREE SPACE                                      |
-        |                   (pd_upper - pd_lower bytes)                         |
-        |                                                                       |
-        +-----------------------------------------------------------------------+
-        |               ↑  pd_upper grows upward as tuples are added            |
-        |   HeapTuple[2] : HeapTupleHeaderData + null bitmap + attribute data  |
-        |   HeapTuple[1] : HeapTupleHeaderData + null bitmap + attribute data  |
-8192    +-----------------------------------------------------------------------+
-        | Special Space (0 bytes on heap; used by B-tree, GiST, etc.)          |
-        +-----------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    subgraph PAGE ["PostgreSQL Heap Page (8192 bytes)"]
+        direction TD
+
+        HEADER["<b>PageHeaderData</b> — bytes 0–23 (24 bytes)
+        ────────────────────────────────────────
+        pd_lsn            [8 bytes]  LSN of last WAL record modifying page
+        pd_checksum       [2 bytes]  Page-level CRC-32C checksum (if enabled)
+        pd_flags          [2 bytes]  PD_HAS_FREE_LINES · PD_PAGE_FULL · …
+        pd_lower          [2 bytes]  Byte offset → end of ItemId array ↓
+        pd_upper          [2 bytes]  Byte offset → start of lowest tuple ↑
+        pd_special        [2 bytes]  Offset to special space (0 on heap pages)
+        pd_pagesize_version [2 bytes]  Page size + format version
+        pd_prune_xid      [4 bytes]  Oldest non-frozen XID (for pruning)"]
+
+        ITEMIDS["<b>ItemIdData Array</b> — starts at byte 24 (4 bytes per entry)
+        ────────────────────────────────────────
+        ItemId[1]  lp_off=7900  lp_flags=LP_NORMAL    lp_len=92
+        ItemId[2]  lp_off=7800  lp_flags=LP_NORMAL    lp_len=97
+        ItemId[3]  lp_off=0     lp_flags=LP_DEAD      lp_len=0   (vacuumable)
+        ItemId[4]  lp_off=7700  lp_flags=LP_REDIRECT  lp_len=0   (HOT chain head)
+        ↓  pd_lower advances downward as entries are added"]
+
+        FREE["<b>Free Space</b>
+        ────────────────────────────────────────
+        pd_upper − pd_lower bytes available
+        ← grows from both ends toward the middle →"]
+
+        TUPLES["<b>HeapTuple Data</b> — grows upward from pd_upper
+        ────────────────────────────────────────
+        ↑  pd_upper retreats upward as tuples are inserted
+        HeapTuple[2]  HeapTupleHeaderData + null bitmap + attribute data
+        HeapTuple[1]  HeapTupleHeaderData + null bitmap + attribute data"]
+
+        SPECIAL["<b>Special Space</b> — ends at byte 8192
+        ────────────────────────────────────────
+        0 bytes on heap pages
+        Used by index AMs: B-tree · GiST · GIN · SP-GiST · BRIN"]
+
+        HEADER   -- "pd_lower marks bottom of ItemId array" --> ITEMIDS
+        ITEMIDS  -- "free space begins here (pd_lower)" --> FREE
+        FREE     -- "free space ends here (pd_upper)" --> TUPLES
+        TUPLES   -- "pd_special marks start of special space" --> SPECIAL
+    end
+
+    style HEADER  fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
+    style ITEMIDS fill:#ede9fe,stroke:#7c3aed,color:#2e1065
+    style FREE    fill:#f0fdf4,stroke:#16a34a,color:#14532d
+    style TUPLES  fill:#fef9c3,stroke:#ca8a04,color:#451a03
+    style SPECIAL fill:#fee2e2,stroke:#dc2626,color:#450a0a
+    style PAGE    fill:#f8fafc,stroke:#64748b,color:#0f172a
 ```
 
 The layout enforces a **two-pointer growth invariant**:
@@ -447,9 +468,9 @@ flowchart TD
     CT --> CK["Checkpointer (background):\nPeriodically flushes dirty pages\nVerifies WAL flushed before each page write\nWrites CHECKPOINT record to WAL"]
     CK --> DF["Data File on Disk:\nDirty 8KB page written to relfilenode\nPage now crash-recoverable via WAL redo"]
 
-    style WR fill:#fffacd,stroke:#b8860b
-    style CT fill:#e6ffe6,stroke:#2e7d32
-    style DF fill:#e3f2fd,stroke:#1565c0
+    style WR fill:#fffacd,stroke:#b8860b,color:#0f172a
+    style CT fill:#e6ffe6,stroke:#2e7d32,color:#0f172a
+    style DF fill:#e3f2fd,stroke:#1565c0,color:#0f172a
 ```
 
 | Architectural Subsystem | Design Implementation | Systems Rationale |

@@ -26,69 +26,36 @@ The internal architecture of pragmatic processing in English discourse operates 
 
 Speech act recognition proceeds through a multi-stage process that begins with illocutionary force indicators encoded in grammatical mood, intonation patterns, and performative vocabulary. English distinguishes three primary mood categories that correlate imperfectly with illocutionary force. Declarative mood, marked by subject-auxiliary word order and falling terminal intonation, prototypically performs assertions: "The library closes at nine." Interrogative mood, signaled through subject-auxiliary inversion ("Does the library close at nine?") or wh-fronting ("When does the library close?"), canonically performs questions. Imperative mood, characterized by bare verb forms and null subjects, conventionally encodes directives: "Close the door." Yet this form-function mapping exhibits extensive indirection. Interrogative syntax frequently expresses directives through conventionalized politeness strategies: "Could you close the door?" functions as a request despite its yes-no question format. Declarative syntax can perform questions when combined with rising intonation: "The library closes at nine?" This intonational contour, transcribed as a high boundary tone (H%) in autosegmental-metrical phonology, overrides the mood-based default and signals interrogative force.
 
-```
-Speech Act Recognition Pipeline:
-┌─────────────────────────────────────────────────────────────┐
-│ Surface Form: "Could you close the door?"                    │
-└───────────────────┬─────────────────────────────────────────┘
-                    │
-        ┌───────────▼──────────────┐
-        │  Grammatical Mood Parse   │
-        │  • Interrogative (Subj-Aux Inversion)  │
-        │  • Modal auxiliary "could"              │
-        └───────────┬──────────────┘
-                    │
-        ┌───────────▼────────────────┐
-        │  Literal Illocutionary Force │
-        │  • Query: ability to close door │
-        └───────────┬────────────────┘
-                    │
-        ┌───────────▼────────────────────┐
-        │  Contextual Reanalysis          │
-        │  • Preparatory condition for request │
-        │  • Conventionalized politeness formula │
-        │  • No genuine info-seeking context     │
-        └───────────┬────────────────────┘
-                    │
-        ┌───────────▼──────────────┐
-        │  Derived Force: Directive │
-        │  CLOSE(addressee, door)   │
-        └───────────────────────────┘
+```mermaid
+flowchart TD
+    A["Surface Form: 'Could you close the door?'"]
+    B["Grammatical Mood Parse<br/>• Interrogative (Subj-Aux Inversion)<br/>• Modal auxiliary 'could'"]
+    C["Literal Illocutionary Force<br/>• Query: ability to close door"]
+    D["Contextual Reanalysis<br/>• Preparatory condition for request<br/>• Conventionalized politeness formula<br/>• No genuine info-seeking context"]
+    E["Derived Force: Directive<br/>CLOSE(addressee, door)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 Performative verbs constitute a specialized lexical class that explicitly names the speech act being performed. First-person present-tense constructions with these verbs function as self-verifying performatives: "I hereby promise to repay the loan," "I apologize for the delay," "I warn you that the ice is thin." The felicity conditions for each performative verb type constrain their appropriate usage contexts. Commissives like "promise," "vow," and "guarantee" require the speaker to commit to future action and presuppose the hearer's interest in this commitment. Directives such as "order," "request," and "forbid" require appropriate authority or social relations between interlocutors. Expressives including "thank," "congratulate," and "apologize" presuppose the existence of specific prior events or states that warrant the emotional stance expressed.
 
 The mechanism of conversational implicature derivation operates through systematic reasoning about violations of or adherence to Gricean maxims. Scalar implicatures arise when speakers select weaker terms from informativeness scales, thereby implicating the negation of stronger alternatives. English possesses numerous scalar sets organized by entailment relationships: quantifiers (all > most > many > some), modals (must > should > might), and evaluative adjectives (excellent > good > adequate). The utterance "Some students passed the exam" implicates "Not all students passed" because if the speaker knew that all students passed, the Maxim of Quantity would have required asserting the stronger proposition. This implicature remains defeasible and can be explicitly canceled: "Some students passed—in fact, all of them did." Generalized conversational implicatures arise systematically across contexts, while particularized implicatures depend on specific situational factors. When asked "How was the concert?" and responding "The violinist showed up on time," the particularized implicature that the performance was poor arises from the Maxim of Relation combined with the expectation that concert reviews mention musical quality rather than punctuality.
 
-```
-Scalar Implicature Computation:
-┌──────────────────────────────────────────────────────┐
-│ Utterance: "Some students passed the exam."          │
-└────────────────┬─────────────────────────────────────┘
-                 │
-     ┌───────────▼──────────────┐
-     │  Semantic Content         │
-     │  ∃x[student(x) ∧ passed(x)] │
-     └───────────┬──────────────┘
-                 │
-     ┌───────────▼────────────────────┐
-     │  Activate Horn Scale            │
-     │  <all, most, many, some>        │
-     │  (ordered by entailment strength) │
-     └───────────┬────────────────────┘
-                 │
-     ┌───────────▼────────────────────────┐
-     │  Reasoning:                         │
-     │  • Speaker said "some" (weaker)     │
-     │  • If speaker knew "all" (stronger) held │
-     │  • Maxim of Quantity requires "all" │
-     │  • Therefore: speaker believes ¬∀x[student(x) → passed(x)] │
-     └───────────┬────────────────────────┘
-                 │
-     ┌───────────▼──────────────┐
-     │  Implicated Content:      │
-     │  "Not all students passed" │
-     └───────────────────────────┘
+```mermaid
+flowchart TD
+    A["Utterance\n'Some students passed the exam.'"]
+    B["Semantic Content\n∃x["student(x) ∧ passed(x)"]"]
+    C["Activate Horn Scale\n⟨all, most, many, some⟩\nordered by entailment strength"]
+    D["Reasoning\n• Speaker said 'some' (weaker term)\n• If speaker knew 'all' (stronger) held\n• Maxim of Quantity requires 'all'\n• Therefore: speaker believes ¬∀x["student(x) → passed(x)"]"]
+    E["Implicated Content\n'Not all students passed'"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 Presupposition projection exhibits complex compositional behavior as presuppositions introduced in embedded clauses interact with logical operators and propositional attitudes. Negation, questions, and modals constitute the canonical tests for presupposition because, unlike assertions, presupposed content survives under these operators. The presupposition that John smoked projects from "John stopped smoking" through negation ("John didn't stop smoking" still presupposes prior smoking), through questions ("Did John stop smoking?"), and through modals ("John might have stopped smoking"). Yet certain embeddings create filtering environments where presuppositions fail to project to matrix clause level. Conditional antecedents filter presuppositions when the antecedent provides the information that would otherwise be presupposed: "If John used to smoke, then he has stopped smoking" does not presuppose that John smoked because the conditional antecedent explicitly introduces this possibility. Disjunctions exhibit asymmetric filtering: "Either John never smoked or he has stopped smoking" does not project the smoking presupposition from the second disjunct.
@@ -97,37 +64,28 @@ The presupposition accommodation mechanism operates as a repair strategy when pr
 
 Reference resolution algorithms exploit multiple information sources organized in accessibility hierarchies. Centering Theory formalizes these preferences through the notions of forward-looking centers (potential referents available for subsequent mention) and backward-looking centers (the most salient referent from the previous utterance). Entities introduced in subject position and maintained across successive utterances as subjects achieve highest accessibility and serve as preferred pronoun antecedents. Passages exhibiting center continuation, where the same entity remains the backward-looking center across utterances, achieve maximal coherence. Center shift, where a new entity becomes the backward-looking center, requires more processing effort and typically correlates with discourse segment boundaries or topic shifts.
 
-```
-Anaphora Resolution Hierarchy:
-┌────────────────────────────────────────────────┐
-│ Discourse Fragment:                            │
-│ [1] John₁ met Bill₂ at the station.            │
-│ [2] He₃ was carrying a heavy suitcase.         │
-└────────────────┬───────────────────────────────┘
-                 │
-     ┌───────────▼─────────────────┐
-     │  Candidate Antecedents:      │
-     │  • John (subj, utterance [1]) │
-     │  • Bill (obj, utterance [1])  │
-     └───────────┬─────────────────┘
-                 │
-     ┌───────────▼──────────────────────┐
-     │  Accessibility Ranking:           │
-     │  1. Subject position (highest)    │
-     │  2. Object position               │
-     │  3. Oblique/adjunct (lowest)      │
-     └───────────┬──────────────────────┘
-                 │
-     ┌───────────▼──────────────────────┐
-     │  Grammatical Parallelism:         │
-     │  • "He" is subject in [2]         │
-     │  • Prefer subject antecedent      │
-     │  • John (subject in [1]) = match  │
-     └───────────┬──────────────────────┘
-                 │
-     ┌───────────▼─────────────┐
-     │  Resolution: He₃ = John₁ │
-     └───────────────────────────┘
+```mermaid
+flowchart TD
+    discourse["<b>Discourse Fragment</b><br/>[1] John₁ met Bill₂ at the station.<br/>[2] He₃ was carrying a heavy suitcase."]
+
+    candidates["<b>Candidate Antecedents</b><br/>• John &nbsp;(subject, utterance [1])<br/>• Bill &nbsp;&nbsp;(object, utterance [1])"]
+
+    ranking["<b>Accessibility Ranking</b><br/>1. Subject position &nbsp;(highest)<br/>2. Object position<br/>3. Oblique / adjunct (lowest)"]
+
+    parallelism["<b>Grammatical Parallelism</b><br/>• 'He' is subject in [2]<br/>• Prefer subject antecedent<br/>• John (subject in [1]) = match"]
+
+    resolution["<b>Resolution</b><br/>He₃ = John₁"]
+
+    discourse    --> candidates
+    candidates   --> ranking
+    ranking      --> parallelism
+    parallelism  --> resolution
+
+    style discourse   fill:#E8F4FD,stroke:#2980B9,stroke-width:2px,color:#000
+    style candidates  fill:#EAF7EA,stroke:#27AE60,stroke-width:2px,color:#000
+    style ranking     fill:#FEF9E7,stroke:#F39C12,stroke-width:2px,color:#000
+    style parallelism fill:#FDF2F8,stroke:#8E44AD,stroke-width:2px,color:#000
+    style resolution  fill:#FDEDEC,stroke:#C0392B,stroke-width:3px,color:#000,font-weight:bold
 ```
 
 Syntactic constraints on pronoun binding prevent certain coreference relations even when semantic plausibility would permit them. C-command requirements dictate that reflexive pronouns must be bound by antecedents within the same local domain (roughly, the same clause or tensed complement). The sentence "John₁ thinks that Bill₂ likes himself₃" allows only the interpretation where "himself" refers to Bill, not John, because Bill c-commands the reflexive within its governing category. Conversely, non-reflexive pronouns typically cannot corefer with c-commanding antecedents in the same local domain, explaining the disjoint reference in "He₁ thinks that John₂ is brilliant" where "he" and "John" must refer to different individuals if "he" occupies subject position in the matrix clause.
@@ -138,24 +96,19 @@ Cleft structures provide rigid information-structural templates that separate pr
 
 Coherence relation identification proceeds through recognition of both explicit discourse connectives and implicit inferential patterns. Explicit connectives form a closed lexical class with specialized members encoding specific relation types. Causal relations surface through "because," "since," "therefore," and "as a result." Contrastive relations employ "but," "however," "although," and "in contrast." Temporal sequencing uses "then," "afterwards," "subsequently," and "meanwhile." Elaboration signals include "in particular," "for instance," and "namely." Yet much discourse coherence operates through implicit relations recoverable from world knowledge and logical inference. The sequence "John pushed Bill. Bill fell down" exhibits a result relation without explicit marking, comprehenders inferring the causal connection from their knowledge of physical mechanics and typical push-fall sequences.
 
-```
-Coherence Relation Taxonomy:
-┌──────────────────────────────────────────────┐
-│              Coherence Relations             │
-└──────────┬───────────────────────────────────┘
-           │
-    ┌──────┴──────────┬─────────────┬──────────────────┐
-    │                 │             │                  │
-Expansion      Contingency    Comparison       Temporal
-    │                 │             │                  │
-┌───┴────┐      ┌─────┴─────┐  ┌──┴────┐       ┌─────┴──────┐
-│Elabor- │      │   Cause/  │  │Contrast│      │ Synchrony/ │
-│ation   │      │   Result  │  │Conces-│      │ Succession │
-│        │      │           │  │ sion  │      │            │
-│"in     │      │"because"  │  │"but"  │      │"then"      │
-│partic- │      │"therefore"│  │"howev-│      │"while"     │
-│ular"   │      │           │  │ er"   │      │            │
-└────────┘      └───────────┘  └───────┘      └────────────┘
+```mermaid
+flowchart TD
+    Root["Coherence Relations"]
+    
+    Root --> Expansion
+    Root --> Contingency
+    Root --> Comparison
+    Root --> Temporal
+    
+    Expansion --> Elaboration["Elaboration<br/><br/>'in particular'"]
+    Contingency --> CauseResult["Cause/Result<br/><br/>'because'<br/>'therefore'"]
+    Comparison --> Contrast["Contrast/Concession<br/><br/>'but'<br/>'however'"]
+    Temporal --> SyncSucc["Synchrony/Succession<br/><br/>'then'<br/>'while'"]
 ```
 
 The interaction between these pragmatic subsystems creates emergent interpretive effects. A single utterance can simultaneously perform a speech act, generate scalar implicatures, trigger presupposition projection, establish reference through anaphora, mark information structure through prosody and syntax, and contribute to discourse coherence through explicit or implicit relations. Consider the discourse fragment: "A: Did everyone enjoy the presentation? B: SOME people found it interesting." The response performs an assertion while simultaneously generating the scalar implicature "Not everyone found it interesting" through the quantifier choice. The contrastive stress on "some" signals focus structure and strengthens the scalar inference by highlighting the quantifier choice as deliberate. The definite description "the presentation" achieves reference through discourse deixis to A's question, and the overall exchange exhibits a question-answer adjacency pair structure that constrains B's response to be relevant to A's query.

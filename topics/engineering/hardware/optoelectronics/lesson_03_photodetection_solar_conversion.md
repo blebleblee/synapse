@@ -60,27 +60,41 @@ Solar cell architecture optimizes for maximum photocurrent generation across the
 
 The metallization grid on the front surface must balance two competing requirements: sufficient metal coverage to minimize series resistance, yet minimal area blockage to maximize photon collection. The optimized finger pitch (spacing between parallel metal lines) emerges from detailed loss analysis balancing resistive losses in the silicon emitter layer against shading losses from metal coverage. Typical designs employ finger pitches of 1.5–2.5 mm with individual finger widths of 80–120 μm, achieving metal coverage fractions below 8%. The rear surface features full-area metallization, often incorporating a back-surface field (BSF) layer—a heavily-doped p⁺ region creating a potential barrier that reflects minority carriers away from the rear surface, reducing recombination losses.
 
-```
-Solar Cell Current-Voltage Characteristics
-
-Iₛc ┐                                  
-    │ ─────┐        Dark I-V: Idiode    
-    │      │                            
-    │      │   ○ Maximum Power Point    
-    │      └─────┐    Pmax = Imp·Vmp    
-Iₚₕ ┤            │                      
-    │      ○     │   Illuminated I-V    
-    │       ╲    │   Iph - Idiode       
-    │        ╲   │                      
-Imp ┤         ╲  │                      
-    │          ╲ │                      
-    │           ╲│                      
-    │            └────────┐             
-    └─────────────────────┴──────────→ V
-    0                   Vmp  Voc        
-                                        
-    Fill Factor: FF = (Imp·Vmp)/(Isc·Voc)
-    Efficiency: η = Pmax/Pin = FF·Isc·Voc/Pin
+```mermaid
+flowchart TD
+    Start["Solar Cell Current-Voltage Characteristics"]
+    
+    subgraph axes ["I-V Coordinate System"]
+        YAxis["Current Axis (I)<br/>Isc (Short Circuit)<br/>Iph (Photocurrent)<br/>Imp (Max Power)"]
+        XAxis["Voltage Axis (V)<br/>0 → Vmp → Voc"]
+    end
+    
+    subgraph curves ["Characteristic Curves"]
+        DarkIV["Dark I-V Curve<br/>Idiode<br/>(Exponential, no illumination)"]
+        IllumIV["Illuminated I-V Curve<br/>I = Iph - Idiode<br/>(Shifted downward)"]
+    end
+    
+    subgraph critical ["Critical Operating Points"]
+        ISC["Short Circuit Point<br/>I = Isc, V = 0"]
+        VOC["Open Circuit Point<br/>I = 0, V = Voc"]
+        MPP["⭕ Maximum Power Point<br/>Pmax = Imp · Vmp<br/>(I = Imp, V = Vmp)"]
+    end
+    
+    subgraph metrics ["Performance Metrics"]
+        FF["Fill Factor<br/>FF = (Imp · Vmp) / (Isc · Voc)"]
+        EFF["Efficiency<br/>η = Pmax / Pin<br/>η = (FF · Isc · Voc) / Pin"]
+    end
+    
+    Start --> axes
+    axes --> curves
+    curves --> critical
+    ISC --> MPP
+    VOC --> MPP
+    MPP --> metrics
+    
+    style MPP fill:#ff9,stroke:#f66,stroke-width:3px
+    style Start fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style metrics fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
 ```
 
 The current-voltage relationship of an illuminated solar cell follows the diode equation modified by the photogenerated current: $I = I_0[\exp(qV/nkT) - 1] - I_{ph}$. Here $I_0$ represents the reverse saturation current (typically 10⁻¹² to 10⁻¹⁰ A/cm²), $n$ the ideality factor (1.0–1.5), $k$ Boltzmann's constant (1.381 × 10⁻²³ J/K), and $T$ the absolute temperature. At short-circuit conditions (V = 0), the current equals the photocurrent $I_{sc} \approx I_{ph}$. At open-circuit conditions (I = 0), the voltage reaches $V_{oc} = \frac{nkT}{q}\ln\left(\frac{I_{ph}}{I_0} + 1\right)$. The maximum power point occurs at intermediate voltage and current values where the product IV maximizes, typically at Vₘₚ ≈ 0.8Vₒc and Iₘₚ ≈ 0.9Iₛc for high-quality silicon cells.
@@ -105,7 +119,7 @@ Avalanche photodiode operation requires precision bias control to maintain stabl
 
 Excess noise factor optimization involves careful design of the multiplication region doping profile. Uniform multiplication regions exhibit higher excess noise than graded structures where field strength varies with position. The dead-space effect—the finite distance required for carriers to acquire sufficient energy for ionization—reduces excess noise in thin multiplication regions below 1 μm. This effect arises because carriers born near the entrance of the multiplication region experience less multiplication than those born deep within, reducing gain variance. Single-photon avalanche diodes (SPADs) exploit this effect in combination with above-breakdown bias operation to achieve gain factors exceeding 10⁶, enabling detection of individual photon arrivals. SPAD operation requires gated or actively-quenched bias control to prevent continuous avalanche after photon detection.
 
-Solar cell optimization for maximum efficiency requires addressing multiple loss mechanisms simultaneously. Optical losses partition into reflection (2–4% for single-layer anti-reflection coating, <1% for dual-layer), shading from front metallization (5–8%), and incomplete absorption of long-wavelength photons (5–10% for 200 μm silicon wafers). Recombination losses include surface recombination at front and rear surfaces (combined 1–3% relative efficiency loss for well-passivated surfaces), Auger recombination in the heavily-doped emitter and base (2–3%), and SRH recombination in the bulk and space-charge region (1–5% depending on material quality). Resistive losses include series resistance from the emitter sheet resistance, contact resistance, and metal grid resistance (combined 2–4% relative efficiency loss), and shunt resistance losses from edge and junction defects (typically <0.5% for high-quality cells).
+Solar cell optimization for maximum efficiency requires addressing multiple loss mechanisms simultaneously. Optical losses partition into reflection (2–4% for single-layer anti-reflection coating, < 1% for dual-layer), shading from front metallization (5–8%), and incomplete absorption of long-wavelength photons (5–10% for 200 μm silicon wafers). Recombination losses include surface recombination at front and rear surfaces (combined 1–3% relative efficiency loss for well-passivated surfaces), Auger recombination in the heavily-doped emitter and base (2–3%), and SRH recombination in the bulk and space-charge region (1–5% depending on material quality). Resistive losses include series resistance from the emitter sheet resistance, contact resistance, and metal grid resistance (combined 2–4% relative efficiency loss), and shunt resistance losses from edge and junction defects (typically < 0.5% for high-quality cells).
 
 The temperature coefficient of efficiency for silicon solar cells amounts to approximately -0.4 to -0.5%/K, arising primarily from the temperature dependence of open-circuit voltage. The bandgap energy decreases with temperature at a rate of approximately -2.3 × 10⁻⁴ eV/K for silicon, while the reverse saturation current $I_0$ increases exponentially according to $I_0 \propto T^3 \exp(-E_g/kT)$. This exponential dependence causes Vₒc to decrease approximately 2.2 mV/K for silicon cells. Short-circuit current increases slightly with temperature (0.06%/K) due to bandgap shrinkage extending the spectral response, but this small positive coefficient cannot compensate for the voltage loss. High-temperature operation (85°C) of solar modules reduces efficiency by 15–20% relative to standard test conditions (25°C), emphasizing the importance of thermal management through backsheet design and air circulation.
 
@@ -117,7 +131,7 @@ Bifacial solar cells, collecting light from both front and rear surfaces, achiev
 
 Tandem solar cells combining multiple junctions with different bandgaps overcome the Shockley-Queisser limit for single-junction cells. A high-bandgap top cell absorbs short-wavelength photons while transmitting longer wavelengths to a low-bandgap bottom cell. The optimal bandgap combination depends on whether current matching is required (two-terminal tandem) or cells operate independently (four-terminal or mechanically-stacked tandem). For a two-terminal silicon-based tandem, the top cell requires a bandgap near 1.7 eV, achievable with perovskites, III-V materials, or chalcogenides. The theoretical efficiency limit for an ideal two-junction tandem reaches 45% under one-sun illumination, with three-junction devices approaching 50% and infinite junctions converging toward the thermodynamic limit near 86% under maximum concentration.
 
-Perovskite-silicon tandem cells have progressed rapidly, achieving laboratory efficiencies exceeding 33% through careful optimization of the perovskite composition (mixed cation, mixed halide formulations like FA₀.₈₃Cs₀.₁₇Pb(I₀.₈Br₀.₂)₃), interface recombination minimization using self-assembled monolayers, and TCO (transparent conducting oxide) selection balancing conductivity with optical transmission. The primary challenge remains long-term stability: perovskites degrade under combined stress from moisture, oxygen, heat, light, and bias. Encapsulation strategies must prevent ion migration while maintaining flexibility to accommodate thermal expansion mismatch between layers. Recent stability tests demonstrate <5% degradation after 1000 hours at 85°C and maximum power point tracking, approaching but not yet meeting the decades-long operational lifetime required for commercial viability.
+Perovskite-silicon tandem cells have progressed rapidly, achieving laboratory efficiencies exceeding 33% through careful optimization of the perovskite composition (mixed cation, mixed halide formulations like FA₀.₈₃Cs₀.₁₇Pb(I₀.₈Br₀.₂)₃), interface recombination minimization using self-assembled monolayers, and TCO (transparent conducting oxide) selection balancing conductivity with optical transmission. The primary challenge remains long-term stability: perovskites degrade under combined stress from moisture, oxygen, heat, light, and bias. Encapsulation strategies must prevent ion migration while maintaining flexibility to accommodate thermal expansion mismatch between layers. Recent stability tests demonstrate < 5% degradation after 1000 hours at 85°C and maximum power point tracking, approaching but not yet meeting the decades-long operational lifetime required for commercial viability.
 
 Concentrator photovoltaics (CPV) employ optical elements (Fresnel lenses or parabolic mirrors) to focus sunlight 100–1000× onto small high-efficiency cells, enabling use of expensive III-V multijunction devices with efficiency exceeding 40%. The photocurrent scales linearly with concentration, while open-circuit voltage increases logarithmically according to $V_{oc} = V_{oc,1sun} + \frac{nkT}{q}\ln(C)$, where $C$ represents the concentration factor. Series resistance losses increase quadratically with concentration, demanding ultra-low resistance contacts and thick metal grids. Thermal management becomes critical at high concentration: a 1 cm² cell under 500× concentration dissipates 20–30 W thermal power, requiring active cooling to maintain junction temperature below 80°C. CPV systems achieve system efficiency of 30–35% in direct normal irradiance (DNI) but require dual-axis tracking and perform poorly under cloudy conditions, limiting deployment to high-DNI locations like deserts.
 

@@ -66,21 +66,36 @@ The aggregate expenditure function $AE = C + I^p + G = C_0 + cY + I^p + G$ combi
 
 The geometric representation plots aggregate expenditure $AE$ on the vertical axis against income $Y$ on the horizontal axis, with a 45-degree reference line where $AE = Y$ identifies all potential equilibrium points. The aggregate expenditure schedule intersects this reference line at the unique equilibrium income $Y^*$. The diagram's mechanics illuminate adjustment dynamics:
 
-```
-       AE
-        |
-        |     AE = Y (45° line)
-        |    /
-        | ┌─/─────────── AE = C₀ + cY + I^p + G
-        | │/           ╱
-     Y* |─┼─────────╱─
-        | │       ╱ │
-        | │     ╱   │ Slope = c
-    C₀+I|─┼───╱─────┤
-        | │ ╱       │
-        |─┼╱────────┼────────> Y
-        | │         Y*
-        |
+```mermaid
+flowchart TD
+    origin["Origin (0,0)"]
+    
+    yAxis["AE Axis (Aggregate Expenditure)"]
+    xAxis["Y Axis (National Income)"]
+    
+    point1["Point: (0, C₀+I)"]
+    point2["Point: (Y*, Y*)"]
+    point3["Point: (Y*, C₀+cY*+Iᵖ+G)"]
+    
+    line45["AE = Y<br/>(45° line)"]
+    lineAE["AE = C₀ + cY + Iᵖ + G<br/>(Slope = c)"]
+    
+    equilibrium["Equilibrium Point<br/>Y = Y*<br/>AE = Y*"]
+    
+    intercept["Y-intercept = C₀+I"]
+    
+    origin --> xAxis
+    origin --> yAxis
+    
+    point1 -.-> lineAE
+    point2 -.-> line45
+    point2 -.-> lineAE
+    point3 -.-> equilibrium
+    
+    lineAE --> equilibrium
+    line45 --> equilibrium
+    
+    point1 --> intercept
 ```
 
 At income levels below equilibrium $Y < Y^*$, the aggregate expenditure schedule lies above the 45-degree line, indicating planned spending exceeds production. Firms experience unintended inventory depletion as customers purchase more goods than were produced during the period. Negative inventory investment $(I_{unintended} = Y - AE < 0)$ signals excess demand, prompting firms to expand production toward $Y^*$. Conversely, at $Y > Y^*$, planned expenditure falls short of output, generating unintended inventory accumulation $(I_{unintended} > 0)$ that induces production cutbacks. The equilibrium condition $Y = AE$ equivalently states that unintended inventory investment equals zero $(I_{unintended} = 0)$, with actual investment (planned plus unintended) equaling realized saving through the national income identity.

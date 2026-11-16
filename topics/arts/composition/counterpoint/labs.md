@@ -73,8 +73,8 @@ graph LR
         G -->|"step down"| H["E4 — penultimate"]
         H -->|"step down"| I["D4 — final"]
     end
-    style E fill:#ffcccc
-    style H fill:#ccffcc
+    style E fill:#ffcccc,color:#0f172a
+    style H fill:#ccffcc,color:#0f172a
 ```
 
 **Keyboard drill**: play this CF with your right hand, 4th-finger-on-D as your anchor, one note per beat at 60 BPM, for 10 repetitions. Then sing it on solfège (Re-Mi-Fa-Sol-La-Sol-Fa-Mi-Re in relative Dorian) while your left hand holds a drone D3. The drone is critical — it's your tuning reference and it immediately exposes any note that sounds "modally wrong."
@@ -180,7 +180,7 @@ graph TD
     A -->|"step or small leap"| C
     B -->|"step, same direction"| D["Next downbeat consonance"]
     C --> D
-    style B fill:#ffcccc
+    style B fill:#ffcccc,color:#0f172a
 ```
 
 **Keyboard drill**: this is where hand independence starts mattering. Practice the CP alone first, right hand only, hearing the stepwise contour of each measure-pair. Then add the CF in the left hand at half the speed — literally play the CF note, hold it, and fit two CP notes against it. Loop each measure 8 times before moving to the next; stitching measures together too early is the #1 cause of sloppy second species.
@@ -261,9 +261,9 @@ graph LR
     A -->|"tie across barline"| B
     B -->|"step down"| C
     C --> D["Next cycle or cadence"]
-    style B fill:#ff9999
-    style A fill:#99ff99
-    style C fill:#99ff99
+    style B fill:#ff9999,color:#0f172a
+    style A fill:#99ff99,color:#0f172a
+    style C fill:#99ff99,color:#0f172a
 ```
 
 **The physical feel at the keyboard**: hold the suspended note with firm finger weight — don't re-strike it, it's tied — while your other hand changes the harmony underneath. You should feel the dissonance arrive as the *bass* moves, not as anything your sustaining finger does. This is the clearest possible demonstration that dissonance is a relationship between voices, not a property of a single note.

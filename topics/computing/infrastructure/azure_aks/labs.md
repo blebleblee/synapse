@@ -522,3 +522,4 @@ While fio runs, verify that the kernel block layer is not introducing additional
 kubectl get pv $(kubectl get pvc bench-pvc -o jsonpath='{.spec.volumeName}') \
   -o jsonpath='{.spec.csi.volumeHandle}'
 # The volume handle contains the Azure disk name.
+```

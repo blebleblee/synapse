@@ -20,74 +20,45 @@ The invocation semantic itself bifurcates into two distinct models with differen
 
 To reason about optimization and failure, you need an accurate internal model of what happens during an invocation lifecycle. The sequence below traces a cold-start invocation through AWS Lambda's execution model, which is representative enough to generalize from.
 
-```
-  Invoke Request
-       │
-       ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                        Lambda Control Plane                          │
-│                                                                      │
-│   ┌──────────────┐    ┌──────────────────┐    ┌──────────────────┐ │
-│   │  Front-End   │───▶│ Assignment Svc   │───▶│  Worker Manager  │ │
-│   │  Load Balancer│   │ (warm pool lookup)│   │  (slot alloc)    │ │
-│   └──────────────┘    └──────────────────┘    └──────────────────┘ │
-└─────────────────────────────────────────────────────────────────────┘
-                                                          │
-                              COLD PATH                   │  WARM PATH
-                    ┌─────────────────────────┐          │
-                    ▼                         │          ▼
-          ┌──────────────────┐               │  ┌──────────────────┐
-          │  MicroVM Boot    │               │  │  Warm Execution  │
-          │  (Firecracker/   │               │  │  Context (reused │
-          │   KVM, ~100ms)   │               │  │  sandbox)        │
-          └────────┬─────────┘               │  └────────┬─────────┘
-                   │                         │           │
-                   ▼                         │           ▼
-          ┌──────────────────┐               │  ┌──────────────────┐
-          │  Container Init  │               │  │  Handler Invoke  │
-          │  (runc, namespace│               └──│  (direct call,   │
-          │   setup, ~50ms)  │                  │   no init cost)  │
-          └────────┬─────────┘                  └────────┬─────────┘
-                   │                                     │
-                   ▼                                     │
-          ┌──────────────────┐                          │
-          │  Runtime Init    │                          │
-          │  (Python/Node    │                          │
-          │   interpreter,   │                          │
-          │   ~50-200ms)     │                          │
-          └────────┬─────────┘                          │
-                   │                                     │
-                   ▼                                     │
-          ┌──────────────────┐                          │
-          │  Handler Init    │                          │
-          │  (module imports,│                          │
-          │   SDK clients,   │                          │
-          │   ~variable)     │                          │
-          └────────┬─────────┘                          │
-                   │                                     │
-                   └──────────────────┬──────────────────┘
-                                      │
-                                      ▼
-                             ┌─────────────────┐
-                             │  Handler Execute │
-                             │  (your code)     │
-                             └────────┬────────┘
-                                      │
-                                      ▼
-                             ┌─────────────────┐
-                             │  Response/Error  │
-                             │  returned to     │
-                             │  control plane   │
-                             └────────┬────────┘
-                                      │
-                              ┌───────┴────────┐
-                              │                │
-                              ▼                ▼
-                       ┌──────────┐    ┌──────────────┐
-                       │  Freeze  │    │  Terminate   │
-                       │  sandbox │    │  (SIGTERM)   │
-                       │  (warm)  │    │              │
-                       └──────────┘    └──────────────┘
+```mermaid
+flowchart TD
+    Start["Invoke Request"]
+    
+    Start --> ControlPlane
+    
+    subgraph ControlPlane["Lambda Control Plane"]
+        FE["Front-End<br/>Load Balancer"]
+        AS["Assignment Svc<br/>(warm pool lookup)"]
+        WM["Worker Manager<br/>(slot alloc)"]
+        
+        FE --> AS
+        AS --> WM
+    end
+    
+    WM --> ColdPath{"Path Selection"}
+    WM --> WarmPath{"Path Selection"}
+    
+    ColdPath -->|"COLD PATH"| MicroVM["MicroVM Boot<br/>(Firecracker/KVM, ~100ms)"]
+    WarmPath -->|"WARM PATH"| WarmExec["Warm Execution Context<br/>(reused sandbox)"]
+    
+    MicroVM --> ContainerInit["Container Init<br/>(runc, namespace setup, ~50ms)"]
+    WarmExec --> HandlerInvoke["Handler Invoke<br/>(direct call, no init cost)"]
+    
+    ContainerInit --> RuntimeInit["Runtime Init<br/>(Python/Node interpreter, ~50-200ms)"]
+    
+    RuntimeInit --> HandlerInit["Handler Init<br/>(module imports, SDK clients, ~variable)"]
+    
+    HandlerInit --> Converge["Convergence Point"]
+    HandlerInvoke --> Converge
+    
+    Converge --> Execute["Handler Execute<br/>(your code)"]
+    
+    Execute --> Response["Response/Error<br/>returned to control plane"]
+    
+    Response --> Decision{"Lifecycle Decision"}
+    
+    Decision --> Freeze["Freeze sandbox<br/>(warm)"]
+    Decision --> Terminate["Terminate<br/>(SIGTERM)"]
 ```
 
 The critical structural insight in this diagram is the asymmetry between the cold path and the warm path. On the cold path, the total latency visible to the caller accumulates across four independent phases before a single line of your code executes. The microVM boot cost is dominated by kernel initialization and the KVM guest entry sequence. Container initialization involves namespace creation, cgroup attachment, rootfs mount, and the `runc` state machine reaching the `created` state. Runtime initialization is language-specific: a Node.js function starts the V8 engine and parses the module graph; a Python function starts the CPython interpreter, compiles bytecode, and loads the standard library modules referenced at import time; a JVM function performs class loading, bytecode verification, and JIT warm-up, making Java the most expensive runtime for cold-start latency at the application layer. Handler initialization — your code at the module level, outside the handler function itself — runs once per execution context lifetime, not once per invocation. This is the hook the platform provides for amortizing initialization cost.

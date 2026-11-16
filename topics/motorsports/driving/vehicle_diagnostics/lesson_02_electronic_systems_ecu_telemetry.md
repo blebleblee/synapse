@@ -42,50 +42,71 @@ Freeze-frame capture logic monitors for the first occurrence of a confirmed diag
 
 The distinction between live data and stored fault codes reflects different phases of the diagnostic workflow. Live data streaming provides immediate visibility into current ECU calculations and sensor readings, enabling the engineer to verify sensor functionality, observe control loop behavior, and trigger specific operating conditions while monitoring the response. This real-time access is essential for dynamic testing: running the engine at 4000 RPM under 80% load while watching lambda sensor feedback, fuel trim corrections, and ignition advance allows immediate identification of control instabilities or sensor anomalies. In contrast, stored fault codes represent historical events that occurred during previous operation, preserving evidence of intermittent failures that may not be present during the current diagnostic session. The freeze-frame context helps bridge this temporal gap by capturing the operating conditions that triggered the fault.
 
-```
-ECU CONTROL LOOP EXECUTION SEQUENCE (10 kHz base rate)
+```mermaid
+flowchart TD
+    CRANK["⚡ Crankshaft Edge Interrupt\nevery 6° @ 10,000 RPM ≈ 100 µs"]
 
-Crankshaft Edge Interrupt (every 6° at 10,000 RPM = ~100 μs)
-│
-├─> Update Position Accumulator
-├─> Calculate Instantaneous Angular Velocity
-├─> Predict Next Cylinder Event Timestamps
-│
-Cylinder Event Timer Interrupt (scheduled per prediction)
-│
-├─> [INJECTION EVENT]
-│   ├─> Lookup Base VE(RPM, MAP)
-│   ├─> Calculate Air Mass: m_air = VE × V_d × MAP / (R × T_intake)
-│   ├─> Calculate Fuel Mass: m_fuel = m_air / (λ_target × AFR_stoich)
-│   ├─> Convert to Pulse Width: t_inj = m_fuel / flow_rate(ΔP, V_batt)
-│   ├─> Apply Corrections: t_final = t_inj × K_temp × K_accel × K_trim
-│   └─> Trigger Injector Driver at Calculated Angle
-│
-├─> [IGNITION EVENT]
-│   ├─> Lookup Base Advance: adv_base(RPM, Load)
-│   ├─> Apply Temperature Correction: adv += K_temp(T_coolant, T_air)
-│   ├─> Apply Knock Retard: adv -= Σ knock_retard[cyl]
-│   ├─> Calculate Dwell Time: t_dwell = f(V_batt, target_energy)
-│   ├─> Schedule Coil Charge: angle_charge = TDC - adv - dwell_angle
-│   └─> Schedule Spark Fire: angle_fire = TDC - adv
-│
-Background Task Loop (1 kHz rate)
-│
-├─> Sample Analog Inputs (MAP, TPS, CLT, IAT, fuel pressure)
-├─> Process Lambda Sensor Controller Messages
-├─> Update Closed-Loop Fuel Trim
-│   ├─> Error = λ_target - λ_measured
-│   ├─> Short-Term Trim += K_p × Error + K_i × ∫Error
-│   └─> Long-Term Trim (adaptive, 0.1 Hz update)
-│
-├─> Execute Diagnostic Monitors
-│   ├─> Plausibility: (0.2 < λ < 1.3), (20 kPa < MAP < 300 kPa)
-│   ├─> Rationality: |λ_bank1 - λ_bank2| < 0.05
-│   └─> Increment Fault Counters / Set Pending DTCs
-│
-├─> Service CAN Bus Diagnostic Requests (ISO 15765-4)
-├─> Broadcast Telemetry Messages (10-100 Hz per message ID)
-└─> Update Dashboard Outputs (tachometer, warning lights)
+    CRANK --> POS["Update Position Accumulator"]
+    CRANK --> VEL["Calculate Instantaneous Angular Velocity"]
+    CRANK --> PRED["Predict Next Cylinder Event Timestamps"]
+
+    PRED --> CYL_TIMER["🕐 Cylinder Event Timer Interrupt\nscheduled per prediction"]
+
+    subgraph INJ_SUB ["INJECTION EVENT"]
+        INJ_VE["Lookup Base VE(RPM, MAP)"]
+        INJ_AIR["Calculate Air Mass\nm_air = VE × V_d × MAP / (R × T_intake)"]
+        INJ_FUEL["Calculate Fuel Mass\nm_fuel = m_air / (λ_target × AFR_stoich)"]
+        INJ_PW["Convert to Pulse Width\nt_inj = m_fuel / flow_rate(ΔP, V_batt)"]
+        INJ_CORR["Apply Corrections\nt_final = t_inj × K_temp × K_accel × K_trim"]
+        INJ_TRIG["Trigger Injector Driver\nat Calculated Angle"]
+
+        INJ_VE --> INJ_AIR --> INJ_FUEL --> INJ_PW --> INJ_CORR --> INJ_TRIG
+    end
+
+    subgraph IGN_SUB ["IGNITION EVENT"]
+        IGN_BASE["Lookup Base Advance\nadv_base(RPM, Load)"]
+        IGN_TEMP["Apply Temperature Correction\nadv += K_temp(T_coolant, T_air)"]
+        IGN_KNOCK["Apply Knock Retard\nadv -= Σ knock_retard[cyl]"]
+        IGN_DWELL["Calculate Dwell Time\nt_dwell = f(V_batt, target_energy)"]
+        IGN_CHARGE["Schedule Coil Charge\nangle_charge = TDC − adv − dwell_angle"]
+        IGN_FIRE["Schedule Spark Fire\nangle_fire = TDC − adv"]
+
+        IGN_BASE --> IGN_TEMP --> IGN_KNOCK --> IGN_DWELL --> IGN_CHARGE --> IGN_FIRE
+    end
+
+    CYL_TIMER --> INJ_VE
+    CYL_TIMER --> IGN_BASE
+
+    BG["🔄 Background Task Loop\n1 kHz rate"]
+
+    BG --> ADC["Sample Analog Inputs\nMAP, TPS, CLT, IAT, Fuel Pressure"]
+    BG --> LAMBDA_MSG["Process Lambda Sensor\nController Messages"]
+
+    subgraph FUEL_TRIM ["CLOSED-LOOP FUEL TRIM"]
+        TRIM_ERR["Error = λ_target − λ_measured"]
+        TRIM_ST["Short-Term Trim\n+= K_p × Error + K_i × ∫Error"]
+        TRIM_LT["Long-Term Trim\nadaptive, 0.1 Hz update"]
+
+        TRIM_ERR --> TRIM_ST --> TRIM_LT
+    end
+
+    BG --> TRIM_ERR
+
+    subgraph DIAG ["DIAGNOSTIC MONITORS"]
+        DIAG_PLAUS["Plausibility Check\n0.2 < λ < 1.3,  20 kPa < MAP < 300 kPa"]
+        DIAG_RAT["Rationality Check\n|λ_bank1 − λ_bank2| < 0.05"]
+        DIAG_DTC["Increment Fault Counters\nSet Pending DTCs"]
+
+        DIAG_PLAUS --> DIAG_DTC
+        DIAG_RAT --> DIAG_DTC
+    end
+
+    BG --> DIAG_PLAUS
+    BG --> DIAG_RAT
+
+    BG --> CAN["Service CAN Bus\nDiagnostic Requests — ISO 15765-4"]
+    BG --> TELEM["Broadcast Telemetry Messages\n10–100 Hz per message ID"]
+    BG --> DASH["Update Dashboard Outputs\nTachometer, Warning Lights"]
 ```
 
 The control loop architecture separates time-critical hard real-time tasks from lower-priority background operations through a two-tier scheduling hierarchy. Crankshaft synchronization and cylinder event scheduling execute in interrupt context with microsecond latency guarantees, preempting all other code. The background task loop handles slower operations like ADC sampling, diagnostic monitoring, and communication protocol processing at a fixed 1 kHz tick rate, providing deterministic execution without disrupting the angular-synchronous engine control.

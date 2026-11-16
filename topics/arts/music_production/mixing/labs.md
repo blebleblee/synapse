@@ -13,23 +13,49 @@ This masterclass runs on a working multitrack session: drums (kick, snare, overh
 3. **Build group buses before you touch a single fader.** Route all drum tracks to a DRUM BUS, guitars to a GTR BUS, vocals to a VOX BUS, all of those into a MIX BUS. This is non-negotiable: bus glue compression and bus EQ are where mixes get cohesion, and you cannot bolt that on at the end.
 4. **Load a reference track.** A commercially released song in a similar genre, on its own fader, gain-matched with a loudness meter — not by ear, because ears lie about level, especially about bass and top end at different volumes.
 
-```
-subgraph session_routing ["Signal Flow: Tracks to Master"]
-  kick["Kick"] --> drumbus["Drum Bus"]
-  snare["Snare"] --> drumbus
-  oh["Overheads"] --> drumbus
-  bass["Bass DI + Amp"] --> bassbus["Bass Bus"]
-  gtr1["Rhythm Gtr"] --> gtrbus["Guitar Bus"]
-  gtr2["Lead Gtr"] --> gtrbus
-  lv["Lead Vocal"] --> voxbus["Vocal Bus"]
-  bv["BGVs"] --> voxbus
-  keys["Keys"] --> mixbus["Mix Bus"]
-  drumbus --> mixbus
-  bassbus --> mixbus
-  gtrbus --> mixbus
-  voxbus --> mixbus
-  mixbus --> master["Master Fader / Limiter"]
-end
+```mermaid
+flowchart TD
+    subgraph session_routing ["Signal Flow: Tracks to Master"]
+        kick["Kick"]
+        snare["Snare"]
+        oh["Overheads"]
+        drumbus["Drum Bus"]
+
+        bass["Bass DI + Amp"]
+        bassbus["Bass Bus"]
+
+        gtr1["Rhythm Gtr"]
+        gtr2["Lead Gtr"]
+        gtrbus["Guitar Bus"]
+
+        lv["Lead Vocal"]
+        bv["BGVs"]
+        voxbus["Vocal Bus"]
+
+        keys["Keys"]
+        mixbus["Mix Bus"]
+        master["Master Fader / Limiter"]
+
+        kick --> drumbus
+        snare --> drumbus
+        oh --> drumbus
+
+        bass --> bassbus
+
+        gtr1 --> gtrbus
+        gtr2 --> gtrbus
+
+        lv --> voxbus
+        bv --> voxbus
+
+        keys --> mixbus
+        drumbus --> mixbus
+        bassbus --> mixbus
+        gtrbus --> mixbus
+        voxbus --> mixbus
+
+        mixbus --> master
+    end
 ```
 
 ---
@@ -174,13 +200,20 @@ Individual track processing only gets you partway. Mixes that sound like "one th
 2. **Gentle mix-bus EQ:** often just a high-shelf +0.5 dB at 10 kHz for air and a low-shelf +0.5 dB at 60 Hz for weight. Nothing dramatic — big tonal moves belong on individual tracks, not the master.
 3. **Leave headroom.** Peak the mix bus around -6 dBFS before any mastering limiter touches it. If you're already slamming a limiter during mixing, you've lost the ability to make final decisions at mastering.
 
-```
-subgraph bus_processing ["Bus Processing Chain"]
-  tracks["Individual Tracks (EQ + Comp per track)"] --> busA["Sub-Bus (Glue Compression)"]
-  busA --> mixbus2["Mix Bus (Light Comp + Gentle EQ)"]
-  mixbus2 --> headroom["-6 dBFS Headroom Target"]
-  headroom --> mastering["Mastering Stage (separate session)"]
-end
+```mermaid
+flowchart TD
+    subgraph bus_processing ["Bus Processing Chain"]
+        tracks["Individual Tracks (EQ + Comp per track)"]
+        busA["Sub-Bus (Glue Compression)"]
+        mixbus2["Mix Bus (Light Comp + Gentle EQ)"]
+        headroom["-6 dBFS Headroom Target"]
+        mastering["Mastering Stage (separate session)"]
+        
+        tracks --> busA
+        busA --> mixbus2
+        mixbus2 --> headroom
+        headroom --> mastering
+    end
 ```
 
 ---
@@ -223,19 +256,18 @@ Overheads, snare top/bottom, and DI+amp bass pairs are all vulnerable to phase c
 
 The actual failure modes you'll hit in every real session.
 
-```
-subgraph diagnosis_tree ["Mix Problem Diagnosis Flowchart"]
-  start["Mix sounds off"] --> q1{"Muddy / undefined low-mids?"}
-  q1 -->|Yes| fix1["Check 200-500 Hz buildup across guitars/keys/vox; high-pass non-bass elements"]
-  q1 -->|No| q2{"Vocal buried / not cutting through?"}
-  q2 -->|Yes| fix2["Check 3-5 kHz presence; check fader level first; check masking from guitars in same range"]
-  q2 -->|No| q3{"Thin / weak on mono playback?"}
-  q3 -->|Yes| fix3["Phase check multi-mic sources; flip polarity on snare bottom / DI"]
-  q3 -->|No| q4{"Pumping / breathing artifact?"}
-  q4 -->|Yes| fix4["Slow compressor release; reduce ratio or raise threshold; check sidechain filter on bus comp"]
-  q4 -->|No| q5{"Harsh / fatiguing on long listen?"}
-  q5 -->|Yes| fix5["Check 2-4 kHz overall buildup; check de-esser threshold; check cymbal overheads EQ"]
-end
+```mermaid
+flowchart TD
+    start["Mix sounds off"] --> q1{"Muddy / undefined low-mids?"}
+    q1 -->|Yes| fix1["Check 200-500 Hz buildup across guitars/keys/vox;<br/>high-pass non-bass elements"]
+    q1 -->|No| q2{"Vocal buried / not cutting through?"}
+    q2 -->|Yes| fix2["Check 3-5 kHz presence;<br/>check fader level first;<br/>check masking from guitars in same range"]
+    q2 -->|No| q3{"Thin / weak on mono playback?"}
+    q3 -->|Yes| fix3["Phase check multi-mic sources;<br/>flip polarity on snare bottom / DI"]
+    q3 -->|No| q4{"Pumping / breathing artifact?"}
+    q4 -->|Yes| fix4["Slow compressor release;<br/>reduce ratio or raise threshold;<br/>check sidechain filter on bus comp"]
+    q4 -->|No| q5{"Harsh / fatiguing on long listen?"}
+    q5 -->|Yes| fix5["Check 2-4 kHz overall buildup;<br/>check de-esser threshold;<br/>check cymbal overheads EQ"]
 ```
 
 ### Fault 1: The Mix Falls Apart in Mono

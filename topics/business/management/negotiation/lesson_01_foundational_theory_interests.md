@@ -32,47 +32,24 @@ The relationship between BATNA, reservation price, and negotiating power operate
 
 The negotiation system operates through an iterative information exchange protocol in which parties alternate between proposal transmission and evaluation against private utility functions. The architectural components consist of interests, positions, BATNAs, reservation prices, and the zone of possible agreement, connected through information flows and decision rules that determine when parties accept, counter, or terminate negotiations.
 
-```
-Party A                            Party B
-┌──────────────────┐              ┌──────────────────┐
-│   Interests      │              │   Interests      │
-│ - Control        │              │ - Returns        │
-│ - Liquidity      │              │ - Portfolio Fit  │
-│ - Timeline       │              │ - Co-investment  │
-└────────┬─────────┘              └────────┬─────────┘
-         │                                 │
-         │ Generate Position               │ Generate Position
-         ▼                                 ▼
-┌──────────────────┐              ┌──────────────────┐
-│   Position       │              │   Position       │
-│ $380M max price  │◄────────────►│ $270M min price  │
-│ + board seat     │   Proposals  │ + earnout        │
-│ + IP rights      │   Counters   │ + retention      │
-└────────┬─────────┘              └────────┬─────────┘
-         │                                 │
-         │ Constrained by                  │ Constrained by
-         ▼                                 ▼
-┌──────────────────┐              ┌──────────────────┐
-│   BATNA          │              │   BATNA          │
-│ Next-best target │              │ Standalone plan  │
-│ NPV: $340M       │              │ NPV: $270M       │
-└────────┬─────────┘              └────────┬─────────┘
-         │                                 │
-         │ Determines                      │ Determines
-         ▼                                 ▼
-┌──────────────────┐              ┌──────────────────┐
-│ Reservation Price│              │ Reservation Price│
-│   $340M          │              │   $270M          │
-└────────┬─────────┘              └────────┬─────────┘
-         │                                 │
-         └────────────┬────────────────────┘
-                      │
-                      ▼
-              ┌──────────────┐
-              │     ZOPA     │
-              │ $270M-$340M  │
-              │ Surplus: $70M│
-              └──────────────┘
+```mermaid
+flowchart TD
+    A["Party A<br/>Interests<br/>- Control<br/>- Liquidity<br/>- Timeline"]
+    B["Party B<br/>Interests<br/>- Returns<br/>- Portfolio Fit<br/>- Co-investment"]
+    
+    A -->|"Generate Position"| C["Party A Position<br/>$380M max price<br/>+ board seat<br/>+ IP rights"]
+    B -->|"Generate Position"| D["Party B Position<br/>$270M min price<br/>+ earnout<br/>+ retention"]
+    
+    C ↔ D
+    
+    C -->|"Constrained by"| E["Party A BATNA<br/>Next-best target<br/>NPV: $340M"]
+    D -->|"Constrained by"| F["Party B BATNA<br/>Standalone plan<br/>NPV: $270M"]
+    
+    E -->|Determines| G["Party A<br/>Reservation Price<br/>$340M"]
+    F -->|Determines| H["Party B<br/>Reservation Price<br/>$270M"]
+    
+    G --> I["ZOPA<br/>$270M - $340M<br/>Surplus: $70M"]
+    H --> I
 ```
 
 The negotiation protocol begins with interest identification, a discovery process internal to each party before bilateral engagement commences. Party A conducts stakeholder interviews across functional leadership—finance, operations, product, legal—to elicit the constraints and objectives that the transaction must satisfy. The chief financial officer requires accretive earnings per share impact in year two to satisfy activist investor expectations. The chief product officer demands retention of the target's engineering team for eighteen months to ensure successful integration of the proprietary recommendation engine. The general counsel insists on comprehensive indemnification for pre-acquisition tax liabilities and intellectual property infringement claims. These diverse interests map onto a multidimensional utility function that the negotiation must optimize, but they remain private information until Party A decides what to reveal.

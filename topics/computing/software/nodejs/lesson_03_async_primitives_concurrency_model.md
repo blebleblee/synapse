@@ -38,47 +38,34 @@ The implication for systems programmers is that `await` is a voluntary yield poi
 
 ### The Event Loop Phase Diagram
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                    CALL STACK (V8)                        │
-│         Synchronous JS executes here exclusively          │
-└───────────────────────────┬──────────────────────────────┘
-                            │  stack empties
-                            ▼
-┌──────────────────────────────────────────────────────────┐
-│              MICROTASK CHECKPOINT                         │
-│  1. Drain process.nextTick queue (fully)                  │
-│  2. Drain Promise microtask queue (fully)                 │
-│  (Repeats until both queues are empty)                    │
-└───────────────────────────┬──────────────────────────────┘
-                            │  microtasks exhausted
-                            ▼
-┌──────────────────────────────────────────────────────────┐
-│                   libuv EVENT LOOP                        │
-│                                                           │
-│  Phase 1: timers                                          │
-│           └─ Execute setTimeout / setInterval callbacks   │
-│              whose threshold has elapsed                  │
-│                                                           │
-│  Phase 2: pending callbacks                               │
-│           └─ I/O error callbacks deferred from prev tick  │
-│                                                           │
-│  Phase 3: idle, prepare  (internal libuv use)             │
-│                                                           │
-│  Phase 4: poll  ◄─────────────────────────────────────┐  │
-│           └─ epoll_wait / kqueue / IOCP                │  │
-│              Block until I/O events arrive             │  │
-│              Execute their callbacks                   │  │
-│              Stop blocking if timers are ready ────────┘  │
-│                                                           │
-│  Phase 5: check                                           │
-│           └─ Execute setImmediate callbacks               │
-│                                                           │
-│  Phase 6: close callbacks                                 │
-│           └─ socket.on('close', ...) etc.                 │
-│                                                           │
-│  ── microtask checkpoint between every phase ──           │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    STACK["<b>CALL STACK (V8)</b><br/>Synchronous JS executes here exclusively"]
+
+    MICRO["<b>MICROTASK CHECKPOINT</b><br/>1. Drain process.nextTick queue (fully)<br/>2. Drain Promise microtask queue (fully)<br/><i>Repeats until both queues are empty</i>"]
+
+    STACK -->|"stack empties"| MICRO
+
+    subgraph EVENT_LOOP ["libuv EVENT LOOP"]
+        P1["<b>Phase 1 · timers</b><br/>Execute setTimeout / setInterval callbacks<br/>whose threshold has elapsed"]
+        MC1(["microtask checkpoint"])
+        P2["<b>Phase 2 · pending callbacks</b><br/>I/O error callbacks deferred from previous tick"]
+        MC2(["microtask checkpoint"])
+        P3["<b>Phase 3 · idle, prepare</b><br/>Internal libuv use"]
+        MC3(["microtask checkpoint"])
+        P4["<b>Phase 4 · poll</b><br/>epoll_wait / kqueue / IOCP<br/>Block until I/O events arrive<br/>Execute their callbacks<br/>Stop blocking when timers are ready"]
+        MC4(["microtask checkpoint"])
+        P5["<b>Phase 5 · check</b><br/>Execute setImmediate callbacks"]
+        MC5(["microtask checkpoint"])
+        P6["<b>Phase 6 · close callbacks</b><br/>socket.on('close', …) etc."]
+        MC6(["microtask checkpoint"])
+
+        P1 --> MC1 --> P2 --> MC2 --> P3 --> MC3 --> P4 --> MC4 --> P5 --> MC5 --> P6 --> MC6
+    end
+
+    MICRO -->|"microtasks exhausted"| P1
+    MC6 -->|"next loop iteration"| P1
+    P4 -->|"timer threshold elapsed"| P1
 ```
 
 The microtask checkpoint runs not only when the call stack empties at the top level, but between each of these phases. This means that a chain of `process.nextTick` callbacks can, in pathological cases, starve the I/O phases entirely — the loop never advances past the microtask checkpoint because each `nextTick` callback schedules another. This was actually a known footgun in early Node.js versions before depth limits were considered.

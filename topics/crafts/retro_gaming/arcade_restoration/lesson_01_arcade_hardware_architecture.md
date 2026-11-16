@@ -32,25 +32,41 @@ The DC rails produced vary by platform, but the most common configuration for JA
 
 Switching power supplies became common in arcade cabinets from the late 1980s onward and are the type most restorers encounter in JAMMA conversion cabinets. They are more efficient and lighter than linears, but their failure modes are subtler. A failing switching supply will often produce correct output voltage under no-load bench measurement but sag catastrophically under the full current draw of a CPU board, or it will produce correct average voltage but with high-frequency ripple that upsets sensitive analog circuits. The correct diagnostic instrument here is an oscilloscope, not a multimeter. Set the scope to DC coupling, probe the +5 V rail at the JAMMA connector with the game board fully loaded, and look for ripple amplitude. Anything above 50 mV peak-to-peak warrants supply replacement or recapping.
 
-```
-AC Mains (120/240V)
-        │
-   [Line Fuse]
-        │
- [EMI Line Filter]
-        │
-  [Power Switch]
-        │
-  ┌─────┴──────────────────────────────────────────────────────┐
-  │                    Power Supply Unit                        │
-  │  Transformer ──► Bridge Rectifier ──► Filter Caps ──► Reg  │
-  └──────┬────────────────────┬─────────────────────┬──────────┘
-         │                    │                     │
-       +5 VDC              +12 VDC               -5 VDC
-         │                    │                     │
-  [JAMMA Edge Connector - Pins A/B 1–28, C/D 1–28]
-         │
-    [PCB Logic]──[Audio Amp]──[Coin Mechanism]──[Controls]
+```mermaid
+flowchart TD
+    AC["AC Mains (120/240V)"]
+    FUSE["Line Fuse"]
+    EMI["EMI Line Filter"]
+    SW["Power Switch"]
+
+    AC --> FUSE
+    FUSE --> EMI
+    EMI --> SW
+
+    subgraph PSU ["Power Supply Unit"]
+        TRANS["Transformer"]
+        RECT["Bridge Rectifier"]
+        CAPS["Filter Caps"]
+        REG["Reg"]
+        TRANS --> RECT --> CAPS --> REG
+    end
+
+    SW --> TRANS
+
+    REG --> V5["+5 VDC"]
+    REG --> V12["+12 VDC"]
+    REG --> VNEG["-5 VDC"]
+
+    JAMMA["JAMMA Edge Connector<br>Pins A/B 1–28, C/D 1–28"]
+
+    V5 --> JAMMA
+    V12 --> JAMMA
+    VNEG --> JAMMA
+
+    JAMMA --> LOGIC["PCB Logic"]
+    JAMMA --> AUDIO["Audio Amp"]
+    JAMMA --> COIN["Coin Mechanism"]
+    JAMMA --> CTRL["Controls"]
 ```
 
 The ground architecture deserves more attention than most restoration guides give it. Arcade machines were among the first consumer-facing products to operate at high voltages (the monitor anode runs at 25–30 kV) in a metal-and-wood enclosure accessible to the public. The chassis ground — the metal frame of the cabinet, the coin door, the monitor chassis mounting brackets — must be bonded together and connected to earth ground through the AC inlet's protective earth conductor. This is not optional and not merely a regulatory formality. A floating chassis ground means that any leakage current from the monitor's flyback transformer or the AC power supply has no defined return path. That path will be found by the first person who touches the coin door while standing on a concrete floor.

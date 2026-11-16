@@ -20,30 +20,13 @@ Understanding DNS caching behavior from first principles requires internalizing 
 
 A DNS resolver's caching subsystem maintains an in-memory data structure mapping tuple keys to resource record sets with associated metadata governing expiration and eviction policies. The canonical cache key consists of the fully-qualified domain name in wire format, query type (A, AAAA, MX, etc.), and query class (nearly always IN for Internet), forming a three-dimensional lookup space. Modern high-performance resolvers implement this structure using hash tables with separate chaining for collision resolution, often employing advanced techniques like consistent hashing or adaptive radix trees for prefix-based wildcard matching. Each cache entry contains not only the RRset payload—potentially multiple resource records sharing the same name and type—but also temporal metadata including the insertion timestamp, the original TTL value received from the authoritative server, and computed expiration times derived by adding TTL to insertion time.
 
-```
-Cache Entry Structure (Conceptual):
-
-+------------------+
-|   Cache Key      |
-|------------------|
-| QNAME: example.com
-| QTYPE: A
-| QCLASS: IN
-+------------------+
-        |
-        v
-+---------------------------+
-|   RRset Container         |
-|---------------------------|
-| Insertion Time: T₀
-| Original TTL: 3600 sec
-| Expiration Time: T₀ + 3600
-| RR Count: 2
-|   ├─ A 192.0.2.1
-|   └─ A 192.0.2.2
-| Validation State: unsigned
-| Trust Anchor: (none)
-+---------------------------+
+```mermaid
+flowchart TD
+    CacheKey["<b>Cache Key</b><br/>QNAME: example.com<br/>QTYPE: A<br/>QCLASS: IN"]
+    
+    RRsetContainer["<b>RRset Container</b><br/>Insertion Time: T₀<br/>Original TTL: 3600 sec<br/>Expiration Time: T₀ + 3600<br/>RR Count: 2<br/>├─ A 192.0.2.1<br/>└─ A 192.0.2.2<br/>Validation State: unsigned<br/>Trust Anchor: (none)"]
+    
+    CacheKey --> RRsetContainer
 ```
 
 The TTL countdown mechanism operates through one of two implementation strategies depending on resolver design philosophy. The decrementing model stores the original TTL and insertion timestamp, calculating remaining TTL on-demand during cache lookups by subtracting elapsed time from the original value. This approach minimizes storage overhead and eliminates the need for background timer threads, but requires microsecond-precision clock reads on every cache hit. The precomputed expiration model calculates and stores the absolute expiration timestamp at insertion time using monotonic clock sources immune to wall-clock adjustments, enabling simple comparison operations during lookups at the cost of slightly increased memory footprint. Production resolvers like BIND and Unbound employ the expiration timestamp approach because it simplifies cache eviction logic and provides deterministic performance characteristics under high query load.
@@ -73,48 +56,19 @@ Negative caching introduces additional complexity because the absence of data mu
 
 NODATA responses—where the name exists but lacks the requested record type—require more nuanced caching semantics. A query for the AAAA record of a domain that only has A records returns NODATA (formally, a response with NOERROR rcode but an empty answer section). The resolver must cache this negative result specific to the QTYPE, allowing subsequent AAAA queries to short-circuit while still forwarding A queries to authoritative servers if not already cached. This type-specific negative caching prevents false negatives where caching a NODATA response for one type inappropriately suppresses queries for other types that might exist.
 
-```
-Negative Cache Entry (NXDOMAIN):
+```mermaid
+flowchart TD
+    subgraph nxdomain["Negative Cache Entry (NXDOMAIN)"]
+        nxkey["<b>Cache Key</b><br/>QNAME: nonexistent.example.com<br/>QTYPE: * (all types)<br/>QCLASS: IN"]
+        nxentry["<b>Negative Entry</b><br/>Type: NXDOMAIN<br/>Insertion Time: T₀<br/>Negative TTL: 900 sec<br/>Expiration Time: T₀ + 900<br/>SOA Authority: example.com"]
+        nxkey --> nxentry
+    end
 
-+---------------------------+
-| Cache Key                 |
-|---------------------------|
-| QNAME: nonexistent.example.com
-| QTYPE: * (all types)
-| QCLASS: IN
-+---------------------------+
-        |
-        v
-+---------------------------+
-| Negative Entry            |
-|---------------------------|
-| Type: NXDOMAIN
-| Insertion Time: T₀
-| Negative TTL: 900 sec
-| Expiration Time: T₀ + 900
-| SOA Authority: example.com
-+---------------------------+
-
-Negative Cache Entry (NODATA):
-
-+---------------------------+
-| Cache Key                 |
-|---------------------------|
-| QNAME: host.example.com
-| QTYPE: AAAA (specific)
-| QCLASS: IN
-+---------------------------+
-        |
-        v
-+---------------------------+
-| Negative Entry            |
-|---------------------------|
-| Type: NODATA
-| Insertion Time: T₀
-| Negative TTL: 600 sec
-| Expiration Time: T₀ + 600
-| SOA Authority: example.com
-+---------------------------+
+    subgraph nodata["Negative Cache Entry (NODATA)"]
+        nodatakey["<b>Cache Key</b><br/>QNAME: host.example.com<br/>QTYPE: AAAA (specific)<br/>QCLASS: IN"]
+        nodataentry["<b>Negative Entry</b><br/>Type: NODATA<br/>Insertion Time: T₀<br/>Negative TTL: 600 sec<br/>Expiration Time: T₀ + 600<br/>SOA Authority: example.com"]
+        nodatakey --> nodataentry
+    end
 ```
 
 Cache eviction policies govern how resolvers manage finite memory resources when cache occupancy approaches configured limits. The simplest strategy implements hard limits that refuse new insertions once capacity is reached, forcing cache flushes or waiting for TTL-based expiration to free space. Production resolvers employ least-recently-used eviction algorithms that prioritize retaining frequently-accessed entries while purging stale data that no longer serves active query patterns. Advanced implementations track per-entry access frequencies and implement adaptive policies that protect high-value entries—like root server addresses and TLD nameserver records—from premature eviction even under memory pressure. Some resolvers expose tunable cache sizes for different record types, allocating larger pools for common A and AAAA records while constraining obscure types like NAPTR or TLSA to prevent cache pollution from specialized workloads.

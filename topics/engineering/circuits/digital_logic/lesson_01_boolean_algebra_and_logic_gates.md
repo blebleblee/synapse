@@ -42,24 +42,34 @@ The structural mechanics of logic gates emerge from transistor network topology 
 
 A two-input NAND gate instantiates this pattern with elegant simplicity. The pull-down network places two NMOS transistors in series between the output and ground, with each transistor gate driven by one input signal. Both transistors must conduct simultaneously to discharge the output node to ground potential, which occurs only when both inputs present logical high. The pull-up network arranges two PMOS transistors in parallel between the supply rail and the output. Either PMOS transistor conducting suffices to charge the output node high, which happens whenever either input falls to logical low. This complementary topology ensures that when both inputs are high, the series NMOS chain conducts while both PMOS transistors remain cut off, pulling the output low. For all other input combinations, at least one NMOS transistor blocks the pull-down path while at least one PMOS transistor activates the pull-up path, driving the output high.
 
-```
-        VDD
-         |
-         +---||--+      PMOS parallel pull-up
-         |       |
-    A ---|   B ---|
-         |       |
-         +-------+---- Y (output)
-         |
-         +----||----+  NMOS series pull-down
-              |
-         A ---|
-              |
-         +----||----+
-              |
-         B ---|
-              |
-             GND
+```mermaid
+flowchart TD
+    VDD["VDD"]
+    A["A"]
+    B["B"]
+    GND["GND"]
+    
+    PMOS_P1["PMOS<br/>(parallel)"]
+    PMOS_P2["PMOS<br/>(parallel)"]
+    NMOS_S1["NMOS<br/>(series)"]
+    NMOS_S2["NMOS<br/>(series)"]
+    Y["Y<br/>(output)"]
+    
+    VDD --> PMOS_P1
+    VDD --> PMOS_P2
+    
+    A --> PMOS_P1
+    B --> PMOS_P2
+    
+    PMOS_P1 --> Y
+    PMOS_P2 --> Y
+    
+    A --> NMOS_S1
+    NMOS_S1 --> NMOS_S2
+    B --> NMOS_S2
+    NMOS_S2 --> GND
+    
+    Y -.-> NMOS_S1
 ```
 
 NOR gate topology inverts this arrangement. The pull-down network positions NMOS transistors in parallel, so that any input going high provides a conduction path to ground. The pull-up network places PMOS transistors in series, requiring all inputs to be low before the series chain conducts and charges the output high. This duality between NAND and NOR gate structures reflects the broader duality principle in Boolean algebra and manifests physically in the swapping of series and parallel transistor configurations between pull-up and pull-down networks.

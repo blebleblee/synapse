@@ -26,35 +26,25 @@ The internal organization of the EV3 intelligent brick separates concerns across
 
 The ARM9 processor connects to external SDRAM through a 16-bit data bus running at 133 MHz, providing the memory bandwidth necessary to support simultaneous display framebuffer updates, Bluetooth packet processing, and program execution. The firmware boots from internal flash into a minimal Linux kernel stripped of unnecessary subsystems like networking stacks and filesystem journaling, preserving boot time under 30 seconds while maintaining enough POSIX compatibility that user programs can leverage standard file I/O for datalogging and configuration management. The kernel reserves contiguous memory regions for DMA-capable buffers used in SPI communication with the AVR and allocates fixed-size heaps for the bytecode virtual machine, ensuring deterministic memory access patterns that avoid cache thrashing and maintain predictable instruction timing.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    ARM9 Main Processor                      │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │   Bytecode   │  │   Display    │  │  Bluetooth   │     │
-│  │   VM Engine  │  │   Driver     │  │   Protocol   │     │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘     │
-│         │                  │                  │             │
-│         └──────────────────┴──────────────────┘             │
-│                            │                                │
-│                   ┌────────▼────────┐                       │
-│                   │  Linux Kernel   │                       │
-│                   │  (Minimal RTOS) │                       │
-│                   └────────┬────────┘                       │
-└────────────────────────────┼─────────────────────────────────┘
-                             │ SPI Bus (10 MHz)
-                    ┌────────▼────────┐
-                    │  AVR ATmega16U2 │
-                    │   Coprocessor   │
-                    └────────┬────────┘
-                             │
-         ┌───────────────────┼───────────────────┐
-         │                   │                   │
-    ┌────▼────┐         ┌────▼────┐        ┌────▼────┐
-    │ ADC Mux │         │   PWM   │        │  Encoder│
-    │ (Sensors│         │Generator│        │ Counter │
-    │ 1-4)    │         │(Motors  │        │ (A-D)   │
-    └─────────┘         │ A-D)    │        └─────────┘
-                        └─────────┘
+```mermaid
+flowchart TD
+    subgraph arm9["ARM9 Main Processor"]
+        bytecode["Bytecode VM Engine"]
+        display["Display Driver"]
+        bluetooth["Bluetooth Protocol"]
+    end
+    
+    linux["Linux Kernel<br/>(Minimal RTOS)"]
+    
+    bytecode --> linux
+    display --> linux
+    bluetooth --> linux
+    
+    linux -->|"SPI Bus 10 MHz"| avr["AVR ATmega16U2<br/>Coprocessor"]
+    
+    avr --> adc["ADC Mux<br/>(Sensors 1-4)"]
+    avr --> pwm["PWM Generator<br/>(Motors A-D)"]
+    avr --> encoder["Encoder Counter<br/>(A-D)"]
 ```
 
 The sensor port architecture implements a unified analog interface capable of supporting the diverse signal types required by different sensor modalities. Each input port provides both 5V regulated power delivery and analog voltage measurement on six independent sensing lines, allowing complex sensors like the ultrasonic rangefinder to transmit trigger pulses while simultaneously measuring echo return timing. The port auto-detection mechanism exploits the fact that different sensor types present characteristic impedance signatures: a touch sensor appears as a simple switch to ground through a 1kΩ resistor, while a color sensor presents a complex impedance profile as its internal LED drivers switch through red, green, and blue illumination sequences. The AVR samples these impedance signatures during port initialization, consults an internal lookup table mapping resistance ratios to device types, and configures the appropriate driver firmware before any user program begins executing.

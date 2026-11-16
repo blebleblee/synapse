@@ -48,55 +48,48 @@ The social comparison processes intensified by social media operate through seve
 
 The quantification of social feedback through platform metrics transforms implicit social status into explicit numerical indicators. Likes, follower counts, comment volume, and share rates provide immediate, quantified feedback about social value and performance success. For some adolescents, these metrics provide desired validation and status confirmation. For others, they become sources of anxiety and obsessive monitoring as adolescents check their phones repeatedly for feedback on posted content. The intermittent reinforcement schedule—unpredictable timing and magnitude of social feedback—creates habit-forming properties similar to gambling, driving compulsive checking behavior. The public nature of these metrics adds reputational stakes: low engagement numbers signal low social value not just to the adolescent but to all network members who can observe them.
 
-```
-Peer Influence Propagation Model
-═══════════════════════════════════════════════════════════════════
-
-Individual Adolescent Processing System:
-┌─────────────────────────────────────────────────────────────────┐
-│ SENSORY INPUT: Peer behavior observation, social feedback       │
-│         ↓                                                        │
-│ ATTENTION ALLOCATION: Preferential attention to high-status     │
-│   peers, emotionally salient social events, identity-relevant   │
-│   behavioral domains                                             │
-│         ↓                                                        │
-│ SOCIAL REWARD PROCESSING: Ventral striatum activation to peer   │
-│   approval signals; reward prediction error updating based on   │
-│   acceptance versus rejection feedback                           │
-│         ↓                                                        │
-│ NORM EXTRACTION: Statistical learning of behavioral frequencies │
-│   and outcome contingencies; construction of descriptive norms  │
-│   (what peers do) and injunctive norms (what peers approve)     │
-│         ↓                                                        │
-│ BEHAVIORAL DECISION: Integration of reward expectations,        │
-│   normative pressures, identity goals, modulated by prefrontal  │
-│   control capacity and contextual arousal                        │
-│         ↓                                                        │
-│ BEHAVIORAL OUTPUT: Modified behavior in alignment with peer     │
-│   norms and reinforcement history                                │
-│         ↓                                                        │
-│ SOCIAL FEEDBACK: Peer reactions (approval/disapproval) update   │
-│   reinforcement learning systems                                 │
-│         ↓ (feedback loop to reward processing)                  │
-└─────────────────────────────────────────────────────────────────┘
-
-Network-Level Propagation:
-┌────────────┐      ┌────────────┐      ┌────────────┐
-│Adolescent A│◄────►│Adolescent B│◄────►│Adolescent C│
-└────────────┘      └────────────┘      └────────────┘
-      ▲                    ▲                    ▲
-      │                    │                    │
-      └────────────────────┴────────────────────┘
-              Mutual influence edges
-              
-Influence strength = f(relationship closeness, status differential,
-                       behavioral domain, individual susceptibility)
-
-Network-level equilibria emerge through:
-- Conformity pressure → behavioral homogenization
-- Selection bias → clustering of similar individuals  
-- Status hierarchies → influence asymmetries
-- Subgroup boundaries → between-group differentiation
+```mermaid
+flowchart TD
+    A["SENSORY INPUT<br/>Peer behavior observation<br/>Social feedback"]
+    B["ATTENTION ALLOCATION<br/>Preferential attention to high-status peers<br/>Emotionally salient social events<br/>Identity-relevant behavioral domains"]
+    C["SOCIAL REWARD PROCESSING<br/>Ventral striatum activation to peer approval<br/>Reward prediction error updating<br/>Acceptance vs rejection feedback"]
+    D["NORM EXTRACTION<br/>Statistical learning of behavioral frequencies<br/>Descriptive norms what peers do<br/>Injunctive norms what peers approve"]
+    E["BEHAVIORAL DECISION<br/>Integration of reward expectations<br/>Normative pressures identity goals<br/>Modulated by prefrontal control & arousal"]
+    F["BEHAVIORAL OUTPUT<br/>Modified behavior aligned with<br/>peer norms and reinforcement history"]
+    G["SOCIAL FEEDBACK<br/>Peer reactions approval disapproval<br/>Updates reinforcement learning systems"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G -.Feedback loop.-> C
+    
+    subgraph network["Network-Level Propagation"]
+        H["Adolescent A"]
+        I["Adolescent B"]
+        J["Adolescent C"]
+        
+        H <-->|"Mutual influence edges"| I
+        I <-->|"Mutual influence edges"| J
+        H <-->|"Mutual influence edges"| J
+    end
+    
+    K["Influence strength = f<br/>relationship closeness<br/>status differential<br/>behavioral domain<br/>individual susceptibility"]
+    
+    L["Conformity pressure<br/>→ behavioral homogenization"]
+    M["Selection bias<br/>→ clustering of similar individuals"]
+    N["Status hierarchies<br/>→ influence asymmetries"]
+    O["Subgroup boundaries<br/>→ between-group differentiation"]
+    
+    K --> L
+    K --> M
+    K --> N
+    K --> O
+    
+    F -.drives.-> network
+    network -.generates.-> K
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

@@ -96,52 +96,37 @@ The generalization to staggered adoption DiD, where different units adopt a poli
 
 The practical workflow for implementing these methods in policy analysis follows a consistent logical architecture regardless of the specific software environment. Understanding the data flow and decision points as a structured system helps analysts avoid specification errors and correctly interpret results.
 
-```
-RAW POLICY DATA (cross-section / panel)
-           │
-           ▼
-┌─────────────────────────────────────┐
-│         DATA STRUCTURE AUDIT        │
-│  - Binary outcome? → LDV route      │
-│  - Repeated obs per unit? → Panel   │
-│  - Treatment timing? → DiD/TWFE     │
-└──────────────┬──────────────────────┘
-               │
-       ┌───────┴────────┐
-       │                │
-       ▼                ▼
- LDV PATHWAY      PANEL PATHWAY
-       │                │
-       ▼                ▼
-  Latent index     Unit/Time FE
-  y* = Xβ + ε     structure check
-       │                │
-       ▼                ▼
-  MLE via           Hausman Test
-  Newton-Raphson    (FE vs. RE)
-       │                │
-       ▼                ▼
-  AME / MEM        Within-estimator
-  computation      (demeaned OLS)
-       │                │
-       ▼                ▼
-  Separation       Parallel trends
-  check (Firth)    pre-test (event
-       │            study plot)
-       └───────┬────────┘
-               │
-               ▼
-     ┌──────────────────┐
-     │  INFERENCE LAYER │
-     │  Clustered SE    │
-     │  Bootstrap       │
-     │  Wild cluster    │
-     └──────────────────┘
-               │
-               ▼
-     POLICY-INTERPRETABLE
-     MARGINAL EFFECTS /
-     ATT ESTIMATES
+```mermaid
+flowchart TD
+    A["RAW POLICY DATA<br/>(cross-section / panel)"]
+    B["DATA STRUCTURE AUDIT<br/>- Binary outcome? → LDV route<br/>- Repeated obs per unit? → Panel<br/>- Treatment timing? → DiD/TWFE"]
+    C["LDV PATHWAY"]
+    D["PANEL PATHWAY"]
+    E["Latent index<br/>y* = Xβ + ε"]
+    F["Unit/Time FE<br/>structure check"]
+    G["MLE via<br/>Newton-Raphson"]
+    H["Hausman Test<br/>(FE vs. RE)"]
+    I["AME / MEM<br/>computation"]
+    J["Within-estimator<br/>(demeaned OLS)"]
+    K["Separation<br/>check (Firth)"]
+    L["Parallel trends<br/>pre-test (event<br/>study plot)"]
+    M["INFERENCE LAYER<br/>Clustered SE<br/>Bootstrap<br/>Wild cluster"]
+    N["POLICY-INTERPRETABLE<br/>MARGINAL EFFECTS /<br/>ATT ESTIMATES"]
+    
+    A --> B
+    B --> C
+    B --> D
+    C --> E
+    D --> F
+    E --> G
+    F --> H
+    G --> I
+    H --> J
+    I --> K
+    J --> L
+    K --> M
+    L --> M
+    M --> N
 ```
 
 ### Implementing Binary Choice Models
@@ -224,20 +209,69 @@ The `type = "dynamic"` aggregation produces the event-study plot: a time series 
 
 The event-study architecture is worth visualizing explicitly for the staggered case:
 
-```
-RELATIVE TIME (periods since treatment adoption)
-          -3    -2    -1     0    +1    +2    +3
-           │     │     │     │     │     │     │
-Cohort A   ◆─────◆─────◆─────◆─────◆─────◆     (treated t=2015)
-Cohort B   ◆─────◆─────◆─────◆─────◆           (treated t=2017)
-Cohort C   ◆─────◆─────◆─────◆                 (treated t=2019)
-           │     │     │     │
-           └── pre-treatment ─┴── post-treatment
-           │                 │
-     [Should be ≈ 0]    [ATT estimates
-     [pre-trend test]    of interest]
-
-Control group: "not yet treated" units at each calendar time t
+```mermaid
+flowchart TD
+    subgraph timeline ["RELATIVE TIME (periods since treatment adoption)"]
+        t_3["−3"]
+        t_2["−2"]
+        t_1["−1"]
+        t0["0"]
+        t1["+1"]
+        t2["+2"]
+        t3["+3"]
+    end
+    
+    subgraph cohorts ["Treatment Cohorts"]
+        direction LR
+        A_3["◆"] --> A_2["◆"] --> A_1["◆"] --> A0["◆"] --> A1["◆"] --> A2["◆"]
+        B_3["◆"] --> B_2["◆"] --> B_1["◆"] --> B0["◆"] --> B1["◆"]
+        C_3["◆"] --> C_2["◆"] --> C_1["◆"] --> C0["◆"]
+    end
+    
+    A_3 -.-> t_3
+    A_2 -.-> t_2
+    A_1 -.-> t_1
+    A0 -.-> t0
+    A1 -.-> t1
+    A2 -.-> t2
+    
+    B_3 -.-> t_3
+    B_2 -.-> t_2
+    B_1 -.-> t_1
+    B0 -.-> t0
+    B1 -.-> t1
+    
+    C_3 -.-> t_3
+    C_2 -.-> t_2
+    C_1 -.-> t_1
+    C0 -.-> t0
+    
+    cohort_A["Cohort A (treated t=2015)"]
+    cohort_B["Cohort B (treated t=2017)"]
+    cohort_C["Cohort C (treated t=2019)"]
+    
+    A2 --> cohort_A
+    B1 --> cohort_B
+    C0 --> cohort_C
+    
+    subgraph periods ["Treatment Periods"]
+        pre["PRE-TREATMENT<br/>Should be ≈ 0<br/>(pre-trend test)"]
+        post["POST-TREATMENT<br/>ATT estimates<br/>of interest"]
+    end
+    
+    t_1 --> pre
+    t0 --> post
+    
+    control["Control group:<br/>'not yet treated' units<br/>at each calendar time t"]
+    
+    periods --> control
+    
+    style pre fill:#e1f5ff
+    style post fill:#ffe1e1
+    style control fill:#f0f0f0
+    style cohort_A fill:#fff9e1
+    style cohort_B fill:#fff9e1
+    style cohort_C fill:#fff9e1
 ```
 
 This diagram captures the clean comparison logic: for Cohort B at relative time $+1$ (calendar year 2018), the control group consists of Cohort C units, which have not yet been treated. This avoids the forbidden comparison between early and late adopters that contaminates the TWFE estimator.

@@ -40,33 +40,56 @@ The **Abort Task** function is the most granular: it targets a single command id
 
 The sequence diagram below illustrates the Level 1 recovery flow through connection reinstatement and task management:
 
-```
-Initiator                           Target
-    |                                   |
-    |--- SCSI Write (CmdSN=42) -------->|
-    |--- SCSI Read  (CmdSN=43) -------->|
-    |                                   |
-    | [TCP connection fails]            |
-    |                                   |
-    |--- TCP SYN (new connection) ----->|
-    |<-- TCP SYN-ACK -------------------|
-    |--- iSCSI Login (TSIH=0x1A3F) --->|
-    |<-- Login Response (OK, StatSN=7) -|
-    |                                   |
-    | [Initiator checks: ExpStatSN=5,   |
-    |  CmdSN 42-43 unacknowledged]      |
-    |                                   |
-    |--- TMF: Abort Task (RTT=42) ----->|
-    |<-- TMF Response: Task Not Exist --|  (target finished cmd 42)
-    |--- SNACK (StatSN=5, run=2) ------>|  (recover lost status PDUs)
-    |<-- Data-In / R2T replay ----------|
-    |<-- SCSI Response (CmdSN=42) ------|
-    |                                   |
-    |--- TMF: Abort Task (RTT=43) ----->|
-    |<-- TMF Response: Function Complete|  (target aborted cmd 43)
-    |--- SCSI Read (CmdSN=43, retry) -->|  (reissue on new connection)
-    |<-- Data-In PDUs ------------------|
-    |<-- SCSI Response (success) -------|
+```mermaid
+flowchart TD
+    Start((" "))
+    
+    A["Initiator sends SCSI Write (CmdSN=42)"]
+    B["Initiator sends SCSI Read (CmdSN=43)"]
+    C["TCP connection fails"]
+    
+    D["Initiator: TCP SYN (new connection)"]
+    E["Target: TCP SYN-ACK"]
+    F["Initiator: iSCSI Login (TSIH=0x1A3F)"]
+    G["Target: Login Response (OK, StatSN=7)"]
+    
+    H["Initiator checks:<br/>ExpStatSN=5<br/>CmdSN 42-43 unacknowledged"]
+    
+    I["Initiator: TMF Abort Task (RTT=42)"]
+    J["Target: TMF Response: Task Not Exist<br/>(target finished cmd 42)"]
+    
+    K["Initiator: SNACK (StatSN=5, run=2)<br/>(recover lost status PDUs)"]
+    L["Target: Data-In / R2T replay"]
+    M["Target: SCSI Response (CmdSN=42)"]
+    
+    N["Initiator: TMF Abort Task (RTT=43)"]
+    O["Target: TMF Response: Function Complete<br/>(target aborted cmd 43)"]
+    
+    P["Initiator: SCSI Read (CmdSN=43, retry)<br/>(reissue on new connection)"]
+    Q["Target: Data-In PDUs"]
+    R["Target: SCSI Response (success)"]
+    
+    End((" "))
+    
+    Start --> A
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+    J --> K
+    K --> L
+    L --> M
+    M --> N
+    N --> O
+    O --> P
+    P --> Q
+    Q --> R
+    R --> End
 ```
 
 ### Session and Connection Parameters: The Data Structures That Matter

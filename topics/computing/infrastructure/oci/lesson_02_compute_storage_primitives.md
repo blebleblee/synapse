@@ -22,12 +22,14 @@ The invariant underlying all of this is **performance isolation**. Whether a ten
 
 OCI's shape catalog follows a systematic naming convention that encodes the hardware generation, instance family, and flexibility:
 
-```
-VM.Standard.E4.Flex
-│   │        │  └── Flex: variable OCPU/memory ratio
-│   │        └───── Generation (E3=EPYC Rome, E4=EPYC Milan, E5=EPYC Genoa)
-│   └────────────── Standard (compute-optimized=CO, GPU=GPU, HPC=BM.HPC)
-└────────────────── VM or BM (bare metal)
+```mermaid
+flowchart LR
+    A["VM.Standard.E4.Flex"]
+
+    A --> B["VM\n(or BM = Bare Metal)"]
+    A --> C["Standard\n(compute-optimized = CO,\nGPU = GPU,\nHPC = BM.HPC)"]
+    A --> D["Generation\n(E3 = EPYC Rome,\nE4 = EPYC Milan,\nE5 = EPYC Genoa)"]
+    A --> E["Flex\n(variable OCPU / memory ratio)"]
 ```
 
 A `BM.Standard.E4.128` gives the tenant 128 physical AMD EPYC Milan cores, 2 TB of DDR4-3200 ECC DRAM across 8 NUMA nodes, and 2x 25 Gbps network via the SmartNIC. The corresponding `VM.Standard.E4.Flex` slices that same physical server across multiple tenant VMs, each pinned to a subset of NUMA-local cores with their memory allocated from the same NUMA node to preserve memory access locality. This NUMA-aware placement is critical: a VM that crosses a NUMA boundary for memory access pays a 30–40 ns latency penalty on each cache miss compared to a NUMA-local access.
@@ -94,32 +96,27 @@ OCI achieves this through a consensus-based metadata tier. Object metadata updat
 
 Durability is distinct from consistency. OCI Object Storage guarantees eleven nines (99.999999999%) of annual durability per object. This is not a probabilistic estimate in the marketing sense; it corresponds to an engineered erasure coding scheme. The service applies **Reed-Solomon erasure coding** across object data, distributing shards across multiple fault-independent storage nodes within an Availability Domain such that the loss of any single storage node (or even multiple nodes, depending on the coding ratio) does not result in data loss. For cross-region durability, Object Storage Replication can be configured to asynchronously replicate a bucket to a paired region, reducing the recovery point objective to near-zero for regional failure scenarios.
 
-```
-Object PUT Request Flow:
-
-Client
-  │
-  ▼
-OCI Object Storage API Gateway
-  │
-  ├──► Metadata Tier (Raft commit)
-  │       │
-  │       ▼
-  │    Consensus: leader + N replicas confirm write
-  │       │
-  │    Commit ACK
-  │
-  ├──► Data Tier (Erasure Coded write)
-  │       │
-  │       ▼
-  │    Shards distributed across fault-domain-isolated
-  │    storage nodes (Reed-Solomon k+m scheme)
-  │       │
-  │    Data ACK
-  │
-  ▼
-HTTP 200 returned to client
-(both metadata commit + data write confirmed)
+```mermaid
+flowchart TD
+    A["Client"]
+    B["OCI Object Storage API Gateway"]
+    C["Metadata Tier<br/>Raft Commit"]
+    D["Consensus: Leader + N Replicas<br/>Confirm Write"]
+    E["Commit ACK"]
+    F["Data Tier<br/>Erasure Coded Write"]
+    G["Shards Distributed Across<br/>Fault-Domain-Isolated Storage Nodes<br/>Reed-Solomon k+m Scheme"]
+    H["Data ACK"]
+    I["HTTP 200 Returned to Client<br/>Metadata Commit + Data Write Confirmed"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    B --> F
+    F --> G
+    G --> H
+    E --> I
+    H --> I
 ```
 
 Bucket policies in OCI are expressed as **IAM policies** rather than S3-style bucket-attached JSON ACL documents, and this design decision has architectural implications for multi-tenancy. In AWS, a bucket policy is an authorization artifact attached to the bucket resource itself, evaluated separately from IAM policies and capable of granting cross-account access independently. In OCI, all authorization flows through the centralized IAM service. A bucket policy is an IAM policy statement that grants a principal (a group, a dynamic group matching instance metadata, or a federated identity) specific verbs (`OBJECT_READ`, `OBJECT_CREATE`, `OBJECT_DELETE`, `BUCKET_INSPECT`) over a resource (all buckets in a compartment, or a specific bucket by name). This centralization means there is a single authorization plane with a single audit trail, rather than the fragmented model where bucket-level and IAM-level policies can conflict or shadow each other.

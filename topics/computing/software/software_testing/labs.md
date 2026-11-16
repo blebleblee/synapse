@@ -355,9 +355,9 @@ Now profile cache behavior using `perf stat` to count hardware events. Run the b
 perf stat -e cycles,instructions,cache-references,cache-misses,L1-dcache-loads,L1-dcache-load-misses ./target/release/cache-profiling
 ```
 
-The output displays event counts for the entire program execution. Key metrics include instructions per cycle (IPC), cache miss rate, and L1 data cache miss rate. High IPC (>2.0) indicates good CPU utilization, while low IPC (<0.5) suggests memory stalls. Cache miss rate above 10% is pathological for sequential workloads but expected for random access. The `cache-misses` counter tracks last-level cache (LLC) misses—typically L3 on modern Intel and AMD CPUs—which incur the longest latency.
+The output displays event counts for the entire program execution. Key metrics include instructions per cycle (IPC), cache miss rate, and L1 data cache miss rate. High IPC (>2.0) indicates good CPU utilization, while low IPC (< 0.5) suggests memory stalls. Cache miss rate above 10% is pathological for sequential workloads but expected for random access. The `cache-misses` counter tracks last-level cache (LLC) misses—typically L3 on modern Intel and AMD CPUs—which incur the longest latency.
 
-Interpret the output by comparing sequential and random access phases. During sequential access, expect low cache miss rates (<1%) and high IPC (>2.5), indicating efficient execution. During random access, cache miss rates spike to 30-70%, and IPC drops below 0.5, showing the CPU is stalled waiting for memory. The strided access phases demonstrate how stride size affects cache efficiency: small strides remain cache-friendly, while large strides thrash the cache.
+Interpret the output by comparing sequential and random access phases. During sequential access, expect low cache miss rates (< 1%) and high IPC (>2.5), indicating efficient execution. During random access, cache miss rates spike to 30-70%, and IPC drops below 0.5, showing the CPU is stalled waiting for memory. The strided access phases demonstrate how stride size affects cache efficiency: small strides remain cache-friendly, while large strides thrash the cache.
 
 To profile at function granularity, use `perf record` to sample call stacks and generate a flame graph. Run:
 

@@ -36,32 +36,19 @@ The data acquisition unit — in a professional single-seater or GT car, this wi
 
 The CAN bus structure in a racing car carries several distinct classes of information simultaneously. The powertrain CAN carries engine RPM, throttle position sensor (TPS), fuel injector duty cycle, manifold absolute pressure (MAP), lambda sensor values, oil pressure, and water temperature at frame rates typically between 50 and 200 Hz per channel. The chassis CAN carries ABS module outputs, steering angle sensor (SAS) data, and suspension control data at rates up to 1 kHz for active-system cars. The body CAN — where it exists — carries PDM channel states, fan relay status, and dashboard lighting. These buses are physically separate on most race cars to prevent a powertrain fault (such as an alternator generating CAN noise) from corrupting safety-critical chassis data.
 
-```
-Physical Phenomena → Sensor Transduction
-        │
-        ▼
-Conditioning (Amp / Filter / Impedance)
-        │
-        ▼
-ADC (channel-specific sample rates)
-        │
-        ▼
-Data Logger (time-stamped frame aggregation)
-        │
-        ├──────────── CAN Bus ─────────────┐
-        │          (ECU / ABS / PDM /      │
-        │           TCU frames @ 50–1000Hz) │
-        │                                   │
-        ▼                                   ▼
-Telemetry Uplink (2.4 / 5.8 GHz)     Logger Internal Storage
-        │                                   │
-        ▼                                   ▼
-Pit Wall Receiver                   Post-Session Download
-        │
-        ▼
-Real-Time Analysis Stack
-(MoTeC i2 Pro / AiM Race Studio /
- Bosch Motorsport MSA / custom DBC decoder)
+```mermaid
+flowchart TD
+    A["Physical Phenomena"] --> B["Sensor Transduction"]
+    B --> C["Conditioning<br/>(Amp / Filter / Impedance)"]
+    C --> D["ADC<br/>(channel-specific sample rates)"]
+    D --> E["Data Logger<br/>(time-stamped frame aggregation)"]
+    E --> F["CAN Bus<br/>(ECU / ABS / PDM / TCU frames @ 50–1000Hz)"]
+    F --> G["Telemetry Uplink<br/>(2.4 / 5.8 GHz)"]
+    F --> H["Logger Internal Storage"]
+    G --> I["Pit Wall Receiver"]
+    H --> J["Post-Session Download"]
+    I --> K["Real-Time Analysis Stack<br/>(MoTeC i2 Pro / AiM Race Studio /<br/>Bosch Motorsport MSA / custom DBC decoder)"]
+    J --> K
 ```
 
 The telemetry uplink introduces its own diagnostic complexity. Depending on the series and circuit, 2.4 GHz telemetry links can suffer multipath interference in certain circuit sections — specifically in tunnel sections, under bridges, and in armco-walled valleys where the signal bounces create destructive interference. This means that telemetry dropout is not always a sign of hardware failure; it is frequently a geometry-of-circuit problem, and the engineer who interprets a telemetry gap as a sensor fault will draw a false diagnostic conclusion. The correct response to any telemetry gap is to compare the post-session downloaded logger data against the real-time telemetry record and confirm whether the channels were actually nominal during the gap. If the downloaded data shows a clean signal through the gap period, the problem was the uplink, not the sensor.

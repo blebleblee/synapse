@@ -22,29 +22,39 @@ The underlying physics connecting KV to motor construction is the back-EMF const
 
 The electrical architecture of a quadcopter is a radial power distribution topology with hierarchical voltage domains. High current flows at battery voltage from the pack to the ESCs; regulated lower voltages branch off for the flight controller, video transmitter, camera, and receiver. Every connection in the high-current path is a potential point of resistance, heat, and failure.
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                    4S / 6S LiPo Pack                             │
-│          (+) ─────────────────────── (-)                         │
-└────────────────┬──────────────────────┬─────────────────────────┘
-                 │  High-Current Bus     │
-         ┌───────┴───────┐       ┌───────┴───────┐
-         │   XT60 Plug   │       │  PDB / ESC    │
-         │  (Connector)  │       │  Capacitor    │
-         └───────┬───────┘       └───────┬───────┘
-                 │                       │
-   ┌─────────────┼───────────────────────┼─────────────┐
-   │             │     Power Distribution│Bus (PDB)    │
-   │      ┌──────┴─────┐          ┌──────┴─────┐       │
-   │      │  ESC 1     │          │  ESC 2     │  ...  │
-   │      │  (Motor 1) │          │  (Motor 2) │       │
-   │      └────────────┘          └────────────┘       │
-   │                                                    │
-   │  5V BEC ────► Flight Controller (FC)               │
-   │  5V BEC ────► Receiver (Rx)                        │
-   │  9V / 10V ──► Video Transmitter (VTx)              │
-   │  Battery V ─► Camera (direct or via FC)            │
-   └────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    PACK["4S / 6S LiPo Pack\n(+) ──────────── (-)"]
+
+    subgraph hcbus ["High-Current Bus"]
+        XT60["XT60 Plug\n(Connector)"]
+        CAP["PDB / ESC\nCapacitor"]
+    end
+
+    subgraph pdb ["Power Distribution Bus (PDB)"]
+        ESC1["ESC 1\n(Motor 1)"]
+        ESC2["ESC 2\n(Motor 2)"]
+        ESCN["... ESC N\n(Motor N)"]
+        BEC5V_FC["5V BEC"]
+        BEC5V_RX["5V BEC"]
+        BEC9V["9V / 10V BEC"]
+        BATV["Battery Voltage Tap"]
+    end
+
+    FC["Flight Controller (FC)"]
+    RX["Receiver (Rx)"]
+    VTX["Video Transmitter (VTx)"]
+    CAM["Camera"]
+
+    PACK --> XT60
+    PACK --> CAP
+    XT60 --> pdb
+    CAP --> pdb
+
+    BEC5V_FC -->|5V| FC
+    BEC5V_RX -->|5V| RX
+    BEC9V -->|"9V / 10V"| VTX
+    BATV -->|"Battery V"| CAM
 ```
 
 Each ESC in this architecture is both a power converter and a signal interpreter. It receives a digital throttle command over DShot — a protocol encoding 11 bits of throttle position plus a telemetry request bit, transmitted as a stream of high/low pulses timed to distinguish 0 from 1 — and uses that command to drive a three-phase bridge of MOSFET pairs. The three motor wires connect to the midpoints of these pairs; by switching the MOSFETs in a precisely sequenced pattern, the ESC synthesizes a rotating magnetic field that the rotor's permanent magnets chase. This is the heart of brushless commutation: the ESC is constantly re-creating an artificial "brush" position in software, polling the back-EMF zero crossings or using a dedicated encoder to know rotor position, then advancing the energized phase 120° ahead of the rotor to maximize torque production.

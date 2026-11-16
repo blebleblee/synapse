@@ -97,57 +97,69 @@ Canon law provided the procedural operating system for ecclesiastical administra
 
 The canonical procedures for heresy prosecution followed defined protocols. Inquisitors required formal appointment with specified territorial jurisdiction. They issued edicts of grace—thirty-day periods during which heretics could voluntarily confess with reduced penalties. This simultaneously offered mercy and identified communities resistant to compliance. Denunciations from informants initiated investigations. Suspects were summoned for interrogation, questioned about beliefs and practices, confronted with witness testimony (without revealing witness identities), and given opportunities to confess.
 
-```
-Inquisitorial Process Flow
+```mermaid
+flowchart TD
+    A["Denunciation / Suspicion"]
+    B["Summons Issued"]
+    C["Failure to Appear"]
+    D["Excommunication"]
+    E["Initial Interrogation"]
+    F["Assessment: Orthodox / Suspect / Heretic"]
+    G["Orthodox"]
+    H["Dismissed"]
+    I["Suspect"]
+    J["Further Investigation"]
+    K["Witness Testimony"]
+    L["Confrontation"]
+    M["Heretic"]
+    N["Confession Attempt"]
+    O["Confession"]
+    P["Penance Assignment"]
+    Q["Light Penance"]
+    R["Prayers, Fasting, Pilgrimage"]
+    S["Heavy Penance"]
+    T["Public Flogging, Imprisonment"]
+    U["Refusal"]
+    V["Torture Authorization"]
+    W["Confession Under Torture"]
+    X["Still Refusing"]
+    Y["Declared Obstinate"]
+    Z["Relaxed to Secular Arm"]
+    AA["Execution by Burning"]
+    AB["Arrest Warrant"]
+    AC["Forced Appearance"]
 
-[Denunciation / Suspicion]
-        |
-        v
-[Summons Issued] --> [Failure to Appear] --> [Excommunication]
-        |                                           |
-        v                                           v
-[Initial Interrogation]                    [Arrest Warrant]
-        |                                           |
-        v                                           v
-[Assessment: Orthodox / Suspect / Heretic]    [Forced Appearance]
-        |
-        +-- Orthodox --> [Dismissed]
-        |
-        +-- Suspect --> [Further Investigation]
-        |                      |
-        |                      v
-        |              [Witness Testimony]
-        |                      |
-        |                      v
-        |              [Confrontation]
-        |                      |
-        v                      v
-    [Heretic] <----------------+
-        |
-        v
-[Confession Attempt]
-        |
-        +-- Confession --> [Penance Assignment]
-        |                         |
-        |                         +-- Light Penance --> [Prayers, Fasting, Pilgrimage]
-        |                         +-- Heavy Penance --> [Public Flogging, Imprisonment]
-        |
-        +-- Refusal --> [Torture Authorization]
-        |                      |
-        |                      v
-        |              [Confession Under Torture]
-        |                      |
-        v                      v
-[Still Refusing] <-------------+
-        |
-        v
-[Declared Obstinate]
-        |
-        v
-[Relaxed to Secular Arm]
-        |
-        v
-[Execution by Burning]
+    A --> B
+    B --> C
+    C --> D
+    D --> AB
+    AB --> AC
+    AC --> E
+    B --> E
+    E --> F
+    F --> G
+    G --> H
+    F --> I
+    I --> J
+    J --> K
+    K --> L
+    L --> M
+    F --> M
+    M --> N
+    N --> O
+    O --> P
+    P --> Q
+    Q --> R
+    P --> S
+    S --> T
+    N --> U
+    U --> V
+    V --> W
+    W --> X
+    U --> X
+    X --> Y
+    Y --> Z
+    Z --> AA
 ```
 
 Torture required episcopal permission and followed theoretical restrictions: single session, no permanent injury, judicial presence. In practice, defining "single session" allowed serial applications separated by days, and psychological torture (showing instruments, threats) supplemented physical methods. Confessions obtained under torture required "voluntary" reaffirmation the following day, though the threat of torture's resumption made this coercion by other means.
@@ -196,33 +208,35 @@ Islamic institutional mechanics operated without centralized hierarchy analogous
 
 Religious authority in Islam rested with the ulama (scholars) as a collective body rather than any individual office. A scholar's authority derived from knowledge, piety, and recognition by other scholars. Students sought out renowned teachers, receiving ijazas (licenses) certifying mastery of specific texts or subjects. These licenses created knowledge transmission networks with traceable genealogies back to the Prophet's companions. The system was radically decentralized—no institution could certify a scholar's authority or revoke it. Consensus (ijma) of qualified scholars defined orthodoxy, but determining who counted as qualified and when consensus existed remained perpetually contested.
 
-```
-Islamic Knowledge Transmission Architecture
+```mermaid
+flowchart TD
+    PROPHET["Prophet Muhammad & Companions (Sahaba)"]
+    TABIIN["Successors (Tabi'un)\nFirst generation after Companions"]
+    TABITABIIN["Successors of Successors\n(Tabi' al-Tabi'in)"]
+    ISNAD["Continued chains of transmission (isnad)"]
 
-Prophet Muhammad & Companions (Sahaba)
-        |
-        v
-Successors (Tabi'un) - First generation after Companions
-        |
-        v
-Successors of Successors (Tabi' al-Tabi'in)
-        |
-        v
-[Continued chains of transmission (isnad)]
-        |
-        v
-Madhab Founders (8th-9th centuries)
-  |     |      |      |
-  |     |      |      +-- Ahmad ibn Hanbal (Hanbali)
-  |     |      +--------- Muhammad ibn Idris al-Shafi'i (Shafi'i)
-  |     +---------------- Malik ibn Anas (Maliki)
-  +---------------------- Abu Hanifa (Hanafi)
-        |
-        v
-Commentators & Jurists - Developed madhab methodologies
-        |
-        v
-Contemporary Scholars - Issue fatwas applying madhab principles
+    subgraph madhabs ["Madhab Founders (8th–9th centuries)"]
+        HANAFI["Abu Hanifa\n(Hanafi)"]
+        MALIKI["Malik ibn Anas\n(Maliki)"]
+        SHAFII["Muhammad ibn Idris al-Shafi'i\n(Shafi'i)"]
+        HANBALI["Ahmad ibn Hanbal\n(Hanbali)"]
+    end
+
+    COMMENTATORS["Commentators & Jurists\nDeveloped madhab methodologies"]
+    CONTEMPORARY["Contemporary Scholars\nIssue fatwas applying madhab principles"]
+
+    PROPHET --> TABIIN
+    TABIIN --> TABITABIIN
+    TABITABIIN --> ISNAD
+    ISNAD --> HANAFI
+    ISNAD --> MALIKI
+    ISNAD --> SHAFII
+    ISNAD --> HANBALI
+    HANAFI --> COMMENTATORS
+    MALIKI --> COMMENTATORS
+    SHAFII --> COMMENTATORS
+    HANBALI --> COMMENTATORS
+    COMMENTATORS --> CONTEMPORARY
 ```
 
 Legal opinions (fatwas) addressed specific questions posed by individuals or communities. A mufti would analyze the question, research relevant Quranic verses, hadith, and established precedents within their madhab, and issue a written opinion. These opinions lacked enforcement power—they were advisory, not binding. The questioner remained free to seek other opinions (a practice called fatwa shopping). This created a market for legal opinions where mufti reputations determined influence. Qadis (judges) applied these opinions in courts, but each case required fresh analysis. Stare decisis (binding precedent) did not exist in Islamic jurisprudence.

@@ -28,30 +28,38 @@ This quadratic dependence on gate overdrive voltage $(V_{gs} - V_{th})$ emerges 
 
 The physical structure of a modern MOSFET extends far beyond the idealized long-channel picture, incorporating numerous geometric and material innovations to combat short-channel effects while maximizing current drive capability. The canonical planar MOSFET features a gate stack consisting of polysilicon or metal gate electrode atop a high-κ dielectric, with source and drain regions formed through ion implantation and thermal activation. The lateral dimension between source and drain metallurgical junctions defines the mask channel length, while diffusion and implant straggle cause the actual electrical channel length to deviate from this nominal value. Lightly doped drain extensions improve reliability by reducing the peak electric field at the drain junction, at the cost of increased series resistance that degrades drive current.
 
-```
-Cross-Section View of Planar NMOS Device:
+```mermaid
+flowchart TD
+    subgraph gate_region ["Gate Stack"]
+        GE["Gate Electrode\n(Poly / Metal)"]
+        OX["High-κ Dielectric\n(EOT 0.5 nm – 50 nm)"]
+        GE --> OX
+    end
 
-                    Gate Electrode (Poly/Metal)
-                   ┌─────────────────────────┐
-                   │                         │
-    ───────────────┴─────────────────────────┴─────────────  High-κ Dielectric
-    
-    n+ Source              Channel              n+ Drain
-    ┌────────┐                               ┌────────┐
-    │        │                               │        │
-    │        │       p-type Substrate        │        │
-    │        │       (Bulk/Body)             │        │
-    └────────┘                               └────────┘
-         │                                        │
-         └──── Depletion Regions ────────────────┘
-    
-    ────────────────────────────────────────────────────── p-substrate
-    
-    Physical Parameters:
-    - Gate Length (L): 7 nm to 1 μm depending on node
-    - Oxide Thickness (EOT): 0.5 nm to 50 nm
-    - Junction Depth: 10 nm to 200 nm
-    - Channel Width (W): Design-dependent, typically 0.1 to 100 μm
+    subgraph active_region ["Active Region"]
+        SRC["n⁺ Source\n(Junction Depth 10–200 nm)"]
+        CH["Channel\n(Gate Length L = 7 nm – 1 µm\nWidth W = 0.1–100 µm)"]
+        DRN["n⁺ Drain\n(Junction Depth 10–200 nm)"]
+        SRC --- CH
+        CH --- DRN
+    end
+
+    subgraph bulk ["p-type Substrate (Bulk / Body)"]
+        DEP_S["Depletion Region\n(Source-side)"]
+        BODY["p-Substrate Body"]
+        DEP_D["Depletion Region\n(Drain-side)"]
+        DEP_S --- BODY
+        BODY --- DEP_D
+    end
+
+    subgraph substrate_layer ["p-Substrate (Wafer)"]
+        PSUB["p-Substrate\n(Wafer Base)"]
+    end
+
+    OX --> CH
+    SRC --> DEP_S
+    DRN --> DEP_D
+    BODY --> PSUB
 ```
 
 Short-channel effects manifest when the channel length approaches the characteristic depletion widths associated with source and drain junctions. The two-dimensional electrostatics of the structure no longer permit the gradual channel approximation, as charge sharing between the gate and the source-drain junctions modifies the threshold voltage. Drain-induced barrier lowering represents the most pernicious short-channel effect: as drain voltage increases, the drain depletion region extends laterally toward the source, effectively lowering the potential barrier that prevents carrier injection from source to channel. This barrier lowering translates directly to a reduction in threshold voltage that increases with drain voltage, causing the drain current in saturation to continue rising rather than saturating to a constant value.
@@ -70,36 +78,32 @@ The subthreshold region, where gate voltage remains below threshold but nonzero 
 
 Quantum mechanical effects become significant when device dimensions approach the electron wavelength, typically below 10 nm gate length. Carrier confinement in the vertical direction quantizes energy levels, splitting the conduction band into discrete subbands separated by approximately 50-100 meV. This quantization increases the effective threshold voltage by forcing carriers into higher energy states and reduces the inversion layer capacitance by displacing the centroid of carrier distribution away from the oxide interface. Direct source-to-drain tunneling through the potential barrier becomes measurable below 5 nm gate length, creating an irreducible off-state leakage path that cannot be eliminated through threshold voltage adjustment. These quantum effects, combined with statistical dopant fluctuations and line-edge roughness, set fundamental limits on MOSFET scaling that necessitated the transition to three-dimensional device architectures like FinFETs and gate-all-around nanowire transistors.
 
-```
-Energy Band Diagram along Channel (Source to Drain):
+```mermaid
+flowchart TD
+    subgraph strong ["Strong Inversion — Vgs &gt; Vth, Vds = 0"]
+        direction TB
+        EcS["Ec  ────────────┬─────────────────┬────────────  Conduction Band"]
+        InvS["                  │  Inversion Layer (Electrons)  │"]
+        EiS["Ei  ────────────┼─────────────────┼────────────  Intrinsic Level"]
+        GapS["                  │                 │"]
+        EvS["Ev  ────────────┴─────────────────┴────────────  Valence Band"]
+        PosS["              Source        Channel        Drain"]
+        EcS ~~~ InvS ~~~ EiS ~~~ GapS ~~~ EvS ~~~ PosS
+    end
 
-Strong Inversion (Vgs > Vth, Vds = 0):
-    
-    Ec ────────────┬─────────────────┬──────────── Conduction Band
-                   │ Inversion Layer │
-                   │  (Electrons)    │
-    Ei ────────────┼─────────────────┼──────────── Intrinsic Level
-                   │                 │
-    Ev ────────────┴─────────────────┴──────────── Valence Band
-    
-        Source     Channel         Drain
+    subgraph sat ["Saturation Mode — Vgs &gt; Vth, Vds = Vdsat"]
+        direction TB
+        EcA["Ec ──┬─────────────────────────╱──────────────  Conduction Band"]
+        EcB["        │  Electrons              ╱  Pinchoff Region"]
+        EiA["Ei ──┼──────────────────────╱─────────────────  Intrinsic Level"]
+        EvA["Ev ──┴───────────────────╱────────────────────  Valence Band"]
+        PosA["          Source    Channel          Drain"]
+        EcA ~~~ EcB ~~~ EiA ~~~ EvA ~~~ PosA
+    end
 
+    Notes["Key Observations:<br/>• Barrier lowering at pinchoff enables saturation current<br/>• Carriers reach velocity saturation in high-field region<br/>• Channel potential varies continuously from Vs to Vd (gradual channel)"]
 
-Saturation Mode (Vgs > Vth, Vds = Vdsat):
-    
-    Ec ──┬─────────────────────────╱────────────── Conduction Band
-         │ Electrons              ╱  Pinchoff
-         │                       ╱    Region
-    Ei ──┼──────────────────────╱─────────────────  Intrinsic Level
-         │                    ╱
-    Ev ──┴───────────────────╱──────────────────── Valence Band
-    
-      Source    Channel              Drain
-
-Key Observations:
-- Barrier lowering at pinchoff enables saturation current
-- Carriers reach velocity saturation in high-field region
-- Channel potential varies continuously from Vs to Vd (gradual channel)
+    strong ~~~ sat ~~~ Notes
 ```
 
 The body effect modifies threshold voltage when source-to-body voltage deviates from zero, a condition frequently encountered in stacked transistor configurations and analog source followers. Increasing the source voltage relative to the body reduces the surface-to-bulk potential difference, requiring additional gate voltage to achieve threshold. The threshold voltage shift follows $\Delta V_{th} = \gamma (\sqrt{2\phi_F + V_{sb}} - \sqrt{2\phi_F})$, where the body effect coefficient $\gamma = \sqrt{2 q \epsilon_s N_A} / C_{ox}$ depends on substrate doping and oxide capacitance. Typical values of $\gamma$ range from 0.3 to 0.5 V^(1/2), causing substantial threshold voltage increases of 200-400 mV when the source rises 1 V above the body. This body effect degrades transconductance and switching speed in circuits where source terminals operate at variable potentials.

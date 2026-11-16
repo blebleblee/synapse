@@ -14,57 +14,52 @@ The security value of stateful inspection derives from its ability to enforce im
 
 The heart of a stateful firewall lies in its connection tracking table, a high-performance in-memory data structure mapping five-tuple flow identifiers to session metadata. Each entry represents a bidirectional communication channel and stores the protocol type, source and destination addresses and ports, current connection state, creation timestamp, last activity timestamp, byte and packet counters for traffic accounting, and pointers to any associated NAT translation records or application-layer gateway state. Modern implementations employ hash tables with chaining or concurrent lock-free structures to support millions of simultaneous connections while maintaining sub-microsecond lookup latency. The hash function typically combines all five tuple elements through XOR and modular arithmetic, distributing flows uniformly across buckets to minimize collision chains.
 
-```
-Connection Table Entry Structure:
-┌────────────────────────────────────────────────────────────────┐
-│ Flow Key (5-tuple)                                             │
-│  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Protocol: TCP | Src: 192.168.1.100:52341                 │ │
-│  │ Dst: 203.0.113.50:443                                    │ │
-│  └──────────────────────────────────────────────────────────┘ │
-│                                                                │
-│ Session State: ESTABLISHED                                     │
-│ Created: 1704123456.123456 | Last Activity: 1704123789.654321│
-│                                                                │
-│ TCP-Specific Metadata:                                         │
-│  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Client SEQ: 3894821763 | Server SEQ: 2198473621          │ │
-│  │ Client Window: 65535 | Server Window: 29200              │ │
-│  │ Flags Seen: SYN,ACK,PSH | Handshake Complete: true       │ │
-│  └──────────────────────────────────────────────────────────┘ │
-│                                                                │
-│ Counters: Pkts In: 847 | Pkts Out: 1203 | Bytes: 2.3MB       │
-│ NAT Record Ptr: 0x7f8a3c40 | ALG State: None                  │
-│ Timeout: 3600s (established) | Expiry: 1704127389             │
-└────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Entry["Connection Table Entry Structure"]
+    
+    Entry --> FlowKey["Flow Key (5-tuple)"]
+    FlowKey --> Protocol["Protocol: TCP"]
+    FlowKey --> Source["Src: 192.168.1.100:52341"]
+    FlowKey --> Destination["Dst: 203.0.113.50:443"]
+    
+    Entry --> SessionState["Session State: ESTABLISHED"]
+    Entry --> Timestamps["Created: 1704123456.123456<br/>Last Activity: 1704123789.654321"]
+    
+    Entry --> TCPMeta["TCP-Specific Metadata"]
+    TCPMeta --> ClientSEQ["Client SEQ: 3894821763"]
+    TCPMeta --> ServerSEQ["Server SEQ: 2198473621"]
+    TCPMeta --> ClientWindow["Client Window: 65535"]
+    TCPMeta --> ServerWindow["Server Window: 29200"]
+    TCPMeta --> Flags["Flags Seen: SYN,ACK,PSH"]
+    TCPMeta --> Handshake["Handshake Complete: true"]
+    
+    Entry --> Counters["Counters:<br/>Pkts In: 847 | Pkts Out: 1203<br/>Bytes: 2.3MB"]
+    Entry --> NATPtr["NAT Record Ptr: 0x7f8a3c40"]
+    Entry --> ALGState["ALG State: None"]
+    Entry --> Timeout["Timeout: 3600s (established)<br/>Expiry: 1704127389"]
 ```
 
 When a packet arrives at the firewall's ingress interface, the connection tracking engine extracts the five-tuple and hashes it to locate the corresponding table entry. If a match exists and the packet's characteristics align with the session's current state—TCP sequence numbers fall within the expected window, UDP timestamps fall within idle timeout bounds, protocol flags make sense given the state machine phase—the firewall forwards the packet to the egress interface and updates the session's last activity timestamp. If no entry exists, the engine evaluates the packet against the configured rule base. For TCP, a SYN packet may create new state if a rule permits the connection's initiation, installing a session entry in SYN_SENT state and recording the initial sequence number. For UDP, which lacks explicit connection semantics, the firewall creates pseudo-connection state when an outbound datagram passes, installing an entry that expires rapidly if no response arrives. ICMP presents unique challenges; the firewall must associate ICMP echo requests with replies by tracking query identifiers and must correlate ICMP errors with the original flows they reference by parsing the payload's embedded IP and transport headers.
 
 TCP connection tracking implements a rigorous state machine that mirrors the protocol's own lifecycle. A client-initiated flow begins when the firewall observes a SYN packet departing the protected network, transitioning the session from nonexistent to SYN_SENT. The firewall records the client's initial sequence number and source port, creating a half-open entry that awaits the server's SYN-ACK response. When the return packet arrives, the engine validates that the acknowledgment number matches the client's sequence plus one, extracts the server's initial sequence number, and promotes the session to SYN_RECEIVED. The client's final ACK completes the three-way handshake, elevating the state to ESTABLISHED and enabling full bidirectional data flow. During this phase, the firewall tracks sequence numbers continuously, maintaining a sliding window that accommodates TCP's cumulative acknowledgment semantics while rejecting packets with sequence numbers wildly outside the expected range—a defense against blind injection attacks where adversaries guess sequence numbers to insert malicious data into established streams.
 
-```
-TCP State Machine in Connection Tracking:
-                                        
-    [Outbound SYN]                      
-         │                              
-         ▼                              
-    SYN_SENT ──────────[Inbound SYN-ACK]─────▶ SYN_RECEIVED
-         │                                          │
-         │                                          │
-    [Timeout/RST]                          [Client ACK]
-         │                                          │
-         ▼                                          ▼
-      CLOSED                                  ESTABLISHED
-         ▲                                          │
-         │                                          │
-         │                         [Either side FIN]│
-         │                                          ▼
-         │                                      FIN_WAIT
-         │                                          │
-         │                              [Final FIN-ACK exchange]
-         │                                          │
-         └────────────[2*MSL timeout]───────────TIME_WAIT
+```mermaid
+flowchart TD
+    SYN_SENT["SYN_SENT"]
+    SYN_RECEIVED["SYN_RECEIVED"]
+    CLOSED["CLOSED"]
+    ESTABLISHED["ESTABLISHED"]
+    FIN_WAIT["FIN_WAIT"]
+    TIME_WAIT["TIME_WAIT"]
+
+    OUTBOUND_SYN(["Outbound SYN"]) --> SYN_SENT
+    SYN_SENT -->|"Inbound SYN-ACK"| SYN_RECEIVED
+    SYN_SENT -->|"Timeout / RST"| CLOSED
+    SYN_RECEIVED -->|"Client ACK"| ESTABLISHED
+    ESTABLISHED -->|"Either side FIN"| FIN_WAIT
+    FIN_WAIT -->|"Final FIN-ACK exchange"| TIME_WAIT
+    TIME_WAIT -->|"2 × MSL timeout"| CLOSED
 ```
 
 Connection teardown requires equally careful tracking to prevent premature state deletion that would block legitimate late-arriving packets or extended timeouts that waste memory on dead sessions. When either endpoint sends a FIN packet, the firewall transitions the connection to FIN_WAIT, allowing continued data flow in the opposite direction to accommodate half-close scenarios. Both sides must exchange FIN and ACK packets before the connection reaches TIME_WAIT, a state that persists for twice the Maximum Segment Lifetime to handle delayed duplicates. A RST packet at any point immediately destroys state, reflecting TCP's abrupt termination semantics. Enterprise firewalls often implement aggressive timeout policies that close idle connections more quickly than the standard 2MSL duration, balancing state table efficiency against compatibility with applications that hold connections open for extended periods without traffic.

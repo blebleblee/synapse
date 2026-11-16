@@ -73,8 +73,8 @@ flowchart TD
     B --> F
     C --> G
 
-    style A fill:#e1f5ff
-    style F fill:#e8f5e9
+    style A fill:#e1f5ff,color:#0f172a
+    style F fill:#e8f5e9,color:#0f172a
 ```
 
 ---
@@ -163,10 +163,10 @@ graph LR
     subgraph sub_para ["Paradiddle: both skills combined"]
         C1["R"] --> C2["L"] --> C3["R full"] --> C4["R rebound"] --> C5["L"] --> C6["R"] --> C7["L full"] --> C8["L rebound"]
     end
-    style B2 fill:#ccccff
-    style B4 fill:#ccccff
-    style C4 fill:#ccccff
-    style C8 fill:#ccccff
+    style B2 fill:#ccccff,color:#0f172a
+    style B4 fill:#ccccff,color:#0f172a
+    style C4 fill:#ccccff,color:#0f172a
+    style C8 fill:#ccccff,color:#0f172a
 ```
 
 ---

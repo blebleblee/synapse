@@ -73,18 +73,18 @@ The `state` field drives the scheduler's decision to enqueue or skip a task. The
 - `EXIT_DEAD` (32): The task is being torn down — `task_struct` is about to be freed.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> TASK_NEW : kernel_clone()
-    TASK_NEW --> TASK_RUNNING : wake_up_new_task()
-    TASK_RUNNING --> TASK_INTERRUPTIBLE : schedule() / sleep
-    TASK_RUNNING --> TASK_UNINTERRUPTIBLE : io_wait / lock
-    TASK_INTERRUPTIBLE --> TASK_RUNNING : wake_up() / signal
-    TASK_UNINTERRUPTIBLE --> TASK_RUNNING : wake_up()
-    TASK_RUNNING --> __TASK_STOPPED : SIGSTOP
-    __TASK_STOPPED --> TASK_RUNNING : SIGCONT
-    TASK_RUNNING --> EXIT_ZOMBIE : do_exit()
-    EXIT_ZOMBIE --> EXIT_DEAD : parent wait()
-    EXIT_DEAD --> [*] : free_task()
+flowchart TD
+    START(["Process Creation"]) --> TASK_NEW["TASK_NEW"]
+    TASK_NEW -->|wake_up_new_task| TASK_RUNNING["TASK_RUNNING"]
+    TASK_RUNNING -->|"schedule / sleep"| TASK_INTERRUPTIBLE["TASK_INTERRUPTIBLE"]
+    TASK_RUNNING -->|"io_wait / lock"| TASK_UNINTERRUPTIBLE["TASK_UNINTERRUPTIBLE"]
+    TASK_INTERRUPTIBLE -->|"wake_up / signal"| TASK_RUNNING
+    TASK_UNINTERRUPTIBLE -->|wake_up| TASK_RUNNING
+    TASK_RUNNING -->|SIGSTOP| TASK_STOPPED["__TASK_STOPPED"]
+    TASK_STOPPED -->|SIGCONT| TASK_RUNNING
+    TASK_RUNNING -->|do_exit| EXIT_ZOMBIE["EXIT_ZOMBIE"]
+    EXIT_ZOMBIE -->|"parent wait"| EXIT_DEAD["EXIT_DEAD"]
+    EXIT_DEAD -->|free_task| END(["Process Terminated"])
 ```
 
 ### Thread Groups and Process Groups

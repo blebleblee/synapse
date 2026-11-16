@@ -145,14 +145,20 @@ $$\frac{\varphi, \Gamma \Rightarrow \Delta}{\varphi \land \psi, \Gamma \Rightarr
 
 A derivation in $\mathsf{LK}$ is a tree of sequents, with the axioms $\varphi \Rightarrow \varphi$ at the leaves and the conclusion at the root. Each internal node is an application of one rule to one or two sequent premises. The derivation structure is illustrated below:
 
-```
-      ─────────────── Id          ─────────────── Id
-       p ⇒ p                       q ⇒ q
-      ─────────────── WL          ─────────────── WR
-       p, q ⇒ p                   q ⇒ q, p
-      ─────────────────────────────────────────── →L
-       (p→q)→p, p→q ⇒ p
-      ─────────────────────────────────────────── ...
+```mermaid
+flowchart TD
+    Id1["Id<br/>p ⇒ p"]
+    Id2["Id<br/>q ⇒ q"]
+    WL["WL<br/>p, q ⇒ p"]
+    WR["WR<br/>q ⇒ q, p"]
+    ArrowL["→L<br/>(p→q)→p, p→q ⇒ p"]
+    Etc["..."]
+    
+    Id1 --> WL
+    Id2 --> WR
+    WL --> ArrowL
+    WR --> ArrowL
+    ArrowL --> Etc
 ```
 
 The pinnacle of sequent calculus metatheory is Gentzen's **Cut Elimination Theorem** (the *Hauptsatz*):

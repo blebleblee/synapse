@@ -100,36 +100,35 @@ This envelope structure mirrors the layered validation logic mandated by SEC Rul
 
 The order validation pipeline implements these checks as a sequential or parallel filter chain, where each stage can reject the order, modify it to comply with constraints, or pass it through unchanged. The architectural choice between sequential and parallel validation depends on the latency budget and the independence of validation dimensions. Price and size validation can execute in parallel since they examine independent properties, while credit validation must occur after size validation to correctly project the incremental exposure impact.
 
-```
-Pre-Trade Validation Pipeline:
-
-[Strategy Signal] 
-    ↓
-[Order Generation]
-    ↓
-[Compliance Envelope Creation]
-    ↓
-┌─────────────────────────────────────┐
-│  Parallel Validation Gates          │
-│  ┌──────────────┐  ┌──────────────┐ │
-│  │ Price Collar │  │ Size Limits  │ │
-│  └──────────────┘  └──────────────┘ │
-│  ┌──────────────┐  ┌──────────────┐ │
-│  │ Rate Limits  │  │ Venue Rules  │ │
-│  └──────────────┘  └──────────────┘ │
-└─────────────────────────────────────┘
-    ↓
-[Credit Aggregation & Limit Check]
-    ↓
-[Duplicate Order Detection]
-    ↓
-[Audit Trail Persistence]
-    ↓
-[Order Routing to Exchange]
-    ↓
-[Exchange Pre-Trade Risk Check]
-    ↓
-[Matching Engine]
+```mermaid
+flowchart TD
+    A["Strategy Signal"]
+    B["Order Generation"]
+    C["Compliance Envelope Creation"]
+    
+    subgraph VALIDATION["Parallel Validation Gates"]
+        D["Price Collar"]
+        E["Size Limits"]
+        F["Rate Limits"]
+        G["Venue Rules"]
+    end
+    
+    H["Credit Aggregation & Limit Check"]
+    I["Duplicate Order Detection"]
+    J["Audit Trail Persistence"]
+    K["Order Routing to Exchange"]
+    L["Exchange Pre-Trade Risk Check"]
+    M["Matching Engine"]
+    
+    A --> B
+    B --> C
+    C --> VALIDATION
+    VALIDATION --> H
+    H --> I
+    I --> J
+    J --> K
+    K --> L
+    L --> M
 ```
 
 The **Price Collar Validation** module implements dynamic reference price tracking and percentage-based deviation bands. The reference price updates continuously from market data feeds, typically using the last traded price, the midpoint of the NBBO, or a volume-weighted average over a sliding time window. Collar bands vary by instrument type and regulatory regime: U.S. equity markets commonly employ ±5-10% bands for normal market conditions, tightening to ±2% during high volatility periods or for lower-priced securities. The validation logic rejects orders where the limit price falls outside the computed collar range:
@@ -374,7 +373,7 @@ bool check_and_update_credit(CreditState& state, int64_t delta_cents) {
 }
 ```
 
-This lock-free implementation eliminates contention at the cost of potential retry loops when multiple threads simultaneously attempt to update the exposure counter. The retry probability remains low (typically <5%) under moderate concurrency levels (8-16 trading threads), and the retry loop completes in 10-50 nanoseconds, still dramatically faster than mutex locking.
+This lock-free implementation eliminates contention at the cost of potential retry loops when multiple threads simultaneously attempt to update the exposure counter. The retry probability remains low (typically < 5%) under moderate concurrency levels (8-16 trading threads), and the retry loop completes in 10-50 nanoseconds, still dramatically faster than mutex locking.
 
 Duplicate order detection using hash tables suffers from cache coherence overhead when multiple threads access the shared hash table structure. High-performance implementations partition the hash table into thread-local shards, routing order checks to shards based on order identifier hash, eliminating cross-thread cache line sharing:
 

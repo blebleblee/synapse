@@ -793,7 +793,7 @@ Divide retired instructions by elapsed cycles. Modern out-of-order CPUs achieve 
 
 - High branch-miss rate (>5%): refactor control flow, reduce conditionals
 - High cache-miss rate (>10%): improve data locality, reduce pointer chasing
-- Low IPC (<1.0): pipeline stalls from data dependencies or memory latency
+- Low IPC (< 1.0): pipeline stalls from data dependencies or memory latency
 
 ### Common Failure Modes and Diagnostics
 

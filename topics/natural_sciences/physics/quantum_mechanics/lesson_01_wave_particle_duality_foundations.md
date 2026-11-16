@@ -80,11 +80,16 @@ Modern realizations extend double-slit physics to macroscopic quantum systems. F
 
 The Mach-Zehnder interferometer architecture provides an alternative configuration isolating wave-particle duality. A beam splitter divides an incident photon or atom beam into two coherent paths; phase shifters and mirrors route the paths to recombine at a second beam splitter feeding two detectors D0 and D1:
 
-```
-Source → BS1 ─────→ M1 ─────→ BS2 → D0
-          │                  ↑
-          └───→ φ ───→ M2 ───┘
-                            → D1
+```mermaid
+flowchart LR
+    Source["Source"] --> BS1["BS1"]
+    BS1 --> M1["M1"]
+    M1 --> BS2["BS2"]
+    BS2 --> D0["D0"]
+    BS1 --> Phi["φ"]
+    Phi --> M2["M2"]
+    M2 --> BS2
+    M2 --> D1["D1"]
 ```
 
 In this configuration, BS1 and BS2 denote beam splitters, M1 and M2 mirrors, and φ a controllable phase shifter. For photons, beam splitters are semi-transparent dielectric interfaces; for atoms, they are pulsed laser fields inducing stimulated Raman transitions between internal states. With no which-path information and phase shift $\phi$, the detection probabilities exhibit sinusoidal interference:

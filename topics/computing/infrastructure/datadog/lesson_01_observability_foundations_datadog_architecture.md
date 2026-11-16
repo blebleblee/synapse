@@ -22,37 +22,32 @@ The Forwarder consumes telemetry from the internal message bus and implements th
 
 The DogStatsD server provides a UDP-based metrics submission interface compatible with the StatsD wire protocol but extended with Datadog-specific tag syntax. It listens on port 8125 by default, receiving datagrams that encode metric name, value, type, sample rate, and tag list in a compact ASCII format like `deployment.count:1|c|#service:api,env:prod`. UDP was chosen deliberately despite its unreliable delivery semantics because metrics collection must never block application execution—a slow or failed metrics endpoint cannot be allowed to impact request serving latency. The server parses datagrams through a zero-allocation parser that operates directly on the receive buffer, constructs internal metric objects, and forwards them to the aggregation pipeline. It implements probabilistic sampling for high-volume metrics through reservoir sampling algorithms that maintain statistical properties while reducing cardinality.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                       Application Process                        │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
-│  │  StatsD SDK  │  │  Trace SDK   │  │  Log Forwarding      │  │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────────────┘  │
-└─────────┼──────────────────┼──────────────────┼──────────────────┘
-          │ UDP              │ TCP              │ File/Stdout
-          │ :8125            │ :8126            │
-          ▼                  ▼                  ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Datadog Agent (DaemonSet)                   │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
-│  │  DogStatsD   │  │  Trace Agent │  │  Log Agent           │  │
-│  │  Server      │  │              │  │                      │  │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────────────┘  │
-│         │                  │                  │                  │
-│         └──────────────────┴──────────────────┘                  │
-│                            ▼                                     │
-│                   ┌────────────────┐                            │
-│                   │  Aggregator    │                            │
-│                   │  & Forwarder   │                            │
-│                   └────────┬───────┘                            │
-└────────────────────────────┼────────────────────────────────────┘
-                             │ HTTPS/HTTP2
-                             │ Batch Payloads
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                  Regional Intake Endpoints                       │
-│         (intake.datadoghq.com / intake.datadoghq.eu)            │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph app["Application Process"]
+        statsd["StatsD SDK"]
+        trace["Trace SDK"]
+        logs["Log Forwarding"]
+    end
+    
+    subgraph agent["Datadog Agent DaemonSet"]
+        dogstatsd["DogStatsD Server"]
+        traceagent["Trace Agent"]
+        logagent["Log Agent"]
+        agg["Aggregator & Forwarder"]
+    end
+    
+    intake["Regional Intake Endpoints<br/>intake.datadoghq.com / intake.datadoghq.eu"]
+    
+    statsd -->|"UDP :8125"| dogstatsd
+    trace -->|"TCP :8126"| traceagent
+    logs -->|"File/Stdout"| logagent
+    
+    dogstatsd --> agg
+    traceagent --> agg
+    logagent --> agg
+    
+    agg -->|"HTTPS/HTTP2<br/>Batch Payloads"| intake
 ```
 
 The intake pipeline implements a stateless ingestion layer that validates, enriches, and routes incoming telemetry to backend storage systems. When a batch payload arrives, intake services perform schema validation against Protocol Buffer definitions for metrics and traces or JSON schema for logs, rejecting malformed submissions with 400-series HTTP status codes. They extract the API key from HTTP headers, perform authentication against a distributed cache of valid customer accounts, and enforce rate limits through token bucket algorithms with per-account quotas. Valid data points receive timestamp normalization to UTC with millisecond precision, and the intake layer injects additional tags like `host`, `availability-zone`, and `kube_cluster_name` based on metadata lookups against cloud provider APIs or Kubernetes cluster state.

@@ -47,20 +47,16 @@ For a transverse butt weld with typical reinforcement profile (convex weld face 
 
 Fillet weld stress analysis introduces shear, bending, and peel stress components that interact in complex fashion. Consider a transverse fillet weld joining a flange plate to a web plate in a T-joint configuration, loaded by tension in the flange pulling perpendicular to the web. The force transmitted through the weld must be decomposed into components parallel and perpendicular to the weld throat plane:
 
-```
-Load Path Decomposition:
+```mermaid
+flowchart TD
+    P["↑ P (Applied Load)"]
+    FP["Flange Plate"]
+    FW["Fillet Weld\n(45° Throat)"]
+    WP["Web Plate"]
 
-    ↑ P (Applied load)
-    |
-    |
-━━━━┿━━━━  Flange plate
-    │╲
-    │ ╲     ← Fillet weld (45° throat)
-    │  ╲
-    │   ╲
-    │    
-    │      Web plate
-    │
+    P -->|"vertical load transfer"| FP
+    FP -->|"shear flow"| FW
+    FW -->|"diagonal force path"| WP
 ```
 
 If the fillet weld has leg length L and throat dimension t = 0.707L, the shear stress through the throat equals τ = P/(throat area) = P/(0.707L × weld length). However, the weld toe on the flange side experiences a bending moment M = P × e, where e is the eccentricity from the weld throat centerline to the line of action of the applied force. This bending moment induces a tensile stress at the weld toe that adds to the nominal shear stress, and the combined stress state must be evaluated using von Mises equivalent stress or maximum principal stress criteria to determine whether yielding will occur.

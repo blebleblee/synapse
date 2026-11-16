@@ -221,48 +221,70 @@ The **sequence number** identifies the first byte of the payload in the byte str
 #### TCP State Machine
 
 ```mermaid
-stateDiagram-v2
-    [*] --> CLOSED
-
-    CLOSED --> LISTEN : passive open
-    CLOSED --> SYN_SENT : active open / send SYN
-
-    LISTEN --> SYN_RCVD : recv SYN / send SYN-ACK
-    SYN_SENT --> SYN_RCVD : recv SYN / send SYN-ACK
-    SYN_SENT --> ESTABLISHED : recv SYN-ACK / send ACK
-
-    SYN_RCVD --> ESTABLISHED : recv ACK
-    SYN_RCVD --> FIN_WAIT_1 : send FIN
-
-    ESTABLISHED --> FIN_WAIT_1 : send FIN
-    ESTABLISHED --> CLOSE_WAIT : recv FIN / send ACK
-
-    FIN_WAIT_1 --> FIN_WAIT_2 : recv ACK
-    FIN_WAIT_1 --> CLOSING : recv FIN / send ACK
-    FIN_WAIT_1 --> TIME_WAIT : recv FIN+ACK / send ACK
-
-    FIN_WAIT_2 --> TIME_WAIT : recv FIN / send ACK
-    CLOSING --> TIME_WAIT : recv ACK
-
-    CLOSE_WAIT --> LAST_ACK : send FIN
-    LAST_ACK --> CLOSED : recv ACK
-
-    TIME_WAIT --> CLOSED : timeout 2×MSL
+flowchart TD
+    START([Start]) --> CLOSED
+    
+    CLOSED["CLOSED"]
+    LISTEN["LISTEN"]
+    SYN_SENT["SYN_SENT"]
+    SYN_RCVD["SYN_RCVD"]
+    ESTABLISHED["ESTABLISHED"]
+    FIN_WAIT_1["FIN_WAIT_1"]
+    FIN_WAIT_2["FIN_WAIT_2"]
+    CLOSING["CLOSING"]
+    TIME_WAIT["TIME_WAIT"]
+    CLOSE_WAIT["CLOSE_WAIT"]
+    LAST_ACK["LAST_ACK"]
+    
+    CLOSED -->|"passive open"| LISTEN
+    CLOSED -->|"active open / send SYN"| SYN_SENT
+    
+    LISTEN -->|"recv SYN / send SYN-ACK"| SYN_RCVD
+    SYN_SENT -->|"recv SYN / send SYN-ACK"| SYN_RCVD
+    SYN_SENT -->|"recv SYN-ACK / send ACK"| ESTABLISHED
+    
+    SYN_RCVD -->|"recv ACK"| ESTABLISHED
+    SYN_RCVD -->|"send FIN"| FIN_WAIT_1
+    
+    ESTABLISHED -->|"send FIN"| FIN_WAIT_1
+    ESTABLISHED -->|"recv FIN / send ACK"| CLOSE_WAIT
+    
+    FIN_WAIT_1 -->|"recv ACK"| FIN_WAIT_2
+    FIN_WAIT_1 -->|"recv FIN / send ACK"| CLOSING
+    FIN_WAIT_1 -->|"recv FIN+ACK / send ACK"| TIME_WAIT
+    
+    FIN_WAIT_2 -->|"recv FIN / send ACK"| TIME_WAIT
+    CLOSING -->|"recv ACK"| TIME_WAIT
+    
+    CLOSE_WAIT -->|"send FIN"| LAST_ACK
+    LAST_ACK -->|"recv ACK"| CLOSED
+    
+    TIME_WAIT -->|"timeout 2×MSL"| CLOSED
 ```
 
 ### UDP: Header and Semantics
 
 UDP (RFC 768) adds the thinnest possible layer over IP: source port, destination port, length, and checksum—8 bytes total. It provides process-to-process demultiplexing with no connection setup, no ordering, no reliability, and no congestion control. The checksum is optional in IPv4 (but effectively required in practice) and mandatory in IPv6.
 
-```
- 0      7 8     15 16    23 24    31
-+--------+--------+--------+--------+
-|   Source Port   | Destination Port|
-+--------+--------+--------+--------+
-|     Length      |    Checksum     |
-+--------+--------+--------+--------+
-|          data octets ...
-+---------------- ...
+```mermaid
+flowchart TD
+    subgraph row1 ["Word 0 — Bits 0 to 31"]
+        direction LR
+        SP["Source Port<br/>Bits 0–15"]
+        DP["Destination Port<br/>Bits 16–31"]
+        SP --- DP
+    end
+    subgraph row2 ["Word 1 — Bits 32 to 63"]
+        direction LR
+        LEN["Length<br/>Bits 32–47"]
+        CHK["Checksum<br/>Bits 48–63"]
+        LEN --- CHK
+    end
+    subgraph row3 ["Payload — Variable Length"]
+        DATA["Data Octets ..."]
+    end
+    row1 --> row2
+    row2 --> row3
 ```
 
 The absence of connection state means a UDP server can serve thousands of clients with a single socket. This is not a limitation to work around; it is a design that makes DNS, DHCP, NTP, and QUIC possible.
@@ -280,11 +302,56 @@ The key variable is the **congestion window (cwnd)**: the maximum number of byte
 #### Slow Start and Congestion Avoidance
 
 ```mermaid
-xychart-beta
-    title "TCP Congestion Window Evolution (Reno)"
-    x-axis ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"]
-    y-axis "cwnd (segments)" 0 --> 20
-    line [1, 2, 4, 8, 9, 10, 11, 12, 6, 7, 8, 9, 10, 5, 6, 7, 8]
+flowchart TD
+    START["Start\ncwnd = 1 segment"]
+
+    subgraph slow_start_1 ["Slow Start Phase 1 (SSthresh = 16)"]
+        SS1_0["Round 0: cwnd = 1"]
+        SS1_1["Round 1: cwnd = 2"]
+        SS1_2["Round 2: cwnd = 4"]
+        SS1_3["Round 3: cwnd = 8"]
+        SS1_0 --> SS1_1 --> SS1_2 --> SS1_3
+    end
+
+    subgraph cong_avoid_1 ["Congestion Avoidance Phase 1"]
+        CA1_4["Round 4: cwnd = 9"]
+        CA1_5["Round 5: cwnd = 10"]
+        CA1_6["Round 6: cwnd = 11"]
+        CA1_7["Round 7: cwnd = 12"]
+        CA1_4 --> CA1_5 --> CA1_6 --> CA1_7
+    end
+
+    TRIPLE_DUP["Triple Duplicate ACK Detected\nPacket Loss Event\nssthresh = cwnd/2 = 6\ncwnd = ssthresh = 6"]
+
+    subgraph cong_avoid_2 ["Congestion Avoidance Phase 2 (Fast Recovery)"]
+        CA2_8["Round 8: cwnd = 6"]
+        CA2_9["Round 9: cwnd = 7"]
+        CA2_10["Round 10: cwnd = 8"]
+        CA2_11["Round 11: cwnd = 9"]
+        CA2_12["Round 12: cwnd = 10"]
+        CA2_8 --> CA2_9 --> CA2_10 --> CA2_11 --> CA2_12
+    end
+
+    TIMEOUT["Timeout Detected\nPacket Loss Event\nssthresh = cwnd/2 = 5\ncwnd = 1 (Slow Start)"]
+
+    subgraph slow_start_2 ["Slow Start Phase 2 (SSthresh = 5)"]
+        SS2_13["Round 13: cwnd = 5"]
+    end
+
+    subgraph cong_avoid_3 ["Congestion Avoidance Phase 3"]
+        CA3_14["Round 14: cwnd = 6"]
+        CA3_15["Round 15: cwnd = 7"]
+        CA3_16["Round 16: cwnd = 8"]
+        CA3_14 --> CA3_15 --> CA3_16
+    end
+
+    START --> slow_start_1
+    SS1_3 --> cong_avoid_1
+    CA1_7 --> TRIPLE_DUP
+    TRIPLE_DUP --> cong_avoid_2
+    CA2_12 --> TIMEOUT
+    TIMEOUT --> slow_start_2
+    SS2_13 --> cong_avoid_3
 ```
 
 The phases are:

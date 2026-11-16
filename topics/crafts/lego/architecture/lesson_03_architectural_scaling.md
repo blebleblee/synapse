@@ -47,26 +47,29 @@ Cantilever mechanics govern the design of overhanging elements from bay windows 
 
 The rotational joint between angled roof sections exemplifies the challenge of maintaining structural continuity through geometric transitions. A gabled roof meeting at a forty-five-degree ridge requires that plates or slopes on opposing sides connect along a diagonal line offset by one-half stud from the rectangular grid. Standard construction resolves this through alternating overlap, where plates from each side take turns extending across the ridge line. However, this creates a weak zone where opposing roof planes do not mechanically interlock but merely rest against one another. A structurally superior approach employs a central ridge beam—typically a 1×N Technic brick with perpendicular axles—that provides a rigid spine to which both roof planes attach via clip plates or modified brackets.
 
-```
-Roof Ridge Connection Strategy (Top View):
-
-Weak Method (Gravity-Only):
+```mermaid
+flowchart TD
+    subgraph weak["❌ Weak Method: Gravity-Only"]
+        A["Plate A"]
+        B["Plate B"]
+        gap["Ridge Gap<br/>No Interlock"]
+        A -->|Separate| gap
+        B -->|Separate| gap
+    end
     
-    Plate A →  ████████
-    Plate B →      ████████
-    Ridge Gap:     ══  ← No interlock
+    subgraph strong["✓ Strong Method: Mechanical Ridge"]
+        C["Plate A"]
+        D["Plate B"]
+        ridge["Ridge Connection"]
+        beam["Technic Beam<br/>1×N brick with axles"]
+        clips["Clip Plates<br/>Both Sides"]
+        C -->|Engages| ridge
+        D -->|Engages| ridge
+        ridge -->|"Supported by"| beam
+        clips -->|"Engage axles"| beam
+    end
     
-Strong Method (Mechanical Ridge):
-
-    Plate A → ████████╪═══
-               Ridge  ║
-    Plate B →     ████████╪═══
-                       ║
-    Technic Beam: ═════╬═════
-                  (1×N brick with axles)
-    
-Clip plates on both sides engage axles,
-creating positive mechanical connection.
+    weak -->|"Upgrade to"| strong
 ```
 
 Modularity at the architectural scale introduces interface compatibility challenges absent from smaller constructions. When individual modules—representing rooms, building sections, or entire structures—must connect to form larger compositions, the designer faces competing demands of structural continuity and assembly practicality. A rigid connection across module boundaries provides optimal load sharing but requires precise alignment during assembly and complicates disassembly for storage or transport. A looser connection through Technic pins or clip hinges permits easier handling but allows differential movement that accumulates into visible gaps and misalignments.

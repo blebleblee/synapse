@@ -30,17 +30,32 @@ A **DS** (Delegation Signer) record lives not in the signed zone but in the pare
 
 The chain of trust propagates as follows through a concrete validation walk:
 
-```
-Root Zone
-  └── DNSKEY (KSK) ← trust anchor distributed to resolvers
-  └── signs DS for .com
-      .com Zone
-        └── DNSKEY (KSK) signed by root DS
-        └── signs DS for example.com
-            example.com Zone
-              └── DNSKEY (KSK) signed by .com DS
-              └── DNSKEY (ZSK) signed by KSK
-              └── A record for www signed by ZSK
+```mermaid
+flowchart TD
+    Root["Root Zone"]
+    RootKSK["DNSKEY (KSK)<br/>trust anchor distributed to resolvers"]
+    RootDS["DS record for .com"]
+    
+    Com[".com Zone"]
+    ComKSK["DNSKEY (KSK)<br/>signed by root DS"]
+    ComDS["DS record for example.com"]
+    
+    Example["example.com Zone"]
+    ExampleKSK["DNSKEY (KSK)<br/>signed by .com DS"]
+    ExampleZSK["DNSKEY (ZSK)<br/>signed by KSK"]
+    WWW["A record for www<br/>signed by ZSK"]
+    
+    Root --> RootKSK
+    Root --> RootDS
+    RootDS -->|signs| Com
+    
+    Com --> ComKSK
+    Com --> ComDS
+    ComDS -->|signs| Example
+    
+    Example --> ExampleKSK
+    Example --> ExampleZSK
+    Example --> WWW
 ```
 
 A validating resolver working bottom-up follows this path: it fetches the RRSIG for the `www.example.com` A record and identifies the Key Tag of the signing ZSK. It fetches the DNSKEY RRSet for `example.com` and finds the ZSK, verifying the A record's RRSIG. It then needs to trust that DNSKEY RRSet, so it checks the RRSIG over the DNSKEY RRSet, finding it was signed by the KSK. To trust the KSK, it queries the parent `.com` zone for a DS record matching the KSK's digest. It finds and verifies the `.com`-signed DS record, then repeats the process up to the root, terminating when it matches a locally configured trust anchor. This is the validation chain in its mechanical entirety.

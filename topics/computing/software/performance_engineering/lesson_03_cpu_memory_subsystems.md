@@ -20,23 +20,42 @@ NUMA (Non-Uniform Memory Access) introduces a topology dimension that scalar ana
 
 Modern L1 and L2 caches are **set-associative**: the cache is divided into sets, each holding a fixed number of ways (lines). An incoming address is mapped to a specific set by hashing the lower address bits (excluding the offset bits), and the cache checks all ways in that set in parallel. A typical L1 data cache is 48 KB, 12-way associative, with 64-byte lines, yielding 64 sets. The L3 is shared across all cores, often 8-way or 16-way, and uses a more complex replacement policy (Intel's Adaptive Replacement Cache in some generations, pseudo-LRU in others).
 
-```
-Physical Address (64-bit):
- ┌──────────────────────┬────────────────┬──────────┐
- │      Tag bits        │   Set Index    │  Offset  │
- │      [63:12]         │    [11:6]      │  [5:0]   │
- └──────────────────────┴────────────────┴──────────┘
-                              │
-                              ▼
-              L1 D-Cache (48KB, 12-way, 64 sets)
-              ┌────────────────────────────────────┐
-              │  Set 0:  [Way 0][Way 1]...[Way 11] │
-              │  Set 1:  [Way 0][Way 1]...[Way 11] │
-              │   ...                              │
-              │  Set 63: [Way 0][Way 1]...[Way 11] │
-              └────────────────────────────────────┘
-                   Each way = 64-byte cache line
-                   + Valid bit + Dirty bit + Tag
+```mermaid
+flowchart TD
+    PA["<b>Physical Address (64-bit)</b>"]
+
+    subgraph addr_bits ["Address Bit Fields"]
+        direction LR
+        TAG["Tag bits<br/>[63:12]"]
+        IDX["Set Index<br/>[11:6]"]
+        OFF["Offset<br/>[5:0]"]
+    end
+
+    PA --> addr_bits
+
+    IDX --> CACHE
+
+    subgraph CACHE ["L1 D-Cache — 48 KB · 12-way · 64 sets"]
+        direction TB
+        SET0["Set 0:  Way 0 | Way 1 | … | Way 11"]
+        SET1["Set 1:  Way 0 | Way 1 | … | Way 11"]
+        DOTS["⋮"]
+        SET63["Set 63: Way 0 | Way 1 | … | Way 11"]
+    end
+
+    subgraph WAYINFO ["Each Cache Way"]
+        direction LR
+        CL["64-byte Cache Line"]
+        VD["Valid bit + Dirty bit"]
+        TG["Tag field"]
+    end
+
+    SET0 --- WAYINFO
+    SET1 --- WAYINFO
+    SET63 --- WAYINFO
+
+    TAG -.->|"compared against stored tag"| TG
+    OFF -.->|"selects byte within line"| CL
 ```
 
 A **cache conflict miss** occurs when two frequently accessed addresses map to the same set and their combined working set exceeds the associativity. This is a subtle failure mode: two arrays that are a multiple of 4 KB apart in virtual address space will often alias to the same L1 set, causing thrashing even if the total data volume would otherwise fit comfortably. The classic manifestation is a matrix transpose whose inner loop accesses two rows whose base addresses differ by exactly a cache-set stride.
@@ -75,19 +94,28 @@ The **indirect branch predictor** (tracking `call [rax]`-style dispatches) is a 
 
 On a dual-socket Xeon system, the memory topology looks like the following:
 
-```
-Socket 0                              Socket 1
-┌────────────────────┐               ┌────────────────────┐
-│  Core 0 ... Core N │               │  Core 0 ... Core N │
-│  L1/L2 (private)   │               │  L1/L2 (private)   │
-│  L3 (shared)       │               │  L3 (shared)       │
-│  IMC ──► DRAM Ch0  │               │  IMC ──► DRAM Ch0  │
-│         DRAM Ch1   │               │         DRAM Ch1   │
-│         DRAM Ch2   │   UPI Link    │         DRAM Ch2   │
-│         DRAM Ch3   │◄─────────────►│         DRAM Ch3   │
-└────────────────────┘               └────────────────────┘
-   Local latency: ~70 ns                Remote latency: ~140 ns
-   Local BW: ~200 GB/s                  Remote BW: ~50 GB/s
+```mermaid
+flowchart LR
+    subgraph socket0 ["Socket 0"]
+        cores0["Core 0 ... Core N<br/>L1/L2 (private)<br/>L3 (shared)"]
+        imc0["IMC"]
+        dram0["DRAM Ch0<br/>DRAM Ch1<br/>DRAM Ch2<br/>DRAM Ch3"]
+        cores0 --> imc0
+        imc0 --> dram0
+    end
+    
+    subgraph socket1 ["Socket 1"]
+        cores1["Core 0 ... Core N<br/>L1/L2 (private)<br/>L3 (shared)"]
+        imc1["IMC"]
+        dram1["DRAM Ch0<br/>DRAM Ch1<br/>DRAM Ch2<br/>DRAM Ch3"]
+        cores1 --> imc1
+        imc1 --> dram1
+    end
+    
+    imc0 <-->|"UPI Link"| imc1
+    
+    socket0 -.->|"Local latency: ~70 ns<br/>Local BW: ~200 GB/s"| socket0
+    socket1 -.->|"Remote latency: ~140 ns<br/>Remote BW: ~50 GB/s"| socket1
 ```
 
 Linux exposes NUMA topology through `numactl --hardware` and the `/sys/devices/system/node/` hierarchy. The kernel's default memory allocation policy is **local allocation**: memory pages are allocated on the NUMA node where the faulting thread runs. This is correct when threads consistently run on the same socket, but breaks down when the OS scheduler migrates threads (which it will do to balance load) or when threads share data across sockets. The `libnuma` API and the `numactl` tool allow explicit binding — a topic covered in the optimization section.

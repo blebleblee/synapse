@@ -150,15 +150,33 @@ A subtle but critical correctness requirement is that `isKnownUniquelyReferenced
 
 When you write `var value: any Equatable`, you are requesting existential erasure: the concrete type is hidden behind a uniform interface. The runtime representation of an existential is an existential container, a fixed-size structure whose layout is defined by the Swift ABI. For protocol existentials (not class-constrained), the container is five words on a 64-bit platform:
 
-```
-Existential Container Layout (5 words, 40 bytes on 64-bit)
-──────────────────────────────────────────────────────────────
- Word 0:  value buffer word 0  ┐
- Word 1:  value buffer word 1  │  Inline storage for small values (≤3 words)
- Word 2:  value buffer word 2  ┘  OR heap pointer if value is large
- Word 3:  value witness table pointer (VWT) — describes type's memory ops
- Word 4:  protocol witness table pointer (PWT) — per conformance dispatch
-──────────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    subgraph container["Existential Container Layout<br/>(5 words, 40 bytes on 64-bit)"]
+        direction TB
+        word0["Word 0: value buffer word 0"]
+        word1["Word 1: value buffer word 1"]
+        word2["Word 2: value buffer word 2"]
+        word3["Word 3: value witness table pointer (VWT)"]
+        word4["Word 4: protocol witness table pointer (PWT)"]
+    end
+    
+    subgraph storage["Storage Strategy"]
+        inline["Inline storage<br/>for small values (≤3 words)"]
+        heap["Heap pointer<br/>if value is large"]
+    end
+    
+    subgraph metadata["Type Metadata"]
+        vwt["Value Witness Table<br/>describes type's memory ops"]
+        pwt["Protocol Witness Table<br/>per conformance dispatch"]
+    end
+    
+    word0 --> inline
+    word1 --> inline
+    word2 --> inline
+    word2 -.OR.-> heap
+    word3 --> vwt
+    word4 --> pwt
 ```
 
 The value witness table (VWT) is a struct of function pointers describing how to allocate, copy, move, and destroy values of the concrete type. It is the type-erased equivalent of a copy constructor and destructor. When Swift assigns one existential to another, it calls through the VWT's copy function, which knows whether the value is inline or heap-allocated and does the right thing in either case.

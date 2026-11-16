@@ -30,13 +30,29 @@ A single-stage reduction using an 8-tooth driver and a 24-tooth driven gear give
 
 The beam grid that makes Lego so precise also constrains it. Gear centers must fall on integer or half-integer stud intervals, because axle holes in Technic beams are spaced on the standard 8mm Lego unit. Not every tooth-count combination produces a center distance that lands cleanly on the grid. The 8/24 and 8/40 pairings are explicitly designed to mesh at whole-stud center distances. The 16-tooth gear meshes cleanly with itself (1:1 ratio, two studs center-to-center) and with the 8-tooth (1:2, though the center distance requires careful beam selection). When you are planning a gear train, checking that every mesh lands on a valid beam position is a prerequisite, not a revision step.
 
-```
-Motor Shaft (8T)        Stage 1 Axle (24T/8T)     Output Axle (24T)
-      |                         |                        |
- [8T driver] ─mesh─> [24T driven]─shaft─[8T driver] ─mesh─> [24T driven]
-      ↓                         ↓                        ↓
- Speed: 1×            Speed: 1/3×                  Speed: 1/9×
- Torque: 1×           Torque: 3×                   Torque: 9×
+```mermaid
+flowchart TD
+    MS["Motor Shaft<br/>8T Driver"]
+    S1A["Stage 1 Axle<br/>24T Driven / 8T Driver"]
+    OA["Output Axle<br/>24T Driven"]
+    
+    MS -->|Mesh| S1A
+    S1A -->|Shaft| OA
+    
+    MS1["Speed: 1×<br/>Torque: 1×"]
+    S1S["Speed: 1/3×<br/>Torque: 3×"]
+    OAS["Speed: 1/9×<br/>Torque: 9×"]
+    
+    MS -.-> MS1
+    S1A -.-> S1S
+    OA -.-> OAS
+    
+    style MS fill:#e1f5ff
+    style S1A fill:#f3e5f5
+    style OA fill:#e8f5e9
+    style MS1 fill:#e1f5ff,stroke:#01579b
+    style S1S fill:#f3e5f5,stroke:#4a148c
+    style OAS fill:#e8f5e9,stroke:#1b5e20
 ```
 
 This cascade illustrates one of the most important structural decisions in a compound train: the intermediate axle must carry both the driven gear of the first stage and the driver gear of the second stage. That axle is under torsional load equal to three times the motor's input torque. If you use a single-stud connection (a plain axle through a beam with no cross-block bracing), that axle will flex, the mesh clearance will increase, teeth will skip under load, and the reduction will collapse. For any intermediate shaft carrying more than roughly 2× motor torque, brace it at both ends with axle connectors locked into structural beams, and use the cross-hole bushings to prevent lateral migration.

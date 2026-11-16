@@ -14,20 +14,32 @@ Advanced SNOT mastery requires developing intuition for the clutch power gradien
 
 The architectural foundation of robust SNOT integration rests on understanding connection point topology and the propagation of mechanical stress through hybrid geometry transitions. Every SNOT surface must anchor to the underlying orthogonal structure through a minimum of three non-collinear attachment points to achieve static determinacy and prevent rotational instability. Consider a sideways wall section four studs wide and six bricks tall: mounting this surface through only two headlight bricks at the top and bottom edges creates a mechanically underconstrained system prone to twisting failure around the connection axis. Adding a third attachment point at the vertical midpoint—either through an additional headlight brick or a technic pin passing through the wall's internal structure into the base framework—establishes triangulation and eliminates the rotational degree of freedom that would otherwise compromise structural integrity.
 
-```
-Vertical Wall (Conventional)          SNOT Wall (Inadequate)              SNOT Wall (Triangulated)
-=========================          =======================          =========================
-
-    ║ ║ ║ ║                            ●━━━━━━━━━━┓                      ●━━━━━━━━━━┓
-    ║ ║ ║ ║                            ┃          ┃                      ┃     ●    ┃ ← Midpoint
-    ║ ║ ║ ║                            ┃  SNOT    ┃                      ┃   pin    ┃   anchor
-    ║ ║ ║ ║                            ┃  WALL    ┃                      ┃  anchor  ┃
-    ║ ║ ║ ║                            ┃          ┃                      ┃          ┃
-    ▀▀▀▀▀▀▀                            ●━━━━━━━━━━┛                      ●━━━━━━━━━━┛
+```mermaid
+flowchart TD
+    subgraph vertical ["Vertical Wall (Conventional)"]
+        V1["Studs arranged vertically"]
+        V2["Gravity vector parallel to connections"]
+        V3["✓ Stable under gravity"]
+        V1 --> V2 --> V3
+    end
     
-Gravity vector             Two-point = rotational          Three-point = statically
-  parallel to              instability around             determinate, torsionally
- connections               connection axis                 stable configuration
+    subgraph inadequate ["SNOT Wall (Inadequate)"]
+        I1["Two connection points at corners"]
+        I2["Two-point attachment"]
+        I3["⚠ Rotational instability around connection axis"]
+        I1 --> I2 --> I3
+    end
+    
+    subgraph triangulated ["SNOT Wall (Triangulated)"]
+        T1["Three connection points:<br/>Two corners + one midpoint"]
+        T2["Three-point anchor system"]
+        T3["✓ Statically determinate"]
+        T4["✓ Torsionally stable configuration"]
+        T1 --> T2 --> T3 --> T4
+    end
+    
+    vertical -.comparison.-> inadequate
+    inadequate -.solution.-> triangulated
 ```
 
 The transition between orthogonal and SNOT planes demands careful management of the 5:2 aspect ratio through bracket sequences and offset compensation techniques. A standard bracket (part 44728) inverts stud direction by exactly one brick height (9.6mm) while maintaining alignment to the standard grid, making it the fundamental building block for 90-degree SNOT transitions. However, achieving half-stud offsets necessary for seamless tile cladding or centered detail work requires introducing jumper plates (part 15573) or modified 1×2 plates with offset studs (part 3794) at strategic positions within the bracket stack. The dimensional arithmetic becomes critical: starting from a conventional base, mounting a bracket followed by a jumper plate produces a half-stud lateral offset but maintains vertical alignment to the five-plates-equals-two-bricks relationship. Adding plates above the jumper to reach the desired SNOT surface height requires counting in units of 2.4mm increments while preserving the total dimensional multiple compatible with returning to orthogonal geometry at the structure's opposite boundary.

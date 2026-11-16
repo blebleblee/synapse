@@ -4,13 +4,17 @@
 
 Cubase's engine makes a hard trade-off every session: **latency vs. headroom**. Recording demands tiny buffers so you hear your performance instantly. Mixing a 150-track film score demands huge buffers so the CPU can pre-calculate everything that isn't being played live. ASIO Guard 2 is the mechanism that lets you have both at once by splitting the engine into two lanes — a low-latency lane for armed/live tracks, and a high-latency, pre-fetched lane for everything else. Understanding this split is the single most useful piece of theory in this document, because 90% of "my session is crackling" or "my latency is killing my take" problems trace back to not understanding which lane a track is in.
 
-```
-Cubase Pro Audio Engine Pipeline:
-[ASIO Hardware Driver] ──▶ [Live Input Buffer: 32-128 samples] ──▶ [Armed Track Engine]
-                                                                          │
-[Playback Tracks] ──▶ [ASIO Guard 2 Pre-Fetch Buffer: 1024-8192 samples] ┤
-                                                                          ▼
-[Control Room Monitor Bus] ◀── [Master MixConsole Bus] ◀── [64-bit Float Summing Bus]
+```mermaid
+flowchart TD
+    A["ASIO Hardware Driver"] --> B["Live Input Buffer: 32-128 samples"]
+    B --> C["Armed Track Engine"]
+    
+    D["Playback Tracks"] --> E["ASIO Guard 2 Pre-Fetch Buffer: 1024-8192 samples"]
+    E --> C
+    
+    C --> F["64-bit Float Summing Bus"]
+    F --> G["Master MixConsole Bus"]
+    G --> H["Control Room Monitor Bus"]
 ```
 
 **The rule of thumb that governs every session:** buffer size trades latency for CPU stability. At 44.1kHz, a 64-sample buffer gives you ~1.5ms of input latency (round-trip closer to 3-6ms with driver overhead) — tight enough to track a drummer. A 1024-sample buffer gives you ~23ms — unplayable live, but it lets ASIO Guard pre-render dozens of VST instrument tracks days ahead of the playhead, so your CPU meter sits comfortably instead of clicking and popping under a dense template.
@@ -119,11 +123,18 @@ Using only Quantize Pitch at high values without touching Straighten Pitch gives
 
 Without Control Room, your monitor volume knob *is* a fader on your signal path — turning down your speakers to rest your ears during a long session physically changes gain-staging feedback (you perceive the mix as quieter and compensate by pushing faders up, inflating your mix over hours). Control Room inserts a dedicated listening-level stage **after** the final mix bus, so your Main Stereo Out fader stays locked at 0dB (purely a rendering/export reference) and all monitoring volume changes happen in a stage that never touches the exported file.
 
-```
-Control Room Monitor Architecture:
-                                            ┌──▶ Main Monitors (K-14 calibrated, Outs 1-2)
-MixConsole Master Bus ──▶ [Control Room] ───┼──▶ Nearfield Alt-B (mono-sum check, Outs 3-4)
-                                            └──▶ Cue Mixes 1-4 (performer headphone feeds)
+```mermaid
+flowchart TD
+    MixConsole["MixConsole Master Bus"]
+    CR["Control Room"]
+    MainMon["Main Monitors<br/>(K-14 calibrated, Outs 1-2)"]
+    AltB["Nearfield Alt-B<br/>(mono-sum check, Outs 3-4)"]
+    Cue["Cue Mixes 1-4<br/>(performer headphone feeds)"]
+    
+    MixConsole --> CR
+    CR --> MainMon
+    CR --> AltB
+    CR --> Cue
 ```
 
 ### Step 1: Routing Configuration

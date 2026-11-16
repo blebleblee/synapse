@@ -92,7 +92,7 @@ $$AF(\theta) = \sum_{n=0}^{N-1} e^{jn(kd\cos\theta + \psi)}$$
 
 where $k = 2\pi / \lambda$ is the wave number and $\theta$ is the angle from the array axis. This is a geometric series with closed form:
 
-$$AF(\theta) = \frac{\sin(N u / 2)}{\sin(u / 2)}}, \quad u = kd\cos\theta + \psi$$
+$$AF(\theta) = \frac{\sin(N u / 2)}{\sin(u / 2)}, \quad u = kd\cos\theta + \psi$$
 
 This formula reveals the critical insight of phased array theory: by controlling the phase shift $\psi$, we can steer the main lobe of the array to arbitrary angles without physically rotating the array. Setting $\psi = -kd\cos\theta_0$ points the main lobe toward angle $\theta_0$. The main lobe width (between the first nulls) is:
 

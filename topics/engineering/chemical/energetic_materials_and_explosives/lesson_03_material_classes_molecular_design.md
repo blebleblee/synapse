@@ -52,83 +52,61 @@ Flash pyrotechnics for photographic illumination or acoustic report charges empl
 
 Colored flame compositions achieve spectral emission through thermal excitation of metal salts: strontium compounds (strontium nitrate, strontium carbonate) emit in the red at 606 nm and 650 nm from Sr I and Sr II atomic lines; barium salts produce green at 524 nm and 514 nm from Ba I and Ba II; and copper compounds yield blue-green at 510−520 nm from CuCl and CuBr molecular bands. The color purity depends critically on flame temperature: excessively hot flames (>2500 K) ionize the metal atoms beyond their visible emission states while overpopulating high-energy rovibrational states that produce broad blackbody continuum emission, washing out the desired narrow-band color. Strontium red formulations balance this by combining strontium nitrate oxidizer with chlorinated organic fuels (hexachloroethane, chlorinated paraffin wax) that reduce flame temperature to 1800−2200 K through endothermic C−Cl bond dissociation, simultaneously producing SrCl molecular emission that enhances red spectral purity.
 
-```
-MOLECULAR ARCHITECTURE DECISION TREE
-
-Start: Energetic Material Application
-│
-├─ Initiation Required? 
-│  ├─ YES → Primary Explosive
-│  │        ├─ Mechanical Stimulus (impact/friction)
-│  │        │  ├─ Lead Azide (Pb(N₃)₂)
-│  │        │  │  • Eₐ = 24 kcal/mol, ρ = 4.7 g/cm³
-│  │        │  │  • Impact: 2.5 J, Friction: 1 N
-│  │        │  └─ Lead Styphnate (C₆HN₃O₈Pb)
-│  │        │     • Eₐ = 32 kcal/mol, ρ = 3.0 g/cm³
-│  │        │     • Impact: 4.0 J (more stable)
-│  │        └─ Electrical Stimulus (bridgewire/ESD)
-│  │           └─ Diazodinitrophenol (DDNP)
-│  │              • Eₐ = 28 kcal/mol, ρ = 1.6 g/cm³
-│  │              • ESD: 0.2 mJ threshold
-│  │
-│  └─ NO → Secondary Use Required?
-│     │
-│     ├─ High Brisance (demolition, shaped charge)
-│     │  ├─ PETN (C₅H₈N₄O₁₂)
-│     │  │  • Vᴅ = 8350 m/s, OB = 0%
-│     │  │  • Highest specific energy: 1510 cal/g
-│     │  ├─ RDX (C₃H₆N₆O₆)
-│     │  │  • Vᴅ = 8750 m/s, OB = −21.6%
-│     │  │  • Military standard, moderate sensitivity
-│     │  └─ HMX (C₄H₈N₈O₈)
-│     │     • Vᴅ = 9100 m/s, OB = −21.6%
-│     │     • Highest Vᴅ, polymer-bonded for IHE
-│     │
-│     ├─ Melt-Castable (munitions manufacturing)
-│     │  └─ TNT (C₇H₅N₃O₆)
-│     │     • MP = 80.8°C, Vᴅ = 6900 m/s
-│     │     • OB = −74% (carbon-rich products)
-│     │
-│     ├─ Insensitive High Explosive (safety-critical)
-│     │  └─ TATB (C₆H₆N₆O₆)
-│     │     • Eₐ = 65 kcal/mol, Impact: 50 J
-│     │     • Vᴅ = 7760 m/s (reduced performance)
-│     │
-│     ├─ Controlled Burn (propellant)
-│     │  ├─ Gun Propellant
-│     │  │  ├─ Single-Base (Nitrocellulose)
-│     │  │  │  • 12.2−13.5% N, OB = −60%
-│     │  │  │  • r = aPⁿ, n = 0.7−0.9
-│     │  │  └─ Double-Base (NC + Nitroglycerin)
-│     │  │     • +20% Isp over single-base
-│     │  │     • Temperature-sensitive mechanics
-│     │  └─ Rocket Propellant
-│     │     └─ Composite (AP + HTPB + Al)
-│     │        • 68−88% AP (oxidizer)
-│     │        • 10−20% HTPB (fuel/binder)
-│     │        • 0−30% Al (performance modifier)
-│     │        • n = 0.3−0.5 (pressure exponent)
-│     │
-│     └─ Pyrotechnic Effect
-│        ├─ Thermite (Metal + Metal Oxide)
-│        │  └─ Al + Fe₂O₃ → Al₂O₃ + Fe
-│        │     • ΔH = 945 cal/g, T = 2700 K
-│        ├─ Flash (Rapid Gas Production)
-│        │  └─ KClO₄ + Al (70:30)
-│        │     • Burn rate: 300 m/s
-│        │     • Light output: intense white
-│        └─ Colored Flame (Metal Salt Emission)
-│           ├─ Red: Sr(NO₃)₂ + organic fuel
-│           ├─ Green: Ba(NO₃)₂ + organic fuel
-│           └─ Blue: CuCl₂ + chlorinated fuel
-
-KEY PARAMETERS
-Vᴅ: Detonation velocity (m/s)
-OB: Oxygen balance (%)
-Eₐ: Activation energy (kcal/mol)
-ρ: Crystal density (g/cm³)
-n: Burn rate pressure exponent
-Isp: Specific impulse (seconds)
+```mermaid
+flowchart TD
+    Start["<b>Start: Energetic Material Application</b>"]
+    
+    Start --> Q1{"Initiation Required?"}
+    
+    Q1 -->|YES| Primary["<b>Primary Explosive</b>"]
+    Q1 -->|NO| Q2{"Secondary Use Required?"}
+    
+    Primary --> Mechanical["<b>Mechanical Stimulus</b><br/>(impact/friction)"]
+    Primary --> Electrical["<b>Electrical Stimulus</b><br/>(bridgewire/ESD)"]
+    
+    Mechanical --> LeadAzide["<b>Lead Azide</b> (Pb(N₃)₂)<br/>• Eₐ = 24 kcal/mol, ρ = 4.7 g/cm³<br/>• Impact: 2.5 J, Friction: 1 N"]
+    Mechanical --> LeadStyphnate["<b>Lead Styphnate</b> (C₆HN₃O₈Pb)<br/>• Eₐ = 32 kcal/mol, ρ = 3.0 g/cm³<br/>• Impact: 4.0 J (more stable)"]
+    
+    Electrical --> DDNP["<b>Diazodinitrophenol (DDNP)</b><br/>• Eₐ = 28 kcal/mol, ρ = 1.6 g/cm³<br/>• ESD: 0.2 mJ threshold"]
+    
+    Q2 --> Brisance["<b>High Brisance</b><br/>(demolition, shaped charge)"]
+    Q2 --> MeltCast["<b>Melt-Castable</b><br/>(munitions manufacturing)"]
+    Q2 --> IHE["<b>Insensitive High Explosive</b><br/>(safety-critical)"]
+    Q2 --> Propellant["<b>Controlled Burn</b><br/>(propellant)"]
+    Q2 --> Pyro["<b>Pyrotechnic Effect</b>"]
+    
+    Brisance --> PETN["<b>PETN</b> (C₅H₈N₄O₁₂)<br/>• Vᴅ = 8350 m/s, OB = 0%<br/>• Highest specific energy: 1510 cal/g"]
+    Brisance --> RDX["<b>RDX</b> (C₃H₆N₆O₆)<br/>• Vᴅ = 8750 m/s, OB = −21.6%<br/>• Military standard, moderate sensitivity"]
+    Brisance --> HMX["<b>HMX</b> (C₄H₈N₈O₈)<br/>• Vᴅ = 9100 m/s, OB = −21.6%<br/>• Highest Vᴅ, polymer-bonded for IHE"]
+    
+    MeltCast --> TNT["<b>TNT</b> (C₇H₅N₃O₆)<br/>• MP = 80.8°C, Vᴅ = 6900 m/s<br/>• OB = −74% (carbon-rich products)"]
+    
+    IHE --> TATB["<b>TATB</b> (C₆H₆N₆O₆)<br/>• Eₐ = 65 kcal/mol, Impact: 50 J<br/>• Vᴅ = 7760 m/s (reduced performance)"]
+    
+    Propellant --> GunProp["<b>Gun Propellant</b>"]
+    Propellant --> RocketProp["<b>Rocket Propellant</b>"]
+    
+    GunProp --> SingleBase["<b>Single-Base</b> (Nitrocellulose)<br/>• 12.2−13.5% N, OB = −60%<br/>• r = aPⁿ, n = 0.7−0.9"]
+    GunProp --> DoubleBase["<b>Double-Base</b> (NC + Nitroglycerin)<br/>• +20% Isp over single-base<br/>• Temperature-sensitive mechanics"]
+    
+    RocketProp --> Composite["<b>Composite</b> (AP + HTPB + Al)<br/>• 68−88% AP (oxidizer)<br/>• 10−20% HTPB (fuel/binder)<br/>• 0−30% Al (performance modifier)<br/>• n = 0.3−0.5 (pressure exponent)"]
+    
+    Pyro --> Thermite["<b>Thermite</b> (Metal + Metal Oxide)"]
+    Pyro --> Flash["<b>Flash</b> (Rapid Gas Production)"]
+    Pyro --> ColoredFlame["<b>Colored Flame</b> (Metal Salt Emission)"]
+    
+    Thermite --> ThermiteReaction["Al + Fe₂O₃ → Al₂O₃ + Fe<br/>• ΔH = 945 cal/g, T = 2700 K"]
+    
+    Flash --> FlashComp["KClO₄ + Al (70:30)<br/>• Burn rate: 300 m/s<br/>• Light output: intense white"]
+    
+    ColoredFlame --> Red["<b>Red:</b> Sr(NO₃)₂ + organic fuel"]
+    ColoredFlame --> Green["<b>Green:</b> Ba(NO₃)₂ + organic fuel"]
+    ColoredFlame --> Blue["<b>Blue:</b> CuCl₂ + chlorinated fuel"]
+    
+    style Start fill:#e1f5ff,stroke:#0066cc,stroke-width:3px
+    style Primary fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
+    style Q1 fill:#fff9e6,stroke:#ff9900,stroke-width:2px
+    style Q2 fill:#fff9e6,stroke:#ff9900,stroke-width:2px
 ```
 
 Crystal polymorphism in energetic materials manifests through multiple thermodynamically distinct crystal structures accessible to the same molecular composition, each exhibiting unique lattice parameters, hydrogen bonding networks, molecular conformations, and corresponding differences in density, sensitivity, and thermal stability. HMX exemplifies this phenomenon with four confirmed polymorphs: β-HMX (monoclinic, P2₁/c) stable at ambient conditions with ρ = 1.903 g/cm³, α-HMX (orthorhombic, Pca2₁) stable above 104°C with ρ = 1.87 g/cm³, γ-HMX (monoclinic, P2₁/n) metastable at all temperatures with ρ = 1.82 g/cm³, and δ-HMX (hexagonal, P6₁22) stable above 164°C with ρ = 1.78 g/cm³. The β → δ transition at 164°C proceeds with 5.7% volume expansion and ΔH = +4.2 kJ/mol, sufficient to fracture pressed charges or induce pressure spikes in confined geometries that can trigger unintended detonation.
@@ -159,7 +137,7 @@ Temperature coefficient minimization for propellants addresses the problem that 
 
 Sensitivity reduction strategies partition into molecular approaches (modifying bond strengths or electronic structure), crystallographic approaches (eliminating defects or controlling morphology), and formulation approaches (incorporating desensitizing additives). Molecular desensitization through hydrogen bonding exploits the inverse correlation between intermolecular hydrogen bond strength and impact sensitivity: compounds forming strong hydrogen bonds (>20 kJ/mol per bond) dissipate mechanical shock energy through hydrogen bond rupture and reformation rather than concentrating energy into hot spots. FOX-7 (1,1-diamino-2,2-dinitroethylene) exemplifies this strategy with four NH₂ groups per molecule providing eight hydrogen bond donors that form a dense three-dimensional network, yielding impact sensitivity of 11 J—comparable to TNT despite FOX-7's superior detonation velocity of 8870 m/s.
 
-Defect elimination during crystallization focuses on removing inclusions, dislocations, and grain boundaries that serve as mechanical stress concentrators and hot spot nucleation sites. Zone refining—repeatedly passing a molten zone through a solid ingot—segregates impurities to one end through differential solubility in liquid versus solid phases, producing 99.99+% purity TNT, RDX, or HMX crystals with 25−40% higher impact thresholds than standard 98% purity material. Single-crystal growth via slow evaporation from dilute solutions (1−5 g/L concentrations, 0.1°C/day cooling rates) produces centimeter-scale crystals with no grain boundaries, achieving impact sensitivities 60% higher than polycrystalline pressed material, but the month-long growth times and <10% yield preclude use beyond research applications for sensitivity mechanism studies.
+Defect elimination during crystallization focuses on removing inclusions, dislocations, and grain boundaries that serve as mechanical stress concentrators and hot spot nucleation sites. Zone refining—repeatedly passing a molten zone through a solid ingot—segregates impurities to one end through differential solubility in liquid versus solid phases, producing 99.99+% purity TNT, RDX, or HMX crystals with 25−40% higher impact thresholds than standard 98% purity material. Single-crystal growth via slow evaporation from dilute solutions (1−5 g/L concentrations, 0.1°C/day cooling rates) produces centimeter-scale crystals with no grain boundaries, achieving impact sensitivities 60% higher than polycrystalline pressed material, but the month-long growth times and < 10% yield preclude use beyond research applications for sensitivity mechanism studies.
 
 Polymer-bonded explosives (PBX) desensitize brittle crystalline explosives by embedding them in elastomeric binders (5−15% by weight) that absorb impact energy and prevent intergranular friction. The archetype PBX 9501 combines 95% HMX with 2.5% polystyrene and 2.5% bis(2,2-dinitropropyl)formal/acetal (BDNPF), achieving impact sensitivity of 12 J versus 7 J for pressed HMX while retaining 97% of the detonation velocity through careful selection of low-molecular-weight binders (MW = 2000−5000 Da) that fill interstices without creating large voids. The binder choice critically affects long-term stability: polystyrene remains chemically inert but suffers creep under sustained stress, while energetic binders like BDNPF participate in combustion but risk autocatalytic decomposition that generates gas bubbles and cracking over years of storage at elevated temperature.
 
@@ -167,12 +145,22 @@ Failure mode analysis for energetic materials spans three temporal regimes: fast
 
 Unintended initiation scenarios include sympathetic detonation where shock from a nearby detonating charge initiates an adjacent acceptor charge separated by air gaps, armor plates, or inert spacers. The shock attenuation through these barriers scales as P(x) = P₀ exp(−x/ℓ) where ℓ is the attenuation length (10−40 mm for steel, 3−10 mm for air), requiring minimum separation distances calculated from P(dₘᵢₙ) = Pₜₕᵣₑₛₕ where Pₜₕᵣₑₛₕ is the acceptor's shock initiation threshold (2−8 GPa for secondary explosives). IHE formulations increase Pₜₕᵣₑₛₕ through high activation energies and reduced hot spot formation, enabling dₘᵢₙ reductions from 150 mm (Comp B) to 50 mm (TATB) in munitions bay designs where closer packing increases aircraft payload.
 
-Electrostatic discharge (ESD) initiation occurs when accumulated triboelectric charge (generated by mechanical friction during handling) discharges through the energetic material, depositing energy that locally heats a microscopic volume to ignition temperature. The sensitivity threshold follows E_ESD = (1/2)CV² where C is the equivalent capacitance of the material (10−100 pF depending on geometry) and V is breakdown voltage (typically 10−30 kV for organic explosives). Primary explosives exhibit E_ESD thresholds of 0.05−0.5 mJ due to low activation energies, while secondary explosives tolerate 5−50 mJ, and propellants >100 mJ. Humidity control provides the primary mitigation: maintaining 40−60% relative humidity prevents triboelectric charging by providing surface conductivity through adsorbed water monolayers that dissipate charge faster than it accumulates, reducing ESD incident rates from ~10⁻² events per handling operation in <20% RH to <10⁻⁵ events in controlled humidity.
+Electrostatic discharge (ESD) initiation occurs when accumulated triboelectric charge (generated by mechanical friction during handling) discharges through the energetic material, depositing energy that locally heats a microscopic volume to ignition temperature. The sensitivity threshold follows E_ESD = (1/2)CV² where C is the equivalent capacitance of the material (10−100 pF depending on geometry) and V is breakdown voltage (typically 10−30 kV for organic explosives). Primary explosives exhibit E_ESD thresholds of 0.05−0.5 mJ due to low activation energies, while secondary explosives tolerate 5−50 mJ, and propellants >100 mJ. Humidity control provides the primary mitigation: maintaining 40−60% relative humidity prevents triboelectric charging by providing surface conductivity through adsorbed water monolayers that dissipate charge faster than it accumulates, reducing ESD incident rates from ~10⁻² events per handling operation in < 20% RH to < 10⁻⁵ events in controlled humidity.
 
 Long-term chemical stability degradation proceeds through autocatalytic pathways where initial decomposition products (NO₂, HNO₃, or organic radicals) catalyze further decomposition in a positive feedback loop. Nitrate esters including nitroglycerin and nitrocellulose undergo hydrolysis: RONO₂ + H₂O → ROH + HNO₃, with the liberated nitric acid accelerating subsequent ester cleavage. Stabilizers such as diphenylamine (0.5−2% by weight) scavenge NO₂ radicals through N-nitroso compound formation, interrupting the catalytic cycle, but stabilizer depletion over 10−30 years at ambient storage leaves the material vulnerable to runaway decomposition detectable through evolved gas analysis (EGA) showing N₂, NO₂, and CO₂ production rates exceeding 1 mL/g/day.
 
 Polymorphic transitions during thermal cycling pose insidious storage risks for cast or pressed charges. HMX's β → δ transition at 164°C expands volume by 5.7%, but repeated cycling through 140−180°C (achievable in desert climates with diurnal temperature swings) generates cumulative microcracking as the transition hysteresis prevents complete reversal: only 95% of δ-HMX reconverts to β-HMX during cooling, leaving 5% residual δ-phase that becomes β during the next heating cycle. After 50−100 thermal cycles, accumulated microcracks increase surface area by 15−30% and lower impact sensitivity by 20%, transforming a desensitized PBX into a more hazardous material. Thermal analysis by differential scanning calorimetry (DSC) detects this degradation through the appearance of exothermic decomposition onsets shifting from 280°C (fresh material) to 260°C (cycled material) due to increased surface area for autocatalytic reactions.
 
-Manufacturing process hazards concentrate in operations involving particle size reduction, solvent crystallization, and pressing or casting. Milling energetic crystals to achieve fine particle distributions (1−50 micron median diameter) risks mechanochemical initiation where cumulative frictional heating from thousands of particle-particle collisions generates hot spots. Jet milling with supersonic gas streams (nitrogen at 8 bar, exit velocity 600 m/s) provides the safest approach by eliminating metal surfaces that can create sparks or frictional heating, but achieves only 3−8 kg/hr throughput and produces wide particle size distributions with 10−90 percentile ratios of 5:1 or worse. Fluid energy milling in cryogenic nitrogen (−196°C) improves safety margins through thermal buffering while embrittling crystals to reduce milling time, but condensed oxygen contamination (boiling point −183°C) introduces explosive oxidizer that raises friction sensitivity 10-fold, demanding oxygen analyzers maintaining <0.1% O₂ in the nitrogen supply.
+Manufacturing process hazards concentrate in operations involving particle size reduction, solvent crystallization, and pressing or casting. Milling energetic crystals to achieve fine particle distributions (1−50 micron median diameter) risks mechanochemical initiation where cumulative frictional heating from thousands of particle-particle collisions generates hot spots. Jet milling with supersonic gas streams (nitrogen at 8 bar, exit velocity 600 m/s) provides the safest approach by eliminating metal surfaces that can create sparks or frictional heating, but achieves only 3−8 kg/hr throughput and produces wide particle size distributions with 10−90 percentile ratios of 5:1 or worse. Fluid energy milling in cryogenic nitrogen (−196°C) improves safety margins through thermal buffering while embrittling crystals to reduce milling time, but condensed oxygen contamination (boiling point −183°C) introduces explosive oxidizer that raises friction sensitivity 10-fold, demanding oxygen analyzers maintaining < 0.1% O₂ in the nitrogen supply.
 
-Solvent crystallization hazards arise from exothermic dissolution and crystallization steps that can trigger thermal runaway if cooling fails. RDX crystallization from acetone releases 45 kJ/kg as supersaturated solution nucleates crystals, with heat generation rates peaking at 15 W/kg during the first hour after seeding. Cooling coil failure in a 1000 kg batch generates 15 kW thermal load that raises solution temperature at 1.5°C/min, accelerating crystallization kinetics and heat generation in a positive feedback loop that reaches the acetone boiling point (56°C) within 40 minutes, producing rapid solvent boiling that aerosolizes R
+Solvent crystallization hazards arise from exothermic dissolution and crystallization steps that can trigger thermal runaway if cooling fails. RDX crystallization from acetone releases 45 kJ/kg as supersaturated solution nucleates crystals, with heat generation rates peaking at 15 W/kg during the first hour after seeding. Cooling coil failure in a 1000 kg batch generates 15 kW thermal load that raises solution temperature at 1.5°C/min, accelerating crystallization kinetics and heat generation in a positive feedback loop that reaches the acetone boiling point (56°C) within 40 minutes, producing rapid solvent boiling that aerosolizes RDX particles into the vapor space. Mitigation requires passive rupture disks sized to discharge vapor at rates exceeding peak boiling kinetics, coupled with automated nitrogen quench systems that flood the crystallizer upon temperature excursion past 45°C.
+
+## 4. Summary & Material Design Invariant Matrix
+
+| Energetic Class | Archetype Compound | Density $\rho_0$ ($\text{g/cm}^3$) | Detonation Velocity $D$ ($\text{km/s}$) | Chapman-Jouguet Pressure $P_{\text{CJ}}$ ($\text{GPa}$) | Governing Structural Invariant |
+|:---|:---|:---:|:---:|:---:|:---|
+| **Aliphatic Nitrate Esters** | PETN ($\text{C}_5\text{H}_8\text{N}_4\text{O}_{12}$) | 1.77 | 8.26 | 31.4 | Weak $\text{O-NO}_2$ ester linkage; high oxygen balance; low activation energy |
+| **Nitramines** | HMX ($\text{C}_4\text{H}_8\text{N}_8\text{O}_8$) | 1.91 | 9.10 | 39.3 | High packing density $\beta$-polymorph; optimal ring strain energy; high $P_{\text{CJ}}$ |
+| **Nitroaromatics** | TNT ($\text{C}_7\text{H}_5\text{N}_3\text{O}_6$) | 1.65 | 6.90 | 19.0 | Low melting point ($80.8^\circ\text{C}$); melt-castability; negative oxygen balance |
+| **Insensitive High Explosives** | TATB ($\text{C}_6\text{H}_6\text{N}_6\text{O}_6$) | 1.93 | 7.90 | 29.1 | Extensive planar intra/intermolecular hydrogen bonding network; shock insensitivity |
+| **High-Nitrogen Heterocycles** | CL-20 ($\text{C}_6\text{H}_6\text{N}_{12}\text{O}_{12}$) | 2.04 | 9.50 | 44.0 | Rigid isowurtzitane cage strain ($E_{\text{strain}} \approx 250\text{ kJ/mol}$); maximum crystal density |

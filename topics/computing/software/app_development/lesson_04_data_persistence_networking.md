@@ -264,17 +264,30 @@ Network request optimization begins with connection reuse through HTTP keep-aliv
 
 HTTP/2 multiplexing interleaves multiple request-response pairs over a single TCP connection using binary framing and stream identifiers. This eliminates head-of-line blocking at the HTTP layer where a slow response would stall subsequent requests using HTTP/1.1 pipelining. However, TCP-level head-of-line blocking remains: if a packet is lost, TCP's reliable in-order delivery guarantee forces all streams to wait for retransmission even if the lost data belongs to only one stream. HTTP/3 addresses this by running over QUIC, a UDP-based protocol that provides independent streams with per-stream reliability.
 
-```
-HTTP/1.1 Sequential:
-  Request 1 ──────────────────────────────────> Response 1
-                                                  Request 2 ──────────> Response 2
-  Total Time: RTT₁ + RTT₂
-
-HTTP/2 Multiplexed:
-  Request 1 ─────────────────> Response 1
-  Request 2 ──────────────────────> Response 2
-  Request 3 ────────> Response 3
-  Total Time: max(RTT₁, RTT₂, RTT₃)
+```mermaid
+flowchart TD
+    subgraph http1["HTTP/1.1 Sequential"]
+        direction LR
+        h1_req1["Request 1"] -->|RTT₁| h1_res1["Response 1"]
+        h1_res1 --> h1_req2["Request 2"]
+        h1_req2 -->|RTT₂| h1_res2["Response 2"]
+        h1_total["Total Time: RTT₁ + RTT₂"]
+    end
+    
+    subgraph http2["HTTP/2 Multiplexed"]
+        direction LR
+        h2_start((" "))
+        h2_start --> h2_req1["Request 1"]
+        h2_start --> h2_req2["Request 2"]
+        h2_start --> h2_req3["Request 3"]
+        h2_req1 -->|RTT₁| h2_res1["Response 1"]
+        h2_req2 -->|RTT₂| h2_res2["Response 2"]
+        h2_req3 -->|RTT₃| h2_res3["Response 3"]
+        h2_res1 --> h2_end((" "))
+        h2_res2 --> h2_end
+        h2_res3 --> h2_end
+        h2_total["Total Time: max(RTT₁, RTT₂, RTT₃)"]
+    end
 ```
 
 Request batching reduces network overhead by combining multiple logically independent operations into a single HTTP request. GraphQL naturally supports batching through its query language, but REST APIs must define custom batch endpoints that accept arrays of operations. The server executes operations concurrently or serially depending on dependencies, returning an array of responses in the same order. Error handling becomes more complex: the batch request may succeed at the HTTP level while individual operations within it fail, requiring clients to check per-operation status codes.
@@ -333,21 +346,17 @@ Distributed transaction failure modes emerge from the coordination required to m
 
 Circuit breakers prevent cascading failures by detecting when a downstream service becomes unhealthy and immediately failing requests without attempting to contact it. After a configured threshold of consecutive failures or a failure rate exceeding a percentage, the circuit breaker transitions to the open state, rejecting requests immediately for a timeout period. After the timeout, it enters half-open state, allowing a limited number of trial requests through. If these succeed, the circuit closes and normal traffic resumes; if they fail, it reopens for another timeout period.
 
-```
-Circuit Breaker State Machine:
-
-    [Closed] ────failure threshold exceeded────> [Open]
-       │                                            │
-       │                                            │
-    success                                    timeout elapsed
-       │                                            │
-       ↓                                            ↓
-    [Closed] <───trial requests succeed─── [Half-Open]
-                                                    │
-                                        trial requests fail
-                                                    │
-                                                    ↓
-                                                 [Open]
+```mermaid
+flowchart LR
+    Closed["Closed"]
+    Open["Open"]
+    HalfOpen["Half-Open"]
+    
+    Closed -->|"failure threshold exceeded"| Open
+    Open -->|"timeout elapsed"| HalfOpen
+    HalfOpen -->|"trial requests succeed"| Closed
+    HalfOpen -->|"trial requests fail"| Open
+    Closed -->|"success"| Closed
 ```
 
 Exponential backoff with jitter optimizes retry timing after transient failures. A naive approach retries immediately, overwhelming a recovering service. Constant delay spreads retries uniformly but doesn't adapt to failure duration. Exponential backoff doubles the delay after each failure, but if many clients fail simultaneously (e.g., due to a network partition), they all retry at the same time, creating a thundering herd. Adding random jitter—typically multiplying the delay by a random value between 0.5 and 1.5—desynchronizes retries across clients.

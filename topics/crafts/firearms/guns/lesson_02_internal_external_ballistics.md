@@ -26,17 +26,27 @@ The pressure-volume-time relationship is computed through numerical integration 
 
 A simplified ASCII representation of the internal ballistics timeline illustrates the sequence:
 
-```
-Time (μs):        0      50     100    150    200    250    300
-──────────────────────────────────────────────────────────────
-Primer ignition:  █
-Propellant ignition:     ███
-Peak pressure:               █
-Bullet exits case neck:      ▓▓▓
-Bullet halfway down bore:            ▓▓▓▓▓▓
-Bullet exits muzzle:                               ▓▓▓▓▓▓▓▓█
-
-Pressure (PSI):   0   15k   55k   45k   30k   18k    8k    0
+```mermaid
+flowchart TD
+    A["Primer Ignition<br/>0 μs"]
+    B["Propellant Ignition<br/>50-100 μs"]
+    C["Peak Pressure<br/>100 μs<br/>55k PSI"]
+    D["Bullet Exits Case Neck<br/>50-100 μs"]
+    E["Bullet Halfway Down Bore<br/>100-150 μs<br/>45k PSI"]
+    F["Bullet Exits Muzzle<br/>250-300 μs<br/>8k PSI"]
+    
+    A -->|"50 μs"| B
+    B -->|"50 μs"| C
+    B --> D
+    C --> E
+    E -->|"100-150 μs"| F
+    
+    style A fill:#ff6b6b
+    style B fill:#ff8c42
+    style C fill:#ffd93d
+    style D fill:#95e1d3
+    style E fill:#6bcf7f
+    style F fill:#4d96ff
 ```
 
 The pressure peak occurs very early, often before the bullet has traveled even 10% of the barrel length. By the time the bullet reaches the muzzle, residual pressure may have dropped to 5,000 PSI or less, depending on barrel length and propellant burn rate. The muzzle blast is the supersonic expansion of this residual gas into ambient air, producing the characteristic report and muzzle flash.

@@ -26,32 +26,26 @@ Water-washable resins replace the acrylate monomers with water-dispersible polye
 
 The wash-to-cure pipeline in process flow form looks like this:
 
-```
-Build plate removal
-       │
-       ▼
-Pre-drain: hold part over vat 60 sec
-       │
-       ▼
-Dirty wash bath (IPA, 3–4 min agitation)
-       │
-       ▼
-Clean wash bath (fresh IPA, 2–3 min agitation)
-       │
-       ▼
-Air dry or compressed air purge (critical: no moisture on surface)
-       │
-       ▼
-Inspect surface under UV penlight for tacky zones
-       │
-       ▼
-UV post-cure station (time + temperature controlled)
-       │
-       ▼
-Support removal
-       │
-       ▼
-Surface finishing
+```mermaid
+flowchart TD
+    A["Build plate removal"]
+    B["Pre-drain: hold part over vat 60 sec"]
+    C["Dirty wash bath (IPA, 3–4 min agitation)"]
+    D["Clean wash bath (fresh IPA, 2–3 min agitation)"]
+    E["Air dry or compressed air purge (critical: no moisture on surface)"]
+    F["Inspect surface under UV penlight for tacky zones"]
+    G["UV post-cure station (time + temperature controlled)"]
+    H["Support removal"]
+    I["Surface finishing"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
 ```
 
 The UV penlight inspection step deserves emphasis. A 365–405 nm penlight held at an oblique angle over a washed part causes any residual uncured resin to fluoresce with a faint blue-violet glow. This non-destructive check catches wash failures before cure locks them in. Practitioners who skip it and go straight from wash to cure discover the problem only after the fact, when the part surface shows a glossy irregular skin or remains tacky to the touch in specific zones.
@@ -60,18 +54,24 @@ The UV penlight inspection step deserves emphasis. A 365–405 nm penlight held 
 
 Post-cure is not simply "more light." It is controlled delivery of photon energy (expressed as dose, in mJ/cm²) at the correct wavelength to bring the degree of conversion (DoC)—the fraction of reactive double bonds that have crosslinked—from the printed value (~50–70%) to the material's target maximum (~85–95%). The relationship between cure dose and mechanical output follows the curve shown conceptually below:
 
-```
-Tensile        │                   ___________
-Strength       │               __/             \
-(MPa)          │           __/                  \___
-               │       __/                           (embrittlement)
-               │   __/
-               │__/
-               └──────────────────────────────────────────
-                           Cure Dose (mJ/cm²)
+```mermaid
+flowchart LR
+    A["Undercure Region\n(Low Tensile Strength)"]
+    B["Optimal Window\n(Peak Tensile Strength)"]
+    C["Overcure Region\n(Embrittlement)"]
 
-                  Undercure    Optimal     Overcure
-                  Region       Window      Region
+    A -->|"Strength rises\nwith cure dose"| B
+    B -->|"Strength drops\npast optimal dose"| C
+
+    subgraph x_axis ["Cure Dose (mJ/cm²)"]
+        A
+        B
+        C
+    end
+
+    style A fill:#f4a460,stroke:#8b4513,color:#000
+    style B fill:#2e8b57,stroke:#006400,color:#fff
+    style C fill:#cd5c5c,stroke:#8b0000,color:#fff
 ```
 
 The optimal window is resin-specific and must be found empirically or taken from the manufacturer's datasheet. Sirayatech Blu, for example, specifies 2–4 minutes in a 405 nm station at 36W equivalent. Elegoo ABS-Like resin reaches peak flexural modulus at approximately 90 seconds under a comparable source. Beyond the optimum, additional crosslinking consumes the flexible chain segments that contribute to elongation at break—the part becomes harder on the Shore D scale but snaps under impact load rather than deforming. This is the mechanism behind the classic failure mode of over-cured dental models: dimensionally accurate, visually perfect, catastrophically brittle.

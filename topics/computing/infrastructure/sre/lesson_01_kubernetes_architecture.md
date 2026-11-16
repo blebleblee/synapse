@@ -100,13 +100,20 @@ A production etcd cluster for Kubernetes should:
 
 The kube-controller-manager is a single binary that embeds dozens of independent control loops, each managing a specific resource type. The architectural pattern for every controller is identical:
 
-```
-Informer (Watch + local cache)
-    └─► Work Queue (rate-limited, deduplicating)
-            └─► Reconcile Loop
-                    ├─► Read desired state from cache
-                    ├─► Read actual state from real world
-                    └─► Issue API calls to close the gap
+```mermaid
+flowchart TD
+    A["Informer<br/>(Watch + local cache)"]
+    B["Work Queue<br/>(rate-limited, deduplicating)"]
+    C["Reconcile Loop"]
+    D["Read desired state<br/>from cache"]
+    E["Read actual state<br/>from real world"]
+    F["Issue API calls<br/>to close the gap"]
+    
+    A -->|feeds| B
+    B -->|triggers| C
+    C --> D
+    C --> E
+    C --> F
 ```
 
 The `Informer` abstraction is crucial to performance at scale. Rather than each controller opening its own Watch stream to etcd (which would create O(controllers × resources) load), all controllers share a single `SharedInformer` per resource type. The `SharedIndexInformer` maintains a local in-memory cache of all objects of its type, synchronized via a single Watch stream. Controllers query this cache for reads, hitting etcd only for writes. This reduces etcd load from O(N) to O(1) per controller type.
@@ -482,18 +489,24 @@ The kernel OOM killer kills containers in BestEffort class first (highest `oom_s
 A Pod is not a simple "running" or "stopped" entity — it is a state machine with well-defined phase transitions, and confusing these transitions is a frequent source of incorrect monitoring and alerting.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Pending: Pod created in etcd
-    Pending --> Running: All containers started successfully
-    Pending --> Failed: Init container or image pull failure (restartPolicy=Never)
-    Running --> Succeeded: All containers exited 0 (restartPolicy=Never/OnFailure)
-    Running --> Failed: At least one container exited non-zero (restartPolicy=Never)
-    Running --> Running: Container restarted by kubelet (restartPolicy=Always/OnFailure)
-    Running --> Unknown: Node communication lost (node.status=NotReady)
-    Unknown --> Running: Node recovers before eviction timeout
-    Unknown --> Failed: Pod forcibly deleted after eviction timeout
-    Succeeded --> [*]
-    Failed --> [*]
+flowchart TD
+    Start([Start]) --> Pending["Pending"]
+    Pending -->|"All containers started successfully"| Running["Running"]
+    Pending -->|"Init container or image pull failure<br/>(restartPolicy=Never)"| Failed["Failed"]
+    Running -->|"All containers exited 0<br/>(restartPolicy=Never/OnFailure)"| Succeeded["Succeeded"]
+    Running -->|"At least one container exited non-zero<br/>(restartPolicy=Never)"| Failed
+    Running -->|"Container restarted by kubelet<br/>(restartPolicy=Always/OnFailure)"| Running
+    Running -->|"Node communication lost<br/>(node.status=NotReady)"| Unknown["Unknown"]
+    Unknown -->|"Node recovers before eviction timeout"| Running
+    Unknown -->|"Pod forcibly deleted after eviction timeout"| Failed
+    Succeeded --> End1([End])
+    Failed --> End2([End])
+    
+    style Pending fill:#fff3cd
+    style Running fill:#d1ecf1
+    style Succeeded fill:#d4edda
+    style Failed fill:#f8d7da
+    style Unknown fill:#e2e3e5
 ```
 
 The `Unknown` phase is not a Kubernetes-managed state transition — it is a signal that the kubelet is unreachable and the API server cannot determine the actual state of the Pod. It does not mean the Pod's process has stopped; the container may still be running on the isolated node. This is the fundamental tension in distributed systems: you cannot distinguish a slow node from a crashed node. Kubernetes resolves this by time-boxing `Unknown` with the eviction timeout and accepting the risk of a brief period where the same logical service has two running instances (the old, isolated Pod and the newly scheduled replacement). Systems that require strict at-most-once semantics (e.g., distributed locks, database primaries) must implement their own fencing mechanisms; Kubernetes does not provide this guarantee at the Pod level.

@@ -30,38 +30,56 @@ Discrete conformal parameterization algorithms operate by constructing a sparse 
 
 Parameterization inevitably introduces cuts—boundaries where the mesh is partitioned into topological disks. Spheres, tori, and higher-genus surfaces cannot be flattened without cutting, as their fundamental groups are non-trivial. Cuts create UV seams where texture coordinates are discontinuous across shared geometric edges. Careful seam placement along edges with high curvature or occluded regions minimizes visible artifacts, but seams complicate mipmapping because texture samples across a seam are spatially distant in texture memory despite being geometrally adjacent on the surface. Modern GPU texture samplers provide wrap modes—repeat, clamp, mirror—to handle boundary conditions, but these cannot fully eliminate seam artifacts in all filtering scenarios.
 
-```
-Mesh Vertex Data Structure:
-┌────────────────────────────────────┐
-│ Vertex Position (x, y, z)          │ ← World-space or object-space coordinates
-│ Vertex Normal (nx, ny, nz)         │ ← Interpolated for shading
-│ Texture Coordinates (u, v)         │ ← Per-vertex UV assignment
-│ Tangent Vector (tx, ty, tz)        │ ← For tangent-space normal mapping
-│ Bitangent Vector (bx, by, bz)      │ ← Orthogonal to tangent and normal
-└────────────────────────────────────┘
-         │
-         ▼ Vertex Shader: Perspective-Correct Interpolation
-┌────────────────────────────────────┐
-│ Screen Position (x_s, y_s, z_s, w) │ ← Clip-space coordinates
-│ Interpolated UV (u', v') / w       │ ← Divide by w for perspective correction
-│ Interpolated Normal (n')           │
-└────────────────────────────────────┘
-         │
-         ▼ Rasterization: Per-Fragment Interpolation
-┌────────────────────────────────────┐
-│ Fragment UV = (u'/w) / (1/w)       │ ← Perspective-correct reconstruction
-│ Screen-Space Derivatives:          │
-│   ∂u/∂x, ∂u/∂y, ∂v/∂x, ∂v/∂y     │ ← Computed via finite differences
-└────────────────────────────────────┘
-         │
-         ▼ Fragment Shader: Texture Sampling
-┌────────────────────────────────────┐
-│ Compute Mip Level λ from gradients │
-│ Fetch Texels from Cache/Memory     │
-│ Apply Filtering Kernel (Bilinear,  │
-│   Trilinear, Anisotropic)          │
-│ Modulate with Lighting/Material    │
-└────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Vertex Position (x, y, z)<br/>World-space or object-space coordinates"]
+    B["Vertex Normal (nx, ny, nz)<br/>Interpolated for shading"]
+    C["Texture Coordinates (u, v)<br/>Per-vertex UV assignment"]
+    D["Tangent Vector (tx, ty, tz)<br/>For tangent-space normal mapping"]
+    E["Bitangent Vector (bx, by, bz)<br/>Orthogonal to tangent and normal"]
+    
+    F["Vertex Shader: Perspective-Correct Interpolation"]
+    
+    G["Screen Position (x_s, y_s, z_s, w)<br/>Clip-space coordinates"]
+    H["Interpolated UV (u', v') / w<br/>Divide by w for perspective correction"]
+    I["Interpolated Normal (n')"]
+    
+    J["Rasterization: Per-Fragment Interpolation"]
+    
+    K["Fragment UV = (u'/w) / (1/w)<br/>Perspective-correct reconstruction"]
+    L["Screen-Space Derivatives:<br/>∂u/∂x, ∂u/∂y, ∂v/∂x, ∂v/∂y<br/>Computed via finite differences"]
+    
+    M["Fragment Shader: Texture Sampling"]
+    
+    N["Compute Mip Level λ from gradients"]
+    O["Fetch Texels from Cache/Memory"]
+    P["Apply Filtering Kernel<br/>(Bilinear, Trilinear, Anisotropic)"]
+    Q["Modulate with Lighting/Material"]
+    
+    A --> F
+    B --> F
+    C --> F
+    D --> F
+    E --> F
+    
+    F --> G
+    F --> H
+    F --> I
+    
+    G --> J
+    H --> J
+    I --> J
+    
+    J --> K
+    J --> L
+    
+    K --> M
+    L --> M
+    
+    M --> N
+    N --> O
+    O --> P
+    P --> Q
 ```
 
 The vertex shader transforms positions into clip space and computes perspective-corrected texture coordinates by dividing by the homogeneous coordinate $w$. The rasterizer linearly interpolates these divided values across the triangle and reconstructs the correct texture coordinates at each fragment by dividing by the interpolated reciprocal of $w$. This perspective correction is essential because linear interpolation in screen space does not correspond to linear interpolation in world space under perspective projection—a texture mapped onto a receding surface would appear compressed without it.

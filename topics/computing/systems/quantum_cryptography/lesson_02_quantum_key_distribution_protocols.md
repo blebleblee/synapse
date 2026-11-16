@@ -30,69 +30,56 @@ The sifted key would be identical between Alice and Bob in an ideal noiseless ch
 
 Assuming acceptable QBER, Alice and Bob perform information reconciliation through classical error correction protocols, typically cascade or low-density parity-check codes, exchanging parity information over the authenticated channel to correct discrepancies in their sifted keys. This error correction step leaks additional information to Eve—she learns all transmitted parity bits—further reducing the extractable secure key length. Privacy amplification follows, applying universal hash functions to compress the error-corrected key into a shorter final key about which Eve has exponentially small mutual information. The hash function selection and output length depend on bounds derived from the observed QBER and the amount of information leaked during error correction, typically using leftover hash lemma constructions or Trevisan's extractor.
 
-```
-BB84 Protocol Execution Flow:
-
-Phase 1: Quantum Transmission
-┌─────────┐                                    ┌─────────┐
-│  Alice  │                                    │   Bob   │
-│         │                                    │         │
-│ 1. Generate random bit string b[0..N-1]     │         │
-│ 2. Generate random basis string B_A[0..N-1] │         │
-│    (R = Rectilinear, D = Diagonal)          │         │
-│                                              │         │
-│ 3. For each i:                               │         │
-│    Encode b[i] in basis B_A[i]:              │         │
-│    - R basis: 0→|H⟩, 1→|V⟩                   │         │
-│    - D basis: 0→|D⟩, 1→|A⟩                   │         │
-│                                              │         │
-│ 4. Transmit photon sequence                  │         │
-│────────────────Quantum Channel─────────────>│         │
-│                                              │ 1. Generate random basis B_B[0..N-1]
-│                                              │ 2. Measure each photon in basis B_B[i]
-│                                              │ 3. Record measurement outcomes m[i]
-│                                              │    (subset detected due to losses)
-└─────────┘                                    └─────────┘
-
-Phase 2: Basis Reconciliation (Classical Authenticated Channel)
-┌─────────┐                                    ┌─────────┐
-│  Alice  │<──── Detection positions ──────────│   Bob   │
-│         │<──── Measurement bases B_B ────────│         │
-│         │─── Matching basis indicators ────>│         │
-│         │                                    │         │
-│ Both parties sift: keep only bits where B_A[i] = B_B[i]
-│ Sifted key length ≈ N/2 (expectation)       │         │
-└─────────┘                                    └─────────┘
-
-Phase 3: Error Estimation
-┌─────────┐                                    ┌─────────┐
-│  Alice  │<──── Random sample positions ──────│   Bob   │
-│         │───── Sample bit values ──────────>│         │
-│         │<──── Sample bit values ────────────│         │
-│         │                                    │         │
-│ Compute QBER = (# disagreements) / (sample size)
-│ If QBER > threshold: ABORT                   │         │
-│ Else: proceed to error correction            │         │
-└─────────┘                                    └─────────┘
-
-Phase 4: Information Reconciliation & Privacy Amplification
-┌─────────┐                                    ┌─────────┐
-│  Alice  │<──── Parity check syndromes ───────│   Bob   │
-│         │───── Parity check syndromes ──────>│         │
-│         │                                    │         │
-│ Error correction using CASCADE or LDPC       │         │
-│ Reconciled key length: n_reconciled          │         │
-│                                              │         │
-│ Privacy amplification:                       │         │
-│ Select universal hash function h with        │         │
-│ output length ℓ based on:                    │         │
-│   - Observed QBER                            │         │
-│   - Information leaked during reconciliation │         │
-│   - Security parameter ε                     │         │
-│                                              │         │
-│ Final key K = h(reconciled_key)              │         │
-│ |K| = ℓ bits with Pr[I(Eve:K) > 0] < ε      │         │
-└─────────┘                                    └─────────┘
+```mermaid
+flowchart TD
+    subgraph Phase1 ["Phase 1: Quantum Transmission"]
+        A1["Alice: Generate random bit string b[0..N-1]"]
+        A2["Alice: Generate random basis string B_A[0..N-1]<br/>(R = Rectilinear, D = Diagonal)"]
+        A3["Alice: For each i, encode b[i] in basis B_A[i]:<br/>R basis: 0→|H⟩, 1→|V⟩<br/>D basis: 0→|D⟩, 1→|A⟩"]
+        A4["Alice: Transmit photon sequence"]
+        B1["Bob: Generate random basis B_B[0..N-1]"]
+        B2["Bob: Measure each photon in basis B_B[i]"]
+        B3["Bob: Record measurement outcomes m[i]<br/>(subset detected due to losses)"]
+        
+        A1 --> A2 --> A3 --> A4
+        A4 -->|"Quantum Channel"| B1
+        B1 --> B2 --> B3
+    end
+    
+    subgraph Phase2 ["Phase 2: Basis Reconciliation (Classical Authenticated Channel)"]
+        B4["Bob: Send detection positions and<br/>measurement bases B_B to Alice"]
+        A5["Alice: Send matching basis indicators to Bob"]
+        S1["Both: Sift and keep only bits where B_A[i] = B_B[i]<br/>Sifted key length ≈ N/2 (expectation)"]
+        
+        B4 --> A5 --> S1
+    end
+    
+    subgraph Phase3 ["Phase 3: Error Estimation"]
+        B5["Bob: Send random sample positions to Alice"]
+        A6["Alice: Send sample bit values to Bob"]
+        B6["Bob: Send sample bit values to Alice"]
+        E1["Both: Compute QBER = (# disagreements) / (sample size)"]
+        E2{"QBER > threshold?"}
+        E3["ABORT Protocol"]
+        E4["Proceed to Error Correction"]
+        
+        B5 --> A6 --> B6 --> E1 --> E2
+        E2 -->|Yes| E3
+        E2 -->|No| E4
+    end
+    
+    subgraph Phase4 ["Phase 4: Information Reconciliation & Privacy Amplification"]
+        R1["Both: Exchange parity check syndromes"]
+        R2["Both: Error correction using CASCADE or LDPC<br/>Reconciled key length: n_reconciled"]
+        P1["Both: Privacy amplification<br/>Select universal hash function h with output length ℓ<br/>based on observed QBER, leaked information, and security parameter ε"]
+        P2["Both: Final key K = h(reconciled_key)<br/>|K| = ℓ bits with Pr["I(Eve:K) > 0"] < ε"]
+        
+        R1 --> R2 --> P1 --> P2
+    end
+    
+    Phase1 --> Phase2
+    Phase2 --> Phase3
+    E4 --> Phase4
 ```
 
 ### E91 Protocol: Entanglement-Based Distribution

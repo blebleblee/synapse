@@ -130,52 +130,39 @@ $$= P_M^* M_0 \left(\varepsilon_X + \varepsilon_M - 1\right)$$
 
 The sign of this derivative determines whether depreciation improves or worsens the trade balance. The critical threshold is $\varepsilon_X + \varepsilon_M = 1$. For $\varepsilon_X + \varepsilon_M > 1$, depreciation improves the balance. For $\varepsilon_X + \varepsilon_M < 1$, depreciation worsens it. Empirical elasticities vary widely across countries and time horizons. Short-run elasticities for advanced economies often sum to 0.5–0.8, while long-run elasticities exceed 1.5–2.0, satisfying the Marshall-Lerner condition.
 
-```
-Balance of Payments Flow Architecture
-======================================
+```mermaid
+flowchart TD
+    subgraph CA["CURRENT ACCOUNT"]
+        direction LR
+        GOODS["Goods Balance\nExports (+) / Imports (-)"]
+        SERVICES["Services Balance\nExports (+) / Imports (-)"]
+        PRIMARY["Primary Income Balance\nIncome (+) / Payments (-)"]
+        SECONDARY["Secondary Income\n(Transfers)"]
+        CA_EQ["Current Account Balance\n= National Saving − Investment"]
+        GOODS & SERVICES & PRIMARY & SECONDARY --> CA_EQ
+    end
 
-┌─────────────────────────────────────────────────────────────────┐
-│                        CURRENT ACCOUNT                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │    Goods     │  │   Services   │  │Primary Income│          │
-│  │   Balance    │  │   Balance    │  │   Balance    │          │
-│  │              │  │              │  │              │          │
-│  │ Exports (+)  │  │ Exports (+)  │  │ Income (+)   │          │
-│  │ Imports (-)  │  │ Imports (-)  │  │ Payments (-) │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-│                                                                  │
-│  ┌──────────────┐                                               │
-│  │  Secondary   │         Current Account Balance               │
-│  │   Income     │    = National Saving - Investment             │
-│  │  (Transfers) │                                               │
-│  └──────────────┘                                               │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                │ Must sum to zero
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      FINANCIAL ACCOUNT                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │    Direct    │  │  Portfolio   │  │    Other     │          │
-│  │  Investment  │  │  Investment  │  │  Investment  │          │
-│  │              │  │              │  │              │          │
-│  │  FDI flows   │  │Equity & Debt │  │Loans, Trade  │          │
-│  │  (≥10% own)  │  │  Securities  │  │   Credit     │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-│                                                                  │
-│  ┌──────────────┐                                               │
-│  │   Reserve    │         Financial Account Balance             │
-│  │    Assets    │    = Change in Net Foreign Assets             │
-│  │  (Central    │                                               │
-│  │    Bank)     │                                               │
-│  └──────────────┘                                               │
-└─────────────────────────────────────────────────────────────────┘
+    ZERO["Must sum to zero\nCA + FA = 0"]
 
-Exchange Rate Determination (Floating Regime):
+    subgraph FA["FINANCIAL ACCOUNT"]
+        direction LR
+        FDI["Direct Investment\nFDI flows (≥10% ownership)"]
+        PORTFOLIO["Portfolio Investment\nEquity & Debt Securities"]
+        OTHER["Other Investment\nLoans, Trade Credit"]
+        RESERVES["Reserve Assets\n(Central Bank)"]
+        FA_EQ["Financial Account Balance\n= Change in Net Foreign Assets"]
+        FDI & PORTFOLIO & OTHER & RESERVES --> FA_EQ
+    end
 
-     CA(q, Y, Y*) + FA(i - i*, E[Δe], ρ) = 0
+    subgraph EX["EXCHANGE RATE DETERMINATION (Floating Regime)"]
+        EQ["CA(q, Y, Y*) + FA(i − i*, E[Δe], ρ) = 0"]
+        ADJ["Real exchange rate q\nadjusts to equilibrate flows"]
+        EQ --> ADJ
+    end
 
-     Real exchange rate q adjusts to equilibrate flows
+    CA_EQ --> ZERO
+    ZERO --> FA_EQ
+    FA_EQ --> EX
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

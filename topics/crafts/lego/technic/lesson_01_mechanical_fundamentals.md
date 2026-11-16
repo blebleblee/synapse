@@ -29,19 +29,38 @@ When you use these triangles to brace a rectangular frame, the diagonal liftarm 
 
 The force-path diagram below illustrates the difference between an unbraced rectangular frame and a triangulated one:
 
-```
-UNBRACED RECTANGULAR FRAME        TRIANGULATED FRAME
-(4-bar mechanism — rackable)       (rigid triangle — stable)
-
-A ─────────── B                    A ─────────── B
-│             │                    │           / │
-│    SHEAR    │  →  rack           │          /  │
-│    FORCE    │                    │  diagonal   │
-│             │                    │  brace   /  │
-D ─────────── C                    D ─────────── C
-
-Under lateral force, A-B          Diagonal converts shear
-slides relative to D-C.           into axial tension/compression.
+```mermaid
+flowchart TD
+    subgraph unbraced ["UNBRACED RECTANGULAR FRAME<br/>(4-bar mechanism — rackable)"]
+        A1["A"]
+        B1["B"]
+        D1["D"]
+        C1["C"]
+        A1 -->|horizontal| B1
+        A1 -->|vertical| D1
+        B1 -->|vertical| C1
+        D1 -->|horizontal| C1
+        shear["SHEAR FORCE"]
+        shear -.->|→ rack| B1
+    end
+    
+    subgraph triangulated ["TRIANGULATED FRAME<br/>(rigid triangle — stable)"]
+        A2["A"]
+        B2["B"]
+        D2["D"]
+        C2["C"]
+        A2 -->|horizontal| B2
+        A2 -->|vertical| D2
+        B2 -->|vertical| C2
+        D2 -->|horizontal| C2
+        A2 -.->|diagonal brace| C2
+    end
+    
+    behavior["Under lateral force,<br/>A-B slides relative to D-C"]
+    benefit["Diagonal converts shear<br/>into axial tension/compression"]
+    
+    unbraced --> behavior
+    triangulated --> benefit
 ```
 
 **Pin connection mechanics** deserve a more granular treatment because they govern both structural behavior and mechanical efficiency. When a friction pin joins two liftarms at a single hole, the connection has one remaining degree of freedom: rotation about the pin axis. Under a bending moment — say, the weight of a motor cantilevered off the end of a 7-hole liftarm — the moment $M = F \cdot d$ is reacted at the pin as a couple. Because the pin diameter is 4.9 mm and the bore is 5.0 mm, the clearance is roughly 0.05–0.1 mm. Under moment loading, the pin contacts the bore on two diagonally opposite lines, and the contact stress concentrates at those lines. This is acceptable for static loads but explains why cantilevered single-pin connections develop visible bore elongation over time under repeated dynamic loading — the plastic at the contact lines undergoes creep and stress whitening.
@@ -55,7 +74,7 @@ The table below summarizes the primary element classes, their mechanical roles, 
 | Element | Primary Role | Bore/Shank Diameter | Friction Class | Key Failure Mode |
 |---|---|---|---|---|
 | Blue Friction Pin (43093) | Structural fastener | 4.9 mm shank / 5.0 mm bore | High (~0.3 N·m rotation) | Bore elongation under cyclic moment |
-| Black Smooth Pin (6558) | Rotating pivot | 4.8 mm shank / 5.0 mm bore | Low (<0.05 N·m rotation) | Rack/slop under bending |
+| Black Smooth Pin (6558) | Rotating pivot | 4.8 mm shank / 5.0 mm bore | Low (< 0.05 N·m rotation) | Rack/slop under bending |
 | Tan Friction Pin | Low-stress structural | 4.9 mm / 5.0 mm bore | Medium | Stress whitening reduced vs. blue |
 | Standard Axle | Torque transmission | Cross-section ~5 mm OD | N/A (keyed) | Torsional flex on long unsupported spans |
 | Full Bush | Axle lateral retention | 5.0 mm bore / 8 mm OD | Low slip | Axial creep if not retained by collar |

@@ -4,7 +4,7 @@
 
 This lab guide is built for the practitioner who needs to move from raw patient data to actionable clinical decisions with speed and precision. The three exercises that follow treat diabetes and metabolic syndrome not as abstract disease categories but as measurable, quantifiable physiological states that respond predictably to systematic analysis. You will work with real diagnostic criteria, calculate risk scores by hand and in spreadsheet models, stress-test your clinical reasoning against edge cases drawn from actual patient archetypes, and build a reusable audit checklist capable of surviving the pressure of a busy outpatient clinic or a wilderness medicine scenario where a glucometer is your only instrument.
 
-Metabolic syndrome is defined operationally by the harmonized IDF/AHA/NHLBI 2009 consensus as the presence of any three of five criteria: waist circumference ≥102 cm (men) or ≥88 cm (women); fasting triglycerides ≥1.7 mmol/L (150 mg/dL) or on lipid-lowering therapy; HDL-C <1.0 mmol/L (40 mg/dL) in men or <1.3 mmol/L (50 mg/dL) in women; resting blood pressure ≥130/85 mmHg or on antihypertensive therapy; and fasting plasma glucose ≥5.6 mmol/L (100 mg/dL) or on glucose-lowering therapy. Type 2 diabetes is confirmed by fasting plasma glucose ≥7.0 mmol/L (126 mg/dL), 2-hour oral glucose tolerance test (OGTT) plasma glucose ≥11.1 mmol/L (200 mg/dL), HbA1c ≥48 mmol/mol (6.5%), or random plasma glucose ≥11.1 mmol/L with classic hyperglycemic symptoms. These thresholds are your operational ground truth throughout every exercise.
+Metabolic syndrome is defined operationally by the harmonized IDF/AHA/NHLBI 2009 consensus as the presence of any three of five criteria: waist circumference ≥102 cm (men) or ≥88 cm (women); fasting triglycerides ≥1.7 mmol/L (150 mg/dL) or on lipid-lowering therapy; HDL-C < 1.0 mmol/L (40 mg/dL) in men or < 1.3 mmol/L (50 mg/dL) in women; resting blood pressure ≥130/85 mmHg or on antihypertensive therapy; and fasting plasma glucose ≥5.6 mmol/L (100 mg/dL) or on glucose-lowering therapy. Type 2 diabetes is confirmed by fasting plasma glucose ≥7.0 mmol/L (126 mg/dL), 2-hour oral glucose tolerance test (OGTT) plasma glucose ≥11.1 mmol/L (200 mg/dL), HbA1c ≥48 mmol/mol (6.5%), or random plasma glucose ≥11.1 mmol/L with classic hyperglycemic symptoms. These thresholds are your operational ground truth throughout every exercise.
 
 ### Analytical Environment Setup
 
@@ -147,7 +147,7 @@ In spreadsheet formula form in cell C6:
 =1-(0.9333^EXP((0.0112*B1)+(0.0171*B2)+(0.0115*B3)+(0.4728*LN(B4))+(0.3337*B5)-3.8524))
 ```
 
-PT-003 carries a 54.1% 10-year CHD risk, which places this patient firmly in the very high-risk category demanding immediate statin therapy (atorvastatin 40–80 mg), ACE inhibitor or ARB initiation for the BP of 152/96, and an HbA1c reduction target of <53 mmol/mol (7.0%) while balancing hypoglycemia risk given eGFR of 65.
+PT-003 carries a 54.1% 10-year CHD risk, which places this patient firmly in the very high-risk category demanding immediate statin therapy (atorvastatin 40–80 mg), ACE inhibitor or ARB initiation for the BP of 152/96, and an HbA1c reduction target of < 53 mmol/mol (7.0%) while balancing hypoglycemia risk given eGFR of 65.
 
 Repeat this calculation for PT-005 (diagnosed at 60, 6 years duration, SBP 144, TC = 3.7 + 1.1 + 1.9/2.2 = 5.66 mmol/L, TC/HDL = 5.66/1.1 = 5.15, HbA1c 7.1%). Expected L = 5.84, CHD_Risk = 44.7%. Now vary HbA1c from 6.0% to 10.0% in 0.5% increments and record the resulting CHD_Risk in a sensitivity table. Create a data table in the spreadsheet using Excel's Data > What-If Analysis > Data Table function (one-variable, with HbA1c_pct as the row input cell). The resulting gradient demonstrates that each 1% reduction in HbA1c reduces 10-year CHD risk by approximately 3.5–4.5 percentage points in this risk profile — a number worth quoting directly to a patient who is debating whether medication adjustment is "worth it."
 
@@ -260,12 +260,12 @@ Apply the glucocorticoid stress to PT-003 (already T2DM with FPG 8.9): stressed 
 
 PT-003 (eGFR 65) and PT-005 (eGFR 54) require eGFR-adjusted pharmacotherapy decisions. Build a Drug_Dosing_Check tab with the following reference table and an automated flagging formula:
 
-| Drug | Full Dose | eGFR 45–60 Action | eGFR 30–45 Action | eGFR <30 Action |
+| Drug | Full Dose | eGFR 45–60 Action | eGFR 30–45 Action | eGFR < 30 Action |
 |---|---|---|---|---|
 | Metformin 1000 mg BD | Standard | Reduce to 500 mg BD | Reduce to 500 mg OD | STOP |
 | Dapagliflozin 10 mg | Standard | Reduce to 5 mg; efficacy reduced | STOP | STOP |
 | Sitagliptin 100 mg | Standard | Reduce to 50 mg | Reduce to 25 mg | 25 mg OD |
-| Empagliflozin 10 mg | Standard | STOP (eGFR<45) | STOP | STOP |
+| Empagliflozin 10 mg | Standard | STOP (eGFR< 45) | STOP | STOP |
 | Ramipril 10 mg | Standard | 75% dose (7.5 mg) | 50% dose (5 mg) | Specialist review |
 
 Enter each patient's eGFR in column B of this tab and use nested IF formulas to output the appropriate drug action automatically. For PT-005 (eGFR 54) on dapagliflozin:
@@ -291,7 +291,7 @@ Score 5 points for each of the following correctly computed: BMI from height and
 Score 5 points each for: HOMA-IR computed and interpreted against the 2.9 threshold, QUICKI cross-validated and consistent with HOMA-IR direction, UKPDS CHD risk computed with correct L-value assembly, AIP classified into the correct risk tier, and the continuous MetSyn z-score computed with correct HDL inversion. Deduct 5 points if the UKPDS calculation omits duration of diabetes as a separate variable from age at diagnosis.
 
 **Domain 3 — Pharmacotherapy Safety (25 points)**
-Score 5 points each for: identifying the correct eGFR threshold for metformin dose reduction, flagging SGLT2 inhibitor cessation at eGFR <45, applying the correct statin intensity (high-intensity defined as atorvastatin ≥40 mg or rosuvastatin ≥20 mg) to any patient with UKPDS CHD risk >20%, identifying thiazide diuretic as a diabetes conversion risk in a Pre-DM patient with MetSyn, and recommending ACE/ARB preference over thiazide or beta-blocker in a hypertensive T2DM patient with microalbuminuria.
+Score 5 points each for: identifying the correct eGFR threshold for metformin dose reduction, flagging SGLT2 inhibitor cessation at eGFR < 45, applying the correct statin intensity (high-intensity defined as atorvastatin ≥40 mg or rosuvastatin ≥20 mg) to any patient with UKPDS CHD risk >20%, identifying thiazide diuretic as a diabetes conversion risk in a Pre-DM patient with MetSyn, and recommending ACE/ARB preference over thiazide or beta-blocker in a hypertensive T2DM patient with microalbuminuria.
 
 **Domain 4 — Boundary Case Management (25 points)**
 Score 5 points each for: implementing the 10% proximity flag for borderline-threshold patients, computing the continuous MetSyn z-score for a patient who fails binary criteria, correctly identifying the beta-cell failure pattern (high FPG + low HOMA-IR) as distinct from insulin resistance (high FPG + high HOMA-IR), managing steroid-induced hyperglycemia with basal insulin rather than increasing oral agents, and re-classifying post-medication-stress DM_Status correctly.
@@ -306,14 +306,14 @@ A score of 90–100 reflects mastery. 75–89 reflects competent practice with o
 | 2h OGTT | 7.8–11.0 mmol/L | ≥11.1 mmol/L | — |
 | HbA1c | 39–47 mmol/mol (5.7–6.4%) | ≥48 mmol/mol (6.5%) | — |
 | TG | — | — | ≥1.7 mmol/L |
-| HDL-M | — | — | <1.0 mmol/L |
-| HDL-F | — | — | <1.3 mmol/L |
+| HDL-M | — | — | < 1.0 mmol/L |
+| HDL-F | — | — | < 1.3 mmol/L |
 | Waist-M | — | — | ≥102 cm |
 | Waist-F | — | — | ≥88 cm |
 | SBP/DBP | — | — | ≥130/85 mmHg |
 | HOMA-IR | 2.9–4.0 (at-risk) | Variable | — |
 | AIP | 0.11–0.21 (intermediate) | >0.21 (high) | — |
-| eGFR action | — | <60: metformin review | <45: SGLT2i STOP |
+| eGFR action | — | < 60: metformin review | < 45: SGLT2i STOP |
 
 ### Diagnostic Algorithm: First 60 Minutes with an Undiagnosed Patient
 
@@ -323,6 +323,6 @@ Measure blood pressure after the patient has been seated for 5 minutes in a chai
 
 From the fasting blood draw, the minimum panel is: FPG, HbA1c, fasting lipid profile (TC, LDL, HDL, TG), creatinine, and urine albumin-to-creatinine ratio (UACR). Fasting insulin should be added if HOMA-IR computation is desired and the laboratory can process it. With these values, you can compute every metric in this lab guide within 15 minutes of receiving the results.
 
-The clinical priority order for intervention, once diagnosis is confirmed, follows the absolute risk reduction hierarchy: smoking cessation (if applicable) produces the largest single-variable CV risk reduction; blood pressure control to <130/80 mmHg produces the second largest reduction in microvascular endpoints; lipid-lowering with high-intensity statin therapy reduces MACE by 25% per 1 mmol/L LDL reduction; glycemic control targets HbA1c individualized to <53 mmol/mol (7%) in most patients or <58 mmol/mol (7.5%) in elderly patients with significant comorbidity or hypoglycemia risk. SGLT2 inhibitors and GLP-1 receptor agonists with demonstrated CV and renal outcomes data (empagliflozin, dapagliflozin, liraglutide, semaglutide) should be prioritized in patients with established cardiovascular disease, heart failure, or CKD regardless of baseline HbA1c, as their benefit is independent of glycemic effect.
+The clinical priority order for intervention, once diagnosis is confirmed, follows the absolute risk reduction hierarchy: smoking cessation (if applicable) produces the largest single-variable CV risk reduction; blood pressure control to < 130/80 mmHg produces the second largest reduction in microvascular endpoints; lipid-lowering with high-intensity statin therapy reduces MACE by 25% per 1 mmol/L LDL reduction; glycemic control targets HbA1c individualized to < 53 mmol/mol (7%) in most patients or < 58 mmol/mol (7.5%) in elderly patients with significant comorbidity or hypoglycemia risk. SGLT2 inhibitors and GLP-1 receptor agonists with demonstrated CV and renal outcomes data (empagliflozin, dapagliflozin, liraglutide, semaglutide) should be prioritized in patients with established cardiovascular disease, heart failure, or CKD regardless of baseline HbA1c, as their benefit is independent of glycemic effect.
 
 This operational framework — registry construction, formula-driven risk calculation, boundary-zone flagging, pharmacological stress testing, and audit-ready scoring — constitutes the repeatable analytical cycle that separates reactive clinical documentation from proactive metabolic risk management.

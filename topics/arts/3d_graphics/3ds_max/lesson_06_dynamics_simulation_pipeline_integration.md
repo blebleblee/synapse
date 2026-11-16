@@ -53,25 +53,38 @@ Constraint resolution converts detected collisions into corrective impulses that
 
 Particle Flow's event-driven architecture structures particle behavior as a directed graph of operators connected through event nodes. Each operator executes one transformation on the particle stream: Birth creates particles, Speed sets initial velocities, Force applies acceleration fields, Collision tests against deflector geometry, and Display sets rendering appearance. Event nodes branch the flow based on conditional tests—age thresholds, collision occurrence, spatial volumes, or script predicates. This modular composition enables complex emergent behaviors from simple operators: a rocket exhaust system might emit particles upward (Birth, Speed), apply turbulent noise forces (Force with noise controller), split particles into sparks and smoke on collision (Collision test branching to two events), and fade sparks quickly while smoke persists (Age test with different display lifetimes).
 
-```
-Particle Flow Event Graph Structure:
+```mermaid
+flowchart TD
+    E01["🟢 Event_01\n[Birth]"]
 
-Event_01 [Birth]
-  │
-  ├─> Position (Surface of Emitter)
-  ├─> Speed (Inherit 50% of emitter velocity)
-  ├─> Shape (Sphere, radius 0.5)
-  │
-  └─> Force (Gravity + Wind)
-        │
-        └─> Collision (Deflector_Floor)
-              ├─> Event_02 [Bounce]
-              │     ├─> Speed By Surface (vary 10%)
-              │     └─> Spin (random angular velocity)
-              │
-              └─> Event_03 [Stick]
-                    ├─> Speed (set to zero)
-                    └─> Delete (after 2 seconds)
+    POS["Position\nSurface of Emitter"]
+    SPD["Speed\nInherit 50% of Emitter Velocity"]
+    SHP["Shape\nSphere · Radius 0.5"]
+    FRC["Force\nGravity + Wind"]
+
+    COL["Collision\nDeflector_Floor"]
+
+    E02["🔵 Event_02\n[Bounce]"]
+    SBS["Speed By Surface\nVary 10%"]
+    SPN["Spin\nRandom Angular Velocity"]
+
+    E03["🟡 Event_03\n[Stick]"]
+    SPD0["Speed\nSet to Zero"]
+    DEL["Delete\nAfter 2 Seconds"]
+
+    E01 --> POS
+    E01 --> SPD
+    E01 --> SHP
+    E01 --> FRC
+    FRC --> COL
+
+    COL --> E02
+    E02 --> SBS
+    E02 --> SPN
+
+    COL --> E03
+    E03 --> SPD0
+    E03 --> DEL
 ```
 
 Particle operators execute in dependency order determined by graph topology. Birth operators run first, injecting new particles with default properties. Transformation operators (Position, Rotation, Speed, Spin) modify existing particle attributes. Force operators accumulate acceleration vectors that integrate into velocity during the physics substep. Test operators evaluate boolean conditions and direct particles into downstream events based on results. Display operators control viewport and render visibility without affecting physics state. This separation of concerns—physics computation versus rendering representation—allows artists to preview low-resolution proxy geometry at interactive speeds while rendering high-fidelity instanced meshes at final quality.

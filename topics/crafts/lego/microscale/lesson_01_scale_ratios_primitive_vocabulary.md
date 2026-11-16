@@ -38,19 +38,39 @@ Horizontal compression strategies prioritize silhouette accuracy over internal s
 
 Vertical construction employs hybrid stacking techniques to achieve correct aspect ratios while maintaining structural coherence. The standard approach alternates plate layers with tile layers, using the tile's smooth surface to visually separate floors while plates provide connection points for outward-facing details. A typical floor assembly might consist of a 1-plate-height base layer carrying 1×1 round plates or cylinders at window positions, topped by a tile layer that caps these details and provides a clean separation plane, followed by another plate layer beginning the next floor's pattern. This three-layer system (plate-detail-tile) repeats vertically, with variations introduced through color changes, modified parts, or strategic omissions to suggest setbacks, parapets, or roof structures.
 
-```
-Vertical Stacking Sequence (Cross-Section):
-    
-    ┌─────────────┐  ← 1-plate tile (floor separator)
-    │ ○   ○   ○   │  ← 1×1 round plates (window details)
-    ├─────────────┤  ← 1-plate base (structural)
-    │ ○   ○   ○   │
-    ├─────────────┤
-    │ ○   ○   ○   │
-    ├─────────────┤
-    
-    Repeating module height = 3 plates (2.88mm per floor)
-    At 1:250 scale: 2.88mm × 250 = 7.2m floor height (realistic)
+```mermaid
+flowchart TD
+    TILE["1-plate tile\n(floor separator)"]
+    W1["○  ○  ○\n1×1 round plates\n(window details)"]
+    BASE1["1-plate base\n(structural)"]
+    W2["○  ○  ○\n1×1 round plates\n(window details)"]
+    BASE2["1-plate base\n(structural)"]
+    W3["○  ○  ○\n1×1 round plates\n(window details)"]
+    BASE3["1-plate base\n(structural)"]
+    SCALE["Repeating module: 3 plates = 2.88 mm per floor\n@ 1:250 scale → 7.2 m floor height"]
+
+    TILE --> W1
+    W1 --> BASE1
+    BASE1 --> W2
+    W2 --> BASE2
+    BASE2 --> W3
+    W3 --> BASE3
+    BASE3 --> SCALE
+
+    subgraph module_1 ["Floor Module 1"]
+        W1
+        BASE1
+    end
+
+    subgraph module_2 ["Floor Module 2"]
+        W2
+        BASE2
+    end
+
+    subgraph module_3 ["Floor Module 3"]
+        W3
+        BASE3
+    end
 ```
 
 SNOT techniques become essential for representing non-orthogonal features. Brackets, headlight bricks, and modified plates with studs on the side allow builders to attach elements perpendicular to the primary build direction, enabling vertical stripes, sideways-mounted tiles for smooth facades, and angled details impossible within pure stud-top construction. However, each SNOT connection introduces structural fragility and dimensional offset that must be carefully managed. A headlight brick (1×1 brick with stud on side) offsets the attached element by 8 millimeters but raises it by 4.8 millimeters relative to the base plate, creating a half-plate vertical shift that must be compensated through subsequent layer adjustments. Builders develop mental libraries of these offset patterns, automatically calculating how bracket assemblies, clip connections, and inverted slopes interact to achieve desired geometries while maintaining grid alignment.

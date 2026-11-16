@@ -48,32 +48,55 @@ Conjugation initiates when a donor cell expressing conjugative pili contacts a r
 
 Transposition mechanisms vary by transposon class but generally involve element excision, target site recognition, and reintegration through transposase-catalyzed reactions. Composite transposons like Tn10 (encoding tetracycline resistance) contain two flanking insertion sequences (IS10-L and IS10-R) in inverted orientation; only IS10-R encodes functional transposase. Transposition initiates when transposase binds terminal inverted repeats, pairs both ends of the transposon, and catalyzes double-strand breaks that excise the element. The liberated transposon, complexed with transposase, binds target DNA and transposase catalyzes staggered cleavage of target strands separated by 9 base pairs (for Tn10). The transposon ends are ligated to target strand ends, leaving 9-nucleotide single-strand gaps flanking the inserted element. DNA polymerase fills these gaps using the complementary strand as template, generating 9-base-pair direct repeats flanking the integrated transposon—a diagnostic signature of transposition events. Replicative transposons employ a distinct mechanism where the original element remains at the donor site while a copy inserts at the target site, doubling transposon copy number per event. This mode involves formation of a cointegrate intermediate (donor and target replicons fused with transposon copies at both junctions), followed by resolution through site-specific recombination that separates replicons, each now carrying a transposon copy.
 
-```
-Replisome Architecture at Replication Fork:
-                                
-                    5'───────────────────→3' Leading Strand (continuous)
-                                 ↓
-                          DNA Pol III + β-clamp
-                                 ↓
-                    ═════════════╬═════════════  Parental Duplex
-               DnaB Helicase ──▶ ║ ◀── SSB proteins
-                    ═════════════╬═════════════
-                                 ↑
-                          DNA Pol III + β-clamp
-                    3'◀─Okazaki─◀─Primer◀──5' Lagging Strand (discontinuous)
-                           ↑
-                       Primase (DnaG)
-
-Okazaki Fragment Processing:
-    ───RNA───DNA───────────  [DNA Pol III extension]
-              ↓
-    ───RNA───DNA──RNA───    [New primer synthesis]
-              ↓
-    ─────────DNA──RNA───    [Pol I removes upstream primer]
-              ↓
-    ─────────DNA──DNA───    [Pol I fills gap]
-              ↓
-    ──────────DNA───────    [Ligase seals nick]
+```mermaid
+flowchart TD
+    A["Replisome Architecture at Replication Fork"]
+    
+    subgraph leading["Leading Strand"]
+        B["5'→3' Continuous Synthesis"]
+        C["DNA Pol III + β-clamp"]
+    end
+    
+    subgraph fork["Replication Fork"]
+        D["DnaB Helicase"]
+        E["Parental Duplex DNA"]
+        F["SSB Proteins"]
+    end
+    
+    subgraph lagging["Lagging Strand"]
+        G["Primase DnaG"]
+        H["3'←5' Discontinuous Synthesis<br/>Okazaki Fragments"]
+        I["DNA Pol III + β-clamp"]
+    end
+    
+    subgraph processing["Okazaki Fragment Processing"]
+        J["Step 1: DNA Pol III Extension<br/>RNA-DNA primer"]
+        K["Step 2: Primase Synthesis<br/>New primer downstream"]
+        L["Step 3: Pol I Removal<br/>Upstream RNA primer"]
+        M["Step 4: Pol I Gap Fill<br/>DNA replacement"]
+        N["Step 5: Ligase Sealing<br/>Nick closure"]
+    end
+    
+    A --> leading
+    A --> fork
+    A --> lagging
+    
+    B --> C
+    C --> E
+    
+    D --> E
+    E --> F
+    
+    G --> H
+    H --> I
+    I --> E
+    
+    E --> processing
+    
+    J --> K
+    K --> L
+    L --> M
+    M --> N
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

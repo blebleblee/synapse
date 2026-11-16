@@ -160,7 +160,7 @@ This reference guide provides standardized verification procedures, common failu
 
 **Sequence-of-Returns Risk Analysis Verification:**
 - [ ] Correlation between early retirement returns (first 5 years) and terminal wealth calculated; should be >0.5, indicating sequence risk is material
-- [ ] Correlation between late retirement returns (last 5 years) and terminal wealth calculated; should be <0.3, confirming early sequence dominates
+- [ ] Correlation between late retirement returns (last 5 years) and terminal wealth calculated; should be < 0.3, confirming early sequence dominates
 - [ ] Dynamic withdrawal strategies implemented and compared to static 4% rule: Guyton-Klinger guardrails, ceiling/floor, constant-percentage
 - [ ] Success probability improvement from dynamic strategies quantified; typical improvement 5-7 percentage points at cost of 3-5% average spending reduction
 
@@ -176,7 +176,7 @@ This reference guide provides standardized verification procedures, common failu
 - [ ] 5th percentile terminal wealth under stochastic longevity checked; should remain positive or plan requires longevity insurance (annuity consideration)
 
 **Contingent Planning Protocol Verification:**
-- [ ] Annual monitoring metrics defined: portfolio balance versus baseline projection (±15% threshold), cumulative return versus expected (±1.5% annually threshold), inflation versus baseline (±1% annually threshold), withdrawal rate (<5% threshold), success probability (>80% threshold)
+- [ ] Annual monitoring metrics defined: portfolio balance versus baseline projection (±15% threshold), cumulative return versus expected (±1.5% annually threshold), inflation versus baseline (±1% annually threshold), withdrawal rate (< 5% threshold), success probability (>80% threshold)
 - [ ] Breach triggers specified for each metric with corresponding contingent action: spending reduction, delayed retirement, asset allocation shift, guardrail activation, comprehensive plan redesign
 - [ ] Early warning analysis identifies diagnostic age (typically first 5-7 retirement years) where failure trajectories diverge from success trajectories; monitoring frequency should increase during this period
 - [ ] Behavioral discipline value quantified: success probability difference between maintaining versus abandoning asset allocation during market crashes (typically 15-25 percentage point difference)
@@ -188,7 +188,7 @@ This reference guide provides standardized verification procedures, common failu
 - [ ] Forced early retirement scenario modeled; income bridge strategy specified (part-time work, delayed Social Security, spending reduction); success probability restored to >75%
 
 **Common Failure Mode Signatures:**
-- Portfolio depletes before age 85: Likely causes are (1) spending too aggressive relative to returns (test by reducing spending 15%), (2) retirement too early (test by modeling 2-year delay), (3) insufficient diversification causing concentrated losses (check maximum single-position concentration). Diagnostic: calculate actual withdrawal rate in failure years; if >6%, spending is unsustainable; if <5%, return sequence is culprit.
+- Portfolio depletes before age 85: Likely causes are (1) spending too aggressive relative to returns (test by reducing spending 15%), (2) retirement too early (test by modeling 2-year delay), (3) insufficient diversification causing concentrated losses (check maximum single-position concentration). Diagnostic: calculate actual withdrawal rate in failure years; if >6%, spending is unsustainable; if < 5%, return sequence is culprit.
 - Large terminal wealth (>$5M) but moderate success probability: Likely cause is binary outcome distribution (either huge success or failure, no middle ground). Diagnostic: plot histogram of terminal wealth; bimodal distribution indicates sequence-of-returns sensitivity. Solution: implement dynamic withdrawal guardrails to reduce volatility of outcomes.
 - Success probability crashes under inflation sensitivity: Plan lacks inflation hedging. Diagnostic: calculate portfolio real return under 4% inflation versus 2% baseline; if difference >2%, allocation is inflation-vulnerable. Solution: add TIPS, I-bonds, commodities, real estate allocation.
 - Roth conversion creates current-year tax spike without improving success probability: Conversion amount exceeds optimal fill-up-the-bracket strategy. Diagnostic: recalculate marginal tax rate in conversion year; if >28%, conversion is pushing into brackets too high to justify. Solution: reduce annual conversion amount and spread over more years.

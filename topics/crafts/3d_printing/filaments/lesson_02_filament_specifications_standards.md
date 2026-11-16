@@ -22,16 +22,28 @@ The glass transition temperature (Tg) of a polymer defines the boundary between 
 
 To reason precisely about how filament diameter error propagates into print quality, it helps to trace the signal path from raw filament geometry through the firmware's extrusion math to the deposited bead.
 
-```
- [Spool Geometry]        [Extruder Drive]        [Firmware Volumetric Model]
-                                                            │
-  Actual Ø = 1.78 mm ──► Drive gear grips ──────────────► E-steps * Ø_nominal²* π/4
-                          displaces filament                │
-                          by arc-length L                   ▼
-                                                   Computed volume > actual volume
-                                                            │
-  Nominal Ø = 1.75 mm                                       ▼
-  set in slicer ───────────────────────────────► Under-extrusion at nozzle output
+```mermaid
+flowchart TD
+    subgraph spool ["Spool Geometry"]
+        actual["Actual Ø = 1.78 mm"]
+        nominal["Nominal Ø = 1.75 mm\n(set in slicer)"]
+    end
+
+    subgraph extruder ["Extruder Drive"]
+        drive["Drive gear grips filament\nand displaces it by arc-length L"]
+    end
+
+    subgraph firmware ["Firmware Volumetric Model"]
+        formula["E-steps × Ø_nominal² × π/4"]
+        overcompute["Computed volume > actual volume"]
+        underextrusion["Under-extrusion at nozzle output"]
+    end
+
+    actual -->|"filament fed into"| drive
+    drive -->|"arc-length fed into"| formula
+    formula --> overcompute
+    overcompute --> underextrusion
+    nominal -->|"Ø_nominal used in"| formula
 ```
 
 The firmware computes the extrusion volume as:
@@ -97,27 +109,31 @@ At high-speed printing—say, a Voron running 150 mm/s perimeters with 0.3 mm la
 
 The degradation pathways for stored filament form a clear hierarchy by mechanism:
 
-```
-Degradation Pathway Map
-───────────────────────
-Moisture uptake
-  └─► Hydrolysis during extrusion (chain scission, permanent)
-  └─► Steam-induced porosity in printed parts
-
-UV photodegradation
-  └─► Chromophore formation (yellowing, embrittlement)
-  └─► Cross-linking or chain scission depending on polymer
-
-Thermal creep (above Tg)
-  └─► Spool hub deformation
-  └─► Inter-layer weld on tightly wound sections
-
-Oxidative degradation
-  └─► Accelerated by heat + oxygen
-  └─► Radical chain reaction in polyolefins and TPUs
-
-Physical entanglement / spool tangles
-  └─► Drive gear jam ─► extruder skip ─► print failure
+```mermaid
+flowchart TD
+    Root["Degradation Pathway Map"]
+    
+    Root --> Moisture["Moisture Uptake"]
+    Root --> UV["UV Photodegradation"]
+    Root --> Thermal["Thermal Creep<br/>Above Tg"]
+    Root --> Oxidative["Oxidative Degradation"]
+    Root --> Entanglement["Physical Entanglement/<br/>Spool Tangles"]
+    
+    Moisture --> Hydrolysis["Hydrolysis During Extrusion<br/>Chain Scission Permanent"]
+    Moisture --> SteamPorosity["Steam-Induced Porosity<br/>in Printed Parts"]
+    
+    UV --> Chromophore["Chromophore Formation<br/>Yellowing Embrittlement"]
+    UV --> CrossLink["Cross-Linking or Chain Scission<br/>Depending on Polymer"]
+    
+    Thermal --> SpoolDeform["Spool Hub Deformation"]
+    Thermal --> InterLayer["Inter-Layer Weld<br/>on Tightly Wound Sections"]
+    
+    Oxidative --> AccelHeat["Accelerated by Heat + Oxygen"]
+    Oxidative --> RadicalChain["Radical Chain Reaction<br/>in Polyolefins and TPUs"]
+    
+    Entanglement --> DriveJam["Drive Gear Jam"]
+    DriveJam --> ExtruderSkip["Extruder Skip"]
+    ExtruderSkip --> PrintFailure["Print Failure"]
 ```
 
 The practical response to this map is a layered storage system. The innermost layer is the individual filament bag: vacuum-sealed (or at minimum heat-sealed) with one or two 10-gram silica gel packets and a humidity indicator card. The intermediate layer is a sealable, rigid storage bin—a Gamma Seal lid on a standard 5-gallon bucket is a practitioner-proven solution—charged with a larger rechargeable desiccant brick (100–200 grams of silica gel, type B, indicating). The outermost layer is the ambient environment: a climate-controlled space away from direct sunlight, ideally below 25°C and 50 percent RH year-round.

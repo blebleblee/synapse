@@ -104,27 +104,37 @@ The Solow-Swan model's internal mechanics revolve around the dynamic interaction
 
 The phase space embeds capital per effective worker $\hat{k}_t$ on the horizontal axis and its time derivative $\dot{\hat{k}}_t$ on the vertical axis. The capital accumulation equation partitions into two curves: actual investment $s \hat{k}_t^\alpha$ (a concave curve originating at the origin due to diminishing returns) and effective depreciation $(\delta + n + g) \hat{k}_t$ (a straight line through the origin with slope $\delta + n + g$). The vertical distance between these curves represents $\dot{\hat{k}}_t$, the instantaneous change in capital per effective worker.
 
-```
-Solow Model Phase Diagram
+```mermaid
+flowchart TD
+    subgraph phase_diagram ["Solow Model Phase Diagram"]
+        subgraph curves ["Curves"]
+            INV["s·k̂^α\n(Investment per effective worker)"]
+            DEP["(δ + n + g)·k̂\n(Depreciation + dilution line)"]
+        end
 
-    Investment, Depreciation
-          │
-          │       s·k̂^α
-          │      ╱
-          │     ╱
-          │    ╱
-          │   ╱
-          │  ╱  ╱│╲
-          │ ╱  ╱ │ ╲ (δ+n+g)·k̂
-          │╱  ╱  │  ╲
-          │  ╱   │   ╲
-          │ ╱  k̂*│    ╲
-          │╱─────┼─────╲────
-          └──────┴──────────→ k̂ (capital per effective worker)
-                 │
-           Convergence dynamics:
-           k̂ < k̂* → k̂ grows (investment > depreciation)
-           k̂ > k̂* → k̂ falls (depreciation > investment)
+        KSTAR["k̂* — Steady-State Capital\n(Investment = Depreciation)"]
+
+        subgraph below ["k̂ < k̂* (Below Steady State)"]
+            B_COND["Investment > Depreciation"]
+            B_DYN["k̂ grows → converges upward to k̂*"]
+        end
+
+        subgraph above ["k̂ > k̂* (Above Steady State)"]
+            A_COND["Depreciation > Investment"]
+            A_DYN["k̂ falls → converges downward to k̂*"]
+        end
+
+        AXES["Axes:\nVertical — Investment & Depreciation\nHorizontal — k̂ (capital per effective worker)"]
+    end
+
+    AXES --> INV
+    AXES --> DEP
+    INV -- "intersects at" --> KSTAR
+    DEP -- "intersects at" --> KSTAR
+    KSTAR --> below
+    KSTAR --> above
+    B_COND --> B_DYN
+    A_COND --> A_DYN
 ```
 
 For any initial capital stock $\hat{k}_0 < \hat{k}^*$, actual investment exceeds effective depreciation, generating positive $\dot{\hat{k}}_t$ and capital accumulation. The economy climbs the investment curve until reaching $\hat{k}^*$ where the curves intersect. Conversely, $\hat{k}_0 > \hat{k}^*$ implies depreciation outpaces investment, eroding capital until equilibrium is restored. This global stability property ensures all economies converge to their unique steady state regardless of starting position, a critical feature distinguishing neoclassical from endogenous growth models.
@@ -175,25 +185,35 @@ Schumpeterian growth theory, pioneered by Philippe Aghion and Peter Howitt, mode
 
 The poverty trap mechanics in dual-economy models partition the capital space into multiple equilibria separated by unstable thresholds. Consider a savings function exhibiting an S-shape: at low income, subsistence constraints suppress savings; at moderate income, rising marginal propensity to save accelerates accumulation; at high income, satiation flattens savings. The capital accumulation equation $\dot{k}_t = s(k_t) f(k_t) - \delta k_t$ admits three intersections with the horizontal axis: a low stable equilibrium (poverty trap), an unstable threshold, and a high stable equilibrium (sustained growth).
 
-```
-Poverty Trap Phase Diagram
-
-    k̇ (change in capital)
-          │
-          │        s(k)·f(k)
-          │       ╱╲
-          │      ╱  ╲
-      ────┼─────╱────╲────────  δ·k
-          │    ╱│     ╲│
-          │   ╱ │      ╲│
-          │  ╱  │       ╲
-          │ ╱   │        ╲
-          │╱────┼──────┼──╲────→ k (capital per worker)
-               k*_L   k*_T  k*_H
-               
-    k*_L: Low stable equilibrium (poverty trap)
-    k*_T: Unstable threshold
-    k*_H: High stable equilibrium (sustained growth)
+```mermaid
+flowchart TD
+    subgraph legend ["Poverty Trap Phase Diagram"]
+        direction LR
+        kL["k*_L: Low stable equilibrium<br/>(poverty trap)"]
+        kT["k*_T: Unstable threshold"]
+        kH["k*_H: High stable equilibrium<br/>(sustained growth)"]
+    end
+    
+    subgraph diagram ["Phase Space"]
+        direction TB
+        axis["k̇ (change in capital)<br/>↑<br/>│<br/>│<br/>│<br/>│<br/>│<br/>│<br/>└────────────────────→<br/>k (capital per worker)"]
+        
+        invest["Investment curve: s(k)·f(k)<br/>(concave, rises then falls)"]
+        deprec["Depreciation line: δ·k<br/>(linear, upward slope)"]
+        
+        eqL["●<br/>k*_L<br/>(stable)"]
+        eqT["○<br/>k*_T<br/>(unstable)"]
+        eqH["●<br/>k*_H<br/>(stable)"]
+        
+        invest -.->|"intersects at" | eqL
+        invest -.->|"intersects at" | eqT
+        invest -.->|"intersects at" | eqH
+        deprec -.->|"intersects at" | eqL
+        deprec -.->|"intersects at" | eqT
+        deprec -.->|"intersects at" | eqH
+    end
+    
+    legend ~~~ diagram
 ```
 
 Economies initialized below $k_T^*$ converge to the poverty trap $k_L^*$, while those above $k_T^*$ escape to sustained growth $k_H^*$. Temporary shocks—natural disasters, conflict, financial crises—can push an economy from the high to low basin of attraction. Development policy aims to lift countries above the threshold through coordinated big push investments that crowd in private capital. Coordination failures arise when individual projects are unprofitable in isolation but collectively profitable due to complementarities. Infrastructure networks, industrial clusters, and skill formation all exhibit such externalities, justifying public intervention to shift economies across thresholds.

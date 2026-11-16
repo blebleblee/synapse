@@ -360,51 +360,30 @@ Distributed locks coordinate exclusive access to shared resources. An agent acqu
 
 The interaction between these subsystems forms the complete agent coordination architecture. An agent runtime executes the control loop, using the message bus to communicate with peers and the control plane to claim tasks and acquire locks. State persistence provides durable storage for checkpoints and shared memory. Each layer maintains clear separation of concerns while composing into a coherent whole.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Agent Swarm                               │
-│                                                                   │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │   Agent 1    │  │   Agent 2    │  │   Agent N    │          │
-│  │  Runtime     │  │  Runtime     │  │  Runtime     │          │
-│  │              │  │              │  │              │          │
-│  │ ┌──────────┐ │  │ ┌──────────┐ │  │ ┌──────────┐ │          │
-│  │ │Reasoning │ │  │ │Reasoning │ │  │ │Reasoning │ │          │
-│  │ │  Loop    │ │  │ │  Loop    │ │  │ │  Loop    │ │          │
-│  │ └──────────┘ │  │ └──────────┘ │  │ └──────────┘ │          │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘          │
-│         │                 │                 │                    │
-│         └─────────────────┼─────────────────┘                    │
-│                           │                                      │
-│  ─────────────────────────┼──────────────────────────────────   │
-│                           │                                      │
-│         ┌─────────────────▼──────────────────┐                  │
-│         │   Message Bus (Communication)      │                  │
-│         │                                     │                  │
-│         │  • Point-to-point messaging        │                  │
-│         │  • Publish-subscribe topics        │                  │
-│         │  • Request-response RPC            │                  │
-│         └─────────────────┬──────────────────┘                  │
-│                           │                                      │
-│         ┌─────────────────▼──────────────────┐                  │
-│         │  Coordination Control Plane        │                  │
-│         │                                     │                  │
-│         │  • Task queue (claim/complete)     │                  │
-│         │  • Distributed locks               │                  │
-│         │  • Leader election                 │                  │
-│         └─────────────────┬──────────────────┘                  │
-│                           │                                      │
-│         ┌─────────────────▼──────────────────┐                  │
-│         │   State Persistence Layer          │                  │
-│         │                                     │                  │
-│         │  ┌──────────┐    ┌──────────────┐  │                  │
-│         │  │ Primary  │    │   Vector     │  │                  │
-│         │  │   DB     │    │   Store      │  │                  │
-│         │  │(Exact KV)│    │(Semantic)    │  │                  │
-│         │  └──────────┘    └──────────────┘  │                  │
-│         └─────────────────────────────────────┘                  │
-│                                                                   │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph swarm["Agent Swarm"]
+        subgraph agents["Agent Runtimes"]
+            A1["Agent 1 Runtime\n──────────\nReasoning Loop"]
+            A2["Agent 2 Runtime\n──────────\nReasoning Loop"]
+            AN["Agent N Runtime\n──────────\nReasoning Loop"]
+        end
+
+        A1 & A2 & AN --> BUS
+
+        BUS["Message Bus\n─────────────────\n• Point-to-point messaging\n• Publish-subscribe topics\n• Request-response RPC"]
+
+        BUS --> CCP
+
+        CCP["Coordination Control Plane\n─────────────────────────\n• Task queue (claim / complete)\n• Distributed locks\n• Leader election"]
+
+        CCP --> SPL
+
+        subgraph SPL["State Persistence Layer"]
+            PDB["Primary DB\n(Exact KV)"]
+            VS["Vector Store\n(Semantic)"]
+        end
+    end
 ```
 
 This layered architecture enables independent scaling of subsystems. Additional agent runtimes can be deployed to increase processing capacity without modifying the communication or persistence layers. The message bus can scale horizontally through partitioned topics or sharded queues. The state persistence layer can leverage read replicas for query-heavy workloads or write-optimized backends for checkpoint-intensive scenarios.

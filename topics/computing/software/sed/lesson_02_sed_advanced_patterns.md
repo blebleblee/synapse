@@ -45,34 +45,22 @@ This pseudocode reveals something that diagram-centric explanations obscure: `d`
 
 The control flow graph of a sed script with branching looks like this:
 
-```
-                    ┌─────────────────────────────┐
-                    │        READ new line         │
-                    │   (reset substitution flag)  │
-                    └──────────────┬──────────────┘
-                                   │
-                    ┌──────────────▼──────────────┐
-                    │         cmd[0]: s/a/b/       │◄──── :loop_label
-                    └──────────────┬──────────────┘
-                           match? ─┤─ no match?
-                           [flag=1]│         │
-                    ┌──────────────▼──┐       │
-                    │  cmd[1]: t loop │       │
-                    │  (flag==1?)     │       │
-                    └──┬──────────────┘       │
-                 yes ──┤                      │
-                       │  no (fall-through)   │
-         ┌─────────────▼──────────────┐       │
-         │  RESET flag; GOTO :loop    │       │
-         └────────────────────────────┘       │
-                                              ▼
-                              ┌───────────────────────────┐
-                              │     remaining commands     │
-                              └────────────┬──────────────┘
-                                           ▼
-                              ┌───────────────────────────┐
-                              │     PRINT pattern space    │
-                              └───────────────────────────┘
+```mermaid
+flowchart TD
+    READ["READ new line\n(reset substitution flag)"]
+    SUBST["cmd[0]: s/a/b/"]
+    TCMD["cmd[1]: t loop\n(flag == 1?)"]
+    RESET["RESET flag; GOTO :loop"]
+    REMAINING["remaining commands"]
+    PRINT["PRINT pattern space"]
+
+    READ --> SUBST
+    SUBST -->|"match? [flag=1]"| TCMD
+    SUBST -->|"no match?"| REMAINING
+    TCMD -->|"yes"| RESET
+    RESET -->|":loop_label"| SUBST
+    TCMD -->|"no (fall-through)"| REMAINING
+    REMAINING --> PRINT
 ```
 
 ### Multi-Line Commands: N, D, and P

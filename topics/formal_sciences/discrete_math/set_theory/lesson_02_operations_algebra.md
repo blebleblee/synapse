@@ -110,21 +110,19 @@ Each element of the product is a *choice function* $f$ that selects one element 
 
 Venn diagrams provide visual intuition for set operations through overlapping regions in the plane. For two sets $A$ and $B$ represented as circles within a universal rectangle $\mathcal{U}$, we partition the plane into four disjoint regions:
 
-```
-        ┌─────────────────────────────────────┐
-        │            𝒰                        │
-        │                                     │
-        │     ┌─────────┐   ┌─────────┐      │
-        │     │         │   │         │      │
-        │     │    A    │   │    B    │      │
-        │     │    ╲    │   │    ╱    │      │
-        │     │     ╲   │   │   ╱     │      │
-        │     └──────╲──┘   └──╱──────┘      │
-        │             ╲       ╱               │
-        │              ╲     ╱                │
-        │               A ∩ B                 │
-        │                                     │
-        └─────────────────────────────────────┘
+```mermaid
+flowchart TD
+    U["𝒰"]
+    
+    subgraph universe [" "]
+        A["A"]
+        B["B"]
+    end
+    
+    A --> intersection["A ∩ B"]
+    B --> intersection
+    
+    U -.-> universe
 ```
 
 The four regions correspond to:

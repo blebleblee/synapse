@@ -71,27 +71,57 @@ The EV3's daisy-chain capability, introduced to allow multiple bricks to share a
 
 The signal and data flow from sensor input to motor output within the EV3 can be understood through the following diagram:
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                        EV3 BRICK (Master)                        │
-│                                                                  │
-│  Sensor Port 1 ──→ [ ADC / I²C / UART Driver ] ──→ [ Kernel    │
-│  Sensor Port 2 ──→ [ ADC / I²C / UART Driver ] ──→   sysfs     │
-│  Sensor Port 3 ──→ [ ADC / I²C / UART Driver ] ──→   layer ]   │
-│  Sensor Port 4 ──→ [ ADC / I²C / UART Driver ] ──┘      │      │
-│                                                           ↓      │
-│                                              [ User Program      │
-│                                                (Python / C /    │
-│                                                EV3-G / RobotC)] │
-│                                                           │      │
-│  Motor Port A ──← [ PWM + Encoder Driver ] ←─────────────┤      │
-│  Motor Port B ──← [ PWM + Encoder Driver ] ←─────────────┤      │
-│  Motor Port C ──← [ PWM + Encoder Driver ] ←─────────────┤      │
-│  Motor Port D ──← [ PWM + Encoder Driver ] ←─────────────┘      │
-│                                                                  │
-│  USB ──→ [ Slave EV3 / PC / WiFi Dongle ]                       │
-│  Bluetooth ──→ [ Smartphone / PC / Slave EV3 ]                  │
-└──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph EV3["EV3 Brick (Master)"]
+        direction TD
+
+        subgraph sensors["Sensor Inputs"]
+            SP1["Sensor Port 1"]
+            SP2["Sensor Port 2"]
+            SP3["Sensor Port 3"]
+            SP4["Sensor Port 4"]
+        end
+
+        DRV["ADC / I²C / UART Driver"]
+
+        SYSFS["Kernel sysfs Layer"]
+
+        USR["User Program
+(Python / C / EV3-G / RobotC)"]
+
+        subgraph motors["Motor Outputs"]
+            PWM["PWM + Encoder Driver"]
+            MA["Motor Port A"]
+            MB["Motor Port B"]
+            MC["Motor Port C"]
+            MD["Motor Port D"]
+        end
+
+        subgraph comms["Communication"]
+            USB["USB"]
+            BT["Bluetooth"]
+            USB_DEV["Slave EV3 / PC / WiFi Dongle"]
+            BT_DEV["Smartphone / PC / Slave EV3"]
+        end
+    end
+
+    SP1 --> DRV
+    SP2 --> DRV
+    SP3 --> DRV
+    SP4 --> DRV
+
+    DRV --> SYSFS
+    SYSFS --> USR
+
+    USR --> PWM
+    PWM --> MA
+    PWM --> MB
+    PWM --> MC
+    PWM --> MD
+
+    USB --> USB_DEV
+    BT --> BT_DEV
 ```
 
 The EV3's UART sensor protocol deserves particular attention because it represents the architectural break from the NXT's I²C model. LEGO's fourth-generation sensors — the EV3 color sensor, infrared sensor, and gyro sensor — communicate over a 115,200-baud serial UART link. The brick and sensor perform an auto-negotiation handshake at power-on during which the sensor transmits its type information, available modes, and data formats. This means the firmware knows exactly what a connected sensor provides without any user configuration, a significant usability improvement. For the practitioner, it also means that the EV3 gyroscope cannot be directly substituted with the HiTechnic NXT gyroscope without an adapter or firmware-level shim, because the communication protocols are fundamentally different.

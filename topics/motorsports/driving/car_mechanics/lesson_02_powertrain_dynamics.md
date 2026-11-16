@@ -34,41 +34,35 @@ The core of a sequential unit is a **barrel cam** (also called a shift drum) —
 
 The power path through the gearbox is best understood as two parallel shaft systems. The input shaft receives torque from the clutch and carries a set of constant-mesh gear pairs. The layshaft (or output shaft in some designs) runs parallel, carrying the mating gears. At any moment, all gear pairs are in constant mesh — their teeth are always engaged — but only one pair is transmitting torque. The active dog clutch locks that specific gear pair to its shaft, creating the mechanical couple from input to output. All other gear pairs freewheel on their shaft bearings. The layshaft connects to the final drive pinion, which drives the ring gear in the differential housing.
 
-```
-ENGINE CRANKSHAFT
-        │
-        ▼
-┌───────────────┐
-│  Clutch Pack  │  ← Engagement pressure from master cylinder / ECU
-│  (Multi-plate │     Clutch paddle or actuator
-│   dry/wet)    │
-└───────┬───────┘
-        │  Input shaft torque
-        ▼
-┌────────────────────────────────────────────┐
-│          SEQUENTIAL GEARBOX                │
-│                                            │
-│  Input Shaft:  [1st][2nd][3rd][4th][5th]  │
-│                 ║    ║    ║    ║    ║      │
-│  (constant     [1st][2nd][3rd][4th][5th]  │
-│   mesh pairs)   ║    ║    ║    ║    ║      │
-│  Layshaft:    ──┴────┴────┴────┴────┴──   │
-│                        │                  │
-│               [Active dog clutch]         │
-│               (selected by barrel cam)    │
-└───────────────────┬────────────────────────┘
-                    │  Output torque
-                    ▼
-           ┌─────────────────┐
-           │  Final Drive    │  Ring gear / Pinion
-           │  Differential   │  ← LSD clutch packs / Torsen
-           └────────┬────────┘
-            ┌───────┴───────┐
-            ▼               ▼
-       Left Driveshaft   Right Driveshaft
-            │                   │
-       Left Rear Wheel      Right Rear Wheel
-       (contact patch)      (contact patch)
+```mermaid
+flowchart TD
+    ENG["ENGINE CRANKSHAFT"]
+    
+    ENG --> CLUTCH["Clutch Pack<br/>(Multi-plate dry/wet)"]
+    
+    PRESS["Engagement pressure from master cylinder / ECU<br/>Clutch paddle or actuator"] -.-> CLUTCH
+    
+    CLUTCH -->|"Input shaft torque"| GEARBOX
+    
+    subgraph GEARBOX["SEQUENTIAL GEARBOX"]
+        INPUT["Input Shaft: [1st][2nd][3rd][4th][5th]"]
+        MESH["(constant mesh pairs)"]
+        LAYSHAFT["Layshaft: [1st][2nd][3rd][4th][5th]"]
+        DOG["Active dog clutch<br/>(selected by barrel cam)"]
+        
+        INPUT ---|"║ ║ ║ ║ ║"| LAYSHAFT
+        LAYSHAFT --> DOG
+    end
+    
+    GEARBOX -->|"Output torque"| FINAL["Final Drive<br/>Differential<br/>Ring gear / Pinion"]
+    
+    LSD["LSD clutch packs / Torsen"] -.-> FINAL
+    
+    FINAL --> LEFT["Left Driveshaft"]
+    FINAL --> RIGHT["Right Driveshaft"]
+    
+    LEFT --> LW["Left Rear Wheel<br/>(contact patch)"]
+    RIGHT --> RW["Right Rear Wheel<br/>(contact patch)"]
 ```
 
 The shift barrel's indexing mechanism deserves engineering attention because it is a common failure point under aggressive shifting. The barrel is indexed by a spring-loaded roller or pin that seats in detent recesses machined around the drum's end face. Under a shift input — whether from a hand-actuated lever on a sequential rod linkage, a pneumatic paddle actuator, or an electrohydraulic system — the drum rotates exactly one position. The detent spring provides the return force that positively seats the drum in the new position, preventing halfway engagement (a half-dog condition, which produces catastrophic dog tooth damage and ratio drop-out under load). Teams running pneumatic or electrohydraulic shift systems must tune actuator dwell time — the period the actuator holds pressure on the linkage — to ensure the drum completes its full rotation without overshooting the detent under high drum inertia.
@@ -93,35 +87,44 @@ The **mechanical plate-type LSD** adds a clutch pack on each side of the differe
 
 The **Torsen (Torque Sensing) differential** operates on helical worm gear principles rather than friction clutches, making it infinitely progressive and self-proportioning. Because worm gears are non-backdrivable above a certain lead angle, torque biasing happens without clutch wear or temperature sensitivity. The torque bias ratio (TBR) — the maximum ratio of torque to the fast wheel versus the slow wheel — is fixed by the gear geometry at manufacture, typically between 2.5:1 and 5:1 for motorsport units. The Torsen cannot lock completely, which makes it predictable and consistent but limits its performance on surfaces where total lockup is desirable, such as ice or gravel.
 
-```
-PLATE-TYPE LSD FORCE SCHEMATIC (rear axle view)
+```mermaid
+flowchart TD
+    TORQUE["⬇ Engine Torque In"]
 
-     Engine torque in
-            │
-            ▼
-    ┌───────────────────┐
-    │  Differential     │
-    │  Crown Wheel      │
-    │                   │
-    │  ┌─────┐  Cross  ┌─────┐
-    │  │Ramp │◄───pin──►│Ramp │
-    │  │45°  │  force  │45°  │
-    │  └──┬──┘         └──┬──┘
-    │     │               │
-    │  ┌──▼──┐         ┌──▼──┐
-    │  │Clutch│        │Clutch│
-    │  │packs │        │packs │
-    │  └──┬──┘         └──┬──┘
-    └─────┼───────────────┼─────┘
-          │               │
-     Left axle        Right axle
-     shaft               shaft
-          │               │
-     Inner wheel      Outer wheel
-   (slower in RH turn) (faster in RH turn)
+    subgraph DIFF ["Differential Crown Wheel"]
+        direction TB
+        RAMP_L["Ramp\n45°\n(Left)"]
+        CROSS["Cross-Pin Force"]
+        RAMP_R["Ramp\n45°\n(Right)"]
+        CLUTCH_L["Clutch Packs\n(Left)"]
+        CLUTCH_R["Clutch Packs\n(Right)"]
 
-Ramp angle ↓ → Axial load ↑ → Lockup ↑ → Understeer on power exit
-Ramp angle ↑ → Axial load ↓ → Lockup ↓ → Oversteer on power exit
+        CROSS -->|"axial load"| RAMP_L
+        CROSS -->|"axial load"| RAMP_R
+        RAMP_L --> CLUTCH_L
+        RAMP_R --> CLUTCH_R
+    end
+
+    AXLE_L["Left Axle Shaft"]
+    AXLE_R["Right Axle Shaft"]
+    WHEEL_L["Inner Wheel\n(slower in RH turn)"]
+    WHEEL_R["Outer Wheel\n(faster in RH turn)"]
+
+    subgraph RAMP_EFFECT ["Ramp Angle Effect on Handling"]
+        direction TB
+        RAMP_LOW["Ramp Angle ↓ → Axial Load ↑ → Lockup ↑"]
+        RAMP_HIGH["Ramp Angle ↑ → Axial Load ↓ → Lockup ↓"]
+        UNDERSTEER["Power-Exit Understeer"]
+        OVERSTEER["Power-Exit Oversteer"]
+        RAMP_LOW --> UNDERSTEER
+        RAMP_HIGH --> OVERSTEER
+    end
+
+    TORQUE --> DIFF
+    CLUTCH_L --> AXLE_L
+    CLUTCH_R --> AXLE_R
+    AXLE_L --> WHEEL_L
+    AXLE_R --> WHEEL_R
 ```
 
 ### Traction Management: From Wheelspin to Coordinated Control

@@ -41,61 +41,57 @@ The `FormData` interface provides an imperative alternative to declarative form 
 
 The autofill specification defines a controlled vocabulary for the `autocomplete` attribute, categorizing fields into sections, addressing components, and autofill categories. The syntax follows `section-* shipping|billing|* category-* type`, where `section` groups related fields, `shipping` and `billing` distinguish address types, and `type` specifies the semantic category like `name`, `email`, `tel`, `street-address`, `postal-code`, `cc-number`, `cc-exp`, `cc-csc`. The `one-time-code` token signals that the field expects a short-lived OTP delivered via SMS or email, prompting browsers to integrate with platform APIs that extract OTP codes from messages. The `new-password` and `current-password` tokens guide password managers to generate or retrieve credentials, while `username` identifies the corresponding username field.
 
-```
-Form Submission Pipeline:
-
-User Action (Submit Button, Enter Key)
-         |
-         v
-Submission Initiator Identified (button, control)
-         |
-         v
-Check novalidate / formnovalidate
-         |
-    +----|----+
-    |         |
-   Yes       No
-    |         |
-    |         v
-    |    Validation Gate
-    |         |
-    |    Iterate Controls
-    |         |
-    |    checkValidity()
-    |         |
-    |    +----+----+
-    |    |         |
-    | Invalid    Valid
-    |    |         |
-    |    v         |
-    | Halt         |
-    | Focus        |
-    | Dispatch     |
-    | 'invalid'    |
-    |              |
-    +----+---------+
-         |
-         v
-Construct Form Payload
-         |
-    +----+----+----+
-    |         |    |
-urlencoded multi plain
-    |         |    |
-    v         v    v
-Serialize Controls
-         |
-         v
-Apply Method (GET, POST, DIALOG)
-         |
-    +----+----+
-    |         |
-   GET      POST
-    |         |
-    v         v
-Navigate   Submit
-with Query  Body
-String
+```mermaid
+flowchart TD
+    A["User Action (Submit Button, Enter Key)"]
+    B["Submission Initiator Identified (button, control)"]
+    C["Check novalidate / formnovalidate"]
+    D1["Yes"]
+    D2["No"]
+    E["Validation Gate"]
+    F["Iterate Controls"]
+    G["checkValidity()"]
+    H1["Invalid"]
+    H2["Valid"]
+    I["Halt"]
+    J["Focus"]
+    K["Dispatch 'invalid'"]
+    L["Construct Form Payload"]
+    M1["urlencoded"]
+    M2["multi"]
+    M3["plain"]
+    N["Serialize Controls"]
+    O["Apply Method (GET, POST, DIALOG)"]
+    P1["GET"]
+    P2["POST"]
+    Q1["Navigate with Query String"]
+    Q2["Submit Body"]
+    
+    A --> B
+    B --> C
+    C --> D1
+    C --> D2
+    D2 --> E
+    E --> F
+    F --> G
+    G --> H1
+    G --> H2
+    H1 --> I
+    I --> J
+    J --> K
+    H2 --> L
+    D1 --> L
+    L --> M1
+    L --> M2
+    L --> M3
+    M1 --> N
+    M2 --> N
+    M3 --> N
+    N --> O
+    O --> P1
+    O --> P2
+    P1 --> Q1
+    P2 --> Q2
 ```
 
 The input sanitization and parsing behavior varies significantly by type. A `url` input accepts a valid URL according to the URL Standard, requiring a scheme, but browsers are permissive, often prepending `http://` if the scheme is omitted during user entry. A `tel` input performs no validation by default, as international telephone number formats are too diverse to enforce a single pattern, but developers can layer a `pattern` attribute for region-specific validation. The `search` input is functionally equivalent to `text` but may render with search-specific UI affordances like a clear button or magnifying glass icon. The `hidden` input type bypasses all validation and UI rendering, contributing its name-value pair directly to the form payload without user interaction.

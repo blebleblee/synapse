@@ -36,61 +36,35 @@ The internal architecture of a production NAS system comprises seven distinct la
 
 At the highest level sits the **network protocol layer**, implementing SMB, NFS, or both. These protocols define the wire format for filesystem operation requests and responses, including authentication, authorization, locking, and caching semantics. The protocol stack in the NAS server typically runs as a kernel module or privileged userspace daemon, binding to TCP sockets on standard ports (445 for SMB, 2049 for NFS). When a client initiates a connection, the protocol server performs authentication (mapping network credentials to local UNIX UIDs/GIDs for NFS, or using NTLM/Kerberos tokens for SMB), then enters a request-processing loop where it reads incoming RPC messages, validates them, and dispatches them to the appropriate handler.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  Client Host (Linux/Windows)                                    │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  Application (userspace)                                  │  │
-│  │  open("/mnt/nas/data.txt", O_RDWR)                       │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-│                       │ syscall                                 │
-│  ┌────────────────────▼─────────────────────────────────────┐  │
-│  │  VFS Layer (kernel)                                       │  │
-│  │  Translates POSIX ops to filesystem-specific operations   │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-│                       │                                         │
-│  ┌────────────────────▼─────────────────────────────────────┐  │
-│  │  NFS/SMB Client Driver (kernel module)                   │  │
-│  │  - Manages RPC request/response correlation              │  │
-│  │  - Client-side attribute/data cache (pagecache)          │  │
-│  │  - Network timeout and retry logic                       │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-│                       │ TCP/IP stack                            │
-└───────────────────────┼─────────────────────────────────────────┘
-                        │
-                    ════╪════  Network (Ethernet/IP)
-                        │
-┌───────────────────────▼─────────────────────────────────────────┐
-│  NAS Server / Appliance                                         │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  NFS/SMB Server (kernel or userspace daemon)             │  │
-│  │  - TCP listener on port 2049/445                         │  │
-│  │  - RPC dispatch and request deserialization              │  │
-│  │  - Per-client state tracking (delegations, locks)        │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-│                       │                                         │
-│  ┌────────────────────▼─────────────────────────────────────┐  │
-│  │  VFS + Local Filesystem (ext4/XFS/ZFS)                   │  │
-│  │  - Inode management, directory trees                     │  │
-│  │  - Journal/transaction log                               │  │
-│  │  - Page cache and buffer cache                           │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-│                       │                                         │
-│  ┌────────────────────▼─────────────────────────────────────┐  │
-│  │  Block Layer (kernel)                                     │  │
-│  │  - I/O scheduler (mq-deadline, BFQ)                      │  │
-│  │  - Device mapper (RAID, LVM)                             │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-│                       │                                         │
-│  ┌────────────────────▼─────────────────────────────────────┐  │
-│  │  Storage Controllers (SATA/SAS/NVMe HBA)                 │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-└───────────────────────┼─────────────────────────────────────────┘
-                        │
-                   ┌────▼────┐
-                   │ Physical│
-                   │  Disks  │
-                   └─────────┘
+```mermaid
+flowchart TD
+    subgraph client ["Client Host (Linux / Windows)"]
+        APP["Application (userspace)\nopen('/mnt/nas/data.txt', O_RDWR)"]
+        VFS_C["VFS Layer (kernel)\nTranslates POSIX ops to filesystem-specific operations"]
+        NFS_CLIENT["NFS / SMB Client Driver (kernel module)\n─ Manages RPC request/response correlation\n─ Client-side attribute/data cache (pagecache)\n─ Network timeout and retry logic"]
+
+        APP -->|syscall| VFS_C
+        VFS_C --> NFS_CLIENT
+    end
+
+    NETWORK(["Network (Ethernet / IP)"])
+
+    subgraph nas ["NAS Server / Appliance"]
+        NFS_SERVER["NFS / SMB Server (kernel or userspace daemon)\n─ TCP listener on port 2049 / 445\n─ RPC dispatch and request deserialization\n─ Per-client state tracking (delegations, locks)"]
+        VFS_S["VFS + Local Filesystem (ext4 / XFS / ZFS)\n─ Inode management, directory trees\n─ Journal / transaction log\n─ Page cache and buffer cache"]
+        BLOCK["Block Layer (kernel)\n─ I/O scheduler (mq-deadline, BFQ)\n─ Device mapper (RAID, LVM)"]
+        HBA["Storage Controllers (SATA / SAS / NVMe HBA)"]
+
+        NFS_SERVER --> VFS_S
+        VFS_S --> BLOCK
+        BLOCK --> HBA
+    end
+
+    DISKS[("Physical Disks")]
+
+    NFS_CLIENT -->|"TCP/IP stack"| NETWORK
+    NETWORK --> NFS_SERVER
+    HBA --> DISKS
 ```
 
 The protocol server must handle multiple simultaneous client connections, each potentially issuing concurrent operations. High-performance NAS servers use thread pools or asynchronous I/O models to prevent any single slow operation from blocking others. In the Linux kernel's NFS server implementation (knfsd), a configurable pool of kernel threads (typically 8-16 per CPU core) dequeues RPC requests from the TCP receive queue, processes them by calling into the VFS layer, and writes responses back to the network. This threading model allows the server to overlap disk I/O operations and network transmission, maximizing throughput when serving many clients.

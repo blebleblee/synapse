@@ -32,20 +32,28 @@ Magneto timing adjustment occurs through physical rotation of the entire magneto
 
 The capacitor discharge ignition system revolutionized motorcycle ignition by replacing the magneto's mechanical switching with solid-state thyristor control. The CDI architecture stores energy in a high-voltage capacitor rather than the ignition coil's magnetic field, then discharges this capacitor through the primary winding when triggered by the electronic control unit. The energy storage capacitor typically charges to three hundred to four hundred volts through a DC-DC converter driven by the alternator's AC output, accumulating one to two joules of energy per ignition cycle. When the electronic control unit determines the correct firing angle based on crankshaft position sensor data, it triggers a silicon-controlled rectifier or thyristor, dumping the capacitor's charge through the ignition coil primary in a violent, sub-microsecond pulse. This rapid primary current rise induces an extremely high secondary voltage—often exceeding thirty thousand volts—but with correspondingly short arc duration, typically point five milliseconds or less.
 
-```
-CDI Energy Flow Architecture:
+```mermaid
+flowchart TD
+    ALT["Alternator AC"]
+    VM["Voltage Multiplier\n(Cockroft-Walton)"]
+    CAP["Energy Storage Capacitor\n(300–400V, 1–2µF)"]
+    CPS["Crankshaft Position Sensor\n(VR Pickup)"]
+    ECU["ECU Logic\n(Timing Map)"]
+    SCR["SCR / Thyristor\nGate Trigger"]
+    PRI["Ignition Coil Primary\n(Rapid Discharge)"]
+    SEC["Secondary Winding"]
+    SPK["Spark Plug\n(>25 kV, 0.5 ms arc)"]
 
-Alternator AC -> Voltage Multiplier -> Energy Storage Capacitor (300-400V, 1-2µF)
-                 (Cockroft-Walton)               |
-                                                 |
-Crankshaft Position -----> ECU Logic -----> SCR/Thyristor Gate Trigger
-Sensor (VR pickup)         (Timing Map)         |
-                                                 |
-                                                 V
-                                    Ignition Coil Primary (rapid discharge)
-                                                 |
-                                                 V
-                                    Secondary Winding -> Spark Plug (>25kV, 0.5ms arc)
+    ALT --> VM
+    VM --> CAP
+    CAP --> SCR
+
+    CPS --> ECU
+    ECU --> SCR
+
+    SCR --> PRI
+    PRI --> SEC
+    SEC --> SPK
 ```
 
 The CDI architecture's primary advantage over magneto and battery-coil systems lies in its immunity to spark energy degradation at high engine speeds. Traditional inductive ignition systems require dwell time—the period during which current builds in the primary winding—to store sufficient energy for the next spark event. At ten thousand RPM, each ignition cycle completes in six milliseconds for a four-stroke engine firing once per two revolutions; subtracting the time required for combustion and exhaust processes leaves perhaps three milliseconds of available dwell. If the ignition coil primary inductance and supply voltage yield a current rise time of four milliseconds to reach saturation current, the system cannot deliver full spark energy at this speed, leading to misfires and power loss. CDI systems circumvent this limitation entirely: the energy storage capacitor charges continuously during the entire engine cycle, then discharges in microseconds regardless of engine speed. This characteristic makes CDI the dominant architecture for high-RPM racing two-strokes and motocross bikes regularly exceeding twelve thousand RPM.

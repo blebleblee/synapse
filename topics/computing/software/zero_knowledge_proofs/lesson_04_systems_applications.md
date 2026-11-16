@@ -22,39 +22,31 @@ The engineering consequence of this mathematical structure is that the dominant 
 
 A production ZK system has four distinct layers that must be engineered independently and composed carefully: the **circuit layer**, the **witness generation layer**, the **proof generation layer**, and the **verification layer**. Each layer has its own data structures, performance characteristics, and failure modes.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        APPLICATION LAYER                        │
-│          (Business logic: balances, Merkle trees, auth)         │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │  public inputs + private witness
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                        CIRCUIT LAYER                            │
-│   R1CS / AIR constraints, gadgets, field arithmetic encoding    │
-│   Tools: circom, halo2, gnark, Noir                             │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │  constraint system + witness assignment
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   WITNESS GENERATION LAYER                      │
-│   Full assignment vector z ∈ F_p^n, deterministic from input   │
-│   Runs in native code (Rust/C++), not inside the proof system   │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │  R1CS matrices A, B, C + assignment
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   PROOF GENERATION LAYER                        │
-│   MSM (multi-scalar multiplication), FFT, polynomial commitment │
-│   CPU/GPU parallelism; dominant runtime cost                    │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │  π (proof) + public inputs
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     VERIFICATION LAYER                          │
-│   Pairing check / FRI query; O(1) or O(log n) in proof size    │
-│   Runs on-chain (EVM) or in a light client                      │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    APP["**APPLICATION LAYER**
+    Business logic: balances, Merkle trees, auth"]
+
+    CIRCUIT["**CIRCUIT LAYER**
+    R1CS / AIR constraints, gadgets, field arithmetic encoding
+    Tools: circom, halo2, gnark, Noir"]
+
+    WITNESS["**WITNESS GENERATION LAYER**
+    Full assignment vector z ∈ Fₚⁿ, deterministic from input
+    Runs in native code (Rust/C++), not inside the proof system"]
+
+    PROVE["**PROOF GENERATION LAYER**
+    MSM (multi-scalar multiplication), FFT, polynomial commitment
+    CPU/GPU parallelism; dominant runtime cost"]
+
+    VERIFY["**VERIFICATION LAYER**
+    Pairing check / FRI query; O(1) or O(log n) in proof size
+    Runs on-chain (EVM) or in a light client"]
+
+    APP     -->|"public inputs + private witness"| CIRCUIT
+    CIRCUIT -->|"constraint system + witness assignment"| WITNESS
+    WITNESS -->|"R1CS matrices A, B, C + assignment"| PROVE
+    PROVE   -->|"π (proof) + public inputs"| VERIFY
 ```
 
 ### The Circuit Layer: Gadgets and Constraint Composition
@@ -264,21 +256,32 @@ The engineering challenge is that verifying a Groth16 proof inside a Groth16 cir
 
 The Halo2 proof system, used by the zkEVM in the Scroll and Taiko implementations, exploits this cycle with **accumulator-based recursion**: rather than verifying each proof completely, the verifier accumulates a linear combination of group elements that is checked once at the end of the recursive chain. This defers the expensive pairing check and reduces the per-step recursive overhead to a few hundred native constraints.
 
-```
-Recursive IVC State Machine
+```mermaid
+flowchart LR
+    S0["**Step 0**\nF(z₀)\nz₀"]
+    S1["**Step 1**\nF(z₁)\nz₁"]
+    S2["**Step 2**\nF(z₂)\nz₂"]
+    SN["**Step n**\nF(zₙ)\nzₙ"]
 
-  Step 0          Step 1          Step 2          Step n
-┌────────┐      ┌────────┐      ┌────────┐      ┌────────┐
-│ F(z_0) │─π_0─▶│ F(z_1) │─π_1─▶│ F(z_2) │─π_2─▶│ F(z_n) │
-│ z_0    │      │ z_1    │      │ z_2    │      │ z_n    │
-└────────┘      └────────┘      └────────┘      └────────┘
-                    │               │               │
-                    ▼               ▼               ▼
-               Verify π_0     Verify π_1     Verify π_{n-1}
-               inside the     inside the     inside the
-               F circuit      F circuit      F circuit
-                              (native field   (native field
-                               arithmetic)    arithmetic)
+    V0["Verify π₀\ninside F circuit"]
+    V1["Verify π₁\ninside F circuit\n(native field arithmetic)"]
+    VN["Verify π₍ₙ₋₁₎\ninside F circuit\n(native field arithmetic)"]
+
+    S0 -->|"π₀"| S1
+    S1 -->|"π₁"| S2
+    S2 -->|"π₂"| SN
+
+    S1 --> V0
+    S2 --> V1
+    SN --> VN
+
+    style S0 fill:#4A90D9,stroke:#2C5F8A,color:#fff
+    style S1 fill:#4A90D9,stroke:#2C5F8A,color:#fff
+    style S2 fill:#4A90D9,stroke:#2C5F8A,color:#fff
+    style SN fill:#4A90D9,stroke:#2C5F8A,color:#fff
+    style V0 fill:#2E7D32,stroke:#1B5E20,color:#fff
+    style V1 fill:#2E7D32,stroke:#1B5E20,color:#fff
+    style VN fill:#2E7D32,stroke:#1B5E20,color:#fff
 ```
 
 The public output of each step is the hash of the accumulated state, binding each step's proof to the entire history. The final verifier only checks $\pi_n$ once, and that check certifies the entire computation chain. This is how zkSync Era and Polygon zkEVM can process thousands of transactions in a single on-chain proof: each transaction is a step in an IVC chain, and the chain's root proof is what gets posted to Ethereum.
@@ -432,27 +435,31 @@ GPU-accelerated proving deserves a careful systems analysis because throwing har
 
 The practical architecture for a ZK proving service is therefore a fleet of GPU instances with the proving key pre-loaded into VRAM at startup, accepting witness assignments via a local socket and streaming proofs back. The witness generator runs on the CPU (it is sequential and memory-bound in a different way) and hands off the assignment to the GPU prover. This architecture is used by Ulvetanna (now Irreducible), Ingonyama, and the in-house proving infrastructure at Polygon.
 
-```
-                        ZK Proving Service Architecture
+```mermaid
+flowchart TD
+    Coord["Coordinator (Rust)<br/>Receives inputs via gRPC,<br/>distributes to worker pool"]
 
-  ┌────────────────────────────────────────────────────────────┐
-  │                     Coordinator (Rust)                     │
-  │   Receives inputs via gRPC, distributes to worker pool    │
-  └───────────────────────────┬────────────────────────────────┘
-                              │
-              ┌───────────────┼───────────────┐
-              ▼               ▼               ▼
-  ┌───────────────┐ ┌───────────────┐ ┌───────────────┐
-  │  Worker Node  │ │  Worker Node  │ │  Worker Node  │
-  │               │ │               │ │               │
-  │  CPU: Witness │ │  CPU: Witness │ │  CPU: Witness │
-  │  Generator    │ │  Generator    │ │  Generator    │
-  │       │       │ │       │       │ │       │       │
-  │       ▼       │ │       ▼       │ │       ▼       │
-  │  GPU: MSM +   │ │  GPU: MSM +   │ │  GPU: MSM +   │
-  │  NTT (VRAM    │ │  NTT (VRAM    │ │  NTT (VRAM    │
-  │  resident PK) │ │  resident PK) │ │  resident PK) │
-  └───────────────┘ └───────────────┘ └───────────────┘
+    subgraph W1 ["Worker Node"]
+        CPU1["CPU: Witness Generator"]
+        GPU1["GPU: MSM + NTT<br/>(VRAM resident PK)"]
+        CPU1 --> GPU1
+    end
+
+    subgraph W2 ["Worker Node"]
+        CPU2["CPU: Witness Generator"]
+        GPU2["GPU: MSM + NTT<br/>(VRAM resident PK)"]
+        CPU2 --> GPU2
+    end
+
+    subgraph W3 ["Worker Node"]
+        CPU3["CPU: Witness Generator"]
+        GPU3["GPU: MSM + NTT<br/>(VRAM resident PK)"]
+        CPU3 --> GPU3
+    end
+
+    Coord --> CPU1
+    Coord --> CPU2
+    Coord --> CPU3
 ```
 
 ### Failure Modes: Under-Constrained Circuits and Soundness Bugs

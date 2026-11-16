@@ -30,44 +30,68 @@ Implementing the three-field system required coordinated labor and institutional
 
 The diagram below illustrates the temporal and spatial structure of a three-field rotation in a hypothetical village with three parcels of arable land, each sufficient to sustain approximately one hundred peasant households.
 
-```
-YEAR 1 (Spring to Autumn)
-┌─────────────────┬─────────────────┬─────────────────┐
-│    Parcel A     │    Parcel B     │    Parcel C     │
-│   Winter Wheat  │   Spring Peas   │     FALLOW      │
-│ (March to August)│ (May to August) │  (Grazing)      │
-└─────────────────┴─────────────────┴─────────────────┘
+```mermaid
+flowchart TD
 
-YEAR 2 (Spring to Autumn)
-┌─────────────────┬─────────────────┬─────────────────┐
-│    Parcel A     │    Parcel B     │    Parcel C     │
-│     FALLOW      │   Winter Wheat  │   Spring Peas   │
-│  (Grazing)      │ (March to August)│ (May to August) │
-└─────────────────┴─────────────────┴─────────────────┘
+    subgraph Y1["YEAR 1 — Spring to Autumn"]
+        direction LR
+        Y1A["Parcel A\nWinter Wheat\n(March – August)"]
+        Y1B["Parcel B\nSpring Peas\n(May – August)"]
+        Y1C["Parcel C\nFALLOW\n(Grazing)"]
+    end
 
-YEAR 3 (Spring to Autumn)
-┌─────────────────┬─────────────────┬─────────────────┐
-│    Parcel A     │    Parcel B     │    Parcel C     │
-│   Spring Peas   │     FALLOW      │   Winter Wheat  │
-│ (May to August) │  (Grazing)      │ (March to August)│
-└─────────────────┴─────────────────┴─────────────────┘
+    subgraph Y2["YEAR 2 — Spring to Autumn"]
+        direction LR
+        Y2A["Parcel A\nFALLOW\n(Grazing)"]
+        Y2B["Parcel B\nWinter Wheat\n(March – August)"]
+        Y2C["Parcel C\nSpring Peas\n(May – August)"]
+    end
 
-Yields and Surplus Generation
-Three-Field Cycle Outputs per 100-hectare parcel:
+    subgraph Y3["YEAR 3 — Spring to Autumn"]
+        direction LR
+        Y3A["Parcel A\nSpring Peas\n(May – August)"]
+        Y3B["Parcel B\nFALLOW\n(Grazing)"]
+        Y3C["Parcel C\nWinter Wheat\n(March – August)"]
+    end
 
-Grain Yield (Winter Wheat): 12-15 tons/year
-  → After seed replacement (20% of yield): ~10-12 tons available surplus
-  → Feeds approximately 40-50 people for one year at subsistence (240 kg/person)
+    Y1 -->|"Rotation cycle"| Y2
+    Y2 -->|"Rotation cycle"| Y3
+    Y3 -->|"Returns to Year 1"| Y1
 
-Legume Yield (Peas): 8-10 tons/year
-  → 70% used as animal fodder; 30% for human consumption: ~2-3 tons edible
-  → Supports 50-60 additional sheep/goats or 15-20 cattle on fallow pasture
-  → Manure production: 25-30 tons/year (fertilizer value equivalent to 3-4 tons grain)
+    subgraph GW["Grain Yield — Winter Wheat (per 100 ha parcel)"]
+        direction TB
+        GW1["Raw yield: 12–15 tons/year"]
+        GW2["After 20% seed replacement:\n10–12 tons surplus"]
+        GW3["Feeds ~40–50 people/year\n@ 240 kg/person subsistence"]
+        GW1 --> GW2 --> GW3
+    end
 
-Cumulative Surplus per 300-hectare village holding:
-  → Year 1: 30-36 tons grain + 6-9 tons legume + manure offset
-  → Compared to two-field equivalent: 20-24 tons grain + minimal legume
-  → Productivity gain: 50-75% increase in caloric surplus
+    subgraph LP["Legume Yield — Spring Peas (per 100 ha parcel)"]
+        direction TB
+        LP1["Raw yield: 8–10 tons/year"]
+        LP2A["70% animal fodder"]
+        LP2B["30% human consumption:\n2–3 tons edible"]
+        LP3["Supports 50–60 sheep/goats\nor 15–20 cattle on fallow"]
+        LP4["Manure: 25–30 tons/year\n≈ 3–4 tons grain fertilizer value"]
+        LP1 --> LP2A --> LP3
+        LP1 --> LP2B
+        LP3 --> LP4
+    end
+
+    subgraph CS["Cumulative Surplus — 300 ha Village Holding"]
+        direction TB
+        CS1["Year 1:\n30–36 tons grain\n+ 6–9 tons legume\n+ manure offset"]
+        CS2["Two-field equivalent:\n20–24 tons grain\n+ minimal legume"]
+        CS3["Productivity gain:\n50–75% increase\nin caloric surplus"]
+        CS1 --> CS3
+        CS2 --> CS3
+    end
+
+    Y1A & Y2B & Y3C -->|"Wheat output"| GW
+    Y1B & Y2C & Y3A -->|"Pea output"| LP
+    Y1C & Y2A & Y3B -->|"Fallow benefits"| LP
+    GW --> CS
+    LP --> CS
 ```
 
 The three-field system was not universally adopted immediately. In southern Europe, Mediterranean climates supported different crop calendars (spring planting of chickpeas and lentils, rather than autumn planting of wheat). In regions where manorial organization remained weak or where population density remained low, the coordination costs of enforcing synchronized rotations outweighed the productivity benefits. The system diffused gradually from the ninth century onward, reaching near-universal adoption in northern France, the Low Countries, and England by the thirteenth century, while remaining patchily distributed in southern regions where two-field and three-field systems coexisted well into the fourteenth century.
@@ -88,61 +112,46 @@ The guild assembly, convened quarterly or annually, established detailed regulat
 
 The diagram below illustrates the hierarchical structure of a typical urban cloth guild and the information flow connecting quality standards, apprenticeship, and market reputation.
 
-```
-GUILD STRUCTURE: Bruges Weavers' Guild (13th century)
+```mermaid
+flowchart TD
+    subgraph guild ["GUILD STRUCTURE: Bruges Weavers' Guild (13th century)"]
+        GA["Guild Assembly (Master Weavers)<br/>20-30 members, meets quarterly<br/>• Establish quality standards<br/>• Set maximum prices<br/>• Admit/expel members<br/>• Enforce regulations via fines/sanctions"]
+        MW1["Master Weaver (Workshop Owner)<br/>• 4-6 looms<br/>• 2-3 journeymen<br/>• 1-2 apprentices"]
+        MW2["Master Weaver (Workshop Owner)<br/>• 4-6 looms<br/>• 2-3 journeymen<br/>• 1-2 apprentices"]
+        JA["Journeymen &amp; Apprentices<br/>• Bound by contract (7-10 years for apprentices)<br/>• Subject to master's authority &amp; instruction<br/>• Journeymen receive wages; apprentices receive room, board, and craft training"]
+        GA --> MW1
+        GA --> MW2
+        MW1 --> JA
+        MW2 --> JA
+    end
 
-┌────────────────────────────────────────────────────┐
-│          GUILD ASSEMBLY (Master Weavers)           │
-│         (20-30 members, meets quarterly)           │
-│  - Establish quality standards                     │
-│  - Set maximum prices                              │
-│  - Admit/expel members                             │
-│  - Enforce regulations via fines/sanctions         │
-└────────────┬─────────────────────────────┬─────────┘
-             │                             │
-    ┌────────▼─────────┐         ┌─────────▼──────────┐
-    │  MASTER WEAVER   │         │ MASTER WEAVER      │
-    │  (Workshop Owner)│         │ (Workshop Owner)   │
-    │ - 4-6 looms     │         │ - 4-6 looms        │
-    │ - 2-3 journeymen│         │ - 2-3 journeymen   │
-    │ - 1-2 apprentices│         │ - 1-2 apprentices  │
-    └────────┬─────────┘         └─────────┬──────────┘
-             │                             │
-    ┌────────▼─────────────────────────────▼────────┐
-    │    JOURNEYMEN & APPRENTICES                    │
-    │ - Bound by contract (7-10 years for apprentices)
-    │ - Subject to master's authority & instruction  │
-    │ - Journeymen receive wages; apprentices receive │
-    │   room, board, and craft training             │
-    └─────────────────────────────────────────────────┘
+    subgraph qa ["QUALITY ASSURANCE CHAIN"]
+        MC["Merchant purchases cloth sealed with guild mark"]
+        GM["Guild mark signals: standards met"]
+        MR["Market reputation of master"]
+        CSF["Customer satisfaction feedback"]
+        GIS["Guild inspection &amp; sanctions"]
+        CGB["Collective guild brand value"]
+        MC --> GM
+        MC --> MR
+        MR --> CSF
+        MR --> GIS
+        MR --> CGB
+    end
 
-QUALITY ASSURANCE CHAIN
-┌──────────────────────────────────────────────────────┐
-│ Merchant purchases cloth sealed with guild mark    │
-└────────────────────┬─────────────────────────────────┘
-                     │
-                     ├─ Guild mark signals: standards met
-                     │
-                     └─ Market reputation of master
-                        ├─ Customer satisfaction feedback
-                        ├─ Guild inspection & sanctions
-                        └─ Collective guild brand value
-
-RISK MITIGATION: Apprenticeship as Long-Term Commitment
-┌──────────────────────────────────────────────────────┐
-│ Master invests in apprentice training               │
-│ (unpaid labor + instruction cost)                   │
-└────────────────────┬─────────────────────────────────┘
-                     │
-         Apprentice produces quality work
-              ↓
-      Master's reputation enhanced
-              ↓
-      Brand value preserved
-              ↓
-      Master can charge premium prices
-              ↓
-      Return on training investment
+    subgraph risk ["RISK MITIGATION: Apprenticeship as Long-Term Commitment"]
+        MI["Master invests in apprentice training<br/>(unpaid labor + instruction cost)"]
+        AQW["Apprentice produces quality work"]
+        MRE["Master's reputation enhanced"]
+        BV["Brand value preserved"]
+        MP["Master can charge premium prices"]
+        ROI["Return on training investment"]
+        MI --> AQW
+        AQW --> MRE
+        MRE --> BV
+        BV --> MP
+        MP --> ROI
+    end
 ```
 
 Guild monopolies also created barriers to entry that protected established masters from competition while extracting rents from consumers. A journeyman with sufficient capital might attempt to open his own shop and undercut established prices, but the guild's charter prohibited it. Over time, the pathway from journeyman to master became progressively more restrictive: entrance fees rose, the requirement to produce a "masterpiece" (a sample of work demonstrating mastery) became more stringent, and quota systems limited the number of new masters admitted annually. By the fourteenth and fifteenth centuries, many guilds had calcified into quasi-hereditary corporations where master status passed from father to son and outsiders faced near-insuperable obstacles to entry.
@@ -151,4 +160,17 @@ Yet during the twelfth and thirteenth centuries, when guilds first proliferated,
 
 ### Long-Distance Trade Networks: The Silk Road Continuity and the Emergence of the Hanseatic League
 
-By the twelfth century, the agricultural and craft production surpluses captured by the three-field rotation and guild systems had created both supply and demand for long-distance trade. Wealthy elites desired luxury goods—spices from the Indian Ocean, silks from China and the Middle East, furs from northern forests. Regional specialization meant that certain cities accumulated exceptional production capacity in particular goods: Bruges and Flanders for cloth, Venice and Genoa for processed metals and ceramics, the Baltic forests for timber and amber. The challenge was connecting supply to demand across spatial distances where direct face-to-face exchange
+By the twelfth century, the agricultural and craft production surpluses captured by the three-field rotation and guild systems had created both supply and demand for long-distance trade. Wealthy elites desired luxury goods—spices from the Indian Ocean, silks from China and the Middle East, furs from northern forests. Regional specialization meant that certain cities accumulated exceptional production capacity in particular goods: Bruges and Flanders for cloth, Venice and Genoa for processed metals and ceramics, the Baltic forests for timber and amber.
+
+The emergence of integrated long-distance trade networks represented not merely an expansion of existing commerce but a qualitative transformation in economic organization. The Silk Road, which had connected the Mediterranean world to Central Asia and China since antiquity, experienced renewed vitality during the Pax Mongolica (1206-1368), when unified Mongol control reduced banditry and standardized customs procedures across Eurasia. Simultaneously, Europe developed indigenous networks that operated under fundamentally different institutional arrangements. The Hanseatic League, formalized in the thirteenth century, united northern German and Baltic cities (Lübeck, Hamburg, Bergen, Novgorod) in a commercial confederation that maintained armed fleets, negotiated treaties with sovereign powers, and established privileged trading posts (kontore) from London to Pskov. Unlike the Silk Road's reliance on sequential exchanges through intermediaries, the Hanse created vertically integrated supply chains: Hanseatic merchants directly controlled goods from extraction (Swedish iron, Russian furs) through maritime transport to final retail markets. Southern Europe developed parallel structures: Venetian and Genoese merchant colonies dotted the Black Sea and Levantine coasts, extracting Asian luxury goods from Muslim intermediaries and redistributing them through northern Italy's urban markets. These networks relied on sophisticated financial instruments—bills of exchange, double-entry bookkeeping, insurance contracts, and joint-stock partnerships (commenda)—that allocated risk across multiple parties and permitted capital accumulation on unprecedented scales. The interplay between agricultural surplus (providing both tradable goods and urban food security), craft guild production (supplying intermediate manufactures), and long-distance networks (capturing arbitrage opportunities across vast price differentials) created a self-reinforcing cycle that fundamentally reoriented medieval Europe from subsistence-dominated agrarianism toward market-integrated commercial capitalism. By 1300, these economic structures had generated sufficient prosperity to support population densities approaching Roman imperial peaks, urban centers containing 10-15% of total population in core regions, and literacy rates among commercial elites that rivaled classical antiquity—setting the material preconditions for the Renaissance and the subsequent transformation of European society.
+
+## Summary & Verification Matrix
+
+| **Governing Invariant** | **Core Mechanism** | **Diagnostic Criteria** | **Historical Validation** |
+|------------------------|-------------------|------------------------|--------------------------|
+| Three-field rotation maximizes land utilization while maintaining soil fertility | Sequential planting of winter grain/spring grain/fallow across three annually rotated fields; legume nitrogen fixation restores nutrients | 33% fallow vs. 50% (two-field); 50% increase in effective acreage; population support 2-3× per unit land | Rapid adoption in Northern Europe 800-1100 CE; population growth from ~30M (1000) to ~73M (1300); contemporary yields 4-6:1 seed ratios |
+| Guild monopolies reduce transaction costs through quality standardization and reputation bonding | Municipal charter grants exclusive production rights; multi-year apprenticeships create human capital investment; masterpiece evaluation enforces minimum quality thresholds | Reduced price variance for standardized goods; formalized contracts for unobserved merchandise; external legal enforcement through guild courts | Guild proliferation 1100-1300 across all major crafts; Parisian guilds numbered 100+ by 1260; merchant willingness to contract for future delivery |
+| Heavy plow and horse collar unlock clayey/waterlogged soils unsuitable for Mediterranean agriculture | Mouldboard plough inverts soil, improving drainage and aeration; horse collar transfers load to shoulders (5× oxen efficiency); iron ploughshare penetrates dense earth | Expansion of cultivation into Northern European river valleys and plains; shift from oxen to horse traction in prosperous regions | Widespread adoption 900-1200 CE; reclamation of Rhine, Loire, Thames floodplains; Domesday Book (1086) records 6,000+ watermills in England |
+| Long-distance trade networks exploit regional comparative advantage through risk-pooled capital instruments | Hanseatic League vertical integration from extraction to retail; Italian commenda partnerships spread risk across voyages; bills of exchange eliminate bullion transport | Price arbitrage ratios exceeding transport costs; specialized urban production clusters; financial instruments separating capital ownership from operational management | Spice price differentials 1000-5000% (Malabar to Venice); Venetian galley fleets standardized 1300s; Hanseatic dominance of Baltic trade 1250-1550 |
+| Agricultural surplus enables urban population concentrations that drive craft specialization and market integration | Manorial system extracts ~30% peasant output as rents/tithes/taxes; surplus grain supports non-agricultural urban labor; guilds concentrate production expertise | Urban population ≥10% in commercialized regions; occupational specialization >50 distinct crafts in major cities; food security permits multi-year capital investments | Northern Italian urbanization 15-20% by 1300; Flemish cities (Bruges, Ghent, Ypres) 40,000-60,000 inhabitants; Paris ~200,000 by 1328 |
+| Institutional innovations in property rights and contract enforcement create credible commitment for capital-intensive investments | Royal/municipal charters grant legal standing; merchant courts (Lex Mercatoria) provide specialized adjudication; written contracts with third-party verification | Multi-generational infrastructure projects (cathedrals, irrigation); inter-temporal contracts spanning years; lending at interest despite usury prohibitions | Champagne Fairs (1180-1320) relied on supra-national enforcement; Italian banking houses (Bardi, Peruzzi) capitalized >100,000 florins; ecclesiastical construction projects spanning 50-200 years |

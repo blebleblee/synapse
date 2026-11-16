@@ -68,51 +68,48 @@ The creative cognitive architecture also includes critical control mechanisms th
 
 Emotional regulation mechanisms modulate arousal and affective state to optimize cognitive performance. Moderate positive affect—what researchers call a "mild positive mood"—consistently enhances creative problem solving by broadening associative networks and increasing cognitive flexibility. Anxiety and stress narrow attention and trigger conservative, risk-averse thinking. Frustration and anger focus attention on obstacles rather than possibilities. Expert practitioners develop emotional awareness and self-regulation skills, recognizing when their affective state impairs creative cognition and applying interventions: taking breaks, changing physical environment, engaging in brief exercise, or using cognitive reappraisal to reframe setbacks as information rather than failures.
 
-```
-CREATIVE COGNITION PROCESSING FLOW
-
-Problem Space
-     ↓
-[Problem Construction & Framing]
-  • Multiple representations
-  • Stakeholder perspectives  
-  • Causal models
-     ↓
-[Divergent Exploration] ←──────┐
-  • Free association           │
-  • Forced combination          │
-  • Analogical mapping          │
-  • Attribute variation         │
-     ↓                          │
-[Convergent Evaluation]         │
-  • Criteria-based filtering   │
-  • Mental simulation          │
-  • Feasibility assessment     │
-     ↓                          │
-Decision Point                  │
-  ├─→ Solution Found → Implement
-  ├─→ Refine Selected → ────────┘
-  └─→ Reframe Problem → [Problem Construction]
-
-Working Memory Workspace:
-┌────────────────────────────────┐
-│ Phonological Loop: verbal     │
-│ Visuospatial Sketchpad: images│
-│ Episodic Buffer: integration  │
-│ Central Executive: control    │
-└────────────────────────────────┘
-        ↕
-Long-Term Memory:
-- Semantic networks
-- Procedural knowledge  
-- Episodic memories
-- Domain expertise
-
-Metacognitive Control:
-→ Monitor progress
-→ Detect impasses
-→ Trigger mode shifts
-→ Regulate emotion
+```mermaid
+flowchart TD
+    Start["Problem Space"]
+    
+    Start --> ProblemConstruct["Problem Construction & Framing<br/>• Multiple representations<br/>• Stakeholder perspectives<br/>• Causal models"]
+    
+    ProblemConstruct --> Divergent["Divergent Exploration<br/>• Free association<br/>• Forced combination<br/>• Analogical mapping<br/>• Attribute variation"]
+    
+    Divergent --> Convergent["Convergent Evaluation<br/>• Criteria-based filtering<br/>• Mental simulation<br/>• Feasibility assessment"]
+    
+    Convergent --> Decision{"Decision Point"}
+    
+    Decision -->|"Solution Found"| Implement["Implement"]
+    Decision -->|"Refine Selected"| Divergent
+    Decision -->|"Reframe Problem"| ProblemConstruct
+    
+    subgraph WorkingMemory ["Working Memory Workspace"]
+        WM1["Phonological Loop: verbal"]
+        WM2["Visuospatial Sketchpad: images"]
+        WM3["Episodic Buffer: integration"]
+        WM4["Central Executive: control"]
+    end
+    
+    subgraph LongTerm ["Long-Term Memory"]
+        LTM1["Semantic networks"]
+        LTM2["Procedural knowledge"]
+        LTM3["Episodic memories"]
+        LTM4["Domain expertise"]
+    end
+    
+    subgraph Metacognitive ["Metacognitive Control"]
+        MC1["Monitor progress"]
+        MC2["Detect impasses"]
+        MC3["Trigger mode shifts"]
+        MC4["Regulate emotion"]
+    end
+    
+    WorkingMemory <--> LongTerm
+    Metacognitive -.-> ProblemConstruct
+    Metacognitive -.-> Divergent
+    Metacognitive -.-> Convergent
+    Metacognitive -.-> Decision
 ```
 
 This architecture reveals creativity not as a unitary faculty but as an orchestrated system of specialized cognitive components. High performance emerges from skilled coordination of these components—knowing when to activate divergent versus convergent processes, how to leverage associative networks effectively, how to manage working memory load, and when to intervene with metacognitive control. These are trainable skills, not fixed traits.

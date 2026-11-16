@@ -34,32 +34,17 @@ The control layer implements corrective interventions based on diagnostic findin
 
 The feedback loop architecture connects these layers into a self-correcting system:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     CONTROL LAYER                            │
-│  (Intervention Selection & Strategic Adjustment)             │
-└───────────────────────────┬─────────────────────────────────┘
-                            │ Corrective Actions
-                            ↓
-┌─────────────────────────────────────────────────────────────┐
-│                   EXECUTION LAYER                            │
-│  (Active Problem-Solving: Analysis, Inference, Construction) │
-└───────────────────────────┬─────────────────────────────────┘
-                            │ Activity Signals
-                            ↓
-┌─────────────────────────────────────────────────────────────┐
-│                  MONITORING LAYER                            │
-│  (Progress Tracking, Consistency Checking, Anomaly Detection)│
-└───────────────────────────┬─────────────────────────────────┘
-                            │ Error Signals
-                            ↓
-┌─────────────────────────────────────────────────────────────┐
-│                  DIAGNOSTIC LAYER                            │
-│  (Fault Localization, Error Classification, Root-Cause ID)   │
-└───────────────────────────┬─────────────────────────────────┘
-                            │ Diagnostic Models
-                            │
-                            └─────────────→ CONTROL LAYER
+```mermaid
+flowchart TD
+    Control["<b>CONTROL LAYER</b><br/>(Intervention Selection &<br/>Strategic Adjustment)"]
+    Execution["<b>EXECUTION LAYER</b><br/>(Active Problem-Solving:<br/>Analysis, Inference, Construction)"]
+    Monitoring["<b>MONITORING LAYER</b><br/>(Progress Tracking, Consistency Checking,<br/>Anomaly Detection)"]
+    Diagnostic["<b>DIAGNOSTIC LAYER</b><br/>(Fault Localization, Error Classification,<br/>Root-Cause ID)"]
+    
+    Control -->|"Corrective Actions"| Execution
+    Execution -->|"Activity Signals"| Monitoring
+    Monitoring -->|"Error Signals"| Diagnostic
+    Diagnostic -->|"Diagnostic Models"| Control
 ```
 
 This architecture implements a classic control-theory feedback loop where sensor data drives actuator responses to minimize error between desired and actual system states. The key distinction from simple thermostatic control is that problem-solving feedback loops must adapt not only execution parameters but also goals, strategies, and even the problem definition itself when monitoring reveals fundamental mismatches between the problem-as-understood and problem-as-actually-constituted.

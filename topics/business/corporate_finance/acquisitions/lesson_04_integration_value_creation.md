@@ -30,33 +30,44 @@ Cost synergy realization follows a characteristic sequencing pattern driven by i
 
 The detailed mechanics of procurement synergy capture illustrate the granular execution required for successful realization. The combined enterprise must first consolidate spend data across disparate ERP systems to identify overlapping suppliers and category spend concentrations. Procurement teams then approach strategic suppliers with enhanced volume commitments to negotiate stepped discount tiers, rebate thresholds, and payment term extensions. The negotiation leverage depends critically on switching cost assessment, supplier margin structure understanding, and credible alternative sourcing options. Realized savings flow through cost of goods sold or operating expense line items depending on spend category, with timing dependent on contract renewal dates and minimum purchase commitment fulfillment.
 
-```
-Procurement Synergy Waterfall Analysis
-
-Combined Annual Spend: $850M
-├─ Category A (Direct Materials): $420M
-│  ├─ Overlapping Suppliers: 12 vendors representing $180M spend
-│  ├─ Volume Rebate Tier Improvement: 3.2% incremental discount
-│  ├─ Gross Annual Savings: $5.76M
-│  ├─ Implementation Cost (RFP, qualification): $0.45M
-│  └─ Net Year 1 Savings: $5.31M (realizes Month 4-12)
-│
-├─ Category B (IT & Telecom): $95M
-│  ├─ Duplicate Software Licenses: $12M redundant spend
-│  ├─ Vendor Consolidation: 8 vendors → 3 vendors
-│  ├─ Gross Annual Savings: $8.4M (70% elimination)
-│  ├─ Implementation Cost (migration, training): $1.2M
-│  └─ Net Year 1 Savings: $6.3M (realizes Month 2-8)
-│
-└─ Category C (Professional Services): $140M
-   ├─ Master Service Agreement Consolidation: $45M addressable
-   ├─ Rate Reduction Through Volume Commitment: 12% average
-   ├─ Gross Annual Savings: $5.4M
-   ├─ Implementation Cost (legal, transition): $0.3M
-   └─ Net Year 1 Savings: $3.8M (realizes Month 6-12)
-
-Total Procurement Synergy: $15.41M Net Year 1
-Annual Run-Rate (Year 2+): $19.46M
+```mermaid
+flowchart TD
+    Root["Procurement Synergy Waterfall Analysis<br/>Combined Annual Spend: $850M"]
+    
+    Root --> CatA["Category A (Direct Materials): $420M"]
+    Root --> CatB["Category B (IT & Telecom): $95M"]
+    Root --> CatC["Category C (Professional Services): $140M"]
+    
+    CatA --> A1["Overlapping Suppliers:<br/>12 vendors representing $180M spend"]
+    CatA --> A2["Volume Rebate Tier Improvement:<br/>3.2% incremental discount"]
+    CatA --> A3["Gross Annual Savings: $5.76M"]
+    CatA --> A4["Implementation Cost<br/>(RFP, qualification): $0.45M"]
+    CatA --> A5["Net Year 1 Savings: $5.31M<br/>(realizes Month 4-12)"]
+    
+    CatB --> B1["Duplicate Software Licenses:<br/>$12M redundant spend"]
+    CatB --> B2["Vendor Consolidation:<br/>8 vendors → 3 vendors"]
+    CatB --> B3["Gross Annual Savings: $8.4M<br/>(70% elimination)"]
+    CatB --> B4["Implementation Cost<br/>(migration, training): $1.2M"]
+    CatB --> B5["Net Year 1 Savings: $6.3M<br/>(realizes Month 2-8)"]
+    
+    CatC --> C1["Master Service Agreement Consolidation:<br/>$45M addressable"]
+    CatC --> C2["Rate Reduction Through Volume Commitment:<br/>12% average"]
+    CatC --> C3["Gross Annual Savings: $5.4M"]
+    CatC --> C4["Implementation Cost<br/>(legal, transition): $0.3M"]
+    CatC --> C5["Net Year 1 Savings: $3.8M<br/>(realizes Month 6-12)"]
+    
+    A5 --> Total["Total Procurement Synergy:<br/>$15.41M Net Year 1"]
+    B5 --> Total
+    C5 --> Total
+    
+    Total --> RunRate["Annual Run-Rate (Year 2+):<br/>$19.46M"]
+    
+    style Root fill:#e1f5ff,stroke:#0066cc,stroke-width:3px
+    style CatA fill:#fff4e6,stroke:#ff9800,stroke-width:2px
+    style CatB fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
+    style CatC fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    style Total fill:#fff9c4,stroke:#fbc02d,stroke-width:3px
+    style RunRate fill:#c8e6c9,stroke:#2e7d32,stroke-width:3px
 ```
 
 Revenue synergy realization requires fundamentally different operational mechanics than cost extraction because it depends on customer adoption decisions outside direct managerial control. The acquiring company must train the target's sales force on its product portfolio, integrate CRM systems to enable cross-sell opportunity identification, develop bundled pricing and packaging, and create incentive compensation structures that reward cross-product attachment without cannibalizing existing revenue streams. The confidence interval on revenue synergies remains perpetually lower than cost synergies because customer purchasing decisions respond to competitive dynamics, economic conditions, and relationship factors that transcend simple product availability.

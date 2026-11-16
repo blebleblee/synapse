@@ -36,18 +36,23 @@ Design rule derivation from electrical requirements transforms abstract signal i
 
 For a 1oz copper trace over FR-4 with dielectric constant εᵣ = 4.3 and dielectric height h = 10 mils to the reference plane, a trace width w of approximately 12 mils yields single-ended impedance Z₀ near 50 ohms. The differential pair spacing s required for 90-ohm differential impedance can be estimated from the coupled microstrip equations. The odd-mode impedance of the pair must satisfy Z₀_odd = Z_diff / 2 = 45 ohms. Empirical formulas relate the odd-mode impedance to the even-mode impedance through the coupling coefficient, which depends on the ratio s/h. For tight coupling where s ≈ h, the odd-mode impedance drops significantly below the isolated trace impedance, requiring narrower traces to compensate. A typical design might use 6-mil traces spaced 6 mils apart, producing differential impedance near 90 ohms.
 
-```
-Differential Pair Cross-Section (microstrip over plane):
+```mermaid
+flowchart TD
+    DP["D+ trace\n1 oz copper · 1.4 mil thick"]
+    DM["D− trace\n1 oz copper · 1.4 mil thick"]
+    GAP["← 6 mil edge-to-edge spacing →\nZ_diff ≈ 90 Ω ± 10%"]
+    SUB["FR-4 dielectric\nεᵣ = 4.3 · 10 mil thick"]
+    GND["Ground plane — Layer 2\n1 oz copper · 1.4 mil thick"]
 
-        ┌──────┐ 6 mil    ┌──────┐
-        │  D+  │          │  D-  │    ← 1 oz copper, 1.4 mil thick
-        └──────┘          └──────┘
-           ↕ 6 mil gap
-    ════════════════════════════════  ← FR-4, εᵣ = 4.3
-                 ↕ 10 mil
-    ════════════════════════════════  ← Ground plane (layer 2)
+    subgraph traces ["Signal Layer — Layer 1"]
+        direction LR
+        DP
+        DM
+    end
 
-Z_diff ≈ 90Ω ± 10%
+    traces --> GAP
+    GAP --> SUB
+    SUB --> GND
 ```
 
 The layout tool must enforce these dimensional constraints through design rules: minimum trace width of 6 mils for USB signals, maximum trace width of 6 mils to prevent impedance droop, and differential pair spacing of 6 mils maintained over the entire routed length. Any violation—a widened trace at a via antipad, a gap in the reference plane that breaks the return current path, or a spacing violation where the pair diverges—creates an impedance discontinuity that reflects signal energy and degrades eye diagram margins.
@@ -56,19 +61,41 @@ Reference plane management forms the foundation of signal integrity in multilaye
 
 The solution requires strategic via placement: a ground via placed immediately adjacent to the signal via provides a low-inductance path for return current to transition between reference planes. For a differential pair transitioning between layers, two ground vias—one on each side of the signal via pair—maintain symmetry and minimize common-mode radiation. The geometric arrangement matters: ground vias placed more than 30 mils from the signal via allow the return current loop to expand, increasing parasitic inductance and radiated emissions.
 
-```
-Signal Layer Transition with Return Path:
-
-Top View:                       Cross-Section:
-                                
-    D+ ──●──                    Layer 1 (signal):  ──●── (D+)
-         │                                           │
-    ●────●────●                 Layer 2 (GND):    ═══●═══ (GND via)
-    │         │                                      │
-    D- ──●──                    Layer 3 (signal):  ──●── (D+)
-                                
-    ● Signal via                Signal via must have adjacent GND via
-    ● Ground via                to provide return current transition path
+```mermaid
+flowchart TD
+    subgraph top ["Top View"]
+        DP1["D+ Signal"]
+        DM1["D- Signal"]
+        VIA1["Signal Via"]
+        VIA2["Signal Via"]
+        VIA3["Ground Via"]
+        VIA4["Ground Via"]
+        VIA5["Ground Via"]
+        
+        DP1 -->|connection| VIA1
+        DM1 -->|connection| VIA2
+        VIA1 --> VIA3
+        VIA2 --> VIA4
+        VIA3 -.->|adjacent| VIA5
+        VIA4 -.->|adjacent| VIA5
+    end
+    
+    subgraph cross ["Cross-Section View"]
+        L1["Layer 1 - Signal: D+"]
+        L2["Layer 2 - Ground: GND Via"]
+        L3["Layer 3 - Signal: D+"]
+        
+        L1 -->|"via transition"| L2
+        L2 -->|"via transition"| L3
+    end
+    
+    subgraph rules ["Design Rules"]
+        RULE1["✓ Signal via must have<br/>adjacent GND via"]
+        RULE2["✓ Provides return current<br/>transition path"]
+    end
+    
+    top --> cross
+    cross --> rules
 ```
 
 Component placement in the layout phase determines parasitic paths that govern circuit behavior. Decoupling capacitors must be placed physically close to the power pins they protect, with the total loop inductance—from the IC power pin through the capacitor and back to the IC ground pin—minimized to reduce the impedance peak at resonance. For a microcontroller operating at 100 megahertz with clock harmonics extending beyond one gigahertz, the decoupling network must present low impedance across this entire frequency range. A typical implementation uses multiple capacitor values in parallel: a 10μF bulk capacitor for low-frequency supply transients, a 100nF ceramic capacitor with self-resonant frequency near 10 megahertz, and a 10nF ceramic capacitor with self-resonant frequency near 100 megahertz. The parallel combination provides overlapping impedance nulls across the required bandwidth.

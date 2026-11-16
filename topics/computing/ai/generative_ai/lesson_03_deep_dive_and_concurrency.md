@@ -81,7 +81,7 @@ Naïve KV-cache implementations pre-allocate a contiguous memory block sized for
 2. **Copy-on-write prefix sharing**: sequences that share a common prompt prefix (e.g., system prompts in chat applications) can share physical KV blocks, reducing redundant storage.
 3. **Dynamic memory management**: blocks are allocated/freed as sequences grow and terminate.
 
-The result is near-zero internal fragmentation (typically <4%) versus 60–80% waste in max-length pre-allocation schemes.
+The result is near-zero internal fragmentation (typically < 4%) versus 60–80% waste in max-length pre-allocation schemes.
 
 ```python
 # Simplified PagedAttention block table concept
@@ -220,7 +220,7 @@ print(f"Per-channel MSE: {err_channel:.6f}")
 |--------|------|-----------|--------------------------------------|
 | FP16 | 16 | Native | 0 (baseline) |
 | BF16 | 16 | Native (wider exponent range) | ≈0 |
-| GPTQ INT8 | 8 | Second-order weight compensation | <0.1 PPL |
+| GPTQ INT8 | 8 | Second-order weight compensation | < 0.1 PPL |
 | GPTQ INT4 | 4 | Second-order weight compensation | 0.2–0.5 PPL |
 | AWQ INT4 | 4 | Activation-aware channel scaling | 0.1–0.3 PPL |
 | GGUF Q4_K_M | ~4.5 | Mixed k-quants (llama.cpp) | 0.2–0.4 PPL |

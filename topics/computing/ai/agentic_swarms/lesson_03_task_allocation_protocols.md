@@ -28,20 +28,26 @@ Task allocation protocols for agentic swarms fall into three architectural famil
 
 In a hierarchical topology, an orchestrator agent holds the global task graph, maintains the agent registry, and issues allocation decisions as directives. Sub-orchestrators may manage sub-domains, creating a tree of decision authority. The orchestrator receives task completion signals and re-plans continuously.
 
-```
-┌───────────────────────────────────────────────────────┐
-│                  Root Orchestrator                    │
-│  [Task Graph] → [Planner] → [Allocator] → [Monitor]   │
-└──────────┬────────────────────────┬───────────────────┘
-           │                        │
-   ┌───────▼───────┐        ┌───────▼───────┐
-   │ Sub-Orch A    │        │ Sub-Orch B    │
-   │ (NLP Domain)  │        │ (Code Domain) │
-   └──┬────────┬───┘        └──┬────────┬───┘
-      │        │               │        │
-  ┌───▼──┐ ┌───▼──┐        ┌───▼──┐ ┌───▼──┐
-  │Ag-1  │ │Ag-2  │        │Ag-3  │ │Ag-4  │
-  └──────┘ └──────┘        └──────┘ └──────┘
+```mermaid
+flowchart TD
+    Root["Root Orchestrator<br/>[Task Graph] → [Planner] → [Allocator] → [Monitor]"]
+    
+    SubA["Sub-Orch A<br/>(NLP Domain)"]
+    SubB["Sub-Orch B<br/>(Code Domain)"]
+    
+    Ag1["Ag-1"]
+    Ag2["Ag-2"]
+    Ag3["Ag-3"]
+    Ag4["Ag-4"]
+    
+    Root --> SubA
+    Root --> SubB
+    
+    SubA --> Ag1
+    SubA --> Ag2
+    
+    SubB --> Ag3
+    SubB --> Ag4
 ```
 
 The critical data structure underpinning this model is the **task graph** — a directed acyclic graph (DAG) where nodes are tasks and edges encode dependencies. Each node carries a task descriptor that specifies the required capability profile, estimated compute cost, priority weight, deadline (if bounded), and input/output schemas. The allocator traverses this DAG in topological order, resolving tasks whose dependencies are already satisfied and whose required capability is available in the agent registry.
@@ -250,26 +256,30 @@ The hierarchical model's strength — global visibility — is also its weakness
 
 In CNP, a manager agent (which may itself be an executor on other tasks) broadcasts a **call for proposals (CFP)** announcement when it has a task requiring allocation. Agents that receive the CFP and possess the required capability evaluate their own current load and willingness to accept, then respond with a **bid** encoding their estimated execution cost and latency. The manager collects bids within a time window, selects the winning bid using a scoring function, issues an **award** to the winning agent, and sends **reject** notifications to others. The winning agent confirms acceptance and executes.
 
-```
-Manager                 Agent-1              Agent-2              Agent-3
-   │                      │                    │                    │
-   │── CFP(task_id) ──────►│                    │                    │
-   │── CFP(task_id) ───────────────────────────►│                    │
-   │── CFP(task_id) ────────────────────────────────────────────────►│
-   │                      │                    │                    │
-   │◄── BID(cost=0.3) ────│                    │                    │
-   │◄── BID(cost=0.6) ─────────────────────────│                    │
-   │                      │               [no capability:           │
-   │                      │                silent drop]             │
-   │                      │                    │                    │
-   │── AWARD(agent-1) ───►│                    │                    │
-   │── REJECT(agent-2) ──────────────────────► │                    │
-   │                      │                    │                    │
-   │◄── CONFIRM ──────────│                    │                    │
-   │                      │                    │                    │
-   │                   [execute]               │                    │
-   │                      │                    │                    │
-   │◄── RESULT ───────────│                    │                    │
+```mermaid
+flowchart TD
+    Manager["Manager"]
+    A1["Agent-1"]
+    A2["Agent-2"]
+    A3["Agent-3"]
+    SilentDrop(["no capability: silent drop"])
+    Execute(["execute"])
+
+    Manager -->|"CFP(task_id)"| A1
+    Manager -->|"CFP(task_id)"| A2
+    Manager -->|"CFP(task_id)"| A3
+
+    A1 -->|"BID(cost=0.3)"| Manager
+    A2 -->|"BID(cost=0.6)"| Manager
+    A3 --> SilentDrop
+
+    Manager -->|"AWARD(agent-1)"| A1
+    Manager -->|"REJECT(agent-2)"| A2
+
+    A1 -->|"CONFIRM"| Manager
+
+    A1 --> Execute
+    Execute -->|"RESULT"| Manager
 ```
 
 The CNP is elegant but introduces several failure modes that a naive implementation will discover under production load. The bidding window creates a hard latency floor: the manager must wait for the window to close before awarding, which adds hundreds of milliseconds to allocation latency even when the winning agent responds immediately. Adaptive window sizing — contracting the window when bids arrive from all reachable capable agents, extending it when only partial coverage is received — mitigates this at the cost of implementation complexity. Additionally, the manager itself is an availability dependency; if it crashes after issuing CFPs but before collecting bids, the task is orphaned. A robust CNP implementation therefore requires the manager to persist the task state to durable storage before broadcasting, enabling recovery by a replacement manager.

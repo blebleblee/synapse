@@ -366,7 +366,7 @@ def generate_hypothetical_document(query: str, model: str = "gpt-4o-mini") -> st
 
 Bi-encoder retrieval (embedding model + ANN search) is fast but approximate. The query and document are encoded independently; their interaction is captured only by a simple dot product or cosine similarity. **Cross-encoders** process the query and document *together* as a single input, allowing the transformer's attention mechanism to model fine-grained query-document interactions. This produces significantly better relevance scores but is too slow to run against millions of documents — hence the two-stage pipeline:
 
-1. **Stage 1 — Recall**: ANN retrieval with bi-encoder. Retrieve `k=50–100` candidates in <10ms.
+1. **Stage 1 — Recall**: ANN retrieval with bi-encoder. Retrieve `k=50–100` candidates in < 10ms.
 2. **Stage 2 — Precision**: Cross-encoder reranking of the 50–100 candidates. Select top `k'=5–10` for the prompt.
 
 ```python
@@ -521,7 +521,7 @@ async def embed_batched(
     return all_embeddings
 ```
 
-**Quantization for vector storage**: 32-bit float vectors consume 4 bytes per dimension. For 1 million documents at 1536 dimensions, that is ~5.8 GB for the vectors alone, before the ANN graph structure. int8 scalar quantization (available in Faiss and pgvector) reduces this to ~1.5 GB with <1% recall loss on most benchmarks. Binary quantization reduces it further to ~0.18 GB but with more significant recall loss (~5–15%), requiring larger `ef_search` to compensate.
+**Quantization for vector storage**: 32-bit float vectors consume 4 bytes per dimension. For 1 million documents at 1536 dimensions, that is ~5.8 GB for the vectors alone, before the ANN graph structure. int8 scalar quantization (available in Faiss and pgvector) reduces this to ~1.5 GB with < 1% recall loss on most benchmarks. Binary quantization reduces it further to ~0.18 GB but with more significant recall loss (~5–15%), requiring larger `ef_search` to compensate.
 
 ### 3.2 Retrieval Quality Optimizations
 

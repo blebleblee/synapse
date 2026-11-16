@@ -922,3 +922,4 @@ kind delete cluster --name distributed-systems
 
 # Remove downloaded tools (optional)
 sudo rm /usr/local/bin/{kubectl,etcdctl,crictl,helm,kind}
+```

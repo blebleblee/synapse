@@ -106,26 +106,39 @@ A skilled rider manages this by beginning throttle application before the apex�
 
 The throttle progression itself must be carefully calibrated to the available rear grip. Modern sport motorcycles generate enormous torque at the rear wheel; a 1000cc superbike can produce over 180 Nm at the crank, and even after drivetrain losses, that translates into rear-wheel torque capable of far exceeding the contact patch's traction limit at any lean angle above roughly 15°. The progression follows a recognizable pattern at the elite level: an initial "crack"—perhaps 5–10% throttle opening—that loads the rear suspension and settles the chassis, followed by a smooth, continuous ramp toward full throttle as the lean angle decreases and the contact patch's available longitudinal grip increases with the improving vertical orientation of the resultant force vector.
 
-```
-Throttle-Lean Coordination: Corner Exit Force Budget
-
-   LEAN ANGLE (°)
-   50 |●
-   45 |  ●
-   40 |    ●
-   35 |      ●
-   30 |        ●─────────────────── THROTTLE APPLICATION WINDOW
-   25 |          ●  
-   20 |            ●               ← "Crack" point: 5-10% throttle
-   15 |              ●●●           ← Ramp phase: 10-70% throttle  
-   10 |                 ●●●●       ← Full power zone: lean < 10°
-    5 |                     ●●●●●
-    0 |                          ●●●── FULL THROTTLE (upright)
-      |──────────────────────────────► THROTTLE (% open)
-         0   10   20   40   60  80 100
-
-Combined friction limit: √(Fy² + Fx²) ≤ μ·Fz
-As lean decreases, Fy demand falls → Fx budget increases.
+```mermaid
+flowchart TD
+    title["Throttle-Lean Coordination: Corner Exit Force Budget"]
+    
+    subgraph physics["Physics Constraint"]
+        friction["Combined friction limit:<br/>√(Fy² + Fx²) ≤ μ·Fz"]
+        principle["As lean decreases → Fy demand falls → Fx budget increases"]
+    end
+    
+    subgraph zones["Operating Zones"]
+        zone1["LEAN ANGLE: 50°-30°<br/>THROTTLE APPLICATION WINDOW<br/>Preparing for acceleration"]
+        zone2["LEAN ANGLE: 30°-20°<br/>CRACK POINT<br/>5-10% throttle<br/>Initial power delivery"]
+        zone3["LEAN ANGLE: 20°-10°<br/>RAMP PHASE<br/>10-70% throttle<br/>Progressive acceleration"]
+        zone4["LEAN ANGLE: 10°-5°<br/>FULL POWER ZONE<br/>70-100% throttle<br/>Lean < 10°"]
+        zone5["LEAN ANGLE: 0°<br/>FULL THROTTLE<br/>100% throttle (upright)<br/>Maximum longitudinal force"]
+    end
+    
+    subgraph chart["Force Budget Relationship"]
+        axis["Vertical: Lean Angle (°) 0-50<br/>Horizontal: Throttle (% open) 0-100"]
+        curve["Inverse relationship curve:<br/>High lean → Low throttle available<br/>Low lean → High throttle available"]
+    end
+    
+    title --> physics
+    physics --> zones
+    zones --> chart
+    
+    zone1 --> zone2
+    zone2 --> zone3
+    zone3 --> zone4
+    zone4 --> zone5
+    
+    friction --> principle
+    axis --> curve
 ```
 
 ### Chain Torque, Squat, and Anti-Squat Mechanics

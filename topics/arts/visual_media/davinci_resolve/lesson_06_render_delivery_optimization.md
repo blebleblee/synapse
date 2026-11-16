@@ -20,32 +20,34 @@ The source decode stage reads compressed media from disk, decompresses frames in
 
 The processing graph traversal stage walks the node tree for every active clip in the timeline, executing transform operations in dependency order. Fusion compositions containing tracker data, particle systems, or 3D camera solves require serialized execution because each frame depends on state accumulated across previous frames. Color grading nodes execute as GPU shader passes when possible, compiling the entire node graph into a single unified shader program to minimize memory roundtrips, but plugins lacking GPU acceleration force expensive GPU-to-CPU memory transfers and CPU scalar processing before uploading results back to GPU memory. Temporal effects like optical flow retiming and motion blur require the render engine to decode and hold multiple adjacent frames simultaneously, scaling memory consumption proportional to the temporal window radius.
 
-```
-Render Pipeline Data Flow:
-
-[Source Media File]
-       ↓
-   DECODE STAGE
-   (Codec-specific: H.264 GOP, ProRes frame)
-       ↓
-[Uncompressed Frame Buffer: RGB/YUV 10-bit]
-       ↓
-   PROCESSING GRAPH TRAVERSAL
-   ├─ Transform Nodes (resize, crop, stabilize)
-   ├─ Fusion Compositions (multi-frame state)
-   ├─ Color Grade Nodes (LUT, curves, qualifiers)
-   └─ Temporal Effects (motion blur, optical flow)
-       ↓
-   COLOR TRANSFORM & OUTPUT SIZING
-   (Timeline color space → Delivery color space)
-   (4K → 1080p downscale, aspect ratio crop)
-       ↓
-[Encoded Frame: codec-specific compressed format]
-       ↓
-   CONTAINER MULTIPLEXING
-   (Video + Audio + Subtitle streams → MP4/MOV/MXF)
-       ↓
-[Final Deliverable File]
+```mermaid
+flowchart TD
+    A["Source Media File"]
+    B["DECODE STAGE<br/>(Codec-specific: H.264 GOP, ProRes frame)"]
+    C["Uncompressed Frame Buffer<br/>RGB/YUV 10-bit"]
+    
+    subgraph processing ["PROCESSING GRAPH TRAVERSAL"]
+        D1["Transform Nodes<br/>(resize, crop, stabilize)"]
+        D2["Fusion Compositions<br/>(multi-frame state)"]
+        D3["Color Grade Nodes<br/>(LUT, curves, qualifiers)"]
+        D4["Temporal Effects<br/>(motion blur, optical flow)"]
+    end
+    
+    E["COLOR TRANSFORM & OUTPUT SIZING<br/>(Timeline color space → Delivery color space)<br/>(4K → 1080p downscale, aspect ratio crop)"]
+    F["Encoded Frame<br/>(codec-specific compressed format)"]
+    G["CONTAINER MULTIPLEXING<br/>(Video + Audio + Subtitle streams → MP4/MOV/MXF)"]
+    H["Final Deliverable File"]
+    
+    A --> B
+    B --> C
+    C --> processing
+    D1 --> D2
+    D2 --> D3
+    D3 --> D4
+    D4 --> E
+    E --> F
+    F --> G
+    G --> H
 ```
 
 The color transform and output sizing stage performs the critical conversion from timeline working color space to delivery color space. If your timeline operates in DaVinci Wide Gamut intermediate with log gamma and your delivery target specifies Rec.709 with standard gamma, this stage applies the 3D LUT or matrix transform converting wide gamut primaries into the smaller Rec.709 triangle, clipping or compressing out-of-gamut colors, and applying the inverse log-to-linear-to-gamma curve to restore contrast for display. Output sizing applies resize algorithms (Lanczos, bicubic, bilinear) when the delivery resolution differs from timeline resolution, and letterboxing or pillarboxing when aspect ratios mismatch. These operations execute as GPU shader passes for standard transforms but may fall back to CPU for exotic color science requiring high-precision floating-point calculations.

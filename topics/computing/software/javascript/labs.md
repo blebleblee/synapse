@@ -265,7 +265,7 @@ The `perf stat -e` flag specifies hardware events to monitor: `cycles` and `inst
       4,567,890,123      L1-dcache-load-misses     #   25.0% of all L1 loads
 ```
 
-The cache-miss rate of 38% and L1 miss rate of 25% indicate severe cache thrashing during the random access phase. For comparison, sequential access typically achieves <5% cache-miss rates due to hardware prefetching and spatial locality.
+The cache-miss rate of 38% and L1 miss rate of 25% indicate severe cache thrashing during the random access phase. For comparison, sequential access typically achieves < 5% cache-miss rates due to hardware prefetching and spatial locality.
 
 To attribute cache misses to specific JavaScript functions, record a `perf.data` profile and generate a flame graph. Install FlameGraph scripts from Brendan Gregg's repository:
 

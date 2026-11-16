@@ -28,21 +28,47 @@ The physics of laser-material interaction depends critically on whether the proc
 
 Mechanical shearing machines manifest in three primary architectures, each optimized for distinct operational envelopes. The guillotine shear employs a straight blade that descends vertically through the full width of the workpiece in a single stroke, inducing a progressive shear front that travels from one edge to the other. The blade mounting angle—known as rake or shear angle—typically ranges from 0.5 to 2.5 degrees, creating a gradual engagement that distributes cutting forces over time rather than requiring simultaneous shearing of the entire cut line. This temporal distribution reduces peak tonnage requirements and minimizes frame deflection, but introduces a slight angular deviation in the cut edge that must be accounted for in precision work.
 
-```
-Guillotine Shear Force Progression (side view):
+```mermaid
+flowchart LR
+    subgraph phase1 ["Initial Contact"]
+        direction TB
+        UB1["Upper Blade\n(rake angle)"]
+        WP1["── Workpiece ──"]
+        LB1["Lower Blade"]
+        F1["⬇ Force"]
+        F1 --> UB1
+        UB1 --> WP1
+        WP1 --> LB1
+    end
 
-Initial Contact          Mid-Stroke              Full Penetration
-    ↓                       ↓↓                      ↓↓↓
-════╱                   ══╱══                    ╱════
-   ║  ←blade rake      ║  ║                   ║  ║  ║
-───╫───────────       ─╫──╫─────────        ──╫──╫──╫────
-   ║ workpiece         ║  ║ fracture         ║  ║  ║
-   ║                   ║  X zones            ║  X  X
-   ║                   ║  ║ meet             ║  ║  ║
-═══╩═══════════       ═╩══╩═════════        ═╩══╩══╩════
-  lower blade        lower blade          lower blade
+    subgraph phase2 ["Mid-Stroke"]
+        direction TB
+        UB2["Upper Blade\n(penetrating)"]
+        WP2["── Workpiece ──"]
+        FZ2["✕ Fracture\nZones Forming"]
+        LB2["Lower Blade"]
+        F2["⬇⬇ Force"]
+        F2 --> UB2
+        UB2 --> WP2
+        WP2 --> FZ2
+        FZ2 --> LB2
+    end
 
-Shear force concentrated at contact point, progressing left→right
+    subgraph phase3 ["Full Penetration"]
+        direction TB
+        UB3["Upper Blade\n(full depth)"]
+        WP3["── Workpiece ──"]
+        FZ3["✕ Fracture Zones\nMeet — Separation"]
+        LB3["Lower Blade"]
+        F3["⬇⬇⬇ Force"]
+        F3 --> UB3
+        UB3 --> WP3
+        WP3 --> FZ3
+        FZ3 --> LB3
+    end
+
+    phase1 -->|"Shear progresses\nleft → right"| phase2
+    phase2 -->|"Crack propagation\ncomplete"| phase3
 ```
 
 The swing beam shear pivots the upper blade through an arc rather than translating it vertically, producing a rocking cut that naturally incorporates shear angle without requiring blade skew. This architecture proves particularly advantageous for heavy-gauge materials where the mechanical advantage gained through the lever arm geometry reduces required hydraulic tonnage. However, the circular blade path introduces a variable clearance across the material thickness, with tighter clearance at the pivot-side edge and gradually increasing clearance toward the free end. Skilled operators compensate by positioning the workpiece such that the critical edge requiring highest quality aligns with the optimal clearance zone approximately one-third of the blade length from the pivot point.
@@ -72,31 +98,33 @@ Plasma cutting system architecture centers on three interdependent subsystems: t
 
 High-definition plasma refines this architecture through several critical enhancements. The electrode features a sintered tungsten-hafnium insert that withstands the extreme thermal cycling and oxidation occurring at current densities exceeding 20,000 amperes per square inch. The nozzle incorporates a precisely machined orifice as small as 0.050 inches in diameter, constricting the plasma column to increase energy density while reducing kerf width. A secondary shield gas flowing through outer orifice ports surrounds the plasma jet with an inert or oxidizing envelope that protects the molten cut edge from atmospheric contamination and assists with dross removal.
 
-```
-High-Definition Plasma Torch Cross-Section:
-
-              ┌─── Electrode (-)
-              │    Hf insert
-    Shield ═══╪═══╗
-     Gas      │   ║
-    ──────→ ┌─┴─┐ ║
-            │   │ ║  Plasma gas
-    Shield  │ ● │ ╟──────────→
-    cup     │   │ ║
-            │ ║ │ ║
-            │ ║ │ ║  ← Nozzle (+)
-            │ ║ │ ║     constricting
-            │ ║ │ ║     orifice
-            └─╨─┘ ║
-              ║   ║
-            Plasma║ 
-            column║ 
-              ║   ║  ← Shield gas
-              ║═══╝     envelope
-              ║
-              ↓ 40,000°F
-         ═══════════
-          Workpiece
+```mermaid
+flowchart TD
+    Electrode["Electrode (-)<br/>Hf insert"]
+    ShieldGasIn["Shield Gas"] -->|input| ShieldCup
+    ShieldCup["Shield Cup"]
+    PlasmaGasIn["Plasma gas"] -->|input| PlasmaChamber
+    
+    subgraph TorchHead["Torch Head Assembly"]
+        Electrode
+        ShieldCup
+        PlasmaChamber["Plasma Chamber"]
+        Nozzle["Nozzle (+)<br/>constricting orifice"]
+    end
+    
+    Electrode --> PlasmaChamber
+    ShieldCup --> Nozzle
+    PlasmaChamber --> PlasmaColumn
+    
+    PlasmaColumn["Plasma Column<br/>40,000°F"]
+    ShieldGas["Shield Gas Envelope"]
+    
+    Nozzle --> PlasmaColumn
+    Nozzle -.->|surrounds| ShieldGas
+    ShieldGas -.->|envelops| PlasmaColumn
+    
+    PlasmaColumn --> Workpiece["Workpiece"]
+    ShieldGas --> Workpiece
 ```
 
 The standoff distance between nozzle face and workpiece critically affects cut quality through its influence on plasma column stability and energy dissipation. Excessive standoff allows the plasma jet to diverge and interact with atmospheric oxygen, widening the kerf and increasing top edge bevel. Insufficient standoff causes molten spatter to adhere to the nozzle face, rapidly degrading the orifice and destabilizing the arc. Capacitive height control systems maintain optimal standoff—typically 0.060 to 0.150 inches depending on amperage and material thickness—by measuring electrical capacitance between torch and workpiece, servo-controlling the Z-axis to compensate for material warpage and table irregularities.

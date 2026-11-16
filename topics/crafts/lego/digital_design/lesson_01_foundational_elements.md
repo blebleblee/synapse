@@ -47,22 +47,30 @@ The 5:2 ratio generalizes to a family of useful equivalences. Two bricks (19.2mm
 
 Beyond the orthogonal grid, the LEGO system supports a limited set of angular constructions through Pythagorean triples. The 3-4-5 triangle — three studs, four studs, five studs along orthogonal axes — produces a right triangle whose hypotenuse spans exactly five studs. When three beams of lengths 3, 4, and 5 (measured in stud pitches) are pinned together at their endpoints, the assembly is geometrically rigid: the triangle cannot deform without stretching or compressing the beams. This is the basis of cross-triangulation, the structural technique that transforms a floppy pin-connected framework into a load-bearing truss. The 5-12-13 triple works identically at a larger scale. These triples are exact — they produce zero angular error — because they are integer solutions to the Pythagorean theorem, and the 8mm stud pitch ensures that the physical beam lengths correspond to integer multiples of the lattice spacing.
 
-```
-Pythagorean Triangulation in Technic Liftarms
+```mermaid
+flowchart TD
+    subgraph triangle ["Pythagorean Triangulation in Technic Liftarms"]
+        subgraph scale ["3-4-5 Triple — Centerline Dimensions: 21.2mm : 28.3mm : 35.4mm"]
+            B["B\n(Pin Hole)"]
+            C["C\n(Pin Hole)"]
+            A["A\n(Pin Hole)"]
+            D["D\n(No pin — square only)"]
 
-   3-4-5 Triple (21.2mm : 28.3mm : 35.4mm measured centerline)
+            B -- "3 — vertical\n24mm liftarm" --> A
+            B -- "5 — hypotenuse\n40mm liftarm" --> D
+            A -- "4 — horizontal\n32mm liftarm" --> D
 
-      B ───────────── C
-      │ ╲             │
-      │   ╲ 5 (40mm)  │
-      │ 3   ╲         │
-      │(24mm)  ╲       │
-      A────────────────D
-            4 (32mm)
+            C -- "vertical member" --> D
+            B -- "top horizontal member" --> C
+        end
+    end
 
- Pin holes at A, B, C form rigid triangle.
- No fourth member needed — triangle is inherently stable.
- Contrast with square ABCD: requires diagonal brace.
+    subgraph stability ["Structural Stability"]
+        triangle_note["✔ Triangle ABC — inherently rigid\nNo fourth member required"]
+        square_note["✖ Square ABCD — requires diagonal brace\nWithout it, parallelogram collapse occurs"]
+    end
+
+    triangle --> stability
 ```
 
 Digital design tools implement these geometric relationships through their part libraries and snapping behavior. In Studio, every part is defined by an LDraw-compatible geometry file that specifies stud positions, anti-stud positions, pin holes, axle holes, and connection points as 3D coordinates in the LEGO lattice. When you drag two parts together, the software snaps their nearest compatible connection points to the same lattice coordinate, producing a connection that is dimensionally correct. The software does not, however, verify structural validity. It will not tell you that a 1×2 plate suspended by a single stud at one end will sag under its own weight in a physical build. It will not warn you that a Technic liftarm spanning 15 studs with pins only at the endpoints will flex under load. Structural analysis is the designer's responsibility, and it requires understanding the connection mechanics that the digital toolchain abstracts away.
@@ -75,42 +83,38 @@ Structural integrity in LEGO construction is not a property of individual elemen
 
 The most common structural failure mode in digitally designed models is the unsupported cantilever. A designer places a long plate or beam extending outward from a support, with connections only at the anchored end. In the digital tool, the beam appears perfectly horizontal — the software does not simulate gravity, material flex, or creep. In the physical build, the beam sags, the studs at the anchor point experience rotational leverage that exceeds their clutch force, and the connection fails. The mitigation is straightforward: design with a minimum of two connection points at every structural joint, place connections as far apart as possible to maximize the moment of inertia resisting rotation, and triangulate any span longer than five studs with a diagonal brace pinned at both endpoints. In practice, this means that every load-bearing member in your model should have a defined load path — a continuous chain of connections from the point of applied force to the ground or primary structure — with no link in that chain relying on a single stud or pin.
 
-```
-Failure Modes & Mitigations
-
- MODE 1: Cantilever Sag
- ┌──────────────────────────┐
- │═══════════════════╗      │  ← Unsupported span
- │   Anchor ══════════╝      │     digital: appears flat
- │   ████                   │     physical: sags, fails
- │   ████                   │
- └──────────────────────────┘
- Fix: Add second support + diagonal brace
- ┌──────────────────────────┐
- │═══════════════════╗      │
- │  ╱═════════════════╝      │  ← Triangulated
- │ ╱                        │
- │██    ████                │
- └──────────────────────────┘
-
- MODE 2: Hinge Walk (pin joints)
- ┌──────────────────────────┐
- │  ────╫────╫────╫────      │  ← All friction pins
- │  Rotation accumulates     │     across joints
- │  → structure "walks"      │     under vibration
- └──────────────────────────┘
- Fix: Use pins-with-stop or add
- rigid cross-bracing (triangulation)
-
- MODE 3: Stud Stress Crack
- ┌──────────────────────────┐
- │  ████████████ ← C-clamp  │  ← Compressive
- │  force on tilted element │     load on
- │  → stud base fractures    │     ABS at
- │  → permanent failure     │     root
- └──────────────────────────┘
- Fix: Ensure coplanar contact
- before applying force
+```mermaid
+flowchart TD
+    title["<b>Failure Modes & Mitigations</b>"]
+    
+    subgraph mode1 ["MODE 1: Cantilever Sag"]
+        m1_problem["<b>Problem</b><br/>Unsupported span<br/>• Digital: appears flat<br/>• Physical: sags, fails"]
+        m1_diagram1["╔═══════════════════╗<br/>║ Anchor ══════════╝<br/>║ ████<br/>║ ████<br/>└─ Unsupported end"]
+        m1_fix["<b>Fix</b><br/>Add second support<br/>+ diagonal brace"]
+        m1_diagram2["╔═══════════════════╗<br/>║ ╱═════════════════╝<br/>║╱ (Triangulated)<br/>██ ████<br/>└─ Braced structure"]
+        
+        m1_problem --> m1_diagram1
+        m1_diagram1 --> m1_fix
+        m1_fix --> m1_diagram2
+    end
+    
+    subgraph mode2 ["MODE 2: Hinge Walk (pin joints)"]
+        m2_problem["<b>Problem</b><br/>All friction pins<br/>────╫────╫────╫────<br/>Rotation accumulates<br/>Structure 'walks' under vibration"]
+        m2_fix["<b>Fix</b><br/>Use pins-with-stop<br/>OR add rigid cross-bracing<br/>(triangulation)"]
+        
+        m2_problem --> m2_fix
+    end
+    
+    subgraph mode3 ["MODE 3: Stud Stress Crack"]
+        m3_problem["<b>Problem</b><br/>C-clamp force on tilted element<br/>████████████ ← Compressive<br/>→ Stud base fractures<br/>→ Permanent failure at ABS root"]
+        m3_fix["<b>Fix</b><br/>Ensure coplanar contact<br/>before applying force"]
+        
+        m3_problem --> m3_fix
+    end
+    
+    title --> mode1
+    title --> mode2
+    title --> mode3
 ```
 
 A second failure mode, particularly prevalent in Technic builds, is pin friction walk. When multiple friction pins connect a series of liftarms in a line, each pin permits a small angular rotation due to the 0.1mm clearance between pin and hole. Across a chain of ten pin connections, these small rotations accumulate, and the assembly develops visible angular displacement — the structure "walks" away from its intended geometry. In a digital model, every pin is shown in its nominal position, and the accumulated error is invisible. The mitigation is to use pins-with-stop (pins with a flanged shoulder that prevents passage beyond a fixed depth) at critical joints, to limit the number of pin connections in any single load path, and to replace long pin-connected chains with rigid beams wherever the geometry permits. A practical rule: if a structural member spans more than seven studs and is connected by more than three pin joints in series, it requires triangulation with at least one rigid diagonal brace.

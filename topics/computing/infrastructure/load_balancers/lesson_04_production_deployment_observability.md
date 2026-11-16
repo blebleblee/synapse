@@ -36,33 +36,34 @@ Layer 7 DDoS attacks require application-aware mitigation strategies. HTTP flood
 
 The internal architecture of a high-performance software load balancer revolves around event-driven I/O multiplexing and connection state management. When a client initiates a TCP connection, the kernel places the incoming SYN packet into the load balancer's listen socket backlog. The load balancer application, typically implementing an event loop using `epoll` on Linux or `kqueue` on BSD systems, receives notification of the pending connection through a file descriptor ready event. The application invokes `accept()` to extract the new connection from the kernel's queue, obtaining a file descriptor representing the client socket.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Load Balancer Process Architecture                          │
-│                                                              │
-│  ┌────────────┐      ┌──────────────────┐                  │
-│  │  Accept    │      │  Worker Thread 1 │                  │
-│  │  Thread    │─────▶│  - epoll fd set  │─────┐            │
-│  │            │      │  - conn table    │     │            │
-│  └────────────┘      └──────────────────┘     │            │
-│        │                                       │            │
-│        │             ┌──────────────────┐     │            │
-│        └────────────▶│  Worker Thread N │     │            │
-│                      │  - epoll fd set  │     │            │
-│                      │  - conn table    │     │            │
-│                      └──────────────────┘     │            │
-│                                               │            │
-│                      ┌──────────────────┐     │            │
-│                      │  Backend Pool    │◀────┘            │
-│                      │  - health state  │                  │
-│                      │  - conn count    │                  │
-│                      │  - weight values │                  │
-│                      └──────────────────┘                  │
-│                                                              │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Shared Memory Segment (stats, config, health)      │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph LB["Load Balancer Process Architecture"]
+        AT["Accept<br/>Thread"]
+        
+        subgraph WT1["Worker Thread 1"]
+            WT1_E["epoll fd set"]
+            WT1_C["conn table"]
+        end
+        
+        subgraph WTN["Worker Thread N"]
+            WTN_E["epoll fd set"]
+            WTN_C["conn table"]
+        end
+        
+        subgraph BP["Backend Pool"]
+            BP_H["health state"]
+            BP_CC["conn count"]
+            BP_W["weight values"]
+        end
+        
+        SMS["Shared Memory Segment<br/>(stats, config, health)"]
+        
+        AT --> WT1
+        AT --> WTN
+        WT1 --> BP
+        WTN --> BP
+    end
 ```
 
 The connection state table forms the central data structure mapping client connections to selected backends. For Layer 4 load balancing, this table stores the connection 4-tuple as the key and the chosen backend IP and port as the value. Hash tables using the connection 4-tuple as input provide O(1) lookup performance, critical for maintaining line-rate packet forwarding. The hashing function must distribute connections uniformly across the hash table buckets to prevent clustering, typically using cryptographic hashes like SipHash or xxHash that resist adversarial input patterns designed to cause hash collisions. When operating in DSR (Direct Server Return) mode where backend responses bypass the load balancer, the connection table must still track flow state to handle connection teardown and detect stale entries.
@@ -75,24 +76,53 @@ Least-connections algorithms track active connection counts per backend and rout
 
 Consistent hashing provides session affinity by deterministically mapping client identifiers—typically IP addresses or session cookies—to backends using a hash ring data structure. The hash space, typically $[0, 2^{32})$ for 32-bit hashes, is conceptually arranged in a circle. Each backend is assigned multiple positions on the ring by hashing the backend identifier concatenated with a sequence number. When routing a request, the load balancer hashes the client identifier, locates the position on the ring, and selects the next backend encountered when traversing clockwise. This algorithm ensures that each client consistently reaches the same backend across requests, preserving session state without requiring state synchronization. When backends are added or removed, only a fraction of keys are remapped—specifically $K/N$ keys where $K$ is total keys and $N$ is the number of backends—minimizing session disruption during topology changes.
 
-```
-Consistent Hash Ring Example:
-
-       0°/360°
-          │
-     B2   │   B1
-    (75°) │  (30°)
-          │
-  270°────┼────90°
-          │
-    B3    │   B2
-   (220°) │  (140°)
-          │
-       180°
-
-Backend positions: B1={30°,140°}, B2={75°,200°}, B3={220°,310°}
-Client hash 50° → routes to B2 (next position clockwise at 75°)
-Client hash 150° → routes to B3 (next position clockwise at 220°)
+```mermaid
+flowchart TD
+    subgraph ring["Consistent Hash Ring (0°-360°)"]
+        direction TB
+        
+        pos0["0°/360°"]
+        pos90["90°"]
+        pos180["180°"]
+        pos270["270°"]
+        
+        B1_30["B1 (30°)"]
+        B2_75["B2 (75°)"]
+        B2_140["B2 (140°)"]
+        B3_200["B3 (200°)"]
+        B3_220["B3 (220°)"]
+        B1_310["B1 (310°)"]
+        
+        pos0 -.->|clockwise| B1_30
+        B1_30 -.-> B2_75
+        B2_75 -.->|90°| pos90
+        pos90 -.-> B2_140
+        B2_140 -.-> pos180
+        pos180 -.->|180°| B3_200
+        B3_200 -.-> B3_220
+        B3_220 -.-> pos270
+        pos270 -.->|270°| B1_310
+        B1_310 -.-> pos0
+    end
+    
+    subgraph routing["Routing Examples"]
+        C1["Client hash 50°"]
+        C2["Client hash 150°"]
+        R1["→ Routes to B2 (75°)"]
+        R2["→ Routes to B3 (220°)"]
+        
+        C1 --> R1
+        C2 --> R2
+    end
+    
+    subgraph backends["Backend Positions"]
+        B1["B1: {30°, 310°}"]
+        B2["B2: {75°, 200°}"]
+        B3["B3: {220°}"]
+    end
+    
+    routing -.-> ring
+    backends -.-> ring
 ```
 
 Amazon's Elastic Load Balancing architecture implements a multi-tier distributed system where DNS resolution returns IP addresses of regional load balancer nodes rather than backend servers directly. When a client resolves an ELB DNS name like `myapp-123456.us-east-1.elb.amazonaws.com`, Route 53 returns multiple IP addresses corresponding to ELB nodes distributed across availability zones. These nodes are themselves horizontally scaled based on traffic volume, with AWS automatically provisioning additional nodes during load spikes. Each ELB node maintains its own connection table and backend health state, making independent routing decisions. This architecture achieves fault isolation—failure of individual ELB nodes impacts only a fraction of client connections—and enables seamless scaling without client-visible disruption.

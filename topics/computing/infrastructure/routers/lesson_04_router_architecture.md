@@ -24,29 +24,37 @@ Line cards are the ingress and egress processing engines. Each line card contain
 
 The Route Processor (RP) or Routing Engine (RE) is a physically distinct card that runs the router's operating system. On Juniper hardware this is the Routing Engine, running FreeBSD under JUNOS. On Cisco IOS-XR platforms it is a dedicated route processor running a microkernel-based OS. This card runs all routing protocol daemons, the management plane, and the RIB. It is explicitly not in the packet forwarding path. Its connection to the line cards is typically via an out-of-band management channel (Ethernet-based internal bus) used only for FIB programming and control messages — not for data traffic.
 
-```
-+--------------------------------------------------+
-|                 CHASSIS MIDPLANE                 |
-|                                                  |
-|  +----------+   +-------------+   +----------+  |
-|  | Line Card|   |  Switching  |   | Line Card|  |
-|  |   (LC-A) |<->|   Fabric    |<->|   (LC-B) |  |
-|  |          |   |   Module    |   |          |  |
-|  |  [NPU-0] |   | (Crossbar / |   |  [NPU-0] |  |
-|  |  [NPU-1] |   |  Clos Topo) |   |  [NPU-1] |  |
-|  |  [TCAM ] |   |             |   |  [TCAM ] |  |
-|  |  [Buf  ] |   +------+------+   |  [Buf  ] |  |
-|  +----+-----+          |          +-----+----+  |
-|       |                |                |        |
-|       +----------------+----------------+        |
-|                        |                         |
-|              +---------+---------+               |
-|              |   Route Processor  |               |
-|              |  (Control Plane)   |               |
-|              |  BGP/OSPF/IS-IS    |               |
-|              |  RIB -> FIB Push   |               |
-|              +-------------------+               |
-+--------------------------------------------------+
+```mermaid
+flowchart TD
+    subgraph midplane ["CHASSIS MIDPLANE"]
+        subgraph lc_a ["Line Card (LC-A)"]
+            npu_a0["NPU-0"]
+            npu_a1["NPU-1"]
+            tcam_a["TCAM"]
+            buf_a["Buffer"]
+        end
+        
+        subgraph fabric ["Switching Fabric Module"]
+            crossbar["Crossbar/Clos Topology"]
+        end
+        
+        subgraph lc_b ["Line Card (LC-B)"]
+            npu_b0["NPU-0"]
+            npu_b1["NPU-1"]
+            tcam_b["TCAM"]
+            buf_b["Buffer"]
+        end
+        
+        subgraph ctrl_plane ["Route Processor - Control Plane"]
+            bgp["BGP/OSPF/IS-IS"]
+            rib_fib["RIB → FIB Push"]
+        end
+        
+        lc_a <--> fabric
+        fabric <--> lc_b
+        fabric --> ctrl_plane
+        ctrl_plane --> fabric
+    end
 ```
 
 This architectural diagram captures the essential topology. The Route Processor programs FIB state down into each line card's local TCAM. Each line card then forwards entirely autonomously — the Route Processor is not consulted for each packet, only for topology changes. This is called *distributed forwarding*, and it is what makes high-density modular routers scale: 48 line cards can forward simultaneously without serializing through a central processor.
@@ -65,43 +73,28 @@ The third stage is **policy and ACL evaluation**. After the FIB lookup determine
 
 The fourth stage is **header rewrite**. The NPU decrements the IP TTL, recomputes the IP checksum (or delegates this to dedicated checksum engines), rewrites the destination MAC address to the next-hop's MAC (resolved via ARP/NDP and cached in an adjacency table), and prepends any required MPLS labels or tunnel headers. The packet buffer — now containing a fully rewritten packet — is queued for fabric transmission.
 
-```
-Ingress Packet Arrival
-        |
-        v
-+-------------------+
-|  Header Parsing   |  <-- Programmable parse graph (NPU pipeline stage 0)
-|  (Ethernet/IP/    |
-|   MPLS/VXLAN)     |
-+--------+----------+
-         |
-         v
-+-------------------+
-|   FIB LPM Lookup  |  <-- TCAM parallel search OR LPC-trie traversal
-|   (Dest IP ->     |      result: egress port + next-hop adjacency index
-|    Next Hop)      |
-+--------+----------+
-         |
-         v
-+-------------------+
-|  ACL / QoS /      |  <-- TCAM policy lookup; DSCP marking, queue assign,
-|  Policy Eval      |      MPLS label push/pop/swap
-+--------+----------+
-         |
-         v
-+-------------------+
-|  Header Rewrite   |  <-- TTL--, L2 rewrite, checksum, label imposition
-|  & Encapsulation  |
-+--------+----------+
-         |
-         v
-+-------------------+
-|  Fabric Scheduler |  <-- Packet segmented into cells, fabric path selected
-|  & Cell Segmenter |
-+-------------------+
-         |
-         v
-   Switching Fabric
+```mermaid
+flowchart TD
+    A["Ingress Packet Arrival"]
+    B["Header Parsing<br/>(Ethernet/IP/MPLS/VXLAN)"]
+    C["FIB LPM Lookup<br/>(Dest IP → Next Hop)"]
+    D["ACL / QoS / Policy Eval"]
+    E["Header Rewrite & Encapsulation"]
+    F["Fabric Scheduler & Cell Segmenter"]
+    G["Switching Fabric"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    
+    B -.->|"Programmable parse graph<br/>(NPU pipeline stage 0)"| B
+    C -.->|"TCAM parallel search OR LPC-trie traversal<br/>result: egress port + next-hop adjacency index"| C
+    D -.->|"TCAM policy lookup; DSCP marking,<br/>queue assign, MPLS label push/pop/swap"| D
+    E -.->|"TTL--, L2 rewrite, checksum,<br/>label imposition"| E
+    F -.->|"Packet segmented into cells,<br/>fabric path selected"| F
 ```
 
 ### Switching Fabric: Crossbar, Clos, and Cell-Based Transport

@@ -159,9 +159,9 @@ graph LR
     T2 -->|"waits for"| T3
     T3 -->|"waits for"| T1
     
-    style T1 fill:#ffcccc
-    style T2 fill:#ffcccc
-    style T3 fill:#ffcccc
+    style T1 fill:#ffcccc,color:#0f172a
+    style T2 fill:#ffcccc,color:#0f172a
+    style T3 fill:#ffcccc,color:#0f172a
 ```
 
 **Detection algorithms:**
@@ -377,9 +377,9 @@ graph TD
     L0 -->|Compact| L1
     L1 -->|Compact| L2
     
-    style L0 fill:#ffe6e6
-    style L1 fill:#fff4e6
-    style L2 fill:#e6f3ff
+    style L0 fill:#ffe6e6,color:#0f172a
+    style L1 fill:#fff4e6,color:#0f172a
+    style L2 fill:#e6f3ff,color:#0f172a
 ```
 
 Level 0 contains overlapping SSTables (direct memtable flushes). When L0 reaches threshold, compact into L1. Each level is ~10× larger than the previous. Reads must check all L0 files but only one file per lower level (using bloom filters for efficient negative lookups).

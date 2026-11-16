@@ -76,25 +76,35 @@ $$\frac{p^2}{2mE} + \frac{q^2}{2E/k} = 1$$
 
 As time advances, the representative point flows along this elliptical trajectory with a circulation direction determined by Hamilton's equations. In the upper half-plane where $p > 0$, we have $\dot{q} > 0$, so the point moves rightward (toward increasing $q$). In the right half-plane where $q > 0$, we have $\dot{p} < 0$, so the point moves downward (toward decreasing $p$). This circulation pattern—counterclockwise for the harmonic oscillator—characterizes the phase flow of the system.
 
-```
-Phase Space Portrait: Harmonic Oscillator
-           p
-           ↑
-           |     E₃ ↗
-       ----●---- E₂
-      /    |    \ E₁
-     /     |     \↘
-    |      |      |
-  --+------+------+--→ q
-    |      |      |
-     \     |     /
-      \    |    /
-       ----●----
-           |
-           
-Energy contours E₁ < E₂ < E₃
-Flow direction: counterclockwise
-Each closed orbit corresponds to periodic motion
+```mermaid
+flowchart TD
+    subgraph phase_space["Phase Space Portrait: Harmonic Oscillator"]
+        E3["E₃ - Highest Energy"]
+        E2["E₂ - Medium Energy"]
+        E1["E₁ - Lowest Energy"]
+        
+        origin["Origin<br/>q=0, p=0"]
+        
+        E3 -->|"counterclockwise orbit"| E3
+        E2 -->|"counterclockwise orbit"| E2
+        E1 -->|"counterclockwise orbit"| E1
+        
+        E1 -.->|E₁ < E₂ < E₃| E2
+        E2 -.->|E₁ < E₂ < E₃| E3
+        
+        origin -->|"nested ellipses"| E1
+    end
+    
+    axis_p["↑<br/>Momentum p"]
+    axis_q["→<br/>Position q"]
+    
+    phase_space --> axis_p
+    phase_space --> axis_q
+    
+    style E3 fill:#ff6b6b,color:#fff
+    style E2 fill:#4ecdc4,color:#fff
+    style E1 fill:#45b7d1,color:#fff
+    style origin fill:#ffd93d,color:#333
 ```
 
 The closure of these orbits reflects the periodic nature of harmonic oscillation—after one complete circuit in phase space, the system returns to its initial state and begins the cycle anew. The period of this circulation can be computed by integrating $dt = dq/\dot{q} = (m/p)dq$ around one complete orbit, though for the harmonic oscillator we know from elementary considerations that this period is $T = 2\pi\sqrt{m/k}$, independent of the energy.

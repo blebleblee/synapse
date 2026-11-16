@@ -287,8 +287,8 @@ flowchart LR
     LL -->|"accumulate"| WL
     L1 -->|"accumulate"| W1
 
-    style WL fill:#d4edda,stroke:#28a745
-    style W1 fill:#d4edda,stroke:#28a745
+    style WL fill:#d4edda,stroke:#28a745,color:#0f172a
+    style W1 fill:#d4edda,stroke:#28a745,color:#0f172a
 ```
 
 The ⊙ symbol denotes element-wise multiplication: the GELU derivative gates the gradient, suppressing it where the pre-activation was deeply negative (similar to how ReLU zeroes gradients for negative pre-activations, but smoothly).
@@ -597,8 +597,8 @@ flowchart LR
     LV    -->|"KL term: σ² - log σ²"| LOSS
     X     -->|"target"| LOSS
 
-    style REP fill:#fff3cd,stroke:#ffc107
-    style LOSS fill:#f8d7da,stroke:#dc3545
+    style REP fill:#fff3cd,stroke:#ffc107,color:#0f172a
+    style LOSS fill:#f8d7da,stroke:#dc3545,color:#0f172a
 ```
 
 ---

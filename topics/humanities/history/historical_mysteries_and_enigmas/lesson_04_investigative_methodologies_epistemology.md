@@ -54,27 +54,24 @@ The mechanical process of source criticism generates what we might term **eviden
 
 Stratigraphic analysis establishes relative chronologies through the law of superposition—absent disturbance, lower layers predate higher layers. But bioturbation, construction activities, and geological processes violate this principle regularly. The investigator examines soil interfaces for signs of intrusion: differing soil textures, truncated artifact distributions, and discontinuous stratigraphic lenses. Modern excavation employs Harris Matrix methodology, constructing formal diagrams of stratigraphic relationships:
 
-```
-Stratigraphic Sequence (Harris Matrix notation):
-
-    [101]────────[102]
-     │            │
-     └────[103]───┘
-           │
-         [104]
-           │
-    ┌──────┴──────┐
-  [105]         [106]
-    │             │
-  [Natural]    [Natural]
-
-Where:
-  101 = Modern topsoil
-  102 = Victorian construction fill  
-  103 = Medieval occupation layer
-  104 = Roman destruction debris
-  105 = Roman occupation surface
-  106 = Pre-Roman agricultural soil
+```mermaid
+flowchart TD
+    A["101: Modern topsoil"]
+    B["102: Victorian construction fill"]
+    C["103: Medieval occupation layer"]
+    D["104: Roman destruction debris"]
+    E["105: Roman occupation surface"]
+    F["106: Pre-Roman agricultural soil"]
+    G["Natural"]
+    H["Natural"]
+    
+    A --> C
+    B --> C
+    C --> D
+    D --> E
+    D --> F
+    E --> G
+    F --> H
 ```
 
 This formal representation makes chronological relationships explicit and testable. When artifact distributions seem anomalous—Roman coins appearing in medieval contexts—the Harris Matrix reveals whether stratigraphic integrity has been compromised.
@@ -130,35 +127,41 @@ The optimization of source criticism workflows involves developing pattern recog
 
 **Database infrastructure proves essential for managing complex multi-source investigations**. Professional historical mystery investigation requires systematic cataloging of every evidentiary fragment with standardized metadata: source type, date range, provenance, reliability assessment, and explicit linkages to related sources. Modern digital tools enable this at scales impossible for paper-based scholarship. Relational database structures capture the network of evidential relationships:
 
-```
-Source Registry Structure:
+```mermaid
+flowchart TD
+    subgraph SOURCES["SOURCES"]
+        S1["source_id<br/>[primary key]"]
+        S2["source_type<br/>[controlled vocabulary]"]
+        S3["date_created<br/>[range with uncertainty]"]
+        S4["date_discovered<br/>[precise]"]
+        S5["current_location<br/>[archive/institution]"]
+        S6["provenance_chain<br/>[linked records]"]
+        S7["authenticity_score<br/>[0-100]"]
+        S8["reliability_assessment<br/>[JSON object]"]
+    end
 
-SOURCES
-├─ source_id [primary key]
-├─ source_type [controlled vocabulary]
-├─ date_created [range with uncertainty]
-├─ date_discovered [precise]
-├─ current_location [archive/institution]
-├─ provenance_chain [linked records]
-├─ authenticity_score [0-100]
-└─ reliability_assessment [JSON object]
+    subgraph CLAIMS["CLAIMS"]
+        C1["claim_id<br/>[primary key]"]
+        C2["source_id<br/>[foreign key]"]
+        C3["claim_text<br/>[extracted statement]"]
+        C4["confidence_level<br/>[subjective/objective]"]
+        C5["corroboration_links<br/>[array of claim_ids]"]
+        C6["contradiction_links<br/>[array of claim_ids]"]
+    end
 
-CLAIMS
-├─ claim_id [primary key]
-├─ source_id [foreign key]
-├─ claim_text [extracted statement]
-├─ confidence_level [subjective/objective]
-├─ corroboration_links [array of claim_ids]
-└─ contradiction_links [array of claim_ids]
+    subgraph ANALYSES["ANALYSES"]
+        A1["analysis_id<br/>[primary key]"]
+        A2["analysis_type<br/>[radiocarbon/DNA/isotope/etc]"]
+        A3["material_sample_id<br/>[foreign key]"]
+        A4["laboratory<br/>[institution]"]
+        A5["result_value<br/>[with uncertainty range]"]
+        A6["date_performed<br/>[precise]"]
+        A7["quality_control_notes<br/>[text]"]
+    end
 
-ANALYSES
-├─ analysis_id [primary key]
-├─ analysis_type [radiocarbon/DNA/isotope/etc]
-├─ material_sample_id [foreign key]
-├─ laboratory [institution]
-├─ result_value [with uncertainty range]
-├─ date_performed [precise]
-└─ quality_control_notes [text]
+    C2 -.->|references| S1
+    C5 -.->|links to| C1
+    C6 -.->|links to| C1
 ```
 
 This structured approach transforms investigative work from linear narrative reconstruction into network analysis where the strength of competing hypotheses can be quantitatively assessed based on how many independent evidential pathways they successfully explain.

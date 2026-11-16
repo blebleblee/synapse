@@ -41,10 +41,26 @@ Bass and kick drum are one rhythmic organism. Lock your note attacks to land **w
 
 **Rest stroke (apoyando):** After plucking, let the finger come to rest against the adjacent lower string. This is the professional default — it gives maximum consistency and volume because the stopping point is fixed and repeatable.
 
-```
-Rest stroke path (index finger on D string):
-  D string ──→ pluck ──→ finger lands on A string
-  A string ──→ pluck ──→ finger lands on E string
+```mermaid
+flowchart TD
+    D1["D string"]
+    D2["pluck"]
+    D3["finger lands on A string"]
+    A1["A string"]
+    A2["pluck"]
+    A3["finger lands on E string"]
+    
+    D1 --> D2 --> D3
+    A1 --> A2 --> A3
+    
+    subgraph rest_stroke ["Rest stroke path (index finger on D string)"]
+        D1
+        D2
+        D3
+        A1
+        A2
+        A3
+    end
 ```
 
 **Free stroke:** Finger clears the string entirely after plucking, used when skipping strings (e.g., E to G) where there's no adjacent string to land on.
@@ -191,14 +207,18 @@ Example — A string, OFPF at 7th position:
 
 Thumb lives on the back of the neck, opposite finger 2, angled roughly 30° toward the headstock. Never hook it over the top — that collapses your arch, kills your reach, and loads the wrist with strain.
 
-```
-Correct geometry — side view of neck:
-    ┌─────────────────────┐  ← fretboard
-    │   ●  ●  ●  ●        │  ← fingers 1-2-4 arched
-    └─────────────────────┘
-              ↑
-         thumb (back of neck, behind finger 2)
-         pointing ~30° toward headstock
+```mermaid
+flowchart TD
+    subgraph neck_side_view["Correct Geometry — Side View of Neck"]
+        direction TB
+        fretboard["┌─────────────────────┐<br/>│   ●  ●  ●  ●        │<br/>└─────────────────────┘<br/>Fretboard"]
+        fingers["Fingers 1-2-4 Arched<br/>(positioned above fretboard)"]
+        thumb["Thumb<br/>(back of neck, behind finger 2)<br/>pointing ~30° toward headstock"]
+        
+        fretboard --> fingers
+        fretboard -.-> thumb
+        thumb -.->|"positioned behind"| fingers
+    end
 ```
 
 Keep the wrist close to straight; mild inward rotation is fine, sharp bending up or down breaks the force chain from forearm to fingertip and is the direct path to repetitive strain injury.
@@ -209,25 +229,34 @@ Keep the wrist close to straight; mild inward rotation is fine, sharp bending up
 
 Land the fingertip **1–2 mm behind the fret** (toward the nut) — the zone where minimum pressure produces a clean note. Fretting in the middle of the fret space takes 2–3× more force for the same result, because you're relying on string tension against the fingerboard wood instead of the leverage the fret wire gives you.
 
-```
-Fret wire cross-section view:
-
-  [Nut] ←──── distance ────→ [Fret wire]
-                    ↑
-              Optimal zone
-           (1–2mm before fret)
+```mermaid
+flowchart LR
+    Nut["Nut"]
+    OptimalZone["Optimal zone<br/>(1–2mm before fret)"]
+    FretWire["Fret wire"]
+    
+    Nut ---|"distance"| FretWire
+    OptimalZone -.->|"↑"| FretWire
 ```
 
 **Minimum pressure test:** fret a note, then slowly release pressure until it just starts to buzz. The pressure needed is a hair above that threshold — memorize that feeling, it's your target for every note. Excess pressure sharpens pitch (you're stretching the string), fatigues the hand, and dampens overtones.
 
 **Finger arch:** keep fingers curved so each tip contacts its string independently. Flat fingers brush and mute adjacent strings by accident.
 
-```
-Correct (curved):       Incorrect (flat):
-    ╭─●                      ──●
-   │  │                        │
-   │  │                        │
-   └──┘                       └──
+```mermaid
+flowchart LR
+    subgraph correct ["Correct (curved)"]
+        C_top["●"]
+        C_top -->|"curved arc"| C_top
+    end
+
+    subgraph incorrect ["Incorrect (flat)"]
+        I_start[" "]
+        I_end["●"]
+        I_bottom[" "]
+        I_start -->|"flat line"| I_end
+        I_end --- I_bottom
+    end
 ```
 
 ### 3.4 Left-Hand Muting Techniques
@@ -1808,120 +1837,128 @@ graph TD
 
 ## Quick Reference Card
 
-```
-═══════════════════════════════════════════════════════════════
-                  BASS GUITAR QUICK REFERENCE
-═══════════════════════════════════════════════════════════════
-
-FINGERING ZONES:
-  Frets 1–5:   Simandl 1-2-4  (index, middle, pinky)
-  Frets 7+:    OFPF 1-2-3-4   (one finger per fret)
-  Frets 5–7:   Hybrid (use context)
-
-HAND POSITIONS:
-  Thumb: Back of neck, behind middle finger, angled to headstock
-  Wrist: Straight, minimal bend up/down
-  Fingers: Curved arch, land 1–2mm behind fret
-  Plucking: Rest stroke default, 45° string angle
-
-MUTING:
-  Floating thumb: Rests on string below current string
-  Left-hand drape: Unused fingers lightly touch lower strings
-  Palm mute: Heel of hand 1–3cm from bridge saddles
-
-SLAP & POP:
-  Slap: Bony thumb edge, wrist rotation 40–60°, BOUNCE off
-  Pop: Hook under string, pull perpendicular, 8–12mm displacement
-  Contact point: Neck/body joint (20th–22nd fret area)
-
-GROOVE POCKETS:
-  Funk: slight push (5–10ms early)
-  Jazz: lay back (10–15ms late)
-  Rock: center (on the beat)
-  Reggae: heavy lay back (20–30ms late)
-
-ROOT-FIFTH-OCTAVE (from E string root):
-  Root:   E string, fret N
-  Fifth:  A string, fret N+2
-  Octave: D string, fret N+2
-
-ROOT-FIFTH-OCTAVE (from A string root):
-  Root:   A string, fret N
-  Fifth:  D string, fret N+2
-  Octave: G string, fret N+2
-
-APPROACH NOTES:
-  From below: Target – 1 fret (half-step)
-  From above: Target + 1 fret (half-step)
-  Encircle: Above → below → target
-
-WALKING BASS RULES:
-  1. Root on beat 1 of new chord
-  2. Chord tones (1, 3, 5, 7) on beats 1 and 3
-  3. Passing tones on beats 2 and 4
-  4. Approach next root by half or whole step
-
-NASHVILLE NUMBERS (quick decode):
-  1-4-5-1 = root, 4th, 5th, root of whatever key is called
-  m or -  = minor     7 = dominant 7th     Δ = major 7th
-  ^       = anticipated/pushed chord
-
-PRACTICE ORDER (60-minute session):
-  00–05 min: Chromatic crawl warmup (Simandl + OFPF)
-  05–10 min: Single-string muting drill
-  10–25 min: Main technique focus (varies by goal)
-  25–45 min: Musical context (backing tracks, songs)
-  45–55 min: Ear training or transcription
-  55–60 min: Cool down (slow root-fifth-octave patterns)
-
-TEMPO PROGRESSION:
-  +2–5 BPM per session (only after clean execution)
-  Do NOT advance with errors
-
-ERGONOMIC ALERTS:
-  Sharp pain → STOP IMMEDIATELY → Rest 48+ hours → Doctor
-  Strap too low → Wrist strain
-  Bass angle flat → Wrist deviation
-  Pre/post stretch → 3.5 minutes (Section 11.5)
-
-DYNAMIC BALANCE:
-  Thumb slap vs. pop: <3 dB difference (use DAW to verify)
-  Index vs. middle finger: <2 dB difference
-  Ghost notes: 50–60% volume of pitched notes (–6 to –8 dB quieter)
-
-METRONOME DISPLACEMENT (groove training):
-  Stage 1: Click on beats 1, 2, 3, 4
-  Stage 2: Click on beats 2 and 4 only
-  Stage 3: Click on beat 1 only
-  Stage 4: Click on beat 1 of every other bar
-  Stage 5: Click on "&" of beat 2 only (advanced)
-
-SETUP BASICS YOU CAN CHECK:
-  Action at 12th fret: 1.5–2.5mm typical
-  Relief: slight visible gap at frets 7–8 with capo on fret 1
-  Intonation: 12th fret should match open string pitch exactly
-
-KEY DRILLS:
-  • Chromatic crawl: Daily warmup, 5 min
-  • Root finder: Random note → find on E and A strings
-  • Gap-click training: Internalize pulse without constant click
-  • ii–V–I in all keys: Harmonic navigation mastery
-  • Ghost note integration: Rhythmic texture building
-  • Slap endurance: 30 sec → 2 min over 8 weeks
-
-RED FLAGS (seek medical/luthier help):
-  ✗ Pain persists after 48-hour rest
-  ✗ Numbness/tingling doesn't resolve in 10 min
-  ✗ Fret buzz on all strings after technique correction
-  ✗ Intonation problems at 12th fret after fresh strings
-
-WEEKLY TEMPO TARGETS (4-Week Foundation):
-  Week 1: quarter = 60 BPM baseline
-  Week 2: quarter = 70–80 BPM
-  Week 3: quarter = 85–95 BPM
-  Week 4: quarter = 100–110 BPM
-  (Adjust based on individual progress)
-
-═══════════════════════════════════════════════════════════════
+```mermaid
+flowchart TD
+    BASS["🎸 BASS GUITAR QUICK REFERENCE"]
+    
+    BASS --> FZ["FINGERING ZONES"]
+    BASS --> HP["HAND POSITIONS"]
+    BASS --> MUT["MUTING TECHNIQUES"]
+    BASS --> SP["SLAP & POP"]
+    BASS --> GP["GROOVE POCKETS"]
+    BASS --> RFO["ROOT-FIFTH-OCTAVE PATTERNS"]
+    BASS --> AN["APPROACH NOTES"]
+    BASS --> WB["WALKING BASS RULES"]
+    BASS --> NN["NASHVILLE NUMBERS"]
+    BASS --> PO["PRACTICE ORDER"]
+    BASS --> TP["TEMPO PROGRESSION"]
+    BASS --> EA["ERGONOMIC ALERTS"]
+    BASS --> DB["DYNAMIC BALANCE"]
+    BASS --> MD["METRONOME DISPLACEMENT"]
+    BASS --> SB["SETUP BASICS"]
+    BASS --> KD["KEY DRILLS"]
+    BASS --> RF["RED FLAGS"]
+    BASS --> WTT["WEEKLY TEMPO TARGETS"]
+    
+    FZ --> FZ1["Frets 1–5: Simandl 1-2-4"]
+    FZ --> FZ2["Frets 7+: OFPF 1-2-3-4"]
+    FZ --> FZ3["Frets 5–7: Hybrid Context"]
+    
+    HP --> HP1["Thumb: Back of neck, angled"]
+    HP --> HP2["Wrist: Straight, minimal bend"]
+    HP --> HP3["Fingers: Curved arch, 1–2mm behind"]
+    HP --> HP4["Plucking: Rest stroke default"]
+    
+    MUT --> MUT1["Floating thumb: On string below"]
+    MUT --> MUT2["Left-hand drape: Light touch"]
+    MUT --> MUT3["Palm mute: 1–3cm from bridge"]
+    
+    SP --> SP1["Slap: Bony edge, 40–60° rotation"]
+    SP --> SP2["Pop: Hook & pull, 8–12mm"]
+    SP --> SP3["Contact: Neck/body joint"]
+    
+    GP --> GP1["Funk: 5–10ms early"]
+    GP --> GP2["Jazz: 10–15ms late"]
+    GP --> GP3["Rock: On the beat"]
+    GP --> GP4["Reggae: 20–30ms late"]
+    
+    RFO --> RFO1["E string root: E-N, A-N+2, D-N+2"]
+    RFO --> RFO2["A string root: A-N, D-N+2, G-N+2"]
+    
+    AN --> AN1["From below: Target – 1 fret"]
+    AN --> AN2["From above: Target + 1 fret"]
+    AN --> AN3["Encircle: Above → below → target"]
+    
+    WB --> WB1["Root on beat 1"]
+    WB --> WB2["Chord tones on 1 & 3"]
+    WB --> WB3["Passing tones on 2 & 4"]
+    WB --> WB4["Approach next root by step"]
+    
+    NN --> NN1["1-4-5-1 root progression"]
+    NN --> NN2["m/- = minor, 7 = dom7, Δ = maj7"]
+    NN --> NN3["^ = anticipated/pushed"]
+    
+    PO --> PO1["00–05: Chromatic warmup"]
+    PO --> PO2["05–10: Muting drill"]
+    PO --> PO3["10–25: Main technique"]
+    PO --> PO4["25–45: Musical context"]
+    PO --> PO5["45–55: Ear training"]
+    PO --> PO6["55–60: Cool down"]
+    
+    TP --> TP1["+2–5 BPM per session"]
+    TP --> TP2["Only after clean execution"]
+    
+    EA --> EA1["Sharp pain → STOP → Rest 48h"]
+    EA --> EA2["Strap too low → Wrist strain"]
+    EA --> EA3["Bass angle flat → Deviation"]
+    EA --> EA4["Stretch: 3.5 minutes pre/post"]
+    
+    DB --> DB1["Thumb slap vs pop: <3 dB"]
+    DB --> DB2["Index vs middle: <2 dB"]
+    DB --> DB3["Ghost notes: –6 to –8 dB"]
+    
+    MD --> MD1["Stage 1: Click 1,2,3,4"]
+    MD --> MD2["Stage 2: Click 2,4 only"]
+    MD --> MD3["Stage 3: Click 1 only"]
+    MD --> MD4["Stage 4: Click beat 1 alternate"]
+    MD --> MD5["Stage 5: Click & of beat 2"]
+    
+    SB --> SB1["Action 12th fret: 1.5–2.5mm"]
+    SB --> SB2["Relief: Gap at 7–8 with capo"]
+    SB --> SB3["Intonation: 12th = Open pitch"]
+    
+    KD --> KD1["Chromatic crawl: Daily 5min"]
+    KD --> KD2["Root finder: Random notes"]
+    KD --> KD3["Gap-click training"]
+    KD --> KD4["ii–V–I in all keys"]
+    KD --> KD5["Ghost note integration"]
+    KD --> KD6["Slap endurance: 30s→2min"]
+    
+    RF --> RF1["✗ Pain after 48h rest"]
+    RF --> RF2["✗ Numbness/tingling >10min"]
+    RF --> RF3["✗ Fret buzz after correction"]
+    RF --> RF4["✗ Intonation issues at 12th"]
+    
+    WTT --> WTT1["Week 1: 60 BPM"]
+    WTT --> WTT2["Week 2: 70–80 BPM"]
+    WTT --> WTT3["Week 3: 85–95 BPM"]
+    WTT --> WTT4["Week 4: 100–110 BPM"]
+    
+    style BASS fill:#1a1a2e,stroke:#16213e,color:#fff,font-weight:bold
+    style FZ fill:#0f3460,stroke:#16213e,color:#fff
+    style HP fill:#0f3460,stroke:#16213e,color:#fff
+    style MUT fill:#0f3460,stroke:#16213e,color:#fff
+    style SP fill:#0f3460,stroke:#16213e,color:#fff
+    style GP fill:#0f3460,stroke:#16213e,color:#fff
+    style RFO fill:#0f3460,stroke:#16213e,color:#fff
+    style AN fill:#0f3460,stroke:#16213e,color:#fff
+    style WB fill:#0f3460,stroke:#16213e,color:#fff
+    style NN fill:#0f3460,stroke:#16213e,color:#fff
+    style PO fill:#0f3460,stroke:#16213e,color:#fff
+    style TP fill:#0f3460,stroke:#16213e,color:#fff
+    style EA fill:#0f3460,stroke:#16213e,color:#fff
+    style DB fill:#0f3460,stroke:#16213e,color:#fff
+    style MD fill:#0f3460,stroke:#16213e,color:#fff
+    style SB fill:#0f3460,s
 ```
 

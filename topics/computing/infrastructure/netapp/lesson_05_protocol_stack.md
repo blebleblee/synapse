@@ -42,40 +42,57 @@ The protocol stack's interaction with snapshots deserves detailed mechanical exp
 
 The LUN geometry implementation within ONTAP's block protocol layer is meticulously engineered to avoid alignment pitfalls. When an administrator executes `lun create -path /vol/iscsi/lun0 -size 100GB`, ONTAP allocates a sparse file at that path and embeds a fake DOS/MBR partition table in the first 512 bytes, specifying a single partition starting at sector 2048 (1MB offset). This offset ensures that the partition's first block aligns with a 4KB boundary (2048 sectors × 512 bytes/sector = 1MB, which is 256 WAFL blocks of 4KB each). When a Windows or Linux host partitions the LUN, its partition tool detects this existing offset and preserves the alignment. For ESXi hosts, VMware's VMFS filesystem also defaults to 1MB alignment, avoiding misalignment issues. Inside the LUN file, ONTAP maintains a sparse block map: a B-tree indexed by LBA, where each entry records whether the block is allocated and, if so, its physical location in the aggregate. Unallocated blocks (holes) consume no disk space and return zeros on read. When a `WRITE SAME` SCSI command arrives (used by operating systems to initialize large regions with zeros or a pattern), ONTAP interprets it as a space reclamation hint and deallocates the affected blocks, returning them to the free pool.
 
-```
-Multi-Protocol Stack Data Flow
-==============================
+```mermaid
+flowchart TD
+    NFS_CLIENT["NFS Client"]
+    CIFS_CLIENT["CIFS Client"]
+    ISCSI_INIT["iSCSI Initiator"]
 
-NFS Client                CIFS Client               iSCSI Initiator
-    |                         |                           |
-    | RPC LOOKUP              | SMB2 CREATE               | SCSI READ(10)
-    v                         v                           v
-[Network Demux]  <----  [TCP/IP Stack]  <----  [Ethernet NIC]
-    |                         |                           |
-    v                         v                           v
-[NFS Translator]       [CIFS Translator]       [iSCSI Target]
-    |                         |                           |
-    +----------+--------------+---------------------------+
-               |
-               v
-       [Unified Security Engine]
-        - Identity Mapping (SID <-> UID)
-        - Authentication (Kerberos, NTLM, CHAP)
-        - Authorization (POSIX or ACL check)
-               |
-               v
-       [WAFL VFS Interface]
-        - vnop_lookup() / vnop_read() / vnop_write()
-        - Inode traversal, locking, COW allocation
-               |
-               v
-       [RAID Scheduler]
-        - NVRAM write-back cache
-        - Consistency point flush (10s interval)
-        - Disk striping (RAID-DP/TEC)
-               |
-               v
-          [Physical Disks / SSDs]
+    NIC["Ethernet NIC"]
+    TCP["TCP/IP Stack"]
+    DEMUX["Network Demux"]
+
+    NFS_TRANS["NFS Translator"]
+    CIFS_TRANS["CIFS Translator"]
+    ISCSI_TARGET["iSCSI Target"]
+
+    SEC["Unified Security Engine
+─────────────────────────
+• Identity Mapping (SID ↔ UID)
+• Authentication (Kerberos, NTLM, CHAP)
+• Authorization (POSIX or ACL check)"]
+
+    WAFL["WAFL VFS Interface
+─────────────────────────
+• vnop_lookup() / vnop_read() / vnop_write()
+• Inode traversal, locking, COW allocation"]
+
+    RAID["RAID Scheduler
+─────────────────────────
+• NVRAM write-back cache
+• Consistency point flush (10s interval)
+• Disk striping (RAID-DP / TEC)"]
+
+    DISKS["Physical Disks / SSDs"]
+
+    NFS_CLIENT  -->|"RPC LOOKUP"| DEMUX
+    CIFS_CLIENT -->|"SMB2 CREATE"| TCP
+    ISCSI_INIT  -->|"SCSI READ(10)"| NIC
+
+    NIC --> TCP
+    TCP --> DEMUX
+
+    DEMUX --> NFS_TRANS
+    DEMUX --> CIFS_TRANS
+    DEMUX --> ISCSI_TARGET
+
+    NFS_TRANS    --> SEC
+    CIFS_TRANS   --> SEC
+    ISCSI_TARGET --> SEC
+
+    SEC  --> WAFL
+    WAFL --> RAID
+    RAID --> DISKS
 ```
 
 The protocol translator layer also handles multi-protocol locking coordination. NFS clients acquire locks through the NLM protocol (a separate RPC service), sending `NLM_LOCK` requests that specify a file handle, byte range, and lock type (read or write). ONTAP stores these locks in a global lock table indexed by inode number and byte range, represented as a red-black tree for efficient range overlap queries. When a CIFS client requests an oplock on the same file, ONTAP must reconcile the semantics: NFS byte-range locks are advisory (the server records them but does not enforce them on I/O operations), while CIFS oplocks are break-on-access (the server revokes the lock and notifies the client if another client attempts conflicting access). ONTAP's policy is to deny oplocks on files with active NFS locks, preventing scenarios where a CIFS client caches file data locally under an oplock while an NFS client holds a lock and writes to the same region. Conversely, if a CIFS client holds an oplock, ONTAP breaks the oplock (sending an `SMB2 OPLOCK_BREAK` notification) when an NFS client attempts to lock or write the file, forcing the CIFS client to flush its cache and relinquish the oplock.

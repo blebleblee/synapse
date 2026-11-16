@@ -26,42 +26,79 @@ Intrinsic value calculation for calls follows the straightforward formula $\max(
 
 The payoff profile at expiration provides the terminal boundary condition for all options pricing. A long call payoff diagram exhibits a horizontal segment at zero premium loss for all spot prices below the strike, then transitions to a diagonal ray with unit slope as spot exceeds strike, offsetting the premium paid. Breakeven occurs at strike plus premium. For a seventy-strike call purchased at five dollars, breakeven lands at seventy-five dollars; the holder profits only if the stock exceeds this threshold at expiration. The maximum loss equals the premium paid, achieved whenever the option expires out-of-the-money. Maximum gain is theoretically unbounded, as the underlying asset can appreciate indefinitely.
 
-```
-Long Call Payoff at Expiration
-   
-   Profit
-      │         ┌─────────
-      │        ╱
-      │       ╱
-  ────┼──────●─────────── Spot Price
-      │     K (Strike)
-      │
-   -Premium
-      │
-      
-Breakeven = K + Premium
-Max Loss = Premium Paid
-Max Gain = Unlimited
+```mermaid
+flowchart TD
+    title["Long Call Payoff at Expiration"]
+    
+    subgraph diagram["Payoff Diagram"]
+        direction LR
+        loss["Max Loss = Premium Paid<br/>Loss = -Premium"]
+        strike["Breakeven Point<br/>Spot = K + Premium"]
+        profit["Profit Zone<br/>Max Gain = Unlimited"]
+    end
+    
+    subgraph key["Key Parameters"]
+        k["K = Strike Price"]
+        premium["Premium = Option Cost"]
+        payoff["Payoff = max(0, S - K) - Premium"]
+    end
+    
+    subgraph zones["Price Zones"]
+        below["S < K<br/>Option expires worthless<br/>Loss = Premium"]
+        at["S = K<br/>At the money<br/>Loss = Premium"]
+        breakeven["S = K + Premium<br/>Breakeven point<br/>P/L = 0"]
+        above["S > K + Premium<br/>In the money<br/>Profit = S - K - Premium"]
+    end
+    
+    title --> diagram
+    diagram --> key
+    key --> zones
+    
+    loss -.->|"Spot < K"| strike
+    strike -.->|"Spot > K + Premium"| profit
 ```
 
 Long put payoffs invert this structure. The diagram shows a diagonal descent from maximum value when spot equals zero, transitioning to a horizontal zero-profit segment when spot exceeds strike plus premium paid. A ninety-strike put purchased at four dollars achieves maximum profit of eighty-six dollars if the stock collapses to zero, while breakeven sits at eighty-six dollars. Maximum loss remains confined to the four-dollar premium if the stock closes above ninety at expiration.
 
-```
-Long Put Payoff at Expiration
-   
-   Profit
-      │  ╲
-      │   ╲
-      │    ╲
-  ────┼─────●────────── Spot Price
-      │     K (Strike)
-      │
-   -Premium
-      │
-      
-Breakeven = K - Premium
-Max Loss = Premium Paid
-Max Gain = K - Premium (if spot → 0)
+```mermaid
+flowchart TD
+    A["Long Put Payoff at Expiration"]
+    
+    B["Spot Price Scenarios"]
+    
+    C["Price &lt; Strike<br/>In The Money"]
+    D["Price = Strike<br/>At The Money"]
+    E["Price &gt; Strike<br/>Out of The Money"]
+    
+    F["Profit = K - S - Premium"]
+    G["Loss = Premium Paid"]
+    H["Loss = Premium Paid"]
+    
+    I["Breakeven = K - Premium"]
+    J["Max Loss = Premium Paid"]
+    K["Max Gain = K - Premium<br/>when S → 0"]
+    
+    A --> B
+    B --> C
+    B --> D
+    B --> E
+    
+    C --> F
+    D --> G
+    E --> H
+    
+    A --> I
+    A --> J
+    A --> K
+    
+    style A fill:#4A90E2,stroke:#2E5C8A,color:#fff,font-weight:bold
+    style B fill:#7B68EE,stroke:#5A4A8A,color:#fff
+    style C fill:#50C878,stroke:#2E7D4E,color:#fff
+    style D fill:#FFB84D,stroke:#8B6914,color:#fff
+    style E fill:#FF6B6B,stroke:#8B3B3B,color:#fff
+    style I fill:#E8F4F8,stroke:#4A90E2,color:#333,font-weight:bold
+    style J fill:#E8F4F8,stroke:#4A90E2,color:#333,font-weight:bold
+    style K fill:#E8F4F8,stroke:#4A90E2,color:#333,font-weight:bold
 ```
 
 Short positions reverse these payoffs, introducing defined maximum gain against theoretically unlimited loss for short calls or substantial loss for short puts. A trader selling a seventy-strike call at five dollars collects the premium immediately but faces unbounded liability if the stock surges. Selling a ninety-strike put at four dollars generates immediate income but exposes the seller to eighty-six dollars of loss per contract if the stock craters. These asymmetric risk profiles underpin the options market's leverage characteristics—small premium outlays control large notional exposures, magnifying both gains and losses relative to outright stock positions.

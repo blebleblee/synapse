@@ -149,22 +149,33 @@ tcpdump -nn -i eth0 -X -s 0 -c 1 'host 93.184.216.34 and tcp port 80'
 
 The output reveals the encapsulation hierarchy as a single linear byte stream. The first 14 bytes are the Ethernet header (Layer 2): destination MAC `52:54:00:de:ad:be`, source MAC `52:54:00:ca:fe:01`, EtherType `0x0800` (IPv4). The next 20 bytes are the IP header (Layer 3): version `4`, header length `5` (20 bytes), TTL `64`, protocol `6` (TCP), source `10.0.0.5`, destination `93.184.216.34`. The next 20 bytes are the TCP header (Layer 4): source port `54321`, destination port `80`, sequence number, flags `PSH ACK`, window `64240`. The remaining bytes are the Layer 7 payload: `GET / HTTP/1.1\r\nHost: example.com\r\n\r\n`.
 
-```
-+--------+-------------------+--------------------+------------------+
-| Layer  | Header Fields     | Size               | Observed By      |
-+--------+-------------------+--------------------+------------------+
-| L2     | DstMAC SrcMAC     | 14 bytes           | NIC, bridge,     |
-|        | EtherType         | (+4 for 802.1Q)    | switch CAM table |
-+--------+-------------------+--------------------+------------------+
-| L3     | SrcIP DstIP TTL   | 20 bytes           | Router FIB,      |
-|        | Proto Checksum    | (no options)       | ip_route_output   |
-+--------+-------------------+--------------------+------------------+
-| L4     | SrcPort DstPort   | 20 bytes           | TCP stack,       |
-|        | Seq Ack Flags Win | (no options)       | conntrack, ss    |
-+--------+-------------------+--------------------+------------------+
-| L7     | Protocol Payload  | Variable           | Application      |
-|        | (HTTP, DNS, TLS)  |                    | process, tcpdump |
-+--------+-------------------+--------------------+------------------+
+```mermaid
+flowchart TD
+    subgraph L2_layer ["L2 — Data Link"]
+        L2_fields["<b>Header Fields</b><br/>DstMAC · SrcMAC · EtherType"]
+        L2_size["<b>Size</b><br/>14 bytes (+4 for 802.1Q)"]
+        L2_obs["<b>Observed By</b><br/>NIC · bridge · switch CAM table"]
+    end
+
+    subgraph L3_layer ["L3 — Network"]
+        L3_fields["<b>Header Fields</b><br/>SrcIP · DstIP · TTL · Proto · Checksum"]
+        L3_size["<b>Size</b><br/>20 bytes (no options)"]
+        L3_obs["<b>Observed By</b><br/>Router FIB · ip_route_output"]
+    end
+
+    subgraph L4_layer ["L4 — Transport"]
+        L4_fields["<b>Header Fields</b><br/>SrcPort · DstPort · Seq · Ack · Flags · Win"]
+        L4_size["<b>Size</b><br/>20 bytes (no options)"]
+        L4_obs["<b>Observed By</b><br/>TCP stack · conntrack · ss"]
+    end
+
+    subgraph L7_layer ["L7 — Application"]
+        L7_fields["<b>Header Fields</b><br/>Protocol Payload (HTTP · DNS · TLS)"]
+        L7_size["<b>Size</b><br/>Variable"]
+        L7_obs["<b>Observed By</b><br/>Application process · tcpdump"]
+    end
+
+    L2_layer --> L3_layer --> L4_layer --> L7_layer
 ```
 
 On the transmit path, the kernel constructs this stack inside-out. The application writes the Layer 7 payload into the socket's send buffer. The TCP layer segments it, prepends TCP headers, and passes segments to the IP layer. The IP layer prepends IP headers, performs the route lookup, resolves the next-hop MAC via ARP, and hands the frame to the NIC driver's `ndo_start_xmit` function. The NIC DMA engine reads the frame from memory and transmits it. On the receive path, the reverse occurs: the NIC DMA engine writes the frame to the ring buffer, raises an MSI-X interrupt, the kernel's NAPI poll loop processes the frame, strips the Ethernet header, passes the IP packet to `ip_rcv`, which strips the IP header and passes the TCP segment to `tcp_v4_rcv`, which strips the TCP header and delivers the payload to the socket's receive buffer, where the application's `recv()` call picks it up.

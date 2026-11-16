@@ -92,30 +92,36 @@ The first step is extracting the domain from the envelope recipient address (`ex
 
 The resolution flow can be visualized as:
 
-```
-RCPT TO: <alice@example.com>
-         │
-         ▼
-   DNS Query: MX example.com
-         │
-         ├─ MX records found?
-         │       │ YES
-         │       ▼
-         │  Sort by priority (ascending)
-         │  Within equal priority: randomize order
-         │  For each MX hostname:
-         │       └─ DNS A/AAAA query → IP address
-         │       └─ Attempt SMTP connection on port 25 (or 587/465)
-         │       └─ Success? → deliver. Failure? → try next.
-         │
-         └─ NO MX records found?
-                 │
-                 ▼
-           DNS A/AAAA query for domain itself
-           (implicit MX with priority 0 — RFC 5321 §5)
-                 │
-                 ├─ A/AAAA found? → attempt delivery
-                 └─ NXDOMAIN or no A record → permanent failure (5xx)
+```mermaid
+flowchart TD
+    Start["RCPT TO: &lt;alice@example.com&gt;"]
+    
+    Start --> DNSQuery["DNS Query: MX example.com"]
+    
+    DNSQuery --> CheckMX{"MX records found?"}
+    
+    CheckMX -->|YES| Sort["Sort by priority (ascending)<br/>Within equal priority: randomize order"]
+    
+    Sort --> ForEach["For each MX hostname"]
+    
+    ForEach --> ResolveIP["DNS A/AAAA query → IP address"]
+    ResolveIP --> AttemptSMTP["Attempt SMTP connection<br/>on port 25 (or 587/465)"]
+    AttemptSMTP --> CheckSuccess{"Success?"}
+    
+    CheckSuccess -->|YES| Deliver["Deliver message"]
+    CheckSuccess -->|NO| TryNext["Try next MX host"]
+    TryNext --> ForEach
+    
+    CheckMX -->|NO| FallbackQuery["DNS A/AAAA query for domain itself<br/>(implicit MX with priority 0 — RFC 5321 §5)"]
+    
+    FallbackQuery --> CheckARecord{"A/AAAA found?"}
+    
+    CheckARecord -->|YES| AttemptDelivery["Attempt delivery"]
+    CheckARecord -->|NO| PermanentFailure["Permanent failure (5xx)<br/>NXDOMAIN or no A record"]
+    
+    Deliver --> End([End])
+    AttemptDelivery --> End
+    PermanentFailure --> End
 ```
 
 The fallback to the A record when no MX exists is a critical invariant that many junior engineers miss. A domain with no MX records is not undeliverable — it accepts mail directly on its A record IP, treated as an implicit MX with the lowest possible priority. This matters for infrastructure domains that run mail incidentally.

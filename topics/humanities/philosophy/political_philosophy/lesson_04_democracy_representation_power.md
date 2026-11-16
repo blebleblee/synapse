@@ -54,32 +54,36 @@ Different democracies resolve this differently. The U.S. Constitution explicitly
 
 Here is the architecture of these three mechanisms presented in relational form:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    DEMOCRATIC SYSTEM ARCHITECTURE               │
-└─────────────────────────────────────────────────────────────────┘
-
-CONSTITUTIONAL LAYER (Second-Order: Rules About Rules)
-    ↓ (establishes procedures for & constrains)
+```mermaid
+flowchart TD
+    Title["<b>DEMOCRATIC SYSTEM ARCHITECTURE</b>"]
     
-ELECTORAL MECHANISM (Preference → Offices)
-    ├─ Vote Aggregation Rule (FPTP, PR, Ranked Choice)
-    ├─ District Structure (Single-member, Multi-member, Mixed)
-    ├─ Candidacy Rules (Who can run; party access; ballot access)
-    └─ Generates: Citizen Preference Revelation Problem
+    subgraph Constitutional1["CONSTITUTIONAL LAYER (Second-Order: Rules About Rules)"]
+        C1["Establishes procedures for & constrains lower layers"]
+    end
     
-    ↓ (produces)
+    subgraph Electoral["ELECTORAL MECHANISM (Preference → Offices)"]
+        E1["Vote Aggregation Rule<br/>(FPTP, PR, Ranked Choice)"]
+        E2["District Structure<br/>(Single-member, Multi-member, Mixed)"]
+        E3["Candidacy Rules<br/>(Who can run; party access; ballot access)"]
+        E4["<i>Generates: Citizen Preference<br/>Revelation Problem</i>"]
+    end
     
-LEGISLATIVE MECHANISM (Deliberation → Collective Decisions)
-    ├─ Procedural Rules (Speaking time, amendment rights, voting thresholds)
-    ├─ Committee Structure (Which issues deliberated where)
-    ├─ Transparency & Participation (Public access, citizen input channels)
-    └─ Generates: Aggregation vs. Deliberation Tension
+    subgraph Legislative["LEGISLATIVE MECHANISM (Deliberation → Collective Decisions)"]
+        L1["Procedural Rules<br/>(Speaking time, amendment rights, voting thresholds)"]
+        L2["Committee Structure<br/>(Which issues deliberated where)"]
+        L3["Transparency & Participation<br/>(Public access, citizen input channels)"]
+        L4["<i>Generates: Aggregation vs.<br/>Deliberation Tension</i>"]
+    end
     
-    ↓ (subject to constraint from)
+    subgraph Constitutional2["CONSTITUTIONAL LAYER (Rights, Structures, Amendment Procedures)"]
+        C2["<i>Generates: Counter-Majoritarian<br/>Difficulty & Path Dependency</i>"]
+    end
     
-CONSTITUTIONAL LAYER (Rights, Structures, Amendment Procedures)
-    └─ Generates: Counter-Majoritarian Difficulty & Path Dependency
+    Title --> Constitutional1
+    Constitutional1 -->|"establishes procedures for<br/>& constrains"| Electoral
+    Electoral -->|produces| Legislative
+    Legislative -->|"subject to<br/>constraint from"| Constitutional2
 ```
 
 This tripartite architecture reveals why no single reform solves democratic problems. Electoral reform might improve preference revelation but cannot alter legislative deliberation quality. Constitutional entrenchment protects rights but constrains adaptive capacity. Complementary reforms must operate across all three layers, and reforms in one layer create feedback effects in others.
@@ -104,4 +108,19 @@ The mechanism operates through several feedback loops. Media coverage frames pol
 
 The resulting pathology is that deliberation becomes impossible: representatives no longer view opposition as honest disagreement but as moral enemies. Compromise becomes electoral death, and any negotiation with the opposing party is framed as betrayal. Constitutional majorities become difficult to construct because genuine cross-party agreement dissolves. The system moves toward winner-take-all politics where holding power matters more than policy substance, and where power-holding involves extensive use of executive prerogatives and judicial nominations to entrench partisan advantage beyond the scope of normal legislative deliberation.
 
-How can we diagnose whether this is primarily an electoral failure, deliberative failure, or constitutional failure? The diagnosis determines the appropriate reform. If the root cause is electoral—sorting is driven by the electoral mechanism's incentives—then reforms should target candidate selection (perhaps open primary systems where candidates are selected through ranked-choice voting to favor centrists), gerrymandering (independent redistricting
+How can we diagnose whether this is primarily an electoral failure, deliberative failure, or constitutional failure? The diagnosis determines the appropriate reform.
+
+The diagnosis of democratic pathology requires distinguishing which failure is primary because misidentification produces counterproductive remedies. An electoral failure diagnosis points toward ranked-choice voting, open primaries, or proportional representation as corrective mechanisms: the problem is that incentive structures reward extremism, and redesigning elections would shift those incentives. A deliberative failure diagnosis points instead toward institutional redesign of legislatures themselves, restoring committee power, requiring supermajority thresholds for certain votes, or creating citizens' assemblies that bypass partisan elites entirely. A constitutional failure diagnosis, the most serious, holds that the problem is not elections or deliberation but the foundational rules themselves: separated powers, counter-majoritarian veto points, and partisan judicial appointments have been weaponized to such a degree that no electoral or deliberative reform operating within the existing constitutional frame can break the cycle. In practice, the pathologies are mutually reinforcing rather than cleanly separable. Electoral sorting produces representatives who cannot deliberate, legislative dysfunction delegitimizes elections by suggesting outcomes are meaningless, and constitutional ambiguity creates incentives for each party to exploit gaps that the other party's future exploitation will make permanent. Accurate diagnosis therefore requires examining the temporal sequence: when did each failure become acute, and which preceded which? In the American case, constitutional veto structures predated partisan sorting and arguably created the conditions for it by making unified government so consequential that ideological discipline became rational strategy for party coalitions.
+
+What follows from this analysis is a clarified framework for evaluating democratic legitimacy over time. Democracy's claim on our allegiance rests not merely on the fact of elections but on elections producing representatives who actually deliberate, on deliberation generating outputs that approximate the considered preferences of constituents, and on constitutional structures that keep any single faction from permanently foreclosing future revision. When any one of these links breaks, the remaining links come under structural stress. A society can sustain temporary deliberative failure if elections remain competitive and constitutional rules prevent entrenchment. It can sustain temporary electoral distortion if deliberative norms among elites remain strong and constitutional constraints hold. But when all three fail simultaneously and reinforce each other's failure, the political system loses its self-correcting capacity. The student of political philosophy must therefore evaluate democratic health not by any single metric but by tracking all three dimensions and, critically, by attending to the feedback dynamics among them, since the most dangerous democratic erosion occurs not in sudden ruptures but in gradual, mutually accelerating degradation that remains deniable at each individual step.
+
+## Summary & Verification Matrix
+
+| Dimension | Governing Invariant | Core Mechanism | Diagnostic Criterion | Failure Mode | Reform Lever |
+|---|---|---|---|---|---|
+| **Electoral Representation** | Elections must translate voter preferences into representative compositions without systematic distortion | Aggregation rules (plurality, PR, ranked-choice) convert vote shares into seat shares; district geometry shapes constituency composition | Does the seat distribution correspond to the population's expressed preferences across parties and issues? | Manufactured majorities via gerrymandering or plurality distortion; primary capture by ideological minorities | Redistricting reform, proportional or ranked-choice systems, open primaries |
+| **Deliberative Legitimacy** | Legislative outcomes require justification through public reasoning, not mere preference aggregation | Committee structure, amendment procedures, and norms of reciprocity enable cross-factional negotiation; media framing shapes what counts as legitimate argument | Do legislators offer publicly articulable reasons, engage opposing arguments, and produce negotiated rather than purely party-line outputs? | Partisan sorting eliminates genuine deliberation; compromise becomes electorally punished; opposition treated as moral enemies | Restore committee authority, supermajority requirements for key votes, citizens' assembly mechanisms |
+| **Constitutional Structure** | Foundational rules must remain revisable and must not be permanently capturable by any single faction | Veto points (bicameralism, executive veto, judicial review) distribute power; amendment procedures set thresholds for rule change; judicial appointments encode past majorities | Are constitutional ambiguities being exploited asymmetrically, and do current rules allow future majorities to reverse present entrenchments? | Weaponized counter-majoritarianism; judicial capture; executive prerogative expansion beyond legislative remedy | Constitutional clarification, norm codification into statute, appointment reform |
+| **Partisan Sorting** | Ideological alignment across multiple issue dimensions amplifies political conflict and reduces cross-cutting coalitions | Media framing, primary incentives, and elite messaging discipline cause voters to align cultural and economic preferences with party identity | Has the correlation between party identity and positions across unrelated issue dimensions increased over time, reducing voters who split across policy areas? | Monolithic ideological camps make compromise illegible as betrayal; winner-take-all logic supersedes policy substance | Cross-cutting electoral incentives, media regulation, campaign finance reform to reduce primary extremism |
+| **Legitimacy-Consent Link** | Political authority is legitimate only insofar as it remains traceable to meaningful, revisable consent | Chains of accountability running from citizen preferences through elections to legislative outputs to enforceable law; each link must transmit rather than distort preference | Can citizens identify how their expressed preferences produced or could produce policy outcomes, and do they retain credible mechanisms for future correction? | Alienation and disengagement when accountability chains are perceived as broken; legitimacy crisis enabling authoritarian alternatives | Transparency in procedure, genuine responsiveness demonstrated through policy outcomes, anti-corruption enforcement |
+| **Systemic Feedback and Self-Correction** | A resilient democracy requires at least one functional self-correcting mechanism that operates even when other dimensions fail | Competitive elections correct deliberative failure; strong deliberative norms correct electoral distortion; constitutional constraints prevent entrenchment when both fail | Are the three primary dimensions (electoral, deliberative, constitutional) failing simultaneously and reinforcing each other, or is at least one functioning as a corrective check? | Mutually accelerating degradation where no single dimension can arrest decline in the others; erosion remains deniable at each incremental step | Prioritize whichever dimension retains the most residual functionality; sequence reforms to restore one corrective mechanism before attempting comprehensive redesign |

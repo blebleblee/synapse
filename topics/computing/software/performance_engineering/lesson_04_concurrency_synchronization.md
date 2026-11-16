@@ -204,20 +204,27 @@ This implementation deliberately avoids the ABA problem by using the sentinel-no
 
 The relationship between acquire/release pairs can be visualized as a directed acyclic graph where each node is an atomic operation and each edge represents a synchronizes-with relationship that establishes happens-before ordering.
 
-```
-Thread 1 (Producer)                 Thread 2 (Consumer)
-─────────────────────────────────   ─────────────────────────
-data = compute_result()             
-                │                   
-atomic_store(&flag, 1,              
-  memory_order_release)             
-                │                   
-                └──── synchronizes-with ────▶ load = atomic_load(&flag,
-                                                memory_order_acquire)
-                                                      │
-                                             if (load == 1)
-                                               use(data)  ← safe: happens-after
-                                                            data = compute_result()
+```mermaid
+flowchart TD
+    subgraph thread1["Thread 1 (Producer)"]
+        A["data = compute_result()"]
+        B["atomic_store(&flag, 1,<br/>memory_order_release)"]
+    end
+    
+    subgraph thread2["Thread 2 (Consumer)"]
+        C["load = atomic_load(&flag,<br/>memory_order_acquire)"]
+        D["if load == 1"]
+        E["use(data)<br/><br/>Safe: happens-after<br/>data = compute_result()"]
+    end
+    
+    A --> B
+    B -->|synchronizes-with| C
+    C --> D
+    D -->|true| E
+    
+    style thread1 fill:#e1f5ff
+    style thread2 fill:#f3e5f5
+    style E fill:#c8e6c9
 ```
 
 The release store on `flag` and the acquire load that reads value `1` form the synchronizes-with edge. Everything that *happened before* the release store in Thread 1 is visible to everything that *happens after* the acquire load in Thread 2. This is not a philosophical claim about time—it is a hardware guarantee implemented by preventing the compiler and CPU from moving stores after a release barrier or loads before an acquire barrier in the generated instruction stream.

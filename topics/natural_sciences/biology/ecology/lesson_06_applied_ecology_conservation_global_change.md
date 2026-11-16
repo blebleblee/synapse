@@ -52,48 +52,49 @@ Marxan solves this NP-hard optimization by simulated annealing: beginning with a
 
 The practical workflow demands careful attention to input data construction. Conservation feature layers must be rasterized to the same spatial resolution and projection as your planning unit grid. Cost layers require thoughtful selection — opportunity cost (forgone agricultural income) is ecologically more defensible than land purchase price as a proxy for the real cost of protection, and the two are not always correlated. A common practitioner error is using a uniform cost surface, which causes Marxan to find solutions that are geographically efficient but politically infeasible because they concentrate reserves in lands that happen to be spatially central rather than lands that are actually cheap to protect.
 
-```
-Marxan Planning Workflow:
-─────────────────────────────────────────────────────────
- Input Preparation
- ┌──────────────────────┐    ┌──────────────────────┐
- │  Planning Unit Grid  │    │  Conservation        │
- │  (shapefile/raster)  │    │  Feature Layers      │
- │  - Equal-area proj.  │    │  - Species SDMs      │
- │  - Cost attribute    │    │  - Habitat types     │
- └──────────┬───────────┘    │  - Ecological procs. │
-            │                └──────────┬───────────┘
-            └──────────┬────────────────┘
-                       ▼
-         ┌─────────────────────────────┐
-         │   Input Matrix Generation   │
-         │   (pu.dat, spec.dat,        │
-         │    puvspr.dat, bound.dat)   │
-         └──────────────┬──────────────┘
-                        ▼
-         ┌─────────────────────────────┐
-         │   Parameter Configuration  │
-         │   input.dat:               │
-         │   - NUMREPS = 100          │
-         │   - BLM = [tune per taxa]  │
-         │   - SPFDEFAULT = 100       │
-         │   - STARTTEMP = -1 (auto)  │
-         └──────────────┬──────────────┘
-                        ▼
-         ┌─────────────────────────────┐
-         │   Simulated Annealing       │
-         │   100× independent runs     │
-         │   Cooling schedule: auto    │
-         └──────────────┬──────────────┘
-                        ▼
-         ┌─────────────────────────────┐
-         │   Output Analysis           │
-         │   - Selection frequency map │
-         │   - Best solution cost      │
-         │   - Target achievement %    │
-         │   - Irreplaceability ranks  │
-         └─────────────────────────────┘
-─────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    PU["Planning Unit Grid
+    (shapefile/raster)
+    • Equal-area projection
+    • Cost attribute"]
+
+    CF["Conservation Feature Layers
+    • Species SDMs
+    • Habitat types
+    • Ecological processes"]
+
+    IMG["Input Matrix Generation
+    pu.dat · spec.dat
+    puvspr.dat · bound.dat"]
+
+    PC["Parameter Configuration
+    input.dat
+    • NUMREPS = 100
+    • BLM = [tune per taxa]
+    • SPFDEFAULT = 100
+    • STARTTEMP = -1 (auto)"]
+
+    SA["Simulated Annealing
+    100× independent runs
+    Cooling schedule: auto"]
+
+    OA["Output Analysis
+    • Selection frequency map
+    • Best solution cost
+    • Target achievement %
+    • Irreplaceability ranks"]
+
+    subgraph inputs ["Input Preparation"]
+        PU
+        CF
+    end
+
+    PU --> IMG
+    CF --> IMG
+    IMG --> PC
+    PC --> SA
+    SA --> OA
 ```
 
 ### Population Viability Analysis and Minimum Viable Population
@@ -122,43 +123,17 @@ The regularization multiplier $\beta$ controls model complexity: low $\beta$ pro
 
 For climate change projections, the workflow transfers the fitted niche model from current climate layers (typically derived from WorldClim or CHELSA at 30-arcsecond or 1-km resolution) to future climate scenarios. The standard climate input set includes temperature seasonality (BIO4), mean temperature of warmest quarter (BIO10), precipitation seasonality (BIO15), and precipitation of driest quarter (BIO17) as the most ecologically mechanistic variables from the 19 standard bioclimatic variables. Future climate layers from CMIP6 models, downscaled to match current-climate resolution, provide the projection surface under SSP2-4.5 (moderate) and SSP5-8.5 (high-emission) scenarios. The resulting shift in predicted suitable habitat area, geographic centroid position, and velocity of niche shift quantifies both the magnitude of climate vulnerability and the directionality of likely range shifts.
 
-```
-SDM Projection Workflow (R / biomod2):
-─────────────────────────────────────────────────────────
- Occurrence Data                   Environmental Predictors
- ┌──────────────────┐              ┌───────────────────────┐
- │ GBIF / iNaturalist│             │ WorldClim BIO1-19      │
- │ Cleaned records  │             │ Current (1970-2000)    │
- │ Spatial rarefied │             │ CMIP6 SSP2-4.5/5-8.5  │
- └────────┬─────────┘              └────────────┬──────────┘
-          │                                     │
-          └────────────────┬────────────────────┘
-                           ▼
-            ┌──────────────────────────┐
-            │   ENMeval / biomod2      │
-            │   Model Tuning           │
-            │   - β regularization     │
-            │   - Feature class select │
-            │   - Spatial block CV     │
-            │   - AUC / TSS / Boyce    │
-            └──────────────┬───────────┘
-                           ▼
-            ┌──────────────────────────┐
-            │   Ensemble Projection    │
-            │   - MaxEnt               │
-            │   - Random Forest        │
-            │   - GLM / GAM            │
-            │   - GBM                  │
-            │   Weighted by TSS scores │
-            └──────────────┬───────────┘
-                           ▼
-         ┌────────────────────────────────┐
-         │   Change Maps (2050, 2100)     │
-         │   - Area gain / loss           │
-         │   - Range centroid shift (km)  │
-         │   - Climate debt exposure      │
-         └────────────────────────────────┘
-─────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    A["Occurrence Data<br/>GBIF / iNaturalist<br/>Cleaned records<br/>Spatial rarefied"]
+    B["Environmental Predictors<br/>WorldClim BIO1-19<br/>Current (1970-2000)<br/>CMIP6 SSP2-4.5/5-8.5"]
+    
+    A --> C["ENMeval / biomod2<br/>Model Tuning<br/>- β regularization<br/>- Feature class select<br/>- Spatial block CV<br/>- AUC / TSS / Boyce"]
+    B --> C
+    
+    C --> D["Ensemble Projection<br/>- MaxEnt<br/>- Random Forest<br/>- GLM / GAM<br/>- GBM<br/>Weighted by TSS scores"]
+    
+    D --> E["Change Maps (2050, 2100)<br/>- Area gain / loss<br/>- Range centroid shift (km)<br/>- Climate debt exposure"]
 ```
 
 ### Restoration Ecology: Protocol-Level Mechanics

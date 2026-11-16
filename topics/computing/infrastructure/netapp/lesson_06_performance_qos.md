@@ -62,34 +62,25 @@ When an I/O request enters the storage stack, the Classification Controller extr
 
 The Admission Controller makes the gate-keeping decision: should this I/O be admitted immediately to the backend, or should it be queued pending token availability? This decision requires consulting the Rate Limiting Scheduler, which maintains per-policy token buckets and tracks current consumption rates. The token bucket data structure consists of four fields: current token count, maximum capacity, refill rate (tokens per millisecond), and last refill timestamp. The admission algorithm computes the tokens required for the incoming I/O—typically 1 token per IOP or N tokens per megabyte for throughput-limited policies—and checks whether sufficient tokens exist. If the bucket contains adequate tokens, the I/O is admitted and the token count is decremented atomically. If tokens are insufficient, the I/O enters a per-policy wait queue ordered by arrival time or priority level.
 
-```
-Token Bucket State Machine:
-
-┌─────────────────────────────────────────┐
-│  Policy: vol_db_data (max 15000 IOPS)  │
-│  Bucket Capacity: 15000 tokens          │
-│  Current Tokens: 8234                   │
-│  Refill Rate: 250 tokens/ms             │
-│  Last Refill: T=1000ms                  │
-└─────────────────────────────────────────┘
-           │
-           │  Incoming I/O (8KB read, cost: 1 token)
-           ▼
-    ┌──────────────┐
-    │ Check Tokens │  8234 >= 1 ? YES
-    └──────────────┘
-           │
-           ▼
-    ┌──────────────┐
-    │ Admit I/O    │  Decrement: 8234 - 1 = 8233
-    │ to Backend   │
-    └──────────────┘
-           │
-           │  Time advances to T=1001ms
-           ▼
-    ┌──────────────┐
-    │ Refill Bucket│  Add 250 tokens: 8233 + 250 = 8483
-    └──────────────┘
+```mermaid
+flowchart TD
+    Policy["Policy: vol_db_data (max 15000 IOPS)<br/>Bucket Capacity: 15000 tokens<br/>Current Tokens: 8234<br/>Refill Rate: 250 tokens/ms<br/>Last Refill: T=1000ms"]
+    
+    Request["Incoming I/O<br/>(8KB read, cost: 1 token)"]
+    
+    Check["Check Tokens<br/>8234 >= 1 ? YES"]
+    
+    Admit["Admit I/O to Backend<br/>Decrement: 8234 - 1 = 8233"]
+    
+    TimeAdvance["Time advances to T=1001ms"]
+    
+    Refill["Refill Bucket<br/>Add 250 tokens: 8233 + 250 = 8483"]
+    
+    Policy --> Request
+    Request --> Check
+    Check --> Admit
+    Admit --> TimeAdvance
+    TimeAdvance --> Refill
 ```
 
 The refill mechanism executes asynchronously at high frequency—typically every millisecond or sub-millisecond—to minimize latency variance. A dedicated kernel thread within the QoS subsystem iterates through all active token buckets, computes elapsed time since last refill, calculates the token increment based on refill rate and elapsed duration, and updates bucket state atomically using lock-free compare-and-swap operations to avoid contention on the critical path. When a bucket refills, the scheduler examines the associated wait queue and admits queued I/Os in FIFO order until tokens are exhausted or the queue is drained.
@@ -98,24 +89,22 @@ Adaptive QoS policies introduce a formula evaluation layer between policy defini
 
 The interaction between minimum guarantees (IOPS floors) and maximum limits (IOPS ceilings) requires a two-tier arbitration strategy. Workloads with minimum guarantees receive priority admission when aggregate resources approach saturation—the Rate Limiting Scheduler maintains a reserved resource pool that only guaranteed workloads can access. When a workload with a minimum guarantee submits I/O and finds its standard token bucket empty, the admission controller checks whether the workload's consumption rate has fallen below its guarantee. If so, it admits the I/O from the reserved pool, effectively bypassing the maximum limit temporarily to honor the minimum commitment. This preemption mechanism ensures that guaranteed workloads never starve, even when competing with aggressive non-guaranteed traffic.
 
-```
-Resource Pool Allocation:
-
-Total Aggregate IOPS Capacity: 100,000
-
-┌──────────────────────────────────────────────┐
-│  Reserved Pool (30,000 IOPS)                 │
-│  - vol_db_data:   min 5,000 IOPS  ▓▓▓▓▓     │
-│  - vol_mission:   min 10,000 IOPS ▓▓▓▓▓▓▓▓▓▓│
-│  - vol_critical:  min 15,000 IOPS ▓▓▓▓▓▓▓▓▓▓│
-└──────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────┐
-│  Shared Pool (70,000 IOPS)                   │
-│  - All workloads compete for shared tokens   │
-│  - Subject to max limits and proportional    │
-│    fairness algorithms                       │
-└──────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Total["Total Aggregate IOPS Capacity: 100,000"]
+    
+    subgraph Reserved["Reserved Pool (30,000 IOPS)"]
+        VolDB["vol_db_data: min 5,000 IOPS"]
+        VolMission["vol_mission: min 10,000 IOPS"]
+        VolCritical["vol_critical: min 15,000 IOPS"]
+    end
+    
+    subgraph Shared["Shared Pool (70,000 IOPS)"]
+        SharedDesc["All workloads compete for shared tokens<br/>Subject to max limits and proportional<br/>fairness algorithms"]
+    end
+    
+    Total --> Reserved
+    Total --> Shared
 ```
 
 Latency-based QoS policies operate differently because latency is not a consumable resource like IOPS—it is an outcome of queueing behavior and backend service time. To enforce a maximum latency target, the QoS scheduler measures the average service time for recent I/Os in a workload's class and uses Little's Law to compute the maximum allowable admission rate: `Max_Admission_Rate = Target_Latency / Avg_Service_Time`. If the observed service time increases due to backend congestion or cache pressure, the admission rate automatically decreases to prevent queue buildup. This feedback-driven approach transforms a latency constraint into an implicitly adaptive IOPS limit that tracks system performance in real-time.

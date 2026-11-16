@@ -67,24 +67,16 @@ The AMQP connection model multiplexes multiple independent logical channels over
 
 Consumer acknowledgment in AMQP 0-9-1 is explicit and delivery-scoped. The broker assigns each delivered message a **delivery tag**, a per-channel monotonically increasing integer. The consumer sends `Basic.Ack` with the delivery tag (and optionally the `multiple` flag to acknowledge all tags up to and including that value) to signal successful processing. If the consumer's TCP connection drops before an acknowledgment arrives, the broker re-queues all unacknowledged messages from that channel and delivers them to the next available consumer. This is the mechanism that realizes at-least-once semantics: the broker retains custody of the message until proof of processing arrives.
 
-```
-AMQP 0-9-1 Message Flow
-────────────────────────────────────────────────────────────────────
-  Producer                   RabbitMQ Broker              Consumer
-     │                            │                            │
-     │── Basic.Publish ──────────▶│                            │
-     │   exchange="orders"        │  Exchange: topic           │
-     │   routing_key="eu.paid"    │  Binding: "eu.#" → q1     │
-     │   body=[payload]           │                            │
-     │                            │── Basic.Deliver ──────────▶│
-     │                            │   delivery_tag=42          │
-     │                            │   body=[payload]           │
-     │                            │                            │
-     │                            │◀─ Basic.Ack ───────────────│
-     │                            │   delivery_tag=42          │
-     │                            │                            │
-     │                 [message removed from queue]            │
-────────────────────────────────────────────────────────────────────
+```mermaid
+flowchart LR
+    Producer["Producer"]
+    Broker["RabbitMQ Broker<br/><br/>Exchange: topic<br/>Binding: 'eu.#' → q1"]
+    Consumer["Consumer"]
+    
+    Producer -->|"1. Basic.Publish<br/>exchange='orders'<br/>routing_key='eu.paid'<br/>body=[payload]"| Broker
+    Broker -->|"2. Basic.Deliver<br/>delivery_tag=42<br/>body=[payload]"| Consumer
+    Consumer -->|"3. Basic.Ack<br/>delivery_tag=42"| Broker
+    Broker -.->|"message removed from queue"| Broker
 ```
 
 ### MQTT: Persistent Sessions and QoS State Machines

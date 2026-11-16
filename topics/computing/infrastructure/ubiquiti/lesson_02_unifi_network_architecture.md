@@ -22,40 +22,41 @@ The core collections that practitioners need to understand are as follows. The `
 
 The inform cycle is the heartbeat of the entire system. Every UniFi device periodically sends an HTTP POST to a URL of the form `http://<controller>:8080/inform`. The body of this POST is a binary payload encrypted with a device-specific key (AES-128-CBC with a key derived from the device's authentication credentials) containing a JSON object reporting the device's current status: uptime, firmware version, radio statistics, interface counters, connected clients, and a hash of its current configuration. The controller receives this inform, decrypts it, updates its local view of the device's operational state in the `device` collection, and responds with one of three possible responses: an empty acknowledgment meaning the device's state is consistent with desired configuration, a new configuration payload telling the device to apply changes, or a command such as a reboot or firmware upgrade instruction. The default inform interval is 30 seconds, though devices in an adoption-pending state poll more aggressively at roughly five-second intervals.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     UniFi Network Application                    │
-│                                                                  │
-│  ┌─────────────┐    ┌──────────────┐    ┌────────────────────┐  │
-│  │   REST API  │    │  Inform Loop │    │  MongoDB           │  │
-│  │  (HTTPS/    │    │  Handler     │    │  ┌──────────────┐  │  │
-│  │   8443)     │───▶│  (HTTP 8080) │───▶│  │   device     │  │  │
-│  └─────────────┘    └──────┬───────┘    │  │   site       │  │  │
-│         ▲                  │            │  │   wlan       │  │  │
-│         │            diff & provision   │  │   network    │  │  │
-│  ┌──────┴──────┐           │            │  │   stat       │  │  │
-│  │  Browser /  │    ┌──────▼───────┐    │  └──────────────┘  │  │
-│  │  unifi-os   │    │  Config      │    └────────────────────┘  │
-│  │  dashboard  │    │  Serializer  │                            │
-│  └─────────────┘    └──────────────┘                            │
-└─────────────────────────────────────────────────────────────────┘
-          ▲                  │
-          │  HTTPS 8443      │  HTTP 8080 inform POST
-          │  (UI/API)        │  (AES-128-CBC payload)
-          │                  ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      UniFi Device (AP/Switch/Gateway)            │
-│                                                                  │
-│  ┌────────────┐    ┌──────────────┐    ┌──────────────────────┐ │
-│  │  mcad      │    │  ubnt-util   │    │  syswrapper /        │ │
-│  │ (inform    │───▶│  (config     │───▶│  hostapd / mca-ctrl  │ │
-│  │  agent)    │    │   applier)   │    │  (data plane config) │ │
-│  └────────────┘    └──────────────┘    └──────────────────────┘ │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │          Forwarding Hardware (ASIC / mac80211 / OpenWrt)   │ │
-│  └────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph unifi_app ["UniFi Network Application"]
+        REST["REST API\n(HTTPS / 8443)"]
+        INFORM["Inform Loop Handler\n(HTTP 8080)"]
+        SERIAL["Config Serializer"]
+        BROWSER["Browser / unifi-os dashboard"]
+
+        subgraph mongo ["MongoDB"]
+            COLS["device · site · wlan\nnetwork · stat"]
+        end
+
+        REST -->|"incoming request"| INFORM
+        INFORM -->|"persist state"| mongo
+        INFORM -->|"diff & provision"| SERIAL
+        BROWSER -->|"HTTPS 8443"| REST
+    end
+
+    subgraph unifi_device ["UniFi Device (AP / Switch / Gateway)"]
+        MCAD["mcad\n(inform agent)"]
+        UBNT["ubnt-util\n(config applier)"]
+        SYSWRAP["syswrapper / hostapd / mca-ctrl\n(data plane config)"]
+
+        subgraph fwd_hw ["Forwarding Hardware (ASIC / mac80211 / OpenWrt)"]
+            HW[" "]
+        end
+
+        MCAD -->|"apply config"| UBNT
+        UBNT -->|"program hardware"| SYSWRAP
+        SYSWRAP --> fwd_hw
+    end
+
+    MCAD -->|"HTTP 8080 inform POST\n(AES-128-CBC payload)"| INFORM
+    REST -->|"HTTPS 8443\n(UI / API)"| BROWSER
+    SERIAL -->|"provisioned config\nHTTPS 8443"| MCAD
 ```
 
 ### Device-Side Agent Architecture

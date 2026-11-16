@@ -1162,9 +1162,9 @@ graph TD
     J -->|"Checkpoint"| K[Write Blocks to Final Location]
     K -->|"Update on-disk structures"| L[Disk]
     
-    style A fill:#e1f5ff
-    style L fill:#ffe1e1
-    style H fill:#fff9e1
+    style A fill:#e1f5ff,color:#0f172a
+    style L fill:#ffe1e1,color:#0f172a
+    style H fill:#fff9e1,color:#0f172a
 ```
 
 ### Visualization: XFS Allocation Group Independence
@@ -1196,9 +1196,9 @@ graph LR
     T2[Thread 2] -.->|"Lock AG 1"| A1
     T3[Thread 3] -.->|"Lock AG 2"| A2
     
-    style T1 fill:#e1ffe1
-    style T2 fill:#e1f5ff
-    style T3 fill:#ffe1f5
+    style T1 fill:#e1ffe1,color:#0f172a
+    style T2 fill:#e1f5ff,color:#0f172a
+    style T3 fill:#ffe1f5,color:#0f172a
 ```
 
 ### Visualization: Btrfs CoW Snapshot
@@ -1216,10 +1216,10 @@ graph TD
     
     R2 -->|"Current root points to"| N2
     
-    style R1 fill:#ffe1e1
-    style R2 fill:#e1ffe1
-    style L1 fill:#fff9e1
-    style L2 fill:#e1f5ff
+    style R1 fill:#ffe1e1,color:#0f172a
+    style R2 fill:#e1ffe1,color:#0f172a
+    style L1 fill:#fff9e1,color:#0f172a
+    style L2 fill:#e1f5ff,color:#0f172a
 ```
 
 ### Real-World Benchmarks

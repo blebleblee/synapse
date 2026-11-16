@@ -26,27 +26,23 @@ Understanding these three invariants before touching any code is essential becau
 
 Playwright's internal architecture involves four distinct process boundaries, and understanding the data flow across those boundaries is prerequisite to diagnosing any non-trivial failure. The diagram below names each layer and the protocol used at each crossing.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  TEST PROCESS (Node.js / Python / Java / .NET)                  │
-│                                                                 │
-│  page.click('#submit')  →  Locator.click()  →  Channel.send()  │
-└───────────────────────────────┬─────────────────────────────────┘
-                                │  JSON-RPC over stdio pipe
-                                │  (Playwright Transport Protocol)
-┌───────────────────────────────▼─────────────────────────────────┐
-│  PLAYWRIGHT SERVER PROCESS  (Node.js, browser-agnostic)         │
-│                                                                 │
-│  BrowserDispatcher → PageDispatcher → FrameDispatcher          │
-│  Action pipeline: attach → visible → stable → enabled → hit    │
-└──────┬────────────────────────────────────┬──────────────────────┘
-       │  Chrome DevTools Protocol (CDP)    │  Firefox Remote Proto
-       │  WebSocket                         │  WebSocket
-┌──────▼──────────┐              ┌──────────▼─────────────────────┐
-│  CHROMIUM       │              │  FIREFOX / WEBKIT              │
-│  browser proc   │              │  browser proc                  │
-│  + CDP endpoint │              │  + patched remote endpoint     │
-└─────────────────┘              └────────────────────────────────┘
+```mermaid
+flowchart TD
+    TestProcess["TEST PROCESS<br/>(Node.js / Python / Java / .NET)<br/><br/>page.click('#submit') → Locator.click() → Channel.send()"]
+    
+    Transport["JSON-RPC over stdio pipe<br/>(Playwright Transport Protocol)"]
+    
+    Server["PLAYWRIGHT SERVER PROCESS<br/>(Node.js, browser-agnostic)<br/><br/>BrowserDispatcher → PageDispatcher → FrameDispatcher<br/>Action pipeline: attach → visible → stable → enabled → hit"]
+    
+    CDP["Chrome DevTools Protocol (CDP)<br/>WebSocket"]
+    Firefox["Firefox Remote Protocol<br/>WebSocket"]
+    
+    Chromium["CHROMIUM<br/>browser proc<br/>+ CDP endpoint"]
+    FirefoxWebkit["FIREFOX / WEBKIT<br/>browser proc<br/>+ patched remote endpoint"]
+    
+    TestProcess -->|Transport| Server
+    Server -->|CDP| Chromium
+    Server -->|Firefox| FirefoxWebkit
 ```
 
 The test process never speaks directly to a browser. All browser communication is mediated by the Playwright server process, which runs in a separate Node.js instance regardless of what language the test is written in. When you use Playwright from Python, the Python bindings spawn a Node.js child process and communicate with it via a length-prefixed JSON-RPC stream over stdio. This design has an important implication: the normalization logic lives entirely in the TypeScript server, and all language bindings are thin wires that relay typed messages. A bug fixed in the TypeScript core is immediately available to all language bindings without changes to any of them.

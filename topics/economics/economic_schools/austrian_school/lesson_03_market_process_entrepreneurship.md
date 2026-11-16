@@ -28,31 +28,50 @@ Second, the knowledge problem is not merely one of information asymmetry or sear
 
 The signal transmission architecture of the catallaxy can be represented as a directed graph where nodes represent economic actors (consumers, entrepreneurs, resource owners) and edges represent price-mediated exchanges:
 
-```
-                    Consumer Valuations
-                           ↓
-                    Final Goods Prices
-                           ↓
-    ┌──────────────────────┴──────────────────────┐
-    ↓                                              ↓
-Entrepreneurial         Profit/Loss Signals    Resource Prices
-Alert Discovery    ←─────────────────────────→   (Wages, Rent,
-    ↓                                              Interest)
-Production Plans                                    ↓
-    ↓                                         Factor Owners'
-Capital Structure    ←────────────────────→   Allocation Decisions
-Adjustments                                         ↓
-    ↓                                          Time Preference
-New Production  ────────────────────────→     & Saving Behavior
-Methods                                             ↓
-    ↓                                        Capital Accumulation
-Final Goods      ←────────────────────────→   & Interest Rates
-Supply                                              ↓
-    ↓                                          Intertemporal
-Market Clearing  ────────────────────────→    Coordination
-(Local, Partial)                                    ↓
-    └──────────────→ Entrepreneurial Discovery ←───┘
-                     (Iterative Refinement)
+```mermaid
+flowchart TD
+    CV["Consumer Valuations"]
+    FGP["Final Goods Prices"]
+    EAD["Entrepreneurial Alert Discovery"]
+    PLS["Profit/Loss Signals"]
+    RP["Resource Prices<br/>(Wages, Rent, Interest)"]
+    PP["Production Plans"]
+    FO["Factor Owners'<br/>Allocation Decisions"]
+    CSA["Capital Structure<br/>Adjustments"]
+    TP["Time Preference<br/>& Saving Behavior"]
+    NPM["New Production<br/>Methods"]
+    CA["Capital Accumulation<br/>& Interest Rates"]
+    FGS["Final Goods<br/>Supply"]
+    IC["Intertemporal<br/>Coordination"]
+    MC["Market Clearing<br/>(Local, Partial)"]
+    ED["Entrepreneurial Discovery<br/>(Iterative Refinement)"]
+
+    CV --> FGP
+    FGP --> EAD
+    FGP --> RP
+    
+    EAD <--> PLS
+    PLS <--> RP
+    
+    EAD --> PP
+    RP --> FO
+    
+    PP --> CSA
+    CSA <--> FO
+    
+    FO --> TP
+    
+    CSA --> NPM
+    TP --> CA
+    
+    NPM --> FGS
+    FGS <--> CA
+    
+    CA --> IC
+    
+    FGS --> MC
+    MC --> ED
+    IC --> ED
 ```
 
 This architecture reveals several key mechanisms. Entrepreneurial alertness functions as the system's sensor array, detecting disequilibrium patterns through localized observation that no central processor could replicate. The entrepreneur in a particular geographic location notices that local consumers pay higher prices for a commodity than the cost of importing it from a lower-cost region—a pure arbitrage opportunity. The entrepreneur in a particular industry observes that existing firms produce using an outdated technique while a superior method exists but remains undeployed—a technological profit opportunity. The entrepreneur with particular knowledge of consumer psychology recognizes an unmet need that existing products fail to satisfy—a product innovation opportunity. Each of these discoveries leverages knowledge that exists only in dispersed, context-specific form and could not be aggregated into a centralized dataset.

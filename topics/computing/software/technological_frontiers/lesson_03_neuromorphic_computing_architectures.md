@@ -26,49 +26,27 @@ The temporal dynamics of neuromorphic computation emerge from the interplay betw
 
 The address-event representation (AER) protocol underlying spike communication encodes each spike as a tuple (source_neuron_id, timestamp) transmitted as a serialized packet. The timestamp field enables precise temporal coding and allows delayed spike delivery for implementing synaptic delays and temporal windows. Modern neuromorphic chips extend this basic AER format with additional fields for routing metadata, spike payload data encoding analog values or labels, and congestion control flags. The Spinnaker architecture pioneered multicast routing where a single spike packet replicates to multiple destination cores through hardware multicast trees, reducing router load for neurons with high fanout. The routing key encodes both source identity and destination groups, allowing reconfigurable connectivity through programmable routing tables that map keys to output ports without explicit per-synapse addressing.
 
-```
-Neuromorphic Core Architecture (Simplified)
-
-┌─────────────────────────────────────────────────────────────┐
-│  Neural Core (1 of N in 2D mesh)                            │
-│                                                              │
-│  ┌──────────────┐        ┌─────────────────────┐           │
-│  │ AER Router   │◄───────┤ Spike Injection     │           │
-│  │              │        │ (from local neurons) │           │
-│  │ • Packet     │        └─────────────────────┘           │
-│  │   decode     │                                           │
-│  │ • XY routing │        ┌─────────────────────┐           │
-│  │ • FIFO queue │───────►│ Spike Delivery      │           │
-│  └──────────────┘        │ (to local synapses) │           │
-│         ▲                └─────────────────────┘           │
-│         │                          │                        │
-│         │                          ▼                        │
-│         │                ┌──────────────────┐              │
-│         │                │ Synaptic Memory  │              │
-│         │                │  (SRAM/RRAM)     │              │
-│         │                │                  │              │
-│         │                │ [neuron_id] →    │              │
-│         │                │   weight[4-8b]   │              │
-│         │                └────────┬─────────┘              │
-│         │                         │                        │
-│         │                         ▼                        │
-│   ┌─────┴───────────────────────────────────────────┐     │
-│   │        Neuron Array (256-1024 neurons)          │     │
-│   │                                                  │     │
-│   │  Neuron[i]:                                     │     │
-│   │    state: { V_m, V_th, refrac_timer }          │     │
-│   │    dynamics: V_m += weight (on spike)          │     │
-│   │              V_m *= alpha (per timestep)       │     │
-│   │    emit: if V_m > V_th → spike + reset         │     │
-│   └──────────────────────────────────────────────────┘     │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
-
-Inter-Core Communication:
-  Spike flow: Neuron[core_A] → Router[core_A] 
-              → Mesh NoC → Router[core_B] → Synapse[core_B]
-  Latency: ~1-10 μs depending on hop count
-  Throughput: 1-10M spikes/sec per core
+```mermaid
+flowchart TD
+    subgraph core["Neural Core (1 of N in 2D mesh)"]
+        SpikeInj["Spike Injection<br/>(from local neurons)"]
+        AERRouter["AER Router<br/>• Packet decode<br/>• XY routing<br/>• FIFO queue"]
+        SpikeDeliv["Spike Delivery<br/>(to local synapses)"]
+        SynapticMem["Synaptic Memory<br/>(SRAM/RRAM)<br/><br/>[neuron_id] →<br/>weight[4-8b]"]
+        NeuronArray["Neuron Array<br/>(256-1024 neurons)<br/><br/>state: V_m, V_th, refrac_timer<br/>dynamics: V_m += weight<br/>V_m *= alpha per timestep<br/>emit: if V_m > V_th → spike + reset"]
+    end
+    
+    subgraph intercore["Inter-Core Communication"]
+        MeshNoC["Mesh NoC<br/>Latency: ~1-10 μs<br/>Throughput: 1-10M spikes/sec"]
+    end
+    
+    SpikeInj -->|"spike input"| AERRouter
+    AERRouter -->|"route spike"| SpikeDeliv
+    SpikeDeliv -->|"deliver to synapse"| SynapticMem
+    SynapticMem -->|"weight lookup"| NeuronArray
+    NeuronArray -->|"spike output"| AERRouter
+    AERRouter -->|"inter-core spike"| MeshNoC
+    MeshNoC -->|"spike arrival"| AERRouter
 ```
 
 The programming abstraction for neuromorphic systems departs fundamentally from conventional tensor flow graphs, instead providing APIs for network specification through declarative connectivity patterns and neuron parameter configurations. The NxSDK software development kit for Intel Loihi exposes a hierarchical object model where developers instantiate neuron groups with shared parameters, define synaptic connectivity through sparse weight matrices or algorithmic connection rules, and configure learning rules through compartment prototypes. A typical workflow begins by creating a network object, adding neuron compartments with specified LIF parameters ($\tau_m$, $V_{th}$, $V_{rest}$), then connecting compartments through weighted synaptic connections. The connectivity specification supports dense matrices for fully-connected layers, sparse coordinate lists for convolutional receptive fields, or algorithmic generators for distance-dependent connectivity in spatial maps.

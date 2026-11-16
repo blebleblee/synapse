@@ -22,32 +22,20 @@ The fourth invariant is **the distinction between correlation and mechanism**. T
 
 A diagnostic framework in a race vehicle context operates across four physical layers simultaneously, and understanding how these layers interact is the central mechanical challenge. These layers are: the **mechanical structure** (geometry, compliance, wear), the **thermal state** (temperatures across brakes, tires, fluids, and power unit), the **dynamic excitation** (vibration frequencies, transient loads, impact events), and the **electronic instrumentation** (sensors, buses, logging hardware, and software decode). Every fault either originates in one layer and propagates upward, or manifests visibly in one layer while its root cause lives in another.
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                DIAGNOSTIC SIGNAL CHAIN                   │
-│                                                          │
-│  ┌────────────────┐      ┌────────────────┐              │
-│  │  Mechanical    │─────▶│  Thermal State │              │
-│  │  Structure     │      │  (Brake, Tire, │              │
-│  │  (Geometry,    │◀─────│   Fluid, PU)   │              │
-│  │   Wear,        │      └────────┬───────┘              │
-│  │   Compliance)  │               │                      │
-│  └───────┬────────┘               │                      │
-│          │                        ▼                      │
-│          │          ┌─────────────────────────┐          │
-│          └─────────▶│  Dynamic Excitation      │          │
-│                     │  (Vibration Spectrum,    │          │
-│                     │   Transient Load, Impact)│          │
-│                     └────────────┬────────────┘          │
-│                                  │                       │
-│                                  ▼                       │
-│                     ┌────────────────────────┐           │
-│                     │  Electronic            │           │
-│                     │  Instrumentation       │           │
-│                     │  (Sensors, CAN Bus,    │           │
-│                     │   Logger, DBC Decode)  │           │
-│                     └────────────────────────┘           │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph diagnostic["DIAGNOSTIC SIGNAL CHAIN"]
+        MS["Mechanical Structure<br/>(Geometry, Wear, Compliance)"]
+        TS["Thermal State<br/>(Brake, Tire, Fluid, PU)"]
+        DE["Dynamic Excitation<br/>(Vibration Spectrum, Transient Load, Impact)"]
+        EI["Electronic Instrumentation<br/>(Sensors, CAN Bus, Logger, DBC Decode)"]
+        
+        MS -->|"affects"| TS
+        TS -->|"feedback"| MS
+        TS --> DE
+        MS --> DE
+        DE --> EI
+    end
 ```
 
 The fault propagation direction is usually bottom-up in the diagnostic discovery sequence — you see it in the data first — but top-down in the causal sequence, meaning the mechanical failure created the thermal anomaly that disturbed the dynamic response that finally showed up as an erratic sensor value. The experienced engineer reads the discovery path in reverse.

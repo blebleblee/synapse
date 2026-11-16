@@ -785,15 +785,18 @@ impl ConnectionState for OpenState {
 
 The State pattern transforms the state machine from implicit (conditional logic) to explicit (class hierarchy), making states visible in the type system. State transitions become object reassignments rather than flag modifications, and invariants can be enforced at state class boundaries. For example, the `ClosedState` implementation makes it impossible to send data because the socket field is inaccessible—the compiler enforces the invariant that closed connections cannot transmit.
 
-```
-State Transition Diagram:
-┌─────────┐  open()   ┌──────────┐
-│ Closed  │ ────────→ │   Open   │
-│         │ ←──────── │          │
-└─────────┘  close()  └──────────┘
-     ↑                      │
-     │  send()/receive()    │ send()/receive()
-     └──── Error ───────    └────── Success
+```mermaid
+flowchart TD
+    Closed["Closed"]
+    Open["Open"]
+    Error["Error"]
+    Success["Success"]
+
+    Closed -->|"open()"| Open
+    Open -->|"close()"| Closed
+    Open -->|"send() / receive()"| Error
+    Open -->|"send() / receive()"| Success
+    Error -->|"close()"| Closed
 ```
 
 State objects can maintain their own internal state beyond the context's fields. A `ListeningState` in a server connection might track pending accept requests, while a `TransmittingState` might maintain a send buffer. This localized state prevents the context from becoming a dumping ground for state-specific data.
@@ -1072,19 +1075,23 @@ The template method enforces the processing pipeline: read → parse → transfo
 
 Hook methods provide optional customization points with default no-op implementations. The `validate_input()` hook allows subclasses to inject validation logic without overriding the entire template method. This pattern appears in GUI frameworks where `onInit()`, `onDestroy()`, and lifecycle hooks allow application code to participate in framework-managed sequences.
 
-```
-Processing Pipeline:
-read_data() ────→ [Raw Bytes]
-                       ↓
-parse_data() ───→ [Structured Data] ← subclass implements
-                       ↓
-validate_input() → [Validated] ← hook (optional)
-                       ↓
-transform_data() → [Transformed] ← subclass implements
-                       ↓
-serialize_data() → [Serialized] ← subclass implements
-                       ↓
-write_data() ────→ [Output File]
+```mermaid
+flowchart TD
+    A["read_data()"] --> B["Raw Bytes"]
+    B --> C["parse_data()"]
+    C --> D["Structured Data"]
+    E["subclass implements"] --> D
+    D --> F["validate_input()"]
+    F --> G["Validated"]
+    H["hook (optional)"] --> G
+    G --> I["transform_data()"]
+    I --> J["Transformed"]
+    K["subclass implements"] --> J
+    J --> L["serialize_data()"]
+    L --> M["Serialized"]
+    N["subclass implements"] --> M
+    M --> O["write_data()"]
+    O --> P["Output File"]
 ```
 
 Template Method composes with Strategy when algorithmic steps themselves vary independently. Rather than a single strategy object, each customization point can accept its own strategy. Template Method also composes with Factory Method when the template method needs to instantiate objects of subclass-specific types, delegating object creation to factory methods that subclasses override.

@@ -22,45 +22,40 @@ SageMaker Processing jobs instantiate as short-lived Kubernetes pods orchestrate
 
 The container image specified in the job definition determines the runtime environment. SageMaker maintains a registry of pre-built containers for common frameworks—Scikit-learn, Pandas, Spark, Dask, PyTorch—but users frequently supply custom images to incorporate proprietary libraries or specialized dependencies. When the job starts, SageMaker pulls the image from ECR (Elastic Container Registry), mounts input data channels from S3 into the container filesystem at `/opt/ml/processing/input/<channel_name>`, and exposes output directories at `/opt/ml/processing/output/<channel_name>`. User code executes within this containerized sandbox, reading from input paths, performing transformations, and writing results to output paths. Upon container exit, SageMaker uploads all output directory contents back to S3, tears down the ephemeral cluster, and marks the job as completed.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    SageMaker Control Plane                       │
-│  ┌──────────────┐      ┌──────────────┐      ┌──────────────┐  │
-│  │ Job Scheduler│─────▶│Resource Mgr  │─────▶│Cluster       │  │
-│  │              │      │              │      │Provisioner   │  │
-│  └──────────────┘      └──────────────┘      └──────────────┘  │
-└───────────────────────────────┬─────────────────────────────────┘
-                                │
-                    Provisions & Monitors
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              Ephemeral EKS Cluster (per job)                     │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │ Worker Node 1                Worker Node N                │  │
-│  │ ┌────────────────────┐       ┌────────────────────┐      │  │
-│  │ │ Processing Pod     │       │ Processing Pod     │      │  │
-│  │ │ ┌────────────────┐ │       │ ┌────────────────┐ │      │  │
-│  │ │ │ User Container │ │  ...  │ │ User Container │ │      │  │
-│  │ │ │                │ │       │ │                │ │      │  │
-│  │ │ │ /opt/ml/       │ │       │ │ /opt/ml/       │ │      │  │
-│  │ │ │   processing/  │ │       │ │   processing/  │ │      │  │
-│  │ │ │     input/     │ │       │ │     input/     │ │      │  │
-│  │ │ │     output/    │ │       │ │     output/    │ │      │  │
-│  │ │ └────────────────┘ │       │ └────────────────┘ │      │  │
-│  │ └────────────────────┘       └────────────────────┘      │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└───────────────────────────────┬─────────────────────────────────┘
-                                │
-                    Uploads Results
-                                │
-                                ▼
-                        ┌──────────────┐
-                        │  S3 Bucket   │
-                        │              │
-                        │ /output/     │
-                        │   data/      │
-                        └──────────────┘
+```mermaid
+flowchart TD
+    subgraph control_plane["SageMaker Control Plane"]
+        scheduler["Job Scheduler"]
+        resource_mgr["Resource Manager"]
+        provisioner["Cluster Provisioner"]
+
+        scheduler --> resource_mgr --> provisioner
+    end
+
+    subgraph eks_cluster["Ephemeral EKS Cluster (per job)"]
+        subgraph worker_nodes["Worker Nodes 1 … N"]
+            subgraph node1["Worker Node 1"]
+                pod1["Processing Pod"]
+                subgraph container1["User Container"]
+                    fs1["/opt/ml/processing/\n  input/\n  output/"]
+                end
+                pod1 --> container1
+            end
+
+            subgraph nodeN["Worker Node N"]
+                podN["Processing Pod"]
+                subgraph containerN["User Container"]
+                    fsN["/opt/ml/processing/\n  input/\n  output/"]
+                end
+                podN --> containerN
+            end
+        end
+    end
+
+    s3["S3 Bucket\n/output/data/"]
+
+    control_plane -- "Provisions & Monitors" --> eks_cluster
+    eks_cluster -- "Uploads Results" --> s3
 ```
 
 Distributed processing frameworks like Spark and Dask integrate into this architecture through specialized container images that coordinate multi-node clusters within the Processing job. For Spark, SageMaker provides a managed container that automatically configures a master node and worker nodes, setting up the Spark context with optimized memory settings and network configurations. The user supplies a PySpark script as the entry point, and the container bootstraps the Spark runtime before executing the script. Input data channels map directly to Spark DataFrames through automatic S3 file discovery, and Spark's native partitioning mechanisms distribute computation across workers. Output DataFrames write back to S3 using optimized columnar formats like Parquet, which compress well and enable efficient downstream query processing.

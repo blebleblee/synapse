@@ -24,19 +24,32 @@ The naive triangle mesh — an array of `(x, y, z)` triples, three per triangle 
 
 The indexed mesh is what you send to the GPU, but it is still topologically impoverished. It tells you which vertices form a face but not which faces surround a vertex, nor which edge connects two specific faces. For algorithms that require this adjacency — subdivision, smoothing, loop-cut operations, geodesic path finding — you need a *half-edge data structure*.
 
-```
-HalfEdge Mesh Topology
-─────────────────────
-
-                 v2
-                / ↑ \
-               /  |  \
-             he5  he4  he3
-             /    |    \
-            ↓    face   ↑
-           v0 ——he0——→ v1
-              ←——he1———
-                twin
+```mermaid
+flowchart TD
+    v0["v0"]
+    v1["v1"]
+    v2["v2"]
+    
+    he0["he0"]
+    he1["he1 (twin)"]
+    he3["he3"]
+    he4["he4"]
+    he5["he5"]
+    
+    face["face"]
+    
+    v0 -->|"he0"| v1
+    v1 -->|"he1"| v0
+    v1 -->|"he3"| v2
+    v2 -->|"he4"| face
+    v2 -->|"he5"| v0
+    
+    he0 -.->|"twin"| he1
+    he1 -.->|"twin"| he0
+    
+    he0 --> face
+    he3 --> face
+    he5 --> face
 ```
 
 In the half-edge structure, every undirected edge is split into two directed *half-edges* pointing in opposite directions, called twins. Each half-edge stores four pointers: `next` (the next half-edge around the same face), `prev` (previous), `twin` (the opposing half-edge on the adjacent face), and `vertex` (the destination vertex). Each face stores one representative half-edge. Each vertex stores one outgoing half-edge. This seemingly redundant structure makes every topological query O(1): to traverse all faces around a vertex, you follow `twin->next` until you return to the starting half-edge. To find the two faces sharing an edge, you follow `twin->face`. To split an edge, you insert two new half-edges and update four pointer fields.
@@ -273,3 +286,4 @@ static Vec3 lerp3(Vec3 a, Vec3 b, float t) {
  */
 Vec3 bezier_evaluate(const Vec3 *control_points, uint32_t n, float t) {
     Vec3 scratch[16
+```

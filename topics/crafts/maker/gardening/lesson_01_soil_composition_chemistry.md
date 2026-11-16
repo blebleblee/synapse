@@ -28,61 +28,50 @@ The base saturation concept extends CEC into a diagnostic tool. The exchange sit
 
 The following diagram maps the nutrient availability-to-pH relationship, the four nutrient pools, and the microbial-driven fluxes between them:
 
-```
-Soil Nutrient System Architecture
-══════════════════════════════════════════════════════════════════════
+```mermaid
+flowchart TD
+    subgraph pH_Scale ["pH SCALE vs. NUTRIENT AVAILABILITY"]
+        pH_range["pH 4.0 ────── 5.0 ────── 6.0 ────── 7.0 ────── 8.0 ────── 9.0"]
+        N_avail["N (mineralization): pH 4.0 → 9.0+"]
+        P_avail["P: severely locked below 6.0 and above 7.5"]
+        P_peak["P PEAK: pH 6.0 – 6.8"]
+        K_avail["K (exchange): pH 4.0 → 9.0"]
+        AlMn_toxic["Al/Mn TOXIC: pH 4.0 – 5.5"]
+        Micro_decline["Fe/Mn/Zn/Cu/B decline: pH 7.0 → 9.0"]
+        optimal["⭐ OPTIMAL WINDOW: pH 6.0 – 6.8 ⭐"]
+    end
 
-pH SCALE vs. NUTRIENT AVAILABILITY
-  4.0       5.0       6.0       7.0       8.0       9.0
-  |         |         |         |         |         |
-  [====N (mineralization)================================]
-  [===========P (severely locked below 6.0 and above 7.5)==========]
-                      [====P PEAK====]
-  [======K (exchange)===========================================]
-  [=Al/Mn TOXIC==]
-                            [===Fe/Mn/Zn/Cu/B decline===========]
-                      [=== OPTIMAL WINDOW pH 6.0–6.8 ===]
+    subgraph Four_Pool ["FOUR-POOL NUTRIENT CYCLE"]
+        OP["ORGANIC POOL<br/>Plant residues, microbial biomass,<br/>humic substances"]
+        MP["MINERAL POOL<br/>Primary/secondary<br/>mineral lattices"]
+        EP["EXCHANGEABLE POOL<br/>Clay & OM surfaces<br/>CEC-limited"]
+        SS["SOIL SOLUTION<br/>Dissolved ions<br/>Immediately available"]
+        
+        OP -->|"Mineralization<br/>(microbial decomposition,<br/>temperature & moisture driven)"| SS
+        MP -->|"Slow weathering"| EP
+        EP -->|"Desorption / diffusion"| SS
+        SS -->|"Plant uptake via<br/>root hairs and mycorrhizae"| Plant_Uptake["🌱 Plant Uptake"]
+        SS -->|"Leaching loss<br/>(esp. NO₃⁻)"| Leaching["💧 Leaching Loss"]
+    end
 
+    subgraph N_Cycle ["MICROBIAL NITROGEN CYCLE"]
+        OrgN["Organic-N"]
+        NH4["NH₄⁺<br/>(held on CEC)"]
+        NO3["NO₃⁻<br/>(mobile, leachable)"]
+        Gas["N₂O, N₂<br/>(gas loss)"]
+        
+        OrgN -->|"Ammonification<br/>(heterotrophs: Bacillus, fungi)"| NH4
+        NH4 -->|"Nitrification<br/>(Nitrosomonas: NH₄⁺→NO₂⁻)<br/>(Nitrobacter: NO₂⁻→NO₃⁻)"| NO3
+        NO3 -->|"Denitrification<br/>(Pseudomonas, anaerobic zones)"| Gas
+    end
 
-FOUR-POOL NUTRIENT CYCLE
-                    ┌─────────────────────────────────┐
-                    │         ORGANIC POOL             │
-                    │  Plant residues, microbial       │
-                    │  biomass, humic substances       │
-                    └──────────┬──────────────────────-┘
-                               │ Mineralization
-                               │ (microbial decomposition,
-                               │  temperature & moisture driven)
-                               ▼
-  ┌──────────────────┐    ┌────────────────────┐
-  │   MINERAL POOL   │───►│  EXCHANGEABLE POOL │
-  │ Primary/secondary│    │  Clay & OM surfaces│
-  │ mineral lattices │    │  CEC-limited       │
-  └──────────────────┘    └────────┬───────────┘
-    (slow weathering)              │ Desorption / diffusion
-                                   ▼
-                          ┌────────────────────┐
-                          │   SOIL SOLUTION    │◄── Plant uptake
-                          │   Dissolved ions   │    via root hairs
-                          │   Immediately      │    and mycorrhizae
-                          │   available        │
-                          └────────────────────┘
-                                   │
-                                   │ Leaching loss (esp. NO₃⁻)
-                                   ▼
-
-
-MICROBIAL NITROGEN CYCLE
-  Organic-N
-      │
-      ▼ Ammonification (heterotrophs: Bacillus, fungi)
-  NH₄⁺ (held on CEC)
-      │
-      ▼ Nitrification (Nitrosomonas: NH₄⁺→NO₂⁻; Nitrobacter: NO₂⁻→NO₃⁻)
-  NO₃⁻ (mobile, leachable)
-      │
-      ▼ Denitrification (Pseudomonas, anaerobic zones)
-  N₂O, N₂ (gas loss)
+    style optimal fill:#90EE90
+    style P_peak fill:#FFD700
+    style AlMn_toxic fill:#FF6B6B
+    style SS fill:#87CEEB
+    style Plant_Uptake fill:#98FB98
+    style Leaching fill:#4682B4
+    style Gas fill:#D3D3D3
 ```
 
 Organic matter decomposition follows a substrate quality gradient that every practitioner should understand mechanically. The carbon-to-nitrogen ratio (C:N) of an organic input determines whether net mineralization or net immobilization of nitrogen will occur during decomposition. When C:N exceeds approximately 25:1, soil microbes metabolizing that material must scavenge nitrogen from the soil solution to build their own biomass, temporarily immobilizing nitrogen and leaving crops deficient — a phenomenon most commonly observed when unfinished wood chip mulch is tilled in rather than used as a surface mulch. When C:N falls below 20:1 (as in finished compost, legume residues, or blood meal), microbial decomposition releases more nitrogen than the microbes retain, producing net mineralization. This is not a complicated formula to apply: it means that raw woodchips used as a surface mulch are beneficial, but the same material incorporated before planting will reliably cause a transient nitrogen crash measurable in tissue tests within two to four weeks.

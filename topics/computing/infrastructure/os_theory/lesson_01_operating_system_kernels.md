@@ -536,16 +536,24 @@ The rule is: if lock A is ever acquired while lock B is held, then lock B must n
 **Livelock and Priority Inversion**: Distinct from deadlock (where progress is impossible), livelock occurs when threads continuously yield to each other without making progress—common in adaptive spinlock implementations. Priority inversion is a failure mode where a high-priority thread blocks waiting for a resource held by a low-priority thread, while medium-priority threads starve the low-priority thread. The classic fix is **priority inheritance**: the holder of a contested mutex temporarily inherits the priority of the highest-priority waiter. Linux implements this via `PI mutexes` (`CONFIG_RT_MUTEXES`, `struct rt_mutex`), used extensively in the PREEMPT_RT realtime kernel patch.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Running : scheduler selects task
-    Running --> Runnable : preempted (timer IRQ)\nor voluntary yield
-    Running --> Blocked : wait for I/O,\nmutex, semaphore
-    Running --> Zombie : exit() called,\nparent not yet wait()ed
-    Zombie --> [*] : parent calls wait4()\nPCB freed
-    Blocked --> Runnable : I/O complete,\nlock released,\nsignal received
-    Runnable --> Running : scheduler selects task
-    Running --> Stopped : SIGSTOP / ptrace attach
-    Stopped --> Runnable : SIGCONT
+flowchart TD
+    Start(["START"])
+    Running["Running"]
+    Runnable["Runnable"]
+    Blocked["Blocked"]
+    Zombie["Zombie"]
+    Stopped["Stopped"]
+    End(["END"])
+    
+    Start -->|"scheduler selects task"| Running
+    Running -->|"preempted (timer IRQ)<br/>or voluntary yield"| Runnable
+    Running -->|"wait for I/O,<br/>mutex, semaphore"| Blocked
+    Running -->|"exit() called,<br/>parent not yet wait()ed"| Zombie
+    Zombie -->|"parent calls wait4()<br/>PCB freed"| End
+    Blocked -->|"I/O complete,<br/>lock released,<br/>signal received"| Runnable
+    Runnable -->|"scheduler selects task"| Running
+    Running -->|"SIGSTOP /<br/>ptrace attach"| Stopped
+    Stopped -->|SIGCONT| Runnable
 ```
 
 ### The Kernel's Self-Measurement: perf and eBPF

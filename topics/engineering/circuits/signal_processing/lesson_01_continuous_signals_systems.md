@@ -56,35 +56,57 @@ representing exponential decay from the peak value reached at $t = T$. The outpu
 
 The block diagram representation of an LTI system abstracts these mathematical operations into a signal flow graph:
 
-```
-         x(t) ────────┐
-                      │
-                      ▼
-                 ┌────────┐
-                 │  h(t)  │  Impulse Response
-                 │  LTI   │  Convolution Kernel
-                 └────────┘
-                      │
-                      ▼
-                    y(t) = x(t) * h(t)
+```mermaid
+flowchart TD
+    x["x(t)<br/>Input Signal"]
+    h["h(t)<br/>LTI System<br/>Impulse Response<br/>Convolution Kernel"]
+    y["y(t) = x(t) * h(t)<br/>Output Signal"]
+    
+    x --> h
+    h --> y
 ```
 
 In this representation, the system box labeled with $h(t)$ symbolizes the entire convolution operation, transforming every input sample into a weighted superposition of time-shifted impulse responses. Series cascades of LTI systems compose through convolution of their individual impulse responses:
 
-```
-x(t) ──→ h₁(t) ──→ h₂(t) ──→ y(t)
+```mermaid
+flowchart LR
+    X["x(t)"]
+    H1["h₁(t)"]
+    H2["h₂(t)"]
+    Y["y(t)"]
 
-y(t) = x(t) * h₁(t) * h₂(t) = x(t) * [h₁(t) * h₂(t)]
+    X -->|"*"| H1
+    H1 -->|"*"| H2
+    H2 --> Y
+
+    subgraph cascade ["Equivalent Combined System: h₁(t) * h₂(t)"]
+        H1
+        H2
+    end
 ```
 
 Parallel combinations sum their outputs, with overall impulse response given by the sum of component impulse responses:
 
-```
-         ┌─→ h₁(t) ─┐
-x(t) ────┤           ├─→ Σ ──→ y(t)
-         └─→ h₂(t) ─┘
+```mermaid
+flowchart LR
+    Input["x(t)"]
+    Output["y(t)"]
+    Sum["Σ"]
 
-h(t) = h₁(t) + h₂(t)
+    subgraph ParallelPaths ["Parallel Paths"]
+        Filter1["h₁(t)"]
+        Filter2["h₂(t)"]
+    end
+
+    subgraph SystemEquation ["System Equation"]
+        Equation["h(t) = h₁(t) + h₂(t)"]
+    end
+
+    Input["x(t)"] --> Filter1["h₁(t)"]
+    Input["x(t)"] --> Filter2["h₂(t)"]
+    Filter1["h₁(t)"] --> Sum["Σ"]
+    Filter2["h₂(t)"] --> Sum["Σ"]
+    Sum["Σ"] --> Output["y(t)"]
 ```
 
 These composition rules enable hierarchical system decomposition, where complex filter networks break down into cascaded stages—perhaps an input buffering stage with impulse response dominated by parasitic capacitance charging, followed by a gain stage with operational amplifier dynamics, and a final output filter rolling off high-frequency noise.

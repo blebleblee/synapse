@@ -40,13 +40,21 @@ where $E_b/N_0$ is the energy per bit to noise power spectral density ratio, and
 
 Quadrature phase-shift keying (QPSK) extends this to four phase states spaced 90° apart, encoding two bits per symbol. The complex baseband representation maps bit pairs to constellation points:
 
-```
-       Q
-       ↑
-   01  |  00
-  -----+-----→ I
-   11  |  10
-       |
+```mermaid
+flowchart LR
+    Origin["Origin (0,0)"]
+    Q01["Q=0, I=1<br/>Region: 01"]
+    Q00["Q=0, I=0<br/>Region: 00"]
+    Q11["Q=1, I=1<br/>Region: 11"]
+    Q10["Q=1, I=0<br/>Region: 10"]
+    
+    Origin --> Q00
+    Origin --> Q01
+    Origin --> Q11
+    Origin --> Q10
+    
+    Q01 -.-> |"Q axis"| Origin
+    Origin -.-> |"I axis"| Q00
 ```
 
 Each point $(I, Q)$ on this constellation represents a unique two-bit symbol. The transmitter generates:
@@ -57,15 +65,29 @@ where $I(t)$ and $Q(t)$ are the in-phase and quadrature baseband pulse-shaped wa
 
 Quadrature amplitude modulation (QAM) generalizes this framework to arbitrary constellation sizes by varying both amplitude and phase. Common variants include 16-QAM (4 bits per symbol), 64-QAM (6 bits per symbol), and 256-QAM (8 bits per symbol). A 16-QAM constellation arranges 16 points in a square grid:
 
-```
-         Q
-         ↑
-    •  •  •  •
-    •  •  •  •
-  --+----------→ I
-    •  •  •  •
-    •  •  •  •
-         |
+```mermaid
+flowchart TD
+    Q["Q (Vertical Axis)"]
+
+    subgraph quadrants ["I-Q Plane"]
+        Q2["• •\n• •"]
+        Q1["• •\n• •"]
+        Q3["• •\n• •"]
+        Q4["• •\n• •"]
+    end
+
+    Origin["Origin (0,0)"]
+    I["I (Horizontal Axis)"]
+
+    Q --> Q2
+    Q --> Q1
+    Q2 --- Origin
+    Q1 --- Origin
+    Origin --- Q3
+    Origin --- Q4
+    Origin --> I
+    Q3 --- NegI["−I"]
+    Q4 --- NegI
 ```
 
 Higher-order QAM schemes achieve greater spectral efficiency at the cost of reduced Euclidean distance between constellation points, making them more susceptible to noise. 802.11ax WiFi uses up to 1024-QAM in favorable channel conditions, requiring SNR exceeding 35 dB to maintain acceptable BER. The security analyst observing such traffic can infer link quality and distance between transmitter and receiver by monitoring modulation adaptation: a device that drops from 256-QAM to 16-QAM is experiencing channel degradation, potentially indicating increased range, physical obstruction, or intentional jamming.

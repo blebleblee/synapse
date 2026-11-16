@@ -20,30 +20,33 @@ Every interactive debugger, regardless of front-end complexity, implements the s
 
 On Linux, the ptrace system call is the kernel's debug API. A tracer process invokes `ptrace(PTRACE_ATTACH, pid, ...)` to seize a target, which delivers SIGSTOP to the tracee and blocks it. From that point, the tracer drives the target entirely through ptrace requests: `PTRACE_GETREGS` to read the full general-purpose register file, `PTRACE_PEEKDATA` to read arbitrary words from the target's address space (one word per syscall, an expensive design that hints at the kernel's assumption that this interface is used sparingly), `PTRACE_POKEDATA` to write, and `PTRACE_SINGLESTEP` to advance exactly one instruction by setting the x86 Trap Flag (TF, RFLAGS bit 8) before resuming, which causes the CPU to generate a #DB after the next instruction retires.
 
-```
-PTRACE_ATTACH
-      │
-      ▼
-┌─────────────────────────────────────┐
-│          Tracer (debugger)          │
-│                                     │
-│  waitpid() ◄──── SIGTRAP/SIGSTOP    │
-│      │                              │
-│  ptrace(GETREGS)                    │
-│  ptrace(PEEKDATA/POKEDATA)          │
-│      │                              │
-│  ptrace(CONT / SINGLESTEP / ...)    │
-└─────────────┬───────────────────────┘
-              │  kernel debug events
-              ▼
-┌─────────────────────────────────────┐
-│           Tracee (target)           │
-│                                     │
-│  User-mode execution                │
-│  ┌─ SIGTRAP on INT3 breakpoint      │
-│  ├─ SIGTRAP on TF single-step       │
-│  └─ SIGTRAP on hardware watchpoint  │
-└─────────────────────────────────────┘
+```mermaid
+flowchart TD
+    ATTACH(["PTRACE_ATTACH"])
+
+    subgraph tracer ["Tracer (debugger)"]
+        WAITPID["waitpid()"]
+        GETREGS["ptrace(GETREGS)"]
+        PEEKPOKE["ptrace(PEEKDATA / POKEDATA)"]
+        CONT["ptrace(CONT / SINGLESTEP / ...)"]
+    end
+
+    subgraph tracee ["Tracee (target)"]
+        USERMODE["User-mode execution"]
+        INT3["SIGTRAP on INT3 breakpoint"]
+        TF["SIGTRAP on TF single-step"]
+        HW["SIGTRAP on hardware watchpoint"]
+    end
+
+    ATTACH --> WAITPID
+    USERMODE -->|"SIGTRAP / SIGSTOP"| WAITPID
+    WAITPID --> GETREGS
+    GETREGS --> PEEKPOKE
+    PEEKPOKE --> CONT
+    CONT -->|"kernel debug events"| USERMODE
+    USERMODE --> INT3
+    USERMODE --> TF
+    USERMODE --> HW
 ```
 
 The design has a critical performance implication: every single-step transition requires two context switches (tracee→kernel→tracer to deliver the event, tracer→kernel→tracee to resume), plus the ptrace syscall overhead on the tracer side. On a modern system this costs roughly 2–10 microseconds per instruction. At 10⁸ instructions per second of target throughput, full single-step tracing slows execution by four to five orders of magnitude. For short code paths this is acceptable; for unpacking loops that execute millions of instructions before producing useful output, it is not. This cost structure forces the analyst to think strategically about *where* to drop into single-step mode rather than applying it globally.
@@ -354,32 +357,30 @@ The architectural divide between in-process and out-of-process instrumentation i
 
 Out-of-process instrumentation, exemplified by ptrace-based debuggers and hardware debug probes, runs the analysis engine in a separate context from the target. The kernel (or the debug hardware) mediates every interaction, which means the target's corrupted heap cannot overwrite the debugger's data structures, the target's anti-debug code cannot directly read the debugger's presence, and the target's crashes do not take the analysis engine down. The cost is the context-switch overhead described earlier — every halt, every register read, every memory peek crosses the user-kernel boundary at minimum once — and the relatively coarse granularity of observation available through the standard interfaces. The ptrace PEEKDATA interface delivers one word per syscall, and there is no built-in mechanism for conditional logging without halting.
 
-```
-Out-of-Process Model:
-
-  ┌──────────────────┐     ptrace / JTAG      ┌──────────────────┐
-  │   Debugger       │ ◄──────────────────►   │   Target Process │
-  │   (separate PID) │                        │   (or bare-metal)│
-  │                  │   kernel mediated       │                  │
-  │  analysis logic  │                        │  code under test │
-  │  cannot be       │                        │  cannot see      │
-  │  corrupted by    │                        │  debugger memory │
-  │  target heap     │                        │                  │
-  └──────────────────┘                        └──────────────────┘
-
-In-Process Model:
-
-  ┌─────────────────────────────────────────────────────────────┐
-  │                      Single Process                         │
-  │                                                             │
-  │   ┌─────────────────┐          ┌─────────────────────────┐  │
-  │   │  Analysis Engine│          │  Target Code            │  │
-  │   │  (DLL injection │◄────────►│  (original .text, heap) │  │
-  │   │   or PIN tool)  │  shared  │                         │  │
-  │   │                 │   addr   │  anti-analysis code can │  │
-  │   │                 │   space  │  scan for tool presence │  │
-  │   └─────────────────┘          └─────────────────────────┘  │
-  └─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph OutOfProcess["Out-of-Process Model"]
+        direction LR
+        Debugger["Debugger<br/>(separate PID)<br/><br/>• analysis logic<br/>• cannot be corrupted by target heap"]
+        Target["Target Process<br/>(or bare-metal)<br/><br/>• code under test<br/>• cannot see debugger memory"]
+        
+        Debugger <-->|"ptrace / JTAG<br/>(kernel mediated)"| Target
+    end
+    
+    subgraph InProcess["In-Process Model"]
+        direction TB
+        SingleProc["Single Process"]
+        
+        subgraph SharedSpace["Shared Address Space"]
+            direction LR
+            AnalysisEngine["Analysis Engine<br/>(DLL injection or PIN tool)"]
+            TargetCode["Target Code<br/>(original .text, heap)<br/><br/>• anti-analysis code can<br/>scan for tool presence"]
+            
+            AnalysisEngine <-->|"shared addr space"| TargetCode
+        end
+        
+        SingleProc -.-> SharedSpace
+    end
 ```
 
 In-process instrumentation — frameworks like Intel PIN, DynamoRIO, Frida's JavaScript runtime, or a manually injected DLL — runs analysis code within the target's own address space. This eliminates context-switch overhead entirely: a PIN analysis callback fires as a native function call within the target's execution context, with direct pointer access to all target memory. The throughput is orders of magnitude higher than ptrace single-stepping, making in-process instrumentation the practical choice for instruction-level tracing, taint tracking, or execution coverage collection over millions of instructions.

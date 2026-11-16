@@ -18,27 +18,31 @@ The practitioner's job is to manage this migration. The car does not need perfec
 
 The core architecture of a racing car's platform is a coupled spring-mass-damper system in which the aerodynamic load is not an external force applied to a fixed structure but a self-generated pressure field whose magnitude and distribution depend on the structure's own position and velocity. This feedback loop is what separates aero-platform tuning from pure mechanical setup.
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                AERO-MECHANICAL PLATFORM LOOP              │
-│                                                          │
-│  Ride Height ──► Aero Pressure Distribution              │
-│       ▲                │                                 │
-│       │                ▼                                 │
-│  Suspension      Downforce (Front / Rear)                │
-│  Displacement          │                                 │
-│       ▲                ▼                                 │
-│       │           Tire Vertical Load                     │
-│       │                │                                 │
-│       │                ▼                                 │
-│  Spring/Damper     Grip Level ──► Lap Time                │
-│  Forces                │                                 │
-│       │                ▼                                 │
-│       └─────────  Pitch / Roll / Heave Response          │
-│                        │                                 │
-│                        ▼                                 │
-│                   Ride Height ──► (loop)                 │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph platform["AERO-MECHANICAL PLATFORM LOOP"]
+        RH1["Ride Height"]
+        APD["Aero Pressure Distribution"]
+        DF["Downforce (Front / Rear)"]
+        TVL["Tire Vertical Load"]
+        GL["Grip Level"]
+        LT["Lap Time"]
+        PRH["Pitch / Roll / Heave Response"]
+        SD["Suspension Displacement"]
+        SDF["Spring/Damper Forces"]
+        RH2["Ride Height"]
+        
+        RH1 --> APD
+        APD --> DF
+        DF --> TVL
+        TVL --> GL
+        GL --> LT
+        GL --> PRH
+        PRH --> SD
+        SD --> SDF
+        SDF --> RH2
+        RH2 -.-> RH1
+    end
 ```
 
 The suspension springs support both the mechanical mass of the car and the aerodynamic downforce. When downforce increases with speed, the car compresses further onto its springs, lowering the ride height, which in turn increases downforce further until the aerodynamic load equals the spring force at the new equilibrium. At high speed, a GT3 car running 700 kg of total downforce at 250 km/h may sit 8 to 12 mm lower than its static ride height purely because of aero compression. A Formula car with higher downforce-to-mass ratios can compress 15 to 25 mm. This compression is not a problem in itself; it is a design variable. The problem arises when the compression moves the floor or splitter into a regime where the flow stalls or becomes unstable.
@@ -183,21 +187,75 @@ The practical mitigation is to ensure that the aero platform degrades gracefully
 
 The telemetry channels that matter for aero platform validation are ride height, damper position, heave/pitch/roll from IMU, and brake/throttle/steering as driver inputs. The key analysis is overlaying damper position traces across a lap to see how the platform moves through each phase.
 
-```
-KEY TELEMETRY CHANNELS FOR AERO PLATFORM ANALYSIS
+```mermaid
+flowchart TD
+    ROOT["🛰️ KEY TELEMETRY CHANNELS\nAero Platform Analysis"]
 
-Channel              Sensor                    What to Look For
-─────────────────────────────────────────────────────────────
-Front Ride Height    Laser/Cable pot          Pitch under braking
-Rear Ride Height     Laser/Cable pot          Squat under power
-Front Damper Pos     Linear potentiometer     Porpoising (5-10 Hz oscillation)
-Rear Damper Pos      Linear potentiometer     Diffuser stall (sudden rebound)
-Heave Accel          IMU Z-axis                Vertical platform oscillation
-Pitch Rate           IMU gyro (Y-axis)         Dive/squat transients
-Yaw Rate             IMU gyro (Z-axis)         Slip angle / stability
-Steering Angle       Rotary potentiometer     Driver correction frequency
-Brake Pressure        Hydraulic transducer     Trail braking depth
-Throttle Position     TPS or pedal pot        Application rate vs. aero load
+    subgraph RH ["Ride Height"]
+        FRH["Front Ride Height\n📡 Laser / Cable Pot"]
+        RRH["Rear Ride Height\n📡 Laser / Cable Pot"]
+    end
+
+    subgraph DP ["Damper Position"]
+        FDP["Front Damper Pos\n📡 Linear Potentiometer"]
+        RDP["Rear Damper Pos\n📡 Linear Potentiometer"]
+    end
+
+    subgraph IMU ["IMU Channels"]
+        HAC["Heave Acceleration\n📡 IMU Z-Axis"]
+        PR["Pitch Rate\n📡 IMU Gyro Y-Axis"]
+        YR["Yaw Rate\n📡 IMU Gyro Z-Axis"]
+    end
+
+    subgraph DRV ["Driver Inputs"]
+        SA["Steering Angle\n📡 Rotary Potentiometer"]
+        BP["Brake Pressure\n📡 Hydraulic Transducer"]
+        TP["Throttle Position\n📡 TPS / Pedal Pot"]
+    end
+
+    ROOT --> RH
+    ROOT --> DP
+    ROOT --> IMU
+    ROOT --> DRV
+
+    FRH --> FRH_OBS["⚠️ Pitch under braking"]
+    RRH --> RRH_OBS["⚠️ Squat under power"]
+    FDP --> FDP_OBS["⚠️ Porpoising\n5–10 Hz oscillation"]
+    RDP --> RDP_OBS["⚠️ Diffuser stall\nsudden rebound"]
+    HAC --> HAC_OBS["⚠️ Vertical platform\noscillation"]
+    PR  --> PR_OBS["⚠️ Dive / squat\ntransients"]
+    YR  --> YR_OBS["⚠️ Slip angle /\nstability"]
+    SA  --> SA_OBS["⚠️ Driver correction\nfrequency"]
+    BP  --> BP_OBS["⚠️ Trail braking\ndepth"]
+    TP  --> TP_OBS["⚠️ Application rate\nvs. aero load"]
+
+    style ROOT fill:#1a1a2e,color:#e0e0ff,stroke:#4a4aff,stroke-width:2px
+    style RH   fill:#0f3460,color:#e0e0ff,stroke:#4a90d9,stroke-width:1.5px
+    style DP   fill:#0f3460,color:#e0e0ff,stroke:#4a90d9,stroke-width:1.5px
+    style IMU  fill:#0f3460,color:#e0e0ff,stroke:#4a90d9,stroke-width:1.5px
+    style DRV  fill:#0f3460,color:#e0e0ff,stroke:#4a90d9,stroke-width:1.5px
+
+    style FRH fill:#16213e,color:#cce5ff,stroke:#4a90d9
+    style RRH fill:#16213e,color:#cce5ff,stroke:#4a90d9
+    style FDP fill:#16213e,color:#cce5ff,stroke:#4a90d9
+    style RDP fill:#16213e,color:#cce5ff,stroke:#4a90d9
+    style HAC fill:#16213e,color:#cce5ff,stroke:#4a90d9
+    style PR  fill:#16213e,color:#cce5ff,stroke:#4a90d9
+    style YR  fill:#16213e,color:#cce5ff,stroke:#4a90d9
+    style SA  fill:#16213e,color:#cce5ff,stroke:#4a90d9
+    style BP  fill:#16213e,color:#cce5ff,stroke:#4a90d9
+    style TP  fill:#16213e,color:#cce5ff,stroke:#4a90d9
+
+    style FRH_OBS fill:#2d1b00,color:#ffd580,stroke:#ffaa00
+    style RRH_OBS fill:#2d1b00,color:#ffd580,stroke:#ffaa00
+    style FDP_OBS fill:#2d1b00,color:#ffd580,stroke:#ffaa00
+    style RDP_OBS fill:#2d1b00,color:#ffd580,stroke:#ffaa00
+    style HAC_OBS fill:#2d1b00,color:#ffd580,stroke:#ffaa00
+    style PR_OBS  fill:#2d1b00,color:#ffd580,stroke:#ffaa00
+    style YR_OBS  fill:#2d1b00,color:#ffd580,stroke:#ffaa00
+    style SA_OBS  fill:#2d1b00,color:#ffd580,stroke:#ffaa00
+    style BP_OBS  fill:#2d1b00,color:#ffd580,stroke:#ffaa00
+    style TP_OBS  fill:#2d1b00,color:#ffd580,stroke:#ffaa00
 ```
 
 A well-tuned platform shows damper traces that move smoothly through braking, turn-in, mid-corner, and exit, with no high-frequency oscillation and no sudden jumps. The front should compress under braking, hold through mid-corner with a slight further compression as lateral load transfers, and extend as the driver applies throttle on exit. The rear should extend under braking, compress slightly as lateral load transfers at mid-corner, and compress further under power. If the rear damper trace shows a sudden extension at high speed without a corresponding throttle or steering input, the diffuser is stalling. If the front shows a high-frequency buzz through a fast corner, the front floor is near the stall boundary and the driver is feeling it as numbness in the steering.
@@ -206,26 +264,45 @@ A well-tuned platform shows damper traces that move smoothly through braking, tu
 
 For a high-downforce circuit, a concrete starting platform for a GT3-class car with front splitter, flat floor, and rear wing:
 
-```
-HIGH-DOWNFORCE CIRCUIT — BASELINE AERO PLATFORM
-
-Parameter                Value
-─────────────────────────────────────────────────────
-Front Ride Height         85 mm (static, measured at hub)
-Rear Ride Height         100 mm (static, measured at hub)
-Rake Angle                0.9 degrees (nose-down)
-Front Spring Rate         14 N/mm (800 lb/in)
-Rear Spring Rate         90 N/mm (514 lb/in, heave spring)
-Front Bump Damping        6 clicks from full hard (4-way adjustable)
-Front Rebound Damping     10 clicks from full hard
-Rear Bump Damping         4 clicks from full hard
-Rear Rebound Damping      8 clicks from full hard
-Front Packers             12 mm gap at static ride height
-Rear Packers             None (heave spring provides progressive rate)
-Rear Wing Angle           14 degrees (measured from horizontal)
-Splitter Projection      Maximum legal extension
-Aero Balance Target       43% front at 200 km/h
-Static Aero (estimated)   650 kg total at 200 km/h
+```mermaid
+flowchart TD
+    title["HIGH-DOWNFORCE CIRCUIT — BASELINE AERO PLATFORM"]
+    
+    subgraph RideHeight ["Ride Height & Rake"]
+        FRH["Front Ride Height<br/>85 mm<br/>(static, measured at hub)"]
+        RRH["Rear Ride Height<br/>100 mm<br/>(static, measured at hub)"]
+        RAKE["Rake Angle<br/>0.9 degrees<br/>(nose-down)"]
+    end
+    
+    subgraph Springs ["Spring Rates"]
+        FSR["Front Spring Rate<br/>14 N/mm<br/>(800 lb/in)"]
+        RSR["Rear Spring Rate<br/>90 N/mm<br/>(514 lb/in, heave spring)"]
+    end
+    
+    subgraph Damping ["Damping Settings"]
+        FBD["Front Bump Damping<br/>6 clicks from full hard<br/>(4-way adjustable)"]
+        FRD["Front Rebound Damping<br/>10 clicks from full hard"]
+        RBD["Rear Bump Damping<br/>4 clicks from full hard"]
+        RRD["Rear Rebound Damping<br/>8 clicks from full hard"]
+    end
+    
+    subgraph Packers ["Packers"]
+        FP["Front Packers<br/>12 mm gap at static ride height"]
+        RP["Rear Packers<br/>None<br/>(heave spring provides progressive rate)"]
+    end
+    
+    subgraph Aero ["Aerodynamics"]
+        RWA["Rear Wing Angle<br/>14 degrees<br/>(measured from horizontal)"]
+        SP["Splitter Projection<br/>Maximum legal extension"]
+        ABT["Aero Balance Target<br/>43% front at 200 km/h"]
+        SAD["Static Aero (estimated)<br/>650 kg total at 200 km/h"]
+    end
+    
+    title --> RideHeight
+    title --> Springs
+    title --> Damping
+    title --> Packers
+    title --> Aero
 ```
 
 The spring rates and packer gaps are the platform control variables. The front spring is soft enough to absorb kerb impacts but stiff enough, combined with the packer engagement at 12 mm compression, to prevent the splitter from reaching the stall height under peak braking. The rear heave spring provides a progressive rate that resists aero compression at speed without the harshness of a packer. The bump and rebound settings control the transient pitch behavior that determines how the aero balance shifts through braking and exit.

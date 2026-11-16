@@ -66,10 +66,11 @@ Counterfactual reasoning forms the logical foundation of causation. To claim X c
 
 Structural equation modeling and directed acyclic graphs (DAGs) provide formal frameworks for causal reasoning with observational data. A DAG represents variables as nodes and causal relationships as directed arrows. Arrows point from causes to effects, and "directed acyclic" means we prohibit causal loops. This graphical representation clarifies confounding pathways and identifies which variables must be statistically controlled to isolate causal effects. If we suspect that education level affects income and that both are affected by family socioeconomic status, the DAG shows that we must control for family background to isolate education's causal effect on income.
 
-```
-Family SES → Education → Income
-     ↓                      ↑
-     └──────────────────────┘
+```mermaid
+flowchart LR
+    SES["Family SES"] --> EDU["Education"]
+    EDU --> INC["Income"]
+    SES --> INC
 ```
 
 The graph reveals a confounding path from education to income through family SES (education ← family SES → income) alongside the direct causal path. Failing to account for family background would conflate these pathways, producing biased causal estimates.

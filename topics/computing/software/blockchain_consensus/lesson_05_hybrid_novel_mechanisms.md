@@ -105,30 +105,74 @@ Topological Sort (Lexicographic):
     Genesis, B1, B2, B3, B4, B5, B6, B7
 ```
 
-```
-Sharded Architecture (k=4 shards, beacon chain coordination):
+```mermaid
+flowchart TD
+    subgraph beacon ["Beacon Chain (Root)"]
+        BC["Beacon Chain
+        Validators: V1–V100
+        Block Time: 12s
+        Checkpoint: Every 32 blocks"]
+    end
 
-                    Beacon Chain (Root)
-                    [Validators: V1-V100]
-                    Block Time: 12s
-                    Checkpoint: Every 32 blocks
-                           |
-        +------------------+------------------+
-        |                  |                  |
-    Shard 0           Shard 1           Shard 2           Shard 3
-  [V1-V25]          [V26-V50]         [V51-V75]        [V76-V100]
-  Accounts:         Accounts:         Accounts:        Accounts:
-  0x00-0x3F         0x40-0x7F         0x80-0xBF        0xC0-0xFF
-  Block Time: 2s    Block Time: 2s    Block Time: 2s   Block Time: 2s
+    subgraph shards ["Shard Layer"]
+        S0["Shard 0
+        Validators: V1–V25
+        Accounts: 0x00–0x3F
+        Block Time: 2s"]
 
-Cross-Shard Transaction Flow:
-    1. User submits tx in Shard 0: Transfer(0x12 -> 0x85, 100 tokens)
-    2. Shard 0 executes: Deduct 100 from 0x12, emit Receipt{to: Shard 2, data: Credit(0x85, 100)}
-    3. Shard 0 finalizes block, posts receipt root to Beacon Chain
-    4. Beacon Chain includes Shard 0 header in checkpoint at height H
-    5. Relayer submits Receipt + Merkle proof to Shard 2
-    6. Shard 2 verifies proof against Beacon checkpoint at H, credits 0x85 with 100 tokens
-    7. Cross-shard tx latency: 2s (Shard 0) + 12s (Beacon) + 2s (Shard 2) ≈ 16s
+        S1["Shard 1
+        Validators: V26–V50
+        Accounts: 0x40–0x7F
+        Block Time: 2s"]
+
+        S2["Shard 2
+        Validators: V51–V75
+        Accounts: 0x80–0xBF
+        Block Time: 2s"]
+
+        S3["Shard 3
+        Validators: V76–V100
+        Accounts: 0xC0–0xFF
+        Block Time: 2s"]
+    end
+
+    BC --> S0
+    BC --> S1
+    BC --> S2
+    BC --> S3
+
+    subgraph xshard ["Cross-Shard Transaction Flow: Transfer(0x12 → 0x85, 100 tokens)"]
+        direction TD
+        X1["① User submits tx to Shard 0
+        Transfer(0x12 → 0x85, 100 tokens)"]
+
+        X2["② Shard 0 executes
+        Deduct 100 from 0x12
+        Emit Receipt{to: Shard 2, data: Credit(0x85, 100)}"]
+
+        X3["③ Shard 0 finalizes block
+        Posts receipt root to Beacon Chain"]
+
+        X4["④ Beacon Chain
+        Includes Shard 0 header
+        in checkpoint at height H"]
+
+        X5["⑤ Relayer submits
+        Receipt + Merkle proof to Shard 2"]
+
+        X6["⑥ Shard 2 verifies proof
+        against Beacon checkpoint at H
+        Credits 0x85 with 100 tokens"]
+
+        X7["⑦ Total latency
+        2s (Shard 0) + 12s (Beacon) + 2s (Shard 2) ≈ 16s"]
+
+        X1 --> X2 --> X3 --> X4 --> X5 --> X6 --> X7
+    end
+
+    S0 -.->|"receipt root"| X3
+    X4 -.->|"checkpoint at H"| BC
+    X6 -.->|"credit 0x85"| S2
 ```
 
 The performance analysis for these hybrid protocols requires modeling the interaction between the fast path and the slow path. Let λ be the block production rate for the optimistic proposal machine, and let τ be the finalization latency for the checkpoint machine. The system's effective throughput is limited by the proposal machine: T = λ × transactions_per_block. The system's finality latency is determined by the checkpoint machine: L_final = τ. However, the proposal machine's confirmation latency L_conf depends on network synchrony: under synchrony, L_conf ≈ 1/λ (one block time); under asynchrony or attack, L_conf can grow arbitrarily large as forks proliferate without resolution.

@@ -186,8 +186,8 @@ graph TD
     B1 --> BAL
     P1 --> BAL
     BAL --> OUT["Scored dynamic + doubling + register choice"]
-    style BAL fill:#fff4e1
-    style OUT fill:#e1f5ff
+    style BAL fill:#fff4e1,color:#0f172a
+    style OUT fill:#e1f5ff,color:#0f172a
 ```
 
 | Family | Dynamic range | Peak SPL @1m | Sustain | Primary scoring role |

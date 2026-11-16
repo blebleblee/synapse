@@ -28,35 +28,29 @@ The public mempool is therefore not a queue in the computer science sense. It is
 
 The anatomy of transaction propagation and inclusion follows this sequence:
 
-```
-User signs tx (nonce, to, value, data, maxFeePerGas, maxPriorityFeePerGas)
-        │
-        ▼
-  Local node mempool
-        │  (p2p gossip, ~300ms median propagation)
-        ▼
- MEV searcher observes mempool
-        │
-        ├──▶ Identifies extraction opportunity
-        │         │
-        │         ▼
-        │    Constructs bundle: [front-run tx, victim tx, back-run tx]
-        │         │
-        │         ▼
-        │    Submits bundle to block builder via MEV-Boost relay
-        │
-        ▼
-  Block builder (mev-boost)
-        │  Receives bundles from multiple searchers
-        │  Simulates execution, selects highest-value ordering
-        ▼
-  Validator proposes block
-        │
-        ▼
-  Attesters vote on block head (LMD-GHOST)
-        │
-        ▼
-  Epoch checkpoint → Casper FFG justification → Finalization
+```mermaid
+flowchart TD
+    A["User signs tx<br/>(nonce, to, value, data,<br/>maxFeePerGas, maxPriorityFeePerGas)"]
+    B["Local node mempool"]
+    C["MEV searcher observes mempool"]
+    D["Identifies extraction opportunity"]
+    E["Constructs bundle:<br/>[front-run tx, victim tx, back-run tx]"]
+    F["Submits bundle to block builder<br/>via MEV-Boost relay"]
+    G["Block builder (mev-boost)<br/>Receives bundles from multiple searchers<br/>Simulates execution, selects highest-value ordering"]
+    H["Validator proposes block"]
+    I["Attesters vote on block head<br/>(LMD-GHOST)"]
+    J["Epoch checkpoint → Casper FFG<br/>justification → Finalization"]
+    
+    A --> B
+    B -->|"p2p gossip<br/>~300ms median propagation"| C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    B --> G
+    G --> H
+    H --> I
+    I --> J
 ```
 
 The separation between *validator* (who proposes and attests) and *builder* (who constructs the execution payload) is the architecture of Proposer-Builder Separation (PBS), which Ethereum has implemented in practice through the MEV-Boost software. Under PBS, validators outsource block construction to a competitive market of builders who bid for the right to have their payload included. The validator simply selects the highest-bid payload whose header they can verify, without needing to know its contents until after they commit to it. This creates a market structure where MEV extraction is professionalized: searchers find opportunities, builders aggregate searcher bundles, and validators passively capture the winning bid. The economic surplus that once accrued entirely to miners now distributes across this stack, but the fundamental extraction mechanics remain unchanged.

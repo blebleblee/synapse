@@ -28,25 +28,21 @@ BizHawk is the dominant platform for tool-assisted speedrunning and glitch analy
 
 The core selection decision is the most consequential one you will make when beginning a research session. For NES work, the difference between the NTSC Nestopia-UE core and the cycle-accurate NESHawk core is not cosmetic. NESHawk implements CPU-PPU interaction at the cycle level, which matters for any glitch that involves sprite 0 hit timing, VBLANK NMI delivery latency, or mid-frame PPU register writes. For SNES, bsnes-mercury Accuracy is the cycle-accurate core of choice, though it carries a significant performance cost relative to Snes9x. For Game Boy, the Gambatte core achieves near-perfect emulation of original DMG behavior, with documented and measured accuracy against hardware test ROMs. Choosing the wrong core for a behavior that depends on sub-frame timing is equivalent to running a chemistry experiment with contaminated reagents.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     BizHawk Research Pipeline                       │
-│                                                                     │
-│  ┌────────────┐    ┌──────────────┐    ┌───────────────────────┐   │
-│  │ TAS Editor │───▶│ System Core  │───▶│  Lua Scripting API    │   │
-│  │  (input    │    │ (NESHawk /   │    │  - memory.read_u8()   │   │
-│  │  timeline) │    │  bsnes /     │    │  - emu.framecount()   │   │
-│  └────────────┘    │  Gambatte /  │    │  - event.onmemory     │   │
-│                    │  Mupen64Plus)│    │    execute()          │   │
-│  ┌────────────┐    └──────────────┘    └───────────┬───────────┘   │
-│  │ Savestate  │◀───────────────────────────────────┘               │
-│  │  Manager   │                                                     │
-│  └────────────┘    ┌──────────────┐    ┌───────────────────────┐   │
-│                    │ RAM Watch /  │    │  Hex Editor /         │   │
-│                    │  RAM Search  │    │  Cheat Engine         │   │
-│                    │  (live diff) │    │  (ROM patch layer)    │   │
-│                    └──────────────┘    └───────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    TASEditor["TAS Editor<br/>(input timeline)"]
+    SystemCore["System Core<br/>(NESHawk / bsnes /<br/>Gambatte / Mupen64Plus)"]
+    LuaAPI["Lua Scripting API<br/>- memory.read_u8()<br/>- emu.framecount()<br/>- event.onmemory<br/>execute()"]
+    SavestateManager["Savestate<br/>Manager"]
+    RAMWatch["RAM Watch / RAM Search<br/>(live diff)"]
+    HexEditor["Hex Editor / Cheat Engine<br/>(ROM patch layer)"]
+    
+    TASEditor -->|input| SystemCore
+    SystemCore -->|execute| LuaAPI
+    LuaAPI -->|state| SavestateManager
+    SystemCore -.->|feedback| SavestateManager
+    SystemCore -.->|observe| RAMWatch
+    SystemCore -.->|patch| HexEditor
 ```
 
 ### TAS Scripting Frameworks
@@ -113,34 +109,20 @@ For SNES work, the architecture shifts to 65816, a 24-bit address space with mod
 
 For Game Boy (SM83 CPU), **Ghidra** with the GhidraBoy plugin has become the standard for large-scale disassembly projects, and it integrates with BizHawk's debug export to import execution traces as function-discovery hints. The key advantage over manual disassembly is Ghidra's cross-reference tracking: when you identify the address of a glitch-triggering function, Ghidra immediately shows you every location in the ROM that calls or jumps to that function, which is essential for understanding whether a glitch is a targeted exploit of a specific code path or an emergent property of a shared routine called from many sites.
 
-```
-Disassembly Verification Workflow
+```mermaid
+flowchart TD
+    A["ROM binary<br/>(SHA-256 verified)"]
+    B["Execution trace<br/>(Mesen / BizHawk trace logger)<br/>records address, opcode, registers, bank state per instruction"]
+    C["Bank map construction<br/>identify all bankswitch points in trace<br/>annotate PRG bank active at each glitch-relevant address"]
+    D["Static disassembly<br/>(da65 / Ghidra)<br/>apply bank annotations as RANGE hints<br/>mark pointer tables vs. code regions<br/>build label map: named functions, named data tables"]
+    E["Reassembly verification<br/>(asar / bass / ca65)<br/>reassemble labeled source<br/>binary-diff against original ROM section<br/>zero diff = disassembly is structurally correct"]
+    F["Annotated source file<br/>preserved as research artifact"]
 
-ROM binary (SHA-256 verified)
-        │
-        ▼
-Execution trace (Mesen / BizHawk trace logger)
- → records address, opcode, registers, bank state per instruction
-        │
-        ▼
-Bank map construction
- → identify all bankswitch points in trace
- → annotate PRG bank active at each glitch-relevant address
-        │
-        ▼
-Static disassembly (da65 / Ghidra)
- → apply bank annotations as RANGE hints
- → mark pointer tables vs. code regions
- → build label map: named functions, named data tables
-        │
-        ▼
-Reassembly verification (asar / bass / ca65)
- → reassemble labeled source
- → binary-diff against original ROM section
- → zero diff = disassembly is structurally correct
-        │
-        ▼
-Annotated source file → preserved as research artifact
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 ---

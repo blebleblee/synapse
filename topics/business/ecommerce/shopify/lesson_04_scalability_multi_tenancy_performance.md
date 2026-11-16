@@ -34,37 +34,31 @@ Shopify's original architecture ran on a single MySQL database, and it served th
 
 The routing architecture works as follows. Each shop is assigned to a shard at creation time using a shard placement algorithm that balances load across available shards. The routing layer, implemented as a Ruby module within the Rails application, maintains a mapping of `shop_id` to shard identifier. When a request arrives for a specific shop, the application resolves the shard, connects to the corresponding MySQL database, and issues queries against it. The shard assignment is persistent: once a shop is placed on a shard, it stays there unless explicitly rebalanced, which is a rare, carefully orchestrated operation.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Shopify Application Layer                 │
-│                                                              │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │  Request A   │  │  Request B   │  │  Request C   │          │
-│  │  Shop ID:    │  │  Shop ID:    │  │  Shop ID:    │          │
-│  │  1024        │  │  5783        │  │  4201        │          │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘          │
-│         │                │                │                  │
-│         ▼                ▼                ▼                  │
-│  ┌──────────────────────────────────────────────────┐       │
-│  │           Shard Router (shop_id → shard)          │       │
-│  └──────────────────────────────────────────────────┘       │
-│         │                │                │                  │
-│         ▼                ▼                ▼                  │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │  Shard 1     │  │  Shard 4    │  │  Shard 3    │          │
-│  │  (MySQL)     │  │  (MySQL)    │  │  (MySQL)    │          │
-│  │              │  │             │  │             │          │
-│  │ Shops:      │  │ Shops:      │  │ Shops:      │          │
-│  │  1024, 1025,│  │  5783, 5784,│  │  4201, 4202,│          │
-│  │  1026, ...   │  │  5785, ...   │  │  4203, ...   │          │
-│  └─────────────┘  └─────────────┘  └─────────────┘          │
-│         │                │                │                  │
-│         ▼                ▼                ▼                  │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │  Read        │  │  Read        │  │  Read        │          │
-│  │  Replicas    │  │  Replicas    │  │  Replicas    │          │
-│  └─────────────┘  └─────────────┘  └─────────────┘          │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph shopify["Shopify Application Layer"]
+        reqA["Request A<br/>Shop ID: 1024"]
+        reqB["Request B<br/>Shop ID: 5783"]
+        reqC["Request C<br/>Shop ID: 4201"]
+        
+        reqA --> router
+        reqB --> router
+        reqC --> router
+        
+        router["Shard Router (shop_id → shard)"]
+        
+        router --> shard1
+        router --> shard4
+        router --> shard3
+        
+        shard1["Shard 1<br/>(MySQL)<br/><br/>Shops:<br/>1024, 1025,<br/>1026, ..."]
+        shard4["Shard 4<br/>(MySQL)<br/><br/>Shops:<br/>5783, 5784,<br/>5785, ..."]
+        shard3["Shard 3<br/>(MySQL)<br/><br/>Shops:<br/>4201, 4202,<br/>4203, ..."]
+        
+        shard1 --> replica1["Read<br/>Replicas"]
+        shard4 --> replica4["Read<br/>Replicas"]
+        shard3 --> replica3["Read<br/>Replicas"]
+    end
 ```
 
 Each shard runs as a MySQL primary with one or more read replicas. Write operations go to the primary, read operations go to replicas, and replication lag between primary and replica is typically sub-second but can increase under heavy write load. The application is designed to route reads to replicas for non-critical operations (product listings, collection browsing, theme rendering) while routing reads to the primary for operations that require absolute consistency (checkout, inventory checks during order placement, payment processing).
@@ -77,35 +71,45 @@ Shard rebalancing is the process of moving shops from an overloaded shard to a l
 
 As Shopify scaled beyond what database sharding alone could handle, the team introduced the concept of pods. A pod is a semi-independent unit of infrastructure that contains its own database shards, Redis clusters, Elasticsearch indices, and supporting services. Each shop is assigned to a pod, and all of that shop's data lives within that pod. The pod architecture provides blast-radius containment: a failure in one pod does not affect shops on other pods, because pods share no infrastructure dependencies at the data layer.
 
-```
-┌────────────────────────────────────────────────────────────────┐
-│                      Shopify Platform (Global)                  │
-│                                                                │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌─────────────┐  │
-│  │     Pod Alpha     │  │     Pod Beta      │  │  Pod Gamma  │  │
-│  │                   │  │                   │  │             │  │
-│  │  ┌─────────────┐ │  │  ┌─────────────┐ │  │  ┌──────┐   │  │
-│  │  │  Shards 1-8  │ │  │  │  Shards 9-16 │ │  │  │Shards│   │  │
-│  │  │  (MySQL)     │ │  │  │  (MySQL)     │ │  │  │17-24 │   │  │
-│  │  └─────────────┘ │  │  └─────────────┘ │  │  └──────┘   │  │
-│  │  ┌─────────────┐ │  │  ┌─────────────┐ │  │  ┌──────┐   │  │
-│  │  │  Redis       │ │  │  │  Redis       │ │  │  │Redis │   │  │
-│  │  │  Cluster     │ │  │  │  Cluster     │ │  │  │      │   │  │
-│  │  └─────────────┘ │  │  └─────────────┘ │  │  └──────┘   │  │
-│  │  ┌─────────────┐ │  │  ┌─────────────┐ │  │  ┌──────┐   │  │
-│  │  │ Elasticsearch │ │  │  │ Elasticsearch │ │  │  │ ES   │   │  │
-│  │  │  Cluster      │ │  │  │  Cluster      │ │  │  │      │   │  │
-│  │  └─────────────┘ │  │  └─────────────┘ │  │  └──────┘   │  │
-│  └──────────────────┘  └──────────────────┘  └─────────────┘  │
-│                                                                │
-│  ┌─────────────────────────────────────────────────────────┐  │
-│  │              Shared Services (Global)                    │  │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐ │  │
-│  │  │ Payments  │  │ Shipping  │  │ Identity  │  │ Billing  │ │  │
-│  │  │ Gateway   │  │ Services  │  │ / Auth    │  │ System   │ │  │
-│  │  └──────────┘  └──────────┘  └──────────┘  └──────────┘ │  │
-│  └─────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph platform ["Shopify Platform (Global)"]
+        subgraph pods ["Regional Pods"]
+            subgraph pod_alpha ["Pod Alpha"]
+                alpha_mysql["Shards 1–8\n(MySQL)"]
+                alpha_redis["Redis Cluster"]
+                alpha_es["Elasticsearch Cluster"]
+            end
+
+            subgraph pod_beta ["Pod Beta"]
+                beta_mysql["Shards 9–16\n(MySQL)"]
+                beta_redis["Redis Cluster"]
+                beta_es["Elasticsearch Cluster"]
+            end
+
+            subgraph pod_gamma ["Pod Gamma"]
+                gamma_mysql["Shards 17–24\n(MySQL)"]
+                gamma_redis["Redis Cluster"]
+                gamma_es["Elasticsearch Cluster"]
+            end
+        end
+
+        subgraph shared ["Shared Services (Global)"]
+            payments["Payments Gateway"]
+            shipping["Shipping Services"]
+            identity["Identity / Auth"]
+            billing["Billing System"]
+        end
+    end
+
+    alpha_mysql --- alpha_redis
+    alpha_redis --- alpha_es
+    beta_mysql --- beta_redis
+    beta_redis --- beta_es
+    gamma_mysql --- gamma_redis
+    gamma_redis --- gamma_es
+
+    pods --> shared
 ```
 
 Pods share a common application codebase and common global services such as the payment gateway, shipping integrations, and identity management. The application layer is stateless and can serve requests for any pod, resolving the pod from the shop's `shop_id` and connecting to the appropriate pod's data layer. New shops are assigned to the pod with the most available capacity at creation time, and pod assignments are immutable for the life of the shop. This immutability simplifies routing: once a shop is on Pod Beta, it stays on Pod Beta, and the routing table does not need to handle pod migrations.
@@ -169,34 +173,20 @@ The **Bulk Operations API** is the escape hatch for large-scale data operations.
 
 Shopify themes are server-side rendered using Liquid, a templating language developed by Shopify co-founder Tobias Lütke. Liquid templates are compiled to Ruby code on first render and cached for subsequent requests. The rendering pipeline for a storefront page request proceeds through the following stages:
 
-```
-Customer Browser
-       │
-       ▼
-┌──────────────┐
-│  Shopify CDN  │  ──── Cache hit? ──→ Serve cached HTML
-└──────┬───────┘
-       │ Cache miss
-       ▼
-┌──────────────────────────────────────┐
-│  Shopify Origin (Rails Application)   │
-│                                       │
-│  1. Resolve shop from host header      │
-│  2. Resolve pod and shard             │
-│  3. Authenticate session (if any)      │
-│  4. Fetch Liquid template (cached)    │
-│  5. Execute Liquid:                   │
-│     - Product/collection data queries  │
-│     - Metafield reads                  │
-│     - content_for_header injection    │
-│  6. Generate HTML                      │
-│  7. Set cache headers                  │
-│  8. Return response to CDN             │
-└──────────────────────────────────────┘
-       │
-       ▼
-  CDN caches response
-  (duration varies by page type)
+```mermaid
+flowchart TD
+    Browser["Customer Browser"]
+    CDN["Shopify CDN"]
+    CacheHit["Serve cached HTML"]
+    Origin["Shopify Origin (Rails Application)"]
+    Process["1. Resolve shop from host header<br/>2. Resolve pod and shard<br/>3. Authenticate session (if any)<br/>4. Fetch Liquid template (cached)<br/>5. Execute Liquid:<br/>   - Product/collection data queries<br/>   - Metafield reads<br/>   - content_for_header injection<br/>6. Generate HTML<br/>7. Set cache headers<br/>8. Return response to CDN"]
+    Cache["CDN caches response<br/>(duration varies by page type)"]
+    
+    Browser --> CDN
+    CDN -->|"Cache hit?"| CacheHit
+    CDN -->|"Cache miss"| Origin
+    Origin --> Process
+    Process --> Cache
 ```
 
 During Liquid execution, the template engine makes database queries to fetch the data needed for rendering: product information, collection membership, metafields, shop settings, and navigation structures. Each of these queries is scoped to the current shop and executed against the shop's assigned shard. The number and complexity of these queries directly affect render time, and Shopify enforces a render time budget to prevent any single merchant's complex theme from degrading performance for co-tenants on the same shard.

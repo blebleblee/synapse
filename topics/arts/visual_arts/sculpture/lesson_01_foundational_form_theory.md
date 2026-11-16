@@ -30,24 +30,28 @@ The cube and its derivatives—rectangular prisms, wedges, pyramids—establish 
 
 Transitional volumes connect these primitives into coherent forms. A neck connecting head to torso is not merely a cylinder inserted between two ovoids—it is a transitional form that must mediate the scale change, shift the axes of the two masses it connects, and create fluid surface continuity. These transitions are where sculptures succeed or fail. Harsh, unmodulated transitions create visual breaks that fragment form into disconnected parts. Overly soft, ambiguous transitions create mushy, weak forms that lack definition. The correct transition exhibits clear directional flow while maintaining surface tension—the eye should move smoothly from one volume to the next while still perceiving distinct formal identity.
 
-```
-Volumetric Hierarchy (Simplified Figure Armature):
+```mermaid
+flowchart TD
+    Head["Head<br/>(sphere, ø 1.0 unit)"]
+    Neck["Neck<br/>(cylinder, ø 0.4, length 0.6)"]
+    Shoulders["Shoulders<br/>(cubic mass, 2.5 × 0.8 × 0.6)"]
+    LeftArm["Left Arm<br/>(tapered cylinder, ø 0.3 → 0.2)"]
+    RightArm["Right Arm<br/>(tapered cylinder, ø 0.3 → 0.2)"]
+    Torso["Torso<br/>(modified box, 1.5 × 2.0 × 0.8)"]
+    LeftLeg["Left Leg<br/>(tapered cylinder, ø 0.4 → 0.25)"]
+    RightLeg["Right Leg<br/>(tapered cylinder, ø 0.4 → 0.25)"]
+    LeftFoot["Left Foot<br/>(wedge/box form)"]
+    RightFoot["Right Foot<br/>(wedge/box form)"]
 
-         ●  ← Head (sphere, ø 1.0 unit)
-         |
-         ║  ← Neck (cylinder, ø 0.4, length 0.6)
-         |
-    ┌────■────┐  ← Shoulders (cubic mass, 2.5 × 0.8 × 0.6)
-    |         |
-    ║         ║  ← Arms (tapered cylinders, ø 0.3 → 0.2)
-    |         |
-    ╔═══════╗    ← Torso (modified box, 1.5 × 2.0 × 0.8)
-    ║       ║
-    ╚═══════╝
-    |       |
-    ║       ║    ← Legs (tapered cylinders, ø 0.4 → 0.25)
-    |       |
-    ●       ●    ← Feet (wedge/box forms)
+    Head --> Neck
+    Neck --> Shoulders
+    Shoulders --> LeftArm
+    Shoulders --> RightArm
+    Shoulders --> Torso
+    Torso --> LeftLeg
+    Torso --> RightLeg
+    LeftLeg --> LeftFoot
+    RightLeg --> RightFoot
 ```
 
 Mass distribution determines structural stability and visual balance. Physical sculptures must support their own weight without collapse, which imposes engineering constraints on form—cantilevers require counterweight or internal armature, top-heavy compositions demand wide bases, and fragile materials cannot sustain aggressive overhangs. Even when working digitally where physics can be ignored, the eye expects gravitationally plausible form and perceives violations as unstable regardless of actual structural soundness. A figure balanced on one foot must shift its center of mass over the supporting leg's contact point, with the free leg, arms, and torso arranged to create compositional counterbalance. Defying these expectations requires extreme exaggeration to read as intentional rather than error.

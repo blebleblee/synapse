@@ -132,13 +132,41 @@ $$a_1 = \frac{2\omega_c^2 - 8}{4 + 2\sqrt{2}\omega_c + \omega_c^2}, \quad a_2 = 
 
 Cascading second-order sections provides modularity and numerical stability. A fifth-order Butterworth lowpass is realized as two biquads (each handling a pole pair) plus a first-order section (real pole). This cascade structure, denoted **Direct Form II** or **canonical form**, minimizes the number of delay registers and coefficients needed:
 
-```
-         b₀                 b₀'                 b₀''
-x[n] ────┬────→ (z⁻¹) ────┬────→ (z⁻¹) ────┬────→ y[n]
-         │      ↑ ↓       │      ↑ ↓       │
-        (+)    -a₁ -a₂   (+)    -a₁' -a₂'  (+)
-         │              │              │
-         └─────────────→─┴─────────────→─┴──
+```mermaid
+flowchart LR
+    xn["x[n]"]
+    s0("+")
+    d1["z⁻¹"]
+    s1("+")
+    d2["z⁻¹"]
+    s2("+")
+    yn["y[n]"]
+
+    fb1["−a₁"]
+    fb2["−a₂"]
+    fb3["−a₁'"]
+    fb4["−a₂'"]
+
+    b0["b₀"]
+    b1["b₀'"]
+    b2["b₀''"]
+
+    xn -->|"b₀"| s0
+    s0 --> d1
+    d1 -->|"b₀'"| s1
+    s1 --> d2
+    d2 -->|"b₀''"| s2
+    s2 --> yn
+
+    d1 --> fb1
+    fb1 --> s0
+    d1 --> fb2
+    fb2 -->|"−a₂"| s1
+
+    d2 --> fb3
+    fb3 --> s1
+    d2 --> fb4
+    fb4 -->|"−a₂'"| s2
 ```
 
 In practice, Direct Form II cascade structure is the most commonly deployed IIR realization in embedded systems and DSP applications because it minimizes storage requirements and computational burden while maintaining excellent numerical stability for moderately-scaled pole-pair configurations.
@@ -161,6 +189,19 @@ The **multitaper method** (Thomson's method) applies multiple independent tapers
 
 Regardless of the PSD estimation method, the fundamental mechanism is identical to filtering: averaging in frequency domain (via FFT) is mathematically equivalent to applying a low-pass filter to a raw periodogram. The window function defines the frequency response of this implicit filter. Understanding this connection—that spectral estimation inherently involves filtering—is essential for interpreting results and selecting appropriate parameters for your specific application.
 
-## 3. High-Performance Optimization & Failure Modes
+## 3.
 
-### 3.1 Coefficient Quantization and Fixed-Point Arithme
+## 3. Practical Considerations and Cross-Domain Synthesis
+
+The spectral estimation techniques presented—periodogram, Welch's method, multitaper—form a hierarchy of bias-variance trade-offs governed by a single unifying principle: **spectral resolution is fundamentally constrained by the time-bandwidth product**. For a signal of duration $T$, the minimum resolvable frequency separation is $\Delta f \approx 1/T$, a manifestation of the uncertainty principle in signal processing. Windowing and segmentation merely redistribute this fundamental limit between main-lobe width (frequency resolution) and side-lobe suppression (dynamic range). The practitioner's task is to allocate this limited "budget" according to application requirements: radar Doppler processing demands narrow main lobes to resolve closely spaced targets despite elevated side lobes; geophysical monitoring prioritizes side-lobe suppression to detect weak broadband phenomena. The multitaper method represents the Pareto frontier of this trade-off, achieving near-optimal concentration of spectral energy for a given time-bandwidth product through the use of orthogonal Slepian sequences.
+
+Integrating the unit's themes, we observe that filter design (FIR/IIR structures) and spectral estimation are **dual formulations of the same underlying mathematics**: convolution in time domain corresponds to multiplication in frequency domain, and vice versa. An FIR filter is a weighted moving average in time; a Welch periodogram estimate is a weighted moving average in frequency. Both operations smooth their respective domains by trading resolution for reduced variance. The pole-zero placement techniques from Section 1 directly inform window design—maximally flat (Butterworth-like) windows such as Hamming minimize passband ripple, while equiripple (Chebyshev-like) windows such as Kaiser allow explicit control of side-lobe roll-off. The lattice structures of Section 2 find application in adaptive spectral estimation (e.g., Burg's maximum entropy method, which estimates PSD via AR modeling using lattice filters). Mastery of signal processing requires recognizing these deep structural connections: seemingly disparate techniques are manifestations of a compact set of principles—linearity, time-frequency duality, and the bias-variance trade-off—applied across different problem domains.
+
+## Summary & Verification Matrix
+
+| **Governing Invariant** | **Core Mechanism** | **Design Trade-off** | **Diagnostic Criterion** | **Failure Mode** |
+|------------------------|-------------------|---------------------|-------------------------|-----------------|
+| **Filter order vs. transition width**: For FIR filters, transition width $\Delta f \propto 1/N$ where $N$ is filter length; IIR achieves steeper roll-off with fewer coefficients but at cost of nonlinear phase. | FIR: direct convolution of input with impulse response; IIR: recursive feedback from poles inside unit circle. | FIR guarantees linear phase (symmetric coefficients) but requires high order for sharp transitions; IIR achieves sharp cutoffs with low order but introduces phase distortion and potential instability. | FIR: verify symmetry of $h[n]$; IIR: verify all poles $\|z_i\| < 1$ and measure group delay variation $\tau_g(\omega)$. | FIR: excessive delay/computational cost; IIR: instability if poles near/outside unit circle, audible ringing from resonant poles. |
+| **Pole-zero placement**: Filter frequency response $H(e^{j\omega})$ determined by distances from $e^{j\omega}$ to poles (peaks) and zeros (nulls); magnitude $\|H\|$ inversely proportional to distance to nearest pole. | Zeros on unit circle create perfect notches; poles near unit circle create narrow resonances; pole-zero pairs cancel (all-pass filters preserve magnitude, alter phase only). | Narrow resonances (poles close to unit circle) achieve selectivity but amplify quantization noise and lengthen transient response; moving poles inward stabilizes but broadens response. | Measure pole radius $r$; resonance bandwidth $\Delta f \approx (1-r)f_s/(2\pi)$; verify stability margin $(1-r_{\max})$ and Q-factor $Q \approx 1/(2(1-r))$. | Limit-cycle oscillations from finite precision in poles near unit circle; excessive transient duration (long ring-down time $\sim 1/(1-r)$). |
+| **Lattice/ladder equivalence**: Any FIR/IIR transfer function admits lattice realization with reflection coefficients $\|k_i\| < 1$; guarantees stability and enables order-recursive updates. | Cascaded two-port sections compute forward/backward predictions; reflection coefficients $k_i$ relate prediction errors at successive stages. | Lattice offers intrinsic stability (bounded coefficients), modular growth, and superior numerical properties; direct-form offers lower computational cost (fewer multiplies) but worse coefficient sensitivity. | Stability: verify $\|k_i\| < 1$ for all stages; orthogonality: confirm decorrelated residuals in adaptive filtering; numerical: compare quantized vs. ideal frequency response. | Coefficient quantization in direct-form moves poles outside unit circle; lattice remains stable but suffers performance degradation (widened passbands). |
+| **Spectral estimation bias-variance trade-off**: Variance $\sigma^2_{\hat{S}} \propto 1/K$ where $K$ is number of averaged segments; resolution $\Delta f \propto 1/T$ where $T$ is segment length; product $K \cdot T$ fixed by total record length. | Periodogram: DFT squared (high variance, unbiased); Welch: average periodograms of overlapped windows (reduced variance, slight bias from windowing); multitaper: average over orthogonal tapers (optimal bias-variance for short records). | Long segments $\rightarrow$ fine frequency resolution but few averages (high variance); short segments $\rightarrow$ many averages (low variance) but coarse resolution. Overlap increases $K$ without additional data but introduces correlation. | Welch: verify segment count $K \geq 8$ for stable estimates, overlap 50-75%; multitaper: time-bandwidth product $NW \geq 2.5$ yields $\sim 2NW-1$ effective tapers; measure spectral confidence intervals. | Under-segmented periodogram exhibits wild fluctuations (variance $\approx S^2$ for Gaussian processes); over-segmented Welch loses frequency resolution (smears spectral features across wide bins). |

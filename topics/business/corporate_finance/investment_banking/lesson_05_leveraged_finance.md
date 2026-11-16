@@ -30,34 +30,26 @@ The Great Financial Crisis of 2008-2009 provided a brutal education in refinanci
 
 The architecture of a leveraged capital structure resembles a vertical stack of claim priorities, each layer distinct in its security package, contractual rights, and risk-return profile. Beginning at the top of the capital stack and descending through progressively subordinated tranches, the typical LBO debt structure comprises five principal layers: the revolving credit facility, the first-lien term loan, the second-lien term loan, the mezzanine facility, and the equity cushion. Each layer occupies a defined position in the absolute priority rule, which governs the distribution of liquidation proceeds in bankruptcy.
 
-```
-╔════════════════════════════════════════════════════════════════╗
-║                   CAPITAL STACK WATERFALL                      ║
-║                                                                ║
-║  ┌──────────────────────────────────────────────────────────┐ ║
-║  │  Revolver (0.5x EBITDA) - SOFR + 325 bps                │ ║
-║  │  First-out in cash sweep; Daily borrowing base           │ ║
-║  └──────────────────────────────────────────────────────────┘ ║
-║  ┌──────────────────────────────────────────────────────────┐ ║
-║  │  1L Term Loan (4.0x EBITDA) - SOFR + 400 bps            │ ║
-║  │  Pari passu security; 1% annual amortization             │ ║
-║  └──────────────────────────────────────────────────────────┘ ║
-║  ┌──────────────────────────────────────────────────────────┐ ║
-║  │  2L Term Loan (1.0x EBITDA) - SOFR + 725 bps            │ ║
-║  │  Subordinated lien; PIK toggle option                    │ ║
-║  └──────────────────────────────────────────────────────────┘ ║
-║  ┌──────────────────────────────────────────────────────────┐ ║
-║  │  Mezzanine Notes (0.5x EBITDA) - 12% PIK + warrants     │ ║
-║  │  Unsecured; 5-year maturity; 10% equity warrants        │ ║
-║  └──────────────────────────────────────────────────────────┘ ║
-║  ┌──────────────────────────────────────────────────────────┐ ║
-║  │  Sponsor Equity (2.5x EBITDA)                            │ ║
-║  │  Common stock; residual claimant                         │ ║
-║  └──────────────────────────────────────────────────────────┘ ║
-║                                                                ║
-║  Total Capitalization: 8.5x EBITDA                            ║
-║  Debt/Capital Ratio: 71%   Equity/Capital Ratio: 29%         ║
-╚════════════════════════════════════════════════════════════════╝
+```mermaid
+---
+title: Capital Stack Waterfall
+---
+flowchart TD
+    Revolver["Revolver (0.5x EBITDA)<br/>SOFR + 325 bps<br/>First-out in cash sweep; Daily borrowing base"]
+    L1["1L Term Loan (4.0x EBITDA)<br/>SOFR + 400 bps<br/>Pari passu security; 1% annual amortization"]
+    L2["2L Term Loan (1.0x EBITDA)<br/>SOFR + 725 bps<br/>Subordinated lien; PIK toggle option"]
+    Mezz["Mezzanine Notes (0.5x EBITDA)<br/>12% PIK + warrants<br/>Unsecured; 5-year maturity; 10% equity warrants"]
+    Equity["Sponsor Equity (2.5x EBITDA)<br/>Common stock; residual claimant"]
+    Summary["Total Capitalization: 8.5x EBITDA<br/>Debt/Capital Ratio: 71%   Equity/Capital Ratio: 29%"]
+
+    Revolver --> L1 --> L2 --> Mezz --> Equity
+    Equity -.-> Summary
+
+    classDef tranche fill:#f8f9fa,stroke:#333,stroke-width:1px
+    classDef summary fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray: 5 5
+
+    class Revolver,L1,L2,Mezz,Equity tranche
+    class Summary summary
 ```
 
 The revolving credit facility functions as the operating liquidity backstop, providing working capital financing, letters of credit issuance, and short-term funding for seasonal cash flow fluctuations. Unlike term loans, which disburse the full principal amount at closing and amortize over time, revolvers permit continuous borrowing and repayment within a maximum commitment amount, typically sized at $25 million to $100 million or 0.5x to 1.0x EBITDA. Revolver availability depends on a borrowing base calculation that applies advance rates to eligible current assets: 85% against accounts receivable less than 90 days outstanding, 50% against finished goods inventory, and zero against obsolete or slow-moving stock. This asset-based lending structure ensures that revolver exposure remains collateralized by liquid, realizable assets, insulating lenders from enterprise value deterioration.

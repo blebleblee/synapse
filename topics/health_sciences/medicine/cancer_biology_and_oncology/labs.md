@@ -306,12 +306,12 @@ Biomarker testing completeness must be verified against site-specific NCCN guide
 | Osimertinib | 80 mg PO daily fixed dose | Fixed | Reduce to 40 mg if Grade 3 toxicity; CYP3A4 interactions |
 | Sotorasib | 960 mg PO daily fixed dose | Fixed | Take with food; CYP3A4 inhibitor; hepatotoxicity monitoring |
 | Adagrasib | 600 mg PO BID fixed dose | Fixed | QTc monitoring; drug interactions extensive |
-| Amivantamab | 1050 mg IV (BW <80 kg); 1400 mg (BW ≥80 kg) | Actual BW | Infusion reactions; premedicate with antihistamine + acetaminophen |
+| Amivantamab | 1050 mg IV (BW < 80 kg); 1400 mg (BW ≥80 kg) | Actual BW | Infusion reactions; premedicate with antihistamine + acetaminophen |
 | Pembrolizumab | 200 mg IV q3w or 400 mg q6w flat dose | Fixed | Permanent discontinuation for Grade 3+ IMP |
 
 ### Section 3: RECIST 1.1 Quick Reference
 
-Applying RECIST 1.1 correctly requires that you identify target lesions (maximum 5 total, maximum 2 per organ, measurable by CT ≥10 mm longest diameter or lymph nodes ≥15 mm short axis) and non-target lesions (all other lesions) at baseline, and track only target lesion diameter sums at subsequent time points. Complete Response (CR) is disappearance of all target lesions, with all pathological nodes reduced to <10 mm short axis. Partial Response (PR) is ≥30% decrease in sum of target lesion diameters from baseline. Progressive Disease (PD) is ≥20% increase in sum from nadir (not baseline) with ≥5 mm absolute increase, or appearance of new lesions. Stable Disease (SD) is any result not meeting PR or PD criteria.
+Applying RECIST 1.1 correctly requires that you identify target lesions (maximum 5 total, maximum 2 per organ, measurable by CT ≥10 mm longest diameter or lymph nodes ≥15 mm short axis) and non-target lesions (all other lesions) at baseline, and track only target lesion diameter sums at subsequent time points. Complete Response (CR) is disappearance of all target lesions, with all pathological nodes reduced to < 10 mm short axis. Partial Response (PR) is ≥30% decrease in sum of target lesion diameters from baseline. Progressive Disease (PD) is ≥20% increase in sum from nadir (not baseline) with ≥5 mm absolute increase, or appearance of new lesions. Stable Disease (SD) is any result not meeting PR or PD criteria.
 
 The most common RECIST errors in clinical practice are measuring a lymph node by longest diameter rather than short axis, calling a cyst or necrotic area a target lesion (target lesions must be measurable solid lesions), failing to document the nadir sum (using the wrong baseline for the 20% PD calculation), and failing to flag new lesions as PD when target lesion change alone does not meet PD criteria.
 

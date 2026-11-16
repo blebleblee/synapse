@@ -20,35 +20,29 @@ The invariants that govern every system in this lesson follow directly from the 
 
 The path from stored data to visible phosphor glow moves through several distinct hardware stages, each operating in tight coordination. It is worth tracing this pipeline concretely using the Namco Pac-Man hardware (1980) as a canonical example, since its schematics are exhaustively documented and its architecture represents the first full generation of purpose-built arcade graphics hardware.
 
-```
-+------------------+     +------------------+     +--------------------+
-|   Tile ROM       |     |   Sprite ROMs    |     |   Color PROMs      |
-| (4 KB, 2bpp gfx) |     | (4 KB, 2bpp gfx) |     | (256×4 bit lookup) |
-+--------+---------+     +--------+---------+     +---------+----------+
-         |                        |                          |
-         v                        v                          v
-+--------+---------+     +--------+-----------+   +---------+----------+
-| Tile Address Mux |     | Sprite Line Buffer |   |  Palette Index Mux |
-| (VRAM row/col    |     | (dual-ported line  |   |  (selects pen from  |
-|  → tile index)   |     |  buffer, 2 lines)  |   |   color PROM bank) |
-+--------+---------+     +--------+-----------+   +---------+----------+
-         |                        |                          |
-         +------------------------+                          |
-                        |                                    |
-                        v                                    |
-              +---------+----------+                         |
-              |  Pixel Priority    +<------------------------+
-              |  Arbitration Logic |
-              |  (sprite vs tile   |
-              |   vs background)   |
-              +---------+----------+
-                        |
-                        v
-              +---------+----------+
-              |  DAC / RGB Output  |
-              |  (resistor ladder  |
-              |   or dedicated IC) |
-              +--------------------+
+```mermaid
+flowchart TD
+    A["Tile ROM<br/>(4 KB, 2bpp gfx)"]
+    B["Sprite ROMs<br/>(4 KB, 2bpp gfx)"]
+    C["Color PROMs<br/>(256×4 bit lookup)"]
+    
+    D["Tile Address Mux<br/>(VRAM row/col<br/>→ tile index)"]
+    E["Sprite Line Buffer<br/>(dual-ported line<br/>buffer, 2 lines)"]
+    F["Palette Index Mux<br/>(selects pen from<br/>color PROM bank)"]
+    
+    G["Pixel Priority<br/>Arbitration Logic<br/>(sprite vs tile<br/>vs background)"]
+    
+    H["DAC / RGB Output<br/>(resistor ladder<br/>or dedicated IC)"]
+    
+    A --> D
+    B --> E
+    C --> F
+    
+    D --> G
+    E --> G
+    F --> G
+    
+    G --> H
 ```
 
 The Tile Address Mux reads the current horizontal and vertical position counters, divides them by eight to identify which tile cell the beam is currently crossing, reads the tile index byte out of VRAM, then fetches the corresponding 8-byte row of pixel data from the Tile ROM. All of this must complete within the time it takes the beam to cross eight horizontal pixels — roughly 450 nanoseconds on standard NTSC hardware. The logic was implemented entirely in TTL discrete chips in the earliest boards, with the Z80 or 6809 CPU playing no role whatsoever in this rendering loop. The CPU's only job is to write the correct data into VRAM and sprite registers before the beam needs them.

@@ -122,40 +122,18 @@ The proportionality constant depends only on the central mass $M$. This allows $
 
 It is instructive to trace how initial conditions propagate through to observable orbital elements, because this is exactly what practitioners do when determining orbits from observations.
 
-```
-Initial State (t=0)
-  ┌─────────────────────────────────────────┐
-  │  Position vector  r⃗ = (x, y, z)         │
-  │  Velocity vector  v⃗ = (vx, vy, vz)      │
-  └──────────────────┬──────────────────────┘
-                     │
-          ┌──────────▼──────────┐
-          │  Compute conserved  │
-          │  quantities:        │
-          │  E = ½μv² + V(r)   │
-          │  L⃗ = μ r⃗ × v⃗       │
-          └──────────┬──────────┘
-                     │
-          ┌──────────▼──────────┐
-          │  Derive orbital     │
-          │  elements:          │
-          │  a  from  E         │
-          │  e  from  E, |L⃗|   │
-          │  i  from  L⃗ direction│
-          └──────────┬──────────┘
-                     │
-          ┌──────────▼──────────┐
-          │  Orbit equation     │
-          │  r(θ) = p/(1+ecosθ) │
-          │  T from Kepler III  │
-          └──────────┬──────────┘
-                     │
-          ┌──────────▼──────────┐
-          │  Predict position   │
-          │  at any future time │
-          │  via Kepler's eq.   │
-          │  M = E - e·sinE     │
-          └─────────────────────┘
+```mermaid
+flowchart TD
+    A["Initial State (t=0)<br/>Position vector r⃗ = (x, y, z)<br/>Velocity vector v⃗ = (vx, vy, vz)"]
+    B["Compute conserved quantities:<br/>E = ½μv² + V(r)<br/>L⃗ = μ r⃗ × v⃗"]
+    C["Derive orbital elements:<br/>a from E<br/>e from E, |L⃗|<br/>i from L⃗ direction"]
+    D["Orbit equation<br/>r(θ) = p/(1+ecosθ)<br/>T from Kepler III"]
+    E["Predict position at any future time<br/>via Kepler's equation<br/>M = E - e·sinE"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 The bottleneck in this chain is the last step: inverting Kepler's equation $M = E_a - e\sin E_a$ (where $M$ is the mean anomaly and $E_a$ is the eccentric anomaly) has no closed-form solution and requires numerical iteration — typically Newton-Raphson, which converges in three to five iterations for $e < 0.9$.

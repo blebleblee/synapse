@@ -123,33 +123,14 @@ The `minimum` field (also called the negative TTL, per RFC 2308) specifies how l
 
 The relationship between primary and secondary nameservers follows a well-defined synchronization protocol. AXFR (Authoritative Transfer) is a full zone transfer: the primary sends every resource record in the zone as a stream of DNS messages, beginning and ending with the SOA record. IXFR (Incremental Transfer, RFC 1995) is a differential transfer: the secondary sends its current serial, and the primary responds with only the changes between that serial and the current zone version. If the primary has not retained enough history to satisfy the IXFR request (or if the difference would be larger than a full transfer), it falls back to AXFR.
 
-```
-                    ┌──────────────────────────────────────────┐
-                    │             Primary Nameserver            │
-                    │                                          │
-                    │   Zone File / Zone Database              │
-                    │   SOA serial = 2024061502                │
-                    └───────────────┬──────────────────────────┘
-                                    │  NOTIFY (serial=2024061502)
-                                    │  UDP, port 53
-                                    ▼
-                    ┌──────────────────────────────────────────┐
-                    │            Secondary Nameserver           │
-                    │                                          │
-                    │  Receives NOTIFY → queries SOA           │
-                    │  Cached serial = 2024061501              │
-                    │  Primary serial = 2024061502  → STALE    │
-                    │                                          │
-                    │  Initiates IXFR / AXFR request           │
-                    └───────────────┬──────────────────────────┘
-                                    │  IXFR query (current serial)
-                                    ▼
-                    ┌──────────────────────────────────────────┐
-                    │             Primary Nameserver            │
-                    │                                          │
-                    │  Sends diff: deleted RRs + added RRs     │
-                    │  Sends SOA with new serial at end         │
-                    └──────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Primary Nameserver<br/><br/>Zone File / Zone Database<br/>SOA serial = 2024061502"]
+    B["Secondary Nameserver<br/><br/>Receives NOTIFY → queries SOA<br/>Cached serial = 2024061501<br/>Primary serial = 2024061502 → STALE<br/><br/>Initiates IXFR / AXFR request"]
+    C["Primary Nameserver<br/><br/>Sends diff: deleted RRs + added RRs<br/>Sends SOA with new serial at end"]
+    
+    A -->|"NOTIFY (serial=2024061502)<br/>UDP, port 53"| B
+    B -->|"IXFR query (current serial)"| C
 ```
 
 Zone transfers require TCP, not UDP, because the response payload exceeds UDP's 512-byte limit (or even the 4096-byte EDNS0 extended limit for large zones). BIND 9's `named.conf` controls which hosts may initiate zone transfers via the `allow-transfer` ACL. In production, zone transfers must be restricted to the IP addresses of known secondary nameservers and optionally protected by TSIG (Transaction SIGnature) keys, which are HMAC-MD5 or HMAC-SHA256 keyed hashes that authenticate both the transfer request and the transfer data. Without TSIG, zone transfers over untrusted networks expose your entire zone contents to passive interception.

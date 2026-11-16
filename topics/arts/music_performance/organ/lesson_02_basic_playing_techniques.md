@@ -67,7 +67,7 @@ graph TB
 | Mechanical (tracker) | Resistance proportional to wind pressure, 50–100 g/key | ~0 ms | You feel the pallet open — use this feedback for precise attacks |
 | Tubular-pneumatic | Light, spongy | 20–50 ms | Play slightly ahead of the beat; rare today, mostly unrestored survivors |
 | Electro-pneumatic | Light, uniform | 10–20 ms | Negligible lag; watch for "double articulation" on worn leather |
-| Direct electric | Lightest, no mechanical feedback | <10 ms | Fastest repetition; you lose tactile cues, rely on ear |
+| Direct electric | Lightest, no mechanical feedback | < 10 ms | Fastest repetition; you lose tactile cues, rely on ear |
 
 **Why this matters in practice:** on tracker action, legato finger substitution must be *physically* precise because you can feel the valve begin to close under your finger before it's fully covered by the incoming finger — a premature release is audible as a "blip." On electric action there's no tactile warning at all, so you must develop the habit by ear, not by feel.
 
@@ -236,7 +236,7 @@ Standard distribution: RH = soprano (manual I), LH = alto (manual II), pedal = b
 
 ### Reverberation governs tempo, not the metronome marking in the score
 
-Measure RT60 informally: play a loud chord, release, count seconds until it's inaudible. Dry room (<1 s): you can push tempo and add brightness (mixtures, reeds) to compensate for the room's lack of natural sustain. Reverberant room (>3 s): drop tempo 15–25% from your practice-room tempo and simplify registration — successive fast notes will otherwise smear into each other in the reverb tail.
+Measure RT60 informally: play a loud chord, release, count seconds until it's inaudible. Dry room (< 1 s): you can push tempo and add brightness (mixtures, reeds) to compensate for the room's lack of natural sustain. Reverberant room (>3 s): drop tempo 15–25% from your practice-room tempo and simplify registration — successive fast notes will otherwise smear into each other in the reverb tail.
 
 ### Phrasing through silence
 

@@ -22,17 +22,46 @@ Minifigure-scale construction operates across three simultaneous spatial systems
 
 In the horizontal plane, the 8mm stud pitch is your primary unit. Standard walls built from bricks running lengthwise consume one stud of depth per wall skin, producing a wall roughly 9.6mm thick — close to realistic at minifigure scale, where a masonry wall would read as somewhere between 150mm and 300mm in full scale. Interiors and exteriors compete for stud-depth from a fixed overall footprint, which is why serious builders establish a plan-view dimension table before placing a single brick.
 
-```
-Plan Dimension Reference (rectangular building module)
-
-Footprint       Total Studs   Exterior Width   Interior Clear   Wall per Side
-─────────────────────────────────────────────────────────────────────────────
-16 × 16 stud    16 studs      128mm            112mm (14 st)    1 brick each
-32 × 32 stud    32 studs      256mm            240mm (30 st)    1 brick each
-48 × 48 stud    48 studs      384mm            368mm (46 st)    1 brick each
-
-Interior stud-clear = Footprint − (2 × 1 brick wall depth, i.e. 2 studs)
-Plate height = 3.2mm | Brick height = 9.6mm | Stud pitch = 8mm
+```mermaid
+flowchart TD
+    A["Plan Dimension Reference<br/>Rectangular Building Module"]
+    
+    subgraph dimensions ["Dimension Parameters"]
+        B["Plate Height: 3.2mm"]
+        C["Brick Height: 9.6mm"]
+        D["Stud Pitch: 8mm"]
+    end
+    
+    subgraph config16 ["16 × 16 Stud Configuration"]
+        E["Total Studs: 16"]
+        F["Exterior Width: 128mm"]
+        G["Interior Clear: 112mm<br/>14 studs"]
+        H["Wall per Side: 1 brick each"]
+    end
+    
+    subgraph config32 ["32 × 32 Stud Configuration"]
+        I["Total Studs: 32"]
+        J["Exterior Width: 256mm"]
+        K["Interior Clear: 240mm<br/>30 studs"]
+        L["Wall per Side: 1 brick each"]
+    end
+    
+    subgraph config48 ["48 × 48 Stud Configuration"]
+        M["Total Studs: 48"]
+        N["Exterior Width: 384mm"]
+        O["Interior Clear: 368mm<br/>46 studs"]
+        P["Wall per Side: 1 brick each"]
+    end
+    
+    subgraph formula ["Calculation Formula"]
+        Q["Interior Stud-Clear = Footprint<br/>− 2 × Wall Depth<br/>2 studs per side"]
+    end
+    
+    A --> dimensions
+    A --> config16
+    A --> config32
+    A --> config48
+    A --> formula
 ```
 
 In the vertical axis, the fundamental constraint is the 3:1 plate-to-brick height relationship: three plates stack to exactly one brick's height. This allows mixed plate-and-brick elevations to hit intermediate heights that pure brick stacking cannot reach. A window sill at 2 bricks + 1 plate (21.6mm actual) reads differently from one at 2 bricks (19.2mm), and that difference is perceptible in the finished model. Builders who work exclusively in full-brick increments impose a coarser vertical resolution on their facades, and it shows in the stiffness of the finished surface.
@@ -55,20 +84,30 @@ Tile-flush panels, which cover exposed stud surfaces with flat tiles, are essent
 
 The most architecturally significant structural pattern in minifigure-scale construction is the modular boundary: the interface geometry that allows two independently built sections to connect, align, and separate without structural compromise. The official Lego Modular Buildings series established a de facto standard — a 32×32 stud baseplate footprint with a first floor plate height of 10 bricks, a fixed connection spine of a 2×2 stack with a 2×4 plate extending into the adjacent module at the floor level, and an interior that is completely self-contained except at that connection point. This standard has been adopted and extended by the broader AFOL community because it solves a real engineering problem: how to build large interior environments in transportable, reconfigurable sections.
 
-```
-Modular Connection Profile (plan view, two adjacent modules)
-
-Module A (32×32)           Module B (32×32)
-┌──────────────────────────┬──────────────────────────┐
-│                          │                          │
-│    Interior A            │    Interior B            │
-│                          │                          │
-│    [wall]  [2×4 plate]──►│◄──[2×4 plate]  [wall]   │
-│            extends 2 st  │   extends 2 st           │
-│                          │                          │
-└──────────────────────────┴──────────────────────────┘
-         ▲ Connection zone: shared 4-stud overlap      ▲
-         Floor plates interlock across seam
+```mermaid
+flowchart LR
+    subgraph ModuleA["Module A (32×32)"]
+        IntA["Interior A"]
+        WallA["Wall"]
+        PlateA["2×4 Plate"]
+    end
+    
+    subgraph ModuleB["Module B (32×32)"]
+        IntB["Interior B"]
+        WallB["Wall"]
+        PlateB["2×4 Plate"]
+    end
+    
+    subgraph Connection["Connection Zone"]
+        Overlap["Shared 4-Stud Overlap<br/>Floor Plates Interlock"]
+    end
+    
+    WallA --> PlateA
+    PlateA -->|"extends 2 studs"| Overlap
+    Overlap -->|"extends 2 studs"| PlateB
+    PlateB --> WallB
+    IntA -.-> PlateA
+    IntB -.-> PlateB
 ```
 
 For custom modular systems, the builder must establish the connection contract before construction begins. This means deciding: at what height does the connection plate sit (always at the bottom of the floor plate stack for ground-floor connections), how wide is the overlap zone, and whether the sidewalk/streetscape tiles extend across the seam or terminate at a clean edge. Failing to specify these parameters up front produces modules that meet at an awkward seam, with tile misalignment or exposed stud rows that break the finished visual.

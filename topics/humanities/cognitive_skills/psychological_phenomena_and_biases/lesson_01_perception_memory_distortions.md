@@ -38,22 +38,24 @@ Perceptual organization imposes structure on ambiguous sensory data through Gest
 
 This pre-conscious organization creates perceptual sets that are difficult to override. When viewing the famous Rubin vase-face illusion, observers perceive either a vase or two faces but cannot simultaneously perceive both interpretations. The visual system commits to one organizational schema, suppressing alternatives. Similarly, once you perceive a Necker cube in a particular orientation, it requires effort to flip the interpretation, and the system exhibits hysteresis—a tendency to persist in the current interpretation even when sensory evidence is ambiguous.
 
-```
-Perceptual Processing Pipeline:
-
-[Physical Stimulus] 
-        ↓
-[Sensory Transduction: Receptors → Neural Spikes]
-        ↓ (125:1 compression in vision)
-[Early Feature Extraction: Edges, Motion, Color]
-        ↓
-[Gestalt Grouping: Object Segmentation]
-        ↓ (Perceptual Set Applied)
-[Predictive Modeling: Top-Down Hypothesis Generation]
-        ↓ ←──────────[Prior Beliefs, Context]
-[Hypothesis Testing: Compare Prediction vs. Sensory Evidence]
-        ↓
-[Conscious Percept: Hybrid Construction]
+```mermaid
+flowchart TD
+    A["Physical Stimulus"]
+    B["Sensory Transduction:<br/>Receptors → Neural Spikes"]
+    C["Early Feature Extraction:<br/>Edges, Motion, Color"]
+    D["Gestalt Grouping:<br/>Object Segmentation"]
+    E["Predictive Modeling:<br/>Top-Down Hypothesis Generation"]
+    F["Hypothesis Testing:<br/>Compare Prediction vs. Sensory Evidence"]
+    G["Conscious Percept:<br/>Hybrid Construction"]
+    H["Prior Beliefs, Context"]
+    
+    A --> B
+    B -->|"125:1 compression<br/>in vision"| C
+    C --> D
+    D -->|"Perceptual Set<br/>Applied"| E
+    E --> F
+    H -.-> F
+    F --> G
 ```
 
 The attentional bottleneck sits between perceptual organization and conscious awareness. Multiple perceptual objects compete for limited attentional resources through a biased competition framework. Each object generates a signal strength proportional to its bottom-up salience—brightness contrast, motion, unexpected features—and top-down relevance—match to current task goals. Objects with the strongest combined signal receive attentional amplification while competitors are actively suppressed.
@@ -82,28 +84,40 @@ Source monitoring relies on qualitative characteristics of memories to infer the
 
 The remember-know distinction captures a fundamental property of recognition memory. "Remember" responses reflect recollection—retrieval of specific contextual details from the encoding episode. "Know" responses reflect familiarity—a sense that an item was previously encountered without retrieval of episodic context. Familiarity is faster and more robust than recollection but provides no source information. When you recognize a face but cannot remember where you know the person from, familiarity is preserved while recollection has failed.
 
-```
-Memory Encoding and Retrieval Architecture:
-
-ENCODING PHASE:
-[Sensory Input] → [Attention Filter] → [Working Memory]
-                                              ↓
-                                    [Elaborative Rehearsal]
-                                              ↓
-                            [Hippocampal Binding: Cortical Pattern Association]
-                                              ↓
-                                    [Long-Term Consolidation]
-                                    
-RETRIEVAL PHASE:
-[Retrieval Cue] → [Hippocampal Pattern Completion] → [Cortical Reinstatement]
-                            ↓                                    ↓
-                  [Competing Memories]              [Semantic Inferences]
-                            ↓                                    ↓
-                    [Interference]  ←────────→  [Reconstructive Updating]
-                                              ↓
-                                    [Retrieved Memory: Hybrid of Original + Inference]
-                                              ↓
-                                    [Source Monitoring: Origin Attribution]
+```mermaid
+flowchart TD
+    SI["Sensory Input"]
+    AF["Attention Filter"]
+    WM["Working Memory"]
+    ER["Elaborative Rehearsal"]
+    HB["Hippocampal Binding:<br/>Cortical Pattern Association"]
+    LTC["Long-Term Consolidation"]
+    
+    RC["Retrieval Cue"]
+    HPC["Hippocampal Pattern Completion"]
+    CR["Cortical Reinstatement"]
+    CM["Competing Memories"]
+    SEM["Semantic Inferences"]
+    INT["Interference"]
+    RU["Reconstructive Updating"]
+    RM["Retrieved Memory:<br/>Hybrid of Original + Inference"]
+    SM["Source Monitoring:<br/>Origin Attribution"]
+    
+    SI --> AF
+    AF --> WM
+    WM --> ER
+    ER --> HB
+    HB --> LTC
+    
+    RC --> HPC
+    HPC --> CR
+    HPC --> CM
+    CR --> SEM
+    CM --> INT
+    SEM --> RU
+    INT <--> RU
+    RU --> RM
+    RM --> SM
 ```
 
 The reconstructive nature of retrieval means that each act of remembering is also an act of reconsolidation. When a memory is retrieved, it enters a labile state where it becomes susceptible to modification before being re-stored. New information present during retrieval—suggestions from an interviewer, current beliefs contradicting the original event—can be incorporated into the memory trace. The updated memory then replaces the original, with no record preserved of the modification.

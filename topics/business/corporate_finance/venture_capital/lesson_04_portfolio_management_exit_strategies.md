@@ -26,85 +26,143 @@ The fiduciary tension between fund-level optimization and founder-level advocacy
 
 The operational architecture of venture portfolio management begins with position sizing and capital reserve allocation at initial investment. Unlike public market portfolios where managers can scale positions freely through secondary market purchases, venture investors must commit to ownership targets at entry and defend those positions through follow-on rounds. A typical early-stage fund targets ten to fifteen percent ownership at Series A, requiring initial investment sizing that accounts for both the entry round and anticipated future dilution across three to five subsequent financings. The reserve ratio—capital held back for follow-on investment divided by initial investment amount—typically ranges from 1.5x to 3.0x depending on entry stage and expected capital intensity.
 
-```
-Initial Check Calculation:
-═══════════════════════════════════════════════════════
-
-Given Parameters:
-  Target Fund Ownership (mature):     12%
-  Series A Post-Money Valuation:      $40M
-  Expected Future Rounds:             3 rounds
-  Expected Dilution per Round:        15%
-
-Ownership Dilution Path:
-  Series A (entry):                   12.0%
-  Series B (post-dilution):           10.2%  [12.0% × (1 - 0.15)]
-  Series C (post-dilution):           8.7%   [10.2% × (1 - 0.15)]
-  Series D (post-dilution):           7.4%   [8.7% × (1 - 0.15)]
-
-Pro Rata Maintenance:
-  To maintain 12% through Series D requires entry at:
-    12% ÷ [(1 - 0.15)³] = 12% ÷ 0.614 = 19.5% at Series A
-
-Series A Check Sizing:
-  Entry Ownership Target:             19.5%
-  Series A Post-Money:                $40M
-  Required Investment:                $7.8M
-
-Reserve Allocation:
-  Assuming full pro-rata defense across 3 rounds at
-  $60M, $90M, $140M post-money valuations:
-    Series B pro-rata:                $3.5M
-    Series C pro-rata:                $2.9M
-    Series D pro-rata:                $2.4M
-    Total Reserves Required:          $8.8M
-
-Reserve Ratio:                        1.13x initial investment
+```mermaid
+flowchart TD
+    Start["<b>Initial Check Calculation</b>"]
+    
+    Start --> Params
+    
+    subgraph Params ["Given Parameters"]
+        P1["Target Fund Ownership: <b>12%</b>"]
+        P2["Series A Post-Money: <b>$40M</b>"]
+        P3["Expected Future Rounds: <b>3</b>"]
+        P4["Expected Dilution per Round: <b>15%</b>"]
+    end
+    
+    Params --> Dilution
+    
+    subgraph Dilution ["Ownership Dilution Path"]
+        D1["Series A Entry: <b>12.0%</b>"]
+        D2["Series B Post-Dilution: <b>10.2%</b><br/><i>12.0% × 0.85</i>"]
+        D3["Series C Post-Dilution: <b>8.7%</b><br/><i>10.2% × 0.85</i>"]
+        D4["Series D Post-Dilution: <b>7.4%</b><br/><i>8.7% × 0.85</i>"]
+        
+        D1 --> D2 --> D3 --> D4
+    end
+    
+    Dilution --> ProRata
+    
+    subgraph ProRata ["Pro Rata Maintenance"]
+        PR1["Target Ownership: <b>12%</b> at Series D"]
+        PR2["Calculation:<br/>12% ÷ (1 - 0.15)³ = 12% ÷ 0.614"]
+        PR3["Required Entry Ownership: <b>19.5%</b> at Series A"]
+        
+        PR1 --> PR2 --> PR3
+    end
+    
+    ProRata --> CheckSize
+    
+    subgraph CheckSize ["Series A Check Sizing"]
+        CS1["Entry Ownership Target: <b>19.5%</b>"]
+        CS2["Series A Post-Money: <b>$40M</b>"]
+        CS3["Required Investment: <b>$7.8M</b>"]
+        
+        CS1 --> CS3
+        CS2 --> CS3
+    end
+    
+    CheckSize --> Reserves
+    
+    subgraph Reserves ["Reserve Allocation"]
+        R0["Assumptions: Full pro-rata defense<br/>Valuations: $60M, $90M, $140M"]
+        R1["Series B Pro-Rata: <b>$3.5M</b>"]
+        R2["Series C Pro-Rata: <b>$2.9M</b>"]
+        R3["Series D Pro-Rata: <b>$2.4M</b>"]
+        R4["Total Reserves Required: <b>$8.8M</b>"]
+        
+        R0 --> R1
+        R0 --> R2
+        R0 --> R3
+        R1 --> R4
+        R2 --> R4
+        R3 --> R4
+    end
+    
+    Reserves --> Summary
+    
+    Summary["<b>Reserve Ratio: 1.13x</b><br/>Initial Investment"]
+    
+    style Start fill:#e1f5ff,stroke:#0066cc,stroke-width:3px
+    style Summary fill:#fff4e1,stroke:#ff9900,stroke-width:3px
+    style CS3 fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    style R4 fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    style PR3 fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
 ```
 
 The decision architecture for follow-on investment operates through a multi-factor triage framework that evaluates both absolute company performance and relative portfolio opportunity cost. Each follow-on decision represents a discrete capital allocation choice between supporting an existing position, initiating a new investment, or returning capital to LPs. The evaluation framework assesses progress against the original investment thesis, comparison to plan across key metrics, competitive positioning evolution, and founder execution capability. However, the most critical input remains the probability-weighted return potential relative to other deployment opportunities available to the fund.
 
 A structured follow-on decision tree proceeds through four sequential gates. The first gate evaluates survival probability: does the company possess sufficient cash runway and access to capital to reach the next meaningful milestone, or does it face imminent distress? Companies failing the survival gate enter triage mode where bridge financing, down-round participation, and structured instruments become relevant. The second gate assesses progress against milestones: has the company retired the specific risk factors the previous round was meant to address? A Series A company that has not demonstrated repeatable sales motion or validated unit economics has not earned Series B capital regardless of revenue growth. The third gate examines market position: has competitive intensity increased, decreased, or remained stable, and does the company maintain credible paths to market leadership? The fourth gate calculates return potential: given current ownership, likely exit valuation range, and required additional investment, does this position offer top-quartile fund return potential?
 
-```
-Follow-On Decision Framework:
-═══════════════════════════════════════════════════════
-
-Portfolio Company: ExampleCo, Series B Decision
-
-Gate 1: Survival Assessment
-├─ Current Cash:                      $4.2M
-├─ Monthly Burn:                      $800K
-├─ Runway:                            5.2 months
-├─ Alternative Capital Sources:       Lead investor committed
-└─ Gate Status:                       PASS
-
-Gate 2: Milestone Progress
-├─ Thesis Risk: Prove repeatable enterprise sales
-├─ Planned Metric: 8 enterprise customers, $1.5M ARR
-├─ Actual Achievement: 6 enterprise customers, $1.1M ARR
-├─ Sales Cycle: 4.5 months (vs 6 month plan)
-├─ Logo Quality: 2 Fortune 500 customers
-└─ Gate Status:                       CONDITIONAL PASS
-
-Gate 3: Market Position
-├─ Competitive Landscape: 2 new well-funded entrants
-├─ Win Rate vs. Incumbent: 45% (stable)
-├─ Market Growth: 30% CAGR (accelerating)
-├─ Differentiation: Strengthening (product velocity advantage)
-└─ Gate Status:                       PASS
-
-Gate 4: Return Potential
-├─ Current Ownership:                 14%
-├─ Proposed Investment:               $3M (pro-rata + $500K)
-├─ Post-Round Ownership:              13.2%
-├─ Bear Case Exit ($150M):            $19.8M return (2.5x position)
-├─ Base Case Exit ($400M):            $52.8M return (6.8x position)
-├─ Bull Case Exit ($1B):              $132M return (17x position)
-├─ Probability-Weighted Return:       $58M (7.5x blended)
-└─ Gate Status:                       PASS → APPROVE INVESTMENT
-
-Decision: Participate pro-rata plus $500K opportunity investment
+```mermaid
+flowchart TD
+    Start["Follow-On Decision Framework<br/>Portfolio Company: ExampleCo, Series B Decision"]
+    
+    Start --> Gate1["Gate 1: Survival Assessment"]
+    Gate1 --> G1_Cash["Current Cash: $4.2M"]
+    Gate1 --> G1_Burn["Monthly Burn: $800K"]
+    Gate1 --> G1_Runway["Runway: 5.2 months"]
+    Gate1 --> G1_Alt["Alternative Capital Sources:<br/>Lead investor committed"]
+    G1_Cash --> G1_Status["Gate Status: PASS"]
+    G1_Burn --> G1_Status
+    G1_Runway --> G1_Status
+    G1_Alt --> G1_Status
+    
+    G1_Status --> Gate2["Gate 2: Milestone Progress"]
+    Gate2 --> G2_Thesis["Thesis Risk: Prove repeatable enterprise sales"]
+    Gate2 --> G2_Planned["Planned Metric: 8 enterprise customers, $1.5M ARR"]
+    Gate2 --> G2_Actual["Actual Achievement: 6 enterprise customers, $1.1M ARR"]
+    Gate2 --> G2_Cycle["Sales Cycle: 4.5 months (vs 6 month plan)"]
+    Gate2 --> G2_Logo["Logo Quality: 2 Fortune 500 customers"]
+    G2_Thesis --> G2_Status["Gate Status: CONDITIONAL PASS"]
+    G2_Planned --> G2_Status
+    G2_Actual --> G2_Status
+    G2_Cycle --> G2_Status
+    G2_Logo --> G2_Status
+    
+    G2_Status --> Gate3["Gate 3: Market Position"]
+    Gate3 --> G3_Comp["Competitive Landscape:<br/>2 new well-funded entrants"]
+    Gate3 --> G3_Win["Win Rate vs. Incumbent: 45% (stable)"]
+    Gate3 --> G3_Growth["Market Growth: 30% CAGR (accelerating)"]
+    Gate3 --> G3_Diff["Differentiation: Strengthening<br/>(product velocity advantage)"]
+    G3_Comp --> G3_Status["Gate Status: PASS"]
+    G3_Win --> G3_Status
+    G3_Growth --> G3_Status
+    G3_Diff --> G3_Status
+    
+    G3_Status --> Gate4["Gate 4: Return Potential"]
+    Gate4 --> G4_Current["Current Ownership: 14%"]
+    Gate4 --> G4_Proposed["Proposed Investment: $3M (pro-rata + $500K)"]
+    Gate4 --> G4_Post["Post-Round Ownership: 13.2%"]
+    Gate4 --> G4_Bear["Bear Case Exit ($150M):<br/>$19.8M return (2.5x position)"]
+    Gate4 --> G4_Base["Base Case Exit ($400M):<br/>$52.8M return (6.8x position)"]
+    Gate4 --> G4_Bull["Bull Case Exit ($1B):<br/>$132M return (17x position)"]
+    Gate4 --> G4_Weighted["Probability-Weighted Return:<br/>$58M (7.5x blended)"]
+    G4_Current --> G4_Status["Gate Status: PASS → APPROVE INVESTMENT"]
+    G4_Proposed --> G4_Status
+    G4_Post --> G4_Status
+    G4_Bear --> G4_Status
+    G4_Base --> G4_Status
+    G4_Bull --> G4_Status
+    G4_Weighted --> G4_Status
+    
+    G4_Status --> Decision["Decision: Participate pro-rata plus $500K<br/>opportunity investment"]
+    
+    style Start fill:#e1f5ff
+    style G1_Status fill:#d4edda
+    style G2_Status fill:#fff3cd
+    style G3_Status fill:#d4edda
+    style G4_Status fill:#d4edda
+    style Decision fill:#d1ecf1,stroke:#0c5460,stroke-width:3px
 ```
 
 Board governance mechanics in venture portfolios establish a cadence of strategic oversight that balances fiduciary monitoring with operational support. A typical venture board meets six to eight times annually, structured around quarterly financial reviews and strategic planning sessions. The operational rhythm separates routine oversight reporting from strategic deliberation to prevent administrative tasks from consuming limited strategic discussion time. Effective board packages arrive five business days before meetings, structured in three sections: financial dashboard including cash, revenue, key unit economics, and runway; operational metrics covering product development, sales pipeline, and customer success; strategic items requiring board input or approval.
@@ -117,67 +175,94 @@ Zombie company triage operates through a deliberate evaluation process that asse
 
 The triage decision tree evaluates three pathways: rehabilitation through strategic intervention, graceful wind-down maximizing asset recovery, or sale to a financial or strategic buyer willing to accept lower growth rates. Rehabilitation requires identifying a specific, actionable hypothesis for accelerating growth—typically founder replacement, market repositioning, or product strategy pivot. If no credible acceleration path exists, the choice collapses to wind-down versus sale. Wind-down analysis calculates recovery value from intellectual property sale, customer list monetization, and asset liquidation minus shutdown costs including employee severance and facility lease termination. Sale processes target niche acquirers seeking established revenue streams or specific technical assets, accepting lower multiples than venture-backed strategic acquisitions.
 
-```
-Zombie Company Triage Matrix:
-═══════════════════════════════════════════════════════
+```mermaid
+flowchart TD
+    PROFILE["<b>PortCo Profile: MatureApp Inc.</b>
+    ARR: $4.2M | Growth: 18% YoY
+    Burn: $50K/mo | Years: 6
+    Capital Invested: $12M
+    Valuation Mark: $20M | Ownership: 22%"]
 
-PortCo Profile: MatureApp Inc.
-  Current ARR:                        $4.2M
-  Growth Rate:                        18% YoY
-  Burn Rate:                          ($50K/month)
-  Years Since Investment:             6 years
-  Total Capital Invested:             $12M
-  Current Valuation Mark:             $20M
-  Fund Ownership:                     22%
+    ANALYSIS["<b>Venture-Scale Analysis</b>
+    Required Exit for 1.0x Fund Return: $280M
+    Required Company Exit at 22%: $1.27B
+    10-yr Trajectory at 18%: $20.4M ARR
+    Exit at 6x ARR → $122M
+    Fund Return: $26.8M (0.13x fund)
+    ⚠ Path to $1.27B: Impossible"]
 
-Venture-Scale Analysis:
-  Required Exit for 1.0x Fund Return: $280M (assumes $200M fund)
-  Required Company Exit at 22%:      $1.27B
-  Path to $1.27B at current metrics: Impossible
-    - Current trajectory: $4.2M → $5.0M → $5.9M → $6.9M
-    - 10-year extrapolation at 18%:   $20.4M ARR
-    - Exit multiple assumption:       6x ARR = $122M
-    - Fund return at 22%:             $26.8M (2.2x position, 0.13x fund)
+    PROFILE --> ANALYSIS
+    ANALYSIS --> PATHWAYS
 
-Pathway Evaluation:
+    PATHWAYS["<b>Pathway Evaluation</b>"]
 
-Option A: Rehabilitation Attempt
-  Hypothesis: Replace sales leadership, pivot to vertical SaaS
-  Cost: $2M additional investment
-  Probability of Acceleration: 15%
-  Success Case Value: $600M exit → $132M return
-  Failure Case Value: $40M exit → $8.8M return
-  Expected Value: (0.15 × $132M) + (0.85 × $8.8M) = $27.3M
+    PATHWAYS --> OPT_A
+    PATHWAYS --> OPT_B
+    PATHWAYS --> OPT_C
+    PATHWAYS --> OPT_D
 
-Option B: Maintain & Harvest
-  Scenario: Support to sustainable profitability, sell in 3 years
-  Additional Investment: $0
-  Exit Multiple: 4x ARR on $6.9M = $27.6M
-  Fund Return at 22%: $6.1M
-  Time Value Penalty: Proceed in year 9, return in year 12
-  NPV at 15% Discount: $4.0M
+    OPT_A["<b>Option A: Rehabilitation Attempt</b>
+    Replace sales leadership, pivot to vertical SaaS
+    Additional Investment: $2M
+    Probability of Acceleration: 15%
+    Success: $600M exit → $132M return
+    Failure: $40M exit → $8.8M return
+    Expected Value: $27.3M"]
 
-Option C: Immediate Sale Process
-  Target: Regional software acquirer, profitable SaaS consolidator
-  Expected Multiple: 3.5x ARR = $14.7M
-  Transaction Costs: $500K
-  Net Proceeds: $14.2M
-  Fund Return at 22%: $3.1M
-  Timing: 6-month process, immediate liquidity
+    OPT_B["<b>Option B: Maintain &amp; Harvest</b>
+    Support to profitability, sell in 3 years
+    Additional Investment: $0
+    Exit: 4x ARR on $6.9M = $27.6M
+    Fund Return at 22%: $6.1M
+    NPV at 15% Discount (Year 12): $4.0M"]
 
-Option D: Wind-Down
-  Asset Recovery: $1.2M (IP, customer contracts)
-  Shutdown Costs: $800K (severance, lease termination)
-  Net Recovery: $400K
-  Fund Return: $88K
-  Reputational Cost: HIGH
+    OPT_C["<b>Option C: Immediate Sale ✅ SELECTED</b>
+    Target: Regional / SaaS consolidator acquirer
+    Multiple: 3.5x ARR = $14.7M
+    Transaction Costs: $500K
+    Net Proceeds: $14.2M
+    Fund Return at 22%: $3.1M
+    Timeline: 6-month process"]
 
-Decision: Execute Option C (Immediate Sale)
-  Rationale: Rehabilitation probability too low given team/market
-            constraints. Maintain scenario delays liquidity into
-            year 12 with minimal value improvement. Sale provides
-            immediate 0.26x position return and reallocates GP
-            attention to higher-potential portfolio companies.
+    OPT_D["<b>Option D: Wind-Down</b>
+    Asset Recovery: $1.2M
+    Shutdown Costs: $800K
+    Net Recovery: $400K
+    Fund Return: $88K
+    Reputational Cost: HIGH"]
+
+    OPT_A --> EV_A["EV: $27.3M
+    Risk: High | Capital: +$2M"]
+    OPT_B --> EV_B["EV: $4.0M NPV
+    Risk: Low | Timeline: Year 12"]
+    OPT_C --> EV_C["EV: $3.1M Fund Return
+    Risk: Low | Timeline: 6 months"]
+    OPT_D --> EV_D["EV: $88K
+    Risk: Reputational | Immediate"]
+
+    EV_A --> DECISION
+    EV_B --> DECISION
+    EV_C --> DECISION
+    EV_D --> DECISION
+
+    DECISION["<b>Decision: Execute Option C — Immediate Sale</b>
+    Rehabilitation probability too low given team and market constraints.
+    Maintain scenario delays liquidity to Year 12 with minimal value gain.
+    Sale provides immediate 0.26x position return.
+    Reallocates GP attention to higher-potential portfolio companies."]
+
+    style PROFILE fill:#1e3a5f,color:#ffffff,stroke:#4a90d9,stroke-width:2px
+    style ANALYSIS fill:#2d2d2d,color:#f0f0f0,stroke:#e07b39,stroke-width:2px
+    style PATHWAYS fill:#2d2d2d,color:#ffffff,stroke:#888888,stroke-width:1px
+    style OPT_A fill:#3b2f4a,color:#f0f0f0,stroke:#9b59b6,stroke-width:1px
+    style OPT_B fill:#2f3b2f,color:#f0f0f0,stroke:#27ae60,stroke-width:1px
+    style OPT_C fill:#1a3a1a,color:#ffffff,stroke:#2ecc71,stroke-width:3px
+    style OPT_D fill:#3a1a1a,color:#f0f0f0,stroke:#e74c3c,stroke-width:1px
+    style EV_A fill:#3b2f4a,color:#f0f0f0,stroke:#9b59b6,stroke-width:1px
+    style EV_B fill:#2f3b2f,color:#f0f0f0,stroke:#27ae60,stroke-width:1px
+    style EV_C fill:#1a3a1a,color:#ffffff,stroke:#2ecc71,stroke-width:3px
+    style EV_D fill:#3a1a1a,color:#f0f0f0,stroke:#e74c3c,stroke-width:1px
+    style DECISION fill:#0a2a0a,color:#2ecc71,stroke:#2ecc71,stroke-width:3px
 ```
 
 Exit path optimization mechanics depend on fund lifecycle stage, portfolio company maturity, market conditions, and founder preferences. The strategic choice between IPO and M&A acquisition rests on multiple dimensions beyond simple valuation comparison. IPOs provide permanent capital enabling continued growth investment, establish public currency for acquisitions, create liquid compensation instruments for employee retention, and generate market validation that elevates company status. However, IPOs impose significant execution burden including eighteen to twenty-four months of preparation, implementation of public company financial controls and SOX compliance, quarterly earnings pressure, and lockup restrictions preventing investor liquidity for six to twelve months post-offering.
@@ -188,92 +273,88 @@ Strategic M&A processes operate through different mechanics than IPO executions 
 
 The valuation mechanics in strategic acquisitions often create disconnect between financial buyer perspectives and strategic acquirer rationales. Financial buyers including private equity firms underwrite acquisitions based on cash flow projections and leverageable EBITDA, typically offering five to eight times EBITDA for profitable software companies. Strategic acquirers assess value based on synergy potential, competitive positioning, and customer acquisition cost arbitrage. A marketing technology company generating twenty million in revenue growing at forty percent annually might receive a three-times-revenue offer from a financial buyer but a seven-times-revenue offer from a strategic acquirer seeking to bundle the capability into an existing platform with shared customer relationships.
 
-```
-Exit Path Decision Framework:
-═══════════════════════════════════════════════════════
+```mermaid
+flowchart TD
+    COMPANY["<b>ScaleUp Corp</b><br/>ARR: $110M | Growth: 65% YoY<br/>NRR: 125% | Rule of 40: 35<br/>Raised: $85M | Last Valuation: $800M<br/>Fund Ownership: 18%"]
 
-Portfolio Company: ScaleUp Corp
-  Current ARR:                        $110M
-  Growth Rate:                        65% YoY
-  Net Revenue Retention:              125%
-  Rule of 40:                         35 (growth 65, margin -30)
-  Raised to Date:                     $85M (Series A-D)
-  Last Round Post-Money:              $800M
-  Fund Ownership:                     18% (Series B lead)
+    COMPANY --> IPO_PATH
+    COMPANY --> MA_PATH
 
-IPO Path Analysis:
-─────────────────────────────────────────────────────
-Readiness Assessment:
-  Financial Metrics:                  READY
-    - Scale: $110M ARR exceeds threshold
-    - Growth: 65% YoY meets public market expectations
-    - Margin Trajectory: Path to breakeven in 18 months
-  Governance Readiness:               READY
-    - CFO: Former public company CFO hired 14 months ago
-    - SOX Compliance: Implementation 75% complete
-    - Board Independence: 2 of 7 directors independent
-  Market Conditions:                  FAVORABLE
-    - Sector IPO Window: Open (3 comps filed in past 90 days)
-    - Public Comps Trading: 12x forward revenue median
-    - Market Volatility (VIX):        18 (stable)
+    subgraph IPO_PATH ["📈 IPO Path Analysis"]
+        direction TB
 
-IPO Valuation Model:
-  Revenue at Filing (projected):      $145M (9 months forward)
-  Public Comp Multiple:               12x forward revenue
-  IPO Discount:                       25% (typical)
-  Implied IPO Valuation:              $1.31B
-  Lockup Period:                      180 days
-  Effective Liquidity:                15 months post-filing
-  Fund Position Value:                $236M (18% × $1.31B)
-  Position Return Multiple:           13.8x (vs $17M initial)
+        subgraph IPO_READY ["Readiness Assessment"]
+            FIN["✅ Financial Metrics: READY<br/>$110M ARR exceeds threshold<br/>65% YoY meets public expectations<br/>Breakeven path in 18 months"]
+            GOV["✅ Governance: READY<br/>Public company CFO (14 mo.)<br/>SOX Compliance 75% complete<br/>2 of 7 independent directors"]
+            MKT["✅ Market Conditions: FAVORABLE<br/>3 comps filed in past 90 days<br/>Public comps: 12x fwd revenue<br/>VIX: 18 (stable)"]
+        end
 
-M&A Path Analysis:
-─────────────────────────────────────────────────────
-Strategic Buyer Universe:
-  Tier 1: Platform Incumbents (3 potential acquirers)
-    - Strategic Rationale: Horizontal platform extension
-    - Typical Multiple: 15x ARR for strategic assets
-    - Valuation Range: $1.5B - $1.8B
-    - Probability: 40% (competitive tension required)
+        IPO_VAL["<b>IPO Valuation Model</b><br/>Revenue at Filing: $145M<br/>Multiple: 12x fwd revenue<br/>IPO Discount: 25%<br/>─────────────────<br/>Implied Valuation: $1.31B<br/>Fund Position: $236M (13.8x)"]
+        IPO_TIMING["⏱ Liquidity Timeline<br/>Lockup: 180 days<br/>Effective liquidity: 15 months post-filing"]
 
-  Tier 2: Category Leaders (5 potential acquirers)
-    - Strategic Rationale: Vertical integration, acquihire
-    - Typical Multiple: 10x ARR
-    - Valuation Range: $1.0B - $1.2B
-    - Probability: 75% (multiple credible buyers)
+        IPO_READY --> IPO_VAL
+        IPO_VAL --> IPO_TIMING
+    end
 
-M&A Expected Value:
-  Tier 1 Scenario (40% prob):         $1.65B × 0.40 = $660M
-  Tier 2 Scenario (60% prob):         $1.10B × 0.60 = $660M
-  Blended Expected Value:             $1.32B
-  Immediate Liquidity:                6-month process
-  Fund Position Value:                $238M (18% × $1.32B)
-  Position Return Multiple:           14.0x
+    subgraph MA_PATH ["🤝 M&A Path Analysis"]
+        direction TB
 
-Decision Matrix:
-─────────────────────────────────────────────────────
-Criterion                    IPO Path    M&A Path    Advantage
-───────────────────────────────────────────────────────────────
-Valuation                    $1.31B      $1.32B      Neutral
-Liquidity Timing             15 months   6 months    M&A
-Execution Risk               Moderate    Low         M&A
-Upside Optionality           High        None        IPO
-Founder Preference           Strong IPO  Neutral     IPO
-Fund Lifecycle Pressure      Moderate    N/A         Neutral
-Market Window Risk           Present     Minimal     M&A
+        subgraph BUYERS ["Strategic Buyer Universe"]
+            TIER1["<b>Tier 1 — Platform Incumbents</b><br/>3 potential acquirers<br/>Rationale: Horizontal platform extension<br/>Multiple: 15x ARR<br/>Range: $1.5B – $1.8B<br/>Probability: 40%"]
+            TIER2["<b>Tier 2 — Category Leaders</b><br/>5 potential acquirers<br/>Rationale: Vertical integration / acquihire<br/>Multiple: 10x ARR<br/>Range: $1.0B – $1.2B<br/>Probability: 75%"]
+        end
 
-Recommendation: Pursue IPO Path
-  Rationale: Company meets all readiness criteria with favorable
-            market conditions. Expected valuations statistically
-            equivalent, but IPO preserves optionality for continued
-            value creation and aligns with founder vision. Fund
-            timeline (year 7 of 10) can accommodate 15-month
-            liquidity delay. Strong aftermarket performance potential
-            given growth profile and market position.
+        MA_EV["<b>M&A Expected Value</b><br/>Tier 1 (40%): $1.65B × 0.40 = $660M<br/>Tier 2 (60%): $1.10B × 0.60 = $660M<br/>─────────────────────────────<br/>Blended EV: $1.32B<br/>Fund Position: $238M (14.0x)"]
+        MA_TIMING["⏱ Liquidity Timeline<br/>Process duration: ~6 months<br/>Immediate close at signing"]
 
-  Contingency: Maintain dialogue with Tier 1 strategic acquirer
-               as fallback if IPO market window closes during
-               preparation period.
+        BUYERS --> MA_EV
+        MA_EV --> MA_TIMING
+    end
+
+    IPO_TIMING --> MATRIX
+    MA_TIMING --> MATRIX
+
+    subgraph MATRIX ["⚖️ Decision Matrix"]
+        direction LR
+        CRIT["<b>Criterion</b><br/>Valuation<br/>Liquidity Timing<br/>Execution Risk<br/>Upside Optionality<br/>Founder Preference<br/>Fund Lifecycle Pressure<br/>Market Window Risk"]
+        IPO_COL["<b>IPO Path</b><br/>$1.31B<br/>15 months<br/>Moderate<br/>High<br/>Strong preference<br/>Moderate<br/>Present"]
+        MA_COL["<b>M&A Path</b><br/>$1.32B<br/>6 months<br/>Low<br/>None<br/>Neutral<br/>N/A<br/>Minimal"]
+        ADV_COL["<b>Advantage</b><br/>⚖️ Neutral<br/>✅ M&A<br/>✅ M&A<br/>✅ IPO<br/>✅ IPO<br/>⚖️ Neutral<br/>✅ M&A"]
+
+        CRIT --- IPO_COL
+        CRIT --- MA_COL
+        CRIT --- ADV_COL
+    end
+
+    MATRIX --> RECOMMEND
+
+    RECOMMEND["<b>🏆 RECOMMENDATION: PURSUE IPO PATH</b><br/>All readiness criteria met with favorable market conditions.<br/>Valuations statistically equivalent ($1.31B vs $1.32B).<br/>IPO preserves optionality for continued value creation.<br/>Aligns with founder vision.<br/>Fund in year 7 of 10 — can absorb 15-month liquidity delay.<br/>Strong aftermarket performance potential."]
+
+    RECOMMEND --> CONTINGENCY
+
+    CONTINGENCY["<b>⚠️ Contingency Plan</b><br/>Maintain active dialogue with Tier 1 strategic acquirer.<br/>Fall back to M&A if IPO market window closes<br/>during preparation period."]
+
+    style COMPANY fill:#1a1a2e,color:#e0e0ff,stroke:#4a4a8a,stroke-width:2px
+    style RECOMMEND fill:#0d3b1e,color:#a0ffb0,stroke:#2a7a4a,stroke-width:3px
+    style CONTINGENCY fill:#3b1a00,color:#ffd0a0,stroke:#7a4a00,stroke-width:2px
+    style IPO_PATH fill:#0a1f3a,color:#c0d8ff,stroke:#2a5080
+    style MA_PATH fill:#1a0a3a,color:#d8c0ff,stroke:#503080
+    style MATRIX fill:#1a1a1a,color:#e0e0e0,stroke:#505050
+    style IPO_READY fill:#0a2a1a,color:#b0ffcc,stroke:#2a6040
+    style BUYERS fill:#2a0a2a,color:#ffb0ff,stroke:#602060
+    style FIN fill:#0a2a0a,color:#c0ffc0,stroke:#206020
+    style GOV fill:#0a2a0a,color:#c0ffc0,stroke:#206020
+    style MKT fill:#0a2a0a,color:#c0ffc0,stroke:#206020
+    style TIER1 fill:#2a1a0a,color:#ffd0a0,stroke:#604020
+    style TIER2 fill:#2a1a0a,color:#ffd0a0,stroke:#604020
+    style IPO_VAL fill:#0a1a3a,color:#a0c8ff,stroke:#204870
+    style MA_EV fill:#1a0a3a,color:#c8a0ff,stroke:#482070
+    style IPO_TIMING fill:#0a0a2a,color:#a0a0ff,stroke:#202060
+    style MA_TIMING fill:#0a0a2a,color:#a0a0ff,stroke:#202060
+    style CRIT fill:#1a1a1a,color:#e0e0e0,stroke:#404040
+    style IPO_COL fill:#0a1a3a,color:#a0c8ff,stroke:#204870
+    style MA_COL fill:#1a0a3a,color:#c8a0ff,stroke:#482070
+    style ADV_COL fill:#1a1a0a,color:#ffffa0,stroke:#484820
 ```
 
 Secondary market transactions provide liquidity mechanisms for venture investors before portfolio company exits, enabling portfolio rebalancing and LP distribution during extended fund lifecycles. The secondary market architecture includes GP-led structured sales where fund managers organize liquidity events for all investors proportionally, LP-led sales where individual limited partners sell fund positions to secondary buyers, and direct secondary transactions where existing shareholders sell positions to new investors through company-facilitated tender offers.
@@ -282,50 +363,61 @@ GP-led secondary processes typically emerge in two scenarios: continuation vehic
 
 The pricing mechanics of secondary transactions reflect the information asymmetry between selling and buying parties. Sellers possess deep knowledge of portfolio company operations, competitive positioning, and management team quality. Buyers must price securities with incomplete information under severe adverse selection pressure: why would a GP sell a position unless exit prospects have dimmed? This dynamic forces secondary buyers to demand pricing discounts ranging from ten to thirty percent versus the most recent primary round valuation, depending on company stage, time since last financing, and market conditions.
 
-```
-Secondary Transaction Pricing:
-═══════════════════════════════════════════════════════
-
-Portfolio Position: GrowthCo Preferred Stock
-  Last Primary Round (18 months ago): $600M post-money
-  Fund Ownership:                      20% ($120M mark)
-  Company Performance Since Round:     Ahead of plan
-  Next Financing:                      Not imminent (24+ months)
-
-Secondary Buyer Diligence:
-  Information Access:                  Limited (summary metrics only)
-  Management Interview:                No (confidential process)
-  Customer References:                 No access
-  Competitive Intelligence:            Public data only
-  Financial Detail:                    Quarterly summaries
-
-Risk Factors Requiring Discount:
-  ├─ Information Asymmetry:            10-15% discount
-  ├─ Illiquidity Premium:              5-10% discount
-  ├─ Adverse Selection:                5-10% discount
-  ├─ Time to Liquidity:                0-5% discount (deal-specific)
-  └─ Market Conditions:                0-10% discount (deal-specific)
-
-Buyer Pricing Framework:
-  Primary Round Reference:             $600M post-money
-  Base Discount:                       20% (information + illiquidity)
-  Performance Adjustment:              +5% (ahead of plan)
-  Market Conditions:                   -5% (sector multiples compressed)
-  Net Secondary Price:                 $570M implied valuation
-  Purchase Price (20% stake):          $114M
-
-Seller Decision:
-  Mark-to-Market Loss:                 $6M (5% discount to carrying value)
-  Cash Proceeds to Fund:               $114M immediate
-  Opportunity Cost:                    Forgone upside if exit > $600M
-  Fund Strategy:                       Return capital in year 8, derisk
-
-Transaction Outcome: PROCEED
-  Rationale: 5% discount acceptable given immediate liquidity
-            and portfolio concentration concerns. Company performing
-            well but exit timeline uncertain (3-4 years estimated).
-            Fund approaching dissolution; secondary provides
-            meaningful DPI improvement for LP reporting.
+```mermaid
+flowchart TD
+    A["Secondary Transaction Pricing:<br/>GrowthCo Preferred Stock"]
+    
+    subgraph portfolio ["Portfolio Position"]
+        B["Last Primary Round<br/>18 months ago: $600M"]
+        C["Fund Ownership: 20%<br/>($120M mark)"]
+        D["Performance: Ahead of plan"]
+        E["Next Financing: 24+ months"]
+    end
+    
+    subgraph diligence ["Secondary Buyer Diligence"]
+        F["Information Access:<br/>Limited"]
+        G["Management Interview:<br/>No access"]
+        H["Customer References:<br/>No access"]
+        I["Competitive Intel:<br/>Public data only"]
+        J["Financial Detail:<br/>Quarterly summaries"]
+    end
+    
+    subgraph risks ["Risk Factors & Discounts"]
+        K["Information Asymmetry<br/>10-15% discount"]
+        L["Illiquidity Premium<br/>5-10% discount"]
+        M["Adverse Selection<br/>5-10% discount"]
+        N["Time to Liquidity<br/>0-5% discount"]
+        O["Market Conditions<br/>0-10% discount"]
+    end
+    
+    subgraph pricing ["Buyer Pricing Framework"]
+        P["Primary Reference: $600M"]
+        Q["Base Discount: 20%"]
+        R["Performance Adj: +5%"]
+        S["Market Conditions: -5%"]
+        T["Net Valuation: $570M"]
+        U["Purchase Price 20%: $114M"]
+    end
+    
+    subgraph decision ["Seller Decision Analysis"]
+        V["Mark-to-Market Loss: $6M<br/>5% discount"]
+        W["Cash Proceeds: $114M<br/>Immediate"]
+        X["Opportunity Cost:<br/>Forgone upside"]
+        Y["Strategy: Return capital,<br/>derisk portfolio"]
+    end
+    
+    Z["Transaction Outcome:<br/>PROCEED"]
+    AA["Rationale: Acceptable 5%<br/>discount for liquidity &<br/>concentration relief"]
+    
+    A --> portfolio
+    A --> diligence
+    A --> risks
+    portfolio --> pricing
+    diligence --> pricing
+    risks --> pricing
+    pricing --> decision
+    decision --> Z
+    Z --> AA
 ```
 
 ## 3. High-Performance Optimization & Failure Modes
@@ -336,70 +428,88 @@ The sizing heuristic balances concentration risk against the need for meaningful
 
 The reserve ratio optimization problem creates a dynamic programming challenge where initial investment sizing must anticipate an uncertain number of future rounds at unknown valuations with unknown dilution. Conservative reserve ratios above 2.0x provide ample dry powder to defend ownership but force smaller initial positions and reduced portfolio breadth. Aggressive reserve ratios below 1.0x enable larger initial ownership but create difficult triage decisions when portfolio companies require more capital than reserved. The optimal reserve ratio depends on entry stage, sector capital intensity, and fund strategy, with seed funds typically reserving 2.5x to 3.0x initial investment and Series B funds reserving 1.0x to 1.5x.
 
-```
-Portfolio Construction Simulation:
-═══════════════════════════════════════════════════════
-
-Fund Parameters:
-  Total Fund Size:                    $150M
-  Management Fee Reserve:             $20M (13% over 10 years)
-  Deployable Capital:                 $130M
-  Target Portfolio:                   15 companies
-  Reserve Ratio:                      2.0x (sector: enterprise SaaS)
-
-Initial Sizing Model:
-  Capital per Company:                $8.67M average ($130M ÷ 15)
-  Split:
-    - Initial Investment:             $2.89M
-    - Reserved for Follow-On:         $5.78M
-
-Dilution & Ownership Model:
-  Entry Stage:                        Series A
-  Target Mature Ownership:            12%
-  Entry Ownership (before dilution):  18%
-  Expected Rounds (A → D):            4 rounds
-  Dilution per Round:                 15% average
-
-Round-by-Round Projection (Example Company):
-  
-  Series A:
-    Post-Money Valuation:             $30M
-    Ownership at Entry:               18% ($5.4M position)
-    Fund Investment:                  $2.89M (pro-rata + lead premium)
-  
-  Series B (15 months later):
-    Pre-Money Valuation:              $70M
-    Round Size:                       $25M
-    Post-Money Valuation:             $95M
-    Pro-Rata Investment:              $1.58M (maintain 15.3% post-dilution)
-    Cumulative Invested:              $4.47M
-    Ownership:                        15.3%
-  
-  Series C (18 months later):
-    Pre-Money Valuation:              $180M
-    Round Size:                       $50M
-    Post-Money Valuation:             $230M
-    Pro-Rata Investment:              $1.97M
-    Cumulative Invested:              $6.44M
-    Ownership:                        13.0%
-  
-  Series D (24 months later):
-    Pre-Money Valuation:              $400M
-    Round Size:                       $100M
-    Post-Money Valuation:             $500M
-    Pro-Rata Investment:              $1.33M
-    Cumulative Invested:              $7.77M
-    Ownership:                        11.1%
-
-Reserve Adequacy Analysis:
-  Total Invested:                     $7.77M
-  Reserved Amount:                    $5.78M
-  Shortfall:                          $1.99M
-  
-Failure Mode: Reserve ratio of 2.0x insufficient for this outcome
-  → Forced to under-defend in Series D or reallocate from
-    underperforming portfolio companies
-  → Alternative: Reserve 2.5x → $7.22M reserved → adequate coverage
+```mermaid
+flowchart TD
+    A["Portfolio Construction Simulation"]
+    
+    subgraph fund_params ["Fund Parameters"]
+        B["Total Fund Size: $150M"]
+        C["Management Fee Reserve: $20M"]
+        D["Deployable Capital: $130M"]
+        E["Target Portfolio: 15 companies"]
+        F["Reserve Ratio: 2.0x"]
+    end
+    
+    subgraph sizing_model ["Initial Sizing Model"]
+        G["Capital per Company: $8.67M"]
+        H["Initial Investment: $2.89M"]
+        I["Reserved for Follow-On: $5.78M"]
+    end
+    
+    subgraph dilution_model ["Dilution & Ownership Model"]
+        J["Entry Stage: Series A"]
+        K["Target Mature Ownership: 12%"]
+        L["Entry Ownership: 18%"]
+        M["Expected Rounds A→D: 4 rounds"]
+        N["Dilution per Round: 15%"]
+    end
+    
+    subgraph series_a ["Series A"]
+        O["Post-Money Valuation: $30M"]
+        P["Ownership at Entry: 18%"]
+        Q["Position Value: $5.4M"]
+        R["Fund Investment: $2.89M"]
+    end
+    
+    subgraph series_b ["Series B - 15 months"]
+        S["Pre-Money Valuation: $70M"]
+        T["Round Size: $25M"]
+        U["Post-Money Valuation: $95M"]
+        V["Pro-Rata Investment: $1.58M"]
+        W["Cumulative Invested: $4.47M"]
+        X["Ownership: 15.3%"]
+    end
+    
+    subgraph series_c ["Series C - 18 months"]
+        Y["Pre-Money Valuation: $180M"]
+        Z["Round Size: $50M"]
+        AA["Post-Money Valuation: $230M"]
+        AB["Pro-Rata Investment: $1.97M"]
+        AC["Cumulative Invested: $6.44M"]
+        AD["Ownership: 13.0%"]
+    end
+    
+    subgraph series_d ["Series D - 24 months"]
+        AE["Pre-Money Valuation: $400M"]
+        AF["Round Size: $100M"]
+        AG["Post-Money Valuation: $500M"]
+        AH["Pro-Rata Investment: $1.33M"]
+        AI["Cumulative Invested: $7.77M"]
+        AJ["Ownership: 11.1%"]
+    end
+    
+    subgraph reserve_analysis ["Reserve Adequacy Analysis"]
+        AK["Total Invested: $7.77M"]
+        AL["Reserved Amount: $5.78M"]
+        AM["Shortfall: $1.99M"]
+        AN["Status: INSUFFICIENT"]
+    end
+    
+    subgraph failure_mode ["Failure Mode & Resolution"]
+        AO["Reserve 2.0x: Inadequate"]
+        AP["Recommendation: Reserve 2.5x"]
+        AQ["Adequate Coverage: $7.22M"]
+    end
+    
+    A --> fund_params
+    A --> sizing_model
+    A --> dilution_model
+    dilution_model --> series_a
+    series_a --> series_b
+    series_b --> series_c
+    series_c --> series_d
+    series_d --> reserve_analysis
+    reserve_analysis --> failure_mode
 ```
 
 Follow-on investment signaling creates adverse selection dynamics that portfolio managers must navigate carefully. When a lead Series A investor declines to participate in the Series B financing, this signals negative private information to other market participants. The declining investor possesses board-level access to financial performance, pipeline metrics, competitive intelligence, and management team dynamics unavailable to new investors. Rational outside investors interpret non-participation as a negative signal, depressing valuation or preventing round completion entirely. This signaling problem forces lead investors into binary decisions: participate fully to avoid signaling, or explicitly resign board seat and communicate transparent reasoning for non-participation.
@@ -410,87 +520,89 @@ Board governance failure modes cluster around information asymmetry, misaligned 
 
 The founder-investor alignment problem becomes acute during down-round scenarios where previous valuations have disconnected from current company performance. Liquidation preference stack mechanics create divergent interests: investors retain downside protection through preferences while founders hold deeply underwater common equity. In a company previously valued at one hundred million dollars now raising at a forty-million-dollar valuation, existing investors may support the financing to provide runway for recovery while founders face massive dilution with minimal upside. This misalignment creates decision paralysis around necessary strategic pivots, management changes, or M&A processes that might salvage investor value but offer founders minimal return.
 
-```
-Down-Round Recapitalization Mechanics:
-═══════════════════════════════════════════════════════
+```mermaid
+flowchart TD
 
-Company Situation: DownCo Inc.
-  Peak Valuation (Series C, 2 years ago): $120M post-money
-  Capital Raised to Date:                  $45M
-  Current ARR:                             $8M (target was $25M)
-  Burn Rate:                               $1.2M/month
-  Runway:                                  4 months
-  Board Consensus:                         Company viable with reset
+    subgraph situation ["🏢 DownCo Inc. — Company Situation"]
+        S1["Peak Valuation (Series C, 2 yrs ago)\n$120M post-money"]
+        S2["Capital Raised to Date\n$45M"]
+        S3["Current ARR\n$8M (target was $25M)"]
+        S4["Burn Rate\n$1.2M / month"]
+        S5["Runway\n4 months"]
+        S6["Board Consensus\nCompany viable with reset"]
+    end
 
-Proposed Financing:
-  New Money:                               $15M
-  Structure:                               Series D Preferred
-  Pre-Money Valuation:                     $30M
-  Post-Money Valuation:                    $45M
+    subgraph financing ["💰 Proposed Series D Financing"]
+        F1["New Money\n$15M"]
+        F2["Structure\nSeries D Preferred"]
+        F3["Pre-Money Valuation\n$30M"]
+        F4["Post-Money Valuation\n$45M"]
+        F1 --> F2 --> F3 --> F4
+    end
 
-Cap Table Impact:
-  
-  Pre-Financing Ownership:
-    Founders & Employees:                  45% ($54M paper value)
-    Series A Investors:                    15% ($18M paper value)
-    Series B Investors:                    20% ($24M paper value)
-    Series C Investors:                    20% ($24M paper value)
-  
-  Post-Financing Ownership:
-    Founders & Employees:                  30.0% ($13.5M value, -$40.5M loss)
-    Series A Investors:                    10.0% ($4.5M value, -$13.5M loss)
-    Series B Investors:                    13.3% ($6.0M value, -$18.0M loss)
-    Series C Investors:                    13.3% ($6.0M value, -$18.0M loss)
-    Series D Investors (new):              33.3% ($15.0M investment)
+    subgraph pre_cap ["📊 Pre-Financing Cap Table (@ $120M peak)"]
+        PRE1["Founders & Employees\n45% → $54M paper"]
+        PRE2["Series A Investors\n15% → $18M paper"]
+        PRE3["Series B Investors\n20% → $24M paper"]
+        PRE4["Series C Investors\n20% → $24M paper"]
+    end
 
-Liquidation Preference Analysis (assuming 1x non-participating):
-  Total Preferences:                       $60M ($45M + $15M)
-  Current Valuation:                       $45M
-  Preference Overhang:                     133% of valuation
-  
-  Exit Scenario Analysis:
-    $30M Exit:
-      - Investors Receive: $30M (preference limited)
-      - Founders Receive: $0
-    
-    $60M Exit:
-      - Investors Receive: $60M (full preferences)
-      - Founders Receive: $0
-    
-    $90M Exit:
-      - Preference Payout: $60M
-      - Remaining: $30M
-      - Founders (30%): $9M
-      - Investors Total: $69M
-    
-    $150M Exit (exceeds peak valuation):
-      - Preference Payout: $60M
-      - Remaining: $90M
-      - Founders (30%): $27M
-      - Investors Total: $87M
+    subgraph post_cap ["📉 Post-Financing Cap Table (@ $45M)"]
+        POST1["Founders & Employees\n30.0% → $13.5M  (−$40.5M loss)"]
+        POST2["Series A Investors\n10.0% → $4.5M  (−$13.5M loss)"]
+        POST3["Series B Investors\n13.3% → $6.0M  (−$18.0M loss)"]
+        POST4["Series C Investors\n13.3% → $6.0M  (−$18.0M loss)"]
+        POST5["Series D Investors (new)\n33.3% → $15.0M invested"]
+    end
 
-Founder Incentive Analysis:
-  Pre-Financing: Founders economically underwater
-    - Any exit below $120M represents loss vs paper value
-    - Practical reality: company value ~$30M without new capital
-  
-  Post-Financing: Founder upside requires $90M+ exit
-    - Below $60M: $0 founder return
-    - Company must achieve 3x post-financing valuation for
-      meaningful founder outcome
-    - Probability assessment: 15-20% given current trajectory
+    subgraph liq_pref ["🔒 Liquidation Preference Analysis (1x Non-Participating)"]
+        LP1["Total Preferences\n$60M  ($45M prior + $15M new)"]
+        LP2["Current Valuation\n$45M"]
+        LP3["Preference Overhang\n133% of valuation"]
+        LP1 --> LP3
+        LP2 --> LP3
+    end
 
-Alternative Structure: Participating Preferred with Cap
-  Series D Terms:
-    - $15M investment at $45M post-money (same economics)
-    - 1x liquidation preference
-    - Participation up to 3x return ($45M total)
-    - After 3x return, converts to common (proportional)
-  
-  This structure:
-    + Provides investors downside protection
-    + Preserves founder upside in genuine recovery scenario
-    + Aligns incentives around growth rather than defensive protection
+    subgraph exits ["🚪 Exit Scenario Analysis"]
+        E1["$30M Exit\nInvestors: $30M (pref limited)\nFounders: $0"]
+        E2["$60M Exit\nInvestors: $60M (full prefs)\nFounders: $0"]
+        E3["$90M Exit\nPref payout: $60M\nRemaining: $30M\nFounders (30%): $9M\nInvestors total: $69M"]
+        E4["$150M Exit (exceeds peak)\nPref payout: $60M\nRemaining: $90M\nFounders (30%): $27M\nInvestors total: $87M"]
+    end
+
+    subgraph founder_incentive ["🎯 Founder Incentive Analysis"]
+        FI1["Pre-Financing\nFounders economically underwater\nPractical value ~$30M without new capital"]
+        FI2["Post-Financing Threshold\nFounders need $90M+ exit\nBelow $60M → $0 founder return\nRequires 3x post-financing valuation"]
+        FI3["Probability Assessment\n15–20% given current trajectory"]
+        FI1 --> FI2 --> FI3
+    end
+
+    subgraph alt_structure ["⚖️ Alternative: Participating Preferred with Cap"]
+        ALT1["Series D Terms\n$15M at $45M post-money\n1x liquidation preference\nParticipation up to 3x return ($45M total)\nConverts to common after 3x"]
+        ALT2["✅ Investor downside protection"]
+        ALT3["✅ Founder upside preserved on recovery"]
+        ALT4["✅ Incentives aligned around growth"]
+        ALT1 --> ALT2
+        ALT1 --> ALT3
+        ALT1 --> ALT4
+    end
+
+    situation -->|"Triggers"| financing
+    financing -->|"Dilutes"| pre_cap
+    pre_cap -->|"Becomes"| post_cap
+    post_cap -->|"Creates"| liq_pref
+    liq_pref -->|"Shapes"| exits
+    exits -->|"Informs"| founder_incentive
+    founder_incentive -->|"Motivates consideration of"| alt_structure
+
+    style situation   fill:#1a1a2e,stroke:#4a90d9,color:#e0e0e0
+    style financing   fill:#1a2e1a,stroke:#4ad94a,color:#e0e0e0
+    style pre_cap     fill:#2e1a1a,stroke:#d94a4a,color:#e0e0e0
+    style post_cap    fill:#2e2a1a,stroke:#d9a44a,color:#e0e0e0
+    style liq_pref    fill:#2a1a2e,stroke:#a44ad9,color:#e0e0e0
+    style exits       fill:#1a2a2e,stroke:#4ac8d9,color:#e0e0e0
+    style founder_incentive fill:#2e2e1a,stroke:#d9d94a,color:#e0e0e0
+    style alt_structure fill:#1a2e2a,stroke:#4ad9a4,color:#e0e0e0
 ```
 
 Zombie company resource drain manifests not only through direct capital allocation but through disproportionate management attention consumption. A struggling portfolio company demands intensive board engagement including emergency financing negotiations, founder coaching or replacement, strategic pivot evaluation, and customer retention firefighting. This attention cost compounds because zombie companies typically provide the least return on invested time: even successful interventions convert certain failures into marginal outcomes rather than generating fund-returning exits.
@@ -503,93 +615,127 @@ Negotiation deadlock emerges from misaligned reservation prices between sellers 
 
 Due diligence failure represents the highest-risk failure mode because it occurs after significant time and resource investment when deal collapse carries severe consequences. Due diligence uncovers issues across financial accuracy, customer contract terms, intellectual property ownership, regulatory compliance, and technical architecture. The most damaging failures emerge from undisclosed liabilities or misrepresented metrics that surface during buyer diligence. A company claiming ninety-five percent gross margin may reveal during diligence that it excludes substantial customer success costs from cost of goods sold calculations. Revenue recognition policies may prove aggressive, pulling future-period revenue into current periods. Customer contracts may contain unfavorable termination clauses or price protection provisions that undermine represented economics.
 
-```
-M&A Process Failure Prevention:
-═══════════════════════════════════════════════════════
+```mermaid
+flowchart TD
+    ROOT["🏢 M&A Process Failure Prevention"]
 
-Pre-Process Preparation:
-  
-  Financial Hygiene (Begin 12 months before process):
-    ├─ Revenue Recognition Audit:
-    │  └─ Engage external auditor to review policies
-    │  └─ Align with ASC 606 or IFRS 15 standards
-    │  └─ Correct any aggressive pull-forward practices
-    │
-    ├─ Cost Classification Review:
-    │  └─ COGS definition aligned with sector standards
-    │  └─ R&D vs. COGS allocation defensible
-    │  └─ Sales & marketing expense fully loaded
-    │
-    └─ Working Capital Normalization:
-       └─ Accounts receivable DSO within sector norms
-       └─ Deferred revenue and contract liabilities accurate
-       └─ Accrued liabilities and commitments disclosed
+    ROOT --> PREP
+    ROOT --> EXEC
 
-  Legal & Regulatory Cleanup (Begin 9 months before):
-    ├─ IP Ownership Verification:
-    │  └─ All contributor agreements executed (employees, contractors)
-    │  └─ Open source license compliance documented
-    │  └─ Patent filings consistent with representations
-    │
-    ├─ Customer Contract Review:
-    │  └─ Material terms disclosed (pricing, SLAs, termination)
-    │  └─ Change-of-control provisions negotiated or waived
-    │  └─ Concentration risk quantified and disclosed
-    │
-    └─ Regulatory Compliance:
-       └─ Data privacy policies (GDPR, CCPA) documented
-       └─ Security certifications current (SOC 2, ISO 27001)
-       └─ Export control compliance if applicable
+    subgraph PREP ["📋 Pre-Process Preparation"]
+        direction TD
 
-  Strategic Positioning (Begin 6 months before):
-    ├─ Equity Story Development:
-    │  └─ Investment thesis clearly articulated
-    │  └─ Competitive differentiation quantified
-    │  └─ Market opportunity sized with credible sources
-    │
-    └─ Management Presentation Preparation:
-       └─ Financial model with transparent assumptions
-       └─ Product roadmap aligned with market needs
-       └─ Customer references prepared and willing
+        subgraph FH ["💰 Financial Hygiene — Begin 12 Months Before"]
+            direction TD
+            RRA["Revenue Recognition Audit"]
+            RRA --> RRA1["Engage external auditor to review policies"]
+            RRA --> RRA2["Align with ASC 606 or IFRS 15 standards"]
+            RRA --> RRA3["Correct aggressive pull-forward practices"]
 
-Deal Execution Risk Mitigation:
+            CCR["Cost Classification Review"]
+            CCR --> CCR1["COGS definition aligned with sector standards"]
+            CCR --> CCR2["R&D vs. COGS allocation defensible"]
+            CCR --> CCR3["Sales & marketing expense fully loaded"]
 
-  Multi-Track Process:
-    Run 3-4 parallel buyer discussions to maintain leverage
-    Avoid exclusivity until final negotiation phase
-    Maintain operational focus during process (risk of distraction)
+            WCN["Working Capital Normalization"]
+            WCN --> WCN1["Accounts receivable DSO within sector norms"]
+            WCN --> WCN2["Deferred revenue and contract liabilities accurate"]
+            WCN --> WCN3["Accrued liabilities and commitments disclosed"]
+        end
 
-  Information Control:
-    Staged disclosure through data room (teaser → CIM → full diligence)
-    Waterfall access control (early interest → LOI → confirmatory)
-    Track buyer questions to identify concerns early
+        subgraph LR ["⚖️ Legal & Regulatory Cleanup — Begin 9 Months Before"]
+            direction TD
+            IPV["IP Ownership Verification"]
+            IPV --> IPV1["All contributor agreements executed"]
+            IPV --> IPV2["Open source license compliance documented"]
+            IPV --> IPV3["Patent filings consistent with representations"]
 
-  Negotiation Leverage Maintenance:
-    Set aggressive but realistic process timeline (90-120 days)
-    Use IOI deadline to create competitive pressure
-    Maintain credible walk-away alternative (IPO path, continued operations)
+            CCN["Customer Contract Review"]
+            CCN --> CCN1["Material terms disclosed — pricing, SLAs, termination"]
+            CCN --> CCN2["Change-of-control provisions negotiated or waived"]
+            CCN --> CCN3["Concentration risk quantified and disclosed"]
 
-  Common Failure Points & Mitigations:
+            RC["Regulatory Compliance"]
+            RC --> RC1["Data privacy policies documented — GDPR, CCPA"]
+            RC --> RC2["Security certifications current — SOC 2, ISO 27001"]
+            RC --> RC3["Export control compliance if applicable"]
+        end
 
-    Failure: Revenue quality concerns
-    Signal: Buyer questions regarding cohort retention, logo churn
-    Mitigation: Pre-emptive cohort analysis, NRR calculation, reference calls
+        subgraph SP ["🎯 Strategic Positioning — Begin 6 Months Before"]
+            direction TD
+            ESD["Equity Story Development"]
+            ESD --> ESD1["Investment thesis clearly articulated"]
+            ESD --> ESD2["Competitive differentiation quantified"]
+            ESD --> ESD3["Market opportunity sized with credible sources"]
 
-    Failure: Technical architecture scalability doubts
-    Signal: Requests for infrastructure documentation, performance testing
-    Mitigation: Third-party architecture review, load testing results
+            MPP["Management Presentation Preparation"]
+            MPP --> MPP1["Financial model with transparent assumptions"]
+            MPP --> MPP2["Product roadmap aligned with market needs"]
+            MPP --> MPP3["Customer references prepared and willing"]
+        end
+    end
 
-    Failure: Key employee retention risk
-    Signal: Questions about management depth, org chart analysis
-    Mitigation: Retention plan development, equity refreshes pre-process
+    subgraph EXEC ["⚡ Deal Execution Risk Mitigation"]
+        direction TD
 
-    Failure: Customer concentration creating post-close risk
-    Signal: Deep diligence on top 10 customers, contract terms
-    Mitigation: Customer diversification narrative, contractual protections
+        subgraph MT ["🔀 Multi-Track Process"]
+            MT1["Run 3–4 parallel buyer discussions to maintain leverage"]
+            MT2["Avoid exclusivity until final negotiation phase"]
+            MT3["Maintain operational focus — mitigate distraction risk"]
+        end
 
-    Failure: Working capital adjustment disputes
-    Signal: Disagreement over normalized working capital levels
-    Mitigation: Pre-negotiated working capital target in LOI, sector comps
+        subgraph IC ["🔒 Information Control"]
+            IC1["Staged disclosure: Teaser → CIM → Full Diligence"]
+            IC2["Waterfall access: Early Interest → LOI → Confirmatory"]
+            IC3["Track buyer questions to identify concerns early"]
+        end
+
+        subgraph NL ["📊 Negotiation Leverage Maintenance"]
+            NL1["Set aggressive but realistic timeline — 90 to 120 days"]
+            NL2["Use IOI deadline to create competitive pressure"]
+            NL3["Maintain credible walk-away alternative — IPO or continued ops"]
+        end
+
+        subgraph CFP ["⚠️ Common Failure Points & Mitigations"]
+            direction TD
+
+            F1["❌ Revenue Quality Concerns"]
+            F1S["Signal: Buyer questions on cohort retention and logo churn"]
+            F1M["✅ Mitigation: Pre-emptive cohort analysis, NRR calculation, reference calls"]
+            F1 --> F1S --> F1M
+
+            F2["❌ Technical Architecture Scalability Doubts"]
+            F2S["Signal: Requests for infrastructure docs and performance testing"]
+            F2M["✅ Mitigation: Third-party architecture review and load testing results"]
+            F2 --> F2S --> F2M
+
+            F3["❌ Key Employee Retention Risk"]
+            F3S["Signal: Questions about management depth and org chart analysis"]
+            F3M["✅ Mitigation: Retention plan development and equity refreshes pre-process"]
+            F3 --> F3S --> F3M
+
+            F4["❌ Customer Concentration Risk"]
+            F4S["Signal: Deep diligence on top 10 customers and contract terms"]
+            F4M["✅ Mitigation: Diversification narrative and contractual protections"]
+            F4 --> F4S --> F4M
+
+            F5["❌ Working Capital Adjustment Disputes"]
+            F5S["Signal: Disagreement over normalized working capital levels"]
+            F5M["✅ Mitigation: Pre-negotiated working capital target in LOI with sector comps"]
+            F5 --> F5S --> F5M
+        end
+    end
+
+    style ROOT fill:#1a1a2e,color:#ffffff,stroke:#4a90d9,stroke-width:3px
+    style PREP fill:#0f3460,color:#ffffff,stroke:#4a90d9,stroke-width:2px
+    style EXEC fill:#16213e,color:#ffffff,stroke:#e94560,stroke-width:2px
+    style FH fill:#1b4332,color:#ffffff,stroke:#52b788,stroke-width:1.5px
+    style LR fill:#1a1a2e,color:#ffffff,stroke:#9b72cf,stroke-width:1.5px
+    style SP fill:#1a3a4a,color:#ffffff,stroke:#4fc3f7,stroke-width:1.5px
+    style MT fill:#2d1b00,color:#ffffff,stroke:#ff9800,stroke-width:1.5px
+    style IC fill:#1a2744,color:#ffffff,stroke:#42a5f5,stroke-width:1.5px
+    style NL fill:#1b2e1b,color:#ffffff,stroke:#66bb6a,stroke-width:1.5px
+    style CFP fill:#2d1515,color:#ffffff,stroke:#ef5350,stroke-width:1.5px
 ```
 
 Performance measurement distortion emerges from the tension between cash-based metrics like DPI that reflect realized returns and marked-to-market metrics like TVPI that incorporate unrealized gains. During bull markets, venture portfolios accumulate substantial paper gains through mark-ups in subsequent financing rounds. These mark-ups flow directly into TVPI calculations, creating impressive interim performance that may never materialize if portfolio companies fail to exit at inflated valuations. Sophisticated LPs recognize this dynamic and discount TVPI figures from young funds, focusing instead on DPI progression and the ratio of realized to unrealized gains as funds mature.

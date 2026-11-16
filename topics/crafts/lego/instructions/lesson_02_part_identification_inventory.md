@@ -28,46 +28,24 @@ The structure of a Lego instruction document itself encodes part information at 
 
 The following diagram represents the conceptual data flow of a complete inventory verification workflow:
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     INVENTORY VERIFICATION PIPELINE                 │
-└─────────────────────────────────────────────────────────────────────┘
-
-  ┌─────────────────────┐       ┌──────────────────────────┐
-  │  Instruction Set    │       │   Rebrickable / BrickLink │
-  │  (Parts List Page)  │──────▶│   Digital Parts List     │
-  └─────────────────────┘       └────────────┬─────────────┘
-                                             │
-                                     Normalize IDs
-                                     (Design / Element / Color)
-                                             │
-                                             ▼
-                              ┌──────────────────────────────┐
-                              │  Master Bill of Materials    │
-                              │  Part ID | Color ID | Qty    │
-                              └──────────────┬───────────────┘
-                                             │
-                               ┌─────────────▼──────────────┐
-                               │   Physical Sorting Stage   │
-                               │   Sort by: Family → Size   │
-                               │             → Color → Qty  │
-                               └─────────────┬──────────────┘
-                                             │
-                               ┌─────────────▼──────────────┐
-                               │   Count Verification       │
-                               │   Exact match check:       │
-                               │   Physical Qty == BOM Qty  │
-                               └─────────────┬──────────────┘
-                                             │
-                           ┌─────────────────┴────────────────┐
-                           │                                  │
-                     ┌─────▼──────┐                   ┌───────▼──────┐
-                     │   PASS     │                   │   DELTA      │
-                     │ Proceed    │                   │ Identify     │
-                     │ to Build   │                   │ missing /    │
-                     └────────────┘                   │ substituted  │
-                                                      │ parts        │
-                                                      └──────────────┘
+```mermaid
+flowchart TD
+    A["Instruction Set<br/>(Parts List Page)"]
+    B["Rebrickable / BrickLink<br/>Digital Parts List"]
+    C["Normalize IDs<br/>(Design / Element / Color)"]
+    D["Master Bill of Materials<br/>Part ID | Color ID | Qty"]
+    E["Physical Sorting Stage<br/>Sort by: Family → Size<br/>→ Color → Qty"]
+    F["Count Verification<br/>Exact match check:<br/>Physical Qty == BOM Qty"]
+    G["PASS<br/>Proceed to Build"]
+    H["DELTA<br/>Identify missing /<br/>substituted parts"]
+    
+    A -->|"Normalize IDs"| B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F -->|Match| G
+    F -->|Mismatch| H
 ```
 
 Physical sorting deserves extended treatment because it is where practitioner skill most directly determines workflow efficiency. The professional approach sorts in three cascading passes. The first pass is a **family sort**: all flat tiles together, all standard bricks together, all Technic beams together, all plates together, and so on. Family identification is based on the fundamental connection geometry of each piece — does it have studs and tubes, only tubes, cross-holes, bar slots, or ball sockets? This pass requires no counting and can proceed quickly even with a large collection.

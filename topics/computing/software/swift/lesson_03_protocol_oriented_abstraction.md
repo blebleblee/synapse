@@ -61,14 +61,13 @@ func renderDynamic(drawable: Drawable) {
 
 The existential container for `Drawable` is laid out in memory as follows:
 
-```
-+-----------------------+
-| Value Buffer (3 words)|  <- Inline storage for small types
-+-----------------------+
-| Witness Table Pointer |  <- Points to Circle: Drawable witness table
-+-----------------------+
-| Type Metadata Pointer |  <- Points to Circle metadata
-+-----------------------+
+```mermaid
+flowchart TD
+    VB["Value Buffer (3 words)<br/><i>Inline storage for small types</i>"]
+    WTP["Witness Table Pointer<br/><i>Points to Circle: Drawable witness table</i>"]
+    TMP["Type Metadata Pointer<br/><i>Points to Circle metadata</i>"]
+    
+    VB --> WTP --> TMP
 ```
 
 Small types (up to three pointer-sized words) are stored inline in the value buffer. Larger types are heap-allocated, and the value buffer holds a pointer to the heap allocation. This small-value optimization reduces allocation overhead for common cases like integers, small structs, and enums.

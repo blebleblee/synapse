@@ -32,51 +32,33 @@ The CSMS documentation structure required for Type Approval follows a hierarchic
 
 The technical architecture implementing CSMS requirements manifests in layered network topologies that partition vehicle systems into security domains. A representative architecture establishes at least three primary zones: the entertainment and comfort domain handling infotainment, navigation, and connectivity; the body and chassis domain managing door locks, climate control, and lighting; and the safety-critical domain encompassing powertrain, braking, and steering. Gateway ECUs enforce security policies at domain boundaries, filtering CAN frames based on whitelisted identifiers, rate-limiting diagnostic requests, and terminating unauthorized protocol sessions. Modern implementations replace traditional CAN gateways with Ethernet switches running firewall rulesets that inspect packet headers, enforce VLAN isolation, and implement MAC address authentication.
 
-```
-Vehicle Network Security Architecture (Logical Topology)
-
-┌─────────────────────────────────────────────────────────────┐
-│  External Interfaces (Attack Surface Entry Points)          │
-│  • Cellular Modem (4G/5G) │ Wi-Fi │ Bluetooth               │
-│  • OBD-II Port │ Charging Interface │ V2X Radio             │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Telematics Control Unit (TCU)                              │
-│  • Application Sandbox (SELinux)                            │
-│  • IDS Agent (Anomaly Detection)                            │
-│  • Secure Element (Key Storage)                             │
-│  • TLS 1.3 Tunnel to OEM Backend                            │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Central Gateway ECU (Security Policy Enforcement Point)    │
-│                                                               │
-│  ┌──────────────────┐  ┌──────────────────┐                │
-│  │ Firewall Engine  │  │ IDS/IPS Engine   │                │
-│  │ • Frame Filtering│  │ • CAN Anomaly    │                │
-│  │ • Rate Limiting  │  │ • Replay Detection│               │
-│  │ • VLAN Isolation │  │ • Sequence Check │                │
-│  └──────────────────┘  └──────────────────┘                │
-│                                                               │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │ Routing Policy Matrix                                 │  │
-│  │ Source Domain → Dest Domain → Allowed Protocols/IDs  │  │
-│  └──────────────────────────────────────────────────────┘  │
-└───────────────┬───────────────┬────────────────────┬────────┘
-                │               │                    │
-        ┌───────▼──────┐ ┌─────▼──────┐  ┌─────────▼────────┐
-        │ Entertainment│ │ Body/Chassis│  │ Safety-Critical  │
-        │   Domain     │ │   Domain    │  │    Domain        │
-        │              │ │             │  │                  │
-        │ • Infotainment│ │ • BCM      │  │ • Engine ECU    │
-        │ • Navigation │ │ • HVAC      │  │ • Brake ECU     │
-        │ • Media      │ │ • Lighting  │  │ • Steering ECU  │
-        │              │ │ • Comfort   │  │ • Transmission  │
-        └──────────────┘ └─────────────┘  └──────────────────┘
-           CAN-FD            LIN/CAN           CAN-FD/FlexRay
+```mermaid
+flowchart TD
+    ExtInt["External Interfaces (Attack Surface Entry Points)<br/>• Cellular Modem (4G/5G) | Wi-Fi | Bluetooth<br/>• OBD-II Port | Charging Interface | V2X Radio"]
+    
+    TCU["Telematics Control Unit (TCU)<br/>• Application Sandbox (SELinux)<br/>• IDS Agent (Anomaly Detection)<br/>• Secure Element (Key Storage)<br/>• TLS 1.3 Tunnel to OEM Backend"]
+    
+    Gateway["Central Gateway ECU<br/>(Security Policy Enforcement Point)"]
+    
+    subgraph GatewayComponents["Gateway Components"]
+        direction LR
+        Firewall["Firewall Engine<br/>• Frame Filtering<br/>• Rate Limiting<br/>• VLAN Isolation"]
+        IDS["IDS/IPS Engine<br/>• CAN Anomaly<br/>• Replay Detection<br/>• Sequence Check"]
+        RoutingPolicy["Routing Policy Matrix<br/>Source Domain → Dest Domain → Allowed Protocols/IDs"]
+    end
+    
+    Entertainment["Entertainment Domain<br/><br/>• Infotainment<br/>• Navigation<br/>• Media<br/><br/>CAN-FD"]
+    
+    BodyChassis["Body/Chassis Domain<br/><br/>• BCM<br/>• HVAC<br/>• Lighting<br/>• Comfort<br/><br/>LIN/CAN"]
+    
+    SafetyCritical["Safety-Critical Domain<br/><br/>• Engine ECU<br/>• Brake ECU<br/>• Steering ECU<br/>• Transmission<br/><br/>CAN-FD/FlexRay"]
+    
+    ExtInt --> TCU
+    TCU --> Gateway
+    Gateway -.-> GatewayComponents
+    Gateway --> Entertainment
+    Gateway --> BodyChassis
+    Gateway --> SafetyCritical
 ```
 
 Cryptographic architecture forms the foundation of secure boot, firmware authentication, and communication protection required by R155. Each ECU contains a Hardware Security Module—either a discrete Trusted Platform Module, an embedded Secure Element, or a dedicated cryptographic coprocessor—storing the device's unique private key and the manufacturer's root certificate. During boot, the hardware security module verifies the bootloader's digital signature before transferring execution, the bootloader verifies the operating system, and the operating system verifies application binaries, creating a chain of trust rooted in immutable ROM code. This secure boot chain prevents attackers from persistently installing malicious firmware even if they temporarily exploit a runtime vulnerability. The cryptographic hierarchy extends to inter-ECU communication through protocols like Secure Onboard Communication (SecOC) that append Message Authentication Codes to CAN frames, allowing receivers to cryptographically verify sender identity and message integrity.
@@ -85,78 +67,83 @@ Software Update Management System architecture under UN R156 implements a secure
 
 The vehicle-side update verification workflow implements defense-in-depth validation before committing changes to persistent storage. Upon receiving an update package, the telematics unit first validates the package signature against the manufacturer's root certificate stored in tamper-resistant memory. This cryptographic verification ensures authenticity—confirming the update originated from the manufacturer—and integrity—guaranteeing no modification occurred during transmission. Next, the gateway ECU checks that the update's target ECU identifier matches an installed component and that the version number exceeds the current firmware revision, preventing downgrade attacks that reinstall vulnerable older versions. Before installation, the ECU performs a dual-bank verification where the new firmware loads into inactive memory while the system continues running the current version, allowing functional testing before making the update permanent.
 
-```
-Secure Software Update Workflow (R156 Compliance)
-
-OEM Backend Infrastructure:
-┌─────────────────────────────────────────────────────────┐
-│  Update Signing Ceremony (Air-Gapped HSM Facility)     │
-│                                                          │
-│  1. Firmware Build → Binary Hash Computation            │
-│  2. Multi-Party Authorization (N-of-M Key Ceremony)     │
-│  3. HSM Signs Hash with Root Private Key                │
-│  4. Package Assembly: {FW Binary, Metadata, Signature}  │
-│                                                          │
-│  Package Metadata:                                      │
-│  • Target ECU ID   • Version (Major.Minor.Patch)        │
-│  • Dependencies    • Rollback Counter                   │
-│  • Install Script  • Expiration Timestamp               │
-└──────────────────────────┬──────────────────────────────┘
-                           │ TLS 1.3 (Certificate Pinning)
-                           ▼
-Vehicle Telematics Control Unit:
-┌─────────────────────────────────────────────────────────┐
-│  Update Reception & Initial Validation                  │
-│                                                          │
-│  1. TLS Session to OEM Backend (Mutual Authentication)  │
-│  2. Download Encrypted Update Package                   │
-│  3. Decrypt with Session Key                            │
-│  4. Verify Digital Signature Against Root Cert          │
-│     → If INVALID: Drop Package, Log Incident            │
-│  5. Check Expiration Timestamp                          │
-│  6. Parse Metadata, Identify Target ECU                 │
-└──────────────────────────┬──────────────────────────────┘
-                           │ Internal Vehicle Network
-                           ▼
-Central Gateway ECU:
-┌─────────────────────────────────────────────────────────┐
-│  Policy Enforcement & Routing Decision                  │
-│                                                          │
-│  1. Verify TCU Authorized to Initiate Update            │
-│  2. Check Target ECU Exists in Vehicle Configuration    │
-│  3. Validate Version Rollback Constraint:               │
-│     New_Rollback_Counter > Current_Rollback_Counter     │
-│  4. Check Dependency Tree (Other ECUs Ready?)           │
-│  5. Route Package to Target ECU Domain                  │
-└──────────────────────────┬──────────────────────────────┘
-                           │
-                           ▼
-Target ECU (e.g., Engine Control Unit):
-┌─────────────────────────────────────────────────────────┐
-│  Dual-Bank Update with Atomic Commit                    │
-│                                                          │
-│  ┌──────────────┐          ┌──────────────┐            │
-│  │ Active Bank  │          │ Inactive Bank│            │
-│  │ (Current FW) │          │ (New FW)     │            │
-│  │   Running    │          │   Staged     │            │
-│  └──────────────┘          └──────────────┘            │
-│                                                          │
-│  Workflow:                                              │
-│  1. Write New Firmware to Inactive Bank                 │
-│  2. Verify Hash Matches Signed Metadata                 │
-│  3. Execute Self-Test in Sandbox (No Commit)            │
-│  4. If Tests PASS:                                      │
-│     → Atomically Swap Boot Pointer to New Bank          │
-│     → Increment Rollback Counter in Secure Storage      │
-│  5. If Tests FAIL:                                      │
-│     → Keep Boot Pointer on Active Bank                  │
-│     → Report Failure to Gateway, Log Incident           │
-│                                                          │
-│  6. Post-Reboot Validation:                             │
-│     → New FW Boots, Runs Extended Diagnostics           │
-│     → If Stable: Mark Update Committed                  │
-│     → If Crashes: Auto-Rollback to Previous Bank        │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph OEM["OEM Backend Infrastructure"]
+        A1["Firmware Build → Binary Hash Computation"]
+        A2["Multi-Party Authorization (N-of-M Key Ceremony)"]
+        A3["HSM Signs Hash with Root Private Key"]
+        A4["Package Assembly:<br/>{FW Binary, Metadata, Signature}"]
+        A5["Package Metadata:<br/>• Target ECU ID<br/>• Version (Major.Minor.Patch)<br/>• Dependencies<br/>• Rollback Counter<br/>• Install Script<br/>• Expiration Timestamp"]
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+    end
+    
+    subgraph TCU["Vehicle Telematics Control Unit"]
+        B1["TLS Session to OEM Backend<br/>(Mutual Authentication)"]
+        B2["Download Encrypted Update Package"]
+        B3["Decrypt with Session Key"]
+        B4["Verify Digital Signature<br/>Against Root Cert"]
+        B5{"Signature Valid?"}
+        B6["Drop Package,<br/>Log Incident"]
+        B7["Check Expiration Timestamp"]
+        B8["Parse Metadata,<br/>Identify Target ECU"]
+        
+        B1 --> B2
+        B2 --> B3
+        B3 --> B4
+        B4 --> B5
+        B5 -->|Invalid| B6
+        B5 -->|Valid| B7
+        B7 --> B8
+    end
+    
+    subgraph GW["Central Gateway ECU"]
+        C1["Verify TCU Authorized<br/>to Initiate Update"]
+        C2["Check Target ECU Exists<br/>in Vehicle Configuration"]
+        C3["Validate Version Rollback Constraint:<br/>New_Rollback_Counter > Current_Rollback_Counter"]
+        C4["Check Dependency Tree<br/>(Other ECUs Ready?)"]
+        C5["Route Package to<br/>Target ECU Domain"]
+        
+        C1 --> C2
+        C2 --> C3
+        C3 --> C4
+        C4 --> C5
+    end
+    
+    subgraph ECU["Target ECU (e.g., Engine Control Unit)"]
+        D1["Write New Firmware<br/>to Inactive Bank"]
+        D2["Verify Hash Matches<br/>Signed Metadata"]
+        D3["Execute Self-Test in Sandbox<br/>(No Commit)"]
+        D4{"Tests Pass?"}
+        D5["Atomically Swap Boot Pointer<br/>to New Bank"]
+        D6["Increment Rollback Counter<br/>in Secure Storage"]
+        D7["Keep Boot Pointer on Active Bank"]
+        D8["Report Failure to Gateway,<br/>Log Incident"]
+        D9["Post-Reboot Validation:<br/>New FW Boots, Runs Extended Diagnostics"]
+        D10{"Firmware Stable?"}
+        D11["Mark Update Committed"]
+        D12["Auto-Rollback to Previous Bank"]
+        
+        D1 --> D2
+        D2 --> D3
+        D3 --> D4
+        D4 -->|Pass| D5
+        D4 -->|Fail| D7
+        D5 --> D6
+        D6 --> D9
+        D7 --> D8
+        D9 --> D10
+        D10 -->|Stable| D11
+        D10 -->|Crashes| D12
+    end
+    
+    A5 -->|"TLS 1.3<br/>(Certificate Pinning)"| B1
+    B8 -->|"Internal Vehicle Network"| C1
+    C5 --> D1
 ```
 
 Post-production monitoring obligations under R155 require manufacturers to establish Security Operations Center capabilities that continuously ingest and triage threat intelligence. This operational architecture integrates multiple data streams: vulnerability disclosures from public databases like CVE and ICS-CERT advisories, threat intelligence feeds from commercial providers tracking automotive-specific exploit campaigns, coordinated disclosures from security researchers, and telemetry from deployed vehicle fleets. Modern implementations deploy intrusion detection agents within vehicles that monitor for anomalous CAN traffic patterns, unexpected diagnostic protocol usage, and cryptographic verification failures, transmitting sanitized alerts to backend analytics platforms. The SOC triages these signals using automated correlation engines that distinguish benign anomalies—like repair shops using legitimate diagnostic tools—from potential security incidents requiring human investigation.

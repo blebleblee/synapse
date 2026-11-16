@@ -63,31 +63,43 @@ The cost model for elastic pools exploits the statistical likelihood that not al
 
 Elastic pools expose three dimensions of resource control: the pool-level vCore or eDTU allocation that determines total available compute, per-database minimum guarantees that establish baseline performance floors, and per-database maximum caps that prevent resource monopolization. These parameters map directly to SQL Server's resource governor configuration but operate at the Azure control plane through ARM template properties. The internal implementation uses a hierarchical scheduling tree where the pool represents the root resource class, and each database maps to a child workload group with specified min/max resource ratios.
 
-```
-Elastic Pool Resource Hierarchy:
-
-                   [Pool: 100 vCores]
-                          |
-         +----------------+------------------+
-         |                |                  |
-    [DB1: 5-20 vCores] [DB2: 5-20 vCores] [DB3: 5-20 vCores]
-         |                |                  |
-    Guaranteed 5      Guaranteed 5       Guaranteed 5
-    Bursts to 20      Bursts to 20       Bursts to 20
-
-Resource Governor Decision Flow:
-1. Query arrives at DB1
-2. Check current DB1 allocation vs. minimum (5 vCores)
-3. If below minimum, allocate from pool unconditionally
-4. If above minimum, check pool remaining capacity
-5. If pool has capacity and DB1 < max (20 vCores), allocate
-6. If pool saturated or DB1 at max, queue query or throttle
-
-Key Metrics for Pool Sizing:
-- P95 concurrent active databases
-- Per-database CPU/IOPS distribution
-- Burst duration and frequency
-- Cross-database workload correlation
+```mermaid
+flowchart TD
+    Pool["🔷 Elastic Pool: 100 vCores"]
+    
+    Pool --> DB1["DB1: 5-20 vCores"]
+    Pool --> DB2["DB2: 5-20 vCores"]
+    Pool --> DB3["DB3: 5-20 vCores"]
+    
+    DB1 --> DB1_Min["Guaranteed: 5 vCores"]
+    DB1 --> DB1_Burst["Burst Capacity: 20 vCores"]
+    
+    DB2 --> DB2_Min["Guaranteed: 5 vCores"]
+    DB2 --> DB2_Burst["Burst Capacity: 20 vCores"]
+    
+    DB3 --> DB3_Min["Guaranteed: 5 vCores"]
+    DB3 --> DB3_Burst["Burst Capacity: 20 vCores"]
+    
+    QueryArrival["Query Arrives at DB"] --> CheckMin{"Current Allocation<br/>≥ Minimum?"}
+    
+    CheckMin -->|No| AllocateMin["Allocate from Pool<br/>Unconditionally"]
+    CheckMin -->|Yes| CheckCapacity{"Pool Has<br/>Remaining Capacity?"}
+    
+    CheckCapacity -->|No| CheckMax{"DB at<br/>Max vCores?"}
+    CheckCapacity -->|Yes| CheckMax
+    
+    CheckMax -->|Yes| Throttle["Queue Query<br/>or Throttle"]
+    CheckMax -->|No| AllocateBurst["Allocate Burst<br/>Capacity"]
+    
+    AllocateMin --> Execute["Execute Query"]
+    AllocateBurst --> Execute
+    Throttle --> Pending["Query Pending"]
+    
+    style Pool fill:#4A90E2,stroke:#2E5C8A,color:#fff
+    style QueryArrival fill:#50C878,stroke:#2D7A4A,color:#fff
+    style Execute fill:#7CB342,stroke:#4A6E2D,color:#fff
+    style Throttle fill:#E85D75,stroke:#8B3A42,color:#fff
+    style Pending fill:#FFB347,stroke:#8B6914,color:#fff
 ```
 
 The failure domain for elastic pools spans all databases within the pool. A hardware fault affecting the underlying compute node triggers automatic failover to a standby replica, during which all databases in the pool experience a brief connectivity interruption. This differs from single-database deployments where failover operates independently per database, introducing a shared-fate coupling that violates blast radius isolation. Critical workloads that cannot tolerate correlated failures should deploy into separate pools or individual databases despite higher cost.
@@ -102,32 +114,43 @@ The distribution strategy—hash, round-robin, or replicated—determines how ta
 
 The cost model for Synapse charges separately for compute node hours and storage capacity, reflecting the architectural separation between processing and persistence. Compute nodes bill continuously while the SQL pool is active, even during idle periods with no query execution. Practitioners optimize cost by pausing SQL pools during off-peak hours and resuming on-demand, incurring a 1-2 minute cold-start latency while compute nodes reattach to storage. Storage costs accrue based on compressed data volume in Data Lake Gen2, with Synapse automatically applying columnstore compression that achieves 5-10x reduction for analytical workloads.
 
-```
-Synapse MPP Query Execution:
-
-Client → Control Node (Query Parser & Optimizer)
-           ↓
-       [Execution Plan DAG]
-           ↓
-   +-------+-------+-------+-------+
-   |       |       |       |       |
-Compute Compute Compute Compute Compute ... (N nodes)
- Node 1  Node 2  Node 3  Node 4  Node 5
-   ↓       ↓       ↓       ↓       ↓
-Partitions Partitions Partitions Partitions Partitions
- 1-12    13-24   25-36   37-48   49-60
-
-Data Movement Patterns:
-- Hash Join on Distribution Key: Local join, no shuffle
-- Hash Join on Non-Distribution Key: Full shuffle (expensive)
-- Aggregation: Two-phase (local + global)
-- Filter: Partition elimination via metadata
-
-Performance Tuning Invariants:
-1. Minimize data movement by distributing on frequent join keys
-2. Use replicated tables for dimensions < 2GB
-3. Align partition boundaries with query predicates
-4. Monitor DMS (Data Movement Service) wait times
+```mermaid
+flowchart TD
+    Client["Client"]
+    ControlNode["Control Node<br/>(Query Parser & Optimizer)"]
+    ExecutionPlan["Execution Plan DAG"]
+    
+    subgraph ComputeLayer["Compute Layer (N nodes)"]
+        CN1["Compute Node 1<br/>Partitions 1-12"]
+        CN2["Compute Node 2<br/>Partitions 13-24"]
+        CN3["Compute Node 3<br/>Partitions 25-36"]
+        CN4["Compute Node 4<br/>Partitions 37-48"]
+        CN5["Compute Node 5<br/>Partitions 49-60"]
+        CNX["..."]
+    end
+    
+    subgraph DataMovement["Data Movement Patterns"]
+        LocalJoin["Hash Join on Distribution Key<br/>Local join, no shuffle"]
+        ShuffleJoin["Hash Join on Non-Distribution Key<br/>Full shuffle (expensive)"]
+        Aggregation["Aggregation<br/>Two-phase (local + global)"]
+        Filter["Filter<br/>Partition elimination via metadata"]
+    end
+    
+    subgraph Tuning["Performance Tuning Invariants"]
+        T1["1. Minimize data movement by<br/>distributing on frequent join keys"]
+        T2["2. Use replicated tables for<br/>dimensions < 2GB"]
+        T3["3. Align partition boundaries<br/>with query predicates"]
+        T4["4. Monitor DMS (Data Movement Service)<br/>wait times"]
+    end
+    
+    Client --> ControlNode
+    ControlNode --> ExecutionPlan
+    ExecutionPlan --> CN1
+    ExecutionPlan --> CN2
+    ExecutionPlan --> CN3
+    ExecutionPlan --> CN4
+    ExecutionPlan --> CN5
+    ExecutionPlan --> CNX
 ```
 
 The critical failure mode in Synapse involves data skew, where uneven distribution keys cause some compute nodes to process disproportionately large partition volumes while others idle. A table distributed on customer ID might encounter a scenario where one enterprise customer generates 40% of total rows, concentrating that workload on a single compute node and negating the parallelism benefits of MPP. Detecting skew requires querying system DMVs that expose per-partition row counts and implementing redistribution strategies like salting hash keys or switching to round-robin for highly skewed dimensions.
@@ -142,33 +165,81 @@ Throughput units control the provisioned network bandwidth and storage throughpu
 
 Consumer groups provide isolated checkpointing state for independent subscriber applications processing the same event stream. Each consumer group maintains a per-partition offset cursor tracking the last processed message sequence number, enabling consumers to resume from their last checkpoint after transient failures. The physical implementation stores checkpoint state in Azure Blob Storage with optimistic concurrency control, requiring consumers to handle race conditions when multiple instances compete for partition ownership. The lease-based partition assignment protocol ensures that each partition within a consumer group has at most one active consumer at any time, preventing duplicate processing but introducing rebalancing latency when consumers join or leave the group.
 
-```
-Event Hub Partition Architecture:
+```mermaid
+flowchart TD
+    subgraph producers ["Producers"]
+        P1["Producer 1"]
+        P2["Producer 2"]
+        P3["Producer 3"]
+        PN["Producer N"]
+    end
 
-Producer 1 ──┐
-Producer 2 ──┤                Event Hub (32 Partitions)
-Producer 3 ──┤  [Partition Key Hash]
-Producer N ──┘           ↓
-                    ┌────┴────┬────┬────┬─────┐
-                    P0   P1   P2   P3  ... P31
-                    │    │    │    │       │
-                [Replicated to 3 Broker Nodes Each]
-                    │    │    │    │       │
-Consumer Group A:   C0   C1   C2   C3  ... C31
-Consumer Group B:   C0   C1   C2   C3  ... C31
+    subgraph routing ["Event Hub Ingress"]
+        PKH["Partition Key Hash"]
+    end
 
-Partition Assignment Lifecycle:
-1. Consumer joins consumer group
-2. Requests partition lease from coordination service
-3. Reads events starting from last checkpointed offset
-4. Periodically renews lease (default 30s)
-5. Stores checkpoint in Blob Storage after batch processing
-6. On failure, lease expires and partition reassigns
+    subgraph eventhub ["Event Hub — 32 Partitions"]
+        subgraph partitions ["Partition Log (P0 – P31)"]
+            PA["P0"]
+            PB["P1"]
+            PC["P2"]
+            PD["P3"]
+            PE["… P31"]
+        end
 
-Throughput Scaling Model:
-- Fixed partition count sets parallelism ceiling
-- Throughput units scale ingress/egress bandwidth
-- Cannot repartition without creating new Event Hub
+        subgraph replication ["Replication Layer"]
+            R1["Broker Node 1"]
+            R2["Broker Node 2"]
+            R3["Broker Node 3"]
+        end
+    end
+
+    subgraph cgA ["Consumer Group A"]
+        CA0["Consumer A — P0"]
+        CA1["Consumer A — P1"]
+        CA2["Consumer A — P2"]
+        CA3["Consumer A — P3"]
+        CAn["Consumer A — P31"]
+    end
+
+    subgraph cgB ["Consumer Group B"]
+        CB0["Consumer B — P0"]
+        CB1["Consumer B — P1"]
+        CB2["Consumer B — P2"]
+        CB3["Consumer B — P3"]
+        CBn["Consumer B — P31"]
+    end
+
+    subgraph lifecycle ["Partition Assignment Lifecycle"]
+        L1["1 · Consumer joins group"]
+        L2["2 · Request partition lease\nfrom coordination service"]
+        L3["3 · Read from last\ncheckpointed offset"]
+        L4["4 · Renew lease\nevery 30 s"]
+        L5["5 · Checkpoint offset\nto Blob Storage"]
+        L6["6 · On failure — lease expires\npartition reassigned"]
+    end
+
+    subgraph scaling ["Throughput Scaling Model"]
+        S1["Fixed partition count\nsets parallelism ceiling"]
+        S2["Throughput Units\nscale ingress / egress bandwidth"]
+        S3["Repartitioning requires\ncreating a new Event Hub"]
+    end
+
+    BLOB[("Azure Blob Storage\nCheckpoint Store")]
+
+    P1 & P2 & P3 & PN --> PKH
+    PKH --> PA & PB & PC & PD & PE
+
+    PA & PB & PC & PD & PE --> R1 & R2 & R3
+
+    R1 & R2 & R3 --> CA0 & CA1 & CA2 & CA3 & CAn
+    R1 & R2 & R3 --> CB0 & CB1 & CB2 & CB3 & CBn
+
+    L1 --> L2 --> L3 --> L4 --> L5 --> L6
+    L5 --> BLOB
+    L6 --> L2
+
+    S1 --- S2 --- S3
 ```
 
 The primary operational failure mode involves partition hotspots, where a single high-cardinality partition key generates disproportionate traffic and saturates the assigned broker node. A telemetry pipeline that uses device ID as partition key might encounter a scenario where a single IoT gateway aggregating thousands of sensors overwhelms one partition while others remain underutilized. Mitigating this requires either pre-sharding high-cardinality keys into multiple synthetic partitions or redesigning the partition key to distribute load more evenly.
@@ -228,54 +299,68 @@ The policy evaluation engine processes rules during three distinct phases: templ
 
 Policy assignments scope policies to management groups, subscriptions, resource groups, or individual resources through a hierarchical inheritance model. A policy assigned at the management group level applies to all descendent subscriptions and resource groups, with child scopes able to exclude specific resources through exemption assignments. The physical implementation caches policy assignment state in ARM's distributed metadata store, indexed by resource scope path, enabling millisecond-latency policy evaluation during template deployment operations.
 
-```
-Azure Policy Evaluation Flow:
-
-ARM Template Deploy Request
-         ↓
-   [Policy Engine]
-         ↓
-   Enumerate Applicable Policies (by scope)
-         ↓
-   Evaluate Each Policy Rule Against Template
-         ↓
-   ┌─────────┬──────────┬─────────┬──────────┐
-   │ Audit   │ Deny     │ Append  │ Modify   │
-   └─────────┴──────────┴─────────┴──────────┘
-      Log       Reject     Mutate    Queue
-      ↓         ↓          Template  Remediation
-   Continue   Fail        ↓          Task
-              Deploy    Continue
-                        Deploy
-
-Policy Definition Example (Deny Public IP):
-{
-  "mode": "All",
-  "policyRule": {
-    "if": {
-      "allOf": [
-        {
-          "field": "type",
-          "equals": "Microsoft.Sql/servers"
-        },
-        {
-          "field": "Microsoft.Sql/servers/publicNetworkAccess",
-          "equals": "Enabled"
-        }
-      ]
-    },
-    "then": {
-      "effect": "deny"
-    }
-  }
-}
-
-Compliance Scanning Lifecycle:
-1. Policy assignment created/updated
-2. Initial compliance scan triggered (async)
-3. Results appear in Policy Compliance dashboard (1-24h latency)
-4. Periodic rescans every 24h
-5. On-demand scan triggered via API/Portal
+```mermaid
+flowchart TD
+    A["ARM Template Deploy Request"]
+    B["Policy Engine"]
+    C["Enumerate Applicable Policies (by scope)"]
+    D["Evaluate Each Policy Rule Against Template"]
+    E["Audit"]
+    F["Deny"]
+    G["Append"]
+    H["Modify"]
+    I["Log"]
+    J["Reject"]
+    K["Mutate Template"]
+    L["Queue Remediation Task"]
+    M["Continue"]
+    N["Fail Deploy"]
+    O["Continue Deploy"]
+    P["Continue Deploy"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    D --> F
+    D --> G
+    D --> H
+    E --> I
+    F --> J
+    G --> K
+    H --> L
+    I --> M
+    J --> N
+    K --> O
+    L --> P
+    
+    subgraph PolicyDef ["Policy Definition Example (Deny Public IP)"]
+        Q["mode: All"]
+        R["if: allOf conditions"]
+        S["field: type = Microsoft.Sql/servers"]
+        T["field: publicNetworkAccess = Enabled"]
+        U["then: effect = deny"]
+        
+        Q --> R
+        R --> S
+        R --> T
+        S --> U
+        T --> U
+    end
+    
+    subgraph ComplianceLifecycle ["Compliance Scanning Lifecycle"]
+        V1["1. Policy assignment created/updated"]
+        V2["2. Initial compliance scan triggered (async)"]
+        V3["3. Results appear in Policy Compliance dashboard (1-24h latency)"]
+        V4["4. Periodic rescans every 24h"]
+        V5["5. On-demand scan triggered via API/Portal"]
+        
+        V1 --> V2
+        V2 --> V3
+        V3 --> V4
+        V4 --> V5
+        V5 -.-> V2
+    end
 ```
 
 The critical limitation of Azure Policy is its confinement to the ARM control plane. Policies cannot enforce data plane constraints like Cosmos DB query patterns, Event Hub partition key distributions, or Service Bus message processing logic. An infrastructure team attempting to prevent developers from provisioning publicly accessible Cosmos DB accounts can implement a Deny policy that rejects ARM templates with public network access enabled, but cannot block a developer from subsequently enabling public access through the Cosmos DB data plane SDK. This architectural gap requires complementary enforcement through role-based access control policies that restrict data plane permissions and runtime monitoring through Azure Monitor alerts that detect configuration drift.

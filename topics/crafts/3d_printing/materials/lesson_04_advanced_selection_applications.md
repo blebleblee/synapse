@@ -30,34 +30,55 @@ Chemical compatibility matrices reveal counterintuitive vulnerabilities. Polycar
 
 Dimensional precision requirements interact complexly with material shrinkage behavior. A 100 mm cube printed in polylactic acid with 0.6% linear shrinkage yields a final dimension of 99.4 mm, easily compensated through slicer scaling. However, differential shrinkage between thin and thick sections generates geometric distortion: thin walls cool rapidly and solidify with minimal shrinkage, while thick bosses cool slowly, contract more, and pull adjacent geometry inward. Glass-filled and carbon-filled composites introduce anisotropic shrinkage where filler particles align with extrusion direction, causing 0.3–0.4% shrinkage parallel to fibers but 1.2–1.5% shrinkage perpendicular to fiber orientation. Achieving ±0.05 mm tolerance on a composite part demands detailed finite element shrinkage simulation and iterative geometry compensation.
 
-```
-Material Selection Decision Flow:
+```mermaid
+flowchart TD
+    A["Operational Requirements"]
 
-Operational Requirements
-         ↓
-┌────────┴────────┐
-│  Thermal Range  │→ Tₛₑᵣᵥᵢcₑ > 90°C? → Yes → ABS/Nylon/PC/PEI/PEEK
-└────────┬────────┘                      ↓ No
-         ↓                              PLA/PETG
-    Load Type
-         ↓
-┌────────┴────────┐
-│ Impact/Cyclic?  │→ Yes → TPU/Nylon/PC-ABS
-└────────┬────────┘  ↓ No
-         ↓         Static → PLA/PETG/ABS
-  Chemical Exposure
-         ↓
-┌────────┴────────┐
-│ Aggressive Env? │→ Yes → PP/PVDF/PPS
-└────────┬────────┘  ↓ No
-         ↓         General → Previous candidates viable
-  Dimensional Tol.
-         ↓
-┌────────┴────────┐
-│  ±0.05mm req?   │→ Yes → Amorphous polymers + annealing
-└────────┬────────┘  ↓ No
-         ↓         Standard FDM achievable
-  Final Candidate Set
+    A --> B["Thermal Range"]
+
+    B -->|"T_service > 90°C"| C["ABS / Nylon / PC / PEI / PEEK"]
+    B -->|"T_service ≤ 90°C"| D["PLA / PETG"]
+
+    B --> E["Load Type"]
+
+    E --> F{"Impact or Cyclic Load?"}
+    F -->|"Yes"| G["TPU / Nylon / PC-ABS"]
+    F -->|"No — Static"| H["PLA / PETG / ABS"]
+
+    F --> I["Chemical Exposure"]
+
+    I --> J{"Aggressive Environment?"}
+    J -->|"Yes"| K["PP / PVDF / PPS"]
+    J -->|"No — General"| L["Previous Candidates Viable"]
+
+    J --> M["Dimensional Tolerance"]
+
+    M --> N{"±0.05 mm Required?"}
+    N -->|"Yes"| O["Amorphous Polymers + Annealing"]
+    N -->|"No — Standard"| P["Standard FDM Achievable"]
+
+    N --> Q["Final Candidate Set"]
+
+    style A fill:#2d4a7a,color:#ffffff,stroke:#1a2f4f
+    style Q fill:#2d6a4f,color:#ffffff,stroke:#1b4332
+
+    style C fill:#5c4033,color:#ffffff,stroke:#3e2723
+    style D fill:#5c4033,color:#ffffff,stroke:#3e2723
+    style G fill:#5c4033,color:#ffffff,stroke:#3e2723
+    style H fill:#5c4033,color:#ffffff,stroke:#3e2723
+    style K fill:#5c4033,color:#ffffff,stroke:#3e2723
+    style L fill:#5c4033,color:#ffffff,stroke:#3e2723
+    style O fill:#5c4033,color:#ffffff,stroke:#3e2723
+    style P fill:#5c4033,color:#ffffff,stroke:#3e2723
+
+    style B fill:#1a3a5c,color:#ffffff,stroke:#0d2137
+    style E fill:#1a3a5c,color:#ffffff,stroke:#0d2137
+    style I fill:#1a3a5c,color:#ffffff,stroke:#0d2137
+    style M fill:#1a3a5c,color:#ffffff,stroke:#0d2137
+
+    style F fill:#4a3f6b,color:#ffffff,stroke:#2e2650
+    style J fill:#4a3f6b,color:#ffffff,stroke:#2e2650
+    style N fill:#4a3f6b,color:#ffffff,stroke:#2e2650
 ```
 
 Composite filaments—polymers reinforced with glass, carbon, or aramid fibers—fundamentally alter mechanical properties and printing behavior. Short-fiber composites with 10–30% filler content by weight increase tensile modulus by 2–4× and reduce thermal expansion by 40–60%, but introduce profound nozzle wear. Brass nozzles degrade visibly after 5–10 kg of glass-filled material, while hardened steel or ruby-tipped nozzles extend service life by 50–100×. Carbon fiber composites achieve exceptional specific stiffness (stiffness-to-weight ratio) but conduct electricity, creating ESD hazards and RF shielding characteristics. Fiber orientation follows extrusion paths, generating orthotropic material properties where strength and stiffness along print paths far exceed properties across paths. Strategic toolpath orientation becomes a critical design parameter: a cantilever beam printed with fibers aligned along the span achieves 3–5× greater bending stiffness than identical geometry with perpendicular fiber orientation.

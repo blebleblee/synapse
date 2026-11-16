@@ -16,20 +16,14 @@ These invariants have a practical consequence that defines the entire workflow o
 
 The NES and SNES execute a game loop synchronized to the video hardware's vertical blanking interval. On NTSC hardware, this loop runs at approximately 60 frames per second (59.94 for the NES, 60.10 for the SNES), meaning each frame occupies roughly 16.67 milliseconds. The frame begins when the Picture Processing Unit (PPU) raises a Non-Maskable Interrupt (NMI) at the start of VBlank. The NMI handler performs time-critical operations that can only occur while the PPU is not actively rendering: copying shadow OAM (sprite attribute data) to the OAM registers, updating VRAM with scroll positions and tilemap changes, and, in most games, reading the controller state. Control then returns to the main game loop, which executes the actual game logic: physics integration, collision detection, entity AI, sound engine updates, and rendering preparation for the next frame.
 
-```
-  NMI Handler                Main Game Loop
- ┌──────────────────┐      ┌─────────────────────────────────┐
- │ 1. Push regs     │      │ 1. Read game phase              │
- │ 2. Copy OAM      │      │ 2. Process player physics       │
- │ 3. Update VRAM   │      │ 3. Run collision detection      │
- │ 4. Read joypad   │◄─────│ 4. Update entity AI             │
- │ 5. Pop regs, RTI │      │ 5. Advance RNG                  │
- └──────────────────┘      │ 6. Prepare next frame's render  │
-        ▲                   │ 7. Wait for NMI                 │
-        │                   └────────────┬────────────────────┘
-        │                                │
-        └────────── NMI fires ───────────┘
-                    (~16.67 ms / frame)
+```mermaid
+flowchart TD
+    NMI["NMI Handler<br/>1. Push regs<br/>2. Copy OAM<br/>3. Update VRAM<br/>4. Read joypad<br/>5. Pop regs, RTI"]
+    
+    MainLoop["Main Game Loop<br/>1. Read game phase<br/>2. Process player physics<br/>3. Run collision detection<br/>4. Update entity AI<br/>5. Advance RNG<br/>6. Prepare next frame's render<br/>7. Wait for NMI"]
+    
+    MainLoop -->|"NMI fires<br/>(~16.67 ms / frame)"| NMI
+    NMI -.->|"Return"| MainLoop
 ```
 
 The critical detail for frame-perfect execution is the controller read sequence. On the NES, the controller's internal shift register is latched by writing a 1 then a 0 to bit 0 of the joypad register at `$4016` (player 1) or `$4017` (player 2). This strobe tells the controller to freeze its current button state into the shift register. Each subsequent read of the register shifts out one bit, representing one button in a fixed hardware-determined order:
@@ -84,26 +78,26 @@ hRandomSub = (hRandomSub - rDIV) mod 256
 
 Because `rDIV` is a free-running hardware counter, its value at any given VBlank depends on the exact number of CPU cycles that elapsed since the last write to `rDIV` (which resets it to zero). In normal play, the cycle count varies based on game state, entity count, and player input, producing effective randomness. But in a controlled environment—a TAS or a savestate-assisted manipulation—the cycle count is deterministic. If you perform the same sequence of inputs on the same frames, `rDIV` will have the same value at each VBlank, and the RNG will advance through the same sequence of states. This means that by controlling the number of frames that pass before triggering a random event (a wild encounter, a critical hit, a slot machine spin), you control the RNG state at the moment the event is evaluated, and therefore the outcome.
 
-```
- ┌─────────────────────────────────────────────────────┐
- │              RNG State (per frame)                  │
- │                                                     │
- │  hRandomAdd ($FFD3)  ◄── +rDIV ($FF04) ──┐          │
- │  hRandomSub ($FFD4)  ◄── -rDIV ($FF04) ──┤          │
- │                                          │          │
- │         VBlank fires every frame          │          │
- │         rDIV value depends on             │          │
- │         cycle count since last             │          │
- │         write to $FF04                     │          │
- └──────────────────────────────────────────┼──────────┘
-                                            │
-                           ┌────────────────┴───────┐
-                           │ Game requests RNG       │
-                           │ (encounter check,       │
-                           │  damage roll, etc.)     │
-                           │ Reads hRandomAdd or     │
-                           │ hRandomSub              │
-                           └────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph rng_state ["RNG State Per Frame"]
+        hRandomAdd["hRandomAdd<br/>($FFD3)"]
+        hRandomSub["hRandomSub<br/>($FFD4)"]
+    end
+    
+    rDIV_pos["rDIV ($FF04)<br/>Addition"]
+    rDIV_neg["rDIV ($FF04)<br/>Subtraction"]
+    
+    vblank["VBlank fires every frame<br/>rDIV value depends on<br/>cycle count since last<br/>write to $FF04"]
+    
+    game_request["Game requests RNG<br/>encounter check,<br/>damage roll, etc.<br/>Reads hRandomAdd or<br/>hRandomSub"]
+    
+    rDIV_pos -->|"+"| hRandomAdd
+    rDIV_neg -->|"-"| hRandomSub
+    vblank --> rDIV_pos
+    vblank --> rDIV_neg
+    hRandomAdd --> game_request
+    hRandomSub --> game_request
 ```
 
 The practical workflow for RNG manipulation follows directly from this structure. First, identify the RNG state address in RAM using memory scanning (described in section 2.5). Second, identify the game event that calls the RNG—the encounter check, the damage calculation, the item drop roll—and determine which RNG byte or bytes it reads. Third, create a savestate at a point before the event. Fourth, advance frames one at a time, monitoring the RNG state in the emulator's hex editor or RAM watch, until the RNG reaches a value that produces the desired outcome when the event fires. Fifth, note the exact frame count from the savestate to the target frame, and execute the sequence with frame-perfect timing. This works because the RNG advances predictably every frame, so the number of frames of waiting between the savestate and the event trigger directly selects which RNG value the event sees.
@@ -114,28 +108,40 @@ Most NES and SNES platformers implement collision detection through tile-based p
 
 Super Mario World (SNES) illustrates this architecture precisely. Mario's interaction hitbox is defined relative to his position at addresses `$7E0094`–`$7E0097` (X and Y position, each 16 bits). The collision routine checks specific offsets: the left edge at a configurable offset from center, the right edge at another offset, the top at one or two points, and the bottom at one or two points. The game processes horizontal collision first—applying the player's X speed to the position register, then checking side collision points—followed by vertical collision—applying Y speed and checking top and bottom points.
 
-```
-     Solid Block (16×16 tile)
-      ┌──────────┐
-      │  ▓▓▓▓▓▓  │
-      │  ▓▓▓▓▓▓  │
-      └──────────┘
-        ▲
-        │  Corner clip occurs here:
-        │  top-left check point enters block
-        │  while left-side check point has
-        │  already passed the block edge
-
-   Mario's Hitbox
-  ┌─────────────────┐
-  │ ●───────●       │ ← Top check points
-  │ │       │       │
-  │ │       │       │   ● = collision sample points
-  │ │       │       │   The game checks the tile at
-  │ │       │       │   each ● against the collision map.
-  │ ●───────●       │ ← Bottom check points
-  └─────────────────┘
-   ←── Moving left at high speed
+```mermaid
+flowchart TD
+    subgraph solidBlock["Solid Block (16×16 tile)"]
+        blockContent["████████<br/>████████"]
+    end
+    
+    subgraph marioHitbox["Mario's Hitbox"]
+        topLeft["● Top-Left"]
+        topRight["● Top-Right"]
+        bottomLeft["● Bottom-Left"]
+        bottomRight["● Bottom-Right"]
+        
+        topLeft ---|"check points"| topRight
+        bottomLeft ---|"check points"| bottomRight
+        topLeft ---|"left side"| bottomLeft
+        topRight ---|"right side"| bottomRight
+    end
+    
+    movement["◄── Moving left at high speed"]
+    
+    cornerClip["Corner Clip Condition:<br/>Top-left check point enters block<br/>while left-side check point has<br/>already passed the block edge"]
+    
+    collisionCheck["Game checks tile at each ●<br/>against collision map"]
+    
+    movement --> marioHitbox
+    marioHitbox --> collisionCheck
+    topLeft -.->|"enters block"| solidBlock
+    bottomLeft -.->|"already passed edge"| solidBlock
+    solidBlock --> cornerClip
+    
+    style solidBlock fill:#666,stroke:#333,color:#fff
+    style cornerClip fill:#ff9,stroke:#f80,color:#000
+    style collisionCheck fill:#9cf,stroke:#06c,color:#000
+    style movement fill:#fff,stroke:#333,color:#000
 ```
 
 The corner clip exploit in Super Mario World exploits a gap in this sampling scheme. When Mario moves left at high speed (X speed of −48 subpixels per frame or greater, corresponding to approximately −0.1875 pixels per frame in the game's fixed-point representation), the horizontal collision check samples the tile at Mario's left edge after applying his speed. If Mario's Y position is precisely aligned so that the left-side collision check point has moved past the block's left edge but the top-left collision check point is inside the block's bottom row, the horizontal check finds no collision (the check point is in an empty tile) while the subsequent vertical check detects Mario's head inside a solid block. The game's correction logic then snaps Mario upward to the top of the detected block, effectively teleporting him through the solid tile. This is not a bug in the collision code—the code correctly checks the designated sample points and correctly applies the correction for the detected collision. The glitch arises because the sample points do not form a continuous boundary, so there exists a geometric configuration where the point set straddles a block corner in a way the developers did not anticipate.
@@ -146,33 +152,35 @@ The exact conditions for a left corner clip in SMW are: Mario's X speed must be 
 
 Retro game physics engines use fixed-point arithmetic rather than floating-point, because the CPUs lack hardware floating-point units and fixed-point operations are faster and more deterministic. In Super Mario World, player position is stored as a 16-bit value per axis, where the high byte represents the pixel coordinate and the low byte represents the subpixel fraction (1/256 of a pixel). Speed is likewise stored as a 16-bit signed value in subpixels per frame.
 
-```
- Position register (16-bit):  $01 2F
- ┌────────┬─────────────────┐
- │  $01   │      $2F        │
- │ Pixel  │    Subpixel     │
- │ = 1 px │  = 47/256 px   │
- └────────┴─────────────────┘
+```mermaid
+flowchart TD
+    subgraph pos_reg ["Position Register (16-bit): $012F"]
+        pos_hi["$01\nPixel\n= 1 px"]
+        pos_lo["$2F\nSubpixel\n= 47/256 px"]
+        pos_hi --- pos_lo
+    end
 
- Speed register (16-bit signed): $FF E0
- ┌────────┬─────────────────┐
- │  $FF   │      $E0        │
- │ = -1px │  = -32/256 px   │
- │  /frame│   /frame        │
- └────────┴─────────────────┘
- Effective speed: -(256 + 224)/256 = -0.875 px/frame... 
- Actually: $FFE0 as signed 16-bit = -32 subpx/frame
-          = -32/256 = -0.125 px/frame
+    subgraph spd_reg ["Speed Register (16-bit signed): $FFE0"]
+        spd_hi["$FF\n= −1 px/frame"]
+        spd_lo["$E0\n= −32/256 px/frame"]
+        spd_hi --- spd_lo
+        spd_note["Signed 16-bit: $FFE0 = −32 subpx/frame\n= −32/256 = −0.125 px/frame"]
+        spd_lo --- spd_note
+    end
 
- After 1 frame: position += speed
- $012F + $FFE0 = $010F (with carry/borrow)
- ┌────────┬─────────────────┐
- │  $01   │      $0F        │
- │ Pixel  │    Subpixel     │
- │ = 1 px │  = 15/256 px   │
- └────────┴─────────────────┘
- Pixel position unchanged: speed didn't accumulate
- enough to cross the subpixel→pixel boundary.
+    add_op["$012F + $FFE0 = $010F\nposition += speed (after 1 frame)"]
+
+    subgraph result_reg ["Result Position Register (16-bit): $010F"]
+        res_hi["$01\nPixel\n= 1 px"]
+        res_lo["$0F\nSubpixel\n= 15/256 px"]
+        res_hi --- res_lo
+        res_note["Pixel position unchanged:\nspeed did not accumulate enough\nto cross the subpixel → pixel boundary"]
+        res_lo --- res_note
+    end
+
+    pos_reg --> add_op
+    spd_reg --> add_op
+    add_op --> result_reg
 ```
 
 This subpixel precision has profound implications for glitch execution. The visible pixel position of the player is the high byte of the position register, but collision detection and movement physics operate on the full 16-bit value. Two game states that look identical on screen—same pixel position, same animation frame, same apparent speed—can have different subpixel values, leading to different collision outcomes, different distances traveled, and different RNG advancement paths. A corner clip that works when the subpixel Y position is `$2F` may fail when it is `$30`, because the 1-pixel difference in the fractional position shifts the collision check points relative to the block boundary.

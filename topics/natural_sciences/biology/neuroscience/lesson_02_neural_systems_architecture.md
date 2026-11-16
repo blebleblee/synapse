@@ -34,31 +34,38 @@ where $k_l$ and $k_v$ are length and velocity sensitivity coefficients respectiv
 
 The pattern-generating circuitry for rhythmic locomotion resides in spinal interneuron networks known as central pattern generators (CPGs), located primarily in lumbar segments. CPGs produce alternating flexor-extensor activity without requiring continuous supraspinal input, as demonstrated by the classic spinalized cat preparations of Sherrington and later Graham Brown. These networks operate through half-center oscillator principles, where mutually inhibitory interneuron populations alternate dominance through a combination of synaptic inhibition, post-inhibitory rebound, and intrinsic membrane currents.
 
-```
-SPINAL REFLEX CIRCUIT TOPOLOGY
-================================
-
-Dorsal Root          Ia Afferent (Spindle)
-(Sensory Input)             │
-                            ▼
-                   ┌────────────────────┐
-Lamina I-II:       │   Nociceptive Relay │  ──► Spinothalamic Tract
-                   └────────────────────┘
-                            │
-Lamina V:          ┌────────────────────┐
-                   │  Wide Dynamic Range │  ──► Referred Pain Circuitry
-                   └────────────────────┘
-                            │
-Lamina IX:         ┌────────────────────┐
-(Ventral Horn)     │  α-Motor Neuron    │  ──► Neuromuscular Junction
-                   └─────────┬──────────┘
-                             │
-                        Ia Inhibitory
-                        Interneuron
-                             │
-                             ▼
-                    Antagonist Motor Pool
-                    (Reciprocal Inhibition)
+```mermaid
+flowchart TD
+    DorsalRoot["Dorsal Root<br/>(Sensory Input)"]
+    IaAfferent["Ia Afferent<br/>(Spindle)"]
+    
+    subgraph LaminaI_II ["Lamina I-II"]
+        NociceptiveRelay["Nociceptive Relay"]
+    end
+    
+    subgraph LaminaV ["Lamina V"]
+        WDR["Wide Dynamic Range"]
+    end
+    
+    subgraph LaminaIX ["Lamina IX<br/>(Ventral Horn)"]
+        AlphaMotor["α-Motor Neuron"]
+    end
+    
+    SpinThal["Spinothalamic Tract"]
+    ReferredPain["Referred Pain Circuitry"]
+    NMJ["Neuromuscular Junction"]
+    IaInhib["Ia Inhibitory<br/>Interneuron"]
+    AntagonistPool["Antagonist Motor Pool<br/>(Reciprocal Inhibition)"]
+    
+    DorsalRoot --> IaAfferent
+    IaAfferent --> NociceptiveRelay
+    NociceptiveRelay --> SpinThal
+    IaAfferent --> WDR
+    WDR --> ReferredPain
+    IaAfferent --> AlphaMotor
+    AlphaMotor --> NMJ
+    AlphaMotor --> IaInhib
+    IaInhib --> AntagonistPool
 ```
 
 ### Brainstem Control Systems
@@ -83,31 +90,20 @@ Each specific relay nucleus maintains a reciprocal, topographically organized pr
 
 The thalamic reticular nucleus (TRN) deserves particular attention because it is the substrate of attentional gating. TRN neurons receive collateral inputs from both thalamocortical and corticothalamic axons — sitting at the intersection of ascending and descending pathways — and project inhibitory synapses exclusively onto thalamic relay neurons. When a cortical region engages in selective attention, it sends enhanced descending drive to the corresponding TRN sector, which in turn inhibits competing thalamic relay neurons, suppressing irrelevant sensory streams. This circuit implements attentional selection at the earliest possible stage, before information reaches cortex, minimizing the metabolic cost of processing distractors.
 
-```
-THALAMOCORTICAL RELAY CIRCUIT
-===============================
-
-Sensory Periphery
-      │
-      ▼
-  Specific Relay Nucleus
-  (LGN / MGN / VPN)
-      │            ▲
-      │  Excitatory │ Corticothalamic
-      │  projection │ feedback (Layer VI)
-      ▼            │
-  Cortical Layer IV ──────────────────────┐
-  (Thalamorecipient)                      │
-                                          │
-      ┌─────────────────────────────────┐ │
-      │  Thalamic Reticular Nucleus     │ │
-      │  (Inhibitory, GABAergic)        │◄┘
-      │  Collaterals from both paths    │
-      └──────────────┬──────────────────┘
-                     │ Lateral inhibition
-                     ▼
-              Competing Relay Nuclei
-              (Attentional suppression)
+```mermaid
+flowchart TD
+    A["Sensory Periphery"]
+    B["Specific Relay Nucleus<br/>(LGN / MGN / VPN)"]
+    C["Cortical Layer IV<br/>(Thalamorecipient)"]
+    D["Thalamic Reticular Nucleus<br/>(Inhibitory, GABAergic)<br/>Collaterals from both paths"]
+    E["Competing Relay Nuclei<br/>(Attentional suppression)"]
+    
+    A -->|"Excitatory projection"| B
+    B -->|"Excitatory projection"| C
+    C -->|"Corticothalamic feedback<br/>Layer VI"| B
+    C -->|"Collateral input"| D
+    B -->|"Collateral input"| D
+    D -->|"Lateral inhibition"| E
 ```
 
 The corticothalamic projection from cortical layer VI is quantitatively the dominant input to thalamic relay nuclei — it vastly outnumbers the ascending sensory drive in terms of synapse number. This anatomical asymmetry is the structural basis for the claim that thalamic neurons are more accurately described as cortically modulated than as simple sensory relays. The implication for functional imaging researchers is significant: BOLD signal changes in thalamic nuclei during cognitive tasks may reflect top-down modulation as much as bottom-up sensory processing.

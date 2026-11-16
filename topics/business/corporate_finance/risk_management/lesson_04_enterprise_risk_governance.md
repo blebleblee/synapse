@@ -32,40 +32,34 @@ This three-layer architecture makes the risk appetite statement a capital alloca
 
 The governance architecture of an ERM system is most clearly understood through the Three Lines of Defense model, which has become the standard organizational framework endorsed by regulators in banking, insurance, and increasingly in publicly listed corporates under SEC and FCA guidance.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        BOARD & AUDIT COMMITTEE                  │
-│                     Risk Committee  |  Remuneration Committee   │
-└────────────────────────────┬────────────────────────────────────┘
-                             │ Oversight & Challenge
-┌────────────────────────────▼────────────────────────────────────┐
-│                    EXECUTIVE MANAGEMENT (CEO / CFO / CRO)        │
-│               Group Risk Appetite  |  Capital Allocation         │
-└──────────┬─────────────────────────────────────┬────────────────┘
-           │                                     │
-           ▼                                     ▼
-┌─────────────────────┐             ┌────────────────────────────┐
-│   FIRST LINE        │             │   SECOND LINE              │
-│   Business Owners   │             │   Risk & Compliance        │
-│                     │             │                            │
-│  • P&L managers     │             │  • Enterprise Risk Mgmt    │
-│  • Treasury dealing │             │  • Credit Risk Policy      │
-│  • Underwriting     │   ◄──────►  │  • Market Risk Analytics   │
-│  • M&A execution    │  Challenge  │  • Regulatory Compliance   │
-│  • Product pricing  │             │  • Legal & General Counsel │
-└─────────────────────┘             └────────────────────────────┘
-           │                                     │
-           └──────────────┬──────────────────────┘
-                          ▼
-           ┌──────────────────────────┐
-           │       THIRD LINE         │
-           │    Internal Audit        │
-           │                          │
-           │  • ERM design adequacy   │
-           │  • Control effectiveness │
-           │  • Process compliance    │
-           │  • Board reporting       │
-           └──────────────────────────┘
+```mermaid
+flowchart TD
+    Board["<b>BOARD & AUDIT COMMITTEE</b><br/>Risk Committee | Remuneration Committee"]
+    
+    Board -->|"Oversight & Challenge"| Exec["<b>EXECUTIVE MANAGEMENT (CEO / CFO / CRO)</b><br/>Group Risk Appetite | Capital Allocation"]
+    
+    Exec --> FirstLine
+    Exec --> SecondLine
+    
+    subgraph FirstLine ["FIRST LINE - Business Owners"]
+        FL1["• P&L managers<br/>• Treasury dealing<br/>• Underwriting<br/>• M&A execution<br/>• Product pricing"]
+    end
+    
+    subgraph SecondLine ["SECOND LINE - Risk & Compliance"]
+        SL1["• Enterprise Risk Mgmt<br/>• Credit Risk Policy<br/>• Market Risk Analytics<br/>• Regulatory Compliance<br/>• Legal & General Counsel"]
+    end
+    
+    FirstLine <-->|Challenge| SecondLine
+    
+    FirstLine --> ThirdLine
+    SecondLine --> ThirdLine
+    
+    subgraph ThirdLine ["THIRD LINE - Internal Audit"]
+        TL1["• ERM design adequacy<br/>• Control effectiveness<br/>• Process compliance<br/>• Board reporting"]
+    end
+    
+    style Board fill:#e1f5ff,stroke:#333,stroke-width:2px
+    style Exec fill:#fff4e1,stroke:#333,stroke-width:2px
 ```
 
 The first line consists of business owners — the people making commercial decisions that create, transform, and consume risk daily. They own the risk; they are the ones entering contracts, extending credit, pricing products, and committing capital. The second line consists of independent risk and compliance functions whose mandate is to design the measurement framework, set policy limits, challenge first-line assumptions, and aggregate risk exposures into a firm-wide picture. The CRO sits at the top of the second line, with direct access to the board's Risk Committee independent of the CEO. This independence is structural, not political: without it, the second line becomes a decoration rather than a genuine counterweight to revenue pressure. The third line, internal audit, provides independent assurance that both the first and second lines are functioning as designed. Internal audit does not own risk and does not set policy; it assesses whether the system of controls is properly designed and operating effectively.

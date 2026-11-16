@@ -69,46 +69,21 @@ Configuration merging within a single plugin's stanza follows standard JSON sema
 
 The sequence of events from pod scheduling to network reachability involves at least four independent processes: the kubelet, containerd (or CRI-O), the CNI binary, and any background daemon the CNI plugin depends on. Understanding the precise handoff points is essential for attributing failures correctly.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         Kubernetes Node                             │
-│                                                                     │
-│  ┌──────────┐    gRPC/CRI     ┌───────────────────────────────┐    │
-│  │  kubelet │ ─────────────► │       containerd (shim)        │    │
-│  │          │ ◄───────────── │                                │    │
-│  └──────────┘  PodSandboxID  │  1. Create netns               │    │
-│                              │  2. exec CNI binary (ADD)      │    │
-│                              │     stdin: conflist + args     │    │
-│                              │     env: CNI_CONTAINERID       │    │
-│                              │          CNI_NETNS             │    │
-│                              │          CNI_IFNAME=eth0       │    │
-│                              │          CNI_COMMAND=ADD       │    │
-│                              │  3. Read stdout (Result JSON)  │    │
-│                              └──────────┬────────────────────┘    │
-│                                         │ fork/exec                │
-│                                         ▼                          │
-│                              ┌──────────────────────┐             │
-│                              │   CNI Plugin Binary   │             │
-│                              │  (e.g. /opt/cni/bin/  │             │
-│                              │        calico)        │             │
-│                              │                       │             │
-│                              │  reads API server     │             │
-│                              │  programs veth pair   │             │
-│                              │  calls IPAM plugin    │             │
-│                              │  writes routes        │             │
-│                              └──────────┬────────────┘             │
-│                                         │ Unix socket / local file │
-│                                         ▼                          │
-│                              ┌──────────────────────┐             │
-│                              │  Background Daemon    │             │
-│                              │  (felix / flanneld /  │             │
-│                              │   cilium-agent)       │             │
-│                              │                       │             │
-│                              │  programs iptables    │             │
-│                              │  programs routes      │             │
-│                              │  syncs policy state   │             │
-│                              └──────────────────────┘             │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph node["Kubernetes Node"]
+        kubelet["kubelet"]
+        containerd["containerd (shim)"]
+        cni["CNI Plugin Binary\n(e.g. /opt/cni/bin/calico)"]
+        daemon["Background Daemon\n(felix / flanneld / cilium-agent)"]
+
+        kubelet -- "gRPC/CRI" --> containerd
+        containerd -- "PodSandboxID" --> kubelet
+
+        containerd -- "fork/exec\n\n1. Create netns\n2. exec CNI binary (ADD)\n   stdin: conflist + args\n   env: CNI_CONTAINERID\n        CNI_NETNS\n        CNI_IFNAME=eth0\n        CNI_COMMAND=ADD\n3. Read stdout (Result JSON)" --> cni
+
+        cni -- "Unix socket / local file\n\nreads API server\nprograms veth pair\ncalls IPAM plugin\nwrites routes" --> daemon
+    end
 ```
 
 The critical insight this diagram conveys is that the CNI binary execution is **synchronous and blocking** from containerd's perspective. Containerd will not return the `RunPodSandbox` response to kubelet until the CNI ADD either succeeds or fails. The timeout for this operation is controlled by the runtime — containerd uses a 50-second deadline by default, configurable via the CNI configuration's `timeout` field. If your plugin takes longer than that to allocate an IP (because, say, the IPAM backend is an etcd cluster experiencing elevated latency), containerd will kill the plugin subprocess and report a timeout error to kubelet. Kubelet will then attempt to delete the sandbox, calling CNI DEL — but since ADD never completed, the DEL may find no state to clean up and return success, leaving a dangling netns on disk.

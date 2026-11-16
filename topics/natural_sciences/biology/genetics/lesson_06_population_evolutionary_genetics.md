@@ -193,34 +193,56 @@ where $f(AB)$ is the observed frequency of the $AB$ haplotype. Under random mati
 
 The normalized measure $r^2 = D^2 / (p_A p_a p_B p_b)$ ranges from 0 (no LD) to 1 (complete LD, one haplotype is absent from the population). It is the standard metric used in GWAS power calculations and in constructing haplotype blocks for genotype imputation.
 
-```
-Linkage Disequilibrium Decay and Haplotype Structure
-======================================================
-
-Locus A ——————•————————————————•—————— Locus B
-              |                |
-         Recombination rate r per generation
-
-LD decay:  D_t = D_0 × (1 - r)^t
-
-r = 0.01 (1 cM):   D halved after ~69 generations
-r = 0.5  (unlinked): D halved after ~1 generation
-
-Haplotype blocks in human genome:
-  High LD regions:   Low recombination, recent bottlenecks
-  Recombination hotspots: LD boundaries, block boundaries
-
-LD matrix across a genomic region:
-  
-  SNP1  SNP2  SNP3  SNP4  SNP5
-  ┌────┬─────┬─────┬─────┬─────┐
-  │ 1.0│ 0.95│ 0.87│ 0.12│ 0.08│  SNP1
-  │    │ 1.0 │ 0.90│ 0.15│ 0.11│  SNP2
-  │    │     │ 1.0 │ 0.09│ 0.07│  SNP3  ← recombination hotspot
-  │    │     │     │ 1.0 │ 0.92│  SNP4
-  │    │     │     │     │ 1.0 │  SNP5
-  └────┴─────┴─────┴─────┴─────┘
-  |←— Block 1 —→|   |← Block 2→|
+```mermaid
+flowchart TD
+    Title["<b>Linkage Disequilibrium Decay and Haplotype Structure</b>"]
+    
+    subgraph Loci["Loci and Recombination"]
+        LocusA["Locus A"]
+        LocusB["Locus B"]
+        Recom["Recombination rate r<br/>per generation"]
+        LocusA -.->|distance| Recom
+        Recom -.->|distance| LocusB
+    end
+    
+    subgraph Decay["LD Decay Formula"]
+        Formula["D<sub>t</sub> = D<sub>0</sub> × (1 - r)<sup>t</sup>"]
+    end
+    
+    subgraph Examples["Decay Examples"]
+        Ex1["r = 0.01 (1 cM)<br/>D halved after ~69 generations"]
+        Ex2["r = 0.5 (unlinked)<br/>D halved after ~1 generation"]
+    end
+    
+    subgraph HapBlocks["Haplotype Blocks in Human Genome"]
+        HighLD["<b>High LD regions</b><br/>Low recombination<br/>Recent bottlenecks"]
+        RecombHotspot["<b>Recombination hotspots</b><br/>LD boundaries<br/>Block boundaries"]
+    end
+    
+    subgraph Matrix["LD Matrix Across Genomic Region"]
+        MatrixHeader["SNP1  SNP2  SNP3 | SNP4  SNP5"]
+        Row1["SNP1: 1.0   0.95  0.87 | 0.12  0.08"]
+        Row2["SNP2:       1.0   0.90 | 0.15  0.11"]
+        Row3["SNP3:             1.0  | 0.09  0.07"]
+        Hotspot["← Recombination hotspot"]
+        Row4["SNP4:                  | 1.0   0.92"]
+        Row5["SNP5:                  |       1.0"]
+        Blocks["Block 1: SNP1-SNP3  |  Block 2: SNP4-SNP5"]
+        
+        MatrixHeader --> Row1
+        Row1 --> Row2
+        Row2 --> Row3
+        Row3 --> Hotspot
+        Hotspot --> Row4
+        Row4 --> Row5
+        Row5 --> Blocks
+    end
+    
+    Title --> Loci
+    Loci --> Decay
+    Decay --> Examples
+    Examples --> HapBlocks
+    HapBlocks --> Matrix
 ```
 
 ### Population Structure and F-Statistics
@@ -245,53 +267,49 @@ The practical workflow of population genetics begins with raw genomic data — t
 
 **Principal Component Analysis of Genomic Variation** is the first exploratory analysis in any new dataset, and it is interpretable directly in terms of population structure. PCA of a genotype matrix, where rows are individuals and columns are biallelic SNP genotypes coded as 0, 1, or 2, decomposes variation into orthogonal axes. The first few principal components capture the strongest axes of population differentiation in the data. Using PLINK for LD-pruning before PCA is essential: because LD causes nearby SNPs to be correlated, an LD-pruned set of approximately independent markers (typically produced by pruning windows of 50 SNPs with step size 10 and $r^2$ threshold 0.1) prevents genomic regions of extended LD from dominating the PCA axes.
 
-```
-Population Genomics Pipeline: Core Architecture
-================================================
+```mermaid
+flowchart TD
+    FASTQ["Raw FASTQ reads"]
+    BWA["BWA-MEM alignment"]
+    BAM["BAM files (per sample)"]
+    HC["GATK HaplotypeCaller"]
+    GVCF["Per-sample GVCFs"]
+    GDBIMPORT["GATK GenomicsDBImport + GenotypeGVCFs"]
+    MVCF["Multi-sample VCF"]
 
-  Raw FASTQ reads
-       |
-       v
-  [BWA-MEM alignment]  →  BAM files (per sample)
-       |
-       v
-  [GATK HaplotypeCaller]  →  per-sample GVCFs
-       |
-       v
-  [GATK GenomicsDBImport + GenotypeGVCFs]  →  Multi-sample VCF
-       |
-       v
-  [Quality Control]
-     • Min depth: DP >= 8 per sample
-     • Genotype quality: GQ >= 20
-     • Missing data: < 20% per site
-     • Strand bias: FS < 60
-     • MAF filter: MAF > 0.01 for most analyses
-       |
-       v
-  [LD Pruning — PLINK]
-     --indep-pairwise 50 10 0.1
-       |
-       ┌────────────────────────────────────┐
-       v                                    v
-  [PCA — PLINK/EIGENSOFT]           [Admixture — ADMIXTURE/fastSTRUCTURE]
-  Population structure visualization  Ancestry proportions (K clusters)
-       |                                    |
-       └────────────┬───────────────────────┘
-                    v
-         [F-statistics — VCFtools/ANGSD]
-         FST per locus, genome-wide averages
-                    |
-                    v
-         [Selection Scans]
-         • FST outliers (BayPass/BayeScan)
-         • Extended haplotype homozygosity (selscan/rehh)
-         • Tajima's D, Fu & Li's statistics (ANGSD)
-                    |
-                    v
-         [Demographic Modeling]
-         • Site frequency spectrum fitting (∂a∂i/moments/fastsimcoal2)
-         • Coalescent simulation (msprime/SLiM)
+    subgraph QC ["Quality Control"]
+        QC_NODE["DP ≥ 8 per sample · GQ ≥ 20 · Missing data < 20% per site · FS < 60 · MAF > 0.01"]
+    end
+
+    LD["LD Pruning — PLINK\n--indep-pairwise 50 10 0.1"]
+
+    PCA["PCA — PLINK / EIGENSOFT\nPopulation structure visualization"]
+    ADM["Admixture — ADMIXTURE / fastSTRUCTURE\nAncestry proportions (K clusters)"]
+
+    FST["F-statistics — VCFtools / ANGSD\nFST per locus · genome-wide averages"]
+
+    subgraph SEL ["Selection Scans"]
+        SEL_NODE["FST outliers (BayPass / BayeScan)\nExtended haplotype homozygosity (selscan / rehh)\nTajima's D · Fu & Li's statistics (ANGSD)"]
+    end
+
+    subgraph DEM ["Demographic Modeling"]
+        DEM_NODE["Site frequency spectrum fitting (∂a∂i / moments / fastsimcoal2)\nCoalescent simulation (msprime / SLiM)"]
+    end
+
+    FASTQ --> BWA
+    BWA --> BAM
+    BAM --> HC
+    HC --> GVCF
+    GVCF --> GDBIMPORT
+    GDBIMPORT --> MVCF
+    MVCF --> QC
+    QC --> LD
+    LD --> PCA
+    LD --> ADM
+    PCA --> FST
+    ADM --> FST
+    FST --> SEL
+    SEL --> DEM
 ```
 
 ### Selection Scans: Methods and Their Failure Modes

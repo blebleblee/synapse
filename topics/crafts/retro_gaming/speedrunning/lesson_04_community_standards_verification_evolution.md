@@ -28,31 +28,20 @@ The game-specific Discord server is architecturally parallel to and often more a
 
 The timing infrastructure is a separate layer. LiveSplit is the near-universal split timer for PC-based timing, and its `.lss` split file format is an XML document containing split names, segment best times, and comparison data. The community-maintained LiveSplit.org component ecosystem extends the base timer with game-specific auto-splitters — Lua or C# scripts that read memory addresses from an emulator process or a connected console capture and trigger splits automatically. An auto-splitter for a Super Nintendo game running on SNES9x, for example, reads the game's RAM at addresses corresponding to room transitions, boss death flags, or inventory states, and fires a split event when the target value changes. Writing and maintaining these scripts is skilled technical work that falls squarely in the domain of the advanced practitioner.
 
-```
-LiveSplit Data Flow (SNES Example)
-────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    ROM["Game ROM on SNES9x"]
+    ASS["Auto-Splitter Script (Lua/C#)"]
+    API["LiveSplit Component API"]
+    UI["LiveSplit UI"]
+    OBS["Capture Card / OBS Scene"]
 
-  [Game ROM on SNES9x]
-        │
-        │  Memory-mapped RAM exposed via
-        │  SNES9x Named Pipes / Shared Memory
-        ▼
-  [Auto-Splitter Script (Lua/C#)]
-        │  Polls address 0x7E0000 + offset
-        │  at ~60 Hz refresh cadence
-        │  Compares byte value to split trigger
-        ▼
-  [LiveSplit Component API]
-        │  Fires Split(), StartTimer(), Reset()
-        │  events on condition match
-        ▼
-  [LiveSplit UI]
-        │  Renders segment time, delta,
-        │  sum of best, pace comparison
-        ▼
-  [Capture Card OBS Scene]
-        Composite: game feed + timer overlay
-        → VOD / Submission proof
+    ROM -->|"Memory-mapped RAM via\nSNES9x Named Pipes / Shared Memory"| ASS
+    ASS -->|"Polls 0x7E0000 + offset at ~60 Hz\nCompares byte value to split trigger"| API
+    API -->|"Fires Split(), StartTimer(), Reset()\non condition match"| UI
+    UI -->|"Renders segment time, delta,\nsum of best, pace comparison"| OBS
+
+    OBS["Capture Card / OBS Scene\n─────────────────────────\nComposite: game feed + timer overlay\n→ VOD / Submission proof"]
 ```
 
 For console runners, the hardware chain is more physically grounded. The canonical setup pairs a region-matched console (e.g., an NTSC-U NES for North American category records) with a capture card feeding into OBS on a sidecar laptop. The timer runs on the laptop display or a secondary monitor, never on the game feed itself, to avoid any perception that the timer could be manipulated independently of gameplay. High-precision categories sometimes use a hardware-synced timer (the original Koop timer concept, now largely superseded by software solutions) to eliminate the inter-frame ambiguity introduced by software timing latency. For games where the winning margin between world records is measured in a handful of frames, this matters.

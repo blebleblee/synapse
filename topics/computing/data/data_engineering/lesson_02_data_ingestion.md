@@ -239,3 +239,4 @@ SELECT
     payload->>'action' AS action
 FROM raw_events
 WHERE payload->>'action' = 'click';
+```

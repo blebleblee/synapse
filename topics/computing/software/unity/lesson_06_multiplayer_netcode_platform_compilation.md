@@ -42,55 +42,36 @@ Cross-compilation challenges include endianness handling, structure padding and 
 
 The network transport layer forms the lowest abstraction above raw socket I/O, providing unreliable and reliable ordered channels, connection management, and bandwidth shaping. Unity's Transport package implements these primitives via platform-specific backends: UDP sockets on standalone platforms, WebRTC Data Channels for WebGL (to bypass browser socket restrictions), and platform SDKs for consoles. The transport's internal architecture revolves around pipeline stages that transform outbound messages through sequencing, fragmentation, acknowledgment tracking, and packet assembly, then reverse the process for inbound packets.
 
-```
-Transport Pipeline Architecture:
+```mermaid
+flowchart TD
+    APP["Application Layer\n(Netcode for GameObjects)"]
+    SEND["INetworkDriver.Send(ConnectionId, ...)"]
+    REL["Reliable Channel"]
+    UNREL["Unreliable Channel"]
 
-Application Layer (Netcode for GameObjects)
-         |
-         | INetworkDriver.Send(ConnectionId, ...)
-         v
-    +------------------+
-    | Reliable Channel |----+
-    +------------------+    |
-                            | Pipeline Stages
-    +--------------------+  |
-    | Unreliable Channel |--+
-    +--------------------+  |
-                            v
-         +-----------------------------------+
-         | Sequence & Acknowledgment Stage  |
-         | - Assign sequence numbers         |
-         | - Track sent packets              |
-         | - Process received ACKs           |
-         +-----------------------------------+
-                      |
-                      v
-         +-----------------------------------+
-         | Fragmentation & Reassembly Stage  |
-         | - Split large messages into MTU   |
-         | - Reconstruct from fragments      |
-         +-----------------------------------+
-                      |
-                      v
-         +-----------------------------------+
-         | Reliability Stage                 |
-         | - Retransmit unacknowledged       |
-         | - Deduplicate received packets    |
-         +-----------------------------------+
-                      |
-                      v
-         +-----------------------------------+
-         | Packet Assembly & Encryption      |
-         | - Serialize headers + payloads    |
-         | - Optional DTLS wrapper           |
-         +-----------------------------------+
-                      |
-                      v
-              Platform Socket API
-         (UDP, WebRTC Data Channel, Console SDK)
-                      |
-                      v
-                 Network Layer
+    SEQ["Sequence & Acknowledgment Stage\n─────────────────────────────\n• Assign sequence numbers\n• Track sent packets\n• Process received ACKs"]
+    FRAG["Fragmentation & Reassembly Stage\n─────────────────────────────\n• Split large messages into MTU\n• Reconstruct from fragments"]
+    RELSTAGE["Reliability Stage\n─────────────────────────────\n• Retransmit unacknowledged packets\n• Deduplicate received packets"]
+    PACK["Packet Assembly & Encryption\n─────────────────────────────\n• Serialize headers and payloads\n• Optional DTLS wrapper"]
+
+    SOCKET["Platform Socket API\n(UDP · WebRTC Data Channel · Console SDK)"]
+    NET["Network Layer"]
+
+    APP --> SEND
+    SEND --> REL
+    SEND --> UNREL
+
+    subgraph pipeline ["Pipeline Stages"]
+        SEQ --> FRAG
+        FRAG --> RELSTAGE
+        RELSTAGE --> PACK
+    end
+
+    REL --> SEQ
+    UNREL --> SEQ
+
+    PACK --> SOCKET
+    SOCKET --> NET
 ```
 
 The reliable channel implements a sliding window protocol similar to TCP but optimized for real-time constraints. Each sent message receives a monotonically increasing sequence number modulo 65536. The sender maintains a send window tracking up to N unacknowledged packets (typical window size: 32-128). When the window fills, further sends block until acknowledgments arrive. Receivers send cumulative acknowledgments indicating the highest sequence number received in order, plus selective acknowledgments (SACKs) for out-of-order packets. Retransmission occurs after a timeout calculated from smoothed round-trip time (SRTT) and variance, typically 1.5x to 2x the estimated RTT. Unity's transport avoids TCP's congestion control backoff since game traffic is real-time—dropping newer frames is preferable to stalling the stream.

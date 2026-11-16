@@ -30,71 +30,37 @@ The practical execution of a CBA for a major public project follows an architect
 
 The logical flow of a full CBA evaluation can be represented as follows:
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                    COST-BENEFIT ANALYSIS ARCHITECTURE                  │
-└────────────────────────────────────────────────────────────────────────┘
-
-  ┌──────────────────────┐
-  │  1. PROBLEM SCOPING  │
-  │  Define: standing,   │
-  │  counterfactual,     │
-  │  time horizon, scope │
-  └──────────┬───────────┘
-             │
-             ▼
-  ┌──────────────────────────────────────────────────────────┐
-  │  2. ENUMERATION OF IMPACTS                               │
-  │                                                          │
-  │  Market impacts          Non-market impacts              │
-  │  (cost savings,          (environmental, health,         │
-  │   revenue, taxes)         time savings, amenity)         │
-  └──────────┬───────────────────────────────┬───────────────┘
-             │                               │
-             ▼                               ▼
-  ┌──────────────────────┐       ┌───────────────────────────┐
-  │  3a. MARKET PRICING  │       │  3b. SHADOW PRICING       │
-  │  Correct for taxes,  │       │  Hedonic regression,      │
-  │  subsidies, monopoly │       │  TCM, CVM, VSL, VOLY,     │
-  │  markups, border     │       │  benefits transfer,       │
-  │  price parity        │       │  avoided cost method      │
-  └──────────┬───────────┘       └──────────────┬────────────┘
-             │                                  │
-             └──────────────┬───────────────────┘
-                            │
-                            ▼
-             ┌──────────────────────────────┐
-             │  4. DISCOUNTING              │
-             │  Select r (social discount   │
-             │  rate), compute PV streams,  │
-             │  apply declining rates where │
-             │  appropriate (gamma, Weitzman│
-             │  uncertain-rate framework)   │
-             └──────────────┬───────────────┘
-                            │
-                            ▼
-             ┌──────────────────────────────┐
-             │  5. AGGREGATION              │
-             │  NPV = Σ PV(Benefits)        │
-             │        - Σ PV(Costs)         │
-             │  BCR = PV(B) / PV(C)         │
-             └──────────────┬───────────────┘
-                            │
-                            ▼
-  ┌─────────────────────────────────────────────────────────────┐
-  │  6. SENSITIVITY & UNCERTAINTY ANALYSIS                      │
-  │  Deterministic: one-way, two-way switching values           │
-  │  Probabilistic: Monte Carlo over joint parameter            │
-  │  distributions; identify dominant uncertainties             │
-  └─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-  ┌─────────────────────────────────────────────────────────────┐
-  │  7. DISTRIBUTIONAL ANALYSIS                                 │
-  │  Disaggregate by income quintile, geography, demographic    │
-  │  Apply distributional weights if mandated or appropriate    │
-  │  Report incidence of costs and benefits separately          │
-  └─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["1. PROBLEM SCOPING<br/>Define: standing,<br/>counterfactual,<br/>time horizon, scope"]
+    
+    B["2. ENUMERATION OF IMPACTS"]
+    
+    C["Market impacts<br/>cost savings,<br/>revenue, taxes"]
+    D["Non-market impacts<br/>environmental, health,<br/>time savings, amenity"]
+    
+    E["3a. MARKET PRICING<br/>Correct for taxes,<br/>subsidies, monopoly<br/>markups, border<br/>price parity"]
+    
+    F["3b. SHADOW PRICING<br/>Hedonic regression,<br/>TCM, CVM, VSL, VOLY,<br/>benefits transfer,<br/>avoided cost method"]
+    
+    G["4. DISCOUNTING<br/>Select r social discount rate,<br/>compute PV streams,<br/>apply declining rates<br/>where appropriate"]
+    
+    H["5. AGGREGATION<br/>NPV = Σ PVBenefits<br/>- Σ PVCosts<br/>BCR = PVB / PVC"]
+    
+    I["6. SENSITIVITY & UNCERTAINTY ANALYSIS<br/>Deterministic: one-way, two-way switching values<br/>Probabilistic: Monte Carlo over joint parameter<br/>distributions; identify dominant uncertainties"]
+    
+    J["7. DISTRIBUTIONAL ANALYSIS<br/>Disaggregate by income quintile, geography, demographic<br/>Apply distributional weights if mandated or appropriate<br/>Report incidence of costs and benefits separately"]
+    
+    A --> B
+    B --> C
+    B --> D
+    C --> E
+    D --> F
+    E --> G
+    F --> G
+    G --> H
+    H --> I
+    I --> J
 ```
 
 Each node in this architecture carries its own technical depth. The problem scoping phase is deceptively consequential: defining who has "standing" — whose welfare counts — determines the population over which the aggregation is performed. A national transport authority may by convention exclude foreign visitors from its welfare aggregation; a climate analysis that excludes developing-country damages will produce starkly different NPVs from one that includes them. The counterfactual, often called the "without project" scenario, must be specified carefully because benefits are always measured as the difference between outcomes with and without the intervention. A road rehabilitation project does not create travel time savings relative to zero travel; it creates savings relative to what travel times would be under a deteriorating pavement scenario with normal maintenance.

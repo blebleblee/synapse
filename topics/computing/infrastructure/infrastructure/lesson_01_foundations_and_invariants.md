@@ -308,40 +308,15 @@ graph TD
 A process transitions through well-defined states during its lifetime:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Created: fork()
-    Created --> Ready: scheduler adds to runqueue
-    Ready --> Running: scheduler selects process
-    Running --> Ready: preempted (timeslice expired)
-    Running --> Blocked: I/O wait, mutex lock, sleep
-    Blocked --> Ready: I/O complete, mutex unlocked, wakeup
-    Running --> Zombie: exit()
-    Zombie --> [*]: parent reaps (wait())
-    
-    note right of Created
-        Process descriptor allocated,
-        address space created
-    end note
-    
-    note right of Ready
-        Process is runnable but
-        not currently on CPU
-    end note
-    
-    note right of Running
-        Process is executing on CPU,
-        has timeslice budget
-    end note
-    
-    note right of Blocked
-        Process cannot proceed,
-        waiting for external event
-    end note
-    
-    note right of Zombie
-        Process terminated but
-        exit status not yet retrieved
-    end note
+flowchart TD
+    Start([Process Start]) --> Created["Created<br/><small>Process descriptor allocated,<br/>address space created</small>"]
+    Created -->|"fork()"| Ready["Ready<br/><small>Process is runnable but<br/>not currently on CPU</small>"]
+    Ready -->|"scheduler selects process"| Running["Running<br/><small>Process is executing on CPU,<br/>has timeslice budget</small>"]
+    Running -->|"preempted (timeslice expired)"| Ready
+    Running -->|"I/O wait, mutex lock, sleep"| Blocked["Blocked<br/><small>Process cannot proceed,<br/>waiting for external event</small>"]
+    Blocked -->|"I/O complete, mutex unlocked, wakeup"| Ready
+    Running -->|"exit()"| Zombie["Zombie<br/><small>Process terminated but<br/>exit status not yet retrieved</small>"]
+    Zombie -->|"parent reaps (wait())"| End([Process Terminated])
 ```
 
 ### Scheduler Operation: The CFS Algorithm

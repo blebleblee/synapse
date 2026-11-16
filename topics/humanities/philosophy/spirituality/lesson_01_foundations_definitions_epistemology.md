@@ -52,29 +52,15 @@ Having established the conceptual terrain and primary epistemic frameworks, we n
 
 The architecture of spiritual inquiry can be modeled as a three-layer recursive system: phenomenological observation, conceptual interpretation, and critical evaluation. These layers do not operate in strict sequence but function as mutually constraining processes that refine each other through iterative cycles.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    CRITICAL EVALUATION                       │
-│  (Coherence checks, validity assessment, bias detection)     │
-│                                                              │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │          CONCEPTUAL INTERPRETATION                     │  │
-│  │  (Pattern recognition, theoretical mapping, meaning)   │  │
-│  │                                                        │  │
-│  │  ┌──────────────────────────────────────────────────┐ │  │
-│  │  │     PHENOMENOLOGICAL OBSERVATION                 │ │  │
-│  │  │  (Raw experience, qualia, prereflective data)    │ │  │
-│  │  └──────────────────────────────────────────────────┘ │  │
-│  │                         ↑                              │  │
-│  │                         │                              │  │
-│  │                    feedback loop                       │  │
-│  │                         │                              │  │
-│  └───────────────────────────────────────────────────────┘  │
-│                           ↑                                  │
-│                           │                                  │
-│                      feedback loop                           │
-│                           │                                  │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["PHENOMENOLOGICAL OBSERVATION<br/>(Raw experience, qualia, prereflective data)"]
+    B["CONCEPTUAL INTERPRETATION<br/>(Pattern recognition, theoretical mapping, meaning)"]
+    C["CRITICAL EVALUATION<br/>(Coherence checks, validity assessment, bias detection)"]
+    
+    A -->|"feedback loop"| B
+    B -->|"feedback loop"| C
+    C -->|"feedback loop"| B
 ```
 
 The phenomenological layer concerns itself with the raw data of experience before conceptual categorization imposes interpretive frameworks. This requires cultivating what Husserl called the "phenomenological attitude"—a systematic suspension of everyday assumptions about what is real or what explains experience, focusing instead on experience exactly as it appears to consciousness. In practical terms, this means developing capacity to observe mental and perceptual events with minimal reactivity or premature interpretation.
@@ -93,28 +79,30 @@ The practitioner operates as a syntopical reader across these multiple tradition
 
 A concrete operational tool for this layer is the construction of conceptual maps that explicitly represent interpretive choices. Consider an experience of profound peace during contemplative practice. One might construct a branching decision tree:
 
-```
-Experience: Deep peace during meditation
-│
-├─ Interpretation A: Psychological calming (reduced rumination)
-│  ├─ Implies: Benefits are purely neurological/psychological
-│  ├─ Predicts: Similar effects from other relaxation techniques
-│  └─ Tests: Should correlate with decreased cortisol, DMN activity
-│
-├─ Interpretation B: Access to inherent quality of consciousness
-│  ├─ Implies: Peace is discovered, not created
-│  ├─ Predicts: Stability across conditions once recognized
-│  └─ Tests: Should persist even in difficult circumstances
-│
-├─ Interpretation C: Divine grace or presence
-│  ├─ Implies: Relationship to transcendent reality
-│  ├─ Predicts: Correlation with other signs of grace
-│  └─ Tests: Coherence with theological framework, moral fruits
-│
-└─ Interpretation D: Temporary neurochemical shift
-   ├─ Implies: Purely mechanistic, no enduring insight
-   ├─ Predicts: Effects fade, no integration into daily life
-   └─ Tests: Should be replicable chemically, unstable
+```mermaid
+flowchart TD
+    Root["Experience: Deep peace during meditation"]
+    
+    Root --> InterpA["Interpretation A: Psychological calming (reduced rumination)"]
+    Root --> InterpB["Interpretation B: Access to inherent quality of consciousness"]
+    Root --> InterpC["Interpretation C: Divine grace or presence"]
+    Root --> InterpD["Interpretation D: Temporary neurochemical shift"]
+    
+    InterpA --> ImpliesA["Implies: Benefits are purely neurological/psychological"]
+    InterpA --> PredictsA["Predicts: Similar effects from other relaxation techniques"]
+    InterpA --> TestsA["Tests: Should correlate with decreased cortisol, DMN activity"]
+    
+    InterpB --> ImpliesB["Implies: Peace is discovered, not created"]
+    InterpB --> PredictsB["Predicts: Stability across conditions once recognized"]
+    InterpB --> TestsB["Tests: Should persist even in difficult circumstances"]
+    
+    InterpC --> ImpliesC["Implies: Relationship to transcendent reality"]
+    InterpC --> PredictsC["Predicts: Correlation with other signs of grace"]
+    InterpC --> TestsC["Tests: Coherence with theological framework, moral fruits"]
+    
+    InterpD --> ImpliesD["Implies: Purely mechanistic, no enduring insight"]
+    InterpD --> PredictsD["Predicts: Effects fade, no integration into daily life"]
+    InterpD --> TestsD["Tests: Should be replicable chemically, unstable"]
 ```
 
 This mapping makes explicit the conceptual commitments embedded in different interpretations and allows systematic evaluation of their respective explanatory power and predictive success. The practitioner can then test interpretations against subsequent experience, checking for coherence, stability, and pragmatic efficacy.

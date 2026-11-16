@@ -28,15 +28,24 @@ The agent establishes an outbound HTTPS connection to the regional monitoring in
 
 The storage layer organizes metrics into a hierarchical namespace structure that mirrors the OCI resource taxonomy:
 
-```
-oci_computeagent/CpuUtilization
-  └─ compartment_id: ocid1.compartment.oc1..unique_id
-      └─ resource_id: ocid1.instance.oc1.phx.unique_id
-          └─ dimensions:
-              ├─ availabilityDomain: PHX-AD-1
-              ├─ faultDomain: FAULT-DOMAIN-1
-              ├─ shape: VM.Standard.E4.Flex
-              └─ freeformTags.environment: production
+```mermaid
+flowchart TD
+    A["oci_computeagent/CpuUtilization"]
+    B["compartment_id: ocid1.compartment.oc1..unique_id"]
+    C["resource_id: ocid1.instance.oc1.phx.unique_id"]
+    D["dimensions:"]
+    E["availabilityDomain: PHX-AD-1"]
+    F["faultDomain: FAULT-DOMAIN-1"]
+    G["shape: VM.Standard.E4.Flex"]
+    H["freeformTags.environment: production"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    D --> F
+    D --> G
+    D --> H
 ```
 
 Each metric data point consists of a timestamp (millisecond precision Unix epoch), a numerical value (64-bit float), and the complete dimension set. The storage engine indexes these points by time and dimension cardinality, enabling efficient retrieval for both time-range queries (fetch all CPU values between 10:00 and 11:00) and dimensional queries (fetch CPU values where `environment == 'production'`). Internally, the system employs a columnar storage format where timestamps, values, and dimension references reside in separate compressed column files, allowing the query engine to skip irrelevant dimensions during scan operations.

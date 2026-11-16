@@ -73,40 +73,44 @@ Quantum cryptographic protocols must address finite-key effects and composable s
 
 The following diagram illustrates the BB84 protocol architecture, showing qubit preparation, transmission, measurement, and classical post-processing stages:
 
-```
-Alice's System                Quantum Channel               Bob's System
-┌─────────────┐              ┌─────────────┐              ┌─────────────┐
-│   Random    │              │             │              │   Random    │
-│ Bit Source  │              │  Photonic   │              │    Basis    │
-│   (b_i)     │              │   Channel   │              │  Selection  │
-└──────┬──────┘              │             │              │   (θ_i)     │
-       │                     │   η < 1     │              └──────┬──────┘
-       ▼                     │ (lossy)     │                     │
-┌─────────────┐              │             │                     ▼
-│   Random    │              │   ┌───┐     │              ┌─────────────┐
-│    Basis    │              │   │ E │     │              │   Single    │
-│  Selection  │              │   │ v │     │              │   Photon    │
-│   (θ_i)     │              │   │ e │     │              │  Detector   │
-└──────┬──────┘              │   │   │     │              │   (b'_i)    │
-       │                     │   └───┘     │              └──────┬──────┘
-       ▼                     │             │                     │
-┌─────────────┐              └─────────────┘                     │
-│   Qubit     │─────────────────────────────────────────────────┘
-│ Preparation │              
-│ |0⟩,|1⟩,    │              Classical Channel (Authenticated)
-│ |+⟩,|-⟩     │              ════════════════════════════════════
-└─────────────┘              ┌────────────────────────────────┐
-       │                     │  Basis Reconciliation         │
-       ▼                     │  Error Estimation (QBER)      │
-┌─────────────┐              │  Privacy Amplification        │
-│   Single    │              │  Authentication               │
-│   Photon    │              └────────────────────────────────┘
-│   Source    │                     │                 │
-└─────────────┘                     ▼                 ▼
-                              ┌─────────┐      ┌─────────┐
-                              │ Alice's │      │  Bob's  │
-                              │   Key   │      │   Key   │
-                              └─────────┘      └─────────┘
+```mermaid
+flowchart TD
+    subgraph Alice["Alice's System"]
+        A1["Random<br/>Bit Source<br/>(b_i)"]
+        A2["Random<br/>Basis<br/>Selection<br/>(θ_i)"]
+        A3["Qubit<br/>Preparation<br/>|0⟩,|1⟩,<br/>|+⟩,|-⟩"]
+        A4["Single<br/>Photon<br/>Source"]
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+    end
+    
+    subgraph Quantum["Quantum Channel"]
+        Q1["Photonic<br/>Channel<br/><br/>η < 1<br/>(lossy)"]
+        Q2["Eve"]
+    end
+    
+    subgraph Bob["Bob's System"]
+        B1["Random<br/>Basis<br/>Selection<br/>(θ_i)"]
+        B2["Single<br/>Photon<br/>Detector<br/>(b'_i)"]
+        
+        B1 --> B2
+    end
+    
+    subgraph Classical["Classical Channel (Authenticated)"]
+        C1["Basis Reconciliation<br/>Error Estimation (QBER)<br/>Privacy Amplification<br/>Authentication"]
+    end
+    
+    A4 --> Q1
+    Q1 -.->|eavesdrop| Q2
+    Q1 --> B2
+    
+    B2 --> C1
+    A4 --> C1
+    
+    C1 --> AK["Alice's<br/>Key"]
+    C1 --> BK["Bob's<br/>Key"]
 ```
 
 Alice generates random bits $b_i \in \{0, 1\}$ and random basis choices $\theta_i \in \{\text{rectilinear}, \text{diagonal}\}$, then prepares qubits accordingly: $|0\rangle$ or $|1\rangle$ for rectilinear, $|+\rangle$ or $|-\rangle$ for diagonal. These qubits traverse a lossy quantum channel with transmittance $\eta$, where lost photons are conservatively attributed to an eavesdropper Eve. Bob selects his measurement basis $\theta'_i$ randomly and measures the arriving qubits, obtaining outcomes $b'_i$. After transmission, Alice and Bob publicly compare basis choices and retain only the bits where $\theta_i = \theta'_i$ (basis sifting). They publicly compare a random subset of these sifted bits to estimate the quantum bit error rate (QBER). If QBER exceeds the threshold (typically 11% for BB84), they abort. Otherwise, they perform information reconciliation (error correction over the classical channel using syndrome-based codes) to correct remaining discrepancies, followed by privacy amplification (extracting a shorter, nearly-uniform secret key using universal hash functions) to reduce Eve's information to negligible levels.

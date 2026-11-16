@@ -40,32 +40,36 @@ A practical workflow for establishing color hierarchy begins with value structur
 
 The spatial container model provides the final architectural component. Web layouts operate within nested rectangular boxes—the browser window contains the page, the page contains sections, sections contain articles, articles contain paragraphs and images. Each container establishes its own internal hierarchy while simultaneously participating in the larger compositional hierarchy. A card component, for instance, might employ a small thumbnail image, a bold heading, and regular body text, creating an internal reading sequence. That same card, when placed within a grid of similar cards, must compete for attention through external attributes: position within the layout, relative scale compared to neighboring cards, or application of shadow and border treatments that lift it off the background.
 
-```
-┌─────────────────────────────────────────────┐
-│  VIEWPORT (100vw × 100vh)                   │
-│  ┌───────────────────────────────────────┐  │
-│  │  CONTAINER (max-width: 1200px)        │  │
-│  │  ┌─────────────────────────────────┐  │  │
-│  │  │  HEADER                         │  │  │
-│  │  │  • Logo (24px, Bold)            │  │  │
-│  │  │  • Nav Links (16px, Medium)     │  │  │
-│  │  └─────────────────────────────────┘  │  │
-│  │  ┌─────────────────────────────────┐  │  │
-│  │  │  HERO                           │  │  │
-│  │  │  • H1 (49px, Bold)              │  │  │
-│  │  │  • Subhead (21px, Regular)      │  │  │
-│  │  │  • CTA Button (16px, Semibold)  │  │  │
-│  │  └─────────────────────────────────┘  │  │
-│  │  ┌─────────────────────────────────┐  │  │
-│  │  │  CONTENT GRID                   │  │  │
-│  │  │  ┌──────┐ ┌──────┐ ┌──────┐   │  │  │
-│  │  │  │ Card │ │ Card │ │ Card │   │  │  │
-│  │  │  │ H3   │ │ H3   │ │ H3   │   │  │  │
-│  │  │  │ Body │ │ Body │ │ Body │   │  │  │
-│  │  │  └──────┘ └──────┘ └──────┘   │  │  │
-│  │  └─────────────────────────────────┘  │  │
-│  └───────────────────────────────────────┘  │
-└─────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph VIEWPORT["VIEWPORT (100vw × 100vh)"]
+        subgraph CONTAINER["CONTAINER (max-width: 1200px)"]
+            HEADER["**HEADER**
+            • Logo (24px, Bold)
+            • Nav Links (16px, Medium)"]
+
+            HERO["**HERO**
+            • H1 (49px, Bold)
+            • Subhead (21px, Regular)
+            • CTA Button (16px, Semibold)"]
+
+            subgraph GRID["CONTENT GRID"]
+                direction LR
+                CARD1["**Card**
+                H3
+                Body"]
+                CARD2["**Card**
+                H3
+                Body"]
+                CARD3["**Card**
+                H3
+                Body"]
+            end
+        end
+    end
+
+    HEADER --> HERO
+    HERO --> GRID
 ```
 
 This nested hierarchy operates through deliberate compression and expansion of visual density. The hero section occupies maximum vertical space with minimal content, creating breathing room and focus for the primary value proposition. The content grid below compresses information into modular units, increasing density while maintaining legibility through consistent internal structure within each card. The eye moves naturally from large, open areas to denser regions, guided by scale contrasts and spatial rhythms.

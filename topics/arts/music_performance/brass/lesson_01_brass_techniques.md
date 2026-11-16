@@ -98,9 +98,9 @@ graph LR
     B -->|"+ Valve 3"| F["1+3: noticeably sharp"]
     E -->|"+ Valve 3"| G["1+2+3: significantly sharp"]
 
-    style E fill:#ffe0b3
-    style F fill:#ffcccc
-    style G fill:#ff9999
+    style E fill:#ffe0b3,color:#0f172a
+    style F fill:#ffcccc,color:#0f172a
+    style G fill:#ff9999,color:#0f172a
 ```
 
 **What you actually do about it, by instrument:**

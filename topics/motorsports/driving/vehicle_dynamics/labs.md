@@ -740,7 +740,7 @@ The operational verification laboratory concludes with the synthesis of diagnost
 1. Identify performance delta magnitude and corner-specific concentration through full-lap comparison of reference and target driver fastest laps
 2. Zoom into deficit-dominant corner and overlay five critical channels: Speed, Brake Pressure, Throttle Position, Steering Angle, Lateral Acceleration
 3. Compute Channel Report statistics for corner entry zone (brake application point to apex): minimum speed, maximum brake pressure, maximum steering angle, mean lateral acceleration
-4. Analyze brake release gradient using distance-domain derivative of brake pressure channel: steep gradient (>8 bar/m) indicates aggressive release technique, shallow gradient (<5 bar/m) indicates conservative trailing brake deep into corner
+4. Analyze brake release gradient using distance-domain derivative of brake pressure channel: steep gradient (>8 bar/m) indicates aggressive release technique, shallow gradient (< 5 bar/m) indicates conservative trailing brake deep into corner
 5. Correlate minimum corner speed with brake release timing: earlier brake release enables earlier throttle application and higher mid-corner speed
 6. Quantify throttle application timing differential using conditional longitudinal acceleration channel filtering throttle position >10%
 7. Generate driver coaching report documenting: lap time delta, corner-specific speed deltas (minimum speed), control input timing deltas (brake release distance, throttle application distance), recommended technique adjustments
@@ -748,11 +748,11 @@ The operational verification laboratory concludes with the synthesis of diagnost
 **Damper Tuning Diagnostic Protocol (Exercise 2 Application):**
 
 1. Construct damper velocity histogram for each corner covering full lap distance with 0.05 m/s bin width and -2.0 to +2.0 m/s range
-2. Compute percentage of suspension events in low-speed regime (<0.15 m/s) vs high-speed regime (>0.15 m/s) to identify dominant damping force regime
+2. Compute percentage of suspension events in low-speed regime (< 0.15 m/s) vs high-speed regime (>0.15 m/s) to identify dominant damping force regime
 3. For driver feedback reporting sluggish turn-in or delayed transient response: reduce high-speed compression damping 2-4 clicks to increase peak shaft velocity during initial weight transfer
 4. For driver feedback reporting excessive mid-corner platform motion or instability over curbing: increase high-speed compression damping 2-4 clicks to limit peak shaft velocity during rapid transient events
 5. For driver feedback reporting harsh ride quality or suspension topping out: reduce high-speed compression damping and verify adequate suspension travel margin (minimum 15mm to bump stop under peak compression)
-6. Validate damper adjustment through lap time correlation: compare mean lap time before and after adjustment across minimum 5-lap sample to establish statistical significance (p<0.05 via Student's t-test)
+6. Validate damper adjustment through lap time correlation: compare mean lap time before and after adjustment across minimum 5-lap sample to establish statistical significance (p< 0.05 via Student's t-test)
 
 **Tire Temperature Diagnostic Protocol (Exercise 3 Application):**
 
@@ -840,7 +840,7 @@ The operational verification laboratory concludes with the synthesis of diagnost
 - Reduce front damper compression settings 2 clicks to soften transient load spikes
 - Coach driver to reduce slip angle in high-speed corners, prioritize maintenance throttle over peak lateral acceleration
 
-*Measured rear tire average temperature <85°C:*
+*Measured rear tire average temperature < 85°C:*
 - Increase rear tire pressure 1.0 psi to concentrate contact patch loading
 - Reduce rear anti-roll bar one blade size to increase rear roll angle and mechanical load transfer
 - Coach driver to increase entry speed and maintain higher throttle through mid-corner to generate additional rear tire slip energy

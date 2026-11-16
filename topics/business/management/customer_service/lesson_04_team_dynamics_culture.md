@@ -26,38 +26,27 @@ The information architecture of the team operates across three overlapping syste
 
 The following diagram illustrates the core information flow in a mature customer service team architecture:
 
-```
- CUSTOMER CONTACT
-        │
-        ▼
-┌───────────────────┐
-│   Contact Routing  │  (IVR / Omnichannel ACD)
-│  Tier 1 / Tier 2  │
-└────────┬──────────┘
-         │
-         ▼
-┌───────────────────┐      ┌──────────────────────┐
-│  Ticketing System │─────▶│   Knowledge Base      │
-│  (transaction     │      │   (resolution guides, │
-│   record)         │      │   policy, FAQs)       │
-└────────┬──────────┘      └────────────┬─────────┘
-         │                              │
-         ▼                              ▼
-┌───────────────────┐      ┌──────────────────────┐
-│  QA / CSAT Data   │      │  Coaching &           │
-│  (interaction     │─────▶│  Development          │
-│   scoring)        │      │  (manager 1:1s)       │
-└────────┬──────────┘      └────────────┬─────────┘
-         │                              │
-         ▼                              ▼
-┌────────────────────────────────────────────────┐
-│          Performance Management Layer           │
-│  (BI / WFM: CSAT, AHT, FCR, NPS, adherence)   │
-└────────────────────────────────────────────────┘
-         │
-         ▼
- OUTER FEEDBACK LOOP
- (Structural diagnosis: policy, tooling, staffing)
+```mermaid
+flowchart TD
+    START["CUSTOMER CONTACT"]
+    
+    START --> ROUTING["Contact Routing<br/>(IVR / Omnichannel ACD)<br/>Tier 1 / Tier 2"]
+    
+    ROUTING --> TICKET["Ticketing System<br/>(transaction record)"]
+    
+    TICKET --> KB["Knowledge Base<br/>(resolution guides,<br/>policy, FAQs)"]
+    
+    TICKET --> QA["QA / CSAT Data<br/>(interaction scoring)"]
+    
+    KB --> COACHING["Coaching &<br/>Development<br/>(manager 1:1s)"]
+    
+    QA --> COACHING
+    
+    QA --> PERF["Performance Management Layer<br/>(BI / WFM: CSAT, AHT, FCR, NPS, adherence)"]
+    
+    COACHING --> PERF
+    
+    PERF --> FEEDBACK["OUTER FEEDBACK LOOP<br/>(Structural diagnosis: policy, tooling, staffing)"]
 ```
 
 This architecture has one decisive dependency: the quality of the data entering the ticketing system. If representatives do not tag contacts with accurate disposition codes, if resolution notes are sparse, if escalation reasons are not documented, the entire downstream chain degrades. This is why disposition hygiene — the discipline of accurate, granular contact categorization — is a team norm that must be established during onboarding and reinforced continuously. It is not an administrative formality. It is the instrumentation layer of your service operation.

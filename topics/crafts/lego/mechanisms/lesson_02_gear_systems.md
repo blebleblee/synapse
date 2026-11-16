@@ -62,28 +62,35 @@ The architecture of a compound train matters as much as the math. In a standard 
 
 The diagram below illustrates the signal path and ratio accumulation through a three-stage compound spur train.
 
-```
-Motor Output
-     │
-     ▼
- ┌─────────┐
- │  Stage 1 │  8t ──► 24t    Ratio: 3:1
- │  Shaft A │
- └────┬────┘
-      │ 24t driven + 8t driver (locked on same axle)
-      ▼
- ┌─────────┐
- │  Stage 2 │  8t ──► 24t    Ratio: 3:1
- │  Shaft B │
- └────┬────┘
-      │ 24t driven + 8t driver (locked on same axle)
-      ▼
- ┌─────────┐
- │  Stage 3 │  8t ──► 24t    Ratio: 3:1
- │  Shaft C │
- └────┬────┘
-      ▼
- Final Output   Total Ratio: 27:1
+```mermaid
+flowchart TD
+    Motor["Motor Output"]
+    
+    Motor -->|"8t"| Stage1
+    
+    subgraph Stage1 ["Stage 1 - Shaft A"]
+        S1_In["8t Driver"]
+        S1_Out["24t Driven"]
+        S1_In -.->|"Ratio 3:1"| S1_Out
+    end
+    
+    Stage1 -->|"24t driven + 8t driver<br/>(locked on same axle)"| Stage2
+    
+    subgraph Stage2 ["Stage 2 - Shaft B"]
+        S2_In["8t Driver"]
+        S2_Out["24t Driven"]
+        S2_In -.->|"Ratio 3:1"| S2_Out
+    end
+    
+    Stage2 -->|"24t driven + 8t driver<br/>(locked on same axle)"| Stage3
+    
+    subgraph Stage3 ["Stage 3 - Shaft C"]
+        S3_In["8t Driver"]
+        S3_Out["24t Driven"]
+        S3_In -.->|"Ratio 3:1"| S3_Out
+    end
+    
+    Stage3 --> FinalOutput["Final Output<br/>Total Ratio: 27:1"]
 ```
 
 Each intermediate shaft (A, B, C) must be supported at both ends. The two gears on each intermediate shaft must be locked together — using a Technic axle with cross-section passing through both — so they cannot rotate independently. If you accidentally mount one gear on a free-spinning bushing on a fixed axle, the stage produces no torque multiplication at all; the gears spin without transmitting power. This is an extremely common assembly error that produces a build that rotates freely under no load but stalls the moment any resistance is applied.

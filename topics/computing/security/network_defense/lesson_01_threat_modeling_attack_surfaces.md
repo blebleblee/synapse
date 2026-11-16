@@ -54,34 +54,32 @@ For networked systems, the surface decomposes into logical layers. At the networ
 
 The attack surface of a modern embedded device running a network-connected application is deeper than it appears. Consider a router running OpenWrt: the exposed surface includes the LuCI web interface (HTTP/HTTPS), SSH daemon, any enabled network services (dnsmasq, odhcp6c), the kernel's netfilter subsystem handling every inbound packet, the UCI configuration daemon, and the bootloader's recovery mode accessible over the serial console. A complete surface map requires both black-box network scanning and white-box source-level analysis.
 
-```
-+----------------------------------------------------------+
-|                   ATTACK SURFACE MAP                      |
-+----------------------------------------------------------+
-|                                                          |
-|  External Network          Firmware / Hardware           |
-|  ┌─────────────────┐       ┌────────────────────────┐   |
-|  │ TCP/UDP Ports   │       │ UART/Serial Console    │   |
-|  │ Protocol Parsers│       │ JTAG Debug Interface   │   |
-|  │ TLS Certificate │       │ SPI Flash (r/w)        │   |
-|  │ Exposed APIs    │       │ U-Boot Recovery Mode   │   |
-|  └────────┬────────┘       └────────────┬───────────┘   |
-|           │                             │               |
-|           ▼                             ▼               |
-|  ┌─────────────────┐       ┌────────────────────────┐   |
-|  │ Application     │       │ Kernel / OS Layer      │   |
-|  │ Web UI / API    │       │ Syscall Surface        │   |
-|  │ MQTT / AMQP     │       │ Driver ioctl()         │   |
-|  │ SNMP / Netconf  │       │ /proc, /sys, /dev      │   |
-|  └────────┬────────┘       └────────────┬───────────┘   |
-|           │                             │               |
-|           └─────────────┬───────────────┘               |
-|                         ▼                               |
-|              ┌──────────────────────┐                   |
-|              │  Trust Boundary /    │                   |
-|              │  Authentication Gate │                   |
-|              └──────────────────────┘                   |
-+----------------------------------------------------------+
+```mermaid
+flowchart TD
+    subgraph external["External Network"]
+        ports["TCP/UDP Ports<br/>Protocol Parsers<br/>TLS Certificate<br/>Exposed APIs"]
+    end
+    
+    subgraph firmware["Firmware / Hardware"]
+        uart["UART/Serial Console<br/>JTAG Debug Interface<br/>SPI Flash r/w<br/>U-Boot Recovery Mode"]
+    end
+    
+    subgraph application["Application Layer"]
+        app["Web UI / API<br/>MQTT / AMQP<br/>SNMP / Netconf"]
+    end
+    
+    subgraph kernel["Kernel / OS Layer"]
+        os["Syscall Surface<br/>Driver ioctl()<br/>/proc, /sys, /dev"]
+    end
+    
+    subgraph trust["Trust Boundary"]
+        auth["Authentication Gate"]
+    end
+    
+    ports --> app
+    uart --> os
+    app --> auth
+    os --> auth
 ```
 
 Automated surface enumeration begins with `nmap` for port and service discovery, followed by protocol-specific tooling. For web surfaces, `feroxbuster` performs recursive directory and endpoint brute-forcing against HTTP targets. For embedded firmware surfaces, `binwalk` extracts filesystem images from raw firmware blobs, after which `checksec` assesses binary hardening flags (NX, stack canaries, PIE, RELRO) across every extracted ELF binary. The gap between what `checksec` reports and what a modern hardened system should provide is a direct measure of attack surface exposure.
@@ -195,30 +193,45 @@ Running this against the full ATT&CK Enterprise matrix will typically reveal tha
 
 The Lockheed Martin Cyber Kill Chain models an intrusion as a linear progression of seven stages, each of which represents an adversary action that creates a defensive opportunity. Understanding each stage mechanistically — what system calls are made, what network connections are established, what filesystem artifacts are created — is what separates the practitioner from the theorist.
 
-```
-+---------------------------------------------------------------------+
-|                    CYBER KILL CHAIN STAGES                          |
-+---------------------------------------------------------------------+
-|                                                                     |
-|  [1] Reconnaissance → [2] Weaponization → [3] Delivery             |
-|         ↓                      ↓                  ↓                |
-|  OSINT, scanning       Exploit + payload    Phishing, drive-by,     |
-|  cert transparency     assembly             supply chain, USB drop  |
-|                                                                     |
-|  [4] Exploitation → [5] Installation → [6] C2 → [7] Actions        |
-|         ↓                   ↓               ↓          ↓            |
-|  CVE trigger,          Backdoor, cron,  Beacon out,  Exfil,         |
-|  memory corruption     LD_PRELOAD,      DNS tunnel,  lateral        |
-|  ROP chain             firmware patch   HTTPS C2     movement,      |
-|                                                                     |
-|  Defender Break Points:                                             |
-|  ◉ Stage 1: Reduce OSINT exposure, rate-limit scanners              |
-|  ◉ Stage 3: Email gateway, TLS inspection, integrity verification   |
-|  ◉ Stage 4: Patch cadence, WAF, exploit mitigations (NX, CFI)      |
-|  ◉ Stage 5: File integrity monitoring, auditd, immutable rootfs     |
-|  ◉ Stage 6: DNS RPZ, TLS certificate pinning, anomalous flow detect |
-|  ◉ Stage 7: Data loss prevention, network segmentation, honeypots  |
-+---------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    subgraph stages ["CYBER KILL CHAIN STAGES"]
+        direction LR
+        
+        R["[1] Reconnaissance<br/>────────────<br/>OSINT, scanning<br/>cert transparency"]
+        W["[2] Weaponization<br/>────────────<br/>Exploit + payload<br/>assembly"]
+        D["[3] Delivery<br/>────────────<br/>Phishing, drive-by,<br/>supply chain, USB drop"]
+        E["[4] Exploitation<br/>────────────<br/>CVE trigger,<br/>memory corruption<br/>ROP chain"]
+        I["[5] Installation<br/>────────────<br/>Backdoor, cron,<br/>LD_PRELOAD,<br/>firmware patch"]
+        C["[6] C2<br/>────────────<br/>Beacon out,<br/>DNS tunnel,<br/>HTTPS C2"]
+        A["[7] Actions<br/>────────────<br/>Exfil,<br/>lateral movement"]
+        
+        R --> W --> D
+        R --> E
+        W --> I
+        D --> A
+        E --> I --> C --> A
+    end
+    
+    subgraph defenders ["DEFENDER BREAK POINTS"]
+        direction TB
+        
+        BP1["◉ Stage 1: Reduce OSINT exposure, rate-limit scanners"]
+        BP3["◉ Stage 3: Email gateway, TLS inspection, integrity verification"]
+        BP4["◉ Stage 4: Patch cadence, WAF, exploit mitigations (NX, CFI)"]
+        BP5["◉ Stage 5: File integrity monitoring, auditd, immutable rootfs"]
+        BP6["◉ Stage 6: DNS RPZ, TLS certificate pinning, anomalous flow detect"]
+        BP7["◉ Stage 7: Data loss prevention, network segmentation, honeypots"]
+        
+        BP1 -.-> BP3 -.-> BP4 -.-> BP5 -.-> BP6 -.-> BP7
+    end
+    
+    R -.->|defend| BP1
+    D -.->|defend| BP3
+    E -.->|defend| BP4
+    I -.->|defend| BP5
+    C -.->|defend| BP6
+    A -.->|defend| BP7
 ```
 
 The kill chain's most important property for the defender is that disruption at any stage denies the adversary their ultimate objective. This is not equally true of all stages, however. Disruption at Stage 1 (Reconnaissance) is lowest-fidelity because reconnaissance activity is often indistinguishable from legitimate internet scanning. Disruption at Stage 6 (Command and Control) is highest-fidelity and highest-impact — an adversary who cannot beacon out cannot receive tasking, exfiltrate data, or propagate. This is why network egress controls and DNS monitoring are disproportionately valuable defensive investments compared to their cost.

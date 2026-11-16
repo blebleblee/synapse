@@ -22,24 +22,33 @@ The Bitcoin network topology implements an unstructured peer-to-peer overlay net
 
 When a wallet constructs a new transaction, it broadcasts the signed transaction to its connected peers using the Bitcoin protocol's inventory announcement mechanism. Each receiving node validates the transaction against consensus rules—verifying cryptographic signatures, checking that inputs reference unspent outputs, confirming that total outputs do not exceed inputs plus acceptable fee—and upon successful validation, adds the transaction to its local mempool while relaying the inventory announcement to its own peers. This recursive gossip propagation ensures that within seconds, a transaction initiated anywhere in the world reaches mining nodes worldwide, ready for inclusion in the next candidate block.
 
-```
-Transaction Propagation Flow
-
-Wallet (Transaction Origin)
-    |
-    | [1] Broadcast INV message
-    v
-Peer Node A (Validates & Relays)
-    |
-    +---> Peer Node B -----> Peer Node E ---> Mining Pool X
-    |                            |
-    +---> Peer Node C            +---> Peer Node F
-    |         |
-    +---> Peer Node D            +---> Mining Pool Y
-              |
-              +---> Peer Node G ---> Full Node Clusters
-
-Timeline: ~2-5 seconds for global propagation under normal conditions
+```mermaid
+flowchart TD
+    Wallet["Wallet (Transaction Origin)"]
+    PeerA["Peer Node A (Validates & Relays)"]
+    PeerB["Peer Node B"]
+    PeerC["Peer Node C"]
+    PeerD["Peer Node D"]
+    PeerE["Peer Node E"]
+    PeerF["Peer Node F"]
+    PeerG["Peer Node G"]
+    PoolX["Mining Pool X"]
+    PoolY["Mining Pool Y"]
+    FullNode["Full Node Clusters"]
+    
+    Wallet -->|"[1] Broadcast INV message"| PeerA
+    PeerA --> PeerB
+    PeerA --> PeerC
+    PeerA --> PeerD
+    PeerB --> PeerE
+    PeerE --> PoolX
+    PeerE --> PeerF
+    PeerC --> PoolY
+    PeerD --> PeerG
+    PeerG --> FullNode
+    
+    classDef timeline fill:#f9f,stroke:#333,stroke-width:2px
+    note["Timeline: ~2-5 seconds for global propagation under normal conditions"]:::timeline
 ```
 
 The mempool constitutes each node's local queue of valid but unconfirmed transactions awaiting inclusion in a block. Nodes maintain independent mempools with potentially divergent contents due to network latency, policy variations, and local resource constraints. Transaction selection from the mempool follows a fee-rate optimization strategy where miners construct block templates prioritizing transactions offering the highest fee per byte, maximizing revenue within the one-megabyte base block size limit. This creates a continuous fee market where users signal transaction urgency through attached fees—low-fee transactions may wait hours or days during congestion periods, while high-fee transactions achieve next-block confirmation even under peak demand.

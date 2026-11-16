@@ -50,46 +50,19 @@ The transformation between stages is mediated by a specific feedback loop betwee
 
 The following diagram illustrates how this feedback loop operates across the developmental stages:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    CONTEMPLATIVE INSIGHT                     │
-│            (Direct perception of philosophical truth)         │
-│              (e.g., impermanence, interdependence,            │
-│                    constructed nature of self)                │
-└──────────────────┬──────────────────────────────────────────┘
-                   │
-                   ▼
-         ┌─────────────────────┐
-         │ PERCEPTUAL SHIFT    │
-         │ (Baseline awareness │
-         │  patterns change)   │
-         └────────┬────────────┘
-                  │
-                  ▼
-        ┌──────────────────────┐
-        │ BEHAVIORAL RESPONSE  │
-        │ (Natural shift in    │
-        │  reaction patterns)  │
-        └────────┬─────────────┘
-                 │
-                 ▼
-      ┌────────────────────────┐
-      │ ENVIRONMENTAL FEEDBACK │
-      │ (Results of new action │
-      │  patterns validate or  │
-      │  reveal gaps)          │
-      └────────┬───────────────┘
-               │
-               ▼
-      ┌────────────────────────┐
-      │ DIAGNOSTIC REFLECTION  │
-      │ (Recognition of what   │
-      │  remains to be seen)   │
-      └────────┬───────────────┘
-               │
-               ▼ (Refined inquiry)
-         [Return to Contemplative
-          Investigation Phase]
+```mermaid
+flowchart TD
+    A["CONTEMPLATIVE INSIGHT<br/>(Direct perception of philosophical truth)<br/>(e.g., impermanence, interdependence,<br/>constructed nature of self)"]
+    B["PERCEPTUAL SHIFT<br/>(Baseline awareness<br/>patterns change)"]
+    C["BEHAVIORAL RESPONSE<br/>(Natural shift in<br/>reaction patterns)"]
+    D["ENVIRONMENTAL FEEDBACK<br/>(Results of new action<br/>patterns validate or<br/>reveal gaps)"]
+    E["DIAGNOSTIC REFLECTION<br/>(Recognition of what<br/>remains to be seen)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E -->|"Refined inquiry"| A
 ```
 
 This loop reveals why genuine spiritual development is necessarily *praxis* rather than abstract study. Knowledge of non-attachment remains sterile until it is tested in situations where attachment naturally arises. The practitioner who intellectually understands compassion but continues to hoard resources in moments of scarcity has not yet penetrated the insight. The environmental feedback—the persistence of hoarding behavior despite intellectual understanding—becomes diagnostic information that points toward what remains obscured. Perhaps the insight is genuine but not yet deeply integrated, or perhaps the understanding remains conceptual rather than perceptual.
@@ -126,4 +99,23 @@ The practitioner achieves genuine insight at one of the intermediate stages and 
 
 The diagnostic indicator is subtle but crucial: resistance to further inquiry, sense of arrival or completion, diminishment of genuine curiosity about what remains obscured. Additionally, the practitioner often becomes attached to practices or frameworks that generated the initial breakthrough and defensive about or dismissive of other approaches or perspectives. There may also be evidence of what Buddhists call *upadana* (grasping)—attempts to stabilize and hold onto the experience or state that was generated.
 
-The navigational strategy involves cultivation of what the Zen tradition calls *beginner's mind*—radical openness to the possibility that even profound experiences are not the final realization. The practitioner deliberately seeks out challenges to their current understanding, cultivates relations
+The navigational strategy involves cultivation of what the Zen tradition calls *beginner's mind*—radical openness to the possibility that even profound experiences are not the final realization.
+
+The practitioner working through premature stabilization benefits from systematic exposure to what Ken Wilber calls *turiya* and what Tibetan traditions describe as the difference between *nyam* (temporary meditative experience) and *rigpa* (stable recognition of ground awareness). Concretely, this means seeking teachers or peers whose realization clearly exceeds one's own, deliberately entering situations that destabilize the acquired equilibrium, and returning to foundational practices with explicit instruction to look for what has not yet been seen. The Zen koan system is structurally designed for this purpose: each koan that "opens" reveals the next layer of obstruction, preventing any intermediate breakthrough from calcifying into a final resting point. The practitioner should also examine whether compassionate responsiveness extends consistently into domains of genuine personal cost, friction, or threat—since residual egoic patterning reliably surfaces under such conditions regardless of how stable meditative states appear in neutral circumstances.
+
+### Failure Mode 3: Enacting the Realization in Only One Domain
+
+A subtler and often unexamined failure involves genuine transformation in one dimension of life accompanied by arrested development or even compensatory regression in adjacent domains. The intellectually accomplished practitioner may undergo real cognitive and contemplative development while enacting relational immaturity. The devoted meditator may achieve sustained non-dual awareness while exhibiting ethical blind spots around power, money, or sexuality. The ethically scrupulous activist may develop genuine moral clarity while remaining entirely unexamined at the level of embodied presence or shadow. The diagnostic indicator here is asymmetry: conspicuous development along one axis paired with conspicuous stagnation or avoidance along another. The navigational strategy requires deliberate integration work across domains rather than deepening exclusively along the axis of greatest natural facility. This means submitting the whole of one's life—relationships, economics, embodiment, social roles—to the same quality of honest inquiry already applied to meditative or ethical development, using the gaps between domains as the most reliable signal of where genuine work remains.
+
+---
+
+## Summary & Verification Matrix
+
+| Governing Invariant | Core Mechanism | Diagnostic Criteria | Failure Mode | Navigational Strategy | Cross-Tradition Reference |
+|---|---|---|---|---|---|
+| Realization must manifest across cognitive, behavioral, relational, and embodied domains simultaneously, not only in contemplative or intellectual registers | Integration of insight into the whole structure of lived action; Stage 4–5 development requires that ethical responsiveness and perceptual clarity become mutually reinforcing | Consistency of conduct under conditions of personal cost, social friction, and genuine threat; absence of conspicuous asymmetry between domains; corroboration from trusted external observers | Intellectual bypass: understanding substitutes for direct realization, producing sophisticated description without behavioral transformation | Shift from conceptual engagement to phenomenological investigation; behavioral experiments; solicit honest external feedback | Tibetan distinction between *tokpa* (conceptual understanding) and *nyams-su len-pa* (taking into experience); Zen insistence on "great doubt" preceding genuine breakthrough |
+| No intermediate stage of development constitutes a final endpoint; every breakthrough reveals the next layer of obstruction | The structure of the path is recursive: each stabilized realization becomes the new platform from which subtler egoic patterns become visible | Resistance to further inquiry; sense of arrival; defensive attachment to practices or frameworks that generated the initial breakthrough; evidence of *upadana* (grasping) | Premature stabilization: genuine but partial insight mistaken for complete realization | Cultivation of beginner's mind; deliberate destabilization through advanced teachers, confrontational practice forms (koans), and high-friction life conditions | Zen koan system; Tibetan *nyam* versus *rigpa* distinction; Wilber's *turiya*; St. John of the Cross on the "dark night of the soul" as a necessary dissolution of intermediate attainments |
+| Ethical praxis is both a consequence of and a cause of genuine realization; the relationship is bidirectional, not sequential | Behavioral enactment of insight restructures the perceptual field, making previously invisible patterns accessible; this is the mechanism underlying karma yoga and virtue ethics traditions | Actual change in habitual response patterns, especially under provocation; reduction in reactive self-protection; increased capacity for compassionate confrontation without ego investment | Enacting realization in only one domain: genuine depth in contemplation or ethics coexisting with arrested development in relational, embodied, or economic domains | Deliberate cross-domain integration; treating asymmetry between domains as the primary diagnostic signal for locating remaining work | Aristotle's *phronesis* as a whole-life virtue, not a cognitive skill; Tantric insistence on integrating *samaya* vows into every dimension of conduct |
+| Transformative practice requires calibrated engagement with suffering rather than its avoidance or suppression | Contact with one's own suffering and that of others, held with non-reactive awareness, generates the motivational and perceptual conditions for genuine compassion and insight | Willingness to remain present with discomfort without immediately resolving it; capacity to hold paradox and uncertainty without premature closure; evidence of genuine equanimity rather than performed calm | Spiritual bypassing of shadow material: unintegrated trauma, grief, or aggression displaced into ostensibly spiritual frameworks, producing apparent serenity with intact egoic structure | Somatic and depth-psychological work alongside contemplative practice; shadow integration practices; deliberate engagement with grief, mortality, and interpersonal conflict | Jung's individuation process; Buddhist *dukkha* as the first noble truth (suffering as the entry point, not the obstacle); Rilke's injunction to "live the questions" |
+| Communal and relational contexts are not auxiliary to development but constitute its necessary medium | The capacity for genuine intimacy, conflict repair, and other-recognition develops only through sustained relational engagement; isolated practice cannot generate these capacities regardless of its depth | Quality of actual relationships; capacity to be genuinely changed by an encounter with another person; ability to tolerate disagreement without withdrawal or aggression | Solitary development without relational testing: contemplative or ethical advances that never face the friction of genuine community or intimate relationship | Deliberate engagement in sangha, supervised relational practice, accountability structures, and feedback-rich communities of practice | Ubuntu philosophy ("I am because we are"); Buber's I-Thou versus I-It relational ontology; Confucian *ren* (benevolence) as intrinsically relational; Sufi emphasis on the *murshid* relationship |
+| Authentic spiritual authority is verified by the quality of its fruits across time, not by the intensity of its experiences or the sophistication of its articulation | Development produces a characteristic signature: stable reduction in reactivity, increased availability for others, diminished need for self-confirmation, and growth in the capacity to bear uncertainty without distress | Long-term behavioral trajectory rather than peak states; response under conditions of failure, loss, or public challenge; absence of defensive self-presentation; willingness to be corrected | Charismatic performance of attainment: intense experiences or eloquent teaching substituted for the slow structural transformation that constitutes actual development | Longitudinal self-assessment against behavioral criteria; submission to peer and community accountability; explicit tracking of reactivity, generosity, and equanimity under adverse conditions | William James's pragmatic criterion ("by their fruits ye shall know them"); Theravāda *sīla-samādhi-paññā* sequence; Ignatius of Loyola's *discernment of spirits* as a fruit-based verification method |

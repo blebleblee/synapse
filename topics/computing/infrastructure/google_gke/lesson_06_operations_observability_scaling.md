@@ -26,29 +26,27 @@ The Cloud Monitoring architecture implements a time-series database optimized fo
 
 Metric collection flows through a multi-stage pipeline that begins with metric sources embedded in GKE components. The kubelet exposes container metrics through the `/metrics/cadvisor` and `/metrics/resource` endpoints using the Prometheus exposition format. The API server emits control plane metrics tracking request latency, admission webhook duration, and etcd operation performance. The kube-state-metrics service synthesizes higher-level Kubernetes object metrics by watching API server state changes and computing derived metrics like pod restart counts and deployment rollout status.
 
-```
-Metric Pipeline Architecture:
-
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Kubelet       │────▶│  Monitoring      │────▶│  Cloud          │
-│   /metrics      │     │  Agent           │     │  Monitoring API │
-└─────────────────┘     │  (DaemonSet)     │     └─────────────────┘
-                        │                  │              │
-┌─────────────────┐     │  - Scrapes       │              │
-│   API Server    │────▶│  - Transforms    │              ▼
-│   /metrics      │     │  - Buffers       │     ┌─────────────────┐
-└─────────────────┘     │  - Batches       │     │  Time-Series    │
-                        └──────────────────┘     │  Database       │
-┌─────────────────┐              │               │  (Monarch)      │
-│ kube-state-     │──────────────┘               └─────────────────┘
-│ metrics         │                                       │
-└─────────────────┘                                       │
-                                                          ▼
-                                                 ┌─────────────────┐
-                                                 │  Query Engine   │
-                                                 │  Alerting       │
-                                                 │  Dashboards     │
-                                                 └─────────────────┘
+```mermaid
+flowchart TD
+    Kubelet["Kubelet<br/>/metrics"]
+    APIServer["API Server<br/>/metrics"]
+    KSM["kube-state-<br/>metrics"]
+    
+    Agent["Monitoring Agent<br/>(DaemonSet)<br/><br/>- Scrapes<br/>- Transforms<br/>- Buffers<br/>- Batches"]
+    
+    CloudAPI["Cloud<br/>Monitoring API"]
+    
+    TSDB["Time-Series<br/>Database<br/>(Monarch)"]
+    
+    QueryEngine["Query Engine<br/>Alerting<br/>Dashboards"]
+    
+    Kubelet --> Agent
+    APIServer --> Agent
+    KSM --> Agent
+    
+    Agent --> CloudAPI
+    CloudAPI --> TSDB
+    TSDB --> QueryEngine
 ```
 
 The Google Cloud Monitoring agent, deployed as a DaemonSet on every node, implements the collection and forwarding pipeline. It scrapes metric endpoints at regular intervals, applies label transformations to normalize dimension names, buffers samples in memory to absorb temporary API unavailability, and batches writes to the Cloud Monitoring API to reduce request overhead. The agent maintains an internal write-ahead log that prevents metric loss during agent restarts. When the agent falls behind due to API throttling or network disruption, it implements exponential backoff with jitter to avoid thundering herd reconnection patterns.
@@ -59,28 +57,26 @@ Query execution implements a distributed scatter-gather pattern where the query 
 
 Cloud Logging implements a structured logging pipeline that preserves the semantic structure of log entries rather than flattening them into unstructured text lines. Each log entry consists of a timestamp, severity level, resource descriptor identifying the source, and a payload that can be structured JSON or unstructured text. The resource descriptor follows the same hierarchical model as metrics, identifying whether the log originated from a container, pod, node, or cluster-level component. Structured payloads enable precise field extraction during query processing without brittle regex parsing that breaks when log formats evolve.
 
-```
-Logging Pipeline Architecture:
-
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Container      │────▶│  Logging Agent   │────▶│  Cloud Logging  │
-│  stdout/stderr  │     │  (DaemonSet)     │     │  API            │
-└─────────────────┘     │                  │     └─────────────────┘
-                        │  - Tails logs    │              │
-┌─────────────────┐     │  - Parses        │              │
-│  Node systemd   │────▶│  - Enriches      │              ▼
-│  journals       │     │  - Buffers       │     ┌─────────────────┐
-└─────────────────┘     │  - Batches       │     │  Log Storage    │
-                        └──────────────────┘     │  (90 days)      │
-┌─────────────────┐              │               └─────────────────┘
-│  API Server     │──────────────┘                       │
-│  audit logs     │                                      │
-└─────────────────┘                                      ▼
-                                                 ┌─────────────────┐
-                                                 │  Log Explorer   │
-                                                 │  Log Analytics  │
-                                                 │  Log Router     │
-                                                 └─────────────────┘
+```mermaid
+flowchart TD
+    A["Container<br/>stdout/stderr"]
+    B["Node systemd<br/>journals"]
+    C["API Server<br/>audit logs"]
+    
+    D["Logging Agent<br/>(DaemonSet)<br/><br/>- Tails logs<br/>- Parses<br/>- Enriches<br/>- Buffers<br/>- Batches"]
+    
+    E["Cloud Logging<br/>API"]
+    
+    F["Log Storage<br/>(90 days)"]
+    
+    G["Log Explorer<br/>Log Analytics<br/>Log Router"]
+    
+    A --> D
+    B --> D
+    C --> D
+    D --> E
+    E --> F
+    F --> G
 ```
 
 The logging agent runs as a DaemonSet with privileged access to node filesystem paths where container runtime writes container logs. On GKE nodes using containerd, logs write to `/var/log/pods/{namespace}_{pod}_{uid}/{container}/` as newline-delimited files. The agent tails these files, parses JSON-structured entries if present, enriches each entry with Kubernetes metadata like namespace and pod name by querying the local kubelet API, and forwards entries to Cloud Logging. For nodes using Docker, the agent reads from journald where Docker logs via the `journald` logging driver.
@@ -91,33 +87,59 @@ The Horizontal Pod Autoscaler implements a proportional feedback controller that
 
 The scaling calculation implements rate limiting and stabilization windows to prevent thrashing. When scaling up, the controller applies the desired replica count immediately to respond quickly to traffic increases. When scaling down, the controller waits for a stabilization window, five minutes by default, during which the metric must remain below the threshold before reducing replicas. This asymmetry reflects the different risk profiles—scaling up too slowly drops traffic, while scaling down too quickly triggers immediate scale-up oscillation. The controller also enforces minimum and maximum replica bounds and respects a scale-up rate limit that prevents doubling replicas more frequently than every three minutes.
 
-```
-HPA Control Loop:
-
-Current Replicas: 3
-Current CPU: 75% average
-Target CPU: 50%
-
-Desired Replicas = Current × (Current / Target)
-                 = 3 × (75 / 50)
-                 = 3 × 1.5
-                 = 4.5 → 5 (rounded up)
-
-Scale-Up Decision:
-┌─────────────────────────────────────────────────────────────┐
-│  Current < Desired?  YES                                     │
-│  Within rate limit?  Check last scale-up timestamp           │
-│  Below max replicas? Check HPA spec.maxReplicas              │
-│  → Update Deployment.spec.replicas = 5                       │
-└─────────────────────────────────────────────────────────────┘
-
-Scale-Down Decision:
-┌─────────────────────────────────────────────────────────────┐
-│  Current > Desired?  Check metric < target                   │
-│  Stable for window?  Wait 5 minutes below threshold          │
-│  Above min replicas? Check HPA spec.minReplicas              │
-│  → Update Deployment.spec.replicas = desired                 │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start["HPA Control Loop Start"]
+    
+    subgraph Metrics["📊 Current Metrics"]
+        M1["Current Replicas: 3"]
+        M2["Current CPU: 75% average"]
+        M3["Target CPU: 50%"]
+    end
+    
+    subgraph Calculation["🧮 Desired Replicas Calculation"]
+        C1["Desired = Current × (Current / Target)"]
+        C2["Desired = 3 × (75 / 50)"]
+        C3["Desired = 3 × 1.5"]
+        C4["Desired = 4.5 → 5 (rounded up)"]
+        C1 --> C2 --> C3 --> C4
+    end
+    
+    Decision{"Current vs Desired?"}
+    
+    subgraph ScaleUp["⬆️ Scale-Up Decision"]
+        SU1{"Current < Desired?"}
+        SU2{"Within rate limit?<br/>Check last scale-up timestamp"}
+        SU3{"Below max replicas?<br/>Check HPA spec.maxReplicas"}
+        SU4["✅ Update Deployment.spec.replicas = 5"]
+        
+        SU1 -->|YES| SU2
+        SU2 -->|YES| SU3
+        SU3 -->|YES| SU4
+    end
+    
+    subgraph ScaleDown["⬇️ Scale-Down Decision"]
+        SD1{"Current > Desired?<br/>Check metric < target"}
+        SD2{"Stable for window?<br/>Wait 5 minutes below threshold"}
+        SD3{"Above min replicas?<br/>Check HPA spec.minReplicas"}
+        SD4["✅ Update Deployment.spec.replicas = desired"]
+        
+        SD1 -->|YES| SD2
+        SD2 -->|YES| SD3
+        SD3 -->|YES| SD4
+    end
+    
+    Start --> Metrics
+    Metrics --> Calculation
+    Calculation --> Decision
+    
+    Decision -->|"Current < Desired"| ScaleUp
+    Decision -->|"Current > Desired"| ScaleDown
+    Decision -->|"Current = Desired"| NoAction["No Action Required"]
+    
+    SU4 --> End["End"]
+    SD4 --> End
+    NoAction --> End
 ```
 
 The Vertical Pod Autoscaler operates through three cooperating components: the Recommender generates resource recommendations based on historical usage, the Updater triggers pod evictions to apply new recommendations, and the Admission Controller injects recommendations into new pods at creation time. Unlike HPA which modifies an external object (Deployment replicas), VPA modifies the pod spec itself, specifically the `resources.requests` fields that determine scheduling and QoS class.
@@ -130,40 +152,26 @@ The Cluster Autoscaler monitors unschedulable pods caused by insufficient node c
 
 The scaling decision balances multiple competing factors. Cost efficiency favors larger nodes that maximize resource utilization by packing more pods per node, reducing per-pod overhead from system daemons and kernel memory. Scheduling latency favors smaller nodes that provision faster and waste less capacity when partially utilized. Blast radius containment favors spreading pods across more nodes to limit impact when a node fails. The autoscaler implements these tradeoffs through configurable parameters like `--scale-down-unneeded-time` that controls how long a node must be underutilized before becoming eligible for removal.
 
-```
-Cluster Autoscaler Decision Flow:
-
-1. Detect Unschedulable Pods
-   ┌────────────────────────────────────────┐
-   │ Pod: web-7f4d8c9fb-xkw2l               │
-   │ Status: Pending                         │
-   │ Reason: Insufficient CPU                │
-   │ Requests: CPU=2000m, Memory=4Gi        │
-   └────────────────────────────────────────┘
-                    ↓
-2. Simulate Node Addition
-   ┌────────────────────────────────────────┐
-   │ Try: n2-standard-4 (4 vCPU, 16Gi)     │
-   │ Available: CPU=3600m, Memory=13Gi      │
-   │ Result: Pod fits, 1 pod schedulable    │
-   │                                         │
-   │ Try: n2-standard-8 (8 vCPU, 32Gi)     │
-   │ Available: CPU=7600m, Memory=29Gi      │
-   │ Result: Pod fits, 3 pods schedulable   │
-   └────────────────────────────────────────┘
-                    ↓
-3. Select Optimal Node Type
-   ┌────────────────────────────────────────┐
-   │ Preference: Minimize cost per pod       │
-   │ Decision: Add n2-standard-8             │
-   │ Reason: Better utilization ratio        │
-   └────────────────────────────────────────┘
-                    ↓
-4. Request Node Provisioning
-   ┌────────────────────────────────────────┐
-   │ API: Compute Engine Instance Groups     │
-   │ Action: Increase target size by 1       │
-   └────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start["Cluster Autoscaler Decision Flow"] --> Step1
+    
+    Step1["1. Detect Unschedulable Pods"]
+    Step1 --> Pod1["Pod: web-7f4d8c9fb-xkw2l<br/>Status: Pending<br/>Reason: Insufficient CPU<br/>Requests: CPU=2000m, Memory=4Gi"]
+    
+    Pod1 --> Step2["2. Simulate Node Addition"]
+    
+    Step2 --> Try1["Try: n2-standard-4 (4 vCPU, 16Gi)<br/>Available: CPU=3600m, Memory=13Gi<br/>Result: Pod fits, 1 pod schedulable"]
+    
+    Try1 --> Try2["Try: n2-standard-8 (8 vCPU, 32Gi)<br/>Available: CPU=7600m, Memory=29Gi<br/>Result: Pod fits, 3 pods schedulable"]
+    
+    Try2 --> Step3["3. Select Optimal Node Type"]
+    
+    Step3 --> Decision["Preference: Minimize cost per pod<br/>Decision: Add n2-standard-8<br/>Reason: Better utilization ratio"]
+    
+    Decision --> Step4["4. Request Node Provisioning"]
+    
+    Step4 --> API["API: Compute Engine Instance Groups<br/>Action: Increase target size by 1"]
 ```
 
 Scale-down operates conservatively to avoid disrupting workloads. The autoscaler identifies nodes as underutilized when their CPU and memory requests fall below configurable thresholds, fifty percent by default. Before removing a node, it verifies that all pods running on that node can reschedule onto other existing nodes without violating pod disruption budgets, pod anti-affinity rules, or resource constraints. It then cordons the node to prevent new pod scheduling, drains the node by gracefully terminating pods, and finally deletes the node from the underlying instance group.

@@ -30,25 +30,41 @@ The ISO 7:24 family, which includes the American CAT 40/50 and Japanese BT 30/40
 
 HSK addresses this by using a short, hollow taper at a steeper 1:10 included angle combined with simultaneous face contact. The drawbar expands a collet inside the hollow shank against the taper bore, pulling the holder's flange face into simultaneous contact with the spindle nose face. This dual-contact geometry provides dramatically higher rigidity — roughly three times the bending stiffness of an equivalent CAT 40 holder — and maintains axial positioning repeatability within 1–2 µm even at high speed because the face contact takes over as the primary locating reference when centrifugal effects loosen the taper grip. HSK-A63 is the dominant standard for general machining centers in Europe and is increasingly common in aerospace applications; HSK-E32 and similar small-bore variants are used in high-speed spindles where balance and minimal mass are critical. The tradeoff is that HSK holders are more expensive to manufacture to specification and more sensitive to contamination on the taper or face surfaces.
 
-```
-ISO 7:24 (CAT/BT) Interface          HSK Interface
-─────────────────────────────         ──────────────────────────────
-                                       
-  Spindle bore                          Spindle nose
-  ┌─────────────────┐                  ┌──────────────────────┐
-  │   7:24 taper    │                  │  1:10 taper          │
-  │   (solid)       │                  │  (hollow shank)      │
-  │       ┌─────────┤                  │      ┌───────────────┤
-  │       │ drawbar │                  │      │  drawbar      │
-  │       │ pull    │                  │      │  expands      │
-  │       │  ↑      │                  │      │  collet ↑     │
-  │       └─────────┤                  │      └───────────────┤
-  │   taper contact │                  │  taper + face contact│
-  └─────────────────┘                  └──────────────────────┘
-  
-  Single contact surface               Dual contact surface
-  Axial error at speed: 20–50 µm      Axial repeat: < 2 µm
-  Bending stiffness: baseline          Bending stiffness: ~3×
+```mermaid
+flowchart LR
+    subgraph iso_group ["ISO 7:24 (CAT/BT) Interface"]
+        direction TB
+        iso_bore["Spindle Bore"]
+        iso_taper["7:24 Taper\n(solid)"]
+        iso_drawbar["Drawbar Pull ↑"]
+        iso_contact["Taper Contact Only\n(single surface)"]
+        iso_axial["Axial Error at Speed:\n20–50 µm"]
+        iso_stiffness["Bending Stiffness:\nBaseline"]
+
+        iso_bore --> iso_taper
+        iso_taper --> iso_drawbar
+        iso_drawbar --> iso_contact
+        iso_contact --> iso_axial
+        iso_contact --> iso_stiffness
+    end
+
+    subgraph hsk_group ["HSK Interface"]
+        direction TB
+        hsk_nose["Spindle Nose"]
+        hsk_taper["1:10 Taper\n(hollow shank)"]
+        hsk_drawbar["Drawbar Expands\nCollet ↑"]
+        hsk_contact["Taper + Face Contact\n(dual surface)"]
+        hsk_axial["Axial Repeat:\n< 2 µm"]
+        hsk_stiffness["Bending Stiffness:\n~3× Baseline"]
+
+        hsk_nose --> hsk_taper
+        hsk_taper --> hsk_drawbar
+        hsk_drawbar --> hsk_contact
+        hsk_contact --> hsk_axial
+        hsk_contact --> hsk_stiffness
+    end
+
+    iso_group -- "vs." --- hsk_group
 ```
 
 For manual and manual-assist machines, R8 and Morse taper holders remain common, particularly in toolroom environments. The R8 collet system used in Bridgeport-style mills relies on a 15° included angle taper with a drawbar, providing reasonable rigidity for light cuts while allowing fast tool changes without a tool changer. Morse tapers are self-locking due to their shallow angle (approximately 2°51' on MT2) and are standard for drill press spindles and lathe tailstocks, where axial pull-out resistance matters more than quick-change capability.

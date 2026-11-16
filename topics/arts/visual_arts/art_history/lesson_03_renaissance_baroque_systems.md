@@ -36,29 +36,35 @@ Linear perspective operates through geometric projection that maps three-dimensi
 
 To determine how these orthogonals intersect with transversals (lines parallel to the picture plane marking depth intervals), Alberti proposed the distance point method. A secondary vanishing point is placed on the horizon at a distance from the central vanishing point equal to the viewer's distance from the picture plane. A diagonal line is drawn from the baseline's corner to this distance point. Where this diagonal crosses each orthogonal marks a transversal, ensuring that depth intervals diminish proportionally. The resulting checkerboard grid provides a coordinate system for positioning figures and objects in measurable space.
 
-```
-Horizon Line (Eye Level)
-         VP ·─────────────────────────────────· DP
-             ╲                               ╱
-              ╲                             ╱
-               ╲                           ╱
-                ╲                         ╱
-                 ╲                       ╱
-                  ╲                     ╱
-                   ╲                   ╱
-                    ╲                 ╱
-                     ╲               ╱
-                      ╲             ╱
-        Transversal 1  ╲           ╱
-        ───────────────┼─────────┼──────────
-        Transversal 2   ╲       ╱
-        ─────────────────┼─────┼────────────
-                          ╲   ╱
-        Baseline ─────────┴───┴────────────
-                          1   2   3 (units)
-
-VP = Vanishing Point
-DP = Distance Point
+```mermaid
+flowchart TD
+    horizon["Horizon Line<br/>(Eye Level)"]
+    vp["VP<br/>(Vanishing Point)"]
+    dp["DP<br/>(Distance Point)"]
+    
+    trans1["Transversal 1"]
+    trans2["Transversal 2"]
+    baseline["Baseline"]
+    
+    units["Units: 1 | 2 | 3"]
+    
+    horizon --> vp
+    horizon --> dp
+    vp -.-> trans1
+    dp -.-> trans1
+    vp -.-> trans2
+    dp -.-> trans2
+    trans1 --> baseline
+    trans2 --> baseline
+    baseline --> units
+    
+    style horizon fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style vp fill:#e8f4f8,stroke:#333,stroke-width:2px
+    style dp fill:#e8f4f8,stroke:#333,stroke-width:2px
+    style trans1 fill:#fff4e6,stroke:#333,stroke-width:2px
+    style trans2 fill:#fff4e6,stroke:#333,stroke-width:2px
+    style baseline fill:#f0f0f0,stroke:#333,stroke-width:2px
+    style units fill:#f9f9f9,stroke:#333,stroke-width:2px
 ```
 
 Advanced perspectival systems evolved beyond single-point to accommodate complex viewpoints. Two-point perspective introduces a second vanishing point on the horizon, used when viewing rectangular objects at an angle so that two sets of parallel edges recede to different points. Three-point perspective adds a vertical vanishing point above or below the horizon, introducing convergence in the vertical axis to depict extreme upward or downward views of tall structures. These systems require careful management of multiple vanishing points while maintaining consistent distance from viewer to picture plane to avoid spatial contradictions.

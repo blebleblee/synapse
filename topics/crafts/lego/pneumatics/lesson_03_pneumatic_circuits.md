@@ -30,25 +30,34 @@ The **hybrid** configuration combines both: actuators within a functional group 
 
 The following diagram illustrates these three topologies. Each rectangle represents an actuator (cylinder), each diamond a switching valve, and the double-line source node represents the pump/accumulator combination.
 
-```
-SERIES TOPOLOGY
-─────────────────────────────────────────────
-[SOURCE] ──── [V1] ──── [CYL A] ──── [V2] ──── [CYL B]
-
-PARALLEL TOPOLOGY
-─────────────────────────────────────────────
-                    ┌── [V1] ── [CYL A]
-[SOURCE] ──[MANIFOLD]── [V2] ── [CYL B]
-                    └── [V3] ── [CYL C]
-
-HYBRID TOPOLOGY
-─────────────────────────────────────────────
-                              ┌── [V2] ── [CYL A]
-[SOURCE] ──[V_MASTER]──[MAN1]─┤
-                              └── [V3] ── [CYL B]
-         │
-         └──[V_MASTER_2]──[MAN2]─┬── [V4] ── [CYL C]
-                                 └── [V5] ── [CYL D]
+```mermaid
+flowchart LR
+    subgraph series ["SERIES TOPOLOGY"]
+        direction LR
+        S1["SOURCE"] --> V1_S["V1"] --> CYL_A_S["CYL A"] --> V2_S["V2"] --> CYL_B_S["CYL B"]
+    end
+    
+    subgraph parallel ["PARALLEL TOPOLOGY"]
+        direction LR
+        S2["SOURCE"] --> MAN["MANIFOLD"]
+        MAN --> V1_P["V1"] --> CYL_A_P["CYL A"]
+        MAN --> V2_P["V2"] --> CYL_B_P["CYL B"]
+        MAN --> V3_P["V3"] --> CYL_C_P["CYL C"]
+    end
+    
+    subgraph hybrid ["HYBRID TOPOLOGY"]
+        direction LR
+        S3["SOURCE"] --> VM1["V_MASTER"]
+        S3 --> VM2["V_MASTER_2"]
+        
+        VM1 --> MAN1["MAN1"]
+        MAN1 --> V2_H["V2"] --> CYL_A_H["CYL A"]
+        MAN1 --> V3_H["V3"] --> CYL_B_H["CYL B"]
+        
+        VM2 --> MAN2["MAN2"]
+        MAN2 --> V4_H["V4"] --> CYL_C_H["CYL C"]
+        MAN2 --> V5_H["V5"] --> CYL_D_H["CYL D"]
+    end
 ```
 
 ### Valve Mechanics and Switching Logic

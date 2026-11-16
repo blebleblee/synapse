@@ -44,30 +44,31 @@ Instruction generation for a LEGO MOC is a software and cognitive workflow with 
 
 The core data structure of a Studio instruction file is a **build sequence graph**: an ordered list of subassembly steps, each of which defines a delta — the set of parts added relative to the previous step — along with a camera viewpoint that makes that delta maximally legible. The challenge of instruction authoring is that the build sequence that optimizes *construction ease for a first-time builder* is almost never the same sequence in which you *built the model yourself*. Expert builders often close structural access points early, route flexible elements before they're constrained, and add cosmetic tiling last, in ways that create dead ends for a builder following along without that contextual knowledge. Good instruction design re-sequences the build to maintain accessibility: internal mechanisms before exterior panels, structural framework before connection points, and always a clear buffer of access to whatever goes in next.
 
-```
-Build Sequence Architecture (Studio Instruction Graph)
+```mermaid
+flowchart TD
+    A["Part Import & Virtual Build"]
+    B["Subassembly Grouping"]
 
-[Part Import & Virtual Build]
-        │
-        ▼
-[Subassembly Grouping]
-   ┌────┴─────────────────────┐
-   │  Chassis / Frame Group   │
-   │  Powertrain Group        │
-   │  Suspension Group        │
-   │  Bodywork / SNOT Group   │
-   └────┬─────────────────────┘
-        │
-        ▼
-[Step Sequencing per Group]
-   Each step = delta (new parts) + camera angle + callout annotation
-        │
-        ▼
-[Instruction Page Layout]
-   Step views + parts list (PLI) + running total inventory
-        │
-        ▼
-[PDF / HTML Export]
+    subgraph groups ["Subassembly Groups"]
+        G1["Chassis / Frame Group"]
+        G2["Powertrain Group"]
+        G3["Suspension Group"]
+        G4["Bodywork / SNOT Group"]
+    end
+
+    C["Step Sequencing per Group"]
+    D["Each step = delta (new parts)\n+ camera angle\n+ callout annotation"]
+    E["Instruction Page Layout"]
+    F["Step views + parts list (PLI)\n+ running total inventory"]
+    Z["PDF / HTML Export"]
+
+    A --> B
+    B --> groups
+    groups --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> Z
 ```
 
 Within Studio's instruction editor, each step's camera angle is the highest-leverage parameter you control. The camera must be positioned so that every part added in the current step is simultaneously visible and unambiguous. Where a step adds parts on opposite faces of the model, you have two options: split the step into two substeps, each with its own camera angle, or select an isometric viewpoint that makes both faces simultaneously visible if the model's geometry permits it. Studio's instruction renderer does not automatically choose the optimal viewpoint — it defaults to the last camera position you used, which is rarely correct for the next step — so each step requires manual camera adjustment. This is tedious but non-negotiable. An ambiguous camera angle in a critical structural step will cause builders to assemble the wrong part orientation, which in a Technic mechanism can mean a gear mesh that is off by one tooth, a steering rack that binds, or an axle that is too short by one stud.

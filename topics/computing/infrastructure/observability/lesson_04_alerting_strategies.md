@@ -881,25 +881,21 @@ A production-grade runbook entry contains the following sections, each with spec
 
 **5. Post-Incident Checklist.** Items to verify before closing the incident (e.g., confirm SLO recovery, file a follow-up ticket, update the runbook if the procedure was inadequate).
 
-```markdown
-<!-- runbooks/api-server-5xx.md -->
-# Runbook: ErrorBudgetBurnRateCritical — api-server
-
-**Alert:** `ErrorBudgetBurnRateCritical`
-**Severity:** Critical
-**Owner:** Platform Engineering
-**SLO:** api_availability_99.9 (30-day rolling)
-**Dashboards:** [API SLO Dashboard](https://grafana.internal/d/api-slo)
-**Definition:** [alerts/slo_burn_rate.yaml](https://github.com/internal/infra/alerts/slo_burn_rate.yaml)
-
----
-
-## Triage (complete within 5 minutes)
-
-### Step 1: Confirm scope
-Run the following query in Grafana Explore to determine whether the error rate
-is elevated across all instances or isolated to a subset:
-
+```mermaid
+flowchart TD
+    A["ErrorBudgetBurnRateCritical Alert"] --> B["Alert Details"]
+    B --> C["Severity: Critical"]
+    B --> D["Owner: Platform Engineering"]
+    B --> E["SLO: api_availability_99.9<br/>30-day rolling"]
+    B --> F["Dashboards: API SLO Dashboard"]
+    B --> G["Definition: slo_burn_rate.yaml"]
+    
+    A --> H["Triage<br/>Complete within 5 minutes"]
+    H --> I["Step 1: Confirm Scope"]
+    I --> J["Run Grafana Explore Query"]
+    J --> K{Error Rate<br/>Elevated?}
+    K -->|"All Instances"| L["Incident: System-wide"]
+    K -->|Subset| M["Incident: Isolated Instances"]
 ```promql
 sum by (instance) (rate(http_requests_total{job="api-server", status=~"5.."}[5m]))
 / sum by (instance) (rate(http_requests_total{job="api-server"}[5m]))

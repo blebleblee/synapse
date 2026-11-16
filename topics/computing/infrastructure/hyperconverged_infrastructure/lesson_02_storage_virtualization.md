@@ -68,9 +68,9 @@ graph TD
     
     D -.->|"Updates"| L["Metadata Store<br/>(B+Tree / LSM-Tree)"]
     
-    style B fill:#e1f5ff
-    style H fill:#fff4e1
-    style L fill:#f0e1ff
+    style B fill:#e1f5ff,color:#0f172a
+    style H fill:#fff4e1,color:#0f172a
+    style L fill:#f0e1ff,color:#0f172a
 ```
 
 ## 2. Core Architecture & Mechanics
@@ -624,8 +624,8 @@ graph LR
     E --> G
     F --> G
     
-    style A fill:#e1f5ff
-    style G fill:#e1ffe1
+    style A fill:#e1f5ff,color:#0f172a
+    style G fill:#e1ffe1,color:#0f172a
 ```
 
 ### 3.2 Failure Modes and Mitigations

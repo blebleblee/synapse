@@ -24,14 +24,26 @@ The most architecturally fundamental category of apparatus gimmick is the load-a
 
 Consider the classic change bag. Its presentation surface is a cloth bag, visually unambiguous and apparently simple. Its load chamber is a second inner compartment separated from the outer compartment by a dividing panel. Its trigger is the act of inverting the bag's orientation, which causes the dividing panel to swing and exchange the visible compartment's contents with the hidden one. The mechanical diagram below captures the essential state machine:
 
-```
-AUDIENCE-VISIBLE STATE          HIDDEN STATE
-────────────────────────────────────────────
-  [Outer Compartment: Object A]  [Inner Compartment: Object B]
-              │
-              │  ← TRIGGER: bag inverts / divider swings
-              ▼
-  [Outer Compartment: Object B]  [Inner Compartment: Object A]
+```mermaid
+flowchart TD
+    A["<b>AUDIENCE-VISIBLE STATE</b><br/>Outer Compartment: Object A"]
+    B["<b>HIDDEN STATE</b><br/>Inner Compartment: Object B"]
+    
+    C["TRIGGER<br/>Bag inverts / Divider swings"]
+    
+    D["<b>AUDIENCE-VISIBLE STATE</b><br/>Outer Compartment: Object B"]
+    E["<b>HIDDEN STATE</b><br/>Inner Compartment: Object A"]
+    
+    A --> C
+    B --> C
+    C --> D
+    C --> E
+    
+    style A fill:#e8f4f8,stroke:#333,stroke-width:2px
+    style B fill:#f0f0f0,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5
+    style C fill:#fff4e6,stroke:#ff9800,stroke-width:2px
+    style D fill:#e8f4f8,stroke:#333,stroke-width:2px
+    style E fill:#f0f0f0,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5
 ```
 
 This state machine is the chassis on which dozens of commercial stage props are built. The specific mechanical implementation — whether the trigger is a wrist rotation, a thumb press on a hidden latch, or a gravity-driven panel — varies, but the logical architecture is identical. Understanding the chassis allows you to evaluate any new prop immediately: identify the load chamber, identify the trigger event, identify how the presentation surface maintains false state before and after. If you cannot identify all three, either the prop has a subtler architecture than you've recognized, or it has a design flaw that creates vulnerability.
@@ -48,24 +60,43 @@ The Okito box and Boston box family of coin gimmicks achieves its effect not thr
 
 Not all apparatus deception is mechanical in the kinetic sense. A substantial class of gimmicks achieves its effect through controlled light path manipulation rather than through moving parts. The mirror box is the archetypal example. A mirrored diagonal panel bisects the interior of a box, reflecting the back wall to the audience's line of sight in a way that makes the interior appear empty when it contains a concealed load space behind the mirror. The critical design constraint is the angle of the mirror relative to the audience viewing cone. A mirror placed at exactly 45° to a symmetrically-decorated box interior will produce a perfect reflection of the side wall, which appears as a view straight through to the back wall — but only if the side wall and back wall share identical visual texture. If the box interior has a plain matte black finish, any audience member within roughly ±15° of the optimal viewing angle will perceive an empty box. If the side wall finish differs from the back wall finish in color, sheen, or texture, the reflection will produce a visible seam or color shift that exposes the gimmick.
 
-```
-TOP VIEW — MIRROR BOX CROSS SECTION
-
-  ┌─────────────────────────┐
-  │   Hidden Load Space     │
-  │                         │
-  │    ╲                    │
-  │     ╲  ← Mirror (45°)   │
-  │      ╲                  │
-  │       ╲─────────────────│── Audience Sightline
-  │        ╲                │
-  │         ╲               │
-  │          ╲──────────────│
-  │       Visible Space     │
-  └─────────────────────────┘
-
-  Mirror reflects LEFT WALL → audience perceives BACK WALL
-  Requirement: left wall ≡ back wall (texture, color, sheen)
+```mermaid
+flowchart TD
+    A["Mirror Box Cross Section<br/>(Top View)"]
+    
+    subgraph structure ["Physical Structure"]
+        B["Hidden Load Space"]
+        C["45° Mirror"]
+        D["Visible Space"]
+        E["Audience Sightline"]
+    end
+    
+    subgraph optical ["Optical Path"]
+        F["Left Wall<br/>(Source)"]
+        G["Mirror Reflection"]
+        H["Back Wall<br/>(Perceived)"]
+    end
+    
+    subgraph requirements ["Design Requirements"]
+        I["Left Wall ≡ Back Wall<br/>- Texture Match<br/>- Color Match<br/>- Sheen Match"]
+    end
+    
+    A --> structure
+    A --> optical
+    A --> requirements
+    
+    B --> C
+    C --> D
+    D --> E
+    
+    F --> G
+    G --> H
+    H --> I
+    
+    style A fill:#1e3a8a,stroke:#1e40af,color:#fff,font-weight:bold
+    style C fill:#f59e0b,stroke:#d97706,color:#000,font-weight:bold
+    style E fill:#10b981,stroke:#059669,color:#fff,font-weight:bold
+    style I fill:#ef4444,stroke:#dc2626,color:#fff,font-weight:bold
 ```
 
 The practical fabrication consequence is that the interior must be finished in a single uniform application — paint sprayed in a single session, flocking applied from the same batch — so there is no batch-to-batch variation between surfaces. Any seam, shadow gap, or texture discontinuity at the mirror's edge collapses the illusion under even modest light changes. Stage lighting conditions vary dramatically between venues, and an optical gimmick that works under a cool-white LED wash may expose itself under warm tungsten, because the two light sources render surface textures and micro-shadows differently.

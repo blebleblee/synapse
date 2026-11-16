@@ -20,25 +20,41 @@ The plug represents the heart of the mechanism, a cylindrical core precisely fit
 
 Each pin stack functions as an independent mechanical gate that must be individually defeated for the lock to open. The key pin, machined to a precise length corresponding to one position in the depth code series, sits atop the key blade when inserted and transfers vertical force upward through the pin chamber. The driver pin, uniformly sized across all positions in most locks, rests atop the key pin and compresses the spring above. When no key occupies the keyway, driver pins are pushed by spring force until they bottom out against the plug, extending past the shear line and into the shell, creating the locked condition. The spring, typically a music wire compression spring with a rate of 20 to 40 grams-force per millimeter of compression, provides consistent downward pressure that maintains pin stack position and returns pins to the locked state when the key is removed.
 
-```
-LOCKED STATE (No Key)                    UNLOCKED STATE (Correct Key)
-═════════════                            ═════════════
-
-Shell:                                   Shell:
-  ┌───────────────┐                       ┌───────────────┐
-  │    Spring     │                       │    Spring     │
-  │   ╱╲╱╲╱╲╱╲    │                       │   ╱╲╱╲╱╲╱╲    │
-  │  Driver Pin   │                       │  Driver Pin   │
-  ├═══════════════┤ ← Shear Line          ├═══════════════┤ ← Shear Line
-  │   Key Pin     │                       │               │
-Plug:                                    Plug:
-  │               │                       │   Key Pin     │
-  │   Keyway      │                       │  ┌────────┐   │
-  └───────────────┘                       │  │  Key   │   │
-                                          └──┴────────┴───┘
-
-Pin extends past shear line              Pin break aligns with shear line
-Plug cannot rotate                       Plug free to rotate
+```mermaid
+flowchart LR
+    subgraph locked ["LOCKED STATE (No Key)"]
+        direction TB
+        L1["Spring<br/>╱╲╱╲╱╲╱╲"]
+        L2["Driver Pin"]
+        L3["───────────── ← Shear Line"]
+        L4["Key Pin"]
+        L5["Keyway<br/>(Empty)"]
+        L6["Pin extends past shear line<br/>Plug cannot rotate"]
+        
+        L1 --> L2
+        L2 --> L3
+        L3 --> L4
+        L4 --> L5
+        L5 -.-> L6
+    end
+    
+    subgraph unlocked ["UNLOCKED STATE (Correct Key)"]
+        direction TB
+        U1["Spring<br/>╱╲╱╲╱╲╱╲"]
+        U2["Driver Pin"]
+        U3["───────────── ← Shear Line"]
+        U4["Key Pin"]
+        U5["Key Inserted"]
+        U6["Pin break aligns with shear line<br/>Plug free to rotate"]
+        
+        U1 --> U2
+        U2 --> U3
+        U3 --> U4
+        U4 --> U5
+        U5 -.-> U6
+    end
+    
+    locked ==> unlocked
 ```
 
 The binding order phenomenon emerges from the compound effects of manufacturing tolerances and applied torque. When a picker applies rotational force to the plug using a tension wrench, the plug attempts to rotate within the shell but cannot complete the motion because driver pins obstruct its path. However, the small clearance between plug and shell allows the plug to rotate microscopically—typically 0.001 to 0.003 inches of arc travel at the shear line—before driver pins jam against both the plug chamber wall and the shell chamber wall. Due to unavoidable variations in hole alignment, one pin will bind first, bearing the entire load of the applied torque while other pins remain slack with minimal friction.

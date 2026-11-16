@@ -535,17 +535,17 @@ This reference section consolidates troubleshooting decision trees, measurement 
 | No current draw | Voltage at DUT input | Nominal | Present | Open fuse or protection | Check inline fuses, PTC devices, examine for opens |
 | Immediate current limit | Voltage at rail under test | Nominal | Near zero | Hard short to ground | Bisect power tree, isolate shorted branch, inspect for solder bridges |
 | Excessive current | Voltage at rails | Nominal | Present | Soft short or overload | Thermal imaging to locate hot components, check for shorted capacitors |
-| Correct current | Core voltage (VDD) | Nominal (e.g., 3.3V) | Low (<90%) | Regulator dropout or overload | Measure regulator input, verify adequate headroom (VIN > VOUT + dropout voltage) |
+| Correct current | Core voltage (VDD) | Nominal (e.g., 3.3V) | Low (< 90%) | Regulator dropout or overload | Measure regulator input, verify adequate headroom (VIN > VOUT + dropout voltage) |
 | Correct current | Core voltage (VDD) | Nominal | High (>110%) | Regulator failure or feedback open | Check regulator feedback network, replace regulator |
-| Correct DC voltage | Ripple amplitude (AC-coupled) | <50 mV for digital | >100 mV | Insufficient decoupling | Add bulk and ceramic capacitors, verify ESR, check capacitor values |
+| Correct DC voltage | Ripple amplitude (AC-coupled) | < 50 mV for digital | >100 mV | Insufficient decoupling | Add bulk and ceramic capacitors, verify ESR, check capacitor values |
 
 **Clock and Reset Troubleshooting Decision Tree**
 
 | Symptom | Measurement | Expected | If Deviant | Likely Cause | Action |
 |---------|-------------|----------|------------|--------------|--------|
 | Processor not executing | Crystal oscillator amplitude | 1–3 Vpp | Absent | Oscillator not running | Check load capacitors (10–20 pF), verify crystal not fractured |
-| Processor not executing | Crystal oscillator amplitude | Present | Too low (<500 mVpp) | Marginal oscillation | Reduce load capacitance, increase crystal drive strength |
-| Processor not executing | NRST pin voltage | VDD (3.3V) | Low (<1V) | Reset held active | Check reset supervisor, disconnect debugger, verify reset button not stuck |
+| Processor not executing | Crystal oscillator amplitude | Present | Too low (< 500 mVpp) | Marginal oscillation | Reduce load capacitance, increase crystal drive strength |
+| Processor not executing | NRST pin voltage | VDD (3.3V) | Low (< 1V) | Reset held active | Check reset supervisor, disconnect debugger, verify reset button not stuck |
 | Processor not executing | NRST pin voltage | VDD | Mid-rail (1.5V) | Floating or contention | Add pull-up resistor (10 kΩ), check for shorts |
 | Oscillator running | System clock frequency | Target (e.g., 72 MHz) | Off by >1% | PLL misconfiguration or crystal tolerance | Verify PLL multiplier settings, replace crystal with tighter tolerance |
 
@@ -555,9 +555,9 @@ This reference section consolidates troubleshooting decision trees, measurement 
 |---------|-------------|----------|------------|--------------|--------|
 | No ACK from slave | SDA/SCL idle levels | VDD (3.3V) | SDA or SCL low | Stuck bus or shorted device | Power cycle, check for shorted slave, execute bus reset sequence |
 | No ACK from slave | SDA/SCL idle levels | VDD | Present | Slave not responding | Verify slave address, check slave power, confirm slave clock running |
-| Intermittent failures | Rise time (10–90%) | <1000 ns (100 kHz) | >1500 ns | Excessive capacitance or weak pull-ups | Reduce cable length, decrease pull-up resistance, buffer long runs |
-| Intermittent failures | Noise on SDA/SCL | <200 mV | >500 mV | EMI coupling | Add ground shielding to cables, route away from noise sources, add series termination |
-| Data corruption | Setup time (data valid before SCL rising) | >100 ns | <50 ns | Timing violation | Reduce bus speed, verify clock stretching support, check for capacitive loading |
+| Intermittent failures | Rise time (10–90%) | < 1000 ns (100 kHz) | >1500 ns | Excessive capacitance or weak pull-ups | Reduce cable length, decrease pull-up resistance, buffer long runs |
+| Intermittent failures | Noise on SDA/SCL | < 200 mV | >500 mV | EMI coupling | Add ground shielding to cables, route away from noise sources, add series termination |
+| Data corruption | Setup time (data valid before SCL rising) | >100 ns | < 50 ns | Timing violation | Reduce bus speed, verify clock stretching support, check for capacitive loading |
 
 **ESD Failure Triage Checklist**
 
@@ -567,7 +567,7 @@ After observing ESD-induced failure, execute this checklist to classify damage a
 ☐ **Functional test:** Attempt normal operation. If functional, classify as upset (Class B/C). If non-functional, proceed to damage assessment  
 ☐ **Power consumption:** Measure supply current. Increased current suggests damaged semiconductor junctions  
 ☐ **Visual inspection:** Examine under magnification for package damage, PCB charring, lifted bond wires  
-☐ **Electrical isolation:** Measure resistance between I/O pins and supply rails. Values <10Ω indicate junction damage  
+☐ **Electrical isolation:** Measure resistance between I/O pins and supply rails. Values < 10Ω indicate junction damage  
 ☐ **Subsystem isolation:** Disconnect suspected damaged ICs, re-test system. If system recovers, confirm IC damage  
 ☐ **Protection audit:** Verify TVS diodes, series resistors, and ferrites on failed path. Missing protection indicates design deficiency  
 ☐ **Corrective action:** Implement additional protection on vulnerable node, re-test at same ESD level, verify protection effectiveness  
@@ -594,7 +594,7 @@ Thermal cycling produces time-series data correlating temperature with functiona
 
 **AC-Coupled Ripple Measurement:** Remove DC offset to maximize vertical resolution when measuring power rail ripple. Engage AC coupling and adjust vertical scale to fill the display with the ripple waveform. Verify scope bandwidth limit (20 MHz) is active to reject aliasing artifacts from high-frequency switching harmonics. Measure peak-to-peak ripple with cursors; avoid automatic measurements which may misinterpret noise spikes as ripple.
 
-**Probe Grounding for Signal Integrity:** Long ground leads create inductive loops coupling external noise and resonating with probe capacitance. Use ground springs (5 mm pigtails) or solder probe ground directly to nearby ground plane. For critical measurements, de-solder the probe's standard ground lead and solder a short wire directly from probe barrel to a ground via adjacent to the measurement point. This technique reduces ground loop inductance from ~100 nH to <5 nH, dramatically improving signal fidelity.
+**Probe Grounding for Signal Integrity:** Long ground leads create inductive loops coupling external noise and resonating with probe capacitance. Use ground springs (5 mm pigtails) or solder probe ground directly to nearby ground plane. For critical measurements, de-solder the probe's standard ground lead and solder a short wire directly from probe barrel to a ground via adjacent to the measurement point. This technique reduces ground loop inductance from ~100 nH to < 5 nH, dramatically improving signal fidelity.
 
 **Temperature Measurement Accuracy:** Contact thermocouples require good thermal coupling to measure accurately. For semiconductor packages, bond the junction with thermal epoxy (Arctic Silver or equivalent) ensuring minimal air gaps. For PCB substrate measurements, tape the thermocouple junction flat against the board with thermally conductive adhesive tape. IR thermography requires emissivity calibration: matte black surfaces exhibit ε ≈ 0.95; shiny metal surfaces exhibit ε ≈ 0.1. Paint critical measurement areas with matte black paint or apply matte black tape to normalize emissivity.
 

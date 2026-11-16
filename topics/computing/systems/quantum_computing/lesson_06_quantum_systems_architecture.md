@@ -69,30 +69,47 @@ Real-time feedback demands deterministic low-latency signal processing pipelines
 
 Hybrid algorithm orchestration requires efficient communication between the classical host and quantum processor. Each VQE iteration involves compiling a parameterized circuit, submitting the job to the quantum control system, waiting for execution and measurement, retrieving result statistics, and invoking the classical optimizer. This round-trip latency, typically 10–100 ms depending on queue depth and control software overhead, dominates total algorithm runtime for shallow circuits. Batching techniques amortize overhead by executing multiple parameter sets in parallel, exploiting the independence of circuit evaluations to saturate the quantum processor's duty cycle.
 
-```
-Quantum-Classical Hybrid VQE Execution Flow:
-
-Classical Host                    Quantum Control System
-─────────────────────────────────────────────────────────
-1. Initialize parameters θ₀
-                        ───────────────────────────────>
-2. Compile circuit U(θ₀)         Translate to pulse sequence
-   
-3. Submit job                     Enqueue & schedule
-   
-                        <───────────────────────────────
-4. Execute shots (1000x)          Generate pulses
-                                  Measure & digitize
-                                  Accumulate statistics
-                        <───────────────────────────────
-5. Receive ⟨H⟩ ± σ                Return expectation value
-   
-6. Optimizer: θ₁ = update(θ₀, ⟨H⟩)
-   
-7. Repeat until convergence
-
-Typical iteration: 50 ms compile + 10 ms execute + 40 ms overhead
-Bottleneck: Job submission and result retrieval latency
+```mermaid
+flowchart TD
+    subgraph Classical["Classical Host"]
+        A["1. Initialize parameters θ₀"]
+        B["2. Compile circuit U(θ₀)"]
+        C["3. Submit job"]
+        E["5. Receive ⟨H⟩ ± σ"]
+        F["6. Optimizer: θ₁ = update(θ₀, ⟨H⟩)"]
+        G["7. Repeat until convergence"]
+    end
+    
+    subgraph Quantum["Quantum Control System"]
+        H["Translate to pulse sequence"]
+        I["Enqueue & schedule"]
+        J["4. Execute shots (1000x)"]
+        K["Generate pulses"]
+        L["Measure & digitize"]
+        M["Accumulate statistics"]
+        N["Return expectation value"]
+    end
+    
+    A --> B
+    B --> C
+    C -->|"Job submission"| I
+    I --> H
+    H --> J
+    J --> K
+    K --> L
+    L --> M
+    M --> N
+    N -->|"Result retrieval"| E
+    E --> F
+    F --> G
+    G -.->|Next iteration| A
+    
+    style Classical fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
+    style Quantum fill:#fff4e1,stroke:#cc6600,stroke-width:2px
+    
+    note1["Typical iteration:<br/>50ms compile + 10ms execute + 40ms overhead<br/>Bottleneck: Job submission and result retrieval latency"]
+    G ~~~ note1
+    style note1 fill:#ffffcc,stroke:#999,stroke-dasharray: 5 5
 ```
 
 ### Compilation Pipeline and Optimization Passes
@@ -105,28 +122,49 @@ Qubit routing represents the most computationally intensive compilation phase, m
 
 Modern routing algorithms use token swapping formulations, modeling the problem as a permutation network where SWAP gates move qubit states through the connectivity graph. The objective function minimizes total circuit depth, accounting for both inserted SWAP gates (typically 3× the two-qubit gate time) and the original circuit gates. Advanced compilers perform gate commutation analysis, recognizing that some gates can be reordered to reduce SWAP overhead. For example, if two non-interacting two-qubit gates target disjoint qubit pairs, the compiler may reorder them to improve routing efficiency.
 
-```
-Qubit Routing Example (Heavy-Hexagon Topology):
-
-Logical Circuit:           Physical Mapping:
-─────────────────          ───────────────────
-|L0⟩ ──■──                 Map: L0→P1, L1→P4, L2→P9
-      │                    
-|L1⟩ ──■──                 P1 requires SWAP path to reach P9
-      │                    Optimal: P1↔P4, P4↔P5, P5↔P9
-|L2⟩ ──X──                 Cost: 3 SWAP gates = 9 CNOTs
-
-Routed Circuit:
-|P1⟩ ─X─ ─X─ ─■──
-      │   │   │
-|P4⟩ ─X─ ─■─ ─┼──
-          │   │
-|P5⟩ ─────X─ ─┼──
-              │
-|P9⟩ ─────────X──
-
-Depth increased from 1 to 4 gates
-Alternative mappings may reduce overhead
+```mermaid
+flowchart TD
+    subgraph logical ["Logical Circuit"]
+        L0["L0: Qubit 0"]
+        L1["L1: Qubit 1"]
+        L2["L2: Qubit 2"]
+        L0 --> CTRL1["Control Gate"]
+        L1 --> CTRL2["Control Gate"]
+        CTRL1 --> CTRL2
+        CTRL2 --> TARG["Target (X)"]
+        TARG --> L2
+    end
+    
+    subgraph mapping ["Physical Mapping"]
+        MAP["L0 → P1<br/>L1 → P4<br/>L2 → P9"]
+        ROUTE["SWAP Path:<br/>P1↔P4, P4↔P5, P5↔P9"]
+        COST["Cost: 3 SWAPs = 9 CNOTs"]
+        MAP --> ROUTE --> COST
+    end
+    
+    subgraph routed ["Routed Circuit (Heavy-Hexagon)"]
+        P1["P1"]
+        P4["P4"]
+        P5["P5"]
+        P9["P9"]
+        
+        P1 --> S1["SWAP"]
+        P4 --> S1
+        S1 --> S2["SWAP"]
+        P5 --> S2
+        S2 --> CNOT["CNOT"]
+        CNOT --> P9
+    end
+    
+    subgraph metrics ["Performance Impact"]
+        DEPTH["Depth: 1 → 4 gates"]
+        OPT["Alternative mappings<br/>may reduce overhead"]
+        DEPTH --> OPT
+    end
+    
+    logical --> mapping
+    mapping --> routed
+    routed --> metrics
 ```
 
 Backend optimization performs gate fusion, pulse optimization, and crosstalk mitigation. Gate fusion merges adjacent single-qubit gates into a single composite rotation, reducing total gate count and control overhead. Pulse optimization uses optimal control theory, typically GRAPE (Gradient Ascent Pulse Engineering) or GOAT (Gradient Optimization of Analytic conTrols), to synthesize pulse shapes that maximize gate fidelity given hardware constraints like bandwidth limits and control amplitude bounds. These techniques can improve two-qubit gate fidelities by 0.1–0.5 percentage points, critical for reducing error rates in deep circuits.
@@ -145,25 +183,35 @@ The network layer routes entanglement across multi-hop paths using entanglement 
 
 Distributed quantum algorithms exploit this infrastructure by partitioning circuits to minimize inter-module qubit teleportations. Teleportation consumes one Bell pair and requires two classical bits of communication to correct the received state. The communication round-trip latency, typically milliseconds for metropolitan-scale networks, dwarfs quantum gate times by six orders of magnitude. Algorithms must therefore exhibit coarse-grained parallelism where large subcircuits execute independently on each module before synchronizing through teleportation.
 
-```
-Distributed VQE Execution (2-Module Architecture):
+```mermaid
+flowchart TD
+    subgraph modA ["Module A (25 qubits)"]
+        A1["Prepare |ψ_A(θ)⟩"]
+        A2["Local gates (depth 50)"]
+        A3["Teleport q_A[12]"]
+        A4["Idle (2 ms latency)"]
+        A5["Measure ⟨H_A⟩"]
 
-Module A (25 qubits)              Module B (25 qubits)
-────────────────────────────────────────────────────────
-Prepare |ψ_A(θ)⟩                  Prepare |ψ_B(θ)⟩
-  ↓                                  ↓
-Local gates (depth 50)            Local gates (depth 50)
-  ↓                                  ↓
-Teleport q_A[12] ──────────────────> Receive & correct
-  ↓                                  ↓
-Idle (2 ms latency)               Apply cross-module CNOT
-  ↓                                  ↓
-Measure ⟨H_A⟩                      Measure ⟨H_B⟩
-                    ↓
-            Classical combine: ⟨H⟩ = ⟨H_A⟩ + ⟨H_B⟩ + ⟨H_AB⟩
+        A1 --> A2 --> A3 --> A4 --> A5
+    end
 
-Teleportation overhead: 2 ms >> 20 μs gate time
-Partitioning objective: Minimize number of teleportations
+    subgraph modB ["Module B (25 qubits)"]
+        B1["Prepare |ψ_B(θ)⟩"]
+        B2["Local gates (depth 50)"]
+        B3["Receive & correct"]
+        B4["Apply cross-module CNOT"]
+        B5["Measure ⟨H_B⟩"]
+
+        B1 --> B2 --> B3 --> B4 --> B5
+    end
+
+    subgraph classical ["Classical Layer"]
+        C1["Combine: ⟨H⟩ = ⟨H_A⟩ + ⟨H_B⟩ + ⟨H_AB⟩"]
+    end
+
+    A3 -->|"Teleportation (2 ms overhead)"| B3
+    A5 --> C1
+    B5 --> C1
 ```
 
 ## 3. High-Performance Optimization & Failure Modes
@@ -202,28 +250,62 @@ Qubit subset allocation allows multiple independent jobs to execute concurrently
 
 Priority inversion occurs when high-priority jobs block on calibration or other maintenance, allowing lower-priority jobs to execute during the delay. Aging mechanisms prevent starvation by gradually increasing the priority of long-waiting jobs, ensuring eventual execution even under heavy high-priority load. The scheduler also implements fair-share allocation across user groups, tracking historical usage and throttling users who exceed their quota while giving unused capacity to below-quota users.
 
-```
-Quantum Job Schedule Timeline (8-hour window):
+```mermaid
+flowchart TD
 
-Time  | Qubit Regions (100 qubits total)
-      | [0-39]    [40-59]    [60-99]
-──────┼──────────────────────────────────────
-00:00 | Job A     Calibrate  Job B
-      | (40q,     (all,       (40q,
-      | 30 min)   15 min)     20 min)
-00:30 | Job C     Job D       Job B
-      | (40q,     (20q,       (continued)
-      | 45 min)   10 min)
-01:20 | Job E     Idle        Job F
-      | (40q,                 (40q,
-      | 60 min)               30 min)
-02:20 | Calibrate all (15 min)
-...
+    subgraph legend ["Legend"]
+        L1["🔵 Compute Job"]
+        L2["🔴 Calibration"]
+        L3["⚪ Idle"]
+    end
 
-Metrics:
-- Utilization: 85% (excluding calibration)
-- Average wait time: 12 minutes
-- Calibration overhead: 18%
+    subgraph metrics ["System Metrics (8-hour window)"]
+        M1["Utilization: 85%\n(excl. calibration)"]
+        M2["Avg Wait Time: 12 min"]
+        M3["Calibration Overhead: 18%"]
+    end
+
+    subgraph timeline ["Quantum Job Schedule — 100 Qubits Total"]
+
+        subgraph t0000 ["00:00 — 00:15 (Calibration Window)"]
+            CAL1["🔴 Calibration\nAll 100 qubits · 15 min"]
+        end
+
+        subgraph t0015 ["00:15 — 00:30"]
+            direction LR
+            JA["🔵 Job A\nQubits 0–39 · 40q · 30 min\nStarts 00:00, ends 00:30"]
+            JB["🔵 Job B\nQubits 60–99 · 40q · 20 min\nStarts 00:00, ends 00:20"]
+        end
+
+        subgraph t0030 ["00:30 — 01:15"]
+            direction LR
+            JC["🔵 Job C\nQubits 0–39 · 40q · 45 min\nStarts 00:30, ends 01:15"]
+            JD["🔵 Job D\nQubits 40–59 · 20q · 10 min\nStarts 00:30, ends 00:40"]
+        end
+
+        subgraph t0120 ["01:20 — 02:20"]
+            direction LR
+            JE["🔵 Job E\nQubits 0–39 · 40q · 60 min\nStarts 01:20, ends 02:20"]
+            JF["🔵 Job F\nQubits 60–99 · 40q · 30 min\nStarts 01:20, ends 01:50"]
+            IDLE1["⚪ Idle\nQubits 40–59"]
+        end
+
+        subgraph t0220 ["02:20 — 02:35 (Calibration Window)"]
+            CAL2["🔴 Calibration\nAll 100 qubits · 15 min"]
+        end
+
+    end
+
+    CAL1 --> JA
+    CAL1 --> JB
+    JA --> JC
+    JB --> JD
+    JD --> IDLE1
+    JC --> JE
+    IDLE1 --> JE
+    JD -.->|"Qubits 40–59 idle\n00:40 – 01:20"| IDLE1
+    JE --> CAL2
+    JF --> CAL2
 ```
 
 ### Fault Tolerance and Error Correction Codes

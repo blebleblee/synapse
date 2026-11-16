@@ -452,7 +452,7 @@ If any of these appear: rest 72 hours, return at 50% volume and 80% of previous 
 | Metric | Beginner | Intermediate | Advanced | Professional |
 |--------|----------|--------------|----------|---------------|
 | Max sustainable tempo (16ths, 1 min) | 80–100 BPM | 110–130 BPM | 140–160 BPM | 170–200+ BPM |
-| Timing precision (CV of note onset) | <10% | <5% | <3% | <2% |
+| Timing precision (CV of note onset) | < 10% | < 5% | < 3% | < 2% |
 | Dynamic range (pp to ff, one scale) | 10 dB | 15 dB | 20 dB | 25+ dB |
 | Endurance (sustained at 85% of MST) | 60 sec | 120 sec | 300 sec | 600+ sec |
 | String crossing (clean 3NPS at tempo) | 60 BPM | 90 BPM | 120 BPM | 150+ BPM |

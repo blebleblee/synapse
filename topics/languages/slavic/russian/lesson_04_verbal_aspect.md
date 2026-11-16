@@ -60,23 +60,21 @@ For the concrete example of the root *писать* (to write):
 
 The same base imperfective may spawn multiple such chains in parallel:
 
-```
-писать (imperfective)
-    ├─[при-]→ приписать (perfective: to add in writing, to ascribe)
-    │           ↓ [-ыва-]
-    │         приписывать (imperfective: to be adding in writing)
-    │
-    ├─[пере-]→ переписать (perfective: to rewrite, to copy)
-    │           ↓ [-ыва-]
-    │         переписывать (imperfective: to be rewriting, to copy habitually)
-    │
-    ├─[под-]→ подписать (perfective: to sign)
-    │           ↓ [-ыва-]
-    │         подписывать (imperfective: to be signing, to sign habitually)
-    │
-    └─[вы-]→ выписать (perfective: to write out, to discharge from hospital)
-                ↓ [-ыва-]
-              выписывать (imperfective: to be writing out, to discharge habitually)
+```mermaid
+flowchart TD
+    root["писать<br/>(imperfective)"]
+    
+    root -->|при-| pri_perf["приписать<br/>(perfective: to add in writing, to ascribe)"]
+    pri_perf -->|-ыва-| pri_imperf["приписывать<br/>(imperfective: to be adding in writing)"]
+    
+    root -->|пере-| pere_perf["переписать<br/>(perfective: to rewrite, to copy)"]
+    pere_perf -->|-ыва-| pere_imperf["переписывать<br/>(imperfective: to be rewriting, to copy habitually)"]
+    
+    root -->|под-| pod_perf["подписать<br/>(perfective: to sign)"]
+    pod_perf -->|-ыва-| pod_imperf["подписывать<br/>(imperfective: to be signing, to sign habitually)"]
+    
+    root -->|вы-| vy_perf["выписать<br/>(perfective: to write out, to discharge from hospital)"]
+    vy_perf -->|-ыва-| vy_imperf["выписывать<br/>(imperfective: to be writing out, to discharge habitually)"]
 ```
 
 This radial structure generates aspectual families rather than simple pairs, with each prefixed branch encoding a distinct semantic modification while maintaining aspectual opposition through suffixation.

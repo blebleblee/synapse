@@ -20,16 +20,16 @@ The network self-regulates its difficulty through an automatic adjustment algori
 
 Every piece of work in the PoW consensus protocol is anchored to an 80-byte block header. Understanding its structure at the byte level is prerequisite to understanding both the mining loop and the chain selection rule.
 
-```
-Block Header (80 bytes)
- ┌─────────────────────────────────────────────────────────────┐
- │  Version       │  4 bytes  │  Protocol version flags         │
- │  PrevBlockHash │ 32 bytes  │  SHA256d of previous header     │
- │  MerkleRoot    │ 32 bytes  │  Root of transaction Merkle tree│
- │  Timestamp     │  4 bytes  │  Unix epoch, ±2hr node tolerance│
- │  Bits          │  4 bytes  │  Compact encoding of target T   │
- │  Nonce         │  4 bytes  │  Miner-controlled search field  │
- └─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Header["Block Header (80 bytes)"]
+    
+    Header --> Version["Version<br/>4 bytes<br/>Protocol version flags"]
+    Header --> PrevBlockHash["PrevBlockHash<br/>32 bytes<br/>SHA256d of previous header"]
+    Header --> MerkleRoot["MerkleRoot<br/>32 bytes<br/>Root of transaction Merkle tree"]
+    Header --> Timestamp["Timestamp<br/>4 bytes<br/>Unix epoch, ±2hr node tolerance"]
+    Header --> Bits["Bits<br/>4 bytes<br/>Compact encoding of target T"]
+    Header --> Nonce["Nonce<br/>4 bytes<br/>Miner-controlled search field"]
 ```
 
 The `PrevBlockHash` field is what chains blocks together cryptographically. Any modification to any transaction in a historical block changes its Merkle root, which changes its header hash, which invalidates the `PrevBlockHash` field in every descendant block, requiring all descendant proof-of-work to be recomputed. This chain-of-hashes structure is why the data structure is called a blockchain, and it is the technical mechanism by which the protocol enforces append-only history.
@@ -199,17 +199,33 @@ The expected number of hash operations needed to produce a valid block at diffic
 
 This diagram shows the fork resolution flow:
 
-```
-Block 100 (genesis ancestor, shared)
-     |
-     +---> Block 101A (chain A) ---> Block 102A ---> Block 103A  chainWork = W_A
-     |
-     +---> Block 101B (chain B) ---> Block 102B                  chainWork = W_B
-
-If W_A > W_B:
-  Canonical tip = Block 103A
-  Orphaned blocks: 101B, 102B
-  Transactions in 101B/102B return to mempool for re-inclusion
+```mermaid
+flowchart TD
+    B100["Block 100<br/>(genesis ancestor, shared)"]
+    
+    B101A["Block 101A<br/>(chain A)"]
+    B102A["Block 102A"]
+    B103A["Block 103A<br/>Canonical tip<br/>(W_A > W_B)"]
+    
+    B101B["Block 101B<br/>(chain B)<br/>⚠ Orphaned"]
+    B102B["Block 102B<br/>⚠ Orphaned"]
+    
+    Mempool["Mempool<br/>(transactions return)"]
+    
+    B100 --> B101A
+    B101A --> B102A
+    B102A --> B103A
+    
+    B100 --> B101B
+    B101B --> B102B
+    
+    B101B -.->|transactions| Mempool
+    B102B -.->|transactions| Mempool
+    
+    style B103A fill:#90EE90
+    style B101B fill:#FFB6C6
+    style B102B fill:#FFB6C6
+    style Mempool fill:#FFE4B5
 ```
 
 Nodes do not vote. They do not coordinate. Each independently evaluates accumulated work and converges on the same tip probabilistically — a statistical consensus that emerges from the physics of computation rather than from message passing.

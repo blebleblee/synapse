@@ -20,35 +20,40 @@ When you execute `terraform plan`, Terraform proceeds through a deterministic se
 
 The graph builder constructs the dependency graph in two passes. The first pass creates one node per resource, data source, local value, output, and variable in the configuration. The second pass wires directed edges between nodes by analyzing attribute reference expressions: wherever a resource attribute references another resource by interpolation (`aws_subnet.private.id`), an edge is drawn from the referencing resource to the referenced resource. The resulting graph is then passed through several transformer stages, including the `ReferenceTransformer`, which adds edges for explicit references, the `OrphanResourceTransformer`, which adds nodes for resources present in the state but absent from the configuration (representing planned destroys), and the `ProviderTransformer`, which connects each resource node to its provider node.
 
-```
-Configuration Loader
-        │
-        ▼
-   HCL AST Parser ──► Module Tree ──► Schema Validation
-                                            │
-                                            ▼
-                               Graph Builder (Pass 1: Nodes)
-                                            │
-                                            ▼
-                               Graph Builder (Pass 2: Edges)
-                                            │
-                              ┌─────────────┼─────────────┐
-                              ▼             ▼             ▼
-                   ReferenceTransformer  OrphanTransformer  ProviderTransformer
-                              │             │             │
-                              └─────────────┴─────────────┘
-                                            │
-                                            ▼
-                               Topological Walk (Parallel)
-                                            │
-                              ┌─────────────┼─────────────┐
-                              ▼             ▼             ▼
-                     ReadState     PlanResourceChange   ReadDataSource
-                              └─────────────┴─────────────┘
-                                            │
-                                            ▼
-                                  Plan File (Binary)
-                                  plan.tfplan (via -out)
+```mermaid
+flowchart TD
+    CL["Configuration Loader"]
+    HCLP["HCL AST Parser"]
+    MT["Module Tree"]
+    SV["Schema Validation"]
+    GB1["Graph Builder (Pass 1: Nodes)"]
+    GB2["Graph Builder (Pass 2: Edges)"]
+    RT["ReferenceTransformer"]
+    OT["OrphanTransformer"]
+    PT["ProviderTransformer"]
+    TW["Topological Walk (Parallel)"]
+    RS["ReadState"]
+    PRC["PlanResourceChange"]
+    RDS["ReadDataSource"]
+    PF["Plan File (Binary)\nplan.tfplan (via -out)"]
+
+    CL --> HCLP
+    HCLP --> MT
+    MT --> SV
+    SV --> GB1
+    GB1 --> GB2
+    GB2 --> RT
+    GB2 --> OT
+    GB2 --> PT
+    RT --> TW
+    OT --> TW
+    PT --> TW
+    TW --> RS
+    TW --> PRC
+    TW --> RDS
+    RS --> PF
+    PRC --> PF
+    RDS --> PF
 ```
 
 The topological walk is where actual I/O occurs. Terraform walks the graph using a concurrent walker that respects topological ordering: a node becomes eligible for processing only after all of its upstream dependencies have been processed. For each resource node, the walker calls the provider's `ReadResource` RPC to refresh the prior state if `-refresh=true` (the default), then calls `PlanResourceChange` with the prior state, the proposed configuration, and any provider-supplied normalization. The provider returns a planned new state — a document that includes both the values known at plan time and placeholder sentinel values (shown as `(known after apply)`) for computed attributes that cannot be determined until the resource is actually created.

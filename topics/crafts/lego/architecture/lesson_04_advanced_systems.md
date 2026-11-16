@@ -20,26 +20,27 @@ Consider a cantilevered balcony projecting from the third floor of a modular bui
 
 The following diagram traces the load path through a typical cantilevered architectural element:
 
-```
-                    CANTILEVER LOAD PATH
-                    ═══════════════════
-
-    [Brick stack]   │   [Balcony plate]
-    counterweight   │   extending outward
-         ▼          │         ▼
-    ╔════════╗   ╔═╧═══╧═══════╧══╗
-    ║  1×4   ║───║  2×8 plate     ║  ← balcony floor
-    ║  1×4   ║───║  (interior      ║
-    ║  1×4   ║   ║   extension)   ║
-    ╚════════╝   ╚════════════════╝
-         │              │
-         ▼              ▼
-    Clutch joints resist   Counterweight
-    peel moment (weaker    gravity load keeps
-    than shear)            path in compression
-         │
-         ▼
-    BASEPLATE — final load resolution
+```mermaid
+flowchart TD
+    BrickStack["Brick stack<br/>counterweight"]
+    BalconyPlate["Balcony plate<br/>extending outward"]
+    Plate2x8["2×8 plate<br/>(balcony floor with<br/>interior extension)"]
+    Bricks1x4["1×4 bricks<br/>(stacked)"]
+    
+    ClutchJoints["Clutch joints<br/>resist peel moment<br/>(weaker than shear)"]
+    CounterweightLoad["Counterweight gravity load<br/>keeps path in compression"]
+    Baseplate["BASEPLATE<br/>final load resolution"]
+    
+    BrickStack --> Bricks1x4
+    BalconyPlate --> Plate2x8
+    
+    Bricks1x4 --> Plate2x8
+    
+    Bricks1x4 --> ClutchJoints
+    Plate2x8 --> CounterweightLoad
+    
+    ClutchJoints --> Baseplate
+    CounterweightLoad --> Baseplate
 ```
 
 ### SNOT Integration and Facade Systems

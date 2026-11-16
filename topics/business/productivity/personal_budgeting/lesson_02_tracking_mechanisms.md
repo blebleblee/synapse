@@ -66,41 +66,36 @@ The reconciliation process closes with a specific mechanical act: you verify tha
 
 The following diagram represents the reconciliation process as a data flow:
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│ Bank Statement (Official Record)                                        │
-│ Ending Balance: $4,250.37                                               │
-└──────────────────────────┬──────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│ Transaction Matching Loop                                              │
-│                                                                         │
-│ For each transaction on bank statement:                                │
-│   If transaction exists in tracking system:                           │
-│     Mark as CLEARED                                                    │
-│   Else:                                                                │
-│     Flag as MISSING (not in tracking system)                          │
-│                                                                         │
-│ For each uncleared transaction in tracking system:                    │
-│   If transaction appears on bank statement:                           │
-│     Mark as CLEARED                                                    │
-│   Else:                                                                │
-│     Keep as PENDING (awaiting clearing)                               │
-└──────────────────────────┬──────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│ Balance Verification                                                    │
-│                                                                         │
-│ Calculate Tracking System Balance:                                     │
-│   Sum of all CLEARED transactions = $4,250.37                         │
-│                                                                         │
-│ Compare to Official Balance:                                           │
-│   Bank Ending Balance: $4,250.37                                       │
-│                                                                         │
-│ Balances match? ✓ RECONCILIATION COMPLETE                             │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    BS["**Bank Statement** *(Official Record)*\nEnding Balance: $4,250.37"]
+
+    subgraph matching ["Transaction Matching Loop"]
+        direction TB
+        BST["For each transaction on bank statement"]
+        BST --> BSTQ{"Exists in\ntracking system?"}
+        BSTQ -- Yes --> CLEARED1["Mark as **CLEARED**"]
+        BSTQ -- No --> MISSING["Flag as **MISSING**\n*(not in tracking system)*"]
+
+        UTS["For each uncleared transaction\nin tracking system"]
+        UTS --> UTSQ{"Appears on\nbank statement?"}
+        UTSQ -- Yes --> CLEARED2["Mark as **CLEARED**"]
+        UTSQ -- No --> PENDING["Keep as **PENDING**\n*(awaiting clearing)*"]
+    end
+
+    subgraph verification ["Balance Verification"]
+        direction TB
+        CALC["Calculate Tracking System Balance\nSum of all CLEARED transactions = $4,250.37"]
+        COMPARE["Compare to Official Balance\nBank Ending Balance: $4,250.37"]
+        MATCH{"Balances\nmatch?"}
+        DONE["✓ **RECONCILIATION COMPLETE**"]
+
+        CALC --> COMPARE --> MATCH
+        MATCH -- Yes --> DONE
+    end
+
+    BS --> matching
+    matching --> verification
 ```
 
 In practice, most reconciliation discrepancies are minor and stem from a handful of predictable sources. A transaction may have been recorded in your tracking system but not yet appeared on the official statement (a timing lag). A transaction may have been recorded twice (a duplicate entry error). A transaction may have been miscategorized by amount (you entered $50 when the actual charge was $50.47). Most of these discrepancies are caught during the matching process, and the tracking system is updated to reflect the correction. Once corrections are made, the balances match, and reconciliation is complete.
@@ -135,6 +130,19 @@ In practice, the mechanics of cash flow tracking encounter numerous operational 
 
 The categorization stage is the most labor-intensive point in the tracking pipeline when executed manually. Faced with fifty to two hundred transactions per month, each requiring a category assignment, many practitioners attempt to automate this work through rules-based systems. A common approach is to create conditional rules: "any transaction from Amazon categorize as Shopping," "any transaction from Whole Foods categorize as Groceries," and so forth.
 
-These rule-based systems work well initially, but they encounter problems as transaction history accumulates and exceptions emerge. You may have purchased office supplies from Amazon (Shopping) and also groceries from Amazon Fresh (Groceries). You may have purchased a birthday gift for a friend from a restaurant (Gifts) rather than dining out. The rule-based system, which was created to reduce manual effort, instead creates additional work: you must constantly refine and revise rules as new exceptions emerge, and you must periodically audit the system to catch miscategorizations that slipped through the rules.
+These rule-based systems work well initially, but they encounter problems as transaction history accumulates and exceptions emerge. You may have purchased office supplies from Amazon (Shopping) and also groceries from Amazon Fresh (Groceries). You may have purchased a birthday gift for a friend from a restaurant (Gifts) rather than dining out.
 
-A more effective optimization is to use machine learning-based categorization, where
+The fundamental issue is that merchant identifiers are ambiguous signals: they correlate with category but do not determine it. Automated categorization systems built on merchant-matching rules will therefore always produce classification errors proportional to the diversity of purchase types from each merchant. The optimization response is not to abandon automation but to implement a hybrid system: apply rules to bulk-categorize obvious cases (utility bills, recurring subscriptions, salary deposits), then surface only the ambiguous subset for manual review. This reduces the manual burden by 60-80% while preserving classification accuracy where it matters. The second critical optimization is to implement learning from corrections: when you manually override an automatic categorization, the system should flag similar future transactions for review rather than blindly applying the same incorrect rule. Modern tracking software implements this through probabilistic models or simple "exception lists," but even a spreadsheet implementation can achieve this by maintaining a separate "review queue" worksheet for flagged merchants.
+
+Beyond categorization, the most severe failure mode is reconciliation drift—when the tracking system's recorded balance diverges from actual account balances without detection. This occurs when transactions are missed (failing to import a cash purchase), duplicated (importing the same credit card statement twice), or when timing mismatches create temporary discrepancies that are never resolved. The diagnostic protocol is mandatory periodic reconciliation: at minimum monthly, compare each tracked account's ending balance in your system against the actual statement balance. Any discrepancy larger than a de minimis threshold (typically $5-10 to account for rounding and pending transactions) must be investigated and resolved before proceeding. Failure to enforce this discipline compounds errors exponentially—a $20 discrepancy in January becomes impossible to diagnose by June when hundreds of subsequent transactions have been recorded. The operational rule is that reconciliation is not optional maintenance but a hard gate: you do not proceed to the next month's data entry until the previous month reconciles to within tolerance.
+
+## Summary & Verification Matrix
+
+| **Invariant / Principle** | **Mechanism** | **Failure Mode** | **Diagnostic Criterion** |
+|---------------------------|---------------|------------------|--------------------------|
+| **Complete Capture** | All cash flows (inflows and outflows) across all accounts must enter the tracking system | Silent omissions—cash transactions, peer-to-peer payments, or secondary accounts are never recorded | Monthly reconciliation: tracked ending balance equals actual statement balance within $5-10 tolerance for each account |
+| **Unambiguous Categorization** | Each transaction receives exactly one category assignment; categories are mutually exclusive and collectively exhaustive | Merchant-based automation produces misclassification when merchants sell diverse product types; manual burden causes under-categorization | Spot audit: randomly sample 20 transactions per month and verify category assignments match actual purchase purpose; error rate < 5% |
+| **Enforced Reconciliation Gate** | Before processing new period data, prior period balances must match actual account statements within tolerance | Reconciliation drift—cumulative errors compound as discrepancies are ignored or postponed, making root cause analysis impossible | Hard blocking rule: system flags any account with >$10 discrepancy and prevents new transaction entry until resolved |
+| **Trend Stability Under Aggregation** | Category spending patterns converge to stable averages as observation window increases (3+ months) | High-variance categories (gifts, medical, travel) produce misleading single-month snapshots; users overreact to noise | Calculate rolling 3-month average for each category; flag any single month deviating >40% from rolling average for review before conclusions |
+| **Forecast Incorporates Known Future Events** | Projections must include scheduled future inflows/outflows with known dates and amounts | Naive trend extrapolation ignores annual insurance premiums, quarterly tax payments, or irregular bonus income, causing false surplus/deficit signals | Forecast accuracy test: compare projected vs. actual balance at month-end; systematic errors >15% indicate missing scheduled events in projection model |
+| **Hybrid Automation Architecture** | Use rules to bulk-process obvious transactions; surface ambiguous cases for manual review | Full automation produces silent classification errors; full manual processing creates unsustainable cognitive load and abandonment | Measure manual review burden: target 20-40 transactions per month requiring human judgment (< 20% of total volume for typical user); automation handles the remaining 60-80% |

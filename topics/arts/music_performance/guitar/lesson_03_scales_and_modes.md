@@ -75,8 +75,8 @@ graph TD
         B2 -->|"P4, +5 frets"| E1["1st String: E, 329.6 Hz"]
     end
 
-    style G3 fill:#ffe0e0,stroke:#cc0000
-    style B2 fill:#ffe0e0,stroke:#cc0000
+    style G3 fill:#ffe0e0,stroke:#cc0000,color:#0f172a
+    style B2 fill:#ffe0e0,stroke:#cc0000,color:#0f172a
 ```
 
 **Practical rule:** any box pattern you've worked out on strings 6-5-4-3 shifts **one fret lower** when you cross onto strings 2 and 1, to land on the correct pitch. Say it out loud while you practice until it's automatic: "cross the G-B, drop one fret." This single habit fixes most "wrong note" accidents in lead playing.
@@ -101,11 +101,11 @@ graph LR
         Gs -.->|"+12 frets, octave"| Es
     end
 
-    style Es fill:#e8f5e9
-    style Ds fill:#fce4ec
-    style Cs fill:#f3e5f5
-    style As fill:#fff3e0
-    style Gs fill:#e3f2fd
+    style Es fill:#e8f5e9,color:#0f172a
+    style Ds fill:#fce4ec,color:#0f172a
+    style Cs fill:#f3e5f5,color:#0f172a
+    style As fill:#fff3e0,color:#0f172a
+    style Gs fill:#e3f2fd,color:#0f172a
 ```
 
 Each shape carries an embedded triad, a pentatonic box, and the full diatonic scale in one hand position. **Learn one shape to completion** — chord grip, scale notes, triad arpeggio — before adding the next. Five incomplete shapes are worth less than one mastered shape.

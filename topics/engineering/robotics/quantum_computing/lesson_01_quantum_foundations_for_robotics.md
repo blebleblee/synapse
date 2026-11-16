@@ -68,16 +68,99 @@ The quantum-classical interface architecture determines how robotics software in
 
 For robotics motion planning via variational quantum algorithms, the quantum circuit architecture encodes trajectory waypoints as qubit states and evaluates collision penalties as Pauli expectation values. Consider a planar manipulator with $n$ joints navigating through a cluttered workspace represented as a grid discretization. Each joint angle $\theta_i$ quantizes into $k$ discrete values, requiring $\lceil \log_2(k) \rceil$ qubits per joint for a total register size of $n\lceil \log_2(k) \rceil$ qubits. The circuit structure typically follows an ansatz pattern: initial Hadamard layers create superposition, followed by alternating entangling layers (CNOT chains, all-to-all controlled gates, or hardware-efficient brick patterns) and parameterized rotation layers $R_y(\vec{\theta})$ where the angles $\vec{\theta}$ encode trajectory parameters subject to classical optimization.
 
-```
-q_0: ──H────●────Ry(θ₀)────●────Ry(φ₀)────M───
-            │              │
-q_1: ──H────X────Ry(θ₁)────┼────Ry(φ₁)────M───
-                           │
-q_2: ──H────●────Ry(θ₂)────X────Ry(φ₂)────M───
-            │
-q_3: ──H────X────Ry(θ₃)────●────Ry(φ₃)────M───
-                           │
-q_4: ──H─────────Ry(θ₄)────X────Ry(φ₄)────M───
+```mermaid
+flowchart LR
+    %% Qubit 0
+    q0_in(["q₀"])
+    q0_H["H"]
+    q0_ry0["Ry(θ₀)"]
+    q0_ry1["Ry(φ₀)"]
+    q0_M[["M"]]
+
+    %% Qubit 1
+    q1_in(["q₁"])
+    q1_H["H"]
+    q1_X1["X"]
+    q1_ry0["Ry(θ₁)"]
+    q1_ry1["Ry(φ₁)"]
+    q1_M[["M"]]
+
+    %% Qubit 2
+    q2_in(["q₂"])
+    q2_H["H"]
+    q2_ry0["Ry(θ₂)"]
+    q2_X2["X"]
+    q2_ry1["Ry(φ₂)"]
+    q2_M[["M"]]
+
+    %% Qubit 3
+    q3_in(["q₃"])
+    q3_H["H"]
+    q3_X1["X"]
+    q3_ry0["Ry(θ₃)"]
+    q3_ctrl2["●"]
+    q3_ry1["Ry(φ₃)"]
+    q3_M[["M"]]
+
+    %% Qubit 4
+    q4_in(["q₄"])
+    q4_H["H"]
+    q4_ry0["Ry(θ₄)"]
+    q4_X2["X"]
+    q4_ry1["Ry(φ₄)"]
+    q4_M[["M"]]
+
+    %% CNOT gate 1: q0 controls q1 (first layer)
+    ctrl1["●"]
+    
+    %% CNOT gate 2: q2 controls q3 (first layer)
+    ctrl2a["●"]
+
+    %% CNOT gate 3: q0 controls q2 (second layer)
+    ctrl3["●"]
+
+    %% Wire q0
+    q0_in --> q0_H --> ctrl1 --> q0_ry0 --> ctrl3 --> q0_ry1 --> q0_M
+
+    %% Wire q1
+    q1_in --> q1_H --> q1_X1 --> q1_ry0 --> q1_ry1 --> q1_M
+
+    %% Wire q2
+    q2_in --> q2_H --> ctrl2a --> q2_ry0 --> q2_X2 --> q2_ry1 --> q2_M
+
+    %% Wire q3
+    q3_in --> q3_H --> q3_X1 --> q3_ry0 --> q3_ctrl2 --> q3_ry1 --> q3_M
+
+    %% Wire q4
+    q4_in --> q4_H --> q4_ry0 --> q4_X2 --> q4_ry1 --> q4_M
+
+    %% CNOT connections: control to target (first layer)
+    ctrl1 -->|"CNOT"| q1_X1
+    ctrl2a -->|"CNOT"| q3_X1
+
+    %% CNOT connections: control to target (second layer)
+    ctrl3 -->|"CNOT"| q2_X2
+    q3_ctrl2 -->|"CNOT"| q4_X2
+
+    %% Styling
+    style ctrl1 fill:#2d2d2d,color:#fff,stroke:#888
+    style ctrl2a fill:#2d2d2d,color:#fff,stroke:#888
+    style ctrl3 fill:#2d2d2d,color:#fff,stroke:#888
+    style q3_ctrl2 fill:#2d2d2d,color:#fff,stroke:#888
+    style q0_H fill:#1a4a7a,color:#fff,stroke:#3a7abf
+    style q1_H fill:#1a4a7a,color:#fff,stroke:#3a7abf
+    style q2_H fill:#1a4a7a,color:#fff,stroke:#3a7abf
+    style q3_H fill:#1a4a7a,color:#fff,stroke:#3a7abf
+    style q4_H fill:#1a4a7a,color:#fff,stroke:#3a7abf
+    style q1_X1 fill:#7a1a1a,color:#fff,stroke:#bf3a3a
+    style q3_X1 fill:#7a1a1a,color:#fff,stroke:#bf3a3a
+    style q2_X2 fill:#7a1a1a,color:#fff,stroke:#bf3a3a
+    style q4_X2 fill:#7a1a1a,color:#fff,stroke:#bf3a3a
+    style q0_M fill:#2a5a2a,color:#fff,stroke:#4abf4a
+    style q1_M fill:#2a5a2a,color:#fff,stroke:#4abf4a
+    style q2_M fill:#2a5a2a,color:#fff,stroke:#4abf4a
+    style q3_M fill:#2a5a2a,color:#fff,stroke:#4abf4a
+    style q4_M fill:#2a5a2a,color:#fff,stroke:#4abf4a
 ```
 
 This schematic represents a five-qubit variational circuit for a two-joint manipulator with four discretization levels per joint ($2^2 = 4$ configurations). The Hadamard gates initialize uniform superposition over all joint configurations. CNOT gates in a ladder topology generate entanglement, encoding kinematic coupling constraints between adjacent joints. Parameterized $R_y$ rotation layers twice repeated allow the circuit to explore configuration space, with angles $\{\theta_i, \phi_i\}$ serving as classical optimization variables. Final measurements project onto computational basis states, each bitstring decoding to a specific joint configuration whose collision status the classical optimizer evaluates.

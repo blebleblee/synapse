@@ -473,7 +473,7 @@ The critical security-performance interaction is **CPU side-channel vulnerabilit
 | Retpoline | Replace indirect branches with return trampolines | 2–5% on branch-heavy workloads |
 | IBRS/IBPB | Flush indirect branch predictor on VM entry/exit | 10–20% on high-VMEX-rate workloads |
 | L1TF (Flushing) | Flush L1 data cache on every VM switch | 5–15% on memory-intensive VMs |
-| MDS (VERW) | Execute VERW before VM entry | <1% average, up to 5% on microservice workloads |
+| MDS (VERW) | Execute VERW before VM entry | < 1% average, up to 5% on microservice workloads |
 | PTI (KPTI) | Separate kernel/user page tables | 3–10% on syscall-heavy workloads |
 
 Disabling these mitigations in an HCI environment to recover performance is a critical security error — it re-enables cross-VM information leakage through shared CPU microarchitectural state. The correct approach is to use CPU pinning and NUMA-aware scheduling to reduce VM co-residency on the same physical core when security domain separation is required (e.g., PCI DSS workloads co-resident with untrusted tenants).
@@ -639,3 +639,4 @@ The CIS VMware ESXi Benchmark (Level 1) provides 100+ controls. The highest-impa
 set -euo pipefail
 
 echo "[1] Disable SSH (management access via vSphere API
+```

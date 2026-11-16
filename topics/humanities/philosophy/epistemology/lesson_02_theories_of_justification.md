@@ -28,23 +28,25 @@ The practical stakes of these theoretical disputes emerge sharply when adjudicat
 
 Foundationalist architecture implements a directed acyclic graph structure with beliefs as nodes and justificatory relations as edges pointing from supporting beliefs to supported beliefs. The graph must satisfy a crucial constraint: there exists a distinguished subset of nodes marked as foundational beliefs that have in-degree zero—no incoming justificatory edges. All non-foundational beliefs must be reachable through directed paths originating from one or more foundational nodes. This ensures that justification terminates rather than regressing infinitely or forming cycles.
 
-```
-Foundational Architecture (DAG Structure):
-
-    [F1: I seem to see red]    [F2: I feel pain]    [F3: 1+1=2]
-         |                           |                    |
-         |                           |                    |
-         v                           v                    |
-    [The apple is red]         [I am in discomfort]      |
-         |                           |                    |
-         |                           v                    |
-         |                    [I should take aspirin]     |
-         |                                                |
-         v                                                v
-    [Some apples are red] ---------> [Mathematical truths are certain]
-         |
-         v
-    [Apples exist in the external world]
+```mermaid
+flowchart TD
+    F1["F1: I seem to see red"]
+    F2["F2: I feel pain"]
+    F3["F3: 1+1=2"]
+    A["The apple is red"]
+    B["I am in discomfort"]
+    C["I should take aspirin"]
+    D["Some apples are red"]
+    E["Mathematical truths are certain"]
+    F["Apples exist in the external world"]
+    
+    F1 --> A
+    F2 --> B
+    B --> C
+    A --> D
+    D --> E
+    F3 --> E
+    D --> F
 ```
 
 The foundationalist must specify both the demarcation criterion for basicality and the transmission principles governing inferential justification. Classical foundationalists like Descartes employed an indubitability criterion: a belief qualifies as foundational only if its denial generates logical or pragmatic contradiction. Cartesian foundational beliefs include one's own existence (the cogito), the contents of immediate conscious experience, and clear and distinct rational intuitions. The transmission principle demands deductive certainty—justified beliefs can support derived beliefs only through logically valid inference, ensuring that the absolute certainty of foundations transmits upward.
@@ -53,28 +55,26 @@ Modest foundationalism relaxes both the basicality criterion and transmission pr
 
 Coherentist architecture abandons the acyclic constraint entirely, permitting circular justificatory relations provided they participate in a globally coherent system. Beliefs justify each other through reciprocal support relations forming densely connected subgraphs. No belief possesses intrinsic justification; rather, justification emerges holistically from network topology and global coherence measures.
 
-```
-Coherentist Architecture (Dense Cyclic Graph):
+```mermaid
+flowchart TD
+    A["The apple looks red"]
+    B["Apples are typically colored"]
+    C["Light conditions are normal as usual"]
+    D["My vision is reliable"]
+    E["I perceive accurately today"]
+    F["No defeaters are present"]
 
-         [The apple looks red]
-              /     |     \
-             /      |      \
-            /       |       \
-           /        |        \
-    [Apples are]    |    [Light conditions]
-    [typically   ]  |    [are normal      ]
-    [colored    ] ←-+---→[as usual        ]
-           \        |        /
-            \       |       /
-             \      |      /
-              \     |     /
-         [My vision is reliable]
-                   |
-                   ↓
-         [I perceive accurately today]
-                   ↑
-                   |
-         [No defeaters are present]
+    A --> B
+    A --> D
+    A --> C
+    B --> A
+    B --> C
+    C --> A
+    C --> B
+    D --> A
+    D --> E
+    E --> D
+    F --> E
 ```
 
 BonJour specifies five coherence dimensions that collectively determine justification strength. Logical consistency requires that no belief logically contradicts any other belief in the system. Probabilistic consistency extends this to statistical coherence—beliefs must assign coherent probability distributions. Inferential density measures the quantity and strength of support relations connecting beliefs. A maximally coherent system exhibits rich inferential interconnections where beliefs mutually reinforce each other through multiple independent pathways. Explanatory integration demands that beliefs cohere into unified explanatory narratives rather than fragmenting into isolated belief clusters. Finally, stability requires that the belief system resists fragmentation under evidential perturbations, maintaining coherence despite local belief revisions.

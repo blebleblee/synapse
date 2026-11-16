@@ -192,23 +192,30 @@ $$\text{Log}\, z = \ln|z| + i \Arg z, \qquad \Arg z \in (-\pi, \pi)$$
 
 defined on the slit plane $\mathbb{C} \setminus (-\infty, 0]$. On this domain, $\text{Log}$ is analytic, and its derivative is $\frac{1}{z}$. This derivative formula is universal: every branch of the logarithm has derivative $1/z$ on its domain of analyticity, because locally the logarithm is an inverse of $e^w$ and $\frac{d}{dz} \log z = \frac{1}{e^{\log z}} = \frac{1}{z}$ by the inverse function theorem.
 
-```
-Branch cut for the principal logarithm Log z
+```mermaid
+flowchart TD
+    subgraph domain ["Principal Logarithm: Log z"]
+        DEF["Log z = ln|z| + i·Arg z"]
+        ARG["Arg z ∈ (−π, π)"]
+        JUMP["Jump discontinuity: +2πi across the cut"]
 
-        Im z
-         ↑
-         |    . . . . . .
-         |  .   Domain of    .
-         |.    analyticity     .
-    ----●----+----+----+----→ Re z
-    -∞  0   |        +∞
-         |.    (slit: (-∞,0])  .
-         |  .                .
-         |    . . . . . .
-         ↓
-         
-    Log z = ln|z| + i·Arg z,  Arg z ∈ (-π, π)
-    Jump discontinuity: +2πi across the cut
+        DEF --> ARG
+        DEF --> JUMP
+    end
+
+    subgraph plane ["Complex z-plane"]
+        ORIGIN["● Origin\n(z = 0, excluded)"]
+        CUT["Slit: (−∞, 0]\n(negative real axis + origin,\nbranch cut)"]
+        ANALYTIC["Domain of analyticity\nℂ \\ (−∞, 0]\n(all z except the cut)"]
+        REAXIS["Re z axis\n(−∞ ← 0 → +∞)"]
+        IMAXIS["Im z axis\n(↑ ↓)"]
+    end
+
+    ORIGIN -->|"branch point"| CUT
+    CUT -->|"excluded from domain"| ANALYTIC
+    REAXIS --> ORIGIN
+    IMAXIS --> ORIGIN
+    ANALYTIC -->|"Log z holomorphic here"| domain
 ```
 
 The branch cut along $(-\infty, 0]$ is a convention, not a necessity. Any simple curve from the origin to infinity serves as a valid branch cut, and different cuts give different single-valued branches. For instance, cutting along the positive real axis with $\Arg z \in (0, 2\pi)$ gives a branch analytic on $\mathbb{C} \setminus [0, \infty)$. The choice of cut is a practical decision guided by the application: which region of the complex plane must remain free of discontinuities, and which paths of analytic continuation must be accommodated.

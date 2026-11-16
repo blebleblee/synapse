@@ -187,10 +187,16 @@ WHERE c.relname = 'employee';
 ```
 
 Example output:
-```
- table_name | file_id |      file_path       | size
-------------+---------+----------------------+------
- employee   |   16385 | base/16384/16385     | 8192 bytes
+```mermaid
+flowchart TD
+    A["Table: employee"]
+    B["File ID: 16385"]
+    C["File Path: base/16384/16385"]
+    D["Size: 8192 bytes"]
+    
+    A --> B
+    B --> C
+    C --> D
 ```
 
 The file path is relative to PostgreSQL's data directory (e.g., `/var/lib/postgresql/14/main/`).
@@ -205,10 +211,19 @@ SELECT * FROM page_header(get_raw_page('employee', 0));
 ```
 
 Output interpretation:
-```
-    lsn    | checksum | flags | lower | upper | special | pagesize | version | prune_xid
------------+----------+-------+-------+-------+---------+----------+---------+-----------
- 0/1E8F4A8 |        0 |     0 |    56 |  7936 |    8192 |     8192 |       4 |         0
+```mermaid
+flowchart TD
+    Header["PostgreSQL Page Header"]
+    
+    Header --> LSN["lsn: 0/1E8F4A8"]
+    Header --> Checksum["checksum: 0"]
+    Header --> Flags["flags: 0"]
+    Header --> Lower["lower: 56"]
+    Header --> Upper["upper: 7936"]
+    Header --> Special["special: 8192"]
+    Header --> PageSize["pagesize: 8192"]
+    Header --> Version["version: 4"]
+    Header --> PruneXID["prune_xid: 0"]
 ```
 
 - **lsn (Log Sequence Number):** WAL position of the last modification to this page
@@ -222,13 +237,30 @@ SELECT * FROM heap_page_items(get_raw_page('employee', 0));
 ```
 
 Simplified output:
-```
- lp | lp_off | lp_flags | lp_len | t_xmin | t_xmax | t_field3 | t_ctid | t_infomask2 | t_infomask | t_hoff | t_bits | t_oid
-----+--------+----------+--------+--------+--------+----------+--------+-------------+------------+--------+--------+-------
-  1 |   8128 |        1 |     64 |    730 |      0 |        0 | (0,1)  |           6 |       2306 |     24 |        |      
-  2 |   8064 |        1 |     63 |    730 |      0 |        0 | (0,2)  |           6 |       2306 |     24 |        |      
-  3 |   7992 |        1 |     71 |    730 |      0 |        0 | (0,3)  |           6 |       2306 |     24 |        |      
-  4 |   7928 |        1 |     63 |    730 |      0 |        0 | (0,4)  |           6 |       2306 |     24 |        |      
+```mermaid
+flowchart TD
+    subgraph page ["PostgreSQL Heap Page — Item Pointer Array"]
+        direction TD
+
+        subgraph hdr ["Line Pointer (lp) Fields"]
+            LP1["lp = 1 | lp_off = 8128 | lp_flags = 1 | lp_len = 64"]
+            LP2["lp = 2 | lp_off = 8064 | lp_flags = 1 | lp_len = 63"]
+            LP3["lp = 3 | lp_off = 7992 | lp_flags = 1 | lp_len = 71"]
+            LP4["lp = 4 | lp_off = 7928 | lp_flags = 1 | lp_len = 63"]
+        end
+
+        subgraph tuples ["HeapTuple Headers"]
+            T1["t_ctid = (0,1) | t_xmin = 730 | t_xmax = 0 | t_field3 = 0\nt_infomask2 = 6 | t_infomask = 2306 | t_hoff = 24"]
+            T2["t_ctid = (0,2) | t_xmin = 730 | t_xmax = 0 | t_field3 = 0\nt_infomask2 = 6 | t_infomask = 2306 | t_hoff = 24"]
+            T3["t_ctid = (0,3) | t_xmin = 730 | t_xmax = 0 | t_field3 = 0\nt_infomask2 = 6 | t_infomask = 2306 | t_hoff = 24"]
+            T4["t_ctid = (0,4) | t_xmin = 730 | t_xmax = 0 | t_field3 = 0\nt_infomask2 = 6 | t_infomask = 2306 | t_hoff = 24"]
+        end
+
+        LP1 -->|"points to"| T1
+        LP2 -->|"points to"| T2
+        LP3 -->|"points to"| T3
+        LP4 -->|"points to"| T4
+    end
 ```
 
 - **lp (Line Pointer):** Index in the item pointer array
@@ -369,8 +401,8 @@ graph TD
     F --> G["ExclusiveLock<br/>(REFRESH MAT VIEW)"]
     G --> H["AccessExclusiveLock<br/>(DROP TABLE, TRUNCATE)"]
     
-    style H fill:#ff6b6b
-    style A fill:#51cf66
+    style H fill:#ff6b6b,color:#0f172a
+    style A fill:#51cf66,color:#0f172a
 ```
 
 **Lock Compatibility Matrix:**
@@ -437,13 +469,30 @@ ORDER BY l.granted, a.query_start;
 
 Output interpretation:
 
-```
- locktype | table_name | mode             | granted | pid   | query                                  | query_duration
-----------+------------+------------------+---------+-------+----------------------------------------+----------------
- relation | employee   | RowShareLock     | t       | 12345 | SELECT * FROM employee WHERE id=1 FOR UPDATE | 00:00:15
- tuple    | employee   | ExclusiveLock    | t       | 12345 | SELECT * FROM employee WHERE id=1 FOR UPDATE | 00:00:15
- relation | employee   | RowExclusiveLock | t       | 12346 | UPDATE employee SET salary=... WHERE id=1    | 00:00:08
- tuple    | employee   | ExclusiveLock    | f       | 12346 | UPDATE employee SET salary=... WHERE id=1    | 00:00:08
+```mermaid
+flowchart TD
+    subgraph PID_12345["Process 12345 (Query Duration: 00:00:15)"]
+        Q1["SELECT * FROM employee<br/>WHERE id=1 FOR UPDATE"]
+        L1["relation: employee<br/>RowShareLock ✓"]
+        L2["tuple: employee<br/>ExclusiveLock ✓"]
+        Q1 --> L1
+        Q1 --> L2
+    end
+    
+    subgraph PID_12346["Process 12346 (Query Duration: 00:00:08)"]
+        Q2["UPDATE employee<br/>SET salary=...<br/>WHERE id=1"]
+        L3["relation: employee<br/>RowExclusiveLock ✓"]
+        L4["tuple: employee<br/>ExclusiveLock ✗ BLOCKED"]
+        Q2 --> L3
+        Q2 --> L4
+    end
+    
+    L2 -.->|"Blocks"| L4
+    
+    style L4 fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style L1 fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+    style L2 fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+    style L3 fill:#ccffcc,stroke:#00cc00,stroke-width:2px
 ```
 
 - T1 (pid 12345) holds a tuple-level `ExclusiveLock` (granted=t)
@@ -717,10 +766,16 @@ SELECT
 ```
 
 Example output:
-```
- start_position | end_position  | bytes_written | wal_size
-----------------+---------------+---------------+----------
- 0/1E8F4A8      | 0/2A3C5F0     | 11642152      | 11 MB
+```mermaid
+flowchart TD
+    A["start_position: 0/1E8F4A8"]
+    B["end_position: 0/2A3C5F0"]
+    C["bytes_written: 11642152"]
+    D["wal_size: 11 MB"]
+    
+    A --> C
+    B --> C
+    C --> D
 ```
 
 #### Step 3: Inspect WAL Records (PostgreSQL 15+)
@@ -743,12 +798,43 @@ LIMIT 20;
 ```
 
 Example output:
-```
- start_lsn  |  end_lsn   | resource_manager |   record_type   | record_length | description
-------------+------------+------------------+-----------------+---------------+----------------------------------
- 0/1E8F4A8  | 0/1E8F4E0  | Heap             | INSERT          | 56            | off 1, blkref #0: rel 1663/16384/16385 fork main blk 0
- 0/1E8F4E0  | 0/1E8F518  | Heap             | INSERT          | 56            | off 2, blkref #0: rel 1663/16384/16385 fork main blk 0
- 0/1E8F518  | 0/1E8F550  | Transaction      | COMMIT          | 56            | 2023-10-15 14:32:10.123456+00
+```mermaid
+flowchart TD
+    A["LSN: 0/1E8F4A8 → 0/1E8F4E0"]
+    B["Resource Manager: Heap"]
+    C["Record Type: INSERT"]
+    D["Length: 56 bytes"]
+    E["Heap Insert #1<br/>Table: 1663/16384/16385<br/>Fork: main, Block: 0"]
+    
+    F["LSN: 0/1E8F4E0 → 0/1E8F518"]
+    G["Resource Manager: Heap"]
+    H["Record Type: INSERT"]
+    I["Length: 56 bytes"]
+    J["Heap Insert #2<br/>Table: 1663/16384/16385<br/>Fork: main, Block: 0"]
+    
+    K["LSN: 0/1E8F518 → 0/1E8F550"]
+    L["Resource Manager: Transaction"]
+    M["Record Type: COMMIT"]
+    N["Length: 56 bytes"]
+    O["Transaction Commit<br/>Timestamp: 2023-10-15 14:32:10.123456+00"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+    
+    K --> L
+    L --> M
+    M --> N
+    N --> O
+    
+    E --> F
+    J --> K
 ```
 
 **Resource Manager Types:**
@@ -975,10 +1061,14 @@ sudo -u postgres psql -c "SELECT * FROM pg_stat_archiver;"
 
 Expected output showing successful archives:
 
-```
- archived_count | failed_count | last_archived_wal | last_archived_time
-----------------+--------------+-------------------+--------------------
-              5 |            0 | 000000010000000000000003 | 2023-10-15 14:45:22
+```mermaid
+flowchart TD
+    A["PostgreSQL Archive Status Table"]
+    
+    A --> B["archived_count: 5"]
+    A --> C["failed_count: 0"]
+    A --> D["last_archived_wal: 000000010000000000000003"]
+    A --> E["last_archived_time: 2023-10-15 14:45:22"]
 ```
 
 ## Production Diagnostic Cheat Sheet

@@ -122,16 +122,18 @@ Casper the Friendly Finality Gadget (FFG) runs as an overlay on top of LMD-GHOST
 
 A checkpoint becomes **justified** when validators representing at least 2/3 of total effective balance have cast votes with that checkpoint as their target. A checkpoint becomes **finalized** when it is justified and the checkpoint in the immediately following epoch is also justified, creating a justified-to-justified supermajority link. Once a block is finalized, no honest validator will ever build on a chain that excludes it, and doing so would trigger slashing.
 
-```
-                 Epoch N          Epoch N+1        Epoch N+2
-                    │                │                │
-Checkpoints:       [A]              [B]              [C]
-                    │                │                │
-FFG votes:          └──────2/3+──────┘                │
-                    └───────────────────2/3+───────────┘
-
-A is justified when 2/3+ votes on link (A → B).
-A is finalized when both (A → B) and (B → C) achieve 2/3+ supermajority.
+```mermaid
+flowchart TD
+    A["Checkpoint A<br/>(Epoch N)"]
+    B["Checkpoint B<br/>(Epoch N+1)"]
+    C["Checkpoint C<br/>(Epoch N+2)"]
+    
+    A -->|"2/3+ votes<br/>(A justified)"| B
+    B -->|"2/3+ votes<br/>(A finalized)"| C
+    
+    style A fill:#e1f5ff,stroke:#0288d1,stroke-width:2px
+    style B fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    style C fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
 ```
 
 The 2/3 threshold is not arbitrary; it is the minimum fraction that guarantees that any two supermajority sets must overlap by at least 1/3, which is the BFT condition that prevents two conflicting checkpoints from both accumulating enough votes to be finalized simultaneously.

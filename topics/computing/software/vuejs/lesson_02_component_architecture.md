@@ -393,37 +393,46 @@ export default {
 
 Scoped slots enable parent components to inject renderable content into designated regions of a child's template while receiving contextual data from the child. The child declares a slot with `<slot>` tags, optionally binding data to the slot via `v-bind` or shorthand colon syntax. The parent then wraps its injected content in a `<template>` tag with `v-slot` directive (or `#` shorthand), destructuring the slot props.
 
-```vue
-<!-- DataTable.vue -->
-<template>
-  <table>
-    <thead>
-      <tr>
-        <th v-for="column in columns" :key="column.key">
-          {{ column.label }}
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="row in data" :key="row.id">
-        <td v-for="column in columns" :key="column.key">
-          <slot :name="column.key" :row="row" :value="row[column.key]">
-            {{ row[column.key] }}
-          </slot>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</template>
-
-<script>
-export default {
-  props: {
-    columns: Array,
-    data: Array
-  }
-};
-</script>
+```mermaid
+flowchart TD
+    A["DataTable.vue<br/>Component"]
+    B["Props"]
+    C["columns: Array"]
+    D["data: Array"]
+    E["Template"]
+    F["Table Element"]
+    G["Thead Section"]
+    H["Column Headers Loop<br/>v-for: column in columns"]
+    I["Tbody Section"]
+    J["Row Loop<br/>v-for: row in data"]
+    K["Cell Loop<br/>v-for: column in columns"]
+    L["Slot or<br/>Default Content"]
+    M["Script"]
+    N["Export Default"]
+    
+    A --> B
+    A --> E
+    A --> M
+    
+    B --> C
+    B --> D
+    
+    E --> F
+    F --> G
+    F --> I
+    
+    G --> H
+    H -->|generates| G
+    
+    I --> J
+    J --> K
+    K --> L
+    
+    L -->|row[column.key]| K
+    
+    M --> N
+    N --> C
+    N --> D
 ```
 
 The parent consumes this table component by providing scoped slot implementations that customize the rendering of specific columns, receiving `row` and `value` as slot props to inform rendering decisions.
@@ -886,18 +895,20 @@ Template compilation errors arise from malformed directives, incorrect expressio
 
 Single-file components with scoped styles can suffer specificity conflicts when third-party component libraries inject global styles. The `:deep()` pseudo-class selector (formerly `>>>` or `/deep/`) allows scoped styles to target child component root elements, but overuse creates tight coupling between parent and child styling contracts. A more maintainable approach uses CSS custom properties (variables) passed via props or provide/inject, allowing children to consume themeable values without parents directly targeting child internals.
 
-```vue
-<!-- Parent.vue -->
-<template>
-  <ChildComponent :style="{ '--primary-color': theme.primary }" />
-</template>
-
-<!-- ChildComponent.vue -->
-<style scoped>
-.button {
-  background-color: var(--primary-color, #007bff);
-}
-</style>
+```mermaid
+flowchart TD
+    Parent["Parent.vue"]
+    Child["ChildComponent.vue"]
+    Binding["Bind CSS Variable<br/>--primary-color: theme.primary"]
+    StyleBlock["Scoped Style Block"]
+    CSSVar["CSS Variable Usage<br/>var(--primary-color, #007bff)"]
+    Button[".button element<br/>background-color applied"]
+    
+    Parent -->|":style prop"| Binding
+    Binding -->|"Pass to"| Child
+    Child -->|"Contains"| StyleBlock
+    StyleBlock -->|"References"| CSSVar
+    CSSVar -->|"Styles"| Button
 ```
 
 This technique inverts the dependency: the parent provides a variable, and the child consumes it, maintaining encapsulation while enabling customization. The fallback value in `var()` ensures the component remains functional even if the variable is not provided.

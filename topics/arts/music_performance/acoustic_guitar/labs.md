@@ -386,7 +386,7 @@ You don't need a lab to manage this — you need a $10 hygrometer in your case a
 **Target environment**: 45–55% relative humidity, 18–22°C (65–72°F). This is the range your guitar's wood was built and glued to behave normally in.
 
 **What goes wrong outside that range**:
-- **Too dry (<35% RH)**: soundboard sinks, action gets lower (sometimes too low, causing buzz), and in extreme/sustained cases the top or back can crack along the grain, especially near braces. If you're in a dry climate or heating season, use an in-case humidifier (Oasis or Boveda packs are standard and cheap).
+- **Too dry (< 35% RH)**: soundboard sinks, action gets lower (sometimes too low, causing buzz), and in extreme/sustained cases the top or back can crack along the grain, especially near braces. If you're in a dry climate or heating season, use an in-case humidifier (Oasis or Boveda packs are standard and cheap).
 - **Too humid (>65% RH)**: soundboard domes up, action rises, neck relief increases, and glue joints are put under added stress. In the tropics or humid summers, use silica packs or a dehumidifier in the case.
 - **Temperature swings**: cold flattens pitch (strings and wood contract), heat sharpens it. Never leave a guitar in a hot car — interior temperatures can exceed 60°C (140°F), enough to soften glue joints and damage finish within an hour.
 

@@ -38,47 +38,48 @@ Filter sweeps—accessed via a dedicated resonant low-pass or high-pass filter o
 
 The following ASCII diagram illustrates the signal flow architecture within a two-channel DJ mixer, from input to master output:
 
-```
-Turntable/CDJ         Turntable/CDJ
-    Line Out              Line Out
-        |                     |
-        v                     v
-   +---------+           +---------+
-   |  TRIM   |           |  TRIM   |
-   | (Gain)  |           | (Gain)  |
-   +---------+           +---------+
-        |                     |
-        +--------> CUE -------+
-        |          Bus         |
-        v                     v
-   +---------+           +---------+
-   | 3-Band  |           | 3-Band  |
-   |   EQ    |           |   EQ    |
-   | Hi/Mid/ |           | Hi/Mid/ |
-   |   Lo    |           |   Lo    |
-   +---------+           +---------+
-        |                     |
-        v                     v
-   +---------+           +---------+
-   | Channel |           | Channel |
-   |  Fader  |           |  Fader  |
-   +---------+           +---------+
-        |                     |
-        +-------[Crossfader]--+
-                   |
-                   v
-            +--------------+
-            | Master Fader |
-            +--------------+
-                   |
-                   v
-            +--------------+
-            | Master Out   |
-            | (XLR/TRS)    |
-            +--------------+
-                   |
-                   v
-              PA System
+```mermaid
+flowchart TD
+    TT1["Turntable/CDJ<br/>Line Out"]
+    TT2["Turntable/CDJ<br/>Line Out"]
+    
+    TRIM1["TRIM<br/>(Gain)"]
+    TRIM2["TRIM<br/>(Gain)"]
+    
+    CUE["CUE Bus"]
+    
+    EQ1["3-Band EQ<br/>Hi/Mid/Lo"]
+    EQ2["3-Band EQ<br/>Hi/Mid/Lo"]
+    
+    CH1["Channel<br/>Fader"]
+    CH2["Channel<br/>Fader"]
+    
+    CROSS["Crossfader"]
+    
+    MASTER["Master Fader"]
+    
+    OUT["Master Out<br/>(XLR/TRS)"]
+    
+    PA["PA System"]
+    
+    TT1 --> TRIM1
+    TT2 --> TRIM2
+    
+    TRIM1 --> CUE
+    TRIM2 --> CUE
+    
+    TRIM1 --> EQ1
+    TRIM2 --> EQ2
+    
+    EQ1 --> CH1
+    EQ2 --> CH2
+    
+    CH1 --> CROSS
+    CH2 --> CROSS
+    
+    CROSS --> MASTER
+    MASTER --> OUT
+    OUT --> PA
 ```
 
 The cue bus split occurs post-trim but pre-EQ, allowing the DJ to audition the incoming track's unprocessed frequency content in headphones while applying EQ adjustments to the live mix channel. This architectural decision is critical: if the cue signal were tapped post-EQ, the DJ would hear the EQ changes in the headphones, making it impossible to accurately assess the track's native frequency balance or to beatmatch using the unadulterated kick drum transient.

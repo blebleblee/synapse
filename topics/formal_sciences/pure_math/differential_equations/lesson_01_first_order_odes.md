@@ -232,44 +232,37 @@ This family of curves is a family of circles. The structure of the original equa
 
 The classification problem for a first-order ODE is not a matter of matching the equation to a list; it is a sequence of structural tests, each peeling away a layer of algebraic complexity. The following diagram depicts the decision logic as a flow through the equation's properties.
 
-```
-Given: M(x,y) dx + N(x,y) dy = 0
-(or equivalently: dy/dx = f(x,y))
-                 │
-                 ▼
-     ┌───────────────────────┐
-     │ Is f(x,y) = g(x)h(y)?│
-     └───────────────────────┘
-          │             │
-         YES            NO
-          │             │
-          ▼             ▼
-    SEPARABLE    ┌─────────────────────────────┐
-    Integrate    │ Is f(x,y) = g(y/x)?         │
-    each side    └─────────────────────────────┘
-                      │             │
-                     YES            NO
-                      │             │
-                      ▼             ▼
-                HOMOGENEOUS   ┌──────────────────────┐
-                Sub v = y/x   │ Is ∂M/∂y = ∂N/∂x?   │
-                → separable   └──────────────────────┘
-                                    │            │
-                                   YES           NO
-                                    │            │
-                                    ▼            ▼
-                               EXACT      ┌────────────────────────┐
-                               Integrate  │ Is N linear in y?      │
-                               for F(x,y) │ (dy/dx + P(x)y = Q(x))│
-                                          └────────────────────────┘
-                                               │             │
-                                              YES            NO
-                                               │             │
-                                               ▼             ▼
-                                           LINEAR      SEEK INTEGRATING
-                                           μ = e^∫P dx  FACTOR μ(x) or μ(y)
-                                           Variation   Test: (M_y−N_x)/N = φ(x)?
-                                           of params   Test: (N_x−M_y)/M = ψ(y)?
+```mermaid
+flowchart TD
+    START["<b>Given:</b> M(x,y) dx + N(x,y) dy = 0<br/>(or equivalently: dy/dx = f(x,y))"]
+
+    Q1{"Is f(x,y) = g(x)·h(y)?"}
+
+    SEP["<b>SEPARABLE</b><br/>Integrate each side"]
+
+    Q2{"Is f(x,y) = g(y/x)?"}
+
+    HOM["<b>HOMOGENEOUS</b><br/>Sub v = y/x<br/>→ separable"]
+
+    Q3{"Is ∂M/∂y = ∂N/∂x?"}
+
+    EXACT["<b>EXACT</b><br/>Integrate for F(x,y)"]
+
+    Q4{"Is equation linear in y?<br/>dy/dx + P(x)y = Q(x)"}
+
+    LIN["<b>LINEAR</b><br/>μ = e^∫P dx<br/>Variation of parameters"]
+
+    MU["<b>SEEK INTEGRATING FACTOR μ</b><br/>Test μ(x): (M_y − N_x) / N = φ(x)?<br/>Test μ(y): (N_x − M_y) / M = ψ(y)?"]
+
+    START --> Q1
+    Q1 -->|YES| SEP
+    Q1 -->|NO|  Q2
+    Q2 -->|YES| HOM
+    Q2 -->|NO|  Q3
+    Q3 -->|YES| EXACT
+    Q3 -->|NO|  Q4
+    Q4 -->|YES| LIN
+    Q4 -->|NO|  MU
 ```
 
 This decision tree is the operational skeleton of classical first-order ODE theory. Each branch corresponds not to an ad hoc trick but to a theorem: separable equations reduce to two independent quadratures by the chain rule; exact equations are solvable by the Poincaré lemma on simply connected domains; linear equations admit integrating factors by exponential construction; and homogeneous equations are separable after the scaling substitution.

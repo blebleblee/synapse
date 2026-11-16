@@ -20,27 +20,33 @@ These three invariants—energy flow, physical primacy, and documentation—form
 
 A systematic repair follows a strict pipeline. You do not skip stages, and you do not reverse them. The sequence below is the canonical workflow for board-level and component-level electronic repair, applicable from small consumer electronics to industrial control boards.
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                   SYSTEMATIC REPAIR PIPELINE                         │
-│                                                                      │
-│  1. Intake & Triage ──► 2. ESD Setup & Bench Prep                    │
-│        │                         │                                   │
-│        ▼                         ▼                                   │
-│  3. Documentation Baseline ──► 4. Visual Inspection (Microscope)      │
-│        │                         │                                   │
-│        ▼                         ▼                                   │
-│  5. Power Rail Assessment ──► 6. Functional Block Isolation          │
-│        │                         │                                   │
-│        ▼                         ▼                                   │
-│  7. Component-Level Diagnosis ──► 8. Component Removal & Replacement  │
-│        │                         │                                   │
-│        ▼                         ▼                                   │
-│  9. Reassembly & Mechanical Verification ──► 10. Functional Testing  │
-│                                              │                       │
-│                                              ▼                       │
-│                                    11. Final Documentation & Return   │
-└──────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["1. Intake & Triage"]
+    B["2. ESD Setup & Bench Prep"]
+    C["3. Documentation Baseline"]
+    D["4. Visual Inspection (Microscope)"]
+    E["5. Power Rail Assessment"]
+    F["6. Functional Block Isolation"]
+    G["7. Component-Level Diagnosis"]
+    H["8. Component Removal & Replacement"]
+    I["9. Reassembly & Mechanical Verification"]
+    J["10. Functional Testing"]
+    K["11. Final Documentation & Return"]
+    
+    A --> B
+    A --> C
+    B --> D
+    C --> D
+    D --> E
+    D --> F
+    E --> F
+    F --> G
+    F --> H
+    G --> H
+    H --> I
+    I --> J
+    J --> K
 ```
 
 Each stage feeds the next. The output of stage $N$ is the input to stage $N+1$, and the quality of your work at each stage determines the efficiency of every subsequent stage. If you skip visual inspection and jump to power rail assessment, you may spend thirty minutes chasing a dead rail that a two-minute microscope inspection would have traced to a visibly cracked inductor. If you skip documentation at intake, you may find yourself unable to reassemble the device because you did not record screw locations, cable routing, or connector orientations.
@@ -181,64 +187,38 @@ The systematic pipeline described above handles the majority of repairs efficien
 
 The following decision tree provides a rapid triage path for the most common fault categories. This is not exhaustive but covers the fault patterns encountered in over 80% of electronic repair cases.
 
-```
-                         ┌─────────────────────────────┐
-                         │   DEVICE WILL NOT POWER ON   │
-                         └──────────────┬──────────────┘
-                                        │
-                         ┌──────────────▼──────────────┐
-                         │  Measure main input voltage  │
-                         │  at first bulk capacitor     │
-                         └──────────────┬──────────────┘
-                                        │
-                    ┌───────────────────┼───────────────────┐
-                    │                   │                   │
-              Input OK             Input Missing        Input Low
-                    │                   │                   │
-                    ▼                   ▼                   ▼
-          ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
-          │ Check each rail │  │ Check fuse,    │  │ Check input     │
-          │ to ground for  │  │ TVS diode,     │  │ protection      │
-          │ shorts (resist │  │ input inductor │  │ MOSFET, input   │
-          │ mode, power off│  │ reverse-polarity│  │ filter cap ESR  │
-          └────────┬────────┘  └─────────────────┘  └─────────────────┘
-                   │
-          ┌────────▼────────┐
-          │  Any rail < 5Ω  │
-          │  to ground?     │
-          └──┬─────────┬────┘
-          Yes│         │No
-             │         │
-     ┌───────▼───┐  ┌──▼──────────────────┐
-     │ Inject    │  │ Check enable signals │
-     │ voltage, │  │ on each regulator.   │
-     │ find hot │  │ Measure output with  │
-     │ component│  │ scope for ripple.    │
-     └───────────┘  └──────────────────────┘
-
-                    ┌─────────────────────────────┐
-                    │   DEVICE POWERS ON BUT      │
-                    │   MALFUNCTIONS              │
-                    └──────────────┬──────────────┘
-                                   │
-                    ┌──────────────▼──────────────┐
-                    │ Which subsystem fails?      │
-                    └──────────────┬──────────────┘
-                                   │
-              ┌────────────────────┼────────────────────┐
-              │                    │                    │
-          Audio/Video        Display/Backlight      Logic/Boot
-              │                    │                    │
-              ▼                    ▼                    ▼
-    ┌─────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-    │ Trace signal    │  │ Check backlight  │  │ Check clock,     │
-    │ path with scope │  │ driver enable,   │  │ reset, and boot  │
-    │ input→preamp→   │  │ measure BL rail  │  │ ROM enable.      │
-    │ amp→output      │  │ voltage. If 0V,  │  │ Scope crystal    │
-    │                  │  │ check PWM dimming │  │ oscillator.      │
-    │ Half-split at   │  │ signal from MCU.  │  │ Check program    │
-    │ preamp output   │  │                   │  │ flash read.      │
-    └─────────────────┘  └──────────────────┘  └──────────────────┘
+```mermaid
+flowchart TD
+    Start1["DEVICE WILL NOT POWER ON"]
+    MeasureInput["Measure main input voltage<br/>at first bulk capacitor"]
+    
+    Start1 --> MeasureInput
+    
+    MeasureInput --> InputOK["Input OK"]
+    MeasureInput --> InputMissing["Input Missing"]
+    MeasureInput --> InputLow["Input Low"]
+    
+    InputOK --> CheckRails["Check each rail<br/>to ground for<br/>shorts (resist<br/>mode, power off)"]
+    InputMissing --> CheckFuse["Check fuse,<br/>TVS diode,<br/>input inductor<br/>reverse-polarity"]
+    InputLow --> CheckProtection["Check input<br/>protection<br/>MOSFET, input<br/>filter cap ESR"]
+    
+    CheckRails --> ShortCheck{"Any rail < 5Ω<br/>to ground?"}
+    
+    ShortCheck -->|Yes| InjectVoltage["Inject<br/>voltage,<br/>find hot<br/>component"]
+    ShortCheck -->|No| CheckEnable["Check enable signals<br/>on each regulator.<br/>Measure output with<br/>scope for ripple."]
+    
+    Start2["DEVICE POWERS ON BUT<br/>MALFUNCTIONS"]
+    SubsystemCheck["Which subsystem fails?"]
+    
+    Start2 --> SubsystemCheck
+    
+    SubsystemCheck --> AudioVideo["Audio/Video"]
+    SubsystemCheck --> DisplayBacklight["Display/Backlight"]
+    SubsystemCheck --> LogicBoot["Logic/Boot"]
+    
+    AudioVideo --> TraceSignal["Trace signal<br/>path with scope<br/>input→preamp→<br/>amp→output<br/><br/>Half-split at<br/>preamp output"]
+    DisplayBacklight --> CheckBacklight["Check backlight<br/>driver enable,<br/>measure BL rail<br/>voltage. If 0V,<br/>check PWM dimming<br/>signal from MCU."]
+    LogicBoot --> CheckClock["Check clock,<br/>reset, and boot<br/>ROM enable.<br/>Scope crystal<br/>oscillator.<br/>Check program<br/>flash read."]
 ```
 
 ### 3.3 Workflow Optimization for Throughput

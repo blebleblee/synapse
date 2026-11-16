@@ -31,17 +31,33 @@ The CPU enforces two categories of protection in hardware:
 
 The only legitimate path from user space into kernel code is a controlled gate: `syscall`/`sysenter` on x86-64, `svc` on ARM64. These instructions atomically switch the stack pointer to the kernel stack stored in the CPU's TSS (Task State Segment on x86-64) or `sp_el1` (ARM64), load a known code address (the system call entry stub), and raise the privilege level. This is the **syscall boundary**—a one-way valve with a single entry point per CPU.
 
-```
-User Space (ring 3)                 Kernel Space (ring 0)
-─────────────────                   ──────────────────────
-  glibc write()                         entry_SYSCALL_64
-  │                                     │
-  │  syscall instruction ──────────────►│  save registers
-  │  (atomic privilege raise)           │  look up sys_call_table[NR_write]
-  │                                     │  call sys_write()
-  │                                     │  restore registers
-  │◄─────────────────── sysret ─────────│  drop privilege, return rax
-  return value in rax
+```mermaid
+flowchart TD
+    subgraph user ["User Space (ring 3)"]
+        direction TD
+        A["glibc write()"]
+        B["syscall instruction<br/>(atomic privilege raise)"]
+        C["return value in rax"]
+    end
+
+    subgraph kernel ["Kernel Space (ring 0)"]
+        direction TD
+        D["entry_SYSCALL_64"]
+        E["save registers"]
+        F["look up sys_call_table[NR_write]"]
+        G["call sys_write()"]
+        H["restore registers"]
+        I["sysret<br/>(drop privilege, return rax)"]
+    end
+
+    A --> B
+    B -->|"privilege raise"| D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I -->|"sysret"| C
 ```
 
 The entry stub `entry_SYSCALL_64` lives in `arch/x86/entry/entry_64.S`. It is hand-written assembly because saving the full register file and switching stacks correctly before touching any C code is mandatory—a single clobber of a register before it is saved would be an exploitable kernel information leak.
@@ -50,16 +66,35 @@ The entry stub `entry_SYSCALL_64` lives in `arch/x86/entry/entry_64.S`. It is ha
 
 The 64-bit virtual address space (48 bits implemented on most x86-64 hardware, 52 bits with 5-level paging) is split at a canonical boundary:
 
-```
-0x0000_0000_0000_0000  ┐
-        ...            │  User virtual address space (128 TiB)
-0x0000_7FFF_FFFF_FFFF  ┘
+```mermaid
+flowchart TD
+    user_top["0x0000_0000_0000_0000"]
+    user_space["User Virtual Address Space\n(128 TiB)"]
+    user_bottom["0x0000_7FFF_FFFF_FFFF"]
+    gap["⚠ Non-Canonical Gap\nhardware fault on access"]
+    kernel_top["0xFFFF_8000_0000_0000"]
+    kernel_space["Kernel Virtual Address Space\n(128 TiB)"]
+    kernel_bottom["0xFFFF_FFFF_FFFF_FFFF"]
 
-      [non-canonical gap — hardware fault on access]
+    subgraph user_region["User Space"]
+        direction TB
+        user_top --- user_space --- user_bottom
+    end
 
-0xFFFF_8000_0000_0000  ┐
-        ...            │  Kernel virtual address space (128 TiB)
-0xFFFF_FFFF_FFFF_FFFF  ┘
+    subgraph kernel_region["Kernel Space"]
+        direction TB
+        kernel_top --- kernel_space --- kernel_bottom
+    end
+
+    user_region --> gap --> kernel_region
+
+    style user_region fill:#d0e8ff,stroke:#3399cc,color:#000
+    style kernel_region fill:#ffe0d0,stroke:#cc6633,color:#000
+    style gap fill:#f5f5a0,stroke:#999900,color:#000
+    style user_top font-family:monospace
+    style user_bottom font-family:monospace
+    style kernel_top font-family:monospace
+    style kernel_bottom font-family:monospace
 ```
 
 Specific kernel regions within the kernel half (from `Documentation/x86/x86_64/mm.rst`):
@@ -448,45 +483,64 @@ Tracing a single system call from user space to hardware and back is the best wa
 
 ### 5.1 `write(2)` to an ext4 File: Full Call Chain
 
-```
-User space:
-  write(fd, buf, count)
-  └── glibc write() wrapper
-      └── syscall instruction (NR_write = 1 on x86-64)
+```mermaid
+flowchart TD
+    subgraph user_space ["User Space"]
+        A["write(fd, buf, count)"]
+        B["glibc write() wrapper"]
+        C["syscall instruction\n(NR_write = 1, x86-64)"]
+    end
 
-Kernel entry (arch/x86/entry/entry_64.S):
-  entry_SYSCALL_64:
-    swapgs                  ; switch GS base to kernel percpu area
-    mov %rsp, %gs:pcpu_rsp  ; save user RSP
-    mov $KERNEL_STACK, %rsp ; switch to kernel stack
-    pushq registers...
-    call do_syscall_64
+    subgraph kernel_entry ["Kernel Entry · arch/x86/entry/entry_64.S"]
+        D["entry_SYSCALL_64"]
+        D1["swapgs\n(switch GS base to kernel percpu area)"]
+        D2["save user RSP →\nmov %rsp, %gs:pcpu_rsp"]
+        D3["switch to kernel stack\nmov $KERNEL_STACK, %rsp"]
+        D4["pushq registers"]
+        D5["call do_syscall_64"]
+    end
 
-do_syscall_64 (arch/x86/kernel/syscall_c64.c):
-  └── sys_call_table[1] → __x64_sys_write()
+    subgraph dispatch ["Syscall Dispatch · arch/x86/kernel/syscall_c64.c"]
+        E["do_syscall_64"]
+        F["sys_call_table[1]\n→ __x64_sys_write()"]
+    end
 
-__x64_sys_write() / ksys_write() (fs/read_write.c):
-  └── fdget_pos(fd) → struct fd (file + flags)
-  └── vfs_write(file, buf, count, &pos)
+    subgraph vfs_layer ["VFS Layer · fs/read_write.c"]
+        G["__x64_sys_write() / ksys_write()"]
+        H["fdget_pos(fd)\n→ struct fd (file + flags)"]
+        I["vfs_write(file, buf, count, &pos)"]
+        J["file->f_op->write_iter\n→ ext4_file_write_iter"]
+    end
 
-vfs_write() (fs/read_write.c):
-  └── file->f_op->write_iter == ext4_file_write_iter
+    subgraph ext4_layer ["ext4 Write Path · fs/ext4/file.c"]
+        K["ext4_file_write_iter()"]
+        L["generic_file_write_iter()"]
+        M["iov_iter_fault_in_readable()\n(fault in user pages)"]
+        N["ext4_buffered_write_iter()"]
+        O["generic_perform_write()"]
+        P["ext4_write_begin()\n(jbd2 journal transaction start)"]
+        Q["copy_page_from_iter_atomic()\n(copy user data → page cache)"]
+        R["ext4_write_end()\n(mark page dirty, journal commit)"]
+    end
 
-ext4_file_write_iter() (fs/ext4/file.c):
-  └── generic_file_write_iter()
-      └── iov_iter_fault_in_readable()   ; ensure user pages are faulted in
-      └── ext4_buffered_write_iter()
-          └── generic_perform_write()
-              └── ext4_write_begin()     ; journal transaction start (jbd2)
-              └── copy_page_from_iter_atomic()  ; copy user data to page cache
-              └── ext4_write_end()       ; mark page dirty, journal commit
+    subgraph writeback ["Writeback · async via pdflush / writeback threads"]
+        S["ext4_writepages()"]
+        T["mpage_prepare_extent_to_map()"]
+        U["submit_bio()\n(submit to block layer)"]
+        V["nvme_queue_rq()\n(NVMe driver)"]
+        W["nvme_submit_cmd()\n(ring doorbell register on PCIe device)"]
+    end
 
-Writeback (asynchronous, via pdflush/writeback threads):
-  └── ext4_writepages()
-      └── mpage_prepare_extent_to_map()
-      └── submit_bio()         ; submit to block layer
-          └── nvme_queue_rq()  ; NVMe driver
-              └── nvme_submit_cmd()  ; ring doorbell register on PCIe device
+    A --> B --> C --> D
+    D --> D1 --> D2 --> D3 --> D4 --> D5 --> E
+    E --> F --> G
+    G --> H --> I --> J --> K
+    K --> L
+    L --> M --> N
+    N --> O
+    O --> P --> Q --> R
+    R -.->|"async writeback"| S
+    S --> T --> U --> V --> W
 ```
 
 The user's `write()` call returns as soon as the data is copied to the page cache. The actual disk write happens asynchronously. The kernel's `fsync(2)` call is the mechanism to force synchronous commit through the journal to stable storage.

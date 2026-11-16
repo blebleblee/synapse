@@ -54,58 +54,25 @@ The process of solving $A\mathbf{x} = \mathbf{b}$ via LU decomposition decompose
 
 Once we have $PA = LU$, solving $A\mathbf{x} = \mathbf{b}$ reduces to solving two triangular systems. First, we apply the permutation to $\mathbf{b}$, computing $\mathbf{b}' = P\mathbf{b}$. Then we solve $L\mathbf{y} = \mathbf{b}'$ by forward substitution: since $L$ is lower triangular with unit diagonal, we compute $y_1 = b'_1$, then for $i = 2, \ldots, n$, we compute $y_i = b'_i - \sum_{j=1}^{i-1} \ell_{ij} y_j$. Finally, we solve $U\mathbf{x} = \mathbf{y}$ by backward substitution: for $i = n, n-1, \ldots, 1$, we compute $x_i = (y_i - \sum_{j=i+1}^{n} u_{ij} x_j) / u_{ii}$. Each triangular solve requires $O(n^2)$ operations, dominated by the $O(n^3)$ factorization cost.
 
-```
-LU Decomposition with Partial Pivoting: Computational Flow
-
-Input: A (n×n matrix), b (n-vector)
-Output: x satisfying Ax = b
-
-┌─────────────────────────────────────────────┐
-│  Phase 1: Factorization (PA = LU)          │
-│  Cost: (2/3)n³ operations                   │
-└─────────────────────────────────────────────┘
-              ↓
-    ┌─────────────────────┐
-    │ Initialize P = I_n   │
-    │ Initialize L = I_n   │
-    │ Copy U = A          │
-    └─────────────────────┘
-              ↓
-    ┌──────────────────────────────────────┐
-    │ For k = 1 to n-1:                    │
-    │   Find p = argmax_i |u_ik|  (i ≥ k) │
-    │   Swap rows k ↔ p in U, L, P        │
-    │   For i = k+1 to n:                  │
-    │     ℓ_ik = u_ik / u_kk               │
-    │     row_i(U) -= ℓ_ik × row_k(U)      │
-    │     L[i,k] = ℓ_ik                    │
-    └──────────────────────────────────────┘
-              ↓
-┌─────────────────────────────────────────────┐
-│  Phase 2: Forward Substitution (Ly = Pb)   │
-│  Cost: n² operations                        │
-└─────────────────────────────────────────────┘
-              ↓
-    ┌─────────────────────────────┐
-    │ Compute b' = Pb             │
-    │ y_1 = b'_1                  │
-    │ For i = 2 to n:             │
-    │   y_i = b'_i - Σ ℓ_ij y_j   │
-    └─────────────────────────────┘
-              ↓
-┌─────────────────────────────────────────────┐
-│  Phase 3: Backward Substitution (Ux = y)   │
-│  Cost: n² operations                        │
-└─────────────────────────────────────────────┘
-              ↓
-    ┌─────────────────────────────┐
-    │ x_n = y_n / u_nn            │
-    │ For i = n-1 down to 1:      │
-    │   x_i = (y_i - Σ u_ij x_j)  │
-    │              / u_ii         │
-    └─────────────────────────────┘
-              ↓
-         Output: x
+```mermaid
+flowchart TD
+    Start["Input: A (n×n matrix), b (n-vector)"]
+    
+    Start --> Phase1["Phase 1: Factorization (PA = LU)<br/>Cost: (2/3)n³ operations"]
+    
+    Phase1 --> Init["Initialize P = I_n<br/>Initialize L = I_n<br/>Copy U = A"]
+    
+    Init --> Loop1["For k = 1 to n-1:<br/>  Find p = argmax_i |u_ik| (i ≥ k)<br/>  Swap rows k ↔ p in U, L, P<br/>  For i = k+1 to n:<br/>    ℓ_ik = u_ik / u_kk<br/>    row_i(U) -= ℓ_ik × row_k(U)<br/>    L[i,k] = ℓ_ik"]
+    
+    Loop1 --> Phase2["Phase 2: Forward Substitution (Ly = Pb)<br/>Cost: n² operations"]
+    
+    Phase2 --> Forward["Compute b' = Pb<br/>y_1 = b'_1<br/>For i = 2 to n:<br/>  y_i = b'_i - Σ ℓ_ij y_j"]
+    
+    Forward --> Phase3["Phase 3: Backward Substitution (Ux = y)<br/>Cost: n² operations"]
+    
+    Phase3 --> Backward["x_n = y_n / u_nn<br/>For i = n-1 down to 1:<br/>  x_i = (y_i - Σ u_ij x_j) / u_ii"]
+    
+    Backward --> Output["Output: x"]
 ```
 
 The LU factorization enjoys remarkable stability when combined with partial pivoting. The row swaps ensure that each multiplier $\ell_{ik}$ satisfies $|\ell_{ik}| \leq 1$, bounding the growth of intermediate entries during elimination. Without pivoting, entries in $U$ can experience exponential growth, causing catastrophic cancellation and loss of precision in floating-point arithmetic. The classical example is the matrix $A = \begin{pmatrix} \epsilon & 1 \\ 1 & 1 \end{pmatrix}$ for small $\epsilon > 0$. Without pivoting, elimination produces $U = \begin{pmatrix} \epsilon & 1 \\ 0 & 1 - 1/\epsilon \end{pmatrix}$, where the $(2,2)$ entry $1 - 1/\epsilon \approx -1/\epsilon$ has magnitude $O(1/\epsilon)$, growing unboundedly as $\epsilon \to 0$. With partial pivoting, we swap rows first, yielding $U = \begin{pmatrix} 1 & 1 \\ 0 & 1 - \epsilon \end{pmatrix}$, where all entries remain $O(1)$.

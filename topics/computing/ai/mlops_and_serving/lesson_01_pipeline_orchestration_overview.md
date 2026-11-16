@@ -76,18 +76,32 @@ graph TD
 Each task instance in a pipeline run is a finite state machine:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> PENDING : run created
-    PENDING --> QUEUED : all upstreams SUCCESS
-    QUEUED --> RUNNING : executor picks up task
-    RUNNING --> SUCCESS : task exits 0, artifacts written
-    RUNNING --> FAILED : task exits non-zero or timeout
-    RUNNING --> UPSTREAM_FAILED : upstream in FAILED state
-    FAILED --> QUEUED : retry policy allows retry
-    FAILED --> [*] : retry limit exhausted
-    SUCCESS --> [*]
-    UPSTREAM_FAILED --> [*]
-    SKIPPED --> [*] : conditional branch not taken
+flowchart TD
+    START((" ")):::terminal
+    PENDING["PENDING"]
+    QUEUED["QUEUED"]
+    RUNNING["RUNNING"]
+    SUCCESS["SUCCESS"]
+    FAILED["FAILED"]
+    UPSTREAM_FAILED["UPSTREAM_FAILED"]
+    SKIPPED["SKIPPED"]
+    END((" ")):::terminal
+
+    START -->|"run created"| PENDING
+    PENDING -->|"all upstreams SUCCESS"| QUEUED
+    QUEUED -->|"executor picks up task"| RUNNING
+    RUNNING -->|"task exits 0, artifacts written"| SUCCESS
+    RUNNING -->|"task exits non-zero or timeout"| FAILED
+    RUNNING -->|"upstream in FAILED state"| UPSTREAM_FAILED
+    FAILED -->|"retry policy allows retry"| QUEUED
+    FAILED -->|"retry limit exhausted"| END
+    SUCCESS --> END
+    UPSTREAM_FAILED --> END
+    SKIPPED -->|"conditional branch not taken"| END
+
+    classDef terminal fill:#111,stroke:#111,color:#111,width:12px,height:12px
+    classDef state fill:#1e293b,stroke:#475569,color:#f1f5f9,rx:6
+    class PENDING,QUEUED,RUNNING,SUCCESS,FAILED,UPSTREAM_FAILED,SKIPPED state
 ```
 
 The key design decision is **where state transitions are authoritative**. In robust systems, the **scheduler** owns state transitions, not the executor. The executor reports an outcome, and the scheduler decides what state to transition to based on that report combined with retry policy, upstream states, and circuit-breaker logic. This prevents split-brain scenarios where an executor believes a task succeeded while the scheduler recorded a timeout failure.
@@ -285,8 +299,8 @@ graph LR
     G --> I["Deploy\n(3m)"]
     H --> I
 
-    style D fill:#ff9999,stroke:#cc0000
-    style F fill:#ff9999,stroke:#cc0000
+    style D fill:#ff9999,stroke:#cc0000,color:#0f172a
+    style F fill:#ff9999,stroke:#cc0000,color:#0f172a
 ```
 
 In this example, the critical path is `Ingest → Preprocess → Feature Eng. → Train → Evaluate → Deploy` with a total of `2 + 5 + 10 + 45 + 5 + 3 = 70 minutes`. Parallelizing `Fetch Config`, `Validation`, and `Package` does not reduce the wall-clock time below 70 minutes. Optimization effort belongs on the critical path tasks — specifically `Train` (45m) and `Feature Engineering` (10m).

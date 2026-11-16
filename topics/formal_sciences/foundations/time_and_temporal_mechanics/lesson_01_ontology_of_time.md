@@ -101,28 +101,36 @@ For instance, the correspondence between transitivity and $FF\phi \to F\phi$ is 
 
 The McTaggart regress admits a precise graph-theoretic representation that clarifies why it is vicious rather than merely infinite. Define a directed graph $\mathcal{G} = (V, E)$ where the nodes are **grounding levels** and an edge $A_\alpha \to A_{\alpha+1}$ represents the dependence of level $\alpha$ on level $\alpha+1$ for the resolution of its A-determinations. A well-founded grounding structure would be a directed acyclic graph (DAG) in which every node has a path of finite length to a node with no outgoing edges — a base level that is self-grounding.
 
-```
-A₀ ──► A₁ ──► A₂ ──► A₃ ──► · · ·
-
-(Each level requires the next to ground its A-determinations.
-No base node exists. The graph has no sink.)
+```mermaid
+flowchart LR
+    A0["A₀"]
+    A1["A₁"]
+    A2["A₂"]
+    A3["A₃"]
+    Ellipsis["· · ·"]
+    
+    A0 --> A1
+    A1 --> A2
+    A2 --> A3
+    A3 --> Ellipsis
 ```
 
 The viciousness of the regress is precisely the absence of a sink in this grounding graph. A vicious regress, in the technical sense introduced by Clark and Hasker and formalized in grounding theory, is a regress in which the existence of the grounding relation at level $\alpha$ is *constitutively dependent* on the existence of a further grounding relation at level $\alpha + 1$, with no level being self-grounding. The graph has no sink, so the grounding relation is never discharged. This is distinct from a *benign* infinite regress (such as the infinite divisibility of the real line), where existence at one level does not depend on the infinite chain being completed.
 
 The two-dimensional semantic response to McTaggart — evaluating sentences at a pair $(t_c, t_e)$ of context time and event time, where "now" refers to $t_c$ and temporal operators shift $t_e$ — breaks the regress precisely by providing a **base level**: the context parameter $t_c$ is not itself in need of A-determination within the object language. It is a semantic parameter, not an entity in the domain. The grounding graph now has a sink, and the regress terminates.
 
-```
-Sentence φ
-    │
-    ▼
-Evaluated at (t_c, t_e)   ← t_c is a fixed semantic parameter, not an A-series entity
-    │
-    ▼
-t_e shifts under F, P, G, H
-    │
-    ▼
-t_c remains fixed: "now" = t_c throughout all embedded operators
+```mermaid
+flowchart TD
+    A["Sentence φ"]
+    B["Evaluated at (t_c, t_e)"]
+    C["t_e shifts under F, P, G, H"]
+    D["t_c remains fixed: 'now' = t_c throughout all embedded operators"]
+    N["t_c is a fixed semantic parameter,\nnot an A-series entity"]
+
+    A --> B
+    B --> C
+    C --> D
+    N -. "annotation" .-> B
 ```
 
 This architecture is the core of Kaplan's two-dimensional semantics for indexicals, applied to the temporal case. It is also, as we will see in later lessons, the structure underlying the semantics of *now*-operators and **hybrid temporal logic**, where nominals explicitly name time points and the satisfaction operator $@_i \phi$ evaluates $\phi$ at the time named by nominal $i$ regardless of the current evaluation point.

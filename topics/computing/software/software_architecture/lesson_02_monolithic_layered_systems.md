@@ -16,34 +16,31 @@ The layered pattern enforces testability through a crucial mechanism: dependency
 
 The canonical three-tier architecture partitions responsibility across presentation, business logic, and data access layers, though production systems often introduce additional strata for cross-cutting concerns. Consider a representative e-commerce order processing system. The presentation layer exposes REST endpoints through a web framework like Spring MVC or ASP.NET Core, accepting JSON-serialized order requests and returning HTTP response codes. This layer's sole responsibility is protocol translation: parsing HTTP headers, validating content types, serializing domain objects to JSON, and mapping business exceptions to appropriate status codes.
 
-```
-┌─────────────────────────────────────────────┐
-│         Presentation Layer                  │
-│  ┌─────────────┐      ┌─────────────┐      │
-│  │ Controllers │      │  DTOs       │      │
-│  │ REST/GraphQL│──────│ Serializers │      │
-│  └─────────────┘      └─────────────┘      │
-└──────────────┬──────────────────────────────┘
-               │ Interface Boundary
-               ↓
-┌─────────────────────────────────────────────┐
-│         Business Logic Layer                │
-│  ┌─────────────┐      ┌─────────────┐      │
-│  │  Services   │      │  Entities   │      │
-│  │ Domain Rules│──────│ Aggregates  │      │
-│  └─────────────┘      └─────────────┘      │
-└──────────────┬──────────────────────────────┘
-               │ Repository Interface
-               ↓
-┌─────────────────────────────────────────────┐
-│         Data Access Layer                   │
-│  ┌─────────────┐      ┌─────────────┐      │
-│  │ Repositories│      │   Mappers   │      │
-│  │     DAO     │──────│  SQL/ORM    │      │
-│  └─────────────┘      └─────────────┘      │
-└──────────────┬──────────────────────────────┘
-               ↓
-         [PostgreSQL]
+```mermaid
+flowchart TD
+    subgraph PresentationLayer ["Presentation Layer"]
+        Controllers["Controllers<br/>REST/GraphQL"]
+        DTOs["DTOs<br/>Serializers"]
+        Controllers --> DTOs
+    end
+    
+    PresentationLayer -->|"Interface Boundary"| BusinessLogicLayer
+    
+    subgraph BusinessLogicLayer ["Business Logic Layer"]
+        Services["Services<br/>Domain Rules"]
+        Entities["Entities<br/>Aggregates"]
+        Services --> Entities
+    end
+    
+    BusinessLogicLayer -->|"Repository Interface"| DataAccessLayer
+    
+    subgraph DataAccessLayer ["Data Access Layer"]
+        Repositories["Repositories<br/>DAO"]
+        Mappers["Mappers<br/>SQL/ORM"]
+        Repositories --> Mappers
+    end
+    
+    DataAccessLayer --> Database["(PostgreSQL)"]
 ```
 
 The business logic layer contains the system's intelligence. An `OrderService` class orchestrates the order placement workflow: validating inventory availability, calculating pricing with applicable discounts, reserving stock, and triggering fulfillment processes. This layer models domain entities as rich objects with both state and behavior. An `Order` aggregate maintains its lifecycle through methods like `addLineItem`, `applyPromotion`, and `markAsShipped`, enforcing invariants such as "an order cannot be modified after shipment" through state machine transitions. The service layer coordinates multiple aggregates—checking `Inventory`, updating `Customer` purchase history, creating `Payment` records—while maintaining transactional consistency.

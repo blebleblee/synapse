@@ -32,29 +32,43 @@ Constructing this linkage in Lego requires precise pin spacing that often does n
 
 The practical Lego four-bar linkage employs specific hole patterns that have been empirically validated by builders: the 3-5-7-5 configuration just described actually works when the coupler link is 9 holes (64 mm) instead of 7, creating a more elongated linkage that maintains chain closure throughout the cycle. Another reliable pattern uses a 4-4-5-6 configuration: ground span of 4 holes (24 mm), crank of 4 holes (24 mm), coupler of 5 holes (32 mm), and follower of 6 holes (40 mm). The Grashof check yields $4+6=10$ versus $4+5=9$, failing the criterion with 10 > 9, indicating no link can complete full rotation and both crank and follower will only rock through limited angles. This creates a double-rocker mechanism where input oscillation at one joint produces output oscillation at the opposite joint, useful for synchronized bilateral motion like walking legs.
 
-```
-Four-Bar Linkage Topology (Schematic Projection):
+```mermaid
+flowchart TD
+    subgraph ground ["Ground Link (Fixed Frame) — length L_g"]
+        O1["O₁\n(Fixed Pivot)"]
+        O2["O₂\n(Fixed Pivot)"]
+    end
 
-Ground Link (fixed frame):
-|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
-O₁                  O₂
- ↑                  ↑
- |                  |
- | Crank (rotates)  | Follower (rocks)
- |                  |
- O₃────────────────O₄
-    Coupler Link
+    subgraph crank ["Crank — length L_c"]
+        O3["O₃\n(Moving Pivot)"]
+    end
 
-Constraints:
-- O₁ fixed to ground at origin
-- O₂ fixed at ground link length L_g
-- O₃ connected to O₁ by crank length L_c (revolute joint)
-- O₄ connected to O₂ by follower length L_f (revolute joint)
-- O₃-O₄ span equals coupler length L_o (rigid link)
+    subgraph follower ["Follower — length L_f"]
+        O4["O₄\n(Moving Pivot)"]
+    end
 
-Grashof Criterion:
-L_shortest + L_longest ≤ L_mid1 + L_mid2
-Determines if continuous crank rotation possible
+    subgraph coupler ["Coupler Link — length L_o"]
+        direction LR
+        O3_ref["O₃"]
+        O4_ref["O₄"]
+        O3_ref -->|"rigid span L_o"| O4_ref
+    end
+
+    subgraph grashof ["Grashof Criterion"]
+        G["L_shortest + L_longest ≤ L_mid1 + L_mid2\n✓ Satisfied → continuous crank rotation possible\n✗ Violated → all links rock only"]
+    end
+
+    O1 -->|"revolute joint\ncrank rotates"| O3
+    O2 -->|"revolute joint\nfollower rocks"| O4
+    O3 -->|"rigid coupler\nlength L_o"| O4
+
+    ground -.->|"anchors"| O1
+    ground -.->|"anchors"| O2
+
+    ground --> grashof
+    crank --> grashof
+    follower --> grashof
+    coupler --> grashof
 ```
 
 Crank-slider mechanisms convert the circular crank motion into linear reciprocation through a sliding joint that constrains the coupler link's endpoint to travel along a straight guide path. The simplest Lego implementation uses a 4-length beam as the crank, mounted on an axle offset 1 stud from the center of a wheel or large turntable. The crank's free end connects via a pin joint to a long beam that slides within a pair of guide rails built from parallel beams or channel pieces. As the crank rotates, the slider beam oscillates back and forth with stroke length equal to twice the crank radius: a 1-stud offset produces 16 mm stroke, a 2-stud offset yields 32 mm stroke, and a 3-stud offset delivers 48 mm stroke.

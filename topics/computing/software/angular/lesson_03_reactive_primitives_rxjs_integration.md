@@ -150,20 +150,33 @@ export class CounterComponent {
 
 Signals build a dependency graph during template evaluation through implicit subscription. When Angular evaluates a template expression like `{{ count() }}`, accessing the signal's value registers the component's view as a consumer. When `count.set()` mutates the underlying value, the signal traverses its consumer list and marks dependent views dirty, scheduling targeted change detection. This fine-grained invalidation enables precise updates without zone.js's global event interception, reducing change detection overhead from O(components) to O(affected components).
 
-```
-Signal Dependency Graph (computed propagation):
+```mermaid
+flowchart TD
+    count["count\n(WritableSignal)"]
+    doubleCount["doubleCount\n(ComputedSignal: count() × 2)"]
+    isEven["isEven\n(ComputedSignal: count() % 2 === 0)"]
+    view["Component View\n(template binding: {{ count() }})"]
 
-count (WritableSignal)
-  ├─→ doubleCount (ComputedSignal: count() * 2)
-  ├─→ isEven (ComputedSignal: count() % 2 === 0)
-  └─→ Component View (template binding: {{ count() }})
+    subgraph propagation ["Update Propagation on count.set(5)"]
+        step1["① count notifies consumers\n[doubleCount, isEven, View]"]
+        step2["② doubleCount recomputes\n5 × 2 = 10"]
+        step3["③ isEven recomputes\n5 % 2 === 0 → false"]
+        step4["④ View marked dirty\nrender scheduled"]
+        step5["⑤ Only affected view updates\nother components unchanged"]
 
-Update propagation on count.set(5):
-1. count notifies consumers: [doubleCount, isEven, View]
-2. doubleCount recomputes: 5 * 2 = 10
-3. isEven recomputes: 5 % 2 === 0 = false
-4. View marks dirty, schedules render
-5. Only affected view updates, other components unchanged
+        step1 --> step2
+        step1 --> step3
+        step1 --> step4
+        step2 --> step5
+        step3 --> step5
+        step4 --> step5
+    end
+
+    count -->|"propagates change"| doubleCount
+    count -->|"propagates change"| isEven
+    count -->|"propagates change"| view
+
+    count -->|"triggers"| step1
 ```
 
 The interop between Observables and Signals bridges push-based asynchronous streams with pull-based synchronous reactivity. The `toSignal` function converts an Observable into a Signal by subscribing internally and updating the signal value on each emission, with configurable initial values and error handling strategies. The `toObservable` function creates an Observable that emits whenever a signal changes, enabling signals to participate in RxJS pipelines with operators like `debounceTime` or `switchMap`. This bidirectional conversion enables hybrid architectures where HTTP responses flow through Observables into Signals for template binding, while signal mutations trigger Observable chains for side effects or backend synchronization.

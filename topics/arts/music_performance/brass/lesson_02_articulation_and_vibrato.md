@@ -44,9 +44,9 @@ graph TD
     F -.->|"Acoustic feedback"| E
     E -.->|"Upstream reflection"| D
 
-    style D fill:#E9A568,stroke:#8B5A3C,stroke-width:3px
-    style F fill:#D4A574,stroke:#8B5A3C,stroke-width:2px
-    style C fill:#A8C5A0,stroke:#4A7A44,stroke-width:2px
+    style D fill:#E9A568,stroke:#8B5A3C,stroke-width:3px,color:#0f172a
+    style F fill:#D4A574,stroke:#8B5A3C,stroke-width:2px,color:#0f172a
+    style C fill:#A8C5A0,stroke:#4A7A44,stroke-width:2px,color:#0f172a
 ```
 
 The lip valve runs on the Bernoulli cycle: air rushing through the narrow aperture drops in pressure, pulling the lips together; flow stops, pressure recovers, elastic recoil reopens the gap, repeat. This locks onto whichever tube resonance is nearest to your buzzed pitch — which is why a sloppy embouchure "finds" the wrong harmonic. The ratio of mouth pressure to oscillation-threshold pressure governs timbre: near threshold the tone is thin and nearly sine-like; at 1.5–2.5× threshold the waveform goes sharply nonlinear and you get the bright, harmonically rich brass tone players actually want. Practical translation: a note played too softly, with too little air behind it, will always sound thin and unfocused no matter how "correct" your embouchure shape is — push more air through a smaller aperture, don't just purse harder.
@@ -116,8 +116,8 @@ graph LR
         C2 --> D2["System jumps harmonic = crack"]
     end
 
-    style D1 fill:#A8C5A0,stroke:#4A7A44,stroke-width:2px
-    style D2 fill:#E9A568,stroke:#8B5A3C,stroke-width:2px
+    style D1 fill:#A8C5A0,stroke:#4A7A44,stroke-width:2px,color:#0f172a
+    style D2 fill:#E9A568,stroke:#8B5A3C,stroke-width:2px,color:#0f172a
 ```
 
 ### Articulation Practice Drills
@@ -193,9 +193,9 @@ graph TD
     V2 --> E2 --> P2
     V3 --> E3 --> P3
 
-    style V1 fill:#E9A568,stroke:#8B5A3C,stroke-width:2px
-    style V2 fill:#D4A574,stroke:#8B5A3C,stroke-width:2px
-    style V3 fill:#C9B99A,stroke:#8B5A3C,stroke-width:2px
+    style V1 fill:#E9A568,stroke:#8B5A3C,stroke-width:2px,color:#0f172a
+    style V2 fill:#D4A574,stroke:#8B5A3C,stroke-width:2px,color:#0f172a
+    style V3 fill:#C9B99A,stroke:#8B5A3C,stroke-width:2px,color:#0f172a
 ```
 
 **Embouchure vibrato** (trumpet, French horn): a slight, symmetric undulation in lip tension — a gentle rocking, not a wobble. Keep the motion even on both sides of center; too much jaw involvement drags it toward jaw vibrato and loses the centered brightness trumpet and horn playing depend on.
@@ -326,7 +326,7 @@ Unsynchronized vibrato across a section creates phase interference — multiple 
 | Max double-tongue rate | — | 8–10 notes/sec | 12–16 notes/sec |
 | Vibrato rate control | 4–8 Hz (variable) | 5–7 Hz (semi-stable) | 5.2–6.5 Hz ±0.3 Hz |
 | Vibrato extent control | ±5–20 cents | ±10–18 cents | ±10–14 cents ±2 cents |
-| Vibrato onset latency | >500 ms | 200–400 ms | <100 ms |
+| Vibrato onset latency | >500 ms | 200–400 ms | < 100 ms |
 | Legato slur accuracy | ±20 cents | ±10 cents | ±5 cents |
 | Dynamic range (single pitch) | pp to mf | pp to f | pp to fff |
 

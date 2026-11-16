@@ -112,7 +112,7 @@ This reference codifies decision frameworks and diagnostic protocols for ongoing
 
 4. **Reissue Risk (0–10 points, inverse scoring):** Original IP with unique design (10 pts), discontinued licensed property (7 pts), ongoing licensed franchise with low reissue history (4 pts), core Star Wars/Harry Potter subject (0 pts).
 
-5. **Spatial Efficiency (0–10 points):** Small box (<1 ft³), high MSRP (10 pts), medium box (1–3 ft³), moderate MSRP (6 pts), large box (>3 ft³), proportional MSRP (3 pts), large box, low MSRP (0 pts).
+5. **Spatial Efficiency (0–10 points):** Small box (< 1 ft³), high MSRP (10 pts), medium box (1–3 ft³), moderate MSRP (6 pts), large box (>3 ft³), proportional MSRP (3 pts), large box, low MSRP (0 pts).
 
 **Scoring:** Sum the five categories (max 50 points). Sets scoring 35+ warrant immediate acquisition at available discount. Scores of 25–34 justify watchlist placement with monthly re-evaluation. Below 25, reject the investment unless you have personal building intent.
 

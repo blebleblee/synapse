@@ -20,31 +20,26 @@ The invariant that governs every high-performance Ubiquiti deployment is this: *
 
 Understanding where Ubiquiti's firmware sits relative to the 802.11 standard requires a precise mental model of the transmit pipeline. When a packet arrives at the AP from the wired backhaul, it enters the driver's transmit queue, is classified by the QoS subsystem into one of four Access Categories (Voice, Video, Best Effort, Background), assigned an EDCA (Enhanced Distributed Channel Access) parameter set governing its contention window and AIFS, and then handed to the MAC sublayer for aggregation and PHY framing.
 
-```
-Wired Backhaul
-      │
-      ▼
-┌─────────────────────────────────────────────────────────┐
-│                    AP Linux Kernel                       │
-│  ┌──────────┐    ┌──────────────┐    ┌────────────────┐ │
-│  │  netdev  │───▶│  mac80211    │───▶│  ath11k/mt76   │ │
-│  │  RX/TX   │    │  subsystem   │    │  driver layer  │ │
-│  └──────────┘    └──────────────┘    └────────┬───────┘ │
-└───────────────────────────────────────────────│─────────┘
-                                                │
-                                     ┌──────────▼──────────┐
-                                     │  Radio Firmware     │
-                                     │  (closed, QCA/MTK)  │
-                                     │                     │
-                                     │  OFDMA Scheduler    │
-                                     │  MU-MIMO Beamformer │
-                                     │  AMPDU Aggregator   │
-                                     └──────────┬──────────┘
-                                                │
-                                     ┌──────────▼──────────┐
-                                     │  PHY / RF Chain     │
-                                     │  4×4 MIMO Antennas  │
-                                     └─────────────────────┘
+```mermaid
+flowchart TD
+    Backhaul["Wired Backhaul"]
+    
+    subgraph Kernel["AP Linux Kernel"]
+        NetDev["netdev<br/>RX/TX"]
+        Mac80211["mac80211<br/>subsystem"]
+        Driver["ath11k/mt76<br/>driver layer"]
+        
+        NetDev --> Mac80211
+        Mac80211 --> Driver
+    end
+    
+    Firmware["Radio Firmware<br/>(closed, QCA/MTK)<br/><br/>OFDMA Scheduler<br/>MU-MIMO Beamformer<br/>AMPDU Aggregator"]
+    
+    PHY["PHY / RF Chain<br/>4×4 MIMO Antennas"]
+    
+    Backhaul --> NetDev
+    Driver --> Firmware
+    Firmware --> PHY
 ```
 
 The mac80211 subsystem in the Linux kernel implements the common 802.11 MAC logic shared across all wireless drivers, including frame aggregation (A-MPDU, A-MSDU), rate control, and power save buffering. Ubiquiti's APs run a customized Linux-based OS (OpenWrt-derived on older UniFi hardware, a proprietary stack on newer U6 models) where mac80211 interacts with vendor-specific firmware for the actual RF scheduling. This split-MAC architecture means that OFDMA Resource Unit allocation and MU-MIMO precoding matrix computation happen entirely within the radio firmware, below the visibility horizon of the administrator. What you can influence from the UniFi controller flows down through configuration APIs that instruct the firmware on channel width, transmit power policy, minimum RSSI thresholds, and BSS color assignment.
@@ -55,23 +50,26 @@ MIMO exploits multipath propagation rather than fighting it. In a traditional si
 
 Explicit beamforming, standardized in 802.11ac and refined in 802.11ax, requires the client to transmit a sounding frame, the AP to respond with an NDP (Null Data Packet), and the client to feed back a compressed Beamforming Feedback Matrix (BFM) that describes its view of the channel. The AP then applies this matrix as a precoder, steering signal energy toward the client and minimizing interference toward other clients. This sounding handshake happens every few hundred milliseconds in a mobile environment, which is non-trivial overhead. In a UniFi deployment, the firmware manages sounding intervals adaptively, backing off the sounding frequency for stationary clients and accelerating it when RSSI variance indicates client movement.
 
-```
-Timeline of MU-MIMO Downlink Transmission (802.11ax):
-
-AP ──► NDPA (sounding announcement) ──────────────────────────────────►
-AP ──► NDP  (null data packet)       ──────────────────────────────────►
-
-Client A ◄────────────────────────────────── BFM Report (compressed)
-Client B ◄────────────────────────────────── BFM Report (compressed)
-Client C ◄────────────────────────────────── BFM Report (compressed)
-
-AP computes precoder W from {BFM_A, BFM_B, BFM_C}
-              │
-              ▼
-AP ──► MU-PPDU [stream_A | stream_B | stream_C] (simultaneous)
-              │             │             │
-              ▼             ▼             ▼
-          Client A      Client B      Client C
+```mermaid
+flowchart TD
+    AP["Access Point (AP)"]
+    
+    AP -->|"1. NDPA<br/>(sounding announcement)"| Phase1["Sounding Phase"]
+    AP -->|"2. NDP<br/>(null data packet)"| Phase1
+    
+    Phase1 --> ClientA_BFM["Client A sends<br/>BFM Report (compressed)"]
+    Phase1 --> ClientB_BFM["Client B sends<br/>BFM Report (compressed)"]
+    Phase1 --> ClientC_BFM["Client C sends<br/>BFM Report (compressed)"]
+    
+    ClientA_BFM --> Compute["AP computes precoder W<br/>from {BFM_A, BFM_B, BFM_C}"]
+    ClientB_BFM --> Compute
+    ClientC_BFM --> Compute
+    
+    Compute --> MUPPDU["MU-PPDU Transmission<br/>[stream_A | stream_B | stream_C]"]
+    
+    MUPPDU -->|"stream_A"| ClientA["Client A"]
+    MUPPDU -->|"stream_B"| ClientB["Client B"]
+    MUPPDU -->|"stream_C"| ClientC["Client C"]
 ```
 
 The spatial separation achieved by this precoder is what allows three clients to share the same frequency resource simultaneously without destructive interference. The precoder quality degrades if the channel estimate fed back is stale, which is why MU-MIMO throughput collapses in environments with high client mobility or a large number of legacy clients that do not support beamforming feedback.
@@ -82,19 +80,34 @@ The 5 GHz band, as defined by the FCC and ETSI regulatory domains, provides 25 n
 
 Ubiquiti's Auto RF feature, accessed through the controller's RF Environment panel, runs a background scan of RSSI levels and neighboring channel utilization and then adjusts channel assignments and transmit power to minimize overlap. The underlying algorithm implements a variant of graph coloring: APs are nodes, edges represent proximity (co-interference potential), and channel assignments are colors. The goal is to maximize the minimum chromatic distance between adjacent APs. Auto RF is not a substitute for deliberate manual channel planning; it is a convergence mechanism that reduces the operational burden of ongoing drift correction as the RF environment changes over weeks and months.
 
-```
-Correct 5 GHz Channel Allocation (80 MHz channels, 6-AP floor plan):
-
-  [AP-1: ch 36]      [AP-2: ch 149]     [AP-3: ch 36]
-       │                   │                   │
-       └────── ~20m ───────┘────── ~20m ───────┘
-
-  [AP-4: ch 149]     [AP-5: ch 100]     [AP-6: ch 149]
-       │                   │                   │
-       └────── ~20m ───────┘────── ~20m ───────┘
-
-Co-channel pairs: AP-1/AP-3, AP-2/AP-4/AP-6
-Mitigated by: transmit power reduction, directional antenna tilt
+```mermaid
+flowchart TD
+    subgraph row1["Row 1"]
+        AP1["AP-1<br/>Channel 36"]
+        AP2["AP-2<br/>Channel 149"]
+        AP3["AP-3<br/>Channel 36"]
+    end
+    
+    subgraph row2["Row 2"]
+        AP4["AP-4<br/>Channel 149"]
+        AP5["AP-5<br/>Channel 100"]
+        AP6["AP-6<br/>Channel 149"]
+    end
+    
+    AP1 ---|"~20m"| AP2
+    AP2 ---|"~20m"| AP3
+    AP4 ---|"~20m"| AP5
+    AP5 ---|"~20m"| AP6
+    
+    AP1 -.->|"~20m"| AP4
+    AP2 -.->|"~20m"| AP5
+    AP3 -.->|"~20m"| AP6
+    
+    subgraph legend["Legend"]
+        direction LR
+        L1["Co-channel pairs:<br/>AP-1/AP-3 (ch 36)<br/>AP-2/AP-4/AP-6 (ch 149)"]
+        L2["Mitigation:<br/>Transmit power reduction<br/>Directional antenna tilt"]
+    end
 ```
 
 The DFS (Dynamic Frequency Selection) channels in the UNII-2 and UNII-2e bands (100–144) add spectrum at the cost of mandatory radar detection. When a Ubiquiti AP operating on a DFS channel detects a radar pulse pattern, it must vacate the channel within 10 seconds and not return for 30 minutes. For latency-sensitive workloads like VoIP or real-time collaboration, DFS channel instability is operationally significant. The mitigation is to designate a dedicated fallback channel in Auto RF configuration and ensure that client devices support 802.11k neighbor reports, so roaming to an adjacent AP on a stable channel is fast when a DFS event triggers.
@@ -105,23 +118,27 @@ Client roaming is one of the most poorly understood and most consequential aspec
 
 The standard 802.11i re-association process without Fast BSS Transition involves a full 802.1X/EAP authentication round-trip back to the RADIUS server, consuming anywhere from 50 ms to 300 ms depending on RADIUS server location, network RTT, and EAP method. For WPA2-Enterprise deployments, this latency causes audible glitches in VoIP calls and visible stalls in real-time screen-sharing applications. 802.11r addresses this by pre-caching the PMK (Pairwise Master Key) keying material in a Mobility Domain, allowing re-association to complete in a single round-trip between the client and the target AP.
 
-```
-Roaming Event Timeline: 802.11r Fast BSS Transition
-
-Client                 Source AP (AP-1)         Target AP (AP-2)
-  │                          │                        │
-  │── Probe Request ─────────►                        │
-  │◄─ Probe Response ────────│ (includes Neighbor     │
-  │   (RSSI: -78 dBm)        │  Report via 802.11k)   │
-  │                          │                        │
-  │── FT Auth Request ───────│────────────────────────►
-  │◄─ FT Auth Response ──────│────────────────────────│
-  │                          │                        │
-  │── Reassoc Request ───────────────────────────────►│
-  │◄─ Reassoc Response ──────────────────────────────│
-  │                          │                        │
-  │  Total: ~15–30 ms        │   (vs. 150–300 ms      │
-  │                          │    without 802.11r)    │
+```mermaid
+flowchart LR
+    Client["Client"]
+    AP1["Source AP (AP-1)"]
+    AP2["Target AP (AP-2)"]
+    
+    Client -->|"1. Probe Request"| AP1
+    AP1 -->|"2. Probe Response<br/>(RSSI: -78 dBm)<br/>(includes Neighbor Report via 802.11k)"| Client
+    
+    Client -->|"3. FT Auth Request"| AP2
+    AP2 -->|"4. FT Auth Response"| Client
+    
+    Client -->|"5. Reassoc Request"| AP2
+    AP2 -->|"6. Reassoc Response"| Client
+    
+    Note1["Total: ~15–30 ms<br/>(vs. 150–300 ms without 802.11r)"]
+    
+    style Client fill:#e1f5ff,stroke:#333,stroke-width:2px
+    style AP1 fill:#fff4e1,stroke:#333,stroke-width:2px
+    style AP2 fill:#fff4e1,stroke:#333,stroke-width:2px
+    style Note1 fill:#f0f0f0,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
 ```
 
 Ubiquiti implements the full 802.11k/r/v trifecta in its U6 access point family. The UniFi controller's Site configuration exposes these as BSS Transition, 802.11r, and 802.11k toggles. Critically, 802.11r compatibility is not universal across client firmware stacks: some legacy Android devices and older Windows 10 builds mishandle the FT authentication state machine and fail to associate at all when 802.11r is active on the SSID. The operationally safe deployment pattern is to run 802.11r on enterprise SSIDs used by known-compatible clients and leave it disabled on guest or IoT SSIDs with heterogeneous client populations.
@@ -291,7 +308,7 @@ Assembling the above mechanics into a coherent deployment workflow requires tran
 | Minimum RSSI | -72 dBm | Prevents sticky clients; requires validated adjacent AP coverage |
 | Transmit Power (5 GHz) | Medium (17–20 dBm) | Reduces co-channel interference footprint; matched to AP density |
 | Band Steering | Enabled | Moves dual-band clients to less congested 5 GHz |
-| 802.11r | Enabled on enterprise SSID | Reduces roaming latency to <30 ms |
+| 802.11r | Enabled on enterprise SSID | Reduces roaming latency to < 30 ms |
 | 802.11k | Enabled | Provides neighbor report to accelerate client roam decisions |
 | 802.11v BSS Transition | Enabled | AP-initiated steering for persistent sticky clients |
 | SSID Count per Radio | ≤ 3 | Each SSID adds beacon overhead; >4 measurably degrades airtime |

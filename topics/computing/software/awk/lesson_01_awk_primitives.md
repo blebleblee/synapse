@@ -64,44 +64,24 @@ The variable `RS` follows analogous but not identical rules. By default it is `"
 
 The following diagram models the full execution lifecycle of an awk program against multiple input files:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    AWK PROGRAM LIFECYCLE                │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start["BEGIN {}<br/><small>Runs once. No $0, no NR, no input.</small>"]
+    OpenFile["Open next input file<br/>(or stdin if none)"]
+    ReadRecord["Read next record into $0<br/>Split $0 → $1..$NF via FS<br/>Increment NR (global), FNR (per-file)"]
+    PatternMatch["For each pattern-action rule:<br/><br/>/regex/ → test $0 against ERE<br/>expr → evaluate as boolean<br/>pat1, pat2 → range: active between match<br/>(empty pat) → matches every record<br/><br/>If match: execute action {}"]
+    MoreRecords{"More records?"}
+    MoreFiles{"More input files?"}
+    End["END {}<br/><small>NR holds final count</small>"]
 
-         ┌──────────────┐
-         │  BEGIN {}    │  ← Runs once. No $0, no NR, no input.
-         └──────┬───────┘
-                │
-         ┌──────▼─────────────────────────────────────────┐
-         │  Open next input file (or stdin if none)       │
-         └──────┬─────────────────────────────────────────┘
-                │
-         ┌──────▼───────────────────────────────────────┐
-         │  Read next record into $0                    │
-         │  Split $0 → $1..$NF via FS                   │
-         │  Increment NR (global), FNR (per-file)        │
-         └──────┬───────────────────────────────────────┘
-                │
-         ┌──────▼───────────────────────────────────────┐
-         │  For each pattern-action rule:               │
-         │                                              │
-         │  /regex/      → test $0 against ERE          │
-         │  expr         → evaluate as boolean          │
-         │  pat1, pat2   → range: active between match  │
-         │  (empty pat)  → matches every record         │
-         │                                              │
-         │  If match: execute action {}                 │
-         └──────┬───────────────────────────────────────┘
-                │
-         ┌──────▼───────────┐    ┌────────────────────────┐
-         │  More records?   │─No─▶  More input files?     │
-         └──────────────────┘    └──────────┬─────────────┘
-                │ Yes                        │ Yes → loop back
-                └────────────────────────────┘ No ↓
-                                        ┌──────▼───────┐
-                                        │   END {}     │  ← NR holds
-                                        └──────────────┘    final count
+    Start --> OpenFile
+    OpenFile --> ReadRecord
+    ReadRecord --> PatternMatch
+    PatternMatch --> MoreRecords
+    MoreRecords -->|Yes| ReadRecord
+    MoreRecords -->|No| MoreFiles
+    MoreFiles -->|Yes| OpenFile
+    MoreFiles -->|No| End
 ```
 
 ### Built-In Variables as Execution State

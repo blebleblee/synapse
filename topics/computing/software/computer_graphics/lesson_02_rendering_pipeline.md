@@ -28,29 +28,26 @@ After clipping, the hardware performs the **perspective divide**: $\mathbf{p}_{N
 
 The pipeline can be visualized as follows:
 
-```
-Object Space
-    │  Model Matrix (M)
-    ▼
-World Space
-    │  View Matrix (V)
-    ▼
-View/Camera Space
-    │  Projection Matrix (P)
-    ▼
-Clip Space  ──────────────────────────► Clipping & Culling
-    │  Perspective Divide (÷w)
-    ▼
-NDC Space
-    │  Viewport Transform
-    ▼
-Screen/Window Space
-    │  Rasterization
-    ▼
-Fragment Space
-    │  Fragment Shader + Tests
-    ▼
-Framebuffer
+```mermaid
+flowchart TD
+    OS["Object Space"]
+    WS["World Space"]
+    VS["View / Camera Space"]
+    CS["Clip Space"]
+    CC["Clipping & Culling"]
+    NDC["NDC Space"]
+    SS["Screen / Window Space"]
+    FS["Fragment Space"]
+    FB["Framebuffer"]
+
+    OS -->|"Model Matrix (M)"| WS
+    WS -->|"View Matrix (V)"| VS
+    VS -->|"Projection Matrix (P)"| CS
+    CS -->|"Perspective Divide (÷w)"| NDC
+    CS -->|""| CC
+    NDC -->|"Viewport Transform"| SS
+    SS -->|"Rasterization"| FS
+    FS -->|"Fragment Shader + Tests"| FB
 ```
 
 ### Vertex Processing
@@ -215,84 +212,60 @@ After the fragment shader executes, the fragment passes through a series of **pe
 
 ### The Complete Pipeline Data-Flow
 
-```
-CPU: glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0)
-         │
-         ▼
-┌─────────────────────────────────────────┐
-│  Vertex Fetch (Fixed-Function)          │
-│  Reads VBO at layout(location=N) attrs  │
-└──────────────┬──────────────────────────┘
-               │  per-vertex attribute structs
-               ▼
-┌─────────────────────────────────────────┐
-│  Vertex Shader (Programmable)           │
-│  Input:  attribute slots                │
-│  Output: gl_Position (clip space)       │
-│          user varyings                  │
-└──────────────┬──────────────────────────┘
-               │  clip-space vertices
-               ▼
-┌─────────────────────────────────────────┐
-│  Tessellation Control Shader (Optional) │
-│  Tessellation Evaluation Shader         │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│  Geometry Shader (Optional)             │
-│  Emits 0..N primitives per input prim   │
-└──────────────┬──────────────────────────┘
-               │  assembled primitives
-               ▼
-┌─────────────────────────────────────────┐
-│  Primitive Assembly (Fixed-Function)    │
-│  Groups vertices → triangles/lines/pts  │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│  Clipping (Fixed-Function)              │
-│  Sutherland-Hodgman on 6 frustum planes │
-│  Perspective divide → NDC               │
-│  Back-face culling                      │
-└──────────────┬──────────────────────────┘
-               │  NDC triangles
-               ▼
-┌─────────────────────────────────────────┐
-│  Viewport Transform (Fixed-Function)    │
-│  NDC → window/screen coordinates        │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│  Rasterization (Fixed-Function)         │
-│  Edge equations → fragment coverage     │
-│  MSAA sub-sample evaluation             │
-│  Perspective-correct varying interp     │
-└──────────────┬──────────────────────────┘
-               │  fragments (x, y, z, varyings)
-               ▼
-┌─────────────────────────────────────────┐
-│  Early-Z / Early Depth Test (HW opt)    │
-│  Discards occluded fragments before FS  │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│  Fragment Shader (Programmable)         │
-│  Reads textures, uniforms, varyings     │
-│  Writes: color outputs, optional depth  │
-└──────────────┬──────────────────────────┘
-               │  output color(s)
-               ▼
-┌─────────────────────────────────────────┐
-│  Per-Fragment Tests (Fixed-Function)    │
-│  Scissor → Stencil → Depth → Blend     │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-         Framebuffer
+```mermaid
+flowchart TD
+    CPU["<b>CPU</b><br/>glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0)"]
+
+    VF["<b>Vertex Fetch</b> · Fixed-Function<br/>Reads VBO at layout(location=N) attrs"]
+
+    VS["<b>Vertex Shader</b> · Programmable<br/>In: attribute slots<br/>Out: gl_Position (clip space), user varyings"]
+
+    TESS["<b>Tessellation Shaders</b> · Optional<br/>Control Shader → Evaluation Shader"]
+
+    GS["<b>Geometry Shader</b> · Optional<br/>Emits 0..N primitives per input primitive"]
+
+    PA["<b>Primitive Assembly</b> · Fixed-Function<br/>Groups vertices → triangles / lines / points"]
+
+    CLIP["<b>Clipping</b> · Fixed-Function<br/>Sutherland-Hodgman on 6 frustum planes<br/>Perspective divide → NDC<br/>Back-face culling"]
+
+    VP["<b>Viewport Transform</b> · Fixed-Function<br/>NDC → window / screen coordinates"]
+
+    RAST["<b>Rasterization</b> · Fixed-Function<br/>Edge equations → fragment coverage<br/>MSAA sub-sample evaluation<br/>Perspective-correct varying interpolation"]
+
+    EZ["<b>Early-Z / Early Depth Test</b> · HW Optimization<br/>Discards occluded fragments before Fragment Shader"]
+
+    FS["<b>Fragment Shader</b> · Programmable<br/>Reads textures, uniforms, varyings<br/>Writes: color outputs, optional depth"]
+
+    PFT["<b>Per-Fragment Tests</b> · Fixed-Function<br/>Scissor → Stencil → Depth → Blend"]
+
+    FB["<b>Framebuffer</b>"]
+
+    CPU -->|" "| VF
+    VF -->|"per-vertex attribute structs"| VS
+    VS -->|"clip-space vertices"| TESS
+    TESS -->|" "| GS
+    GS -->|"assembled primitives"| PA
+    PA -->|" "| CLIP
+    CLIP -->|"NDC triangles"| VP
+    VP -->|" "| RAST
+    RAST -->|"fragments (x, y, z, varyings)"| EZ
+    EZ -->|" "| FS
+    FS -->|"output color(s)"| PFT
+    PFT -->|" "| FB
+
+    classDef programmable fill:#1a3a5c,stroke:#4a9eff,color:#e8f4ff
+    classDef fixed fill:#1a2e1a,stroke:#4aaa4a,color:#e8ffe8
+    classDef optional fill:#3a2a1a,stroke:#cc8833,color:#fff0d8
+    classDef hw fill:#2a1a3a,stroke:#9955cc,color:#f0e8ff
+    classDef cpu fill:#2a1a1a,stroke:#cc4444,color:#ffe8e8
+    classDef fb fill:#1a1a2a,stroke:#8888cc,color:#e8e8ff
+
+    class CPU cpu
+    class VF,PA,CLIP,VP,RAST,PFT fixed
+    class VS,FS programmable
+    class TESS,GS optional
+    class EZ hw
+    class FB fb
 ```
 
 ---

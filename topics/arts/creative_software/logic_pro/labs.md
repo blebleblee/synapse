@@ -41,8 +41,7 @@ If you get the "CPU overload" pop-up, don't blindly max the buffer. Check the **
 - **Disk meter maxed, Process fine** → too many simultaneous audio streams for your drive's read speed (common on sample library-heavy orchestral templates). Move libraries to an internal SSD or use a faster external (NVMe over Thunderbolt, not USB spinning disk).
 - **Spike only when a specific plugin's GUI is open** → that plugin's UI thread is poorly optimized; close its window and automate via the mixer instead.
 
-```
-CoreAudio Signal Flow:
+```mermaid
 flowchart TD
     subgraph sub_input ["Hardware Input Stage"]
         A1["Audio Interface ADC"] --> A2["CoreAudio Driver"]

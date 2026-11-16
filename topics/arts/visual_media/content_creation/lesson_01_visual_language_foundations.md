@@ -24,26 +24,35 @@ The human eye naturally gravitates toward certain positions within a rectangular
 
 This is not mystical. It emerges from how the human visual system evolved to scan space for predators and resources. A horizon at the center reads as uncertain, ambiguous—neither sky nor ground dominates. A horizon in the upper third immediately establishes a clear visual hierarchy: ground is primary, sky is secondary. This is why landscape photographers universally position horizons at the upper or lower third; it is not fashion but perceptual physics.
 
-```
-Rule of Thirds Grid:
-
-+-------+-------+-------+
-|       |       |       |
-|   A   |   B   |   C   |
-|       |       |       |
-+-------+-------+-------+
-|       |       |       |
-|   D   |   E   |   F   |
-|       |       |       |
-+-------+-------+-------+
-|       |       |       |
-|   G   |   H   |   I   |
-|       |       |       |
-+-------+-------+-------+
-
-Optimal subject placement: corners A, C, G, I (strongest) 
-or intersections B, D, F, H (secondary strength)
-Weakest position: center E (use only for specific intentional reasons)
+```mermaid
+flowchart TD
+    subgraph grid["Rule of Thirds Grid"]
+        subgraph row1[" "]
+            A["A<br/>Strongest<br/>Position"]
+            B["B<br/>Secondary<br/>Strength"]
+            C["C<br/>Strongest<br/>Position"]
+        end
+        subgraph row2[" "]
+            D["D<br/>Secondary<br/>Strength"]
+            E["E<br/>Weakest<br/>Center"]
+            F["F<br/>Secondary<br/>Strength"]
+        end
+        subgraph row3[" "]
+            G["G<br/>Strongest<br/>Position"]
+            H["H<br/>Secondary<br/>Strength"]
+            I["I<br/>Strongest<br/>Position"]
+        end
+    end
+    
+    style A fill:#2d5,stroke:#333,stroke-width:3px
+    style C fill:#2d5,stroke:#333,stroke-width:3px
+    style G fill:#2d5,stroke:#333,stroke-width:3px
+    style I fill:#2d5,stroke:#333,stroke-width:3px
+    style B fill:#5ad,stroke:#333,stroke-width:2px
+    style D fill:#5ad,stroke:#333,stroke-width:2px
+    style F fill:#5ad,stroke:#333,stroke-width:2px
+    style H fill:#5ad,stroke:#333,stroke-width:2px
+    style E fill:#f88,stroke:#333,stroke-width:2px
 ```
 
 ### Color as Perceptual Structure

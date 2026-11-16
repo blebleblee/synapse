@@ -20,23 +20,16 @@ The invariant that holds across all difficulty levels is this: *a fair cryptic c
 
 The architecture of a cryptic clue can be visualized as a three-layer system: the *definition layer*, the *mechanism layer*, and the *surface narrative layer*. These layers operate semi-independently, yet they must ultimately converge on a single solution.
 
-```
-┌─────────────────────────────────────────┐
-│     SURFACE NARRATIVE LAYER             │
-│  (False semantic meaning, misdirection) │
-└──────────────────┬──────────────────────┘
-                   │
-┌──────────────────v──────────────────────┐
-│     MECHANISM LAYER                      │
-│  (Anagram, insertion, reversal, etc.)   │
-└──────────────────┬──────────────────────┘
-                   │
-┌──────────────────v──────────────────────┐
-│     DEFINITION LAYER                     │
-│  (Synonym, categorical descriptor)      │
-└──────────────────┬──────────────────────┘
-                   │
-            SOLUTION (word)
+```mermaid
+flowchart TD
+    A["SURFACE NARRATIVE LAYER<br/>(False semantic meaning, misdirection)"]
+    B["MECHANISM LAYER<br/>(Anagram, insertion, reversal, etc.)"]
+    C["DEFINITION LAYER<br/>(Synonym, categorical descriptor)"]
+    D["SOLUTION (word)"]
+    
+    A --> B
+    B --> C
+    C --> D
 ```
 
 The definition layer is the substrate. Every cryptic clue must contain a legitimate definition of the target word. This definition can be explicit and obvious—"Dog (3)" clearly defines the answer "pup"—or it can be subtle and require some interpretive work. "Man's best friend (3)" also yields "pup," but it requires the solver to recognize the common phrase and extract the synonym. The definition is the *anchor of legitimacy*. It ensures that once a solver has worked through the wordplay and extracted a candidate answer, they can verify that answer by checking whether it satisfies the definition. In poorly constructed clues, the definition is absent or ambiguous, leaving solvers unable to verify their solution independently.

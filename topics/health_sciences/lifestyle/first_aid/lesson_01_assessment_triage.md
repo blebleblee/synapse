@@ -43,49 +43,48 @@ Once the primary survey is complete and immediate threats are addressed or contr
 The assessment workflow is a state machine. Understanding its transitions explicitly allows practitioners to avoid getting trapped in one state when the clinical picture demands escalation.
 
 ```mermaid
-stateDiagram-v2
-    direction TB
-
-    [*] --> SceneSafety : Arrive at scene
-
-    SceneSafety --> HazardPresent : Threat identified
-    SceneSafety --> InitialApproach : Scene declared safe
-
-    HazardPresent --> SceneSafety : Hazard mitigated
-    HazardPresent --> StageAndCall : Hazard uncontrollable
-
-    InitialApproach --> AVPU : Call to casualty
-
-    AVPU --> Alert : Verbal response + orientation
-    AVPU --> VoicePain : Responds to stimulation only
-    AVPU --> Unresponsive : No response
-
-    Alert --> SecondaryA : Vitals stable, mechanism assessed
-    VoicePain --> PrimarySurvey : Escalate to full primary
-    Unresponsive --> PrimarySurvey : Immediate primary survey
-
-    PrimarySurvey --> AirwayAssessment : Step A
-    AirwayAssessment --> BreathingAssessment : Airway patent or opened
-    AirwayAssessment --> AirwayIntervention : Obstruction detected
-
-    AirwayIntervention --> BreathingAssessment : Obstruction cleared
-
-    BreathingAssessment --> CirculationAssessment : Breathing present
-    BreathingAssessment --> CardiacArrest : Absent or agonal
-
-    CirculationAssessment --> SecondaryA : No hemorrhage, pulse present
-    CirculationAssessment --> HemorrhageControl : Life-threatening bleed
-
-    HemorrhageControl --> SecondaryA : Bleed controlled
-
-    CardiacArrest --> CPR_AED : Initiate CPR + AED
-
-    SecondaryA --> HeadToToe : Primary survey clean
-    HeadToToe --> HandoffReport : Full picture assembled
-
-    CPR_AED --> HandoffReport : EMS transfer
-
-    HandoffReport --> [*]
+flowchart TD
+    Start([Start]) --> SceneSafety["Scene Safety"]
+    
+    SceneSafety -->|"Threat identified"| HazardPresent["Hazard Present"]
+    SceneSafety -->|"Scene declared safe"| InitialApproach["Initial Approach"]
+    
+    HazardPresent -->|"Hazard mitigated"| SceneSafety
+    HazardPresent -->|"Hazard uncontrollable"| StageAndCall["Stage and Call"]
+    
+    InitialApproach -->|"Call to casualty"| AVPU["AVPU Assessment"]
+    
+    AVPU -->|"Verbal response + orientation"| Alert["Alert"]
+    AVPU -->|"Responds to stimulation only"| VoicePain["Voice/Pain Response"]
+    AVPU -->|"No response"| Unresponsive["Unresponsive"]
+    
+    Alert -->|"Vitals stable, mechanism assessed"| SecondaryA["Secondary Assessment"]
+    VoicePain -->|"Escalate to full primary"| PrimarySurvey["Primary Survey"]
+    Unresponsive -->|"Immediate primary survey"| PrimarySurvey
+    
+    PrimarySurvey -->|"Step A"| AirwayAssessment["Airway Assessment"]
+    
+    AirwayAssessment -->|"Airway patent or opened"| BreathingAssessment["Breathing Assessment"]
+    AirwayAssessment -->|"Obstruction detected"| AirwayIntervention["Airway Intervention"]
+    
+    AirwayIntervention -->|"Obstruction cleared"| BreathingAssessment
+    
+    BreathingAssessment -->|"Breathing present"| CirculationAssessment["Circulation Assessment"]
+    BreathingAssessment -->|"Absent or agonal"| CardiacArrest["Cardiac Arrest"]
+    
+    CirculationAssessment -->|"No hemorrhage, pulse present"| SecondaryA
+    CirculationAssessment -->|"Life-threatening bleed"| HemorrhageControl["Hemorrhage Control"]
+    
+    HemorrhageControl -->|"Bleed controlled"| SecondaryA
+    
+    CardiacArrest -->|"Initiate CPR + AED"| CPR_AED["CPR & AED"]
+    
+    SecondaryA -->|"Primary survey clean"| HeadToToe["Head-to-Toe Examination"]
+    
+    HeadToToe -->|"Full picture assembled"| HandoffReport["Handoff Report"]
+    CPR_AED -->|"EMS transfer"| HandoffReport
+    
+    HandoffReport --> End([End])
 ```
 
 The diagram makes explicit what prose alone sometimes obscures: assessment is not a linear march from scene entry to handoff. It is a branching state machine where findings at each node can redirect the entire workflow. A practitioner who has internalized this topology does not freeze when a secondary survey finding requires re-entry into the primary track.

@@ -74,35 +74,42 @@ Leaders establish psychological safety through four behavioral patterns that emp
 
 The fragility of psychological safety becomes evident during organizational change. Change initiatives inherently increase error rates as individuals execute unfamiliar routines. If leadership responds to elevated failure rates with criticism or punishment, employees rationally conclude that the safest strategy is to hide difficulties and wait for the initiative to collapse under its own weight. If leadership responds by normalizing struggle and providing support, employees conclude that transparency accelerates help and increases change success probability.
 
-```
-Psychological Safety Feedback Loop:
-
-[Individual Takes Interpersonal Risk]
-     ↓
-[Leadership/Peer Response]
-     ├─→ [Reinforcing: Acknowledge, Explore, Support]
-     │        ↓
-     │   [Increased Risk-Taking Across Network]
-     │        ↓
-     │   [Problems Surface Early]
-     │        ↓
-     │   [Rapid Problem Resolution]
-     │        ↓
-     │   [Confidence in System Responsiveness]
-     │        ↓
-     │   [REINFORCING LOOP: Higher Safety]
-     │
-     └─→ [Punishing: Deflect, Blame, Attack]
-              ↓
-         [Decreased Risk-Taking Across Network]
-              ↓
-         [Problems Concealed]
-              ↓
-         [Problems Metastasize]
-              ↓
-         [Crisis Emerges]
-              ↓
-         [REINFORCING LOOP: Lower Safety]
+```mermaid
+flowchart TD
+    A["Individual Takes Interpersonal Risk"]
+    B["Leadership/Peer Response"]
+    
+    C["Acknowledge, Explore, Support"]
+    D["Increased Risk-Taking Across Network"]
+    E["Problems Surface Early"]
+    F["Rapid Problem Resolution"]
+    G["Confidence in System Responsiveness"]
+    H["Higher Psychological Safety<br/>REINFORCING LOOP"]
+    
+    I["Deflect, Blame, Attack"]
+    J["Decreased Risk-Taking Across Network"]
+    K["Problems Concealed"]
+    L["Problems Metastasize"]
+    M["Crisis Emerges"]
+    N["Lower Psychological Safety<br/>REINFORCING LOOP"]
+    
+    A --> B
+    B -->|Reinforcing| C
+    B -->|Punishing| I
+    
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H -.feedback.-> A
+    
+    I --> J
+    J --> K
+    K --> L
+    L --> M
+    M --> N
+    N -.feedback.-> A
 ```
 
 ### Collective Sensemaking Architecture
@@ -143,38 +150,72 @@ Organizational memory exists in multiple substrates simultaneously: documented p
 
 Effective change embeds new patterns by deliberately modifying all relevant memory substrates in coordinated fashion. New procedures are documented, but also encoded into workflow automation tools. Information systems are reconfigured to make desired metrics visible. Physical or virtual collaboration spaces are redesigned to enable required interaction patterns. Training programs build necessary skills. Key network nodes are identified and supported rather than disrupted. Cultural narratives are cultivated that connect the change to organizational identity and values.
 
-```
-Organizational Memory Substrates & Change Persistence:
+```mermaid
+flowchart TD
+    CI["CHANGE INITIATIVE"]
 
-┌─────────────────────────────────────────────────────┐
-│ CHANGE INITIATIVE                                    │
-└──────────────┬──────────────────────────────────────┘
-               │
-               ├─→ [Procedural Memory: Documentation]
-               │        ├─ Updated? → Persists
-               │        └─ Neglected? → Reverts to old procedures
-               │
-               ├─→ [Systems Memory: Information Architecture]
-               │        ├─ Reconfigured? → Redirects attention
-               │        └─ Unchanged? → Preserves old focus
-               │
-               ├─→ [Spatial Memory: Physical/Virtual Layout]
-               │        ├─ Redesigned? → Enables new interactions
-               │        └─ Static? → Constrains to old patterns
-               │
-               ├─→ [Skill Memory: Workforce Capabilities]
-               │        ├─ Developed? → Builds new competence
-               │        └─ Assumed? → Performance gaps emerge
-               │
-               ├─→ [Network Memory: Informal Connections]
-               │        ├─ Preserved? → Knowledge transfer continues
-               │        └─ Disrupted? → Critical information lost
-               │
-               └─→ [Cultural Memory: Identity Narratives]
-                        ├─ Integrated? → Change aligns with values
-                        └─ Conflicting? → Change interpreted as threat
+    subgraph proc ["Procedural Memory: Documentation"]
+        P_Y["Updated? → Persists"]
+        P_N["Neglected? → Reverts to old procedures"]
+    end
 
-PERSISTENCE = f(alignment across all substrates)
+    subgraph sys ["Systems Memory: Information Architecture"]
+        S_Y["Reconfigured? → Redirects attention"]
+        S_N["Unchanged? → Preserves old focus"]
+    end
+
+    subgraph spatial ["Spatial Memory: Physical / Virtual Layout"]
+        SP_Y["Redesigned? → Enables new interactions"]
+        SP_N["Static? → Constrains to old patterns"]
+    end
+
+    subgraph skill ["Skill Memory: Workforce Capabilities"]
+        SK_Y["Developed? → Builds new competence"]
+        SK_N["Assumed? → Performance gaps emerge"]
+    end
+
+    subgraph network ["Network Memory: Informal Connections"]
+        N_Y["Preserved? → Knowledge transfer continues"]
+        N_N["Disrupted? → Critical information lost"]
+    end
+
+    subgraph culture ["Cultural Memory: Identity Narratives"]
+        C_Y["Integrated? → Change aligns with values"]
+        C_N["Conflicting? → Change interpreted as threat"]
+    end
+
+    PERSIST["PERSISTENCE = f(alignment across all substrates)"]
+
+    CI --> proc
+    CI --> sys
+    CI --> spatial
+    CI --> skill
+    CI --> network
+    CI --> culture
+
+    proc --> PERSIST
+    sys --> PERSIST
+    spatial --> PERSIST
+    skill --> PERSIST
+    network --> PERSIST
+    culture --> PERSIST
+
+    P_Y:::positive
+    S_Y:::positive
+    SP_Y:::positive
+    SK_Y:::positive
+    N_Y:::positive
+    C_Y:::positive
+
+    P_N:::negative
+    S_N:::negative
+    SP_N:::negative
+    SK_N:::negative
+    N_N:::negative
+    C_N:::negative
+
+    classDef positive fill:#d4edda,stroke:#28a745,color:#155724
+    classDef negative fill:#f8d7da,stroke:#dc3545,color:#721c24
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

@@ -22,19 +22,59 @@ The practical manifestation of these invariants in the serverless cloud-native w
 
 To understand how a workflow engine achieves durability without distributed transactions, it helps to trace the exact mechanical sequence of events for a single workflow execution. Consider a three-step order-fulfillment saga: charge the customer, reserve inventory, dispatch shipping. In Temporal's architecture, the workflow worker process hosts the orchestrator function in-memory but never actually performs I/O itself. When the orchestrator calls `activity.ExecuteActivity(ctx, ChargeCustomer, order)`, Temporal's SDK does not invoke the `ChargeCustomer` function directly. Instead, it records a `ScheduleActivityTask` command into the outbound command buffer, suspends the coroutine at that exact point, and yields back to the Temporal server. The server appends a `ActivityTaskScheduled` event to the workflow's event history, then dispatches the task to an activity worker. When the activity completes, the server appends `ActivityTaskCompleted` with the result. The next time the orchestrator coroutine runs, Temporal replays every event in the history, deterministically re-executing each line of the orchestrator code up to the suspension point and injecting the recorded results rather than re-executing the activities. The orchestrator's in-memory state is reconstructed entirely from this replay, and execution continues from the point of suspension.
 
-```
-Temporal Server Event History (append-only log)
-─────────────────────────────────────────────────
-EventID | EventType                    | Payload
-1       | WorkflowExecutionStarted     | {input: order}
-2       | ActivityTaskScheduled        | {activity: ChargeCustomer}
-3       | ActivityTaskStarted          | {worker: worker-01}
-4       | ActivityTaskCompleted        | {result: {chargeId: "ch_123"}}
-5       | ActivityTaskScheduled        | {activity: ReserveInventory}
-6       | ActivityTaskStarted          | {worker: worker-02}
-7       | ActivityTaskFailed           | {error: "OutOfStock", attempt: 1}
-8       | ActivityTaskScheduled        | {activity: ReserveInventory, attempt: 2}
-...
+```mermaid
+flowchart TD
+    subgraph history ["Temporal Server — Event History (append-only log)"]
+        E1["Event 1\nWorkflowExecutionStarted\n📦 input: order"]
+        E2["Event 2\nActivityTaskScheduled\n⚙️ activity: ChargeCustomer"]
+        E3["Event 3\nActivityTaskStarted\n👷 worker: worker-01"]
+        E4["Event 4\nActivityTaskCompleted\n✅ result: chargeId = ch_123"]
+        E5["Event 5\nActivityTaskScheduled\n⚙️ activity: ReserveInventory"]
+        E6["Event 6\nActivityTaskStarted\n👷 worker: worker-02"]
+        E7["Event 7\nActivityTaskFailed\n❌ error: OutOfStock — attempt 1"]
+        E8["Event 8\nActivityTaskScheduled\n🔁 activity: ReserveInventory — attempt 2"]
+        EDOT["..."]
+
+        E1 --> E2
+        E2 --> E3
+        E3 --> E4
+        E4 --> E5
+        E5 --> E6
+        E6 --> E7
+        E7 --> E8
+        E8 --> EDOT
+    end
+
+    subgraph charge_activity ["Activity: ChargeCustomer"]
+        CA_SCHED["Scheduled\nEvent 2"]
+        CA_START["Started\nEvent 3 · worker-01"]
+        CA_DONE["Completed\nEvent 4 · chargeId: ch_123"]
+        CA_SCHED --> CA_START --> CA_DONE
+    end
+
+    subgraph reserve_activity ["Activity: ReserveInventory"]
+        RA_SCHED1["Scheduled\nEvent 5 · attempt 1"]
+        RA_START1["Started\nEvent 6 · worker-02"]
+        RA_FAIL["Failed\nEvent 7 · OutOfStock"]
+        RA_SCHED2["Rescheduled\nEvent 8 · attempt 2"]
+        RA_SCHED1 --> RA_START1 --> RA_FAIL --> RA_SCHED2
+    end
+
+    E2 -.->|"maps to"| CA_SCHED
+    E4 -.->|"maps to"| CA_DONE
+    E5 -.->|"maps to"| RA_SCHED1
+    E7 -.->|"maps to"| RA_FAIL
+    E8 -.->|"maps to"| RA_SCHED2
+
+    style E1 fill:#4A90D9,color:#fff,stroke:#2c5f8a
+    style E4 fill:#27AE60,color:#fff,stroke:#1a7a42
+    style E7 fill:#E74C3C,color:#fff,stroke:#a93226
+    style E2 fill:#8E44AD,color:#fff,stroke:#6c3483
+    style E3 fill:#8E44AD,color:#fff,stroke:#6c3483
+    style E5 fill:#8E44AD,color:#fff,stroke:#6c3483
+    style E6 fill:#8E44AD,color:#fff,stroke:#6c3483
+    style E8 fill:#E67E22,color:#fff,stroke:#a85b05
+    style EDOT fill:#95A5A6,color:#fff,stroke:#717d7e
 ```
 
 This append-only event log is the single source of truth. The workflow's current state is not stored as a snapshot of fields in a database row — it is fully derivable by replaying the event sequence. This is the event sourcing pattern applied to workflow execution, and it carries all the same durability guarantees: as long as the event history is replicated and durable, the execution can be resumed on any worker anywhere.
@@ -43,32 +83,23 @@ This append-only event log is the single source of truth. The workflow's current
 
 A workflow is a directed graph where nodes are states and edges are transitions triggered by events (activity completions, timer firings, external signals, child workflow results). Amazon States Language makes this graph explicit and declarative. Temporal makes it implicit in code but enforces the same state machine semantics through the SDK's coroutine model. The following diagram illustrates the state machine for the order-fulfillment saga with compensation paths:
 
-```
-                         ┌─────────────────────────────────────────┐
-                         │          WorkflowStarted                │
-                         └──────────────────┬──────────────────────┘
-                                            │
-                                            ▼
-                         ┌─────────────────────────────────────────┐
-                    ┌────│         ChargeCustomer                  │────┐
-                    │    └──────────────────┬──────────────────────┘    │
-                    │               success │                           │ failure
-                    │                       ▼                           │
-                    │    ┌─────────────────────────────────────────┐    │
-                    │    │         ReserveInventory                │    │
-              refund│    └──────────────────┬──────────────────────┘    │
-              charge│               success │                           │
-                    │                       ▼                      ┌────▼─────────┐
-                    │    ┌─────────────────────────────────────────┐│ WorkflowFail │
-                    │    │          DispatchShipping               ││              │
-                    │    └──────────────────┬──────────────────────┘└──────────────┘
-                    │               success │        │ failure
-                    │                       ▼        │
-                    │    ┌───────────────────────┐   │ ┌──────────────────────────────┐
-                    │    │   WorkflowCompleted   │   └►│  CancelReservation +         │
-                    │    └───────────────────────┘     │  RefundCharge (compensation) │
-                    │                                  └───────────────┬──────────────┘
-                    └──────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    WS["WorkflowStarted"]
+    CC["ChargeCustomer"]
+    RI["ReserveInventory"]
+    DS["DispatchShipping"]
+    WC["WorkflowCompleted"]
+    WF["WorkflowFailed"]
+    COMP["CancelReservation +\nRefundCharge (compensation)"]
+
+    WS --> CC
+    CC -->|success| RI
+    CC -->|failure| WF
+    RI -->|success| DS
+    DS -->|success| WC
+    DS -->|failure| COMP
+    COMP -->|"refund charge"| CC
 ```
 
 The compensation path is not an error handler bolted onto the side of the happy path. It is a fully specified forward-moving execution branch that the workflow engine schedules just as it would any other activity sequence. The engine does not roll back time — it moves forward through the compensation sequence, recording each compensating activity's completion into the same append-only event history.
@@ -572,3 +603,4 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: order-fulfillment-worker
+```

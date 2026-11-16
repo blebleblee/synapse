@@ -16,19 +16,19 @@ To understand how the compiler enforces these invariants, we must trace the borr
 
 Consider the mechanics of a move. When you bind `let s1 = String::from("data");` and then `let s2 = s1;`, the compiler does not copy the `String`'s heap allocation. Instead it performs a bitwise move of the stack-allocated `String` struct—three words: a pointer to the heap buffer, a length, and a capacity—into `s2`'s slot and marks `s1` as moved. The MIR (Mid-level Intermediate Representation) for this sequence records `s1` as `DEAD` after the move statement, and any subsequent read of `s1` triggers error E0382. A `String` on the stack is a fixed-size struct: `{ ptr: *mut u8, len: usize, cap: usize }`. Moving it copies the three words but does not duplicate the heap allocation, so when `s2` is dropped, the heap frees exactly once.
 
-```
-Stack                           Heap
-+-------------------+          +----+----+----+----+
-| s1 (moved)        |    .---->| 'd'| 'a'| 't'| 'a'|
-|  ptr: 0x... ----+--+        +----+----+----+----+
-|  len: 4          |           cap: 4 (capacity)
-|  cap: 4          |
-+-------------------+
-| s2 (owner)       |
-|  ptr: 0x... -----+--------->^ (same allocation)
-|  len: 4          |
-|  cap: 4          |
-+-------------------+
+```mermaid
+flowchart LR
+    subgraph Stack
+        s1["s1 (moved)<br/>ptr: 0x...<br/>len: 4<br/>cap: 4"]
+        s2["s2 (owner)<br/>ptr: 0x...<br/>len: 4<br/>cap: 4"]
+    end
+    
+    subgraph Heap
+        data["Heap Allocation<br/>['d', 'a', 't', 'a']<br/>capacity: 4"]
+    end
+    
+    s1 -.->|"dangling"| data
+    s2 -->|"owns"| data
 ```
 
 Borrowing introduces references whose validity the compiler threads through scope analysis. The canonical example:

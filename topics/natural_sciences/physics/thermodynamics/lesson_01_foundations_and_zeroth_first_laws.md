@@ -174,37 +174,43 @@ where $A_s = \pi D L$ is the cylinder surface area.
 
 The following ASCII diagram illustrates the calorimeter energy flow architecture:
 
-```
-                   BOMB CALORIMETER SYSTEM
-                   
-    ┌─────────────────────────────────────────┐
-    │         Insulated Outer Jacket          │
-    │  ┌───────────────────────────────────┐  │
-    │  │    Water Bath (stirred, T_bath)   │  │
-    │  │  ┌─────────────────────────────┐  │  │
-    │  │  │   Bomb (sealed, rigid)      │  │  │
-    │  │  │                             │  │  │
-    │  │  │   Sample + O₂  ──> CO₂+H₂O │  │  │
-    │  │  │   (combustion reaction)     │  │  │
-    │  │  │                             │  │  │
-    │  │  │   Q_rxn ──────────────────> │  │  │
-    │  │  └──────────┬──────────────────┘  │  │
-    │  │             │                      │  │
-    │  │             │ Q_bomb (conduction)  │  │
-    │  │             ▼                      │  │
-    │  │   Water absorbs heat              │  │
-    │  │   ΔT_bath = Q_rxn / C_cal         │  │
-    │  │                                   │  │
-    │  │   RTD measures T_bath(t)          │  │
-    │  └───────────────────────────────────┘  │
-    │                                         │
-    │  Minimize Q_leak to environment         │
-    └─────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph outer["Insulated Outer Jacket"]
+        subgraph water["Water Bath (stirred, T_bath)"]
+            subgraph bomb["Bomb (sealed, rigid)"]
+                sample["Sample + O₂"]
+                reaction["Combustion Reaction"]
+                products["CO₂ + H₂O"]
+                qrxn["Q_rxn (heat released)"]
+                
+                sample --> reaction
+                reaction --> products
+                reaction --> qrxn
+            end
+            
+            qbomb["Q_bomb (conduction)"]
+            absorption["Water absorbs heat"]
+            temp_change["ΔT_bath = Q_rxn / C_cal"]
+            rtd["RTD measures T_bath(t)"]
+            
+            qrxn --> qbomb
+            qbomb --> absorption
+            absorption --> temp_change
+            temp_change --> rtd
+        end
+        
+        qleak["Q_leak to environment<br/>(minimized)"]
+        water -.->|heat loss| qleak
+    end
     
-    Energy Balance (First Law):
-    Q_rxn = C_cal · ΔT_bath + Q_leak
+    subgraph energy["Energy Balance (First Law)"]
+        eq1["Q_rxn = C_cal · ΔT_bath + Q_leak"]
+        eq2["Negligible Q_leak ⇒<br/>Q_rxn ≈ C_cal · ΔT_bath"]
+        eq1 --> eq2
+    end
     
-    Negligible Q_leak ⇒ Q_rxn ≈ C_cal · ΔT_bath
+    temp_change -.->|"measured ΔT"| energy
 ```
 
 For open systems, the steady-flow energy equation (SFEE) analysis proceeds through systematic control volume definition and term-by-term evaluation. Consider a steam turbine: high-pressure superheated steam enters at state 1 (known $P_1$, $T_1$, and hence $h_1$ from steam tables), expands through rotating blades, and exhausts at lower pressure and temperature (state 2). The SFEE for a single inlet, single outlet, adiabatic turbine with negligible kinetic and potential energy changes reduces to:

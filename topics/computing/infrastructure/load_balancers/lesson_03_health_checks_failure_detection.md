@@ -33,24 +33,14 @@ The active health checker is a background thread or coroutine pool that periodic
 
 Consider a typical active health check state machine:
 
-```
-                   ┌─────────────┐
-                   │   HEALTHY   │
-                   └──────┬──────┘
-                          │
-              [fail_count >= threshold]
-                          │
-                          ▼
-                   ┌─────────────┐
-                   │  UNHEALTHY  │
-                   └──────┬──────┘
-                          │
-            [success_count >= threshold]
-                          │
-                          ▼
-                   ┌─────────────┐
-                   │   HEALTHY   │
-                   └─────────────┘
+```mermaid
+flowchart TD
+    HEALTHY_1["HEALTHY"]
+    UNHEALTHY["UNHEALTHY"]
+    HEALTHY_2["HEALTHY"]
+
+    HEALTHY_1 -->|"fail_count >= threshold"| UNHEALTHY
+    UNHEALTHY -->|"success_count >= threshold"| HEALTHY_2
 ```
 
 The state machine implements hysteresis through the threshold counters. A backend marked healthy must fail multiple consecutive health checks before transitioning to unhealthy, and a backend marked unhealthy must succeed multiple consecutive health checks before transitioning back to healthy. This prevents flapping, where transient network glitches cause a backend to oscillate rapidly between states. A typical configuration might require three consecutive failures to mark a backend unhealthy and two consecutive successes to restore it.

@@ -50,28 +50,32 @@ The mathematical relationship between subdivision levels and displacement map re
 
 Edge bleeding and padding represent a critical technical concern in displacement map extraction. Because UV islands occupy discrete regions of the texture atlas with empty space between them, and because rendering engines apply texture filtering (bilinear or trilinear interpolation) that samples across pixel boundaries, the edges of UV islands can exhibit color bleeding where the renderer samples from the black background or from adjacent unrelated islands. To prevent this, ZBrush and other map-baking tools apply edge padding (also called dilation or margin expansion), which extends the displacement values outward from the UV island boundaries by a specified number of pixels. A padding width of 8 to 16 pixels is typical for production assets; insufficient padding causes visible seams along UV boundaries, while excessive padding increases processing time without benefit.
 
-```
-UV Space (Texture Atlas)          World Space (3D Mesh)
+```mermaid
+flowchart TD
+    subgraph uv_space ["UV Space (Texture Atlas)"]
+        HEAD["HEAD Island\n[4K]"]
+        LHAND["L Hand"]
+        RHAND["R Hand"]
+    end
 
-┌─────────────────────────┐       
-│                         │       High-res sculpt (8M polys)
-│   ┌─────────────┐       │              ▲
-│   │ HEAD        │       │              │ Raycast from
-│   │   Island    │       │              │ low-res normal
-│   │     [4K]    │       │              │
-│   └─────────────┘       │       Low-res cage (12K polys)
-│                         │       Normal vector →
-│  ┌──┐        ┌──┐       │       
-│  │L │        │R │       │       Displacement = distance
-│  │  │        │  │       │       along normal to nearest
-│  │Hnd│       │Hnd│      │       high-res intersection point
-│  └──┘        └──┘       │       
-│                         │       
-└─────────────────────────┘       
-    ↓ Bake                       
- Displacement Map                 
- (stores signed distance          
-  per UV pixel)                   
+    subgraph world_space ["World Space (3D Mesh)"]
+        SCULPT["High-res Sculpt\n(8M polys)"]
+        CAGE["Low-res Cage\n(12K polys)"]
+        RAYCAST["Raycast from\nlow-res normal"]
+        DISP_CALC["Displacement = signed distance\nalong normal to nearest\nhigh-res intersection point"]
+    end
+
+    BAKE["Bake"]
+
+    DISPMAP["Displacement Map\n(stores signed distance\nper UV pixel)"]
+
+    CAGE -->|"Normal vector →"| RAYCAST
+    RAYCAST -->|"Raycast toward"| SCULPT
+    SCULPT -->|"Intersection point"| DISP_CALC
+    DISP_CALC --> BAKE
+
+    uv_space --> BAKE
+    BAKE --> DISPMAP
 ```
 
 ZBrush's projection system also offers masking and group-based projection controls for handling complex multi-material assets. If your sculpt includes separate material regions—for instance, skin, teeth, and eyes on a character head—you can assign these regions to different PolyGroups and configure the projection to respect group boundaries, preventing rays cast from skin regions from intersecting with teeth geometry. This group-aware projection is essential for avoiding cross-contamination artifacts in maps where geometrically overlapping but logically separate elements occupy the same spatial volume.

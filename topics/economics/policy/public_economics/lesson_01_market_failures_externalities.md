@@ -98,27 +98,23 @@ $$\max_{q_i, a_i} \pi_i = P q_i - C_i(q_i) - t^* (\alpha - a_i) q_i - A_i(a_i) q
 
 Optimizing over abatement yields $t^* = A_i'(a_i^*)$, equating the marginal abatement cost to the tax for each firm. Firms with low marginal abatement costs abate more; firms with high costs abate less and pay more tax. Total abatement cost is minimized because any reallocation of abatement across firms that maintains the same aggregate emission reduction would increase total cost due to the inequality of marginal costs.
 
-```
-Tax Transmission Architecture:
-
-                        Tax Rate t* = α·D'(αQ**)
-                                 ↓
-         ┌───────────────────────┴───────────────────────┐
-         ↓                                               ↓
-    Firm 1: Low MAC                                 Firm N: High MAC
-    A₁'(a₁) = t*                                   Aₙ'(aₙ) = t*
-    → High abatement a₁                            → Low abatement aₙ
-    → Low emissions e₁                             → High emissions eₙ
-    → Low tax payment t*·e₁                        → High tax payment t*·eₙ
-         ↓                                               ↓
-         └───────────────────────┬───────────────────────┘
-                                 ↓
-                   Aggregate Emissions E** = Σeᵢ
-                   Total Abatement Cost = Σ Aᵢ(aᵢ)·qᵢ
-                   Total Tax Revenue = t*·E**
-                                 ↓
-                   Deadweight Loss Eliminated:
-                   DWL₀ - DWL** = ∫[Q**,Q*] [SMC(x) - P(x)] dx
+```mermaid
+flowchart TD
+    TaxRate["Tax Rate<br/>t* = α·D'(αQ**)"]
+    
+    TaxRate --> Firm1
+    TaxRate --> FirmN
+    
+    Firm1["Firm 1: Low MAC<br/>A₁'(a₁) = t*<br/>→ High abatement a₁<br/>→ Low emissions e₁<br/>→ Low tax payment t*·e₁"]
+    
+    FirmN["Firm N: High MAC<br/>Aₙ'(aₙ) = t*<br/>→ Low abatement aₙ<br/>→ High emissions eₙ<br/>→ High tax payment t*·eₙ"]
+    
+    Firm1 --> Aggregate
+    FirmN --> Aggregate
+    
+    Aggregate["Aggregate Emissions E** = Σeᵢ<br/>Total Abatement Cost = Σ Aᵢ(aᵢ)·qᵢ<br/>Total Tax Revenue = t*·E**"]
+    
+    Aggregate --> DWL["Deadweight Loss Eliminated:<br/>DWL₀ - DWL** = ∫[Q**,Q*] [SMC(x) - P(x)] dx"]
 ```
 
 Tradable permit systems operate through a dual adjustment mechanism: firms optimize abatement versus permit purchase decisions, and the permit market clears to establish the equilibrium price. The regulator sets a cap $\bar{E}$ and allocates permits through grandfathering, auction, or hybrid methods. Let $\ell_i$ denote the initial permit allocation to firm $i$, with $\sum_{i=1}^{N} \ell_i = \bar{E}$.

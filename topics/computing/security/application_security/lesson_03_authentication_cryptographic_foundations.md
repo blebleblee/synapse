@@ -20,27 +20,30 @@ The nonce is another invariant with catastrophic failure modes on violation. In 
 
 A production authentication system is a pipeline with discrete, ordered stages. Understanding the data structures and control flow at each stage is what separates practitioners who can audit and exploit these systems from those who can merely configure them.
 
-```
-Client                 Load Balancer          Auth Service            Resource Server
-  |                        |                      |                        |
-  |-- POST /token -------->|                      |                        |
-  |   {username, password} |-- forward ---------->|                        |
-  |                        |                      |-- lookup(username) --> [User Store]
-  |                        |                      |<-- {hash, salt, alg} --|
-  |                        |                      |                        |
-  |                        |                      |-- Argon2id.Verify()    |
-  |                        |                      |   (candidate_pw,       |
-  |                        |                      |    stored_hash)        |
-  |                        |                      |                        |
-  |                        |                      |-- sign(JWT, ES256_key) |
-  |<-- {access_token,  ----|<-- {access_token} ---|                        |
-  |     refresh_token}     |                      |                        |
-  |                        |                      |                        |
-  |-- GET /api/resource -->|-- forward (w/ JWT) ->|-- verify(JWT) -------->|
-  |                        |                      |   (sig, expiry, iss)   |
-  |                        |                      |-- authorize(sub, res) ->|
-  |                        |                      |   policy eval          |
-  |<-- 200 OK -------------|<-- 200 OK -----------|<-- resource payload ---|
+```mermaid
+flowchart LR
+    Client["Client"]
+    LB["Load Balancer"]
+    AuthSvc["Auth Service"]
+    UserStore["User Store"]
+    ResourceSrv["Resource Server"]
+
+    Client -->|"POST /token<br/>{username, password}"| LB
+    LB -->|forward| AuthSvc
+    AuthSvc -->|"lookup(username)"| UserStore
+    UserStore -->|"{hash, salt, alg}"| AuthSvc
+    AuthSvc -->|"Argon2id.Verify()<br/>(candidate_pw, stored_hash)"| AuthSvc
+    AuthSvc -->|"sign(JWT, ES256_key)"| AuthSvc
+    AuthSvc -->|"{access_token, refresh_token}"| LB
+    LB -->|"{access_token, refresh_token}"| Client
+
+    Client -->|"GET /api/resource"| LB
+    LB -->|"forward with JWT"| AuthSvc
+    AuthSvc -->|"verify(JWT)<br/>(sig, expiry, iss)"| AuthSvc
+    AuthSvc -->|"authorize(sub, res)<br/>policy eval"| ResourceSrv
+    ResourceSrv -->|"resource payload"| AuthSvc
+    AuthSvc -->|"200 OK"| LB
+    LB -->|"200 OK"| Client
 ```
 
 The user store must never hold plaintext passwords or reversible encodings. The stored record for a credential looks like a serialized Argon2id parameter set alongside the hash output:
@@ -79,39 +82,26 @@ The accumulator `diff` collects all bit differences with OR, ensuring the loop a
 
 OAuth2 is a delegation protocol, not an authentication protocol. It defines four grant types, of which the Authorization Code flow with PKCE is the only one appropriate for user-facing applications in 2024. The state machine is worth tracing at the byte level because every state transition is an attack surface.
 
-```
-                   ┌─────────────────────────────────────────┐
-                   │           AUTHORIZATION SERVER           │
-                   │                                          │
-  User-Agent       │  /authorize          /token             │  Resource Server
-      │            │      │                   │              │       │
-      │──(1)GET ──────────>│                  │              │       │
-      │  ?response_type    │                  │              │       │
-      │   =code            │                  │              │       │
-      │  &client_id        │                  │              │       │
-      │  &redirect_uri     │                  │              │       │
-      │  &state=<rand>     │                  │              │       │
-      │  &code_challenge   │                  │              │       │
-      │   =S256(verifier)  │                  │              │       │
-      │                    │──(authenticate)──>              │       │
-      │<──(2)redirect ─────│                  │              │       │
-      │   ?code=<authz_code│                  │              │       │
-      │   &state=<rand>    │                  │              │       │
-      │                    │                  │              │       │
-      │──(3)POST /token ───────────────────>  │              │       │
-      │   code=<authz_code>│                  │              │       │
-      │   code_verifier    │                  │              │       │
-      │   client_id        │                  │── verify ────>       │
-      │                    │                  │   S256(verifier)     │
-      │                    │                  │   == stored          │
-      │                    │                  │   challenge          │
-      │<──(4){access_token,│<─────────────────│              │       │
-      │       id_token,    │                  │              │       │
-      │       refresh_token│                  │              │       │
-      │──(5)GET /resource ──────────────────────────────────────────>│
-      │   Authorization:   │                  │              │       │
-      │   Bearer <token>   │                  │              │       │
-      │<──(6)200 ──────────────────────────────────────────────────<─│
+```mermaid
+flowchart LR
+    UA["User-Agent"]
+    AS_AUTH["/authorize"]
+    AS_TOKEN["/token"]
+    RS["Resource Server"]
+    
+    subgraph AS["AUTHORIZATION SERVER"]
+        AS_AUTH
+        AS_TOKEN
+    end
+    
+    UA -->|"(1) GET<br/>?response_type=code<br/>&client_id<br/>&redirect_uri<br/>&state=&lt;rand&gt;<br/>&code_challenge=S256(verifier)"| AS_AUTH
+    AS_AUTH -.->|"authenticate"| AS_TOKEN
+    AS_AUTH -->|"(2) redirect<br/>?code=&lt;authz_code&gt;<br/>&state=&lt;rand&gt;"| UA
+    UA -->|"(3) POST /token<br/>code=&lt;authz_code&gt;<br/>code_verifier<br/>client_id"| AS_TOKEN
+    AS_TOKEN -.->|"verify<br/>S256(verifier)<br/>== stored challenge"| RS
+    AS_TOKEN -->|"(4) {access_token,<br/>id_token,<br/>refresh_token}"| UA
+    UA -->|"(5) GET /resource<br/>Authorization: Bearer &lt;token&gt;"| RS
+    RS -->|"(6) 200"| UA
 ```
 
 PKCE (Proof Key for Code Exchange, RFC 7636) closes the authorization code interception attack. The client generates a random 32-byte `code_verifier`, computes `code_challenge = BASE64URL(SHA256(code_verifier))`, and sends the challenge at step 1. When it exchanges the authorization code at step 3, it sends the raw verifier. The authorization server verifies that `S256(verifier) == stored_challenge` before issuing tokens. An attacker who intercepts the authorization code from the redirect URI cannot exchange it without the verifier, which never traversed the redirect channel.
@@ -161,3 +151,18 @@ int hkdf_derive_session_key(const uint8_t *ikm,  size_t ikm_len,
 ```
 
 The `info` label is what makes HKDF domain
+
+-separating: deriving `HKDF(secret, salt, "session-key-v1")` and `HKDF(secret, salt, "mac-key-v1")` from the same master secret produces cryptographically independent keys that cannot feasibly influence one another, preventing key reuse vulnerabilities. The salt should be unique per derivation context (typically a random 32-byte value), and the info parameter must uniquely identify the key's purpose within the protocol. HKDF's security relies on HMAC-SHA-256's pseudorandomness properties: the extract phase ensures that even weak entropy sources produce a uniform PRK, while the expand phase guarantees that output keys of any required length remain computationally indistinguishable from random. This two-phase construction is provably secure under the standard PRF assumption for HMAC and has become the de facto KDF for modern protocols including TLS 1.3, Signal, and WireGuard.
+
+Key derivation discipline eliminates entire vulnerability classes that plague systems relying on password-derived keys or naive key reuse. A production implementation must never skip HKDF's extract phase even when the input appears uniformly random—Diffie-Hellman outputs, for instance, are not uniform bitstrings and require conditioning. Similarly, omitting the info parameter or reusing info labels across different key purposes breaks domain separation and can lead to catastrophic key compromise. When integrating HKDF into a protocol, document the exact info strings, salt generation strategy, and output lengths in the specification; these parameters form part of the protocol's cryptographic identity and must remain stable across implementations. For compliance validation, verify that derived keys pass statistical randomness tests, that identical inputs with different info labels produce uncorrelated outputs, and that the KDF invocation matches the protocol specification byte-for-byte—subtle deviations in info encoding or salt handling have historically caused interoperability failures and security downgrades in fielded systems.
+
+## Summary & Verification Matrix
+
+| Invariant | Mechanism | Diagnostic Criterion | Failure Mode |
+|-----------|-----------|---------------------|--------------|
+| **Authentication binds identity to proof-of-possession** | Challenge-response over cryptographic primitives (password hashing, public-key signatures, HMAC tokens) | Verify that authentication cannot succeed without the secret; test replay attack resistance; confirm timing-safe comparisons | Credential stuffing, session fixation, timing oracles leaking password length or validity |
+| **Authorization decisions use least-privilege ACLs with mandatory access checks** | RBAC/ABAC policies evaluated at every privileged operation; deny-by-default with explicit grants | Audit logs show authorization checks before sensitive actions; privilege escalation attempts fail; no ambient authority | Broken access control (IDOR), confused deputy attacks, privilege escalation via parameter tampering |
+| **Password storage must use memory-hard KDFs with per-user salts** | Argon2id (19+ MiB, 2+ iterations, 1+ parallelism) transforms passwords into verification hashes; unique random salt per credential | `hashcat` benchmark shows < 10 H/s on production hardware; salts are cryptographically random and never reused; verify parameters at rest | Rainbow tables, GPU-accelerated brute force, offline dictionary attacks against leaked databases |
+| **Session tokens are cryptographically random, short-lived, and transport-protected** | CSPRNG-generated 128+ bit tokens with server-side expiry; transmitted only over TLS with `Secure`, `HttpOnly`, `SameSite=Strict` flags | Token entropy analysis shows 128+ bits; sessions expire within protocol-defined TTL; tokens invalidated on logout; no token leakage in URLs/logs | Session hijacking via XSS, CSRF, network eavesdropping; session fixation; persistent sessions after logout |
+| **Cryptographic operations use authenticated encryption with domain separation** | AES-256-GCM with unique nonces (never reused); HKDF derives purpose-specific keys from master secrets using distinct info labels | Decryption failures are indistinguishable from authentication tag mismatches; nonce collision tests fail; derived keys show no statistical correlation | Nonce reuse catastrophically breaks confidentiality; key reuse enables cross-protocol attacks; unauthenticated encryption allows padding oracles |
+| **TLS configuration enforces forward secrecy with certificate pinning and modern ciphersuites** | ECDHE key exchange; TLS 1.3 with `TLS_AES_256_GCM_SHA384`; certificate pins validated against known good hashes | `ssllabs.com` scan shows A+ rating; deprecated ciphersuites rejected; pinning failures abort connection; no SSLv3/TLS1.0 fallback | Passive decryption of recorded traffic after private key compromise; MITM via rogue CA; downgrade attacks to weak ciphers |

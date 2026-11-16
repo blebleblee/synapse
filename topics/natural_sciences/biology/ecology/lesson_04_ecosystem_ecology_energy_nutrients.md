@@ -114,32 +114,33 @@ Stoichiometric imbalances propagate through food webs with consequences for nutr
 
 The following schematic represents the integrated structure of ecosystem energy and nutrient flows:
 
-```
-SOLAR RADIATION (100%)
-         ↓
-    ╔════════════════════╗
-    ║ PRIMARY PRODUCERS  ║  ← CO₂, N, P, H₂O
-    ║   GPP → NPP        ║
-    ╚════════════════════╝
-         ↓ (10%)
-    ╔════════════════════╗
-    ║ PRIMARY CONSUMERS  ║  → Respiration (90%)
-    ║   (Herbivores)     ║  → Excretion (N, P recycling)
-    ╚════════════════════╝
-         ↓ (10%)
-    ╔════════════════════╗
-    ║ SECONDARY CONSUMERS║  → Respiration (90%)
-    ║   (Carnivores)     ║
-    ╚════════════════════╝
-         ↓
-    ╔════════════════════╗
-    ║   DECOMPOSERS      ║  → Mineralization (N, P release)
-    ║ (Fungi, Bacteria)  ║  → CO₂ respiration
-    ╚════════════════════╝
-         ↓
-    Inorganic nutrient pools (NH₄⁺, NO₃⁻, PO₄³⁻)
-         ↑__________________________|
-              Plant uptake cycle
+```mermaid
+flowchart TD
+    SUN["☀️ SOLAR RADIATION\n100%"]
+    PP["PRIMARY PRODUCERS\nGPP → NPP"]
+    PC["PRIMARY CONSUMERS\nHerbivores"]
+    SC["SECONDARY CONSUMERS\nCarnivores"]
+    DC["DECOMPOSERS\nFungi & Bacteria"]
+    NP["Inorganic Nutrient Pools\nNH₄⁺ · NO₃⁻ · PO₄³⁻"]
+    RESP1["Respiration\n90%"]
+    RESP2["Respiration\n90%"]
+    EXC["Excretion\nN, P recycling"]
+    MIN["Mineralization\nN, P release + CO₂"]
+
+    INPUTS["CO₂ · N · P · H₂O"]
+
+    INPUTS -->|"nutrient uptake"| PP
+    SUN -->|"light energy"| PP
+    PP -->|"10% energy transfer"| PC
+    PC -->|"10% energy transfer"| SC
+    SC --> DC
+    PC --> RESP1
+    PC --> EXC
+    SC --> RESP2
+    DC --> MIN
+    MIN --> NP
+    EXC --> NP
+    NP -->|"plant uptake"| PP
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

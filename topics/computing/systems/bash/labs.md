@@ -156,31 +156,21 @@ The `strace` tool uses `ptrace(PTRACE_SYSCALL)` to intercept every entry and exi
 Every Linux process occupies exactly one state at any instant. The kernel encodes this in the `state` field of `task_struct` (the kernel's process descriptor). User space sees a simplified version in `/proc/[pid]/stat` as a single character.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Created : fork() / clone()
-    Created --> Runnable : scheduler enqueues task
-    Runnable --> Running : scheduler selects task (context switch in)
-    Running --> Runnable : preemption (scheduler tick or higher-priority task)
-    Running --> InterruptibleSleep : syscall blocks (read, nanosleep, wait...)
-    Running --> UninterruptibleSleep : kernel critical section (D state)
-    Running --> Stopped : SIGSTOP or ptrace attach
-    InterruptibleSleep --> Runnable : event arrives OR signal delivered
-    UninterruptibleSleep --> Runnable : I/O completes (no signal can interrupt)
-    Stopped --> Runnable : SIGCONT delivered
-    Running --> Zombie : exit() called, parent not yet waited
-    Zombie --> [*] : parent calls wait() / waitpid()
-
-    note right of UninterruptibleSleep
-        D state: appears in ps/top.
-        Unkillable. Usually indicates
-        I/O wait or NFS hang.
-    end note
-
-    note right of Zombie
-        Z state: task_struct exists,
-        resources freed. Holds exit
-        code for parent to collect.
-    end note
+flowchart TD
+    Start(["Start"]) --> Created["Created"]
+    Created -->|"scheduler enqueues task"| Runnable["Runnable"]
+    Runnable -->|"scheduler selects task<br/>(context switch in)"| Running["Running"]
+    Running -->|"preemption<br/>(scheduler tick or higher-priority task)"| Runnable
+    Running -->|"syscall blocks<br/>(read, nanosleep, wait...)"| InterruptibleSleep["Interruptible Sleep"]
+    Running -->|"kernel critical section<br/>(D state)"| UninterruptibleSleep["Uninterruptible Sleep<br/>━━━━━━━━━━━━━━━<br/><i>D state: appears in ps/top.<br/>Unkillable. Usually indicates<br/>I/O wait or NFS hang.</i>"]
+    Running -->|"SIGSTOP or ptrace attach"| Stopped["Stopped"]
+    InterruptibleSleep -->|"event arrives OR signal delivered"| Runnable
+    UninterruptibleSleep -->|"I/O completes<br/>(no signal can interrupt)"| Runnable
+    Stopped -->|"SIGCONT delivered"| Runnable
+    Running -->|"exit() called,<br/>parent not yet waited"| Zombie["Zombie<br/>━━━━━━━━━━━━━━━<br/><i>Z state: task_struct exists,<br/>resources freed. Holds exit<br/>code for parent to collect.</i>"]
+    Zombie -->|"parent calls wait() / waitpid()"| End(["End"])
+    
+    Created -.->|"fork() / clone()"| Start
 ```
 
 The state values reported by `/proc/[pid]/stat` and `/proc/[pid]/status`:

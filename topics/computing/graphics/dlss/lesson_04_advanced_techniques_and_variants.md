@@ -394,34 +394,32 @@ Ray Reconstruction composes into this pipeline at a different stage. When the en
 
 Frame generation's failure modes are the practitioner's primary concern, because they determine where the system helps and where it actively degrades the experience. The most pervasive artifact is disocclusion ghosting. When a foreground object moves and reveals background that was occluded in both bracketing frames, the network has no information about what was behind the occluder. The depth buffer identifies the occlusion boundary — the network knows that pixels on one side are foreground and the other side is newly revealed background — but it does not know what the background looks like. The trained prior fills these regions with content extrapolated from adjacent visible background, which is usually correct for large, slowly varying surfaces (walls, sky, terrain) but produces visible ghosts when the occluded region has distinct structure: a character stepping in front of a textured sign reveals text that the network cannot reconstruct, producing a smeared, partially legible ghost of the text. The mitigation is partially architectural — the network's training data includes many disocclusion cases, and it learns to suppress the occluder's contribution at boundaries — and partially content-dependent: games with fast-moving characters against detailed backgrounds exhibit this artifact more than games with slow camera motion against simple geometry.
 
-```
-DISOCCLUSION GHOSTING MECHANISM
-
-  Frame N-1              Frame N (object moved right)
-  ┌─────────────┐        ┌─────────────┐
-  │  ████████  │        │   ████████ │
-  │  ████████  │        │   ████████ │
-  │  ████████  │        │   ████████ │
-  └─────────────┘        └─────────────┘
-       ↑                        ↑
-  Background BG       Background BG now visible
-  is occluded        (but NOT in Frame N-1)
-
-  Interpolated Frame (t_mid):
-  ┌─────────────┐
-  │   ████████ │  ← Object correctly interpolated (mid-position)
-  │  ████████  │
-  │  ████████  │
-  └─────────────┘
-       ↑
-  BG region: network EXTRAPOLATES from visible BG
-  in Frame N. If BG has detail (text, patterns),
-  the extrapolation produces a "ghost" —
-  partially correct, partially hallucinated content.
-
-  Mitigation: depth buffer marks the boundary;
-  network suppresses occluder contribution;
-  residual artifact proportional to BG detail level.
+```mermaid
+flowchart TD
+    A["Frame N-1<br/>Object at Position Left"] --> B["Background BG<br/>Occluded by Object"]
+    C["Frame N<br/>Object Moved Right"] --> D["Background BG<br/>Now Visible"]
+    
+    B --> E["Interpolated Frame<br/>at t_mid"]
+    D --> E
+    
+    E --> F["Object Correctly<br/>Interpolated to Mid-Position"]
+    E --> G["Background Region<br/>Network Extrapolates from Frame N"]
+    
+    G --> H{Background Detail Level}
+    
+    H -->|"High Detail"| I["Ghost Artifact Generated<br/>Partially Correct +<br/>Hallucinated Content"]
+    H -->|"Low Detail"| J["Minimal Artifact<br/>Closer to Ground Truth"]
+    
+    I --> K["Mitigation Strategy"]
+    J --> K
+    
+    K --> L["Depth Buffer:<br/>Marks Occluder Boundary"]
+    K --> M["Network Suppression:<br/>Reduces Occluder Contribution"]
+    K --> N["Residual Artifact:<br/>Proportional to BG Detail"]
+    
+    L --> O["Result: Reduced<br/>Disocclusion Ghosting"]
+    M --> O
+    N --> O
 ```
 
 Transparent surfaces and particle effects represent a second class of failure. Engine motion vectors are written for opaque geometry during the G-buffer pass: each pixel's velocity is computed from the difference between its clip-space position in the current and previous frame. Transparent geometry — water surfaces, glass, fire, smoke, particle sprites — either does not write to the G-buffer (in deferred renderers, transparency is handled in a separate forward pass) or writes motion vectors that are incorrect because the particle's motion is computed entirely in the shader without a stable world-space anchor. The optical flow accelerator partially compensates: it detects the image-space motion of the particle system from the color buffer, and the network fuses this with the (zero or incorrect) engine vectors. But optical flow on semi-transparent particles is itself unreliable, because the pixel color is a blend of the particle and the background behind it, and the flow estimator cannot separate the two motion signals. The practical result is that particle effects in generated frames may exhibit slight warping, smearing along the motion direction, or a reduction in density that makes the particle system appear thinner in interpolated frames than in rendered frames. Engines can mitigate this by writing motion vectors for transparent surfaces in a dedicated velocity pass, using the particle's emitter velocity as a proxy, but this is an approximation that trades correctness for consistency.

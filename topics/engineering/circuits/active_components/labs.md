@@ -60,7 +60,7 @@ Repeat the temperature sweep with the MOSFET amplifier, observing distinct behav
 
 Conduct a Monte Carlo parameter tolerance analysis in SPICE to predict production yield and worst-case performance. In the LTspice schematic of the BJT amplifier, assign tolerance distributions to all resistors by editing each resistor value to include a tolerance specification: right-click each resistor, enter the value field as `{R1}`, then add a `.step param R1 list 43k 47k 51k` directive to sweep the resistor across its $\pm 10\%$ tolerance range. For transistor parameter variation, edit the 2N3904 SPICE model to include Monte Carlo directives: add `.param BF_nom=200` for nominal $\beta$, then `.step param BF list 100 200 300` to span the datasheet $\beta$ range. Execute nested parameter sweeps combining resistor and transistor variations, generating a family of AC response curves. Plot the gain envelope, shaded region, and worst-case boundaries, illustrating that production units may exhibit $\pm 3\,\text{dB}$ gain variation without component selection. Histogram the simulated gain distribution, computing mean and standard deviation. This statistical design validation is critical for production designs, where individual component tuning is economically infeasible.
 
-The parametric sweep exercise culminates in a comprehensive sensitivity matrix, tabulating how each circuit performance metric (gain, bandwidth, input/output impedance, quiescent current, output swing) responds to variations in supply voltage, bias resistors, transistor parameters, load resistance, and temperature. Present this matrix as a spreadsheet with rows representing parameters and columns representing variations, color-coding cells by severity of impact (green for $<5\%$ change, yellow for $5$ to $20\%$, red for $>20\%$). This matrix becomes a design reference, guiding component selection and tolerance allocation to meet performance specifications with adequate margin.
+The parametric sweep exercise culminates in a comprehensive sensitivity matrix, tabulating how each circuit performance metric (gain, bandwidth, input/output impedance, quiescent current, output swing) responds to variations in supply voltage, bias resistors, transistor parameters, load resistance, and temperature. Present this matrix as a spreadsheet with rows representing parameters and columns representing variations, color-coding cells by severity of impact (green for $< 5\%$ change, yellow for $5$ to $20\%$, red for $>20\%$). This matrix becomes a design reference, guiding component selection and tolerance allocation to meet performance specifications with adequate margin.
 
 ## Exercise 3: Stress Testing, Boundary Failure & Recovery Protocol
 
@@ -72,7 +72,7 @@ Within 30 to 60 seconds, observe that $I_C$ begins to rise spontaneously despite
 
 Mitigate thermal runaway by clamping a clip-on heatsink with documented thermal resistance $R_{\theta SA} = 10\,°\text{C/W}$ onto the TIP31C case, applying thermal paste to ensure intimate contact. Recalculate effective thermal resistance: $R_{\theta JA} = R_{\theta JC} + R_{\theta CS} + R_{\theta SA}$, where junction-to-case $R_{\theta JC} \approx 1.5\,°\text{C/W}$ (from datasheet), case-to-sink $R_{\theta CS} \approx 0.5\,°\text{C/W}$ (with thermal paste), and sink-to-ambient $R_{\theta SA} = 10\,°\text{C/W}$, totaling $12\,°\text{C/W}$. At $3\,\text{W}$, junction temperature rises only $36\,°\text{C}$ above ambient, landing safely at $61\,°\text{C}$ for $25\,°\text{C}$ ambient. Repeat the experiment with the heatsink installed: $I_C$ and temperature stabilize within 2 minutes, runaway does not occur, and the heatsink becomes warm but not untouchable. This demonstrates that adequate heat-sinking is not optional but mandatory for reliable power transistor operation.
 
-Deliberately induce transistor saturation in the common-emitter amplifier by increasing the input signal amplitude from $50\,\text{mV}_{\text{peak}}$ to $500\,\text{mV}_{\text{peak}}$ while observing the output waveform on the oscilloscope. As input amplitude grows, negative half-cycles of the output approach ground (transistor saturation voltage $V_{CE,\text{sat}} \approx 0.2\,\text{V}$), while positive half-cycles approach $V_{CC}$ (transistor cutoff). Observe waveform clipping—flattened peaks—and measure the clipped output amplitude, which no longer scales linearly with input. Capture the clipped waveform on the oscilloscope and export it for FFT analysis (most digital oscilloscopes offer built-in FFT math functions). Observe the emergence of odd-harmonic distortion peaks at $3\,\text{kHz}$, $5\,\text{kHz}$, $7\,\text{kHz}$, etc., arising from the nonlinear transfer function near clipping boundaries. Quantify total harmonic distortion $\text{THD} = \frac{\sqrt{V_{2}^2 + V_{3}^2 + V_{4}^2 + \cdots}}{V_1}$, where $V_1$ is the fundamental amplitude and $V_2, V_3, \ldots$ are harmonic amplitudes from the FFT spectrum. Expect THD exceeding $10\%$ in hard clipping, compared to $<1\%$ in small-signal operation.
+Deliberately induce transistor saturation in the common-emitter amplifier by increasing the input signal amplitude from $50\,\text{mV}_{\text{peak}}$ to $500\,\text{mV}_{\text{peak}}$ while observing the output waveform on the oscilloscope. As input amplitude grows, negative half-cycles of the output approach ground (transistor saturation voltage $V_{CE,\text{sat}} \approx 0.2\,\text{V}$), while positive half-cycles approach $V_{CC}$ (transistor cutoff). Observe waveform clipping—flattened peaks—and measure the clipped output amplitude, which no longer scales linearly with input. Capture the clipped waveform on the oscilloscope and export it for FFT analysis (most digital oscilloscopes offer built-in FFT math functions). Observe the emergence of odd-harmonic distortion peaks at $3\,\text{kHz}$, $5\,\text{kHz}$, $7\,\text{kHz}$, etc., arising from the nonlinear transfer function near clipping boundaries. Quantify total harmonic distortion $\text{THD} = \frac{\sqrt{V_{2}^2 + V_{3}^2 + V_{4}^2 + \cdots}}{V_1}$, where $V_1$ is the fundamental amplitude and $V_2, V_3, \ldots$ are harmonic amplitudes from the FFT spectrum. Expect THD exceeding $10\%$ in hard clipping, compared to $< 1\%$ in small-signal operation.
 
 Stress-test an operational amplifier by constructing a non-inverting gain stage using an LM358 dual op-amp. Configure one section for $A_v = 1 + \frac{R_F}{R_G} = 11$ by choosing feedback resistor $R_F = 100\,\text{k}\Omega$ and ground resistor $R_G = 10\,\text{k}\Omega$, powering the op-amp with $\pm 12\,\text{V}$ split supplies. Apply a $1\,\text{kHz}$ $1\,\text{V}_{\text{peak}}$ sine wave to the non-inverting input and observe the output on the oscilloscope. Gradually increase the input amplitude while monitoring the output: the LM358 output cannot swing rail-to-rail but saturates approximately $1.5\,\text{V}$ below each supply rail due to its NPN output stage topology. Measure output clipping levels, expecting $+10.5\,\text{V}$ and $-10.5\,\text{V}$ clipping thresholds. Beyond this, distortion soars.
 
@@ -101,7 +101,7 @@ This operational reference consolidates systematic troubleshooting procedures, p
 2. Measure transistor base-emitter voltage $V_{BE}$ (NPN) or base-source voltage $V_{GS}$ (MOSFET): $0.6$ to $0.75\,\text{V}$ for silicon BJTs, $2$ to $5\,\text{V}$ above threshold for MOSFETs. Significantly lower values indicate damaged junctions.
 3. Verify collector voltage $V_C$ (BJT) or drain voltage $V_D$ (MOSFET) sits mid-supply, approximately $0.4 \times V_{CC}$ to $0.6 \times V_{CC}$. If $V_C$ equals $V_{CC}$, transistor is in cutoff; if near ground, transistor is saturated.
 4. Calculate and verify collector/drain current from $I_C = (V_{CC} - V_C)/R_C$ matches design target within $\pm 20\%$. Larger deviations signal bias network errors.
-5. Touch the transistor package gently to assess temperature; it should be barely warm ($<40\,°\text{C}$ above ambient). If hot, reduce bias current or add heat-sinking.
+5. Touch the transistor package gently to assess temperature; it should be barely warm ($< 40\,°\text{C}$ above ambient). If hot, reduce bias current or add heat-sinking.
 
 **DC Bias Verification Sequence (Operational Amplifiers):**
 1. Measure supply voltages at the op-amp $V_{CC}$ and $V_{EE}$ pins (or $V_{DD}$ and ground for single-supply designs) to confirm proper power delivery.
@@ -146,7 +146,7 @@ This operational reference consolidates systematic troubleshooting procedures, p
 
 **Symptom: Output clipped symmetrically at both peaks.**
 - Cause: Input signal amplitude excessive, driving transistor into saturation and cutoff.
-- Recovery: Reduce input amplitude to $<10\%$ of supply rail voltage.
+- Recovery: Reduce input amplitude to $< 10\%$ of supply rail voltage.
 
 **Symptom: Output clipped asymmetrically (one peak only).**
 - Cause: Bias point too close to one supply rail.
@@ -186,11 +186,11 @@ This operational reference consolidates systematic troubleshooting procedures, p
 | Base Voltage | $V_B$ | $2.1\,\text{V}$ | | $\pm 0.2\,\text{V}$ | |
 | Emitter Voltage | $V_E$ | $1.4\,\text{V}$ | | $\pm 0.2\,\text{V}$ | |
 | Voltage Gain | $A_v$ | $-200$ | | $\pm 30\%$ | |
-| Lower Cutoff Frequency | $f_L$ | $<100\,\text{Hz}$ | | | |
+| Lower Cutoff Frequency | $f_L$ | $< 100\,\text{Hz}$ | | | |
 | Upper Cutoff Frequency | $f_H$ | $>100\,\text{kHz}$ | | | |
 | Input Impedance | $Z_{\text{in}}$ | $>5\,\text{k}\Omega$ | | $\pm 50\%$ | |
 | Output Impedance | $Z_{\text{out}}$ | $\approx 4.7\,\text{k}\Omega$ | | $\pm 20\%$ | |
-| THD at 1 kHz | THD | $<1\%$ | | | |
+| THD at 1 kHz | THD | $< 1\%$ | | | |
 
 Populate this table for each circuit implementation, using it as both design verification checklist and troubleshooting aid when measurements fall outside tolerance bounds.
 
@@ -203,7 +203,7 @@ Populate this table for each circuit implementation, using it as both design ver
 
 **Safety and Damage Prevention Rules:**
 - Never exceed absolute maximum ratings in datasheets, even briefly; semiconductor damage is cumulative and irreversible.
-- Always current-limit power supplies to $<2 \times$ expected draw; uncontrolled current causes fires and component explosion.
+- Always current-limit power supplies to $< 2 \times$ expected draw; uncontrolled current causes fires and component explosion.
 - Disconnect power before modifying circuits; hot-swapping components risks short circuits and electrostatic discharge.
 - Use heatsinks on all power transistors dissipating $>1\,\text{W}$; thermal runaway occurs rapidly without heat-sinking.
 - Decouple power supplies with $0.1\,\mu\text{F}$ ceramic capacitors at every IC power pin within $1\,\text{cm}$ distance to prevent supply rail oscillation.

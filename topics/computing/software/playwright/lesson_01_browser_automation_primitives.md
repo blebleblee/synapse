@@ -22,35 +22,29 @@ A Playwright test begins with a `BrowserType.launch()` call, which spawns the br
 
 Each CDP message is a JSON object with an integer `id`, a dot-namespaced `method` string (e.g. `Target.createTarget`, `Page.navigate`, `Runtime.evaluate`), and a `params` object. The browser sends back a response with the matching `id` and a `result` or `error` field. Independently, the browser fires unsolicited event notifications—objects with a `method` field but no `id`—whenever state changes occur: a network request starts, a frame navigates, a JavaScript dialog appears. Playwright's internal connection layer maintains an in-process map of pending request IDs to promise resolvers, so that when a response arrives on the WebSocket, the correct promise is fulfilled and the awaiting coroutine resumes.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Playwright Process                       │
-│                                                             │
-│  ┌────────────┐    async/await    ┌───────────────────────┐ │
-│  │  User Code │ ◄────────────────►│  Playwright API Layer  │ │
-│  └────────────┘                   └──────────┬────────────┘ │
-│                                              │              │
-│                                   ┌──────────▼────────────┐ │
-│                                   │  Connection / Session  │ │
-│                                   │  (pending RPC map)     │ │
-│                                   └──────────┬────────────┘ │
-│                                              │              │
-└──────────────────────────────────────────────┼──────────────┘
-                                               │  WebSocket
-                                               │  JSON-RPC 2.0
-┌──────────────────────────────────────────────┼──────────────┐
-│                   Browser Process            │              │
-│                                             ▼              │
-│  ┌─────────────────────┐       ┌────────────────────────┐  │
-│  │   Browser Target     │       │   DevTools Protocol    │  │
-│  │  (Root Session)      │◄─────►│   Handler / Router     │  │
-│  └──────────┬──────────┘       └────────────────────────┘  │
-│             │                                               │
-│    ┌────────▼────────┐    ┌──────────────┐                  │
-│    │  Renderer Proc  │    │  Renderer    │                  │
-│    │  (Tab / Frame)  │    │  Proc (Tab)  │                  │
-│    └─────────────────┘    └──────────────┘                  │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph playwright["Playwright Process"]
+        userCode["User Code"]
+        apiLayer["Playwright API Layer"]
+        connection["Connection / Session<br/>(pending RPC map)"]
+        
+        userCode <-->|"async/await"| apiLayer
+        apiLayer --> connection
+    end
+    
+    subgraph browser["Browser Process"]
+        devtools["DevTools Protocol<br/>Handler / Router"]
+        browserTarget["Browser Target<br/>(Root Session)"]
+        renderer1["Renderer Proc<br/>(Tab / Frame)"]
+        renderer2["Renderer<br/>Proc (Tab)"]
+        
+        devtools <--> browserTarget
+        browserTarget --> renderer1
+        browserTarget --> renderer2
+    end
+    
+    connection -->|"WebSocket<br/>JSON-RPC 2.0"| devtools
 ```
 
 A critical structural detail: CDP multiplexes multiple browser targets (tabs, service workers, iframes) over a single WebSocket connection using **sessions**. When a new page is created, Playwright calls `Target.createTarget` and receives a `targetId`. It then calls `Target.attachToTarget` with `flatten: true`, which returns a `sessionId`. All subsequent messages directed at that tab are prefixed with the `sessionId` field, and all events from that tab carry the same field. This flattened session model is what allows a single WebSocket connection to control an arbitrary number of concurrently open pages without multiplying OS-level connections.

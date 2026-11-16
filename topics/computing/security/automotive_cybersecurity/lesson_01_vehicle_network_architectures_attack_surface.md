@@ -83,28 +83,32 @@ These physical-layer attacks extend to the differential signaling mechanism itse
 
 Modern vehicles mitigate these risks through network segmentation, partitioning the vehicle into multiple isolated CAN buses. A typical architecture might include:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Gateway ECU                          │
-│  ┌─────────────┐  ┌──────────────┐  ┌────────────────┐ │
-│  │ Firewall &  │  │   Routing    │  │  Diagnostic    │ │
-│  │   Filters   │  │    Engine    │  │    Proxy       │ │
-│  └─────────────┘  └──────────────┘  └────────────────┘ │
-└───────┬────────────────┬────────────────┬───────────────┘
-        │                │                │
-   ┌────▼─────┐    ┌────▼─────┐    ┌────▼─────┐
-   │Powertrain│    │ Chassis  │    │   Body   │
-   │ CAN Bus  │    │ CAN Bus  │    │ CAN Bus  │
-   └──────────┘    └──────────┘    └──────────┘
-        │                │                │
-   ┌────▼─────┐    ┌────▼─────┐    ┌────▼─────┐
-   │  Engine  │    │   ABS    │    │  HVAC    │
-   │   ECU    │    │   ECU    │    │   ECU    │
-   └──────────┘    └──────────┘    └──────────┘
-   ┌──────────┐    ┌──────────┐    ┌──────────┐
-   │  Trans.  │    │ Steering │    │ Lighting │
-   │   ECU    │    │   ECU    │    │   ECU    │
-   └──────────┘    └──────────┘    └──────────┘
+```mermaid
+flowchart TD
+    subgraph gateway ["Gateway ECU"]
+        fw["Firewall &amp; Filters"]
+        re["Routing Engine"]
+        dp["Diagnostic Proxy"]
+    end
+
+    subgraph pt_bus ["Powertrain CAN Bus"]
+        engine_ecu["Engine ECU"]
+        trans_ecu["Transmission ECU"]
+    end
+
+    subgraph ch_bus ["Chassis CAN Bus"]
+        abs_ecu["ABS ECU"]
+        steering_ecu["Steering ECU"]
+    end
+
+    subgraph body_bus ["Body CAN Bus"]
+        hvac_ecu["HVAC ECU"]
+        lighting_ecu["Lighting ECU"]
+    end
+
+    gateway --> pt_bus
+    gateway --> ch_bus
+    gateway --> body_bus
 ```
 
 The gateway ECU serves as a controlled bridge between these domains, enforcing a routing policy that specifies which CAN identifiers may traverse from one bus to another. For instance, the gateway might allow vehicle speed (identifier `0x210` from the powertrain bus) to be forwarded to the instrument cluster on the body bus, but it blocks all other powertrain messages from crossing this boundary. Similarly, diagnostic requests from the OBD-II port—which typically connects to the body or infotainment bus—are filtered or proxied through the gateway, preventing direct access to safety-critical buses.

@@ -401,3 +401,4 @@ def demonstrate_vector_clocks():
     print(f"recv(P0→P1 at P1): {events['recv_0_1']}")
 
     # P2: independent event
+```

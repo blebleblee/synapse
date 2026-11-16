@@ -26,48 +26,18 @@ The Timeline system extends animation from reactive state machines to authored s
 
 The Animator component serves as the primary runtime interface between Unity's game object hierarchy and the animation evaluation pipeline. When attached to a GameObject, the Animator references an Animator Controller asset—a state machine definition authored in Unity's visual editor—and exposes parameters that drive state transitions and blend tree coordinates. At initialization, Unity constructs an internal evaluation graph representing all reachable states, transitions, and blend nodes, optimizing the structure for cache-coherent traversal. The graph exists in native memory space, minimizing managed-to-native marshalling overhead during the per-frame evaluation cycle that occurs during the animation phase of Unity's main loop, positioned after input processing but before physics simulation.
 
-```
-Animation Evaluation Pipeline (per-frame):
-┌─────────────────────────────────────────────────────────────────┐
-│ 1. Parameter Update Phase                                       │
-│    - Script-driven SetFloat/SetBool/SetTrigger calls            │
-│    - Internal parameter values updated in parameter buffer      │
-└────────────────┬────────────────────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│ 2. State Machine Evaluation Phase                               │
-│    - Transition condition evaluation (guards check parameters)  │
-│    - Active state determination (follow edges or remain)        │
-│    - Normalized time advancement (speed × deltaTime)            │
-│    - Transition blend weight computation (exit → entry fade)    │
-└────────────────┬────────────────────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│ 3. Pose Sampling Phase                                          │
-│    - Clip keyframe lookup (binary search on normalized time)    │
-│    - Curve interpolation (lerp/slerp between keyframe samples)  │
-│    - Blend tree evaluation (weighted average of clip poses)     │
-│    - Layer blending (override/additive composition)             │
-└────────────────┬────────────────────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│ 4. IK Solve Phase (if enabled)                                  │
-│    - OnAnimatorIK callback invocation                           │
-│    - Two-bone limb solver iterations                            │
-│    - Look-at constraint solving                                 │
-│    - Hint target processing (elbow/knee direction)              │
-└────────────────┬────────────────────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│ 5. Transform Write-Back Phase                                   │
-│    - Final pose written to Transform hierarchy                  │
-│    - Position/Rotation/Scale updates propagate to GameObjects   │
-│    - Child transforms recalculate world matrices                │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["1. Parameter Update Phase<br/>• Script-driven SetFloat/SetBool/SetTrigger calls<br/>• Internal parameter values updated in parameter buffer"]
+    B["2. State Machine Evaluation Phase<br/>• Transition condition evaluation<br/>• Active state determination<br/>• Normalized time advancement<br/>• Transition blend weight computation"]
+    C["3. Pose Sampling Phase<br/>• Clip keyframe lookup<br/>• Curve interpolation<br/>• Blend tree evaluation<br/>• Layer blending"]
+    D["4. IK Solve Phase<br/>• OnAnimatorIK callback invocation<br/>• Two-bone limb solver iterations<br/>• Look-at constraint solving<br/>• Hint target processing"]
+    E["5. Transform Write-Back Phase<br/>• Final pose written to Transform hierarchy<br/>• Position/Rotation/Scale updates<br/>• Child transforms recalculate world matrices"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 State machine transitions encode the edges between animation states with configurable conditions and timing parameters. Each transition specifies a source state, destination state, exit time, transition duration, and a list of conditions that gate the transition's activation. Exit time represents the normalized time within the source state at which the transition becomes eligible—a value of 0.8 means the transition can only begin once the source animation has played 80% of its duration, ensuring critical keyframes like foot plants complete before blending to the next motion. Transition duration defines the blending window, during which the runtime linearly interpolates between source and destination poses. A 0.25-second duration produces a smooth 250-millisecond crossfade, where the source state's weight decays from 1 to 0 while the destination state's weight grows from 0 to 1 along a linear ramp.

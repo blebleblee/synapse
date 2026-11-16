@@ -78,41 +78,25 @@ $$V^{flex} = -C(G_0) + \mathbb{E}\left[\max\left\{\pi(G_0, \theta), -K_e + \pi(G
 
 The expectation is taken over the posterior distribution $p(\theta | s)$ conditional on observing signal $s$, and the max operator captures the option to expand only in favorable states. Comparing $V^{flex}$ to the rigid investment value $V^{rigid} = -C(G_0) + \mathbb{E}[\pi(G_0, \theta)]$ quantifies the value of preserving flexibility, which rises with volatility, learning rate, and irreversibility.
 
-```
-Public Goods Provision Decision Architecture:
-
-Social Planner Objective
-         |
-         v
-+------------------+
-| Preference       |
-| Aggregation      |
-| (Samuelson Sum)  |
-+------------------+
-         |
-         v
-+------------------+       +------------------+
-| Information      |<----->| Mechanism        |
-| Revelation       |       | Design           |
-| Problem          |       | (Clarke-Groves)  |
-+------------------+       +------------------+
-         |
-         v
-+------------------+       +------------------+
-| Cost-Benefit     |------>| Uncertainty      |
-| Analysis         |       | Quantification   |
-| Framework        |<------| (Monte Carlo)    |
-+------------------+       +------------------+
-         |
-         v
-+------------------+
-| Provision        |
-| Decision &       |
-| Financing Rule   |
-+------------------+
-         |
-         v
-Implementation (Tax/Expenditure Policy)
+```mermaid
+flowchart TD
+    SPO["Social Planner Objective"]
+    PA["Preference Aggregation<br/>(Samuelson Sum)"]
+    IRP["Information Revelation<br/>Problem"]
+    MD["Mechanism Design<br/>(Clarke-Groves)"]
+    CBA["Cost-Benefit Analysis<br/>Framework"]
+    UQ["Uncertainty Quantification<br/>(Monte Carlo)"]
+    PD["Provision Decision &<br/>Financing Rule"]
+    IMPL["Implementation<br/>(Tax/Expenditure Policy)"]
+    
+    SPO --> PA
+    PA --> IRP
+    IRP <--> MD
+    IRP --> CBA
+    CBA --> UQ
+    UQ --> CBA
+    CBA --> PD
+    PD --> IMPL
 ```
 
 The practical execution of cost-benefit analysis for a major infrastructure project proceeds through structured stages. First, the analyst defines the project scope and identifies the full set of stakeholders whose welfare enters the social objective. A highway expansion affects commuters through reduced travel time, nearby residents through noise and air quality externalities, commercial freight operators through reliability gains, and future generations through climate emissions. Second, the analyst constructs a simulation model that maps project design parameters (number of lanes, route alignment, construction timeline) to physical outcomes (traffic flow, accident rates, emissions levels) using transportation engineering models calibrated to local conditions. Third, revealed and stated preference studies monetize non-market impacts: hedonic regressions isolate the marginal willingness to pay for reduced travel time embedded in housing prices and wage differentials across locations, while contingent valuation surveys elicit willingness to pay for air quality improvements. Fourth, Monte Carlo simulation propagates parameter uncertainty through the model, generating probability distributions over net present value rather than point estimates. Fifth, sensitivity analysis identifies which parameters drive variance in outcomes, focusing data collection efforts on high-impact uncertainties. Sixth, distributional incidence analysis decomposes benefits and costs across income quintiles, regions, and demographic groups, informing equity weighting decisions.

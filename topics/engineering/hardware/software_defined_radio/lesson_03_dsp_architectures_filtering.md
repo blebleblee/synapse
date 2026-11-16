@@ -32,39 +32,66 @@ These core mechanisms—filtering to isolate desired spectral content, multirate
 
 The internal architecture of a digital filter determines both its frequency response characteristics and its computational efficiency. For FIR filters, the direct-form implementation instantiates the convolution sum directly: a tapped delay line stores the most recent N input samples, multipliers scale each delayed sample by its corresponding coefficient, and an accumulator sums the products. This structure, conceptually simple, maps naturally to hardware implementations using shift registers, multiplier arrays, and adder trees. In software implementations on general-purpose processors, the direct form exploits single-instruction-multiple-data (SIMD) vector units, computing four or eight multiply-accumulate operations in parallel per clock cycle.
 
-```
-Direct-Form FIR Filter (N taps):
-
-x[n] ──┬─→ z⁻¹ ──┬─→ z⁻¹ ──┬─→ ... ──┬─→ z⁻¹
-       │         │         │          │
-       ↓ ×h[0]   ↓ ×h[1]   ↓ ×h[2]    ↓ ×h[N-1]
-       │         │         │          │
-       └────→ Σ ←┴────────┴──────────┘
-              │
-           y[n]
+```mermaid
+flowchart LR
+    input["x[n]"]
+    z1["z⁻¹"]
+    z2["z⁻¹"]
+    z3["z⁻¹"]
+    h0["×h[0]"]
+    h1["×h[1]"]
+    h2["×h[2]"]
+    hn["×h[N-1]"]
+    sum["Σ"]
+    output["y[n]"]
+    dots["..."]
+    
+    input --> h0
+    input --> z1
+    z1 --> h1
+    z1 --> z2
+    z2 --> h2
+    z2 --> dots
+    dots --> z3
+    z3 --> hn
+    
+    h0 --> sum
+    h1 --> sum
+    h2 --> sum
+    hn --> sum
+    
+    sum --> output
 ```
 
 The symmetry property of linear-phase FIR filters, where h[k] = h[N-1-k] for even-symmetric or h[k] = -h[N-1-k] for odd-symmetric coefficients, permits computational optimization. Pairing symmetric samples before multiplication halves the number of multipliers required. For a 64-tap symmetric FIR filter, this optimization reduces the multiplier count from 64 to 32, proportionally decreasing hardware area or software execution time. The polyphase decomposition further exploits this structure in multirate systems, partitioning the filter coefficients into M interleaved subsequences for decimation-by-M or L subsequences for interpolation-by-L.
 
 In polyphase decimation, the input signal x[n] feeds M parallel subfilters, each operating at the reduced output rate fs/M. The k-th subfilter processes every M-th input sample starting at offset k, using coefficients h[k], h[k+M], h[k+2M], and so forth. A commutator selects the subfilter outputs in rotation, producing the decimated output stream. This architecture eliminates computation on samples ultimately discarded, reducing the multiply-accumulate rate by the decimation factor. For an N-tap prototype filter and decimation factor M, the polyphase implementation requires N/M multiplications per output sample compared to N multiplications in the naive approach of filtering before downsampling.
 
-```
-Polyphase Decimation (M=4):
+```mermaid
+flowchart LR
+    xn["x[n]"]
+    down["↓M (M=4)"]
 
-           ┌─────────────────┐
-x[n] ──→ ↓M├─→ E₀(z⁴) ──┐    │
-           │              ├─→ Σ ──→ y[m]
-           ├─→ E₁(z⁴) ──┤    │
-           │              │    │
-           ├─→ E₂(z⁴) ──┤    │
-           │              │    │
-           └─→ E₃(z⁴) ──┘    │
-                              └─────────────────┘
+    subgraph polyphase ["Polyphase Decomposition"]
+        E0["E₀(z⁴)\nh[0], h[4], h[8], …"]
+        E1["E₁(z⁴)\nh[1], h[5], h[9], …"]
+        E2["E₂(z⁴)\nh[2], h[6], h[10], …"]
+        E3["E₃(z⁴)\nh[3], h[7], h[11], …"]
+    end
 
-E₀: coefficients h[0], h[4], h[8], ...
-E₁: coefficients h[1], h[5], h[9], ...
-E₂: coefficients h[2], h[6], h[10], ...
-E₃: coefficients h[3], h[7], h[11], ...
+    summer["Σ"]
+    ym["y[m]"]
+
+    xn --> down
+    down --> E0
+    down --> E1
+    down --> E2
+    down --> E3
+    E0 --> summer
+    E1 --> summer
+    E2 --> summer
+    E3 --> summer
+    summer --> ym
 ```
 
 IIR filter architectures balance computational efficiency against numerical stability and dynamic range. The direct-form I structure implements the difference equation explicitly, computing the feed-forward (FIR) portion first, then recursively applying the feedback (IIR) portion. Direct-form II rearranges the computation, sharing a single delay line between feed-forward and feedback paths, halving memory requirements. However, internal node signal levels in direct-form structures can grow large even when input and output remain bounded, causing overflow in fixed-point arithmetic or precision loss in floating-point. Cascaded biquad sections, each implemented in direct-form II transposed structure with carefully scaled intermediate signals, provide superior numerical behavior.
@@ -82,14 +109,40 @@ The digital down-converter architecture exemplifies the integration of frequency
 
 The CIC filter, invented by Hogenauer, implements a recursive moving-average structure requiring no multipliers—only additions and subtractions. A K-stage CIC decimator consists of K integrator sections operating at the high input rate, a downsampler reducing the rate by factor M, and K differentiator sections (comb filters) operating at the low output rate. The frequency response exhibits a sinc^K characteristic with deep nulls at multiples of the output sample rate, providing substantial alias rejection despite the absence of coefficients. However, the passband droop, approximately 0.5 dB per stage at the band edge for decimation factors typical in SDR, necessitates compensation with a subsequent FIR filter designed with inverse droop characteristics.
 
-```
-CIC Decimator (K=3, M decimation factor):
-
-           Integrators (fs_in)       ↓M      Combs (fs_out)
-           ┌────┐  ┌────┐  ┌────┐         ┌────┐  ┌────┐  ┌────┐
-x[n] ──→ Σ├─→│z⁻¹├─→Σ├─→│z⁻¹├─→Σ├─→│z⁻¹├─→ ↓M ─→┤1-z⁻ᴹ├─→┤1-z⁻ᴹ├─→┤1-z⁻ᴹ├─→ y[m]
-        ↑ └────┘  ↑ └────┘  ↑ └────┘         └────┘  └────┘  └────┘
-        └─────────┴──────────┴─────────
+```mermaid
+flowchart LR
+    input["x[n]"]
+    
+    subgraph integrators ["Integrators (fs_in)"]
+        sum1["Σ"]
+        delay1["z⁻¹"]
+        sum2["Σ"]
+        delay2["z⁻¹"]
+        sum3["Σ"]
+        delay3["z⁻¹"]
+        
+        sum1 --> delay1 --> sum2 --> delay2 --> sum3 --> delay3
+        sum1 -.-> sum1
+        sum2 -.-> sum2
+        sum3 -.-> sum3
+    end
+    
+    downsample["↓M<br/>Decimation"]
+    
+    subgraph combs ["Combs (fs_out)"]
+        comb1["1-z⁻ᴹ"]
+        comb2["1-z⁻ᴹ"]
+        comb3["1-z⁻ᴹ"]
+        
+        comb1 --> comb2 --> comb3
+    end
+    
+    output["y[m]"]
+    
+    input --> sum1
+    delay3 --> downsample
+    downsample --> comb1
+    comb3 --> output
 ```
 
 The NCO phase accumulator requires careful attention to word width and phase quantization effects. A 32-bit accumulator clocked at 100 MHz sample rate provides frequency resolution of approximately 0.023 Hz, sufficient for most communication applications. However, truncating the phase accumulator output to address a sine/cosine lookup table introduces phase quantization noise, which manifests as spurious tones in the output spectrum. These spurs, located at frequencies determined by the rational approximation to the desired frequency divided by the accumulator modulus, degrade signal-to-noise ratio and can mask weak signals. Dithering the phase accumulator by adding a pseudo-random sequence before truncation spreads phase quantization energy across the spectrum, trading discrete spurs for a slightly elevated noise floor.

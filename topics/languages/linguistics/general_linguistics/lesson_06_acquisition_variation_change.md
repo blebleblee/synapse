@@ -34,45 +34,66 @@ The practitioner working in variationist sociolinguistics must master the **vari
 
 The acquisition mechanism operates across four interacting components that the practitioner must keep analytically distinct: the *input processor*, which extracts distributional and prosodic information from the ambient speech stream; the *parameter-setting device*, which maps analyzed input onto parametric choices constrained by UG; the *lexical acquisition system*, which builds form-meaning pairings through joint attention, referential disambiguation, and fast-mapping; and the *morphophonological learning component*, which acquires the allomorphic and prosodic adaptations specific to the target language.
 
-```
-INPUT (Ambient Speech Stream)
-        │
-        ▼
-┌───────────────────────────────────────────────────┐
-│          PROSODIC / STATISTICAL BOOTSTRAPPING     │
-│  - Distributional analysis (phoneme boundaries)  │
-│  - Prosodic packaging (clause, phrase detection) │
-│  - Mutual information → morpheme segmentation    │
-└───────────────────────────┬───────────────────────┘
-                            │
-                            ▼
-┌───────────────────────────────────────────────────┐
-│          SYNTACTIC PARAMETER-SETTING              │
-│  UG-constrained hypothesis space                 │
-│  Head Direction ← [head-first | head-final]      │
-│  Pro-Drop      ← [+null subject | −null subject] │
-│  Wh-movement   ← [overt | covert]                │
-│  V2 constraint ← [obligatory | absent]           │
-└───────────────────────────┬───────────────────────┘
-                            │
-                            ▼
-┌───────────────────────────────────────────────────┐
-│          LEXICAL / CONSTRUCTIONAL LAYER           │
-│  Item-specific schemas → abstract constructions  │
-│  Token frequency drives entrenchment             │
-│  Type frequency drives abstraction               │
-└───────────────────────────┬───────────────────────┘
-                            │
-                            ▼
-┌───────────────────────────────────────────────────┐
-│          MORPHOPHONOLOGICAL COMPONENT             │
-│  Allomorphy rules (irregular → regular shift)    │
-│  Stress/tone assignment                          │
-│  Phonotactic repair strategies                   │
-└───────────────────────────┬───────────────────────┘
-                            │
-                            ▼
-              INTERNALIZED GRAMMAR (I-Language)
+```mermaid
+flowchart TD
+    INPUT["🎙 INPUT\nAmbient Speech Stream"]
+
+    subgraph PSB ["PROSODIC / STATISTICAL BOOTSTRAPPING"]
+        PSB1["• Distributional analysis (phoneme boundaries)"]
+        PSB2["• Prosodic packaging (clause & phrase detection)"]
+        PSB3["• Mutual information → morpheme segmentation"]
+    end
+
+    subgraph SPS ["SYNTACTIC PARAMETER-SETTING"]
+        SPS0["UG-constrained hypothesis space"]
+        SPS1["Head Direction ← [head-first | head-final]"]
+        SPS2["Pro-Drop ← [+null subject | −null subject]"]
+        SPS3["Wh-movement ← [overt | covert]"]
+        SPS4["V2 constraint ← [obligatory | absent]"]
+    end
+
+    subgraph LCL ["LEXICAL / CONSTRUCTIONAL LAYER"]
+        LCL1["• Item-specific schemas → abstract constructions"]
+        LCL2["• Token frequency drives entrenchment"]
+        LCL3["• Type frequency drives abstraction"]
+    end
+
+    subgraph MPC ["MORPHOPHONOLOGICAL COMPONENT"]
+        MPC1["• Allomorphy rules (irregular → regular shift)"]
+        MPC2["• Stress / tone assignment"]
+        MPC3["• Phonotactic repair strategies"]
+    end
+
+    OUTPUT["INTERNALIZED GRAMMAR\n(I-Language)"]
+
+    INPUT --> PSB
+    PSB --> SPS
+    SPS --> LCL
+    LCL --> MPC
+    MPC --> OUTPUT
+
+    style INPUT fill:#1a1a2e,stroke:#4a90d9,color:#e0e0ff,font-weight:bold
+    style OUTPUT fill:#1a1a2e,stroke:#4a90d9,color:#e0e0ff,font-weight:bold
+
+    style PSB fill:#0f3460,stroke:#4a90d9,color:#c8d8f0
+    style SPS fill:#16213e,stroke:#7b68ee,color:#c8d8f0
+    style LCL fill:#0f3460,stroke:#4a90d9,color:#c8d8f0
+    style MPC fill:#16213e,stroke:#7b68ee,color:#c8d8f0
+
+    style PSB1 fill:#0f3460,stroke:none,color:#a0b8d8
+    style PSB2 fill:#0f3460,stroke:none,color:#a0b8d8
+    style PSB3 fill:#0f3460,stroke:none,color:#a0b8d8
+    style SPS0 fill:#16213e,stroke:none,color:#b0a0e8,font-style:italic
+    style SPS1 fill:#16213e,stroke:none,color:#a0b8d8
+    style SPS2 fill:#16213e,stroke:none,color:#a0b8d8
+    style SPS3 fill:#16213e,stroke:none,color:#a0b8d8
+    style SPS4 fill:#16213e,stroke:none,color:#a0b8d8
+    style LCL1 fill:#0f3460,stroke:none,color:#a0b8d8
+    style LCL2 fill:#0f3460,stroke:none,color:#a0b8d8
+    style LCL3 fill:#0f3460,stroke:none,color:#a0b8d8
+    style MPC1 fill:#16213e,stroke:none,color:#a0b8d8
+    style MPC2 fill:#16213e,stroke:none,color:#a0b8d8
+    style MPC3 fill:#16213e,stroke:none,color:#a0b8d8
 ```
 
 The sequence is not strictly linear — there is extensive feedback between layers — but the directionality of the dominant data flow is bottom-up: speech segmentation precedes syntactic analysis, and syntactic analysis precedes the acquisition of morphophonological alternations conditioned by syntactic context. The practitioner designing acquisition studies must intervene at a specific layer rather than treating "language acquisition" as a monolithic process. A preferential looking paradigm testing subject-relative versus object-relative clauses probes the syntactic layer directly; a word segmentation task using the head-turn preference procedure probes prosodic bootstrapping; a wug test (Berko's 1958 methodology of presenting novel nonsense morphemes) isolates the morphophonological productive rule system from rote lexical memory.
@@ -135,51 +156,26 @@ The practitioner must also decide between **apparent time** and **real time** in
 
 The Comparative Method is the core analytical engine of historical linguistics, and its operational architecture is a strict sequence of steps that the practitioner must execute in order, because later steps presuppose the outputs of earlier ones.
 
-```
-COGNATE SET ASSEMBLY
-Identify probable cognates across daughter languages
-using semantic plausibility and gross phonological
-similarity (not regular correspondence — that comes later)
-            │
-            ▼
-CORRESPONDENCE SET EXTRACTION
-For each cognate set, extract the correspondence
-of segments in the same structural position:
-
-  Latin    Greek    Sanskrit   Gothic    Old Irish
-  p        p        p          f         [ø/h]
-  (pater)  (patēr)  (pitā)     (fadar)   (athir)
-
-            │
-            ▼
-REGULARITY TEST
-Does the correspondence hold across all cognate sets
-sharing the same structural context? Exceptions
-require conditioning environments or borrowing hypotheses.
-            │
-            ▼
-PROTO-PHONEME RECONSTRUCTION
-Choose the proto-phoneme that accounts for all reflexes
-via natural, attested processes. Prefer the derivation
-requiring fewer marked processes. Mark as *p, *b, etc.
-
-  PIE *p → Latin p, Greek p, Sanskrit p, Germanic f
-  (Grimm's Law: voiceless stop → fricative in Germanic)
-
-            │
-            ▼
-PROTO-LANGUAGE ASSEMBLY
-Reconstruct proto-morphology (inflectional endings,
-ablaut grades) and proto-syntax from the daughter
-evidence, using the same correspondence logic.
-            │
-            ▼
-SUBGROUPING
-Shared innovations (not retentions) define subgroups:
-If Latin and Celtic share a feature not found in
-Germanic or Sanskrit, it is a shared innovation
-defining an Italo-Celtic node — unless it is
-independently natural enough to have arisen twice.
+```mermaid
+flowchart TD
+    A["COGNATE SET ASSEMBLY"]
+    B["CORRESPONDENCE SET EXTRACTION"]
+    C["REGULARITY TEST"]
+    D["PROTO-PHONEME RECONSTRUCTION"]
+    E["PROTO-LANGUAGE ASSEMBLY"]
+    F["SUBGROUPING"]
+    
+    A --> |"Identify probable cognates across daughter languages<br/>using semantic plausibility and gross phonological<br/>similarity (not regular correspondence — that comes later)"| B
+    
+    B --> |"For each cognate set, extract the correspondence<br/>of segments in the same structural position:<br/><br/>Latin p (pater) → Greek p (patēr) → Sanskrit p (pitā)<br/>→ Gothic f (fadar) → Old Irish ø/h (athir)"| C
+    
+    C --> |"Does the correspondence hold across all cognate sets<br/>sharing the same structural context? Exceptions<br/>require conditioning environments or borrowing hypotheses."| D
+    
+    D --> |"Choose the proto-phoneme that accounts for all reflexes<br/>via natural, attested processes. Prefer the derivation<br/>requiring fewer marked processes. Mark as *p, *b, etc.<br/><br/>PIE *p → Latin p, Greek p, Sanskrit p, Germanic f<br/>(Grimm's Law: voiceless stop → fricative in Germanic)"| E
+    
+    E --> |"Reconstruct proto-morphology (inflectional endings,<br/>ablaut grades) and proto-syntax from the daughter<br/>evidence, using the same correspondence logic."| F
+    
+    F["SUBGROUPING<br/><br/>Shared innovations (not retentions) define subgroups:<br/>If Latin and Celtic share a feature not found in<br/>Germanic or Sanskrit, it is a shared innovation<br/>defining an Italo-Celtic node — unless it is<br/>independently natural enough to have arisen twice."]
 ```
 
 The practitioner must maintain a strict distinction between **shared retentions** (symplesiomorphies, in the cladistic analogy) and **shared innovations** (synapomorphies). Two languages sharing a conservative feature that the proto-language already had do not thereby form a subgroup; it is shared *departure from* the proto-language state that counts as evidence of common ancestry after the proto-language broke up. This distinction is what prevents the analyst from grouping all languages that conserved the PIE consonant system into a single subgroup against languages that underwent Grimm's Law.

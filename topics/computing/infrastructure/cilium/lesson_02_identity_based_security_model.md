@@ -26,39 +26,19 @@ The identity store is backed by the cluster's kvstore, which in production deplo
 
 The resulting endpoint state on the local node is a data structure called `EndpointInfo`, which the Cilium agent maintains in its own in-memory store and also materializes as a `CiliumEndpoint` custom resource in the Kubernetes API. The `EndpointInfo` record contains the endpoint's IP address, its assigned security identity, its current policy revision, and the set of active datapath programs pinned in the kernel for that endpoint. The relationship between these components is shown in the following diagram.
 
-```
-┌───────────────────────────────────────────────────────────────────────────────┐
-│                          Cilium Agent (Node)                                  │
-│                                                                               │
-│  ┌─────────────────────┐       ┌────────────────────────────────────────┐    │
-│  │   K8s Node Informer  │       │         Identity Allocator             │    │
-│  │                     │       │                                        │    │
-│  │  Pod spec + labels  │──────▶│  LabelSet → SHA256 → kvstore CAS      │    │
-│  │  observed via watch │       │  Returns: numeric identity (uint32)    │    │
-│  └─────────────────────┘       └────────────────┬───────────────────────┘    │
-│                                                  │                            │
-│                                                  ▼                            │
-│                              ┌───────────────────────────────────┐           │
-│                              │          EndpointInfo             │           │
-│                              │                                   │           │
-│                              │  IP:        10.0.1.47             │           │
-│                              │  Identity:  12483                 │           │
-│                              │  Labels:    app=payments,         │           │
-│                              │             env=production        │           │
-│                              │  PolicyRev: 7                     │           │
-│                              │  LxcMap:    bpf_lxc[0x3A2F]      │           │
-│                              └───────────────────────────────────┘           │
-│                                                                               │
-└───────────────────────────────────────────────────────────────────────────────┘
-                    │                               │
-                    ▼                               ▼
-         ┌──────────────────┐           ┌───────────────────────┐
-         │  etcd kvstore    │           │  CiliumEndpoint CRD   │
-         │                  │           │  (Kubernetes API)     │
-         │  /cilium/state/  │           │                       │
-         │  identities/     │           │  .status.id: 12483    │
-         │  12483 → {labels}│           │  .status.networking   │
-         └──────────────────┘           └───────────────────────┘
+```mermaid
+flowchart TD
+    subgraph CiliumAgent["Cilium Agent (Node)"]
+        K8sInformer["K8s Node Informer<br/><br/>Pod spec + labels<br/>observed via watch"]
+        IdentityAllocator["Identity Allocator<br/><br/>LabelSet → SHA256 → kvstore CAS<br/>Returns: numeric identity (uint32)"]
+        EndpointInfo["EndpointInfo<br/><br/>IP: 10.0.1.47<br/>Identity: 12483<br/>Labels: app=payments,<br/>        env=production<br/>PolicyRev: 7<br/>LxcMap: bpf_lxc[0x3A2F]"]
+        
+        K8sInformer --> IdentityAllocator
+        IdentityAllocator --> EndpointInfo
+    end
+    
+    EndpointInfo --> etcdKvstore["etcd kvstore<br/><br/>/cilium/state/<br/>identities/<br/>12483 → {labels}"]
+    EndpointInfo --> CiliumCRD["CiliumEndpoint CRD<br/>(Kubernetes API)<br/><br/>.status.id: 12483<br/>.status.networking"]
 ```
 
 The numeric identity space is partitioned by reserved ranges. Identities 1 through 999 are reserved for well-known cluster entities: identity 1 is the host itself, identity 2 represents the cluster aggregate (any in-cluster IP), identity 3 represents the world (any IP not covered by in-cluster CIDRs), and identity 4 is used for unmanaged endpoints — pods running without Cilium instrumentation. This reservation scheme means that a node's datapath can make a policy decision against traffic from the host network namespace without consulting the kvstore at all; the identity is a compile-time constant.
@@ -73,44 +53,30 @@ This computation is not static. As pods are created and destroyed and as their l
 
 The datapath representation of a computed policy is a BPF hash map called `cilium_policy` (or `cilium_ct_any4_global` for connection tracking). For each endpoint, there is a per-endpoint policy map keyed by the tuple `(identity, destination port, protocol)` with a value encoding the action (allow, deny, redirect to L7 proxy). A packet arriving at an endpoint's ingress hook carries the source identity in a metadata field, and the datapath performs a single map lookup to determine whether the flow is permitted. The critical performance property is that this lookup is O(1) — it does not iterate over CIDR ranges or rule lists.
 
-```
-Policy Computation Pipeline:
+```mermaid
+flowchart TD
+    CNP["CiliumNetworkPolicy\n(YAML)"]
 
-CiliumNetworkPolicy (YAML)
-         │
-         ▼
-┌─────────────────────────────────────┐
-│       Policy Repository             │
-│  (in-memory rule DAG, per-agent)    │
-│                                     │
-│  Rule: ingress from selector        │
-│    {app: frontend} to port 8080     │
-└───────────────┬─────────────────────┘
-                │  selector resolution
-                ▼
-┌─────────────────────────────────────┐
-│      Identity Cache                 │
-│                                     │
-│  {app: frontend} → [9821, 15042]    │
-│  {app: payments} → [12483]          │
-└───────────────┬─────────────────────┘
-                │  cross-product
-                ▼
-┌─────────────────────────────────────┐
-│      Distilled Policy               │
-│                                     │
-│  Allow: src=9821  dst=12483 :8080   │
-│  Allow: src=15042 dst=12483 :8080   │
-└───────────────┬─────────────────────┘
-                │  map update
-                ▼
-┌─────────────────────────────────────┐
-│   Kernel BPF Policy Map             │
-│   (per-endpoint, O(1) lookup)       │
-│                                     │
-│  key: {9821,  8080, TCP} → ALLOW    │
-│  key: {15042, 8080, TCP} → ALLOW    │
-└─────────────────────────────────────┘
+    subgraph repo ["Policy Repository"]
+        REPO_DESC["in-memory rule DAG, per-agent\n─────────────────────────\nRule: ingress from selector\n{app: frontend} → port 8080"]
+    end
+
+    subgraph id_cache ["Identity Cache"]
+        ID_DESC["{app: frontend} → [9821, 15042]\n{app: payments} → [12483]"]
+    end
+
+    subgraph distilled ["Distilled Policy"]
+        DIST_DESC["Allow: src=9821  dst=12483 :8080\nAllow: src=15042 dst=12483 :8080"]
+    end
+
+    subgraph bpf ["Kernel BPF Policy Map"]
+        BPF_DESC["per-endpoint, O(1) lookup\n─────────────────────────\nkey: {9821,  8080, TCP} → ALLOW\nkey: {15042, 8080, TCP} → ALLOW"]
+    end
+
+    CNP --> repo
+    repo -->|"selector resolution"| id_cache
+    id_cache -->|"cross-product"| distilled
+    distilled -->|"map update"| bpf
 ```
 
 ### CIDR-Based vs. Identity-Based Enforcement

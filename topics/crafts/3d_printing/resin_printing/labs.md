@@ -100,7 +100,7 @@ Orient the test geometry so all beams print simultaneously, ensuring identical e
 | 30° | 6 supports/10mm | Medium supports adequate |
 | 45° | 4 supports/10mm | Light supports acceptable |
 | 60° | 3 supports/10mm | Minimal support needed |
-| 75° (shallow) | Self-supporting | Zero supports for spans <20mm |
+| 75° (shallow) | Self-supporting | Zero supports for spans < 20mm |
 
 This empirical data informs your support generation strategy for production prints. Shallow overhangs (60+ degrees from horizontal) are effectively self-supporting for most resins due to the viscosity of the liquid resin—the partially cured layer below provides sufficient mechanical support during the brief exposure and lift cycle. Steep overhangs (less than 30 degrees) require dense, heavy supports to counteract the bending moment induced by peel forces.
 
@@ -169,7 +169,7 @@ Compile these stress test results into a comprehensive failure mode diagnostic m
 |---------|-----------|----------------|--------|
 | Rough, porous bottom surface | Cold resin (>2× viscosity) | Touch resin, check thermometer | Preheat resin to 25°C in water bath |
 | Poor first-layer adhesion | Warm resin or dirty platform | Check temperature, inspect platform | Cool resin, abrade platform with 220-grit |
-| Cloudy, low-detail prints | Degraded FEP film | Backlight transmission test (<80%) | Replace FEP film, verify 90%+ transmission |
+| Cloudy, low-detail prints | Degraded FEP film | Backlight transmission test (< 80%) | Replace FEP film, verify 90%+ transmission |
 | Divots or lines on bottom | Contaminated resin/FEP | Visual inspection of tank | Filter resin, clean FEP with IPA |
 | Support detachment | Excessive peel force | High lift speed, large cross-section | Reduce lift speed to 60 mm/min, increase supports |
 | Fused thin walls | Lateral overcure | Feature bloat, closed holes | Reduce exposure time by 10–15% |
@@ -201,7 +201,7 @@ Execute this checklist before every print session to ensure system readiness and
 - [ ] Resin level sufficient for print height: minimum (print volume ÷ 0.6) + 100 ml reserve
 
 **Hardware Inspection**
-- [ ] FEP film inspected under backlight: no scratches, clouding <20%, no deformation
+- [ ] FEP film inspected under backlight: no scratches, clouding < 20%, no deformation
 - [ ] Build platform cleaned with 90% IPA, abraded surface verified (no polish)
 - [ ] Z-axis lead screw lubrication verified (thin film of lithium grease, no dry spots)
 - [ ] Linear guide rails checked for debris (wipe with lint-free cloth)
@@ -210,7 +210,7 @@ Execute this checklist before every print session to ensure system readiness and
 **Calibration Confirmation**
 - [ ] Z-axis home position verified with paper test: consistent friction at all four corners
 - [ ] Build platform level within ±0.05 mm (re-tighten if loose)
-- [ ] Last print success date recorded: FEP film <200 hours since replacement
+- [ ] Last print success date recorded: FEP film < 200 hours since replacement
 - [ ] Slicer profile loaded: exposure time, lift speed, layer height match calibrated values
 
 **File Preparation**
@@ -274,11 +274,11 @@ If dimensional accuracy fails (>±0.15 mm deviation):
 
 If supports fail (detachment or sagging):
 1. Check lift speed: if >100 mm/min → reduce to 60–80 mm/min
-2. Check support density: if <5 supports/10mm on steep overhang → increase density 30%
-3. Check resin temperature: if <20°C → preheat to 25°C; if >30°C → cool and increase bottom exposure
+2. Check support density: if < 5 supports/10mm on steep overhang → increase density 30%
+3. Check resin temperature: if < 20°C → preheat to 25°C; if >30°C → cool and increase bottom exposure
 
 If surface quality is poor (rough, porous, or cloudy):
-1. Check FEP transmission: if <80% → replace FEP film immediately
+1. Check FEP transmission: if < 80% → replace FEP film immediately
 2. Check resin contamination: if visible particles → filter through 190-micron strainer
 3. Check exposure consistency: print solid 50mm cube; if uniformly rough → cold resin; if patchy rough → FEP or contamination
 
@@ -307,7 +307,7 @@ Establish a routine maintenance protocol keyed to print hours:
 - Calibrate exposure: re-run exposure matrix test with fresh resin
 
 **Every 200 Print Hours or 6 Months**
-- Replace FEP film: measure transmission, replace if <85%
+- Replace FEP film: measure transmission, replace if < 85%
 - Replace UV LED array if intensity drops >20% (measure with UV meter)
 - Inspect linear guide rails for wear, replace if binding or backlash detected
 

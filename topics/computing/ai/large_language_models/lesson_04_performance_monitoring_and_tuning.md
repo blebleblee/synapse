@@ -191,7 +191,7 @@ Quantization maps floating-point weights (and optionally activations) to lower-p
 min_{Ŵ} || WX - ŴX ||²_F
 ```
 
-where W is the FP16 weight matrix and Ŵ is the quantized weight matrix, computed using the inverse Hessian of the loss with respect to W to determine which weights can tolerate more aggressive quantization. GPTQ runs in a few GPU-hours on a single A100 for a 70B model and achieves 3–4-bit quantization with <1% perplexity degradation on standard benchmarks (WikiText-2, C4).
+where W is the FP16 weight matrix and Ŵ is the quantized weight matrix, computed using the inverse Hessian of the loss with respect to W to determine which weights can tolerate more aggressive quantization. GPTQ runs in a few GPU-hours on a single A100 for a 70B model and achieves 3–4-bit quantization with < 1% perplexity degradation on standard benchmarks (WikiText-2, C4).
 
 **AWQ** (Lin et al., 2023) observes that ~1% of weight channels are **salient** — they correspond to large activation magnitudes. Rather than minimizing layer-wise reconstruction error over all weights equally, AWQ identifies salient channels by analyzing activation statistics and applies a per-channel scale factor before quantization, protecting those channels from large quantization error. AWQ is hardware-friendly because the scaling can be absorbed into adjacent LayerNorm operations.
 
@@ -324,8 +324,8 @@ The critical cost is **pipeline bubble**: with P pipeline stages and M microbatc
 Meaningful LLM serving observability requires distinguishing three layers:
 
 **Service-level metrics** (business impact):
-- **Time to First Token (TTFT)**: Latency from request arrival to first output token. Dominated by prefill compute. SLA target: <200 ms for interactive use.
-- **Time Between Tokens (TBT)** / Inter-Token Latency (ITL): Latency per decode step. Dominated by KV-cache memory bandwidth. SLA target: <30 ms for real-time streaming.
+- **Time to First Token (TTFT)**: Latency from request arrival to first output token. Dominated by prefill compute. SLA target: < 200 ms for interactive use.
+- **Time Between Tokens (TBT)** / Inter-Token Latency (ITL): Latency per decode step. Dominated by KV-cache memory bandwidth. SLA target: < 30 ms for real-time streaming.
 - **Request throughput**: Requests completed per second. Limited by continuous batching efficiency.
 - **Token throughput**: Output tokens generated per second across all requests.
 

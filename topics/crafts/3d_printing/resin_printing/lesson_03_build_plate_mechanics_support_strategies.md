@@ -38,36 +38,28 @@ The build plate surface itself matters as much as the exposure parameters. A fre
 
 To optimize peel mechanics, you must understand the complete sequence of events that the printer executes per layer. Each cycle is not merely "expose and lift" — it is a phased mechanical sequence where timing decisions at every step affect forces, cure quality, and dimensional accuracy.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     RESIN LAYER CYCLE                               │
-│                                                                     │
-│  1. SETTLE                                                          │
-│     Build plate descends to layer Z position                        │
-│     Rest time: 0.5–2 s (resin flows to uniform thickness)           │
-│                                                                     │
-│  2. EXPOSE                                                          │
-│     UV array fires for layer exposure time                          │
-│     Cross-links photopolymer against FEP                            │
-│                                                                     │
-│  3. LIFT (Phase 1 — Peel)                                           │
-│     Stepper/leadscrew raises plate at peel speed (40–80 mm/min)     │
-│     FEP flexes upward; delamination front propagates                │
-│     Peak force occurs here — highest risk of print failure          │
-│                                                                     │
-│  4. LIFT (Phase 2 — Clear)                                          │
-│     Plate continues to retract distance (5–8 mm typical)            │
-│     Accelerates to fast travel speed (200–400 mm/min)               │
-│     Resin surface levels; bubbles escape                             │
-│                                                                     │
-│  5. RETURN                                                          │
-│     Plate descends rapidly toward next layer position               │
-│     Decelerates near FEP to avoid resin splash                      │
-│                                                                     │
-│  6. REST (Bottom of stroke)                                         │
-│     Settles at exact layer Z; rest delay 1–3 s                      │
-│     Returns to Step 2                                               │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["1. SETTLE<br/>Build plate descends to layer Z<br/>Rest time: 0.5–2 s"]
+    B["2. EXPOSE<br/>UV array fires for layer exposure<br/>Cross-links photopolymer against FEP"]
+    C["3. LIFT Phase 1 — Peel<br/>Stepper raises plate at peel speed 40–80 mm/min<br/>FEP flexes; delamination propagates<br/>Peak force — highest risk of failure"]
+    D["4. LIFT Phase 2 — Clear<br/>Plate retracts 5–8 mm typical<br/>Accelerates to fast travel 200–400 mm/min<br/>Resin levels; bubbles escape"]
+    E["5. RETURN<br/>Plate descends rapidly toward next layer<br/>Decelerates near FEP to avoid splash"]
+    F["6. REST<br/>Settles at exact layer Z<br/>Rest delay 1–3 s"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> A
+    
+    style A fill:#e1f5ff
+    style B fill:#fff3e0
+    style C fill:#ffebee
+    style D fill:#f3e5f5
+    style E fill:#e8f5e9
+    style F fill:#fce4ec
 ```
 
 The peel speed in Step 3 is one of the most consequential parameters you can tune. A slow peel (40–60 mm/min) gives the FEP film time to flex progressively, keeping peak force low. A fast peel (120+ mm/min) attempts to snap the FEP film faster than the cured resin can follow, which works for extremely small cross-sections but fails catastrophically on large ones. ELEGOO, Phrozen, and Anycubic all support variable lift speed sequences — sometimes called "TSMC" lift in community firmware — where the first 1–3 mm of lift executes at slow peel speed and the remaining retract distance executes at fast travel speed. This achieves the minimum peak force while keeping overall cycle time reasonable.
@@ -98,23 +90,39 @@ Raft size should extend at least 2–4 mm beyond the outer footprint of the supp
 
 ### Orientation Strategy: Cross-Section, Angle, and Feature Priority
 
-```
-                ORIENTATION IMPACT ON LAYER CROSS-SECTION
-
-  BAD: Flat horizontal orientation         GOOD: 30–45° angled orientation
-  ┌────────────────────────────┐           ┌──────────────────────────────┐
-  │  Build Plate               │           │  Build Plate                 │
-  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │           │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
-  │  │  │  │  │  │  │  │  │  │           │          /                   │
-  │  Supports (many, tall)     │           │        /  Part at angle      │
-  │                            │           │      /                       │
-  │  ████████████████████████  │           │    /──────────────────       │
-  │  FLAT PART (huge layer     │           │  / Narrow layer slice:       │
-  │  cross-section = max peel) │           │  minimal peel force          │
-  └────────────────────────────┘           └──────────────────────────────┘
-  Peak peel force: MAXIMUM                 Peak peel force: MINIMIZED
-  Suction effect:  SEVERE                  Suction effect:  MINIMAL
-  FEP stress:      HIGH                    FEP stress:      LOW
+```mermaid
+flowchart LR
+    subgraph bad ["❌ BAD: Flat Horizontal Orientation"]
+        BP1["Build Plate"]
+        S1["Supports<br/>many, tall"]
+        FP1["FLAT PART<br/>huge layer cross-section<br/>= max peel"]
+        PF1["Peak peel force:<br/>MAXIMUM"]
+        SE1["Suction effect:<br/>SEVERE"]
+        FEP1["FEP stress:<br/>HIGH"]
+        
+        BP1 --> S1
+        S1 --> FP1
+        FP1 --> PF1
+        FP1 --> SE1
+        FP1 --> FEP1
+    end
+    
+    subgraph good ["✓ GOOD: 30–45° Angled Orientation"]
+        BP2["Build Plate"]
+        PA2["Part at angle<br/>30–45°"]
+        NLS2["Narrow layer slice<br/>minimal peel force"]
+        PF2["Peak peel force:<br/>MINIMIZED"]
+        SE2["Suction effect:<br/>MINIMAL"]
+        FEP2["FEP stress:<br/>LOW"]
+        
+        BP2 --> PA2
+        PA2 --> NLS2
+        NLS2 --> PF2
+        NLS2 --> SE2
+        NLS2 --> FEP2
+    end
+    
+    bad -.->|Orientation Impact| good
 ```
 
 Optimal orientation for a given part emerges from weighing four competing considerations: minimizing peak layer cross-section (to reduce peel force), minimizing total support contact marks on critical surfaces, aligning layer lines perpendicular to the primary stress direction of the finished part (since inter-layer bonds are weaker than intra-layer bonds), and distributing unsupported spans to avoid long horizontal bridges.

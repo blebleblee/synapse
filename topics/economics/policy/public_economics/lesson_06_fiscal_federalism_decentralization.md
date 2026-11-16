@@ -74,40 +74,22 @@ The mechanics of soft budget constraints in federal systems operate through the 
 
 Institutional mechanisms to harden budget constraints include numerical fiscal rules enforced through constitutional or statutory provisions, independent fiscal councils that monitor compliance and impose reputational costs on violators, and explicit no-bailout clauses that expose subnational debt to default risk. The U.S. state bankruptcy prohibition and the resulting market discipline imposed by credit rating agencies and differential borrowing costs represent one pole of this institutional spectrum, while the European Central Bank's bond-buying programs during the Eurozone crisis illustrate the difficulty of maintaining no-bailout credibility when systemic financial stability is at stake.
 
-```
-Federal Fiscal Architecture Flow:
-
-┌────────────────────────────────────────────────────────┐
-│          CENTRAL GOVERNMENT                            │
-│  • Stabilization policy (countercyclical)              │
-│  • Redistributive taxation (progressive income tax)    │
-│  • Mobile base taxation (capital, corporate profits)   │
-│  • National public goods (defense, monetary policy)    │
-└──────────────┬──────────────────────┬──────────────────┘
-               │                      │
-               │ Vertical Transfers   │ Mandates & Regulation
-               │ (equalization,       │ (service standards,
-               │  matching grants)    │  debt limits)
-               ▼                      ▼
-┌──────────────────────────┬──────────────────────────┐
-│   SUBNATIONAL GOVT (A)   │   SUBNATIONAL GOVT (B)   │
-│ • Local public goods     │ • Local public goods     │
-│ • Immobile base taxation │ • Immobile base taxation │
-│   (property, land value) │   (property, land value) │
-│ • Service delivery       │ • Service delivery       │
-└────────┬─────────────────┴───────────┬──────────────┘
-         │                             │
-         │ Horizontal Tax Competition  │
-         │ (race to bottom on mobile   │
-         │  capital taxation)          │
-         └─────────────────────────────┘
-                       │
-                       ▼
-              ┌───────────────────┐
-              │   HOUSEHOLDS      │
-              │ Tiebout sorting   │
-              │ (vote with feet)  │
-              └───────────────────┘
+```mermaid
+flowchart TD
+    CG["CENTRAL GOVERNMENT<br/>• Stabilization policy (countercyclical)<br/>• Redistributive taxation (progressive income tax)<br/>• Mobile base taxation (capital, corporate profits)<br/>• National public goods (defense, monetary policy)"]
+    
+    CG -->|"Vertical Transfers<br/>(equalization,<br/>matching grants)"| SGA["SUBNATIONAL GOVT (A)<br/>• Local public goods<br/>• Immobile base taxation<br/>(property, land value)<br/>• Service delivery"]
+    
+    CG -->|"Vertical Transfers<br/>(equalization,<br/>matching grants)"| SGB["SUBNATIONAL GOVT (B)<br/>• Local public goods<br/>• Immobile base taxation<br/>(property, land value)<br/>• Service delivery"]
+    
+    CG -->|"Mandates & Regulation<br/>(service standards,<br/>debt limits)"| SGA
+    
+    CG -->|"Mandates & Regulation<br/>(service standards,<br/>debt limits)"| SGB
+    
+    SGA <-->|"Horizontal Tax Competition<br/>(race to bottom on mobile<br/>capital taxation)"| SGB
+    
+    SGA --> HH["HOUSEHOLDS<br/>Tiebout sorting<br/>(vote with feet)"]
+    SGB --> HH
 ```
 
 The policy architecture of matching grants for correcting spillovers requires careful calibration of the matching rate to the empirical magnitude of externalities. Consider a provincial investment in higher education that generates benefits both to residents who attend in-state institutions and remain in-state after graduation and to other provinces that receive skilled migrants trained at the first province's expense. If empirical estimates suggest that 30% of graduates emigrate within five years, the optimal federal matching grant should reimburse the origin province for 30% of educational expenditures, raising the effective return on investment and inducing efficient provision levels. However, implementation faces the challenge of estimating spillover magnitudes, which vary by field of study, institution quality, and regional labor market conditions.

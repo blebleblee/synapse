@@ -41,53 +41,46 @@ Caramelization, often conflated with the Maillard reaction, is a wholly differen
 The following diagram maps the sequential state transitions a baking loaf undergoes, from oven entry to finished internal temperature, and the heat transfer modes and chemical reactions active at each stage.
 
 ```mermaid
-stateDiagram-v2
-    direction LR
-
-    [*] --> OvenEntry : Shaped dough loaded
-
-    state OvenEntry {
-        [*] --> SteamPhase
-        SteamPhase : Surface condensation\nCrust pliability maintained\nConvective + Radiant heat
-    }
-
-    OvenEntry --> OvenSpring : 0–7 min | Surface < 60°C
-
-    state OvenSpring {
-        [*] --> GasExpansion
-        GasExpansion : CO₂ de-solvation\nEthanol vaporization\nThermal gas expansion (PV=nRT)
-        GasExpansion --> GlutenExtension
-        GlutenExtension : Gluten elongates\nGas cells expand\nScore opens
-    }
-
-    OvenSpring --> GelatinizationZone : Internal temp 60°C–85°C
-
-    state GelatinizationZone {
-        [*] --> StarchSwelling
-        StarchSwelling : Granule hydration\nCrystalline → amorphous\nFree water binding
-        StarchSwelling --> ProteinDenaturation
-        ProteinDenaturation : Glutenin/gliadin cross-links set\nCrumb structure locked\nElasticity lost
-    }
-
-    GelatinizationZone --> CrustDrying : Surface temp crosses 100°C
-
-    state CrustDrying {
-        [*] --> WaterEvacuation
-        WaterEvacuation : Surface Aw drops below 0.9\nMoisture migrates inward\nCrust temp rises past 130°C
-    }
-
-    CrustDrying --> BrowningReactions : Crust temp 130°C–200°C
-
-    state BrowningReactions {
-        [*] --> MaillardReaction
-        MaillardReaction : Reducing sugars + amino acids\nPyrazines, furans, melanoidins\nRate doubles per 10°C rise
-        MaillardReaction --> Caramelization
-        Caramelization : Fructose 110°C / Sucrose 160°C\nCaramel polymers\nColorant and sweetness
-    }
-
-    BrowningReactions --> FullyBaked : Internal temp 92°C–98°C
-
-    FullyBaked --> [*] : Remove, cool on wire rack\nMoisture redistribution 20–30 min
+flowchart LR
+    Start([Start]) --> OvenEntry
+    
+    subgraph OvenEntry["Oven Entry"]
+        OE1["Steam Phase<br/>Surface condensation<br/>Crust pliability maintained<br/>Convective + Radiant heat"]
+    end
+    
+    OvenEntry -->|"0–7 min | Surface < 60°C"| OvenSpring
+    
+    subgraph OvenSpring["Oven Spring"]
+        OS1["Gas Expansion<br/>CO₂ de-solvation<br/>Ethanol vaporization<br/>Thermal gas expansion (PV=nRT)"]
+        OS2["Gluten Extension<br/>Gluten elongates<br/>Gas cells expand<br/>Score opens"]
+        OS1 --> OS2
+    end
+    
+    OvenSpring -->|"Internal temp 60°C–85°C"| GelatinizationZone
+    
+    subgraph GelatinizationZone["Gelatinization Zone"]
+        GZ1["Starch Swelling<br/>Granule hydration<br/>Crystalline → amorphous<br/>Free water binding"]
+        GZ2["Protein Denaturation<br/>Glutenin/gliadin cross-links set<br/>Crumb structure locked<br/>Elasticity lost"]
+        GZ1 --> GZ2
+    end
+    
+    GelatinizationZone -->|"Surface temp crosses 100°C"| CrustDrying
+    
+    subgraph CrustDrying["Crust Drying"]
+        CD1["Water Evacuation<br/>Surface Aw drops below 0.9<br/>Moisture migrates inward<br/>Crust temp rises past 130°C"]
+    end
+    
+    CrustDrying -->|"Crust temp 130°C–200°C"| BrowningReactions
+    
+    subgraph BrowningReactions["Browning Reactions"]
+        BR1["Maillard Reaction<br/>Reducing sugars + amino acids<br/>Pyrazines, furans, melanoidins<br/>Rate doubles per 10°C rise"]
+        BR2["Caramelization<br/>Fructose 110°C / Sucrose 160°C<br/>Caramel polymers<br/>Colorant and sweetness"]
+        BR1 --> BR2
+    end
+    
+    BrowningReactions -->|"Internal temp 92°C–98°C"| FullyBaked["Fully Baked"]
+    
+    FullyBaked -->|"Remove, cool on wire rack<br/>Moisture redistribution 20–30 min"| End([End])
 ```
 
 The transition from GelatinizationZone to CrustDrying is the critical junction in the baking arc. If the crust dries and hardens before the interior completes gelatinization — which happens when oven spring steam is insufficient or oven temperature is too high too early — the crumb is permanently compromised regardless of how long the loaf subsequently bakes. The baker's instrument at this junction is a combination of steam management, oven temperature, and the loaf's initial dough temperature going into the oven.

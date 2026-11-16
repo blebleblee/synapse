@@ -168,7 +168,7 @@ Establish a reference database of empirical performance specifications for virgi
 - Mata socket (2001–2003 generation): 1.15–1.35 mN·m baseline, 0.9–1.05 mN·m after 2000 cycles
 - Metru socket (2004–2005 generation): 1.50–1.80 mN·m baseline, 1.25–1.55 mN·m after 2000 cycles  
 - Inika socket (2006–2008 generation): 1.90–2.35 mN·m baseline, 1.60–2.05 mN·m after 2000 cycles
-- Virgin factory specification: <5° droop under standard loading, indicating holding torque >1.20 mN·m
+- Virgin factory specification: < 5° droop under standard loading, indicating holding torque >1.20 mN·m
 
 **Gear Train Transmission Efficiency (per mesh interface):**
 - Standard mesh spacing (nominal center-to-center): 96–98% single-stage efficiency, 92–96% two-stage efficiency
@@ -202,21 +202,21 @@ When confronting unexpected performance deficiencies or functional failures in B
 
 **Symptom: Pose instability with progressive limb droop during static display**
 
-*Initial Assessment:* Measure droop angle progression over 60-second interval. Droop <5° indicates acceptable performance within specification. Droop 5–15° suggests marginal joint performance requiring optimization. Droop >15° indicates substandard joint friction requiring immediate intervention.
+*Initial Assessment:* Measure droop angle progression over 60-second interval. Droop < 5° indicates acceptable performance within specification. Droop 5–15° suggests marginal joint performance requiring optimization. Droop >15° indicates substandard joint friction requiring immediate intervention.
 
 *Inspection Level 1 (Non-Destructive):* Visually examine socket-ball interface for incomplete seating, indicated by visible gap between ball equator and socket rim. Verify ball fully inserted by applying gentle axial compression—correctly seated joints exhibit zero compliance, while incompletely inserted balls compress 1–2 mm during seating. Check for interference from adjacent armor or structural elements that prevent complete socket closure.
 
 *Inspection Level 2 (Articulation Testing):* Exercise joint through complete range of motion, assessing smoothness and detecting binding points. Smooth articulation with uniform resistance indicates proper assembly and acceptable wear state. Rough articulation with discrete clicking suggests particulate contamination or damaged detent ridges. Highly variable resistance with tight and loose zones indicates socket deformation or asymmetric ball wear.
 
-*Quantitative Testing:* Measure holding torque using cantilever droop protocol, comparing result against baseline specifications. Holding torque >80% of virgin specification indicates acceptable joint condition—consider mass distribution optimization or armor repositioning to reduce gravitational moment. Holding torque 50–80% of specification suggests moderate wear—implement friction enhancement through surface roughening or external compression reinforcement. Holding torque <50% of specification indicates severe wear or damage—component replacement required.
+*Quantitative Testing:* Measure holding torque using cantilever droop protocol, comparing result against baseline specifications. Holding torque >80% of virgin specification indicates acceptable joint condition—consider mass distribution optimization or armor repositioning to reduce gravitational moment. Holding torque 50–80% of specification suggests moderate wear—implement friction enhancement through surface roughening or external compression reinforcement. Holding torque < 50% of specification indicates severe wear or damage—component replacement required.
 
 *Root Cause Determination:* Disassemble joint and measure ball diameter and socket bore diameter using precision calipers. Ball diameter 0.2+ mm below nominal or socket bore 0.3+ mm above nominal confirms geometric degradation beyond restoration capacity. Surface polishing wear without dimensional change indicates friction coefficient degradation amenable to texture renewal treatment. Stress whitening or visible cracking in socket walls indicates plastic yield or fatigue damage requiring socket replacement.
 
 **Symptom: Gear train exhibiting excessive backlash or low transmission efficiency**
 
-*Initial Assessment:* Measure input-output rotation ratio and compare against theoretical gear ratio. Efficiency >90% indicates acceptable performance for typical applications. Efficiency 80–90% suggests elevated friction or backlash requiring optimization. Efficiency <80% indicates significant mechanical losses demanding investigation.
+*Initial Assessment:* Measure input-output rotation ratio and compare against theoretical gear ratio. Efficiency >90% indicates acceptable performance for typical applications. Efficiency 80–90% suggests elevated friction or backlash requiring optimization. Efficiency < 80% indicates significant mechanical losses demanding investigation.
 
-*Backlash Measurement:* Quantify angular play at input pinion using bidirectional rotation protocol. Backlash <10° indicates properly meshed gears at appropriate spacing. Backlash 10–20° suggests loose mesh or worn teeth warranting axle repositioning. Backlash >20° confirms excessive clearance requiring immediate correction through spacing reduction or component replacement.
+*Backlash Measurement:* Quantify angular play at input pinion using bidirectional rotation protocol. Backlash < 10° indicates properly meshed gears at appropriate spacing. Backlash 10–20° suggests loose mesh or worn teeth warranting axle repositioning. Backlash >20° confirms excessive clearance requiring immediate correction through spacing reduction or component replacement.
 
 *Visual Gear Mesh Inspection:* Rotate gear train slowly by hand while observing tooth engagement pattern. Proper mesh exhibits continuous contact throughout rotation cycle with minimal clearance between tooth flanks. Visible gaps >0.5 mm indicate loose mesh from excessive center-to-center distance. Binding or irregular rotation indicates tight mesh, misalignment, or tooth damage. Inspect tooth profiles for wear indicators: polished contact zones, chipped tooth tips, or stress whitening at root fillets.
 
@@ -252,7 +252,7 @@ Operational models subjected to frequent articulation, dynamic play scenarios, o
 - Complete disassembly of critical structural paths: spine, primary limbs, head attachment
 - Component dimensional measurement: ball stud diameters, socket bore dimensions, axle straightness
 - Gear tooth visual inspection under magnification for wear progression, chip formation, root fillet cracking
-- Replacement of components showing wear indicators: holding torque <70% baseline, visible tooth damage, stress whitening >30% of socket wall area
+- Replacement of components showing wear indicators: holding torque < 70% baseline, visible tooth damage, stress whitening >30% of socket wall area
 
 **Annual Overhaul (high-value models, historical preservation pieces):**
 - Complete disassembly to individual component level with photographic documentation of original configuration

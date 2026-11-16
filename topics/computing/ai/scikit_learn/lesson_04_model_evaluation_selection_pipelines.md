@@ -32,15 +32,81 @@ Splitters are iterators that yield train/test index arrays for each cross-valida
 
 The cross-validation orchestrator, `cross_validate`, accepts an estimator, data X and y, a splitter or integer K, a scorer or list of scorers, and optional parallelization settings. It iterates over the folds produced by the splitter, clones the estimator for each fold to ensure independence, fits the clone on the training indices, evaluates the clone on the test indices using each specified scorer, and optionally records fit times, score times, and the fitted estimators themselves. Results are returned as a dictionary of NumPy arrays indexed by metric name, enabling statistical analysis across folds. The related `cross_val_score` function is a simplified interface that returns only test scores for a single metric.
 
-```
-Fold 0:  [────── train ──────][test]
-Fold 1:  [test][────── train ──────]
-Fold 2:  [── train ──][test][── train ──]
+```mermaid
+flowchart TD
 
-TimeSeriesSplit:
-Fold 0:  [train]              [test]
-Fold 1:  [──── train ─────]   [test]
-Fold 2:  [────── train ──────][test]
+    subgraph KFold ["K-Fold Cross-Validation"]
+        direction LR
+
+        subgraph kf0 ["Fold 0"]
+            direction LR
+            kf0_train["🟦 Train"]
+            kf0_test["🟧 Test"]
+            kf0_train --> kf0_test
+        end
+
+        subgraph kf1 ["Fold 1"]
+            direction LR
+            kf1_test["🟧 Test"]
+            kf1_train["🟦 Train"]
+            kf1_test --> kf1_train
+        end
+
+        subgraph kf2 ["Fold 2"]
+            direction LR
+            kf2_train_a["🟦 Train"]
+            kf2_test["🟧 Test"]
+            kf2_train_b["🟦 Train"]
+            kf2_train_a --> kf2_test --> kf2_train_b
+        end
+    end
+
+    subgraph TSSplit ["TimeSeriesSplit (Walk-Forward Validation)"]
+        direction LR
+
+        subgraph ts0 ["Fold 0"]
+            direction LR
+            ts0_train["🟦 Train"]
+            ts0_gap0[" "]
+            ts0_test["🟧 Test"]
+            ts0_train --> ts0_gap0 --> ts0_test
+        end
+
+        subgraph ts1 ["Fold 1"]
+            direction LR
+            ts1_train["🟦 Train (expanded)"]
+            ts1_gap1[" "]
+            ts1_test["🟧 Test"]
+            ts1_train --> ts1_gap1 --> ts1_test
+        end
+
+        subgraph ts2 ["Fold 2"]
+            direction LR
+            ts2_train["🟦 Train (full)"]
+            ts2_test["🟧 Test"]
+            ts2_train --> ts2_test
+        end
+    end
+
+    KFold -->|"shuffled splits\n(no temporal order)"| TSSplit
+
+    style kf0_train  fill:#4A90D9,color:#fff,stroke:#2c6fad
+    style kf1_train  fill:#4A90D9,color:#fff,stroke:#2c6fad
+    style kf2_train_a fill:#4A90D9,color:#fff,stroke:#2c6fad
+    style kf2_train_b fill:#4A90D9,color:#fff,stroke:#2c6fad
+    style ts0_train  fill:#4A90D9,color:#fff,stroke:#2c6fad
+    style ts1_train  fill:#4A90D9,color:#fff,stroke:#2c6fad
+    style ts2_train  fill:#4A90D9,color:#fff,stroke:#2c6fad
+
+    style kf0_test   fill:#E8853D,color:#fff,stroke:#b35e1a
+    style kf1_test   fill:#E8853D,color:#fff,stroke:#b35e1a
+    style kf2_test   fill:#E8853D,color:#fff,stroke:#b35e1a
+    style ts0_test   fill:#E8853D,color:#fff,stroke:#b35e1a
+    style ts1_test   fill:#E8853D,color:#fff,stroke:#b35e1a
+    style ts2_test   fill:#E8853D,color:#fff,stroke:#b35e1a
+
+    style ts0_gap0   fill:none,stroke:none,color:transparent
+    style ts1_gap1   fill:none,stroke:none,color:transparent
 ```
 
 Grid search is implemented by `GridSearchCV`, which wraps an estimator and accepts a `param_grid` dictionary mapping hyperparameter names to lists of candidate values. It computes the Cartesian product of these lists, generating all possible configurations. For each configuration, it performs cross-validation using the specified splitter and scorer, recording the mean and standard deviation of test scores across folds. After evaluating all configurations, it identifies the one with the best mean score, refits the estimator on the entire dataset using the optimal hyperparameters, and stores this final model as `best_estimator_`. The `cv_results_` attribute provides a detailed record of all evaluations as a dictionary of NumPy arrays, including per-fold scores, mean test scores, standard deviations, parameter values, and timings. This dataframe-like structure enables post-hoc analysis of the hyperparameter response surface.

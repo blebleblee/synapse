@@ -34,30 +34,67 @@ The instrumentation strategy depends on the failure's temporal characteristics. 
 
 For faults occurring at microsecond to millisecond timescales—such as power supply transients during load steps or signal integrity violations during burst data transfers—mixed-signal oscilloscopes with sufficient bandwidth and sample rate serve as the primary diagnostic tool. For faults manifesting over seconds to minutes—thermal drift, charge pump leakage, or slow control loop oscillations—data loggers continuously recording voltage, current, or temperature provide the necessary temporal resolution. For faults appearing only after hours or days of operation—electromigration failures, dielectric breakdown, or memory retention loss—accelerated life testing combines elevated temperature, increased voltage stress, and extended operational duty cycles to compress the failure timeline into practical test durations.
 
-```
-Signal Flow Analysis: Microcontroller System
+```mermaid
+flowchart TD
+    subgraph PWR["Power Domain"]
+        PWR1["Battery/USB"]
+        PWR2["LDO Regulator"]
+        PWR3["3.3V Rail"]
+        PWR4["MCU VDD"]
+        PWR5["Analog VDD"]
+        PWR6["ADC Reference"]
+        PWR1 --> PWR2
+        PWR2 --> PWR3
+        PWR3 --> PWR4
+        PWR3 --> PWR5
+        PWR5 --> PWR6
+    end
 
-Power Domain:
-  [Battery/USB] ---> [LDO Regulator] ---> [3.3V Rail] ---> [MCU VDD]
-                                      |
-                                      +-> [Analog VDD] ---> [ADC Reference]
+    subgraph CLK["Clock Domain"]
+        CLK1["16 MHz Crystal"]
+        CLK2["OSC Input"]
+        CLK3["PLL x4"]
+        CLK4["64 MHz Core Clock"]
+        CLK5["÷2"]
+        CLK6["32 MHz Peripheral Clock"]
+        CLK1 --> CLK2
+        CLK2 --> CLK3
+        CLK3 --> CLK4
+        CLK3 --> CLK5
+        CLK5 --> CLK6
+    end
 
-Clock Domain:
-  [16 MHz Crystal] ---> [OSC Input] ---> [PLL x4] ---> [64 MHz Core Clock]
-                                                    |
-                                                    +-> [/2] ---> [32 MHz Peripheral Clock]
+    subgraph DATA["Data Path"]
+        DATA1["Sensor"]
+        DATA2["OpAmp Buffer"]
+        DATA3["RC Filter"]
+        DATA4["ADC Channel"]
+        DATA5["DMA"]
+        DATA6["SRAM"]
+        DATA7["CPU"]
+        DATA8["UART TX"]
+        DATA1 --> DATA2
+        DATA2 --> DATA3
+        DATA3 --> DATA4
+        DATA4 --> DATA5
+        DATA5 --> DATA6
+        DATA6 --> DATA7
+        DATA7 --> DATA8
+    end
 
-Data Path:
-  [Sensor] ---> [OpAmp Buffer] ---> [RC Filter] ---> [ADC Channel] ---> [DMA] ---> [SRAM]
-                                                                                 |
-                                                                                 +-> [CPU] ---> [UART TX]
+    subgraph MEAS["Measurement Points"]
+        MEAS1["P1: Battery voltage<br/>DC, 3.7-4.2V"]
+        MEAS2["P2: LDO output ripple<br/>AC-coupled, &lt;50mV p-p"]
+        MEAS3["P3: Crystal oscillation<br/>10X probe, 16 MHz, 1V p-p"]
+        MEAS4["P4: ADC input voltage<br/>match sensor spec"]
+        MEAS5["P5: UART output<br/>115200 baud, 8N1"]
+    end
 
-Measurement Points:
-  P1: Battery voltage (DC, expect 3.7-4.2V)
-  P2: LDO output ripple (AC-coupled, <50mV p-p)
-  P3: Crystal oscillation (10X probe, 16 MHz sine, 1V p-p)
-  P4: ADC input voltage (match sensor output specification)
-  P5: UART output (logic analyzer, 115200 baud, 8N1 framing)
+    PWR1 -.->|P1| MEAS1
+    PWR2 -.->|P2| MEAS2
+    CLK1 -.->|P3| MEAS3
+    DATA4 -.->|P4| MEAS4
+    DATA8 -.->|P5| MEAS5
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

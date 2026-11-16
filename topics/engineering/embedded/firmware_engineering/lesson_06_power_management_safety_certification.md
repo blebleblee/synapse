@@ -32,30 +32,16 @@ Modern ARM Cortex-M microcontrollers expose power management through the ARM Pow
 
 The hardware state machine transitions between these modes through a combination of direct register writes and interrupt-driven events. Consider the STM32H745 dual-core MCU power state diagram:
 
-```
-           ┌─────────────────┐
-           │   Run Mode      │
-           │ (max frequency) │
-           └────────┬────────┘
-                    │ WFI instruction / no interrupts
-                    ▼
-           ┌─────────────────┐
-           │  Sleep Mode     │
-           │ (CPU halted)    │
-           └────────┬────────┘
-                    │ Interrupt or EXTI event
-                    ▼
-         ┌──────────────────────┐
-         │  Deep Sleep Modes    │
-         │ (Stop 0/1/2)         │
-         │ (clock gating)       │
-         └────────┬─────────────┘
-                  │ Wake-up source or RTC
-                  ▼
-         ┌──────────────────────┐
-         │  Standby Mode        │
-         │ (RTC only)           │
-         └──────────────────────┘
+```mermaid
+flowchart TD
+    RUN["Run Mode\n(max frequency)"]
+    SLEEP["Sleep Mode\n(CPU halted)"]
+    DEEP["Deep Sleep Modes\n(Stop 0/1/2)\n(clock gating)"]
+    STANDBY["Standby Mode\n(RTC only)"]
+
+    RUN -->|"WFI instruction / no interrupts"| SLEEP
+    SLEEP -->|"Interrupt or EXTI event"| DEEP
+    DEEP -->|"Wake-up source or RTC"| STANDBY
 ```
 
 Each transition involves precise register manipulation. For an STM32H7 device entering Stop 1 mode, firmware must:
@@ -445,3 +431,4 @@ IWDG->RLR = 8000U;  /* Unsigned literal */
 ```c
 /* MISRA violation */
 if (PWR->SR2 & 0x100) {  /* Mixing int (0x100) with uint32_t (PWR->SR2) */
+```

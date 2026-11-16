@@ -22,31 +22,19 @@ The formal invariants that govern correct concurrent Go programs are these: ever
 
 A Go channel is not a simple queue. At the runtime level, a channel is a heap-allocated `hchan` struct. Its architecture directly explains channel semantics, blocking behavior, and the cost model you must carry when designing channel-heavy systems.
 
-```
-+-----------------------------------------------------------+
-|                        hchan                              |
-|-----------------------------------------------------------|
-|  qcount   uint          // current elements in buf        |
-|  dataqsiz uint          // capacity of circular buffer    |
-|  buf      unsafe.Pointer// ring buffer (for buffered ch.) |
-|  elemsize uint16        // element size in bytes          |
-|  closed   uint32        // 1 if channel is closed         |
-|  elemtype *_type        // type descriptor for GC         |
-|  sendx    uint          // send index into ring buffer    |
-|  recvx    uint          // receive index into ring buffer |
-|  recvq    waitq         // goroutines blocked on receive  |
-|  sendq    waitq         // goroutines blocked on send     |
-|  lock     mutex         // internal spinlock              |
-+-----------------------------------------------------------+
-            |
-            v  waitq is a doubly-linked list of sudog
-+---------------------------+     +---------------------------+
-|  sudog                    |---->|  sudog                    |
-|  g    *g    (goroutine)   |     |  g    *g                  |
-|  elem unsafe.Pointer      |     |  elem unsafe.Pointer      |
-|  next *sudog              |     |  next *sudog              |
-|  prev *sudog              |     |  prev *sudog              |
-+---------------------------+     +---------------------------+
+```mermaid
+flowchart TD
+    hchan["<b>hchan</b><br/>─────────────────────────────<br/>qcount &nbsp;&nbsp; uint &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// current elements in buf<br/>dataqsiz uint &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// capacity of circular buffer<br/>buf &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsafe.Pointer // ring buffer<br/>elemsize uint16 &nbsp;&nbsp;&nbsp;&nbsp;// element size in bytes<br/>closed &nbsp;&nbsp; uint32 &nbsp;&nbsp;&nbsp;&nbsp;// 1 if channel is closed<br/>elemtype *_type &nbsp;&nbsp;&nbsp;&nbsp;// type descriptor for GC<br/>sendx &nbsp;&nbsp;&nbsp; uint &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// send index into ring buffer<br/>recvx &nbsp;&nbsp;&nbsp; uint &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// receive index into ring buffer<br/>recvq &nbsp;&nbsp;&nbsp; waitq &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// goroutines blocked on receive<br/>sendq &nbsp;&nbsp;&nbsp; waitq &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// goroutines blocked on send<br/>lock &nbsp;&nbsp;&nbsp;&nbsp; mutex &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// internal spinlock"]
+
+    subgraph waitq ["waitq — doubly-linked list of sudog"]
+        direction LR
+        sudog1["<b>sudog</b><br/>──────────────────────<br/>g &nbsp;&nbsp;&nbsp; *g &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (goroutine)<br/>elem unsafe.Pointer<br/>next *sudog<br/>prev *sudog"]
+        sudog2["<b>sudog</b><br/>──────────────────────<br/>g &nbsp;&nbsp;&nbsp; *g &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (goroutine)<br/>elem unsafe.Pointer<br/>next *sudog<br/>prev *sudog"]
+        sudog1 -->|next| sudog2
+        sudog2 -->|prev| sudog1
+    end
+
+    hchan -->|"recvq / sendq"| waitq
 ```
 
 A send operation on a full buffered channel, or any send on an unbuffered channel with no waiting receiver, allocates a `sudog` (a "sudo-goroutine" wrapper), appends it to `sendq`, and parks the goroutine via a `gopark` call. The OS thread is not blocked; the scheduler simply runs the next available goroutine. When a receiver eventually arrives, it checks `sendq`, finds the waiting sender, copies the element *directly* from the sender's stack into its own receiving variable (bypassing the ring buffer entirely for this case), and unparks the sender. This direct-copy optimization is non-obvious and important: when you send on an unbuffered channel to a waiting receiver, there is *no* intermediate buffer allocation, and the memory copy is a single `memmove` between two goroutine stacks, mediated by the scheduler.

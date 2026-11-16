@@ -26,27 +26,18 @@ The REST Admin API organizes its resource hierarchy around a versioned URL struc
 
 Authentication for REST API requests follows the OAuth 2.0 authorization code flow, beginning when a merchant clicks an "Install App" button that redirects their browser to Shopify's OAuth authorization page. This page displays the application's requested permission scopes—`read_products`, `write_orders`, `read_customers`—and prompts the merchant to approve access. Upon approval, Shopify redirects the merchant's browser back to the application's registered redirect URI with a one-time authorization code appended as a query parameter. The application's backend immediately exchanges this code for a permanent access token by POSTing to Shopify's token endpoint with the code, its client ID, and client secret. The response contains an access token (a long-lived bearer credential), the shop domain, and the granted scopes. This token must be stored securely in the application's database, typically encrypted at rest, and included in all subsequent API requests as an `X-Shopify-Access-Token` HTTP header.
 
-```
-Merchant Browser                  Shopify OAuth Server           Application Backend
-      |                                  |                              |
-      |  1. Click "Install"              |                              |
-      |--------------------------------->|                              |
-      |                                  |                              |
-      |  2. Authorization Page           |                              |
-      |<---------------------------------|                              |
-      |                                  |                              |
-      |  3. Approve Scopes               |                              |
-      |--------------------------------->|                              |
-      |                                  |                              |
-      |  4. Redirect with code           |                              |
-      |---------------------------------------------------------------->|
-      |                                  |                              |
-      |                                  |  5. Exchange code for token  |
-      |                                  |<-----------------------------|
-      |                                  |                              |
-      |                                  |  6. Return access token      |
-      |                                  |----------------------------->|
-      |                                  |                              |
+```mermaid
+flowchart TD
+    MB["Merchant Browser"]
+    OS["Shopify OAuth Server"]
+    AB["Application Backend"]
+    
+    MB -->|"1. Click 'Install'"| OS
+    OS -->|"2. Authorization Page"| MB
+    MB -->|"3. Approve Scopes"| OS
+    OS -->|"4. Redirect with code"| AB
+    AB -->|"5. Exchange code for token"| OS
+    OS -->|"6. Return access token"| AB
 ```
 
 Rate limiting in the REST API operates through a leaky bucket algorithm where each shop-application pair receives a bucket of 40 credits that refills at a rate of 2 credits per second. Standard GET requests consume 1 credit, while POST, PUT, and DELETE operations consume 2-4 credits depending on their complexity. Shopify includes rate limit state in every API response through three custom headers: `X-Shopify-Shop-Api-Call-Limit` shows current usage as a ratio like `32/40`, indicating 32 credits consumed from a 40-credit bucket. When applications exceed this limit, they receive a 429 status code with a `Retry-After` header indicating how many seconds to wait before retrying. High-volume applications must implement exponential backoff with jitter: after receiving a 429, wait the `Retry-After` duration plus a random interval between 0 and 1000 milliseconds to prevent thundering herd problems when multiple request threads retry simultaneously.
@@ -98,21 +89,13 @@ GraphQL rate limiting operates on a cost-based model where each query consumes p
 
 Webhook delivery begins when an application creates a webhook subscription through the REST API by POSTing to `/admin/api/2024-01/webhooks.json` with a payload specifying the `topic` (e.g., `orders/create`, `products/update`, `customers/delete`) and the `address` (the HTTPS URL where Shopify should POST event notifications). Shopify validates that the address uses HTTPS (plain HTTP endpoints are rejected to prevent credential leakage), registers the subscription in a distributed topic registry, and returns a webhook ID that the application can use to manage or delete the subscription later. When a subscribed event occurs—say, a customer completes checkout and creates an order—Shopify's event bus serializes the order resource as JSON, computes an HMAC-SHA256 signature over the payload using the application's client secret as the key, and POSTs the data to the registered address with the signature in the `X-Shopify-Hmac-Sha256` header and a unique event ID in the `X-Shopify-Webhook-Id` header.
 
-```
-Shopify Event Bus                    Application Webhook Endpoint
-      |                                        |
-      |  POST /webhooks/order_created          |
-      |  X-Shopify-Topic: orders/create        |
-      |  X-Shopify-Hmac-Sha256: abc123...      |
-      |  X-Shopify-Webhook-Id: uuid-string     |
-      |  X-Shopify-Shop-Domain: store.myshopify.com
-      |                                        |
-      |  Body: {order JSON payload}            |
-      |--------------------------------------->|
-      |                                        |
-      |                    200 OK or 201 Created
-      |<---------------------------------------|
-      |                                        |
+```mermaid
+flowchart LR
+    A["Shopify Event Bus"]
+    B["Application Webhook Endpoint"]
+    
+    A -->|"POST /webhooks/order_created<br/>X-Shopify-Topic: orders/create<br/>X-Shopify-Hmac-Sha256: abc123...<br/>X-Shopify-Webhook-Id: uuid-string<br/>X-Shopify-Shop-Domain: store.myshopify.com<br/>Body: {order JSON payload}"| B
+    B -->|"200 OK or 201 Created"| A
 ```
 
 Applications must verify the HMAC signature before processing the payload to ensure the request originated from Shopify and was not forged by an attacker. The verification algorithm concatenates the raw POST body (not JSON-parsed, but the literal byte string as received), computes HMAC-SHA256 using the application's client secret, base64-encodes the result, and compares it to the header value using a constant-time comparison function to prevent timing attacks. Only after successful verification should the application extract the webhook ID, check whether it has already processed this ID (to handle duplicate deliveries), and execute business logic based on the event data.
@@ -121,20 +104,16 @@ Webhook delivery guarantees follow an at-least-once model with exponential backo
 
 App Bridge architecture enables embedded applications to render user interfaces within the Shopify Admin while maintaining strict security boundaries through iframe sandboxing and controlled message passing. When a merchant navigates to an embedded application, Shopify renders the admin shell with its standard navigation and loads the application's frontend URL inside an iframe with the `sandbox` attribute set to `allow-scripts allow-same-origin allow-forms`, restricting the frame's access to the parent document and preventing direct cookie access. The application loads the App Bridge SDK, a JavaScript library that establishes a bidirectional communication channel with the parent frame through the postMessage API.
 
-```
-Shopify Admin Shell (Parent Frame)
-+----------------------------------------------------------+
-|  Navigation | App: Custom Inventory Manager             |
-|-------------|----------------------------------------------|
-|             |  <iframe src="https://app.example.com"      |
-|             |          sandbox="allow-scripts allow-same-origin"
-|             |          App Bridge SDK Loaded>             |
-|             |                                             |
-|             |    postMessage                              |
-|             |    <---------------->                       |
-|             |    Parent validates and executes actions    |
-|             |                                             |
-+----------------------------------------------------------+
+```mermaid
+flowchart LR
+    subgraph Parent ["Shopify Admin Shell (Parent Frame)"]
+        Nav["Navigation"]
+        ParentActions["Parent validates and executes actions"]
+        subgraph App ["App: Custom Inventory Manager"]
+            Iframe["<iframe><br>src: https://app.example.com<br>sandbox: allow-scripts allow-same-origin<br>App Bridge SDK Loaded"]
+        end
+    end
+    Iframe <--> |postMessage| ParentActions
 ```
 
 The application interacts with Shopify features by dispatching actions through the SDK rather than manipulating the DOM directly. To display a toast notification, the application calls `app.dispatch(Toast.Action.SHOW, {message: "Product saved", duration: 5000})`, which serializes this action as a postMessage event to the parent frame. Shopify's parent frame receives the message, validates that the action type is permitted for this application's scope, and executes the toast rendering using its own UI components. Similarly, to navigate the merchant to a different admin page, the application dispatches a `Redirect.Action.ADMIN_PATH` action with the target path, and Shopify handles the navigation while updating the browser's address bar. This architecture prevents malicious applications from executing JavaScript in the parent frame's context, reading session tokens from cookies, or navigating the merchant to phishing sites.

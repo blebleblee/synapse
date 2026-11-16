@@ -74,29 +74,27 @@ where **Y** is a geometric factor, **Δσ** is stress range, and **a** is crack 
 
 Complete fracture occurs when the remaining ligament can no longer support the applied load, leading to fast fracture through the final uncracked cross-section. The fracture surface exhibits a characteristic appearance: a smooth, creep-dominated region near the initiation site (fine, equiaxed dimples), transitioning to a rougher, fatigue-striated region in the propagation zone, and culminating in a rough, ductile overload region where final separation occurred. Cross-sectional metallography reveals the crack path: typically initiating at the IMC interface, propagating through the bulk solder along grain boundaries, and occasionally diverting into the IMC layer itself if IMC thickness exceeds 5–7 micrometers.
 
-```
-Stress Distribution in SMT Solder Joint (Cross-Section)
-
-         Component Termination
-         ┌───────────────────┐
-         │                   │
-         │    (Ceramic/Si)   │
-         └─────────┬─────────┘
-                   │
-         ┌─────────▼─────────┐  ← Solder fillet (elliptical)
-         │  ╱               ╲ │
-         │ ╱   Max σ_eq     ╲│  ← Stress concentration at toe
-    ┌────▼────────────────────▼────┐
-    │    Cu Pad                     │  ← PCB copper
-    │  (IMC interface layer)        │
-    └───────────────────────────────┘
-    │                               │
-    │         FR-4 Substrate        │
-    └───────────────────────────────┘
-
-Crack Initiation: Fillet toe (component side)
-Propagation Path: Grain boundaries → bulk solder → IMC interface
-Failure Mode: Intergranular creep-fatigue with final ductile overload
+```mermaid
+flowchart TD
+    A["Component Termination<br/>(Ceramic/Si)"]
+    B["Solder Fillet<br/>(Elliptical Shape)"]
+    C["Max σ_eq<br/>Stress Concentration at Toe"]
+    D["Cu Pad<br/>(IMC Interface Layer)"]
+    E["FR-4 Substrate<br/>(PCB)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    
+    subgraph failure ["Failure Analysis"]
+        F["Crack Initiation:<br/>Fillet toe (component side)"]
+        G["Propagation Path:<br/>Grain boundaries → Bulk solder → IMC interface"]
+        H["Failure Mode:<br/>Intergranular creep-fatigue with final ductile overload"]
+        F --> G --> H
+    end
+    
+    C -.->|"Critical stress location"| F
 ```
 
 ## 3. High-Performance Optimization & Failure Modes
@@ -111,9 +109,9 @@ Alloy selection trades ductility against creep resistance. SAC305 exhibits super
 
 Reflow profile optimization controls grain structure and IMC thickness. A fast ramp rate (2–3°C/s) and short time above liquidus (60–90 seconds) minimize grain growth and IMC formation, producing fine-grained microstructures with thin IMC layers. However, insufficient time above liquidus prevents complete flux activation and solder spreading, leading to poor wetting and voiding. The optimal peak temperature for SAC305 is 235–245°C, measured at the board surface; package body temperatures typically lag by 10–20°C. Exceeding 250°C risks component damage and excessive IMC growth, while staying below 230°C produces incomplete reflow and cold joints.
 
-Voiding degrades joint reliability by reducing effective cross-sectional area and introducing stress concentrations. Voids form when flux volatiles become trapped in the molten solder during reflow. Void content should remain below 25% of joint area for most applications; automotive and aerospace standards mandate <15% for critical joints. Reducing voiding requires optimizing flux chemistry (minimizing residue-forming activators), controlling paste deposit thickness (thinner deposits enable easier outgassing), and adjusting reflow atmosphere (nitrogen reflow reduces oxidation and promotes flux spreading, lowering void nucleation).
+Voiding degrades joint reliability by reducing effective cross-sectional area and introducing stress concentrations. Voids form when flux volatiles become trapped in the molten solder during reflow. Void content should remain below 25% of joint area for most applications; automotive and aerospace standards mandate < 15% for critical joints. Reducing voiding requires optimizing flux chemistry (minimizing residue-forming activators), controlling paste deposit thickness (thinner deposits enable easier outgassing), and adjusting reflow atmosphere (nitrogen reflow reduces oxidation and promotes flux spreading, lowering void nucleation).
 
-Inspection criteria for solder joint quality derive from IPC-A-610 workmanship standards, which define three acceptability classes. Class 1 (general electronics) permits incomplete fillet coverage provided electrical continuity exists. Class 2 (dedicated service) requires 270° fillet coverage around the component termination with minimal voiding. Class 3 (high-reliability) mandates 360° fillet coverage, <25% voiding, and no evidence of disturbed solder (grainy appearance indicating movement during solidification). Visual inspection identifies gross defects like insufficient solder, bridging, and component misalignment. X-ray inspection reveals internal voiding, cracks, and IMC layer thickness. Cross-sectional metallography provides definitive microstructural analysis but is destructive and limited to sample-based assessment.
+Inspection criteria for solder joint quality derive from IPC-A-610 workmanship standards, which define three acceptability classes. Class 1 (general electronics) permits incomplete fillet coverage provided electrical continuity exists. Class 2 (dedicated service) requires 270° fillet coverage around the component termination with minimal voiding. Class 3 (high-reliability) mandates 360° fillet coverage, < 25% voiding, and no evidence of disturbed solder (grainy appearance indicating movement during solidification). Visual inspection identifies gross defects like insufficient solder, bridging, and component misalignment. X-ray inspection reveals internal voiding, cracks, and IMC layer thickness. Cross-sectional metallography provides definitive microstructural analysis but is destructive and limited to sample-based assessment.
 
 Failure analysis proceeds systematically from visual inspection to destructive physical analysis. External visual inspection identifies obvious fractures, discoloration (evidence of overheating), or lifted components. Dye penetrant testing highlights crack openings invisible to the naked eye by capillary action drawing fluorescent dye into microcracks. X-ray imaging in 2D or 3D computed tomography mode maps internal crack propagation and void distribution. Once the failure location is identified, cross-sectional metallography exposes the fracture surface for SEM imaging. Energy-dispersive X-ray spectroscopy (EDS) maps elemental distribution, revealing IMC composition and identifying contaminants. Fractography—detailed analysis of fracture surface morphology—distinguishes failure modes: smooth facets indicate brittle fracture, dimpled surfaces indicate ductile overload, and striations indicate fatigue propagation.
 

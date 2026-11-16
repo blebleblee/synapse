@@ -28,80 +28,84 @@ Site responsiveness represents the final layer of compositional thinking, acknow
 
 The practical construction of sculptural balance begins with the identification of visual axes—imaginary lines along which forces appear to concentrate or resolve. In a vertically oriented work, the primary axis typically runs through the work's center of mass, establishing a gravitational spine. Horizontal extensions from this axis create secondary vectors that must be balanced either through symmetrical distribution or asymmetrical counterweight. The sculptor working from a maquette or digital model must continuously rotate the work, identifying these axes from multiple viewpoints and ensuring that no single angle collapses into visual chaos.
 
-```
-VERTICAL AXIS ANALYSIS (Front View)
+```mermaid
+flowchart TD
+    THRUST["↑ Visual Thrust"]
 
-         ↑ (visual thrust)
-         │
-    ┌────┴────┐
-    │  HEAD   │  ← dense focal mass
-    └────┬────┘
-         │
-    ┌────┴────┐
-    │  TORSO  │  ← expanded volume
-    │         │
-    │         │
-    └────┬────┘
-         │
-    ┌────┴────┐
-    │  BASE   │  ← grounded platform
-    └─────────┘
-         ↓
+    HEAD["HEAD
+    ─────────────
+    15% visual weight
+    High detail density
+    Dense focal mass"]
 
-Mass Distribution:
-  Head:  15% visual weight, high detail density
-  Torso: 60% visual weight, primary volume
-  Base:  25% visual weight, anchoring function
+    TORSO["TORSO
+    ─────────────
+    60% visual weight
+    Primary volume
+    Expanded volume"]
+
+    BASE["BASE
+    ─────────────
+    25% visual weight
+    Anchoring function
+    Grounded platform"]
+
+    GROUND["↓ Ground Plane"]
+
+    THRUST --> HEAD
+    HEAD --> TORSO
+    TORSO --> BASE
+    BASE --> GROUND
+
+    style THRUST fill:#f0f0f0,stroke:#999,stroke-width:1px,color:#555
+    style HEAD fill:#2c3e50,stroke:#1a252f,stroke-width:2px,color:#ecf0f1
+    style TORSO fill:#2980b9,stroke:#1a5276,stroke-width:3px,color:#ecf0f1
+    style BASE fill:#1a5276,stroke:#0d2b40,stroke-width:2px,color:#ecf0f1
+    style GROUND fill:#f0f0f0,stroke:#999,stroke-width:1px,color:#555
 ```
 
 Symmetrical compositions resolve around a single central axis with mirrored distribution on either side. This arrangement leverages our innate preference for bilateral correspondence, but it requires deliberate activation to avoid static predictability. Classical portrait busts achieve this through subtle head rotation—the figure gazes 15 degrees off-axis, introducing directionality without breaking symmetry. Architectural sculpture employs contrapposto, the standing figure's weight shifted to one leg, which tilts the hips and compensates with opposing shoulder rotation, transforming a frontal figure into a dynamic system of opposing curves.
 
 Asymmetrical balance operates through the principle of the visual fulcrum—an imaginary pivot point around which unequal masses achieve equilibrium. A large, light-toned volume positioned near the center can be counterbalanced by a small, dark, highly textured element at the periphery. The designer's task is to calibrate the relative weights: surface area, tonal value, textural complexity, and distance from the fulcrum all contribute to perceived mass. This calibration proceeds iteratively, adjusting positions and proportions until the composition achieves dynamic equilibrium across primary viewpoints.
 
-```
-ASYMMETRICAL BALANCE DIAGRAM (Plan View)
-
-                FULCRUM
-                   ↓
-    [A]───────────●───[B]
-     │                 │
-   Large            Small
-   Smooth           Dense
-   Light            Dark
-   Near center      At edge
-
-  Visual Weight Calculation:
-    A: size × proximity = 4 × 0.3 = 1.2
-    B: size × density × distance = 1 × 2 × 0.6 = 1.2
-    → Balanced composition
+```mermaid
+flowchart LR
+    A["Element A<br/>Large, Smooth, Light<br/>Near center<br/>Weight: 4 × 0.3 = 1.2"]
+    F(("FULCRUM"))
+    B["Element B<br/>Small, Dense, Dark<br/>At edge<br/>Weight: 1 × 2 × 0.6 = 1.2"]
+    
+    A ---|"Distance: 0.3"| F
+    F ---|"Distance: 0.6"| B
+    
+    style F fill:#333,stroke:#666,stroke-width:3px,color:#fff
+    style A fill:#f9f9f9,stroke:#999,stroke-width:2px
+    style B fill:#333,stroke:#666,stroke-width:2px,color:#fff
 ```
 
 Scale relationships demand systematic measurement and ratio analysis. The sculptor establishes a base unit—often derived from human proportions such as the width of the hand, the distance from elbow to fingertip, or the height of the head—and then derives all other dimensions as multiples or fractions of this unit. This modular approach ensures internal coherence even when absolute dimensions vary. A site-specific monument scaled up from a 1:10 maquette maintains its proportional integrity if all dimensions increase by the same factor, though the sculptor must account for optical distortion at monumental scale—forms that read clearly at arm's length can appear squat or attenuated when viewed from 50 meters below.
 
 The golden ratio method provides one systematic approach to proportional subdivision. Given a total height or length, the sculptor divides this dimension approximately 61.8% of the way up, creating a larger lower section and a smaller upper section. This point often defines the transition between base and figure, or torso and head. Further subdivisions can follow the same ratio recursively, generating a nested hierarchy of proportions. While not universal, this system produces dimensions that the eye registers as harmonious, likely because the ratio appears frequently in natural growth patterns and therefore aligns with perceptual expectation.
 
-```
-GOLDEN RATIO SUBDIVISION (Vertical Composition)
-
-Total Height: 100 units
-
-         0 ─────────────────── Top
-         ↕ 38.2 units
-        38.2 ───────────────── Golden Section (upper)
-         ↕ 61.8 units
-       100 ─────────────────── Base
-
-Secondary Division of Lower Section (61.8 units):
-         0 (base) 
-         ↕ 23.6 units
-        23.6 ───────────────── Secondary golden point
-         ↕ 38.2 units
-        61.8 ───────────────── Primary golden point
-
-This creates three zones:
-  - Lower third: grounding mass
-  - Middle third: transitional volume
-  - Upper third: focal termination
+```mermaid
+flowchart TD
+    Top["Top<br/>Height: 0"]
+    
+    Top -->|"38.2 units"| GoldenUpper["Golden Section (Upper)<br/>Height: 38.2<br/>Zone: Focal Termination"]
+    
+    GoldenUpper -->|"61.8 units"| Base["Base<br/>Height: 100"]
+    
+    subgraph LowerSection ["Lower Section (61.8 units)"]
+        direction TD
+        BasePoint["Base Point<br/>Height: 0 (relative)"]
+        BasePoint -->|"23.6 units"| SecondaryGolden["Secondary Golden Point<br/>Height: 23.6<br/>Zone: Grounding Mass"]
+        SecondaryGolden -->|"38.2 units"| PrimaryGolden["Primary Golden Point<br/>Height: 61.8<br/>Zone: Transitional Volume"]
+    end
+    
+    style Top fill:#e1f5ff
+    style GoldenUpper fill:#fff4e1
+    style Base fill:#f0f0f0
+    style SecondaryGolden fill:#e8f5e9
+    style PrimaryGolden fill:#fff3e0
 ```
 
 Human scale relationships govern the experiential impact of the work. A sculpture scaled to approximate human height—roughly 1.5 to 2 meters—invites identification and reads as figure or portrait regardless of subject matter. The viewer unconsciously projects bodily experience onto the form, interpreting its gestures and proportions through empathetic simulation. Scale the same form down to 30 centimeters, and it becomes an object of contemplation, something to be held and examined intimately. Scale it to 10 meters, and it becomes environmental infrastructure, a monument that dwarfs the body and asserts dominance over the site. These scalar shifts are not merely quantitative—they fundamentally alter the work's ontological status and the viewer's psychological relationship to it.
@@ -110,29 +114,52 @@ Rhythmic patterning across surfaces follows principles analogous to musical mete
 
 Focal hierarchy construction proceeds through contrast control. The sculptor reserves the highest degree of surface articulation—fine detail, sharp edges, figural representation—for primary focal zones. Secondary areas receive intermediate treatment, maintaining visual interest without competing for dominance. Tertiary zones transition to simplified planes or smooth gradients that guide the eye toward focal centers without arresting it. This gradient must be managed carefully; too abrupt a transition between detailed and simplified areas reads as incomplete or careless execution, while too gradual a gradient risks diffusing focus entirely.
 
-```
-FOCAL HIERARCHY MAP (Elevation View)
+```mermaid
+flowchart TD
+    subgraph primary ["Primary Focus"]
+        P1["█████████  High Detail Density"]
+        P2["███████  Figural Articulation"]
+        P3["█████  Sharp Edge Definition"]
+    end
 
-    ████████  ← Primary Focus
-    ██████    ← High detail density
-    ████      ← Figural articulation
-    ██        ← Sharp edge definition
-              
-    ▓▓▓▓      ← Secondary Focus
-    ▓▓        ← Moderate detail
-              ← Textural variation
-              
-    ░░░░      ← Tertiary Zone
-    ░░        ← Smooth transitions
-              ← Minimal articulation
-              
-    ─────     ← Base/Support
-              ← Planar simplicity
+    subgraph secondary ["Secondary Focus"]
+        S1["▓▓▓▓  Moderate Detail"]
+        S2["▓▓  Textural Variation"]
+    end
 
-Detail Density Gradient:
-  Primary → Secondary: 3:1 detail ratio
-  Secondary → Tertiary: 2:1 detail ratio
-  Smooth transitions prevent visual rupture
+    subgraph tertiary ["Tertiary Zone"]
+        T1["░░░░  Smooth Transitions"]
+        T2["░░  Minimal Articulation"]
+    end
+
+    subgraph base ["Base / Support"]
+        B1["─────  Planar Simplicity"]
+    end
+
+    P1 -->|"3:1 detail ratio"| S1
+    P2 --> S1
+    P3 --> S2
+    S1 -->|"2:1 detail ratio"| T1
+    S2 --> T2
+    T1 --> B1
+    T2 --> B1
+
+    style primary  fill:#1a1a2e,stroke:#4a4aff,color:#ffffff
+    style secondary fill:#2d2d44,stroke:#8888cc,color:#ddddff
+    style tertiary  fill:#3d3d4f,stroke:#aaaaaa,color:#cccccc
+    style base      fill:#4a4a4a,stroke:#888888,color:#bbbbbb
+
+    style P1 fill:#0d0d1a,stroke:#6666ff,color:#ffffff
+    style P2 fill:#0d0d1a,stroke:#6666ff,color:#ffffff
+    style P3 fill:#0d0d1a,stroke:#6666ff,color:#ffffff
+
+    style S1 fill:#1e1e33,stroke:#9999dd,color:#ddddff
+    style S2 fill:#1e1e33,stroke:#9999dd,color:#ddddff
+
+    style T1 fill:#2e2e3e,stroke:#bbbbcc,color:#cccccc
+    style T2 fill:#2e2e3e,stroke:#bbbbcc,color:#cccccc
+
+    style B1 fill:#3a3a3a,stroke:#999999,color:#bbbbbb
 ```
 
 Site analysis for sculptural placement begins with documentation of existing visual axes—primary sightlines from pedestrian approaches, vehicular corridors, and elevated viewpoints. The sculptor sketches these as vectors converging on the proposed site, identifying which angles will dominate viewer experience. A plaza sculpture seen primarily from one direction can optimize that frontal composition, while a work in a park with 360-degree access must resolve equally from all cardinal approaches. Vertical sightlines matter particularly for indoor installations—does the work sit below eye level, inviting a downward gaze, or rise above, demanding the viewer tilt back and experience foreshortening?

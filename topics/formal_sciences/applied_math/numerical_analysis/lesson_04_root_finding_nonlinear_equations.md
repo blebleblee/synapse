@@ -144,54 +144,80 @@ The critical arithmetic hazard is computing the midpoint. The naive formula $(a 
 
 The execution flow of the four algorithms is illustrated in the following state-machine diagram:
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     ROOT-FINDING EXECUTION FLOWS                    │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
 
-BISECTION                        NEWTON–RAPHSON
-─────────                        ──────────────
- Input: f, [a,b], ε               Input: f, f', x₀, ε
-      │                                  │
-      ▼                                  ▼
- Verify f(a)·f(b) < 0            Evaluate f(xₙ), f'(xₙ)
-      │                                  │
-      ▼                           f'(xₙ) = 0? ──Yes──► FAIL
- m ← a + (b−a)/2                        │No
-      │                                  ▼
- Evaluate f(m)                   xₙ₊₁ ← xₙ − f(xₙ)/f'(xₙ)
-      │                                  │
- f(a)·f(m)<0?                    |f(xₙ₊₁)| < ε? ──Yes──► x*
-  Yes │   │ No                          │No
-      ▼   ▼                             ▼
-  b←m  a←m                      n ← n+1; loop
-      │
- |b−a| < ε?──Yes──► x* ≈ (a+b)/2
-      │No
-      ▼
-   loop
+subgraph BIS ["BISECTION"]
+  direction TB
+  B_in["Input: f, [a,b], ε"]
+  B_verify["Verify f(a)·f(b) &lt; 0"]
+  B_mid["m ← a + (b−a)/2"]
+  B_fm["Evaluate f(m)"]
+  B_check["f(a)·f(m) &lt; 0?"]
+  B_bm["b ← m"]
+  B_am["a ← m"]
+  B_conv["|b−a| &lt; ε?"]
+  B_ok(["x* ≈ (a+b)/2"])
 
-SECANT METHOD                    FIXED-POINT ITERATION
-─────────────                    ─────────────────────
- Input: f, x₀, x₁, ε             Input: g, x₀, ε
-      │                                  │
-      ▼                                  ▼
- Evaluate f(x₀), f(x₁)          Evaluate g(xₙ)
-      │                                  │
-      ▼                                  ▼
-      Δf ← f(xₙ) − f(xₙ₋₁)     xₙ₊₁ ← g(xₙ)
-      │                                  │
-   Δf = 0? ──Yes──► FAIL         |xₙ₊₁ − xₙ| < ε?──Yes──► x*
-      │No                               │No
-      ▼                                 ▼
- xₙ₊₁ ← xₙ − f(xₙ)·(xₙ−xₙ₋₁)/Δf    n ← n+1; loop
-      │
- |f(xₙ₊₁)| < ε? ──Yes──► x*
-      │No
-      ▼
- Discard xₙ₋₁, shift: xₙ₋₁←xₙ, xₙ←xₙ₊₁
-      ▼
-   loop
+  B_in --> B_verify --> B_mid --> B_fm --> B_check
+  B_check -->|Yes| B_bm
+  B_check -->|No| B_am
+  B_bm --> B_conv
+  B_am --> B_conv
+  B_conv -->|Yes| B_ok
+  B_conv -->|No| B_mid
+end
+
+subgraph NR ["NEWTON–RAPHSON"]
+  direction TB
+  N_in["Input: f, f', x₀, ε"]
+  N_eval["Evaluate f(xₙ), f'(xₙ)"]
+  N_zero["f'(xₙ) = 0?"]
+  N_fail(["FAIL"])
+  N_next["xₙ₊₁ ← xₙ − f(xₙ)/f'(xₙ)"]
+  N_conv["|f(xₙ₊₁)| &lt; ε?"]
+  N_ok(["x*"])
+  N_loop["n ← n+1"]
+
+  N_in --> N_eval --> N_zero
+  N_zero -->|Yes| N_fail
+  N_zero -->|No| N_next --> N_conv
+  N_conv -->|Yes| N_ok
+  N_conv -->|No| N_loop --> N_eval
+end
+
+subgraph SEC ["SECANT METHOD"]
+  direction TB
+  S_in["Input: f, x₀, x₁, ε"]
+  S_eval["Evaluate f(x₀), f(x₁)"]
+  S_df["Δf ← f(xₙ) − f(xₙ₋₁)"]
+  S_zero["Δf = 0?"]
+  S_fail(["FAIL"])
+  S_next["xₙ₊₁ ← xₙ − f(xₙ)·(xₙ−xₙ₋₁)/Δf"]
+  S_conv["|f(xₙ₊₁)| &lt; ε?"]
+  S_ok(["x*"])
+  S_shift["Shift: xₙ₋₁ ← xₙ, xₙ ← xₙ₊₁"]
+
+  S_in --> S_eval --> S_df --> S_zero
+  S_zero -->|Yes| S_fail
+  S_zero -->|No| S_next --> S_conv
+  S_conv -->|Yes| S_ok
+  S_conv -->|No| S_shift --> S_df
+end
+
+subgraph FPI ["FIXED-POINT ITERATION"]
+  direction TB
+  F_in["Input: g, x₀, ε"]
+  F_eval["Evaluate g(xₙ)"]
+  F_next["xₙ₊₁ ← g(xₙ)"]
+  F_conv["|xₙ₊₁ − xₙ| &lt; ε?"]
+  F_ok(["x*"])
+  F_loop["n ← n+1"]
+
+  F_in --> F_eval --> F_next --> F_conv
+  F_conv -->|Yes| F_ok
+  F_conv -->|No| F_loop --> F_eval
+end
 ```
 
 ### Convergence Rate Comparison Under Identical Conditions
@@ -283,7 +309,7 @@ The practitioner's decision among methods depends on the interplay of several fa
 | Bisection | 1, $C=1/2$ | 1 ($f$ only) | Yes (IVT) | Continuity, bracket |
 | Secant | $\phi \approx 1.618$ | 1 ($f$ only) | No | Smoothness, two initial pts |
 | Newton | 2 | 2 ($f$ and $f'$) | No | $C^2$, $f'(x^*) \neq 0$ |
-| Fixed-point | 1, $C = |g'(x^*)|$ | 1 ($g$ only) | Local ($|g'|<1$) | Contraction near $x^*$ |
+| Fixed-point | 1, $C = |g'(x^*)|$ | 1 ($g$ only) | Local ($|g'|< 1$) | Contraction near $x^*$ |
 
 The practical resolution for mission-critical computation is Brent's method (bisection fallback with secant/IQI acceleration) when only $f$ evaluations are available, and a damped, globalized Newton's method (with backtracking line search and bisection safeguard) when $f'$ is available analytically or via AD. The purely theoretical bisection and Newton methods serve as the foundational poles from which all practical hybrid schemes are designed.
 

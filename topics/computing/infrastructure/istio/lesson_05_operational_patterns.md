@@ -24,25 +24,27 @@ Istio supports three fundamental multi-cluster models, each with distinct trade-
 
 In a **single control plane, multiple clusters** topology, one Kubernetes cluster hosts the Istio control plane while worker clusters contain only data plane components (Envoy sidecars and gateways). The control plane cluster runs `istiod`, which watches the Kubernetes API servers of all clusters for service and endpoint changes. Worker clusters receive configuration updates via the xDS protocol over secure gRPC connections. This model minimizes control plane resource overhead but creates a dependency: if the control plane cluster becomes unreachable, worker clusters cannot receive configuration updates, though existing traffic continues to flow using cached routing tables.
 
-```
-┌─────────────────────────┐
-│  Control Plane Cluster  │
-│  ┌─────────────────┐    │
-│  │     istiod      │────┼──────┐
-│  │  (xDS Server)   │    │      │
-│  └─────────────────┘    │      │
-└─────────────────────────┘      │
-                                 │ xDS/gRPC
-        ┌────────────────────────┼─────────────────────┐
-        │                        │                     │
-        ▼                        ▼                     ▼
-┌─────────────────┐      ┌─────────────────┐  ┌─────────────────┐
-│ Worker Cluster 1│      │ Worker Cluster 2│  │ Worker Cluster 3│
-│  ┌───────────┐  │      │  ┌───────────┐  │  │  ┌───────────┐  │
-│  │  Envoy    │  │      │  │  Envoy    │  │  │  │  Envoy    │  │
-│  │ Sidecars  │  │      │  │ Sidecars  │  │  │  │ Sidecars  │  │
-│  └───────────┘  │      │  └───────────┘  │  │  └───────────┘  │
-└─────────────────┘      └─────────────────┘  └─────────────────┘
+```mermaid
+flowchart TD
+    subgraph control_plane["Control Plane Cluster"]
+        istiod["istiod<br/>(xDS Server)"]
+    end
+    
+    subgraph worker1["Worker Cluster 1"]
+        envoy1["Envoy<br/>Sidecars"]
+    end
+    
+    subgraph worker2["Worker Cluster 2"]
+        envoy2["Envoy<br/>Sidecars"]
+    end
+    
+    subgraph worker3["Worker Cluster 3"]
+        envoy3["Envoy<br/>Sidecars"]
+    end
+    
+    istiod -->|"xDS/gRPC"| envoy1
+    istiod -->|"xDS/gRPC"| envoy2
+    istiod -->|"xDS/gRPC"| envoy3
 ```
 
 In a **primary-remote** topology, the primary cluster runs the full Istio control plane with its own Kubernetes API server, while remote clusters delegate service discovery to the primary. Remote clusters install only the Istio CRDs and the Envoy data plane; they do not run their own `istiod` instance. The primary control plane watches both its local API server and the API servers of all remote clusters, synthesizing a unified view of the mesh topology. Services in remote clusters are automatically discoverable from the primary cluster and vice versa, assuming network reachability through VPN tunnels or cloud provider peering.

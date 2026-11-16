@@ -48,58 +48,80 @@ The Napoleonic synthesis emerged from revolutionary exhaustion, combining elemen
 
 The Napoleonic military system revolutionized warfare through mass conscription, rapid maneuver, and decisive battle-seeking strategy, translating revolutionary enthusiasm and national mobilization into overwhelming tactical advantage against professional armies of the Old Regime. The Grande Armée's organizational structure embedded meritocratic promotion, corps system flexibility, and artillery concentration, creating a military instrument capable of projecting French power across the entire European continent. However, this system contained inherent overextension risks: the military apparatus required continuous conquest to sustain itself through requisitioning and plunder, generating resistance nationalism in occupied territories and eventually overreaching in the Spanish and Russian campaigns.
 
-```
-Enlightenment → Revolution → Consolidation Causal Architecture
+```mermaid
+flowchart TD
+    subgraph epist ["Epistemological Foundation"]
+        direction TD
+        NR["Natural Rights Theory (Locke)"]
+        NR --> NR1["State of nature baseline"]
+        NR --> NR2["Pre-political individual rights"]
+        NR --> NR3["Contractarian legitimacy"]
+        NR --> NR4["Right to revolution"]
 
-Epistemological Foundation:
-├─ Natural Rights Theory (Locke)
-│  ├─ State of nature baseline
-│  ├─ Pre-political individual rights
-│  ├─ Contractarian legitimacy
-│  └─ Right to revolution
-│
-├─ Popular Sovereignty (Rousseau)
-│  ├─ General will doctrine
-│  ├─ Total social contract
-│  ├─ Rational collective interest
-│  └─ Revolutionary reconstruction license
-│
-└─ Constitutional Balance (Montesquieu)
-   ├─ Separation of powers
-   ├─ Institutional checks
-   ├─ Mixed constitution
-   └─ Adaptive institutional design
+        PS["Popular Sovereignty (Rousseau)"]
+        PS --> PS1["General will doctrine"]
+        PS --> PS2["Total social contract"]
+        PS --> PS3["Rational collective interest"]
+        PS --> PS4["Revolutionary reconstruction license"]
 
-Transmission Mechanisms:
-├─ Print culture expansion
-├─ Republic of Letters networks
-├─ Colonial educated elites
-└─ Urban middling classes
+        CB["Constitutional Balance (Montesquieu)"]
+        CB --> CB1["Separation of powers"]
+        CB --> CB2["Institutional checks"]
+        CB --> CB3["Mixed constitution"]
+        CB --> CB4["Adaptive institutional design"]
+    end
 
-Revolutionary Pathways:
+    subgraph trans ["Transmission Mechanisms"]
+        direction TD
+        T1["Print culture expansion"]
+        T2["Republic of Letters networks"]
+        T3["Colonial educated elites"]
+        T4["Urban middling classes"]
+    end
 
-American Model:
-Crisis → Limited constitutional reform → Federal republic
-├─ Colonial self-governing tradition
-├─ Distance from metropolitan authority
-├─ Lockean rights discourse
-├─ Constitutional institutionalization
-└─ Federalist power-sharing
+    subgraph american ["American Model"]
+        direction TD
+        AM_C["Crisis"]
+        AM_R["Limited constitutional reform"]
+        AM_O["Federal republic"]
+        AM_C --> AM_R --> AM_O
+        AM_O --> AM1["Colonial self-governing tradition"]
+        AM_O --> AM2["Distance from metropolitan authority"]
+        AM_O --> AM3["Lockean rights discourse"]
+        AM_O --> AM4["Constitutional institutionalization"]
+        AM_O --> AM5["Federalist power-sharing"]
+    end
 
-French Model:
-Crisis → Total reconstruction → Terror → Military dictatorship
-├─ Absolutist structural contradiction
-├─ Fiscal collapse
-├─ Rousseauian popular sovereignty
-├─ War-driven radicalization
-└─ Napoleonic centralization
+    subgraph french ["French Model"]
+        direction TD
+        FM_C["Crisis"]
+        FM_R["Total reconstruction"]
+        FM_T["Terror"]
+        FM_O["Military dictatorship"]
+        FM_C --> FM_R --> FM_T --> FM_O
+        FM_O --> FM1["Absolutist structural contradiction"]
+        FM_O --> FM2["Fiscal collapse"]
+        FM_O --> FM3["Rousseauian popular sovereignty"]
+        FM_O --> FM4["War-driven radicalization"]
+        FM_O --> FM5["Napoleonic centralization"]
+    end
 
-Post-Revolutionary Settlement:
-├─ Liberal constitutionalism
-├─ Legal equality baseline
-├─ Meritocratic legitimacy
-├─ National sovereignty principle
-└─ Conservative-Liberal dialectic
+    subgraph settle ["Post-Revolutionary Settlement"]
+        direction TD
+        S1["Liberal constitutionalism"]
+        S2["Legal equality baseline"]
+        S3["Meritocratic legitimacy"]
+        S4["National sovereignty principle"]
+        S5["Conservative-Liberal dialectic"]
+    end
+
+    epist --> trans
+    NR4 --> american
+    PS4 --> french
+    trans --> american
+    trans --> french
+    american --> settle
+    french --> settle
 ```
 
 The Napoleonic Wars' conclusion at Waterloo (1815) and the Congress of Vienna settlement attempted conservative restoration while accommodating irreversible revolutionary transformations. The Vienna system reestablished monarchical legitimacy and territorial balance of power, but could not resurrect feudal social structures or corporatist legal orders. The principle of national sovereignty, the demand for constitutional limits on monarchical authority, and the expectation of legal equality had become embedded in European political consciousness, creating permanent tension between restoration regimes and liberal-nationalist opposition movements.

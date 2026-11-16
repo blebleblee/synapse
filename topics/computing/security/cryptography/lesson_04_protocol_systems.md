@@ -28,32 +28,29 @@ The TLS 1.3 handshake proceeds through a two-flight exchange minimizing connecti
 
 The handshake's cryptographic architecture layers multiple keys derived from a central secret schedule. Upon receiving the server's key share, both parties compute the ECDH shared secret and feed it into the HKDF key derivation function along with the handshake transcript hash. HKDF implements extract-then-expand: first applying HMAC-based extraction to concentrate entropy from the shared secret into a pseudorandom key, then expanding that key into multiple derived secrets using distinct labels and context strings. The key schedule generates independent keys for client-to-server and server-to-client traffic encryption, handshake message authentication, and resumption secrets for future session tickets. This hierarchical derivation ensures that compromise of application traffic keys does not reveal handshake authentication keys, and that session ticket secrets remain isolated from the primary handshake.
 
-```
-                        ClientHello
-                    + key_share (ECDH)
-                    + signature_algorithms
-       ─────────────────────────────────────>
-                                            
-                                            ServerHello
-                                        + key_share (ECDH)
-                                    {EncryptedExtensions}
-                                   {CertificateRequest*}
-                                          {Certificate}
-                                    {CertificateVerify}
-                                            {Finished}
-       <─────────────────────────────────────
-                                            
-                       {Certificate*}
-                 {CertificateVerify*}
-                         {Finished}
-       ─────────────────────────────────────>
-                                            
-           [Application Data]     <───────>     [Application Data]
+```mermaid
+flowchart TD
+    subgraph client_side ["Client"]
+        CH["ClientHello\n+ key_share (ECDH)\n+ signature_algorithms"]
+        CC["{Certificate*}\n{CertificateVerify*}\n{Finished}"]
+        CAD["[Application Data]"]
+    end
 
-       Legend:
-       * = optional message
-       {} = encrypted under handshake traffic keys
-       [] = encrypted under application traffic keys
+    subgraph server_side ["Server"]
+        SH["ServerHello\n+ key_share (ECDH)\n{EncryptedExtensions}\n{CertificateRequest*}\n{Certificate}\n{CertificateVerify}\n{Finished}"]
+        SAD["[Application Data]"]
+    end
+
+    subgraph legend ["Legend"]
+        L1["* = optional message"]
+        L2["{} = encrypted under handshake traffic keys"]
+        L3["[] = encrypted under application traffic keys"]
+    end
+
+    CH -->|"Flight 1 ──────────────────────────────►"| SH
+    SH -->|"◄────────────────────────────── Flight 2"| CC
+    CC -->|"Flight 3 ──────────────────────────────►"| SAD
+    CAD <-->|"◄─────── Application Data ───────────►"| SAD
 ```
 
 Certificate validation forms the trust anchor binding cryptographic keys to real-world identities. An X.509 certificate encodes a subject identity, public key, validity period, and digital signature from a Certificate Authority. The certificate chain establishes transitive trust: the server presents its leaf certificate signed by an intermediate CA, which itself holds a certificate signed by a root CA whose public key exists in the client's pre-distributed trust store. Validation proceeds bottom-up through the chain, verifying each signature using the public key from the parent certificate, checking validity periods, and confirming that each certificate's key usage extensions authorize signing subordinate certificates.

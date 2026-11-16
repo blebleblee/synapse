@@ -99,12 +99,28 @@ $$C_2 = \frac{g_2}{\omega_c \times R_0} = \frac{2.0}{2\pi \times 10^6 \times 50}
 
 The load resistance is $R_0 = 50\,\Omega$ (the g4 value of 1.0 times the impedance level). The schematic is:
 
-```
-Input ──[L1: 7.96µH]──┬──[L3: 7.96µH]──┬── Output
-                      │                 │
-                     [C2: 6.37nF]      [R_load: 50Ω]
-                      │                 │
-                     GND               GND
+```mermaid
+flowchart LR
+    Input["Input"]
+    L1["L1: 7.96µH"]
+    Node1[" "]
+    C2["C2: 6.37nF"]
+    GND1["GND"]
+    L3["L3: 7.96µH"]
+    Node2[" "]
+    Rload["R_load: 50Ω"]
+    GND2["GND"]
+    Output["Output"]
+    
+    Input --> L1
+    L1 --> Node1
+    Node1 --> C2
+    C2 --> GND1
+    Node1 --> L3
+    L3 --> Node2
+    Node2 --> Rload
+    Rload --> GND2
+    Node2 --> Output
 ```
 
 The Butterworth response gives maximally flat passband behavior, with the gain decreasing monotonically from DC. At the cutoff frequency, the gain is -3 dB (0.707). Beyond cutoff, the attenuation increases at 60 dB/decade (18 dB/octave) for this 3rd-order filter. The phase response is non-linear, with group delay peaking near the cutoff frequency, which causes transient ringing in pulse applications.

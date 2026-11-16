@@ -24,44 +24,34 @@ The decoder pathway mirrors the encoder, employing transposed convolutions or bi
 
 Temporal feedback introduces recurrence into the otherwise feedforward architecture. The network outputs not only the current frame's high-resolution image but also a feature buffer intended for reuse in the next frame. This feature buffer encodes persistent details like accumulated sub-pixel edge information and temporal anti-aliasing state. On the subsequent frame, this buffer is warped using the current motion vectors and concatenated with the new low-resolution input, effectively extending the network's receptive field across time. The warping operation applies bilinear or bicubic interpolation, adjusting for camera and object motion. Disocclusion detection compares warped depth values against the current depth buffer; regions with significant depth mismatch indicate newly visible surfaces that cannot rely on historical data. The network learns to weight temporal information adaptively, trusting history in stable regions while prioritizing current-frame data in disoccluded areas.
 
-```
-DLSS Inference Pipeline (Simplified)
-====================================
-
-Frame N:
-  ┌─────────────────────────────────────────────────────┐
-  │ Rasterize at Internal Resolution (e.g., 1080p)      │
-  │  - Apply Jitter Offset to Projection Matrix         │
-  │  - Output: Color (RGB), Motion Vectors (RG),        │
-  │            Depth (R), Exposure (R)                   │
-  └────────────────┬────────────────────────────────────┘
-                   │
-                   ▼
-  ┌─────────────────────────────────────────────────────┐
-  │ Warp Previous Frame Feature Buffer                  │
-  │  - Use Motion Vectors to Reproject History          │
-  │  - Detect Disocclusions via Depth Test              │
-  └────────────────┬────────────────────────────────────┘
-                   │
-                   ▼
-  ┌─────────────────────────────────────────────────────┐
-  │ DLSS Neural Network (Tensor Core Inference)         │
-  │                                                      │
-  │  Input:  [Color, MV, Depth, Exposure, Warped Hist]  │
-  │          ↓                                           │
-  │  Encoder: Conv → Downsample → Feature Extract       │
-  │          ↓                                           │
-  │  Latent: Compressed Spatial + Temporal Context      │
-  │          ↓                                           │
-  │  Decoder: Upsample → Conv → Skip Connections        │
-  │          ↓                                           │
-  │  Output: High-Res RGB + Feature Buffer for Frame N+1│
-  └────────────────┬────────────────────────────────────┘
-                   │
-                   ▼
-  ┌─────────────────────────────────────────────────────┐
-  │ Composite & Display at Native Resolution (e.g., 4K) │
-  └─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Frame N: Rasterize at Internal Resolution<br/>(e.g., 1080p)<br/>- Apply Jitter Offset to Projection Matrix<br/>- Output: Color RGB, Motion Vectors RG,<br/>Depth R, Exposure R"]
+    
+    B["Warp Previous Frame Feature Buffer<br/>- Use Motion Vectors to Reproject History<br/>- Detect Disocclusions via Depth Test"]
+    
+    C["DLSS Neural Network<br/>Tensor Core Inference"]
+    
+    C_sub["Input: Color, MV, Depth, Exposure,<br/>Warped History"]
+    
+    C_enc["Encoder: Conv → Downsample →<br/>Feature Extract"]
+    
+    C_lat["Latent: Compressed Spatial +<br/>Temporal Context"]
+    
+    C_dec["Decoder: Upsample → Conv →<br/>Skip Connections"]
+    
+    C_out["Output: High-Res RGB +<br/>Feature Buffer for Frame N+1"]
+    
+    D["Composite & Display at Native<br/>Resolution e.g., 4K"]
+    
+    A --> B
+    B --> C
+    C --> C_sub
+    C_sub --> C_enc
+    C_enc --> C_lat
+    C_lat --> C_dec
+    C_dec --> C_out
+    C_out --> D
 ```
 
 The network weights are quantized to FP16 or INT8 precision to maximize tensor core utilization and minimize memory bandwidth consumption. FP16 weights halve memory footprint compared to FP32, and modern tensor cores natively support mixed-precision arithmetic, accumulating intermediate results in FP32 to preserve numerical stability. Quantization introduces negligible perceptual quality loss because the network training process incorporates quantization-aware training, where forward passes simulate reduced precision to allow the optimizer to compensate during backpropagation. The final trained model undergoes inference optimization passes that fuse batch normalization into convolution weights, eliminate redundant operations, and tile tensor operations to fit within shared memory and register file constraints.

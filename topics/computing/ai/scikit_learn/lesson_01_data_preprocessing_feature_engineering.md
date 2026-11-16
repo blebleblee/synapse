@@ -49,12 +49,42 @@ During prediction, only `transform()` methods execute, propagating test data thr
 
 The `ColumnTransformer` extends this linear chain to heterogeneous feature sets, applying different transformations to distinct column subsets. A dataset might contain continuous numerical features requiring standardization, categorical variables needing one-hot encoding, and text fields demanding vectorization. The `ColumnTransformer` accepts a list of (name, transformer, columns) tuples, where columns can be specified as indices, names, or boolean masks. During transformation, it slices the input matrix, applies each transformer to its designated columns independently, then horizontally concatenates results:
 
-```
-Input X: (n_samples, n_features)
-  ├─ Numerical cols [0, 3, 7] → StandardScaler → (n_samples, 3)
-  ├─ Categorical cols [1, 2] → OneHotEncoder → (n_samples, k_encoded)
-  └─ Text col [4] → TfidfVectorizer → (n_samples, vocab_size)
-Output: hstack([scaled, encoded, tfidf]) → (n_samples, 3 + k_encoded + vocab_size)
+```mermaid
+flowchart TD
+    Input["Input X: (n_samples, n_features)"]
+    
+    NumCols["Numerical cols [0, 3, 7]"]
+    CatCols["Categorical cols [1, 2]"]
+    TextCol["Text col [4]"]
+    
+    Scaler["StandardScaler"]
+    Encoder["OneHotEncoder"]
+    Vectorizer["TfidfVectorizer"]
+    
+    ScaledOut["(n_samples, 3)"]
+    EncodedOut["(n_samples, k_encoded)"]
+    TfidfOut["(n_samples, vocab_size)"]
+    
+    HStack["hstack([scaled, encoded, tfidf])"]
+    Output["Output: (n_samples, 3 + k_encoded + vocab_size)"]
+    
+    Input --> NumCols
+    Input --> CatCols
+    Input --> TextCol
+    
+    NumCols --> Scaler
+    CatCols --> Encoder
+    TextCol --> Vectorizer
+    
+    Scaler --> ScaledOut
+    Encoder --> EncodedOut
+    Vectorizer --> TfidfOut
+    
+    ScaledOut --> HStack
+    EncodedOut --> HStack
+    TfidfOut --> HStack
+    
+    HStack --> Output
 ```
 
 This composition pattern enables modular, maintainable preprocessing graphs where each transformer encapsulates domain-specific logic. The column specification remains frozen after construction, ensuring that column orderings and types remain consistent between training and inference.

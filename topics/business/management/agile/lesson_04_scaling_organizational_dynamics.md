@@ -26,31 +26,33 @@ Vertical ownership minimizes cross-team dependencies by giving each team complet
 
 The SAFe architecture addresses this tension through the Agile Release Train construct, which groups five to twelve teams into a virtual organization aligned around a shared business mission. Each ART operates as a self-contained value stream responsible for delivering a solution increment every ten weeks (the Program Increment boundary). Within an ART, teams organize around subsystems or features depending on technical architecture, but the critical constraint requires that 70-80% of dependencies resolve within the ART boundary. Dependencies that cross ART boundaries escalate to the Solution Train level, where coordination occurs through pre-planned integration milestones rather than dynamic sprint-level negotiation.
 
-```
-Enterprise Portfolio
-        |
-        ├─ Solution Train 1 (Cross-ART coordination)
-        |      |
-        |      ├─ ART A: Customer Experience (8 teams)
-        |      |      ├─ Team 1: Mobile checkout
-        |      |      ├─ Team 2: Web storefront  
-        |      |      ├─ Team 3: Search & discovery
-        |      |      ├─ Team 4: User profiles
-        |      |      ├─ Team 5: Recommendations
-        |      |      ├─ Team 6: Payments platform
-        |      |      ├─ Team 7: Content management
-        |      |      └─ Team 8: A/B testing infrastructure
-        |      |
-        |      └─ ART B: Order Fulfillment (6 teams)
-        |             ├─ Team 9: Inventory management
-        |             ├─ Team 10: Warehouse operations
-        |             ├─ Team 11: Shipping integration
-        |             ├─ Team 12: Returns processing
-        |             ├─ Team 13: Fraud detection
-        |             └─ Team 14: Customer service tools
-        |
-        └─ Solution Train 2
-               └─ [additional ARTs...]
+```mermaid
+flowchart TD
+    EP["Enterprise Portfolio"]
+    
+    EP --> ST1["Solution Train 1<br/>(Cross-ART coordination)"]
+    EP --> ST2["Solution Train 2"]
+    
+    ST1 --> ARTA["ART A: Customer Experience<br/>(8 teams)"]
+    ST1 --> ARTB["ART B: Order Fulfillment<br/>(6 teams)"]
+    
+    ARTA --> T1["Team 1: Mobile checkout"]
+    ARTA --> T2["Team 2: Web storefront"]
+    ARTA --> T3["Team 3: Search & discovery"]
+    ARTA --> T4["Team 4: User profiles"]
+    ARTA --> T5["Team 5: Recommendations"]
+    ARTA --> T6["Team 6: Payments platform"]
+    ARTA --> T7["Team 7: Content management"]
+    ARTA --> T8["Team 8: A/B testing infrastructure"]
+    
+    ARTB --> T9["Team 9: Inventory management"]
+    ARTB --> T10["Team 10: Warehouse operations"]
+    ARTB --> T11["Team 11: Shipping integration"]
+    ARTB --> T12["Team 12: Returns processing"]
+    ARTB --> T13["Team 13: Fraud detection"]
+    ARTB --> T14["Team 14: Customer service tools"]
+    
+    ST2 --> ADD["additional ARTs..."]
 ```
 
 The Program Increment planning ceremony represents the central synchronization mechanism in SAFe. Every ten weeks, all teams on an ART convene for two full days of face-to-face planning, typically consuming 150-300 person-hours for an eight-team train. Day one begins with a business context presentation where the Product Manager articulates strategic priorities, followed by architectural vision from the System Architect, then breakout sessions where individual teams draft iteration plans for the five two-week sprints comprising the PI. Day two opens with a team-by-team presentation of draft plans, followed by program board construction where every team visualizes their planned deliverables, identifies dependencies on other teams, and flags risks that could prevent delivery.
@@ -65,22 +67,23 @@ The LeSS coordination model replaces explicit ceremonies with implicit coordinat
 
 The Spotify model introduces matrix organization mechanics through the squad-chapter-tribe-guild taxonomy. Squads represent the fundamental delivery unit: cross-functional teams of five to nine people with end-to-end ownership of a feature area, analogous to Scrum teams. Chapters group people with similar functional expertise across multiple squads within a tribe—all backend engineers across five squads form the Backend Chapter—providing career development, technical standards, and competency building. Tribes aggregate squads working on related product areas, typically 40-150 people, representing the maximum group size where informal communication can substitute for formal coordination. Guilds span tribal boundaries to share knowledge across the entire organization: the Data Guild might include data engineers, analysts, and data scientists from all tribes meeting monthly to discuss tooling standards and best practices.
 
-```
-Guild (Org-wide community: e.g., Data, Security, Architecture)
-        |
-        ├─ Tribe 1: Customer Acquisition (10 squads, ~80 people)
-        |      |
-        |      ├─ Squad A: Onboarding flow
-        |      |      ├─ Product Manager
-        |      |      ├─ Frontend Engineers (Chapter: Frontend)
-        |      |      ├─ Backend Engineers (Chapter: Backend)
-        |      |      └─ Designer (Chapter: Design)
-        |      |
-        |      ├─ Squad B: Referral program
-        |      └─ Squad C-J: [additional squads...]
-        |
-        └─ Tribe 2: Retention & Engagement
-               └─ [additional squads organized similarly...]
+```mermaid
+flowchart TD
+    Guild["Guild<br/>(Org-wide community: e.g., Data, Security, Architecture)"]
+    
+    Guild --> Tribe1["Tribe 1: Customer Acquisition<br/>(10 squads, ~80 people)"]
+    Guild --> Tribe2["Tribe 2: Retention & Engagement"]
+    
+    Tribe1 --> SquadA["Squad A: Onboarding flow"]
+    Tribe1 --> SquadB["Squad B: Referral program"]
+    Tribe1 --> SquadCJ["Squad C-J: [additional squads...]"]
+    
+    SquadA --> PM_A["Product Manager"]
+    SquadA --> FE_A["Frontend Engineers<br/>(Chapter: Frontend)"]
+    SquadA --> BE_A["Backend Engineers<br/>(Chapter: Backend)"]
+    SquadA --> Des_A["Designer<br/>(Chapter: Design)"]
+    
+    Tribe2 --> SquadsT2["[additional squads organized similarly...]"]
 ```
 
 The dependency management mechanism in tribal scaling relies on inter-squad communication protocols rather than synchronized planning cycles. When Squad A identifies a dependency on Squad B, the squads form a temporary working group—often just the two Product Managers and technical leads—to negotiate the interface contract and delivery timeline. If the dependency represents significant scope (more than one sprint of effort from the upstream squad), it escalates to the Tribe Lead, who has authority to reprioritize work across squads within the tribe. Dependencies that span tribal boundaries escalate further to the Product Area Council, a lightweight governance body of senior Product Managers who resolve cross-tribe conflicts and maintain strategic alignment.

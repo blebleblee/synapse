@@ -40,43 +40,34 @@ The cluster module implements a master-worker pattern optimized for multi-core H
 
 Worker threads provide an alternative concurrency model for CPU-bound tasks within a single process. Each Worker instantiates a new V8 Isolate, a complete JavaScript execution context with independent heap and garbage collector. Workers communicate via `postMessage()` and `'message'` events, which serialize data through structured cloning—a recursive algorithm that handles objects, arrays, and typed arrays but throws errors on functions or symbols. For high-bandwidth communication, SharedArrayBuffer enables zero-copy data sharing: an ArrayBuffer allocated with `new SharedArrayBuffer(size)` lives in shared memory accessible from multiple Isolates. Workers create typed array views (`Int32Array`, `Float64Array`) over the shared buffer and use Atomics operations (`Atomics.add()`, `Atomics.compareExchange()`, `Atomics.wait()`, `Atomics.notify()`) to coordinate access without races. This model suits parallel data processing pipelines where workers transform slices of a large dataset in place.
 
-```
-Event Loop Execution Model with Concurrent Processes:
-
-┌───────────────────────────┐
-│    Main Process (Master)   │
-│  ┌─────────────────────┐  │
-│  │  JavaScript Heap    │  │
-│  │  (V8 Managed)       │  │
-│  └─────────────────────┘  │
-│  ┌─────────────────────┐  │
-│  │   Event Loop Queue  │  │
-│  │  ┌──┐ ┌──┐ ┌──┐    │  │
-│  │  │cb│→│cb│→│cb│    │  │
-│  │  └──┘ └──┘ └──┘    │  │
-│  └─────────────────────┘  │
-│           │                │
-│      fork()│                │
-└───────────┼────────────────┘
-            ↓
-    ┌───────┴────────┐
-    │                │
-┌───▼─────┐    ┌─────▼────┐
-│ Worker 1│    │ Worker 2 │
-│         │    │          │
-│ Socket  │    │ Socket   │
-│ FD Pool │    │ FD Pool  │
-└─────────┘    └──────────┘
-     ↑              ↑
-     │              │
-     └──────┬───────┘
-            │ SO_REUSEPORT
-            │ (kernel load balance)
-            │
-      ┌─────▼──────┐
-      │  TCP Stack  │
-      │ Listen Socket│
-      └─────────────┘
+```mermaid
+flowchart TD
+    Main["Main Process (Master)"]
+    Heap["JavaScript Heap<br/>(V8 Managed)"]
+    EventLoop["Event Loop Queue"]
+    Callbacks["cb → cb → cb"]
+    Fork["fork()"]
+    
+    Worker1["Worker 1<br/>Socket FD Pool"]
+    Worker2["Worker 2<br/>Socket FD Pool"]
+    
+    ReusePort["SO_REUSEPORT<br/>(kernel load balance)"]
+    TCPStack["TCP Stack<br/>Listen Socket"]
+    
+    Main --> Heap
+    Main --> EventLoop
+    EventLoop --> Callbacks
+    Main --> Fork
+    
+    Fork --> Worker1
+    Fork --> Worker2
+    
+    Worker1 --> ReusePort
+    Worker2 --> ReusePort
+    
+    ReusePort --> TCPStack
+    
+    TCPStack -.->|incoming connections| ReusePort
 ```
 
 The distinction between child processes and worker threads reduces to isolation versus overhead tradeoffs. Child processes provide complete isolation—separate address spaces, file descriptor tables, and security contexts—at the cost of heavyweight fork/exec syscalls (milliseconds) and IPC data copying. Worker threads share the process address space, file descriptors, and security context, enabling microsecond startup and zero-copy data sharing through SharedArrayBuffer, but crashes or memory corruption in one worker can destabilize the entire process. The `cluster` module represents a middle ground: process-level isolation for fault tolerance, but specialized for the single use case of distributing socket connections across CPU cores.

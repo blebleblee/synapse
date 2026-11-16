@@ -24,36 +24,34 @@ The architecture of a testing system mirrors the structure of the software it va
 
 At the core of this architecture lies the test case, a four-tuple of preconditions, input, expected output, and postconditions. The preconditions establish the environment state before the test executes—files created, databases initialized, mocks configured, threads started. The input is the data supplied to the system under test—function arguments, command-line flags, HTTP requests, user events. The expected output is the oracle against which actual output is compared—return values, file contents, log messages, side effects on shared state. The postconditions verify invariants that must hold after execution—resources released, connections closed, data structures consistent. A test passes if actual output matches expected output and postconditions are satisfied; it fails otherwise. This simple model scales from unit tests of pure functions (where preconditions and postconditions are trivial) to integration tests of distributed systems (where setup requires orchestrating dozens of services and postconditions involve checking consensus across replicas).
 
-```
-Test Case Execution Flow:
-
-┌─────────────────────────────────────────┐
-│         Test Harness / Runner           │
-└─────────────┬───────────────────────────┘
-              │
-              ├─► Setup Phase
-              │   ├─ Initialize fixtures
-              │   ├─ Create temporary resources
-              │   ├─ Configure mocks/stubs
-              │   └─ Establish preconditions
-              │
-              ├─► Execution Phase
-              │   ├─ Invoke system under test
-              │   ├─ Pass input parameters
-              │   ├─ Capture output
-              │   └─ Monitor side effects
-              │
-              ├─► Verification Phase
-              │   ├─ Compare actual vs expected
-              │   ├─ Check postconditions
-              │   ├─ Validate invariants
-              │   └─ Record pass/fail
-              │
-              └─► Teardown Phase
-                  ├─ Release resources
-                  ├─ Clean up fixtures
-                  ├─ Reset global state
-                  └─ Close connections
+```mermaid
+flowchart TD
+    A["Test Harness / Runner"]
+    
+    A --> B["Setup Phase"]
+    A --> C["Execution Phase"]
+    A --> D["Verification Phase"]
+    A --> E["Teardown Phase"]
+    
+    B --> B1["Initialize fixtures"]
+    B --> B2["Create temporary resources"]
+    B --> B3["Configure mocks/stubs"]
+    B --> B4["Establish preconditions"]
+    
+    C --> C1["Invoke system under test"]
+    C --> C2["Pass input parameters"]
+    C --> C3["Capture output"]
+    C --> C4["Monitor side effects"]
+    
+    D --> D1["Compare actual vs expected"]
+    D --> D2["Check postconditions"]
+    D --> D3["Validate invariants"]
+    D --> D4["Record pass/fail"]
+    
+    E --> E1["Release resources"]
+    E --> E2["Clean up fixtures"]
+    E --> E3["Reset global state"]
+    E --> E4["Close connections"]
 ```
 
 Test adequacy criteria formalize the notion of sufficient testing by defining metrics over the program's structure or behavior that the test suite must achieve. The simplest criterion is statement coverage: the fraction of executable statements in the program that at least one test case executes. A test suite with 100% statement coverage ensures that no code is completely untested, but it provides weak guarantees about correctness because a statement can be executed without its logic being validated. Consider a function that returns the maximum of two integers: a single test case `max(3, 5)` achieves full statement coverage but fails to test the case where the first argument is larger.

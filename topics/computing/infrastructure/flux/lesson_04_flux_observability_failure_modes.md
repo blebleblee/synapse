@@ -40,50 +40,47 @@ The architecture of Flux observability thus resembles a layered telemetry stack.
 
 The following diagram illustrates the flow of observability signals from Flux controllers to external systems:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Flux Controller Runtime                      │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
-│  │ source-      │  │ kustomize-   │  │ helm-        │         │
-│  │ controller   │  │ controller   │  │ controller   │         │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘         │
-│         │                  │                  │                  │
-│         ▼                  ▼                  ▼                  │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │         Status Subresource (conditions, generation)      │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│         │                  │                  │                  │
-│         ▼                  ▼                  ▼                  │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │    Kubernetes Events (type, reason, message, timestamp)  │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│         │                  │                  │                  │
-│         ▼                  ▼                  ▼                  │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │   Prometheus Metrics (/metrics endpoint, histograms)     │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-         │                  │                  │
-         │                  │                  │
-         ▼                  ▼                  ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              Flux notification-controller                       │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  Alert CRD: filter, aggregate, route events              │  │
-│  │  Provider CRD: Slack, Teams, PagerDuty, webhook          │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-         │                  │                  │
-         ▼                  ▼                  ▼
-┌────────────────┐  ┌────────────────┐  ┌────────────────┐
-│ Prometheus     │  │ Slack /        │  │ PagerDuty /    │
-│ Alertmanager   │  │ Teams          │  │ Opsgenie       │
-└────────────────┘  └────────────────┘  └────────────────┘
-         │                  │                  │
-         ▼                  ▼                  ▼
-┌─────────────────────────────────────────────────────────────────┐
-│        Grafana Dashboards / Incident Response Workflows         │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph flux_runtime ["Flux Controller Runtime"]
+        source_ctrl["source-controller"]
+        kustomize_ctrl["kustomize-controller"]
+        helm_ctrl["helm-controller"]
+    end
+    
+    status_sub["Status Subresource<br/>conditions, generation"]
+    k8s_events["Kubernetes Events<br/>type, reason, message, timestamp"]
+    prometheus_metrics["Prometheus Metrics<br/>/metrics endpoint, histograms"]
+    
+    subgraph notification_ctrl ["Flux notification-controller"]
+        alert_crd["Alert CRD<br/>filter, aggregate, route events"]
+        provider_crd["Provider CRD<br/>Slack, Teams, PagerDuty, webhook"]
+    end
+    
+    prometheus_am["Prometheus<br/>Alertmanager"]
+    slack_teams["Slack / Teams"]
+    pagerduty_og["PagerDuty /<br/>Opsgenie"]
+    
+    incident_response["Grafana Dashboards /<br/>Incident Response Workflows"]
+    
+    source_ctrl --> status_sub
+    kustomize_ctrl --> status_sub
+    helm_ctrl --> status_sub
+    
+    status_sub --> k8s_events
+    k8s_events --> prometheus_metrics
+    
+    status_sub --> alert_crd
+    k8s_events --> provider_crd
+    prometheus_metrics --> alert_crd
+    
+    alert_crd --> prometheus_am
+    provider_crd --> slack_teams
+    alert_crd --> pagerduty_og
+    
+    prometheus_am --> incident_response
+    slack_teams --> incident_response
+    pagerduty_og --> incident_response
 ```
 
 Each controller writes status conditions and emits Events synchronously during reconciliation. Prometheus scrapes the `/metrics` endpoint asynchronously at a fixed interval, introducing latency between metric emission and scrape. The notification-controller watches Flux resources via the Kubernetes API watch mechanism, receiving change notifications with sub-second latency under normal load. Alert delivery to external systems depends on the reliability and rate limits of those systems: Slack webhooks may be throttled to one message per second per channel, while PagerDuty may batch alerts to prevent incident storms.

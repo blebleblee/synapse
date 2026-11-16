@@ -43,19 +43,16 @@ Every Swift class instance begins life as a contiguous region of heap memory lai
 
 When a weak reference is created, the runtime promotes the object to use a side table. The `InlineRefCounts` word is overwritten with a pointer to the side table (distinguished by a flag in the low bit), and the side table holds the original strong and unowned counts along with a pointer back to the object.
 
-```
-┌────────────────┐          ┌──────────────────────────────────┐
-│  Object Header │          │  HeapObjectSideTableEntry        │
-│  metadata ptr  │◄─────────│  object: *HeapObject             │
-│  *SideTable ──►│          │  strongRefCount: UInt32          │
-│  ...properties │          │  unownedRefCount: UInt32         │
-└────────────────┘          └──────────────────────────────────┘
-        ▲
-        │   weak references point here, not to the object
-        │
-┌───────┴──────┐
-│  WeakRef ptr │──────────────────────► HeapObjectSideTableEntry
-└──────────────┘
+```mermaid
+flowchart TD
+    OH["Object Header<br/>metadata ptr<br/>*SideTable<br/>...properties"]
+    HSTE["HeapObjectSideTableEntry<br/>object: *HeapObject<br/>strongRefCount: UInt32<br/>unownedRefCount: UInt32"]
+    WR["WeakRef ptr"]
+    
+    OH -->|"*SideTable"| HSTE
+    HSTE -->|"metadata ptr"| OH
+    WR -->|"weak references point here,<br/>not to the object"| HSTE
+    WR -.->|indirectly via| OH
 ```
 
 The indirection through the side table is the key mechanism enabling safe weak reference loading. When the strong count hits zero, `swift_deallocObject` is called, which destroys the object's contents (calling `deinit` and releasing all contained references) and then frees the object's heap memory. The side table entry is marked with `IsDeinitialized = true`. Subsequent loads of any `weak` reference go through `swift_weakLoadStrongFromSideTable`, which checks the flag, returns `nil` if set, or performs an atomic increment of the strong count and returns the object if not.

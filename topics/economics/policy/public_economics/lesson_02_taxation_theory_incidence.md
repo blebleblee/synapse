@@ -70,65 +70,71 @@ The practical implication for policy design is profound. Differential tax rates 
 
 The partial-equilibrium incidence model extends in important and sometimes counterintuitive ways once market structure departs from perfect competition. The figure below maps the signal path of a commodity tax under four market structures.
 
-```
-COMPETITIVE MARKET
-─────────────────────────────────────────────────────────────
-  Tax Wedge (t)
-      │
-      ▼
-  P_D ─────────► Consumer Price ──► Quantity ↓ → EB Triangle
-      │
-  P_S = P_D - t
-      │
-      ▼
-  Split by relative elasticities (ε_D / ε_S)
-  Incidence: Buyer fraction = ε_S / (ε_S - ε_D)
-             Seller fraction = -ε_D / (ε_S - ε_D)
+```mermaid
+flowchart TD
 
+subgraph CM ["COMPETITIVE MARKET"]
+    CM1["Tax Wedge (t)"]
+    CM2["Consumer Price P_D rises"]
+    CM3["Producer Price P_S = P_D − t"]
+    CM4["Quantity traded falls → Excess Burden Triangle"]
+    CM5["Incidence split by relative elasticities ε_D / ε_S"]
+    CM6["Buyer fraction = ε_S / (ε_S − ε_D)"]
+    CM7["Seller fraction = −ε_D / (ε_S − ε_D)"]
 
-MONOPOLY MARKET
-─────────────────────────────────────────────────────────────
-  Tax Wedge (t) → Shifts MC upward by t
-      │
-      ▼
-  Profit-maximizing monopolist: MR = MC + t
-      │
-      ▼
-  Price rise (ΔP) depends on curvature of demand
-  Under linear demand: ΔP = t/2  (firm absorbs half)
-  Under constant-elasticity demand: ΔP > t  (overshifting)
-      │
-      ▼
-  Excess burden compounded: pre-existing monopoly markup
-  means deadweight loss exceeds competitive benchmark
+    CM1 --> CM2
+    CM1 --> CM3
+    CM2 --> CM4
+    CM3 --> CM4
+    CM4 --> CM5
+    CM5 --> CM6
+    CM5 --> CM7
+end
 
+subgraph MM ["MONOPOLY MARKET"]
+    MM1["Tax Wedge (t)"]
+    MM2["MC shifts upward by t"]
+    MM3["Monopolist optimum: MR = MC + t"]
+    MM4["Price rise ΔP depends on demand curvature"]
+    MM5["Linear demand: ΔP = t/2 — firm absorbs half"]
+    MM6["Constant-elasticity demand: ΔP > t — overshifting"]
+    MM7["Excess burden compounded by pre-existing monopoly markup\nDeadweight loss exceeds competitive benchmark"]
 
-MONOPSONY LABOR MARKET
-─────────────────────────────────────────────────────────────
-  Payroll tax on employer side
-      │
-      ▼
-  Monopsonist sets wage below competitive level
-  Tax shifts labor supply curve upward
-      │
-      ▼
-  Incidence depends on monopsony markdown, not just elasticities
-  Workers may bear MORE than 100% of tax in wages
-  (wage falls below new monopsonist optimum)
+    MM1 --> MM2
+    MM2 --> MM3
+    MM3 --> MM4
+    MM4 --> MM5
+    MM4 --> MM6
+    MM5 --> MM7
+    MM6 --> MM7
+end
 
+subgraph MN ["MONOPSONY LABOR MARKET"]
+    MN1["Payroll tax on employer side"]
+    MN2["Monopsonist sets wage below competitive level"]
+    MN3["Tax shifts labor supply curve upward"]
+    MN4["Incidence governed by monopsony markdown,\nnot elasticities alone"]
+    MN5["Workers may bear more than 100% of tax\n— wage falls below new monopsonist optimum"]
 
-OLIGOPOLY / COURNOT MARKET
-─────────────────────────────────────────────────────────────
-  Tax on marginal cost of each firm
-      │
-      ▼
-  Nash equilibrium shifts: each firm contracts output
-  Strategic complementarity → rivals also contract
-      │
-      ▼
-  Price rise exceeds competitive benchmark passthrough
-  (Overshifting common under quantity competition)
-  Excess burden: deadweight loss + strategic output distortion
+    MN1 --> MN2
+    MN1 --> MN3
+    MN2 --> MN4
+    MN3 --> MN4
+    MN4 --> MN5
+end
+
+subgraph OL ["OLIGOPOLY / COURNOT MARKET"]
+    OL1["Per-unit tax on each firm's marginal cost"]
+    OL2["Nash equilibrium shifts: each firm contracts output"]
+    OL3["Strategic complementarity: rivals also contract output"]
+    OL4["Price rise exceeds competitive passthrough — overshifting common\nunder quantity competition"]
+    OL5["Excess burden = deadweight loss + strategic output distortion"]
+
+    OL1 --> OL2
+    OL2 --> OL3
+    OL3 --> OL4
+    OL4 --> OL5
+end
 ```
 
 The monopoly case deserves particular elaboration because it complicates the standard Ramsey prescription. Under monopoly with a constant-elasticity demand curve, it is possible — and not merely a theoretical curiosity — for the consumer price to rise by *more* than the full amount of the tax. This phenomenon, called **overshifting**, arises because a higher marginal cost reduces the monopolist's profit-maximizing output along a demand curve whose elasticity changes with quantity. Empirical evidence of overshifting has been documented in studies of cigarette excise taxes in markets with imperfect competition, suggesting that standard partial-equilibrium incidence calculations that assume competitive markets can systematically misestimate the consumer burden of commodity taxes.

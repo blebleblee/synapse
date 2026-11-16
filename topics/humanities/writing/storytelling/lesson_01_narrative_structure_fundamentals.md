@@ -98,24 +98,86 @@ Critically, this structure is not about time. Act One can be fifty pages or five
 
 The diagram below illustrates how these nested scales relate:
 
-```
-ACT ONE                    ACT TWO                    ACT THREE
-├─ Sequence 1              ├─ Sequence 3              ├─ Sequence 7
-│  ├─ Scene 1              │  ├─ Scene 8              │  ├─ Scene 15
-│  │  ├─ Beat 1            │  │  ├─ Beat 47           │  │  ├─ Beat 89
-│  │  ├─ Beat 2            │  │  └─ Beat 50           │  │  └─ Beat 92
-│  │  └─ Beat 3            │  │                        │  │
-│  ├─ Scene 2              │  └─ Scene 9              │  └─ Scene 16
-│  │  ├─ Beat 4            │     ├─ Beat 51           │     ├─ Beat 93
-│  │  └─ Beat 5            │     └─ Beat 55           │     └─ Beat 97
-│  │                        │                         │
-│  └─ Scene 3              └─ Sequence 4             └─ RESOLUTION
-│     ├─ Beat 6                ├─ Scene 10
-│     ├─ Beat 7                └─ Scene 11
-│     └─ Beat 8            [Midpoint: Stakes Raised]
-│
-└─ TURNING POINT
-   [Commitment Made]
+```mermaid
+flowchart TD
+    %% Act One
+    subgraph act1["ACT ONE"]
+        seq1["Sequence 1"]
+        scene1["Scene 1"]
+        beat1["Beat 1"]
+        beat2["Beat 2"]
+        beat3["Beat 3"]
+        scene2["Scene 2"]
+        beat4["Beat 4"]
+        beat5["Beat 5"]
+        scene3["Scene 3"]
+        beat6["Beat 6"]
+        beat7["Beat 7"]
+        beat8["Beat 8"]
+        tp1["TURNING POINT<br/>[Commitment Made]"]
+        
+        seq1 --> scene1
+        seq1 --> scene2
+        seq1 --> scene3
+        scene1 --> beat1
+        scene1 --> beat2
+        scene1 --> beat3
+        scene2 --> beat4
+        scene2 --> beat5
+        scene3 --> beat6
+        scene3 --> beat7
+        scene3 --> beat8
+        seq1 --> tp1
+    end
+    
+    %% Act Two
+    subgraph act2["ACT TWO"]
+        seq3["Sequence 3"]
+        scene8["Scene 8"]
+        beat47["Beat 47"]
+        beat50["Beat 50"]
+        scene9["Scene 9"]
+        beat51["Beat 51"]
+        beat55["Beat 55"]
+        seq4["Sequence 4"]
+        scene10["Scene 10"]
+        scene11["Scene 11"]
+        mp["Midpoint: Stakes Raised"]
+        
+        seq3 --> scene8
+        seq3 --> scene9
+        scene8 --> beat47
+        scene8 --> beat50
+        scene9 --> beat51
+        scene9 --> beat55
+        seq4 --> scene10
+        seq4 --> scene11
+        seq4 --> mp
+    end
+    
+    %% Act Three
+    subgraph act3["ACT THREE"]
+        seq7["Sequence 7"]
+        scene15["Scene 15"]
+        beat89["Beat 89"]
+        beat92["Beat 92"]
+        scene16["Scene 16"]
+        beat93["Beat 93"]
+        beat97["Beat 97"]
+        res["RESOLUTION"]
+        
+        seq7 --> scene15
+        seq7 --> scene16
+        seq7 --> res
+        scene15 --> beat89
+        scene15 --> beat92
+        scene16 --> beat93
+        scene16 --> beat97
+    end
+    
+    %% Flow between acts
+    act1 --> act2
+    act2 --> act3
 ```
 
 Each nested level operates according to the same fundamental pattern: equilibrium, disruption, confrontation, and transformation. This recursive structure is why narrative feels coherent. The pattern repeats at every scale, creating a fractal-like coherence that human minds find satisfying.
@@ -174,6 +236,17 @@ If the character's actual choice differs from the most rational choice, the gap 
 
 The inverse failure is over-escalation without breathing room. If every scene is maximally intense, readers experience fatigue rather than tension. The rhythm of intensity matters. Professional structures deliberately place lower-intensity scenes after high-intensity sequences to allow the reader's nervous system to normalize before the next surge.
 
-A healthy rhythm alternates between high-intensity scenes (action, conflict, revelation) and lower-intensity scenes (recovery, planning, character reflection). A scene of physical conflict might be followed by a quiet scene of strategizing. A scene of emotional confrontation might be followed by a scene of mundane activity where the character processes what happened. These lower-intensity scenes are not filler; they are essential pacing mechanism.
+A healthy rhythm alternates between high-intensity scenes (action, conflict, revelation) and lower-intensity scenes (recovery, planning, character reflection). A scene of physical conflict might be followed by a quiet scene of strategizing. A scene of emotional confrontation might be followed by a scene of mundane activity where the character processes what happened.
 
-The intervention is to graph not just intensity but also *type* of intensity
+The structural principle is **intensity variance as narrative respiration**. A story that maintains constant high intensity creates habituation rather than engagement—the reader's threat-detection system recalibrates, and what should feel climactic begins to feel baseline. The solution is rhythmic modulation: high-intensity scenes establish stakes and advance plot momentum, while lower-intensity scenes allow characters (and readers) to consolidate meaning, process emotional impact, and establish the strategic or emotional context that makes the next high-intensity scene comprehensible. This isn't padding—it's the necessary negative space that gives shape to the intensity peaks. Without recovery intervals, narrative tension collapses into noise. The test is consequence integration: does the quiet scene after a crisis show how that crisis has changed the character's understanding, relationships, or strategic position? If the answer is yes, the pacing serves structure. If the scene merely delays the next action beat without consolidating meaning, it's filler masquerading as pacing control.
+
+The unifying principle across all three failure modes—arbitrary causation, unmotivated choice, and relentless escalation—is **structural legibility**. Readers don't require explicit exposition of every causal link, but they do require the felt sense that causation exists and operates consistently. When cause-effect chains break (arbitrary causation), when characters behave incoherently (unmotivated choice), or when intensity patterns prevent meaning consolidation (pacing whip), the reader loses confidence in the narrative's internal logic. The solution is never to over-explain, but to ensure that every major structural element—plot turns, character decisions, intensity rhythms—can survive backward interrogation. If you can't trace the causal ancestry of an event, justify a character's choice through established values and constraints, or identify what narrative work a scene accomplishes, the structure has a legibility gap that will erode reader trust even if they can't articulate why the story feels unconvincing.
+
+## Summary & Verification Matrix
+
+| Structural Element | Governing Invariant | Diagnostic Test | Failure Mode Signature |
+|-------------------|---------------------|-----------------|------------------------|
+| **Causation Chain** | Every major plot event must have traceable causal ancestry in prior established conditions | Backward trace: can each plot turn be explained by preceding setup without author intervention? | Events feel arbitrary; reader asks "why would that happen?" or "that's convenient" |
+| **Character Decision Logic** | Character choices must follow from established values + current constraints + available options | Motive mapping: does the character's choice represent the most rational option given their established priorities, or is the gap explicitly explained? | Character feels puppeted; decisions serve plot rather than emerging from coherent psychology |
+| **Intensity Rhythm** | High-intensity scenes must alternate with consolidation scenes that integrate consequences and restore baseline | Consequence integration: does each lower-intensity scene show how the preceding crisis changed understanding, relationships, or position? | Either relentless exhausting escalation (pacing whip) or aimless filler that doesn't consolidate meaning |
+| **Structural Legibility** | Readers must maintain confidence that causation operates consistently, even when not fully visible | Backward interrogation: can any structural element (plot turn, choice, scene) survive "why does this exist?" questioning? | Erosion of narrative trust; story feels unconvincing or contrived even when reader can't specify why |

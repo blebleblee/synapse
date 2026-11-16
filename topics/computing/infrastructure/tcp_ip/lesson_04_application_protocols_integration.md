@@ -336,27 +336,39 @@ HTTP is a stateless, request-response application protocol layered over TCP. Its
 
 HTTP/1.1 introduced persistent connections (keep-alive) by default, allowing multiple requests and responses to be sent over a single TCP connection without the overhead of repeated three-way handshakes. However, HTTP/1.1 enforces strict serialization on a single connection: the client must wait for a full response before sending the next request (pipelining was specified but widely disabled due to head-of-line blocking and was effectively abandoned). HTTP/2 solved this by introducing a binary framing layer that multiplexes multiple concurrent streams over a single TCP connection, each stream carrying an independent request-response pair. HTTP/3 further solved TCP-level head-of-line blocking by moving to QUIC, a UDP-based transport that implements its own stream-level reliability, so a lost packet on one stream does not stall independent streams sharing the same connection.
 
-```
-HTTP Protocol Evolution -- Connection and Multiplexing Model
+```mermaid
+flowchart TD
+    subgraph http1["HTTP/1.1 - TCP, Serialized"]
+        direction TB
+        h1c1["Client"] -->|"GET /a"| h1s1["Server"]
+        h1s1 -->|"200 OK (a)"| h1c2["Client"]
+        h1c2 -->|"GET /b (must wait)"| h1s2["Server"]
+        h1s2 -->|"200 OK (b)"| h1c3["Client"]
+    end
 
-HTTP/1.1 (TCP, serialized):
-  Client ──── GET /a ────────────────────────────▶ Server
-  Client ◀─── 200 OK (a) ──────────────────────── Server
-  Client ──── GET /b ────────────────────────────▶ Server   (must wait)
-  Client ◀─── 200 OK (b) ──────────────────────── Server
+    subgraph http2["HTTP/2 - TCP, Multiplexed Streams"]
+        direction TB
+        h2c1["Client"] -->|"GET /a (stream 1)"| h2conn["Same TCP Connection"]
+        h2c1 -->|"GET /b (stream 3)"| h2conn
+        h2conn --> h2s["Server"]
+        h2s -->|"Multiplexed"| h2resp["Response Handler"]
+        h2resp -->|"200 OK (stream 1)"| h2c2["Client"]
+        h2resp -->|"200 OK (stream 3)"| h2c2
+    end
 
-HTTP/2 (TCP, multiplexed streams):
-  Client ──── GET /a (stream 1) ──┐
-  Client ──── GET /b (stream 3) ──┤─── same TCP connection ───▶ Server
-  Client ◀─── 200 OK (stream 1) ──┤◀──── multiplexed ────────── Server
-  Client ◀─── 200 OK (stream 3) ──┘
+    subgraph http3["HTTP/3 - QUIC over UDP, Independent Stream Reliability"]
+        direction TB
+        h3c1["Client"] -->|"stream 1 (independent ACK)"| h3udp["UDP Transport"]
+        h3c1 -->|"stream 3 (independent ACK)"| h3udp
+        h3udp --> h3s["Server"]
+        h3s --> h3udp2["UDP Transport"]
+        h3udp2 -->|"stream 1 response (no HOL)"| h3c2["Client"]
+        h3udp2 -->|"stream 3 response (no HOL)"| h3c2
+        h3note["Note: Loss on stream 1<br/>does not block stream 3"]
+    end
 
-HTTP/3 (QUIC over UDP, independent stream reliability):
-  Client ──── stream 1 (independent ACK) ────┐
-  Client ──── stream 3 (independent ACK) ────┤─── UDP ──▶ Server
-  Client ◀─── stream 1 response (no HOL) ◀────┤◀── UDP ──── Server
-  Client ◀─── stream 3 response (no HOL) ◀────┘
-  (Loss on stream 1 does not block stream 3)
+    http1 -.->|"Evolution"| http2
+    http2 -.->|"Evolution"| http3
 ```
 
 The following program is a complete, compilable HTTP/1.1 server using Linux `epoll` with edge-triggered I/O. It demonstrates the socket lifecycle from `socket()` through `listen()`, `accept()`, and `recv()`/`send()`, with proper non-blocking I/O and connection management. This is the production pattern used by high-performance web servers (nginx, h2o) scaled down to its essentials:
@@ -576,65 +588,79 @@ int main(int argc, char *argv[]) {
 
 The socket lifecycle for a TCP connection in the Linux kernel involves two distinct queues. The SYN queue (`tcp_max_syn_backlog`, default 2048) holds connections that have received a SYN but not yet completed the three-way handshake. The accept queue (`somaxconn`, default 4096 on modern kernels) holds connections that have completed the handshake and are waiting for `accept()` to return them to the application. When the accept queue is full, the kernel drops incoming SYN-ACKs (or sends RST depending on `tcp_abort_on_overflow`), and the client experiences connection timeouts. These queue depths are not abstractions; they are the direct cause of connection failures under load spikes in production web servers.
 
-```
-TCP Connection Queues in the Linux Kernel
-
-                    Kernel Space                          Application
-                    ────────────                          ───────────
-
-SYN arrives  ┌─── SYN Queue ───┐
-──────────▶  │ (incomplete 3WHS)│  tcp_max_syn_backlog
-             │  SYN_RCVD state  │  /proc/sys/net/ipv4/
-             └───────┬──────────┘
-                     │ ACK received
-                     ▼
-             ┌─── Accept Queue ──┐
-             │ (completed 3WHS)   │  somaxconn
-             │  ESTABLISHED state │  /proc/sys/net/core/
-             └───────┬───────────┘
-                     │ accept() / accept4()
-                     ▼
-               Application fd      ──────▶  read(), write()
+```mermaid
+flowchart TD
+    SYN["SYN arrives"]
+    
+    subgraph kernel ["Kernel Space"]
+        synq["<b>SYN Queue</b><br/>(incomplete 3WHS)<br/>SYN_RCVD state<br/><br/>tcp_max_syn_backlog<br/>/proc/sys/net/ipv4/"]
+        acceptq["<b>Accept Queue</b><br/>(completed 3WHS)<br/>ESTABLISHED state<br/><br/>somaxconn<br/>/proc/sys/net/core/"]
+    end
+    
+    subgraph app ["Application"]
+        fd["Application fd"]
+        ops["read(), write()"]
+    end
+    
+    SYN --> synq
+    synq -->|"ACK received"| acceptq
+    acceptq -->|"accept() / accept4()"| fd
+    fd --> ops
 ```
 
 ### DHCP: Bootstrapping Network Identity
 
 DHCP (RFC 2131, RFC 2132) solves a bootstrapping problem that the TCP/IP stack creates for itself: a host needs an IP address to participate in IP communication, but it has no IP address before it starts communicating. The protocol resolves this chicken-and-egg problem by using UDP broadcast (source 0.0.0.0:68, destination 255.255.255.255:67) to discover a DHCP server willing to assign an address. The exchange follows a four-step sequence known as DORA: Discover, Offer, Request, Acknowledge.
 
-```
-DHCP DORA State Machine
-
-    Client                                   Server(s)
-    ──────                                   ─────────
-      │                                         │
-      │─── DHCPDISCOVER (broadcast) ──────────▶│  "I need an IP"
-      │    src: 0.0.0.0:68                      │
-      │    dst: 255.255.255.255:67             │
-      │    op=1, xid=TID                        │
-      │                                         │
-      │◀── DHCPOFFER (unicast or broadcast) ────│  "Here is one: 10.0.0.50"
-      │    yiaddr=10.0.0.50                     │
-      │    options: lease_time, subnet_mask,    │
-      │    router, dns_server                   │
-      │                                         │
-      │─── DHCPREQUEST (broadcast) ───────────▶│  "I accept 10.0.0.50"
-      │    requested_ip=10.0.0.50               │  (broadcast so other
-      │    server_id=chosen_server              │   servers know they
-      │                                         │   were not selected)
-      │                                         │
-      │◀── DHCPACK (unicast or broadcast) ─────│  "Confirmed. Lease is yours."
-      │    yiaddr=10.0.0.50                     │
-      │    lease_time=86400                     │
-      │                                         │
-      │    [BOUND state — host configures IP]  │
-      │                                         │
-      │    [T1 = 0.5 * lease_time ─── RENEWING] │
-      │─── DHCPREQUEST (unicast to server) ───▶│  "Renew my lease"
-      │◀── DHCPACK ─────────────────────────────│  "Renewed"
-      │                                         │
-      │    [T2 = 0.875 * lease_time ─ REBINDING]│
-      │─── DHCPREQUEST (broadcast) ───────────▶│  "Any server, renew?"
-      │◀── DHCPACK ─────────────────────────────│  "Renewed"
+```mermaid
+flowchart TD
+    Start([Client Startup]) --> Discover
+    
+    Discover["DHCPDISCOVER (broadcast)<br/>src: 0.0.0.0:68<br/>dst: 255.255.255.255:67<br/>op=1, xid=TID<br/><i>I need an IP</i>"]
+    
+    Discover --> Offer
+    
+    Offer["DHCPOFFER (unicast/broadcast)<br/>yiaddr=10.0.0.50<br/>options: lease_time, subnet_mask,<br/>router, dns_server<br/><i>Here is one: 10.0.0.50</i>"]
+    
+    Offer --> Request
+    
+    Request["DHCPREQUEST (broadcast)<br/>requested_ip=10.0.0.50<br/>server_id=chosen_server<br/><i>I accept 10.0.0.50</i><br/>(broadcast so other servers know<br/>they were not selected)"]
+    
+    Request --> Ack
+    
+    Ack["DHCPACK (unicast/broadcast)<br/>yiaddr=10.0.0.50<br/>lease_time=86400<br/><i>Confirmed. Lease is yours.</i>"]
+    
+    Ack --> Bound
+    
+    Bound["BOUND State<br/>Host configures IP"]
+    
+    Bound --> T1
+    
+    T1["T1 Reached<br/>(0.5 × lease_time)<br/>RENEWING State"]
+    
+    T1 --> RenewRequest
+    
+    RenewRequest["DHCPREQUEST (unicast to server)<br/><i>Renew my lease</i>"]
+    
+    RenewRequest --> RenewAck
+    
+    RenewAck["DHCPACK<br/><i>Renewed</i>"]
+    
+    RenewAck --> Bound
+    
+    Bound --> T2
+    
+    T2["T2 Reached<br/>(0.875 × lease_time)<br/>REBINDING State"]
+    
+    T2 --> RebindRequest
+    
+    RebindRequest["DHCPREQUEST (broadcast)<br/><i>Any server, renew?</i>"]
+    
+    RebindRequest --> RebindAck
+    
+    RebindAck["DHCPACK<br/><i>Renewed</i>"]
+    
+    RebindAck --> Bound
 ```
 
 The client begins in the INIT state with no IP address. It broadcasts a DHCPDISCOVER containing its MAC address and a transaction ID (XID). Any DHCP server receiving this may respond with a DHCPOFFER proposing an IP address (in the `yiaddr` field), a lease time, and configuration options (subnet mask, default gateway, DNS servers). The client selects one offer and broadcasts a DHCPREQUEST that includes the server identifier of the chosen server (the broadcast ensures non-selected servers can release their reserved addresses). The selected server responds with a DHCPACK confirming the lease, at which point the client performs ARP probe to detect address conflicts and then configures its interface. The lease has two timers: T1 (50% of lease time) triggers renewal with the same server via unicast; T2 (87.5% of lease time) triggers rebinding via broadcast to any server. If both timers expire without renewal, the client must release the address and restart the DORA cycle.
@@ -964,3 +990,4 @@ First, the system resolver cache (managed by `nscd`, `systemd-resolved`, or the 
 resolvectl statistics
 
 # Flush
+```

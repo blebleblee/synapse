@@ -80,24 +80,21 @@ Since $f_X$ is symmetric around zero, all odd moments of $X$ vanish: $\mathbb{E}
 
 The following diagram shows how the components of a bivariate distribution relate to one another through conditioning, marginalization, and moment extraction:
 
-```
-         Joint Density f_{X,Y}(x,y)
-                    │
-        ┌───────────┴────────────┐
-        │  Marginalize over Y    │  Marginalize over X
-        ▼                        ▼
-   f_X(x) = ∫f(x,y)dy      f_Y(y) = ∫f(x,y)dx
-        │                        │
-        │   Bayes Ratio           │
-        └──────────┬─────────────┘
-                   │
-         f_{Y|X}(y|x) = f(x,y)/f_X(x)
-                   │
-         Conditional Expectation
-         E[Y|X=x] = ∫y·f_{Y|X}(y|x)dy
-                   │
-         Covariance extraction:
-         Cov(X,Y) = E[XY] - E[X]E[Y]
+```mermaid
+flowchart TD
+    A["Joint Density f<sub>X,Y</sub>(x,y)"]
+    B["f<sub>X</sub>(x) = ∫f(x,y)dy<br/>(Marginalize over Y)"]
+    C["f<sub>Y</sub>(y) = ∫f(x,y)dx<br/>(Marginalize over X)"]
+    D["f<sub>Y|X</sub>(y|x) = f(x,y)/f<sub>X</sub>(x)<br/>(Bayes Ratio)"]
+    E["E["Y|X=x"] = ∫y·f<sub>Y|X</sub>(y|x)dy<br/>(Conditional Expectation)"]
+    F["Cov(X,Y) = E[XY] - E[X]E[Y]<br/>(Covariance extraction)"]
+    
+    A --> B
+    A --> C
+    B --> D
+    C --> D
+    D --> E
+    E --> F
 ```
 
 Each arrow represents a well-defined mathematical operation. The joint density is the top-level object; every derived quantity, marginal density, conditional density, conditional expectation, covariance, is obtained from it by integration, ratio, or moment extraction. This hierarchy prevents conceptual confusion about what is "fundamental" versus what is "derived."

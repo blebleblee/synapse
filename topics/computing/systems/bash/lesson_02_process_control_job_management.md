@@ -405,20 +405,45 @@ I — TASK_IDLE: idle kernel thread (Linux 4.14+)
 The `D` state deserves special attention: a process in `D` state cannot be killed because it is in the middle of a kernel operation that must complete (typically a synchronous disk I/O). `SIGKILL` is queued but not delivered until the process exits the `D` state. If a disk is unreachable (NFS timeout, failing hardware), a process can be stuck in `D` state indefinitely. This is a hardware-level issue; no amount of signaling resolves it.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> R : fork() + exec()
-    R --> S : wait for I/O or event (interruptible sleep)
-    R --> D : wait for I/O (uninterruptible sleep)
-    S --> R : I/O complete or signal received
-    D --> R : I/O complete (SIGKILL queued but not delivered in D)
-    R --> T : SIGSTOP or SIGTSTP or ptrace attach
-    T --> R : SIGCONT received
-    S --> T : SIGSTOP or SIGTSTP
-    R --> Z : exit() called or fatal signal
-    Z --> [*] : parent calls waitpid() — process table entry freed
+flowchart TD
+    CREATED(["● Start"])
+    R["R — Running / Runnable"]
+    S["S — Interruptible Sleep"]
+    D["D — Uninterruptible Sleep"]
+    T["T — Stopped / Traced"]
+    Z["Z — Zombie"]
+    REAPED(["● End"])
 
-    note right of D : Cannot be killed.\nMust wait for kernel.\nTypically disk/NFS I/O.
-    note right of Z : PCB preserved.\nConsumes PID slot.\nParent must reap.
+    DNOTE["Cannot be killed.\nMust wait for kernel.\nTypically disk / NFS I/O."]
+    ZNOTE["PCB preserved.\nConsumes PID slot.\nParent must reap."]
+
+    CREATED -->|"fork() + exec()"| R
+
+    R -->|"wait for I/O or event\n(interruptible sleep)"| S
+    S -->|"I/O complete or\nsignal received"| R
+
+    R -->|"wait for I/O\n(uninterruptible sleep)"| D
+    D -->|"I/O complete\n(SIGKILL queued, not delivered in D)"| R
+
+    R -->|"SIGSTOP / SIGTSTP /\nptrace attach"| T
+    S -->|"SIGSTOP / SIGTSTP"| T
+    T -->|"SIGCONT received"| R
+
+    R -->|"exit() called or\nfatal signal"| Z
+    Z -->|"parent calls waitpid() —\nprocess table entry freed"| REAPED
+
+    D -. " " .- DNOTE
+    Z -. " " .- ZNOTE
+
+    style CREATED fill:#222,stroke:#222,color:#fff
+    style REAPED  fill:#222,stroke:#222,color:#fff
+    style R       fill:#1a6e1a,stroke:#0f4d0f,color:#fff
+    style S       fill:#1a4e8a,stroke:#0f3366,color:#fff
+    style D       fill:#8a1a1a,stroke:#661010,color:#fff
+    style T       fill:#7a5a00,stroke:#554000,color:#fff
+    style Z       fill:#4a1a6e,stroke:#330f4d,color:#fff
+    style DNOTE   fill:#3d1a1a,stroke:#8a1a1a,color:#ffcccc,font-size:12px
+    style ZNOTE   fill:#2a1a3d,stroke:#4a1a6e,color:#ddccff,font-size:12px
 ```
 
 ---
@@ -1213,3 +1238,4 @@ strace -f -e trace=process,signal bash script.sh
 set -x          # Trace commands as they execute
 set -euo pipefail  # Exit on error, undefined var, pipe failure
 bash -n script.sh  # Parse-only check (no execution)
+```

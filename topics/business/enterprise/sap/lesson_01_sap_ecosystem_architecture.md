@@ -24,56 +24,59 @@ Transport management binds these environments through a change request workflow 
 
 The client-server model divides processing responsibilities between presentation tier, application tier, and database tier, with each tier executing on dedicated server hardware or virtualized compute instances. The presentation tier runs on end-user workstations, executing either the SAP GUI client—a thick client application that maintains persistent connections to application servers—or a web browser accessing Fiori applications through the HTML5 rendering framework. The application tier consists of ABAP work processes executing on application servers, processing business logic, enforcing authorization rules, and orchestrating database transactions. The database tier persists all transactional data, configuration settings, and program source code in relational tables, executing SQL queries and maintaining transaction log files for crash recovery and point-in-time restore operations.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     Presentation Layer                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
-│  │  SAP GUI     │  │  Web Browser │  │  Mobile App  │         │
-│  │  (SAPLogon)  │  │  (Fiori)     │  │  (Fiori)     │         │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘         │
-│         │                  │                  │                  │
-│         └──────────────────┴──────────────────┘                  │
-│                            │                                     │
-└────────────────────────────┼─────────────────────────────────────┘
-                             │
-                    DIAG / HTTP(S) / RFC
-                             │
-┌────────────────────────────┼─────────────────────────────────────┐
-│                     Application Layer                            │
-│         ┌──────────────────┴──────────────────┐                 │
-│         │      SAP Application Server         │                 │
-│         │  ┌────────────────────────────────┐ │                 │
-│         │  │  Dispatcher (Load Balancer)    │ │                 │
-│         │  └────────┬───────────────────────┘ │                 │
-│         │           │                          │                 │
-│         │  ┌────────┴────────┐  Work Process Pool               │
-│         │  │ DIA │ BTC │ UPD │ SPO │ ENQ │   │                 │
-│         │  │ WP  │ WP  │ WP  │ WP  │ Lock│   │                 │
-│         │  └─────┬──────┬────┴─────┴──┬──┘   │                 │
-│         │        │      │              │       │                 │
-│         │        └──────┴──────────────┘       │                 │
-│         │               │                       │                 │
-│         └───────────────┼───────────────────────┘                 │
-│                         │                                         │
-│         ┌───────────────┼───────────────────────┐                │
-│         │      Gateway / Message Server         │                │
-│         └───────────────┼───────────────────────┘                │
-│                         │                                         │
-└─────────────────────────┼─────────────────────────────────────────┘
-                          │
-                    SQL / Native DB Protocol
-                          │
-┌─────────────────────────┼─────────────────────────────────────────┐
-│                    Database Layer                                 │
-│         ┌───────────────┴───────────────────────┐                │
-│         │      SAP HANA / Oracle / SQL Server   │                │
-│         │  ┌──────────────────────────────────┐ │                │
-│         │  │  Table Spaces (Data, Indexes)    │ │                │
-│         │  │  Transaction Logs (Redo, Undo)   │ │                │
-│         │  │  Backup Volumes (Full, Incremental)│ │               │
-│         │  └──────────────────────────────────┘ │                │
-│         └────────────────────────────────────────┘                │
-└───────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph presentation["Presentation Layer"]
+        sapgui["SAP GUI<br/>(SAPLogon)"]
+        webbrowser["Web Browser<br/>(Fiori)"]
+        mobileapp["Mobile App<br/>(Fiori)"]
+    end
+    
+    subgraph application["Application Layer"]
+        dispatcher["Dispatcher<br/>(Load Balancer)"]
+        
+        subgraph workpool["Work Process Pool"]
+            diawp["DIA WP"]
+            btcwp["BTC WP"]
+            updwp["UPD WP"]
+            spowp["SPO WP"]
+            enqlock["ENQ Lock"]
+        end
+        
+        gateway["Gateway / Message Server"]
+    end
+    
+    subgraph database["Database Layer"]
+        dbengine["SAP HANA / Oracle / SQL Server"]
+        
+        subgraph dbcomponents["Database Components"]
+            tablespaces["Table Spaces<br/>(Data, Indexes)"]
+            translogs["Transaction Logs<br/>(Redo, Undo)"]
+            backupvols["Backup Volumes<br/>(Full, Incremental)"]
+        end
+    end
+    
+    sapgui -->|"DIAG / HTTP(S) / RFC"| dispatcher
+    webbrowser -->|"DIAG / HTTP(S) / RFC"| dispatcher
+    mobileapp -->|"DIAG / HTTP(S) / RFC"| dispatcher
+    
+    dispatcher --> diawp
+    dispatcher --> btcwp
+    dispatcher --> updwp
+    dispatcher --> spowp
+    dispatcher --> enqlock
+    
+    diawp --> gateway
+    btcwp --> gateway
+    updwp --> gateway
+    spowp --> gateway
+    enqlock --> gateway
+    
+    gateway -->|"SQL / Native DB Protocol"| dbengine
+    
+    dbengine --> tablespaces
+    dbengine --> translogs
+    dbengine --> backupvols
 ```
 
 Each application server instance runs a dispatcher process that accepts inbound connection requests and assigns them to available work processes from a pre-allocated pool. Dialog work processes handle interactive user sessions, processing screen inputs, executing business logic, and returning screen outputs through the SAP GUI protocol. Background work processes execute scheduled batch jobs, processing mass data updates, running financial close programs, and generating reports without user interaction. Update work processes handle asynchronous database commits, allowing dialog processes to return control to users immediately after posting transactions while the actual database write operations complete in parallel. Spool work processes manage print job queues, rendering output documents and routing them to physical printers or PDF archives. The enqueue work process maintains a centralized lock table that coordinates concurrent access to business objects, preventing lost updates when multiple users modify the same customer master record, sales order, or general ledger account simultaneously.

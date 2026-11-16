@@ -76,7 +76,7 @@ Visualize autonomy mode using layered transparency and color coding:
 - **Constrained mode**: overlays with 50% opacity and saturated red for constraint boundaries. The operator has input authority, but the robot's control system actively prevents violation of hard constraints (e.g., joint limits, collision zones).
 - **Handoff mode**: overlays briefly flash (alternating opacity 100%/50% at 2 Hz) in neutral white, signaling a transition. Used when switching between teleoperation and autonomy.
 
-Additionally, render a "confidence meter" for autonomous behaviors. When the robot's trajectory planner computes a motion, assign it a confidence score based on collision-free workspace volume, path length, and smoothness. Visualize this as a gradient fill on the planned trajectory: green for high confidence (>0.8), yellow for moderate (0.5–0.8), red for low (<0.5). An operator seeing a red trajectory can immediately request re-planning or override.
+Additionally, render a "confidence meter" for autonomous behaviors. When the robot's trajectory planner computes a motion, assign it a confidence score based on collision-free workspace volume, path length, and smoothness. Visualize this as a gradient fill on the planned trajectory: green for high confidence (>0.8), yellow for moderate (0.5–0.8), red for low (< 0.5). An operator seeing a red trajectory can immediately request re-planning or override.
 
 ### Spatial Audio for System State and Alerts
 
@@ -98,7 +98,7 @@ Achieving responsive AR interfaces requires aggressive latency profiling and opt
 
 **Gesture classification and command generation**: 5–10 ms. k-NN or simple neural network classification in feature space is fast. Bottleneck is usually I/O or network transmission.
 
-**Network transmission (if remote robot)**: 50–200 ms. This is the teleoperation delay. A 1 Gbps local network can transmit a command packet (100–500 bytes) in <1 ms, but wireless networks (WiFi 6, 5G) introduce 20–50 ms round-trip latency. Cellular links add 50–200 ms.
+**Network transmission (if remote robot)**: 50–200 ms. This is the teleoperation delay. A 1 Gbps local network can transmit a command packet (100–500 bytes) in < 1 ms, but wireless networks (WiFi 6, 5G) introduce 20–50 ms round-trip latency. Cellular links add 50–200 ms.
 
 **Robot control loop execution**: 10–50 ms. Depends on robot hardware. Industrial robots often run 100 Hz control loops (10 ms cycle). Mobile robots may run 50 Hz (20 ms). Software stack overhead (serialization, deserialization, queue latency) adds 5–10 ms.
 
@@ -130,7 +130,7 @@ For a grasping task:
 
 Implement phase transitions using context sensors. Typically, track robot state (idle, moving, grasping) from the robot's telemetry stream and update the overlay phase accordingly. Some AR platforms support gesture-triggered phase changes: operator swipes left/right to cycle through overlay information levels.
 
-The benefit is cognitive load reduction. Each phase presents only the minimal information needed for decision-making in that phase. A study on operator performance with time-sharing multiple robots found that operators with progressive disclosure overlays could manage 3–4 robots simultaneously with <10% task error rate, compared to 1–2 robots without progressive disclosure and >30% error rates.
+The benefit is cognitive load reduction. Each phase presents only the minimal information needed for decision-making in that phase. A study on operator performance with time-sharing multiple robots found that operators with progressive disclosure overlays could manage 3–4 robots simultaneously with < 10% task error rate, compared to 1–2 robots without progressive disclosure and >30% error rates.
 
 ### Failure Mode: Spatial Desynchronization
 
@@ -168,4 +168,24 @@ When gesture recognition fails silently (the classifier outputs a wrong gesture 
 
 Mitigate through:
 1. **Confidence thresholding**: only accept a gesture classification if the posterior probability (distance to nearest neighbor / distance to second-nearest neighbor) exceeds a threshold (e.g., 0.7). Otherwise, hold the previous gesture state.
-2. **Temporal hysteresis**: require a gesture to be classified consistently for 500
+2.
+
+**Confidence thresholding**: only accept a gesture classification if the posterior probability (distance to nearest neighbor / distance to second-nearest neighbor) exceeds a threshold (e.g., 0.7). Otherwise, hold the previous gesture state.
+2. **Multi-modal confirmation**: require a secondary input modality (voice command, button press, or dwell time) to confirm high-risk gestures (emergency stop, path override, grasp release). This breaks the single-point failure chain where a misclassified gesture directly triggers an unsafe action.
+3. **Temporal consistency filtering**: require a gesture to persist for 200–300 ms before accepting it as a command. This filters jitter and transient misclassifications while remaining below the threshold where latency degrades operator experience.
+4. **Fallback visualization**: when gesture confidence drops below threshold, render the hand skeleton in yellow or orange rather than green, signaling to the operator that their input is not being reliably interpreted. Provide an explicit visual cue (text overlay: "Hand occluded—adjust position") rather than failing silently.
+
+Robust AR interface design for human-robot interaction is not about eliminating failure modes—gesture ambiguity, perceptual aliasing, and trust calibration errors are inherent properties of any system coupling noisy perception to high-consequence actuation. Instead, the design objective is to ensure that when failures occur, they degrade gracefully: the operator retains situational awareness, the system state remains recoverable, and the probability of catastrophic outcomes (collision, grasp failure, unintended actuation) is bounded by multiple independent safety layers. This requires treating AR not as a visualization layer but as a control surface with formal safety invariants: every overlay element must either convey actionable state information or provide a mechanism for the operator to verify, reject, or refine the system's internal world model. The governing principle is **transparency with accountability**—the operator must always know what the robot believes, why it believes it, and have the authority to intervene when that belief is wrong.
+
+---
+
+## Summary & Verification Matrix
+
+| **Invariant / Mechanism** | **Governing Principle** | **Diagnostic Criterion** | **Failure Signature** |
+|---------------------------|-------------------------|--------------------------|----------------------|
+| **Spatial Registration Error** | AR overlays must align with physical geometry within ±2–5 mm to prevent misinterpretation of collision boundaries and grasp targets. | Measure overlay-to-physical drift using fiducial markers. Registration error σ < 3 mm at 95th percentile across workspace. | Object appears safe in AR but collides in reality; operator reaches for virtual handle positioned 10 cm from actual handle. |
+| **Perceptual Aliasing (Depth Ambiguity)** | Monocular AR displays collapse 3D workspace to 2D retinal projection; operators cannot reliably judge object distance or overlay depth ordering without stereoscopic or motion parallax cues. | Measure depth estimation error in user studies: present objects at varying distances and ask operators to rank proximity. Error rate > 30% indicates inadequate depth cues. | Operator misjudges object distance, commanding robot to grasp an object 20 cm farther than perceived; collision with foreground obstacle. |
+| **Cognitive Load (Overlay Density)** | Total information density in AR view must not exceed operator working memory capacity (~4 ± 1 chunks). Overlays compete with real-world stimuli for attention. | Measure secondary task performance degradation: if reaction time to peripheral events increases > 200 ms when AR is active, overlay density is excessive. | Operator misses critical alarm or physical hazard because attention is consumed by AR overlays; task completion time increases, error rate spikes. |
+| **Trust Calibration** | Operator trust in AR guidance must align with system reliability. Overtrust causes operators to ignore contradictory real-world evidence; undertrust causes operators to reject valid AR guidance. | Measure trust using post-task questionnaires and behavioral proxies (frequency of manual override, time spent visually cross-checking overlays). Trust misalignment > ±15% on Likert scale indicates calibration failure. | Operator ignores flashing collision warning because previous false alarms eroded trust; catastrophic collision occurs. Operator rejects valid grasp pose suggestion, wasting 30 seconds repositioning manually. |
+| **Gesture Ambiguity & Recognition Latency** | Gesture classifiers must achieve > 95% accuracy with < 100 ms latency and explicitly signal uncertainty when confidence is low. High-risk commands require multi-modal confirmation. | Measure confusion matrix (precision/recall per gesture class) and end-to-end latency from hand motion to command execution. False positive rate > 2% on critical gestures (emergency stop, path override) is unacceptable. | Misclassified pinch gesture triggers grasp release, dropping payload; jittery gesture recognition oscillates between "move forward" and "stop," causing erratic robot motion. |
+| **Alert Latency & Transparency Budgeting** | Safety-critical alerts (collision warnings, constraint violations) must trigger within 50 ms. Total overlay opacity must remain ≤ 60–70% to preserve real-world visibility. | Profile alert pipeline latency using instrumented test harness; measure overlay opacity in production scenes using photometer. Latency > 50 ms or opacity > 70% violates safety bounds. | Operator receives collision alert 200 ms after contact begins—too late to intervene. Dense overlays obscure physical hazard (oil spill, protruding equipment), causing operator injury. |

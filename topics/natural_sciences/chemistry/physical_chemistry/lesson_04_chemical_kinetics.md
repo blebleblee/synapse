@@ -145,12 +145,22 @@ Quantify enzyme catalytic parameters $V_{\max}$ and $K_M$ through substrate satu
 
 Reactions with half-lives below 10 seconds demand specialized instrumentation eliminating manual mixing delays. The stopped-flow apparatus implements pneumatically driven syringe rams that inject reactant solutions through a high-turbulence mixing chamber (tangential jets, mixing time $\sim 1$ ms), filling an observation cell where flow abruptly stops via a stopping syringe triggering data acquisition:
 
-```
-Syringe A (Reactant 1) ──┐
-                          ├──> Mixer ──> Observation Cell ──> PMT ──> Digitizer
-Syringe B (Reactant 2) ──┘                     ↓
-                                          Stopping Syringe
-                                          (triggers t = 0)
+```mermaid
+flowchart TD
+    A["Syringe A<br/>(Reactant 1)"]
+    B["Syringe B<br/>(Reactant 2)"]
+    mixer["Mixer"]
+    obs_cell["Observation Cell"]
+    pmt["PMT"]
+    digitizer["Digitizer"]
+    stop_syringe["Stopping Syringe<br/>(triggers t = 0)"]
+    
+    A --> mixer
+    B --> mixer
+    mixer --> obs_cell
+    obs_cell --> pmt
+    pmt --> digitizer
+    obs_cell --> stop_syringe
 ```
 
 Drive gas pressure (N₂, 80–120 psi) determines shot speed; faster drives improve mixing but increase sample consumption. Quartz observation cell volume (20–100 μL) sits in thermostated brass block. Monochromatic light from the Xe arc lamp passes transversely; photomultiplier detects transmitted intensity at microsecond sampling rates. Typical applications include enzyme pre-steady-state bursts, protein folding, ligand binding, and fast acid-base equilibrations. Dead time (mixing completion to first reliable data point) ranges 0.5–2 ms depending on geometry—reactions faster than dead time require alternative techniques (temperature-jump, flash photolysis).

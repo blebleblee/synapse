@@ -24,24 +24,18 @@ Champions advocate for your solution internally, spending political capital to s
 
 The structural representation of an enterprise account's stakeholder network resembles a directed graph where nodes represent individuals and edges represent influence relationships. The economic buyer sits at the apex, but influence flows through indirect paths that bypass hierarchical reporting structures. A senior architect might lack budget authority but hold de facto veto power through technical credibility. A business unit leader might champion adoption in their division, creating proof-points that persuade the CFO to fund enterprise-wide rollout. The account manager's task is to map these influence paths and orchestrate engagement strategies that build momentum along multiple vectors simultaneously.
 
-```
-Enterprise Account Stakeholder Map
-
-                    [CFO - Economic Buyer]
-                            |
-                     Budget Authority
-                            |
-            +---------------+----------------+
-            |                                |
-     [VP Engineering]              [VP Sales Operations]
-      Influencer                     Champion
-            |                                |
-    Technical Veto                    Internal Advocate
-            |                                |
-    +-------+-------+                +-------+-------+
-    |               |                |               |
-[Architect]    [Security]       [RevOps]        [Sales Mgr]
-Influencer     Influencer       End User        End User
+```mermaid
+flowchart TD
+    CFO["CFO - Economic Buyer<br/>Budget Authority"]
+    
+    CFO --> VP_Eng["VP Engineering<br/>Influencer<br/>Technical Veto"]
+    CFO --> VP_Sales["VP Sales Operations<br/>Champion<br/>Internal Advocate"]
+    
+    VP_Eng --> Architect["Architect<br/>Influencer"]
+    VP_Eng --> Security["Security<br/>Influencer"]
+    
+    VP_Sales --> RevOps["RevOps<br/>End User"]
+    VP_Sales --> Sales_Mgr["Sales Mgr<br/>End User"]
 ```
 
 The second architectural layer is the engagement model, which defines how your cross-functional team interacts with the customer's stakeholders. The simplest engagement model assigns a single account executive who manages all customer interactions. This model scales to mid-market accounts where total contract value remains below half a million dollars annually and organizational complexity stays contained. Enterprise accounts exceeding several million in annual recurring revenue demand specialized roles that divide responsibilities by functional domain.

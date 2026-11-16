@@ -34,19 +34,40 @@ For a linear projection of size `[d_model, d_ff]`:
 
 At batch=1, seq=1 (autoregressive decode), arithmetic intensity ≈ 1 FLOP/byte — roughly **300× below the H100's compute roof**. The kernel spends nearly all time reading weights from HBM. Increasing batch size is the primary lever to shift toward compute-bound operation.
 
-```
-Roofline for H100 (FP16)
-
-TFLOP/s
- 1000 |                            * Peak Compute (989 TFLOP/s)
-      |                           /
-  100 |                          /
-      |               _________ / <-- Bandwidth roof (slope = 3350 GB/s)
-   10 |     *         /
-      |  batch=1  batch=32   batch=256
-    1 |
-      +---+----------+----------+-------> Arithmetic Intensity (FLOP/byte)
-      1   10        100        1000
+```mermaid
+flowchart TD
+    A["Roofline Model for H100 FP16"]
+    
+    subgraph performance ["Performance vs Arithmetic Intensity"]
+        B["Arithmetic Intensity<br/>1 FLOP/byte"]
+        C["Arithmetic Intensity<br/>10 FLOP/byte"]
+        D["Arithmetic Intensity<br/>100 FLOP/byte"]
+        E["Arithmetic Intensity<br/>1000 FLOP/byte"]
+        
+        F["1 TFLOP/s<br/>Batch=1"]
+        G["10 TFLOP/s"]
+        H["100 TFLOP/s<br/>Batch=32"]
+        I["1000 TFLOP/s<br/>Peak Compute 989 TFLOP/s<br/>Batch=256"]
+        
+        J["Bandwidth Roof<br/>Slope = 3350 GB/s<br/>Memory Bound Region"]
+    end
+    
+    B --> C
+    C --> D
+    D --> E
+    
+    B -.->|"Memory Bound"| F
+    C -.->|"Bandwidth Limited"| G
+    D -.->|"Transition"| H
+    E -.->|"Compute Bound"| I
+    
+    G --> J
+    H --> J
+    J --> I
+    
+    style I fill:#ff9999
+    style J fill:#99ccff
+    style F fill:#ffff99
 ```
 
 This is why **continuous batching** (Orca, vLLM) is the highest-impact systems optimization for LLM serving throughput.
@@ -440,15 +461,14 @@ for i, (inputs, labels) in enumerate(dataloader):
 
 The **linear warmup + cosine decay** schedule (Loshchilov & Hutter, 2017; Chinchilla, Hoffmann et al., 2022) is empirically near-optimal for large model training:
 
-```
-              Warmup         Cosine Decay
-LR
- η_max |     /‾‾‾‾‾‾‾‾‾‾‾‾‾\
-       |    /               \
-       |   /                 ‾‾‾‾‾‾\
- η_min |  /                        ‾‾‾‾‾‾‾‾‾—
-       +--+--------+---------------+---------> Step
-          0    warmup_steps    total_steps
+```mermaid
+flowchart LR
+    A["Step 0<br/>η = η_min"] -->|"Warmup Phase"| B["warmup_steps<br/>η = η_max"]
+    B -->|"Cosine Decay"| C["total_steps<br/>η = η_min"]
+    
+    style A fill:#e1f5ff,stroke:#0288d1
+    style B fill:#ffebee,stroke:#c62828
+    style C fill:#e1f5ff,stroke:#0288d1
 ```
 
 Warmup is necessary because Adam's `v̂_t` is initialized at zero; without warmup, early steps have unreliably large effective learning rates (the `1/√ε` case when `v̂_t ≈ 0`).
@@ -482,7 +502,7 @@ def get_cosine_schedule_with_warmup(
 
 **Structured pruning** removes entire neurons, attention heads, or layers, producing smaller dense matrices that benefit immediately from hardware-optimized dense BLAS. The tradeoff: structured pruning is harder to apply without quality degradation.
 
-**SparseGPT** (Frantar & Alistarh, 2023) extends the GPTQ second-order framework to pruning: it determines which weights to zero while compensating remaining weights to minimize reconstruction error, achieving ~50% unstructured sparsity on 175B-parameter models with <1% perplexity increase.
+**SparseGPT** (Frantar & Alistarh, 2023) extends the GPTQ second-order framework to pruning: it determines which weights to zero while compensating remaining weights to minimize reconstruction error, achieving ~50% unstructured sparsity on 175B-parameter models with < 1% perplexity increase.
 
 ---
 

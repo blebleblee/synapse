@@ -26,30 +26,36 @@ The execution model that follows from this construction is *parallel state track
 
 PCRE takes a different architectural path. It uses a recursive backtracking NFA simulation, which performs depth-first search through the NFA's nondeterministic choices. The benefit is that PCRE can support capturing groups, non-greedy quantifiers, lookaheads, lookbehinds, backreferences, and possessive quantifiers — features that are outside the formal definition of regular languages but that engineers have come to rely on. The cost is that the worst-case complexity becomes O(2^n) or worse for certain patterns against adversarial input. This is not a hypothetical concern; it is the mechanism behind ReDoS (Regular Expression Denial of Service) attacks.
 
-```
-Input: "aaaaab"
-Pattern: (a+)+b
-
-NFA State Machine (simplified):
-
-Start --> [Group start] --> [a+: match one or more 'a']
-              |                       |
-              <--------- (backtrack loop) -------->
-              |
-          [Group end (+)]  --> [match 'b'] --> Accept
-
-Backtracking Tree for input "aaaaaa" (no trailing 'b'):
-
-(a+)+ tries:
-  "aaaaaa" as one group -> fail on 'b'
-  "aaaaa"+"a" as two groups -> fail on 'b'
-  "aaaa"+"aa" -> fail
-  "aaaa"+"a"+"a" -> fail
-  "aaa"+"aaa" -> fail
-  "aaa"+"aa"+"a" -> fail
-  "aaa"+"a"+"aa" -> fail
-  "aaa"+"a"+"a"+"a" -> fail
-  ... (exponential)
+```mermaid
+flowchart TD
+    Start([Start])
+    GrpStart["Group Start: (a+)+"]
+    MatchA["Match a+: one or more 'a'"]
+    GrpEnd["Group End: capture group"]
+    MatchB["Match 'b'"]
+    Accept([Accept])
+    
+    Start --> GrpStart
+    GrpStart --> MatchA
+    MatchA --> |"backtrack loop"| GrpStart
+    MatchA --> GrpEnd
+    GrpEnd --> MatchB
+    MatchB --> Accept
+    
+    subgraph Backtracking["Backtracking Attempts for 'aaaaaa' (no 'b')"]
+        direction TB
+        T1["Try: 'aaaaaa' as 1 group → fail on 'b'"]
+        T2["Try: 'aaaaa' + 'a' as 2 groups → fail on 'b'"]
+        T3["Try: 'aaaa' + 'aa' → fail"]
+        T4["Try: 'aaaa' + 'a' + 'a' → fail"]
+        T5["Try: 'aaa' + 'aaa' → fail"]
+        T6["Try: 'aaa' + 'aa' + 'a' → fail"]
+        T7["Try: 'aaa' + 'a' + 'aa' → fail"]
+        T8["Try: 'aaa' + 'a' + 'a' + 'a' → fail"]
+        T9["... exponential combinations ..."]
+        
+        T1 --> T2 --> T3 --> T4 --> T5 --> T6 --> T7 --> T8 --> T9
+    end
 ```
 
 The pattern `(a+)+b` applied to a string of *n* `a` characters with no trailing `b` produces 2^(n-1) distinct ways to partition the `a` characters among the outer `+` repetitions. Each partition is explored and fails at the final `b`, resulting in exponential time. This is a textbook catastrophic backtracking example. The pattern is an instance of *nested quantifiers over overlapping character classes*, which is the canonical structure that produces exponential blowup.

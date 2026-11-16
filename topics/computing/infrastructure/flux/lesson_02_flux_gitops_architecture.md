@@ -98,15 +98,16 @@ The `wait: true` parameter activates Flux's health assessment logic. After apply
 
 The dependency graph, expressed through the `dependsOn` field, allows sophisticated orchestration patterns. Consider a multi-tier application deployment where a database operator CRD must be installed before database instance custom resources can be created, and application Deployments must wait for the database to reach ready status before starting. This three-level dependency chain can be encoded as:
 
-```
-Kustomization: infrastructure-operators (no dependencies)
-    └── Installs: PostgreSQL Operator CRD, Deployment, RBAC
-
-Kustomization: infrastructure-databases (depends on: infrastructure-operators)
-    └── Creates: PostgreSQL custom resource instances
-
-Kustomization: infrastructure-apps (depends on: infrastructure-databases)
-    └── Deploys: Application Deployments referencing database connection secrets
+```mermaid
+flowchart TD
+    ops["<b>Kustomization:</b><br/>infrastructure-operators<br/><br/>Installs:<br/>PostgreSQL Operator CRD<br/>Deployment, RBAC"]
+    
+    dbs["<b>Kustomization:</b><br/>infrastructure-databases<br/><br/>Creates:<br/>PostgreSQL custom resource instances"]
+    
+    apps["<b>Kustomization:</b><br/>infrastructure-apps<br/><br/>Deploys:<br/>Application Deployments<br/>referencing database connection secrets"]
+    
+    ops -->|"depends on"| dbs
+    dbs -->|"depends on"| apps
 ```
 
 Flux evaluates the dependency graph topologically, reconciling resources in phases such that no Kustomization begins reconciliation until all its dependencies report ready status. If a dependency reconciliation fails or times out, dependent Kustomizations remain in a suspended state, preventing cascading failures from propagating through the deployment pipeline.

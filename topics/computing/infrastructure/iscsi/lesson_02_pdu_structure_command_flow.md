@@ -75,26 +75,38 @@ The most important types for command flow are the SCSI Command (0x00), the SCSI 
 
 Four distinct write flows exist, distinguished by two negotiation flags: `ImmediateData` (whether the initiator may carry data in the SCSI Command PDU itself) and `InitialR2T` (whether the target must issue an R2T before any data is sent). When both default values hold — `ImmediateData=Yes`, `InitialR2T=No` — the initiator may emit unsolicited data, either as the data segment of the SCSI Command itself (immediate data) or as one or more Data-Out PDUs immediately following the SCSI Command, without waiting for the target to grant an R2T. The unsolicited phase is bounded by `FirstBurstLength`, negotiated during login. Any data beyond `FirstBurstLength` must be solicited: the target sends an R2T naming an offset and a length (itself bounded by `MaxBurstLength`), and the initiator responds with Data-Out PDUs that advance the offset. When `InitialR2T=Yes`, the unsolicited phase disappears entirely: the initiator sends only the SCSI Command and waits, the target replies with one or more R2Ts, and the write proceeds as a pure request/grant exchange.
 
-```
-Initiator                                     Target
-  |                                             |
-  |  SCSI Cmd (CmdSN=N, ITT=T, EDTL=64K, W=1)   |
-  |  + immediate data, len=min(EDTL,FirstBurst) |
-  |-------------------------------------------->|
-  |                                             |
-  |  R2T (ITT=T, offset=FB, len=MaxBurst)        |
-  |<--------------------------------------------|
-  |  Data-Out (DataSN=0, offset=FB)              |
-  |-------------------------------------------->|
-  |  Data-Out (DataSN=1, offset=FB+DS)           |
-  |-------------------------------------------->|
-  |  ...                                        |
-  |  R2T (ITT=T, offset=..., len=residual)       |
-  |<--------------------------------------------|
-  |  Data-Out (...)                             |
-  |-------------------------------------------->|
-  |  SCSI Response (Status=GOOD)                |
-  |<--------------------------------------------|
+```mermaid
+flowchart TD
+    subgraph initiator ["Initiator"]
+        I1(["Start"])
+        I2["Send SCSI Cmd\n(CmdSN=N, ITT=T, EDTL=64K, W=1)\n+ Immediate Data\nlen = min(EDTL, FirstBurst)"]
+        I3["Send Data-Out\n(DataSN=0, offset=FirstBurst)"]
+        I4["Send Data-Out\n(DataSN=1, offset=FirstBurst+DataSegLen)"]
+        I5["Send Data-Out\n(DataSN=N, offset=...)"]
+        I6(["Done"])
+    end
+
+    subgraph target ["Target"]
+        T1["Receive SCSI Cmd\n+ Immediate Data"]
+        T2["Send R2T\n(ITT=T, offset=FirstBurst, len=MaxBurst)"]
+        T3["Receive Data-Out Burst 1"]
+        T4["Send R2T\n(ITT=T, offset=..., len=residual)"]
+        T5["Receive Final Data-Out"]
+        T6["Send SCSI Response\n(Status=GOOD)"]
+    end
+
+    I1 --> I2
+    I2 -->|"SCSI Cmd + Immediate Data"| T1
+    T1 --> T2
+    T2 -->|"R2T (ITT=T, offset=FirstBurst, len=MaxBurst)"| I3
+    I3 -->|"Data-Out (DataSN=0)"| T3
+    T3 --> I4
+    I4 -->|"Data-Out (DataSN=1)"| T3
+    T3 --> T4
+    T4 -->|"R2T (ITT=T, offset=..., len=residual)"| I5
+    I5 -->|"Data-Out (final segment)"| T5
+    T5 --> T6
+    T6 -->|"SCSI Response (Status=GOOD)"| I6
 ```
 
 A read is structurally simpler. The initiator sends a SCSI Command with `R=1` and an EDTL stating how much it expects; the target returns one or more Data-In PDUs, each carrying a `DataSN` and an `offset` into the EDTL, followed by a SCSI Response with the status byte. The Data-In PDU has a flag `S` (Status) that allows the target to fold the SCSI Response into the final Data-In, a fused optimisation called "Data-In with Status" that avoids a separate round-trip. When `S=1`, the final Data-In carries the status in the BHS and the response sequence is complete; when `S=0`, a separate SCSI Response PDU follows. Targets almost always fuse status when permitted because the round-trip savings compound across millions of small reads.

@@ -22,32 +22,20 @@ These four invariants do not operate independently. The advanced practitioner mu
 
 To engineer deception reliably, it helps to have a working model of the target system. The pipeline from sensory input to conscious memory encoding can be sketched at a functional level as follows:
 
-```
-Sensory Input (Eyes, Ears, Touch)
-         │
-         ▼
-   Pre-attentive Processing
-   (peripheral motion, contrast,
-    salience detection — ~100ms)
-         │
-         ▼
-   Attentional Filter
-   (selective, capacity-limited,
-    ~200–500ms decision window)
-         │
-         ▼
-   Working Memory (WM)
-   (~4 chunks, ~15–30s without rehearsal)
-         │
-         ▼
-   Narrative Integration
-   (causal story constructed from
-    encoded chunks + prior knowledge)
-         │
-         ▼
-   Long-Term Memory Consolidation
-   (only strongly attended + rehearsed
-    material survives here)
+```mermaid
+flowchart TD
+    A["Sensory Input<br/>(Eyes, Ears, Touch)"]
+    B["Pre-attentive Processing<br/>(peripheral motion, contrast,<br/>salience detection — ~100ms)"]
+    C["Attentional Filter<br/>(selective, capacity-limited,<br/>~200–500ms decision window)"]
+    D["Working Memory (WM)<br/>(~4 chunks, ~15–30s without rehearsal)"]
+    E["Narrative Integration<br/>(causal story constructed from<br/>encoded chunks + prior knowledge)"]
+    F["Long-Term Memory Consolidation<br/>(only strongly attended + rehearsed<br/>material survives here)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 The magician's leverage points are the **Attentional Filter** and the **Working Memory** stage. If the secret action occurs while the attentional filter is directed elsewhere, it is not encoded into working memory. If it *is* briefly encoded into working memory but is not rehearsed (because a competing stimulus immediately overwrites it), it will not consolidate into long-term memory. Both pathways are exploitable, and the most robust deceptions target both simultaneously.
@@ -62,20 +50,20 @@ The sophisticated version operates through what Dai Vernon called "naturalness" 
 
 The geometry of spatial misdirection in close-up performance follows a consistent structure. The magician establishes a "work zone" — a region of space where consequential actions have been occurring and the spectator therefore monitors. They then generate a salience event *within or near* the work zone (not far from it, which would be spatially jarring) that occupies the attentional filter for a minimum of 200–400 milliseconds. Within that window, the secret action occurs in a region that falls within peripheral vision but below the threshold of attentional encoding. The action must be mechanically clean enough to generate no sound, no abrupt motion profile, and no tactile tell that would transmit as a sensory signal through the spectator's social monitoring.
 
-```
-Work Zone (spectator's focal attention)
-┌─────────────────────────────────┐
-│                                 │
-│   [Left Hand — Action Point]    │◄── Salience event generated here
-│                                 │        (coin flash, color change,
-│   [Right Hand — Secret Action]  │◄──      verbal cue, eye contact)
-│                                 │
-└─────────────────────────────────┘
-   ↑
-   Secret action occurs here, in the
-   attentional shadow of the salience event.
-   Must be within ~40° of focal point to
-   avoid pre-attentive salience triggers.
+```mermaid
+flowchart TD
+    subgraph work_zone["Work Zone (spectator's focal attention)"]
+        left_hand["Left Hand — Action Point"]
+        right_hand["Right Hand — Secret Action"]
+    end
+    
+    salience_event["Salience event generated here<br/>(coin flash, color change,<br/>verbal cue, eye contact)"]
+    
+    secret_action["Secret action occurs here, in the<br/>attentional shadow of the salience event.<br/>Must be within ~40° of focal point to<br/>avoid pre-attentive salience triggers."]
+    
+    salience_event -.-> left_hand
+    salience_event -.-> right_hand
+    secret_action --> work_zone
 ```
 
 ### Temporal Misdirection: The Gap Before and After

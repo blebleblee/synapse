@@ -28,47 +28,28 @@ The architecture of a file-infecting virus decomposes into four functional stage
 
 Target selection begins with filesystem enumeration to identify candidate executables. A sophisticated virus walks directory trees, filters files by extension (`.exe`, `.dll`, `.so`, `.out`), and validates file headers to confirm executable format. For PE files, the virus reads the first two bytes to verify the `MZ` signature (0x4D5A), then follows the `e_lfanew` offset at byte 0x3C to locate the PE header marked by the `PE\0\0` signature (0x50450000). ELF files begin with the four-byte magic number `\x7FELF` (0x7F454C46), followed by class, endianness, and version fields. Validating these signatures prevents the virus from corrupting non-executable files or attempting to infect already-infected binaries, which would waste resources and potentially destabilize the infected host.
 
-```
-PE File Structure:
-+------------------------+
-| DOS Header (MZ)        | Offset 0x0000
-| DOS Stub               |
-+------------------------+
-| PE Header (PE\0\0)     | Offset: e_lfanew (from DOS header)
-| COFF File Header       |
-| Optional Header        |
-|   - Entry Point        |
-|   - Image Base         |
-|   - Section Alignment  |
-+------------------------+
-| Section Table          |
-|   .text  (code)        |
-|   .data  (data)        |
-|   .rsrc  (resources)   |
-+------------------------+
-| Section Data           |
-|   (actual code/data)   |
-+------------------------+
+```mermaid
+flowchart TD
+    subgraph PE ["PE File Structure"]
+        PE1["DOS Header (MZ)\nOffset 0x0000"]
+        PE2["DOS Stub"]
+        PE3["PE Header (PE\\0\\0)\nOffset: e_lfanew"]
+        PE4["COFF File Header"]
+        PE5["Optional Header\n• Entry Point\n• Image Base\n• Section Alignment"]
+        PE6["Section Table\n• .text  (code)\n• .data  (data)\n• .rsrc  (resources)"]
+        PE7["Section Data\n(actual code / data)"]
 
-ELF File Structure:
-+------------------------+
-| ELF Header             | Offset 0x0000
-|   - Magic (\x7FELF)    |
-|   - Entry Point        |
-|   - Program Hdr Offset |
-|   - Section Hdr Offset |
-+------------------------+
-| Program Headers        |
-|   PT_LOAD segments     |
-|   PT_DYNAMIC           |
-+------------------------+
-| Section Headers        |
-|   .text                |
-|   .data, .bss          |
-|   .symtab, .strtab     |
-+------------------------+
-| Section Data           |
-+------------------------+
+        PE1 --> PE2 --> PE3 --> PE4 --> PE5 --> PE6 --> PE7
+    end
+
+    subgraph ELF ["ELF File Structure"]
+        ELF1["ELF Header\nOffset 0x0000\n• Magic (\\x7FELF)\n• Entry Point\n• Program Hdr Offset\n• Section Hdr Offset"]
+        ELF2["Program Headers\n• PT_LOAD segments\n• PT_DYNAMIC"]
+        ELF3["Section Headers\n• .text\n• .data, .bss\n• .symtab, .strtab"]
+        ELF4["Section Data"]
+
+        ELF1 --> ELF2 --> ELF3 --> ELF4
+    end
 ```
 
 Infection vector execution determines how viral code integrates into the host binary. The cavity method searches for unused space within existing sections, exploiting alignment padding or gaps between sections. PE files align sections to boundaries defined by `SectionAlignment` (typically 4KB for memory) and `FileAlignment` (typically 512 bytes for disk), creating slack space when section data doesn't fill alignment blocks. A virus scans section headers for regions where `VirtualSize` exceeds `SizeOfRawData`, indicating zero-padded memory that won't be paged from disk, or searches for inter-section gaps where file offset plus raw size of one section falls short of the next section's file offset. Injecting into cavities preserves the section count and avoids expanding the file size, reducing the footprint of infection.

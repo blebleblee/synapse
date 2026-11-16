@@ -18,35 +18,24 @@ The other foundational invariant is isolation. Each job runs in a fresh executio
 
 The lifecycle of a workflow run begins the moment a qualifying event reaches GitHub's servers. The sequence from that point to code executing on a runner involves several distinct layers, each with its own responsibilities.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        GitHub Platform                      │
-│                                                             │
-│  Repository Event                                           │
-│  (push / PR / tag)                                          │
-│        │                                                    │
-│        ▼                                                    │
-│  Webhook Dispatcher                                         │
-│  - Reads .github/workflows/*.yml at event commit SHA        │
-│  - Evaluates `on:` trigger filters                          │
-│  - Resolves workflow permissions (GITHUB_TOKEN scope)       │
-│        │                                                    │
-│        ▼                                                    │
-│  Actions Scheduler                                          │
-│  - Builds job DAG from `needs:` declarations                │
-│  - Assigns jobs to runner queues                            │
-│  - Injects secrets into job environment                     │
-│        │                                                    │
-│        ▼                                                    │
-│  Runner Assignment                                          │
-│  - GitHub-hosted pool  OR  Self-hosted runner (long-poll)   │
-│        │                                                    │
-│        ▼                                                    │
-│  Job Execution Container                                     │
-│  - Runner binary unpacks steps                              │
-│  - Each step: action checkout → action execute → log stream │
-│  - Exit code 0 = success; non-zero = failure                │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph github ["GitHub Platform"]
+        EVT["Repository Event\npush / PR / tag"]
+
+        WD["Webhook Dispatcher\n─────────────────────\nReads .github/workflows/*.yml at event commit SHA\nEvaluates on: trigger filters\nResolves workflow permissions (GITHUB_TOKEN scope)"]
+
+        AS["Actions Scheduler\n─────────────────────\nBuilds job DAG from needs: declarations\nAssigns jobs to runner queues\nInjects secrets into job environment"]
+
+        RA["Runner Assignment\n─────────────────────\nGitHub-hosted pool  OR  Self-hosted runner (long-poll)"]
+
+        JEC["Job Execution Container\n─────────────────────\nRunner binary unpacks steps\nEach step: action checkout → action execute → log stream\nExit code 0 = success · non-zero = failure"]
+
+        EVT --> WD
+        WD --> AS
+        AS --> RA
+        RA --> JEC
+    end
 ```
 
 A critical detail in this flow is when the workflow file is read. GitHub always reads the workflow definition at the commit SHA that triggered the event, not the HEAD of the default branch. For a pull request event, this means the workflow running against that PR is the workflow as modified in the PR branch. This is intentional and correct — a PR that modifies the workflow should run under that modified workflow — but it is a frequent source of confusion when debugging. It also has security implications for pull requests from forks, which the platform addresses by withholding secrets and limiting the `GITHUB_TOKEN` permissions for first-time contributors until a maintainer approves the run.

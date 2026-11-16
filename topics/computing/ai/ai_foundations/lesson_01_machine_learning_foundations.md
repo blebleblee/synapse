@@ -502,16 +502,23 @@ flowchart TD
 
 Modern GPU architectures (NVIDIA Volta and later) provide dedicated Tensor Core hardware for FP16 matrix multiplication, delivering up to $8\times$ throughput improvement over FP32. Mixed-precision training (Micikevicius et al., 2018) stores activations and gradients in FP16 during forward and backward passes while maintaining a master copy of parameters in FP32 for the optimizer step:
 
-```
-FP32 master weights ──→ cast to FP16 ──→ Forward pass (FP16)
-                                          ↓
-                                    Backward pass (FP16 activations, FP16 gradients)
-                                          ↓
-                              Loss scaling to prevent FP16 underflow
-                                          ↓
-                              Gradient unscaling + FP32 optimizer step
-                                          ↓
-FP32 master weights ←── updated ←────────┘
+```mermaid
+flowchart TD
+    A["FP32 Master Weights"]
+    B["Cast to FP16"]
+    C["Forward Pass (FP16)"]
+    D["Backward Pass<br/>(FP16 activations, FP16 gradients)"]
+    E["Loss Scaling<br/>(Prevent FP16 underflow)"]
+    F["Gradient Unscaling +<br/>FP32 Optimizer Step"]
+    G["Update FP32 Master Weights"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> A
 ```
 
 The critical implementation detail is **loss scaling**: FP16 has a minimum representable value of $\approx 6 \times 10^{-8}$, while typical gradient magnitudes can be $10^{-10}$ or smaller. Without scaling, these gradients underflow to exactly zero and no learning occurs. The loss is multiplied by a scale factor $S$ (typically 2048–65536) before the backward pass; gradients are divided by $S$ before the optimizer step. Dynamic loss scaling starts with a large $S$ and reduces it on overflow (detected by checking for `inf` or `nan` in gradients), increasing it periodically when no overflow occurs.
@@ -544,11 +551,42 @@ Accuracy is a misleading metric for imbalanced datasets. A classifier predicting
 
 For binary classification with positive class $P$ and negative class $N$:
 
-```
-                 Predicted
-                  P     N
-Actual  P  │  TP  │  FN  │  (Sensitivity / Recall = TP / (TP + FN))
-        N  │  FP  │  TN  │  (Specificity = TN / (TN + FP))
+```mermaid
+flowchart TD
+    subgraph confusion_matrix ["Confusion Matrix"]
+        subgraph predicted ["Predicted"]
+            P_pred["P"]
+            N_pred["N"]
+        end
+        
+        subgraph actual ["Actual"]
+            P_actual["P"]
+            N_actual["N"]
+        end
+        
+        TP["TP<br/>(True Positive)"]
+        FN["FN<br/>(False Negative)"]
+        FP["FP<br/>(False Positive)"]
+        TN["TN<br/>(True Negative)"]
+        
+        P_actual -.-> TP
+        P_actual -.-> FN
+        N_actual -.-> FP
+        N_actual -.-> TN
+        
+        TP -.-> P_pred
+        FP -.-> P_pred
+        FN -.-> N_pred
+        TN -.-> N_pred
+    end
+    
+    sensitivity["Sensitivity / Recall<br/>TP / (TP + FN)"]
+    specificity["Specificity<br/>TN / (TN + FP)"]
+    
+    TP --> sensitivity
+    FN --> sensitivity
+    TN --> specificity
+    FP --> specificity
 ```
 
 - **Precision** $= \text{TP} / (\text{TP} + \text{FP})$: Of predicted positives, what fraction is actually positive?

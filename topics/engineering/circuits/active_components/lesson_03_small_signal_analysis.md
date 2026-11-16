@@ -24,23 +24,30 @@ The Miller capacitance $C_\mu$ bridges input and output ports, connecting base t
 
 The complete hybrid-pi topology, including parasitic resistances, takes this form:
 
-```
-       rbb'        B'
-    ──────┬────────┬────── (internal base node)
-          │        │
-    B ────┘        │
-    (external      │ C_π         ┌──── C_μ ────┐
-     base)         │             │              │
-                  ─┴─          ──┴──          ──┴──
-                  ───      E ───────  g_m·v_π  ─── C
-                   │         (transconductance  │
-                  ─┴─         controlled       r_o
-                  ───          source)          │
-                   │                           ─┴─
-                   E                           ───
-                (emitter)                       │
-                                                C
-                                            (collector)
+```mermaid
+flowchart TD
+    rbb["r_bb' (internal base resistance)"]
+    Bprime["B' (internal base node)"]
+    B["B (external base)"]
+    Cpi["C_π"]
+    E1["E (emitter)"]
+    E2["E"]
+    gm["g_m·v_π (transconductance controlled source)"]
+    Cmu["C_μ"]
+    ro["r_o"]
+    C1["C (collector)"]
+    C2["C"]
+    
+    rbb --> Bprime
+    B --> Bprime
+    Bprime --> Cpi
+    Bprime --> Cmu
+    Cpi --> E1
+    E2 --> gm
+    gm --> Cmu
+    Cmu --> ro
+    ro --> C1
+    C1 --> C2
 ```
 
 The base spreading resistance $r_{bb'}$—typically $10\,\Omega$ to $100\,\Omega$—represents the distributed resistance of the narrow base region between the external base contact and the active intrinsic base directly under the emitter. This seemingly small resistance profoundly impacts high-frequency gain, as input current must flow through $r_{bb'}$ before developing voltage across $r_\pi$. At frequencies where the $r_{bb'}C_\pi$ time constant becomes significant, a portion of the input signal drops across the parasitic resistance rather than modulating the base-emitter junction, reducing effective transconductance.

@@ -635,3 +635,4 @@ For a Deployment to achieve true zero-downtime updates, the following conditions
 spec:
   minReadySeconds: 30
   progressDeadlineSeconds: 600
+```

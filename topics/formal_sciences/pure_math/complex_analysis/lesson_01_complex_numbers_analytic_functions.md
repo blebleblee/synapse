@@ -112,31 +112,27 @@ This is precisely the matrix representation of multiplication by the complex num
 
 This is the geometric content of the Cauchy-Riemann equations: a complex-differentiable map, at each point where $f'(z) \neq 0$, acts locally like a rotation by $\arg(f'(z))$ followed by a scaling by $|f'(z)|$. In particular, it preserves angles between curves. A map with this angle-preserving property is called **conformal**, and conformal maps are exactly the complex-differentiable maps with nonzero derivative. The preservation of angles is not a consequence of analyticity that we layer on afterwards—it is baked into the algebraic structure of $\mathbb{C}$ from the start.
 
-```
- Complex Differentiability Hierarchy
- ════════════════════════════════════════════════════════════
-
-  Real-differentiable map F : ℝ² → ℝ²
-  ┌─────────────────────────────────────────────────────┐
-  │   J_F arbitrary 2×2 matrix                          │
-  │                                                      │
-  │   ┌──────────────────────────────────────────────┐  │
-  │   │  Cauchy-Riemann equations hold               │  │
-  │   │                                              │  │
-  │   │   J_F = | a  -b |  (similitude matrix)       │  │
-  │   │         | b   a |                            │  │
-  │   │                                              │  │
-  │   │  ══► f = u + iv is complex-differentiable    │  │
-  │   │  ══► f'(z) = a + bi                          │  │
-  │   │                                              │  │
-  │   │   ┌──────────────────────────────────────┐   │  │
-  │   │   │  f analytic on open set U            │   │  │
-  │   │   │  ══► f is C^∞                        │   │  │
-  │   │   │  ══► f equals its Taylor series      │   │  │
-  │   │   │  ══► f is conformal where f'≠ 0      │   │  │
-  │   │   └──────────────────────────────────────┘   │  │
-  │   └──────────────────────────────────────────────┘  │
-  └─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph L1["Real-differentiable map F : ℝ² → ℝ²"]
+        J1["J_F arbitrary 2×2 matrix"]
+        subgraph L2["Cauchy-Riemann equations hold"]
+            J2["J_F = | a  -b |  (similitude matrix)<br/>      | b   a |"]
+            CR1["f = u + iv is complex-differentiable"]
+            CR2["f'(z) = a + bi"]
+            subgraph L3["Analyticity"]
+                AN["f analytic on open set U"]
+                A1["f is C^∞"]
+                A2["f equals its Taylor series"]
+                A3["f is conformal where f' ≠ 0"]
+            end
+        end
+    end
+    J2 ==> CR1
+    J2 ==> CR2
+    AN ==> A1
+    AN ==> A2
+    AN ==> A3
 ```
 
 ### Analytic Functions

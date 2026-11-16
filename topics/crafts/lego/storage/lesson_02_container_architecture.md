@@ -26,23 +26,57 @@ The workhorse solution is **cross-braced wall construction**. Rather than buildi
 
 The base is the most critical element. For containers that will be fully loaded and stacked, the base plate alone is insufficient — an 8×16 stud base plate under 400 g of parts experiences measurable flex across its center when lifted at the corners, which will eventually fatigue the connection at the central studs. The standard remediation is a **ribbed baseplate assembly**: a base plate reinforced by a grid of 1×4 or 1×6 bricks placed on their sides in SNOT orientation, running in both axes beneath the floor plate. These ribs function as I-beams, shifting the neutral axis of the cross-section away from the plate's mid-plane and dramatically increasing the second moment of area against bending. The vertical height of the rib — typically one standard brick, 9.6 mm — is enough to convert a flexible platform into a rigid one for all practical loads.
 
-```
-Top view — Ribbed base assembly (cross-section at mid-height):
-
-╔══╦══╦══╦══╦══╦══╦══╦══╗
-║  ║XX║  ║XX║  ║XX║  ║XX║   <- Base plate (top face, stud grid)
-╠══╬══╬══╬══╬══╬══╬══╬══╣
-║  ║  ║  ║  ║  ║  ║  ║  ║   <- Open cell (accessible from below)
-║RR║  ║RR║  ║RR║  ║RR║  ║   <- R = SNOT rib brick (1×4, laid transverse)
-║  ║  ║  ║  ║  ║  ║  ║  ║
-╚══╩══╩══╩══╩══╩══╩══╩══╝
-
-Side elevation (cross-section through rib):
-
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  <- Base plate
-   ░░░░░       ░░░░░        <- Rib bricks (SNOT, one brick tall)
-   ░░░░░       ░░░░░
-════════════════════════    <- Container floor (tile-finished)
+```mermaid
+flowchart TD
+    subgraph top_view ["Top View — Ribbed Base Assembly (Cross-section at mid-height)"]
+        direction TB
+        BP["Base Plate (Top Face, Stud Grid)"]
+        
+        subgraph grid ["8×2 Stud Grid Pattern"]
+            direction LR
+            S1["Stud"]
+            S2["Stud XX"]
+            S3["Stud"]
+            S4["Stud XX"]
+            S5["Stud"]
+            S6["Stud XX"]
+            S7["Stud"]
+            S8["Stud XX"]
+        end
+        
+        subgraph cell_layer ["Open Cell Layer"]
+            direction LR
+            C1["Open Cell<br/>(accessible from below)"]
+            R1["SNOT Rib Brick RR<br/>(1×4, transverse)"]
+            C2["Open Cell"]
+            R2["SNOT Rib Brick RR<br/>(1×4, transverse)"]
+            C3["Open Cell"]
+            R3["SNOT Rib Brick RR<br/>(1×4, transverse)"]
+            C4["Open Cell"]
+            R4["SNOT Rib Brick RR<br/>(1×4, transverse)"]
+        end
+        
+        BP --> grid
+        grid --> cell_layer
+    end
+    
+    subgraph side_view ["Side Elevation (Cross-section through rib)"]
+        direction TB
+        BASE["▓▓▓ Base Plate ▓▓▓"]
+        RIB1["░ Rib Brick ░<br/>(SNOT, one brick tall)"]
+        SPACE1[" "]
+        RIB2["░ Rib Brick ░<br/>(SNOT, one brick tall)"]
+        FLOOR["═══ Container Floor (Tile-finished) ═══"]
+        
+        BASE --> RIB1
+        BASE --> SPACE1
+        BASE --> RIB2
+        RIB1 --> FLOOR
+        SPACE1 --> FLOOR
+        RIB2 --> FLOOR
+    end
+    
+    top_view -.represents same assembly.-> side_view
 ```
 
 ### Interior Partitioning: Fixed, Sliding, and Clip-Rail Systems
@@ -55,20 +89,47 @@ With the shell established, interior architecture governs retrieval efficiency m
 
 **Clip-rail systems** represent the highest flexibility tier. A grid of 1×1 and 1×2 Technic bricks with clip holes runs along the container's long axis at a consistent height, and L-shaped divider panels terminated in bar or clip connections can be inserted at any stud increment without tools. This mirrors the rail-and-hook systems used in professional workshop pegboard storage, and it is worth understanding why they work: the clip connection transfers load through shear at the bar-clip interface rather than relying on the axial pull-out resistance of a stud connection, so panels can bear significant lateral load from packed parts without detaching. The limitation is connector count: a fully populated clip-rail system in a 16-stud-wide container consumes a surprisingly large number of clip bricks, which must themselves be catalogued and budgeted as part of the design.
 
-```
-Clip-rail divider system — front elevation:
-
-╔════════════════════════════════════╗
-║  CLIP RAIL (top)                   ║
-║  ○─┬─○─┬─○─┬─○─┬─○─┬─○─┬─○─┬─○   ║   <- Clip bricks, 2-stud spacing
-║   │   │   │   │                   ║
-║   │   │   │   │                   ║   <- Divider panels (snap-in)
-║   │   │   │   │                   ║
-║  ○─┴─○─┴─○─┴─○─┴─○─┴─○─┴─○─┴─○   ║   <- Clip rail (base)
-╚════════════════════════════════════╝
-
-                     ↕ panel slides
-                  to any stud increment
+```mermaid
+flowchart TD
+    subgraph rail_top ["Top Clip Rail"]
+        T1["Clip Brick"] --- T2["Clip Brick"]
+        T2 --- T3["Clip Brick"]
+        T3 --- T4["Clip Brick"]
+        T4 --- T5["Clip Brick"]
+        T5 --- T6["Clip Brick"]
+        T6 --- T7["Clip Brick"]
+        T7 --- T8["Clip Brick"]
+    end
+    
+    subgraph panels ["Divider Panels (Snap-In)"]
+        P1["Panel 1"] 
+        P2["Panel 2"]
+        P3["Panel 3"]
+        P4["Panel 4"]
+    end
+    
+    subgraph rail_base ["Base Clip Rail"]
+        B1["Clip Brick"] --- B2["Clip Brick"]
+        B2 --- B3["Clip Brick"]
+        B3 --- B4["Clip Brick"]
+        B4 --- B5["Clip Brick"]
+        B5 --- B6["Clip Brick"]
+        B6 --- B7["Clip Brick"]
+        B7 --- B8["Clip Brick"]
+    end
+    
+    T1 -.->|"2-stud<br/>spacing"| P1
+    T3 -.-> P2
+    T5 -.-> P3
+    T7 -.-> P4
+    
+    P1 -.->|"slides to any<br/>stud increment"| B1
+    P2 -.-> B3
+    P3 -.-> B5
+    P4 -.-> B7
+    
+    rail_top ---|"Vertical<br/>Assembly"| panels
+    panels ---|"Vertical<br/>Assembly"| rail_base
 ```
 
 ### Stackability: The Anti-Stud Interface and Lid Architecture

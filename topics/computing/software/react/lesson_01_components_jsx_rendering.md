@@ -111,12 +111,27 @@ React's reconciliation algorithm operates on two parallel trees: the current fib
 
 The reconciliation process begins when a component's state changes or new props arrive from a parent. React marks that fiber as dirty and schedules a render pass. During the render pass, React walks the fiber tree, calling render functions for dirty components and their descendants. For each element in the returned tree, React attempts to match it with an existing fiber from the previous render:
 
-```
-Current tree:              New tree:
-<div key="a">       -->    <div key="a">
-<span key="b">      -->    <p key="b">
-<img key="c">       -->    <img key="c">
-                           <button key="d">
+```mermaid
+flowchart LR
+    subgraph current ["Current Tree"]
+        A["&lt;div key='a'&gt;"]
+        B["&lt;span key='b'&gt;"]
+        C1["&lt;img key='c'&gt;"]
+        A --> B
+        A --> C1
+    end
+
+    subgraph new ["New Tree"]
+        D["&lt;div key='a'&gt;"]
+        E["&lt;p key='b'&gt;"]
+        C2["&lt;img key='c'&gt;"]
+        F["&lt;button key='d'&gt;"]
+        D --> E
+        D --> C2
+        D --> F
+    end
+
+    current -->|"reconcile"| new
 ```
 
 The reconciler applies heuristics to minimize DOM operations. Elements with the same type and key are updated in place by applying new props. Elements with different types are completely replaced—the old fiber is marked for deletion, and a new fiber is created and marked for insertion. The `key` prop is critical for list reconciliation because it allows React to detect reorderings rather than treating them as deletions followed by insertions.

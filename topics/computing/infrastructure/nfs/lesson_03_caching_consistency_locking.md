@@ -30,24 +30,24 @@ The close-to-open consistency guarantee emerges from the interaction between pag
 
 NFSv4 delegations introduce a fundamentally different architecture. When a client opens a file, it may request a delegation as part of the OPEN operation. The server's response includes a delegation stateid and type: `OPEN_DELEGATE_READ` or `OPEN_DELEGATE_WRITE`. A read delegation permits the client to satisfy all read operations from its cache without revalidation, even after attribute timeouts expire. A write delegation goes further, allowing the client to service other local clients' read and write requests without contacting the server. The server maintains a callback RPC channel to each client. When another client attempts to access a delegated file in a conflicting mode, the server sends a CB_RECALL callback to the delegation holder, which must flush dirty data and return the delegation before the server can grant the new client's request.
 
-```
-Client A                      Server                      Client B
-   |                            |                            |
-   |-- OPEN(file.txt) --------->|                            |
-   |<---- delegation_read ------|                            |
-   |                            |                            |
-   | [cache valid indefinitely] |                            |
-   | read(), read(), read() ... |                            |
-   |   [no RPCs required]       |                            |
-   |                            |                            |
-   |                            |<---- OPEN(file.txt, W) ----|
-   |                            |                            |
-   |<--- CB_RECALL -------------|                            |
-   |-- DELEGRETURN ------------>|                            |
-   |                            |---- delegation_write ----->|
-   |                            |                            |
-   |-- GETATTR ---------------->|                            |
-   | [cache invalidated]        |                            |
+```mermaid
+flowchart TD
+    A["Client A"]
+    S["Server"]
+    B["Client B"]
+    
+    A -->|"OPEN file.txt"| S
+    S -->|delegation_read| A
+    A -->|"read, read, read...<br/>cache valid indefinitely<br/>no RPCs required"| A
+    
+    B -->|"OPEN file.txt, W"| S
+    
+    S -->|CB_RECALL| A
+    A -->|DELEGRETURN| S
+    
+    S -->|delegation_write| B
+    
+    A -->|"GETATTR<br/>cache invalidated"| S
 ```
 
 Delegation recall introduces tail latency challenges. If the delegation holder is slow to respond to the callback, the requesting client blocks waiting for the delegation to be returned. NFSv4 servers typically implement delegation timeouts, forcibly revoking a delegation if the client does not respond within a grace period. Clients that lose delegations in this manner must revalidate their cache and may discover that their open file handles are no longer valid, forcing them to reopen the file and potentially lose their position in the file.

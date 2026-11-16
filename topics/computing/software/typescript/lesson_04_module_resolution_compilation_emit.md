@@ -66,26 +66,38 @@ Module resolution unfolds through a deterministic state machine that consumes im
 
 The resolution algorithm branches immediately based on module specifier format. Relative specifiers (`./`, `../`, `/`) bypass `node_modules` traversal entirely, proceeding directly to file extension probing in the specified directory. Absolute paths (starting with `/`) resolve from the file system root on Unix-like systems or the drive letter on Windows. Bare specifiers without path separators enter the package resolution subsystem, which implements the full Node.js algorithm augmented with TypeScript extensions.
 
-```
-Resolution Decision Tree (Node Strategy):
-
-Import: import { X } from "specifier"
-│
-├─ Specifier starts with ./ or ../ or / ?
-│  │
-│  ├─ YES → Relative/Absolute Resolution
-│  │         1. Try specifier.ts, specifier.tsx, specifier.d.ts
-│  │         2. Try specifier/package.json → types field
-│  │         3. Try specifier/index.ts, specifier/index.tsx, specifier/index.d.ts
-│  │
-│  └─ NO → Package Resolution
-│            1. Check compiler paths mapping
-│            2. For each ancestor dir (bottom-up):
-│               a. Try node_modules/specifier/package.json → types/typings
-│               b. Try node_modules/specifier/index.d.ts
-│               c. Try node_modules/@types/specifier/index.d.ts
-│            3. Check ambient module declarations
-│            4. Fail resolution → error TS2307
+```mermaid
+flowchart TD
+    A["Import: import { X } from 'specifier'"]
+    B{"Specifier starts with<br/>./ or ../ or /?"}
+    
+    C["Relative/Absolute Resolution"]
+    D["1. Try specifier.ts,<br/>specifier.tsx,<br/>specifier.d.ts"]
+    E["2. Try specifier/package.json<br/>→ types field"]
+    F["3. Try specifier/index.ts,<br/>specifier/index.tsx,<br/>specifier/index.d.ts"]
+    
+    G["Package Resolution"]
+    H["1. Check compiler<br/>paths mapping"]
+    I["2. For each ancestor dir<br/>bottom-up"]
+    J["a. Try node_modules/specifier/package.json<br/>→ types/typings"]
+    K["b. Try node_modules/specifier/index.d.ts"]
+    L["c. Try node_modules/@types/specifier/index.d.ts"]
+    M["3. Check ambient<br/>module declarations"]
+    N["4. Fail resolution<br/>→ error TS2307"]
+    
+    A --> B
+    B -->|YES| C
+    C --> D
+    D --> E
+    E --> F
+    B -->|NO| G
+    G --> H
+    H --> I
+    I --> J
+    J --> K
+    K --> L
+    L --> M
+    M --> N
 ```
 
 Path mappings in `tsconfig.json` provide an escape hatch from standard resolution logic, enabling project-specific module aliasing and monorepo support. The `paths` configuration maps specifier prefixes to file system locations relative to `baseUrl`. For example:

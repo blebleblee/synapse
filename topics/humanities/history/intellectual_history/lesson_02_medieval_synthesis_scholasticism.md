@@ -34,149 +34,228 @@ The *ad primum*, *ad secundum*, *ad tertium* sections ("to the first," "to the s
 
 The debate over universals generates a conceptual taxonomy that maps the logical space of possible positions:
 
-```
-Ontological Status of Universals
-
-Extreme Realism (Platonism)
-│
-├─ Universals exist ante rem (before particulars)
-├─ Particulars participate in or imitate Forms
-├─ Knowledge = recollection of prenatal Form-contemplation
-└─ Problem: How do transcendent Forms causally interact with matter?
-
-Moderate Realism (Aristotelianism)
-│
-├─ Universals exist in rebus (in particulars) as formal principles
-├─ Abstraction: intellect derives universals post rem (after particulars)
-├─ Knowledge = abstraction of intelligible form from sensible matter
-└─ Resolution: Preserves both individual substances and real commonalities
-
-Conceptualism
-│
-├─ Universals exist only post rem as mental concepts
-├─ Extra-mental reality contains only particulars
-├─ Mind actively constructs categories from observed similarities
-└─ Problem: Are these categories arbitrary or do they track real structure?
-
-Nominalism (Extreme)
-│
-├─ Universals = flatus vocis (mere vocal sounds)
-├─ Only particulars exist; commonalities are linguistic conventions
-├─ Problem: Undermines scientific knowledge and causal explanation
-└─ Theological crisis: Threatens doctrine of human nature and original sin
+```mermaid
+flowchart TD
+    Start["Ontological Status of Universals"]
+    
+    Start --> ER["Extreme Realism (Platonism)"]
+    Start --> MR["Moderate Realism (Aristotelianism)"]
+    Start --> C["Conceptualism"]
+    Start --> N["Nominalism (Extreme)"]
+    
+    ER --> ER1["Universals exist ante rem (before particulars)"]
+    ER --> ER2["Particulars participate in or imitate Forms"]
+    ER --> ER3["Knowledge = recollection of prenatal Form-contemplation"]
+    ER --> ER4["Problem: How do transcendent Forms causally interact with matter?"]
+    
+    MR --> MR1["Universals exist in rebus (in particulars) as formal principles"]
+    MR --> MR2["Abstraction: intellect derives universals post rem (after particulars)"]
+    MR --> MR3["Knowledge = abstraction of intelligible form from sensible matter"]
+    MR --> MR4["Resolution: Preserves both individual substances and real commonalities"]
+    
+    C --> C1["Universals exist only post rem as mental concepts"]
+    C --> C2["Extra-mental reality contains only particulars"]
+    C --> C3["Mind actively constructs categories from observed similarities"]
+    C --> C4["Problem: Are these categories arbitrary or do they track real structure?"]
+    
+    N --> N1["Universals = flatus vocis (mere vocal sounds)"]
+    N --> N2["Only particulars exist; commonalities are linguistic conventions"]
+    N --> N3["Problem: Undermines scientific knowledge and causal explanation"]
+    N --> N4["Theological crisis: Threatens doctrine of human nature and original sin"]
 ```
 
 This taxonomy matters because each position generates cascading implications for epistemology, natural science, ethics, and theology. Platonism explains why mathematical truths seem necessary and eternal but struggles to account for how immutable Forms produce contingent, mutable particulars. Nominalism explains linguistic diversity and conceptual flexibility but cannot ground the universal natural laws that make science possible. Moderate realism emerged dominant not through arbitrary preference but because it successfully navigated between extremes while preserving the data that motivated each: the mind does abstract commonalities (against extreme realism's innate ideas), yet these commonalities track real structures rather than arbitrary conventions (against nominalism).
 
 Natural theology's argument structure implements a distinctive proof pattern: demonstration *quia* (from effects to cause) rather than *propter quid* (from cause to effects). Since human knowledge begins with sensory experience of created effects rather than direct apprehension of the divine essence, theological proofs must work backwards from observable phenomena to their metaphysically necessary grounds. The cosmological argument's logical architecture illustrates this pattern:
 
-```
-Cosmological Argument Structure (Argument from Contingency)
+```mermaid
+flowchart TD
+    P1["**P1 — Empirical Observation**
+    Some beings exist contingently
+    (they might not have existed)"]
 
-P1: Empirical Observation
-    └─ Some beings exist contingently (they might not have existed)
+    P2["**P2 — Metaphysical Principle**
+    Every contingent being requires
+    an explanation for its existence"]
 
-P2: Metaphysical Principle
-    └─ Every contingent being requires an explanation for its existence
+    P3["**P3 — Rejection of Infinite Regress**
+    An infinite chain of contingent causes
+    provides no ultimate explanation"]
 
-P3: Rejection of Infinite Regress
-    └─ An infinite chain of contingent causes provides no ultimate explanation
+    P4["**P4 — Rejection of Circular Causation**
+    X cannot ultimately explain X
+    (would require X to exist before itself)"]
 
-P4: Rejection of Circular Causation  
-    └─ X cannot ultimately explain X (would require X to exist before itself)
+    C1["**C1 — Intermediate Conclusion**
+    There must exist at least one
+    necessary being (exists by its own nature)"]
 
-C1: Intermediate Conclusion
-    └─ There must exist at least one necessary being (exists by its own nature)
+    subgraph C2 ["C2 — Attribute Analysis: The Necessary Being Must Be…"]
+        ATT_E["**Eternal**
+        No beginning or end —
+        otherwise it would be contingent"]
+        ATT_I["**Immutable**
+        Change implies potentiality,
+        and potentiality implies contingency"]
+        ATT_S["**Simple**
+        Composite beings depend on their parts,
+        making them contingent"]
+        ATT_P["**Perfect**
+        Lacking nothing — any lack would make it
+        contingent on what it lacks"]
+    end
 
-C2: Attribute Analysis
-    └─ This necessary being must be:
-        • Eternal (no beginning or end, else would be contingent)
-        • Immutable (change implies potentiality, thus contingency)  
-        • Simple (composite beings depend on their parts, thus contingent)
-        • Perfect (lacks nothing, else would be contingent on what it lacks)
+    C3["**C3 — Identification**
+    This necessary being is what
+    all traditions call God"]
 
-C3: Identification
-    └─ This necessary being is what all traditions call God
+    P1 --> C1
+    P2 --> C1
+    P3 --> C1
+    P4 --> C1
+
+    C1 --> ATT_E
+    C1 --> ATT_I
+    C1 --> ATT_S
+    C1 --> ATT_P
+
+    ATT_E --> C3
+    ATT_I --> C3
+    ATT_S --> C3
+    ATT_P --> C3
+
+    style P1 fill:#1a3a5c,stroke:#4a90d9,color:#e8f4fd
+    style P2 fill:#1a3a5c,stroke:#4a90d9,color:#e8f4fd
+    style P3 fill:#1a3a5c,stroke:#4a90d9,color:#e8f4fd
+    style P4 fill:#1a3a5c,stroke:#4a90d9,color:#e8f4fd
+    style C1 fill:#2d5a1b,stroke:#6abf40,color:#e8fde8
+    style ATT_E fill:#4a2060,stroke:#a855f7,color:#f5e8ff
+    style ATT_I fill:#4a2060,stroke:#a855f7,color:#f5e8ff
+    style ATT_S fill:#4a2060,stroke:#a855f7,color:#f5e8ff
+    style ATT_P fill:#4a2060,stroke:#a855f7,color:#f5e8ff
+    style C3 fill:#5c2a0a,stroke:#f97316,color:#fff3e8
 ```
 
 The argument's power derives not from empirical premises alone (which might be disputed) but from the logical relationships between contingency and necessity, explanation and infinite regress. Even if one rejects the conclusion, engagement requires identifying which premise or inference fails—a significantly higher intellectual bar than dismissing the argument as question-begging or based on outdated science.
 
 Translation networks exhibit a hub-and-spoke topology with three primary transmission nodes, each characterized by distinct linguistic combinations and institutional structures:
 
-```
-Medieval Translation Network Architecture
+```mermaid
+flowchart TD
+    subgraph baghdad ["🏛 Baghdad (8th–10th centuries)"]
+        B_src["Source Languages\nGreek · Syriac · Pahlavi · Sanskrit"]
+        B_tgt["Target Language\nArabic"]
+        B_fig["Key Figures\nHunayn ibn Ishaq · Thabit ibn Qurra"]
+        B_inst["Institutional Base\nHouse of Wisdom · Private physician networks"]
+        B_con["Content Focus\nMedicine (Galen) · Mathematics (Euclid)\nPhilosophy (Aristotle · Plotinus)"]
+        B_out["Output\nEstablished Arabic as philosophical lingua franca"]
 
-Baghdad (8th-10th centuries)
-│
-├─ Source Languages: Greek, Syriac, Pahlavi, Sanskrit
-├─ Target Language: Arabic  
-├─ Key Figures: Hunayn ibn Ishaq, Thabit ibn Qurra
-├─ Institutional Base: House of Wisdom, private physician networks
-├─ Content Focus: Medicine (Galen), Mathematics (Euclid), 
-│                  Philosophy (Aristotle, Plotinus)
-└─ Output: Established Arabic as philosophical lingua franca
+        B_src --> B_tgt
+        B_tgt --> B_fig
+        B_fig --> B_inst
+        B_inst --> B_con
+        B_con --> B_out
+    end
 
-Toledo (12th century)
-│
-├─ Source Languages: Arabic, Hebrew
-├─ Target Language: Latin
-├─ Key Figures: Gerard of Cremona, Dominicus Gundissalinus  
-├─ Institutional Base: Cathedral school, archiepiscopal patronage
-├─ Content Focus: Aristotelian corpus, Islamic commentaries,
-│                  Mathematical and astronomical texts
-└─ Output: Made Greek learning available to Latin West
+    subgraph toledo ["⛪ Toledo (12th century)"]
+        T_src["Source Languages\nArabic · Hebrew"]
+        T_tgt["Target Language\nLatin"]
+        T_fig["Key Figures\nGerard of Cremona · Dominicus Gundissalinus"]
+        T_inst["Institutional Base\nCathedral School · Archiepiscopal Patronage"]
+        T_con["Content Focus\nAristotelian corpus · Islamic commentaries\nMathematical and astronomical texts"]
+        T_out["Output\nMade Greek learning available to Latin West"]
 
-Palermo (12th-13th centuries)  
-│
-├─ Source Languages: Greek, Arabic
-├─ Target Language: Latin
-├─ Key Figures: Henricus Aristippus, Eugenius of Palermo
-├─ Institutional Base: Norman royal court, multilingual bureaucracy
-├─ Content Focus: Direct Greek-to-Latin translations (Plato, Ptolemy),
-│                  Arabic scientific texts
-└─ Output: Bypassed Arabic mediation for some Greek texts
+        T_src --> T_tgt
+        T_tgt --> T_fig
+        T_fig --> T_inst
+        T_inst --> T_con
+        T_con --> T_out
+    end
+
+    subgraph palermo ["👑 Palermo (12th–13th centuries)"]
+        P_src["Source Languages\nGreek · Arabic"]
+        P_tgt["Target Language\nLatin"]
+        P_fig["Key Figures\nHenricus Aristippus · Eugenius of Palermo"]
+        P_inst["Institutional Base\nNorman Royal Court · Multilingual Bureaucracy"]
+        P_con["Content Focus\nDirect Greek-to-Latin (Plato · Ptolemy)\nArabic scientific texts"]
+        P_out["Output\nBypassed Arabic mediation for some Greek texts"]
+
+        P_src --> P_tgt
+        P_tgt --> P_fig
+        P_fig --> P_inst
+        P_inst --> P_con
+        P_con --> P_out
+    end
+
+    B_out -->|"Arabic corpus flows into Toledo"| T_src
+    B_out -->|"Arabic corpus flows into Palermo"| P_src
+    T_out -->|"Latin Aristotelianism\nenters European universities"| EUROPE["🎓 European Scholasticism\nUniversity curriculum · Scholastic philosophy"]
+    P_out -->|"Direct Greek texts\nenter Latin scholarship"| EUROPE
 ```
 
 Each node's architecture reflects local political and cultural conditions. Baghdad's translations served a confident, expansionist Islamic civilization seeking to appropriate the best knowledge of conquered peoples. Toledo operated in the contested frontier zone of the Reconquista, where Christian military victory over Muslim principalities created temporary zones of cultural collaboration before hardening sectarian boundaries foreclosed such exchanges. Palermo benefited from Norman conquerors who maintained Byzantine Greek bureaucratic traditions alongside Arab-influenced court culture, enabling direct access to Greek manuscripts that had never been translated into Arabic.
 
 The university curriculum implements a hierarchical skill-tree progression where mastery of lower faculties unlocks access to higher ones:
 
-```
-University Curriculum Architecture (c. 1250)
-
-Foundation: Arts Faculty (4-6 years to BA, 2-3 more to MA)
-│
-├─ Trivium (Language Arts)
-│   ├─ Grammar: Latin syntax, Priscian, Donatus
-│   ├─ Rhetoric: Cicero, pseudo-Ciceronian Ad Herennium  
-│   └─ Logic: Aristotle's Organon, Porphyry's Isagoge, Peter of Spain
-│
-├─ Quadrivium (Mathematical Arts)  
-│   ├─ Arithmetic: Boethius, Euclidean number theory
-│   ├─ Geometry: Euclid's Elements (Books I-VI)
-│   ├─ Music: Boethius (mathematical ratios, not performance)
-│   └─ Astronomy: Ptolemy, Sacrobosco's Sphere
-│
-└─ Natural Philosophy
-    ├─ Physics: Aristotle (matter, motion, causation)
-    ├─ De Anima: Psychology, sensation, intellection  
-    ├─ Metaphysics: Being qua being, first causes
-    └─ Ethics: Nicomachean Ethics, political philosophy
-
-Advanced Faculties (entrance requires Arts MA)
-│
-├─ Medicine (5-7 years)
-│   └─ Prerequisites: Natural philosophy, especially biology
-│
-├─ Law (5-7 years)  
-│   ├─ Civil Law: Justinian's Digest and Code
-│   └─ Canon Law: Gratian's Decretum, papal decretals
-│
-└─ Theology (8-12 years)
-    ├─ Bible: Lectio of Scripture with Glossa Ordinaria
-    ├─ Sentences: Commenting on Peter Lombard
-    ├─ Disputed Questions: Public defense of theses
-    └─ Principium: Inaugural lecture demonstrating mastery
+```mermaid
+flowchart TD
+    Root["University Curriculum Architecture<br/>(c. 1250)"]
+    
+    Root --> Arts["Arts Faculty<br/>(4-6 years to BA<br/>2-3 more to MA)"]
+    Root --> Advanced["Advanced Faculties<br/>(requires Arts MA)"]
+    
+    subgraph Trivium ["Trivium - Language Arts"]
+        Grammar["Grammar<br/>Latin syntax, Priscian, Donatus"]
+        Rhetoric["Rhetoric<br/>Cicero, pseudo-Ciceronian Ad Herennium"]
+        Logic["Logic<br/>Aristotle's Organon, Porphyry's Isagoge,<br/>Peter of Spain"]
+    end
+    
+    subgraph Quadrivium ["Quadrivium - Mathematical Arts"]
+        Arithmetic["Arithmetic<br/>Boethius, Euclidean number theory"]
+        Geometry["Geometry<br/>Euclid's Elements Books I-VI"]
+        Music["Music<br/>Boethius mathematical ratios,<br/>not performance"]
+        Astronomy["Astronomy<br/>Ptolemy, Sacrobosco's Sphere"]
+    end
+    
+    subgraph NatPhil ["Natural Philosophy"]
+        Physics["Physics<br/>Aristotle: matter, motion, causation"]
+        DeAnima["De Anima<br/>Psychology, sensation, intellection"]
+        Metaphysics["Metaphysics<br/>Being qua being, first causes"]
+        Ethics["Ethics<br/>Nicomachean Ethics,<br/>political philosophy"]
+    end
+    
+    Arts --> Trivium
+    Arts --> Quadrivium
+    Arts --> NatPhil
+    
+    subgraph Medicine ["Medicine - 5-7 years"]
+        MedPrereq["Prerequisites: Natural philosophy,<br/>especially biology"]
+    end
+    
+    subgraph Law ["Law - 5-7 years"]
+        CivilLaw["Civil Law<br/>Justinian's Digest and Code"]
+        CanonLaw["Canon Law<br/>Gratian's Decretum, papal decretals"]
+    end
+    
+    subgraph Theology ["Theology - 8-12 years"]
+        Bible["Bible<br/>Lectio of Scripture with Glossa Ordinaria"]
+        Sentences["Sentences<br/>Commenting on Peter Lombard"]
+        DisputedQ["Disputed Questions<br/>Public defense of theses"]
+        Principium["Principium<br/>Inaugural lecture demonstrating mastery"]
+    end
+    
+    Advanced --> Medicine
+    Advanced --> Law
+    Advanced --> Theology
+    
+    NatPhil -.->|prerequisite for| MedPrereq
+    
+    Law --> CivilLaw
+    Law --> CanonLaw
+    Theology --> Bible
+    Theology --> Sentences
+    Theology --> DisputedQ
+    Theology --> Principium
 ```
 
 This structure encodes epistemological assumptions about knowledge hierarchy. Logic and natural philosophy provide the analytical toolkit required for theology, while mathematics trains the mind in demonstrative reasoning. The multi-year apprenticeship model—listening to lectures, participating in disputations, finally lecturing and disputing as master—treats intellectual formation as craft mastery requiring extensive guided practice rather than information transfer achievable through reading alone.

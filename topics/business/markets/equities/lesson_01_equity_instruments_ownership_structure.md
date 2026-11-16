@@ -50,29 +50,19 @@ For a Series A with $20 million preference and 33% ownership, conversion is rati
 
 The liquidation waterfall is the definitive mechanism by which proceeds from a company sale or liquidation are distributed across all capital structure claimants. Every M&A practitioner and equity analyst must be able to construct and stress-test this model from scratch. The waterfall has the following canonical structure:
 
-```
-Total Enterprise Proceeds (Sale Price or Liquidation Value)
-         │
-         ▼
-[1] Senior Secured Debt Repayment
-    (Term Loans, Revolving Credit Facility — full principal + accrued interest)
-         │
-         ▼
-[2] Unsecured Senior Notes / Subordinated Debt
-    (Full principal + accrued interest, in priority order)
-         │
-         ▼
-[3] Preferred Stock Liquidation Preferences
-    (Series C → Series B → Series A, in reverse seniority order)
-    + Accrued Cumulative Dividends (if applicable)
-         │
-         ▼
-[4] Participating Preferred Participation Rights
-    (Pro-rata with common, only if participating structure)
-         │
-         ▼
-[5] Common Stock (Residual)
-    (Pro-rata among all common holders, including converted preferred)
+```mermaid
+flowchart TD
+    Start["Total Enterprise Proceeds<br/>(Sale Price or Liquidation Value)"]
+    
+    Start --> Step1["[1] Senior Secured Debt Repayment<br/>(Term Loans, Revolving Credit Facility)<br/>Full principal + accrued interest"]
+    
+    Step1 --> Step2["[2] Unsecured Senior Notes / Subordinated Debt<br/>(Full principal + accrued interest, in priority order)"]
+    
+    Step2 --> Step3["[3] Preferred Stock Liquidation Preferences<br/>(Series C → Series B → Series A, in reverse seniority order)<br/>+ Accrued Cumulative Dividends (if applicable)"]
+    
+    Step3 --> Step4["[4] Participating Preferred Participation Rights<br/>(Pro-rata with common, only if participating structure)"]
+    
+    Step4 --> Step5["[5] Common Stock (Residual)<br/>(Pro-rata among all common holders, including converted preferred)"]
 ```
 
 A complete worked model for a hypothetical SaaS company acquisition at $150 million illustrates the mechanics fully. Assume the company has $30 million in senior secured term debt (6% coupon, accrued interest $900K), $15 million in Series A preferred (1× non-participating, cumulative 8%, accrued dividends of $3.6M over three years), and $20 million in Series B preferred (1.5× non-participating, 8% cumulative, accrued dividends of $3.2M over two years). The fully diluted cap table is 10 million common shares, 2 million Series A shares (25% as-converted), and 1.5 million Series B shares (20% as-converted), for 13.5 million fully diluted shares.

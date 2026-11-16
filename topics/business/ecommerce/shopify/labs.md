@@ -38,76 +38,31 @@ Analytics instrumentation transforms the Shopify storefront into an observable s
 
 Insert the following Google Analytics 4 ecommerce tracking implementation immediately before the closing </head> tag in theme.liquid:
 
-```liquid
-<!-- GA4 Enhanced Ecommerce Tracking -->
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX', {
-    'send_page_view': false,
-    'allow_google_signals': true,
-    'allow_ad_personalization_signals': true
-  });
-
-  {% if template contains 'product' %}
-    gtag('event', 'view_item', {
-      currency: '{{ cart.currency.iso_code }}',
-      value: {{ product.price | money_without_currency | remove: ',' }},
-      items: [{
-        item_id: '{{ product.selected_or_first_available_variant.sku }}',
-        item_name: '{{ product.title | escape }}',
-        item_brand: '{{ product.vendor | escape }}',
-        item_category: '{{ product.type | escape }}',
-        price: {{ product.price | money_without_currency | remove: ',' }},
-        quantity: 1
-      }]
-    });
-  {% endif %}
-
-  {% if template == 'cart' %}
-    gtag('event', 'view_cart', {
-      currency: '{{ cart.currency.iso_code }}',
-      value: {{ cart.total_price | money_without_currency | remove: ',' }},
-      items: [
-        {% for item in cart.items %}
-        {
-          item_id: '{{ item.sku }}',
-          item_name: '{{ item.product.title | escape }}',
-          item_brand: '{{ item.product.vendor | escape }}',
-          item_category: '{{ item.product.type | escape }}',
-          price: {{ item.price | money_without_currency | remove: ',' }},
-          quantity: {{ item.quantity }}
-        }{% unless forloop.last %},{% endunless %}
-        {% endfor %}
-      ]
-    });
-  {% endif %}
-
-  {% if first_time_accessed %}
-    {% if checkout.order_id %}
-      gtag('event', 'purchase', {
-        transaction_id: '{{ checkout.order_id }}',
-        value: {{ checkout.total_price | money_without_currency | remove: ',' }},
-        tax: {{ checkout.tax_price | money_without_currency | remove: ',' }},
-        shipping: {{ checkout.shipping_price | money_without_currency | remove: ',' }},
-        currency: '{{ checkout.currency }}',
-        items: [
-          {% for line_item in checkout.line_items %}
-          {
-            item_id: '{{ line_item.sku }}',
-            item_name: '{{ line_item.title | escape }}',
-            item_brand: '{{ line_item.vendor | escape }}',
-            item_category: '{{ line_item.product.type | escape }}',
-            price: {{ line_item.price | money_without_currency | remove: ',' }},
-            quantity: {{ line_item.quantity }}
-          }{% unless forloop.last %},{% endunless %}
-          {% endfor %}
-        ]
-      });
-    {% endif %}
-  {% endif %}
-</script>
+```mermaid
+flowchart TD
+    Start["Page Load"]
+    
+    Start --> Init["Initialize GA4<br/>gtag('config', 'G-XXXXXXXXXX')"]
+    
+    Init --> TemplateCheck{Template<br/>Type?}
+    
+    TemplateCheck -->|"Contains 'product'"| ProductPage["Product Page"]
+    TemplateCheck -->|"Equals 'cart'"| CartPage["Cart Page"]
+    TemplateCheck -->|"Other"| CheckCheckout{First Time<br/>Accessed?}
+    
+    ProductPage --> ViewItem["gtag('event', 'view_item')<br/>• currency<br/>• value<br/>• items["sku, name, brand, category, price, qty=1"]"]
+    
+    CartPage --> ViewCart["gtag('event', 'view_cart')<br/>• currency<br/>• value (cart total)<br/>• items[] (all cart items)"]
+    
+    CheckCheckout -->|Yes| OrderCheck{Order ID<br/>Exists?}
+    CheckCheckout -->|No| End["End"]
+    
+    OrderCheck -->|Yes| Purchase["gtag('event', 'purchase')<br/>• transaction_id<br/>• value<br/>• tax<br/>• shipping<br/>• currency<br/>• items[] (all line items)"]
+    OrderCheck -->|No| End
+    
+    ViewItem --> End
+    ViewCart --> End
+    Purchase --> End
 ```
 
 Replace G-XXXXXXXXXX with your actual GA4 measurement ID. This implementation fires granular ecommerce events with product-level attribution data, enabling cohort analysis, product affinity modeling, and multi-touch attribution across marketing channels. The first_time_accessed conditional prevents duplicate purchase events when customers refresh the thank-you page, maintaining conversion metric accuracy.
@@ -478,7 +433,7 @@ The success criteria for Exercise 3 require documented experience with minimum t
 
 This reference guide provides systematic diagnostic protocols for troubleshooting common Shopify operational failures and a comprehensive checklist for pre-launch verification and ongoing performance audits. The diagnostic methodologies follow a structured investigation process: observe symptoms, collect quantitative evidence, isolate root causes through hypothesis testing, implement remediation, and verify resolution through metric monitoring.
 
-**Diagnostic Protocol: Low Conversion Rate (<1.5% for paid traffic)**
+**Diagnostic Protocol: Low Conversion Rate (< 1.5% for paid traffic)**
 
 Primary symptom manifestation occurs in Analytics > Reports > Online store conversion over time showing sustained conversion rate below industry benchmarks. Begin investigation by segmenting conversion metrics by traffic source—organic search typically converts at 2-3%, paid search at 1.5-2.5%, social media at 0.5-1.5%, email at 3-5%. If all traffic sources demonstrate uniformly low conversion, root cause likely resides in storefront architecture rather than traffic quality.
 
@@ -496,7 +451,7 @@ Execute the following diagnostic sequence:
 
 Implement remediation based on highest-impact failure discovered—mobile usability and page load performance typically drive 2-3× conversion improvement when moving from poor to acceptable implementation quality.
 
-**Diagnostic Protocol: High Traffic, Low Sales (traffic up 50%+, revenue increase <10%)**
+**Diagnostic Protocol: High Traffic, Low Sales (traffic up 50%+, revenue increase < 10%)**
 
 This symptom pattern indicates traffic quality degradation where incremental visitors exhibit low purchase intent. Extract traffic source data from Analytics > Reports > Sessions by traffic source and calculate conversion rate by source: divide sales by sessions for each traffic channel. Channels demonstrating conversion rates below 50% of baseline indicate low-intent traffic inappropriate for immediate conversion optimization—these visitors require nurture campaigns or content engagement strategies rather than product-focused traffic.
 
@@ -556,7 +511,7 @@ Execute the following verification sequence before launching promotional campaig
 **Product Catalog Verification**
 - [ ] Minimum 10 products published with complete information
 - [ ] All products include: SKU, price, weight, inventory quantity, product type, vendor
-- [ ] Product images minimum 2048×2048 pixels, optimized to <200KB file size
+- [ ] Product images minimum 2048×2048 pixels, optimized to < 200KB file size
 - [ ] Product descriptions minimum 150 words with benefit-focused copywriting
 - [ ] Collections created with automated rules for "New Arrivals," "Best Sellers," "Sale"
 - [ ] Navigation menu includes all primary collections

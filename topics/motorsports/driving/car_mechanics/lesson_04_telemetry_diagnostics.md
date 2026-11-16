@@ -32,48 +32,47 @@ The steering angle sensor, mounted on the steering column just below the wheel, 
 
 The physical sensor signals described above route back to data loggers and ECUs through a network governed primarily by the Controller Area Network protocol — CAN 2.0B in most race applications, with CAN FD appearing in newer GT and prototype platforms where bandwidth demands have outgrown the classic 1 Mbit/s ceiling. Understanding the bus architecture is essential because it determines latency, message priority, and the structure of the data you will decode in analysis software.
 
-```
-┌────────────────────────────────────────────────────────────────────────────┐
-│                        Race Car CAN Bus Architecture                       │
-└────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph sensors_mech ["Mechanical / Chassis Sensors"]
+        SP["Suspension Pots"]
+        BP["Brake Pressure"]
+        TP["Tire Pyrometers"]
+        RH["Ride Height"]
+    end
 
-   [ Suspension Pots ]──┐           [ Wheel Speed Sensors ]──┐
-   [ Brake Pressure  ]──┤           [ Steering Angle      ]──┤
-   [ Tire Pyrometers ]──┤           [ IMU (Accel/Gyro)    ]──┤
-   [ Ride Height     ]──┘           [ GPS Module          ]──┘
-           │                                   │
-           ▼                                   ▼
-   ┌───────────────┐               ┌───────────────────────┐
-   │  Sensor DAU   │               │   ECU (Engine/Trans)  │
-   │  (e.g. AiM    │               │   (Magneti Marelli /  │
-   │   EVO4S / MX  │               │    Life Racing / Pi)  │
-   └───────┬───────┘               └──────────┬────────────┘
-           │  CAN-H / CAN-L (120Ω term)        │
-           └────────────┬──────────────────────┘
-                        │
-              ┌─────────▼──────────┐
-              │  High-Speed CAN    │
-              │  Bus (1 Mbit/s)    │
-              │  Arbitration IDs   │
-              │  0x001–0x7FF       │
-              └─────────┬──────────┘
-                        │
-           ┌────────────┴────────────┐
-           ▼                         ▼
-  ┌─────────────────┐      ┌──────────────────────┐
-  │  Central Data   │      │  Dashboard / Dash     │
-  │  Logger         │      │  Display (AiM MXS /   │
-  │  (stores .xdrz  │      │  Stack ST700 / Cosworth│
-  │   / .ld / .csv) │      │  CD-7)                │
-  └─────────────────┘      └──────────────────────┘
-                        │
-              ┌─────────▼──────────┐
-              │  Post-Session      │
-              │  Download to PC    │
-              │  (RS3Analysis /    │
-              │   MoTeC i2 /       │
-              │   WinDarab)        │
-              └────────────────────┘
+    subgraph sensors_motion ["Motion & Navigation Sensors"]
+        WSS["Wheel Speed Sensors"]
+        SA["Steering Angle"]
+        IMU["IMU (Accel / Gyro)"]
+        GPS["GPS Module"]
+    end
+
+    DAU["Sensor DAU\n(AiM EVO4S / MX)"]
+    ECU["ECU — Engine / Trans\n(Magneti Marelli / Life Racing / Pi)"]
+
+    BUS["High-Speed CAN Bus\n1 Mbit/s · Arbitration IDs 0x001–0x7FF\nCAN-H / CAN-L · 120 Ω termination"]
+
+    LOGGER["Central Data Logger\n(.xdrz / .ld / .csv)"]
+    DASH["Dashboard Display\n(AiM MXS / Stack ST700 / Cosworth CD-7)"]
+    PC["Post-Session Download to PC\n(RS3Analysis / MoTeC i2 / WinDarab)"]
+
+    SP --> DAU
+    BP --> DAU
+    TP --> DAU
+    RH --> DAU
+
+    WSS --> ECU
+    SA  --> ECU
+    IMU --> ECU
+    GPS --> ECU
+
+    DAU --> BUS
+    ECU --> BUS
+
+    BUS --> LOGGER
+    BUS --> DASH
+    LOGGER --> PC
 ```
 
 On the CAN bus, every device is a node. Each node transmits messages framed with an 11-bit (standard) or 29-bit (extended) arbitration ID, a data length code of 0 to 8 bytes, and the payload bytes carrying the encoded physical values. The bus operates on a non-destructive bitwise arbitration scheme: when two nodes attempt to transmit simultaneously, the one with the lower numerical arbitration ID wins and the other backs off, ensuring that high-priority messages — typically ECU-broadcast engine RPM, throttle position, and wheel speed — always take precedence over lower-priority telemetry housekeeping traffic.

@@ -118,32 +118,25 @@ The resulting position $^{A}\mathbf{p} = [3, 7, 0]^T$ reflects both the rotation
 
 Software implementations typically encapsulate homogeneous transformations within classes or structures providing overloaded multiplication operators for natural composition syntax. Modern robotics libraries such as the Robotics Toolbox for MATLAB, Python's `spatialmath` package, and C++'s Eigen library offer battle-tested implementations handling numerical subtleties and providing utilities for conversion between rotation representations. Real-time control systems favor fixed-point or SIMD-vectorized floating-point implementations exploiting processor instruction sets for parallel matrix-vector operations, achieving transformation computations within single-digit microseconds on contemporary embedded processors.
 
-```
-Frame Transformation Diagram (Serial Kinematic Chain):
+```mermaid
+flowchart TD
+    World["{World}"]
+    Base["{Base}"]
+    Link1["{Link1}"]
+    Link2["{Link2}"]
+    Link3["{Link3}"]
+    Gripper["{Gripper}"]
 
-{World} ────────────T₀──────────> {Base}
-                                    │
-                                    │ T₁ (Joint 1)
-                                    ▼
-                                  {Link1}
-                                    │
-                                    │ T₂ (Joint 2)
-                                    ▼
-                                  {Link2}
-                                    │
-                                    │ T₃ (Joint 3)
-                                    ▼
-                                  {Link3}
-                                    │
-                                    │ T_tool
-                                    ▼
-                                 {Gripper}
+    World -->|"T₀"| Base
+    Base -->|"T₁(θ₁) — Joint 1"| Link1
+    Link1 -->|"T₂(θ₂) — Joint 2"| Link2
+    Link2 -->|"T₃(θ₃) — Joint 3"| Link3
+    Link3 -->|"T_tool"| Gripper
 
-Composite Transformation:
-T_world_gripper = T₀ · T₁(θ₁) · T₂(θ₂) · T₃(θ₃) · T_tool
-
-Each Tᵢ is a 4×4 homogeneous transformation matrix.
-Notation: T^A_B transforms from frame {B} to frame {A}.
+    subgraph composite ["Composite Transformation"]
+        EQ["T_world_gripper = T₀ · T₁(θ₁) · T₂(θ₂) · T₃(θ₃) · T_tool"]
+        NOTE["Each Tᵢ is a 4×4 homogeneous matrix — T^A_B transforms from frame B to frame A"]
+    end
 ```
 
 The diagram illustrates a typical serial manipulator's kinematic structure, where each joint introduces a transformation parameterized by the joint variable $\theta_i$. The forward kinematics problem reduces to computing the composite transformation from base to gripper, while inverse kinematics inverts this mapping to determine joint angles achieving a desired gripper pose. Both problems rely fundamentally on the homogeneous transformation formalism developed here.

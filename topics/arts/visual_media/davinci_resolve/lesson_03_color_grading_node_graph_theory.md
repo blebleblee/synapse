@@ -39,12 +39,19 @@ The beauty of serial architecture is clarity: you can trace the signal path visu
 
 Parallel architecture occurs when a single node output feeds into *multiple* downstream nodes, which then perform independent operations, and their results are later recombined. In Resolve, you create parallel branches by selecting a node and pressing the "Add Node" button (or Alt+A), which inserts a new node in parallel to the selected node, both receiving input from the same upstream source.
 
-```
-                  ↓ [Node 2a: Isolate Skin Tones via Qualifier]
-Input Image → [Node 1: Global Curves] ─┤
-                  ↓ [Node 2b: Isolate Sky via Qualifier]
-                  
-[Node 2a Output] → [Blend/Composite] ← [Node 2b Output]
+```mermaid
+flowchart TD
+    INPUT["Input Image"]
+    GLOBAL_CURVES["Node 1: Global Curves"]
+    SKIN_QUALIFIER["Node 2a: Isolate Skin Tones via Qualifier"]
+    SKY_QUALIFIER["Node 2b: Isolate Sky via Qualifier"]
+    BLEND["Blend / Composite"]
+
+    INPUT --> GLOBAL_CURVES
+    GLOBAL_CURVES --> SKIN_QUALIFIER
+    GLOBAL_CURVES --> SKY_QUALIFIER
+    SKIN_QUALIFIER --> BLEND
+    SKY_QUALIFIER --> BLEND
 ```
 
 The practical use case is powerful: imagine you want to grade the subject (talent/actor) differently from the background. In a parallel architecture, you would insert Node 2a with a qualifier that isolates only the skin tones and apply a warm, flattering curve to that selection. In parallel, Node 2b isolates only the sky (using a luma or HSL qualifier) and applies a cooler, more saturated grade to it. The blending happens automatically—Resolve's qualifier creates a soft-edge mask that blends the two graded outputs based on the isolation criteria you defined.
@@ -57,10 +64,21 @@ Parallel architecture enables you to think compositionally: each branch handles 
 
 Layer architecture is a refinement of parallel architecture where multiple independent grades are stacked on top of each other, each with its own explicit mix slider. You create a layer node by selecting a node and pressing the "Add Layer" button (Alt+L). This creates a new node that sits *at the same hierarchical level* as the first node, both receiving the same upstream input, but with an explicit "Mix" slider that controls the blend percentage (0–100%).
 
-```
-Input Image → [Node 1a: Primary Grade] ┐
-               [Node 1b: Secondary Grade (Mix: 75%)] ┤ → Composited Output
-               [Node 1c: Tertiary Grade (Mix: 50%)]  ┘
+```mermaid
+flowchart LR
+    in_img["Input Image"]
+    grade1a["Node 1a: Primary Grade"]
+    grade1b["Node 1b: Secondary Grade (Mix: 75%)"]
+    grade1c["Node 1c: Tertiary Grade (Mix: 50%)"]
+    out_comp["Composited Output"]
+
+    in_img --> grade1a
+    in_img --> grade1b
+    in_img --> grade1c
+
+    grade1a --> out_comp
+    grade1b --> out_comp
+    grade1c --> out_comp
 ```
 
 Layer architecture is ideal when you have multiple, somewhat independent adjustments that you want to dial in and out as needed. A common workflow is:
@@ -210,4 +228,21 @@ A typical power window workflow for on-set footage is:
 
 Another workflow is creating a vignette: a large rectangular power window with heavy feathering at all edges, darkening the periphery to draw the viewer's eye to the center of the frame.
 
-Power windows can be animated using keyframes, allowing you to track a moving subject across the frame and maintain the localized adjustment. For
+Power windows can be animated using keyframes, allowing you to track a moving subject across the frame and maintain the localized adjustment.
+
+### Integrating Power Windows with Node Graph Architecture
+
+Power windows reach their full potential when integrated into a structured node graph. A professional approach is to dedicate specific nodes to spatial adjustments: create a node explicitly for foreground isolation (face, primary subject), another for background control (sky replacement, environmental mood), and a third for edge vignetting. This separation maintains editorial flexibility—if the director requests a warmer face but cooler background, you adjust independent nodes rather than unpicking a monolithic grade. When combining power windows with qualifiers, the recommended order is: **qualifier first, then power window**. This allows you to isolate a color range globally (e.g., all skin tones), then spatially refine that selection with a window (e.g., only the actor's face, not the extra in the background). The inverse order—window then qualifier—can work but often requires more aggressive qualifier settings, risking noise and edge artifacts. Advanced users employ **node layering with mattes**: create a power window on one node, export its matte via the node's key output, and feed that matte into a downstream node's key input to build compound spatial-chromatic selections. This technique is essential for complex compositing scenarios, such as grading a subject's reflection separately from the subject itself. Finally, remember that power windows are computationally expensive when animated or heavily feathered; if performance degrades, consider pre-rendering or simplifying your node tree by consolidating non-animated windows into a single compound node.
+
+---
+
+## Summary & Verification Matrix
+
+| **Invariant / Mechanism** | **Governing Principle** | **Diagnostic Criteria** | **Common Failure Mode** |
+|---------------------------|-------------------------|-------------------------|-------------------------|
+| **Serial vs. Parallel Nodes** | Serial nodes compound transformations multiplicatively; parallel nodes blend independently then composite. | If adjusting exposure in two serial nodes (+1 stop each), final result is +2 stops. If parallel, each applies +1 stop to the source, then averages. | Misunderstanding parallel blend modes (e.g., expecting serial accumulation). Outputs appear "weaker" than intended. |
+| **Layer Mixer Logic** | Acts as a mini-compositor: layers stack bottom-to-top, each with independent blend mode and opacity. | Changing layer order changes final composite. A "screen" layer above a "multiply" layer produces different results than reversed order. | Forgotten layer opacity or incorrect blend mode. Adjustments "disappear" or produce inverted effects. |
+| **ACES Color Management** | Input Transform → Grade in ACES → Output Transform. Single grade, multiple deliverables. | ACES grade appears identical across Rec. 709 and DCI-P3 outputs (within gamut limits). Non-ACES grades require manual re-grading per output. | Skipping input transform or mismatched output LUT. Colors shift unpredictably across deliverables or show clipping. |
+| **Qualifier Precision Hierarchy** | Hue/Sat/Lum qualifiers isolate color ranges; combine with power windows for spatial refinement. Qualifier *before* window reduces noise. | Clean, feathered selection edges. No color spill into unintended regions. Adjustments isolated to intended subject. | Overly aggressive qualifier settings (too wide tolerance). Noise in selection edges, banding, or unintended areas affected. |
+| **Power Window Spatial Control** | Feathered geometric masks for localized adjustment. Animate via keyframes to track moving subjects. Compound with qualifiers for spatial+chromatic isolation. | Smooth, invisible transitions at window edges. Subject enhancement (e.g., warmer face) without artificiality. Vignettes feel natural, not "spotlight-like." | Hard, visible edges (insufficient feather). Misaligned tracking keyframes causing adjustment to drift off subject. Window applied *after* qualifier, requiring excessive qualifier aggression. |
+| **Node Tree Performance** | Complexity scales with node count, animated windows, and heavy feathering. Simplify via pre-rendering or compound nodes when real-time playback degrades. | Real-time playback at target frame rate (23.976, 24, etc.). GPU utilization remains below 90%. No dropped frames during scrubbing. | Excessive nodes (>15 per clip). Multiple animated, heavily-feathered windows. System stutters, renders slowly, or shows "Processing..." overlays during playback. |

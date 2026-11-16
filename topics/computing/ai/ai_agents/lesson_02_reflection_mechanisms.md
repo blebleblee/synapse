@@ -555,9 +555,9 @@ graph TD
     T3 --> T3B
     T3A --> T3A1
 
-    style T2 fill:#ffcccc,stroke:#cc0000
-    style T3B fill:#ffcccc,stroke:#cc0000
-    style T3A1 fill:#ccffcc,stroke:#00cc00
+    style T2 fill:#ffcccc,stroke:#cc0000,color:#0f172a
+    style T3B fill:#ffcccc,stroke:#cc0000,color:#0f172a
+    style T3A1 fill:#ccffcc,stroke:#00cc00,color:#0f172a
 ```
 
 The reflection operation is the node scoring function. Pruned branches (shown in red) represent discarded hypotheses — the agent has implicitly reflected that those reasoning paths are unlikely to yield correct answers.
@@ -720,7 +720,7 @@ Reflection mechanisms must be empirically evaluated, not just theoretically just
 | **Reflection Utility Rate (RUR)** | Fraction of episodes where the agent's behaviour demonstrably changed in response to a reflection | >50% |
 | **Critique Accuracy** | Fraction of critiques that correctly identify the actual root cause | >70% via human eval |
 | **Score Trajectory Slope** | Linear regression slope of score vs. episode index | Positive (improving) |
-| **Oscillation Rate** | Fraction of episode pairs where score decreases after a non-zero score | <10% |
+| **Oscillation Rate** | Fraction of episode pairs where score decreases after a non-zero score | < 10% |
 
 A reflection mechanism where Pass@k does not improve significantly over Pass@1 (baseline: retry without reflection) is not functioning. This is the null hypothesis that every reflection implementation must disprove.
 

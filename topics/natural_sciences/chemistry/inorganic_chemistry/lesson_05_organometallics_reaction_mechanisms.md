@@ -116,18 +116,21 @@ where $\Delta G^\ddagger = \Delta H^\ddagger - T\Delta S^\ddagger$ represents th
 
 The Suzuki-Miyaura coupling synthesizes biaryl compounds through palladium-catalyzed cross-coupling of aryl halides with arylboronic acids. The catalytic cycle integrates oxidative addition, transmetalation, and reductive elimination, with turnover frequencies reaching 10²-10³ h⁻¹ under optimized conditions.
 
-```
-Catalytic Cycle:
+```mermaid
+flowchart TD
+    ArX["Ar-X"]
+    OA["[Pd(Ar)(X)(L)₂]\nd⁸ Pd(II)"]
+    TM["[Pd(Ar)(Ar')(L)₂]\nd⁸ Pd(II)"]
+    RE["Ar-Ar' + PdL₂"]
+    Pd0["[Pd(L)₂]\nd¹⁰ Pd(0)"]
+    Reagents["Ar'-B(OH)₂ + Base\n→ X-B(OH)₂ + H₂O"]
 
-    Ar-X  ───────► [Pd(Ar)(X)(L)₂]   (Oxidative Addition)
-     ↑                  │ d⁸ Pd(II)
-     │                  │
-[Pd(L)₂] ◄───────  [Ar-Ar'] + PdL₂  (Reductive Elimination)
-  d¹⁰ Pd(0)            ↑
-     ↑                  │
-     │                  │
-  Ar'-B(OH)₂ + Base → [Pd(Ar)(Ar')(L)₂]  (Transmetalation)
-  + X-B(OH)₂ + H₂O        d⁸ Pd(II)
+    ArX -- "Oxidative Addition" --> OA
+    OA -- "Transmetalation" --> TM
+    Reagents --> TM
+    TM -- "Reductive Elimination" --> RE
+    RE --> Pd0
+    Pd0 --> ArX
 ```
 
 **Laboratory Protocol for Suzuki Coupling (1 mmol scale):**
@@ -275,7 +278,7 @@ Ligand oxidation affects phosphines with air-sensitive P(III) centers, which oxi
 
 Dimer formation through bridging ligands (e.g., μ-halide or μ-hydride bridges) creates coordinatively saturated, inactive species. For example, [Rh(Cl)(PPh₃)₃] dimerizes under H₂ atmosphere to form [Rh₂(μ-Cl)₂(H)₂(PPh₃)₄], which exhibits negligible hydrogenation activity. Preventing dimerization requires maintaining high ligand-to-metal ratios and employing chelating ligands that occupy multiple coordination sites, sterically precluding bridging geometries.
 
-Impurity poisoning affects catalyst performance at ppm levels. Oxygen reversibly binds to low-valent metals, forming peroxo or superoxo complexes that oxidize substrates or ligands. Sulfur-containing impurities (thiophene, thiols) irreversibly bind to metals through soft Lewis acid-base interactions, blocking coordination sites. Deoxygenation via freeze-pump-thaw degassing (three cycles minimum) and sulfur removal via activated alumina column chromatography ensure impurity levels below detection thresholds (<1 ppm).
+Impurity poisoning affects catalyst performance at ppm levels. Oxygen reversibly binds to low-valent metals, forming peroxo or superoxo complexes that oxidize substrates or ligands. Sulfur-containing impurities (thiophene, thiols) irreversibly bind to metals through soft Lewis acid-base interactions, blocking coordination sites. Deoxygenation via freeze-pump-thaw degassing (three cycles minimum) and sulfur removal via activated alumina column chromatography ensure impurity levels below detection thresholds (< 1 ppm).
 
 ### Enantioselective Catalysis: Chiral Ligand Engineering
 

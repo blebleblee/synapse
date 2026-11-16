@@ -148,31 +148,38 @@ Drop to just vocal + one instrument for bars 1–4. Add one element every two ba
 ## 7. Full Form Map
 
 ```mermaid
-stateDiagram-v2
-    [*] --> intro_sec
-    intro_sec --> verse1_sec
-    verse1_sec --> chorus1_sec
-    chorus1_sec --> verse2_sec
-    verse2_sec --> chorus2_sec
-    chorus2_sec --> bridge_sec
-    bridge_sec --> chorus3_sec
-    chorus3_sec --> outro_sec
-    outro_sec --> [*]
+flowchart TD
+    START((" ")):::terminal
+    intro["Intro"]
+    verse1["Verse 1"]
+    chorus1["Chorus 1"]
+    verse2["Verse 2"]
+    chorus2["Chorus 2"]
+    bridge["Bridge"]
+    chorus3["Chorus 3"]
+    outro["Outro"]
+    END((" ")):::terminal
 
-    note right of verse1_sec
-        8-16 bars, narrow range,
-        new lyrics each pass
-    end note
+    verse1_note["8–16 bars\nNarrow range\nNew lyrics each pass"]:::note
+    chorus1_note["8–16 bars\n2–4 chords\nIdentical lyrics, wide range"]:::note
+    bridge_note["8–16 bars\nBreaks at least two\nestablished patterns"]:::note
 
-    note right of chorus1_sec
-        8-16 bars, 2-4 chords,
-        identical lyrics, wide range
-    end note
+    START --> intro
+    intro --> verse1
+    verse1 --> chorus1
+    chorus1 --> verse2
+    verse2 --> chorus2
+    chorus2 --> bridge
+    bridge --> chorus3
+    chorus3 --> outro
+    outro --> END
 
-    note right of bridge_sec
-        8-16 bars, breaks at least
-        two established patterns
-    end note
+    verse1 -. " " .- verse1_note
+    chorus1 -. " " .- chorus1_note
+    bridge -. " " .- bridge_note
+
+    classDef terminal fill:#111,stroke:#111,color:#111,width:12px,height:12px
+    classDef note fill:#fffde7,stroke:#f9a825,stroke-dasharray:4 3,color:#333,font-size:12px,text-align:left
 ```
 
 ### Timing map for a 3-minute song (120 BPM, 4/4 — 1 bar = 2 seconds)
@@ -198,22 +205,12 @@ stateDiagram-v2
 ### AABA (jazz standards, early rock, singer-songwriter)
 
 ```mermaid
-stateDiagram-v2
-    [*] --> a1_sec
-    a1_sec --> a2_sec
-    a2_sec --> b_sec
-    b_sec --> a3_sec
-    a3_sec --> [*]
-
-    note right of a1_sec
-        16-32 bars, main theme,
-        functions as verse+chorus combined
-    end note
-
-    note right of b_sec
-        8-16 bars, contrasting bridge
-        (the "middle eight")
-    end note
+flowchart TD
+    Start([Start]) --> A1["A1 Section<br/>16-32 bars, main theme,<br/>functions as verse+chorus combined"]
+    A1 --> A2["A2 Section"]
+    A2 --> B["B Section<br/>8-16 bars, contrasting bridge<br/>(the 'middle eight')"]
+    B --> A3["A3 Section"]
+    A3 --> End([End])
 ```
 
 The A section does double duty — it's melodically memorable like a chorus but carries new lyrics like a verse. There's no separate hook section. "Yesterday" (The Beatles) runs this with ~8-bar A sections and an 8-bar B. If you're writing something intimate and lyric-driven, this form avoids the "shout the hook four times" feel of pop structure.

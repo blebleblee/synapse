@@ -24,26 +24,29 @@ The Grashof condition governs whether the input link can rotate fully (a *crank*
 
 In Technic practice, all four bar lengths must be constructed from integer multiples of the stud unit (8mm per stud pitch, noting that axle holes on liftarms are spaced at 8mm center-to-center). This discretization is simultaneously a constraint and a gift: it forces you to work from a finite catalog of geometries, which means the community has thoroughly mapped the design space. A crank-rocker using a 3-stud crank, 5-stud coupler, 4-stud rocker, and 7-stud ground link, for example, produces a rocker sweep of approximately 65°, which is well-matched to a Technic gear rack travel range. Adjust the crank to 2 studs and the coupler to 6 studs, and the dwell behavior at the extreme positions changes substantially — the output rocker slows and nearly pauses near its limits, a behavior called *approximate dwell* that is enormously useful for synchronized pick-and-place mechanisms where you want the working end to linger momentarily while other parts of the machine complete their cycle.
 
-```
-Four-Bar Linkage — Crank-Rocker Configuration (Top View, Schematic)
+```mermaid
+flowchart TD
+    subgraph frame ["Ground Link — Fixed Frame"]
+        A["A\nFixed Pivot\n(Ø3.2 mm Technic Pin)"]
+        D["D\nFixed Pivot\n(Ø3.2 mm Technic Pin)"]
+    end
 
-GROUND LINK (Fixed Frame Beam)
- A ════════════════════════════════ D
- |                                  |
- |  INPUT CRANK (length r)          | OUTPUT ROCKER (length l)
- |                                  |
- B ————————————————————————————— C
-        COUPLER (length c)
+    subgraph crank_side ["Input Side"]
+        B["B\nDriven Crank Pin\n(rotates about A)"]
+    end
 
-A, D : Fixed pivots bolted to frame (Ø3.2mm Technic pins)
-B    : Driven crank pin (rotates about A)
-C    : Coupler-rocker joint (floating)
-B→C  : Coupler liftarm
-D→C  : Output rocker liftarm
+    subgraph coupler_side ["Output Side"]
+        C["C\nCoupler–Rocker Joint\n(floating pin)"]
+    end
 
-Grashof check:  min(r, c, l, ground) + max(r, c, l, ground)
-                ≤ sum of remaining two lengths
-                → Satisfied → crank can rotate 360°
+    A -- "Input Crank\nlength r" --> B
+    B -- "Coupler\nlength c" --> C
+    D -- "Output Rocker\nlength l" --> C
+    A -- "Ground Link\n(fixed, length g)" --> D
+
+    grashof["Grashof Condition\nmin(r, c, l, g) + max(r, c, l, g)\n≤ sum of remaining two\n✓ Satisfied → 360° crank rotation"]
+
+    frame -. "design constraint" .-> grashof
 ```
 
 The coupler curve — the path traced by any point attached to the coupler link other than its two endpoints — is a sixth-degree algebraic curve that can approximate straight lines, figure-eights, and near-circular arcs depending on the geometry. The practical significance is profound: by mounting a payload or a tool at a carefully chosen point along the coupler, you can synthesize nearly straight-line motion without rails or sliders, using only pivoting links. Roberts and Chebyshev independently discovered linkage geometries that trace near-perfect straight lines in the mid-19th century; in Technic, you replicate these findings empirically by sliding the mounting hole of a 3L axle along the coupler beam and observing how the path character changes. Near the midpoint of the coupler in a symmetric geometry, the path tends toward a straight line. Near the endpoints, it curves aggressively.
@@ -66,28 +69,31 @@ The pressure source is either manual (the hand pump, part 74981c01) or electric 
 
 The distribution network is simply the interconnecting tubing — Lego's 3mm OD pneumatic hose, available in multiple lengths. Its internal volume is not trivial: a 20-stud run of tubing contains roughly 0.5 cm³ of air volume, which matters when you are trying to understand why cylinder response lags the valve actuation. Each centimeter of additional tubing adds dead volume that must be pressurized before the cylinder begins to move. In high-speed mechanisms where timing is critical, minimize tube run lengths and avoid coils or sharp bends that restrict airflow.
 
-```
-Pneumatic Circuit — Dual-Cylinder Actuation (Schematic)
-
-                          ┌─────────────┐
-                          │  RESERVOIR  │ ←── Electric Compressor
-                          │  (76765)    │     or Manual Pump
-                          └──────┬──────┘
-                                 │
-                        ┌────────┴────────┐
-                        │   3-PORT VALVE  │ (Part 71206)
-                        │  (A) | OFF | (B)│
-                        └───┬─────────┬───┘
-                            │         │
-                     ┌──────┴──┐   ┌──┴──────┐
-                     │  CYL A  │   │  CYL B  │
-                     │ EXTEND  │   │ EXTEND  │
-                     └─────────┘   └─────────┘
-
-Valve center position vents both cylinder ports to atmosphere.
-Valve (A) position pressurizes Cyl A, vents Cyl B.
-Valve (B) position pressurizes Cyl B, vents Cyl A.
-Reservoir decouples pump duty cycle from cylinder response speed.
+```mermaid
+flowchart TD
+    Pump["⚡ Electric Compressor<br/>or Manual Pump"]
+    Reservoir["🛢️ RESERVOIR<br/>(76765)"]
+    Valve["🎚️ 3-PORT VALVE<br/>(Part 71206)"]
+    
+    CylA["🔧 CYLINDER A<br/>EXTEND"]
+    CylB["🔧 CYLINDER B<br/>EXTEND"]
+    
+    Atmosphere["💨 Atmosphere<br/>Vent"]
+    
+    Pump -->|Pressurize| Reservoir
+    Reservoir -->|Supply| Valve
+    
+    Valve -->|"Position A:<br/>Pressurize"| CylA
+    Valve -->|"Position B:<br/>Pressurize"| CylB
+    
+    CylA -->|"Position B/OFF:<br/>Vent"| Atmosphere
+    CylB -->|"Position A/OFF:<br/>Vent"| Atmosphere
+    
+    style Reservoir fill:#e1f5ff
+    style Valve fill:#fff3e0
+    style CylA fill:#f3e5f5
+    style CylB fill:#f3e5f5
+    style Atmosphere fill:#f1f8e9
 ```
 
 Lego's switching valve (part 71206) is a three-position, three-port spool valve. In its center (off) position, both outlet ports are open to atmosphere, which means connected cylinders go slack — their pistons can be pushed freely by external loads. This is a critical circuit behavior to design around: if your pneumatic arm is supporting a load and the valve returns to center, the arm will fall. The design solution is to either keep the valve in an energized position when holding load, or to use a mechanical latch — a Technic ratchet or over-center linkage — to provide mechanical retention independent of circuit pressure.

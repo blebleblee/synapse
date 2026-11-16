@@ -26,18 +26,25 @@ Grip mechanics divide into three primary modes, each optimized for different mar
 
 Pressure dynamics operate on a spectrum that must be consciously mapped and practiced. At the lightest threshold, the tool barely contacts the surface, depositing minimal pigment in a pale, transparent mark. This range is critical for initial lay-in gestures and construction lines that will later be obscured by darker finish layers. Medium pressure, engaging approximately thirty to fifty percent of available force, produces the primary working value for contour drawing and structural mapping. Maximum pressure, driving the tool into the paper with full hand and arm weight, creates saturated darks and can physically emboss the paper surface, an effect useful for final accents and cast shadow cores but damaging if overused. Training pressure control requires the same deliberate practice as developing dynamic control on a piano keyboard: repeated exercises moving smoothly from pianissimo to fortissimo and back, internalizing the muscle memory of each increment.
 
-```
-Pressure Mapping Diagram:
-
-Light (10-30%)     Medium (30-60%)      Heavy (60-90%)     Maximum (90-100%)
-     |                   |                    |                    |
-  ┌──┴──┐            ┌──┴──┐              ┌──┴──┐              ┌──┴──┐
-  │ ╱╱╱ │            │▓▓▓▓▓│              │████ │              │█████│
-  │╱╱╱  │            │▓▓▓▓▓│              │████ │              │█████│
-  └─────┘            └─────┘              └─────┘              └─────┘
-   
-   Lay-in           Construction         Primary Form         Accents
-   Search Lines     Mapping              Definition           Cast Shadows
+```mermaid
+flowchart LR
+    subgraph Light_Pressure ["Light (10-30%)"]
+        direction TB
+        Visual_Light["╱╱╱"] --> Label_Light["Lay-in Search Lines"]
+    end
+    subgraph Medium_Pressure ["Medium (30-60%)"]
+        direction TB
+        Visual_Medium["▓▓▓▓▓"] --> Label_Medium["Construction Mapping"]
+    end
+    subgraph Heavy_Pressure ["Heavy (60-90%)"]
+        direction TB
+        Visual_Heavy["████"] --> Label_Heavy["Primary Form Definition"]
+    end
+    subgraph Maximum_Pressure ["Maximum (90-100%)"]
+        direction TB
+        Visual_Maximum["█████"] --> Label_Maximum["Accents Cast Shadows"]
+    end
+    Light_Pressure --> Medium_Pressure --> Heavy_Pressure --> Maximum_Pressure
 ```
 
 The mechanical execution of a gestural line involves a coordinated sequence that parallels the kinetic chain activation in drumming. The gesture begins with the larger proximal muscles—the shoulder and back—initiating movement direction and velocity. The elbow joint acts as a hinge, allowing the forearm to extend and compress, modulating the arc and reach of the stroke. The wrist provides fine angular adjustments, and the fingers stabilize the tool while micro-adjusting pressure. This proximal-to-distal activation sequence ensures that energy flows from the body's center of mass outward, creating lines with organic momentum rather than cramped, wrist-locked scratching.

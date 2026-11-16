@@ -337,44 +337,29 @@ The `retry` block configures exponential backoff for failed sync operations. Whe
 
 The application controller is the central component that drives reconciliation. Its internal architecture follows the standard Kubernetes controller pattern with ArgoCD-specific extensions. The following diagram illustrates the data flow during a single reconciliation cycle:
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                   ArgoCD Application Controller                       │
-│                                                                      │
-│  ┌─────────────┐     ┌──────────────────┐     ┌───────────────────┐ │
-│  │ Application │────▶│  Reconciliation  │────▶│ Repo Server gRPC   │ │
-│  │  Informer   │     │     Loop         │     │ Call (GetManifests)│ │
-│  │ (Watch/App) │     │                  │     │                    │ │
-│  └─────────────┘     └──────────────────┘     └────────┬───────────┘ │
-│                                                         │             │
-│  ┌──────────────────────────────────────────────────────▼──────────┐ │
-│  │           Manifest Cache (Redis-backed)                         │ │
-│  │  Key: (repoURL, revision, path, sourceType, params) → manifests  │ │
-│  └──────────────────────────────────────────────────────┬──────────┘ │
-│                                                         │             │
-│  ┌──────────────────────────────────────────────────────▼──────────┐ │
-│  │           Cluster State Cache (per-cluster informers)            │ │
-│  │  Watches all resource GVKs referenced by managed Applications    │ │
-│  │  Maintains live-state diff against generated manifests           │ │
-│  └──────────────────────────────────────────────────────┬──────────┘ │
-│                                                         │             │
-│  ┌──────────────────────────────────────────────────────▼──────────┐ │
-│  │           Sync Engine (if syncPolicy.automated)                 │ │
-│  │  1. Sort resources by sync-wave annotation                      │ │
-│  │  2. Apply each resource via kubectl apply (SSA or CSA)          │ │
-│  │  3. Wait for health per resource before proceeding              │ │
-│  │  4. Execute hooks at appropriate phases                         │ │
-│  │  5. Report status to Application object                         │ │
-│  └─────────────────────────────────────────────────────────────────┘ │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-        │                                               │
-        ▼                                               ▼
-┌──────────────────┐                         ┌──────────────────────┐
-│  Git Repository  │                         │  Target Cluster(s)   │
-│  (Source of      │                         │  Kube API Server     │
-│   Truth)         │                         │  etcd                │
-└──────────────────┘                         └──────────────────────┘
+```mermaid
+flowchart TD
+    subgraph controller ["ArgoCD Application Controller"]
+        direction TB
+        AppInformer["Application Informer\n(Watch/App)"]
+        ReconcileLoop["Reconciliation Loop"]
+        RepoServerCall["Repo Server gRPC Call\n(GetManifests)"]
+        ManifestCache["Manifest Cache (Redis-backed)\nKey: (repoURL, revision, path, sourceType, params) → manifests"]
+        ClusterStateCache["Cluster State Cache (per-cluster informers)\nWatches all resource GVKs referenced by managed Applications\nMaintains live-state diff against generated manifests"]
+        SyncEngine["Sync Engine (if syncPolicy.automated)\n1. Sort resources by sync-wave annotation\n2. Apply each resource via kubectl apply (SSA or CSA)\n3. Wait for health per resource before proceeding\n4. Execute hooks at appropriate phases\n5. Report status to Application object"]
+
+        AppInformer --> ReconcileLoop
+        ReconcileLoop --> RepoServerCall
+        RepoServerCall --> ManifestCache
+        ManifestCache --> ClusterStateCache
+        ClusterStateCache --> SyncEngine
+    end
+
+    GitRepo["Git Repository\n(Source of Truth)"]
+    TargetCluster["Target Cluster(s)\nKube API Server\netcd"]
+
+    controller --> GitRepo
+    controller --> TargetCluster
 ```
 
 The reconciliation cycle proceeds as follows. The application controller's informer receives an event—either a change to the Application object itself, a Git commit notification from the repository server, or a change to a live cluster resource that the Application manages. The controller then requests generated manifests from the repository server via a gRPC `GetManifests` call, passing the source specification. The repository server clones or fetches the Git repository (using its local cache if the revision is already present), runs the appropriate manifest generation tool, and returns the rendered manifests. The controller queries the live cluster state for every resource referenced in the generated manifests, using its per-cluster informer caches, and computes a diff. If the diff is non-empty and automated sync is enabled, the controller initiates a sync operation.

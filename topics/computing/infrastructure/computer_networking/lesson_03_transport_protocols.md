@@ -22,23 +22,38 @@ The TCP header encodes every mechanism the protocol requires. Its most consequen
 
 Connection setup requires the three-way handshake because both endpoints must synchronize their initial sequence numbers. The client sends a SYN with its chosen ISN (Initial Sequence Number). The server responds with a SYN-ACK carrying both its own ISN and an acknowledgment of the client's SYN. The client completes the exchange with an ACK. Only after this exchange do both sides have enough state to deliver data. The choice of a random ISN matters for security: a predictable ISN allows an off-path attacker to inject forged segments by guessing the sequence number the receiver expects, the attack that broke early TCP implementations before RFC 1948 mandated randomization.
 
-```
-Client                          Server
-  |                               |
-  |--------- SYN (seq=x) -------->|
-  |                               |
-  |<--- SYN-ACK (seq=y, ack=x+1)--|
-  |                               |
-  |--------- ACK (ack=y+1) ------>|
-  |                               |
-  |====== DATA TRANSFER ==========|
-  |                               |
-  |--------- FIN (seq=a) -------->|
-  |<-------- ACK (ack=a+1) -------|
-  |<-------- FIN (seq=b) ---------|
-  |--------- ACK (ack=b+1) ------>|
-  |                               |
-  [TIME_WAIT: 2*MSL seconds]
+```mermaid
+flowchart TD
+    Client1["Client"]
+    Server1["Server"]
+    Client2["Client"]
+    Server2["Server"]
+    Client3["Client"]
+    Server3["Server"]
+    Client4["Client"]
+    Server4["Server"]
+    Client5["Client"]
+    Server5["Server"]
+    Client6["Client"]
+    Server6["Server"]
+    Client7["Client"]
+    Server7["Server"]
+    Client8["Client"]
+    Server8["Server"]
+    Client9["Client"]
+    
+    Client1 -->|"SYN (seq=x)"| Server1
+    Server2 -->|"SYN-ACK (seq=y, ack=x+1)"| Client2
+    Client3 -->|"ACK (ack=y+1)"| Server3
+    
+    Client4 -.->|"DATA TRANSFER"| Server4
+    
+    Client5 -->|"FIN (seq=a)"| Server5
+    Server6 -->|"ACK (ack=a+1)"| Client6
+    Server7 -->|"FIN (seq=b)"| Client7
+    Client8 -->|"ACK (ack=b+1)"| Server8
+    
+    Client9["Client<br/>TIME_WAIT: 2*MSL seconds"]
 ```
 
 The teardown is a four-way exchange because TCP connections are half-duplex at close: each side independently closes its direction of the stream with a FIN. The TIME_WAIT state on the initiating side lasts 2×MSL (Maximum Segment Lifetime, typically 60 seconds, so TIME_WAIT is 2 minutes) to absorb any delayed segments that might otherwise be misinterpreted by a future connection reusing the same four-tuple.
@@ -73,24 +88,38 @@ Congestion control is TCP's most architecturally significant mechanism and the o
 
 The original Jacobson/Karels algorithm, which all subsequent algorithms build upon, defines three phases. Slow Start begins with `cwnd` equal to the initial congestion window (IW), which RFC 6928 sets at ten segments (10 × MSS, approximately 14,600 bytes). For each ACK received, the sender increases `cwnd` by one MSS, doubling `cwnd` each RTT. This exponential growth continues until `cwnd` reaches the slow start threshold (`ssthresh`). When loss occurs, `ssthresh` is set to half of the current `cwnd`, and `cwnd` is reset to IW.
 
-```
-cwnd growth (cwnd in MSS units):
+```mermaid
+flowchart TD
+    START(["Start: cwnd = 1 MSS"])
 
-  |             /
-  |            /                 Congestion
-  |           /                  Avoidance
-  |          /                 (linear, +1 MSS/RTT)
-  |         /            ......./............
-  |        /         ..../
-  |       /      ..../
-  |      /   ..../     <- ssthresh
-  |     /..../
-  |    /
-  |   /  Slow Start
-  |  /   (doubles each RTT)
-  | /
-  |/
-  +------------------------------------------> time
+    subgraph slow_start ["Slow Start Phase"]
+        SS["Slow Start\n(cwnd doubles each RTT:\ncwnd × 2 per RTT)"]
+    end
+
+    subgraph threshold_check ["Threshold Decision"]
+        THRESH{"cwnd ≥ ssthresh?"}
+    end
+
+    subgraph cong_avoid ["Congestion Avoidance Phase"]
+        CA["Congestion Avoidance\n(cwnd grows linearly:\n+1 MSS per RTT)"]
+    end
+
+    subgraph loss_event ["Loss Event Detected"]
+        LOSS{"Loss Type?"}
+        TIMEOUT["Timeout\n→ cwnd = 1 MSS\n→ ssthresh = cwnd / 2\n→ restart Slow Start"]
+        TRIPLE_DUP["Triple Duplicate ACK\n→ ssthresh = cwnd / 2\n→ cwnd = ssthresh\n→ enter Congestion Avoidance"]
+    end
+
+    START --> SS
+    SS --> THRESH
+    THRESH -- "No: cwnd < ssthresh" --> SS
+    THRESH -- "Yes: cwnd ≥ ssthresh" --> CA
+    CA -- "Loss detected" --> LOSS
+    SS -- "Loss detected" --> LOSS
+    LOSS -- "Timeout" --> TIMEOUT
+    LOSS -- "3× Duplicate ACK" --> TRIPLE_DUP
+    TIMEOUT --> START
+    TRIPLE_DUP --> CA
 ```
 
 Congestion Avoidance activates once `cwnd` exceeds `ssthresh`. The sender grows `cwnd` by one MSS per RTT rather than per ACK, producing linear growth. The combined shape is the sawtooth waveform that characterizes classic TCP: exponential growth, detection of loss, halving, then linear recovery. This sawtooth is not ideal; it means TCP probes for bandwidth by inducing loss, which forces queues to overflow before it backs off.

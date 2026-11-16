@@ -22,60 +22,46 @@ The AWS-specific integration surface manifests through IAM authentication, VPC n
 
 The physical topology of an EKS control plane spans multiple Availability Zones within a single AWS region, ensuring that single-zone failures do not render the cluster inoperable. AWS provisions at least two API server instances and distributes them across zones, fronting them with a Network Load Balancer that terminates TLS and distributes requests using connection-level load balancing. The etcd cluster follows a similar multi-zone placement strategy, with member count determined by regional availability zone count and AWS's internal reliability calculations. Each etcd member runs on dedicated compute with provisioned IOPS storage to guarantee consistent write latency, because etcd's consensus protocol requires a majority quorum to commit writes, making write latency sensitive to tail latencies across cluster members.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         EKS Control Plane                        │
-│                     (AWS-Managed VPC, Hidden)                    │
-│                                                                   │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │              Network Load Balancer (NLB)                  │   │
-│  │      (Public + Private IPs, TLS Termination 443)         │   │
-│  └────────┬──────────────────────────────────┬───────────────┘   │
-│           │                                  │                   │
-│  ┌────────▼─────────┐               ┌───────▼──────────┐        │
-│  │  kube-apiserver  │               │ kube-apiserver   │        │
-│  │    (AZ-1)        │               │    (AZ-2)        │        │
-│  │  Authentication  │               │  Authentication  │        │
-│  │  Authorization   │               │  Authorization   │        │
-│  │  Admission       │               │  Admission       │        │
-│  └────────┬─────────┘               └───────┬──────────┘        │
-│           │                                  │                   │
-│           └────────────┬─────────────────────┘                   │
-│                        │                                         │
-│           ┌────────────▼─────────────────┐                       │
-│           │       etcd Cluster           │                       │
-│           │  ┌────────┬────────┬──────┐ │                       │
-│           │  │Member 1│Member 2│Member│ │                       │
-│           │  │ (AZ-1) │ (AZ-2) │(AZ-3)│ │                       │
-│           │  └────────┴────────┴──────┘ │                       │
-│           │   Raft Consensus (Quorum=2) │                       │
-│           │   MVCC Revisions, Snapshots │                       │
-│           └─────────────────────────────┘                       │
-│                                                                   │
-│  ┌────────────────┐  ┌──────────────────┐  ┌─────────────────┐ │
-│  │ kube-scheduler │  │ kube-controller- │  │ cloud-controller│ │
-│  │                │  │    manager       │  │    -manager     │ │
-│  │ Pod Binding    │  │ Deployment, RS   │  │ AWS ELB, VPC    │ │
-│  └────────────────┘  └──────────────────┘  └─────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
-                            │
-                            │ API Calls (HTTPS, IAM SigV4)
-                            │ Kubelet Heartbeats, Pod Status
-                            │
-┌───────────────────────────▼─────────────────────────────────────┐
-│                    Customer VPC (Data Plane)                     │
-│                                                                   │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
-│  │  Worker EC2 │  │  Worker EC2 │  │  Worker EC2 │             │
-│  │   (Node 1)  │  │   (Node 2)  │  │   (Node 3)  │             │
-│  │  ┌────────┐ │  │  ┌────────┐ │  │  ┌────────┐ │             │
-│  │  │ kubelet│ │  │  │ kubelet│ │  │  │ kubelet│ │             │
-│  │  │ CNI    │ │  │  │ CNI    │ │  │  │ CNI    │ │             │
-│  │  │ Pods   │ │  │  │ Pods   │ │  │  │ Pods   │ │             │
-│  │  └────────┘ │  │  └────────┘ │  │  └────────┘ │             │
-│  └─────────────┘  └─────────────┘  └─────────────┘             │
-│                                                                   │
-└───────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph CP["EKS Control Plane<br/>(AWS-Managed VPC, Hidden)"]
+        NLB["Network Load Balancer (NLB)<br/>Public + Private IPs, TLS Termination 443"]
+        
+        API1["kube-apiserver (AZ-1)<br/>Authentication<br/>Authorization<br/>Admission"]
+        API2["kube-apiserver (AZ-2)<br/>Authentication<br/>Authorization<br/>Admission"]
+        
+        subgraph ETCD["etcd Cluster"]
+            ETCD1["Member 1<br/>(AZ-1)"]
+            ETCD2["Member 2<br/>(AZ-2)"]
+            ETCD3["Member 3<br/>(AZ-3)"]
+            RAFT["Raft Consensus (Quorum=2)<br/>MVCC Revisions, Snapshots"]
+        end
+        
+        SCHED["kube-scheduler<br/>Pod Binding"]
+        CTRL["kube-controller-manager<br/>Deployment, RS"]
+        CLOUD["cloud-controller-manager<br/>AWS ELB, VPC"]
+        
+        NLB --> API1
+        NLB --> API2
+        API1 --> ETCD
+        API2 --> ETCD
+    end
+    
+    subgraph VPC["Customer VPC (Data Plane)"]
+        subgraph W1["Worker EC2 (Node 1)"]
+            K1["kubelet<br/>CNI<br/>Pods"]
+        end
+        
+        subgraph W2["Worker EC2 (Node 2)"]
+            K2["kubelet<br/>CNI<br/>Pods"]
+        end
+        
+        subgraph W3["Worker EC2 (Node 3)"]
+            K3["kubelet<br/>CNI<br/>Pods"]
+        end
+    end
+    
+    CP -->|"API Calls (HTTPS, IAM SigV4)<br/>Kubelet Heartbeats, Pod Status"| VPC
 ```
 
 The API server's request processing pipeline implements a sophisticated series of gates that transform raw HTTP requests into committed etcd writes. When a client issues a `POST` to `/api/v1/namespaces/default/pods`, the request first passes through authentication, where EKS evaluates either an AWS IAM Sigv4 signature in the HTTP headers or a Kubernetes bearer token. For IAM-based authentication, the API server invokes the AWS authentication webhook, which calls `sts:GetCallerIdentity` to verify the credential's validity and extract the IAM principal ARN. This ARN is then matched against entries in the `aws-auth` ConfigMap to determine the corresponding Kubernetes username and group memberships.

@@ -145,38 +145,64 @@ Splice site mutations constitute a major class of disease-causing variants, acco
 
 Antisense oligonucleotide (ASO) therapy exploits the sequence-specific nature of splice site recognition to redirect splicing patterns in disease. ASOs complementary to exonic or intronic splicing enhancers can induce exon skipping by sterically blocking SR protein binding. Eteplirsen, an FDA-approved ASO for Duchenne muscular dystrophy, targets exon 51 of the dystrophin gene, inducing skipping of this exon to restore the translational reading frame in patients with specific frame-shifting deletions. The 2'-O-methyl phosphorothioate chemistry stabilizes the ASO against nuclease degradation while maintaining high-affinity hybridization to target sequences. Optimal ASO design requires empirical testing of multiple target sites within the exon, as secondary structure and protein binding can occlude access to certain sequences.
 
-```
-Experimental Protocol: Minigene Splicing Reporter Assay
-
-Objective: Test effects of sequence variants on splicing patterns
-
-Construct Design:
-┌─────────────────────────────────────────────────────┐
-│  CMV Promoter | Exon 1 | Intron | Exon 2 | PolyA   │
-│               └─[Test]─┴────────┴─[Test]─┘         │
-└─────────────────────────────────────────────────────┘
-
-Protocol:
-1. Clone genomic region containing exon ± 300 bp flanking intronic sequence
-2. Insert into expression vector between constitutive exons
-3. Transfect into HEK293 or HeLa cells (Lipofectamine 3000, 1 μg DNA per well)
-4. Harvest RNA 24-48 hours post-transfection (TRIzol extraction)
-5. Perform RT-PCR with primers in flanking constitutive exons
-6. Resolve products on 2% agarose gel or Bioanalyzer
-7. Quantify band intensities to calculate percent spliced in (PSI):
-   
-   PSI = [Exon Included] / ([Exon Included] + [Exon Skipped]) × 100%
-
-8. Sequence bands to confirm splicing junctions
-
-Positive Controls:
-- Wild-type sequence should yield predominant inclusion (PSI > 80%)
-- GT→GC mutation at 5' splice site should cause complete skipping (PSI < 5%)
-
-Quantification Notes:
-- Include biological triplicates; report PSI ± standard deviation
-- Significant splicing change: |ΔPSI| > 10% with p < 0.05 (Student's t-test)
-- Consider RNA secondary structure effects using mfold predictions
+```mermaid
+flowchart TD
+    A["Experimental Protocol:<br/>Minigene Splicing Reporter Assay"]
+    
+    B["Objective:<br/>Test effects of sequence variants<br/>on splicing patterns"]
+    
+    C["Construct Design"]
+    C1["CMV Promoter | Exon 1 | Intron | Exon 2 | PolyA"]
+    C2["Test variants in Exon 1, Exon 2,<br/>and Intron regions"]
+    
+    D["Protocol Steps"]
+    D1["1. Clone genomic region<br/>Exon ± 300 bp flanking intron"]
+    D2["2. Insert into expression vector<br/>between constitutive exons"]
+    D3["3. Transfect HEK293/HeLa cells<br/>Lipofectamine 3000, 1 μg DNA"]
+    D4["4. Harvest RNA 24-48 hours<br/>post-transfection using TRIzol"]
+    D5["5. Perform RT-PCR<br/>with primers in flanking exons"]
+    D6["6. Resolve on 2% agarose gel<br/>or Bioanalyzer"]
+    D7["7. Quantify band intensities"]
+    D8["8. Sequence bands<br/>to confirm junctions"]
+    
+    E["PSI Calculation"]
+    E1["PSI = Exon Included /<br/>Exon Included + Exon Skipped × 100%"]
+    
+    F["Analysis & Validation"]
+    F1["Positive Controls"]
+    F1a["WT: PSI > 80%<br/>predominant inclusion"]
+    F1b["GT→GC at 5' splice site:<br/>PSI < 5% complete skipping"]
+    
+    F2["Quantification Requirements"]
+    F2a["Biological triplicates<br/>Report PSI ± SD"]
+    F2b["Significant change:<br/>|ΔPSI| > 10%, p < 0.05"]
+    F2c["Consider RNA secondary structure<br/>using mfold predictions"]
+    
+    A --> B
+    A --> C
+    C --> C1
+    C1 --> C2
+    
+    A --> D
+    D --> D1
+    D1 --> D2
+    D2 --> D3
+    D3 --> D4
+    D4 --> D5
+    D5 --> D6
+    D6 --> D7
+    D7 --> E
+    E --> E1
+    E1 --> D8
+    
+    D8 --> F
+    F --> F1
+    F1 --> F1a
+    F1 --> F1b
+    F --> F2
+    F2 --> F2a
+    F2 --> F2b
+    F2 --> F2c
 ```
 
 The fidelity of splicing depends on accurate discrimination of authentic splice sites from pseudo-splice sites, a problem complicated by the high genomic abundance of sequences matching splice site consensus. Human genomes contain approximately 5 × 10^5 AG dinucleotides in intronic contexts, yet only ~2 × 10^5 serve as authentic 3' splice sites. The exon definition model explains splice site selection in vertebrate genes, where recognition across exons (typically 50-250 nucleotides) dominates over intron definition (which applies to introns shorter than ~250 nucleotides). SR proteins bound to ESEs within an exon recruit U2AF and U1 snRNP to the flanking 3' and 5' splice sites respectively, pairing splice sites across the exon. This mechanism explains why internal exons require both flanking introns for efficient recognition, while isolated exons lacking intronic context exhibit poor splicing in minigene assays.
@@ -191,7 +217,7 @@ The energetic cost of mRNA production integrates transcription, processing, and 
 
 Advanced mass spectrometry approaches enable proteome-wide measurement of alternative splicing outcomes. Isoform-resolved proteomics using high-resolution MS/MS identifies peptides unique to specific splice isoforms, quantifying relative protein abundance for alternatively spliced variants. These studies reveal that alternative splicing at the RNA level often fails to produce corresponding protein isoform diversity, suggesting that many splice variants undergo selective degradation or translation repression. The discordance between transcript and protein isoform ratios indicates that post-splicing regulatory mechanisms filter alternative transcripts, permitting only functionally relevant variants to access the translation machinery.
 
-Human genes exhibit median pre-mRNA half-lives of 6-10 hours, determined by metabolic labeling with 4sU or 5-ethynyluridine (EU) followed by time-course RNA-seq. Mature cytoplasmic mRNA half-lives average 4-8 hours for typical transcripts but span a 1000-fold range, from <1 hour for immediate early genes to >24 hours for housekeeping transcripts. The AU-rich elements (AREs) in 3' untranslated regions confer rapid decay by recruiting deadenylases and decapping enzymes through ARE-binding proteins like TTP (tristetraprolin) and AUF1. Conversely, iron-responsive elements (IREs), when bound by iron regulatory proteins under iron-depleted conditions, stabilize transferrin receptor mRNA by blocking endonucleolytic cleavage.
+Human genes exhibit median pre-mRNA half-lives of 6-10 hours, determined by metabolic labeling with 4sU or 5-ethynyluridine (EU) followed by time-course RNA-seq. Mature cytoplasmic mRNA half-lives average 4-8 hours for typical transcripts but span a 1000-fold range, from < 1 hour for immediate early genes to >24 hours for housekeeping transcripts. The AU-rich elements (AREs) in 3' untranslated regions confer rapid decay by recruiting deadenylases and decapping enzymes through ARE-binding proteins like TTP (tristetraprolin) and AUF1. Conversely, iron-responsive elements (IREs), when bound by iron regulatory proteins under iron-depleted conditions, stabilize transferrin receptor mRNA by blocking endonucleolytic cleavage.
 
 Failure modes in RNA processing generate transcriptomic noise that cells must tolerate or eliminate. Intron retention, the most prevalent splicing error, occurs at rates of 1-5% for most introns in healthy human cells. These unspliced transcripts typically undergo nuclear retention and degradation by the exosome complex, preventing cytoplasmic export of aberrant RNAs. Cellular stress, aging, and disease states often increase intron retention rates, overwhelming quality control capacity and permitting translation of cryptic open reading frames within retained introns. Such cryptic peptides can elicit immune responses through MHC presentation, potentially contributing to autoimmunity or anti-tumor immunity.
 

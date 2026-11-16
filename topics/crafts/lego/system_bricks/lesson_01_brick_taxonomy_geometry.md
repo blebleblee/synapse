@@ -30,25 +30,51 @@ A 1×1 or 1×2 brick does not have room to accommodate interior tubes between it
 
 The anatomy of the coupling system can be mapped geometrically:
 
-```
-Side cross-section view (two bricks stacked):
-
-Top Brick    ┌──────────────────────────────┐
-             │  ○ stud  │  tube  │  ○ stud  │   ← top brick underside tubes
-             │          │        │          │
-Mating zone  │──────────│────────│──────────│   ← coupling interface
-             │  stud ○  │        │  stud ○  │
-Bottom Brick │          │        │          │
-             └──────────────────────────────┘
-
-Horizontal (plan) view — 1×4 brick top face:
-
-   |   8mm   |   8mm   |   8mm   |
-   ●─────────●─────────●─────────●    ← stud centers (4.8mm OD each)
-   │         │         │         │
-   │   [T]   │   [T]   │   [T]   │    ← interior tube centers (between stud grid)
-   │         │         │         │
-   (T) = tube OD 6.51mm, positioned at mid-stud-pitch intersections
+```mermaid
+flowchart TD
+    subgraph side_view["Side Cross-Section View (Two Bricks Stacked)"]
+        direction TB
+        TB1["Top Brick"]
+        TBU["Top Brick Underside<br/>○ stud | tube | ○ stud"]
+        MZ["Mating Zone<br/>(coupling interface)"]
+        BBS["Bottom Brick Studs<br/>stud ○ | | stud ○"]
+        BB["Bottom Brick Base"]
+        
+        TB1 --> TBU
+        TBU --> MZ
+        MZ --> BBS
+        BBS --> BB
+    end
+    
+    subgraph plan_view["Horizontal Plan View (1×4 Brick Top Face)"]
+        direction LR
+        S1["● Stud 1<br/>4.8mm OD"]
+        S2["● Stud 2<br/>4.8mm OD"]
+        S3["● Stud 3<br/>4.8mm OD"]
+        S4["● Stud 4<br/>4.8mm OD"]
+        
+        T1["[T] Tube<br/>6.51mm OD"]
+        T2["[T] Tube<br/>6.51mm OD"]
+        T3["[T] Tube<br/>6.51mm OD"]
+        
+        S1 ---|"8mm"| S2
+        S2 ---|"8mm"| S3
+        S3 ---|"8mm"| S4
+        
+        S1 -.- T1
+        S2 -.- T1
+        S2 -.- T2
+        S3 -.- T2
+        S3 -.- T3
+        S4 -.- T3
+    end
+    
+    subgraph specs["Dimensional Specifications"]
+        D1["Stud pitch: 8mm center-to-center"]
+        D2["Stud OD: 4.8mm"]
+        D3["Tube OD: 6.51mm"]
+        D4["Tube position: Mid-stud-pitch intersections"]
+    end
 ```
 
 The plan view reveals a critical point: tubes are not aligned under studs — they fall at the interstices of the stud grid. This offset means that the structural load path from stud to tube to base is never vertically direct. Compressive loads applied through a stud travel laterally through the tube walls before reaching the brick floor, introducing a small bending moment into the tube-wall interface. At Lego load scales this is entirely benign, but it explains why very tall unsupported brick columns under point loads exhibit a subtle tendency to rack rather than crush.

@@ -22,21 +22,20 @@ A fourth dimension — **quality** — is sometimes added to the model, either a
 
 The PMI framework organizes project management activity into five process groups: **Initiating, Planning, Executing, Monitoring and Controlling, and Closing**. The common misreading of this framework is to treat the process groups as sequential phases — a waterfall in which you complete one before beginning the next. This is incorrect and leads to brittle project execution. The process groups are better understood as *control loops* that run at varying intensities across the project's natural lifecycle, overlapping and interacting as conditions change.
 
-```
-Project Lifecycle: Process Group Intensity Over Time
-
-Effort
- │
- │      Initiating     Planning       Executing     Monitoring    Closing
- │         ▲             ▲▲▲             ▲▲▲▲▲         ▲▲▲▲▲        ▲
- │         │            ╱   ╲           ╱     ╲        ╱     ╲      │
- │        ╱│           ╱     ╲         ╱       ╲      ╱       ╲    ╱│
- │       ╱ │          ╱       ╲       ╱         ╲    ╱         ╲  ╱ │
- │      ╱  │         ╱         ╲     ╱           ╲  ╱           ╲╱  │
- │─────╱───┼────────╱───────────╲───╱─────────────╲╱─────────────────┤
- │                                                                     │
- └─────────────────────────────────────────────────────────────────► Time
-        Start       Early         Mid-project         Late          End
+```mermaid
+flowchart LR
+    Start(["Start"]) --> Initiating["Initiating<br/>Low Effort"]
+    Initiating --> Planning["Planning<br/>Medium Effort"]
+    Planning --> Executing["Executing<br/>Peak Effort"]
+    Executing --> Monitoring["Monitoring & Controlling<br/>Peak Effort"]
+    Monitoring --> Closing["Closing<br/>Low Effort"]
+    Closing --> End(["End"])
+    
+    style Initiating fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style Planning fill:#fff3e0,stroke:#f57c00,stroke-width:3px
+    style Executing fill:#ffebee,stroke:#c62828,stroke-width:4px
+    style Monitoring fill:#ffebee,stroke:#c62828,stroke-width:4px
+    style Closing fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
 ```
 
 The **Initiating** process group is not a lengthy bureaucratic gate — it is the moment of organizational authorization. Its primary output is the **project charter**, a document that formally authorizes the project to exist and grants the project manager the authority to apply organizational resources. Without a charter, the project manager is managing informally, which means their authority to commit resources, resolve conflicts, and make scope decisions is entirely dependent on their personal political capital. That is a fragile operating condition. The charter transforms implicit executive backing into documented organizational commitment.

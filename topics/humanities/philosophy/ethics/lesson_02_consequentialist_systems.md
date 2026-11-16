@@ -62,27 +62,32 @@ Between act and rule consequentialism lies a spectrum of intermediate positions.
 
 These architectural variations cascade through the entire system. A theory built on hedonistic value, additive aggregation, and act-level evaluation generates fundamentally different practical recommendations than one built on objective goods, prioritarian aggregation, and rule-level evaluation. Practitioners must understand not just that someone claims to be a "consequentialist" but *which* consequentialist architecture they employ.
 
-```
-┌─────────────────────────────────────────────────────┐
-│   CONSEQUENTIALIST ARCHITECTURE: DECISION TREE      │
-└─────────────────────────────────────────────────────┘
-
-                     Consequentialism
-                            │
-         ┌──────────────────┼──────────────────┐
-         │                  │                  │
-    [Value Component]  [Aggregation]    [Decision Level]
-         │                  │                  │
-    ┌────┴────┐         ┌────┴────┐      ┌────┴────┐
-    │          │         │         │      │         │
-  Hedonic  Preference  Additive Priorit. Act Rule  Motive
-  (Mill)   Satisf.    Utilit.   Egalit. Consq. Conseq.
-    │          │         │         │      │         │
-    └──────────┴─────────┴─────────┘      └────┬────┘
-                         │                       │
-           Different moral conclusions,     Different practical
-           policy implications, and         decision procedures,
-           personal recommendations         but same core logic
+```mermaid
+flowchart TD
+    Root["Consequentialism"]
+    
+    Root --> Value["Value Component"]
+    Root --> Aggregation["Aggregation"]
+    Root --> Decision["Decision Level"]
+    
+    Value --> Hedonic["Hedonic<br/>(Mill)"]
+    Value --> Preference["Preference<br/>Satisfaction"]
+    
+    Aggregation --> Additive["Additive<br/>Utilitarian"]
+    Aggregation --> Prioritarian["Prioritarian<br/>Egalitarian"]
+    
+    Decision --> Act["Act<br/>Consequentialism"]
+    Decision --> Rule["Rule<br/>Consequentialism"]
+    Decision --> Motive["Motive<br/>Consequentialism"]
+    
+    Hedonic --> Conclusion["Different moral conclusions,<br/>policy implications, and<br/>personal recommendations"]
+    Preference --> Conclusion
+    Additive --> Conclusion
+    Prioritarian --> Conclusion
+    
+    Act --> Procedure["Different practical<br/>decision procedures,<br/>but same core logic"]
+    Rule --> Procedure
+    Motive --> Procedure
 ```
 
 ## 3. High-Performance Optimization & Failure Modes
@@ -107,4 +112,21 @@ The measurement problem becomes acute in what philosophers call *value incommens
 
 For practitioners, this implies that consequentialist calculation has limits. In genuinely incommensurable cases, we cannot derive a determinate right answer from consequentialist principles alone. We must supplement consequentialist reasoning with judgment—what Aristotle called *phronesis* or practical wisdom. This is not abandonment of consequentialism but recognition of its proper domain. Consequentialism excels when comparing outcomes along defined dimensions: Does policy A produce more reduction in poverty than policy B? Does strategy X generate more educational opportunity than strategy Y? It struggles when the question requires comparing fundamentally different kinds of value.
 
-Sophisticated consequentialists address this through *satisficing* rather than maximizing. Instead of identifying the single best outcome, we identify an acceptable threshold and select actions that meet it. In cases of incommensurable values, we might seek an outcome that adequately promotes each relevant value rather than absolutely maximizing along a single dimension. This pragmatic approach maintains consequentialist structure—outcomes still guide choice—while avoiding the false precision of trying to reduce all values to
+Sophisticated consequentialists address this through *satisficing* rather than maximizing. Instead of identifying the single best outcome, we identify an acceptable threshold and select actions that meet it. In cases of incommensurable values, we might seek an outcome that adequately promotes each relevant value rather than absolutely maximizing along a single dimension.
+
+## Conclusion: The Practical Integration of Consequentialist Ethics
+
+The consequentialist tradition, from Bentham's hedonic calculus through Mill's qualitative utilitarianism to contemporary rule and preference variants, demonstrates both remarkable analytical power and necessary humility about its own limits. Its strength lies in forcing explicit consideration of outcomes, demanding that moral reasoning engage with actual consequences rather than retreating into procedural formalism or unexamined intuition. For practitioners navigating complex institutional decisions—whether in medicine, policy, business, or technology—consequentialism provides an indispensable framework: it directs attention to stakeholder impacts, requires systematic comparison of alternatives, and makes moral reasoning transparent and contestable. Yet the demandingness objection, the knowledge problem, and value incommensurability reveal that pure consequentialism cannot stand alone as a complete ethical system. The insight is not that consequentialism fails, but that it succeeds within bounded domains where outcomes are measurable, consequences are reasonably foreseeable, and values share sufficient commensurability for comparison.
+
+The mature consequentialist approach therefore integrates several corrective mechanisms: rule-consequentialism to address knowledge and coordination problems, satisficing to manage incommensurable values, and explicit acknowledgment of the role of virtue and judgment when calculation reaches its limits. This hybrid framework preserves consequentialism's core commitment—that morality must ultimately answer to the well-being of sentient creatures—while incorporating the wisdom of competing traditions. In practice, this means using consequentialist analysis as the default mode for institutional and policy decisions, supplemented by deontological side-constraints where rights are at stake and virtue-based judgment where values prove incommensurable. The practitioner's consequentialism is thus neither naive maximization nor theoretical purity, but rather a disciplined methodology that knows both its power and its proper place within the broader architecture of ethical reasoning.
+
+## Summary & Verification Matrix
+
+| **Invariant Principle** | **Core Mechanism** | **Diagnostic Criterion** | **Failure Mode** |
+|------------------------|-------------------|-------------------------|------------------|
+| **Right action = maximal good consequences** | Evaluate actions exclusively by outcomes; agent-relative considerations have no independent weight | If swapping consequences between actions swaps moral verdicts, consequentialism applies | Agent-neutrality violation: treating my promise as fundamentally different from others' promises |
+| **Classical utilitarianism: maximize aggregate utility** | Bentham's hedonic calculus; sum pleasures minus pains across all affected parties | Policy increases total welfare even if through severe inequality or individual sacrifice | Repugnant conclusion; utility monster scenarios; demandingness (requires constant self-sacrifice) |
+| **Mill's qualitative utilitarianism** | Higher/lower pleasures distinction; "better to be Socrates dissatisfied than a fool satisfied" | Competent judges prefer intellectual/moral pleasures despite lower intensity | Abandons hedonism's elegant monism; introduces contested value judgments about "higher" goods |
+| **Rule-consequentialism** | Evaluate rules by consequences, not individual acts; internalizing optimal rules solves coordination problems | Following rule R generally produces better outcomes than act-by-act calculation | Rule worship: following rules when breaking them would clearly improve outcomes |
+| **Preference utilitarianism** | Maximize preference-satisfaction rather than mental states; respects autonomy and diverse values | Accounts for preferences about process, dignity, rights—not just experiential outcomes | Adaptive preferences problem; expensive tastes; preferences formed under oppression |
+| **Value incommensurability & satisficing** | Some goods lack common metric; seek acceptable threshold across values rather than maximum | When forced comparison feels like category error (love vs. money; beauty vs. justice) | Paralysis when satisficing threshold itself requires comparing incommensurable values; abandons optimization |

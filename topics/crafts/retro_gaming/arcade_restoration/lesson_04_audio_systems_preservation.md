@@ -16,30 +16,40 @@ The third invariant is ground topology. Arcade cabinets are notorious for ground
 
 The signal path from sound generation to speaker output can be traced as a linear chain with well-defined stages, each of which has characteristic failure modes and restoration procedures. Consider the Capcom CPS1 architecture as a representative example, since it appears in dozens of cabinets and its service documentation is thorough. The audio subsystem on a CPS1 board consists of a Z80 sound CPU running at 3.58 MHz, a YM2151 FM synthesis chip for music and effects, an OKI M6295 for ADPCM voice samples, and a TL074 quad JFET-input op-amp for active mixing and filtering. The combined output passes through a 10kΩ logarithmic volume potentiometer mounted on the PCB edge, then into a BA5406 dual-channel power amplifier that drives the speaker at up to 2.5 watts per channel.
 
-```
-CAPCOM CPS1 AUDIO SIGNAL PATH
-=============================
+```mermaid
+flowchart TD
+    Z80["Z80 CPU"]
+    YM["YM2151\nFM Synthesizer"]
+    OKI["OKI M6295\nADPCM Sampler"]
+    CAP_YM["1µF Electrolytic\nCoupling Cap"]
+    CAP_OKI["1µF Electrolytic\nCoupling Cap"]
+    MIX["Mixing Network"]
+    LPF["RC Low-Pass Filter\ncutoff ~12 kHz"]
+    VOL["10 kΩ Log Pot\nVolume Control"]
+    AMP["BA5406 Power Amp\ngain ~40 dB"]
+    CAP_SPK["470µF Electrolytic\nCoupling Cap"]
+    SPK["Speaker\n4 Ω or 8 Ω"]
+    PWR["Supply Rail +12V"]
+    BYPASS["100µF Bypass Cap"]
 
-  Z80 CPU ──(data bus)──→ YM2151 (FM synth) ──(analog out)──→ [MIXING NET]
-          │                                                      │
-          └──(data bus)──→ OKI M6295 (ADPCM) ──(analog out)──→  [MIXING NET]
-                                                                     │
-                                                              [RC LP FILTER]
-                                                          (cutoff ~12 kHz)
-                                                                     │
-                                                            [10kΩ LOG POT]
-                                                           (volume control)
-                                                                     │
-                                                        [BA5406 PWR AMP]
-                                                        (gain ~40 dB)
-                                                                     │
-                                                              [SPEAKER]
-                                                           (4Ω or 8Ω)
+    Z80 -->|"data bus"| YM
+    Z80 -->|"data bus"| OKI
 
-  SUPPLY RAIL: +12V ──[100µF bypass]──→ BA5406 Vcc
-  COUPLING:   1µF electrolytic between YM2151 output and mixing network
-  COUPLING:   1µF electrolytic between OKI6295 output and mixing network
-  COUPLING:   470µF electrolytic between BA5406 output and speaker
+    YM -->|"analog out"| CAP_YM
+    OKI -->|"analog out"| CAP_OKI
+
+    CAP_YM --> MIX
+    CAP_OKI --> MIX
+
+    MIX --> LPF
+    LPF --> VOL
+    VOL --> AMP
+
+    PWR --> BYPASS
+    BYPASS -->|"Vcc"| AMP
+
+    AMP --> CAP_SPK
+    CAP_SPK --> SPK
 ```
 
 The mixing network on the CPS1 is a passive summing junction built from discrete resistors. The YM2151 output, which is already a current-to-voltage converted signal from the chip's internal DAC, passes through a 1µF coupling capacitor to strip any DC offset, then through a series resistor of approximately 4.7kΩ into a summing node. The OKI M6295 output takes a parallel path through its own 1µF coupling cap and a series resistor. At the summing node, a small capacitor to ground, typically 1000pF, forms a low-pass filter with the series resistors that rolls off response above approximately 12 kHz, removing the stair-step quantization noise inherent in the 10-bit DACs. This filter is not designed for audiophile quality. It is designed to prevent the aliasing artifacts of the sample-rate converters from reaching the amplifier and producing harsh, metallic distortion that operators would recognize as a defect.
@@ -52,36 +62,55 @@ The JAMMA pinout standardizes audio as a differential pair on pins L (positive) 
 
 Williams sound boards, common in Defender, Robotron, Joust, and Sinistar cabinets, present a fundamentally different architecture. These boards use a dedicated 6802 or 6808 CPU with its own ROM and RAM, communicating with the main CPU board through a parallel interface. The sound generation is handled by a combination of custom Williams sound chips and discrete analog circuitry, including voltage-controlled oscillators, analog noise generators, and active filter networks built around LM324 or LM2902 quad op-amps. The signal path is longer, with more active stages, and the boards use a higher component count than the integrated Capcom approach. This means more coupling capacitors, more solder joints, and more potential failure points. The Williams sound board also derives its power from the main power supply through a separate connector, and the ground reference is established through the ribbon cable to the CPU board, which makes ground integrity at the ribbon connector a critical diagnostic point.
 
-```
-WILLIAMS SOUND BOARD (DEFENDER / ROBOTRON)
-============================================
-
-  Main CPU ──[parallel bus]──→ 6802 Sound CPU
-                                   │
-                    ┌──────────────┼──────────────┐
-                    │              │              │
-              [ROM bank]    [RAM scratch]    [PIA 6821]
-                                                    │
-                    ┌───────────────────────────────┘
-                    │                    │           │
-            [CUSTOM SOUND]     [ANALOG NOISE]   [VCO BANK]
-               IC (ROM-based)    gen (shift reg)   (4046 PLL)
-                    │                    │           │
-                    └────[ACTIVE FILTER NETWORK]────┘
-                              (LM324 stages)
-                         cutoff freqs: 200Hz, 1kHz, 5kHz
-                                    │
-                            [SUMMING AMP + POT]
-                              (50kΩ log taper)
-                                    │
-                        [DISCRETE PWR AMP]
-                       (BD139/BD140 push-pull)
-                                    │
-                              [8Ω SPEAKER]
-
-  POWER: +12V unregulated from main PS ──[7812 reg]──→ +12V local rail
-         +5V regulated ──[7805 reg]──→ +5V logic rail
-  NOTE: Ground path through ribbon cable to CPU board is critical
+```mermaid
+flowchart TD
+    MainCPU["Main CPU"]
+    SoundCPU["6802 Sound CPU"]
+    ROM["ROM bank"]
+    RAM["RAM scratch"]
+    PIA["PIA 6821"]
+    CustomSound["CUSTOM SOUND IC<br/>(ROM-based)"]
+    NoiseGen["ANALOG NOISE gen<br/>(shift reg)"]
+    VCOBank["VCO BANK<br/>(4046 PLL)"]
+    FilterNetwork["ACTIVE FILTER NETWORK<br/>(LM324 stages)<br/>cutoff: 200Hz, 1kHz, 5kHz"]
+    SummingAmp["SUMMING AMP + POT<br/>(50kΩ log taper)"]
+    PowerAmp["DISCRETE PWR AMP<br/>(BD139/BD140 push-pull)"]
+    Speaker["8Ω SPEAKER"]
+    
+    MainPS["+12V unregulated<br/>from main PS"]
+    Reg7812["7812 reg"]
+    Rail12V["+12V local rail"]
+    
+    Reg5V["+5V regulated"]
+    Reg7805["7805 reg"]
+    Rail5V["+5V logic rail"]
+    
+    MainCPU -->|"parallel bus"| SoundCPU
+    SoundCPU --> ROM
+    SoundCPU --> RAM
+    SoundCPU --> PIA
+    
+    PIA --> CustomSound
+    PIA --> NoiseGen
+    PIA --> VCOBank
+    
+    CustomSound --> FilterNetwork
+    NoiseGen --> FilterNetwork
+    VCOBank --> FilterNetwork
+    
+    FilterNetwork --> SummingAmp
+    SummingAmp --> PowerAmp
+    PowerAmp --> Speaker
+    
+    MainPS --> Reg7812
+    Reg7812 --> Rail12V
+    
+    Reg5V --> Reg7805
+    Reg7805 --> Rail5V
+    
+    Note["NOTE: Ground path through ribbon<br/>cable to CPU board is critical"]
+    
+    style Note fill:#ffffcc,stroke:#333,stroke-width:2px
 ```
 
 The discrete push-pull amplifier used on early Williams boards is a complementary symmetry stage using an NPN transistor (BD139 or similar) and a PNP transistor (BD140 or similar) in a class-AB configuration. The bias network establishes a small quiescent current to prevent crossover distortion, and the output is capacitor-coupled to the speaker. These transistors are rated for 1.5 A collector current and 12.5 W dissipation with a heat sink, but many Williams cabinets ran without adequate heat sinking on these devices, leading to thermal failure. A failed output transistor is often the result of a shorted speaker or a shorted output coupling capacitor, and replacing the transistor without diagnosing the root cause will produce a second failure. When rebuilding a Williams discrete amplifier stage, check the speaker voice coil resistance, verify the output coupling capacitor, and confirm the bias resistor values before installing replacement transistors.

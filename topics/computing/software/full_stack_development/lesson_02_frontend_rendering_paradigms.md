@@ -42,30 +42,73 @@ The reconciliation pass during a re-render compares the "current" fiber tree (re
 
 The following diagram illustrates how a component tree maps to fiber nodes and how those nodes connect to real DOM nodes during the commit phase:
 
-```
-Component Tree              Fiber Tree (Work-in-Progress)         Real DOM
-─────────────────           ──────────────────────────────        ─────────────────
-<App>                       FiberNode(App)                        <div id="root">
-  <Header title="X">    →   FiberNode(Header)              →        <header>
-    <h1>X</h1>              FiberNode(h1)                             <h1>X</h1>
-  </Header>                                                         </header>
-  <Main>                    FiberNode(Main)                          <main>
-    <List items={...}>      FiberNode(List)                            <ul>
-      <Item key="1">        FiberNode(Item, key=1)                       <li>...</li>
-      <Item key="2">        FiberNode(Item, key=2)                       <li>...</li>
-    </List>                                                          </ul>
-  </Main>                                                          </main>
-</App>                                                           </div>
-
-Each FiberNode carries:
-  .stateNode     → reference to real DOM node (for host components)
-  .memoizedProps → props used in last committed render
-  .pendingProps  → props for current work-in-progress render
-  .flags         → Placement | Update | Deletion | PassiveEffect
-  .alternate     → pointer to its counterpart in the current/WIP tree
-  .child         → first child fiber
-  .sibling       → next sibling fiber
-  .return        → parent fiber
+```mermaid
+flowchart LR
+    subgraph ComponentTree ["Component Tree"]
+        A["&lt;App&gt;"]
+        B["&lt;Header title='X'&gt;"]
+        C["&lt;h1&gt;X&lt;/h1&gt;"]
+        D["&lt;Main&gt;"]
+        E["&lt;List items={...}&gt;"]
+        F["&lt;Item key='1'&gt;"]
+        G["&lt;Item key='2'&gt;"]
+        
+        A --> B
+        B --> C
+        A --> D
+        D --> E
+        E --> F
+        E --> G
+    end
+    
+    subgraph FiberTree ["Fiber Tree (Work-in-Progress)"]
+        FA["FiberNode(App)<br/>.child → Header<br/>.sibling → null<br/>.return → null"]
+        FB["FiberNode(Header)<br/>.stateNode → &lt;header&gt;<br/>.memoizedProps<br/>.pendingProps<br/>.flags<br/>.alternate<br/>.child → h1<br/>.sibling → Main<br/>.return → App"]
+        FC["FiberNode(h1)<br/>.stateNode → &lt;h1&gt;<br/>.child → null<br/>.sibling → null<br/>.return → Header"]
+        FD["FiberNode(Main)<br/>.stateNode → &lt;main&gt;<br/>.child → List<br/>.sibling → null<br/>.return → App"]
+        FE["FiberNode(List)<br/>.child → Item1<br/>.sibling → null<br/>.return → Main"]
+        FF["FiberNode(Item, key=1)<br/>.stateNode → &lt;li&gt;<br/>.sibling → Item2<br/>.return → List"]
+        FG["FiberNode(Item, key=2)<br/>.stateNode → &lt;li&gt;<br/>.sibling → null<br/>.return → List"]
+        
+        FA --> FB
+        FB --> FC
+        FA --> FD
+        FD --> FE
+        FE --> FF
+        FF --> FG
+    end
+    
+    subgraph RealDOM ["Real DOM"]
+        DA["&lt;div id='root'&gt;"]
+        DB["&lt;header&gt;"]
+        DC["&lt;h1&gt;X&lt;/h1&gt;"]
+        DD["&lt;main&gt;"]
+        DE["&lt;ul&gt;"]
+        DF["&lt;li&gt;...&lt;/li&gt;"]
+        DG["&lt;li&gt;...&lt;/li&gt;"]
+        
+        DA --> DB
+        DB --> DC
+        DA --> DD
+        DD --> DE
+        DE --> DF
+        DE --> DG
+    end
+    
+    A -.->|"transforms to"| FA
+    B -.->|"transforms to"| FB
+    C -.->|"transforms to"| FC
+    D -.->|"transforms to"| FD
+    E -.->|"transforms to"| FE
+    F -.->|"transforms to"| FF
+    G -.->|"transforms to"| FG
+    
+    FB -.->|".stateNode"| DB
+    FC -.->|".stateNode"| DC
+    FD -.->|".stateNode"| DD
+    FE -.->|".stateNode (ul)"| DE
+    FF -.->|".stateNode"| DF
+    FG -.->|".stateNode"| DG
 ```
 
 When a list item's `key` changes, React treats it as a new element entirely and schedules a `Deletion` for the old fiber and a `Placement` for the new one. When a `key` is absent from dynamic lists, React falls back to positional matching, which causes incorrect component state reuse when items are reordered — a subtle but serious correctness bug that manifests as state being "stuck" on the wrong item.
@@ -78,27 +121,46 @@ The serialized HTML carries inline `<script>` tags containing serialized React s
 
 The following diagram shows the temporal relationship between server work, network transmission, browser parsing, and hydration:
 
-```
-Timeline ─────────────────────────────────────────────────────────────────────►
-
-Server:  [Data Fetch][Component Render][HTML Serialize]─────────────────────────
-                                                        ↓ TTFB
-Network:                                       [Transfer HTML Chunks ─────────]
-                                                        ↓ First Byte Received
-Browser:                                        [HTML Parse ──][DOM Ready]
-                                                               [CSS/JS Fetch]
-                                                                     ↓ JS Loaded
-                                                               [JS Parse+Compile]
-                                                                           ↓
-                                                                    [Hydration]
-                                                                           ↓ TTI
-                                                                    [Interactive]
-
-LCP fires here ──────────────────────────────────► ↑
-(browser painted server HTML before JS loaded)
-
-TTI (Time to Interactive) is delayed until
-hydration completes — the "uncanny valley"
+```mermaid
+flowchart TD
+    subgraph Server["Server"]
+        S1["Data Fetch"]
+        S2["Component Render"]
+        S3["HTML Serialize"]
+        S1 --> S2 --> S3
+    end
+    
+    subgraph Network["Network"]
+        N1["Transfer HTML Chunks"]
+    end
+    
+    subgraph Browser["Browser"]
+        B1["HTML Parse"]
+        B2["DOM Ready"]
+        B3["CSS/JS Fetch"]
+        B4["JS Parse + Compile"]
+        B5["Hydration"]
+        B6["Interactive"]
+        B1 --> B2
+        B1 --> B3
+        B3 --> B4
+        B4 --> B5
+        B5 --> B6
+    end
+    
+    S3 -->|"TTFB"| N1
+    N1 -->|"First Byte Received"| B1
+    B3 -->|"JS Loaded"| B4
+    B5 -->|"TTI"| B6
+    
+    LCP["LCP fires here<br/>(browser painted server HTML<br/>before JS loaded)"]
+    B2 -.-> LCP
+    
+    Note["TTI (Time to Interactive) is delayed<br/>until hydration completes<br/>— the 'uncanny valley'"]
+    B6 -.-> Note
+    
+    style LCP fill:#fff3cd,stroke:#856404
+    style Note fill:#f8d7da,stroke:#721c24
 ```
 
 The gap between LCP and Time-to-Interactive (TTI) is the defining performance characteristic of SSR. The user sees fully-rendered content but cannot interact with it. Click events during this window are either lost or queued by frameworks that implement event replay (Next.js does not replay events by default; this is a known footgun).

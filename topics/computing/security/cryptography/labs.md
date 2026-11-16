@@ -98,7 +98,7 @@ This multi-channel capture demonstrates the complete attack chain for cryptograp
 
 ### Signal Integrity Considerations and Troubleshooting
 
-If captured SPI waveforms exhibit excessive noise or decode errors, reduce the logic analyzer sampling rate to 8 MHz and verify that ground leads are short (<5 cm) and twisted with their respective signal leads. High-frequency digital edges on unshielded probe wires radiate electromagnetic interference that couples into adjacent probes, causing spurious transitions. Route probe wires away from switching power supplies and WiFi antennas, which emit broadband RF noise spanning 2.4 GHz that aliases down into the sampling bandwidth through nonlinear mixer effects in the logic analyzer's input protection diodes.
+If captured SPI waveforms exhibit excessive noise or decode errors, reduce the logic analyzer sampling rate to 8 MHz and verify that ground leads are short (< 5 cm) and twisted with their respective signal leads. High-frequency digital edges on unshielded probe wires radiate electromagnetic interference that couples into adjacent probes, causing spurious transitions. Route probe wires away from switching power supplies and WiFi antennas, which emit broadband RF noise spanning 2.4 GHz that aliases down into the sampling bandwidth through nonlinear mixer effects in the logic analyzer's input protection diodes.
 
 For UART captures with sporadic framing errors or incorrect baud rate detection, measure the actual TX bit timing with the logic analyzer running at maximum sampling rate (100-200 MHz if available). Zoom into a single character transmission and measure the duration between the start bit falling edge and the first data bit transition. Divide 1 by this duration to compute the actual baud rate; embedded systems often generate baud clocks by dividing the CPU clock with integer prescalers that produce rates slightly offset from nominal values (e.g., 115385 baud instead of 115200).
 
@@ -355,7 +355,7 @@ Differential fault analysis exploits the mathematical relationship between corre
 
 Construct a voltage glitching apparatus using a bench power supply, a fast MOSFET switch, and a microcontroller-based trigger generator. The STM32F407 target operates at 3.3V nominal; introduce glitches by momentarily dropping supply voltage to 2.5V for 50-500 nanoseconds during the ninth AES round. This voltage drop causes timing violations in critical path logic, inducing computational errors in the SubBytes or MixColumns transformations while preserving enough stability for the microcontroller to complete the encryption and output (faulty) ciphertext.
 
-Wire the glitching circuit in series with the target's power rail. Connect the bench supply positive terminal to the MOSFET drain, the MOSFET source to the target VDD, and the MOSFET gate to a PWM output from an Arduino or STM32 Nucleo board serving as the glitch controller. Configure the MOSFET as a low-side switch using an N-channel device (IRLZ44N or similar logic-level FET) with gate driven by 3.3V logic. The MOSFET's RDS(on) of <50 milliohms ensures minimal voltage drop during normal operation.
+Wire the glitching circuit in series with the target's power rail. Connect the bench supply positive terminal to the MOSFET drain, the MOSFET source to the target VDD, and the MOSFET gate to a PWM output from an Arduino or STM32 Nucleo board serving as the glitch controller. Configure the MOSFET as a low-side switch using an N-channel device (IRLZ44N or similar logic-level FET) with gate driven by 3.3V logic. The MOSFET's RDS(on) of < 50 milliohms ensures minimal voltage drop during normal operation.
 
 Implement the glitch trigger on the controller board to synchronize with the target's encryption operation. Monitor the target's UART TX line with a GPIO input on the controller and detect the start bit of ciphertext transmission. Upon detecting the start bit, introduce a delay corresponding to the ninth AES round timing (approximately 80-90% through the total encryption duration measured earlier with the oscilloscope). Generate a 100-nanosecond glitch pulse by toggling the MOSFET gate: set GPIO high (turns off MOSFET, dropping target voltage), wait 100 ns, set GPIO low (restores voltage).
 
@@ -602,7 +602,7 @@ if __name__ == "__main__":
 
 Execute the script and monitor the output. Successful bypass appears when the target boots into the secondary bootloader despite an invalid signature. The script identifies the timing window (range of delays that produce successful bypass) and optimal parameters. Clock glitching typically requires sub-microsecond timing precision; success rates vary from 1-30% depending on the target's clock frequency, voltage, and temperature.
 
-Document the successful glitch parameters and verify repeatability. Reset the target multiple times and apply the glitch at the identified delay, confirming consistent bypass behavior. If the success rate is low (<10%), refine the glitch pulse width or try injecting multiple pulses in rapid succession to increase the probability of hitting the vulnerable instruction.
+Document the successful glitch parameters and verify repeatability. Reset the target multiple times and apply the glitch at the identified delay, confirming consistent bypass behavior. If the success rate is low (< 10%), refine the glitch pulse width or try injecting multiple pulses in rapid succession to increase the probability of hitting the vulnerable instruction.
 
 ### Timing Side-Channel Attack: RSA Key Recovery
 
@@ -715,7 +715,7 @@ if __name__ == "__main__":
     print("\nTimings saved to rsa_timings.json")
 ```
 
-Run the timing collection script and observe the distribution of decryption durations. A vulnerable implementation exhibits a standard deviation of 0.5-5% of the mean duration, indicating measurable timing variation. If the standard deviation is negligible (<0.1%), the implementation likely uses constant-time techniques (Montgomery ladder, blinding) that resist timing attacks.
+Run the timing collection script and observe the distribution of decryption durations. A vulnerable implementation exhibits a standard deviation of 0.5-5% of the mean duration, indicating measurable timing variation. If the standard deviation is negligible (< 0.1%), the implementation likely uses constant-time techniques (Montgomery ladder, blinding) that resist timing attacks.
 
 Recover the private exponent by applying Kocher's binary search algorithm. For each bit position in the exponent (starting from the most significant), partition the collected timing samples into two sets based on a timing threshold. Hypothesize that the current bit is 0 or 1, simulate the remaining bits, and check which hypothesis better explains the observed timing distribution. The hypothesis with lower variance is likely correct. Iterate through all bit positions to reconstruct the full exponent.
 

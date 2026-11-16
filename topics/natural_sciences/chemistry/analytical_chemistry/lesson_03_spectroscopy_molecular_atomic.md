@@ -60,55 +60,52 @@ ICP-OES optical systems employ échelle polychromators for simultaneous multiwav
 
 ICP-MS replaces photon detection with ion mass analysis, achieving parts-per-trillion sensitivity for most elements. Ions extracted from the plasma traverse a differentially pumped vacuum interface through sampling and skimmer cones (nickel or platinum), forming an ion beam delivered to the mass analyzer. Quadrupole mass filters transmit only ions with a specific mass-to-charge ratio $m/z$ satisfying the stability condition in the oscillating radiofrequency field, scanning across the mass range to construct a mass spectrum. Collision/reaction cells positioned before the mass filter use kinetic energy discrimination or reactive gases (H₂, He, NH₃) to eliminate polyatomic interferences—argon plasma generates ArO⁺, ArCl⁺, ArAr⁺ ions that overlap important analytes like ⁵⁶Fe⁺, ⁷⁵As⁺, and ⁸⁰Se⁺. Internal standardization with elements of similar mass and ionization potential (e.g., ⁴⁵Sc, ¹¹⁵In, ²⁰⁹Bi) corrects for plasma drift and matrix suppression through ratiometric measurements.
 
-```
-UV-Vis Double-Beam Optical Path:
+```mermaid
+flowchart TD
+    subgraph uvvis ["UV-Vis Double-Beam Optical Path"]
+        uv_source["Source"] --> uv_mono["Monochromator"]
+        uv_mono --> uv_split["Beam Splitter"]
+        uv_split --> uv_sample["Sample Cell"]
+        uv_split --> uv_ref["Reference Cell"]
+        uv_sample --> uv_det1["Detector 1"]
+        uv_ref --> uv_det2["Detector 2"]
+        uv_det1 --> uv_ratio["Ratio Circuit<br/>A = -log₁₀(I/I₀)"]
+        uv_det2 --> uv_ratio
+    end
 
-Source → Monochromator → Beam Splitter
-                               ↓
-                    ┌──────────┴───────────┐
-                    ↓                      ↓
-              Sample Cell            Reference Cell
-                    ↓                      ↓
-              Detector 1             Detector 2
-                    ↓                      ↓
-                    └──────────┬───────────┘
-                               ↓
-                      Ratio Circuit (A = -log₁₀(I/I₀))
+    subgraph ftir ["FTIR Michelson Interferometer"]
+        ftir_source["Source"] --> ftir_coll["Collimator"]
+        ftir_coll --> ftir_bs["Beamsplitter"]
+        ftir_bs --> ftir_fixed["Fixed Mirror"]
+        ftir_fixed --> ftir_bs
+        ftir_bs --> ftir_moving["Moving Mirror<br/>(±L displacement)"]
+        ftir_moving --> ftir_bs
+        ftir_bs --> ftir_sample["Sample"]
+        ftir_sample --> ftir_det["Detector"]
+        ftir_det --> ftir_ifg["Interferogram I(δ)"]
+        ftir_ifg --> ftir_fft["FFT"]
+        ftir_fft --> ftir_spec["Spectrum B(ν)"]
+    end
 
+    subgraph fluor ["Fluorescence Right-Angle Geometry"]
+        fl_ex["Excitation Monochromator<br/>(λₑₓ selection)"] --> fl_sample["Sample Cuvette<br/>(90° angle)"]
+        fl_sample --> fl_em["Emission Monochromator<br/>(λₑₘ scan)"]
+        fl_em --> fl_pmt["PMT<br/>(photon count)"]
+    end
 
-FTIR Michelson Interferometer:
+    subgraph aas ["AAS Signal Path"]
+        aas_hc["Hollow Cathode<br/>(line source)"] --> aas_atom["Atomizer<br/>(flame)"]
+        aas_atom --> aas_mono["Monochromator<br/>(0.2 nm slit)"]
+        aas_mono --> aas_det["Detector<br/>(PMT)"]
+        aas_det --> aas_lock["Lock-in Amp<br/>(AC coupling)"]
+    end
 
-                    Fixed Mirror
-                         ↑
-                         |
-Source → Collimator → Beamsplitter → Sample → Detector
-                         |
-                         ↓
-                    Moving Mirror
-                    (±L displacement)
-
-Output: Interferogram I(δ) → FFT → Spectrum B(ν)
-
-
-Fluorescence Right-Angle Geometry:
-
-Excitation Monochromator → Sample Cuvette → Emission Monochromator → PMT
-      (λₑₓ selection)         (90° angle)       (λₑₘ scan)       (photon count)
-
-
-AAS Signal Path:
-
-Hollow Cathode → Atomizer → Monochromator → Detector → Lock-in Amp
-   (line source)   (flame)   (0.2 nm slit)    (PMT)   (AC coupling)
-
-
-ICP-OES Cross-Dispersion:
-
-Plasma → Transfer Optics → Échelle Grating (high orders)
-                                ↓
-                           Cross-Dispersion Prism (order separation)
-                                ↓
-                            CCD Array (2D format, 165-800 nm)
+    subgraph icp ["ICP-OES Cross-Dispersion"]
+        icp_plasma["Plasma"] --> icp_optics["Transfer Optics"]
+        icp_optics --> icp_echelle["Échelle Grating<br/>(high orders)"]
+        icp_echelle --> icp_prism["Cross-Dispersion Prism<br/>(order separation)"]
+        icp_prism --> icp_ccd["CCD Array<br/>(2D format, 165-800 nm)"]
+    end
 ```
 
 ## 3. High-Performance Optimization & Failure Modes
@@ -135,7 +132,7 @@ Graphite furnace optimization demands exquisite control over thermal programming
 
 Platform atomization implementation requires careful attention to injection position and tube geometry. L'vov platforms mount coaxially within the graphite tube, heated solely by radiant transfer from the tube walls, creating a 200–500 ms delay between wall atomization and platform vaporization. This delay allows the gas phase to reach thermal and chemical equilibrium, dramatically reducing matrix effects from differential vaporization kinetics. Pyrolytic graphite coating on platforms and tube walls inhibits analyte carbide formation and extends tube lifetime from 100–200 firings (uncoated) to 300–500 firings (coated). Autosampler precision proves critical for reproducible furnace analysis—pipetting errors of ±1% translate directly to quantitative bias, demanding calibrated positive-displacement pipettes and viscosity-matched standards.
 
-ICP source stability depends on argon gas purity (>99.995% minimum), nebulizer flow optimization, and RF power tuning. Nebulizer gas flow rate (0.6–1.0 L/min) must be optimized daily using standard reference solutions—too low yields incomplete desolvation and reduced analyte transport, while excessive flow cools the plasma and increases oxide formation rates (monitored via the CeO⁺/Ce⁺ ratio, target <2%). RF power selection balances sensitivity and matrix tolerance: higher power (1200–1500 W) improves ionization efficiency for refractory elements but increases spectral interferences from doubly charged ions and increases operating costs. Plasma position relative to the sampler cone affects matrix loading and space-charge effects—axial positioning 1–2 mm inside the cone tip maximizes sensitivity but exacerbates matrix suppression.
+ICP source stability depends on argon gas purity (>99.995% minimum), nebulizer flow optimization, and RF power tuning. Nebulizer gas flow rate (0.6–1.0 L/min) must be optimized daily using standard reference solutions—too low yields incomplete desolvation and reduced analyte transport, while excessive flow cools the plasma and increases oxide formation rates (monitored via the CeO⁺/Ce⁺ ratio, target < 2%). RF power selection balances sensitivity and matrix tolerance: higher power (1200–1500 W) improves ionization efficiency for refractory elements but increases spectral interferences from doubly charged ions and increases operating costs. Plasma position relative to the sampler cone affects matrix loading and space-charge effects—axial positioning 1–2 mm inside the cone tip maximizes sensitivity but exacerbates matrix suppression.
 
 Matrix matching or standard addition becomes mandatory for complex sample matrices (seawater, biological digests, industrial effluents) where mass loading and ionization suppression alter analyte signals nonlinearly. Internal standardization monitors suppression through co-introduction of elements absent in the sample but with similar mass and ionization potential—yttrium (89) for mid-mass elements, indium (115) for high-mass analytes. Intensity ratios (analyte/internal standard) compensate for plasma fluctuations, drift, and matrix effects provided suppression affects both elements proportionally. Standard addition verification checks calibration accuracy by spiking samples with known analyte quantities and recovering 95–105% of added concentration, flagging nonlinearity or severe matrix mismatch requiring dilution or matrix decomposition.
 

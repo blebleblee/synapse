@@ -35,42 +35,66 @@ Schema activation governs which chunks are available. When a practitioner begins
 The following diagram maps the encoding pipeline as a state machine, showing the transitions between processing levels and the branch points that determine trace durability.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> StimulusEntry: External or internal input
-    StimulusEntry --> StructuralProcessing: Surface feature registration
-    StructuralProcessing --> PhonologicalLoop: Subvocal rehearsal
-    PhonologicalLoop --> StructuralProcessing: Maintenance cycle (no durable trace)
-    PhonologicalLoop --> SemanticProcessing: Elaborative shift
-    StructuralProcessing --> SemanticProcessing: Direct semantic analysis
-    SemanticProcessing --> SchemaActivation: Relate to existing knowledge
-    SchemaActivation --> VerbalElaboration: Generate verbal associations
-    SchemaActivation --> VisualImagery: Generate mental image
-    VerbalElaboration --> DualCoding: Concurrent verbal + visual encoding
-    VisualImagery --> DualCoding: Concurrent verbal + visual encoding
-    SemanticProcessing --> SelfReferencing: Personal relevance judgment
-    SelfReferencing --> DualCoding: Self-schema as anchor
-    DualCoding --> DurableTrace: Multiple retrieval pathways
-    SemanticProcessing --> DurableTrace: Deep single-channel trace
-    MaintenanceRehearsalOnly --> WeakTrace: Minimal retrieval cues
-    WeakTrace --> [*]: Rapid decay / interference
-    DurableTrace --> [*]: Persistent, retrievable
-    note right of PhonologicalLoop
-        Maintenance rehearsal only:
-        Holds content in working memory
-        Produces no durable LTM trace
-    end note
-    note right of SemanticProcessing
-        Elaborative rehearsal:
-        Extracts meaning, builds
-        associative network, activates
-        schema-based retrieval cues
-    end note
-    note right of DualCoding
-        Paivio dual-coding:
-        Verbal + visual channels
-        create redundant retrieval
-        pathways, resistant to decay
-    end note
+flowchart TD
+    START((" ")):::terminal
+    END((" ")):::terminal
+
+    START -->|"External or internal input"| SE["Stimulus Entry"]
+    SE -->|"Surface feature registration"| SP["Structural Processing\n(orthographic / acoustic features)"]
+    SP -->|"Subvocal rehearsal"| PL["Phonological Loop\n(working memory buffer)"]
+    PL -->|"Maintenance cycle — no durable trace"| SP
+    PL -->|"Elaborative shift"| SEM["Semantic Processing\n(elaborative rehearsal)"]
+    SP -->|"Direct semantic analysis"| SEM
+    SEM -->|"Relate to existing knowledge"| SA["Schema Activation"]
+    SA -->|"Generate verbal associations"| VE["Verbal Elaboration"]
+    SA -->|"Generate mental image"| VI["Visual Imagery"]
+    VE -->|"Concurrent verbal + visual encoding"| DC["Dual Coding\n(Paivio, 1971)"]
+    VI -->|"Concurrent verbal + visual encoding"| DC
+    SEM -->|"Personal relevance judgment"| SR["Self-Referencing"]
+    SR -->|"Self-schema as anchor"| DC
+    DC -->|"Multiple retrieval pathways"| DT["Durable LTM Trace"]
+    SEM -->|"Deep single-channel trace"| DT
+    MR["Maintenance Rehearsal Only"] -->|"Minimal retrieval cues"| WT["Weak Trace"]
+    WT -->|"Rapid decay / interference"| END
+    DT -->|"Persistent, retrievable"| END
+
+    subgraph wm ["Working Memory — No LTM Consolidation"]
+        PL
+        MR
+        WT
+    end
+
+    subgraph elaboration ["Elaborative Processing Pathways"]
+        SEM
+        SA
+        VE
+        VI
+        SR
+        DC
+    end
+
+    subgraph ltm ["Long-Term Memory Outcome"]
+        DT
+    end
+
+    N1["📝 Maintenance rehearsal:\nHolds content in working memory.\nProduces no durable LTM trace."]:::note
+    N2["📝 Elaborative rehearsal:\nExtracts meaning, builds associative\nnetwork, activates schema-based\nretrieval cues."]:::note
+    N3["📝 Paivio dual-coding:\nVerbal + visual channels create\nredundant retrieval pathways,\nresistant to decay."]:::note
+
+    PL -.-> N1
+    SEM -.-> N2
+    DC -.-> N3
+
+    classDef terminal fill:#1a1a2e,stroke:#4a4a8a,color:#fff,shape:circle
+    classDef note fill:#fffde7,stroke:#f9a825,color:#333,font-size:12px,text-align:left
+    classDef default fill:#e8f4f8,stroke:#2980b9,color:#1a1a2e,rx:6
+    classDef wm_node fill:#fce4ec,stroke:#c0392b,color:#1a1a2e
+    classDef elab_node fill:#e8f5e9,stroke:#27ae60,color:#1a1a2e
+    classDef ltm_node fill:#e3f2fd,stroke:#1565c0,color:#1a1a2e,font-weight:bold
+
+    class PL,MR,WT wm_node
+    class SEM,SA,VE,VI,SR,DC elab_node
+    class DT ltm_node
 ```
 
 The diagram makes explicit what the prose has described: the critical branch point is the transition from phonological loop cycling to semantic processing. Everything downstream of that transition produces durable traces. Everything that remains upstream of it produces transient traces that decay rapidly and are vulnerable to interference.

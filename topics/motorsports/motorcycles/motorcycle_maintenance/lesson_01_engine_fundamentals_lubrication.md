@@ -24,25 +24,38 @@ Thermal management extends beyond preventing catastrophic overheating to maintai
 
 The physical layout of a motorcycle engine's lubrication system follows one of two fundamental architectures: wet sump or dry sump. In wet sump designs, the crankcase itself serves as the oil reservoir, with a pickup tube submerged in the oil pool at the lowest point of the sump. The oil pump, typically a gear-type or gerotor design driven directly from the crankshaft or transmission input shaft, draws oil through a coarse strainer screen and delivers it under pressure to the main oil gallery—a drilled passage running the length of the crankcase. From this primary distribution point, branch passages supply oil to crankshaft main bearings, connecting rod big-end bearings, camshaft bearings, and valve train components. Crankshaft journals feature precisely drilled cross-holes that align with gallery ports during specific rotation phases, allowing pressurized oil to enter the hollow crankshaft and flow radially outward through connecting rod oil passages to lubricate the small-end wrist pin bearing.
 
-```
-Oil Flow Path - Wet Sump System:
-
-Crankcase Sump Pool
-        ↓
-  Pickup Strainer
-        ↓
-    Oil Pump (gear or gerotor)
-        ↓
-  Main Oil Gallery (longitudinal crankcase passage)
-        ↓
-        ├─→ Crankshaft Main Bearings → Connecting Rod Big-End Bearings
-        ├─→ Camshaft Bearings → Cam Lobes → Valve Lifters
-        ├─→ Cylinder Head Oil Passages → Rocker Arms / Cam Followers
-        └─→ Piston Cooling Jets (high-performance applications)
-        ↓
-  Return via Gravity Drainage
-        ↓
-  Crankcase Sump Pool (cycle repeats)
+```mermaid
+flowchart TD
+    A["Crankcase Sump Pool"]
+    B["Pickup Strainer"]
+    C["Oil Pump<br/>(gear or gerotor)"]
+    D["Main Oil Gallery<br/>(longitudinal crankcase passage)"]
+    E["Crankshaft Main Bearings"]
+    F["Connecting Rod Big-End Bearings"]
+    G["Camshaft Bearings"]
+    H["Cam Lobes"]
+    I["Valve Lifters"]
+    J["Cylinder Head Oil Passages"]
+    K["Rocker Arms / Cam Followers"]
+    L["Piston Cooling Jets<br/>(high-performance applications)"]
+    M["Return via Gravity Drainage"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    D --> G
+    G --> H
+    H --> I
+    D --> J
+    J --> K
+    D --> L
+    F --> M
+    I --> M
+    K --> M
+    L --> M
+    M --> A
 ```
 
 Dry sump systems separate the oil storage function into an external reservoir tank, employing multiple pump stages: scavenge pumps actively evacuate oil from collection points throughout the engine, while a pressure pump delivers oil from the tank to the main gallery. This architecture offers several performance advantages. First, the shallow crankcase reduces overall engine height, lowering the motorcycle's center of gravity. Second, eliminating a large oil pool in the crankcase reduces windage losses from the crankshaft churning through liquid, freeing horsepower at high RPM. Third, the external tank permits increased total oil capacity and improved oil cooling through larger surface area and optional heat exchanger integration. Racing applications almost universally employ dry sump systems, accepting the added complexity and component count in exchange for these benefits.
@@ -61,22 +74,31 @@ Valve springs provide the restoring force that maintains follower contact with t
 
 Thermal expansion characteristics dominate valve clearance specifications and adjustment procedures. Exhaust valves operate in the most severe thermal environment, with head temperatures routinely exceeding 700°C in high-performance engines. The valve stem, connecting the head to the cooler guide region, creates a thermal gradient that drives expansion on the order of 0.10 to 0.15mm between cold and hot states. Aluminum cylinder heads expand roughly 23 microns per meter per 100°C temperature rise, while steel valve stems expand at approximately 12 microns per meter per 100°C. This differential expansion means that as the engine reaches operating temperature, the aluminum head "grows away" from the valve stem tip, effectively reducing the clearance gap. Intake valves run significantly cooler—typically 300 to 400°C—due to cooling from incoming charge flow, and therefore exhibit less expansion and often require tighter cold clearances than exhaust valves to achieve similar hot running clearances.
 
-```
-Thermal Expansion & Valve Clearance:
+```mermaid
+flowchart TD
+    Title["Thermal Expansion & Valve Clearance"]
 
-Cold Engine (20°C ambient):
-├─ Exhaust Valve: Specified clearance 0.25mm
-├─ Intake Valve: Specified clearance 0.15mm
-└─ Aluminum head and steel valve at thermal equilibrium
+    subgraph cold ["Cold Engine — 20°C ambient"]
+        ColdExhaust["Exhaust Valve<br/>Specified clearance: 0.25mm"]
+        ColdIntake["Intake Valve<br/>Specified clearance: 0.15mm"]
+        ColdEquilibrium["Aluminum head and steel valve<br/>at thermal equilibrium"]
+    end
 
-Operating Temperature (90°C):
-├─ Cylinder head expands ~0.16mm (700mm head height × 23 μm/m/°C × 70°C ΔT)
-├─ Steel exhaust valve expands ~0.06mm (70mm stem length × 12 μm/m/°C × 600°C head temp)
-├─ Net clearance reduction: 0.10mm
-└─ Running exhaust clearance: 0.15mm (0.25mm cold - 0.10mm thermal growth)
+    subgraph hot ["Operating Temperature — 90°C"]
+        HotHead["Cylinder head expands ~0.16mm<br/>700mm × 23 μm/m/°C × 70°C ΔT"]
+        HotValve["Steel exhaust valve expands ~0.06mm<br/>70mm × 12 μm/m/°C × 600°C head temp"]
+        NetReduction["Net clearance reduction: 0.10mm"]
+        RunningExhaust["Running exhaust clearance: 0.15mm<br/>0.25mm cold − 0.10mm thermal growth"]
+        RunningIntake["Intake valve operates cooler,<br/>less differential expansion<br/>Running clearance: ~0.10mm from 0.15mm cold"]
+    end
 
-Intake valve operates cooler, experiences less differential expansion,
-maintains ~0.10mm running clearance from 0.15mm cold specification.
+    Title --> cold
+    Title --> hot
+    HotHead --> NetReduction
+    HotValve --> NetReduction
+    NetReduction --> RunningExhaust
+    ColdExhaust --> RunningExhaust
+    ColdIntake --> RunningIntake
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

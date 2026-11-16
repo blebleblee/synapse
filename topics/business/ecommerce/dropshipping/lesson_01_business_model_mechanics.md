@@ -34,16 +34,21 @@ The dropshipping value chain consists of five sequential transaction stages, eac
 
 The data architecture supporting this five-stage flow requires synchronization across multiple systems with different update latencies and failure modes. Order state must propagate from the retailer's ecommerce platform to the supplier's order management system, then back to the retailer as tracking updates, and finally to the customer via notification systems. Each handoff introduces potential failure points—API timeouts, data format mismatches, inventory synchronization delays, or lost messages. Production dropshipping operations implement monitoring dashboards that track order state transitions, flag orders stuck in processing queues, and trigger alerts when tracking numbers fail to appear within expected time windows.
 
-```
-Customer → [Payment Capture] → Retailer → [Order Transmission] → Supplier
-             ↓ Funds Held                     ↓ Order Processing
-             ↓                                 ↓
-             └─────── [Margin Realized] ←──── Shipment → Customer
-                      (Days/Weeks Later)        ↓ Tracking Data
-                                                ↓
-                      Retailer ←─────────── [Tracking Feed]
-                        ↓
-                        └─→ Customer Notification
+```mermaid
+flowchart TD
+    Customer1["Customer"] -->|Payment| PaymentCapture["Payment Capture"]
+    PaymentCapture -->|"Funds Held"| Retailer1["Retailer"]
+    Retailer1 -->|"Order Transmission"| OrderTrans["Order Transmission"]
+    OrderTrans -->|"Order Processing"| Supplier["Supplier"]
+    
+    Supplier -->|Shipment| Customer2["Customer"]
+    Customer2 -->|"Tracking Data"| TrackingFeed["Tracking Feed"]
+    TrackingFeed --> Retailer2["Retailer"]
+    
+    Supplier -->|Fulfillment| MarginRealized["Margin Realized<br/>(Days/Weeks Later)"]
+    MarginRealized --> Retailer2
+    
+    Retailer2 -->|Notification| Customer3["Customer"]
 ```
 
 The margin structure in dropshipping involves multiple fee layers that compress net profitability. Start with the customer's total payment—the gross merchandise value (GMV). Subtract payment processing fees, typically 2.9% plus $0.30 per transaction for credit cards. Subtract the supplier's wholesale price, usually 40% to 70% of retail price depending on product category and supplier tier. Subtract the supplier's fulfillment fee, ranging from $2 to $8 per order for standard items. Subtract ecommerce platform fees—Shopify charges 2% of GMV for their payment gateway plus monthly subscription fees; custom platforms have hosting and maintenance costs. The remainder is contribution margin before marketing costs.

@@ -24,37 +24,47 @@ The third invariant is the **difference between volatility and risk**. Standard 
 
 The operational architecture of risk measurement — from raw exposure identification through quantified loss distribution to management decision — follows a consistent structure across industries. Understanding the mechanics at each stage allows a practitioner to identify exactly where a risk process is likely to fail and what the downstream consequences of that failure will be.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    RISK MEASUREMENT PIPELINE                    │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    EI["**EXPOSURE IDENTIFICATION**
+    What can go wrong, and
+    to what asset/value?"]
 
-  ┌──────────────┐     ┌──────────────┐     ┌──────────────────┐
-  │   EXPOSURE   │────▶│  FREQUENCY   │────▶│  LOSS SEVERITY   │
-  │ IDENTIFICATION│     │  ESTIMATION  │     │   DISTRIBUTION   │
-  │              │     │              │     │                  │
-  │ What can go  │     │ P(event) per │     │ Loss | event     │
-  │ wrong, and   │     │ unit time    │     │ occurs: mean,    │
-  │ to what      │     │              │     │ variance, tail   │
-  │ asset/value? │     │ Sources:     │     │                  │
-  └──────────────┘     │ · Historical │     │ Distributions:   │
-                       │   data       │     │ · Lognormal      │
-                       │ · Expert     │     │ · Pareto         │
-                       │   elicitation│     │ · GEV (EVT)      │
-                       │ · Industry   │     └────────┬─────────┘
-                       │   benchmarks │              │
-                       └──────────────┘              │
-                                                      ▼
-  ┌──────────────┐     ┌──────────────┐     ┌──────────────────┐
-  │   DECISION   │◀────│  AGGREGATE   │◀────│  MONTE CARLO /   │
-  │   ACTIONS    │     │  RISK METRICS│     │  ANALYTICAL      │
-  │              │     │              │     │  CONVOLUTION     │
-  │ · Accept     │     │ · EL (mean)  │     │                  │
-  │ · Transfer   │     │ · UL (σ)     │     │ Combine freq ×   │
-  │ · Mitigate   │     │ · VaR(99%)   │     │ severity across  │
-  │ · Avoid      │     │ · CVaR/ES    │     │ N risks with     │
-  └──────────────┘     └──────────────┘     │ correlation ρ    │
-                                             └──────────────────┘
+    FE["**FREQUENCY ESTIMATION**
+    P(event) per unit time
+
+    Sources:
+    · Historical data
+    · Expert elicitation
+    · Industry benchmarks"]
+
+    LSD["**LOSS SEVERITY DISTRIBUTION**
+    Loss | event occurs:
+    mean, variance, tail
+
+    Distributions:
+    · Lognormal
+    · Pareto
+    · GEV (EVT)"]
+
+    MCA["**MONTE CARLO / ANALYTICAL CONVOLUTION**
+    Combine freq × severity
+    across N risks with
+    correlation ρ"]
+
+    ARM["**AGGREGATE RISK METRICS**
+    · EL (mean)
+    · UL (σ)
+    · VaR (99%)
+    · CVaR / ES"]
+
+    DA["**DECISION ACTIONS**
+    · Accept
+    · Transfer
+    · Mitigate
+    · Avoid"]
+
+    EI --> FE --> LSD --> MCA --> ARM --> DA
 ```
 
 The pipeline begins with **exposure identification**, which is the most qualitative step and therefore the one that receives the least rigorous treatment in practice. An exposure is any combination of an asset (physical, financial, reputational, human capital) and a threat that could reduce its value. The completeness of a risk register depends entirely on the breadth and structure of the exposure identification process. Practitioners use structured taxonomies — the COSO framework organizes exposures into strategic, operational, financial, and compliance categories; the Basel II framework segments operational risk into seven event types — to ensure systematic coverage. The failure mode at this stage is **omission bias**: risks that are difficult to quantify get left off the register, which creates the paradox that the most dangerous risks (novel, unprecedented, structurally uncertain) receive zero formal management attention.

@@ -289,7 +289,7 @@ Run Monte Carlo simulations for both topologies with five hundred iterations eac
 
 Physical measurements validate simulation predictions. Construct both filters on separate breadboard sections using components from the same manufacturing lot to control batch-to-batch variation. Measure each resistor and capacitor with a precision LCR meter before installation, logging actual values. Predict expected corner frequency using measured component values substituted into design equations, then measure actual frequency response. Calculate prediction error: $Error = \frac{f_{c,measured} - f_{c,predicted}}{f_{c,predicted}} \times 100\%$. Errors below 2% confirm accurate modeling and measurement technique. Larger errors suggest parasitic effects: measure breadboard node-to-node capacitance with the LCR meter (remove all components, leaving only wire connections) to quantify layout parasitics, then add these parasitic capacitances to SPICE models for refined predictions.
 
-Temperature coefficient testing exposes thermal sensitivities. Place both filter circuits in a temperature-controlled chamber or apply localized heating with a hot-air station. Sweep temperature from 20°C to 60°C while monitoring corner frequency. Film resistors exhibit 50 ppm/°C temperature coefficients, while NP0 ceramic capacitors maintain 30 ppm/°C. Calculate expected corner frequency drift: $\frac{\Delta f_c}{f_c} = -\frac{1}{2}(TC_R) - (TC_C) = -\frac{1}{2}(50ppm/°C) - (30ppm/°C) = -55ppm/°C$. For a 40°C temperature rise, expect $\Delta f_c = 1000Hz \times (-55ppm/°C) \times 40°C = -2.2Hz$ corner frequency decrease. Measure actual drift using swept-frequency oscilloscope measurements or spectrum analyzer tracking generator. Discrepancies exceeding ±1 Hz suggest thermal gradients within the circuit (uneven component heating) or power supply voltage drift with temperature. Eliminate supply voltage effects by powering circuits from precision laboratory power supplies with <0.01%/°C regulation and monitoring supply voltages continuously during temperature sweeps.
+Temperature coefficient testing exposes thermal sensitivities. Place both filter circuits in a temperature-controlled chamber or apply localized heating with a hot-air station. Sweep temperature from 20°C to 60°C while monitoring corner frequency. Film resistors exhibit 50 ppm/°C temperature coefficients, while NP0 ceramic capacitors maintain 30 ppm/°C. Calculate expected corner frequency drift: $\frac{\Delta f_c}{f_c} = -\frac{1}{2}(TC_R) - (TC_C) = -\frac{1}{2}(50ppm/°C) - (30ppm/°C) = -55ppm/°C$. For a 40°C temperature rise, expect $\Delta f_c = 1000Hz \times (-55ppm/°C) \times 40°C = -2.2Hz$ corner frequency decrease. Measure actual drift using swept-frequency oscilloscope measurements or spectrum analyzer tracking generator. Discrepancies exceeding ±1 Hz suggest thermal gradients within the circuit (uneven component heating) or power supply voltage drift with temperature. Eliminate supply voltage effects by powering circuits from precision laboratory power supplies with < 0.01%/°C regulation and monitoring supply voltages continuously during temperature sweeps.
 
 ## Exercise 3: Stress Testing, Boundary Failure & Recovery Protocol
 
@@ -380,26 +380,46 @@ Short-circuit protection limits output current to prevent pass transistor destru
 
 Construct the protected regulator circuit incorporating all three protection elements: TVS on input, series Schottky diode, and PTC resettable fuse on output. Add indicator LEDs to signal protection activation: a red LED in series with a 1kΩ resistor connected across the TVS lights when overvoltage clamping occurs (TVS conducts, raising voltage across the LED to forward threshold); a green LED with 1kΩ resistor on the output illuminates during normal operation and extinguishes during short circuit when the PTC trips.
 
-```
-Protected LM317 Regulator Schematic:
+```mermaid
+flowchart TD
+    INPUT["Input (+12V)"]
+    D1["D1: 1N5822<br/>Diode"]
+    TVS["TVS: 1.5KE33CA<br/>Transient Voltage Suppressor"]
+    C1["C1: 100nF<br/>Capacitor"]
+    LM317["LM317<br/>Voltage Regulator"]
+    R1["R1: 240Ω<br/>Resistor"]
+    R2["R2: 750Ω<br/>Resistor"]
+    C2["C2: 1µF<br/>Capacitor"]
+    F1["F1: PTC MF-R050<br/>Resettable Fuse"]
+    LED_GREEN["LED Green<br/>Power Indicator"]
+    R_LED2["R_LED2: 1kΩ<br/>Current Limiting Resistor"]
+    R_LED1["R_LED1<br/>Current Limiting Resistor"]
+    LED_RED["LED Red<br/>Indicator"]
+    GND1["GND"]
+    GND2["GND"]
+    GND3["GND"]
+    OUTPUT["Output (+5V)"]
 
-Input(+12V) ---[D1:1N5822]---+---[TVS:1.5KE33CA]---+--- GND
-                              |                      |
-                          [C1:100nF]             [R_LED1]
-                              |                      |
-                          [LM317]                 [LED_RED]
-                              |                      |
-                          [R1:240Ω]                GND
-                              |
-                          [R2:750Ω]
-                              |
-                          [C2:1uF]
-                              |
-                        [F1:PTC_MF-R050]
-                              |
-                          [LED_GREEN]---[R_LED2:1kΩ]
-                              |
-                          Output(+5V)
+    INPUT --> D1
+    D1 --> NODE1[ ]
+    NODE1 --> TVS
+    NODE1 --> C1
+    TVS --> NODE2[ ]
+    NODE2 --> R_LED1
+    NODE2 --> GND1
+    C1 --> LM317
+    LM317 --> R1
+    R1 --> R2
+    R2 --> C2
+    C2 --> F1
+    F1 --> LED_GREEN
+    LED_GREEN --> R_LED2
+    R_LED2 --> OUTPUT
+    R_LED1 --> LED_RED
+    LED_RED --> GND2
+    
+    style NODE1 fill:none,stroke:none
+    style NODE2 fill:none,stroke:none
 ```
 
 Simulate overvoltage transients by modifying the input voltage source to ramp from 12V to 50V over 100μs, then return to 12V. The TVS should clamp input voltage at 40V maximum, preventing the LM317 from experiencing voltages beyond its rating. SPICE modeling of TVS diodes requires piecewise-linear approximations due to their complex avalanche characteristics. Use the following subcircuit model:
@@ -427,9 +447,9 @@ Combined fault scenarios test simultaneous stresses: apply reverse polarity conc
 
 ### Component Selection and Procurement Guidelines
 
-Operational amplifier selection balances offset voltage, bias current, bandwidth, slew rate, and supply voltage range against cost and availability. For precision DC applications (instrumentation amplifiers, active filters below 10 kHz), prioritize low input offset voltage (<1mV) and drift (<10μV/°C): OP07, OP27, and LT1013 families satisfy these requirements. For audio and mid-frequency signal processing (10 Hz to 100 kHz), JFET-input devices (TL072, TL082) offer high input impedance (>10¹²Ω) and low noise. For wideband applications (video amplifiers, fast comparators), current-feedback amplifiers (AD8011, LT1223) provide constant bandwidth independent of closed-loop gain, supporting gains above ten with bandwidths exceeding 100 MHz.
+Operational amplifier selection balances offset voltage, bias current, bandwidth, slew rate, and supply voltage range against cost and availability. For precision DC applications (instrumentation amplifiers, active filters below 10 kHz), prioritize low input offset voltage (< 1mV) and drift (< 10μV/°C): OP07, OP27, and LT1013 families satisfy these requirements. For audio and mid-frequency signal processing (10 Hz to 100 kHz), JFET-input devices (TL072, TL082) offer high input impedance (>10¹²Ω) and low noise. For wideband applications (video amplifiers, fast comparators), current-feedback amplifiers (AD8011, LT1223) provide constant bandwidth independent of closed-loop gain, supporting gains above ten with bandwidths exceeding 100 MHz.
 
-Passive component quality determines long-term stability and noise floor. Metal-film resistors (Vishay RN55, Yageo MFR series) exhibit <50 ppm/°C temperature coefficients and <0.1μV/°C thermal EMF, critical for low-noise, thermally stable circuits. Thin-film resistor networks provide matched resistor pairs with <0.1% ratio tolerance, essential for differential amplifiers and precision voltage dividers. Capacitor selection depends on frequency and precision requirements: NP0/C0G ceramic for RF and timing circuits (<1% tolerance, <30 ppm/°C), X7R ceramic for general decoupling (acceptable 15% tolerance and moderate temperature coefficient), polyester film for audio coupling (low dielectric absorption), and aluminum electrolytic for bulk energy storage (high capacitance density at cost of ESR and lifetime limitations).
+Passive component quality determines long-term stability and noise floor. Metal-film resistors (Vishay RN55, Yageo MFR series) exhibit < 50 ppm/°C temperature coefficients and < 0.1μV/°C thermal EMF, critical for low-noise, thermally stable circuits. Thin-film resistor networks provide matched resistor pairs with < 0.1% ratio tolerance, essential for differential amplifiers and precision voltage dividers. Capacitor selection depends on frequency and precision requirements: NP0/C0G ceramic for RF and timing circuits (< 1% tolerance, < 30 ppm/°C), X7R ceramic for general decoupling (acceptable 15% tolerance and moderate temperature coefficient), polyester film for audio coupling (low dielectric absorption), and aluminum electrolytic for bulk energy storage (high capacitance density at cost of ESR and lifetime limitations).
 
 Procurement from authorized distributors (Digi-Key, Mouser, Newark, Arrow) ensures genuine components with traceable date codes and manufacturing provenance. Counterfeit operational amplifiers and voltage regulators proliferate in unauthorized distribution channels, often remarked lower-grade devices that fail under temperature or voltage stress. Verify authenticity through visual inspection: check package markings for font consistency, logo quality, and date code format matching manufacturer specifications. Measure key parameters (input offset voltage, quiescent current, gain-bandwidth product) and compare against datasheet specifications; deviations exceeding typical variation ranges (±20%) suggest counterfeit or out-of-spec parts.
 
@@ -437,9 +457,9 @@ Procurement from authorized distributors (Digi-Key, Mouser, Newark, Arrow) ensur
 
 Analog circuit measurements carry inherent uncertainties from instrument accuracy, probe loading, thermal noise, and environmental factors. Digital multimeters specify accuracy as a percentage of reading plus a fixed offset (e.g., ±0.1% + 2 counts for DC voltage). For a 5.00V measurement on a 20V range, total uncertainty computes as $\pm(5.00V \times 0.001 + 0.02V) = \pm0.025V$ or ±0.5%. Oscilloscope vertical accuracy degrades with deflection factor: 8-bit analog-to-digital converters provide 256 quantization levels, yielding ±2% accuracy of full scale. For 1V/division scale displaying a 2V signal (occupying 2 divisions of the 8-division screen), quantization uncertainty reaches $\pm(\frac{8V}{256}) = \pm31mV$ or ±1.6% of the measured value.
 
-Calibration intervals depend on instrument usage intensity and environmental conditions. Precision DMMs require annual calibration against NIST-traceable voltage references to maintain specified accuracy. Oscilloscopes need calibration every two years, adjusting vertical gain, offset, and timebase accuracy. Function generators demand annual frequency and amplitude calibration, particularly for applications requiring <1% frequency accuracy (communications, timing circuits). Calibration certificates document traceability to national standards, necessary for ISO/IEC 17025 compliant measurement records and regulatory submissions (medical devices, aerospace applications).
+Calibration intervals depend on instrument usage intensity and environmental conditions. Precision DMMs require annual calibration against NIST-traceable voltage references to maintain specified accuracy. Oscilloscopes need calibration every two years, adjusting vertical gain, offset, and timebase accuracy. Function generators demand annual frequency and amplitude calibration, particularly for applications requiring < 1% frequency accuracy (communications, timing circuits). Calibration certificates document traceability to national standards, necessary for ISO/IEC 17025 compliant measurement records and regulatory submissions (medical devices, aerospace applications).
 
-Probe compensation equalizes frequency response by adjusting the parallel capacitance in 10:1 oscilloscope probes to match the input capacitance of the oscilloscope channel. Miscompensation causes square wave edges to overshoot (under-compensation: too little probe capacitance) or round (over-compensation: too much probe capacitance). Perform compensation daily before critical measurements: connect the probe to the oscilloscope's calibration output (typically 1 kHz, 1V square wave), then adjust the probe's trimmer capacitor until square wave edges appear square with minimal overshoot (<5%) and fast rise time. Digital oscilloscopes offer automated probe compensation routines that sweep capacitance while measuring rise time and overshoot, converging to optimal settings within seconds.
+Probe compensation equalizes frequency response by adjusting the parallel capacitance in 10:1 oscilloscope probes to match the input capacitance of the oscilloscope channel. Miscompensation causes square wave edges to overshoot (under-compensation: too little probe capacitance) or round (over-compensation: too much probe capacitance). Perform compensation daily before critical measurements: connect the probe to the oscilloscope's calibration output (typically 1 kHz, 1V square wave), then adjust the probe's trimmer capacitor until square wave edges appear square with minimal overshoot (< 5%) and fast rise time. Digital oscilloscopes offer automated probe compensation routines that sweep capacitance while measuring rise time and overshoot, converging to optimal settings within seconds.
 
 ### Simulation Model Validation and Limitations
 

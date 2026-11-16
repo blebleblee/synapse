@@ -1304,418 +1304,151 @@ This allows the same policy engine to serve:
 
 ### 8.2 OPA Policy for Container Image Security
 
-```rego
-# security/opa/container_image_policy.rego
-# OPA policy for validating container images before deployment.
-# Evaluated by CI pipeline and Kubernetes admission webhook.
-
-package container.security
-
-import future.keywords.in
-import future.keywords.every
-
-# ─────────────────────────────────────────────────────────────
-# Default deny: images must explicitly satisfy all rules
-# ─────────────────────────────────────────────────────────────
-default allow := false
-
-# Allow only when all security checks pass
-allow {
-    count(deny_reasons) == 0
-}
-
-# ─────────────────────────────────────────────────────────────
-# Collect all denial reasons (for structured error reporting)
-# ─────────────────────────────────────────────────────────────
-deny_reasons[reason] {
-    reason := critical_vulnerabilities_present
-}
-
-deny_reasons[reason] {
-    reason := runs_as_root
-}
-
-deny_reasons[reason] {
-    reason := uses_latest_tag
-}
-
-deny_reasons[reason] {
-    reason := missing_sbom
-}
-
-deny_reasons[reason] {
-    reason := forbidden_base_image
-}
-
-deny_reasons[reason] {
-    reason := missing_required_labels[_]
-}
-
-deny_reasons[reason] {
-    reason := writable_root_filesystem
-}
-
-deny_reasons[reason] {
-    reason := excessive_capabilities[_]
-}
-
-# ─────────────────────────────────────────────────────────────
-# Rule: No CRITICAL or HIGH CVEs with available fixes
-# ─────────────────────────────────────────────────────────────
-critical_vulnerabilities_present := reason {
-    critical_vulns := [v |
-        v := input.scan_results.vulnerabilities[_]
-        v.severity in {"CRITICAL", "HIGH"}
-        v.fix_available == true
-    ]
-    count(critical_vulns) > 0
-    reason := sprintf(
-        "Image has %d CRITICAL/HIGH fixable vulnerabilities. Run `trivy image --severity CRITICAL,HIGH %s` for details.",
-        [count(critical_vulns), input.image.name]
-    )
-}
-
-# ─────────────────────────────────────────────────────────────
-# Rule: Container must not run as root (UID 0)
-# ─────────────────────────────────────────────────────────────
-runs_as_root := reason {
-    input.image.config.User == ""
-    reason := "Container image has no USER directive. Set a non-root user: USER 65534"
-}
-
-runs_as_root := reason {
-    user := input.image.config.User
-    user != ""
-    # Match UID 0 or "root" username
-    regex.match(`^(0|root)(:.*)?$`, user)
-    reason := sprintf("Container image runs as root user '%s'. Use a non-root UID >= 1000.", [user])
-}
-
-# ─────────────────────────────────────────────────────────────
-# Rule: Image must not use :latest tag
-# ─────────────────────────────────────────────────────────────
-uses_latest_tag := reason {
-    image_ref := input.image.reference
-    endswith(image_ref, ":latest")
-    reason := sprintf(
-        "Image '%s' uses ':latest' tag. Pin to a specific digest or semantic version tag.",
-        [image_ref]
-    )
-}
-
-uses_latest_tag := reason {
-    image_ref := input.image.reference
-    not contains(image_ref, ":")
-    reason := sprintf(
-        "Image '%s' has no tag specified (defaults to :latest). Pin to a specific version.",
-        [image_ref]
-    )
-}
-
-# ─────────────────────────────────────────────────────────────
-# Rule: SBOM must be present and signed
-# ─────────────────────────────────────────────────────────────
-missing_sbom := reason {
-    not input.attestations.sbom
-    reason := "No SBOM attestation found for image. Generate with: syft <image> -o spdx-json | cosign attest ..."
-}
-
-missing_sbom := reason {
-    input.attestations.sbom
-    not input.attestations.sbom.verified
-    reason := "SBOM attestation present but signature verification failed. Check Cosign signing key."
-}
-
-# ─────────────────────────────────────────────────────────────
-# Rule: Base image must be from approved registry
-# ─────────────────────────────────────────────────────────────
-approved_base_registries := {
-    "gcr.io/distroless",
-    "cgr.dev/chainguard",
-    "registry.access.redhat.com/ubi",
-    "docker.io/library/alpine",
-    "our-internal-registry.example.com",
-}
-
-forbidden_base_image := reason {
-    base := input.image.base_image
-    not any_approved_base(base)
-    reason := sprintf(
-        "Base image '%s' is not from an approved registry. Use distroless, Chainguard, or UBI.",
-        [base]
-    )
-}
-
-any_approved_base(base) {
-    approved := approved_base_registries[_]
-    startswith(base, approved)
-}
-
-# ─────────────────────────────────────────────────────────────
-# Rule: Required OCI labels must be present
-# ─────────────────────────────────────────────────────────────
-required_labels := {
-    "org.opencontainers.image.source",
-    "org.opencontainers.image.revision",
-    "org.opencontainers.image.created",
-    "org.opencontainers.image.version",
-}
-
-missing_required_labels[reason] {
-    label := required_labels[_]
-    not input.image.config.Labels[label]
-    reason := sprintf("Required OCI label '%s' is missing from image.", [label])
-}
-
-# ─────────────────────────────────────────────────────────────
-# Rule: Root filesystem should be read-only
-# ─────────────────────────────────────────────────────────────
-writable_root_filesystem := reason {
-    # Check Kubernetes security context if present
-    input.kubernetes_spec
-    not input.kubernetes_spec.securityContext.readOnlyRootFilesystem
-    reason := "Kubernetes pod spec does not set readOnlyRootFilesystem: true"
-}
-
-# ─────────────────────────────────────────────────────────────
-# Rule: No excessive Linux capabilities
-# ─────────────────────────────────────────────────────────────
-dangerous_capabilities := {
-    "SYS_ADMIN", "NET_ADMIN", "SYS_PTRACE",
-    "SYS_MODULE", "DAC_OVERRIDE", "SETUID",
-    "SETGID", "NET_RAW", "SYS_RAWIO",
-}
-
-excessive_capabilities[reason] {
-    cap := input.kubernetes_spec.securityContext.capabilities.add[_]
-    cap in dangerous_capabilities
-    reason := sprintf("Dangerous Linux capability '%s' added to container. Avoid unless strictly necessary.", [cap])
-}
-
-# ─────────────────────────────────────────────────────────────
-# Summary report for structured output
-# ─────────────────────────────────────────────────────────────
-report := {
-    "allow": allow,
-    "image": input.image.reference,
-    "denial_reasons": deny_reasons,
-    "checks_passed": count(deny_reasons) == 0,
-    "severity": severity_summary,
-}
-
-severity_summary := "PASS" { count(deny_reasons) == 0 }
-severity_summary := "FAIL" { count(deny_reasons) > 0 }
+```mermaid
+flowchart TD
+    Start([Container Image Deployment Request])
+    Start --> DefaultDeny[Default Policy: DENY]
+    
+    DefaultDeny --> CheckAll{All Security<br/>Checks Pass?}
+    
+    CheckAll -->|Evaluate| Check1[Critical Vulnerabilities Check]
+    CheckAll -->|Evaluate| Check2[Root User Check]
+    CheckAll -->|Evaluate| Check3[Latest Tag Check]
+    CheckAll -->|Evaluate| Check4[SBOM Attestation Check]
+    CheckAll -->|Evaluate| Check5[Base Image Registry Check]
+    CheckAll -->|Evaluate| Check6[Required OCI Labels Check]
+    CheckAll -->|Evaluate| Check7[Root Filesystem Check]
+    CheckAll -->|Evaluate| Check8[Linux Capabilities Check]
+    
+    subgraph Rule1 ["Rule 1: Vulnerability Scanning"]
+        Check1 --> Vuln1{Has CRITICAL/HIGH<br/>fixable CVEs?}
+        Vuln1 -->|Yes| Deny1["❌ DENY: Fixable vulnerabilities present<br/>Run trivy scan for details"]
+        Vuln1 -->|No| Pass1[✓ Pass]
+    end
+    
+    subgraph Rule2 ["Rule 2: Non-Root User"]
+        Check2 --> Root1{USER directive<br/>present?}
+        Root1 -->|"No USER"| Deny2["❌ DENY: No USER directive<br/>Set USER 65534"]
+        Root1 -->|"USER set"| Root2{Runs as<br/>root/UID 0?}
+        Root2 -->|Yes| Deny3["❌ DENY: Runs as root<br/>Use UID >= 1000"]
+        Root2 -->|No| Pass2[✓ Pass]
+    end
+    
+    subgraph Rule3 ["Rule 3: Tag Pinning"]
+        Check3 --> Tag1{Uses :latest<br/>or no tag?}
+        Tag1 -->|Yes| Deny4["❌ DENY: Unpinned image<br/>Use digest or semantic version"]
+        Tag1 -->|No| Pass3[✓ Pass]
+    end
+    
+    subgraph Rule4 ["Rule 4: SBOM Attestation"]
+        Check4 --> SBOM1{SBOM<br/>present?}
+        SBOM1 -->|No| Deny5["❌ DENY: No SBOM<br/>Generate with syft + cosign"]
+        SBOM1 -->|Yes| SBOM2{Signature<br/>verified?}
+        SBOM2 -->|No| Deny6["❌ DENY: SBOM verification failed<br/>Check Cosign signing key"]
+        SBOM2 -->|Yes| Pass4[✓ Pass]
+    end
+    
+    subgraph Rule5 ["Rule 5: Approved Base Images"]
+        Check5 --> Base1{Base from approved<br/>registry?}
+        Base1 -->|No| Deny7["❌ DENY: Unapproved base image<br/>Use distroless/Chainguard/UBI"]
+        Base1 -->|Yes| Pass5[✓ Pass]
+        
+        Approved["Approved Registries:<br/>• gcr.io/distroless<br/>• cgr.dev/chainguard<br/>• registry.access.redhat.com/ubi<br/>• docker.io/library/alpine<br/>• our-internal-registry.example.com"]
+        Base1 -.Check against.-> Approved
+    end
+    
+    subgraph Rule6 ["Rule 6: OCI Labels"]
+        Check6 --> Label1{All required<br/>labels present?}
+        Label1 -->|No| Deny8["❌ DENY: Missing OCI labels<br/>Add org.opencontainers.image.*"]
+        Label1 -->|Yes| Pass6[✓ Pass]
+        
+        Required["Required Labels:<br/>• org.opencontainers.image.source<br/>• org.opencontainers.image.revision<br/>• org.opencontainers.image.created<br/>• org.opencontainers.image.version"]
+        Label1 -.Verify.-> Required
+    end
+    
+    subgraph Rule7 ["Rule 7: Read-Only Root FS"]
+        Check7 --> RO1{readOnlyRootFilesystem<br/>set to true?}
+        RO1 -->|No| Deny9["❌ DENY: Writable root filesystem<br/>Set readOnlyRootFilesystem: true"]
+        RO1 -->|Yes| Pass7[✓ Pass]
+    end
+    
+    subgraph Rule8 ["Rule 8: Linux Capabilities"]
+        Check8 --> Cap1{Dangerous<br/>capabilities added?}
+        Cap1 -->|Yes| Deny10["❌ DENY: Excessive capabilities<br/>Remove SYS_ADMIN, NET_ADMIN, etc."]
+        Cap1 -->|No| Pass8[✓ Pass]
+        
+        Dangerous["Forbidden Capabilities:<br/>SYS_ADMIN, NET_ADMIN, SYS_PTRACE<br/>SYS_MODULE, DAC_OVERRIDE, SETUID<br/>SETGID, NET_RAW, SYS_RAWIO"]
+        Cap1 -.Check.-> Dangerous
+    end
+    
+    Pass1 --> Aggregate
+    Pass2 --> Aggregate
+    Pass3 --> Aggregate
+    Pass4 --> Aggregate
+    Pass5 --> Aggregate
+    Pass6 --> Aggregate
+    Pass7 --> Aggregate
+    Pass8 --> Aggregate
+    
+    Deny1 --> Aggregate
+    Deny2 --> Aggregate
+    Deny3 --> Aggregate
+    Deny4 --> Aggregate
+    Deny5 --> Aggregate
+    Deny6 --> Aggregate
+    Deny7 --> Aggregate
+    Deny8 --> Aggregate
+    Deny9 --> Aggregate
+    Deny10 --> Aggregate
+    
+    Aggregate{Count denial<br/>reasons == 0?}
+    Aggregate -->|Yes| Allow["✅ ALLOW<br/>Image approved for deployment"]
+    Aggregate -->|No| DenyFinal["⛔ DENY<br/>Image rejected - see denial reasons"]
+    
+    Allow --> Report["Generate Report:<br/>• allow: true<br/>• denial_reasons: []<br/>• severity: PASS"]
+    DenyFinal --> ReportFail["Generate Report:<br/>• allow: false<br/>• denial_reasons: [...]<br/>• severity: FAIL"]
+    
+    Report --> End([Deployment Proceeds])
+    ReportFail --> Block([Deployment Blocked])
 ```
 
 ### 8.3 OPA Unit Tests
 
-```rego
-# security/opa/container_image_policy_test.rego
-# Unit tests for the container image security policy.
-# Run with: opa test security/opa/ -v
-
-package container.security
-
-# ─────────────────────────────────────────────────────────────
-# Test: Clean image should be allowed
-# ─────────────────────────────────────────────────────────────
-test_clean_image_passes if {
-    allow with input as {
-        "image": {
-            "reference": "our-internal-registry.example.com/api:1.2.3",
-            "name": "api:1.2.3",
-            "base_image": "gcr.io/distroless/static:nonroot",
-            "config": {
-                "User": "65534",
-                "Labels": {
-                    "org.opencontainers.image.source": "https://github.com/example/api",
-                    "org.opencontainers.image.revision": "abc123",
-                    "org.opencontainers.image.created": "2024-01-01T00:00:00Z",
-                    "org.opencontainers.image.version": "1.2.3",
-                },
-            },
-        },
-        "scan_results": {"vulnerabilities": []},
-        "attestations": {
-            "sbom": {"verified": true},
-        },
-        "kubernetes_spec": {
-            "securityContext": {
-                "readOnlyRootFilesystem": true,
-                "capabilities": {"add": []},
-            },
-        },
-    }
-}
-
-# ─────────────────────────────────────────────────────────────
-# Test: Latest tag should be denied
-# ─────────────────────────────────────────────────────────────
-test_latest_tag_denied if {
-    not allow with input as {
-        "image": {
-            "reference": "our-internal-registry.example.com/api:latest",
-            "name": "api:latest",
-            "base_image": "gcr.io/distroless/static:nonroot",
-            "config": {
-                "User": "65534",
-                "Labels": {
-                    "org.opencontainers.image.source": "https://github.com/example/api",
-                    "org.opencontainers.image.revision": "abc123",
-                    "org.opencontainers.image.created": "2024-01-01T00:00:00Z",
-                    "org.opencontainers.image.version": "1.2.3",
-                },
-            },
-        },
-        "scan_results": {"vulnerabilities": []},
-        "attestations": {"sbom": {"verified": true}},
-        "kubernetes_spec": {
-            "securityContext": {
-                "readOnlyRootFilesystem": true,
-                "capabilities": {"add": []},
-            },
-        },
-    }
-}
-
-# ─────────────────────────────────────────────────────────────
-# Test: Root user should be denied
-# ─────────────────────────────────────────────────────────────
-test_root_user_denied if {
-    not allow with input as {
-        "image": {
-            "reference": "our-internal-registry.example.com/api:1.0.0",
-            "name": "api:1.0.0",
-            "base_image": "gcr.io/distroless/static:nonroot",
-            "config": {
-                "User": "root",
-                "Labels": {
-                    "org.opencontainers.image.source": "https://github.com/example/api",
-                    "org.opencontainers.image.revision": "abc123",
-                    "org.opencontainers.image.created": "2024-01-01T00:00:00Z",
-                    "org.opencontainers.image.version": "1.0.0",
-                },
-            },
-        },
-        "scan_results": {"vulnerabilities": []},
-        "attestations": {"sbom": {"verified": true}},
-        "kubernetes_spec": {
-            "securityContext": {
-                "readOnlyRootFilesystem": true,
-                "capabilities": {"add": []},
-            },
-        },
-    }
-}
-
-# ─────────────────────────────────────────────────────────────
-# Test: Critical vulnerability should be denied when fix available
-# ─────────────────────────────────────────────────────────────
-test_critical_vuln_denied if {
-    not allow with input as {
-        "image": {
-            "reference": "our-internal-registry.example.com/api:1.0.0",
-            "name": "api:1.0.0",
-            "base_image": "gcr.io/distroless/static:nonroot",
-            "config": {
-                "User": "65534",
-                "Labels": {
-                    "org.opencontainers.image.source": "https://github.com/example/api",
-                    "org.opencontainers.image.revision": "abc123",
-                    "org.opencontainers.image.created": "2024-01-01T00:00:00Z",
-                    "org.opencontainers.image.version": "1.0.0",
-                },
-            },
-        },
-        "scan_results": {
-            "vulnerabilities": [
-                {
-                    "id": "CVE-2021-44228",
-                    "severity": "CRITICAL",
-                    "fix_available": true,
-                    "package": "log4j-core",
-                },
-            ],
-        },
-        "attestations": {"sbom": {"verified": true}},
-        "kubernetes_spec": {
-            "securityContext": {
-                "readOnlyRootFilesystem": true,
-                "capabilities": {"add": []},
-            },
-        },
-    }
-}
-
-# ─────────────────────────────────────────────────────────────
-# Test: Unfixable vulnerability should not block deployment
-# (fix is not available; teams cannot act on it immediately)
-# ─────────────────────────────────────────────────────────────
-test_unfixable_critical_does_not_block if {
-    allow with input as {
-        "image": {
-            "reference": "our-internal-registry.example.com/api:2.0.0",
-            "name": "api:2.0.0",
-            "base_image": "gcr.io/distroless/static:nonroot",
-            "config": {
-                "User": "65534",
-                "Labels": {
-                    "org.opencontainers.image.source": "https://github.com/example/api",
-                    "org.opencontainers.image.revision": "def456",
-                    "org.opencontainers.image.created": "2024-01-02T00:00:00Z",
-                    "org.opencontainers.image.version": "2.0.0",
-                },
-            },
-        },
-        "scan_results": {
-            "vulnerabilities": [
-                {
-                    "id": "CVE-2024-99999",
-                    "severity": "CRITICAL",
-                    "fix_available": false,
-                    "package": "some-lib",
-                },
-            ],
-        },
-        "attestations": {"sbom": {"verified": true}},
-        "kubernetes_spec": {
-            "securityContext": {
-                "readOnlyRootFilesystem": true,
-                "capabilities": {"add": []},
-            },
-        },
-    }
-}
-
-# ─────────────────────────────────────────────────────────────
-# Test: Missing SBOM should be denied
-# ─────────────────────────────────────────────────────────────
-test_missing_sbom_denied if {
-    not allow with input as {
-        "image": {
-            "reference": "our-internal-registry.example.com/api:3.0.0",
-            "name": "api:3.0.0",
-            "base_image": "gcr.io/distroless/static:nonroot",
-            "config": {
-                "User": "65534",
-                "Labels": {
-                    "org.opencontainers.image.source": "https://github.com/example/api",
-                    "org.opencontainers.image.revision": "ghi789",
-                    "org.opencontainers.image.created": "2024-01-03T00:00:00Z",
-                    "org.opencontainers.image.version": "3.0.0",
-                },
-            },
-        },
-        "scan_results": {"vulnerabilities": []},
-        "attestations": {},
-        "kubernetes_spec": {
-            "securityContext": {
-                "readOnlyRootFilesystem": true,
-                "capabilities": {"add": []},
-            },
-        },
-    }
-}
+```mermaid
+flowchart TD
+    Start["OPA Container Image Security Policy Tests"]
+    
+    Start --> T1["Test: Clean Image"]
+    Start --> T2["Test: Latest Tag"]
+    Start --> T3["Test: Root User"]
+    Start --> T4["Test: Critical Vuln with Fix"]
+    Start --> T5["Test: Unfixable Critical Vuln"]
+    Start --> T6["Test: Missing SBOM"]
+    
+    T1 --> T1_Input["Input:<br/>✓ Semantic version tag (1.2.3)<br/>✓ Non-root user (65534)<br/>✓ OCI labels present<br/>✓ No vulnerabilities<br/>✓ SBOM verified<br/>✓ Read-only filesystem"]
+    T1_Input --> T1_Result["✅ ALLOW"]
+    
+    T2 --> T2_Input["Input:<br/>✗ :latest tag<br/>✓ All other checks pass"]
+    T2_Input --> T2_Result["❌ DENY<br/>Reason: Immutable tags required"]
+    
+    T3 --> T3_Input["Input:<br/>✓ Semantic version<br/>✗ User: root<br/>✓ All other checks pass"]
+    T3_Input --> T3_Result["❌ DENY<br/>Reason: Root user forbidden"]
+    
+    T4 --> T4_Input["Input:<br/>✓ Semantic version<br/>✓ Non-root user<br/>✗ CVE-2021-44228 CRITICAL<br/>✗ Fix available: true"]
+    T4_Input --> T4_Result["❌ DENY<br/>Reason: Fixable critical vulnerability"]
+    
+    T5 --> T5_Input["Input:<br/>✓ Semantic version<br/>✓ Non-root user<br/>✗ CVE-2024-99999 CRITICAL<br/>✓ Fix available: false"]
+    T5_Input --> T5_Result["✅ ALLOW<br/>Rationale: Cannot act on unfixable vuln"]
+    
+    T6 --> T6_Input["Input:<br/>✓ Semantic version<br/>✓ Non-root user<br/>✓ No vulnerabilities<br/>✗ SBOM missing"]
+    T6_Input --> T6_Result["❌ DENY<br/>Reason: SBOM attestation required"]
+    
+    style T1_Result fill:#4ade80,stroke:#22c55e,color:#000
+    style T2_Result fill:#f87171,stroke:#ef4444,color:#000
+    style T3_Result fill:#f87171,stroke:#ef4444,color:#000
+    style T4_Result fill:#f87171,stroke:#ef4444,color:#000
+    style T5_Result fill:#4ade80,stroke:#22c55e,color:#000
+    style T6_Result fill:#f87171,stroke:#ef4444,color:#000
 ```
 
 ### 8.4 Kubernetes Admission Policy with Kyverno
@@ -1959,84 +1692,43 @@ A secure Dockerfile follows several invariants:
 5. **Pinned base image digest**: reproducible builds, immune to tag mutation attacks
 6. **Read-only root filesystem friendly**: writable paths explicitly declared
 
-```dockerfile
-# Dockerfile
-# Multi-stage secure build for a Python FastAPI application.
-# Base: distroless/python3 — no shell, no package manager, minimal attack surface.
+```mermaid
+flowchart TD
+    subgraph stage1 ["Stage 1 · dependency-builder\npython:3.12.3-slim-bookworm (pinned SHA)"]
+        S1_BASE["Base Image\npython:3.12.3-slim-bookworm@sha256:a12f..."]
+        S1_ENV["Build-time ENV\nPYTHONDONTWRITEBYTECODE · PYTHONUNBUFFERED\nPIP_NO_CACHE_DIR · PIP_DISABLE_PIP_VERSION_CHECK"]
+        S1_COPY["COPY\nrequirements.txt\nrequirements-hash.txt"]
+        S1_VERIFY["RUN sha256sum -c requirements-hash.txt\n✖ exit 1 on mismatch"]
+        S1_INSTALL["RUN pip install\n--no-cache-dir --prefix=/install\n--requirement requirements.txt"]
+        S1_OUT[("/install\n(compiled site-packages)")]
 
-# ─────────────────────────────────────────────────────────────
-# Stage 1: Dependency resolution
-# Uses full Python image to compile native extensions
-# ─────────────────────────────────────────────────────────────
-FROM python:3.12.3-slim-bookworm@sha256:a12f14f3cb89b53e4b8949e44f4e04ab575cfb88c35dab9b9d6b6a97e43c81e4 \
-    AS dependency-builder
+        S1_BASE --> S1_ENV --> S1_COPY --> S1_VERIFY --> S1_INSTALL --> S1_OUT
+    end
 
-# Set build-time environment
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    subgraph stage2 ["Stage 2 · security-scanner (optional / local)\naquasec/trivy:0.51.1 (pinned SHA)"]
+        S2_BASE["Base Image\naquasec/trivy:0.51.1@sha256:3ebf..."]
+        S2_COPY["COPY --from=dependency-builder\n/install → /install"]
+        S2_SCAN["RUN trivy filesystem\n--exit-code 1 --severity CRITICAL\n✖ fail on CRITICAL · ⚠ warn if unavailable"]
 
-WORKDIR /build
+        S2_BASE --> S2_COPY --> S2_SCAN
+    end
 
-# Copy only dependency manifests first (leverages layer caching)
-COPY requirements.txt requirements-hash.txt ./
+    subgraph stage3 ["Stage 3 · runtime (final image)\ngcr.io/distroless/python3-debian12:nonroot (pinned SHA)"]
+        S3_BASE["Base Image\ndistroless/python3-debian12:nonroot@sha256:2d7a...\n(no shell · no curl · no package manager)"]
+        S3_LABELS["LABEL OCI Annotations\nimage.source · image.description\nimage.licenses · +CI-injected labels"]
+        S3_DEPS["COPY --from=dependency-builder\n/install/lib/python3.12/site-packages\n→ /usr/local/lib/python3.12/site-packages"]
+        S3_SRC["COPY --chown=65534:65534\nsrc/ → /app/src/\npyproject.toml → /app/"]
+        S3_USER["USER 65534\n(distroless nonroot UID)"]
+        S3_WORKDIR["WORKDIR /app"]
+        S3_EXPOSE["EXPOSE 8080"]
+        S3_ENTRY["ENTRYPOINT\npython -m uvicorn src.main:app\n--host 0.0.0.0 --port 8080"]
 
-# Verify requirements file integrity before installing
-RUN sha256sum -c requirements-hash.txt || \
-    (echo "ERROR: requirements.txt integrity check failed" && exit 1)
+        S3_BASE --> S3_LABELS --> S3_DEPS --> S3_SRC --> S3_USER --> S3_WORKDIR --> S3_EXPOSE --> S3_ENTRY
+    end
 
-# Install dependencies into an isolated prefix
-RUN pip install \
-    --no-cache-dir \
-    --prefix=/install \
-    --requirement requirements.txt
-
-# ─────────────────────────────────────────────────────────────
-# Stage 2: Security scanning (optional — for local builds)
-# In CI, Trivy runs externally; this stage enables local scan
-# ─────────────────────────────────────────────────────────────
-FROM aquasec/trivy:0.51.1@sha256:3ebf78e920b3e6e9b97f99ce70c6d3e8be726c17fa34d7ee7a16be8a79a3e643 \
-    AS security-scanner
-
-COPY --from=dependency-builder /install /install
-# Scan installed packages; fail on CRITICAL findings
-RUN trivy filesystem --exit-code 1 --severity CRITICAL --no-progress /install \
-    || (echo "WARN: Trivy not available in local build; CI will scan" && exit 0)
-
-# ─────────────────────────────────────────────────────────────
-# Stage 3: Final runtime image
-# Distroless: no shell, no curl, no package manager
-# ─────────────────────────────────────────────────────────────
-FROM gcr.io/distroless/python3-debian12:nonroot@sha256:2d7ac4949dca6b52fd3c2f6ee8cedb52e9b56e4bf18ce97869cbf50ce04c1bc6 \
-    AS runtime
-
-# OCI image annotations (required by container policy)
-LABEL org.opencontainers.image.source="https://github.com/example/api" \
-      org.opencontainers.image.description="Example FastAPI service" \
-      org.opencontainers.image.licenses="MIT"
-# Note: revision, created, and version labels are injected by CI
-# docker build --label org.opencontainers.image.revision=$(git rev-parse HEAD) ...
-
-# Copy installed dependencies from builder stage
-COPY --from=dependency-builder /install/lib/python3.12/site-packages \
-     /usr/local/lib/python3.12/site-packages
-
-# Copy application source (non-secret files only)
-COPY --chown=65534:65534 src/ /app/src/
-COPY --chown=65534:65534 pyproject.toml /app/
-
-# Distroless nonroot image uses UID 65534 by default
-# This is set in the base image; we document it explicitly
-USER 65534
-
-WORKDIR /app
-
-# Expose only the application port
-EXPOSE 8080
-
-# Use exec form to avoid shell interpretation
-ENTRYPOINT ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+    S1_OUT -- "artifacts forwarded" --> S2_COPY
+    S1_OUT -- "site-packages forwarded" --> S3_DEPS
+    S2_SCAN -. "scan gate (local builds)" .-> S3_BASE
 ```
 
 ### 9.2 Terraform Security with Checkov
@@ -2639,3 +2331,4 @@ jobs:
           category: trivy-image
 
       - name: Install Syft for SBOM generation
+```

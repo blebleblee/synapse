@@ -619,7 +619,7 @@ Implement a recovery protocol for a counter that has entered an undefined state.
 4. If normal operation resumes, the failure was a soft state corruption, not component damage
 
 **Clock Integrity Verification:**
-1. Measure clock signal at function generator output: should show clean square wave with <2ns rise time
+1. Measure clock signal at function generator output: should show clean square wave with < 2ns rise time
 2. Measure clock signal at each flip-flop clock input: should match generator within 50 mV amplitude and 5ns timing
 3. If clock shows ringing >500 mV peak-to-peak, add 100Ω series damping resistor at source
 4. If clock exhibits slow rise time >10ns, reduce load capacitance by shortening wires or buffering with 74LS244 octal buffer
@@ -645,8 +645,8 @@ This third exercise establishes that digital logic reliability emerges from disc
 This reference guide consolidates the diagnostic procedures, measurement techniques, and troubleshooting protocols developed throughout the laboratory exercises into a systematic checklist for field deployment and production debugging.
 
 **Pre-Flight Verification (Before Energizing Any New Circuit):**
-- Measure continuity between all VCC pins and positive power rail; resistance should read <1Ω
-- Measure continuity between all GND pins and ground rail; resistance should read <1Ω
+- Measure continuity between all VCC pins and positive power rail; resistance should read < 1Ω
+- Measure continuity between all GND pins and ground rail; resistance should read < 1Ω
 - Measure resistance between VCC and GND rails; should exceed 100kΩ (no short circuits)
 - Verify polarity of all electrolytic capacitors using visual inspection of stripe marking
 - Confirm presence of 0.1µF bypass capacitor within 1 cm of every IC power pin
@@ -654,16 +654,16 @@ This reference guide consolidates the diagnostic procedures, measurement techniq
 
 **Power Supply Quality Metrics:**
 - DC voltage at every IC VCC pin: 5.00V ±5% (4.75V to 5.25V acceptable range)
-- AC ripple on VCC rail measured with oscilloscope AC coupling: <50 mV peak-to-peak
-- Ground bounce during switching transients: <200 mV observed on GND rail
+- AC ripple on VCC rail measured with oscilloscope AC coupling: < 50 mV peak-to-peak
+- Ground bounce during switching transients: < 200 mV observed on GND rail
 - Power supply current capacity: minimum 10 mA per 74LS IC, 2 mA per 74HC IC
 - Transient response time to load step: VCC should recover within 10µs after sudden load change
 
 **Logic Level Voltage Standards:**
 - VOH (output HIGH voltage) under 10 mA source current: >2.7V for LS, >4.5V for HC at 5V supply
-- VOL (output LOW voltage) under 10 mA sink current: <0.5V for LS, <0.1V for HC
+- VOL (output LOW voltage) under 10 mA sink current: < 0.5V for LS, < 0.1V for HC
 - VIH (input HIGH threshold): >2.0V guaranteed recognition as logic HIGH
-- VIL (input LOW threshold): <0.8V guaranteed recognition as logic LOW
+- VIL (input LOW threshold): < 0.8V guaranteed recognition as logic LOW
 - Noise margin HIGH (VOH - VIH): >0.7V minimum for reliable operation
 - Noise margin LOW (VIL - VOL): >0.3V minimum for reliable operation
 
@@ -685,11 +685,11 @@ This reference guide consolidates the diagnostic procedures, measurement techniq
 - 74LS-series: each input loads the driving output with 0.5 mA sink (IIL) and 20 µA source (IIH)
 - 74LS-series: each output can sink 8 mA (IOL) and source 400 µA (IOH)
 - Fan-out calculation: LS can drive 16 LS inputs in LOW state (8mA / 0.5mA), 20 inputs in HIGH state
-- 74HC-series: inputs draw <1 µA, outputs drive ±4 mA typical, permitting fan-out >50 for HC loads
+- 74HC-series: inputs draw < 1 µA, outputs drive ±4 mA typical, permitting fan-out >50 for HC loads
 - Mixed loading: calculate worst-case as sum of all input currents vs. output drive capability
 
 **Oscilloscope Measurement Setup for Digital Circuits:**
-- Bandwidth: minimum 5× the signal frequency, or 100 MHz minimum for <20ns rise-time signals
+- Bandwidth: minimum 5× the signal frequency, or 100 MHz minimum for < 20ns rise-time signals
 - Probe: 10× passive probe (10 MΩ input, 10 pF loading) for minimal circuit perturbation
 - Coupling: DC coupling for absolute voltage levels, AC coupling only for ripple/noise analysis
 - Trigger: edge trigger on clock or data signal with trigger level set to 50% of logic swing
@@ -745,20 +745,20 @@ This reference guide consolidates the diagnostic procedures, measurement techniq
 - Topology: star distribution from central buffer IC (74LS244) to all sequential elements
 - Trace length: match within ±5 mm (1 ns skew) for all clock loads in critical timing paths
 - Termination: series 100Ω resistor at source end for ringing reduction on long traces
-- Jitter specification: clock edge timing uncertainty must remain <10% of setup time
+- Jitter specification: clock edge timing uncertainty must remain < 10% of setup time
 - Duty cycle: maintain 40-60% duty cycle for flip-flops requiring minimum pulse width
 
 **Environmental Stress Testing Parameters:**
 - Temperature range: -40°C to +85°C for commercial 74LS/74HC (industrial grade)
 - Supply voltage range: 4.5V to 5.5V (74LS), 2.0V to 6.0V (74HC)
-- Humidity exposure: <85% RH non-condensing to prevent leakage currents
+- Humidity exposure: < 85% RH non-condensing to prevent leakage currents
 - ESD protection: human body model >2kV for 74HC, >1kV for 74LS
 
 **Signal Integrity Verification Checklist:**
 - Rise time: 2-10 ns for 74LS outputs, 1-5 ns for 74HC at light loads
 - Fall time: typically 10-20% faster than rise time due to stronger sink current
-- Overshoot: <10% of logic swing or <500 mV, whichever is stricter
-- Undershoot: <300 mV below ground, exceeding this risks substrate injection
+- Overshoot: < 10% of logic swing or < 500 mV, whichever is stricter
+- Undershoot: < 300 mV below ground, exceeding this risks substrate injection
 - Ringing frequency: if oscillation observed, calculate L and C of parasitic transmission line
 
 This operational reference guide provides the measurement procedures and diagnostic decision trees necessary to troubleshoot digital logic failures in laboratory and production environments. The practitioner equipped with these protocols approaches circuit debugging as a systematic hypothesis-testing discipline rather than random component swapping.

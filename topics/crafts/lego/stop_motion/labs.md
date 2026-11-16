@@ -233,11 +233,11 @@ This concluding section consolidates operational parameters, troubleshooting dec
 - Tool: Transparent mm-graduated ruler for all translation measurements, graph paper protractor for rotation angles
 
 **Mechanical Stability Thresholds:**
-- Acceptable lateral drift: <1 mm per 20 frames (detectable but correctable in post-production)
+- Acceptable lateral drift: < 1 mm per 20 frames (detectable but correctable in post-production)
 - Critical lateral drift: >2 mm per 20 frames (requires capture restart or frame-by-frame correction)
-- Acceptable vertical settling: <0.5 mm per 30 frames
+- Acceptable vertical settling: < 0.5 mm per 30 frames
 - Critical vertical settling: >1 mm per 30 frames (requires mid-sequence height correction or figure replacement)
-- Rotational tolerance: <3° cumulative yaw error across sequence (beyond 5° creates perceptible wobble at playback speed)
+- Rotational tolerance: < 3° cumulative yaw error across sequence (beyond 5° creates perceptible wobble at playback speed)
 
 **Frame Assembly Command Templates:**
 
@@ -266,23 +266,23 @@ ffmpeg -framerate 12 -i frame-%04d.jpg -vf "minterpolate=fps=24:mi_mode=mci" -c:
 Symptom: Stuttering or velocity discontinuity during playback  
 → Measure frame-to-frame displacement across sequence  
 → If variance >50% between adjacent frames: Identify affected frames, re-capture with calibrated increments  
-→ If variance <50%: Apply optical flow interpolation or frame blending in post
+→ If variance < 50%: Apply optical flow interpolation or frame blending in post
 
 Symptom: Lateral wobble or rotational oscillation  
 → Export frames 1, N/2, and N to image editor  
 → Overlay with difference blend mode to measure cumulative drift  
-→ If drift <3°: Apply digital stabilization (Blender tracking or DaVinci Resolve stabilization)  
+→ If drift < 3°: Apply digital stabilization (Blender tracking or DaVinci Resolve stabilization)  
 → If drift >5°: Manual frame registration required or sequence re-capture
 
 Symptom: Lighting flicker or color shift  
 → Sample RGB values from neutral surface across affected frames  
 → Calculate luminance using $L = 0.299R + 0.587G + 0.114B$  
-→ If luminance variance <15%: Color grade with gamma and offset corrections  
+→ If luminance variance < 15%: Color grade with gamma and offset corrections  
 → If luminance variance >15%: Check for lamp failure, restore hardware consistency, re-capture affected segment
 
 Symptom: Vertical settling (figure lowers over sequence duration)  
 → Measure torso height in first and last frames  
-→ If settling <0.5 mm: Acceptable, no correction required  
+→ If settling < 0.5 mm: Acceptable, no correction required  
 → If settling 0.5-1 mm: Insert corrective spacer plate mid-sequence, apply keyframed position correction in post  
 → If settling >1 mm: Replace figure with tighter-clutch alternative, re-capture sequence
 
@@ -340,6 +340,6 @@ Track these metrics across projects to measure operational proficiency growth:
 - **Capture efficiency:** Frames captured per hour (target: >60 frames/hour for simple motion, >30 frames/hour for complex compound motion)
 - **First-pass success rate:** Percentage of sequences requiring no re-capture (target: >75% after completing these three exercises)
 - **Displacement precision:** Average deviation from planned incremental motion (target: ±0.5 mm for translation, ±3° for rotation)
-- **Post-production correction ratio:** Frames requiring digital correction ÷ total frames captured (target: <10%)
+- **Post-production correction ratio:** Frames requiring digital correction ÷ total frames captured (target: < 10%)
 
 These operational verification laboratories establish foundational competency in stop motion animation mechanics, material behavior, and systematic failure recovery. Mastery derives from deliberate practice across hundreds of frames—the tactile calibration required to advance a minifigure 3 mm while maintaining rotational alignment emerges only through repeated execution and empirical feedback. Archive your completed sequences, laboratory notebook entries, and failure-mode documentation as the foundation for increasingly complex animation projects.

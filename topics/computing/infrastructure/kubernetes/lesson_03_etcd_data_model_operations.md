@@ -680,17 +680,35 @@ sequenceDiagram
 ### Compaction and Defragmentation State Machine
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Running: etcd starts
-    Running --> Compacting: auto-compaction timer fires\nor manual compact RPC
-    Compacting --> Running: logical compaction complete\n(key index updated, bbolt freelist updated)
-    Running --> Defragmenting: manual defrag RPC
-    Defragmenting --> Running: bbolt file rewritten\ndisk space reclaimed
-    Running --> Snapshotting: snapshot save RPC\nor Raft log truncation
-    Snapshotting --> Running: bbolt pages streamed\nto snapshot file
-    Running --> [*]: etcd exits
-    note right of Compacting: Frees pages in bbolt freelist\nbut does NOT shrink the file
-    note right of Defragmenting: Rewrites db file;\nbriefly pauses writes on this member
+flowchart TD
+    START((" ")):::terminal
+    Running["Running"]
+    Compacting["Compacting"]
+    Defragmenting["Defragmenting"]
+    Snapshotting["Snapshotting"]
+    END((" ")):::terminal
+
+    NoteCompacting["Frees pages in bbolt freelist\nbut does NOT shrink the file"]:::note
+    NoteDefrag["Rewrites db file;\nbriefly pauses writes on this member"]:::note
+
+    START -->|"etcd starts"| Running
+
+    Running -->|"auto-compaction timer fires\nor manual compact RPC"| Compacting
+    Compacting -->|"logical compaction complete\n(key index updated, bbolt freelist updated)"| Running
+
+    Running -->|"manual defrag RPC"| Defragmenting
+    Defragmenting -->|"bbolt file rewritten\ndisk space reclaimed"| Running
+
+    Running -->|"snapshot save RPC\nor Raft log truncation"| Snapshotting
+    Snapshotting -->|"bbolt pages streamed\nto snapshot file"| Running
+
+    Running -->|"etcd exits"| END
+
+    Compacting -. " " .- NoteCompacting
+    Defragmenting -. " " .- NoteDefrag
+
+    classDef terminal fill:#111,stroke:#111,color:#111,width:18px,height:18px
+    classDef note fill:#fffde7,stroke:#f9a825,color:#333,font-size:12px,text-align:left
 ```
 
 ## Key Architectural Invariants: A Reference

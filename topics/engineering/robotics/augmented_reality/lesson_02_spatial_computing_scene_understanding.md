@@ -131,6 +131,21 @@ Robotic spatial computing operates under strict real-time constraints: autonomou
 
 **Loop Closure Failures**: Revisit detection based on visual similarity (bag-of-words, place recognition networks) occasionally produces false positives, introducing contradictory loop constraints that corrupt the global map. Solution: apply geometric consistency checks before accepting loop constraints; verify that the proposed loop closure is consistent with odometry and existing constraints within a probabilistic bound.
 
-**Semantic Segmentation Hallucination**: Deep networks occasionally misclassify scenes due to distribution shift (objects or lighting not present in training data). A robot relying blindly on segmentation labels may grasp incorrectly. Mitigation: integrate segmentation with geometric reasoning; if segmentation assigns "metal part" to a region but geometric analysis reveals it's reflective glass (high specularity), flag the classification as uncertain and apply alternative strategies (e.g., request human intervention or default to safe fallback behaviors).
+**Semantic Segmentation Hallucination**: Deep networks occasionally misclassify scenes due to distribution shift (objects or lighting not present in training data). A robot relying blindly on segmentation labels may grasp incorrectly.
 
-**Drift in
+**Mitigation**: maintain semantic prediction confidence scores; threshold acceptance based on task-critical reliability (e.g., reject grasp candidates below 95% confidence for fragile objects). Cross-validate with geometric priors: if segmentation labels a thin object as "table," geometry inconsistency (thin structure, vertical normal) overrides the semantic label. Multi-modal fusion reduces hallucination—combine vision-based segmentation with tactile confirmation or geometry-based shape matching.
+
+**Temporal Incoherence in Dynamic Scenes**: Moving objects violate the static-world assumption underlying SLAM and mapping. When pedestrians or vehicles traverse the scene, stereo depth may be valid instantaneously but contradicts previous observations at the same spatial location. Solution: detect dynamic regions via temporal consistency checks (optical flow, change detection) and exclude them from map updates. Alternatively, maintain dual representations: a persistent static map for localization and a transient occupancy grid tracking dynamic obstacles. Robust systems degrade gracefully—falling back to odometry-only tracking when scene dynamics overwhelm mapping assumptions, then re-engaging full SLAM once the scene stabilizes.
+
+---
+
+## Summary & Verification Matrix
+
+| **Invariant / Mechanism** | **Core Principle** | **Failure Mode** | **Diagnostic Criterion** | **Mitigation Strategy** |
+|---|---|---|---|---|
+| **Stereo Triangulation** | Disparity inversely proportional to depth; requires baseline B and focal length f | Textureless regions yield no correspondence | Gradient magnitude < threshold in correspondence window | Augment with active sensing (structured light/lidar) in low-texture zones |
+| **SLAM Pose Graph Optimization** | Minimize sum of squared errors over odometry and loop-closure constraints | False loop closures introduce contradictory edges | χ² residual exceeds probabilistic bound after loop insertion | Apply geometric consistency checks; reject loops violating odometry confidence intervals |
+| **Truncated Signed Distance Functions (TSDF)** | Weighted averaging of signed distances within truncation band | Sensor noise causes voxel churn in dynamic scenes | Temporal variance of voxel occupancy > noise floor | Mask dynamic regions via optical flow; exclude from integration |
+| **Semantic Segmentation Fusion** | Probabilistic label propagation via ray-casting votes | Neural network hallucination under distribution shift | Prediction confidence < task-specific threshold (e.g., 95% for safety-critical) | Cross-validate with geometric priors; reject labels inconsistent with shape/normal analysis |
+| **Octree Spatial Indexing** | Logarithmic query complexity O(log N) for volumetric data | Memory overhead scales with subdivisions | Leaf node count exceeds memory budget | Adaptive resolution: fine voxels near surfaces, coarse in free/unknown space |
+| **Loop Closure Detection** | Place recognition (BoW, embeddings) triggers global optimization | Perceptual aliasing causes false positives in repetitive environments | RANSAC inlier ratio < 30% for proposed transform | Require temporal proximity (nearby poses) or multi-hypothesis tracking before accepting closure |

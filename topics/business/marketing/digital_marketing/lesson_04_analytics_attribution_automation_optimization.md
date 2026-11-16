@@ -50,11 +50,16 @@ Marketing mix modeling offers an alternative attribution approach that operates 
 
 Funnel conversion rate calculation proceeds by defining sequential stages—awareness, consideration, preference, purchase—and measuring the percentage of users who advance from each stage to the next. A typical B2B SaaS funnel might decompose as:
 
-```
-Anonymous Website Visitors: 50,000/month
-├─> Trial Signups (3% CVR): 1,500/month
-    ├─> Activated Users (40% CVR): 600/month
-        ├─> Paying Customers (15% CVR): 90/month
+```mermaid
+flowchart TD
+    A["Anonymous Website Visitors<br/>50,000/month"]
+    B["Trial Signups<br/>1,500/month<br/>(3% CVR)"]
+    C["Activated Users<br/>600/month<br/>(40% CVR)"]
+    D["Paying Customers<br/>90/month<br/>(15% CVR)"]
+    
+    A --> B
+    B --> C
+    C --> D
 ```
 
 The overall conversion rate from visitor to customer is 0.18%, but the stage-level decomposition reveals that activation (getting trial users to experience the product's core value) represents the critical bottleneck, with 900 users (60% of trials) abandoning before activation. Customer acquisition cost calculation divides total marketing spend by new customer count, but the numerator definition varies dramatically by organizational convention. A narrow CAC includes only media spend—the dollars paid to Google, Facebook, and other advertising platforms. A broader CAC adds agency fees, attribution software licensing, creative production costs, and potentially even a fully-loaded headcount allocation for the marketing team. The denominator definition demands equal precision: does a "customer" mean any first-time purchaser, or only those exceeding a minimum order value threshold? For subscription businesses, does a free trial count as a customer or only paid conversions? A rigorous CAC definition documents these inclusion rules explicitly and calculates variants—media CAC, fully-loaded CAC, paid CAC excluding organic—to support different analytical contexts.
@@ -75,22 +80,36 @@ CAC payback period measures how many months of gross profit are required to reco
 
 Email marketing automation architecture centers on event-triggered workflows that subscribe users to message sequences based on behavioral signals. The technical implementation relies on an event bus that streams user actions—signup, purchase, feature adoption, inactivity—into a workflow engine that evaluates trigger conditions and enqueues scheduled messages. A cart abandonment workflow illustrates the core mechanics:
 
-```
-Trigger: User adds product to cart AND does NOT complete purchase within 2 hours
-Actions:
-  └─> Wait 2 hours
-      └─> Check: Has user completed purchase? 
-          ├─> Yes: Exit workflow
-          └─> No: Send "You left items in your cart" email with product images and checkout link
-              └─> Wait 24 hours
-                  └─> Check: Has user completed purchase?
-                      ├─> Yes: Exit workflow
-                      └─> No: Send "Still thinking it over?" email with 10% discount code
-                          └─> Wait 48 hours
-                              └─> Check: Has user completed purchase?
-                                  ├─> Yes: Exit workflow
-                                  └─> No: Send "Last chance" email noting discount expires in 24 hours
-                                      └─> End workflow
+```mermaid
+flowchart TD
+    trigger["Trigger: User adds product to cart<br/>AND does NOT complete purchase within 2 hours"]
+    wait1["Wait 2 hours"]
+    check1{"Has user<br/>completed purchase?"}
+    exit1["Exit workflow"]
+    email1["Send 'You left items in your cart' email<br/>with product images and checkout link"]
+    wait2["Wait 24 hours"]
+    check2{"Has user<br/>completed purchase?"}
+    exit2["Exit workflow"]
+    email2["Send 'Still thinking it over?' email<br/>with 10% discount code"]
+    wait3["Wait 48 hours"]
+    check3{"Has user<br/>completed purchase?"}
+    exit3["Exit workflow"]
+    email3["Send 'Last chance' email<br/>noting discount expires in 24 hours"]
+    end_workflow["End workflow"]
+
+    trigger --> wait1
+    wait1 --> check1
+    check1 -->|Yes| exit1
+    check1 -->|No| email1
+    email1 --> wait2
+    wait2 --> check2
+    check2 -->|Yes| exit2
+    check2 -->|No| email2
+    email2 --> wait3
+    wait3 --> check3
+    check3 -->|Yes| exit3
+    check3 -->|No| email3
+    email3 --> end_workflow
 ```
 
 The workflow combines temporal delays with conditional branching that checks whether the triggering condition still applies before sending each message, preventing the common failure mode of messaging users about abandoned carts they have already purchased. Suppression logic adds additional safety checks: users who have unsubscribed from marketing emails, users who have received more than N messages in the past 7 days (frequency capping), and users who have explicitly opted out of cart abandonment reminders specifically. The implementation typically relies on a workflow engine like Iterable, Braze, Customer.io, or Klaviyo that provides a visual workflow builder, connects to your event stream via API or SDK, and manages the state tracking for millions of in-flight workflows across your user base.

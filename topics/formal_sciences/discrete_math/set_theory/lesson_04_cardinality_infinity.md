@@ -93,35 +93,23 @@ There is no largest cardinality, and no cardinality at the top of the hierarchy.
 
 The structural picture of cardinality comparison can be summarized through the following diagram, which traces the principal sets encountered in discrete mathematics and analysis:
 
-```
-Cardinality Hierarchy
-─────────────────────────────────────────────────────────────
-
-UNCOUNTABLE ┌─────────────────────────────────────────────┐
-            │  𝔠 = 2^ℵ₀  (Continuum cardinality)         │
-            │  Examples: ℝ, ℂ, ℝⁿ (any finite n),        │
-            │            𝒫(ℕ), {0,1}^ℕ, irrational numbers│
-            └──────────────────┬──────────────────────────┘
-                               │  Cantor: strict inequality
-                               │  |ℕ| < |ℝ|
-            ┌──────────────────┴──────────────────────────┐
-COUNTABLE   │  ℵ₀  (Countably infinite cardinality)       │
-INFINITE    │  Examples: ℕ, ℤ, ℚ, algebraic numbers,     │
-            │            finite strings, Turing machines  │
-            └──────────────────┬──────────────────────────┘
-                               │  Finite sets inject into ℕ
-            ┌──────────────────┴──────────────────────────┐
-FINITE      │  n ∈ {0,1,2,3,...}                          │
-            │  Examples: {∅}, {a,b,c}, ℤ/nℤ, Sₙ          │
-            └─────────────────────────────────────────────┘
-
-Key relations:
-  |A| ≤ |B|  ⟺  ∃ injection   f: A → B
-  |A| = |B|  ⟺  ∃ bijection   f: A → B
-  |A| < |B|  ⟺  |A| ≤ |B| and |A| ≠ |B|
-
-Schröder-Bernstein: |A|≤|B| and |B|≤|A|  ⟹  |A|=|B|
-Cantor General:     |A| < |𝒫(A)| for every set A
+```mermaid
+flowchart TD
+    uncountable["<b>UNCOUNTABLE</b><br/>𝔠 = 2^ℵ₀ (Continuum cardinality)<br/>Examples: ℝ, ℂ, ℝⁿ (any finite n),<br/>𝒫(ℕ), {0,1}^ℕ, irrational numbers"]
+    
+    countable["<b>COUNTABLE INFINITE</b><br/>ℵ₀ (Countably infinite cardinality)<br/>Examples: ℕ, ℤ, ℚ, algebraic numbers,<br/>finite strings, Turing machines"]
+    
+    finite["<b>FINITE</b><br/>n ∈ {0,1,2,3,...}<br/>Examples: {∅}, {a,b,c}, ℤ/nℤ, Sₙ"]
+    
+    relations["<b>Key relations:</b><br/>|A| ≤ |B| ⟺ ∃ injection f: A → B<br/>|A| = |B| ⟺ ∃ bijection f: A → B<br/>|A| < |B| ⟺ |A| ≤ |B| and |A| ≠ |B|"]
+    
+    theorems["<b>Fundamental theorems:</b><br/>Schröder-Bernstein: |A|≤|B| and |B|≤|A| ⟹ |A|=|B|<br/>Cantor General: |A| < |𝒫(A)| for every set A"]
+    
+    uncountable -->|"Cantor: strict inequality<br/>|ℕ| < |ℝ|"| countable
+    countable -->|"Finite sets inject into ℕ"| finite
+    
+    finite -.-> relations
+    relations -.-> theorems
 ```
 
 **Countability in the Theory of Formal Languages.** The practical import of countability theory for theoretical computer scientists deserves detailed attention. Fix a finite alphabet $\Sigma = \{0, 1\}$ for concreteness. The set $\Sigma^* = \bigcup_{n=0}^{\infty} \Sigma^n$ of all finite binary strings is countable: $\Sigma^n$ is finite with exactly $2^n$ elements, and a countable union of finite sets is countable. We can exhibit the bijection from $\mathbb{N}$ to $\Sigma^*$ explicitly by interpreting each positive integer $n$ in binary and stripping its leading 1-bit to recover a canonical string of length $\lfloor \log_2 n \rfloor$:

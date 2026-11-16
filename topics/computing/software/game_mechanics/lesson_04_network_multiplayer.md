@@ -20,27 +20,30 @@ Understanding these three invariants before writing a line of network code will 
 
 The dominant pattern in competitive and cooperative multiplayer is the **dedicated authoritative server** model, in which a headless server process owns the canonical simulation and all clients send input, receive state deltas, and render a locally interpolated approximation of that truth. This architecture exists primarily as a cheat-prevention strategy: if no client owns the simulation, no client can directly manipulate physics, hit detection, or inventory state without the server's consent. It trades raw simplicity for security and consistency.
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         GAME SERVER                              │
-│                                                                  │
-│   ┌─────────────┐    ┌──────────────┐    ┌──────────────────┐   │
-│   │  Input      │───▶│  Authoritative│───▶│  State Snapshot  │   │
-│   │  Ring Buffer│    │  Simulation  │    │  Broadcaster     │   │
-│   └─────────────┘    │  (Tick Loop) │    └──────────────────┘   │
-│                       └──────────────┘              │            │
-└─────────────────────────────────────────────────────┼────────────┘
-                                                       │
-           ┌───────────────────────────────────────────┤
-           │                                           │
-           ▼                                           ▼
-┌──────────────────────┐                   ┌──────────────────────┐
-│      CLIENT A        │                   │      CLIENT B        │
-│                      │                   │                      │
-│  Local Prediction    │                   │  Local Prediction    │
-│  Render (interp.)    │                   │  Render (interp.)    │
-│  Input → UDP frame   │                   │  Input → UDP frame   │
-└──────────────────────┘                   └──────────────────────┘
+```mermaid
+flowchart TD
+    subgraph server["GAME SERVER"]
+        InputRing["Input Ring Buffer"]
+        AuthSim["Authoritative Simulation<br/>(Tick Loop)"]
+        StateSnap["State Snapshot<br/>Broadcaster"]
+        
+        InputRing -->|feed| AuthSim
+        AuthSim -->|broadcast| StateSnap
+    end
+    
+    StateSnap -->|"state updates"| ClientA
+    StateSnap -->|"state updates"| ClientB
+    
+    subgraph clientA["CLIENT A"]
+        PredA["Local Prediction<br/>Render interpolation<br/>Input → UDP frame"]
+    end
+    
+    subgraph clientB["CLIENT B"]
+        PredB["Local Prediction<br/>Render interpolation<br/>Input → UDP frame"]
+    end
+    
+    ClientA -.->|UDP input| InputRing
+    ClientB -.->|UDP input| InputRing
 ```
 
 The server runs a fixed-timestep simulation loop, commonly at 20–128 ticks per second depending on the game genre. A first-person shooter demands tighter tick rates (64–128 Hz) because precise hit detection requires fine temporal resolution; a turn-based strategy game might run at 20 Hz or synchronize only on player actions. At each tick, the server processes all buffered inputs from connected clients, advances the simulation, and broadcasts a state update. The state update may be a full snapshot of relevant world state or a delta-encoded diff against the last acknowledged snapshot—a distinction with enormous bandwidth implications.

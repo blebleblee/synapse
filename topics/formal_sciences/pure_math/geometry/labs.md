@@ -474,4 +474,62 @@ print("Gauss-Bonnet theorem on S^2: VERIFIED (∫∫K dA = 4π)")
 
 The Wu–Ritt characteristic set method and the Buchberger algorithm for Gröbner bases provide the algebraic backbone of automated geometric theorem proving. The fundamental idea is to translate a geometric configuration into a system of polynomial equations (hypotheses), translate the conclusion into a polynomial equation or inequality, and then reduce the conclusion polynomial modulo the Gröbner basis of the hypothesis ideal. If the reduction yields zero, the conclusion is an algebraic consequence of the hypotheses.
 
-We demonstrate this methodology on the classical theorem that the diagonals of a parallelogram bisect each other. The parallelogram $ABCD$ is defined by its vertex coordinates
+We demonstrate this methodology on the classical theorem that the diagonals of a parallelogram bisect each other.
+
+```python
+from sympy import symbols, groebner, poly, reduce, GF
+from sympy.polys.orderings import lex
+
+# Coordinates: parallelogram ABCD with A at origin
+# A = (0,0), B = (b1,b2), D = (d1,d2), C = B+D
+# Midpoint of AC = ((b1+d1)/2, (b2+d2)/2)
+# Midpoint of BD = ((b1+d1)/2, (b2+d2)/2)
+# These are equal by construction, but we verify via ideal membership.
+
+x1, y1, x2, y2, x3, y3, x4, y4, mx, my = symbols(
+    'x1 y1 x2 y2 x3 y3 x4 y4 mx my'
+)
+
+# Hypotheses: ABCD is a parallelogram
+# A=(x1,y1), B=(x2,y2), C=(x3,y3), D=(x4,y4)
+# Parallelogram condition: C - B = D - A, i.e., x3-x2 = x4-x1, y3-y2 = y4-y1
+h1 = x3 - x2 - x4 + x1
+h2 = y3 - y2 - y4 + y1
+
+# Midpoint of diagonal AC
+h3 = 2*mx - x1 - x3
+h4 = 2*my - y1 - y3
+
+# Conclusion: midpoint of BD equals (mx, my)
+# i.e., x2 + x4 = x1 + x3 and y2 + y4 = y1 + y3
+conclusion_x = 2*mx - x2 - x4
+conclusion_y = 2*my - y2 - y4
+
+hypotheses = [h1, h2, h3, h4]
+variables = [x1, y1, x2, y2, x3, y3, x4, y4, mx, my]
+
+G = groebner(hypotheses, variables, order='lex')
+_, rem_x = poly(conclusion_x, variables).div(G)
+_, rem_y = poly(conclusion_y, variables).div(G)
+
+assert rem_x == 0, f"conclusion_x not in ideal, remainder: {rem_x}"
+assert rem_y == 0, f"conclusion_y not in ideal, remainder: {rem_y}"
+print("Gröbner basis reduction: diagonals of parallelogram bisect each other: VERIFIED")
+```
+
+The Gröbner basis reduction confirms that both conclusion polynomials reduce to zero modulo the hypothesis ideal, constituting a complete algebraic proof that the diagonals of any parallelogram bisect each other. This approach generalizes directly: any projective or affine theorem expressible as polynomial hypotheses and a polynomial conclusion can be subjected to the same mechanical test, converting geometric intuition into decidable ideal membership. The computational complexity is controlled by the degree and number of hypotheses, and the lexicographic ordering of the Gröbner basis makes the elimination structure explicit, allowing the algorithm to serve not only as a verifier but as a certificate generator whose steps can be inspected and translated back into human-readable geometric reasoning.
+
+Taken together, the three exercise tracks of this lab establish the methodological unity underlying computational geometry: symbolic coordinate methods anchor classical Euclidean statements in polynomial arithmetic; differential-geometric computations over parametric surfaces make intrinsic invariants such as Gaussian curvature and the Euler characteristic computable and verifiable to machine precision; and algebraic decision procedures via Gröbner bases transform theorem proving into a terminating algorithmic process. Each method is not merely a numerical check but a formal certificate, grounded in the algebraic structure of the underlying geometric object and reproducible by any compliant implementation of the relevant symbolic computation system.
+
+---
+
+## Summary & Verification Matrix
+
+| Governing Invariant | Formal Definition | Core Mechanism | Canonical Test Case | Diagnostic Criterion | Failure Signature |
+|---|---|---|---|---|---|
+| **Cross-ratio (projective)** | $(AB;CD) = \frac{AC \cdot BD}{BC \cdot AD}$ (signed, affine coords) | Invariance under Möbius / projective transformations; computed from coordinate differences | Four collinear points under a projective map | Numerical equality of cross-ratio before and after transformation to within floating-point tolerance | Ratio drift exceeding tolerance indicates incorrect transformation matrix or coordinate assignment |
+| **Gaussian curvature K** | $K = (eg - f^2)/(EG - F^2)$, second over first fundamental form | Intrinsic; depends only on the metric $g_{ij}$; computable from partial derivatives of parametrization | Unit sphere $S^2$: expected $K \equiv 1$ everywhere | `simplify(K - 1) == 0` in symbolic computation; residual nonzero implies parametrization error | Nonzero residual after simplification signals incorrect normal vector, sign error in second fundamental form, or degenerate parametrization |
+| **Gauss–Bonnet theorem** | $\iint_M K\, dA + \int_{\partial M} \kappa_g\, ds = 2\pi\chi(M)$ | Connects local curvature to global topology via Euler characteristic $\chi$; integral over closed surface | $S^2$: $\chi = 2$, so $\iint K\, dA = 4\pi$ | Symbolic double integral equals $4\pi$; mismatch with $2\pi\chi$ reveals topological or metric error | Integral yielding $2\pi$ (torus result) on a sphere indicates incorrect domain bounds or wrong surface parametrization |
+| **Ideal membership / Gröbner basis** | Polynomial $f$ is in ideal $I = \langle h_1,\ldots,h_k\rangle$ iff its remainder under division by the Gröbner basis $G(I)$ is zero | Buchberger algorithm computes $G(I)$ under a fixed monomial order; multivariate division is then deterministic | Parallelogram diagonal bisection: conclusion polynomials reduce to zero mod hypothesis ideal | `remainder == 0` after `poly.div(G)`; nonzero remainder means conclusion is not an algebraic consequence of hypotheses | Nonzero remainder indicates either an incorrect hypothesis encoding, a false geometric claim, or an insufficient set of hypothesis polynomials |
+| **First fundamental form coefficients** | $E = \mathbf{X}_u \cdot \mathbf{X}_u$, $F = \mathbf{X}_u \cdot \mathbf{X}_v$, $G = \mathbf{X}_v \cdot \mathbf{X}_v$ | Encodes the intrinsic metric of a surface; determines arc length, area, and angle between curves | Sphere: $E = 1$, $F = 0$, $G = \sin^2 u$ (standard spherical parametrization) | Symbolic equality of $E, F, G$ to expected closed forms after `simplify`; $F \neq 0$ on a coordinate-orthogonal parametrization is a red flag | $E$ or $G$ negative (non-Riemannian), or $EG - F^2 = 0$ (degenerate metric) signals a singular or incorrectly oriented parametrization |
+| **Affine invariants (centroid, area)** | Centroid $\bar{x} = \frac{1}{n}\sum x_i$; signed area $= \frac{1}{2}\lvert\sum (x_i y_{i+1} - x_{i+1} y_i)\rvert$ | Invariant under translation and rotation; area scales by $\lvert\det A\rvert$ under linear map $A$; centroid transforms covariantly | Regular polygon: centroid at geometric center; area matches closed-form formula | Centroid coordinates match analytic values; area ratio equals $\lvert\det A\rvert$ after any invertible affine transformation | Centroid displacement after a pure rotation indicates floating-point accumulation or incorrect vertex ordering; area ratio mismatch exposes a shear or scale error in the transformation |

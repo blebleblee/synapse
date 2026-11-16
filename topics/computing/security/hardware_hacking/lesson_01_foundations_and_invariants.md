@@ -97,7 +97,7 @@ Physical security measures—tamper-evident enclosures, epoxy potting, secure bo
 
 2. **Signal Radiation**: UART traces radiate electromagnetic energy proportional to current slew rate and trace geometry. While weak, these emissions can be captured using near-field probes (H-field loops or E-field monopoles) positioned close to the PCB. Differential analysis of radiated signals can reconstruct transmitted data without physical contact.
 
-3. **Non-Invasive Probing**: Modern logic analyzers use high-impedance probes (>1MΩ input impedance, <1pF capacitance) that can be attached to UART traces with minimal circuit loading. The attached probe draws negligible current, making the intrusion electrically undetectable by the target system.
+3. **Non-Invasive Probing**: Modern logic analyzers use high-impedance probes (>1MΩ input impedance, < 1pF capacitance) that can be attached to UART traces with minimal circuit loading. The attached probe draws negligible current, making the intrusion electrically undetectable by the target system.
 
 4. **Voltage Injection Through Shared Grounds**: Even if TX and RX lines are protected, UART requires a common ground reference. By injecting controlled currents into the ground plane, an attacker can modulate ground potential and induce noise that manifests as data corruption or exploitable timing variations.
 
@@ -297,8 +297,8 @@ graph TD
     UART_CTRL -->|"TX"| EXT_TX["External TX Line"]
     EXT_RX["External RX Line"] -->|"RX"| UART_CTRL
     
-    style UART_CTRL fill:#ffcccc
-    style MPU fill:#ccffcc
+    style UART_CTRL fill:#ffcccc,color:#0f172a
+    style MPU fill:#ccffcc,color:#0f172a
 ```
 
 **Key Architectural Components:**
@@ -346,8 +346,8 @@ graph TD
     TARGET_UART_TX["TX"] -.->|"Monitor"| PROBE_TX
     TARGET_UART_RX["RX"] -.->|"Monitor"| PROBE_RX
     
-    style ANALYZER fill:#ccccff
-    style TARGET_UART fill:#ffcccc
+    style ANALYZER fill:#ccccff,color:#0f172a
+    style TARGET_UART fill:#ffcccc,color:#0f172a
 ```
 
 **Analysis Workflow:**

@@ -120,37 +120,46 @@ Crop rotation introduces intertemporal diversification by altering pest pressure
 
 The mean-variance efficient frontier formalizes diversification benefits geometrically. Plotting expected return $\mathbb{E}[\pi]$ against standard deviation $\sigma[\pi]$ for all feasible crop mixes traces a concave frontier where northwest-most portfolios dominate. A farmer with mean-variance preferences selects the tangency point between the efficient frontier and an indifference curve, trading incremental expected return for reduced risk according to risk aversion intensity. Empirical estimation of the efficient frontier requires historical return covariances, often derived from county-level yield data and futures price time series, though structural breaks from climate change and technological advances complicate the use of historical covariances as forward-looking risk measures.
 
-```
-Agricultural Risk Management Architecture
-
-Farmer: Production Decisions (Acreage, Inputs)
-   ↓
-Production Uncertainty: Weather, Pests, Disease → Yield Y
-   ↓
-Price Uncertainty: Supply/Demand Shocks → Harvest Price p
-   ↓
-Revenue Realization: π = pYA - Costs
-   ↓
-Risk Management Layer:
-   ├─ Federal Crop Insurance (MPCI, RP)
-   │    ├─ Covers yield shortfalls below guarantee
-   │    ├─ Subsidized premiums encourage participation
-   │    └─ Moral hazard vs. basis risk trade-off
-   │
-   ├─ Futures/Options (CME Group)
-   │    ├─ Short futures hedge: lock in F_t(T)
-   │    ├─ Put options: floor price, preserve upside
-   │    └─ Basis risk: local cash vs. delivery point
-   │
-   ├─ Forward Contracts (Elevators)
-   │    ├─ Eliminate basis risk at delivery location
-   │    ├─ Introduce counterparty credit risk
-   │    └─ Reduced liquidity vs. exchange-traded
-   │
-   └─ On-Farm Diversification
-        ├─ Crop mix: exploit low correlation
-        ├─ Vertical integration: corn-hog hedge
-        └─ Rotation: intertemporal risk reduction
+```mermaid
+flowchart TD
+    A["Farmer: Production Decisions<br/>(Acreage, Inputs)"]
+    B["Production Uncertainty<br/>(Weather, Pests, Disease)<br/>→ Yield Y"]
+    C["Price Uncertainty<br/>(Supply/Demand Shocks)<br/>→ Harvest Price p"]
+    D["Revenue Realization<br/>π = pYA - Costs"]
+    
+    E["Risk Management Layer"]
+    
+    F["Federal Crop Insurance<br/>(MPCI, RP)"]
+    F1["Covers yield shortfalls<br/>below guarantee"]
+    F2["Subsidized premiums<br/>encourage participation"]
+    F3["Moral hazard vs.<br/>basis risk trade-off"]
+    
+    G["Futures/Options<br/>(CME Group)"]
+    G1["Short futures hedge:<br/>lock in F_t(T)"]
+    G2["Put options: floor price,<br/>preserve upside"]
+    G3["Basis risk: local cash<br/>vs. delivery point"]
+    
+    H["Forward Contracts<br/>(Elevators)"]
+    H1["Eliminate basis risk<br/>at delivery location"]
+    H2["Introduce counterparty<br/>credit risk"]
+    H3["Reduced liquidity vs.<br/>exchange-traded"]
+    
+    I["On-Farm Diversification"]
+    I1["Crop mix:<br/>exploit low correlation"]
+    I2["Vertical integration:<br/>corn-hog hedge"]
+    I3["Rotation:<br/>intertemporal risk reduction"]
+    
+    A --> B --> C --> D --> E
+    
+    E --> F
+    E --> G
+    E --> H
+    E --> I
+    
+    F --> F1 --> F2 --> F3
+    G --> G1 --> G2 --> G3
+    H --> H1 --> H2 --> H3
+    I --> I1 --> I2 --> I3
 ```
 
 Insurance and hedging interact through complementarity and substitution channels. Crop insurance covers yield risk that futures cannot hedge—a farmer selling futures forward locks in a price but remains exposed to yield shortfalls that prevent contract fulfillment. Conversely, futures hedge price risk that area-based insurance ignores—a county-based policy provides no protection against individual farm price declines if county yields remain stable. Revenue insurance combines both dimensions, substituting for separate yield insurance and futures hedging, though at a premium structure that may exceed the cost of unbundled instruments for farmers with idiosyncratic risk profiles.

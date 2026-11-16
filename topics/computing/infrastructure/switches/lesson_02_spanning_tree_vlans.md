@@ -30,33 +30,34 @@ The root bridge originates configuration BPDUs every hello time interval, typica
 
 Port role determination follows a strict precedence hierarchy. The root bridge has all ports in designated role since it is the tree root. Every non-root switch identifies exactly one root port: the port offering the lowest cost path to root, breaking ties first by lowest advertising bridge ID, then lowest advertising port ID, then lowest receiving port ID. For each network segment, the switch with the lowest root path cost to that segment becomes the designated bridge, and its port on that segment becomes the designated port. All other ports on that segment that are neither root nor designated enter blocking state. A key insight: each segment has exactly one designated port (or zero if no switches connect to it), ensuring no loops, while each non-root switch has exactly one root port, ensuring connectivity.
 
-```
-         Root Bridge (Priority 4096)
-         Switch A - All Ports Designated
-              |
-              | Cost 4 (1 Gbps)
-              |
-         ┌────┴─────┐
-         |          |
-    Switch B    Switch C
-    (Priority    (Priority
-     32768)       32768)
-         
-Switch B:
-  - Port 1 (to A): Root Port, Cost 4
-  - Port 2 (to C): Designated Port, Cost 4
-  - Total root path cost: 4
-
-Switch C:
-  - Port 1 (to A): Root Port, Cost 4
-  - Port 2 (to B): Blocking Port (receives superior BPDU from B)
-  - Total root path cost: 4
-
-On segment B-C:
-  - B advertises: Root A, Cost 4, Bridge ID 32768.B
-  - C advertises: Root A, Cost 4, Bridge ID 32768.C
-  - B's bridge ID < C's bridge ID → B is designated bridge
-  - B's Port 2 forwards, C's Port 2 blocks
+```mermaid
+flowchart TD
+    A["Root Bridge<br/>Switch A<br/>Priority: 4096<br/>All Ports Designated"]
+    
+    A -->|"Cost 4<br/>(1 Gbps)"| B
+    A -->|"Cost 4<br/>(1 Gbps)"| C
+    B <-->|"Segment B-C<br/>Cost 4"| C
+    
+    B["Switch B<br/>Priority: 32768<br/>Root Path Cost: 4"]
+    C["Switch C<br/>Priority: 32768<br/>Root Path Cost: 4"]
+    
+    subgraph B_Ports ["Switch B Ports"]
+        B1["Port 1 to A<br/>Root Port<br/>Cost 4"]
+        B2["Port 2 to C<br/>Designated Port<br/>Cost 4<br/>Forwarding"]
+    end
+    
+    subgraph C_Ports ["Switch C Ports"]
+        C1["Port 1 to A<br/>Root Port<br/>Cost 4"]
+        C2["Port 2 to B<br/>Blocking Port<br/>Receives Superior BPDU"]
+    end
+    
+    subgraph Decision ["Segment B-C Decision"]
+        D1["B advertises:<br/>Root A, Cost 4<br/>Bridge ID 32768.B"]
+        D2["C advertises:<br/>Root A, Cost 4<br/>Bridge ID 32768.C"]
+        D3["B Bridge ID < C Bridge ID<br/>→ B is Designated Bridge<br/>→ B Port 2 Forwards<br/>→ C Port 2 Blocks"]
+        D1 --> D3
+        D2 --> D3
+    end
 ```
 
 Topology change notification (TCN) handles MAC address table coherence during network transitions. When a switch detects that a previously forwarding port has transitioned to blocking or a previously blocking port has transitioned to forwarding, it must assume that MAC address locations learned through the old topology may now be stale. The detecting switch sends TCN BPDUs upstream toward the root, and the root responds by setting the topology change flag in configuration BPDUs sent downstream. Switches receiving BPDUs with the topology change flag set reduce their MAC address aging time from the default 300 seconds to the forward delay (typically 15 seconds), causing faster relearning of MAC locations through the new topology. This aging acceleration trades increased unknown unicast flooding during convergence for faster restoration of optimized forwarding.

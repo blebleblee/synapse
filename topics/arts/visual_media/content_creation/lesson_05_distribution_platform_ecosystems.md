@@ -34,36 +34,53 @@ The content delivery network architecture that actually transmits video and audi
 
 Adaptive bitrate streaming protocols like HLS (HTTP Live Streaming) and MPEG-DASH dynamically adjust video quality based on available bandwidth. The platform encodes uploaded content into multiple quality tiers—240p, 360p, 480p, 720p, 1080p, 1440p, 4K—and segments each version into small chunks, typically two to ten seconds long. The client video player continuously monitors download speeds and buffer fullness, requesting higher or lower quality segments as network conditions change. This seamless quality switching prevents buffering interruptions but introduces encoding complexity for creators. Uploading source files at the highest practical resolution and bitrate maximizes quality preservation across all adaptive tiers, even if most viewers consume lower resolutions.
 
-```
-YouTube Upload Processing Pipeline:
-┌─────────────────┐
-│  Source File    │ (Creator uploads 4K ProRes/H.264)
-│  Validation     │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Transcoding    │ → 240p H.264
-│  Queue          │ → 360p H.264
-│  (Multiple      │ → 480p H.264
-│   Resolutions)  │ → 720p H.264/VP9
-│                 │ → 1080p H.264/VP9/AV1
-│                 │ → 1440p VP9/AV1
-│                 │ → 2160p VP9/AV1
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  CDN            │ → Edge node caching
-│  Distribution   │ → Geographic replication
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Adaptive       │ → Client requests quality tiers
-│  Streaming      │ → Buffer management
-│  Delivery       │ → Seamless quality switching
-└─────────────────┘
+```mermaid
+flowchart TD
+    VAL["Source File Validation
+    (4K ProRes / H.264 input)"]
+
+    subgraph TQ["Transcoding Queue — Multiple Resolutions"]
+        R240["240p · H.264"]
+        R360["360p · H.264"]
+        R480["480p · H.264"]
+        R720["720p · H.264 / VP9"]
+        R1080["1080p · H.264 / VP9 / AV1"]
+        R1440["1440p · VP9 / AV1"]
+        R2160["2160p · VP9 / AV1"]
+    end
+
+    subgraph CDN["CDN Distribution"]
+        EDGE["Edge Node Caching"]
+        GEO["Geographic Replication"]
+    end
+
+    subgraph ASD["Adaptive Streaming Delivery"]
+        TIER["Client Quality Tier Selection"]
+        BUF["Buffer Management"]
+        SWITCH["Seamless Quality Switching"]
+    end
+
+    VAL --> R240
+    VAL --> R360
+    VAL --> R480
+    VAL --> R720
+    VAL --> R1080
+    VAL --> R1440
+    VAL --> R2160
+
+    R240  --> EDGE
+    R360  --> EDGE
+    R480  --> EDGE
+    R720  --> EDGE
+    R1080 --> EDGE
+    R1440 --> EDGE
+    R2160 --> EDGE
+
+    EDGE --> GEO
+
+    GEO --> TIER
+    TIER --> BUF
+    BUF --> SWITCH
 ```
 
 Metadata optimization represents a direct interface to the candidate generation and ranking systems. Titles and thumbnails function as the primary click-through rate drivers, but their impact extends beyond initial attraction. YouTube's algorithm parses title text for keyword relevance to search queries and suggested video associations. Including specific terminology rather than vague descriptors increases discoverability—"Neapolitan Jazz Piano Voicings Tutorial" outperforms "Cool Piano Lesson" in search relevance. However, keyword stuffing triggers spam detection penalties; natural language with strategic terminology placement balances optimization and authenticity.

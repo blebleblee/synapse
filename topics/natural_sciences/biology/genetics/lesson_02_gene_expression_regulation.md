@@ -38,30 +38,41 @@ The bacterial transcription cycle proceeds through distinct mechanistic phases m
 
 Promoter escape occurs when the growing transcript reaches 9-11 nucleotides, sufficient to form a stable RNA-DNA hybrid that drives conformational changes releasing sigma factor and enabling processive elongation. The elongating RNA polymerase exhibits extraordinary processivity, transcribing thousands of nucleotides without dissociating while maintaining high fidelity (error rate ~10⁻⁵ per nucleotide). The enzyme translocates along DNA by a Brownian ratchet mechanism: thermal fluctuations drive both forward and backward motion, but nucleotide addition to the growing transcript biases the equilibrium toward forward translocation. The transcription elongation complex maintains a constantly moving transcription bubble with approximately 9 base pairs of RNA-DNA hybrid and 8-9 nucleotides of single-stranded RNA emerging from the RNA exit channel.
 
-```
-Transcription Elongation Complex Structure:
+```mermaid
+flowchart TD
+    downDNA["🧬 Downstream DNA\n(non-template strand 5'→3')"]
+    nonTemplate["Non-Template Strand\n(displaced / coding strand)"]
+    templateDNA["Template DNA Strand\n(transcribed 3'→5')"]
+    upDNA["🧬 Upstream DNA\n(non-template strand)"]
+    rnaTranscript["RNA Transcript\n(synthesized 5'→3')"]
+    rna5prime["5' RNA End\n(emerging from exit channel)"]
 
-    5'─────────────[Downstream DNA]──────────→
-                       ║
-              ┌────────║────────┐
-              │   RNA Polymerase│
-              │    Core Enzyme  │
-              └────────║────────┘
-                       ║
-                   [Transcript]
-                       ║
-                      5' RNA (emerging)
-    
-    ←──[Upstream DNA]──║
-                       3'
+    subgraph RNAP ["🔬 RNA Polymerase Core Enzyme"]
+        direction TB
+        activesite["Active Site\n(NTP addition / catalysis)"]
+        bridgeHelix["Bridge Helix\n(translocation motor)"]
+        rudderLid["Rudder / Lid\n(RNA–DNA hybrid separation)"]
+    end
 
-Components:
-- Template DNA strand (transcribed 3'→5')
-- Non-template strand (displaced)
-- RNA transcript (synthesized 5'→3')
-- Active site (NTP addition)
-- Bridge helix (translocation motor)
-- Rudder/lid (RNA-DNA separation)
+    downDNA -->|"enters clamp"| RNAP
+    nonTemplate -->|"displaced bubble"| RNAP
+    templateDNA -->|"threaded through\nprimary channel"| activesite
+    activesite -->|"catalyzes NTP addition"| rnaTranscript
+    bridgeHelix -->|"drives forward\ntranslocation"| activesite
+    rudderLid -->|"peels RNA from\nDNA hybrid"| rnaTranscript
+    RNAP -->|"exits upstream"| upDNA
+    rnaTranscript -->|"threads exit channel"| rna5prime
+
+    style RNAP fill:#e8f4f8,stroke:#2980b9,stroke-width:2px,color:#000
+    style activesite fill:#fde8e8,stroke:#c0392b,stroke-width:1.5px,color:#000
+    style bridgeHelix fill:#fef9e7,stroke:#f39c12,stroke-width:1.5px,color:#000
+    style rudderLid fill:#eafaf1,stroke:#27ae60,stroke-width:1.5px,color:#000
+    style downDNA fill:#d6eaf8,stroke:#2471a3,stroke-width:1px,color:#000
+    style upDNA fill:#d6eaf8,stroke:#2471a3,stroke-width:1px,color:#000
+    style nonTemplate fill:#d6eaf8,stroke:#2471a3,stroke-width:1px,color:#000
+    style templateDNA fill:#d5f5e3,stroke:#1e8449,stroke-width:1px,color:#000
+    style rnaTranscript fill:#fdedec,stroke:#922b21,stroke-width:1px,color:#000
+    style rna5prime fill:#fadbd8,stroke:#922b21,stroke-width:1px,color:#000
 ```
 
 Transcriptional pausing regulates elongation kinetics and coordinates transcription with RNA processing. Sequence-dependent pauses occur at specific DNA sequences, particularly those forming hairpin structures in nascent RNA or causing backtracking where polymerase slides backward on the template. The elongation factor NusA stabilizes the paused state, while GreA and GreB rescue backtracked complexes by inducing transcript cleavage that realigns the 3′ end with the active site. In eukaryotes, pausing near promoters provides checkpoints for recruiting capping enzymes and establishing proper chromatin structure over the gene body.
@@ -72,33 +83,40 @@ Eukaryotic transcription termination couples to 3′ end processing through reco
 
 The spliceosome represents one of biology's most complex molecular machines, a dynamic ribonucleoprotein complex comparable in size to the ribosome. Pre-mRNA splicing proceeds through two sequential transesterification reactions that precisely remove introns and ligate exons. The spliceosome assembles stepwise on each intron through ordered recruitment of five small nuclear ribonucleoproteins (snRNPs): U1 recognizes the 5′ splice site through base pairing; U2 binds the branch point adenosine; the U4/U6-U5 tri-snRNP joins to form the catalytic core. Extensive conformational rearrangements activate the catalytic site where the branch point adenosine attacks the 5′ splice site, forming the lariat intermediate. The second transesterification joins the exons and releases the lariat intron.
 
-```
-Splicing Reaction Mechanism:
+```mermaid
+flowchart TD
+    subgraph step1 ["Step 1 — Branching"]
+        PRE["5′exon — GU ═══════ AG — 3′exon\n(Pre-mRNA)"]
+        PRE -->|"2′-OH of branch-point adenosine\nattacks 5′ splice site"| LARIAT
+        LARIAT["Lariat Intermediate\n5′exon—GU\n         ╲\n          A (branch point)\n         ╱\n       AG — 3′exon"]
+    end
 
-Step 1 (Branching):
-5'exon—GU————————AG—3'exon
-         ↓A (branch point)
-         
-5'exon—GU     AG—3'exon
-         \   /
-          \ /
-           A
-        Lariat
+    subgraph step2 ["Step 2 — Exon Ligation"]
+        LARIAT -->|"Free 3′-OH of 5′ exon\nattacks 3′ splice site"| PRODUCTS
+        subgraph products ["Final Products"]
+            MRNA["Ligated Exons\n(Mature mRNA)"]
+            INTRON["Lariat Intron\n(debranched & degraded)"]
+        end
+        PRODUCTS[ ] --> MRNA
+        PRODUCTS --> INTRON
+    end
 
-Step 2 (Exon Ligation):
-5'exon┐     ┌—3'exon
-      └─────┘
-   
-Final Products:
-- Ligated exons (mature mRNA)
-- Lariat intron (degraded)
+    subgraph spliceosome ["Spliceosome Assembly & Components"]
+        U1["U1 snRNP\n5′ splice site recognition"]
+        U2["U2 snRNP\nBranch point binding"]
+        TRI["U4/U6·U5 tri-snRNP\nCatalytic core"]
+        SR["SR Proteins\nExon definition"]
+        HN["hnRNPs\nSplicing silencers"]
 
-Spliceosome Components:
-U1 snRNP → 5' splice site recognition
-U2 snRNP → branch point binding  
-U4/U6-U5 tri-snRNP → catalytic core
-SR proteins → exon definition
-hnRNPs → splicing silencers
+        U1 -->|"base-pairs with\n5′ splice site"| U2
+        U2 -->|"recruits"| TRI
+        SR -->|"antagonizes"| HN
+        SR -->|"stabilises\nspliceosome"| TRI
+    end
+
+    PRE -.->|"U1 binds first"| U1
+    TRI -.->|"drives catalysis"| step1
+    spliceosome -.->|"coordinates both\ntransesterifications"| step2
 ```
 
 Alternative splicing regulation operates through cis-elements and trans-acting factors that modulate splice site recognition. Exonic and intronic splicing enhancers (ESEs, ISEs) promote nearby splice site usage by recruiting SR proteins that stabilize spliceosome assembly. Conversely, exonic and intronic splicing silencers (ESSs, ISSs) inhibit splicing by recruiting hnRNPs that block spliceosome components. The relative strength of splice sites—determined by their match to consensus sequences—and the balance of positive and negative regulatory factors determine splicing outcomes. Weak splice sites require enhancers for recognition and are more susceptible to regulation than strong constitutive sites.
@@ -113,32 +131,54 @@ Internal ribosome entry sites circumvent the cap-dependent scanning mechanism by
 
 The peptidyltransferase center within the large ribosomal subunit catalyzes peptide bond formation between the incoming aminoacyl-tRNA and the growing peptide chain. This reaction, one of biology's most fundamental catalytic activities, occurs through a ribozymal mechanism where ribosomal RNA—specifically the A2451 nucleotide in bacterial 23S rRNA (A4493 in eukaryotic 28S rRNA)—positions reactants and stabilizes the transition state without directly participating as an acid-base catalyst. The ribosome accelerates peptide bond formation by approximately 10⁷-fold compared to the uncatalyzed reaction through substrate positioning, electrostatic stabilization, and exclusion of bulk water from the active site.
 
-```
-Translation Cycle Overview:
-
-1. INITIATION
-   Cap → eIF4F → 43S → Scanning → AUG recognition → 80S assembly
-
-2. ELONGATION (repeats)
-   ┌─────────────────────────────────────┐
-   │                                     │
-   ↓                                     │
-   Aminoacyl-tRNA • EF1A • GTP ────→ A-site binding
-                                     ↓
-                              Peptide bond formation
-                                     ↓
-                              EF2 • GTP ────→ Translocation
-                                     ↓
-                              E-site tRNA release
-   └─────────────────────────────────────┘
-
-3. TERMINATION
-   Stop codon → eRF1 recognition → eRF3 GTP → Peptide release → Subunit dissociation
-
-Ribosome Sites:
-E-site: Exit site (deacylated tRNA)
-P-site: Peptidyl-tRNA site (growing chain)
-A-site: Aminoacyl-tRNA site (incoming amino acid)
+```mermaid
+flowchart TD
+    subgraph initiation["1. INITIATION"]
+        cap["Cap Recognition"]
+        eif4f["eIF4F Complex"]
+        ps43["43S Preinitiation Complex"]
+        scan["Scanning"]
+        aug["AUG Recognition"]
+        s80["80S Ribosome Assembly"]
+        
+        cap --> eif4f --> ps43 --> scan --> aug --> s80
+    end
+    
+    subgraph elongation["2. ELONGATION (repeats)"]
+        aatrna["Aminoacyl-tRNA • EF1A • GTP"]
+        asite["A-site Binding"]
+        peptide["Peptide Bond Formation"]
+        ef2["EF2 • GTP"]
+        translo["Translocation"]
+        esite["E-site tRNA Release"]
+        
+        aatrna --> asite
+        asite --> peptide
+        peptide --> ef2
+        ef2 --> translo
+        translo --> esite
+        esite -.-> aatrna
+    end
+    
+    subgraph termination["3. TERMINATION"]
+        stop["Stop Codon"]
+        erf1["eRF1 Recognition"]
+        erf3["eRF3 • GTP"]
+        release["Peptide Release"]
+        dissoc["Subunit Dissociation"]
+        
+        stop --> erf1 --> erf3 --> release --> dissoc
+    end
+    
+    subgraph sites["Ribosome Sites"]
+        direction LR
+        e["E-site: Exit site<br/>(deacylated tRNA)"]
+        p["P-site: Peptidyl-tRNA site<br/>(growing chain)"]
+        a["A-site: Aminoacyl-tRNA site<br/>(incoming amino acid)"]
+    end
+    
+    s80 --> aatrna
+    esite --> stop
 ```
 
 Elongation factor competition controls translation elongation rates through modulating aminoacyl-tRNA delivery kinetics. EF-Tu (eEF1A in eukaryotes) delivers aminoacyl-tRNAs to the ribosomal A-site in a GTP-dependent manner. The rate of elongation depends on aminoacyl-tRNA concentrations, EF-Tu:GTP regeneration by EF-Ts (eEF1B), and the efficiency of codon-anticodon recognition. Rare codons—those decoded by low-abundance tRNAs—slow elongation locally, creating translational pauses that affect cotranslational folding. The relationship between codon usage, tRNA abundance, and protein folding represents an underappreciated layer of genetic information where synonymous codon choice influences protein structure and function independent of amino acid sequence.
@@ -149,27 +189,66 @@ The thermodynamics of RNA-RNA interactions govern miRNA targeting specificity an
 
 Operons represent prokaryotic regulatory modules where multiple genes encoding functionally related proteins cluster under shared transcriptional control. The lactose operon exemplifies inducible regulation: in glucose-rich medium lacking lactose, the lac repressor (LacI) binds operator sequences overlapping the promoter, sterically blocking RNA polymerase binding. Lactose metabolism generates allolactose, which binds LacI inducing a conformational change that reduces DNA-binding affinity by approximately 1000-fold, derepressing transcription. Simultaneously, glucose depletion increases cAMP levels, enabling cAMP-CRP complex formation. The CRP-cAMP complex binds upstream of the promoter, bending DNA and recruiting RNA polymerase through direct protein-protein contacts, amplifying transcription approximately 50-fold. This combinatorial AND logic—requiring both inducer presence and glucose absence—ensures lac operon expression only when lactose is available and preferred carbon sources are exhausted.
 
-```
-lac Operon Regulatory Logic:
+```mermaid
+flowchart TD
+    subgraph truth_table ["lac Operon: Regulatory States"]
+        direction TB
+        S1["State 1\nGlucose ✓ | Lactose ✗\n→ Expression: OFF\n(LacI repressor bound, low cAMP)"]
+        S2["State 2\nGlucose ✗ | Lactose ✗\n→ Expression: LOW\n(LacI repressor bound, high cAMP)"]
+        S3["State 3\nGlucose ✓ | Lactose ✓\n→ Expression: LOW\n(Allolactose frees LacI, low cAMP)"]
+        S4["State 4 ★ INDUCED\nGlucose ✗ | Lactose ✓\n→ Expression: HIGH\n(Allolactose frees LacI, high cAMP)"]
+    end
 
-                    Glucose   Lactose   lac Expression
-State 1 (repressed):   +         -         OFF
-State 2 (partial):     -         -         LOW  
-State 3 (partial):     +         +         LOW
-State 4 (induced):     -         +         HIGH
+    subgraph mechanism ["Molecular Mechanism — State 4 (Full Induction)"]
+        direction TD
+        LACT["Lactose\n(inducer)"]
+        ALLOLACT["Allolactose\n(converted by residual β-gal)"]
+        LACI["LacI Repressor\n(inactive — allolactose bound)"]
+        CAMP["High cAMP\n(glucose absent)"]
+        CRP["CRP Protein"]
+        CRPCAMP["CRP–cAMP Complex\n(active)"]
+        OPER["lac Operator (O1)\n(unblocked — no LacI)"]
+        PROM["lac Promoter (P)"]
+        RNAP["RNA Polymerase\n(recruited with high affinity)"]
+        TRANS["Transcription\n(HIGH rate)"]
 
-Molecular Mechanism (State 4):
+        subgraph genes ["lac Operon Structural Genes"]
+            direction LR
+            LACZ["lacZ\n(β-galactosidase)"]
+            LACY["lacY\n(Permease)"]
+            LACA["lacA\n(Transacetylase)"]
+        end
+    end
 
-           CRP-cAMP        
-              ↓            
-    ═══════╦═══════════O₁══[P]══O₂═══════►lacZ═══►lacY═══►lacA═══
-           ║                               
-        Enhances                          β-gal  Perm.  Transacet.
-        RNAP binding
-           
-    No LacI binding (allolactose bound to repressor)
-    + CRP-cAMP recruitment of RNAP
-    = High transcription rate
+    LACT -->|"converted"| ALLOLACT
+    ALLOLACT -->|"binds & inactivates"| LACI
+    LACI -. "cannot bind O1\n(operator free)" .-> OPER
+
+    CAMP -->|"binds"| CRP
+    CRP -->|"forms complex"| CRPCAMP
+    CRPCAMP -->|"binds enhancer\nupstream of P"| PROM
+
+    PROM -->|"recruits"| RNAP
+    CRPCAMP -->|"enhances RNAP\nbinding affinity"| RNAP
+    OPER -->|"unblocked —\nRNAP proceeds"| RNAP
+
+    RNAP -->|"initiates"| TRANS
+    TRANS --> LACZ
+    LACZ --> LACY
+    LACY --> LACA
+
+    S4 -.->|"mechanism detail"| mechanism
+
+    style S1 fill:#ffcccc,stroke:#cc0000,color:#000
+    style S2 fill:#fff0cc,stroke:#cc8800,color:#000
+    style S3 fill:#fff0cc,stroke:#cc8800,color:#000
+    style S4 fill:#ccffcc,stroke:#006600,color:#000
+    style CRPCAMP fill:#cce5ff,stroke:#0055cc,color:#000
+    style LACI fill:#ffcccc,stroke:#cc0000,color:#000
+    style TRANS fill:#ccffcc,stroke:#006600,color:#000
+    style LACZ fill:#e8ccff,stroke:#6600cc,color:#000
+    style LACY fill:#e8ccff,stroke:#6600cc,color:#000
+    style LACA fill:#e8ccff,stroke:#6600cc,color:#000
 ```
 
 The tryptophan operon demonstrates repressible regulation and attenuation. The trp repressor (TrpR) cannot bind DNA in its apo form; tryptophan binding converts TrpR to a high-affinity DNA-binding state, suppressing transcription when the amino acid is abundant. Additionally, attenuation provides fine-tuning through a ribosome-mediated mechanism that senses tryptophan availability. The 5′ leader sequence of the trp mRNA contains two tandem tryptophan codons followed by sequences capable of forming alternative secondary structures. When tryptophan-charged tRNATrp is abundant, ribosomes translate through the leader efficiently, forming a terminator hairpin that halts transcription. When tryptophan is scarce, ribosome stalling at the trp codons allows formation of an alternative antiterminator structure, permitting continued transcription. This elegant mechanism links translation kinetics to transcription termination, achieving graded regulation proportional to tryptophan availability.

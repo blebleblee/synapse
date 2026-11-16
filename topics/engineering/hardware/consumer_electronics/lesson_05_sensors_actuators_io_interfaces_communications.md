@@ -28,39 +28,62 @@ Touchscreen firmware must implement sophisticated filtering algorithms to reject
 
 The physical layout of touchscreen electrodes involves careful tradeoffs between touch sensitivity, optical transparency, and electromagnetic interference immunity. Diamond-pattern ITO electrodes provide superior optical clarity compared to rectangular patterns by breaking up the periodic structure that causes moiré interference with display pixel matrices. However, diamond patterns exhibit anisotropic capacitive coupling that varies with finger touch angle, requiring sophisticated interpolation algorithms to achieve consistent position accuracy. The touch sensor stackup also critically affects performance—the cover glass thickness above the ITO electrodes determines the baseline capacitance and sets a maximum practical thickness around 1.1 millimeters for consumer devices, though automotive touchscreens operating through thicker glass employ active styluses that inject AC signals capacitively coupled through the barrier. Modern smartphones laminate the touch sensor directly to the OLED display using optically clear adhesive to eliminate the air gap that previously reduced optical transmission and created troublesome internal reflections.
 
-```
-Mutual Capacitance Touch Sensing Architecture:
-
-     VDD_TX
-       |
-     Drive    C_drive-sense (mutual capacitance)
-     Buffer   ___
-       |_____|   |_____
-       |          |    |
-     Drive     Sense   |  C_finger (parasitic when touched)
-     Lines     Lines   |    |
-       |          |    |    |
-    [Column  ] [Row  ]GND  GND
-    [ Grid   ] [Grid ]
-       |          |
-     [ ITO Electrode Matrix ]
-          |
-     ADC → ARM Cortex-M4 Touch Controller
-          ↓
-     I2C/SPI to Application Processor
-
-Sense Amplifier Detail:
-                    
-    Sense ─┬─── C_integrator ───┬─── ADC
-           │                    │
-         [S1]                 [S2]
-           │                    │
-          GND              V_ref (reset)
-
-Timing: 
-  Phase 1 (S2 closed): Reset integrator to V_ref
-  Phase 2 (S1 closed, drive line pulsed): Charge transfer Q = C_mutual × V_drive
-  Phase 3: ADC samples V_out = V_ref - Q/C_integrator
+```mermaid
+flowchart TD
+    VDD_TX["VDD_TX"]
+    DriveBuffer["Drive Buffer"]
+    DriveLines["Drive Lines<br/>(Column Grid)"]
+    SenseLines["Sense Lines<br/>(Row Grid)"]
+    ITOMatrix["ITO Electrode Matrix"]
+    CMutual["C_drive-sense<br/>(Mutual Capacitance)"]
+    CFinger["C_finger<br/>(Parasitic)"]
+    GND1["GND"]
+    GND2["GND"]
+    ADC["ADC"]
+    ARM["ARM Cortex-M4<br/>Touch Controller"]
+    I2CSPI["I2C/SPI to<br/>Application Processor"]
+    
+    SenseInput["Sense Input"]
+    S1Switch["S1 Switch"]
+    S2Switch["S2 Switch"]
+    CIntegrator["C_integrator"]
+    Vref["V_ref<br/>(Reset)"]
+    ADCOutput["ADC Output"]
+    
+    VDD_TX --> DriveBuffer
+    DriveBuffer --> DriveLines
+    DriveBuffer --> CMutual
+    CMutual --> SenseLines
+    CFinger --> GND1
+    CMutual --> GND2
+    DriveLines --> ITOMatrix
+    SenseLines --> ITOMatrix
+    ITOMatrix --> ADC
+    ADC --> ARM
+    ARM --> I2CSPI
+    
+    SenseInput --> S1Switch
+    S1Switch --> CIntegrator
+    S2Switch --> CIntegrator
+    Vref --> S2Switch
+    CIntegrator --> ADCOutput
+    
+    subgraph SenseAmp ["Sense Amplifier Detail"]
+        SenseInput
+        S1Switch
+        S2Switch
+        CIntegrator
+        Vref
+        ADCOutput
+    end
+    
+    subgraph Timing ["Timing Phases"]
+        Phase1["Phase 1: S2 closed<br/>Reset integrator to V_ref"]
+        Phase2["Phase 2: S1 closed, drive pulsed<br/>Charge transfer Q = C_mutual × V_drive"]
+        Phase3["Phase 3: ADC samples<br/>V_out = V_ref - Q/C_integrator"]
+        Phase1 --> Phase2
+        Phase2 --> Phase3
+    end
 ```
 
 ### Inductive Sensing: Position, Proximity, and Wireless Charging
@@ -95,40 +118,73 @@ Image sensors in consumer device cameras employ CMOS technology that integrates 
 
 Image sensor signal chains implement sophisticated processing to overcome fundamental physics limitations. Dark current—thermally generated electron-hole pairs creating signal even in complete darkness—doubles approximately every 8°C temperature increase and must be subtracted through periodic dark frame calibration. Fixed pattern noise arising from pixel-to-pixel variations in dark current and photoresponse requires column-wise and row-wise correction. Analog-to-digital converters in modern sensors employ column-parallel architectures with 10 to 14-bit resolution operating at 10 to 100 megasamples per second, enabling 4K video capture at 60 frames per second. On-chip image signal processors perform demosaicing to interpolate full RGB color from the Bayer pattern, lens shading correction to compensate for optical vignetting, and defect pixel concealment to hide manufacturing defects.
 
-```
-CMOS Image Sensor Pixel Readout Architecture:
+```mermaid
+flowchart TD
+    subgraph pixel_array ["Pixel Array (4x4 Bayer Pattern)"]
+        P1["R"] 
+        P2["G"]
+        P3["R"]
+        P4["G"]
+        P5["G"]
+        P6["B"]
+        P7["G"]
+        P8["B"]
+        P9["R"]
+        P10["G"]
+        P11["R"]
+        P12["G"]
+        P13["G"]
+        P14["B"]
+        P15["G"]
+        P16["B"]
+    end
 
-Pixel Array (4x4 Bayer pattern shown):
-    
-    [ R  G ][ R  G ]     V_DD
-    [ G  B ][ G  B ]       │
-    [ R  G ][ R  G ]     Reset
-    [ G  B ][ G  B ]       │
-                          RST transistor
-    Single Pixel:          │
-                    Photo  │   Tx (transfer gate)
-                    Diode  │    │
-    hν→ ─────────  ╱╲  ───┴────┴─── FD (floating diffusion node)
-                           │
-                        Readout
-                          │
-    Row Select ───────────┤ (row select transistor)
-                          │
-    V_out ────────────────┴──── (to column amplifier)
+    subgraph single_pixel ["Single Pixel Architecture"]
+        VDD["V_DD"]
+        PHOTON["hν (Incident Light)"]
+        PD["Photodiode"]
+        RST_GATE["RST Transistor"]
+        TX_GATE["Transfer Gate (Tx)"]
+        FD["Floating Diffusion (FD)"]
+        SF["Source Follower"]
+        ROW_SEL["Row Select Transistor"]
+        VOUT["V_out"]
+        
+        PHOTON --> PD
+        VDD --> RST_GATE
+        RST_GATE --> FD
+        PD --> TX_GATE
+        TX_GATE --> FD
+        FD --> SF
+        SF --> ROW_SEL
+        ROW_SEL --> VOUT
+    end
 
-Column ADC Pipeline:
-    
-    Pixel → CDS (Correlated Double Sampling) → PGA → ADC → Digital
-    V_out   Reset sample & Signal sample        Gain   10-14b  Output
-            difference removes kTC noise               column-parallel
+    subgraph column_pipeline ["Column ADC Pipeline"]
+        CDS["CDS<br/>(Correlated Double Sampling)<br/>Reset & Signal Difference<br/>Removes kTC Noise"]
+        PGA["PGA<br/>(Programmable Gain Amplifier)"]
+        ADC["ADC<br/>(10-14 bit)<br/>Column-Parallel"]
+        DOUT["Digital Output"]
+        
+        CDS --> PGA
+        PGA --> ADC
+        ADC --> DOUT
+    end
 
-Timing Diagram (Rolling Shutter):
-    
-    Row 1:  RST ‾\_____  TX ____/‾‾‾‾  READ ______/‾‾\_____
-    Row 2:          RST ‾\_____  TX ____/‾‾‾‾  READ ______/‾‾\_____
-    Row n:                  RST ‾\_____  TX ____/‾‾‾‾  READ ______/‾‾\_____
-            
-            ← Exposure → ← Readout →
+    subgraph timing ["Rolling Shutter Timing"]
+        R1["Row 1: RST → TX → READ"]
+        R2["Row 2: RST → TX → READ (delayed)"]
+        RN["Row n: RST → TX → READ (delayed)"]
+        PHASE["← Exposure → ← Readout →"]
+        
+        R1 --> R2
+        R2 --> RN
+        RN -.-> PHASE
+    end
+
+    pixel_array -.->|"Example Pixel"| single_pixel
+    VOUT --> CDS
+    column_pipeline -.->|"Synchronized with"| timing
 ```
 
 ### MEMS Sensors: Accelerometers, Gyroscopes, Pressure, and Microphones
@@ -153,56 +209,81 @@ Stepper motors provide precise angular positioning without feedback through incr
 
 Motor drivers must handle substantial inductive energy storage in windings, with voltage spikes during commutation potentially exceeding supply rails by multiples. The energy stored in a motor winding follows E = (1/2)LI², where L represents winding inductance and I current. When current interrupts, di/dt generates voltage v = L(di/dt) that can damage switching transistors if not properly clamped. Modern motor driver ICs integrate fast-recovery diodes or synchronous rectification MOSFETs that provide current recirculation paths, along with snubber circuits and transient voltage suppressors limiting voltage excursions. Thermal management becomes critical in high-current applications, with driver ICs dissipating power P = I²R_ds(on) in MOSFET on-state resistance plus switching losses P_sw = (1/2)V_ds I_switch t_switch f_sw. Calculating junction temperature requires thermal resistance analysis through the package, θ_JA, and maintaining T_j below absolute maximum ratings through heatsinking or forced airflow.
 
-```
-Brushless DC Motor Electronic Commutation:
+```mermaid
+flowchart TD
+    subgraph inverter ["Three-Phase Inverter (Six-Step Commutation)"]
+        VDC(["+ V_DC"])
 
-Three-Phase Inverter (Six-Step Commutation):
+        Q1["Q1\nHigh-Side MOSFET\nPhase A"]
+        Q3["Q3\nHigh-Side MOSFET\nPhase B"]
+        Q5["Q5\nHigh-Side MOSFET\nPhase C"]
 
-                        +V_DC
-                          │
-         ┌────────────────┼────────────────┐
-         │                │                │
-       [Q1]             [Q3]             [Q5]  ← High-side MOSFETs
-         │                │                │
-    A ───┴───        B ───┴───        C ───┴───  → To motor windings
-         │                │                │
-       [Q2]             [Q4]             [Q6]  ← Low-side MOSFETs
-         │                │                │
-         └────────────────┼────────────────┘
-                          │
-                         GND
+        PhaseA(["Phase A\n→ Motor Winding"])
+        PhaseB(["Phase B\n→ Motor Winding"])
+        PhaseC(["Phase C\n→ Motor Winding"])
 
-Six-Step Commutation Sequence (Hall sensor-driven):
+        Q2["Q2\nLow-Side MOSFET\nPhase A"]
+        Q4["Q4\nLow-Side MOSFET\nPhase B"]
+        Q6["Q6\nLow-Side MOSFET\nPhase C"]
 
-Step  Hall  Energized  Current Path       Rotor Position
-      ABC   Phases                         (electrical deg)
-───────────────────────────────────────────────────────
-  1   101    A-B       +A → -B              0-60
-  2   100    A-C       +A → -C             60-120
-  3   110    B-C       +B → -C            120-180
-  4   010    B-A       +B → -A            180-240
-  5   011    C-A       +C → -A            240-300
-  6   001    C-B       +C → -B            300-360
+        GND(["GND"])
 
-Back-EMF Sensorless Position Detection:
+        VDC --> Q1
+        VDC --> Q3
+        VDC --> Q5
 
-    Unenergized Phase Voltage (e.g., Phase C when A-B energized):
-    
-    V_C = V_neutral + E_C(θ,ω)
-    
-    Zero-crossing of E_C indicates rotor aligned 30° electrically 
-    from commutation point → trigger next commutation 30° later
+        Q1 --> PhaseA
+        Q3 --> PhaseB
+        Q5 --> PhaseC
 
-PWM Current Regulation (Chopper Mode):
+        PhaseA --> Q2
+        PhaseB --> Q4
+        PhaseC --> Q6
 
-    Target: I_phase = I_cmd (commanded current)
-    Sensed: I_actual (via shunt resistor or MOSFET R_ds(on) sensing)
-    
-    If I_actual < I_cmd: turn ON high-side MOSFET (fast rise)
-    If I_actual ≥ I_cmd: turn OFF high-side, current freewheels through low-side
-    
-    Switching frequency: 20-50 kHz
-    Hysteresis band: typically ±5-10% of I_cmd
+        Q2 --> GND
+        Q4 --> GND
+        Q6 --> GND
+    end
+
+    subgraph commutation ["Six-Step Commutation Sequence (Hall Sensor-Driven)"]
+        S1["Step 1 | Hall: 101\nEnergized: A→B\n0° – 60°"]
+        S2["Step 2 | Hall: 100\nEnergized: A→C\n60° – 120°"]
+        S3["Step 3 | Hall: 110\nEnergized: B→C\n120° – 180°"]
+        S4["Step 4 | Hall: 010\nEnergized: B→A\n180° – 240°"]
+        S5["Step 5 | Hall: 011\nEnergized: C→A\n240° – 300°"]
+        S6["Step 6 | Hall: 001\nEnergized: C→B\n300° – 360°"]
+
+        S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S1
+    end
+
+    subgraph bemf ["Back-EMF Sensorless Position Detection"]
+        UnenergizedPhase["Unenergized Phase Voltage\nV_C = V_neutral + E_C(θ, ω)"]
+        ZeroCrossing["Zero-Crossing of E_C Detected\n→ Rotor aligned 30° before\nnext commutation point"]
+        CommTrigger["Trigger Next Commutation\n30° electrical degrees later"]
+
+        UnenergizedPhase --> ZeroCrossing --> CommTrigger
+    end
+
+    subgraph pwm ["PWM Current Regulation (Chopper Mode)"]
+        CurrentCmd["I_cmd\nCommanded Current"]
+        CurrentSense["I_actual\nSensed via Shunt Resistor\nor MOSFET R_ds(on)"]
+        Compare{{"I_actual vs I_cmd"}}
+        TurnOn["Turn ON High-Side MOSFET\nFast Current Rise"]
+        FreeWheel["Turn OFF High-Side MOSFET\nCurrent Freewheels\nthrough Low-Side Diode"]
+        SwitchParams["Switching Frequency: 20–50 kHz\nHysteresis Band: ±5–10% of I_cmd"]
+
+        CurrentCmd --> Compare
+        CurrentSense --> Compare
+        Compare -- "I_actual < I_cmd" --> TurnOn
+        Compare -- "I_actual ≥ I_cmd" --> FreeWheel
+        TurnOn --> SwitchParams
+        FreeWheel --> SwitchParams
+    end
+
+    commutation -- "Hall sensor state\nselects active step" --> inverter
+    CommTrigger -- "Sensorless commutation\ntrigger" --> commutation
+    inverter -- "Phase voltage\nof unenergized winding" --> UnenergizedPhase
+    pwm -- "PWM gate signal\nto active MOSFETs" --> inverter
 ```
 
 ### USB: Universal Serial Bus Architecture and Enumeration
@@ -215,86 +296,76 @@ USB data transfer occurs through four transfer types optimized for different use
 
 USB Power Delivery extended USB beyond 5-volt 500-milliamp legacy power limits to support up to 240 watts through voltage negotiation ranging from 5 to 48 volts. The USB-C connector's CC (Configuration Channel) pins establish cable orientation and capability through resistor-based detection, with the downstream-facing port containing Rd pull-down resistors and the upstream-facing port containing Rp pull-up resistors. A USB PD controller monitors CC voltage to detect cable attachment, orientation (by determining which CC pin shows valid resistance), and initial current capability through the Rp resistor value: 56 kilohms indicates default USB power (500/900 mA), 22 kilohms indicates 1.5A, and 10 kilohms indicates 3A at 5V. Negotiation of higher voltages and currents employs BMC (Biphase Mark Coding) signaling over the CC line at 300 kilobaud, implementing a packet-based protocol where the source advertises available power profiles and the sink requests specific voltage/current combinations. The protocol includes sophisticated handshaking preventing voltage transients and ensuring both ends acknowledge configuration changes before the source adjusts output voltage.
 
-```
-USB 2.0 Packet Structure:
+```mermaid
+flowchart TD
+    subgraph differential ["Differential Signaling (NRZI with Bit Stuffing)"]
+        DS1["D+ and D- lines encode data via transitions"]
+        DS2["J state (Idle): D+ high, D- low"]
+        DS3["K state (Data): D+ low, D- high"]
+        DS4["Bit stuffing: Insert 0 after six consecutive 1s"]
+        DS1 --> DS2
+        DS1 --> DS3
+        DS1 --> DS4
+    end
 
-Differential Signaling:
-    D+ ────────┐     ┌────────┐     ┌──
-               └─────┘        └─────┘
-    D- ┐     ┌─────────┐     ┌─────────
-       └─────┘         └─────┘
-       ← J →← K →← J →← K →← J →
-       (Idle) (Data encoding via NRZI with bit stuffing)
+    subgraph token ["Token Packet (Host → Device)"]
+        T1["SYNC<br/>8 bits<br/>0x80<br/>(Clock recovery)"]
+        T2["PID<br/>8 bits<br/>IN=0x69, OUT=0xE1<br/>SETUP=0x2D"]
+        T3["ADDR<br/>7 bits<br/>(Device 0-127)"]
+        T4["ENDP<br/>4 bits<br/>(Endpoint 0-15)"]
+        T5["CRC5<br/>5 bits<br/>(Over ADDR+ENDP)"]
+        T6["EOP<br/>2 bits<br/>(SE0 then J)"]
+        T1 --> T2 --> T3 --> T4 --> T5 --> T6
+    end
 
-Token Packet (Host → Device):
-    
-    SYNC  PID   ADDR   ENDP   CRC5   EOP
-    8bits 8bits 7bits  4bits  5bits  2bits
-    
-    SYNC: 0x80 (8-bit sync pattern for clock recovery)
-    PID:  Packet ID (IN=0x69, OUT=0xE1, SETUP=0x2D, DATA0=0xC3, DATA1=0x4B, ACK=0xD2)
-    ADDR: Device address (0-127)
-    ENDP: Endpoint number (0-15)
-    CRC5: 5-bit CRC over ADDR+ENDP
-    EOP:  End of Packet (SE0 for 2 bit times, then J state)
+    subgraph data ["Data Packet (Direction per Token)"]
+        D1["SYNC<br/>8 bits"]
+        D2["PID<br/>8 bits<br/>DATA0=0xC3<br/>DATA1=0x4B"]
+        D3["DATA<br/>0-1023 bytes<br/>(Payload)"]
+        D4["CRC16<br/>16 bits<br/>Poly: x^16+x^15+x^2+1"]
+        D5["EOP<br/>2 bits"]
+        D1 --> D2 --> D3 --> D4 --> D5
+    end
 
-Data Packet (Direction determined by preceding token):
-    
-    SYNC  PID   DATA(0-1023 bytes)  CRC16  EOP
-    
-    CRC16: Polynomial x^16 + x^15 + x^2 + 1
+    subgraph enum ["USB Enumeration State Machine"]
+        E1["Device Attach<br/>(Pullup resistor on D+/D-)"]
+        E2["Host: 100ms Debounce"]
+        E3["Host: Reset<br/>(SE0 for 10-20ms)"]
+        E4["Default State<br/>(Address 0, EP0)"]
+        E5["Host: GetDescriptor(Device)"]
+        E6["Device: Device Descriptor"]
+        E7["Host: SetAddress(N)"]
+        E8["Device: ACK"]
+        E9["Addressed State<br/>(Address N)"]
+        E10["Host: GetDescriptor(Config)"]
+        E11["Device: Config Descriptor"]
+        E12["Host: GetDescriptor(String)"]
+        E13["Device: String Descriptor"]
+        E14["Host: SetConfiguration(1)"]
+        E15["Device: ACK"]
+        E16["Configured State<br/>(Device Functional)"]
+        
+        E1 --> E2 --> E3 --> E4
+        E4 --> E5 --> E6 --> E7 --> E8 --> E9
+        E9 --> E10 --> E11 --> E12 --> E13 --> E14 --> E15 --> E16
+    end
 
-USB Enumeration State Machine:
+    subgraph pd ["USB-C Power Delivery Voltage Negotiation"]
+        P1["Source: CC pull-up Rp<br/>(Detects sink via CC voltage)"]
+        P2["Sink: CC pull-down Rd<br/>(Detects source type from Rp)"]
+        P3["Source → Sink: 5V Default"]
+        P4["Sink → Source: PD Request<br/>(e.g., 20V @ 3A)<br/>(BMC encoding on CC)"]
+        P5["Source → Sink: PD Accept"]
+        P6["Source → Sink: PD PS_RDY<br/>(Power Supply Ready)"]
+        P7["Source → Sink: 20V @ 3A"]
+        
+        P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7
+    end
 
-    Device          Host
-      │              │
-      │   Attach     │
-      │──(pullup)───>│
-      │              │ (100ms debounce)
-      │   Reset      │
-      │<────SE0──────│ (10-20ms, both D+/D- low)
-      │              │
-      │ Default State│ (Address 0, control EP0)
-      │              │
-      │<─GetDesc(Dev)│
-      │─────Device───>│
-      │   Descriptor │
-      │              │
-      │<─SetAddress(N)
-      │─────ACK──────>│
-      │              │
-      │ Addressed(N) │
-      │              │
-      │<─GetDesc(Cfg)│
-      │──Config Desc─>│
-      │<─GetDesc(Str)│
-      │──String Desc─>│
-      │              │
-      │<─SetConfig(1)│
-      │─────ACK──────>│
-      │              │
-      │ Configured   │ (Device functional)
-      │              │
-
-USB Power Delivery Voltage Negotiation (USB-C):
-
-    Source (Charger)          Sink (Device)
-        │                          │
-        │    CC pull-up Rp         │ CC pull-down Rd
-        │ (detects sink attach     │ (detects source type
-        │  via voltage on CC)      │  from Rp value)
-        │                          │
-        │──────5V default─────────>│
-        │                          │
-        │<──PD Message: Request───>│ (BMC encoding on CC)
-        │   (e.g., 20V 3A)         │
-        │                          │
-        │──PD: Accept─────────────>│
-        │                          │
-        │──PD: PS_RDY─────────────>│ (Power supply ready)
-        │                          │
-        │──────20V @ 3A───────────>│
-        │                          │
+    differential -.->|"Physical Layer"| token
+    token -.->|"Transaction"| data
+    data -.->|"Protocol"| enum
+    enum -.->|"Power Negotiation"| pd
 ```
 
 ### PCIe: PCI Express Link Architecture and Transaction Layer
@@ -420,74 +491,138 @@ The Bluetooth protocol stack implements a sophisticated layered architecture abs
 
 Bluetooth security implements pairing procedures generating long-term keys enabling encrypted connections and protecting against eavesdropping and man-in-the-middle attacks. Secure Simple Pairing (Bluetooth 4.2+) employs Elliptic Curve Diffie-Hellman key exchange with authentication through numeric comparison (both devices display six-digit codes verified by the user) or passkey entry. The pairing process generates a link key stored in non-volatile memory, enabling bonding where devices remember each other and automatically reconnect without repeating authentication. Bluetooth 5.0 introduced LE Secure Connections mandatory for new device qualifications, using FIPS-approved cryptographic algorithms including AES-CMAC for authentication and P-256 elliptic curve for ECDH key agreement. The AES-CCM cipher mode provides authenticated encryption of link-layer packets using 128-bit keys, with message integrity codes detecting tampering attempts.
 
-```
-Bluetooth Classic Frequency Hopping:
+```mermaid
+flowchart TD
+    subgraph BT_CLASSIC ["Bluetooth Classic Frequency Hopping"]
+        direction TB
+        FREQ["Channel Formula
+        f = (2402 + k) MHz
+        k = 0 to 78 (79 channels)"]
 
-Channel Selection:
-    f = (2402 + k) MHz, where k = 0 to 78
-    
-Hop sequence determined by:
-    - Master device BD_ADDR (48-bit Bluetooth address)
-    - Master clock (28-bit, increments every 312.5 μs)
-    
-Hop rate: 1600 hops/second (slot duration = 625 μs)
+        subgraph HOP_SEQ ["Hop Sequence Inputs"]
+            BD["Master BD_ADDR
+            48-bit Bluetooth Address"]
+            CLK["Master Clock
+            28-bit, increments every 312.5 μs"]
+        end
 
-Adaptive Frequency Hopping:
-    
-    Channel Classification:
-    - Measure PER (Packet Error Rate) per channel
-    - Mark channels as "bad" if PER > threshold (e.g., 10%)
-    - Remove bad channels from hopping sequence
-    - Periodically re-evaluate bad channels
-    
-    Typical scenario:
-    79 total channels - 20 WiFi-interfered channels = 59 good channels
+        HOPRATE["Hop Rate: 1600 hops/second
+        Slot Duration = 625 μs"]
 
-BLE Connection Event Timing:
+        FREQ --> HOP_SEQ
+        HOP_SEQ --> HOPRATE
 
-Connection Interval: 30ms (example)
-Slave Latency: 0
-Supervision Timeout: 6000ms
+        subgraph AFH ["Adaptive Frequency Hopping"]
+            PER["Measure PER
+            (Packet Error Rate) per channel"]
+            MARK["Mark channel 'bad'
+            if PER > threshold (e.g. 10%)"]
+            REMOVE["Remove bad channels
+            from hopping sequence"]
+            REEVAL["Periodically re-evaluate
+            bad channels"]
 
-Time │ Master │ Peripheral │
-─────┼────────┼────────────┤
-0    │ TX───> │            │ ← Anchor point (connection event start)
-     │        │ <───RX     │
-0.15 │        │ ──>TX      │   (IFS = 150μs inter-frame space)
-     │ <──RX  │            │
-     │        │            │
-     │  (Connection event ends, both enter low-power)
-     │        │            │
-30   │ TX───> │            │ ← Next anchor point
-     │        │ <───RX     │
+            PER --> MARK --> REMOVE --> REEVAL --> PER
 
-Average current (peripheral with 30ms interval, 5ms active per event):
-    I_avg = (I_active × t_active + I_sleep × t_sleep) / T_interval
-    I_avg = (15mA × 5ms + 2μA × 25ms) / 30ms ≈ 2.5mA + negligible
-    
-With aggressive optimization: ~50μA average achievable
+            SCENARIO["Typical Scenario
+            79 total − 20 WiFi-interfered = 59 good channels"]
+            REMOVE --> SCENARIO
+        end
 
-BLE Advertising Packet Structure:
+        HOPRATE --> AFH
+    end
 
-    Preamble  Access Addr  PDU Header  Payload      CRC
-    1 byte    4 bytes      2 bytes     6-37 bytes   3 bytes
-    
-    0xAA/0x55  0x8E89BED6  [Type|Len]  [AdvAddr|Data]  CRC-24
+    subgraph BLE_CONN ["BLE Connection Event Timing"]
+        direction TB
+        PARAMS["Connection Parameters
+        Interval: 30 ms | Slave Latency: 0 | Supervision Timeout: 6000 ms"]
 
-PDU Types:
-    ADV_IND (0x00):         Connectable undirected advertising
-    ADV_DIRECT_IND (0x01):  Connectable directed (fast reconnect)
-    ADV_NONCONN_IND (0x02): Non-connectable (broadcast only)
-    SCAN_REQ (0x03):        Active scan request
-    SCAN_RSP (0x04):        Scan response
-    CONNECT_REQ (0x05):     Connection request from central
+        subgraph CEVENT ["Connection Event (Anchor Point t = 0 ms)"]
+            M_TX["Master TX ───>"]
+            P_RX["Peripheral <─── RX"]
+            IFS["IFS = 150 μs inter-frame space"]
+            P_TX["Peripheral ──> TX"]
+            M_RX["Master <─── RX"]
 
-Advertising Interval:
-    Range: 20ms to 10.24s
-    Trade-off: shorter = faster discovery, higher power
-               longer = lower power, slower discovery
-    Typical smartphone peripheral: 100ms (balanced)
-    Beacon (e.g., iBeacon): 1000ms (ultra-low power)
+            M_TX --> P_RX --> IFS --> P_TX --> M_RX
+        end
+
+        SLEEP["Both enter low-power sleep
+        (connection event ends)"]
+
+        NEXT["Next Anchor Point (t = 30 ms)
+        Master TX ───> next event"]
+
+        PARAMS --> CEVENT --> SLEEP --> NEXT
+
+        subgraph POWER ["Average Current (Peripheral)"]
+            FORMULA["I_avg = (I_active × t_active + I_sleep × t_sleep) / T_interval"]
+            CALC["= (15 mA × 5 ms + 2 μA × 25 ms) / 30 ms ≈ 2.5 mA"]
+            OPT["Aggressive optimization: ~50 μA average achievable"]
+
+            FORMULA --> CALC --> OPT
+        end
+
+        NEXT --> POWER
+    end
+
+    subgraph BLE_ADV ["BLE Advertising Packet Structure"]
+        direction TB
+        subgraph PKT ["Packet Layout"]
+            PRE["Preamble
+            1 byte
+            0xAA / 0x55"]
+            ACC["Access Address
+            4 bytes
+            0x8E89BED6"]
+            PDU_H["PDU Header
+            2 bytes
+            [Type | Len]"]
+            PAYL["Payload
+            6–37 bytes
+            [AdvAddr | Data]"]
+            CRC["CRC
+            3 bytes
+            CRC-24"]
+
+            PRE --> ACC --> PDU_H --> PAYL --> CRC
+        end
+
+        subgraph PDU_TYPES ["PDU Types"]
+            T0["ADV_IND (0x00)
+            Connectable undirected advertising"]
+            T1["ADV_DIRECT_IND (0x01)
+            Connectable directed — fast reconnect"]
+            T2["ADV_NONCONN_IND (0x02)
+            Non-connectable broadcast only"]
+            T3["SCAN_REQ (0x03)
+            Active scan request"]
+            T4["SCAN_RSP (0x04)
+            Scan response"]
+            T5["CONNECT_REQ (0x05)
+            Connection request from central"]
+        end
+
+        PDU_H --> PDU_TYPES
+
+        subgraph ADV_INT ["Advertising Interval"]
+            RANGE["Range: 20 ms to 10.24 s"]
+            TRADEOFF["Shorter → faster discovery, higher power
+            Longer  → lower power, slower discovery"]
+            EX1["Typical smartphone peripheral
+            100 ms — balanced"]
+            EX2["Beacon (e.g. iBeacon)
+            1000 ms — ultra-low power"]
+
+            RANGE --> TRADEOFF --> EX1
+            TRADEOFF --> EX2
+        end
+
+        CRC --> ADV_INT
+    end
+
+    BT_CLASSIC --> BLE_CONN
+    BLE_CONN --> BLE_ADV
 ```
 
 ### NFC: Near Field Communication and ISO 14443 Protocol
@@ -671,6 +806,6 @@ When radiated or conducted emission measurements fail regulatory limits, systema
 
 Common-mode current measurement on cables employs RF current probes—ferrite-core toroids clamping around cable bundles—distinguishing common-mode from differential-mode currents. Common-mode current, flowing in the same direction on all conductors within the cable, generates the far-field radiation coupling to the test antenna, while differential-mode current flows in opposite directions and cancels in the far field. The mitigation strategy targets common-mode sources through ferrite beads and common-mode chokes presenting high impedance at problem frequencies. Material selection matters critically: nickel-zinc ferrites provide maximum impedance at 10 to 500 MHz (ideal for digital clock harmonics), while manganese-zinc ferrites dominate at 100 kHz to 10 MHz (switched-mode power supply range). Multi-turn windings through ferrite cores multiply impedance linearly with turns (Z ∝ N² neglecting leakage), though self-resonance from turn-to-turn capacitance limits practical winding counts to 3 to 5 turns for frequencies above 30 MHz.
 
-Shielding effectiveness quantifies the attenuation provided by conductive enclosures through absorption and reflection mechanisms. At low frequencies where skin depth exceeds shield thickness, the shield operates primarily through reflection—the wave impedance mismatch between free space (377 ohms) and the shield conductor (<0.001 ohms for copper) creates large reflection coefficients preventing field penetration. At higher frequencies where skin depth becomes smaller than shield thickness, absorption dominates with shielding effectiveness increasing 20 log₁₀(t/δ) where t represents shield thickness and δ skin depth calculated as δ = √(2/(ωμσ)) with ω angular frequency, μ permeability, and σ conductivity. Apertures and seams in shields compromise effectiveness dramatically—a slot or gap with length approaching λ/2 at the interference frequency resonates and radiates efficiently, negating the shield. Conductive gaskets employing metal-filled elastomers or wire meshes maintain electrical contact between shield sections across manufacturing tolerances and vibration, achieving contact resistance below 10 milliohms and maintaining shielding effectiveness above 40 dB to 1 GHz.
+Shielding effectiveness quantifies the attenuation provided by conductive enclosures through absorption and reflection mechanisms. At low frequencies where skin depth exceeds shield thickness, the shield operates primarily through reflection—the wave impedance mismatch between free space (377 ohms) and the shield conductor (< 0.001 ohms for copper) creates large reflection coefficients preventing field penetration. At higher frequencies where skin depth becomes smaller than shield thickness, absorption dominates with shielding effectiveness increasing 20 log₁₀(t/δ) where t represents shield thickness and δ skin depth calculated as δ = √(2/(ωμσ)) with ω angular frequency, μ permeability, and σ conductivity. Apertures and seams in shields compromise effectiveness dramatically—a slot or gap with length approaching λ/2 at the interference frequency resonates and radiates efficiently, negating the shield. Conductive gaskets employing metal-filled elastomers or wire meshes maintain electrical contact between shield sections across manufacturing tolerances and vibration, achieving contact resistance below 10 milliohms and maintaining shielding effectiveness above 40 dB to 1 GHz.
 
 Filter design for conducted emission compliance targets both common-mode and differential-mode components. Differential-mode filters employ series inductors in line and return conductors paired with X-capacitors (line-to-line capacitors rated for mains voltage service), forming L-C lowpass filters with cutoff frequencies around 100 kHz to 1 MHz. Common-mode filters use coupled inductors where windings on both line and return conductors share a common magnetic core—differential-mode currents generate opposing magnetic fluxes that cancel, presenting low impedance to power delivery, while common-mode currents generate additive fluxes that saturate the core and present high impedance. Y-capacitors (line-to-ground capacitors) shunt common-mode noise to chassis, though safety regulations limit Y-capacitor values to prevent excessive earth leakage current—typically 2200 to 4700 picofarads to maintain leakage below 0.5 to 1 milliampere. Multi-stage filtering with cascaded differential-mode and common-mode sections achieves 40 to 60 dB attenuation across the conducted emission frequency range, with careful attention to filter layout avoiding coupling between input and output that bypasses the filter through parasitic capacitance.

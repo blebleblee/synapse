@@ -72,31 +72,23 @@ Internal orders in CO-OPA serve as short-lived cost collectors for projects, cam
 
 Profitability Analysis (CO-PA) is where CO delivers management P&L. SAP supports two CO-PA types: account-based and costing-based. Account-based CO-PA stores profitability data in GL accounts and reconciles precisely with FI — in S/4HANA, it is the only type written to ACDOCA and is effectively the default. Costing-based CO-PA uses value fields instead of GL accounts, allows real-time accruals for planned costs like freight or rebates that have not yet been invoiced, and historically provided faster, more flexible margin analysis at the cost of a reconciliation gap with FI. Many enterprises running ECC operated both types simultaneously and reconciled them periodically. In S/4HANA, SAP's recommended path is account-based CO-PA.
 
-```
-CO Object Hierarchy & Cost Flow
-
-                    ┌─────────────────┐
-                    │   CO Area        │
-                    │  (Controlling   │
-                    │   Umbrella)     │
-                    └────────┬────────┘
-                             │
-          ┌──────────────────┼──────────────────┐
-          │                  │                  │
-   ┌──────┴──────┐   ┌───────┴──────┐   ┌──────┴──────┐
-   │  Cost Center│   │Internal Order│   │  WBS Element│
-   │  (CCA)      │   │  (OPA)       │   │  (PS)       │
-   └──────┬──────┘   └──────┬───────┘   └──────┬──────┘
-          │                 │                   │
-          │   Assessment/   │   Settlement      │   Settlement
-          │   Distribution  │                   │
-          └────────────┬────┴───────────────────┘
-                       │
-              ┌────────┴────────┐
-              │  CO-PA Segment  │
-              │ (Product/Region/│
-              │  Customer)      │
-              └─────────────────┘
+```mermaid
+flowchart TD
+    A["CO Area<br/>(Controlling Umbrella)"]
+    
+    B["Cost Center<br/>(CCA)"]
+    C["Internal Order<br/>(OPA)"]
+    D["WBS Element<br/>(PS)"]
+    
+    E["CO-PA Segment<br/>(Product/Region/Customer)"]
+    
+    A --> B
+    A --> C
+    A --> D
+    
+    B -->|"Assessment/<br/>Distribution"| E
+    C -->|Settlement| E
+    D -->|Settlement| E
 ```
 
 Product costing (CO-PC) calculates the standard cost of a manufactured or assembled product by exploding its bill of materials through the routing operations on the work centers, applying activity rates per operation, and summing material costs at standard prices. The result is the standard cost estimate, which is marked and released to the material master as the standard price field. Every subsequent goods movement of that material uses this standard price, and any difference between the actual purchase price and the standard is posted as a price variance to a price difference GL account. Manufacturing orders accumulate actual costs against their standard, and at period end the variance is calculated by category — price variance, quantity variance, lot size variance, resource-usage variance — and settled to CO-PA, closing the loop between operational manufacturing and management profitability reporting.

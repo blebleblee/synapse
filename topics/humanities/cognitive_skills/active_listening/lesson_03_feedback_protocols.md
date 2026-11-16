@@ -48,24 +48,20 @@ The escalation ladder for verification loops proceeds from low-cost, low-fidelit
 
 The temporal structure of verification loops depends on semantic chunking. Human working memory buffers approximately three to five semantic propositions before requiring consolidation. Skilled listeners insert verification checkpoints every thirty to sixty seconds of speaker monologue—not by interrupting arbitrarily, but by waiting for the speaker to complete a semantic cluster and then reflecting or paraphrasing the cluster before the speaker continues. This rhythm matches the speaker's natural cognitive cadence: encode and transmit a chunk, receive confirmation, encode and transmit the next chunk.
 
-```
-Listener-Speaker Synchronization Flow:
-
-Speaker: Encodes semantic chunk → Transmits via speech
-                                         ↓
-Listener: Decodes speech → Constructs internal model
-                                         ↓
-Listener: Generates feedback (reflection/paraphrase/question)
-                                         ↓
-Speaker: Receives feedback → Compares to intended meaning
-                                         ↓
-                    ┌────────────────────┴────────────────────┐
-                    ↓                                          ↓
-            Match: Confirm                              Mismatch: Correct
-                    ↓                                          ↓
-         Advance to next chunk              Retransmit with refinement
-                                                               ↓
-                                            Return to decode step
+```mermaid
+flowchart TD
+    SPK_ENC["Speaker: Encodes semantic chunk"] --> SPK_TX["Transmits via speech"]
+    SPK_TX --> LST_DEC["Listener: Decodes speech"]
+    LST_DEC --> LST_MOD["Listener: Constructs internal model"]
+    LST_MOD --> LST_FB["Listener: Generates feedback<br/>(reflection / paraphrase / question)"]
+    LST_FB --> SPK_RX["Speaker: Receives feedback"]
+    SPK_RX --> SPK_CMP["Speaker: Compares to intended meaning"]
+    SPK_CMP --> DECISION{"Match or Mismatch?"}
+    DECISION -->|Match| MATCH["Confirm"]
+    DECISION -->|Mismatch| MISMATCH["Correct"]
+    MATCH --> ADVANCE["Advance to next chunk"]
+    MISMATCH --> RETRANSMIT["Retransmit with refinement"]
+    RETRANSMIT --> LST_DEC
 ```
 
 This cycle repeats throughout the conversation, maintaining synchronization as the dialogue evolves. Each iteration refines the shared mental model, reducing the error accumulation that would otherwise occur in unverified communication.

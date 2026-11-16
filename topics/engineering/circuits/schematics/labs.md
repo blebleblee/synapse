@@ -384,7 +384,7 @@ Resolution: Add frequency compensation capacitor across high-gain stage to reduc
 
 Access via `Tools → Control Panel → SPICE`:
 
-- **Relative Tolerance (`reltol`)**: Set to `1e-6` for analog circuits requiring <0.1% accuracy. Reduce to `1e-4` for troubleshooting convergence issues in complex nonlinear circuits.
+- **Relative Tolerance (`reltol`)**: Set to `1e-6` for analog circuits requiring < 0.1% accuracy. Reduce to `1e-4` for troubleshooting convergence issues in complex nonlinear circuits.
 - **Absolute Current Tolerance (`abstol`)**: Set to `1e-12 A` for low-noise amplifiers and precision current sources. Increase to `1e-9 A` for power circuits where sub-nanoamp precision is irrelevant.
 - **Absolute Voltage Tolerance (`vntol`)**: Set to `1e-9 V` for high-impedance nodes in CMOS and JFET circuits. Increase to `1e-6 V` for general-purpose analog circuits.
 

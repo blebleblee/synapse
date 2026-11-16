@@ -69,29 +69,33 @@ The practical mechanics of milling — why a dull planer blade tears grain in on
 
 Wood's tensile strength parallel to the grain can exceed 10,000 psi in many hardwoods, while its tensile strength perpendicular to the grain may be only 500 to 1,500 psi. This extreme anisotropy means that crosscutting severs fibers across their strongest axis while ripping splits them along their weakest lateral bonding. A sharp saw tooth crosscutting dense oak must do real work to fracture individual fiber cells cleanly. If the tooth geometry is designed for ripping — with minimal rake angle and large gullets for chip evacuation — it will crush and tear the wood surface rather than sever it cleanly, producing a rough, bruised kerf that telegraphs into any subsequent jointing or planing operation.
 
-```
-   Cutting force vectors relative to grain:
+```mermaid
+flowchart TD
+    subgraph rip ["Rip Cut — Parallel to Grain"]
+        R_force["⬇ Tooth Force"]
+        R_fiber["Grain Fibers ║║║║║║║║"]
+        R_effect["Splits inter-cell bonding\nLower cutting force\nRisk of tearout on interlocked grain"]
+        R_force --> R_fiber --> R_effect
+    end
 
-   Rip cut (parallel to grain):
-   ────────────────────────────────────────
-   ↓ tooth force     grain fibers ║║║║║║║║
-   Splits inter-cell bonding; lower force, risk of tearout on interlocked grain
+    subgraph cross ["Crosscut — Perpendicular to Grain"]
+        C_force["⬇ Tooth Force"]
+        C_fiber["Grain Fibers ═══════"]
+        C_effect["Severs fibers transversely\nHigher cutting force\nClean cut with correct geometry"]
+        C_force --> C_fiber --> C_effect
+    end
 
-   Crosscut (perpendicular to grain):
-   ══════════════════════════════════════
-   ↓ tooth force     grain fibers ═══════
-   Severs fibers transversely; higher force, clean cut with correct geometry
+    subgraph plane ["Grain Direction Relative to Cut Path — Planing / Routing"]
+        subgraph with_grain ["↗ Cutting With the Grain"]
+            WG["Fibers supported at the tip\nShearing action from behind\nClean, smooth cut surface"]
+        end
+        subgraph against_grain ["↙ Cutting Against the Grain"]
+            AG["Fibers unsupported ahead of tool\nFibers lever up before severance\nTearout occurs"]
+        end
+    end
 
-   Grain direction relative to cut path (planing/routing):
-                    ┌──────────────────────────────────┐
-                    │  ↗ Cutting with the grain:       │
-                    │    Fibers supported at the tip;   │
-                    │    clean, shearing cut            │
-                    │                                  │
-                    │  ↙ Cutting against the grain:    │
-                    │    Fibers unsupported, lever up  │
-                    │    before the cut, tearout occurs │
-                    └──────────────────────────────────┘
+    rip ~~~ cross
+    cross ~~~ plane
 ```
 
 Interlocked grain, common in tropical hardwoods like sapele, utile, and certain mahoganies, presents a specific challenge at the mill. The fibers reverse their helical angle every few growth rings, alternating between left-hand and right-hand spirals. Any fixed planer configuration will cut with the grain for half the board and against it for the other half, producing alternating bands of torn surface that cannot be eliminated by adjusting feed rate or blade depth alone. The correct response is to reduce the cutting angle dramatically — using a high-angle plane set to 55 to 60 degrees, or a spiral-head jointer/planer with carbide inserts, which produces a slicing cut rather than a scraping or planing cut and attacks the interlocked fibers from an angle that minimizes leveraging.

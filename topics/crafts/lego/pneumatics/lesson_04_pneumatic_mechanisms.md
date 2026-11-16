@@ -24,26 +24,20 @@ One further invariant governs timing and sequencing, and it is rooted in the phy
 
 A complete Lego pneumatic circuit has five functional layers: the pressure source, the storage and distribution manifold, the control valves, the actuators, and the mechanical transmission that converts linear cylinder motion into useful work. Understanding each layer independently, and then understanding how they interact, is the prerequisite for any build that behaves predictably under load.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     LEGO PNEUMATIC CIRCUIT                          │
-│                                                                     │
-│  ┌──────────┐    ┌──────────────┐    ┌───────────┐    ┌──────────┐ │
-│  │          │    │              │    │           │    │          │ │
-│  │  PUMP    │───▶│  RESERVOIR   │───▶│   VALVE   │───▶│ CYLINDER │ │
-│  │ (manual  │    │ (10 cm³ vol) │    │ (2-way or │    │ (small / │ │
-│  │  or L    │    │              │    │  switch)  │    │  large)  │ │
-│  │  motor)  │    │              │    │           │    │          │ │
-│  └──────────┘    └──────────────┘    └───────────┘    └────┬─────┘ │
-│                                                            │        │
-│                                                            ▼        │
-│                                               ┌─────────────────┐  │
-│                                               │  MECHANICAL     │  │
-│                                               │  TRANSMISSION   │  │
-│                                               │  (lever/linkage/│  │
-│                                               │   gear stage)   │  │
-│                                               └─────────────────┘  │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph circuit ["LEGO PNEUMATIC CIRCUIT"]
+        PUMP["PUMP<br/>(manual or L motor)"]
+        RES["RESERVOIR<br/>(10 cm³ vol)"]
+        VALVE["VALVE<br/>(2-way or switch)"]
+        CYL["CYLINDER<br/>(small / large)"]
+        MECH["MECHANICAL TRANSMISSION<br/>(lever/linkage/<br/>gear stage)"]
+
+        PUMP --> RES
+        RES --> VALVE
+        VALVE --> CYL
+        CYL --> MECH
+    end
 ```
 
 The pressure source is either the manual hand pump (part 74510), which delivers approximately 0.5 cm³ of air per stroke, or a motorized pump assembly where an L or XL motor drives the pump piston through an eccentric cam linkage. The motorized variant runs at around 1–2 Hz pumping frequency when coupled through a 1:3 speed-reduction gear stage, which is the practical sweet spot: fast enough to maintain pressure under moderate load, slow enough that the motor does not stall against pump back-pressure. At 1:1 direct drive, the pump loads the motor heavily and heats it within two minutes of continuous operation. At 1:5 reduction, the pump frequency drops below 0.7 Hz and the system cannot replenish pressure as fast as a large cylinder consumes it during rapid cycling. The 1:3 stage hits the crossover point where thermal and flow requirements balance.
@@ -74,17 +68,20 @@ At first glance this seems well within the L motor's capacity even at 1:1, but t
 
 The practical gear stage for a pump drive train looks like this: a 12-tooth gear on the motor output meshes with a 36-tooth gear on a secondary axle (1:3 reduction). The secondary axle carries the eccentric pin that drives the pump piston rod through a connecting rod assembly. The 36-tooth gear also gives you a convenient attachment point for a secondary cam lobe if you are using mechanical cascade valve switching—mount the cam concentrically with the pump drive gear and size the lobe dwell angle to match your desired valve-open duration, measured in degrees of gear rotation.
 
-```
-Motor Output (12T)
-      │
-      ▼
-  ┌───────┐
-  │  12T  │ ──mesh──▶  ┌───────┐
-  └───────┘             │  36T  │◀── pump eccentric pin on this axle
-                        └───────┘
-                   Reduction Ratio: 36/12 = 3:1
-                   Motor RPM 300 → Pump 100 strokes/min
-                   Motor τ 0.17 Nm → Pump axle 0.51 Nm available
+```mermaid
+flowchart TD
+    A["Motor Output<br/>12T Gear"] -->|mesh| B["36T Gear<br/>Pump Eccentric Pin Axle"]
+    
+    C["Motor: 300 RPM<br/>0.17 Nm"] -.->|input| A
+    B -->|output| D["Pump: 100 strokes/min<br/>0.51 Nm available"]
+    
+    E["Reduction Ratio: 3:1<br/>36T ÷ 12T"]
+    
+    style A fill:#e1f5ff
+    style B fill:#fff3e0
+    style C fill:#f3e5f5
+    style D fill:#e8f5e9
+    style E fill:#fce4ec
 ```
 
 ### Lever Mechanics and Mechanical Advantage
@@ -97,22 +94,26 @@ In a Lego context, these distances are constrained to stud-grid increments of 8 
 
 There is a second geometric effect that is frequently missed: the angle between the cylinder axis and the lever arm changes as the cylinder strokes, and this angle directly affects the torque transferred to the lever. The effective moment arm is not the fixed distance to the pivot pin; it is that distance multiplied by the sine of the included angle between the cylinder and the lever. At 90°, efficiency is perfect. At 30°, only half the cylinder force contributes to rotation—the rest is wasted as a compressive load through the pivot pin. For this reason, well-designed Lego pneumatic linkages position the cylinder attachment point such that the cylinder is close to perpendicular to the lever at the midpoint of its useful travel, accepting reduced efficiency at the extremes in exchange for maximum torque where the mechanism does its primary work.
 
-```
-        PIVOT
-          │
-          │◀── d_cyl ──▶│          │◀─────── d_load ────────▶│
-          │             │          │                           │
-     ═════╪═════════════╪══════════╪═══════════════════════════╪═══
-         [P]           [C]        [L]
-                   Cylinder     Load
-                   attach       attach
-                   point        point
-
-  MA = d_cyl / d_load
-
-  Effective torque at load:
-  τ = F_cylinder × d_cyl × sin(θ)
-  where θ = angle between cylinder axis and lever beam
+```mermaid
+flowchart LR
+    subgraph lever ["Lever System"]
+        P["PIVOT"]
+        C["Cylinder<br/>Attach Point"]
+        L["Load<br/>Attach Point"]
+        P -->|d_cyl| C
+        C -->|d_load| L
+    end
+    
+    subgraph calcs ["Mechanical Advantage"]
+        MA["MA = d_cyl / d_load"]
+    end
+    
+    subgraph torque ["Effective Torque at Load"]
+        TAU["τ = F_cylinder × d_cyl × sin(θ)<br/>where θ = angle between<br/>cylinder axis and lever beam"]
+    end
+    
+    lever --> calcs
+    lever --> torque
 ```
 
 ---

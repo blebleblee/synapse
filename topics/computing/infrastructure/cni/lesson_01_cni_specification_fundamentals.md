@@ -164,12 +164,34 @@ For production networks, a single plugin is rarely sufficient. A realistic pod n
 
 The runtime processes the `plugins` array in order for ADD and in reverse order for DEL. Each plugin in the chain receives the previous plugin's Result object injected into its configuration JSON under the key `prevResult`. This threading of results through the chain is how a firewall plugin knows which IP address was just allocated by its predecessor: it reads `prevResult.ips[0].address` and installs rules against that address. A plugin that modifies the network state must also update and re-emit the Result, preserving any fields added by earlier plugins and augmenting with its own additions.
 
-```
-ADD  →  Plugin[0] → Plugin[1] → Plugin[2]
-              result ──► prevResult ──► prevResult
+```mermaid
+flowchart TD
 
-DEL  ←  Plugin[2] → Plugin[1] → Plugin[0]
-        (reverse order, all receive original config + prevResult)
+    subgraph add_flow ["ADD — Forward Pass"]
+        direction LR
+        ADD_trigger(["ADD"])
+        P0_add["Plugin[0]"]
+        P1_add["Plugin[1]"]
+        P2_add["Plugin[2]"]
+
+        ADD_trigger --> P0_add
+        P0_add -->|"result → prevResult"| P1_add
+        P1_add -->|"result → prevResult"| P2_add
+    end
+
+    subgraph del_flow ["DEL — Reverse Pass"]
+        direction LR
+        P2_del["Plugin[2]"]
+        P1_del["Plugin[1]"]
+        P0_del["Plugin[0]"]
+        DEL_trigger(["DEL"])
+
+        P2_del -->|"originalConfig + prevResult"| P1_del
+        P1_del -->|"originalConfig + prevResult"| P0_del
+        P0_del --> DEL_trigger
+    end
+
+    add_flow -->|"reverse on delete"| del_flow
 ```
 
 This directional, stateless chaining model has an important property: no central coordinator is needed. The runtime itself is the orchestrator, and it carries the state between plugins as a simple JSON value. If a plugin crashes midway through a chain, the runtime knows exactly which plugins completed (those before the failure) and which did not (the failed plugin and everything after it), because it tracks position in the array and the return value from each exec call.

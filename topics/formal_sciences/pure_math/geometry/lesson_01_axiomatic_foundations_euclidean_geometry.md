@@ -64,26 +64,24 @@ The corresponding structure for angles holds symmetrically: congruence of angles
 
 The logical architecture of Euclidean geometry in Hilbert's formulation can be understood as a directed acyclic graph in which nodes are propositions and edges represent direct logical dependency. The axioms are the source nodes. Every theorem is reachable from the axioms by a finite path of valid inference steps. The power of the axiomatic method is precisely this graph structure: once a theorem is proved, it becomes available as a node that subsequent theorems can depend on, and the correctness of the entire structure reduces to the correctness of the source nodes and the validity of each individual edge.
 
-```
-Incidence Axioms (I.1–I.8)
-        │
-        ▼
-Order Axioms (II.1–II.5)      Congruence Axioms (III.1–III.6)
-        │                               │
-        └─────────────┬─────────────────┘
-                      ▼
-             Triangle Congruence Theorems
-             (SAS, ASA, SSS, AAS, HL)
-                      │
-            ┌─────────┴──────────┐
-            ▼                    ▼
-    Parallel Axiom          Continuity Axioms
-    (Playfair)              (Archimedean + Cantor)
-            │                    │
-            └─────────┬──────────┘
-                      ▼
-           Angle Sum Theorem, Pythagorean Theorem,
-           Circle Theorems, Similar Triangle Theory
+```mermaid
+flowchart TD
+    I["Incidence Axioms (I.1–I.8)"]
+    O["Order Axioms (II.1–II.5)"]
+    C["Congruence Axioms (III.1–III.6)"]
+    T["Triangle Congruence Theorems<br/>(SAS, ASA, SSS, AAS, HL)"]
+    P["Parallel Axiom<br/>(Playfair)"]
+    CT["Continuity Axioms<br/>(Archimedean + Cantor)"]
+    F["Angle Sum Theorem, Pythagorean Theorem,<br/>Circle Theorems, Similar Triangle Theory"]
+    
+    I --> O
+    I --> T
+    O --> T
+    C --> T
+    T --> P
+    T --> CT
+    P --> F
+    CT --> F
 ```
 
 The triangle congruence theorems occupy a pivotal position in this graph. They are the first propositions that allow reasoning to transfer information across *different* triangles — that is, to establish facts about one geometric object by identifying it with another. This transfer mechanism is so productive that an enormous fraction of classical Euclidean geometry amounts to the following strategy: given an unknown configuration, decompose it into triangles, identify congruent triangle pairs, and extract the desired equalities from the congruence.

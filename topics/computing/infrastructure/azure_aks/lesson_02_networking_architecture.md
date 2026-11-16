@@ -36,78 +36,72 @@ Azure CNI's address allocation mechanism begins during node bootstrap when the k
 
 When the kubelet needs to start a pod, it invokes the CNI plugin's ADD command with a JSON payload describing the container ID, network namespace path, and interface name. The Azure CNI plugin selects an available IP from the pre-allocated pool, creates a veth pair with one end in the pod's network namespace and the other in the node's root namespace, attaches the root-side veth to the Linux bridge device (typically azure0), assigns the allocated IP address to the pod-side veth interface, configures a default route pointing to the bridge device, and returns a JSON response containing the allocated IP address and gateway configuration. The pod's network namespace now contains a fully configured network interface with a routable Azure VNet IP address, and the bridge device forwards traffic between pod interfaces and the node's primary NIC using standard Linux bridge forwarding rules.
 
-```
-Node Network Architecture (Azure CNI):
-
-┌─────────────────────────────────────────────────────────┐
-│ Node VM (VNet IP: 10.240.0.4/16)                       │
-│                                                           │
-│  ┌─────────────────────────────────────────────────┐   │
-│  │ eth0 (Primary NIC)                               │   │
-│  │ Primary IP: 10.240.0.4                           │   │
-│  │ Secondary IPs: 10.240.0.10, 10.240.0.11, ...    │   │
-│  └────────────────┬────────────────────────────────┘   │
-│                   │                                      │
-│  ┌────────────────┴────────────────────────────────┐   │
-│  │ azure0 Bridge Device                             │   │
-│  │ Routes pod subnet traffic to eth0                │   │
-│  └─────┬───────────────────┬────────────────────────┘   │
-│        │                   │                             │
-│  ┌─────┴─────┐       ┌─────┴─────┐                     │
-│  │ veth0     │       │ veth1     │                     │
-│  └─────┬─────┘       └─────┬─────┘                     │
-│        │                   │                             │
-│  ┌─────┴──────────┐  ┌─────┴──────────┐                │
-│  │ Pod A netns    │  │ Pod B netns    │                │
-│  │ IP: 10.240.0.10│  │ IP: 10.240.0.11│                │
-│  │ Route:         │  │ Route:         │                │
-│  │ default via    │  │ default via    │                │
-│  │ bridge gateway │  │ bridge gateway │                │
-│  └────────────────┘  └────────────────┘                │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph NodeVM["Node VM (VNet IP: 10.240.0.4/16)"]
+        eth0["eth0 (Primary NIC)<br/>Primary IP: 10.240.0.4<br/>Secondary IPs: 10.240.0.10, 10.240.0.11, ..."]
+        
+        azure0["azure0 Bridge Device<br/>Routes pod subnet traffic to eth0"]
+        
+        veth0["veth0"]
+        veth1["veth1"]
+        
+        subgraph PodA["Pod A netns"]
+            podAIP["IP: 10.240.0.10<br/>Route: default via bridge gateway"]
+        end
+        
+        subgraph PodB["Pod B netns"]
+            podBIP["IP: 10.240.0.11<br/>Route: default via bridge gateway"]
+        end
+        
+        eth0 --> azure0
+        azure0 --> veth0
+        azure0 --> veth1
+        veth0 --> podAIP
+        veth1 --> podBIP
+    end
 ```
 
 Kubenet constructs a fundamentally different topology where pod addresses live in a private address space disconnected from the VNet's routing domain. During node initialization, the kubelet assigns each node a /24 CIDR block from the cluster's pod CIDR range, typically a large RFC1918 range like 10.244.0.0/16, subdividing it into per-node blocks like 10.244.0.0/24, 10.244.1.0/24, and so forth. The kubelet creates a cbr0 bridge device, assigns the first address from the node's CIDR as the bridge's IP address (e.g., 10.244.0.1), and configures iptables rules to SNAT all traffic leaving the node from the pod CIDR range to the node's primary IP address.
 
 When starting a pod, the kubenet plugin creates a veth pair connecting the pod's network namespace to the cbr0 bridge, assigns an IP from the node's pod CIDR to the pod interface, configures the pod's default route to point to the bridge's gateway address, and returns without making any Azure API calls since no VNet-level resource allocation is required. Outbound traffic from the pod reaches the cbr0 bridge, where the kernel's routing table forwards it to the eth0 interface, and iptables POSTROUTING rules in the NAT table match packets with source addresses in the pod CIDR range, applying SNAT masquerading to replace the pod's source IP with the node's eth0 primary IP before packets enter the VNet fabric.
 
-```
-Node Network Architecture (kubenet):
-
-┌─────────────────────────────────────────────────────────┐
-│ Node VM (VNet IP: 10.240.0.4/16)                       │
-│                                                           │
-│  ┌─────────────────────────────────────────────────┐   │
-│  │ eth0 (Primary NIC)                               │   │
-│  │ Primary IP: 10.240.0.4                           │   │
-│  │ (Only IP visible to Azure VNet)                  │   │
-│  └────────────────┬────────────────────────────────┘   │
-│                   │                                      │
-│                   │ iptables SNAT rules masquerade     │
-│                   │ pod CIDR 10.244.0.0/24 to 10.240.0.4│
-│                   │                                      │
-│  ┌────────────────┴────────────────────────────────┐   │
-│  │ cbr0 Bridge Device                               │   │
-│  │ IP: 10.244.0.1/24 (Pod gateway)                  │   │
-│  └─────┬───────────────────┬────────────────────────┘   │
-│        │                   │                             │
-│  ┌─────┴─────┐       ┌─────┴─────┐                     │
-│  │ veth0     │       │ veth1     │                     │
-│  └─────┬─────┘       └─────┬─────┘                     │
-│        │                   │                             │
-│  ┌─────┴──────────┐  ┌─────┴──────────┐                │
-│  │ Pod A netns    │  │ Pod B netns    │                │
-│  │ IP: 10.244.0.2 │  │ IP: 10.244.0.3 │                │
-│  │ (Private, NAT) │  │ (Private, NAT) │                │
-│  │ Route: default │  │ Route: default │                │
-│  │ via 10.244.0.1 │  │ via 10.244.0.1 │                │
-│  └────────────────┘  └────────────────┘                │
-└─────────────────────────────────────────────────────────┘
-
-VNet Routing Table (Azure UDR):
-Destination: 10.244.0.0/24 → Next Hop: 10.240.0.4
-Destination: 10.244.1.0/24 → Next Hop: 10.240.0.5
-(Per-node routes for pod CIDR blocks)
+```mermaid
+flowchart TD
+    subgraph VNet["Azure VNet"]
+        subgraph UDR["VNet Routing Table (Azure UDR)"]
+            Route1["10.244.0.0/24 → 10.240.0.4"]
+            Route2["10.244.1.0/24 → 10.240.0.5"]
+        end
+        
+        subgraph Node["Node VM (VNet IP: 10.240.0.4/16)"]
+            NIC["eth0 (Primary NIC)<br/>Primary IP: 10.240.0.4<br/>(Only IP visible to Azure VNet)"]
+            
+            IPTABLES["iptables SNAT rules<br/>masquerade pod CIDR<br/>10.244.0.0/24 → 10.240.0.4"]
+            
+            Bridge["cbr0 Bridge Device<br/>IP: 10.244.0.1/24<br/>(Pod gateway)"]
+            
+            veth0["veth0"]
+            veth1["veth1"]
+            
+            subgraph PodA["Pod A netns"]
+                PodA_IP["IP: 10.244.0.2<br/>(Private, NAT)<br/>Route: default<br/>via 10.244.0.1"]
+            end
+            
+            subgraph PodB["Pod B netns"]
+                PodB_IP["IP: 10.244.0.3<br/>(Private, NAT)<br/>Route: default<br/>via 10.244.0.1"]
+            end
+            
+            NIC --> IPTABLES
+            IPTABLES --> Bridge
+            Bridge --> veth0
+            Bridge --> veth1
+            veth0 --> PodA_IP
+            veth1 --> PodB_IP
+        end
+        
+        UDR -.->|routes to| NIC
+    end
 ```
 
 Inbound traffic to kubenet pods requires Azure User-Defined Routes that direct traffic for each node's pod CIDR to that node's IP address as the next hop. The AKS control plane automatically maintains these routes in the VNet's route table, watching the Kubernetes node objects for pod CIDR assignments and creating corresponding UDR entries. When a packet destined for 10.244.0.2 enters the VNet from a peered network or VPN gateway, the route table lookup matches the 10.244.0.0/24 entry and forwards the packet to node IP 10.240.0.4, where iptables rules in the FORWARD chain permit the traffic and the kernel's routing table forwards it through the cbr0 bridge to the destination pod.

@@ -28,40 +28,31 @@ Each alloying element is weighted by its effect on hardenability — that is, it
 
 The weld cross-section is not a uniform mass of re-solidified metal. It is a precisely stratified set of zones, each defined by the peak temperature it reached during the thermal cycle and the subsequent cooling rate. Understanding this architecture is prerequisite to reading a macro-etch, interpreting a failed weld, or specifying a post-weld heat treatment.
 
-```
-WELD CROSS-SECTION — ZONE MAP (transverse view, single-pass butt weld)
-═══════════════════════════════════════════════════════════════════════
-
-   BASE METAL          HAZ                  WELD METAL
-   (unaffected)  ←─────────────────────→  (fusion zone)
-   ─────────────┬───┬────┬────┬────┬────┬──────────────────
-                │ A │ B  │ C  │ D  │ E  │
-   ─────────────┴───┴────┴────┴────┴────┴──────────────────
-                 │    │    │    │    │
-                 │    │    │    │    └─ E: Subcritical HAZ
-                 │    │    │    │       (Tp < Ac1, ~600–720°C)
-                 │    │    │    │       Stress-relief range; carbide
-                 │    │    │    │       coarsening in prior-tempered steels
-                 │    │    │    │
-                 │    │    │    └─ D: Intercritical HAZ
-                 │    │    │       (Tp ~720–820°C, Ac1–Ac3)
-                 │    │    │       Partial austenitization; mixed
-                 │    │    │       ferrite + fresh martensite (embrittlement risk)
-                 │    │    │
-                 │    │    └─ C: Fine-Grained HAZ (FGHAZ)
-                 │    │       (Tp ~900–1100°C, above Ac3)
-                 │    │       Full austenitization, fine recrystallized grains;
-                 │    │       often toughest HAZ sub-zone
-                 │    │
-                 │    └─ B: Coarse-Grained HAZ (CGHAZ)
-                 │       (Tp ~1100–1450°C, near fusion line)
-                 │       Prior austenite grains grow rapidly;
-                 │       highest hardenability; worst toughness
-                 │
-                 └─ A: Fusion Boundary / Partial Melt Zone
-                    (Tp ~1450–1500°C)
-                    Constitutional liquation possible;
-                    epitaxial nucleation site for columnar grains
+```mermaid
+flowchart LR
+    BM["BASE METAL<br/>(unaffected)"]
+    
+    subgraph HAZ ["HEAT-AFFECTED ZONE (HAZ)"]
+        direction LR
+        A["A: Fusion Boundary /<br/>Partial Melt Zone<br/><br/>Tp ~1450–1500°C<br/>Constitutional liquation possible;<br/>epitaxial nucleation site<br/>for columnar grains"]
+        
+        B["B: Coarse-Grained HAZ<br/>(CGHAZ)<br/><br/>Tp ~1100–1450°C<br/>near fusion line<br/>Prior austenite grains grow rapidly;<br/>highest hardenability;<br/>worst toughness"]
+        
+        C["C: Fine-Grained HAZ<br/>(FGHAZ)<br/><br/>Tp ~900–1100°C<br/>above Ac3<br/>Full austenitization,<br/>fine recrystallized grains;<br/>often toughest HAZ sub-zone"]
+        
+        D["D: Intercritical HAZ<br/><br/>Tp ~720–820°C<br/>Ac1–Ac3<br/>Partial austenitization;<br/>mixed ferrite + fresh martensite<br/>(embrittlement risk)"]
+        
+        E["E: Subcritical HAZ<br/><br/>Tp < Ac1<br/>~600–720°C<br/>Stress-relief range;<br/>carbide coarsening<br/>in prior-tempered steels"]
+    end
+    
+    WM["WELD METAL<br/>(fusion zone)"]
+    
+    BM --> E
+    E --> D
+    D --> C
+    C --> B
+    B --> A
+    A --> WM
 ```
 
 The coarse-grained heat-affected zone (CGHAZ) commands the most attention from a failure-analysis standpoint. When steel is heated above roughly 1100°C, austenite grain boundary migration becomes rapid, and the grain-boundary pinning particles — typically titanium nitrides (TiN) or aluminum oxides — either dissolve into the matrix or coarsen beyond the point where they can retard boundary motion. The result is a dramatic increase in prior austenite grain size. Because hardenability scales directly with austenite grain size (larger grains mean longer diffusion paths for carbon during cooling, reducing the kinetics of pearlite formation and increasing the tendency toward martensite), the CGHAZ of high-CE steels is precisely where hydrogen-induced cold cracking initiates. The fracture path follows prior austenite grain boundaries, and the fracture surface has a characteristic intergranular, faceted appearance when viewed under a scanning electron microscope.
@@ -80,27 +71,64 @@ During the heating phase, the metal near the arc expands thermally. The surround
 
 The distribution of these stresses follows a characteristic pattern. Longitudinal stresses (parallel to the weld axis) are highest directly over the weld, reaching values near the yield strength in a narrow band, then transitioning to balancing compressive stresses in the outer regions of the plate. Transverse stresses (perpendicular to the weld axis) are more uniform but can be significantly elevated by joint restraint — a weld made between two rigidly clamped plates will carry far higher transverse residual stress than the same weld made on freely supported plates.
 
-```
-RESIDUAL STRESS DISTRIBUTION — Longitudinal Stress Profile
-(transverse cross-section, single-pass butt weld in steel plate)
+```mermaid
+flowchart TD
+    subgraph legend ["Legend"]
+        L1["Fy = Tensile yield strength peak (weld metal)"]
+        L2["Fc = Balancing compressive stress (base metal)"]
+        L3["HAZ = Heat-Affected Zone"]
+    end
 
-  Stress
-  (+Tensile)
-     │
- +Fy ┤           ╭──────────╮
-     │          ╱            ╲
-     │         ╱              ╲
-   0 ┤─────╮──╯                ╰──╭─────────────────
-     │      ╲                    ╱
-     │       ╲                  ╱
- -Fc ┤        ╰────────────────╯
-     │
-  (-Compressive)
-     └───────────────────────────────────────────────
-       Plate edge   Weld CL    HAZ    Base metal far field
+    subgraph profile ["Longitudinal Residual Stress Profile — Transverse Cross-Section\n(Single-Pass Butt Weld in Steel Plate)"]
+        direction LR
 
-  Fy = Approximate yield strength (tension peak in weld metal)
-  Fc = Balancing compressive stress in base metal
+        subgraph stress_axis ["Stress Axis (vertical)"]
+            S_pos["+ Fy\n(Tensile Peak)"]
+            S_zero["0\n(Neutral)"]
+            S_neg["− Fc\n(Compressive Trough)"]
+            S_pos --> S_zero --> S_neg
+        end
+
+        subgraph zones ["Plate Zones (left → right)"]
+            Z1["Plate Edge\n(near-zero stress,\ntransitioning to compression)"]
+            Z2["Heat-Affected Zone — HAZ\n(stress rises steeply\nfrom compressive to tensile)"]
+            Z3["Weld Centreline\n(peak tensile stress ≈ +Fy)"]
+            Z4["Heat-Affected Zone — HAZ\n(stress drops steeply\nback toward compressive)"]
+            Z5["Base Metal Far Field\n(low compressive plateau ≈ −Fc,\nbalances weld tension)"]
+
+            Z1 -->|"stress rises"| Z2
+            Z2 -->|"reaches tensile peak"| Z3
+            Z3 -->|"stress falls"| Z4
+            Z4 -->|"decays to plateau"| Z5
+        end
+
+        subgraph stress_levels ["Stress State by Zone"]
+            SL1["Zone: Plate Edge\nStress: ~0 → slight compression"]
+            SL2["Zone: HAZ (approach)\nStress: compression → tension transition"]
+            SL3["Zone: Weld CL\nStress: +Fy (tensile yield)"]
+            SL4["Zone: HAZ (retreat)\nStress: tension → compression transition"]
+            SL5["Zone: Base Metal Far Field\nStress: −Fc (uniform low compression)"]
+
+            SL1 --> SL2 --> SL3 --> SL4 --> SL5
+        end
+
+        subgraph equilibrium ["Global Equilibrium Condition"]
+            EQ["∫ σ dA = 0\nTensile force in weld region\n= Compressive force in base metal\n(self-equilibrating system)"]
+        end
+    end
+
+    Z1 --- SL1
+    Z2 --- SL2
+    Z3 --- SL3
+    Z4 --- SL4
+    Z5 --- SL5
+
+    SL3 -. "peak maps to" .-> S_pos
+    SL1 -. "near-zero maps to" .-> S_zero
+    SL5 -. "trough maps to" .-> S_neg
+
+    SL5 --> EQ
+    SL3 --> EQ
 ```
 
 Distortion is the visible, geometric consequence of these same thermal strains. Angular distortion in a butt weld occurs because the weld reinforcement on the crown contracts more than the root, rotating the plate edges upward. Longitudinal bowing occurs because the weld contracts along its length, bowing a long weldment into a slight arc. Transverse shrinkage reduces the total joint width by a predictable amount — roughly 1–3 mm for a single-pass butt weld in 10 mm mild steel — which must be accounted for in precise fabrication. Skilled fabricators pre-set their joints with a deliberate angular offset in the direction opposite the expected distortion, so the assembly springs into geometric tolerance as it cools.

@@ -20,32 +20,26 @@ The third invariant distinguishes **cold** from **hot** observables, a distincti
 
 A Flux pipeline is a linked list of operator nodes assembled at subscription time. When you write a chain like `Flux.range(1, 1_000_000).map(i -> i * 2).filter(i -> i % 3 == 0).take(1000)`, Reactor assembles this into an operator assembly. Each operator implements `CorePublisher` and wraps a downstream `CoreSubscriber`. Subscription initiates a recursive `subscribe()` call that walks the chain from downstream to upstream, wiring each operator's inner subscriber to the previous stage. The demand signal travels upstream through `request(n)` calls; data travels downstream through `onNext(T)` calls.
 
-```
-Subscriber
-    │  request(n)
-    ▼
- TakeSubscriber (take 1000)
-    │  request(n)
-    ▼
- FilterSubscriber (% 3 == 0)
-    │  request(n * replenishment_ratio)
-    ▼
- MapSubscriber (* 2)
-    │  request(n)
-    ▼
- RangeSubscription (source)
-    │  onNext(i)
-    ▼
- MapSubscriber
-    │  onNext(i * 2)
-    ▼
- FilterSubscriber
-    │  onNext (passes or drops)
-    ▼
- TakeSubscriber
-    │  onNext (counts, cancels at 1000)
-    ▼
- Subscriber.onNext(value)
+```mermaid
+flowchart TD
+    A["Subscriber"]
+    B["TakeSubscriber<br/>(take 1000)"]
+    C["FilterSubscriber<br/>(% 3 == 0)"]
+    D["MapSubscriber<br/>(* 2)"]
+    E["RangeSubscription<br/>(source)"]
+    F["MapSubscriber"]
+    G["FilterSubscriber"]
+    H["TakeSubscriber"]
+    I["Subscriber.onNext<br/>(value)"]
+    
+    A -->|"request(n)"| B
+    B -->|"request(n)"| C
+    C -->|"request(n * replenishment_ratio)"| D
+    D -->|"request(n)"| E
+    E -->|"onNext(i)"| F
+    F -->|"onNext(i * 2)"| G
+    G -->|"onNext<br/>(passes or drops)"| H
+    H -->|"onNext<br/>(counts, cancels at 1000)"| I
 ```
 
 Reactor performs **operator fusion** when adjacent operators implement compatible fuseable interfaces (`QueueSubscription`, `Fuseable.SYNC`, `Fuseable.ASYNC`). When two adjacent operators are both `SYNC`-fuseable, Reactor collapses the queue between them: instead of enqueuing into an intermediate queue and immediately dequeuing, `onNext` delivers directly through the chain without allocation. This is not a micro-optimization for infrastructure engineers. At 500,000 events per second through a pod scheduling pipeline, the difference between allocating an intermediate `ArrayBlockingQueue` node per event and not doing so is measurable in GC pause latency.
@@ -66,14 +60,16 @@ Backpressure strategies are not policies you configure once at the subscriber. T
 
 The transition from cold to hot is accomplished through `publish()`, which wraps a cold `Flux` in a `ConnectableFlux`. The `ConnectableFlux` holds a single subscription to the upstream source and multicasts to all downstream subscribers. It does not begin emitting until `connect()` is called (or `autoConnect(n)` triggers after `n` subscribers have attached). The internal implementation maintains a `DirectProcessor` or a `Sinks.many().multicast()` depending on Reactor version; in Reactor 3.4+ the `Sinks` API supersedes the deprecated processor classes entirely.
 
-```
-                     Cold Source
-                         │
-                    ConnectableFlux
-                   (single upstream sub)
-                   ┌────────┴────────┐
-              Subscriber A       Subscriber B
-           (independent demand) (independent demand)
+```mermaid
+flowchart TD
+    CS["Cold Source"]
+    CF["ConnectableFlux<br/>(single upstream sub)"]
+    SA["Subscriber A<br/>(independent demand)"]
+    SB["Subscriber B<br/>(independent demand)"]
+    
+    CS --> CF
+    CF --> SA
+    CF --> SB
 ```
 
 The demand semantics of a multicast `ConnectableFlux` are worth examining carefully. The `ConnectableFlux` requests from upstream the minimum of all subscribers' outstanding demand. If subscriber A requests 100 and subscriber B requests 10, the source emits 10 items. Subscriber A's outstanding demand decreases to 90, subscriber B's to 0. The source will not emit again until subscriber B issues more demand. This is called the **slow subscriber problem**, and it is one of the most operationally significant failure modes in infrastructure stream processing. A single lagging consumer in a multicast group throttles all other consumers to its rate.
@@ -85,15 +81,17 @@ The resolution depends on whether the pipeline can tolerate divergence between s
 The subscription lifecycle follows a strict state machine. A `Subscription` begins in the `REQUESTED` state upon `subscribe()`. It transitions through `CANCELLED` upon `cancel()` from downstream, or reaches terminal state via `onComplete()` or `onError(t)`. Once terminal, no further signals are valid, and any operator that emits after terminal is a protocol violation that Reactor will suppress with a `Hooks.onNextDropped` callback.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Active : subscribe() / onSubscribe()
-    Active --> Active : request(n) / onNext(item)
-    Active --> Completed : onComplete()
-    Active --> Errored : onError(t)
-    Active --> Cancelled : cancel()
-    Completed --> [*]
-    Errored --> [*]
-    Cancelled --> [*]
+flowchart TD
+    Start(["Start"]) --> Active["Active"]
+    Active -->|"request(n) / onNext(item)"| Active
+    Active -->|"onComplete()"| Completed["Completed"]
+    Active -->|"onError(t)"| Errored["Errored"]
+    Active -->|"cancel()"| Cancelled["Cancelled"]
+    Completed --> End1(["End"])
+    Errored --> End2(["End"])
+    Cancelled --> End3(["End"])
+    
+    Start -.->|"subscribe() / onSubscribe()"| Active
 ```
 
 Cancellation is propagated upstream through the `Subscription.cancel()` method, and each operator in the chain is responsible for forwarding cancellation to its upstream subscription. This is not automatic: custom operators that hold external resources (database cursors, file handles, network connections) must implement `CoreSubscriber` and handle cancellation in their `cancel()` override. Failure to do so is the most common source of resource leaks in Reactor-based infrastructure services. The `Flux.using(resourceSupplier, fluxFactory, resourceCleanup)` operator codifies the acquire-use-release pattern so that resource cleanup occurs on completion, error, and cancellation uniformly.

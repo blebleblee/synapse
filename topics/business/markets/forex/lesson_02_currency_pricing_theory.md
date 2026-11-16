@@ -64,47 +64,29 @@ where "basis" is the cross-currency basis spread — a persistent non-zero term 
 
 The following diagram illustrates the full mechanical signal path from deposit market inputs to a quoted forward rate and the arbitrage circuit that enforces CIP:
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    CIP Pricing & Arbitrage Architecture             │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph inputs["INPUTS"]
+        A["Spot Rate<br/>S (EUR/USD)"]
+        B["USD OIS<br/>r_d (%)"]
+        C["Foreign CCY OIS<br/>r_f + basis (%)"]
+    end
 
-   INPUTS
-   ┌──────────────┐    ┌──────────────┐    ┌──────────────────────┐
-   │ Spot Rate    │    │  USD OIS     │    │  Foreign CCY OIS     │
-   │  S (EUR/USD) │    │  r_d  (%)    │    │  r_f + basis (%)     │
-   └──────┬───────┘    └──────┬───────┘    └──────────┬───────────┘
-          │                   │                       │
-          └──────────────────►│◄──────────────────────┘
-                              │
-                     ┌────────▼────────┐
-                     │  Forward Price  │
-                     │                 │
-                     │  F = S × (1+r_d)│
-                     │        ───────  │
-                     │       (1+r_f+b) │
-                     └────────┬────────┘
-                              │
-                   ┌──────────▼──────────┐
-                   │  Forward Points     │
-                   │  (Fwd - Spot) × pip │
-                   │  multiplier         │
-                   └──────────┬──────────┘
-                              │
-            ┌─────────────────▼──────────────────┐
-            │          ARBITRAGE CHECK            │
-            │                                     │
-            │  If |F_market - F_theoretical| >    │
-            │  bid-ask + balance sheet cost:      │
-            │                                     │
-            │  ┌────────────────────────────────┐ │
-            │  │ BORROW low-rate CCY at r_f      │ │
-            │  │ CONVERT to high-rate CCY at S   │ │
-            │  │ INVEST at r_d                   │ │
-            │  │ SELL forward at F_market        │ │
-            │  │ REPAY borrowing → lock profit   │ │
-            │  └────────────────────────────────┘ │
-            └─────────────────────────────────────┘
+    A --> D
+    B --> D
+    C --> D
+
+    D["Forward Price<br/><br/>F = S × (1+r_d) / (1+r_f+b)"]
+    
+    D --> E["Forward Points<br/>(Fwd - Spot) × pip multiplier"]
+    
+    E --> F["ARBITRAGE CHECK<br/><br/>If |F_market - F_theoretical| ><br/>bid-ask + balance sheet cost"]
+    
+    F --> G["BORROW low-rate CCY at r_f<br/>CONVERT to high-rate CCY at S<br/>INVEST at r_d<br/>SELL forward at F_market<br/>REPAY borrowing → lock profit"]
+
+    style inputs fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style F fill:#fff4e6,stroke:#ff9800,stroke-width:2px
+    style G fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
 ```
 
 The forward points themselves — the difference between the outright forward rate and the spot rate, quoted in pips — are what traders and corporate treasurers actually see on their trading platforms (Bloomberg FXFA screen, Refinitiv FXall, or direct bank portal) rather than the outright forward rate. For EUR/USD with spot at 1.0850 and 12-month forward points of −130 pips, the outright one-year forward is 1.0720. A corporate treasurer locking in a forward sale of EUR receivables is effectively selling EUR forward at 1.0720, which guarantees a USD receipt at a rate below today's spot, reflecting the dollar's higher carry cost over the year.
@@ -121,6 +103,21 @@ The relationship between spot, forwards, and expected future rates is best visua
 
 Practitioners use the forward curve in two distinct operational modes. The first is **hedging mode**, in which a corporate or institutional investor with a known future currency cash flow (a dividend repatriation, an acquisition payment, a bond coupon) locks in the forward rate to eliminate FX risk. The hedge is marked-to-market daily against the prevailing forward rate, and the P&L impact flows through OCI (Other Comprehensive Income) under IFRS 9 or ASC 815 for corporates that apply hedge accounting. The second is **speculative mode**, in which a macro fund or prop desk takes a view that spot will deviate from the forward in a profitable direction — a bet that UIP will fail in a specific direction over a specific horizon. The critical difference is that the hedger does not need to predict the spot rate; the speculator does.
 
-The real exchange rate framework adds the final layer of analytical architecture. The **real effective exchange rate (REER)** is a trade-weighted index that adjusts the nominal exchange rate by the relative price levels of trading partners. It is the most comprehensive measure of competitive valuation because it captures both the exchange rate and inflation differentials simultaneously. When the REER is elevated relative to its long-run average, the currency is "overvalued" in PPP terms — exports become less competitive, the current account deteriorates, and eventual spot depreciation is implied by external balance dynamics. When the REER is depressed, the reverse holds.
+The real exchange rate framework adds the final layer of analytical architecture. The **real effective exchange rate (REER)** is a trade-weighted index that adjusts the nominal exchange rate by the relative price levels of trading partners. It is the most comprehensive measure of competitive valuation because it captures both the exchange rate and inflation differentials simultaneously. When the REER is elevated relative to its long-run average, the currency is "overvalued" in PPP terms — exports become less competitive, the current account deteriorates, and eventual spot depreciation is implied by external balance dynamics.
 
-The REER is published monthly by the BIS, the IMF (as part of its World Economic Outlook database), and central banks, and it serves as an
+Central banks and sovereign wealth funds monitor the REER closely because it is the most reliable forward indicator of balance-of-payments adjustment. A sustained REER overvaluation—particularly when accompanied by a widening current account deficit and rising external debt—creates the conditions for a sharp nominal depreciation, as capital inflows slow and the currency must adjust to restore external equilibrium. The REER thus links the three pillars of currency valuation: purchasing power parity determines the long-run equilibrium, interest rate parity governs the forward curve and short-term carry dynamics, and the real effective exchange rate integrates both into a competitiveness metric that anticipates medium-term spot movements. Practitioners who understand these relationships can distinguish between temporary mispricings (UIP deviations that generate alpha in the short run) and fundamental disequilibria (REER extremes that signal structural adjustment ahead). The forward curve, in this framework, is not merely a hedging instrument—it is a real-time consensus forecast of interest rate differentials, a no-arbitrage benchmark for spot prediction, and a window into the market's assessment of central bank credibility and sovereign risk.
+
+The operational implication is that currency valuation is never a single-variable problem. A trader who buys high-yield currency exposure without checking the REER is betting on carry without accounting for terminal depreciation risk. A corporate treasurer who hedges a receivable at the forward rate without understanding the interest differential is locking in a rate that may be far from the expected spot outcome. The rigorous approach integrates spot-forward arbitrage, forward-forward extrapolation, real exchange rate positioning, and central bank reaction functions into a unified view. In practice, the most successful currency strategies are those that identify **divergences across these frameworks**—moments when CIP holds but UIP is failing, when the forward curve is steep but the REER is at multi-year lows, or when interest differentials are wide but inflation convergence is imminent. These divergences are where mispricing concentrates, and where the principles of this lesson deliver the highest informational edge.
+
+---
+
+## Summary & Verification Matrix
+
+| **Framework** | **Governing Invariant** | **Core Mechanism** | **Diagnostic Criterion** | **Failure Mode** |
+|---------------|------------------------|-------------------|-------------------------|-----------------|
+| **Covered Interest Parity (CIP)** | \( F/S = (1 + i_d)/(1 + i_f) \) | Arbitrage via cash-forward-borrow-invest loop enforces no-arbitrage pricing in spot-forward space | CIP deviation < 5 bps in G10; wider in EM or stress → arbitrage cost or counterparty risk | Post-2008 basis persists due to balance sheet constraints, regulatory capital, and cross-currency funding premia |
+| **Uncovered Interest Parity (UIP)** | \( E[S_{t+1}] = F_t \) or \( E[\Delta s] \approx i_d - i_f \) | High-yield currencies should depreciate by interest differential; forward is unbiased predictor of future spot | UIP holds on average over long horizons (5–10 years); fails systematically in short run (< 2 years) | Forward premium puzzle: high-yield currencies appreciate, not depreciate → carry trade profitability and predictable UIP violations |
+| **Purchasing Power Parity (PPP)** | \( S = P_d / P_f \) (absolute); \( \Delta s \approx \pi_d - \pi_f \) (relative) | Arbitrage in goods markets (Law of One Price) links exchange rates to relative price levels and inflation | Long-run mean reversion to PPP over 3–7 years; deviations >20% signal misalignment | Short-run failures due to trade barriers, non-tradables, nominal rigidities, and productivity (Balassa-Samuelson) effects |
+| **Real Effective Exchange Rate (REER)** | \( \text{REER} = \text{NEER} \times (P_{\text{domestic}} / P_{\text{foreign}}) \) | Trade-weighted nominal rate adjusted for relative price levels; competitiveness and external balance indicator | REER >10% above long-run average → overvaluation; widening current account deficit confirms adjustment pressure | REER extremes precede sharp nominal adjustments, but timing is uncertain; carry can persist during overvaluation if capital inflows continue |
+| **Forward Curve & Tenor Structure** | \( F_T = S \times \prod_{i=1}^{T} (1 + i_{d,i})/(1 + i_{f,i}) \) | Multi-period CIP applied recursively; forward curve embeds path of future interest differentials | Steep curve → wide rate differential; curve inversion → expected rate convergence or reversal | Forward curve shape reflects rate expectations but not risk premium; UIP failure means forwards are biased predictors of realized spot path |
+| **Spot-Forward Arbitrage & Hedge Accounting** | Hedge P&L flows through OCI (IFRS 9/ASC 815); speculator marks-to-market in P&L | Hedgers lock forward rate to eliminate FX risk; speculators bet on spot deviation from forward (UIP failure) | Hedger success = eliminated uncertainty; speculator success = spot moves more favorably than forward implied | Hedger faces basis risk if cash flow timing shifts; speculator loses if UIP holds or if carry is offset by depreciation |

@@ -37,14 +37,18 @@ The internal architecture of Blender's animation system is a layered stack of ev
 
 Armature evaluation begins with the armature object's pose data structure, which maintains a parallel array of pose bones corresponding to each edit bone defined in the armature's rest pose. When you animate a rig, you are keyframing properties on these pose bones, not the edit bones themselves, because edit bones define the blueprint topology while pose bones hold the live runtime state. Each pose bone stores a local transformation matrix in 4×4 homogeneous coordinates, initially set to the identity transform, which is then modified by evaluated FCurves, constraints, and IK solvers during the evaluation pass. The armature evaluator performs a depth-first recursive traversal of the bone hierarchy starting from root bones—those with no parents. For each bone, it computes the world matrix by multiplying the parent's world matrix by the bone's local matrix, then recursively processes all child bones, passing the freshly computed world matrix down the hierarchy tree. This propagation ensures that a grandchild bone's world transform correctly accumulates the rotations and translations of all ancestors in the skeletal chain.
 
-```
-Armature Hierarchy Traversal (Depth-First)
-
-Root Bone A                  M_world_A = M_local_A
-    ├─ Child Bone B          M_world_B = M_world_A × M_local_B
-    │   └─ Child Bone D      M_world_D = M_world_B × M_local_D
-    └─ Child Bone C          M_world_C = M_world_A × M_local_C
-        └─ Child Bone E      M_world_E = M_world_C × M_local_E
+```mermaid
+flowchart TD
+    A["Root Bone A<br/>M_world_A = M_local_A"]
+    B["Child Bone B<br/>M_world_B = M_world_A × M_local_B"]
+    C["Child Bone C<br/>M_world_C = M_world_A × M_local_C"]
+    D["Child Bone D<br/>M_world_D = M_world_B × M_local_D"]
+    E["Child Bone E<br/>M_world_E = M_world_C × M_local_E"]
+    
+    A --> B
+    A --> C
+    B --> D
+    C --> E
 ```
 
 Skinning deformation occurs in the Armature modifier, which appears in the modifier stack of the mesh object being deformed. The modifier holds a reference to the armature object and a mapping between the mesh's vertex groups and the armature's bone names. During evaluation, the modifier iterates over every vertex in the mesh. For each vertex, it retrieves the list of vertex group assignments and their weights, looks up the corresponding bone pose matrices, and computes the deformed vertex position using the linear blend skinning formula. The critical mathematical object here is the bone's deformation matrix, which is not simply the bone's world matrix but rather the offset matrix encoding how to transform a vertex from the mesh's rest pose space into the bone's deformed pose space. This offset is computed as the product of the bone's inverse rest pose matrix and the bone's current world pose matrix: M_deform = M_pose_world × M_rest_world⁻¹. The inverse rest matrix transforms the vertex from mesh space into the bone's local rest space, and the pose world matrix then transforms it from the bone's rest space to the bone's current posed space. This two-stage transformation ensures that the bone deforms the mesh relative to its original rest position, not from some arbitrary origin.

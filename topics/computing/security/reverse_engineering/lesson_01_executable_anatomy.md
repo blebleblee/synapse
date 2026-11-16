@@ -60,30 +60,35 @@ Understanding relocations is essential for analyzing position-independent shellc
 
 **The PLT/GOT Mechanism.** The Procedure Linkage Table and Global Offset Table together implement lazy binding: the deferred resolution of imported function addresses until the first call. When compiled code calls an external function such as `malloc`, the compiler emits a `call` instruction to a stub in the PLT rather than directly to `malloc`'s address. The PLT stub performs an indirect jump through a slot in the GOT. Before the first call, that GOT slot contains the address of a resolver trampoline back in the PLT. On the first call, the trampoline pushes a relocation index and the address of the link map onto the stack and jumps to `_dl_runtime_resolve` in the dynamic linker. The dynamic linker walks the symbol tables of all loaded shared objects, finds `malloc` in `libc`'s `.dynsym`, writes its address into the GOT slot, and jumps to it. All subsequent calls find the GOT slot already populated and jump directly, paying no further resolution cost.
 
-```
-First call to malloc():
-
-  call site
-     │
-     ▼
-  PLT[malloc] stub:
-     jmp [GOT[malloc]]      ← GOT slot initially points here ↓
-     push reloc_index                                         │
-     jmp PLT[0]             ← resolver trampoline            │
-         │                                                   │
-         ▼                                                   │
-  _dl_runtime_resolve()  ◄──────────────────────────────────┘
-     resolve symbol
-     write GOT[malloc] = &malloc in libc
-     jmp malloc
-
-Subsequent calls to malloc():
-
-  call site
-     │
-     ▼
-  PLT[malloc] stub:
-     jmp [GOT[malloc]]  → malloc in libc  (direct, no resolver)
+```mermaid
+flowchart TD
+    subgraph first ["First call to malloc()"]
+        A1["call site"]
+        B1["PLT[malloc] stub:<br/>jmp [GOT[malloc]]"]
+        C1["push reloc_index"]
+        D1["jmp PLT[0]<br/>(resolver trampoline)"]
+        E1["_dl_runtime_resolve()"]
+        F1["resolve symbol<br/>write GOT[malloc] = &malloc in libc"]
+        G1["jmp malloc"]
+        H1["malloc in libc"]
+        
+        A1 --> B1
+        B1 -->|"GOT slot initially<br/>points to next instruction"| C1
+        C1 --> D1
+        D1 --> E1
+        E1 --> F1
+        F1 --> G1
+        G1 --> H1
+    end
+    
+    subgraph subsequent ["Subsequent calls to malloc()"]
+        A2["call site"]
+        B2["PLT[malloc] stub:<br/>jmp [GOT[malloc]]"]
+        C2["malloc in libc"]
+        
+        A2 --> B2
+        B2 -->|"direct, no resolver"| C2
+    end
 ```
 
 For a security researcher, the GOT is a high-value target. GOT overwrite attacks corrupt a GOT slot with the address of an attacker-controlled function, redirecting all subsequent calls to that imported function. Full RELRO (`RELRO=FULL`), enforced by marking the GOT read-only after the dynamic linker finishes all relocations, mitigates this class of attack by marking the entire GOT non-writable before execution reaches `main`. Partial RELRO only protects the non-PLT portion of the GOT; the PLT GOT slots remain writable for lazy binding. Enumerating RELRO status is therefore one of the first binary hardening checks in any exploit development workflow.

@@ -86,46 +86,47 @@ Thomas Nagel's position grounds statism in what he calls the "agent-centered pre
 
 We can map these positions against their foundational commitments:
 
-```
-COSMOPOLITANISM vs. STATISM/PARTICULARISM
-
-Cosmopolitan Positions:
-├─ Individual Cosmopolitanism (Pogge, Beitz)
-│  └─ Trigger: Shared humanity + Global institutional harm
-│  └─ Scope: Individual humans globally
-│  └─ Principle: Negative duties not to harm (primary)
-│              Positive duties to assist (secondary)
-│
-├─ Capability Cosmopolitanism (Nussbaum, Sen-inspired)
-│  └─ Trigger: Shared humanity + Central human functionings
-│  └─ Scope: All humans' capability to achieve central functionings
-│  └─ Principle: Ensure threshold of substantive freedoms
-│
-├─ Luck Egalitarian Cosmopolitanism (Dworkin, Cohen)
-│  └─ Trigger: Brute luck (birth circumstances)
-│  └─ Scope: Compensation for factors beyond individual control
-│  └─ Principle: Redistribute to neutralize brute luck effects
-│
-└─ Sufficientarian Cosmopolitanism
-   └─ Trigger: Basic human decency threshold
-   └─ Scope: All humans above deprivation line
-   └─ Principle: Ensure sufficiency, permit inequality above threshold
-
-Statist/Particularist Positions:
-├─ Liberal Statism (Walzer, Nagel)
-│  └─ Trigger: Shared political institutions & authority
-│  └─ Scope: Co-citizens within bounded polity
-│  └─ Principle: "Thick" justice within; "thin" respect without
-│
-├─ Relational Egalitarianism
-│  └─ Trigger: Power relationships & shared institutions
-│  └─ Scope: Those under shared authority relationships
-│  └─ Principle: Equality required where power is coordinated
-│
-└─ Nationalism (Miller, Tamir)
-   └─ Trigger: Shared national identity & self-governance
-   └─ Scope: Nation members with legitimate claims to culture/autonomy
-   └─ Principle: Self-determination + basic rights globally
+```mermaid
+flowchart TD
+    Root["COSMOPOLITANISM vs. STATISM/PARTICULARISM"]
+    
+    Root --> Cosmo["Cosmopolitan Positions"]
+    Root --> Statist["Statist/Particularist Positions"]
+    
+    Cosmo --> IC["Individual Cosmopolitanism<br/>(Pogge, Beitz)"]
+    IC --> IC_T["Trigger: Shared humanity +<br/>Global institutional harm"]
+    IC --> IC_S["Scope: Individual humans globally"]
+    IC --> IC_P["Principle: Negative duties not to harm (primary)<br/>Positive duties to assist (secondary)"]
+    
+    Cosmo --> CC["Capability Cosmopolitanism<br/>(Nussbaum, Sen-inspired)"]
+    CC --> CC_T["Trigger: Shared humanity +<br/>Central human functionings"]
+    CC --> CC_S["Scope: All humans' capability to<br/>achieve central functionings"]
+    CC --> CC_P["Principle: Ensure threshold of<br/>substantive freedoms"]
+    
+    Cosmo --> LEC["Luck Egalitarian Cosmopolitanism<br/>(Dworkin, Cohen)"]
+    LEC --> LEC_T["Trigger: Brute luck<br/>(birth circumstances)"]
+    LEC --> LEC_S["Scope: Compensation for factors<br/>beyond individual control"]
+    LEC --> LEC_P["Principle: Redistribute to<br/>neutralize brute luck effects"]
+    
+    Cosmo --> SC["Sufficientarian Cosmopolitanism"]
+    SC --> SC_T["Trigger: Basic human<br/>decency threshold"]
+    SC --> SC_S["Scope: All humans above<br/>deprivation line"]
+    SC --> SC_P["Principle: Ensure sufficiency,<br/>permit inequality above threshold"]
+    
+    Statist --> LS["Liberal Statism<br/>(Walzer, Nagel)"]
+    LS --> LS_T["Trigger: Shared political<br/>institutions & authority"]
+    LS --> LS_S["Scope: Co-citizens within<br/>bounded polity"]
+    LS --> LS_P["Principle: 'Thick' justice within;<br/>'thin' respect without"]
+    
+    Statist --> RE["Relational Egalitarianism"]
+    RE --> RE_T["Trigger: Power relationships &<br/>shared institutions"]
+    RE --> RE_S["Scope: Those under shared<br/>authority relationships"]
+    RE --> RE_P["Principle: Equality required<br/>where power is coordinated"]
+    
+    Statist --> Nat["Nationalism<br/>(Miller, Tamir)"]
+    Nat --> Nat_T["Trigger: Shared national identity<br/>& self-governance"]
+    Nat --> Nat_S["Scope: Nation members with legitimate<br/>claims to culture/autonomy"]
+    Nat --> Nat_P["Principle: Self-determination +<br/>basic rights globally"]
 ```
 
 ## 3. High-Performance Optimization & Failure Modes
@@ -144,4 +145,17 @@ This generates a practical optimization problem for practitioners evaluating glo
 
 A central tension in global justice debates concerns the relationship between state sovereignty and justice. The statist position privileges sovereignty: states should retain the right to organize their own internal distributions, limit immigration, and resist external pressure to reorganize their institutions according to cosmopolitan principles. The cosmopolitan position subordinates sovereignty to justice: if a state's institutions violate cosmopolitan principles, external pressure or intervention to correct these violations may be justified.
 
-This tension is not resolvable through abstract argument; it requires examining specific contexts. Consider the relationship between national self-determination and distributive justice. A nation with a strong culture of internal solidarity might democratically choose a more equal distribution than other nations, express this through public policy, and resist external pressure to modify this choice. Cosmopolitan principles might demand that resources be transferred globally rather than used for high levels
+This tension is not resolvable through abstract argument; it requires examining specific contexts. Consider the relationship between national self-determination and distributive justice. A nation with a strong culture of internal solidarity might democratically choose a more equal distribution than other nations, express this through public policy, and resist external pressure to modify this choice.
+
+The sovereignty-justice tension ultimately cannot be resolved through hierarchical ordering of principles but rather through contextual judgment that acknowledges legitimate pluralism in how societies weigh competing values. The statist insight—that democratic self-determination and cultural autonomy carry genuine moral weight—remains valid even when cosmopolitan principles identify real injustices. Yet pure statism fails because it treats state boundaries as morally arbitrary cutoffs for obligation while simultaneously acknowledging that institutional arrangements profoundly shape life prospects across borders. The most defensible framework recognizes a graduated structure: strong presumptions favoring state discretion in internal distributions where democratic processes are robust and not grossly violating baseline human rights; proportionally stronger cosmopolitan obligations where institutions demonstrably produce severe deprivation, where affected populations lack voice in decisions shaping their circumstances, or where wealthy states possess capacity to remedy injustice at minimal cost. Critically, this framework rejects both the cosmopolitan claim that sovereignty is merely contingent on justice outcomes and the statist claim that democratic authorization within borders fully exhausts justice obligations. Instead, it treats sovereignty and justice as values in genuine tension that must be negotiated through transparent reasoning about institutional effects, democratic legitimacy across multiple levels, and the actual capacities and constraints of implementing agents.
+
+The deepest insight from this unit is methodological: **global justice theory must shift from determining which principle is correct to specifying mechanisms for legitimate adjudication when principles conflict.** This recognition points toward institutional design questions: How should transnational bodies make decisions about justice claims? What procedural legitimacy do they require? How should authority be distributed between local, national, and global levels? These questions cannot be answered by pure theory alone; they require empirical investigation of what institutional arrangements actually produce both justice and legitimacy across borders, and they demand ongoing democratic deliberation rather than philosophical settlement.
+
+## Summary & Verification Matrix
+
+| **Governing Tension** | **Core Mechanism** | **Statist Position** | **Cosmopolitan Position** | **Diagnostic Criterion** | **Practical Implication** |
+|---|---|---|---|---|---|
+| **Scope of Justice** | Institutional effects on life prospects vs. procedural legitimacy | Justice obligations limited to co-members with shared political institutions | Justice obligations universal; apply wherever institutions shape life prospects | Does the institutional arrangement demonstrably affect material conditions for distant populations? | Broader institutional scope expands justice claims; narrower scope limits them to authorized political communities |
+| **Authority Distribution** | Legitimate decision-making power across governance levels | State sovereignty as default; external pressure presumptively illegitimate | Democratic authorization required at all levels; state autonomy subordinate to justice | Are affected parties included in decision-making processes shaping their circumstances? | Graduated authority: stronger presumption for local discretion with robust democracy; stronger cosmopolitan obligation where affected populations lack voice |
+| **Sovereignty-Justice Relationship** | Competing values requiring contextual negotiation | Sovereignty morally primary; justice secondary within state bounds | Justice primary; sovereignty contingent on justice outcomes | What institutional mechanisms exist to reconcile self-determination with cosmopolitan obligations? | Pure hierarchy rejected; graduated framework acknowledges both values as legitimate but requires transparent reasoning about trade-offs |
+| **Implementation Challenge** | Translating abstract principles into institutional design | Implementation hazards: external enforcement risks paternalism and unintended consequences | Implementation hazards: state resistance and insufficient global enforcement capacity | Can the proposed mechanism achieve justice without sacrificing democratic legitimacy or creating perverse incentives? | Shift focus from determining correct principle to designing legitimate procedures for adjudicating conflicts |

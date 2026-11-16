@@ -544,3 +544,4 @@ class FunctionCallingAgent:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
+```

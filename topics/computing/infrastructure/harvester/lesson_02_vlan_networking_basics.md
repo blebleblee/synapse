@@ -10,15 +10,27 @@ VLANs solve this by partitioning a single physical switched fabric into multiple
 
 The 802.1Q standard defines VLAN tagging by inserting a 4-byte tag into the Ethernet frame between the source MAC address and the EtherType/Length field:
 
-```
-Original Ethernet Frame:
-[Dest MAC][Src MAC][EtherType][Payload][FCS]
-
-802.1Q Tagged Frame:
-[Dest MAC][Src MAC][TPID][TCI][EtherType][Payload][FCS]
-                     |    |
-                     |    +-- Tag Control Information (2 bytes)
-                     +------- Tag Protocol ID = 0x8100 (2 bytes)
+```mermaid
+flowchart TD
+    subgraph original["Original Ethernet Frame"]
+        A1["Dest MAC"]
+        A2["Src MAC"]
+        A3["EtherType"]
+        A4["Payload"]
+        A5["FCS"]
+        A1 --> A2 --> A3 --> A4 --> A5
+    end
+    
+    subgraph tagged["802.1Q Tagged Frame"]
+        B1["Dest MAC"]
+        B2["Src MAC"]
+        B3["TPID<br/>Tag Protocol ID<br/>0x8100<br/>(2 bytes)"]
+        B4["TCI<br/>Tag Control Information<br/>(2 bytes)"]
+        B5["EtherType"]
+        B6["Payload"]
+        B7["FCS"]
+        B1 --> B2 --> B3 --> B4 --> B5 --> B6 --> B7
+    end
 ```
 
 The Tag Control Information (TCI) contains:

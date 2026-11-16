@@ -28,43 +28,33 @@ Spot instances deserve particular attention for cost-sensitive architectures. AW
 
 The internal architecture of an Auto Scaling Group revolves around a reconciliation control loop that continuously compares desired state against observed reality. The ASG controller, a distributed system running within the AWS control plane, maintains authoritative state in a strongly consistent datastore. This state includes the launch template reference, capacity bounds (`MinSize`, `MaxSize`, `DesiredCapacity`), health check configuration, and the set of currently managed instance identifiers. Every few seconds, the controller executes a reconciliation pass: it queries EC2 for the current state of managed instances, evaluates health criteria, and synthesizes API calls to converge observed state toward desired state.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Auto Scaling Group Controller                 │
-│                                                                   │
-│  ┌──────────────┐      ┌─────────────┐      ┌────────────────┐ │
-│  │  Desired     │      │  Current    │      │  Health Check  │ │
-│  │  Capacity: 4 │─────▶│  Instances  │◀─────│  Integration   │ │
-│  └──────────────┘      └─────────────┘      └────────────────┘ │
-│         │                     │                       │          │
-│         │                     │                       │          │
-│         ▼                     ▼                       ▼          │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │           Reconciliation Logic (Control Loop)            │  │
-│  │  • Compare desired vs actual instance count              │  │
-│  │  • Filter healthy vs unhealthy instances                 │  │
-│  │  • Calculate delta (launch N, terminate M)               │  │
-│  │  • Apply termination policies (OldestInstance, etc.)     │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│         │                                          │             │
-└─────────┼──────────────────────────────────────────┼─────────────┘
-          │                                          │
-          ▼                                          ▼
-   ┌─────────────┐                          ┌──────────────────┐
-   │ EC2 RunInstances                       │ EC2 TerminateInstances
-   │ (from Launch Template)                 │ (with drain hooks)
-   └─────────────┘                          └──────────────────┘
-          │                                          │
-          ▼                                          ▼
-   ┌─────────────────────────────────────────────────────────────┐
-   │              EC2 Instance Lifecycle States                   │
-   │                                                               │
-   │   Pending ──▶ InService ──▶ Draining ──▶ Terminating ──▶ ✕  │
-   │      ▲            │              ▲                            │
-   │      │            │              │                            │
-   │      │            ▼              │                            │
-   │      └─────── (health check fail)                            │
-   └─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph ASG["Auto Scaling Group Controller"]
+        DC["Desired<br/>Capacity: 4"]
+        CI["Current<br/>Instances"]
+        HC["Health Check<br/>Integration"]
+        
+        DC --> RL
+        CI --> RL
+        HC --> RL
+        
+        RL["Reconciliation Logic (Control Loop)<br/>• Compare desired vs actual instance count<br/>• Filter healthy vs unhealthy instances<br/>• Calculate delta (launch N, terminate M)<br/>• Apply termination policies (OldestInstance, etc.)"]
+    end
+    
+    RL --> Launch["EC2 RunInstances<br/>(from Launch Template)"]
+    RL --> Terminate["EC2 TerminateInstances<br/>(with drain hooks)"]
+    
+    Launch --> Lifecycle
+    Terminate --> Lifecycle
+    
+    subgraph Lifecycle["EC2 Instance Lifecycle States"]
+        Pending["Pending"] --> InService["InService"]
+        InService --> Draining["Draining"]
+        Draining --> Terminating["Terminating"]
+        Terminating --> Terminated["✕"]
+        InService -->|"health check fail"| Pending
+    end
 ```
 
 Instance launch proceeds through a deterministic state machine. When the reconciliation loop determines that additional capacity is required—either because desired capacity exceeds current healthy instances or because a health check failure necessitates replacement—the ASG invokes `ec2:RunInstances` with parameters extracted from the launch template. The EC2 service allocates a physical host, provisions the requested instance type from available capacity, attaches network interfaces with assigned private IPs from the configured subnets, and boots the instance using the specified AMI. The instance transitions to **Pending** state, during which user data scripts execute. These scripts typically install application dependencies, fetch configuration from Parameter Store or Secrets Manager, and start the application process.

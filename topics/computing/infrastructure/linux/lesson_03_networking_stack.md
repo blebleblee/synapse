@@ -187,23 +187,39 @@ nf_register_net_hook(net, &my_nf_ops);
 TCP is a finite state machine with 11 defined states (RFC 793 + RFC 1122 clarifications). The kernel tracks per-connection state in `struct tcp_sock` (which embeds `struct inet_connection_sock`, which embeds `struct sock`).
 
 ```mermaid
-stateDiagram-v2
-    [*] --> CLOSED
-    CLOSED --> LISTEN : passive open (listen)
-    CLOSED --> SYN_SENT : active open (connect)
-    LISTEN --> SYN_RCVD : SYN received
-    SYN_SENT --> ESTABLISHED : SYN+ACK received
-    SYN_SENT --> SYN_RCVD : simultaneous open
-    SYN_RCVD --> ESTABLISHED : ACK received
-    ESTABLISHED --> FIN_WAIT_1 : close (local)
-    ESTABLISHED --> CLOSE_WAIT : FIN received
-    FIN_WAIT_1 --> FIN_WAIT_2 : ACK received
-    FIN_WAIT_1 --> CLOSING : FIN received
-    FIN_WAIT_2 --> TIME_WAIT : FIN received
-    CLOSING --> TIME_WAIT : ACK received
-    CLOSE_WAIT --> LAST_ACK : close (local)
-    LAST_ACK --> CLOSED : ACK received
-    TIME_WAIT --> CLOSED : 2MSL timeout
+flowchart TD
+    START(["[*]"]) --> CLOSED["CLOSED"]
+    CLOSED --> LISTEN["LISTEN"]
+    CLOSED --> SYN_SENT["SYN_SENT"]
+    LISTEN --> SYN_RCVD["SYN_RCVD"]
+    SYN_SENT --> ESTABLISHED["ESTABLISHED"]
+    SYN_SENT --> SYN_RCVD
+    SYN_RCVD --> ESTABLISHED
+    ESTABLISHED --> FIN_WAIT_1["FIN_WAIT_1"]
+    ESTABLISHED --> CLOSE_WAIT["CLOSE_WAIT"]
+    FIN_WAIT_1 --> FIN_WAIT_2["FIN_WAIT_2"]
+    FIN_WAIT_1 --> CLOSING["CLOSING"]
+    FIN_WAIT_2 --> TIME_WAIT["TIME_WAIT"]
+    CLOSING --> TIME_WAIT
+    CLOSE_WAIT --> LAST_ACK["LAST_ACK"]
+    LAST_ACK --> CLOSED
+    TIME_WAIT --> CLOSED
+    
+    CLOSED -.->|"passive open (listen)"| LISTEN
+    CLOSED -.->|"active open (connect)"| SYN_SENT
+    LISTEN -.->|"SYN received"| SYN_RCVD
+    SYN_SENT -.->|"SYN+ACK received"| ESTABLISHED
+    SYN_SENT -.->|"simultaneous open"| SYN_RCVD
+    SYN_RCVD -.->|"ACK received"| ESTABLISHED
+    ESTABLISHED -.->|"close (local)"| FIN_WAIT_1
+    ESTABLISHED -.->|"FIN received"| CLOSE_WAIT
+    FIN_WAIT_1 -.->|"ACK received"| FIN_WAIT_2
+    FIN_WAIT_1 -.->|"FIN received"| CLOSING
+    FIN_WAIT_2 -.->|"FIN received"| TIME_WAIT
+    CLOSING -.->|"ACK received"| TIME_WAIT
+    CLOSE_WAIT -.->|"close (local)"| LAST_ACK
+    LAST_ACK -.->|"ACK received"| CLOSED
+    TIME_WAIT -.->|"2MSL timeout"| CLOSED
 ```
 
 TIME_WAIT lasts 2×MSL (Maximum Segment Lifetime), set to 60 seconds in Linux (`TCP_TIMEWAIT_LEN = 60 * HZ`). Its purpose is twofold: allow the final ACK to be retransmitted if lost, and prevent delayed segments from a prior connection being accepted by a new one. `net.ipv4.tcp_tw_reuse = 1` permits reuse of TIME_WAIT sockets for new outgoing connections when timestamps are in use—safe because PAWS distinguishes old segments. `tcp_tw_recycle` was removed in Linux 4.12 because it broke connections through NAT.
@@ -565,3 +581,4 @@ ip addr add 10.0.0.1/24 dev veth_host
 
 ip netns exec container_a ip link set veth_ctr up
 ip netns exec container_a ip addr add 10.0.0.2/24 dev veth_ctr
+```

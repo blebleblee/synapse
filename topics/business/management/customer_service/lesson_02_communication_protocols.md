@@ -22,29 +22,34 @@ The concept of **listening architecture** extends this reasoning further. In con
 
 A production-grade mental model for customer service communication treats each interaction as a pipeline with five sequential stages. Understanding the structure of this pipeline is prerequisite to optimizing throughput, reducing resolution time, and preventing the most common failure modes.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    CUSTOMER SERVICE COMMUNICATION PIPELINE          │
-│                                                                     │
-│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐        │
-│  │  SIGNAL  │──▶│  PARSE   │──▶│  INFER   │──▶│  MATCH   │        │
-│  │ CAPTURE  │   │ SEMANTIC │   │  INTENT  │   │ KNOWLEDGE│        │
-│  └──────────┘   └──────────┘   └──────────┘   └────┬─────┘        │
-│       │               │              │              │              │
-│  Channel noise   Jargon gaps    Unstated needs  Policy gaps        │
-│  (async lag,     (literal vs.   (symptom vs.    (edge cases,       │
-│   poor audio,    figurative)     root cause)     exceptions)       │
-│   form limits)                                       │              │
-│                                                      ▼              │
-│                                               ┌──────────┐         │
-│                                               │ RESPONSE │         │
-│                                               │GENERATION│         │
-│                                               └──────────┘         │
-│                                                     │               │
-│                                              Tone, sequence,        │
-│                                              channel selection,     │
-│                                              resolution path        │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph pipeline ["CUSTOMER SERVICE COMMUNICATION PIPELINE"]
+        direction LR
+        
+        A["SIGNAL<br/>CAPTURE"]
+        B["PARSE<br/>SEMANTIC"]
+        C["INFER<br/>INTENT"]
+        D["MATCH<br/>KNOWLEDGE"]
+        E["RESPONSE<br/>GENERATION"]
+        
+        A -->|"Main flow"| B
+        B -->|"Main flow"| C
+        C -->|"Main flow"| D
+        D -->|"Main flow"| E
+        
+        A -.->|"Channel noise<br/>(async lag, poor audio,<br/>form limits)"| A_note[ ]
+        B -.->|"Jargon gaps<br/>(literal vs. figurative)"| B_note[ ]
+        C -.->|"Unstated needs<br/>(symptom vs. root cause)"| C_note[ ]
+        D -.->|"Policy gaps<br/>(edge cases, exceptions)"| D_note[ ]
+        E -.->|"Tone, sequence,<br/>channel selection,<br/>resolution path"| E_note[ ]
+        
+        style A_note fill:none,stroke:none
+        style B_note fill:none,stroke:none
+        style C_note fill:none,stroke:none
+        style D_note fill:none,stroke:none
+        style E_note fill:none,stroke:none
+    end
 ```
 
 Each stage has a failure mode and a corresponding diagnostic signal. At the **signal capture** stage, failures are channel-specific: a voice call with background noise, a chat widget with a 500-character input limit, an email form that truncates long messages. At the **semantic parsing** stage, failures arise from vocabulary gaps between customer and agent—a customer who says "your system charged me twice" may mean a duplicate transaction, a failed refund, or a billing cycle she doesn't understand. At the **intent inference** stage, the failure is mistaking the stated request for the actual need: a customer requesting a refund may actually need reassurance that the organization respects her, and will accept a credit plus a sincere apology over a full refund if the emotional need is addressed correctly.
@@ -67,40 +72,19 @@ The computational model of active listening is built from four operations that m
 
 Conflict resolution in customer service is best modeled as a finite state machine in which the customer's emotional state is the primary state variable, and the agent's actions are the transition triggers. This model gives managers a precise framework for designing de-escalation protocols and diagnosing where individual interactions fail.
 
-```
-                        ┌──────────────────────┐
-                        │  DISTRESSED (ENTRY)  │◀──────────────────┐
-                        └──────────┬───────────┘                   │
-                                   │                               │
-                     Agent labels emotion correctly                 │
-                                   │                        Re-escalation
-                                   ▼                        trigger (denial,
-                        ┌──────────────────────┐             wait time,
-                        │     ACKNOWLEDGED     │             invalidation)
-                        └──────────┬───────────┘                   │
-                                   │                               │
-                     Agent paraphrases + confirms                  │
-                                   │                               │
-                                   ▼                               │
-                        ┌──────────────────────┐                   │
-                        │      CLARIFIED       │───────────────────┘
-                        └──────────┬───────────┘
-                                   │
-                     Agent presents resolution path
-                     with options + timeframe
-                                   │
-                                   ▼
-                        ┌──────────────────────┐
-                        │      RESOLVED        │
-                        └──────────┬───────────┘
-                                   │
-                     Agent confirms satisfaction
-                     + documents root cause
-                                   │
-                                   ▼
-                        ┌──────────────────────┐
-                        │       CLOSED         │
-                        └──────────────────────┘
+```mermaid
+flowchart TD
+    DISTRESSED["DISTRESSED (ENTRY)"]
+    ACKNOWLEDGED["ACKNOWLEDGED"]
+    CLARIFIED["CLARIFIED"]
+    RESOLVED["RESOLVED"]
+    CLOSED["CLOSED"]
+    
+    DISTRESSED -->|"Agent labels emotion correctly"| ACKNOWLEDGED
+    ACKNOWLEDGED -->|"Agent paraphrases + confirms"| CLARIFIED
+    CLARIFIED -->|"Agent presents resolution path<br/>with options + timeframe"| RESOLVED
+    RESOLVED -->|"Agent confirms satisfaction<br/>+ documents root cause"| CLOSED
+    CLARIFIED -->|"Re-escalation trigger<br/>(denial, wait time,<br/>invalidation)"| DISTRESSED
 ```
 
 The state machine makes explicit the most dangerous failure mode in de-escalation: **bypassing the ACKNOWLEDGED state**. An agent who moves from DISTRESSED directly to CLARIFIED—skipping emotional acknowledgment and proceeding immediately to fact-gathering—will almost invariably re-escalate the customer, because the customer's nervous system registers problem-solving before validation as indifference. The resulting re-escalation is typically more intense than the initial state because it adds a secondary grievance: "not only was my problem not solved, but I was made to feel like a support ticket rather than a person."

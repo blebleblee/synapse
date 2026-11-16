@@ -854,33 +854,30 @@ The virtual proxy variant deserves particular attention in systems programming b
 
 Here is the structural relationship between all seven patterns in the context of a layered system:
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                            Client Code                                          │
-│           Uses one stable interface regardless of what lies behind it           │
-└────────────────────────────────┬────────────────────────────────────────────────┘
-                                 │ calls
-         ┌───────────────────────┼───────────────────────┐
-         │                       │                       │
-    ┌────▼────┐            ┌─────▼─────┐          ┌──────▼──────┐
-    │  PROXY  │            │ DECORATOR │          │   FACADE    │
-    │intercept│            │wrap+augment│          │ simplify API│
-    └────┬────┘            └─────┬─────┘          └──────┬──────┘
-         │ delegates             │ delegates              │ delegates to
-         │                       │                        │ multiple subsystems
-    ┌────▼──────────────────────▼──────┐                  │
-    │           COMPOSITE              │          ┌───────▼────────┐
-    │    uniform leaf + container tree │          │  BRIDGE        │
-    │                                  │          │ abstraction ──► impl
-    └────────────────┬─────────────────┘          └────────────────┘
-                     │
-         ┌───────────┴────────────┐
-         │                        │
-    ┌────▼────┐            ┌──────▼──────┐
-    │ ADAPTER │            │  FLYWEIGHT  │
-    │translate│            │ share state │
-    │interface│            │across leaves│
-    └─────────┘            └─────────────┘
+```mermaid
+flowchart TD
+    Client["Client Code<br/>Uses one stable interface regardless of what lies behind it"]
+    
+    Proxy["PROXY<br/>intercept"]
+    Decorator["DECORATOR<br/>wrap+augment"]
+    Facade["FACADE<br/>simplify API"]
+    
+    Composite["COMPOSITE<br/>uniform leaf + container tree"]
+    Bridge["BRIDGE<br/>abstraction ──► impl"]
+    
+    Adapter["ADAPTER<br/>translate<br/>interface"]
+    Flyweight["FLYWEIGHT<br/>share state<br/>across leaves"]
+    
+    Client -->|calls| Proxy
+    Client -->|calls| Decorator
+    Client -->|calls| Facade
+    
+    Proxy -->|delegates| Composite
+    Decorator -->|delegates| Composite
+    Facade -->|"delegates to<br/>multiple subsystems"| Bridge
+    
+    Composite --> Adapter
+    Composite --> Flyweight
 ```
 
 The diagram illustrates a layered reading of the patterns: Proxy, Decorator, and Facade operate at the boundary between the client and the system; Composite operates within the system to build recursive structures; Bridge decouples the abstraction from its platform realization; and Adapter and Flyweight operate at the leaves, handling impedance mismatches and memory efficiency respectively.

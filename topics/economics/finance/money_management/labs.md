@@ -665,7 +665,7 @@ After position entry, maintain continuous monitoring of aggregate portfolio risk
 
 Different trading systems require tailored position sizing approaches based on win rate, reward-to-risk profiles, and correlation structure. Use this decision tree to select appropriate rules:
 
-**High-Frequency / Market-Making Systems (Win Rate >60%, Reward:Risk <2:1)**
+**High-Frequency / Market-Making Systems (Win Rate >60%, Reward:Risk < 2:1)**
 - Fixed Fractional sizing inappropriate due to low per-trade returns relative to execution costs
 - Implement capital allocation percentage: allocate fixed percentage of equity (10-30%) to strategy as working capital
 - Use volatility-normalized sizing: Scale position by inverse of recent ATR to stabilize dollar volatility per trade

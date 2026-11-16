@@ -143,36 +143,61 @@ These three quantities generate two variance measures and two efficiency indices
 
 The forward-looking power of EVM lies in its **Estimate at Completion (EAC)** formulas, which project total final cost based on current performance:
 
-```
-EVM CORE METRICS — WORKED EXAMPLE
-
-Project:     ERP Integration Program
-BAC (Budget at Completion):   $2,400,000
-Status Date:                  Month 6 of 12 (50% through schedule)
-
-Planned Value (PV):           $1,200,000  (50% of BAC should be earned)
-Earned Value (EV):            $1,020,000  (actual work completed = 42.5% of BAC)
-Actual Cost (AC):             $1,140,000  (what we actually spent so far)
-
-Schedule Variance (SV):       EV − PV = $1,020,000 − $1,200,000 = −$180,000
-Cost Variance (CV):           EV − AC = $1,020,000 − $1,140,000 = −$120,000
-
-Schedule Performance Index:   SPI = EV ÷ PV = 1,020,000 ÷ 1,200,000 = 0.85
-Cost Performance Index:       CPI = EV ÷ AC = 1,020,000 ÷ 1,140,000 = 0.895
-
-── EAC Formulas (choose based on future performance assumption) ──
-
-EAC₁ (CPI continues):        BAC ÷ CPI = $2,400,000 ÷ 0.895 = $2,681,564
-EAC₂ (remaining at budget):  AC + (BAC − EV) = $1,140,000 + $1,380,000 = $2,520,000
-EAC₃ (SPI and CPI compound): AC + [(BAC−EV) ÷ (CPI × SPI)]
-                              = $1,140,000 + [$1,380,000 ÷ (0.895 × 0.85)]
-                              = $1,140,000 + $1,815,085
-                              = $2,955,085
-
-Estimate to Complete (ETC):   EAC₁ − AC = $2,681,564 − $1,140,000 = $1,541,564
-
-Variance at Completion (VAC): BAC − EAC₁ = $2,400,000 − $2,681,564 = −$281,564
-                              (project projected to overrun by $281,564)
+```mermaid
+flowchart TD
+    Start["<b>EVM CORE METRICS — WORKED EXAMPLE</b><br/>ERP Integration Program"]
+    
+    subgraph Baseline ["📊 Project Baseline"]
+        BAC["<b>BAC</b> (Budget at Completion)<br/>$2,400,000"]
+        Status["<b>Status Date</b><br/>Month 6 of 12<br/>(50% through schedule)"]
+    end
+    
+    subgraph Core ["📈 Core Metrics"]
+        PV["<b>PV</b> (Planned Value)<br/>$1,200,000<br/>(50% of BAC should be earned)"]
+        EV["<b>EV</b> (Earned Value)<br/>$1,020,000<br/>(actual work = 42.5% of BAC)"]
+        AC["<b>AC</b> (Actual Cost)<br/>$1,140,000<br/>(what we actually spent)"]
+    end
+    
+    subgraph Variance ["⚖️ Variance Analysis"]
+        SV["<b>SV</b> (Schedule Variance)<br/>EV − PV<br/>$1,020,000 − $1,200,000<br/><b>= −$180,000</b>"]
+        CV["<b>CV</b> (Cost Variance)<br/>EV − AC<br/>$1,020,000 − $1,140,000<br/><b>= −$120,000</b>"]
+    end
+    
+    subgraph Performance ["📊 Performance Indices"]
+        SPI["<b>SPI</b> (Schedule Performance)<br/>EV ÷ PV<br/>1,020,000 ÷ 1,200,000<br/><b>= 0.85</b>"]
+        CPI["<b>CPI</b> (Cost Performance)<br/>EV ÷ AC<br/>1,020,000 ÷ 1,140,000<br/><b>= 0.895</b>"]
+    end
+    
+    subgraph Forecasts ["🔮 EAC Forecasts"]
+        EAC1["<b>EAC₁</b> (CPI continues)<br/>BAC ÷ CPI<br/>$2,400,000 ÷ 0.895<br/><b>= $2,681,564</b>"]
+        EAC2["<b>EAC₂</b> (remaining at budget)<br/>AC + (BAC − EV)<br/>$1,140,000 + $1,380,000<br/><b>= $2,520,000</b>"]
+        EAC3["<b>EAC₃</b> (SPI & CPI compound)<br/>AC + [(BAC−EV) ÷ (CPI × SPI)]<br/>$1,140,000 + [$1,380,000 ÷ 0.7608]<br/><b>= $2,955,085</b>"]
+    end
+    
+    subgraph Final ["🎯 Final Estimates"]
+        ETC["<b>ETC</b> (Estimate to Complete)<br/>EAC₁ − AC<br/>$2,681,564 − $1,140,000<br/><b>= $1,541,564</b>"]
+        VAC["<b>VAC</b> (Variance at Completion)<br/>BAC − EAC₁<br/>$2,400,000 − $2,681,564<br/><b>= −$281,564</b><br/>(projected overrun)"]
+    end
+    
+    Start --> Baseline
+    Baseline --> Core
+    Core --> Variance
+    Core --> Performance
+    Performance --> Forecasts
+    Forecasts --> Final
+    
+    EV -.-> SV
+    PV -.-> SV
+    EV -.-> CV
+    AC -.-> CV
+    EV -.-> SPI
+    PV -.-> SPI
+    EV -.-> CPI
+    AC -.-> CPI
+    CPI -.-> EAC1
+    BAC -.-> EAC1
+    EAC1 -.-> ETC
+    EAC1 -.-> VAC
 ```
 
 The three EAC formulas represent different assumptions about future performance. EAC₁ assumes the CPI experienced to date will persist — this is the statistically most reliable predictor once a project is 20% complete, validated by research showing that CPI rarely improves significantly after that threshold. EAC₂ assumes the overruns to date were anomalous and remaining work will proceed at the original budgeted rate — an optimistic assumption that requires specific justification. EAC₃ is the most conservative and is appropriate for projects with both cost and schedule problems that are structurally related (a resource shortage that simultaneously drives schedule slippage and overtime costs, for example).
@@ -187,48 +212,46 @@ A Change Request (CR) is a formal document that must specify five elements to be
 
 The Change Control Board (CCB) is the governance body that receives, reviews, and dispositions CRs. Its membership must include the Project Sponsor, the Project Manager, the technical lead, the finance controller, and any external stakeholder (client, regulatory body) whose approval is contractually required. CCB meetings should be scheduled bi-weekly at minimum; ad hoc emergency reviews should be possible within 48 hours for high-severity changes. Every CR reviewed by the CCB, regardless of disposition, must be recorded in the Change Log with its decision rationale, decision date, and approver names.
 
-```
-CHANGE REQUEST DOCUMENT — FORMAL TEMPLATE
-
-CR Number:          CR-2024-047
-Project Name:       Payments Platform Modernization
-Requested By:       Head of Fraud Operations
-Date Submitted:     2024-03-14
-Priority:           High
-
-──────────────────────────────────────────────────────────────
-CHANGE DESCRIPTION
-Add real-time sanctions screening API integration (OFAC/UN lists)
-to the payment processing pipeline, pre-authorization.
-
-BUSINESS JUSTIFICATION
-Regulatory Affairs flagged an upcoming FinCEN rule change (Q3 2024
-effective date) requiring real-time sanctions check at transaction
-initiation. Current batch screening creates a 24-hr compliance gap.
-
-IMPACT ANALYSIS
-  Scope:    New integration module (~800 hours development estimate)
-            Vendor API contract required (3rd party, est. $60K/yr)
-  Schedule: Critical path impact — +3 weeks to system integration
-            testing phase. New delivery date: Oct 18 → Nov 8
-  Cost:     Additional labor: 800 hrs × $125/hr = $100,000
-            Vendor license (Year 1): $60,000
-            Total incremental cost: $160,000
-  Risk:     API vendor delivery timeline dependency (medium risk)
-            Mitigant: pilot vendor selection within 10 days
-
-RECOMMENDED DISPOSITION
-Approve. Regulatory compliance is non-discretionary. Recommend
-parallel-pathing vendor selection with development to compress
-schedule impact.
-
-APPROVAL AUTHORITY REQUIRED: Steering Committee (>$100K threshold)
-
-CCB DECISION:  ☑ Approved   ☐ Rejected   ☐ Deferred
-Decided By:    J. Whitmore (Sponsor), T. Reyes (Finance)
-Decision Date: 2024-03-19
-Revised Baseline Logged: Yes — Baseline Rev 3
-──────────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    A["CR-2024-047<br/>Payments Platform Modernization"]
+    
+    B["CHANGE DESCRIPTION<br/>Real-time Sanctions Screening<br/>OFAC/UN Integration"]
+    
+    C["BUSINESS JUSTIFICATION<br/>FinCEN Rule Change Q3 2024<br/>Close 24-hr Compliance Gap"]
+    
+    D["IMPACT ANALYSIS"]
+    
+    E["Scope<br/>New Integration Module<br/>~800 Hours Dev<br/>3rd Party Vendor API<br/>$60K/yr License"]
+    
+    F["Schedule<br/>+3 Weeks Impact<br/>Oct 18 → Nov 8<br/>Critical Path"]
+    
+    G["Cost<br/>Labor: $100,000<br/>Vendor Yr1: $60,000<br/>Total: $160,000"]
+    
+    H["Risk<br/>Vendor Delivery Timeline<br/>Medium Risk<br/>Mitigant: 10-day Selection"]
+    
+    I["APPROVAL AUTHORITY<br/>Steering Committee<br/>Required: >$100K Threshold"]
+    
+    J["RECOMMENDED DISPOSITION<br/>Approve<br/>Parallel-path Vendor Selection"]
+    
+    K["CCB DECISION"]
+    
+    L["✓ Approved<br/>J. Whitmore Sponsor<br/>T. Reyes Finance<br/>2024-03-19"]
+    
+    M["BASELINE REVISION 3<br/>Logged & Established"]
+    
+    A --> B
+    A --> C
+    A --> D
+    D --> E
+    D --> F
+    D --> G
+    D --> H
+    C --> I
+    I --> J
+    J --> K
+    K --> L
+    L --> M
 ```
 
 Once a CR is approved, the Project Manager must perform a **baseline re-baseline** — formally updating the project schedule, budget, and scope documentation to reflect the approved change. This is not optional. A project that carries approved CRs without re-baselining will show false variances in EVM reporting, because the PV curve still reflects the original plan rather than the authorized plan. Every approved CR produces a new baseline revision, logged with its revision number, effective date, and the CR that triggered it.

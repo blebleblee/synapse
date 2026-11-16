@@ -24,18 +24,35 @@ Stud-to-side connections place cylindrical studs into gaps never intended to rec
 
 Compression-based assemblies, colloquially termed "brick stuffing," pack elements into volumes geometrically insufficient to contain them at zero stress. The prototypical example inserts a 1x2 plate into the gap between two parallel walls separated by 1.5 plates (4.8mm) rather than the 2-plate minimum (6.4mm) required for unstressed fit. The 0.5-plate deficit (1.6mm) distributes across the plate thickness and wall deflection, generating bidirectional bending stress. The technique succeeds because LEGO plates possess surprisingly large elastic limits—temporary deflections of 2-3mm recover without permanent set if loads remain below approximately 30 seconds duration during assembly. Once neighboring elements lock into place, they provide reaction forces that reduce stress to sustainable levels. The critical design parameter is the load path geometry: compression must resolve through multiple elements in parallel rather than cascading through a single structural chain. A common error places stuffed assemblies near model edges where insufficient surrounding structure exists to redistribute forces, resulting in elements spontaneously ejecting during handling.
 
-```
-COMPRESSION ASSEMBLY - CROSS SECTION VIEW
-
-Standard (legal) plate insertion:
-Wall1  [ 1.6mm gap ]  Wall2
-       ═══════════    (1x2 plate, 3.2mm height)
-       ^-8.0mm spacing between walls-^
-
-Compressed (illegal) insertion:
-Wall1 [0.8mm] Wall2
-      ╱═══════╲      (1x2 plate, forced fit)
-     ◄──6.4mm──►     (deflection: walls bow outward 0.8mm each)
+```mermaid
+flowchart TD
+    subgraph standard ["Standard (Legal) Plate Insertion"]
+        W1["Wall 1"]
+        gap1["1.6mm gap"]
+        plate1["1x2 Plate<br/>3.2mm height"]
+        W2["Wall 2"]
+        spacing1["8.0mm spacing<br/>between walls"]
+        
+        W1 -.->|"1.6mm"| gap1
+        gap1 -.-> plate1
+        plate1 -.->|"1.6mm"| W2
+        spacing1
+    end
+    
+    subgraph compressed ["Compressed (Illegal) Insertion"]
+        W3["Wall 1<br/>(bowed outward 0.8mm)"]
+        gap2["0.8mm gap"]
+        plate2["1x2 Plate<br/>(forced fit)"]
+        W4["Wall 2<br/>(bowed outward 0.8mm)"]
+        deflection["6.4mm total width<br/>Deflection: 0.8mm per wall"]
+        
+        W3 -.->|"0.8mm"| gap2
+        gap2 -.-> plate2
+        plate2 -.->|"0.8mm"| W4
+        deflection
+    end
+    
+    standard ==> compressed
 ```
 
 Clip-based elastic deformation leverages the designed flexibility of specific elements—bar holders with clip, modified plate with handled bar, minifigure hand assemblies—but applies them outside intended use cases to achieve angles, curves, or offsets impossible through rigid connections. A bar holder clip exerts approximately 2-3 Newtons of gripping force on a 3.18mm diameter bar, sufficient to maintain position under model self-weight but loose enough to permit deliberate repositioning. By attaching multiple clips along a flexible bar or chain element, builders create compound curves with local tangent directions defined by clip positions. The mathematical model approximates a discretized Euler-Bernoulli beam: each clip acts as a displacement boundary condition, and the connecting bar minimizes bending energy to assume a smooth curve interpolating these constraints. Failure occurs through either clip fatigue—the polycarbonate or ABS fingers work-harden after hundreds of insertion cycles and lose elasticity—or through bar torsion accumulation, where multiple clips impose incompatible twist angles that sum to exceed the bar's torsional yield limit. Preventive design distributes angular change across maximum bar length and avoids concentrating multiple clips within short segments.
@@ -113,7 +130,7 @@ The failure mode matrix for advanced integration summarizes stress mechanisms, d
 
 **Clip-based elastic deformation:** Stress mechanism is cyclic fatigue and stress whitening. Detection: crazed appearance in transparent clips, permanent set in opaque clips. Mitigation: polycarbonate for construction-phase flexibility, ABS for permanent installations, maintain spare parts for replacement.
 
-**Stacked plate offsets:** Stress mechanism is shear stress at misaligned interfaces. Detection: lateral element deflection, buckling under vertical load. Mitigation: surround each offset stack with properly aligned structure, limit accumulated offset to <1 brick height per vertical span.
+**Stacked plate offsets:** Stress mechanism is shear stress at misaligned interfaces. Detection: lateral element deflection, buckling under vertical load. Mitigation: surround each offset stack with properly aligned structure, limit accumulated offset to < 1 brick height per vertical span.
 
 **Excessive greebling density:** Stress mechanism is cognitive, not mechanical—viewer attention fatigue. Detection: absence of clear focal points, uniform visual noise. Mitigation: establish 3:1 density variance, concentrate detail at compositional focal points.
 

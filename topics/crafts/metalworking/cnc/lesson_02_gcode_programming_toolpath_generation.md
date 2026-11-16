@@ -36,49 +36,77 @@ Cutter radius compensation (G41 for left-side offset and G42 for right-side offs
 
 The post-processor serves as the critical translation layer between generic CAM instructions and machine-specific G-code dialects. Post-processors account for controller-specific command syntax (Fanuc, Haas, Siemens, and Heidenhain controllers all implement subtly different G-code dialects), axis naming conventions (particularly for multi-axis machines where rotary axis designations vary), safe-start sequences (initializing modal states, activating default work offsets, establishing spindle warmup routines), and tool change protocols (automatic tool changers versus manual tool change prompts). High-quality post-processors incorporate machine-specific kinematic limits (maximum feedrates per axis, acceleration limits, jerk constraints) to ensure generated toolpaths respect physical capabilities. Custom post-processor development or modification is often necessary for specialized machines, non-standard kinematics, or operations requiring extended G-code commands not present in generic post-processors.
 
-```
-Block Structure and Execution Semantics:
+```mermaid
+flowchart TD
+    START["% — Program Delimiter"]
+    PROGNUM["O0001 — Program Number"]
 
-Program Start:
-  % (program delimiter)
-  O0001 (program number)
-  
-Initialization Sequence:
-  G90 G54 G17 G40 G49 G80 (absolute mode, WCS1, XY plane, comp cancel)
-  G21 (metric units) or G20 (inch units)
-  
-Tool Call and Spindle Start:
-  T01 M06 (tool 1, tool change)
-  S2500 M03 (spindle 2500 RPM clockwise)
-  G43 H01 Z100.0 (tool length offset, rapid to clearance)
-  
-Linear Interpolation Block:
-  N0100 G01 X50.0 Y25.0 Z-5.0 F500 M08
-    │    │   └──────┬──────┘  │    │   └─ coolant on (modal M-code)
-    │    │          │         │    └───── feedrate 500 mm/min (modal)
-    │    │          └─────────┴────────── target coordinates (absolute G90)
-    │    └──────────────────────────────── linear interpolation (modal)
-    └───────────────────────────────────── optional line number
-  
-Circular Interpolation Block:
-  N0110 G02 X70.0 Y25.0 I10.0 J0.0 F500
-         │   └────┬────┘  └───┬───┘
-         │        │           └─────────── arc center offset from start
-         │        └─────────────────────── arc endpoint (absolute)
-         └──────────────────────────────── clockwise circular motion
+    subgraph INIT ["Initialization Sequence"]
+        G90_ETC["G90 G54 G17 G40 G49 G80\nAbsolute mode · WCS1 · XY plane\nComp cancel · Length cancel · Cycle cancel"]
+        UNITS["G21 — Metric Units\n── or ──\nG20 — Inch Units"]
+    end
 
-Canned Cycle Example (G83 Peck Drilling):
-  G83 X10.0 Y10.0 Z-20.0 R2.0 Q5.0 F150
-      └────┬────┘ │      │    │    └───── feed rate during pecks
-           │      │      │    └────────── peck depth increment
-           │      │      └─────────────── rapid retract plane (clearance)
-           │      └────────────────────── final hole depth
-           └───────────────────────────── hole position (X, Y)
+    subgraph TOOLCALL ["Tool Call & Spindle Start"]
+        TOOL["T01 M06 — Select Tool 1 · Tool Change"]
+        SPINDLE["S2500 M03 — Spindle 2500 RPM CW"]
+        TLO["G43 H01 Z100.0 — Apply Tool Length Offset\nRapid to Clearance Height"]
+    end
 
-Modal State Persistence:
-  G01 X10.0 Y10.0 F500  → linear motion, 500 mm/min
-  X20.0 Y20.0           → G01 still active (modal)
-  X30.0 Y30.0           → G01 and F500 still active
+    subgraph LINEAR ["Linear Interpolation Block"]
+        L_BLOCK["N0100 G01 X50.0 Y25.0 Z-5.0 F500 M08"]
+        L_N["N0100 — Optional Line Number"]
+        L_G01["G01 — Linear Interpolation (modal)"]
+        L_XYZ["X50.0 Y25.0 Z-5.0 — Target Coordinates\n(absolute, G90 active)"]
+        L_F["F500 — Feedrate 500 mm/min (modal)"]
+        L_M08["M08 — Coolant ON (modal M-code)"]
+        L_BLOCK --> L_N
+        L_BLOCK --> L_G01
+        L_BLOCK --> L_XYZ
+        L_BLOCK --> L_F
+        L_BLOCK --> L_M08
+    end
+
+    subgraph CIRCULAR ["Circular Interpolation Block"]
+        C_BLOCK["N0110 G02 X70.0 Y25.0 I10.0 J0.0 F500"]
+        C_G02["G02 — Clockwise Circular Motion (modal)"]
+        C_XY["X70.0 Y25.0 — Arc Endpoint (absolute)"]
+        C_IJ["I10.0 J0.0 — Arc Center Offset\nfrom Start Point"]
+        C_BLOCK --> C_G02
+        C_BLOCK --> C_XY
+        C_BLOCK --> C_IJ
+    end
+
+    subgraph CANNED ["Canned Cycle — G83 Peck Drilling"]
+        CC_BLOCK["G83 X10.0 Y10.0 Z-20.0 R2.0 Q5.0 F150"]
+        CC_XY["X10.0 Y10.0 — Hole Position"]
+        CC_Z["Z-20.0 — Final Hole Depth"]
+        CC_R["R2.0 — Rapid Retract Plane (clearance)"]
+        CC_Q["Q5.0 — Peck Depth Increment"]
+        CC_F["F150 — Feed Rate During Pecks"]
+        CC_BLOCK --> CC_XY
+        CC_BLOCK --> CC_Z
+        CC_BLOCK --> CC_R
+        CC_BLOCK --> CC_Q
+        CC_BLOCK --> CC_F
+    end
+
+    subgraph MODAL ["Modal State Persistence"]
+        M1["G01 X10.0 Y10.0 F500\n→ Linear motion · 500 mm/min"]
+        M2["X20.0 Y20.0\n→ G01 still active (modal)"]
+        M3["X30.0 Y30.0\n→ G01 and F500 still active (modal)"]
+        M1 -->|"G01 persists"| M2
+        M2 -->|"G01 + F500 persist"| M3
+    end
+
+    START --> PROGNUM
+    PROGNUM --> INIT
+    G90_ETC --> UNITS
+    INIT --> TOOLCALL
+    TOOL --> SPINDLE --> TLO
+    TOOLCALL --> LINEAR
+    LINEAR --> CIRCULAR
+    CIRCULAR --> CANNED
+    CANNED --> MODAL
 ```
 
 The controller's motion planner operates as a multi-stage pipeline. The parser stage tokenizes each G-code block and updates modal state variables. The trajectory planner stage computes the kinematic path through configured acceleration and jerk limits, generating a time-parameterized position profile for each axis. The interpolator stage samples this trajectory at the real-time control loop frequency (typically 1-4 kHz) and feeds setpoint commands to servo drive amplifiers. The lookahead buffer maintains visibility of upcoming blocks to optimize deceleration before tight corners, smooth velocity profiles through tangent-continuous segments, and precompute compensation offsets for radius compensation modes.

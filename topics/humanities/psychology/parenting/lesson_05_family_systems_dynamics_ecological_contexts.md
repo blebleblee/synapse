@@ -60,37 +60,31 @@ Bidirectional influence is assessed through microanalytic observation of parent-
 
 Genotype-environment correlation is assessed through careful developmental history taking that examines how child temperament characteristics have shaped the caregiving environment from infancy forward. A temperamentally difficult infant may have evoked parental frustration, reducing sensitive responsiveness, which exacerbated regulatory difficulties, eliciting further harsh parenting in a cumulative cascade. Alternatively, parents may have adapted sensitively to temperament challenge, providing elevated structure and soothing that prevented temperament-related risk from manifesting in behavioral problems. The assessment distinguishes passive correlation (parents provide environments correlated with their own genetics transmitted to the child), evocative correlation (child characteristics elicit specific environmental responses), and active correlation (children select environments matching their predispositions). This differentiation informs intervention: evocative correlation suggests targeting parental response patterns to child behavior, while active correlation suggests modifying available environmental options.
 
-```
-ECOLOGICAL SYSTEMS MAP STRUCTURE
-
-┌─────────────────────────────────────────────────────────────┐
-│                      MACROSYSTEM                            │
-│  Cultural Values • SES Structures • Policy Context          │
-│  ┌───────────────────────────────────────────────────────┐ │
-│  │                   EXOSYSTEM                           │ │
-│  │  Parental Work • Extended Family • Community Resources│ │
-│  │  ┌─────────────────────────────────────────────────┐ │ │
-│  │  │              MESOSYSTEM                         │ │ │
-│  │  │  Home↔School • Parent↔Peer • Family↔Community  │ │ │
-│  │  │  ┌───────────────────────────────────────────┐ │ │ │
-│  │  │  │          MICROSYSTEM                      │ │ │ │
-│  │  │  │  ┌─────────┐     ┌──────────┐            │ │ │ │
-│  │  │  │  │ Family  │────→│  School  │            │ │ │ │
-│  │  │  │  │  Home   │     │Classroom │            │ │ │ │
-│  │  │  │  └────┬────┘     └────┬─────┘            │ │ │ │
-│  │  │  │       │               │                  │ │ │ │
-│  │  │  │       └───→ [CHILD] ←─┘                  │ │ │ │
-│  │  │  │               ↕                          │ │ │ │
-│  │  │  │       ┌───────┴────────┐                 │ │ │ │
-│  │  │  │       │  Peer Group    │                 │ │ │ │
-│  │  │  │       │  Neighborhood  │                 │ │ │ │
-│  │  │  │       └────────────────┘                 │ │ │ │
-│  │  │  └───────────────────────────────────────────┘ │ │ │
-│  │  └─────────────────────────────────────────────────┘ │ │
-│  └───────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-            ↕ CHRONOSYSTEM (Time Dimension) ↕
-    Individual Development • Family Transitions • Historical Change
+```mermaid
+flowchart TD
+    CHRONO["CHRONOSYSTEM<br/>Time Dimension<br/>Individual Development • Family Transitions • Historical Change"]
+    
+    MACRO["MACROSYSTEM<br/>Cultural Values • SES Structures • Policy Context"]
+    
+    subgraph EXO["EXOSYSTEM<br/>Parental Work • Extended Family • Community Resources"]
+        MESO["MESOSYSTEM<br/>Home↔School • Parent↔Peer • Family↔Community"]
+        
+        subgraph MICRO["MICROSYSTEM"]
+            FAMILY["Family Home"]
+            SCHOOL["School Classroom"]
+            CHILD["CHILD"]
+            PEER["Peer Group<br/>Neighborhood"]
+            
+            FAMILY -->|interaction| CHILD
+            SCHOOL -->|interaction| CHILD
+            CHILD -->|interaction| PEER
+        end
+    end
+    
+    CHRONO -.->|encompasses| MACRO
+    MACRO -->|contains| EXO
+    EXO -->|contains| MESO
+    MESO -->|contains| MICRO
 ```
 
 The practitioner constructs this map collaboratively with the family, using large paper or whiteboard to create a shared visual representation that externalizes complexity and identifies intervention leverage points. The map becomes a living document, updated as contexts shift and interventions modify system architecture.

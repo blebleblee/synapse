@@ -140,31 +140,18 @@ Header versioning uses a custom request header (`API-Version: 2024-06-01`) or th
 
 Stripe's date-based versioning model deserves special attention because it represents a production-hardened solution at scale. Each API version corresponds to a calendar date string (`2024-11-01`). The client declares its version at account creation time, and the platform guarantees that client's response shapes and behavior are frozen at that date. When a breaking change ships, it ships behind a new date version. Clients upgrade by moving their version string forward and running their integration test suite. The server maintains a middleware chain of coercions that transforms new internal models into older representations for pinned clients — a unidirectional transformation pipeline rather than a fork of business logic. This eliminates the N×M explosion of maintaining full parallel implementations for every version combination, at the cost of building and testing that transformation layer carefully.
 
-```
-Client Request ──→ [Version Header: 2023-08-01]
-                         │
-                         ▼
-           ┌─────────────────────────────┐
-           │  Versioning Middleware       │
-           │  Dispatch table:            │
-           │  2023-08-01 → coerce_v3()   │
-           │  2024-01-15 → coerce_v4()   │
-           │  2024-11-01 → passthrough() │
-           └──────────┬──────────────────┘
-                      │
-                      ▼
-           ┌──────────────────────┐
-           │  Current Business    │
-           │  Logic & Data Model  │
-           └──────────┬───────────┘
-                      │
-                      ▼
-           ┌──────────────────────────────┐
-           │  Response Coercion Layer     │
-           │  newest → 2024-11-01 (noop)  │
-           │  newest → 2024-01-15 (xform) │
-           │  newest → 2023-08-01 (xform) │
-           └──────────────────────────────┘
+```mermaid
+flowchart TD
+    Client["Client Request"]
+    VersionHeader["Version Header: 2023-08-01"]
+    
+    Client --> VersionHeader
+    
+    VersionHeader --> Middleware["Versioning Middleware<br/>Dispatch table:<br/>2023-08-01 → coerce_v3()<br/>2024-01-15 → coerce_v4()<br/>2024-11-01 → passthrough()"]
+    
+    Middleware --> BusinessLogic["Current Business<br/>Logic & Data Model"]
+    
+    BusinessLogic --> ResponseCoercion["Response Coercion Layer<br/>newest → 2024-11-01 (noop)<br/>newest → 2024-01-15 (xform)<br/>newest → 2023-08-01 (xform)"]
 ```
 
 The following complete Go snippet implements a minimal version coercion middleware that demonstrates the dispatch pattern. It compiles against the standard library with no external dependencies:

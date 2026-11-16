@@ -56,26 +56,51 @@ The PFDavg calculation integrates the failure rates and architectures of all thr
 
 The safety PLC, with dual processors and HFT of 1, contributes a PFDavg of approximately $5 \times 10^{-5}$ per the manufacturer's certified safety manual, accounting for internal diagnostics and common-cause beta factor. The final element, a single solenoid valve with λDU of 100 FIT after accounting for partial stroke testing every 6 months reducing the effective undetected interval, contributes $\frac{100 \times 10^{-9} \times 4380}{2} = 2.2 \times 10^{-4}$. Summing subsystems yields total PFDavg of approximately $3.0 \times 10^{-4}$, qualifying the SIF for SIL 2 (which permits $10^{-3}$ to $10^{-2}$) with comfortable margin.
 
-```
-+-------------------+       +-------------------+       +-------------------+
-|  Sensor Subsystem |       |  Logic Solver     |       | Final Element     |
-|                   |       |                   |       |                   |
-| [PT-101A] ----|   |       |  +-----------+    |       |  +-----------+    |
-|   4-20mA      |   |------>|  | Processor |    |------>|  | Solenoid  |    |
-|               | O |       |  |     A     |    |       |  |   Valve   |    |
-| [PT-101B] ----|   |       |  +-----------+    |       |  | XV-101    |    |
-|   4-20mA      | R |       |       |           |       |  +-----------+    |
-|               |   |       |  +-----------+    |       |       |           |
-|  1oo2 Voting  |   |       |  | Processor |    |       |  Actuator &       |
-|               |   |       |  |     B     |    |       |  Spring Return    |
-+-------------------+       |  +-----------+    |       +-------------------+
-                            |       |           |
-                            | Comparison Logic  |
-                            +-------------------+
-                                    
-         PFDavg ≈ 2.5×10⁻⁵          PFDavg ≈ 5×10⁻⁵        PFDavg ≈ 2.2×10⁻⁴
-         
-                     Total SIF PFDavg ≈ 3.0×10⁻⁴ (SIL 2)
+```mermaid
+flowchart LR
+    subgraph Sensor["Sensor Subsystem"]
+        PT101A["PT-101A<br/>4-20mA"]
+        PT101B["PT-101B<br/>4-20mA"]
+        Voting["1oo2 Voting<br/>OR Logic"]
+        PT101A --> Voting
+        PT101B --> Voting
+    end
+    
+    subgraph Logic["Logic Solver"]
+        ProcA["Processor A"]
+        ProcB["Processor B"]
+        Compare["Comparison Logic"]
+        ProcA --> Compare
+        ProcB --> Compare
+    end
+    
+    subgraph Final["Final Element"]
+        Solenoid["Solenoid Valve<br/>XV-101"]
+        Actuator["Actuator &<br/>Spring Return"]
+        Solenoid --> Actuator
+    end
+    
+    Voting --> ProcA
+    Voting --> ProcB
+    Compare --> Solenoid
+    
+    PFD1["PFDavg ≈ 2.5×10⁻⁵"]
+    PFD2["PFDavg ≈ 5×10⁻⁵"]
+    PFD3["PFDavg ≈ 2.2×10⁻⁴"]
+    Total["Total SIF PFDavg ≈ 3.0×10⁻⁴ (SIL 2)"]
+    
+    Sensor -.-> PFD1
+    Logic -.-> PFD2
+    Final -.-> PFD3
+    
+    PFD1 -.-> Total
+    PFD2 -.-> Total
+    PFD3 -.-> Total
+    
+    style PFD1 fill:#f9f9f9,stroke:#999
+    style PFD2 fill:#f9f9f9,stroke:#999
+    style PFD3 fill:#f9f9f9,stroke:#999
+    style Total fill:#e1f5e1,stroke:#4caf50,stroke-width:2px
 ```
 
 Common-cause failures subvert the independence assumption underlying redundancy calculations. If both pressure transmitters in a 1oo2 architecture share a common impulse line that plugs with polymer, or if both are exposed to the same electromagnetic interference during a lightning strike, or if a technician miscalibrates both during the same maintenance shift using identical faulty procedures, then redundancy provides no protection. The beta factor β quantifies common-cause susceptibility as the fraction of failures that affect multiple channels simultaneously. A β of 10% means that 10% of dangerous failures strike both channels, reducing the effectiveness of redundancy. Beta factor reduction demands physical separation, diverse technologies (one capacitive transmitter and one strain gauge transmitter), diverse manufacturers, staggered maintenance schedules, and strict procedural controls preventing simultaneous work on redundant channels.

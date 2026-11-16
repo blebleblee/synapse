@@ -85,18 +85,27 @@ The rate limiter `StartLimitBurst=` and `StartLimitIntervalSec=` define a token 
 
 The full unit state machine, simplified to its most practically relevant transitions, looks like this:
 
-```
-                 ┌────────────────────────────────────────────────────┐
-                 │                                                    │
-  [inactive] ──► [activating] ──► [active (running)] ──► [deactivating] ──► [inactive]
-                     │                    │
-                     │                    │  (crash / signal / watchdog)
-                     ▼                    ▼
-                 [failed]  ◄──────── [failed]
-                     │
-                     │  systemctl reset-failed
-                     ▼
-                 [inactive]
+```mermaid
+flowchart LR
+    inactive1["inactive"]
+    activating["activating"]
+    active["active (running)"]
+    deactivating["deactivating"]
+    inactive2["inactive"]
+    failed1["failed"]
+    failed2["failed"]
+    
+    inactive1 --> activating
+    activating --> active
+    active --> deactivating
+    deactivating --> inactive2
+    
+    activating --> failed1
+    active --> failed2
+    failed1 --> inactive1
+    failed2 --> failed1
+    
+    failed1 -.->|systemctl reset-failed| inactive1
 ```
 
 The `activating` state is where service type semantics are enforced. For `Type=notify`, the unit stays in `activating` until the `READY=1` datagram arrives or the `TimeoutStartSec=` deadline expires, whichever comes first. `TimeoutStartSec=` defaults to ninety seconds in most distributions; for services with well-understood startup profiles, constraining it to five or ten seconds catches hangs early and gives the restart policy a chance to recover faster.

@@ -233,11 +233,27 @@ A decision table has four regions: the condition stub (naming each condition), t
 
 Consider a session authorization function in a web backend: it must check whether the requesting user is authenticated, whether the requested resource is owned by that user, and whether the resource's access policy is set to public. The expected behavior matrix is:
 
+```mermaid
+flowchart TD
+    Start(["Authorization Check"]) --> C1{"C1: User<br/>Authenticated?"}
+    
+    C1 -->|No| C2a{"C2: User Owns<br/>Resource?"}
+    C1 -->|Yes| C2b{"C2: User Owns<br/>Resource?"}
+    
+    C2a -->|No| C3a{"C3: Resource<br/>is Public?"}
+    C2a -->|Yes| C3b{"C3: Resource<br/>is Public?"}
+    C2b -->|No| C3c{"C3: Resource<br/>is Public?"}
+    C2b -->|Yes| C3d{"C3: Resource<br/>is Public?"}
+    
+    C3a -->|No| R1["R1: Deny<br/>N,N,N"]
+    C3a -->|Yes| R2["R2: Deny<br/>N,N,Y"]
+    
+    C3b -->|No| R3["R3: Deny<br/>N,Y,N"]
+    C3b -->|Yes| R4["R4: Allow<br/>N,Y,Y"]
+    
+    C3c -->|No| R5["R5: Deny<br/>Y,N,N"]
+    C3c -->|Yes| R6["R6: Allow<br/>Y,N,Y"]
+    
+    C3d -->|No| R7["R7: Allow<br/>Y,Y,N"]
+    C3d -->|Yes| R8["R8: Allow<br/>Y,Y,Y"]
 ```
-┌──────────────────────────────┬────┬────┬────┬────┬────┬────┬────┬────┐
-│ Condition                    │ R1 │ R2 │ R3 │ R4 │ R5 │ R6 │ R7 │ R8 │
-├──────────────────────────────┼────┼────┼────┼────┼────┼────┼────┼────┤
-│ C1: User authenticated?      │  N │  N │  N │  N │  Y │  Y │  Y │  Y │
-│ C2: User owns resource?      │  N │  N │  Y │  Y │  N │  N │  Y │  Y │
-│ C3: Resource is public?      │  N │  Y │  N │  Y │  N │  Y │  N │  Y │
-├──────────────────────────────┼────┼────┼────┼────┼────┼────┼────┼────

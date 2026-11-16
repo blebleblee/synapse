@@ -58,37 +58,25 @@ For voltammetric and amperometric techniques, the working electrode material dir
 
 The geometric configuration and pretreatment protocol dramatically influence electrode performance. Electrode area determines absolute current levels: larger areas generate proportionally larger currents (assuming uniform mass transport), but also increase capacitive charging currents and susceptibility to convective disturbances. Most voltammetric experiments employ electrodes with areas from 1 to 10 mm², balancing adequate signal magnitude against background noise. Surface pretreatment removes contaminants and establishes reproducible activity: polishing with alumina slurries (0.3 to 0.05 μm grades) mechanically refreshes surfaces, while electrochemical conditioning through repeated potential cycling removes adsorbed species and oxidizes surface carbon to introduce oxygenated functional groups that improve wettability and electron transfer kinetics.
 
-```
-Electrochemical Cell Architecture (Three-Electrode Configuration)
-
-    Reference              Working            Counter
-    Electrode              Electrode          Electrode
-        │                      │                  │
-        │   [High Impedance   │                  │
-        │    Voltage Follower] │                  │
-        │          │           │                  │
-        └──────────┴───────────┴──────────────────┘
-                   │           │                  │
-              ┌────▼───────────▼──────────────────▼────┐
-              │                                         │
-              │         Potentiostat Control            │
-              │                                         │
-              │  ┌─────────────────────────────────┐   │
-              │  │  Potential Control Loop         │   │
-              │  │  E_applied = E_ref + V_control  │   │
-              │  └─────────────────────────────────┘   │
-              │                                         │
-              │  ┌─────────────────────────────────┐   │
-              │  │  Current Measurement            │   │
-              │  │  i = V_sense / R_sense          │   │
-              │  └─────────────────────────────────┘   │
-              │                                         │
-              └─────────────────────────────────────────┘
-                             │
-                    ┌────────▼────────┐
-                    │   ADC / DAC     │
-                    │   Data System   │
-                    └─────────────────┘
+```mermaid
+flowchart TD
+    RE["Reference Electrode"]
+    WE["Working Electrode"]
+    CE["Counter Electrode"]
+    
+    RE --> HIVF["High Impedance<br/>Voltage Follower"]
+    WE --> HIVF
+    
+    HIVF --> POT["Potentiostat Control"]
+    WE --> POT
+    CE --> POT
+    
+    subgraph POT ["Potentiostat Control"]
+        PCL["Potential Control Loop<br/>E_applied = E_ref + V_control"]
+        CM["Current Measurement<br/>i = V_sense / R_sense"]
+    end
+    
+    POT --> ADC["ADC / DAC<br/>Data System"]
 ```
 
 The reference electrode maintains a constant potential against which working electrode potential is measured or controlled. The saturated calomel electrode (SCE) contains mercury in contact with mercurous chloride (calomel) and saturated potassium chloride solution, establishing the equilibrium Hg₂Cl₂(s) + 2e⁻ ⇌ 2Hg(l) + 2Cl⁻ with a potential of +0.241 V versus the standard hydrogen electrode at 25°C. The silver/silver chloride reference electrode, increasingly preferred due to mercury's toxicity, employs the analogous equilibrium AgCl(s) + e⁻ ⇌ Ag(s) + Cl⁻, yielding potentials from +0.197 V (saturated KCl) to +0.222 V (3 M KCl) versus SHE. Reference electrode construction typically incorporates porous frits or ceramic plugs that allow ionic conduction while minimizing mixing between internal filling solution and sample. Double-junction designs add an intermediate salt bridge chamber, preventing contamination when measuring samples incompatible with the internal electrolyte.
@@ -97,7 +85,7 @@ Reference electrode performance degrades through several mechanisms that demand 
 
 The counter electrode (also termed auxiliary electrode) completes the current path in three-electrode potentiostatic systems, carrying all current that flows through the working electrode without constraining the working electrode potential. Counter electrodes employ inert materials with large surface areas—platinum wire, platinum mesh, or graphite rods—to minimize polarization even when substantial currents flow. The potentiostat applies whatever potential necessary at the counter electrode to drive the required current while maintaining the working electrode at the setpoint potential relative to the reference. This decoupling of current-carrying and potential-sensing functions represents the crucial architectural innovation that enables controlled-potential techniques.
 
-Potentiostats and electrometers embody distinct instrumental architectures optimized for different measurement modes. Electrometers for potentiometry employ ultra-high input impedance amplifiers (>10¹² Ω) that draw negligible current (<1 pA) from the indicator electrode, preserving equilibrium conditions while measuring potential differences in the microvolt to volt range with nanovolt resolution. Modern electrometers incorporate guarded input stages, where driven shields surround signal paths at virtual ground potential, eliminating leakage currents through cable capacitance that would otherwise compromise measurements. Logarithmic amplifiers directly convert Nernstian potentials to concentration readouts, while microprocessors perform temperature compensation and calibration transformations.
+Potentiostats and electrometers embody distinct instrumental architectures optimized for different measurement modes. Electrometers for potentiometry employ ultra-high input impedance amplifiers (>10¹² Ω) that draw negligible current (< 1 pA) from the indicator electrode, preserving equilibrium conditions while measuring potential differences in the microvolt to volt range with nanovolt resolution. Modern electrometers incorporate guarded input stages, where driven shields surround signal paths at virtual ground potential, eliminating leakage currents through cable capacitance that would otherwise compromise measurements. Logarithmic amplifiers directly convert Nernstian potentials to concentration readouts, while microprocessors perform temperature compensation and calibration transformations.
 
 Potentiostats for voltammetry and amperometry implement feedback control loops that enforce a specified potential relationship between working and reference electrodes while measuring current flow. The classical three-amplifier potentiostat architecture employs a control amplifier that adjusts counter electrode potential, a current measurement amplifier (current-to-voltage converter), and a reference buffer amplifier with extremely high input impedance. The control loop compares the working electrode potential (measured against the reference) to a command voltage, applying corrective signals to the counter electrode that null the difference. This feedback operates at kilohertz to megahertz bandwidths, enabling rapid potential waveforms while maintaining potential control accuracy within millivolts even as currents fluctuate over microamperes to milliamperes.
 

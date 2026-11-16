@@ -30,25 +30,67 @@ A **session window** abandons fixed temporal structure entirely. A session group
 
 The following diagram shows the temporal layout of all three window types applied to the same event stream, with event times on the horizontal axis:
 
-```
-Events:   e1    e2    e3        e4  e5         e6     e7
-Time:     ──┬────┬────┬──────────┬───┬──────────┬──────┬──────►
-           t1   t2   t3         t4  t5          t6    t7
+```mermaid
+flowchart TD
 
-TUMBLING (5-unit duration):
-Window A: [──────────────────]
-Window B:                     [──────────────────]
-Window C:                                         [──────────────]
+    subgraph TIMELINE ["⏱ Event Timeline"]
+        direction LR
+        T["Events: e1 · e2 · e3 · · · e4 · e5 · · · e6 · e7
+        Time:  ──t1────t2────t3─────────t4───t5──────────t6──────t7──►"]
+    end
 
-SLIDING (8-unit duration, 3-unit slide):
-Window 1: [────────────────────────]
-Window 2:          [────────────────────────]
-Window 3:                   [────────────────────────]
+    subgraph TUMBLING ["🟦 Tumbling Windows (5-unit duration, no overlap)"]
+        direction LR
+        WA["Window A
+        ├─────────────────┤
+        e1, e2, e3"]
+        WB["Window B
+        ├─────────────────┤
+        e4, e5"]
+        WC["Window C
+        ├─────────────────┤
+        e6, e7"]
+        WA -->|"next fixed slot"| WB -->|"next fixed slot"| WC
+    end
 
-SESSION (3-unit inactivity gap):
-Session A:[──────────────────]       (e1,e2,e3 within gap)
-Session B:                    [──────] (e4,e5 within gap)
-Session C:                               [────────────] (e6,e7)
+    subgraph SLIDING ["🟩 Sliding Windows (8-unit duration, 3-unit slide)"]
+        direction LR
+        SW1["Window 1
+        ├───────────────────────┤
+        e1, e2, e3, e4"]
+        SW2["Window 2
+        ├───────────────────────┤
+        e2, e3, e4, e5"]
+        SW3["Window 3
+        ├───────────────────────┤
+        e3, e4, e5, e6"]
+        SW1 -->|"slide +3 units"| SW2 -->|"slide +3 units"| SW3
+    end
+
+    subgraph SESSION ["🟧 Session Windows (3-unit inactivity gap)"]
+        direction LR
+        SA["Session A
+        ├─────────────────┤
+        e1, e2, e3
+        (gap < 3 units)"]
+        GAP1(["idle gap
+        > 3 units"])
+        SB["Session B
+        ├──────┤
+        e4, e5
+        (gap < 3 units)"]
+        GAP2(["idle gap
+        > 3 units"])
+        SC["Session C
+        ├────────────┤
+        e6, e7
+        (gap < 3 units)"]
+        SA -->|"inactivity closes session"| GAP1 -->|"new event opens session"| SB -->|"inactivity closes session"| GAP2 -->|"new event opens session"| SC
+    end
+
+    TIMELINE -->|"partitioned into"| TUMBLING
+    TIMELINE -->|"partitioned into"| SLIDING
+    TIMELINE -->|"partitioned into"| SESSION
 ```
 
 ### Stateful Operator Internals
@@ -59,32 +101,22 @@ The **state backend** is the physical storage layer for keyed state. Flink ships
 
 The **checkpoint coordinator** runs in the Flink JobManager and orchestrates distributed snapshots using a variant of the Chandy-Lamport algorithm. When a checkpoint is triggered, the coordinator injects a barrier — a special control record — into the data stream at each source. Each source first snapshots its own state (the Kafka consumer offset) and then emits the barrier downstream. When an operator receives a barrier on all of its input channels, it atomically snapshots its current state to the state backend and forwards the barrier downstream. The barrier thus propagates through the entire operator DAG, creating a consistent cut: every operator's snapshot reflects a world in which all events before the barrier have been processed and no events after the barrier have been processed. When the last operator in the DAG acknowledges the barrier to the coordinator, the checkpoint is complete. The checkpoint commit — writing the final metadata pointer to the checkpoint store — is the moment of durability.
 
-```
-JobManager
-┌─────────────────────────────────────────────────────┐
-│  Checkpoint Coordinator                             │
-│  triggers barrier injection at sources              │
-└──────────────────────┬──────────────────────────────┘
-                       │
-           ┌───────────▼───────────┐
-           │  Kafka Source (s1)    │
-           │  snapshot: offset=42  │◄── barrier injected here
-           │  emits barrier ──────►│
-           └───────────┬───────────┘
-                       │  events + barrier token
-           ┌───────────▼───────────┐
-           │  Window Operator (w1) │
-           │  receives barrier on  │
-           │  all inputs → flush   │
-           │  RocksDB snapshot ───►│──► S3 / HDFS
-           │  forward barrier ────►│
-           └───────────┬───────────┘
-                       │
-           ┌───────────▼───────────┐
-           │  Sink Operator (k1)   │
-           │  two-phase commit to  │
-           │  Kafka output topic   │
-           └───────────────────────┘
+```mermaid
+flowchart TD
+    JM["JobManager<br/>Checkpoint Coordinator<br/>triggers barrier injection at sources"]
+    
+    S1["Kafka Source (s1)<br/>snapshot: offset=42<br/>emits barrier"]
+    
+    W1["Window Operator (w1)<br/>receives barrier on all inputs → flush<br/>forward barrier"]
+    
+    K1["Sink Operator (k1)<br/>two-phase commit to Kafka output topic"]
+    
+    STORAGE[("S3 / HDFS<br/>RocksDB snapshot")]
+    
+    JM -->|"barrier injected"| S1
+    S1 -->|"events + barrier token"| W1
+    W1 -->|"RocksDB snapshot"| STORAGE
+    W1 -->|barrier| K1
 ```
 
 ### Exactly-Once Semantics: The Two-Phase Commit Contract

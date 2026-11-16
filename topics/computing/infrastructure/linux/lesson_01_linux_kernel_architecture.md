@@ -317,10 +317,10 @@ graph TD
     E --> D
     E --> F
     
-    style C fill:#90EE90
-    style E fill:#FFB6C1
-    style D fill:#ADD8E6
-    style F fill:#FFD700
+    style C fill:#90EE90,color:#0f172a
+    style E fill:#FFB6C1,color:#0f172a
+    style D fill:#ADD8E6,color:#0f172a
+    style F fill:#FFD700,color:#0f172a
 ```
 
 Scheduler operations:
@@ -383,8 +383,8 @@ graph TB
 
 **Zones** segregate memory by hardware constraints:
 
-- **ZONE_DMA**: ISA devices requiring <16MB addresses (x86)
-- **ZONE_DMA32**: Devices requiring <4GB addresses (x86-64)
+- **ZONE_DMA**: ISA devices requiring < 16MB addresses (x86)
+- **ZONE_DMA32**: Devices requiring < 4GB addresses (x86-64)
 - **ZONE_NORMAL**: Directly mapped kernel memory (3GB-~896GB on x86-64)
 - **ZONE_HIGHMEM**: Memory above direct map (obsolete on 64-bit)
 - **ZONE_MOVABLE**: Movable pages for memory hotplug and hugepage allocation
@@ -449,14 +449,16 @@ struct vm_area_struct {
 
 VMAs are stored in both a linked list (for sequential traversal) and a red-black tree (for fast lookup):
 
-```
-User Address Space (0x0000000000000000 - 0x00007FFFFFFFFFFF on x86-64)
-├─ VMA [0x400000 - 0x401000]  .text (executable)
-├─ VMA [0x600000 - 0x601000]  .data (read-write)
-├─ VMA [0x601000 - 0x602000]  .bss (read-write)
-├─ VMA [0x7f0000000000 - 0x7f0000001000]  heap (anonymous, expandable)
-├─ VMA [0x7ffff7a00000 - 0x7ffff7c00000]  libc.so (shared library)
-└─ VMA [0x7ffffffde000 - 0x7ffffffff000]  stack (grows down)
+```mermaid
+flowchart TD
+    UserSpace["User Address Space<br/>0x0000000000000000 - 0x00007FFFFFFFFFFF<br/>(x86-64)"]
+    
+    UserSpace --> VMA1["VMA [0x400000 - 0x401000]<br/>.text (executable)"]
+    UserSpace --> VMA2["VMA [0x600000 - 0x601000]<br/>.data (read-write)"]
+    UserSpace --> VMA3["VMA [0x601000 - 0x602000]<br/>.bss (read-write)"]
+    UserSpace --> VMA4["VMA [0x7f0000000000 - 0x7f0000001000]<br/>heap (anonymous, expandable)"]
+    UserSpace --> VMA5["VMA [0x7ffff7a00000 - 0x7ffff7c00000]<br/>libc.so (shared library)"]
+    UserSpace --> VMA6["VMA [0x7ffffffde000 - 0x7ffffffff000]<br/>stack (grows down)"]
 ```
 
 **Page fault handling**:
@@ -600,12 +602,16 @@ struct file {
 
 **Dentry cache (dcache)** stores recent path lookups:
 
-```
-/home/user/file.txt
-├─ dentry "/" -> inode (root filesystem)
-├─ dentry "home" -> inode (home directory)
-├─ dentry "user" -> inode (user directory)
-└─ dentry "file.txt" -> inode (file)
+```mermaid
+flowchart TD
+    root["dentry '/'<br/>→ inode<br/>(root filesystem)"]
+    home["dentry 'home'<br/>→ inode<br/>(home directory)"]
+    user["dentry 'user'<br/>→ inode<br/>(user directory)"]
+    file["dentry 'file.txt'<br/>→ inode<br/>(file)"]
+    
+    root --> home
+    home --> user
+    user --> file
 ```
 
 Path resolution (`path_lookupat()`) walks dcache, falling back to filesystem `lookup` operations on cache miss.
@@ -827,16 +833,21 @@ The kernel uses `____cacheline_aligned` to avoid false sharing in hot paths.
 
 On NUMA (Non-Uniform Memory Access) systems, memory access latency depends on locality:
 
-```
-CPU 0 (Node 0)     CPU 1 (Node 1)
-     |                  |
-   Local RAM          Local RAM
-     |                  |
-     +------ QPI -------+
-     
-Access latency:
-- Local:  ~60ns
-- Remote: ~120ns
+```mermaid
+flowchart TD
+    subgraph node0 ["Node 0"]
+        cpu0["CPU 0"]
+        ram0["Local RAM\n~60ns local access"]
+        cpu0 --- ram0
+    end
+
+    subgraph node1 ["Node 1"]
+        cpu1["CPU 1"]
+        ram1["Local RAM\n~60ns local access"]
+        cpu1 --- ram1
+    end
+
+    ram0 <-->|"QPI Interconnect\n~120ns remote access"| ram1
 ```
 
 The kernel's NUMA policy (controlled by `numactl` or `mbind()` syscall):

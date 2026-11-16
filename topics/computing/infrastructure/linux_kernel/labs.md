@@ -125,8 +125,8 @@ graph TB
     F --> G["Context Switch<br/>(__switch_to)"]
     G --> H["Task Executing"]
     
-    style G fill:#ff6b6b
-    style H fill:#51cf66
+    style G fill:#ff6b6b,color:#0f172a
+    style H fill:#51cf66,color:#0f172a
 ```
 
 ---
@@ -355,9 +355,9 @@ graph LR
     J --> K
     K --> L["User Space recvmsg()"]
     
-    style A fill:#4dabf7
-    style K fill:#51cf66
-    style L fill:#ffd43b
+    style A fill:#4dabf7,color:#0f172a
+    style K fill:#51cf66,color:#0f172a
+    style L fill:#ffd43b,color:#0f172a
 ```
 
 ---
@@ -528,8 +528,8 @@ graph TD
     G -->|"usleep(1000)"| H["Artificial Delay"]
     H --> B
     
-    style G fill:#ff6b6b
-    style H fill:#ffa94d
+    style G fill:#ff6b6b,color:#0f172a
+    style H fill:#ffa94d,color:#0f172a
 ```
 
 ---
@@ -679,9 +679,9 @@ graph TB
     M --> N["Validate Fix with<br/>Synthetic Load Test"]
     N --> O["Document Root Cause"]
     
-    style A fill:#ff6b6b
-    style M fill:#51cf66
-    style O fill:#4dabf7
+    style A fill:#ff6b6b,color:#0f172a
+    style M fill:#51cf66,color:#0f172a
+    style O fill:#4dabf7,color:#0f172a
 ```
 
 ---

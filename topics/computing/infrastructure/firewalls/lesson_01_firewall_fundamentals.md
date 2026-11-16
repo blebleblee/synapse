@@ -38,25 +38,24 @@ A packet destined for the local machine traverses PRE_ROUTING, then LOCAL_IN. A 
 
 `nftables` organizes rules into tables, chains, and rules, where chains are attached to netfilter hooks with a declared priority. Priority governs the order in which multiple chains attached to the same hook are evaluated — lower numeric priority runs first. This is the data structure behind policy:
 
-```
-                   ┌────────────────────────────────────────┐
-                   │            nftables Ruleset             │
-                   │                                         │
-                   │  table inet filter {                    │
-                   │    chain input {                        │
-                   │      type filter hook input priority 0  │
-                   │      policy drop                        │
-                   │      ┌──────────────────────────────┐  │
-                   │      │  Rule 1: ct state established │  │
-                   │      │          accept               │  │
-                   │      │  Rule 2: tcp dport 22 accept  │  │
-                   │      │  Rule 3: tcp dport 443 accept │  │
-                   │      │  Rule 4: (implicit policy)    │  │
-                   │      │          drop                 │  │
-                   │      └──────────────────────────────┘  │
-                   │    }                                     │
-                   │  }                                       │
-                   └────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["nftables Ruleset"]
+    B["table inet filter"]
+    C["chain input"]
+    D["type filter hook input priority 0<br/>policy drop"]
+    R1["Rule 1: ct state established<br/>accept"]
+    R2["Rule 2: tcp dport 22<br/>accept"]
+    R3["Rule 3: tcp dport 443<br/>accept"]
+    R4["Rule 4: implicit policy<br/>drop"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> R1
+    R1 --> R2
+    R2 --> R3
+    R3 --> R4
 ```
 
 The `policy drop` declaration at the chain level implements default-deny. If a packet reaches the end of the chain without matching any explicit rule, the chain policy governs its fate. This is architecturally cleaner than appending an explicit `drop all` rule at the end, because it makes the default action a property of the chain rather than a rule that could accidentally be reordered or deleted.

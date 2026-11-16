@@ -634,109 +634,41 @@ graph LR
     H --- S --- F --- T
 ```
 
-```c
-/* Slotted page implementation (PostgreSQL-inspired) */
-
-#define PAGE_SIZE 8192
-#define PAGE_HEADER_SIZE 24
-#define SLOT_SIZE 4   /* 2 bytes offset + 2 bytes length */
-
-/* Page header at the start of every page */
-typedef struct {
-    uint64_t page_lsn;        /* LSN of last WAL record affecting this page */
-    uint16_t checksum;         /* Page checksum for corruption detection */
-    uint16_t pd_lower;         /* Offset to start of free space (after slot array) */
-    uint16_t pd_upper;         /* Offset to end of free space (before last tuple) */
-    uint16_t pd_special;       /* Offset to start of special area (opaque data) */
-    uint16_t n_tuples;          /* Number of valid tuples (slot entries) */
-} page_header_t;
-
-/* Each slot entry in the slot array */
-typedef struct {
-    uint16_t offset;           /* Byte offset of tuple data within page */
-    uint16_t length;           /* Length of tuple data in bytes */
-} item_id_t;
-
-/*
- * Memory layout of a slotted page:
- *
- * +-------------------+  offset 0
- * | page_header_t     |  (24 bytes)
- * +-------------------+  offset 24
- * | item_id_t[0]       |  (slot 0: offset=8150, length=42)
- * | item_id_t[1]       |  (slot 1: offset=8080, length=70)
- * | item_id_t[2]       |  (slot 2: offset=8010, length=50)
- * | ...               |
- * +-------------------+  offset = pd_lower (free space start)
- * |                   |
- * |   FREE SPACE      |
- * |                   |
- * +-------------------+  offset = pd_upper (free space end)
- * | tuple[2] data     |  (grows leftward)
- * | tuple[1] data     |
- * | tuple[0] data     |
- * +-------------------+  offset = PAGE_SIZE (or pd_special)
- * | special area      |  (opaque data for index, etc.)
- * +-------------------+
- */
-
-/* Insert a tuple into a slotted page.
- * Returns the slot index on success, -1 if page is full. */
-int slotted_page_insert(uint8_t *page, const uint8_t *tuple, uint16_t len) {
-    page_header_t *hdr = (page_header_t *)page;
-
-    /* Check if there is enough free space.
-     * Need: SLOT_SIZE for the new slot + len bytes for tuple data */
-    uint16_t free_space = hdr->pd_upper - hdr->pd_lower;
-    if (free_space < (uint16_t)(SLOT_SIZE + len))
-        return -1; /* Page full */
-
-    /* Grow slot array downward (toward higher addresses) */
-    item_id_t *new_slot = (item_id_t *)(page + PAGE_HEADER_SIZE
-                                       + hdr->n_tuples * SLOT_SIZE);
-
-    /* Grow tuple data upward (toward lower addresses) */
-    hdr->pd_upper -= len;
-    new_slot->offset = hdr->pd_upper;
-    new_slot->length = len;
-
-    /* Copy tuple data into the page */
-    memcpy(page + hdr->pd_upper, tuple, len);
-
-    /* Update header metadata */
-    hdr->n_tuples++;
-    hdr->pd_lower += SLOT_SIZE;
-
-    return hdr->n_tuples - 1;
-}
-
-/* Read a tuple from a slotted page by slot index. */
-int slotted_page_read(const uint8_t *page, int slot,
-                      uint8_t *out, uint16_t *len_out) {
-    const page_header_t *hdr = (const page_header_t *)page;
-    if (slot < 0 || slot >= hdr->n_tuples)
-        return -1;
-
-    const item_id_t *item = (const item_id_t *)(page + PAGE_HEADER_SIZE
-                                                + slot * SLOT_SIZE);
-    if (item->offset == 0) /* Tombstone: tuple was deleted */
-        return -1;
-
-    memcpy(out, page + item->offset, item->length);
-    *len_out = item->length;
-    return 0;
-}
-
-/* Delete a tuple: mark its slot as a tombstone. */
-void slotted_page_delete(uint8_t *page, int slot) {
-    page_header_t *hdr = (page_header_t *)page;
-    if (slot < 0 || slot >= hdr->n_tuples)
-        return;
-
-    item_id_t *item = (item_id_t *)(page + PAGE_HEADER_SIZE + slot * SLOT_SIZE);
-    item->offset = 0; /* Tombstone marker; space is NOT reclaimed
-                       * until page is vacuumed/compacted. */
-}
+```mermaid
+flowchart TD
+    subgraph PageLayout ["Slotted Page Memory Layout (8192 bytes)"]
+        PageHeader["Page Header (24 bytes)<br/>───────────────<br/>page_lsn: uint64_t<br/>checksum: uint16_t<br/>pd_lower: uint16_t<br/>pd_upper: uint16_t<br/>pd_special: uint16_t<br/>n_tuples: uint16_t"]
+        
+        SlotArray["Slot Array (grows downward)<br/>───────────────<br/>item_id_t[0]: offset, length<br/>item_id_t[1]: offset, length<br/>item_id_t[2]: offset, length<br/>..."]
+        
+        FreeSpace["FREE SPACE<br/>───────────────<br/>(pd_upper - pd_lower bytes)"]
+        
+        TupleData["Tuple Data (grows upward)<br/>───────────────<br/>tuple[2] data<br/>tuple[1] data<br/>tuple[0] data"]
+        
+        SpecialArea["Special Area<br/>───────────────<br/>(opaque data for indexes)"]
+        
+        PageHeader --> SlotArray
+        SlotArray --> FreeSpace
+        FreeSpace --> TupleData
+        TupleData --> SpecialArea
+    end
+    
+    subgraph Operations ["Core Operations"]
+        Insert["slotted_page_insert()<br/>───────────────<br/>1. Check free space<br/>2. Add slot entry at pd_lower<br/>3. Add tuple data at pd_upper<br/>4. Update pd_lower += SLOT_SIZE<br/>5. Update pd_upper -= len<br/>6. Increment n_tuples"]
+        
+        Read["slotted_page_read()<br/>───────────────<br/>1. Validate slot index<br/>2. Check for tombstone (offset==0)<br/>3. Copy tuple data from slot offset"]
+        
+        Delete["slotted_page_delete()<br/>───────────────<br/>1. Validate slot index<br/>2. Set offset = 0 (tombstone)<br/>3. Space reclaimed on vacuum"]
+    end
+    
+    PageLayout -.->|"insert tuple"| Insert
+    PageLayout -.->|"read by slot"| Read
+    PageLayout -.->|"delete slot"| Delete
+    
+    Insert -->|"success: return slot index"| SlotArray
+    Insert -->|"failure: return -1"| FreeSpace
+    Read -->|"reads from"| TupleData
+    Delete -->|"marks tombstone in"| SlotArray
 ```
 
 The slot array provides an **indirection layer** between the logical tuple identifier (page + slot) and the physical location of tuple data within the page. When a tuple is updated and the new version is larger, the database can place the new tuple elsewhere in the page and update the slot to point to the new location, without changing the tuple identifier. This is critical for index stability: secondary indexes reference tuple IDs (page, slot), and if the physical location changed, every index would need updating.

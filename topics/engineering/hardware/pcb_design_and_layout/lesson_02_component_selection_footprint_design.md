@@ -54,36 +54,46 @@ Component spacing rules derive from electrical isolation requirements, thermal m
 
 Thermal relief patterns address the challenge of soldering ground and power plane connections without requiring excessive heating. A direct connection between a plated through-hole and an internal copper plane creates a massive thermal mass that conducts heat away from the joint faster than the soldering iron supplies it, preventing sufficient temperature rise for solder flow. Thermal relief patterns interrupt the plane with a narrow gap, connecting the pad to the plane through two to four thin spokes typically 0.3-0.4 millimeters wide. These spokes carry full current during operation—their resistance contribution remains negligible—but limit thermal conduction during soldering to rates compatible with hand and wave soldering processes. Surface-mount pads generally omit thermal reliefs because reflow soldering heats the entire assembly uniformly, though high-power QFN thermal pads sometimes employ spoke patterns to control reflow thermal gradients and reduce voiding.
 
-```
-Through-Hole Package Electrical Model:
-                       Llead
-    Terminal A ----====----+----====---- Terminal B
-                  ~25nH    |    ~25nH
-                           |
-                          ---  Cbarrel
-                          ---  ~3pF
-                           |
-                          GND
-
-Surface-Mount Package Electrical Model (0402):
-                      Llead
-    Terminal A ---===---+---===--- Terminal B
-                 ~0.4nH |  ~0.4nH
-                        |
-                       ---  Cpad
-                       ---  ~0.2pF
-                        |
-                       GND
-
-BGA Ball Electrical Model:
-                   Lball
-    Die Pad ----===----+----===---- PCB Pad
-               ~0.5nH  |   ~0.5nH
-                       |
-                      --- Csubstrate
-                      --- ~1pF
-                       |
-                      GND
+```mermaid
+flowchart TD
+    subgraph through_hole["Through-Hole Package Electrical Model"]
+        TH_A["Terminal A"]
+        TH_L1["Llead<br/>~25nH"]
+        TH_Node["Node"]
+        TH_L2["Llead<br/>~25nH"]
+        TH_B["Terminal B"]
+        TH_C["Cbarrel<br/>~3pF"]
+        TH_GND["GND"]
+        
+        TH_A --> TH_L1 --> TH_Node --> TH_L2 --> TH_B
+        TH_Node --> TH_C --> TH_GND
+    end
+    
+    subgraph surface_mount["Surface-Mount Package Electrical Model 0402"]
+        SM_A["Terminal A"]
+        SM_L1["Llead<br/>~0.4nH"]
+        SM_Node["Node"]
+        SM_L2["Llead<br/>~0.4nH"]
+        SM_B["Terminal B"]
+        SM_C["Cpad<br/>~0.2pF"]
+        SM_GND["GND"]
+        
+        SM_A --> SM_L1 --> SM_Node --> SM_L2 --> SM_B
+        SM_Node --> SM_C --> SM_GND
+    end
+    
+    subgraph bga["BGA Ball Electrical Model"]
+        BGA_A["Die Pad"]
+        BGA_L1["Lball<br/>~0.5nH"]
+        BGA_Node["Node"]
+        BGA_L2["~0.5nH"]
+        BGA_B["PCB Pad"]
+        BGA_C["Csubstrate<br/>~1pF"]
+        BGA_GND["GND"]
+        
+        BGA_A --> BGA_L1 --> BGA_Node --> BGA_L2 --> BGA_B
+        BGA_Node --> BGA_C --> BGA_GND
+    end
 ```
 
 Manufacturing design-for-manufacturability rules impose additional constraints that component selection must accommodate. Pick-and-place machines demand minimum component sizes for reliable vacuum nozzle pickup—0201 packages approach the practical limit for high-speed lines and suffer significantly higher placement error rates than 0402 and larger. Mixed technology assemblies with both through-hole and surface-mount components require either two-stage reflow (placing SMD on both sides with an intermediate bake) or wave soldering fixtures for selective through-hole population, increasing process complexity and cost. Component height variations create shadowing effects in reflow ovens where tall components block infrared radiation from reaching adjacent shorter parts, causing non-uniform heating and potential cold joints. Assembly houses typically mandate maximum height ratios of 3:1 between adjacent components to ensure adequate thermal uniformity.

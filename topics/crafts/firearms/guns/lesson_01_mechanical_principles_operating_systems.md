@@ -32,20 +32,38 @@ The blowback principle represents the purest translation of Newton's laws into a
 
 The mathematics of blowback timing are straightforward but unforgiving. The bolt mass $m_b$ and recoil spring constant $k$ must be chosen such that the bolt remains effectively stationary during the peak pressure phase, moving less than 2–3 millimeters before pressure drops below 15,000 psi. This constraint becomes severe as cartridge power increases. A 9mm blowback pistol might use a 500-gram bolt; scaling to .308 Winchester would require bolt masses exceeding 9 kilograms—clearly impractical.
 
-```
-Simple Blowback Cycle:
-
-Firing: [Case]-->[Bolt]====Spring====|Frame|
-         ↑ Pressure pushes case, bolt resists via inertia
-
-Recoil:  [Case+Bolt]→→→→ |Compressed Spring| →→ Extraction
-         Extractor pulls case; ejector flips it clear
-
-Counter-recoil: ←←←←[Bolt] |Expanding Spring|
-         Bolt strips new round from magazine
-
-Chambering: [New Round]←[Bolt] |Spring| Chamber
-         Bolt pushes round into chamber, ready to fire
+```mermaid
+flowchart TD
+    Start([Start: Simple Blowback Cycle])
+    
+    subgraph Firing ["Phase 1: Firing"]
+        F1["Case"] -->|"Pressure pushes"| F2["Bolt"]
+        F2 -.->|Resists via inertia| F3["Spring"]
+        F3 -.-> F4["Frame"]
+    end
+    
+    subgraph Recoil ["Phase 2: Recoil"]
+        R1["Case + Bolt move rearward"] -->|Compresses| R2["Spring"]
+        R2 --> R3["Extractor pulls case"]
+        R3 --> R4["Ejector flips case clear"]
+    end
+    
+    subgraph CounterRecoil ["Phase 3: Counter-Recoil"]
+        C1["Expanding Spring"] -->|"Pushes forward"| C2["Bolt"]
+        C2 --> C3["Bolt strips new round from magazine"]
+    end
+    
+    subgraph Chambering ["Phase 4: Chambering"]
+        CH1["Bolt pushes new round"] --> CH2["Round enters chamber"]
+        CH3["Spring"] -.->|Tension| CH1
+        CH2 --> CH4["Ready to fire"]
+    end
+    
+    Start --> Firing
+    Firing --> Recoil
+    Recoil --> CounterRecoil
+    CounterRecoil --> Chambering
+    Chambering -.->|Cycle repeats| Firing
 ```
 
 The ejection port timing in blowback actions is critical: if the port opens too early, gas leakage and case rupture occur; too late, and the fired case lacks sufficient rearward velocity to clear the port reliably. The extractor claw maintains its grip throughout the entire recoil stroke, dragging the case rearward until the ejector imparts lateral momentum.

@@ -23,14 +23,43 @@ def compute_checksum(file_path: Path) -> str:
 
 def export_topic_pack(domain: str, output_dir: Optional[Path] = None) -> Path:
     """
-    Exports an entire domain or discipline into a modular .synpack distribution archive.
+    Exports an entire domain or the complete global curriculum into a modular .synpack distribution archive.
     """
+    out_dir = output_dir or PACKS_DIR
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    if domain.lower() in ["all", "complete", "global"]:
+        pack_path = out_dir / "synapse_complete_curriculum.synpack"
+        lesson_count = len(list(TOPICS_DIR.rglob("lesson_*.md")))
+        lab_count = len(list(TOPICS_DIR.rglob("labs.md")))
+        topic_dirs = [p for p in TOPICS_DIR.glob("*/*/*") if (p / "labs.md").exists()]
+
+        manifest = {
+            "format": "synpack/v1",
+            "domain": "complete",
+            "title": "Synapse Master Global Curriculum (All 12 Domains)",
+            "topic_count": len(topic_dirs),
+            "lesson_count": lesson_count,
+            "lab_count": lab_count,
+            "domains": [d.name for d in TOPICS_DIR.iterdir() if d.is_dir() and not d.name.startswith(".")]
+        }
+
+        manifest_path = out_dir / "complete_manifest.json"
+        manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+        with tarfile.open(pack_path, "w:gz") as tar:
+            for d in TOPICS_DIR.iterdir():
+                if d.is_dir() and not d.name.startswith("."):
+                    tar.add(d, arcname=f"topics/{d.name}")
+            tar.add(manifest_path, arcname="manifest.json")
+
+        manifest_path.unlink(missing_ok=True)
+        return pack_path
+
     domain_dir = validate_workspace_path(TOPICS_DIR, TOPICS_DIR / domain)
     if not domain_dir.exists() or not domain_dir.is_dir():
         raise ValueError(f"Domain '{domain}' does not exist.")
 
-    out_dir = output_dir or PACKS_DIR
-    out_dir.mkdir(parents=True, exist_ok=True)
     pack_path = out_dir / f"{domain}.synpack"
 
     # Count topics and lessons in this domain

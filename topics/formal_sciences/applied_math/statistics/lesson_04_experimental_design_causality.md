@@ -154,18 +154,24 @@ where $\mathbf{J}_b$ is a $b \times b$ matrix of ones, and $\otimes$ denotes the
 
 The **analysis workflow** for split-plot designs involves constructing separate error strata and computing appropriate F-statistics for each type of effect. The ANOVA table distinguishes whole-plot effects (tested against whole-plot error) from subplot effects and interactions (tested against subplot error):
 
-```
-Source                 df      MS            F-statistic
-─────────────────────────────────────────────────────────
-Whole-plot stratum:
-  Block                b-1     MS_Block      MS_Block / MS_WP
-  Treatment A          a-1     MS_A          MS_A / MS_WP
-  WP Error             (a-1)(b-1)  MS_WP     
-  
-Subplot stratum:
-  Treatment B          b-1     MS_B          MS_B / MS_SP
-  A × B                (a-1)(b-1)  MS_AB     MS_AB / MS_SP
-  SP Error             a(b-1)(r-1) MS_SP
+```mermaid
+flowchart TD
+    title["ANOVA Table for Split-Plot Design"]
+    
+    subgraph whole["Whole-plot stratum"]
+        block["Block<br/>df: b-1<br/>MS: MS_Block<br/>F: MS_Block / MS_WP"]
+        treatA["Treatment A<br/>df: a-1<br/>MS: MS_A<br/>F: MS_A / MS_WP"]
+        wpError["WP Error<br/>df: (a-1)(b-1)<br/>MS: MS_WP"]
+    end
+    
+    subgraph subplot["Subplot stratum"]
+        treatB["Treatment B<br/>df: b-1<br/>MS: MS_B<br/>F: MS_B / MS_SP"]
+        axb["A × B<br/>df: (a-1)(b-1)<br/>MS: MS_AB<br/>F: MS_AB / MS_SP"]
+        spError["SP Error<br/>df: a(b-1)(r-1)<br/>MS: MS_SP"]
+    end
+    
+    title --> whole
+    whole --> subplot
 ```
 
 **Latin square analysis** proceeds similarly, with the model $Y_{ijk} = \mu + \tau_i + \rho_j + \gamma_k + \epsilon_{ijk}$ and the constraint that each treatment appears exactly once in each row and column. The design matrix includes columns for treatments, rows, and columns, with one level of each factor omitted as the reference. The sum of squares decomposition is:

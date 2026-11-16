@@ -20,48 +20,38 @@ The second invariant worth establishing before moving to mechanics is the nature
 
 The Cilium data plane architecture for service load balancing consists of four physically distinct layers that interact through BPF maps and ring buffers. Understanding how data flows between these layers, and where observability hooks are inserted, is the foundation for being able to diagnose any production issue you will encounter.
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           USERSPACE                                         │
-│                                                                             │
-│  ┌──────────────────┐    ┌────────────────┐    ┌─────────────────────────┐ │
-│  │  cilium-agent    │    │ hubble-observer │    │  hubble-relay / UI      │ │
-│  │                  │    │                │    │                         │ │
-│  │ • map population │    │ • ring consumer│    │ • aggregation           │ │
-│  │ • health sync    │◄──►│ • flow decode  │───►│ • Prometheus export     │ │
-│  │ • policy compile │    │ • verdict emit │    │ • Jaeger/OTLP forward   │ │
-│  └────────┬─────────┘    └────────────────┘    └─────────────────────────┘ │
-│           │                      ▲                                          │
-└───────────┼──────────────────────┼──────────────────────────────────────────┘
-            │ BPF map writes       │ perf/ringbuf events
-┌───────────▼──────────────────────┼──────────────────────────────────────────┐
-│                           KERNEL / BPF LAYER                                │
-│                                                                             │
-│  ┌──────────────────────────────────────────────────────────────────────┐  │
-│  │  BPF Maps (pinned at /sys/fs/bpf/tc/globals/)                        │  │
-│  │                                                                      │  │
-│  │  cilium_lb4_services_v2    →  service VIP → {flags, count, rev_nat}  │  │
-│  │  cilium_lb4_backends_v3    →  backend_id  → {addr, port, state}      │  │
-│  │  cilium_lb4_reverse_nat    →  rev_nat_id  → {addr, port}             │  │
-│  │  cilium_lb_maglev_outer    →  service_id  → maglev_inner_map_fd      │  │
-│  │  cilium_lb_maglev_inner    →  slot[0..M]  → backend_id               │  │
-│  │  cilium_ct4_global         →  5-tuple     → ct_entry (DNAT state)    │  │
-│  └──────────────────────────────────────────────────────────────────────┘  │
-│                                                                             │
-│  ┌──────────────────┐   ┌──────────────────┐   ┌────────────────────────┐  │
-│  │ cil_sock4_connect│   │ cil_from_netdev  │   │   cil_to_overlay /     │  │
-│  │ (BPF_PROG_TYPE_  │   │ (TC BPF ingress) │   │   cil_to_netdev        │  │
-│  │  CGROUP_SOCK_    │   │                  │   │   (TC BPF egress)      │  │
-│  │  ADDR)           │   │ • DNAT at XDP    │   │ • rev-DNAT for reply   │  │
-│  │ • early DNAT at  │   │   or TC for      │   │ • DSR encap decision   │  │
-│  │   connect(2)     │   │   NodePort pkts  │   │ • Hubble event write   │  │
-│  └──────────────────┘   └──────────────────┘   └────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────────┘
-            │                                               │
-┌───────────▼───────────────────────────────────────────────▼─────────────────┐
-│                        PHYSICAL NETWORK                                      │
-│   pod veth ──► node eth0 ──► ECMP fabric ──► destination node ──► pod veth  │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph userspace["USERSPACE"]
+        agent["cilium-agent<br/>• map population<br/>• health sync<br/>• policy compile"]
+        observer["hubble-observer<br/>• ring consumer<br/>• flow decode<br/>• verdict emit"]
+        relay["hubble-relay / UI<br/>• aggregation<br/>• Prometheus export<br/>• Jaeger/OTLP forward"]
+        
+        agent <-->|bidirectional| observer
+        observer -->|"flow events"| relay
+    end
+    
+    subgraph kernel["KERNEL / BPF LAYER"]
+        maps["BPF Maps<br/>(pinned at /sys/fs/bpf/tc/globals/)<br/><br/>cilium_lb4_services_v2 → service VIP<br/>cilium_lb4_backends_v3 → backend_id<br/>cilium_lb4_reverse_nat → rev_nat_id<br/>cilium_lb_maglev_outer → service_id<br/>cilium_lb_maglev_inner → slot[0..M]<br/>cilium_ct4_global → 5-tuple"]
+        
+        sock_connect["cil_sock4_connect<br/>(BPF_PROG_TYPE_CGROUP_SOCK_ADDR)<br/>• early DNAT at connect(2)"]
+        from_netdev["cil_from_netdev<br/>(TC BPF ingress)<br/>• DNAT at XDP or TC<br/>for NodePort pkts"]
+        to_netdev["cil_to_overlay / cil_to_netdev<br/>(TC BPF egress)<br/>• rev-DNAT for reply<br/>• DSR encap decision<br/>• Hubble event write"]
+    end
+    
+    subgraph network["PHYSICAL NETWORK"]
+        phys["pod veth ──► node eth0 ──► ECMP fabric ──► destination node ──► pod veth"]
+    end
+    
+    agent -->|"BPF map writes"| maps
+    observer -->|"perf/ringbuf events"| maps
+    
+    sock_connect -.-> maps
+    from_netdev -.-> maps
+    to_netdev -.-> maps
+    
+    from_netdev --> phys
+    to_netdev --> phys
 ```
 
 The first layer is the BPF cgroup socket program, `cil_sock4_connect`, attached to the cgroup of every pod on the node at the `BPF_CGROUP_INET4_CONNECT` hook. This hook fires when a pod calls `connect(2)`, before the kernel has even created a socket buffer for the outgoing flow. At this point, Cilium performs DNAT in software: the program looks up the destination IP and port in `cilium_lb4_services_v2`, resolves a backend using the Maglev table or the conntrack map if the connection is already tracked, and rewrites the destination address in the socket structure before the kernel constructs the first packet. The implication is profound: for pod-originated traffic to ClusterIPs, **the DNAT happens before any packet is ever constructed**, which means there is no netfilter involvement whatsoever, and no need for conntrack entries in the kernel's connection tracking subsystem for this class of traffic. This is what gives Cilium its conntrack bypass capability, reducing memory pressure significantly in clusters with high ephemeral connection rates.

@@ -122,19 +122,26 @@ This formula carries the **domain of dependence** in its structure: the value $u
 
 The following diagram illustrates the characteristic structure of the wave equation and the relationship between domain of dependence and domain of influence:
 
-```
-t
-|          /\
-|         /  \
-|        /    \
-|  char /  D   \ char
-|  x+ct=c1 x-ct=c2
-|      /    u(x0,t0)    \
-|     /______|______\
-|    [x0-ct0, x0+ct0]
-|
-+--------------------------------- x
-     Domain of Dependence
+```mermaid
+flowchart TD
+    origin["Origin: u(x₀, t₀)"]
+    leftChar["Left Characteristic<br/>x + ct = c₁"]
+    rightChar["Right Characteristic<br/>x - ct = c₂"]
+    leftPoint["x₀ - ct₀"]
+    rightPoint["x₀ + ct₀"]
+    domain["Domain of Dependence<br/>[x₀ - ct₀, x₀ + ct₀]"]
+    
+    origin --> leftChar
+    origin --> rightChar
+    leftChar --> leftPoint
+    rightChar --> rightPoint
+    leftPoint --> domain
+    rightPoint --> domain
+    
+    style origin fill:#e1f5ff,stroke:#0288d1,stroke-width:2px
+    style leftChar fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style rightChar fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style domain fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
 ```
 
 The characteristic lines through $(x_0, t_0)$ reach back to the initial line at exactly $x_0 \pm ct_0$, bounding the interval of initial data that determines the solution at that point.

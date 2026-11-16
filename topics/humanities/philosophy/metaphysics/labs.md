@@ -48,47 +48,82 @@ The wooden table satisfies criterion (a): it exists independently of other entit
 
 Document this analysis:
 
-```
-CASE 1: Wooden Table
-────────────────────────────────────────
+```mermaid
+flowchart TD
+    CASE["🪵 CASE 1: Wooden Table"]
 
-Substance Criterion (a) — Independent Existence:
-  Status: SATISFIED
-  Analysis: The table exists independently. Remove it from the room and it continues 
-  to exist. It is not dependent on being perceived, used, or related to other entities 
-  for its being. Even if all humans vanished, this table-structure would persist as 
-  matter organized by form.
+    CASE --> CA
+    CASE --> CB
+    CASE --> CC
 
-Substance Criterion (b) — Subject of Predication:
-  Status: SATISFIED
-  Predications: "The table is wooden," "The table is brown," "The table is rectangular," 
-  "The table is 1.2 meters long," "The table is located in the kitchen"
-  Counter-predication Test: Can the table be predicated of something else? No. We never 
-  say "X is a table" in the sense that "tableness" inheres in X. The table is always 
-  subject, never predicate.
+    subgraph CA ["Criterion (a) — Independent Existence"]
+        CA_STATUS["✅ SATISFIED"]
+        CA_ANALYSIS["The table exists independently of perception,\nuse, or relation to other entities.\nIf all humans vanished, the table-structure\nwould persist as matter organized by form."]
+        CA_STATUS --> CA_ANALYSIS
+    end
 
-Substance Criterion (c) — Identity Through Change:
-  Status: SATISFIED WITH CONDITIONS
-  
-  Change 1 (Accident Change): Paint the table white. The table's color changes from brown 
-  to white. Is it still the same table? Yes. Why? The form persists; only the accident 
-  (quality: color) changes.
-  
-  Change 2 (Structural Modification): Replace one leg. Is it still the same table? Yes, 
-  because sufficient form-structure remains, and the change is accidental (quantity).
-  
-  Change 3 (Radical Replacement): Gradually replace every wooden plank, one per week, 
-  until after six months, the original wood remains zero percent. Is it still the same 
-  table? This is *the Ship of Theseus*, a boundary case. Aristotelian solution: Yes, 
-  because the form (the structural principle) remains continuous throughout the gradual 
-  process. The matter is not the principle of identity; the form is.
+    subgraph CB ["Criterion (b) — Subject of Predication"]
+        CB_STATUS["✅ SATISFIED"]
+        CB_PREDS["Predications:\n• The table is wooden\n• The table is brown\n• The table is rectangular\n• The table is 1.2 meters long\n• The table is located in the kitchen"]
+        CB_TEST["Counter-predication Test:\nCan the table be predicated of something else?\nNo — the table is always subject, never predicate.\n'Tableness' does not inhere in X."]
+        CB_STATUS --> CB_PREDS
+        CB_STATUS --> CB_TEST
+    end
 
-Aristotelian Prediction: The table remains a substance through all three changes because 
-substance is form, not matter. Accidents (color, quantity, location) change; substance 
-(form-matter composite) persists as long as the formal principle organizing the whole is 
-sufficiently continuous.
+    subgraph CC ["Criterion (c) — Identity Through Change"]
+        CC_STATUS["⚠️ SATISFIED WITH CONDITIONS"]
 
-VERIFICATION OUTCOME: ✓ CONSISTENT
+        subgraph CH1 ["Change 1 — Accidental Change"]
+            CH1_DESC["Paint the table white.\nColor changes: brown → white."]
+            CH1_VERDICT["Same table? ✅ YES\nOnly the accident (quality: color) changes.\nThe form persists."]
+            CH1_DESC --> CH1_VERDICT
+        end
+
+        subgraph CH2 ["Change 2 — Structural Modification"]
+            CH2_DESC["Replace one leg."]
+            CH2_VERDICT["Same table? ✅ YES\nSufficient form-structure remains.\nThe change is accidental (quantity)."]
+            CH2_DESC --> CH2_VERDICT
+        end
+
+        subgraph CH3 ["Change 3 — Radical Replacement (Ship of Theseus)"]
+            CH3_DESC["Gradually replace every wooden plank\nover six months.\nOriginal wood remaining: 0%."]
+            CH3_BOUNDARY["Boundary case:\nIs it still the same table?"]
+            CH3_SOLUTION["Aristotelian Solution: ✅ YES\nThe form (structural principle)\nremains continuous throughout.\nMatter is not the principle of identity —\nform is."]
+            CH3_DESC --> CH3_BOUNDARY
+            CH3_BOUNDARY --> CH3_SOLUTION
+        end
+
+        CC_STATUS --> CH1
+        CC_STATUS --> CH2
+        CC_STATUS --> CH3
+    end
+
+    subgraph PRED ["Aristotelian Prediction"]
+        PRED_CORE["Substance = form-matter composite.\nAccidents (color, quantity, location) change.\nSubstance persists as long as the formal\nprinciple organizing the whole\nremains sufficiently continuous."]
+    end
+
+    CA --> PRED
+    CB --> PRED
+    CC --> PRED
+
+    PRED --> VERDICT["✅ VERIFICATION OUTCOME: CONSISTENT"]
+
+    style CASE fill:#4a3728,color:#fff,stroke:#2c1f14
+    style CA fill:#1a3a1a,color:#fff,stroke:#0d1f0d
+    style CB fill:#1a3a1a,color:#fff,stroke:#0d1f0d
+    style CC fill:#1a2a3a,color:#fff,stroke:#0d1520
+    style CH1 fill:#1f3d1f,color:#fff,stroke:#0d2010
+    style CH2 fill:#1f3d1f,color:#fff,stroke:#0d2010
+    style CH3 fill:#3a2a1a,color:#fff,stroke:#1f1408
+    style PRED fill:#2a1a3a,color:#fff,stroke:#150d20
+    style VERDICT fill:#1a4a1a,color:#fff,stroke:#0d2a0d
+    style CA_STATUS fill:#2d5a2d,color:#fff,stroke:#1a3a1a
+    style CB_STATUS fill:#2d5a2d,color:#fff,stroke:#1a3a1a
+    style CC_STATUS fill:#4a4a1a,color:#fff,stroke:#2a2a0d
+    style CH1_VERDICT fill:#2d5a2d,color:#fff,stroke:#1a3a1a
+    style CH2_VERDICT fill:#2d5a2d,color:#fff,stroke:#1a3a1a
+    style CH3_SOLUTION fill:#2d5a2d,color:#fff,stroke:#1a3a1a
+    style CH3_BOUNDARY fill:#5a3a1a,color:#fff,stroke:#3a2010
 ```
 
 Repeat this case structure for the cup of coffee and for a specific human being. For the human, examine how Aristotelian substance handles growth (the person was once an infant; matter and size have changed radically), learning (the person's accidents—knowledge, disposition—change continuously), and biological continuity (cells replace themselves; the matter is different over time).
@@ -138,28 +173,64 @@ This visual representation makes the metaphysical architecture explicit. Now exa
 
 In Aristotelian substance ontology, the dependency structure terminates at **primary substances** (particular things) and the **Unmoved Mover** (in natural theology), avoiding both circularity and infinite regress. Document this verification:
 
-```
-DEPENDENCY STRUCTURE VERIFICATION
-──────────────────────────────────
+```mermaid
+flowchart TD
+    subgraph foundations ["Foundational / Termination Points"]
+        PM["Prime Matter"]
+        PF["Pure Form"]
+        UM["Unmoved Mover\n(God — depends on nothing)"]
+    end
 
-Circular Dependency Test: Does the graph contain any cycles?
-  Result: NO CYCLES DETECTED
-  Rationale: Substances are foundational (no dependencies). Accidents depend on 
-  substances but substances do not depend on accidents. Secondary substances depend 
-  on primary substances but not vice versa. The direction of dependency is uniform 
-  and acyclic.
-  
-Infinite Regress Test: Does the graph terminate at foundational entities?
-  Result: YES, REGRESS TERMINATES
-  Termination Points: 
-    1. Primary Substances (particular things like Socrates, this horse) — exist 
-       independently as composites of matter and form.
-    2. Prime Matter and Pure Form — Aristotle's ultimate metaphysical primitives, 
-       not further analyzed.
-    3. The Unmoved Mover — God, the ultimate cause of all motion and being, 
-       depends on nothing.
-  
-Logical Coherence Status: ✓ COHERENT
+    subgraph primary_substances ["Primary Substances\n(Particular Things)"]
+        PS["Primary Substance\ne.g. Socrates, this horse\n(composite of matter and form)"]
+    end
+
+    subgraph secondary_substances ["Secondary Substances\n(Universal / Species / Genera)"]
+        SS["Secondary Substance\ne.g. Human, Animal"]
+    end
+
+    subgraph accidents ["Accidents\n(Non-essential Attributes)"]
+        AC_Q["Quality\ne.g. pale, musical"]
+        AC_QT["Quantity\ne.g. four-foot long"]
+        AC_R["Relation\ne.g. double, half"]
+        AC_P["Place / Time / Position\nState / Action / Passion"]
+    end
+
+    PM -->|"constitutes (matter)"| PS
+    PF -->|"constitutes (form)"| PS
+    UM -->|"ultimate cause of\nmotion and being"| PS
+    UM -->|"ultimate cause of\nmotion and being"| PM
+    UM -->|"ultimate cause of\nmotion and being"| PF
+
+    PS -->|"instantiates"| SS
+
+    PS -->|"bears"| AC_Q
+    PS -->|"bears"| AC_QT
+    PS -->|"bears"| AC_R
+    PS -->|"bears"| AC_P
+
+    SS -->|"predicated of"| AC_Q
+    SS -->|"predicated of"| AC_QT
+
+    CYCLE_CHECK["✓ No Cycles Detected\nDependency direction is uniform and acyclic"]
+    REGRESS_CHECK["✓ Regress Terminates\nat Prime Matter, Pure Form, and Unmoved Mover"]
+    COHERENCE["✓ Logically Coherent"]
+
+    foundations -.->|"verified" | CYCLE_CHECK
+    foundations -.->|"verified"| REGRESS_CHECK
+    CYCLE_CHECK --- COHERENCE
+    REGRESS_CHECK --- COHERENCE
+
+    style foundations fill:#1a1a2e,stroke:#e94560,color:#eaeaea
+    style primary_substances fill:#16213e,stroke:#0f3460,color:#eaeaea
+    style secondary_substances fill:#0f3460,stroke:#533483,color:#eaeaea
+    style accidents fill:#1a1a2e,stroke:#533483,color:#eaeaea
+    style CYCLE_CHECK fill:#1b4332,stroke:#52b788,color:#d8f3dc
+    style REGRESS_CHECK fill:#1b4332,stroke:#52b788,color:#d8f3dc
+    style COHERENCE fill:#1b4332,stroke:#52b788,color:#d8f3dc,font-weight:bold
+    style UM fill:#3d0000,stroke:#e63946,color:#ffddd2
+    style PM fill:#2d2d2d,stroke:#adb5bd,color:#eaeaea
+    style PF fill:#2d2d2d,stroke:#adb5bd,color:#eaeaea
 ```
 
 Save this analysis in your `stress-tests` directory as `dependency-analysis-aristotle.md`. This exercise reveals whether your chosen metaphysical system's internal structure is logically sound before you test it against empirical cases and alternative frameworks.
@@ -202,13 +273,17 @@ For each framework, complete the matrix by analyzing the following parameters:
 
 Once the matrix is complete, perform a **comparative analysis** by examining cross-framework patterns. Create a new document titled `comparative-analysis.md` in your `case-studies` directory:
 
-```
-COMPARATIVE METAPHYSICAL ANALYSIS: SUBSTANCE FRAMEWORKS
-═══════════════════════════════════════════════════════
-
-PATTERN 1: REGRESS VULNERABILITY
-────────────────────────────────
-
-Aristotelian Substance: Avoids regress via foundational particulars and Prime Matter.
-Platonic Forms: Suffers Third Man regress — if
+```mermaid
+flowchart TD
+    title["COMPARATIVE METAPHYSICAL ANALYSIS: SUBSTANCE FRAMEWORKS"]
+    
+    subgraph pattern1["PATTERN 1: REGRESS VULNERABILITY"]
+        aristotelian["Aristotelian Substance:<br/>Avoids regress via foundational<br/>particulars and Prime Matter"]
+        platonic["Platonic Forms:<br/>Suffers Third Man regress"]
+        
+        aristotelian -->|Solution| foundational["Foundational Particulars<br/>+ Prime Matter"]
+        platonic -->|Problem| regress["Third Man Regress"]
+    end
+    
+    title --> pattern1
 ```

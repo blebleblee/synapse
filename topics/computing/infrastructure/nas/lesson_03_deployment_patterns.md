@@ -20,39 +20,29 @@ A standalone NAS appliance consolidates storage hardware, network interfaces, fi
 
 Network topology for a single-node NAS typically employs link aggregation (IEEE 802.3ad LACP) to combine multiple physical Ethernet interfaces into a higher-bandwidth logical channel. A NAS with four 10 Gigabit Ethernet interfaces can theoretically deliver 40 Gbps of aggregate throughput, though real-world performance depends on the switch's ability to distribute traffic across member links using a hash function based on source/destination MAC addresses or IP tuples. The link aggregation provides both increased bandwidth and resilience against single link failure, though it does not protect against switch failure or NAS controller failure.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Client Network                        │
-│              (1 Gbps or 10 Gbps Ethernet)               │
-└───────────────────────┬─────────────────────────────────┘
-                        │
-            ┌───────────┴───────────┐
-            │   Network Switch      │
-            │   (LACP-capable)      │
-            └───────────┬───────────┘
-                        │ (4×10G LACP bond)
-            ┌───────────┴───────────────────────┐
-            │      NAS Storage Controller        │
-            │  ┌──────────────────────────────┐ │
-            │  │  Protocol Services           │ │
-            │  │  (NFS, SMB, iSCSI daemons)   │ │
-            │  └──────────┬───────────────────┘ │
-            │  ┌──────────┴───────────────────┐ │
-            │  │  Filesystem Layer            │ │
-            │  │  (ZFS, ext4, XFS)            │ │
-            │  └──────────┬───────────────────┘ │
-            │  ┌──────────┴───────────────────┐ │
-            │  │  RAID Controller / Volume Mgr│ │
-            │  └──────────┬───────────────────┘ │
-            └─────────────┼─────────────────────┘
-                          │ (SAS/SATA)
-         ┌────────────────┼────────────────┐
-         │                │                │
-    ┌────┴───┐       ┌───┴────┐      ┌───┴────┐
-    │ Disk 0 │       │ Disk 1 │ ...  │ Disk N │
-    │ (HDD/  │       │ (HDD/  │      │ (HDD/  │
-    │  SSD)  │       │  SSD)  │      │  SSD)  │
-    └────────┘       └────────┘      └────────┘
+```mermaid
+flowchart TD
+    Client["Client Network<br/>(1 Gbps or 10 Gbps Ethernet)"]
+    Switch["Network Switch<br/>(LACP-capable)"]
+    
+    subgraph NAS["NAS Storage Controller"]
+        Protocol["Protocol Services<br/>(NFS, SMB, iSCSI daemons)"]
+        Filesystem["Filesystem Layer<br/>(ZFS, ext4, XFS)"]
+        RAID["RAID Controller / Volume Mgr"]
+        
+        Protocol --> Filesystem
+        Filesystem --> RAID
+    end
+    
+    Disk0["Disk 0<br/>(HDD/SSD)"]
+    Disk1["Disk 1<br/>(HDD/SSD)"]
+    DiskN["Disk N<br/>(HDD/SSD)"]
+    
+    Client --> Switch
+    Switch -->|"4×10G LACP bond"| Protocol
+    RAID -->|"SAS/SATA"| Disk0
+    RAID -->|"SAS/SATA"| Disk1
+    RAID -->|"SAS/SATA"| DiskN
 ```
 
 The single-node architecture exhibits clear performance boundaries. Network bandwidth caps the maximum aggregate throughput across all clients: a 40 Gbps bond cannot serve more than approximately 4.5 GB/s even with perfectly parallelized workloads. Storage backend throughput imposes a second ceiling: twelve 7200 RPM SATA drives in RAID 6 might deliver 1.2 GB/s sequential reads but only 1200-1500 IOPS of random writes after RAID parity overhead. The CPU resources consumed by protocol processing, encryption (if enabled), and filesystem operations create a third constraint, particularly visible in SMB workloads that require frequent metadata operations or ACL evaluations. These three boundaries—network, storage, and compute—interact non-linearly, and the actual bottleneck shifts depending on workload characteristics.
@@ -63,30 +53,29 @@ High-availability NAS deployments eliminate the single controller as a point of 
 
 The shared storage architecture requires careful coordination of write operations to prevent data corruption. SCSI reservations provide a hardware-level mutual exclusion mechanism: the active controller registers a reservation on each shared LUN, and the standby controller periodically tests its ability to communicate with the storage devices without disrupting the reservation. If the active controller fails, the standby controller breaks the existing reservation, establishes its own, and imports the filesystem volumes. This process typically completes within 10-30 seconds for well-configured systems, though actual client impact depends on protocol timeouts and retry logic.
 
-```
-                 Client Network (Virtual IP: 10.0.1.10)
-                            │
-              ┌─────────────┴─────────────┐
-              │                           │
-    ┌─────────┴──────────┐      ┌────────┴──────────┐
-    │  Controller A      │      │  Controller B     │
-    │  (Active)          │      │  (Standby)        │
-    │  - Owns VIP        │      │  - Monitors       │
-    │  - Services I/O    │      │  - Ready for      │
-    │  - Holds SCSI res. │      │    takeover       │
-    └─────────┬──────────┘      └────────┬──────────┘
-              │                           │
-              │   Heartbeat Network       │
-              │   (dedicated link)        │
-              └───────────┬───────────────┘
-                          │
-                  ┌───────┴────────┐
-                  │  Shared        │
-                  │  Storage Array │
-                  │  (Dual-ported) │
-                  └────────────────┘
-                  │  │  │  │  │  │
-                 Disks in RAID 6
+```mermaid
+flowchart TD
+    Client["Client Network<br/>(Virtual IP: 10.0.1.10)"]
+    
+    ControllerA["Controller A (Active)<br/>- Owns VIP<br/>- Services I/O<br/>- Holds SCSI res."]
+    ControllerB["Controller B (Standby)<br/>- Monitors<br/>- Ready for takeover"]
+    
+    Heartbeat["Heartbeat Network<br/>(dedicated link)"]
+    
+    Storage["Shared Storage Array<br/>(Dual-ported)"]
+    
+    Disks["Disks in RAID 6"]
+    
+    Client --> ControllerA
+    Client --> ControllerB
+    
+    ControllerA --> Heartbeat
+    ControllerB --> Heartbeat
+    
+    ControllerA --> Storage
+    ControllerB --> Storage
+    
+    Storage --> Disks
 ```
 
 IP address failover leverages gratuitous ARP (GARP) to update network topology. The active controller binds a virtual IP address (VIP) to one of its physical interfaces and responds to client requests. Upon takeover, the standby controller configures the VIP on its own interface and broadcasts a GARP packet announcing the new MAC address associated with the VIP. Switches update their MAC address tables, redirecting subsequent traffic to the new active controller. Clients with established TCP connections experience connection resets and must reconnect, but because the VIP remains constant, no client-side reconfiguration is required.
@@ -156,33 +145,23 @@ Enterprise NAS deployments integrate into complex network topologies with multip
 
 Quality of Service (QoS) mechanisms prioritize latency-sensitive traffic over throughput-oriented bulk transfers. IEEE 802.1p specifies 3-bit priority code points (PCP) embedded in the VLAN tag, defining eight priority levels from background (PCP 0) to network control (PCP 7). Production NAS deployments typically assign interactive file access to PCP 4 or 5, bulk backup traffic to PCP 2, and replication streams to PCP 3. Network switches inspect these priority tags and implement weighted fair queueing or strict priority scheduling to ensure that high-priority traffic receives preferential access to link bandwidth during congestion.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     Core Distribution Switch                     │
-│                                                                  │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐            │
-│  │ VLAN 10     │  │ VLAN 20     │  │ VLAN 30     │            │
-│  │ (Client     │  │ (iSCSI)     │  │ (Replication)│           │
-│  │  Access)    │  │             │  │             │            │
-│  │ QoS PCP 5   │  │ QoS PCP 4   │  │ QoS PCP 3   │            │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘            │
-└─────────┼─────────────────┼─────────────────┼──────────────────┘
-          │                 │                 │
-          │ 10G Trunk       │                 │
-          │ (802.1Q)        │                 │
-          │                 │                 │
-    ┌─────┴─────────────────┴─────────────────┴─────┐
-    │        NAS Controller (VLAN-aware)             │
-    │                                                 │
-    │  eth0.10 (VLAN 10): 10.1.10.5  - Client access│
-    │  eth0.20 (VLAN 20): 10.1.20.5  - iSCSI target │
-    │  eth0.30 (VLAN 30): 10.1.30.5  - Replication  │
-    │                                                 │
-    │  Internal QoS policies:                        │
-    │   - Client I/O: 60% bandwidth share            │
-    │   - iSCSI: 30% bandwidth share                 │
-    │   - Replication: 10% bandwidth, best-effort    │
-    └─────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph core ["Core Distribution Switch"]
+        VLAN10["VLAN 10\n(Client Access)\nQoS PCP 5"]
+        VLAN20["VLAN 20\n(iSCSI)\nQoS PCP 4"]
+        VLAN30["VLAN 30\n(Replication)\nQoS PCP 3"]
+    end
+
+    subgraph nas ["NAS Controller (VLAN-aware)"]
+        ETH10["eth0.10 — 10.1.10.5\nClient Access\n60% bandwidth share"]
+        ETH20["eth0.20 — 10.1.20.5\niSCSI Target\n30% bandwidth share"]
+        ETH30["eth0.30 — 10.1.30.5\nReplication\n10% bandwidth, best-effort"]
+    end
+
+    VLAN10 -->|"10G Trunk (802.1Q)"| ETH10
+    VLAN20 -->|"10G Trunk (802.1Q)"| ETH20
+    VLAN30 -->|"10G Trunk (802.1Q)"| ETH30
 ```
 
 Jumbo frames (MTU 9000 bytes instead of the standard 1500) reduce CPU overhead and improve throughput for bulk transfers by decreasing the packet-per-byte ratio. A 64 KB write operation fragmented into 1500-byte MTU requires 44 packets, each incurring per-packet processing overhead in the NIC, kernel protocol stack, and switch. With 9000-byte jumbo frames, the same transfer requires only 8 packets, reducing interrupt load and switch buffer occupancy. Jumbo frames must be enabled consistently across all network segments between clients and storage; a single device with standard MTU fragments packets and negates the benefit. NAS performance tuning typically enables jumbo frames on dedicated storage VLANs while leaving client-facing VLANs at standard MTU to accommodate heterogeneous client configurations.

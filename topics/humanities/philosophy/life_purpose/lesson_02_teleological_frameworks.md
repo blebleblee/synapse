@@ -40,16 +40,21 @@ The conclusion yields a precise functional specification: the human good consist
 
 The conceptual architecture can be diagrammed as a nested hierarchy of functional specification:
 
-```
-BIOLOGICAL LIFE (nutrition, growth, reproduction)
-  ↓ shared with plants, necessary but insufficient
-PERCEPTUAL LIFE (sensation, locomotion, appetite)
-  ↓ shared with animals, necessary but insufficient  
-RATIONAL LIFE (practical and theoretical reasoning)
-  ↓ distinctive to humans, necessary and sufficient
-    ├─ Practical Wisdom (phronesis): excellence in deliberation and choice
-    ├─ Moral Virtues (courage, temperance, justice): habituated excellence in action
-    └─ Theoretical Wisdom (sophia): excellence in contemplative understanding
+```mermaid
+flowchart TD
+    BIO["BIOLOGICAL LIFE<br/>(nutrition, growth, reproduction)"]
+    PERC["PERCEPTUAL LIFE<br/>(sensation, locomotion, appetite)"]
+    RAT["RATIONAL LIFE<br/>(practical and theoretical reasoning)"]
+    
+    PHRO["Practical Wisdom - phronesis<br/>excellence in deliberation and choice"]
+    MORAL["Moral Virtues<br/>(courage, temperance, justice)<br/>habituated excellence in action"]
+    THEO["Theoretical Wisdom - sophia<br/>excellence in contemplative understanding"]
+    
+    BIO -->|"shared with plants<br/>necessary but insufficient"| PERC
+    PERC -->|"shared with animals<br/>necessary but insufficient"| RAT
+    RAT -->|"distinctive to humans<br/>necessary and sufficient"| PHRO
+    RAT --> MORAL
+    RAT --> THEO
 ```
 
 This hierarchy establishes both necessary conditions—humans must be alive and sentient—and sufficient conditions—rational activity according to virtue constitutes complete human flourishing. The structure also reveals that human purpose is not monolithic but internally differentiated according to the plurality of rational excellences. A life dedicated solely to intellectual contemplation might realize theoretical virtue while neglecting practical and social virtues, falling short of complete *eudaimonia*.
@@ -64,17 +69,15 @@ This normative dimension is not imposed externally but read off the internal fun
 
 Theistic teleology in the Thomistic tradition supplements this natural functional analysis with theological commitments about divine intentionality and providence. Aquinas accepts the Aristotelian *ergon* argument as delivering valid conclusions about natural human purpose but insists these natural ends require theological completion. The structure can be represented as concentric circles of purposive ordering:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ ULTIMATE END: Beatific Vision (supernatural end)            │
-│ ┌─────────────────────────────────────────────────────────┐ │
-│ │ PROXIMATE ENDS: Natural Virtues & Human Flourishing     │ │
-│ │ ┌─────────────────────────────────────────────────────┐ │ │
-│ │ │ INSTRUMENTAL ENDS: Health, Wealth, Pleasure         │ │ │
-│ │ │ (good as means to higher ends, not good in self)    │ │ │
-│ │ └─────────────────────────────────────────────────────┘ │ │
-│ └─────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Ultimate["ULTIMATE END<br/>Beatific Vision<br/>(supernatural end)"]
+    
+    subgraph Proximate ["PROXIMATE ENDS<br/>Natural Virtues & Human Flourishing"]
+        Instrumental["INSTRUMENTAL ENDS<br/>Health, Wealth, Pleasure<br/>(good as means to higher ends,<br/>not good in self)"]
+    end
+    
+    Ultimate --> Proximate
 ```
 
 Aquinas argues that natural reason can discover proximate human purposes through philosophical analysis, but revelation discloses that these natural perfections are themselves ordered toward a supernatural end beyond philosophical reach. Human beings are created *imago Dei*, in the image of God, which means rational nature is intrinsically oriented toward knowledge of and communion with its divine source. Natural virtues remain genuine goods but become inadequate as final purposes because rational nature's deepest orientation points beyond any created good toward the uncreated Good itself.

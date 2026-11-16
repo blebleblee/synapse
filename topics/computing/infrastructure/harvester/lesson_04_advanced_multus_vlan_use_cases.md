@@ -12,16 +12,20 @@ The fundamental invariant is:
 
 For VMs running under KubeVirt, the network namespace belongs to the `virt-launcher` pod. KubeVirt then plumbs network interfaces from that namespace into the QEMU process via either a bridge (the `bridge` binding method) or a passthrough mechanism such as SR-IOV or VFIO. The result is a two-hop wiring model:
 
-```
-Physical NIC / Bond
-        │
-  Linux Bridge or OVS (on host)
-        │
-  virt-launcher pod netns  (Multus wires this end)
-        │  (tap device)
-  QEMU vhost-net
-        │
-  VM's virtio-net or e1000 interface
+```mermaid
+flowchart TD
+    A["Physical NIC / Bond"]
+    B["Linux Bridge or OVS (on host)"]
+    C["virt-launcher pod netns<br/>(Multus wires this end)"]
+    D["tap device"]
+    E["QEMU vhost-net"]
+    F["VM's virtio-net or e1000 interface"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 The VLAN invariant at the host level is that any frame carrying a dot1q tag with VLAN ID `N` must arrive at a bridge port that is configured to either (a) accept tagged frames for VLAN `N` and present them tagged to the VM (trunk mode), or (b) strip the tag and present untagged frames to the VM (access mode). These two modes map directly to the `vlanConfig` settings in Harvester's `ClusterNetwork` and `NetworkAttachmentDefinition` resources.

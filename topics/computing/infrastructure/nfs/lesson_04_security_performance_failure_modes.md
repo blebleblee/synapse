@@ -20,61 +20,35 @@ Failure modes in distributed filesystems fall into two categories: **fail-stop**
 
 NFS authentication occurs at the RPC layer, wrapping filesystem protocol messages in security contexts that establish caller identity before operation execution. The RPC header contains an `auth_flavor` field specifying the credential format, followed by opaque credential and verifier blobs whose structure depends on the selected flavor. The server's RPC dispatch routine validates these credentials before invoking the NFS protocol handler, mapping authenticated principal identities to local UIDs through name service lookups or explicit ID mapping configurations.
 
-```
-┌─────────────────────────────────────────────────────┐
-│              Application Process                     │
-│         (uid=1000, gid=1000, groups=[1000,27])      │
-└────────────────────┬────────────────────────────────┘
-                     │ write(fd, buf, 4096)
-                     ↓
-┌─────────────────────────────────────────────────────┐
-│          VFS Layer (Generic Filesystem)             │
-│    Translates POSIX calls to filesystem operations  │
-└────────────────────┬────────────────────────────────┘
-                     │ nfs_write()
-                     ↓
-┌─────────────────────────────────────────────────────┐
-│         NFS Client (Kernel Module)                  │
-│  Constructs WRITE RPC with filehandle, offset, data │
-└────────────────────┬────────────────────────────────┘
-                     │ Attach AUTH context
-                     ↓
-┌─────────────────────────────────────────────────────┐
-│        RPC Authentication Layer                     │
-│  ┌──────────────┐  ┌──────────────┐  ┌───────────┐ │
-│  │  AUTH_SYS    │  │ RPCSEC_GSS   │  │ AUTH_NULL │ │
-│  │              │  │              │  │           │ │
-│  │ Credential:  │  │ GSS Context: │  │ No Auth   │ │
-│  │ uid=1000     │  │ krb5 ticket  │  │           │ │
-│  │ gid=1000     │  │ seqnum=42    │  │           │ │
-│  │ groups=[...]  │  │ MAC digest   │  │           │ │
-│  └──────────────┘  └──────────────┘  └───────────┘ │
-└────────────────────┬────────────────────────────────┘
-                     │ Embed in RPC header
-                     ↓
-┌─────────────────────────────────────────────────────┐
-│          Network Transport (TCP/UDP)                │
-│    Transmit RPC packet to server:port               │
-└────────────────────┬────────────────────────────────┘
-                     │
-                     │  Network
-                     ↓
-┌─────────────────────────────────────────────────────┐
-│         NFS Server (Kernel NFSD Threads)            │
-│  ┌──────────────────────────────────────────────┐  │
-│  │ RPC Dispatcher:                              │  │
-│  │ 1. Validate auth_flavor                      │  │
-│  │ 2. Verify credential format                  │  │
-│  │ 3. Map principal → local UID                 │  │
-│  │ 4. Check export permissions                  │  │
-│  │ 5. Dispatch to NFS protocol handler          │  │
-│  └──────────────────────────────────────────────┘  │
-│              ↓ (if authorized)                      │
-│  ┌──────────────────────────────────────────────┐  │
-│  │ VFS Operation: vfs_write()                   │  │
-│  │ Filesystem enforces POSIX ACLs locally       │  │
-│  └──────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Application Process<br/>(uid=1000, gid=1000, groups=[1000,27])"]
+    B["VFS Layer<br/>(Generic Filesystem)<br/>Translates POSIX calls to filesystem operations"]
+    C["NFS Client<br/>(Kernel Module)<br/>Constructs WRITE RPC with filehandle, offset, data"]
+    D["RPC Authentication Layer"]
+    
+    subgraph auth_methods ["Authentication Methods"]
+        E["AUTH_SYS<br/>Credential:<br/>uid=1000<br/>gid=1000<br/>groups=[...]"]
+        F["RPCSEC_GSS<br/>GSS Context:<br/>krb5 ticket<br/>seqnum=42<br/>MAC digest"]
+        G["AUTH_NULL<br/>No Auth"]
+    end
+    
+    H["Network Transport<br/>(TCP/UDP)<br/>Transmit RPC packet to server:port"]
+    I["NFS Server<br/>(Kernel NFSD Threads)"]
+    
+    subgraph server_ops ["Server Operations"]
+        J["RPC Dispatcher<br/>1. Validate auth_flavor<br/>2. Verify credential format<br/>3. Map principal → local UID<br/>4. Check export permissions<br/>5. Dispatch to NFS protocol handler"]
+        K["VFS Operation: vfs_write()<br/>Filesystem enforces POSIX ACLs locally"]
+    end
+    
+    A -->|"write(fd, buf, 4096)"| B
+    B -->|"nfs_write()"| C
+    C -->|"Attach AUTH context"| D
+    D --> auth_methods
+    D -->|"Embed in RPC header"| H
+    H -->|Network| I
+    I --> J
+    J -->|"if authorized"| K
 ```
 
 AUTH_SYS credentials consist of a machine name string (often ignored), a numeric UID, a numeric GID, and an auxiliary group list limited to 16 entries. The server trusts these values implicitly, applying them directly to VFS permission checks. An `/etc/exports` entry with `root_squash` remaps client UID 0 to the `nobody` user (typically UID 65534) to prevent root privilege escalation, but non-root UIDs pass through unmodified. The `all_squash` option forces all users to `nobody`, effectively creating anonymous read-only or read-write shares. ID mapping complications arise when client and server use different user databases: a user `alice` with UID 1000 on the client may map to UID 1050 on the server if they maintain separate `/etc/passwd` files. Enterprise deployments resolve this through centralized identity systems like LDAP, ensuring numeric UIDs stay synchronized across the infrastructure.
@@ -133,7 +107,7 @@ The kernel's RPC credential cache (`rpcauth_cache`) stores mappings from (UID, s
 
 Network partition failures decouple client caches from server state, creating consistency violations that manifest as stale reads or lost writes. When a client loses connectivity mid-operation, pending RPCs timeout and retry until `timeo` expires. Hard mounts continue retrying indefinitely, causing applications to hang in uninterruptible sleep (`D` state in `ps` output). This preserves data integrity at the cost of availability: critical system processes like shell logins or init scripts blocking on NFS can render the entire client unresponsive. Soft mounts return EIO after timeout, allowing applications to detect failures and potentially fall back to cached data or alternative paths. However, soft mounts violate POSIX semantics—`write()` returning success then later failing with EIO during `close()` breaks assumptions of durable storage, risking silent data loss.
 
-Server-side export configuration errors create subtle failure modes where filesystem operations succeed but violate intended security boundaries. An export with `no_root_squash` inadvertently allows remote root privilege escalation: a compromised client mounting the export can create setuid-root binaries in shared directories, then execute them to gain root on other clients. The `secure` export option restricts clients to privileged ports (<1024), preventing unprivileged users from impersonating NFS clients, but this protection relies on client kernel security—a compromised client can bind low ports anyway. Defense-in-depth requires layered controls: `root_squash` on all exports, IP-based access lists (exportfs hosts), and application-level permission checks that do not trust client-provided UIDs.
+Server-side export configuration errors create subtle failure modes where filesystem operations succeed but violate intended security boundaries. An export with `no_root_squash` inadvertently allows remote root privilege escalation: a compromised client mounting the export can create setuid-root binaries in shared directories, then execute them to gain root on other clients. The `secure` export option restricts clients to privileged ports (< 1024), preventing unprivileged users from impersonating NFS clients, but this protection relies on client kernel security—a compromised client can bind low ports anyway. Defense-in-depth requires layered controls: `root_squash` on all exports, IP-based access lists (exportfs hosts), and application-level permission checks that do not trust client-provided UIDs.
 
 Disk exhaustion on the server manifests as ENOSPC errors propagated to clients, but delayed write buffering obscures the failure point. An application writing gigabytes of data receives successful `write()` returns as long as the client's page cache has free memory. The actual ENOSPC occurs during writeback flush, potentially minutes or hours later when `close()` forces dirty page synchronization. Applications checking return codes see `close()` fail with EIO, but the root cause—insufficient server disk space—requires examining server logs or manually checking `df` output. Proactive monitoring through `statd` notifications or custom health checks can alert before exhaustion, but the fundamental race persists: clients cannot atomically reserve server disk space before buffering writes.
 
@@ -151,7 +125,7 @@ Container orchestration platforms like Kubernetes integrate NFS through persiste
 
 Observability tooling captures NFS performance metrics through multiple instrumentation points. The client exposes `/proc/self/mountstats` containing per-mount counters for RPC operations, retries, timeouts, and data volumes. Parsing this file reveals bottlenecks: high retry counts indicate network instability, elevated read/write latencies point to server overload, and disproportionate GETATTR traffic suggests excessive cache revalidation. Server-side metrics live in `/proc/net/rpc/nfsd` and include per-operation histograms, thread utilization, and reply cache hit rates. Combining client and server metrics pinpoints fault domains: if client metrics show high latency but server metrics show low CPU and disk utilization, the network path likely introduces delay (congestion, routing loops).
 
-The configuration below implements a hardened NFS deployment with RPCSEC_GSS authentication, tuned caching parameters, and defensive timeouts suitable for production multi-tenant environments. The server exports a filesystem with synchronous writes enforced, Kerberos-only authentication, and root squashing. Clients mount with hard semantics to prevent data loss, reduced cache timeouts to improve consistency, and explicit timeout values chosen for a datacenter network with <5 ms RTT.
+The configuration below implements a hardened NFS deployment with RPCSEC_GSS authentication, tuned caching parameters, and defensive timeouts suitable for production multi-tenant environments. The server exports a filesystem with synchronous writes enforced, Kerberos-only authentication, and root squashing. Clients mount with hard semantics to prevent data loss, reduced cache timeouts to improve consistency, and explicit timeout values chosen for a datacenter network with < 5 ms RTT.
 
 Server configuration (`/etc/exports`):
 ```

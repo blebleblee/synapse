@@ -322,11 +322,25 @@ sigrok-cli \
 
 Wire the FTDI FT232R to the target using a **crossover** connection: the transmitter of one device connects to the receiver of the other.
 
-```
-Target TX  ──────────► FT232R RX  (orange on FTDI cable)
-Target RX  ◄──────────  FT232R TX  (yellow on FTDI cable)
-Target GND ───────────  FT232R GND (black on FTDI cable)
-                                   (Do NOT connect VCC unless powering target from bridge)
+```mermaid
+flowchart LR
+    TargetTX["Target TX"]
+    TargetRX["Target RX"]
+    TargetGND["Target GND"]
+    
+    FT232RX["FT232R RX<br/>(orange on FTDI cable)"]
+    FT232TX["FT232R TX<br/>(yellow on FTDI cable)"]
+    FT232GND["FT232R GND<br/>(black on FTDI cable)"]
+    
+    Note["Do NOT connect VCC<br/>unless powering target from bridge"]
+    
+    TargetTX -->|"TX data"| FT232RX
+    FT232TX -->|"RX data"| TargetRX
+    TargetGND ---|"Ground"| FT232GND
+    
+    FT232GND -.->|"Warning"| Note
+    
+    style Note fill:#fff3cd,stroke:#856404,stroke-width:2px
 ```
 
 **Safety check before connecting:**

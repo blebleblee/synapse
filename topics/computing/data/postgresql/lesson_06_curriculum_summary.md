@@ -261,7 +261,7 @@ graph LR
     CURRENT -->|"danger zone starts at"| HORIZON
     FROZEN -->|"always in the past\n(HEAP_XMIN_FROZEN)"| CURRENT
 
-    style HORIZON fill:#ff9999,stroke:#cc0000
+    style HORIZON fill:#ff9999,stroke:#cc0000,color:#0f172a
     style WRAP fill:#ff0000,stroke:#990000,color:#ffffff
 ```
 
@@ -337,9 +337,9 @@ graph TD
     PGSTBY --> ROPOOL
     A1 & A2 & AN -.->|"read-only queries"| ROPOOL
 
-    style PGPrimary fill:#e8f4e8,stroke:#2d8a2d
-    style PGStandby fill:#e8eef4,stroke:#2d5a8a
-    style HALayer fill:#f4f0e8,stroke:#8a7a2d
+    style PGPrimary fill:#e8f4e8,stroke:#2d8a2d,color:#0f172a
+    style PGStandby fill:#e8eef4,stroke:#2d5a8a,color:#0f172a
+    style HALayer fill:#f4f0e8,stroke:#8a7a2d,color:#0f172a
 ```
 
 ---
@@ -520,10 +520,10 @@ graph TD
     DBUF -->|"8KB shared page\nis the unit of MVCC tuple storage"| MVCC
     MVCC -->|"snapshot reads\ntraverse B-tree index pages"| BTREE
 
-    style WAL fill:#fff3cd,stroke:#856404
-    style MVCC fill:#d1ecf1,stroke:#0c5460
-    style WRAP fill:#f8d7da,stroke:#721c24
-    style HA fill:#d4edda,stroke:#155724
+    style WAL fill:#fff3cd,stroke:#856404,color:#0f172a
+    style MVCC fill:#d1ecf1,stroke:#0c5460,color:#0f172a
+    style WRAP fill:#f8d7da,stroke:#721c24,color:#0f172a
+    style HA fill:#d4edda,stroke:#155724,color:#0f172a
 ```
 
 The WAL invariant occupies the central position in this graph: it is a dependency of process isolation recovery, double-buffer eviction safety, B-tree page atomicity, and physical replication. No other invariant can be violated in isolation — WAL correctness is the keystone of the entire system's durability guarantee.

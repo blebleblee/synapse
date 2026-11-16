@@ -30,29 +30,73 @@ Miller compensation stabilizes the two-stage amplifier by creating a dominant po
 
 A critical subtlety arises in the right-half-plane zero introduced by the feedforward current path through $C_c$, which creates a zero at $z_1 = g_{m2}/(2\pi C_c)$. This RHP zero contributes phase lag rather than phase lead, consuming phase margin and potentially causing peaking in the frequency response or even instability if it falls near the unity-gain frequency. Several compensation strategies address this: nulling resistor compensation places a resistor $R_z = 1/g_{m2}$ in series with $C_c$ to cancel the zero, though this creates a sensitivity to process variation in $g_{m2}$; damping-factor compensation accepts the zero but sizes $C_c$ large enough to push the zero well beyond the unity-gain frequency; and current-buffer compensation inserts a voltage buffer in the compensation path to eliminate the feedforward current entirely.
 
-```
-Two-Stage Miller-Compensated Op-Amp (Conceptual)
+```mermaid
+flowchart TD
+    VDD(["Vdd"])
+    VSS(["Vss"])
 
-         Vdd
-          |
-    +-----+-----+
-    |           |
-   [Ibias]     [M3]  PMOS loads
-    |           |
-    |     Cc    |
-    +-----||--->+----> Vout
-    |           |
-   [M1]  [M2]  [M5]  (M1-M2: diff pair, M5: 2nd stage)
-    |     |     |
-    +--[M4]-----+
-    |   Itail
-   Vin+ Vin-   
-         |
-        Vss
+    subgraph supply ["Power Rails"]
+        VDD
+        VSS
+    end
 
-Dominant pole: p1 ≈ 1/(2π·gm1·R1·gm2·R2·Cc)
-Unity-gain freq: ft ≈ gm1/(2π·Cc)
-RHP zero: z1 ≈ gm2/(2π·Cc)
+    subgraph bias ["Bias Network"]
+        IBIAS["Ibias\n(Current Source)"]
+    end
+
+    subgraph stage1 ["First Stage — Differential Pair"]
+        M1["M1\n(Diff Pair +)"]
+        M2["M2\n(Diff Pair −)"]
+        M3["M3\n(PMOS Load)"]
+        M4["M4\n(Tail Current Source / Itail)"]
+    end
+
+    subgraph stage2 ["Second Stage"]
+        M5["M5\n(Common-Source Amplifier)"]
+    end
+
+    subgraph compensation ["Miller Compensation"]
+        CC["Cc\n(Miller Capacitor)"]
+    end
+
+    subgraph inputs ["Input Signals"]
+        VINP(["Vin+"])
+        VINM(["Vin−"])
+    end
+
+    subgraph performance ["Key Performance Equations"]
+        P1["Dominant Pole\np₁ ≈ 1 / (2π · gm1 · R1 · gm2 · R2 · Cc)"]
+        FT["Unity-Gain Frequency\nft ≈ gm1 / (2π · Cc)"]
+        Z1["RHP Zero\nz₁ ≈ gm2 / (2π · Cc)"]
+    end
+
+    VOUT(["Vout"])
+
+    VDD --> IBIAS
+    VDD --> M3
+
+    IBIAS --> M1
+    M3 --> M2
+
+    VINP --> M1
+    VINM --> M2
+
+    M1 --> M4
+    M2 --> M4
+    M4 --> VSS
+
+    M2 -->|"Intermediate Node\n(drain of M2)"| M5
+    M5 --> VOUT
+    M5 --> VSS
+
+    M2 ---|"feedback via Cc"| CC
+    CC -->|"feeds forward to output"| VOUT
+
+    VOUT -.->|"pole-splitting\nfeedback"| M1
+
+    VOUT --> P1
+    VOUT --> FT
+    VOUT --> Z1
 ```
 
 The folded-cascode topology addresses several limitations of the two-stage architecture by achieving high gain in a single stage, eliminating the need for dominant-pole compensation and its associated bandwidth reduction. In a folded-cascode, the differential input pair sits near one supply rail while the output swings near the opposite rail, with the signal current "folding" through cascoded current mirrors to reach the output nodes. An NMOS differential pair with PMOS cascoded loads creates a structure where the input pair sources current to the folding mirrors, which then sink current through NMOS cascode devices to establish high-impedance output nodes. The voltage gain of a folded-cascode can reach 80–100 dB even in modern processes, approaching $g_{m,in}(g_{m,casc}r_{o}^2)$ where the cascode multiplication squares the output resistance.
@@ -67,24 +111,31 @@ Rail-to-rail output stages, equally critical in low-voltage designs, must provid
 
 A typical class-AB biasing scheme uses a translinear loop where the sum of gate-source voltages around the loop remains constant. The PMOS output device gate is driven by the amplifier's gain stage, while its source connects to $V_{DD}$; the NMOS output device gate is also driven by the gain stage while its source connects to $V_{SS}$ or ground through a small sense resistor. A biasing circuit comprising matched PMOS and NMOS devices in a diode-connected configuration establishes the quiescent $V_{GS}$ values. As the gain stage output voltage swings, one output device is driven harder into conduction while the other begins to cut off, providing the push-pull action. The design must account for the non-constant $g_m$ of the output devices as they transition from weak to strong inversion, which introduces gain variation and potential distortion in the closed-loop transfer function.
 
-```
-Class-AB Output Stage (Simplified)
-
-        Vdd
-         |
-        [Mp]  <-- PMOS output device
-         |
-    Vout +---------> load
-         |
-        [Mn]  <-- NMOS output device
-         |
-        Vss
-
-Bias network (not shown) sets Vgs,p and Vgs,n
-to establish quiescent current Iq (typ. 10-100 µA)
-
-During positive slew: Mp sources large current, Mn cuts off
-During negative slew: Mn sinks large current, Mp cuts off
+```mermaid
+flowchart TD
+    Vdd["Vdd<br/>(Positive Supply)"]
+    Mp["Mp<br/>PMOS Output Device"]
+    Vout["Vout<br/>(Output Node)"]
+    Load["Load"]
+    Mn["Mn<br/>NMOS Output Device"]
+    Vss["Vss<br/>(Negative Supply)"]
+    
+    Bias["Bias Network<br/>(Sets Vgs,p and Vgs,n)<br/>Quiescent Current Iq = 10-100 µA"]
+    
+    Vdd --> Mp
+    Mp --> Vout
+    Vout --> Load
+    Vout --> Mn
+    Mn --> Vss
+    
+    Bias -.- Mp
+    Bias -.- Mn
+    
+    Note1["Positive Slew:<br/>Mp sources large current<br/>Mn cuts off"]
+    Note2["Negative Slew:<br/>Mn sinks large current<br/>Mp cuts off"]
+    
+    Note1 -.-> Mp
+    Note2 -.-> Mn
 ```
 
 Slew rate in two-stage amplifiers is fundamentally limited by the tail current of the input differential pair and the size of the compensation capacitor. When a large input step demands rapid output change, the input pair steers all of its tail current to one branch, charging or discharging $C_c$ at the maximum rate $SR = I_{tail}/C_c$. This creates the familiar tradeoff: increasing tail current improves slew rate but increases power consumption and input-referred noise current; decreasing $C_c$ improves slew rate but reduces phase margin and may cause instability. Practical designs target slew rates of 1–100 V/µs depending on application, with audio amplifiers at the lower end and high-speed buffer amplifiers at the upper end.

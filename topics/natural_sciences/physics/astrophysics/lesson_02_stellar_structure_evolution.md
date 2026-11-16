@@ -114,23 +114,56 @@ $$R \propto K^{n/(3-n)} M^{(1-n)/(3-n)}$$
 
 For $n=3$, this relation becomes independent of $K$ and implies a unique mass for any value of $K$, the physical meaning of which emerges when applied to white dwarfs: the $n=3$ relativistic degeneracy limit gives the Chandrasekhar mass $M_\text{Ch} \approx 1.44\,M_\odot$, the maximum mass a cold degenerate object can support before gravitational collapse overcomes electron degeneracy pressure.
 
-```
-STELLAR INTERIOR STRUCTURE — SOLAR-MASS STAR
-════════════════════════════════════════════════════════════════
- CORE          RADIATIVE ZONE         CONVECTIVE ZONE    SURFACE
- r < 0.25 R☉   0.25 – 0.70 R☉        0.70 – 1.00 R☉
-─────────────────────────────────────────────────────────────────
-  pp-chain      photon diffusion        bulk convection
-  T ~ 1.57e7 K  ∇_rad < ∇_ad           ∇_rad > ∇_ad
-  ρ ~ 1.5e5     opacity κ(ρ,T)          MLT cells ~ 1 Mm
-  kg/m³         Rosseland mean          τ_cell ~ 10 min
-                τ_photon ~ 10⁵ yr
-─────────────────────────────────────────────────────────────────
-  dP/dr = -Gρm/r²    dT/dr∝ κρL/r²T³   dT/dr ≈ ∇_ad (dT/dr)_P
-─────────────────────────────────────────────────────────────────
- BOUNDARY CONDITIONS:
-   center: r=0, L=0   |   surface: P≈0, L=4πR²σT_eff⁴
-════════════════════════════════════════════════════════════════
+```mermaid
+flowchart LR
+    subgraph CORE ["🌟 CORE — r < 0.25 R☉"]
+        C1["pp-chain fusion"]
+        C2["T ~ 1.57 × 10⁷ K"]
+        C3["ρ ~ 1.5 × 10⁵ kg/m³"]
+        C4["dP/dr = −Gρm/r²"]
+    end
+
+    subgraph RAD ["☀️ RADIATIVE ZONE — 0.25 – 0.70 R☉"]
+        R1["Photon diffusion"]
+        R2["∇_rad < ∇_ad (stable)"]
+        R3["Opacity κ(ρ,T) — Rosseland mean"]
+        R4["τ_photon ~ 10⁵ yr"]
+        R5["dT/dr ∝ κρL / r²T³"]
+    end
+
+    subgraph CONV ["🌀 CONVECTIVE ZONE — 0.70 – 1.00 R☉"]
+        V1["Bulk convection — MLT"]
+        V2["∇_rad > ∇_ad (unstable)"]
+        V3["Convection cells ~ 1 Mm"]
+        V4["τ_cell ~ 10 min"]
+        V5["dT/dr ≈ ∇_ad · (dT/dr)_P"]
+    end
+
+    subgraph SURF ["🔆 SURFACE — r = R☉"]
+        S1["Photosphere"]
+        S2["P ≈ 0"]
+        S3["L = 4πR²σT_eff⁴"]
+    end
+
+    subgraph BC ["📐 BOUNDARY CONDITIONS"]
+        B1["Center: r = 0, L = 0"]
+        B2["Surface: P ≈ 0, L = 4πR²σT_eff⁴"]
+    end
+
+    CORE -->|"energy transport\nby radiation"| RAD
+    RAD -->|"convective\ninstability onset"| CONV
+    CONV -->|"energy radiated\nat photosphere"| SURF
+
+    B1 -.->|"inner BC"| CORE
+    B2 -.->|"outer BC"| SURF
+
+    C1 -->|"generates L(r)"| C4
+    R1 --> R3
+    R3 --> R4
+    R4 --> R5
+    V1 --> V3
+    V3 --> V4
+    V4 --> V5
 ```
 
 ### The Hertzsprung-Russell Diagram as a Structural Map
@@ -157,27 +190,42 @@ where the factor 0.007 is the mass-to-energy conversion efficiency of hydrogen b
 
 When a star exhausts the hydrogen in its convective core (or in its radiative core, once the central abundance $X \to 0$), the core can no longer sustain nuclear burning and contracts. The gravitational energy released heats the surrounding hydrogen-rich shell, which ignites in a thin shell-burning configuration. The energy generated in this shell is too great to be carried by radiation alone in the overlying envelope; the stellar envelope expands dramatically and cools, moving the star to the right on the HR diagram — evolving off the main sequence onto the subgiant and then red-giant branch. This envelope expansion is not driven by pressure from the core but by a subtle mirror principle: the Kelvin-Helmholtz contraction of the core is mirrored by the expansion of the envelope, maintaining hydrostatic equilibrium across the hydrogen-burning shell.
 
-```
-STELLAR EVOLUTION PATHWAYS (schematic, HR diagram topology)
-═══════════════════════════════════════════════════════════════════
-log L/L☉
-   6 │      O/B supergiants                     Red Supergiants
-     │      ★                                        ★★
-   4 │        ↘ CNO-burning MS               Helium flash
-     │          ↘                       ↗
-   2 │            [MAIN SEQUENCE]  Subgiant Branch → RGB
-     │       ★ A/F ↗                              ↓ He core flash
-   0 │      ★ G/K → (Solar path) ——→ ——→ ——→  HB / Clump
-     │                                              ↓ AGB
-  -2 │  White Dwarf Cooling Sequence        PN ejection
-     │        ★★                              ↓
-     └───────────────────────────────────────────────────
-         50k   20k   10k   6k   4k   3k     T_eff (K)
-                Hot ◄────────────────► Cool
-═══════════════════════════════════════════════════════════════════
- M < 8 M☉:   MS → SGB → RGB → He flash → HB → AGB → PN → WD
- M > 8 M☉:   MS → SGB → RSG → He/C/O burning → Core collapse → NS/BH
-═══════════════════════════════════════════════════════════════════
+```mermaid
+flowchart TD
+    MS["Main Sequence<br/>(A/F/G/K stars)"]
+    SGB["Subgiant Branch"]
+    RGB["Red Giant Branch"]
+    HeFlash["Helium Flash"]
+    HB["Horizontal Branch/<br/>Red Clump"]
+    AGB["Asymptotic Giant<br/>Branch"]
+    PN["Planetary Nebula<br/>Ejection"]
+    WD["White Dwarf<br/>Cooling Sequence"]
+    
+    RSG["Red Supergiant"]
+    HeCBurning["He/C/O Core<br/>Burning"]
+    CoreCollapse["Core Collapse"]
+    NSbh["Neutron Star/<br/>Black Hole"]
+    
+    MS -->|"M < 8 M☉<br/>Solar Path"| SGB
+    MS -->|"M > 8 M☉"| RSG
+    
+    SGB --> RGB
+    RGB --> HeFlash
+    HeFlash --> HB
+    HB --> AGB
+    AGB --> PN
+    PN --> WD
+    
+    RSG --> HeCBurning
+    HeCBurning --> CoreCollapse
+    CoreCollapse --> NSBH["Neutron Star/<br/>Black Hole"]
+    
+    style MS fill:#fff4e6
+    style RSG fill:#ffe6cc
+    style WD fill:#e6f3ff
+    style NSBH fill:#333,color:#fff
+    style HB fill:#f0e6ff
+    style AGB fill:#ffe6f0
 ```
 
 For stars with $M \lesssim 8\,M_\odot$, the degenerate helium core ignites in a thermal runaway called the helium flash when the core reaches roughly $10^8$ K and $\sim 0.45\,M_\odot$. After the flash lifts degeneracy and re-establishes thermal equilibrium, the star settles onto the horizontal branch (HB) burning helium in the core via the triple-alpha process:

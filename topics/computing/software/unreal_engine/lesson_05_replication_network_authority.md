@@ -271,66 +271,30 @@ This interpolation scheme trades latency for smoothness. Simulated proxies rende
 
 The network architecture diagram below illustrates the dataflow between client and server, showing input transmission, authoritative simulation, replication, and reconciliation:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         SERVER                               │
-│  ┌────────────────────────────────────────────────────┐     │
-│  │  Authoritative Simulation (30Hz Tick)              │     │
-│  │  • Receive Client Input Commands                   │     │
-│  │  • Validate Input (ServerRPC_Validate)             │     │
-│  │  • Execute Game Logic                              │     │
-│  │  • Update Actor Properties                         │     │
-│  │  • Compute Relevancy Sets Per Connection           │     │
-│  │  • Serialize Delta Snapshots                       │     │
-│  └─────────────┬──────────────────────────────────────┘     │
-│                │                                             │
-│                │ Replication Packets (Property Deltas, RPCs) │
-└────────────────┼─────────────────────────────────────────────┘
-                 │
-                 ▼
-    ┌────────────────────────────┐
-    │   Network (150ms RTT)      │
-    │   • Packet Loss (1%)       │
-    │   • Jitter (±20ms)         │
-    └────────────┬───────────────┘
-                 │
-                 ▼
-┌────────────────┴─────────────────────────────────────────────┐
-│                    CLIENT (Autonomous Proxy)                  │
-│                                                               │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │  Input Processing & Client-Side Prediction (60Hz)   │    │
-│  │  • Capture Player Input                             │    │
-│  │  • Apply Movement Locally (Speculative)             │    │
-│  │  • Buffer Input Commands (Frame-Tagged)             │    │
-│  │  • Transmit Input to Server (ServerRPC)             │    │
-│  └────────────────────┬────────────────────────────────┘    │
-│                       │                                      │
-│                       ▼                                      │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │  Reconciliation & Error Correction                  │    │
-│  │  • Receive Server Snapshot (Confirmed Frame N)      │    │
-│  │  • Compare Server Position vs Predicted Position    │    │
-│  │  • If Error > Threshold:                            │    │
-│  │    - Rewind to Server State                         │    │
-│  │    - Replay Buffered Inputs (Frame N+1..Current)    │    │
-│  │    - Smooth Correction via Interpolation            │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                                                               │
-└───────────────────────────────────────────────────────────────┘
-
-┌───────────────────────────────────────────────────────────────┐
-│              REMOTE CLIENT (Simulated Proxy)                  │
-│                                                               │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │  Snapshot Buffering & Interpolation (60Hz)          │    │
-│  │  • Receive Server Snapshots (Actor Properties)      │    │
-│  │  • Buffer Snapshots with Timestamps                 │    │
-│  │  • Interpolate Between Snapshots (100ms Delay)      │    │
-│  │  • Render Smooth Motion (Lerp Position/Rotation)    │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                                                               │
-└───────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph SERVER["SERVER"]
+        AuthSim["Authoritative Simulation (30Hz Tick)<br/>• Receive Client Input Commands<br/>• Validate Input (ServerRPC_Validate)<br/>• Execute Game Logic<br/>• Update Actor Properties<br/>• Compute Relevancy Sets Per Connection<br/>• Serialize Delta Snapshots"]
+    end
+    
+    AuthSim -->|"Replication Packets<br/>Property Deltas, RPCs"| Network
+    
+    Network["Network (150ms RTT)<br/>• Packet Loss (1%)<br/>• Jitter (±20ms)"]
+    
+    Network --> ClientInput
+    Network --> RemoteClient
+    
+    subgraph CLIENT["CLIENT (Autonomous Proxy)"]
+        ClientInput["Input Processing & Client-Side Prediction (60Hz)<br/>• Capture Player Input<br/>• Apply Movement Locally (Speculative)<br/>• Buffer Input Commands (Frame-Tagged)<br/>• Transmit Input to Server (ServerRPC)"]
+        
+        ClientInput --> Reconciliation["Reconciliation & Error Correction<br/>• Receive Server Snapshot (Confirmed Frame N)<br/>• Compare Server Position vs Predicted Position<br/>• If Error > Threshold:<br/>  - Rewind to Server State<br/>  - Replay Buffered Inputs (Frame N+1..Current)<br/>  - Smooth Correction via Interpolation"]
+    end
+    
+    ClientInput -.->|ServerRPC<br/>Input Commands| AuthSim
+    
+    subgraph REMOTE["REMOTE CLIENT (Simulated Proxy)"]
+        RemoteClient["Snapshot Buffering & Interpolation (60Hz)<br/>• Receive Server Snapshots (Actor Properties)<br/>• Buffer Snapshots with Timestamps<br/>• Interpolate Between Snapshots (100ms Delay)<br/>• Render Smooth Motion (Lerp Position/Rotation)"]
+    end
 ```
 
 The server operates as the central authority, processing client inputs at its fixed tick rate and broadcasting state updates. Autonomous proxies execute optimistic local predictions to mask latency, reconciling periodically against server corrections. Simulated proxies sacrifice real-time accuracy for smooth interpolation, rendering positions slightly in the past. This three-tier architecture balances responsiveness, consistency, and visual quality under real-world network conditions.

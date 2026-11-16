@@ -478,16 +478,24 @@ A process transitions through multiple states managed by the scheduler. The prim
 State transitions occur via system calls, signals, and scheduler decisions:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> TASK_RUNNING: fork() creates process
-    TASK_RUNNING --> TASK_INTERRUPTIBLE: wait(), read() on empty pipe
-    TASK_INTERRUPTIBLE --> TASK_RUNNING: Event ready, signal received
-    TASK_RUNNING --> TASK_UNINTERRUPTIBLE: Disk I/O, page fault
-    TASK_UNINTERRUPTIBLE --> TASK_RUNNING: I/O complete
-    TASK_RUNNING --> TASK_STOPPED: SIGSTOP, SIGTTIN
-    TASK_STOPPED --> TASK_RUNNING: SIGCONT
-    TASK_RUNNING --> TASK_ZOMBIE: exit(), fatal signal
-    TASK_ZOMBIE --> [*]: Parent calls wait()
+flowchart TD
+    Start(["Process Start"])
+    Running["TASK_RUNNING"]
+    Interruptible["TASK_INTERRUPTIBLE"]
+    Uninterruptible["TASK_UNINTERRUPTIBLE"]
+    Stopped["TASK_STOPPED"]
+    Zombie["TASK_ZOMBIE"]
+    End(["Process End"])
+    
+    Start -->|"fork() creates process"| Running
+    Running -->|"wait(), read() on empty pipe"| Interruptible
+    Interruptible -->|"Event ready, signal received"| Running
+    Running -->|"Disk I/O, page fault"| Uninterruptible
+    Uninterruptible -->|"I/O complete"| Running
+    Running -->|"SIGSTOP, SIGTTIN"| Stopped
+    Stopped -->|SIGCONT| Running
+    Running -->|"exit(), fatal signal"| Zombie
+    Zombie -->|"Parent calls wait()"| End
 ```
 
 A zombie process retains its PID and minimal metadata until the parent reaps it via `wait()` or `waitpid()`. If the parent exits first, init adopts orphaned children and automatically reaps zombies.
@@ -548,11 +556,21 @@ Ansible's control node spawns worker processes (default 5, configurable via `for
 
 The control node waits for all workers, aggregates results, and proceeds to the next task. This process model balances parallelism (limited by `forks` to avoid overwhelming targets or the control node) with isolation (each worker is independent, failures don't cascade).
 
-SSH connection reuse (ControlMaster/ControlPersist) amortizes connection setup cost across multiple tasks. Pipelining reduces round-trips by executing modules without writing to temp files, but requires `requiretty` to be disabled in sudoers.
+SSH connection reuse (ControlMaster/ControlPersist) amortizes connection setup cost across multiple tasks.
 
-Understanding the kernel's process lifecycle, memory management, and scheduling enables Ansible users to:
+## Conclusion
 
-- Optimize `forks` based on available memory and network bandwidth
-- Diagnose hangs (processes stuck in TASK_UNINTERRUPTIBLE due to NFS issues)
-- Tune SSH connection limits and timeouts
-- Profile control node resource usage during large-scale deployments
+Ansible's architecture is a deliberate exploitation of Unix process and memory fundamentals to achieve robust, scalable automation. By forking worker processes, Ansible gains memory isolation (each worker operates in its own address space, preventing cross-contamination of state), failure containment (a crashed worker cannot corrupt the control node's state or other workers), and natural parallelism without the complexity of threading or shared memory synchronization. The `forks` parameter directly maps to the kernel's scheduler load: each worker is a distinct scheduling entity, and the control node avoids saturating either its own CPU or the managed nodes' SSH daemons by bounding concurrency. SSH connection reuse via ControlMaster/ControlPersist transforms what would be a catastrophic overhead (public-key handshake, Diffie-Hellman exchange, authentication) into a one-time cost amortized across an entire playbook run, reducing task latency from seconds to tens of milliseconds for subsequent operations on the same host.
+
+The memory model underlying Ansible's execution—copy-on-write forking, page table inheritance, and demand paging—ensures efficient use of physical RAM even when hundreds of tasks execute across dozens of hosts. The control node's parent process holds the shared code and data segments (Python interpreter, Ansible libraries, playbook AST), and each worker inherits read-only mappings without duplicating physical pages until writes occur. This deferred copying, combined with the transient nature of workers (they exit after each task batch), keeps the control node's memory footprint proportional to the working set of active connections rather than the total playbook size. The kernel's VMA-based memory management transparently handles cleanup during worker termination, preventing leaks and ensuring predictable resource consumption across long-running automation campaigns. Understanding these invariants is critical for diagnosing performance pathologies—stalled playbooks often trace to scheduler starvation (too many forks), memory pressure (excessive parallelism forcing page eviction), or SSH multiplexing failures (ControlPath exhaustion or stale sockets).
+
+## Summary & Verification Matrix
+
+| **Invariant/Mechanism** | **Governing Principle** | **Observable Artifact** | **Diagnostic Command/Criterion** |
+|-------------------------|------------------------|-------------------------|----------------------------------|
+| **Process Fork Model** | Each Ansible worker is an independent process with isolated address space; control node spawns `forks` workers in parallel per batch. | Worker PIDs visible during execution; no shared memory between workers. | `ps aux \| grep ansible` shows multiple child processes; `strace -f ansible-playbook` reveals `clone()` syscalls; `forks` parameter in `ansible.cfg`. |
+| **Copy-on-Write Memory Sharing** | Forked workers inherit parent's page tables with COW flags; physical pages duplicated only on write, minimizing memory overhead. | RSS remains low until workers modify state; shared code/library pages not duplicated. | `pmap <parent_pid>` and `pmap <worker_pid>` show overlapping address ranges; `/proc/<pid>/smaps` reveals shared vs. private dirty pages; memory usage grows sublinearly with worker count. |
+| **SSH Connection Reuse (ControlMaster)** | Unix domain socket acts as persistent SSH channel; subsequent connections multiplex over existing session, avoiding handshake overhead. | ControlPath socket exists in `/tmp` or `~/.ansible/cp/`; connection latency drops to < 50ms after first task. | `ls ~/.ansible/cp/` shows active sockets; `ssh -O check <host>` confirms master status; `time ssh <host> true` (first run vs. subsequent) shows 10-100× speedup. |
+| **Blocking I/O and Task Scheduling** | Workers block in `read()` waiting for SSH output; kernel transitions task to TASK_INTERRUPTIBLE, yielding CPU until data arrives. | Workers show `S` (sleeping) state in `ps`; low CPU usage during network I/O; completion order non-deterministic across hosts. | `ps aux \| grep ansible` shows `S` state for waiting workers; `strace -p <worker_pid>` reveals `read()` blocking on socket FD; `iotop` shows minimal disk I/O. |
+| **Resource Cleanup on Termination** | Worker `exit()` triggers `do_exit()`: closes FDs (SSH sockets, temp files), unmaps VMAs, releases PIDs; parent collects status via `wait()`. | No lingering SSH connections or temp files after playbook completes; zombie processes cleared immediately. | `lsof -p <worker_pid>` shows open FDs released post-exit; `netstat -anp \| grep :22` confirms closed SSH connections; no `<defunct>` processes in `ps aux`. |
+| **Parallelism vs. Overhead Trade-off** | `forks` parameter balances throughput (more parallelism) against control node CPU/memory and target SSH daemon capacity. | Optimal `forks` depends on network latency, task duration, and host count; too high causes scheduler thrashing or SSH refusals. | Benchmark with varying `forks`: `time ansible-playbook -f 5 vs. -f 50`; monitor control node load (`uptime`, `vmstat 1`); check target `/var/log/auth.log` for `sshd` rate limiting or MaxStartups errors. |

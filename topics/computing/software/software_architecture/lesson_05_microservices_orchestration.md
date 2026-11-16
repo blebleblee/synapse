@@ -42,34 +42,16 @@ Service discovery solves the problem of locating service instances in dynamic en
 
 The service registry maintains a mapping from logical service names to physical network endpoints. In Kubernetes, the built-in DNS-based service discovery maps service names to cluster IP addresses backed by iptables or IPVS load balancing rules that distribute traffic across pod IPs. When a pod starts, the kubelet registers it with the API server, which updates the Endpoints object associated with the service. The kube-proxy component on each node watches Endpoints objects and programs the local iptables or IPVS rules to include the new pod. When clients resolve the service DNS name, they receive the cluster IP, and the node's iptables rules probabilistically select a backend pod using DNAT (Destination Network Address Translation).
 
-```
-Client Request Flow (Kubernetes DNS-based Discovery):
-
-┌─────────────┐
-│   Client    │  DNS query for "payment-service.default.svc.cluster.local"
-│   Pod       │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────────────────────────────────────────────────────┐
-│  CoreDNS (cluster DNS)                                      │
-│  Returns: 10.96.45.123 (ClusterIP of payment-service)      │
-└──────┬──────────────────────────────────────────────────────┘
-       │
-       ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Node iptables/IPVS rules                                   │
-│  DNAT 10.96.45.123:8080 → {10.244.1.5:8080,               │
-│                             10.244.2.8:8080,               │
-│                             10.244.3.12:8080}              │
-└──────┬──────────────────────────────────────────────────────┘
-       │
-       ▼ (Load-balanced selection)
-┌─────────────┐
-│  Payment    │
-│  Pod        │
-│  10.244.2.8 │
-└─────────────┘
+```mermaid
+flowchart TD
+    Client["Client Pod"]
+    DNS["CoreDNS (cluster DNS)<br/>Returns: 10.96.45.123 (ClusterIP of payment-service)"]
+    IPTables["Node iptables/IPVS rules<br/>DNAT 10.96.45.123:8080 → {10.244.1.5:8080,<br/>10.244.2.8:8080,<br/>10.244.3.12:8080}"]
+    Pod["Payment Pod<br/>10.244.2.8"]
+    
+    Client -->|"DNS query for<br/>payment-service.default.svc.cluster.local"| DNS
+    DNS --> IPTables
+    IPTables -->|"Load-balanced selection"| Pod
 ```
 
 Client-side load balancing provides an alternative model where clients query the service registry directly and maintain their own load balancing state. Consul and Eureka popularized this pattern in pre-Kubernetes microservices deployments. The client periodically polls the registry for updated instance lists and uses local load balancing algorithms—round robin, least connections, weighted random—to select a target instance for each request. This approach eliminates the dependency on infrastructure load balancers but requires embedding registry client libraries in every service and handling registry failures gracefully. Service meshes revive client-side load balancing by moving the logic into sidecar proxies that query the control plane for service endpoints and perform sophisticated load balancing with health checking, connection pooling, and circuit breaking.
@@ -154,32 +136,38 @@ Message brokers decouple producers and consumers through persistent message queu
 
 The partition assignment and consumer group coordination mechanism enables scalable parallel consumption. Consumers join a consumer group identified by a group ID. Kafka's group coordinator assigns each consumer a subset of the topic's partitions, ensuring that each partition is assigned to exactly one consumer in the group. When a consumer joins or leaves the group, Kafka triggers a rebalance that redistributes partitions among the remaining consumers. This enables horizontal scaling: adding more consumers to the group increases parallelism, and removing consumers redistributes their workload. The coordinator uses the Kafka protocol's heartbeat and session timeout mechanisms to detect consumer failures and trigger rebalances.
 
-```
-Kafka Topic Partition Assignment & Consumer Group Coordination:
-
-Topic: order-events (6 partitions, replication factor 3)
-
-Partition Layout Across Brokers:
-┌────────────────────────────────────────────────────────────────┐
-│  Broker 1          Broker 2          Broker 3                  │
-│  [P0-Leader]       [P0-Follower]     [P0-Follower]            │
-│  [P1-Follower]     [P1-Leader]       [P1-Follower]            │
-│  [P2-Follower]     [P2-Follower]     [P2-Leader]              │
-│  [P3-Leader]       [P3-Follower]     [P3-Follower]            │
-│  [P4-Follower]     [P4-Leader]       [P4-Follower]            │
-│  [P5-Follower]     [P5-Follower]     [P5-Leader]              │
-└────────────────────────────────────────────────────────────────┘
-
-Consumer Group: order-processors (3 consumers)
-
-Partition Assignment:
-Consumer A: [P0, P1]  ─────┐
-Consumer B: [P2, P3]  ─────┼──→ Group Coordinator (Broker 2)
-Consumer C: [P4, P5]  ─────┘    (Manages assignments, heartbeats, offsets)
-
-Message Flow:
-Producer → [Partition Leader] → [Followers] → ACK to Producer
-Consumer ← [Assigned Partitions] → Commit Offset → __consumer_offsets topic
+```mermaid
+flowchart TD
+    Topic["📊 Topic: order-events<br/>(6 partitions, RF=3)"]
+    
+    subgraph Brokers ["Partition Layout Across Brokers"]
+        B1["<b>Broker 1</b><br/>P0-Leader<br/>P1-Follower<br/>P2-Follower<br/>P3-Leader<br/>P4-Follower<br/>P5-Follower"]
+        B2["<b>Broker 2</b><br/>P0-Follower<br/>P1-Leader<br/>P2-Follower<br/>P3-Follower<br/>P4-Leader<br/>P5-Follower"]
+        B3["<b>Broker 3</b><br/>P0-Follower<br/>P1-Follower<br/>P2-Leader<br/>P3-Follower<br/>P4-Follower<br/>P5-Leader"]
+    end
+    
+    subgraph ConsumerGroup ["Consumer Group: order-processors"]
+        CA["Consumer A<br/>[P0, P1]"]
+        CB["Consumer B<br/>[P2, P3]"]
+        CC["Consumer C<br/>[P4, P5]"]
+    end
+    
+    Coordinator["🔧 Group Coordinator<br/>(Broker 2)<br/>• Assignments<br/>• Heartbeats<br/>• Offset Management"]
+    
+    OffsetsTopic["__consumer_offsets<br/>Topic"]
+    
+    Producer["📤 Producer"]
+    
+    Topic --> Brokers
+    Brokers --> ConsumerGroup
+    ConsumerGroup --> Coordinator
+    Coordinator --> CA
+    Coordinator --> CB
+    Coordinator --> CC
+    CA --> OffsetsTopic
+    CB --> OffsetsTopic
+    CC --> OffsetsTopic
+    Producer --> Brokers
 ```
 
 Synchronous inter-service communication via gRPC provides type-safe, high-performance request-response interactions. gRPC uses Protocol Buffers for interface definition and message serialization, generating client and server stubs from `.proto` schema files. The generated code provides strongly typed method signatures, eliminating entire classes of integration errors that plague schema-less HTTP APIs. The binary encoding is significantly more compact than JSON, reducing network bandwidth and serialization CPU overhead. HTTP/2 multiplexing enables multiple concurrent RPC calls over a single TCP connection, eliminating the head-of-line blocking that HTTP/1.1 suffers with connection-per-request patterns.

@@ -83,30 +83,65 @@ No income statement effect in February. The expense was recognized in December, 
 
 The flow of these four mechanisms through the financial statements can be visualized as a set of parallel pipelines connecting the balance sheet to the income statement, with the cash flow statement serving as the reconciliation layer that explains why net income and operating cash flow diverge:
 
-```
-INCOME STATEMENT                    BALANCE SHEET
-─────────────────────               ───────────────────────────────────────
-Revenue                             Assets
-  Recognized revenue      ◄────     Accounts Receivable / Unbilled Revenue
-                          ────►     Deferred Revenue (Liability)
-                                    Prepaid Expenses (Asset)
-Expenses                            Accrued Liabilities
-  COGS / OpEx             ◄────     Inventory (flows to COGS on sale)
-                          ────►     Accounts Payable
-                          ────►     Accrued Expenses
-
-CASH FLOW STATEMENT (Indirect Method)
-─────────────────────────────────────────────────────────────────────────
-Net Income
-  + Depreciation & Amortization               (non-cash expense add-back)
-  +/- Change in Accounts Receivable           (increase = cash shortfall)
-  +/- Change in Inventory                     (increase = cash consumed)
-  +/- Change in Prepaid Expenses              (increase = cash consumed)
-  +/- Change in Accounts Payable              (increase = cash benefit)
-  +/- Change in Accrued Liabilities           (increase = cash benefit)
-  +/- Change in Deferred Revenue              (increase = cash benefit)
-─────────────────────────────────────────────────────────────────────────
-  = Net Cash from Operations
+```mermaid
+flowchart TD
+    subgraph IS["INCOME STATEMENT"]
+        Revenue["Revenue"]
+        RecRev["Recognized Revenue"]
+        Expenses["Expenses"]
+        COGS["COGS / OpEx"]
+    end
+    
+    subgraph BS["BALANCE SHEET"]
+        Assets["Assets"]
+        AR["Accounts Receivable<br/>Unbilled Revenue"]
+        DR["Deferred Revenue<br/>Liability"]
+        PE["Prepaid Expenses<br/>Asset"]
+        Inv["Inventory"]
+        AP["Accounts Payable"]
+        AE["Accrued Expenses"]
+        AL["Accrued Liabilities"]
+    end
+    
+    subgraph CFS["CASH FLOW STATEMENT - Indirect Method"]
+        NI["Net Income"]
+        DA["+ Depreciation &<br/>Amortization"]
+        CAR["± Change in<br/>Accounts Receivable"]
+        CInv["± Change in<br/>Inventory"]
+        CPE["± Change in<br/>Prepaid Expenses"]
+        CAP["± Change in<br/>Accounts Payable"]
+        CAL["± Change in<br/>Accrued Liabilities"]
+        CDR["± Change in<br/>Deferred Revenue"]
+        NCO["= Net Cash from<br/>Operations"]
+    end
+    
+    Revenue --> RecRev
+    RecRev ◄--> AR
+    RecRev ◄--> DR
+    RecRev ◄--> PE
+    
+    Expenses --> COGS
+    COGS ◄--> Inv
+    COGS ◄--> AP
+    COGS ◄--> AE
+    
+    NI --> DA
+    DA --> CAR
+    CAR --> CInv
+    CInv --> CPE
+    CPE --> CAP
+    CAP --> CAL
+    CAL --> CDR
+    CDR --> NCO
+    
+    RecRev -.-> NI
+    COGS -.-> NI
+    AR -.-> CAR
+    Inv -.-> CInv
+    PE -.-> CPE
+    AP -.-> CAP
+    AL -.-> CAL
+    DR -.-> CDR
 ```
 
 This reconciliation is where corporate finance practitioners spend a disproportionate amount of their analytical energy, and for good reason. The working capital section of the cash flow statement is a compression algorithm for the entire accrual framework — it encodes every timing difference between economic recognition and cash settlement into signed delta values. A business growing rapidly may show strong net income and deteriorating operating cash flow simultaneously, because expanding receivables and inventory absorb cash faster than earnings generate it. A business in decline may show falling net income but robust cash flow, because it is liquidating working capital. Neither story is legible from the income statement alone.

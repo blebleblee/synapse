@@ -100,10 +100,10 @@ This reference section consolidates critical parameters, failure signatures, and
 - Cell imbalance: 50 mV maximum delta between cells in series string
 
 **Internal Resistance Diagnostic Ranges (18650 Form Factor, 100% SOC, 25°C):**
-- New cell, <10 cycles: 15–25 mΩ
+- New cell, < 10 cycles: 15–25 mΩ
 - Mid-life, 200–500 cycles: 25–40 mΩ
 - End-of-life, >800 cycles: 40–60 mΩ
-- Failing cell, internal short: <10 mΩ or >100 mΩ
+- Failing cell, internal short: < 10 mΩ or >100 mΩ
 - Measurement technique: 1 kHz AC milliohm meter, Kelvin connections, ±0.1 mΩ accuracy
 
 **Capacity Fade Diagnostic Procedure:**
@@ -112,7 +112,7 @@ This reference section consolidates critical parameters, failure signatures, and
 3. Discharge at 0.2C to minimum voltage cutoff (2.80 V for Li-ion)
 4. Calculate delivered capacity: Q = I × t, where I is constant current and t is discharge time in hours
 5. Compare to nameplate capacity: fade percentage = 100 × (Q_nameplate - Q_measured) / Q_nameplate
-6. Acceptable fade rates: <2% per 100 cycles for consumer electronics, <0.5% per 100 cycles for automotive
+6. Acceptable fade rates: < 2% per 100 cycles for consumer electronics, < 0.5% per 100 cycles for automotive
 7. Investigate if fade exceeds 5% in first 50 cycles (manufacturing defect) or accelerates beyond square-root trend (thermal abuse)
 
 **Self-Discharge Rate Measurement:**
@@ -122,7 +122,7 @@ This reference section consolidates critical parameters, failure signatures, and
 4. Measure final open-circuit voltage after 30-day storage period
 5. Convert voltage drop to SOC loss using OCV-SOC lookup table
 6. Calculate self-discharge rate as percentage per month: R = 100 × ΔQ / Q_nameplate / 30 days
-7. Acceptable rates: <3% per month for consumer cells, <1% per month for precision applications
+7. Acceptable rates: < 3% per month for consumer cells, < 1% per month for precision applications
 8. Rates exceeding 5% per month indicate internal shorts or electrolyte decomposition
 
 **Thermal Runaway Warning Signs:**
@@ -263,8 +263,8 @@ For each discharge rate test, calculate average voltage as the time-weighted mea
 
 **Failure Mode Diagnosis Decision Tree:**
 - **Voltage >4.3 V during charge:** Over-charge event, check BMS voltage sensing calibration, verify charge current cutoff algorithm, inspect for control loop failures
-- **Voltage <2.5 V at rest:** Over-discharge damage, measure internal resistance (expect >50 mΩ), attempt recovery charge at 0.1C, monitor for gas venting, likely permanent capacity loss >30%
-- **Capacity fade >10% in <50 cycles:** Manufacturing defect or severe thermal abuse, check cycle temperature logs, inspect for electrolyte leakage at vents, reject cell batch
+- **Voltage < 2.5 V at rest:** Over-discharge damage, measure internal resistance (expect >50 mΩ), attempt recovery charge at 0.1C, monitor for gas venting, likely permanent capacity loss >30%
+- **Capacity fade >10% in < 50 cycles:** Manufacturing defect or severe thermal abuse, check cycle temperature logs, inspect for electrolyte leakage at vents, reject cell batch
 - **Resistance increase >50% at mid-life:** SEI layer overgrowth or current collector corrosion, correlate with average cycle temperature and depth-of-discharge, reduce charge rate to 0.3C to extend remaining life
 - **Self-discharge >5% per month:** Internal micro-short from dendrite formation or separator degradation, do not return to service, schedule immediate replacement
 - **Cell swelling or bulging:** Gas generation from electrolyte decomposition, immediate safety hazard, discharge to 0 V in fireproof container, do not puncture, recycle through hazmat channels

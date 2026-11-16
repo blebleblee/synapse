@@ -26,17 +26,30 @@ The operational architecture for decision protocols under strategic agility cons
 
 The entry point for every strategic decision is classification along two orthogonal dimensions: reversibility and impact magnitude. Reversibility measures the cost and feasibility of unwinding the decision if outcomes prove unfavorable. Impact magnitude measures the scope of consequences across time, resources, and strategic optionality. This produces a two-by-two decision matrix that determines downstream protocol selection.
 
-```
-                    Low Impact              High Impact
-Reversible      │ EXECUTE FAST         │ EXECUTE MONITORED
-                │ Delegate widely       │ Delegate w/ feedback
-                │ 60% confidence        │ 70% confidence
-                │ Post-decision review  │ Real-time dashboards
-────────────────┼──────────────────────┼────────────────────
-Irreversible    │ ESCALATE MID-LEVEL   │ ESCALATE SENIOR
-                │ Domain expert review  │ Full stakeholder consult
-                │ 80% confidence        │ 90% confidence
-                │ Scenario planning     │ Red-team adversarial
+```mermaid
+flowchart TD
+    subgraph impact [" "]
+        direction LR
+        low["Low Impact"]
+        high["High Impact"]
+    end
+    
+    subgraph reversible ["Reversible"]
+        direction LR
+        A["<b>EXECUTE FAST</b><br/>Delegate widely<br/>60% confidence<br/>Post-decision review"]
+        B["<b>EXECUTE MONITORED</b><br/>Delegate w/ feedback<br/>70% confidence<br/>Real-time dashboards"]
+    end
+    
+    subgraph irreversible ["Irreversible"]
+        direction LR
+        C["<b>ESCALATE MID-LEVEL</b><br/>Domain expert review<br/>80% confidence<br/>Scenario planning"]
+        D["<b>ESCALATE SENIOR</b><br/>Full stakeholder consult<br/>90% confidence<br/>Red-team adversarial"]
+    end
+    
+    low -.-> A
+    low -.-> C
+    high -.-> B
+    high -.-> D
 ```
 
 Operationalizing this matrix requires training leaders to distinguish genuine irreversibility from perceived irreversibility. Many decisions that feel permanent are actually reversible at acceptable cost. The psychological weight of a choice often distorts its true reversibility profile. A useful forcing function is the "one-year reversal test": if this decision proves wrong, can we unwind it within twelve months at less than twenty percent of the original investment? If yes, it is functionally reversible regardless of how it feels in the moment.

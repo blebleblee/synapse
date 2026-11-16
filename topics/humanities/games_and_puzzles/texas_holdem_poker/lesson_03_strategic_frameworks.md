@@ -73,18 +73,45 @@ This matrix evolves as position improves, with all frequencies shifting toward m
 
 Postflop decision trees can be represented through nested conditional structures where each node branches based on actions:
 
-```
-Preflop: Open UTG with range R1
-   ├─ Folds to us: Win blinds
-   ├─ Face 3-bet from CO: 
-   │    ├─ 4-bet with {QQ+, AK}: Polarized aggression
-   │    ├─ Call with {JJ-99, AQs, KQs}: Medium strength
-   │    └─ Fold: All weaker holdings
-   └─ Call from BB:
-        ├─ Flop arrives: Texture analysis
-        │    ├─ Ace-high: C-bet 80-100% range
-        │    └─ Connected: C-bet 40-60% range
-        └─ Check arrives: Pot control or slow-play
+```mermaid
+flowchart TD
+    A["Preflop: Open UTG with range R1"]
+    
+    B["Folds to us"]
+    C["Face 3-bet from CO"]
+    D["Call from BB"]
+    
+    E["Win blinds"]
+    F["4-bet with QQ+, AK"]
+    G["Call with JJ-99, AQs, KQs"]
+    H["Fold: Weaker holdings"]
+    I["Flop arrives: Texture analysis"]
+    J["Check arrives: Pot control or slow-play"]
+    
+    K["Ace-high: C-bet 80-100% range"]
+    L["Connected: C-bet 40-60% range"]
+    
+    F1["Polarized aggression"]
+    G1["Medium strength"]
+    
+    A --> B
+    A --> C
+    A --> D
+    
+    B --> E
+    
+    C --> F
+    C --> G
+    C --> H
+    
+    F --> F1
+    G --> G1
+    
+    D --> I
+    D --> J
+    
+    I --> K
+    I --> L
 ```
 
 This tree structure, when fully enumerated across all board textures and bet sizes, contains millions of nodes, which is why solver software requires substantial computational resources to approximate equilibrium solutions.

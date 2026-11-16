@@ -22,31 +22,21 @@ Understanding these invariants from first principles changes how you read a test
 
 The standard three-tier model — unit, integration, system — maps cleanly onto a contract graph where nodes are software components and edges are interface contracts. A unit test verifies the internal postconditions of a single node given controlled preconditions. An integration test verifies that two adjacent nodes satisfy their shared edge contract. A system test verifies a path through the entire graph against a behavioral specification.
 
-```
-┌────────────────────────────────────────────────────────────────────┐
-│                      CONTRACT GRAPH                                │
-│                                                                    │
-│   ┌──────────┐    interface    ┌──────────┐    interface           │
-│   │ Unit A   │◄───contract────►│ Unit B   │◄───contract──► ...    │
-│   └──────────┘                 └──────────┘                       │
-│        │                            │                             │
-│    unit test                   unit test                          │
-│   (internal                   (internal                           │
-│    invariants)                 invariants)                        │
-│        │                            │                             │
-│        └───────────────┬────────────┘                             │
-│                        │                                          │
-│               integration test                                    │
-│               (edge contract)                                     │
-│                        │                                          │
-│                        ▼                                          │
-│        ┌───────────────────────────────┐                          │
-│        │        Full Composition       │                          │
-│        └───────────────────────────────┘                          │
-│                        │                                          │
-│               system / e2e test                                   │
-│               (behavioral spec)                                   │
-└────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Unit A"]
+    B["Unit B"]
+    MORE["..."]
+
+    A <-->|"interface contract"| B
+    B <-->|"interface contract"| MORE
+
+    A -->|"unit test\n(internal invariants)"| INT["Integration Test\n(edge contract)"]
+    B -->|"unit test\n(internal invariants)"| INT
+
+    INT --> COMP["Full Composition"]
+
+    COMP -->|"system / e2e test\n(behavioral spec)"| END["Behavioral Spec Verified"]
 ```
 
 For a compiler engineer, this graph is not abstract. Consider the pipeline of a modern compiler frontend: lexer → parser → AST builder → semantic analyzer → IR lowerer. Each stage exposes a typed interface. The lexer's contract is that it produces a complete, correct token stream from any valid source input and a well-typed error from any invalid one. The parser's contract is that it produces a valid AST from any valid token stream. When you unit-test the lexer, you are verifying its internal state machine transitions in isolation, using a mock or directly constructed input. When you integration-test the lexer-parser boundary, you are verifying that every token stream the lexer can produce is a token stream the parser can correctly consume — including error tokens. When you system-test the compiler, you are verifying that a source file produces the expected object code or diagnostic output, traversing all five stages as a composition.
@@ -194,27 +184,39 @@ A flaky test is not a test that sometimes fails for no reason. That framing is e
 
 The taxonomy of flakiness root causes in systems software is well-characterized. The most common class is **order dependency**: a test passes or fails depending on which tests ran before it, because some mutable global state — a singleton registry, a process-level file descriptor table, an in-memory cache — was modified by a prior test and not reset. The second class is **timing dependency**: a test asserts on the result of an asynchronous operation without a sound synchronization primitive, so it passes when the scheduler happens to complete the operation within the implicit deadline and fails otherwise. The third class is **resource exhaustion dependency**: a test passes on a development machine with 32GB RAM and 16 cores but fails in CI on a 2-core container with 4GB, because it implicitly assumes concurrency or memory capacity that the environment does not provide.
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                   FLAKINESS ROOT CAUSE TAXONOMY                  │
-│                                                                  │
-│  Category           Root Cause                Detection          │
-│  ──────────────────────────────────────────────────────────────  │
-│  Order Dependency   Shared mutable global      --randomize-order │
-│                     state leaking between      + re-run on fail  │
-│                     tests                                        │
-│                                                                  │
-│  Timing Dependency  Async op without sound     Deterministic     │
-│                     synchronization            mock clocks,      │
-│                                                explicit barriers │
-│                                                                  │
-│  Resource           Implicit capacity          CI parity:        │
-│  Exhaustion         assumptions                match dev/CI      │
-│                                                resource limits   │
-│                                                                  │
-│  Filesystem/Network External state not         Hermetic test     │
-│  Leakage            isolated per test run      sandboxing        │
-└──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    root["🔍 Flakiness Root Cause Taxonomy"]
+    
+    subgraph orderDep["Order Dependency"]
+        orderCause["Shared mutable global state<br/>leaking between tests"]
+        orderDetect["Detection:<br/>--randomize-order<br/>+ re-run on fail"]
+    end
+    
+    subgraph timingDep["Timing Dependency"]
+        timingCause["Async op without sound<br/>synchronization"]
+        timingDetect["Detection:<br/>Deterministic mock clocks,<br/>explicit barriers"]
+    end
+    
+    subgraph resourceExhaust["Resource Exhaustion"]
+        resourceCause["Implicit capacity<br/>assumptions"]
+        resourceDetect["Detection:<br/>CI parity: match dev/CI<br/>resource limits"]
+    end
+    
+    subgraph fsNetLeakage["Filesystem/Network Leakage"]
+        fsNetCause["External state not<br/>isolated per test run"]
+        fsNetDetect["Detection:<br/>Hermetic test sandboxing"]
+    end
+    
+    root --> orderDep
+    root --> timingDep
+    root --> resourceExhaust
+    root --> fsNetLeakage
+    
+    orderCause --> orderDetect
+    timingCause --> timingDetect
+    resourceCause --> resourceDetect
+    fsNetCause --> fsNetDetect
 ```
 
 The diagnostic protocol for a flaky test in a C or C++ systems project involves three phases. In the first phase, run the suspect test in isolation 100 times and record the pass/fail distribution. If it never fails in isolation, the root cause is almost certainly order dependency. In the second phase, enable address sanitizer and thread sanitizer simultaneously and re-run:
@@ -239,25 +241,39 @@ If TSan identifies a data race, the fix is a synchronization primitive — typic
 
 Continuous testing is the principle that verification should happen as close to the moment of change as possible, at the finest granularity for which automated verification is tractable. The process integration architecture that makes this real in a modern systems project is a layered feedback pipeline with distinct latency and coverage targets at each layer.
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│               CONTINUOUS TESTING FEEDBACK PIPELINE                   │
-│                                                                      │
-│  Developer         Pre-commit        CI: PR Gate      CI: Merge      │
-│  Workstation       Hook              (minutes)        Main (hours)   │
-│  (seconds)                                                           │
-│                                                                      │
-│  ┌──────────┐    ┌──────────┐    ┌────────────┐    ┌────────────┐  │
-│  │ Compiler │    │ Changed  │    │ Regression │    │ Full suite │  │
-│  │ warnings │───►│ file unit│───►│ frontier   │───►│ + system   │  │
-│  │ + local  │    │ tests    │    │ + sanitizer│    │ tests +    │  │
-│  │ unit run │    │ only     │    │ build      │    │ fuzzing    │  │
-│  └──────────┘    └──────────┘    └────────────┘    └────────────┘  │
-│                                                                      │
-│  Latency:          <5s              <3min              <60min        │
-│  Scope:            Local unit       Changed-impact     Full contract │
-│  Failure signal:   Immediate        Pre-merge          Nightly gate  │
-└──────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph dev ["Developer Workstation (seconds)"]
+        A["Compiler warnings<br/>+ local unit run"]
+    end
+    
+    subgraph precommit ["Pre-commit Hook"]
+        B["Changed file<br/>unit tests only"]
+    end
+    
+    subgraph cipr ["CI: PR Gate (minutes)"]
+        C["Regression frontier<br/>+ sanitizer build"]
+    end
+    
+    subgraph cimerge ["CI: Merge Main (hours)"]
+        D["Full suite<br/>+ system tests<br/>+ fuzzing"]
+    end
+    
+    subgraph latency ["Latency &amp; Scope"]
+        E["&lt;5s | Local unit"]
+        F["&lt;3min | Changed-impact"]
+        G["&lt;60min | Full contract"]
+        H["Failure signal:<br/>Immediate | Pre-merge | Nightly gate"]
+    end
+    
+    A -->|Feedback| B
+    B -->|Feedback| C
+    C -->|Feedback| D
+    
+    A -.-> E
+    B -.-> F
+    C -.-> G
+    D -.-> H
 ```
 
 The pre-commit hook is the first gate. It should run in under five seconds, which means it can only run the unit tests for files directly modified in the staged diff. A practical implementation using `git diff` and a build system like CMake with CTest:

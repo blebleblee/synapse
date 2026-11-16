@@ -58,26 +58,25 @@ The response to these paradoxes was not a single unified remedy but a family of 
 
 The deductive structure of naive set theory can be represented as a system with a single powerful schema that licenses set formation from any predicate. The flow of a paradox-generating derivation looks like this:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                   NAIVE SET THEORY ENGINE                   │
-│                                                             │
-│  UNRESTRICTED COMPREHENSION AXIOM SCHEMA                    │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  For ANY predicate φ(x):  ∃y ∀x [x ∈ y ↔ φ(x)]      │  │
-│  └───────────────────────────────────────────────────────┘  │
-│                           │                                 │
-│                           ▼                                 │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │  φ(x) := (x ∉ x)       →    R = {x | x ∉ x}  EXISTS  │ │
-│  └────────────────────────────────────────────────────────┘ │
-│                           │                                 │
-│                           ▼                                 │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │  R ∈ R  ↔  R ∉ R           CONTRADICTION              │ │
-│  │                             SYSTEM TRIVIALIZES         │ │
-│  └────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["NAIVE SET THEORY ENGINE"]
+    
+    subgraph axiom ["UNRESTRICTED COMPREHENSION AXIOM SCHEMA"]
+        B["For ANY predicate φ(x):<br/>∃y ∀x [x ∈ y ↔ φ(x)]"]
+    end
+    
+    subgraph russell ["RUSSELL'S PARADOX CONSTRUCTION"]
+        C["φ(x) := (x ∉ x)<br/>R = {x | x ∉ x}<br/>EXISTS"]
+    end
+    
+    subgraph contradiction ["CONTRADICTION"]
+        D["R ∈ R ↔ R ∉ R<br/>SYSTEM TRIVIALIZES"]
+    end
+    
+    A --> axiom
+    axiom --> russell
+    russell --> contradiction
 ```
 
 The failure is precisely localized: the unrestricted comprehension schema allows predicates that quantify over the very collection being defined, enabling circular self-reference of a destructive kind. Any repair must either restrict the predicates allowed in comprehension, stratify the universe so that self-membership is syntactically ill-formed, or introduce a size limitation that segregates paradox-generating collections from legitimate sets.
@@ -106,37 +105,50 @@ $$V_0 = \emptyset, \quad V_{\alpha+1} = \mathcal{P}(V_\alpha), \quad V_\lambda =
 
 The deductive flow through ZFC looks fundamentally different from naive set theory:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     ZFC UNIVERSE ARCHITECTURE                   │
-│                                                                 │
-│   V = ⋃ V_α (Cumulative Hierarchy, built bottom-up)            │
-│                                                                 │
-│   V_ω+2 ══════════════════════════════════════════╗            │
-│      ║   P(V_ω+1)  — uncountable sets             ║            │
-│   V_ω+1 ══════════════════════════════════════════╣            │
-│      ║   P(V_ω)   — sets of real-number-like obj  ║            │
-│   V_ω  ═══════════════════════════════════════════╣            │
-│      ║   all hereditarily finite sets             ║            │
-│   V_3  ═══╦═══╦═══╗                              ║            │
-│      ║    ║   ║   ║   ...                         ║            │
-│   V_2  ═╦═╩═╦═╩═╦═╩═╗                            ║            │
-│      ║  ║   ║   ║   ║                             ║            │
-│   V_1  ═╩═══╩═══╩═══╩═ { ∅ }                     ║            │
-│   V_0  ═════════════════  ∅                       ║            │
-│                                                   ║            │
-│   SEPARATION SCHEMA: {x ∈ A | φ(x)}              ║            │
-│   Always carves from an existing level            ║            │
-│   Cannot generate sets from void                 ║            │
-│                                                   ║            │
-│   FOUNDATION AXIOM: Forbids x ∈ x and all        ║            │
-│   membership cycles.  Every set is "grounded"     ║            │
-│   at some V_α.                                   ║            │
-│                                                   ║            │
-│   PROPER CLASSES: Ord, V itself — too large       ║            │
-│   to be sets, exist only as virtual/definable     ║            │
-│   collections outside the hierarchy. ═════════════╝            │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["<b>ZFC UNIVERSE ARCHITECTURE</b><br/>V = ⋃ V_α<br/>(Cumulative Hierarchy)"]
+    
+    B["V_0<br/>∅"]
+    C["V_1<br/>{∅}"]
+    D["V_2<br/>P(V_1)"]
+    E["V_3<br/>P(V_2)"]
+    F["..."]
+    G["V_ω<br/>All hereditarily finite sets"]
+    H["V_ω+1<br/>P(V_ω)<br/>Sets of real-number-like objects"]
+    I["V_ω+2<br/>P(V_ω+1)<br/>Uncountable sets"]
+    
+    J["<b>SEPARATION SCHEMA</b><br/>{x ∈ A | φ(x)}<br/>Carves from existing level<br/>Cannot generate from void"]
+    
+    K["<b>FOUNDATION AXIOM</b><br/>Forbids x ∈ x<br/>and membership cycles<br/>Every set grounded at V_α"]
+    
+    L["<b>PROPER CLASSES</b><br/>Ord, V itself<br/>Too large to be sets<br/>Virtual/definable only<br/>Outside hierarchy"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    
+    A -.-> J
+    A -.-> K
+    A -.-> L
+    
+    style A fill:#e1f5ff,stroke:#01579b,stroke-width:2px,color:#000
+    style B fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style C fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style D fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000
+    style E fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000
+    style F fill:#e0f2f1,stroke:#004d40,stroke-width:1px,color:#000
+    style G fill:#fce4ec,stroke:#880e4f,stroke-width:2px,color:#000
+    style H fill:#fce4ec,stroke:#880e4f,stroke-width:2px,color:#000
+    style I fill:#fce4ec,stroke:#880e4f,stroke-width:2px,color:#000
+    style J fill:#fff9c4,stroke:#f57f17,stroke-width:2px,color:#000
+    style K fill:#c8e6c9,stroke:#1b5e20,stroke-width:2px,color:#000
+    style L fill:#ffccbc,stroke:#bf360c,stroke-width:2px,color:#000
 ```
 
 In this architecture, the Russell set $R$ cannot be formed at all, because there is no universal set $V$ that is itself a set within the hierarchy. The collection of all sets exists only as a *proper class*, a virtual collection that can be quantified over in formulas but cannot appear as a member of anything, cannot be manipulated as a completed object, and does not satisfy the axioms governing sets. The Burali-Forti paradox is resolved analogously: $\text{Ord}$, the class of all ordinals, is a proper class, not a set, so the argument that $\Omega$ must be an ordinal and therefore $\Omega \in \Omega$ never gets off the ground. Cantor's paradox dissolves because the universal set does not exist; Cantor's theorem applies to sets, and there is no set of all sets whose power set could exceed it.

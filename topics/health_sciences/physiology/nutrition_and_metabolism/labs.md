@@ -117,7 +117,7 @@ This reference section consolidates the quantitative parameters, decision trees,
 - Moderate-intensity training: 4-5 g/kg
 - High-intensity or volume training: 6-8 g/kg
 - Extreme endurance or ultra-volume: 8-10 g/kg
-- Ketogenic protocols: <0.5 g/kg (<50g/day)
+- Ketogenic protocols: < 0.5 g/kg (< 50g/day)
 - Peri-workout timing: 0.5-1.0 g/kg within 2 hours pre-training, 1.0-1.5 g/kg within 2 hours post-training
 
 **Respiratory Exchange Ratio Substrate Interpretation**
@@ -149,7 +149,7 @@ This reference section consolidates the quantitative parameters, decision trees,
 - Adjustment threshold: two consecutive weeks outside target range
 
 **Deficit Troubleshooting Decision Tree**
-- Loss rate <0.3%/week for 2 weeks + confirmed compliance → reduce intake 100-200 kcal from carbohydrate/fat
+- Loss rate < 0.3%/week for 2 weeks + confirmed compliance → reduce intake 100-200 kcal from carbohydrate/fat
 - Loss rate >1.2%/week for 2 weeks → increase intake 100-200 kcal from carbohydrate
 - Training volume load declined >15% → insert refeed (48h) or diet break (10-14 days)
 - Morning RHR declined >10 bpm → insert diet break, assess overtraining
@@ -176,7 +176,7 @@ This reference section consolidates the quantitative parameters, decision trees,
 - Measure actual loss rate and back-calculate true TDEE: (intake - [loss_kg × 7700/7])
 - Adaptation magnitude = Predicted TDEE - Actual TDEE
 - Clinically significant adaptation: >150 kcal beyond predicted
-- Intervention threshold: Adaptation >200 kcal or loss rate <0.3%/week for 2+ weeks
+- Intervention threshold: Adaptation >200 kcal or loss rate < 0.3%/week for 2+ weeks
 
 **Hydration and Electrolyte Management During Deficit**
 - Base water intake: 30-40 mL/kg body mass daily
@@ -184,7 +184,7 @@ This reference section consolidates the quantitative parameters, decision trees,
 - Sodium: 3-5g daily, increase to 5-7g during heat acclimation or high sweat rate
 - Potassium: 3-4g daily from food sources (potatoes, bananas, avocado, spinach)
 - Magnesium: 400-500mg daily, consider supplementation during cramping or sleep disturbance
-- Monitor urine color (pale yellow target) and morning body mass fluctuation (<1% daily variation)
+- Monitor urine color (pale yellow target) and morning body mass fluctuation (< 1% daily variation)
 
 **Micronutrient Adequacy Thresholds During Restriction**
 - Minimum caloric intake for micronutrient sufficiency: 1200 kcal females, 1500 kcal males

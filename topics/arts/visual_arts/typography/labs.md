@@ -282,6 +282,22 @@ Create a **visual grid overlay** by printing or exporting your page with the gri
 Extend your liner notes to **4 pages** and verify that the grid aligns consistently across pages. Add a **header and footer** to reinforce visual continuity:
 
 - **Header:** Album title in 13 pt, Regular, centered. Positioned 5 mm below the top margin (inside the margin area, not in the content area).
+- **Footer:** Page number in 13 pt, Regular, centered.
+
+Positioned 5 mm below the top margin (inside the margin area, not in the content area).
 - **Footer:** Page number in 13 pt, Regular, centered. Positioned 5 mm above the bottom margin.
 
-On pages 2–4, add a **page number in
+Check that all text blocks and graphical elements align to the same grid boundaries across all four pages. Export each page as a PDF with grid overlays enabled, then compare them side-by-side. If any element drifts by more than 0.5 mm from its intended grid position, correct the frame anchor or margin settings. This process reveals **grid drift**, a common failure mode in multi-page layouts caused by inconsistent baseline grids or floating frame anchors. To prevent drift, lock all text frames to the master page grid and use **baseline grid alignment** (InDesign: Paragraph panel > Align to Baseline Grid; Affinity Publisher: Paragraph > Baseline Grid > Align to Grid). Verify that body text baselines snap to a consistent vertical rhythm—typically matching your leading value—so that facing pages align horizontally when viewed in spreads.
+
+Grid systems succeed when they become **generative constraints** rather than restrictive templates. Once you internalize the relationship between column count, gutter width, and content hierarchy, you can make rapid, confident layout decisions without trial-and-error repositioning. The grid does not eliminate creative judgment; it accelerates it by encoding spatial logic into reusable infrastructure. Your final deliverable should demonstrate that every design choice—typeface pairing, hierarchy, spacing, alignment—traces back to measurable parameters defined in your grid specification. This makes your layout **auditable**: another designer could reconstruct your decisions from the grid alone.
+
+## Summary & Verification Matrix
+
+| **Invariant/Mechanism** | **Governing Principle** | **Diagnostic Criterion** | **Failure Mode** |
+|---|---|---|---|
+| **Grid Modularity** | All content blocks span whole-number multiples of column units; no arbitrary widths or offsets. | Measure any text frame width: it must equal `(n × column_width) + ((n-1) × gutter_width)` for integer `n`. | Content drifts between grid lines; alignment breaks across pages. |
+| **Baseline Grid Alignment** | Body text baselines snap to a vertical grid with interval equal to leading value (e.g., 14 pt leading = 14 pt baseline grid). | Select body text and enable baseline grid view: every line's baseline should align to grid increments. Measure distance between baselines with a ruler tool. | Text baselines misalign in facing-page spreads; vertical rhythm is irregular. |
+| **Hierarchical Span Differentiation** | Higher-hierarchy elements (titles, headings) span more columns than lower-hierarchy elements (captions, footnotes). | Compare column spans: title > subheading > body > caption. Span ratios should reflect typographic scale ratios. | Visual hierarchy is flat; reader cannot distinguish content importance by position. |
+| **Cross-Page Grid Consistency** | Grid column boundaries and baseline grid remain fixed across all pages; margins and gutters do not shift. | Export pages with grid overlay; superimpose page 1 grid over pages 2–4 in image editor. Boundaries must coincide within ±0.5 mm. | Grid drift: elements on page 3 no longer align with page 1 structure; document appears inconsistent. |
+| **Locked Frame Anchoring** | Text and image frames lock to master page grid; manual repositioning disabled or requires override confirmation. | Attempt to drag a text frame: software should snap to grid or require explicit unlock. Check frame properties for "Align to Grid" or "Lock to Master" status. | Frames float freely; accidental nudges break grid alignment; layout degrades over edit cycles. |
+| **Gutter Preservation** | White space (gutters) between columns remains unoccupied; no content bleeds into gutter zones. | Highlight gutter areas and verify no text or graphic elements intersect them. Use software's "Check Overset Text" or collision detection. | Content crowds; readability suffers; grid structure becomes invisible to reader. |

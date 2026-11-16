@@ -20,23 +20,46 @@ The cryptographic primitives underlying blockchain security—hash functions, di
 
 The canonical blockchain data structure consists of a cryptographically linked sequence of blocks, each containing a batch of transactions, a timestamp, and a reference to the previous block's hash. This chaining creates an append-only ledger where altering historical records requires recomputing all subsequent blocks—an operation whose cost grows linearly with chain length. The Genesis block, hardcoded into client software, anchors the chain and establishes initial token distribution.
 
-```
-Block N-1                    Block N                      Block N+1
-┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
-│ Previous Hash   │◄────────│ Previous Hash   │◄────────│ Previous Hash   │
-│ Timestamp       │         │ Timestamp       │         │ Timestamp       │
-│ Nonce/Sig       │         │ Nonce/Sig       │         │ Nonce/Sig       │
-│ Merkle Root     │         │ Merkle Root     │         │ Merkle Root     │
-│   ┌──────┐      │         │   ┌──────┐      │         │   ┌──────┐      │
-│   │ Tx 1 │      │         │   │ Tx 1 │      │         │   │ Tx 1 │      │
-│   │ Tx 2 │      │         │   │ Tx 2 │      │         │   │ Tx 2 │      │
-│   │ ...  │      │         │   │ ...  │      │         │   │ ...  │      │
-│   │ Tx N │      │         │   │ Tx N │      │         │   │ Tx N │      │
-│   └──────┘      │         │   └──────┘      │         │   └──────┘      │
-└─────────────────┘         └─────────────────┘         └─────────────────┘
-         │                           │                           │
-         └───────────────────────────┴───────────────────────────┘
-                          Cryptographic Chain
+```mermaid
+flowchart LR
+    subgraph BlockNMinus1["Block N-1"]
+        N1_PrevHash["Previous Hash"]
+        N1_Timestamp["Timestamp"]
+        N1_Nonce["Nonce/Sig"]
+        N1_Merkle["Merkle Root"]
+        subgraph N1_Txs["Transactions"]
+            N1_Tx1["Tx 1"]
+            N1_Tx2["Tx 2"]
+            N1_TxN["Tx N"]
+        end
+    end
+
+    subgraph BlockN["Block N"]
+        N_PrevHash["Previous Hash"]
+        N_Timestamp["Timestamp"]
+        N_Nonce["Nonce/Sig"]
+        N_Merkle["Merkle Root"]
+        subgraph N_Txs["Transactions"]
+            N_Tx1["Tx 1"]
+            N_Tx2["Tx 2"]
+            N_TxN["Tx N"]
+        end
+    end
+
+    subgraph BlockNPlus1["Block N+1"]
+        N2_PrevHash["Previous Hash"]
+        N2_Timestamp["Timestamp"]
+        N2_Nonce["Nonce/Sig"]
+        N2_Merkle["Merkle Root"]
+        subgraph N2_Txs["Transactions"]
+            N2_Tx1["Tx 1"]
+            N2_Tx2["Tx 2"]
+            N2_TxN["Tx N"]
+        end
+    end
+
+    BlockNMinus1 -->|"Cryptographic Chain"| BlockN
+    BlockN -->|"Cryptographic Chain"| BlockNPlus1
 ```
 
 Each block header contains a Merkle root, the top hash of a binary tree summarizing all transactions in the block. This construction allows light clients to verify transaction inclusion without downloading the entire block—a critical efficiency for mobile wallets and IoT devices. A Merkle proof requires only log₂(N) hashes to prove membership in a set of N transactions, enabling fraud proofs and stateless verification schemes.

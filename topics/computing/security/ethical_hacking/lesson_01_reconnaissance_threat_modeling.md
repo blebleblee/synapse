@@ -20,29 +20,30 @@ For hardware security researchers and embedded engineers, this lesson carries ad
 
 Reconnaissance is best understood as a layered pipeline. Each layer produces structured output that feeds into the next, and each layer operates at a different level of abstraction. The pipeline begins with open-source intelligence (OSINT) at the highest level of abstraction and terminates with service-level enumeration at the lowest. The practitioner moves through these layers sequentially, with the output of each pass constraining and focusing the work of the next.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    RECONNAISSANCE PIPELINE                  │
-│                                                             │
-│  ┌────────────┐    ┌────────────┐    ┌────────────────────┐ │
-│  │  OSINT /   │    │  PASSIVE   │    │  ACTIVE            │ │
-│  │  SIGINT    │───▶│  DNS/IP    │───▶│  PORT/SERVICE      │ │
-│  │  Layer     │    │  Recon     │    │  ENUMERATION       │ │
-│  └────────────┘    └────────────┘    └────────────────────┘ │
-│        │                 │                    │              │
-│        ▼                 ▼                    ▼              │
-│  ┌──────────┐    ┌──────────────┐    ┌────────────────────┐ │
-│  │ Org/Org  │    │ IP Ranges,   │    │ Banner grabs,      │ │
-│  │ Structure│    │ ASN, DNS     │    │ version strings,   │ │
-│  │ Employees│    │ zones, certs │    │ TLS fingerprints   │ │
-│  └──────────┘    └──────────────┘    └────────────────────┘ │
-│                                               │              │
-│                                               ▼              │
-│                              ┌────────────────────────────┐  │
-│                              │  THREAT MODEL + ATTACK     │  │
-│                              │  SURFACE MAP               │  │
-│                              └────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph pipeline["RECONNAISSANCE PIPELINE"]
+        direction TB
+        
+        osint["OSINT / SIGINT<br/>Layer"]
+        passive["PASSIVE<br/>DNS/IP<br/>Recon"]
+        active["ACTIVE<br/>PORT/SERVICE<br/>ENUMERATION"]
+        
+        osint_output["Org/Org Structure<br/>Employees"]
+        passive_output["IP Ranges, ASN,<br/>DNS zones, certs"]
+        active_output["Banner grabs,<br/>version strings,<br/>TLS fingerprints"]
+        
+        threat["THREAT MODEL + ATTACK<br/>SURFACE MAP"]
+        
+        osint --> passive
+        passive --> active
+        
+        osint --> osint_output
+        passive --> passive_output
+        active --> active_output
+        
+        active_output --> threat
+    end
 ```
 
 ### Passive Reconnaissance: DNS, Certificate Transparency, and ASN Analysis
@@ -154,36 +155,41 @@ The concept of a trust boundary is central to this analysis. A trust boundary is
 
 For hardware researchers specifically, the attack surface map must include physical interfaces that software-only assessments ignore entirely. JTAG and SWD debug interfaces, UART console headers, SPI and I²C buses connecting onboard peripherals, and USB enumeration surfaces are all part of the attack surface. A device that is completely hardened at the network layer may expose an unauthenticated root shell over a 3.3V UART header accessible with a $15 logic analyzer and a USB-UART adapter. The practitioner who ignores the physical attack surface has not performed a complete assessment.
 
-```
-Attack Surface Map - Embedded Gateway Device
-┌─────────────────────────────────────────────────────────────────┐
-│                     EXTERNAL INTERFACES                         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────────┐  │
-│  │  WAN     │  │  HTTPS   │  │  MQTT/   │  │  OTA Update    │  │
-│  │  ETH     │  │  Admin   │  │  TLS     │  │  Service       │  │
-│  │  (eth0)  │  │  Portal  │  │  (8883)  │  │  (TCP 8888)    │  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └───────┬────────┘  │
-│       │              │              │                │            │
-│  ═════╪══════════════╪══════════════╪════════════════╪═══════════│
-│                 TRUST BOUNDARY (network→OS)                      │
-│  ═════╪══════════════╪══════════════╪════════════════╪═══════════│
-│       │              │              │                │            │
-│  ┌────▼──────────────▼──────────────▼────────────────▼────────┐  │
-│  │               Linux Kernel (OpenWrt 22.03)                 │  │
-│  │        iptables rules, net namespaces, process model       │  │
-│  └──────────────────────────────┬──────────────────────────── ┘  │
-│                                 │                                 │
-│  ═══════════════════════════════╪═════════════════════════════   │
-│            TRUST BOUNDARY (kernel→hardware)                      │
-│  ═══════════════════════════════╪═════════════════════════════   │
-│                                 │                                 │
-│  ┌─────────────┐  ┌─────────────▼──┐  ┌──────────────────────┐  │
-│  │  JTAG/SWD   │  │  SoC (ARM      │  │  SPI Flash           │  │
-│  │  Header     │  │  Cortex-A7)    │  │  (Firmware Storage)  │  │
-│  │  [PHYSICAL] │  │                │  │  [PHYSICAL]          │  │
-│  └─────────────┘  └────────────────┘  └──────────────────────┘  │
-│                     PHYSICAL ATTACK SURFACE                      │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph external ["EXTERNAL INTERFACES"]
+        WAN["WAN ETH<br/>(eth0)"]
+        HTTPS["HTTPS Admin<br/>Portal"]
+        MQTT["MQTT/TLS<br/>(8883)"]
+        OTA["OTA Update<br/>Service<br/>(TCP 8888)"]
+    end
+    
+    subgraph trust_boundary_1 [" "]
+        TB1["TRUST BOUNDARY<br/>(network→OS)"]
+    end
+    
+    subgraph kernel ["Linux Kernel<br/>(OpenWrt 22.03)"]
+        KERN["iptables rules<br/>net namespaces<br/>process model"]
+    end
+    
+    subgraph trust_boundary_2 [" "]
+        TB2["TRUST BOUNDARY<br/>(kernel→hardware)"]
+    end
+    
+    subgraph hardware ["PHYSICAL ATTACK SURFACE"]
+        JTAG["JTAG/SWD<br/>Header<br/>[PHYSICAL]"]
+        SOC["SoC<br/>(ARM Cortex-A7)"]
+        FLASH["SPI Flash<br/>(Firmware Storage)<br/>[PHYSICAL]"]
+    end
+    
+    WAN --> KERN
+    HTTPS --> KERN
+    MQTT --> KERN
+    OTA --> KERN
+    
+    KERN --> SOC
+    SOC --> JTAG
+    SOC --> FLASH
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

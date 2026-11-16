@@ -152,11 +152,17 @@ Structure:
 (Deep narrative exposition establishing theoretical grounding, problem space, and core invariants)
 
 ## 2. Core Architecture & Mechanics
-(Dissect internal data structures, signal paths, physical mechanics, or execution models with ASCII or clean Mermaid diagrams)
+(Dissect internal data structures, signal paths, physical mechanics, or execution models. You MUST include an authoritative, richly styled Mermaid diagram (```mermaid ... ```) showing component topology, dataflow, or state transitions. NEVER use raw ASCII art boxes)
 
 ## 3. High-Performance Optimization & Failure Modes
 (Workflow optimization, resource scaling, boundary edge cases, and failure mitigations)
 
+## 4. Summary & Verification Matrix
+(Conclude with a comprehensive 4-6 row Markdown table summarizing governing invariants, mechanisms, diagnostic criteria, and failure modes)
+
+CRITICAL BUDGETING & TERMINAL INVARIANT:
+- Budget your response to approximately 2,800 to 3,500 words so that all 4 numbered sections are completely and cleanly finished BEFORE reaching output limits.
+- ABSOLUTELY NEVER cut off mid-sentence. You MUST cleanly conclude Section 3 and provide the complete final Summary & Verification Matrix with valid terminal punctuation.
 Remember: Write in rich, continuous book prose like an O'Reilly or MIT Press author. Avoid lazy bullet point lists.
 Output publication-grade Markdown only."""
 
@@ -181,7 +187,8 @@ def generate_topic_parallel(
     subtopic_id: str,
     subtopic_dir: Path,
     force: bool = False,
-    workers: Optional[List[Tuple[str, str, OllamaProvider]]] = None
+    workers: Optional[List[Tuple[str, str, OllamaProvider]]] = None,
+    fallback_provider: Optional[LLMProvider] = None
 ) -> Dict[str, Any]:
     """
     Generates a dynamically-scoped multi-lesson masterclass curriculum unit across all active
@@ -199,7 +206,7 @@ def generate_topic_parallel(
         cluster = OllamaCluster()
         workers = cluster.get_parallel_workers()
 
-    scoping_prov = workers[0][2] if workers else None
+    scoping_prov = (workers[0][2] if workers else fallback_provider)
     modules = scope_topic_curriculum(domain, category, subtopic_id, subtopic_title, scoping_provider=scoping_prov)
 
     tasks_to_run = []
@@ -236,41 +243,61 @@ def generate_topic_parallel(
             mod_item, (w_host, w_model, w_provider) = job
             host_label = CLUSTER_HOST_SPECS.get(w_host, {}).get("name", w_host).upper()
             t0 = time.time()
+            active_provider = w_provider
+            active_label = host_label
+
             for attempt in range(1, 4):
                 try:
                     with _LLM_SEMAPHORE:
-                        content = w_provider.generate(mod_item["prompt"], system_instruction=system_instruction)
+                        content = active_provider.generate(mod_item["prompt"], system_instruction=system_instruction)
                     validated = validate_generation_output(content)
                     elapsed = time.time() - t0
-                    print(f"          [✔] [{host_label:9s}] Drafted {mod_item['filename']} in {elapsed:.1f}s", flush=True)
-                    return mod_item["filename"], True, validated, mod_item, host_label, w_host, elapsed, None
+                    print(f"          [✔] [{active_label:9s}] Drafted {mod_item['filename']} in {elapsed:.1f}s", flush=True)
+                    return mod_item["filename"], True, validated, mod_item, active_label, w_host, elapsed, None
                 except Exception as e:
+                    # Gateway failover: if active provider fails and fallback is available, failover immediately
+                    if fallback_provider and active_provider != fallback_provider:
+                        print(f"          [!] [{active_label:9s}] Gateway error on {mod_item['filename']}: {e}. Failing over to backup gateway...", flush=True)
+                        active_provider = fallback_provider
+                        active_label = "BACKUP"
+                        time.sleep(1)
+                        continue
+
                     if attempt < 3:
                         wait_s = attempt * 6
-                        print(f"          [!] [{host_label:9s}] Transient error on {mod_item['filename']}: {e} (retrying in {wait_s}s, attempt {attempt}/3)...", flush=True)
+                        print(f"          [!] [{active_label:9s}] Transient error on {mod_item['filename']}: {e} (retrying in {wait_s}s, attempt {attempt}/3)...", flush=True)
                         time.sleep(wait_s)
                         continue
-                    print(f"          [✘] [{host_label:9s}] Failed {mod_item['filename']} after 3 attempts: {e}", flush=True)
-                    return mod_item["filename"], False, None, mod_item, host_label, w_host, time.time() - t0, str(e)
+                    print(f"          [✘] [{active_label:9s}] Failed {mod_item['filename']} after 3 attempts: {e}", flush=True)
+                    return mod_item["filename"], False, None, mod_item, active_label, w_host, time.time() - t0, str(e)
 
         # Phase 1: Draft modules across parallel worker pool
-        is_cloud = any("anthropic" in w[0].lower() or "gemini" in w[0].lower() or "vnaipro" in w[0].lower() or "aiapiflow" in w[0].lower() for w in workers)
+        is_cloud = any("anthropic" in w[0].lower() or "gemini" in w[0].lower() or "vnaipro" in w[0].lower() for w in workers)
         pool_size = min(len(workers), len(tasks_to_run))
         with ThreadPoolExecutor(max_workers=pool_size) as executor:
             future_to_mod = {executor.submit(run_draft_job, job): job[0]["filename"] for job in jobs}
             for fut in as_completed(future_to_mod):
-                fname, ok, content, mod_item, host_label, w_host, elapsed, err = fut.result()
-                if ok and content:
-                    drafts[fname] = (content, mod_item, host_label, w_host, elapsed)
-                else:
+                try:
+                    fname, ok, content, mod_item, host_label, w_host, elapsed, err = fut.result()
+                    if ok and content:
+                        drafts[fname] = (content, mod_item, host_label, w_host, elapsed)
+                    else:
+                        results[fname] = False
+                except Exception as e:
+                    fname = future_to_mod.get(fut, "unknown")
+                    print(f"      [✘] Failed future for {fname}: {e}", flush=True)
                     results[fname] = False
 
         if is_cloud:
             # Single-pass masterclass authoring for cloud frontier models:
             # Direct publication eliminates redundant full-text re-drafting, cutting time and costs by 50%.
             for fname, (content, mod_item, host_label, w_host, elapsed) in drafts.items():
+                clean_content = content.strip()
+                fence_count = sum(1 for line in clean_content.splitlines() if line.strip().startswith("```"))
+                if fence_count % 2 != 0:
+                    clean_content += "\n```"
                 target_file = subtopic_dir / fname
-                target_file.write_text(content.strip() + "\n", encoding="utf-8")
+                target_file.write_text(clean_content + "\n", encoding="utf-8")
                 print(f"      [✔] {fname} published ({host_label} -> Masterclass Draft in {elapsed:.1f}s)", flush=True)
                 results[fname] = True
             return results
@@ -371,17 +398,14 @@ def generate_subtopic_content(
     vnaipro_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app")
 
     if vnaipro_key:
-        # High-throughput multi-gateway parallel pool (empirically benchmarked):
-        # 4 workers on vnaipro (100% success up to 6 streams) + 2 workers on aiapiflow (100% success up to 4 streams)
-        # Total: 6 concurrent drafting streams! All 5 topic lessons + labs draft simultaneously!
+        # High-throughput parallel pool with VNAIPRO:
         workers = []
         p_vnaipro = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key, model="claude-sonnet-5")
-        for i in range(1, 5):
-            workers.append((f"VNAIPRO-{i}", "claude-sonnet-5", p_vnaipro))
-        if provider:
-            p_model = getattr(provider, "model", "claude-sonnet-5")
-            for j in range(1, 3):
-                workers.append((f"AIAPIFLOW-{j}", p_model, provider))
+        
+        # Deploy triple-redundancy on VNAIPRO gateways
+        workers.append(("VNAIPRO-1", "claude-sonnet-5", p_vnaipro))
+        workers.append(("VNAIPRO-2", "claude-sonnet-5", p_vnaipro))
+        workers.append(("VNAIPRO-3", "claude-sonnet-5", p_vnaipro))
     elif provider:
         p_model = getattr(provider, "model", "custom")
         workers = [(p_model, p_model, provider)]
@@ -391,5 +415,6 @@ def generate_subtopic_content(
         subtopic_id=subtopic_id,
         subtopic_dir=subtopic_dir,
         force=force,
-        workers=workers
+        workers=workers,
+        fallback_provider=provider
     )

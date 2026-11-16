@@ -102,25 +102,45 @@ Rouché's theorem also yields a clean proof of the **Open Mapping Theorem**: if 
 
 The following diagram depicts the relationship between local function elements and their global propagation via chains of overlapping disks.
 
-```
-        γ(0)=p                              γ(1)=q
-          │                                   │
-    (f₀, D₀)──overlap──(f₁, D₁)──overlap──(f₂, D₂)── ··· ──(fₙ, Dₙ)
-          │                │                  │                   │
-       germ at p        germ propagated     germ propagated    germ at q
-                          along γ            along γ
-
-  Homotopy invariance:
-  
-       γ₀ ─────────────────────────────► q
-       │  ╲                              ▲
-       │   H(s,t)  (homotopy in Ω)       │
-       │        ╲                        │
-       p ─────────────────────────────► q
-       γ₁
-  
-  If Ω simply connected ⟹ [γ₀] = [γ₁] in π₁(Ω) ⟹ same germ at q.
-  If Ω = ℂ∖{0}:  π₁ ≅ ℤ,  loop generator acts on log-germ by z ↦ z + 2πi.
+```mermaid
+flowchart TD
+    subgraph continuation ["Analytic Continuation along Path γ"]
+        p["γ(0) = p"]
+        f0["(f₀, D₀)<br/>germ at p"]
+        f1["(f₁, D₁)<br/>germ propagated<br/>along γ"]
+        f2["(f₂, D₂)<br/>germ propagated<br/>along γ"]
+        dots["···"]
+        fn["(fₙ, Dₙ)<br/>germ at q"]
+        q["γ(1) = q"]
+        
+        p --> f0
+        f0 -->|overlap| f1
+        f1 -->|overlap| f2
+        f2 --> dots
+        dots --> fn
+        fn --> q
+    end
+    
+    subgraph homotopy ["Homotopy Invariance"]
+        p2["p"]
+        q2["q"]
+        gamma0["γ₀"]
+        gamma1["γ₁"]
+        H["H(s,t)<br/>(homotopy in Ω)"]
+        
+        p2 -->|γ₀| q2
+        p2 -->|γ₁| q2
+        p2 -.-> H
+        H -.-> q2
+    end
+    
+    subgraph properties ["Topological Properties"]
+        prop1["If Ω simply connected<br/>⟹ [γ₀] = [γ₁] in π₁(Ω)<br/>⟹ same germ at q"]
+        prop2["If Ω = ℂ∖{0}:<br/>π₁ ≅ ℤ<br/>loop generator acts on log-germ<br/>by z ↦ z + 2πi"]
+    end
+    
+    continuation -.->|depends on| homotopy
+    homotopy -.->|implies| properties
 ```
 
 The chain of overlapping disks forms the analytic continuation. The monodromy action of $\pi_1(\Omega)$ on the fiber of germs above any basepoint encodes all the multi-valuedness of the function.

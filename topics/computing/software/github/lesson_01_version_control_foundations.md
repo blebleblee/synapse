@@ -47,23 +47,14 @@ Packfiles provide Git's mechanism for efficient storage and network transfer. Wh
 
 The index, also called the staging area, deserves detailed examination because it's Git's most frequently misunderstood component. The `.git/index` file is a binary structure that caches metadata about every file in the working directory that Git tracks. Each entry records the pathname, file size, modification timestamp, inode number, and the SHA-1 hash of the file's content as it exists in the staging area. This allows Git to detect changes instantly: when you run `git status`, Git stats each tracked file, compares the timestamp and size against the index, and only recalculates hashes for files that might have changed. The index also enables three-way merges by simultaneously tracking the current HEAD commit, the merge target, and local modifications.
 
-```
-┌─────────────────────────────────────────────────┐
-│                Working Directory                 │
-│  (files you edit, potentially modified)         │
-└────────────────┬────────────────────────────────┘
-                 │ git add <file>
-                 ↓
-┌─────────────────────────────────────────────────┐
-│                 Index / Staging                  │
-│  (snapshot prepared for next commit)            │
-└────────────────┬────────────────────────────────┘
-                 │ git commit
-                 ↓
-┌─────────────────────────────────────────────────┐
-│              Repository / HEAD                   │
-│  (permanent commit graph with history)          │
-└─────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    WorkingDir["Working Directory<br/>(files you edit, potentially modified)"]
+    Staging["Index / Staging<br/>(snapshot prepared for next commit)"]
+    Repo["Repository / HEAD<br/>(permanent commit graph with history)"]
+    
+    WorkingDir -->|"git add <file>"| Staging
+    Staging -->|"git commit"| Repo
 ```
 
 Branching mechanics reveal Git's efficiency. Creating a branch writes one 41-byte file (40 hex characters plus newline) containing the commit hash where the branch starts. Switching branches updates HEAD to point at the new branch reference, then replaces working directory contents to match that branch's tree. Git performs this through a three-way operation: it compares the current HEAD tree, the target branch tree, and the index to determine which files need updating, which are locally modified, and which would conflict. For clean checkouts, this operation touches only changed files, preserving inode numbers and timestamps where possible to avoid triggering unnecessary rebuilds.

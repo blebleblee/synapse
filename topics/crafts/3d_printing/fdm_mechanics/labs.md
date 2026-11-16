@@ -124,7 +124,7 @@ Evaluate overhang quality by measuring droop distance: the vertical deviation of
 
 Examine top surfaces for visual smoothness. Under-cooling leaves a glossy, slightly raised finish from incomplete solidification before the next layer deposits. Over-cooling creates a matte finish with visible gaps between extrusion lines from excessive shrinkage.
 
-For PLA, optimal cooling typically falls in the 75–100% fan range after initial layers. Reduce cooling for first layers (0–10%) to prevent bed adhesion failure from warping. For materials with higher glass transition temperatures like PETG (80°C Tg versus PLA's 60°C), reduce maximum cooling to 25–50% to maintain sufficient inter-layer temperature for bonding. ABS generally requires minimal cooling (<25%) to prevent warping and cracking from differential thermal stresses.
+For PLA, optimal cooling typically falls in the 75–100% fan range after initial layers. Reduce cooling for first layers (0–10%) to prevent bed adhesion failure from warping. For materials with higher glass transition temperatures like PETG (80°C Tg versus PLA's 60°C), reduce maximum cooling to 25–50% to maintain sufficient inter-layer temperature for bonding. ABS generally requires minimal cooling (< 25%) to prevent warping and cracking from differential thermal stresses.
 
 Compile a material-specific cooling profile matrix: fan speeds for first layers, general layers, overhangs, and bridges, informed by empirical performance across the test specimen's diverse features.
 

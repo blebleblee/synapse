@@ -79,42 +79,48 @@ Protocol layer mapping transforms the continuous stream of symbol decisions into
 
 Latency through this pipeline accumulates from multiple sources: analog filter group delay, ADC pipeline stages, digital decimation filter transients, carrier and timing loop acquisition time, FEC decoder constraint length or block size, and software interrupt or DMA transfer overhead. A typical SDR receiver processing a burst transmission might require hundreds of symbols for preamble detection and synchronization, followed by tens to hundreds of microseconds for FEC decoding, resulting in total latency spanning milliseconds. Protocols with tight turnaround requirements, such as automatic repeat request acknowledgments in time-division duplex systems, demand careful budget allocation and may necessitate hybrid FPGA-CPU architectures to meet real-time deadlines.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         SDR Receiver Architecture                    │
-└─────────────────────────────────────────────────────────────────────┘
-
- Antenna → LNA → Mixer → IF Filter → ADC (12-16 bit, fs)
-                    ↑                   │
-                    │                   ▼
-                Local Osc         ┌─────────────┐
-                                  │   FPGA/ASIC  │
-                                  │              │
-                                  │  NCO + Mixer │
-                                  │     ↓        │
-                                  │  CIC Decim   │
-                                  │     ↓        │
-                                  │  FIR Filters │
-                                  │     ↓        │
-                                  │  Matched Flt │
-                                  └──────┬───────┘
-                                         │ I/Q baseband
-                                         ▼
-                              ┌──────────────────────┐
-                              │  CPU / GPU / FPGA    │
-                              │                      │
-                              │  Carrier PLL         │
-                              │  Timing Recovery     │
-                              │  Frame Sync Correlate│
-                              │     ↓                │
-                              │  Symbol Decisions    │
-                              │     ↓                │
-                              │  FEC Decoder         │
-                              │     ↓                │
-                              │  CRC Check           │
-                              │     ↓                │
-                              │  Protocol Stack      │
-                              └──────────────────────┘
+```mermaid
+flowchart TD
+    Antenna["Antenna"]
+    LNA["LNA"]
+    Mixer["Mixer"]
+    LocalOsc["Local Oscillator"]
+    IFFilter["IF Filter"]
+    ADC["ADC (12-16 bit, fs)"]
+    
+    subgraph FPGA["FPGA/ASIC"]
+        NCOMixer["NCO + Mixer"]
+        CICDecim["CIC Decimation"]
+        FIRFilters["FIR Filters"]
+        MatchedFlt["Matched Filter"]
+    end
+    
+    subgraph DSP["CPU / GPU / FPGA"]
+        CarrierPLL["Carrier PLL"]
+        TimingRecovery["Timing Recovery"]
+        FrameSync["Frame Sync Correlate"]
+        SymbolDecisions["Symbol Decisions"]
+        FECDecoder["FEC Decoder"]
+        CRCCheck["CRC Check"]
+        ProtocolStack["Protocol Stack"]
+    end
+    
+    Antenna --> LNA
+    LNA --> Mixer
+    LocalOsc --> Mixer
+    Mixer --> IFFilter
+    IFFilter --> ADC
+    ADC --> NCOMixer
+    NCOMixer --> CICDecim
+    CICDecim --> FIRFilters
+    FIRFilters --> MatchedFlt
+    MatchedFlt -->|"I/Q baseband"| CarrierPLL
+    CarrierPLL --> TimingRecovery
+    TimingRecovery --> FrameSync
+    FrameSync --> SymbolDecisions
+    SymbolDecisions --> FECDecoder
+    FECDecoder --> CRCCheck
+    CRCCheck --> ProtocolStack
 ```
 
 The partitioning decision between FPGA, GPU, and CPU processing hinges on throughput requirements, latency constraints, and algorithm characteristics. FPGA implementations achieve deterministic latency and high throughput for streaming operations: channelization banks processing 100 MHz instantaneous bandwidth with sub-microsecond group delay, polyphase decimators achieving 1000:1 rate reductions with hundreds of filter taps, and matched filters with dozens of samples per symbol updated at megasample rates. The fixed-point arithmetic typical in FPGA designs requires careful wordlength analysis to prevent overflow and maintain sufficient signal-to-noise ratio through the processing chain. Internal accumulator widths often exceed the input data width by the logarithm base-two of the number of accumulations to prevent loss of precision.

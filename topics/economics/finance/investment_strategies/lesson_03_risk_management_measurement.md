@@ -118,34 +118,47 @@ $$\text{IR} = \text{IC} \sqrt{BR}$$
 
 where IC represents the information coefficient (correlation between forecasted and realized returns) and BR denotes breadth (the number of independent active bets). This identity reveals that consistent alpha generation requires either high forecast accuracy (large IC) or numerous independent opportunities (large BR). Long-only stock pickers face constrained breadth due to position sizing and diversification requirements, while high-frequency traders exploit low-IC signals across thousands of independent opportunities to achieve competitive information ratios.
 
-```
-Risk Measurement Framework Architecture
+```mermaid
+flowchart TD
+    PH["Portfolio Holdings"]
+    FED["Factor Exposure Decomposition"]
+    PLR["Position-Level Risk"]
+    BETAS["β₁, β₂, ..., βₖ"]
+    CM["Covariance Matrix"]
+    FC["Factor Covariances"]
+    PV["Portfolio Variance = w'Σw"]
 
-Portfolio Holdings → Factor Exposure Decomposition
-        ↓                       ↓
-  Position-Level Risk    Beta₁, Beta₂, ..., BetaK
-        ↓                       ↓
-  Covariance Matrix ←─── Factor Covariances
-        ↓
-  Portfolio Variance = w'Σw
-        ↓
-  ┌──────────────┴──────────────┐
-  │                             │
-Volatility Metrics        Tail Risk Measures
-  σ_total                    VaR_α, CVaR_α
-  σ_up, σ_down              Max Drawdown
-  GARCH/EWMA forecast       Tail Ratio
-  │                             │
-  └──────────┬──────────────────┘
-             ↓
-    Risk-Adjusted Ratios
-      Sharpe = (r̄ - rf)/σ
-      Sortino = (r̄ - MAR)/σ_down
-      IR = (r̄_P - r̄_B)/TE
-             ↓
-    Performance Attribution
-      Alpha, Factor Returns
-      Specific Return
+    subgraph vol_metrics ["Volatility Metrics"]
+        VM["σ_total, σ_up, σ_down
+        GARCH / EWMA Forecast"]
+    end
+
+    subgraph tail_metrics ["Tail Risk Measures"]
+        TR["VaR_α, CVaR_α
+        Max Drawdown, Tail Ratio"]
+    end
+
+    RAR["Risk-Adjusted Ratios
+    Sharpe = (r̄ − rƒ) / σ
+    Sortino = (r̄ − MAR) / σ_down
+    IR = (r̄_P − r̄_B) / TE"]
+
+    PA["Performance Attribution
+    Alpha, Factor Returns
+    Specific Return"]
+
+    PH --> FED
+    PH --> PLR
+    FED --> BETAS
+    PLR --> CM
+    BETAS --> FC
+    FC --> CM
+    CM --> PV
+    PV --> vol_metrics
+    PV --> tail_metrics
+    vol_metrics --> RAR
+    tail_metrics --> RAR
+    RAR --> PA
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

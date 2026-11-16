@@ -26,202 +26,152 @@ The security boundary between internal cluster networking and external Internet 
 
 The packet flow through a VPC-native GKE cluster begins at the Pod's network namespace, a Linux kernel construct that isolates network interfaces, routing tables, and firewall rules. When a container starts, the kubelet invokes the CNI plugin, which creates a virtual Ethernet pair—one end attached to the Pod's network namespace and the other end attached to a bridge device on the node's root network namespace. The CNI plugin assigns an IP address from the node's Pod CIDR to the Pod's interface and configures a default route that sends all non-local traffic through the bridge to the node's routing table. This setup mirrors the classic bridged networking model used in virtual machines, but with one crucial difference: the Pod IP addresses are allocated from the VPC's alias IP range, making them directly routable within the VPC without requiring masquerading or tunneling.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│ GKE Node (10.128.0.5)                                           │
-│                                                                   │
-│  ┌──────────────────┐         ┌──────────────────┐             │
-│  │ Pod A            │         │ Pod B            │             │
-│  │ Namespace: ns-a  │         │ Namespace: ns-b  │             │
-│  │ IP: 10.4.0.10    │         │ IP: 10.4.0.11    │             │
-│  │                  │         │                  │             │
-│  │  eth0────────┐   │         │  eth0────────┐   │             │
-│  └──────────────│───┘         └──────────────│───┘             │
-│                 │                              │                 │
-│              veth-a                         veth-b               │
-│                 │                              │                 │
-│                 └──────────┬───────────────────┘                 │
-│                            │                                     │
-│                       cbr0 (bridge)                              │
-│                            │                                     │
-│                      ┌─────┴─────┐                               │
-│                      │  iptables │                               │
-│                      │   DNAT    │                               │
-│                      │  conntrack│                               │
-│                      └─────┬─────┘                               │
-│                            │                                     │
-│                       ens4 (Node NIC)                            │
-│                       IP: 10.128.0.5                             │
-└───────────────────────────┼─────────────────────────────────────┘
-                            │
-                    ┌───────┴────────┐
-                    │  VPC Router    │
-                    │  Routes Pod IPs│
-                    └───────┬────────┘
-                            │
-                    ┌───────┴────────┐
-                    │ Google Cloud   │
-                    │ Network Fabric │
-                    └────────────────┘
+```mermaid
+flowchart TD
+    subgraph node ["GKE Node (10.128.0.5)"]
+        subgraph pod_a ["Pod A | Namespace: ns-a | IP: 10.4.0.10"]
+            eth0_a["eth0"]
+        end
+
+        subgraph pod_b ["Pod B | Namespace: ns-b | IP: 10.4.0.11"]
+            eth0_b["eth0"]
+        end
+
+        veth_a["veth-a"]
+        veth_b["veth-b"]
+        bridge["cbr0 (bridge)"]
+
+        subgraph netfilter ["Netfilter"]
+            iptables["iptables DNAT / conntrack"]
+        end
+
+        ens4["ens4 (Node NIC)\nIP: 10.128.0.5"]
+
+        eth0_a --> veth_a
+        eth0_b --> veth_b
+        veth_a --> bridge
+        veth_b --> bridge
+        bridge --> iptables
+        iptables --> ens4
+    end
+
+    vpc["VPC Router\nRoutes Pod IPs"]
+    fabric["Google Cloud\nNetwork Fabric"]
+
+    ens4 --> vpc
+    vpc --> fabric
 ```
 
 When Pod A initiates a connection to Pod B running on a different node, the packet exits Pod A's network namespace through its veth interface and arrives at the node's bridge. The node's routing table recognizes the destination IP 10.4.0.11 as belonging to another node's Pod CIDR and forwards the packet through the physical network interface to the VPC router. Google Cloud's VPC routing layer consults its route table, discovers that 10.4.0.11 is assigned to node 10.128.0.6, and forwards the packet through the Andromeda software-defined network to that node. The receiving node's routing table directs the packet to its bridge, which forwards it through the appropriate veth interface into Pod B's network namespace. This entire path operates at Layer 3 without any tunneling or encapsulation overhead, as the Pod IP addresses are natively understood by the VPC infrastructure.
 
 Service abstraction introduces an additional layer of packet rewriting through the kube-proxy component running on each node. Consider a Service named `backend` in the `prod` namespace with ClusterIP 10.96.0.100 and three backend Pods with IPs 10.4.0.10, 10.4.0.11, and 10.4.0.12. The kube-proxy on each node installs iptables rules in the `nat` table's `PREROUTING` and `OUTPUT` chains to intercept packets destined for 10.96.0.100 and rewrite the destination address to one of the backend Pod IPs. The netfilter framework evaluates these rules before routing decisions, ensuring that the kernel routes the rewritten packet to the correct Pod based on its actual IP rather than the virtual ClusterIP.
 
-```
-Client Pod (10.4.0.5)
-     │
-     │ Sends packet to Service ClusterIP 10.96.0.100:80
-     ↓
-┌────────────────────────────────────────────────────────────┐
-│ iptables nat/OUTPUT chain                                  │
-│                                                              │
-│ Rule 1: -A KUBE-SERVICES -d 10.96.0.100/32 -p tcp          │
-│         --dport 80 -j KUBE-SVC-BACKEND                     │
-│                                                              │
-│ KUBE-SVC-BACKEND chain:                                     │
-│   Rule 1: -m statistic --mode random --probability 0.33    │
-│           -j KUBE-SEP-POD-A  (DNAT to 10.4.0.10:8080)     │
-│   Rule 2: -m statistic --mode random --probability 0.50    │
-│           -j KUBE-SEP-POD-B  (DNAT to 10.4.0.11:8080)     │
-│   Rule 3: -j KUBE-SEP-POD-C  (DNAT to 10.4.0.12:8080)     │
-│                                                              │
-└────────────────────────────────────────────────────────────┘
-     │
-     │ Packet destination rewritten to 10.4.0.10:8080
-     ↓
-   Routing decision: forward to Pod A via VPC network
+```mermaid
+flowchart TD
+    client["Client Pod\n10.4.0.5"]
+
+    client -->|"Sends packet to Service ClusterIP\n10.96.0.100:80"| kube_services
+
+    subgraph nat ["iptables nat/OUTPUT chain"]
+        kube_services["KUBE-SERVICES\n-d 10.96.0.100/32 -p tcp --dport 80\n-j KUBE-SVC-BACKEND"]
+
+        kube_services --> svc_chain
+
+        subgraph svc_chain ["KUBE-SVC-BACKEND chain"]
+            rule1["Rule 1\n-m statistic --mode random\n--probability 0.33\n-j KUBE-SEP-POD-A"]
+            rule2["Rule 2\n-m statistic --mode random\n--probability 0.50\n-j KUBE-SEP-POD-B"]
+            rule3["Rule 3\n-j KUBE-SEP-POD-C"]
+
+            rule1 -->|"DNAT to 10.4.0.10:8080"| sep_a["KUBE-SEP-POD-A"]
+            rule2 -->|"DNAT to 10.4.0.11:8080"| sep_b["KUBE-SEP-POD-B"]
+            rule3 -->|"DNAT to 10.4.0.12:8080"| sep_c["KUBE-SEP-POD-C"]
+        end
+    end
+
+    sep_a -->|"Destination rewritten to\n10.4.0.10:8080"| routing
+    sep_b -->|"Destination rewritten to\n10.4.0.11:8080"| routing
+    sep_c -->|"Destination rewritten to\n10.4.0.12:8080"| routing
+
+    routing["Routing Decision\nForward via VPC network"]
+
+    routing --> podA["Pod A\n10.4.0.10:8080"]
+    routing --> podB["Pod B\n10.4.0.11:8080"]
+    routing --> podC["Pod C\n10.4.0.12:8080"]
 ```
 
 The probabilistic selection mechanism relies on the `statistic` match module in iptables, which maintains per-rule counters to approximate uniform distribution across backends. Connection tracking in the kernel's `nf_conntrack` module records the DNAT translation for each connection, ensuring that subsequent packets in the same TCP flow—identified by source IP, source port, destination IP, and destination port—receive consistent destination address translation. When the backend Pod replies, the source NAT reverse translation occurs in the `POSTROUTING` chain, rewriting the source IP from the Pod's address back to the Service's ClusterIP so the client sees replies coming from the address it originally contacted.
 
 LoadBalancer Services extend this architecture by provisioning an external Network Load Balancer that forwards traffic to the Service's NodePort on all cluster nodes. The cloud controller manager watches for Services of type LoadBalancer and invokes the Google Cloud API to create a forwarding rule, target pool, and health checks. The forwarding rule assigns a public IP address—drawn from Google Cloud's global anycast range—and directs traffic to the target pool, which consists of all GKE nodes' primary IP addresses. Health checks probe each node's NodePort to determine whether the node is capable of forwarding traffic to healthy backend Pods; if the check fails due to no Pods being scheduled on that node or all Pods being unhealthy, the load balancer removes the node from the pool until health checks succeed again.
 
-```
-Internet Client (203.0.113.5)
-     │
-     │ TCP SYN to LoadBalancer IP 35.190.0.100:80
-     ↓
-┌────────────────────────────────────────────┐
-│ Google Cloud Network Load Balancer         │
-│ Frontend: 35.190.0.100:80                  │
-│                                              │
-│ Backend Pool:                               │
-│   Node 1 (10.128.0.5:30001) - Healthy      │
-│   Node 2 (10.128.0.6:30001) - Healthy      │
-│   Node 3 (10.128.0.7:30001) - Unhealthy    │
-│                                              │
-│ Selects Node 1 for connection               │
-└───────────────┬────────────────────────────┘
-                │
-                │ Forwards to 10.128.0.5:30001
-                ↓
-┌────────────────────────────────────────────┐
-│ GKE Node 1 (10.128.0.5)                    │
-│                                              │
-│ iptables PREROUTING chain:                  │
-│   Match: dport 30001                        │
-│   Jump to KUBE-NODEPORTS chain             │
-│                                              │
-│ KUBE-NODEPORTS chain:                       │
-│   DNAT to Service ClusterIP 10.96.0.100:80 │
-│                                              │
-│ Then follows standard Service DNAT to Pod   │
-└────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Client["Internet Client<br/>203.0.113.5"]
+    
+    Client -->|"TCP SYN to<br/>35.190.0.100:80"| LB
+    
+    subgraph LB ["Google Cloud Network Load Balancer"]
+        Frontend["Frontend: 35.190.0.100:80"]
+        Pool["Backend Pool:<br/>• Node 1 (10.128.0.5:30001) - Healthy<br/>• Node 2 (10.128.0.6:30001) - Healthy<br/>• Node 3 (10.128.0.7:30001) - Unhealthy"]
+        Selection["Selects Node 1 for connection"]
+        
+        Frontend --> Pool
+        Pool --> Selection
+    end
+    
+    LB -->|"Forwards to<br/>10.128.0.5:30001"| Node1
+    
+    subgraph Node1 ["GKE Node 1 (10.128.0.5)"]
+        Prerouting["iptables PREROUTING chain:<br/>Match: dport 30001<br/>Jump to KUBE-NODEPORTS"]
+        KubeNodeports["KUBE-NODEPORTS chain:<br/>DNAT to Service ClusterIP<br/>10.96.0.100:80"]
+        ServiceDNAT["Standard Service DNAT to Pod"]
+        
+        Prerouting --> KubeNodeports
+        KubeNodeports --> ServiceDNAT
+    end
 ```
 
 This dual-layer NAT design—external load balancer to NodePort, then NodePort to Pod—introduces an extra network hop and complicates source IP preservation. By default, the external client's IP address is lost during the SNAT performed by kube-proxy when forwarding from the NodePort to the Pod. To preserve the client IP, Services can set `externalTrafficPolicy: Local`, which instructs kube-proxy to only forward traffic to Pods running on the same node that received the external connection, bypassing the second SNAT and allowing backend Pods to see the true client IP. However, this changes the load balancing behavior: nodes without Pods will fail health checks and be removed from the load balancer's backend pool, potentially creating uneven traffic distribution if Pods are not evenly spread across nodes.
 
 Ingress introduces HTTP-layer routing by positioning a reverse proxy—either the GKE Ingress controller's integration with Google Cloud HTTP(S) Load Balancer or a third-party controller like nginx-ingress or Istio Gateway—between external clients and backend Services. The GKE Ingress controller watches Ingress resources and translates them into Google Cloud load balancer configuration objects: a URL map that defines hostname and path-based routing rules, backend services that represent Kubernetes Services and their health checks, target HTTP(S) proxies that handle SSL termination and HTTP/2 negotiation, and global forwarding rules that allocate anycast IP addresses. When a client connects to the Ingress IP address, Google's global frontend infrastructure terminates the SSL connection, parses the HTTP request, evaluates the URL map to determine the appropriate backend service, and forwards the request to a healthy GKE node in the nearest region.
 
-```
-┌───────────────────────────────────────────────────────────────┐
-│ Ingress Resource                                              │
-│                                                               │
-│ apiVersion: networking.k8s.io/v1                              │
-│ kind: Ingress                                                 │
-│ metadata:                                                     │
-│   name: app-ingress                                           │
-│ spec:                                                         │
-│   rules:                                                      │
-│   - host: api.example.com                                     │
-│     http:                                                     │
-│       paths:                                                  │
-│       - path: /v1                                             │
-│         backend:                                              │
-│           service: api-v1-service                             │
-│       - path: /v2                                             │
-│         backend:                                              │
-│           service: api-v2-service                             │
-└───────────────────────────────────────────────────────────────┘
-                            │
-                            │ GKE Ingress Controller watches
-                            ↓
-┌───────────────────────────────────────────────────────────────┐
-│ Google Cloud HTTP(S) Load Balancer                            │
-│                                                               │
-│ Global Forwarding Rule: 35.190.0.200:443                      │
-│         ↓                                                     │
-│ Target HTTPS Proxy (SSL termination)                          │
-│         ↓                                                     │
-│ URL Map:                                                      │
-│   Host: api.example.com                                       │
-│     /v1/* → Backend Service A (NEG for api-v1-service)        │
-│     /v2/* → Backend Service B (NEG for api-v2-service)        │
-│         ↓                                                     │
-│ Network Endpoint Groups (NEG):                                │
-│   Pod IPs directly (Container-native load balancing)          │
-│   10.4.0.10:8080  (api-v1 Pod 1)                             │
-│   10.4.0.11:8080  (api-v1 Pod 2)                             │
-│   10.4.0.12:9090  (api-v2 Pod 1)                             │
-└───────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Ingress["Ingress Resource<br/>---<br/>apiVersion: networking.k8s.io/v1<br/>kind: Ingress<br/>metadata:<br/>  name: app-ingress<br/>spec:<br/>  rules:<br/>  - host: api.example.com<br/>    http:<br/>      paths:<br/>      - path: /v1<br/>        backend:<br/>          service: api-v1-service<br/>      - path: /v2<br/>        backend:<br/>          service: api-v2-service"]
+    
+    Ingress -->|"GKE Ingress Controller watches"| GCLB
+    
+    subgraph GCLB["Google Cloud HTTP(S) Load Balancer"]
+        FwdRule["Global Forwarding Rule<br/>35.190.0.200:443"]
+        Proxy["Target HTTPS Proxy<br/>(SSL termination)"]
+        URLMap["URL Map<br/>---<br/>Host: api.example.com<br/>/v1/* → Backend Service A (NEG for api-v1-service)<br/>/v2/* → Backend Service B (NEG for api-v2-service)"]
+        NEG["Network Endpoint Groups (NEG)<br/>---<br/>Pod IPs directly (Container-native load balancing)<br/>10.4.0.10:8080 (api-v1 Pod 1)<br/>10.4.0.11:8080 (api-v1 Pod 2)<br/>10.4.0.12:9090 (api-v2 Pod 1)"]
+        
+        FwdRule --> Proxy
+        Proxy --> URLMap
+        URLMap --> NEG
+    end
 ```
 
 The GKE Ingress controller can operate in two modes: service-based backends, where traffic is forwarded to NodePorts and then load-balanced by kube-proxy to Pods, or container-native load balancing with Network Endpoint Groups. In NEG mode, the Ingress controller registers Pod IPs directly with the Google Cloud load balancer as backend endpoints, bypassing the NodePort layer entirely and eliminating the extra network hop. This requires the load balancer to have direct VPC network connectivity to Pod IPs, which is automatically satisfied in VPC-native clusters. NEG mode provides better performance, more accurate health checking—the load balancer probes Pod IPs directly rather than relying on NodePort availability—and precise connection draining during rolling updates, as the load balancer can track individual Pod lifecycle events rather than treating all Pods behind a NodePort as an opaque pool.
 
 DNS resolution within the cluster operates through a CoreDNS deployment in the `kube-system` namespace, typically running as a three-replica Deployment with anti-affinity rules to spread Pods across nodes for high availability. Each Pod's `/etc/resolv.conf` is generated by the kubelet at container start time and configured to use the CoreDNS Service's ClusterIP as the nameserver, with a search path that includes the Pod's namespace and the cluster domain suffix `svc.cluster.local`. When a container performs a DNS lookup for `database`, the resolver library first tries `database.default.svc.cluster.local`, then falls back to the upstream DNS servers configured in CoreDNS for external names.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Application Pod (10.4.0.5)                                  │
-│                                                             │
-│ /etc/resolv.conf:                                           │
-│   nameserver 10.96.0.10  (CoreDNS Service ClusterIP)       │
-│   search default.svc.cluster.local svc.cluster.local       │
-│   options ndots:5                                           │
-│                                                             │
-│ getaddrinfo("database") called                              │
-│   → tries database.default.svc.cluster.local                │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         │ DNS query to 10.96.0.10
-                         ↓
-┌─────────────────────────────────────────────────────────────┐
-│ CoreDNS Pod (10.4.1.20)                                     │
-│                                                             │
-│ Corefile configuration:                                     │
-│   cluster.local {                                           │
-│       kubernetes {                                          │
-│           pods insecure                                     │
-│           fallthrough in-addr.arpa ip6.arpa                 │
-│       }                                                     │
-│       forward . /etc/resolv.conf                            │
-│   }                                                         │
-│                                                             │
-│ Queries Kubernetes API for Service "database" in "default" │
-│   → Returns ClusterIP 10.96.0.50                            │
-└─────────────────────────────────────────────────────────────┘
-                         │
-                         │ DNS response: 10.96.0.50
-                         ↓
-┌─────────────────────────────────────────────────────────────┐
-│ Application Pod                                             │
-│ Receives A record: database.default.svc.cluster.local      │
-│                    → 10.96.0.50                             │
-│ Connects to 10.96.0.50:5432                                 │
-│   → iptables DNAT to backend Pod                            │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    AppPod["🔵 Application Pod<br/>10.4.0.5<br/><br/>getaddrinfo('database')<br/>→ database.default.svc.cluster.local"]
+    
+    DNSQuery["DNS Query<br/>to 10.96.0.10<br/>CoreDNS Service ClusterIP"]
+    
+    CoreDNS["🟢 CoreDNS Pod<br/>10.4.1.20<br/><br/>Corefile: cluster.local<br/>kubernetes plugin<br/>Queries Kubernetes API<br/>for Service 'database'<br/>→ Returns ClusterIP 10.96.0.50"]
+    
+    DNSResponse["DNS Response<br/>database.default.svc.cluster.local<br/>→ 10.96.0.50"]
+    
+    AppConnect["🔵 Application Pod<br/><br/>Connects to 10.96.0.50:5432<br/>iptables DNAT<br/>→ backend Pod"]
+    
+    AppPod -->|"DNS query"| DNSQuery
+    DNSQuery --> CoreDNS
+    CoreDNS -->|"DNS response"| DNSResponse
+    DNSResponse --> AppConnect
 ```
 
 CoreDNS implements the Kubernetes plugin by watching Service and Pod resources through the Kubernetes API and generating DNS responses on-demand rather than pre-building a zone file. This architecture ensures that DNS records are always consistent with the current cluster state, even during rapid scaling or failover events. The plugin generates A records for Services that return the ClusterIP, SRV records that enumerate backend Pods with port numbers, and PTR records for reverse lookups. For headless Services—those with `clusterIP: None`—CoreDNS returns A records for all backend Pod IPs instead of a single ClusterIP, enabling clients to implement client-side load balancing or service mesh sidecar injection patterns.

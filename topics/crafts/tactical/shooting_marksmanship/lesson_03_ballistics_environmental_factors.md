@@ -8,26 +8,51 @@ Three forces dominate the bullet's path from muzzle to target, and every ballist
 
 Aerodynamic drag is the second force, and it is the one that makes external ballistics a nonlinear, counterintuitive discipline rather than a simple parabola. Drag opposes the bullet's velocity vector, and its magnitude is roughly proportional to the square of the bullet's velocity. At the muzzle, where the bullet is moving at 2,600 to 3,000 feet per second, the air resistance is enormous — the bullet loses velocity at its highest rate in the first hundred yards, then progressively less as it slows. This means the trajectory is not symmetric. In a vacuum, the bullet's path would be a perfect parabola with its apex at the midpoint of the range, because the horizontal velocity would remain constant. In air, the bullet decelerates continuously, so it spends more time in the descending half of the trajectory than in the ascending half. The apex shifts to roughly 55 to 60 percent of the distance to target, and the descending portion of the curve grows progressively steeper as the bullet slows and gravity has more time to act per unit of horizontal distance traveled. This is why drop per hundred yards is not constant: a .308 Winchester 175-grain Sierra MatchKing at 2,650 fps might drop 6 additional inches between 400 and 500 yards but 18 additional inches between 900 and 1,000 yards. The curve compounds on itself.
 
-```
-  Height above bore line
-       ^
-       |       .  <- Apex (~55-60% of range, NOT midpoint)
-       |      / \
-       |     /   \
-       |    /     \
-       |   /       \____
-       |  /              \____
-       | /                    \____
-       |/                          \____
-       +---|---------|---------|---------|--> Range
-          0         300        600       1000 yd
+```mermaid
+flowchart TD
+    subgraph concept ["Bullet Trajectory: Vacuum vs. Real Path"]
 
-  Vacuum path: symmetric parabola, apex at midpoint.
-  Real path:    asymmetric, apex past midpoint,
-                descent steeper than ascent.
-  Cause:        velocity decays throughout flight,
-                so gravity has more time per unit
-                distance in the latter half.
+        subgraph forces ["Governing Physics"]
+            VD["Velocity Decay\nThroughout Flight"]
+            G["Gravity\nConstant Downward Force"]
+            VD -->|"more time per unit distance\nin latter half"| G
+        end
+
+        subgraph vacuum_path ["Vacuum Path"]
+            V_launch["Launch Point\n0 yd"]
+            V_apex["Apex\nat Midpoint\n(~500 yd)"]
+            V_land["Impact Point\n~1000 yd"]
+            V_note["Symmetric Parabola\nAscent = Descent"]
+
+            V_launch -->|"symmetric ascent"| V_apex
+            V_apex -->|"symmetric descent"| V_land
+            V_note -. "describes" .-> V_apex
+        end
+
+        subgraph real_path ["Real Path (Atmosphere)"]
+            R_launch["Launch Point\n0 yd"]
+            R_apex["Apex\n~55–60% of Range\n(NOT midpoint)"]
+            R_land["Impact Point\n~1000 yd"]
+            R_asym["Asymmetric Trajectory\nDescent Steeper than Ascent"]
+
+            R_launch -->|"gradual ascent"| R_apex
+            R_apex -->|"steeper descent"| R_land
+            R_asym -. "describes" .-> R_apex
+        end
+
+        subgraph range_markers ["Range Scale"]
+            M0["0 yd\nMuzzle"]
+            M300["300 yd"]
+            M600["600 yd"]
+            M1000["1000 yd\nImpact"]
+            M0 --> M300 --> M600 --> M1000
+        end
+
+    end
+
+    G -->|"causes asymmetry"| R_asym
+    V_launch -. "compare" .-> R_launch
+    V_apex -. "apex earlier" .-> R_apex
 ```
 
 The Magnus force, the third actor, is the smallest and most often ignored, but it becomes relevant at extended range. A spinning bullet in a crosswind experiences a lateral pressure differential between its top and bottom surfaces, producing a small vertical force. In practice, the Magnus effect's contribution to vertical deflection is negligible compared to other factors and is absorbed into the empirical truing process. It is calculated by advanced solvers like Applied Ballistics but rarely called out separately on a dope card.

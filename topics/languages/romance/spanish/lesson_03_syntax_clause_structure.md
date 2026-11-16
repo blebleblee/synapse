@@ -36,37 +36,56 @@ The distribution of *se* constructions extends beyond passive voice to reflexive
 
 Spanish clause structure follows the universal functional sequence proposed in cartographic syntax, a hierarchical spine of functional projections hosting interpretive and morphosyntactic features. At the base, the lexical verb merges with its internal argument (the object) in VP, forming the thematic core where semantic roles are assigned. This VP layer embeds within a series of functional projections encoding aspect, voice, tense, mood, and complementizer structure. Examining this architecture from bottom to top reveals the syntactic positions where clitics, subjects, and moved constituents surface.
 
-```
-Clause Architecture (bottom-up):
-
-VP (Verb Phrase)
-  └─ V' (V-bar)
-      ├─ V (Verb: comer, escribir, ver)
-      └─ DP (Direct Object: manzanas, el libro, a Juan)
-
-AspP (Aspect Phrase)
-  └─ Asp' 
-      ├─ Asp (Progressive: estar + gerund; Perfective: haber + participle)
-      └─ VP
-
-VoiceP (Voice Phrase: active vs. passive, external argument introduction)
-  └─ Voice'
-      ├─ Voice (active: -Ø; passive: ser/se)
-      └─ AspP
-
-TP (Tense Phrase)
-  └─ T' (T-bar)
-      ├─ Spec-TP (Canonical subject position: pro, él, María)
-      └─ T'
-          ├─ T (Tense/Agreement: -o, -as, -a, -amos, -áis, -an)
-          └─ VoiceP
-
-CP (Complementizer Phrase)
-  └─ C' (C-bar)
-      ├─ Spec-CP (Wh-phrase landing site: qué, quién, cuándo, dónde)
-      └─ C'
-          ├─ C (Complementizer: que, si; interrogative C features)
-          └─ TP
+```mermaid
+flowchart TD
+    CP["CP<br/>(Complementizer Phrase)"]
+    C_bar1["C'<br/>(C-bar)"]
+    SpecCP["Spec-CP<br/>(Wh-phrase landing site:<br/>qué, quién, cuándo, dónde)"]
+    C_bar2["C'<br/>(C-bar)"]
+    C["C<br/>(Complementizer: que, si;<br/>interrogative C features)"]
+    TP["TP<br/>(Tense Phrase)"]
+    
+    T_bar1["T'<br/>(T-bar)"]
+    SpecTP["Spec-TP<br/>(Canonical subject position:<br/>pro, él, María)"]
+    T_bar2["T'<br/>(T-bar)"]
+    T["T<br/>(Tense/Agreement:<br/>-o, -as, -a, -amos, -áis, -an)"]
+    VoiceP["VoiceP<br/>(Voice Phrase:<br/>active vs. passive)"]
+    
+    Voice_bar["Voice'<br/>(Voice-bar)"]
+    Voice["Voice<br/>(active: -Ø; passive: ser/se)"]
+    AspP["AspP<br/>(Aspect Phrase)"]
+    
+    Asp_bar["Asp'<br/>(Asp-bar)"]
+    Asp["Asp<br/>(Progressive: estar + gerund;<br/>Perfective: haber + participle)"]
+    VP["VP<br/>(Verb Phrase)"]
+    
+    V_bar["V'<br/>(V-bar)"]
+    V["V<br/>(Verb: comer, escribir, ver)"]
+    DP["DP<br/>(Direct Object:<br/>manzanas, el libro, a Juan)"]
+    
+    CP --> C_bar1
+    C_bar1 --> SpecCP
+    C_bar1 --> C_bar2
+    C_bar2 --> C
+    C_bar2 --> TP
+    
+    TP --> T_bar1
+    T_bar1 --> SpecTP
+    T_bar1 --> T_bar2
+    T_bar2 --> T
+    T_bar2 --> VoiceP
+    
+    VoiceP --> Voice_bar
+    Voice_bar --> Voice
+    Voice_bar --> AspP
+    
+    AspP --> Asp_bar
+    Asp_bar --> Asp
+    Asp_bar --> VP
+    
+    VP --> V_bar
+    V_bar --> V
+    V_bar --> DP
 ```
 
 The subject occupies Spec-TP in canonical configurations, though Spanish's rich verbal morphology licenses null pronunciation, yielding *pro* in the specifier position when the subject is discourse-recoverable or generic. Verb movement to T is obligatory in finite clauses, driven by T's strong inflectional features attracting the verbal head to check tense and agreement. In non-finite clauses (infinitives and gerunds), the verb remains in situ or raises only to a lower functional head, accounting for the distinct clitic placement patterns: proclisis in finite contexts reflects clitic attachment to the raised verb in T, while enclisis in non-finite contexts attaches the clitic to the lower verbal base.

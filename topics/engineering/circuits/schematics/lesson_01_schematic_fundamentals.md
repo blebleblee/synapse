@@ -30,37 +30,43 @@ Bus notation provides syntactic compression for parallel signal groups. A microc
 
 Component attribute fields extend beyond the visible reference designator and value labels. A resistor symbol displays **R45** and **10kΩ** on the schematic canvas, but the component database record includes manufacturer part number, tolerance specification (±1%, ±5%), power rating (1/4 W, 1/2 W), temperature coefficient, package footprint (0603, 0805 imperial codes), and supplier stock codes (Digi-Key, Mouser, Farnell part numbers). This parametric data flows from schematic to BOM generation, enabling automated procurement and ensuring that **R45** specified as a 0.1% metal-film resistor doesn't get substituted with a 5% carbon-composition variant during assembly.
 
-```
-Hierarchical Design Netlist Resolution Example:
+```mermaid
+flowchart TD
+    subgraph sheet1 ["Sheet 1 — Top Level"]
+        U1["MCU_CORE [U1]"]
+    end
 
-TOP LEVEL (Sheet 1):
-┌─────────────────┐
-│  MCU_CORE       │
-│  [U1]           │
-│                 │
-│  SPI_MOSI  ─────┼────┐
-│  SPI_MISO  ─────┼────┤
-│  SPI_CLK   ─────┼────┤
-│  SPI_CS    ─────┼────┤
-└─────────────────┘    │
-                       │
-                  ┌────▼────────┐
-                  │ SPI_FLASH   │
-                  │ (Sheet 3)   │
-                  └─────────────┘
+    subgraph sheet3 ["Sheet 3 — SPI_FLASH Sub-Schematic"]
+        direction TB
+        MOSI_PORT["SPI_MOSI [INPUT PORT]"]
+        MISO_PORT["SPI_MISO [OUTPUT PORT]"]
+        CLK_PORT["SPI_CLK [INPUT PORT]"]
+        CS_PORT["SPI_CS [INPUT PORT]"]
 
-SHEET 3 (SPI_FLASH sub-schematic):
-Port Entry Points:
-  SPI_MOSI [INPUT]  ────> Pin 5 of U7 (W25Q128)
-  SPI_MISO [OUTPUT] <──── Pin 2 of U7
-  SPI_CLK  [INPUT]  ────> Pin 6 of U7
-  SPI_CS   [INPUT]  ────> Pin 1 of U7
+        U7["W25Q128 [U7]"]
 
-Flattened Netlist Output:
-  MCU_CORE.SPI_MOSI  ===  SPI_FLASH.SPI_MOSI  ===  U7.PIN5
-  MCU_CORE.SPI_MISO  ===  SPI_FLASH.SPI_MISO  ===  U7.PIN2
-  MCU_CORE.SPI_CLK   ===  SPI_FLASH.SPI_CLK   ===  U7.PIN6
-  MCU_CORE.SPI_CS    ===  SPI_FLASH.SPI_CS    ===  U7.PIN1
+        MOSI_PORT -->|"Pin 5"| U7
+        U7 -->|"Pin 2"| MISO_PORT
+        CLK_PORT -->|"Pin 6"| U7
+        CS_PORT -->|"Pin 1"| U7
+    end
+
+    subgraph netlist ["Flattened Netlist"]
+        NET_MOSI["Net: SPI_MOSI\nMCU_CORE.SPI_MOSI = SPI_FLASH.SPI_MOSI = U7.PIN5"]
+        NET_MISO["Net: SPI_MISO\nMCU_CORE.SPI_MISO = SPI_FLASH.SPI_MISO = U7.PIN2"]
+        NET_CLK["Net: SPI_CLK\nMCU_CORE.SPI_CLK = SPI_FLASH.SPI_CLK = U7.PIN6"]
+        NET_CS["Net: SPI_CS\nMCU_CORE.SPI_CS = SPI_FLASH.SPI_CS = U7.PIN1"]
+    end
+
+    U1 -->|"SPI_MOSI"| MOSI_PORT
+    U1 -->|"SPI_MISO"| MISO_PORT
+    U1 -->|"SPI_CLK"| CLK_PORT
+    U1 -->|"SPI_CS"| CS_PORT
+
+    MOSI_PORT -.->|"resolves to"| NET_MOSI
+    MISO_PORT -.->|"resolves to"| NET_MISO
+    CLK_PORT -.->|"resolves to"| NET_CLK
+    CS_PORT -.->|"resolves to"| NET_CS
 ```
 
 The netlist compilation process transforms the schematic graph into multiple output formats. The SPICE netlist format targets analog circuit simulation, encoding component values, node connectivity, and subcircuit definitions in ASCII text. The Gerber/ODB++ netlist drives PCB fabrication, specifying copper pad coordinates, drill hole locations, and solder mask apertures. The assembly netlist (often XML or CSV format) provides pick-and-place machine coordinates, component rotation angles, and feeder slot assignments for automated surface-mount assembly lines.

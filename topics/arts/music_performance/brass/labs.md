@@ -28,9 +28,9 @@ flowchart TD
     D --> E
     E --> F
 
-    style sub_foundation fill:#e8f5e9
-    style sub_technique fill:#e3f2fd
-    style sub_maintenance fill:#fce4ec
+    style sub_foundation fill:#e8f5e9,color:#0f172a
+    style sub_technique fill:#e3f2fd,color:#0f172a
+    style sub_maintenance fill:#fce4ec,color:#0f172a
 ```
 
 **Instruments covered:** Bb trumpet, F/Bb double horn, tenor trombone (with Bb/F attachment), and Bb tuba/euphonium. Written pitches are for Bb trumpet unless stated otherwise; concert pitch (C.P.) is marked where transposition matters.
@@ -81,9 +81,9 @@ Primary engine for brass"]
     end
     Z3 --> Z2 --> Z1
 
-    style Z1 fill:#ffcccc
-    style Z2 fill:#ffffcc
-    style Z3 fill:#ccffcc
+    style Z1 fill:#ffcccc,color:#0f172a
+    style Z2 fill:#ffffcc,color:#0f172a
+    style Z3 fill:#ccffcc,color:#0f172a
 ```
 
 **Filling sequence on the inhale:**
@@ -345,10 +345,10 @@ Legato breath accent, used for sfp/fp"]
     end
     T1 --> T2 --> T3 --> T4
 
-    style T1 fill:#cce5ff
-    style T2 fill:#d4edda
-    style T3 fill:#fff3cd
-    style T4 fill:#f8d7da
+    style T1 fill:#cce5ff,color:#0f172a
+    style T2 fill:#d4edda,color:#0f172a
+    style T3 fill:#fff3cd,color:#0f172a
+    style T4 fill:#f8d7da,color:#0f172a
 ```
 
 **Syllable guide:**
@@ -572,9 +572,9 @@ flowchart TD
     SYM5 --> C5 --> F5
     SYM6 --> C6 --> F6
 
-    style sub_symptoms fill:#fce4ec
-    style sub_causes fill:#fff3e0
-    style sub_fixes fill:#e8f5e9
+    style sub_symptoms fill:#fce4ec,color:#0f172a
+    style sub_causes fill:#fff3e0,color:#0f172a
+    style sub_fixes fill:#e8f5e9,color:#0f172a
 ```
 
 ### 6.1 Intonation Troubleshooting Checklist

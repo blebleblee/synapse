@@ -885,25 +885,28 @@ effective_rate = min(cwnd, rwnd) / RTT
 where `rwnd` is the receiver's advertised window.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> SlowStart : Connection established\ncwnd = IW (typically 10 MSS)
-
-    SlowStart --> SlowStart : ACK received\ncwnd += 1 MSS per ACK\n(exponential growth)
-    SlowStart --> CongestionAvoidance : cwnd >= ssthresh
-    SlowStart --> FastRecovery : 3 duplicate ACKs
-    SlowStart --> SlowStart_Reset : Timeout\nssthresh = cwnd/2\ncwnd = 1 MSS
-
-    CongestionAvoidance --> CongestionAvoidance : ACK received\ncwnd += MSS²/cwnd\n(linear growth ~1 MSS/RTT)
-    CongestionAvoidance --> FastRecovery : 3 duplicate ACKs\nssthresh = cwnd/2\ncwnd = ssthresh + 3 MSS
-    CongestionAvoidance --> SlowStart_Reset : Timeout\nssthresh = cwnd/2\ncwnd = 1 MSS
-
-    FastRecovery --> FastRecovery : Duplicate ACK\ncwnd += 1 MSS
-    FastRecovery --> CongestionAvoidance : New ACK received\ncwnd = ssthresh
-    FastRecovery --> SlowStart_Reset : Timeout
-
-    SlowStart_Reset --> SlowStart : Retransmit\nlost segment
-
-    note right of FastRecovery : TCP Reno/CUBIC\nSACK enables selective\nretransmission of\nonly lost segments
+flowchart TD
+    Start([Connection Established]) --> SlowStart["Slow Start<br/>cwnd = IW (typically 10 MSS)"]
+    
+    SlowStart -->|"ACK received<br/>cwnd += 1 MSS per ACK<br/>(exponential growth)"| SlowStart
+    SlowStart -->|"cwnd >= ssthresh"| CongestionAvoidance["Congestion Avoidance"]
+    SlowStart -->|"3 duplicate ACKs"| FastRecovery["Fast Recovery"]
+    SlowStart -->|"Timeout<br/>ssthresh = cwnd/2<br/>cwnd = 1 MSS"| SlowStartReset["Slow Start Reset"]
+    
+    CongestionAvoidance -->|"ACK received<br/>cwnd += MSS²/cwnd<br/>(linear growth ~1 MSS/RTT)"| CongestionAvoidance
+    CongestionAvoidance -->|"3 duplicate ACKs<br/>ssthresh = cwnd/2<br/>cwnd = ssthresh + 3 MSS"| FastRecovery
+    CongestionAvoidance -->|"Timeout<br/>ssthresh = cwnd/2<br/>cwnd = 1 MSS"| SlowStartReset
+    
+    FastRecovery -->|"Duplicate ACK<br/>cwnd += 1 MSS"| FastRecovery
+    FastRecovery -->|"New ACK received<br/>cwnd = ssthresh"| CongestionAvoidance
+    FastRecovery -->|"Timeout"| SlowStartReset
+    
+    SlowStartReset -->|"Retransmit lost segment"| SlowStart
+    
+    Note["TCP Reno/CUBIC<br/>SACK enables selective<br/>retransmission of<br/>only lost segments"]
+    
+    style FastRecovery fill:#e1f5ff
+    style Note fill:#ffffcc
 ```
 
 The salient diagnostic implication: a TCP flow exhibiting "saw-tooth" throughput in Wireshark's IO graph is not experiencing random drops — it is in the normal CUBIC/Reno congestion avoidance cycle. Persistent low throughput with many retransmissions indicates either chronic congestion (queue overflow), or a faulty NIC/cable introducing physical-layer errors.
@@ -1005,3 +1008,4 @@ ethtool -S eth0
 ethtool -S eth0 | grep -i "tx_queue\|stop\|wake"
 
 # Adjust interrupt
+```

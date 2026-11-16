@@ -30,119 +30,62 @@ For engineers who write non-trivial applications, the Setup style is strictly mo
 
 Here is a production-representative cart store. It is complete, typechecked, and ready to deploy:
 
-```typescript
-// stores/cart.ts
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import type { CartItem, Product } from '@/types/catalog'
-
-export const useCartStore = defineStore('cart', () => {
-  // ── State ────────────────────────────────────────────────────────────────
-  const items = ref<CartItem[]>([])
-  const couponCode = ref<string | null>(null)
-  const isSyncing = ref(false)
-
-  // ── Getters (derived computed state) ─────────────────────────────────────
-  const itemCount = computed(() =>
-    items.value.reduce((sum, item) => sum + item.quantity, 0)
-  )
-
-  const subtotal = computed(() =>
-    items.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  )
-
-  const discountAmount = computed(() => {
-    if (couponCode.value === 'SAVE20') return subtotal.value * 0.2
-    return 0
-  })
-
-  const total = computed(() => subtotal.value - discountAmount.value)
-
-  const isEmpty = computed(() => items.value.length === 0)
-
-  // ── Actions ───────────────────────────────────────────────────────────────
-  function addItem(product: Product, quantity = 1): void {
-    const existing = items.value.find(i => i.productId === product.id)
-    if (existing) {
-      existing.quantity += quantity
-    } else {
-      items.value.push({
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        quantity,
-        imageUrl: product.imageUrl,
-      })
-    }
-  }
-
-  function removeItem(productId: string): void {
-    const index = items.value.findIndex(i => i.productId === productId)
-    if (index !== -1) items.value.splice(index, 1)
-  }
-
-  function updateQuantity(productId: string, quantity: number): void {
-    if (quantity <= 0) {
-      removeItem(productId)
-      return
-    }
-    const item = items.value.find(i => i.productId === productId)
-    if (item) item.quantity = quantity
-  }
-
-  function applyCoupon(code: string): void {
-    couponCode.value = code.trim().toUpperCase()
-  }
-
-  function clearCoupon(): void {
-    couponCode.value = null
-  }
-
-  async function syncWithServer(): Promise<void> {
-    if (isSyncing.value) return
-    isSyncing.value = true
-    try {
-      const payload = items.value.map(i => ({
-        productId: i.productId,
-        quantity: i.quantity,
-      }))
-      await fetch('/api/cart/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-    } finally {
-      isSyncing.value = false
-    }
-  }
-
-  function $reset(): void {
-    items.value = []
-    couponCode.value = null
-    isSyncing.value = false
-  }
-
-  return {
-    // state
-    items,
-    couponCode,
-    isSyncing,
-    // getters
-    itemCount,
-    subtotal,
-    discountAmount,
-    total,
-    isEmpty,
-    // actions
-    addItem,
-    removeItem,
-    updateQuantity,
-    applyCoupon,
-    clearCoupon,
-    syncWithServer,
-    $reset,
-  }
-})
+```mermaid
+flowchart TD
+    Store["🗄️ useCartStore (Pinia)"]
+    
+    subgraph State ["State (ref)"]
+        items["items: CartItem[]"]
+        couponCode["couponCode: string | null"]
+        isSyncing["isSyncing: boolean"]
+    end
+    
+    subgraph Getters ["Getters (computed)"]
+        itemCount["itemCount<br/>sum of quantities"]
+        subtotal["subtotal<br/>sum of price × quantity"]
+        discountAmount["discountAmount<br/>20% if SAVE20"]
+        total["total<br/>subtotal - discount"]
+        isEmpty["isEmpty<br/>items.length === 0"]
+    end
+    
+    subgraph Actions ["Actions (functions)"]
+        addItem["addItem(product, quantity)<br/>add or increment item"]
+        removeItem["removeItem(productId)<br/>remove by index"]
+        updateQuantity["updateQuantity(productId, quantity)<br/>update or remove if ≤ 0"]
+        applyCoupon["applyCoupon(code)<br/>set coupon code"]
+        clearCoupon["clearCoupon()<br/>set to null"]
+        syncWithServer["syncWithServer()<br/>POST /api/cart/sync"]
+        reset["$reset()<br/>clear all state"]
+    end
+    
+    Store --> State
+    Store --> Getters
+    Store --> Actions
+    
+    State --> Getters
+    
+    addItem -.->|mutates| items
+    removeItem -.->|mutates| items
+    updateQuantity -.->|mutates| items
+    updateQuantity -.->|calls if qty ≤ 0| removeItem
+    
+    applyCoupon -.->|mutates| couponCode
+    clearCoupon -.->|mutates| couponCode
+    
+    syncWithServer -.->|reads| items
+    syncWithServer -.->|mutates| isSyncing
+    
+    reset -.->|resets| items
+    reset -.->|resets| couponCode
+    reset -.->|resets| isSyncing
+    
+    items -.->|derives| itemCount
+    items -.->|derives| subtotal
+    items -.->|derives| isEmpty
+    couponCode -.->|derives| discountAmount
+    subtotal -.->|derives| discountAmount
+    subtotal -.->|derives| total
+    discountAmount -.->|derives| total
 ```
 
 Several design decisions here deserve explicit justification. The `items` ref holds an array of `CartItem` objects, and mutations happen by direct array methods (`splice`, `push`) and direct property assignment (`item.quantity = quantity`). Vue's reactivity system uses ES Proxy to intercept these operations, so both are tracked correctly without any special wrapper. Calling `items.value.splice(index, 1)` triggers a reactive update identically to assigning a whole new array — but splice is O(1) in position rather than O(n) for a full replacement, which matters when the array grows large and the component rendering it uses a virtualized list.
@@ -263,52 +206,73 @@ Notice that `useCartStore()` is called inside the action, not at the top level o
 
 Consuming a store in a component is syntactically identical to using any other composable:
 
-```vue
-<!-- components/CartSummary.vue -->
-<script setup lang="ts">
-import { storeToRefs } from 'pinia'
-import { useCartStore } from '@/stores/cart'
-
-const cartStore = useCartStore()
-
-// storeToRefs extracts reactive refs from the store while preserving reactivity.
-// Destructuring without storeToRefs breaks reactivity because it copies values.
-const { items, itemCount, subtotal, total, discountAmount, isSyncing } =
-  storeToRefs(cartStore)
-
-// Actions are plain functions — destructure them directly, no need for storeToRefs.
-const { removeItem, updateQuantity, applyCoupon, syncWithServer } = cartStore
-</script>
-
-<template>
-  <section class="cart-summary">
-    <p v-if="itemCount === 0">Your cart is empty.</p>
-
-    <ul v-else>
-      <li v-for="item in items" :key="item.productId">
-        <span>{{ item.name }}</span>
-        <input
-          type="number"
-          :value="item.quantity"
-          min="0"
-          @change="(e) => updateQuantity(item.productId, Number((e.target as HTMLInputElement).value))"
-        />
-        <span>{{ (item.price * item.quantity).toFixed(2) }}</span>
-        <button @click="removeItem(item.productId)">Remove</button>
-      </li>
-    </ul>
-
-    <div class="pricing">
-      <div>Subtotal: {{ subtotal.toFixed(2) }}</div>
-      <div v-if="discountAmount > 0">Discount: -{{ discountAmount.toFixed(2) }}</div>
-      <div>Total: {{ total.toFixed(2) }}</div>
-    </div>
-
-    <button :disabled="isSyncing" @click="syncWithServer">
-      {{ isSyncing ? 'Syncing...' : 'Save Cart' }}
-    </button>
-  </section>
-</template>
+```mermaid
+flowchart TD
+    Component["CartSummary.vue Component"]
+    
+    subgraph Setup ["Script Setup"]
+        Store["useCartStore()"]
+        StoreToRefs["storeToRefs(cartStore)"]
+        ReactiveRefs["Reactive Refs<br/>items, itemCount, subtotal,<br/>total, discountAmount, isSyncing"]
+        Actions["Actions<br/>removeItem, updateQuantity,<br/>applyCoupon, syncWithServer"]
+    end
+    
+    subgraph Template ["Template Rendering"]
+        EmptyCheck{"itemCount === 0?"}
+        EmptyMsg["Display: 'Your cart is empty'"]
+        ItemList["Render items list (v-for)"]
+        
+        subgraph ItemRow ["Each Item"]
+            ItemName["Display item.name"]
+            QtyInput["Quantity input<br/>@change → updateQuantity()"]
+            ItemPrice["Display item.price × quantity"]
+            RemoveBtn["Remove button<br/>@click → removeItem()"]
+        end
+        
+        Pricing["Pricing Section"]
+        SubtotalDisplay["Display subtotal"]
+        DiscountCheck{"discountAmount > 0?"}
+        DiscountDisplay["Display discount"]
+        TotalDisplay["Display total"]
+        
+        SyncBtn["Save Cart button<br/>:disabled=isSyncing<br/>@click → syncWithServer()"]
+    end
+    
+    Component --> Setup
+    Setup --> Store
+    Store --> StoreToRefs
+    Store --> Actions
+    StoreToRefs --> ReactiveRefs
+    
+    Component --> Template
+    Template --> EmptyCheck
+    EmptyCheck -->|Yes| EmptyMsg
+    EmptyCheck -->|No| ItemList
+    ItemList --> ItemRow
+    ItemRow --> ItemName
+    ItemRow --> QtyInput
+    ItemRow --> ItemPrice
+    ItemRow --> RemoveBtn
+    
+    ItemList --> Pricing
+    Pricing --> SubtotalDisplay
+    Pricing --> DiscountCheck
+    DiscountCheck -->|Yes| DiscountDisplay
+    DiscountCheck -->|No| TotalDisplay
+    DiscountDisplay --> TotalDisplay
+    
+    Pricing --> SyncBtn
+    
+    ReactiveRefs -.->|Reactive binding| EmptyCheck
+    ReactiveRefs -.->|Reactive binding| ItemList
+    ReactiveRefs -.->|Reactive binding| SubtotalDisplay
+    ReactiveRefs -.->|Reactive binding| DiscountCheck
+    ReactiveRefs -.->|Reactive binding| TotalDisplay
+    ReactiveRefs -.->|Reactive binding| SyncBtn
+    
+    Actions -.->|Function call| QtyInput
+    Actions -.->|Function call| RemoveBtn
+    Actions -.->|Function call| SyncBtn
 ```
 
 The `storeToRefs` utility deserves a precise explanation. When you destructure a plain object in JavaScript, you copy the current values, not references to the reactive containers. `const { itemCount } = cartStore` extracts the computed's current numeric value — a primitive — severing the reactive link. `storeToRefs` walks the store object, identifies which properties are `ref` or `computed` instances, and returns them directly rather than unwrapping them. The destructured `itemCount` is then the `ComputedRef<number>` itself, which the template engine knows how to unwrap reactively. Actions, being plain functions, do not hold reactive state and can be destructured directly.

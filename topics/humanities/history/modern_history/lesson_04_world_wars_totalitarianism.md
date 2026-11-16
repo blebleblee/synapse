@@ -34,40 +34,36 @@ Japan's entry into the war through the Pearl Harbor attack stemmed from a differ
 
 The operational architecture of World War I can be modeled as a network of mobilization dependencies and strategic miscalculations that created cascading commitments. Understanding the war's outbreak requires mapping the decision-tree structure faced by each major power and recognizing how information asymmetries and time compression eliminated negotiated exit options.
 
-```
-Crisis Escalation Network (July-August 1914)
+```mermaid
+flowchart TD
+    A["June 28: Assassination of Franz Ferdinand"]
 
-June 28: Assassination Trigger
-         │
-         ▼
-July 23: Austrian Ultimatum to Serbia
-         │
-         ├─► Serbia accepts 8/10 demands
-         │   └─► Austria rejects (war predetermined)
-         │
-         ▼
-July 28: Austria declares war on Serbia
-         │
-         ├─► Russia begins partial mobilization (Slavic solidarity)
-         │   │
-         │   ▼
-         │   Germany demands Russian demobilization
-         │   │
-         │   ▼
-         │   Russia continues mobilization (July 30)
-         │
-         ▼
-July 31: Germany declares "state of imminent war"
-         │
-         ├─► Schlieffen Plan activation requirements:
-         │   • Must mobilize before France (first-mover advantage)
-         │   • Must attack through Belgium (geographic constraint)
-         │   • Must complete Western campaign before Russian mobilization
-         │
-         ▼
-Aug 1:  Germany declares war on Russia
-Aug 3:  Germany declares war on France, invades Belgium
-Aug 4:  Britain declares war on Germany (Belgian neutrality guarantee)
+    A --> B["July 23: Austrian Ultimatum to Serbia"]
+
+    B --> C["Serbia Accepts 8 of 10 Demands"]
+    C --> D["Austria Rejects Response\n(War Predetermined)"]
+
+    B --> E["July 28: Austria Declares War on Serbia"]
+
+    E --> F["Russia Begins Partial Mobilization\n(Slavic Solidarity)"]
+    F --> G["Germany Demands\nRussian Demobilization"]
+    G --> H["Russia Continues Mobilization\n(July 30)"]
+
+    E --> I["July 31: Germany Declares\n'State of Imminent War'"]
+
+    subgraph schlieffen ["Schlieffen Plan Activation Requirements"]
+        S1["Must mobilize before France\n(first-mover advantage)"]
+        S2["Must attack through Belgium\n(geographic constraint)"]
+        S3["Must complete Western campaign\nbefore Russian mobilization"]
+    end
+
+    I --> schlieffen
+
+    H --> J["Aug 1: Germany Declares War on Russia"]
+    schlieffen --> J
+
+    J --> K["Aug 3: Germany Declares War on France\n& Invades Belgium"]
+    K --> L["Aug 4: Britain Declares War on Germany\n(Belgian Neutrality Guarantee)"]
 ```
 
 This decision tree illustrates the compression of diplomatic time windows and the dominance of military logistics over political judgment. The Russian decision to mobilize activated German war plans that had been optimized for a two-front war scenario, assuming France would support Russia. Once mobilization began, the alliance system operated with mechanical inevitability because military timetables allowed no flexibility. The German General Staff calculated that delaying mobilization by even forty-eight hours would compromise the Schlieffen Plan's viability, while Russian generals insisted that partial mobilization was technically impossible—full mobilization or nothing. These technical constraints meant that political leaders faced binary choices with existential consequences under severe time pressure.
@@ -80,55 +76,77 @@ Technological attempts to break the stalemate included poison gas, tanks, and in
 
 The interwar period's political economy can be mapped as a system of interdependent flows that collapsed when American credit dried up. The reparations-debt structure created circular dependencies where systemic stability required continued credit expansion:
 
-```
-Interwar Financial Flow Network (1924-1929)
-
-    United States
-         │
-         │ (Wall Street loans)
-         ▼
-      Germany ──────► (Reparations) ──────► France/Britain
-         ▲                                        │
-         │                                        │
-         └────────── (War debt payments) ─────────┘
-                              │
-                              ▼
-                       United States
-
-Collapse Mechanism (1929-1931):
-1. US stock market crash → credit contraction
-2. Loans to Germany cease → reparations payments stop
-3. France/Britain cannot pay war debts → banking crisis
-4. Gold standard rigidity prevents monetary expansion
-5. Deflationary spiral: prices fall → wages fall → demand falls
-6. Unemployment rises → political radicalization
+```mermaid
+flowchart TD
+    US["United States"]
+    Germany["Germany"]
+    FB["France & Britain"]
+    
+    US -->|"Wall Street loans"| Germany
+    Germany -->|"Reparations payments"| FB
+    FB -->|"War debt payments"| US
+    
+    subgraph collapse["Collapse Mechanism 1929-1931"]
+        C1["1. US stock market crash<br/>→ credit contraction"]
+        C2["2. Loans to Germany cease<br/>→ reparations payments stop"]
+        C3["3. France/Britain cannot pay<br/>war debts → banking crisis"]
+        C4["4. Gold standard rigidity<br/>prevents monetary expansion"]
+        C5["5. Deflationary spiral:<br/>prices fall → wages fall → demand falls"]
+        C6["6. Unemployment rises<br/>→ political radicalization"]
+        
+        C1 --> C2
+        C2 --> C3
+        C3 --> C4
+        C4 --> C5
+        C5 --> C6
+    end
+    
+    US -.->|Triggers| C1
 ```
 
 This architecture explains why the Depression propagated globally despite originating in the United States. The gold standard operated as a transmission mechanism, requiring countries experiencing gold outflows to contract money supply and raise interest rates, thereby exporting deflation. Countries that abandoned gold early—Britain in 1931, United States in 1933—recovered faster than those that maintained convertibility. The economic crisis delegitimized liberal economic policies and created political space for interventionist alternatives, whether Roosevelt's New Deal social democracy, Stalin's five-year plans, or Nazi autarkic rearmament.
 
 The totalitarian state apparatus developed by Nazi Germany represents the most systematic application of modern organizational techniques to political repression and genocide. The regime's control structure layered multiple overlapping institutions that combined ideological indoctrination, surveillance, and violence:
 
-```
-Nazi Control Architecture
-
-Party Organizations                 State Institutions
-─────────────────                  ──────────────────
-NSDAP (Nazi Party)                 Reichstag (rubber stamp)
-    │                              Civil Service (coordinated)
-    ├─► SA (Stormtroopers)        Wehrmacht (military)
-    ├─► SS (Schutzstaffel)        Police (merged with SS)
-    │   ├─► Gestapo (secret police)
-    │   ├─► SD (intelligence)
-    │   └─► Waffen-SS (military)
-    ├─► Hitler Youth
-    └─► Nazi Women's League
-
-Coordination Mechanisms:
-• Gleichschaltung: forced alignment of institutions
-• Führerprinzip: leader authority at all levels
-• Denunciation systems: citizens report neighbors
-• Concentration camps: visible deterrent
-• Propaganda saturation: Goebbels' media control
+```mermaid
+flowchart TD
+    subgraph party ["Party Organizations"]
+        NSDAP["NSDAP (Nazi Party)"]
+        SA["SA (Stormtroopers)"]
+        SS["SS (Schutzstaffel)"]
+        Gestapo["Gestapo (secret police)"]
+        SD["SD (intelligence)"]
+        WaffenSS["Waffen-SS (military)"]
+        HitlerYouth["Hitler Youth"]
+        WomensLeague["Nazi Women's League"]
+        
+        NSDAP --> SA
+        NSDAP --> SS
+        NSDAP --> HitlerYouth
+        NSDAP --> WomensLeague
+        SS --> Gestapo
+        SS --> SD
+        SS --> WaffenSS
+    end
+    
+    subgraph state ["State Institutions"]
+        Reichstag["Reichstag (rubber stamp)"]
+        CivilService["Civil Service (coordinated)"]
+        Wehrmacht["Wehrmacht (military)"]
+        Police["Police (merged with SS)"]
+    end
+    
+    subgraph mechanisms ["Coordination Mechanisms"]
+        Gleichschaltung["Gleichschaltung: forced alignment of institutions"]
+        Fuhrerprinzip["Führerprinzip: leader authority at all levels"]
+        Denunciation["Denunciation systems: citizens report neighbors"]
+        Camps["Concentration camps: visible deterrent"]
+        Propaganda["Propaganda saturation: Goebbels' media control"]
+    end
+    
+    SS -.-> Police
+    mechanisms -.-> party
+    mechanisms -.-> state
 ```
 
 This architecture created redundancy and competition among institutions, all ultimately responsible to Hitler. The SS under Heinrich Himmler expanded from a small bodyguard unit to a state within a state, controlling concentration camps, racial policy implementation, intelligence operations, and combat divisions. This institutional structure was not bureaucratic inefficiency but a deliberate design that prevented any single institution from accumulating power to challenge Hitler while ensuring total penetration of society.

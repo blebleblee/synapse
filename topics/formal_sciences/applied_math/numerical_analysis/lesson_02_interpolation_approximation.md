@@ -90,15 +90,34 @@ $$D[i, k] = \frac{D[i+1, k-1] - D[i, k-1]}{x_{i+k} - x_i}.$$
 
 The base case is $D[i, 0] = y_i$ for $i = 0, 1, \ldots, n$. The Newton form coefficients are precisely the diagonal entries $c_k = D[0, k]$ for $k = 0, 1, \ldots, n$. The following schematic illustrates the table structure for four data points:
 
-```
-k=0       k=1                k=2                      k=3
-D[0,0] -> D[0,1] ------> D[0,2] ------------> D[0,3]
-           /               /                     /
-D[1,0] -> D[1,1] ------> D[1,2]              /
-           /               /                 /
-D[2,0] -> D[2,1] --------/                 /
-           /                               /
-D[3,0] ---/-------------------------------/
+```mermaid
+flowchart LR
+    D00["D[0,0]"]
+    D01["D[0,1]"]
+    D02["D[0,2]"]
+    D03["D[0,3]"]
+    D10["D[1,0]"]
+    D11["D[1,1]"]
+    D12["D[1,2]"]
+    D20["D[2,0]"]
+    D21["D[2,1]"]
+    D30["D[3,0]"]
+
+    D00 --> D01
+    D01 --> D02
+    D02 --> D03
+
+    D10 --> D11
+    D11 --> D12
+    D11 --> D02
+    D12 --> D03
+
+    D20 --> D21
+    D21 --> D12
+    D21 --> D02
+
+    D30 --> D11
+    D30 --> D03
 ```
 
 Each arrow represents a single application of the recurrence formula. The coefficients $c_0, c_1, c_2, c_3$ are read from the top row $D[0, 0], D[0, 1], D[0, 2], D[0, 3]$. The computational cost is dominated by the $O(n^2)$ arithmetic operations required to fill the table, with each entry requiring one subtraction, one division, and lookups of two previously computed values and two node coordinates.

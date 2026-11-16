@@ -36,32 +36,43 @@ Spatial hearing mechanisms partition into low-frequency and high-frequency strat
 
 Mid-side processing and stereo width manipulation must respect these frequency-dependent mechanisms. Widening bass content below 150 Hz through mid-side decorrelation produces phase differences between channels that the auditory system interprets as ITD cues, but because bass wavelengths are large relative to head size, the resulting ITDs correspond to physically impossible source positions—angles beyond ±90 degrees. The ear perceives this as instability, diffuseness, or phase cancellation when summed to mono. Conversely, widening midrange and high-frequency content through decorrelation or Haas-effect delays produces perceptually stable width because the ILD and pinna filtering cues remain consistent with plausible source positions. The standard practice of keeping bass content below 100 Hz strictly mono and applying width enhancement only above 200 Hz aligns with the biological reality of binaural hearing.
 
-```
-Frequency-Dependent Spatial Hearing Mechanisms
+```mermaid
+flowchart TD
+    subgraph mechanisms ["Frequency-Dependent Spatial Hearing Mechanisms"]
 
-   Low Frequencies (<1.5 kHz)              High Frequencies (>1.5 kHz)
-   ──────────────────────────              ────────────────────────────
-   
-   Mechanism: Interaural Time Diff         Mechanism: Interaural Level Diff
-              (ITD / phase detection)                 (ILD / head shadow)
-   
-   Wavefront arrival time Δt               Sound level difference ΔL
-   
-        ┌─────┐                                 ┌─────┐
-    ~~~~│ L   │                             ////│ L   │
-    ~~~~│     │ ← 600 μs delay              ////│     │ ← −3 dB (shadow)
-        │  HEAD                                 │  HEAD
-    ~~~~│     │ at 500 Hz, 90°             ////│     │ 8 kHz, 90°
-    ────│ R   │                             ────│ R   │ ← 0 dB
-        └─────┘                                 └─────┘
-        
-   Result: Phase difference                Result: Amplitude difference
-           allows precise azimuth                  enables localization
-           
-   Width Processing Strategy:
-   • <150 Hz: Keep mono (ITD cues misleading)
-   • 150 Hz–1.5 kHz: Moderate width (ITD dominant)
-   • >1.5 kHz: Aggressive width safe (ILD dominant)
+        subgraph low ["Low Frequencies (< 1.5 kHz)"]
+            LM["Mechanism: Interaural Time Difference\n(ITD / phase detection)"]
+            LT["Wavefront arrival time Δt"]
+            LH["LEFT ear: ~~~~ signal\n← 600 µs delay at 500 Hz, 90°\n\nHEAD\n\nRIGHT ear: ──── signal"]
+            LR["Result: Phase difference\nallows precise azimuth"]
+        end
+
+        subgraph high ["High Frequencies (> 1.5 kHz)"]
+            HM["Mechanism: Interaural Level Difference\n(ILD / head shadow)"]
+            HT["Sound level difference ΔL"]
+            HH["LEFT ear: //// signal\n← −3 dB shadow at 8 kHz, 90°\n\nHEAD\n\nRIGHT ear: ──── signal ← 0 dB"]
+            HR["Result: Amplitude difference\nenables localization"]
+        end
+
+        subgraph strategy ["Width Processing Strategy"]
+            S1["< 150 Hz\nKeep mono\n(ITD cues misleading)"]
+            S2["150 Hz – 1.5 kHz\nModerate width\n(ITD dominant)"]
+            S3["> 1.5 kHz\nAggressive width safe\n(ILD dominant)"]
+        end
+
+    end
+
+    LM --> LT
+    LT --> LH
+    LH --> LR
+
+    HM --> HT
+    HT --> HH
+    HH --> HR
+
+    LR --> S1
+    LR --> S2
+    HR --> S3
 ```
 
 Pinna filtering contributes elevation and front-back disambiguation through spectral notches created by sound wave reflections off the complex folds of the outer ear. These notches occur at frequencies determined by the geometry of the incident sound wave relative to pinna structures, typically producing dips in the 6–16 kHz range. The auditory system learns these spectral patterns through lifetime exposure and uses them to infer source elevation and resolve front-back ambiguities that ITD and ILD alone cannot distinguish. Head-related transfer functions (HRTFs), the frequency-domain representation of how the head, torso, and pinnae filter sound from different spatial positions, encode all these mechanisms. Binaural rendering for headphone playback applies measured or modeled HRTFs to position sound sources in three-dimensional space, but the effectiveness depends on how closely the applied HRTF matches the listener's individual anatomy. Generic HRTFs work reasonably well for azimuthal localization but produce high variability in elevation and front-back perception.
@@ -80,7 +91,7 @@ The second optimization principle is leveraging temporal masking windows for dyn
 
 Critical band awareness informs equalization strategy, particularly when stacking harmonic layers. If building a bass sound from three layers—a sub-bass sine wave at 50 Hz, a mid-bass sawtooth providing harmonics from 100–400 Hz, and a distorted top layer carrying 800 Hz–3 kHz—each layer should target distinct critical band regions to avoid beating and roughness. The sub-bass remains pure and mono-focused. The mid-bass is high-passed at 80 Hz to avoid clashing with the sub, and low-passed at 500 Hz to avoid interfering with the top layer. The distorted top is high-passed at 600 Hz and low-passed at 4 kHz, occupying midrange critical bands without extending into the sub or mid-bass territory. This separation allows each layer to contribute distinct timbral information without perceptual fusion or masking interactions eroding clarity.
 
-Reference monitoring level discipline prevents frequency balance errors caused by Fletcher-Munson sensitivity shifts. Establishing a primary mixing level—79 to 85 dB SPL measured with pink noise at the mix position using C-weighted slow response—and checking that level with an SPL meter before each session ensures consistent perceptual conditions. Mixing at excessively loud levels (>90 dB SPL) causes the bass and treble to sound overly prominent, leading to compensatory EQ cuts that produce thin, mid-heavy mixes on playback systems. Mixing at excessively quiet levels (<70 dB SPL) causes bass and treble to sound deficient, leading to compensatory boosts that sound bloated and hyped on louder playback systems. Frequent level checks at ±10 dB relative to the reference level catch these imbalances before they require wholesale mix revisions.
+Reference monitoring level discipline prevents frequency balance errors caused by Fletcher-Munson sensitivity shifts. Establishing a primary mixing level—79 to 85 dB SPL measured with pink noise at the mix position using C-weighted slow response—and checking that level with an SPL meter before each session ensures consistent perceptual conditions. Mixing at excessively loud levels (>90 dB SPL) causes the bass and treble to sound overly prominent, leading to compensatory EQ cuts that produce thin, mid-heavy mixes on playback systems. Mixing at excessively quiet levels (< 70 dB SPL) causes bass and treble to sound deficient, leading to compensatory boosts that sound bloated and hyped on louder playback systems. Frequent level checks at ±10 dB relative to the reference level catch these imbalances before they require wholesale mix revisions.
 
 Failure mode recognition allows early detection of psychoacoustic problems. If a mix sounds clear and spacious at 85 dB SPL but becomes cluttered and midrange-heavy at 70 dB SPL, the mix has excessive bass content that is only audible at higher playback levels. The ear's reduced bass sensitivity at quiet levels reveals the imbalance. The correction is to reduce bass level by 1–3 dB globally—lowering the kick, bass guitar, and sub synth layers—and recheck at multiple levels until the spectral balance remains consistent. If a mix sounds punchy and impactful at 85 dB SPL but becomes harsh and fatiguing at 95 dB SPL, the mix has excessive high-frequency content. The ear's increased treble sensitivity at loud levels reveals the imbalance. The correction is to apply gentle high-frequency shelving attenuation above 8 kHz, reducing 1–2 dB to restore balance.
 

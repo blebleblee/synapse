@@ -92,16 +92,25 @@ Real-time animation contexts—game engines, interactive simulations, virtual pr
 
 Profiling begins with **instrumentation**—inserting timer queries around critical code paths to measure elapsed time. The character deformation pipeline breaks into measurable stages: skeleton evaluation (compute bone transformations from animation curves), skinning execution (transform vertices by bone matrices), blend shape application (accumulate shape deltas), and mesh finalization (compute normals, tangents, upload to GPU). A typical profile might reveal:
 
-```
-Frame Time Budget: 16.67 ms (60 fps target)
-──────────────────────────────────────────
-Skeleton Eval:      1.2 ms  (  7.2%)
-Skinning (CPU):     8.5 ms  ( 51.0%)  ← Bottleneck
-Blend Shapes:       2.1 ms  ( 12.6%)
-Mesh Finalization:  0.8 ms  (  4.8%)
-Physics/Other:      4.0 ms  ( 24.0%)
-──────────────────────────────────────────
-Total Frame:       16.6 ms  ( 99.6% of budget)
+```mermaid
+flowchart TD
+    Budget["Frame Time Budget: 16.67 ms (60 fps target)"]
+    
+    Budget --> Skeleton["Skeleton Eval<br/>1.2 ms (7.2%)"]
+    Budget --> Skinning["Skinning (CPU)<br/>8.5 ms (51.0%)<br/>⚠️ BOTTLENECK"]
+    Budget --> Blend["Blend Shapes<br/>2.1 ms (12.6%)"]
+    Budget --> Mesh["Mesh Finalization<br/>0.8 ms (4.8%)"]
+    Budget --> Physics["Physics/Other<br/>4.0 ms (24.0%)"]
+    
+    Skeleton --> Total["Total Frame: 16.6 ms<br/>(99.6% of budget)"]
+    Skinning --> Total
+    Blend --> Total
+    Mesh --> Total
+    Physics --> Total
+    
+    style Skinning fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style Budget fill:#4dabf7,stroke:#1971c2,color:#fff
+    style Total fill:#51cf66,stroke:#2f9e44,color:#fff
 ```
 
 Skinning consumes half the frame budget, immediately identifying the optimization target. The technical artist investigates: the character mesh contains 80,000 vertices, each influenced by an average of 4.5 bones. Skinning requires $80{,}000 \times 4.5 = 360{,}000$ matrix-vector multiplications per frame. On a CPU with eight cores, naive single-threaded execution processes 42,000 vertices per millisecond, requiring 1.9 ms under ideal conditions—far below the measured 8.5 ms. Profiler inspection reveals the skinning code streams bone matrices from main memory on every vertex, thrashing CPU cache lines. Optimization restructures data layout: group vertices by primary influencing bone, enabling the CPU to load each bone matrix once and amortize cache misses across multiple vertices. Post-optimization, skinning drops to 2.8 ms—a 3× improvement.
@@ -112,18 +121,21 @@ Pre-rendered animation contexts—film, television, high-fidelity cinematics—a
 
 The dominant cost in pre-rendered pipelines shifts from deformation evaluation to **render engine raytracing and shading**. Character deformation remains relatively cheap: even complex rigs with thousands of blend shapes and dozens of bones evaluate in seconds. Profiling reveals render time distribution:
 
-```
-Total Frame Render Time: 47 minutes
-─────────────────────────────────────────────
-Scene Setup:             15 sec  (  0.5%)
-Deformation Eval:        22 sec  (  0.8%)
-BVH Construction:        90 sec  (  3.2%)
-Primary Ray Tracing:    780 sec  ( 27.7%)
-Indirect Illumination: 1440 sec  ( 51.1%)  ← Dominant
-Shading/Textures:       320 sec  ( 11.4%)
-Motion Blur Sampling:   130 sec  (  4.6%)
-Compositing/Output:      23 sec  (  0.8%)
-─────────────────────────────────────────────
+```mermaid
+flowchart TD
+    Start["Total Frame Render Time: 47 minutes"]
+    
+    Start --> A["Scene Setup<br/>15 sec (0.5%)"]
+    Start --> B["Deformation Eval<br/>22 sec (0.8%)"]
+    Start --> C["BVH Construction<br/>90 sec (3.2%)"]
+    Start --> D["Primary Ray Tracing<br/>780 sec (27.7%)"]
+    Start --> E["Indirect Illumination<br/>1440 sec (51.1%)<br/>⚠️ Dominant"]
+    Start --> F["Shading/Textures<br/>320 sec (11.4%)"]
+    Start --> G["Motion Blur Sampling<br/>130 sec (4.6%)"]
+    Start --> H["Compositing/Output<br/>23 sec (0.8%)"]
+    
+    style E fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
+    style Start fill:#4dabf7,stroke:#1864ab,stroke-width:2px
 ```
 
 Indirect illumination—secondary light bounces, caustics, subsurface scattering—dominates the render budget. Character deformation optimizations yield negligible improvements. Instead, technical directors optimize render settings: reduce global illumination bounce depth from 8 to 5 bounces (halving render time with minimal perceptual quality loss), decrease subsurface scattering sample counts in non-closeup shots, and apply aggressive camera-based level-of-detail—characters distant from camera render at reduced subdivision levels, cutting BVH construction time and ray intersection tests.

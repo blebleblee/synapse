@@ -200,45 +200,66 @@ The integral operator $T_\lambda : f \mapsto \int_a^b G(\cdot,\xi;\lambda) f(\xi
 
 The workflow of the transform and eigenfunction expansion methods shares a common computational topology, which the following diagram makes explicit:
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│          TRANSFORM METHOD: UNIFIED SIGNAL FLOW ARCHITECTURE                 │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-   ORIGINAL DOMAIN                         TRANSFORM DOMAIN
-   ─────────────────                        ──────────────────────────
-
-   Differential equation                   Algebraic / spectral equation
-   with initial or               ─────────────────────────────────────►
-   boundary conditions         FORWARD TRANSFORM     (multiplication by
-                                (ℒ, ℱ, eigenfunction    eigenvalue; linear
-                                   expansion)            algebraic solve)
-                                                               │
-                                                               │ SOLVE
-                                                               ▼
-   Solution y(t) or u(x,t)                 Y(s), Û(ω), or expansion
-   in original domain          ◄─────────────────────────────────────
-                               INVERSE TRANSFORM      coefficients
-                               (Bromwich integral,
-                                Fourier inversion,
-                                series reassembly)
-
-
-   ┌──────────────────────────────────────────────────────────────────┐
-   │  LAPLACE PATH             │  FOURIER/STURM-LIOUVILLE PATH        │
-   │                           │                                      │
-   │  IVP on [0,∞)             │  BVP on [a,b]                        │
-   │  d/dt  ───►  s·(·) - IC  │  -d/dx[p·d/dx] + q  ───►  λ_n · φ_n │
-   │                           │                                      │
-   │  Y(s) = [G(s)+Q(s)]/P(s) │  Expand: f = Σ c_n φ_n              │
-   │                           │  c_n = ⟨f, φ_n⟩_w / ‖φ_n‖²_w      │
-   │  Poles of Y ↔ eigenvalues │  λ_n ↔ decay/oscillation rates      │
-   │  Residues ↔ amplitudes    │  Completeness in L²_w               │
-   │                           │                                      │
-   │  Inversion via            │  Convergence: uniform if f ∈ C²,    │
-   │  Bromwich contour or      │  L² (norm) in general;              │
-   │  partial fractions        │  pointwise a.e. (Carleson '66)      │
-   └───────────────────────────┴──────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph TITLE["TRANSFORM METHOD: UNIFIED SIGNAL FLOW ARCHITECTURE"]
+        direction LR
+        DUMMY[" "]
+        style DUMMY fill:none,stroke:none
+    end
+    
+    subgraph ORIGINAL["ORIGINAL DOMAIN"]
+        DE["Differential equation<br/>with initial or<br/>boundary conditions"]
+    end
+    
+    subgraph TRANSFORM["TRANSFORM DOMAIN"]
+        FWD["FORWARD TRANSFORM<br/>(ℒ, ℱ, eigenfunction<br/>expansion)"]
+        ALG["Algebraic / spectral equation<br/>(multiplication by eigenvalue;<br/>linear algebraic solve)"]
+        COEF["Y(s), Û(ω), or expansion<br/>coefficients"]
+    end
+    
+    subgraph SOLUTION["SOLUTION DOMAIN"]
+        SOL["Solution y(t) or u(x,t)<br/>in original domain"]
+        INV["INVERSE TRANSFORM<br/>(Bromwich integral,<br/>Fourier inversion,<br/>series reassembly)"]
+    end
+    
+    DE --> FWD
+    FWD --> ALG
+    ALG -->|SOLVE| COEF
+    COEF --> INV
+    INV --> SOL
+    
+    subgraph PATHS["TRANSFORM METHODS"]
+        direction LR
+        
+        subgraph LAPLACE["LAPLACE PATH"]
+            L1["IVP on [0,∞)"]
+            L2["d/dt ───► s·(·) - IC"]
+            L3["Y(s) = [G(s)+Q(s)]/P(s)"]
+            L4["Poles of Y ↔ eigenvalues<br/>Residues ↔ amplitudes"]
+            L5["Inversion via<br/>Bromwich contour or<br/>partial fractions"]
+            
+            L1 --> L2 --> L3 --> L4 --> L5
+        end
+        
+        subgraph FOURIER["FOURIER/STURM-LIOUVILLE PATH"]
+            F1["BVP on [a,b]"]
+            F2["-d/dx["p·d/dx"] + q ───► λ_n · φ_n"]
+            F3["Expand: f = Σ c_n φ_n<br/>c_n = ⟨f, φ_n⟩_w / ‖φ_n‖²_w"]
+            F4["λ_n ↔ decay/oscillation rates<br/>Completeness in L²_w"]
+            F5["Convergence: uniform if f ∈ C²,<br/>L² (norm) in general;<br/>pointwise a.e. (Carleson '66)"]
+            
+            F1 --> F2 --> F3 --> F4 --> F5
+        end
+    end
+    
+    style TITLE fill:#e1f5ff,stroke:#0288d1,stroke-width:3px
+    style ORIGINAL fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style TRANSFORM fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style SOLUTION fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style PATHS fill:#fafafa,stroke:#616161,stroke-width:2px
+    style LAPLACE fill:#fff8e1,stroke:#f9a825,stroke-width:2px
+    style FOURIER fill:#e0f2f1,stroke:#00897b,stroke-width:2px
 ```
 
 ### The Fourier Transform on $\mathbb{R}$: Spectral Decomposition via Continuous Eigenfunctions

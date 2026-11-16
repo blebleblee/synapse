@@ -18,52 +18,31 @@ A second anatomical invariant concerns the springwood-latewood boundary at the c
 
 The practical mechanics of surface preparation can be understood as a linear reduction pipeline: each stage reduces the dominant defect scale by a controlled amount, handing off a surface whose worst remaining defects fall within the removal capacity of the next stage. Violating the pipeline by advancing prematurely — or by under-cutting it by applying too little pressure and completing too few strokes — produces a surface that appears ready under ambient light but fails under raking light or under finish.
 
-```
-RAW STOCK
-    │
-    ▼
-[Stage 1: Machine Marks Removal]
-  Tool: Random-orbit sander (5") or hand scraper
-  Grit: 80 or 100
-  Goal: Eliminate planer mill marks, tearout, and
-        cup/twist artifacts from milling
-    │
-    ▼
-[Stage 2: Coarse Scratch Removal]
-  Tool: Random-orbit sander
-  Grit: 120 → 150
-  Goal: Replace coarse scratch pattern with finer,
-        uniform scratch field; check under raking light
-    │
-    ▼
-[Stage 3: Intermediate Refinement]
-  Tool: Random-orbit sander → cork or felt block
-  Grit: 180 → 220
-  Goal: Remove 150-grit swirl marks; begin
-        with-grain pass using sanding block
-    │
-    ▼
-[Stage 4: Grain Raising]
-  Agent: Distilled water, wiped on liberally
-  Dwell: 10–15 minutes; allow full dry (20–30 min)
-  Goal: Raise and stiffen cellulose fibers before
-        final abrasion
-    │
-    ▼
-[Stage 5: Final Denib]
-  Tool: Folded 320-grit or gray Scotch-Brite pad
-        (hand-held, with-grain strokes only)
-  Goal: Shear raised grain fibers flush without
-        re-compressing new fiber ends
-    │
-    ▼
-[Stage 6: Surface Cleaning]
-  Tool: Tack cloth, compressed air, vacuum
-  Goal: Remove all abrasive dust from open pores
-        before any finish application
-    │
-    ▼
-FINISH-READY SURFACE
+```mermaid
+flowchart TD
+    START["RAW STOCK"]
+    
+    S1["Stage 1: Machine Marks Removal<br/>Tool: Random-orbit sander (5") or hand scraper<br/>Grit: 80 or 100<br/>Goal: Eliminate planer mill marks, tearout, and<br/>cup/twist artifacts from milling"]
+    
+    S2["Stage 2: Coarse Scratch Removal<br/>Tool: Random-orbit sander<br/>Grit: 120 → 150<br/>Goal: Replace coarse scratch pattern with finer,<br/>uniform scratch field; check under raking light"]
+    
+    S3["Stage 3: Intermediate Refinement<br/>Tool: Random-orbit sander → cork or felt block<br/>Grit: 180 → 220<br/>Goal: Remove 150-grit swirl marks; begin<br/>with-grain pass using sanding block"]
+    
+    S4["Stage 4: Grain Raising<br/>Agent: Distilled water, wiped on liberally<br/>Dwell: 10–15 minutes; allow full dry (20–30 min)<br/>Goal: Raise and stiffen cellulose fibers before<br/>final abrasion"]
+    
+    S5["Stage 5: Final Denib<br/>Tool: Folded 320-grit or gray Scotch-Brite pad<br/>(hand-held, with-grain strokes only)<br/>Goal: Shear raised grain fibers flush without<br/>re-compressing new fiber ends"]
+    
+    S6["Stage 6: Surface Cleaning<br/>Tool: Tack cloth, compressed air, vacuum<br/>Goal: Remove all abrasive dust from open pores<br/>before any finish application"]
+    
+    END["FINISH-READY SURFACE"]
+    
+    START --> S1
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 --> S5
+    S5 --> S6
+    S6 --> END
 ```
 
 The grit numbers above represent a workflow for most hardwoods. For soft, open-pored species like Douglas fir, beginning at 60 or 80 makes sense because mill marks tend to be deeper and tearout more pronounced. For dense, fine-grained species like hard maple or boxwood, you may begin at 100 without sacrificing efficiency. The critical discipline is not the specific starting grit but the commitment to completing each stage fully before advancing.

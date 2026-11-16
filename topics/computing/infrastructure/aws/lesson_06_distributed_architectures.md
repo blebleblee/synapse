@@ -20,28 +20,47 @@ Multi-region architectures on AWS require explicit coordination between autonomo
 
 Consider a globally distributed web application backed by DynamoDB Global Tables. The Global Tables feature replicates data across multiple Regions using a last-write-wins conflict resolution strategy based on timestamp. Each regional DynamoDB deployment operates independently, accepting writes and serving reads from local replicas. Replication streams capture item-level changes through DynamoDB Streams, a durable, ordered log of table modifications. Background replication processes consume these streams, transforming regional writes into cross-region update operations. The replication topology forms a mesh: a three-region deployment establishes six unidirectional replication streams, one for each ordered pair of regions.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Route 53 Global DNS                       │
-│  • Latency-based routing to nearest healthy region           │
-│  • Health checks with 30s intervals                          │
-└──────────────┬────────────────┬────────────────┬─────────────┘
-               │                │                │
-       ┌───────▼──────┐  ┌─────▼──────┐  ┌─────▼──────┐
-       │  us-east-1   │  │  eu-west-1 │  │ ap-south-1 │
-       │              │  │            │  │            │
-       │  ALB         │  │  ALB       │  │  ALB       │
-       │  ECS Tasks   │  │  ECS Tasks │  │  ECS Tasks │
-       └──────┬───────┘  └─────┬──────┘  └─────┬──────┘
-              │                │                │
-       ┌──────▼────────────────▼────────────────▼──────┐
-       │         DynamoDB Global Tables                 │
-       │                                                │
-       │  us-east-1 ◄──► eu-west-1 ◄──► ap-south-1    │
-       │      Replica       Replica        Replica      │
-       │                                                │
-       │  Replication lag: P50 < 1s, P99 < 3s          │
-       └────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Route53["Route 53 Global DNS<br/>• Latency-based routing to nearest healthy region<br/>• Health checks with 30s intervals"]
+    
+    Route53 --> USEast1
+    Route53 --> EUWest1
+    Route53 --> APSouth1
+    
+    subgraph USEast1 ["us-east-1"]
+        USEast1ALB["ALB"]
+        USEast1ECS["ECS Tasks"]
+        USEast1ALB --> USEast1ECS
+    end
+    
+    subgraph EUWest1 ["eu-west-1"]
+        EUWest1ALB["ALB"]
+        EUWest1ECS["ECS Tasks"]
+        EUWest1ALB --> EUWest1ECS
+    end
+    
+    subgraph APSouth1 ["ap-south-1"]
+        APSouth1ALB["ALB"]
+        APSouth1ECS["ECS Tasks"]
+        APSouth1ALB --> APSouth1ECS
+    end
+    
+    USEast1ECS --> DynamoDB
+    EUWest1ECS --> DynamoDB
+    APSouth1ECS --> DynamoDB
+    
+    subgraph DynamoDB ["DynamoDB Global Tables"]
+        ReplicaUS["us-east-1<br/>Replica"]
+        ReplicaEU["eu-west-1<br/>Replica"]
+        ReplicaAP["ap-south-1<br/>Replica"]
+        
+        ReplicaUS <--> ReplicaEU
+        ReplicaEU <--> ReplicaAP
+        ReplicaUS <--> ReplicaAP
+        
+        ReplicationLag["Replication lag: P50 < 1s, P99 < 3s"]
+    end
 ```
 
 Serverless event-driven architectures decouple producers from consumers through message queues and publish-subscribe topics. Lambda functions execute in response to events without managing server infrastructure, auto-scaling from zero to thousands of concurrent executions. SQS provides durable message queuing with at-least-once delivery guarantees. Producers send messages to the queue, which replicates them across multiple Availability Zones before acknowledging receipt. Consumers poll the queue, receiving batches of messages with a visibility timeout that prevents other consumers from processing the same messages concurrently. If processing fails, messages return to the queue after the visibility timeout expires, enabling automatic retry.

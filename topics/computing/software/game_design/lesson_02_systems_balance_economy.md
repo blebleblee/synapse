@@ -513,3 +513,4 @@ void update_positions(EntitySystem_DOD* system, float delta_time) {
 
 // Combat resolution: only touches combat-relevant data
 void resolve_combat(EntitySystem_DOD
+```

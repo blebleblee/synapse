@@ -42,41 +42,26 @@ The datum-to-fixturing translation follows directly. For a prismatic part fixtur
 
 The following diagram illustrates the signal path from drawing interpretation through to inspection:
 
-```
-Drawing FCF Analysis
-        │
-        ▼
-Datum Hierarchy Identification
-   (A → B → C priority)
-        │
-        ▼
-Datum-to-Fixture Mapping
-   (Face, bore, edge contacts)
-        │
-        ▼
-Operation Sequencing
-   (Establish datums first,
-    dependent features after)
-        │
-        ▼
-Machine Setup & Tramming
-   (DTI sweep of vise/fixture)
-        │
-        ▼
-Toolpath Execution (CAM)
-   (WCS aligned to DRF)
-        │
-        ▼
-In-Process Gauging
-   (Probe cycles, mic checks)
-        │
-        ▼
-Final CMM Inspection
-   (Verify against DRF)
-        │
-        ▼
-Balloon Chart Disposition
-   (Accept / Rework / Scrap)
+```mermaid
+flowchart TD
+    A["Drawing FCF Analysis"]
+    B["Datum Hierarchy Identification<br/>(A → B → C priority)"]
+    C["Datum-to-Fixture Mapping<br/>(Face, bore, edge contacts)"]
+    D["Operation Sequencing<br/>(Establish datums first,<br/>dependent features after)"]
+    E["Machine Setup & Tramming<br/>(DTI sweep of vise/fixture)"]
+    F["Toolpath Execution (CAM)<br/>(WCS aligned to DRF)"]
+    G["In-Process Gauging<br/>(Probe cycles, mic checks)"]
+    H["Final CMM Inspection<br/>(Verify against DRF)"]
+    I["Balloon Chart Disposition<br/>(Accept / Rework / Scrap)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
 ```
 
 ### Coordinate Measuring Machine Principles and Practice

@@ -75,19 +75,29 @@ A job in systemd's internal representation is a tuple of `(unit, operation)` whe
 
 After the job set is assembled, the transaction is validated for consistency. A transaction is inconsistent if it contains both a `start` and a `stop` job for the same unit with no way to resolve the conflict, or if its ordering constraints form a cycle. Cycles in ordering constraints are a configuration error that systemd detects and reports with a detailed conflict trace. The resolution algorithm attempts to merge conflicting jobs by promoting a `start` to override a conflicting `stop` when the requesting unit has sufficient priority, but if no consistent resolution is possible, the entire transaction is aborted and an error is reported before any unit state changes.
 
-```
-Activation Request: app-server.service
-│
-├─ Requires: postgresql.service → add job: start postgresql.service
-│   └─ Requires: network.target → add job: start network.target (already active, verify-active)
-│
-├─ After: postgresql.service → record ordering constraint
-├─ After: network-online.target → record ordering constraint
-│
-└─ Transaction:
-   [1] start network.target       (verify-active, already satisfied)
-   [2] start postgresql.service   (After: [1])
-   [3] start app-server.service   (After: [2])
+```mermaid
+flowchart TD
+    Start["Activation Request:<br/>app-server.service"]
+    
+    Start --> ReqPostgres["Requires: postgresql.service"]
+    Start --> AfterPostgres["After: postgresql.service"]
+    Start --> AfterNetOnline["After: network-online.target"]
+    
+    ReqPostgres --> AddJobPostgres["add job: start postgresql.service"]
+    AddJobPostgres --> ReqNetwork["Requires: network.target"]
+    ReqNetwork --> AddJobNetwork["add job: start network.target<br/>(already active, verify-active)"]
+    
+    AfterPostgres -.->|"ordering constraint"| Transaction
+    AfterNetOnline -.->|"ordering constraint"| Transaction
+    
+    subgraph Transaction["Transaction"]
+        T1["[1] start network.target<br/>(verify-active, already satisfied)"]
+        T2["[2] start postgresql.service<br/>(After: [1])"]
+        T3["[3] start app-server.service<br/>(After: [2])"]
+        
+        T1 --> T2
+        T2 --> T3
+    end
 ```
 
 Once the transaction is validated, jobs are dispatched to the job queue. The job runner processes jobs in dependency order, running all jobs whose ordering constraints are satisfied concurrently. This is the mechanism by which systemd achieves parallel activation: independent subgraphs in the dependency DAG produce independent jobs with no mutual ordering constraints, and the job runner dispatches them simultaneously.
@@ -106,18 +116,18 @@ Targets are the systemd equivalent of SysV runlevels, but they are architectural
 
 The standard boot sequence is itself a chain of targets, each representing a stable system state:
 
-```
-sysinit.target
-    │  (mounts, kernel modules, udev)
-    ▼
-basic.target
-    │  (timers, paths, local sockets)
-    ▼
-multi-user.target ──► network-online.target
-    │                        │
-    │                   (network stack fully configured)
-    ▼
-graphical.target
+```mermaid
+flowchart TD
+    SYSINIT["sysinit.target\n(mounts, kernel modules, udev)"]
+    BASIC["basic.target\n(timers, paths, local sockets)"]
+    MULTIUSER["multi-user.target"]
+    NETONLINE["network-online.target\n(network stack fully configured)"]
+    GRAPHICAL["graphical.target"]
+
+    SYSINIT --> BASIC
+    BASIC --> MULTIUSER
+    MULTIUSER --> NETONLINE
+    MULTIUSER --> GRAPHICAL
 ```
 
 This graph encodes the invariant that you cannot reach `multi-user.target` without passing through `basic.target`, and you cannot reach `basic.target` without `sysinit.target`. The targets act as ordering fences: any unit that declares `After=network-online.target` is guaranteed to start after all units that have propagated their completion into that target's activation.

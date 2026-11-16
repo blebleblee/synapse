@@ -46,32 +46,32 @@ Polarity indicators extend beyond component symbols into connector pinouts, test
 
 The following ASCII schematic fragment illustrates passive-active component integration in a common-emitter NPN amplifier with biasing network, AC coupling, and emitter degeneration:
 
-```
-        +12V
-         |
-         R1 (10kΩ)
-         |
-    +----+----+
-    |         |
-   C1        R2 (2.2kΩ)  ← Collector load
-  (10µF)      |
-    |      C--+
-   Vin      | / 
-    |      B |  Q1 (2N3904 NPN)
-    +-------|  
-            | \ E
-            +--+
-            |  |
-           R3  C2 (100µF)
-          (1kΩ) |
-            |   |
-           GND GND
-            
-R1 = Base bias divider
-C1 = AC coupling capacitor (blocks DC, passes AC)
-R2 = Collector load resistor
-R3 = Emitter degeneration resistor (stabilizes bias)
-C2 = Emitter bypass capacitor (AC ground at emitter)
+```mermaid
+flowchart TD
+    VCC["+12V Supply"]
+    R1["R1 — 10kΩ\nBase bias divider"]
+    R2["R2 — 2.2kΩ\nCollector load resistor"]
+    C1["C1 — 10µF\nAC coupling capacitor\n(blocks DC, passes AC)"]
+    VIN["Vin\n(AC input signal)"]
+    B["Q1 Base\n(2N3904 NPN)"]
+    C["Q1 Collector"]
+    E["Q1 Emitter"]
+    R3["R3 — 1kΩ\nEmitter degeneration resistor\n(stabilizes bias)"]
+    C2["C2 — 100µF\nEmitter bypass capacitor\n(AC ground at emitter)"]
+    GND1["GND"]
+    GND2["GND"]
+
+    VCC --> R1
+    VCC --> R2
+    R2 --> C["Q1 Collector"]
+    R1 --> B
+    C1 --> B
+    VIN --> C1
+    C --> E
+    E --> R3
+    E --> C2
+    R3 --> GND1
+    C2 --> GND2
 ```
 
 This topology demonstrates the hierarchical layering of passive and active components: resistors establish DC bias points, capacitors couple AC signals while blocking DC offsets, and the transistor amplifies the AC-coupled input signal.

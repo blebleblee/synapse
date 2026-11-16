@@ -1,420 +1,398 @@
 # Lesson 4: Melodic Contour Recognition & Reproduction
 
-## 1. First-Principles Intuition & Invariants
+## 1. Why Contour First — The Acoustic and Perceptual Reality
 
-Melodic contour—the shape a melody traces as it rises, falls, or stays level—is one of the most immediate and memorable features of music. Before you can recognize individual intervals or name specific pitches, your ear naturally tracks the *direction* and *shape* of a melodic line. Infants recognize contour before they recognize exact pitches; it is a fundamental perceptual anchor.
+Before you can name a major sixth or a minor third, your ear already knows whether a melody went up, down, or stayed put. Contour — the shape a line traces as pitch rises, falls, or repeats — is the first thing the auditory system extracts, and it's the fastest path into functional transcription and improvisation. Infants track contour months before they track exact intervals, and adult listeners misremember exact pitches constantly while almost never misremembering shape.
 
-**Core Acoustic Reality:**
-When a melody ascends, the frequency of successive pitches increases; when it descends, frequency decreases. Your cochlea and auditory cortex process these frequency changes as directional motion. Contour is the gestalt—the overall trajectory—independent of exact interval sizes or starting pitch.
+**The one paragraph of physics you need:** pitch is perceived frequency. Rising melody = increasing fundamental frequency reaching the cochlea's basilar membrane closer to its base (high-frequency end); falling melody = frequency decreasing, activating hair cells further toward the apex. Your brain's pitch-direction detectors respond to *relative* change in firing-rate location, not absolute frequency — which is exactly why contour survives transposition. Sing "Happy Birthday" in C, then in F: every interval's starting pitch changed, but the up-down-up-down shape is bit-for-bit identical. That invariance is the whole training opportunity. Stop there — you don't need cent values or Hz tables to use this; you need your voice and a keyboard.
 
-**Three Contour Primitives:**
-1. **Ascending:** Each successive pitch is higher (frequency increases).
-2. **Descending:** Each successive pitch is lower (frequency decreases).
-3. **Static (Repeated):** Successive pitches remain at the same frequency.
+**Three primitives, no more:**
+1. **↑ Ascending** — next pitch higher.
+2. **↓ Descending** — next pitch lower.
+3. **→ Static** — next pitch repeated.
 
-**Contour vs. Interval:**
-- **Contour** = *direction* and *shape* (up, down, arch, wave).
-- **Interval** = *distance* and *quality* (major third, perfect fifth).
+Every melody on earth is a sentence written in these three letters. Fluent contour readers parse the sentence in real time, the way fluent readers don't sound out each letter of a word.
 
-You can sing a melody in a different key and preserve its contour exactly while changing every interval's starting pitch. Contour is transposition-invariant; it is a topological feature, not a metric one.
+**Contour vs. interval — keep them separate in training, combine them in performance:**
 
-**Invariants for Ear Training:**
-- Contour is *easier* to perceive than exact intervals for most listeners.
-- Contour is *context-independent*: you can recognize the shape of "Somewhere Over the Rainbow" (octave leap up, step down, step down) in any key.
-- Contour encodes *emotional trajectory*: arching phrases suggest resolution; descending lines suggest relaxation or sadness; ascending lines build tension and excitement.
-
-**Practice Goal:**
-Train your ear to *track and reproduce* melodic contour in real time, independent of key or absolute pitch. This is the foundation for dictation, improvisation, and transcription.
+| | Contour | Interval |
+|---|---|---|
+| Answers | "Which way?" | "How far, what quality?" |
+| Invariant under | Transposition | Nothing (changes with every transposition of starting pitch, stays constant for quality) |
+| Learned first | Yes — by ear and by infants | No — requires reference-interval comparison |
+| Training tool | Hand gesture, solfège direction | Piano reference intervals, drone comparison |
 
 ---
 
 ## 2. Contour Vocabulary & Pattern Library
 
-### 2.1 Basic Two-Note Contours
+### 2.1 Two-Note Contours — The Atomic Unit
 
-| Contour Type | Symbol | Example (C reference) | Perception Cue |
-|--------------|--------|----------------------|----------------|
-| Ascending    | ↑      | C → E                | "Going up"     |
-| Descending   | ↓      | E → C                | "Going down"   |
-| Repeated     | →      | C → C                | "Same pitch"   |
+| Contour | Symbol | Example (C ref) | What you're listening for |
+|---|---|---|---|
+| Ascending | ↑ | C → E | Second note brighter, "lifted" |
+| Descending | ↓ | E → C | Second note "settles," heavier |
+| Repeated | → | C → C | No change in brightness at all |
 
-**Drill 1: Two-Note Contour Recognition**
-- Have a partner (or app) play random two-note pairs.
-- Respond *immediately* with ↑, ↓, or →.
-- Start with wide intervals (octaves, fifths) for 90%+ accuracy, then narrow to seconds and thirds.
-- Target: 95% accuracy at 120 pairs/session within two weeks.
+**Drill 1 — Two-Note Contour Sprint**
+- Partner or app plays random two-note pairs on piano or guitar, isolated, let ring 1 second each.
+- You call out ↑ / ↓ / → **within 1 second** of the second note sounding — speed matters as much as accuracy here, because real transcription doesn't wait for you.
+- **Progression:** octaves and fifths (Day 1–2) → fourths and thirds (Day 3–5) → seconds (Day 6–10).
+- **Metronome-anchored variant:** set 60 BPM, one pair every 2 beats, forcing an answer before the next pair starts.
+- **Target:** 95% accuracy over 120 pairs/session by end of week 2. Log your daily score — a simple tally sheet, not an app dashboard, keeps you honest.
+
+**Common trap:** narrow descending seconds (e.g., C→B) get misheard as repeated notes because the brightness change is subtle. Fix: sing the two notes yourself immediately after hearing them — your own vocal effort to drop a half step makes the direction undeniable.
 
 ---
 
 ### 2.2 Three-Note Contour Archetypes
 
-| Contour Name       | Symbol   | Example (C)       | Common Usage                  |
-|--------------------|----------|-------------------|-------------------------------|
-| Ascending Scale    | ↑↑       | C – D – E         | Uplifting, building energy    |
-| Descending Scale   | ↓↓       | E – D – C         | Resolving, relaxing           |
-| Arch (Up-Down)     | ↑↓       | C – E – D         | Question-answer, phrase peak  |
-| Valley (Down-Up)   | ↓↑       | E – C – D         | Bounce, syncopated feel       |
-| Ascending Leap     | ↑→       | C – G – G         | Stable arrival after leap     |
-| Descending Leap    | ↓→       | G – C – C         | Grounded, conclusive          |
-| Plateau High       | →↑       | E – E – G         | Delayed ascent, suspense      |
-| Plateau Low        | →↓       | E – E – C         | Settling after hold           |
+| Contour Name | Symbol | Example (C) | Phrase Function |
+|---|---|---|---|
+| Ascending Scale | ↑↑ | C–D–E | Builds energy, open-ended |
+| Descending Scale | ↓↓ | E–D–C | Resolves, relaxes |
+| Arch (Up-Down) | ↑↓ | C–E–D | Question→answer, local peak |
+| Valley (Down-Up) | ↓↑ | E–C–D | Bounce, pickup feel |
+| Ascending Leap-then-Hold | ↑→ | C–G–G | Arrival after a jump |
+| Descending Leap-then-Hold | ↓→ | G–C–C | Grounded, conclusive |
+| Plateau-then-Rise | →↑ | E–E–G | Delayed ascent, suspense |
+| Plateau-then-Fall | →↓ | E–E–C | Settling after a hold |
 
-**Drill 2: Three-Note Contour Dictation**
-1. Listen to a three-note melodic fragment.
-2. Sketch the contour on staff paper or a whiteboard (no need for exact pitches yet—just draw the shape).
-3. Sing it back, matching the contour but in *your own comfortable key*.
-4. Check: Does your sung contour match the played contour?
+**Drill 2 — Three-Note Dictation-to-Sing**
+1. Listen once, eyes closed, no pencil — just feel the shape.
+2. Sketch the contour as a simple line graph (peaks up, valleys down) — not staff notation yet.
+3. Sing the shape back in **your own comfortable range**, any key.
+4. Compare: did your sung direction-pattern match your sketch, and did your sketch match what you heard?
 
-**Progressive Routine:**
-- Week 1: 20 three-note patterns/day, mostly stepwise motion.
-- Week 2: Introduce one leap per pattern.
-- Week 3: Mix stepwise and leaping patterns randomly.
-- Target: 90% contour accuracy before moving to four-note patterns.
+**Progressive routine (daily, 10–15 min):**
+- **Week 1:** 20 patterns/day, stepwise only (seconds).
+- **Week 2:** introduce exactly one leap (third or larger) per pattern.
+- **Week 3:** random mix of stepwise and leaping.
+- **Gate to move on:** 90% contour accuracy before touching four-note patterns. Don't advance early — contour fluency compounds, and shaky three-note recognition will sabotage four-note work.
 
 ---
 
-### 2.3 Four-Note & Longer Contour Shapes
+### 2.3 Four-Note & Longer Shapes
 
-| Contour Name        | Symbol    | Example (C)           | Phrase Character              |
-|---------------------|-----------|-----------------------|-------------------------------|
-| Ascending Sequence  | ↑↑↑       | C – D – E – G         | Climactic, driving            |
-| Descending Sequence | ↓↓↓       | G – E – D – C         | Conclusive, final cadence     |
-| Arch Phrase         | ↑↑↓       | C – E – G – E         | Classical phrase shape        |
-| Inverted Arch       | ↓↓↑       | G – E – C – E         | Rebound, recovery             |
-| Wave (Up-Down-Up)   | ↑↓↑       | C – E – D – F         | Oscillating, playful          |
-| Wave (Down-Up-Down) | ↓↑↓       | E – C – D – A         | Syncopated, jazzy             |
-| Zigzag Ascending    | ↑↓↑       | C – E – D – F – E – G | Stepwise climb with backtracks|
-| Zigzag Descending   | ↓↑↓       | G – E – F – D – E – C | Stepwise descent with rebounds|
+| Contour Name | Symbol | Example (C) | Character |
+|---|---|---|---|
+| Ascending Sequence | ↑↑↑ | C–D–E–G | Climactic, driving |
+| Descending Sequence | ↓↓↓ | G–E–D–C | Conclusive, cadential |
+| Arch Phrase | ↑↑↓ | C–E–G–E | Classical period shape (think Mozart) |
+| Inverted Arch | ↓↓↑ | G–E–C–E | Rebound, recovery |
+| Wave Up-Down-Up | ↑↓↑ | C–E–D–F | Oscillating, playful |
+| Wave Down-Up-Down | ↓↑↓ | E–C–D–A | Syncopated, jazzy |
 
-**Landmark Melodies by Contour:**
-- **"Somewhere Over the Rainbow"**: ↑ (octave) ↓ ↓ → (iconic arch)
-- **"Twinkle Twinkle Little Star"**: → ↑ → ↑ → ↑ ↓ (repeated notes with stepwise motion)
-- **"My Bonnie Lies Over the Ocean"**: ↑ (major sixth) ↓ ↓ → (wide leap, gentle descent)
-- **Beethoven's 5th motif**: ↓ ↓ ↓ → (three repeated notes, descending step)
+**Landmark melodies as contour fingerprints** — memorize these as reference shapes you can recall instantly:
+- **"Somewhere Over the Rainbow":** → ↑(octave) ↓ ↓ → — huge leap, then settle down stepwise.
+- **"Twinkle Twinkle Little Star":** → ↑ → ↑ → ↑ ↓ — repeated-note pairs climbing by step.
+- **"My Bonnie Lies Over the Ocean":** ↑(major 6th) ↓ ↓ → — wide leap, gentle stepwise descent.
+- **Beethoven's 5th motif:** → → ↓ — plateau then a single decisive drop.
 
-**Drill 3: Contour-to-Pitch Dictation**
+Use these as **anchor shapes**: when a new melody's opening contour resembles one of these, you can borrow the interval feel (e.g., "this leap feels like the Rainbow octave, not the Bonnie sixth — it's bigger").
+
+**Drill 3 — Contour-to-Pitch Dictation**
 1. Listen to a 4–6 note melody.
-2. Draw the contour shape on paper (peaks and valleys).
-3. Sing the contour back in your range.
-4. *Now* identify the starting pitch and notate exact pitches.
-5. Check against the original.
+2. Sketch contour only (peaks/valleys, no pitches).
+3. Sing contour back in your range.
+4. *Now* find the starting pitch on a keyboard.
+5. Map scale degrees onto your contour sketch (1-3-5, 1-2-3, etc.).
+6. Check against source.
 
-**Metronome-Anchored Practice:**
-- 60 BPM: One note per beat, simple stepwise contours.
-- 80 BPM: Introduce one leap per phrase.
-- 100 BPM: Mixed stepwise and leaping, up to 8 notes.
-- 120 BPM: Real-time dictation from simple folk melodies.
+**Metronome-anchored practice ladder:**
+- **60 BPM** — one note per beat, pure stepwise, 4 notes.
+- **80 BPM** — one leap per phrase allowed, 4–5 notes.
+- **100 BPM** — mixed stepwise/leaping, up to 8 notes.
+- **120 BPM** — real-time dictation from actual folk melodies, no pausing the recording.
 
 ---
 
-## 3. Hands-On Contour Singing & Dictation Drills
+## 3. Hands-On Singing & Dictation Technique
 
 ### 3.1 Contour Solfège (Movable Do)
 
-**Why Solfège:**
-Solfège syllables give you a verbal handle on contour and scale degrees simultaneously. In movable-do systems, "Do" is always the tonic, so contour and tonal function align.
+Solfège gives contour a voice. In movable-do, **Do is always the tonic**, so the syllable itself encodes scale-degree function while the direction you sing it encodes contour — two layers of information in one vocal gesture.
 
-**Core Syllables:**
-- **Do Re Mi Fa Sol La Ti Do** (ascending major scale)
-- **Do Ti La Sol Fa Mi Re Do** (descending major scale)
+**Ascending major scale:** Do Re Mi Fa Sol La Ti Do
+**Descending major scale:** Do Ti La Sol Fa Mi Re Do
 
-**Contour Solfège Drill:**
-1. Sing ascending Do-Re-Mi (↑↑).
-2. Sing descending Mi-Re-Do (↓↓).
-3. Sing arch contour Do-Mi-Re (↑↓).
-4. Sing valley contour Mi-Do-Re (↓↑).
-5. Randomize starting pitch and repeat 10 cycles.
+**Keyboard reference, C major = Do:**
 
-**Keyboard Reference (C Major as Do):**
-- Do = C, Re = D, Mi = E, Fa = F, Sol = G, La = A, Ti = B
+| Do | Re | Mi | Fa | Sol | La | Ti | Do |
+|---|---|---|---|---|---|---|---|
+| C | D | E | F | G | A | B | C |
 
-**No Keyboard? Use Your Voice:**
-Hum any comfortable pitch as "Do" and sing the contour patterns. The goal is *relative* pitch motion, not absolute pitch accuracy.
+**Drill — Contour Solfège Cycle** (no keyboard required — hum any pitch as Do):
+1. Sing Do-Re-Mi (↑↑).
+2. Sing Mi-Re-Do (↓↓).
+3. Sing Do-Mi-Re (↑↓, the arch).
+4. Sing Mi-Do-Re (↓↑, the valley).
+5. Pick a new random "Do" pitch in your range, repeat all four. Ten full cycles per session.
+
+The goal is **relative** motion. If your "Do" drifts a quarter-tone over ten cycles, that's fine — you're training shape recognition, not absolute pitch memory.
 
 ---
 
 ### 3.2 Physical Gesture Anchoring
 
-**Hand Height = Pitch Height:**
-As you sing or listen to a melody, move your hand vertically in space to trace the contour:
-- **Rising melody:** Raise your hand smoothly.
-- **Falling melody:** Lower your hand smoothly.
-- **Repeated note:** Hold your hand steady.
+**The rule: hand height tracks pitch height, in real time, no exceptions.**
 
-**Why This Works:**
-Kinesthetic reinforcement activates motor cortex and spatial reasoning, deepening pitch-direction perception. Many conductors and vocal coaches use this technique instinctively.
+- Rising melody → hand rises smoothly, not in steps.
+- Falling melody → hand falls smoothly.
+- Repeated note → hand holds dead still.
 
-**Drill 4: Gesture + Sing**
-1. Play a simple melody (e.g., "Mary Had a Little Lamb").
-2. Trace the contour with your hand while singing along.
-3. Play the melody again *without singing*, tracing with your hand.
-4. Sing the melody back *from memory*, guided by your hand gesture alone.
-5. Check accuracy by playing the original.
+This isn't a gimmick — conductors use exactly this gesture vocabulary, and it works because it recruits motor cortex and proprioception to reinforce an auditory judgment, giving you two independent channels agreeing on the same answer. When the two channels disagree (your hand says up, your ear says down), that mismatch is diagnostic: it tells you your ear anticipated wrong and you should re-listen.
 
----
+**Drill 4 — Gesture-Then-Sing Memory Chain**
+1. Play a known simple tune ("Mary Had a Little Lamb").
+2. Trace contour with your hand *while singing along* — calibration pass.
+3. Play again, **no singing**, hand-trace only.
+4. Sing the tune back *from memory*, letting your hand gesture lead your voice.
+5. Play the original once more and check your reproduction against it.
 
-### 3.3 Contour Dictation Progressive Routine
-
-**Week-by-Week Plan:**
-
-| Week | Duration (min/day) | Focus                              | Accuracy Target |
-|------|--------------------|------------------------------------|-----------------|
-| 1    | 10                 | Two-note ↑↓→ recognition          | 95%             |
-| 2    | 15                 | Three-note stepwise contours       | 90%             |
-| 3    | 15                 | Three-note contours with one leap  | 85%             |
-| 4    | 20                 | Four-note contours, mixed intervals| 80%             |
-| 5    | 20                 | Five-note phrases from folk songs  | 75%             |
-| 6    | 25                 | Six-note phrases, real-time singing| 70%             |
-| 7–8  | 30                 | Full 8-bar melodies, contour first | 70%             |
-
-**Tools:**
-- **Apps:** EarMaster, Teoria.com (contour drills), musictheory.net
-- **Partner Practice:** One person plays, the other sings back and sketches contour.
-- **Self-Recording:** Record yourself singing a contour, then check against the source.
+This builds the gesture into a retrievable memory cue independent of audio playback — exactly what you need in a live dictation exam or when transcribing from a recording you can't pause mid-phrase.
 
 ---
 
-### 3.4 Real-World Transcription Workflow
+### 3.3 Eight-Week Progressive Routine
 
-**Step-by-Step Contour-First Dictation:**
-
-1. **Listen Once (No Pencil):**  
-   Focus *only* on the overall shape. Is it rising, falling, arching, wave-like?
-
-2. **Sketch the Contour (Second Listen):**  
-   Draw peaks, valleys, and plateaus on scratch paper. Don't worry about exact pitches yet.
-
-3. **Sing It Back (Third Listen):**  
-   Match the contour in your comfortable range. Does your sketch match what you sang?
-
-4. **Identify Starting Pitch (Fourth Listen):**  
-   Use a keyboard or tuner to find the first note.
-
-5. **Map Contour to Scale Degrees (Fifth Listen):**  
-   Now that you know the key, sing solfège syllables or number the scale degrees (1-2-3-4-5-6-7-1).
-
-6. **Notate Exact Pitches (Sixth Listen):**  
-   Write the melody on staff paper, checking rhythm and articulation.
-
-7. **Play Back & Verify:**  
-   Play your transcription. Does it match the original?
-
-**Common Failure Modes & Fixes:**
-
-| Failure Mode                          | Symptom                          | Fix                                                                 |
-|---------------------------------------|----------------------------------|---------------------------------------------------------------------|
-| Mixing up small vs. large leaps       | ↑ is correct but interval wrong  | Sing the leap slowly; compare to known intervals (3rd vs. 5th)     |
-| Missing repeated notes                | Hear ↑ when it's actually →↑     | Tap each note onset; count how many times you tap the same pitch   |
-| Losing track after 4+ notes           | Can't remember the middle        | Break into two-note chunks; chain them together incrementally      |
-| Confusing rhythm with contour         | Hear syncopation as pitch change | Clap the rhythm separately; sing the pitches on a neutral syllable |
-
----
-
-## 4. Applied Contour Analysis: Song Examples
-
-### 4.1 "Happy Birthday" (Contour + Solfège)
-
-**Key: C Major (Do = C)**
-
-```
-Phrase 1: "Happy birthday to you"
-C  C  D  C  F  E
-Do Do Re Do Fa Mi
-→  ↑  ↓  ↑  ↓
+```mermaid
+flowchart LR
+    subgraph wk12 ["Weeks 1-2: Atoms"]
+        A1["2-note ↑↓→<br/>95% target"] --> A2["3-note stepwise<br/>90% target"]
+    end
+    subgraph wk34 ["Weeks 3-4: Leaps"]
+        B1["3-note w/ one leap<br/>85% target"] --> B2["4-note mixed<br/>80% target"]
+    end
+    subgraph wk56 ["Weeks 5-6: Phrases"]
+        C1["5-note folk phrases<br/>75% target"] --> C2["6-note real-time sing<br/>70% target"]
+    end
+    subgraph wk78 ["Weeks 7-8: Fluency"]
+        D1["Full 8-bar melodies<br/>contour-first"] --> D2["70% target,<br/>sustained"]
+    end
+    wk12 --> wk34 --> wk56 --> wk78
 ```
 
-**Contour:** Repeated, up, down, up, down (arch with repeated start).
+| Week | Min/day | Focus | Accuracy Gate |
+|---|---|---|---|
+| 1 | 10 | Two-note ↑↓→ | 95% |
+| 2 | 15 | Three-note stepwise | 90% |
+| 3 | 15 | Three-note + one leap | 85% |
+| 4 | 20 | Four-note, mixed intervals | 80% |
+| 5 | 20 | Five-note folk phrases | 75% |
+| 6 | 25 | Six-note, real-time singing | 70% |
+| 7–8 | 30 | Full 8-bar melodies | 70% sustained |
 
-**Sing-Through:**
-1. Sing "Happy birthday to you" in C.
-2. Sing it in G (Do = G): G G A G C B.
-3. Sing it in F (Do = F): F F G F Bb A.
-4. Notice: The contour (→↑↓↑↓) is *identical* in all three keys.
+**Tools:** EarMaster and Teoria.com both have randomized contour-only drill modes — use them for Drill 1 and 2 so you're not depending on a human partner for repeatable, graded reps. For Weeks 5+, switch to real recordings (folk melodies, pop choruses) because algorithmic drill content doesn't carry the phrasing irregularities of real music.
 
 ---
 
-### 4.2 "Somewhere Over the Rainbow" (Opening Leap)
+## 4. Real-World Transcription Workflow
 
-**Key: C Major**
+This is the sequence to run on *any* melody you're trying to learn by ear — a solo, a bassline, a vocal hook.
+
+1. **Listen once, no pencil.** Only question: rising, falling, arching, or wave-like overall?
+2. **Sketch contour on second listen.** Peaks and valleys as a line graph. Ignore exact pitch entirely.
+3. **Sing it back on third listen.** Match shape in your own range. Does your sung shape match your sketch?
+4. **Find the starting pitch on fourth listen.** Keyboard or tuner, just note 1.
+5. **Map scale degrees on fifth listen.** Now that you have a key, sing numbers (1-2-3-4-5...) or solfège against your contour sketch.
+6. **Notate exact pitches and rhythm on sixth listen.** Staff paper, real durations.
+7. **Play back and verify** against the source — loop the original and your transcription back to back.
+
+### Failure Modes & Fixes
+
+| Symptom | Likely Cause | Fix |
+|---|---|---|
+| Direction right, interval size wrong | Confusing adjacent interval sizes (3rd vs 5th) | Sing the leap slowly, bridge through the passing scale degree, compare to a known reference song interval |
+| Hear ↑ when it's actually →↑ | Missed a repeated-note onset | Tap your finger on every note onset you hear, count taps on the same pitch before judging direction |
+| Lose the thread after note 4 | Working memory overload | Chunk into overlapping pairs: judge (1→2), then (2→3), then (3→4), chain results instead of holding the whole phrase |
+| Hear syncopation as a pitch change | Rhythm and pitch judgments conflated | Clap the rhythm alone first, then sing pitches on a neutral "la," never judge both at once |
+
+---
+
+## 5. Applied Analysis: Four Real Melodies
+
+### 5.1 "Happy Birthday" — Contour Stays Fixed Across Keys
 
 ```
-"Some - where    o   -   ver the rain - bow"
-C      C        C↑(octave) Bb   A   G   F
-Do     Do       Do↑       ↓Ti  ↓La ↓Sol ↓Fa
-→      ↑(large) ↓         ↓    ↓   ↓
+Key of C:           C   C   D   C   F   E
+Solfège:             Do  Do  Re  Do  Fa  Mi
+Contour:               →   ↑   ↓   ↑   ↓
 ```
 
-**Contour:** Repeated note, huge leap up (octave), then stepwise descent (arch).
+**Transposition check — sing all three, same contour every time:**
+- **C:** C C D C F E
+- **G:** G G A G C B
+- **F:** F F G F Bb A
 
-**Practice:**
-- Sing the opening octave leap in multiple keys (C, D, E♭).
-- Focus on the *feeling* of the large leap, not the letter names.
-- Sketch the contour before singing.
+Sing all three back to back. The *letter names* change completely; the →↑↓↑↓ shape never does. This is the single clearest proof you can give yourself that contour is a real, separate perceptual object from interval.
 
----
-
-### 4.3 Beethoven's 5th Symphony (Motif)
-
-**Key: C minor**
+### 5.2 "Somewhere Over the Rainbow" — The Octave Leap Signature
 
 ```
-G  G  G  E♭
-Sol Sol Sol Mi♭
-→  →  ↓
+"Some - where      o    -   ver the rain - bow"
+C        C       C(+8ve)    Bb   A    G    F
+Do       Do       Do          Ti   La   Sol  Fa
+  →          ↑(leap)            ↓    ↓    ↓    ↓
 ```
 
-**Contour:** Three repeated notes (rhythmically accented), then descending leap (major third down).
+Contour: repeated note, massive leap up, then unbroken stepwise descent — an arch with an exaggerated front edge. **Practice:** sing the octave leap in C, then D, then Eb, focusing entirely on the physical sensation of the jump (breath support increase, laryngeal adjustment) rather than landing on "correct" letter names. Sketch the contour before you ever sing a pitch name.
 
-**Ear Training Insight:**
-The repeated notes create rhythmic drive; the descending leap provides resolution. This is a **plateau-then-drop** contour, iconic for creating tension-release in a minimal gesture.
-
----
-
-## 5. Advanced Contour Techniques
-
-### 5.1 Compound Contour (Melodic Sequence)
-
-A **melodic sequence** is a contour pattern repeated at different pitch levels. The *internal* contour stays the same, but the overall trajectory can be ascending or descending.
-
-**Example: Ascending Sequence (Vivaldi "Spring")**
+### 5.3 Beethoven's 5th — Plateau-Then-Drop
 
 ```
-Pattern A: C  D  E  (↑↑)
-Pattern B: D  E  F♯ (↑↑) — same contour, up a step
-Pattern C: E  F♯ G♯ (↑↑) — same contour, up another step
+G    G    G    Eb
+Sol  Sol  Sol  Mi♭
+  →    →    ↓
 ```
 
-**Drill 5: Sequence Recognition**
-1. Listen to a melodic sequence.
-2. Identify the *internal* contour of the repeating unit (e.g., ↑↑).
-3. Identify the *sequence direction* (is the whole pattern ascending, descending, or static?).
-4. Sing the sequence back, transposing the pattern yourself.
+Three repeated notes build rhythmic tension (accented, short-short-short-LONG rhythmically), then a descending major third releases it. This is the most economical tension-release gesture in the classical repertoire — one plateau, one drop. Listen for this exact shape; it recurs constantly in riff-based rock and film scoring.
+
+### 5.4 "My Bonnie Lies Over the Ocean" — Wide Leap, Gentle Resolve
+
+```
+F         F         D          C      Bb     A
+Fa        Fa(+6th)   Re          Do     Ti     La
+  →         ↑(leap)    ↓           ↓      ↓      ↓
+```
+
+Contrast this leap against the Rainbow octave: both open with a repeated note then a big upward leap, but the Bonnie leap (major 6th) feels noticeably smaller and less dramatic than the octave. **Drill:** sing Rainbow's opening leap immediately followed by Bonnie's opening leap, back to back, several times — training your ear to discriminate leap *size* within the same contour shape (↑ after →) is the bridge exercise into full interval training.
 
 ---
 
-### 5.2 Contour Inversion
+## 6. Advanced Contour Techniques
 
-**Definition:**  
-Inverting a contour means flipping all ascending intervals to descending (and vice versa) while preserving interval sizes.
+### 6.1 Melodic Sequence — Repeated Contour at Shifting Pitch Levels
 
-**Example:**
+A sequence repeats the *same internal contour* starting from a new pitch each time. The internal shape is constant; the overall trajectory across repetitions can itself be ascending, descending, or static.
 
-| Original Contour | C → E → D (↑↓) |
-|------------------|----------------|
-| Inverted Contour | C → A♭ → B♭ (↓↑) |
+**Vivaldi "Spring," opening violin figure:**
+```
+Unit A: C  D  E   (↑↑)
+Unit B: D  E  F♯  (↑↑)  — same shape, whole step higher
+Unit C: E  F♯ G♯  (↑↑)  — same shape, another whole step higher
+```
 
-**Perception Drill:**
-- Sing a simple three-note ascending contour (C–D–E).
-- Sing its inversion (C–B♭–A♭).
-- Notice how the emotional character flips: major to minor, bright to dark.
+**Drill 5 — Sequence Recognition**
+1. Listen to a sequence passage.
+2. Identify the internal (unit) contour — here, ↑↑.
+3. Identify the sequence-level trajectory — is each repetition landing higher, lower, or at the same pitch level as the last?
+4. Sing the sequence back, transposing the unit yourself by ear — this is functionally improvisation practice disguised as dictation.
 
----
+### 6.2 Contour Inversion
 
-### 5.3 Contour Augmentation & Diminution
+Inverting a contour flips every ascending motion to descending (and vice versa), typically preserving interval *size* while reversing direction.
 
-**Augmentation:** Stretch the rhythm while preserving contour.  
-**Diminution:** Compress the rhythm while preserving contour.
+| | Pitches | Contour |
+|---|---|---|
+| Original | C → E → D | ↑↓ |
+| Inverted | C → A♭ → B♭ | ↓↑ |
 
-**Example:**
-- Original: C (quarter) → E (quarter) → D (quarter)
-- Augmented: C (half) → E (half) → D (half)
-- Diminished: C (eighth) → E (eighth) → D (eighth)
+**Drill:** sing C–D–E (↑↑, bright, major). Sing its inversion C–Bb–Ab (↓↓, immediately darker). The pitch *material* is nearly unrelated, but the gesture inversion alone flips the emotional read from ascending/bright to descending/dark. This is the ear-training counterpart to writing invertible counterpoint — useful the moment you start composing countermelodies or bass lines that answer a melodic phrase.
 
-**Why It Matters:**
-Contour remains perceptually salient even when rhythm changes drastically. This is why you can recognize a melody played twice as fast or twice as slow.
+### 6.3 Augmentation & Diminution — Contour Survives Tempo Change
 
----
+| Version | Rhythm | Pitches |
+|---|---|---|
+| Original | quarter-quarter-quarter | C–E–D |
+| Augmented (2x slower) | half-half-half | C–E–D |
+| Diminished (2x faster) | eighth-eighth-eighth | C–E–D |
 
-## 6. Diagnostic Self-Assessment
-
-**Contour Mastery Checklist:**
-
-- [ ] I can identify ↑↓→ in two-note pairs with 95%+ accuracy.
-- [ ] I can sketch the contour of a 4-note melody before identifying exact pitches.
-- [ ] I can sing back a 6-note melody in my own key, preserving contour.
-- [ ] I can dictate an 8-bar folk melody using contour-first workflow.
-- [ ] I can recognize melodic sequences and sing the repeating contour pattern.
-- [ ] I can invert a simple contour and hear the emotional transformation.
-- [ ] I use hand gestures to trace contour while listening and improve my accuracy.
-
-**If You're Stuck:**
-- **Can't hear direction:** Start with extremely wide intervals (octaves, fifths) and gradually narrow.
-- **Can't remember 4+ notes:** Break into overlapping two-note pairs (notes 1-2, then 2-3, then 3-4).
-- **Confusing rhythm and pitch:** Practice rhythm and pitch separately; clap, then sing.
+The contour symbol (↑↓) never changes across all three. This is why you recognize a theme instantly whether a composer states it in long notes (augmentation, common in fugal expositions) or doubles its speed (diminution, common in development sections). **Drill:** have a partner play a 4-note contour at three different tempos (60, 120, 240 BPM) in random order — your job is only to confirm it's the *same* shape each time, ignoring tempo entirely.
 
 ---
 
-## 7. Integration with Interval & Harmony Training
+## 7. Diagnostic Self-Assessment
 
-**Contour ≠ Interval (But They're Best Friends):**
-- **Contour** tells you *where* the melody is going (shape).
-- **Interval** tells you *how far* it's going (distance).
+```mermaid
+flowchart TD
+    subgraph gate1 ["Gate 1: Atoms"]
+        g1["95%+ on 2-note ↑↓→?"]
+    end
+    subgraph gate2 ["Gate 2: Shapes"]
+        g2["Sketch 4-note contour<br/>before naming pitches?"]
+    end
+    subgraph gate3 ["Gate 3: Memory"]
+        g3["Sing back 6-note melody<br/>in own key, contour intact?"]
+    end
+    subgraph gate4 ["Gate 4: Transcription"]
+        g4["Dictate 8-bar folk melody<br/>contour-first workflow?"]
+    end
+    subgraph gate5 ["Gate 5: Advanced"]
+        g5["Recognize sequences +<br/>hear inversion's mood flip?"]
+    end
+    g1 --> g2 --> g3 --> g4 --> g5
+```
 
-**Training Progression:**
-1. **Weeks 1–2:** Pure contour (direction only).
-2. **Weeks 3–4:** Contour + interval quality (major vs. minor third).
-3. **Weeks 5–6:** Contour + exact interval size (major third, perfect fifth, etc.).
-4. **Weeks 7–8:** Contour + harmonic context (does the melody outline a chord?).
+**Checklist:**
+- [ ] 95%+ on two-note ↑↓→ pairs.
+- [ ] Can sketch a 4-note contour before identifying exact pitches.
+- [ ] Can sing back a 6-note melody in my own key, contour intact.
+- [ ] Can dictate an 8-bar folk melody using the contour-first workflow.
+- [ ] Can spot a melodic sequence and sing its repeating unit.
+- [ ] Can invert a simple contour and hear the mood flip from bright to dark.
+- [ ] Use hand gestures while listening, and it measurably improves my accuracy.
 
-**Contour in Harmonic Context:**
-- Melodies often trace chord tones (1-3-5) or neighbor tones (stepwise motion).
-- Recognizing contour helps you *anticipate* harmonic function: ascending lines often lead to dominant; descending lines often resolve to tonic.
-
----
-
-## 8. Practice Plan Summary (Daily 20-Minute Block)
-
-**Minutes 0–5: Warm-Up**
-- Sing major scale ascending/descending (Do-Re-Mi-Fa-Sol-La-Ti-Do-Ti-La-Sol-Fa-Mi-Re-Do).
-- Sing simple two-note contours (↑↓→) in random order.
-
-**Minutes 5–12: Contour Dictation Drill**
-- Use app or partner to play 10 three-to-four-note melodic fragments.
-- Sketch contour, sing back, check accuracy.
-- Track success rate in a notebook.
-
-**Minutes 12–17: Song Transcription**
-- Pick one 8-bar folk melody or pop chorus.
-- Apply contour-first transcription workflow (sketch shape, sing, identify pitches).
-
-**Minutes 17–20: Review & Correction**
-- Play back your transcription.
-- Circle errors, diagnose failure mode (rhythm? interval? starting pitch?).
-- Re-sing the corrected version three times.
+**Troubleshooting:**
+- **Can't hear direction at all:** restart Drill 1 at octaves/fifths only, don't touch seconds until two straight sessions at 95%.
+- **Can't hold 4+ notes in memory:** use the overlapping-pair chunking method from Section 4's failure-mode table — stop trying to hold the whole phrase at once.
+- **Confusing rhythm and pitch:** split every drill into two passes — clap rhythm only, then sing pitch only on a neutral syllable.
 
 ---
 
-## 9. Recommended Tools & Resources
+## 8. Integration With Interval & Harmony Training
 
-**Software & Apps:**
-- **EarMaster:** Comprehensive ear training with contour recognition modules.
-- **Teoria.com:** Free browser-based contour and interval drills.
-- **musictheory.net:** Staff-based melodic dictation exercises.
-- **Functional Ear Trainer (Android/iOS):** Focuses on scale degrees and contour in tonal context.
+**Contour tells you *where*; interval tells you *how far*.** They're trained separately but used together instantly in real transcription.
 
-**Method Books:**
-- *Ear Training for the Contemporary Musician* by Keith Wyatt & Carl Schroeder (Berklee Press)
-- *The Musician's Guide to Aural Skills* by Joel Phillips, Jane Piper Clendinning, Elizabeth West Marvin
-- *Practica Musica* software (comprehensive drill suite)
+**Eight-week integration arc:**
+1. **Weeks 1–2:** Pure contour, direction only (this lesson).
+2. **Weeks 3–4:** Contour + interval *quality* — is the leap major or minor sounding?
+3. **Weeks 5–6:** Contour + exact interval *size* — major third vs. perfect fifth, confirmed against reference melodies.
+4. **Weeks 7–8:** Contour + harmonic context — does the melody outline a chord (1-3-5 arpeggiation) or move by scale step (neighbor/passing tones)?
 
-**YouTube Channels:**
-- **Seth Monahan** (Music Theory and Aural Skills tutorials)
-- **Rick Beato** ("Ear Training" series with real-world examples)
-- **David Bennett Piano** (Melodic analysis and contour discussions)
-
-**Partner Practice:**
-- Form a practice duo: one person plays/improvises short melodies on keyboard or guitar, the other sings back and sketches contour.
-- Swap roles every 10 minutes.
+**Harmonic payoff:** melodies built from leaps usually trace chord tones; melodies built from steps usually fill in between them. Recognizing "this is a leaping contour" during dictation is your cue to test chord-tone hypotheses (1-3-5, 1-3-5-3) before falling back to interval-by-interval guessing. Recognizing "this is a stepwise contour" cues you to think scale degrees and passing/neighbor motion instead. Ascending contours frequently build toward dominant harmony; descending contours frequently resolve toward tonic — not a rule, but a strong enough tendency to use as a working hypothesis while you transcribe.
 
 ---
 
-## 10. Conclusion: From Contour to Musical Fluency
+## 9. Daily 20-Minute Practice Block
 
-Melodic contour is the backbone of musical memory and the gateway to advanced aural skills. By training your ear to *feel* the shape of a melody before dissecting its intervals, you develop an intuitive, gestalt-level understanding that accelerates transcription, improvisation, and composition.
+```mermaid
+flowchart LR
+    subgraph block ["Daily 20-Min Session"]
+        p1["0-5 min<br/>Scale + 2-note<br/>contour warm-up"] --> p2["5-12 min<br/>3-4 note contour<br/>dictation x10"]
+        p2 --> p3["12-17 min<br/>8-bar song<br/>transcription"]
+        p3 --> p4["17-20 min<br/>Playback, diagnose,<br/>re-sing 3x"]
+    end
+```
 
-**Next Steps:**
-- Once you achieve 80%+ accuracy on four-note contours, move to **Lesson 5: Interval Recognition & Singing** to refine *how far* each contour step travels.
-- Integrate contour training into your daily instrument practice: when learning a new piece, sketch its contour first, sing it, *then* play it. This ear-to-hand feedback loop is the fastest path to musical fluency.
+**0–5 min — Warm-up:** Sing full major scale ascending then descending in solfège. Then 10 random two-note contours (↑↓→), called out instantly.
 
-**Remember:**
-Music is motion. Contour is the map. Train your ear to follow the map, and you'll never get lost in the sonic landscape.
+**5–12 min — Contour dictation:** App or partner plays 10 three-to-four-note fragments. Sketch, sing back, score accuracy, log the number.
+
+**12–17 min — Song transcription:** One 8-bar folk melody or pop chorus, full contour-first workflow from Section 4.
+
+**17–20 min — Review:** Play back your transcription against source. Identify the specific failure mode using the Section 4 table (interval size? missed repeat? rhythm bleed?). Re-sing the corrected phrase three times before closing the session.
+
+---
+
+## 10. Recommended Tools & Resources
+
+**Software:**
+- **EarMaster** — dedicated contour-recognition modules, graded difficulty.
+- **Teoria.com** — free browser-based contour and interval drills.
+- **musictheory.net** — staff-based melodic dictation.
+- **Functional Ear Trainer** (Android/iOS) — scale-degree and contour drills in tonal context.
+
+**Method books:**
+- *Ear Training for the Contemporary Musician* — Keith Wyatt & Carl Schroeder (Berklee Press)
+- *The Musician's Guide to Aural Skills* — Phillips, Clendinning, Marvin
+
+**Partner practice protocol:** one person improvises or plays short phrases on keyboard/guitar, the other sketches contour and sings back — swap roles every 10 minutes. This forces you to both produce and recognize contour in the same session, which trains the gesture-to-sound mapping in both directions.
+
+---
+
+## 11. Next Steps
+
+Once you hold 80%+ accuracy on four-note contours across a full week, move to **Lesson 5: Interval Recognition & Singing**, where you attach exact distances to the directions you've already mastered.
+
+Build contour sketching into your regular instrument practice independent of ear-training sessions: before learning a new piece from notation or recording, sketch its contour, sing it, *then* play it. That ear-to-hand loop — hear shape, voice shape, execute shape on the instrument — is the fastest route from passive listening to fluent, confident transcription.

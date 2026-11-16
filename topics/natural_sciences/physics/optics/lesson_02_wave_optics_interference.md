@@ -132,38 +132,61 @@ $$\phi(x, y) = \arctan\left( \frac{I_4 - I_2}{I_1 - I_3} \right)$$
 
 This technique achieves phase measurement accuracy of $\lambda/100$ or better, enabling nanometer-scale surface profilometry and wavefront characterization.
 
+```mermaid
+flowchart LR
+    subgraph params ["Optical Parameters"]
+        direction TB
+        P1["λ = 632.8 nm"]
+        P2["d = 0.3 mm (slit separation)"]
+        P3["a = 0.05 mm (slit width)"]
+        P4["L = 2 m (screen distance)"]
+    end
+
+    subgraph results ["Expected Results"]
+        direction TB
+        R1["Fringe spacing: Δy = λL/d = 4.2 mm"]
+        R2["First single-slit minimum: y_min = λL/a = 25.3 mm"]
+    end
+
+    subgraph optical_path ["Optical Configuration for Double-Slit Interference Measurement"]
+        direction LR
+        A["Laser\n(HeNe)"]
+        B["Spatial Filter\n(pinhole)"]
+        C["Collimating Lens\n(f = 100 mm)"]
+        D["Double Slit\n(d, a)"]
+        E["Screen / Detector\n(L = 2 m)"]
+
+        A --> B --> C --> D --> E
+    end
+
+    params -. governs .-> optical_path
+    optical_path -. produces .-> results
 ```
-Optical Configuration for Double-Slit Interference Measurement
 
-Laser ──> Spatial Filter ──> Collimating Lens ──> Double Slit ──> Screen/Detector
-(HeNe)       (pinhole)          (f = 100 mm)        (d, a)        (L = 2 m)
-
-Parameters:
-  λ = 632.8 nm
-  d = 0.3 mm (slit separation)
-  a = 0.05 mm (slit width)
-  L = 2 m (screen distance)
-
-Expected fringe spacing: Δy = λL/d = 4.2 mm
-First single-slit minimum: y_min = λL/a = 25.3 mm
-```
-
-```
-Michelson Interferometer for Coherence Length Measurement
-
-                Fixed Mirror (M1)
-                      ↑
-                      |
-                      |
-Light Source ─> Beamsplitter ─> Detector
-                      |
-                      |
-                      ↓
-                Movable Mirror (M2, precision stage)
-
-Path difference: ΔL = 2|L₂ - L₁|
-Record visibility V(ΔL) as M2 translates
-Fit to V(ΔL) = exp(-ΔL/Lc) to extract coherence length Lc
+```mermaid
+flowchart TD
+    LS["Light Source"]
+    BS["Beamsplitter"]
+    M1["Fixed Mirror (M1)"]
+    M2["Movable Mirror (M2)<br/>precision stage"]
+    DET["Detector"]
+    
+    LS --> BS
+    BS --> M1
+    M1 --> BS
+    BS --> M2
+    M2 --> BS
+    BS --> DET
+    
+    subgraph analysis ["Analysis"]
+        PD["Path difference:<br/>ΔL = 2|L₂ - L₁|"]
+        VIS["Record visibility V(ΔL)<br/>as M2 translates"]
+        FIT["Fit to V(ΔL) = exp(-ΔL/Lc)<br/>to extract coherence length Lc"]
+        
+        PD --> VIS --> FIT
+    end
+    
+    DET -.-> analysis
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

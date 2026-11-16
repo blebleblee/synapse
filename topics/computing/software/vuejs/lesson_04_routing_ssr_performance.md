@@ -31,39 +31,30 @@ Vue Router's navigation pipeline is a linear sequence of hooks executed in a fix
 
 The pipeline is sequential and async-aware. Each guard receives `(to, from)` and can return `false` to abort, a route location object to redirect, or nothing (or `true`) to proceed. This design gives you a layered permission model. Global `beforeEach` handles authentication. Route-level `beforeEnter` handles per-route authorization. Component `beforeRouteLeave` handles unsaved-changes confirmation.
 
-```
-User clicks link
-        │
-        ▼
-  Router resolves target route record
-        │
-        ▼
-  beforeRouteLeave  ◄── leaving component
-        │
-        ▼
-  beforeEach        ◄── global guards (auth, logging)
-        │
-        ▼
-  beforeRouteUpdate ◄── reused component (same route, new params)
-        │
-        ▼
-  beforeEnter       ◄── route-level guard
-        │
-        ▼
-  async component   ◄── lazy chunk fetch (network I/O)
-  resolution
-        │
-        ▼
-  beforeRouteEnter  ◄── entering component
-        │
-        ▼
-  beforeResolve     ◄── final global hook (data ready)
-        │
-        ▼
-  Navigation commits
-        │
-        ▼
-  afterEach         ◄── analytics, progress bar teardown
+```mermaid
+flowchart TD
+    A["User clicks link"]
+    B["Router resolves target route record"]
+    C["beforeRouteLeave<br/><span style='font-size:0.85em'>(leaving component)</span>"]
+    D["beforeEach<br/><span style='font-size:0.85em'>(global guards: auth, logging)</span>"]
+    E["beforeRouteUpdate<br/><span style='font-size:0.85em'>(reused component: same route, new params)</span>"]
+    F["beforeEnter<br/><span style='font-size:0.85em'>(route-level guard)</span>"]
+    G["Async component resolution<br/><span style='font-size:0.85em'>(lazy chunk fetch: network I/O)</span>"]
+    H["beforeRouteEnter<br/><span style='font-size:0.85em'>(entering component)</span>"]
+    I["beforeResolve<br/><span style='font-size:0.85em'>(final global hook: data ready)</span>"]
+    J["Navigation commits"]
+    K["afterEach<br/><span style='font-size:0.85em'>(analytics, progress bar teardown)</span>"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+    J --> K
 ```
 
 Consider a real authentication guard. The pattern below uses a Pinia store for auth state, redirects unauthenticated users to login while preserving the intended destination in `redirect`, and uses `beforeResolve` to prefetch route-level data before the component mounts—preventing the flash of empty content that plagues naïve SSR applications.
@@ -306,19 +297,16 @@ Vite and Rollup split the application bundle at dynamic `import()` call sites. E
 
 The module graph after a Vite production build for a medium-complexity application looks like this:
 
-```
-                    ┌─────────────────────┐
-                    │   index-[hash].js   │  ← entry chunk: Vue runtime,
-                    │   (vendor + app)    │    router, Pinia, shared utils
-                    └────────┬────────────┘
-                             │  dynamic import on navigation
-         ┌───────────────────┼───────────────────┐
-         ▼                   ▼                   ▼
-  HomeView-[hash].js  Dashboard-[hash].js  Login-[hash].js
-                             │
-              ┌──────────────┼──────────────┐
-              ▼              ▼              ▼
-  InvoiceList-[hash].js  InvoiceDetail-[hash].js  (child route chunks)
+```mermaid
+flowchart TD
+    entry["index-[hash].js<br/>(entry chunk)<br/>Vue runtime, router,<br/>Pinia, shared utils"]
+    
+    entry -->|"dynamic import"| home["HomeView-[hash].js"]
+    entry -->|"dynamic import"| dashboard["Dashboard-[hash].js"]
+    entry -->|"dynamic import"| login["Login-[hash].js"]
+    
+    dashboard -->|"child routes"| invoiceList["InvoiceList-[hash].js"]
+    dashboard -->|"child routes"| invoiceDetail["InvoiceDetail-[hash].js"]
 ```
 
 Shared dependencies imported by multiple chunks are automatically split into separate shared chunks by Rollup's `splitChunks` heuristic. Vue itself, Pinia, and Vue Router appear in the entry chunk because they are needed immediately. A large date-formatting library imported only by `InvoiceDetailView` appears only in that route's chunk.

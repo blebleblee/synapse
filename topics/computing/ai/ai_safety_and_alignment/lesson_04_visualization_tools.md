@@ -988,4 +988,16 @@ This lesson has established the mechanistic and mathematical foundations of mode
 - Selvaraju et al. (2017). "Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization." *ICCV 2017.* https://arxiv.org/abs/1610.02391
 - Abnar & Zuidema (2020). "Quantifying Attention Flow in Transformers." *ACL 2020.* https://arxiv.org/abs/2005.00928
 - Elhage et al. (2022). "Toy Models of Superposition." *Anthropic.* https://transformer-circuits.pub/2022/toy_model/index.html
-- Nanda et al. (2023). "TransformerLens: A Library for Mechanistic Interpretability." https://github.com/neelnanda-io/TransformerLens
+- Nanda et al. (2023).
+
+"Transformer Lens: A Library for Mechanistic Interpretability of GPT-Style Language Models." *arXiv:2304.05062.*
+- Bricken et al. (2023). "Towards Monosemanticity: Decomposing Language Models With Dictionary Learning." *Anthropic.* https://transformer-circuits.pub/2023/monosemantic-features/index.html
+- Templeton et al. (2024). "Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet." *Anthropic.* https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html
+
+---
+
+## Conclusion
+
+The interpretability toolkit presented in this lesson—attention visualization, activation analysis, probing, integrated gradients, sparse autoencoders, and GradCAM—collectively enables a multi-scale investigation of transformer behavior from individual neurons to emergent circuits. When applied rigorously, these methods reveal not only *what* a model computes but increasingly *how* and *why*, transforming opaque weight matrices into mechanistic explanations grounded in causal intervention. However, each technique carries failure modes that practitioners must anticipate: gradient saturation in attribution methods, adversarial brittleness in saliency maps, baseline sensitivity in integrated gradients, feature splitting in SAEs, and tokenization artifacts in residual stream analysis. Mitigation requires principled experimental design—ablation controls, multiple attribution baselines, adversarial robustness checks, and cross-validation of interpretations against held-out behavioral predictions.
+
+The path from interpretability to *alignment assurance* demands more than post-hoc explanation; it requires causal models of misalignment-relevant circuits. The next lesson bridges this gap by applying these tools to alignment-critical behaviors: using activation patching to localize deceptive reasoning, probing for situational awareness representations, and deploying steering vectors (representation engineering) to intervene on model cognition without retraining. Mastery of the foundational techniques in this lesson—particularly residual stream decomposition, SAE feature analysis, and gradient-based attribution—is prerequisite for the causal interventions ahead. The interpretability researcher's goal is not merely to describe what a model does, but to predict and control what it *will* do under distributional shift, adversarial pressure, and misaligned objectives.

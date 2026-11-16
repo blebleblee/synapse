@@ -34,36 +34,69 @@ The commit phase elevates the prepared state to committed finality. Once a node 
 
 The certificate aggregation process leverages threshold signatures or explicit signature collection depending on implementation constraints. In the original PBFT design, each message carries a full digital signature, and nodes accumulate vectors of signatures to form certificates. Modern implementations employ BLS signature aggregation where $2f + 1$ signatures combine into a single compact proof, reducing storage and verification overhead from linear to constant complexity. The verification logic checks that the aggregate signature corresponds to a valid quorum of distinct signers, rejecting duplicates or signatures from non-participants. This cryptographic compression accelerates certificate validation and reduces bandwidth consumption in message-heavy phases.
 
-```
-Client Request Flow (Normal Case Operation):
-
-Client                Primary (p=0)         Backup 1              Backup 2              Backup 3
-  |                        |                     |                     |                     |
-  |----REQUEST(op)-------->|                     |                     |                     |
-  |                        |                     |                     |                     |
-  |                   [assign seq=s]             |                     |                     |
-  |                        |                     |                     |                     |
-  |                        |--PRE-PREPARE(v,s,D(op))----------------->|-------------------->|
-  |                        |                     |                     |                     |
-  |                   [accept]              [accept]              [accept]              [accept]
-  |                        |                     |                     |                     |
-  |                        |<--PREPARE(v,s,D)----+----PREPARE(v,s,D)-->|----PREPARE(v,s,D)-->|
-  |                        |                     |                     |                     |
-  |                 [prepared: 2f+1 certs]  [prepared]            [prepared]            [prepared]
-  |                        |                     |                     |                     |
-  |                        |<--COMMIT(v,s,D)-----+-----COMMIT(v,s,D)-->|-----COMMIT(v,s,D)-->|
-  |                        |                     |                     |                     |
-  |                [committed: 2f+1 certs] [committed]           [committed]           [committed]
-  |                        |                     |                     |                     |
-  |                   [execute op]          [execute op]          [execute op]          [execute op]
-  |                        |                     |                     |                     |
-  |<---REPLY(result)-------+------REPLY(result)--+------REPLY(result)--+------REPLY(result)--|
-  |                        |                     |                     |                     |
-[wait f+1 matching replies]                     
-
-Certificate Structure:
-  prepared(m,v,s) ≡ { PRE-PREPARE(v,s,D(m)) from p } ∪ { 2f PREPARE(v,s,D(m)) from backups }
-  committed(m,v,s) ≡ 2f+1 COMMIT(v,s,D(m)) messages
+```mermaid
+flowchart TD
+    Client["Client"]
+    Primary["Primary (p=0)"]
+    Backup1["Backup 1"]
+    Backup2["Backup 2"]
+    Backup3["Backup 3"]
+    
+    Client -->|"REQUEST(op)"| Primary
+    Primary -->|"assign seq=s"| Primary
+    Primary -->|"PRE-PREPARE(v,s,D(op))"| Backup1
+    Primary -->|"PRE-PREPARE(v,s,D(op))"| Backup2
+    Primary -->|"PRE-PREPARE(v,s,D(op))"| Backup3
+    
+    Primary -->|"accept"| Primary
+    Backup1 -->|"accept"| Backup1
+    Backup2 -->|"accept"| Backup2
+    Backup3 -->|"accept"| Backup3
+    
+    Backup1 -->|"PREPARE(v,s,D)"| Primary
+    Backup1 -->|"PREPARE(v,s,D)"| Backup2
+    Backup1 -->|"PREPARE(v,s,D)"| Backup3
+    Backup2 -->|"PREPARE(v,s,D)"| Primary
+    Backup2 -->|"PREPARE(v,s,D)"| Backup1
+    Backup2 -->|"PREPARE(v,s,D)"| Backup3
+    Backup3 -->|"PREPARE(v,s,D)"| Primary
+    Backup3 -->|"PREPARE(v,s,D)"| Backup1
+    Backup3 -->|"PREPARE(v,s,D)"| Backup2
+    
+    Primary -->|"prepared: 2f+1 certs"| Primary
+    Backup1 -->|"prepared"| Backup1
+    Backup2 -->|"prepared"| Backup2
+    Backup3 -->|"prepared"| Backup3
+    
+    Primary -->|"COMMIT(v,s,D)"| Backup1
+    Primary -->|"COMMIT(v,s,D)"| Backup2
+    Primary -->|"COMMIT(v,s,D)"| Backup3
+    Backup1 -->|"COMMIT(v,s,D)"| Primary
+    Backup1 -->|"COMMIT(v,s,D)"| Backup2
+    Backup1 -->|"COMMIT(v,s,D)"| Backup3
+    Backup2 -->|"COMMIT(v,s,D)"| Primary
+    Backup2 -->|"COMMIT(v,s,D)"| Backup1
+    Backup2 -->|"COMMIT(v,s,D)"| Backup3
+    Backup3 -->|"COMMIT(v,s,D)"| Primary
+    Backup3 -->|"COMMIT(v,s,D)"| Backup1
+    Backup3 -->|"COMMIT(v,s,D)"| Backup2
+    
+    Primary -->|"committed: 2f+1 certs"| Primary
+    Backup1 -->|"committed"| Backup1
+    Backup2 -->|"committed"| Backup2
+    Backup3 -->|"committed"| Backup3
+    
+    Primary -->|"execute op"| Primary
+    Backup1 -->|"execute op"| Backup1
+    Backup2 -->|"execute op"| Backup2
+    Backup3 -->|"execute op"| Backup3
+    
+    Primary -->|"REPLY(result)"| Client
+    Backup1 -->|"REPLY(result)"| Client
+    Backup2 -->|"REPLY(result)"| Client
+    Backup3 -->|"REPLY(result)"| Client
+    
+    Client -->|"wait f+1 matching replies"| Client
 ```
 
 Sequence number assignment enforces total ordering of operations across the replicated state machine. The primary maintains a monotonically increasing counter and assigns consecutive sequence numbers to incoming requests. Backup nodes enforce a low and high water mark window $[h, H]$ where $H = h + k$ for some constant $k$, typically $k = 100$ to $200$ operations. This bounded window prevents memory exhaustion from malicious primaries that assign arbitrarily large sequence numbers. Nodes reject pre-prepare messages with sequence numbers outside this window and trigger garbage collection once a checkpoint spanning sequence number $s$ is stable, advancing the low water mark to $s$.
@@ -74,38 +107,67 @@ View changes address liveness failures when the primary node is Byzantine or net
 
 The new primary must determine the correct state to initialize the new view, ensuring that any operation committed in the prior view remains committed. The primary examines all prepared certificates reported in the $2f + 1$ view change messages and identifies the highest sequence number at which any operation prepared. For each sequence number in the new view's initial window, the primary either adopts the request that prepared in the previous view or, if no operation prepared at that slot, proposes a no-op. This selection strategy ensures safety: if an honest node committed operation $m$ at sequence $s$ in the old view, at least $f + 1$ honest nodes prepared $m$ at $s$, and at least one of these honest nodes participates in the view change quorum, forcing the new primary to adopt $m$ for sequence $s$.
 
-```
-View Change Protocol (Liveness Recovery):
+```mermaid
+flowchart TD
 
-Backup 1                 Backup 2                 Backup 3                 New Primary (p'=1)
-  |                          |                          |                          |
-[timeout]                [timeout]                [timeout]                       |
-  |                          |                          |                          |
-  |---VIEW-CHANGE(v'=1, stable_ckpt, prepared_certs)--------------------------->|
-  |                          |                          |                          |
-  |                          |---VIEW-CHANGE(v'=1, ...)--------------------------->|
-  |                          |                          |                          |
-  |                          |                          |---VIEW-CHANGE(v'=1, ...)>|
-  |                          |                          |                          |
-  |                          |                          |              [collect 2f+1 VIEW-CHANGE]
-  |                          |                          |              [compute min-s, max-s]
-  |                          |                          |              [for each s: adopt prepared or null-op]
-  |                          |                          |                          |
-  |<---NEW-VIEW(v'=1, view_change_proof, pre-prepare_set)--------------------------|
-  |                          |                          |                          |
-[validate NEW-VIEW]    [validate NEW-VIEW]        [validate NEW-VIEW]             |
-[resume normal case]   [resume normal case]       [resume normal case]            |
+    subgraph backups ["Backup Nodes"]
+        B1_timeout["⏱ Timeout\nBackup 1"]
+        B2_timeout["⏱ Timeout\nBackup 2"]
+        B3_timeout["⏱ Timeout\nBackup 3"]
+    end
 
-Safety Invariant:
-  If committed(m, v, s) at honest node, then for all v' > v:
-    prepared(m', v', s) at any honest node ⟹ m' = m
-  
-Proof Sketch:
-  committed(m, v, s) ⟹ 2f+1 nodes have prepared(m, v, s)
-  ⟹ at least f+1 honest nodes prepared(m, v, s)
-  ⟹ any quorum of 2f+1 VIEW-CHANGE messages contains ≥1 honest node with prepared(m, v, s)
-  ⟹ new primary observes prepared(m, v, s) in view change quorum
-  ⟹ new primary must propose m at sequence s in view v'
+    subgraph vc_messages ["VIEW-CHANGE Messages → New Primary (p′ = 1)"]
+        VC1["VIEW-CHANGE(v′=1, stable_ckpt, prepared_certs)\nfrom Backup 1"]
+        VC2["VIEW-CHANGE(v′=1, stable_ckpt, prepared_certs)\nfrom Backup 2"]
+        VC3["VIEW-CHANGE(v′=1, stable_ckpt, prepared_certs)\nfrom Backup 3"]
+    end
+
+    subgraph new_primary ["New Primary Logic (p′ = 1)"]
+        NP_collect["Collect 2f+1 VIEW-CHANGE messages"]
+        NP_compute["Compute min-s and max-s\nacross stable checkpoints"]
+        NP_adopt["For each sequence s in (min-s, max-s]:\nadopt highest prepared request\nor insert null-op"]
+        NP_send["Broadcast NEW-VIEW(v′=1,\nview_change_proof, pre-prepare_set)"]
+    end
+
+    subgraph validation ["Backup Validation & Resume"]
+        V1["Backup 1:\nValidate NEW-VIEW\nResume normal-case operation"]
+        V2["Backup 2:\nValidate NEW-VIEW\nResume normal-case operation"]
+        V3["Backup 3:\nValidate NEW-VIEW\nResume normal-case operation"]
+    end
+
+    subgraph safety ["Safety Invariant"]
+        SI["If committed(m, v, s) at any honest node,\nthen for all v′ > v:\nprepared(m′, v′, s) ⟹ m′ = m"]
+    end
+
+    subgraph proof ["Proof Sketch"]
+        P1["committed(m, v, s)\n⟹ 2f+1 nodes have prepared(m, v, s)"]
+        P2["⟹ at least f+1 honest nodes\nhave prepared(m, v, s)"]
+        P3["⟹ any quorum of 2f+1 VIEW-CHANGE messages\ncontains ≥1 honest node with prepared(m, v, s)"]
+        P4["⟹ new primary observes prepared(m, v, s)\nin view-change quorum"]
+        P5["⟹ new primary must propose m\nat sequence s in view v′"]
+    end
+
+    B1_timeout --> VC1
+    B2_timeout --> VC2
+    B3_timeout --> VC3
+
+    VC1 --> NP_collect
+    VC2 --> NP_collect
+    VC3 --> NP_collect
+
+    NP_collect --> NP_compute
+    NP_compute --> NP_adopt
+    NP_adopt  --> NP_send
+
+    NP_send --> V1
+    NP_send --> V2
+    NP_send --> V3
+
+    SI --> P1
+    P1 --> P2
+    P2 --> P3
+    P3 --> P4
+    P4 --> P5
 ```
 
 Replica state encompasses several data structures maintained in memory and periodically persisted to stable storage. The message log accumulates all pre-prepare, prepare, and commit messages indexed by sequence number and view, enabling certificate validation and view change reconstruction. The checkpoint log stores stable checkpoints and associated proof certificates. The view change log retains view change and new view messages for the current and recent views. The client table tracks the latest request and reply for each client, implementing exactly-once semantics by rejecting duplicate requests and replaying cached replies. These structures collectively enable a replica to participate in consensus, recover from crashes, and provide state transfer to lagging or recovering peers.

@@ -26,27 +26,70 @@ The mathematical architecture of a discrete-time linear state space model compri
 
 The forward simulation of a state space model proceeds through iterated application of the discrete-time dynamics. Starting from an initial condition $\mathbf{x}_0$, we compute the trajectory recursively: $\mathbf{x}_1 = \mathbf{A}\mathbf{x}_0 + \mathbf{B}\mathbf{u}_0$, then $\mathbf{x}_2 = \mathbf{A}\mathbf{x}_1 + \mathbf{B}\mathbf{u}_1 = \mathbf{A}^2\mathbf{x}_0 + \mathbf{AB}\mathbf{u}_0 + \mathbf{B}\mathbf{u}_1$, and generally $\mathbf{x}_t = \mathbf{A}^t\mathbf{x}_0 + \sum_{k=0}^{t-1} \mathbf{A}^{t-1-k}\mathbf{B}\mathbf{u}_k$. This closed-form solution exposes the cumulative influence of the initial state through the matrix power $\mathbf{A}^t$ and the weighted superposition of all historical inputs through the convolution kernel $\mathbf{A}^{t-1-k}\mathbf{B}$. The eigendecomposition $\mathbf{A} = \mathbf{V}\mathbf{\Lambda}\mathbf{V}^{-1}$ transforms matrix powers into diagonal powers: $\mathbf{A}^t = \mathbf{V}\mathbf{\Lambda}^t\mathbf{V}^{-1}$, where $\mathbf{\Lambda}^t$ simply raises each eigenvalue to the $t$-th power. This reveals how modes corresponding to eigenvalues with magnitude less than one decay exponentially, while those exceeding one dominate long-term behavior.
 
-```
-State Evolution Over Time (Discrete LTI System)
-
-Time step:        t=0          t=1          t=2          t=3
-                   │            │            │            │
-State:            x₀    →      x₁    →      x₂    →      x₃
-                   │            │            │            │
-                   │   A,B      │   A,B      │   A,B      │
-Input:            u₀           u₁           u₂           u₃
-                   │            │            │            │
-                   ↓            ↓            ↓            ↓
-Observation:      y₀           y₁           y₂           y₃
-                       C,D          C,D          C,D
-
-State Update Rule:    x_{t+1} = A x_t + B u_t
-Observation Rule:     y_t = C x_t + D u_t
-
-Recursive Expansion:
-  x₁ = A x₀ + B u₀
-  x₂ = A² x₀ + AB u₀ + B u₁
-  x₃ = A³ x₀ + A²B u₀ + AB u₁ + B u₂
+```mermaid
+flowchart LR
+    subgraph t0 ["t=0"]
+        x0["x₀"]
+        u0["u₀"]
+        y0["y₀"]
+        x0 -->|"A, B"| transition0[ ]
+        u0 --> transition0
+        transition0 --> y0
+        y0 -.->|"y₀ = C x₀ + D u₀"| obs0[ ]
+    end
+    
+    subgraph t1 ["t=1"]
+        x1["x₁"]
+        u1["u₁"]
+        y1["y₁"]
+        x1 -->|"A, B"| transition1[ ]
+        u1 --> transition1
+        transition1 --> y1
+        y1 -.->|"y₁ = C x₁ + D u₁"| obs1[ ]
+    end
+    
+    subgraph t2 ["t=2"]
+        x2["x₂"]
+        u2["u₂"]
+        y2["y₂"]
+        x2 -->|"A, B"| transition2[ ]
+        u2 --> transition2
+        transition2 --> y2
+        y2 -.->|"y₂ = C x₂ + D u₂"| obs2[ ]
+    end
+    
+    subgraph t3 ["t=3"]
+        x3["x₃"]
+        u3["u₃"]
+        y3["y₃"]
+        u3 --> y3
+        y3 -.->|"y₃ = C x₃ + D u₃"| obs3[ ]
+    end
+    
+    x0 -->|"x₁ = A x₀ + B u₀"| x1
+    x1 -->|"x₂ = A x₁ + B u₁"| x2
+    x2 -->|"x₃ = A x₂ + B u₂"| x3
+    
+    subgraph rules ["State Evolution Rules"]
+        rule1["x<sub>t+1</sub> = A x<sub>t</sub> + B u<sub>t</sub>"]
+        rule2["y<sub>t</sub> = C x<sub>t</sub> + D u<sub>t</sub>"]
+        rule1 ~~~ rule2
+    end
+    
+    subgraph expansion ["Recursive Expansion"]
+        exp1["x₁ = A x₀ + B u₀"]
+        exp2["x₂ = A² x₀ + AB u₀ + B u₁"]
+        exp3["x₃ = A³ x₀ + A²B u₀ + AB u₁ + B u₂"]
+        exp1 --> exp2 --> exp3
+    end
+    
+    style transition0 fill:none,stroke:none
+    style transition1 fill:none,stroke:none
+    style transition2 fill:none,stroke:none
+    style obs0 fill:none,stroke:none
+    style obs1 fill:none,stroke:none
+    style obs2 fill:none,stroke:none
+    style obs3 fill:none,stroke:none
 ```
 
 The observability matrix construction reveals how information about internal states leaks into observation sequences. Each row block $\mathbf{CA}^k$ captures the contribution of the initial state to observations $k$ time steps in the future. When we stack these matrices vertically, the resulting observability Gramian $\mathcal{O}^\top\mathcal{O}$ measures the cumulative information content across all output channels and time lags. The singular value decomposition of the observability matrix identifies observable and unobservable subspaces. Singular vectors corresponding to near-zero singular values span directions in state space that remain invisible to the measurement process, while large singular values indicate strongly observable modes. In practical model identification tasks, engineers regularize estimation problems using truncated SVD of observability matrices, effectively projecting dynamics onto the maximally observable subspace.

@@ -56,26 +56,47 @@ Consider the relationship between Platonic ontology and epistemology. Plato's Fo
 
 We can map this structural dependency pattern:
 
-```
-ONTOLOGICAL FOUNDATION
-├─ Forms (eternal, immaterial, perfect) = true reality
-└─ Particulars (temporal, material, imperfect) = derivative appearance
-    │
-    ├─> EPISTEMOLOGICAL IMPLICATION
-    │   ├─ Knowledge (epistēmē) requires intellectual access to Forms
-    │   └─ Sensory experience yields only opinion (doxa)
-    │
-    ├─> PSYCHOLOGICAL IMPLICATION  
-    │   ├─ Tripartite soul: rational, spirited, appetitive
-    │   └─ Reason must govern lesser faculties
-    │
-    ├─> ETHICAL IMPLICATION
-    │   ├─ Virtue = proper psychic order (justice as harmony)
-    │   └─ Happiness requires philosophical contemplation
-    │
-    └─> POLITICAL IMPLICATION
-        ├─ Legitimate authority requires knowledge (philosopher-kings)
-        └─ Social hierarchy mirrors psychological structure
+```mermaid
+flowchart TD
+    OF["ONTOLOGICAL FOUNDATION"]
+    Forms["Forms (eternal, immaterial, perfect) = true reality"]
+    Particulars["Particulars (temporal, material, imperfect) = derivative appearance"]
+    
+    EPI["EPISTEMOLOGICAL IMPLICATION"]
+    EpiKnowledge["Knowledge (epistēmē) requires intellectual access to Forms"]
+    EpiSensory["Sensory experience yields only opinion (doxa)"]
+    
+    PSY["PSYCHOLOGICAL IMPLICATION"]
+    PsyTripartite["Tripartite soul: rational, spirited, appetitive"]
+    PsyReason["Reason must govern lesser faculties"]
+    
+    ETH["ETHICAL IMPLICATION"]
+    EthVirtue["Virtue = proper psychic order (justice as harmony)"]
+    EthHappiness["Happiness requires philosophical contemplation"]
+    
+    POL["POLITICAL IMPLICATION"]
+    PolAuthority["Legitimate authority requires knowledge (philosopher-kings)"]
+    PolHierarchy["Social hierarchy mirrors psychological structure"]
+    
+    OF --> Forms
+    OF --> Particulars
+    
+    Particulars --> EPI
+    Particulars --> PSY
+    Particulars --> ETH
+    Particulars --> POL
+    
+    EPI --> EpiKnowledge
+    EPI --> EpiSensory
+    
+    PSY --> PsyTripartite
+    PSY --> PsyReason
+    
+    ETH --> EthVirtue
+    ETH --> EthHappiness
+    
+    POL --> PolAuthority
+    POL --> PolHierarchy
 ```
 
 Contrast this with the Aristotelian revision. By relocating form within particular substances rather than transcendent separation, Aristotle fundamentally restructures the entire architecture. Knowledge now begins with sensory observation of particulars, proceeds through inductive generalization to grasp formal principles, and achieves demonstrative certainty through deductive syllogism from first principles. The psychological faculties form a developmental continuum rather than metaphysical rupture: sensory perception, memory, experience, and rational intellect build sequentially on one another. Ethical virtue becomes a matter of habituated character formation rather than intellectual contemplation alone, making it accessible to properly educated citizens rather than exclusively to philosophical elites. Political legitimacy derives not from transcendent knowledge but from practical wisdom (*phronēsis*) developed through experience and refined through deliberation about contingent particulars.
@@ -88,39 +109,47 @@ Buddhist epistemologists, particularly Dignāga and Dharmakīrti, streamlined th
 
 We can represent the complete Nyāya epistemological system:
 
-```
-KNOWLEDGE ACQUISITION PROTOCOL
-
-PERCEPTION (pratyakṣa)
-├─ Ordinary Perception
-│  ├─ Sense-object contact
-│  ├─ Non-erroneous (correspondence)
-│  └─ Determinate (conceptualized)
-└─ Yogic Perception (for advanced practitioners)
-   └─ Direct cognition of imperceptible objects
-
-INFERENCE (anumāna)  
-├─ For Oneself (svārtha)
-│  └─ Direct observation → general principle
-└─ For Others (parārtha)
-    ├─ Statement of thesis (pratijñā)
-    ├─ Statement of reason (hetu)
-    ├─ Statement of example (udāharaṇa)
-    ├─ Application (upanaya)
-    └─ Conclusion (nigamana)
-
-COMPARISON (upamāna)
-└─ Similarity recognition based on authoritative description
-
-TESTIMONY (śabda)
-├─ Reliable speaker (āpta)
-│  ├─ Knowledge of subject matter
-│  ├─ Intention to communicate truth
-│  └─ Capacity to express clearly
-└─ Concern imperceptible matters
-    ├─ Past/future events
-    ├─ Distant locations
-    └─ Metaphysical truths
+```mermaid
+flowchart TD
+    KAP["KNOWLEDGE ACQUISITION PROTOCOL"]
+    
+    KAP --> PERC["PERCEPTION (pratyakṣa)"]
+    KAP --> INF["INFERENCE (anumāna)"]
+    KAP --> COMP["COMPARISON (upamāna)"]
+    KAP --> TEST["TESTIMONY (śabda)"]
+    
+    PERC --> OP["Ordinary Perception"]
+    PERC --> YP["Yogic Perception (for advanced practitioners)"]
+    
+    OP --> SOC["Sense-object contact"]
+    OP --> NE["Non-erroneous (correspondence)"]
+    OP --> DET["Determinate (conceptualized)"]
+    
+    YP --> DC["Direct cognition of imperceptible objects"]
+    
+    INF --> FS["For Oneself (svārtha)"]
+    INF --> FO["For Others (parārtha)"]
+    
+    FS --> DOGP["Direct observation → general principle"]
+    
+    FO --> P["Statement of thesis (pratijñā)"]
+    FO --> H["Statement of reason (hetu)"]
+    FO --> U["Statement of example (udāharaṇa)"]
+    FO --> UP["Application (upanaya)"]
+    FO --> N["Conclusion (nigamana)"]
+    
+    COMP --> SR["Similarity recognition based on authoritative description"]
+    
+    TEST --> RS["Reliable speaker (āpta)"]
+    TEST --> CIM["Concern imperceptible matters"]
+    
+    RS --> KS["Knowledge of subject matter"]
+    RS --> IC["Intention to communicate truth"]
+    RS --> CE["Capacity to express clearly"]
+    
+    CIM --> PF["Past/future events"]
+    CIM --> DL["Distant locations"]
+    CIM --> MT["Metaphysical truths"]
 ```
 
 The ethical layer translates ontological and epistemological commitments into normative frameworks governing individual conduct and social organization. Ancient ethical systems divided into roughly three structural types: teleological frameworks defining the good as a natural end toward which humans develop, deontological frameworks defining right action through principles or duties independent of outcomes, and consequentialist frameworks evaluating action by results produced. Though these modern taxonomic categories risk anachronism, they identify genuine structural differences in ancient ethical reasoning.
@@ -143,19 +172,92 @@ The first optimization strategy involves developing structured comparative frame
 
 A high-performance comparative matrix structures this analysis:
 
-```
-PERMANENCE-CHANGE PROBLEM: Solution Space
+```mermaid
+flowchart TD
+    ROOT["PERMANENCE–CHANGE PROBLEM\nSolution Space"]
 
-Position         | Permanent Element  | Changing Element | Resolution Strategy
-─────────────────┼───────────────────┼─────────────────┼──────────────────────
-Parmenides       | Being (monistic)  | [Illusory]      | Deny reality of change
-Heraclitus       | Logos (process)   | All phenomena   | Ground change in rational pattern  
-Plato            | Forms             | Particulars     | Ontological dualism
-Aristotle        | Form in substance | Matter          | Hylomorphic composition
-Atomism          | Atoms, void       | Arrangements    | Recombination of permanents
-Sāṃkhya          | Puruṣa            | Prakṛti         | Consciousness-matter dualism
-Buddhism         | [None/Nirvana]    | All dharmas     | Radical impermanence
-Advaita Vedānta  | Brahman           | Māyā            | Appearance-reality distinction
+    ROOT --> PARM
+    ROOT --> HERA
+    ROOT --> PLAT
+    ROOT --> ARIS
+    ROOT --> ATOM
+    ROOT --> SANK
+    ROOT --> BUDH
+    ROOT --> ADVA
+
+    subgraph PARM ["Parmenides"]
+        PARM_P["Permanent: Being (monistic)"]
+        PARM_C["Changing: Illusory"]
+        PARM_R["Strategy: Deny reality of change"]
+        PARM_P --> PARM_R
+        PARM_C --> PARM_R
+    end
+
+    subgraph HERA ["Heraclitus"]
+        HERA_P["Permanent: Logos (process)"]
+        HERA_C["Changing: All phenomena"]
+        HERA_R["Strategy: Ground change in rational pattern"]
+        HERA_P --> HERA_R
+        HERA_C --> HERA_R
+    end
+
+    subgraph PLAT ["Plato"]
+        PLAT_P["Permanent: Forms"]
+        PLAT_C["Changing: Particulars"]
+        PLAT_R["Strategy: Ontological dualism"]
+        PLAT_P --> PLAT_R
+        PLAT_C --> PLAT_R
+    end
+
+    subgraph ARIS ["Aristotle"]
+        ARIS_P["Permanent: Form in substance"]
+        ARIS_C["Changing: Matter"]
+        ARIS_R["Strategy: Hylomorphic composition"]
+        ARIS_P --> ARIS_R
+        ARIS_C --> ARIS_R
+    end
+
+    subgraph ATOM ["Atomism"]
+        ATOM_P["Permanent: Atoms & void"]
+        ATOM_C["Changing: Arrangements"]
+        ATOM_R["Strategy: Recombination of permanents"]
+        ATOM_P --> ATOM_R
+        ATOM_C --> ATOM_R
+    end
+
+    subgraph SANK ["Sāṃkhya"]
+        SANK_P["Permanent: Puruṣa (consciousness)"]
+        SANK_C["Changing: Prakṛti (matter)"]
+        SANK_R["Strategy: Consciousness–matter dualism"]
+        SANK_P --> SANK_R
+        SANK_C --> SANK_R
+    end
+
+    subgraph BUDH ["Buddhism"]
+        BUDH_P["Permanent: None / Nirvāṇa"]
+        BUDH_C["Changing: All dharmas"]
+        BUDH_R["Strategy: Radical impermanence"]
+        BUDH_P --> BUDH_R
+        BUDH_C --> BUDH_R
+    end
+
+    subgraph ADVA ["Advaita Vedānta"]
+        ADVA_P["Permanent: Brahman"]
+        ADVA_C["Changing: Māyā (appearance)"]
+        ADVA_R["Strategy: Appearance–reality distinction"]
+        ADVA_P --> ADVA_R
+        ADVA_C --> ADVA_R
+    end
+
+    style ROOT fill:#1a1a2e,color:#e0e0ff,stroke:#7070cc,stroke-width:2px
+    style PARM_R fill:#2e1a1a,color:#ffd0d0,stroke:#cc7070
+    style HERA_R fill:#1a2e1a,color:#d0ffd0,stroke:#70cc70
+    style PLAT_R fill:#1a1a2e,color:#d0d0ff,stroke:#7070cc
+    style ARIS_R fill:#2e2a1a,color:#fff0d0,stroke:#ccaa70
+    style ATOM_R fill:#1a2a2e,color:#d0f0ff,stroke:#70aacc
+    style SANK_R fill:#2a1a2e,color:#f0d0ff,stroke:#aa70cc
+    style BUDH_R fill:#2e2e1a,color:#ffffd0,stroke:#cccc70
+    style ADVA_R fill:#2e1a2a,color:#ffd0f0,stroke:#cc70aa
 ```
 
 This matrix reveals that traditions faced forced choices: accept change as fully real and abandon permanent knowledge objects (Heraclitus, Buddhism), accept permanence and deny change's ultimate reality (Parmenides, Advaita), or construct dualistic or compositional solutions that partition reality into permanent and changing aspects (Plato, Aristotle, Sāṃkhya, Atomism). No tradition escaped this constraint, making the divergent responses illuminating about different intellectual priorities and methodological commitments.

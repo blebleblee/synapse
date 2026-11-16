@@ -48,16 +48,26 @@ Paragraph formatting properties govern alignment (left, right, center, justified
 
 The style inheritance tree in `styles.xml` defines named styles with explicit parent references. The default template ships with approximately fifty built-in styles organized in a three-tier hierarchy:
 
-```
-Normal (root style: defines document defaults)
-├─ Heading 1 (based on Normal, defines level-1 hierarchy)
-│  ├─ Heading 2 (based on Heading 1, inherits color/font, reduces size)
-│  │  ├─ Heading 3 (based on Heading 2, continues hierarchy)
-│  │  └─ ...
-├─ Body Text (based on Normal, optimized for reading flow)
-├─ List Paragraph (based on Normal, adds hanging indent)
-├─ Quote (based on Normal, adds left/right indent, italic)
-└─ No Spacing (based on Normal, removes paragraph spacing)
+```mermaid
+flowchart TD
+    Normal["Normal\n(root style: defines document defaults)"]
+    H1["Heading 1\n(based on Normal, defines level-1 hierarchy)"]
+    H2["Heading 2\n(based on Heading 1, inherits color/font, reduces size)"]
+    H3["Heading 3\n(based on Heading 2, continues hierarchy)"]
+    HN["..."]
+    Body["Body Text\n(based on Normal, optimized for reading flow)"]
+    List["List Paragraph\n(based on Normal, adds hanging indent)"]
+    Quote["Quote\n(based on Normal, adds left/right indent, italic)"]
+    NoSpacing["No Spacing\n(based on Normal, removes paragraph spacing)"]
+
+    Normal --> H1
+    Normal --> Body
+    Normal --> List
+    Normal --> Quote
+    Normal --> NoSpacing
+    H1 --> H2
+    H2 --> H3
+    H2 --> HN
 ```
 
 This inheritance graph means that modifying the Normal style's typeface instantly propagates to every descendant unless a child explicitly overrides the font property. The professional documentation workflow invests heavily in style definition upfront, treating the style library as infrastructure that amortizes its configuration cost across thousands of content edits.

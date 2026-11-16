@@ -30,21 +30,34 @@ index.php
 
 This candidate list is constructed by `get_query_template()`, which calls the appropriate template-type function such as `get_single_template()`. Each of these functions builds an array of candidate paths, passes them through the `"{type}_template_hierarchy"` filter (allowing plugins and themes to inject additional candidates), and then calls `locate_template()` to perform the actual file system walk.
 
-```
-Request URL: /products/blue-widget/
-        │
-        ▼
-wp-blog-header.php → wp() → $wp_query->get_posts()
-        │
-        ▼
-do_action('template_redirect')
-        │
-        ▼
-get_single_template()
-        │
-        ├─ Candidate: themes/my-theme/single-product-blue-widget.php  [MISS]
-        ├─ Candidate: themes/my-theme/single-product.php              [HIT]  ◄──── resolved
-        └─ (remaining candidates never evaluated)
+```mermaid
+flowchart TD
+    A["Request URL: /products/blue-widget/"]
+    B["wp-blog-header.php"]
+    C["wp()"]
+    D["$wp_query->get_posts()"]
+    E["do_action('template_redirect')"]
+    F["get_single_template()"]
+    G["Candidate: themes/my-theme/single-product-blue-widget.php"]
+    H["Candidate: themes/my-theme/single-product.php"]
+    I["(remaining candidates never evaluated)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    F --> H
+    F --> I
+    
+    G -.->|MISS| J[" "]
+    H -.->|HIT - resolved| K[" "]
+    
+    style H fill:#90EE90
+    style G fill:#FFB6C6
+    style J fill:none,stroke:none
+    style K fill:none,stroke:none
 ```
 
 The `locate_template()` function checks the **child theme directory** first, then the **parent theme directory**, and finally the stylesheet directory. This three-tier lookup is what makes child themes work without file duplication: the child theme shadows any file from the parent by providing its own copy, and the parent provides the base implementation for everything the child does not override. The resolution is purely file-system based—there is no manifest, no registry, no compiled routing table. The first file found on disk wins.
@@ -226,16 +239,28 @@ The architectural distinction between static and dynamic blocks has direct perfo
 
 A dynamic block stores only its attribute JSON in the comment delimiter and contains no inner HTML. At render time, WordPress invokes the registered PHP callback with the block's attributes, and the callback generates fresh HTML on every request:
 
-```
-Static block serialized form:
-<!-- wp:my-plugin/static-heading {"level":2} -->
-<h2 class="wp-block-my-plugin-static-heading">My Title</h2>
-<!-- /wp:my-plugin/static-heading -->
-
-Dynamic block serialized form:
-<!-- wp:my-plugin/product-card {"productId":42,"showPrice":true} /-->
-                                                                  ▲
-                                                     self-closing: no inner HTML
+```mermaid
+flowchart TD
+    Start["WordPress Block Serialization"]
+    
+    Start --> Static["Static Block"]
+    Start --> Dynamic["Dynamic Block"]
+    
+    Static --> StaticComment["Block Comment Delimiters"]
+    StaticComment --> StaticOpen["<!-- wp:my-plugin/static-heading {&quot;level&quot;:2} -->"]
+    StaticComment --> StaticClose["<!-- /wp:my-plugin/static-heading -->"]
+    
+    StaticOpen --> StaticHTML["Inner HTML Content"]
+    StaticHTML --> StaticElement["<h2 class=&quot;wp-block-my-plugin-static-heading&quot;>My Title</h2>"]
+    StaticElement --> StaticClose
+    
+    Dynamic --> DynamicComment["Self-Closing Block Comment"]
+    DynamicComment --> DynamicSingle["<!-- wp:my-plugin/product-card {&quot;productId&quot;:42,&quot;showPrice&quot;:true} /-->"]
+    
+    DynamicSingle --> DynamicNote["No Inner HTML<br/>Self-closing syntax"]
+    
+    style DynamicNote fill:#fff3cd,stroke:#856404
+    style StaticHTML fill:#d1ecf1,stroke:#0c5460
 ```
 
 The render callback (or `render.php` file declared in `block.json`) receives the attributes array and the block context object:

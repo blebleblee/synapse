@@ -25,21 +25,28 @@ These three invariants establish the problem space. Account lifecycle management
 The lifecycle is best understood as a finite state machine. Each state has defined entry criteria, characteristic activities, measurable exit signals, and transition paths — both forward toward expansion and backward toward risk. The following diagram renders the canonical five-stage model with its primary transition vectors.
 
 ```mermaid
-stateDiagram-v2
-    direction LR
+flowchart LR
+    START((" ")):::startEnd
+    ACQ["Acquisition"]
+    ONB["Onboarding"]
+    ADP["Adoption"]
+    GRW["Growth"]
+    RET["Retention"]
+    END((" ")):::startEnd
 
-    [*] --> Acquisition : Qualified opportunity closes
+    START -->|"Qualified opportunity closes"| ACQ
+    ACQ -->|"Contract executed, kickoff scheduled"| ONB
+    ONB -->|"Time-to-value milestone achieved"| ADP
+    ADP -->|"Expansion trigger identified"| GRW
+    GRW -->|"Renewal cycle opens (90 days prior)"| RET
+    RET -->|"Contract renewed + upsell attached"| GRW
+    RET -->|"Churn (voluntary or involuntary)"| END
 
-    Acquisition --> Onboarding : Contract executed, kickoff scheduled
-    Onboarding --> Adoption : Time-to-value milestone achieved
-    Adoption --> Growth : Expansion trigger identified
-    Growth --> Retention : Renewal cycle opens (90 days prior)
-    Retention --> Growth : Contract renewed + upsell attached
-    Retention --> [*] : Churn (voluntary or involuntary)
+    ONB -->|"At-risk flag raised before adoption"| RET
+    ADP -->|"Stalled adoption, no champion"| RET
+    GRW -->|"Expansion stalls, competitive threat"| RET
 
-    Onboarding --> Retention : At-risk flag raised before adoption
-    Adoption --> Retention : Stalled adoption, no champion
-    Growth --> Retention : Expansion stalls, competitive threat
+    classDef startEnd fill:#111,stroke:#111,color:#111,width:12px,height:12px
 ```
 
 Each arrow in this diagram represents a decision point that the account manager actively controls, not a passive passage of time. Understanding the mechanics at each stage is what separates practitioners who manage by calendar from those who manage by state.

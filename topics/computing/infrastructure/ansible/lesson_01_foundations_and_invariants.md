@@ -209,10 +209,10 @@ graph TB
     J -->|"Format Output"| K[Results Aggregator]
     K -->|"Write Logs"| L[Exit Handler]
     
-    style A fill:#e1f5ff
-    style I fill:#ffe1e1
-    style G fill:#e1ffe1
-    style J fill:#fff5e1
+    style A fill:#e1f5ff,color:#0f172a
+    style I fill:#ffe1e1,color:#0f172a
+    style G fill:#e1ffe1,color:#0f172a
+    style J fill:#fff5e1,color:#0f172a
 ```
 
 ### Subsystem Breakdown

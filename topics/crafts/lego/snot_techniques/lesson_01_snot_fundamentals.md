@@ -42,16 +42,22 @@ In a SNOT joint, these same clutch forces act in a rotated frame. A sideways-mou
 
 ### SNOT Hardware: The Primary Parts Family
 
-```
-SNOT Brick (Brick 1×1 with Stud on Side)
-┌─────────┐
-│  ══╗    │  ← Standard top stud (points up)
-│   ║    │
-│  ◉     │  ← Lateral stud (points horizontally, centered on side face)
-│        │
-└─────────┘
-  Lateral stud is offset 1 plate (3.2 mm) below the top face of the brick,
-  placing it at half-brick height from the bottom of the standard stud row.
+```mermaid
+flowchart TD
+    brick["SNOT Brick (1×1 with Stud on Side)"]
+    
+    subgraph top_surface ["Top Surface"]
+        top_stud["Standard Top Stud<br/>(points upward)"]
+    end
+    
+    subgraph side_surface ["Side Face"]
+        lateral_stud["Lateral Stud<br/>(points horizontally)"]
+        offset["Offset: 1 plate (3.2mm) below top face<br/>Positioned at half-brick height"]
+    end
+    
+    brick --> top_surface
+    brick --> side_surface
+    lateral_stud -.-> offset
 ```
 
 The workhorse of SNOT construction is the **1×1 brick with stud on side** (commonly called the SNOT brick, Lego part 87087 in its most common modern form). It is a single-stud brick with an additional stud protruding from one face. The lateral stud is not centered at mid-brick height; it sits 3.2 mm below the top face, which places it at exactly one plate height below the top of the brick. This offset is not arbitrary. It means that when the SNOT brick is embedded in a standard brick layer and a tile or plate is attached to its lateral stud, the outer face of that attached element lies flush with the adjacent surface only under a specific dimensional condition that the builder must verify.
@@ -60,16 +66,34 @@ The **headlight brick** (Lego part 4070, one of the oldest SNOT-enabling parts i
 
 **Bracket plates** (the 1×2–1×2, 1×2–2×2, and 1×2–1×4 families) represent the high-capacity SNOT hardware. These are L-shaped plate elements that provide a horizontal stud field on one leg and a vertical stud field on the other, with the transition geometry designed so that the two fields satisfy the 5-plate-to-2-stud dimensional relationship. A 1×2–2×2 bracket allows a 2×2 field of studs to point laterally from a structure while engaging two standard studs on the vertical face, and because the bracket is a single molded part rather than a stack of individual SNOT bricks, it is stiffer and faster to integrate.
 
-```
-Bracket Plate (1×2 – 2×2) cross-section:
+```mermaid
+flowchart TD
+    subgraph lateral ["Lateral Stud Field (2×2 — points outward)"]
+        LS1["◉ Stud"]
+        LS2["◉ Stud"]
+        LS3["◉ Stud"]
+    end
 
-Lateral stud field (2×2, pointing outward)
-│  │  │
-◉  ◉  ◉
-│──────│
-│      │  ← Bracket body
-│──────│
-◉  ◉       ← Vertical stud field (1×2, pointing up into standard structure)
+    subgraph body ["Bracket Body (1×2 – 2×2 Cross-Section)"]
+        TOP_RAIL["── Top Rail ──"]
+        BODY_CORE["Bracket Interior"]
+        BOT_RAIL["── Bottom Rail ──"]
+    end
+
+    subgraph vertical ["Vertical Stud Field (1×2 — points up into structure)"]
+        VS1["◉ Stud"]
+        VS2["◉ Stud"]
+    end
+
+    LS1 --> TOP_RAIL
+    LS2 --> TOP_RAIL
+    LS3 --> TOP_RAIL
+
+    TOP_RAIL --> BODY_CORE
+    BODY_CORE --> BOT_RAIL
+
+    BOT_RAIL --> VS1
+    BOT_RAIL --> VS2
 ```
 
 The critical dimensional check for any bracket is that the transition between the two stud fields does not introduce an offset. For the standard bracket family, TLG has designed these transitions to be dimensionally exact — the lateral stud field aligns with the same 8 mm grid as the vertical field when the 5-plate relationship is satisfied by the surrounding structure. If the surrounding structure is at the wrong height, the lateral studs will be off-grid and nothing will seat cleanly.

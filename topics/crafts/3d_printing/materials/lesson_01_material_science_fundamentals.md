@@ -36,42 +36,22 @@ The practical invariant is this: treat all hygroscopic filaments as perishable. 
 
 Understanding material behavior through a print requires thinking of the filament as passing through a precisely ordered sequence of thermal states. Each transition has mechanical consequences that the practitioner must manage.
 
-```
-RAW FILAMENT (solid, ~25°C)
-        │
-        ▼ Enters cold zone / PTFE liner
-SOFTENING ZONE (Tg → Tm, 60–180°C depending on material)
-  - Chain mobility increases
-  - Filament loses rigidity; buckling risk if pressure is high
-  - In bowden systems: this zone must stay short (heat creep)
-        │
-        ▼ Heater block
-MELT ZONE (Tprocessing, 180–500°C)
-  - Full viscoelastic flow
-  - Chains partially disentangle
-  - Melt viscosity governed by T and shear rate (shear thinning)
-        │
-        ▼ Nozzle orifice
-EXTRUSION / SHEAR ZONE
-  - High shear rate thins viscosity (pseudoplastic behavior)
-  - Die swell: elastic recovery widens bead slightly after nozzle exit
-  - Actual deposited width > nominal nozzle diameter by 10–20%
-        │
-        ▼ Deposition onto substrate / previous layer
-WELDING / DIFFUSION ZONE (brief window above Tg)
-  - Critical for interlayer adhesion
-  - Chain segments diffuse across layer interface
-  - Reptation time determines bond strength
-  - Rapid quench by cooling fan freezes chains in place
-        │
-        ▼ Part cooling
-SOLIDIFICATION ZONE
-  - Amorphous: vitrification below Tg (no latent heat)
-  - Semi-crystalline: crystallization releases latent heat; shrinkage
-  - Residual thermal stress builds as layers contract at different rates
-        │
-        ▼
-FINISHED PART (locked-in stress state, anisotropic microstructure)
+```mermaid
+flowchart TD
+    A["RAW FILAMENT<br/>(solid, ~25°C)"]
+    B["SOFTENING ZONE<br/>(Tg → Tm, 60–180°C)<br/>• Chain mobility increases<br/>• Filament loses rigidity; buckling risk if pressure is high<br/>• In bowden systems: this zone must stay short (heat creep)"]
+    C["MELT ZONE<br/>(Tprocessing, 180–500°C)<br/>• Full viscoelastic flow<br/>• Chains partially disentangle<br/>• Melt viscosity governed by T and shear rate (shear thinning)"]
+    D["EXTRUSION / SHEAR ZONE<br/>• High shear rate thins viscosity (pseudoplastic behavior)<br/>• Die swell: elastic recovery widens bead slightly after nozzle exit<br/>• Actual deposited width > nominal nozzle diameter by 10–20%"]
+    E["WELDING / DIFFUSION ZONE<br/>(brief window above Tg)<br/>• Critical for interlayer adhesion<br/>• Chain segments diffuse across layer interface<br/>• Reptation time determines bond strength<br/>• Rapid quench by cooling fan freezes chains in place"]
+    F["SOLIDIFICATION ZONE<br/>• Amorphous: vitrification below Tg (no latent heat)<br/>• Semi-crystalline: crystallization releases latent heat; shrinkage<br/>• Residual thermal stress builds as layers contract at different rates"]
+    G["FINISHED PART<br/>(locked-in stress state, anisotropic microstructure)"]
+
+    A -->|"Enters cold zone / PTFE liner"| B
+    B -->|"Heater block"| C
+    C -->|"Nozzle orifice"| D
+    D -->|"Deposition onto substrate / previous layer"| E
+    E -->|"Part cooling"| F
+    F --> G
 ```
 
 This state machine is not academic. Every slicer parameter you set is a direct intervention at a specific node in this chain. Print temperature governs melt viscosity and the duration of the welding window. Cooling fan speed controls quench rate and therefore both welding effectiveness and residual stress accumulation. Print speed determines shear rate in the nozzle and time available for interdiffusion at the layer interface. These variables do not operate independently; they are coupled, and optimizing one at the expense of others produces the classic failure modes documented in Section 3.

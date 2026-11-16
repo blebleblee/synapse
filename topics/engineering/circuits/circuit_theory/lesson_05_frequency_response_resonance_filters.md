@@ -145,15 +145,30 @@ Bandpass and bandstop filters require higher-order realizations because each low
 
 Active filter realizations using operational amplifiers overcome the limitations of passive LC designs, particularly the requirement for bulky, expensive, high-Q inductors at audio and low RF frequencies. The Sallen-Key topology implements second-order lowpass, highpass, and bandpass functions using a single op-amp, two resistors, and two capacitors. For a unity-gain lowpass Sallen-Key filter:
 
-```
-        R₁         R₂
-v_in ---VVV----+---VVV----+---- v_out
-               |          |
-               C₁        C₂
-               |          |
-              GND         +----[op-amp buffer]
-                                    |
-                                   GND
+```mermaid
+flowchart LR
+    VIN["v_in"]
+    R1["R₁"]
+    R2["R₂"]
+    NODE1((" "))
+    NODE2((" "))
+    C1["C₁"]
+    C2["C₂"]
+    GND1["GND"]
+    GND2["GND"]
+    BUF["Op-Amp Buffer"]
+    VOUT["v_out"]
+
+    VIN --> R1
+    R1 --> NODE1
+    NODE1 --> R2
+    R2 --> NODE2
+    NODE2 --> VOUT
+    NODE1 --> C1
+    C1 --> GND1
+    NODE2 --> C2
+    C2 --> BUF
+    BUF --> GND2
 ```
 
 The transfer function takes the standard second-order form with ω₀ = 1/√(R₁R₂C₁C₂) and damping determined by the component ratios. Setting R₁ = R₂ = R and C₁ = C₂ = C yields ω₀ = 1/(RC) and Q = 0.5 (Butterworth response). Higher Q values require unequal component ratios, increasing sensitivity to component tolerances.

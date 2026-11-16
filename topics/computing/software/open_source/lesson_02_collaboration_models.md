@@ -52,38 +52,27 @@ The `--ff-only` flag is not optional discipline—it is a correctness invariant.
 
 A pull request is not simply a notification that code is ready. It is a stateful artifact that tracks the full lifecycle of a proposed change: from initial submission through review, revision, approval, and integration. Modeling it as a state machine makes the workflow tractable and reveals where the common failure modes live.
 
-```
-                     ┌─────────────────────────────────────────────────┐
-                     │                 PULL REQUEST                     │
-                     │                                                  │
-  contributor        │  ┌──────────┐    review     ┌──────────────┐    │
-  pushes branch ─────┼─►│  OPEN    │──────────────►│  IN REVIEW   │    │
-                     │  └──────────┘               └──────┬───────┘    │
-                     │                                     │            │
-                     │                           ┌─────────▼──────────┐ │
-                     │                           │  changes requested │ │
-                     │                           └─────────┬──────────┘ │
-                     │                                     │            │
-                     │          contributor updates ◄──────┘            │
-                     │          branch (force-push)                     │
-                     │                                     │            │
-                     │                           ┌─────────▼──────────┐ │
-                     │                           │     APPROVED       │ │
-                     │                           └─────────┬──────────┘ │
-                     │                                     │            │
-                     │                    ┌────────────────▼─────┐      │
-                     │                    │      CI PASSING      │      │
-                     │                    └────────────┬─────────┘      │
-                     │                                 │                │
-                     │          ┌──────────────────────▼─────────────┐  │
-                     │          │  merge strategy decision           │  │
-                     │          │  (squash / rebase / merge commit)  │  │
-                     │          └──────────────────────┬─────────────┘  │
-                     │                                 │                │
-                     │                          ┌──────▼──────┐         │
-                     │                          │   MERGED    │         │
-                     │                          └─────────────┘         │
-                     └─────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Contributor pushes branch"]
+    B["OPEN"]
+    C["IN REVIEW"]
+    D["Changes Requested"]
+    E["Contributor updates branch<br/>force-push"]
+    F["APPROVED"]
+    G["CI PASSING"]
+    H["Merge strategy decision<br/>squash / rebase / merge commit"]
+    I["MERGED"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> C
+    C --> F
+    F --> G
+    G --> H
+    H --> I
 ```
 
 The state transition from APPROVED to MERGED is where maintainers make a decision that permanently shapes project history. This deserves careful first-principles reasoning.

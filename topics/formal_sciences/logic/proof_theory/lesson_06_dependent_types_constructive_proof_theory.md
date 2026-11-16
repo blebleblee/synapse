@@ -137,32 +137,18 @@ Each row is not merely an analogy but an identification. The type formation rule
 
 The practical workflow of constructive proof theory lives inside a proof assistant. The architecture common to Agda, Coq (via its CIC kernel), and Lean (via its Calculus of Constructions with universes) follows a fixed pipeline that is worth making explicit, since the correctness of all mechanized mathematics depends on it.
 
-```
-User writes: proof term / tactic script
-                    │
-                    ▼
-         ┌─────────────────────┐
-         │  Elaboration Layer  │  Resolves implicit arguments,
-         │                     │  universe levels, coercions
-         └────────┬────────────┘
-                  │  Fully elaborated term (explicit types everywhere)
-                  ▼
-         ┌─────────────────────┐
-         │  Type Checking      │  Bidirectional algorithm:
-         │  (Bidirectional)    │  check mode vs. infer mode
-         └────────┬────────────┘
-                  │  Needs definitional equality check
-                  ▼
-         ┌─────────────────────┐
-         │  Reduction Engine   │  β, η, ι (iota for inductives),
-         │  (Normalization)    │  δ (δ-unfolding of definitions)
-         └────────┬────────────┘
-                  │  Normal forms compared for syntactic equality
-                  ▼
-         ┌─────────────────────┐
-         │  Kernel (TCB)       │  Minimal trusted code base;
-         │                     │  only this must be correct
-         └─────────────────────┘
+```mermaid
+flowchart TD
+    A["User writes:<br/>proof term / tactic script"]
+    B["Elaboration Layer<br/><br/>Resolves implicit arguments,<br/>universe levels, coercions"]
+    C["Type Checking<br/>Bidirectional<br/><br/>Bidirectional algorithm:<br/>check mode vs. infer mode"]
+    D["Reduction Engine<br/>Normalization<br/><br/>β, η, ι (iota for inductives),<br/>δ (δ-unfolding of definitions)"]
+    E["Kernel TCB<br/><br/>Minimal trusted code base;<br/>only this must be correct"]
+    
+    A -->|"Fully elaborated term<br/>explicit types everywhere"| B
+    B -->|"Needs definitional<br/>equality check"| C
+    C -->|"Normal forms compared<br/>for syntactic equality"| D
+    D --> E
 ```
 
 The critical architectural principle is that the kernel is kept as small as possible. All syntactic sugar, tactic automation, and elaboration heuristics live in layers above the kernel and are therefore not part of the trusted computing base. When Coq's kernel rejects a term, the rejection is absolute. When a tactic fails, it only means the automation layer could not construct a term; the user can always bypass tactics and write the proof term directly.

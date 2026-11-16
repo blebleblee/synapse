@@ -24,25 +24,27 @@ Resin printing inverts this logic. Wall thickness in SLA/MSLA is not constrained
 
 The geometry of overhangs and bridges determines where support structures become mandatory. An overhang is any surface whose angle relative to the build plate exceeds the material's self-supporting threshold. For FDM, this threshold sits near 45 degrees: angles steeper than this (measured from vertical) can print unsupported because each layer finds sufficient contact area on the layer below to maintain adhesion during cooling. Angles shallower than 45 degrees (approaching horizontal) require supports because the extruded filament must span an increasing gap before reaching the previous layer.
 
-```
-Overhang Angle Analysis (FDM)
-
-                         │ Vertical
-                         │ (90°, self-supporting)
-                         │
-                       ╱ │
-                     ╱   │ 60° (marginal, stringing likely)
-                   ╱     │
-                 ╱       │
-               ╱         │ 45° (critical threshold)
-             ╱           │
-           ╱             │
-         ╱               │ 30° (requires support)
-       ╱                 │
-     ╱                   │
-   ╱_____________________|  Horizontal (0°, maximum support)
-   
-   Build Plate
+```mermaid
+flowchart TD
+    BuildPlate["Build Plate"]
+    Horizontal["Horizontal (0°, maximum support)"]
+    Angle30["30° (requires support)"]
+    Angle45["45° (critical threshold)"]
+    Angle60["60° (marginal, stringing likely)"]
+    Vertical["Vertical (90°, self-supporting)"]
+    
+    BuildPlate -->|"Increasing Angle"| Horizontal
+    Horizontal --> Angle30
+    Angle30 --> Angle45
+    Angle45 --> Angle60
+    Angle60 --> Vertical
+    
+    style Horizontal fill:#ff6b6b
+    style Angle30 fill:#ffa500
+    style Angle45 fill:#ffd700
+    style Angle60 fill:#90ee90
+    style Vertical fill:#90ee90
+    style BuildPlate fill:#d3d3d3
 ```
 
 Bridges represent a special case: horizontal spans between two supported endpoints. FDM can bridge surprising distances—up to 10 mm or more—by extruding filament under tension, allowing it to cool mid-span and form a self-supporting structure. Bridge success depends on print speed, cooling fan intensity, and filament material. PLA bridges effectively due to its low glass transition temperature (55–60°C), allowing rapid solidification. ABS bridges poorly because its higher glass transition (105°C) keeps the filament soft longer, increasing sag. The designer must either limit bridge lengths to material-specific maximums or introduce intermediate support pillars to divide long spans into shorter, printable segments.

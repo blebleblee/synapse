@@ -66,52 +66,30 @@ Market valuation multiples translate financial statement data into market-price 
 
 The following diagram illustrates the complete ratio analysis workflow from raw financial statements through to final investment signal:
 
-```
-                    ┌─────────────────────────────────┐
-                    │     FINANCIAL STATEMENTS          │
-                    │  ┌───────────┐ ┌───────────────┐  │
-                    │  │ Balance   │ │ Income        │  │
-                    │  │ Sheet     │ │ Statement     │  │
-                    │  └─────┬─────┘ └───────┬───────┘  │
-                    │        │ ┌─────────────┘          │
-                    │        ▼ ▼                        │
-                    │  ┌───────────┐                     │
-                    │  │ Cash Flow │                     │
-                    │  │ Statement │                     │
-                    │  └─────┬─────┘                     │
-                    └────────┼───────────────────────────┘
-                             │
-              ┌──────────────┼──────────────┐
-              ▼              ▼              ▼
-        ┌──────────┐  ┌──────────┐   ┌───────────┐
-        │ Liquidity│  │Profitab. │   │ Leverage  │
-        │ Ratios   │  │ Ratios   │   │ Ratios    │
-        └────┬─────┘  └────┬─────┘   └─────┬─────┘
-             │             │              │
-             │             ▼              │
-             │      ┌──────────────┐       │
-             │      │ DuPont Decomp│       │
-             │      │ (3-step/5-step│      │
-             │      └──────┬───────┘       │
-             │             │              │
-             └─────────────┼──────────────┘
-                           ▼
-                   ┌───────────────┐
-                   │ Market Multipl│
-                   │ (P/E, EV/EBITDA)│
-                   └───────┬───────┘
-                           │
-                           ▼
-                   ┌───────────────┐
-                   │  PEER / TREND  │
-                   │  BENCHMARKING  │
-                   └───────┬───────┘
-                           │
-                           ▼
-                   ┌───────────────┐
-                   │ INVESTMENT    │
-                   │ / CREDIT SIGNAL│
-                   └───────────────┘
+```mermaid
+flowchart TD
+    subgraph FS["FINANCIAL STATEMENTS"]
+        BS["Balance Sheet"]
+        IS["Income Statement"]
+        CFS["Cash Flow Statement"]
+        
+        BS --> CFS
+        IS --> CFS
+    end
+    
+    CFS --> LIQ["Liquidity Ratios"]
+    CFS --> PROF["Profitability Ratios"]
+    CFS --> LEV["Leverage Ratios"]
+    
+    PROF --> DUPONT["DuPont Decomposition<br/>(3-step/5-step)"]
+    
+    LIQ --> MULT["Market Multiples<br/>(P/E, EV/EBITDA)"]
+    DUPONT --> MULT
+    LEV --> MULT
+    
+    MULT --> BENCH["PEER / TREND<br/>BENCHMARKING"]
+    
+    BENCH --> SIGNAL["INVESTMENT<br/>/ CREDIT SIGNAL"]
 ```
 
 ### Efficiency and Turnover Ratios

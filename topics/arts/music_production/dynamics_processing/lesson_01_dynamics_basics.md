@@ -202,7 +202,7 @@ Running two gentler compressors in series instead of one aggressive one is stand
 |---|---|---|
 | Compressor pumping obviously on sustained notes | Release too fast relative to program material | Lengthen release, or switch to auto-release if available |
 | Transients feel dead/squashed after compression | Attack too fast, catching the transient itself | Slow attack to 10–30 ms to let the transient pass before GR engages |
-| Gate chops the start off every hit | Gate attack too slow | Set gate attack to fastest available (<1 ms) |
+| Gate chops the start off every hit | Gate attack too slow | Set gate attack to fastest available (< 1 ms) |
 | Gate chatters open/closed on a decaying tail | Hold time too short, threshold too close to signal level | Increase hold time, lower threshold slightly |
 | Bass/kick compressor reacts wildly to the other instrument | Sidechain picking up bleed/crosstalk, or mono-summed low end triggering unexpectedly | Apply sidechain HPF to ignore frequencies below the detector's intended range |
 | Mix "sounds louder" after compression but muddier on critical listening | Makeup gain not level-matched for an honest A/B | Gain-match before judging; confirm with a loudness meter (LUFS) |

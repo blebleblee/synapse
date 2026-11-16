@@ -30,33 +30,22 @@ Anomaly-based detection supplements signature matching with statistical models o
 
 The SIEM platform sits above individual detection systems as an aggregation, correlation, and enrichment layer. Its core function is log ingestion: consuming event streams from firewalls, IDS sensors, endpoint detection and response (EDR) agents, authentication systems, cloud provider audit logs, and application-layer access logs, normalizing them into a common schema, and making them queryable at forensic timescales. Architecturally, a production SIEM is a distributed data pipeline. Elastic SIEM, Splunk Enterprise Security, and Microsoft Sentinel all share a common structural pattern:
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        SIEM Data Pipeline                              │
-│                                                                        │
-│  ┌──────────────┐    ┌──────────────┐    ┌────────────────────────┐   │
-│  │  Log Sources │───▶│  Shipper /   │───▶│   Message Broker       │   │
-│  │              │    │  Collector   │    │   (Kafka / Logstash)   │   │
-│  │  • Firewall  │    │  (Beats,     │    └───────────┬────────────┘   │
-│  │  • EDR       │    │   Fluentd,   │                │                │
-│  │  • Auth Logs │    │   NXLog)     │                ▼                │
-│  │  • DNS/DHCP  │    └──────────────┘    ┌────────────────────────┐   │
-│  │  • Cloud API │                        │   Indexing / Storage   │   │
-│  └──────────────┘                        │   (Elasticsearch,      │   │
-│                                          │    Splunk Indexers)    │   │
-│                                          └───────────┬────────────┘   │
-│                                                      │                │
-│                      ┌───────────────────────────────▼──────────┐    │
-│                      │          Correlation Engine               │    │
-│                      │   Detection Rules, Threat Intelligence    │    │
-│                      │   Enrichment (GeoIP, ASN, IOC feeds)      │    │
-│                      └───────────────────────────────┬──────────┘    │
-│                                                      │                │
-│                      ┌───────────────────────────────▼──────────┐    │
-│                      │        Alert Queue / SOAR Platform        │    │
-│                      │   Triage, Case Management, Playbooks      │    │
-│                      └──────────────────────────────────────────┘    │
-└────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph pipeline ["SIEM Data Pipeline"]
+        log_src["Log Sources<br/>• Firewall<br/>• EDR<br/>• Auth Logs<br/>• DNS/DHCP<br/>• Cloud API"]
+        shipper["Shipper / Collector<br/>(Beats, Fluentd, NXLog)"]
+        broker["Message Broker<br/>(Kafka / Logstash)"]
+        indexer["Indexing / Storage<br/>(Elasticsearch, Splunk Indexers)"]
+        corr_engine["Correlation Engine<br/>Detection Rules, Threat Intelligence<br/>Enrichment (GeoIP, ASN, IOC feeds)"]
+        soar["Alert Queue / SOAR Platform<br/>Triage, Case Management, Playbooks"]
+        
+        log_src --> shipper
+        shipper --> broker
+        broker --> indexer
+        indexer --> corr_engine
+        corr_engine --> soar
+    end
 ```
 
 The correlation engine is where raw events are transformed into security findings. A correlation rule might specify: "if a single source IP attempts authentication against more than twenty distinct accounts within sixty seconds and at least one attempt succeeds, generate a HIGH severity alert tagged CREDENTIAL_STUFFING." This rule combines event frequency, field cardinality, and outcome state across a time window—logic that cannot be expressed in a single-packet IDS signature. Correlation rules are the primary mechanism by which defenders detect multi-stage attack sequences: an initial reconnaissance scan, followed hours later by a phishing email delivery, followed by a callback from the target host to a command-and-control IP.

@@ -100,29 +100,59 @@ Focalization is the technical term for the structural position of the consciousn
 
 The diagram below illustrates how focalization patterns shape reader access and emotional alignment:
 
-```
-SINGLE FOCALIZATION (Third-Person Limited)
-────────────────────────────────────────
-Scene 1: Protagonist's consciousness
-Scene 2: Protagonist's consciousness (continued)
-Scene 3: Protagonist's consciousness (continued)
-READER ALIGNMENT: Locked to protagonist's perspective throughout
+```mermaid
+flowchart TD
 
-MULTIPLE FOCALIZATION (Free-Ranging Third Person)
-──────────────────────────────────────────────────
-Scene 1: Protagonist's consciousness
-Scene 2: Antagonist's consciousness
-Scene 3: Side character's consciousness
-Scene 4: Protagonist's consciousness (returned)
-READER ALIGNMENT: Shifts between characters; emotional distance varies
+subgraph single ["SINGLE FOCALIZATION (Third-Person Limited)"]
+    direction TD
+    SF1["Scene 1: Protagonist's consciousness"]
+    SF2["Scene 2: Protagonist's consciousness (continued)"]
+    SF3["Scene 3: Protagonist's consciousness (continued)"]
+    SF_align["READER ALIGNMENT: Locked to protagonist's perspective throughout"]
 
-EXTERNAL FOCALIZATION (Objective Third Person)
-──────────────────────────────────────────────────
-Scene 1: Dialogue and behavior observed; no internal consciousness
-Scene 2: Dialogue and behavior observed; no internal consciousness
-READER ALIGNMENT: Detached; must infer internal states from external signs
+    SF1 --> SF2 --> SF3 --> SF_align
+end
+
+subgraph multiple ["MULTIPLE FOCALIZATION (Free-Ranging Third Person)"]
+    direction TD
+    MF1["Scene 1: Protagonist's consciousness"]
+    MF2["Scene 2: Antagonist's consciousness"]
+    MF3["Scene 3: Side character's consciousness"]
+    MF4["Scene 4: Protagonist's consciousness (returned)"]
+    MF_align["READER ALIGNMENT: Shifts between characters; emotional distance varies"]
+
+    MF1 --> MF2 --> MF3 --> MF4 --> MF_align
+end
+
+subgraph external ["EXTERNAL FOCALIZATION (Objective Third Person)"]
+    direction TD
+    EF1["Scene 1: Dialogue and behavior observed; no internal consciousness"]
+    EF2["Scene 2: Dialogue and behavior observed; no internal consciousness"]
+    EF_align["READER ALIGNMENT: Detached; must infer internal states from external signs"]
+
+    EF1 --> EF2 --> EF_align
+end
+
+single --> multiple --> external
 ```
 
 Single focalization creates deep identification with the protagonist. The reader experiences the story world as the protagonist experiences it, with the protagonist's blindnesses becoming the reader's blindnesses. This is the architecture of suspense and identification. The reader is emotionally invested because they are locked into the protagonist's perspective and cannot escape to observe the story from a position of advantage.
 
-Multiple focalization creates a more complex reader experience. When the narrative shifts to the an
+Multiple focalization creates a more complex reader experience.
+
+Multiple focalization creates a more complex reader experience: the reader gains privileged information no single character possesses, which generates irony, dramatic tension, and a kind of narrative omniscience by accumulation. When the reader knows what the antagonist is planning before the protagonist does, the subsequent scenes carrying the protagonist forward in ignorance become charged with dread. This is the architecture of dramatic irony rather than suspense—the reader watches the trap closing rather than feeling its jaws. The cost is emotional distance; each shift in focalization breaks the spell of identification and reminds the reader they are observing a constructed story world. Writers who use multiple focalization successfully compensate by making each focalized consciousness vivid and specific enough to generate its own temporary investment, so the reader is not simply oscillating between cameras but inhabiting genuinely different subjectivities. External focalization pushes this further, removing interior access entirely and requiring the reader to do interpretive work from behavior, dialogue, and environmental detail alone. This technique is not a limitation but a tool: when a character's internal state is withheld, the reader projects onto the gap, and what they project is shaped by everything the narrative has established. Used deliberately, external focalization produces a particular quality of unease—the reader senses interiority without being granted it, which creates characters who feel opaque and therefore real in the way strangers are real.
+
+Perspective control is ultimately a contract with the reader about where knowledge and empathy will be distributed across the story. Every decision—who focalizes, when access shifts, what the narrative voice is permitted to know and say—determines what questions the reader can ask, which answers they can reach, and which emotional experiences the story makes available. A writer who masters these mechanisms does not simply choose a point of view; they engineer a reading experience from the inside out, controlling not just what the reader sees but what the reader feels capable of understanding at every moment in the narrative.
+
+---
+
+## Summary & Verification Matrix
+
+| Dimension | Governing Invariant | Core Mechanism | Diagnostic Criterion |
+|---|---|---|---|
+| **Point of View (POV)** | Every narrative has a narrating position that determines what can be known and said; there is no neutral or unpositioned telling. | The narrator's grammatical person (first, second, third) and reliability status set the outer boundary of available information and reader trust. | Ask: Who is speaking, and what are the limits of what that speaker can legitimately know? Any violation of those limits is an intentional or unintentional intrusion. |
+| **Focalization** | Narration and focalization are distinct: the narrator tells, but the focalizer sees. A third-person narrator can focalize through any character without that character becoming the narrator. | Focalization determines whose perceptual and cognitive frame filters the story world. Single focalization locks reader alignment; multiple focalization distributes it; external focalization withholds it. | Ask: Through whose consciousness is the scene being filtered right now? If the answer shifts mid-scene without purpose, the focalization is inconsistent, not fluid. |
+| **Narrative Distance** | Distance is a continuous variable, not a binary. The writer controls proximity to a character's consciousness moment by moment, and each increment changes the reader's emotional experience. | Free indirect discourse collapses the distance between narrator and character voice without formal markers (no "she thought"). Summary and authorial commentary increase distance. Direct interior monologue minimizes it. | Ask: At any given sentence, how much separation exists between the narrator's language and the character's own mental idiom? Involuntary slippage between registers signals an uncontrolled distance shift. |
+| **Reliability and Dramatic Irony** | An unreliable narrator or focalizer does not make a story untruthful; it displaces truth from the narrator's account to the gap between that account and what the narrative otherwise implies. | The reader constructs a corrected version of events from contradiction, omission, and contextual evidence. Dramatic irony arises when the reader's constructed understanding exceeds the narrator's or protagonist's. | Ask: Is there a systematic discrepancy between what the narrator claims and what the story shows? If so, is that discrepancy productive and controlled, or accidental? |
+| **Perspective Shifts and Pacing** | Every shift in focalizer or narrative distance is a cut that resets emotional alignment. Unearned or frequent cuts erode investment; purposeful cuts create irony, tension, or structural counterpoint. | Scene-level shifts (changing focalizer between scenes) are less disruptive than mid-scene shifts because white space signals transition. Chapter-level shifts allow each consciousness to reach a satisfying partial resolution before the reader moves on. | Ask: What does the reader gain from this shift that they could not gain from staying in the current perspective? If the answer is only information and not also emotional texture, the shift may be mechanical rather than purposeful. |
+| **Voice and Perspective Integration** | A character's perspective is inseparable from their voice; the language through which their focalization is rendered must carry the signature of their cognition, not the narrator's default register. | Vocabulary range, syntactic patterns, what a character notices and what they overlook, and their characteristic metaphors all encode perspective without requiring explicit statement. Consistency of these markers across scenes confirms perspective integrity. | Ask: If the character's name were removed from this passage, would it still be recognizably this character's consciousness? If not, the voice and perspective have not been fully integrated. |

@@ -105,17 +105,32 @@ This asserts that there exists some natural number that codes a valid proof of $
 
 The following flow illustrates the architecture of encoding and self-reference:
 
-```
-   Syntactic Realm                   Arithmetic Realm
-   ─────────────────                 ──────────────────────────────
-   Symbols of L_A    ──encode──▶     Natural numbers (Gödel numbers)
-   Formulas           ──encode──▶     Gödel numbers of formulas
-   Proofs             ──encode──▶     Gödel numbers of proof sequences
-   Syntactic ops      ──encode──▶     Primitive recursive functions
-   "φ is provable"    ──encode──▶     Prov(⌈φ⌉)  [Σ₁⁰ formula in PA]
-        │                                         │
-        └──────── PA can reason about ────────────┘
-                  its own provability
+```mermaid
+flowchart LR
+    subgraph syntactic ["Syntactic Realm"]
+        A["Symbols of L_A"]
+        B["Formulas"]
+        C["Proofs"]
+        D["Syntactic Operations"]
+        E["φ is provable"]
+    end
+    
+    subgraph arithmetic ["Arithmetic Realm"]
+        F["Natural Numbers<br/>(Gödel Numbers)"]
+        G["Gödel Numbers<br/>of Formulas"]
+        H["Gödel Numbers<br/>of Proof Sequences"]
+        I["Primitive Recursive<br/>Functions"]
+        J["Prov(⌈φ⌉)<br/>(Σ₁⁰ formula in PA)"]
+    end
+    
+    A -->|encode| F
+    B -->|encode| G
+    C -->|encode| H
+    D -->|encode| I
+    E -->|encode| J
+    
+    E -.->|PA can reason about| J
+    J -.->|its own provability| E
 ```
 
 This feedback loop — the system reasoning arithmetically about its own syntax — is the structural precondition for Gödel's self-referential construction.

@@ -74,16 +74,37 @@ Sourcing reliable precedent transaction data requires access to Bloomberg Termin
 
 The football field chart is the standard deliverable that synthesizes all three methodologies into a single visualization:
 
-```
-Valuation Methodology         Low        High
-─────────────────────────────────────────────
-DCF (Base Case)               $42.00     $58.00
-DCF (Upside Synergies)        $51.00     $67.00
-Trading Comparables           $38.00     $54.00
-Precedent Transactions        $47.00     $63.00
-52-Week Trading Range         $33.00     $49.00
-─────────────────────────────────────────────
-Offer Price (Initial)                    $55.00
+```mermaid
+flowchart TD
+    title["<b>Valuation Methodology Summary</b>"]
+    
+    dcf_base["DCF (Base Case)<br/>Low: $42.00 | High: $58.00"]
+    dcf_upside["DCF (Upside Synergies)<br/>Low: $51.00 | High: $67.00"]
+    trading["Trading Comparables<br/>Low: $38.00 | High: $54.00"]
+    precedent["Precedent Transactions<br/>Low: $47.00 | High: $63.00"]
+    range_52w["52-Week Trading Range<br/>Low: $33.00 | High: $49.00"]
+    
+    offer["<b>Offer Price (Initial): $55.00</b>"]
+    
+    title --> dcf_base
+    title --> dcf_upside
+    title --> trading
+    title --> precedent
+    title --> range_52w
+    
+    dcf_base --> offer
+    dcf_upside --> offer
+    trading --> offer
+    precedent --> offer
+    range_52w --> offer
+    
+    style title fill:#e1f5ff,stroke:#0288d1,stroke-width:2px
+    style offer fill:#fff3e0,stroke:#f57c00,stroke-width:3px
+    style dcf_base fill:#f1f8e9,stroke:#689f38
+    style dcf_upside fill:#f1f8e9,stroke:#689f38
+    style trading fill:#fce4ec,stroke:#c2185b
+    style precedent fill:#ede7f6,stroke:#5e35b1
+    style range_52w fill:#fff9c4,stroke:#f9a825
 ```
 
 The offer price should sit within the range established by precedent transactions and the synergy-adjusted DCF, above the trading comparable floor, and reflect a defensible premium to the unaffected share price. Any offer price that falls outside the precedent transaction range demands explicit justification — either the deal is uniquely synergistic (justifying a higher price) or the target is fundamentally impaired (justifying a lower one).
@@ -94,24 +115,25 @@ The structure of acquisition consideration is not a secondary administrative dec
 
 The three basic forms of consideration are cash, stock, and earnouts, and most transactions of meaningful complexity blend all three.
 
-```
-                     ┌─────────────────────────────────┐
-                     │       ACQUISITION STRUCTURE      │
-                     └────────────────┬────────────────┘
-                                      │
-            ┌─────────────────────────┼─────────────────────────┐
-            │                         │                          │
-     ┌──────▼──────┐           ┌──────▼──────┐          ┌──────▼──────┐
-     │    CASH     │           │    STOCK    │           │   EARNOUT   │
-     │ Consideration│           │ Consideration│          │ Consideration│
-     └──────┬──────┘           └──────┬──────┘          └──────┬──────┘
-            │                         │                          │
-     Buyer assumes           Seller participates         Bridges valuation
-     full valuation          in upside / downside        gap; defers
-     risk. Full tax          of combined entity.         payment to future
-     step-up available       No immediate tax            performance.
-     in asset deal.          event for seller.           Contingent liability
-                                                         on buyer's B/S.
+```mermaid
+flowchart TD
+    Root["ACQUISITION STRUCTURE"]
+    
+    Root --> Cash["CASH<br/>Consideration"]
+    Root --> Stock["STOCK<br/>Consideration"]
+    Root --> Earnout["EARNOUT<br/>Consideration"]
+    
+    Cash --> CashDesc["Buyer assumes<br/>full valuation<br/>risk. Full tax<br/>step-up available<br/>in asset deal."]
+    Stock --> StockDesc["Seller participates<br/>in upside / downside<br/>of combined entity.<br/>No immediate tax<br/>event for seller."]
+    Earnout --> EarnoutDesc["Bridges valuation<br/>gap; defers<br/>payment to future<br/>performance.<br/>Contingent liability<br/>on buyer's B/S."]
+    
+    style Root fill:#e1f5ff,stroke:#333,stroke-width:2px
+    style Cash fill:#fff4e6,stroke:#333,stroke-width:2px
+    style Stock fill:#fff4e6,stroke:#333,stroke-width:2px
+    style Earnout fill:#fff4e6,stroke:#333,stroke-width:2px
+    style CashDesc fill:#f9f9f9,stroke:#666,stroke-width:1px
+    style StockDesc fill:#f9f9f9,stroke:#666,stroke-width:1px
+    style EarnoutDesc fill:#f9f9f9,stroke:#666,stroke-width:1px
 ```
 
 A cash deal is structurally simpler: the seller's shareholders receive immediate, certain liquidity. For the buyer, a fully cash-funded acquisition either depletes cash reserves, requires debt financing, or both. A leveraged transaction funded primarily with debt introduces a detailed LBO debt waterfall that must be modeled alongside the accretion/dilution analysis, because the interest expense from new debt directly affects the buyer's post-acquisition EPS. A stock deal, by contrast, issues new shares to the seller's shareholders, diluting the existing ownership base. Whether the deal accretes or dilutes the buyer's EPS depends on the relationship between the target's post-acquisition earnings contribution and the dilution caused by new share issuance. The key operational test is whether the target's earnings yield (Net Income / Purchase Price) exceeds the buyer's earnings yield (Net Income / Market Cap). When the target's earnings yield is higher, the deal acccretes EPS; when lower, it dilutes.

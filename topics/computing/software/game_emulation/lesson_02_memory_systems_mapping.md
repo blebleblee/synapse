@@ -177,36 +177,34 @@ An emulator modeling both formats must configure its page tables differently at 
 
 The architectural diagram below shows the signal path from CPU address generation through dispatch to backing storage:
 
-```
-                    ┌─────────────────────────────────┐
-                    │          Emulated CPU Core        │
-                    │   generates 16-bit or 24-bit      │
-                    │   effective address (EA)          │
-                    └────────────────┬────────────────-─┘
-                                     │  EA
-                                     ▼
-                    ┌────────────────────────────────-──┐
-                    │       MemMap Page Table            │
-                    │  index = EA >> PAGE_BITS           │
-                    │  page  = pages[index]              │
-                    └──────┬──────────────┬─────────────┘
-                           │              │
-              read_ptr      │              │  read_ptr == NULL
-              != NULL       │              │
-                           ▼              ▼
-              ┌────────────────┐    ┌─────────────────────┐
-              │  Direct RAM    │    │  MMIO Handler Dispatch│
-              │  Dereference   │    │  page.read_fn(ctx,EA) │
-              │  O(1), ~1 ns   │    │  PPU / APU / DMA reg  │
-              └────────────────┘    └──────────┬────────────┘
-                                               │
-                              ┌────────────────┴──────────────┐
-                              │                               │
-                    ┌─────────▼──────┐              ┌─────────▼──────┐
-                    │   PPU Register │              │  DMA Register  │
-                    │   Handler      │              │  Handler       │
-                    │  (side effects)│              │ (triggers xfer)│
-                    └────────────────┘              └────────────────┘
+```mermaid
+flowchart TD
+    CPU["Emulated CPU Core
+    generates 16-bit or 24-bit
+    effective address (EA)"]
+
+    PT["MemMap Page Table
+    index = EA >> PAGE_BITS
+    page = pages[index]"]
+
+    RAM["Direct RAM Dereference
+    O(1), ~1 ns"]
+
+    MMIO["MMIO Handler Dispatch
+    page.read_fn(ctx, EA)
+    PPU / APU / DMA reg"]
+
+    PPU["PPU Register Handler
+    (side effects)"]
+
+    DMA["DMA Register Handler
+    (triggers xfer)"]
+
+    CPU -->|"EA"| PT
+    PT -->|"read_ptr != NULL"| RAM
+    PT -->|"read_ptr == NULL"| MMIO
+    MMIO --> PPU
+    MMIO --> DMA
 ```
 
 ### Memory-Mapped I/O: Behavioral Contracts

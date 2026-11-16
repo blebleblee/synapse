@@ -22,47 +22,49 @@ The mesolimbic dopamine pathway represents a distributed computational system th
 
 The ventral tegmental area contains approximately 20,000 to 30,000 dopamine neurons in humans, comprising roughly 60-65% of the total cell population alongside GABAergic and glutamatergic neurons. These dopamine neurons exhibit heterogeneous response properties, with distinct subpopulations encoding different aspects of motivated behavior. Medial VTA neurons projecting to medial nucleus accumbens shell respond preferentially to primary rewards and basic homeostatic drives, while lateral VTA neurons projecting to nucleus accumbens core and prefrontal cortex encode learned associations, effort costs, and abstract goal representations.
 
-```
-VTA Dopamine Signal Flow Architecture:
+```mermaid
+flowchart TD
+    subgraph inputs ["Input Sources"]
+        LH["Lateral Hypothalamus\nOrexin — energy homeostasis"]
+        LHb["Lateral Habenula\nGABAergic — punishment / omission"]
+        PPT["Pedunculopontine Tegmentum\nGlutamate — arousal"]
+        PFC_in["Prefrontal Cortex\nGlutamate — goal representations"]
+        BNST["Bed Nucleus Stria Terminalis\nCRF — stress / aversion"]
+    end
 
-Input Sources:
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│  Lateral Hypothalamus → Orexin (energy homeostasis)   │
-│  Lateral Habenula → GABAergic (punishment/omission)    │
-│  Pedunculopontine Tegmentum → Glutamate (arousal)      │
-│  Prefrontal Cortex → Glutamate (goal representations)  │
-│  Bed Nucleus Stria Terminalis → CRF (stress/aversion)  │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-                            ↓
-                   ┌────────────────┐
-                   │  VTA Dopamine  │
-                   │    Neurons     │
-                   │                │
-                   │  • Tonic firing (2-10 Hz baseline)
-                   │  • Phasic bursts (20-100 Hz for 50-200ms)
-                   │  • Pauses (prediction error < 0)
-                   └────────────────┘
-                            ↓
-                   Projection Targets:
-        ┌───────────────────┴───────────────────┐
-        ↓                                       ↓
-┌──────────────────┐                  ┌──────────────────┐
-│ Nucleus Accumbens│                  │ Prefrontal Cortex│
-│                  │                  │                  │
-│ Core: effort,    │                  │ Dorsolateral:    │
-│ action selection │                  │ working memory,  │
-│                  │                  │ cognitive control│
-│ Shell: hedonic,  │                  │                  │
-│ homeostatic drives│                 │ Orbitofrontal:   │
-│                  │                  │ outcome value,   │
-│ D1 receptors →   │                  │ contingency      │
-│ "Go" pathway     │                  │ learning         │
-│                  │                  │                  │
-│ D2 receptors →   │                  │                  │
-│ "No-Go" pathway  │                  │                  │
-└──────────────────┘                  └──────────────────┘
+    subgraph vta ["VTA"]
+        VTA["VTA Dopamine Neurons\n━━━━━━━━━━━━━━━━━━━━\nTonic firing: 2–10 Hz baseline\nPhasic bursts: 20–100 Hz for 50–200 ms\nPauses: prediction error < 0"]
+    end
+
+    subgraph targets ["Projection Targets"]
+        subgraph nac ["Nucleus Accumbens"]
+            NAc_core["Core\neffort, action selection"]
+            NAc_shell["Shell\nhedonic, homeostatic drives"]
+            D1["D1 receptors → 'Go' pathway"]
+            D2["D2 receptors → 'No-Go' pathway"]
+        end
+
+        subgraph pfc_out ["Prefrontal Cortex"]
+            DLPFC["Dorsolateral PFC\nworking memory, cognitive control"]
+            OFC["Orbitofrontal Cortex\noutcome value, contingency learning"]
+        end
+    end
+
+    LH    --> VTA
+    LHb   --> VTA
+    PPT   --> VTA
+    PFC_in --> VTA
+    BNST  --> VTA
+
+    VTA --> NAc_core
+    VTA --> NAc_shell
+    VTA --> DLPFC
+    VTA --> OFC
+
+    NAc_core  --> D1
+    NAc_core  --> D2
+    NAc_shell --> D1
+    NAc_shell --> D2
 ```
 
 The nucleus accumbens functions as a limbic-motor interface, integrating dopaminergic signals with glutamatergic inputs from prefrontal cortex, amygdala, and hippocampus to gate behavioral output. Medium spiny neurons in the accumbens, comprising 95% of the neuronal population, express either D1 or D2 dopamine receptors in largely segregated populations. D1-expressing neurons form the direct "Go" pathway, facilitating action initiation when activated by phasic dopamine release. D2-expressing neurons comprise the indirect "No-Go" pathway, suppressing competing actions and increasing during dopamine pauses that signal worse-than-expected outcomes.

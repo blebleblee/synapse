@@ -158,25 +158,22 @@ In computational practice, the eigendecomposition of $\hat{\boldsymbol{\Sigma}}$
 
 The architecture of a PCA-augmented experiment flows as follows:
 
-```
-Raw multivariate response Y ∈ ℝ^{n×p}
-            │
-            ▼
-  Center (and optionally scale) columns
-            │
-            ▼
-  Compute SVD: X_c = U_s · D · V^T
-            │
-            ▼
-  Select m components (scree, % variance, or CV)
-            │
-            ▼
-  Project: Z = X_c · V_m  (scores ∈ ℝ^{n×m})
-            │
-            ├──────────────────────────────────┐
-            ▼                                  ▼
-  Analyze Z as response in ANOVA          Interpret loadings V_m
-  (m univariate ANOVAs or MANOVA)         as rotations of original variables
+```mermaid
+flowchart TD
+    A["Raw multivariate response Y ∈ ℝⁿˣᵖ"]
+    B["Center (and optionally scale) columns"]
+    C["Compute SVD: X_c = Uₛ · D · Vᵀ"]
+    D["Select m components (scree, % variance, or CV)"]
+    E["Project: Z = X_c · Vₘ  (scores ∈ ℝⁿˣᵐ)"]
+    F["Analyze Z as response in ANOVA\n(m univariate ANOVAs or MANOVA)"]
+    G["Interpret loadings Vₘ\nas rotations of original variables"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    E --> G
 ```
 
 The scree plot—eigenvalues plotted in decreasing order against their index—provides a visual heuristic for selecting $m$: look for an "elbow" where the eigenvalue curve flattens. The Kaiser criterion retains components with eigenvalue exceeding one (when working with the correlation matrix). Both are heuristics; the most principled approach is cross-validation, which repeatedly holds out subsets of rows and measures the reconstruction error $\|\mathbf{X}_c - \hat{\mathbf{X}}_c\|_F^2$ as a function of $m$. The minimizer of prediction error over held-out data is the $m$ that generalizes.

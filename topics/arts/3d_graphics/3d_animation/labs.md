@@ -151,7 +151,7 @@ Consolidate your operational verification procedures into a systematic diagnosti
 - Midrange compression: -12 dBFS threshold, 2:1 ratio, 10 ms attack, 80 ms release
 - Treble compression: -15 dBFS threshold, 4:1 ratio, 5 ms attack, 50 ms release
 - Gain reduction target: 2-4 dB on bass, 1-2 dB on mids, 3-5 dB on treble
-- Limiter threshold: -1 dBTP ceiling, <2 dB gain reduction on peaks only
+- Limiter threshold: -1 dBTP ceiling, < 2 dB gain reduction on peaks only
 
 **Loudness Compliance Targets:**
 - Streaming (Spotify/YouTube): -16 LUFS ±1 LU integrated, -1 dBTP true peak max
@@ -162,7 +162,7 @@ Consolidate your operational verification procedures into a systematic diagnosti
 **Stereo Imaging Verification:**
 - Mid-side side channel boost: +3 dB max (wider stereo without phase issues)
 - Side channel high-pass: 250 Hz (keep bass centered in mono mid)
-- Mono compatibility test: <3 dB loudness loss, no midrange frequency cancellation
+- Mono compatibility test: < 3 dB loudness loss, no midrange frequency cancellation
 - Correlation meter: >+0.5 (positive correlation, avoid phase incoherence)
 
 **Critical Listening Checkpoints:**

@@ -48,43 +48,54 @@ The mechanical dynamics of TOT states reveal strategic opportunities and vulnera
 
 Prevention of TOT states requires strengthening phonological pathways during encoding. Passive reading creates strong semantic encoding but weak phonological traces. Effective protocols incorporate explicit phonological processing: reading target terms aloud, exaggerating articulation of difficult phoneme sequences, writing target words by hand to reinforce orthographic-phonological binding, creating phonological mnemonics that link sound patterns to meaning (e.g., "Dostoyevsky's novels are *dusty* with existential angst"), and conducting retrieval practice that requires speaking answers rather than merely recognizing them. These interventions build robust phonological access that resists TOT blockage under competition stress.
 
-```
-Spreading Activation Network Example
-
-Question Cue: "This German physicist formulated the uncertainty principle"
-
-         [German]────┐
-             │       │
-             │       v
-         [Physicist] ───> (Werner Heisenberg) ──┐
-             │                    ^             │
-             │                    │             │
-             v                    │             v
-    [Quantum Mechanics]───────────┘        [Uncertainty
-             │                              Principle]
-             │                                  ^
-             v                                  │
-    [1920s Discoveries]────────────────────────┘
-
-Activation flows from cue nodes [German], [Physicist], [Uncertainty Principle]
-converging on target node (Werner Heisenberg). Strong, multiple pathways 
-produce rapid threshold crossing and confident retrieval.
-
-Interference Example
-
-Cue: "This U.S. President named James..."
-
-    [President]──────┬──────┐
-                     │      │
-                     v      v
-              (James K.    (James
-               Polk)        Buchanan)
-                 ^            ^
-                 │            │
-              [1840s]      [1850s]
-
-Similar names + overlapping temporal/categorical features split activation,
-creating competition and potential retrieval failure or confusion.
+```mermaid
+flowchart TD
+    subgraph example1 ["Spreading Activation Network Example"]
+        direction TB
+        Q1["Question Cue: 'This German physicist formulated the uncertainty principle'"]
+        
+        German["German"]
+        Physicist["Physicist"]
+        QM["Quantum Mechanics"]
+        Discoveries["1920s Discoveries"]
+        WH(("Werner Heisenberg"))
+        UP["Uncertainty Principle"]
+        
+        Q1 -.-> German
+        Q1 -.-> Physicist
+        Q1 -.-> UP
+        
+        German --> Physicist
+        German --> WH
+        Physicist --> WH
+        Physicist --> QM
+        QM --> WH
+        QM --> Discoveries
+        WH --> UP
+        Discoveries --> UP
+        
+        Note1["Activation flows from cue nodes converging on target.<br/>Strong, multiple pathways produce rapid<br/>threshold crossing and confident retrieval."]
+    end
+    
+    subgraph example2 ["Interference Example"]
+        direction TB
+        Q2["Cue: 'This U.S. President named James...'"]
+        
+        President["President"]
+        Polk(("James K. Polk"))
+        Buchanan(("James Buchanan"))
+        Period1["1840s"]
+        Period2["1850s"]
+        
+        Q2 -.-> President
+        
+        President --> Polk
+        President --> Buchanan
+        Period1 --> Polk
+        Period2 --> Buchanan
+        
+        Note2["Similar names + overlapping temporal/categorical<br/>features split activation, creating competition<br/>and potential retrieval failure or confusion."]
+    end
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

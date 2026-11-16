@@ -134,37 +134,29 @@ For a system with $k > 2$ moduli, one proceeds iteratively: combine the first tw
 
 The following diagram captures the flow of the CRT construction and the Hensel lifting process described in the next section.
 
-```
-Input: system x ≡ aᵢ (mod mᵢ), i = 1..k
-                    │
-        ┌───────────▼────────────┐
-        │  Check pairwise gcd    │
-        │  gcd(mᵢ, mⱼ) = 1?     │
-        └───────┬────────┬───────┘
-                │ YES    │ NO
-                │        ▼
-                │  Compatibility check:
-                │  aᵢ ≡ aⱼ (mod gcd(mᵢ,mⱼ))
-                │  for all pairs → merge moduli iteratively
-                │
-                ▼
-    Compute M = m₁·m₂·…·mₖ (or lcm in general)
-    Compute Mᵢ = M/mᵢ
-    Compute yᵢ = Mᵢ⁻¹ mod mᵢ  (Extended Euclidean)
-    Compute eᵢ = Mᵢ · yᵢ
-                │
-                ▼
-    x₀ = Σ aᵢ · eᵢ  (mod M)
-                │
-                ▼
-    Unique solution mod M (or mod lcm in non-coprime case)
-                │
-                ▼  [If modulus is prime power pⁿ]
-        ┌───────▼────────────┐
-        │  Hensel Lifting    │
-        │  x mod p → x mod  │
-        │  p² → … → x mod pⁿ│
-        └────────────────────┘
+```mermaid
+flowchart TD
+    Input["Input: system x ≡ aᵢ (mod mᵢ), i = 1..k"]
+    
+    Input --> Check["Check pairwise gcd<br/>gcd(mᵢ, mⱼ) = 1?"]
+    
+    Check -->|YES| Compute
+    Check -->|NO| Compat["Compatibility check:<br/>aᵢ ≡ aⱼ (mod gcd(mᵢ,mⱼ))<br/>for all pairs → merge moduli iteratively"]
+    
+    Compat --> Compute
+    
+    Compute["Compute M = m₁·m₂·…·mₖ (or lcm in general)<br/>Compute Mᵢ = M/mᵢ<br/>Compute yᵢ = Mᵢ⁻¹ mod mᵢ  (Extended Euclidean)<br/>Compute eᵢ = Mᵢ · yᵢ"]
+    
+    Compute --> Sum["x₀ = Σ aᵢ · eᵢ  (mod M)"]
+    
+    Sum --> Solution["Unique solution mod M<br/>(or mod lcm in non-coprime case)"]
+    
+    Solution --> PrimePower{"If modulus is<br/>prime power pⁿ?"}
+    
+    PrimePower -->|YES| Hensel["Hensel Lifting<br/>x mod p → x mod p² → … → x mod pⁿ"]
+    
+    PrimePower -->|NO| End["End"]
+    Hensel --> End
 ```
 
 ### Hensel's Lemma and Lifting Solutions to Prime Powers

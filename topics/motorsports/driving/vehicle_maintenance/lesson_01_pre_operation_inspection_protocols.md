@@ -24,91 +24,138 @@ Wheel and tire inspection follows aerodynamic survey, beginning with lug nut tor
 
 Suspension geometry verification employs string alignment rigs or laser measurement systems to confirm static toe, camber, and ride height settings match setup specifications within documented tolerances. Front toe settings typically resolve to ±0.5mm total, measured as differential dimension between wheel rim leading and trailing edges. Negative camber angles range from 2° to 4° depending on circuit characteristics, with acceptance tolerance around ±0.2°. Ride height measurement references standardized datum points on chassis floor, with front and rear targets balanced to achieve aerodynamic platform attitude optimized for downforce generation. The inspector logs all dimensional measurements in session setup sheets, creating time-series data that reveals suspension settling trends or bushing wear patterns requiring corrective maintenance.
 
-```
-Pre-Operation Inspection Sequence Flow:
-
-SAFETY CRITICAL TIER (30 minutes)
-│
-├─ Aerodynamic Surface Survey
-│  ├─ Leading edge impact damage inspection
-│  ├─ Underfloor plank wear depth measurement
-│  └─ Active aero actuator range-of-motion test
-│
-├─ Wheel & Tire Verification
-│  ├─ Lug nut torque check (600 Nm centerlock)
-│  ├─ Torque stripe alignment confirmation
-│  ├─ Tire pressure measurement (±0.5 psi)
-│  └─ Tread surface integrity inspection
-│
-├─ Suspension Geometry Measurement
-│  ├─ Static toe alignment (±0.5mm total)
-│  ├─ Camber angle verification (±0.2°)
-│  └─ Ride height dimensional check
-│
-├─ Brake System Inspection
-│  ├─ Pad thickness measurement (>3.0mm min)
-│  ├─ Rotor friction surface inspection
-│  ├─ Caliper piston seal integrity check
-│  └─ Hydraulic line routing/chafing survey
-│
-├─ Steering System Verification
-│  ├─ Column U-joint backlash assessment
-│  ├─ Rack end ball joint play measurement
-│  ├─ Tie rod locknut torque confirmation
-│  └─ Steering wheel retention bolt check
-│
-└─ Driver Safety Equipment
-   ├─ Harness webbing condition inspection
-   ├─ Buckle latch mechanism function test
-   ├─ HANS device tether attachment
-   └─ Fire suppression system charge pressure
-
-PERFORMANCE SYSTEMS TIER (20 minutes)
-│
-├─ Powertrain Inspection
-│  ├─ Oil level/condition assessment
-│  ├─ Coolant level/pressure cap integrity
-│  ├─ Exhaust system mounting/hanger security
-│  └─ Driveshaft CV joint boot condition
-│
-├─ Fuel System Verification
-│  ├─ Fuel cell vent check valve function
-│  ├─ Filler cap seal integrity inspection
-│  ├─ Fuel line routing/mounting security
-│  └─ Collector tank breather condition
-│
-└─ Aerodynamic Balance Elements
-   ├─ Rear wing endplate attachment security
-   ├─ Gurney flap mounting screw torque
-   └─ Dive plane retention verification
-
-DATA ACQUISITION TIER (15 minutes)
-│
-├─ Sensor Function Verification
-│  ├─ Wheel speed sensor air gap measurement
-│  ├─ Suspension potentiometer sweep test
-│  ├─ Brake pressure transducer zero offset
-│  └─ Steering angle sensor calibration check
-│
-├─ Telemetry System Health
-│  ├─ Data logger memory capacity verification
-│  ├─ GPS antenna mounting security
-│  ├─ CAN bus termination resistance check
-│  └─ Radio transponder battery voltage
-│
-└─ Cockpit Interface Elements
-   ├─ Dashboard display pixel integrity
-   ├─ Rotary switch detent function
-   ├─ Paddle shift microsensor response
-   └─ Drink system reservoir fill level
-
-DOCUMENTATION SIGNOFF
-│
-└─ Setup Sheet Completion
-   ├─ Inspector identification and timestamp
-   ├─ Component serial number logging
-   ├─ Measured dimension entry
-   └─ Discrepancy notation and resolution tracking
+```mermaid
+flowchart TD
+    Start["Pre-Operation Inspection Sequence Flow"]
+    
+    Start --> SafetyTier["SAFETY CRITICAL TIER<br/>(30 minutes)"]
+    Start --> PerfTier["PERFORMANCE SYSTEMS TIER<br/>(20 minutes)"]
+    Start --> DataTier["DATA ACQUISITION TIER<br/>(15 minutes)"]
+    
+    SafetyTier --> Aero["Aerodynamic Surface Survey"]
+    SafetyTier --> Wheel["Wheel & Tire Verification"]
+    SafetyTier --> Susp["Suspension Geometry Measurement"]
+    SafetyTier --> Brake["Brake System Inspection"]
+    SafetyTier --> Steer["Steering System Verification"]
+    SafetyTier --> Driver["Driver Safety Equipment"]
+    
+    Aero --> Aero1["Leading edge impact damage inspection"]
+    Aero --> Aero2["Underfloor plank wear depth measurement"]
+    Aero --> Aero3["Active aero actuator range-of-motion test"]
+    
+    Wheel --> Wheel1["Lug nut torque check (600 Nm centerlock)"]
+    Wheel --> Wheel2["Torque stripe alignment confirmation"]
+    Wheel --> Wheel3["Tire pressure measurement (±0.5 psi)"]
+    Wheel --> Wheel4["Tread surface integrity inspection"]
+    
+    Susp --> Susp1["Static toe alignment (±0.5mm total)"]
+    Susp --> Susp2["Camber angle verification (±0.2°)"]
+    Susp --> Susp3["Ride height dimensional check"]
+    
+    Brake --> Brake1["Pad thickness measurement (>3.0mm min)"]
+    Brake --> Brake2["Rotor friction surface inspection"]
+    Brake --> Brake3["Caliper piston seal integrity check"]
+    Brake --> Brake4["Hydraulic line routing/chafing survey"]
+    
+    Steer --> Steer1["Column U-joint backlash assessment"]
+    Steer --> Steer2["Rack end ball joint play measurement"]
+    Steer --> Steer3["Tie rod locknut torque confirmation"]
+    Steer --> Steer4["Steering wheel retention bolt check"]
+    
+    Driver --> Driver1["Harness webbing condition inspection"]
+    Driver --> Driver2["Buckle latch mechanism function test"]
+    Driver --> Driver3["HANS device tether attachment"]
+    Driver --> Driver4["Fire suppression system charge pressure"]
+    
+    PerfTier --> Power["Powertrain Inspection"]
+    PerfTier --> Fuel["Fuel System Verification"]
+    PerfTier --> AeroBalance["Aerodynamic Balance Elements"]
+    
+    Power --> Power1["Oil level/condition assessment"]
+    Power --> Power2["Coolant level/pressure cap integrity"]
+    Power --> Power3["Exhaust system mounting/hanger security"]
+    Power --> Power4["Driveshaft CV joint boot condition"]
+    
+    Fuel --> Fuel1["Fuel cell vent check valve function"]
+    Fuel --> Fuel2["Filler cap seal integrity inspection"]
+    Fuel --> Fuel3["Fuel line routing/mounting security"]
+    Fuel --> Fuel4["Collector tank breather condition"]
+    
+    AeroBalance --> AeroB1["Rear wing endplate attachment security"]
+    AeroBalance --> AeroB2["Gurney flap mounting screw torque"]
+    AeroBalance --> AeroB3["Dive plane retention verification"]
+    
+    DataTier --> Sensor["Sensor Function Verification"]
+    DataTier --> Telem["Telemetry System Health"]
+    DataTier --> Cockpit["Cockpit Interface Elements"]
+    
+    Sensor --> Sensor1["Wheel speed sensor air gap measurement"]
+    Sensor --> Sensor2["Suspension potentiometer sweep test"]
+    Sensor --> Sensor3["Brake pressure transducer zero offset"]
+    Sensor --> Sensor4["Steering angle sensor calibration check"]
+    
+    Telem --> Telem1["Data logger memory capacity verification"]
+    Telem --> Telem2["GPS antenna mounting security"]
+    Telem --> Telem3["CAN bus termination resistance check"]
+    Telem --> Telem4["Radio transponder battery voltage"]
+    
+    Cockpit --> Cockpit1["Dashboard display pixel integrity"]
+    Cockpit --> Cockpit2["Rotary switch detent function"]
+    Cockpit --> Cockpit3["Paddle shift microsensor response"]
+    Cockpit --> Cockpit4["Drink system reservoir fill level"]
+    
+    Aero1 --> Doc["DOCUMENTATION SIGNOFF"]
+    Aero2 --> Doc
+    Aero3 --> Doc
+    Wheel1 --> Doc
+    Wheel2 --> Doc
+    Wheel3 --> Doc
+    Wheel4 --> Doc
+    Susp1 --> Doc
+    Susp2 --> Doc
+    Susp3 --> Doc
+    Brake1 --> Doc
+    Brake2 --> Doc
+    Brake3 --> Doc
+    Brake4 --> Doc
+    Steer1 --> Doc
+    Steer2 --> Doc
+    Steer3 --> Doc
+    Steer4 --> Doc
+    Driver1 --> Doc
+    Driver2 --> Doc
+    Driver3 --> Doc
+    Driver4 --> Doc
+    Power1 --> Doc
+    Power2 --> Doc
+    Power3 --> Doc
+    Power4 --> Doc
+    Fuel1 --> Doc
+    Fuel2 --> Doc
+    Fuel3 --> Doc
+    Fuel4 --> Doc
+    AeroB1 --> Doc
+    AeroB2 --> Doc
+    AeroB3 --> Doc
+    Sensor1 --> Doc
+    Sensor2 --> Doc
+    Sensor3 --> Doc
+    Sensor4 --> Doc
+    Telem1 --> Doc
+    Telem2 --> Doc
+    Telem3 --> Doc
+    Telem4 --> Doc
+    Cockpit1 --> Doc
+    Cockpit2 --> Doc
+    Cockpit3 --> Doc
+    Cockpit4 --> Doc
+    
+    Doc --> Setup["Setup Sheet Completion"]
+    
+    Setup --> Setup1["Inspector identification and timestamp"]
+    Setup --> Setup2["Component serial number logging"]
+    Setup --> Setup3["Measured dimension entry"]
+    Setup --> Setup4["Discrepancy notation and resolution tracking"]
 ```
 
 Brake system inspection constitutes the highest-priority mechanical verification, as hydraulic failure modes directly compromise vehicle control authority with minimal warning. The inspector measures brake pad friction material thickness using depth micrometers, rejecting pads below 3.0mm remaining thickness to ensure adequate thermal mass for sustained high-energy braking zones. Rotor friction surfaces receive visual inspection for heat checking, a network of fine radial cracks indicating thermal fatigue accumulation from repeated thermal cycling between ambient and 800°C peak temperatures. Severe heat checking creates stress concentration sites where crack propagation can cause catastrophic rotor failure, ejecting fragments that puncture tire sidewalls or damage suspension components. Caliper piston dust seals undergo inspection for tears or extrusion that permit contamination ingress, degrading hydraulic pressure sealing and causing inconsistent brake pedal feel that corrupts driver braking threshold precision.

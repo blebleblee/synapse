@@ -24,33 +24,24 @@ SELinux policy is not interpreted at runtime from text files. It is compiled int
 
 The source language is split across three distinct file types. Plain `.te` files contain type enforcement rules: type declarations, attribute assignments, `allow` rules, and `type_transition` statements. Interface files (`.if`) define reusable macros that abstract common rule patterns, the SELinux equivalent of a library header. File context files (`.fc`) define the regular expressions that `restorecon` and `setfiles` use to assign types to filesystem paths. These three artifacts feed into the `checkpolicy` and `semodule_package` toolchain, which produces a loadable `.pp` module. The kernel's policy loader then links all loaded modules with the base policy into the kernel's internal representation.
 
-```
-                   .te source          .if macros           .fc contexts
-                      │                   │                     │
-                      ▼                   ▼                     ▼
-              ┌───────────────────────────────────────────────────┐
-              │              m4 macro processor                   │
-              └───────────────────────┬───────────────────────────┘
-                                      │
-                                      ▼
-                             .te (expanded)
-                                      │
-                                      ▼
-              ┌───────────────────────────────────────────────────┐
-              │        checkmodule  — parses, validates TE        │
-              │        produces binary Module Policy (.mod)       │
-              └───────────────────────┬───────────────────────────┘
-                                      │
-                                      ▼
-              ┌───────────────────────────────────────────────────┐
-              │  semodule_package — bundles .mod + .fc → .pp     │
-              └───────────────────────┬───────────────────────────┘
-                                      │
-                                      ▼
-              ┌───────────────────────────────────────────────────┐
-              │  semodule -i  — loads into kernel policy store   │
-              │  kernel links base + all modules, activates      │
-              └───────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A[".te source"]
+    B[".if macros"]
+    C[".fc contexts"]
+    D["m4 macro processor"]
+    E[".te (expanded)"]
+    F["checkmodule — parses, validates TE<br/>produces binary Module Policy (.mod)"]
+    G["semodule_package — bundles .mod + .fc → .pp"]
+    H["semodule -i — loads into kernel policy store<br/>kernel links base + all modules, activates"]
+    
+    A --> D
+    B --> D
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
 ```
 
 The key architectural insight here is that the kernel's active policy is a *linked* artifact. The base policy module contains all core types, and additional modules extend it. When `semodule -i my_module.pp` runs, the entire policy store is relinked and replaced atomically — the kernel sees a consistent new policy at the moment of reload, with no window during which partial rules are active. This matters for security: policy updates on a running system cannot be partially applied.

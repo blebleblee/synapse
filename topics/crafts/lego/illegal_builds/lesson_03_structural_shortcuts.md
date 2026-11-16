@@ -35,21 +35,48 @@ For a 1.5mm deflection, this yields approximately 18 MPa—well below the 40 MPa
 
 The most common bracket bending application bridges the notorious half-plate offset problem. Standard LEGO geometry allows studs to be offset by integer multiples of 8mm, but achieving a 4mm offset (half a stud) within the standard grid requires geometric violation. The canonical solution employs two 1×2–2×2 brackets in mirror configuration: the first bracket mounts flush to a baseplate, while the second bracket's mounting face is forced onto studs offset by exactly 4mm (half a stud spacing). The imposed deflection causes both brackets to bend inward, their semicircular webs storing roughly 15 MPa of stress. When assembled into a larger structure, these bent brackets distribute loads across adjacent plates, preventing localized stress concentration.
 
-```
-Standard Grid (8mm spacing):
-│ • │   • │   • │
-└───┴─────┴─────┘
+```mermaid
+flowchart TD
 
-Half-Stud Offset (4mm):
-│ • │ • │ • │ • │
-└─┴───┴───┴───┴─┘
+    subgraph SG["Standard Grid (8mm spacing)"]
+        direction LR
+        SG_S1["Stud"]
+        SG_S2["Stud"]
+        SG_S3["Stud"]
+        SG_S1 <-->|"8mm"| SG_S2
+        SG_S2 <-->|"8mm"| SG_S3
+    end
 
-Bracket Bridge:
-  ╭─[Plate]─╮
- ╭┴╮       ╭┴╮
- │•│       │•│  ← Brackets bent ~1.5mm inward
- ╰┬╯       ╰┬╯
-  ╰─[Plate]─╯
+    subgraph HO["Half-Stud Offset (4mm)"]
+        direction LR
+        HO_S1["Stud"]
+        HO_S2["Stud"]
+        HO_S3["Stud"]
+        HO_S4["Stud"]
+        HO_S1 <-->|"4mm"| HO_S2
+        HO_S2 <-->|"4mm"| HO_S3
+        HO_S3 <-->|"4mm"| HO_S4
+    end
+
+    subgraph BB["Bracket Bridge"]
+        direction TB
+        TOP_PLATE["Plate (top)"]
+        BKT_L["Bracket Left\n(bent ~1.5mm inward)"]
+        BKT_R["Bracket Right\n(bent ~1.5mm inward)"]
+        STUD_L["Stud"]
+        STUD_R["Stud"]
+        BOT_PLATE["Plate (bottom)"]
+
+        TOP_PLATE --> BKT_L
+        TOP_PLATE --> BKT_R
+        BKT_L --> STUD_L
+        BKT_R --> STUD_R
+        STUD_L --> BOT_PLATE
+        STUD_R --> BOT_PLATE
+    end
+
+    SG -.->|"offset by half-stud"| HO
+    HO -.->|"bridged via brackets"| BB
 ```
 
 Plate compression techniques exploit the finite bending stiffness of LEGO plates to reduce their effective thickness. A standard 1×n plate measures 3.2mm nominal height, but the web connecting the top stud surface to the bottom anti-stud geometry is only 1.0–1.2mm thick in most regions. When a plate is inserted into a confined space—such as between two parallel surfaces separated by slightly less than 3.2mm—the web compresses elastically, allowing the plate to fit where it theoretically should not.
@@ -58,30 +85,34 @@ The most dramatic compression application occurs in SNOT (Studs Not On Top) cons
 
 Builders resolve this conflict through strategic plate compression combined with selective tolerance matching. Long plates (1×8 or longer) exhibit greater compliance than short plates (1×2 or 1×4) due to their increased lever arm, allowing deflections of 0.15–0.2mm without permanent deformation. The assembly sequence matters critically: the compliant long plate must be installed last, forcing it to bend around the already-constrained vertical plates. Attempting to install the vertical plates second would concentrate stress at rigid connection points, likely causing clutch damage or stud deformation.
 
-```
-Plate Compression in Mixed Orientation:
-
-Side View (Dimensional Conflict):
-        ┌─── 3.2mm ───┐
-        │   [Horiz.]   │
-        └──────────────┘
-    ┌───┐← 3.1mm
-    │ V │
-    │ e │  ← 0.1-0.2mm interference!
-    │ r │
-    │ t │
-    └───┘
-
-Resolution via Compression:
-        ╔═════════════╗
-        ║  [Horiz.]   ║ ← Web compresses 0.15mm
-        ╚═════════════╝
-    ┌───┐
-    │ V │  ← Vertical plate fully rigid
-    │ e │
-    │ r │
-    │ t │
-    └───┘
+```mermaid
+flowchart TD
+    subgraph conflict ["Side View (Dimensional Conflict)"]
+        H1["Horizontal Plate<br/>3.2mm width"]
+        V1["Vertical Plate<br/>3.1mm height"]
+        I1["⚠ 0.1-0.2mm interference"]
+        
+        H1 -.-> I1
+        V1 -.-> I1
+    end
+    
+    subgraph resolution ["Resolution via Compression"]
+        H2["Horizontal Plate<br/>Web compresses 0.15mm"]
+        V2["Vertical Plate<br/>Fully rigid"]
+        R["✓ Compatible assembly"]
+        
+        H2 --> R
+        V2 --> R
+    end
+    
+    conflict ==> resolution
+    
+    style H1 fill:#e1f5ff,stroke:#0288d1
+    style V1 fill:#fff3e0,stroke:#f57c00
+    style I1 fill:#ffebee,stroke:#c62828
+    style H2 fill:#e8f5e9,stroke:#388e3c
+    style V2 fill:#fff3e0,stroke:#f57c00
+    style R fill:#e8f5e9,stroke:#2e7d32
 ```
 
 Forced alignment in mismatched grids represents the most audacious category of geometric violation because it deliberately creates structures that store significant elastic energy across entire subassemblies. The canonical example: the "compressed brick" technique, where a builder constructs two parallel walls separated by a non-integer multiple of the brick grid, then forces bricks to span between them. A 7-stud gap should accommodate exactly seven 1×1 plates or one 1×6 brick plus one 1×1 brick, but neither a 1×7 brick nor a 1×8 brick has any legal installation. The compressed brick technique forces a 1×8 brick into a 7-stud gap, compressing the structure by 8mm (one full stud) and storing approximately 50–80 Newtons of spring force depending on the rigidity of the surrounding assembly.
@@ -125,7 +156,7 @@ Failure mode taxonomy divides into four categories, each with characteristic sig
 
 **Fatigue crack propagation** manifests as hairline cracks visible under magnification, typically originating at stress concentration features like bracket hinge radii or plate corner fillets. Cracks propagate perpendicular to the principal stress direction, growing with each load cycle until catastrophic failure. Mitigation requires either reducing cyclic stress below the fatigue endurance limit (15 MPa) or redesigning geometry to eliminate stress concentrations. **Creep deformation** appears as permanent geometric changes developing over months under constant load—bent brackets that no longer return to neutral geometry, compressed plates with permanent thickness reduction, or warped beams with visible curvature. Mitigation requires replacing damaged elements and reducing static stress to below 15 MPa for long-term installations.
 
-Edge case handling addresses the boundary conditions where geometric violations interact with extreme environmental or mechanical factors. High-temperature environments (>50°C, such as near display lighting or in closed vehicles) reduce ABS yield strength by 20–30%, necessitating proportional stress reduction in illegal connections. Low-temperature environments (<5°C) increase brittleness, transforming normally ductile failures into catastrophic fractures—models containing geometric violations should not be transported or handled in cold conditions. High-humidity environments (>70% RH) cause dimensional swelling in ABS of approximately 0.1–0.2%, potentially tightening already-stressed connections to failure threshold.
+Edge case handling addresses the boundary conditions where geometric violations interact with extreme environmental or mechanical factors. High-temperature environments (>50°C, such as near display lighting or in closed vehicles) reduce ABS yield strength by 20–30%, necessitating proportional stress reduction in illegal connections. Low-temperature environments (< 5°C) increase brittleness, transforming normally ductile failures into catastrophic fractures—models containing geometric violations should not be transported or handled in cold conditions. High-humidity environments (>70% RH) cause dimensional swelling in ABS of approximately 0.1–0.2%, potentially tightening already-stressed connections to failure threshold.
 
 Scaling geometric violations to large structures (>1000 parts, >50cm dimensions) introduces systemic challenges absent in small assemblies. Tolerance accumulation becomes severe—what appears as a 0.1mm error in a 10-stud span compounds to 1mm or more across 100 studs, potentially overwhelming the elastic compliance available from illegal techniques. The solution employs **segmented construction** with geometric violation "joints" at regular intervals that absorb cumulative tolerance errors. A 100-stud wall should not be built as a monolithic assembly but rather as 10-stud segments joined by bracket bridges or compressed brick connections that function as expansion joints, preventing tolerance stack-up from generating destructive stress.
 

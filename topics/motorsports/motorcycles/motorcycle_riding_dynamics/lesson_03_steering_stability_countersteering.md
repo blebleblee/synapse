@@ -32,31 +32,36 @@ The front fork assembly consists of two parallel tubes—the outer fork tubes, w
 
 Fork offset, alternatively termed "triple clamp offset" or simply "offset," measures the horizontal distance between the steering axis and the fork tube centerline. Manufacturers typically implement this offset at the lower triple clamp, where the fork tubes pass through machined holes that position the tubes forward of the steering head axis. Adjustable offset triple clamps, common on racing motorcycles, provide multiple hole positions that allow mechanics to shift the fork tubes fore or aft in 2-3 mm increments. Reducing offset increases trail, creating heavier, more stable steering; increasing offset reduces trail, quickening steering response at the expense of reduced stability under deceleration.
 
-```
-STEERING GEOMETRY RELATIONSHIPS (SIDE VIEW)
-
-                    │ Steering Axis
-                    │ ╲
-                    │  ╲ Rake Angle α
-                    │   ╲
-            Triple  │____╲____________
-            Clamp   │     ╲           ↓ Fork Offset (f)
-                    │      ╲          |
-                    │       ╲         |
-            Fork    │        ╲        ↓
-            Tubes   │         ╲_______●────── Fork tube centerline
-                    │          ╲      
-                    │           ╲     
-                    │            ╲    
-                    │             ╲   
-        Ground ─────●──────────────●──────────
-                    ↑              ↑
-                    │              │
-            Steering axis      Tire contact
-            ground projection  patch center
-                    
-                    ├──────────────┤
-                       Trail (t)
+```mermaid
+flowchart TD
+    TC["Triple Clamp"]
+    SA["Steering Axis"]
+    FT["Fork Tubes"]
+    FO["Fork Offset (f)"]
+    RA["Rake Angle (α)"]
+    FTC["Fork Tube Centerline"]
+    SAGP["Steering Axis<br/>Ground Projection"]
+    TCP["Tire Contact<br/>Patch Center"]
+    TR["Trail (t)"]
+    GL["Ground Line"]
+    
+    TC -->|"along axis"| SA
+    SA -->|"angled at"| RA
+    SA -->|"offset by"| FO
+    FO -->|to| FTC
+    FT -->|follow| FTC
+    FTC -->|"ends at"| TCP
+    SA -->|"projects to"| SAGP
+    SAGP -.->|measured distance| TR
+    TR -.->|to| TCP
+    SAGP -->|on| GL
+    TCP -->|on| GL
+    
+    style SA stroke:#333,stroke-width:3px
+    style RA fill:#ffe6e6
+    style FO fill:#e6f3ff
+    style TR fill:#e6ffe6
+    style GL stroke:#666,stroke-width:2px,stroke-dasharray: 5 5
 ```
 
 Gyroscopic precession manifests when an external torque acts on a spinning wheel, causing the wheel to respond with rotation about an axis perpendicular to both the applied torque and the spin axis. For a motorcycle wheel rotating with angular velocity $\omega$ and possessing moment of inertia $I$, the gyroscopic moment $M_g$ resulting from an applied steering velocity $\dot{\delta}$ follows: $M_g = I \omega \dot{\delta}$. This moment acts perpendicular to the plane containing both the wheel spin axis and the steering axis, resisting rapid changes in steering angle. At highway speeds, the front wheel rotational velocity might reach 60 radians per second, generating substantial gyroscopic resistance to quick steering inputs. This resistance increases linearly with both wheel speed and the rate of steering angle change, explaining why rapid lane changes at high velocity require firm handlebar pressure while the same angular displacement at parking lot speeds demands minimal effort.

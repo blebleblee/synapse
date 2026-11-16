@@ -62,29 +62,27 @@ This resolution preserves classical logic for all sentences not involving the tr
 
 **Diagrammatic Signal Flow.** We model the evaluation cycle for the Liar paradox as a feedback loop:
 
-```
-Liar Sentence L: "This sentence is false"
-                    ↓
-Evaluation attempt: Assign τ(L) ∈ {True, False}
-                    ↓
-             ┌──────┴──────┐
-             ↓              ↓
-      Assume τ(L) = T   Assume τ(L) = F
-             ↓              ↓
-      L asserts "L is F"   L asserts "L is F"
-             ↓              ↓
-      Assertion is F       Assertion is T
-             ↓              ↓
-      Contradiction:       Contradiction:
-      τ(L) = F             τ(L) = T
-             ↓              ↓
-             └──────┬──────┘
-                    ↓
-             Oscillation / No Fixed Point
-                    ↓
-        Classical Bivalence Fails
-                    ↓
-   Resolution Options: Tarski Hierarchy / Kripke Fixed Point / Paraconsistency
+```mermaid
+flowchart TD
+    L["Liar Sentence L: 'This sentence is false'"]
+    L --> Eval["Evaluation attempt: Assign τ(L) ∈ {True, False}"]
+    Eval --> Branch{" "}
+    Branch --> AssumeT["Assume τ(L) = T"]
+    Branch --> AssumeF["Assume τ(L) = F"]
+    
+    AssumeT --> AssertT["L asserts 'L is F'"]
+    AssertT --> AssertionF["Assertion is F"]
+    AssertionF --> ContradT["Contradiction:<br/>τ(L) = F"]
+    
+    AssumeF --> AssertF["L asserts 'L is F'"]
+    AssertF --> AssertionT["Assertion is T"]
+    AssertionT --> ContradF["Contradiction:<br/>τ(L) = T"]
+    
+    ContradT --> Merge[" "]
+    ContradF --> Merge
+    Merge --> Osc["Oscillation / No Fixed Point"]
+    Osc --> Fails["Classical Bivalence Fails"]
+    Fails --> Resolution["Resolution Options:<br/>Tarski Hierarchy / Kripke Fixed Point / Paraconsistency"]
 ```
 
 The signal path demonstrates that both classical truth-value assignments lead to contradictions, forcing the conclusion that the sentence cannot be accommodated within a bivalent framework.

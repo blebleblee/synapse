@@ -941,12 +941,17 @@ except Exception as e:
 The circuit breaker prevents cascading failures by failing fast when the API is degraded. It tracks recent failures and opens after a threshold is reached, short-circuiting all requests for a recovery period before allowing a probe request through. This protects both the client (wasted compute on doomed requests) and the server (reduces load during outages).
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Closed
-    Closed --> Open : failure_count >= threshold
-    Open --> HalfOpen : recovery_timeout elapsed
-    HalfOpen --> Closed : probe_request succeeds
-    HalfOpen --> Open : probe_request fails
+flowchart TD
+    Start(["Start"])
+    Closed["Closed"]
+    Open["Open"]
+    HalfOpen["Half-Open"]
+    
+    Start --> Closed
+    Closed -->|"failure_count ≥ threshold"| Open
+    Open -->|"recovery_timeout elapsed"| HalfOpen
+    HalfOpen -->|"probe succeeds"| Closed
+    HalfOpen -->|"probe fails"| Open
 ```
 
 ```python

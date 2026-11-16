@@ -30,27 +30,32 @@ The **classical pathway** is initiated when C1q, the recognition subunit of the 
 
 The functional outputs of complement are threefold. Covalently deposited C3b acts as an **opsonin**, flagging pathogens for phagocytosis via CR1 and CR3 receptors on macrophages and neutrophils. Cleavage fragments C3a and C5a are **anaphylatoxins** — potent chemoattractants and vasoactive mediators that increase vascular permeability, recruit phagocytes, and stimulate mast cell degranulation. Downstream assembly of C5b-9 forms the **membrane attack complex (MAC)**, a transmembrane pore that disrupts the lipid bilayer of Gram-negative bacteria and certain enveloped viruses. Host cells are protected from inadvertent MAC assembly by membrane-bound regulators including CD55 (decay-accelerating factor), CD59 (protectin), and plasma factor H.
 
-```
-COMPLEMENT PATHWAY CONVERGENCE
-
-Classical Pathway          Lectin Pathway          Alternative Pathway
-  (C1q-IgG/IgM)            (MBL-Carbohydrate)       (Spontaneous C3 tick-over)
-       |                          |                           |
-   C1r/C1s                   MASP-1/2                  C3(H₂O) + Factor B/D
-   cleave C4, C2             cleave C4, C2               form C3bBb
-       |                          |                           |
-       +------------- C3 Convertase -------------------------+
-                             |
-                           C3 → C3a + C3b
-                           |           |
-                     Anaphylatoxin   Opsonin (CR1/CR3)
-                     (C3a, C5a)      + Amplification Loop
-                           |
-                        C5 → C5a + C5b
-                           |
-                       C5b + C6-C9 →
-                    Membrane Attack Complex (MAC)
-                       (transmembrane pore)
+```mermaid
+flowchart TD
+    CP["Classical Pathway<br/>(C1q-IgG/IgM)"]
+    LP["Lectin Pathway<br/>(MBL-Carbohydrate)"]
+    AP["Alternative Pathway<br/>(Spontaneous C3 tick-over)"]
+    
+    CP --> C1["C1r/C1s<br/>cleave C4, C2"]
+    LP --> MASP["MASP-1/2<br/>cleave C4, C2"]
+    AP --> C3H2O["C3(H₂O) + Factor B/D<br/>form C3bBb"]
+    
+    C1 --> C3Conv["C3 Convertase"]
+    MASP --> C3Conv
+    C3H2O --> C3Conv
+    
+    C3Conv --> C3Split["C3 → C3a + C3b"]
+    
+    C3Split --> C3a["C3a<br/>Anaphylatoxin"]
+    C3Split --> C3b["C3b<br/>Opsonin (CR1/CR3)<br/>+ Amplification Loop"]
+    
+    C3a --> C5Split["C5 → C5a + C5b"]
+    C3b --> C5Split
+    
+    C5Split --> C5a["C5a<br/>Anaphylatoxin"]
+    C5Split --> C5b["C5b"]
+    
+    C5b --> MAC["C5b + C6-C9 →<br/>Membrane Attack Complex (MAC)<br/>(transmembrane pore)"]
 ```
 
 **Phagocytes** execute the cellular arm of innate immunity. Neutrophils are the most abundant circulating leukocytes (~60–70% of white blood cells in humans) and respond earliest to bacterial and fungal infection. Within minutes of complement activation or bacterial recognition, neutrophils exit blood vessels by a stepwise process of rolling (selectin-mediated), activation (chemokine-mediated integrin upregulation), firm adhesion (LFA-1/ICAM-1 ligation), and transendothelial migration driven by the C5a and IL-8 concentration gradient. Engulfment of opsonized pathogens into phagosomes triggers the **oxidative burst**: NADPH oxidase (NOX2) assembled on the phagosomal membrane generates superoxide ($\text{O}_2^{\bullet-}$), which dismutates to hydrogen peroxide ($\text{H}_2\text{O}_2$). Myeloperoxidase then converts $\text{H}_2\text{O}_2$ and chloride ions into hypochlorous acid (HOCl), one of the most potent antimicrobial oxidants produced by mammalian cells. Simultaneously, phagosome-lysosome fusion delivers cathepsins, defensins, and lysozyme into the phagolysosome. Activated neutrophils can also extrude their nuclear chromatin as **neutrophil extracellular traps (NETs)** — mesh-like fibers decorated with histones and antimicrobial proteins that physically trap and kill extracellular pathogens.

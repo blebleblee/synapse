@@ -243,9 +243,9 @@ graph TD
     D -->|"MVCC/2PL"| J["Transaction Manager"]
     J -->|Checkpoint| E
     
-    style E fill:#f9f,stroke:#333,stroke-width:2px
-    style F fill:#bbf,stroke:#333,stroke-width:2px
-    style I fill:#bfb,stroke:#333,stroke-width:2px
+    style E fill:#f9f,stroke:#333,stroke-width:2px,color:#0f172a
+    style F fill:#bbf,stroke:#333,stroke-width:2px,color:#0f172a
+    style I fill:#bfb,stroke:#333,stroke-width:2px,color:#0f172a
 ```
 
 **Key observations**:

@@ -20,19 +20,44 @@ The architecture of retro game timing systems begins with the master clock that 
 
 Super Mario Bros. exemplifies frame rules through its level transition logic. The game implements a 21-frame rule where level completion times get rounded to the nearest multiple of twenty-one frames before the transition occurs. If a player finishes a level at frame 8340 or frame 8359, both times round to the same frame rule boundary, meaning the nineteen-frame difference produces zero actual timesave. This quantization emerges from the game's logic loop structure: every twenty-one frames, the level transition routine checks whether Mario has touched the flagpole, and if so, initiates the transition on that specific frame boundary. Consequently, speedrunners optimize routes to just barely reach the next frame rule threshold rather than maximizing raw speed throughout every section—an unintuitive strategy where slowing down can paradoxically improve final time.
 
-```
-Frame Rule Structure (Super Mario Bros.):
-
-Frame Count:  0    21   42   63   84   105  126  147  168  189  210
-             |----|----|----|----|----|----|----|----|----|----|---->
-Level States: PLAY PLAY PLAY PLAY PLAY PLAY PLAY PLAY TRANS TRANS ...
-
-Example finish times:
-  8340 frames → rounds to frame rule at 8337 (21 × 397)
-  8355 frames → rounds to frame rule at 8358 (21 × 398)
-  8359 frames → rounds to frame rule at 8358 (21 × 398)
-  
-Result: 15-frame variance collapses to same transition boundary
+```mermaid
+flowchart TD
+    subgraph timeline["Frame Rule Timeline (21-frame intervals)"]
+        F0["Frame 0"]
+        F21["Frame 21"]
+        F42["Frame 42"]
+        F63["Frame 63"]
+        F84["Frame 84"]
+        F105["Frame 105"]
+        F126["Frame 126"]
+        F147["Frame 147"]
+        F168["Frame 168"]
+        F189["Frame 189"]
+        F210["Frame 210"]
+        
+        F0 --> F21 --> F42 --> F63 --> F84 --> F105 --> F126 --> F147 --> F168 --> F189 --> F210
+    end
+    
+    subgraph states["Level State Mapping"]
+        S1["PLAY (0-147)"]
+        S2["TRANSITION (168-189)"]
+        S3["..."]
+        
+        S1 --> S2 --> S3
+    end
+    
+    subgraph examples["Frame Rule Rounding Examples"]
+        E1["8340 frames<br/>→ Rule 397<br/>→ Frame 8337"]
+        E2["8355 frames<br/>→ Rule 398<br/>→ Frame 8358"]
+        E3["8359 frames<br/>→ Rule 398<br/>→ Frame 8358"]
+        
+        E1 -.-> Result["15-frame variance<br/>collapses to same<br/>transition boundary"]
+        E2 -.-> Result
+        E3 -.-> Result
+    end
+    
+    timeline -.->|"Maps to"| states
+    states -.->|"Example"| examples
 ```
 
 Subpixel positioning represents another layer of hidden state that profoundly affects speedrun execution. Most retro games implement positional tracking using fixed-point arithmetic rather than floating-point numbers to avoid expensive division operations on integer-only CPUs. A typical implementation stores position as a sixteen-bit value where the upper eight bits represent whole pixels and the lower eight bits represent fractional subpixels. When Mario moves at "3.5 pixels per frame," the actual implementation adds 896 to his position value each frame (3 × 256 + 128 = 896), and the display routine renders him at the position formed by the upper eight bits while the accumulating lower eight bits remain invisible.

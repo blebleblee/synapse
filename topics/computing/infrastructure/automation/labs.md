@@ -1854,25 +1854,25 @@ systemd uses cgroups v2 for resource limiting:
 - `CapabilityBoundingSet=`: Restrict kernel capabilities
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Inactive
-    Inactive --> Activating: systemctl start
-    Activating --> Active: ExecStart succeeds
-    Activating --> Failed: ExecStart fails
-    
-    Active --> Deactivating: systemctl stop
-    Active --> Reloading: systemctl reload
-    Active --> Failed: Watchdog timeout
-    Active --> Failed: Process crash
-    
-    Reloading --> Active: ExecReload succeeds
-    
-    Failed --> Activating: Auto-restart
-    Failed --> Inactive: StartLimitBurst exceeded
-    
-    Deactivating --> Inactive: ExecStop succeeds
-    
-    Inactive --> [*]
+flowchart TD
+    Start(["[*]"]) --> Inactive["Inactive"]
+    Inactive --> End(["[*]"])
+
+    Inactive -->|"systemctl start"| Activating["Activating"]
+    Activating -->|"ExecStart succeeds"| Active["Active"]
+    Activating -->|"ExecStart fails"| Failed["Failed"]
+
+    Active -->|"systemctl stop"| Deactivating["Deactivating"]
+    Active -->|"systemctl reload"| Reloading["Reloading"]
+    Active -->|"Watchdog timeout"| Failed
+    Active -->|"Process crash"| Failed
+
+    Reloading -->|"ExecReload succeeds"| Active
+
+    Failed -->|Auto-restart| Activating
+    Failed -->|"StartLimitBurst exceeded"| Inactive
+
+    Deactivating -->|"ExecStop succeeds"| Inactive
 ```
 
 ## Lab 5: Scheduled Automation with systemd Timers

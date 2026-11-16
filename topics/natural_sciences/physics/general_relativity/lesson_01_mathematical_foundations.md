@@ -280,50 +280,22 @@ where $u^\mu = \partial x^\mu/\partial\tau$ is the common tangent vector. This e
 
 The computational pipeline for solving problems in curved spacetime follows a systematic sequence:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                   Specify Metric g_μν(x)                        │
-│         (from symmetry, ansatz, or known solution)              │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              Compute Inverse Metric g^μν                        │
-│                  and Determinant √(-g)                          │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│         Calculate Christoffel Symbols Γ^λ_μν                   │
-│      Γ^λ_μν = ½ g^λρ (∂_μ g_νρ + ∂_ν g_μρ - ∂_ρ g_μν)        │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│          Construct Riemann Curvature Tensor R^ρ_σμν            │
-│   R^ρ_σμν = ∂_μ Γ^ρ_νσ - ∂_ν Γ^ρ_μσ + Γ^ρ_μλ Γ^λ_νσ - ...   │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│           Contract to Ricci Tensor R_μν and Scalar R            │
-│              R_μν = R^λ_μλν,  R = g^μν R_μν                    │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              Form Einstein Tensor G_μν                          │
-│                G_μν = R_μν - ½ R g_μν                           │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│    Solve Geodesic Equations or Einstein Field Equations         │
-│                                                                 │
-│  Geodesics: d²x^μ/dτ² + Γ^μ_ρσ (dx^ρ/dτ)(dx^σ/dτ) = 0         │
-│                                                                 │
-│  Field Eqs: G_μν = 8πG/c⁴ T_μν                                  │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Specify Metric g_μν(x)<br/>(from symmetry, ansatz, or known solution)"]
+    B["Compute Inverse Metric g^μν<br/>and Determinant √(-g)"]
+    C["Calculate Christoffel Symbols Γ^λ_μν<br/>Γ^λ_μν = ½ g^λρ (∂_μ g_νρ + ∂_ν g_μρ - ∂_ρ g_μν)"]
+    D["Construct Riemann Curvature Tensor R^ρ_σμν<br/>R^ρ_σμν = ∂_μ Γ^ρ_νσ - ∂_ν Γ^ρ_μσ + Γ^ρ_μλ Γ^λ_νσ - ..."]
+    E["Contract to Ricci Tensor R_μν and Scalar R<br/>R_μν = R^λ_μλν,  R = g^μν R_μν"]
+    F["Form Einstein Tensor G_μν<br/>G_μν = R_μν - ½ R g_μν"]
+    G["Solve Geodesic Equations or Einstein Field Equations<br/><br/>Geodesics: d²x^μ/dτ² + Γ^μ_ρσ (dx^ρ/dτ)(dx^σ/dτ) = 0<br/><br/>Field Eqs: G_μν = 8πG/c⁴ T_μν"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
 ```
 
 This workflow applies to both forward problems—given a metric, compute curvature and geodesics—and inverse problems—given a matter distribution via $T_{\mu\nu}$, solve the Einstein equations for $g_{\mu\nu}$. Symbolic algebra systems like Mathematica, Maxima with the `ctensor` package, or Python with the `sympy` library automate much of this calculation, but understanding the manual procedure is essential for physical intuition and debugging.

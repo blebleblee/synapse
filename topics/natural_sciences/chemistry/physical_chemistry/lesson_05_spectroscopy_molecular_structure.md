@@ -32,29 +32,34 @@ Microwave rotational spectroscopy employs coherent radiation sources in the 1–
 
 The supersonic expansion technique deserves detailed examination, as it provides the population inversion and cooling essential for high-resolution rotational spectroscopy. A high-pressure gas pulse (typically 3–10 bar backing pressure) expands through a small orifice (0.5–1 mm diameter) into a vacuum chamber maintained at $10^{-5}$ to $10^{-6}$ torr. The rapid adiabatic expansion converts the random thermal energy of gas molecules into directed flow along the expansion axis, reducing the internal temperature from ambient 300 K to 1–10 K within a few nozzle diameters downstream. This cooling collapses the Boltzmann distribution over rotational states to predominantly populate the lowest few $J$ levels, simultaneously simplifying the spectrum by removing hot-band transitions and enhancing signal intensity by concentrating molecules into fewer quantum states. For weakly bound clusters and van der Waals complexes, the low temperature stabilizes species that would dissociate at room temperature, enabling structural determination of hydrogen-bonded and dispersion-bound systems.
 
-```
-Supersonic Molecular Beam FTMW Spectrometer Architecture:
+```mermaid
+flowchart TD
+    PulseValve["Pulse Valve<br/>10 Hz, 3-10 bar"]
+    Expansion["Expansion Region<br/>10 K"]
+    Skimmer["Skimmer<br/>1-2 mm"]
+    Cavity["Fabry-Pérot Cavity<br/>Q ~ 10,000"]
+    MWPulse["MW Pulse<br/>50-100 ns"]
+    MolPacket["Molecular Packet"]
+    FID["Free Induction Decay"]
+    LO["Local Oscillator"]
+    Mixer["Mixer"]
+    LPF["Low-Pass Filter"]
+    Digitizer["Digitizer<br/>1-10 GS/s"]
+    FFT["FFT"]
+    Spectrum["Frequency Spectrum"]
 
-Pulse Valve (10 Hz)                    Fabry-Pérot Cavity
-[3-10 bar] ───────────> Expansion ────────> [Q ~ 10,000]
-                         Region               │
-                         [10 K]               │ MW Pulse (50-100 ns)
-                                              │ ↓
-                         Skimmer             Molecular
-                         [1-2 mm]  ────────> Packet
-                                              │
-                                              │ Free Induction Decay
-                                              ↓
-                                         Mixer ←──── Local Oscillator
-                                              │
-                                              ↓
-                                         Low-Pass Filter
-                                              │
-                                              ↓
-                                         Digitizer (1-10 GS/s)
-                                              │
-                                              ↓
-                                         FFT → Frequency Spectrum
+    PulseValve --> Expansion
+    Expansion --> Skimmer
+    Skimmer --> MolPacket
+    Cavity --> MWPulse
+    MWPulse --> MolPacket
+    MolPacket --> FID
+    FID --> Mixer
+    LO --> Mixer
+    Mixer --> LPF
+    LPF --> Digitizer
+    Digitizer --> FFT
+    FFT --> Spectrum
 ```
 
 Infrared vibrational spectroscopy operates across the 400–4000 cm$^{-1}$ wavenumber range (2.5–25 μm wavelength), encompassing the fundamental stretching and bending modes of most chemical bonds. Modern Fourier transform infrared (FTIR) spectrometers employ a Michelson interferometer configuration where broadband infrared radiation from a thermal source (silicon carbide globar or mercury arc lamp) splits at a beamsplitter, with one arm reflecting from a fixed mirror and the other from a mirror mounted on a precision translation stage. The recombined beams create an interference pattern that modulates the intensity reaching the detector as a function of mirror displacement. The sample, positioned in one or both arms, imparts its wavelength-dependent absorption onto this interferogram. Fourier transformation converts the mirror-position domain signal to the frequency domain, yielding a complete absorption spectrum from a single mirror scan with resolution determined by the maximum optical path difference $\Delta_{\text{max}}$ through $\Delta\nu = 1/(2\Delta_{\text{max}})$. Standard FTIR instruments achieve 0.5–4 cm$^{-1}$ resolution, sufficient to resolve rotational fine structure in gas-phase spectra and distinguish closely spaced vibrational bands.
@@ -71,38 +76,23 @@ For time-resolved electronic spectroscopy probing photochemical dynamics, pump-p
 
 Nuclear magnetic resonance spectroscopy requires the highest magnetic field homogeneity of any spectroscopic technique, as the chemical shift scale spans only parts per million of the Larmor frequency. Superconducting magnets wound from niobium-titanium or niobium-tin wire, immersed in liquid helium at 4.2 K and thermally shielded by liquid nitrogen, generate fields of 7–23.5 tesla (corresponding to proton Larmor frequencies of 300–1000 MHz). Active shim coils superimpose precisely calibrated gradient fields to compensate residual inhomogeneities, achieving field variations below 0.01 Hz across the 5 mm sample volume after careful shimming. The radiofrequency detection system surrounds the sample with a resonant LC circuit tuned to the Larmor frequency of the nucleus under study (proton, carbon-13, nitrogen-15, phosphorus-31, or fluorine-19 most commonly). Pulsed radiofrequency excitation, typically 90° and 180° pulses lasting 10–50 μs, rotates the nuclear magnetization away from equilibrium, and the precessing transverse magnetization induces a voltage in the detection coil that decays with time constant $T_2^*$ (the inhomogeneous transverse relaxation time).
 
-```
-NMR Signal Processing and Spectral Acquisition:
-
-RF Pulse          Nuclear Spin              Free Induction Decay
-Sequence    ──>   Dynamics    ──>          Signal (time domain)
-                  (Bloch Eqs)               
-                                             ↓ Digitize (10-100 MHz)
-                                             
-                                           Complex Time Series
-                                           I(t) + iQ(t)
-                                             
-                                             ↓ Apodization (exponential/Gaussian)
-                                             
-                                           Windowed FID
-                                             
-                                             ↓ Zero filling
-                                             
-                                           Extended time array
-                                             
-                                             ↓ Fast Fourier Transform
-                                             
-                                           Frequency-domain spectrum
-                                           Real[S(ω)] and Imag[S(ω)]
-                                             
-                                             ↓ Phase correction (φ₀, φ₁)
-                                             
-                                           Absorption-mode spectrum
-                                             
-                                             ↓ Baseline correction
-                                             
-                                           Final NMR spectrum
-                                           δ (ppm) vs. Intensity
+```mermaid
+flowchart TD
+    A["RF Pulse<br/>Sequence"] --> B["Nuclear Spin<br/>Dynamics<br/>(Bloch Eqs)"]
+    B --> C["Free Induction Decay<br/>Signal (time domain)"]
+    C --> D["Complex Time Series<br/>I(t) + iQ(t)"]
+    D --> E["Windowed FID"]
+    E --> F["Extended time array"]
+    F --> G["Frequency-domain spectrum<br/>Real["S(ω)"] and Imag["S(ω)"]"]
+    G --> H["Absorption-mode spectrum"]
+    H --> I["Final NMR spectrum<br/>δ (ppm) vs. Intensity"]
+    
+    C -.->|"Digitize (10-100 MHz)"| D
+    D -.->|"Apodization (exponential/Gaussian)"| E
+    E -.->|"Zero filling"| F
+    F -.->|"Fast Fourier Transform"| G
+    G -.->|"Phase correction (φ₀, φ₁)"| H
+    H -.->|"Baseline correction"| I
 ```
 
 Multidimensional NMR experiments extend the information content by correlating resonances through chemical bonds or through space. In a two-dimensional (2D) experiment such as COSY (correlation spectroscopy), the pulse sequence consists of preparation, evolution ($t_1$), mixing, and detection ($t_2$) periods. During the evolution period, the spin system develops chemical shift and J-coupling modulation encoded in the phase and amplitude of the coherence. The mixing period transfers this modulation between coupled spins through scalar coupling. The detection period records the FID as a function of $t_2$ for each value of the incremented evolution time $t_1$. Double Fourier transformation with respect to $t_1$ and $t_2$ yields a 2D frequency spectrum $S(\omega_1, \omega_2)$ displaying cross-peaks at coordinates $(\delta_A, \delta_B)$ whenever nuclei A and B couple. NOESY (nuclear Overhauser effect spectroscopy) replaces scalar coupling transfer with dipolar coupling through space, revealing internuclear distances up to 5 Å and providing the distance constraints essential for protein structure determination. HSQC (heteronuclear single quantum coherence) and HMBC (heteronuclear multiple bond correlation) experiments correlate protons with directly bonded and long-range coupled carbons, respectively, enabling unambiguous connectivity assignment in complex organic molecules.

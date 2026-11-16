@@ -22,31 +22,30 @@ The chord tolerance setting is the single most important export parameter, and p
 
 The angular tolerance parameter, available in Fusion 360's export dialog and FreeCAD's Mesh workbench, controls how aggressively the tessellator refines regions of high surface curvature independent of the linear deviation. Setting angular tolerance to 1° ensures that regions where surface normals change rapidly — fillets, blended transitions, spherical surfaces — receive additional triangle density without inflating the triangle count in flat regions. Use both parameters together: chord tolerance governs linear accuracy, angular tolerance governs curvature fidelity.
 
-```
-CAD Kernel (Exact Geometry)
-         │
-         ▼
-   Tessellation Engine
-   ┌─────────────────────────────────────────┐
-   │  chord_tolerance = 0.01–0.05 mm         │
-   │  angular_tolerance = 1–5°               │
-   │  Surface type dispatch:                 │
-   │    planar  → minimal triangles          │
-   │    cylindrical → chord-sampled arcs     │
-   │    NURBS → adaptive subdivision         │
-   └─────────────────────────────────────────┘
-         │
-         ▼
-   Raw Triangle Soup (unstitched vertices)
-         │
-         ▼
-   Vertex Merging (coincidence within ε)
-         │
-         ▼
-   Manifold Check → pass/fail
-         │
-         ▼
-   Binary STL / ASCII STL / OBJ
+```mermaid
+flowchart TD
+    A["CAD Kernel<br/>(Exact Geometry)"]
+    
+    B["Tessellation Engine"]
+    
+    subgraph B_config ["Configuration & Strategy"]
+        B1["chord_tolerance = 0.01–0.05 mm"]
+        B2["angular_tolerance = 1–5°"]
+        B3["Surface Type Dispatch:<br/>• planar → minimal triangles<br/>• cylindrical → chord-sampled arcs<br/>• NURBS → adaptive subdivision"]
+    end
+    
+    C["Raw Triangle Soup<br/>(unstitched vertices)"]
+    D["Vertex Merging<br/>(coincidence within ε)"]
+    E{"Manifold Check"}
+    F["Binary STL / ASCII STL / OBJ"]
+    
+    A --> B
+    B --> B_config
+    B_config --> C
+    C --> D
+    D --> E
+    E -->|pass| F
+    E -->|fail| E
 ```
 
 The vertex merging step deserves particular attention because it is the site of most export-induced non-manifold geometry. When two adjacent surface patches meet at a shared edge, the tessellator samples each patch independently and produces two sets of vertices along that edge, nominally coincident but potentially separated by floating-point rounding errors at the sub-micron level. The merging tolerance — typically around 0.001 mm in well-implemented exporters — determines whether these near-coincident vertices are welded into shared vertices or left as duplicates. Duplicate vertices at a shared edge produce the classic T-junction or open-edge non-manifold condition: the slicer sees an edge bounded by one face rather than two, interprets it as a surface boundary, and either flags an error or attempts incorrect repair.

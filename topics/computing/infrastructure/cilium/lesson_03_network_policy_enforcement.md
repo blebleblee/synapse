@@ -88,44 +88,25 @@ The policy compilation process transforms these declarative YAML specifications 
 
 The agent's policy compilation stage begins with identity resolution, where it queries the local endpoint cache to determine which pods on the current node match the policy's endpoint selector. For each matched endpoint, the agent constructs a policy decision tree by evaluating all applicable CNPs and CCNPs in priority order, merging their ingress and egress rules using the allow-union semantics described earlier. This decision tree is then flattened into a series of BPF map entries that encode policy verdicts as (source_identity, destination_identity, port, protocol) tuples mapped to allow or deny actions. These map entries are loaded into the kernel using the BPF syscall, replacing the previous policy map atomically to ensure consistent enforcement across all packets.
 
-```
-Policy Compilation Pipeline:
-┌─────────────────────────────────────────────────────────────────┐
-│  CNP/CCNP Resources (etcd)                                      │
-└────────────────┬────────────────────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Cilium Operator: Global Identity Allocation                    │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │ app=frontend,tier=web → Identity 1024                    │  │
-│  │ app=backend,tier=app → Identity 1025                     │  │
-│  │ app=cache,tier=data → Identity 1026                      │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└────────────────┬────────────────────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Cilium Agent (per-node): Policy Compilation                    │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │ Endpoint Resolution: pods matching endpointSelector      │  │
-│  │ Decision Tree Merging: union of applicable policies      │  │
-│  │ L3/L4 Map Generation: (src_id, dst_id, port) → verdict  │  │
-│  │ L7 Proxy Config: Envoy HTTP/Kafka filter chains         │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└────────────────┬────────────────────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  eBPF Datapath: Runtime Enforcement                             │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │ Connection Tracking: new vs. established flow detection  │  │
-│  │ Identity Lookup: IP → security identity hash table       │  │
-│  │ Policy Map Lookup: (src_id, dst_id, port) → verdict     │  │
-│  │ Verdict Caching: per-connection state in conntrack       │  │
-│  │ L7 Redirect: forward to Envoy proxy if HTTP/Kafka       │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["CNP/CCNP Resources (etcd)"]
+    
+    B["Cilium Operator: Global Identity Allocation"]
+    B1["app=frontend,tier=web → Identity 1024<br/>app=backend,tier=app → Identity 1025<br/>app=cache,tier=data → Identity 1026"]
+    
+    C["Cilium Agent (per-node): Policy Compilation"]
+    C1["Endpoint Resolution: pods matching endpointSelector<br/>Decision Tree Merging: union of applicable policies<br/>L3/L4 Map Generation: (src_id, dst_id, port) → verdict<br/>L7 Proxy Config: Envoy HTTP/Kafka filter chains"]
+    
+    D["eBPF Datapath: Runtime Enforcement"]
+    D1["Connection Tracking: new vs. established flow detection<br/>Identity Lookup: IP → security identity hash table<br/>Policy Map Lookup: (src_id, dst_id, port) → verdict<br/>Verdict Caching: per-connection state in conntrack<br/>L7 Redirect: forward to Envoy proxy if HTTP/Kafka"]
+    
+    A --> B
+    B -.-> B1
+    B --> C
+    C -.-> C1
+    C --> D
+    D -.-> D1
 ```
 
 The distinction between Layer 3/4 and Layer 7 policy enforcement manifests in the datapath execution model. Layer 3/4 policies are fully enforced in the eBPF kernel datapath using direct hash map lookups, achieving single-digit microsecond latency for both policy decision and packet forwarding. When a policy includes Layer 7 rules indicated by `http`, `kafka`, or `dns` protocol specifications, the datapath cannot make a final verdict in kernel space because protocol parsing and stateful inspection require capabilities beyond what eBPF can safely express within its restricted execution environment. Instead, the datapath marks these connections for Layer 7 redirection and transparently forwards them to an embedded Envoy proxy instance running in the Cilium agent's user-space process.

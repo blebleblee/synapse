@@ -245,8 +245,19 @@ For a center frequency of 1 GHz:
 
 $$L = \frac{QR}{\omega_0} = \frac{20 \times 25}{2\pi \times 10^9} \approx 79.6 \text{ nanohenries}$$
 
-This inductance is large enough that parasitic inductances from component leads become significant, and precise tuning may be required. If we need 10% bandwidth (lower Q = 10), the inductance drops to 40 nanohenries, but the match is less precise.
+This inductance is large enough that parasitic inductances from component leads become significant, and precise tuning may be required.
 
-### Measurement and Validation: Network Analyzer Workflow
+### Practical Matching Network Design Considerations
 
-Mo
+High-Q matching networks, while achieving excellent impedance transformation at their design frequency, exhibit sharp roll-off in performance as frequency deviates from resonance. The voltage and current maxima within the network increase with Q, creating potential failure points under high-power operation—arc-over in capacitors, saturation in inductors, and I²R heating in resistive elements. For broadband systems (fractional bandwidths exceeding 10-20%), multi-section matching networks become necessary. The Chebyshev response distributes mismatch ripple evenly across the passband, while the Butterworth response maximizes flatness at band center. Real-world implementations must account for parasitic elements: PCB trace inductance (typically 1 nH/mm), via inductance (0.5-1 nH), SMD component self-resonances, and temperature coefficients. At microwave frequencies, distributed matching networks using quarter-wave transformers or tapered transmission lines often outperform lumped elements, trading component count for predictable, low-loss performance. The art of matching network design lies in balancing theoretical optimality against manufacturability, cost, tuning sensitivity, and environmental robustness—choices that distinguish functional prototypes from production-ready systems.
+
+## Summary & Verification Matrix
+
+| **Invariant/Mechanism** | **Governing Equation** | **Physical Interpretation** | **Diagnostic Criterion** |
+|------------------------|------------------------|----------------------------|-------------------------|
+| **Characteristic Impedance** | $Z_0 = \sqrt{L/C} = \sqrt{(R + j\omega L)/(G + j\omega C)}$ | Ratio of voltage to current wave amplitudes; purely resistive for lossless lines | Mismatch when $Z_L \neq Z_0$ produces reflection; measure with TDR or VNA |
+| **Propagation Constant** | $\gamma = \alpha + j\beta = \sqrt{(R + j\omega L)(G + j\omega C)}$ | $\alpha$ quantifies attenuation per unit length; $\beta = 2\pi/\lambda$ governs phase velocity | Loss increases with $\sqrt{f}$ (skin effect); verify with S₂₁ magnitude vs. frequency |
+| **Reflection Coefficient** | $\Gamma = \frac{Z_L - Z_0}{Z_L + Z_0} = \|\Gamma\|e^{j\theta}$ | Fraction of incident wave reflected at discontinuity; maps complex load impedances to unit circle | $\|\Gamma\| = 0$ for matched load, $\|\Gamma\| = 1$ for open/short; measure with directional coupler or VNA S₁₁ |
+| **Standing Wave Ratio** | $\text{VSWR} = \frac{1 + \|\Gamma\|}{1 - \|\Gamma\|}$ | Ratio of maximum to minimum voltage amplitude on line; always ≥ 1 | VSWR = 1 for perfect match; VSWR > 2 (Γ ≈ 0.33) often triggers redesign; measure with slotted line or VNA |
+| **Stub Matching Principle** | Shunt stub: $Y_{\text{stub}} = -jB$ cancels load susceptance; position stub where $G_{\text{load}} = Y_0$ | Reactance cancellation via parallel resonance; stub location transforms conductance to match $Z_0$ | Smith chart: rotate load admittance to $g=1$ circle, then add stub to reach center; verify with swept-frequency S₁₁ < -20 dB |
+| **Matching Network Q** | $Q = \frac{\omega_0 L}{R} = \frac{1}{\omega_0 RC}$; $\text{BW} \approx f_0/Q$ | High-Q networks store reactive energy, limiting bandwidth; voltage/current stress scales with Q | Bandwidth-mismatch tradeoff: 5% BW requires Q ≈ 20; measure 3-dB bandwidth or return loss contour on Smith chart.

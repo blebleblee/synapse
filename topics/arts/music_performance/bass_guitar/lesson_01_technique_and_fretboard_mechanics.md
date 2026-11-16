@@ -947,7 +947,33 @@ Do this on non-practice days or at least 4 hours after practice. The extensors (
 
 ---
 
-## 9. Lesson Summary and Progress Benchmarks
+## 9. Ear-to-Fretboard: Hearing What You Play
+
+Mechanics without ear training produces a player who can execute shapes but can't find a note by sound, follow a song by ear, or correct a wrong note before the audience hears it. Build this alongside the drills above, not after them.
+
+### 9.1 Sing the Root Before You Play It
+
+Before every repetition of Drill 4 (box shapes), hum or sing the root pitch, then play it and check the match. This closes the loop between what you intend to hear and what the string actually produces — the same checkpoint a singer uses, applied to an instrument.
+
+### 9.2 Interval Ear Drill (10 Minutes, Paired with Section 5)
+
+```
+Step 1: Play Root, then Perfect 5th. Sing the 5th back without the bass.
+Step 2: Play Root, then minor 3rd. Sing it back. Compare the "darker" color to the 5th.
+Step 3: Play Root, then Major 3rd. Sing it back. Compare the "brighter" color to the minor 3rd.
+Step 4: Have a practice partner or looper play a root. Identify m3 vs M3 by ear alone,
+        then confirm on the fretboard.
+```
+
+**Why this belongs in Lesson 1:** box shapes are finger geometry wrapped around intervals you need to recognize by ear in real time, on stage, when someone calls a key change or you drop into an unfamiliar jam. Players who skip ear training can execute a rehearsed shape perfectly and still freeze the moment the context changes.
+
+### 9.3 Call-and-Response Drill (5 Minutes Daily)
+
+Using a backing track, looper pedal, or practice partner: they play or sing a single note, you find it on the fretboard in two different positions as fast as possible, then play the perfect 5th above it without checking a chart. This single drill, done daily, does more for real-world fretboard fluency than any amount of isolated shape memorization.
+
+---
+
+## 10. Lesson Summary and Progress Benchmarks
 
 Don't advance to Lesson 2 until every box below is checked, cleanly, on two different days.
 
@@ -981,7 +1007,7 @@ Don't advance to Lesson 2 until every box below is checked, cleanly, on two diff
 - [ ] Frets 7–8–9–10 as a chromatic group with the ring finger fully independent
 - [ ] Explain the physical criteria deciding Simandl vs. OFPF
 
-### Box Shapes
+### Box Shapes and Ear Training
 
 - [ ] Minor box in E, F, G, A, B♭, C, D at 60 BPM, no hesitation
 - [ ] Major box in the same seven keys at 60 BPM
@@ -989,6 +1015,7 @@ Don't advance to Lesson 2 until every box below is checked, cleanly, on two diff
 - [ ] Move any box shape to a new root within two seconds
 - [ ] Name every interval aloud while playing, no hesitation
 - [ ] Explain why box shapes transpose (perfect fourth tuning between strings)
+- [ ] Identify m3 vs. M3 by ear alone in the call-and-response drill, 8 of 10 correct
 
 ### Injury Prevention
 
@@ -1011,7 +1038,7 @@ Don't advance to Lesson 2 until every box below is checked, cleanly, on two diff
 
 ---
 
-## 10. Looking Ahead: Lesson 2
+## 11. Looking Ahead: Lesson 2
 
 Lesson 2, **Right-Hand Technique and Your First Bass Lines**, builds directly on this foundation:
 

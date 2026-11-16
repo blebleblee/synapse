@@ -151,30 +151,20 @@ The `config.matcher` export deserves careful attention. This is not a runtime fi
 
 ISR's caching behavior is best understood as a per-route state machine with four states: `MISSING` (no cache entry exists), `FRESH` (a cache entry exists and is within its revalidation window), `STALE` (a cache entry exists but has exceeded its revalidation window), and `REVALIDATING` (a stale entry is being regenerated in the background).
 
-```
-  Initial Request
-        │
-        ▼
-  ┌─────────────┐    Entry exists and      ┌────────────┐
-  │   MISSING   │──────────────────────────►   FRESH    │◄─────────────┐
-  └──────┬──────┘    revalidate > now      └─────┬──────┘              │
-         │                                       │                     │
-         │ Trigger full                          │ revalidate          │
-         │ blocking render                       │ window expires      │
-         │                                       ▼                     │
-         │                               ┌──────────────┐             │
-         └──────────────────────────────►│    STALE     │             │
-                                         └──────┬───────┘             │
-                                                │                     │
-                                                │ Next request        │
-                                                │ arrives             │
-                                                ▼                     │
-                                        ┌────────────────┐           │
-                                        │  REVALIDATING  │───────────┘
-                                        │ (serve stale   │  Background render
-                                        │  while regen   │  completes; new
-                                        │  runs in BG)   │  entry stored
-                                        └────────────────┘
+```mermaid
+flowchart TD
+    Start["Initial Request"]
+    Missing["MISSING"]
+    Fresh["FRESH"]
+    Stale["STALE"]
+    Revalidating["REVALIDATING<br/>(serve stale while regen runs in BG)"]
+    
+    Start --> Missing
+    Missing -->|"Entry exists and<br/>revalidate > now"| Fresh
+    Missing -->|"Trigger full<br/>blocking render"| Stale
+    Fresh -->|"revalidate<br/>window expires"| Stale
+    Stale -->|"Next request<br/>arrives"| Revalidating
+    Revalidating -->|"Background render completes;<br/>new entry stored"| Fresh
 ```
 
 In the Next.js App Router, ISR is configured through the `revalidate` export from a Server Component or layout:

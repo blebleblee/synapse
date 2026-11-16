@@ -26,39 +26,40 @@ The site navigation itself employs a consistent interaction grammar across pages
 
 Form design demands particular attention to interaction flow and validation feedback. Users expect logical tab order that progresses through fields in reading sequence, allowing keyboard-only navigation without mouse intervention. Field focus states must be highly visible—not just a thin browser-default outline, but prominent borders or background color changes that work for users with reduced color perception. Label placement affects completion efficiency: top-aligned labels support vertical scanning and work better for short forms, while left-aligned labels leverage horizontal space for longer forms with fewer fields. Placeholder text should provide format examples rather than label substitutes, since placeholders disappear on focus and cannot serve double duty as persistent labels.
 
-```
-Form Field State Transition Diagram
-
-IDLE (unfocused, empty)
-  │
-  ├─→ hover → shows focus indicator preview
-  │
-  └─→ focus → ACTIVE (cursor visible, empty)
-        │
-        ├─→ blur → validation check
-        │     │
-        │     ├─→ if empty & required → ERROR (empty)
-        │     │     └─→ shows "Field required" message
-        │     │
-        │     └─→ if valid → SUCCESS (valid value)
-        │           └─→ shows checkmark icon
-        │
-        ├─→ type → ACTIVE (populated)
-        │     │
-        │     └─→ real-time validation (debounced 300ms)
-        │           │
-        │           ├─→ if invalid → WARNING (invalid format)
-        │           │     └─→ shows inline error hint
-        │           │
-        │           └─→ if valid → active, no warning
-        │
-        └─→ submit → VALIDATING (checking server)
-              │
-              ├─→ success → SUBMITTED (disabled)
-              │     └─→ field grays out, locks content
-              │
-              └─→ failure → ERROR (server rejection)
-                    └─→ re-enables field, shows error
+```mermaid
+flowchart TD
+    IDLE["🔘 IDLE<br/>unfocused, empty"]
+    HOVER["✨ HOVER<br/>focus indicator preview"]
+    ACTIVE_EMPTY["✏️ ACTIVE<br/>cursor visible, empty"]
+    ACTIVE_POPULATED["✏️ ACTIVE<br/>populated"]
+    VALIDATING["⏳ VALIDATING<br/>checking server"]
+    SUCCESS["✅ SUCCESS<br/>valid value<br/>checkmark icon"]
+    WARNING["⚠️ WARNING<br/>invalid format<br/>inline error hint"]
+    ERROR_EMPTY["❌ ERROR<br/>empty field<br/>Field required"]
+    ERROR_SERVER["❌ ERROR<br/>server rejection<br/>re-enabled field"]
+    SUBMITTED["🔒 SUBMITTED<br/>disabled<br/>grayed out"]
+    
+    IDLE -->|hover| HOVER
+    IDLE -->|focus| ACTIVE_EMPTY
+    HOVER -->|blur| IDLE
+    
+    ACTIVE_EMPTY -->|blur| VALIDATE_CHECK{Validation Check}
+    VALIDATE_CHECK -->|"empty & required"| ERROR_EMPTY
+    VALIDATE_CHECK -->|valid| SUCCESS
+    
+    ACTIVE_EMPTY -->|type| ACTIVE_POPULATED
+    ACTIVE_POPULATED -->|"real-time validation<br/>debounced 300ms"| RT_CHECK{Format Valid?}
+    RT_CHECK -->|invalid| WARNING
+    RT_CHECK -->|valid| ACTIVE_POPULATED
+    WARNING -->|"correct input"| ACTIVE_POPULATED
+    
+    ACTIVE_POPULATED -->|submit| VALIDATING
+    VALIDATING -->|success| SUBMITTED
+    VALIDATING -->|failure| ERROR_SERVER
+    ERROR_SERVER -->|"user corrects"| ACTIVE_POPULATED
+    
+    SUCCESS -->|focus| ACTIVE_POPULATED
+    ERROR_EMPTY -->|focus| ACTIVE_EMPTY
 ```
 
 Inline validation provides immediate feedback as users complete each field, catching errors before form submission rather than forcing users to hunt through lengthy forms for problems after clicking submit. Email fields can verify format with regular expressions client-side, then check domain existence and mailbox validity server-side with debounced API calls. Password fields show strength meters that update in real-time, guiding users toward secure choices through progressive disclosure of requirements: minimum length, mixed case, numeric inclusion, special character inclusion. Error messages must be actionable rather than punitive: "Email address must include @ symbol" rather than "Invalid input." Success indicators—green checkmarks, collapsing warning messages—provide positive reinforcement that motivates completion.

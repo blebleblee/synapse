@@ -571,3 +571,4 @@ For critical infrastructure alerts, use aggressive timing:
 - matchers:
     - severity = 'critical'
   receiver: critic
+```

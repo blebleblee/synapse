@@ -22,37 +22,42 @@ The `workflow_dispatch` event deserves particular attention for infrastructure e
 
 To reason precisely about what happens between a git push and a completed job, it helps to trace the execution lifecycle end-to-end through GitHub's platform, the runner agent, and the host operating system.
 
-```
-GitHub Platform (Event Bus Layer)
-│
-│  git push → webhook event emitted
-│  ↓
-│  Workflow resolver: reads .github/workflows/*.yml at pushed SHA
-│  ↓
-│  Trigger filter evaluation (branch, path, event type filters)
-│  ↓
-│  Workflow run record created → jobs queued into runner dispatch layer
-│
-Runner Assignment & Bootstrapping
-│
-│  Runner polling: registered runners long-poll the Actions service
-│  ↓
-│  Job assignment: runner claims job, receives encrypted job context
-│  ↓
-│  Runner agent: downloads action repositories, sets up $GITHUB_WORKSPACE
-│  ↓
-│  Step execution loop: shell steps run as child processes; action steps
-│    invoke Node.js or Docker container runtimes
-│
-Job Completion
-│
-│  Runner reports step outcomes, annotations, and artifacts
-│  ↓
-│  Platform evaluates downstream job conditions (needs, if expressions)
-│  ↓
-│  Dependent jobs queued or skipped based on evaluated conditions
-│  ↓
-│  Workflow run terminal state: success, failure, or cancelled
+```mermaid
+flowchart TD
+    subgraph platform ["GitHub Platform (Event Bus Layer)"]
+        A["git push"]
+        B["Workflow Resolver\nreads .github/workflows/*.yml at pushed SHA"]
+        C["Trigger Filter Evaluation\nbranch, path, event type filters"]
+        D["Workflow Run Record Created\njobs queued into runner dispatch layer"]
+    end
+
+    subgraph runner ["Runner Assignment & Bootstrapping"]
+        E["Runner Polling\nregistered runners long-poll the Actions service"]
+        F["Job Assignment\nrunner claims job, receives encrypted job context"]
+        G["Runner Agent\ndownloads action repos, sets up \$GITHUB_WORKSPACE"]
+        H["Step Execution Loop\nshell steps as child processes;\naction steps invoke Node.js or Docker runtimes"]
+    end
+
+    subgraph completion ["Job Completion"]
+        I["Runner Reports\nstep outcomes, annotations, and artifacts"]
+        J["Platform Evaluates\ndownstream job conditions (needs, if expressions)"]
+        K["Dependent Jobs\nqueued or skipped based on evaluated conditions"]
+        L["Workflow Run Terminal State\nsuccess, failure, or cancelled"]
+    end
+
+    A -->|"webhook event emitted"| B
+    B --> C
+    C --> D
+
+    D -->|"jobs dispatched"| E
+    E --> F
+    F --> G
+    G --> H
+
+    H -->|"job completes"| I
+    I --> J
+    J --> K
+    K --> L
 ```
 
 The runner agent is a .NET process (open-sourced at `actions/runner`) that runs on the host machine and maintains a long-poll connection to GitHub's broker service. When a job becomes available, the broker assigns it to an idle runner by pushing a job execution payload over that connection. This payload includes the workflow definition fragment for that specific job, the encrypted values of all referenced secrets, the runtime context (repository metadata, event payload, ref information), and a short-lived GITHUB_TOKEN scoped to the specific run. The token's scope is not the user's personal access token—it is a machine credential issued by GitHub's internal OAuth infrastructure with permissions derived from the workflow's `permissions:` stanza and the repository's Actions settings.
@@ -323,12 +328,20 @@ This workflow is worth dissecting precisely because every structural decision it
 
 The `needs:` key is how GitHub Actions encodes the edges in the job DAG. Its semantics are precise: a job listed in `needs:` will not start until all listed dependencies have reached a terminal state. By default, the terminal state required is `success`. If any dependency finishes with `failure` or `cancelled`, the dependent job is skipped rather than run—a behavior that propagates downstream through the DAG via transitive dependency resolution. The platform evaluates the entire DAG at workflow start time and determines the full execution order before any runner is assigned.
 
-```
-validate ──────────────┐
-                        ├──► security-scan ──┐
-validate ──────────────┘                      ├──► plan ──► apply
-                                              │
-security-scan ────────────────────────────────┘
+```mermaid
+flowchart TD
+    V1["validate"]
+    V2["validate"]
+    SS1["security-scan"]
+    SS2["security-scan"]
+    P["plan"]
+    A["apply"]
+
+    V1 --> SS1
+    V2 --> SS1
+    SS1 --> P
+    SS2 --> P
+    P --> A
 ```
 
 The `plan` job declares `needs: [validate, security-scan]`, which means GitHub computes a fan-in join: both upstream jobs must succeed before `plan` is dispatched to a runner. This is the platform's native expression of a parallel-then-synchronize pattern. The `validate` and `security-scan` jobs run concurrently on separate runners, and GitHub holds the `plan` job in a pending state, consuming no runner resources, until both complete.

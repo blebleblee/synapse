@@ -46,31 +46,57 @@ Solid-state laser systems based on Nd:YAG (neodymium-doped yttrium aluminum garn
 
 The Ti:sapphire laser exploits the extraordinarily broad gain bandwidth spanning 650-1100 nm, enabling femtosecond pulse generation through mode-locking techniques. Titanium ions (Ti³⁺) substituted into sapphire (Al₂O₃) crystal lattice sites couple strongly to lattice phonons, producing homogeneously broadened gain with over 200 THz bandwidth centered near 790 nm. This broad spectrum supports transform-limited pulses as short as 5 fs containing only a few optical cycles. Optical pumping typically employs frequency-doubled Nd:YAG or Nd:YVO₄ lasers at 532 nm green wavelength, exciting Ti³⁺ from the ground $^2T_2$ state to the excited $^2E$ manifold. Kerr lens mode-locking, wherein the optical Kerr effect induces intensity-dependent refractive index changes creating self-focusing for high-intensity pulses, discriminates against continuous wave operation by enhancing intracavity aperture transmission for pulsed modes. Dispersion compensation through prism pairs or chirped mirrors maintains transform-limited pulse duration by canceling group velocity dispersion accumulated during cavity round-trips.
 
-```
-Laser Cavity Mode Structure (Fabry-Pérot Resonator):
+```mermaid
+flowchart TD
+    subgraph cavity ["Fabry-Pérot Laser Cavity  (length L)"]
+        direction LR
+        M1["**Mirror R₁ > 99.9%**
+        T₁ = −ln(R₁)"]
 
-Mirror R₁ > 99.9%                    Mirror R₂ ≈ 95% (output coupler)
-    |                                              |
-    |←────────── Cavity Length L ─────────────→|
-    |                                              |
-    |  ┌─────────────────────────┐                |
-    |  │   Gain Medium (length l)  │                |
-    |  │   α(ω) = gain coefficient │                |
-    |  └─────────────────────────┘                |
-    |                                              |
-    |═══════════════════════════════════════════|
-    |        Gaussian TEM₀₀ mode profile         |
-    |        w(z) = w₀√[1 + (z/z_R)²]           |
-    |        Rayleigh range z_R = πw₀²/λ        |
-    |                                              |
-    
-Longitudinal modes: ω_q = qπc/L, spacing Δω_FSR = πc/L
-Threshold condition: 2αl - T₁ - T₂ - α_loss·2L ≥ 0
-    where T₁,₂ = -ln(R₁,₂) = transmission loss
-    
-Intracavity intensity I(t) governed by rate equations:
-    dI/dt = (2αl - loss)·(c/2L)·I
-    dN/dt = R_pump - N/τ_sp - σ(N_e - N_g)I/ℏω
+        subgraph gain_region ["Gain Medium (length l)"]
+            direction TB
+            GM["α(ω) — gain coefficient
+            dN/dt = R_pump − N/τ_sp − σ(Nₑ−Ng)I/ℏω"]
+        end
+
+        subgraph mode_profile ["Intracavity Beam — TEM₀₀ Gaussian Mode"]
+            direction TB
+            BEAM["w(z) = w₀ √[1 + (z/z_R)²]
+            Rayleigh range: z_R = πw₀²/λ"]
+        end
+
+        M2["**Mirror R₂ ≈ 95%**
+        Output Coupler
+        T₂ = −ln(R₂)"]
+
+        M1 -->|"round-trip propagation"| gain_region
+        gain_region --> mode_profile
+        mode_profile -->|"feedback"| M2
+        M2 -->|"reflected beam"| mode_profile
+    end
+
+    subgraph longitudinal ["Longitudinal Mode Structure"]
+        MODES["Resonant frequencies: ω_q = qπc/L
+        Free spectral range: Δω_FSR = πc/L"]
+    end
+
+    subgraph threshold ["Threshold & Oscillation Condition"]
+        THRESH["2αl − T₁ − T₂ − α_loss · 2L ≥ 0"]
+    end
+
+    subgraph rate_eqs ["Intracavity Intensity — Rate Equations"]
+        RATE["dI/dt = (2αl − loss) · (c/2L) · I
+        dN/dt = R_pump − N/τ_sp − σ(Nₑ−Ng)I/ℏω"]
+    end
+
+    OUTPUT["**Laser Output Beam**
+    (through R₂ output coupler)"]
+
+    cavity -->|"longitudinal resonances set by L"| longitudinal
+    cavity -->|"net round-trip gain condition"| threshold
+    threshold -->|"above threshold: I grows"| rate_eqs
+    rate_eqs -->|"steady-state output"| OUTPUT
+    M2 -->|"transmitted fraction T₂"| OUTPUT
 ```
 
 Semiconductor laser diodes achieve population inversion through electrical current injection across a forward-biased p-n junction in direct bandgap materials. The active region typically consists of quantum well structures with thickness 5-10 nm, providing carrier confinement and discrete energy levels enhancing radiative recombination. Separate confinement heterostructures surround the quantum wells with wider bandgap cladding layers, confining optical modes through refractive index steps while maintaining electrical injection. Cleaved facets perpendicular to the waveguide axis provide Fresnel reflection (≈30% for GaAs-air interface), forming a compact cavity with length 300-500 μm yielding free spectral range 100-200 GHz. Current injection above threshold density $J_{\text{th}} \approx 1$ kA/cm² establishes population inversion, with output power scaling linearly as $P = \eta(I - I_{\text{th}})$ where $\eta$ represents differential quantum efficiency typically 0.3-0.7 W/A.

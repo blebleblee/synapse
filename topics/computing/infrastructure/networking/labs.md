@@ -660,37 +660,51 @@ interval:s:5 {
 ## Appendix A: TCP State Machine Reference
 
 ```mermaid
-stateDiagram-v2
-    [*] --> CLOSED
+flowchart TD
+    START((" ")):::startNode
 
-    CLOSED --> SYN_SENT : connect()\nSYN sent
-    CLOSED --> LISTEN : listen()
+    CLOSED["CLOSED"]
+    LISTEN["LISTEN"]
+    SYN_SENT["SYN_SENT"]
+    SYN_RCVD["SYN_RCVD"]
+    ESTABLISHED["ESTABLISHED"]
+    FIN_WAIT_1["FIN_WAIT_1"]
+    FIN_WAIT_2["FIN_WAIT_2"]
+    CLOSE_WAIT["CLOSE_WAIT"]
+    CLOSING["CLOSING"]
+    LAST_ACK["LAST_ACK"]
+    TIME_WAIT["TIME_WAIT\n────────────────\n2×MSL prevents late segments\nfrom a closed connection\nbeing accepted by a new\nconnection on the same 4-tuple"]
 
-    LISTEN --> SYN_RCVD : SYN received\nSYN+ACK sent
-    SYN_SENT --> ESTABLISHED : SYN+ACK received\nACK sent
-    SYN_SENT --> SYN_RCVD : simultaneous open\nSYN received
-    SYN_RCVD --> ESTABLISHED : ACK received
+    START --> CLOSED
 
-    ESTABLISHED --> FIN_WAIT_1 : close()\nFIN sent
-    ESTABLISHED --> CLOSE_WAIT : FIN received\nACK sent
+    CLOSED -->|"connect()\nSYN sent"| SYN_SENT
+    CLOSED -->|"listen()"| LISTEN
 
-    CLOSE_WAIT --> LAST_ACK : close()\nFIN sent
+    LISTEN -->|"SYN received\nSYN+ACK sent"| SYN_RCVD
+    SYN_SENT -->|"SYN+ACK received\nACK sent"| ESTABLISHED
+    SYN_SENT -->|"simultaneous open\nSYN received"| SYN_RCVD
+    SYN_RCVD -->|"ACK received"| ESTABLISHED
 
-    FIN_WAIT_1 --> FIN_WAIT_2 : ACK received
-    FIN_WAIT_1 --> CLOSING : FIN received\nACK sent
-    FIN_WAIT_2 --> TIME_WAIT : FIN received\nACK sent
-    CLOSING --> TIME_WAIT : ACK received
+    ESTABLISHED -->|"close()\nFIN sent"| FIN_WAIT_1
+    ESTABLISHED -->|"FIN received\nACK sent"| CLOSE_WAIT
 
-    LAST_ACK --> CLOSED : ACK received
+    CLOSE_WAIT -->|"close()\nFIN sent"| LAST_ACK
 
-    TIME_WAIT --> CLOSED : 2×MSL timer expires\n(2 × 60s default)
+    FIN_WAIT_1 -->|"ACK received"| FIN_WAIT_2
+    FIN_WAIT_1 -->|"FIN received\nACK sent"| CLOSING
+    FIN_WAIT_2 -->|"FIN received\nACK sent"| TIME_WAIT
+    CLOSING -->|"ACK received"| TIME_WAIT
 
-    note right of TIME_WAIT
-        2×MSL prevents late segments
-        from a closed connection
-        being accepted by a new
-        connection on the same 4-tuple
-    end note
+    LAST_ACK -->|"ACK received"| CLOSED
+
+    TIME_WAIT -->|"2×MSL timer expires\n(2 × 60s default)"| CLOSED
+
+    classDef startNode fill:#000,color:#000,stroke:#000,width:12px,height:12px
+    classDef state fill:#dbeafe,stroke:#2563eb,color:#1e3a5f,rx:6,ry:6,font-weight:bold
+    classDef noteState fill:#fef9c3,stroke:#ca8a04,color:#1e3a5f,rx:6,ry:6,font-weight:bold
+
+    class CLOSED,LISTEN,SYN_SENT,SYN_RCVD,ESTABLISHED,FIN_WAIT_1,FIN_WAIT_2,CLOSE_WAIT,CLOSING,LAST_ACK state
+    class TIME_WAIT noteState
 ```
 
 ---

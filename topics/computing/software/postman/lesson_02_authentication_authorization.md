@@ -104,27 +104,41 @@ API key authentication manifests in diverse implementation patterns across API p
 
 The credential resolution algorithm that determines which authentication configuration applies to a given request follows a deterministic precedence order that engineers must internalize to debug unexpected authentication behavior. Postman evaluates authentication settings in this sequence: request-level authentication configured directly on the request overrides all other sources; if no request-level authentication exists, the system checks for inherited authentication from the parent collection or folder; if inheritance is disabled or no parent authentication exists, Postman falls back to environment variables that match authentication parameter names; finally, global variables provide a last-resort fallback. This cascade implements the principle of specificity where local configurations override inherited settings, but it also creates debugging challenges when credentials resolve from unexpected sources. Engineers frequently encounter scenarios where deleting a request-level API key fails to disable authentication because collection-level inheritance immediately fills the gap, or where environment switching fails to update tokens because a request-level override shadows the environment-specific value.
 
-```
-Credential Resolution Precedence (Highest to Lowest):
-
-1. Request-Level Authentication
-   └─> Explicitly configured on individual request
-       Example: Request → Authorization → Bearer Token
-
-2. Collection/Folder Inheritance
-   └─> Inherited from parent container if inheritance enabled
-       Example: Collection → Authorization → OAuth 2.0
-
-3. Environment Variables
-   └─> Variables matching authentication parameter names
-       Example: {{api_key}} resolves to environment.api_key
-
-4. Global Variables
-   └─> Workspace-wide fallback values
-       Example: {{base_token}} resolves to global.base_token
-
-Resolution stops at first match; lower tiers never consulted
-if higher tier provides a value (even if empty/invalid).
+```mermaid
+flowchart TD
+    Start([Credential Resolution Process]) --> L1
+    
+    L1["1. Request-Level Authentication<br/><i>Explicitly configured on individual request</i>"]
+    L1 --> L1Ex["Example: Request → Authorization → Bearer Token"]
+    L1Ex --> Check1{Value<br/>found?}
+    Check1 -->|Yes| Resolved([Resolution Complete])
+    Check1 -->|No| L2
+    
+    L2["2. Collection/Folder Inheritance<br/><i>Inherited from parent container if enabled</i>"]
+    L2 --> L2Ex["Example: Collection → Authorization → OAuth 2.0"]
+    L2Ex --> Check2{Value<br/>found?}
+    Check2 -->|Yes| Resolved
+    Check2 -->|No| L3
+    
+    L3["3. Environment Variables<br/><i>Variables matching authentication parameter names</i>"]
+    L3 --> L3Ex["Example: {{api_key}} → environment.api_key"]
+    L3Ex --> Check3{Value<br/>found?}
+    Check3 -->|Yes| Resolved
+    Check3 -->|No| L4
+    
+    L4["4. Global Variables<br/><i>Workspace-wide fallback values</i>"]
+    L4 --> L4Ex["Example: {{base_token}} → global.base_token"]
+    L4Ex --> Check4{Value<br/>found?}
+    Check4 -->|Yes| Resolved
+    Check4 -->|No| Unresolved([No Credentials Found])
+    
+    style Start fill:#e1f5ff
+    style Resolved fill:#d4edda
+    style Unresolved fill:#f8d7da
+    style L1 fill:#fff3cd
+    style L2 fill:#fff3cd
+    style L3 fill:#fff3cd
+    style L4 fill:#fff3cd
 ```
 
 Postman's scripting environment exposes authentication state through the pre-request and test script interfaces, enabling programmatic credential manipulation for advanced flows that exceed the declarative configuration capabilities. Pre-request scripts execute before authentication preprocessing, allowing engineers to dynamically generate tokens, compute HMAC signatures, or update environment variables that subsequent authentication stages consume. The pm.variables API provides methods to set temporary request-scoped variables, environment variables, or global variables, with modifications persisting only within their respective scopes. This capability proves essential for implementing custom authentication schemes that require nonce generation, timestamp injection, or cryptographic signature computation over request payloads. Engineers must recognize that script-based credential updates occur synchronously within the Node.js sandbox that executes the script, and any asynchronous operations—HTTP requests to token endpoints, cryptographic operations requiring external libraries—must complete before the script returns or Postman will abort the request with a timeout error.

@@ -231,30 +231,17 @@ The **Double Submit Cookie** pattern is a stateless alternative that avoids stor
 
 The architecture of CSRF token generation and validation looks like this:
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         CSRF Token Lifecycle                        │
-│                                                                     │
-│  Server                              Browser                        │
-│  ──────                              ───────                        │
-│                                                                     │
-│  1. GET /form                                                       │
-│     ─────────────────────────────────────────────────────────►     │
-│                                                                     │
-│  2. Generate csrf_token = HMAC-SHA256(session_id, server_secret)    │
-│     Embed in <input type="hidden" name="_csrf" value="...">         │
-│     ◄─────────────────────────────────────────────────────────      │
-│                                                                     │
-│  3.                           POST /form                            │
-│                               body: _csrf=<token>&amount=1000       │
-│                               Cookie: sid=<session>                 │
-│     ─────────────────────────────────────────────────────────►     │
-│                                                                     │
-│  4. Recompute expected = HMAC-SHA256(session_id, server_secret)     │
-│     constant_time_compare(submitted_csrf, expected)                 │
-│     If mismatch → 403 Forbidden                                     │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start["Client"] -->|"1. GET /form"| Server["Server"]
+    Server -->|"2. Generate csrf_token = HMAC-SHA256(session_id, server_secret)"| GenToken["Generate Token"]
+    GenToken -->|"Embed in &lt;input type='hidden' name='_csrf' value='...'&gt;"| ReturnForm["Return HTML Form"]
+    ReturnForm -->|"Response with embedded token"| Browser["Browser"]
+    Browser -->|"3. POST /form<br/>body: _csrf=&lt;token&gt;&amount=1000<br/>Cookie: sid=&lt;session&gt;"| ServerPost["Server receives POST"]
+    ServerPost --> Validate["4. Recompute expected = HMAC-SHA256(session_id, server_secret)"]
+    Validate --> Compare["constant_time_compare(submitted_csrf, expected)"]
+    Compare -->|"Match"| Success["200 OK / Process Request"]
+    Compare -->|"Mismatch"| Reject["403 Forbidden"]
 ```
 
 Using HMAC over a session identifier rather than a purely random token has a practical advantage: the server does not need to store the CSRF token in the session. It recomputes the expected value on the fly from the session identifier and a server-side secret. As long as the secret is protected, the token is unforgeable.
@@ -284,43 +271,25 @@ OAuth 2.0 is frequently misunderstood as an authentication protocol. It is not. 
 
 The Authorization Code flow, the most secure and widely deployed grant type, works through a redirect-based handshake:
 
-```
-┌──────────┐        ┌────────────────────┐        ┌──────────────────┐
-│  Client  │        │  Auth Server       │        │  Resource Server │
-│  (App)   │        │  (e.g. Google)     │        │  (e.g. API)      │
-└────┬─────┘        └────────┬───────────┘        └────────┬─────────┘
-     │                       │                             │
-     │  1. Redirect browser to /authorize                  │
-     │     ?response_type=code                             │
-     │     &client_id=...                                  │
-     │     &redirect_uri=...                               │
-     │     &scope=openid profile email                     │
-     │     &state=<random>                                 │
-     │     &code_challenge=<PKCE_challenge>                │
-     │──────────────────────►│                             │
-     │                       │                             │
-     │                       │  User authenticates &       │
-     │                       │  consents                   │
-     │                       │                             │
-     │  2. Browser redirected back to redirect_uri         │
-     │     ?code=<auth_code>&state=<random>                │
-     │◄──────────────────────│                             │
-     │                       │                             │
-     │  3. POST /token                                     │
-     │     grant_type=authorization_code                   │
-     │     code=<auth_code>                                │
-     │     code_verifier=<PKCE_verifier>                   │
-     │     client_id + client_secret                       │
-     │──────────────────────►│                             │
-     │                       │                             │
-     │  4. { access_token, id_token, refresh_token }       │
-     │◄──────────────────────│                             │
-     │                       │                             │
-     │  5. GET /userinfo  Authorization: Bearer <token>    │
-     │─────────────────────────────────────────────────►  │
-     │                       │                             │
-     │  6. { sub, email, name, ... }                       │
-     │◄────────────────────────────────────────────────── │
+```mermaid
+flowchart TD
+    Client["Client<br/>(App)"]
+    AuthServer["Auth Server<br/>(e.g. Google)"]
+    ResourceServer["Resource Server<br/>(e.g. API)"]
+    
+    Client -->|"1. Redirect browser to /authorize<br/>?response_type=code<br/>&client_id=...<br/>&redirect_uri=...<br/>&scope=openid profile email<br/>&state=&lt;random&gt;<br/>&code_challenge=&lt;PKCE_challenge&gt;"| AuthServer
+    
+    AuthServer -.->|"User authenticates &<br/>consents"| AuthServer
+    
+    AuthServer -->|"2. Browser redirected back to redirect_uri<br/>?code=&lt;auth_code&gt;&state=&lt;random&gt;"| Client
+    
+    Client -->|"3. POST /token<br/>grant_type=authorization_code<br/>code=&lt;auth_code&gt;<br/>code_verifier=&lt;PKCE_verifier&gt;<br/>client_id + client_secret"| AuthServer
+    
+    AuthServer -->|"4. { access_token, id_token, refresh_token }"| Client
+    
+    Client -->|"5. GET /userinfo<br/>Authorization: Bearer &lt;token&gt;"| ResourceServer
+    
+    ResourceServer -->|"6. { sub, email, name, ... }"| Client
 ```
 
 Several security invariants govern this flow. The `state` parameter is a CSRF token for the OAuth flow itself: the client generates a random value, stores it in the session, sends it in the authorization request, and validates that the redirect returns the same value. Without this check, an attacker can initiate an OAuth flow, intercept the redirect, and inject their authorization code into the victim's session — a login CSRF attack that authenticates the victim as the attacker.

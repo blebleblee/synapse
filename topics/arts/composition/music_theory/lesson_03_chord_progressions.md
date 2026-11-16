@@ -17,13 +17,13 @@ A vibrating string or air column doesn't produce one pitch — it produces a **h
 The tension in V comes from the **tritone** between scale degrees 4 and 7 (in C: F and B). That tritone is acoustically unstable — it splits the octave exactly in half, so your ear can't decide which way it resolves on its own. Voice-leading rules decide for it: the leading tone (B) pulls up by a half step to the tonic (C), and the 4th (F) pulls down by a half step to the 3rd (E). That double half-step resolution is the single strongest gesture in Western tonal music — everything else in this lesson is a variation on it.
 
 ```mermaid
-stateDiagram-v2
-    direction LR
-    state "Tonic (I, vi)" as T
-    state "Predominant (IV, ii)" as PD
-    state "Dominant (V, vii°)" as D
+flowchart LR
+    Start((" "))
+    T["Tonic (I, vi)"]
+    PD["Predominant (IV, ii)"]
+    D["Dominant (V, vii°)"]
 
-    [*] --> T
+    Start --> T
     T --> PD
     T --> D
     PD --> D

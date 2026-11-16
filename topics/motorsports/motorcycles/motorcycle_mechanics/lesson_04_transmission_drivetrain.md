@@ -38,46 +38,61 @@ Power leaves the crankshaft through the primary drive before it even reaches the
 
 The clutch basket itself is an aluminum or steel drum that is driven by the primary gear and freewheels on the input shaft until the clutch is engaged. Inside the basket sit the friction plates, which are splined to the basket and therefore rotate with it at all times. Interleaved with the friction plates are the steel drive plates, which are splined to the clutch hub, which is in turn splined to the gearbox input shaft. The clutch spring pack — either coil springs arranged around the pressure plate or a single Belleville washer stack in some racing designs — clamps these two sets of plates together. When clamped, friction coupling between the basket (driven by the crank) and the hub (driving the gearbox) transmits torque. When the lever is pulled, the pressure plate retracts, the plates separate, and the coupling is broken.
 
-```
-CRANKSHAFT
-    │
-    ▼
-┌───────────────────────────────────────────────────────────┐
-│ PRIMARY DRIVE (Fixed Gear Reduction: ~1.84:1)             │
-│   Crank Gear ──────────► Clutch Basket Gear               │
-└───────────────────────────────────────────────────────────┘
-    │
-    ▼
-┌───────────────────────────────────────────────────────────┐
-│ WET MULTI-PLATE CLUTCH                                    │
-│   Friction Plates (splined to Basket)                     │
-│   Steel Drive Plates (splined to Hub / Input Shaft)       │
-│   Spring Pack clamps assembly │ Lever releases pressure   │
-└───────────────────────────────────────────────────────────┘
-    │
-    ▼
-┌───────────────────────────────────────────────────────────┐
-│ CONSTANT MESH GEARBOX (6 speeds shown)                    │
-│                                                           │
-│  Input Shaft:  [1st] [3rd] [5th] [2nd] [4th] [6th]       │
-│                  │     │     │     │     │     │          │
-│                  mesh  mesh  mesh  mesh  mesh  mesh       │
-│                  │     │     │     │     │     │          │
-│ Output Shaft:  [1st] [3rd] [5th] [2nd] [4th] [6th]       │
-│                                                           │
-│  Selector Drum ──► Fork A ──► Dog Ring (1st/2nd)          │
-│                ──► Fork B ──► Dog Ring (3rd/4th)          │
-│                ──► Fork C ──► Dog Ring (5th/6th)          │
-└───────────────────────────────────────────────────────────┘
-    │
-    ▼
-OUTPUT SHAFT SPROCKET
-    │
-    ▼
-FINAL DRIVE (Chain, Belt, or Shaft)
-    │
-    ▼
-REAR WHEEL HUB
+```mermaid
+flowchart TD
+    CRANK["🔩 CRANKSHAFT"]
+
+    subgraph primary_drive ["PRIMARY DRIVE — Fixed Gear Reduction ~1.84:1"]
+        CG["Crank Gear"] -->|"drives"| CBG["Clutch Basket Gear"]
+    end
+
+    subgraph clutch ["WET MULTI-PLATE CLUTCH"]
+        FP["Friction Plates\n(splined to Basket)"]
+        SDP["Steel Drive Plates\n(splined to Hub / Input Shaft)"]
+        SP["Spring Pack\n(clamps assembly)"]
+        LR["Lever\n(releases pressure)"]
+        FP --- SDP
+        SP -->|"clamps"| FP
+        LR -->|"releases"| SP
+    end
+
+    subgraph gearbox ["CONSTANT MESH GEARBOX — 6 Speeds"]
+        subgraph input_shaft ["Input Shaft"]
+            IS1["1st"] & IS3["3rd"] & IS5["5th"] & IS2["2nd"] & IS4["4th"] & IS6["6th"]
+        end
+
+        subgraph output_shaft ["Output Shaft"]
+            OS1["1st"] & OS3["3rd"] & OS5["5th"] & OS2["2nd"] & OS4["4th"] & OS6["6th"]
+        end
+
+        IS1 -->|"mesh"| OS1
+        IS3 -->|"mesh"| OS3
+        IS5 -->|"mesh"| OS5
+        IS2 -->|"mesh"| OS2
+        IS4 -->|"mesh"| OS4
+        IS6 -->|"mesh"| OS6
+
+        SD["Selector Drum"]
+        FA["Fork A"] --> DR12["Dog Ring\n(1st / 2nd)"]
+        FB["Fork B"] --> DR34["Dog Ring\n(3rd / 4th)"]
+        FC["Fork C"] --> DR56["Dog Ring\n(5th / 6th)"]
+        SD --> FA & FB & FC
+    end
+
+    OSS["OUTPUT SHAFT SPROCKET"]
+
+    subgraph final_drive ["FINAL DRIVE"]
+        FD["Chain / Belt / Shaft"]
+    end
+
+    RWH["🛞 REAR WHEEL HUB"]
+
+    CRANK --> primary_drive
+    CBG --> clutch
+    SDP -->|"transmits to"| gearbox
+    output_shaft --> OSS
+    OSS --> final_drive
+    FD --> RWH
 ```
 
 The gear pairs are intentionally arranged in an interleaved order on each shaft (1st, 3rd, 5th on the input side; 2nd, 4th, 6th adjacent) so that consecutive ratios are never axially adjacent to one another. This arrangement shortens the axial travel required of each fork during sequential shifts and provides sufficient clearance between dog ring positions to prevent simultaneous engagement.

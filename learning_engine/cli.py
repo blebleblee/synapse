@@ -260,6 +260,15 @@ def cmd_lint(args):
         if len(report["issues"]) > 15:
             print(f"  ... and {len(report['issues']) - 15} more issues.")
 
+    if getattr(args, "render", False):
+        import subprocess
+        print("\n" + "=" * 50)
+        print(" [*] Executing Headless AST & Render Validation...")
+        print("=" * 50)
+        script_path = WORKSPACE_ROOT / "scripts" / "validate_render.mjs"
+        target = f"topics/{args.domain}" if args.domain else "topics"
+        subprocess.run(["node", str(script_path), target])
+
 def cmd_export(args):
     out_file = export_handbook(domain=args.domain, level=args.level)
     print(f"[✔] Successfully exported {args.domain} handbook to: {out_file}")
@@ -452,6 +461,7 @@ def main():
     # lint
     p_lint = subparsers.add_parser("lint", help="Lint curriculum files for depth, structure, and placeholders")
     p_lint.add_argument("--domain", "-d", help="Filter by specific domain name")
+    p_lint.add_argument("--render", "-r", action="store_true", help="Execute headless AST compilation and render validation (Marked, KaTeX, Mermaid.js)")
     p_lint.set_defaults(func=cmd_lint)
 
     # export

@@ -20,43 +20,30 @@ The core invariants the system must enforce are session isolation, capability fi
 
 The physical signal path of a session request in Grid 4 moves through a well-defined sequence of components. Understanding this path in detail is what allows you to place instrumentation, interpret log output, and reason about where a bottleneck or failure originates.
 
-```
-                        ┌─────────────────────────────────────────────────────┐
-                        │                   TEST CLIENT                       │
-                        │  RemoteWebDriver("http://grid-router:4444/wd/hub")  │
-                        └────────────────────────┬────────────────────────────┘
-                                                 │  POST /session {caps}
-                                                 ▼
-                        ┌────────────────────────────────────────────────────┐
-                        │                     ROUTER                         │
-                        │   Stateless HTTP reverse proxy + path classifier   │
-                        │   /session  → Distributor                          │
-                        │   /session/{id}/* → Session Map → Node             │
-                        └────────────┬────────────────────────┬──────────────┘
-                                     │                        │
-                     new session     │          command on    │  existing session
-                                     ▼          session       ▼
-                        ┌─────────────────────┐    ┌────────────────────────┐
-                        │    DISTRIBUTOR      │    │      SESSION MAP        │
-                        │  Capability match   │    │  sessionId → nodeUrl   │
-                        │  Slot allocation    │    │  (in-memory or Redis)  │
-                        │  Node health track  │    └──────────┬─────────────┘
-                        └──────┬──────────────┘               │
-                               │                              │ proxy to node
-                               │  reserve slot                ▼
-                        ┌──────▼──────────────────────────────────────────────┐
-                        │                 SESSION QUEUE                        │
-                        │  Unbounded FIFO with capability-keyed pending items  │
-                        │  Polled by Distributor on slot availability event    │
-                        └───────────────────────────────────────────────────-─┘
-                                     │
-              ┌──────────────────────┼──────────────────────┐
-              ▼                      ▼                       ▼
-   ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-   │      NODE A      │  │      NODE B      │  │      NODE C      │
-   │  Chrome 114 ×4   │  │  Firefox 112 ×2  │  │  Chrome 114 ×2   │
-   │  Edge 114 ×2     │  │  Chrome 113 ×2   │  │  Safari 16 ×1    │
-   └──────────────────┘  └──────────────────┘  └──────────────────┘
+```mermaid
+flowchart TD
+    Client["TEST CLIENT<br/>RemoteWebDriver('http://grid-router:4444/wd/hub')"]
+    
+    Router["ROUTER<br/>Stateless HTTP reverse proxy + path classifier<br/>/session → Distributor<br/>/session/{id}/* → Session Map → Node"]
+    
+    Distributor["DISTRIBUTOR<br/>Capability match<br/>Slot allocation<br/>Node health track"]
+    
+    SessionMap["SESSION MAP<br/>sessionId → nodeUrl<br/>(in-memory or Redis)"]
+    
+    Queue["SESSION QUEUE<br/>Unbounded FIFO with capability-keyed pending items<br/>Polled by Distributor on slot availability event"]
+    
+    NodeA["NODE A<br/>Chrome 114 ×4<br/>Edge 114 ×2"]
+    NodeB["NODE B<br/>Firefox 112 ×2<br/>Chrome 113 ×2"]
+    NodeC["NODE C<br/>Chrome 114 ×2<br/>Safari 16 ×1"]
+    
+    Client -->|"POST /session {caps}"| Router
+    Router -->|"new session"| Distributor
+    Router -->|"command on existing session"| SessionMap
+    SessionMap -->|"proxy to node"| Queue
+    Distributor -->|"reserve slot"| Queue
+    Queue --> NodeA
+    Queue --> NodeB
+    Queue --> NodeC
 ```
 
 The Router is intentionally stateless. It inspects only whether the incoming HTTP request is a new session creation (`POST /session`) or a command against an existing session (`POST|GET|DELETE /session/{id}/...`). For new session requests, it forwards to the Distributor. For existing session commands, it queries the Session Map to resolve the target node URL, then proxies the request directly to that node, bypassing the Distributor entirely. This design is critical for performance: once a session is established, every subsequent WebDriver command travels in one network hop from the Router to the Node without touching any coordination layer. At hundreds of commands per second across dozens of concurrent sessions, eliminating that indirection makes a measurable difference.

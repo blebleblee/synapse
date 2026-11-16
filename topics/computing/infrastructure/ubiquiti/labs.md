@@ -240,14 +240,14 @@ Execute this sequence prior to declaring a UniFi deployment production-ready:
 3. Execute `ip -s link show` on gateway, verify zero errors and drops on all active interfaces
 4. Run `ss -tunap | grep 8080` on controller, confirm established TCP session for each adopted device
 5. Perform `iperf3` throughput test across WAN interface, verify achievement of ≥95% line rate
-6. Query `sudo conntrack -C` on gateway under representative load, confirm utilization <70% of `nf_conntrack_max`
+6. Query `sudo conntrack -C` on gateway under representative load, confirm utilization < 70% of `nf_conntrack_max`
 7. Inject WAN link failure via cable disconnect, verify alarm generation within 15 seconds and reconvergence within 30 seconds post-restoration
 8. Test dual-WAN failover (if configured) by degrading primary link with `tc netem loss 10%`, confirm automatic failover and session continuity
 9. Capture 60 seconds of traffic with `tcpdump` on each interface, analyze in Wireshark for retransmissions >0.5%
 10. Execute wireless roaming test: associate client to AP-1, walk to AP-2's coverage area, verify seamless handoff without session interruption
 11. Validate firewall ruleset by attempting explicitly blocked traffic patterns, confirm drops logged correctly
-12. Terminate and restart controller, measure device re-adoption time (target: <120 seconds for all devices)
-13. Stress-test controller API with concurrent request script, verify P95 latency <200ms under 20 concurrent sessions
+12. Terminate and restart controller, measure device re-adoption time (target: < 120 seconds for all devices)
+13. Stress-test controller API with concurrent request script, verify P95 latency < 200ms under 20 concurrent sessions
 14. Review controller logs for recurring errors: `tail -f /var/log/unifi/server.log | grep -i error`
 15. Document baseline performance metrics: achieved throughput, typical CPU utilization, conntrack table size under normal load
 

@@ -20,39 +20,25 @@ The POSIX specification governs baseline `sed` behavior, and two implementations
 
 The `sed` virtual machine executes a fixed algorithm for every line of input. Visualizing this loop precisely is more valuable than any reference card:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     SED EXECUTION ENGINE                        │
-│                                                                 │
-│  ┌──────────────┐     Read next line      ┌──────────────────┐ │
-│  │  Input       │ ──────────────────────► │  Pattern Space   │ │
-│  │  Stream      │                         │  (working buf)   │ │
-│  └──────────────┘                         └────────┬─────────┘ │
-│                                                    │           │
-│                                           Evaluate each        │
-│                                           command in script     │
-│                                                    │           │
-│                              ┌─────────────────────▼─────────┐ │
-│                              │  Address Check                 │ │
-│                              │  (line#, regex, range, $)      │ │
-│                              │  → YES: execute command        │ │
-│                              │  → NO:  skip command           │ │
-│                              └─────────────────────┬─────────┘ │
-│                                                    │           │
-│                                        End of script?          │
-│                                                    │           │
-│                              ┌─────────────────────▼─────────┐ │
-│                              │  Implicit Print (unless -n)    │ │
-│                              │  Write pattern space to stdout │ │
-│                              │  Clear pattern space           │ │
-│                              └─────────────────────┬─────────┘ │
-│                                                    │           │
-│                                        More input?             │
-│                              ┌─────────────────────▼─────────┐ │
-│                              │  Hold Space                    │ │
-│                              │  (persists across cycles)      │ │
-│                              └────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph engine["SED EXECUTION ENGINE"]
+        input["Input Stream"]
+        pattern["Pattern Space\n(working buf)"]
+        address["Address Check\nline#, regex, range, $"]
+        print["Implicit Print (unless -n)\nWrite pattern space to stdout\nClear pattern space"]
+        hold["Hold Space\n(persists across cycles)"]
+
+        input -->|"Read next line"| pattern
+        pattern -->|"Evaluate each command in script"| address
+        address -->|"End of script"| print
+        print -->|"More input"| input
+        print -.->|"h, H, g, G, x commands"| hold
+        hold -.->|"g, G, x commands"| pattern
+    end
+
+    address -->|"YES: execute command"| address
+    address -->|"NO: skip command"| address
 ```
 
 A concrete way to verify this model against an implementation is to watch `sed` with no commands at all:

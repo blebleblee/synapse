@@ -26,53 +26,109 @@ Following input protection, the programmable gain amplifier (PGA) scales the inp
 
 The anti-aliasing filter prevents high-frequency components beyond the Nyquist limit from folding back into the measurement bandwidth as aliased artifacts. Consider a 10 MHz data acquisition system sampling at 20 MSa/s, confronted with a 25 MHz interference signal from a nearby switch-mode power supply. Without filtering, this 25 MHz interferer—located 5 MHz above the Nyquist frequency—aliases down to 5 MHz (20 MHz - 15 MHz), appearing as a valid in-band signal indistinguishable from genuine data. A 7th-order Butterworth lowpass filter with a cutoff frequency at 9 MHz attenuates this interferer by 60 dB before it reaches the sampling circuit, reducing its aliased contribution to negligible levels. The filter's analog realization employs cascaded Sallen-Key biquad sections built from precision op-amps, polypropylene capacitors (for low dielectric absorption), and 0.1% tolerance thin-film resistors. Each biquad section contributes a complex conjugate pole pair, and the cascade of stages realizes the desired frequency response with minimal component count.
 
-```
-Analog Signal Chain Architecture
-=================================
+```mermaid
+flowchart LR
+    subgraph signal_chain ["Analog Signal Chain Architecture"]
 
-Physical      Input         Programmable      Anti-Aliasing     Sample/Hold      ADC Core
-Signal     Protection         Gain Amp           Filter           Circuit        
-  │            │                 │                  │                │              │
-  │   TVS      │    Inst.Amp     │   7th-order      │    CMOS        │   SAR/      │
-  ▼  Diodes    ▼    + R-2R       ▼   Butterworth    ▼   Switch       ▼  ΔΣ/Flash   ▼
-───┤├─────────>├─────>├─────────>├────────────────>├──────────────>├────────────>
-  1MΩ        9MΩ   Gain: 1-1000×  fc = 0.8×fNyq     Taperture      N-bit codes
-Series Res  Input Z              3dB @ -3dB/oct    < 100ps jitter  to digital bus
+        subgraph phys ["Physical Signal"]
+            PS["Physical Signal\n────────────\n1 MΩ Series Res\nJohnson noise:\n4kTBR"]
+        end
 
-Noise Sources:
-- Input: Johnson noise from Rsource || Rinput ~ 4kTBR
-- PGA: Voltage noise spectral density ~ 10 nV/√Hz
-- Filter: Op-amp noise accumulation in cascade
-- S/H: kT/C noise from sampling capacitor Chold
-- ADC: Quantization noise ~ Vfs/(2^N × √12)
+        subgraph prot ["Input Protection"]
+            IP["Input Protection\n────────────\nTVS Diodes\n9 MΩ Input Z"]
+        end
+
+        subgraph pga ["Programmable Gain Amp"]
+            PGA["Prog. Gain Amp\n────────────\nInst. Amp + R-2R\nGain: 1 – 1000×\n~10 nV/√Hz noise"]
+        end
+
+        subgraph filt ["Anti-Aliasing Filter"]
+            AAF["Anti-Aliasing Filter\n────────────\n7th-order Butterworth\nfc = 0.8 × fNyq\n–3 dB/oct rolloff\nOp-amp noise cascade"]
+        end
+
+        subgraph sh ["Sample / Hold Circuit"]
+            SH["Sample / Hold\n────────────\nCMOS Switch\nTaperture < 100 ps jitter\nkT/C noise: Chold"]
+        end
+
+        subgraph adc ["ADC Core"]
+            ADC["ADC Core\n────────────\nSAR / ΔΣ / Flash\nN-bit output codes\nQuant. noise:\nVfs ÷ (2ᴺ × √12)"]
+        end
+
+        DBUS[/"N-bit Digital Bus"/]
+
+    end
+
+    PS  -->|"Analog\nsignal"| IP
+    IP  -->|"Protected\nsignal"| PGA
+    PGA -->|"Amplified\nsignal"| AAF
+    AAF -->|"Band-limited\nsignal"| SH
+    SH  -->|"Sampled\nsignal"| ADC
+    ADC -->|"Digital\ncodes"| DBUS
+
+    style phys fill:#1a3a5c,stroke:#4a90d9,color:#e8f4fd
+    style prot fill:#1a3a5c,stroke:#4a90d9,color:#e8f4fd
+    style pga  fill:#1a3a5c,stroke:#4a90d9,color:#e8f4fd
+    style filt fill:#1a3a5c,stroke:#4a90d9,color:#e8f4fd
+    style sh   fill:#1a3a5c,stroke:#4a90d9,color:#e8f4fd
+    style adc  fill:#1a3a5c,stroke:#4a90d9,color:#e8f4fd
+
+    style PS   fill:#0d2b45,stroke:#4a90d9,color:#cce7ff
+    style IP   fill:#0d2b45,stroke:#4a90d9,color:#cce7ff
+    style PGA  fill:#0d2b45,stroke:#4a90d9,color:#cce7ff
+    style AAF  fill:#0d2b45,stroke:#4a90d9,color:#cce7ff
+    style SH   fill:#0d2b45,stroke:#4a90d9,color:#cce7ff
+    style ADC  fill:#0d2b45,stroke:#4a90d9,color:#cce7ff
+
+    style DBUS fill:#0a4a2a,stroke:#2ecc71,color:#a8f0c6
+
+    style signal_chain fill:#0a1628,stroke:#4a90d9,color:#e8f4fd
 ```
 
 The sample-and-hold circuit freezes the analog input voltage at a precise instant, providing a stable DC level to the ADC during the multi-clock-cycle conversion process. A CMOS transmission gate controlled by the sampling clock connects a hold capacitor to the signal path during the acquisition phase, then opens to isolate the capacitor during the hold phase. The critical performance parameter is aperture jitter—the statistical variation in the exact instant when the switch opens. A sample-and-hold circuit with 100 femtoseconds RMS aperture jitter observing a 1 GHz sine wave experiences a timing uncertainty that translates into 0.628 mV RMS voltage error (from dV/dt = 2πfA × jitter). This aperture jitter noise adds directly to the ADC's quantization noise floor, degrading the achievable signal-to-noise ratio. High-performance oscilloscopes employ GaAs or SiGe track-and-hold circuits with sub-10 fs aperture jitter, enabling clean sampling of multi-gigahertz analog bandwidths.
 
 Analog-to-digital converter architectures trade speed against resolution through fundamentally different circuit topologies. The successive approximation register (SAR) ADC operates like a binary search algorithm implemented in hardware: beginning with the most significant bit, the converter tests whether the input voltage exceeds half the full-scale range, sets that bit accordingly, then recursively tests the next bit position. An N-bit SAR ADC requires N comparison cycles, making it ideal for moderate-speed applications (1 kSa/s to 10 MSa/s) where 12- to 18-bit resolution is paramount. The internal architecture comprises a binary-weighted capacitor array serving as a charge-redistribution DAC, a high-gain comparator, and a state machine implementing the successive approximation algorithm. Each bit decision takes one clock cycle, and the final N-bit conversion result appears after N + 1 clocks (including one acquisition phase).
 
-```
-SAR ADC Internal Architecture (8-bit example)
-=============================================
+```mermaid
+flowchart TD
+    VIN["Vin (Analog Input)"]
 
-Vin ──┬───────[S/H]────────┬────[Comparator]────> Async Logic
-      │                    │         ▲             State Machine
-     ===                  ===        │                  │
-    Chold              Capacitor   Decision            │
-                         DAC         │                 │
-                          │◄─────────┴─────────────────┘
-                          │    Binary Search Control
-                          │
-                         ═╧═  VREF (Binary-weighted
-                        GND    capacitor array)
+    subgraph sample ["Sample & Hold"]
+        SH["S/H Switch"]
+        CHOLD["Chold\n(Hold Capacitor)"]
+    end
 
-Conversion Sequence for Vin = 5.2V, Vref = 10V:
-Clock 0: Acquire input → Chold charged to 5.2V
-Clock 1: Test MSB (bit 7 = 5.0V): 5.2V > 5.0V → bit7 = 1
-Clock 2: Test bit 6 (7.5V):      5.2V < 7.5V → bit6 = 0
-Clock 3: Test bit 5 (6.25V):     5.2V < 6.25V → bit5 = 0
-...continue through LSB...
-Clock 8: Output code = 10000011 = 131 decimal
+    subgraph dac_block ["Capacitor DAC"]
+        CDAC["Binary-Weighted\nCapacitor Array"]
+        VREF["VREF"]
+        GND["GND"]
+        VREF --> CDAC
+        GND --> CDAC
+    end
+
+    subgraph control ["Digital Control"]
+        COMP["Comparator"]
+        SAR["Async Logic /\nSAR State Machine"]
+        BSC["Binary Search\nControl"]
+        COMP -- "1-bit Decision" --> SAR
+        SAR --> BSC
+    end
+
+    subgraph output ["Conversion Result (8-bit Example, Vin=5.2V, Vref=10V)"]
+        CLK0["Clock 0: Acquire → Chold = 5.2V"]
+        CLK1["Clock 1: Test MSB 5.0V → 5.2V > 5.0V → bit7 = 1"]
+        CLK2["Clock 2: Test bit6 7.5V → 5.2V < 7.5V → bit6 = 0"]
+        CLK3["Clock 3: Test bit5 6.25V → 5.2V < 6.25V → bit5 = 0"]
+        CLKN["... continue through LSB ..."]
+        CLK8["Clock 8: Output = 10000011 = 131 decimal"]
+        CLK0 --> CLK1 --> CLK2 --> CLK3 --> CLKN --> CLK8
+    end
+
+    VIN --> SH
+    SH --> CHOLD
+    CHOLD -- "Sampled Voltage" --> COMP
+    CDAC -- "DAC Voltage" --> COMP
+    BSC -- "Capacitor Switching\nControl" --> CDAC
+    SAR --> CLK0
 ```
 
 Delta-sigma ADCs sacrifice speed for extraordinary resolution, achieving 24-bit effective resolution at audio sampling rates through oversampling and noise shaping. The core principle involves sampling the input signal at rates 64× to 256× higher than the Nyquist rate, then applying a 1-bit quantizer within a negative feedback loop containing an integrator. This feedback loop pushes quantization noise toward high frequencies, concentrating it outside the signal bandwidth. A subsequent digital decimation filter attenuates the high-frequency noise while downsampling the bitstream to the final output rate, recovering the original signal with dramatically improved resolution. The AD7768, a representative delta-sigma ADC, samples at 8.192 MSa/s internally while producing final output samples at 128 kSa/s, achieving 108 dB dynamic range (equivalent to 18-bit noise-free resolution). The penalty for this performance is latency—the decimation filter introduces group delay on the order of hundreds of samples—making delta-sigma converters unsuitable for feedback control loops but ideal for precision sensor measurements.
@@ -87,31 +143,33 @@ Oscilloscope bandwidth specifications merit careful interpretation because they 
 
 Spectrum analyzer architecture revolves around the superheterodyne receiver principle, downconverting the input RF signal to a fixed intermediate frequency (IF) where narrow-bandwidth filtering and detection occur. The input signal first passes through a tunable preselector filter that attenuates out-of-band interferers and image frequencies. A mixer driven by a swept local oscillator (LO) translates the desired frequency slice down to the IF—typically 10.7 MHz or 21.4 MHz—where a crystal or SAW filter with selectable bandwidth (RBW, resolution bandwidth) isolates the signal component of interest. The envelope detector recovers the signal amplitude, and a logarithmic amplifier compresses the dynamic range for display on a linear vertical scale marked in dBm (decibels relative to 1 milliwatt). The sweep rate, determined by the RBW and span settings, must be slow enough to allow the IF filter to settle at each frequency step, creating the classic tradeoff: narrow RBW for fine frequency resolution versus fast sweep for real-time observation.
 
-```
-Superheterodyne Spectrum Analyzer Block Diagram
-===============================================
-
-RF Input       Preselector    Mixer        IF Filter      Envelope      Log Amp
-  50Ω            Filter         ×            (RBW)        Detector        │
-   │               │            │              │             │            │
-   ▼               ▼            ▼              ▼             ▼            ▼
-──┤├───────────>├──────────>├────────────>├──────────────>├───────────>├───> ADC
-  Atten       Tracking     fRF - fLO       Crystal/SAW     Diode/       dB/div
- 0-70dB       YIG Filter    = fIF (fixed)  10Hz-1MHz BW    RMS Det      scaling
-
-                                ▲
-                                │
-                         Swept LO Generator
-                      PLL-synthesized 100kHz-50GHz
-                                │
-                         Frequency Control
-                       (Span, Center Freq, RBW)
-
-Key Parameters:
-- RBW (Resolution Bandwidth): IF filter bandwidth, determines frequency resolution
-- VBW (Video Bandwidth): Post-detection lowpass filter, reduces trace noise
-- Span: Frequency range displayed, Start to Stop frequency
-- Sweep Time: (Span / RBW²) × k, where k accounts for filter settling
+```mermaid
+flowchart LR
+    RF["RF Input<br/>50Ω"]
+    ATTEN["Attenuator<br/>0-70dB"]
+    PRESEL["Preselector<br/>Tracking YIG Filter"]
+    MIXER["Mixer<br/>×"]
+    IF["IF Filter (RBW)<br/>Crystal/SAW<br/>10Hz-1MHz BW"]
+    ENV["Envelope Detector<br/>Diode/RMS Det"]
+    LOG["Log Amp<br/>dB/div scaling"]
+    ADC["ADC"]
+    
+    LO["Swept LO Generator<br/>PLL-synthesized<br/>100kHz-50GHz"]
+    CTRL["Frequency Control<br/>(Span, Center Freq, RBW)"]
+    
+    RF --> ATTEN --> PRESEL --> MIXER
+    MIXER --> IF --> ENV --> LOG --> ADC
+    LO --> MIXER
+    CTRL -.-> LO
+    
+    note1["fRF - fLO = fIF (fixed)"]
+    note2["Key Parameters:<br/>RBW: IF filter bandwidth<br/>VBW: Post-detection lowpass filter<br/>Span: Start to Stop frequency<br/>Sweep Time: (Span / RBW²) × k"]
+    
+    MIXER -.-> note1
+    CTRL -.-> note2
+    
+    style note1 fill:#ffffcc,stroke:#999,stroke-dasharray: 5 5
+    style note2 fill:#ffffcc,stroke:#999,stroke-dasharray: 5 5
 ```
 
 The resolution bandwidth (RBW) setting determines the spectrum analyzer's ability to resolve closely spaced frequency components. Consider two sine waves separated by 100 kHz: with a 10 kHz RBW filter, they appear as distinct peaks with a visible null between them. With a 300 kHz RBW filter, they merge into a single broadened peak, losing frequency resolution. The narrow RBW filter improves sensitivity by reducing the integrated noise power within the measurement bandwidth—halving the RBW improves noise floor by 3 dB—but at the cost of slower sweep speed. The video bandwidth (VBW) filter, applied after envelope detection, performs temporal averaging to smooth trace noise without affecting frequency resolution, allowing the engineer to reduce displayed noise while maintaining fast sweep rates.

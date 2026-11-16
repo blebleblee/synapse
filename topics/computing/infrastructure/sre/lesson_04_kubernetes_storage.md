@@ -183,8 +183,8 @@ The underlying storage medium determines baseline performance:
 
 | Storage Type | IOPS | Throughput | Latency | Use Case |
 |--------------|------|------------|---------|----------|
-| Local NVMe SSD | 500k+ | 7+ GB/s | <100 μs | Databases, high-frequency trading |
-| Cloud SSD (gp3, pd-ssd) | 16k | 1 GB/s | <1 ms | General-purpose stateful apps |
+| Local NVMe SSD | 500k+ | 7+ GB/s | < 100 μs | Databases, high-frequency trading |
+| Cloud SSD (gp3, pd-ssd) | 16k | 1 GB/s | < 1 ms | General-purpose stateful apps |
 | Cloud HDD (st1, pd-standard) | 500 | 500 MB/s | 10-20 ms | Log aggregation, cold storage |
 | Network FS (NFS, EFS) | 1k-10k | 100-500 MB/s | 1-10 ms | Shared read workloads |
 | Distributed FS (Ceph, GlusterFS) | 10k-100k | 1-10 GB/s | 1-5 ms | Multi-attach RWX workloads |
@@ -393,7 +393,7 @@ spec:
       storage: 100Gi
 ```
 
-**Performance consideration**: Snapshot creation can cause brief I/O pauses (typically <1s) while the storage system creates a crash-consistent point-in-time copy. For databases, prefer application-consistent snapshots by quiescing writes before snapshotting.
+**Performance consideration**: Snapshot creation can cause brief I/O pauses (typically < 1s) while the storage system creates a crash-consistent point-in-time copy. For databases, prefer application-consistent snapshots by quiescing writes before snapshotting.
 
 ## 7. Capacity Management and Overprovisioning
 

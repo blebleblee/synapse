@@ -22,15 +22,20 @@ The third invariant governs reproduction: plants have evolved two fundamentally 
 
 The internal architecture of a plant stem, viewed in cross-section, reveals its transport logic directly. In a dicotyledonous plant — the broad-leaf species that make up most garden vegetables, ornamentals, and woody shrubs — the vascular bundles are arranged in a ring, with xylem toward the pith and phloem toward the outer bark, separated by a meristematic layer called the vascular cambium. In monocots (grasses, corn, lilies), the bundles are scattered throughout the cross-section without a continuous cambium ring, which is why monocots cannot produce secondary (radial) growth and you cannot graft them using cambium-alignment techniques.
 
-```
-        Dicot Stem Cross-Section
-        ─────────────────────────
-              [Epidermis]
-            [Cortex / Bark]
-          [Phloem]  ← sugars, bidirectional
-         [Cambium]  ← meristematic, divides to form new xylem/phloem
-          [Xylem]   ← water & minerals, upward
-              [Pith]
+```mermaid
+flowchart TD
+    EPI["Epidermis"]
+    COR["Cortex / Bark"]
+    PHL["Phloem\n← sugars, bidirectional"]
+    CAM["Cambium\n← meristematic, divides to form new xylem / phloem"]
+    XYL["Xylem\n← water & minerals, upward"]
+    PTH["Pith"]
+
+    EPI --> COR
+    COR --> PHL
+    PHL --> CAM
+    CAM --> XYL
+    XYL --> PTH
 ```
 
 The cambium is the key structure for all grafting operations. When you align the cambium of a rootstock to the cambium of a scion and exclude air and desiccation with grafting tape or parafilm, the cells at the cut faces begin dividing within days, forming a callus bridge. Vascular differentiation within the callus eventually re-establishes xylem-to-xylem and phloem-to-phloem continuity. If cambium layers are offset by more than a millimeter, callus forms but functional vascular union is delayed or incomplete, and the graft union will be mechanically weak even if the scion appears to leaf out initially.
@@ -51,20 +56,47 @@ Stratification addresses physiological dormancy in many woody perennials and col
 
 The germination sequence is captured in the diagram below, which also maps the failure modes to their physical causes:
 
-```
-                    GERMINATION TRIGGER SEQUENCE
-                    ─────────────────────────────
+```mermaid
+flowchart LR
+    SEED["🌱 SEED\n(dry)"]
+    IMBIBITION["💧 IMBIBITION\n(water uptake)"]
+    ENZYME["⚗️ ENZYME\nACTIVATION"]
+    RADICLE["🌿 RADICLE\nEMERGENCE"]
 
-  SEED             IMBIBITION          ENZYME        RADICLE
-  (dry)   ──────►  (water uptake) ──►  ACTIVATION ──► EMERGENCE
-                        │                  │               │
-                   BLOCKED BY:        BLOCKED BY:    BLOCKED BY:
-                   • Hard testa       • Temp < base  • Compacted
-                   • Waxy coat        • ABA dormancy   substrate
-                   • Insufficient     • Absent light  • Damping-off
-                     substrate         (if required)   fungi
-                     moisture          • Stratific.   • Inadequate
-                                        required        O₂ in mix
+    SEED -->|triggers| IMBIBITION
+    IMBIBITION -->|enables| ENZYME
+    ENZYME -->|drives| RADICLE
+
+    subgraph block_imb ["🚫 Blocked by: Imbibition"]
+        BI1["Hard testa"]
+        BI2["Waxy coat"]
+        BI3["Insufficient\nsubstrate moisture"]
+    end
+
+    subgraph block_enz ["🚫 Blocked by: Enzyme Activation"]
+        BE1["Temp below\nbase temperature"]
+        BE2["ABA dormancy"]
+        BE3["Absent light\n(if required)"]
+        BE4["Stratification\nrequired"]
+    end
+
+    subgraph block_rad ["🚫 Blocked by: Radicle Emergence"]
+        BR1["Compacted\nsubstrate"]
+        BR2["Damping-off\nfungi"]
+        BR3["Inadequate O₂\nin mix"]
+    end
+
+    IMBIBITION --- block_imb
+    ENZYME --- block_enz
+    RADICLE --- block_rad
+
+    style SEED fill:#f5e6c8,stroke:#b8860b,color:#000
+    style IMBIBITION fill:#cce5ff,stroke:#0066cc,color:#000
+    style ENZYME fill:#d4edda,stroke:#28a745,color:#000
+    style RADICLE fill:#d0f0c0,stroke:#2e7d32,color:#000
+    style block_imb fill:#fff3cd,stroke:#ffc107,color:#000
+    style block_enz fill:#fff3cd,stroke:#ffc107,color:#000
+    style block_rad fill:#fff3cd,stroke:#ffc107,color:#000
 ```
 
 ### Vegetative Propagation: Hormonal Architecture of Rooting

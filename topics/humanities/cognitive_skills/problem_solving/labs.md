@@ -289,7 +289,7 @@ Implement this protocol for any causal analysis:
 
 2. **Intervention Prediction Test**: For the root cause identified in your fifth Why, specify a concrete intervention and its predicted quantitative effect. Research whether natural experiments or historical cases implemented similar interventions. If observed effects contradict predictions, diagnose incomplete model.
 
-3. **Residual Variance Analysis**: If available data permits, construct regression models. If your causal variable explains <40% of outcome variance (R² < 0.40), substantial causal factors remain unmodeled. Investigate residuals for patterns indicating omitted variables.
+3. **Residual Variance Analysis**: If available data permits, construct regression models. If your causal variable explains < 40% of outcome variance (R² < 0.40), substantial causal factors remain unmodeled. Investigate residuals for patterns indicating omitted variables.
 
 **Scenario 2: Circular Reasoning Detection—Cybersecurity Incident Analysis:**
 
@@ -340,7 +340,7 @@ Run your original simulation model with this shock. Observe failure symptoms: Yo
 
 **Physical Reality Check:**
 
-What actually happens in real systems when demand exceeds capacity? Queues grow without bound, wait times increase exponentially, and system shifts from steady-state to transient growth regime. Patients either wait indefinitely or divert to alternative care sources (unmodeled overflow valve). Your linearization assumption—valid for utilization <0.9—breaks down completely at utilization >1.0.
+What actually happens in real systems when demand exceeds capacity? Queues grow without bound, wait times increase exponentially, and system shifts from steady-state to transient growth regime. Patients either wait indefinitely or divert to alternative care sources (unmodeled overflow valve). Your linearization assumption—valid for utilization < 0.9—breaks down completely at utilization >1.0.
 
 **Recovery Protocol: Piecewise Model with Regime Switching:**
 
@@ -458,7 +458,7 @@ For any problem-solving analysis (Five Whys, MECE decomposition, causal loop dia
 - Boundary Robustness: successful categorization of 5 extreme edge cases (target: 5/5)
 
 **Failure Signatures and Recovery:**
-- **Symptom**: Terminal node count <8 at second-level decomposition
+- **Symptom**: Terminal node count < 8 at second-level decomposition
 - **Diagnosis**: Insufficient granularity; categories too coarse for operational intervention design
 - **Recovery**: Select largest terminal nodes for third-level decomposition; validate each has ≥3 distinct sub-mechanisms
 
@@ -519,6 +519,6 @@ Complex real-world problems require integrating multiple analytical methods. Exe
 **Integration Quality Check:**
 - Do MECE categories align with distinct causal loops in systems diagram? (target: yes)
 - Does Five Whys root cause correspond to high-leverage loop intervention point? (target: yes)
-- Does quantitative simulation reproduce observed problem behavior? (target: <20% prediction error)
+- Does quantitative simulation reproduce observed problem behavior? (target: < 20% prediction error)
 
 This operational reference guide provides the complete diagnostic and recovery protocols required for rigorous problem-solving practice. Master these methods through repeated application to diverse domains, systematic stress-testing, and disciplined falsification. Problem-solving excellence emerges not from theoretical knowledge but from accumulated pattern recognition across hundreds of diagnosed failures and validated solutions.

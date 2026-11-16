@@ -172,20 +172,20 @@ Diagnostic: This signals a gap between your internal decision process and your e
 Calibrate your agility metrics against these empirically validated performance bands derived from multi-domain leadership research. These standards reflect operational effectiveness across volatile business, military, healthcare, and emergency response contexts where agility directly predicts outcome quality.
 
 **Mean Decision Cycle Time:**  
-- Strategic Planning Decisions: 90-180 seconds (acceptable), 60-90 seconds (strong), <60 seconds (exceptional)  
-- Operational Execution Decisions: 30-60 seconds (acceptable), 20-30 seconds (strong), <20 seconds (exceptional)  
-- Crisis Response Decisions: 15-30 seconds (acceptable), 10-15 seconds (strong), <10 seconds (exceptional)  
-- Interpersonal Conflict Decisions: 45-90 seconds (acceptable), 30-45 seconds (strong), <30 seconds (exceptional)
+- Strategic Planning Decisions: 90-180 seconds (acceptable), 60-90 seconds (strong), < 60 seconds (exceptional)  
+- Operational Execution Decisions: 30-60 seconds (acceptable), 20-30 seconds (strong), < 20 seconds (exceptional)  
+- Crisis Response Decisions: 15-30 seconds (acceptable), 10-15 seconds (strong), < 10 seconds (exceptional)  
+- Interpersonal Conflict Decisions: 45-90 seconds (acceptable), 30-45 seconds (strong), < 30 seconds (exceptional)
 
 **Information Seeking Distribution:**  
 - Breadth-First Scanning: 60-75% (optimal agility range)  
 - Depth-First Exploration: 20-30% (optimal agility range)  
 - Authority Delegation: 5-10% (optimal agility range)  
-- Intuitive Snap Judgment: <5% (optimal agility range, except in genuine expertise domains)
+- Intuitive Snap Judgment: < 5% (optimal agility range, except in genuine expertise domains)
 
 **Reversibility Signal Presence:**  
 - 40-60% of decisions (optimal agility range indicating balanced commitment and flexibility)  
-- <30% indicates overconfidence or premature closure  
+- < 30% indicates overconfidence or premature closure  
 - >70% indicates excessive hedging or commitment avoidance
 
 **Cognitive Load Resilience:**  

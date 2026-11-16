@@ -309,7 +309,7 @@ Reconfigure ORB-SLAM3 to accept RGB-D input but handle missing depth gracefully:
 
 Execute the standardized trajectory under each failure scenario, recording SLAM tracking status and APE statistics. Compare RGB-D versus RGB-only performance by computing the APE increase during depth outages: for transient failures, expect 1.5–2× APE increase during the dropout and 1–2 second recovery period; for permanent failures, sustained 2–3× APE degradation but continued tracking if sufficient motion parallax is maintained (minimum 5-degree viewing angle change between keyframes).
 
-Examine scale drift in monocular mode by analyzing the relative transformation between consecutive keyframes. In RGB-D mode, scale is directly observable from depth measurements, but monocular SLAM estimates scale up to an arbitrary factor. Compute the scale factor drift as the ratio of estimated to ground truth trajectory lengths over 5-second windows during depth outages. Implement scale correction via IMU integration: the accelerometer double integration provides absolute scale, constraining the monocular estimate. Validate correction effectiveness by demonstrating scale drift reduction from 15–20% uncorrected to <5% with IMU fusion.
+Examine scale drift in monocular mode by analyzing the relative transformation between consecutive keyframes. In RGB-D mode, scale is directly observable from depth measurements, but monocular SLAM estimates scale up to an arbitrary factor. Compute the scale factor drift as the ratio of estimated to ground truth trajectory lengths over 5-second windows during depth outages. Implement scale correction via IMU integration: the accelerometer double integration provides absolute scale, constraining the monocular estimate. Validate correction effectiveness by demonstrating scale drift reduction from 15–20% uncorrected to < 5% with IMU fusion.
 
 Develop a sensor health monitoring and fallback protocol that detects degraded depth quality before complete failure. Compute per-frame depth metrics: fill ratio, mean depth of valid pixels, and temporal depth stability (correlation coefficient between consecutive aligned depth frames). Trigger preemptive fallback to monocular mode when fill ratio drops below 50% or temporal stability falls below 0.7, avoiding abrupt tracking loss:
 
@@ -414,19 +414,19 @@ Execute this checklist before each AR-enabled robotic operation to ensure system
 **Workspace Calibration and Ground Truth Reference**
 10. Verify AprilTag positions: using a laser distance meter, re-measure the distances between pairs of workspace perimeter tags, compare to the ground truth YAML configuration, confirm agreement within ±3 mm.
 11. Validate lighting uniformity: measure illuminance at five points (workspace center and four corners), compute coefficient of variation, confirm CV < 0.15 for uniform conditions.
-12. Check manipulator calibration: command motion to three known Cartesian positions, measure actual end-effector location with external tracking (laser tracker or CMM if available), confirm positioning error <1 mm.
+12. Check manipulator calibration: command motion to three known Cartesian positions, measure actual end-effector location with external tracking (laser tracker or CMM if available), confirm positioning error < 1 mm.
 
 **AR Rendering Pipeline**
-13. Launch Unity AR application and verify network connectivity to ROS 2: monitor the ROS-TCP-Connector console for successful connection message, ping latency should remain <5 ms on local network.
+13. Launch Unity AR application and verify network connectivity to ROS 2: monitor the ROS-TCP-Connector console for successful connection message, ping latency should remain < 5 ms on local network.
 14. Confirm pose message reception: observe the AR camera transform updates in the Unity Hierarchy panel, should update at 30 Hz synchronized with SLAM output.
-15. Validate virtual overlay alignment: with camera viewing a workspace AprilTag, verify the rendered coordinate frame overlays the physical tag with visible offset <5 mm (subjective visual assessment sufficient for pre-flight check, quantitative measurement performed during Exercise 1).
-16. Test rendering performance: enable the Unity Profiler, confirm CPU frame time <20 ms and GPU frame time <12 ms under idle conditions (no active manipulation tasks).
+15. Validate virtual overlay alignment: with camera viewing a workspace AprilTag, verify the rendered coordinate frame overlays the physical tag with visible offset < 5 mm (subjective visual assessment sufficient for pre-flight check, quantitative measurement performed during Exercise 1).
+16. Test rendering performance: enable the Unity Profiler, confirm CPU frame time < 20 ms and GPU frame time < 12 ms under idle conditions (no active manipulation tasks).
 
 **Computational Resources**
-17. Monitor system load: `htop` or equivalent should show total CPU utilization <40% before SLAM initialization, confirming headroom for operational load.
+17. Monitor system load: `htop` or equivalent should show total CPU utilization < 40% before SLAM initialization, confirming headroom for operational load.
 18. Check available memory: confirm at least 4 GB free RAM to accommodate SLAM map growth and rendering buffers.
-19. Verify disk write performance: test checkpoint save operation, confirm write completes in <200 ms (`time` the save function call).
-20. Validate network bandwidth: `iperf3` between robot computer and AR rendering host should demonstrate >100 Mbps throughput with <1% packet loss.
+19. Verify disk write performance: test checkpoint save operation, confirm write completes in < 200 ms (`time` the save function call).
+20. Validate network bandwidth: `iperf3` between robot computer and AR rendering host should demonstrate >100 Mbps throughput with < 1% packet loss.
 
 ### Real-Time Diagnostic Dashboard Metrics
 
@@ -435,8 +435,8 @@ Deploy a live monitoring dashboard displaying these key performance indicators d
 **Pose Estimation Quality** (update 10 Hz)
 - **APE Translation**: Current absolute pose error translation magnitude relative to last fiducial check, threshold warning >10 mm, critical >20 mm.
 - **APE Rotation**: Current absolute pose error rotation magnitude, threshold warning >2°, critical >5°.
-- **Feature Count**: Number of tracked ORB features in current frame, threshold warning <80, critical <50.
-- **Map Point Density**: Number of map points visible in current frustum divided by visible volume, threshold warning <800/m³, critical <500/m³.
+- **Feature Count**: Number of tracked ORB features in current frame, threshold warning < 80, critical < 50.
+- **Map Point Density**: Number of map points visible in current frustum divided by visible volume, threshold warning < 800/m³, critical < 500/m³.
 - **Tracking State**: Boolean indicator of valid SLAM state, alert on any tracking loss event.
 
 **Rendering Performance** (update at frame rate)
@@ -445,9 +445,9 @@ Deploy a live monitoring dashboard displaying these key performance indicators d
 - **Registration Error**: Pixel-space distance between virtual overlay and physical fiducial when both visible, threshold warning >5 pixels, critical >10 pixels.
 
 **Sensor Health** (update 1 Hz)
-- **Depth Fill Ratio**: Percentage of valid depth pixels, threshold warning <60%, critical <40%.
-- **Depth Temporal Stability**: Frame-to-frame correlation coefficient, threshold warning <0.75, critical <0.60.
-- **Image Brightness**: Mean pixel intensity in central ROI, threshold warning <40 or >200 (on 0–255 scale), critical <20 or >235.
+- **Depth Fill Ratio**: Percentage of valid depth pixels, threshold warning < 60%, critical < 40%.
+- **Depth Temporal Stability**: Frame-to-frame correlation coefficient, threshold warning < 0.75, critical < 0.60.
+- **Image Brightness**: Mean pixel intensity in central ROI, threshold warning < 40 or >200 (on 0–255 scale), critical < 20 or >235.
 - **IMU Acceleration Magnitude**: Norm of accelerometer reading, threshold critical if >50 m/s² (likely sensor fault or violent collision).
 
 **Computational Load** (update 1 Hz)
@@ -468,7 +468,7 @@ Deploy a live monitoring dashboard displaying these key performance indicators d
 - **Diagnostic**: Plot trajectory in 3D, check for closed loops (should return to starting position within 10 mm after 60-second circuit), verify loop closure events in SLAM log.
 - **Mitigation**: Enable loop closure detection, reduce trajectory size to ensure frequent revisits to starting region, recalibrate IMU to minimize bias.
 
-**Symptom: Sudden APE Spike to >50 mm Lasting <2 Seconds**
+**Symptom: Sudden APE Spike to >50 mm Lasting < 2 Seconds**
 - **Root Cause**: Transient occlusion or rapid lighting change causing momentary feature loss.
 - **Diagnostic**: Correlate APE spike timing with manipulator motion logs and lighting sensor data, check depth fill ratio during spike window.
 - **Mitigation**: Implement feature prediction to bridge short occlusions, enable adaptive exposure control, add illuminated fiducials for recovery.

@@ -24,13 +24,26 @@ The critical mechanism here is *mimesis*—imitation or representation. A partic
 
 To see how this operates in practice, consider Plato's divided line, which maps the entire structure of reality and corresponding modes of cognition:
 
-```
-Reality                    Cognition
-─────────────────────────────────────────
-Forms (Noetic)  ────────  Nous (Intellection)
-Mathematical    ────────  Dianoia (Reasoning)
-Visible Objects ────────  Pistis (Belief)
-Images/Shadows  ────────  Eikasia (Imagination)
+```mermaid
+flowchart LR
+    subgraph reality ["Reality"]
+        F["Forms (Noetic)"]
+        M["Mathematical"]
+        V["Visible Objects"]
+        I["Images / Shadows"]
+    end
+
+    subgraph cognition ["Cognition"]
+        N["Nous (Intellection)"]
+        D["Dianoia (Reasoning)"]
+        P["Pistis (Belief)"]
+        E["Eikasia (Imagination)"]
+    end
+
+    F["Forms (Noetic)"]     --- N["Nous (Intellection)"]
+    M["Mathematical"]       --- D["Dianoia (Reasoning)"]
+    V["Visible Objects"]    --- P["Pistis (Belief)"]
+    I["Images / Shadows"]   --- E["Eikasia (Imagination)"]
 ```
 
 The practitioner's task is to train the mind to ascend this ladder. Aesthetic experience, in Plato's system, is explicitly an engine for this ascent. When we encounter something beautiful in the sensible world—say, a mathematically proportioned temple—our immediate sensory experience (eikasia) can be refined into belief about its proportions (pistis), which can then be elevated to discursive reasoning about mathematical ratios (dianoia), and ultimately to direct intellectual apprehension of Beauty itself as a Form (nous). The sensible object is a stepping stone, not the destination.
@@ -149,4 +162,21 @@ The practitioner operating across classical and medieval aesthetics can develop 
 
 The practitioner will frequently encounter tension between these frameworks. Platonic transcendence seems incompatible with Aristotelian immanence. Neoplatonic emanation seems to conflict with Augustinian creation ex nihilo. How does the sophisticated practitioner navigate these tensions?
 
-The solution is to recognize that each framework is solving a distinct problem and operating at a distinct metaphysical level. Plato is addressing how particular beautiful things relate to universal Beauty; Aristotle is addressing how matter becomes organized into functional form; Plotinus is addressing how intelligibility flows from transcendence into materiality; Augustine and Aquinas are addressing how divine intention is impressed in
+The solution is to recognize that each framework is solving a distinct problem and operating at a distinct metaphysical level.
+
+**Plato addresses the transcendent source of intelligible order; Aristotle addresses its immanent actualization in material substrates; Plotinus addresses the dynamic process connecting transcendent to immanent through hierarchical emanation; Augustine addresses the theological ground of intelligibility in divine will; Aquinas synthesizes immanence and transcendence through analogical participation.** The practitioner does not choose between frameworks but deploys each where its explanatory power is strongest. When analyzing formal proportion in a specific artifact, Aristotelian hylomorphism provides the most precise analytical vocabulary. When tracing those proportions to their ultimate source, Platonic or Neoplatonic ascent becomes necessary. When situating aesthetic experience within the drama of creation and redemption, Augustinian or Thomistic frameworks supply the theological integration. The masterful practitioner moves fluidly between frameworks, recognizing that each illuminates a distinct dimension of the same phenomenon—beauty as the manifestation of intelligible order in sensible form.
+
+This methodological pluralism does not constitute eclecticism or relativism, but rather reflects the complexity of beauty itself as a reality spanning multiple ontological levels. The sensible object genuinely embodies intelligible form (Aristotle); that form genuinely participates in transcendent universals (Plato); those universals genuinely emanate from or are created by an ultimate principle (Plotinus, Augustine, Aquinas); and the human soul genuinely ascends toward that principle through aesthetic contemplation (all frameworks). Each framework captures a genuine aspect of this comprehensive reality. The practitioner's task is not to select the "correct" framework but to develop sufficient facility with all frameworks to recognize which questions each answers and how they complement rather than contradict one another when properly understood at their appropriate metaphysical levels.
+
+---
+
+## Summary & Verification Matrix
+
+| **Framework** | **Governing Invariant** | **Core Mechanism** | **Diagnostic Criteria** | **Primary Question Addressed** |
+|---------------|------------------------|-------------------|------------------------|-------------------------------|
+| **Platonic** | Beauty = sensible manifestation of transcendent Form; particular beautiful objects participate in Beauty Itself | Methexis (participation): particulars imperfectly instantiate eternal Forms; soul recollects pre-embodied knowledge through encounter with proportioned sensibles | Perfect mathematical proportion; symmetry as mark of intelligibility; beauty prompts philosophical eros and recollection | What is the ultimate ontological source of beauty? How do imperfect sensibles relate to perfect universals? |
+| **Aristotelian** | Beauty = harmonious actualization of form in matter; entelechy realized through proportioned parts serving unified function | Hylomorphism: matter receives intelligible form; beauty emerges when material substrate fully actualizes formal potential within teleological constraints | Organic unity; functional integration; appropriate proportion relative to purpose; wholeness, harmony, radiance as criteria | How does beauty exist *in* material objects? What makes *this* particular thing beautiful? |
+| **Plotinian (Neoplatonic)** | Beauty = luminous trace of The One descending through hierarchical emanation; degrees of beauty map degrees of being | Emanation: from The One → Intellect → Soul → Matter; beauty = transparent manifestation of higher intelligible reality through lower medium | Hierarchical gradation; translucent quality; capacity to redirect attention upward; contemplative ascent from sensible to intelligible to mystical union | How does the transcendent connect to the immanent? How does aesthetic experience enable metaphysical ascent? |
+| **Augustinian** | Beauty = created order manifesting divine Wisdom; aesthetic experience as pedagogical discipline toward caritas | Divine exemplarism: God creates through eternal archetypes; beauty = vestigium Dei; ordo amoris directs cupiditas toward caritas through aesthetic habituation | Theological referentiality; moral-aesthetic integration; beauty as sign pointing beyond itself; serves conversion and sanctification | How does beauty relate to divine will and creation? How does aesthetic experience serve theological and moral formation? |
+| **Thomistic (Synthetic)** | Beauty = transcendental convertible with Being; analogical participation allows immanent forms to manifest transcendent exemplars | Analogia entis: proportion, integrity, clarity as beauty's constituents; being manifests through graduated participation; natural and supernatural orders integrated | Formal analysis combined with transcendent referent; natural beauty compatible with supernatural end; reason and revelation harmonized | How can immanence and transcendence coexist? How does beauty function as both natural property and theological reality? |
+| **Methodological Integration** | Each framework addresses distinct metaphysical level and question type; comprehensive understanding requires facility with all frameworks | Deploy Aristotelian analysis for immanent formal structures; Platonic/Plotinian frameworks for transcendent sources; Augustinian/Thomistic for theological integration | Recognize which framework provides strongest explanatory power for specific question; avoid false dilemmas by distinguishing levels of analysis | How do seemingly incompatible frameworks complement rather than contradict? What is the unified reality these frameworks collectively illuminate? |

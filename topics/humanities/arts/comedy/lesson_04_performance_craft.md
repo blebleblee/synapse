@@ -51,26 +51,27 @@ Facial expression operates at higher temporal resolution than spoken language, c
 
 Physical tension and relaxation patterns communicate comfort, anxiety, confidence, and vulnerability through body posture and movement quality. High physical tension—locked joints, rigid spine, shallow breathing—signals anxiety or aggression depending on context. Physical relaxation—loose joints, curved spine, deep breathing—signals confidence or exhaustion depending on energy level. The comedian manipulates personal physical tension to create embodied emotional states that the audience reads subconsciously. A performer describing anxiety while physically relaxed creates cognitive dissonance; describing anxiety while physically tense creates authentic resonance that amplifies the material's emotional reality.
 
-```
-Persona Embodiment Matrix:
-
-ARCHETYPE: The Anxious Overthinker
-├─ Vocal: Higher pitch baseline, rapid tempo with interruption patterns
-├─ Physical: Elevated shoulder tension, compressed spatial occupation
-├─ Gesture: Small, tight, repetitive movements near body centerline
-└─ Facial: Furrowed brow default, frequent eye widening at "realizations"
-
-ARCHETYPE: The Confident Provocateur  
-├─ Vocal: Lower pitch baseline, controlled tempo with strategic pauses
-├─ Physical: Expanded spatial occupation, relaxed joint positioning
-├─ Gesture: Large, sweeping movements into audience space
-└─ Facial: Slight smirk default, direct eye contact, minimal surprise
-
-ARCHETYPE: The Bewildered Observer
-├─ Vocal: Mid-range pitch with confusion inflections, uneven tempo
-├─ Physical: Neutral spine, frequent weight shifts, head tilts
-├─ Gesture: Open-palm questioning gestures, pointing at imagined scenarios
-└─ Facial: Raised eyebrows, slight head shake, genuine puzzlement
+```mermaid
+flowchart TD
+    Root["Persona Embodiment Matrix"]
+    
+    Root --> A1["ARCHETYPE: The Anxious Overthinker"]
+    A1 --> A1V["Vocal: Higher pitch baseline, rapid tempo with interruption patterns"]
+    A1 --> A1P["Physical: Elevated shoulder tension, compressed spatial occupation"]
+    A1 --> A1G["Gesture: Small, tight, repetitive movements near body centerline"]
+    A1 --> A1F["Facial: Furrowed brow default, frequent eye widening at 'realizations'"]
+    
+    Root --> A2["ARCHETYPE: The Confident Provocateur"]
+    A2 --> A2V["Vocal: Lower pitch baseline, controlled tempo with strategic pauses"]
+    A2 --> A2P["Physical: Expanded spatial occupation, relaxed joint positioning"]
+    A2 --> A2G["Gesture: Large, sweeping movements into audience space"]
+    A2 --> A2F["Facial: Slight smirk default, direct eye contact, minimal surprise"]
+    
+    Root --> A3["ARCHETYPE: The Bewildered Observer"]
+    A3 --> A3V["Vocal: Mid-range pitch with confusion inflections, uneven tempo"]
+    A3 --> A3P["Physical: Neutral spine, frequent weight shifts, head tilts"]
+    A3 --> A3G["Gesture: Open-palm questioning gestures, pointing at imagined scenarios"]
+    A3 --> A3F["Facial: Raised eyebrows, slight head shake, genuine puzzlement"]
 ```
 
 The mechanics of **audience relationship construction** begin with eye contact patterns that establish connection without intimidation. The performer must distribute visual attention across the audience geography, creating the illusion of individual connection while maintaining awareness of collective energy. The technical pattern involves sectional scanning—focusing on different audience zones for 3-5 second intervals, making brief eye contact with individuals within each section without sustained staring. This creates inclusion while preventing the awkwardness of prolonged direct contact that transforms comedy into confrontation.
@@ -83,23 +84,42 @@ Adaptive timing represents the highest-order performance skill, the real-time ca
 
 The technical challenge of adaptive timing emerges when jokes fail. A failed joke creates awkward silence that must be addressed or transcended. The options form a decision tree: acknowledge the failure with meta-commentary that transforms failure into new material, plow forward with confidence that reframes silence as intentional pause, or deploy a prepared rescue callback that redirects attention. The choice depends on persona—a vulnerable persona can acknowledge failure authentically, a confident persona must reframe or ignore. The critical invariant is that **hesitation and apology amplify failure**; the performer must commit fully to their chosen recovery strategy without visible panic.
 
-```
-Timing Decision Protocol:
+```mermaid
+flowchart TD
+    A["Punchline delivered"] --> B["Monitor audience facial expressions and body language (0.5 sec)"]
 
-Punchline delivered
-↓
-Monitor audience facial expressions and body language (0.5 sec)
-↓
-┌─────────────────┬─────────────────┬─────────────────┐
-│ Recognition +   │ Recognition but │ Confusion or    │
-│ Building laugh  │ hesitation      │ flat response   │
-└─────────────────┴─────────────────┴─────────────────┘
-        ↓                  ↓                  ↓
-   EXTEND PAUSE      BRIEF PAUSE      IMMEDIATE PROCEED
-   (2-3 seconds)     (0.5-1 second)    (no pause)
-        ↓                  ↓                  ↓
-   Ride laugh peak   Give processing   Move to stronger
-   then proceed      time, proceed     material rapidly
+    subgraph sub_reactions ["Audience Reaction"]
+        direction LR
+        C1["Recognition + Building laugh"]
+        C2["Recognition but hesitation"]
+        C3["Confusion or flat response"]
+    end
+
+    B --> C1
+    B --> C2
+    B --> C3
+
+    subgraph sub_decision ["Timing Decision"]
+        direction LR
+        D1["EXTEND PAUSE (2-3 seconds)"]
+        D2["BRIEF PAUSE (0.5-1 second)"]
+        D3["IMMEDIATE PROCEED (no pause)"]
+    end
+
+    C1 --> D1
+    C2 --> D2
+    C3 --> D3
+
+    subgraph sub_action ["Next Action"]
+        direction LR
+        E1["Ride laugh peak then proceed"]
+        E2["Give processing time, proceed"]
+        E3["Move to stronger material rapidly"]
+    end
+
+    D1 --> E1
+    D2 --> E2
+    D3 --> E3
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

@@ -916,56 +916,44 @@ pub enum PaymentError {
 
 The architecture diagram below illustrates the dependency flow and component relationships in a canonical Domain-Driven Design implementation:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Presentation Layer                           │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │  REST API    │  │   GraphQL    │  │     gRPC     │          │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘          │
-└─────────┼──────────────────┼──────────────────┼──────────────────┘
-          │                  │                  │
-          └──────────────────┼──────────────────┘
-                             │
-┌────────────────────────────┼─────────────────────────────────────┐
-│                    Application Layer                             │
-│                             │                                     │
-│  ┌──────────────────────────▼─────────────────────────┐          │
-│  │       Application Services                         │          │
-│  │  • Transaction Coordination                        │          │
-│  │  • Use Case Orchestration                          │          │
-│  │  • Event Publishing                                │          │
-│  └──────────┬──────────────────────┬──────────────────┘          │
-└─────────────┼──────────────────────┼──────────────────────────────┘
-              │                      │
-              │                      │
-┌─────────────▼──────────────────────▼──────────────────────────────┐
-│                      Domain Layer                                 │
-│                                                                    │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐            │
-│  │  Aggregates  │  │   Entities   │  │    Value     │            │
-│  │     Root     │  │              │  │   Objects    │            │
-│  └──────────────┘  └──────────────┘  └──────────────┘            │
-│                                                                    │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐            │
-│  │   Domain     │  │   Domain     │  │  Repository  │            │
-│  │   Services   │  │    Events    │  │  Interfaces  │            │
-│  └──────────────┘  └──────────────┘  └──────┬───────┘            │
-└────────────────────────────────────────────────┼────────────────────┘
-                                                 │
-                                                 │ (implements)
-┌────────────────────────────────────────────────▼────────────────────┐
-│                   Infrastructure Layer                              │
-│                                                                      │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │  Repository  │  │    Event     │  │   External   │              │
-│  │     Impl     │  │  Publisher   │  │   Services   │              │
-│  └──────────────┘  └──────────────┘  └──────────────┘              │
-│                                                                      │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │  PostgreSQL  │  │    Kafka     │  │   REST/gRPC  │              │
-│  │    Driver    │  │   Producer   │  │    Clients   │              │
-│  └──────────────┘  └──────────────┘  └──────────────┘              │
-└──────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph sub_presentation ["Presentation Layer"]
+        REST["REST API"]
+        GQL["GraphQL"]
+        GRPC["gRPC"]
+    end
+
+    subgraph sub_application ["Application Layer"]
+        APPSVC["Application Services<br/>• Transaction Coordination<br/>• Use Case Orchestration<br/>• Event Publishing"]
+    end
+
+    subgraph sub_domain ["Domain Layer"]
+        AGG["Aggregates Root"]
+        ENT["Entities"]
+        VAL["Value Objects"]
+        DOMSVC["Domain Services"]
+        DOMEVT["Domain Events"]
+        REPOINT["Repository Interfaces"]
+    end
+
+    subgraph sub_infra ["Infrastructure Layer"]
+        REPOIMPL["Repository Impl"]
+        EVTPUB["Event Publisher"]
+        EXTSVC["External Services"]
+        PG["PostgreSQL Driver"]
+        KAFKA["Kafka Producer"]
+        CLIENTS["REST/gRPC Clients"]
+    end
+
+    REST --> APPSVC
+    GQL --> APPSVC
+    GRPC --> APPSVC
+
+    APPSVC --> AGG
+    APPSVC --> DOMSVC
+
+    REPOINT -->|"implements"| REPOIMPL
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

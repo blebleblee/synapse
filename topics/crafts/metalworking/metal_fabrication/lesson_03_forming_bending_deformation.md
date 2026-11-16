@@ -44,40 +44,26 @@ $$BD = 2 \times SB - BA$$
 
 These relationships form the closed system shown below:
 
-```
-  FLAT BLANK LENGTH DERIVATION
-  ─────────────────────────────────────────────────────────────────────
-
-  Input Parameters
-  ┌────────────────────────────────────────────────────────────┐
-  │  Material: t (thickness), K-factor                        │
-  │  Geometry: Ri (inside radius), θ (bend angle)             │
-  └───────────────────────┬────────────────────────────────────┘
-                          │
-                          ▼
-  ┌────────────────────────────────────────────────────────────┐
-  │  Neutral Axis Offset = K × t                              │
-  │  Effective bend radius = Ri + (K × t)                     │
-  └───────────────────────┬────────────────────────────────────┘
-                          │
-              ┌───────────┴───────────┐
-              ▼                       ▼
-  ┌─────────────────────┐   ┌──────────────────────────┐
-  │  Bend Allowance     │   │  Setback (SB)            │
-  │  BA = (π/180)×θ     │   │  SB = tan(θ/2)×(Ri + t)  │
-  │      ×(Ri + K×t)    │   └──────────┬───────────────┘
-  └──────────┬──────────┘              │
-             │             ┌───────────▼───────────────┐
-             │             │  Bend Deduction           │
-             │             │  BD = 2×SB − BA           │
-             │             └──────────┬────────────────┘
-             │                        │
-             └───────────┬────────────┘
-                         ▼
-  ┌────────────────────────────────────────────────────────────┐
-  │  Flat Pattern = Leg₁ + BA + Leg₂  (using BA method)       │
-  │  OR: Flat Pattern = OD₁ + OD₂ − BD  (using BD method)     │
-  └────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Input["Input Parameters<br/>Material: t (thickness), K-factor<br/>Geometry: Ri (inside radius), θ (bend angle)"]
+    
+    NeutralAxis["Neutral Axis Offset = K × t<br/>Effective bend radius = Ri + (K × t)"]
+    
+    BA["Bend Allowance<br/>BA = (π/180) × θ × (Ri + K × t)"]
+    
+    SB["Setback (SB)<br/>SB = tan(θ/2) × (Ri + t)"]
+    
+    BD["Bend Deduction<br/>BD = 2 × SB − BA"]
+    
+    FlatPattern["Flat Pattern = Leg₁ + BA + Leg₂ (using BA method)<br/>OR: Flat Pattern = OD₁ + OD₂ − BD (using BD method)"]
+    
+    Input --> NeutralAxis
+    NeutralAxis --> BA
+    NeutralAxis --> SB
+    SB --> BD
+    BA --> FlatPattern
+    BD --> FlatPattern
 ```
 
 Both methods are algebraically identical; the BD method simply operates on outside dimensions, which are easier to measure on a finished part during reverse engineering.

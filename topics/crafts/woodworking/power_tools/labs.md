@@ -146,7 +146,7 @@ Establish binding recognition and recovery protocol: listen continuously for aco
 No-load amperage: 5.5-6.5 A
 Loaded amperage (3/4-inch oak rip, 6 in/sec feed): 11.5-13.0 A
 No-load RPM: 3,450 ±50 RPM
-Blade runout tolerance: <0.003 in TIR
+Blade runout tolerance: < 0.003 in TIR
 Blade-to-slot parallelism: 0.000-0.002 in (rear toe-out preferred)
 Fence squareness to blade: ±0.002 in over fence length
 Miter gauge squareness: ±0.07 degrees (0.010 in over 8 in)
@@ -161,7 +161,7 @@ Corrective action: Clean arbor flange with acetone; replace blade if bore is dam
 
 Symptom: Cut width varies along workpiece length (taper in rip cut)
 Probable causes: Fence misalignment, blade deflection under load, inadequate workpiece control pressure
-Diagnostic procedure: Verify fence parallelism at front and rear positions; check blade for lateral deflection (should be <0.010 in at rim under 10 lb lateral load); observe workpiece contact with fence during cut
+Diagnostic procedure: Verify fence parallelism at front and rear positions; check blade for lateral deflection (should be < 0.010 in at rim under 10 lb lateral load); observe workpiece contact with fence during cut
 Corrective action: Adjust fence parallelism within 0.005 in; replace blade if body is warped; increase lateral control pressure; reduce feed rate to decrease cutting forces
 
 Symptom: Burning or burnishing on cut surface
@@ -171,7 +171,7 @@ Corrective action: Sharpen or replace blade; reduce feed rate to 4-5 in/sec; cle
 
 Symptom: Motor trips thermal overload or circuit breaker
 Probable causes: Dull blade, excessive depth of cut, motor bearing wear increasing friction, inadequate circuit capacity
-Diagnostic procedure: Measure no-load amperage (should be <7 A); measure loaded amperage during normal cut; verify circuit provides dedicated 15-20 A capacity; inspect motor bearings for roughness
+Diagnostic procedure: Measure no-load amperage (should be < 7 A); measure loaded amperage during normal cut; verify circuit provides dedicated 15-20 A capacity; inspect motor bearings for roughness
 Corrective action: Sharpen or replace blade; reduce depth of cut; replace motor bearings if rough; upgrade circuit to 20 A dedicated line; allow motor to cool between heavy cuts
 
 ### Router Operational Parameters and Maintenance Intervals
@@ -180,14 +180,14 @@ Corrective action: Sharpen or replace blade; reduce depth of cut; replace motor 
 No-load amperage at maximum speed: 10-11 A
 Loaded amperage (1/4-inch-deep edge profile, 10 in/sec feed): 12-14 A
 No-load RPM: 22,000 ±500 RPM
-Bit runout tolerance: <0.003 in TIR
+Bit runout tolerance: < 0.003 in TIR
 Depth accuracy: ±0.010 in from scale reading
 Depth repeatability: ±0.003 in over 10 cycles
 Acoustic signature at no-load: 98-102 dB(A)
 Housing temperature after 90-sec heavy cut: 145-155°F
 
 **Maintenance Schedule:**
-Every 20 operating hours: Vacuum dust from motor cooling vents; inspect brushes for length (replace when <1/4 inch remains); clean collet taper and bit shanks with acetone
+Every 20 operating hours: Vacuum dust from motor cooling vents; inspect brushes for length (replace when < 1/4 inch remains); clean collet taper and bit shanks with acetone
 Every 50 operating hours: Disassemble and clean plunge mechanism bushings with dry lubricant spray; inspect power cord for abrasion or conductor exposure; verify switch operation under no-load condition
 Every 100 operating hours: Replace motor brushes regardless of remaining length; inspect armature commutator for scoring or burning; clean collet compression surfaces and inspect for cracking or wear; verify depth stop mechanism lock force
 Annual or 200 operating hours: Professional bearing replacement and armature balancing; electrical safety inspection including ground continuity verification; collet replacement if runout exceeds 0.004 in after cleaning

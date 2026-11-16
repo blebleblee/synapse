@@ -196,4 +196,23 @@ Before shipping a rig to animation, validate it rigorously:
 
 4. **Deformer Stack Validation**: Check deformer order; verify blend shapes behave correctly at different joint angles.
 
-5. **Performance Profiling**: Measure frame time with the rig. Typical character rigs evaluate in 1–5 milliseconds. If slower, profile the dependency graph to id
+5. **Performance Profiling**: Measure frame time with the rig. Typical character rigs evaluate in 1–5 milliseconds.
+
+6. **Animation Compatibility Testing**: Have animators perform standard actions (walk, run, gesture cycles) to surface rig issues that only emerge during animation. Look for controls snapping unexpectedly, constraints solving incorrectly during continuous motion, or deformers producing artifacts at velocity. Fix issues before full production deployment.
+
+7. **Namespace and Attribute Locking**: Lock and hide attributes on controls that animators should not modify. Use namespaces to prevent naming conflicts in referenced rigs. Lock transforms on nodes that should not move (bind joints, deformer handles). This prevents accidental breakage and enforces the rig's intended usage contract.
+
+Once validation is complete, publish the rig with clear documentation: control naming conventions, attribute purpose, expected value ranges, and any known limitations. A robust rig is not just mechanically correct but also animator-friendly, performant, and maintainable across production iterations. The architecture decisions made in joint hierarchy design, the deformation stack, and constraint frameworks directly determine whether the rig will survive the demands of production or require costly mid-stream refactoring.
+
+---
+
+## Summary & Verification Matrix
+
+| **Invariant/Mechanism** | **Core Principle** | **Diagnostic Criterion** | **Failure Mode** |
+|-------------------------|-------------------|-------------------------|------------------|
+| **Joint Hierarchy** | Parent-child transforms propagate multiplicatively; leaf joints carry no deformation weight but define bone endpoints for IK solvers | Traverse hierarchy; verify no cycles, no zero-length bones, all deformation joints have non-zero skin weights | Cyclic dependencies cause infinite evaluation loops; zero-length bones produce IK singularities |
+| **Skin Cluster Binding** | Deformation = weighted sum of joint transforms applied to bind-pose vertices; normalization ensures ∑weights = 1 per vertex | Query `skinCluster` node; verify bind pose matrix matches current joint world matrix at bind time; check weight normalization | Non-normalized weights cause scaling artifacts; incorrect bind pose produces rest-state deformation |
+| **Blend Shape Deformation** | Target deltas interpolate linearly: `finalVert = baseVert + ∑(targetDelta_i × weight_i)`; evaluated pre-skinning in deformer stack | Inspect deformer order via `listHistory`; verify blend shape precedes skin cluster; test weight ranges [0,1] | Blend shapes after skinning lose pose-space correction capability; extrapolated weights (>1) amplify deltas unpredictably |
+| **IK Solver Constraints** | `ikHandle` minimizes distance between end effector and goal via iterative joint rotation; pole vector defines solution plane | Test IK chain at extreme positions; verify no flipping when goal crosses pole vector axis; measure solve error (`ikHandle.currentError`) | Flip occurs when goal passes through root-to-pole plane; solver fails (error ≠ 0) when goal exceeds anatomical joint limits |
+| **Constraint Frameworks** | Parent/point/orient constraints blend multiple driver transforms; aim constraints solve target-to-up vector orientation; cycle detection prevents infinite dependency graphs | Query constraint weights sum to 1.0; trace dependency graph for cycles via `listConnections -type constraint`; verify constraint offset matrices are identity at setup time | Non-unit weight sums cause scaling drift; cyclic constraints hang evaluation; non-identity offsets bake unintended transforms into solved pose |
+| **Corrective Shape Workflow** | Pose-space deformers (PSD) or driven blend shapes activate based on joint angle thresholds; corrective deltas compensate for skinning deficiencies (elbow collapse, shoulder candy-wrapper) | Pose joint to target angle; verify corrective shape activates smoothly; measure volume preservation in corrected region vs. uncorrected baseline | Correctives misaligned with joint angles activate at wrong poses; insufficient correction leaves volume loss or mesh interpenetration visible in animation |

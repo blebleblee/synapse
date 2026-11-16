@@ -540,17 +540,26 @@ public class ParticleCompactionSystem : MonoBehaviour
 
 The pipeline dependency graph for a frame that uses this compute result looks like:
 
-```
-Frame N:
-  [Compute Pass]  ScanParticles dispatch  ─────────────────────────┐
-  [AsyncReadback] GPU→CPU (async, latency 1-2 frames)             │
-  [Raster Pass]   Draw opaque geometry                             │
-  [Raster Pass]   Draw particles using GPU-side scan buffer ◄──────┘
-                  (GPU reads _ScanResult directly; no readback needed
-                   for GPU-driven draw; readback only for CPU statistics)
-
-Frame N+1:
-  CPU receives AsyncGPUReadbackRequest callback with liveCount
+```mermaid
+flowchart TD
+    subgraph frame_n ["Frame N"]
+        A["Compute Pass: ScanParticles dispatch"]
+        B["AsyncReadback: GPU→CPU (async, latency 1-2 frames)"]
+        C["Raster Pass: Draw opaque geometry"]
+        D["Raster Pass: Draw particles using GPU-side scan buffer"]
+        E["Note: GPU reads _ScanResult directly;<br/>no readback needed for GPU-driven draw;<br/>readback only for CPU statistics"]
+        
+        A --> B
+        A --> D
+        C --> D
+        D -.-> E
+    end
+    
+    subgraph frame_n1 ["Frame N+1"]
+        F["CPU receives AsyncGPUReadbackRequest callback with liveCount"]
+    end
+    
+    B --> F
 ```
 
 ---

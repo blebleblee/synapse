@@ -44,13 +44,17 @@ An ensemble doesn't respond to your arm position, it responds to **velocity chan
 
 ### The Four-Pattern (4/4)
 
-```
-          1 (down)
-           |
-      4 ───┼─── 2
-     (in)  |  (out,right)
-           |
-          3 (up, left-of-center)
+```mermaid
+flowchart TD
+    Node1["1 (down)"]
+    Node2["2 (out, right)"]
+    Node3["3 (up, left-of-center)"]
+    Node4["4 (in)"]
+    
+    Node1 --- Node2
+    Node1 --- Node3
+    Node1 --- Node4
+    Node4 --- Node2
 ```
 
 **Mechanics, beat by beat:**
@@ -71,11 +75,17 @@ An ensemble doesn't respond to your arm position, it responds to **velocity chan
 
 ### The Three-Pattern (3/4)
 
-```
-        1 (down)
-         |
-    3 ───┴─── 2
-  (up,left)  (right, wider arc)
+```mermaid
+flowchart TD
+    Node1["1"]
+    Node2["2"]
+    Node3["3"]
+    
+    Node1 -->|down| Node1_Junction[ ]
+    Node1_Junction -->|"right, wider arc"| Node2
+    Node1_Junction -->|"up, left"| Node3
+    
+    style Node1_Junction fill:none,stroke:none
 ```
 
 - Beat 1: vertical drop, identical ictus to the four-pattern's beat 1 — downbeats should always look the same regardless of meter, so the ensemble never has to relearn what "beat 1" looks like.
@@ -204,29 +214,46 @@ Subdivision exists to protect ensemble unity in two specific situations: tempos 
 
 ### Five-Pattern (5/4, grouped 3+2)
 
-```
-            1 (down)
-             |
-       3 ────┼──── 2
-     (up,L)  |   (right)
-             |
-          5──┴──4  (small, compressed down-up)
+```mermaid
+flowchart TD
+    N1["1"]
+    N2["2"]
+    N3["3"]
+    N4["4"]
+    N5["5"]
+    
+    N1 --> Center((( )))
+    N3 --- Center
+    N2 --- Center
+    Center --- Junction[(" ")]
+    N5 --- Junction
+    N4 --- Junction
 ```
 
 Beats 1–3 are a standard three-pattern. Beats 4–5 are a compressed two-pattern tucked into the lower-right quadrant, roughly half the size of beats 1–3 — the size compression is what visually signals "this is the short half of the bar."
 
 ### Seven-Pattern (7/8, grouped 2+2+3)
 
-```
-            1 (down)
-             |
-       2 ────┼──── 3
-      (L)    |    (R)
-             |
-       7 ────┼──── 4
-    (small L)|  (small R)
-             |
-          6──┴──5  (compressed three)
+```mermaid
+flowchart TD
+    Node1["1 (down)"]
+    Node2["2 (L)"]
+    Node3["3 (R)"]
+    Node7["7 (small L)"]
+    Node4["4 (small R)"]
+    Node6["6"]
+    Node5["5 (compressed three)"]
+    
+    Node1 --> Node2
+    Node1 --> Node3
+    Node1 --> Node7
+    Node1 --> Node4
+    Node1 --> Node6
+    Node1 --> Node5
+    
+    Node2 -.-> Node3
+    Node7 -.-> Node4
+    Node6 -.-> Node5
 ```
 
 Groups 1–2 and 3–4 are mirrored two-patterns in left/right space; 5–7 collapses into a tight three-pattern underneath. The visual logic: each sub-group occupies its *own* quadrant of space so the ensemble can see the grouping without you having to announce it verbally every time.

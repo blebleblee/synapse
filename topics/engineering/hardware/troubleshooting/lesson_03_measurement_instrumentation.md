@@ -38,19 +38,37 @@ The oscilloscope's triggering system determines when waveform acquisition begins
 
 Oscilloscope probes dramatically affect measurement fidelity through their frequency-dependent impedance characteristics. A standard 1X probe provides the oscilloscope's native input impedance, typically 1MΩ in parallel with 10-20 pF of capacitance. At low frequencies, the 1MΩ resistance dominates, presenting minimal circuit loading. As frequency increases, capacitive reactance decreases according to Xc = 1/(2πfC), eventually shorting high-frequency content to ground and limiting usable bandwidth to 5-10 MHz. The 10X passive probe introduces a 9MΩ series resistor and compensates for cable capacitance through an adjustable parallel capacitor at the probe tip, extending bandwidth to hundreds of megahertz. This compensation requires adjustment against the oscilloscope's calibration output, a procedure often neglected but critical for accurate rise-time measurement.
 
-```
-1X Probe Model:                    10X Probe Model:
-                                   
-Probe Tip                          Probe Tip
-   |                                  |
-   +---[1MΩ]---+                     +---[9MΩ]---+---[adjustable C]---+
-   |           |                     |                                 |
-   |          ===  (10-20pF)         +---[1MΩ]---+                    |
-   |          ===  (cable)           |           |                    |
-   |           |                     |          ===  (1-2pF net)      |
-  GND    Scope Input                 |          ===                   |
-                                     |           |                    |
-                                    GND    Scope Input
+```mermaid
+flowchart TD
+    subgraph probe1x ["1X Probe Model"]
+        tip1["Probe Tip"]
+        res1["1MΩ"]
+        cap1["10-20pF<br/>cable capacitance"]
+        gnd1["GND"]
+        scope1["Scope Input"]
+        
+        tip1 --> res1
+        res1 --> cap1
+        cap1 --> gnd1
+        res1 --> scope1
+    end
+    
+    subgraph probe10x ["10X Probe Model"]
+        tip10["Probe Tip"]
+        res9m["9MΩ"]
+        adjc["Adjustable C"]
+        res1m["1MΩ"]
+        cap10["1-2pF net<br/>cable capacitance"]
+        gnd10["GND"]
+        scope10["Scope Input"]
+        
+        tip10 --> res9m
+        res9m --> adjc
+        adjc --> scope10
+        tip10 --> res1m
+        res1m --> cap10
+        cap10 --> gnd10
+    end
 ```
 
 Active probes abandon passive resistor-capacitor networks for integrated amplifier circuits powered by external sources, achieving input capacitances below 1 pF and bandwidths exceeding 1 GHz. High-impedance active probes maintain multi-megaohm input resistance across their bandwidth, making them ideal for probing sensitive analog circuits, crystal oscillator circuits, and high-impedance sensor outputs. Differential active probes measure voltage differences between two arbitrary points without chassis ground reference, essential for measuring voltage drops across current-sense resistors in noisy environments or for probing signals riding on substantial common-mode voltages like motor drive outputs.

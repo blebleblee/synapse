@@ -51,28 +51,75 @@ The monthly mesocycle review conducts full variance decomposition across all cat
 
 The quarterly macrocycle review assesses strategic goal alignment and conducts comprehensive scenario planning exercises. This review occurs on a dedicated day at the end of each quarter and examines whether resource allocation across budget categories remains aligned with evolving life priorities. The practitioner re-evaluates major financial goals—emergency fund targets, retirement savings rates, discretionary spending allocations—and determines whether current budget parameters still serve those objectives or whether rebalancing is warranted. The macrocycle also incorporates scenario planning by constructing plausible future states and stress-testing budget resilience.
 
-```
-Review Cycle Architecture:
+```mermaid
+flowchart TD
+    ROOT["🔄 Review Cycle Architecture"]
 
-Weekly Microcycle (30 minutes)
-├─ Transaction accuracy verification
-├─ Fraud detection scan
-├─ Categorization cleanup
-└─ Upcoming obligation review
+    subgraph weekly ["⏱ Weekly Microcycle (30 min)"]
+        W1["Transaction Accuracy Verification"]
+        W2["Fraud Detection Scan"]
+        W3["Categorization Cleanup"]
+        W4["Upcoming Obligation Review"]
+    end
 
-Monthly Mesocycle (2 hours)
-├─ Category-level variance calculation
-├─ Top-N variance decomposition
-├─ Root-cause analysis session
-├─ Behavioral protocol adjustment
-└─ Baseline recalibration
+    subgraph monthly ["📅 Monthly Mesocycle (2 hrs)"]
+        M1["Category-Level Variance Calculation"]
+        M2["Top-N Variance Decomposition"]
+        M3["Root-Cause Analysis Session"]
+        M4["Behavioral Protocol Adjustment"]
+        M5["Baseline Recalibration"]
+    end
 
-Quarterly Macrocycle (4 hours)
-├─ Goal alignment assessment
-├─ Priority evolution analysis
-├─ Scenario planning exercises
-├─ Strategic rebalancing decisions
-└─ Optimization framework tuning
+    subgraph quarterly ["📊 Quarterly Macrocycle (4 hrs)"]
+        Q1["Goal Alignment Assessment"]
+        Q2["Priority Evolution Analysis"]
+        Q3["Scenario Planning Exercises"]
+        Q4["Strategic Rebalancing Decisions"]
+        Q5["Optimization Framework Tuning"]
+    end
+
+    ROOT --> weekly
+    ROOT --> monthly
+    ROOT --> quarterly
+
+    weekly --> W1
+    weekly --> W2
+    weekly --> W3
+    weekly --> W4
+
+    monthly --> M1
+    M1 --> M2
+    M2 --> M3
+    M3 --> M4
+    M4 --> M5
+
+    quarterly --> Q1
+    Q1 --> Q2
+    Q2 --> Q3
+    Q3 --> Q4
+    Q4 --> Q5
+
+    weekly -->|"feeds"| monthly
+    monthly -->|"feeds"| quarterly
+
+    style ROOT fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style weekly fill:#16213e,stroke:#0f3460,color:#ffffff
+    style monthly fill:#16213e,stroke:#0f3460,color:#ffffff
+    style quarterly fill:#16213e,stroke:#0f3460,color:#ffffff
+    style W1 fill:#0f3460,stroke:#e94560,color:#ffffff
+    style W2 fill:#0f3460,stroke:#e94560,color:#ffffff
+    style W3 fill:#0f3460,stroke:#e94560,color:#ffffff
+    style W4 fill:#0f3460,stroke:#e94560,color:#ffffff
+    style M1 fill:#0f3460,stroke:#533483,color:#ffffff
+    style M2 fill:#0f3460,stroke:#533483,color:#ffffff
+    style M3 fill:#0f3460,stroke:#533483,color:#ffffff
+    style M4 fill:#0f3460,stroke:#533483,color:#ffffff
+    style M5 fill:#0f3460,stroke:#533483,color:#ffffff
+    style Q1 fill:#0f3460,stroke:#e94560,color:#ffffff
+    style Q2 fill:#0f3460,stroke:#e94560,color:#ffffff
+    style Q3 fill:#0f3460,stroke:#e94560,color:#ffffff
+    style Q4 fill:#0f3460,stroke:#e94560,color:#ffffff
+    style Q5 fill:#0f3460,stroke:#e94560,color:#ffffff
 ```
 
 The scenario planning subsystem constructs coherent future states that stress-test budget resilience without requiring probability estimation. The framework employs a two-dimensional scenario matrix that crosses income trajectory with expense regime to generate four archetypal futures: sustained growth, constrained growth, plateau, and contraction. Sustained growth scenarios assume continued income increases matching or exceeding historical rates while expenses grow at baseline inflation. Constrained growth scenarios model income increases that lag inflation while expenses accelerate due to lifestyle factors like family expansion or housing upgrades. Plateau scenarios hold real income constant while expenses fluctuate within the historical range. Contraction scenarios model income reductions from career disruption, health issues, or economic recession while expenses remain sticky or increase due to emergency needs.

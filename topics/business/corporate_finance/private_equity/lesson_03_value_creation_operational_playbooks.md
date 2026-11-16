@@ -34,21 +34,41 @@ Pricing optimization initiatives exploit the widespread tendency of middle-marke
 
 The EBITDA bridge serves as the central organizing framework for value creation tracking, translating strategic initiatives into quantified financial impacts that aggregate to a projected exit EBITDA target. The bridge format displays the base-year EBITDA as the starting point, then layers sequential bars representing organic revenue growth impact, price realization, volume growth, gross margin improvement, opex reduction, and acquired EBITDA from tuck-ins, culminating in the target exit EBITDA. Each bridge component links to a detailed sub-plan that specifies the operational levers, investment requirements, risk factors, and monthly phasing assumptions. The bridge methodology enforces accountability because it makes explicit which initiatives must succeed to achieve the return hurdles embedded in the investment thesis.
 
-```
-EBITDA Bridge Structure ($ Millions):
-
-Year 0 EBITDA:                $20.0
-  + Organic Revenue Growth:   $ 8.0  (Price: $3.0 + Volume: $5.0)
-  + Gross Margin Expansion:   $ 2.5  (COGS optimization)
-  - SG&A Investment:          ($ 1.5) (Sales force expansion)
-  + OpEx Rationalization:     $ 1.0  (Facility consolidation)
-  + Working Capital Release:  $ 0.5  (One-time cash impact)
-  + Acquired EBITDA:          $ 5.5  (Three tuck-ins @ $5M revenue, 30% margin)
-  ─────────────────────────────────
-Year 5 Exit EBITDA:           $36.0
-
-EBITDA CAGR: 12.5%
-Value Creation: (Exit Multiple × $36M) - (Entry Multiple × $20M) = Gross MoIC basis
+```mermaid
+flowchart TD
+    Start["Year 0 EBITDA<br/>$20.0M"]
+    
+    Start --> Growth["Organic Revenue Growth<br/>+$8.0M"]
+    Growth -.-> GrowthDetail["Price: +$3.0M<br/>Volume: +$5.0M"]
+    
+    Growth --> Margin["Gross Margin Expansion<br/>+$2.5M"]
+    Margin -.-> MarginDetail["COGS Optimization"]
+    
+    Margin --> SGA["SG&A Investment<br/>-$1.5M"]
+    SGA -.-> SGADetail["Sales Force Expansion"]
+    
+    SGA --> OpEx["OpEx Rationalization<br/>+$1.0M"]
+    OpEx -.-> OpExDetail["Facility Consolidation"]
+    
+    OpEx --> WC["Working Capital Release<br/>+$0.5M"]
+    WC -.-> WCDetail["One-time Cash Impact"]
+    
+    WC --> Acq["Acquired EBITDA<br/>+$5.5M"]
+    Acq -.-> AcqDetail["Three Tuck-ins<br/>$5M Revenue Each<br/>30% Margin"]
+    
+    Acq --> End["Year 5 Exit EBITDA<br/>$36.0M"]
+    
+    End --> Metrics["EBITDA CAGR: 12.5%<br/>Value Creation: Exit Multiple × $36M - Entry Multiple × $20M"]
+    
+    style Start fill:#e1f5ff,stroke:#0288d1,stroke-width:3px
+    style End fill:#c8e6c9,stroke:#388e3c,stroke-width:3px
+    style Metrics fill:#fff9c4,stroke:#f57c00,stroke-width:2px
+    style Growth fill:#f3e5f5,stroke:#7b1fa2
+    style Margin fill:#f3e5f5,stroke:#7b1fa2
+    style OpEx fill:#f3e5f5,stroke:#7b1fa2
+    style WC fill:#f3e5f5,stroke:#7b1fa2
+    style Acq fill:#f3e5f5,stroke:#7b1fa2
+    style SGA fill:#ffebee,stroke:#c62828
 ```
 
 Cost rationalization playbooks distinguish between structural cost reduction and efficiency-driven optimization. Structural interventions address redundant overhead layers, unproductive assets, and misaligned organizational designs that impose fixed costs without commensurate value delivery. Common structural initiatives include back-office consolidation (combining duplicative finance, HR, and IT functions post-acquisition), facility rationalization (closing underutilized locations and renegotiating leases), and span-of-control optimization (flattening management hierarchies to reduce supervisory headcount). These interventions generate immediate savings but risk organizational disruption if executed without adequate change management.

@@ -103,17 +103,44 @@ Interdigitation extends this concept to devices that need not share a centroid b
 
 The spacing-dependent term in the Pelgrom model, $S_P^2 D^2$, becomes significant when matched devices are separated by more than a few hundred micrometers. For threshold voltage, $S_{V_t} \approx 0.03$ μm·mV/μm in a typical 0.18 μm process, meaning two devices separated by 500 μm have an additional $\sigma(\Delta V_t) = 0.03 \times 500 = 15$ μV of mismatch from the spacing term alone. For sub-millivolt precision, the interdigitated pair must be kept within 100 μm of each other.
 
-```
-    ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐
-    │D │ │M1│ │M2│ │M1│ │M2│ │M1│ │M2│ │M1│ │M2│ │D │
-    │  │ │  │ │  │ │  │ │  │ │  │ │  │ │  │ │  │ │  │
-    └──┘ └──┘ └──┘ └──┘ └──┘ └──┘ └──┘ └──┘ └──┘ └──┘
-     ↑                                        ↑
-     Dummy                               Dummy (same size)
-     
-     Common-centroid interdigitated pair:
-     M1 = fingers 2,4,6,8    M2 = fingers 3,5,7,9
-     Centroid of M1 = centroid of M2 = center of array
+```mermaid
+flowchart LR
+    subgraph array ["Common-Centroid Interdigitated Differential Pair"]
+        direction LR
+        D1["D\n(Dummy)"]
+        M1_F2["M1\nFinger 2"]
+        M2_F3["M2\nFinger 3"]
+        M1_F4["M1\nFinger 4"]
+        M2_F5["M2\nFinger 5"]
+        M1_F6["M1\nFinger 6"]
+        M2_F7["M2\nFinger 7"]
+        M1_F8["M1\nFinger 8"]
+        M2_F9["M2\nFinger 9"]
+        D2["D\n(Dummy)"]
+
+        D1 --- M1_F2 --- M2_F3 --- M1_F4 --- M2_F5 --- M1_F6 --- M2_F7 --- M1_F8 --- M2_F9 --- D2
+    end
+
+    subgraph centroids ["Centroid Properties"]
+        direction TB
+        C1["Centroid of M1\n(Fingers 2,4,6,8)"]
+        C2["Centroid of M2\n(Fingers 3,5,7,9)"]
+        CC["Common Centroid\n= Center of Array"]
+
+        C1 --> CC
+        C2 --> CC
+    end
+
+    subgraph legend ["Layout Key"]
+        direction TB
+        L1["M1 — Transistor 1 fingers"]
+        L2["M2 — Transistor 2 fingers"]
+        L3["D  — Dummy edge devices\n(same size as active fingers)"]
+    end
+
+    D1 -.->|"edge guard"| legend
+    D2 -.->|"edge guard"| legend
+    array --> centroids
 ```
 
 Guard rings surrounding the matched pair serve two purposes. First, they provide a low-impedance substrate tie that prevents substrate noise coupling from adjacent digital circuitry. Second, they create a uniform mechanical stress boundary, because the lattice stress introduced by the heavily doped guard ring is identical on all sides, avoiding stress asymmetry that would shift threshold voltages through the piezoresistive effect. A P+ guard ring tied to ground, placed at minimum spacing from the NMOS matched pair, typically reduces substrate noise injection by 30–40 dB.
@@ -132,15 +159,26 @@ Another source of systematic offset is the body effect. If the input pair M1/M2 
 
 Chopping is a continuous-time technique that moves the amplifier's offset and flicker noise away from DC by modulating the signal, amplifying it, and then demodulating it back to baseband. The offset and flicker noise, which originate inside the amplifier and are not modulated, end up at the chop frequency after the output demodulator and are removed by a low-pass filter.
 
-```
-                    ┌─────────┐    CH2    ┌──────┐
-   Vin ──×(CH1)──→│ Amplifier │──×──────→│ LPF  │──→ Vout
-         f_chop     │  A(f),    │  f_chop   │      │
-                    │  Vos,1/f │           └──────┘
-                    └─────────┘
-         ↑                          ↑
-    Modulates signal           Demodulates signal back to baseband
-    up to f_chop ± f_sig      Modulates offset/1/f up to f_chop
+```mermaid
+flowchart LR
+    Vin["Vin"]
+    CH1["CH1<br/>f_chop"]
+    AMP["Amplifier<br/>A(f), Vos, 1/f"]
+    CH2["CH2<br/>f_chop"]
+    LPF["LPF"]
+    Vout["Vout"]
+    
+    Vin -->|"×"| CH1
+    CH1 --> AMP
+    AMP -->|"×"| CH2
+    CH2 --> LPF
+    LPF --> Vout
+    
+    NOTE1["Modulates signal<br/>up to f_chop ± f_sig"]
+    NOTE2["Demodulates signal back to baseband<br/>Modulates offset/1/f up to f_chop"]
+    
+    NOTE1 -.-> CH1
+    NOTE2 -.-> CH2
 ```
 
 The input chopper CH1 is a set of CMOS switches (typically transmission gates or NMOS-only pass-transistor pairs) driven by a non-overlapping two-phase clock at frequency $f_\text{chop}$. The signal is multiplied by a square wave $s(t) = \text{sgn}(\cos(2\pi f_\text{chop} t))$, which translates the baseband signal to odd harmonics of $f_\text{chop}$. The amplifier processes this upconverted signal with its full gain $A(f)$. The output chopper CH2 demodulates the amplified signal back to baseband, while the amplifier's own offset and flicker noise — which entered the amplifier after CH1 and were never upconverted — are modulated up to $f_\text{chop}$ and its odd harmonics. A low-pass filter (which can be the amplifier's own bandwidth if $f_\text{chop}$ is well above the signal band) removes these spectral images.
@@ -151,26 +189,27 @@ The choice of chop frequency is a critical design decision. It must be well abov
 
 Auto-zeroing is a discrete-time technique that samples the amplifier's offset during a calibration phase and subtracts it during the amplification phase. Unlike chopping, which is continuous-time, auto-zeroing requires the amplifier to be taken offline during the calibration phase, making it inherently suited to switched-capacitor circuits, comparators, and pipelined or cyclic ADCs where the amplifier is not continuously processing a signal.
 
-```
-Phase 1 (Auto-zero):           Phase 2 (Amplify):
-                              
-  ┌─────┐    ┌─────┐          ┌─────┐         ┌─────┐
-  │ S1  │    │ S2  │          │ S3  │         │ S4  │
-  └──┬──┘    └──┬──┘          └──┬──┘         └──┬──┘
-     │          │                │              │
-  Vin─┴──(-)──┴──┐           Vin───(-)──────┐  │
-                 │                          │  │
-              ┌──┴──┐                    ┌──┴──┴──┐
-              │ Amp │                    │  Amp   │
-              │A,Vos│                    │ A,Vos  │
-              └──┬──┘                    └──┬────┘
-                 │                          │
-              ┌──┴──┐                    ┌───┴───┐
-              │ Caz │                    │ Caz   │──→ Vout
-              └─────┘                    └───────┘
-              
-  S1,S2 closed: Amp is unity-gain     S3,S4 closed: Caz voltage
-  buffer, Caz charges to Vos           subtracts Vos from input
+```mermaid
+flowchart TD
+    subgraph P1 ["Phase 1 (Auto-zero)"]
+        Vin1["Vin"] --- S1["S1"]
+        S1 --- Neg1["(-)"]
+        Vin1 --- S2["S2"]
+        S2 --- Neg1
+        Neg1 --- Amp1["Amp<br>A, Vos"]
+        Amp1 --- Caz1["Caz"]
+        Note1["S1,S2 closed: Amp is unity-gain buffer, Caz charges to Vos"]
+    end
+
+    subgraph P2 ["Phase 2 (Amplify)"]
+        Vin2["Vin"] --- S3["S3"]
+        S3 --- Neg2["(-)"]
+        Neg2 --- Amp2["Amp<br>A, Vos"]
+        S4["S4"] --- Amp2
+        Amp2 --- Caz2["Caz"]
+        Caz2 --> Vout["Vout"]
+        Note2["S3,S4 closed: Caz voltage subtracts Vos from input"]
+    end
 ```
 
 During Phase 1, switches S1 and S2 close, connecting the amplifier as a unity-gain buffer with its input shorted. The offset $V_{os}$ is amplified and appears at the output, where it charges the auto-zero capacitor $C_{az}$ to $V_{az} = V_{os} \times A/(1+A) \approx V_{os}$ (for loop gain $A \gg 1$). During Phase 2, S1 and S2 open, S3 and S4 close, and the real input signal $V_{in}$ is applied. The capacitor $C_{az}$ now holds a voltage approximately equal to $V_{os}$, which is subtracted from the input. The residual offset is $V_{os,\text{res}} = V_{os}/(1+A)$, which for a typical open-loop gain of $A = 80$ dB (10,000×) gives a residual of $V_{os}/10^4 \approx 0.1$ μV — far below the noise floor.

@@ -72,16 +72,28 @@ is the **Poincaré return map**. The continuous-time dynamics near $\gamma$ redu
 
 The diagram below sketches this reduction schematically. The periodic orbit $\gamma$ (the loop) punctures the section $\Sigma$ at $p$; nearby trajectories trace out the action of $P$.
 
-```
-        Continuous Flow (3D)         Poincaré Map (2D section Σ)
-        ─────────────────────         ─────────────────────────────
-              ╭─────╮
-           ╭─→  γ   ─→╮               p  ──P──→  P(p) = p
-          │  (periodic │                   ↑
-          │   orbit)   │             near │  trajectories
-          ╰────────────╯             orbits spiral inward
-                │                   if |λ_i| < 1 for all multipliers
-           cuts Σ at p
+```mermaid
+flowchart TD
+    subgraph continuous["Continuous Flow (3D)"]
+        gamma["γ<br/>(periodic orbit)"]
+        gamma -->|cycles| gamma
+        gamma -->|"cuts Σ at p"| cutPoint[" "]
+    end
+    
+    subgraph poincare["Poincaré Map (2D section Σ)"]
+        p["p"]
+        Pp["P(p) = p"]
+        p -->|P| Pp
+        Pp -.->|fixed point| p
+        
+        nearOrbits["near orbits"]
+        nearOrbits -->|"trajectories<br/>spiral inward"| p
+        
+        condition["if |λᵢ| < 1<br/>for all multipliers"]
+        condition -.->|stability| nearOrbits
+    end
+    
+    cutPoint -.->|corresponds to| p
 ```
 
 This construction places the logistic map, the circle map, and every other discrete system we study in a unified framework: they either arise as Poincaré maps of natural flows, or they serve as model systems whose dynamics illuminate the behavior of the full flow.

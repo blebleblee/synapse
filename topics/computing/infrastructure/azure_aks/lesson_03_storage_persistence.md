@@ -22,44 +22,37 @@ One invariant that trips up engineers coming from VM-centric infrastructure is t
 
 When you submit a `PersistentVolumeClaim`, the reconciliation path that leads to a mounted filesystem in a running container traverses several distinct components. Understanding this path is essential for diagnosing the class of failures that manifest as pods stuck in `Pending` or `ContainerCreating`.
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                         Kubernetes Control Plane                       │
-│                                                                        │
-│  ┌─────────────────┐      ┌──────────────────────────────────────┐    │
-│  │   API Server    │◄────►│  PersistentVolumeController           │    │
-│  └────────┬────────┘      │  (Bind PVC → PV, trigger provision)  │    │
-│           │               └──────────────────────────────────────┘    │
-│           │               ┌──────────────────────────────────────┐    │
-│           └──────────────►│  AttachDetachController               │    │
-│                           │  (Triggers CSI ControllerPublish)    │    │
-│                           └──────────────────────────────────────┘    │
-└──────────────────────────────────┬─────────────────────────────────────┘
-                                   │ gRPC
-                        ┌──────────▼──────────────┐
-                        │   CSI Controller Plugin  │
-                        │   (azuredisk-csi-driver) │
-                        │                          │
-                        │  CreateVolume()           │
-                        │  ControllerPublishVolume()│
-                        └──────────┬───────────────┘
-                                   │ Azure ARM API
-                        ┌──────────▼───────────────┐
-                        │   Azure Managed Disk API  │
-                        │   (SCSI attach to VM)     │
-                        └──────────┬───────────────┘
-                                   │
-┌──────────────────────────────────▼─────────────────────────────────────┐
-│                            Node (VM)                                   │
-│                                                                        │
-│  ┌────────────┐    ┌────────────────────┐    ┌──────────────────────┐  │
-│  │  kubelet   │───►│  CSI Node Plugin   │───►│  Linux Mount Stack   │  │
-│  │            │    │  NodeStageVolume() │    │                      │  │
-│  │            │    │  NodePublishVolume │    │  mkfs.ext4 /dev/sdX  │  │
-│  └────────────┘    └────────────────────┘    │  mount --bind        │  │
-│                                              │  → pod mount ns      │  │
-│                                              └──────────────────────┘  │
-└────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph control_plane ["Kubernetes Control Plane"]
+        api["API Server"]
+        pvc_ctrl["PersistentVolumeController\n(Bind PVC → PV, trigger provision)"]
+        adc["AttachDetachController\n(Triggers CSI ControllerPublish)"]
+
+        api <--> pvc_ctrl
+        api --> adc
+    end
+
+    subgraph csi_controller ["CSI Controller Plugin (azuredisk-csi-driver)"]
+        csi_ctrl["CreateVolume()\nControllerPublishVolume()"]
+    end
+
+    subgraph azure ["Azure Managed Disk API"]
+        arm["Azure Managed Disk API\n(SCSI attach to VM)"]
+    end
+
+    subgraph node ["Node (VM)"]
+        kubelet["kubelet"]
+        csi_node["CSI Node Plugin\nNodeStageVolume()\nNodePublishVolume()"]
+        mount["Linux Mount Stack\nmkfs.ext4 /dev/sdX\nmount --bind\n→ pod mount ns"]
+
+        kubelet --> csi_node
+        csi_node --> mount
+    end
+
+    adc -->|gRPC| csi_ctrl
+    csi_ctrl -->|"Azure ARM API"| arm
+    arm --> kubelet
 ```
 
 The CSI driver for Azure Disks (`disk.csi.azure.com`) implements two logical roles: a controller plugin running as a deployment on the control plane side, and a node plugin running as a DaemonSet on every worker node. The controller handles volume lifecycle operations that require Azure API calls: `CreateVolume`, `DeleteVolume`, `ControllerPublishVolume` (which calls the Azure Compute API to attach the disk to the target VM). The node plugin handles the operations that require direct access to the node's block devices: `NodeStageVolume` formats the disk if needed and mounts it to a global staging directory, and `NodePublishVolume` bind-mounts that staged path into the pod's specific volume directory within the container's mount namespace.

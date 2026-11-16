@@ -198,30 +198,23 @@ The names attached to each quantity are worth fixing precisely: $P(B_k)$ is the 
 
 The structure diagram below traces the information flow from prior and likelihood to posterior through the Bayes update:
 
-```
-         ┌─────────────────────────────────────────────────────┐
-         │              Probability Space (Ω, F, P)            │
-         └────────────────────────┬────────────────────────────┘
-                                  │
-              ┌───────────────────┼───────────────────┐
-              │                   │                   │
-         P(B₁)              P(B₂)              P(Bₙ)
-         [Prior]            [Prior]            [Prior]
-              │                   │                   │
-     P(A|B₁)·P(B₁)      P(A|B₂)·P(B₂)    P(A|Bₙ)·P(Bₙ)
-     [Joint Prob]        [Joint Prob]      [Joint Prob]
-              │                   │                   │
-              └───────────────────┼───────────────────┘
-                                  │
-                        P(A) = Σ P(A|Bₙ)·P(Bₙ)
-                       [Law of Total Probability]
-                                  │
-                    ┌─────────────▼──────────────┐
-                    │  P(Bₖ|A) = P(A|Bₖ)·P(Bₖ)  │
-                    │            ──────────────── │
-                    │                 P(A)        │
-                    │          [Bayes' Theorem]   │
-                    └────────────────────────────┘
+```mermaid
+flowchart TD
+    PS["Probability Space (Ω, F, P)"]
+
+    PS --> B1["P(B₁)\n[Prior]"]
+    PS --> B2["P(B₂)\n[Prior]"]
+    PS --> Bn["P(Bₙ)\n[Prior]"]
+
+    B1 --> J1["P(A|B₁)·P(B₁)\n[Joint Probability]"]
+    B2 --> J2["P(A|B₂)·P(B₂)\n[Joint Probability]"]
+    Bn --> Jn["P(A|Bₙ)·P(Bₙ)\n[Joint Probability]"]
+
+    J1 --> LTP["P(A) = Σ P(A|Bₙ)·P(Bₙ)\n[Law of Total Probability]"]
+    J2 --> LTP
+    Jn --> LTP
+
+    LTP --> BT["P(Bₖ|A) = P(A|Bₖ)·P(Bₖ) / P(A)\n[Bayes' Theorem]"]
 ```
 
 ### Independence: The Structural Definition

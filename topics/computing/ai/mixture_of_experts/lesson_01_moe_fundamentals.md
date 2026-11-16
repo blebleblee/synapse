@@ -34,35 +34,28 @@ where $W_1 \in \mathbb{R}^{d_{model} \times d_{ff}}$ and $W_2 \in \mathbb{R}^{d_
 
 The MoE substitution replaces the single FFN sublayer with $N$ parallel expert FFNs plus a gating network. The attention mechanism is left unchanged. The resulting block looks like this:
 
-```
-                    Token Embedding (B × T × D)
-                             │
-                    ┌────────▼─────────┐
-                    │  Multi-Head      │
-                    │  Self-Attention  │
-                    └────────┬─────────┘
-                             │ residual +
-                    ┌────────▼─────────┐
-                    │  Layer Norm      │
-                    └────────┬─────────┘
-                             │
-              ┌──────────────▼──────────────────┐
-              │         Gating Network          │
-              │   G(x) = Softmax(TopK(x·W_g))  │
-              └─────┬──────────┬────────┬───────┘
-                    │          │        │
-              ┌─────▼──┐  ┌────▼───┐  ┌─▼──────┐
-              │Expert 1│  │Expert k│  │Expert N│
-              │ FFN(x) │  │ FFN(x) │  │ FFN(x) │
-              └─────┬──┘  └────┬───┘  └─┬──────┘
-                    │          │         │
-              ┌─────▼──────────▼─────────▼──────┐
-              │  Weighted Sum: Σ g_i · Expert_i(x)│
-              └────────────────┬────────────────┘
-                               │ residual +
-                    ┌──────────▼──────────┐
-                    │     Layer Norm      │
-                    └─────────────────────┘
+```mermaid
+flowchart TD
+    A["Token Embedding (B × T × D)"]
+    B["Multi-Head<br/>Self-Attention"]
+    C["Layer Norm"]
+    D["Gating Network<br/>G(x) = Softmax(TopK(x·W_g))"]
+    E1["Expert 1<br/>FFN(x)"]
+    E2["Expert k<br/>FFN(x)"]
+    E3["Expert N<br/>FFN(x)"]
+    F["Weighted Sum<br/>Σ g_i · Expert_i(x)"]
+    G["Layer Norm"]
+    
+    A --> B
+    B -->|"residual +"| C
+    C --> D
+    D --> E1
+    D --> E2
+    D --> E3
+    E1 --> F
+    E2 --> F
+    E3 --> F
+    F -->|"residual +"| G
 ```
 
 Each expert is an independent FFN with its own parameters. At inference time, only the top-$k$ experts receive the token, compute their outputs, and contribute to the weighted sum. The experts not selected perform zero computation.

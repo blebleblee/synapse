@@ -60,80 +60,119 @@ Cas13 systems extend CRISPR targeting to RNA rather than DNA, operating as progr
 
 The RNA targeting capability of Cas13 enables applications distinct from DNA-targeting systems: knockdown of specific transcripts without genome modification, targeting of RNA viruses, and programmable RNA editing when the nuclease domains are inactivated and the protein is fused to adenosine deaminase acting on RNA (ADAR) enzymes. This latter application creates RNA base editors capable of installing A→I (read as G) changes in transcripts, offering transient modification without heritable genome alterations. The kinetics of RNA base editing differ substantially from DNA editing: cellular mRNA half-lives typically range from 1-10 hours, creating a temporal window during which edits must be installed before transcript turnover, but also ensuring that editing effects are reversible and titratable based on the continued expression of the Cas13-ADAR fusion.
 
-```
-CRISPR-Cas System Architecture Comparison:
+```mermaid
+flowchart TD
+    subgraph cas9 ["Cas9 — Type II (DNA targeting)"]
+        direction TB
+        subgraph cas9_rec ["REC Lobe"]
+            cas9_rec1["REC1"]
+            cas9_rec2["REC2"]
+        end
+        subgraph cas9_nuc ["NUC Lobe"]
+            cas9_ruvc["RuvC\n(non-target strand)"]
+            cas9_hnh["HNH\n(target strand)"]
+        end
+        cas9_sgrna(["sgRNA"])
+        cas9_dna[/"DNA Target\n(NGG PAM)"\]
+        cas9_out["Blunt DSB"]
 
-Cas9 (Type II):
-┌─────────────────────────────────────────────────────┐
-│  REC Lobe          NUC Lobe                         │
-│  ┌──────┐         ┌──────┐                         │
-│  │ REC1 │         │ RuvC │ ← Non-target strand     │
-│  │ REC2 │  sgRNA  │ HNH  │ ← Target strand         │
-│  └──────┘   |||   └──────┘                         │
-│      ↓       |||       ↓                            │
-│    Guide    DNA    Blunt DSB                       │
-│   Binding  Target  (NGG PAM)                       │
-└─────────────────────────────────────────────────────┘
+        cas9_rec1 --> cas9_sgrna
+        cas9_rec2 --> cas9_sgrna
+        cas9_sgrna --> cas9_dna
+        cas9_dna --> cas9_ruvc
+        cas9_dna --> cas9_hnh
+        cas9_ruvc --> cas9_out
+        cas9_hnh --> cas9_out
+    end
 
-Cas12a (Type V):
-┌─────────────────────────────────────────────────────┐
-│  REC Lobe          NUC Lobe                         │
-│  ┌──────┐         ┌──────┐                         │
-│  │ REC  │         │ RuvC │ ← Both strands          │
-│  │ WED  │  crRNA  │(dual)│ (sequential)            │
-│  └──────┘   |||   └──────┘                         │
-│      ↓       |||       ↓                            │
-│    Guide    DNA   Staggered DSB                    │
-│   Binding  Target  (TTTV PAM)                      │
-│                    (5' overhang)                    │
-└─────────────────────────────────────────────────────┘
+    subgraph cas12 ["Cas12a — Type V (DNA targeting)"]
+        direction TB
+        subgraph cas12_rec ["REC Lobe"]
+            cas12_rec["REC"]
+            cas12_wed["WED"]
+        end
+        subgraph cas12_nuc ["NUC Lobe"]
+            cas12_ruvc["RuvC (dual)\n(both strands, sequential)"]
+        end
+        cas12_crrna(["crRNA"])
+        cas12_dna[/"DNA Target\n(TTTV PAM)"\]
+        cas12_out["Staggered DSB\n(5′ overhang)"]
 
-Cas13 (Type VI):
-┌─────────────────────────────────────────────────────┐
-│  Recognition Domain    Nuclease Domains             │
-│  ┌──────┐         ┌──────┬──────┐                  │
-│  │ REC  │         │HEPN1 │HEPN2 │ ← RNA cleavage   │
-│  │      │  crRNA  │      │      │                   │
-│  └──────┘   |||   └──────┴──────┘                  │
-│      ↓       |||       ↓                            │
-│    Guide    RNA    ssRNA cleavage                  │
-│   Binding  Target  + collateral activity           │
-└─────────────────────────────────────────────────────┘
+        cas12_rec --> cas12_crrna
+        cas12_wed --> cas12_crrna
+        cas12_crrna --> cas12_dna
+        cas12_dna --> cas12_ruvc
+        cas12_ruvc --> cas12_out
+    end
+
+    subgraph cas13 ["Cas13 — Type VI (RNA targeting)"]
+        direction TB
+        subgraph cas13_rec ["Recognition Domain"]
+            cas13_recdom["REC"]
+        end
+        subgraph cas13_nuc ["Nuclease Domains"]
+            cas13_hepn1["HEPN1"]
+            cas13_hepn2["HEPN2"]
+        end
+        cas13_crrna(["crRNA"])
+        cas13_rna[/"RNA Target"\]
+        cas13_out["ssRNA cleavage\n+ collateral activity"]
+
+        cas13_recdom --> cas13_crrna
+        cas13_crrna --> cas13_rna
+        cas13_rna --> cas13_hepn1
+        cas13_rna --> cas13_hepn2
+        cas13_hepn1 --> cas13_out
+        cas13_hepn2 --> cas13_out
+    end
 ```
 
 Base editor architecture represents a fusion of CRISPR targeting with enzymatic base modification. The standard CBE design positions the deaminase domain at the N-terminus of Cas9 nickase, connected through a flexible linker peptide typically 16-32 amino acids in length composed of XTEN repeats or similar flexible motifs designed to minimize secondary structure. At the C-terminus, a uracil glycosylase inhibitor (UGI) domain is appended to prevent base excision repair from removing the deaminated uracil before DNA replication can fix the edit. Advanced CBE variants include tandem UGI domains or UGI-dCas9 fusion proteins to further suppress uracil excision.
 
 The spatial arrangement of domains in base editors critically determines editing window position and width. The deaminase must access single-stranded DNA in the R-loop, which extends approximately 10-15 base pairs from the PAM-proximal end of the protospacer. Structural modeling and empirical optimization studies reveal that linker length and composition directly affect the range of positions the deaminase can reach: shorter, more rigid linkers restrict editing to a narrow window but may increase on-target editing efficiency by reducing diffusion, while longer flexible linkers expand the editing window but potentially increase background deamination of non-target cytosines or adenines within the accessible region.
 
-```
-Cytosine Base Editor (CBE) Architecture:
-
-    Deaminase                 Cas9n                    UGI
-    (APOBEC1)               (D10A)                 (×1 or ×2)
-    ┌────────┐          ┌─────────────┐          ┌────────┐
-    │        │          │             │          │        │
-5'──┴─Linker─┴──────────┴─────────────┴──Linker──┴────────┴──3'
-         ↓                    ↓                       ↓
-    C→U conversion      R-loop formation      Block BER repair
-
-R-loop structure showing editing window:
-
-         PAM
-         NGG
-          ↓
-5'─...─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─...─3' Non-target
-       │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │
-3'─...─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─...─5' Target
-                  ╱                           (nicked)
-                 ╱
-                ╱ sgRNA
-               ╱
-    Editing window
-    (positions 4-8)
-          ↓
-      C C C C C  ← Exposed in R-loop
-      ↓ ↓ ↓ ↓ ↓
-      U ? ? ? ?  ← APOBEC1 deamination
+```mermaid
+flowchart TD
+    subgraph CBE["Cytosine Base Editor (CBE) Architecture"]
+        direction LR
+        A["Deaminase<br/>(APOBEC1)"]
+        B["Cas9n<br/>(D10A nickase)"]
+        C["UGI<br/>(×1 or ×2)"]
+        
+        A -->|Linker| B
+        B -->|Linker| C
+        
+        A -.->|Function| D["C→U conversion"]
+        B -.->|Function| E["R-loop formation"]
+        C -.->|Function| F["Block BER repair"]
+    end
+    
+    subgraph RLoop["R-loop Structure & Editing Window"]
+        direction TB
+        G["5' Non-target strand ...─────────────────── PAM (NGG) ─... 3'"]
+        H["3' Target strand (nicked) ─────────────────────────... 5'"]
+        I["sgRNA hybridizes to target strand"]
+        
+        G ---|"Watson-Crick pairing"| H
+        I -.->|guides| H
+    end
+    
+    subgraph EditWindow["Editing Window (positions 4-8)"]
+        direction TB
+        J["Exposed cytosines: C C C C C"]
+        K["APOBEC1 deamination"]
+        L["Conversion: C → U"]
+        
+        J --> K
+        K --> L
+    end
+    
+    CBE --> RLoop
+    RLoop --> EditWindow
+    
+    style CBE fill:#e1f5ff
+    style RLoop fill:#fff4e1
+    style EditWindow fill:#e8f5e9
 ```
 
 The thermodynamics of R-loop formation and stability define the accessible substrate for base editing. R-loop formation requires overcoming the energetic cost of DNA melting (approximately 1-2 kcal/mol per base pair) offset by the favorable free energy of RNA-DNA hybridization (slightly more stable than DNA-DNA due to the 2'-OH group forming additional interactions with the DNA backbone). The net free energy of R-loop formation depends on guide RNA length, G/C content, and the presence of mismatches between guide and target. Truncated guides (17-18 nucleotides rather than 20) can reduce off-target editing by destabilizing R-loop formation at imperfect match sites, but this comes at the cost of reduced on-target efficiency at sites with difficult-to-access chromatin or high local G/C content.
@@ -144,39 +183,45 @@ The adenine deamination mechanism proceeds through a different chemical pathway 
 
 Prime editing architecture integrates three distinct enzymatic activities—nickase, reverse transcriptase, and 5' flap endonuclease (through cellular machinery)—into a single genome editing event. The prime editor protein consists of Cas9 nickase (H840A) fused to an engineered reverse transcriptase, typically M-MLV RT with five mutations (D200N, L603W, T306K, W313F, T330P) that collectively enhance processivity, reduce RNase H activity, and improve thermostability. The pegRNA encodes both the spacer for genomic targeting and a 3' extension containing a primer binding site (PBS) complementary to the nicked DNA strand and a reverse transcription template encoding the desired edit plus additional homology sequence.
 
-```
-Prime Editing Mechanism:
+```mermaid
+flowchart TD
+    subgraph step1 ["Step 1: Target Binding and Nicking"]
+        pegRNA["pegRNA\n(spacer + PBS + RT template)"]
+        nts["5'━━━━━━━━━━━━━━━━━━━━━━━━3'\nNon-target strand"]
+        ts_nick["3'━━━━━━━━━━━━━━━━━━━━━━━━5'\nTarget strand (nicked by nickase)"]
+        pegRNA -->|"base-pairs with\ntarget strand"| ts_nick
+        nts --- ts_nick
+    end
 
-Step 1: Target binding and nicking
-                        pegRNA
-                         |||
-5'─────────────┬─────────|||─────────────3' Non-target
-               │         |||
-3'─────────────┴─────────┴┴┴─────────────5' Target (nicked)
-                             ↘
-                              PBS  RT template
-                              |||  ──────────
-                              
-Step 2: Reverse transcription
-                        
-5'─────────────┬─────────────────────────3' Non-target
-               │         
-3'─────────────┴════════════════─────────5' Original target
-               3'────────*──────5'            New DNA with edit (*)
-                     ↑
-                    RT synthesis from 3' end
+    subgraph step2 ["Step 2: Reverse Transcription"]
+        nt2["5'━━━━━━━━━━━━━━━━━━━━━━━━3'\nNon-target strand (intact)"]
+        ot2["3'━━━━━━━━━━━━━━━━━━━━━━━━5'\nOriginal target strand"]
+        new_dna["3'━━━━━ edited DNA ✱ ━━━━━5'\nNew 3' flap (synthesized by RT)"]
+        rt["Reverse Transcriptase\n(fused to Cas9 nickase)"]
+        rt -->|"extends 3' nick using\nRT template of pegRNA"| new_dna
+        nt2 --- ot2
+        ot2 --- new_dna
+    end
 
-Step 3: 5' flap resolution
+    subgraph step3 ["Step 3: 5' Flap Resolution"]
+        flap5["5' flap\n(original strand displaced)"]
+        flap3["3' flap\n(newly synthesized, contains edit ✱)"]
+        endonuclease["Structure-specific\nendonuclease (e.g. FEN1)"]
+        flap5 -->|"recognized and\ncleaved"| endonuclease
+        flap3 -->|"anneals to\nnon-target strand"| ligation["DNA Ligation\n/ gap fill"]
+    end
 
-5'─────────────┬─────────────────────────3' Non-target
-               │         ╱
-3'─────────────┘════════ ← 5' flap (original)
-               3'────────*──────5' ← 3' flap (edited)
-               
-Step 4: Cellular repair determines outcome
-   
-If 5' flap excised → edit installed
-If 3' flap excised → no edit
+    subgraph step4 ["Step 4: Cellular Repair Determines Outcome"]
+        repair{"Which flap\nis excised?"}
+        edited["✱ Edit Installed\n(desired outcome)"]
+        reverted["No Edit\n(original sequence restored)"]
+        repair -->|"5' flap excised → 3' flap retained\nligated into genome"| edited
+        repair -->|"3' flap excised → original retained\nmismatch repaired"| reverted
+    end
+
+    step1 -->|"nicked 3' end anneals\nto PBS of pegRNA"| step2
+    step2 -->|"3' flap displaces\noriginal 5' strand"| step3
+    step3 --> step4
 ```
 
 The primer binding site length in the pegRNA critically determines reverse transcription initiation efficiency. PBS sequences typically range from 8-17 nucleotides, balancing competing requirements: longer PBS provides more stable primer-template hybridization, improving RT initiation, but also increases the likelihood of PBS binding to off-target sites in the genome or forming secondary structure with other pegRNA regions. The thermodynamic stability of PBS-DNA hybridization must exceed approximately -8 kcal/mol at 37°C to support efficient RT initiation, which requires roughly 8-10 base pairs of continuous Watson-Crick pairing. However, excessively stable PBS binding (below -15 kcal/mol) can create kinetic barriers to subsequent steps by preventing efficient flap formation or increasing the probability of aberrant binding conformations.
@@ -193,31 +238,43 @@ The chemical constraints of oligonucleotide synthesis create sequence-dependent 
 
 Large-scale DNA assembly strategies employ hierarchical methods where small synthesized oligonucleotides are joined into progressively larger fragments. Overlap extension PCR assembles fragments with 15-25 bp terminal homologies through primer-free PCR where overlapping regions anneal and extend. Gibson assembly uses a combination of 5' exonuclease, DNA polymerase, and DNA ligase in an isothermal reaction that chews back the 5' ends of overlapping fragments, fills in gaps, and seals nicks. Golden Gate assembly employs Type IIS restriction enzymes that cut outside their recognition sites, generating defined overhangs that can be directionally ligated in a one-pot reaction.
 
-```
-Hierarchical DNA Assembly Strategy:
-
-Level 1: Oligonucleotide synthesis (100-200 bp)
-─────────  ─────────  ─────────  ─────────
-   Oligo 1   Oligo 2    Oligo 3    Oligo 4
-            ↓ Assembly (PCR/Gibson)
-
-Level 2: Assembled fragments (500-1000 bp)
-────────────────────  ────────────────────
-    Fragment A            Fragment B
-            ↓ Assembly (Gibson/Golden Gate)
-
-Level 3: Multi-fragment constructs (2-5 kb)
-────────────────────────────────────────────
-          Construct I
-            ↓ Yeast assembly or BAC cloning
-
-Level 4: Large genomic segments (50-150 kb)
-════════════════════════════════════════════
-         Chromosome segment
-            ↓ Iterative integration
-
-Level 5: Complete synthetic chromosome
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+```mermaid
+flowchart TD
+    O1["Oligo 1<br/>100-200 bp"]
+    O2["Oligo 2<br/>100-200 bp"]
+    O3["Oligo 3<br/>100-200 bp"]
+    O4["Oligo 4<br/>100-200 bp"]
+    
+    O1 --> PCR["Assembly<br/>PCR/Gibson"]
+    O2 --> PCR
+    O3 --> PCR
+    O4 --> PCR
+    
+    PCR --> FA["Fragment A<br/>500-1,000 bp"]
+    PCR --> FB["Fragment B<br/>500-1,000 bp"]
+    
+    FA --> GG["Assembly<br/>Gibson/Golden Gate"]
+    FB --> GG
+    
+    GG --> CI["Construct I<br/>2-5 kb"]
+    
+    CI --> YA["Yeast Assembly<br/>or BAC Cloning"]
+    
+    YA --> CS["Chromosome Segment<br/>50-150 kb"]
+    
+    CS --> II["Iterative Integration"]
+    
+    II --> SC["Complete Synthetic<br/>Chromosome"]
+    
+    style O1 fill:#e1f5ff
+    style O2 fill:#e1f5ff
+    style O3 fill:#e1f5ff
+    style O4 fill:#e1f5ff
+    style FA fill:#fff3e0
+    style FB fill:#fff3e0
+    style CI fill:#f3e5f5
+    style CS fill:#e8f5e9
+    style SC fill:#424242,color:#fff
 ```
 
 Error correction in synthetic DNA assembly relies on detecting and eliminating mutant molecules from the population. Mismatch-binding proteins such as MutS can enrich for perfectly matched duplex DNA over molecules containing mismatches, but this approach only works for errors creating base pair mismatches and cannot correct insertions or deletions where both strands contain the error. Deep sequencing of assembled constructs identifies low-frequency errors, but correcting them requires either re-synthesis of affected regions or site-directed mutagenesis, both costly and time-consuming for large constructs.

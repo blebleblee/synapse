@@ -22,26 +22,44 @@ Adhesion methodologies for LED modules and electronic components must balance ho
 
 Specialized Lego-compatible LED holders and clip systems represent the most elegant solution for installations prioritizing modularity. These components, typically 3D-printed in PLA or nylon, incorporate standard Lego stud and tube geometries on one face and precisely dimensioned LED retention clips on the opposing face. A well-designed holder maintains 0.15 mm clearance around a 3 mm LED body, providing friction-fit retention while allowing removal without tools. The holder itself connects to the Lego structure through standard clutch力, making the entire lighting installation as reversible as the underlying brick assembly. The limitation of this approach is the additional volume consumed—a clip holder typically occupies the equivalent of a 1×2 plate (3.2 mm height), which must be accommodated in the vertical spacing of the build.
 
-```
-Wire Routing Through 2×4 Brick - Top View
-┌─────────────────────────────────┐
-│  ●        ●        ●        ●   │  ● = Stud cylinders (1.6mm gap at corners)
-│     ╱──────╲  ╱──────╲          │  ╱──╲ = Wire routing paths
-│  ●  │      │  │      │  ●       │  
-│     ╲──────╱  ╲──────╱          │
-│  ●        ●        ●        ●   │
-└─────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph top_view ["Wire Routing Through 2×4 Brick — Top View"]
+        direction LR
+        S1["● Stud"]
+        S2["● Stud"]
+        S3["● Stud"]
+        S4["● Stud"]
+        S5["● Stud"]
+        S6["● Stud"]
+        S7["● Stud"]
+        S8["● Stud"]
 
-Vertical Transition Through Brick Layers
-Layer N+1: ┌──────┐
-            │      │ ← Upper brick pressed down
-            │  │   │    Wire captured in gap (0.2-0.4mm)
-            └──┼───┘
-               │
-Layer N:    ┌──┼───┐
-            │  ▼   │ ← Wire descends through hollow core
-            │      │
-            └──────┘
+        R1["╱──╲ Wire Path A ╲──╱"]
+        R2["╱──╲ Wire Path B ╲──╱"]
+
+        S1 --- R1
+        S2 --- R1
+        R1 --- S3
+        R1 --- S4
+
+        S5 --- R2
+        S6 --- R2
+        R2 --- S7
+        R2 --- S8
+    end
+
+    subgraph vertical ["Vertical Transition Through Brick Layers"]
+        direction TD
+        LayerN1["Layer N+1\nUpper Brick\n(pressed down)"]
+        Gap["Wire Captured in Gap\n(0.2 – 0.4 mm)"]
+        LayerN["Layer N\nLower Brick\n(hollow core)"]
+
+        LayerN1 -->|"Wire enters gap"| Gap
+        Gap -->|"Wire descends\nthrough hollow core"| LayerN
+    end
+
+    top_view -->|"Wire exits stud gap\nand transitions downward"| vertical
 ```
 
 Light diffusion techniques exploit the optical properties of Lego's transparent and translucent element catalog to transform point-source LEDs into area emitters or volumetric glow effects. A 3mm LED produces a Lambertian emission pattern with approximately ±60° half-intensity angle, creating harsh shadows and visible hotspots when viewed directly. Placing the LED behind a single layer of trans-clear 1×2 plate produces minimal diffusion—the plastic acts primarily as a transparent window with slight edge scattering. True diffusion requires either volumetric scattering or multiple surface reflections. A trans-white brick, with its microscopic titanium dioxide particles suspended in the ABS matrix, provides excellent Lambertian diffusion, converting the point source into a uniform area emitter with luminance uniformity better than 85% across the brick face.

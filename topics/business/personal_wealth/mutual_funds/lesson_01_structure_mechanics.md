@@ -44,55 +44,53 @@ Expense ratios matter profoundly because they compound over time, eroding wealth
 
 The operational architecture of a mutual fund resembles a hub-and-spoke topology, with the fund's board and legal entity at the center and specialized service providers connected through contractual relationships and data exchange protocols. Understanding this architecture requires mapping the daily operational cycle through which investor orders transform into portfolio transactions and ultimately resolve into updated shareholder account balances.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        MUTUAL FUND ENTITY                        │
-│                     (Corporation or Trust)                       │
-│                                                                   │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │              Board of Directors / Trustees               │   │
-│  │     • Approve advisory contract annually                │   │
-│  │     • Oversee compliance and risk management            │   │
-│  │     • Review fair value procedures quarterly            │   │
-│  └─────────────────────────────────────────────────────────┘   │
-│                              │                                   │
-│              ┌───────────────┼────────────────┐                │
-│              │               │                │                │
-│              ▼               ▼                ▼                │
-│      ┌───────────┐   ┌──────────┐    ┌─────────────┐         │
-│      │Investment │   │  Fund    │    │ Distributor │         │
-│      │ Adviser   │   │  Admin   │    │             │         │
-│      └───────────┘   └──────────┘    └─────────────┘         │
-└─────────────────────────────────────────────────────────────────┘
-         │                    │                    │
-         │ Portfolio          │ Accounting &       │ Sales & Marketing
-         │ Management         │ NAV Calculation    │
-         │                    │                    │
-         ▼                    ▼                    ▼
-┌─────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-│   Custodian     │  │  Transfer Agent  │  │  Broker-Dealers  │
-│   Bank          │  │                  │  │  & Advisers      │
-│                 │  │                  │  │                  │
-│ • Hold assets   │  │ • Maintain       │  │ • Distribute     │
-│ • Settle trades │  │   shareholder    │  │   fund shares    │
-│ • Lend          │  │   records        │  │ • Collect sales  │
-│   securities    │  │ • Process        │  │   loads          │
-│ • Manage        │  │   orders         │  │ • Service        │
-│   collateral    │  │ • Distribute     │  │   clients        │
-│                 │  │   dividends      │  │                  │
-└─────────────────┘  └──────────────────┘  └──────────────────┘
-         │                    │                    │
-         └────────────────────┼────────────────────┘
-                              │
-                              ▼
-                    ┌──────────────────┐
-                    │   Shareholders   │
-                    │                  │
-                    │ • Purchase       │
-                    │ • Redeem         │
-                    │ • Receive        │
-                    │   distributions  │
-                    └──────────────────┘
+```mermaid
+flowchart TD
+    subgraph fund_entity ["MUTUAL FUND ENTITY (Corporation or Trust)"]
+        BOD["**Board of Directors / Trustees**
+        • Approve advisory contract annually
+        • Oversee compliance and risk management
+        • Review fair value procedures quarterly"]
+
+        IA["Investment
+        Adviser"]
+        FA["Fund
+        Admin"]
+        DIST["Distributor"]
+
+        BOD --> IA
+        BOD --> FA
+        BOD --> DIST
+    end
+
+    CUST["**Custodian Bank**
+    • Hold assets
+    • Settle trades
+    • Lend securities
+    • Manage collateral"]
+
+    TA["**Transfer Agent**
+    • Maintain shareholder records
+    • Process orders
+    • Distribute dividends"]
+
+    BD["**Broker-Dealers & Advisers**
+    • Distribute fund shares
+    • Collect sales loads
+    • Service clients"]
+
+    SH["**Shareholders**
+    • Purchase
+    • Redeem
+    • Receive distributions"]
+
+    IA -->|"Portfolio Management"| CUST
+    FA -->|"Accounting & NAV Calculation"| TA
+    DIST -->|"Sales & Marketing"| BD
+
+    CUST --> SH
+    TA --> SH
+    BD --> SH
 ```
 
 The daily operational cycle begins when investors submit purchase or redemption orders through their brokers or directly to the transfer agent before the fund's order cutoff time. Each order includes the investor's account identification, the transaction type (purchase or redemption), the dollar amount or share quantity, and settlement instructions. The transfer agent aggregates all orders received before the cutoff, distinguishing between purchase orders that will bring cash into the fund and redemption orders that will require cash disbursement. This net order flow—total purchases minus total redemptions—determines whether the fund will experience net inflows or outflows for the day.

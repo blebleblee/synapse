@@ -20,40 +20,22 @@ The computational reason distributed training is hard reduces to one equation. I
 
 A Vertex AI Custom Training Job is specified as a `CustomJobSpec` containing one or more `WorkerPoolSpec` objects. This is not a cosmetic API choice. The worker pool model directly reflects the logical topology of distributed training: a chief worker that coordinates checkpointing and logging, a set of homogeneous compute workers, a parameter server pool for asynchronous training, and an evaluator. Each pool specifies its machine type, accelerator configuration, replica count, and container specification independently. This means you can, and often should, give your parameter servers CPU-only `n1-highmem-16` machines while your workers run on `a2-highgpu-8g` nodes with eight A100s each.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Vertex AI Control Plane                      │
-│                                                                 │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │                   CustomJobSpec                           │  │
-│  │                                                           │  │
-│  │  ┌─────────────────┐    ┌─────────────────────────────┐  │  │
-│  │  │  WorkerPoolSpec │    │      WorkerPoolSpec         │  │  │
-│  │  │  (Chief / 0)    │    │      (Workers / 1)          │  │  │
-│  │  │                 │    │                             │  │  │
-│  │  │  replica: 1     │    │  replica: 8                 │  │  │
-│  │  │  a2-highgpu-1g  │    │  a2-highgpu-8g              │  │  │
-│  │  │  1x A100        │    │  8x A100 each               │  │  │
-│  │  │  container: gcr │    │  container: gcr             │  │  │
-│  │  └────────┬────────┘    └──────────────┬──────────────┘  │  │
-│  └───────────│─────────────────────────────│─────────────────┘  │
-└──────────────│─────────────────────────────│─────────────────────┘
-               │  TF_CONFIG / MASTER_ADDR    │
-               │  Injected via env vars      │
-               ▼                             ▼
-     ┌──────────────────┐         ┌──────────────────────────┐
-     │   Chief Worker   │◄────────│     Worker Nodes (x8)    │
-     │   Rank 0         │ AllReduce│     Rank 1–8             │
-     │   Checkpoint IO  │◄────────│     Gradient Sync        │
-     └──────────────────┘ NCCL   └──────────────────────────┘
-              │
-              ▼
-     ┌────────────────┐
-     │  Cloud Storage │
-     │  (GCS Bucket)  │
-     │  Checkpoints   │
-     │  Artifacts     │
-     └────────────────┘
+```mermaid
+flowchart TD
+    subgraph VertexAI["Vertex AI Control Plane"]
+        subgraph CustomJob["CustomJobSpec"]
+            WP0["WorkerPoolSpec (Chief / 0)<br/>replica: 1<br/>a2-highgpu-1g<br/>1x A100<br/>container: gcr"]
+            WP1["WorkerPoolSpec (Workers / 1)<br/>replica: 8<br/>a2-highgpu-8g<br/>8x A100 each<br/>container: gcr"]
+        end
+    end
+    
+    WP0 -->|"TF_CONFIG / MASTER_ADDR<br/>Injected via env vars"| Chief["Chief Worker<br/>Rank 0<br/>Checkpoint IO"]
+    WP1 -->|"TF_CONFIG / MASTER_ADDR<br/>Injected via env vars"| Workers["Worker Nodes (x8)<br/>Rank 1–8<br/>Gradient Sync"]
+    
+    Workers -->|"NCCL<br/>AllReduce"| Chief
+    Chief -->|"NCCL<br/>AllReduce"| Workers
+    
+    Chief --> GCS["Cloud Storage<br/>(GCS Bucket)<br/>Checkpoints<br/>Artifacts"]
 ```
 
 When you submit a Custom Job, the Vertex AI control plane resolves the worker pool topology, provisions the VMs via GCE, pulls your container images from Artifact Registry, and injects the distributed training environment. For TensorFlow workloads, it populates the `TF_CONFIG` JSON environment variable on each worker, encoding the cluster specification and the current worker's task type and index. For PyTorch workloads using `torch.distributed`, it injects `MASTER_ADDR`, `MASTER_PORT`, `WORLD_SIZE`, and `RANK`. Your training code reads these at startup to initialize the process group and begin collective communication.

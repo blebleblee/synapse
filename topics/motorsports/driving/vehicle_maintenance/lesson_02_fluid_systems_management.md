@@ -30,37 +30,25 @@ Viscosity modifiers (VM) are polymer additives used in multi-grade oils to impro
 
 The practical selection workflow for race engine oil begins with the engine builder's bearing clearance specification. From that clearance and the anticipated maximum oil temperature — measured at the pressure gallery, not the sump — the engineer calculates the minimum required dynamic viscosity to maintain a film thickness above the surface roughness of the bearing shells. For most purpose-built race engines running PAO-based full synthetic oil, the selection will fall into the 5W-50 or 10W-60 range, with the specific choice governed by the ambient temperature range of the event and the engine's thermal management system effectiveness. An engine running in a 35°C ambient endurance race with marginal oil cooling will need a higher-viscosity selection than the same engine in a 15°C sprint event with an oversized oil cooler.
 
-```
-Engine Oil Selection Decision Path
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Engine Builder Bearing Clearance Spec
-              │
-              ▼
-  Max Expected Oil Gallery Temp (°C)
-  [from thermocouple on pressure rail]
-              │
-              ▼
-  Calculate min. dynamic viscosity for
-  film thickness ≥ 2× bearing Ra value
-              │
-        ┌─────┴──────┐
-        │            │
-   PAO Synthetic   PAO+Ester Synthetic
-   (high VI ~150)  (high VI + film strength)
-        │            │
-        └─────┬──────┘
-              │
-  Select SAE grade: target 8–12 cSt at
-  peak operating temp (100°C proxy)
-              │
-              ▼
-  Confirm pour point < min ambient − 10°C
-              │
-              ▼
-  Validate with UOA after first 2 events:
-  check kinematic viscosity retention,
-  TBN depletion rate, wear metals (Fe, Cu, Al)
+```mermaid
+flowchart TD
+    A["Engine Builder Bearing Clearance Spec"]
+    B["Max Expected Oil Gallery Temp (°C)<br/>[from thermocouple on pressure rail]"]
+    C["Calculate min. dynamic viscosity for<br/>film thickness ≥ 2× bearing Ra value"]
+    D["PAO Synthetic<br/>(high VI ~150)"]
+    E["PAO+Ester Synthetic<br/>(high VI + film strength)"]
+    F["Select SAE grade: target 8–12 cSt at<br/>peak operating temp (100°C proxy)"]
+    G["Confirm pour point < min ambient − 10°C"]
+    H["Validate with UOA after first 2 events:<br/>check kinematic viscosity retention,<br/>TBN depletion rate, wear metals (Fe, Cu, Al)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    C --> E
+    D --> F
+    E --> F
+    F --> G
+    G --> H
 ```
 
 ### Coolant Thermodynamics and Mixture Management

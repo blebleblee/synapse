@@ -58,25 +58,28 @@ The sampling period represents a critical tradeoff. Frequent sampling (low overf
 
 The stack trace captured during sampling encodes the call chain from the current function back to the program entry point. By aggregating thousands of samples, the profiler constructs a statistical model of where execution time is spent. A function appearing in 3,000 out of 10,000 samples consumed approximately 30% of total CPU time during the profiling interval. The hierarchical call graph reveals not just hot functions but hot paths—specific sequences of function calls that dominate execution.
 
-```
-Profiling Data Structure: Sampling Stack Aggregation
-
-Sample 1: main → process_request → parse_json → malloc
-Sample 2: main → process_request → parse_json → strcmp
-Sample 3: main → process_request → validate_data → regex_match
-...
-Sample N: main → process_request → parse_json → malloc
-
-Aggregated Call Tree:
-main [10000 samples, 100%]
-  └─ process_request [9500 samples, 95%]
-       ├─ parse_json [6000 samples, 60%]
-       │    ├─ malloc [2500 samples, 25%]
-       │    └─ strcmp [2000 samples, 20%]
-       └─ validate_data [2500 samples, 25%]
-            └─ regex_match [2000 samples, 20%]
-
-Interpretation: malloc and regex_match are primary hotspots
+```mermaid
+flowchart TD
+    S1["Sample 1: main → process_request → parse_json → malloc"]
+    S2["Sample 2: main → process_request → parse_json → strcmp"]
+    S3["Sample 3: main → process_request → validate_data → regex_match"]
+    SN["Sample N: main → process_request → parse_json → malloc"]
+    
+    S1 --> AGG["Aggregated Call Tree"]
+    S2 --> AGG
+    S3 --> AGG
+    SN --> AGG
+    
+    AGG --> MAIN["main<br/>10000 samples, 100%"]
+    MAIN --> PR["process_request<br/>9500 samples, 95%"]
+    PR --> PJ["parse_json<br/>6000 samples, 60%"]
+    PR --> VD["validate_data<br/>2500 samples, 25%"]
+    PJ --> MALLOC["malloc<br/>2500 samples, 25%<br/>🔥 HOTSPOT"]
+    PJ --> STRCMP["strcmp<br/>2000 samples, 20%"]
+    VD --> REGEX["regex_match<br/>2000 samples, 20%<br/>🔥 HOTSPOT"]
+    
+    style MALLOC fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
+    style REGEX fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
 ```
 
 The distinction between self time and cumulative time is crucial. A function's self time measures samples captured while executing that function's own instructions, excluding time spent in callees. Cumulative time includes both self time and time spent in all functions called transitively. The `parse_json` function above has 60% cumulative time but only 15% self time (6000 - 2500 - 2000 = 1500 samples), indicating most time is spent in callees rather than the function's own logic. Optimization efforts should focus on the callees (`malloc`, `strcmp`) or on reducing calls to them rather than rewriting `parse_json` itself.
@@ -125,25 +128,24 @@ Tracing systems extend instrumentation to capture not just aggregate statistics 
 
 Raw profiling data—thousands of stack traces—is incomprehensible without visualization. The flame graph, invented by Brendan Gregg, transforms stack trace samples into an intuitive hierarchical visualization. Each function appears as a horizontal bar, width proportional to the number of samples containing that function. Functions are stacked vertically by call depth, with the program entry point at the bottom and leaf functions at the top.
 
-```
-Flame Graph Structure (ASCII Approximation):
-
-      ┌─────────┐ ┌───────┐
-      │ malloc  │ │strcmp │  <- Leaf functions (top)
-      └─────────┘ └───────┘
-  ┌────────────────────────────┐
-  │      parse_json            │  <- Intermediate
-  └────────────────────────────┘
-┌──────────────────────────────────┐
-│      process_request             │  <- Callers
-└──────────────────────────────────┘
-┌──────────────────────────────────────┐
-│           main                       │  <- Entry (bottom)
-└──────────────────────────────────────┘
-
-Width = % of total samples
-Reading: Follow columns upward to see call paths
-Wide bars = hotspots worth investigating
+```mermaid
+flowchart BT
+    A["main<br/>(Entry Point)"]
+    B["process_request<br/>(Caller)"]
+    C["parse_json<br/>(Intermediate)"]
+    D["malloc<br/>(Leaf Function)"]
+    E["strcmp<br/>(Leaf Function)"]
+    
+    A -->|"100% samples"| B
+    B -->|"~80% samples"| C
+    C -->|"~40% samples"| D
+    C -->|"~40% samples"| E
+    
+    style A fill:#e1f5ff,stroke:#0288d1,stroke-width:4px
+    style B fill:#fff9c4,stroke:#f9a825,stroke-width:3px
+    style C fill:#ffecb3,stroke:#fb8c00,stroke-width:2px
+    style D fill:#ffccbc,stroke:#e64a19,stroke-width:2px
+    style E fill:#ffccbc,stroke:#e64a19,stroke-width:2px
 ```
 
 The flame graph makes optimization targets immediately visible. Wide bars at the top represent functions consuming significant self time. Wide bars lower in the stack with narrow children indicate functions with high self time rather than time spent in callees. Patterns emerge—a wide bar spanning multiple narrow children suggests a loop calling many small functions, potentially benefiting from inlining or loop restructuring.

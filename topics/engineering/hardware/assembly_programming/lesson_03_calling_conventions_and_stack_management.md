@@ -84,26 +84,30 @@ Tail call optimization represents a powerful transformation where a function cal
 
 The following diagram illustrates the x86-64 stack frame layout for a function with local variables and saved registers:
 
-```
-High Addresses
-+---------------------------+
-| Caller's Stack Frame      |
-+---------------------------+
-| 7th Argument (if any)     |  16(%rbp)
-+---------------------------+
-| Return Address            |   8(%rbp) ← pushed by call
-+---------------------------+
-| Saved %rbp                |   0(%rbp) ← %rbp points here after prologue
-+---------------------------+
-| Saved Callee-Saved Regs   |  -8(%rbp), -16(%rbp), ...
-+---------------------------+
-| Local Variables           | -24(%rbp), -32(%rbp), ...
-+---------------------------+
-| Padding (if needed)       |
-+---------------------------+ ← %rsp points here (16-byte aligned)
-| Red Zone (128 bytes)      | ← leaf functions may use without adjusting %rsp
-+---------------------------+
-Low Addresses
+```mermaid
+flowchart TD
+    HighAddr["High Addresses"]
+    CallerFrame["Caller's Stack Frame"]
+    Arg7["7th Argument (if any)<br/>16(%rbp)"]
+    RetAddr["Return Address<br/>8(%rbp)<br/>← pushed by call"]
+    SavedRBP["Saved %rbp<br/>0(%rbp)<br/>← %rbp points here after prologue"]
+    SavedRegs["Saved Callee-Saved Regs<br/>-8(%rbp), -16(%rbp), ..."]
+    LocalVars["Local Variables<br/>-24(%rbp), -32(%rbp), ..."]
+    Padding["Padding (if needed)"]
+    RSP["← %rsp points here (16-byte aligned)"]
+    RedZone["Red Zone (128 bytes)<br/>← leaf functions may use without adjusting %rsp"]
+    LowAddr["Low Addresses"]
+    
+    HighAddr --> CallerFrame
+    CallerFrame --> Arg7
+    Arg7 --> RetAddr
+    RetAddr --> SavedRBP
+    SavedRBP --> SavedRegs
+    SavedRegs --> LocalVars
+    LocalVars --> Padding
+    Padding --> RSP
+    RSP --> RedZone
+    RedZone --> LowAddr
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

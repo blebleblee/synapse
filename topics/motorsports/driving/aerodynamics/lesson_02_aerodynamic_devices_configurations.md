@@ -32,28 +32,40 @@ The floor and diffuser assembly constitutes the highest-efficiency downforce gen
 
 The diffuser section, beginning where the floor starts its upward expansion toward the rear axle centerline, must decelerate this high-velocity flow back to ambient pressure without triggering flow separation that would stall the entire underbody. Diffuser expansion angle, measured between the floor surface tangent and horizontal reference plane, critically determines whether flow remains attached or separates into turbulent chaos. Expansion angles exceeding 15 to 18 degrees risk separation, though aggressive endplate fences, strakes, and vortex generators can stabilize flow and permit steeper angles approaching 20 to 22 degrees. Greater expansion angles allow more rapid pressure recovery over shorter diffuser length, permitting physically compact designs that concentrate downforce near the rear axle, shifting aerodynamic balance rearward and potentially reducing rear wing dependency.
 
-```
-FLOOR & DIFFUSER SECTION VIEW (Longitudinal Cut Plane)
-
-Front Wing          Throat Section           Diffuser Exit
-     ↓              (Min Ride Height)              ↓
-     |                    ↓                        |
-─────●──────────────────────────────────────────────●──────  Reference Plane
-                    
-     ▼ ▼ ▼          ▼ ▼ ▼ ▼ ▼               ▲ ▲ ▲
-  ═══════════════════════════════════════════╗
-  ║  High Pressure     |    Low Pressure     ║\
-  ║  (P₀ ≈ Ambient)    |   (P₁ = P₀ - ΔP)   ║ \    Expansion Angle
-  ║                    |                     ║  \   (θ = 15-22°)
-  ║                    V_max (80-100 m/s)    ║   \
-  ║                                          ║    ╲
-  ║  Sealed Volume (Ground Effect Channel)   ║     ╲
-  ║                                          ║      ╲
-  ╚══════════════════════════════════════════╝       ╲
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  Track Surface
-  
-  Ride Height: 20-40mm → 10-15mm → 30-60mm
-  Downforce peaks when ΔP maximized without triggering separation
+```mermaid
+flowchart LR
+    subgraph inlet ["Front Wing / Inlet Zone"]
+        A["Front Wing<br/>High Pressure<br/>P₀ ≈ Ambient"]
+        RH1["Ride Height<br/>20-40mm"]
+    end
+    
+    subgraph throat ["Throat Section (Min Ride Height)"]
+        B["Low Pressure Zone<br/>P₁ = P₀ - ΔP<br/>V_max = 80-100 m/s"]
+        RH2["Ride Height<br/>10-15mm"]
+        C["Ground Effect Channel<br/>Sealed Volume"]
+    end
+    
+    subgraph diffuser ["Diffuser Exit / Expansion"]
+        D["Pressure Recovery<br/>Expansion Angle<br/>θ = 15-22°"]
+        RH3["Ride Height<br/>30-60mm"]
+    end
+    
+    subgraph boundary ["Boundary Conditions"]
+        REF["Reference Plane"]
+        TRACK["Track Surface"]
+    end
+    
+    A -->|"Flow Acceleration"| B
+    B -->|"Flow Expansion"| D
+    RH1 -.->|Converging| RH2
+    RH2 -.->|Diverging| RH3
+    C -.->|Sealed by| TRACK
+    REF -.->|Above| A
+    REF -.->|Above| D
+    
+    note1["Downforce peaks when<br/>ΔP maximized without<br/>triggering separation"]
+    
+    D -.-> note1
 ```
 
 Diffuser strakes, longitudinal vertical fences running along the diffuser floor, partition the expansion region into multiple channels that act as independent pressure recovery zones. If separation initiates in one channel due to local flow disturbance, the strakes prevent lateral propagation, confining the stall to a single partition rather than collapsing the entire diffuser. This compartmentalization provides aerodynamic robustness, particularly valuable during transient cornering when ride height varies asymmetrically between inside and outside suspension travel. The strakes also generate their own vortex structures along their edges, which energize the boundary layer through turbulent mixing and delay separation, permitting more aggressive expansion angles than would otherwise be achievable.

@@ -20,11 +20,14 @@ The forward secrecy property deserves special attention because it changes the a
 
 TLS sits between the transport layer (TCP) and the application layer (HTTP, SMTP, etc.), operating as a framing and protection sublayer. All TLS traffic is segmented into *records*, each with a 5-byte header identifying the content type (Handshake = 22, Alert = 21, ChangeCipherSpec = 20, Application Data = 23), the protocol version, and the payload length. The maximum record size is 16,384 bytes.
 
-```
-+---+---+---+---+---+---...---+
-| CT| Ver | Length  | Payload |
-| 1B| 2B  |   2B    |  ≤16KB  |
-+---+---+---+---+---+---...---+
+```mermaid
+flowchart LR
+    CT["CT<br/>1B"]
+    Ver["Ver<br/>2B"]
+    Length["Length<br/>2B"]
+    Payload["Payload<br/>≤16KB"]
+    
+    CT --> Ver --> Length --> Payload
 ```
 
 In TLS 1.3, the outer content type field is set to 23 (Application Data) for all protected records regardless of actual content, and the real content type is encrypted inside the payload as the last byte. This prevents traffic analysis from distinguishing handshake messages from application data at the record boundary — a meaningful improvement against traffic fingerprinting.
@@ -33,25 +36,19 @@ In TLS 1.3, the outer content type field is set to 23 (Application Data) for all
 
 TLS 1.3 achieves full handshake completion in one round-trip (1-RTT), with an optional zero round-trip resumption mode (0-RTT). The 1-RTT handshake proceeds as follows.
 
-```
-Client                                           Server
-  |                                                |
-  |------ ClientHello --------------------------->|
-  |       (key_share, supported_groups,            |
-  |        supported_versions, ciphers)            |
-  |                                                |
-  |<----- ServerHello ----------------------------+
-  |       (key_share, selected_cipher,             |
-  |        selected_version)                       |
-  |                                                |
-  |<----- {EncryptedExtensions} -----------------+
-  |<----- {Certificate} -------------------------+
-  |<----- {CertificateVerify} ------------------+|
-  |<----- {Finished} ---------------------------+|
-  |                                                |
-  |------ {Finished} --------------------------->|
-  |                                                |
-  |====== [Application Data] ===================|
+```mermaid
+flowchart TD
+    Client["Client"]
+    Server["Server"]
+    
+    Client -->|"ClientHello<br/>(key_share, supported_groups,<br/>supported_versions, ciphers)"| Server
+    Server -->|"ServerHello<br/>(key_share, selected_cipher,<br/>selected_version)"| Client
+    Server -->|"{EncryptedExtensions}"| Client
+    Server -->|"{Certificate}"| Client
+    Server -->|"{CertificateVerify}"| Client
+    Server -->|"{Finished}"| Client
+    Client -->|"{Finished}"| Server
+    Client <-->|"[Application Data]"| Server
 ```
 
 The server transmits its Certificate, CertificateVerify, and Finished messages already encrypted (shown in curly braces) using the *handshake traffic secret*, which is derived immediately after the key_share exchange. This means the server's identity is never transmitted in cleartext — unlike TLS 1.2, where the certificate was sent in the clear. The key schedule in TLS 1.3 uses HKDF (HMAC-based Key Derivation Function) to derive a hierarchy of secrets from the ECDHE shared secret.

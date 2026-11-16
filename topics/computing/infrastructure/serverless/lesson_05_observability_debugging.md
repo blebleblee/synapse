@@ -28,42 +28,34 @@ The distributed tracing protocol stack for serverless systems builds upon the W3
 
 The mechanical flow of trace context propagation through a serverless invocation chain proceeds through five distinct phases, each requiring careful instrumentation to preserve causality invariants. In the **injection phase**, the calling function's instrumentation library serializes its current span context into the traceparent header format, appending this header to outbound HTTP requests, message envelope metadata, or event payload fields. For asynchronous messaging systems like SQS or EventBridge, injection occurs at message publication time, embedding trace context as message attributes rather than body fields to avoid coupling telemetry to application payload schemas. In the **transport phase**, the platform's networking layer forwards these annotated requests through load balancers, service meshes, and event routers without modification, treating trace context as opaque metadata. The **extraction phase** activates when the downstream function runtime receives the triggering event, parsing the traceparent header to recover the upstream trace ID and parent span ID. The runtime then enters the **span creation phase**, generating a fresh span ID for its own execution scope and establishing a parent-child relationship with the extracted context. Finally, in the **enrichment phase**, the function's structured logging library annotates all emitted log entries with both the inherited trace ID and its locally-generated span ID, ensuring that log aggregation services can reassemble the complete execution flow.
 
-```
-Trace Context Propagation Flow:
+```mermaid
+flowchart TD
+    headers["HTTP Headers\nor Message Attributes\n──────────────────\ntraceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01\ntracestate: vendor=metadata"]
 
-┌─────────────────┐ traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
-│  Function A     │ tracestate: vendor=metadata
-│  trace: 4bf9... │────────────────────────────────────────────────────┐
-│  span:  d4f7... │                                                    │
-└────────┬────────┘                                                    │
-         │ invoke()                                                    ▼
-         │                                                   ┌─────────────────┐
-         │                                            ┌─────▶│  HTTP Headers   │
-         │                                            │      │  or Message     │
-         │                                            │      │  Attributes     │
-         │                                            │      └─────────────────┘
-         ▼                                            │
-┌─────────────────┐  extract context                 │
-│  Function B     │◀─────────────────────────────────┘
-│  trace: 4bf9... │  create child span
-│  span:  8a3c... │  parent: 00f067aa0ba902b7
-│  parent:00f0... │
-└────────┬────────┘
-         │ invoke()
-         │
-         ▼
-┌─────────────────┐
-│  Function C     │
-│  trace: 4bf9... │
-│  span:  2b1f... │
-│  parent:8a3c... │
-└─────────────────┘
+    subgraph trace_propagation ["Trace Context Propagation  |  trace-id: 4bf92f3577b34da6a3ce929d0e0e4736"]
+        funcA["**Function A**\n──────────────────\ntrace: 4bf92f35...\nspan:  d4f7...\n⏱ 45ms (init 38ms + exec 7ms)"]
+        funcB["**Function B**\n──────────────────\ntrace: 4bf92f35...\nspan:  8a3c...\nparent: 00f067aa0ba902b7\n⏱ 15ms (warm)"]
+        funcC["**Function C**\n──────────────────\ntrace: 4bf92f35...\nspan:  2b1f...\nparent: 8a3c...\n⏱ 165ms (cold start: 158ms + exec 7ms)"]
+    end
 
-Critical Path Analysis:
-Total:  245ms
-A:       45ms (initialization: 38ms, execution: 7ms)
-B→C:    180ms (B: 15ms warm, C: 165ms cold start)
-C:      165ms (initialization: 158ms, execution: 7ms)
+    subgraph critical_path ["Critical Path Analysis  |  Total: 245ms"]
+        cp["A: 45ms  →  B→C: 180ms  (B: 15ms warm,  C: 165ms cold start)"]
+    end
+
+    funcA -- "inject context\ntraceparent / tracestate" --> headers
+    headers -- "extract context\ncreate child span\nparent: 00f067aa0ba902b7" --> funcB
+    funcA -- "invoke()" --> funcB
+    funcB -- "invoke()\ncreate child span\nparent: 8a3c..." --> funcC
+
+    funcC -.-> critical_path
+
+    style funcA fill:#1a3a5c,stroke:#4a9ede,color:#e8f4fd
+    style funcB fill:#1a3a5c,stroke:#4a9ede,color:#e8f4fd
+    style funcC fill:#3a1a1a,stroke:#e05c5c,color:#fde8e8
+    style headers fill:#1a3a2a,stroke:#4ade80,color:#e8fdf0
+    style cp fill:#2a2a1a,stroke:#ede04a,color:#fdfbe8
+    style trace_propagation fill:#0d1b2a,stroke:#4a9ede,color:#e8f4fd
+    style critical_path fill:#0d0d0d,stroke:#ede04a,color:#fdfbe8
 ```
 
 The internal architecture of a serverless observability pipeline consists of four major subsystems: the in-process instrumentation layer, the telemetry ingestion gateway, the storage and indexing layer, and the query and visualization frontend. The instrumentation layer operates as a sidecar library linked into the function runtime, intercepting execution control flow at framework boundaries—HTTP request handlers, message queue consumers, database client invocations—to emit structured telemetry signals. This layer must minimize performance overhead through careful design choices: asynchronous buffering of log entries to avoid blocking application threads, adaptive sampling algorithms that reduce telemetry volume during steady-state operation while capturing full traces during anomalous conditions, and binary encoding protocols like Protocol Buffers that compress telemetry payloads before transmission.
@@ -104,56 +96,81 @@ After the handler function returns, the runtime reads these same counter files a
 
 The metrics aggregation pipeline employs a hierarchical rollup architecture to balance query latency against storage cost. Raw per-invocation metrics flow into a real-time aggregation layer that maintains one-second resolution histograms over a sliding 24-hour window, using a sketch-based quantile estimation algorithm—t-digest or DDSketch—to compute accurate p50, p99, and p99.9 latencies without storing individual samples. After 24 hours, the aggregation service downsamples this data into one-minute buckets, discarding individual invocation timestamps while preserving count, sum, and pre-computed quantiles. This minute-resolution data persists for 30 days before further downsampling to hourly buckets, which remain queryable for one year. The final retention tier compresses data into daily summaries that archive indefinitely at negligible storage cost.
 
-```
-Metrics Aggregation Hierarchy:
+```mermaid
+flowchart TD
+    RAW["**Raw Invocation Metrics**
+    ─────────────────────────────
+    timestamp:    1704153845123 (epoch ms)
+    trace_id:     4bf92f3577b34da6
+    function_arn: ...function:processor
+    duration_ms:  247
+    billed_mb_ms: 12800 (256MB × 50ms)
+    cpu_us:       183420
+    mem_max_mb:   187"]
 
-Raw Invocation Metrics (ephemeral)
-├─ timestamp:    1704153845123 (epoch millis)
-├─ trace_id:     4bf92f3577b34da6a3ce929d0e0e4736
-├─ function_arn: arn:aws:lambda:us-east-1:123456789012:function:processor
-├─ duration_ms:  247
-├─ billed_mb_ms: 12800 (256 MB × 50ms billed duration)
-├─ cpu_us:       183420
-└─ mem_max_mb:   187
+    DS1(["⬇ Real-time Aggregation
+    1-second buckets · 24-hour retention"])
 
-↓ Real-time Aggregation (1-second buckets, 24 hour retention)
+    SEC["**Second-Level Bucket**
+    ─────────────────────────────
+    window:      t = 1704153845
+    function_arn: ...function:processor
+    count:        1,847
+    sum_duration: 456,789 ms
+    histogram:    t-digest sketch
+    ↳ p50: 235 ms · p99: 1,203 ms · p99.9: 2,841 ms
+    sum_cost:     $0.0234
+    error_count:  12"]
 
-Second-Level Bucket (t=1704153845)
-├─ function_arn: arn:aws:lambda:us-east-1:123456789012:function:processor
-├─ count:        1847
-├─ sum_duration: 456789ms
-├─ histogram:    t-digest sketch (p50: 235ms, p99: 1203ms, p99.9: 2841ms)
-├─ sum_cost:     $0.0234
-└─ error_count:  12
+    DS2(["⬇ Downsampling
+    1-minute buckets · 30-day retention"])
 
-↓ Downsampling (1-minute buckets, 30 day retention)
+    MIN["**Minute-Level Bucket**
+    ─────────────────────────────
+    window:      t = 1704153840 (60 s)
+    function_arn: ...function:processor
+    count:        110,820
+    sum_duration: 27,405,600 ms
+    p50:          238 ms (merged t-digest)
+    p99:          1,198 ms
+    p99.9:        2,837 ms
+    error_rate:   0.0065 (718 / 110,820)"]
 
-Minute-Level Bucket (t=1704153840, 60-second window)
-├─ function_arn: arn:aws:lambda:us-east-1:123456789012:function:processor
-├─ count:        110820
-├─ sum_duration: 27405600ms
-├─ p50:          238ms (from merged t-digest sketches)
-├─ p99:          1198ms
-├─ p99.9:        2837ms
-└─ error_rate:   0.0065 (718 errors / 110820 invocations)
+    DS3(["⬇ Downsampling
+    1-hour buckets · 1-year retention"])
 
-↓ Downsampling (1-hour buckets, 1 year retention)
+    HOUR["**Hour-Level Bucket**
+    ─────────────────────────────
+    window:      t = 1704153600 (3600 s)
+    function_arn: ...function:processor
+    count:        6,649,200
+    sum_duration: 1,644,540,000 ms
+    p50:          240 ms
+    p99:          1,205 ms
+    sum_cost:     $82.23"]
 
-Hour-Level Bucket (t=1704153600, 3600-second window)
-├─ function_arn: arn:aws:lambda:us-east-1:123456789012:function:processor
-├─ count:        6649200
-├─ sum_duration: 1644540000ms
-├─ p50:          240ms
-├─ p99:          1205ms
-└─ sum_cost:     $82.23
+    DS4(["⬇ Downsampling
+    1-day buckets · indefinite retention"])
 
-↓ Downsampling (1-day buckets, indefinite retention)
+    DAY["**Daily Summary**
+    ─────────────────────────────
+    window:      date = 2024-01-02
+    function_arn: ...function:processor
+    count:        159,580,800
+    sum_cost:     $1,973.52
+    error_rate:   0.0062"]
 
-Daily Summary (date=2024-01-02)
-├─ function_arn: arn:aws:lambda:us-east-1:123456789012:function:processor
-├─ count:        159580800
-├─ sum_cost:     $1973.52
-└─ error_rate:   0.0062
+    RAW --> DS1 --> SEC --> DS2 --> MIN --> DS3 --> HOUR --> DS4 --> DAY
+
+    style RAW  fill:#1a1a2e,stroke:#4a9eff,stroke-width:2px,color:#e0e0e0
+    style SEC  fill:#16213e,stroke:#4a9eff,stroke-width:2px,color:#e0e0e0
+    style MIN  fill:#16213e,stroke:#4a9eff,stroke-width:2px,color:#e0e0e0
+    style HOUR fill:#16213e,stroke:#4a9eff,stroke-width:2px,color:#e0e0e0
+    style DAY  fill:#16213e,stroke:#4a9eff,stroke-width:2px,color:#e0e0e0
+    style DS1  fill:#0f3460,stroke:#4a9eff,stroke-width:1px,color:#a0c4ff
+    style DS2  fill:#0f3460,stroke:#4a9eff,stroke-width:1px,color:#a0c4ff
+    style DS3  fill:#0f3460,stroke:#4a9eff,stroke-width:1px,color:#a0c4ff
+    style DS4  fill:#0f3460,stroke:#4a9eff,stroke-width:1px,color:#a0c4ff
 ```
 
 The distributed trace reconstruction algorithm operates as a streaming graph assembly process, incrementally building the causal topology as span records arrive from distributed function invocations. The trace backend maintains an in-memory cache of active traces indexed by trace ID, with each trace represented as a mutable directed acyclic graph where nodes store span metadata and edges encode parent-child relationships. When a span record arrives, the backend first checks whether its trace ID exists in the active cache. If not, it initializes a new trace graph with the span as the provisional root. If the trace already exists, the backend inserts the span as a new node and attempts to link it to its parent by searching for a node whose span ID matches the incoming span's parent span ID field. This parent-child linkage may succeed immediately if the parent span has already arrived, or it may pend if the parent remains in-flight due to network delays or out-of-order delivery.

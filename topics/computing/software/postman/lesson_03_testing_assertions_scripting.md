@@ -108,66 +108,20 @@ For parameterized testing workflows, Postman supports CSV and JSON data files th
 
 The execution flow diagram clarifies the temporal relationships:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Collection Runner Initialization                             │
-│  • Load environment variables                                │
-│  • Initialize collection variables                           │
-│  • Read data file if configured                              │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│ FOR EACH REQUEST IN COLLECTION:                             │
-│                                                              │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │ Pre-Request Script Phase                              │  │
-│  │  • Initialize JavaScript sandbox                      │  │
-│  │  • Execute pre-request script                         │  │
-│  │  • Variables: read from scope hierarchy               │  │
-│  │  • Variables: write to local/environment/collection   │  │
-│  └─────────────────┬─────────────────────────────────────┘  │
-│                    │                                         │
-│                    ▼                                         │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │ Request Construction Phase                            │  │
-│  │  • Resolve {{variable}} placeholders                  │  │
-│  │  • Assemble headers, body, URL                        │  │
-│  │  • Apply authentication scheme                        │  │
-│  └─────────────────┬─────────────────────────────────────┘  │
-│                    │                                         │
-│                    ▼                                         │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │ HTTP Transaction Phase                                │  │
-│  │  • DNS resolution                                     │  │
-│  │  • TCP handshake                                      │  │
-│  │  • TLS negotiation (if HTTPS)                         │  │
-│  │  • Send request                                       │  │
-│  │  • Receive response                                   │  │
-│  │  • Capture timing metrics                             │  │
-│  └─────────────────┬─────────────────────────────────────┘  │
-│                    │                                         │
-│                    ▼                                         │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │ Test Script Phase                                     │  │
-│  │  • Populate pm.response object                        │  │
-│  │  • Execute test script                                │  │
-│  │  • Run all pm.test() assertions                       │  │
-│  │  • Extract data and set variables                     │  │
-│  │  • Aggregate test results                             │  │
-│  └───────────────────────────────────────────────────────┘  │
-│                                                              │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│ Generate Test Report                                         │
-│  • Total requests executed                                   │
-│  • Total tests run                                           │
-│  • Pass/fail breakdown                                       │
-│  • Response time statistics                                  │
-│  • Failure diagnostics                                       │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Collection Runner Initialization<br/>• Load environment variables<br/>• Initialize collection variables<br/>• Read data file if configured"]
+    A --> B["FOR EACH REQUEST IN COLLECTION"]
+    
+    B --> C["Pre-Request Script Phase<br/>• Initialize JavaScript sandbox<br/>• Execute pre-request script<br/>• Variables: read from scope hierarchy<br/>• Variables: write to local/environment/collection"]
+    
+    C --> D["Request Construction Phase<br/>• Resolve {{variable}} placeholders<br/>• Assemble headers, body, URL<br/>• Apply authentication scheme"]
+    
+    D --> E["HTTP Transaction Phase<br/>• DNS resolution<br/>• TCP handshake<br/>• TLS negotiation (if HTTPS)<br/>• Send request<br/>• Receive response<br/>• Capture timing metrics"]
+    
+    E --> F["Test Script Phase<br/>• Populate pm.response object<br/>• Execute test script<br/>• Run all pm.test() assertions<br/>• Extract data and set variables<br/>• Aggregate test results"]
+    
+    F --> G["Generate Test Report<br/>• Total requests executed<br/>• Total tests run<br/>• Pass/fail breakdown<br/>• Response time statistics<br/>• Failure diagnostics"]
 ```
 
 This execution model remains consistent whether the collection runs interactively in the Postman desktop application, headlessly via Newman on a CI server, or remotely via Postman's cloud runners. The portability of collections—stored as JSON documents containing request definitions, scripts, and variable declarations—enables engineers to version control their API test suites alongside application code, track changes through pull requests, and run identical tests across development, staging, and production environments.

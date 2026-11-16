@@ -16,34 +16,30 @@ The CCBS system, which replaced the classic Technic-pin-and-socket Bionicle syst
 
 The biomechanical architecture of any Bionicle figure can be decomposed into four functional layers: the spinal column and pelvis assembly, the shoulder and hip girdles, the limb segments, and the terminal effectors (hands, feet, weapons, wings). Each layer has distinct structural requirements and each interfaces with the adjacent layers through specific joint geometries. Understanding these layers and their interactions is the analytical framework that separates purposeful design from accumulated improvisation.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    BIONICLE STRUCTURAL LAYERS                   │
-│                                                                 │
-│   ┌─────────────────────────────────────────────────────────┐   │
-│   │  LAYER 4: TERMINAL EFFECTORS                            │   │
-│   │  Hands · Feet · Weapons · Wings · Masks                 │   │
-│   │  → Low structural load, high visual impact              │   │
-│   └───────────────────────┬─────────────────────────────────┘   │
-│                           │ Ball joint / axle pin                │
-│   ┌───────────────────────▼─────────────────────────────────┐   │
-│   │  LAYER 3: LIMB SEGMENTS                                 │   │
-│   │  Upper arm · Forearm · Thigh · Shin                     │   │
-│   │  → Length determines proportion; joint friction = key   │   │
-│   └───────────────────────┬─────────────────────────────────┘   │
-│                           │ Shoulder / hip socket                │
-│   ┌───────────────────────▼─────────────────────────────────┐   │
-│   │  LAYER 2: SHOULDER & HIP GIRDLES                        │   │
-│   │  Torso expansion frames · Pelvic plate · Socket mounts  │   │
-│   │  → Governs reach envelope and stance width              │   │
-│   └───────────────────────┬─────────────────────────────────┘   │
-│                           │ Rigid axle / stacked pin connection  │
-│   ┌───────────────────────▼─────────────────────────────────┐   │
-│   │  LAYER 1: SPINAL COLUMN & PELVIS                        │   │
-│   │  Central torso brick · Spine stack · Pelvic anchor      │   │
-│   │  → Primary load path; determines overall height ratio   │   │
-│   └─────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph BIONICLE["BIONICLE STRUCTURAL LAYERS"]
+        L4["LAYER 4: TERMINAL EFFECTORS<br/>Hands · Feet · Weapons · Wings · Masks<br/>→ Low structural load, high visual impact"]
+        
+        C1["Ball joint / axle pin"]
+        
+        L3["LAYER 3: LIMB SEGMENTS<br/>Upper arm · Forearm · Thigh · Shin<br/>→ Length determines proportion; joint friction = key"]
+        
+        C2["Shoulder / hip socket"]
+        
+        L2["LAYER 2: SHOULDER & HIP GIRDLES<br/>Torso expansion frames · Pelvic plate · Socket mounts<br/>→ Governs reach envelope and stance width"]
+        
+        C3["Rigid axle / stacked pin connection"]
+        
+        L1["LAYER 1: SPINAL COLUMN & PELVIS<br/>Central torso brick · Spine stack · Pelvic anchor<br/>→ Primary load path; determines overall height ratio"]
+        
+        L4 --> C1
+        C1 --> L3
+        L3 --> C2
+        C2 --> L2
+        L2 --> C3
+        C3 --> L1
+    end
 ```
 
 The spinal column is where most MOC failures originate, and yet it receives the least design attention because it will be entirely hidden by armor panels. The classic Bionicle build uses a single Technic brick or beam as the central spine, with the torso shell clipped around it. For small figures (roughly 20–24 studs tall), this single-element spine is structurally adequate. For larger MOCs — the Titan-class builds, the Makuta-scale constructions that push 35–40 studs — a single Technic beam will exhibit visible flex when the arms are extended and loaded, particularly at the connection point between torso and pelvis. The solution is to treat the spine as a compression column rather than a cantilevered beam. Stack two parallel Technic liftarms or beams offset by one stud, joined at regular intervals by perpendicular pin connections, creating a truss rather than a monolith. This I-beam analog increases resistance to bending forces along both the anterior-posterior and lateral axes, which is precisely where arm extension and head weight apply their loads.

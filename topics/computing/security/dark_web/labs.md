@@ -380,7 +380,7 @@ sigrok-cli -d fx2lafw --config samplerate=24M --channels 0-3 \
 
 - **Glitch Duration:** 100-500 nanoseconds
 - **Voltage Drop:** VCC nominal to VCC - 0.5V (e.g., 3.3V → 2.8V)
-- **Rise/Fall Time:** <10 nanoseconds (fast MOSFET required)
+- **Rise/Fall Time:** < 10 nanoseconds (fast MOSFET required)
 - **Trigger Delay:** 10-200 microseconds post-breakpoint (requires empirical tuning)
 - **Success Rate Target:** >50% for production exploits
 

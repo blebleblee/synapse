@@ -76,35 +76,17 @@ Basic strategy deviations exploit count-dependent situations where optimal play 
 
 The structural diagram below illustrates the information flow architecture connecting these strategic layers:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    STRATEGIC DECISION                        │
-│                 (Action + Frequency)                         │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-           ┌───────────────┴───────────────┐
-           │                               │
-           ▼                               ▼
-┌──────────────────────┐        ┌─────────────────────────┐
-│  GAME-THEORETIC      │        │   EXPLOITATIVE          │
-│     SOLVER           │        │    ADJUSTMENT           │
-│                      │        │                         │
-│  • Equilibrium freq. │        │  • Opponent model       │
-│  • Indifference pts  │        │  • Leak identification  │
-│  • Mixed strategies  │        │  • Counter-strategy     │
-└──────────┬───────────┘        └────────────┬────────────┘
-           │                                 │
-           │                ┌────────────────┘
-           │                │
-           ▼                ▼
-    ┌──────────────────────────────┐
-    │    PROBABILITY ENGINE         │
-    │                               │
-    │  • Range construction         │
-    │  • Equity calculation         │
-    │  • Bayesian updates           │
-    │  • Card removal effects       │
-    └───────────────────────────────┘
+```mermaid
+flowchart TD
+    A["STRATEGIC DECISION<br/>(Action + Frequency)"]
+    B["GAME-THEORETIC SOLVER<br/><br/>• Equilibrium freq.<br/>• Indifference pts<br/>• Mixed strategies"]
+    C["EXPLOITATIVE ADJUSTMENT<br/><br/>• Opponent model<br/>• Leak identification<br/>• Counter-strategy"]
+    D["PROBABILITY ENGINE<br/><br/>• Range construction<br/>• Equity calculation<br/>• Bayesian updates<br/>• Card removal effects"]
+    
+    A --> B
+    A --> C
+    B --> D
+    C --> D
 ```
 
 Each decision cycle begins at the probability engine, which computes the statistical landscape of possible hands and outcomes. This probability distribution feeds both into the game-theoretic solver (which determines equilibrium frequencies that resist exploitation) and into the opponent modeling system (which identifies deviations from equilibrium). The final decision integrates these streams: defaulting toward equilibrium frequencies while making exploitative adjustments when opponent models justify them. High-confidence models warrant larger deviations; uncertain models recommend staying closer to equilibrium to minimize reverse exploitation.

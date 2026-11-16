@@ -36,29 +36,37 @@ The most critical modal groups for a machinist programming at the floor level ar
 
 The following diagram illustrates the relationship between the block execution pipeline and the modal state registers:
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        PROGRAM INPUT BUFFER                         │
-│  N010 G90 G94 G17 G00 X0 Y0 Z50.0 S2800 M03                        │
-└───────────────────────────┬─────────────────────────────────────────┘
-                            │  Block Scanner / Lexer
-                            ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                        BLOCK DECODER                                │
-│  Parses word-address tokens → assigns to register slots             │
-│  G90 → Group 3 register    G94 → Group 5 register                  │
-│  G17 → Group 2 register    G00 → Group 1 register                  │
-│  X0 Y0 Z50.0 → axis target buffer                                  │
-│  S2800 → spindle speed register   M03 → PLC queue                  │
-└───────────────────────────┬─────────────────────────────────────────┘
-                            │  Modal state update + axis target commit
-                            ▼
-┌─────────────────┐    ┌────────────────┐    ┌────────────────────────┐
-│  MODAL STATE    │    │  INTERPOLATOR  │    │  PLC INTERFACE         │
-│  G90 G94 G17    │───▶│  G00 rapid     │    │  M03 → spindle CW      │
-│  G00 active     │    │  to X0 Y0 Z50  │    │  S2800 → drive setpt   │
-│  WCS: G54       │    │  at rapid rate │    │  interlock check       │
-└─────────────────┘    └────────────────┘    └────────────────────────┘
+```mermaid
+flowchart TD
+    INPUT["**PROGRAM INPUT BUFFER**
+    N010 G90 G94 G17 G00 X0 Y0 Z50.0 S2800 M03"]
+
+    DECODER["**BLOCK DECODER**
+    Parses word-address tokens → assigns to register slots
+    G90 → Group 3 register │ G94 → Group 5 register
+    G17 → Group 2 register │ G00 → Group 1 register
+    X0 Y0 Z50.0 → axis target buffer
+    S2800 → spindle speed register │ M03 → PLC queue"]
+
+    MODAL["**MODAL STATE**
+    G90 G94 G17
+    G00 active
+    WCS: G54"]
+
+    INTERP["**INTERPOLATOR**
+    G00 rapid
+    to X0 Y0 Z50
+    at rapid rate"]
+
+    PLC["**PLC INTERFACE**
+    M03 → spindle CW
+    S2800 → drive setpt
+    interlock check"]
+
+    INPUT -->|"Block Scanner / Lexer"| DECODER
+    DECODER -->|"Modal state update + axis target commit"| MODAL
+    MODAL -->|"drives"| INTERP
+    DECODER -->|"M03 / S2800 dispatch"| PLC
 ```
 
 The key architectural point this diagram communicates is that modal state updates and axis motion are concurrent operations within the same block execution. The controller does not first update all modal registers and then initiate motion on a subsequent clock cycle. Modal changes in a block take effect for the motion commanded *within the same block*. This is why you can legally write `G01 X100.0 F300` in a single block without a separate preceding block to establish G01 mode.

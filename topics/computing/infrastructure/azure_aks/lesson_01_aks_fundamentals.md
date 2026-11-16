@@ -26,48 +26,51 @@ The AKS architecture decomposes into three primary layers: the managed control p
 
 The managed control plane consists of Kubernetes core components that Microsoft operates in a multi-tenant shared infrastructure. The API server acts as the central coordination point, exposing the Kubernetes REST API over HTTPS on a public or private endpoint that customers configure during cluster creation. This API server authenticates requests using Azure Active Directory integration, certificate-based authentication, or bearer tokens, then authorizes them against role-based access control policies stored in etcd. The API server itself maintains no state; it reads from and writes to etcd exclusively, functioning as a stateless gateway that validates, transforms, and persists resource declarations into the cluster's source of truth.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Managed Control Plane                     │
-│                   (Microsoft-Operated)                       │
-│                                                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │  API Server  │  │  Scheduler   │  │  Controller  │     │
-│  │   (n pods)   │  │   (leader-   │  │   Manager    │     │
-│  │              │  │   elected)   │  │  (leader-    │     │
-│  └───────┬──────┘  └──────┬───────┘  │   elected)   │     │
-│          │                 │          └──────┬───────┘     │
-│          │                 │                 │             │
-│          └─────────────────┼─────────────────┘             │
-│                            │                               │
-│                    ┌───────▼───────┐                       │
-│                    │  etcd Cluster │                       │
-│                    │  (Raft quorum)│                       │
-│                    └───────────────┘                       │
-└─────────────────────────────┬───────────────────────────────┘
-                              │
-                              │ Kubernetes API (TLS)
-                              │
-┌─────────────────────────────▼───────────────────────────────┐
-│                  Customer Node Pools                         │
-│                (Virtual Machine Scale Sets)                  │
-│                                                              │
-│  ┌────────────────┐  ┌────────────────┐  ┌──────────────┐  │
-│  │  Node 1        │  │  Node 2        │  │  Node n      │  │
-│  │                │  │                │  │              │  │
-│  │  ┌──────────┐  │  │  ┌──────────┐  │  │  ┌────────┐  │  │
-│  │  │ kubelet  │  │  │  │ kubelet  │  │  │  │ kubelet│  │  │
-│  │  └────┬─────┘  │  │  └────┬─────┘  │  │  └───┬────┘  │  │
-│  │       │        │  │       │        │  │      │       │  │
-│  │  ┌────▼─────┐  │  │  ┌────▼─────┐  │  │  ┌───▼────┐  │  │
-│  │  │Container │  │  │  │Container │  │  │  │Contain │  │  │
-│  │  │ Runtime  │  │  │  │ Runtime  │  │  │  │ Runtime│  │  │
-│  │  │(containerd)│ │  │  │(containerd)│ │  │  │(contai)│  │  │
-│  │  └──────────┘  │  │  └──────────┘  │  │  └────────┘  │  │
-│  │                │  │                │  │              │  │
-│  │  Pod Pod Pod   │  │  Pod Pod Pod   │  │  Pod Pod Pod │  │
-│  └────────────────┘  └────────────────┘  └──────────────┘  │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph ControlPlane ["Managed Control Plane<br/>(Microsoft-Operated)"]
+        API["API Server<br/>(n pods)"]
+        Scheduler["Scheduler<br/>(leader-elected)"]
+        Controller["Controller Manager<br/>(leader-elected)"]
+        etcd["etcd Cluster<br/>(Raft quorum)"]
+        
+        API --> etcd
+        Scheduler --> etcd
+        Controller --> etcd
+    end
+    
+    subgraph NodePools ["Customer Node Pools<br/>(Virtual Machine Scale Sets)"]
+        subgraph Node1 ["Node 1"]
+            kubelet1["kubelet"]
+            runtime1["Container Runtime<br/>(containerd)"]
+            pods1["Pod Pod Pod"]
+            
+            kubelet1 --> runtime1
+            runtime1 --> pods1
+        end
+        
+        subgraph Node2 ["Node 2"]
+            kubelet2["kubelet"]
+            runtime2["Container Runtime<br/>(containerd)"]
+            pods2["Pod Pod Pod"]
+            
+            kubelet2 --> runtime2
+            runtime2 --> pods2
+        end
+        
+        subgraph NodeN ["Node n"]
+            kubeletN["kubelet"]
+            runtimeN["Container Runtime<br/>(containerd)"]
+            podsN["Pod Pod Pod"]
+            
+            kubeletN --> runtimeN
+            runtimeN --> podsN
+        end
+    end
+    
+    etcd -.->|"Kubernetes API (TLS)"| kubelet1
+    etcd -.->|"Kubernetes API (TLS)"| kubelet2
+    etcd -.->|"Kubernetes API (TLS)"| kubeletN
 ```
 
 The etcd cluster stores all Kubernetes resources as JSON or Protocol Buffer serialized objects indexed by resource type and namespace, maintaining a monotonically increasing revision number for every write operation. This revision forms the foundation for watch mechanisms—clients establish HTTP long-polling connections to the API server specifying a resource type and optional selector, and the API server streams updates whenever objects matching the watch criteria change. Controllers leverage these watch streams to detect state changes and trigger reconciliation loops without polling, creating an efficient event notification system that scales to clusters with thousands of resources.

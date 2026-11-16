@@ -38,36 +38,20 @@ account_locked: bool                  -- Administrative lock
 
 Service principals operate under distinctly different semantics because they lack interactive authentication capabilities. A service principal authenticates using cryptographic proof-of-possession, where the service demonstrates control of a private key without transmitting the key material itself. The canonical implementation pattern uses X.509 client certificates issued by an internal certificate authority, with certificate subject distinguished names encoding the service identity. During TLS mutual authentication, the service presents its certificate, the relying party validates the certificate chain back to the trusted CA root, and extracts the service identity from the subject field.
 
-```
-Service Principal Authentication Flow:
-
-┌─────────────┐                ┌──────────────┐                ┌─────────────┐
-│  Service A  │                │   API        │                │  CA + PKI   │
-│             │                │  Gateway     │                │             │
-└──────┬──────┘                └──────┬───────┘                └──────┬──────┘
-       │                              │                               │
-       │  TLS ClientHello             │                               │
-       │  + SNI extension             │                               │
-       │─────────────────────────────>│                               │
-       │                              │                               │
-       │  TLS ServerHello             │                               │
-       │  + Certificate Request       │                               │
-       │<─────────────────────────────│                               │
-       │                              │                               │
-       │  Client Certificate          │                               │
-       │  (signed by CA)              │                               │
-       │─────────────────────────────>│                               │
-       │                              │   Validate cert chain         │
-       │                              │──────────────────────────────>│
-       │                              │                               │
-       │                              │   Certificate valid           │
-       │                              │   + OCSP stapling response    │
-       │                              │<──────────────────────────────│
-       │                              │                               │
-       │  Application Data            │   Extract CN from subject:    │
-       │  (encrypted channel)         │   "service-a.prod.internal"   │
-       │<────────────────────────────>│   Map to ServicePrincipalID   │
-       │                              │                               │
+```mermaid
+flowchart TD
+    ServiceA["Service A"]
+    APIGateway["API Gateway"]
+    CA["CA + PKI"]
+    
+    ServiceA -->|"TLS ClientHello + SNI extension"| APIGateway
+    APIGateway -->|"TLS ServerHello + Certificate Request"| ServiceA
+    ServiceA -->|"Client Certificate<br/>signed by CA"| APIGateway
+    APIGateway -->|"Validate cert chain"| CA
+    CA -->|"Certificate valid + OCSP stapling response"| APIGateway
+    APIGateway -->|"Extract CN from subject:<br/>service-a.prod.internal<br/>Map to ServicePrincipalID"| APIGateway
+    APIGateway -->|"Application Data<br/>encrypted channel"| ServiceA
+    ServiceA -->|"Application Data<br/>encrypted channel"| APIGateway
 ```
 
 Role assumption mechanisms implement privilege elevation through cryptographic token exchange protocols. When a principal requests elevated permissions, the IAM system issues a temporary security token encoding the assumed role identity, constrained permissions, and expiration timestamp. The reference implementation uses a trusted token service that validates the requesting principal's authorization to assume the target role, generates a signed token, and returns it to the caller. All subsequent requests present this token as proof of delegated authority.

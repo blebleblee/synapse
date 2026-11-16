@@ -369,7 +369,7 @@ Attempt the voltage fault injection procedure from Exercise 3.3 across a minimum
 Execute the frame injection sweep from Exercise 3.1 against every unique ID identified during the candump enumeration session. For each injected ID, record whether a DTC is generated. For a vehicle claiming SecOC compliance, every message in the SecOC-protected message set must generate a verification failure DTC upon injection. Use the following quick reference for injection:
 
     # Inject single frame
-    cansend can0 <ID>#<8-byte-hex-payload>
+    cansend can0 <ID>#< 8-byte-hex-payload>
 
     # Replay a captured legitimate frame immediately after capture to test freshness counter
     canreplay -i candump_session.log can0

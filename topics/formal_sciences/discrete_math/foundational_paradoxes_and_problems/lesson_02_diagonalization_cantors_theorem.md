@@ -115,14 +115,33 @@ If $D$ halts on $\langle D \rangle$, then by construction $D$ loops on $\langle 
 
 The correspondence between the two proofs is structural and exact:
 
-```
-Cantor's Theorem               Halting Problem
-─────────────────────────────────────────────────────────
-Set A                          Enumeration of Turing machines
-f : A → P(A)                   H : decider for halting
-D = { a | a ∉ f(a) }           D = machine that inverts diagonal of T
-d ∈ D ↔ d ∉ f(d)               D halts ↔ D does not halt
-Contradiction at preimage of D  Contradiction at index k where D = M_k
+```mermaid
+flowchart TD
+    subgraph cantor["Cantor's Theorem"]
+        A["Set A"]
+        f["f : A → P(A)"]
+        D1["D = { a | a ∉ f(a) }"]
+        contra1["d ∈ D ↔ d ∉ f(d)"]
+        result1["Contradiction at preimage of D"]
+    end
+    
+    subgraph halting["Halting Problem"]
+        TM["Enumeration of Turing machines"]
+        H["H : decider for halting"]
+        D2["D = machine that inverts diagonal of T"]
+        contra2["D halts ↔ D does not halt"]
+        result2["Contradiction at index k where D = M_k"]
+    end
+    
+    A --> f
+    f --> D1
+    D1 --> contra1
+    contra1 --> result1
+    
+    TM --> H
+    H --> D2
+    D2 --> contra2
+    contra2 --> result2
 ```
 
 The diagonal invariant — read the main diagonal, invert it, observe the contradiction — transfers intact from set theory to computability theory. It will appear again in Rice's theorem, in proofs of the undecidability of program equivalence, and in the arithmetical hierarchy.

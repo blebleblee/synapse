@@ -26,38 +26,32 @@ Enterprise governance controls formalize the approval workflows and policy enfor
 
 Vertex AI Feature Store implements a layered architecture where the control plane manages feature definitions and schema metadata while dual data planes handle offline historical access and online serving workloads. The control plane persists feature group schemas in a centralized metadata service, defining feature data types, entity relationships, and serving configuration. When users register a new feature, the system creates corresponding BigQuery tables for offline storage and Bigtable namespaces for online storage, establishing the physical storage topology that supports the dual-store pattern.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Vertex AI Feature Store                      │
-│                        Control Plane                            │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐ │
-│  │  Feature     │  │   Schema     │  │   IAM & Access       │ │
-│  │  Registry    │  │  Validator   │  │   Control            │ │
-│  └──────────────┘  └──────────────┘  └──────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
-           │                                    │
-           ▼                                    ▼
-┌──────────────────────────┐      ┌──────────────────────────────┐
-│    Offline Data Plane    │      │     Online Data Plane        │
-│  ┌────────────────────┐  │      │  ┌────────────────────────┐ │
-│  │    BigQuery        │  │      │  │      Bigtable          │ │
-│  │  Point-in-Time     │  │      │  │   Low-Latency KV       │ │
-│  │  Feature Joins     │  │      │  │   Feature Serving      │ │
-│  └────────────────────┘  │      │  └────────────────────────┘ │
-│           │              │      │            │                │
-│  ┌────────────────────┐  │      │  ┌────────────────────────┐ │
-│  │  Historical Data   │  │      │  │   Materialized         │ │
-│  │  Warehouse         │  │      │  │   Feature Cache        │ │
-│  └────────────────────┘  │      │  └────────────────────────┘ │
-└──────────────────────────┘      └──────────────────────────────┘
-           │                                    │
-           └────────────────┬───────────────────┘
-                            ▼
-                 ┌────────────────────┐
-                 │  Ingestion Engine  │
-                 │  Feature Pipeline  │
-                 │  Orchestration     │
-                 └────────────────────┘
+```mermaid
+flowchart TD
+    subgraph cp ["Vertex AI Feature Store: Control Plane"]
+        fr["Feature Registry"]
+        sv["Schema Validator"]
+        iam["IAM & Access Control"]
+    end
+
+    subgraph off ["Offline Data Plane"]
+        bq["BigQuery<br/>Point-in-Time Feature Joins"]
+        hdw["Historical Data Warehouse"]
+        bq --> hdw
+    end
+
+    subgraph on ["Online Data Plane"]
+        bt["Bigtable<br/>Low-Latency KV Feature Serving"]
+        mfc["Materialized Feature Cache"]
+        bt --> mfc
+    end
+
+    ing["Ingestion Engine<br/>Feature Pipeline Orchestration"]
+
+    cp --> off
+    cp --> on
+    off --> ing
+    on --> ing
 ```
 
 Feature ingestion pipelines transform raw event streams and batch data sources into materialized feature values stored in both BigQuery and Bigtable. For streaming features, ingestion jobs consume from Pub/Sub topics, apply windowed aggregations or stateful transformations, and write results atomically to both stores. The system maintains eventual consistency between offline and online stores through a materialization process that snapshots BigQuery feature values and synchronizes them to Bigtable at configurable intervals. This synchronization strategy accepts temporary online-offline divergence in exchange for decoupling high-throughput batch writes to BigQuery from latency-sensitive Bigtable updates.

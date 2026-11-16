@@ -52,45 +52,39 @@ Distributed tracing systems like OpenTelemetry formalize correlation through tra
 
 Choreography-based coordination emerges from services responding autonomously to domain events without centralized control. When an OrderPlaced event arrives on the order-events topic, the inventory service consumes it, checks stock availability, reserves items, and publishes either ItemsReserved or InsufficientInventory events. The payment service independently consumes ItemsReserved, charges the customer, and publishes PaymentAuthorized or PaymentFailed. The fulfillment service consumes PaymentAuthorized and initiates shipping. At no point does any service command another or maintain awareness of the overall workflow; instead, each service implements local business logic triggered by events it cares about, and the end-to-end process emerges from their collective behavior.
 
-```
-OrderService               InventoryService          PaymentService           FulfillmentService
-     |                            |                         |                         |
-     |--OrderPlaced-------------->|                         |                         |
-     |                            |--ItemsReserved--------->|                         |
-     |                            |                         |--PaymentAuthorized----->|
-     |                            |                         |                         |--ShipmentCreated-->
+```mermaid
+flowchart LR
+    OS["OrderService"]
+    IS["InventoryService"]
+    PS["PaymentService"]
+    FS["FulfillmentService"]
+    
+    OS -->|OrderPlaced| IS
+    IS -->|ItemsReserved| PS
+    PS -->|PaymentAuthorized| FS
+    FS -->|ShipmentCreated| End["..."]
 ```
 
 This topology exhibits natural fault tolerance: if the payment service crashes, inventory and fulfillment continue processing unrelated orders without disruption. Services can deploy independently since they couple only through published event schemas, not direct API dependencies. However, choreography introduces emergent complexity that compounds with workflow sophistication. Implementing compensation—say, releasing reserved inventory when payment fails—requires each service to subscribe to failure events and encode rollback logic. Understanding end-to-end system behavior demands tracing event flows across multiple service codebases and message topics. Circular dependencies emerge easily: if fulfillment publishes ShipmentCreated and inventory consumes it to update stock projections, which payment consumes to trigger loyalty points, which order consumes to update status, we've created a feedback loop where reasoning about causality becomes nearly impossible.
 
 Orchestration centralizes workflow logic within a dedicated coordinator that explicitly models the process as a state machine. Instead of publishing events and hoping the right consumers react appropriately, the orchestrator issues commands to specific services and transitions state based on their responses. A saga orchestrator for hotel reservations might be implemented as a finite state machine with states like Initial, RoomReserving, RoomReserved, PaymentProcessing, PaymentAuthorized, ConfirmationSending, and Completed, along with failure states like RoomUnavailable, PaymentFailed, and Cancelled.
 
-```
-[Initial]
-   |
-   |--ReserveRoom(hotelId, dates)-->
-   v
-[RoomReserving]
-   |
-   |<--RoomReserved(reservationId)--
-   v
-[RoomReserved]
-   |
-   |--ChargePayment(amount, cardToken)-->
-   v
-[PaymentProcessing]
-   |
-   |<--PaymentAuthorized(txnId)--
-   v
-[PaymentAuthorized]
-   |
-   |--SendConfirmation(email, details)-->
-   v
-[ConfirmationSending]
-   |
-   |<--ConfirmationSent()--
-   v
-[Completed]
+```mermaid
+flowchart TD
+    Initial["Initial"]
+    RoomReserving["RoomReserving"]
+    RoomReserved["RoomReserved"]
+    PaymentProcessing["PaymentProcessing"]
+    PaymentAuthorized["PaymentAuthorized"]
+    ConfirmationSending["ConfirmationSending"]
+    Completed["Completed"]
+    
+    Initial -->|"ReserveRoom(hotelId, dates)"| RoomReserving
+    RoomReserving -->|"RoomReserved(reservationId)"| RoomReserved
+    RoomReserved -->|"ChargePayment(amount, cardToken)"| PaymentProcessing
+    PaymentProcessing -->|"PaymentAuthorized(txnId)"| PaymentAuthorized
+    PaymentAuthorized -->|"SendConfirmation(email, details)"| ConfirmationSending
+    ConfirmationSending -->|"ConfirmationSent()"| Completed
 ```
 
 The orchestrator maintains this state machine instance in durable storage—typically a database table indexed by workflow instance ID—and drives state transitions by sending commands to worker services via point-to-point queues. When RoomReserved arrives, the orchestrator loads the state machine instance, verifies it's in the RoomReserving state, transitions to RoomReserved, persists the new state, and sends the ChargePayment command. If PaymentFailed arrives instead, the orchestrator transitions to compensation, sending a ReleaseRoom command to undo the reservation before moving to Cancelled state.

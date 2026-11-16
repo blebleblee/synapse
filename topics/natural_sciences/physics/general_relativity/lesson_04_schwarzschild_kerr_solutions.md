@@ -60,25 +60,27 @@ $$u = \sqrt{\frac{r}{r_s} - 1}\;e^{r/(2r_s)}\cosh\left(\frac{c\,t}{2r_s}\right),
 
 for $r > r_s$ (with trigonometric functions replacing hyperbolic ones for $r < r_s$). In these coordinates, radial light cones are the same as in flat space — $v = \pm u + \text{const}$ — and the metric is regular everywhere except $r = 0$. The resulting Penrose diagram reveals four regions:
 
-```
-    Region II        Region I
-    (black hole      (exterior
-     interior)        universe)
-        
-        singularity r=0 (future)
-    ~~~~~~~~~|~~~~~~~~~|~~~~~~~~~~
-             |         |
-         II  |    I    |
-             |         |
-    ---------+---------+--------- r=r_s (horizon)
-             |         |
-         III|    IV    |
-             |         |
-    ~~~~~~~~~|~~~~~~~~~|~~~~~~~~~~
-        singularity r=0 (past)
-    Region III       Region IV
-    (white hole      (another
-     interior)        universe)
+```mermaid
+flowchart TD
+    subgraph region_I ["Region I<br/>(Exterior Universe)"]
+        sing_future["Singularity r=0<br/>(Future)"]
+    end
+    
+    subgraph region_II ["Region II<br/>(Black Hole Interior)"]
+        horizon_top["Event Horizon r=r_s"]
+    end
+    
+    subgraph region_IV ["Region IV<br/>(Another Universe)"]
+        horizon_bottom["Event Horizon r=r_s"]
+    end
+    
+    subgraph region_III ["Region III<br/>(White Hole Interior)"]
+        sing_past["Singularity r=0<br/>(Past)"]
+    end
+    
+    sing_future --> horizon_top
+    horizon_top --> horizon_bottom
+    horizon_bottom --> sing_past
 ```
 
 Region I is our exterior universe. Region II is the black hole interior — once entered, all future-directed timelike and null paths lead to the singularity at $r = 0$. Region III is a white hole, the time-reverse of a black hole, from which particles can only emerge. Region IV is a second, causally disconnected asymptotically flat universe. The Kruskal extension is mathematically complete but astrophysically irrelevant: real black holes form from gravitational collapse, which truncates the diagram at the surface of the collapsing star, removing Regions III and IV entirely. The maximally extended Schwarzschild solution is a mathematical object; the physical black hole formed by stellar collapse is described by only a portion of it.
@@ -103,21 +105,28 @@ This is the Lense-Thirring precession rate, and it has been directly measured. T
 
 The cross-sectional structure of the Kerr black hole in the equatorial plane illustrates the layered architecture:
 
-```
-  Equatorial plane (θ = π/2), Kerr black hole, a < M
-
-      ←────────── exterior spacetime ──────────→
-      
-      |              |         |         |        |
-      |  r_ergo=2M   |   r_+   |   r_-   |  r=0  |
-      | (static limit) |(event  | (Cauchy | (ring |
-      |               | horizon)| horizon)| sing.)
-      |              |         |         |        |
-      
-      |←── ergosphere ──→|
-                     |←─ between horizons ─→|
-                                           | inner |
-                                           | region|
+```mermaid
+flowchart LR
+    subgraph exterior["Exterior Spacetime"]
+        ergo["r_ergo = 2M<br/>(Static Limit)"]
+    end
+    
+    subgraph ergosphere["Ergosphere"]
+        ergo
+        event["r_+ (Event Horizon)"]
+    end
+    
+    subgraph between["Between Horizons"]
+        event
+        cauchy["r_- (Cauchy Horizon)"]
+    end
+    
+    subgraph inner["Inner Region"]
+        cauchy
+        ring["r = 0 (Ring Singularity)"]
+    end
+    
+    ergo --> event --> cauchy --> ring
 ```
 
 Inside the ergosphere, particles can still escape to infinity (unlike inside the event horizon), but they cannot remain stationary. This is the key enabler of the Penrose process.

@@ -20,40 +20,19 @@ Geometric errors arise from imperfections in the machine's physical construction
 
 The positioning control loop in a closed-loop servo system follows a hierarchical cascade architecture where position commands flow from the CNC controller through the servo drive to the motor and encoder feedback closes the loop through multiple nested control layers. At the outermost layer, the CNC trajectory planner generates position setpoints at the interpolation cycle rate—typically 1 millisecond for ISO Standard controls, as fast as 250 microseconds for high-performance systems—defining the commanded position, velocity, and acceleration for each axis. The servo drive receives these setpoints via high-speed serial communication (EtherCAT, SERCOS III, or Powerlink protocols operating at 100 megabits per second or faster) and executes the position control algorithm. The position loop compares the commanded position against the actual position reported by the feedback device, computing position error that drives the velocity command input to the next control layer. The velocity loop compares commanded velocity against actual velocity—either measured directly from encoder pulse frequency or computed by differentiating position—generating a torque command that feeds the innermost current control loop. The current loop modulates power transistor switching in the servo amplifier to regulate motor phase currents at kilohertz update rates, producing electromagnetic torque that accelerates the rotor and connected ballscrew. This nested architecture achieves bandwidth separation: the current loop operates at 5-10 kHz, responding instantly to torque demands; the velocity loop updates at 1-5 kHz, regulating speed against load variations; the position loop closes at the interpolation rate, maintaining trajectory accuracy.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    CNC Trajectory Planner                    │
-│              (Position, Velocity, Acceleration)              │
-└────────────────────────┬────────────────────────────────────┘
-                         │ Position Setpoint
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  Position Control Loop                       │
-│   Position Error = Setpoint - Actual (from encoder)         │
-│   Velocity Command = Kp × Error + Feedforward               │
-└────────────────────────┬────────────────────────────────────┘
-                         │ Velocity Command
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  Velocity Control Loop                       │
-│   Velocity Error = Commanded - Actual (dPosition/dt)        │
-│   Torque Command = Kv × Velocity Error + Ki × ∫Error        │
-└────────────────────────┬────────────────────────────────────┘
-                         │ Torque (Current) Command
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  Current Control Loop                        │
-│   PWM Modulation → Motor Phase Currents → Torque            │
-└────────────────────────┬────────────────────────────────────┘
-                         │ Mechanical Motion
-                         ▼
-                    ┌─────────┐
-                    │ Encoder │──────────┐
-                    │ Feedback│          │
-                    └─────────┘          │
-                         │               │
-                         └───────────────┘
-                         Position Signal
+```mermaid
+flowchart TD
+    A["CNC Trajectory Planner<br/>(Position, Velocity, Acceleration)"]
+    B["Position Control Loop<br/>Position Error = Setpoint - Actual (from encoder)<br/>Velocity Command = Kp × Error + Feedforward"]
+    C["Velocity Control Loop<br/>Velocity Error = Commanded - Actual (dPosition/dt)<br/>Torque Command = Kv × Velocity Error + Ki × ∫Error"]
+    D["Current Control Loop<br/>PWM Modulation → Motor Phase Currents → Torque"]
+    E["Encoder<br/>Feedback"]
+    
+    A -->|"Position Setpoint"| B
+    B -->|"Velocity Command"| C
+    C -->|"Torque (Current) Command"| D
+    D -->|"Mechanical Motion"| E
+    E -->|"Position Signal"| B
 ```
 
 Encoder technology divides into incremental and absolute architectures, each offering distinct advantages for positioning accuracy and system initialization. Incremental encoders generate quadrature pulse trains—two square wave signals phase-shifted by 90 degrees—where pulse counting determines relative position from a reference point and the quadrature relationship indicates direction. A 10,000-count-per-revolution encoder on a 10 mm lead ballscrew provides theoretical resolution of 1 micrometer per count, though electronic interpolation typically multiplies this by four (quadrature decoding) to 100 (advanced subdivision), achieving sub-nanometer position granularity. The controller increments or decrements position counters based on pulse edges, maintaining position knowledge through power-on state and continuous operation. Incremental systems require homing sequences at machine startup—driving each axis to a reference switch or encoder index pulse—to establish the work coordinate origin. Absolute encoders encode position within each revolution (single-turn absolute) or across multiple revolutions (multi-turn absolute using battery-backed counters or Wiegand energy harvesting) as a unique digital code, eliminating the homing requirement and providing instant position knowledge at power-on. Linear absolute scales mounted directly to machine ways offer the ultimate positioning accuracy, measuring displacement independent of drive train mechanics, but cost substantially more than rotary encoders and require careful contamination protection.

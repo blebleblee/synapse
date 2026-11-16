@@ -176,120 +176,79 @@ State management patterns in design systems span local component state, global a
 
 For web components and framework-agnostic implementations, the state management contract typically surfaces through property setters, event dispatchers, and state synchronization callbacks. A disclosure widget (collapsible accordion panel) demonstrates this pattern:
 
-```javascript
-class DisclosureComponent extends HTMLElement {
-  static observedAttributes = ['open'];
-  
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-    this._open = false;
-  }
-  
-  connectedCallback() {
-    this.shadowRoot.innerHTML = `
-      <style>
-        .disclosure-button {
-          width: 100%;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: var(--disclosure-bg);
-          border: 1px solid var(--disclosure-border);
-          padding: var(--spacing-3);
-          cursor: pointer;
-        }
-        
-        .disclosure-content {
-          padding: var(--spacing-3);
-          border: 1px solid var(--disclosure-border);
-          border-top: 0;
-        }
-        
-        .disclosure-content[hidden] {
-          display: none;
-        }
-        
-        .disclosure-icon {
-          transition: transform 150ms ease-out;
-        }
-        
-        .disclosure-button[aria-expanded="true"] .disclosure-icon {
-          transform: rotate(180deg);
-        }
-      </style>
-      
-      <button
-        type="button"
-        class="disclosure-button"
-        aria-expanded="${this._open}"
-        aria-controls="disclosure-content"
-      >
-        <span class="disclosure-title"><slot name="title"></slot></span>
-        <span class="disclosure-icon">▼</span>
-      </button>
-      
-      <div
-        id="disclosure-content"
-        class="disclosure-content"
-        role="region"
-        aria-labelledby="disclosure-button"
-        ${this._open ? '' : 'hidden'}
-      >
-        <slot></slot>
-      </div>
-    `;
+```mermaid
+flowchart TD
+    A["DisclosureComponent<br/>extends HTMLElement"]
     
-    const button = this.shadowRoot.querySelector('.disclosure-button');
-    button.addEventListener('click', () => this.toggle());
-  }
-  
-  attributeChangedCallback(name, oldValue, newValue) {
-    if (name === 'open' && oldValue !== newValue) {
-      this._open = newValue !== null;
-      this._syncState();
-    }
-  }
-  
-  toggle() {
-    this.open = !this._open;
-    this.dispatchEvent(new CustomEvent('disclosure-toggle', {
-      detail: { open: this._open },
-      bubbles: true,
-      composed: true
-    }));
-  }
-  
-  set open(value) {
-    const isOpen = Boolean(value);
-    if (isOpen) {
-      this.setAttribute('open', '');
-    } else {
-      this.removeAttribute('open');
-    }
-  }
-  
-  get open() {
-    return this._open;
-  }
-  
-  _syncState() {
-    const button = this.shadowRoot.querySelector('.disclosure-button');
-    const content = this.shadowRoot.querySelector('.disclosure-content');
+    B["Static Members"]
+    C["observedAttributes<br/>= ['open']"]
     
-    if (!button || !content) return;
+    D["Constructor"]
+    E["Initialize shadowRoot<br/>mode: open"]
+    F["Set _open = false"]
     
-    button.setAttribute('aria-expanded', String(this._open));
+    G["connectedCallback"]
+    H["Render Template"]
+    I["Attach Styles"]
+    J["Create Button Element<br/>aria-expanded"]
+    K["Create Content Slot<br/>role: region"]
+    L["Attach Click Listener"]
     
-    if (this._open) {
-      content.removeAttribute('hidden');
-    } else {
-      content.setAttribute('hidden', '');
-    }
-  }
-}
-
-customElements.define('ui-disclosure', DisclosureComponent);
+    M["attributeChangedCallback"]
+    N["Monitor 'open' Attribute"]
+    O["Update _open State"]
+    P["Call _syncState"]
+    
+    Q["toggle Method"]
+    R["Toggle _open State"]
+    S["Dispatch 'disclosure-toggle'<br/>Custom Event"]
+    
+    T["open Setter"]
+    U["Set/Remove 'open'<br/>Attribute"]
+    
+    V["open Getter"]
+    W["Return _open Value"]
+    
+    X["_syncState Method"]
+    Y["Update Button<br/>aria-expanded"]
+    Z["Show/Hide Content<br/>via hidden Attribute"]
+    
+    AA["customElements.define<br/>ui-disclosure"]
+    
+    A --> B
+    B --> C
+    
+    A --> D
+    D --> E
+    D --> F
+    
+    A --> G
+    G --> H
+    H --> I
+    H --> J
+    H --> K
+    H --> L
+    
+    A --> M
+    M --> N
+    N --> O
+    O --> P
+    
+    A --> Q
+    Q --> R
+    R --> S
+    
+    A --> T
+    T --> U
+    
+    A --> V
+    V --> W
+    
+    A --> X
+    X --> Y
+    X --> Z
+    
+    AA -.-> A
 ```
 
 This component maintains an internal `_open` boolean representing expansion state. The `open` property setter updates the corresponding HTML attribute, which triggers `attributeChangedCallback`, ensuring attribute and property remain synchronized. The `_syncState` method updates both the visual `hidden` attribute and the `aria-expanded` ARIA attribute atomically, preventing desynchronization between visual and assistive technology state. The component dispatches a custom `disclosure-toggle` event when state changes, enabling parent components to react to expansion state without tight coupling.

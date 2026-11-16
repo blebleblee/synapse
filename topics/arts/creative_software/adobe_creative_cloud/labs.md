@@ -9,19 +9,22 @@ These labs assume working knowledge of basic editing (cuts, timeline navigation,
 - A dedicated NVMe scratch disk, not your boot drive, for Media Cache and Audition peak files.
 - Multi-mic interview or documentary footage with at least dialogue, one SFX layer, and a music bed — or substitute your own project.
 
-```
-Creative Cloud Cross-Application Dynamic Link Pipeline:
-[Premiere Pro NLE Assembly] ──(Dynamic Link)──▶ [Audition 32-bit Float Multitrack Session]
-             │                                                          │
-             │                                            [Spectral Audio Restoration]
-             │                                                          │
-             │◀────────────── (Lossless Audio Mixdown) ─────────────────┘
-             │
-             ├──(Dynamic Link)──▶ [After Effects Motion Graphics, MFR]
-             │                                     │
-             │◀────────────── (RGB + Alpha) ────────┘
-             ▼
-[Adobe Media Encoder: ProRes 422 HQ Master / EBU R128-Compliant Delivery]
+```mermaid
+flowchart TD
+    PPro["Premiere Pro NLE Assembly"]
+    Audition["Audition 32-bit Float Multitrack Session"]
+    SpectralRestore["Spectral Audio Restoration"]
+    AE["After Effects Motion Graphics, MFR"]
+    AME["Adobe Media Encoder: ProRes 422 HQ Master / EBU R128-Compliant Delivery"]
+    
+    PPro -->|"Dynamic Link"| Audition
+    Audition --> SpectralRestore
+    SpectralRestore -->|"Lossless Audio Mixdown"| PPro
+    
+    PPro -->|"Dynamic Link"| AE
+    AE -->|"RGB + Alpha"| PPro
+    
+    PPro --> AME
 ```
 
 **Why Dynamic Link matters operationally**: without it, moving audio to Audition or graphics to After Effects means exporting an intermediate file, editing it, then re-importing — a lossy round trip where you lose sync the moment someone trims the Premiere sequence. Dynamic Link keeps a live project reference: edit the Audition session or AE composition, hit save, and Premiere's timeline updates in place with zero re-import step. This is the habit that separates an amateur workflow from a studio one.
@@ -180,16 +183,21 @@ Primary grading gets you close, but specular highlights (sun glints, lens flares
 
 ### Step 2 — Alpha Channel Master Export
 
-```
-Alpha Channel Master Configuration:
-[Composited Motion Graphic] ──▶ [After Effects Render Queue]
-                                           │
-                             Format: Apple ProRes 4444
-                             Channels: RGB + Alpha
-                             Depth: Millions of Colors+
-                             Color: Straight (Unmatted)
-                                           ▼
-                             [Broadcast Master .mov with Transparency]
+```mermaid
+flowchart TD
+    A["Composited Motion Graphic"] --> B["After Effects Render Queue"]
+
+    B --> C["Broadcast Master .mov with Transparency"]
+
+    subgraph config ["Alpha Channel Master Configuration"]
+        fmt["Format: Apple ProRes 4444"]
+        ch["Channels: RGB + Alpha"]
+        dep["Depth: Millions of Colors+"]
+        col["Color: Straight (Unmatted)"]
+    end
+
+    B --> config
+    config --> C
 ```
 
 1. Select the composition, `Cmd/Ctrl+M` to add to **Render Queue**.

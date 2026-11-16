@@ -18,55 +18,19 @@ The fundamental tension in mutual fund economics lies between investor interests
 
 The operational infrastructure supporting mutual fund operations consists of four primary service layers, each performing specialized functions and extracting fees from fund assets. The investment adviser serves as the fund's brain, making portfolio construction and trading decisions while collecting the management fee. The transfer agent operates as the fund's nervous system, maintaining the shareholder registry, processing transactions, calculating account values, and generating investor statements. The custodian bank functions as the fund's vault, holding securities in segregated accounts, settling trades, collecting dividend and interest income, and providing daily asset valuations to the fund accountant. The fund administrator acts as the operational spine, calculating daily net asset values (NAV), maintaining accounting records, preparing regulatory filings, and coordinating board reporting.
 
-```
-Mutual Fund Operational Architecture
-
-┌─────────────────────────────────────────────────────────────┐
-│                        FUND SPONSOR                          │
-│                    (Investment Adviser)                      │
-│                                                              │
-│  • Portfolio management & trading decisions                 │
-│  • Research, analysis, security selection                   │
-│  • Management fee: 0.25% - 1.50% of assets                 │
-└──────────────────┬───────────────────────────────────────────┘
-                   │
-        ┌──────────┴──────────┐
-        │                     │
-        ▼                     ▼
-┌──────────────────┐   ┌──────────────────┐
-│  TRANSFER AGENT  │   │    CUSTODIAN     │
-│                  │   │      BANK        │
-│ • Shareholder    │   │                  │
-│   registry       │   │ • Securities     │
-│ • Transactions   │   │   safekeeping    │
-│ • Account        │   │ • Trade          │
-│   statements     │   │   settlement     │
-│ • Per-account    │   │ • Corporate      │
-│   fees: $20-40   │   │   actions        │
-│ • 12b-1 fees:    │   │ • Custody fees:  │
-│   0.25%-1.00%    │   │   0.01%-0.05%    │
-└────────┬─────────┘   └────────┬─────────┘
-         │                      │
-         │        ┌─────────────┴─────────────┐
-         │        │   FUND ADMINISTRATOR      │
-         │        │                           │
-         └───────►│  • Daily NAV calculation  │
-                  │  • Fund accounting        │
-                  │  • Regulatory compliance  │
-                  │  • Board reporting        │
-                  │  • Admin fees: 0.05%-0.15%│
-                  └───────────────────────────┘
-                              │
-                              ▼
-                  ┌───────────────────────────┐
-                  │    DISTRIBUTION LAYER     │
-                  │                           │
-                  │  • Broker-dealers         │
-                  │  • RIAs & wirehouses      │
-                  │  • Fund supermarkets      │
-                  │  • Front/back-end loads   │
-                  │  • 12b-1 distribution fees│
-                  └───────────────────────────┘
+```mermaid
+flowchart TD
+    Sponsor["FUND SPONSOR<br/>(Investment Adviser)<br/><br/>• Portfolio management & trading decisions<br/>• Research, analysis, security selection<br/>• Management fee: 0.25% - 1.50% of assets"]
+    
+    Sponsor --> TransferAgent["TRANSFER AGENT<br/><br/>• Shareholder registry<br/>• Transactions<br/>• Account statements<br/>• Per-account fees: $20-40<br/>• 12b-1 fees: 0.25%-1.00%"]
+    
+    Sponsor --> Custodian["CUSTODIAN BANK<br/><br/>• Securities safekeeping<br/>• Trade settlement<br/>• Corporate actions<br/>• Custody fees: 0.01%-0.05%"]
+    
+    TransferAgent --> Admin["FUND ADMINISTRATOR<br/><br/>• Daily NAV calculation<br/>• Fund accounting<br/>• Regulatory compliance<br/>• Board reporting<br/>• Admin fees: 0.05%-0.15%"]
+    
+    Custodian --> Admin
+    
+    Admin --> Distribution["DISTRIBUTION LAYER<br/><br/>• Broker-dealers<br/>• RIAs & wirehouses<br/>• Fund supermarkets<br/>• Front/back-end loads<br/>• 12b-1 distribution fees"]
 ```
 
 Transfer agent operations form the most investor-facing component of the operational infrastructure. When an investor purchases mutual fund shares, the transfer agent records the transaction in the shareholder registry, assigning a unique account number and maintaining records of share ownership, transaction history, cost basis for tax reporting, and dividend reinvestment elections. Unlike stock ownership recorded through the Depository Trust Company (DTC) in street name, mutual fund shares are typically registered directly in investor names, creating individualized account relationships. This direct registration model generates operational complexity: a large mutual fund may maintain hundreds of thousands or millions of individual shareholder accounts, each requiring periodic statement generation, tax form preparation (1099-DIV for dividends, 1099-B for redemptions), and customer service support.

@@ -39,21 +39,30 @@ For large spans, the skeleton benefits from **cross-bracing with Technic beams a
 
 The infill and transition zone is where most of the geometric problem-solving happens. The transition from a vertical Technic skeleton to a sideways-studded SNOT surface requires a bracket or hinge element to rotate the stud orientation, and then the 5:2 plate-to-stud rule must close the geometry. The following diagram shows the stacking logic for a common sideways panel connection:
 
-```
-Side view (vertical axis = build height, horizontal = stud depth)
-
-Standard brick course (9.6 mm tall)
-│
-├── 1× plate (3.2 mm)       ─┐
-├── 1× plate (3.2 mm)        │  5 plates = 16 mm = 2 studs
-├── 1× plate (3.2 mm)        │
-├── 1× plate (3.2 mm)        │
-├── 1× plate (3.2 mm)       ─┘
-│
-Bracket here turns stud face 90°.
-Outward stud now aligns exactly with
-a 2-stud (16 mm) horizontal interval.
-Geometry closes. Zero internal stress.
+```mermaid
+flowchart TD
+    A["Standard Brick Course<br/>Height: 9.6 mm"]
+    
+    subgraph plates ["5 Plates Stack = 16 mm = 2 Studs"]
+        P1["Plate 1<br/>3.2 mm"]
+        P2["Plate 2<br/>3.2 mm"]
+        P3["Plate 3<br/>3.2 mm"]
+        P4["Plate 4<br/>3.2 mm"]
+        P5["Plate 5<br/>3.2 mm"]
+    end
+    
+    B["Bracket Turns Stud Face 90°"]
+    C["Outward Stud Aligns with<br/>2-Stud (16 mm) Horizontal Interval"]
+    D["Geometry Closes<br/>Zero Internal Stress"]
+    
+    A --> P1
+    P1 --> P2
+    P2 --> P3
+    P3 --> P4
+    P4 --> P5
+    P5 --> B
+    B --> C
+    C --> D
 ```
 
 When this closure fails—when a designer attempts a SNOT panel connection that is off by one plate—the result is an internal stress of 3.2 mm distributed across whichever connections are forced to bridge the gap. In thin cosmetic cladding this produces a visible bow; in a structurally loaded connection it concentrates shear stress at the weakest clutch pair in the stack. The fix is always to audit the plate stack from the nearest rigid datum (usually the baseboard or a full-brick course) and correct the count before the shell is attached.

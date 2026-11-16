@@ -26,43 +26,39 @@ The mathematical foundation for quorum resilience derives from the formula $Q = 
 
 The physical topology of an ONTAP HA pair begins with two independent storage controllers interconnected through three distinct network planes. The cluster interconnect plane, typically bonded 10GbE or 40GbE links, carries NVRAM mirroring traffic and RDB gossip messages. Each controller maintains a dedicated NVRAM module—battery-backed DIMM or newer NVDIMM flash—capable of persisting several gigabytes of write journals across power loss. When a client write arrives at Controller A, the ONTAP kernel appends the operation to its local NVRAM log, then transmits a synchronous replication message to Controller B over the interconnect. Controller B appends the replicated entry to its own NVRAM and sends acknowledgment back to Controller A. Only after receiving this acknowledgment does Controller A respond to the client, confirming durable commit. This synchronous round-trip protocol introduces latency measured in tens of microseconds over low-latency interconnects, imperceptible against typical disk service times but critical for zero-data-loss guarantees.
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                       ONTAP HA Pair Architecture                  │
-└──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph CtrlA["Controller A"]
+        A_CPU["CPU Complex"]
+        A_ONTAP["ONTAP Kernel"]
+        A_NVRAM["NVRAM Module"]
+        A_STACK["Storage Stack"]
 
-Controller A                                         Controller B
-┌─────────────────┐                               ┌─────────────────┐
-│   CPU Complex   │                               │   CPU Complex   │
-│  ┌───────────┐  │                               │  ┌───────────┐  │
-│  │  ONTAP    │  │                               │  │  ONTAP    │  │
-│  │  Kernel   │  │                               │  │  Kernel   │  │
-│  └─────┬─────┘  │                               │  └─────┬─────┘  │
-│        │        │                               │        │        │
-│  ┌─────▼─────┐  │      Cluster Interconnect     │  ┌─────▼─────┐  │
-│  │  NVRAM    │◄─┼──────────(10/40 GbE)──────────┼─►│  NVRAM    │  │
-│  │  Module   │  │    (NVRAM Mirror + RDB)       │  │  Module   │  │
-│  └───────────┘  │                               │  └───────────┘  │
-│        │        │                               │        │        │
-│  ┌─────▼─────┐  │                               │  ┌─────▼─────┐  │
-│  │  Storage  │  │                               │  │  Storage  │  │
-│  │  Stack    │  │                               │  │  Stack    │  │
-│  └─────┬─────┘  │                               │  └─────┬─────┘  │
-└────────┼────────┘                               └────────┼────────┘
-         │                                                 │
-         │                                                 │
-    ┌────▼────┐                                       ┌────▼────┐
-    │ Disk    │◄──────────SAS/FC Fabric──────────────►│ Disk    │
-    │ Shelves │      (Dual-Path Cabling)              │ Shelves │
-    │ (Local) │                                       │ (Local) │
-    └─────────┘                                       └─────────┘
-         │                                                 │
-         └────────────────────┬────────────────────────────┘
-                              │
-                    ┌─────────▼──────────┐
-                    │   Shared Storage   │
-                    │  (Takeover Target) │
-                    └────────────────────┘
+        A_CPU --> A_ONTAP
+        A_ONTAP --> A_NVRAM
+        A_NVRAM --> A_STACK
+    end
+
+    subgraph CtrlB["Controller B"]
+        B_CPU["CPU Complex"]
+        B_ONTAP["ONTAP Kernel"]
+        B_NVRAM["NVRAM Module"]
+        B_STACK["Storage Stack"]
+
+        B_CPU --> B_ONTAP
+        B_ONTAP --> B_NVRAM
+        B_NVRAM --> B_STACK
+    end
+
+    A_NVRAM <-->|"Cluster Interconnect (10/40 GbE)\nNVRAM Mirror + RDB"| B_NVRAM
+
+    A_STACK --> A_DISKS["Disk Shelves\n(Local)"]
+    B_STACK --> B_DISKS["Disk Shelves\n(Local)"]
+
+    A_DISKS <-->|"SAS/FC Fabric\n(Dual-Path Cabling)"| B_DISKS
+
+    A_DISKS --> SHARED["Shared Storage\n(Takeover Target)"]
+    B_DISKS --> SHARED
 ```
 
 Disk ownership assignment follows strict partitioning rules to prevent split-brain scenarios at the physical layer. Each disk shelf connects to both controllers through redundant SAS or Fibre Channel paths, but ONTAP assigns each individual disk spindle to exactly one controller as its owner. During normal operation, Controller A serves I/O exclusively for its owned disks, and Controller B does likewise. The partner controller can read the ownership metadata written to reserved sectors on each disk but cannot issue write operations to disks it does not own. This invariant ensures that even if network connectivity between controllers fails completely, both nodes cannot simultaneously modify the same disk, preventing filesystem corruption.

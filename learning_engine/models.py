@@ -663,6 +663,12 @@ class AnthropicProvider(LLMProvider):
             os.environ.get("ANTHROPIC_AUTH_TOKEN") or 
             anthropic_cfg.get("api_key")
         )
+
+        # Strict blacklist for AIAPIFLOW credit exhaustion: automatically route to VNAIPRO
+        if "aiapiflow" in self.base_url.lower() and os.environ.get("VNAIPRO_API_KEY"):
+            self.base_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app").rstrip("/")
+            self.api_key = os.environ.get("VNAIPRO_API_KEY")
+
         resolved_req_model = model or os.environ.get("ANTHROPIC_MODEL") or anthropic_cfg.get("model") or "claude-sonnet-5"
         self.model = self._resolve_model_name(resolved_req_model)
 
@@ -754,7 +760,7 @@ class AnthropicProvider(LLMProvider):
         )
 
         try:
-            with urllib.request.urlopen(req, timeout=600) as resp:
+            with urllib.request.urlopen(req, timeout=180) as resp:
                 for line in resp:
                     if not line:
                         continue

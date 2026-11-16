@@ -168,40 +168,46 @@ which is zero when $\boldsymbol{\Sigma}(\boldsymbol{\theta}) = \mathbf{S}$ exact
 
 The practitioner must internalize the mechanical architecture through which these methods flow: from raw data matrix to inference. The following diagram captures the main computation pipeline.
 
-```
-┌────────────────────────────────────────────────────────────────────┐
-│                     Raw Data Matrix  X (n×p)                       │
-└───────────────────────────────┬────────────────────────────────────┘
-                                │
-                    Center: X_c = X - 1μ̂ᵀ
-                                │
-            ┌───────────────────┼──────────────────────┐
-            │                   │                      │
-     Scatter/SVD           Covariance S          Group Labels
-     X_c = UDVᵀ        S = Xcᵀ Xc / (n-1)        (if known)
-            │                   │                      │
-     ┌──────┴──────┐     ┌──────┴──────┐     ┌────────┴───────┐
-     │     PCA     │     │   Factor    │     │  MANOVA / LDA  │
-     │  scores=UD  │     │  Analysis   │     │  B, W matrices │
-     │ loadings=V  │     │  Λ, Ψ estim │     │  W⁻¹B eigens   │
-     └──────┬──────┘     └──────┬──────┘     └────────┬───────┘
-            │                   │                      │
-     Dimensionality     Latent Structure         Discriminant
-     Reduction          Rotation (varimax)       Functions / Groups
-            │                   │                      │
-            └───────────────────┴──────────────────────┘
-                                │
-                        Reduced Representation
-                        (scores, factors, discriminants)
-                                │
-                    ┌───────────┴────────────┐
-                    │                        │
-             Clustering              Canonical Correlation
-             (k-means, GMM,          (CCA: Σ_XX⁻¹ Σ_XY Σ_YY⁻¹ Σ_YX)
-              hierarchical)
-                    │                        │
-             Cluster Labels          Canonical Variates
-                                     and Correlations ρ₁,...,ρₛ
+```mermaid
+flowchart TD
+    RAW["Raw Data Matrix X (n×p)"]
+    CENTER["Center: X_c = X − 1μ̂ᵀ"]
+
+    RAW --> CENTER
+
+    CENTER --> SVD["Scatter / SVD\nX_c = UDVᵀ"]
+    CENTER --> COV["Covariance S\nS = Xcᵀ Xc / (n−1)"]
+    CENTER --> GRP["Group Labels\n(if known)"]
+
+    subgraph pca_block ["PCA"]
+        PCA["PCA\nscores = UD\nloadings = V"]
+    end
+
+    subgraph fa_block ["Factor Analysis"]
+        FA["Factor Analysis\nΛ, Ψ estimation"]
+    end
+
+    subgraph lda_block ["MANOVA / LDA"]
+        LDA["MANOVA / LDA\nB, W matrices\nW⁻¹B eigenvectors"]
+    end
+
+    SVD --> PCA
+    COV --> FA
+    GRP --> LDA
+
+    PCA --> DR["Dimensionality\nReduction"]
+    FA  --> LS["Latent Structure\nRotation (varimax)"]
+    LDA --> DF["Discriminant\nFunctions / Groups"]
+
+    DR --> REDUCED["Reduced Representation\n(scores, factors, discriminants)"]
+    LS --> REDUCED
+    DF --> REDUCED
+
+    REDUCED --> CLUST["Clustering\n(k-means, GMM, hierarchical)"]
+    REDUCED --> CCA["Canonical Correlation\nCCA: Σ_XX⁻¹ Σ_XY Σ_YY⁻¹ Σ_YX"]
+
+    CLUST --> CLABELS["Cluster Labels"]
+    CCA   --> CVARIATES["Canonical Variates\nand Correlations ρ₁, …, ρₛ"]
 ```
 
 ### The Covariance Matrix as the Load-Bearing Structure

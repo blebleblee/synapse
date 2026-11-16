@@ -53,62 +53,71 @@ contract VulnerableVault {
 
 The attacker deploys a contract whose `receive` function calls back into `VulnerableVault.withdraw()` before the balance zeroing at step ② has executed. The call graph during the attack looks like this:
 
-```
-Attacker EOA
-  └─► AttackerContract.attack()
-        └─► VulnerableVault.withdraw()       [Frame depth 1]
-              balances[attacker] = 1 ether   (read, still 1 ether)
-              └─► AttackerContract.receive() [Frame depth 2]
-                    └─► VulnerableVault.withdraw()   [Frame depth 3]
-                          balances[attacker] = 1 ether (STILL 1 ether)
-                          └─► AttackerContract.receive() [Frame depth 4]
-                                ... recurse until gas limit ...
-                          balances[attacker] = 0  ← too late
-                    return
-              balances[attacker] = 0  ← too late, already drained
-        return
+```mermaid
+flowchart TD
+    A["Attacker EOA"]
+    B["AttackerContract.attack()"]
+    C["VulnerableVault.withdraw()<br/>[Frame depth 1]<br/>balances[attacker] = 1 ether (read)"]
+    D["AttackerContract.receive()<br/>[Frame depth 2]"]
+    E["VulnerableVault.withdraw()<br/>[Frame depth 3]<br/>balances[attacker] = 1 ether (STILL)"]
+    F["AttackerContract.receive()<br/>[Frame depth 4]<br/>... recurse until gas limit ..."]
+    G["balances[attacker] = 0<br/>← too late"]
+    H["return"]
+    I["balances[attacker] = 0<br/>← too late, already drained"]
+    J["return"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
 ```
 
 Each recursive frame passes the `require(amount > 0)` check because the balance has not been zeroed in any prior frame. The attacker drains the entire vault balance, bounded only by the EVM's call stack depth limit of 1024 frames and the gas cost of each recursive call.
 
 The correct vault applies CEI strictly:
 
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
-
-/// @title SecureVault - Reentrancy-safe withdrawal using CEI pattern.
-contract SecureVault {
-    mapping(address => uint256) public balances;
-
-    event Deposited(address indexed user, uint256 amount);
-    event Withdrawn(address indexed user, uint256 amount);
-
-    function deposit() external payable {
-        balances[msg.sender] += msg.value;
-        emit Deposited(msg.sender, msg.value);
-    }
-
-    function withdraw() external {
-        // ── CHECKS ──────────────────────────────────────────────────
-        uint256 amount = balances[msg.sender];
-        require(amount > 0, "SecureVault: zero balance");
-
-        // ── EFFECTS ─────────────────────────────────────────────────
-        // State is mutated before any external call.
-        // A reentrant call now sees balances[msg.sender] == 0
-        // and fails the require above, breaking the attack loop.
-        balances[msg.sender] = 0;
-
-        // ── INTERACTIONS ────────────────────────────────────────────
-        (bool success, ) = msg.sender.call{value: amount}("");
-        require(success, "SecureVault: ETH transfer failed");
-
-        emit Withdrawn(msg.sender, amount);
-    }
-
-    receive() external payable {}
-}
+```mermaid
+flowchart TD
+    A["SecureVault Contract"]
+    
+    A --> B["Public State"]
+    B --> B1["balances: mapping<br/>address → uint256"]
+    
+    A --> C["Events"]
+    C --> C1["Deposited<br/>indexed user, amount"]
+    C --> C2["Withdrawn<br/>indexed user, amount"]
+    
+    A --> D["deposit Function"]
+    D --> D1["Update Balance"]
+    D1 --> D2["balances[msg.sender] += msg.value"]
+    D --> D3["Emit Event"]
+    D3 --> D4["Deposited event"]
+    
+    A --> E["withdraw Function<br/>CEI Pattern"]
+    E --> E1["CHECKS Phase"]
+    E1 --> E2["Get Amount"]
+    E2 --> E3["balances[msg.sender]"]
+    E1 --> E4["Require amount > 0"]
+    
+    E --> E5["EFFECTS Phase"]
+    E5 --> E6["Mutate State First"]
+    E6 --> E7["balances[msg.sender] = 0"]
+    E7 --> E8["Prevents Reentrancy"]
+    
+    E --> E9["INTERACTIONS Phase"]
+    E9 --> E10["External Call"]
+    E10 --> E11["msg.sender.call{value}"]
+    E9 --> E12["Require Transfer Success"]
+    E12 --> E13["Emit Event"]
+    E13 --> E14["Withdrawn event"]
+    
+    A --> F["receive Function"]
+    F --> F1["Accept ETH Deposits"]
 ```
 
 CEI alone is a strong defense, but defense in depth is the correct posture for high-value contracts. The `ReentrancyGuard` from OpenZeppelin encodes the invariant as an explicit mutex in contract storage, ensuring that even a cross-function reentrancy attack—where the attacker re-enters a different function that shares the same storage—cannot succeed.
@@ -466,58 +475,51 @@ contract VaultSymbolicTest is Test, SymTest {
 
 Echidna operates differently: it is a coverage-guided fuzzer that generates sequences of function calls against a contract and checks that user-defined invariant functions—prefixed with `echidna_`—never return false. Where Halmos reasons exhaustively over all inputs through SMT solving, Echidna uses corpus mutation and coverage feedback to find deep call sequences that classical random testing would miss. For stateful protocols with many interacting functions, Echidna's ability to generate multi-transaction attack sequences makes it complementary to symbolic execution.
 
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
-
-import "../src/SecureVault.sol";
-
-/// @title VaultEchidnaTest - Echidna invariant harness for SecureVault.
-/// @dev Run with: echidna test/VaultEchidnaTest.sol --contract VaultEchidnaTest --config echidna.yaml
-contract VaultEchidnaTest {
-    SecureVault vault;
-
-    // Track total deposited through this harness to verify solvency.
-    uint256 public totalDeposited;
-
-    constructor() payable {
-        vault = new SecureVault();
-    }
-
-    // Echidna calls these functions with random arguments across random sequences.
-
-    function deposit(uint256 amount) public payable {
-        amount = amount % (address(this).balance + 1);
-        if (amount == 0) return;
-        vault.deposit{value: amount}();
-        totalDeposited += amount;
-    }
-
-    function withdraw() public {
-        uint256 before = address(this).balance;
-        uint256 claimed = vault.balances(address(this));
-        vault.withdraw();
-        uint256 gained = address(this).balance - before;
-        // Track net flows for invariant accounting.
-        if (gained <= totalDeposited) {
-            totalDeposited -= gained;
-        }
-    }
-
-    // ── Invariants ───────────────────────────────────────────────────────────
-
-    /// @notice The vault's ETH balance must always be >= the sum of claimed balances.
-    function echidna_vault_solvent() public view returns (bool) {
-        return address(vault).balance >= vault.balances(address(this));
-    }
-
-    /// @notice The vault must never hold more ETH than was deposited into it.
-    function echidna_no_inflation() public view returns (bool) {
-        return address(vault).balance <= totalDeposited;
-    }
-
-    receive() external payable {}
-}
+```mermaid
+flowchart TD
+    A["VaultEchidnaTest Contract"]
+    B["SecureVault Instance"]
+    C["Test Harness State"]
+    D["Random Input Generator"]
+    
+    E["deposit Function"]
+    F["withdraw Function"]
+    G["Invariant Checks"]
+    
+    H["echidna_vault_solvent"]
+    I["echidna_no_inflation"]
+    
+    J["Vault ETH Balance"]
+    K["User Claimed Balance"]
+    L["Total Deposited Tracker"]
+    
+    A --> B
+    A --> C
+    D --> E
+    D --> F
+    
+    E --> J
+    E --> L
+    F --> J
+    F --> L
+    
+    G --> H
+    G --> I
+    
+    H --> J
+    H --> K
+    I --> J
+    I --> L
+    
+    C --> L
+    B --> J
+    B --> K
+    
+    style A fill:#e1f5ff
+    style B fill:#fff3e0
+    style G fill:#f3e5f5
+    style H fill:#c8e6c9
+    style I fill:#c8e6c9
 ```
 
 The `echidna.yaml` configuration controls the fuzzing campaign's parameters, including the number of test sequences, the sequence length, and the initial account balances. For a production audit, sequence lengths of 200 or more call sequences give Echidna sufficient depth to discover multi-step attack paths.

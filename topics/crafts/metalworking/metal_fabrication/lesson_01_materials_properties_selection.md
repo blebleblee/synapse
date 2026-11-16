@@ -28,32 +28,27 @@ The Vickers hardness test utilizes a diamond pyramid indenter that produces a sq
 
 Toughness integrates strength and ductility into a single metric quantifying energy absorption before fracture, visualized as the area under the stress-strain curve. The Charpy V-notch impact test measures toughness by fracturing a notched specimen with a swinging pendulum, recording absorbed energy in joules. Structural steels for cold-climate applications must demonstrate minimum Charpy values at specified temperatures to ensure adequate fracture resistance during winter operation. The fracture toughness parameter K_IC quantifies resistance to crack propagation in the presence of pre-existing flaws, critical for pressure vessels, aircraft structures, and any application where catastrophic failure must be avoided. High-strength materials do not automatically confer high toughness; quenched and untempered martensitic steels achieve exceptional hardness but exhibit brittleness and low impact resistance until tempered at elevated temperatures to precipitate carbides and relieve internal stresses.
 
-```
-Stress-Strain Curve Regions (Tensile Test):
-
-Stress (σ)
-    │
-    │                    Necking
-    │                      ╱╲
-UTS─┤─────────────────────●  ╲
-    │                    ╱    ╲  Fracture
-    │                   ╱      ●
-    │                  ╱
- σy─┤─────────────────●  Plastic Deformation
-    │                ╱│
-    │               ╱ │
-    │              ╱  │ Yield Point
-    │     Elastic ╱   │
-    │    Region  ╱    │
-    │           ╱     │
-    │          ╱      │
-    └─────────┴───────┴──────────────► Strain (ε)
-              εy      εu        εf
-              
-    Elastic Modulus E = σ/ε (slope of elastic region)
-    Yield Strength σy (0.2% offset method)
-    Ultimate Tensile Strength (UTS)
-    Elongation = (εf / original length) × 100%
+```mermaid
+flowchart TD
+    Start["Origin (0,0)"] --> Elastic["Elastic Region<br/>Linear Behavior<br/>E = σ/ε"]
+    Elastic --> YieldPoint["Yield Point (σy, εy)<br/>0.2% Offset Method"]
+    YieldPoint --> Plastic["Plastic Deformation<br/>Permanent Strain"]
+    Plastic --> UTS["Ultimate Tensile Strength<br/>(UTS, εu)<br/>Maximum Stress"]
+    UTS --> Necking["Necking Region<br/>Localized Deformation"]
+    Necking --> Fracture["Fracture Point (εf)<br/>Material Failure"]
+    
+    subgraph Legend["Key Parameters"]
+        L1["E = Elastic Modulus (slope)"]
+        L2["σy = Yield Strength"]
+        L3["UTS = Ultimate Tensile Strength"]
+        L4["εf = Fracture Strain"]
+        L5["Elongation = (εf / L₀) × 100%"]
+    end
+    
+    style YieldPoint fill:#fff4e6
+    style UTS fill:#ffe6e6
+    style Fracture fill:#ffcccc
+    style Elastic fill:#e6f3ff
 ```
 
 Thermal properties govern material behavior during welding, heat treatment, and service at elevated temperatures. Thermal conductivity determines heat distribution during welding and machining, with copper (401 W/m·K) conducting heat approximately 25 times faster than 304 stainless steel (16 W/m·K). This disparity explains why stainless steel requires lower welding travel speeds and reduced heat input to avoid burn-through compared to steel, while copper welding demands preheating and high amperage to overcome rapid heat dissipation. The coefficient of thermal expansion quantifies dimensional change per degree temperature change, critical for assemblies joining dissimilar metals or components operating across wide temperature ranges. Aluminum expands at approximately 23 μm/m·°C, nearly double steel's 12 μm/m·°C, creating thermal stress concentrations in bimetallic joints unless accommodation through slip joints, expansion loops, or flexible connections is provided.
@@ -62,37 +57,74 @@ Specific heat capacity determines the energy required to raise material temperat
 
 The iron-carbon phase diagram maps the stable phases and transformation temperatures as functions of carbon content, serving as the foundational reference for steel heat treatment. Pure iron transforms from BCC ferrite (α-iron) to FCC austenite (γ-iron) at 912°C, then reverts to BCC δ-ferrite at 1394°C before melting at 1538°C. Carbon dissolves interstitially to maximum concentrations of 0.022% in ferrite, 2.11% in austenite, and 6.67% in cementite (Fe₃C), with the eutectoid composition at 0.76% carbon transforming directly from austenite to pearlite at 727°C. Hypoeutectoid steels containing less than 0.76% carbon consist of proeutectoid ferrite plus pearlite at room temperature, while hypereutectoid steels above 0.76% carbon contain proeutectoid cementite networks plus pearlite.
 
-```
-Simplified Iron-Carbon Phase Diagram (up to 2% C):
-
-Temp (°C)
-1600─┤
-     │        Liquid (L)
-1538─┤──●─────────────────
-     │   ╲
-1400─┤    ╲         δ + L
-     │     ╲       ╱
-1200─┤      ╲  L  ╱
-     │       ╲   ╱
-1148─┤────────●─────────── Peritectic
-     │       ╱ ╲
-1000─┤      ╱   ╲  Austenite (γ-Fe + C)
-     │     ╱  L+γ ╲
- 912─┤────●         ╲
-     │   ╱ α+γ       ╲
- 800─┤  ╱             ╲
-     │ ╱               ╲
- 727─┤●─────────────────●─── Eutectoid (0.76% C)
-     │ ╲  Ferrite+      ╱ Cementite
- 600─┤  ╲  Pearlite    ╱  + Pearlite
-     │   ╲            ╱
-     │    ╲          ╱
-   0─┴─────┴────────┴──────────► Carbon Content (wt%)
-          0.022   0.76    2.11
-          
-    α-Fe: Body-Centered Cubic (BCC) ferrite
-    γ-Fe: Face-Centered Cubic (FCC) austenite
-    Fe₃C: Cementite (iron carbide)
+```mermaid
+flowchart TD
+    Start["Iron-Carbon Phase Diagram<br/>(Simplified, up to 2% C)"]
+    
+    subgraph Legend ["Crystal Structures & Phases"]
+        L1["α-Fe: Body-Centered Cubic (BCC) ferrite"]
+        L2["γ-Fe: Face-Centered Cubic (FCC) austenite"]
+        L3["Fe₃C: Cementite (iron carbide)"]
+    end
+    
+    subgraph TempAxis ["Temperature Scale (°C)"]
+        T1600["1600°C"]
+        T1538["1538°C"]
+        T1400["1400°C"]
+        T1200["1200°C"]
+        T1148["1148°C - Peritectic Point"]
+        T1000["1000°C"]
+        T912["912°C"]
+        T800["800°C"]
+        T727["727°C - Eutectoid Point (0.76% C)"]
+        T600["600°C"]
+    end
+    
+    subgraph Phases ["Phase Regions"]
+        Liquid["Liquid (L)<br/>1538-1600°C"]
+        DeltaLiquid["δ + L<br/>Mixed Phase"]
+        LiquidGamma["L + γ<br/>Liquid + Austenite"]
+        Austenite["Austenite (γ-Fe + C)<br/>FCC Structure<br/>912-1148°C"]
+        AlphaGamma["α + γ<br/>Ferrite + Austenite<br/>Below 912°C"]
+        FerritePearlite["Ferrite + Pearlite<br/>(< 0.76% C)<br/>Below 727°C"]
+        CementitePearlite["Cementite + Pearlite<br/>(> 0.76% C)<br/>Below 727°C"]
+    end
+    
+    subgraph CarbonAxis ["Carbon Content (wt%)"]
+        C0["0%"]
+        C0022["0.022%<br/>(Max C in α-Fe)"]
+        C076["0.76%<br/>(Eutectoid)"]
+        C211["2.11%<br/>(Max C in γ-Fe)"]
+    end
+    
+    Start --> TempAxis
+    Start --> CarbonAxis
+    
+    T1600 --> Liquid
+    T1538 --> Liquid
+    Liquid --> DeltaLiquid
+    T1400 --> DeltaLiquid
+    T1200 --> LiquidGamma
+    T1148 --> LiquidGamma
+    LiquidGamma --> Austenite
+    T1000 --> Austenite
+    T912 --> AlphaGamma
+    Austenite --> AlphaGamma
+    T800 --> AlphaGamma
+    T727 --> FerritePearlite
+    T727 --> CementitePearlite
+    AlphaGamma --> FerritePearlite
+    AlphaGamma --> CementitePearlite
+    T600 --> FerritePearlite
+    T600 --> CementitePearlite
+    
+    C0 -.-> FerritePearlite
+    C0022 -.-> FerritePearlite
+    C076 -.-> FerritePearlite
+    C076 -.-> CementitePearlite
+    C211 -.-> CementitePearlite
+    
+    Legend -.-> Phases
 ```
 
 Heat treatment exploits phase transformations and diffusion kinetics to manipulate microstructure and properties. Annealing heats steel into the austenite region, holds for homogenization, then furnace-cools slowly to produce coarse pearlite with maximum ductility and machinability. Normalizing air-cools from austenite to refine grain size and improve uniformity compared to as-rolled or as-cast conditions. Quenching rapidly cools austenite faster than the critical cooling rate to suppress diffusion-controlled pearlite formation, instead producing diffusionless martensitic transformation where carbon atoms become trapped in a supersaturated body-centered tetragonal lattice that generates high hardness through severe lattice distortion.

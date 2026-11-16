@@ -22,33 +22,19 @@ The authorization pipeline in Kubernetes is a linear chain evaluated on every AP
 
 RBAC evaluation itself is a multi-stage resolution. The authorizer takes the request's (verb, group, resource, subresource, namespace) tuple and computes the set of all bindings that apply to the requesting identity. A binding applies if the identity matches the binding's `subjects` array, which can match by user name, service account name, or group membership. For service accounts, the match is on the fully-qualified name `system:serviceaccount:<namespace>:<name>`. For groups, the match is on the group string, which includes the implicit `system:serviceaccounts:<namespace>` and `system:authenticated` groups.
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    API Request: (verb, resource, namespace)              │
-│                          Authenticated Identity: SA:joe-prod              │
-└──────────────────────────────┬──────────────────────────────────────────┘
-                               │
-                    ┌──────────▼──────────┐
-                    │  Authorization Chain │
-                    │  [Node] → [RBAC]     │
-                    └──────────┬──────────┘
-                               │
-                    ┌──────────▼──────────────────────────┐
-                    │  RBAC Binding Resolution            │
-                    │                                     │
-                    │  1. Enumerate all RoleBindings in   │
-                    │     target namespace                │
-                    │  2. Enumerate all ClusterRoleBindings│
-                    │     cluster-wide                    │
-                    │  3. Filter: subjects match SA?       │
-                    │  4. Resolve referenced Roles/CRs     │
-                    │  5. Union all policy rules           │
-                    │  6. Match (verb, resource, subres)?  │
-                    └──────────┬──────────────────────────┘
-                               │
-                    ┌──────────▼──────────┐
-                    │  Allow / Deny        │
-                    └─────────────────────┘
+```mermaid
+flowchart TD
+    API_Req["API Request: (verb, resource, namespace)<br/>Authenticated Identity: SA:joe-prod"]
+    
+    Auth_Chain["Authorization Chain<br/>[Node] → [RBAC]"]
+    
+    RBAC_Resolution["RBAC Binding Resolution<br/><br/>1. Enumerate all RoleBindings in target namespace<br/>2. Enumerate all ClusterRoleBindings cluster-wide<br/>3. Filter: subjects match SA?<br/>4. Resolve referenced Roles/CRs<br/>5. Union all policy rules<br/>6. Match (verb, resource, subres)?"]
+    
+    Decision["Allow / Deny"]
+
+    API_Req --> Auth_Chain
+    Auth_Chain --> RBAC_Resolution
+    RBAC_Resolution --> Decision
 ```
 
 For each matching binding, the authorizer resolves the referenced Role or ClusterRole and iterates its `policyRules` array. Each rule is a match if the request verb appears in `verbs`, the resource appears in `resources`, the API group appears in `apiGroups`, and (for namespaced resources) the namespace matches. Wildcards (`"*"`) match any value. The `resources` field also supports subresource syntax like `pods/log` or `pods/exec`, which are distinct resources for authorization purposes. A rule granting `resources: ["pods"]` does not grant access to `pods/exec`. This distinction is the most common source of accidental over-privilege, because operators assume "pod access" includes exec when it does not, then add `pods/exec` broadly to fix the breakage.

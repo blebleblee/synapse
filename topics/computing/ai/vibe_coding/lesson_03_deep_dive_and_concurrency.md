@@ -191,12 +191,12 @@ graph TB
     BT2 -->|"logical block 0"| B1
     BT2 -->|"logical block 1"| B9
 
-    style B3 fill:#f9f,stroke:#333
-    style B7 fill:#f9f,stroke:#333
-    style B15 fill:#bbf,stroke:#333
+    style B3 fill:#f9f,stroke:#333,color:#0f172a
+    style B7 fill:#f9f,stroke:#333,color:#0f172a
+    style B15 fill:#bbf,stroke:#333,color:#0f172a
 ```
 
-The attention kernel in PagedAttention must scatter-gather across non-contiguous physical memory, which adds modest indexing overhead compared to standard contiguous attention. The vLLM team's benchmarks show this overhead is negligible (<5%) compared to the throughput gains from higher batch sizes enabled by better memory utilization—on typical production workloads, PagedAttention achieves **2–4× higher throughput** than the contiguous baseline at equivalent latency targets.
+The attention kernel in PagedAttention must scatter-gather across non-contiguous physical memory, which adds modest indexing overhead compared to standard contiguous attention. The vLLM team's benchmarks show this overhead is negligible (< 5%) compared to the throughput gains from higher batch sizes enabled by better memory utilization—on typical production workloads, PagedAttention achieves **2–4× higher throughput** than the contiguous baseline at equivalent latency targets.
 
 ### 1.4 FlashAttention: I/O-Aware Tiling for O(n) Memory
 
@@ -214,7 +214,7 @@ For a 4096-token sequence with 32 heads (each of dimension 128), the score matri
 
 The I/O complexity of standard attention is O(n²d) HBM accesses (reading Q, K, V multiple times plus writing/reading S and P). FlashAttention reduces this to O(n²d/M) where *M* is the SRAM capacity, because each element of Q, K, V is loaded from HBM exactly once and intermediate S, P values never leave SRAM. For H100 with 228 KB SRAM per SM and typical d_head=128, this gives a 5–8× reduction in HBM traffic for 4096-token sequences.
 
-**FlashAttention-2** (Dao, 2023) adds: (1) reduced non-matmul FLOPs by restructuring the online softmax updates; (2) work partitioning across warps within a thread block to reduce synchronization; (3) sequence-length parallelism along the sequence dimension for multi-query scenarios. It achieves **50–73% of theoretical peak A100 FLOP utilization** versus 25–35% for FlashAttention-1 and <10% for PyTorch's naive attention.
+**FlashAttention-2** (Dao, 2023) adds: (1) reduced non-matmul FLOPs by restructuring the online softmax updates; (2) work partitioning across warps within a thread block to reduce synchronization; (3) sequence-length parallelism along the sequence dimension for multi-query scenarios. It achieves **50–73% of theoretical peak A100 FLOP utilization** versus 25–35% for FlashAttention-1 and < 10% for PyTorch's naive attention.
 
 **FlashAttention-3** (Shah et al., 2024) further exploits H100-specific features: asynchronous memory copies using the TMA (Tensor Memory Accelerator) unit, overlapping GEMM computation with softmax rescaling via producer-consumer warp specialization, and FP8 low-precision support. It reaches ~75% of H100 FP16 peak throughput on long sequences.
 
@@ -362,20 +362,20 @@ Post-training quantization (PTQ) methods avoid re-training the model while pushi
 
 **AWQ** (Lin, Tang, Tang, Yang, Dang, Han; MLSys 2024) is motivated by the empirical observation that weight channels corresponding to high-magnitude activation channels are disproportionately important—protecting just the top 1% of channels by activation magnitude recovers most model performance. AWQ applies per-channel **scaling factors** α before quantization: for a linear layer y = Wx, it computes ỹ = (W · diag(s)) · (diag(s)⁻¹ · x) where s is chosen to minimize quantization error on important channels. Because the scaling is absorbed into adjacent operations, it adds no inference-time overhead. AWQ achieves better accuracy than GPTQ at INT4 on instruction-tuned models and is significantly faster to apply (minutes vs. hours for large models).
 
-**SmoothQuant** (Xiao, Lin, Seznec, Wu, Demouth, Han; ICML 2023) addresses the specific challenge of **activation quantization**. LLM activations contain systematic outliers—certain channels consistently carry magnitudes 100× larger than the median—which cause catastrophic quantization error when uniform INT8 is applied. SmoothQuant migrates the quantization difficulty from activations to weights by applying a channel-wise smoothing transformation: activations are divided by a channel-wise factor *s* and weights are multiplied by *s* (which can be fused into the preceding LayerNorm). With *s* calibrated on a small dataset, both activations and weights become INT8-quantizable with <1% accuracy loss on GPT-3 scale models, enabling full W8A8 inference with native INT8 tensor cores.
+**SmoothQuant** (Xiao, Lin, Seznec, Wu, Demouth, Han; ICML 2023) addresses the specific challenge of **activation quantization**. LLM activations contain systematic outliers—certain channels consistently carry magnitudes 100× larger than the median—which cause catastrophic quantization error when uniform INT8 is applied. SmoothQuant migrates the quantization difficulty from activations to weights by applying a channel-wise smoothing transformation: activations are divided by a channel-wise factor *s* and weights are multiplied by *s* (which can be fused into the preceding LayerNorm). With *s* calibrated on a small dataset, both activations and weights become INT8-quantizable with < 1% accuracy loss on GPT-3 scale models, enabling full W8A8 inference with native INT8 tensor cores.
 
 **GGUF/llama.cpp k-quant formats** (Gerganov et al.) introduce mixed-precision block quantization (e.g., Q4_K_M) where the quantization scale itself is stored at higher precision, and different weight matrices use different bit widths (some at 6-bit, others at 4-bit) based on empirically measured sensitivity—achieving better quality-per-bit than uniform schemes.
 
 | Method | Bit width | Memory vs. FP16 | Accuracy impact | Key mechanism |
 |--------|-----------|-----------------|-----------------|---------------|
 | FP16 baseline | 16-bit | 1× | 0% | — |
-| BF16 | 16-bit | 1× | <0.1% | Better training range, same size |
-| INT8 per-channel (W8A16) | 8-bit weights | 2× | <0.5% | Per-channel scale, FP16 activations |
+| BF16 | 16-bit | 1× | < 0.1% | Better training range, same size |
+| INT8 per-channel (W8A16) | 8-bit weights | 2× | < 0.5% | Per-channel scale, FP16 activations |
 | SmoothQuant W8A8 | 8-bit both | 2× | 0.5–1% | Activation smoothing, full INT8 |
 | GPTQ INT4 (W4A16) | 4-bit weights | 4× | 1–3% | Hessian-guided column-wise quant |
-| AWQ INT4 (W4A16) | 4-bit weights | 4× | <1% | Activation-aware channel scaling |
+| AWQ INT4 (W4A16) | 4-bit weights | 4× | < 1% | Activation-aware channel scaling |
 | GGUF Q4_K_M | ~4.5-bit avg | ~3.5× | 1–2% | Mixed-precision block quant |
-| FP8 E4M3 (W8A8) | 8-bit both | 2× | <0.5% | Native H100/H200 FP8 tensor cores |
+| FP8 E4M3 (W8A8) | 8-bit both | 2× | < 0.5% | Native H100/H200 FP8 tensor cores |
 
 ```mermaid
 graph LR

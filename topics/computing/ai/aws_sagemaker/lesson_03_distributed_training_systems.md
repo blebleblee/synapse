@@ -80,28 +80,29 @@ The three canonical parallelism strategies map to fundamentally different decomp
 
 **Data parallelism** replicates the entire model on every device and partitions the training dataset across replicas. Each device computes a full forward and backward pass on its local mini-batch, producing a local gradient tensor. A collective `AllReduce` operation then computes the mean gradient across all devices, and every replica applies the same gradient update, ensuring that all replicas remain synchronized. The defining property of data parallelism is that communication volume scales with model size, not dataset size: regardless of how many samples each worker processes, the `AllReduce` payload is always proportional to the number of model parameters. DDP (Distributed Data Parallel) in PyTorch implements this with gradient bucketing: rather than waiting for all gradients to materialize before beginning `AllReduce`, it fires off NCCL collectives for each bucket as the backward pass populates them, overlapping gradient communication with the computation of earlier-layer gradients. This pipelining of communication and computation is the central optimization that makes DDP scale efficiently to hundreds of nodes.
 
-```
-Data Parallelism: AllReduce Gradient Synchronization
-
-Node 0 GPU 0    Node 1 GPU 0    Node 2 GPU 0    Node 3 GPU 0
-┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-│ Model    │    │ Model    │    │ Model    │    │ Model    │
-│ Replica  │    │ Replica  │    │ Replica  │    │ Replica  │
-│          │    │          │    │          │    │          │
-│ Batch[0] │    │ Batch[1] │    │ Batch[2] │    │ Batch[3] │
-│          │    │          │    │          │    │          │
-│ grad_0   │    │ grad_1   │    │ grad_2   │    │ grad_3   │
-└────┬─────┘    └────┬─────┘    └────┬─────┘    └────┬─────┘
-     │               │               │               │
-     └───────────────┴───────────────┴───────────────┘
-                             │
-                     AllReduce (NCCL EFA)
-                    mean_grad = (g0+g1+g2+g3)/4
-                             │
-     ┌───────────────┬───────┴───────┬───────────────┐
-     ▼               ▼               ▼               ▼
-  Δw = -lr·g     Δw = -lr·g     Δw = -lr·g     Δw = -lr·g
-  (identical)    (identical)    (identical)    (identical)
+```mermaid
+flowchart TD
+    N0["Node 0 GPU 0<br/>Model Replica<br/>Batch[0]<br/>grad_0"]
+    N1["Node 1 GPU 0<br/>Model Replica<br/>Batch[1]<br/>grad_1"]
+    N2["Node 2 GPU 0<br/>Model Replica<br/>Batch[2]<br/>grad_2"]
+    N3["Node 3 GPU 0<br/>Model Replica<br/>Batch[3]<br/>grad_3"]
+    
+    AR["AllReduce (NCCL EFA)<br/>mean_grad = (g0+g1+g2+g3)/4"]
+    
+    U0["Δw = -lr·g<br/>(identical)"]
+    U1["Δw = -lr·g<br/>(identical)"]
+    U2["Δw = -lr·g<br/>(identical)"]
+    U3["Δw = -lr·g<br/>(identical)"]
+    
+    N0 --> AR
+    N1 --> AR
+    N2 --> AR
+    N3 --> AR
+    
+    AR --> U0
+    AR --> U1
+    AR --> U2
+    AR --> U3
 ```
 
 **Tensor parallelism** (also called intra-layer model parallelism) partitions individual weight matrices across devices. Consider a transformer attention layer with a projection matrix $W \in \mathbb{R}^{d \times d}$. In column-parallel partitioning, each of $N$ devices holds a $d \times (d/N)$ shard. The forward pass for each shard can be computed independently, requiring only an `AllGather` collective on the activation output before the next layer. In row-parallel partitioning, each device holds a $(d/N) \times d$ shard, computes a partial output, and requires an `AllReduce` to sum the partials. Megatron-LM pioneered the analysis of which layers benefit from column- versus row-parallelism to minimize the number of collectives per transformer block, and the SageMaker Model Parallel library (SMP) implements this analysis automatically when you configure `tensor_parallel_degree`.

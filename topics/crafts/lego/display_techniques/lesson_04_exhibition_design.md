@@ -34,29 +34,66 @@ Actuation for kinetic displays employs Lego-native Technic motors or third-party
 
 Environmental sensing extends exhibition intelligence beyond simple presence detection. **Ambient light sensors** (TSL2561 or similar I²C digital devices) measure illuminance from 0.1 to 40,000 lux, allowing exhibitions to auto-adjust lighting intensity based on room conditions—compensating for daylight flooding near windows or dimming to preserve atmosphere in darkened spaces. **Temperature and humidity sensors** (DHT22 modules) monitor environmental conditions that affect long-term Lego stability: ABS plastic exhibits coefficient of thermal expansion near 90 µm/(m·K), meaning a 2-meter tall structure undergoes 1.8 mm height change across a 10°C temperature swing. While this rarely compromises structural integrity, monitoring allows correlation of observed loosening or color changes with environmental excursions.
 
-```
-Exhibition Lighting Control Flow
-================================
+```mermaid
+flowchart TD
+    PS["Power Supply\n12V/24V DC"]
+    MC["Microcontroller\nArduino Mega"]
+    SA["Sensor Array"]
+    PIR["PIR Sensor"]
+    HC["HC-SR04"]
+    DIST["Distribution"]
+    IOM["I/O Mapping\nPin Assignment"]
+    DET["Detection"]
+    LED["LED Driver\nMOSFET Bank"]
+    SM["State Machine\nDecision Logic"]
+    PL["Pattern Library"]
+    CHASE["Chase"]
+    FADE["Fade"]
+    STROBE["Strobe"]
+    TS["Temporal Sequencer"]
+    ET["Event Triggers"]
 
-   [Power Supply]              [Microcontroller]           [Sensor Array]
-     12V/24V DC                   Arduino Mega                  |
-         |                            |                     PIR | HC-SR04
-         |                            |                         |
-    [Distribution]              [I/O Mapping]                   |
-         |                     Pin Assignment              [Detection]
-         |                            |                         |
-    [LED Driver]────PWM Control───────┴────[State Machine]─────┘
-    (MOSFET Bank)                          Decision Logic
-         |                                       |
-    [Fixture Zones]                      [Pattern Library]
-     Zone A: Key                          Chase | Fade | Strobe
-     Zone B: Fill                              |
-     Zone C: Accent                      [Temporal Sequencer]
-         |                                      |
-    [Visual Output]                    [Event Triggers]
-     Illuminated Display              Approach → Brighten
-                                      Dwell → Animate
-                                      Departure → Dim
+    subgraph zones ["Fixture Zones"]
+        ZA["Zone A: Key"]
+        ZB["Zone B: Fill"]
+        ZC["Zone C: Accent"]
+    end
+
+    subgraph events ["Event Behaviors"]
+        EV1["Approach → Brighten"]
+        EV2["Dwell → Animate"]
+        EV3["Departure → Dim"]
+    end
+
+    VO["Visual Output\nIlluminated Display"]
+
+    PS --> DIST
+    DIST --> LED
+    MC --> IOM
+    SA --> PIR
+    SA --> HC
+    PIR --> DET
+    HC --> DET
+    IOM -->|"PWM Control"| LED
+    DET --> SM
+    IOM --> SM
+    LED --> SM
+    SM --> zones
+    SM --> PL
+    PL --> CHASE
+    PL --> FADE
+    PL --> STROBE
+    CHASE --> TS
+    FADE --> TS
+    STROBE --> TS
+    TS --> ET
+    ET --> EV1
+    ET --> EV2
+    ET --> EV3
+    zones --> VO
+    EV1 --> VO
+    EV2 --> VO
+    EV3 --> VO
 ```
 
 The mechanical staging of interactive displays requires **kinematic planning**—ensuring moving elements follow collision-free paths at velocities compatible with viewer safety and mechanical wear limits. A rotating turntable displaying a model must accelerate smoothly (maximum jerk below 5 m/s³ to avoid viewer discomfort), reach cruising angular velocity (typically 3–8 RPM for comfortable viewing), and incorporate soft-start/soft-stop profiles that prevent impulsive loads on drivetrain components. For linear actuators, trapezoidal motion profiles dominate: initial acceleration phase (occupying 15–25% of total travel), constant velocity cruise, and deceleration phase mirrored to the acceleration. Position feedback from rotary encoders or Hall-effect sensors closes the control loop, allowing microcontroller PID algorithms to compensate for load variations and maintain precise timing.

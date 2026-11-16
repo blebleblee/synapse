@@ -30,52 +30,61 @@ Understanding these principles abstractly is necessary but insufficient. The mor
 
 The interaction pipeline for such a component can be modeled as a directed state machine where user inputs are events that drive state transitions, and each transition produces both a new state and a feedback emission. The following diagram shows the signal path:
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                      USER MENTAL MODEL                              │
-│    "I am editing a YAML config; invalid syntax will be flagged"     │
-└────────────────────────────┬────────────────────────────────────────┘
-                             │  Keystroke / Paste / Command
-                             ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                     PERCEIVED AFFORDANCE LAYER                      │
-│  Signifiers: monospace font, line numbers, syntax highlighting      │
-│  Mapping:    cursor position  ←→  document coordinate (line, col)   │
-└────────────────────────────┬────────────────────────────────────────┘
-                             │  Input Event
-                             ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                     EXECUTION LAYER (Gulf of Execution)             │
-│                                                                     │
-│   InputEvent ──► CommandDispatcher ──► DocumentMutation             │
-│                        │                                            │
-│                        └──► Precondition Check (is mode = INSERT?)  │
-│                                   │                                 │
-│                              ┌────┴────┐                            │
-│                              │ PASS    │ FAIL ──► Mode Error Signal  │
-│                              └────┬────┘                            │
-│                                   ▼                                 │
-│                          DocumentState(n+1)                         │
-└────────────────────────────┬────────────────────────────────────────┘
-                             │  State Delta
-                             ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                   VALIDATION & FEEDBACK LAYER (Gulf of Evaluation)  │
-│                                                                      │
-│   DocumentState ──► Parser/Validator ──► DiagnosticList             │
-│                                                │                    │
-│                              ┌─────────────────┼──────────────────┐ │
-│                              ▼                 ▼                  ▼ │
-│                        InlineGutter       StatusBar          Toast  │
-│                        (signifier:        (signifier:    (signifier:│
-│                         red squiggle)      error count)   dismissal)│
-└─────────────────────────────────────────────────────────────────────┘
-                             │  Visual + Textual Feedback
-                             ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                   UPDATED USER MENTAL MODEL                         │
-│   "Line 14 has a type mismatch; the expected type is string[]"      │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["USER MENTAL MODEL<br/>I am editing a YAML config;<br/>invalid syntax will be flagged"]
+    
+    B["PERCEIVED AFFORDANCE LAYER<br/>Signifiers: monospace font, line numbers,<br/>syntax highlighting<br/>Mapping: cursor position ↔ document coordinate"]
+    
+    C["EXECUTION LAYER<br/>Gulf of Execution"]
+    
+    D["InputEvent"]
+    E["CommandDispatcher"]
+    F["DocumentMutation"]
+    G["Precondition Check<br/>is mode = INSERT?"]
+    H["PASS"]
+    I["FAIL"]
+    J["Mode Error Signal"]
+    K["DocumentState n+1"]
+    
+    L["VALIDATION & FEEDBACK LAYER<br/>Gulf of Evaluation"]
+    
+    M["DocumentState"]
+    N["Parser/Validator"]
+    O["DiagnosticList"]
+    
+    P["InlineGutter<br/>signifier: red squiggle"]
+    Q["StatusBar<br/>signifier: error count"]
+    R["Toast<br/>signifier: dismissal"]
+    
+    S["UPDATED USER MENTAL MODEL<br/>Line 14 has a type mismatch;<br/>the expected type is string[]"]
+    
+    A -->|"Keystroke / Paste / Command"| B
+    B -->|"Input Event"| C
+    
+    C --> D
+    D --> E
+    E --> F
+    E --> G
+    
+    G --> H
+    G --> I
+    I --> J
+    
+    H --> K
+    K --> L
+    
+    L --> M
+    M --> N
+    N --> O
+    
+    O --> P
+    O --> Q
+    O --> R
+    
+    P -->|"Visual + Textual Feedback"| S
+    Q --> S
+    R --> S
 ```
 
 Each layer in this pipeline maps to a distinct design concern. The perceived affordance layer determines whether the developer understands what kind of input the component accepts. The execution layer determines whether the intended command reaches the right handler in the right mode. The validation and feedback layer determines whether the resulting state is communicated with enough precision to close the evaluation gulf.

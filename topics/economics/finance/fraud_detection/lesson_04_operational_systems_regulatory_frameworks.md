@@ -46,26 +46,50 @@ where $P(\text{fraud})$ is the model's estimated fraud probability, $L_{\text{fr
 
 This economic decision framework requires careful calibration of the loss parameters. The fraud loss $L_{\text{fraud}}$ is directly observable as the transaction amount plus chargeback fees, but the friction cost $L_{\text{friction}}$ is substantially harder to measure because it includes not only the immediate lost transaction revenue but also the long-term customer lifetime value impact when legitimate customers abandon the institution after experiencing false declines. Industry estimates suggest that each false positive decline costs between one and five times the transaction amount in long-term customer value, though this varies dramatically by customer segment and competitive market dynamics.
 
-```
-Transaction Flow Architecture:
+```mermaid
+flowchart TD
+    AR["Authorization Request"]
+    FE["Feature Extraction"]
+    SF["Synchronous Features"]
+    MI["Model Inference"]
+    AS["Async Feature Services"]
+    EN["Enrichment (if time)"]
+    SA["Score Array"]
+    MS["Meta-Scoring"]
+    RS["Risk Score"]
+    RE["Rule Engine Evaluation"]
+    RF{"Rule Fires?"}
+    DA["Decision Aggregation\n(Economic Loss Minimization)"]
 
-Authorization Request → Feature Extraction → [Synchronous Features] → Model Inference
-         |                    |                                              ↓
-         |                    └─────→ [Async Feature Services]         Score Array
-         |                                    ↓                              ↓
-         |                            Enrichment (if time)            Meta-Scoring
-         |                                    ↓                              ↓
-         └────────────────────→ Rule Engine Evaluation              Risk Score
-                                        ↓                                   ↓
-                                   Rule Fires?  ←──────────────────────────┘
-                                        ↓
-                           Decision Aggregation (Economic Loss Minimization)
-                                        ↓
-                        ┌───────────────┼───────────────┐
-                        ↓               ↓               ↓
-                    APPROVE         DECLINE         REVIEW
-                        ↓               ↓               ↓
-                Authorization      Decline Code    Alert Queue
+    APP["APPROVE"]
+    DEC["DECLINE"]
+    REV["REVIEW"]
+
+    AUTH["Authorization"]
+    DC["Decline Code"]
+    AQ["Alert Queue"]
+
+    AR --> FE
+    FE --> SF
+    SF --> MI
+    FE --> AS
+    AS --> EN
+    MI --> SA
+    SA --> MS
+    MS --> RS
+    AR --> RE
+    EN --> RE
+    RS --> RF
+    RE --> RF
+    RF --> DA
+
+    DA --> APP
+    DA --> DEC
+    DA --> REV
+
+    APP --> AUTH
+    DEC --> DC
+    REV --> AQ
 ```
 
 Transactions routed to manual review enter the **alert triage and case management system**, which represents the second major operational subsystem. Alert queues must be architected to balance workload distribution across analyst teams while respecting analyst specialization and expertise. A common approach implements multiple queues prioritized by estimated fraud severity and expected case complexity: high-value transactions, account takeover alerts, synthetic identity patterns, and first-party fraud investigations each flow to specialized queues staffed by analysts with relevant training and access to investigative tools.

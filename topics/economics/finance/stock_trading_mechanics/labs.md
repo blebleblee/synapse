@@ -435,7 +435,7 @@ Compute manipulation detection metrics:
 
 **Quote Stuffing Metric:** Measure quote update rate (messages per second). Normal markets: 50-200 updates/sec for liquid equities. Quote stuffing: >1,000 updates/sec. Compute the ratio of order cancellations to executions: normal markets ~3:1, quote stuffing >20:1.
 
-**Layering Detection:** Identify sequences where large orders appear at non-top-of-book levels, remain for <100 milliseconds, then cancel without execution. Compute the frequency of such "fleeting depth" events. Score each event based on size (larger orders score higher) and distance from top of book (closer orders score higher). A layering index above threshold (calibrated as 95th percentile of historical distribution) flags suspicious activity.
+**Layering Detection:** Identify sequences where large orders appear at non-top-of-book levels, remain for < 100 milliseconds, then cancel without execution. Compute the frequency of such "fleeting depth" events. Score each event based on size (larger orders score higher) and distance from top of book (closer orders score higher). A layering index above threshold (calibrated as 95th percentile of historical distribution) flags suspicious activity.
 
 **Spoofing Detection:** Detect patterns where large orders on one side of the book appear, the price moves in the favorable direction, then the orders cancel and a trade occurs on the opposite side. This "bait-and-cancel" pattern indicates intentional false signaling. Compute the correlation between non-executed order size imbalances and subsequent short-term price movements. High positive correlation (>0.5) combined with rapid cancellations suggests spoofing.
 
@@ -652,8 +652,8 @@ ELSE:
 1. Effective spread (30%): lower is better, benchmark against NBBO
 2. Price improvement rate (20%): higher is better, target >50% of trades
 3. Fill rate (20%): higher is better, target >90% fill rate
-4. Fill latency (10%): lower is better, target <100ms
-5. Trade-through rate (10%): lower is better, target <0.1%
+4. Fill latency (10%): lower is better, target < 100ms
+5. Trade-through rate (10%): lower is better, target < 0.1%
 
 **Qualitative Factors (30% Weight):**
 1. Market structure (10%): maker-taker vs. taker-maker vs. inverted
@@ -665,7 +665,7 @@ $$
 \text{Score} = -0.3 \cdot \text{Spread}^{\text{norm}} + 0.2 \cdot \text{Improvement}^{\text{norm}} + 0.2 \cdot \text{Fill}^{\text{norm}} - 0.1 \cdot \text{Latency}^{\text{norm}} - 0.1 \cdot \text{Tradethrough}^{\text{norm}} + 0.3 \cdot \text{Qualitative}^{\text{norm}}
 $$
 
-Normalize each metric to [0,1] scale using historical distribution. Venues scoring >0.7 are Tier 1 (preferred routing). Venues scoring 0.4-0.7 are Tier 2 (conditional use). Venues scoring <0.4 are Tier 3 (avoid or use only for specialized needs).
+Normalize each metric to [0,1] scale using historical distribution. Venues scoring >0.7 are Tier 1 (preferred routing). Venues scoring 0.4-0.7 are Tier 2 (conditional use). Venues scoring < 0.4 are Tier 3 (avoid or use only for specialized needs).
 
 ### Post-Trade TCA (Transaction Cost Analysis) Workflow
 

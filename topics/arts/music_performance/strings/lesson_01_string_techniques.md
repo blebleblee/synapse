@@ -58,9 +58,9 @@ graph TB
     A -.->|"too slow + heavy"| E
     B -.->|"too light + fast"| F
 
-    style D fill:#e8f5e8
-    style E fill:#ffe1e1
-    style F fill:#fff4e1
+    style D fill:#e8f5e8,color:#0f172a
+    style E fill:#ffe1e1,color:#0f172a
+    style F fill:#fff4e1,color:#0f172a
 ```
 
 ---
@@ -116,8 +116,8 @@ graph LR
     B1 --> D
     B4 --> D
 
-    style C fill:#e1f5ff
-    style D fill:#e8f5e8
+    style C fill:#e1f5ff,color:#0f172a
+    style D fill:#e8f5e8,color:#0f172a
 ```
 
 ### 2.2 Intonation: The Auditory-Motor Loop
@@ -250,9 +250,9 @@ flowchart LR
     SP2 --> P2
     SP3 --> P3
 
-    style SP1 fill:#e1f5ff
-    style SP2 fill:#e8f5e8
-    style SP3 fill:#fff4e1
+    style SP1 fill:#e1f5ff,color:#0f172a
+    style SP2 fill:#e8f5e8,color:#0f172a
+    style SP3 fill:#fff4e1,color:#0f172a
 ```
 
 ### 3.3 Plucking Mechanics (Bass Guitar and Double Bass)
@@ -373,9 +373,9 @@ graph TD
     V2 -.-> E2
     V3 -.-> E3
 
-    style V1 fill:#fff4e1
-    style V2 fill:#e8f5e8
-    style V3 fill:#e1f5ff
+    style V1 fill:#fff4e1,color:#0f172a
+    style V2 fill:#e8f5e8,color:#0f172a
+    style V3 fill:#e1f5ff,color:#0f172a
 ```
 
 ---
@@ -502,10 +502,10 @@ flowchart TD
     T3 --> S3
     T4 --> S4
 
-    style S1 fill:#e8f5e8
-    style S2 fill:#e1f5ff
-    style S3 fill:#fff4e1
-    style S4 fill:#ffe1e1
+    style S1 fill:#e8f5e8,color:#0f172a
+    style S2 fill:#e1f5ff,color:#0f172a
+    style S3 fill:#fff4e1,color:#0f172a
+    style S4 fill:#ffe1e1,color:#0f172a
 ```
 
 ---
@@ -611,12 +611,12 @@ flowchart TD
     P5 --> C5 --> F5
     P6 --> C6 --> F6
 
-    style F1 fill:#e8f5e8
-    style F2 fill:#e8f5e8
-    style F3 fill:#e8f5e8
-    style F4 fill:#e8f5e8
-    style F5 fill:#e8f5e8
-    style F6 fill:#e8f5e8
+    style F1 fill:#e8f5e8,color:#0f172a
+    style F2 fill:#e8f5e8,color:#0f172a
+    style F3 fill:#e8f5e8,color:#0f172a
+    style F4 fill:#e8f5e8,color:#0f172a
+    style F5 fill:#e8f5e8,color:#0f172a
+    style F6 fill:#e8f5e8,color:#0f172a
 ```
 
 ### 8.2 Intonation Self-Assessment Protocol
@@ -713,8 +713,8 @@ graph TD
     B -.-> I1
     I1 --> I2 --> I3 --> I4
 
-    style E fill:#ffe1e1
-    style I4 fill:#e8f5e8
+    style E fill:#ffe1e1,color:#0f172a
+    style I4 fill:#e8f5e8,color:#0f172a
 ```
 
 ---
@@ -819,15 +819,15 @@ graph LR
         end
     end
 
-    style B1 fill:#fff4e1
-    style B2 fill:#fff4e1
-    style B3 fill:#fff4e1
-    style D1 fill:#e1f5ff
-    style D2 fill:#e1f5ff
-    style D3 fill:#e1f5ff
-    style F1 fill:#e8f5e8
-    style F2 fill:#e8f5e8
-    style F3 fill:#e8f5e8
+    style B1 fill:#fff4e1,color:#0f172a
+    style B2 fill:#fff4e1,color:#0f172a
+    style B3 fill:#fff4e1,color:#0f172a
+    style D1 fill:#e1f5ff,color:#0f172a
+    style D2 fill:#e1f5ff,color:#0f172a
+    style D3 fill:#e1f5ff,color:#0f172a
+    style F1 fill:#e8f5e8,color:#0f172a
+    style F2 fill:#e8f5e8,color:#0f172a
+    style F3 fill:#e8f5e8,color:#0f172a
 ```
 
 ---

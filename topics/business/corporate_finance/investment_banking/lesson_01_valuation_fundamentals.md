@@ -58,22 +58,40 @@ The iterative nature of WACC calculation arises because capital structure weight
 
 Present value calculation discounts each year's projected free cash flow and the terminal value back to the present using the WACC as the discount rate. The discounting formula for a cash flow occurring at time t is: PV = FCF_t / (1 + WACC)^t. The exponent reflects the compounding periods between the valuation date and the cash flow receipt. A subtlety arises in mid-year convention versus year-end convention: if cash flows accrue continuously throughout the year rather than in a lump sum on December 31st, then discounting should use t - 0.5 rather than t, reflecting that the average cash flow occurs at mid-year. This adjustment typically increases enterprise value by two to four percent, and convention varies by institution and geography. The terminal value, calculated as of the end of the explicit forecast period, must be discounted back the same number of periods as the final year's cash flow.
 
-```
-DCF Architecture Flow:
-
-Year 0 (Present) ──┐
-                   │
-Year 1: EBIT(1-T) + D&A - ΔNW - Capex = FCF₁ ──┐
-Year 2: EBIT(1-T) + D&A - ΔNW - Capex = FCF₂ ──┤
-Year 3: EBIT(1-T) + D&A - ΔNW - Capex = FCF₃ ──┤
-Year 4: EBIT(1-T) + D&A - ΔNW - Capex = FCF₄ ──┼─→ PV(FCF)
-Year 5: EBIT(1-T) + D&A - ΔNW - Capex = FCF₅ ──┤
-                                                 │
-Terminal Value = FCF₅(1+g)/(WACC-g) ────────────┘
-
-Enterprise Value = Σ [FCF_t / (1+WACC)^t] + [TV / (1+WACC)^5]
-
-Equity Value = Enterprise Value - Net Debt - Minority Interest + Associates
+```mermaid
+flowchart TD
+    Y0["Year 0 (Present)"]
+    
+    Y1["Year 1: EBIT(1-T) + D&A - ΔNW - Capex = FCF₁"]
+    Y2["Year 2: EBIT(1-T) + D&A - ΔNW - Capex = FCF₂"]
+    Y3["Year 3: EBIT(1-T) + D&A - ΔNW - Capex = FCF₃"]
+    Y4["Year 4: EBIT(1-T) + D&A - ΔNW - Capex = FCF₄"]
+    Y5["Year 5: EBIT(1-T) + D&A - ΔNW - Capex = FCF₅"]
+    
+    TV["Terminal Value = FCF₅(1+g)/(WACC-g)"]
+    
+    PV["PV(FCF)<br/>Present Value of Free Cash Flows"]
+    
+    EV["Enterprise Value = Σ [FCF_t / (1+WACC)^t] + [TV / (1+WACC)^5]"]
+    
+    EquityVal["Equity Value = Enterprise Value - Net Debt - Minority Interest + Associates"]
+    
+    Y0 --> Y1
+    Y0 --> Y2
+    Y0 --> Y3
+    Y0 --> Y4
+    Y0 --> Y5
+    
+    Y1 --> PV
+    Y2 --> PV
+    Y3 --> PV
+    Y4 --> PV
+    Y5 --> PV
+    Y5 --> TV
+    
+    TV --> PV
+    PV --> EV
+    EV --> EquityVal
 ```
 
 The bridge from enterprise value to equity value requires subtracting net debt and other non-equity claims. Net debt equals total debt, including bonds, term loans, revolving credit facilities, and capital leases, minus cash and marketable securities. The cash subtraction recognizes that an acquirer inheriting a company's balance sheet receives not just the operating business but also its cash balances, effectively reducing the net purchase price. Minority interest, representing third-party ownership stakes in consolidated subsidiaries, must be subtracted because the DCF projects consolidated cash flows but equity value should reflect only the parent company shareholders' claim. Conversely, the company's proportional ownership in unconsolidated affiliates, valued at market if publicly traded or carried at book value if private, should be added back as a separable asset.

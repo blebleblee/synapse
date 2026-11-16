@@ -24,19 +24,48 @@ The diathesis-stress framework operates as an interactive system in which enviro
 
 **The Risk and Protective Factor Matrix** structures this assessment. Create a two-dimensional map with risk factors on one axis and protective factors on the other, then plot the specific family's position within this space.
 
-```
-                    HIGH PROTECTION
-                          ▲
-                          │
-                    RESILIENT │  RECOVERED
-                    OUTCOMES  │  OUTCOMES
-                          │
-    LOW RISK ────────────┼────────────► HIGH RISK
-                          │
-                          │  VULNERABLE │  HIGH-RISK
-                          │  OUTCOMES   │  OUTCOMES
-                          ▼
-                    LOW PROTECTION
+```mermaid
+flowchart TD
+    %% Axes
+    HighProtection["HIGH PROTECTION"]
+    LowProtection["LOW PROTECTION"]
+    LowRisk["LOW RISK"]
+    HighRisk["HIGH RISK"]
+    
+    %% Quadrants
+    Q1["RESILIENT<br/>OUTCOMES"]
+    Q2["RECOVERED<br/>OUTCOMES"]
+    Q3["VULNERABLE<br/>OUTCOMES"]
+    Q4["HIGH-RISK<br/>OUTCOMES"]
+    
+    %% Vertical axis (Protection)
+    HighProtection -.-> Q1
+    HighProtection -.-> Q2
+    Q1 -.-> Center
+    Q2 -.-> Center
+    Center -.-> Q3
+    Center -.-> Q4
+    Q3 -.-> LowProtection
+    Q4 -.-> LowProtection
+    
+    %% Horizontal axis (Risk)
+    LowRisk -.-> Q1
+    LowRisk -.-> Q3
+    Q1 -.-> Center
+    Q3 -.-> Center
+    Center -.-> Q2
+    Center -.-> Q4
+    Q2 -.-> HighRisk
+    Q4 -.-> HighRisk
+    
+    %% Center point
+    Center[" "]
+    
+    style Center fill:none,stroke:none
+    style HighProtection fill:#e1f5ff,stroke:#333,stroke-width:2px
+    style LowProtection fill:#ffe1e1,stroke:#333,stroke-width:2px
+    style LowRisk fill:#e1ffe1,stroke:#333,stroke-width:2px
+    style HighRisk fill:#ffe1e1,stroke:#333,stroke-width:2px
 ```
 
 This two-dimensional representation immediately illuminates why a high-risk child might show adaptive functioning (sufficient protection) and why a low-risk child might struggle (insufficient protective resources or emerging psychological distress unrelated to classical risk exposure). The map also identifies intervention leverage points: increase protective factors through skill-building or resource access, decrease risk exposure through safety planning, or both simultaneously.

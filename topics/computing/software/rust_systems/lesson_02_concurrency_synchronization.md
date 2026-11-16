@@ -284,23 +284,29 @@ The `std::sync::mpsc` channel comes in two flavors internally. `channel()` creat
 
 The following diagram illustrates the ownership-transfer model that channels enforce, contrasted with the shared-state model that mutexes enable:
 
-```
-SHARED STATE MODEL (Mutex<T>)                CHANNEL MODEL (Sender<T>)
-─────────────────────────────                ────────────────────────────
-
-Thread A ──┐                                Thread A
-           │  Arc<Mutex<Data>>              ╔══════════╗
-           ├─────────────────────────────► ║   Data   ║ ──send()──►  Channel
-           │  Arc<Mutex<Data>>              ╚══════════╝              Buffer
-Thread B ──┘                               (ownership                │
-                                            transferred,             │
-   Both hold references;                    A can no          recv() │
-   lock serializes access.                  longer see it)           ▼
-                                                                Thread B
-                                                               ╔══════════╗
-                                                               ║   Data   ║
-                                                               ╚══════════╝
-                                                            (sole owner)
+```mermaid
+flowchart TD
+    subgraph shared ["SHARED STATE MODEL (Mutex&lt;T&gt;)"]
+        ThreadA1["Thread A"]
+        ThreadB1["Thread B"]
+        SharedData["Arc&lt;Mutex&lt;Data&gt;&gt;<br/><br/>Both hold references;<br/>lock serializes access"]
+        
+        ThreadA1 -->|"Arc&lt;Mutex&lt;Data&gt;&gt;"| SharedData
+        ThreadB1 -->|"Arc&lt;Mutex&lt;Data&gt;&gt;"| SharedData
+    end
+    
+    subgraph channel ["CHANNEL MODEL (Sender&lt;T&gt;)"]
+        ThreadA2["Thread A"]
+        DataA["Data<br/>(ownership transferred,<br/>A can no longer see it)"]
+        ChannelBuffer["Channel<br/>Buffer"]
+        DataB["Data<br/>(sole owner)"]
+        ThreadB2["Thread B"]
+        
+        ThreadA2 --> DataA
+        DataA -->|send| ChannelBuffer
+        ChannelBuffer -->|recv| DataB
+        DataB --> ThreadB2
+    end
 ```
 
 For high-throughput scenarios where `std::sync::mpsc` becomes a bottleneck, the `crossbeam-channel` crate provides multi-producer multi-consumer (MPMC) channels with both bounded and unbounded variants, implemented using lock-free algorithms. It also provides `select!` macro support for simultaneously waiting on multiple channels — the equivalent of `select(2)` for channel operations — which is essential for building responsive pipeline stages that can receive from multiple upstream sources or a cancellation signal.
@@ -469,3 +475,18 @@ fn main() {
 ```
 
 Rayon's safety guarantee is the same as Rust's: `par_iter_mut()` requires the closure to implement `Send`, and because each
+
+Rayon's safety guarantee is the same as Rust's: `par_iter_mut()` requires the closure to implement `Send`, and because each iteration receives an exclusive mutable reference to a distinct element, there is no aliasing and no need for interior mutability or synchronization primitives. The type system enforces that parallel operations cannot introduce data races. Work stealing is implemented using a `Stealer<T>` and `Worker<T>` pair, where the worker owns a double-ended queue and pushes/pops from one end while stealers attempt to pop from the other end using atomic operations. When a worker's queue is exhausted, it randomly selects another worker and attempts to steal from the back of that queue, continuing until all work is complete. This design achieves high throughput because workers rarely contend on their own queues, and the randomized stealing strategy balances load without centralized coordination. Rayon's structured concurrency model—where parallel scopes ensure all spawned work completes before the scope exits—prevents the dangling reference bugs that plague unstructured parallelism, making it safe to pass borrowed data into parallel closures without cloning.
+
+The ecosystem's layered approach to concurrency reflects Rust's zero-cost abstraction philosophy: low-level primitives expose the full power and complexity of synchronization (with `unsafe` escape hatches when necessary), while high-level libraries like Tokio and Rayon encapsulate common patterns behind safe, ergonomic APIs. Choosing the right abstraction depends on the problem domain. CPU-bound embarrassingly parallel workloads fit Rayon's data parallelism model. I/O-bound services with thousands of concurrent connections require an async runtime like Tokio. Hybrid workloads may use both: Tokio for network I/O and Rayon for CPU-intensive processing within async tasks via `tokio::task::spawn_blocking`. The key insight is that Rust's ownership and type system provide a foundation for safe concurrency at every level, from raw atomics to actor frameworks, without imposing a single concurrency model. This flexibility, combined with compile-time enforcement of thread safety invariants, enables Rust programs to achieve both safety and performance in concurrent contexts that would require extensive runtime checking or simply be unsafe in other languages.
+
+## Summary & Verification Matrix
+
+| **Invariant / Mechanism** | **Core Rule** | **Type System Enforcement** | **Runtime Consequence** | **Diagnostic Signal** |
+|---|---|---|---|---|
+| **Ownership & Send/Sync** | `Send` enables transfer across threads; `Sync` enables shared access via `&T`. | Compiler rejects cross-thread use of `!Send` types (e.g., `Rc`) and shared mutation of `!Sync` types (e.g., `Cell`). | Data races impossible; unsynchronized shared mutation blocked at compile time. | Error: "cannot be sent between threads safely" or "cannot be shared between threads safely". |
+| **Mutex & Interior Mutability** | `Mutex<T>` grants exclusive access via `lock()`, enforcing single-writer or multiple-reader discipline at runtime. | `MutexGuard<T>` implements `Deref<Target=T>` and `DerefMut`, exposing `&mut T` only to lock holder; guard is `!Send`. | Lock contention serializes access; deadlock possible if locks acquired in inconsistent order; poisoning propagates panic across lock holders. | `.lock().unwrap()` panic indicates poisoned lock; profiling shows high contention latency. |
+| **Arc & Reference Counting** | `Arc<T>` enables shared ownership; cloning increments count (atomic); dropping decrements; last drop deallocates. | Requires `T: Send + Sync` for `Arc<T>: Send + Sync`; compiler rejects `Arc<Cell<T>>` shared across threads. | Atomic increment/decrement overhead on clone/drop; cyclic references leak memory (use `Weak` to break cycles). | Leak detected by observing non-decreasing memory usage; `Arc::strong_count()` reveals reference leaks. |
+| **Channels & Message Passing** | MPSC: multiple senders, single receiver; ownership transferred via `send()`, preventing aliasing. | `Sender<T>: Clone + Send` requires `T: Send`; receiver cannot be cloned, ensuring exclusive consumption. | Backpressure via bounded channels; unbounded channels risk unbounded memory growth; disconnection signaled by `Err`. | `send()` returns `Err` if receiver dropped; `recv()` returns `Err` if all senders dropped; latency spikes indicate bounded channel saturation. |
+| **Async & Cooperative Scheduling** | Futures represent suspended computations; executor polls futures; `.await` yields to runtime. | `Future` requires `Send` for cross-thread scheduling (Tokio's `spawn` requires `Future: Send + 'static`); borrows must outlive `.await` points. | No OS preemption; blocking operations starve runtime (use `spawn_blocking`); work stealing balances load across runtime threads. | Runtime stalls indicate blocking in async context; poor parallelism suggests CPU-bound work in async tasks (use Rayon or `spawn_blocking`). |
+| **Rayon & Data Parallelism** | Work-stealing scheduler divides tasks; `par_iter_mut()` grants exclusive access per element; structured scopes ensure completion. | Parallel closures must be `Send`; exclusive references prevent aliasing; scope lifetime bounds prevent dangling references. | Near-linear scaling on CPU-bound workloads; no synchronization overhead within iterations; all work completes before scope exit. | Sublinear scaling indicates insufficient parallelism (small input) or contention (shared mutation); use `.par_chunks()` for coarse-grained parallelism. |

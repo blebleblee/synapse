@@ -48,9 +48,9 @@ graph TB
     PROM -->|"evaluates rules"| AM
     HEY -->|"HTTP requests"| API
     
-    style sub_app fill:#e1f5ff
-    style sub_monitoring fill:#fff3e0
-    style sub_clients fill:#f3e5f5
+    style sub_app fill:#e1f5ff,color:#0f172a
+    style sub_monitoring fill:#fff3e0,color:#0f172a
+    style sub_clients fill:#f3e5f5,color:#0f172a
 ```
 
 ### Setup: Deploy Sample Application & Prometheus Stack
@@ -664,3 +664,4 @@ stringData:
     - name: 'ops-team-pagerduty'
       pagerduty_configs:
       - service_key: 'YOUR
+```

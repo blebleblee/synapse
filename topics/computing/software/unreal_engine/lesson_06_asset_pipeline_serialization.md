@@ -24,96 +24,28 @@ The package file format's binary layout reflects these concerns through a carefu
 
 The serialization framework's runtime behavior centers on the `FArchive` abstract base class, a bidirectional stream abstraction that unifies loading and saving through operator overloading. Concrete archive implementations—`FArchiveFileReaderGeneric`, `FArchiveFileWriterGeneric`, `FArchiveLoadCompressedProxy`, `FArchiveSaveCompressedProxy`—override virtual methods like `Serialize(void* Data, int64 Length)` to handle actual I/O, while higher-level serialization logic remains implementation-agnostic. When serializing a UObject, the system invokes `Serialize(FArchive& Ar)` methods that chain through the class hierarchy: derived class serializes its members, calls `Super::Serialize(Ar)`, which recurses to the parent, until reaching `UObject::Serialize` which handles universal concerns like outer references and flags.
 
-```
-Package File Structure (Logical Layout):
-
-┌─────────────────────────────────────────────────────────┐
-│ Package File Summary Header                              │
-│  - File Version Tag (Engine + Licensee + Custom GUIDs)  │
-│  - Total Header Size (byte offset to first export)      │
-│  - Name Table: Offset + Count                           │
-│  - Gatherable Text Data: Offset + Count                 │
-│  - Import Table: Offset + Count                         │
-│  - Export Table: Offset + Count                         │
-│  - Depends Table: Offset + Count                        │
-│  - Soft Package References: Offset + Count              │
-│  - Asset Registry Data: Offset + Size                   │
-│  - Bulk Data Start Offset                               │
-│  - World Tile Info (if world partition enabled)         │
-│  - Package Flags (PKG_ContainsMap, PKG_Cooked, etc.)   │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│ Name Table (Compressed FString array)                    │
-│  Entry[0]: "None" (reserved)                            │
-│  Entry[1]: "StaticMesh"                                 │
-│  Entry[2]: "SM_Rock_Large_A"                            │
-│  ...                                                     │
-│  Entry[N]: "MaterialInstanceConstant"                   │
-│  (Each entry: uint32 hash, uint32 length, UTF-8 bytes)  │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│ Import Table (External Object References)               │
-│  Import[0]:                                             │
-│    - ClassPackage: "Engine"                             │
-│    - ClassName: "StaticMesh"                            │
-│    - ObjectName: "SM_Foundation"                        │
-│    - OuterIndex: 0 (package-level import)               │
-│  Import[1]:                                             │
-│    - ClassPackage: "Engine"                             │
-│    - ClassName: "Material"                              │
-│    - ObjectName: "M_Basic"                              │
-│    - OuterIndex: 0                                      │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│ Export Table (Assets Defined in This Package)           │
-│  Export[0]:                                             │
-│    - ClassIndex: Import[0] (StaticMesh)                 │
-│    - SuperIndex: -1 (no super)                          │
-│    - OuterIndex: 0 (package root)                       │
-│    - ObjectName: "SM_Rock_Large_A"                      │
-│    - SerialSize: 245760 bytes                           │
-│    - SerialOffset: 0x1A400 (file position)              │
-│    - ObjectFlags: RF_Public | RF_Standalone             │
-│  Export[1]:                                             │
-│    - ClassIndex: Import[1] (Material)                   │
-│    - ObjectName: "M_Rock_Diffuse"                       │
-│    - SerialSize: 8192 bytes                             │
-│    - SerialOffset: 0x57800                              │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│ Preload Dependency Table (Optional, for streaming)      │
-│  Export[0] depends on: [Import[1], Export[1]]          │
-│  Export[1] depends on: [Import[1]]                      │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│ Serialized Export Data (Actual Asset Payloads)          │
-│  [Offset 0x1A400]: StaticMesh SM_Rock_Large_A           │
-│    - LODData[0]:                                        │
-│       - VertexBuffer (positions, normals, UVs)          │
-│       - IndexBuffer (triangle list)                     │
-│       - SectionInfo (material slots, vertex ranges)     │
-│    - LODData[1]: ... (lower detail)                     │
-│    - Bounds: FBox(Min, Max), FSphere(Center, Radius)    │
-│    - Materials: [FObjectImport ref to M_Rock_Diffuse]   │
-│  [Offset 0x57800]: Material M_Rock_Diffuse              │
-│    - Parent: Import[1] (M_Basic)                        │
-│    - Scalar Parameters: [Roughness=0.8]                 │
-│    - Texture Parameters: [Diffuse=Import[2]]            │
-│    - Compiled Material Resource (shader bytecode)       │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│ Bulk Data Payloads (Large Binary Blobs)                 │
-│  - Texture Mipmap Chains (compressed, e.g., BC7)        │
-│  - Audio Sample Data (compressed, e.g., Vorbis)         │
-│  - Skeletal Animation Curve Data                        │
-│  (May reside in separate .ubulk file for >16MB assets)  │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Header["Package File Summary Header<br/>• File Version Tag (Engine + Licensee + Custom GUIDs)<br/>• Total Header Size (byte offset to first export)<br/>• Name Table: Offset + Count<br/>• Gatherable Text Data: Offset + Count<br/>• Import Table: Offset + Count<br/>• Export Table: Offset + Count<br/>• Depends Table: Offset + Count<br/>• Soft Package References: Offset + Count<br/>• Asset Registry Data: Offset + Size<br/>• Bulk Data Start Offset<br/>• World Tile Info (if world partition enabled)<br/>• Package Flags (PKG_ContainsMap, PKG_Cooked, etc.)"]
+    
+    NameTable["Name Table (Compressed FString array)<br/>• Entry[0]: 'None' (reserved)<br/>• Entry[1]: 'StaticMesh'<br/>• Entry[2]: 'SM_Rock_Large_A'<br/>• ...<br/>• Entry[N]: 'MaterialInstanceConstant'<br/>• (Each entry: uint32 hash, uint32 length, UTF-8 bytes)"]
+    
+    ImportTable["Import Table (External Object References)<br/>Import[0]:<br/>  - ClassPackage: 'Engine'<br/>  - ClassName: 'StaticMesh'<br/>  - ObjectName: 'SM_Foundation'<br/>  - OuterIndex: 0 (package-level import)<br/>Import[1]:<br/>  - ClassPackage: 'Engine'<br/>  - ClassName: 'Material'<br/>  - ObjectName: 'M_Basic'<br/>  - OuterIndex: 0"]
+    
+    ExportTable["Export Table (Assets Defined in This Package)<br/>Export[0]:<br/>  - ClassIndex: Import[0] (StaticMesh)<br/>  - SuperIndex: -1 (no super)<br/>  - OuterIndex: 0 (package root)<br/>  - ObjectName: 'SM_Rock_Large_A'<br/>  - SerialSize: 245760 bytes<br/>  - SerialOffset: 0x1A400 (file position)<br/>  - ObjectFlags: RF_Public | RF_Standalone<br/>Export[1]:<br/>  - ClassIndex: Import[1] (Material)<br/>  - ObjectName: 'M_Rock_Diffuse'<br/>  - SerialSize: 8192 bytes<br/>  - SerialOffset: 0x57800"]
+    
+    DependsTable["Preload Dependency Table (Optional, for streaming)<br/>• Export[0] depends on: [Import[1], Export[1]]<br/>• Export[1] depends on: [Import[1]]"]
+    
+    SerialData["Serialized Export Data (Actual Asset Payloads)<br/>[Offset 0x1A400]: StaticMesh SM_Rock_Large_A<br/>  - LODData[0]:<br/>    • VertexBuffer (positions, normals, UVs)<br/>    • IndexBuffer (triangle list)<br/>    • SectionInfo (material slots, vertex ranges)<br/>  - LODData[1]: ... (lower detail)<br/>  - Bounds: FBox(Min, Max), FSphere(Center, Radius)<br/>  - Materials: [FObjectImport ref to M_Rock_Diffuse]<br/>[Offset 0x57800]: Material M_Rock_Diffuse<br/>  - Parent: Import[1] (M_Basic)<br/>  - Scalar Parameters: [Roughness=0.8]<br/>  - Texture Parameters: [Diffuse=Import[2]]<br/>  - Compiled Material Resource (shader bytecode)"]
+    
+    BulkData["Bulk Data Payloads (Large Binary Blobs)<br/>• Texture Mipmap Chains (compressed, e.g., BC7)<br/>• Audio Sample Data (compressed, e.g., Vorbis)<br/>• Skeletal Animation Curve Data<br/>• (May reside in separate .ubulk file for >16MB assets)"]
+    
+    Header --> NameTable
+    NameTable --> ImportTable
+    ImportTable --> ExportTable
+    ExportTable --> DependsTable
+    DependsTable --> SerialData
+    SerialData --> BulkData
 ```
 
 The import and export table mechanism implements a two-tier addressing scheme that resolves external references while maintaining package independence. Import entries encode references to objects defined in other packages, storing the class name, object name, and outer hierarchy as string indices into the name table. At load time, the engine resolves imports lazily: the first access to an imported object triggers package loading if not already resident, walking the object path to locate the referenced asset. Export entries define objects stored in this package, encoding their class (as an import or export index), serialized data location (file offset and byte length), and flags. This indirection enables the streaming system to load objects on-demand: rather than deserializing the entire package, the loader seeks directly to the export's data offset, reads the payload, and instantiates the UObject.

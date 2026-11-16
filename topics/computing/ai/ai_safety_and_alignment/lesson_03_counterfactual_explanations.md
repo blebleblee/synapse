@@ -349,3 +349,4 @@ class CounterfactualEngine:
 
             # Clamp inline (non-in-place to preserve autograd graph)
             cfs_proj = torch.max(torch.min(cfs, ranges[:, 1]), ranges[:,
+```

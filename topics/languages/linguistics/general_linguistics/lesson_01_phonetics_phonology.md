@@ -73,18 +73,27 @@ Place features organize hierarchically under a Place node. The feature [Labial] 
 
 Feature geometry structures these features hierarchically rather than as flat bundles:
 
-```
-            Root
-             |
-    ┌────────┴────────┐
-Laryngeal          Place
-    |                 |
-[±voice]      ┌──────┴──────┐
-[±spread gl]  Labial  Coronal  Dorsal
-[±constr gl]           |         |
-                  [±anterior]  [±back]
-                  [±distributed] [±high]
-                  [±lateral]
+```mermaid
+flowchart TD
+    Root["Root"]
+
+    Root --> Laryngeal["Laryngeal"]
+    Root --> Place["Place"]
+
+    Laryngeal --> voice["[±voice]"]
+    Laryngeal --> spread_gl["[±spread gl]"]
+    Laryngeal --> constr_gl["[±constr gl]"]
+
+    Place --> Labial["Labial"]
+    Place --> Coronal["Coronal"]
+    Place --> Dorsal["Dorsal"]
+
+    Coronal --> anterior["[±anterior]"]
+    Coronal --> distributed["[±distributed]"]
+    Coronal --> lateral["[±lateral]"]
+
+    Dorsal --> back["[±back]"]
+    Dorsal --> high["[±high]"]
 ```
 
 This hierarchy predicts spreading domains in assimilation. When a nasal consonant triggers nasalization on a preceding vowel, the [+nasal] feature under the root node spreads, bringing along velum lowering without affecting oral articulator configuration. When place assimilation occurs—as in the prefix /in-/ surfacing as [im] before bilabials ("impossible"), [iŋ] before velars ("incomplete"), or [in] before coronals ("intolerable")—only the Place node copies from the following consonant while laryngeal features remain stable.

@@ -139,40 +139,101 @@ The correct general hierarchy is: compactness implies limit point compactness in
 
 The relationships among connectedness, path-connectedness, and compactness, and among the three forms of compactness, are most clearly seen through the interaction of their definitions with continuous maps and subspace constructions. The following diagram renders the logical dependencies and implication structure.
 
-```
-PATH-CONNECTED
-      |
-      | (Proposition 3.3)
-      v
-  CONNECTED
-  
-  
-COMPACT (open cover)
-      |
-      | in metric spaces       in T1 spaces
-      v                              |
-SEQUENTIALLY COMPACT  -------> LIMIT POINT COMPACT
-      |
-      | (requires first-countability)
-      v
-   (implies compact in metric spaces, via total boundedness + completeness)
+```mermaid
+flowchart TD
+    PC["PATH-CONNECTED"]
+    C["CONNECTED"]
+    COMP["COMPACT<br/>(open cover)"]
+    SC["SEQUENTIALLY COMPACT"]
+    LPC["LIMIT POINT COMPACT"]
+    
+    PC -->|"Proposition 3.3"| C
+    COMP -->|"in metric spaces"| SC
+    COMP -->|"in T1 spaces"| LPC
+    SC --> LPC
+    SC -->|"requires first-countability"| IMPL["implies compact in metric spaces<br/>(via total boundedness + completeness)"]
+    
+    style PC fill:#e1f5ff
+    style C fill:#e1f5ff
+    style COMP fill:#fff4e1
+    style SC fill:#f0e1ff
+    style LPC fill:#f0e1ff
+    style IMPL fill:#f5f5f5
 ```
 
 In the vertical chain on the left, path-connectedness strictly implies connectedness. The gap is illustrated by the topologist's sine curve: connected but not path-connected. In the lower chain, the three forms of compactness are equivalent in metric spaces but diverge in general topological spaces.
 
 The following diagram exhibits how these properties interact under the fundamental constructions of topology.
 
-```
-CONSTRUCTION              CONNECTEDNESS    PATH-CONN.    COMPACTNESS
-─────────────────────────────────────────────────────────────────────
-Continuous image          preserved        preserved     preserved
-Closed subspace           NOT preserved    NOT preserved preserved
-Open subspace             NOT preserved    NOT preserved NOT preserved
-Finite product            preserved        preserved     preserved
-Arbitrary product         preserved        preserved     preserved (Tychonoff)
-Closure                   preserved        NOT preserved preserved (if compact)
-Union (common point)      preserved        preserved     NOT preserved
-─────────────────────────────────────────────────────────────────────
+```mermaid
+flowchart LR
+    subgraph constructions ["Constructions"]
+        C1["Continuous Image"]
+        C2["Closed Subspace"]
+        C3["Open Subspace"]
+        C4["Finite Product"]
+        C5["Arbitrary Product"]
+        C6["Closure"]
+        C7["Union (Common Point)"]
+    end
+
+    subgraph connectedness_col ["Connectedness"]
+        N1["✔ Preserved"]
+        N2["✘ Not Preserved"]
+        N3["✔ Preserved"]
+        N4["✔ Preserved"]
+        N5["✔ Preserved"]
+        N6["✘ Not Preserved"]
+        N7["✔ Preserved"]
+    end
+
+    subgraph path_conn_col ["Path-Connectedness"]
+        P1["✔ Preserved"]
+        P2["✘ Not Preserved"]
+        P3["✘ Not Preserved"]
+        P4["✔ Preserved"]
+        P5["✔ Preserved"]
+        P6["✘ Not Preserved"]
+        P7["✔ Preserved"]
+    end
+
+    subgraph compactness_col ["Compactness"]
+        K1["✔ Preserved"]
+        K2["✔ Preserved"]
+        K3["✘ Not Preserved"]
+        K4["✔ Preserved"]
+        K5["✔ Preserved (Tychonoff)"]
+        K6["✔ Preserved (if compact)"]
+        K7["✘ Not Preserved"]
+    end
+
+    C1 --> N1
+    C1 --> P1
+    C1 --> K1
+
+    C2 --> N2
+    C2 --> P2
+    C2 --> K2
+
+    C3 --> N3
+    C3 --> P3
+    C3 --> K3
+
+    C4 --> N4
+    C4 --> P4
+    C4 --> K4
+
+    C5 --> N5
+    C5 --> P5
+    C5 --> K5
+
+    C6 --> N6
+    C6 --> P6
+    C6 --> K6
+
+    C7 --> N7
+    C7 --> P7
+    C7 --> K7
 ```
 
 Each entry in this table is a theorem — not an observation — and understanding the proof of each row is essential for working in topology. We detail the most consequential.

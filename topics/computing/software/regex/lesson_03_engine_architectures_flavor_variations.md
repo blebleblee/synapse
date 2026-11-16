@@ -28,21 +28,32 @@ The critical implementation detail is that **captures are part of the state that
 
 The following diagram shows the NFA structure for the pattern `a(b|c)*d` and the backtracking execution trace against the string `"abcd"`:
 
-```
-NFA Graph for a(b|c)*d:
+```mermaid
+flowchart LR
+    S0(["S0"])
+    S1(["S1"])
+    S2(["S2"])
+    S3(["S3"])
+    S4(["S4"])
+    S5(["S5"])
+    S3p(["S3'"])
+    S4p(["S4'"])
+    S6(["S6"])
+    S7(["S7 · ACCEPT"])
 
-  [S0] --a--> [S1] --ε--> [S2] --ε--> [S3] --b--> [S4] --ε--> [S5] --ε--> [S2]
-                                  |                                          |
-                                  |              [S3'] --c--> [S4'] --ε-----|
-                                  |                                          |
-                                  +--ε------------------------------------> [S6] --d--> [S7:ACCEPT]
+    S0 -->|"a"| S1
+    S1 -->|"ε"| S2
+    S2 -->|"ε"| S3
+    S3 -->|"b"| S4
+    S4 -->|"ε"| S5
+    S5 -->|"ε"| S2
+    S2 -->|"ε"| S3p
+    S3p -->|"c"| S4p
+    S4p -->|"ε"| S5
+    S2 -->|"ε"| S6
+    S6 -->|"d"| S7
 
-Execution trace on "abcd":
-  pos=0: S0, match 'a', advance -> S1
-  pos=1: S1-ε->S2-ε->S3, try branch 'b', match 'b', -> S4-ε->S5-ε->S2
-  pos=2: S2-ε->S3, try branch 'b', no match ('c'), backtrack to try 'c'
-  pos=2: S2-ε->S3', try branch 'c', match 'c', -> S4'-ε->S5-ε->S2
-  pos=3: S2-ε->S6, try 'd', match 'd', -> S7:ACCEPT
+    style S7 fill:#2d6a2d,color:#fff,stroke:#1a401a
 ```
 
 The backtracking engine's time complexity in the worst case is `O(2^n)` because the number of choice points on the stack can grow exponentially with the input length. This is not a theoretical curiosity—it is a production failure mode discussed in depth in Section 3.
@@ -53,23 +64,26 @@ The DFA engine takes the opposite approach. During compilation, it applies the p
 
 The canonical DFA transition table for a small pattern can be visualized as follows. For the pattern `(a|b)*abb`:
 
-```
-DFA States (each is a subset of NFA states):
+```mermaid
+flowchart LR
+    Q0(["Q0\n{start}"])
+    Q1(["Q1\n{after 'a'}"])
+    Q2(["Q2\n{after 'ab'}"])
+    Q3(["Q3\n{after 'abb'}\n✓ ACCEPT"])
 
-  State Q0 = {NFA states active before consuming input}
-  State Q1 = {NFA states active after 'a'}
-  State Q2 = {NFA states active after 'ab'}
-  State Q3 = {NFA states active after 'abb'}  <- ACCEPT
+    style Q0 fill:#4a90d9,stroke:#2c5f8a,color:#fff
+    style Q1 fill:#4a90d9,stroke:#2c5f8a,color:#fff
+    style Q2 fill:#4a90d9,stroke:#2c5f8a,color:#fff
+    style Q3 fill:#2ecc71,stroke:#1a7a44,color:#fff
 
-Transition Table:
-  +--------+-------+-------+
-  | State  |  'a'  |  'b'  |
-  +--------+-------+-------+
-  |  Q0    |  Q1   |  Q0   |
-  |  Q1    |  Q1   |  Q2   |
-  |  Q2    |  Q1   |  Q3   |
-  |  Q3    |  Q1   |  Q0   |
-  +--------+-------+-------+
+    Q0 -->|"'a'"| Q1
+    Q0 -->|"'b'"| Q0
+    Q1 -->|"'a'"| Q1
+    Q1 -->|"'b'"| Q2
+    Q2 -->|"'a'"| Q1
+    Q2 -->|"'b'"| Q3
+    Q3 -->|"'a'"| Q1
+    Q3 -->|"'b'"| Q0
 ```
 
 Matching `"aabb"` requires four table lookups: `Q0 --a--> Q1 --a--> Q1 --b--> Q2 --b--> Q3`, accepting in exactly `O(n)` time.

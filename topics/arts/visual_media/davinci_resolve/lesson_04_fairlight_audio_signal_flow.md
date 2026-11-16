@@ -34,20 +34,37 @@ The true power of Fairlight's architecture emerges when you construct *buses*—
 
 In a typical television or film mixing scenario, you might construct this bus hierarchy:
 
-```
-Track 1 (Dialogue A) ──┐
-Track 2 (Dialogue B) ──┤
-Track 3 (Dialogue C) ──┼──→ DIALOGUE BUS
-Track 4 (Dialogue D) ──┤
-Track 5 (Dialogue E) ──┘
-    
-    Dialogue Bus ──┐
-    Music Bus ─────┤
-    Effects Bus ───┼──→ STEM BUS (Mono / Stereo / Immersive)
-    Foley Bus ─────┤
-    Ambience Bus ──┘
-    
-    Stem Bus ──→ MASTER OUTPUT (Stereo / Surround / Atmos)
+```mermaid
+flowchart LR
+    T1["Track 1 (Dialogue A)"]
+    T2["Track 2 (Dialogue B)"]
+    T3["Track 3 (Dialogue C)"]
+    T4["Track 4 (Dialogue D)"]
+    T5["Track 5 (Dialogue E)"]
+
+    DB["DIALOGUE BUS"]
+
+    MB["Music Bus"]
+    EB["Effects Bus"]
+    FB["Foley Bus"]
+    AB["Ambience Bus"]
+
+    SB["STEM BUS\n(Mono / Stereo / Immersive)"]
+    MO["MASTER OUTPUT\n(Stereo / Surround / Atmos)"]
+
+    T1 --> DB
+    T2 --> DB
+    T3 --> DB
+    T4 --> DB
+    T5 --> DB
+
+    DB --> SB
+    MB --> SB
+    EB --> SB
+    FB --> SB
+    AB --> SB
+
+    SB --> MO
 ```
 
 Each track routes to its category bus (dialogue, music, effects, foley, ambience). Each category bus routes to a *stem bus* that collects all content for a particular delivery format (stereo mix, 5.1 surround, Atmos immersive bed). The stem bus finally routes to the master output, which represents the final mix.
@@ -114,4 +131,19 @@ Fairlight computes every automation keyframe and plugin effect in real time as y
 
 The first optimization is *freezing tracks*, which pre-renders a track's effects chain into a temporary cached audio file. Once frozen, Fairlight plays back the cached audio instead of computing plugins in real time, freeing CPU. However, freezing is not final; you can unfreeze at any moment to adjust plugins or automation. Professional workflows freeze dialogue and effects tracks once their mixing is finalized, keeping music and dialogue bus tracks unfrozen for last-minute tweaks. Freezing has a critical caveat: if you freeze a track before finalizing its bus routing or master processing, changes to the bus compressor or master EQ will not affect the frozen track. You must unfreeze to incorporate downstream changes.
 
-The second optimization is *plugin instance sharing*. Instead of inserting identical compressors on dialogue track A and dialogue track B, you insert a single compressor on the Dialo
+The second optimization is *plugin instance sharing*.
+
+Many DAWs share identical plugin instances across multiple tracks when the same plugin is inserted with identical settings, reducing CPU load. Fairlight, however, instantiates a separate plugin process for each track by default, which can double or triple CPU usage in sessions where the same EQ or compressor appears on 20+ tracks. To mitigate this, professional mixers consolidate common processing to buses—routing all dialogue tracks through a single dialogue bus with one EQ and one compressor, rather than placing those plugins on each individual track. This bus-centric approach mirrors analog console workflows where all channels of a given type (drums, vocals, dialogue) are summed into a group bus before hitting master processing. The trade-off is loss of per-track granularity; if one dialogue clip requires different EQ, it must be handled via clip-level effects or a separate routing path. The third optimization is *sample rate and buffer size management*. Higher sample rates (96 kHz, 192 kHz) double or quadruple the number of samples processed per second, increasing CPU load proportionally. Professional workflows use 48 kHz for final delivery unless the project explicitly requires high-resolution audio for theatrical release. Buffer size controls the latency between when Fairlight computes audio and when you hear it. Smaller buffers (64 samples) give near-zero latency for recording but require more frequent CPU interrupts, increasing dropout risk. Larger buffers (1024 samples) introduce noticeable delay but allow smoother playback. Standard practice: use 128–256 samples during mixing, increase to 512–1024 for final render if dropout occurs.
+
+Failure modes in Fairlight signal flow are almost always traceable to routing misconfiguration, clipping, or plugin overload. The most common failure is *silent bus output*: you hear tracks in solo but not in the mix. This indicates the track is routed to a bus that is either muted, disabled, or not routed to the master. The diagnostic is to check the track's output assignment in the mixer, verify the bus fader is up and enabled, then confirm the bus routes to the master output. The second failure is *pre-fader send clipping*: a reverb or delay bus distorts even though the source track is at reasonable levels. This occurs when the pre-fader send is set too high, sending a hot signal to the bus before the track fader attenuates it. The fix is either switching to post-fader sends or reducing the send level. The third failure is *automation fighting manual adjustments*: you move a fader during playback, but it snaps back to its automated position. Fairlight's automation read mode overrides manual input unless switched to latch or touch mode, where manual moves create new keyframes. The final critical failure is *plugin latency accumulation*: some plugins (especially linear-phase EQs and look-ahead limiters) introduce processing delay. When multiple such plugins are chained across tracks and buses, the cumulative latency can desynchronize audio from video by tens of milliseconds. Fairlight compensates automatically via plugin delay compensation (PDC), but PDC can be disabled by user error or fail when plugin latency reporting is incorrect. The diagnostic is to check the PDC indicator in the mixer and verify all plugins report their latency accurately to the host.
+
+## Summary & Verification Matrix
+
+| **Invariant / Mechanism** | **Governing Rule** | **Diagnostic Criterion** | **Failure Mode** |
+|---------------------------|-------------------|-------------------------|-----------------|
+| **Signal Flow Hierarchy** | Track → Bus → Master, each stage sums inputs and applies processing. No stage can amplify beyond 0 dBFS without clipping. | Solo the master output; if silent, verify bus routing. Solo the bus; if silent, verify track outputs target that bus. | Bus assigned but muted, or bus not routed to master. Track routed to wrong bus. |
+| **Pre/Post-Fader Topology** | Pre-fader sends sample signal before volume fader; post-fader sends sample after. Pre-fader is independent of track level; post-fader is proportional. | Mute the source track. If the reverb/delay persists, the send is pre-fader. If it stops, the send is post-fader. | Pre-fader send overloads the effects bus when the source track is reduced. Post-fader send disappears when the track is soloed if not configured correctly. |
+| **Metering Standards** | PPM measures instantaneous peaks (protect converters). LUFS measures integrated loudness (match platform targets). A mix can be peak-safe but too quiet, or vice versa. | Peak meter hits −3 dB max; LUFS integrates to −16 LUFS (Netflix) or −14 LUFS (YouTube). If LUFS is −20, raise overall gain without exceeding PPM limits. | Mix peaks at −6 dB but integrates at −10 LUFS: platform normalizer will reduce gain, losing headroom. Mix integrates at −14 LUFS but peaks at +2 dB: clipping on export. |
+| **CPU Optimization** | Freezing pre-renders effects; bus-centric routing reduces plugin instances; sample rate and buffer size control CPU load vs. latency. | Freeze finalized tracks, route common processing (EQ, compression) to buses, use 48 kHz and 256-sample buffer for mixing. Monitor CPU meter during playback. | Frozen track does not respond to bus changes (must unfreeze). Per-track plugin duplication exhausts CPU. Dropout occurs at low buffer sizes under high CPU load. |
+| **Automation Modes** | Read plays back keyframes. Latch overwrites all downstream automation. Touch writes automation only while the control is held. Manual moves are ignored in Read mode. | Switch to Touch mode; move a fader during playback. If new keyframes appear on the timeline, automation is writing correctly. If fader snaps back, mode is still in Read. | Automation in Read mode ignores manual adjustments. Latch mode accidentally overwrites existing automation past the intended edit point. |
+| **Plugin Delay Compensation** | High-latency plugins (linear-phase EQ, look-ahead limiters) delay audio. PDC shifts all tracks to maintain sync. PDC failure desynchronizes audio and video. | Check PDC indicator in mixer. Render a sync reference (beep + flash). If audio lags video by >10 ms, PDC is disabled or a plugin misreports latency. | PDC disabled in preferences. Plugin does not report latency to host. Cumulative latency exceeds PDC buffer limits (rare above 10,000 samples). |

@@ -24,41 +24,31 @@ The architecture of a resilient event-driven system rests on layered failure det
 
 The lifecycle of an event begins with producer serialization and partitioning. Modern event systems like Kafka require producers to specify a partition key that determines which broker partition receives the event. This partition assignment has profound implications for ordering guarantees and failure isolation. Events with the same partition key are delivered to a single consumer instance within a consumer group, preserving strict ordering but creating a head-of-line blocking risk: if that consumer crashes or processes slowly, all events for that partition key experience latency. Producers typically compute partition keys using consistent hashing over domain identifiers like user IDs or tenant IDs, trading global ordering for horizontal scalability.
 
-```
-┌─────────────┐
-│  Producer   │
-│  Instance   │
-└──────┬──────┘
-       │ Serialize event → Avro/Protobuf
-       │ Compute partition key → hash(user_id) % num_partitions
-       │ Select partition → partition_3
-       │
-       ▼
-┌─────────────────────────────────────────┐
-│           Message Broker                │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐ │
-│  │Partition│  │Partition│  │Partition│ │
-│  │    0    │  │    1    │  │    2    │ │
-│  └─────────┘  └─────────┘  └─────────┘ │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐ │
-│  │Partition│  │Partition│  │Partition│ │
-│  │    3    │  │    4    │  │    5    │ │
-│  └─────────┘  └─────────┘  └─────────┘ │
-└─────────────────────────────────────────┘
-       │
-       │ Consumer polls partition 3
-       ▼
-┌──────────────┐
-│   Consumer   │
-│   Instance   │ ← Heartbeat to coordinator every 3s
-└──────┬───────┘
-       │ Deserialize event
-       │ Execute business logic
-       │ Commit offset (auto or manual)
-       │
-       ├─ SUCCESS → Acknowledge
-       │
-       └─ FAILURE → Retry or Dead-Letter
+```mermaid
+flowchart TD
+    Producer["Producer<br/>Instance"]
+    Producer --> |"Serialize event → Avro/Protobuf"| Step1["Compute partition key<br/>hash(user_id) % num_partitions"]
+    Step1 --> |"Select partition → partition_3"| Broker
+    
+    subgraph Broker["Message Broker"]
+        P0["Partition<br/>0"]
+        P1["Partition<br/>1"]
+        P2["Partition<br/>2"]
+        P3["Partition<br/>3"]
+        P4["Partition<br/>4"]
+        P5["Partition<br/>5"]
+    end
+    
+    Broker --> |"Consumer polls partition 3"| Consumer["Consumer<br/>Instance"]
+    Consumer -.->|"Heartbeat to coordinator every 3s"| Consumer
+    
+    Consumer --> Process["Deserialize event<br/>Execute business logic<br/>Commit offset (auto or manual)"]
+    
+    Process --> Success["SUCCESS"]
+    Process --> Failure["FAILURE"]
+    
+    Success --> Ack["Acknowledge"]
+    Failure --> Retry["Retry or Dead-Letter"]
 ```
 
 When a consumer fetches events from a broker partition, it receives a batch of messages along with their offset positions within the partition's append-only log. The consumer processes each message and must decide when to commit the offset advancement back to the broker. This commit strategy represents a fundamental tradeoff between throughput and reliability. Auto-commit modes periodically commit offsets on a fixed interval, maximizing throughput but risking message loss if the consumer crashes between commit intervals. Manual commit allows the consumer to commit only after successful processing, guaranteeing at-least-once delivery but introducing latency from the round-trip acknowledgment.

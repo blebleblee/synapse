@@ -52,33 +52,26 @@ The physical structure of Lego pneumatic tanks typically employs cylindrical or 
 
 The complete pneumatic circuit architecture follows a topological pattern of series and parallel air paths that determines system behavior and failure modes:
 
-```
-                    ┌─────────────┐
-                    │   Pump      │
-                    │  (Source)   │
-                    └──────┬──────┘
-                           │
-                    ┌──────┴──────┐
-                    │    Tank     │
-                    │  (Reservoir) │
-                    └──────┬──────┘
-                           │
-                    ┌──────┴──────┐
-                    │    Valve    │
-                    │  (Control)  │
-                    └──┬────────┬─┘
-                       │        │
-                Port A │        │ Port B
-                       │        │
-            ┌──────────┴───┐    └─────────────┐
-            │  Cylinder 1  │                  │
-            │  Chamber A   │          ┌───────┴────────┐
-            └──────────────┘          │   Cylinder 1   │
-                                      │   Chamber B    │
-            Vent to                   └────────────────┘
-            Atmosphere
-                                      Vent to
-                                      Atmosphere
+```mermaid
+flowchart TD
+    Pump["Pump<br/>(Source)"]
+    Tank["Tank<br/>(Reservoir)"]
+    Valve["Valve<br/>(Control)"]
+    PortA["Port A"]
+    PortB["Port B"]
+    Cyl1A["Cylinder 1<br/>Chamber A"]
+    Cyl1B["Cylinder 1<br/>Chamber B"]
+    VentA["Vent to<br/>Atmosphere"]
+    VentB["Vent to<br/>Atmosphere"]
+    
+    Pump --> Tank
+    Tank --> Valve
+    Valve --> PortA
+    Valve --> PortB
+    PortA --> Cyl1A
+    PortB --> Cyl1B
+    Cyl1A --> VentA
+    Cyl1B --> VentB
 ```
 
 This canonical topology for a valve-controlled double-acting cylinder illustrates how pressure propagates from source through control elements to actuators, with atmospheric vents allowing return air to escape. Series elements like pumps, tanks, and valve inlet ports share common flow—all air passing downstream must traverse each series element. Parallel elements like multiple cylinders fed from a common manifold divide flow—air from the supply splits among the parallel branches according to each branch's flow resistance and pressure requirements.

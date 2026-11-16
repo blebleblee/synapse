@@ -22,21 +22,52 @@ The computational substrate of motion in three-dimensional space begins with the
 
 Keyframe interpolation relies on parameterized curve representations that map the normalized time interval [0, 1] onto value ranges with controllable velocity profiles. Linear interpolation computes the weighted average between adjacent keyframes, producing constant velocity but discontinuous acceleration at keyframe boundaries. Cubic Bézier curves introduce two control handles per keyframe, defining tangent directions that ensure C1 continuity—matching first derivatives—at segment junctions. The curve parameter does not correspond directly to arc length, however; uniform time steps produce nonuniform spatial displacements, enabling the ease-in and ease-out profiles fundamental to natural motion. Hermite splines parameterize segments through endpoint positions and tangent vectors, while Catmull-Rom splines compute tangents automatically from adjacent keyframe positions, providing continuity without manual handle adjustment. The choice of interpolation kernel directly determines motion quality: Bézier curves grant fine-grained timing control, while Catmull-Rom automation suits rapid blocking workflows.
 
-```
-Time Domain [0, 1]:
-  t=0.0 -------- t=0.25 -------- t=0.50 -------- t=0.75 -------- t=1.0
-   │                                                                  │
-   v (keyframe)                                                  v (keyframe)
-Position: P₀                                                      P₁
-
-Linear: P(t) = (1-t)·P₀ + t·P₁
-  Velocity = constant (P₁ - P₀)
-  Acceleration = 0 (robotic)
-
-Cubic Bézier: P(t) = (1-t)³·P₀ + 3(1-t)²t·H₀ + 3(1-t)t²·H₁ + t³·P₁
-  H₀, H₁ = control handles defining tangent slopes
-  Velocity varies smoothly, acceleration continuous
-  Ease-in/ease-out through handle positioning
+```mermaid
+flowchart TD
+    subgraph timeline ["Time Domain [0, 1]"]
+        t0["t=0.0<br/>Keyframe"]
+        t025["t=0.25"]
+        t050["t=0.50"]
+        t075["t=0.75"]
+        t1["t=1.0<br/>Keyframe"]
+        
+        t0 -.-> t025 -.-> t050 -.-> t075 -.-> t1
+    end
+    
+    subgraph positions ["Position Keyframes"]
+        P0["P₀<br/>(Start Position)"]
+        P1["P₁<br/>(End Position)"]
+    end
+    
+    subgraph linear ["Linear Interpolation"]
+        lin_formula["P(t) = (1-t)·P₀ + t·P₁"]
+        lin_vel["Velocity = constant (P₁ - P₀)"]
+        lin_accel["Acceleration = 0<br/>(robotic motion)"]
+        
+        lin_formula --> lin_vel --> lin_accel
+    end
+    
+    subgraph bezier ["Cubic Bézier Interpolation"]
+        bez_formula["P(t) = (1-t)³·P₀ + 3(1-t)²t·H₀ +<br/>3(1-t)t²·H₁ + t³·P₁"]
+        bez_handles["H₀, H₁<br/>(Control handles defining tangent slopes)"]
+        bez_vel["Velocity varies smoothly"]
+        bez_accel["Acceleration continuous"]
+        bez_ease["Ease-in/ease-out through<br/>handle positioning"]
+        
+        bez_formula --> bez_handles
+        bez_handles --> bez_vel
+        bez_vel --> bez_accel
+        bez_accel --> bez_ease
+    end
+    
+    t0 --> P0
+    t1 --> P1
+    
+    P0 --> linear
+    P1 --> linear
+    
+    P0 --> bezier
+    P1 --> bezier
 ```
 
 Traditional animation's timing and spacing principles map directly onto this interpolation machinery. Timing corresponds to keyframe interval duration measured in frames: a ball dropping through 120 pixels over 8 frames exhibits faster velocity than one traversing the same distance over 16 frames. Spacing controls the distribution of inbetween positions, which directly determines the acceleration profile. Uniform spacing produces constant velocity; closer spacing near the starting keyframe concentrates positional change at the action's beginning, creating ease-out deceleration. The animator manipulates spacing by adjusting Bézier handles or inserting intermediate keyframes, sculpting the motion's rhythmic cadence. The graph editor visualizes these curves as time-versus-value plots, transforming abstract numerical interpolation into tangible visual editing targets.

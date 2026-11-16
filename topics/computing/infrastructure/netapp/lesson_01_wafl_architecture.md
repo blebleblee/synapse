@@ -22,39 +22,57 @@ Understanding WAFL requires holding two timescales in mind simultaneously. At th
 
 WAFL's on-disk structure can be visualized as a tree rooted at the FSINFO block. The FSINFO block occupies a fixed sector address on each RAID group and contains the block pointer to the root inode of the inode file, a generation count, and the CP sequence number. The root inode of the inode file uses a standard indirect block tree—direct pointers, single indirect, double indirect, triple indirect—exactly like a Unix inode, except that what it describes is not user data but an array of 128-byte inode records, one per file or directory in the volume.
 
-```
-FSINFO Block (fixed sector)
-│  cp_seq: 0x0000A4F2
-│  root_inode_ptr: 0x003F8000
-│
-└─► Root Inode (inode file)
-    │  size: N * 128 bytes
-    │  block[0..N]: pointers to inode array blocks
-    │
-    ├─► Inode[0] (volume metadata)
-    ├─► Inode[1] (snapshot directory)
-    ├─► Inode[2..M] (user inodes)
-    │
-    └─► Inode[K] (example file inode)
-        │  size: 65536 bytes
-        │  direct[0..11]: direct data block pointers
-        │  indirect: → indirect block → data blocks
-        │
-        └─► Data Blocks (anywhere on disk)
+```mermaid
+flowchart TD
+    FSINFO["FSINFO Block (fixed sector)<br/>cp_seq: 0x0000A4F2<br/>root_inode_ptr: 0x003F8000"]
+    
+    ROOT["Root Inode (inode file)<br/>size: N * 128 bytes<br/>block[0..N]: pointers to inode array blocks"]
+    
+    INODE0["Inode[0]<br/>(volume metadata)"]
+    INODE1["Inode[1]<br/>(snapshot directory)"]
+    INODE2["Inode[2..M]<br/>(user inodes)"]
+    INODEK["Inode[K]<br/>(example file inode)<br/>size: 65536 bytes<br/>direct[0..11]: direct data block pointers<br/>indirect: pointer"]
+    
+    INDIRECT["Indirect Block"]
+    DATABLOCKS["Data Blocks<br/>(anywhere on disk)"]
+    
+    FSINFO --> ROOT
+    ROOT --> INODE0
+    ROOT --> INODE1
+    ROOT --> INODE2
+    ROOT --> INODEK
+    INODEK --> INDIRECT
+    INDIRECT --> DATABLOCKS
+    INODEK -.direct pointers.-> DATABLOCKS
 ```
 
 The critical insight in this layout is that every block in the tree carries the address of the block it points to, not the address of itself. This is pointer-based addressing rather than offset-based addressing, and it is what makes write-anywhere semantically coherent. When a data block is rewritten, its new physical address is recorded in its parent indirect block; when that indirect block changes, its new address propagates up to the inode; when the inode changes, the inode array block is rewritten, which propagates up to the root inode, which forces a new FSINFO write. The old chain of blocks remains on disk, unreferenced by the live tree but perfectly intact.
 
-```
-Before CP:                          After CP:
+```mermaid
+flowchart LR
+    subgraph before ["Before Checkpoint"]
+        direction TB
+        B_FSINFO["FSINFO"]
+        B_RootV1["Root Inode [v1]"]
+        B_InodeKV1["Inode [K][v1]"]
+        B_DataA["DataBlock [A]\n(old data, still on disk)"]
 
-FSINFO ──► Root Inode[v1]           FSINFO ──► Root Inode[v2]
-           │                                   │
-           └─► Inode[K][v1]                    └─► Inode[K][v2]
-               │                                   │
-               └─► DataBlock[A]                    └─► DataBlock[B]  (new write)
-                   (old data,                       (new data,
-                    still on disk)                   new location)
+        B_FSINFO --> B_RootV1
+        B_RootV1 --> B_InodeKV1
+        B_InodeKV1 --> B_DataA
+    end
+
+    subgraph after ["After Checkpoint"]
+        direction TB
+        A_FSINFO["FSINFO"]
+        A_RootV2["Root Inode [v2]"]
+        A_InodeKV2["Inode [K][v2]"]
+        A_DataB["DataBlock [B]\n(new data, new location)"]
+
+        A_FSINFO --> A_RootV2
+        A_RootV2 --> A_InodeKV2
+        A_InodeKV2 --> A_DataB
+    end
 ```
 
 The blocks labeled v1 remain physically present until the space reclaimer (a background process WAFL calls the **block reclaimer** or, in ONTAP terminology, the **wafl_scan** subsystem) determines that no snapshot holds a reference to them. This deferred reclamation is not a bug or a space-leak—it is the mechanism by which snapshots are free. A snapshot is nothing more than a saved copy of the FSINFO block, preserving the root inode pointer that was current at the moment the snapshot was taken.
@@ -67,25 +85,40 @@ During the **write phase**, the CP engine walks all CP-pending buffers, allocate
 
 The final write of the CP—the FSINFO update—is a single-sector synchronous write. Because a disk sector write is atomic at the hardware level (the drive controller guarantees either the full sector is written or the old sector remains), the transition from the old filesystem state to the new one is atomic. There is no torn-write problem at the root. This is the invariant that eliminates the need for a recovery journal: the filesystem is always rooted at a valid, consistent FSINFO block.
 
-```
-CP Phase Sequence:
+```mermaid
+flowchart TD
+    RAM["Dirty Buffers in RAM"]
 
-[Dirty Buffers in RAM]
-        │
-        ▼
-  1. Mark CP-pending buffers
-  2. Continue accepting writes (into next-CP dirty set)
-        │
-        ▼
-  3. Write data blocks  ──► RAID / disk
-  4. Write indirect blocks ──► RAID / disk
-  5. Write inode array blocks ──► RAID / disk
-  6. Write root inode ──► RAID / disk
-  7. fsync() FSINFO block ──► RAID / disk  ◄── atomic commit point
-        │
-        ▼
-  8. Invalidate NVRAM log entries covered by this CP
-  9. Release reclaimed block addresses to free map
+    RAM --> MARK["1. Mark CP-pending buffers"]
+    MARK --> WRITES["2. Continue accepting writes\n(into next-CP dirty set)"]
+
+    WRITES --> DATA["3. Write data blocks"]
+    DATA --> RAID1[("RAID / disk")]
+    DATA --> RAID1
+
+    WRITES --> INDIR["4. Write indirect blocks"]
+    INDIR --> RAID2[("RAID / disk")]
+
+    WRITES --> INODE_ARR["5. Write inode array blocks"]
+    INODE_ARR --> RAID3[("RAID / disk")]
+
+    WRITES --> ROOT_INODE["6. Write root inode"]
+    ROOT_INODE --> RAID4[("RAID / disk")]
+
+    WRITES --> FSYNC["7. fsync() FSINFO block\n⬅ atomic commit point"]
+    FSYNC --> RAID5[("RAID / disk")]
+
+    DATA ~~~ INDIR
+    INDIR ~~~ INODE_ARR
+    INODE_ARR ~~~ ROOT_INODE
+    ROOT_INODE ~~~ FSYNC
+
+    FSYNC --> INVAL["8. Invalidate NVRAM log entries\ncovered by this CP"]
+    INVAL --> FREE["9. Release reclaimed block addresses\nto free map"]
+
+    style FSYNC fill:#d4a017,stroke:#a07010,color:#000
+    style RAM fill:#4a90d9,stroke:#2c6fad,color:#fff
+    style FREE fill:#5aab61,stroke:#3a8b41,color:#fff
 ```
 
 ### NVRAM: The Durability Bridge

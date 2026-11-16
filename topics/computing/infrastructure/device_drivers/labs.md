@@ -51,8 +51,8 @@ graph TB
     H --> I
     I --> J["Physical Medium"]
     
-    style F fill:#ff9
-    style I fill:#9cf
+    style F fill:#ff9,color:#0f172a
+    style I fill:#9cf,color:#0f172a
 ```
 
 **Critical Driver Interfaces:**

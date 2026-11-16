@@ -24,46 +24,46 @@ GTAW tungsten electrodes have their own classification system under AWS A5.12. P
 
 The practical mechanic of the arc can be understood as a system with four interacting layers: the power source and its control loop, the electrode and consumable feed system, the arc plasma column itself, and the weld pool and its solidification dynamics. These layers communicate bidirectionally in real time, and competence as a welder means developing reflexes that intervene at the right layer for each class of problem.
 
-```
-POWER SOURCE (CC or CV)
-        │
-        │  Voltage / Current feedback loop
-        ▼
-ELECTRODE SYSTEM
-  ┌─────────────────────────────────────────────────┐
-  │  GTAW: Non-consumable tungsten / filler added   │
-  │        separately by hand                       │
-  │                                                 │
-  │  GMAW: Consumable wire, motor-driven feed,      │
-  │        contact tip transfers current            │
-  │                                                 │
-  │  SMAW: Consumable flux-coated stick electrode,  │
-  │        flux vaporizes to form shielding gas     │
-  └─────────────────────────────────────────────────┘
-        │
-        │  Arc gap (1–6 mm depending on process)
-        ▼
-ARC PLASMA COLUMN
-  ┌─────────────────────────────────────────────────┐
-  │  Cathode spot → plasma core → anode spot        │
-  │  T: 6,000–20,000 °C                             │
-  │  Electromagnetic pinch / arc pressure           │
-  │  Shielding gas envelope: excludes O₂, N₂, H₂O  │
-  └─────────────────────────────────────────────────┘
-        │
-        │  Heat flux (conduction + convection + radiation)
-        ▼
-WELD POOL & BASE METAL
-  ┌─────────────────────────────────────────────────┐
-  │  Fusion zone: fully melted, chemical mixing     │
-  │  HAZ: solid but thermally affected              │
-  │  Marangoni convection drives pool fluid motion  │
-  │  Solidification: columnar → equiaxed grains     │
-  └─────────────────────────────────────────────────┘
-        │
-        ▼
-SOLIDIFIED WELD BEAD
-  (Microstructure, residual stress, distortion locked in)
+```mermaid
+flowchart TD
+    A["POWER SOURCE<br/>(CC or CV)"]
+    B["ELECTRODE SYSTEM"]
+    C["ARC PLASMA COLUMN"]
+    D["WELD POOL & BASE METAL"]
+    E["SOLIDIFIED WELD BEAD"]
+    
+    A -->|"Voltage / Current<br/>feedback loop"| B
+    
+    subgraph electrode ["Electrode Types"]
+        B1["GTAW: Non-consumable tungsten<br/>filler added separately by hand"]
+        B2["GMAW: Consumable wire, motor-driven feed<br/>contact tip transfers current"]
+        B3["SMAW: Consumable flux-coated stick electrode<br/>flux vaporizes to form shielding gas"]
+    end
+    
+    B --> electrode
+    electrode -->|"Arc gap<br/>(1–6 mm depending on process)"| C
+    
+    subgraph plasma ["Plasma Characteristics"]
+        C1["Cathode spot → plasma core → anode spot"]
+        C2["T: 6,000–20,000 °C"]
+        C3["Electromagnetic pinch / arc pressure"]
+        C4["Shielding gas envelope: excludes O₂, N₂, H₂O"]
+    end
+    
+    C --> plasma
+    plasma -->|"Heat flux<br/>(conduction + convection + radiation)"| D
+    
+    subgraph pool ["Weld Pool Dynamics"]
+        D1["Fusion zone: fully melted, chemical mixing"]
+        D2["HAZ: solid but thermally affected"]
+        D3["Marangoni convection drives pool fluid motion"]
+        D4["Solidification: columnar → equiaxed grains"]
+    end
+    
+    D --> pool
+    pool --> E
+    
+    E -.->|"Result"| E1["Microstructure, residual stress,<br/>distortion locked in"]
 ```
 
 The penetration profile—the cross-sectional shape of the fusion zone—is the most direct physical record of how energy was delivered and distributed. A narrow, deep profile (high aspect ratio) indicates concentrated heat delivery: high current, long arc, helium shielding gas, or DCEN polarity. A wide, shallow profile indicates distributed energy: lower current, short arc, argon shielding, or the cleaning-cycle bias of AC on aluminum. The penetration profile is measured in production quality control by sectioning a sample coupon transversely, polishing it to 600 grit, etching with a suitable reagent (nital for carbon steel, oxalic acid for stainless, Keller's reagent for aluminum), and examining the macro cross-section. The fusion line—the boundary between the fully melted zone and the HAZ—must show complete fusion to the root with no cold lap, undercut, or lack-of-fusion discontinuities.

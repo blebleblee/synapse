@@ -206,11 +206,11 @@ graph TD
     N3 -->|"Yes"| L4["Leaf: Predict Class 1\n(n=61, gini=0.19)"]
     N3 -->|"No"| L5["Leaf: Predict Class 0\n(n=44, gini=0.12)"]
 
-    style L1 fill:#d4edda,stroke:#28a745
-    style L3 fill:#d4edda,stroke:#28a745
-    style L5 fill:#d4edda,stroke:#28a745
-    style L2 fill:#f8d7da,stroke:#dc3545
-    style L4 fill:#f8d7da,stroke:#dc3545
+    style L1 fill:#d4edda,stroke:#28a745,color:#0f172a
+    style L3 fill:#d4edda,stroke:#28a745,color:#0f172a
+    style L5 fill:#d4edda,stroke:#28a745,color:#0f172a
+    style L2 fill:#f8d7da,stroke:#dc3545,color:#0f172a
+    style L4 fill:#f8d7da,stroke:#dc3545,color:#0f172a
 ```
 
 ### 2.3 Neural Networks: Mechanistic Interpretability and Circuit Analysis
@@ -849,18 +849,18 @@ graph TD
     P1 --> I1
     P2 --> I2
 
-    style C1 fill:#ffe0b2,stroke:#e65100
-    style C2 fill:#ffe0b2,stroke:#e65100
-    style C3 fill:#ffe0b2,stroke:#e65100
-    style N1 fill:#fff9c4,stroke:#f57f17
-    style N2 fill:#fff9c4,stroke:#f57f17
-    style N3 fill:#fff9c4,stroke:#e65100
-    style P1 fill:#e1f5fe,stroke:#0277bd
-    style P2 fill:#e1f5fe,stroke:#0277bd
-    style P3 fill:#e1f5fe,stroke:#0277bd
-    style I1 fill:#e8f5e9,stroke:#2e7d32
-    style I2 fill:#e8f5e9,stroke:#2e7d32
-    style I3 fill:#e8f5e9,stroke:#2e7d32
+    style C1 fill:#ffe0b2,stroke:#e65100,color:#0f172a
+    style C2 fill:#ffe0b2,stroke:#e65100,color:#0f172a
+    style C3 fill:#ffe0b2,stroke:#e65100,color:#0f172a
+    style N1 fill:#fff9c4,stroke:#f57f17,color:#0f172a
+    style N2 fill:#fff9c4,stroke:#f57f17,color:#0f172a
+    style N3 fill:#fff9c4,stroke:#e65100,color:#0f172a
+    style P1 fill:#e1f5fe,stroke:#0277bd,color:#0f172a
+    style P2 fill:#e1f5fe,stroke:#0277bd,color:#0f172a
+    style P3 fill:#e1f5fe,stroke:#0277bd,color:#0f172a
+    style I1 fill:#e8f5e9,stroke:#2e7d32,color:#0f172a
+    style I2 fill:#e8f5e9,stroke:#2e7d32,color:#0f172a
+    style I3 fill:#e8f5e9,stroke:#2e7d32,color:#0f172a
 ```
 
 The choice of decomposition technique is not a matter of preference; it is determined by the **threat model**:

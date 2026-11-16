@@ -22,10 +22,33 @@ These three invariants should be the lens through which you read every parameter
 
 To optimize print parameters intelligently, you need a precise mental model of what happens between the filament spool and the printed bead. The pipeline has four distinct functional stages, and each one introduces a potential source of error.
 
-```
-  [Spool]──►[Extruder/Drive]──►[Heatbreak/Melt Zone]──►[Nozzle Orifice]──►[Deposited Bead]
-               Back-pressure        Viscosity &            Die swell &           Interlayer
-               & slip              melt length             flow rate             diffusion
+```mermaid
+flowchart LR
+    spool["Spool"]
+    extruder["Extruder / Drive"]
+    heatbreak["Heatbreak / Melt Zone"]
+    nozzle["Nozzle Orifice"]
+    bead["Deposited Bead"]
+
+    spool --> extruder
+    extruder --> heatbreak
+    heatbreak --> nozzle
+    nozzle --> bead
+
+    extruder_note["Back-pressure\n& slip"]
+    heatbreak_note["Viscosity &\nmelt length"]
+    nozzle_note["Die swell &\nflow rate"]
+    bead_note["Interlayer\ndiffusion"]
+
+    extruder -. " " .- extruder_note
+    heatbreak -. " " .- heatbreak_note
+    nozzle -. " " .- nozzle_note
+    bead -. " " .- bead_note
+
+    style extruder_note fill:#f5f5f5,stroke:#aaaaaa,stroke-dasharray:4 2,color:#555555
+    style heatbreak_note fill:#f5f5f5,stroke:#aaaaaa,stroke-dasharray:4 2,color:#555555
+    style nozzle_note fill:#f5f5f5,stroke:#aaaaaa,stroke-dasharray:4 2,color:#555555
+    style bead_note fill:#f5f5f5,stroke:#aaaaaa,stroke-dasharray:4 2,color:#555555
 ```
 
 The extruder drive gear bites into the filament and displaces a metered volume per motor step. Any slip, wear, or inconsistency at this stage causes under-extrusion that no downstream parameter can compensate for. The heatbreak is the thermal boundary between the cold zone (where the filament must remain solid to transmit push force) and the melt zone (where it must be fully liquid to flow). Heat creep—the upward migration of the melt front into the cold zone—causes clogs that manifest as intermittent under-extrusion mid-print, often incorrectly blamed on layer adhesion or slicer settings. The nozzle orifice imposes a pressure drop (governed by the Hagen-Poiseuille relationship) that scales with viscosity and volumetric flow rate; exceeding the nozzle's maximum flow rate produces the characteristic grinding, skipping, and rough surface texture of a hotend that is being asked to move more plastic than the melt zone can deliver per unit time.

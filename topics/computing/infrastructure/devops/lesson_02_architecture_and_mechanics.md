@@ -120,15 +120,15 @@ int main(void) {
 A process or thread transitions through multiple states during its lifetime. The kernel scheduler manages these transitions based on events (I/O completion, timer expiration, synchronization primitives) and scheduling policies (CFS, real-time priorities).
 
 ```mermaid
-stateDiagram-v2
-    [*] --> New: fork/pthread_create
-    New --> Ready: Scheduler admission
-    Ready --> Running: Dispatch
-    Running --> Ready: Preemption/yield
-    Running --> Blocked: I/O wait/lock acquire
-    Blocked --> Ready: I/O complete/lock released
-    Running --> Zombie: exit
-    Zombie --> [*]: wait/waitpid (reap)
+flowchart TD
+    Start(("Start")) --> New["New"]
+    New -->|"Scheduler admission"| Ready["Ready"]
+    Ready -->|"Dispatch"| Running["Running"]
+    Running -->|"Preemption/yield"| Ready
+    Running -->|"I/O wait/lock acquire"| Blocked["Blocked"]
+    Blocked -->|"I/O complete/lock released"| Ready
+    Running -->|"exit"| Zombie["Zombie"]
+    Zombie -->|"wait/waitpid (reap)"| End(("End"))
 ```
 
 The kernel maintains separate run queues per CPU core (in multiprocessor systems) to minimize cache coherency traffic. The Completely Fair Scheduler (CFS) in Linux uses a red-black tree keyed by virtual runtime to ensure fairness, while real-time schedulers (SCHED_FIFO, SCHED_RR) use strict priority queues.

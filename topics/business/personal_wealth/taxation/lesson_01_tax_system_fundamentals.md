@@ -54,51 +54,89 @@ Schedule C captures self-employment income and expenses for sole proprietors. Gr
 
 Adjustments to income appear on Schedule 1 and reduce total income to compute adjusted gross income. These above-the-line deductions include self-employed health insurance premiums, self-employed SEP or SIMPLE IRA contributions, half of self-employment tax (the employer-equivalent portion), HSA contributions, student loan interest (up to $2,500, subject to phase-out), and educator expenses ($300). Above-the-line status provides significant value because these deductions reduce AGI, which serves as the threshold for numerous phase-outs and limitations downstream. A taxpayer with $250,000 in gross income who contributes $7,000 to an HSA reduces AGI to $243,000, potentially preserving eligibility for benefits that phase out based on AGI.
 
-```
-Income Cascade Architecture:
+```mermaid
+flowchart TD
+    subgraph SOURCES["Total Income — All Sources"]
+        W2["W-2 Wages\n(Box 1, post-401k deferrals)"]
+        BUSI["Business Income\n(Schedule C Net Profit)"]
+        CAPGAIN["Capital Gains & Dividends\n(Schedule D)"]
+        INTEREST["Interest & Ordinary Dividends\n(1099-INT / 1099-DIV)"]
+        RENTAL["Rental Income\n(Schedule E)"]
+        PASSTHRU["Passthrough Income\n(K-1s: Partnerships / S-Corps)"]
+        OTHER["Other Income\n(prizes, awards, gambling, jury duty)"]
+    end
 
-Total Income (All Sources)
-    ├─ W-2 Wages (Box 1, post-401k deferrals)
-    ├─ Business Income (Schedule C Net Profit)
-    ├─ Capital Gains & Dividends (Schedule D)
-    ├─ Interest & Ordinary Dividends (1099-INT, 1099-DIV)
-    ├─ Rental Income (Schedule E)
-    ├─ Passthrough Income (K-1s from partnerships/S-corps)
-    └─ Other Income (prizes, awards, gambling, jury duty)
-         ↓
-    LESS: Adjustments to Income (Schedule 1)
-    ├─ Educator expenses
-    ├─ HSA contributions
-    ├─ Self-employed retirement contributions
-    ├─ Self-employed health insurance
-    ├─ Half of self-employment tax
-    └─ Student loan interest deduction
-         ↓
-    = ADJUSTED GROSS INCOME (AGI)
-         ↓
-    LESS: Deductions
-    ├─ Standard Deduction ($14,600 Single / $29,200 MFJ)
-    └─ OR Itemized Deductions (Schedule A)
-         ├─ State & Local Taxes (capped at $10,000)
-         ├─ Mortgage Interest (acquisition debt < $750k)
-         ├─ Charitable Contributions
-         └─ Medical Expenses (> 7.5% AGI)
-         ↓
-    = TAXABLE INCOME
-         ↓
-    APPLY: Progressive Rate Schedule
-    ├─ Ordinary Income: Graduated Brackets (10% → 37%)
-    └─ Long-Term Capital Gains: Preferential Rates (0%, 15%, 20%)
-         ↓
-    = TAX LIABILITY (before credits)
-         ↓
-    LESS: Tax Credits
-    ├─ Child Tax Credit ($2,000 per qualifying child)
-    ├─ Foreign Tax Credit
-    ├─ Education Credits (AOTC, Lifetime Learning)
-    └─ Energy Efficiency Credits
-         ↓
-    = NET TAX LIABILITY
+    subgraph ADJ["Adjustments to Income — Schedule 1"]
+        EDU["Educator Expenses"]
+        HSA["HSA Contributions"]
+        RETIRE["Self-Employed Retirement Contributions"]
+        SEHI["Self-Employed Health Insurance"]
+        SETAX["Half of Self-Employment Tax"]
+        SLI["Student Loan Interest Deduction"]
+    end
+
+    subgraph DED["Deductions"]
+        STDDED["Standard Deduction\n$14,600 Single / $29,200 MFJ"]
+        ITEMDED["Itemized Deductions\n(Schedule A)"]
+        SALT["State & Local Taxes\n(capped at $10,000)"]
+        MORTG["Mortgage Interest\n(acquisition debt < $750k)"]
+        CHARITY["Charitable Contributions"]
+        MEDICAL["Medical Expenses\n(> 7.5% of AGI)"]
+        ITEMDED --> SALT
+        ITEMDED --> MORTG
+        ITEMDED --> CHARITY
+        ITEMDED --> MEDICAL
+    end
+
+    subgraph RATES["Progressive Rate Schedule"]
+        ORDINARY["Ordinary Income\nGraduated Brackets 10% → 37%"]
+        LTCG["Long-Term Capital Gains\nPreferential Rates: 0% / 15% / 20%"]
+    end
+
+    subgraph CREDITS["Tax Credits"]
+        CTC["Child Tax Credit\n$2,000 per qualifying child"]
+        FTC["Foreign Tax Credit"]
+        EDCREDIT["Education Credits\n(AOTC / Lifetime Learning)"]
+        ENERGY["Energy Efficiency Credits"]
+    end
+
+    AGI(["= Adjusted Gross Income (AGI)"])
+    TAXINC(["= Taxable Income"])
+    TAXLIAB(["= Tax Liability\n(before credits)"])
+    NETTAX(["= Net Tax Liability"])
+
+    W2 --> AGI
+    BUSI --> AGI
+    CAPGAIN --> AGI
+    INTEREST --> AGI
+    RENTAL --> AGI
+    PASSTHRU --> AGI
+    OTHER --> AGI
+
+    EDU --> AGI
+    HSA --> AGI
+    RETIRE --> AGI
+    SEHI --> AGI
+    SETAX --> AGI
+    SLI --> AGI
+
+    AGI --> STDDED
+    AGI --> ITEMDED
+
+    STDDED --> TAXINC
+    ITEMDED --> TAXINC
+
+    TAXINC --> ORDINARY
+    TAXINC --> LTCG
+
+    ORDINARY --> TAXLIAB
+    LTCG --> TAXLIAB
+
+    CTC --> NETTAX
+    FTC --> NETTAX
+    EDCREDIT --> NETTAX
+    ENERGY --> NETTAX
+    TAXLIAB --> NETTAX
 ```
 
 The standard deduction provides a fixed amount that reduces AGI without requiring itemization. For 2024, single filers claim $14,600 and married filing jointly claim $29,200. Taxpayers age 65 or older receive an additional amount ($1,950 for single, $1,550 per person for married filing jointly). The blind taxpayer additional amount matches the age-65 amount. The standard deduction represents a tax policy choice to simplify filing for the majority of taxpayers who lack sufficient itemized deductions to exceed the standard amount. Prior to the Tax Cuts and Jobs Act doubling the standard deduction in 2018, approximately 30% of taxpayers itemized; post-TCJA that figure dropped below 10%.

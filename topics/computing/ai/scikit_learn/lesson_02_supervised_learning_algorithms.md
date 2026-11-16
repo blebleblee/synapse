@@ -173,27 +173,22 @@ where $p_k$ is the proportion of class $k$ samples in region $S$. At each node, 
 
 The critical architectural insight about decision trees is that their hypothesis class is piecewise-constant functions over hyper-rectangular regions. A tree of depth $d$ can represent at most $2^d$ distinct output values. Deep trees can approximate any measurable function given enough data, but each additional split doubles the number of parameters and halves the number of samples available to estimate each leaf value. This is why unconstrained trees overfit catastrophically and why `max_depth`, `min_samples_leaf`, and `min_samples_split` are not optional hyperparameters — they define the entire generalization behavior.
 
-```
-                    Feature Space Partitioning by a Decision Tree
-
-  x2 ^
-  3  |           |           |
-     |     L1    |     L2    |
-  2  +-----------+------+----+
-     |           |  L3  | L4 |
-  1  |     L5    +------+    |
-     |           |  L6  |    |
-  0  +-----------+------+----+--> x1
-     0           1      2    3
-
-  Tree Structure:
-  [x1 <= 1.0]
-   ├─ Yes → Leaf L1 / L5 (single region)
-   └─ No  → [x2 <= 2.0]
-             ├─ Yes → [x1 <= 2.0]
-             │         ├─ Yes → Leaf L3
-             │         └─ No  → Leaf L4
-             └─ No  → Leaf L2
+```mermaid
+flowchart TD
+    A["x1 ≤ 1.0"]
+    B["x2 ≤ 2.0"]
+    C["x1 ≤ 2.0"]
+    D["Leaf L1 / L5"]
+    E["Leaf L2"]
+    F["Leaf L3"]
+    G["Leaf L4"]
+    
+    A -->|Yes| D
+    A -->|No| B
+    B -->|No| E
+    B -->|Yes| C
+    C -->|Yes| F
+    C -->|No| G
 ```
 
 ```python

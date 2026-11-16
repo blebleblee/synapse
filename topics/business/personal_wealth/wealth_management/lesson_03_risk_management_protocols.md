@@ -46,29 +46,30 @@ Value at Risk (VaR) and Conditional Value at Risk (CVaR) provide probabilistic c
 
 Parametric VaR assumes normally distributed returns, enabling closed-form calculation as VaR_α = μ - z_α × σ, where z_α denotes the standard normal quantile at confidence level α. For a portfolio with daily expected return of 0.05% and volatility of 1.2%, the one-day 95% VaR equals 0.05% - 1.645 × 1.2% = -1.92%. Historical VaR abandons distributional assumptions, instead directly sampling the return history and selecting the appropriate percentile. Monte Carlo VaR simulates thousands of return paths using either parametric distributions or bootstrapped historical data, then empirically estimates the percentile. Each approach embodies distinct trade-offs between model risk, computational cost, and responsiveness to regime changes.
 
-```
-Portfolio Risk Decomposition Flow:
+```mermaid
+flowchart TD
+    A["Asset Returns (r_1, r_2, ..., r_N)"]
+    B["Covariance Matrix Estimation (Σ̂)"]
+    
+    subgraph sub_estimators ["Estimation Methods"]
+        C["Sample Covariance"]
+        D["Exponentially Weighted"]
+        E["Shrinkage Estimators"]
+    end
 
-Asset Returns (r_1, r_2, ..., r_N)
-         |
-         v
-Covariance Matrix Estimation (Σ̂)
-         |
-         +---------> Sample Covariance
-         |---------> Exponentially Weighted
-         +---------> Shrinkage Estimators
-         |
-         v
-Portfolio Volatility: σ_p = √(w'Σw)
-         |
-         v
-Marginal Risk: MCTR_i = (Σw)_i / σ_p
-         |
-         v
-Risk Attribution: PCTR_i = w_i × MCTR_i / σ_p
-         |
-         v
-∑PCTR_i = 1.0 (validation)
+    F["Portfolio Volatility: σ_p = √(w'Σw)"]
+    G["Marginal Risk: MCTR_i = (Σw)_i / σ_p"]
+    H["Risk Attribution: PCTR_i = w_i × MCTR_i / σ_p"]
+    I["∑PCTR_i = 1.0 (validation)"]
+
+    A --> B
+    B --> C
+    B --> D
+    B --> E
+    B --> F
+    F --> G
+    G --> H
+    H --> I
 ```
 
 Hedging strategies leverage derivatives to insulate portfolios from specific risk factors. Equity put options provide the most direct downside protection: purchasing puts with strike prices below current market levels establishes a floor on portfolio value, albeit at the cost of premium paid. A collar strategy sells out-of-the-money calls to finance put purchases, capping both upside and downside. The protective put's payoff at expiration equals max(S_T - K, 0) - premium, where S_T represents the terminal stock price and K the strike price. For a portfolio valued at $1,000,000, buying three-month puts with a 95% strike ($950,000) costing 2% ($20,000) guarantees that losses cannot exceed $70,000 over the hedge horizon.

@@ -44,26 +44,41 @@ The Vox-ATypI classification divides typefaces into eleven primary categories or
 
 The interaction between classification categories and formal properties can be visualized as a multidimensional space where stress axis, contrast, serif treatment, and construction philosophy create continuous gradients rather than discrete buckets:
 
-```
-STRESS AXIS CONTINUUM
-Diagonal (15-30°) ───────→ Vertical (0°)
-    Humanist            Transitional      Modern
-    [Jenson]            [Baskerville]     [Bodoni]
-    
-CONTRAST CONTINUUM
-Low (1.2:1) ─────────────→ Extreme (20:1)
-    Old Style           Transitional      Didone
-    [Bembo]            [Caslon]          [Didot]
+```mermaid
+flowchart TD
+    subgraph stress ["STRESS AXIS CONTINUUM"]
+        direction LR
+        stress_diag["Diagonal (15-30°)<br/>Humanist<br/><b>Jenson</b>"]
+        stress_trans["Transitional<br/><b>Baskerville</b>"]
+        stress_vert["Vertical (0°)<br/>Modern<br/><b>Bodoni</b>"]
+        stress_diag --> stress_trans --> stress_vert
+    end
 
-SERIF CONSTRUCTION
-Organic Bracketed ───→ Refined Bracketed ───→ Hairline Unbracketed
-    Humanist            Transitional           Modern
-    [Centaur]          [Baskerville]          [Bodoni]
+    subgraph contrast ["CONTRAST CONTINUUM"]
+        direction LR
+        contrast_low["Low (1.2:1)<br/>Old Style<br/><b>Bembo</b>"]
+        contrast_trans["Transitional<br/><b>Caslon</b>"]
+        contrast_high["Extreme (20:1)<br/>Didone<br/><b>Didot</b>"]
+        contrast_low --> contrast_trans --> contrast_high
+    end
 
-SANS-SERIF CONSTRUCTION PHILOSOPHY
-Organic/Calligraphic ─→ Systematic/Neutral ─→ Pure Geometric
-    Humanist Sans       Neo-Grotesque          Geometric Sans
-    [Gill Sans]        [Helvetica]            [Futura]
+    subgraph serif ["SERIF CONSTRUCTION"]
+        direction LR
+        serif_org["Organic Bracketed<br/>Humanist<br/><b>Centaur</b>"]
+        serif_ref["Refined Bracketed<br/>Transitional<br/><b>Baskerville</b>"]
+        serif_hair["Hairline Unbracketed<br/>Modern<br/><b>Bodoni</b>"]
+        serif_org --> serif_ref --> serif_hair
+    end
+
+    subgraph sans ["SANS-SERIF CONSTRUCTION PHILOSOPHY"]
+        direction LR
+        sans_org["Organic/Calligraphic<br/>Humanist Sans<br/><b>Gill Sans</b>"]
+        sans_sys["Systematic/Neutral<br/>Neo-Grotesque<br/><b>Helvetica</b>"]
+        sans_geo["Pure Geometric<br/>Geometric Sans<br/><b>Futura</b>"]
+        sans_org --> sans_sys --> sans_geo
+    end
+
+    stress ~~~ contrast ~~~ serif ~~~ sans
 ```
 
 ## 3. High-Performance Optimization & Failure Modes
@@ -80,4 +95,19 @@ Applying historical classification to practical design work requires recognizing
 
 **Pairing Strategy and Contrast Management**: Effective typeface pairing requires understanding the formal relationships between classification categories. Successful pairings either harmonize (typefaces from the same historical period with similar stress axis and contrast) or contrast deliberately (pairing categories with opposing formal properties to create hierarchy). Harmonious pairings like Bembo with Bembo Italic or Baskerville with Baskerville Semibold maintain consistent texture while using weight and posture to create hierarchy. Contrastive pairings like Bodoni (high-contrast modern serif) with Futura (geometric sans-serif) create dynamic tension through opposing construction philosophies while maintaining shared rationalist geometry. The failure mode occurs with insufficient contrast (pairing similar sans-serifs like Helvetica and Univers creates confusion rather than hierarchy) or excessive incompatibility (pairing Blackletter with a casual script creates chaotic texture with no formal bridge). The optimization rule: pairs should share either historical period or formal geometry while contrasting in at least two properties (serif presence, weight, width, or posture).
 
-**Responsive Typography and Classification Shifting**: Digital environments with variable viewing distances and device resolutions require classification-aware responsive strategies. Humanist typefaces with moderate contrast and organic construction maintain legibility across device scales from smartphones to desktop displays. Modern serifs with extreme contrast require careful breakpoints where hairlines break below rendering thresholds, often necessitating substitution with transitional or slab serif alternatives at small sizes. Geometric sans-serifs with large x-heights and open apertures perform effectively on low-resolution displays but can appear oversized and clumsy in print. The optimization strategy: establish device-specific typeface hierarchies where classification shifts based on rendering context. Desktop displays at 16+ pixels can support refined transitional serifs, while mobile devices below
+**Responsive Typography and Classification Shifting**: Digital environments with variable viewing distances and device resolutions require classification-aware responsive strategies. Humanist typefaces with moderate contrast and organic construction maintain legibility across device scales from smartphones to desktop displays. Modern serifs with extreme contrast require careful breakpoints where hairlines break below rendering thresholds, often necessitating substitution with transitional or slab serif alternatives at small sizes. Geometric sans-serifs with large x-heights and open apertures perform effectively on low-resolution displays but can appear oversized and clumsy in print. The optimization strategy: establish device-specific typeface hierarchies where classification shifts based on rendering context.
+
+**Classification as Predictive Framework for Performance**: The historical classification system functions not merely as descriptive taxonomy but as predictive instrument for typographic performance across technical constraints. Classification correlates directly with rendering thresholds: humanist forms with their stroke modulation and organic apertures maintain coherence at 6-8pt text sizes where geometric or modern categories collapse into illegible masses. Transitional serifs occupy the optimization zone for extended reading in print (9-12pt body text) where their balanced contrast and rational construction provide maximum differentiation without excessive visual stress. Slab serifs with uniform stroke weight tolerate aggressive reproduction constraints (newspaper printing, low-resolution fax transmission) where contrast-dependent categories fail. Display classifications (decorative, script, blackletter) operate in inverse relationships to text classifications—optimal performance requires scale inversion where display forms dominate at large sizes (headlines, posters) while becoming dysfunctional below 14pt. The classification decision precedes all other typographic variables: selecting Bodoni for 8pt footnotes guarantees failure regardless of spacing, hierarchy, or layout quality, while selecting a well-crafted humanist sans-serif (Gill Sans, Syntax) establishes conditions for success before any other parameters are set.
+
+**Unified Design Space and Cross-Classification Navigation**: Mastery requires understanding classification not as discrete categories but as continuous design space where formal properties create navigable topology. The stress axis operates as primary dimension from old-style vertical stress through transitional oblique stress to modern vertical stress with maximum contrast. A secondary dimension spans serif treatment from bracketed triangular serifs through unbracketed slab serifs to absent serifs in sans-serif forms. Terminal treatment, aperture geometry, and stroke modulation create additional orthogonal axes. Successful typography navigates this space with intentionality: a text-intensive academic publication might traverse from Bembo (old-style serif, vertical stress, moderate contrast) for body text through Syntax (humanist sans-serif, organic construction) for captions to a geometric sans-serif (Futura, circular construction) for data labels—a coherent path through design space where each transition maintains formal bridges while shifting classification. Failed typography jumps discontinuously: pairing Fraktur with Helvetica violates every dimensional relationship simultaneously. The classification system provides coordinates in this space, but expertise lies in understanding the continuous topology between discrete categories and planning coherent trajectories that serve functional requirements while maintaining formal integrity across the complete typographic system.
+
+## Summary & Verification Matrix
+
+| Classification Dimension | Governing Invariant | Core Mechanism | Diagnostic Criteria | Failure Mode |
+|---|---|---|---|---|
+| **Stress Axis & Historical Period** | Stress angle evolves from humanist vertical (pen-based) → transitional oblique → modern vertical (rationalist) | Technological advancement drives geometric rationalization; reflects tools (broad-nib pen → pointed pen → mechanical construction) | Old-style: calligraphic stress, low contrast; Transitional: oblique stress, moderate contrast; Modern: vertical stress, extreme contrast | Selecting high-contrast moderns for small text sizes (hairlines break below rendering threshold) |
+| **Contrast & Rendering Threshold** | Maximum functional contrast inversely proportional to rendering size and resolution constraints | Stroke weight differentiation creates texture but requires minimum absolute thickness for visibility | Measure hairline weight at intended size: < 0.25pt fails at body text scales; >0.5pt maintains legibility | Bodoni at 8pt produces broken hairlines; geometric sans-serifs with uniform stroke excel at low resolution |
+| **X-Height & Legibility Optimization** | Larger x-height increases legibility at small sizes but reduces distinctive ascender/descender zones | X-height ratio determines counter size (internal negative space) which controls character recognition | X-height >65% of cap height: optimized for text; < 60%: optimized for display; measure x/H ratio directly | Oversized x-heights in display contexts appear crude; undersized x-heights fail in constrained text settings |
+| **Serif Construction & Functional Role** | Serif presence and geometry directly correlate with reading speed and texture control in extended text | Bracketed serifs create horizontal flow emphasis; unbracketed slabs provide weight stability; absent serifs maximize geometric clarity | Bracketed triangular: fastest extended reading; slab: high durability/reproduction; sans-serif: maximum clarity at distance | Mixing serif categories without intentional hierarchy creates texture chaos; insufficient contrast in sans-serif pairing |
+| **Classification Pairing & Hierarchy** | Effective pairs share one formal property (period/geometry) while contrasting in at least two others (serif, weight, width, posture) | Shared properties create coherence; contrasting properties establish hierarchy without texture conflict | Harmonious: same family + weight/posture variation; Contrastive: opposing categories + shared geometry (Bodoni + Futura) | Insufficient contrast (Helvetica + Univers: ambiguous hierarchy); excessive conflict (Blackletter + casual script: no formal bridge) |
+| **Responsive Classification Shifting** | Device context and resolution determine optimal classification; requires strategic substitution at breakpoints | Rendering constraints favor stroke uniformity at low resolution; contrast requires minimum absolute dimensions | Humanist forms: cross-device stability; Modern serifs: require breakpoint substitution; Geometric sans: low-res optimization | Fixed classification across all contexts: modern serifs fail on mobile; geometric sans appear clumsy in print |

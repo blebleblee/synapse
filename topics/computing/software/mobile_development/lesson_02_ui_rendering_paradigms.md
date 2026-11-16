@@ -61,23 +61,23 @@ The **Element tree** is the persistent identity layer. Each `Element` correspond
 
 The **RenderObject tree** is the layout and painting engine. `RenderObject` subclasses implement `performLayout()` and `paint()`, and they maintain the actual geometric and visual state. `RenderBox` implements a two-pass constraint-based layout where parent nodes pass `BoxConstraints` (minimum and maximum width and height) downward, and children return `Size` objects upward. The layout algorithm is strictly single-pass in the common case, with a `relayoutBoundary` mechanism that prevents layout changes from propagating upward past a designated boundary—a critical optimization for large scrolling lists where a child size change must not force the entire scroll list to re-lay-out.
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                   Flutter Rendering Pipeline                      │
-│                                                                  │
-│  Dart VM (UI Isolate)              Raster Thread                 │
-│  ┌────────────────────┐            ┌──────────────────────────┐  │
-│  │ 1. Widget.build()  │            │ 4. LayerTree.rasterize() │  │
-│  │    → new Widgets   │            │    Skia/Impeller         │  │
-│  │                    │            │    GPU draw calls        │  │
-│  │ 2. Element diff    │            │    → GPU texture         │  │
-│  │    reconciliation  │   LayerTree│                          │  │
-│  │                    │ ─────────► │ 5. FlutterView.present() │  │
-│  │ 3. RenderObject    │            │    Platform compositor   │  │
-│  │    layout + paint  │            │    schedules vsync       │  │
-│  │    → LayerTree     │            └──────────────────────────┘  │
-│  └────────────────────┘                                          │
-└──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph UIIsolate ["Dart VM (UI Isolate)"]
+        A["1. Widget.build()<br/>→ new Widgets"]
+        B["2. Element diff<br/>reconciliation"]
+        C["3. RenderObject<br/>layout + paint<br/>→ LayerTree"]
+    end
+    
+    subgraph RasterThread ["Raster Thread"]
+        D["4. LayerTree.rasterize()<br/>Skia/Impeller<br/>GPU draw calls<br/>→ GPU texture"]
+        E["5. FlutterView.present()<br/>Platform compositor<br/>schedules vsync"]
+    end
+    
+    A --> B
+    B --> C
+    C -->|LayerTree| D
+    D --> E
 ```
 
 The separation between the UI isolate and the raster thread is architecturally significant. The UI isolate produces a `LayerTree`—a serializable, platform-independent representation of the visual output—which is handed to the raster thread. The raster thread translates the `LayerTree` into Skia or Impeller draw calls against the GPU. Because these two threads run concurrently, the system can be rasterizing frame N on the GPU while the Dart code is computing the widget diff for frame N+1. This pipelining is what allows Flutter to maintain 60 or 120 Hz throughput even when individual frames have non-trivial work, as long as neither thread individually overruns a frame budget.
@@ -108,29 +108,26 @@ On iOS, touch events originate in the kernel from hardware interrupts delivered 
 
 On Android, the model is **interception-first**. `MotionEvent` objects travel downward through the view hierarchy in `dispatchTouchEvent()`. At each `ViewGroup`, `onInterceptTouchEvent()` is called before the event is passed to children. A `ViewGroup` can intercept the event mid-stream—even after a child has been receiving the gesture—by returning `true` from `onInterceptTouchEvent()`. This is the mechanism that allows a `RecyclerView` to intercept a horizontal swipe gesture from a child view that was initially tracking a vertical scroll. The pattern produces a classic problem: the **gesture conflict** between a horizontally-scrolling parent and a child that handles its own horizontal swipe, which must be resolved by explicitly calling `requestDisallowInterceptTouchEvent(true)` from the child when it begins tracking a gesture it owns.
 
-```
-Android Touch Dispatch Flow
-
-ACTION_DOWN arrives
-        │
-        ▼
-  ViewGroup.dispatchTouchEvent()
-        │
-        ▼
-  onInterceptTouchEvent() ──► true ──► ViewGroup.onTouchEvent()
-        │
-       false
-        │
-        ▼
-  Child.dispatchTouchEvent()
-        │
-        ▼
-  Child.onTouchEvent() ──► true (consumed) ──► done
-        │
-       false (not consumed)
-        │
-        ▼
-  Parent.onTouchEvent()
+```mermaid
+flowchart TD
+    Start["ACTION_DOWN arrives"]
+    DispatchTouch["ViewGroup.dispatchTouchEvent()"]
+    Intercept{"onInterceptTouchEvent()"}
+    ParentTouch["ViewGroup.onTouchEvent()"]
+    ChildDispatch["Child.dispatchTouchEvent()"]
+    ChildTouch{"Child.onTouchEvent()"}
+    Done1["done"]
+    Done2["done"]
+    FallbackParent["Parent.onTouchEvent()"]
+    
+    Start --> DispatchTouch
+    DispatchTouch --> Intercept
+    Intercept -->|true| ParentTouch
+    Intercept -->|false| ChildDispatch
+    ParentTouch --> Done1
+    ChildDispatch --> ChildTouch
+    ChildTouch -->|"true (consumed)"| Done2
+    ChildTouch -->|"false (not consumed)"| FallbackParent
 ```
 
 Flutter's touch model is conceptually cleaner because it is entirely platform-independent. The framework implements a **hit-testing arena** using `GestureRecognizer` objects. When a pointer event arrives, every `GestureRecognizer` in the render object subtree that claims the pointer enters a competitive arena. Recognizers declare their intent by calling `resolve(GestureDisposition.accepted)` or `resolve(GestureDisposition.rejected)`. Once a recognizer accepts, all others in the arena are automatically rejected. This arena model eliminates the need for interception logic and makes gesture conflict resolution explicit and composable—you can write a custom `GestureArenaEntry` to implement arbitration policies that are impossible to express cleanly in the iOS or Android interception models.

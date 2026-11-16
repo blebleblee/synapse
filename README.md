@@ -247,6 +247,7 @@ python3 scripts/monitor.py
 For detailed guides, see the `docs/` directory:
 
 - [Curriculum Generation & Models Guide](docs/CURRICULUM_GENERATION_AND_MODELS.md)
+- [Pipeline & Release Operational Runbook](docs/RUNBOOK_PIPELINE_AND_RELEASE.md)
 - [Socratic Workbench & UI Architecture](docs/SOCRATIC_WORKBENCH_AND_UI.md)
 - [Configuration, Node Pinning & Security](docs/CONFIG_AND_SECURITY.md)
 - [Terminal Sandboxes: Docker, k3s & Host Safety](docs/CONTAINERS_AND_SANDBOX.md)

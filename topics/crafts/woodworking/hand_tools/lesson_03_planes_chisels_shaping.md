@@ -20,22 +20,20 @@ The micro-geometry of the cutting edge itself—the final frontier of sharpening
 
 The anatomy of a Bailey-pattern bench plane—the design that Stanley perfected in the 1870s and remains ubiquitous today—reveals an elegant mechanical system optimizing force transmission, adjustment precision, and user ergonomics. The iron (blade) and chipbreaker assembly clamps against the frog, a machined casting that defines the bed angle and provides lateral adjustment. The frog bolts to the sole casting but includes fore-aft adjustment screws allowing mouth width tuning: closing the mouth to a narrow gap (1/64 to 1/32 inch) for fine work on figured wood, or opening it wider for aggressive stock removal where tearout is not a concern. The lever cap applies clamping force through a cam mechanism, distributing pressure across the blade's width while allowing quick release for blade removal and sharpening.
 
-```
-              [Lever Cap Cam]
-                    |
-         /----------------------\
-        |  Chipbreaker (curved) |
-        |------------------------|
-        |    Iron (blade)        |
-        |  25° primary bevel     |
-         \______|_______/
-                |
-         [Frog @ 45° bed angle]
-                |
-         _______________
-        |_____Sole______|
-         <--Mouth gap-->
-             (0.5-2mm)
+```mermaid
+flowchart TD
+    LC["Lever Cap Cam"]
+    CB["Chipbreaker (curved)"]
+    IR["Iron (blade)<br/>25° primary bevel"]
+    FR["Frog @ 45° bed angle"]
+    SL["Sole"]
+    MG["Mouth gap<br/>(0.5-2mm)"]
+    
+    LC --> CB
+    CB --> IR
+    IR --> FR
+    FR --> SL
+    SL -.-> MG
 ```
 
 Depth-of-cut adjustment in Bailey planes uses a threaded rod (the Y-lever or depth adjustment knob) that engages a brass disk seated in a slot machined into the chipbreaker. Rotating the knob advances or retracts the blade assembly relative to the sole in increments as fine as 0.001 inches per quarter-turn. This mechanism allows the craftsman to dial in shaving thickness precisely—from gossamer shavings measuring 0.0005 inches for final finishing passes to 0.003-inch cuts for dimensioning work. Lateral adjustment uses a lever that engages the slotted chipbreaker back, allowing side-to-side correction to make the blade parallel with the sole, essential for producing even-width shavings across the full blade width.

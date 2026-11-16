@@ -352,21 +352,37 @@ This section provides rapid-access reference tables and diagnostic decision tree
 
 ### Case Selection Decision Tree
 
-```
-Does the sentence contain a preposition?
-├─ YES → Is it a two-way preposition (an, auf, hinter, in, neben, über, unter, vor, zwischen)?
-│   ├─ YES → Does the verb indicate directional motion toward a goal?
-│   │   ├─ YES → Use ACCUSATIVE
-│   │   └─ NO → Use DATIVE
-│   └─ NO → Check fixed case government
-│       ├─ Accusative: durch, für, gegen, ohne, um, bis, entlang
-│       ├─ Dative: aus, außer, bei, mit, nach, seit, von, zu, gegenüber
-│       └─ Genitive: während, wegen, trotz, statt, außerhalb, innerhalb
-└─ NO → Identify the verb and its argument structure
-    ├─ Subject → NOMINATIVE
-    ├─ Direct object → ACCUSATIVE
-    ├─ Indirect object → DATIVE
-    └─ Possessive/measure → GENITIVE
+```mermaid
+flowchart TD
+    START["Does the sentence contain a preposition?"]
+
+    START -->|YES| TWO_WAY["Is it a two-way preposition?\nan, auf, hinter, in, neben,\nüber, unter, vor, zwischen"]
+    START -->|NO| VERB_ARG["Identify the verb and its argument structure"]
+
+    TWO_WAY -->|YES| DIRECTIONAL["Does the verb indicate\ndirectional motion toward a goal?"]
+    TWO_WAY -->|NO| FIXED["Check fixed case government"]
+
+    DIRECTIONAL -->|YES| ACC1["Use ACCUSATIVE"]
+    DIRECTIONAL -->|NO| DAT1["Use DATIVE"]
+
+    FIXED --> ACC2["ACCUSATIVE\ndurch, für, gegen, ohne,\num, bis, entlang"]
+    FIXED --> DAT2["DATIVE\naus, außer, bei, mit, nach,\nseit, von, zu, gegenüber"]
+    FIXED --> GEN["GENITIVE\nwährend, wegen, trotz, statt,\naußerhalb, innerhalb"]
+
+    VERB_ARG --> NOM["Subject → NOMINATIVE"]
+    VERB_ARG --> ACC3["Direct object → ACCUSATIVE"]
+    VERB_ARG --> DAT3["Indirect object → DATIVE"]
+    VERB_ARG --> GEN2["Possessive / measure → GENITIVE"]
+
+    style ACC1 fill:#4a90d9,color:#fff,stroke:#2c5f8a
+    style ACC2 fill:#4a90d9,color:#fff,stroke:#2c5f8a
+    style ACC3 fill:#4a90d9,color:#fff,stroke:#2c5f8a
+    style DAT1 fill:#e8a838,color:#fff,stroke:#a0721e
+    style DAT2 fill:#e8a838,color:#fff,stroke:#a0721e
+    style DAT3 fill:#e8a838,color:#fff,stroke:#a0721e
+    style GEN  fill:#6abf69,color:#fff,stroke:#3a7d3a
+    style GEN2 fill:#6abf69,color:#fff,stroke:#3a7d3a
+    style NOM  fill:#9b59b6,color:#fff,stroke:#6c3483
 ```
 
 ### Adjective Declension Quick Reference

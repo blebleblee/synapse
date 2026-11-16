@@ -26,19 +26,29 @@ The critical architectural distinction between signal diodes and power diodes li
 
 Reverse recovery introduces the most consequential dynamic behavior in power diodes. During forward conduction, the drift region fills with minority carriers—holes stored in the N-type drift layer. When the diode experiences a reverse voltage transient, these stored holes cannot vanish instantaneously. Instead, the diode continues conducting in reverse while the stored charge depletes through recombination and reverse current flow. The reverse current initially equals the forward current, then decays as stored charge diminishes. When the charge fully depletes, the current snaps off abruptly, creating a high di/dt event that generates voltage spikes through parasitic inductances. The reverse recovery charge, measured in nanocoulombs, quantifies this stored charge, while the reverse recovery time—typically 30 to 500 nanoseconds for fast recovery diodes—measures the duration.
 
-```
-Forward Conduction → Reverse Transient → Reverse Recovery → Voltage Blocking
+```mermaid
+flowchart TD
+    subgraph phases ["Reverse Recovery Sequence"]
+        direction LR
+        A["Forward Conduction"] --> B["Reverse Transient"]
+        B --> C["Reverse Recovery"]
+        C --> D["Voltage Blocking"]
+    end
 
- I_F                    I_R (reverse)              
-  ↑                      ↑  ╱╲                     V_R
-  │████████              │ ╱  ╲                     ↑
-  │████████              │╱    ╲___                 │
-  │████████    t_rr      ╱      ▔▔▔▔▔▔▔▔▔          │████████
-  └────────→   ◄────►   ╱                           └────────→
-     Time       Q_rr = ∫I_R dt                         Time
+    subgraph waveforms ["Associated Waveforms"]
+        direction LR
+        E["I_F — Forward Current\n\n  ↑\n  │████████\n  └────────→\n     Time"]
+        F["I_R — Reverse Current\n\n  ↑  ╱╲\n  │ ╱  ╲___\n  │╱    ▔▔▔▔▔\n  ╱\n  └────────→\n     Time\n\n  t_rr ◄────►\n  Q_rr = ∫I_R dt"]
+        G["V_R — Reverse Voltage\n\n  ↑\n  │████████\n  └────────→\n     Time"]
+    end
 
-  Stored minority carriers must be swept out before blocking occurs.
-  Abrupt current snap-off (di/dt) induces voltage spike: V_spike = L × di/dt
+    subgraph notes ["Key Relationships"]
+        H["Stored minority carriers must be swept out before blocking occurs."]
+        I["Abrupt current snap-off di/dt induces voltage spike:\nV_spike = L × di/dt"]
+    end
+
+    phases --> waveforms
+    waveforms --> notes
 ```
 
 Ultra-fast recovery diodes mitigate reverse recovery through lifetime killing—introducing recombination centers (gold or platinum doping) that accelerate minority carrier recombination. This reduces stored charge and recovery time but increases forward voltage drop, trading conduction losses for switching losses. Schottky diodes eliminate reverse recovery entirely by replacing the PN junction with a metal-semiconductor junction, which conducts through majority carriers only. However, Schottky diodes exhibit higher leakage currents and limited voltage ratings—typically 200 V maximum in silicon—because the metal-semiconductor barrier cannot sustain large depletion widths.
@@ -51,24 +61,38 @@ Applying a positive gate voltage (relative to source) attracts electrons to the 
 
 The MOSFET's gate structure introduces three critical parasitic capacitances: gate-to-source capacitance C_gs, gate-to-drain capacitance C_gd (also called Miller capacitance), and drain-to-source capacitance C_ds. These capacitances are highly nonlinear, varying with applied voltages. During turn-on, the gate driver must first charge C_gs to reach the threshold voltage V_th, typically 2 to 4 V for silicon MOSFETs. Further charging increases gate voltage toward the driver voltage V_GS, but as drain current begins flowing and drain voltage starts falling, the Miller capacitance C_gd presents a feedback path that diverts gate current to maintain dV_ds/dt. This Miller plateau region dominates switching time, as the gate driver must supply sufficient current to charge C_gd while the drain voltage transitions from blocking voltage to near zero.
 
-```
-MOSFET Turn-On Sequence:
-
-V_GS  ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔       Gate Voltage
-      ▁▁▁▁▁▁Miller Plateau
-V_th  ────────────────────       Threshold
-
-I_D            ████████████       Drain Current
-      ▁▁▁▁▁▁▁▁                   (rises after V_th)
-
-V_DS  ████████                    Drain Voltage
-               ▁▁▁▁▁▁▁▁▁▁▁▁       (falls during Miller plateau)
-
-      │◄─td(on)─►│◄─tr─►│
-      Gate delay  Current rise   Voltage fall time
-                  time             (Miller-limited)
-
-Total turn-on loss: E_on ≈ (1/6) × V_DS × I_D × (t_ri + t_fv)
+```mermaid
+flowchart TD
+    Start["MOSFET Turn-On Sequence"]
+    
+    subgraph timing ["Timing Phases"]
+        direction LR
+        td["t<sub>d(on)</sub><br/>Gate Delay"]
+        tr["t<sub>r</sub><br/>Current Rise Time"]
+        tf["t<sub>fv</sub><br/>Voltage Fall Time<br/>(Miller-limited)"]
+        td --> tr --> tf
+    end
+    
+    subgraph signals ["Signal Behavior"]
+        direction TB
+        vgs["V<sub>GS</sub> - Gate Voltage<br/>▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔<br/>Rises with Miller Plateau"]
+        vth["V<sub>th</sub> - Threshold<br/>────────────────────<br/>Gate voltage crosses threshold"]
+        id["I<sub>D</sub> - Drain Current<br/>████████████<br/>Rises after V<sub>th</sub> exceeded"]
+        vds["V<sub>DS</sub> - Drain Voltage<br/>████████▁▁▁▁▁▁▁▁▁▁▁▁<br/>Falls during Miller plateau"]
+        
+        vgs --> vth
+        vth --> id
+        id -.-> vds
+    end
+    
+    subgraph loss ["Turn-On Loss"]
+        eon["E<sub>on</sub> ≈ (1/6) × V<sub>DS</sub> × I<sub>D</sub> × (t<sub>ri</sub> + t<sub>fv</sub>)"]
+    end
+    
+    Start --> timing
+    Start --> signals
+    signals --> loss
+    timing -.relates to.-> loss
 ```
 
 Turn-off reverses this sequence, but with a critical difference: the gate driver must now sink current to discharge the gate capacitance. If the gate driver source resistance is too high, the MOSFET may turn off slowly, extending switching losses and potentially inducing thermal runaway. External gate resistors tailor the switching speed by limiting gate current, trading faster switching (lower losses) against increased dV/dt and dI/dt that can trigger EMI or false turn-on of adjacent devices through parasitic inductances.

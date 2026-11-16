@@ -61,43 +61,22 @@ At runtime, Unity manages assets through a two-layer system. The lower layer is 
 
 The lifecycle of a runtime asset follows the pattern below:
 
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                      Unity Runtime Asset Lifecycle                        │
-│                                                                            │
-│  LOAD REQUEST                                                              │
-│  (Resources.Load / AssetBundle.LoadAsset / Addressables.LoadAssetAsync)  │
-│          │                                                                 │
-│          ▼                                                                 │
-│  ┌───────────────────┐    cache hit?    ┌────────────────────────────┐   │
-│  │  Object Registry  │ ───────────────► │  Return existing reference │   │
-│  │  (instance table) │                  └────────────────────────────┘   │
-│  └───────────────────┘                                                    │
-│          │ cache miss                                                      │
-│          ▼                                                                 │
-│  ┌───────────────────┐                                                    │
-│  │  Deserialize      │  Read serialized binary → instantiate C++ object  │
-│  │  Native Object    │  Allocate GPU resource (tex upload, VBO map)       │
-│  └───────────────────┘                                                    │
-│          │                                                                 │
-│          ▼                                                                 │
-│  ┌───────────────────┐                                                    │
-│  │  Create Managed   │  Allocate C# wrapper on managed heap               │
-│  │  Wrapper (C#)     │  Register native ptr in wrapper                    │
-│  └───────────────────┘                                                    │
-│          │                                                                 │
-│          ▼                                                                 │
-│  ┌───────────────────┐                                                    │
-│  │  Reference Count  │  Incremented per active load handle                │
-│  │  Tracking         │  Decremented on Release / Unload                   │
-│  └───────────────────┘                                                    │
-│          │  refcount == 0                                                  │
-│          ▼                                                                 │
-│  ┌───────────────────┐                                                    │
-│  │  Unload Native    │  Free GPU resource, release system memory          │
-│  │  Resource         │  Managed wrapper becomes invalid (null native ptr) │
-│  └───────────────────┘                                                    │
-└──────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    LoadRequest["LOAD REQUEST<br/>(Resources.Load / AssetBundle.LoadAsset / Addressables.LoadAssetAsync)"]
+    ObjectRegistry["Object Registry<br/>(instance table)"]
+    CacheHit["Return existing reference"]
+    Deserialize["Deserialize Native Object<br/>Read serialized binary → instantiate C++ object<br/>Allocate GPU resource (tex upload, VBO map)"]
+    CreateWrapper["Create Managed Wrapper (C#)<br/>Allocate C# wrapper on managed heap<br/>Register native ptr in wrapper"]
+    RefCount["Reference Count Tracking<br/>Incremented per active load handle<br/>Decremented on Release / Unload"]
+    Unload["Unload Native Resource<br/>Free GPU resource, release system memory<br/>Managed wrapper becomes invalid (null native ptr)"]
+
+    LoadRequest --> ObjectRegistry
+    ObjectRegistry -->|"cache hit?"| CacheHit
+    ObjectRegistry -->|"cache miss"| Deserialize
+    Deserialize --> CreateWrapper
+    CreateWrapper --> RefCount
+    RefCount -->|"refcount == 0"| Unload
 ```
 
 The critical detail here is that Unity's runtime does not use automatic garbage collection to manage native assets. The C# GC collects managed wrappers, but it cannot and does not free GPU textures or audio buffers. Those are freed only by explicit unload calls: `Resources.UnloadAsset`, `AssetBundle.Unload(true)`, or `Addressables.Release`. Missing an unload call leaks native memory, and that leak will not appear in dotMemory or any managed-heap profiler. It appears only in the Unity Profiler's Memory module under "Texture Memory" or in the platform's GPU memory counters.

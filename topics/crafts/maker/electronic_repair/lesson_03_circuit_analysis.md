@@ -26,16 +26,30 @@ The most powerful shift in schematic literacy comes from stopping reading a sche
 
 Consider a typical I²C bus on a microcontroller board. The SDA and SCL lines are open-drain: the MCU and peripheral devices can pull the lines low but rely on pull-up resistors connected to VCC to restore them high. The topology looks like this:
 
-```
-VCC (3.3V)
-   |
-  4.7kΩ        4.7kΩ
-   |               |
-  SCL ─────────── SDA
-   |               |
-[MCU]         [Sensor]
-[Peripheral 1]
-[Peripheral 2]
+```mermaid
+flowchart TD
+    VCC["VCC (3.3V)"]
+    R1["4.7kΩ"]
+    R2["4.7kΩ"]
+    SCL["SCL"]
+    SDA["SDA"]
+    MCU["MCU"]
+    SENSOR["Sensor"]
+    P1["Peripheral 1"]
+    P2["Peripheral 2"]
+    
+    VCC --> R1
+    VCC --> R2
+    R1 --> SCL
+    R2 --> SDA
+    SCL --> MCU
+    SCL --> SENSOR
+    SDA --> MCU
+    SDA --> SENSOR
+    SCL --> P1
+    SCL --> P2
+    SDA --> P1
+    SDA --> P2
 ```
 
 If SDA is stuck low and you cannot communicate with any device on the bus, you have three candidate failure branches: the pull-up resistor has failed or is missing its supply voltage, the MCU's I²C peripheral is holding SDA low due to a clock-stretch lockup, or one of the peripheral devices has a shorted output stage. The schematic immediately tells you all three branches exist. Your first physical measurement is voltage at the top of the pull-up resistor — if VCC is not present there, the fault is upstream in power distribution. If VCC is present but SDA reads low, you use the **divide-and-isolate** method: physically disconnect the peripheral with the most probability of failure (or temporarily remove it from the board), and check whether SDA recovers. If it does, the fault is in that peripheral. If it does not, work toward the MCU.
@@ -48,25 +62,35 @@ The power supply section of any board deserves a full architectural breakdown be
 
 The signal flow through the regulator stage can be represented as follows:
 
-```
-USB 5V / DC Jack
-      |
-   [Reverse
-   Protection
-     Diode]
-      |
-   VIN_RAW ──────────────────────────────► [5V Rail to headers, USB peripherals]
-      |
-  [AMS1117-3.3]
-   IN ─► [Pass Transistor] ─► OUT ─────► [3.3V Rail]
-              ▲                               |
-         [Error Amp]                    [100nF + 10µF
-              |                          Decoupling]
-         [1.25V Ref]                          |
-              |                             GND
-           [ADJ/GND]
-              |
-             GND
+```mermaid
+flowchart TD
+    USB["USB 5V / DC Jack"]
+    RPD["Reverse<br/>Protection<br/>Diode"]
+    VIN["VIN_RAW"]
+    RAIL5V["5V Rail to headers,<br/>USB peripherals"]
+    AMS["AMS1117-3.3"]
+    PT["Pass Transistor"]
+    OUT["OUT"]
+    RAIL3V["3.3V Rail"]
+    DECOUP["100nF + 10µF<br/>Decoupling"]
+    EA["Error Amp"]
+    VREF["1.25V Ref"]
+    ADJ["ADJ/GND"]
+    GND1["GND"]
+    GND2["GND"]
+    
+    USB --> RPD
+    RPD --> VIN
+    VIN --> RAIL5V
+    VIN --> AMS
+    AMS -->|IN| PT
+    PT -->|OUT| RAIL3V
+    EA --> PT
+    VREF --> EA
+    VREF --> ADJ
+    ADJ --> GND1
+    RAIL3V --> DECOUP
+    DECOUP --> GND2
 ```
 
 The two decoupling capacitors at the output are not optional — they are part of the regulator's feedback stability network. Remove or fail them and the regulator will oscillate, producing a 3.3V rail with hundreds of millivolts of AC ripple riding on it. An oscilloscope with AC coupling and a 20MHz bandwidth limit will show this immediately as a sawtooth or sinusoidal ripple. A DMM will show approximately 3.3V and tell you nothing is wrong. This is the single most common reason a DMM-only diagnostic gives false confidence.

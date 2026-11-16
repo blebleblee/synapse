@@ -54,20 +54,18 @@ What modular arithmetic does *not* generally preserve is division. The equation 
 
 Before deriving the principal theorems, it is useful to map out the structural relationships that govern this domain. The following diagram summarizes the algebraic hierarchy from $\mathbb{Z}$ down through its quotient rings and unit groups, with the key theorems acting as arrows between structures.
 
-```
-        ℤ (integers)
-         │
-         │  quotient by nℤ
-         ▼
-      ℤ/nℤ  (commutative ring, additive group ℤ/nℤ, +)
-         │
-         │  retain only units (gcd(a,n)=1)
-         ▼
-   (ℤ/nℤ)×  (multiplicative group of units, order φ(n))
-     /     \
-    /         \
-n = p^k      n = p·q (semiprime, e.g. RSA modulus)
-(cyclic)     (ℤ/pℤ)× × (ℤ/qℤ)×  ← CRT isomorphism
+```mermaid
+flowchart TD
+    Z["ℤ (integers)"]
+    ZnZ["ℤ/nℤ<br/>(commutative ring, additive group ℤ/nℤ, +)"]
+    Units["(ℤ/nℤ)×<br/>(multiplicative group of units, order φ(n))"]
+    PrimeK["n = p^k<br/>(cyclic)"]
+    Semiprime["n = p·q (semiprime, e.g. RSA modulus)<br/>(ℤ/pℤ)× × (ℤ/qℤ)×<br/>← CRT isomorphism"]
+    
+    Z -->|"quotient by nℤ"| ZnZ
+    ZnZ -->|"retain only units<br/>(gcd(a,n)=1)"| Units
+    Units --> PrimeK
+    Units --> Semiprime
 ```
 
 Each node in this hierarchy has well-defined arithmetic, and each edge represents a construction or theorem. The Chinese Remainder Theorem, Fermat's Little Theorem, and Euler's Theorem each correspond to structural facts about these nodes and their relationships.

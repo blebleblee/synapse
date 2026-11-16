@@ -34,33 +34,88 @@ The principle of rally tempo modulation recognizes that consistent ball velocity
 
 Pattern recognition systems enable elite players to compress complex rally states into memorized tactical archetypes. Through thousands of hours of match experience and deliberate practice, players develop an extensive pattern library where current court positions, spin orientations, and momentum states trigger automatic stroke selections. This pattern-matching architecture operates below conscious cognitive processing, enabling sub-200-millisecond decision latencies that conscious analysis cannot achieve. The training methodology for pattern development requires deliberate variation during practice, exposing players to hundreds of distinct rally configurations rather than repetitive drilling of single patterns, thereby building robust classification systems that generalize across match contexts.
 
-```
-Rally State Classification System:
-
-Input Features:
-├─ Ball Properties
-│  ├─ Spin Axis: [Topspin | Backspin | Sidespin | No-spin]
-│  ├─ Velocity: [Slow: <30km/h | Medium: 30-60km/h | Fast: >60km/h]
-│  └─ Trajectory: [High arc | Mid arc | Flat]
-├─ Positional State
-│  ├─ Self Position: [Neutral | Left displaced | Right displaced | Far from table]
-│  ├─ Opponent Position: [Neutral | Displaced | Recovered | Off-balance]
-│  └─ Ball Depth: [Short: <40cm from net | Mid | Deep: >120cm from net]
-└─ Tactical Context
-   ├─ Rally Count: [0-3: Setup | 4-8: Mid-rally | 9+: Endurance]
-   ├─ Score State: [Leading | Tied | Trailing]
-   └─ Momentum: [Positive | Neutral | Negative]
-
-Pattern-Response Mapping:
-├─ Offensive Pattern A: [Short backspin serve → Long push return → Forehand loop to forehand]
-├─ Offensive Pattern B: [Fast sidespin serve → Weak flick → Backhand counter-drive]
-├─ Defensive Pattern C: [Deep topspin to backhand → Block return → Forehand chop with heavy backspin]
-└─ Transition Pattern D: [Opponent topspin loop → Mid-distance block → Positional reset to neutral]
-
-Terminal Conditions:
-├─ Scoring Shot: [Unreturnable placement | Opponent forced error | Net/edge winner]
-├─ Opponent Score: [Unforced error | Net/edge loss | Out-of-position vulnerability]
-└─ Rally Extension: [Neutral exchange continues | Pattern recognition incomplete]
+```mermaid
+flowchart TD
+    Start["Rally State Classification System"]
+    
+    Start --> InputFeatures["Input Features"]
+    Start --> PatternResponse["Pattern-Response Mapping"]
+    Start --> TerminalConditions["Terminal Conditions"]
+    
+    InputFeatures --> BallProps["Ball Properties"]
+    InputFeatures --> PositionalState["Positional State"]
+    InputFeatures --> TacticalContext["Tactical Context"]
+    
+    BallProps --> SpinAxis["Spin Axis"]
+    BallProps --> Velocity["Velocity"]
+    BallProps --> Trajectory["Trajectory"]
+    
+    SpinAxis --> SA1["Topspin"]
+    SpinAxis --> SA2["Backspin"]
+    SpinAxis --> SA3["Sidespin"]
+    SpinAxis --> SA4["No-spin"]
+    
+    Velocity --> V1["Slow: <30km/h"]
+    Velocity --> V2["Medium: 30-60km/h"]
+    Velocity --> V3["Fast: >60km/h"]
+    
+    Trajectory --> T1["High arc"]
+    Trajectory --> T2["Mid arc"]
+    Trajectory --> T3["Flat"]
+    
+    PositionalState --> SelfPos["Self Position"]
+    PositionalState --> OpponentPos["Opponent Position"]
+    PositionalState --> BallDepth["Ball Depth"]
+    
+    SelfPos --> SP1["Neutral"]
+    SelfPos --> SP2["Left displaced"]
+    SelfPos --> SP3["Right displaced"]
+    SelfPos --> SP4["Far from table"]
+    
+    OpponentPos --> OP1["Neutral"]
+    OpponentPos --> OP2["Displaced"]
+    OpponentPos --> OP3["Recovered"]
+    OpponentPos --> OP4["Off-balance"]
+    
+    BallDepth --> BD1["Short: <40cm from net"]
+    BallDepth --> BD2["Mid"]
+    BallDepth --> BD3["Deep: >120cm from net"]
+    
+    TacticalContext --> RallyCount["Rally Count"]
+    TacticalContext --> ScoreState["Score State"]
+    TacticalContext --> Momentum["Momentum"]
+    
+    RallyCount --> RC1["0-3: Setup"]
+    RallyCount --> RC2["4-8: Mid-rally"]
+    RallyCount --> RC3["9+: Endurance"]
+    
+    ScoreState --> SS1["Leading"]
+    ScoreState --> SS2["Tied"]
+    ScoreState --> SS3["Trailing"]
+    
+    Momentum --> M1["Positive"]
+    Momentum --> M2["Neutral"]
+    Momentum --> M3["Negative"]
+    
+    PatternResponse --> PatternA["Offensive Pattern A:<br/>Short backspin serve → Long push return<br/>→ Forehand loop to forehand"]
+    PatternResponse --> PatternB["Offensive Pattern B:<br/>Fast sidespin serve → Weak flick<br/>→ Backhand counter-drive"]
+    PatternResponse --> PatternC["Defensive Pattern C:<br/>Deep topspin to backhand → Block return<br/>→ Forehand chop with heavy backspin"]
+    PatternResponse --> PatternD["Transition Pattern D:<br/>Opponent topspin loop → Mid-distance block<br/>→ Positional reset to neutral"]
+    
+    TerminalConditions --> ScoringShot["Scoring Shot"]
+    TerminalConditions --> OpponentScore["Opponent Score"]
+    TerminalConditions --> RallyExtension["Rally Extension"]
+    
+    ScoringShot --> SC1["Unreturnable placement"]
+    ScoringShot --> SC2["Opponent forced error"]
+    ScoringShot --> SC3["Net/edge winner"]
+    
+    OpponentScore --> OS1["Unforced error"]
+    OpponentScore --> OS2["Net/edge loss"]
+    OpponentScore --> OS3["Out-of-position vulnerability"]
+    
+    RallyExtension --> RE1["Neutral exchange continues"]
+    RallyExtension --> RE2["Pattern recognition incomplete"]
 ```
 
 Opponent exploitation begins with systematic reconnaissance during warm-up and early game phases. The analytical player observes stroke preferences under various ball characteristics: does the opponent favor backhand blocks or forehand topspins when receiving fast serves to the middle? Does lateral displacement to the forehand side trigger cross-court returns or down-the-line attempts? Does the opponent struggle with short, low serves compared to long, fast serves? These observations populate a dynamic opponent model that continuously updates throughout the match as new data emerges.

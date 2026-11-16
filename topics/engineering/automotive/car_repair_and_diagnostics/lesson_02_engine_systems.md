@@ -20,31 +20,64 @@ Sequential port injection fires each injector once per engine cycle, timed to op
 
 Direct injection systems, now dominant in new production, inject fuel directly into the combustion chamber at pressures ranging from 500 to 2900 psi (35 to 200 bar), atomizing fuel through microscopic nozzle orifices for superior mixture preparation. A camshaft-driven high-pressure pump, supplied by a conventional low-pressure pump in the tank, compresses fuel against a pressure control valve modulated by the ECU. Direct injection permits stratified-charge operation: injecting fuel late in the compression stroke creates a rich zone near the spark plug within a globally lean chamber, improving part-throttle efficiency. However, the absence of intake port fuel wash permits carbon deposit accumulation on intake valve faces, progressively restricting airflow and causing rough idle and misfire. Repair procedures involve walnut shell blasting—abrasive media pneumatically propelled through removed intake manifolds to scour valve deposits—or chemical cleaning with pressurized solvents introduced through intake ports.
 
-```
-Four-Stroke Engine Cycle Timing Diagram (720° Crankshaft Rotation)
-
-Crank Angle:    0°      180°    360°    540°    720°
-              (TDC)           (BDC)           (TDC)
-                │              │              │
-Intake:        [═════════════════════════════>]
-               Valve open ───────────────> Valve close
-               (IVO -20°)              (IVC +60° ABDC)
-
-Compression:                  [═════════════>]
-                              Air/fuel compressed
-                              Pressure: 1→14 bar
-
-Power:                                  [*═══>]
-                                        │Ignition -15° BTDC
-                                        Peak pressure +15° ATDC
-
-Exhaust:                                    [═════════════>]
-                                         Valve open +45° BBDC
-                                         Valve close +10° ATDC
-
-Valve Overlap: [++]────────────────────────────────[++]
-               Both valves open during overlap period
-               Exhaust scavenging assists intake flow
+```mermaid
+flowchart TD
+    TDC0["0° TDC<br/>Top Dead Center"]
+    A180["180°"]
+    BDC["360° BDC<br/>Bottom Dead Center"]
+    A540["540°"]
+    TDC720["720° TDC<br/>Top Dead Center"]
+    
+    subgraph Intake ["<b>INTAKE STROKE</b><br/>0° - 180°"]
+        IVO["IVO: -20° BTDC<br/>Intake Valve Opens"]
+        IntakeProcess["Air/Fuel Mixture<br/>Enters Cylinder"]
+        IVC["IVC: +60° ABDC<br/>Intake Valve Closes<br/>(at 420°)"]
+    end
+    
+    subgraph Compression ["<b>COMPRESSION STROKE</b><br/>180° - 360°"]
+        CompStart["Both Valves Closed"]
+        CompProcess["Air/Fuel Compressed<br/>Pressure: 1 → 14 bar"]
+        CompEnd["Maximum Compression"]
+    end
+    
+    subgraph Power ["<b>POWER STROKE</b><br/>360° - 540°"]
+        Ignition["Ignition: -15° BTDC<br/>(at 345°)"]
+        Combustion["Combustion Event"]
+        PeakPressure["Peak Pressure<br/>+15° ATDC"]
+        Expansion["Expanding Gases<br/>Drive Piston Down"]
+    end
+    
+    subgraph Exhaust ["<b>EXHAUST STROKE</b><br/>540° - 720°"]
+        EVO["EVO: +45° BBDC<br/>Exhaust Valve Opens<br/>(at 495°)"]
+        ExhaustProcess["Burned Gases<br/>Exit Cylinder"]
+        EVC["EVC: +10° ATDC<br/>Exhaust Valve Closes<br/>(at 730°/10°)"]
+    end
+    
+    ValveOverlap1["<b>VALVE OVERLAP</b><br/>Both Valves Open<br/>Exhaust scavenging<br/>assists intake flow"]
+    ValveOverlap2["<b>VALVE OVERLAP</b><br/>Both Valves Open<br/>-20° to +10°"]
+    
+    TDC0 --> IVO
+    IVO --> IntakeProcess
+    IntakeProcess --> A180
+    A180 --> IVC
+    IVC --> CompStart
+    CompStart --> CompProcess
+    CompProcess --> BDC
+    BDC --> CompEnd
+    CompEnd --> Ignition
+    Ignition --> Combustion
+    Combustion --> PeakPressure
+    PeakPressure --> Expansion
+    Expansion --> A540
+    A540 --> EVO
+    EVO --> ExhaustProcess
+    ExhaustProcess --> TDC720
+    TDC720 --> EVC
+    
+    TDC0 -.-> ValveOverlap1
+    ValveOverlap1 -.-> IVO
+    TDC720 -.-> ValveOverlap2
+    EVC -.-> ValveOverlap2
 ```
 
 Ignition system architecture determines how stored electrical energy transforms into the fifteen to forty kilovolt spark required to ionize the air-fuel mixture gap. Conventional distributor ignition, prevalent through the 1980s, employs a rotating arm to sequentially direct secondary coil voltage to each spark plug through carbon-impregnated rotor and cap contacts. The ignition coil functions as a step-up transformer: the ECU (or points mechanism in earlier systems) interrupts primary current flow through the coil's low-voltage winding, causing magnetic field collapse that induces high voltage in the secondary winding according to the turns ratio—typically one hundred turns secondary per single primary turn. Primary current buildup requires finite time governed by coil inductance, limiting maximum engine speed in distributor systems to approximately 6500 RPM before insufficient dwell time prevents full coil saturation.

@@ -128,24 +128,28 @@ For example, the sentence $\forall x\, (P(x) \to P(x))$ is logically valid: in a
 
 The structure of the semantic consequence relation can be visualized as follows, illustrating how a set of axioms $\Gamma$ carves out a class of models, and how consequence propagates from that class:
 
-```
-All L-structures
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│   Models of Γ (Mod(Γ))                                  │
-│   ┌─────────────────────────────────┐                   │
-│   │                                 │                   │
-│   │  M₁   M₂   M₃   M₄  ...        │                   │
-│   │                                 │                   │
-│   │  Every model here satisfies     │                   │
-│   │  every γ ∈ Γ                    │                   │
-│   │                                 │                   │
-│   └─────────────────────────────────┘                   │
-│                                                         │
-│   Γ ⊨ σ iff σ is true in every model inside Mod(Γ)      │
-│   Γ ⊭ σ iff some model in Mod(Γ) falsifies σ            │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["All L-structures"]
+    B["Models of Γ<br/>Mod(Γ)"]
+    C["M₁"]
+    D["M₂"]
+    E["M₃"]
+    F["M₄"]
+    G["..."]
+    H["Every model satisfies<br/>every γ ∈ Γ"]
+    I["Γ ⊨ σ<br/>σ is true in every model<br/>inside Mod(Γ)"]
+    J["Γ ⊭ σ<br/>Some model in Mod(Γ)<br/>falsifies σ"]
+    
+    A --> B
+    B --> C
+    B --> D
+    B --> E
+    B --> F
+    B --> G
+    B --> H
+    H --> I
+    H --> J
 ```
 
 A *theory* $T$ in first-order logic is a deductively closed set of sentences: if $T \models \sigma$ then $\sigma \in T$. The theory of a structure $\mathcal{M}$, written $\text{Th}(\mathcal{M})$, is the set of all sentences true in $\mathcal{M}$, and it is always a complete theory — for every sentence $\sigma$, either $\sigma \in \text{Th}(\mathcal{M})$ or $\neg\sigma \in \text{Th}(\mathcal{M})$, by the law of excluded middle applied at the semantic level. The theory of the standard natural numbers, $\text{Th}(\mathbb{N}, 0, s, +, \times)$ — known as *true arithmetic* — is a paradigmatic example of a complete, semantically defined theory that, by Gödel's First Incompleteness Theorem, is not recursively axiomatizable.

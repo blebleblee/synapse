@@ -22,23 +22,20 @@ Git supports three transport families: the dumb HTTP protocol (deprecated but hi
 
 When you execute `git fetch origin`, the following sequence of operations unfolds. Your local Git process establishes a connection to the remote URL and invokes the `git-upload-pack` process on the server side. The server immediately advertises all of its references — every branch, every tag, every note ref — along with their current SHA hashes. In protocol version 0 and 1, this advertisement was unconditional and unbounded, which created a significant scalability problem for repositories with tens of thousands of branches (a common situation in large monorepo deployments at Google, Meta, and Microsoft). Protocol version 2, introduced in Git 2.18 and now the default, inverts this model: the server advertises its capabilities first, and the client then issues a filtered `ls-refs` command specifying exactly which reference prefixes it wants to see. This lazy reference advertisement reduces the initial round-trip cost from O(total refs) to O(requested refs).
 
-```
-Client                          Server
-  |                               |
-  |--- git-upload-pack request -->|
-  |                               |
-  |<-- capability advertisement --|  (protocol v2: capabilities only)
-  |                               |
-  |--- ls-refs (filter: heads) -->|
-  |                               |
-  |<-- ref list ------------------|
-  |                               |
-  |--- want <sha> ... ----------->|  (objects client wants)
-  |--- have <sha> ... ----------->|  (objects client already has)
-  |--- done ---------------------->|
-  |                               |
-  |<-- NAK / ACK negotiation -----|
-  |<-- pack-objects stream --------|
+```mermaid
+flowchart TD
+    Client["Client"]
+    Server["Server"]
+    
+    Client -->|"git-upload-pack request"| Server
+    Server -->|"capability advertisement<br/>protocol v2: capabilities only"| Client
+    Client -->|"ls-refs filter: heads"| Server
+    Server -->|"ref list"| Client
+    Client -->|"want &lt;sha&gt; ..."| Server
+    Client -->|"have &lt;sha&gt; ...<br/>objects client already has"| Server
+    Client -->|done| Server
+    Server -->|"NAK / ACK negotiation"| Client
+    Server -->|"pack-objects stream"| Client
 ```
 
 The `want`/`have` negotiation is the heart of the fetch protocol and deserves close examination. After receiving the remote's reference list, the client identifies the tip commits it wants (the `want` set) and begins advertising the commit hashes it already has (the `have` set). The goal is for the server to identify the greatest common ancestor set — the boundary commits that both sides share — so it knows exactly which objects to include in the pack file it will send. The client sends `have` lines in a round-trip loop, walking back through its commit history from all local branch tips in a breadth-first traversal. The server responds with `ACK <sha>` when it recognizes a commit the client has, allowing the client to prune that subtree from further advertisement. When the client has exhausted its history advertisement or the server signals sufficient common ground, the client sends `done`, and the server sends the pack file containing exactly the objects the client needs to reach the requested tips from the acknowledged common ancestors.

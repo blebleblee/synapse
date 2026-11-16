@@ -434,7 +434,7 @@ The setup adjustment matrix codifies the quantitative suspension parameter chang
 | Front Understeer | Apex roll angle -2° vs ref | Front comp -3 clicks, preload -3mm | Apex roll angle +2°, apex speed +2 km/h |
 | Front Tuck | Apex roll angle +3° vs ref, inside edge temp +15°C | Front comp +4 clicks, preload +2mm, tire +0.2 bar | Apex roll angle -2°, inside temp -10°C |
 | Front Chatter | Susp velocity >10 Hz content | Front rebound -4 clicks, comp -2 clicks | High-freq content reduced 40% |
-| Rear Spin | Rear slip ratio >8%, center temp +10°C | Rear rebound +3 clicks, preload -2mm, tire -0.3 bar | Slip ratio <5%, center temp -5°C |
+| Rear Spin | Rear slip ratio >8%, center temp +10°C | Rear rebound +3 clicks, preload -2mm, tire -0.3 bar | Slip ratio < 5%, center temp -5°C |
 | Rear Chatter | Susp velocity >10 Hz during accel | Rear comp -4 clicks, rebound +1 click, tire +0.2 bar | High-freq content reduced 50% |
 | Rear Packing | Avg susp position drifts -5mm | Rear rebound +5 clicks | Susp position stable within ±2mm |
 

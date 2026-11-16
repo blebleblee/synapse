@@ -40,44 +40,50 @@ The first decision point separates cognitivism from non-cognitivism: do moral ut
 
 Non-cognitivism must address the Frege-Geach problem, which exposes difficulties embedding moral claims within complex logical constructions. Consider the argument: "If torturing innocents is wrong, then getting your brother to torture innocents is wrong. Torturing innocents is wrong. Therefore, getting your brother to torture innocents is wrong." This reasoning appears valid through modus ponens. But if "torturing innocents is wrong" expresses an emotion or prescription rather than a truth-apt belief, what does the conditional "If torturing innocents is wrong, then..." express? You cannot feel an emotion conditionally in the way required to make the argument valid. Sophisticated non-cognitivists like Simon Blackburn and Allan Gibbard have developed complex solutions involving higher-order attitudes, but the problem reveals genuine logical complexity in non-cognitivist semantics.
 
-```
-Metaethical Decision Tree
+```mermaid
+flowchart TD
+    START["🗣️ Moral Utterance: 'Torture is wrong'"]
 
-MORAL UTTERANCE: "Torture is wrong"
-          |
-          v
-    [Cognitivism or Non-cognitivism?]
-          |
-    +-----+-----+
-    |           |
-COGNITIVISM  NON-COGNITIVISM
-(expresses    (expresses
- belief)       attitude/prescription)
-    |              |
-    v              v
-[Realism?]    [Emotivism or
-    |          Prescriptivism?]
-+---+---+
-|       |
-REALISM ANTI-REALISM
-(moral  (no moral
- facts   facts exist)
- exist)     |
-    |       v
-    |   [Error Theory or
-    |    Constructivism?]
-    v
-[Naturalism?]
-    |
-+---+---+
-|       |
-NATURAL NON-NATURAL
-(moral  (moral properties
- props   are sui generis,
- reduce  grasped via
- to      rational
- natural intuition)
- props)
+    START --> Q1["Cognitivism or Non-cognitivism?"]
+
+    Q1 --> COGN["Cognitivism\n(expresses a belief)"]
+    Q1 --> NONCOGN["Non-cognitivism\n(expresses an attitude or prescription)"]
+
+    COGN --> Q2["Realism?"]
+    NONCOGN --> Q3["Emotivism or Prescriptivism?"]
+
+    Q2 --> REALISM["Realism\n(moral facts exist)"]
+    Q2 --> ANTIREALISM["Anti-realism\n(no moral facts exist)"]
+
+    ANTIREALISM --> Q4["Error Theory or Constructivism?"]
+
+    Q3 --> EMOTIVISM["Emotivism"]
+    Q3 --> PRESCRIPTIVISM["Prescriptivism"]
+
+    Q4 --> ERRORTHEORY["Error Theory"]
+    Q4 --> CONSTRUCTIVISM["Constructivism"]
+
+    REALISM --> Q5["Naturalism?"]
+
+    Q5 --> NATURAL["Naturalism\n(moral properties reduce\nto natural properties)"]
+    Q5 --> NONNATURAL["Non-naturalism\n(moral properties are\nsui generis, grasped via\nrational intuition)"]
+
+    style START fill:#4A90D9,color:#fff,stroke:#2c5f8a
+    style Q1 fill:#F5A623,color:#fff,stroke:#b87a1a
+    style Q2 fill:#F5A623,color:#fff,stroke:#b87a1a
+    style Q3 fill:#F5A623,color:#fff,stroke:#b87a1a
+    style Q4 fill:#F5A623,color:#fff,stroke:#b87a1a
+    style Q5 fill:#F5A623,color:#fff,stroke:#b87a1a
+    style COGN fill:#7ED321,color:#fff,stroke:#5a9918
+    style NONCOGN fill:#7ED321,color:#fff,stroke:#5a9918
+    style REALISM fill:#9B59B6,color:#fff,stroke:#6c3483
+    style ANTIREALISM fill:#9B59B6,color:#fff,stroke:#6c3483
+    style NATURAL fill:#1ABC9C,color:#fff,stroke:#148f77
+    style NONNATURAL fill:#1ABC9C,color:#fff,stroke:#148f77
+    style EMOTIVISM fill:#E74C3C,color:#fff,stroke:#a93226
+    style PRESCRIPTIVISM fill:#E74C3C,color:#fff,stroke:#a93226
+    style ERRORTHEORY fill:#E74C3C,color:#fff,stroke:#a93226
+    style CONSTRUCTIVISM fill:#E74C3C,color:#fff,stroke:#a93226
 ```
 
 Within cognitivism, the realism/anti-realism distinction marks the second major fork. Moral realists affirm that moral facts exist independently of human attitudes and conventions, while anti-realists deny this claim. This metaphysical question determines whether moral investigation aims at discovery or invention. Realists treat moral inquiry as comparable to scientific investigation: we seek to uncover pre-existing moral structure in reality. Anti-realists treat moral frameworks as human constructions, whether grounded in subjective preferences, cultural conventions, or idealized rational agreement.

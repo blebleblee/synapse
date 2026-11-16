@@ -58,7 +58,7 @@ With time delay estimates $\{\tau_{12}, \tau_{13}, \tau_{14}\}$ from a reference
 
 $$\mathbf{b}_j \cdot \hat{\mathbf{s}} = c \tau_{1j}, \quad j \in \{2, 3, 4\}$$
 
-subject to the unit norm constraint $\|\hat{\mathbf{s}\| = 1$. In practice, least-squares or RANSAC-based solvers provide robust estimates in the presence of noise and reverberation.
+subject to the unit norm constraint $\|\hat{\mathbf{s}}\| = 1$. In practice, least-squares or RANSAC-based solvers provide robust estimates in the presence of noise and reverberation.
 
 For speech command recognition in the identified spatial direction, beamforming techniques apply spatial filtering to enhance the target source while suppressing noise and interfering sources. A delay-and-sum beamformer for a desired look direction $\hat{\mathbf{s}}_0$ applies compensating delays $\tau_j^0 = -\mathbf{b}_j \cdot \hat{\mathbf{s}}_0 / c$ to each microphone signal and sums:
 

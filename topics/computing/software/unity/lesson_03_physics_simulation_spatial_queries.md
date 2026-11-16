@@ -26,28 +26,34 @@ The trigger semantic is architecturally distinct from collider contact. When a `
 
 The execution graph below shows how Unity's main thread and physics thread interleave across a single rendered frame, illustrating why `FixedUpdate` can fire zero, one, or multiple times per frame.
 
-```
-Frame N (render loop, 16ms wall-clock target)
-│
-├─ Accumulate dt into physics accumulator
-│    accumulator += Time.unscaledDeltaTime
-│
-├─ While accumulator >= fixedDeltaTime:
-│   │
-│   ├─ [Physics substep]
-│   │   ├─ Unity → PhysX: apply pending force/velocity mutations from script
-│   │   ├─ PhysX Broadphase (SAP/ABP on AABBs + contact offset)
-│   │   ├─ PhysX Midphase  (BVH on triangle mesh shapes)
-│   │   ├─ PhysX Narrowphase (GJK / EPA → contact manifolds)
-│   │   ├─ Constraint build  (contacts + joints → PGS constraint rows)
-│   │   ├─ Solver iterations (PGS, default 6 pos + 1 vel)
-│   │   ├─ Integration        (semi-implicit Euler: v += a*dt, x += v*dt)
-│   │   └─ PhysX → Unity: write actor poses to Transform
-│   │
-│   ├─ FixedUpdate() fires here (all MonoBehaviours)
-│   └─ accumulator -= fixedDeltaTime
-│
-└─ Update() → LateUpdate() → Rendering
+```mermaid
+flowchart TD
+    A["Frame N\n(render loop, 16 ms wall-clock target)"]
+
+    A --> B["Accumulate dt into physics accumulator\naccumulator += Time.unscaledDeltaTime"]
+
+    B --> C{"accumulator >= fixedDeltaTime?"}
+
+    subgraph physics_substep ["Physics Substep"]
+        direction TB
+        P1["Unity → PhysX\napply pending force/velocity mutations from script"]
+        P2["PhysX Broadphase\nSAP/ABP on AABBs + contact offset"]
+        P3["PhysX Midphase\nBVH on triangle mesh shapes"]
+        P4["PhysX Narrowphase\nGJK / EPA → contact manifolds"]
+        P5["Constraint Build\ncontacts + joints → PGS constraint rows"]
+        P6["Solver Iterations\nPGS — default 6 position + 1 velocity"]
+        P7["Integration\nsemi-implicit Euler: v += a·dt, x += v·dt"]
+        P8["PhysX → Unity\nwrite actor poses to Transform"]
+
+        P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8
+    end
+
+    C -- "Yes" --> physics_substep
+    physics_substep --> FU["FixedUpdate()\nall MonoBehaviours"]
+    FU --> DEC["accumulator -= fixedDeltaTime"]
+    DEC --> C
+
+    C -- "No" --> D["Update() → LateUpdate() → Rendering"]
 ```
 
 The indirection between `FixedUpdate` and `Update` is intentional: rendering runs at the display frame rate while physics advances in fixed increments. Unity interpolates `Transform` positions for rendering using the `Rigidbody.interpolation` setting, which buffers one or two previous physics poses and blends them against the current render fraction. Without interpolation, rigid bodies exhibit the characteristic jitter of a 50 Hz signal displayed at 60+ Hz.
@@ -56,24 +62,26 @@ The indirection between `FixedUpdate` and `Update` is intentional: rendering run
 
 A `Rigidbody` can be in one of three PhysX actor states that map loosely to Unity concepts.
 
-```
-                    ┌─────────────────────┐
-                    │   Dynamic (default) │◄────── AddComponent<Rigidbody>()
-                    │  PxRigidDynamic     │        mass > 0, gravity on
-                    └────────┬────────────┘
-                             │ isKinematic = true
-                             ▼
-                    ┌─────────────────────┐
-                    │     Kinematic       │   Driven by Transform/MovePosition
-                    │  PxRigidDynamic     │   Generates contacts but ignores forces
-                    │  (kinematic flag)   │
-                    └────────┬────────────┘
-                             │ Rigidbody removed
-                             ▼
-                    ┌─────────────────────┐
-                    │      Static         │   No velocity, no mass
-                    │  PxRigidStatic      │   Terrain, walls
-                    └─────────────────────┘
+```mermaid
+flowchart TD
+    Dynamic["Dynamic (default)<br/>PxRigidDynamic"]
+    Kinematic["Kinematic<br/>PxRigidDynamic<br/>(kinematic flag)"]
+    Static["Static<br/>PxRigidStatic"]
+    
+    AddComponent[["AddComponent&lt;Rigidbody&gt;()<br/>mass > 0, gravity on"]]
+    
+    AddComponent -.-> Dynamic
+    Dynamic -->|"isKinematic = true"| Kinematic
+    Kinematic -->|"Rigidbody removed"| Static
+    
+    note1["Driven by Transform/MovePosition<br/>Generates contacts but ignores forces"]
+    note2["No velocity, no mass<br/>Terrain, walls"]
+    
+    Kinematic -.-> note1
+    Static -.-> note2
+    
+    style note1 fill:#f9f9f9,stroke:#999,stroke-dasharray: 3 3
+    style note2 fill:#f9f9f9,stroke:#999,stroke-dasharray: 3 3
 ```
 
 A kinematic body is architecturally significant: it participates in contact generation and pushes dynamic bodies, but it is not subject to solver forces. This makes it ideal for driven platforms, doors, and character controllers—objects that need to block dynamic actors without being deflected by them. The critical failure mode with kinematic bodies is teleportation: setting `transform.position` directly on a kinematic `Rigidbody` bypasses PhysX's swept motion tracking, which means no contacts are generated along the swept path. `Rigidbody.MovePosition`, by contrast, instructs PhysX to move the kinematic actor along a linear sweep within the substep, enabling swept contact generation.

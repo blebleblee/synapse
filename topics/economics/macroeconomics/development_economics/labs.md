@@ -372,7 +372,7 @@ This reference guide consolidates the operational procedures, diagnostic criteri
 **Red Flags:**
 - Convergence coefficient positive and significant: indicates model misspecification or sample selection issues (e.g., only successful convergers included)
 - $R^2 < 0.20$: conditioning variables explain little cross-country variation; consider adding institutional or geographic controls
-- Large standard errors (t-statistic <1.5): insufficient sample size or excessive measurement error
+- Large standard errors (t-statistic < 1.5): insufficient sample size or excessive measurement error
 
 ### Threshold Regression: Execution Checklist
 
@@ -389,12 +389,12 @@ This reference guide consolidates the operational procedures, diagnostic criteri
 6. Bootstrap 1,000 samples to construct threshold confidence interval
 
 **Diagnostic Tests:**
-- Bootstrap 95% CI width should be <0.5 log points (less than 65% income difference); wider intervals indicate imprecise threshold estimate
+- Bootstrap 95% CI width should be < 0.5 log points (less than 65% income difference); wider intervals indicate imprecise threshold estimate
 - Test whether threshold disappears when adding institutional or geographic controls: if so, apparent income threshold is proxy for omitted variables
 
 **Red Flags:**
 - Threshold estimate at boundary of tested range (20th or 80th percentile): extend grid search
-- Low-regime sample size <30 observations: insufficient power to detect regime-specific convergence coefficient
+- Low-regime sample size < 30 observations: insufficient power to detect regime-specific convergence coefficient
 - Confidence interval spans full tested range: no credible threshold exists in data
 
 ### IV Estimation: Execution Checklist
@@ -405,7 +405,7 @@ This reference guide consolidates the operational procedures, diagnostic criteri
 
 **First-Stage Diagnostics:**
 - Coefficient on instrument should be statistically significant (t-stat >3) with expected sign
-- First-stage F-statistic must exceed 10; values <10 indicate weak instrument problems
+- First-stage F-statistic must exceed 10; values < 10 indicate weak instrument problems
 - Partial $R^2$ of instrument (incremental variance explained beyond other regressors) should exceed 0.05
 
 **Exclusion Restriction Tests:**
@@ -429,7 +429,7 @@ This reference guide consolidates the operational procedures, diagnostic criteri
 1. Set up equilibrium conditions as system of equations in factor prices and quantities
 2. Define market-clearing error terms (supply minus demand for each factor and good)
 3. Use non-linear solver to minimize sum of squared errors
-4. Verify solution: all markets clear (errors <0.001), all quantities non-negative, zero-profit conditions hold
+4. Verify solution: all markets clear (errors < 0.001), all quantities non-negative, zero-profit conditions hold
 
 **Convergence Diagnostics:**
 - Solver should converge within 100 iterations from reasonable starting values

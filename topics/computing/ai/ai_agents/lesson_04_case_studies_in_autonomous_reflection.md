@@ -293,8 +293,8 @@ graph TB
     I -->|"Stuck Detection"| L["Replanning Trigger"]
     L -->|"Change Strategy"| B
     
-    style H fill:#e1f5ff
-    style I fill:#ffe1e1
+    style H fill:#e1f5ff,color:#0f172a
+    style I fill:#ffe1e1,color:#0f172a
 ```
 
 ### Reflection Mechanisms
@@ -598,8 +598,8 @@ graph TB
     L -.->|"Powers"| F
     L -.->|"Powers"| I
     
-    style E fill:#d4edda
-    style I fill:#f8d7da
+    style E fill:#d4edda,color:#0f172a
+    style I fill:#f8d7da,color:#0f172a
 ```
 
 ### Reflection Mechanisms

@@ -134,30 +134,26 @@ This matrix is lower-triangular with a specific structure that guarantees the st
 
 The computational pipeline for S4 during training, illustrated as a data flow, proceeds as follows:
 
-```
-Input x  : (batch, length, d_model)
-           │
-           ▼
-   Linear Projection
-           │
-           ▼
- ┌─────────────────────────────────────────────────────────┐
- │               SSM Layer  (per d_model channel)          │
- │                                                         │
- │  Parameters: A (NPLR or diag), B, C, Δ (log-domain)    │
- │                                                         │
- │  Step 1: Discretize A, B using ZOH + Δ                 │
- │            Ā = exp(Δ·A),  B̄ = (ΔA)⁻¹(Ā-I)·ΔB         │
- │                                                         │
- │  Step 2: Build convolutional kernel                     │
- │            K = [CB̄, CĀB̄, CĀ²B̄, ..., CĀᴸ⁻¹B̄]        │
- │                                                         │
- │  Step 3: FFT-based convolution                          │
- │            y = IFFT(FFT(x) ⊙ FFT(K))                   │
- └─────────────────────────────────────────────────────────┘
-           │
-           ▼
-   Output y : (batch, length, d_model)
+```mermaid
+flowchart TD
+    Input["Input x : (batch, length, d_model)"]
+    
+    Input --> LinearProj["Linear Projection"]
+    
+    LinearProj --> SSM
+    
+    subgraph SSM["SSM Layer (per d_model channel)"]
+        direction TB
+        Params["Parameters: A (NPLR or diag), B, C, Δ (log-domain)"]
+        
+        Params --> Step1["Step 1: Discretize A, B using ZOH + Δ<br/>Ā = exp(Δ·A)<br/>B̄ = (ΔA)⁻¹(Ā-I)·ΔB"]
+        
+        Step1 --> Step2["Step 2: Build convolutional kernel<br/>K = [CB̄, CĀB̄, CĀ²B̄, ..., CĀᴸ⁻¹B̄]"]
+        
+        Step2 --> Step3["Step 3: FFT-based convolution<br/>y = IFFT(FFT(x) ⊙ FFT(K))"]
+    end
+    
+    SSM --> Output["Output y : (batch, length, d_model)"]
 ```
 
 The kernel $K$ has a closed-form frequency-domain representation that depends on the eigenvalues of $A$. For the NPLR case, this reduces to evaluating a sum of Cauchy-type terms at points on the unit circle, which is $O(N \log N)$ per kernel computation. The total training complexity for S4 on a sequence of length $L$ is $O(L \log L + N L)$, where the $L \log L$ term comes from the FFT convolution and the $NL$ term comes from the kernel construction.
@@ -399,21 +395,31 @@ During training with selective SSMs (Mamba), the parallel scan is mandatory beca
 
 During autoregressive inference, neither the FFT mode nor the scan is appropriate. You have exactly one new token and a cached state vector $h \in \mathbb{R}^{N}$. The correct mode is the single-step recurrence: $h_{\text{new}} = \bar{A}_t h + \bar{B}_t x_t$, $y = Ch_{\text{new}}$. This is a constant-time operation — $O(N)$ per token regardless of sequence length — which is the core advantage of SSMs over Transformers for long-context inference. A Transformer must recompute attention over all $L$ past key-value pairs at every new token, giving $O(L)$ per-token inference cost and $O(L)$ KV-cache memory that grows with sequence length. The SSM's recurrent state is a fixed-size vector of dimension $N$, so both compute and memory per token are $O(N)$ regardless of how many tokens have been processed. For very long sequences (beyond 32k tokens), this is a substantial practical advantage.
 
-```
-Inference Latency Scaling Comparison
-
-Per-token latency
-      │
-  O(L)│         Transformer (KV-cache attention)
-      │                            /
-      │                        /
-      │                    /
-      │                /
-      │            /
- O(N) │. . . . . . . . . . . . . . SSM (fixed recurrent state)
-      │
-      └──────────────────────────────────► Sequence length L
-            4k     16k    64k   256k
+```mermaid
+flowchart TD
+    title["Inference Latency Scaling Comparison"]
+    
+    subgraph plot["Per-token Latency vs Sequence Length"]
+        direction LR
+        
+        y_axis["Per-token latency<br/>(vertical axis)"]
+        
+        ol["O(L)<br/>Transformer<br/>(KV-cache attention)"]
+        on["O(N)<br/>SSM<br/>(fixed recurrent state)"]
+        
+        x_axis["Sequence length L →<br/>4k&nbsp;&nbsp;&nbsp;&nbsp;16k&nbsp;&nbsp;&nbsp;&nbsp;64k&nbsp;&nbsp;&nbsp;&nbsp;256k"]
+        
+        y_axis -.-> ol
+        y_axis -.-> on
+        ol -.-> |"linear growth"| x_axis
+        on -.-> |"constant"| x_axis
+    end
+    
+    style ol fill:#fff4e6,stroke:#ff9800,stroke-width:2px
+    style on fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    style y_axis fill:#f5f5f5,stroke:#757575
+    style x_axis fill:#f5f5f5,stroke:#757575
+    style plot fill:#fafafa,stroke:#bdbdbd,stroke-width:2px
 ```
 
 ### Failure Modes and Numerical Stability

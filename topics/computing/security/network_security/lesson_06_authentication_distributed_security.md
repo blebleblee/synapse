@@ -70,34 +70,27 @@ Risk-based authentication, also called adaptive authentication, dynamically adju
 
 The Kerberos ticket structure encodes all information necessary for stateless distributed authentication in a carefully designed binary format. A service ticket consists of an encrypted portion (the ticket itself) and an unencrypted authenticator. The ticket contains the client's principal name, the service principal name, a session key, a timestamp, and a lifetime, all encrypted using the service's long-term secret key known only to the service and the KDC. The authenticator, generated fresh by the client for each service request, contains the client's principal name and a timestamp, encrypted with the session key embedded in the ticket. This two-layer cryptographic binding ensures that only the legitimate client who received the ticket from the KDC can generate valid authenticators, and only the legitimate service can decrypt the ticket to extract the session key needed to verify those authenticators.
 
-```
-Kerberos Service Ticket Structure:
-
-Client                          KDC                            Service
-  |                              |                                |
-  |---(1) TGS-REQ: TGT----------->|                                |
-  |     + Service Principal       |                                |
-  |                              |                                |
-  |<--(2) TGS-REP: Service Ticket-|                                |
-  |     Encrypted with Service Key|                                |
-  |                              |                                |
-  |---(3) AP-REQ: Service Ticket + Authenticator------------------>|
-  |     Ticket = E[K_service](client, session_key, timestamp)      |
-  |     Authenticator = E[session_key](client, timestamp)          |
-  |                              |                                |
-  |                              |     (4) Service decrypts ticket,
-  |                              |         extracts session_key,
-  |                              |         decrypts authenticator,
-  |                              |         verifies client identity
-  |                              |                                |
-  |<--(5) AP-REP (optional mutual auth)----------------------------|
-
-Ticket Lifetime Bounds:
-- TGT: typically 10 hours (renewable up to 7 days)
-- Service Ticket: typically 10 hours
-- Authenticator: valid for 5 minutes (prevents replay)
-
-Clock Skew Tolerance: ±5 minutes (configurable)
+```mermaid
+flowchart TD
+    Client["Client"]
+    KDC["KDC (Key Distribution Center)"]
+    Service["Service"]
+    
+    Client -->|"(1) TGS-REQ: TGT + Service Principal"| KDC
+    KDC -->|"(2) TGS-REP: Service Ticket<br/>Encrypted with Service Key"| Client
+    Client -->|"(3) AP-REQ: Service Ticket + Authenticator<br/>Ticket = E[K_service](client, session_key, timestamp)<br/>Authenticator = E[session_key](client, timestamp)"| Service
+    Service -->|"(4) Service decrypts ticket,<br/>extracts session_key,<br/>decrypts authenticator,<br/>verifies client identity"| Service
+    Service -->|"(5) AP-REP (optional mutual auth)"| Client
+    
+    subgraph Lifetimes ["Ticket Lifetime Bounds"]
+        TGT["TGT: typically 10 hours<br/>(renewable up to 7 days)"]
+        ST["Service Ticket: typically 10 hours"]
+        Auth["Authenticator: valid for 5 minutes<br/>(prevents replay)"]
+    end
+    
+    subgraph ClockSkew ["Clock Skew Tolerance"]
+        Skew["±5 minutes (configurable)"]
+    end
 ```
 
 The encryption algorithms used in Kerberos have evolved over decades. Early implementations used DES (Data Encryption Standard), a 56-bit symmetric cipher now considered cryptographically broken. Modern Kerberos deployments use AES-128 or AES-256 in CTS (Ciphertext Stealing) mode, providing strong confidentiality without padding-related side channels. The Key Distribution Center derives encryption keys from user passwords through a process called string-to-key (s2k), typically involving PBKDF2 (Password-Based Key Derivation Function 2) with salt and iteration count to increase computational cost for brute-force attacks. However, weak user passwords remain Kerberos's Achilles heel—an attacker who captures a TGT can perform offline brute-force against the encrypted portion because they possess both the ciphertext and knowledge of the encryption algorithm.
@@ -250,58 +243,54 @@ The SAML assertion validation process requires multiple security checks beyond s
 
 OAuth 2.0 authorization code flow, the most secure grant type for web applications, separates the authorization decision from token issuance through an intermediate authorization code. The client redirects the user's browser to the authorization server's authorization endpoint with parameters specifying the requested scope and a redirect URI. After the user authenticates and consents, the authorization server redirects back to the client's redirect URI with a short-lived authorization code (typically valid for 60 seconds). The client then makes a direct back-channel request to the authorization server's token endpoint, presenting the authorization code and authenticating itself using client credentials (typically a client ID and client secret). If valid, the authorization server issues an access token and optionally a refresh token. This two-phase design prevents the access token from flowing through the user's browser, where it could be intercepted by malicious JavaScript or browser extensions.
 
-```
-OAuth 2.0 Authorization Code Flow:
-
-Client                User Agent               Authorization Server          Resource Server
-  |                       |                            |                            |
-  |---(1) Initiate Authorization------------------->|                            |
-  |     GET /authorize?                              |                            |
-  |       response_type=code&                        |                            |
-  |       client_id=CLIENT_ID&                       |                            |
-  |       redirect_uri=https://client.com/callback&  |                            |
-  |       scope=read write&                          |                            |
-  |       state=RANDOM_STATE                         |                            |
-  |                       |                            |                            |
-  |                       |<--(2) Login Prompt---------|                            |
-  |                       |---(3) Credentials--------->|                            |
-  |                       |<--(4) Consent Screen-------|                            |
-  |                       |---(5) Approve------------->|                            |
-  |                       |                            |                            |
-  |<--(6) Authorization Code-----------------------|                            |
-  |     302 https://client.com/callback?             |                            |
-  |       code=AUTH_CODE&                            |                            |
-  |       state=RANDOM_STATE                         |                            |
-  |                       |                            |                            |
-  |---(7) Exchange Code for Token------------------->|                            |
-  |     POST /token                                  |                            |
-  |     Content-Type: application/x-www-form-urlencoded                          |
-  |     Authorization: Basic BASE64(CLIENT_ID:CLIENT_SECRET)                     |
-  |     grant_type=authorization_code&               |                            |
-  |     code=AUTH_CODE&                              |                            |
-  |     redirect_uri=https://client.com/callback     |                            |
-  |                       |                            |                            |
-  |<--(8) Access Token + Refresh Token---------------|                            |
-  |     {                                            |                            |
-  |       "access_token": "...",                     |                            |
-  |       "token_type": "Bearer",                    |                            |
-  |       "expires_in": 3600,                        |                            |
-  |       "refresh_token": "...",                    |                            |
-  |       "scope": "read write"                      |                            |
-  |     }                                            |                            |
-  |                       |                            |                            |
-  |---(9) Access Protected Resource------------------------------------------>|
-  |     GET /api/data                                                            |
-  |     Authorization: Bearer ACCESS_TOKEN                                       |
-  |                       |                            |                            |
-  |<--(10) Protected Resource Data-------------------------------------------|
-
-Security Properties:
-- Authorization code flows through front channel (browser), but only once and with short lifetime
-- Access token flows only through back channel (server-to-server)
-- Client authentication required at token endpoint prevents code theft
-- state parameter prevents CSRF attacks
-- PKCE extension (RFC 7636) protects public clients without client secrets
+```mermaid
+flowchart TD
+    Start["OAuth 2.0 Authorization Code Flow"]
+    
+    subgraph Participants
+        Client["Client"]
+        UA["User Agent<br/>(Browser)"]
+        AuthServer["Authorization Server"]
+        ResourceServer["Resource Server"]
+    end
+    
+    Start --> Step1
+    
+    Step1["(1) Initiate Authorization<br/>GET /authorize?<br/>response_type=code&<br/>client_id=CLIENT_ID&<br/>redirect_uri=https://client.com/callback&<br/>scope=read write&<br/>state=RANDOM_STATE"]
+    
+    Step1 --> Step2["(2) Login Prompt"]
+    Step2 --> Step3["(3) User Submits Credentials"]
+    Step3 --> Step4["(4) Consent Screen"]
+    Step4 --> Step5["(5) User Approves"]
+    
+    Step5 --> Step6["(6) Authorization Code<br/>302 Redirect<br/>https://client.com/callback?<br/>code=AUTH_CODE&<br/>state=RANDOM_STATE"]
+    
+    Step6 --> Step7["(7) Exchange Code for Token<br/>POST /token<br/>Content-Type: application/x-www-form-urlencoded<br/>Authorization: Basic BASE64(CLIENT_ID:CLIENT_SECRET)<br/>grant_type=authorization_code&<br/>code=AUTH_CODE&<br/>redirect_uri=https://client.com/callback"]
+    
+    Step7 --> Step8["(8) Access Token + Refresh Token<br/>{<br/>'access_token': '...',<br/>'token_type': 'Bearer',<br/>'expires_in': 3600,<br/>'refresh_token': '...',<br/>'scope': 'read write'<br/>}"]
+    
+    Step8 --> Step9["(9) Access Protected Resource<br/>GET /api/data<br/>Authorization: Bearer ACCESS_TOKEN"]
+    
+    Step9 --> Step10["(10) Protected Resource Data"]
+    
+    Step10 --> Security
+    
+    subgraph Security["Security Properties"]
+        Prop1["✓ Authorization code: front channel, short-lived"]
+        Prop2["✓ Access token: back channel only"]
+        Prop3["✓ Client authentication prevents code theft"]
+        Prop4["✓ state parameter prevents CSRF"]
+        Prop5["✓ PKCE (RFC 7636) for public clients"]
+    end
+    
+    style Start fill:#e1f5ff
+    style Security fill:#f0f9ff
+    style Step1 fill:#fff4e6
+    style Step6 fill:#fff4e6
+    style Step7 fill:#e8f5e9
+    style Step8 fill:#e8f5e9
+    style Step9 fill:#f3e5f5
+    style Step10 fill:#f3e5f5
 ```
 
 Proof Key for Code Exchange (PKCE), originally designed for mobile applications but now recommended for all OAuth clients, prevents authorization code interception attacks. The client generates a random code_verifier (a high-entropy cryptographic random string), computes its SHA-256 hash as the code_challenge, and sends the code_challenge to the authorization server during the authorization request. When exchanging the authorization code for tokens, the client sends the original code_verifier. The authorization server recomputes the hash and verifies it matches the stored code_challenge, proving that the entity exchanging the code is the same entity that initiated the authorization flow. This binds the authorization code to a specific client instance, preventing malicious applications from using stolen codes.
@@ -467,45 +456,31 @@ The service mesh sidecar enforces authorization policy by validating the client 
 
 SPIRE server architecture separates the control plane (SPIRE Server) from the agent deployed on each node (SPIRE Agent). The SPIRE Server maintains the certificate authority, stores identity registration entries mapping workload attributes to SPIFFE IDs, and issues signed certificates through an attestation protocol. The SPIRE Agent runs on each Kubernetes node, exposing the SPIFFE Workload API as a Unix domain socket. When a pod starts, the agent detects it through Kubernetes API watches, retrieves workload attributes (namespace, service account, labels), queries the SPIRE Server for matching identity registration, and provisions the pod with its certificate through a shared volume mount.
 
-```
-SPIRE Identity Attestation Flow:
+```mermaid
+flowchart TD
+    W["Workload"]
+    A["SPIRE Agent"]
+    S["SPIRE Server"]
+    K["Kubernetes API"]
+    R["Remote Service Mesh<br/>Sidecar"]
 
-Workload                SPIRE Agent           SPIRE Server            Kubernetes API
-  |                          |                      |                        |
-  |---(1) Connect to         |                      |                        |
-  |     Workload API-------->|                      |                        |
-  |     unix:///run/spire/   |                      |                        |
-  |     sockets/agent.sock   |                      |                        |
-  |                          |                      |                        |
-  |                          |---(2) Attest-------->|                        |
-  |                          |     Process PID,     |                        |
-  |                          |     UID, Cgroup      |                        |
-  |                          |                      |                        |
-  |                          |                      |---(3) Query Pod Info-->|
-  |                          |                      |     Pod UID,           |
-  |                          |                      |     Namespace, SA      |
-  |                          |                      |<--(4) Pod Metadata-----|
-  |                          |                      |                        |
-  |                          |                      |---(5) Match Identity   |
-  |                          |                      |     Registration       |
-  |                          |                      |     Entry              |
-  |                          |                      |                        |
-  |                          |<--(6) Issue SVID-----|                        |
-  |                          |     X.509 Certificate|                        |
-  |                          |     SPIFFE ID        |                        |
-  |                          |                      |                        |
-  |<--(7) Return SVID--------|                      |                        |
-  |     Certificate + Key    |                      |                        |
-  |                          |                      |                        |
-  |---(8) Establish mTLS-----|-------------------->|Remote Service Mesh     |
-  |     connections          |                      |Sidecar                 |
-  |                          |                      |                        |
+    W -->|"(1) Connect to Workload API<br/>unix:///run/spire/sockets/agent.sock"| A
+    A -->|"(2) Attest<br/>Process PID, UID, Cgroup"| S
+    S -->|"(3) Query Pod Info<br/>Pod UID, Namespace, SA"| K
+    K -->|"(4) Pod Metadata"| S
+    S -->|"(5) Match Identity<br/>Registration Entry"| S
+    S -->|"(6) Issue SVID<br/>X.509 Certificate<br/>SPIFFE ID"| A
+    A -->|"(7) Return SVID<br/>Certificate + Key"| W
+    W -->|"(8) Establish mTLS<br/>connections"| R
 
-Certificate Lifecycle:
-- Default SVID TTL: 1 hour
-- Rotation: automatic, begins at 50% TTL remaining
-- Private key: generated by agent, never leaves node
-- Root CA: intermediate CA signed by SPIRE Server root, rotatable
+    subgraph lifecycle ["Certificate Lifecycle"]
+        L1["Default SVID TTL: 1 hour"]
+        L2["Rotation: automatic at 50% TTL"]
+        L3["Private key: generated by agent,<br/>never leaves node"]
+        L4["Root CA: intermediate CA signed<br/>by SPIRE Server root, rotatable"]
+    end
+
+    style lifecycle fill:#f9f9f9,stroke:#333,stroke-width:2px
 ```
 
 The attestation process proves that a workload running as a specific process truly has the claimed identity. The SPIRE Agent examines kernel data structures to correlate the requesting process with a container and ultimately a Kubernetes pod. On Linux, this involves reading `/proc/<pid>/cgroup` to extract the container ID, querying the container runtime (containerd or CRI-O) to map the container to a pod UID, then querying the Kubernetes API for pod metadata. This attestation chain ensures that a malicious process cannot claim another workload's identity even if running on the same node—the kernel enforces process isolation, and the agent verifies the complete attestation path.

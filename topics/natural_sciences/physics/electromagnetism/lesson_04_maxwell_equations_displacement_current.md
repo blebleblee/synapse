@@ -30,30 +30,27 @@ The continuity equation $\frac{\partial \rho}{\partial t} + \nabla \cdot \vec{J}
 
 The Lorentz force law $\vec{F} = q(\vec{E} + \vec{v} \times \vec{B})$ describes the force exerted by electromagnetic fields on a point charge $q$ moving with velocity $\vec{v}$. The electric field component $q\vec{E}$ acts parallel to the electric field and performs work on the charge, changing its kinetic energy. The magnetic force component $q\vec{v} \times \vec{B}$ acts perpendicular to both the velocity and magnetic field, performing no work (since $\vec{F}_B \cdot \vec{v} = q(\vec{v} \times \vec{B}) \cdot \vec{v} = 0$) but altering the trajectory. For a charge moving perpendicular to a uniform magnetic field, the magnetic force provides centripetal acceleration, causing circular motion with radius $r = mv/(qB)$, where $m$ denotes the particle mass. The cyclotron frequency $\omega_c = qB/m$ determines the angular velocity of this orbital motion and is independent of the particle's speed for non-relativistic velocities. In crossed electric and magnetic fields, the particle experiences a drift velocity $\vec{v}_d = \frac{\vec{E} \times \vec{B}}{B^2}$ perpendicular to both fields, a phenomenon exploited in velocity selectors and mass spectrometers.
 
-```
-Maxwell's Equations Architecture (Field Evolution)
-
-Initial Conditions (t=0):       Sources:
-  E⃗(r⃗,0), B⃗(r⃗,0)                 ρ(r⃗,t), J⃗(r⃗,t)
-       ↓                              ↓
-   ┌───────────────────────────────────┐
-   │  Constraint Equations (all t)     │
-   │  ∇·E⃗ = ρ/ε₀  (Gauss electric)    │
-   │  ∇·B⃗ = 0     (Gauss magnetic)    │
-   └───────────────────────────────────┘
-       ↓
-   ┌───────────────────────────────────┐
-   │  Evolution Equations              │
-   │  ∇×E⃗ = -∂B⃗/∂t    (Faraday)       │
-   │  ∇×B⃗ = μ₀J⃗ + μ₀ε₀∂E⃗/∂t          │
-   │              (Ampère-Maxwell)     │
-   └───────────────────────────────────┘
-       ↓
-   E⃗(r⃗,t), B⃗(r⃗,t)  ──→  F⃗ = q(E⃗ + v⃗×B⃗)
-   (field solution)      (Lorentz force)
-       ↓
-   Charge/current back-reaction:
-   J⃗ = ρv⃗  (self-consistent dynamics)
+```mermaid
+flowchart TD
+    IC["Initial Conditions (t=0)<br/>E⃗(r⃗,0), B⃗(r⃗,0)"]
+    SRC["Sources<br/>ρ(r⃗,t), J⃗(r⃗,t)"]
+    
+    IC --> CONST
+    SRC --> CONST
+    
+    CONST["Constraint Equations (all t)<br/>∇·E⃗ = ρ/ε₀ (Gauss electric)<br/>∇·B⃗ = 0 (Gauss magnetic)"]
+    
+    CONST --> EVOL
+    
+    EVOL["Evolution Equations<br/>∇×E⃗ = -∂B⃗/∂t (Faraday)<br/>∇×B⃗ = μ₀J⃗ + μ₀ε₀∂E⃗/∂t (Ampère-Maxwell)"]
+    
+    EVOL --> SOL["E⃗(r⃗,t), B⃗(r⃗,t)<br/>(field solution)"]
+    
+    SOL --> LORENTZ["F⃗ = q(E⃗ + v⃗×B⃗)<br/>(Lorentz force)"]
+    
+    SOL --> BACK["Charge/current back-reaction<br/>J⃗ = ρv⃗<br/>(self-consistent dynamics)"]
+    
+    BACK --> SRC
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

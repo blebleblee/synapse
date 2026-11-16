@@ -74,24 +74,36 @@ To measure and validate these profiles in production, reflow ovens are instrumen
 
 The following ASCII diagram illustrates a typical lead-free reflow profile:
 
-```
-Temperature (°C)
-     |
- 280 |                    ╱─────╲  Peak region
-     |                   ╱       ╲
- 260 |                  ╱         ╲
-     |                 ╱           ╲  Reflow
- 240 |                ╱             ╲ zone
-     |               ╱               ╲
- 217 |  Liquidus ───╱                 ╲───
-     |             ╱                   ╲
- 200 |____________╱                     ╲
-     |           │                       │
- 150 |    ╱──────╲                       │  Cool
-     |   ╱        │   Soak zone         ╱
-   0 |__╱_________|___________________|_____ Time
-     0           60s      120s        240s
-     Preheat     Soak      Reflow      Cool
+```mermaid
+flowchart LR
+    PREHEAT["🔆 Preheat\n0 – 60s\n~25°C → 150°C"]
+    SOAK["♨️ Soak Zone\n60s – 120s\n~150°C (plateau)"]
+    REFLOW["🔥 Reflow Zone\n120s – 180s\n217°C → 260°C peak"]
+    PEAK["⚡ Peak Region\n~180s\n260°C"]
+    COOLDOWN["❄️ Cool\n180s – 240s\n260°C → ambient"]
+    LIQUIDUS["📏 Liquidus Threshold\n217°C"]
+
+    PREHEAT -->|"ramp up"| SOAK
+    SOAK -->|"cross liquidus"| REFLOW
+    REFLOW -->|"reach peak"| PEAK
+    PEAK -->|"descend past liquidus"| COOLDOWN
+
+    LIQUIDUS -. "solder melts above this" .-> REFLOW
+    LIQUIDUS -. "solder solidifies below this" .-> COOLDOWN
+
+    subgraph below_liquidus ["Below Liquidus (< 217°C)"]
+        PREHEAT
+        SOAK
+    end
+
+    subgraph above_liquidus ["Above Liquidus (≥ 217°C)"]
+        REFLOW
+        PEAK
+    end
+
+    subgraph solidification ["Solidification"]
+        COOLDOWN
+    end
 ```
 
 In hand soldering, you do not have explicit control over all these phases—the iron temperature is fixed, and you must manually control contact time and iron movement. However, the principles remain identical. By understanding that you need a "preheat" phase (touching the iron to the joint without adding solder, heating both the pad and lead), then a "soak" phase (continuing to heat while the joint temperature rises toward the solder's melting point), and finally a "reflow" phase (adding solder at the moment wetting begins), you execute the same thermal sequence, just compressed into 10–30 seconds instead of 240 seconds.
@@ -140,6 +152,19 @@ Tip geometry directly affects heat transfer rate. A pointed, narrow tip concentr
 
 Tip temperature measurement and control is critical. A thermocouple-equipped thermometer placed against the tip while the iron idles (without touching the joint) provides the true tip temperature. Many soldering irons advertise "350°C" set temperature but deliver only 250–280°C at the tip under load (i.e., when soldering), due to thermal mass and power delivery limitations. A quality temperature-controlled iron uses a feedback thermistor or thermocouple embedded in the tip itself to maintain setpoint even under load.
 
-Flux selection influences wetting time and joint quality. Rosin-based flux (traditional) provides good wetting characteristics but leaves sticky residue that must be cleaned with isopropyl alcohol or flux cleaner. Water-soluble flux cleans with deionized water but may absorb moisture in humid environments, requiring rapid processing after soldering. No-clean flux formulations are designed to leave minimal residue and require no cleaning, but they are less aggressive than rosin flux and may require slightly higher temperatures or longer soak times for reliable wetting.
+Flux selection influences wetting time and joint quality. Rosin-based flux (traditional) provides good wetting characteristics but leaves sticky residue that must be cleaned with isopropyl alcohol or flux cleaner. Water-soluble flux cleans with deionized water but may absorb moisture in humid environments, requiring rapid processing after soldering.
 
-Solder alloy composition affects melting point, wetting temperature, and jo
+No-clean flux is a third category that leaves minimal, non-conductive residue and requires no cleaning, but provides weaker wetting action than rosin flux and is unsuitable for high-reliability applications (aerospace, medical devices). The flux core in solder wire typically contains 2–3% flux by weight; this is sufficient for small joints but inadequate for large or oxidized surfaces, where additional flux applied via syringe or brush before soldering is necessary. Over-fluxing causes spattering and voids; under-fluxing causes cold joints with incomplete wetting. The optimal flux quantity creates a thin, continuous film across the joint surfaces that vaporizes completely during the solder's liquid phase, leaving only the intended residue type.
+
+Thermal profiling across joint types enables systematic process control. For through-hole components in FR-4 PCB (copper plating ~35 µm, board thickness 1.6 mm), the thermal time constant of the plated-through hole is approximately 8–12 seconds. Preheat the pad and lead simultaneously for 6 seconds, introduce solder wire at the junction (not on the iron tip), and allow capillary action to draw molten solder into the barrel. Remove the iron only after observing a smooth concave fillet around the lead, indicating complete wetting and proper intermetallic formation. For surface-mount devices, the thermal mass is dominated by the pad geometry: a 0805 resistor pad reaches thermal equilibrium in 2–3 seconds, while a QFN package with exposed thermal pad may require 10–15 seconds and auxiliary hot-air assist to prevent thermal gradient stress. Bridging (solder spanning adjacent pins) results from excess solder volume combined with insufficient flux to control surface tension; tombstoning (component standing on one end) results from asymmetric heating where one pad reaches reflow temperature significantly before the other, creating unbalanced surface tension forces. Both failure modes are correctable through deliberate iron placement and dwell time adjustment informed by thermal time constant analysis.
+
+## Summary & Verification Matrix
+
+| **Governing Principle** | **Mechanism** | **Observable Indicator** | **Failure Mode if Violated** |
+|------------------------|---------------|-------------------------|------------------------------|
+| **Thermal time constant τ = (mC)/h** | Heat capacity of joint mass vs. thermal conductivity to iron determines equilibrium time | Joint reaches solder liquidus (217°C for 63/37) in time ≈ 3τ | Cold joint (insufficient heat/time), lifted pads (excessive heat/time), intermetallic voids |
+| **Heat transfer via conduction dominates** | Contact area × thermal conductivity × ΔT governs power delivery; convection/radiation negligible | Chisel tip full-face contact yields 5–10× faster heating than point contact | Slow heating promotes oxidation; uneven heating causes bridging or tombstoning |
+| **Flux activation precedes wetting** | Flux reduces surface oxides and lowers surface tension in 150–180°C range before solder melts | Solder flows smoothly toward heat source; bright, reflective fillet forms | Dewetting (solder balls up), rosin joint (dull, granular surface), incomplete barrel fill |
+| **Intermetallic layer formation requires 217–260°C sustained contact** | Cu₆Sn₅ and Cu₃Sn phases grow at solder/copper interface; optimal thickness 1–3 µm forms in 2–4 seconds at temperature | Concave fillet with smooth transition; solder "wets" into copper texture | Cold joint (grainy appearance, low mechanical strength), excessive intermetallic (brittle, purple hue) |
+| **Thermal mass ratio joint:tip determines control authority** | High-mass tip maintains temperature under load; low-mass tip drops 50–100°C when contacting joint | Temperature-controlled iron recovers to setpoint within 1–2 seconds of contact | Temperature undershoot causes incomplete reflow; overshoot damages components or burns flux |
+| **Capillary action drives solder flow in confined geometries** | Surface tension and wetting angle create pressure gradient; solder flows toward smallest gap and heat source | Through-hole solder climbs barrel against gravity; SMD solder spreads evenly under component | Insufficient flux prevents capillary fill; excess solder volume causes bridging; voids form in shadowed regions |

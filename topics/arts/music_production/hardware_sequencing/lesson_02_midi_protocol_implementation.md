@@ -29,21 +29,69 @@ MIDI's byte-level encoding follows a strict grammar that hardware sequencers mus
 The parsing state machine must differentiate between these classes without lookahead. When a status byte arrives, the parser examines the upper nybble to determine message length: Note Off (`0x8n`), Note On (`0x9n`), Polyphonic Key Pressure (`0xAn`), Control Change (`0xBn`), Pitch Bend (`0xEn`) each expect two data bytes; Program Change (`0xCn`) and Channel Pressure (`0xDn`) expect one data byte; System Exclusive (`0xF0`) has variable length delimited by `0xF7`; and System Real-Time messages (`0xF8` through `0xFF`) carry no data bytes and must be processed immediately, even if they interrupt multi-byte messages in progress.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Idle
-    Idle --> StatusByte: "Receive byte with MSB=1"
-    StatusByte --> WaitData1: "Channel voice/mode (0x80-0xEF)"
-    StatusByte --> SysEx: "SysEx start (0xF0)"
-    StatusByte --> ProcessRealTime: "Real-time (0xF8-0xFF)"
-    WaitData1 --> WaitData2: "Receive data byte (MSB=0), 2-byte message"
-    WaitData1 --> ProcessMessage: "Receive data byte (MSB=0), 1-byte message"
-    WaitData2 --> ProcessMessage: "Receive second data byte (MSB=0)"
-    ProcessMessage --> Idle: "Message complete"
-    SysEx --> SysExData: "Receive data bytes (MSB=0)"
-    SysExData --> SysExData: "Continue receiving (MSB=0)"
-    SysExData --> ProcessSysEx: "Receive 0xF7 terminator"
-    ProcessSysEx --> Idle: "SysEx complete"
-    ProcessRealTime --> Idle: "Real-time processed immediately"
+flowchart TD
+    START((" ")) --> Idle["Idle"]
+
+    Idle --> StatusByte["Status Byte\nReceived"]
+
+    StatusByte --> WaitData1["Wait Data 1"]
+    StatusByte --> SysEx["SysEx\nAccumulate"]
+    StatusByte --> ProcessRealTime["Process\nReal-Time"]
+
+    WaitData1 --> WaitData2["Wait Data 2"]
+    WaitData1 --> ProcessMessage["Process\nMessage"]
+
+    WaitData2 --> ProcessMessage
+
+    ProcessMessage --> Idle
+
+    SysEx --> SysExData["SysEx\nData"]
+    SysExData --> SysExData
+    SysExData --> ProcessSysEx["Process\nSysEx"]
+
+    ProcessSysEx --> Idle
+    ProcessRealTime --> Idle
+
+    StatusByte:::noteStyle
+
+    START:::startStyle
+
+    classDef startStyle fill:#000,color:#fff,stroke:#000,shape:circle
+    classDef noteStyle fill:#f9f,stroke:#333
+
+    Idle:::idleStyle
+    classDef idleStyle fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+
+    WaitData1:::dataStyle
+    WaitData2:::dataStyle
+    classDef dataStyle fill:#fef9c3,stroke:#ca8a04,color:#713f12
+
+    ProcessMessage:::procStyle
+    ProcessSysEx:::procStyle
+    ProcessRealTime:::procStyle
+    classDef procStyle fill:#dcfce7,stroke:#16a34a,color:#14532d
+
+    SysEx:::sysStyle
+    SysExData:::sysStyle
+    classDef sysStyle fill:#fce7f3,stroke:#db2777,color:#831843
+
+    StatusByte:::statusStyle
+    classDef statusStyle fill:#ede9fe,stroke:#7c3aed,color:#3b0764
+
+    linkStyle 0 stroke:#6b7280,stroke-width:2px
+    linkStyle 1 stroke:#7c3aed,stroke-width:2px,stroke-dasharray:0
+    linkStyle 2 stroke:#ca8a04,stroke-width:2px
+    linkStyle 3 stroke:#db2777,stroke-width:2px
+    linkStyle 4 stroke:#16a34a,stroke-width:2px
+    linkStyle 5 stroke:#ca8a04,stroke-width:2px
+    linkStyle 6 stroke:#ca8a04,stroke-width:2px
+    linkStyle 7 stroke:#ca8a04,stroke-width:2px
+    linkStyle 8 stroke:#16a34a,stroke-width:2px
+    linkStyle 9 stroke:#db2777,stroke-width:2px
+    linkStyle 10 stroke:#db2777,stroke-width:2px
+    linkStyle 11 stroke:#db2777,stroke-width:2px
+    linkStyle 12 stroke:#16a34a,stroke-width:2px
+    linkStyle 13 stroke:#16a34a,stroke-width:2px
 ```
 
 Real-time messages pose a unique parsing challenge. The MIDI specification mandates that System Real-Time messages like Timing Clock (`0xF8`), Start (`0xFA`), Continue (`0xFB`), and Stop (`0xFC`) must be processed immediately upon arrival, even if they arrive between the status byte and data bytes of a channel voice message. A compliant parser must implement a split-state architecture where real-time messages bypass the main state machine entirely. The typical implementation uses a two-stage input buffer: a hardware UART interrupt handler scans each incoming byte, immediately dispatches real-time messages to the clock subsystem, and enqueues all other bytes into a FIFO for the main parser. This split path ensures that a Timing Clock message arriving between a Note On status byte and its note number data byte does not corrupt the partially assembled message.

@@ -28,43 +28,30 @@ The calibration certificate documents the entire process, recording environmenta
 
 The architecture of a calibration workstation embodies the principle of bootstrapping measurement accuracy from a more precise reference standard down to the device under test. At the apex sits the reference source, which generates or reproduces the physical quantity with an uncertainty at least three times smaller than the desired calibration uncertainty, satisfying the test uncertainty ratio (TUR) criterion of 4:1 specified in many industrial standards. For pressure sensor calibration, the reference might comprise a pneumatic deadweight tester employing precision-machined piston-cylinder assemblies where known masses stacked atop the piston generate hydrostatic pressure according to the fundamental definition of force per unit area. For temperature sensor calibration, a stirred-fluid bath circulates silicone oil or liquid nitrogen, maintaining thermal uniformity to millikelvin levels while an embedded platinum resistance thermometer traceable to the International Temperature Scale of 1990 (ITS-90) provides the reference reading.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    CALIBRATION WORKSTATION                       │
-│                                                                   │
-│  ┌──────────────┐          ┌──────────────┐                     │
-│  │   Reference  │          │   Sensor     │                     │
-│  │   Standard   │◄────────►│   Under      │                     │
-│  │   (Deadwght  │  Physical│   Test       │                     │
-│  │   Tester)    │  Stimulus│   (DUT)      │                     │
-│  └──────┬───────┘          └──────┬───────┘                     │
-│         │                          │                              │
-│         │ Pneumatic                │ Electrical                   │
-│         │ Connection               │ Output                       │
-│         │                          │                              │
-│         │                          ▼                              │
-│         │                  ┌──────────────┐                      │
-│         │                  │   Precision  │                      │
-│         └─────────────────►│   DMM /      │                      │
-│                            │   DAQ        │                      │
-│                            └──────┬───────┘                      │
-│                                   │                              │
-│                                   │ Digital Readings             │
-│                                   │                              │
-│                                   ▼                              │
-│                          ┌──────────────┐                        │
-│                          │   Control    │                        │
-│                          │   Computer   │                        │
-│                          │   (Python/   │                        │
-│                          │   LabVIEW)   │                        │
-│                          └──────────────┘                        │
-│                                                                   │
-│  Environmental Monitoring:                                        │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐                           │
-│  │  Temp   │ │ Humid   │ │  Barometric                          │
-│  │  Sensor │ │ Sensor  │ │  Pressure                            │
-│  └─────────┘ └─────────┘ └─────────┘                           │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph workstation ["CALIBRATION WORKSTATION"]
+
+        subgraph env ["Environmental Monitoring"]
+            TEMP["Temp\nSensor"]
+            HUMID["Humidity\nSensor"]
+            BARO["Barometric\nPressure Sensor"]
+        end
+
+        REF["Reference Standard\n(Deadweight Tester)"]
+        DUT["Sensor Under Test\n(DUT)"]
+        DMM["Precision DMM / DAQ"]
+        PC["Control Computer\n(Python / LabVIEW)"]
+
+        REF <-->|"Physical Stimulus"| DUT
+        DUT -->|"Electrical Output"| DMM
+        REF -->|"Pneumatic Connection"| DMM
+        DMM -->|"Digital Readings"| PC
+
+        TEMP -->|"Environmental Data"| PC
+        HUMID -->|"Environmental Data"| PC
+        BARO -->|"Environmental Data"| PC
+    end
 ```
 
 The signal conditioning chain bridging the sensor under test to the data acquisition system must preserve fidelity while rejecting common-mode noise and electromagnetic interference. A precision instrumentation amplifier with differential inputs and a common-mode rejection ratio (CMRR) exceeding 100 dB amplifies the sensor's millivolt-level output while suppressing ground loop currents and RF pickup. Guard-driven shielding, where the cable shield connects to a low-impedance replica of the signal voltage rather than ground, eliminates leakage currents through parasitic capacitance between the signal conductor and shield. Twisted-pair wiring with individual shield drains for each differential pair maintains balanced impedance and minimizes magnetic field coupling. The analog-to-digital converter (ADC) must offer resolution exceeding the sensor's inherent noise floor by at least two bits to avoid quantization as the limiting factor; for a 16-bit sensor with LSB noise, an 18-bit or 20-bit ADC ensures digitization does not dominate the uncertainty budget.

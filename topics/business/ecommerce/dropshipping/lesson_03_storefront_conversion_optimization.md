@@ -26,41 +26,34 @@ Shopify represents the industrial standard for dropshipping operations because i
 
 The Shopify liquid templating system provides the technical foundation for theme customization and A/B testing implementation without requiring full-stack development expertise. Liquid operates as a server-side rendering engine that generates HTML from product data schemas, allowing operators to modify page layouts, inject dynamic content blocks, and implement conditional logic for personalization through a constrained template syntax that prevents catastrophic site breakage. The product data schema follows a normalized structure where each product entity contains variants—size, color, material combinations—that map to unique SKU identifiers tied to supplier inventory feeds. The checkout process operates through Shopify's hosted payment gateway, which handles tokenization, fraud detection, and chargeback dispute management, eliminating the operator's liability for payment card data storage and reducing payment processing failure rates below three percent through adaptive routing across multiple acquirer relationships.
 
-```
-Shopify Data Flow Architecture
+```mermaid
+flowchart TD
+    subgraph browser ["Customer Browser"]
+        storefront["Storefront\n(Liquid Templates + Theme Assets via CDN)"]
+    end
 
-┌─────────────────────────────────────────────────────────────────┐
-│                     Customer Browser                             │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │  Storefront (Liquid Templates + Theme Assets via CDN)      │ │
-│  └───────────────────┬────────────────────────────────────────┘ │
-└────────────────────────┼──────────────────────────────────────────┘
-                         │ HTTPS Request
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              Shopify Platform Infrastructure                     │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  Request Router (Load Balancer + WAF)                    │  │
-│  └────────────┬─────────────────────────────────────────────┘  │
-│               │                                                  │
-│  ┌────────────▼─────────────┐    ┌──────────────────────────┐  │
-│  │  Product Catalog Engine  │───▶│  Inventory Sync Service  │  │
-│  │  (PostgreSQL Schema)     │    │  (Supplier API Polling)  │  │
-│  └────────────┬─────────────┘    └──────────────────────────┘  │
-│               │                                                  │
-│  ┌────────────▼─────────────┐    ┌──────────────────────────┐  │
-│  │  Cart Session Store      │    │  Checkout Service        │  │
-│  │  (Redis Cache)           │───▶│  (Payment Gateway)       │  │
-│  └──────────────────────────┘    └─────────┬────────────────┘  │
-└────────────────────────────────────────────┼───────────────────┘
-                                              │
-                         ┌────────────────────┼────────────────────┐
-                         │                    │                    │
-                         ▼                    ▼                    ▼
-              ┌──────────────────┐ ┌──────────────────┐ ┌─────────────────┐
-              │ Payment Processor│ │ Supplier Network │ │ Email Service   │
-              │ (Stripe/Shopify) │ │ (Order Routing)  │ │ (Klaviyo/Mailchimp)│
-              └──────────────────┘ └──────────────────┘ └─────────────────┘
+    subgraph shopify ["Shopify Platform Infrastructure"]
+        router["Request Router\n(Load Balancer + WAF)"]
+        catalog["Product Catalog Engine\n(PostgreSQL Schema)"]
+        inventory["Inventory Sync Service\n(Supplier API Polling)"]
+        cart["Cart Session Store\n(Redis Cache)"]
+        checkout["Checkout Service\n(Payment Gateway)"]
+    end
+
+    subgraph external ["External Services"]
+        payment["Payment Processor\n(Stripe / Shopify)"]
+        supplier["Supplier Network\n(Order Routing)"]
+        email["Email Service\n(Klaviyo / Mailchimp)"]
+    end
+
+    storefront -->|"HTTPS Request"| router
+    router --> catalog
+    catalog --> inventory
+    catalog --> cart
+    cart -->|"Proceed to Checkout"| checkout
+    checkout --> payment
+    checkout --> supplier
+    checkout --> email
 ```
 
 WooCommerce on WordPress provides greater architectural flexibility at the cost of operational complexity that typically exceeds dropshipping operator technical capabilities. The platform operates as a PHP-based plugin ecosystem layered on WordPress content management infrastructure, requiring the operator to manage server hosting, security patch cycles, database optimization, and payment gateway integration rather than relying on platform-managed services. The architectural advantage emerges in margin optimization scenarios where the operator processes sufficient volume—typically above five thousand monthly orders—to justify the reduction in transaction fees from two-point-nine percent on Shopify to one-point-five percent through direct payment processor integration with Stripe or Authorize.net. The hosting infrastructure cost ranges from twenty to two hundred dollars monthly depending on traffic volume and performance requirements, with additional expenses for SSL certificates, CDN services through Cloudflare or StackPath, and premium plugin licenses for conversion optimization functionality.
@@ -81,35 +74,36 @@ The product catalog curation strategy must maintain radical focus on ten to fift
 
 Pricing strategy implementation requires calculating the complete unit economics chain from supplier cost through customer acquisition cost to landed gross profit, then working backward to identify the customer-facing price that sustains positive contribution margin at scale. The supplier cost represents the wholesale price plus international shipping if sourcing from AliExpress or equivalent overseas networks, typically ranging from three to fifteen dollars for physical products in the twenty to eighty dollar retail price band. The payment processing cost consumes two-point-nine percent of transaction value plus thirty cents per order on Shopify or equivalent platforms, meaning a fifty dollar order incurs one dollar seventy-five in processing fees. The customer acquisition cost depends on traffic channel and conversion rate but typically ranges from fifteen to forty dollars in Facebook Ads for cold audience targeting, assuming conversion rates between one and three percent. The shipping cost to the end customer must be explicitly calculated even when presented as "free shipping" because the operator pays outbound shipping whether absorbed in product price or charged separately, typically ranging from five to twelve dollars for domestic US fulfillment through supplier networks.
 
-```
-Unit Economics Calculation Framework
-
-Product: Wireless Bluetooth Earbuds
-Target Retail Price: $49.99
-
-Cost Structure:
-├─ Supplier Cost (AliExpress + Shipping):           $8.50
-├─ Payment Processing (2.9% + $0.30):               $1.75
-├─ Outbound Shipping (absorbed):                    $7.00
-├─ Customer Acquisition Cost (Facebook Ads):       $28.00
-└─ Platform Fee (Shopify monthly / avg orders):     $1.20
-                                                  ─────────
-Total Cost per Unit:                               $46.45
-
-Gross Profit per Unit:                              $3.54
-Gross Margin:                                        7.1%
-
-Break-Even Analysis:
-Required Monthly Sales to Cover Fixed Costs ($500):
-  500 / 3.54 = 142 units
-
-Revenue at Break-Even:
-  142 × $49.99 = $7,098
-
-Scale Economics (1000 units/month):
-  Gross Profit: 1000 × $3.54 = $3,540
-  Fixed Costs: $500
-  Net Profit: $3,040 (43% net margin on gross profit)
+```mermaid
+flowchart TD
+    Start["Unit Economics Calculation Framework<br/>Product: Wireless Bluetooth Earbuds<br/>Target Retail Price: $49.99"]
+    
+    Start --> CostStructure["Cost Structure"]
+    
+    CostStructure --> C1["Supplier Cost<br/>(AliExpress + Shipping)<br/>$8.50"]
+    CostStructure --> C2["Payment Processing<br/>(2.9% + $0.30)<br/>$1.75"]
+    CostStructure --> C3["Outbound Shipping<br/>(absorbed)<br/>$7.00"]
+    CostStructure --> C4["Customer Acquisition Cost<br/>(Facebook Ads)<br/>$28.00"]
+    CostStructure --> C5["Platform Fee<br/>(Shopify monthly / avg orders)<br/>$1.20"]
+    
+    C1 --> TotalCost["Total Cost per Unit<br/>$46.45"]
+    C2 --> TotalCost
+    C3 --> TotalCost
+    C4 --> TotalCost
+    C5 --> TotalCost
+    
+    TotalCost --> Profit["Gross Profit per Unit: $3.54<br/>Gross Margin: 7.1%"]
+    
+    Profit --> BreakEven["Break-Even Analysis"]
+    
+    BreakEven --> BE1["Required Monthly Sales<br/>to Cover Fixed Costs ($500)<br/>500 / 3.54 = 142 units"]
+    BreakEven --> BE2["Revenue at Break-Even<br/>142 × $49.99 = $7,098"]
+    
+    BreakEven --> Scale["Scale Economics<br/>(1000 units/month)"]
+    
+    Scale --> S1["Gross Profit<br/>1000 × $3.54 = $3,540"]
+    Scale --> S2["Fixed Costs<br/>$500"]
+    Scale --> S3["Net Profit<br/>$3,040<br/>(43% net margin on gross profit)"]
 ```
 
 The pricing calculation reveals why most dropshipping operations fail: gross margins below ten percent leave zero buffer for customer acquisition cost variance, creative testing budget, or operational overhead, creating a binary outcome where even minor performance degradation collapses profitability. The correct response is to filter products during validation that cannot sustain twenty to thirty percent gross margins after all variable costs, even if this eliminates ninety percent of potential products, because sustained profitability requires margin buffers to absorb the inevitable traffic cost inflation that occurs as Facebook and Google audience targeting saturates over time.

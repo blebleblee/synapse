@@ -68,28 +68,38 @@ The Age of Exploration's operational mechanics combined navigational technology,
 
 The navigation technology stack required integration of multiple instruments and knowledge domains:
 
-```
-CELESTIAL NAVIGATION SYSTEM
-│
-├─ Observational Layer
-│  ├─ Astrolabe: measures celestial body altitude above horizon
-│  ├─ Cross-staff/Backstaff: alternative altitude measurement
-│  └─ Compass: determines magnetic bearing
-│
-├─ Computational Layer
-│  ├─ Ephemeris tables: predicted celestial body positions
-│  ├─ Latitude calculation: from noon sun altitude or Polaris
-│  └─ Dead reckoning: estimated position from course and speed
-│
-├─ Cartographic Layer
-│  ├─ Portolan charts: coastal navigation with compass bearings
-│  ├─ Latitude-scale maps: emerging coordinate system
-│  └─ Rutters: written sailing directions and harbor approaches
-│
-└─ Knowledge Accumulation
-   ├─ Pilot journals: voyage records with navigation notes
-   ├─ Hydrographic data: currents, winds, coastal features
-   └─ Institutional memory: training and data archives
+```mermaid
+flowchart TD
+    Root["CELESTIAL NAVIGATION SYSTEM"]
+
+    subgraph sub_observational ["Observational Layer"]
+        Astrolabe["Astrolabe: measures celestial body altitude above horizon"]
+        CrossStaff["Cross-staff/Backstaff: alternative altitude measurement"]
+        Compass["Compass: determines magnetic bearing"]
+    end
+
+    subgraph sub_computational ["Computational Layer"]
+        Ephemeris["Ephemeris tables: predicted celestial body positions"]
+        Latitude["Latitude calculation: from noon sun altitude or Polaris"]
+        DeadReckoning["Dead reckoning: estimated position from course and speed"]
+    end
+
+    subgraph sub_cartographic ["Cartographic Layer"]
+        Portolan["Portolan charts: coastal navigation with compass bearings"]
+        LatMaps["Latitude-scale maps: emerging coordinate system"]
+        Rutters["Rutters: written sailing directions and harbor approaches"]
+    end
+
+    subgraph sub_knowledge ["Knowledge Accumulation"]
+        PilotJournals["Pilot journals: voyage records with navigation notes"]
+        Hydrographic["Hydrographic data: currents, winds, coastal features"]
+        Institutional["Institutional memory: training and data archives"]
+    end
+
+    Root --> sub_observational
+    Root --> sub_computational
+    Root --> sub_cartographic
+    Root --> sub_knowledge
 ```
 
 Longitude determination remained unsolved until the eighteenth century, forcing navigators to rely on dead reckoning and coastal pilotage. This technical limitation explains why Columbus significantly miscalculated his westward distance to Asia and why early Atlantic crossings aimed for latitude sailing—reaching the target's latitude then sailing east or west until making landfall.
@@ -106,29 +116,53 @@ Military transformation proceeded from feudal levy and mercenary contract to per
 
 The fiscal architecture supporting state expansion involved multiple revenue innovations:
 
-```
-EARLY MODERN FISCAL STATE
-
-Revenue Sources
-├─ Direct Taxation
-│  ├─ Land tax: levied on agricultural production value
-│  ├─ Poll tax: per capita assessment (regressive)
-│  └─ Property tax: assessed on moveable wealth
-│
-├─ Indirect Taxation
-│  ├─ Customs duties: tariffs on imports/exports
-│  ├─ Excise taxes: levied on commodities (salt, wine, tobacco)
-│  └─ Sales taxes: transaction-based revenue
-│
-├─ Monopoly Revenue
-│  ├─ State trading monopolies: colonial products
-│  ├─ Mining concessions: precious metal extraction
-│  └─ License fees: regulated professions and activities
-│
-└─ Borrowing Mechanisms
-   ├─ Sale of offices: purchasable government positions
-   ├─ State debt: bonds and annuities sold to investors
-   └─ Tax farming: private contractors advance revenue
+```mermaid
+flowchart TD
+    Root["EARLY MODERN FISCAL STATE"]
+    
+    Revenue["Revenue Sources"]
+    
+    Direct["Direct Taxation"]
+    DirectLand["Land tax: levied on agricultural production value"]
+    DirectPoll["Poll tax: per capita assessment (regressive)"]
+    DirectProperty["Property tax: assessed on moveable wealth"]
+    
+    Indirect["Indirect Taxation"]
+    IndirectCustoms["Customs duties: tariffs on imports/exports"]
+    IndirectExcise["Excise taxes: levied on commodities (salt, wine, tobacco)"]
+    IndirectSales["Sales taxes: transaction-based revenue"]
+    
+    Monopoly["Monopoly Revenue"]
+    MonopolyTrading["State trading monopolies: colonial products"]
+    MonopolyMining["Mining concessions: precious metal extraction"]
+    MonopolyLicense["License fees: regulated professions and activities"]
+    
+    Borrowing["Borrowing Mechanisms"]
+    BorrowingOffices["Sale of offices: purchasable government positions"]
+    BorrowingDebt["State debt: bonds and annuities sold to investors"]
+    BorrowingFarming["Tax farming: private contractors advance revenue"]
+    
+    Root --> Revenue
+    Revenue --> Direct
+    Revenue --> Indirect
+    Revenue --> Monopoly
+    Revenue --> Borrowing
+    
+    Direct --> DirectLand
+    Direct --> DirectPoll
+    Direct --> DirectProperty
+    
+    Indirect --> IndirectCustoms
+    Indirect --> IndirectExcise
+    Indirect --> IndirectSales
+    
+    Monopoly --> MonopolyTrading
+    Monopoly --> MonopolyMining
+    Monopoly --> MonopolyLicense
+    
+    Borrowing --> BorrowingOffices
+    Borrowing --> BorrowingDebt
+    Borrowing --> BorrowingFarming
 ```
 
 The fiscal state's success depended on creating legible populations and territories. Census records enabled per capita taxation. Cadastral surveys mapping property boundaries enabled land taxation. Standardized weights and measures enabled commodity taxation. This information infrastructure transformed abstract sovereignty into operational governance capacity.
@@ -137,18 +171,36 @@ The Scientific Revolution's institutional mechanics involved creating communitie
 
 The experimental method architecture stratified into distinct layers:
 
-```
-EXPERIMENTAL PROTOCOL STACK
-
-├─ Phenomenon Identification: selecting natural effect for investigation
-├─ Hypothesis Formation: proposing explanatory mechanism
-├─ Experimental Design: creating controlled conditions isolating variables
-├─ Instrumentation: deploying tools extending observational capacity
-├─ Data Recording: systematic notation of observations
-├─ Replication Protocol: documenting procedure enabling reproduction
-├─ Peer Demonstration: public performance before qualified witnesses
-├─ Mathematical Analysis: quantifying relationships between variables
-└─ Theoretical Integration: connecting findings to broader framework
+```mermaid
+flowchart TD
+    A["Phenomenon Identification"]
+    B["Hypothesis Formation"]
+    C["Experimental Design"]
+    D["Instrumentation"]
+    E["Data Recording"]
+    F["Replication Protocol"]
+    G["Peer Demonstration"]
+    H["Mathematical Analysis"]
+    I["Theoretical Integration"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    
+    A -.-> |"selecting natural effect for investigation"| A
+    B -.-> |"proposing explanatory mechanism"| B
+    C -.-> |"creating controlled conditions isolating variables"| C
+    D -.-> |"deploying tools extending observational capacity"| D
+    E -.-> |"systematic notation of observations"| E
+    F -.-> |"documenting procedure enabling reproduction"| F
+    G -.-> |"public performance before qualified witnesses"| G
+    H -.-> |"quantifying relationships between variables"| H
+    I -.-> |"connecting findings to broader framework"| I
 ```
 
 Robert Boyle's air pump experiments exemplified this protocol. Boyle designed an apparatus evacuating air from a sealed chamber, enabling investigation of pneumatic phenomena. He demonstrated that sound cannot propagate in vacuum, that combustion requires air, and that respiration depends on atmospheric pressure. Crucially, Boyle published detailed diagrams and instructions enabling other natural philosophers to construct air pumps and replicate experiments. This replicability transformed experimental results from personal testimony into publicly validated knowledge.

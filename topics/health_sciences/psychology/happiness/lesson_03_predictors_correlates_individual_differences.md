@@ -21,49 +21,56 @@ The practitioner should understand the mechanism behind these correlations rathe
 Assessment of personality should use validated instruments appropriate to the context. The Big Five Inventory-2 (BFI-2) provides a comprehensive 60-item assessment with 15 facet scores suitable for clinical practice. The NEO-PI-R offers 240 items with 30 facets and remains the gold standard for research-grade assessment. For rapid screening, the Ten-Item Personality Inventory (TIPI) sacrifices facet-level resolution for brevity but maintains acceptable convergent validity at the domain level.
 
 ```mermaid
-diagram
-    graph TB
-        subgraph sub_distal_layer ["Distal Layer"]
-            GEN["Genetic Set-Point<br/>~50% variance"]
-            EXT["Extraversion<br/>→ Positive Affect"]
-            NEU["Neuroticism<br/>→ Negative Affect"]
-            CON["Conscientiousness<br/>→ Life Satisfaction"]
-            AGR["Agreeableness<br/>→ Relationship Quality"]
-            OPN["Openness<br/>→ Meaning/Growth"]
-        end
+flowchart TD
+    subgraph sub_distal_layer ["Distal Layer"]
+        GEN["Genetic Set-Point<br/>~50% variance"]
+        EXT["Extraversion<br/>→ Positive Affect"]
+        NEU["Neuroticism<br/>→ Negative Affect"]
+        CON["Conscientiousness<br/>→ Life Satisfaction"]
+        AGR["Agreeableness<br/>→ Relationship Quality"]
+        OPN["Openness<br/>→ Meaning/Growth"]
+    end
 
-        subgraph sub_proximal_environmental_layer ["Proximal Environmental Layer"]
-            INC["Income<br/>Diminishing Returns"]
-            SOC["Social Relationships<br/>Strongest External Predictor"]
-            CUL["Cultural Frame<br/>Individualist vs. Collectivist"]
-            DEM["Demographics<br/>Age, Education, Health"]
-        end
+    subgraph sub_proximal_environmental_layer ["Proximal Environmental Layer"]
+        INC["Income<br/>Diminishing Returns"]
+        SOC["Social Relationships<br/>Strongest External Predictor"]
+        CUL["Cultural Frame<br/>Individualist vs. Collectivist"]
+        DEM["Demographics<br/>Age, Education, Health"]
+    end
 
-        subgraph sub_volitional_layer ["Volitional Layer"]
-            GOAL["Goal Pursuit<br/>Approach vs. Avoidance"]
-            MEAN["Meaning-Making<br/>Coherence, Purpose, Significance"]
-            RES["Resilience<br/>Recovery, Adaptation"]
-        end
+    subgraph sub_volitional_layer ["Volitional Layer"]
+        GOAL["Goal Pursuit<br/>Approach vs. Avoidance"]
+        MEAN["Meaning-Making<br/>Coherence, Purpose, Significance"]
+        RES["Resilience<br/>Recovery, Adaptation"]
+    end
 
-        GEN --> EXT & NEU
-        EXT --> PA[Positive Affect]
-        NEU --> NA[Negative Affect]
-        CON --> LS[Life Satisfaction]
-        AGR --> SOC
-        OPN --> MEAN
+    PA["Positive Affect"]
+    NA["Negative Affect"]
+    LS["Life Satisfaction"]
+    SWB["Subjective Well-Being"]
 
-        INC --> LS
-        SOC --> PA & LS
-        CUL --> LS
-        DEM --> LS
+    GEN --> EXT
+    GEN --> NEU
+    EXT --> PA
+    NEU --> NA
+    CON --> LS
+    AGR --> SOC
+    OPN --> MEAN
 
-        GOAL --> LS & PA
-        MEAN --> LS
-        RES --> NA
+    INC --> LS
+    SOC --> PA
+    SOC --> LS
+    CUL --> LS
+    DEM --> LS
 
-        PA --> SWB[Subjective Well-Being]
-        NA --> SWB
-        LS --> SWB
+    GOAL --> LS
+    GOAL --> PA
+    MEAN --> LS
+    RES --> NA
+
+    PA --> SWB
+    NA --> SWB
+    LS --> SWB
 ```
 
 Demographic factors exhibit a paradoxical relationship with SWB. Individually, each shows small-to-moderate correlations, yet collectively they account for a surprisingly small proportion of total variance—rarely exceeding 10 to 15 percent in regression models. Age follows a U-shaped curve in many large-scale datasets, with SWB lowest in the mid-40s to early 50s and higher in both younger and older cohorts, though cross-sectional versus longitudinal designs complicate interpretation. Education correlates positively with SWB but the effect is substantially mediated by income and health. Physical health shows a moderate correlation with SWB that is stronger when health is subjectively rated than when measured objectively, a finding that highlights the mediating role of health perception and adaptation.

@@ -24,19 +24,39 @@ The Power Query execution model implements a streaming architecture where data f
 
 The M language itself represents a functional programming language with lazy evaluation semantics, lexical scoping, and first-class functions. Unlike VBA or worksheet formulas, M code executes in a sandboxed environment with restricted access to system resources, making it safe to run untrusted queries. The language's type system distinguishes between primitive types like text and number, structured types like records and tables, and function types that accept and return other functions. This type system enables the query engine to perform aggressive optimization, such as eliminating dead code paths and hoisting invariant expressions out of loops. However, the type system also introduces complexity—analysts must understand type coercion rules, null propagation semantics, and the difference between early-bound and late-bound field access to write correct transformation logic.
 
-```
-Power Query Execution Pipeline:
-
-Source Connector → Query Folding Analysis → Transformation DAG
-       ↓                     ↓                       ↓
-[SQL/OData/File]    [Fold/Materialize]    [Stream/Buffer/Cache]
-       ↓                     ↓                       ↓
-   Network I/O          Memory Budget         xVelocity Ingest
-       ↓                     ↓                       ↓
-   ────────────────────────────────────────────────────
-                     Data Model Load
-                          ↓
-             [Columnar Compression + Bitmap Index]
+```mermaid
+flowchart TD
+    SC["Source Connector"]
+    QFA["Query Folding Analysis"]
+    TDAG["Transformation DAG"]
+    
+    SQL["SQL/OData/File"]
+    FM["Fold/Materialize"]
+    SBC["Stream/Buffer/Cache"]
+    
+    NIO["Network I/O"]
+    MB["Memory Budget"]
+    XV["xVelocity Ingest"]
+    
+    DML["Data Model Load"]
+    CCI["Columnar Compression + Bitmap Index"]
+    
+    SC --> QFA
+    QFA --> TDAG
+    
+    SC --> SQL
+    QFA --> FM
+    TDAG --> SBC
+    
+    SQL --> NIO
+    FM --> MB
+    SBC --> XV
+    
+    NIO --> DML
+    MB --> DML
+    XV --> DML
+    
+    DML --> CCI
 ```
 
 The data model layer implements a columnar storage engine fundamentally different from Excel's traditional row-oriented worksheet architecture. When Power Query loads transformed data into the model, Excel compresses each column independently using dictionary encoding and run-length compression. Text columns with low cardinality—like product categories or region names—compress to a dictionary of unique values plus an integer array mapping rows to dictionary entries. Numeric columns use value encoding where the engine stores bit-packed integers representing scaled decimal values. This compression typically achieves 10x to 100x reduction in memory footprint compared to storing the same data in worksheet cells, enabling Excel to hold datasets that would otherwise require gigabytes of RAM.

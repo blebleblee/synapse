@@ -107,29 +107,66 @@ $$\text{Acetyl-CoA} + 3\text{NAD}^+ + \text{FAD} + \text{GDP} + \text{P}_i + 2\t
 
 Combining glycolysis, pyruvate oxidation, and the citric acid cycle, the complete oxidation of one glucose molecule yields four ATP (or GTP), ten NADH, and two FADH₂ molecules before considering oxidative phosphorylation. The NADH and FADH₂ represent stored reducing power that will be oxidized by the electron transport chain to generate the bulk of cellular ATP.
 
-```
-CITRIC ACID CYCLE (KREBS CYCLE)
+```mermaid
+flowchart TD
+    AcCoA["**Acetyl-CoA** (2C)"]
+    OAA["**Oxaloacetate** (4C)"]
+    CIT["**Citrate** (6C)"]
+    ISO["**Isocitrate** (6C)"]
+    AKG["**α-Ketoglutarate** (5C)"]
+    SUCCoA["**Succinyl-CoA** (4C)"]
+    SUC["**Succinate** (4C)"]
+    FUM["**Fumarate** (4C)"]
+    MAL["**Malate** (4C)"]
 
-Acetyl-CoA (2C)
-  ↓ + Oxaloacetate (4C)
-Citrate (6C) ←(Citrate synthase)
-  ↓ (Aconitase)
-Isocitrate (6C)
-  ↓ NAD⁺ → NADH + CO₂ (Isocitrate dehydrogenase) [REGULATORY]
-α-Ketoglutarate (5C)
-  ↓ NAD⁺ → NADH + CO₂, CoA (α-Ketoglutarate dehydrogenase) [REGULATORY]
-Succinyl-CoA (4C)
-  ↓ GDP + Pᵢ → GTP (Succinyl-CoA synthetase)
-Succinate (4C)
-  ↓ FAD → FADH₂ (Succinate dehydrogenase = Complex II)
-Fumarate (4C)
-  ↓ + H₂O (Fumarase)
-Malate (4C)
-  ↓ NAD⁺ → NADH (Malate dehydrogenase)
-Oxaloacetate (4C) ──→ (cycle repeats)
+    CS(["Citrate synthase"])
+    ACO(["Aconitase"])
+    IDH(["⚠ Isocitrate dehydrogenase\n*REGULATORY*"])
+    AKGDH(["⚠ α-Ketoglutarate dehydrogenase\n*REGULATORY*"])
+    SCS(["Succinyl-CoA synthetase"])
+    SDH(["Succinate dehydrogenase\n*(Complex II)*"])
+    FUM_E(["Fumarase"])
+    MDH(["Malate dehydrogenase"])
 
-NET per Acetyl-CoA: 3 NADH + 1 FADH₂ + 1 GTP + 2 CO₂
-NET per Glucose: 6 NADH + 2 FADH₂ + 2 GTP + 4 CO₂
+    subgraph net ["Net Yield per Acetyl-CoA"]
+        NET["3 NADH · 1 FADH₂ · 1 GTP · 2 CO₂\n*(×2 per glucose: 6 NADH · 2 FADH₂ · 2 GTP · 4 CO₂)*"]
+    end
+
+    AcCoA -- "+ Oxaloacetate (4C)" --> CS
+    OAA --> CS
+    CS --> CIT
+
+    CIT --> ACO
+    ACO --> ISO
+
+    ISO --> IDH
+    IDH -- "NAD⁺ → NADH + CO₂" --> AKG
+
+    AKG --> AKGDH
+    AKGDH -- "NAD⁺ → NADH + CO₂  |  + CoA" --> SUCCoA
+
+    SUCCoA --> SCS
+    SCS -- "GDP + Pᵢ → GTP" --> SUC
+
+    SUC --> SDH
+    SDH -- "FAD → FADH₂" --> FUM
+
+    FUM --> FUM_E
+    FUM_E -- "+ H₂O" --> MAL
+
+    MAL --> MDH
+    MDH -- "NAD⁺ → NADH" --> OAA
+
+    OAA -. "cycle repeats" .-> CS
+
+    OAA ~~~ net
+
+    style IDH fill:#fff3cd,stroke:#f0ad4e,color:#333
+    style AKGDH fill:#fff3cd,stroke:#f0ad4e,color:#333
+    style AcCoA fill:#d4edda,stroke:#28a745,color:#155724
+    style OAA fill:#cce5ff,stroke:#004085,color:#004085
+    style NET fill:#f8f9fa,stroke:#6c757d,color:#333
+    style net fill:#f8f9fa,stroke:#adb5bd
 ```
 
 ### Electron Transport Chain: Redox Cascades and Proton Pumping
@@ -154,30 +191,56 @@ $$\text{NADH} + \text{H}^+ + \frac{1}{2}\text{O}_2 + 10\text{H}_{matrix}^+ \righ
 
 This equation reflects the pumping of approximately ten protons from the matrix to the intermembrane space per NADH oxidized (four by Complex I, four by Complex III via the Q cycle, and two by Complex IV). For FADH₂ entering at Complex II, approximately six protons are pumped per molecule oxidized.
 
-```
-ELECTRON TRANSPORT CHAIN
-
-Matrix:  NADH ──→ Complex I ──→ Q ──→ Complex III ──→ Cyt c ──→ Complex IV ──→ ½O₂ + 2H⁺ → H₂O
-                    ↓ 4H⁺              ↓ 4H⁺                      ↓ 2H⁺
-         Succinate → Complex II ──┘
-                    (FADH₂)
-
-IMS:     [H⁺ accumulation from pumping]
-
-Reduction Potentials (E°'):
-NADH/NAD⁺: -0.32 V
-FAD/FADH₂: -0.22 V (Complex II)
-Q/QH₂: +0.045 V
-Cyt b: +0.07 V
-Cyt c₁: +0.22 V
-Cyt c: +0.254 V
-Cyt a: +0.29 V
-O₂/H₂O: +0.82 V
-
-Total ΔE°' (NADH → O₂): ~1.14 V → ΔG°' ≈ -220 kJ/mol (per NADH)
-
-Proton stoichiometry per NADH: ~10 H⁺ pumped
-Proton stoichiometry per FADH₂: ~6 H⁺ pumped
+```mermaid
+flowchart TD
+    subgraph Matrix["Matrix"]
+        NADH["NADH<br/>E°' = -0.32 V"]
+        Succinate["Succinate"]
+        C1["Complex I"]
+        C2["Complex II<br/>(FADH₂)<br/>E°' = -0.22 V"]
+        Q["Q (Ubiquinone)<br/>E°' = +0.045 V"]
+        C3["Complex III<br/>Cyt b: +0.07 V<br/>Cyt c₁: +0.22 V"]
+        CytC["Cyt c<br/>E°' = +0.254 V"]
+        C4["Complex IV<br/>Cyt a: +0.29 V"]
+        O2["½O₂ + 2H⁺"]
+        H2O["H₂O<br/>E°' = +0.82 V"]
+    end
+    
+    subgraph IMS["Intermembrane Space (IMS)"]
+        HP1["4H⁺ pumped"]
+        HP2["4H⁺ pumped"]
+        HP3["2H⁺ pumped"]
+        Accum["H⁺ accumulation"]
+    end
+    
+    NADH -->|electrons| C1
+    C1 -->|electrons| Q
+    Succinate -->|electrons| C2
+    C2 -->|electrons| Q
+    Q -->|electrons| C3
+    C3 -->|electrons| CytC
+    CytC -->|electrons| C4
+    C4 -->|electrons| O2
+    O2 --> H2O
+    
+    C1 -.->|pump| HP1
+    C3 -.->|pump| HP2
+    C4 -.->|pump| HP3
+    
+    HP1 --> Accum
+    HP2 --> Accum
+    HP3 --> Accum
+    
+    subgraph Energetics["Energetics"]
+        DeltaE["Total ΔE°' (NADH → O₂): ~1.14 V"]
+        DeltaG["ΔG°' ≈ -220 kJ/mol per NADH"]
+        StoichN["~10 H⁺ pumped per NADH"]
+        StoichF["~6 H⁺ pumped per FADH₂"]
+    end
+    
+    DeltaE --> DeltaG
+    DeltaG --> StoichN
+    StoichN --> StoichF
 ```
 
 ### Chemiosmosis and ATP Synthesis: The Proton-Motive Force
@@ -263,30 +326,63 @@ The proton gradient generated across the thylakoid membrane (lumen acidic, strom
 
 The stoichiometry of the light reactions per two photons absorbed (one per photosystem) produces one NADPH and translocates approximately three protons, yielding roughly one ATP per two electrons transferred (corresponding to 1.5 ATP per NADPH if all protons are used for ATP synthesis). However, some proton gradient is consumed for metabolite transport, and cyclic electron flow adjusts the actual ATP/NADPH production ratio.
 
-```
-PHOTOSYNTHETIC LIGHT REACTIONS (Z-SCHEME)
-
-Stroma (reducing side):
-                                    Fd
-                                    ↑ E°'≈-0.43V
-                                   PSI (P700*)
-                                    ↑ hν (700 nm)
-Lumen ←─ H⁺ ←─ PC ←─ Cyt b₆f ←─ PQH₂
-         ↑              ↑
-        H₂O           PSII (P680*)
-         │             ↑ hν (680 nm)
-         │            P680
-         │             ↑
-        OEC          Q_A → Q_B → PQH₂
-       (Mn₄CaO₅)
-         │
-        2H₂O → O₂ + 4H⁺
-
-Electron Flow: H₂O → PSII → PQ → Cyt b₆f → PC → PSI → Fd → NADP⁺
-Proton Gradient: Lumen (low pH, ~5) vs Stroma (high pH, ~8)
-
-Linear electron flow: 2 H₂O + 2 NADP⁺ + ~10 H⁺(stroma) → O₂ + 2 NADPH + ~10 H⁺(lumen)
-Cyclic electron flow: Fd → Cyt b₆f (additional H⁺ pumping, no NADPH or O₂)
+```mermaid
+flowchart TD
+    subgraph Stroma["Stroma (reducing side, pH ~8)"]
+        Fd["Fd<br/>E°' ≈ -0.43V"]
+        NADP["NADP⁺ / NADPH"]
+        Fd -->|Reduction| NADP
+    end
+    
+    subgraph Membrane["Thylakoid Membrane"]
+        PSI_excited["PSI (P700*)<br/>Excited State"]
+        PSI_ground["PSI (P700)<br/>Ground State"]
+        Cyt["Cyt b₆f<br/>Complex"]
+        PSII_excited["PSII (P680*)<br/>Excited State"]
+        PSII_ground["PSII (P680)<br/>Ground State"]
+        QA["Q_A"]
+        QB["Q_B"]
+        
+        PSI_ground -->|"hν 700 nm"| PSI_excited
+        PSI_excited --> Fd
+        
+        PC["Plastocyanin (PC)"] --> PSI_ground
+        Cyt --> PC
+        
+        PQH2_1["PQH₂<br/>Plastoquinol"] --> Cyt
+        
+        QB --> PQH2_2["PQH₂"]
+        QA --> QB
+        
+        PSII_ground -->|"hν 680 nm"| PSII_excited
+        PSII_excited --> QA
+        
+        PQH2_2 -.->|Pool| PQH2_1
+    end
+    
+    subgraph Lumen["Lumen (oxidizing side, pH ~5)"]
+        OEC["OEC<br/>(Mn₄CaO₅)"]
+        Water["2H₂O"]
+        Products["O₂ + 4H⁺"]
+        H_pump["H⁺ accumulation"]
+        
+        Water --> OEC
+        OEC --> Products
+        OEC --> PSII_ground
+    end
+    
+    Cyt -.->|H⁺ pumping| H_pump
+    PQH2_1 -.->|H⁺ release| H_pump
+    
+    subgraph Cyclic["Cyclic Electron Flow (dashed)"]
+        direction LR
+        Fd_cyclic["Fd"] -.->|Back to| Cyt_cyclic["Cyt b₆f"]
+    end
+    
+    style Stroma fill:#e8f5e9
+    style Lumen fill:#fff3e0
+    style Membrane fill:#e3f2fd
+    style Cyclic fill:#f3e5f5
 ```
 
 ### The Calvin Cycle: Carbon Dioxide Fixation and Reduction

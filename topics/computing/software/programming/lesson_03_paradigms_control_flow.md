@@ -80,26 +80,26 @@ The evaluation strategy of a language determines **when** and **how many times**
 
 **Lazy evaluation** (normal-order evaluation with sharing, also called call-by-need) defers evaluation of an expression until its value is actually required, and memoizes the result so that subsequent demands for the same thunk return the cached result without re-evaluation. Haskell is the canonical lazy language. The concrete mechanism is the **thunk**: an unevaluated expression is represented at runtime as a heap-allocated closure containing a pointer to the evaluator code and the captured environment. When a value is demanded (by pattern matching, arithmetic, or IO), the runtime enters the thunk, computes the value, overwrites the thunk in place with an **indirection node** pointing to the computed value, and returns it. Subsequent accesses follow the indirection directly.
 
-```
-┌─────────────────────────────────────────────────────┐
-│                 Lazy Evaluation: Thunk Lifecycle     │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph lifecycle ["Lazy Evaluation: Thunk Lifecycle"]
+        direction TB
 
-Initial state (expression unevaluated):
-┌─────────────────────┐
-│  THUNK              │
-│  code_ptr → eval_fn │
-│  env_ptr  → {x,y,z} │
-└─────────────────────┘
+        subgraph initial ["Initial state — expression unevaluated"]
+            T["THUNK<br/>code_ptr → eval_fn<br/>env_ptr → {x,y,z}"]
+        end
 
-After first demand (value computed):
-┌─────────────────────┐
-│  INDIRECTION        │
-│  ptr ──────────────►│  VALUE (e.g., 42)
-└─────────────────────┘
+        subgraph after ["After first demand — value computed"]
+            I["INDIRECTION<br/>ptr"]
+            V["VALUE (e.g., 42)"]
+            I -->|"follows indirection"| V
+        end
 
-Subsequent demands follow indirection directly;
-no re-evaluation occurs.
+        T -->|"first demand triggers evaluation"| I
+    end
+
+    note["Subsequent demands follow the indirection directly;<br/>no re-evaluation occurs."]
+    note -.-> V
 ```
 
 The power of lazy evaluation is that it makes infinite data structures representable as finite programs, and it enables functions to be short-circuit consumers: a function that only inspects the first element of a list will only force the first thunk. The classic example is an infinite list of primes that the programmer can slice into finite subsequences. The cost is that heap allocation for thunks is pervasive, and the programmer loses predictable control over when computations occur—a critical problem when computations have side effects or consume significant memory, which is why Haskell's IO model must be carefully designed to remain pure even in the presence of deferred evaluation.

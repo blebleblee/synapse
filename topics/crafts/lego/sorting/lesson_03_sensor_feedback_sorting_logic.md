@@ -24,40 +24,26 @@ The practical consequence is that a tight polling loop running `while True: colo
 
 The signal path from sensor to motor looks like this:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        SORTING PIPELINE                         │
-│                                                                 │
-│  [Brick enters]                                                 │
-│       │                                                         │
-│       ▼                                                         │
-│  ┌─────────────┐    Raw RGB or     ┌──────────────────┐        │
-│  │ Color Sensor│───intensity───────▶  Classification  │        │
-│  │  (Station 1)│                   │     Function     │        │
-│  └─────────────┘                   │  (threshold/map) │        │
-│                                    └────────┬─────────┘        │
-│                                             │ color_id          │
-│                                             ▼                   │
-│                                    ┌──────────────────┐        │
-│  ┌─────────────┐    Distance mm    │  State Register  │        │
-│  │  Distance   │──────────────────▶│  {color, size,   │        │
-│  │  Sensor     │                   │   timestamp}     │        │
-│  │  (Station 2)│                   └────────┬─────────┘        │
-│  └─────────────┘                            │                  │
-│                                             ▼                   │
-│                                    ┌──────────────────┐        │
-│                                    │  Decision Logic  │        │
-│                                    │  (lookup table / │        │
-│                                    │   if-elif tree)  │        │
-│                                    └────────┬─────────┘        │
-│                                             │ gate_position     │
-│                                             ▼                   │
-│                                    ┌──────────────────┐        │
-│                                    │  Gate Motor      │        │
-│                                    │  (servo/medium   │        │
-│                                    │   motor + angle) │        │
-│                                    └──────────────────┘        │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph pipeline["SORTING PIPELINE"]
+        entry["Brick enters"]
+        
+        colorSensor["Color Sensor<br/>(Station 1)"]
+        distanceSensor["Distance Sensor<br/>(Station 2)"]
+        
+        classification["Classification Function<br/>(threshold/map)"]
+        stateRegister["State Register<br/>{color, size, timestamp}"]
+        decisionLogic["Decision Logic<br/>(lookup table / if-elif tree)"]
+        gateMotor["Gate Motor<br/>(servo/medium motor + angle)"]
+        
+        entry --> colorSensor
+        colorSensor -->|"Raw RGB or<br/>intensity"| classification
+        classification -->|"color_id"| stateRegister
+        distanceSensor -->|"Distance mm"| stateRegister
+        stateRegister --> decisionLogic
+        decisionLogic -->|"gate_position"| gateMotor
+    end
 ```
 
 ### Color Classification: From Raw Readings to Confident Labels

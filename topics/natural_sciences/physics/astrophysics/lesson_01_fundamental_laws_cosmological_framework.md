@@ -120,21 +120,21 @@ $$\frac{\Delta T}{T}(\hat{n}) = \sum_{\ell m} a_{\ell m} Y_{\ell m}(\hat{n})$$
 
 encodes information about curvature (through the angular scale of the first acoustic peak), matter density (through peak heights), and baryon density (through peak positions). The power spectrum $C_\ell = \langle |a_{\ell m}|^2 \rangle$ fits the Lambda-CDM model to sub-percent precision, constraining cosmological parameters with extraordinary accuracy.
 
-```
-Cosmic Evolution Timeline (Lambda-CDM Model)
-
-t = 0 ────────────────────────────────────────────> t₀ = 13.8 Gyr
-│                    │            │         │
-Inflation      BBN         Recombination  Matter-Λ
-10⁻³⁶ s       3 min        380 kyr      ~9 Gyr
-                                                equality
-z → ∞          z ~ 10⁹      z ~ 1100      z ~ 0.3    z = 0
-
-Radiation    Matter-dominated era    Λ-dominated era
-dominated    (ρ_m ∝ a⁻³)             (ρ_Λ = const)
-(ρ_r ∝ a⁻⁴)                           acceleration
-
-Scale factor: a(t) ~ t^(1/2)  t^(2/3)     e^(H_Λ t)
+```mermaid
+flowchart LR
+    Start["t = 0<br/>Big Bang<br/>z → ∞"] --> Inflation["Inflation<br/>t ~ 10⁻³⁶ s<br/>Radiation Dominated<br/>ρ_r ∝ a⁻⁴<br/>a(t) ~ t^(1/2)"]
+    
+    Inflation --> BBN["BBN<br/>Big Bang Nucleosynthesis<br/>t ~ 3 min<br/>z ~ 10⁹"]
+    
+    BBN --> MatterDom["Matter-Dominated Era<br/>ρ_m ∝ a⁻³<br/>a(t) ~ t^(2/3)"]
+    
+    MatterDom --> Recomb["Recombination<br/>t ~ 380 kyr<br/>z ~ 1100"]
+    
+    Recomb --> MatterLambda["Matter-Λ Equality<br/>t ~ 9 Gyr<br/>z ~ 0.3"]
+    
+    MatterLambda --> LambdaDom["Λ-Dominated Era<br/>Dark Energy<br/>ρ_Λ = const<br/>a(t) ~ e^(H_Λ t)<br/>Acceleration"]
+    
+    LambdaDom --> Present["t₀ = 13.8 Gyr<br/>Present Day<br/>z = 0"]
 ```
 
 The concordance Lambda-CDM model—cold dark matter plus cosmological constant—successfully describes cosmic evolution from Big Bang nucleosynthesis at $t \sim 3$ minutes through structure formation to the present accelerating epoch. Its six free parameters ($\Omega_m h^2$, $\Omega_b h^2$, $h$, $\tau$, $n_s$, $\sigma_8$) are measured to percent-level precision through complementary probes: CMB, supernovae, baryon acoustic oscillations, weak gravitational lensing, and galaxy clustering.

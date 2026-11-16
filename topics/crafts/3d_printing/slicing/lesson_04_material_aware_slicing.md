@@ -20,54 +20,26 @@ The fourth invariant concerns support structures and belongs more to geometry th
 
 Understanding what the slicer actually does to generate toolpaths is essential for diagnosing artifacts and tuning intelligently. The pipeline is a sequential transformation, and knowing where each transformation occurs tells you which slicer setting corrects which physical problem.
 
-```
-STL / 3MF / AMF (Watertight Mesh)
-            │
-            ▼
-  ┌─────────────────────┐
-  │   Mesh Validation   │  ← Manifold check, normal repair, overlap detection
-  └─────────┬───────────┘
-            │
-            ▼
-  ┌─────────────────────┐
-  │   Layer Slicing     │  ← Intersect mesh with Z-planes at layer_height intervals
-  │   (Polygon Stack)   │  → Outputs closed 2D polygons per layer
-  └─────────┬───────────┘
-            │
-            ▼
-  ┌─────────────────────────────────┐
-  │  Support & Overhang Detection   │  ← Per-layer polygon differencing
-  │  (Overhang angle threshold,     │     against layer N-1 polygon footprint
-  │   bridge detection, interface   │
-  │   layer calculation)            │
-  └─────────┬───────────────────────┘
-            │
-            ▼
-  ┌─────────────────────────────────┐
-  │  Perimeter / Shell Generation   │  ← Inward polygon offsetting by
-  │                                 │     (nozzle_diameter × overlap_factor)
-  │                                 │  → Produces wall loop stack
-  └─────────┬───────────────────────┘
-            │
-            ▼
-  ┌─────────────────────────────────┐
-  │     Infill Pattern Generation   │  ← Clip infill pattern to remaining
-  │  (Gyroid, Grid, Cubic, etc.)    │     interior polygon after shell removal
-  └─────────┬───────────────────────┘
-            │
-            ▼
-  ┌─────────────────────────────────┐
-  │  Travel & Retraction Planning   │  ← Shortest-path travel with
-  │                                 │     retraction/wipe at crossing boundaries
-  └─────────┬───────────────────────┘
-            │
-            ▼
-  ┌─────────────────────────────────┐
-  │  Extrusion Width & E-axis Calc  │  ← Volumetric flow: E = (w × h × dist) / (π × r²)
-  └─────────┬───────────────────────┘
-            │
-            ▼
-         G-code Output
+```mermaid
+flowchart TD
+    A["STL / 3MF / AMF<br/>(Watertight Mesh)"]
+    B["Mesh Validation<br/><br/><i>Manifold check, normal repair,<br/>overlap detection</i>"]
+    C["Layer Slicing<br/>(Polygon Stack)<br/><br/><i>Intersect mesh with Z-planes<br/>at layer_height intervals<br/>→ Outputs closed 2D polygons per layer</i>"]
+    D["Support & Overhang Detection<br/><br/><i>Per-layer polygon differencing<br/>against layer N-1 polygon footprint<br/>Overhang angle threshold,<br/>bridge detection, interface<br/>layer calculation</i>"]
+    E["Perimeter / Shell Generation<br/><br/><i>Inward polygon offsetting by<br/>nozzle_diameter × overlap_factor<br/>→ Produces wall loop stack</i>"]
+    F["Infill Pattern Generation<br/>(Gyroid, Grid, Cubic, etc.)<br/><br/><i>Clip infill pattern to remaining<br/>interior polygon after shell removal</i>"]
+    G["Travel & Retraction Planning<br/><br/><i>Shortest-path travel with<br/>retraction/wipe at crossing boundaries</i>"]
+    H["Extrusion Width & E-axis Calc<br/><br/><i>Volumetric flow:<br/>E = w × h × dist / π × r²</i>"]
+    I["G-code Output"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
 ```
 
 The layer slicing step deserves careful attention because it is where layer height choices interact with surface quality and bond strength simultaneously. The slicer intersects the mesh with a horizontal plane at each Z increment to produce a stack of closed 2D polygons. These polygons are then inward-offset by successive amounts to generate the wall loops. The first offset is exactly one extrusion width from the outer surface, then one additional extrusion width for each subsequent wall count. This is why extrusion width — not just layer height — is a primary dimensional accuracy control. Setting your extrusion width to 120% of nozzle diameter (a common optimization for structural parts) means your walls are thicker than nominal, and if your model's wall thickness is not a multiple of that adjusted extrusion width, the slicer will either insert a gap or artificially narrow the innermost perimeter, neither of which is desirable. The practitioner designs wall thickness to be an integer multiple of the chosen extrusion width, particularly for structural load-bearing shells.

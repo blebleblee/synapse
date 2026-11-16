@@ -34,15 +34,33 @@ Superposition analysis proceeds by considering one independent source at a time 
 
 The following ASCII diagram illustrates a resistive network amenable to multiple analysis techniques:
 
-```
-        R1=2Ω           R3=4Ω
-    ┌────────●────────────┐
-    │       n1            │
-   ═ V1              R4=6Ω ┴ R5=3Ω
-   ═ 12V                  │
-    │                    n2
-   GND ───────●────────────┘
-             R2=8Ω
+```mermaid
+flowchart TD
+    V1["V1<br/>12V"]
+    R1["R1<br/>2Ω"]
+    R2["R2<br/>8Ω"]
+    R3["R3<br/>4Ω"]
+    R4["R4<br/>6Ω"]
+    R5["R5<br/>3Ω"]
+    n1(("n1"))
+    n2(("n2"))
+    GND["GND"]
+    
+    V1 --> n1
+    n1 --> R1
+    R1 --> GND
+    
+    n1 --> R3
+    R3 --> n2
+    
+    n2 --> R4
+    R4 --> GND
+    
+    n2 --> R5
+    R5 --> GND
+    
+    GND --> R2
+    R2 --> n1
 ```
 
 For nodal analysis, designate ground at the bottom rail and label node $n1$ (top-left junction) and node $n2$ (right junction). The voltage source directly defines $V_{n1} = 12\,\text{V}$ relative to ground, eliminating one unknown. At node $n2$, apply KCL: $(V_{n2} - V_{n1})/R_3 + (V_{n2} - 0)/R_4 + (V_{n2} - 0)/R_5 = 0$. Substituting values: $(V_{n2} - 12)/4 + V_{n2}/6 + V_{n2}/3 = 0$. Multiplying by 12: $3(V_{n2} - 12) + 2V_{n2} + 4V_{n2} = 0$, yielding $9V_{n2} = 36$, so $V_{n2} = 4\,\text{V}$.

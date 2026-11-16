@@ -65,58 +65,39 @@ The NIST incident handling lifecycle maps to distinct system states in the case 
 
 The transition from Analysis to Containment occurs when an analyst (or automated decision engine) approves a containment playbook. Playbooks are directed acyclic graphs where nodes represent tasks—API calls, script executions, human approvals—and edges represent dependencies and conditional branches. A typical phishing response playbook contains these sequenced tasks: extract URLs and attachments from the email, detonate attachments in a sandbox environment, query threat intelligence for domain reputation, identify all users who received the email, check if any users clicked the link (via web proxy logs), quarantine the email from all mailboxes, block sender domain at email gateway, notify affected users through security awareness platform, and generate executive summary report.
 
-```
-PHISHING CONTAINMENT PLAYBOOK (DAG Execution Flow)
+```mermaid
+flowchart TD
+    ALERT["Alert Triggered\n(Email Gateway)"]
+    EXTRACT["Extract Indicators\n(URLs, Attachments)"]
+    SANDBOX["Sandbox Detonation"]
+    TIMEOUT["Timeout: 5 min"]
+    TI["TI Enrichment\n(Parallel Queries)"]
+    APIS["APIs: VT, AlienVault"]
+    SCORE["Confidence Scoring\n(Threshold: 0.80)"]
+    DECISION{"score ≥ 0.80?"}
+    AUTO["AUTO-CONTAIN"]
+    HUMAN["HUMAN REVIEW"]
+    BLOCK["Block Sender\nat Gateway"]
+    QUARANTINE["Quarantine Email\nfrom Mailboxes"]
+    NOTIFY["User Notification\n(Security Awareness)"]
+    REPORT["Generate Report\n(Executive Summary)"]
 
-          ┌─────────────────┐
-          │ Alert Triggered │
-          │  (Email Gateway)│
-          └────────┬────────┘
-                   │
-         ┌─────────▼──────────┐
-         │ Extract Indicators │
-         │ (URLs, Attachments)│
-         └─────────┬──────────┘
-                   │
-         ┌─────────▼──────────┐
-         │ Sandbox Detonation │◄──── Timeout: 5min
-         └─────────┬──────────┘
-                   │
-         ┌─────────▼──────────┐
-         │ TI Enrichment      │◄──── APIs: VT, AlienVault
-         │ (Parallel Queries) │
-         └─────────┬──────────┘
-                   │
-         ┌─────────▼──────────┐
-         │ Confidence Scoring │
-         │  (Threshold: 0.80) │
-         └─────────┬──────────┘
-                   │
-         ┌─────────▼──────────┐
-         │ IF score >= 0.80   │
-         │   AUTO-CONTAIN     │
-         │ ELSE               │
-         │   HUMAN REVIEW     │
-         └─────────┬──────────┘
-                   │
-     ┌─────────────┴──────────────┐
-     │                            │
-┌────▼────────┐          ┌────────▼────────┐
-│ Block Sender│          │ Quarantine Email│
-│  at Gateway │          │  from Mailboxes │
-└────┬────────┘          └────────┬────────┘
-     │                            │
-     └─────────────┬──────────────┘
-                   │
-         ┌─────────▼──────────┐
-         │ User Notification  │
-         │ (Security Awareness)│
-         └─────────┬──────────┘
-                   │
-         ┌─────────▼──────────┐
-         │ Generate Report    │
-         │ (Executive Summary)│
-         └────────────────────┘
+    ALERT --> EXTRACT
+    EXTRACT --> SANDBOX
+    TIMEOUT -.->|feeds| SANDBOX
+    SANDBOX --> TI
+    APIS -.->|feeds| TI
+    TI --> SCORE
+    SCORE --> DECISION
+    DECISION -->|Yes| AUTO
+    DECISION -->|No| HUMAN
+    AUTO --> BLOCK
+    AUTO --> QUARANTINE
+    HUMAN --> BLOCK
+    HUMAN --> QUARANTINE
+    BLOCK --> NOTIFY
+    QUARANTINE --> NOTIFY
+    NOTIFY --> REPORT
 ```
 
 Containment strategies follow a graduated response model calibrated to incident severity and adversary sophistication. Network-level containment uses access control lists to isolate compromised hosts, preventing lateral movement while maintaining limited connectivity for remote forensic analysis. Application-level containment revokes OAuth tokens, disables user accounts, and terminates active sessions. Host-level containment stops malicious processes, removes persistence mechanisms (scheduled tasks, registry autoruns, startup scripts), and deploys patches to close exploited vulnerabilities. Data-level containment rotates encryption keys, invalidates certificates, and purges cached credentials from memory.

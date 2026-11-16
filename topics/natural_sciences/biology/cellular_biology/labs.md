@@ -900,7 +900,7 @@ This thermal stress test completes the boundary condition analysis, mapping the 
 - Beer-Lambert pathlength (96-well plate, 200 μL): 0.55 cm  
 - Para-nitrophenolate ε₄₀₅: 18,000 M⁻¹cm⁻¹ at pH 8.0  
 - Acceptable calibration curve R²: ≥0.98  
-- Triplicate measurement precision (RSD): <5% for good technique  
+- Triplicate measurement precision (RSD): < 5% for good technique  
 
 **Enzyme Kinetics Reference Values**  
 - Alkaline phosphatase $K_M$ (pNPP substrate): 0.5–2.0 mM  
@@ -911,8 +911,8 @@ This thermal stress test completes the boundary condition analysis, mapping the 
 
 **pH and Temperature Stability**  
 - Optimal pH for ALP: 9.0–10.0  
-- Residual activity at pH 4.0: <10% (severe inhibition)  
-- Residual activity at pH 11.0: <15% (moderate inhibition)  
+- Residual activity at pH 4.0: < 10% (severe inhibition)  
+- Residual activity at pH 11.0: < 15% (moderate inhibition)  
 - Thermal melting temperature $T_m$: 60–70°C  
 - Denaturation activation energy: 200–400 kJ/mol  
 
@@ -969,14 +969,14 @@ Absolute uncertainty scales: $\delta C_{\text{final}} = \delta C_{\text{stock}} 
 - Diameter distribution bimodal: culture may contain mixed cell cycle stages; consider synchronization or flow cytometry sorting  
 
 **Spectrophotometry Issues**  
-- Nonlinear calibration curve: suspect reagent degradation, check blank absorbance (<0.05), remake Bradford reagent fresh  
+- Nonlinear calibration curve: suspect reagent degradation, check blank absorbance (< 0.05), remake Bradford reagent fresh  
 - High inter-replicate variability (RSD >10%): inspect pipetting technique, verify complete mixing, extend equilibration time  
 - Negative intercept in Bradford curve: verify blank subtraction, check for air bubbles in cuvettes  
 - Absorbance drift during kinetics: confirm temperature stabilization, check for evaporation in open cuvettes  
 
 **Enzyme Kinetics Issues**  
-- Non-hyperbolic Michaelis-Menten plot: test for substrate inhibition (activity decreases at [S] >10 mM), product inhibition (measure at low product conversion <10%), or enzyme aggregation (verify single band on SDS-PAGE)  
-- Poor fit R² <0.95: increase number of substrate concentrations (minimum 7 points), extend concentration range to span 0.2×$K_M$ to 5×$K_M$  
+- Non-hyperbolic Michaelis-Menten plot: test for substrate inhibition (activity decreases at [S] >10 mM), product inhibition (measure at low product conversion < 10%), or enzyme aggregation (verify single band on SDS-PAGE)  
+- Poor fit R² < 0.95: increase number of substrate concentrations (minimum 7 points), extend concentration range to span 0.2×$K_M$ to 5×$K_M$  
 - Negative control activity: test for substrate autohydrolysis, reagent contamination, or incomplete enzyme inactivation in blank samples  
 - Temperature-dependent $K_M$: indicates conformational changes; repeat at multiple temperatures and report temperature-specific parameters  
 

@@ -583,22 +583,30 @@ echo "Filtered: " . count($admins) . "\n";
 
 The namespace resolution flow can be visualized as follows:
 
-```
-Source: use App\Domain\UserRepository;
-        $repo = new UserRepository();
-
-  Compile Phase                          Runtime Phase
-  ┌─────────────────────────┐           ┌──────────────────────────────┐
-  │ 1. Lexer produces FQN   │           │ 1. ZEND_NEW opcode fires     │
-  │    App\Domain\UserRepo  │           │ 2. Lookup in EG(class_table) │
-  │ 2. use import matches   │           │    key: "app\domain\userrepo"│
-  │    App\Domain\ prefix   │           │ 3. MISS → invoke autoloaders │
-  │ 3. Emits FQN in opcode  │──────────▶│ 4. Psr4Autoloader::loadClass │
-  │    literal              │           │ 5. require file → class link │
-  └─────────────────────────┘           │ 6. Retry lookup → HIT        │
-                                        │ 7. Allocate object, call     │
-                                        │    __construct               │
-                                        └──────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph compile ["Compile Phase"]
+        A["1. Lexer produces FQN<br/>App\Domain\UserRepo"]
+        B["2. use import matches<br/>App\Domain\ prefix"]
+        C["3. Emits FQN in opcode<br/>literal"]
+        A --> B --> C
+    end
+    
+    subgraph runtime ["Runtime Phase"]
+        D["1. ZEND_NEW opcode fires"]
+        E["2. Lookup in EG(class_table)<br/>key: 'app\domain\userrepo'"]
+        F["3. MISS → invoke autoloaders"]
+        G["4. Psr4Autoloader::loadClass"]
+        H["5. require file → class link"]
+        I["6. Retry lookup → HIT"]
+        J["7. Allocate object, call<br/>__construct"]
+        D --> E --> F --> G --> H --> I --> J
+    end
+    
+    C -.->|source code| D
+    
+    style compile fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style runtime fill:#f9f9f9,stroke:#333,stroke-width:2px
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

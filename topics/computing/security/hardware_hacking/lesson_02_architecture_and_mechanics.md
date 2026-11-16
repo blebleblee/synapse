@@ -68,8 +68,8 @@ UART signal levels are logic-level by default (0 V = logic 0, V_CC = logic 1) bu
 
 | Standard | Logic 0 | Logic 1 | Max distance | Notes |
 |---|---|---|---|---|
-| TTL / CMOS (3.3V) | 0 V | 3.3 V | <1 m | Direct MCU output |
-| TTL / CMOS (5V) | 0 V | 5 V | <1 m | Requires level shifting to 3.3V MCU |
+| TTL / CMOS (3.3V) | 0 V | 3.3 V | < 1 m | Direct MCU output |
+| TTL / CMOS (5V) | 0 V | 5 V | < 1 m | Requires level shifting to 3.3V MCU |
 | RS-232 (EIA-232) | +3 to +15 V | -3 to -15 V | ~15 m | Inverted logic; DB9 connector |
 | RS-485 (EIA-485) | Differential | Differential | ~1200 m | Half or full duplex; bus topology |
 
@@ -154,18 +154,26 @@ The 1.5-stop-bit configuration is a historical artifact originating from 5-bit B
 The hardware state machine governing a UART receiver is non-trivial and directly relevant to fault-injection and glitch attacks:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> IDLE : Power-on / reset
-    IDLE --> START_DETECT : Falling edge on RX
-    START_DETECT --> START_VERIFY : Wait 0.5 bit period
-    START_VERIFY --> IDLE : Start bit = HIGH (false start, framing error)
-    START_VERIFY --> DATA_SAMPLE : Start bit confirmed LOW
-    DATA_SAMPLE --> DATA_SAMPLE : Sample bit N; N < data_bits
-    DATA_SAMPLE --> PARITY_CHECK : N == data_bits AND parity enabled
-    DATA_SAMPLE --> STOP_CHECK : N == data_bits AND no parity
-    PARITY_CHECK --> STOP_CHECK : Parity computed
-    STOP_CHECK --> IDLE : Stop bit = HIGH; frame complete → RX buffer write
-    STOP_CHECK --> IDLE : Stop bit = LOW → Framing Error flag set; RX buffer write (data may be corrupt)
+flowchart TD
+    RESET(["⬤ Start"])
+    IDLE["IDLE"]
+    START_DETECT["START_DETECT"]
+    START_VERIFY["START_VERIFY"]
+    DATA_SAMPLE["DATA_SAMPLE"]
+    PARITY_CHECK["PARITY_CHECK"]
+    STOP_CHECK["STOP_CHECK"]
+
+    RESET -->|"Power-on / reset"| IDLE
+    IDLE -->|"Falling edge on RX"| START_DETECT
+    START_DETECT -->|"Wait 0.5 bit period"| START_VERIFY
+    START_VERIFY -->|"Start bit = HIGH\n(false start / framing error)"| IDLE
+    START_VERIFY -->|"Start bit confirmed LOW"| DATA_SAMPLE
+    DATA_SAMPLE -->|"Sample bit N; N < data_bits"| DATA_SAMPLE
+    DATA_SAMPLE -->|"N == data_bits AND parity enabled"| PARITY_CHECK
+    DATA_SAMPLE -->|"N == data_bits AND no parity"| STOP_CHECK
+    PARITY_CHECK -->|"Parity computed"| STOP_CHECK
+    STOP_CHECK -->|"Stop bit = HIGH\nFrame complete → RX buffer write"| IDLE
+    STOP_CHECK -->|"Stop bit = LOW\nFraming Error flag set;\nRX buffer write (data may be corrupt)"| IDLE
 ```
 
 The **framing error** condition is architecturally important: most UART peripherals still write the received data byte to the receive buffer even on a framing error, with the error flag set alongside. Software that does not check the error flag will process corrupt data silently — a common vulnerability in embedded firmware that hardware attackers exploit via deliberate baud-rate mismatches or voltage glitching during the stop bit window.

@@ -40,27 +40,44 @@ Once a manuscript was located, the scholar faced copying logistics. For a substa
 
 Critical edition construction involved collating multiple manuscripts to establish a stemma—a genealogical tree showing how copies descended from a common archetype. If manuscripts A and B shared errors not present in C, they likely derived from a common intermediate source distinct from C's lineage. By mapping these relationships, editors could make principled decisions about which readings to adopt in a reconstructed text. This required access to multiple manuscripts, often necessitating travel or correspondence with scholars in other cities.
 
-```
-Manuscript Collation Stemma Example:
-
-                    [Archetype: Lost Original]
-                              |
-                    +---------+---------+
-                    |                   |
-              [Intermediate α]    [Intermediate β]
-                    |                   |
-              +-----+-----+       +-----+-----+
-              |           |       |           |
-         [Ms. A]     [Ms. B]  [Ms. C]     [Ms. D]
-         
-Error Analysis:
-- A & B share error X (inherited from α)
-- C & D share error Y (inherited from β)
-- Where A-B and C-D disagree, editor must choose via:
-  * Classical usage patterns
-  * Meter (for poetry)
-  * Sense in context
-  * Principle of difficilior lectio (harder reading more likely original)
+```mermaid
+flowchart TD
+    Archetype["Archetype: Lost Original"]
+    Alpha["Intermediate α"]
+    Beta["Intermediate β"]
+    A["Ms. A"]
+    B["Ms. B"]
+    C["Ms. C"]
+    D["Ms. D"]
+    
+    Archetype --> Alpha
+    Archetype --> Beta
+    
+    Alpha --> A
+    Alpha --> B
+    
+    Beta --> C
+    Beta --> D
+    
+    ErrorX["Error X shared by A & B<br/>(inherited from α)"]
+    ErrorY["Error Y shared by C & D<br/>(inherited from β)"]
+    
+    Alpha -.-> ErrorX
+    Beta -.-> ErrorY
+    
+    Decision["Editorial Decision Points:<br/>• Classical usage patterns<br/>• Meter (for poetry)<br/>• Sense in context<br/>• Difficilior lectio principle"]
+    
+    A -.-> Decision
+    B -.-> Decision
+    C -.-> Decision
+    D -.-> Decision
+    
+    style Archetype fill:#f9f,stroke:#333,stroke-width:2px
+    style Alpha fill:#bbf,stroke:#333,stroke-width:2px
+    style Beta fill:#bbf,stroke:#333,stroke-width:2px
+    style ErrorX fill:#fbb,stroke:#333,stroke-width:1px
+    style ErrorY fill:#fbb,stroke:#333,stroke-width:1px
+    style Decision fill:#bfb,stroke:#333,stroke-width:2px
 ```
 
 The apparatus criticus—footnotes documenting variant readings—became standard in humanist editions. This transparency allowed readers to second-guess editorial decisions and demonstrated scholarly rigor. It also created a competitive dynamic: editions with fuller apparatus and more manuscripts consulted gained prestige, incentivizing deeper philological work.

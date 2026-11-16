@@ -1074,24 +1074,36 @@ async fn main() -> Result<()> {
 Choosing a fusion strategy requires reasoning about four axes simultaneously:
 
 ```mermaid
-quadrantChart
-    title Fusion Strategy Selection
-    x-axis "Low Cross-Modal Interaction Needed" --> "High Cross-Modal Interaction Needed"
-    y-axis "Low Compute Budget" --> "High Compute Budget"
-    quadrant-1 "Cross-attention / Full token concat"
-    quadrant-2 "Hybrid fusion with selective cross-attn"
-    quadrant-3 "Late fusion (CLS concat + MLP)"
-    quadrant-4 "Early feature concat + shared encoder"
-    "Medical VQA": [0.85, 0.80]
-    "Sentiment (text+emoji)": [0.3, 0.2]
-    "Video QA": [0.9, 0.85]
-    "Audio classification": [0.2, 0.3]
-    "Document understanding": [0.7, 0.6]
+flowchart TD
+    A["Fusion Strategy Selection"]
+    
+    A --> B["Cross-Modal Interaction Level"]
+    A --> C["Compute Budget Level"]
+    
+    B --> B1["Low Cross-Modal Interaction"]
+    B --> B2["High Cross-Modal Interaction"]
+    
+    C --> C1["Low Compute Budget"]
+    C --> C2["High Compute Budget"]
+    
+    B1 & C1 --> Q3["Late Fusion<br/>CLS concat + MLP"]
+    Q3 --> U1["Audio classification"]
+    Q3 --> U2["Sentiment text+emoji"]
+    
+    B1 & C2 --> Q4["Early Feature Concat<br/>+ Shared Encoder"]
+    Q4 --> U3["Document understanding"]
+    
+    B2 & C1 --> Q2["Hybrid Fusion with<br/>Selective Cross-Attention"]
+    Q2 --> U4["Document understanding"]
+    
+    B2 & C2 --> Q1["Cross-Attention<br/>Full Token Concat"]
+    Q1 --> U5["Medical VQA"]
+    Q1 --> U6["Video QA"]
 ```
 
 **Late fusion** (CLS concatenation) is correct when modalities provide largely independent evidence (e.g., audio and text sentiment both independently classify emotional valence). It scales as O(N) in the number of tokens per modality because encoders process each modality independently.
 
-**Early fusion (token concatenation)** is correct when fine-grained spatial-semantic alignment is required—for example, visual question answering where the answer depends on a specific image region referenced by a word in the question. The attention map `Softmax(QK^T/√d)` over the concatenated sequence lets text tokens attend directly to image patch tokens. The cost is O((N_text + N_image)²) attention—acceptable for <10k total tokens, expensive beyond that.
+**Early fusion (token concatenation)** is correct when fine-grained spatial-semantic alignment is required—for example, visual question answering where the answer depends on a specific image region referenced by a word in the question. The attention map `Softmax(QK^T/√d)` over the concatenated sequence lets text tokens attend directly to image patch tokens. The cost is O((N_text + N_image)²) attention—acceptable for < 10k total tokens, expensive beyond that.
 
 **Cross-modal attention (Flamingo/Gemini adapter layers)** is correct when you need the expressiveness of early fusion but want to preserve a pretrained language model unchanged. The image tokens appear only as keys and values in specialized gating layers; the LM's self-attention layers never see image tokens directly. This is architecturally important: it means the LM's internal representations are not polluted by visual features, making few-shot learning more stable.
 

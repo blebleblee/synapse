@@ -20,16 +20,18 @@ The fundamental invariant underlying all garbage collection algorithms states th
 
 The HotSpot JVM, Oracle's reference implementation and the foundation for OpenJDK distributions, partitions heap memory into generational regions optimized for different object lifetimes and collection strategies. The young generation, typically sized between one quarter and one third of total heap space, receives all new object allocations into its Eden region. Each thread maintains a Thread-Local Allocation Buffer or TLAB, a contiguous chunk of Eden space carved out for lock-free bump-pointer allocation. When a thread exhausts its TLAB, it requests a fresh buffer from the global Eden allocator, minimizing contention on the allocation fast path. This design transforms allocation into a pointer arithmetic operation—incrementing a thread-local allocation pointer by the object size and returning the previous pointer value—achieving allocation latencies measured in nanoseconds.
 
-```
-Young Generation Layout:
-+------------------+------------+------------+
-|      Eden        | Survivor 0 | Survivor 1 |
-| (8/10 of young)  | (1/10)     | (1/10)     |
-+------------------+------------+------------+
-       |                |            |
-       v                v            v
-  New objects      From space    To space
-  allocated here   during GC     during GC
+```mermaid
+flowchart TD
+    subgraph young["Young Generation Layout"]
+        direction LR
+        eden["Eden<br/>(8/10 of young)"]
+        s0["Survivor 0<br/>(1/10)"]
+        s1["Survivor 1<br/>(1/10)"]
+    end
+    
+    eden --> eden_desc["New objects<br/>allocated here"]
+    s0 --> s0_desc["From space<br/>during GC"]
+    s1 --> s1_desc["To space<br/>during GC"]
 ```
 
 Young generation collection, termed minor GC, employs a copying collector that traces live objects from GC roots, copying survivors into one of two symmetric survivor spaces and promoting tenured objects to the old generation. The algorithm begins by identifying root references from thread stacks, scanning each frame's local variable slots and operand stack positions for object references. It then performs a breadth-first traversal of the object graph, copying each reachable object from Eden or the from-survivor space into the to-survivor space, updating references to point to new locations, and recording objects that have survived sufficient collections for promotion. After copying completes, the entire Eden and from-survivor regions become dead space available for immediate reuse—no explicit deallocation pass is required because all live objects have been evacuated.
@@ -40,17 +42,27 @@ The old generation, occupying the majority of heap space, accumulates promoted o
 
 The Garbage-First or G1 collector, introduced in Java 7 and made default in Java 9, abandons strict generational boundaries in favor of heap regionalization. G1 partitions the entire heap into fixed-size regions, typically 1MB to 32MB depending on heap size, and dynamically assigns region roles as Eden, survivor, old, or humongous object storage. Each region tracks a remembered set or RSet, a data structure recording cross-region references pointing into that region from elsewhere in the heap. These RSets, maintained through write barriers inserted by the JIT compiler, permit G1 to collect individual regions independently without scanning the entire heap for incoming references.
 
-```
-G1 Heap Regionalization:
-+----+----+----+----+----+----+----+----+
-| E  | E  | S  | O  | O  | H  | E  | O  |
-+----+----+----+----+----+----+----+----+
-  Eden  Eden Surv Old  Old  Huge Eden Old
-
-E = Eden region (young gen)
-S = Survivor region (young gen)
-O = Old generation region
-H = Humongous object (spans multiple regions)
+```mermaid
+flowchart LR
+    subgraph heap["G1 Heap Regionalization"]
+        E1["E<br/>Eden"]
+        E2["E<br/>Eden"]
+        S1["S<br/>Survivor"]
+        O1["O<br/>Old"]
+        O2["O<br/>Old"]
+        H1["H<br/>Humongous"]
+        E3["E<br/>Eden"]
+        O3["O<br/>Old"]
+    end
+    
+    subgraph legend["Legend"]
+        LE["E = Eden region (young gen)"]
+        LS["S = Survivor region (young gen)"]
+        LO["O = Old generation region"]
+        LH["H = Humongous object (spans multiple regions)"]
+    end
+    
+    E1 ~~~ E2 ~~~ S1 ~~~ O1 ~~~ O2 ~~~ H1 ~~~ E3 ~~~ O3
 ```
 
 G1's evacuation pause selects a collection set of regions based on predicted collection efficiency—regions with high garbage ratios yield more reclaimed space per unit collection time. During a mixed collection, G1 evacuates both young and selected old regions concurrently, copying live objects to survivor or old regions while application threads continue executing. The concurrent marking cycle runs alongside mutator threads, using Snapshot-At-The-Beginning semantics to maintain consistency. SATB preserves the object graph as it existed when marking began by logging overwrites to reference fields into per-thread saturation buffers. The marker processes these logged references to ensure no live objects become unreachable due to concurrent mutation.
@@ -81,19 +93,27 @@ Finalization, the legacy cleanup mechanism, allows classes to override `finalize
 
 Object layout in memory reflects JVM object model requirements and hardware alignment constraints. Each object begins with a two-word header: a mark word encoding lock state, identity hash, and GC metadata, and a class pointer referencing the object's metadata structure. Instance fields follow the header, padded to respect alignment requirements—eight-byte fields align to eight-byte boundaries, four-byte fields to four-byte boundaries. The JVM may reorder fields to minimize padding waste, packing smaller fields into alignment gaps. Array objects carry an additional length field after the header, followed by array elements stored contiguously in memory.
 
-```
-Object Memory Layout:
-+-------------------+
-| Mark Word (8B)    |  - Identity hash, lock state, GC age
-+-------------------+
-| Klass Pointer (8B)|  - Metadata reference (compressed in many JVMs)
-+-------------------+
-| Field 1           |  - Instance fields
-| Field 2           |
-| ...               |
-+-------------------+
-| Padding           |  - Align to 8-byte boundary
-+-------------------+
+```mermaid
+flowchart TD
+    A["Mark Word (8B)"]
+    B["Klass Pointer (8B)"]
+    C["Field 1"]
+    D["Field 2"]
+    E["..."]
+    F["Padding"]
+    
+    A -->|"Identity hash, lock state, GC age"| B
+    B -->|"Metadata reference (compressed in many JVMs)"| C
+    C -->|"Instance fields"| D
+    D --> E
+    E -->|"Align to 8-byte boundary"| F
+    
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#fff4e1
+    style D fill:#fff4e1
+    style E fill:#fff4e1
+    style F fill:#f0f0f0
 ```
 
 Compressed ordinary object pointers or Compressed Oops, enabled by default for heaps below 32GB, represent references using 32-bit offsets rather than full 64-bit pointers. The JVM assumes heap base alignment and three-bit zero padding—all objects align to eight-byte boundaries, leaving the low three bits unused—permitting 32-bit values to address 32GB of heap space. This compression halves reference storage overhead and improves cache utilization, at the cost of slightly increased load and store latency for pointer compression and decompression arithmetic.

@@ -46,26 +46,53 @@ On the leading strand template, continuous DNA synthesis proceeds in the same di
 
 Lagging strand synthesis, proceeding opposite to fork movement, must occur discontinuously in short segments (Okazaki fragments: 1000-2000 nucleotides in prokaryotes, 100-200 nucleotides in eukaryotes). Primase synthesizes short RNA primers at intervals, each approximately 10 nucleotides long, providing the 3' hydroxyl terminus required for polymerase extension. DNA polymerase III extends each primer until encountering the 5' terminus of the preceding fragment. Polymerase exchange, mediated by clamp loader complexes that couple ATP hydrolysis to clamp opening and closing, enables rapid cycling of polymerases between completed and newly primed fragments. The result is a trombone-like looping of lagging strand template that maintains spatial coupling between leading and lagging strand polymerases within a dimeric replisome architecture.
 
-```
-5'→3' Leading Strand Synthesis (continuous)
-     
-       ╱╲ ← Helicase (DnaB)
-      ╱  ╲
-     ╱    ╲
-    ╱      ╲
-5'─────────────→ 3' Template (leading)
-3'←─────────────  5' Template (lagging)
-    ╲      ╱
-     ╲    ╱  ← Primase
-      ╲  ╱
-       ╲╱
-    ←─── ←─── ←─── Okazaki fragments
-    
-3'←5' Lagging Strand Synthesis (discontinuous)
+```mermaid
+flowchart TD
+    TOPO["Topoisomerase\n(manages supercoiling ahead of fork)"]
+    HELICASE["Helicase DnaB\n(unwinds double helix)"]
+    SSB["SSB Proteins\n(coat single-stranded regions)"]
 
-SSB coating single-stranded regions
-Polymerase III extending both strands
-Topoisomerase ahead of fork managing supercoiling
+    subgraph fork ["Replication Fork"]
+        direction TB
+        PRIMASE["Primase\n(synthesizes RNA primers)"]
+
+        subgraph leading_side ["Leading Strand (5'→3', continuous)"]
+            LT["5'──────────────→3'\nTemplate (leading)"]
+            POL3L["DNA Polymerase III\n(continuous extension)"]
+            LS["3'←──────────────5'\nNew Leading Strand"]
+        end
+
+        subgraph lagging_side ["Lagging Strand (3'→5', discontinuous)"]
+            LGT["3'←──────────────5'\nTemplate (lagging)"]
+            POL3LG["DNA Polymerase III\n(discontinuous extension)"]
+            OKA1["←─── Okazaki Fragment 3"]
+            OKA2["←─── Okazaki Fragment 2"]
+            OKA3["←─── Okazaki Fragment 1"]
+        end
+    end
+
+    POL1["DNA Polymerase I\n(removes primers, fills gaps)"]
+    LIGASE["DNA Ligase\n(seals nicks between fragments)"]
+
+    TOPO --> HELICASE
+    HELICASE --> SSB
+    HELICASE --> PRIMASE
+    SSB --> LT
+    SSB --> LGT
+
+    LT --> POL3L
+    POL3L --> LS
+
+    PRIMASE --> LGT
+    LGT --> POL3LG
+    POL3LG --> OKA1
+    POL3LG --> OKA2
+    POL3LG --> OKA3
+
+    OKA1 --> POL1
+    OKA2 --> POL1
+    OKA3 --> POL1
+    POL1 --> LIGASE
 ```
 
 Primer removal and fragment ligation complete lagging strand maturation. In prokaryotes, the 5' to 3' exonuclease activity of DNA polymerase I removes ribonucleotides as the polymerase extends the upstream fragment in a process termed nick translation. In eukaryotes, RNase H and FEN1 (flap endonuclease 1) perform sequential cleavages to remove primers. DNA ligase catalyzes phosphodiester bond formation between adjacent fragments, consuming ATP (prokaryotes use NAD⁺-dependent ligases; eukaryotes use ATP-dependent ligases) to drive the thermodynamically unfavorable ligation reaction. The ligase mechanism proceeds through a covalent enzyme-AMP intermediate, transfers AMP to the 5' phosphate terminus, and resolves the activated intermediate through nucleophilic attack by the 3' hydroxyl to form the sealed phosphodiester bond.

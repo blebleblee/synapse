@@ -26,52 +26,56 @@ The tension between security and diagnostics creates architectural challenges wh
 
 The secure boot chain instantiates a finite state machine where each state transition requires cryptographic validation before proceeding. At the architectural level, this manifests as a sequence of verification stages, each with defined inputs, outputs, and failure modes. The state machine begins in the RESET state when power is applied or the watchdog timer expires, progressing through ROM_BOOT, BOOTLOADER_VERIFY, OS_VERIFY, and finally RUN states. Each transition validates cryptographic signatures, checks version numbers, and measures code into platform configuration registers before advancing.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  Secure Boot State Machine (Automotive ECU)                     │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    POR(["POWER-ON RESET"])
 
-    POWER-ON RESET
-         │
-         ▼
-    ┌─────────────────┐
-    │   ROM BOOT      │◄─────── Immutable Hardware Root of Trust
-    │   (Mask ROM)    │         • OEM Root Public Key Hash Embedded
-    └────────┬────────┘         • Anti-Rollback Counter Check
-             │                  • Temperature & Voltage Sensors Active
-             │ Read Stage-1 Bootloader from Flash
-             │ Compute SHA-256 Hash
-             ▼
-    ┌─────────────────┐
-    │  VERIFY_STAGE1  │
-    │  Signature Check│──────► FAIL: Lock ECU, Flash LED Code
-    └────────┬────────┘        (Boot ROM Never Returns)
-             │ PASS
-             │ Load Bootloader to SRAM
-             │ Jump to Entry Point
-             ▼
-    ┌─────────────────┐
-    │  BOOTLOADER     │◄─────── Second-Stage Loader (Signed by OEM)
-    │  Environment    │         • Parse Update Metadata
-    └────────┬────────┘         • Check Active/Inactive Bank Status
-             │                  • Verify Application Firmware
-             │ Read Application Image
-             │ Validate Certificate Chain
-             ▼
-    ┌─────────────────┐
-    │  VERIFY_APP     │
-    │  RSA-2048/ECDSA │──────► FAIL: Attempt Fallback Image
-    │  Certificate    │                Validate Backup Bank
-    └────────┬────────┘                If Both Fail: BRICKED State
-             │ PASS
-             │ Configure MPU Regions
-             │ Initialize SecOC Module
-             ▼
-    ┌─────────────────┐
-    │  RUN STATE      │◄─────── Application Execution
-    │  Operational    │         • SecOC Message Authentication Active
-    └─────────────────┘         • HSM Monitors Tamper Signals
-                                • Periodic Health Checks
+    ROM["ROM BOOT\n(Mask ROM)"]
+    HRT["🔒 Immutable Hardware Root of Trust\n• OEM Root Public Key Hash Embedded\n• Anti-Rollback Counter Check\n• Temperature & Voltage Sensors Active"]
+
+    VS1["VERIFY_STAGE1\nSignature Check"]
+    FAIL1["🔴 FAIL: Lock ECU\nFlash LED Code\n(Boot ROM Never Returns)"]
+
+    BL["BOOTLOADER\nEnvironment"]
+    SSL["Second-Stage Loader (Signed by OEM)\n• Parse Update Metadata\n• Check Active/Inactive Bank Status\n• Verify Application Firmware"]
+
+    VA["VERIFY_APP\nRSA-2048 / ECDSA\nCertificate Chain"]
+    FAIL2A["Attempt Fallback Image\nValidate Backup Bank"]
+    FAIL2B["🔴 BRICKED State"]
+
+    RUN["RUN STATE\nOperational"]
+    AEX["Application Execution\n• SecOC Message Authentication Active\n• HSM Monitors Tamper Signals\n• Periodic Health Checks"]
+
+    POR --> ROM
+    HRT -. "Root of Trust" .-> ROM
+
+    ROM -->|"Read Stage-1 Bootloader from Flash\nCompute SHA-256 Hash"| VS1
+
+    VS1 -->|FAIL| FAIL1
+    VS1 -->|"PASS: Load Bootloader to SRAM\nJump to Entry Point"| BL
+
+    SSL -. "Second-Stage Config" .-> BL
+
+    BL -->|"Read Application Image\nValidate Certificate Chain"| VA
+
+    VA -->|FAIL| FAIL2A
+    FAIL2A --> FAIL2B
+    VA -->|"PASS: Configure MPU Regions\nInitialize SecOC Module"| RUN
+
+    AEX -. "Runtime Security" .-> RUN
+
+    style POR fill:#2d2d2d,color:#ffffff,stroke:#555
+    style ROM fill:#1a3a5c,color:#ffffff,stroke:#2a5a8c
+    style HRT fill:#0d2b3e,color:#aec8e0,stroke:#2a5a8c,stroke-dasharray:4 4
+    style VS1 fill:#1a3a5c,color:#ffffff,stroke:#2a5a8c
+    style FAIL1 fill:#5c1a1a,color:#ffcccc,stroke:#8c2a2a
+    style BL fill:#1a3a5c,color:#ffffff,stroke:#2a5a8c
+    style SSL fill:#0d2b3e,color:#aec8e0,stroke:#2a5a8c,stroke-dasharray:4 4
+    style VA fill:#1a3a5c,color:#ffffff,stroke:#2a5a8c
+    style FAIL2A fill:#5c3a1a,color:#ffe0cc,stroke:#8c5a2a
+    style FAIL2B fill:#5c1a1a,color:#ffcccc,stroke:#8c2a2a
+    style RUN fill:#1a4a2a,color:#ccffcc,stroke:#2a7a3a
+    style AEX fill:#0d2b1a,color:#a0d4a0,stroke:#2a7a3a,stroke-dasharray:4 4
 ```
 
 The RSA signature verification process at each stage follows a deterministic procedure that begins with extracting the signature from the firmware image header. The bootloader reads the signed hash value and certificate chain, then performs modular exponentiation using the public key to recover the original hash. This recovered hash is compared against a freshly computed SHA-256 digest of the firmware binary. The mathematical operation for RSA verification computes $m = s^e \bmod n$ where $s$ is the signature, $e$ is the public exponent (typically 65537 for performance), and $n$ is the modulus. If the recovered message $m$ matches the computed hash after applying PKCS#1 v1.5 or PSS padding, verification succeeds.

@@ -101,8 +101,14 @@ This nesting eliminates the need for **shadow page tables**, an older technique 
 
 **Extended Page Tables (EPT)** are hardware-assisted nested page tables. The CPU's MMU performs both translations in a single memory reference:
 
-```
-GVA --[guest PT]--> GPA --[EPT]--> HPA
+```mermaid
+flowchart LR
+    GVA["GVA\n(Guest Virtual Address)"]
+    GPA["GPA\n(Guest Physical Address)"]
+    HPA["HPA\n(Host Physical Address)"]
+
+    GVA -->|"Guest Page Table"| GPA
+    GPA -->|"EPT\n(Extended Page Table)"| HPA
 ```
 
 When a guest accesses memory:
@@ -221,7 +227,7 @@ Live migration transfers a running VM from one host to another with minimal down
 
 1. **Pre-Copy Phase**: Iteratively copy memory pages while the VM runs. Track dirtied pages via **write-protection** (EPT write faults) or **dirty page logging**.
 2. **Iterative Copy**: Repeat the copy for dirtied pages. Each iteration transmits fewer pages as the working set stabilizes.
-3. **Stop-and-Copy**: When the dirty set is small enough (typically <10MB), pause the VM, copy remaining pages, and transfer CPU/device state.
+3. **Stop-and-Copy**: When the dirty set is small enough (typically < 10MB), pause the VM, copy remaining pages, and transfer CPU/device state.
 4. **Resume**: Start the VM on the destination, updating network routing and storage connections.
 
 The **total migration time** equals the time to copy all memory plus iterative passes. The **downtime** equals the stop-and-copy duration. Network bandwidth and memory write rate (memory dirtying rate) determine feasibility. If the dirtying rate exceeds the network throughput, migration may never converge, requiring techniques like **post-copy migration** (move CPU state first, fault in memory pages on demand).
@@ -272,7 +278,7 @@ Set **reservations** for latency-sensitive VMs to guarantee physical memory avai
 
 **Vhost Offload**: Move VirtIO backend processing to a kernel thread (vhost-net, vhost-blk) instead of running in QEMU userspace. This eliminates system call overhead and enables kernel-to-kernel data paths.
 
-**SR-IOV for High Throughput**: For 10/25/100 Gbps networking, SR-IOV passthrough eliminates the hypervisor from the data path entirely. Latency drops from 10-30μs (VirtIO) to <1μs (SR-IOV).
+**SR-IOV for High Throughput**: For 10/25/100 Gbps networking, SR-IOV passthrough eliminates the hypervisor from the data path entirely. Latency drops from 10-30μs (VirtIO) to < 1μs (SR-IOV).
 
 **I/O Throttling and QoS**: Prevent I/O-heavy VMs from starving others. Configure IOPS limits:
 
@@ -342,8 +348,8 @@ echo 1 > /sys/module/kvm_intel/parameters/vmentry_l1d_flush_param
 **Key Metrics**:
 - **CPU Ready Time**: Time a vCPU is runnable but waiting for a pCPU (indicates overcommit).
 - **Balloon Size**: Memory reclaimed via ballooning (indicates memory pressure).
-- **EPT Violations/s**: EPT page faults (should be <1000/s).
-- **VM Exits/s**: Trap rate (should be <100k/s for low overhead).
+- **EPT Violations/s**: EPT page faults (should be < 1000/s).
+- **VM Exits/s**: Trap rate (should be < 100k/s for low overhead).
 - **Stolen Time**: CPU time stolen by hypervisor (visible in guest via `steal` in `top`).
 
 **Tools**:

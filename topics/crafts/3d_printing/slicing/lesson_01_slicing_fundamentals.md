@@ -34,41 +34,20 @@ Polygon chaining works by building an adjacency map: each segment's endpoint is 
 
 The following diagram illustrates the full pipeline from mesh input to closed polygon output at a single layer:
 
-```
-STL / 3MF Input
-       │
-       ▼
-┌─────────────────────────────┐
-│   Mesh Validation Pass       │
-│  (manifold, normals, degens) │
-└─────────────┬───────────────┘
-              │
-              ▼
-┌─────────────────────────────┐
-│   Triangle–Plane Intersect   │
-│   for each z_i = i × Δz     │
-│   → unordered segment set    │
-└─────────────┬───────────────┘
-              │
-              ▼
-┌─────────────────────────────┐
-│   Segment Chaining           │
-│   endpoint adjacency graph   │
-│   → closed polygon loops     │
-└─────────────┬───────────────┘
-              │
-              ▼
-┌─────────────────────────────┐
-│   Loop Classification        │
-│   winding number / even-odd  │
-│   → outer contours & holes   │
-└─────────────┬───────────────┘
-              │
-              ▼
-┌─────────────────────────────┐
-│   Perimeter + Infill         │
-│   Toolpath Generation        │
-└─────────────────────────────┘
+```mermaid
+flowchart TD
+    A["STL / 3MF Input"]
+    B["Mesh Validation Pass<br/>(manifold, normals, degens)"]
+    C["Triangle–Plane Intersect<br/>for each z_i = i × Δz<br/>→ unordered segment set"]
+    D["Segment Chaining<br/>endpoint adjacency graph<br/>→ closed polygon loops"]
+    E["Loop Classification<br/>winding number / even-odd<br/>→ outer contours & holes"]
+    F["Perimeter + Infill<br/>Toolpath Generation"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 ### STL Mesh Parsing and Internal Representation

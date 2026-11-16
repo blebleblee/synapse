@@ -81,29 +81,49 @@ Engine temperature sensing employs a thermistor immersed in the coolant passage,
 
 The Controller Area Network physical layer employs differential signaling to reject electromagnetic interference from the ignition system, fuel injectors, and external radio-frequency sources. Two conductors, CAN High and CAN Low, form a twisted pair with characteristic impedance of one hundred twenty ohms. During idle bus conditions, both lines rest at two-point-five volts, the recessive state. When a node transmits a dominant bit, it drives CAN High to three-point-five volts and CAN Low to one-point-five volts, producing a two-volt differential. The receiver at each node subtracts CAN Low from CAN High, amplifying the desired signal while canceling common-mode noise that affects both conductors equally. Termination resistors of one hundred twenty ohms connect between CAN High and CAN Low at each end of the bus, matching the line impedance and preventing signal reflections that would corrupt data at high bit rates.
 
-```
-CAN Bus Message Frame Structure (11-bit Standard Identifier):
+```mermaid
+flowchart TD
+    subgraph frame ["CAN Bus Message Frame — 11-bit Standard Identifier"]
+        direction LR
+        SOF["SOF\n1 bit"]
+        ID["Identifier\n11 bits\n(Priority: lower = higher)"]
+        RTR["RTR\n1 bit"]
+        IDE["IDE\n1 bit"]
+        R0["R0\n1 bit"]
+        DLC["DLC\n4 bits\n(Length Code)"]
+        DATA["Data Field\n0–8 bytes"]
+        CRC["CRC\n15 bits"]
+        ACK["ACK\n2 bits"]
+        EOF["EOF\n7 bits"]
 
- SOF  Identifier (11-bit)  RTR IDE R0  DLC   Data (0-8 bytes)    CRC   ACK EOF
-  │   │                     │   │  │    │     │                   │     │   │
-  1   0 1 0 1 1 0 0 0 0 0   0   0  0   0100  [0x3A][0xF2]...    15bit  2   7
-      ↑                                  ↑
-      Priority (Lower = Higher)          Length Code (4 bytes)
+        SOF --> ID --> RTR --> IDE --> R0 --> DLC --> DATA --> CRC --> ACK --> EOF
+    end
 
-Example: Engine RPM Broadcast (500 ms period)
-  Identifier: 0x0CF00400 (SAE J1939 Engine Speed)
-  DLC: 8 bytes
-  Data[0-1]: RPM (16-bit, 0.125 rpm/bit)
-  Data[2-3]: Throttle Position (16-bit, 0.4%/bit)
+    subgraph example_rpm ["Example: Engine RPM Broadcast (SAE J1939 — 500 ms period)"]
+        RPM_ID["Identifier: 0x0CF00400\nSAE J1939 Engine Speed"]
+        RPM_DLC["DLC: 8 bytes"]
+        RPM_D01["Data[0–1]: RPM\n16-bit · 0.125 rpm/bit"]
+        RPM_D23["Data[2–3]: Throttle Position\n16-bit · 0.4 %/bit"]
 
-Diagnostic Request: Read Fault Codes (ISO 14229 UDS)
-  Identifier: 0x7E0 (Physical addressing, ECU)
-  Data: [0x03][0x19][0x02][0xFF][0xCC][0xCC][0xCC][0xCC]
-         │     │     │     │     └─── Padding
-         │     │     │     └───── Subfunction: Report All
-         │     │     └───────── Service: Read DTC by status
-         │     └───────────── Service ID: 0x19
-         └─────────────────── Length: 3 bytes
+        RPM_ID --> RPM_DLC --> RPM_D01
+        RPM_DLC --> RPM_D23
+    end
+
+    subgraph diag ["Diagnostic Request: Read Fault Codes (ISO 14229 UDS)"]
+        DIAG_ID["Identifier: 0x7E0\nPhysical Addressing — ECU"]
+        DIAG_LEN["Data[0]: 0x03\nLength: 3 bytes"]
+        DIAG_SID["Data[1]: 0x19\nService ID — ReadDTCInformation"]
+        DIAG_SUB["Data[2]: 0x02\nService: Read DTC by Status"]
+        DIAG_SF["Data[3]: 0xFF\nSubfunction: Report All"]
+        DIAG_PAD["Data[4–7]: 0xCC\nPadding"]
+
+        DIAG_ID --> DIAG_LEN --> DIAG_SID --> DIAG_SUB --> DIAG_SF --> DIAG_PAD
+    end
+
+    DLC -->|"defines payload length"| RPM_DLC
+    DLC -->|"defines payload length"| DIAG_LEN
+    ID -->|"0x0CF00400"| RPM_ID
+    ID -->|"0x7E0"| DIAG_ID
 ```
 
 Message arbitration proceeds through bitwise comparison of identifiers during simultaneous transmission attempts. Each node monitors the bus while transmitting, comparing the observed bit level against the transmitted bit. A node transmitting a recessive bit (logic one) while observing a dominant bit (logic zero) immediately ceases transmission and becomes a receiver, deferring to the message with higher priority. This non-destructive arbitration ensures the message with the lowest numerical identifier—highest priority—always wins access without corruption or retransmission delay. Engine speed and wheel speed data employ low identifier values to guarantee delivery within deterministic latency bounds, while instrument cluster updates and diagnostic responses accept higher identifiers and correspondingly longer worst-case delays.

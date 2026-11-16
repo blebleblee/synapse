@@ -32,32 +32,42 @@ Reinforcement schedules govern behavioral persistence and extinction resistance 
 
 Interval schedules introduce temporal contingencies. Fixed-interval schedules produce scalloped response patterns with acceleration as reinforcement availability approaches, observable when children study intensively just before exams. Variable-interval schedules generate steady moderate response rates, ideal for maintaining behaviors like checking in with parents or consistent effort application. The practitioner designing behavioral interventions must consciously architect schedule transitions: continuous reinforcement for initial acquisition, gradually thinning to variable-ratio or variable-interval schedules for maintenance, ensuring behaviors persist without constant reinforcement dependence.
 
-```
-Operant Conditioning Decision Tree
-
-Environmental Context (Discriminative Stimulus)
-           |
-           v
-    Behavior Emission
-           |
-           v
-    Consequence Evaluation
-           |
-    +------+------+
-    |             |
-Appetitive    Aversive
-Stimulus      Stimulus
-    |             |
-+---+---+     +---+---+
-|       |     |       |
-Add   Remove Add   Remove
-|       |     |       |
-Positive Negative Positive Negative
-Reinforce Reinforce Punish  Punish
-|       |     |       |
-v       v     v       v
-Behavior   Behavior   Behavior   Behavior
-Increases  Increases  Decreases  Decreases
+```mermaid
+flowchart TD
+    A["Environmental Context<br/>(Discriminative Stimulus)"]
+    B["Behavior Emission"]
+    C["Consequence Evaluation"]
+    D["Appetitive Stimulus"]
+    E["Aversive Stimulus"]
+    F["Add"]
+    G["Remove"]
+    H["Add"]
+    I["Remove"]
+    J["Positive Reinforcement"]
+    K["Negative Reinforcement"]
+    L["Positive Punishment"]
+    M["Negative Punishment"]
+    N["Behavior Increases"]
+    O["Behavior Increases"]
+    P["Behavior Decreases"]
+    Q["Behavior Decreases"]
+    
+    A --> B
+    B --> C
+    C --> D
+    C --> E
+    D --> F
+    D --> G
+    E --> H
+    E --> I
+    F --> J
+    G --> K
+    H --> L
+    I --> M
+    J --> N
+    K --> O
+    L --> P
+    M --> Q
 ```
 
 ### Observational Learning Architecture
@@ -90,30 +100,40 @@ Uninvolved parenting exhibits low demandingness and low responsiveness—essenti
 
 The typology's utility for practitioners lies in diagnostic precision and intervention targeting. Assessing a family's location within the demandingness-responsiveness space immediately suggests which intervention components to prioritize. Authoritarian families need enhanced warmth, communication skills, and reasoning strategies while maintaining their structural strengths. Permissive families require behavioral management training, consistent consequence implementation, and age-appropriate limit-setting while preserving their relational warmth. Uninvolved families need comprehensive intervention addressing parental stressors, building basic parenting skills across both dimensions, and sometimes mandating external monitoring.
 
-```
-Parenting Style Matrix
-
-Responsiveness
-        High                  Low
-      +----------------+----------------+
-      |                |                |
-High  | Authoritative  | Authoritarian  |
-      |                |                |
-D     | • Clear limits | • Strict rules |
-e     | • Warm support | • Low warmth   |
-m     | • Reasoning    | • Obedience    |
-a     | • Bidirectional| • One-way      |
-n     |                |                |
-d     +----------------+----------------+
-i     |                |                |
-n     | Permissive     | Uninvolved     |
-g     |                |                |
-      | • Few limits   | • Disengaged   |
-Low   | • High warmth  | • Neglectful   |
-      | • Inconsistent | • Minimal      |
-      | • Indulgent    | • Absent       |
-      |                |                |
-      +----------------+----------------+
+```mermaid
+flowchart TD
+    subgraph matrix["Parenting Style Matrix"]
+        subgraph axes[" "]
+            direction LR
+            resp["<b>Responsiveness</b><br/>High ← → Low"]
+            demand["<b>Demandingness</b><br/>High ↕ Low"]
+        end
+        
+        subgraph grid[" "]
+            direction TB
+            
+            subgraph row1[" "]
+                direction LR
+                auth["<b>Authoritative</b><br/>(High Demand, High Response)<br/>• Clear limits<br/>• Warm support<br/>• Reasoning<br/>• Bidirectional"]
+                author["<b>Authoritarian</b><br/>(High Demand, Low Response)<br/>• Strict rules<br/>• Low warmth<br/>• Obedience<br/>• One-way"]
+            end
+            
+            subgraph row2[" "]
+                direction LR
+                perm["<b>Permissive</b><br/>(Low Demand, High Response)<br/>• Few limits<br/>• High warmth<br/>• Inconsistent<br/>• Indulgent"]
+                uninv["<b>Uninvolved</b><br/>(Low Demand, Low Response)<br/>• Disengaged<br/>• Neglectful<br/>• Minimal<br/>• Absent"]
+            end
+        end
+    end
+    
+    style auth fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    style author fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+    style perm fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    style uninv fill:#ffebee,stroke:#f44336,stroke-width:2px
+    style axes fill:none,stroke:none
+    style grid fill:none,stroke:none
+    style row1 fill:none,stroke:none
+    style row2 fill:none,stroke:none
 ```
 
 ### Scaffolding and Zone of Proximal Development

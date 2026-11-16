@@ -32,21 +32,22 @@ African aesthetic philosophy, particularly ubuntu aesthetics rooted in Southern 
 
 The architectural diagram for ubuntu aesthetics can be represented as follows:
 
-```
-COMMUNAL PARTICIPATION
-         ↓
-    ┌────────────────┐
-    │ RITUAL MUSIC   │←──→ Social Cohesion
-    │ DANCE PRACTICE │
-    └────────────────┘
-         ↓
-AESTHETIC QUALITY = f(Relational_Intensity, Communal_Harmony, Vital_Force)
-         ↓
-    ┌────────────────┐
-    │ ETHICAL VALUE  │←──→ Ubuntu (Humanity Toward Others)
-    └────────────────┘
-         ↓
-CULTURAL CONTINUITY
+```mermaid
+flowchart TD
+    A["COMMUNAL PARTICIPATION"]
+    B["RITUAL MUSIC<br/>DANCE PRACTICE"]
+    C["Social Cohesion"]
+    D["AESTHETIC QUALITY = f(Relational_Intensity, Communal_Harmony, Vital_Force)"]
+    E["ETHICAL VALUE"]
+    F["Ubuntu (Humanity Toward Others)"]
+    G["CULTURAL CONTINUITY"]
+    
+    A --> B
+    B <--> C
+    B --> D
+    D --> E
+    E <--> F
+    E --> G
 ```
 
 This architecture inverts Western aesthetic autonomy. Where Kantian aesthetics insists on bracketing moral considerations to preserve aesthetic purity, ubuntu aesthetics treats such bracketing as conceptually incoherent—a dismemberment of integrated human experience. The evaluative criterion is not formal properties analyzed in isolation but the capacity of aesthetic practice to generate and sustain vital communal relations. A song is beautiful not primarily through melodic or harmonic structure (though these matter) but through its power to coordinate collective movement, embody ancestral wisdom, and renew social solidarity.
@@ -63,30 +64,19 @@ Postcolonial aesthetic critique introduces a diagnostic framework for identifyin
 
 The architectural mechanics of postcolonial critique can be diagrammed as a recursive loop:
 
-```
-COLONIAL ENCOUNTER
-         ↓
-    ┌──────────────────────────────┐
-    │ Aesthetic Hierarchies        │
-    │ (Western = Universal/High    │
-    │  Non-Western = Local/Low)    │
-    └──────────────────────────────┘
-         ↓
-    ┌──────────────────────────────┐
-    │ Institutional Structures     │
-    │ (Museums, Academies,         │
-    │  Canons, Markets)            │
-    └──────────────────────────────┘
-         ↓
-    ┌──────────────────────────────┐
-    │ Internalized Devaluation     │
-    │ (Colonial Subjects Accept    │
-    │  Imposed Hierarchies)        │
-    └──────────────────────────────┘
-         ↓
-REPRODUCTION OF COLONIAL EPISTEMOLOGY
-         ↑
-         └──────────────────────────┘
+```mermaid
+flowchart TD
+    A["COLONIAL ENCOUNTER"]
+    B["Aesthetic Hierarchies<br/>(Western = Universal/High<br/>Non-Western = Local/Low)"]
+    C["Institutional Structures<br/>(Museums, Academies,<br/>Canons, Markets)"]
+    D["Internalized Devaluation<br/>(Colonial Subjects Accept<br/>Imposed Hierarchies)"]
+    E["REPRODUCTION OF COLONIAL EPISTEMOLOGY"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> B
 ```
 
 Breaking this loop requires epistemological decolonization—actively dismantling inherited frameworks that encode colonial presumptions. This involves several operations. First, excavating suppressed or marginalized aesthetic traditions and restoring them to theoretical visibility. Second, analyzing how museums, galleries, and academic curricula reproduce colonial hierarchies through classification systems, exhibition practices, and pedagogical canons that systematically privilege Western art while relegating non-Western traditions to ethnographic curiosity or "world art" addenda. Third, developing new theoretical vocabularies and methodologies rooted in non-Western philosophical traditions rather than always translating into Western conceptual schemes.

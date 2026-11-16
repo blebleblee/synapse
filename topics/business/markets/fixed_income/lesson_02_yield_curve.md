@@ -71,47 +71,41 @@ Cross-currency basis and collateral discounting introduce additional complexity 
 
 The system architecture for production curve construction typically separates data ingestion, curve calibration, and pricing services into distinct components:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Market Data Feed                        │
-│  (Treasury auction results, interdealer broker quotes,      │
-│   swap rates, futures settlements, central bank rates)      │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  Data Validation Layer                      │
-│  • Stale price detection                                    │
-│  • Bid-ask crossing checks                                  │
-│  • Calendar alignment (holidays, roll conventions)          │
-│  • Day-count convention normalization                       │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Bootstrapping / Calibration Engine             │
-│  • Sequential spot rate extraction                          │
-│  • Interpolation (spline / Nelson-Siegel / parametric)      │
-│  • No-arbitrage constraint enforcement                      │
-│  • Multi-curve projection vs. discounting separation        │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Curve Storage & Cache                     │
-│  • Discount factor lookup tables                            │
-│  • Forward rate precomputation                              │
-│  • Version control for time-series analysis                 │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│               Pricing & Risk Analytics                      │
-│  • Bond valuation                                           │
-│  • Duration and convexity calculation                       │
-│  • Scenario analysis (parallel shifts, twists, butterflies) │
-│  • Hedge ratio computation                                  │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    MDF["**Market Data Feed**
+    Treasury auction results
+    Interdealer broker quotes
+    Swap rates, futures settlements
+    Central bank rates"]
+
+    DVL["**Data Validation Layer**
+    • Stale price detection
+    • Bid-ask crossing checks
+    • Calendar alignment (holidays, roll conventions)
+    • Day-count convention normalization"]
+
+    BCE["**Bootstrapping / Calibration Engine**
+    • Sequential spot rate extraction
+    • Interpolation (spline / Nelson-Siegel / parametric)
+    • No-arbitrage constraint enforcement
+    • Multi-curve projection vs. discounting separation"]
+
+    CSC["**Curve Storage & Cache**
+    • Discount factor lookup tables
+    • Forward rate precomputation
+    • Version control for time-series analysis"]
+
+    PRA["**Pricing & Risk Analytics**
+    • Bond valuation
+    • Duration and convexity calculation
+    • Scenario analysis (parallel shifts, twists, butterflies)
+    • Hedge ratio computation"]
+
+    MDF --> DVL
+    DVL --> BCE
+    BCE --> CSC
+    CSC --> PRA
 ```
 
 Real-time curve updates require incremental recalibration as new trades arrive. Rather than rebootstrapping the entire curve for each price update, practitioners isolate the affected maturity segment and update local discount factors while preserving smoothness constraints with adjacent segments. This localized adjustment maintains sub-millisecond latency for pricing applications while ensuring global curve consistency at lower frequency batch recalibrations.

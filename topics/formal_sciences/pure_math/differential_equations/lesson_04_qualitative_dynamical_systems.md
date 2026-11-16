@@ -46,19 +46,53 @@ When the eigenvalues are real and distinct, $\lambda_1 \neq \lambda_2 \in \mathb
 
 The following diagram organizes the classification by the trace-determinant plane:
 
-```
-det(J)
-^
-| (stable spiral) | (unstable spiral)
-| tr<0, Δ<0 | tr>0, Δ<0
-| |
-|---stable-node---+---unstable-node-----> tr(J)
-| tr<0, Δ>0 | tr>0, Δ>0
-|                 |
-| saddle: det(J) < 0 (below the tr-axis)
-|
-Parabola: Δ = tr^2 - 4·det = 0 (boundary: improper nodes)
-Center line: tr(J) = 0, det > 0 (linear centers / nonlinear TBD)
+```mermaid
+flowchart TD
+    Origin(["Origin (0,0)"])
+
+    subgraph above_axis ["det(J) > 0  —  Above the tr-axis"]
+        direction LR
+
+        subgraph left_half ["tr(J) < 0  —  Left Half-Plane"]
+            SN["Stable Node\ntr < 0, Δ > 0\n(real negative eigenvalues)"]
+            SS["Stable Spiral\ntr < 0, Δ < 0\n(complex, Re < 0)"]
+            IN_left["Improper Node\ntr < 0, Δ = 0\n(repeated eigenvalue)"]
+        end
+
+        subgraph center_axis ["tr(J) = 0  —  Imaginary Axis"]
+            CN["Center\ntr = 0, det > 0\n(purely imaginary eigenvalues)"]
+        end
+
+        subgraph right_half ["tr(J) > 0  —  Right Half-Plane"]
+            UN["Unstable Node\ntr > 0, Δ > 0\n(real positive eigenvalues)"]
+            US["Unstable Spiral\ntr > 0, Δ < 0\n(complex, Re > 0)"]
+            IN_right["Improper Node\ntr > 0, Δ = 0\n(repeated eigenvalue)"]
+        end
+    end
+
+    subgraph below_axis ["det(J) < 0  —  Below the tr-axis"]
+        SAD["Saddle Point\ndet < 0\n(one positive, one negative eigenvalue)"]
+    end
+
+    subgraph boundary ["Parabola Boundary: Δ = tr² - 4·det = 0"]
+        PARA["Improper / Degenerate Nodes\n(boundary between nodes and spirals)"]
+    end
+
+    Origin -->|"increasing tr →"| UN
+    Origin -->|"decreasing tr ←"| SN
+    Origin -->|"det > 0, tr = 0"| CN
+    Origin -->|"det < 0"| SAD
+
+    IN_left -. "Δ = 0 boundary" .-> SN
+    IN_left -. "Δ = 0 boundary" .-> SS
+    IN_right -. "Δ = 0 boundary" .-> UN
+    IN_right -. "Δ = 0 boundary" .-> US
+
+    PARA -. "describes" .-> IN_left
+    PARA -. "describes" .-> IN_right
+
+    SS -->|"tr → 0"| CN
+    US -->|"tr → 0"| CN
 ```
 
 The saddle condition $\det(J) < 0$ means the eigenvalues have opposite signs regardless of the trace value, placing saddles entirely in the lower half of the trace-determinant plane.

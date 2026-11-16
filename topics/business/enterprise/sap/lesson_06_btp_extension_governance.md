@@ -413,29 +413,30 @@ BTP extension governance requires a transport management strategy that mirrors t
 
 The transport flow for a CAP extension follows this pipeline:
 
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                        cTMS Transport Pipeline                            │
-│                                                                          │
-│  ┌───────────┐    ┌───────────┐    ┌───────────┐    ┌───────────┐        │
-│  │   DEV     │───▶│   INT     │───▶│   PRE     │───▶│   PROD    │        │
-│  │ Subaccount│    │ Subaccount│    │ Subaccount│    │ Subaccount│        │
-│  │           │    │           │    │           │    │           │        │
-│  │ Auto-import│   │ Auto-import│   │ Manual    │    │ Manual    │        │
-│  │ on commit │    │ on merge  │    │ approval  │    │ approval  │        │
-│  │           │    │           │    │ + QA gate │    │ + CAB sign│        │
-│  └───────────┘    └───────────┘    └───────────┘    └───────────┘        │
-│       │                 │                │                │               │
-│       ▼                 ▼                ▼                ▼               │
-│  Unit Tests        Integration       Penetration     Go-Live             │
-│  + Lint            Tests + API       Tests + Perf    Checklist            │
-│                    Contract Test     Load Test                           │
-│                                                                          │
-│  Transport triggers:                                                     │
-│  DEV→INT:  Git tag push (e.g., v1.0.0-int)                                │
-│  INT→PRE:  Manual trigger in cTMS with approval                           │
-│  PRE→PROD: Change advisory board approval + scheduled import window       │
-└──────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    DEV["DEV Subaccount<br/>Auto-import on commit"]
+    INT["INT Subaccount<br/>Auto-import on merge"]
+    PRE["PRE Subaccount<br/>Manual approval<br/>+ QA gate"]
+    PROD["PROD Subaccount<br/>Manual approval<br/>+ CAB sign-off"]
+    
+    DEVTEST["Unit Tests<br/>+ Lint"]
+    INTTEST["Integration Tests<br/>+ API Contract Test"]
+    PRETEST["Penetration Tests<br/>+ Perf Load Test"]
+    PRODGO["Go-Live<br/>Checklist"]
+    
+    TRIGGER1["Git tag push<br/>v1.0.0-int"]
+    TRIGGER2["Manual trigger in cTMS<br/>with approval"]
+    TRIGGER3["CAB approval<br/>+ scheduled import window"]
+    
+    DEV -->|"Transport trigger:<br/>Git tag push"| INT
+    INT -->|"Transport trigger:<br/>Manual + Approval"| PRE
+    PRE -->|"Transport trigger:<br/>CAB + Scheduled Window"| PROD
+    
+    DEV --> DEVTEST
+    INT --> INTTEST
+    PRE --> PRETEST
+    PROD --> PRODGO
 ```
 
 The CI/CD pipeline is implemented with SAP Cloud Transport Management bound to the subaccounts. The development pipeline is fully automated: a commit to the main branch triggers a build using the Cloud MTA Build Tool (`mbt`), the build artifact is uploaded to cTMS, and cTMS imports it into the DEV subaccount. The integration pipeline triggers on a Git tag push with a version suffix, and the import into the INT subaccount is automatic after a successful build.

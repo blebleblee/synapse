@@ -28,25 +28,22 @@ The electrochemical architecture of a lithium polymer cell consists of layered e
 
 During discharge, lithium ions deintercalate from the graphite anode structure and migrate through the electrolyte to intercalate into the cathode metal oxide lattice. This process is reversed during charging, driven by external voltage applied above the cell's open-circuit potential. The charge/discharge cycle efficiency approaches 98-99% for properly maintained cells, with energy losses manifesting as heat generation from internal resistance and electrochemical irreversibility. The state of charge (SOC) directly correlates with open-circuit voltage in a nonlinear relationship: a fully charged 3.7V nominal cell measures approximately 4.20V at 100% SOC, declining to 3.85V at 50% SOC, and reaching the critical 3.0V cutoff threshold at 10-15% remaining capacity. The steep voltage decline below 3.5V reflects increased internal resistance as lithium ion concentration gradients steepen and electrolyte conductivity degrades.
 
-```
-LiPo Cell Discharge Voltage Curve (3.7V Nominal, 1C Rate)
-        
-Voltage │
- 4.2V ──┤●─────────────────────────┐  100% SOC
-        │                           │
- 4.0V ──┤                           │
-        │                           └──●  90% SOC
- 3.8V ──┤                              │
-        │                              └────●  70% SOC
- 3.6V ──┤                                   │
-        │                                   └──────●  40% SOC
- 3.4V ──┤                                          │
-        │                                          └────●  20% SOC
- 3.2V ──┤                                               │
-        │                                               └─────●  5% SOC
- 3.0V ──┤                                                     │ (Cutoff)
-        └───────────────────────────────────────────────────┴─────→
-        0min                  Runtime Duration              ~20min
+```mermaid
+flowchart LR
+    V100["4.2V<br/>100% SOC"] --> V90["4.0V<br/>90% SOC"]
+    V90 --> V70["3.8V<br/>70% SOC"]
+    V70 --> V40["3.6V<br/>40% SOC"]
+    V40 --> V20["3.4V<br/>20% SOC"]
+    V20 --> V5["3.2V<br/>5% SOC"]
+    V5 --> V0["3.0V<br/>Cutoff"]
+    
+    style V100 fill:#4CAF50
+    style V90 fill:#8BC34A
+    style V70 fill:#CDDC39
+    style V40 fill:#FFC107
+    style V20 fill:#FF9800
+    style V5 fill:#FF5722
+    style V0 fill:#F44336
 ```
 
 The internal resistance of the cell manifests as voltage sag under load, calculated through Ohm's law: $V_{\text{load}} = V_{\text{OC}} - I \cdot R_{\text{internal}}$. A cell with 10 mΩ internal resistance at 50% SOC drawing 50 amperes experiences a voltage drop of 0.5V below its open-circuit potential. This resistance is not constant but increases approximately linearly as SOC depletes, rising from 5-8 mΩ when fully charged to 15-20 mΩ near discharge cutoff. The practitioner monitors this behavior through real-time voltage telemetry or by measuring pack voltage immediately before and during a high-current pulse: the difference divided by current yields the total pack internal resistance, which should remain below 20 mΩ for a 2S configuration to avoid excessive power loss and heating.
@@ -59,28 +56,29 @@ NiMH charging employs constant-current protocols with termination triggered by n
 
 The mechanical architecture of a shock absorber comprises a cylindrical body filled with silicone damping oil, a piston assembly attached to a shaft that protrudes through a sealed end cap, and internal spring preload adjustment mechanisms. The piston contains metering orifices drilled through its face, and check valve assemblies that permit oil flow in one direction while restricting flow in the opposite direction. This asymmetric flow architecture allows the practitioner to tune compression damping (shock shortening) independently from rebound damping (shock extension). The orifice diameter and oil viscosity jointly determine damping force magnitude through the relationship $F_{\text{damp}} = C \cdot \mu \cdot A \cdot v$, where $C$ is a geometric coefficient dependent on orifice size, $\mu$ represents dynamic viscosity, $A$ denotes piston area, and $v$ is piston velocity.
 
-```
-Shock Absorber Internal Architecture (Cutaway)
-
-        ┌─── Shaft Seal & Guide Bushing
-        │    
-    ════╪════  ← Upper Shock Mount (Chassis)
-        │
-        ▼
-    ┌───────┐
-    │   │   │ ← Piston Rod
-    │   │   │
-    │ ╔═╧═╗ │ ← Piston Assembly
-    │ ║ ╱─╲ ║ │   (Compression/Rebound Orifices)
-    │ ╚═╤═╝ │
-    │   │   │ ← Damping Oil Volume (30-50wt)
-    │   │   │
-    │ Spring │ ← Coil Spring (3.5-5.0 lbf/in)
-    │  ┃┃┃  │
-    │  ┃┃┃  │
-    └──┴┴┴──┘
-       │││
-       └┴┴──→ Lower Shock Mount (Suspension Arm)
+```mermaid
+flowchart TD
+    ShaftSeal["Shaft Seal & Guide Bushing"]
+    UpperMount["Upper Shock Mount (Chassis)"]
+    
+    subgraph ShockBody ["Shock Absorber Body"]
+        PistonRod["Piston Rod"]
+        PistonAssy["Piston Assembly<br>(Compression/Rebound Orifices)"]
+        DampingOil["Damping Oil Volume (30-50wt)"]
+        CoilSpring["Coil Spring (3.5-5.0 lbf/in)"]
+    end
+    
+    LowerMount["Lower Shock Mount (Suspension Arm)"]
+    
+    ShaftSeal --- UpperMount
+    UpperMount --> PistonRod
+    PistonRod --> PistonAssy
+    
+    CoilSpring --- UpperMount
+    CoilSpring --- LowerMount
+    
+    DampingOil --- PistonAssy
+    PistonAssy --> LowerMount
 ```
 
 Shock oil viscosity selection begins with track surface characterization and desired transient response. The viscosity-temperature relationship for silicone oils follows an exponential decay: oil viscosity decreases approximately 10-15% per 10°C temperature rise. A shock filled with 40wt oil at ambient 20°C may exhibit effective viscosity of 35wt equivalent after extended running at 50°C shock body temperature. The practitioner accounts for this thermal viscosity reduction by selecting oil weight based on anticipated operating temperature rather than ambient fill conditions. High-downforce, high-grip asphalt configurations maintain stable shock temperatures and benefit from heavy 45-50wt oils that resist weight transfer oscillation during rapid directional transitions. Off-road configurations with repetitive impact loading generate greater shock heating and require lighter 30-35wt oils to prevent packing and maintain suspension compliance as viscosity declines.
@@ -91,24 +89,33 @@ Spring preload adjustment alters the initial compression load required to begin 
 
 Roll center geometry emerges from the instantaneous center of rotation defined by the intersection of lines projected from upper and lower suspension arm pivot axes through their outer ball joint attachment points. In a simplified front double-wishbone suspension, the front-view instant center is found by extending a line from the inner chassis pivot through the outer ball joint on the upper arm, and similarly for the lower arm. The intersection of these two extended lines defines the instant center for that corner of the suspension. The roll center is then constructed by drawing a line from the instant center to the tire contact patch center on the opposite side of the vehicle and finding where this line intersects the chassis centerline plane.
 
-```
-Roll Center Geometry (Front View, Double Wishbone)
-
-         Chassis CG (200mm height)
-              ●  ← Center of Gravity
-              │
-    ══════════┼══════════  ← Chassis Rail
-         ╱    │    ╲
-        ╱     │     ╲  ← Upper A-Arm
-       IC1────┼─────IC2  ← Instant Centers (Virtual Pivot Points)
-        ╲     │     ╱
-         ╲    │    ╱  ← Lower A-Arm
-    ══════════┼══════════
-              │
-       ───────●───────  ← Roll Center (80mm height)
-              │
-    ==========┴==========  ← Ground Plane
-         Contact Patch
+```mermaid
+flowchart TD
+    CG["Chassis CG<br/>(200mm height)"]
+    ChassisRail["═══════ Chassis Rail ═══════"]
+    UpperArmL["╱ Upper A-Arm Left"]
+    UpperArmR["Upper A-Arm Right ╲"]
+    IC1["IC1<br/>(Instant Center)"]
+    IC2["IC2<br/>(Instant Center)"]
+    LowerArmL["╲ Lower A-Arm Left"]
+    LowerArmR["Lower A-Arm Right ╱"]
+    ChassisLower["═══════ Chassis Lower ═══════"]
+    RC["Roll Center<br/>(80mm height)"]
+    Ground["══════ Ground Plane ══════"]
+    Contact["Contact Patch"]
+    
+    CG --> ChassisRail
+    ChassisRail --> UpperArmL
+    ChassisRail --> UpperArmR
+    UpperArmL --> IC1
+    UpperArmR --> IC2
+    IC1 --> LowerArmL
+    IC2 --> LowerArmR
+    LowerArmL --> ChassisLower
+    LowerArmR --> ChassisLower
+    ChassisLower --> RC
+    RC --> Ground
+    Ground --> Contact
 ```
 
 Raising the roll center by angling the suspension arms upward (inner pivot higher, outer ball joint lower) decreases the vertical distance between CG and roll center, reducing the roll moment arm and therefore the magnitude of lateral weight transfer during cornering. This change produces less aggressive initial turn-in but more predictable mid-corner balance and reduced sensitivity to surface irregularities. Lowering the roll center increases the moment arm, amplifying weight transfer and producing sharper rotation response with increased oversteer tendency. The optimal configuration depends on corner geometry, surface grip level, and driver preference for rotation aggressiveness.
@@ -143,7 +150,7 @@ Tire compound optimization depends critically on operating temperature managemen
 
 The tire temperature measurement protocol requires an infrared thermometer with 1-second response time to capture surface temperature immediately after runs before conductive cooling to the wheel rim occurs. Measure three points across the tire width (inside edge, center, outside edge) to assess camber and tire pressure effects on contact patch loading. Ideal temperature distribution shows ±5°C variation across the width, indicating even contact patch loading. Inside-edge temperatures exceeding outside-edge by >10°C indicate excessive negative camber concentrating load on the inner tread, while outside-edge temperatures exceeding inside-edge suggest insufficient camber or excessive tire pressure causing crown contact.
 
-The diagnostic failure mode decision tree for traction loss isolates root causes through systematic parameter elimination. If the car exhibits front-end push (understeer) in corner entry, the differential diagnosis includes: front springs too stiff preventing weight transfer to front tires, front shock oil too heavy preventing rapid compression response, front roll center too high limiting front weight transfer magnitude, or front tire compound too hard for current temperature. Validate spring stiffness by measuring static sag and dynamic sag under braking: if dynamic sag during hard braking is <60% of total travel, springs are too stiff. Validate damping by removing springs and manually compressing shocks: if resistance feels excessive relative to rear shocks, oil is too heavy. Validate roll center by measuring front vs rear ride height during steady-state cornering (use onboard video to assess body roll magnitude): if front rolls less than rear, front roll center is relatively too high. Validate tire compound by measuring surface temperature post-run: if temperature is <40°C, compound is too hard or run duration too short for thermal activation.
+The diagnostic failure mode decision tree for traction loss isolates root causes through systematic parameter elimination. If the car exhibits front-end push (understeer) in corner entry, the differential diagnosis includes: front springs too stiff preventing weight transfer to front tires, front shock oil too heavy preventing rapid compression response, front roll center too high limiting front weight transfer magnitude, or front tire compound too hard for current temperature. Validate spring stiffness by measuring static sag and dynamic sag under braking: if dynamic sag during hard braking is < 60% of total travel, springs are too stiff. Validate damping by removing springs and manually compressing shocks: if resistance feels excessive relative to rear shocks, oil is too heavy. Validate roll center by measuring front vs rear ride height during steady-state cornering (use onboard video to assess body roll magnitude): if front rolls less than rear, front roll center is relatively too high. Validate tire compound by measuring surface temperature post-run: if temperature is < 40°C, compound is too hard or run duration too short for thermal activation.
 
 Conversely, if the car exhibits excessive rotation or rear-end traction loss during corner exit, the diagnostic tree examines: rear springs too stiff preventing weight transfer to rear tires under acceleration, rear shock oil too light allowing excessive weight transfer rate that overshoots optimal loading, rear roll center too low amplifying lateral weight transfer beyond tire capacity, or rear tire compound too hard or overheated beyond working temperature. Validate through the same methodical measurement approach: static/dynamic sag analysis, manual shock compression resistance assessment, body roll angle measurement from video, and tire temperature verification.
 

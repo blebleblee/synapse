@@ -67,27 +67,34 @@ The System Landscape Directory is the central registry of technical systems, the
 
 The Integration Engine runs inside the ABAP stack and handles synchronous ABAP-proxy-based scenarios. The Advanced Adapter Engine (AAE) runs in the Java stack and handles all adapter-based scenarios: file, JDBC, JMS, HTTP, SOAP, IDoc, RFC, and so on. In the Process Orchestration deployment, BPM (Business Process Management, based on SAP BPM/BPEL) is co-deployed alongside PI, allowing stateful, long-running process orchestration in which a single process instance can send a message, wait for an asynchronous reply, invoke a business rule, and then send a second message based on the result.
 
-```
-PI/PO Message Flow (Advanced Adapter Engine Path)
-──────────────────────────────────────────────────────────────────────────
- Sender System
-     │
-     │  (IDoc / File / SOAP / JDBC adapter)
-     ▼
- Advanced Adapter Engine (AAE) – Sender Channel
-     │  Converts to XI Message (SOAP envelope + attachments)
-     ▼
- Integration Engine
-     │  Applies Receiver Determination  ──► Receiver System(s) resolved
-     │  Applies Interface Determination ──► Target interface selected
-     │  Applies Message Mapping         ──► Payload transformed
-     │  Applies Routing Conditions      ──► Fork / split / merge logic
-     ▼
- Advanced Adapter Engine (AAE) – Receiver Channel
-     │  Converts from XI Message to target protocol
-     ▼
- Receiver System
-──────────────────────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    Sender["Sender System"]
+    Adapter["Advanced Adapter Engine<br/>(AAE) – Sender Channel"]
+    AdapterDesc["Converts to XI Message<br/>(SOAP envelope + attachments)"]
+    Engine["Integration Engine"]
+    ReceiverDet["Applies Receiver Determination<br/>Receiver System(s) resolved"]
+    InterfaceDet["Applies Interface Determination<br/>Target interface selected"]
+    Mapping["Applies Message Mapping<br/>Payload transformed"]
+    Routing["Applies Routing Conditions<br/>Fork / split / merge logic"]
+    ReceiverAdapter["Advanced Adapter Engine<br/>(AAE) – Receiver Channel"]
+    ReceiverAdapterDesc["Converts from XI Message<br/>to target protocol"]
+    Receiver["Receiver System"]
+
+    Sender -->|"IDoc / File / SOAP / JDBC adapter"| Adapter
+    Adapter --> AdapterDesc
+    AdapterDesc --> Engine
+    Engine --> ReceiverDet
+    ReceiverDet -.->|Receiver System(s)<br/>resolved| Engine
+    Engine --> InterfaceDet
+    InterfaceDet -.->|Target interface<br/>selected| Engine
+    Engine --> Mapping
+    Mapping -.->|Payload<br/>transformed| Engine
+    Engine --> Routing
+    Routing -.->|Fork / split /<br/>merge logic| Engine
+    Engine --> ReceiverAdapter
+    ReceiverAdapter --> ReceiverAdapterDesc
+    ReceiverAdapterDesc --> Receiver
 ```
 
 The XI message format is the internal envelope that carries every message through the Integration Engine. It is a SOAP 1.1 message with a mandatory header block containing the sender, receiver, message ID, interface name, interface namespace, and processing flags. This header is what the Integration Engine reads to execute routing decisions. The XI message ID is globally unique and is used for exactly-once delivery guarantees: the engine stores processed message IDs and rejects duplicates, preventing double-posting on retries.

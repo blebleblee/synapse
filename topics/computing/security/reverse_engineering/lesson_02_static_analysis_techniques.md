@@ -134,38 +134,29 @@ The CFG edges encode the successor relationship between basic blocks. A direct u
 
 The following diagram illustrates the CFG of a simple conditional function:
 
-```
-  FUNCTION: check_bounds(int x)
-  ┌─────────────────────────────────┐
-  │  ENTRY BLOCK                    │
-  │  push rbp                       │
-  │  mov  rbp, rsp                  │
-  │  mov  DWORD PTR [rbp-4], edi    │
-  │  cmp  DWORD PTR [rbp-4], 0      │
-  │  jl   .LBB_NEG                  │
-  └────────────┬────────────────────┘
-               │ (fall-through: x >= 0)
-               ▼
-  ┌────────────────────────────┐
-  │  BLOCK_POS                 │
-  │  cmp  DWORD PTR [rbp-4],100│
-  │  jg   .LBB_OOB             │
-  └──────┬─────────────────────┘
-         │ (fall-through: 0 <= x <= 100)
-         ▼
-  ┌──────────────┐    ┌────────────────┐    ┌──────────────┐
-  │  BLOCK_OK    │    │  BLOCK_NEG     │    │  BLOCK_OOB   │
-  │  mov eax, 1  │    │  mov eax, 0    │    │  mov eax, 0  │
-  │  jmp .exit   │    │  jmp .exit     │    │  jmp .exit   │
-  └──────┬───────┘    └───────┬────────┘    └──────┬───────┘
-         │                    │                     │
-         └──────────┬─────────┘─────────────────────┘
-                    ▼
-           ┌─────────────────┐
-           │  EXIT BLOCK     │
-           │  pop rbp        │
-           │  ret            │
-           └─────────────────┘
+```mermaid
+flowchart TD
+    ENTRY["ENTRY BLOCK<br/>push rbp<br/>mov rbp, rsp<br/>mov DWORD PTR [rbp-4], edi<br/>cmp DWORD PTR [rbp-4], 0<br/>jl .LBB_NEG"]
+    
+    BLOCK_POS["BLOCK_POS<br/>cmp DWORD PTR [rbp-4], 100<br/>jg .LBB_OOB"]
+    
+    BLOCK_OK["BLOCK_OK<br/>mov eax, 1<br/>jmp .exit"]
+    
+    BLOCK_NEG["BLOCK_NEG<br/>mov eax, 0<br/>jmp .exit"]
+    
+    BLOCK_OOB["BLOCK_OOB<br/>mov eax, 0<br/>jmp .exit"]
+    
+    EXIT["EXIT BLOCK<br/>pop rbp<br/>ret"]
+    
+    ENTRY -->|"fall-through: x >= 0"| BLOCK_POS
+    ENTRY -.->|"jl .LBB_NEG"| BLOCK_NEG
+    
+    BLOCK_POS -->|"fall-through: 0 <= x <= 100"| BLOCK_OK
+    BLOCK_POS -.->|"jg .LBB_OOB"| BLOCK_OOB
+    
+    BLOCK_OK --> EXIT
+    BLOCK_NEG --> EXIT
+    BLOCK_OOB --> EXIT
 ```
 
 Building a CFG in practice requires identifying all basic block boundaries. A boundary begins at the first instruction of the function, at every branch target, and at every fall-through address following a branch. It ends at every branch instruction, every call instruction that is treated as a terminator (such as `noreturn` calls to `abort` or `__stack_chk_fail`), and every return instruction. Modern tools like Binary Ninja and IDA Pro compute CFGs incrementally during disassembly, using the recursive descent algorithm to simultaneously drive code discovery and block splitting.
@@ -280,17 +271,30 @@ The **Program Dependence Graph** (PDG) superimposes control dependence and data 
 
 The **Inter-procedural Control Flow Graph** (ICFG) connects function-level CFGs through call and return edges, enabling analysis that follows execution across function boundaries. The ICFG is expensive to compute and even more expensive to analyze, because path explosion across call sites grows exponentially with call depth. Practical tools approximate it through **summaries**: a function summary captures the effect of a function on its inputs and outputs without inlining the full function body at every call site, enabling efficient inter-procedural analysis at scale.
 
-```
-INTER-PROCEDURAL DATA FLOW (ICFG PARTIAL VIEW)
+```mermaid
+flowchart LR
+    subgraph main_proc ["main()"]
+        read_buf["read_buf\n(input)"]
+    end
 
-main()                      decrypt()                   memcpy()
-  ┌──────────┐    call         ┌──────────────┐  call    ┌───────────┐
-  │ read_buf │ ──────────────► │ load_key     │          │  dst      │
-  │ (input)  │                 │ xor_round×16 │ ────────►│  src      │
-  └────┬─────┘                 │ write_output │          │  len ◄─── vulnerable if
-       │                       └──────┬───────┘          │          len = f(input)
-       │ (buf_len = attacker)         │ return            └───────────┘
-       └────────────────────────────► len propagates
+    subgraph decrypt_proc ["decrypt()"]
+        load_key["load_key"]
+        xor_round["xor_round × 16"]
+        write_output["write_output"]
+        load_key --> xor_round --> write_output
+    end
+
+    subgraph memcpy_proc ["memcpy()"]
+        dst["dst"]
+        src["src"]
+        len["len\n⚠ vulnerable if\nlen = f(input)"]
+        dst --- src --- len
+    end
+
+    read_buf -->|"call\nbuf_len = attacker-controlled"| load_key
+    write_output -->|"call"| dst
+    write_output -->|"return\nlen propagates"| len
+    read_buf -.->|"buf_len → len"| len
 ```
 
 ---

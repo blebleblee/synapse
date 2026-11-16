@@ -54,38 +54,39 @@ The technical procedure involves multi-sited archival research that traces circu
 
 The integration of these analytical layers produces a multi-dimensional historiographical architecture:
 
-```
-INTELLECTUAL PRODUCTION SYSTEM
-
-Textual Layer: Discourse Analysis
-│ ├─ Metaphoric patterns & conceptual architecture
-│ ├─ Binary oppositions & boundary maintenance
-│ └─ Subject positions & rules of formation
-│
-├─ Institutional Layer: Power-Knowledge Nexus
-│ ├─ Sites of knowledge production & credentialing
-│ ├─ Documentation systems & classificatory schemes
-│ └─ Professional disciplines & methodological orthodoxies
-│
-├─ Social Layer: Networks & Positioning
-│ ├─ Prosopography: collective biography & trajectories
-│ ├─ Network analysis: affiliation & citation patterns
-│ └─ Social structural determinants of access
-│
-├─ Interpretive Layer: Deconstructive Reading
-│ ├─ Rhetorical strategies & performative contradictions
-│ ├─ Aporias & constitutive exclusions
-│ └─ Suppressed alternatives & repressed elements
-│
-├─ Material Layer: Political Economy
-│ ├─ Funding flows & resource allocation
-│ ├─ Labor conditions & institutional organization
-│ └─ Commodification & market logics
-│
-└─ Circulation Layer: Transnational Networks
-  ├─ Translation & appropriation pathways
-  ├─ Metropolitan-peripheral power asymmetries
-  └─ Global institutions & educational migrations
+```mermaid
+flowchart TD
+    A["INTELLECTUAL PRODUCTION SYSTEM"]
+    
+    A --> B["Textual Layer: Discourse Analysis"]
+    B --> B1["Metaphoric patterns & conceptual architecture"]
+    B --> B2["Binary oppositions & boundary maintenance"]
+    B --> B3["Subject positions & rules of formation"]
+    
+    A --> C["Institutional Layer: Power-Knowledge Nexus"]
+    C --> C1["Sites of knowledge production & credentialing"]
+    C --> C2["Documentation systems & classificatory schemes"]
+    C --> C3["Professional disciplines & methodological orthodoxies"]
+    
+    A --> D["Social Layer: Networks & Positioning"]
+    D --> D1["Prosopography: collective biography & trajectories"]
+    D --> D2["Network analysis: affiliation & citation patterns"]
+    D --> D3["Social structural determinants of access"]
+    
+    A --> E["Interpretive Layer: Deconstructive Reading"]
+    E --> E1["Rhetorical strategies & performative contradictions"]
+    E --> E2["Aporias & constitutive exclusions"]
+    E --> E3["Suppressed alternatives & repressed elements"]
+    
+    A --> F["Material Layer: Political Economy"]
+    F --> F1["Funding flows & resource allocation"]
+    F --> F2["Labor conditions & institutional organization"]
+    F --> F3["Commodification & market logics"]
+    
+    A --> G["Circulation Layer: Transnational Networks"]
+    G --> G1["Translation & appropriation pathways"]
+    G --> G2["Metropolitan-peripheral power asymmetries"]
+    G --> G3["Global institutions & educational migrations"]
 ```
 
 Each layer generates distinctive evidence types and requires specific research protocols, but rigorous intellectual history after the modernist crisis integrates multiple layers to produce thick description of how ideas function within complex assemblages of discourse, power, institutions, social relations, material conditions, and global circuits.

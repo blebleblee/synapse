@@ -54,8 +54,8 @@ The choice of how many layers to freeze is determined by two factors: (1) the **
 
 | Target Dataset Size | Domain Similarity | Strategy |
 |---|---|---|
-| Small (<1k) | High | Freeze all backbone, train head only |
-| Small (<1k) | Low | Fine-tune last 2–3 blocks + head |
+| Small (< 1k) | High | Freeze all backbone, train head only |
+| Small (< 1k) | Low | Fine-tune last 2–3 blocks + head |
 | Medium (1k–100k) | High | Fine-tune last block + head |
 | Medium (1k–100k) | Low | Fine-tune entire network with low LR |
 | Large (>100k) | Any | Fine-tune entire network |

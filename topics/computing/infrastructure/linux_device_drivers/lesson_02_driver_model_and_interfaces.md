@@ -721,12 +721,14 @@ For kernel-allocated buffers (not MMIO), use `vm_insert_page()` or `dma_mmap_coh
 Modern drivers must implement the kernel's **Runtime PM** framework (`drivers/base/power/runtime.c`). Runtime PM allows the kernel to automatically suspend a device when it has been idle for a configurable period and resume it on demand, transparent to user space.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Active : probe() completes
-    Active --> Suspended : rpm_suspend()\n(idle timer expires)
-    Suspended --> Active : rpm_resume()\n(I/O request arrives)
-    Active --> [*] : remove() called
-    Suspended --> [*] : remove() calls\npm_runtime_disable()
+flowchart TD
+    Start([Start]) --> Active["Active"]
+    Active -->|"rpm_suspend()<br/>(idle timer expires)"| Suspended["Suspended"]
+    Suspended -->|"rpm_resume()<br/>(I/O request arrives)"| Active
+    Active -->|"remove() called"| End1([End])
+    Suspended -->|"remove() calls<br/>pm_runtime_disable()"| End2([End])
+    
+    Start -.->|"probe() completes"| Active
 ```
 
 The driver implements `.runtime_suspend` and `.runtime_resume` callbacks in a `struct dev_pm_ops`, then calls `pm_runtime_enable()` during probe. The kernel's PM core manages the state machine; the driver only describes the hardware transitions.

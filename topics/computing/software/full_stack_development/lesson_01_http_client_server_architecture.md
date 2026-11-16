@@ -85,33 +85,38 @@ HTTP/2 multiplexes multiple request-response streams over a single TCP connectio
 
 The protocol flow for a typical API request proceeds as follows:
 
-```
-Client                                    Server
-  |                                         |
-  |--- TCP SYN -------------------------->  |
-  |<-- TCP SYN+ACK ------------------------ |
-  |--- TCP ACK --------------------------->  |
-  |                                         |
-  |--- TLS ClientHello ------------------->  |
-  |<-- TLS ServerHello + Certificate ----- |
-  |--- TLS ClientKeyExchange ------------>  |
-  |<-- TLS Finished ----------------------- |
-  |--- TLS Finished ---------------------->  |
-  |                                         |
-  |--- HTTP Request ---------------------->  |
-  |    GET /api/users/42 HTTP/1.1          |
-  |    Host: api.example.com                |
-  |    Authorization: Bearer <token>        |
-  |    Accept: application/json             |
-  |                                         |
-  |<-- HTTP Response --------------------- |
-  |    HTTP/1.1 200 OK                      |
-  |    Content-Type: application/json       |
-  |    Content-Length: 512                  |
-  |    {"id":42,"name":"Alice",...}         |
-  |                                         |
-  |--- TCP FIN --------------------------->  |
-  |<-- TCP FIN+ACK ------------------------ |
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+
+    rect rgb(220, 235, 255)
+        Note over C,S: TCP Handshake
+        C->>S: TCP SYN
+        S->>C: TCP SYN+ACK
+        C->>S: TCP ACK
+    end
+
+    rect rgb(220, 255, 220)
+        Note over C,S: TLS Handshake
+        C->>S: TLS ClientHello
+        S->>C: TLS ServerHello + Certificate
+        C->>S: TLS ClientKeyExchange
+        S->>C: TLS Finished
+        C->>S: TLS Finished
+    end
+
+    rect rgb(255, 245, 210)
+        Note over C,S: HTTP Exchange
+        C->>S: GET /api/users/42 HTTP/1.1<br/>Host: api.example.com<br/>Authorization: Bearer &lt;token&gt;<br/>Accept: application/json
+        S->>C: HTTP/1.1 200 OK<br/>Content-Type: application/json<br/>Content-Length: 512<br/>{"id":42,"name":"Alice",...}
+    end
+
+    rect rgb(255, 220, 220)
+        Note over C,S: TCP Teardown
+        C->>S: TCP FIN
+        S->>C: TCP FIN+ACK
+    end
 ```
 
 Chunked transfer encoding solves the problem of streaming responses with unknown lengths. Instead of requiring `Content-Length`, the server transmits the body as a sequence of chunks, each prefixed by its hexadecimal size:

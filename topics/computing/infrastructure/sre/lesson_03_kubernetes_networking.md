@@ -100,13 +100,22 @@ The `cali*` interface is the host-side of the veth pair. Calico's `bird` daemon 
 
 In iptables mode, kube-proxy creates chains in the `nat` table of netfilter. The structure is:
 
-```
-PREROUTING → KUBE-SERVICES
-                └→ KUBE-SVC-<hash>  (matches clusterIP:port)
-                        └→ KUBE-SEP-<hash1>  (33% probability → pod1)
-                        └→ KUBE-SEP-<hash2>  (50% probability → pod2)
-                        └→ KUBE-SEP-<hash3>  (100% probability → pod3)
-                                └→ DNAT to podIP:targetPort
+```mermaid
+flowchart TD
+    A["PREROUTING"]
+    B["KUBE-SERVICES"]
+    C["KUBE-SVC-&lt;hash&gt;<br/>matches clusterIP:port"]
+    D["KUBE-SEP-&lt;hash1&gt;<br/>33% → pod1"]
+    E["KUBE-SEP-&lt;hash2&gt;<br/>50% → pod2"]
+    F["KUBE-SEP-&lt;hash3&gt;<br/>100% → pod3"]
+    G["DNAT to podIP:targetPort"]
+    
+    A --> B
+    B --> C
+    C --> D
+    C --> E
+    C --> F
+    F --> G
 ```
 
 The probabilistic selection uses iptables `-m statistic --mode random --probability`. The fundamental problem: netfilter evaluates rules linearly. For a cluster with 10,000 services averaging 5 pods each, kube-proxy creates approximately 50,000 `KUBE-SEP-*` rules. A single packet traverses O(n) rules before matching. Rule updates (pod churn) require a full `iptables-restore` of the entire ruleset, which acquires a global `xtables` lock—blocking all other iptables operations on the node. At scale, this lock contention causes multi-second disruptions during deployments.

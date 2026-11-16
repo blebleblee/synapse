@@ -22,55 +22,39 @@ The race engineer confronting a telemetry trace showing unexpected oscillation i
 
 The physical architecture of a racing vehicle's diagnostic network typically follows a distributed topology where subsystem control modules—engine management, transmission controller, data acquisition unit, dashboard display—interconnect via one or more CAN bus networks operating at standardized baud rates. Professional motorsport applications commonly deploy dual-redundant CAN networks: a high-speed powertrain bus running at 500 kilobits per second or 1 megabit per second carrying time-critical engine and transmission data, and a lower-speed chassis bus at 250 or 125 kilobits per second handling less latency-sensitive measurements like suspension position and tire pressure. This segregation prevents chassis sensor traffic from introducing transmission delays into engine control feedback loops where millisecond-scale timing precision directly impacts combustion phasing and torque delivery.
 
-```
-Vehicle Diagnostic Network Topology
+```mermaid
+flowchart TD
+    subgraph powertrain ["High-Speed Powertrain Bus — 500 kbps / 1 Mbps"]
+        direction TB
+        Logger["Data Acquisition &amp; Logging Unit<br/>(Primary Logger)"]
+        PT_Bus["CAN_H / CAN_L — Twisted Pair Differential"]
+        ECU["Engine Control Unit (ECU)<br/>• Throttle Position<br/>• Lambda Sensors<br/>• Ignition Timing<br/>• Fuel Pressure"]
+        TCU["Transmission Control Unit (TCU)<br/>• Gear Position<br/>• Clutch Pressure<br/>• Shaft Speed<br/>• Shift Solenoids"]
+        Logger --- PT_Bus
+        ECU --- PT_Bus
+        TCU --- PT_Bus
+    end
 
-                           ┌─────────────────────┐
-                           │  Data Acquisition   │
-                           │  & Logging Unit     │
-                           │  (Primary Logger)   │
-                           └──────────┬──────────┘
-                                      │
-                    ┌─────────────────┼─────────────────┐
-                    │                 │                 │
-                    │    CAN_H ───────┴──────── CAN_L  │
-                    │    (High-Speed Powertrain Bus)   │
-                    │         500 kbps / 1 Mbps        │
-                    │                                   │
-        ┌───────────┴───────────┐         ┌────────────┴───────────┐
-        │   Engine Control      │         │   Transmission Control │
-        │   Unit (ECU)          │         │   Unit (TCU)          │
-        │                       │         │                       │
-        │ • Throttle Position   │         │ • Gear Position       │
-        │ • Lambda Sensors      │         │ • Clutch Pressure     │
-        │ • Ignition Timing     │         │ • Shaft Speed         │
-        │ • Fuel Pressure       │         │ • Shift Solenoids     │
-        └───────────────────────┘         └───────────────────────┘
-        
-                           ┌─────────────────────┐
-                           │  Dashboard Display  │
-                           │  & Driver Interface │
-                           └──────────┬──────────┘
-                                      │
-                    ┌─────────────────┼─────────────────┐
-                    │                 │                 │
-                    │    CAN_H ───────┴──────── CAN_L  │
-                    │    (Lower-Speed Chassis Bus)     │
-                    │           250 kbps               │
-                    │                                   │
-        ┌───────────┴────────────┐        ┌───────────┴────────────┐
-        │  Suspension Damper     │        │  Brake System Module   │
-        │  Controller            │        │                        │
-        │                        │        │ • Brake Pressure (F/R) │
-        │ • Linear Potentiometers│        │ • Fluid Temperature    │
-        │ • Damper Current       │        │ • Pad Wear Sensors     │
-        │ • Ride Height          │        │ • Proportioning Valve  │
-        └────────────────────────┘        └────────────────────────┘
+    subgraph chassis ["Lower-Speed Chassis Bus — 250 kbps"]
+        direction TB
+        Dash["Dashboard Display &amp; Driver Interface"]
+        CH_Bus["CAN_H / CAN_L — Twisted Pair Differential"]
+        SUSP["Suspension Damper Controller<br/>• Linear Potentiometers<br/>• Damper Current<br/>• Ride Height"]
+        BRAKE["Brake System Module<br/>• Brake Pressure (F/R)<br/>• Fluid Temperature<br/>• Pad Wear Sensors<br/>• Proportioning Valve"]
+        Dash --- CH_Bus
+        SUSP --- CH_Bus
+        BRAKE --- CH_Bus
+    end
 
-        ┌──────────────────────────────────────────────────────────┐
-        │  120Ω Termination        Twisted Pair         120Ω Term  │
-        │  Resistor (Bus End)      Differential         Resistor   │
-        └──────────────────────────────────────────────────────────┘
+    Term["120Ω Termination Resistor (Bus End) — Twisted Pair Differential — 120Ω Termination Resistor"]
+
+    PT_Bus -.- Term
+    CH_Bus -.- Term
+
+    classDef busNode fill:#e8eef7,stroke:#3b5998,stroke-width:2px,color:#1a2a4a
+    classDef termNode fill:#f7efe0,stroke:#b5651d,stroke-width:1px,stroke-dasharray:5 3,color:#5a3a10
+    class PT_Bus,CH_Bus busNode
+    class Term termNode
 ```
 
 The fundamental signal types flowing across this network architecture divide into analog continuous-time voltages at the sensor level and digital packetized messages at the network level. Analog sensors produce output voltages that vary continuously with the measured physical quantity. A resistive throttle position sensor, mechanically coupled to the throttle butterfly shaft, implements a potentiometric voltage divider: applying a stable 5-volt reference across a resistive track with a movable wiper contact produces an output voltage proportional to angular position. At closed throttle, the wiper sits at ground potential (0 volts); at wide-open throttle, it connects to the 5-volt reference. The analog voltage between these extremes varies linearly with throttle angle, providing a continuous representation of driver input.

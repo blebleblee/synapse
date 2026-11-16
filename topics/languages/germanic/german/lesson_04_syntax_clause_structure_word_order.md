@@ -24,16 +24,15 @@ The Vorfeld enforces a strict capacity constraint: exactly one constituent may o
 
 The topological field model is best understood through its physical layout before examining the rules that govern each zone. The following diagram renders the full bracket architecture of a German main clause.
 
-```
-┌─────────────┬──────────────────┬────────────────────────────────────┬──────────────────┬──────────────┐
-│   VORFELD   │  LINKE KLAMMER   │           MITTELFELD               │  RECHTE KLAMMER  │   NACHFELD   │
-│  (Prefield) │  (Left Bracket)  │         (Middle Field)             │  (Right Bracket) │ (Postfield)  │
-│             │                  │                                    │                  │              │
-│  1 constit. │  finite verb     │  subjects, objects, adjuncts,      │  infinitive,     │  heavy/extra │
-│  only       │  (main clause)   │  pronouns, negation, clitics       │  participle,     │  constituents│
-│             │  OR conjunction  │                                    │  prefix, modal   │              │
-│             │  (sub. clause)   │                                    │  inf.            │              │
-└─────────────┴──────────────────┴────────────────────────────────────┴──────────────────┴──────────────┘
+```mermaid
+flowchart LR
+    A["VORFELD<br/>(Prefield)<br/><br/>1 constituent<br/>only"]
+    B["LINKE KLAMMER<br/>(Left Bracket)<br/><br/>finite verb<br/>(main clause)<br/>OR conjunction<br/>(subordinate clause)"]
+    C["MITTELFELD<br/>(Middle Field)<br/><br/>subjects, objects,<br/>adjuncts, pronouns,<br/>negation, clitics"]
+    D["RECHTE KLAMMER<br/>(Right Bracket)<br/><br/>infinitive,<br/>participle, prefix,<br/>modal infinitive"]
+    E["NACHFELD<br/>(Postfield)<br/><br/>heavy/extra<br/>constituents"]
+    
+    A --> B --> C --> D --> E
 ```
 
 A concrete main clause fills this topology as follows. Take the sentence *Dem alten Mann hat sie das Buch leider nicht gegeben* ("She unfortunately did not give the book to the old man"):
@@ -59,12 +58,25 @@ Pronominal subjects and objects sit near the left edge of the Mittelfeld, immedi
 
 When a subordinating conjunction introduces a clause, the topology reorganizes fundamentally. The conjunction occupies the left bracket position, and the finite verb — which in a main clause would be anchored in that same left bracket — migrates to the right bracket. The Vorfeld disappears entirely; there is no prefield in a subordinate clause. All constituents, including the subject, distribute into the Mittelfeld, and the finite verb closes the clause at the right edge.
 
-```
-Main clause:     Er   │ kommt  │ heute nicht
-                 Vf   │  LK    │ Mittelfeld
-
-Sub. clause:  weil │ er   heute nicht    │ kommt
-              LK   │      Mittelfeld     │  RK (finite verb)
+```mermaid
+flowchart TD
+    subgraph main ["Main Clause (Hauptsatz)"]
+        direction LR
+        M1["Er<br/><i>Vf (Vorfeld)</i>"]
+        M2["kommt<br/><i>LK (Linke Klammer)</i>"]
+        M3["heute nicht<br/><i>Mittelfeld</i>"]
+        M1 --> M2 --> M3
+    end
+    
+    subgraph sub ["Subordinate Clause (Nebensatz)"]
+        direction LR
+        S1["weil<br/><i>LK (Linke Klammer)</i>"]
+        S2["er heute nicht<br/><i>Mittelfeld</i>"]
+        S3["kommt<br/><i>RK (Rechte Klammer)</i><br/><i>finite verb</i>"]
+        S1 --> S2 --> S3
+    end
+    
+    main ~~~ sub
 ```
 
 The word *weil* ("because") occupies the left bracket, displacing the finite verb to the right bracket. The subject *er*, the temporal adjunct *heute*, and the negation *nicht* all sit in the Mittelfeld. The sentence is not interpretable until *kommt* arrives at the end. This verb-final constraint applies equally to relative clauses (*das Buch, das er ihr gegeben hat*), *dass*-complements (*Ich weiß, dass er heute nicht kommt*), and indirect questions (*Ich frage mich, ob er kommen wird*).

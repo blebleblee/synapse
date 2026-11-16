@@ -28,33 +28,29 @@ The core idea in Raft is leader-based replication with strong invariants around 
 
 The term is Raft's logical clock. It is a monotonically increasing integer that advances each time an election begins. Every RPC in Raft carries the sender's current term. If a node receives a message with a higher term, it immediately demotes itself to follower. If it receives a message with a lower term, it rejects it. This prevents split-brain scenarios where a deposed leader continues issuing commands that the cluster has already moved past.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    RAFT CLUSTER (5 Nodes)                    │
-│                                                              │
-│  ┌──────────┐    AppendEntries RPC    ┌──────────┐          │
-│  │          │ ──────────────────────► │          │          │
-│  │  LEADER  │                         │ FOLLOWER │          │
-│  │  (Node1) │ ◄────────────────────── │  (Node2) │          │
-│  │          │       ACK (success)     │          │          │
-│  └────┬─────┘                         └──────────┘          │
-│       │                                                      │
-│       │  AppendEntries RPC            ┌──────────┐          │
-│       └──────────────────────────────►│          │          │
-│       ◄────────────────────────────── │ FOLLOWER │          │
-│              ACK (success)            │  (Node3) │          │
-│                                       └──────────┘          │
-│                                                              │
-│  Quorum = ⌊5/2⌋ + 1 = 3   (Nodes 1, 2, 3 commit entry)     │
-│                                                              │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  LOG STATE (Leader)                                  │   │
-│  │  Index:  [1]      [2]      [3]      [4]      [5]    │   │
-│  │  Term:    1        1        2        2        3      │   │
-│  │  Cmd:    SET x    SET y   DEL z   SET w    SET v    │   │
-│  │  Status: COMMIT  COMMIT  COMMIT  COMMIT   PENDING   │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph cluster["RAFT CLUSTER (5 Nodes)"]
+        leader["LEADER<br/>(Node1)"]
+        follower2["FOLLOWER<br/>(Node2)"]
+        follower3["FOLLOWER<br/>(Node3)"]
+        
+        leader -->|"AppendEntries RPC"| follower2
+        follower2 -->|"ACK (success)"| leader
+        
+        leader -->|"AppendEntries RPC"| follower3
+        follower3 -->|"ACK (success)"| leader
+        
+        quorum["Quorum = ⌊5/2⌋ + 1 = 3<br/>(Nodes 1, 2, 3 commit entry)"]
+        
+        logstate["LOG STATE (Leader)<br/>─────────────────────────────<br/>Index: [1] [2] [3] [4] [5]<br/>Term: 1 1 2 2 3<br/>Cmd: SET x | SET y | DEL z | SET w | SET v<br/>Status: COMMIT | COMMIT | COMMIT | COMMIT | PENDING"]
+    end
+    
+    style leader fill:#4a90e2,stroke:#2e5c8a,color:#fff
+    style follower2 fill:#7fb3d5,stroke:#4a90e2,color:#fff
+    style follower3 fill:#7fb3d5,stroke:#4a90e2,color:#fff
+    style quorum fill:#f0f0f0,stroke:#999,color:#333
+    style logstate fill:#fff8dc,stroke:#daa520,color:#333
 ```
 
 Election works through a randomized timeout mechanism that sidesteps the FLP impossibility result. Each follower maintains an election timer, reset whenever it receives a valid heartbeat from the leader. If the timer expires without a heartbeat — indicating the leader has failed or the network has partitioned — the follower transitions to candidate, increments its term, votes for itself, and broadcasts a `RequestVote` RPC. A node grants its vote to the first candidate it hears from in a given term, provided the candidate's log is at least as up-to-date as its own. The randomization of the election timeout (typically spread over a range like 150–300ms) ensures that multiple candidates rarely compete simultaneously, minimizing split votes.
@@ -289,46 +285,32 @@ This implementation makes the invariants tangible. The `AppendEntries` handler's
 
 Consistency models are contracts between a distributed storage system and its clients. They form a strict hierarchy: each model in the following diagram is strictly weaker than the one above it, meaning every execution that satisfies a stronger model also satisfies every weaker model, but not vice versa.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│              CONSISTENCY MODEL HIERARCHY (Strongest → Weakest)   │
-│                                                                   │
-│  ┌─────────────────────────────────────────────────────────┐     │
-│  │  STRICT SERIALIZABILITY  (Linearizable + Serializable)  │     │
-│  │  Reads/writes appear as if executed atomically at a      │     │
-│  │  single point in real time. FoundationDB, Spanner.       │     │
-│  └────────────────────────┬────────────────────────────────┘     │
-│                            │ weaker                               │
-│  ┌─────────────────────────▼──────────────────────────────┐      │
-│  │  LINEARIZABILITY  (External Consistency)                │      │
-│  │  Every operation appears instantaneous between its       │      │
-│  │  invocation and response. Single-object safety.          │      │
-│  │  etcd, ZooKeeper (reads from leader).                    │      │
-│  └────────────────────────┬────────────────────────────────┘      │
-│                            │ weaker                                │
-│  ┌─────────────────────────▼──────────────────────────────┐       │
-│  │  SEQUENTIAL CONSISTENCY                                  │       │
-│  │  All processes see operations in the same order,         │       │
-│  │  not necessarily real-time order.                        │       │
-│  └────────────────────────┬────────────────────────────────┘       │
-│                            │ weaker                                 │
-│  ┌─────────────────────────▼──────────────────────────────┐        │
-│  │  CAUSAL CONSISTENCY                                      │        │
-│  │  Causally related operations are seen in causal order.   │        │
-│  │  Concurrent ops may differ across nodes. COPS, Riak.     │        │
-│  └────────────────────────┬────────────────────────────────┘        │
-│                            │ weaker                                  │
-│  ┌─────────────────────────▼──────────────────────────────┐         │
-│  │  MONOTONIC READ / MONOTONIC WRITE / READ-YOUR-WRITES     │         │
-│  │  Session-level guarantees. DynamoDB with sessions.        │         │
-│  └────────────────────────┬────────────────────────────────┘         │
-│                            │ weaker                                   │
-│  ┌─────────────────────────▼──────────────────────────────┐          │
-│  │  EVENTUAL CONSISTENCY                                    │          │
-│  │  Given no new writes, all replicas converge.             │          │
-│  │  Cassandra (ONE read level), DynamoDB (default).          │          │
-│  └─────────────────────────────────────────────────────────┘          │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    SS["**STRICT SERIALIZABILITY**\nLinearizable + Serializable\nReads/writes appear as if executed atomically\nat a single point in real time.\n_FoundationDB, Spanner_"]
+
+    LIN["**LINEARIZABILITY**\nExternal Consistency\nEvery operation appears instantaneous between\nits invocation and response. Single-object safety.\n_etcd, ZooKeeper (reads from leader)_"]
+
+    SEQ["**SEQUENTIAL CONSISTENCY**\nAll processes see operations in the same order,\nnot necessarily real-time order."]
+
+    CAU["**CAUSAL CONSISTENCY**\nCausally related operations are seen in causal order.\nConcurrent ops may differ across nodes.\n_COPS, Riak_"]
+
+    MON["**MONOTONIC READ / MONOTONIC WRITE / READ-YOUR-WRITES**\nSession-level guarantees.\n_DynamoDB with sessions_"]
+
+    EVT["**EVENTUAL CONSISTENCY**\nGiven no new writes, all replicas converge.\n_Cassandra (ONE read level), DynamoDB (default)_"]
+
+    SS -->|weaker| LIN
+    LIN -->|weaker| SEQ
+    SEQ -->|weaker| CAU
+    CAU -->|weaker| MON
+    MON -->|weaker| EVT
+
+    style SS  fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style LIN fill:#16213e,stroke:#e94560,color:#ffffff
+    style SEQ fill:#16213e,stroke:#f5a623,color:#ffffff
+    style CAU fill:#16213e,stroke:#f5a623,color:#ffffff
+    style MON fill:#16213e,stroke:#7ed321,color:#ffffff
+    style EVT fill:#16213e,stroke:#7ed321,color:#ffffff
 ```
 
 Linearizability is the strongest single-object consistency model and the one most practitioners mean when they casually say "consistent." A linearizable system behaves as if there is exactly one copy of the data, and every operation takes effect atomically at some point between the moment the client sends the request and the moment the client receives the response. This real-time ordering requirement is what makes linearizability expensive: to satisfy it, a system must coordinate with a quorum before returning any read, not just any write. A system that handles writes through quorum but serves reads from a single replica is not linearizable, because that replica's view of the world might lag behind a completed write.

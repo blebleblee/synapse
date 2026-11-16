@@ -1134,7 +1134,7 @@ After completing all labs, verify:
 - [ ] VMs successfully provision and migrate between nodes
 - [ ] Longhorn volumes maintain 3 replicas and survive node failures
 - [ ] VLAN networks allow VM-to-VM communication without cluster network involvement
-- [ ] Migration completes within predictable timeframes (<5 minutes for 2GB VM)
+- [ ] Migration completes within predictable timeframes (< 5 minutes for 2GB VM)
 - [ ] Replica rebuild completes automatically after simulated failures
 - [ ] Resource limits prevent VM overcommit from affecting node stability
 - [ ] Network throughput meets expected performance (>1 Gbps for virtio)
@@ -1170,3 +1170,4 @@ tcpdump -i <interface> -e -n vlan <id>
 # Resource monitoring
 kubectl top pods -l kubevirt.io/vm=<name>
 kubectl get vmi <name> -o jsonpath='{.status.migrationState}'
+```

@@ -22,30 +22,24 @@ To execute techniques reliably, a runner needs an accurate mental model of exact
 
 The practical upshot is that your physical input must be established *before* the LATCH pulse fires. If you press a button one microsecond after the latch, your input will not register until the following frame. The game is therefore not "reading" your controller in real time; it is reading a snapshot that was taken at the frame boundary. This is why experienced runners speak of "buffering" inputs — they mean pressing a button earlier than the moment of intended effect, ensuring the input is captured in the next available snapshot.
 
-```
-Physical Button Press
-        │
-        ▼
-  Controller Shift Register (4021)
-        │
-        │  (LATCH pulse, ~16.67ms interval)
-        ▼
-  NES CPU reads $4016/$4017
-        │
-        ▼
-  Game RAM: Button State Byte (8 bits)
-        │
-        ▼
-  Game Logic Loop (runs post-VBlank)
-        │
-        ▼
-  Physics Update → Collision → State Change
-        │
-        ▼
-  PPU Renders Frame to Screen (~1 frame later)
-        │
-        ▼
-  Display (CRT: ~0–1ms, LCD: 10–50ms additional)
+```mermaid
+flowchart TD
+    btn["Physical Button Press"]
+    sr["Controller Shift Register (4021)"]
+    cpu["NES CPU reads $4016/$4017"]
+    ram["Game RAM: Button State Byte (8 bits)"]
+    loop["Game Logic Loop (runs post-VBlank)"]
+    logic["Physics Update → Collision → State Change"]
+    ppu["PPU Renders Frame to Screen (~1 frame later)"]
+    display["Display (CRT: ~0–1ms, LCD: 10–50ms additional)"]
+
+    btn --> sr
+    sr -- "(LATCH pulse, ~16.67ms interval)" --> cpu
+    cpu --> ram
+    ram --> loop
+    loop --> logic
+    logic --> ppu
+    ppu --> display
 ```
 
 This pipeline has two important consequences for the runner. First, there is an irreducible one-frame lag between input capture and visual confirmation that the input had its intended effect, because the PPU rendering the result of this frame's logic will not appear on screen until the next VBlank. Second, any additional display latency from an LCD monitor, capture card, or upscaler inserts delay between the visual cue the runner uses to time their next input and the actual game state. A runner playing on original hardware through a CRT experiences roughly 0–1ms of display lag. A runner playing through a cheap LCD capture setup might experience 50–80ms of additional lag, which is 3–5 frames of distortion in the visual feedback loop. This matters enormously for frame-sensitive tricks and is a primary reason the speedrunning community has converged on specific hardware configurations, which we will examine in Section 3.

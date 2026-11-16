@@ -53,25 +53,42 @@ The `uses` and `provides` directives implement the service provider interface (S
 
 The module graph is resolved by the JVM's module system layer, implemented in the `java.lang.module` package. The `ModuleFinder` abstraction locates module descriptors from the module path, the JDK's internal modules, and optionally from custom sources. The `Configuration` class represents a resolved module graph, computed by starting from a set of root modules and recursively resolving their dependencies. The resolution algorithm performs topological sorting, cycle detection, and conflict resolution: if two modules export the same package, resolution fails with a split package error unless one module is `opens`ed or the conflict is explicitly resolved via `--add-reads` and `--patch-module` JVM options.
 
-```
-Module Graph Resolution (ASCII):
+```mermaid
+flowchart TD
+    subgraph L5["Resolution Level 5"]
+        app["com.example.app (root)"]
+    end
+    subgraph L4["Resolution Level 4"]
+        core["com.example.core"]
+        slf4j["org.slf4j.api"]
+    end
+    subgraph L3["Resolution Level 3"]
+        api["com.example.api"]
+    end
+    subgraph L2["Resolution Level 2"]
+        sql["java.sql"]
+        logging["java.logging"]
+    end
+    subgraph L1["Resolution Level 1"]
+        base["java.base"]
+    end
 
- Root Module: com.example.app
-     |
-     |--requires--> java.base (automatic, always present)
-     |--requires--> com.example.core
-     |                  |--requires--> java.sql
-     |                  |--requires transitive--> com.example.api
-     |
-     |--requires--> org.slf4j.api
-                       |--requires--> java.logging
+    app -.->|requires automatic| base
+    app -->|requires| core
+    core -->|requires| sql
+    core -->|"requires transitive"| api
+    app -->|requires| slf4j
+    slf4j -->|requires| logging
 
-Resolution order (topological sort):
-  1. java.base
-  2. java.sql, java.logging
-  3. com.example.api
-  4. com.example.core, org.slf4j.api
-  5. com.example.app
+    linkStyle 3 stroke:#c62828,stroke-width:3px
+
+    classDef jdk fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef appMod fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef rootMod fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
+
+    class app rootMod
+    class base,sql,logging jdk
+    class core,api,slf4j appMod
 ```
 
 At runtime, the module system enforces accessibility through modifications to the JVM's class resolution and method linkage logic. When a class in module A references a class in module B, the JVM verifies that A reads B and that B exports the containing package. This check occurs during class loading and is cached in the constant pool resolution metadata. Reflective access via `Class.forName()` performs the same checks; the caller's module must read the target module, and the target package must be exported. The `setAccessible(true)` method on `AccessibleObject` (superclass of `Field`, `Method`, and `Constructor`) performs additional checks: it succeeds only if the target package is opened to the caller's module or if the caller has been granted permission via `--add-opens`.

@@ -73,27 +73,31 @@ Enhancers function through binding of transcriptional activators—sequence-spec
 
 The spatial mechanism by which distal enhancers communicate with promoters remained mysterious until chromosome conformation capture (3C) technologies revealed that chromatin exists in dynamic three-dimensional loop structures. Enhancers and promoters are brought into close spatial proximity through **DNA looping**, mediated by the coordinated action of transcription factors, Mediator, and the cohesin complex. Cohesin, a ring-shaped protein assembly that topologically encircles DNA, stabilizes enhancer-promoter loops by constraining chromatin flexibility. The loop extrusion model posits that cohesin actively extrudes chromatin loops until encountering boundary elements such as CTCF-bound insulators, which define the spatial domains within which enhancer-promoter interactions can occur.
 
-```
-Enhancer-Promoter Loop Formation:
-
-Inactive State (Linear Chromatin):
-5'—[Enhancer]——————————————————————[Promoter]——[Gene]—3'
-         |                                    |
-    Activators bind                      Pol II paused
+```mermaid
+flowchart TD
+    subgraph inactive ["Inactive State (Linear Chromatin)"]
+        E1["Enhancer"] --> Linear["———————————————————"] --> P1["Promoter"] --> G1["Gene"]
+        E1 -.-> Act1["Activators bind"]
+        P1 -.-> Pol1["Pol II paused"]
+    end
     
-Active State (Looped Chromatin):
-         [Enhancer]————————————————————————┐
-              |                            |
-         Activators + Coactivators         |
-              |                            |
-              └──────────[Mediator]────────┘
-                            |
-                       [Promoter]——[Gene]—3'
-                            |
-                       Pol II active
-                       
-Cohesin rings stabilize loop
-CTCF insulators define boundaries
+    subgraph active ["Active State (Looped Chromatin)"]
+        E2["Enhancer"]
+        E2 --> ActCo["Activators + Coactivators"]
+        ActCo --> Med["Mediator"]
+        Med --> P2["Promoter"]
+        P2 --> G2["Gene"]
+        P2 --> Pol2["Pol II active"]
+        E2 -.->|Loop formation| P2
+    end
+    
+    subgraph regulation ["Regulatory Factors"]
+        Coh["Cohesin rings stabilize loop"]
+        CTCF["CTCF insulators define boundaries"]
+    end
+    
+    inactive ==> active
+    regulation -.-> active
 ```
 
 Enhancer activity is highly cell-type-specific, driven by the combinatorial binding of lineage-determining transcription factors. For example, the β-globin locus control region (LCR)—a cluster of enhancers located 6–20 kb upstream of the β-globin gene—activates high-level expression exclusively in erythroid cells through binding of erythroid-specific factors such as GATA1, NF-E2, and KLF1. Deletion of the LCR abolishes β-globin expression and causes β-thalassemia, demonstrating the functional indispensability of enhancers for physiological gene regulation.
@@ -224,7 +228,7 @@ Bulk chromatin profiling averages signals across millions of cells, obscuring ce
 
 Analysis of scATAC-seq data requires specialized computational pipelines. After demultiplexing, cells are filtered based on total fragments (typically 1,000–50,000 per cell) and fraction of reads in peaks versus background, removing low-quality cells and doublets. Dimensionality reduction through latent semantic indexing (LSI) or topic modeling compresses the sparse accessibility matrix, followed by graph-based clustering (e.g., Louvain algorithm) to identify cell types. Trajectory inference algorithms (Monocle3, Slingshot) order cells along pseudotime axes, reconstructing differentiation trajectories and identifying temporally dynamic regulatory elements.
 
-**scChIP-seq** for transcription factors and histone modifications faces greater technical challenges than scATAC-seq due to lower target abundance (10³–10⁵ factor molecules per cell versus 10⁷ histones). Drop-ChIP and CoBATCH (Combinatorial Barcoding and Targeted Chromatin release) methods use droplet microfluidics and combinatorial indexing, respectively, to achieve moderate throughput (1,000–10,000 cells), but data sparsity remains severe with typically <1% of potential binding sites covered per cell. Population-level inferences require aggregating hundreds of similar cells, limiting single-cell resolution.
+**scChIP-seq** for transcription factors and histone modifications faces greater technical challenges than scATAC-seq due to lower target abundance (10³–10⁵ factor molecules per cell versus 10⁷ histones). Drop-ChIP and CoBATCH (Combinatorial Barcoding and Targeted Chromatin release) methods use droplet microfluidics and combinatorial indexing, respectively, to achieve moderate throughput (1,000–10,000 cells), but data sparsity remains severe with typically < 1% of potential binding sites covered per cell. Population-level inferences require aggregating hundreds of similar cells, limiting single-cell resolution.
 
 Multi-omic single-cell assays simultaneously profile chromatin accessibility, transcriptome, and proteome from the same cells, enabling integrated analysis of gene regulation. **SHARE-seq** and **10X Multiome** co-assay scATAC-seq and scRNA-seq by splitting cell lysates between separate tagmentation and reverse transcription reactions with shared barcodes. Correlation of accessibility and expression at individual regulatory elements identifies functional enhancers and quantifies enhancer-promoter coupling at single-cell resolution.
 

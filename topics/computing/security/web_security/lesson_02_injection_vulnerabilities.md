@@ -225,32 +225,30 @@ Here, `render_template_string` receives a template string that it compiles once.
 
 The execution flow across all four injection classes can be summarized in a single architectural diagram:
 
-```
-  Attacker Input
-       │
-       ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                     APPLICATION LAYER                            │
-│                                                                  │
-│  UNSAFE PATH:  input → string concat → interpreter              │
-│               (data enters token stream as control tokens)       │
-│                                                                  │
-│  SAFE PATH:    input → parameter binding → pre-compiled AST      │
-│               (data never touches the token stream)             │
-└──────────────────────────────────────────────────────────────────┘
-       │                              │
-       ▼                              ▼
- INTERPRETER                    INTERPRETER
- receives modified               receives original
- AST (attacker wins)             AST (developer wins)
-       │
-       ▼
- ┌─────────────────────────────────────┐
- │  SQL Engine  → data exfiltration    │
- │  POSIX Shell → OS command execution │
- │  Browser DOM → session hijacking    │
- │  Jinja2 Eval → server RCE           │
- └─────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Input["Attacker Input"]
+    
+    Input --> AppLayer
+    
+    subgraph AppLayer ["APPLICATION LAYER"]
+        direction TB
+        UnsafePath["UNSAFE PATH:<br/>input → string concat → interpreter<br/>(data enters token stream as control tokens)"]
+        SafePath["SAFE PATH:<br/>input → parameter binding → pre-compiled AST<br/>(data never touches the token stream)"]
+    end
+    
+    AppLayer --> |Unsafe| InterpreterModified["INTERPRETER<br/>receives modified AST<br/>(attacker wins)"]
+    AppLayer --> |Safe| InterpreterOriginal["INTERPRETER<br/>receives original AST<br/>(developer wins)"]
+    
+    InterpreterModified --> Exploitation
+    
+    subgraph Exploitation ["EXPLOITATION VECTORS"]
+        direction TB
+        SQL["SQL Engine → data exfiltration"]
+        Shell["POSIX Shell → OS command execution"]
+        DOM["Browser DOM → session hijacking"]
+        Jinja["Jinja2 Eval → server RCE"]
+    end
 ```
 
 ---

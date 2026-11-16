@@ -34,28 +34,63 @@ Consider the practical execution when analyzing commodification critiques. A res
 
 The second architectural operation constructs comparative matrices mapping how different theoretical frameworks analyze identical phenomena. These matrices make explicit what each paradigm takes as explanatory primitive, what evidence it considers valid, and what questions it treats as meaningful versus nonsensical. The structure resembles a database schema with frameworks as columns and analytical dimensions as rows.
 
-```
-╔══════════════════════╦══════════════════╦══════════════════╦═══════════════════╗
-║  ANALYTICAL DIM.     ║  NEUROSCIENCE    ║  PHENOMENOLOGY   ║  TRADITION        ║
-╠══════════════════════╬══════════════════╬══════════════════╬═══════════════════╣
-║ Ontological          ║ Physicalist:     ║ Neutral/agnostic ║ Often includes    ║
-║ Commitment           ║ brain = person   ║ re: metaphysics  ║ non-physical      ║
-║                      ║                  ║                  ║ realities         ║
-╠══════════════════════╬══════════════════╬══════════════════╬═══════════════════╣
-║ Valid Evidence       ║ fMRI, EEG,       ║ First-person     ║ Scripture,        ║
-║                      ║ behavioral data  ║ reports, inter-  ║ lineage wisdom,   ║
-║                      ║                  ║ subjective agree ║ transmitted auth. ║
-╠══════════════════════╬══════════════════╬══════════════════╬═══════════════════╣
-║ Explanation Goal     ║ Causal mechanism ║ Meaning struct.  ║ Liberation/       ║
-║                      ║ identification   ║ articulation     ║ transformation    ║
-╠══════════════════════╬══════════════════╬══════════════════╬═══════════════════╣
-║ Mystical Experience  ║ Neural correlate ║ Intentional      ║ Encounter with    ║
-║ Interpreted As       ║ of altered state ║ structure of     ║ ultimate reality  ║
-║                      ║                  ║ consciousness    ║                   ║
-╠══════════════════════╬══════════════════╬══════════════════╬═══════════════════╣
-║ Normative Status     ║ Descriptive only ║ Descriptive but  ║ Prescriptive:     ║
-║                      ║ (no ought)       ║ ethics-adjacent  ║ guides practice   ║
-╚══════════════════════╩══════════════════╩══════════════════╩═══════════════════╝
+```mermaid
+flowchart TD
+    subgraph analytical["ANALYTICAL DIMENSIONS"]
+        direction LR
+        dim1["Ontological<br/>Commitment"]
+        dim2["Valid<br/>Evidence"]
+        dim3["Explanation<br/>Goal"]
+        dim4["Mystical Experience<br/>Interpreted As"]
+        dim5["Normative<br/>Status"]
+    end
+    
+    subgraph neuro["NEUROSCIENCE"]
+        direction LR
+        n1["Physicalist:<br/>brain = person"]
+        n2["fMRI, EEG,<br/>behavioral data"]
+        n3["Causal mechanism<br/>identification"]
+        n4["Neural correlate<br/>of altered state"]
+        n5["Descriptive only<br/>no ought"]
+    end
+    
+    subgraph phenom["PHENOMENOLOGY"]
+        direction LR
+        p1["Neutral/agnostic<br/>re: metaphysics"]
+        p2["First-person reports,<br/>inter-subjective agree"]
+        p3["Meaning struct.<br/>articulation"]
+        p4["Intentional structure<br/>of consciousness"]
+        p5["Descriptive but<br/>ethics-adjacent"]
+    end
+    
+    subgraph trad["TRADITION"]
+        direction LR
+        t1["Often includes<br/>non-physical<br/>realities"]
+        t2["Scripture,<br/>lineage wisdom,<br/>transmitted auth."]
+        t3["Liberation/<br/>transformation"]
+        t4["Encounter with<br/>ultimate reality"]
+        t5["Prescriptive:<br/>guides practice"]
+    end
+    
+    dim1 --> n1
+    dim1 --> p1
+    dim1 --> t1
+    
+    dim2 --> n2
+    dim2 --> p2
+    dim2 --> t2
+    
+    dim3 --> n3
+    dim3 --> p3
+    dim3 --> t3
+    
+    dim4 --> n4
+    dim4 --> p4
+    dim4 --> t4
+    
+    dim5 --> n5
+    dim5 --> p5
+    dim5 --> t5
 ```
 
 Working with this matrix structure allows practitioners to diagnose category mistakes and identify genuine contradictions versus apparent conflicts arising from incommensurable explanatory goals. When a neuroscientist claims meditation is "just" prefrontal cortex activation and a Buddhist claims it's insight into emptiness, the matrix reveals these need not conflict—one describes necessary physiological conditions, the other articulates existential significance. However, when a neuroscientist claims complete explanation leaves no explanatory remainder, a genuine philosophical dispute emerges about the relationship between physical implementation and subjective meaning.

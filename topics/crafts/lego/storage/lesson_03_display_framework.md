@@ -24,23 +24,20 @@ The French cleat deserves particular attention because it aligns naturally with 
 
 The architecture described above maps to the following structural hierarchy:
 
-```
-Wall Structure (studs / masonry)
-        │
-        ▼
-Wall Cleats (French cleat, 45°, 19 mm Baltic birch)
-        │  mounted at 400 mm vertical intervals
-        ▼
-Shelf Cleats (matching 45° hook)
-        │
-        ▼
-Shelf Panel (25 mm furniture ply or 32 mm MFC board)
-        │  supported at front edge by optional face rail
-        ▼
-Baseplate Layer (32×32 or 48×48 stud plates, friction-seated)
-        │
-        ▼
-Model Assembly (distributed load, full-area support)
+```mermaid
+flowchart TD
+    A["Wall Structure<br/>(studs / masonry)"]
+    B["Wall Cleats<br/>(French cleat, 45°, 19 mm Baltic birch)<br/>mounted at 400 mm vertical intervals"]
+    C["Shelf Cleats<br/>(matching 45° hook)"]
+    D["Shelf Panel<br/>(25 mm furniture ply or 32 mm MFC board)<br/>supported at front edge by optional face rail"]
+    E["Baseplate Layer<br/>(32×32 or 48×48 stud plates, friction-seated)"]
+    F["Model Assembly<br/>(distributed load, full-area support)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 Every load introduced at the model layer travels upward through this hierarchy without accumulation at any single joint, which is the structural condition you must maintain as the collection grows.

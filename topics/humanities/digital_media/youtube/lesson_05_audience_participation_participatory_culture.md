@@ -67,23 +67,20 @@ The Content ID system operates through audio and visual fingerprinting algorithm
 
 When a new video uploads, the system compares its fingerprints against the reference database. Matches trigger configurable policies set by the rights holder: block the video entirely, mute the matched audio segment, or monetize the video by redirecting ad revenue. This automation enables rights management at YouTube's scale—over 500 hours of video uploaded per minute—but creates friction with fair use doctrine because algorithmic matching cannot assess transformative use, criticism, commentary, or educational purpose. The result is a high false-positive rate where legitimate remix and reaction content receives automated claims requiring manual appeal.
 
-```
-Content ID Match Flow:
-
-Upload → Fingerprint Extraction → Database Query → Match Detection
-                                                           ↓
-                                                    Policy Lookup
-                                                           ↓
-                                    ┌──────────────────────┼──────────────────────┐
-                                    ↓                      ↓                      ↓
-                                  Block                 Monetize                Track
-                            (video unavailable)    (revenue to claimant)  (analytics only)
-                                                           ↓
-                                                    Creator Options:
-                                                    - Accept claim
-                                                    - Trim claimed content
-                                                    - Replace audio
-                                                    - Dispute (fair use)
+```mermaid
+flowchart TD
+    A["Upload"] --> B["Fingerprint Extraction"]
+    B --> C["Database Query"]
+    C --> D["Match Detection"]
+    D --> E["Policy Lookup"]
+    E --> F["Block<br/>(video unavailable)"]
+    E --> G["Monetize<br/>(revenue to claimant)"]
+    E --> H["Track<br/>(analytics only)"]
+    G --> I["Creator Options"]
+    I --> J["Accept claim"]
+    I --> K["Trim claimed content"]
+    I --> L["Replace audio"]
+    I --> M["Dispute (fair use)"]
 ```
 
 Fan community infrastructure extends beyond YouTube's native features to encompass a coordinated multi-platform ecosystem. The typical architecture places YouTube at the center for long-form video content, Twitter for real-time event commentary and creator updates, Discord for synchronous community chat and voice coordination, Reddit for long-form discussion and archival knowledge, and Patreon for financial support and exclusive content tiers. This distributed topology emerges organically because no single platform optimally serves all community functions.

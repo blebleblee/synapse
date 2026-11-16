@@ -128,31 +128,31 @@ This condition locates the frame element, invokes `driver.switchTo().frame(frame
 
 Polling interval configuration balances responsiveness against CPU and network overhead. The default 500-millisecond interval derives from empirical observation that typical web application state transitions—DOM mutations triggered by AJAX responses, CSS animation completions, React component lifecycle hooks—resolve within 1-3 seconds. Polling twice per second provides sub-second detection latency while limiting command throughput to manageable levels. Applications with known fast update cycles—real-time dashboards, financial trading interfaces—benefit from reducing the interval to 100-250 milliseconds, accepting increased protocol overhead for tighter synchronization bounds. Conversely, applications with expensive server-side rendering or slow database queries justify intervals of 1-2 seconds to avoid hammering backend systems with redundant requests.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  WebDriverWait Polling Timeline (10s timeout, 500ms interval) │
-└─────────────────────────────────────────────────────────────┘
-
-t=0ms       ┬─> Condition.apply(driver) → null (element not found)
-            │   Sleep 500ms
-            │
-t=500ms     ┬─> Condition.apply(driver) → null (element exists but invisible)
-            │   Sleep 500ms
-            │
-t=1000ms    ┬─> Condition.apply(driver) → null (CSS transition incomplete)
-            │   Sleep 500ms
-            │
-t=1500ms    ┬─> Condition.apply(driver) → WebElement (SUCCESS)
-            │   Return element immediately
-            └─> Total elapsed: 1500ms
-
-Alternative failure scenario:
-
-t=9500ms    ┬─> Condition.apply(driver) → null
-            │   Sleep 500ms
-            │
-t=10000ms   ┬─> Timeout threshold exceeded
-            └─> Throw TimeoutException("Expected condition failed: ...")
+```mermaid
+flowchart TD
+    Start["WebDriverWait Polling Timeline<br/>(10s timeout, 500ms interval)"]
+    
+    Start --> T0["t=0ms<br/>Condition.apply(driver) → null<br/>(element not found)"]
+    T0 --> Sleep0["Sleep 500ms"]
+    
+    Sleep0 --> T500["t=500ms<br/>Condition.apply(driver) → null<br/>(element exists but invisible)"]
+    T500 --> Sleep1["Sleep 500ms"]
+    
+    Sleep1 --> T1000["t=1000ms<br/>Condition.apply(driver) → null<br/>(CSS transition incomplete)"]
+    T1000 --> Sleep2["Sleep 500ms"]
+    
+    Sleep2 --> T1500["t=1500ms<br/>Condition.apply(driver) → WebElement<br/>(SUCCESS)"]
+    T1500 --> Success["Return element immediately<br/>Total elapsed: 1500ms"]
+    
+    Start --> AltPath["Alternative failure scenario"]
+    AltPath --> T9500["t=9500ms<br/>Condition.apply(driver) → null"]
+    T9500 --> Sleep3["Sleep 500ms"]
+    
+    Sleep3 --> T10000["t=10000ms<br/>Timeout threshold exceeded"]
+    T10000 --> Failure["Throw TimeoutException<br/>'Expected condition failed: ...'"]
+    
+    style Success fill:#90EE90
+    style Failure fill:#FFB6C6
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

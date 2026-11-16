@@ -24,16 +24,43 @@ Modern UI frameworks converge on a component model in which the UI is a pure fun
 
 The critical data structure underpinning this model is the **virtual DOM** (or its equivalents: the Compose Slot Table, SwiftUI's view graph, or Flutter's widget tree). React's reconciler maintains a fiber tree in which each node stores the current and alternate (work-in-progress) representations of a component. During reconciliation, the work-in-progress tree is built by calling render functions and diffing against the current tree using a heuristic O(n) algorithm that bets on two empirically observed properties of UI trees: elements of the same type at the same position in the tree are likely the same conceptual element across renders, and sibling elements can be identified across renders by stable keys.
 
-```
-Current Fiber Tree (committed)          Work-In-Progress Tree (reconciling)
-─────────────────────────────           ──────────────────────────────────
-Root                                    Root
- └─ App                                  └─ App
-     ├─ NavBar          [no change]          ├─ NavBar          [reuse fiber]
-     └─ FeedList                             └─ FeedList
-         ├─ FeedItem(key=1) [no change]          ├─ FeedItem(key=1) [reuse]
-         ├─ FeedItem(key=2) [props changed]      ├─ FeedItem(key=2) [update]
-         └─ FeedItem(key=3) [new]                └─ FeedItem(key=3) [mount]
+```mermaid
+flowchart LR
+    subgraph current ["Current Fiber Tree (committed)"]
+        direction TB
+        C_Root["Root"]
+        C_App["App"]
+        C_NavBar["NavBar<br/>[no change]"]
+        C_FeedList["FeedList"]
+        C_Item1["FeedItem(key=1)<br/>[no change]"]
+        C_Item2["FeedItem(key=2)<br/>[props changed]"]
+        C_Item3["FeedItem(key=3)<br/>[new]"]
+        
+        C_Root --> C_App
+        C_App --> C_NavBar
+        C_App --> C_FeedList
+        C_FeedList --> C_Item1
+        C_FeedList --> C_Item2
+        C_FeedList --> C_Item3
+    end
+    
+    subgraph wip ["Work-In-Progress Tree (reconciling)"]
+        direction TB
+        W_Root["Root"]
+        W_App["App"]
+        W_NavBar["NavBar<br/>[reuse fiber]"]
+        W_FeedList["FeedList"]
+        W_Item1["FeedItem(key=1)<br/>[reuse]"]
+        W_Item2["FeedItem(key=2)<br/>[update]"]
+        W_Item3["FeedItem(key=3)<br/>[mount]"]
+        
+        W_Root --> W_App
+        W_App --> W_NavBar
+        W_App --> W_FeedList
+        W_FeedList --> W_Item1
+        W_FeedList --> W_Item2
+        W_FeedList --> W_Item3
+    end
 ```
 
 The work-in-progress tree is built incrementally by React's scheduler, which yields control back to the main thread between units of work using `MessageChannel` or `requestIdleCallback`. This is the architecture behind Concurrent Mode: long reconciliation work is broken into interruptible chunks so that high-priority input events can preempt in-progress rendering work. When a user types in an input field, the keystroke handler can interrupt an ongoing low-priority list reconciliation, process the input synchronously, and let the list reconciliation resume afterward.
@@ -50,27 +77,18 @@ CSS Grid extends Flexbox's model to two axes simultaneously. The grid track sizi
 
 SwiftUI and UIKit's Auto Layout use a constraint solver based on the **Cassowary linear constraint algorithm**. Each constraint is a linear equality or inequality between layout attributes: `button.leading == container.leading + 16`. The solver maintains a simplex tableau and resolves all constraints simultaneously to find a consistent assignment of values. The algorithm's complexity is O(n) in practice for the typical sparsely-connected constraint graphs found in real UIs, but pathological configurations—where constraints form tightly coupled cycles or introduce contradictions—can cause the solver to fall back to exponential-time behavior or emit unsatisfiable-constraint warnings and silently drop constraints to reach a solution.
 
-```
-SwiftUI Measurement Protocol (bottom-up → top-down)
-
-Parent proposes size
-      │
-      ▼
- ┌────────────────────────────────┐
- │  View.sizeThatFits(proposal)   │
- │  - Child measures its content  │
- │  - Returns ideal/min/max size  │
- └───────────────┬────────────────┘
-                 │  child reports back
-                 ▼
-Parent places child at computed origin
-      │
-      ▼
- ┌────────────────────────────────┐
- │  View._place(at:anchor:size:)  │
- │  - Finalizes frame in parent   │
- │    coordinate space            │
- └────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Parent proposes size"]
+    B["View.sizeThatFits(proposal)<br/>- Child measures its content<br/>- Returns ideal/min/max size"]
+    C["Child reports back"]
+    D["Parent places child at computed origin"]
+    E["View._place(at:anchor:size:)<br/>- Finalizes frame in parent<br/>coordinate space"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 SwiftUI's layout protocol is notably more principled than Auto Layout. Rather than a global constraint solver, SwiftUI uses a bottom-up proposal-response protocol: the parent proposes a size, the child responds with what size it actually wants given that proposal, and the parent places the child. Because each view measures itself locally, the system avoids the global constraint-solving overhead. The implication for component authors is that a view implementing `Layout` protocol must be conservative in its measurement: calling `subview.sizeThatFits` with a large variety of different proposals on each layout pass is expensive because it forces the subview to recompute its size for each proposal.
@@ -91,25 +109,17 @@ An easing curve maps normalized time `t ∈ [0, 1]` to a normalized value `v ∈
 
 Spring-based animation models the animated property as a mass on a spring with configurable stiffness, damping, and mass. The spring equation `F = -kx - bv` (where `x` is displacement from the target, `v` is velocity, `k` is stiffness, and `b` is damping) is integrated on each frame tick. Spring animations are **not time-bounded** in general: an underdamped spring oscillates around the target with decreasing amplitude indefinitely in theory, and frameworks terminate the animation when both displacement and velocity fall below a threshold. The critical advantage is **velocity continuity**: because the simulation tracks the current velocity, changing the target value mid-animation is simply a parameter update. The spring integrates smoothly from the current velocity toward the new target, producing the fluid, interruptible transitions users associate with high-quality applications.
 
-```
-Spring Animation State Machine
+```mermaid
+flowchart TD
+    Idle["Idle\n(at rest)"]
+    Animating["Animating\nx′ = -kx - bv (per frame)"]
+    Redirect["Redirect (retarget)\nv preserved, new k, b"]
+    Settling["Settling (snap to target)"]
 
-                       target changes
- ┌──────────────┐      mid-animation
- │    Idle      │◄──────────────────────────────────────────┐
- │  (at rest)   │                                           │
- └──────┬───────┘                                           │
-        │ value change requested                            │
-        ▼                                                   │
- ┌──────────────────────────────┐    target update    ┌─────┴──────────────────┐
- │       Animating              │───────────────────► │  Redirect (retarget)   │
- │  x′ = -kx - bv (per frame)  │                     │  v preserved, new k,b  │
- └──────────────┬───────────────┘                     └────────────────────────┘
-                │ |x| < ε && |v| < ε
-                ▼
- ┌──────────────────────────────┐
- │   Settling (snap to target)  │
- └──────────────────────────────┘
+    Idle -->|"value change requested"| Animating
+    Animating -->|"target update"| Redirect
+    Redirect -->|"target changes mid-animation"| Idle
+    Animating -->|"|x| < ε && |v| < ε"| Settling
 ```
 
 Flutter's animation system makes the layering explicit. `AnimationController` owns the clock and advances a value from 0.0 to 1.0 over a specified duration using the ticker provided by the widget tree's `TickerProvider`. Curves are applied via `CurvedAnimation`, which wraps the controller and maps its linear output through a `Curve` instance. `Tween` performs the type-safe interpolation between concrete start and end values. This three-layer composition—controller, curve, tween—gives you orthogonal control over timing, easing, and value range, and is the correct model for composing complex multi-property animations.

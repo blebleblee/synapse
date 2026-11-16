@@ -72,48 +72,21 @@ Anthropic's primary interface is the **Messages API** (`POST /v1/messages`). It 
 ### Message Object Schema
 
 ```mermaid
-classDiagram
-    class MessageRequest {
-        +str model
-        +int max_tokens
-        +List~MessageParam~ messages
-        +Optional~str~ system
-        +Optional~float~ temperature
-        +Optional~float~ top_p
-        +Optional~int~ top_k
-        +Optional~List~Tool~~ tools
-        +Optional~ToolChoice~ tool_choice
-    }
+flowchart TD
+    MR["<b>MessageRequest</b><br/>─────────────────<br/>+ model: str<br/>+ max_tokens: int<br/>+ messages: List~MessageParam~<br/>+ system: Optional[str]<br/>+ temperature: Optional[float]<br/>+ top_p: Optional[float]<br/>+ top_k: Optional[int]<br/>+ tools: Optional[List~Tool~]<br/>+ tool_choice: Optional[ToolChoice]"]
 
-    class MessageParam {
-        +str role  "user | assistant"
-        +ContentBlock content
-    }
+    MP["<b>MessageParam</b><br/>─────────────────<br/>+ role: str <i>(user | assistant)</i><br/>+ content: ContentBlock"]
 
-    class ContentBlock {
-        +str type  "text | image | tool_use | tool_result"
-        +str text
-    }
+    CB["<b>ContentBlock</b><br/>─────────────────<br/>+ type: str <i>(text | image | tool_use | tool_result)</i><br/>+ text: str"]
 
-    class MessageResponse {
-        +str id
-        +str type  "message"
-        +str role  "assistant"
-        +List~ContentBlock~ content
-        +str model
-        +str stop_reason  "end_turn | max_tokens | stop_sequence | tool_use"
-        +Usage usage
-    }
+    RESP["<b>MessageResponse</b><br/>─────────────────<br/>+ id: str<br/>+ type: str <i>(message)</i><br/>+ role: str <i>(assistant)</i><br/>+ content: List~ContentBlock~<br/>+ model: str<br/>+ stop_reason: str <i>(end_turn | max_tokens | stop_sequence | tool_use)</i><br/>+ usage: Usage"]
 
-    class Usage {
-        +int input_tokens
-        +int output_tokens
-    }
+    US["<b>Usage</b><br/>─────────────────<br/>+ input_tokens: int<br/>+ output_tokens: int"]
 
-    MessageRequest "1" --> "*" MessageParam
-    MessageParam --> ContentBlock
-    MessageResponse --> Usage
-    MessageResponse --> ContentBlock
+    MR -- "1 to *" --> MP
+    MP --> CB
+    RESP --> CB
+    RESP --> US
 ```
 
 The `stop_reason` field is critical for agentic loops: `tool_use` means the model has emitted a structured function call and expects a `tool_result` turn before continuing; `max_tokens` means the response was truncated and the caller must decide whether to continue with a follow-up prompt.
@@ -1392,3 +1365,20 @@ if __name__ == "__main__":
 - Token usage logged per-request for cost attribution and anomaly detection
 - Context window utilization monitored; pruning logic tested at 90%+ utilization
 - Rate-limit response headers inspected for proactive throttling
+
+### Operational Hardening and Continuous Verification
+
+Production Claude API deployments demand continuous validation of the entire request-response lifecycle, not just initial configuration. Implement distributed tracing with correlation IDs that traverse API requests, token tracking, and error boundaries to enable forensic analysis of failures. Monitor token consumption trends against rate limits with headroom alerts at 70% and 80% thresholds to trigger proactive throttling before hitting hard limits. Deploy circuit breakers with half-open state testing: after three consecutive 500/529 errors, transition to open state for 30 seconds, then permit one probe request to test recovery before resuming full traffic. Validate `stop_reason` in production: `max_tokens` truncation indicates undersized limits or runaway generation requiring investigation, while `tool_use` without proper handling causes silent feature failures. For streaming responses, implement timeout supervision at the delta level—if no delta arrives within 10 seconds during an active stream, abort and retry the entire request rather than waiting indefinitely for a stalled connection.
+
+Cost control requires request-level attribution and anomaly detection across token dimensions. Log `input_tokens`, `output_tokens`, and cache utilization per-request with timestamps, user identifiers, and model versions to enable retrospective analysis of cost spikes. Establish baseline token distributions by request type and fire alerts when individual requests exceed P99 token counts by 2×, indicating potential prompt injection, infinite loops in tool use, or unexpected context expansion. Implement monthly cost projections using trailing 7-day averages with breakdowns by model, feature, and user cohort to surface high-impact optimization opportunities before they compound. Test failover behavior explicitly: rotate API keys in staging to verify graceful degradation, simulate sustained 529 responses to confirm circuit breaker activation, and inject malformed responses to validate error parsing and retry exclusion logic. Operational excellence emerges from treating the API as a stateful, observable system component with defined SLOs for latency (p50, p95, p99), availability (uptime %), and cost efficiency ($/1k tokens), continuously validated through synthetic traffic and real-user monitoring.
+
+## Summary & Verification Matrix
+
+| Dimension | Governing Invariant | Core Mechanism | Diagnostic Criterion |
+|---|---|---|---|
+| **Authentication** | API key must remain confidential and have sufficient quota headroom. | Bearer token in `x-api-key` or `Authorization` header; server validates and rate-limits. | 401 indicates invalid/revoked key; 429 indicates quota exhaustion; rotation tested quarterly. |
+| **Request Integrity** | Every request must specify `model`, `max_tokens`, and `messages` with valid structure. | Client SDK serializes to JSON; server validates schema and enforces model-specific limits. | 422 with specific field error indicates schema violation; never send unbounded `max_tokens`. |
+| **Response Handling** | `stop_reason` determines completion state; `max_tokens` truncation requires explicit handling. | Server returns structured `Message` with usage metadata; streaming yields deltas then final message. | `stop_reason="max_tokens"` means output truncated; `stop_reason="end_turn"` confirms natural completion. |
+| **Error Recovery** | Transient errors (429, 5xx) are retryable with exponential backoff; client errors (4xx) are not. | SDK raises typed exceptions; retry logic catches `RateLimitError` and `InternalServerError`. | Retry count capped at 3; base delay 1s, max 60s; 401/422 fail fast without retry. |
+| **Cost & Observability** | Token usage must be logged per-request for attribution; anomalies detected via statistical thresholds. | `usage.input_tokens` and `usage.output_tokens` in response; cached tokens counted separately. | Per-request logs enable cost breakdowns; P99 exceedance alerts catch runaway generation or injection. |
+| **Production Resilience** | API clients must bound concurrency, implement timeouts, and fail gracefully under load. | Semaphore limits concurrent requests; circuit breaker opens after failure threshold; timeouts enforce SLOs. | Circuit breaker opens after 3 consecutive 5xx; probes after 30s; synthetic tests validate failover paths. |

@@ -28,12 +28,13 @@ Before that analysis can proceed, one must have precise definitions of error. Gi
 
 The 64-bit IEEE 754 double-precision layout arranges its three fields as follows, from most significant to least significant bit:
 
-```
- 63        62      52 51                                    0
-  +--------+----------+--------------------------------------+
-  |  sign  | exponent |             fraction                 |
-  | 1 bit  |  11 bits |              52 bits                 |
-  +--------+----------+--------------------------------------+
+```mermaid
+flowchart LR
+    sign["sign<br/>1 bit<br/>(bit 63)"]
+    exponent["exponent<br/>11 bits<br/>(bits 62-52)"]
+    fraction["fraction<br/>52 bits<br/>(bits 51-0)"]
+    
+    sign --> exponent --> fraction
 ```
 
 The exponent field stores a biased integer $E$ in $[0, 2047]$, with bias 1023, so the true exponent is $e = E - 1023$. The reserved values $E = 0$ and $E = 2047$ encode the system's special values. When $E = 0$ and the fraction field is zero, the value is $\pm 0$. When $E = 0$ and the fraction is nonzero, the value is a *subnormal* number: $\pm 0.\text{fraction} \times 2^{-1022}$. Subnormals extend the representable range below $2^{-1022}$ by sacrificing precision, providing *gradual underflow* rather than a sudden collapse to zero. When $E = 2047$ and the fraction is zero, the value is $\pm\infty$. When $E = 2047$ and the fraction is nonzero, the value is *NaN* (Not a Number), which propagates through subsequent operations to signal that a computation has produced a meaningless result.

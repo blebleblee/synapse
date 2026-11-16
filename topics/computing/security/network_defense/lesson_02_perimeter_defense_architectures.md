@@ -24,23 +24,32 @@ The mathematical foundation of ACL design involves set theory operations over IP
 
 The physical deployment topology of a perimeter defense architecture dictates both its security properties and operational characteristics. In the simplest configuration, a single firewall appliance sits at the network boundary with three interfaces: one connected to the external router facing the internet, one connected to the internal distribution switch, and one connected to the DMZ segment. The firewall operates as a layer-3 router, forwarding packets between interfaces according to its policy ruleset and maintaining connection state for permitted flows. This topology creates an enforcement point where all inter-zone traffic must traverse the firewall's decision engine.
 
-```
-                                    Internet
-                                       |
-                                 [Border Router]
-                                       |
-                                  (External IF)
-                                       |
-                              +------------------+
-                              |    Firewall      |
-                              |  State Engine    |
-                              +------------------+
-                                /              \
-                          (DMZ IF)          (Internal IF)
-                             /                  \
-                    [DMZ Switch]           [Core Switch]
-                     /       \                   |
-              [Web] [Mail] [DNS]          [Internal Hosts]
+```mermaid
+flowchart TD
+    Internet["Internet"]
+    BorderRouter["Border Router"]
+    ExtIF["External Interface"]
+    Firewall["Firewall<br/>State Engine"]
+    DMZIF["DMZ Interface"]
+    InternalIF["Internal Interface"]
+    DMZSwitch["DMZ Switch"]
+    CoreSwitch["Core Switch"]
+    Web["Web Server"]
+    Mail["Mail Server"]
+    DNS["DNS Server"]
+    InternalHosts["Internal Hosts"]
+    
+    Internet --> BorderRouter
+    BorderRouter --> ExtIF
+    ExtIF --> Firewall
+    Firewall --> DMZIF
+    Firewall --> InternalIF
+    DMZIF --> DMZSwitch
+    InternalIF --> CoreSwitch
+    DMZSwitch --> Web
+    DMZSwitch --> Mail
+    DMZSwitch --> DNS
+    CoreSwitch --> InternalHosts
 ```
 
 The firewall's packet processing pipeline begins at the ingress interface where the network interface card delivers frames to the kernel's network stack. The firewall extracts the layer-3 and layer-4 headers, computing a flow tuple hash that serves as the lookup key into the connection tracking table. This hash function typically operates on a five-tuple: source IP, destination IP, protocol number, source port, and destination port. The connection table is implemented as a hash table with chaining for collision resolution, allowing constant-time average-case lookups. If the flow tuple matches an existing connection entry, the firewall validates packet sequence numbers and flags against the expected state, then forwards the packet to the appropriate egress interface.

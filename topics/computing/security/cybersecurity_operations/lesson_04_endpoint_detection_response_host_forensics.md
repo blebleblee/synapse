@@ -20,40 +20,38 @@ Lateral movement presents a special case. When an attacker pivots from a beachhe
 
 A production EDR agent is a layered system spanning kernel space, a userspace service, and a cloud telemetry pipeline. Its architecture can be understood as three concentric rings of observation, each with different access, fidelity, and performance cost.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    EDR AGENT ARCHITECTURE                   │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  KERNEL RING (Ring 0)                               │   │
-│  │                                                     │   │
-│  │  ┌─────────────┐  ┌──────────────┐  ┌──────────┐  │   │
-│  │  │ Process &   │  │  Minifilter  │  │  Network │  │   │
-│  │  │ Thread      │  │  (FS Events) │  │  Filter  │  │   │
-│  │  │ Callbacks   │  │              │  │  Driver  │  │   │
-│  │  └──────┬──────┘  └──────┬───────┘  └────┬─────┘  │   │
-│  │         └────────────────┴───────────────┘        │   │
-│  │                          │                         │   │
-│  │                 Kernel Event Queue                  │   │
-│  └──────────────────────────┬──────────────────────────┘   │
-│                             │ IOCTL / Shared Memory         │
-│  ┌──────────────────────────▼──────────────────────────┐   │
-│  │  USERSPACE SERVICE (Ring 3)                         │   │
-│  │                                                     │   │
-│  │  ┌────────────┐  ┌──────────────┐  ┌─────────────┐ │   │
-│  │  │ Event      │  │  Behavioral  │  │  Local Rule │ │   │
-│  │  │ Normalizer │  │  Correlator  │  │  Engine     │ │   │
-│  │  └──────┬─────┘  └──────┬───────┘  └──────┬──────┘ │   │
-│  │         └───────────────┴──────────────────┘        │   │
-│  │                         │                           │   │
-│  │              Telemetry Serializer (Protobuf/MsgPack)│   │
-│  └──────────────────────────┬──────────────────────────┘   │
-│                             │ TLS 1.3                       │
-│  ┌──────────────────────────▼──────────────────────────┐   │
-│  │  CLOUD TELEMETRY PIPELINE                           │   │
-│  │  (SIEM Ingest / Detection Engine / Threat Graph)    │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph kernel ["KERNEL RING (Ring 0)"]
+        PC["Process &amp; Thread Callbacks"]
+        MF["Minifilter\n(FS Events)"]
+        NF["Network Filter Driver"]
+        KEQ["Kernel Event Queue"]
+
+        PC --> KEQ
+        MF --> KEQ
+        NF --> KEQ
+    end
+
+    subgraph userspace ["USERSPACE SERVICE (Ring 3)"]
+        EN["Event Normalizer"]
+        BC["Behavioral Correlator"]
+        LRE["Local Rule Engine"]
+        TS["Telemetry Serializer\n(Protobuf / MsgPack)"]
+
+        EN --> TS
+        BC --> TS
+        LRE --> TS
+    end
+
+    subgraph cloud ["CLOUD TELEMETRY PIPELINE"]
+        CTP["SIEM Ingest / Detection Engine / Threat Graph"]
+    end
+
+    KEQ -->|"IOCTL / Shared Memory"| EN
+    KEQ -->|"IOCTL / Shared Memory"| BC
+    KEQ -->|"IOCTL / Shared Memory"| LRE
+    TS  -->|"TLS 1.3"| CTP
 ```
 
 The kernel ring is the agent's most privileged and most critical component. Its principal job is not detection — detection logic running in the kernel introduces unacceptable stability risk — but *collection and minimal filtering*. Each registered callback fires synchronously in the context of the thread that triggered the event. The callback must therefore be as lean as possible: it reads the relevant data from the kernel data structures, enqueues a fixed-size event record into a lock-free ring buffer in shared memory, and returns. Any heavyweight processing — string parsing, rule evaluation, graph lookups — happens in the userspace service, which drains the ring buffer from a dedicated high-priority thread.
@@ -66,27 +64,32 @@ The richest single telemetry source in Windows host forensics is the *process cr
 
 The chain of custody from process creation to full telemetry record looks like this:
 
-```
-NtCreateUserProcess (syscall)
-        │
-        ▼
-PspInsertProcess (kernel)
-        │
-        ├─► PsSetCreateProcessNotifyRoutineEx ◄─── EDR callback fires here
-        │        (synchronous, in creating thread context)
-        │        Captures: PID, PPID, ImageFileName, CommandLine, CreatingThreadId
-        │
-        ▼
-Process object initialized, returns to userspace
-        │
-        ▼
-EDR Userspace Service drains ring buffer
-        │
-        ├─► QueryFullProcessImageName → resolves full disk path
-        ├─► ReadProcessMemory(PEB) → independent command-line capture
-        ├─► AuthenticodeVerifySignature → code signing chain
-        ├─► Hash(image) → SHA-256 file identity
-        └─► Enrich with parent chain, session, user SID → EventRecord{}
+```mermaid
+flowchart TD
+    A["NtCreateUserProcess (syscall)"]
+    B["PspInsertProcess (kernel)"]
+    C["PsSetCreateProcessNotifyRoutineEx\n─────────────────────────────\nEDR callback fires here\n(synchronous, in creating thread context)\nCaptures: PID, PPID, ImageFileName,\nCommandLine, CreatingThreadId"]
+    D["Process object initialized\nReturns to userspace"]
+    E["EDR Userspace Service\nDrains ring buffer"]
+    F["QueryFullProcessImageName\n→ resolves full disk path"]
+    G["ReadProcessMemory(PEB)\n→ independent command-line capture"]
+    H["AuthenticodeVerifySignature\n→ code signing chain"]
+    I["Hash(image)\n→ SHA-256 file identity"]
+    J["Enrich with parent chain,\nsession, user SID\n→ EventRecord{}"]
+
+    A --> B
+    B --> C
+    B --> D
+    C -. "EDR callback" .-> C
+    D --> E
+    E --> F
+    E --> G
+    E --> H
+    E --> I
+    F --> J
+    G --> J
+    H --> J
+    I --> J
 ```
 
 A fully enriched process telemetry record therefore carries not just what executed, but *who* spawned it, *from what parent*, with *what privilege level*, and whether the binary on disk at the time of execution carried a valid Microsoft or vendor Authenticode signature. The absence of a valid signature for a process masquerading as a Windows component is one of the highest-fidelity detection signals in the entire EDR corpus.

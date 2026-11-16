@@ -112,23 +112,28 @@ Connect the coil terminals to an oscilloscope via slip rings or a wireless induc
 
 The diagram below illustrates the magnetic flux and induced EMF in a rotating coil:
 
-```
-Time evolution of magnetic flux and induced EMF in a rotating coil:
-
-Φ_B(t) = BA cos(ωt)     |    ε(t) = BAω sin(ωt)
-                         |
-    Flux                 |        EMF
-     ↑                   |         ↑
-  BA |     ___           |    BAω  |   /\
-     |    /   \          |         |  /  \
-   0 |___/     \___      |       0 |_/____\_
-     |         \   /     |         |        \  /
- -BA |          \_/      |   -BAω  |         \/
-     |                   |         |
-     └──────────→ t      |         └──────────→ t
-       0  π/ω  2π/ω      |           0  π/ω  2π/ω
-
-The induced EMF leads the flux by 90° (π/2 radians).
+```mermaid
+flowchart TD
+    A["Rotating Coil in Magnetic Field"]
+    
+    B["Magnetic Flux<br/>Φ_B(t) = BA cos(ωt)"]
+    C["Induced EMF<br/>ε(t) = BAω sin(ωt)"]
+    
+    D["Flux Characteristics:<br/>- Amplitude: BA<br/>- Period: 2π/ω<br/>- Phase: 0°"]
+    E["EMF Characteristics:<br/>- Amplitude: BAω<br/>- Period: 2π/ω<br/>- Phase: 90°"]
+    
+    F["Phase Relationship:<br/>EMF leads Flux by 90°<br/>π/2 radians"]
+    
+    A --> B
+    A --> C
+    B --> D
+    C --> E
+    D --> F
+    E --> F
+    
+    G["Time Evolution"]
+    B -.-> G
+    C -.-> G
 ```
 
 This phase relationship is universal in inductive systems and arises because the EMF depends on the time derivative of the flux, not the flux itself.

@@ -94,19 +94,24 @@ By Post–Kleene, since $H$ is r.e. but not recursive, the complement $\overline
 
 The resulting classification is best visualized as a hierarchy:
 
-```
-╔══════════════════════════════════════════════════════════╗
-║          ALL LANGUAGES OVER Σ*                           ║
-║  ╔════════════════════════════════════════╗              ║
-║  ║      RECURSIVELY ENUMERABLE (RE)       ║  ← H ∈ RE   ║
-║  ║   ╔══════════════════════════════╗     ║              ║
-║  ║   ║       RECURSIVE (R)          ║     ║              ║
-║  ║   ║  (Decidable Languages)       ║     ║              ║
-║  ║   ╚══════════════════════════════╝     ║              ║
-║  ╚════════════════════════════════════════╝              ║
-║           ↑ H∉R                                          ║
-║           H̄ ∉ RE  (outside the RE boundary entirely)    ║
-╚══════════════════════════════════════════════════════════╝
+```mermaid
+flowchart TD
+    subgraph ALL ["ALL LANGUAGES OVER Σ*"]
+        subgraph RE ["RECURSIVELY ENUMERABLE (RE)"]
+            subgraph R ["RECURSIVE (R)<br/>(Decidable Languages)"]
+            end
+            H_in["H ∈ RE"]
+        end
+        H_not_R["H ∉ R"]
+        H_bar["H̄ ∉ RE<br/>(outside the RE boundary entirely)"]
+    end
+    
+    style ALL fill:#f9f9f9,stroke:#333,stroke-width:3px
+    style RE fill:#e6f3ff,stroke:#333,stroke-width:2px
+    style R fill:#d4edda,stroke:#333,stroke-width:2px
+    style H_in fill:none,stroke:none
+    style H_not_R fill:none,stroke:none
+    style H_bar fill:none,stroke:none
 ```
 
 ### Many-One Reductions and the Architecture of Undecidability
@@ -139,16 +144,61 @@ A fundamental tool for constructing recognizers for r.e. sets is **dovetailing**
 
 This can be represented schematically. Let the rows index machines $M_0, M_1, M_2, \ldots$ and the columns index computation steps $1, 2, 3, \ldots$. The dovetailing order visits cells $(i,j)$ in increasing order of $i + j$:
 
-```
-Step:   1    2    3    4    5    6   ...
-       ─────────────────────────────
-M₀:    s₁   s₂   s₄   s₇  s₁₁  ...
-M₁:    s₃   s₅   s₈  s₁₂  ...
-M₂:    s₆   s₉  s₁₃  ...
-M₃:   s₁₀  s₁₄  ...
-...
-
-(sₙ denotes the n-th simulation step visited)
+```mermaid
+flowchart LR
+    subgraph step1 ["Step 1"]
+        s1["s₁"]
+        s3["s₃"]
+        s6["s₆"]
+        s10["s₁₀"]
+    end
+    
+    subgraph step2 ["Step 2"]
+        s2["s₂"]
+        s5["s₅"]
+        s9["s₉"]
+        s14["s₁₄"]
+    end
+    
+    subgraph step3 ["Step 3"]
+        s4["s₄"]
+        s8["s₈"]
+        s13["s₁₃"]
+    end
+    
+    subgraph step4 ["Step 4"]
+        s7["s₇"]
+        s12["s₁₂"]
+    end
+    
+    subgraph step5 ["Step 5"]
+        s11["s₁₁"]
+    end
+    
+    subgraph step6 ["Step 6"]
+        dots1["..."]
+    end
+    
+    s1 --> s2
+    s2 --> s4
+    s4 --> s7
+    s7 --> s11
+    s11 --> dots1
+    
+    s3 --> s5
+    s5 --> s8
+    s8 --> s12
+    
+    s6 --> s9
+    s9 --> s13
+    
+    s10 --> s14
+    
+    M0["M₀"] -.-> s1
+    M1["M₁"] -.-> s3
+    M2["M₂"] -.-> s6
+    M3["M₃"] -.-> s10
+    Mmore["..."] -.-> dots1
 ```
 
 This dovetailing schedule guarantees that for any fixed machine $M_k$ and step count $t$, the step $M_k$-step-$t$ is reached at global step $\binom{k+t}{2} + k + 1$, a computable bound. No halting computation escapes the schedule.

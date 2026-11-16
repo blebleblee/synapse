@@ -18,34 +18,38 @@ The `HTMLMediaElement` interface is specified in WHATWG HTML as a formal state m
 
 The following diagram captures the signal path from resource selection through rendering:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     HTMLMediaElement                            │
-│                                                                 │
-│  src / <source>  ──▶  Resource Selection Algorithm             │
-│                              │                                  │
-│                              ▼                                  │
-│                     Network Fetch (HTTP range requests)         │
-│                              │                                  │
-│                              ▼                                  │
-│                     Demuxer  (MP4/WebM/Ogg container parse)     │
-│                     ┌────────┴─────────┐                        │
-│                     ▼                  ▼                        │
-│              Video Track           Audio Track                  │
-│            (Encoded NALUs)       (Encoded frames)               │
-│                     │                  │                        │
-│                     ▼                  ▼                        │
-│            HW/SW Video Decoder    Audio Decoder                 │
-│                     │                  │                        │
-│                     ▼                  ▼                        │
-│            YCbCr frame buffer    PCM sample buffer              │
-│                     │                  │                        │
-│                     ▼                  ▼                        │
-│            GPU Texture Upload    Audio Output Node              │
-│                     │            (Web Audio or direct)          │
-│                     ▼                                           │
-│            Compositor Layer ◀──── requestVideoFrameCallback     │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph HME ["HTMLMediaElement"]
+        Src["src / <source>"]
+        RSA["Resource Selection Algorithm"]
+        NetFetch["Network Fetch (HTTP range requests)"]
+        Demuxer["Demuxer (MP4/WebM/Ogg container parse)"]
+        VideoTrack["Video Track (Encoded NALUs)"]
+        AudioTrack["Audio Track (Encoded frames)"]
+        VidDecoder["HW/SW Video Decoder"]
+        AudDecoder["Audio Decoder"]
+        YCbCr["YCbCr frame buffer"]
+        PCM["PCM sample buffer"]
+        GPU["GPU Texture Upload"]
+        AudioOut["Audio Output Node (Web Audio or direct)"]
+        Compositor["Compositor Layer"]
+        RVFC["requestVideoFrameCallback"]
+
+        Src --> RSA
+        RSA --> NetFetch
+        NetFetch --> Demuxer
+        Demuxer --> VideoTrack
+        Demuxer --> AudioTrack
+        VideoTrack --> VidDecoder
+        AudioTrack --> AudDecoder
+        VidDecoder --> YCbCr
+        AudDecoder --> PCM
+        YCbCr --> GPU
+        PCM --> AudioOut
+        GPU --> Compositor
+        RVFC --> Compositor
+    end
 ```
 
 The browser maintains two internal queues between the decoder and the compositor: a decoded video frame queue and a PCM audio render buffer. The audio/video synchronization algorithm works by designating audio as the master clock. The browser measures the difference between the audio renderer's presentation timestamp and the video frame's composition timestamp (DTS vs. PTS), and either drops video frames (if video is running behind) or inserts repetitions (if video is ahead). This design means that audio glitches propagate to visible video drift, not the reverse.

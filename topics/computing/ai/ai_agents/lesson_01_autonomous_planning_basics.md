@@ -37,8 +37,8 @@ graph LR
     S2 -->|"a₃"| S3["s₃"]
     S3 -->|"..."| SN["sₙ ∈ G (Goal State)"]
     
-    style S0 fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
-    style SN fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style S0 fill:#e1f5ff,stroke:#0066cc,stroke-width:2px,color:#0f172a
+    style SN fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#0f172a
 ```
 
 This diagram illustrates a valid plan as a path through the state space from \(s_0\) to a goal state.
@@ -111,19 +111,57 @@ Consider a 5×5 grid where an agent can move in four cardinal directions (cost 1
 
 **State Space Visualization**:
 
-```
-+---+---+---+---+---+
-| S |   |   |   |   |  (0,4)
-+---+---+---+---+---+
-|   |   |   |   |   |  (0,3)
-+---+---+---+---+---+
-|   | X | X | X |   |  (0,2) - X marks obstacles
-+---+---+---+---+---+
-|   |   |   |   |   |  (0,1)
-+---+---+---+---+---+
-|   |   |   |   | G |  (0,0)
-+---+---+---+---+---+
-(0,0) (1,0) (2,0) (3,0) (4,0)
+```mermaid
+flowchart TD
+    subgraph grid ["5×5 Grid (col, row)"]
+        R4C0["S\n(0,4)"]
+        R4C1[" \n(1,4)"]
+        R4C2[" \n(2,4)"]
+        R4C3[" \n(3,4)"]
+        R4C4[" \n(4,4)"]
+
+        R3C0[" \n(0,3)"]
+        R3C1[" \n(1,3)"]
+        R3C2[" \n(2,3)"]
+        R3C3[" \n(3,3)"]
+        R3C4[" \n(4,3)"]
+
+        R2C0[" \n(0,2)"]
+        R2C1["X\n(1,2)"]
+        R2C2["X\n(2,2)"]
+        R2C3["X\n(3,2)"]
+        R2C4[" \n(4,2)"]
+
+        R1C0[" \n(0,1)"]
+        R1C1[" \n(1,1)"]
+        R1C2[" \n(2,1)"]
+        R1C3[" \n(3,1)"]
+        R1C4[" \n(4,1)"]
+
+        R0C0[" \n(0,0)"]
+        R0C1[" \n(1,0)"]
+        R0C2[" \n(2,0)"]
+        R0C3[" \n(3,0)"]
+        R0C4["G\n(4,0)"]
+    end
+
+    R4C0 --- R4C1 --- R4C2 --- R4C3 --- R4C4
+    R3C0 --- R3C1 --- R3C2 --- R3C3 --- R3C4
+    R2C0 --- R2C1 --- R2C2 --- R2C3 --- R2C4
+    R1C0 --- R1C1 --- R1C2 --- R1C3 --- R1C4
+    R0C0 --- R0C1 --- R0C2 --- R0C3 --- R0C4
+
+    R4C0 --- R3C0 --- R2C0 --- R1C0 --- R0C0
+    R4C1 --- R3C1 --- R2C1 --- R1C1 --- R0C1
+    R4C2 --- R3C2 --- R2C2 --- R1C2 --- R0C2
+    R4C3 --- R3C3 --- R2C3 --- R1C3 --- R0C3
+    R4C4 --- R3C4 --- R2C4 --- R1C4 --- R0C4
+
+    style R4C0 fill:#4CAF50,color:#fff,stroke:#388E3C
+    style R0C4 fill:#F44336,color:#fff,stroke:#C62828
+    style R2C1 fill:#212121,color:#fff,stroke:#000
+    style R2C2 fill:#212121,color:#fff,stroke:#000
+    style R2C3 fill:#212121,color:#fff,stroke:#000
 ```
 
 A* begins at \(S = (0, 4)\) with \(g = 0\), \(h = 8\), \(f = 8\). The algorithm expands states with the lowest \(f\)-value, systematically exploring paths around the obstacle wall. The optimal plan involves moving right to \((1, 4)\), then down to \((1, 0)\), then right to \((4, 0)\), and finally up to \((4, 4)\)—a total cost of 12.
@@ -149,9 +187,9 @@ graph TD
     
     D2 -->|"..."| G["G(4,4)<br/>GOAL"]
     
-    style S fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
-    style G fill:#d4edda,stroke:#28a745,stroke-width:3px
-    style C2 fill:#f8d7da,stroke:#dc3545,stroke-width:2px
+    style S fill:#e1f5ff,stroke:#0066cc,stroke-width:2px,color:#0f172a
+    style G fill:#d4edda,stroke:#28a745,stroke-width:3px,color:#0f172a
+    style C2 fill:#f8d7da,stroke:#dc3545,stroke-width:2px,color:#0f172a
 ```
 
 This diagram shows how A* expands states in order of increasing \(f\)-value, pruning paths blocked by obstacles.
@@ -358,8 +396,8 @@ graph TB
     Monitoring -->|"Execution Feedback"| Environment
     Monitoring -->|"Valid Plan"| Executor["Plan Executor"]
     
-    style Planning_Engine fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
-    style Optimization_Layer fill:#fff3cd,stroke:#ff9800,stroke-width:2px
+    style Planning_Engine fill:#e1f5ff,stroke:#0066cc,stroke-width:2px,color:#0f172a
+    style Optimization_Layer fill:#fff3cd,stroke:#ff9800,stroke-width:2px,color:#0f172a
 ```
 
 This architecture illustrates how planning components interact, from state representation through optimization layers to execution and feedback.

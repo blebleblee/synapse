@@ -308,7 +308,7 @@ Ratio Reasonableness Checks:
 - Debt-to-equity: typically 0.3 to 1.5; industry-dependent (utilities higher, tech lower)
 - Interest coverage: above 3.0 is comfortable; 1.5 to 3.0 is adequate; below 1.5 is concerning
 - ROE: 10-20% is typical; above 25% is excellent; below 5% may indicate problem
-- Gross margin: highly industry-specific (software 70-90%, retail 20-40%, commodities <20%)
+- Gross margin: highly industry-specific (software 70-90%, retail 20-40%, commodities < 20%)
 
 **Common Errors and Solutions**
 

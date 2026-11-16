@@ -28,33 +28,49 @@ Here is the critical timing constraint: if the receiver's oscillator runs 3% slo
 
 The receiver's architecture typically consists of a shift register, a baud-rate generator (dividing the system clock to produce sampling ticks at 8× or 16× the baud rate), and a state machine. Upon detecting a START bit (RX line goes low), the receiver initializes a counter and begins sampling on each clock tick. After 8 or 16 samples (depending on whether the implementation over-samples for noise immunity), the receiver asserts the bit value of the majority sample and shifts it into the receive shift register. After 8 data bits, it checks for the STOP bit. If the STOP bit is not detected at the expected time, a framing error is asserted.
 
-```
-Transmitter (generating 8 data bits: 0x41, 'A', LSB first):
+```mermaid
+flowchart LR
+    IDLE_PRE["🔵 Idle\n(Line High: 1 1 1 1 … 1)"]
+    START["⬛ START Bit\nValue: 0\n(Line pulled LOW)"]
+    BIT0["BIT 0 — LSB\nValue: 1"]
+    BIT1["BIT 1\nValue: 0"]
+    BIT2["BIT 2\nValue: 0"]
+    BIT3["BIT 3\nValue: 0"]
+    BIT4["BIT 4\nValue: 0"]
+    BIT5["BIT 5\nValue: 0"]
+    BIT6["BIT 6\nValue: 1"]
+    BIT7["BIT 7 — MSB\nValue: 0"]
+    STOP["⬜ STOP Bit\nValue: 1\n(Line HIGH)"]
+    IDLE_POST["🔵 Idle\n(Line High: 1 1 1 1 … 1)"]
 
-Idle:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-       │
+    IDLE_PRE -->|"Begin frame"| START
+    START -->|"1 bit cell"| BIT0
+    BIT0 -->|"1 bit cell"| BIT1
+    BIT1 -->|"1 bit cell"| BIT2
+    BIT2 -->|"1 bit cell"| BIT3
+    BIT3 -->|"1 bit cell"| BIT4
+    BIT4 -->|"1 bit cell"| BIT5
+    BIT5 -->|"1 bit cell"| BIT6
+    BIT6 -->|"1 bit cell"| BIT7
+    BIT7 -->|"1 bit cell"| STOP
+    STOP -->|"Frame complete"| IDLE_POST
 
-START: 0 (one bit cell at low)
-       ├─────┤
-BIT0:  1 (LSB of 0x41 = 0b01000001 = 1)
-       ├─────┤
-BIT1:  0
-       ├─────┤
-BIT2:  0
-       ├─────┤
-BIT3:  0
-       ├─────┤
-BIT4:  0
-       ├─────┤
-BIT5:  0
-       ├─────┤
-BIT6:  1
-       ├─────┤
-BIT7:  0 (MSB)
-       ├─────┤
-STOP:  1 (one bit cell at high)
-       ├─────┤
-Idle:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    subgraph frame ["UART Frame — 0x41 ('A') — LSB First"]
+        START
+        BIT0
+        BIT1
+        BIT2
+        BIT3
+        BIT4
+        BIT5
+        BIT6
+        BIT7
+        STOP
+    end
+
+    subgraph byte_val ["Byte Composition: 0x41 = 0b0100_0001"]
+        NOTE["MSB→LSB: 0 1 0 0 0 0 0 1\nTransmit order (LSB first): BIT0=1, BIT1-5=0, BIT6=1, BIT7=0"]
+    end
 ```
 
 The transmitter's task is the inverse: load a byte into the shift register, drive START low for one bit cell, shift out the 8 data bits (often LSB first for historical reasons stemming from telegraph technology), then drive STOP high for at least one bit cell. On many microcontroller UARTs, configurable options exist: 7 or 8 data bits, even/odd/no parity, 1 or 2 STOP bits. A parity bit, when enabled, is inserted between the data bits and STOP bit; it toggles so that the total number of ones across the byte plus parity is even (even parity) or odd (odd parity). Parity provides single-bit error *detection* only—if two bits flip, parity remains correct but the byte is corrupted.
@@ -126,20 +142,58 @@ This produces four SPI modes (CPOL, CPHA): Mode 0 (0,0), Mode 1 (0,1), Mode 2 (1
 
 Here is a timing diagram for SPI Mode 0, transmitting 0x42 (0b01000010) from master to slave:
 
-```
-SCK   ────┐   ┌─┐   ┌─┐   ┌─┐   ┌─┐   ┌─┐   ┌─┐   ┌─┐   ┌─────────────
-          └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─┘
-          1   2   3   4   5   6   7   8
+```mermaid
+flowchart TD
+    subgraph spi ["SPI Byte Transmission — 0x42 (LSB First)"]
+        subgraph sck_line ["SCK — Clock (8 pulses)"]
+            SCK_IDLE["SCK idle HIGH"]
+            B1["Bit 1 ↕"]
+            B2["Bit 2 ↕"]
+            B3["Bit 3 ↕"]
+            B4["Bit 4 ↕"]
+            B5["Bit 5 ↕"]
+            B6["Bit 6 ↕"]
+            B7["Bit 7 ↕"]
+            B8["Bit 8 ↕"]
+            SCK_END["SCK returns HIGH"]
+            SCK_IDLE --> B1 --> B2 --> B3 --> B4 --> B5 --> B6 --> B7 --> B8 --> SCK_END
+        end
 
-MOSI  ──────┐   ┌───┐   ┌─────────┐   ┌───┐   ┌───────┐   ┌─────────────
-            │0  │   │0  │         │0  │   │0  │       │1  │
-            └─────────┘ └─────────┘ └───┘ └───────┘ └─────────────
+        subgraph mosi_line ["MOSI — Data (LSB first)"]
+            MOSI_B0["Bit 0 = 0"]
+            MOSI_B1["Bit 1 = 1"]
+            MOSI_B2["Bit 2 = 0"]
+            MOSI_B3["Bit 3 = 0"]
+            MOSI_B4["Bit 4 = 0"]
+            MOSI_B5["Bit 5 = 0"]
+            MOSI_B6["Bit 6 = 1"]
+            MOSI_B7["Bit 7 = 0"]
+            MOSI_B0 --> MOSI_B1 --> MOSI_B2 --> MOSI_B3 --> MOSI_B4 --> MOSI_B5 --> MOSI_B6 --> MOSI_B7
+        end
 
-      Bit: 0   1   2   3   4   5   6   7
-      Val: 0   1   0   0   0   0   1   0  (0x42 LSB first on this impl)
+        subgraph cs_line ["CS — Chip Select"]
+            CS_LOW["CS held LOW for entire byte"]
+            CS_HIGH["CS pulled HIGH after Bit 8"]
+            CS_LOW --> CS_HIGH
+        end
 
-CS    ──────────────────────────────────────────────────────────────────
-      (stays low during byte; pulled high after last bit)
+        subgraph result ["Decoded Value"]
+            DECODE["LSB-first sequence: 0,1,0,0,0,0,1,0 → 0x42"]
+        end
+
+        B1 -.->|"samples"| MOSI_B0
+        B2 -.->|"samples"| MOSI_B1
+        B3 -.->|"samples"| MOSI_B2
+        B4 -.->|"samples"| MOSI_B3
+        B5 -.->|"samples"| MOSI_B4
+        B6 -.->|"samples"| MOSI_B5
+        B7 -.->|"samples"| MOSI_B6
+        B8 -.->|"samples"| MOSI_B7
+
+        CS_LOW -.->|"enables"| MOSI_B0
+        SCK_END -.->|"triggers"| CS_HIGH
+        MOSI_B7 --> DECODE
+    end
 ```
 
 SPI has no inherent flow control or error detection. If the slave is busy and cannot serve data, the master has no way to know; it reads stale data. If electromagnetic noise flips a bit, neither master nor slave detects it. Therefore, protocols layered atop SPI often include application-level checksums (CRC) and request-acknowledgment patterns. For example, when reading a sensor register, the master may send a "read register 0x10" command, the slave responds with the register value plus a CRC, and the master validates the CRC before using the value.
@@ -264,4 +318,17 @@ Here is a high-level state diagram for an I2C bus cycle:
          └─────────────────┘
 ```
 
-Clock stretching is a powerful but often-overlooked I2C feature. If a slave is not ready to send or receive data, it can pull SCL low and hold it indefinite
+Clock stretching is a powerful but often-overlooked I2C feature.
+
+If the addressed slave cannot respond within the expected time—perhaps it is waiting for an internal operation to complete, or reading from slow non-volatile memory—it can hold SCL low after the master releases it, effectively pausing the transaction. The master must wait until the slave releases SCL before continuing. This mechanism allows slow peripherals to participate in I2C networks without requiring the master to know their internal timing characteristics in advance. However, clock stretching is not universally supported; some bit-banged implementations and certain I2C controllers do not honor it, leading to subtle failures when interfacing with slaves that rely on this feature. Engineers must verify hardware support and consult slave datasheets to determine whether clock stretching is necessary.
+
+I2C's robustness stems from its START/STOP framing, address arbitration, and explicit acknowledgment protocol, but these same features impose overhead: every byte requires nine clock cycles (eight data bits plus one ACK/NACK), and bus capacitance limits practical speeds to 400 kHz in most embedded systems, with 3.4 MHz (high-speed mode) achievable only with careful PCB design and compatible devices. Multi-master arbitration—where two masters simultaneously transmit START conditions and compare transmitted bits—adds further complexity, though it is rarely used in practice. For applications requiring higher throughput or longer distances, SPI or differential protocols (CAN, RS-485) are more appropriate. I2C excels in moderate-speed, multi-drop sensor networks where simplicity, address-based selection, and two-wire topology outweigh speed constraints.
+
+## Summary & Verification Matrix
+
+| **Protocol** | **Core Invariant** | **Key Mechanism** | **Diagnostic Criteria** | **Failure Mode** |
+|--------------|-------------------|-------------------|------------------------|------------------|
+| **UART** | Each frame is independent; no clock synchronization beyond start bit edge detection. | Baud rate agreement (±2–5% tolerance); start bit (0) triggers 1× sampling at bit center; stop bit (1) re-arms receiver. | Oscilloscope: verify bit timing matches baud period; check idle-high, start-low, stop-high sequence. Logic analyzer: decode frames, verify parity. | Baud mismatch → framing errors (stop bit read as 0). Noise during start → false triggers. Clock drift → sampling skew, parity/framing errors. |
+| **SPI** | Master generates clock; data sampled on one edge, shifted on the other. No inherent addressing—CS asserts target slave. | Four-wire (MOSI, MISO, SCK, CS); full-duplex; mode (CPOL/CPHA) defines clock polarity and phase. Multi-slave via separate CS lines or daisy-chain. | Oscilloscope: CS low → SCK toggles; MOSI/MISO transitions align with clock edges per mode. Logic analyzer: verify CPOL/CPHA, decode bytes, check CS setup/hold. | Mode mismatch → data sampled on wrong edge, corrupted reads. CS glitch → slave resets mid-transaction. Clock rate exceeds slave spec → setup/hold violations. |
+| **I2C** | Bus is idle when both SDA and SCL are high (pull-up). START (SDA↓ while SCL high) claims bus; STOP (SDA↑ while SCL high) releases it. | Open-drain + pull-ups; 7-bit address + R/W bit; slave ACK (SDA low during 9th clock); clock stretching (slave holds SCL low to pause master). | Oscilloscope: verify START/STOP conditions, ACK (SDA low on 9th SCL pulse). Logic analyzer: decode address, check ACK/NACK, measure clock stretch duration. | Missing pull-ups → bus stuck low. Address conflict → multiple slaves ACK. No ACK → wrong address, slave offline, or clock stretch not honored. Fast rise time without series resistors → ringing, false edges. |
+| **CAN** | Differential signaling (CAN_H, CAN_L); dominant (0) overrides recessive (1). Arbitration by ID: lowest ID wins without collision. | Bit stuffing (insert opposite bit after five identical); CRC + ACK + error frames. Termination resistors (120Ω) at both ends. | Oscilloscope: differential voltage ~2V (dominant), ~0V (recessive). CAN analyzer: verify bit rate, check stuffing, decode frames, monitor error counters. | Missing/incorrect termination → reflections, bit errors. Dominant stuck (short) → bus-off. Recessive stuck (open) → frame errors. Bit rate mismatch → ACK errors, error frames. |

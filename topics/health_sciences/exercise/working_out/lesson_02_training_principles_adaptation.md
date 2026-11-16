@@ -21,24 +21,33 @@ The practical expression of these principles is periodization: the systematic st
 When mechanical tension is applied to a muscle fiber—particularly at long muscle lengths during eccentric loading—mechanosensors in the sarcolemma and extracellular matrix activate downstream signaling cascades. The mTORC1 pathway, the central regulator of muscle protein synthesis, is upregulated. Satellite cells are recruited to donate nuclei for hypertrophic expansion. Meanwhile, metabolic stress from repeated contractions generates reactive oxygen species and metabolic byproducts that signal mitochondrial biogenesis via the PGC-1α pathway. These two signals—mechanical tension and metabolic stress—are largely distinct, which is why strength training and endurance training produce different adaptive phenotypes even when performed by the same athlete. The practitioner does not need to memorize the molecular actors, but they do need to understand the implication: the type of stress determines the type of adaptation, not merely the magnitude.
 
 ```mermaid
-stateDiagram-v2
-    direction LR
+flowchart LR
+    Stimulus["Training Stimulus"]
+    Alarm["Alarm Phase
+(Acute fatigue, DOMS,
+performance dip)"]
+    Resistance["Resistance Phase
+(Protein synthesis,
+neural recruitment gains)"]
+    Super["Supercompensation
+(Peak: +3–10% capacity
+above baseline)"]
+    Baseline["Return to Baseline
+(If stimulus not repeated)"]
+    Exhaustion["Overreaching / GAS Exhaustion
+(Stacked fatigue,
+performance decline)"]
 
-    state "Training Stimulus" as Stimulus
-    state "Alarm Phase\n(Acute fatigue, DOMS, \nperformance dip)" as Alarm
-    state "Resistance Phase\n(Protein synthesis,\nneural recruitment gains)" as Resistance
-    state "Supercompensation\n(Peak: +3–10% capacity\nabove baseline)" as Super
-    state "Return to Baseline\n(If stimulus not repeated)" as Baseline
-    state "Overreaching / GAS Exhaustion\n(Stacked fatigue, \nperformance decline)" as Exhaustion
-
-    [*] --> Stimulus
-    Stimulus --> Alarm : Homeostatic disruption
-    Alarm --> Resistance : Recovery initiated
-    Resistance --> Super : Adaptive overshoot
-    Super --> Baseline : No follow-up stimulus
-    Super --> Stimulus : Optimal re-stimulation\n(Accumulation)
-    Alarm --> Exhaustion : Re-stimulation too early\nor too intense
-    Exhaustion --> Resistance : Forced deload / taper
+    Stimulus --> Alarm["Alarm Phase
+(Acute fatigue, DOMS,
+performance dip)"]
+    Alarm -->|"Recovery initiated"| Resistance
+    Resistance -->|"Adaptive overshoot"| Super
+    Super -->|"No follow-up stimulus"| Baseline
+    Super -->|"Optimal re-stimulation (Accumulation)"| Stimulus
+    Alarm -->|"Re-stimulation too early or too intense"| Exhaustion
+    Exhaustion -->|"Forced deload / taper"| Resistance
+    Stimulus -->|"Homeostatic disruption"| Alarm
 ```
 
 The diagram above captures the temporal logic of the supercompensation cycle and its failure modes. The critical decision point is re-stimulation timing. If the next training bout lands during the supercompensation window, the organism's new, elevated baseline is disrupted, and the subsequent supercompensation settles slightly higher than the previous one—this is the mechanism of fitness accumulation. If the next bout lands during the alarm phase, before recovery is complete, the organism is pushed deeper into fatigue, and successive bouts in this configuration produce functional overreaching, and eventually non-functional overreaching or frank overtraining syndrome.

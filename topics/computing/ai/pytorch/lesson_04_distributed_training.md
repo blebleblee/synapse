@@ -316,41 +316,67 @@ The `torchrun` launcher sets `RANK`, `WORLD_SIZE`, `LOCAL_RANK`, and `MASTER_ADD
 
 To understand why DDP is fast, consider the exact sequence of operations during a single training step. When `loss.backward()` is called, PyTorch's autograd engine begins computing gradients in reverse topological order. DDP registers gradient hooks on every parameter via `Reductor` objects that wrap NCCL all-reduce calls. The internal data flow looks like this:
 
-```
-  GPU 0 (rank 0)          GPU 1 (rank 1)          GPU 2 (rank 2)
-  ──────────────         ──────────────         ──────────────
-  
-  backward() starts       backward() starts       backward() starts
-       │                       │                       │
-       ▼                       ▼                       ▼
-  grad[batch_0]            grad[batch_0]            grad[batch_0]
-  computed                 computed                 computed
-       │                       │                       │
-       ▼                       ▼                       ▼
-  ┌─────────────────────────────────────────────────────────┐
-  │  Bucket 0 full → NCCL all-reduce (async, overlapped)     │
-  └─────────────────────────────────────────────────────────┘
-       │                       │                       │
-       ▼                       ▼                       ▼
-  grad[batch_1]            grad[batch_1]            grad[batch_1]
-  computed (overlaps       computed (overlaps       computed (overlaps
-  with bucket 0 reduce)    with bucket 0 reduce)    with bucket 0 reduce)
-       │                       │                       │
-       ▼                       ▼                       ▼
-  ┌─────────────────────────────────────────────────────────┐
-  │  Bucket 1 full → NCCL all-reduce (async, overlapped)     │
-  └─────────────────────────────────────────────────────────┘
-       │                       │                       │
-       ▼                       ▼                       ▼
-  backward() returns       backward() returns       backward() returns
-       │                       │                       │
-       ▼                       ▼                       ▼
-  ┌─────────────────────────────────────────────────────────┐
-  │  Wait for all buckets to finish → gradients are global   │
-  └─────────────────────────────────────────────────────────┘
-       │                       │                       │
-       ▼                       ▼                       ▼
-  optimizer.step()         optimizer.step()         optimizer.step()
+```mermaid
+flowchart TD
+    subgraph GPU0["GPU 0 (rank 0)"]
+        G0_bwd["backward() starts"]
+        G0_grad0["grad[batch_0] computed"]
+        G0_grad1["grad[batch_1] computed\n(overlaps with bucket 0 reduce)"]
+        G0_ret["backward() returns"]
+        G0_opt["optimizer.step()"]
+    end
+
+    subgraph GPU1["GPU 1 (rank 1)"]
+        G1_bwd["backward() starts"]
+        G1_grad0["grad[batch_0] computed"]
+        G1_grad1["grad[batch_1] computed\n(overlaps with bucket 0 reduce)"]
+        G1_ret["backward() returns"]
+        G1_opt["optimizer.step()"]
+    end
+
+    subgraph GPU2["GPU 2 (rank 2)"]
+        G2_bwd["backward() starts"]
+        G2_grad0["grad[batch_0] computed"]
+        G2_grad1["grad[batch_1] computed\n(overlaps with bucket 0 reduce)"]
+        G2_ret["backward() returns"]
+        G2_opt["optimizer.step()"]
+    end
+
+    bucket0["Bucket 0 full → NCCL all-reduce\n(async, overlapped)"]
+    bucket1["Bucket 1 full → NCCL all-reduce\n(async, overlapped)"]
+    wait["Wait for all buckets to finish → gradients are global"]
+
+    G0_bwd --> G0_grad0
+    G1_bwd --> G1_grad0
+    G2_bwd --> G2_grad0
+
+    G0_grad0 --> bucket0
+    G1_grad0 --> bucket0
+    G2_grad0 --> bucket0
+
+    bucket0 --> G0_grad1
+    bucket0 --> G1_grad1
+    bucket0 --> G2_grad1
+
+    G0_grad1 --> bucket1
+    G1_grad1 --> bucket1
+    G2_grad1 --> bucket1
+
+    bucket1 --> G0_ret
+    bucket1 --> G1_ret
+    bucket1 --> G2_ret
+
+    G0_ret --> wait
+    G1_ret --> wait
+    G2_ret --> wait
+
+    wait --> G0_opt
+    wait --> G1_opt
+    wait --> G2_opt
+
+    style bucket0 fill:#2d6a9f,color:#fff,stroke:#1a4a7a
+    style bucket1 fill:#2d6a9f,color:#fff,stroke:#1a4a7a
+    style wait fill:#1a7a4a,color:#fff,stroke:#0d5c35
 ```
 
 The `gradient_as_bucket_view=True` flag in the DDP constructor tells the framework to reuse the bucket's memory as the gradient storage for the parameter, avoiding an extra copy. The `static_graph=True` option, when applicable, tells DDP that the computational graph structure does not change between iterations, allowing it to skip the graph analysis overhead on every forward pass and schedule reductions more aggressively.

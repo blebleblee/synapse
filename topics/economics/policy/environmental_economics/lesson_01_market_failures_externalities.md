@@ -104,30 +104,36 @@ Transaction costs break this elegant result through multiple channels:
 
 Empirical evidence supports Coase's transaction cost hypothesis. In settings with few parties and low information barriers—neighboring landowners negotiating fence construction, small-scale irrigation cooperatives managing water allocation—Coasean bargaining frequently achieves efficient outcomes. Ronald Coase's original examples (ranchers and farmers, confectionery manufacturer and physician sharing a building) involved bilateral negotiations with observable damages and low enforcement costs. But environmental externalities typically exhibit diffuse damages across large populations, high measurement costs, and complex causal chains linking emissions to damages, rendering transaction costs prohibitive. The policy implication is stark: when transaction costs exceed the deadweight loss from Pigouvian taxation or regulatory standards, centralized correction mechanisms dominate decentralized bargaining despite informational inefficiencies.
 
-```
-Market Mechanism Selection Decision Tree:
-
-1. Can property rights be defined and enforced at low cost?
-   ├─ YES: Assign rights + allow Coasean bargaining
-   │         Example: Water rights in small watersheds
-   │
-   └─ NO: Proceed to question 2
-
-2. Can marginal damages be measured with reasonable precision?
-   ├─ YES: Pigouvian tax (price instrument)
-   │         Example: Carbon tax based on CO₂ emissions
-   │
-   └─ NO: Proceed to question 3
-
-3. Is marginal damage curve steep relative to marginal cost curve?
-   ├─ YES: Cap-and-trade (quantity instrument)
-   │         Example: SO₂ allowances, fishery quotas
-   │
-   └─ NO: Proceed to question 4
-
-4. Are catastrophic risks or equity concerns paramount?
-   └─ YES: Direct regulation (technology standards, bans)
-             Example: Ozone-depleting substances, nuclear safety
+```mermaid
+flowchart TD
+    A["Can property rights be defined<br/>and enforced at low cost?"]
+    
+    A -->|YES| B["Assign rights +<br/>allow Coasean bargaining"]
+    B --> B1["Example: Water rights<br/>in small watersheds"]
+    
+    A -->|NO| C["Can marginal damages be measured<br/>with reasonable precision?"]
+    
+    C -->|YES| D["Pigouvian tax<br/>price instrument"]
+    D --> D1["Example: Carbon tax<br/>based on CO₂ emissions"]
+    
+    C -->|NO| E["Is marginal damage curve steep<br/>relative to marginal cost curve?"]
+    
+    E -->|YES| F["Cap-and-trade<br/>quantity instrument"]
+    F --> F1["Example: SO₂ allowances,<br/>fishery quotas"]
+    
+    E -->|NO| G["Are catastrophic risks or<br/>equity concerns paramount?"]
+    
+    G -->|YES| H["Direct regulation<br/>technology standards, bans"]
+    H --> H1["Example: Ozone-depleting substances,<br/>nuclear safety"]
+    
+    style B fill:#90EE90
+    style D fill:#90EE90
+    style F fill:#90EE90
+    style H fill:#90EE90
+    style B1 fill:#E8F5E9
+    style D1 fill:#E8F5E9
+    style F1 fill:#E8F5E9
+    style H1 fill:#E8F5E9
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

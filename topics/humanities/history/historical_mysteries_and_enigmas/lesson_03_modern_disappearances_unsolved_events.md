@@ -30,34 +30,18 @@ Effective investigation of modern disappearances requires a structured analytica
 
 The interaction among these five layers creates the complete evidentiary landscape. A case might have abundant physical evidence but sparse documentation, or comprehensive records but minimal physical traces. The historian must map which layers are richly preserved and which contain gaps.
 
-```
-DISAPPEARANCE CASE ANALYSIS FRAMEWORK
-═════════════════════════════════════════════════════════════════
-
-┌─────────────────────────────────────────────────────────────┐
-│  INSTITUTIONAL-PROCEDURAL LAYER                              │
-│  (Investigation authorities, jurisdictions, incentives)     │
-└──────────────────┬──────────────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────────────────┐
-│  TECHNOLOGICAL LAYER                                         │
-│  (Radar, satellite, comms systems, detection capabilities) │
-└──────────────────┬──────────────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────────────────┐
-│  TESTIMONIAL LAYER                                           │
-│  (Eyewitness accounts, survivor reports, memory evidence)  │
-└──────────────────┬──────────────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────────────────┐
-│  DOCUMENTARY-ARCHIVAL LAYER                                 │
-│  (Records, reports, photographs, institutional documents)  │
-└──────────────────┬──────────────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────────────────┐
-│  PHYSICAL-ARCHAEOLOGICAL LAYER                              │
-│  (Material remains, forensic traces, environmental evidence)│
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["INSTITUTIONAL-PROCEDURAL LAYER<br/>(Investigation authorities, jurisdictions, incentives)"]
+    B["TECHNOLOGICAL LAYER<br/>(Radar, satellite, comms systems, detection capabilities)"]
+    C["TESTIMONIAL LAYER<br/>(Eyewitness accounts, survivor reports, memory evidence)"]
+    D["DOCUMENTARY-ARCHIVAL LAYER<br/>(Records, reports, photographs, institutional documents)"]
+    E["PHYSICAL-ARCHAEOLOGICAL LAYER<br/>(Material remains, forensic traces, environmental evidence)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 Let us apply this framework to concrete cases to understand how these layers interact and where gaps create persistent mystery.
@@ -108,4 +92,19 @@ The case reveals the limits of technological omniscience. Modern aircraft genera
 
 ## 3. High-Performance Optimization & Failure Modes
 
-Systematic historical investigation of disappearance cases requires disciplined methodology that maximizes evidentiary yield while acknowledging inherent limitations. Historians and analysts working with such cases encounter recurring failure modes that undermine reliable reconstruction. Understanding and circumventing these patterns constitutes the core of professional pract
+Systematic historical investigation of disappearance cases requires disciplined methodology that maximizes evidentiary yield while acknowledging inherent limitations. Historians and analysts working with such cases encounter recurring failure modes that undermine reliable reconstruction.
+
+### Avoiding Investigative Pathologies
+
+The primary failure mode in disappearance investigation is premature narrative convergence—the adoption of a single explanatory framework before sufficient evidence warrants it. This cognitive error manifests when investigators privilege one hypothesis (mechanical failure, deliberate action, criminal intervention) and subsequently filter evidence through that lens, discounting contradictions and amplifying confirmations. The Amelia Earhart case demonstrates this pathology across decades: the crash-and-sink hypothesis dominated official investigations despite credible witness testimony suggesting alternative scenarios, leading to decades of misdirected search efforts. Effective methodology requires maintaining multiple competing hypotheses simultaneously, explicitly tracking which evidence supports or contradicts each framework, and resisting institutional pressure toward premature closure. The temporal dimension compounds this challenge—early investigative decisions determine which evidence gets preserved, which witnesses get interviewed, and which physical sites get examined, creating path dependencies that constrain all subsequent analysis.
+
+A second critical failure mode involves inadequate integration across evidentiary domains. Disappearance cases generate heterogeneous data—physical artifacts, documentary records, testimonial accounts, environmental conditions—that require cross-validation rather than isolated analysis. The MH370 investigation initially suffered from compartmentalized analysis: satellite engineers interpreted ping data, oceanographers modeled debris drift, and aviation experts analyzed flight systems, but inadequate synthesis delayed recognition of contradictions between models. High-performance investigation establishes explicit interfaces between analytical domains, using contradictions as diagnostic signals rather than anomalies to be explained away. The third pathology is scale mismatch between search resources and problem geometry: the Mary Celery's potential drift zone, Earhart's possible crash sites, and MH370's calculated search corridor all encompass areas orders of magnitude larger than available search capacity can thoroughly examine. Effective methodology must acknowledge when physical search becomes probabilistic rather than comprehensive, shifting emphasis toward evidence that constrains the search space rather than exhaustively covering it. These cases ultimately reveal that some historical events resist complete reconstruction not due to methodological inadequacy but due to fundamental information loss—when critical evidence physically vanishes beneath ocean waters or deteriorates beyond recovery, certainty becomes unattainable regardless of analytical sophistication.
+
+## Summary & Verification Matrix
+
+| **Case** | **Core Mystery Mechanism** | **Evidentiary Domains** | **Key Diagnostic Criteria** | **Resolution Status & Limiting Factors** |
+|----------|---------------------------|------------------------|----------------------------|------------------------------------------|
+| **Mary Celeste (1872)** | Abandonment without distress signals in calm conditions | Physical: seaworthy vessel, missing lifeboat, cargo intact; Documentary: ship's log ending abruptly; Environmental: weather records, drift patterns | Absence of damage, violence, or theft; crew competency level; rational vs. panic-driven decision indicators | Unresolved—testimonial layer lost (crew deceased), physical evidence degraded; multiple hypotheses remain plausible |
+| **Amelia Earhart (1937)** | Aircraft disappearance during transoceanic navigation attempt | Physical: aircraft wreckage (not definitively located), potential artifacts; Testimonial: witness accounts, radio transmissions; Documentary: flight plans, fuel calculations | Radio bearing accuracy, fuel range calculations, witness credibility assessment, artifact authentication protocols | Unresolved—vast search area, conflicting testimonial evidence, institutional classification barriers; crash-and-sink vs. survival hypotheses compete |
+| **MH370 (2014)** | Commercial aircraft deviation and disappearance despite modern tracking | Physical: recovered debris (confirmed), satellite handshake data; Institutional: radar records (incomplete), military data (restricted); Technological: ACARS cessation, transponder deactivation | Satellite ping arc analysis, debris drift modeling, radar gap interpretation, deliberate vs. mechanical causation indicators | Unresolved—ocean floor search incomplete despite unprecedented scale; fuel exhaustion zone identified but not searched comprehensively; political access restrictions |
+| **General Methodology** | Information asymmetry and evidence decay over time | Multi-domain integration required: physical, testimonial, documentary, environmental, institutional, technological | Hypothesis plurality maintenance, cross-domain contradiction detection, search geometry vs. resource matching | Success requires avoiding premature convergence, compartmentalized analysis, and scale mismatch; some cases fundamentally unresolvable due to irretrievable information loss |

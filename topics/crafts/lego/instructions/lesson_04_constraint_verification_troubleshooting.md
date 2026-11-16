@@ -22,23 +22,21 @@ In a core-out build — common in large Technic flagship sets — the central ch
 
 The architecture of a typical complex Lego build can be mapped as a **constraint dependency graph**, where each assembly stage is a node and each geometric dependency is a directed edge:
 
-```
-Stage 1: Base Chassis Frame
-        |
-        v
-Stage 2: Drivetrain Core ──────────────────────────────────────────────┐
-        |                                                               │
-        v                                                               │
-Stage 3: Suspension Geometry                                            │
-        |                                                               │
-        v                                                               │
-Stage 4: Steering Linkage ◄─────────────────────────── depends on ─────┘
-        |                        (axle coaxiality from Stage 2)
-        v
-Stage 5: Body Panel Mounts
-        |
-        v
-Stage 6: Exterior Cladding & Aesthetic Closures
+```mermaid
+flowchart TD
+    A["Stage 1: Base Chassis Frame"]
+    B["Stage 2: Drivetrain Core"]
+    C["Stage 3: Suspension Geometry"]
+    D["Stage 4: Steering Linkage"]
+    E["Stage 5: Body Panel Mounts"]
+    F["Stage 6: Exterior Cladding & Aesthetic Closures"]
+    
+    A --> B
+    B --> C
+    C --> D
+    E --> F
+    D --> E
+    B -->|"axle coaxiality"| D
 ```
 
 This graph makes visible a property that the page-linear instruction manual obscures: **Stage 4 carries a constraint dependency on Stage 2 that skips Stage 3**. The steering rack's center point is set by the front axle position, which was fixed in Stage 2. If Stage 3 — say, a suspension wishbone — was assembled with a pin in the wrong hole by one stud, it may not prevent Stage 3 from completing, but it will shift the wheel hub forward by 8 mm, moving it outside the kinematic range the Stage 4 linkage was designed to reach. The manual will appear to fail at Step 4, but the actual constraint violation lives in Step 3.

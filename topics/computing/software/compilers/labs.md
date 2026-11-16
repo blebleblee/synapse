@@ -504,12 +504,35 @@ fn test_aliasing_violation() {
 
 Run under Miri: `cargo +nightly miri test test_aliasing_violation`. Miri detects the aliasing violation:
 
-```
-error: Undefined Behavior: trying to reborrow for Unique at alloc1234, but parent tag <12> does not have appropriate permissions
-  --> tests/aliasing.rs:6:27
-   |
-6  |     let r2 = unsafe { &mut *ptr };
-   |                           ^^^^^ trying to reborrow for Unique at alloc1234, but parent tag <12> does not have appropriate permissions
+```mermaid
+flowchart TD
+    ERROR["🔴 Undefined Behavior Error\nUndefined Behavior: trying to reborrow for Unique"]
+    LOCATION["📄 Source Location\ntests/aliasing.rs : line 6, col 27"]
+    CODE["💻 Offending Code\nlet r2 = unsafe { &mut *ptr };"]
+    HIGHLIGHT["⚠️ Highlighted Span\n^^^^^ trying to reborrow for Unique\nat alloc1234"]
+    ALLOC["🗄️ Allocation\nalloc1234"]
+    TAG["🏷️ Parent Tag\n&lt;tag 12&gt;"]
+    PERM["🚫 Permission Failure\nParent tag does not have\nappropriate permissions for Unique reborrow"]
+
+    subgraph error_block ["Miri Error Report"]
+        ERROR
+        LOCATION
+        CODE
+        HIGHLIGHT
+    end
+
+    subgraph memory_block ["Memory State"]
+        ALLOC
+        TAG
+        PERM
+    end
+
+    ERROR --> LOCATION
+    LOCATION --> CODE
+    CODE --> HIGHLIGHT
+    HIGHLIGHT --> ALLOC
+    ALLOC --> TAG
+    TAG --> PERM
 ```
 
 Miri's Stacked Borrows model tracks a "borrow stack" for each memory location, pushing new borrows when references are created and popping when they are used. The code creates a mutable reference `r1`, then creates a second mutable reference `r2` through a raw pointer, violating Rust's aliasing guarantee that mutable references are exclusive. When `r1` is dereferenced again after `r2` was created, Miri detects that `r1`'s tag has been invalidated by the conflicting borrow.
@@ -722,7 +745,7 @@ opt-18 -print-after-all -O3 input.bc 2>&1 | less    # Dump IR after each pass
 
 **Microbenchmark Validation Criteria:**
 
-- Runtime coefficient of variation <5% across runs
+- Runtime coefficient of variation < 5% across runs
 - Black-box inputs to prevent constant folding
 - Sufficient iteration count to amortize loop overhead (>10³ iterations)
 - Verify compiler did not eliminate computation via assembly inspection

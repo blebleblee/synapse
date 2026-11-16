@@ -20,22 +20,41 @@ PowerPoint's temporal execution system operates through a finite state machine w
 
 The animation trigger taxonomy defines four fundamental activation patterns. "On Click" triggers create manual control points where the presenter explicitly advances to the next animation state, providing maximum synchronization precision at the cost of requiring active presenter intervention. "With Previous" triggers bind an animation to its temporal predecessor, executing simultaneously to create composite multi-object effects. "After Previous" triggers establish sequential dependencies where the second animation begins immediately upon the first animation's completion, constructing deterministic animation chains. "After Previous with Delay" extends this model by inserting explicit wait states, measured in fractional seconds, to create rhythmic pacing within automated sequences. These four primitives compose into arbitrarily complex temporal graphs.
 
-```
-Slide State Machine:
-
-Slide_N
-  ├─ Initial State (static content visible)
-  ├─ Animation_1 [Trigger: On Click | Duration: 0.5s | Effect: Fade In]
-  │   └─ Target: Title_TextBox
-  ├─ Animation_2 [Trigger: With Previous | Duration: 0.5s | Effect: Fly In From Left]
-  │   └─ Target: Subtitle_TextBox
-  ├─ Animation_3 [Trigger: After Previous | Delay: 0.8s | Duration: 0.3s | Effect: Wipe Right]
-  │   └─ Target: Bullet_1
-  ├─ Animation_4 [Trigger: After Previous | Delay: 0.3s | Duration: 0.3s | Effect: Wipe Right]
-  │   └─ Target: Bullet_2
-  └─ Final State (all content visible)
-
-Transition → Slide_N+1
+```mermaid
+flowchart TD
+    subgraph Slide_N ["Slide_N"]
+        InitialState["Initial State<br/>(static content visible)"]
+        
+        Anim1["Animation_1<br/>[Trigger: On Click | Duration: 0.5s | Effect: Fade In]"]
+        Target1["Target: Title_TextBox"]
+        
+        Anim2["Animation_2<br/>[Trigger: With Previous | Duration: 0.5s | Effect: Fly In From Left]"]
+        Target2["Target: Subtitle_TextBox"]
+        
+        Anim3["Animation_3<br/>[Trigger: After Previous | Delay: 0.8s | Duration: 0.3s | Effect: Wipe Right]"]
+        Target3["Target: Bullet_1"]
+        
+        Anim4["Animation_4<br/>[Trigger: After Previous | Delay: 0.3s | Duration: 0.3s | Effect: Wipe Right]"]
+        Target4["Target: Bullet_2"]
+        
+        FinalState["Final State<br/>(all content visible)"]
+        
+        InitialState --> Anim1
+        Anim1 --> Target1
+        
+        InitialState --> Anim2
+        Anim2 --> Target2
+        
+        Anim2 --> Anim3
+        Anim3 --> Target3
+        
+        Anim3 --> Anim4
+        Anim4 --> Target4
+        
+        Anim4 --> FinalState
+    end
+    
+    FinalState -->|Transition| SlideNext["Slide_N+1"]
 ```
 
 Duration parameters interact with effect types through a complex transfer function that maps abstract time values to concrete visual displacement curves. A fade effect with 0.5-second duration interpolates opacity linearly from 0% to 100% across 30 frames at standard 60fps rendering rates, updating the alpha channel in discrete steps of approximately 3.33% per frame. A fly-in effect with equivalent duration must compute both position displacement and potential rotation or scaling transformations, applying easing curves that modify the velocity profile across the temporal span. PowerPoint's animation engine samples these curves at the display refresh rate, which varies from 60Hz on standard monitors to 120Hz or 144Hz on high-refresh displays, creating subtle rendering differences across presentation environments that meticulous presenters must anticipate.

@@ -1,501 +1,505 @@
-# Operational Verification Labs: Ear Training
+# Ear Training Masterclass: Interval, Chord, Rhythm & Harmonic Recognition
 
-## Objective & Lab Setup
+## Why Ear Training Is a Physical Skill, Not a Quiz
 
-This laboratory develops accurate, immediate interval, chord, rhythm, and melodic recognition through systematic, progressive drills. Ear training is the bridge between theoretical knowledge and physical execution—recognizing what you hear accelerates transcription, improvisation, intonation correction, and harmonic analysis.
+Ear training is not trivia about frequency ratios—it's building a direct nerve pathway from **sound → recognition → physical execution** on your instrument. A bassist who hears a dominant 7th chord and can instantly find the root by feel, without stopping to think, has trained that pathway. Everything in this lab is built around one loop, repeated thousands of times until it's unconscious:
 
-**Required Tools:**
-- **Audacity** (Free): Record and analyze your own playing, loop sections, slow down audio without pitch shift (Effect → Change Tempo)
-- **Tenuto** or **Complete Ear Trainer** (iOS/Android): Interval, chord, scale, rhythm drills with instant feedback
-- **Teoria.com** (Web): Free interval and chord drills, no installation required
-- **Your instrument**: Piano, guitar, bass, or any polyphonic instrument for physical reinforcement
-- **Metronome**: Physical or app (Soundbrenner, Pro Metronome)
+```mermaid
+graph LR
+    subgraph sub_loop ["The Core Ear-Training Loop"]
+        H[Hear] --> S[Sing]
+        S --> P[Play on Instrument]
+        P --> V[Verify Against Source]
+        V --> H
+    end
+```
 
-**Practice Discipline:**
-- **Daily consistency beats marathon sessions.** 10 focused minutes daily is superior to 2-hour weekend binges.
-- **Track accuracy and speed.** Log results in a notebook or spreadsheet. Aim for 85%+ accuracy before increasing difficulty.
-- **Sing everything.** Audiation (internal hearing) requires vocalization. Hum, solfège, or speak interval names aloud.
+Skip the "Sing" step and you're memorizing app answers, not training your ear. Skip "Play" and you're training a singer's ear, not a performer's. All four steps, every time.
+
+**Required tools:**
+- **Audacity** (free): loop sections, slow playback without pitch shift (`Effect → Change Tempo`), isolate bass with EQ
+- **Tenuto** or **Complete Ear Trainer** (iOS/Android): instant-feedback interval/chord/rhythm drills
+- **Teoria.com**: free browser-based interval, chord, and progression drills
+- **Your instrument**: piano, guitar, or bass for physical reinforcement—polyphonic instruments are ideal but a single-line instrument works if you can play harmony as broken chords
+- **Metronome**: Soundbrenner, Pro Metronome, or a physical unit
+
+**Non-negotiable practice rules:**
+1. **10 minutes daily beats 2 hours on Sunday.** Pitch recognition is encoded through spaced repetition, not cramming.
+2. **85–90% accuracy gates progression.** Moving on at 60% accuracy builds confusion, not skill.
+3. **You must vocalize.** Humming, solfège, or just speaking "major third" out loud forces your brain to commit to an answer instead of passively recognizing a vibe.
+4. **Log everything.** Date, exercise, accuracy %, specific errors. Patterns in your mistakes (always confusing m3/M2, always missing the 5th of diminished chords) are your practice roadmap.
 
 ---
 
-## Exercise 1: Interval Recognition—Ascending & Descending
+## Exercise 1: Interval Recognition
 
-### 1.1 Perfect and Major Intervals (Week 1–2)
+### 1.1 Perfect & Major Intervals (Days 1–14)
 
-**Physical Context:**
-Intervals are muscle memory for your ear. Each interval has a characteristic tension or resolution quality derived from the harmonic series. P5 (3:2 ratio) sounds stable; M2 (9:8) sounds tense and ascending.
+**The physics in one paragraph:** An interval's character comes from how closely its frequency ratio approximates a simple whole-number ratio. P5 (3:2) and P4 (4:3) are the simplest ratios after the octave (2:1), so they sound stable and "open." M3 (5:4) and m3 (6:5) are the next simplest, giving major/minor their characteristic warmth without perfect stability. M2 (9:8) is a rough ratio—your ear hears it as unresolved tension pulling toward something simpler. That's the entire acoustic foundation you need; everything else below is pattern training.
 
-**Drill Setup:**
-1. Open Tenuto or Teoria.com → Interval Training → **Select intervals:** P1 (unison), M2, M3, P4, P5, P8 (octave)
-2. **Mode:** Ascending only, melodic (not harmonic)
-3. **Start at:** 40–50 questions per session, target 90%+ accuracy before advancing
+**Drill setup:**
+1. Tenuto or Teoria.com → Interval Training → select P1, M2, M3, P4, P5, P8
+2. Mode: **melodic ascending only**
+3. Session: 40–50 questions, target 90%+ before adding anything
 
-**Physical Anchors (Melodic References):**
-- **P1 (unison):** Identical pitch (tune your instrument by matching unisons)
-- **M2:** "Happy Birthday" first interval, tension upward
-- **M3:** "Oh When the Saints" first interval, bright and consonant
-- **P4:** "Here Comes the Bride" first interval, open and hollow
-- **P5:** "Twinkle Twinkle" first interval, stable power chord feel
-- **P8:** Same note name, one octave higher, doubling resonance
+**Melodic song anchors (memorize these cold):**
 
-**Execution:**
-1. **Listen:** Play interval in app
-2. **Sing:** Vocalize both pitches—bottom note, then top note
-3. **Name:** Speak interval quality aloud ("Major third")
-4. **Verify:** Check answer, repeat incorrect intervals 3 times
-5. **Instrument reinforcement (once daily):**
-   - Piano: Play each interval physically, ascending from C4: C→D (M2), C→E (M3), C→F (P4), C→G (P5), C→C' (P8)
-   - Guitar: Low E string: 0→2 (M2), 0→4 (M3), 0→5 (P4), 0→7 (P5), 0→12 (P8)
+| Interval | Song Cue | Feel |
+|---|---|---|
+| P1 | Same pitch repeated | Perfect fusion |
+| M2 | "Happy Birthday" (Hap-*py*) | Rising tension |
+| M3 | "Oh When the Saints" (Oh-*when*) | Bright, settled |
+| P4 | "Here Comes the Bride" | Open, hollow |
+| P5 | "Twinkle Twinkle" | Stable, powerful |
+| P8 | Same note name, doubled | Fused resonance |
 
-**Log:** Date, interval set, accuracy percentage, time elapsed
+**Execution loop, every question:**
+1. **Listen** to the interval in the app
+2. **Sing** the bottom note, then the top note, out loud
+3. **Name** it aloud: "Major third"
+4. **Check** the answer; if wrong, replay and sing it correctly 3 times before moving on
+5. **Instrument reinforcement (once per session, after the app drill):**
+   - **Piano:** From C4, play each interval and sing along: C→D (M2), C→E (M3), C→F (P4), C→G (P5), C→C5 (P8). Use **right hand fingers 1 and 2** for seconds/thirds, 1 and 4 for fourths/fifths, 1 and 5 reaching the octave.
+   - **Guitar/Bass (low E string):** fret 0→2 (M2), 0→4 (M3), 0→5 (P4), 0→7 (P5), 0→12 (P8). Pluck the open string, then the fretted note, and sing the gap between them before you even hear the second pitch—this is audiation, not just listening.
 
-### 1.2 Minor and Augmented/Diminished Intervals (Week 3–4)
+**Log:** date, interval set, accuracy %, time elapsed.
 
-Add: m2, m3, m6, m7, A4 (tritone), d5
+### 1.2 Minor, Augmented & Diminished Intervals (Days 15–28)
 
-**Physical Anchors:**
-- **m2:** "Jaws" theme, maximum tension, semitone crunch
-- **m3:** "Greensleeves" opening, minor quality, melancholic
-- **m6:** "The Entertainer" (Scott Joplin) descending m6
-- **m7:** "Star Trek" theme, wide dissonant leap
-- **A4/d5 (tritone):** "The Simpsons" opening, devil's interval, symmetrically splits octave
+Add: m2, m3, m6, m7, A4/d5 (tritone).
 
-**Execution (same protocol as 1.1):**
-1. Melodic intervals only, ascending first
-2. Once 85%+ accuracy: switch to **descending**
-3. Once 85%+ descending: **mixed direction mode**
-4. Add **harmonic intervals** (both notes sounding simultaneously) only after melodic mastery
+**Song anchors:**
 
-**Piano Physical Check (C Major Scale):**
-- Play C major scale ascending: C D E F G A B C'
-- Stop on each note, sing back to C (tonic), name interval
-- Reverse: descending C' B A G F E D C, sing up to C', name descending interval
+| Interval | Song Cue | Feel |
+|---|---|---|
+| m2 | *Jaws* theme | Maximum semitone crunch |
+| m3 | "Greensleeves" opening | Melancholic |
+| m6 | "The Entertainer" descending phrase | Wide and tense |
+| m7 | *Star Trek* theme leap | Wide, unresolved |
+| A4/d5 | *The Simpsons* theme opening | Splits the octave exactly in half |
 
-**Guitar Physical Check (All on Low E String):**
-- Fret 0 (E) → Fret X, sing interval, name it:
-  - Fret 1 = m2, Fret 2 = M2, Fret 3 = m3, Fret 4 = M3, Fret 5 = P4, Fret 6 = A4, Fret 7 = P5, etc.
+**Progression inside this block:**
+1. Melodic ascending first, same protocol as 1.1
+2. At 85%+, flip to **descending**
+3. At 85%+ descending, switch to **randomized direction**
+4. Only after melodic mastery, add **harmonic intervals** (both notes struck together)—this is harder because you're parsing a single fused sound instead of a sequence
+
+**Piano physical check, full C major scale:**
+- Play C D E F G A B C ascending. After each note, stop and sing back down to the tonic C, naming the interval you just sang ("that's a major sixth below").
+- Reverse: play the scale descending from the top C, sing *up* to each note from the starting C, naming the ascending interval.
+
+This cross-training (ascending notes identified as descending intervals, and vice versa) is what actually breaks the "I can only hear intervals from the bottom up" plateau.
+
+**Guitar physical check, all on the low E string, fretted against the open string:**
+
+| Fret | Interval | Fret | Interval |
+|---|---|---|---|
+| 1 | m2 | 7 | P5 |
+| 2 | M2 | 8 | m6 |
+| 3 | m3 | 9 | M6 |
+| 4 | M3 | 10 | m7 |
+| 5 | P4 | 11 | M7 |
+| 6 | A4/d5 | 12 | P8 |
+
+Play open string, fretted note, sing the gap, name it, check against the table. Do all 12 frets daily in under 2 minutes once memorized—this becomes a 90-second warmup forever.
 
 ---
 
 ## Exercise 2: Chord Quality Recognition
 
-### 2.1 Triads—Major, Minor, Diminished, Augmented (Week 5–6)
+### 2.1 Triads: Major, Minor, Diminished, Augmented (Days 29–42)
 
-**Acoustic Context:**
-Triads are stacked thirds. Major (M3+m3) sounds bright/resolved. Minor (m3+M3) sounds dark/introspective. Diminished (m3+m3) sounds tense/unstable. Augmented (M3+M3) sounds surreal/unresolved.
+**Acoustic signature in one paragraph:** A triad is two stacked thirds, and the *order* of major (4 semitones) and minor (3 semitones) thirds determines everything. Major triad (M3 on bottom, m3 on top) sounds resolved because the interval from root to 5th is a perfect fifth—simple ratio, stable. Minor triad (m3 then M3) keeps that same stable perfect fifth but darkens the color because the 3rd is closer to the root. Diminished (m3+m3) replaces the stable 5th with a tritone, so it sounds inherently unstable and wants to move. Augmented (M3+M3) is perfectly symmetrical—there's no "resolved" note to land on, which is why it sounds suspended and strange.
 
-**Drill Setup:**
-1. App: Chord ID → **Triads only** → Root position, close voicing
-2. Start with **Major vs. Minor only** (50 repetitions, 90%+ accuracy)
-3. Add **Diminished and Augmented** after Major/Minor mastery
+**Drill setup:**
+1. App: Chord ID → triads, root position, close voicing
+2. Start Major vs. Minor only, 50 reps, 90%+ before adding anything
+3. Add Diminished and Augmented once Major/Minor is automatic
 
-**Physical Execution:**
+**Piano close-position triads from C4:**
 
-**Piano Close-Position Triads (Root C):**
-- **C Major:** C–E–G (4 semitones + 3 semitones)
-- **C Minor:** C–E♭–G (3 semitones + 4 semitones)
-- **C Diminished:** C–E♭–G♭ (3 semitones + 3 semitones, tritone between root and fifth)
-- **C Augmented:** C–E–G♯ (4 semitones + 4 semitones, symmetrical, divides octave evenly)
+| Chord | Notes | Stack | Finger (RH, root position) |
+|---|---|---|---|
+| C Major | C–E–G | M3+m3 | 1-3-5 |
+| C Minor | C–E♭–G | m3+M3 | 1-3-5 |
+| C Diminished | C–E♭–G♭ | m3+m3 | 1-3-5 |
+| C Augmented | C–E–G♯ | M3+M3 | 1-3-5 |
 
-**Physical Practice (10 min/day):**
-1. Play each triad type on piano
-2. **Sing the root** → **play chord** → **sing root again** (establish tonal center)
-3. Arpeggiate ascending: C → E → G → C'
-4. Listen for the **third's quality** (major = wide/bright, minor = narrow/dark)
-5. Move through all 12 keys using circle of fifths: C → G → D → A → E → B → F♯ → D♭ → A♭ → E♭ → B♭ → F → C
+**Daily physical practice (10 min):**
+1. Play each triad type, root position, RH fingers 1-3-5
+2. **Sing root → play chord → sing root again.** This anchors the tonal center before you judge the chord's color against it.
+3. Arpeggiate ascending: C → E → G → C5, singing each note
+4. Listen specifically to the **third**: does it feel like a half-step reach (minor, closer together) or a wider, brighter stretch (major)?
+5. Cycle through all 12 keys by circle of fifths: C → G → D → A → E → B → F♯ → D♭ → A♭ → E♭ → B♭ → F → C. This is the single highest-leverage drill in this entire lab—triads in all keys, by feel, with no sheet music.
 
-**Guitar Triads (Movable Root-Position Shapes):**
-- **Major (Root on E string, 6th string):**
-  - Fret 3 (G Major): Strings 6-3-2 = Fret 3-5-4 (G-B-D notes, but G-D-G-B-D-G voicing)
-  - Simpler: Strings 4-3-2 only (D-G-B strings), Root on 4th string
-    - Fret 5 (G Major): 5-4-5 = G-B-D
-- **Minor:** Lower the 3rd by one fret
-  - Fret 5 (G Minor): 5-3-5 = G-B♭-D
+**Guitar movable triad shapes (top 3 strings, D-G-B, root on the G string):**
 
-**Chord Identification Drill:**
-1. **Listen:** App plays triad
-2. **Sing root:** Find the lowest, most stable pitch (bass note)
-3. **Assess third:** Is the middle note wide (major) or narrow (minor) above root?
-4. **Assess fifth:** Is the top note perfect (consonant), flat (diminished), or sharp (augmented)?
-5. **Name quality:** Major, Minor, Diminished, Augmented
-6. **Play on instrument:** Verify by playing the identified chord
+This "top-3-strings" triad set is far more useful on guitar than low-string shapes—it's how real comping guitarists voice chords, and it isolates exactly the three notes you're trying to hear.
 
-**Error Analysis:**
-- Confusing Major/Minor → Focus on the **third alone** (M3 vs. m3)
-- Confusing Diminished/Minor → Diminished has a **flat fifth** (tritone tension)
-- Confusing Augmented/Major → Augmented fifth sounds **exotic/unresolved**
+| Chord | G string | B string | high E string | Shape |
+|---|---|---|---|---|
+| G Major (root pos.) | 5 (G) | 5 (D... wait use B string 8 for D) | — | see below |
 
-### 2.2 Seventh Chords (Week 7–8)
+Simplified and verified movable shape, root on the **G string**:
 
-Add four-note chords: Major 7, Minor 7, Dominant 7, Half-Diminished 7, Diminished 7
+- **Major triad** (strings G-B-E, frets x-x-x from root R on G string): R(G str) – M3 (B str, 4 frets higher) – P5 (E str, 3 frets higher than B string note)
+  - Example in G: G string fret 5 (G) – B string fret 8 (D)... 
 
-**Acoustic Signatures:**
-- **Major 7 (Cmaj7: C–E–G–B):** Bright, dreamy, jazz ballad sound (M3+m3+M3)
-- **Minor 7 (Cm7: C–E♭–G–B♭):** Dark, smooth, Dorian vamp feel (m3+M3+m3)
-- **Dominant 7 (C7: C–E–G–B♭):** Tense, wants to resolve down a fifth, blues/rock sound (M3+m3+m3)
-- **Half-Diminished 7 (Cø7: C–E♭–G♭–B♭):** m7♭5, tense, minor ii chord quality (m3+m3+M3)
-- **Diminished 7 (C°7: C–E♭–G♭–B𝄫/A):** Symmetrical, horror movie tension (m3+m3+m3)
+**Simpler and more reliable for drilling: use the classic open-position triad shapes you already know, isolate just the top 3 notes.**
+- **G Major, open:** low E (3) – A (2) – D (0) – G (0) – B (0) – high E (3). Strum only strings G-B-E (open G, open B, fret 3 high E) = G–B–G. Sing each note before you strum.
+- **G Minor (same shape area), fret B string down one semitone:** You'll need a barre or different fingering—for drilling purposes, play minor triads on piano and use guitar for major triad and power-chord (no 3rd) recognition, since full movable minor triads require CAGED shapes covered in a dedicated guitar harmony lesson.
 
-**Piano Seventh Chord Shapes (Root C):**
-| Chord Type       | Notes           | Interval Stack       | Function                     |
-|------------------|-----------------|----------------------|------------------------------|
-| Cmaj7            | C–E–G–B         | M3+m3+M3             | Tonic resolution, I△7        |
-| Cm7              | C–E♭–G–B♭       | m3+M3+m3             | Subdominant/Modal, ii-7      |
-| C7 (Dominant)    | C–E–G–B♭        | M3+m3+m3             | Tension → Resolution, V7     |
-| Cø7 (Half-dim)   | C–E♭–G♭–B♭      | m3+m3+M3             | Pre-dominant, ii-7♭5         |
-| C°7 (Fully-dim)  | C–E♭–G♭–A       | m3+m3+m3 (symmetry)  | Passing/Auxiliary, vii°7     |
+**Chord ID execution, every question:**
+1. **Listen** to the chord
+2. **Sing the root**—find the lowest, most gravitationally stable pitch
+3. **Assess the third**: sing root, then sing up to the middle note. Wide gap = major. Narrow gap = minor.
+4. **Assess the fifth**: is the top note a comfortable, consonant fifth above the root (perfect), noticeably collapsed (diminished), or stretched/exotic (augmented)?
+5. **Name the quality** out loud
+6. **Play it back** on your instrument to verify before checking the app's answer
+
+**Error-specific fixes:**
+- Confusing Major/Minor → isolate the third. Play root + major 3rd, then root + minor 3rd, back to back, 10 times, singing the gap each time.
+- Confusing Diminished/Minor → diminished has a **flat fifth**. Play a minor triad, then flatten just the top note by a half step, and listen for the tritone tension against the root appearing.
+- Confusing Augmented/Major → play a major triad, then sharpen just the top note. Notice the chord stops feeling "resolved" and starts feeling like it's floating.
+
+### 2.2 Seventh Chords (Days 43–56)
+
+Add four-note chords: Maj7, Min7, Dominant 7, Half-Diminished 7 (m7♭5), Diminished 7.
+
+**Piano seventh chord shapes, root C, RH fingers 1-2-3-5:**
+
+| Chord | Notes | Stack | Function | Sound |
+|---|---|---|---|---|
+| Cmaj7 | C–E–G–B | M3+m3+M3 | I△7, tonic | Bright, dreamy |
+| Cm7 | C–E♭–G–B♭ | m3+M3+m3 | ii–7, modal | Smooth, dark |
+| C7 | C–E–G–B♭ | M3+m3+m3 | V7, dominant | Tense, wants to resolve down a 5th |
+| Cø7 | C–E♭–G♭–B♭ | m3+m3+M3 | ii–7♭5, pre-dominant | Tense, Locrian flavor |
+| C°7 | C–E♭–G♭–A | m3+m3+m3 | vii°7, symmetric | Horror-movie tension |
 
 **Execution:**
-1. App drill: 20 repetitions per chord type, isolated
-2. Once 85%+ each → **Mixed all five types**, 50 repetitions
-3. **Play-along:** For each drill chord, immediately play it on your instrument before answering
-4. **Functional context:** Play ii-V-I in C: Dm7 → G7 → Cmaj7 (feel each chord's pull)
+1. 20 isolated reps per chord type until you can call each one instantly
+2. At 85%+ each, mix all five types randomly, 50 reps
+3. For every drill question, **play the chord on your instrument immediately after naming it**, before checking the app's answer—this closes the loop every single time instead of only once a session
+4. **Functional context drill:** play ii–V–I in C (Dm7 → G7 → Cmaj7), whole notes at 60 BPM, and feel each chord's directional pull toward the next. This is more valuable than isolated chord ID because real music almost never presents chords in isolation.
 
-**Bass Player Focus:**
-You only need to recognize the root and quality (not voicing). But you must hear:
-- **Major 7 vs. Dominant 7:** The difference between stable (maj7) and tense (dom7) changes your note choices. Over Cmaj7, you can use B natural. Over C7, B♭ is diatonic.
-- **Minor 7 vs. Half-Diminished 7:** Cm7 = Dorian/Aeolian. Cø7 = Locrian (flat 5 tension).
+**Bass player's critical distinctions** (you need root + quality, not full voicing, but these two confusions wreck note choice in real time):
+- **Maj7 vs. Dom7:** over Cmaj7 you can safely land on B natural (the 7th, a beautiful color tone); over C7, B natural is a wrong note and B♭ is the correct diatonic choice. Mishearing this swap is the single most common bass transcription error on jazz and soul tunes.
+- **Min7 vs. Half-dim7:** Cm7 implies Dorian or Aeolian color (natural or lowered 6th, your call); Cø7 implies Locrian, meaning the 5th itself is flat and your walking-bass approach notes need to respect that ♭5 as a chord tone, not an avoid note.
 
 ---
 
-## Exercise 3: Rhythmic Dictation & Syncopation Recognition
+## Exercise 3: Rhythmic Dictation & Syncopation
 
-### 3.1 Simple Time Signatures (Week 9–10)
+### 3.1 Simple Time (Days 57–70)
 
-**Rhythmic Context:**
-Rhythm is the time-domain organization of attack points. Western music subdivides time into hierarchical grids: measures → beats → subdivisions. Recognizing syncopation (off-beat accents) requires internalizing the grid.
+**The grid in one paragraph:** Western rhythm is a nested grid—measure divides into beats, beats divide into subdivisions (2 for simple time, 3 for compound time). Syncopation is simply an attack that lands *between* grid points instead of on them. You cannot hear syncopation accurately until your body has internalized the underlying grid strongly enough that an off-grid attack feels like a a displacement against something solid. That's why every drill below starts with physically establishing pulse before you listen to anything.
 
-**Drill Setup:**
-1. App: Tenuto → Rhythm Training → **4/4 time, quarter and eighth notes only**
-2. Metronome at 80 BPM, quarter note = pulse
-3. Listen to 2-bar rhythm, notate on staff or speak rhythm syllables
+**Drill setup:**
+1. Tenuto → Rhythm Training → 4/4, quarter and eighth notes only
+2. Metronome at 80 BPM, quarter note = click
+3. Listen to a 2-bar rhythm, then notate (stems only) or speak back using rhythm syllables
 
-**Physical Execution:**
-1. **Establish pulse:** Tap quarter notes with your foot (1-2-3-4, 1-2-3-4)
-2. **Listen:** App plays rhythm
-3. **Clap back:** Reproduce rhythm while foot maintains pulse
-4. **Speak rhythm:** Use "1 e & a 2 e & a 3 e & a 4 e & a" for sixteenth-note subdivisions
-   - Example: Quarter-Eighth-Eighth-Quarter-Quarter = "1 _ _ _ 2 & 3 _ _ _ 4 _ _ _"
-5. **Notate:** Write rhythmic notation (stems only, no pitch)
-6. **Verify:** Check answer, clap correct rhythm 3 times
+**Execution, every rhythm:**
+1. **Establish pulse**: tap quarter notes with your foot, 4 full bars, before the app plays anything
+2. **Listen** to the 2-bar rhythm once
+3. **Clap it back immediately** while your foot keeps tapping the quarter-note pulse underneath—never let the foot stop
+4. **Speak it** using "1-e-&-a, 2-e-&-a, 3-e-&-a, 4-e-&-a" for sixteenth subdivisions. Example: quarter-eighth-eighth-quarter-quarter reads as "1___ 2&3___4___"
+5. **Notate** on a staff (stems only) or in a rhythm-syllable row
+6. **Verify**, then clap the correct version 3 times before the next question
 
-**Progression:**
-- Week 9: Quarter and eighth notes (4/4)
-- Week 10: Add sixteenth notes and rests
-- Once 85%+: Add triplets (1-trip-let, 2-trip-let)
-- Once 85%+: Add syncopation (accents on off-beats)
+**Progression inside this block:**
+- Days 57–63: quarters and eighths only
+- Days 64–70: add sixteenths and rests
+- At 85%+: add triplets (say "1-trip-let, 2-trip-let")
+- At 85%+: add syncopation—accents landing on the "&" or "a" subdivisions
 
-**Physical Anchors:**
-- **Straight eighths:** "Pass the god-damn but-ter" (8 syllables = 8 eighth notes in 4/4)
-- **Triplets:** "Chi-cken dum-pling" per beat
-- **Sixteenths:** "1-e-&-a" per beat
-- **Syncopation:** "ONE-and-TWO-and-THREE-and-FOUR-and" with random capital (accent) placement
+**Spoken subdivision anchors:**
 
-### 3.2 Compound Time & Polyrhythms (Week 11–12)
+| Subdivision | Spoken phrase | Count |
+|---|---|---|
+| Eighth notes | "Pass the god-damn but-ter" | 8 syllables = 8 eighths in 4/4 |
+| Triplets | "Chi-cken dum-pling" per beat | 3 per beat |
+| Sixteenths | "1-e-&-a" per beat | 4 per beat |
 
-**6/8 Time (Compound Duple):**
-- Pulse = dotted quarter (2 pulses per bar, each divisible by 3)
-- Counting: "1-2-3-4-5-6" with accent on 1 and 4
-- Physical: Conduct in 2 (DOWN-UP) while subdividing triplets internally
+### 3.2 Compound Time & Polyrhythms (Days 71–84)
 
-**Polyrhythm Drill (3 against 2):**
-1. **Setup:** Right hand taps 3 evenly spaced taps per measure (triplets). Left hand taps 2 evenly spaced taps (half notes).
-2. **Physical execution:**
-   - Speak: "PASS-the-GOD-damn-BUT-ter" while:
-     - Right hand taps on: PASS / damn / ter (3 taps)
-     - Left hand taps on: PASS / BUT (2 taps)
-3. **Verify alignment:** Record yourself, play back in Audacity, zoom in to verify accurate subdivision
+**6/8 (compound duple):** pulse is the dotted quarter, 2 pulses per bar, each subdividing into 3. Count "1-2-3-4-5-6" with accents on 1 and 4. Physically conduct in 2 (down-up) while your internal subdivision stays triplet-based—this is the exact feel of a slow blues shuffle or a waltz-adjacent ballad.
 
-**Polyrhythm (4 against 3):**
-- Right hand: 4 taps (sixteenths)
-- Left hand: 3 taps (triplets)
-- Spoken: "WHAT-is-the-PROB-lem-HERE-to-DAY" (12 syllables = lowest common multiple)
-  - Right hand accents: WHAT / PROB / HERE / DAY (every 3 syllables)
-  - Left hand accents: WHAT / lem / to (every 4 syllables)
+**3-against-2 polyrhythm drill:**
+1. Right hand taps 3 evenly spaced hits per measure. Left hand taps 2 evenly spaced hits in the same measure.
+2. Speak the phrase "PASS-the-GOD-damn-BUT-ter" while:
+   - Right hand strikes on: PASS / damn / ter
+   - Left hand strikes on: PASS / BUT
+3. Record yourself, open the file in Audacity, zoom into the waveform, and visually check that your 3 taps are evenly spaced and your 2 taps land exactly at the start and the halfway point of the bar.
+
+**4-against-3 polyrhythm drill:**
+- Right hand: 4 evenly spaced hits. Left hand: 3 evenly spaced hits.
+- Spoken 12-syllable phrase: "WHAT-is-the-PROB-lem-HERE-to-DAY"
+  - Right hand (groups of 3 syllables): WHAT / PROB / HERE / DAY
+  - Left hand (groups of 4 syllables): WHAT / lem / to
+
+Start both polyrhythms at 50 BPM per measure and don't increase tempo until you can hold 16 consecutive bars without the hands drifting into sync by accident (a common failure mode where 3-against-2 collapses into straight eighths).
 
 ---
 
 ## Exercise 4: Melodic Dictation & Transcription
 
-### 4.1 Diatonic Melodies (Week 13–14)
+### 4.1 Diatonic Melodies (Days 85–98)
 
-**Objective:** Transcribe 4-bar monophonic melodies in major keys by ear.
+**Objective:** transcribe 4-bar monophonic melodies in major keys, by ear, to standard notation.
 
 **Setup:**
-1. Source: Use nursery rhymes, folk tunes, or app-generated melodies (Teoria.com → Melody Dictation)
-2. Key signature: C Major only (no accidentals)
-3. Rhythm: Quarter and eighth notes only
+1. Source: Teoria.com Melody Dictation, or any folk/nursery melody you don't already know by heart
+2. Key: C major only, no accidentals yet
+3. Rhythm: quarters and eighths only
 
-**Physical Protocol:**
-1. **Establish key:** Play C major scale ascending and descending on your instrument. Sing scale with solfège (Do-Re-Mi-Fa-Sol-La-Ti-Do).
-2. **First listen (full playthrough):** Listen to entire 4-bar melody without pausing. **Sing back immediately** to test audiation.
-3. **Second listen (phrase by phrase):** Loop each 1-bar phrase. Sing it back until accurate.
-4. **Find starting pitch:** Play C major scale on instrument until you match the first note. Identify scale degree (Do, Re, Mi, etc.).
-5. **Transcribe melody:** For each note:
-   - Sing note with solfège
-   - Find note on instrument
-   - Verify interval from previous note (M2 up? m3 down?)
-   - Write notation: pitch + rhythm
-6. **Verification:** Play your transcription back on instrument. Does it match the recording?
+**Protocol:**
+1. **Establish the key center**: play C major ascending and descending on your instrument, singing solfège (Do-Re-Mi-Fa-Sol-La-Ti-Do) along with it
+2. **First listen, full playthrough, no pausing.** Immediately sing it back from memory—this tests raw audiation before you've analyzed anything
+3. **Second listen, phrase by phrase.** Loop each 1-bar phrase and sing it back until it's locked in
+4. **Find the starting pitch**: play up the C major scale on your instrument until you match the melody's first note, and name its scale degree
+5. **Transcribe note by note**:
+   - Sing the note with solfège
+   - Find it on your instrument
+   - Verify the interval from the previous note (was that a step up, a third down?)
+   - Write pitch + rhythm
+6. **Verify**: play your transcription on the instrument and compare directly against the recording
 
 **Troubleshooting:**
-- **Lost in the middle?** Anchor on **strong beats** (beat 1 of each bar) first. Fill in weak beats after.
-- **Can't find pitch?** Sing the tonic (Do) before each note to establish reference. Then sing the interval.
-- **Rhythm unclear?** Isolate rhythm first. Clap rhythm while ignoring pitch. Then add pitch.
+- **Lost in the middle of a phrase?** Anchor on beat 1 of each bar first—get the strong beats locked in, then fill in weak beats.
+- **Can't find a pitch?** Sing the tonic (Do) immediately before attempting the note, then sing the interval from Do to the target note.
+- **Rhythm is the confusing part, not pitch?** Isolate rhythm completely first: clap it while ignoring pitch entirely, lock the rhythm in, then layer pitch on top.
 
-### 4.2 Chromatic Melodies & Modulation (Week 15–16)
+### 4.2 Chromatic Melodies & Modulation (Days 99–112)
 
-Add: Accidentals, key changes, modal melodies
+Add accidentals, key changes, modal melodies.
 
-**Execution:**
-1. Start in C Major
-2. When you hear a note that doesn't fit the scale, **stop and test chromatically:**
-   - Play scale-tone options on instrument (e.g., F natural vs. F♯)
-   - One will sound wrong. The correct note will lock in with the harmonic context.
-3. For key changes: Identify new tonic by finding the **resolution point** (where tension releases)
+**Protocol:**
+1. Start diatonic in C major as in 4.1
+2. When a note doesn't fit the scale, stop and test chromatically on your instrument: play both the diatonic option (F natural) and the chromatic alternative (F♯) against the implied harmony. One will clearly sound wrong against the context; the correct note locks in and stops sounding like a question.
+3. For a key change, find the new tonic by locating the **resolution point**—the moment tension visibly releases and a new note feels like "home."
 
-**Jazz Standard Transcription (Real-World Application):**
-1. Pick a simple melody: "Autumn Leaves" (first 8 bars)
-2. Loop 1-bar phrases in Audacity (Selection → Ctrl+L or Cmd+L to loop)
-3. Slow down to 70% speed (Effect → Change Tempo → -30%) without pitch shift
-4. Transcribe note-by-note, then speed back to 100% to verify
+**Real-world application: transcribe 8 bars of a jazz standard melody (e.g. "Autumn Leaves")**
+1. In Audacity, select the 8-bar region and loop it (`Ctrl+L` / `Cmd+L`)
+2. Slow to 70% speed without pitch shift: `Effect → Change Tempo → -30%`
+3. Transcribe note by note at reduced speed
+4. Return to 100% speed and verify your transcription matches what you actually hear at tempo
 
 ---
 
-## Exercise 5: Stress Testing—Real-World Conditions
+## Exercise 5: Stress Testing Under Real-World Conditions
 
-### 5.1 Recognition in Dense Mix (Instrument Separation)
+### 5.1 Chord Recognition Inside a Full Mix
 
-**Objective:** Identify chord changes in a full band mix where bass, guitar, keys, and drums are all present.
-
-**Setup:**
-1. Source: Use a simple pop/rock song with clear chord changes (e.g., "Let It Be" by The Beatles)
-2. Tools: Audacity to loop 8-bar sections
-3. Instrument: Piano or guitar to test harmonic hypotheses
-
-**Protocol:**
-1. **First pass—Bass line:** Isolate lowest frequencies (Effect → Equalization → Low-pass filter at 300 Hz). Transcribe bass notes (root movement).
-2. **Second pass—Chord quality:** Listen to full mix. For each bass note, test major/minor/7th quality by playing options on your instrument. Trust the one that locks in.
-3. **Third pass—Rhythm:** When do chords change? Mark changes on a timeline (bar 1 beat 1, bar 2 beat 3, etc.).
-4. **Verification:** Play your chord chart along with the recording. Does it sound correct?
-
-**Common Errors:**
-- **Confusing bass note with chord root:** A bass player may play the 5th of the chord on beat 1. Listen for where the **piano or guitar changes** to identify true chord root.
-- **Missing passing chords:** Fast harmonic rhythm (chords changing every 2 beats) requires slower playback speed.
-
-### 5.2 Transcription with Background Noise
-
-**Objective:** Train in suboptimal listening conditions (simulating live venue, headphone bleed).
+**Objective:** identify chord changes in a dense arrangement (bass, guitar, keys, drums all present), not an isolated app tone.
 
 **Setup:**
-1. Use Audacity to mix a melody with white noise at -12 dB below signal
-2. Or play drill audio through phone speaker in a noisy room
+1. Pick a song with clear, slow harmonic rhythm—"Let It Be" by The Beatles is ideal
+2. Loop 8-bar sections in Audacity
+3. Keep your instrument within reach to test harmonic hypotheses live
 
 **Protocol:**
-1. Same melodic dictation protocol as Exercise 4.1
-2. **Focus technique:** Loop 1-bar phrases **10 times each** to burn through noise floor
-3. **Verification:** Remove noise, compare your transcription to clean audio
+1. **Pass 1, bass line:** low-pass filter at 300 Hz (`Effect → Filter Curve EQ`, boost below 300 Hz, cut above 500 Hz) to isolate the bass. Transcribe root movement only.
+2. **Pass 2, chord quality:** listen to the full mix. For each bass note, test major/minor/7th options on your instrument and trust the one that "locks in" against the recording instead of clashing.
+3. **Pass 3, rhythm of changes:** mark exactly when each chord change happens (bar 2, beat 3, for example) on a timeline.
+4. **Verify:** play your chord chart along with the actual recording, muted on your end, and listen for any clash.
 
-**Outcome:** Builds resilience for transcribing live performances, YouTube videos with compression artifacts, or field recordings.
+**Common failure modes:**
+- **Mistaking the bass note for the chord root.** A bassist might play the 5th on beat 1 of a chord change. Confirm the true root by listening for where the piano/guitar's **harmony** actually shifts, not just where the bass note changes.
+- **Missing fast passing chords.** If the harmonic rhythm speeds up to 2 beats per chord, slow the recording down before attempting transcription.
+
+### 5.2 Transcription With Background Noise
+
+**Objective:** build resilience for live venues, phone recordings, and compressed YouTube audio.
+
+**Setup:**
+1. In Audacity, mix a melody with white noise at −12 dB relative to the signal, or
+2. Play drill audio through a phone speaker in a noisy room
+
+**Protocol:**
+1. Run the same melodic dictation protocol as 4.1
+2. Loop each 1-bar phrase **10 times** to burn through the noise floor rather than straining for one perfect listen
+3. Remove the noise afterward and compare your transcription against the clean source to measure how much accuracy the noise actually cost you
 
 ---
 
 ## Exercise 6: Functional Ear Training—Harmonic Progressions
 
-### 6.1 Diatonic Chord Progressions (Week 17–18)
+### 6.1 Diatonic Progressions (Days 113–126)
 
-**Objective:** Recognize chord movement by Roman numeral function (I-IV-V-I, ii-V-I, etc.) in major keys.
+**Theory foundation, kept to one paragraph:** every diatonic chord has a function based on its pull toward or away from the tonic. **I** is home, stable, zero tension. **IV** and **ii** are pre-dominant—they create gentle lift that wants to move toward V. **V** is maximum tension, demanding resolution back to I. **vi** behaves like a relative-minor substitute for I, giving a "deceptive," bittersweet resolution instead of a full landing. Four progressions you already know by ear even if you've never named them: **I–IV–V–I** (basic rock/blues cadence), **I–vi–IV–V** (the "50s progression," "Stand By Me"), **ii–V–I** (the jazz turnaround), **I–V–vi–IV** (the modern pop loop, "Let It Be," "Don't Stop Believin'").
 
-**Theory Foundation (15% Academic Context):**
-In functional harmony, chords have gravitational pull based on scale degree:
-- **I (Tonic):** Home, resolution, stability
-- **ii (Supertonic):** Pre-dominant, moves to V
-- **IV (Subdominant):** Pre-dominant, moves to I or V
-- **V (Dominant):** Maximum tension, resolves to I
-- **vi (Submediant):** Relative minor, deceptive resolution
+**Drill setup:**
+1. Teoria.com → Chord Function ID, key of C major, chords I–vi
 
-Common progressions:
-- **I-IV-V-I:** Basic cadence (rock, folk, blues)
-- **I-vi-IV-V:** 50s progression ("Stand By Me")
-- **ii-V-I:** Jazz turnaround
-- **I-V-vi-IV:** Pop progression ("Let It Be," "Don't Stop Believin'")
+**Protocol, every progression:**
+1. **Establish tonic**: play C major on your instrument, sing "Do"
+2. **Listen** to the progression (e.g. I–IV–V–I)
+3. **Sing the bass note movement** as it happens: Do → Fa → Sol → Do
+4. **Name** the Roman numerals out loud
+5. **Play the progression back** on your instrument to verify
+6. **Judge the direction by feel**, not just by name:
+   - Movement **to I** feels like arriving home
+   - Movement **to IV** feels like lifting, opening up
+   - Movement **to V** feels like a question being asked
+   - Movement **to vi** feels like a soft, minor-flavored landing that isn't quite "home"
 
-**Drill Setup:**
-1. App: Teoria.com → Chord Function ID
-2. Key: C Major
-3. Chords: I, ii, iii, IV, V, vi (all diatonic triads)
+**Metronome drill for bassists and keyboardists:**
+1. Set 80 BPM, one chord per bar, whole notes
+2. Record yourself playing I–IV–V–I
+3. Play it back without watching your hands—can you hear the function of each chord and predict the next one before it arrives?
 
-**Physical Execution:**
-1. **Establish tonic:** Play I chord (C Major) on instrument. Sing root "Do."
-2. **Listen:** App plays progression (e.g., I → IV → V → I)
-3. **Sing roots:** For each chord, sing the bass note movement (Do → Fa → Sol → Do)
-4. **Name function:** Speak Roman numerals (I → IV → V → I)
-5. **Play progression:** Verify by playing the progression on your instrument
-6. **Analyze direction:**
-   - **To I (Tonic):** Sounds like arriving home
-   - **To IV (Subdominant):** Sounds like lifting, preparing
-   - **To V (Dominant):** Sounds like question, tension
-   - **To vi (Submediant):** Sounds like deceptive resolution, minor flavor
+### 6.2 Modal & Chromatic Progressions (Days 127–140)
 
-**Metronome Drill (Bass Players & Keyboardists):**
-1. Metronome at 80 BPM
-2. Record yourself playing I-IV-V-I (whole notes, one chord per bar)
-3. Listen back without looking at your hands
-4. Can you hear the harmonic function? Do chord changes feel inevitable?
+Add modal interchange, secondary dominants, tritone substitutions.
 
-### 6.2 Modal and Chromatic Progressions (Week 19–20)
+**Modal interchange** (borrowing from parallel minor): I–♭VII–♭VI–I
+- C → B♭ → A♭ → C (classic rock-ballad color)
 
-Add: Modal interchange (borrowing chords from parallel minor), secondary dominants, tritone substitutions
+**Secondary dominant**: I–V7/ii–ii–V7–I
+- C → E7 → Dm → G7 → C (the E7 is a dominant chord borrowed to temporarily "tonicize" Dm before the real resolution)
 
-**Examples:**
-- **Modal interchange:** I → ♭VII → ♭VI → I (borrowed from Mixolydian/Aeolian)
-  - C → B♭ → A♭ → C (rock ballad sound)
-- **Secondary dominant:** I → V7/ii → ii → V7 → I
-  - C → E7 → Dm → G7 → C (E7 temporarily tonicizes Dm)
-- **Tritone sub:** I → ♭II7 → I (substitute V7 with chord a tritone away)
-  - C → D♭7 → C (jazz sound, replaces G7 → C)
+**Tritone substitution**: I–♭II7–I replacing a V7
+- C → D♭7 → C (D♭7 shares the same tritone tension as G7 but resolves with smoother chromatic bass motion—classic jazz reharmonization)
 
-**Execution:**
-1. Play examples on piano/guitar while singing roots
-2. Use app drills for random modal progressions
-3. Transcribe real songs: Listen to a jazz standard (e.g., "Autumn Leaves") and chart the chord changes by ear
+**Protocol:**
+1. Play each example on piano or guitar while singing the root motion
+2. Use app drills for randomized modal progressions until you can call them without hesitation
+3. Apply it for real: pick a jazz standard ("Autumn Leaves" works well here too) and chart its chord changes purely by ear, then check your chart against a published lead sheet
 
 ---
 
-## Practical Cheat Sheet & Quick Reference
+## Quick Reference
 
-### Interval Recognition Physical Anchors
+### Interval Anchors
 
-| Interval | Melodic Cue                | Harmonic Feel         | Piano (from C4) | Guitar (Low E) |
-|----------|----------------------------|-----------------------|-----------------|----------------|
-| P1       | Identical pitch            | Perfect unison        | C–C             | 0–0            |
-| m2       | "Jaws" theme               | Maximum tension       | C–D♭            | 0–1            |
-| M2       | "Happy Birthday" start     | Tension, upward       | C–D             | 0–2            |
-| m3       | "Greensleeves" opening     | Minor, melancholic    | C–E♭            | 0–3            |
-| M3       | "Oh When the Saints"       | Bright, consonant     | C–E             | 0–4            |
-| P4       | "Here Comes the Bride"     | Open, hollow          | C–F             | 0–5            |
-| A4 (TT)  | "The Simpsons"             | Devil's interval      | C–F♯            | 0–6            |
-| P5       | "Twinkle Twinkle"          | Stable, power chord   | C–G             | 0–7            |
-| m6       | "The Entertainer" descend. | Wide, tense           | C–A♭            | 0–8            |
-| M6       | "My Bonnie" leap           | Wide, consonant       | C–A             | 0–9            |
-| m7       | "Star Trek" theme          | Wide, dissonant       | C–B♭            | 0–10           |
-| M7       | Dissonant leading tone     | Tense resolution      | C–B             | 0–11           |
-| P8       | Same note, one octave      | Doubling resonance    | C–C'            | 0–12           |
+| Interval | Melodic Cue | Feel | Piano (from C4) | Guitar (low E) |
+|---|---|---|---|---|
+| P1 | Identical pitch | Perfect fusion | C–C | 0–0 |
+| m2 | *Jaws* theme | Max tension | C–D♭ | 0–1 |
+| M2 | "Happy Birthday" start | Rising tension | C–D | 0–2 |
+| m3 | "Greensleeves" opening | Melancholic | C–E♭ | 0–3 |
+| M3 | "Oh When the Saints" | Bright | C–E | 0–4 |
+| P4 | "Here Comes the Bride" | Open, hollow | C–F | 0–5 |
+| A4/d5 | *The Simpsons* theme | Devil's interval | C–F♯ | 0–6 |
+| P5 | "Twinkle Twinkle" | Stable, strong | C–G | 0–7 |
+| m6 | "The Entertainer" descending | Wide, tense | C–A♭ | 0–8 |
+| M6 | "My Bonnie Lies Over the Ocean" leap | Wide, consonant | C–A | 0–9 |
+| m7 | *Star Trek* theme | Wide, dissonant | C–B♭ | 0–10 |
+| M7 | Leading-tone tension | Tense | C–B | 0–11 |
+| P8 | Same note, doubled | Fused resonance | C–C5 | 0–12 |
 
 ### Chord Quality Quick ID
 
-| Chord Type          | Interval Stack | Sound Signature                  | Piano (Root C)       |
-|---------------------|----------------|----------------------------------|----------------------|
-| Major Triad         | M3 + m3        | Bright, resolved                 | C–E–G                |
-| Minor Triad         | m3 + M3        | Dark, introspective              | C–E♭–G               |
-| Diminished Triad    | m3 + m3        | Tense, unstable (tritone)        | C–E♭–G♭              |
-| Augmented Triad     | M3 + M3        | Surreal, unresolved (symmetry)   | C–E–G♯               |
-| Major 7             | M3+m3+M3       | Dreamy, jazz ballad              | C–E–G–B              |
-| Minor 7             | m3+M3+m3       | Smooth, Dorian vamp              | C–E♭–G–B♭            |
-| Dominant 7          | M3+m3+m3       | Tense, wants resolution          | C–E–G–B♭             |
-| Half-Diminished 7   | m3+m3+M3       | Tense, minor ii chord (m7♭5)     | C–E♭–G♭–B♭           |
-| Diminished 7        | m3+m3+m3       | Symmetrical horror movie tension | C–E♭–G♭–A (B𝄫)       |
+| Chord | Stack | Sound | Piano (root C) |
+|---|---|---|---|
+| Major triad | M3+m3 | Bright, resolved | C–E–G |
+| Minor triad | m3+M3 | Dark, introspective | C–E♭–G |
+| Diminished triad | m3+m3 | Tense, unstable | C–E♭–G♭ |
+| Augmented triad | M3+M3 | Suspended, symmetric | C–E–G♯ |
+| Maj7 | M3+m3+M3 | Dreamy | C–E–G–B |
+| Min7 | m3+M3+m3 | Smooth, modal | C–E♭–G–B♭ |
+| Dom7 | M3+m3+m3 | Tense, resolving | C–E–G–B♭ |
+| Half-dim7 (ø7) | m3+m3+M3 | Tense, Locrian | C–E♭–G♭–B♭ |
+| Dim7 (°7) | m3+m3+m3 | Symmetric, horror | C–E♭–G♭–A |
 
 ### Rhythm Counting Systems
 
-| Subdivision        | Counting System         | Syllables Per Beat  | BPM Range   |
-|--------------------|-------------------------|---------------------|-------------|
-| Quarter notes      | 1-2-3-4                 | 1                   | 60–120      |
-| Eighth notes       | 1-&-2-&-3-&-4-&         | 2                   | 80–160      |
-| Sixteenth notes    | 1-e-&-a-2-e-&-a         | 4                   | 60–100      |
-| Triplets           | 1-trip-let-2-trip-let   | 3                   | 60–120      |
-| Quintuplets        | 1-ta-ti-ta-let          | 5                   | 40–80       |
+| Subdivision | Counting | Syllables/beat | BPM range |
+|---|---|---|---|
+| Quarter notes | 1-2-3-4 | 1 | 60–120 |
+| Eighth notes | 1-&-2-&-3-&-4-& | 2 | 80–160 |
+| Sixteenth notes | 1-e-&-a-2-e-&-a | 4 | 60–100 |
+| Triplets | 1-trip-let-2-trip-let | 3 | 60–120 |
+| Quintuplets | 1-ta-ki-mi-ta | 5 | 40–80 |
 
-### Practice Session Template (Daily 20-Minute Routine)
+### Daily 20-Minute Practice Routine
 
 ```mermaid
 graph LR
-    subgraph sub_warmup ["Warmup (5 min)"]
-        A1[Sing C Major Scale] --> A2[Play Scale on Instrument]
-        A2 --> A3[Interval Drill: P1-P5-P8]
+    subgraph sub_warmup ["Warmup — 5 min"]
+        A1["Sing C major scale"] --> A2["Play scale on instrument"]
+        A2 --> A3["Interval drill: P1, P5, P8"]
     end
-    
-    subgraph sub_focus ["Focus Drill (10 min)"]
-        B1[App: Current Exercise] --> B2[Log Accuracy %]
-        B2 --> B3[Repeat Errors 3x]
+
+    subgraph sub_focus ["Focus Drill — 10 min"]
+        B1["Run current app exercise"] --> B2["Log accuracy %"]
+        B2 --> B3["Repeat every error 3x"]
     end
-    
-    subgraph sub_application ["Real-World Application (5 min)"]
-        C1[Transcribe 1 Bar of Real Song] --> C2[Play Transcription on Instrument]
+
+    subgraph sub_apply ["Real Application — 5 min"]
+        C1["Transcribe 1 bar of a real song"] --> C2["Play transcription on instrument"]
     end
-    
+
     sub_warmup --> sub_focus
-    sub_focus --> sub_application
+    sub_focus --> sub_apply
 ```
 
 ### Progression Milestones
 
-| Week   | Focus                                | Target Accuracy | Next Step                          |
-|--------|--------------------------------------|-----------------|-------------------------------------|
-| 1–2    | P1, M2, M3, P4, P5, P8 (ascending)   | 90%+            | Add minor intervals                 |
-| 3–4    | All intervals ascending + descending | 90%+            | Add harmonic intervals              |
-| 5–6    | Major/Minor triads                   | 90%+            | Add diminished/augmented            |
-| 7–8    | All seventh chords                   | 85%+            | Add inversions                      |
-| 9–10   | 4/4 rhythm (quarters/eighths)        | 85%+            | Add sixteenths/triplets             |
-| 11–12  | Compound time, polyrhythms           | 80%+            | Add syncopation                     |
-| 13–14  | Diatonic melodies (C Major)          | 80%+            | Add accidentals                     |
-| 15–16  | Chromatic melodies, modulation       | 75%+            | Add modal melodies                  |
-| 17–18  | Diatonic chord progressions (I-IV-V) | 85%+            | Add modal interchange               |
-| 19–20  | Modal/chromatic progressions         | 80%+            | Transcribe full jazz standard       |
+| Days | Focus | Target Accuracy | Next Step |
+|---|---|---|---|
+| 1–14 | P1, M2, M3, P4, P5, P8 ascending | 90%+ | Add minor intervals |
+| 15–28 | All intervals, both directions | 90%+ | Add harmonic intervals |
+| 29–42 | Major/minor triads | 90%+ | Add diminished/augmented |
+| 43–56 | All seventh chord types | 85%+ | Add inversions |
+| 57–70 | 4/4 rhythm, quarters/eighths | 85%+ | Add sixteenths/triplets |
+| 71–84 | Compound time, polyrhythms | 80%+ | Add syncopation |
+| 85–98 | Diatonic melodies (C major) | 80%+ | Add accidentals |
+| 99–112 | Chromatic melodies, modulation | 75%+ | Add modal melodies |
+| 113–126 | Diatonic progressions | 85%+ | Add modal interchange |
+| 127–140 | Modal/chromatic progressions | 80%+ | Transcribe a full jazz standard |
 
-### Troubleshooting Common Errors
+### Troubleshooting
 
-| Problem                                      | Diagnosis                                    | Fix                                                                 |
-|----------------------------------------------|----------------------------------------------|---------------------------------------------------------------------|
-| Confusing M3 and P4                          | Not singing intervals before answering       | Sing both pitches aloud, feel the width difference                  |
-| Can't identify chord quality in full mix     | Listening to melody instead of harmony       | Mute or EQ out vocals/lead instruments, isolate bass and piano      |
-| Losing rhythmic pulse during dictation       | Not physically tapping pulse                 | Always tap quarter note pulse with foot; never stop the grid        |
-| Missing chromatic passing tones              | Assuming diatonic scale                      | Test every "wrong" note by playing scale-tone vs. chromatic option  |
-| Intervals sound correct but answers are wrong| Relative vs. absolute pitch confusion        | Always anchor to a reference pitch (tonic) before identifying       |
-| Can't transcribe fast runs                   | Trying to catch every note at full speed     | Slow to 50% in Audacity, transcribe, speed back up to verify        |
+| Problem | Diagnosis | Fix |
+|---|---|---|
+| Confusing M3 and P4 | Not singing the interval before answering | Sing both pitches aloud and feel the width difference before naming it |
+| Can't ID chord quality in a full mix | Listening to melody/lead instead of harmony | Low-pass filter out everything above 500 Hz; isolate bass and keys/guitar comping |
+| Losing the pulse during rhythmic dictation | Not physically tapping the grid | Tap the quarter-note pulse with your foot continuously, never stop the grid mid-exercise |
+| Missing chromatic passing tones | Assuming the melody stays diatonic | Test the "wrong" note against both the diatonic and chromatic option on your instrument |
+| Intervals sound right but answers are wrong | Relative vs. absolute pitch confusion | Always sing the tonic as a reference before naming any interval |
+| Can't transcribe fast runs | Trying to catch every note at full tempo | Slow to 50% in Audacity (no pitch shift), transcribe, then verify back at full speed |
 
-### Tools & CLI Commands
+### Tool Commands
 
-**Audacity:**
-- **Import audio:** File → Open (Cmd+O / Ctrl+O)
-- **Loop selection:** Select region → Loop button in Transport toolbar
-- **Change tempo (no pitch shift):** Effect → Change Tempo → Enter -30% to slow down
-- **Low-pass filter (isolate bass):** Effect → Filter Curve EQ → Boost below 300 Hz, cut above 500 Hz
-- **Export selection:** File → Export → Export Selected Audio
+**Audacity**
+- Open file: `Cmd+O` / `Ctrl+O`
+- Loop a selection: select region → Loop button in Transport toolbar
+- Slow down without pitch shift: `Effect → Change Tempo → -30%`
+- Isolate bass: `Effect → Filter Curve EQ` → boost below 300 Hz, cut above 500 Hz
+- Export a clip: `File → Export → Export Selected Audio`
 
-**MuseScore (for Notation Verification):**
-- **New score:** File → New (Cmd+N / Ctrl+N)
-- **Note input:** Press N, use QWERTY (A-G for pitches), numbers 1-7 for durations (5=quarter, 6=eighth)
-- **Playback:** Spacebar to play, [ and ] to adjust tempo
+**MuseScore (verify your transcriptions against real notation)**
+- New score: `Cmd+N` / `Ctrl+N`
+- Note input: press `N`, letters A–G set pitch, numbers 1–7 set duration (5 = quarter, 6 = eighth)
+- Playback: Spacebar; adjust tempo with `[` and `]`
 
-**Teoria.com (No Installation):**
-- Navigate to https://teoria.com/exercises
-- Interval training: Exercises → Intervals → Melodic
-- Chord ID: Exercises → Chords → Triads or Seventh Chords
-- No registration required, runs in browser
+**Teoria.com**
+- `teoria.com/exercises` → Intervals → Melodic, or Chords → Triads/Seventh Chords, no account needed
 
-**Metronome CLI (if using Sonic Pi or CLI tools):**
+**Sonic Pi metronome (80 BPM click for untethered drilling)**
 ```ruby
-# Sonic Pi metronome at 80 BPM with subdivisions
 live_loop :metronome do
   sample :elec_tick, amp: 1
-  sleep 0.75  # 80 BPM = 0.75 sec per beat
+  sleep 0.75  # 60 / 80 BPM = 0.75 sec per beat
 end
 ```
 
 ---
 
-## Final Remarks: Integration & Long-Term Practice
+## Long-Term Integration
 
-Ear training is cumulative. Intervals learned in Week 1 must be maintained through Week 20. Use spaced repetition:
-- **Daily:** Current focus exercise (10 min)
-- **Every 3 days:** Review previous exercise (5 min)
-- **Weekly:** Transcribe one real-world song (20 min)
+Ear training compounds only if old material stays active. Use this review cadence alongside whatever week you're currently on:
 
-**Instrument players:** Your ear is only as strong as your ability to physically reproduce what you hear. Always close the loop: hear → sing → play → verify.
+- **Daily:** current focus exercise, 10 minutes
+- **Every 3 days:** revisit the previous exercise block, 5 minutes
+- **Weekly:** transcribe one real song passage end to end, 20 minutes
 
-**Composers and producers:** Ear training accelerates harmonic decision-making. When you hear a chord progression in your head, you can immediately notate or program it without trial-and-error.
+**For instrument players:** your ear is only as useful as your ability to physically reproduce what it hears. Never break the loop—hear, sing, play, verify—even when you're confident you already know the answer.
 
-**Live performers:** Strong ears enable real-time adaptation. If a guitarist modulates to an unexpected key, a trained ear catches it within one bar and adjusts.
+**For composers and producers:** a trained ear turns harmonic decisions from trial-and-error into direct notation or programming. You hear the progression in your head and you can write it down immediately, no hunting at the keyboard.
 
-Consistency and deliberate error-correction beat volume. Log your accuracy, identify systematic errors (e.g., always confusing m3 and M2), and drill those specific distinctions until they become automatic.
+**For live performers:** this is what lets you catch an unexpected key change or a last-second chord substitution within one bar and adjust on the fly instead of clashing.
+
+Track your specific, recurring errors rather than your overall score. "I always mistake m3 for M2 in descending melodic context" is an actionable fact. "I got 70% today" is not. Drill the specific confusion until it disappears, then move to the next one.

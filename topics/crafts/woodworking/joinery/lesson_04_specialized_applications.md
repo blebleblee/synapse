@@ -86,21 +86,29 @@ Cam lock systems, ubiquitous in flat-pack furniture, consist of a cylindrical ca
 
 Tusk tenons, a traditional knockdown method, extend the mortise-and-tenon principle into demountable form. The tenon passes completely through the mortise and projects beyond, and a separate wedge—the tusk—is driven through a slot cut perpendicular to the tenon near its end. The tusk bears against the outer face of the mortised component, drawing the tenon shoulder tight against the mortise face. The geometry is self-tightening under load: weight or racking forces on the assembly increase the compressive stress on the tusk, which in turn clamps the joint more firmly. The system requires no metal fasteners, permits disassembly by tapping out the tusk, and announces its joinery method as a visible design element. The tusk slot must be positioned far enough from the tenon's end to leave adequate wood behind the slot—typically one to one and a half times the slot width—to prevent splitting when the tusk is driven.
 
-```
-Tusk Tenon Assembly:
-
-  [Base/Leg]                [Mortised Component]
-      ║                             ║
-      ║         Tenon               ║
-      ║═══════════╬═════════════════║═══╗
-      ║           ║                 ║   ║ Tusk Wedge
-      ║           ║    Mortise      ║   ║ (perpendicular)
-      ║═══════════╬═════════════════║═══╝
-      ║                             ║
-      ║                             ║
-
-Tusk driven through slot compresses tenon shoulder against mortise,
-creating clamping force without adhesive or permanent fasteners.
+```mermaid
+flowchart TD
+    Base["Base/Leg"]
+    Mortised["Mortised Component"]
+    Tenon["Tenon<br/>(protrudes from base)"]
+    Mortise["Mortise<br/>(cavity in component)"]
+    TuskSlot["Tusk Slot<br/>(perpendicular hole)"]
+    Wedge["Tusk Wedge"]
+    Force["Clamping Force<br/>(compression at shoulder)"]
+    
+    Base -->|"extends from"| Tenon
+    Mortised -->|contains| Mortise
+    Tenon -->|"inserts into"| Mortise
+    Tenon -->|"passes through"| TuskSlot
+    Wedge -->|"driven through"| TuskSlot
+    Wedge -->|compresses| Tenon
+    Tenon -->|"shoulder bears against"| Mortised
+    Wedge -->|creates| Force
+    
+    style Force fill:#e1f5e1
+    style Wedge fill:#ffe6e6
+    style Tenon fill:#e6f3ff
+    style Mortise fill:#fff4e6
 ```
 
 ### Biscuit Joinery: Mechanical Principles, Glue-Surface Geometry, and Alignment Tolerances

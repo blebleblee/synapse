@@ -46,25 +46,31 @@ Stock(t+1) = Stock(t) + Σ(Inflows) - Σ(Outflows)
 
 This deceptively simple equation generates rich dynamics because flows themselves depend on stock levels, creating feedback loops. A **reinforcing feedback loop** occurs when a stock influences a flow in a manner that amplifies the initial change. Consider organizational capability as a stock: higher capability enables successful project delivery, which builds reputation, attracting better talent, further increasing capability. This virtuous cycle can generate exponential growth under favorable conditions. The mathematical signature of reinforcing feedback appears as an even number of negative relationships around the loop, or more simply, net positive polarity.
 
-```
-      ┌─────────────────┐
-      │                 │
-      ▼                 │
-  Capability ──▶ Success ──▶ Reputation ──▶ Talent Acquisition
-      ▲                                          │
-      └──────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Capability["Capability"]
+    Success["Success"]
+    Reputation["Reputation"]
+    TalentAcquisition["Talent Acquisition"]
+    
+    Capability -->|enables| Success
+    Success -->|builds| Reputation
+    Reputation -->|attracts| TalentAcquisition
+    TalentAcquisition -->|strengthens| Capability
 ```
 
 Conversely, a **balancing feedback loop** drives the system toward equilibrium by counteracting deviation from a target state. Workload regulation provides a canonical example: as task backlog grows, pressure increases, teams work harder, completion rate rises, backlog shrinks, pressure decreases, pace moderates. This negative feedback maintains homeostasis. The mathematical signature involves an odd number of negative relationships around the loop, yielding net negative polarity.
 
-```
-      ┌──────────────────┐
-      │                  │
-      ▼                  │
-  Backlog ──▶ Pressure ──▶ Completion Rate
-      ▲                        │
-      └────────────────────────┘
-      (-)                      (+)
+```mermaid
+flowchart TD
+    B["Backlog"]
+    P["Pressure"]
+    CR["Completion Rate"]
+    
+    B -->|"+"| P
+    P -->|"+"| CR
+    CR -->|"+"| B
+    P -->|"+"| P
 ```
 
 Real systems contain multiple interacting feedback loops operating simultaneously, creating complex dynamics. Delays introduce temporal separation between cause and effect, generating oscillation and instability. If hiring decisions lag six months behind workload changes, organizations perpetually overshoot and undershoot optimal staffing levels, creating feast-or-famine cycles. Nonlinearities arise when relationships between variables shift based on operating region—marginal productivity increases linearly at low utilization but degrades exponentially beyond 85% capacity as coordination overhead dominates.

@@ -68,45 +68,45 @@ Two aspects of this binding are worth examining carefully. First, the `roleRef` 
 
 The request authorization flow is best understood as a decision pipeline:
 
-```
-Client Request
-     │
-     ▼
-┌──────────────────────────────────┐
-│   Authentication Middleware      │
-│   (resolve credential → subject) │
-└────────────────┬─────────────────┘
-                 │  username, groups, uid
-                 ▼
-┌──────────────────────────────────┐
-│   Authorization Chain            │
-│                                  │
-│   ┌──────────────────────────┐   │
-│   │  Node Authorizer         │   │
-│   │  (kubelet credentials)   │   │
-│   └────────────┬─────────────┘   │
-│                │ deny → next     │
-│   ┌────────────▼─────────────┐   │
-│   │  RBAC Authorizer         │   │
-│   │                          │   │
-│   │  For each RoleBinding /  │   │
-│   │  ClusterRoleBinding that │   │
-│   │  references the subject: │   │
-│   │    resolve Role →        │   │
-│   │    match PolicyRule →    │   │
-│   │    allow if match found  │   │
-│   └────────────┬─────────────┘   │
-│                │ deny → next     │
-│   ┌────────────▼─────────────┐   │
-│   │  Webhook Authorizer      │   │
-│   │  (optional OPA/Kyverno)  │   │
-│   └──────────────────────────┘   │
-└──────────────────────────────────┘
-                 │
-                 ▼
-           Allow / Deny
+```mermaid
+flowchart TD
+    CLIENT["Client Request"]
+
+    CLIENT --> AUTH
+
+    AUTH["Authentication Middleware\n(resolve credential → subject)"]
+
+    AUTH -->|"username, groups, uid"| AUTHZ_CHAIN
+
+    subgraph AUTHZ_CHAIN ["Authorization Chain"]
+        NODE["Node Authorizer\n(kubelet credentials)"]
+        RBAC["RBAC Authorizer\n\nFor each RoleBinding / ClusterRoleBinding\nthat references the subject:\n  resolve Role →\n  match PolicyRule →\n  allow if match found"]
+        WEBHOOK["Webhook Authorizer\n(optional OPA/Kyverno)"]
+
+        NODE -->|"deny → next"| RBAC
+        RBAC -->|"deny → next"| WEBHOOK
+    end
+
+    AUTHZ_CHAIN --> DECISION["Allow / Deny"]
 ```
 
 The RBAC authorizer's internal resolution follows a specific lookup pattern. When a request arrives for subject `system:serviceaccount:monitoring:log-collector`, the authorizer queries the in-memory cache (backed by informers watching etcd) for all bindings whose subject list contains either that exact service account or any group the service account belongs to, including the synthetic `system:serviceaccounts` group and `system:serviceaccounts:monitoring`. It collects the referenced roles, iterates over their rules, and performs a match against the request's (apiGroup, resource, resourceName, verb, namespace) tuple. The evaluation short-circuits on first match, and the RBAC authorizer's decision feeds into the broader chain of authorizers configured via `--authorization-modes` on the API server.
 
-Service account tokens in modern Kubernetes (1.21+) are issued as projected volumes with bounded lifetimes, audience constraints, and namespace binding. The token's claims include `sub` in the form `system:serviceaccount:<namespace>:<name>`, which is what the RBAC lookup resolves against. Understanding this token format is critical when debugging authorization failures: a pod using an
+Service account tokens in modern Kubernetes (1.21+) are issued as projected volumes with bounded lifetimes, audience constraints, and namespace binding. The token's claims include `sub` in the form `system:serviceaccount:<namespace>:<name>`, which is what the RBAC lookup resolves against.
+
+## Conclusion
+
+The preceding examination of RBAC fundamentals establishes that authorization in production systems is an exercise in structured constraint propagation, not mere access lists. The triadic model—principals bound to roles, roles composed of permissions—survives precisely because it maps cleanly onto organizational hierarchies while maintaining computational tractability: role bindings create an O(bindings × rules) lookup space that in-memory caches and indexed data structures can satisfy at millisecond scale, even in clusters managing tens of thousands of subjects. The critical insight is that RBAC's expressive power derives not from exotic rule composition but from the separation of *binding scope* (namespace vs. cluster) and *permission scope* (namespaced resources vs. cluster-scoped resources), which permits both least-privilege isolation and controlled privilege escalation through explicit ClusterRoleBindings. When troubleshooting authorization failures, the verification path is deterministic: enumerate the subject's effective bindings via `kubectl get rolebindings,clusterrolebindings --all-namespaces -o json | jq '.items[] | select(.subjects[]?.name == "<principal>")'`, resolve each referenced role, expand wildcard rules, and match the request tuple against the union of rule sets—any gap in this chain is the failure point.
+
+The integration of service account tokens as first-class RBAC subjects demonstrates the model's extensibility: the synthetic groups `system:serviceaccounts` and `system:serviceaccounts:<namespace>` permit both namespace-level and cross-namespace delegation without introducing special-case logic in the authorizer. Modern token projection (BoundServiceAccountTokenVolume) binds cryptographic identity to pod lifecycle and audience scope, ensuring that even compromised tokens carry temporal and contextual constraints that limit blast radius. In multi-authorizer deployments, RBAC typically occupies the second or third position in the chain (after Node authorization, before Webhook), and its deny-by-default, first-match-wins semantics ensure predictable behavior: a request proceeds if *any* binding grants the required permission, and the absence of explicit denies means that adding permissions is monotonic and safe. This design choice—permit-on-match rather than explicit deny rules—simplifies auditing and eliminates the combinatorial explosion inherent in deny-precedence systems, making RBAC's operational complexity linear in the number of roles rather than exponential in rule interactions.
+
+## Summary & Verification Matrix
+
+| **Governing Invariant** | **Core Mechanism** | **Diagnostic Criterion** | **Failure Signature** |
+|------------------------|-------------------|-------------------------|----------------------|
+| Deny-by-default, permit-on-first-match | RBAC authorizer iterates subject's bindings, short-circuits on first rule match for (apiGroup, resource, verb, namespace) tuple | `kubectl auth can-i <verb> <resource> --as=<principal>` returns definitive yes/no; audit logs show `authorization.k8s.io` decision | 403 Forbidden with no matching RoleBinding/ClusterRoleBinding in `kubectl get` output for subject |
+| Namespace-scoped RoleBindings grant only namespaced-resource permissions within binding's namespace | RoleBinding references Role (namespaced) or ClusterRole (reusable template); permission scope ≤ min(binding.namespace, role.rules[].namespace-scope) | Cross-namespace access denied even if Role permits it; `kubectl get rolebinding -n <ns>` shows subject bound to role with required apiGroup/resource/verb | Request to resource in namespace A with RoleBinding in namespace B fails despite correct Role |
+| ClusterRoleBindings grant cluster-wide permissions, including cluster-scoped resources | ClusterRoleBinding + ClusterRole permits access to non-namespaced resources (nodes, PVs, CRDs) and all-namespace queries | `kubectl get nodes --as=<principal>` succeeds only with ClusterRoleBinding to role granting `get nodes` | Subject can access namespaced resources in own namespace but `kubectl get <cluster-resource>` returns 403 |
+| Service accounts resolve to `system:serviceaccount:<ns>:<name>` and inherit `system:serviceaccounts` / `system:serviceaccounts:<ns>` group memberships | Authenticator extracts `sub` claim from JWT, RBAC matches against explicit subject or group membership in binding | `kubectl get sa <name> -n <ns> -o yaml` shows auto-mounted token secret; `kubectl auth can-i --as=system:serviceaccount:<ns>:<name>` verifies effective permissions | Pod using service account receives 403; verify token projection in pod spec and binding references correct subject string |
+| Wildcard expansion (`*`) in apiGroups, resources, verbs interpreted as literal set union at match time | Rule `{apiGroups: ["*"], resources: ["*"], verbs: ["*"]}` matches all requests; partial wildcards invalid | Role with `resources: ["*"]` allows `get pods`, `get services`, etc.; removing wildcard requires enumerating each resource | Overly permissive access granted; audit shows single binding granting cluster-admin-equivalent permissions |
+| Authorization chain position (Node → RBAC → Webhook) determines evaluation order; RBAC allow preempts later denies | API server `--authorization-mode=Node,RBAC,Webhook` flag configures chain; first allow or final deny wins | API server logs show `authorization.k8s.io` annotations indicating which authorizer made decision | Request allowed by RBAC but denied in external webhook still succeeds; reorder modes or add explicit RBAC deny via Webhook |

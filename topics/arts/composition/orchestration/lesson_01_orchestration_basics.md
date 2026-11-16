@@ -54,27 +54,45 @@ graph TB
 
 **First-position fingering on the A string**, the workhorse register for ensemble writing:
 
-```
-A string (open A4):
-┌──────┬──────┬──────┬──────┬──────┐
-│  0   │  1   │  2   │  3   │  4   │
-│  A4  │  B4  │  C5  │  D5  │  E5  │
-└──────┴──────┴──────┴──────┴──────┘
- open   index  middle  ring   pinky
+```mermaid
+flowchart LR
+    fret0["Fret 0 (Open)\nA4"]
+    fret1["Fret 1 (Index)\nB4"]
+    fret2["Fret 2 (Middle)\nC5"]
+    fret3["Fret 3 (Ring)\nD5"]
+    fret4["Fret 4 (Pinky)\nE5"]
+
+    fret0 --> fret1 --> fret2 --> fret3 --> fret4
 ```
 
 **Bow articulation — notate exactly what you want, players execute literally:**
 
-```
-Détaché (one note per bow stroke, separate):
-♩ ♩ ♩ ♩  →  ∏ V ∏ V
-
-Legato (slurred, one bow across several notes):
-♩ ♩ ♩ ♩  →  ∏─────────  (slur marking over the beam)
-
-Spiccato (bow bounces off the string, light and detached):
-♪♪♪♪♪♪  →  ∏V∏V∏V  — mark "spiccato" at tempo ≤132 bpm;
-above that it becomes "sautillé" (bow bounces on its own, less player control)
+```mermaid
+flowchart TD
+    subgraph detache ["Détaché (one note per bow stroke, separate)"]
+        D1["♩ ♩ ♩ ♩"]
+        D2["∏ V ∏ V"]
+        D1 -->|"bow direction alternates"| D2
+    end
+    
+    subgraph legato ["Legato (slurred, one bow across several notes)"]
+        L1["♩ ♩ ♩ ♩"]
+        L2["∏─────────<br/>(slur marking over the beam)"]
+        L1 -->|"continuous bow stroke"| L2
+    end
+    
+    subgraph spiccato ["Spiccato (bow bounces off the string, light and detached)"]
+        S1["♪♪♪♪♪♪"]
+        S2["∏V∏V∏V"]
+        S3["Mark 'spiccato' at tempo ≤132 bpm"]
+        S4["Above 132 bpm becomes<br/>'sautillé'<br/>(bow bounces on its own,<br/>less player control)"]
+        S1 --> S2
+        S2 --> S3
+        S3 --> S4
+    end
+    
+    detache --> legato
+    legato --> spiccato
 ```
 
 **Contact point changes timbre more than dynamic does.** This is the single most underused string tool in student orchestration:
@@ -88,14 +106,22 @@ above that it becomes "sautillé" (bow bounces on its own, less player control)
 
 Viola read alto clef (middle line = C4):
 
-```
-────────────────  A4
-  ──────────────  F4
-    ────────────  D4
-      ──────────  B3  ← middle line = C4
-        ────────  G3
-          ──────  E3
-            ────  C3
+```mermaid
+flowchart TD
+    A4["A4"]
+    F4["F4"]
+    D4["D4"]
+    B3["B3 (C4)"]
+    G3["G3"]
+    E3["E3"]
+    C3["C3"]
+    
+    A4 --> F4
+    F4 --> D4
+    D4 --> B3
+    B3 --> G3
+    G3 --> E3
+    E3 --> C3
 ```
 
 The C string (C3-G3) is the viola's unique acoustic territory — no other string instrument's open low string lives there with that dark, slightly veiled color. **Give violas independent material in this register instead of doubling cello an octave up** — that's where the instrument actually sounds like itself rather than a weak violin.
@@ -104,13 +130,35 @@ The C string (C3-G3) is the viola's unique acoustic territory — no other strin
 
 Below A3, use neck positions (1st-4th). Above A3, the thumb anchors flat against the fingerboard as a movable "nut," with fingers 1-2-3 playing above it:
 
-```
-C string (C2):
-Neck positions (1st-4th):  C2──────G2─────────────
-                                     │
-Thumb position (thumb=G2): ─────────G2─C3─E3─G3─C4─E4─G4──→
-                                     ↑
-                            thumb anchors here, fingers play above
+```mermaid
+flowchart TD
+    A["C string C2"]
+    B["Neck Positions<br/>1st-4th Fret"]
+    C["C2"]
+    D["G2"]
+    E["Thumb Position<br/>Anchor Point"]
+    F["G2"]
+    G["C3"]
+    H["E3"]
+    I["G3"]
+    J["C4"]
+    K["E4"]
+    L["G4"]
+    M["Fingers Play<br/>Above Thumb"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+    J --> K
+    K --> L
+    L --> M
+    D -.->|thumb anchors here| F
 ```
 
 Cello's three-register versatility is its orchestrational superpower: low register (C2-G2) = bass foundation doubling basses at the octave; tenor register (A2-A3) = warmest singing-melody register in the orchestra, used constantly for solo lines (Elgar Cello Concerto, Tchaikovsky *Rococo Variations*); thumb-position register (A3+) = brilliant, intense, cuts through texture.
@@ -119,13 +167,21 @@ Cello's three-register versatility is its orchestrational superpower: low regist
 
 Bass notation sounds an octave below written pitch — always. Below the 7th fret-equivalent position, the hand span required for one-finger-per-fret playing causes tendon strain, so the standard pedagogy (Franz Simandl) uses **1-2-4 fingering**, skipping the 3rd finger entirely in low positions:
 
-```
-E string, low position (sounds E1, written E2):
-┌──────┬──────┬──────┬──────┐
-│   0  │   1  │   2  │   4  │
-│  E1  │  F1  │  F#1 │  G#1 │
-└──────┴──────┴──────┴──────┘
- open  index  middle  pinky  (NO 3rd finger used here)
+```mermaid
+flowchart LR
+    subgraph e_string["E string, low position (sounds E1, written E2)"]
+        direction LR
+        pos0["0<br/>E1<br/>open"]
+        pos1["1<br/>F1<br/>index"]
+        pos2["2<br/>F#1<br/>middle"]
+        pos4["4<br/>G#1<br/>pinky"]
+        
+        pos0 --> pos1 --> pos2 --> pos4
+    end
+    
+    note["NO 3rd finger used here"]
+    
+    e_string -.-> note
 ```
 
 Above the 7th position (roughly G2 and up on the G string), switch to one-finger-per-fret (OFPF) — the frets are close enough that the 1-2-3-4 span is comfortable. **If you're writing fast chromatic bass lines below G2, check they're playable with 1-2-4 only** — a passage that needs the 3rd finger in low position will force the player to shift position mid-phrase, killing your tempo.
@@ -273,10 +329,26 @@ Standard large orchestra: 4 horns, 3 trumpets, 3 trombones, 1 tuba.
 
 Written F#2-C6, sounding a 5th lower (Horn in F). Modern players use a double horn (F/B♭) switching between tubing lengths internally — you don't need to notate the switch, the player manages it.
 
-```
-Harmonic series on open F horn:
-F2──C3──F3──A3──C4──E4──F4──A4──C5
-    (P5) (P4)(M3)(m3)(M2)(M3)(m3)
+```mermaid
+flowchart LR
+    F2["F2"]
+    C3["C3"]
+    F3["F3"]
+    A3["A3"]
+    C4["C4"]
+    E4["E4"]
+    F4["F4"]
+    A4["A4"]
+    C5["C5"]
+    
+    F2 -->|"P5"| C3
+    C3 -->|"P4"| F3
+    F3 -->|"M3"| A3
+    A3 -->|"m3"| C4
+    C4 -->|"M2"| E4
+    E4 -->|"M3"| F4
+    F4 -->|"m3"| A4
+    A4 -->|"M3"| C5
 ```
 
 **The crack risk is real and affects your writing choices.** The horn's long tubing (~3.7 m unwound) and small mouthpiece make wide leaps and cold entries from silence genuinely risky — a horn entering *forte* on a high note after 40 bars of rest is a classic "miss" moment in rehearsal. **Mitigation: give horns a stepwise lead-in, or double the entrance with another instrument (bassoon, trombone) so a crack is covered.** This isn't being overly cautious — professional players and conductors plan around this constantly.

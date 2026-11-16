@@ -335,7 +335,7 @@ MDE = (Z_α + Z_β) × sqrt(p₁(1-p₁)/n₁ + p₂(1-p₂)/n₂)
 
 **Automated Bidding Failure Symptoms & Recovery:**
 - Symptom: "Learning" status persists beyond 14 days
-  - Cause: Insufficient conversion volume (<30 conversions/month)
+  - Cause: Insufficient conversion volume (< 30 conversions/month)
   - Recovery: Consolidate campaigns, lower target CPA by 20% temporarily, or switch to Maximize Clicks with manual CPA tracking
 - Symptom: CPA spikes 50%+ after stable period
   - Cause: Algorithm exploring new auction patterns
@@ -368,7 +368,7 @@ For underpacing: Increase bids 20%, raise target CPA 10%, expand keyword list wi
 - [ ] Server-side GTM deployed for iOS 15+ Safari traffic (optional but recommended)
 
 **Monthly Audit Protocol:**
-- [ ] Compare GA4 conversion count to Google Ads imported conversions (variance <5%)
+- [ ] Compare GA4 conversion count to Google Ads imported conversions (variance < 5%)
 - [ ] Check for duplicate conversion events (filter GA4 events for event_name duplicates)
 - [ ] Verify conversion lag time remains stable (Conversions → Time to conversion report)
 - [ ] Audit search terms report for tracking parameter stripping (look for "(not set)" source/medium with conversion events)

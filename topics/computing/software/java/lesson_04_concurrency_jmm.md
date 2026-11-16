@@ -24,11 +24,20 @@ A Java thread begins its existence as an instance of `java.lang.Thread`, but the
 
 The thread state machine that governs a Java thread's lifecycle reflects the interaction between JVM and OS scheduler:
 
-```
-NEW ──► RUNNABLE ──► BLOCKED (waiting for monitor)
-                 ──► WAITING (Object.wait, LockSupport.park)
-                 ──► TIMED_WAITING (Thread.sleep, LockSupport.parkNanos)
-                 ──► TERMINATED
+```mermaid
+flowchart LR
+    NEW["NEW"]
+    RUNNABLE["RUNNABLE"]
+    BLOCKED["BLOCKED<br/>(waiting for monitor)"]
+    WAITING["WAITING<br/>(Object.wait, LockSupport.park)"]
+    TIMED_WAITING["TIMED_WAITING<br/>(Thread.sleep, LockSupport.parkNanos)"]
+    TERMINATED["TERMINATED"]
+    
+    NEW --> RUNNABLE
+    RUNNABLE --> BLOCKED
+    RUNNABLE --> WAITING
+    RUNNABLE --> TIMED_WAITING
+    RUNNABLE --> TERMINATED
 ```
 
 A thread in `RUNNABLE` state may be either actually running on a CPU core or sitting in the OS run queue waiting for a scheduler timeslice. The JVM makes no distinction between these two substates from the perspective of `Thread.getState()`. A thread enters `BLOCKED` specifically when it is attempting to acquire an intrinsic monitor that another thread holds. It enters `WAITING` when it voluntarily suspends via `Object.wait()`, `LockSupport.park()`, or `Thread.join()` without a timeout. These distinctions matter when interpreting thread dumps from production systems.
@@ -112,21 +121,28 @@ The `Thread.onSpinWait()` call, introduced in Java 9, emits a `PAUSE` instructio
 
 AQS maintains a single `volatile int state` field and a CLH-variant (Craig, Landin, Hagersten) queue of blocked threads. The CLH queue is a lock-free FIFO queue of nodes, where each node contains a reference to the waiting thread and a status flag. Lock acquisition attempts a CAS on `state` from 0 to 1. On failure, the thread enqueues itself at the tail via another CAS and then parks itself using `LockSupport.park()`. On release, the lock holder sets `state` back to 0 and calls `LockSupport.unpark()` on the head node's thread.
 
-```
-AQS Internal Structure:
+```mermaid
+flowchart TD
+    State["state: volatile int<br/>0 = unlocked | 1 = locked | &gt;1 = reentrant count"]
 
-  state: volatile int (0=unlocked, 1=locked, >1=reentrant count)
-  head: Node ──► Node ──► Node ──► Node (tail)
-                 │         │
-                 Thread-A  Thread-B  (parked, waiting)
+    subgraph Queue ["AQS Wait Queue (FIFO)"]
+        direction LR
+        Head["head"] -.-> N1["Node"]
+        N1 --> N2["Node"]
+        N2 --> N3["Node"]
+        N3 --> N4["Node"]
+        Tail["tail"] -.-> N4
+    end
 
-Each Node:
-  ┌─────────────────────────────────┐
-  │ waitStatus: SIGNAL | CANCELLED  │
-  │ prev: Node*                     │
-  │ next: Node*                     │
-  │ thread: Thread                  │
-  └─────────────────────────────────┘
+    N2 -.-> TA["Thread-A<br/>(parked, waiting)"]
+    N3 -.-> TB["Thread-B<br/>(parked, waiting)"]
+
+    subgraph NodeStruct ["Each Node"]
+        F1["waitStatus: SIGNAL | CANCELLED"]
+        F2["prev: Node*"]
+        F3["next: Node*"]
+        F4["thread: Thread"]
+    end
 ```
 
 `ReentrantReadWriteLock` extends this model by encoding both reader count and writer presence in the single `state` integer: the high 16 bits hold the shared (read) count, and the low 16 bits hold the exclusive (write) count. This packing enables the read-lock acquisition path to perform a single CAS for the common case with no writer present, delivering significantly higher throughput for read-heavy workloads. Java 8 added `StampedLock`, which introduces an *optimistic read* mode: the reader acquires a stamp without locking, performs its read, and then validates the stamp afterward. If a concurrent writer has intervened, validation fails and the reader falls back to a pessimistic read lock. Under low-write workloads, optimistic reads approach the performance of non-synchronized code.

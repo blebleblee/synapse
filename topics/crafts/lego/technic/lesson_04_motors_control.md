@@ -73,11 +73,21 @@ The derivative term acts on the rate of change of error. When the motor is appro
 
 Pybricks exposes PID gains via the `motor.control.limits()` and `motor.control.pid()` methods, allowing you to tune them directly in Python rather than accepting the firmware defaults. The defaults are conservative and work well for most mechanisms; you will typically need to adjust them when driving mechanisms with unusual friction profiles or when precision requirements are tighter than the defaults achieve.
 
-```
-Desired Position ──►[+]──► PID Controller ──► Motor PWM ──► Motor
-                     ↑                                          │
-                     │                                          ▼
-                     └──────────────────────── Encoder Feedback
+```mermaid
+flowchart LR
+    DesiredPos["Desired Position"]
+    Sum["[+]"]
+    PID["PID Controller"]
+    PWM["Motor PWM"]
+    Motor["Motor"]
+    Encoder["Encoder Feedback"]
+    
+    DesiredPos --> Sum
+    Sum --> PID
+    PID --> PWM
+    PWM --> Motor
+    Motor --> Encoder
+    Encoder --> Sum
 ```
 
 The feedback path is what transforms an open-loop actuator into a closed-loop servo. Without the encoder return path, the motor is simply a power consumer. With it, the motor is a positioning system whose accuracy is bounded by encoder resolution, control loop frequency, and mechanical compliance — all of which you can characterize and design around.

@@ -24,18 +24,28 @@ The CREATE2 cell initiates circuit establishment, carrying an ephemeral X25519 p
 
 To extend the circuit, the client sends an EXTEND2 cell through the established tunnel to the entry guard, specifying the next relay's identity fingerprint and connection parameters. The entry guard establishes a TLS connection to the middle relay and forwards the CREATE2 handshake encapsulated within. The middle relay completes the handshake, sends back CREATED2, and the client now shares secrets with both relays. Critically, the middle relay never sees the client's IP address—it observes only the entry guard's address. The client can now send cells encrypted in nested layers: the outer layer decryptable by the entry guard reveals the middle relay as destination; the inner layer decryptable by the middle relay reveals the exit relay.
 
-```
-Client Circuit State After Extension:
-
-Client ─[AES(K1, AES(K2, payload))]→ Guard ─[AES(K2, payload)]→ Middle ─[payload]→ Exit
-
-Forward Keys:  K1_forward (Client→Guard)
-               K2_forward (Client→Middle)  
-               K3_forward (Client→Exit)
-
-Backward Keys: K1_backward (Guard→Client)
-               K2_backward (Middle→Client)
-               K3_backward (Exit→Client)
+```mermaid
+flowchart LR
+    Client["Client"]
+    Guard["Guard"]
+    Middle["Middle"]
+    Exit["Exit"]
+    
+    Client -->|"AES(K1, AES(K2, payload))"| Guard
+    Guard -->|"AES(K2, payload)"| Middle
+    Middle -->|"payload"| Exit
+    
+    subgraph forward ["Forward Keys"]
+        K1f["K1_forward (Client→Guard)"]
+        K2f["K2_forward (Client→Middle)"]
+        K3f["K3_forward (Client→Exit)"]
+    end
+    
+    subgraph backward ["Backward Keys"]
+        K1b["K1_backward (Guard→Client)"]
+        K2b["K2_backward (Middle→Client)"]
+        K3b["K3_backward (Exit→Client)"]
+    end
 ```
 
 Each relay maintains only local circuit state: an incoming circuit identifier mapping to an outgoing circuit identifier and next-hop address. When a relay receives a cell on circuit ID 0x1A3F, it decrypts one encryption layer, looks up the outbound circuit ID 0x2B84, and forwards the cell to the next relay. Circuit IDs are locally significant, preventing correlation across hops. An observer at the entry guard sees circuit 0x1A3F connecting to the middle relay; an observer at the middle relay sees a different circuit 0x2B84 connecting to the exit relay. Without breaking encryption, linking these observations requires sophisticated traffic analysis correlating cell timing and volume patterns.

@@ -29,24 +29,45 @@ The second-order subassemblies comprise the functional mechanical systems: the t
 
 The assembly sequence tree for the crawler crane follows this dependency graph:
 
-```
-Subassembly 0: Primary Chassis Frame (foundational)
-├─ Subassembly 1A: Left Track Drive Module
-├─ Subassembly 1B: Right Track Drive Module
-├─ Subassembly 1C: Central Turntable Bearing Mount
-│
-Subassembly 2: Rotating Superstructure Platform (mounts to 1C)
-├─ Subassembly 2A: Gear Reduction Drivetrain (internal to 2)
-├─ Subassembly 2B: Motor Housing and Clutch Assembly
-│
-Subassembly 3: Boom Assembly (mounts to 2)
-├─ Subassembly 3A: Lower Boom Section with Pivot Bearings
-├─ Subassembly 3B: Upper Boom Extension with Pulley System
-├─ Subassembly 3C: Hoist Winch with Ratchet Lock
-│
-Subassembly 4: Cosmetic Enclosures (non-structural)
-├─ Subassembly 4A: Operator Cab Body Panels
-├─ Subassembly 4B: Engine Housing Fairings
+```mermaid
+flowchart TD
+    SA0["Subassembly 0: Primary Chassis Frame<br/>(foundational)"]
+    SA1A["Subassembly 1A: Left Track Drive Module"]
+    SA1B["Subassembly 1B: Right Track Drive Module"]
+    SA1C["Subassembly 1C: Central Turntable Bearing Mount"]
+    
+    SA2["Subassembly 2: Rotating Superstructure Platform<br/>(mounts to 1C)"]
+    SA2A["Subassembly 2A: Gear Reduction Drivetrain<br/>(internal to 2)"]
+    SA2B["Subassembly 2B: Motor Housing and Clutch Assembly"]
+    
+    SA3["Subassembly 3: Boom Assembly<br/>(mounts to 2)"]
+    SA3A["Subassembly 3A: Lower Boom Section<br/>with Pivot Bearings"]
+    SA3B["Subassembly 3B: Upper Boom Extension<br/>with Pulley System"]
+    SA3C["Subassembly 3C: Hoist Winch with Ratchet Lock"]
+    
+    SA4["Subassembly 4: Cosmetic Enclosures<br/>(non-structural)"]
+    SA4A["Subassembly 4A: Operator Cab Body Panels"]
+    SA4B["Subassembly 4B: Engine Housing Fairings"]
+    
+    SA0 --> SA1A
+    SA0 --> SA1B
+    SA0 --> SA1C
+    
+    SA1C --> SA2
+    
+    SA2 --> SA2A
+    SA2 --> SA2B
+    
+    SA2 --> SA3
+    
+    SA3 --> SA3A
+    SA3 --> SA3B
+    SA3 --> SA3C
+    
+    SA0 --> SA4
+    
+    SA4 --> SA4A
+    SA4 --> SA4B
 ```
 
 This tree structure reveals several critical principles. First, subassemblies at the same hierarchical level (1A, 1B, 1C) are independent and can be constructed in parallel or in any order, since none depends on the others for assembly access or structural support. Second, subassemblies at higher levels (2, 3) strictly depend on lower-level subassemblies being completed and integrated first; attempting to install the boom (Subassembly 3) before the superstructure platform (Subassembly 2) is geometrically impossible since the boom's pivot bearings mount to hardpoints on the superstructure. Third, cosmetic enclosures (Subassembly 4) appear last in the sequence because they enclose internal mechanisms and would obstruct access if installed prematurely.

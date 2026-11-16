@@ -78,16 +78,16 @@ graph TB
         K -->|"Filter/Query"| F
     end
     
-    style A fill:#e1f5ff
-    style B fill:#e1f5ff
-    style C fill:#e1f5ff
-    style D fill:#fff4e1
-    style E fill:#fff4e1
-    style F fill:#f0e1ff
-    style G fill:#f0e1ff
-    style H fill:#e1ffe1
-    style I fill:#e1ffe1
-    style J fill:#e1ffe1
+    style A fill:#e1f5ff,color:#0f172a
+    style B fill:#e1f5ff,color:#0f172a
+    style C fill:#e1f5ff,color:#0f172a
+    style D fill:#fff4e1,color:#0f172a
+    style E fill:#fff4e1,color:#0f172a
+    style F fill:#f0e1ff,color:#0f172a
+    style G fill:#f0e1ff,color:#0f172a
+    style H fill:#e1ffe1,color:#0f172a
+    style I fill:#e1ffe1,color:#0f172a
+    style J fill:#e1ffe1,color:#0f172a
 ```
 
 **Layer 1: Data Sources and Warehousing**
@@ -166,7 +166,7 @@ Three primary rendering technologies power browser-based visualizations:
 **WebGL:** GPU-accelerated 3D graphics. Advantages: handles millions of points through vertex shaders, 100-1000x faster than Canvas for large datasets. Disadvantages: steep learning curve, shader programming required, limited text rendering support.
 
 Decision matrix:
-- <1000 elements, need interactivity and styling → SVG
+- < 1000 elements, need interactivity and styling → SVG
 - 1k-50k elements, interactive charts → Canvas 2D
 - >50k elements, scatterplots, heatmaps → WebGL
 

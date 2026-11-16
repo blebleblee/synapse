@@ -26,31 +26,40 @@ Playwright's test runner resolves test execution through three interacting syste
 
 The scheduler reads the `workers` configuration—either a fixed integer or a percentage of logical CPU cores—and maintains a pool of worker processes. Each worker executes tests from a single file at a time by default, though `fullyParallel: true` instructs the scheduler to distribute individual tests across workers regardless of file boundaries. The important mechanical detail is that a worker's browser is created once per worker lifecycle and reused across the tests that worker executes. The context, however, is created fresh for each test via the fixture system. This arrangement gives you browser process reuse (cheap) and context isolation (correct).
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        Playwright Test Runner                        │
-│                                                                      │
-│   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐           │
-│   │   Worker 1   │   │   Worker 2   │   │   Worker 3   │           │
-│   │  (Node PID)  │   │  (Node PID)  │   │  (Node PID)  │           │
-│   │              │   │              │   │              │           │
-│   │  ┌────────┐  │   │  ┌────────┐  │   │  ┌────────┐  │           │
-│   │  │Browser │  │   │  │Browser │  │   │  │Browser │  │           │
-│   │  │Process │  │   │  │Process │  │   │  │Process │  │           │
-│   │  └────┬───┘  │   │  └────┬───┘  │   │  └────┬───┘  │           │
-│   │       │      │   │       │      │   │       │      │           │
-│   │  ┌────▼───┐  │   │  ┌────▼───┐  │   │  ┌────▼───┐  │           │
-│   │  │Context │  │   │  │Context │  │   │  │Context │  │           │
-│   │  │(test A)│  │   │  │(test B)│  │   │  │(test C)│  │           │
-│   │  └────┬───┘  │   │  └────┬───┘  │   │  └────┬───┘  │           │
-│   │       │      │   │       │      │   │       │      │           │
-│   │  ┌────▼───┐  │   │  ┌────▼───┐  │   │  ┌────▼───┐  │           │
-│   │  │  Page  │  │   │  │  Page  │  │   │  │  Page  │  │           │
-│   │  └────────┘  │   │  └────────┘  │   │  └────────┘  │           │
-│   └──────────────┘   └──────────────┘   └──────────────┘           │
-└─────────────────────────────────────────────────────────────────────┘
-                 Cookie jars, localStorage, service workers:
-                 ISOLATED per context. Browser process: SHARED per worker.
+```mermaid
+flowchart TD
+    subgraph TestRunner["Playwright Test Runner"]
+        subgraph Worker1["Worker 1<br/>(Node PID)"]
+            Browser1["Browser<br/>Process"]
+            Context1["Context<br/>(test A)"]
+            Page1["Page"]
+            Browser1 --> Context1
+            Context1 --> Page1
+        end
+        
+        subgraph Worker2["Worker 2<br/>(Node PID)"]
+            Browser2["Browser<br/>Process"]
+            Context2["Context<br/>(test B)"]
+            Page2["Page"]
+            Browser2 --> Context2
+            Context2 --> Page2
+        end
+        
+        subgraph Worker3["Worker 3<br/>(Node PID)"]
+            Browser3["Browser<br/>Process"]
+            Context3["Context<br/>(test C)"]
+            Page3["Page"]
+            Browser3 --> Context3
+            Context3 --> Page3
+        end
+    end
+    
+    Note["Cookie jars, localStorage, service workers:<br/>ISOLATED per context. Browser process: SHARED per worker."]
+    
+    TestRunner -.->|isolation model| Note
+    
+    style TestRunner fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style Note fill:#ffffcc,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
 ```
 
 Fixtures are the dependency injection system that wires this hierarchy together. Every `test` function receives its fixtures via its first argument, and the runner builds a directed acyclic graph of fixture dependencies before executing any test. Fixtures declare their scope—`'test'`, `'worker'`, or `'project'`—which determines their lifetime. A `'test'`-scoped fixture is created before the test body runs and torn down immediately after, whether the test passes or fails. A `'worker'`-scoped fixture is created once when the worker starts and destroyed when the worker terminates, making it appropriate for state that is expensive to initialize and safe to share across the sequential tests a single worker executes.

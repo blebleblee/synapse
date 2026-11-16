@@ -56,40 +56,44 @@ Practitioners mitigate schematic distortion through explicit schema monitoring a
 
 The working memory integration diagram illustrates the dynamic interaction among these processing stages:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    WORKING MEMORY BUFFER                     │
-│                    (4-item capacity limit)                   │
-│                                                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │ Phonological │  │  Semantic    │  │  Pragmatic   │     │
-│  │    Trace     │  │ Proposition  │  │   Context    │     │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘     │
-│         │                  │                  │              │
-└─────────┼──────────────────┼──────────────────┼─────────────┘
-          │                  │                  │
-          ▼                  ▼                  ▼
-┌─────────────────┐  ┌──────────────┐  ┌──────────────────┐
-│  PHONOLOGICAL   │  │   SEMANTIC   │  │    PRAGMATIC     │
-│   PROCESSING    │─▶│  INTEGRATION │─▶│  INTERPRETATION  │
-│                 │  │              │  │                  │
-│ • Feature       │  │ • Schema     │  │ • Speaker        │
-│   extraction    │  │   activation │  │   intent         │
-│ • Lexical       │  │ • Proposi-   │  │ • Implicature    │
-│   access        │  │   tional     │  │ • Social         │
-│ • Syntactic     │  │   encoding   │  │   context        │
-│   parsing       │  │              │  │                  │
-└─────────────────┘  └──────┬───────┘  └──────────────────┘
-                            │
-                            ▼
-                  ┌──────────────────┐
-                  │   LONG-TERM      │
-                  │     MEMORY       │
-                  │                  │
-                  │ • Episodic       │
-                  │ • Semantic       │
-                  │ • Schematic      │
-                  └──────────────────┘
+```mermaid
+flowchart TD
+    subgraph WMB["WORKING MEMORY BUFFER (4-item capacity limit)"]
+        PT["Phonological Trace"]
+        SP["Semantic Proposition"]
+        PC["Pragmatic Context"]
+    end
+
+    PT --> PHON
+    SP --> SEM
+    PC --> PRAG
+
+    PHON["PHONOLOGICAL PROCESSING
+─────────────────
+• Feature extraction
+• Lexical access
+• Syntactic parsing"]
+
+    SEM["SEMANTIC INTEGRATION
+─────────────────
+• Schema activation
+• Propositional encoding"]
+
+    PRAG["PRAGMATIC INTERPRETATION
+─────────────────
+• Speaker intent
+• Implicature
+• Social context"]
+
+    LTM["LONG-TERM MEMORY
+─────────────────
+• Episodic
+• Semantic
+• Schematic"]
+
+    PHON --> SEM
+    SEM --> PRAG
+    SEM --> LTM
 ```
 
 **Pragmatic Interpretation and Speaker Intent Inference**

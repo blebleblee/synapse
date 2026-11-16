@@ -56,26 +56,55 @@ Perdurantism introduces temporal parts as fundamental entities. A temporal part 
 
 The mereological structure underlying perdurantism requires careful specification. Classical mereology provides the framework: a partial ordering relation ⊑ (read "is part of") satisfying reflexivity, antisymmetry, and transitivity. We define proper parthood as x ⊏ y =df (x ⊑ y ∧ x ≠ y). Overlap is defined as O(x,y) =df ∃z(z ⊑ x ∧ z ⊑ y)—two entities overlap just in case they share a common part. The fusion of a collection of entities is the mereological sum containing exactly those entities as parts. Temporal parts are related by the same parthood relation that relates spatial parts, extended to cover the temporal dimension.
 
-```
-Mereological Relations for Four-Dimensional Objects
+```mermaid
+flowchart TD
+    subgraph temporal_dim ["Temporal Dimension"]
+        W["Four-dimensional whole W"]
 
-Spatial Dimension:              Temporal Dimension:
-                                
-   t₀        t₁        t₂         Four-dimensional whole W
-   |         |         |          composed of temporal parts
-   |         |         |          
-   ●─────────●─────────●          W = TP(t₀) ∪ TP(t₁) ∪ TP(t₂)
-   TP₀       TP₁       TP₂        
-                                  Where: TP(tᵢ) ⊏ W for all i
-Spatial parts at t₁:              
-                                  Parthood: TP(t₀) ⊑ W
-     TP₁                          Overlap: O(TP(t₀), W) = true
-    ┌───┐                         Disjoint: ¬O(TP(t₀), TP(t₁))
-    │ a │ b                       
-    └───┘                         Fusion: W = σx[∃t TP(x, W, t)]
-                                          (the fusion of all 
-    a ⊏ TP₁                                temporal parts of W)
-    b ⊏ TP₁
+        subgraph fusion ["Fusion Law"]
+            F["W = σx["∃t TP(x, W, t)"]"]
+        end
+
+        subgraph composition ["Composition"]
+            C["W = TP(t₀) ∪ TP(t₁) ∪ TP(t₂)"]
+        end
+
+        subgraph mereological_relations ["Mereological Relations"]
+            R1["Proper Part:  TP(tᵢ) ⊏ W  for all i"]
+            R2["Parthood:     TP(t₀) ⊑ W"]
+            R3["Overlap:      O(TP(t₀), W) = true"]
+            R4["Disjoint:     ¬O(TP(t₀), TP(t₁))"]
+        end
+
+        W --> C
+        W --> F
+        W --> R1
+        R1 --> R2
+        R1 --> R3
+        R1 --> R4
+    end
+
+    subgraph spatial_dim ["Spatial Dimension"]
+        TP0["TP₀  (temporal part at t₀)"]
+        TP1["TP₁  (temporal part at t₁)"]
+        TP2["TP₂  (temporal part at t₂)"]
+
+        subgraph spatial_parts ["Spatial Parts of TP₁"]
+            a["a  (spatial part)"]
+            b["b  (spatial part)"]
+        end
+
+        TP0 -->|"successor"| TP1
+        TP1 -->|"successor"| TP2
+        TP1 --> a
+        TP1 --> b
+        a --->|"a ⊏ TP₁"| TP1
+        b --->|"b ⊏ TP₁"| TP1
+    end
+
+    TP0 -->|"TP(t₀) ⊏ W"| W
+    TP1 -->|"TP(t₁) ⊏ W"| W
+    TP2 -->|"TP(t₂) ⊏ W"| W
 ```
 
 The perdurance relation obtains when temporal parts at different times belong to the same four-dimensional whole via genidentity—the relation that unifies temporal parts into a single persisting object. Different accounts specify genidentity differently: psychological continuity for persons, spatiotemporal continuity for physical objects, functional continuity for artifacts. The formal structure remains: Genidentity(x, y) defines an equivalence relation partitioning temporal parts into equivalence classes, each class constituting a single perduring object.

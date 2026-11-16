@@ -144,46 +144,35 @@ The solution set is $\left\{\frac{\pi}{4},\, \frac{\pi}{3},\, \frac{5\pi}{4},\, 
 
 The following diagram summarizes the full solution-finding pipeline:
 
-```
-INPUT: f(θ) = c
-
-        │
-        ▼
-┌───────────────────────────────┐
-│  ALGEBRAIC REDUCTION          │
-│  Isolate a single circular    │
-│  function via substitution,   │
-│  factoring, or identities.    │
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│  IDENTIFY FUNCTION TYPE       │
-│                               │
-│  sin θ = c │ cos θ = c │ tan θ = c
-└──────┬──────┴────┬─────┴───┬──┘
-       │           │         │
-       ▼           ▼         ▼
- θ₀=arcsin(c)  θ₀=arccos(c) θ₀=arctan(c)
- θ₁=π−θ₀       θ₁=−θ₀      (one solution
-                             per period)
-       │           │         │
-       └───────────┴─────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│  GENERAL SOLUTION             │
-│  Add period multiples:        │
-│  sin/cos → +2πk              │
-│  tan     → +πk               │
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│  FILTER TO REQUIRED INTERVAL  │
-│  Select k ∈ ℤ such that       │
-│  solution lies in [a, b).     │
-└───────────────────────────────┘
+```mermaid
+flowchart TD
+    INPUT["INPUT: f(θ) = c"]
+    
+    INPUT --> REDUCE
+    
+    REDUCE["ALGEBRAIC REDUCTION<br/>Isolate a single circular<br/>function via substitution,<br/>factoring, or identities."]
+    
+    REDUCE --> IDENTIFY
+    
+    IDENTIFY["IDENTIFY FUNCTION TYPE"]
+    
+    IDENTIFY --> SIN["sin θ = c"]
+    IDENTIFY --> COS["cos θ = c"]
+    IDENTIFY --> TAN["tan θ = c"]
+    
+    SIN --> SIN_SOL["θ₀ = arcsin(c)<br/>θ₁ = π − θ₀"]
+    COS --> COS_SOL["θ₀ = arccos(c)<br/>θ₁ = −θ₀"]
+    TAN --> TAN_SOL["θ₀ = arctan(c)<br/>(one solution per period)"]
+    
+    SIN_SOL --> GENERAL
+    COS_SOL --> GENERAL
+    TAN_SOL --> GENERAL
+    
+    GENERAL["GENERAL SOLUTION<br/>Add period multiples:<br/>sin/cos → +2πk<br/>tan → +πk"]
+    
+    GENERAL --> FILTER
+    
+    FILTER["FILTER TO REQUIRED INTERVAL<br/>Select k ∈ ℤ such that<br/>solution lies in [a, b)."]
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

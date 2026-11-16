@@ -24,22 +24,26 @@ The visual targeting system operates through a hierarchical fixation sequence th
 
 This sequential fixation pattern creates a visual tunnel that excludes peripheral distractions while maintaining sufficient preview distance to enable feedforward motor commands. The temporal spacing of fixation transitions couples directly to vehicle speed: at 200 kph circuit velocity, each fixation dwells for approximately 0.8 to 1.2 seconds before advancing to the next target, while at 100 kph the same geometric sequence supports 1.5 to 2.0 second fixation durations. The driver learns these timing relationships through practice repetition, developing an internal clock that triggers fixation advances without conscious deliberation. Disruption of this learned timing—through traffic interference, flag condition warnings, or mechanical anomaly distraction—immediately degrades corner execution precision, producing late braking, early turn-in, or premature power application errors.
 
-```
-Visual Fixation Sequence (High-Speed Corner Entry)
-
-Time: T-3.0s    T-2.0s         T-1.0s      T-0.5s         T=0        T+0.5s
-      |          |              |           |              |           |
-      v          v              v           v              v           v
-   Brake     Turn-In         Apex       Track-Out      Next        Next
-  Marker      Point        Curbing        Point       Corner     Straight
-   (300m)     (150m)        (80m)         (40m)     Entry Zone   Target
-      
-      └─────────┘──────────┘──────────┘──────────┘──────────┘
-       Straight    Entry      Rotation    Exit      Transition
-        Phase     Transient    Phase      Phase       Phase
-
-Fixation Dwell: 1.0-1.5s per target @ 180 kph circuit average
-Saccade Transition Time: 40-80ms between fixation points
+```mermaid
+flowchart LR
+    T1["T-3.0s<br/>Brake Marker<br/>(300m)"]
+    T2["T-2.0s<br/>Turn-In Point<br/>(150m)"]
+    T3["T-1.0s<br/>Apex Curbing<br/>(80m)"]
+    T4["T-0.5s<br/>Track-Out Point<br/>(40m)"]
+    T5["T=0<br/>Next Corner<br/>Entry Zone"]
+    T6["T+0.5s<br/>Next Straight<br/>Target"]
+    
+    T1 -->|"Straight Phase"| T2
+    T2 -->|"Entry Transient"| T3
+    T3 -->|"Rotation Phase"| T4
+    T4 -->|"Exit Phase"| T5
+    T5 -->|"Transition Phase"| T6
+    
+    subgraph meta ["Visual Fixation Sequence - High-Speed Corner Entry"]
+        direction TB
+        info1["Fixation Dwell: 1.0-1.5s per target @ 180 kph circuit average"]
+        info2["Saccade Transition Time: 40-80ms between fixation points"]
+    end
 ```
 
 The proprioceptive feedback architecture operates through multiple receptor populations distributed across the kinetic chain from foot sole to shoulder girdle. Muscle spindle organs embedded within skeletal muscle bellies detect fiber length changes at sub-millimeter resolution, providing position sense for pedal displacement and steering wheel rotation angle. These length sensors exhibit velocity-dependent gain characteristics: slow movements generate proportional static firing rates, while rapid displacement transients produce dynamic overshoot spikes that signal movement direction and acceleration. The Golgi tendon organs located at musculotendinous junctions measure tension magnitude with logarithmic encoding, saturating at forces approaching maximum voluntary contraction while maintaining exquisite sensitivity near threshold detection limits. This logarithmic compression enables drivers to detect pedal force changes of less than two percent during light initial application while tolerating peak emergency brake forces exceeding 500 Newtons without receptor damage.
@@ -56,38 +60,52 @@ Throttle application strategy differs fundamentally between corner exit traction
 
 As the vehicle tracks toward corner exit and steering angle unwinds, the driver increases throttle opening in proportion to available traction margin, monitoring rear tire slip through seat-of-pants lateral acceleration feedback and auditory exhaust note changes that correlate with wheel spin events. The throttle progression follows an approximately quadratic profile: 30 percent pedal at apex, 50 percent at mid-exit, 75 percent when steering approaches neutral, and 100 percent when the vehicle achieves straight-line trajectory. Deviation from this smooth progression—either by excessive early throttle producing power oversteer or conservative late application leaving traction unused—directly converts to lap time loss through reduced exit velocity and compromised straight speed.
 
-```
-Pedal Control Signal Flow Architecture
+```mermaid
+flowchart TD
+    subgraph sensory ["Sensory Input Layer"]
+        VIS["Visual\nCorner geometry · Apex reference · Exit trajectory"]
+        VES["Vestibular\nLateral/longitudinal g-force magnitude & rate"]
+        PRO["Proprioceptive\nPedal position · Steering angle · Limb posture"]
+        TAC["Tactile\nPedal force feedback · Steering torque · Seat loading"]
+        AUD["Auditory\nTire squeal frequency · Engine RPM · Exhaust note"]
+    end
 
-Sensory Input Layer:
-    Visual: Corner geometry, apex reference, exit trajectory
-    Vestibular: Lateral/longitudinal g-force magnitude and rate
-    Proprioceptive: Pedal position, steering angle, limb posture
-    Tactile: Pedal force feedback, steering torque, seat loading
-    Auditory: Tire squeal frequency, engine rpm, exhaust note
-            |
-            v
-    ┌───────────────────────────────────────────┐
-    │  Cerebellar Integration & State Estimation│
-    │  - Bayesian sensor fusion                 │
-    │  - Internal vehicle dynamics model        │
-    │  - Friction circle utilization estimate   │
-    └───────────────────────────────────────────┘
-            |
-            v
-    ┌───────────────────────────────────────────┐
-    │  Motor Cortex Command Generation          │
-    │  - Feedforward trajectory prediction      │
-    │  - Feedback error correction              │
-    │  - Muscle activation timing sequence      │
-    └───────────────────────────────────────────┘
-            |
-            v
-Motor Output Layer:
-    Brake Pedal: Force magnitude 0-600N, modulation rate 50-200 N/s
-    Throttle Pedal: Position 0-100%, application rate 100-300%/s  
-    Steering Wheel: Angle ±540°, rotation rate 180-400°/s
-    Weight Transfer: Lateral head position ±100mm, torso rotation ±15°
+    subgraph cerebellum ["Cerebellar Integration & State Estimation"]
+        CEI["Bayesian sensor fusion"]
+        CEJ["Internal vehicle dynamics model"]
+        CEK["Friction circle utilization estimate"]
+    end
+
+    subgraph motor_cortex ["Motor Cortex Command Generation"]
+        MCA["Feedforward trajectory prediction"]
+        MCB["Feedback error correction"]
+        MCC["Muscle activation timing sequence"]
+    end
+
+    subgraph output ["Motor Output Layer"]
+        OUT_B["Brake Pedal\nForce 0–600 N · Modulation rate 50–200 N/s"]
+        OUT_T["Throttle Pedal\nPosition 0–100% · Application rate 100–300%/s"]
+        OUT_S["Steering Wheel\nAngle ±540° · Rotation rate 180–400°/s"]
+        OUT_W["Weight Transfer\nLateral head ±100 mm · Torso rotation ±15°"]
+    end
+
+    VIS --> CEI
+    VES --> CEI
+    PRO --> CEJ
+    TAC --> CEJ
+    AUD --> CEK
+
+    CEI --> MCA
+    CEJ --> MCA
+    CEK --> MCB
+
+    MCA --> MCC
+    MCB --> MCC
+
+    MCC --> OUT_B
+    MCC --> OUT_T
+    MCC --> OUT_S
+    MCC --> OUT_W
 ```
 
 Steering input precision depends on maintaining smooth, continuous rotation rate without abrupt velocity changes that excite chassis resonances. The expert driver initiates turn-in rotation with a rapid initial pulse—achieving 200 to 300 degrees per second angular velocity within 100 milliseconds—then sustains constant rotation rate through the primary steering phase before executing a symmetric deceleration ramp as the vehicle approaches target slip angle. This velocity profile minimizes excitation of chassis roll and yaw natural frequencies, typically ranging from 0.8 to 1.5 Hz depending on suspension stiffness and anti-roll bar configuration. Novice drivers produce stair-step steering inputs with multiple acceleration-deceleration cycles, generating 2 to 4 Hz oscillatory content that couples directly into chassis resonance bands and produces visible vehicle attitude oscillation.

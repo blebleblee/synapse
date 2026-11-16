@@ -116,42 +116,36 @@ The implementation architecture requires careful specification of default rules 
 
 The behavioral override stack thus integrates diagnostic awareness of bias patterns with proactive architectural design that preempts manifestation:
 
-```
-┌─────────────────────────────────────────────────┐
-│  Decision Entry Point                           │
-│  (Spending, Investment, Rebalancing)            │
-└────────────────┬────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────┐
-│  Automation Layer: Can This Be Prespecified?    │
-│  → YES: Execute automatically, log, notify      │
-│  → NO: Proceed to decision support              │
-└────────────────┬────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────┐
-│  Framing & Aggregation Layer                    │
-│  - Multi-reference comparison                   │
-│  - Integrated portfolio view (anti-mental-acct) │
-│  - Long-horizon projection                      │
-└────────────────┬────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────┐
-│  Commitment Check: Pre-Specified Rules?         │
-│  - Stop-loss triggers                           │
-│  - Rebalancing bands                            │
-│  - Contribution minimums                        │
-└────────────────┬────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────┐
-│  Manual Decision (if required)                  │
-│  - Documented rationale required                │
-│  - Cooling-off period for large decisions       │
-│  - Post-decision review logging                 │
-└─────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Decision Entry Point
+    (Spending, Investment, Rebalancing)"]
+
+    B["Automation Layer: Can This Be Prespecified?"]
+
+    B_YES["Execute Automatically
+    Log & Notify"]
+
+    C["Framing & Aggregation Layer
+    • Multi-reference comparison
+    • Integrated portfolio view (anti-mental-acct)
+    • Long-horizon projection"]
+
+    D["Commitment Check: Pre-Specified Rules?
+    • Stop-loss triggers
+    • Rebalancing bands
+    • Contribution minimums"]
+
+    E["Manual Decision (if required)
+    • Documented rationale required
+    • Cooling-off period for large decisions
+    • Post-decision review logging"]
+
+    A --> B
+    B -->|YES| B_YES
+    B -->|NO| C
+    C --> D
+    D --> E
 ```
 
 This architecture systematically reduces behavioral decision surface area, pushing the maximum volume of decisions into the automated and commitment layers where biases cannot manifest, while imposing structure and delay on residual manual decisions where behavioral patterns remain active.

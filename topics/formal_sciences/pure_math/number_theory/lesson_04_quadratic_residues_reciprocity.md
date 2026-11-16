@@ -112,29 +112,27 @@ The reciprocity formula for the Jacobi symbol is proven by reducing to the prime
 
 The following diagram captures the computational reduction pipeline for evaluating a Legendre symbol $\left(\frac{a}{p}\right)$:
 
-```
-Input: (a, p) with p odd prime, 1 ≤ a < p
-            │
-            ▼
-     a ≡ 0 (mod p)? ──YES──► Return 0
-            │NO
-            ▼
-     Factor out powers of 2 from a: a = 2^s · m, m odd
-            │
-            ▼
-  Apply (2/p) = (-1)^((p²-1)/8)  for each factor of 2
-            │
-            ▼
-       m = 1? ──YES──► Return accumulated sign
-            │NO
-            ▼
-  Apply reciprocity: (m/p) → (-1)^((m-1)/2·(p-1)/2) · (p mod m, m)
-            │
-            ▼
-  Replace (a,p) ← (p mod m, m)   [Euclidean step]
-            │
-            ▼
-       Return to top (loop until m = 1)
+```mermaid
+flowchart TD
+    START(["Input: a, p — p odd prime, 1 ≤ a < p"])
+    CHECK_ZERO{"a ≡ 0 (mod p)?"}
+    RETURN_ZERO(["Return 0"])
+    FACTOR["Factor out powers of 2 from a: a = 2ˢ · m, m odd"]
+    APPLY_TWO["Apply Jacobi rule for each factor of 2: (2/p) = (-1)^((p²−1)/8)"]
+    CHECK_ONE{"m = 1?"}
+    RETURN_SIGN(["Return accumulated sign"])
+    RECIPROCITY["Apply quadratic reciprocity: flip sign by (-1)^((m−1)/2 · (p−1)/2)"]
+    EUCLIDEAN["Replace (a, p) ← (p mod m, m)"]
+
+    START --> CHECK_ZERO
+    CHECK_ZERO -->|YES| RETURN_ZERO
+    CHECK_ZERO -->|NO| FACTOR
+    FACTOR --> APPLY_TWO
+    APPLY_TWO --> CHECK_ONE
+    CHECK_ONE -->|YES| RETURN_SIGN
+    CHECK_ONE -->|NO| RECIPROCITY
+    RECIPROCITY --> EUCLIDEAN
+    EUCLIDEAN --> FACTOR
 ```
 
 This algorithm runs in $O(\log^2 \min(a,p))$ time, identical in structure to the Euclidean algorithm, with an accumulated sign correction at each reciprocity flip. It is the standard computational workhorse for Legendre/Jacobi symbol evaluation in computer algebra systems.

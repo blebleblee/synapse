@@ -131,76 +131,69 @@ State locking granularity typically operates at the state file level rather than
 
 Backend migration operations enable transitions between local and remote backends or between different remote backend types, carrying state files and lineage metadata across storage systems. The migration protocol begins when Terraform detects a backend configuration change and prompts the operator to confirm migration intent. Upon confirmation, Terraform reads the complete state from the source backend, validates its integrity through checksum verification, releases any locks held on the source, acquires a lock on the destination backend, writes the state to the destination with lineage preserved and serial number intact, and optionally destroys the source state file if the operator requests cleanup. This transactional migration pattern ensures that state is never orphaned or duplicated during backend transitions, maintaining the single-source-of-truth property critical to Terraform's operational model.
 
-```
-Terraform State Lifecycle & Backend Integration Flow
+```mermaid
+flowchart TD
+    CLI["**Operator Invokes CLI**
+    terraform plan / terraform apply"]
 
-┌─────────────────────────────────────────────────────────────────┐
-│                     Operator Invokes CLI                         │
-│              terraform plan / terraform apply                    │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Backend Initialization                        │
-│  • Parse backend{} block from configuration                      │
-│  • Resolve credentials (IAM, env vars, credential files)         │
-│  • Validate backend connectivity (S3 bucket exists, etc)         │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     Lock Acquisition                             │
-│  • Write lock record to DynamoDB / Consul / Backend primitive    │
-│  • Retry with exponential backoff on conflict                    │
-│  • Fail if timeout exceeded, display current lock holder info    │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      State Retrieval                             │
-│  • Fetch tfstate JSON from S3 / GCS / Azure Blob                 │
-│  • Validate version, lineage, serial number                      │
-│  • Decrypt if encryption enabled (KMS envelope decryption)       │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                       Refresh Phase                              │
-│  • For each resource in state:                                   │
-│    - Invoke provider Read() API                                  │
-│    - Compare returned attributes vs. state attributes            │
-│    - Detect drift (modified, deleted, state changes)             │
-│  • Update in-memory state with observed reality                  │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                        Plan Phase                                │
-│  • Parse configuration files into resource graph                 │
-│  • Compare desired config vs. refreshed state                    │
-│  • Compute resource dispositions:                                │
-│    create | update | delete | replace | no-op                    │
-│  • Topologically sort dependency graph                           │
-│  • Generate human-readable plan output                           │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                        Apply Phase                               │
-│  • Walk dependency graph in topological order                    │
-│  • For each operation:                                           │
-│    - Invoke provider Create/Update/Delete                        │
-│    - On success: update state, increment serial                  │
-│    - Persist state to backend (atomic write with serial check)   │
-│    - On failure: halt, leave state reflecting partial success    │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Lock Release                                │
-│  • Delete lock record from DynamoDB / Consul                     │
-│  • On crash/timeout: lock expires via TTL or requires force-unlock│
-└─────────────────────────────────────────────────────────────────┘
+    INIT["**Backend Initialization**
+    • Parse backend{} block from configuration
+    • Resolve credentials (IAM, env vars, credential files)
+    • Validate backend connectivity (S3 bucket exists, etc.)"]
+
+    LOCK_ACQ["**Lock Acquisition**
+    • Write lock record to DynamoDB / Consul / Backend primitive
+    • Retry with exponential backoff on conflict
+    • Fail if timeout exceeded — display current lock holder info"]
+
+    STATE_FETCH["**State Retrieval**
+    • Fetch tfstate JSON from S3 / GCS / Azure Blob
+    • Validate version, lineage, serial number
+    • Decrypt if encryption enabled (KMS envelope decryption)"]
+
+    REFRESH["**Refresh Phase**
+    • For each resource in state:
+      · Invoke provider Read() API
+      · Compare returned attributes vs. state attributes
+      · Detect drift (modified, deleted, state changes)
+    • Update in-memory state with observed reality"]
+
+    PLAN["**Plan Phase**
+    • Parse configuration files into resource graph
+    • Compare desired config vs. refreshed state
+    • Compute resource dispositions:
+      create | update | delete | replace | no-op
+    • Topologically sort dependency graph
+    • Generate human-readable plan output"]
+
+    APPLY["**Apply Phase**
+    • Walk dependency graph in topological order
+    • For each operation:
+      · Invoke provider Create / Update / Delete
+      · On success: update state, increment serial
+      · Persist state to backend (atomic write with serial check)
+      · On failure: halt, leave state reflecting partial success"]
+
+    LOCK_REL["**Lock Release**
+    • Delete lock record from DynamoDB / Consul
+    • On crash/timeout: lock expires via TTL or requires force-unlock"]
+
+    CLI       --> INIT
+    INIT      --> LOCK_ACQ
+    LOCK_ACQ  --> STATE_FETCH
+    STATE_FETCH --> REFRESH
+    REFRESH   --> PLAN
+    PLAN      --> APPLY
+    APPLY     --> LOCK_REL
+
+    style CLI        fill:#1a1a2e,stroke:#4f8ef7,color:#e0e0e0
+    style INIT       fill:#16213e,stroke:#4f8ef7,color:#e0e0e0
+    style LOCK_ACQ   fill:#16213e,stroke:#f7a24f,color:#e0e0e0
+    style STATE_FETCH fill:#16213e,stroke:#4f8ef7,color:#e0e0e0
+    style REFRESH    fill:#16213e,stroke:#4fcdf7,color:#e0e0e0
+    style PLAN       fill:#16213e,stroke:#4fcdf7,color:#e0e0e0
+    style APPLY      fill:#16213e,stroke:#4ff7a2,color:#e0e0e0
+    style LOCK_REL   fill:#16213e,stroke:#f7a24f,color:#e0e0e0
 ```
 
 Workspace isolation extends state management to support multiple independent infrastructure instances derived from identical configuration codebases, enabling development, staging, and production environment separation without configuration duplication. Each workspace maintains its own distinct state file, variable value overrides, and backend storage path. The `terraform workspace select` command switches the CLI context to operate against a specific workspace's state, with all subsequent plan and apply operations scoped to that workspace's resource inventory. Backend implementations store workspace state files using distinct keys or paths, such as `env:/dev/terraform.tfstate` and `env:/prod/terraform.tfstate` for S3 backends, ensuring complete state isolation across workspaces.

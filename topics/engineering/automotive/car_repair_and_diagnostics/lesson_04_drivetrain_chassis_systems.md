@@ -34,30 +34,57 @@ The torque converter's internal geometry defines its performance envelope across
 
 The stator's blade geometry represents the key to torque multiplication. Its vanes curve in a direction that redirects the returning low-velocity fluid exiting the turbine, bending the flow path to re-enter the pump in the direction of pump rotation. This redirection requires the stator to exert a reaction force on the fluid, and by Newton's third law, the fluid exerts an equal and opposite force on the stator. The stator mounts on a one-way clutch (sprag or roller type) that permits rotation in one direction only—the same direction as pump and turbine rotation—but locks solid when reverse torque attempts to rotate it backward. At stall and low speed ratios, the fluid exits the turbine at an angle that would naturally drive the stator backward; the one-way clutch locks, the stator becomes a fixed reaction member, and its redirection of the fluid flow adds angular momentum to the pump's input, resulting in the turbine receiving more torque than the pump delivers. The torque multiplication ratio reaches its peak at stall (turbine stationary, pump rotating at idle speed), where K-factors (a measure of the torque converter's torque capacity, defined as engine RPM divided by the square root of engine torque in ft-lbs) typically range from 120 to 200 depending on converter design.
 
-```
-Torque Converter States:
-
-Stall Condition (Speed Ratio = 0):
-  Engine → Pump (rotating) → ATF (high velocity) → Turbine (stationary)
-  ↑                                                      ↓
-  └────── Stator (locked, redirecting flow) ←───────────┘
-  
-  Torque Multiplication: 1.8:1 to 2.5:1
-  Efficiency: 0% (turbine not rotating, all energy → heat)
-
-Coupling Point (Speed Ratio ≈ 0.85):
-  Engine → Pump → ATF → Turbine (85% of pump speed)
-                   ↓
-              Stator (begins freewheeling, one-way clutch releases)
-  
-  Torque Multiplication: 1.0:1 (transitions from multiplier to coupling)
-  Efficiency: ≈ 95%
-
-Lockup Engaged (Speed Ratio = 1.0):
-  Engine → Pump ←→ Lockup Clutch ←→ Turbine (mechanical lock)
-  
-  Torque Multiplication: 1.0:1 (direct mechanical drive)
-  Efficiency: ≈ 98–99% (only bearing and seal drag losses)
+```mermaid
+flowchart TD
+    subgraph stall ["Stall Condition (Speed Ratio = 0)"]
+        direction LR
+        S_Engine["Engine"]
+        S_Pump["Pump<br/>(rotating)"]
+        S_ATF["ATF<br/>(high velocity)"]
+        S_Turbine["Turbine<br/>(stationary)"]
+        S_Stator["Stator<br/>(locked, redirecting flow)"]
+        
+        S_Engine --> S_Pump
+        S_Pump --> S_ATF
+        S_ATF --> S_Turbine
+        S_Turbine --> S_Stator
+        S_Stator --> S_Pump
+        
+        S_Metrics["<b>Torque Multiplication:</b> 1.8:1 to 2.5:1<br/><b>Efficiency:</b> 0%<br/>(turbine not rotating, all energy → heat)"]
+    end
+    
+    subgraph coupling ["Coupling Point (Speed Ratio ≈ 0.85)"]
+        direction LR
+        C_Engine["Engine"]
+        C_Pump["Pump"]
+        C_ATF["ATF"]
+        C_Turbine["Turbine<br/>(85% of pump speed)"]
+        C_Stator["Stator<br/>(begins freewheeling,<br/>one-way clutch releases)"]
+        
+        C_Engine --> C_Pump
+        C_Pump --> C_ATF
+        C_ATF --> C_Turbine
+        C_ATF --> C_Stator
+        
+        C_Metrics["<b>Torque Multiplication:</b> 1.0:1<br/>(transitions from multiplier to coupling)<br/><b>Efficiency:</b> ≈ 95%"]
+    end
+    
+    subgraph lockup ["Lockup Engaged (Speed Ratio = 1.0)"]
+        direction LR
+        L_Engine["Engine"]
+        L_Pump["Pump"]
+        L_Clutch["Lockup Clutch<br/>(mechanical lock)"]
+        L_Turbine["Turbine"]
+        
+        L_Engine --> L_Pump
+        L_Pump <--> L_Clutch
+        L_Clutch <--> L_Turbine
+        
+        L_Metrics["<b>Torque Multiplication:</b> 1.0:1<br/>(direct mechanical drive)<br/><b>Efficiency:</b> ≈ 98–99%<br/>(only bearing and seal drag losses)"]
+    end
+    
+    stall ==> coupling
+    coupling ==> lockup
 ```
 
 The lockup clutch—a friction disc splined to the turbine hub—faces a machined surface on the inner wall of the pump housing. An apply chamber behind the clutch receives pressurized ATF routed through the transmission input shaft's central passage, while the release chamber in front of the clutch connects to return flow. When the transmission controller commands lockup, a solenoid valve shifts to route high-pressure mainline ATF into the apply chamber while draining the release chamber, creating a differential pressure across the clutch disc that forces it into contact with the pump housing. Modern adaptive lockup strategies employ pulse-width modulation of the lockup solenoid to feather clutch engagement, achieving partial lockup with controlled slip (typically 20–50 RPM differential) that permits torque converter damping to attenuate driveline vibrations while capturing most of the efficiency benefit of full lockup.

@@ -24,23 +24,36 @@ The instruments of layout form a logical hierarchy ordered by the measurement re
 
 The critical insight about this hierarchy is that instruments at different levels are not interchangeable. Using a tape measure to mark tenon shoulders wastes the tape's range and exceeds its useful precision for that application. Using a caliper to lay out rough crosscut lengths wastes the caliper's precision on a task where 1 mm error is irrelevant and wastes your time. Matching instrument to task is itself a form of error control.
 
-```
-Instrument Hierarchy: Resolution vs. Task Domain
-─────────────────────────────────────────────────────────────────────────
-  High Resolution │  Dial Caliper (0.02 mm)
-  Precision Work  │  Machinist's Combination Square
-                  │  Vernier Marking Gauge
-                  │  Precision Ground Steel Rule
-                  │
-  Mid-Range       │  Try Square / Engineer's Square
-  Reference Work  │  Sliding Bevel / Bevel Gauge
-                  │  Mortise / Cutting Gauge
-                  │  Folding Rule
-                  │
-  Gross Layout    │  Steel Tape Measure
-  & Dimensioning  │  Winding Sticks
-─────────────────────────────────────────────────────────────────────────
-  Low Resolution
+```mermaid
+flowchart TD
+    Root["Instrument Hierarchy:<br/>Resolution vs. Task Domain"]
+    
+    subgraph high["🔬 High Resolution<br/>Precision Work"]
+        DC["Dial Caliper<br/>(0.02 mm)"]
+        MCS["Machinist's Combination Square"]
+        VMG["Vernier Marking Gauge"]
+        PGSR["Precision Ground Steel Rule"]
+    end
+    
+    subgraph mid["📐 Mid-Range<br/>Reference Work"]
+        TS["Try Square /<br/>Engineer's Square"]
+        SB["Sliding Bevel /<br/>Bevel Gauge"]
+        MG["Mortise / Cutting Gauge"]
+        FR["Folding Rule"]
+    end
+    
+    subgraph low["📏 Gross Layout<br/>& Dimensioning"]
+        STM["Steel Tape Measure"]
+        WS["Winding Sticks"]
+    end
+    
+    Root --> high
+    Root --> mid
+    Root --> low
+    
+    DC ~~~ MCS ~~~ VMG ~~~ PGSR
+    TS ~~~ SB ~~~ MG ~~~ FR
+    STM ~~~ WS
 ```
 
 ### The Steel Rule: Calibration, Parallax, and Hook Error
@@ -75,36 +88,23 @@ Knife-wall registration against a square follows a specific sequence. Set the sq
 
 ### Layout Sequence Architecture
 
-```
-Reference Surface Hierarchy — The Layout Decision Tree
-══════════════════════════════════════════════════════════════════════════
- START
-   │
-   ▼
- Establish FACE SIDE (flattest, clearest face)
-   │  Mark with cabinetmaker's loop symbol
-   │
-   ▼
- Establish FACE EDGE (straightest edge, 90° to face side)
-   │  Mark with tick pointing to face side
-   │
-   ▼
- Dimension to LENGTH
-   │  Rule + marking knife for shoulder locations
-   │  Direct comparison (story stick) preferred for repeat parts
-   │
-   ▼
- Gauge THICKNESS/WIDTH lines from face side/face edge
-   │  Wheel gauge, single setting, all matching parts at once
-   │
-   ▼
- Mark JOINT FEATURES (tenon cheeks, dovetail angles, mortise position)
-   │  Mortise gauge from face side for tenon cheeks
-   │  Sliding bevel + knife for dovetail slopes
-   │
-   ▼
- VERIFY: check square on all layout lines before first cut
-══════════════════════════════════════════════════════════════════════════
+```mermaid
+flowchart TD
+    Start([START])
+    
+    Start --> FaceSide["Establish FACE SIDE<br/>(flattest, clearest face)<br/>Mark with cabinetmaker's loop symbol"]
+    
+    FaceSide --> FaceEdge["Establish FACE EDGE<br/>(straightest edge, 90° to face side)<br/>Mark with tick pointing to face side"]
+    
+    FaceEdge --> Length["Dimension to LENGTH<br/>Rule + marking knife for shoulder locations<br/>Direct comparison (story stick) preferred for repeat parts"]
+    
+    Length --> Gauge["Gauge THICKNESS/WIDTH lines from face side/face edge<br/>Wheel gauge, single setting, all matching parts at once"]
+    
+    Gauge --> JointFeatures["Mark JOINT FEATURES<br/>(tenon cheeks, dovetail angles, mortise position)<br/>Mortise gauge from face side for tenon cheeks<br/>Sliding bevel + knife for dovetail slopes"]
+    
+    JointFeatures --> Verify["VERIFY: check square on all layout lines<br/>before first cut"]
+    
+    Verify --> End([END])
 ```
 
 The sequence above encodes two error-management principles simultaneously. First, every downstream mark derives from an upstream reference that has already been established and verified, so errors cannot accumulate laterally across the layout. Second, all parts that must match dimensionally are gauged in a single session with a single gauge setting, eliminating between-session drift entirely.

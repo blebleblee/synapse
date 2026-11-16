@@ -30,25 +30,20 @@ These three invariants explain why the same printer produces excellent parts one
 
 **The hotend as a thermal-fluid system.** A modern all-metal hotend—the E3D V6, Phaetus Rapido, Slice Engineering Mosquito, or newer high-flow variants—consists of a finned heat sink with a cooling fan, a heatbreak with a sharp thermal gradient, a heater block carrying a thermistor and a cartridge heater, and a nozzle threaded into the block. The design intent is to maintain a near-ambient temperature at the filament entrance and a controlled melt temperature at the nozzle exit, with a steep transition between them so that the filament does not soften until it is well within the heated region. The thermal gradient across the heatbreak is the single most important architectural feature of the hotend, because filament that softens too early forms a soft plug in the cold zone that increases back pressure, causes inconsistent extrusion, and eventually jams.
 
-```
-       ┌──────────────────────────────────────────┐
-       │ Filament (solid, 1.75 mm)                │
-       ▼                                           │
-   ╔═══════════╗                                   │
-   ║  Heat sink ║        Fan-cooled, 30–40 °C      │
-   ║   (fins)   ║                                  │
-   ╚════╤══════╝                                   │
-        │ Heatbreak (thin-walled, ~2 mm bore)      │
-        │ Thermal gradient:  40 °C → 200 °C        │
-        │                   over ~10 mm axial       │
-   ╔════╧═══════════════════╗                       │
-   ║  Heater block          ║  Cartridge 40 W      │
-   ║  Thermistor (≈220 °C)  ║                      │
-   ╚════╤═══════════════════╝                       │
-        │ Nozzle (convergent 60° → 0.4 mm bore)    │
-        │ Land length: 1.0–2.0 mm                   │
-        ▼                                           │
-       Extrudate (0.45 mm wide × 0.20 mm layer)     │
+```mermaid
+flowchart TD
+    A["Filament<br/>(solid, 1.75 mm)"]
+    B["Heat Sink<br/>(fins)<br/>Fan-cooled, 30–40 °C"]
+    C["Heatbreak<br/>(thin-walled, ~2 mm bore)<br/>Thermal gradient: 40 °C → 200 °C<br/>over ~10 mm axial"]
+    D["Heater Block<br/>Thermistor ≈220 °C<br/>Cartridge 40 W"]
+    E["Nozzle<br/>(convergent 60° → 0.4 mm bore)<br/>Land length: 1.0–2.0 mm"]
+    F["Extrudate<br/>(0.45 mm wide × 0.20 mm layer)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 The heatbreak achieves its gradient through a thin-walled section of stainless steel, whose low thermal conductivity (~16 W/m·K) compared to the brass or copper alloy of the heater block (~120–380 W/m·K) restricts heat flow upward. The cooling fan on the heat sink must run at full speed whenever the hotend is above 50°C; without it, conductive heat from the block creeps upward, the cold zone warms, and filament softens too early. This failure mode, called heat creep, is the most common cause of mid-print jams on Bowden and direct-drive systems alike, and it is almost always traceable to insufficient hotend cooling or excessive retraction pulling molten filament into the heatbreak.

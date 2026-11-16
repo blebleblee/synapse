@@ -34,32 +34,35 @@ The forward triangular merger introduces a holding company structure. The acquir
 
 The reverse triangular merger is the most complex and most common structure for public company acquisitions. The acquirer forms a subsidiary (MergerCo), and MergerCo merges into the target, with the target surviving as a wholly-owned subsidiary of the acquirer. This structure preserves the target's legal entity, which means all of its contracts, licenses, permits, and regulatory approvals remain in force without the need for assignment or novation. This is critically important in heavily regulated industries where transfer of licenses would trigger costly and time-consuming regulatory review. The structure also allows the acquirer to push the consideration down to the target's shareholders through MergerCo, which facilitates mixed consideration structures. If the consideration is at least 40 percent acquirer stock and the acquirer acquires substantially all of the target's properties, the transaction qualifies as a Section 368(a)(1)(C) reorganization.
 
-```
-                    Reverse Triangular Merger Structure
-                    ====================================
-
-    BEFORE CLOSE                          AFTER CLOSE
-    ------------                          ----------
-
-    [Acquirer]                           [Acquirer]
-        |                                     |
-        | forms                               | owns 100%
-        v                                     v
-    [MergerCo]          merges into      [Target (surviving)]
-        |               -------->            |
-        |  merges into                       | (contracts, licenses,
-        v                                    |  permits preserved)
-    [Target]                                 |
-        |                                    |
-        v                                    v
-    [Target SHs]                        [Target SHs]
-    (receive cash                        (receive cash
-     and/or stock)                        and/or stock)
-
-
-    Key constraint: >= 40% stock consideration for Section 368(a)(1)(C)
-    Key benefit: Target entity survives -> no contract assignment needed
-    Key benefit: Liabilities isolated in Target subsidiary
+```mermaid
+flowchart TD
+    subgraph before ["BEFORE CLOSE"]
+        A1["Acquirer"]
+        M1["MergerCo<br/>(formed by Acquirer)"]
+        T1["Target"]
+        SH1["Target Shareholders"]
+        
+        A1 -->|forms| M1
+        M1 -->|"merges into"| T1
+        T1 --> SH1
+    end
+    
+    subgraph after ["AFTER CLOSE"]
+        A2["Acquirer"]
+        T2["Target (surviving)<br/>• Contracts preserved<br/>• Licenses preserved<br/>• Permits preserved"]
+        SH2["Target Shareholders<br/>(receive cash and/or stock)"]
+        
+        A2 -->|"owns 100%"| T2
+        T2 --> SH2
+    end
+    
+    before -.->|merger| after
+    
+    subgraph benefits ["Key Points"]
+        B1["≥ 40% stock consideration<br/>for Section 368(a)(1)(C)"]
+        B2["Target entity survives<br/>No contract assignment needed"]
+        B3["Liabilities isolated<br/>in Target subsidiary"]
+    end
 ```
 
 ### Consideration Mechanics

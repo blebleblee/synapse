@@ -32,28 +32,28 @@ The elimination of RSA key exchange in TLS 1.3 is architecturally significant. I
 
 The TLS 1.3 handshake is designed to complete in a single round-trip under normal conditions, down from TLS 1.2's two round-trips. The protocol achieves this by having the client speculatively send its key share in the first message, allowing the server to derive the session keys and begin encrypting its own response immediately.
 
-```
-Client                                           Server
-  |                                                |
-  |--- ClientHello -------------------------------->|
-  |    (supported versions, ciphers, key_share,    |
-  |     session_ticket for 0-RTT)                  |
-  |                                                |
-  |<-- ServerHello --------------------------------|
-  |    (selected cipher, server key_share)         |
-  |                                                |
-  |    [Handshake keys derived by both sides       |
-  |     from ECDHE: (EC)DHE(client_priv,           |
-  |     server_pub) = shared_secret]               |
-  |                                                |
-  |<-- {EncryptedExtensions} --------------------|
-  |<-- {Certificate} -----------------------------|
-  |<-- {CertificateVerify} ----------------------|
-  |<-- {Finished} -------------------------------|
-  |                                                |
-  |--- {Finished} -------------------------------->|
-  |                                                |
-  |=== Application Data (symmetric AEAD) ========|
+```mermaid
+flowchart TD
+    Client["Client"]
+    Server["Server"]
+    
+    Client -->|"ClientHello<br/>(supported versions, ciphers, key_share,<br/>session_ticket for 0-RTT)"| Server
+    
+    Server -->|"ServerHello<br/>(selected cipher, server key_share)"| Client
+    
+    KeyDerivation["Handshake keys derived by both sides<br/>from ECDHE: (EC)DHE(client_priv, server_pub) = shared_secret"]
+    
+    Server -->|"{EncryptedExtensions}"| Client
+    Server -->|"{Certificate}"| Client
+    Server -->|"{CertificateVerify}"| Client
+    Server -->|"{Finished}"| Client
+    
+    Client -->|"{Finished}"| Server
+    
+    AppData["Application Data (symmetric AEAD)"]
+    
+    Client -.->|"Encrypted Application Data"| AppData
+    Server -.->|"Encrypted Application Data"| AppData
 ```
 
 The curly braces above denote encryption under the handshake traffic keys, which are derived immediately after the ECDHE exchange. This means the server's certificate travels encrypted over the wire in TLS 1.3, an improvement over TLS 1.2 where certificates were visible to passive observers. For offensive researchers intercepting traffic, this means certificate metadata — the server's identity, the issuing CA, the Subject Alternative Names — is no longer trivially visible to a passive listener positioned on the wire.
@@ -99,26 +99,18 @@ For network requests specifically, the distinction between "simple" and "preflig
 
 For requests that do not qualify as "simple" — anything using `PUT`, `DELETE`, `PATCH`, any custom headers like `Authorization` or `Content-Type: application/json` — the browser first issues an HTTP `OPTIONS` preflight request to the target origin. The server must explicitly authorize the actual request method and headers by responding with the appropriate `Access-Control-Allow-*` headers, or the browser will refuse to send the actual request entirely.
 
-```
-Browser                                         Server (api.example.com)
-   |                                                   |
-   |-- OPTIONS /resource HTTP/1.1 ------------------>  |
-   |   Origin: https://app.other.com                   |
-   |   Access-Control-Request-Method: DELETE           |
-   |   Access-Control-Request-Headers: Authorization   |
-   |                                                   |
-   |<- 204 No Content --------------------------------  |
-   |   Access-Control-Allow-Origin: https://app.other.com
-   |   Access-Control-Allow-Methods: DELETE            |
-   |   Access-Control-Allow-Headers: Authorization     |
-   |   Access-Control-Max-Age: 86400                   |
-   |                                                   |
-   |-- DELETE /resource HTTP/1.1 ------------------>   |
-   |   Authorization: Bearer <token>                   |
-   |   Origin: https://app.other.com                   |
-   |                                                   |
-   |<- 200 OK ---------------------------------------- |
-   |   Access-Control-Allow-Origin: https://app.other.com
+```mermaid
+flowchart LR
+    Browser["Browser"]
+    Server["Server (api.example.com)"]
+    
+    Browser -->|"OPTIONS /resource HTTP/1.1<br/>Origin: https://app.other.com<br/>Access-Control-Request-Method: DELETE<br/>Access-Control-Request-Headers: Authorization"| Server
+    
+    Server -->|"204 No Content<br/>Access-Control-Allow-Origin: https://app.other.com<br/>Access-Control-Allow-Methods: DELETE<br/>Access-Control-Allow-Headers: Authorization<br/>Access-Control-Max-Age: 86400"| Browser
+    
+    Browser -->|"DELETE /resource HTTP/1.1<br/>Authorization: Bearer &lt;token&gt;<br/>Origin: https://app.other.com"| Server
+    
+    Server -->|"200 OK<br/>Access-Control-Allow-Origin: https://app.other.com"| Browser
 ```
 
 The `Access-Control-Max-Age` header tells the browser to cache the preflight result for the specified duration, avoiding a round-trip penalty on subsequent requests to the same endpoint. In production systems under heavy API load, failing to set this header can double the number of HTTP requests to an origin.

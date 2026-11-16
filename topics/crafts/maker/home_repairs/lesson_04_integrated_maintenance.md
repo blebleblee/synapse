@@ -22,22 +22,17 @@ Understanding these four invariants — boundary awareness, material compatibili
 
 It helps to organize the systems of a residential structure into three functional domains: the **envelope**, the **services**, and the **finish layer**. These domains are physically nested, with the envelope as the outermost, the services running through the structural fabric just inside it, and the finish layer presented to the occupants on the interior. Every repair can be located within this three-domain model, and the model immediately reveals which domains a given repair must touch.
 
-```
-┌──────────────────────────────────────────────────────┐
-│                   FINISH LAYER                       │
-│    (tile, drywall, paint, trim, flooring, cabinets)  │
-│                                                      │
-│   ┌──────────────────────────────────────────────┐   │
-│   │               SERVICES DOMAIN               │   │
-│   │   (electrical, plumbing, HVAC, data/low-V)  │   │
-│   │                                             │   │
-│   │   ┌─────────────────────────────────────┐  │   │
-│   │   │        ENVELOPE / STRUCTURE         │  │   │
-│   │   │  (foundation, framing, sheathing,   │  │   │
-│   │   │   WRB, insulation, roofing)          │  │   │
-│   │   └─────────────────────────────────────┘  │   │
-│   └──────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph finish_layer ["FINISH LAYER"]
+        subgraph services_domain ["SERVICES DOMAIN"]
+            subgraph envelope_structure ["ENVELOPE / STRUCTURE"]
+                ENV["foundation · framing · sheathing · WRB · insulation · roofing"]
+            end
+            SVC["electrical · plumbing · HVAC · data / low-V"]
+        end
+        FIN["tile · drywall · paint · trim · flooring · cabinets"]
+    end
 ```
 
 The envelope domain is responsible for load transfer, thermal separation, and moisture management. The services domain distributes energy and fluid through the conditioned space. The finish layer provides surface durability, aesthetics, and occupant interface. A leak in a supply line (services domain) that migrates into the bottom plate (envelope domain) and stains the baseboard paint (finish layer) is a cross-domain failure, and the repair sequence must proceed inward from envelope to services to finish — never the reverse.

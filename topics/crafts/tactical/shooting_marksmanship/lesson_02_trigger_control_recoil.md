@@ -20,38 +20,27 @@ The third invariant governs the period after the shot: **recoil does not destroy
 
 To control the trigger intelligently, the shooter must understand what they are actually manipulating. All service-pistol and rifle trigger mechanisms, regardless of platform, reduce to the same functional architecture: a sear holds the striker or hammer under spring tension, and the trigger linkage progressively reduces the mechanical advantage of that sear until, at a defined travel point, the contact surfaces separate and the firing pin is released. The geometry of those sear surfaces and the spring rates involved determine every tactile quality the shooter experiences — the take-up, the wall, the break, and the reset.
 
-```
-                    ┌─────────────────────────────────────────┐
-                    │         TRIGGER PULL SEQUENCE           │
-                    └─────────────────────────────────────────┘
-
-   REARWARD PRESSURE ──►
-
-   Phase 1: Pre-Travel       Phase 2: Wall           Phase 3: Break
-   (Slack / Take-Up)         (Stacking / Resistance)  (Sear Release)
-
-   ┌──────────┐              ┌──────────┐              ┌──────────┐
-   │ Trigger  │              │ Trigger  │              │ Striker  │
-   │ moves    │──────────────│ contacts │──────────────│ released │
-   │ freely   │  increasing  │ sear edge│  threshold   │ FP fires │
-   │ no sear  │  engagement  │ load     │  crossed     │          │
-   │ contact  │              │ peaks    │              │          │
-   └──────────┘              └──────────┘              └──────────┘
-        │                         │                         │
-   Feel: soft                 Feel: hard wall            Feel: crisp
-   resistance                 resistance increases       sudden release
-
-
-   Phase 4: Overtravel       Phase 5: Reset
-   (Rearward past break)     (Forward to engagement)
-
-   ┌──────────┐              ┌──────────┐
-   │ Trigger  │              │ Trigger  │
-   │ continues│──────────────│ travels  │
-   │ rearward │  irrelevant  │ forward  │  ◄── audible/tactile click
-   │ post-    │  to accuracy │ to sear  │       marks new engagement
-   │ ignition │              │ re-catch │
-   └──────────┘              └──────────┘
+```mermaid
+flowchart TD
+    trigger["🔫 TRIGGER PULL SEQUENCE"]
+    rearward["← REARWARD PRESSURE"]
+    
+    trigger --> phase1
+    rearward --> phase1
+    
+    subgraph phases ["Trigger Pull Phases"]
+        phase1["<b>Phase 1: Pre-Travel</b><br/>(Slack / Take-Up)<br/><br/>Trigger moves freely<br/>no sear contact<br/><br/>Feel: soft resistance"]
+        phase2["<b>Phase 2: Wall</b><br/>(Stacking / Resistance)<br/><br/>Trigger contacts sear edge<br/>load peaks<br/><br/>Feel: hard wall<br/>resistance increases"]
+        phase3["<b>Phase 3: Break</b><br/>(Sear Release)<br/><br/>Striker released<br/>FP fires<br/><br/>Feel: crisp sudden release"]
+        phase4["<b>Phase 4: Overtravel</b><br/>(Rearward past break)<br/><br/>Trigger continues rearward<br/>post-ignition<br/><br/>Irrelevant to accuracy"]
+        phase5["<b>Phase 5: Reset</b><br/>(Forward to engagement)<br/><br/>Trigger travels forward<br/>to sear re-catch<br/><br/>Audible/tactile click<br/>marks new engagement"]
+    end
+    
+    phase1 -->|"increasing engagement"| phase2
+    phase2 -->|"threshold crossed"| phase3
+    phase3 -->|"trigger continues"| phase4
+    phase4 -->|"reset cycle"| phase5
+    phase5 -->|"ready for next pull"| phase1
 ```
 
 The *wall* is the tactile keystone of trigger management. It is the point at which the sear geometry has reached its threshold and additional pressure in the range of grams, not kilograms, will cause the break. A trained shooter rides the wall: they apply pre-travel pressure to consume slack, feel the wall engage, then transition to a slow, steady squeeze that delivers the final increment of force with no acceleration. Accelerating through the wall — hurrying the final press — is the mechanical act that creates the involuntary flinch response, because it provides exactly the temporal cue the brainstem needs to initiate its anticipatory contraction.
@@ -68,19 +57,37 @@ Double-action/single-action pistols, such as the Beretta 92 and SIG P226, demand
 
 The grip is the shooter's mechanical interface with the recoil impulse. Its geometry determines whether that impulse travels directly rearward along the bore axis or generates a rotational moment about the shooter's wrist joint. The ideal grip structure on a semi-automatic pistol positions the bore axis as low as possible relative to the web of the shooter's hand. This minimizes the moment arm through which the recoil force acts. The difference between a low-bore-axis pistol like the Walther PDP and a higher-bore-axis design is tangible in rapid-fire strings: a 10 to 15 millisecond difference in return-to-target time per shot compounds significantly across a multi-round sequence.
 
-```
-   HIGH BORE AXIS                          LOW BORE AXIS
-
-   ════ Bore Line ════                     ════ Bore Line ════
-         │                                        │
-         │  long moment arm                       │  short moment arm
-         │                                        │
-         ▼                                        ▼
-   [Web of hand]                           [Web of hand]
-
-   Recoil torque: HIGH                    Recoil torque: LOW
-   Muzzle flip: PRONOUNCED               Muzzle flip: MINIMAL
-   Return time: SLOWER                   Return time: FASTER
+```mermaid
+flowchart LR
+    subgraph high ["HIGH BORE AXIS"]
+        direction TB
+        HL["════ Bore Line ════"]
+        HM["│<br/>│ long moment arm<br/>│<br/>▼"]
+        HW["Web of hand"]
+        HR1["Recoil torque: HIGH"]
+        HR2["Muzzle flip: PRONOUNCED"]
+        HR3["Return time: SLOWER"]
+        
+        HL --> HM --> HW
+        HW --> HR1
+        HW --> HR2
+        HW --> HR3
+    end
+    
+    subgraph low ["LOW BORE AXIS"]
+        direction TB
+        LL["════ Bore Line ════"]
+        LM["│<br/>│ short moment arm<br/>│<br/>▼"]
+        LW["Web of hand"]
+        LR1["Recoil torque: LOW"]
+        LR2["Muzzle flip: MINIMAL"]
+        LR3["Return time: FASTER"]
+        
+        LL --> LM --> LW
+        LW --> LR1
+        LW --> LR2
+        LW --> LR3
+    end
 ```
 
 The shooter's grip must be **maximally high** on the back strap to minimize this moment arm, and the support hand must fill every available space on the frame that the firing hand does not occupy. The firing hand provides roughly 60% of total grip pressure, concentrated through the middle, ring, and pinky fingers clamping the grip to the palm. The support hand wraps over the firing hand's fingers and applies independent, lateral crushing pressure, driving the two palms together. This creates a hydraulic clamp around the grip rather than a muscular squeeze applied in a single direction. The combined grip pressure in competition shooting contexts is typically 60 to 70% of the shooter's maximum grip strength — firm enough to control recoil impulse, loose enough to prevent the forearm tension that contaminates trigger finger independence.
@@ -91,24 +98,22 @@ Wrist position is structural, not stylistic. Both wrists should be canted slight
 
 Shot calling is the practice of reading one's own sight picture at the precise instant of the break and predicting, before looking at the target, exactly where the shot landed. It is the closed-loop validation mechanism of marksmanship, and its absence is the clearest sign of an untrained shooter.
 
-```
-   ┌──────────────────────────────────────────────────────────┐
-   │              MARKSMANSHIP FEEDBACK LOOP                  │
-   └──────────────────────────────────────────────────────────┘
-
-   ┌─────────────┐        ┌──────────────┐       ┌────────────────┐
-   │  Sight      │        │  Trigger     │       │  Shot Call     │
-   │  Alignment  │───────►│  Press       │──────►│  (mental image │
-   │  confirmed  │        │  (continuous │       │   of sights at │
-   │             │        │   pressure)  │       │   break)       │
-   └─────────────┘        └──────────────┘       └───────┬────────┘
-                                                          │
-                                                          ▼
-   ┌─────────────┐        ┌──────────────┐       ┌────────────────┐
-   │  Diagnosis  │◄───────│  Compare:    │◄──────│  Actual hole   │
-   │  & Adjust   │        │  Call vs.    │       │  location on   │
-   │  next rep   │        │  Impact      │       │  target        │
-   └─────────────┘        └──────────────┘       └────────────────┘
+```mermaid
+flowchart TD
+    title["MARKSMANSHIP FEEDBACK LOOP"]
+    
+    A["Sight<br/>Alignment<br/>confirmed"]
+    B["Trigger<br/>Press<br/>(continuous<br/>pressure)"]
+    C["Shot Call<br/>(mental image<br/>of sights at<br/>break)"]
+    D["Actual hole<br/>location on<br/>target"]
+    E["Compare:<br/>Call vs.<br/>Impact"]
+    F["Diagnosis<br/>& Adjust<br/>next rep"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 If the shot call matches the impact location, the shooter's read of their own technique is calibrated. If the shot lands lower than called, anticipation is driving the muzzle down before the break. If the shot lands where called but off-center, the sight picture itself was misread — a front sight focus problem or a parallax issue. The diagnostic power of this loop is that it separates errors in the fire-control system (trigger and grip mechanics) from errors in the aiming system (sight alignment and sight picture), which are entirely different root causes demanding entirely different corrections.

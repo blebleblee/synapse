@@ -95,8 +95,8 @@ graph TB
     C3 -->|"OpenFlow Protocol"| D2
     D1 -.->|"Optional Offload"| D3
     
-    style C1 fill:#e1f5ff
-    style D1 fill:#fff4e1
+    style C1 fill:#e1f5ff,color:#0f172a
+    style D1 fill:#fff4e1,color:#0f172a
 ```
 
 **Application Layer**: Consumes network services through high-level APIs (REST, gRPC). A traffic engineering application might request "balance traffic across paths to maximize throughput," while a security application might specify "isolate tenant A from tenant B."
@@ -145,8 +145,8 @@ graph TB
     A -.->|"Optional"| H
     H -.-> G
     
-    style D fill:#e1f5ff
-    style E fill:#ffe1e1
+    style D fill:#e1f5ff,color:#0f172a
+    style E fill:#ffe1e1,color:#0f172a
 ```
 
 **Two-Path Architecture**: OVS uses a fast path (kernel module) and slow path (user space daemon):
@@ -226,9 +226,9 @@ graph LR
     S2 -->|"3. No threats detected"| S3
     S3 -->|"4. Distributed to backend"| T2
     
-    style S1 fill:#ffe1e1
-    style S2 fill:#e1ffe1
-    style S3 fill:#e1e1ff
+    style S1 fill:#ffe1e1,color:#0f172a
+    style S2 fill:#e1ffe1,color:#0f172a
+    style S3 fill:#e1e1ff,color:#0f172a
 ```
 
 **Service Function Chaining (SFC)** routes traffic through an ordered sequence of VNFs:
@@ -302,8 +302,8 @@ graph TB
     
     S1 -.->|"Failover"| C2
     
-    style C1 fill:#e1ffe1
-    style DB fill:#ffe1e1
+    style C1 fill:#e1ffe1,color:#0f172a
+    style DB fill:#ffe1e1,color:#0f172a
 ```
 
 **Consistency Models**:
@@ -414,8 +414,8 @@ graph TB
     D --> E
     E <--> F
     
-    style C fill:#e1f5ff
-    style D fill:#ffe1e1
+    style C fill:#e1f5ff,color:#0f172a
+    style D fill:#ffe1e1,color:#0f172a
 ```
 
 SmartNICs implement OVS datapath in hardware (FPGA or ASIC), achieving:
@@ -618,8 +618,8 @@ graph LR
     A -->|"Forward Path: Working"| B
     B -.->|"Return Path: Failed (firewall blocks UDP 4789)"| A
     
-    style A fill:#e1ffe1
-    style B fill:#ffe1e1
+    style A fill:#e1ffe1,color:#0f172a
+    style B fill:#ffe1e1,color:#0f172a
 ```
 
 **Consequence**: TCP handshake fails (SYN succeeds, SYN-ACK dropped), or established connections hang on return traffic.
@@ -727,8 +727,8 @@ graph TB
     T2 -->|"Promotion on<br/>packet threshold"| T1
     T1 -->|"Demotion on<br/>idle timeout"| T2
     
-    style T1 fill:#e1f5ff
-    style T2 fill:#ffe1e1
+    style T1 fill:#e1f5ff,color:#0f172a
+    style T2 fill:#ffe1e1,color:#0f172a
 ```
 
 Elephant flows (e.g., long-lived database connections, video streams) installed in hardware for line-rate forwarding. Mice flows (e.g., DNS queries, short HTTP requests) handled in software, accepting higher latency for infrequent packets.
@@ -978,7 +978,7 @@ FAILOVER_MS=$((TIME_END - TIME_START))
 echo "Failover took ${FAILOVER_MS}ms"
 ```
 
-Target: <5 seconds failover with zero packet loss for established flows.
+Target: < 5 seconds failover with zero packet loss for established flows.
 
 **VXLAN Tunnel Debugging Workflow**:
 

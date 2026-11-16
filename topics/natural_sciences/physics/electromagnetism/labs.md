@@ -361,7 +361,7 @@ Function Generator Output Impedance:
 - Use BNC tee adapter and 50-Ω terminator for impedance-matched measurements
 
 Hall Effect Gaussmeter Calibration:
-- Zero field nulling: Shield probe in μ-metal enclosure, adjust zero offset to <0.1 mT
+- Zero field nulling: Shield probe in μ-metal enclosure, adjust zero offset to < 0.1 mT
 - Linearity verification: Test with calibrated permanent magnet (0.1–0.5 T range)
 - Temperature compensation: Allow 5-minute thermal stabilization before measurements
 - Probe orientation: Active Hall element perpendicular to field direction (±5° alignment)

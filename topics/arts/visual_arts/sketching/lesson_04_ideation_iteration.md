@@ -22,40 +22,48 @@ The geometric armature underlying each thumbnail begins with the division of the
 
 Value structure functions as the primary compositional organizing principle during thumbnail ideation. The three-value reduction protocol compresses the full luminance range into discrete zones: highlight mass (top 20% of the value scale, typically reserved for primary focal elements or light sources), midtone mass (middle 60%, establishing environmental context and secondary forms), and shadow mass (bottom 20%, providing contrast anchors and negative space). This compression forces explicit decisions about silhouette legibility and spatial depth cueing. A successful thumbnail reads clearly when squinted at or viewed from across the room—the acid test for compositional clarity.
 
-```
-Thumbnail Iteration Workflow (Single Concept Development)
-
-PHASE 1: Rapid Divergence (20-30 thumbnails, 3-5 minutes each)
-├─ Constraint Definition
-│  ├─ Format aspect ratio locked
-│  ├─ Emotional register identified
-│  └─ Functional requirements listed
-├─ Compositional Armature Variations
-│  ├─ Focal placement grid permutations
-│  ├─ Mass distribution asymmetries
-│  └─ Dynamic diagonal emphasis tests
-└─ Value Structure Experiments
-   ├─ High-key (dominant light mass)
-   ├─ Low-key (dominant shadow mass)
-   └─ Mid-key balanced distributions
-
-PHASE 2: Comparative Convergence (Select top 3-5)
-├─ Silhouette Legibility Ranking
-├─ Focal Hierarchy Clarity Assessment
-└─ Emotional Resonance Evaluation
-
-PHASE 3: Refinement Iteration (30-60 minutes each)
-├─ Secondary Form Articulation
-├─ Perspective Consistency Verification
-└─ Atmospheric Depth Integration
-
-PHASE 4: Tight Drawing (2-4 hours)
-├─ Anatomical/Architectural Accuracy Lock
-├─ Material Indicator Notation
-└─ Final Compositional Adjustments
-
-PHASE 5: Final Rendering (6-12 hours)
-└─ Surface Detail, Color, Lighting
+```mermaid
+flowchart TD
+    Start["Thumbnail Iteration Workflow<br/>(Single Concept Development)"]
+    
+    Start --> P1["PHASE 1: Rapid Divergence<br/>(20-30 thumbnails, 3-5 minutes each)"]
+    
+    P1 --> P1A["Constraint Definition"]
+    P1A --> P1A1["Format aspect ratio locked"]
+    P1A --> P1A2["Emotional register identified"]
+    P1A --> P1A3["Functional requirements listed"]
+    
+    P1 --> P1B["Compositional Armature Variations"]
+    P1B --> P1B1["Focal placement grid permutations"]
+    P1B --> P1B2["Mass distribution asymmetries"]
+    P1B --> P1B3["Dynamic diagonal emphasis tests"]
+    
+    P1 --> P1C["Value Structure Experiments"]
+    P1C --> P1C1["High-key (dominant light mass)"]
+    P1C --> P1C2["Low-key (dominant shadow mass)"]
+    P1C --> P1C3["Mid-key balanced distributions"]
+    
+    P1A1 & P1A2 & P1A3 & P1B1 & P1B2 & P1B3 & P1C1 & P1C2 & P1C3 --> P2["PHASE 2: Comparative Convergence<br/>(Select top 3-5)"]
+    
+    P2 --> P2A["Silhouette Legibility Ranking"]
+    P2 --> P2B["Focal Hierarchy Clarity Assessment"]
+    P2 --> P2C["Emotional Resonance Evaluation"]
+    
+    P2A & P2B & P2C --> P3["PHASE 3: Refinement Iteration<br/>(30-60 minutes each)"]
+    
+    P3 --> P3A["Secondary Form Articulation"]
+    P3 --> P3B["Perspective Consistency Verification"]
+    P3 --> P3C["Atmospheric Depth Integration"]
+    
+    P3A & P3B & P3C --> P4["PHASE 4: Tight Drawing<br/>(2-4 hours)"]
+    
+    P4 --> P4A["Anatomical/Architectural Accuracy Lock"]
+    P4 --> P4B["Material Indicator Notation"]
+    P4 --> P4C["Final Compositional Adjustments"]
+    
+    P4A & P4B & P4C --> P5["PHASE 5: Final Rendering<br/>(6-12 hours)"]
+    
+    P5 --> P5A["Surface Detail, Color, Lighting"]
 ```
 
 The refinement bridge between thumbnail and tight drawing introduces secondary form articulation without sacrificing compositional integrity. At this intermediate scale—typically four to six inches—the artist introduces perspective structure (horizon line placement, vanishing point convergence), anatomical landmark placement (gesture line of action, joint articulation nodes, volumetric axis tilts), and spatial depth layering (foreground occlusion overlaps, atmospheric perspective gradient weakening). The critical discipline at this stage is resisting premature detail investment: edges remain softly blocked, surfaces indicated with broad value planes rather than texture rendering, and contours defined through value contrast rather than hard line boundaries.

@@ -44,46 +44,35 @@ Denial of service threats against the smart lock span both physical and network 
 
 The hardware security module at the foundation of IoT security architectures typically implements a complete secure microcontroller system with its own CPU core, SRAM, non-volatile key storage, and cryptographic accelerators, all integrated into a single tamper-resistant package that actively detects and responds to physical attacks. The architecture diagram for a representative HSM like the NXP EdgeLock SE050 illustrates the isolation boundaries:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Application Processor                     │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │ Application  │  │   Network    │  │    Flash     │      │
-│  │   Firmware   │  │    Stack     │  │  Controller  │      │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘      │
-│         │                 │                 │               │
-│         └─────────────────┼─────────────────┘               │
-│                           │                                 │
-│                    ┌──────▼───────┐                         │
-│                    │   I2C / SPI  │                         │
-│                    │   Interface  │                         │
-└────────────────────┴──────┬───────┴─────────────────────────┘
-                            │
-                    ┌───────▼────────┐
-                    │  Command FIFO  │
-                    └───────┬────────┘
-┌───────────────────────────▼─────────────────────────────────┐
-│              Hardware Security Module (HSM)                  │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │           Secure Cortex-M Core (48 MHz)              │  │
-│  └─────┬────────────────────────────────────────┬───────┘  │
-│        │                                        │           │
-│  ┌─────▼─────┐  ┌──────────────┐  ┌───────────▼────────┐  │
-│  │  Crypto   │  │   OTP Fuse   │  │   Secure NVM       │  │
-│  │ Engines   │  │    Array     │  │  (Device Keys)     │  │
-│  │           │  │              │  │                    │  │
-│  │ AES-256   │  │ Device UID   │  │ ECC P-256 Private  │  │
-│  │ SHA-256   │  │ Root Secret  │  │ RSA-2048 Private   │  │
-│  │ ECC P-256 │  │              │  │ Symmetric Keys     │  │
-│  │ RSA-2048  │  │              │  │                    │  │
-│  └───────────┘  └──────────────┘  └────────────────────┘  │
-│                                                             │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │          Tamper Detection & Response                 │  │
-│  │  • Mesh Grid    • Temp Sensor   • Voltage Monitor   │  │
-│  │  • Light Sensor • Clock Monitor • Glitch Detector   │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph AP["Application Processor"]
+        AF["Application Firmware"]
+        NS["Network Stack"]
+        FC["Flash Controller"]
+        IF["I2C / SPI Interface"]
+
+        AF --> IF
+        NS --> IF
+        FC --> IF
+    end
+
+    CF["Command FIFO"]
+
+    IF --> CF
+
+    subgraph HSM["Hardware Security Module (HSM)"]
+        subgraph CORE["Secure Cortex-M Core (48 MHz)"]
+            direction LR
+            CE["Crypto Engines\n─────────────\nAES-256\nSHA-256\nECC P-256\nRSA-2048"]
+            OTP["OTP Fuse Array\n─────────────\nDevice UID\nRoot Secret"]
+            NVM["Secure NVM (Device Keys)\n─────────────────────────\nECC P-256 Private\nRSA-2048 Private\nSymmetric Keys"]
+        end
+
+        TD["Tamper Detection & Response\n────────────────────────────────────────────\nMesh Grid  •  Temp Sensor  •  Voltage Monitor\nLight Sensor  •  Clock Monitor  •  Glitch Detector"]
+    end
+
+    CF --> CORE
 ```
 
 The application processor communicates with the HSM exclusively through a narrow command interface, typically implemented as an I2C or SPI serial bus running at a few megahertz. The application sends command APDUs (Application Protocol Data Units) that specify cryptographic operations like "generate ECDSA signature over this SHA-256 digest using key slot 0x42" or "derive AES key using HKDF with this context string." The HSM validates the command structure, performs access control checks to verify the requesting application has permission to use the specified key slot, executes the cryptographic operation using its internal accelerators, and returns the result. Critically, the HSM never returns the private key itself—only the outputs of operations performed with that key.
@@ -219,52 +208,71 @@ The staging partition approach allows atomic updates: the device never overwrite
 
 Encryption key management for data in transit follows a hierarchical derivation pattern that separates long-term identity keys from ephemeral session keys. The device's private key stored in the HSM serves as the root of this hierarchy but never directly encrypts application data:
 
-```
-Key Hierarchy for Secure Communication:
-
-Level 0: Device Private Key (HSM, never exported)
-  └─> Used only for: Authentication (ECDSA signatures)
-                       Key Agreement (ECDH with server)
-
-Level 1: Session Master Secret (derived from ECDH)
-  Master_Secret = ECDH(Device_Private, Server_Public)
-  └─> Input to HKDF key derivation function
-
-Level 2: Session Keys (derived from Master Secret)
-  HKDF-Expand(Master_Secret, "client write key", 32) → Client_Encrypt_Key
-  HKDF-Expand(Master_Secret, "server write key", 32) → Server_Encrypt_Key
-  HKDF-Expand(Master_Secret, "client write IV", 12)  → Client_IV
-  HKDF-Expand(Master_Secret, "server write IV", 12)  → Server_IV
-  HKDF-Expand(Master_Secret, "client MAC key", 32)   → Client_MAC_Key
-  HKDF-Expand(Master_Secret, "server MAC key", 32)   → Server_MAC_Key
-
-Level 3: Per-Message Keys (for AES-GCM)
-  For each TLS record (sequence number seq_num):
-    Nonce = Client_IV XOR seq_num
-    Encrypt: AES-GCM(plaintext, Client_Encrypt_Key, Nonce, AAD)
-    → ciphertext + auth_tag
+```mermaid
+flowchart TD
+    L0["<b>Level 0: Device Private Key</b><br/>(HSM, never exported)"]
+    
+    L0_Auth["Authentication<br/>(ECDSA signatures)"]
+    L0_KA["Key Agreement<br/>(ECDH with server)"]
+    
+    L1["<b>Level 1: Session Master Secret</b><br/>Master_Secret = ECDH(Device_Private, Server_Public)"]
+    
+    L1_HKDF["HKDF key derivation function"]
+    
+    subgraph L2 ["Level 2: Session Keys (derived from Master Secret)"]
+        L2_CEK["Client_Encrypt_Key<br/>HKDF-Expand(Master_Secret, 'client write key', 32)"]
+        L2_SEK["Server_Encrypt_Key<br/>HKDF-Expand(Master_Secret, 'server write key', 32)"]
+        L2_CIV["Client_IV<br/>HKDF-Expand(Master_Secret, 'client write IV', 12)"]
+        L2_SIV["Server_IV<br/>HKDF-Expand(Master_Secret, 'server write IV', 12)"]
+        L2_CMAC["Client_MAC_Key<br/>HKDF-Expand(Master_Secret, 'client MAC key', 32)"]
+        L2_SMAC["Server_MAC_Key<br/>HKDF-Expand(Master_Secret, 'server MAC key', 32)"]
+    end
+    
+    subgraph L3 ["Level 3: Per-Message Keys (AES-GCM)"]
+        L3_Nonce["Nonce = Client_IV XOR seq_num<br/>(for each TLS record with sequence number)"]
+        L3_Encrypt["AES-GCM(plaintext, Client_Encrypt_Key, Nonce, AAD)"]
+        L3_Output["ciphertext + auth_tag"]
+    end
+    
+    L0 -->|"Used only for"| L0_Auth
+    L0 -->|"Used only for"| L0_KA
+    L0_KA --> L1
+    L1 -->|"Input to"| L1_HKDF
+    L1_HKDF --> L2
+    
+    L2_CEK --> L3_Encrypt
+    L2_CIV --> L3_Nonce
+    L3_Nonce --> L3_Encrypt
+    L3_Encrypt --> L3_Output
 ```
 
 The HKDF key derivation function takes a single master secret and expands it into multiple independent session keys using different context strings, ensuring that compromise of one session key (for example, through a side-channel attack during encryption) does not compromise the other session keys. The per-message nonce construction prevents nonce reuse even across billions of messages by XORing a counter with the base IV, a technique that remains secure as long as the same session keys never encrypt more than 2^32 messages—well beyond the practical session lifetime for IoT devices.
 
 Hardware security modules implement tamper detection through multiple physical sensors that monitor environmental conditions and trigger defensive responses when they detect attack attempts. A typical tamper mesh consists of a serpentine conductive trace etched onto the PCB directly above the secure microcontroller die, forming a continuous electrical path that carries a integrity-check signal:
 
-```
-Tamper Mesh Pattern (Top Copper Layer):
-
-    ┌─────────────────────────────────────┐
-    │  ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┐  │
-    │  ┃ ┌───────────────────────────┐ ┃  │
-    │  ┃ │                           │ ┃  │
-    │  ┃ │    Secure Microcontroller │ ┃  │
-    │  ┃ │         Die Package       │ ┃  │
-    │  ┃ │                           │ ┃  │
-    │  ┃ └───────────────────────────┘ ┃  │
-    │  └━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┘  │
-    │                                    ●│
-    └────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph PCB["Tamper Mesh Pattern (Top Copper Layer)"]
+        PIN1["● Monitor Pin 1<br/>(GPIO + Pull-up)"]
+        
+        subgraph MESH["Tamper Mesh Grid"]
+            subgraph DIE["Secure Microcontroller Die Package"]
+                MCU["Secure<br/>Microcontroller<br/>Die"]
+            end
+        end
+        
+        PIN2["● Monitor Pin 2<br/>(GPIO + Pull-up)"]
+        
+        PIN1 -.->|Mesh Integrity| MESH
+        MESH -.->|Mesh Integrity| PIN2
+    end
     
-    ● = Mesh integrity monitor pins (GPIO with pull-up resistors)
+    style PCB fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style MESH fill:#fff,stroke:#000,stroke-width:3px,stroke-dasharray: 5 5
+    style DIE fill:#e6f3ff,stroke:#333,stroke-width:2px
+    style MCU fill:#cce5ff,stroke:#333,stroke-width:1px
+    style PIN1 fill:#ffeb3b,stroke:#333,stroke-width:2px
+    style PIN2 fill:#ffeb3b,stroke:#333,stroke-width:2px
 ```
 
 The HSM continuously drives one mesh pin with a high-frequency square wave (typically 1-10 MHz) and monitors the signal at the other end using a comparator. The mesh trace routes across the entire surface of the secure die, ensuring that any attempt to drill through the PCB, probe internal signals, or physically access the chip die will necessarily cut or short-circuit the mesh trace. When the comparator detects that the mesh signal has deviated from expected waveform characteristics—signal amplitude dropped, rise time increased, or duty cycle changed—the HSM triggers a tamper response.

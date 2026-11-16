@@ -32,30 +32,15 @@ The internal architecture of the Czech verbal system rests on a triadic interact
 
 To visualize this layered dependency:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    VERB ROOT / LEXEME                        │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-         ┌───────────▼────────────┐
-         │   ASPECT ASSIGNMENT    │
-         │  (Perfective / Impf.)  │
-         └───────────┬────────────┘
-                     │
-       ┌─────────────▼─────────────┐
-       │  TENSE-MOOD SELECTION     │
-       │ (Pres / Past / Fut / Cond)│
-       └─────────────┬─────────────┘
-                     │
-         ┌───────────▼────────────┐
-         │  CONJUGATION CLASS     │
-         │ (-á- / -í- / -uje- )   │
-         └───────────┬────────────┘
-                     │
-            ┌────────▼────────┐
-            │  PERSON-NUMBER  │
-            │   INFLECTION    │
-            └─────────────────┘
+```mermaid
+flowchart TD
+    A["VERB ROOT / LEXEME"]
+    B["ASPECT ASSIGNMENT\n(Perfective / Imperfective)"]
+    C["TENSE-MOOD SELECTION\n(Present / Past / Future / Conditional)"]
+    D["CONJUGATION CLASS\n(-á- / -í- / -uje-)"]
+    E["PERSON-NUMBER\nINFLECTION"]
+
+    A --> B --> C --> D --> E
 ```
 
 This dependency cascade enforces strict ordering: aspect must be determined before tense-mood marking, because the availability of certain tense forms depends on aspectual value (e.g., perfective verbs lack true present-tense forms), and conjugation class applies only after the tense-mood frame is established, as it dictates the phonological realization of inflectional suffixes.

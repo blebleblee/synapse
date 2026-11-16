@@ -26,24 +26,20 @@ Behind the edge layer, API Gateway serves as the regional entry point for server
 
 The Lambda execution model operates on a unit called an execution environment, which is not a container in the Docker sense but a lightweight virtualization boundary implemented through Firecracker microVMs on AWS or gVisor sandboxes on Google Cloud. When a new invocation request arrives and no warm environment exists, the platform allocates a microVM, provisions the configured memory allocation, downloads the deployment package from S3, extracts the code bundle, initializes the runtime (Node.js, Python, Java, etc.), and executes any global initialization code before finally invoking the handler function. This entire sequence constitutes the cold start, and its duration depends on deployment package size, runtime initialization time, and network latency to S3.
 
-```
-Cold Start Sequence (AWS Lambda):
+```mermaid
+flowchart TD
+    subgraph ColdStartSeq ["Cold Start Sequence (AWS Lambda)"]
+        Step1["1. API Gateway receives request"] --> Step2["2. Lambda control plane allocates Firecracker microVM"]
+        Step2 --> Step3["3. Attach network interface (ENI) for VPC functions"]
+        Step3 --> Step4["4. Download deployment package from S3 (zip artifact)"]
+        Step4 --> Step5["5. Extract package into /var/task directory"]
+        Step5 --> Step6["6. Initialize runtime environment (node, python3.11, etc.)"]
+        Step6 --> Step7["7. Execute global/module-level code (imports, connections)"]
+        Step7 --> Step8["8. Invoke handler function with event payload"]
+    end
 
-┌─────────────────────────────────────────────────────────────┐
-│  1. API Gateway receives request                             │
-│  2. Lambda control plane allocates Firecracker microVM       │
-│  3. Attach network interface (ENI) for VPC functions         │
-│  4. Download deployment package from S3 (zip artifact)       │
-│  5. Extract package into /var/task directory                 │
-│  6. Initialize runtime environment (node, python3.11, etc.)  │
-│  7. Execute global/module-level code (imports, connections)  │
-│  8. Invoke handler function with event payload               │
-└─────────────────────────────────────────────────────────────┘
-     │                                                    
-     ├─> Warm Start: Skip steps 2-7, reuse existing environment
-     │                                                    
-     └─> Provisioned Concurrency: Pre-execute steps 2-7,
-         maintain N warm environments ready for invocation
+    ColdStartSeq --> WarmStart["Warm Start: Skip steps 2-7, reuse existing environment"]
+    ColdStartSeq --> ProvConc["Provisioned Concurrency: Pre-execute steps 2-7, maintain N warm environments ready for invocation"]
 ```
 
 Once initialized, the execution environment persists for an indeterminate period, handling subsequent invocations as warm starts that skip initialization and jump directly to handler execution. The Lambda platform manages a pool of execution environments per function version, scaling capacity dynamically based on incoming request rate. When concurrent requests exceed available warm environments, the platform launches new microVMs in parallel, subject to account-level concurrency limits (default 1000 concurrent executions per region, configurable via service quotas). This scaling behavior exhibits burst capacity during traffic spikes, where Lambda can instantiate up to 3000 execution environments in the first minute, then scale by 500 environments per minute thereafter. These limits exist to prevent runaway resource consumption but also create failure modes where sudden traffic surges trigger throttling errors when the burst limit is exhausted.
@@ -52,30 +48,25 @@ The memory model in Lambda is particularly nuanced because memory allocation dir
 
 Multi-region deployment introduces architectural complexity in data plane replication and control plane orchestration. A typical active-active topology deploys identical function versions to three regions—us-east-1, eu-west-1, ap-southeast-1—with Route 53 geolocation routing directing requests to the nearest region. Each region maintains its own DynamoDB table replica through DynamoDB Global Tables, which use a last-write-wins conflict resolution strategy based on timestamp. When a function in us-east-1 writes an item to the regional table, DynamoDB asynchronously replicates the write to eu-west-1 and ap-southeast-1 within 1-2 seconds. During this replication window, a read in eu-west-1 might return stale data, creating eventual consistency anomalies that applications must handle through versioning schemes or client-side timestamps.
 
-```
-Multi-Region Active-Active Topology:
-
-                    ┌──────────────────┐
-                    │   CloudFront     │
-                    │  (Edge Caching)  │
-                    └────────┬─────────┘
-                             │
-              ┌──────────────┼──────────────┐
-              │              │              │
-        ┌─────▼─────┐  ┌─────▼─────┐  ┌────▼──────┐
-        │ us-east-1 │  │ eu-west-1 │  │ap-se-1    │
-        │           │  │           │  │           │
-        │ Lambda    │  │ Lambda    │  │ Lambda    │
-        │ Functions │  │ Functions │  │ Functions │
-        └─────┬─────┘  └─────┬─────┘  └─────┬─────┘
-              │              │              │
-        ┌─────▼─────┐  ┌─────▼─────┐  ┌─────▼─────┐
-        │ DynamoDB  │◄─┤ DynamoDB  │◄─┤ DynamoDB  │
-        │  Primary  │─►│  Replica  │─►│  Replica  │
-        └───────────┘  └───────────┘  └───────────┘
-             │                                  
-             └──► Bi-directional replication    
-                  (last-write-wins, ~1-2s lag)  
+```mermaid
+flowchart TD
+    CF["CloudFront<br/>(Edge Caching)"]
+    
+    CF --> USE["us-east-1<br/>Lambda Functions"]
+    CF --> EUW["eu-west-1<br/>Lambda Functions"]
+    CF --> APS["ap-se-1<br/>Lambda Functions"]
+    
+    USE --> DBUSE["DynamoDB<br/>Primary"]
+    EUW --> DBEUW["DynamoDB<br/>Replica"]
+    APS --> DBAPS["DynamoDB<br/>Replica"]
+    
+    DBUSE <--> DBEUW
+    DBEUW <--> DBAPS
+    DBAPS <--> DBUSE
+    
+    NOTE["Bi-directional replication<br/>(last-write-wins, ~1-2s lag)"]
+    
+    DBUSE -.-> NOTE
 ```
 
 The failure mode that emerges from this topology is split-brain consistency during network partitions. If replication between us-east-1 and eu-west-1 is delayed due to inter-region network congestion, concurrent writes to the same DynamoDB item in both regions will eventually converge, but the last-write-wins resolution might discard valid updates. Practitioners mitigate this through application-level conflict resolution: versioning items with monotonically increasing counters, using conditional writes with expected values, or implementing CRDTs (Conflict-free Replicated Data Types) where operations commute regardless of application order.
@@ -134,7 +125,7 @@ spec:
 
 This policy embodies several security best practices: resource-level restrictions using ARN patterns, condition keys that enforce object tags or tenant isolation, and separation of concerns where the function cannot modify its own IAM role or escalate privileges. The `dynamodb:LeadingKeys` condition enforces row-level security by restricting writes to items whose partition key matches the principal's tenant-id tag, preventing cross-tenant data leakage in multi-tenant systems.
 
-Secrets management in serverless functions requires balancing security and performance because fetching secrets from AWS Secrets Manager or Parameter Store incurs network round-trip latency (20-50ms per call) and API request costs. The common pattern is to fetch secrets during cold start initialization and cache them in global variables for reuse across warm invocations, but this creates a credential rotation problem: if a secret is rotated while a function is warm, the cached value becomes stale. The solution is to implement TTL-based cache invalidation where secrets are refetched every N minutes, or to listen for secret rotation events via EventBridge and proactively invalidate the cache. Alternatively, Lambda extensions like the AWS Parameters and Secrets Lambda Extension run as a sidecar process that maintains a local caching proxy, reducing fetch latency from 50ms to <1ms while handling rotation transparently.
+Secrets management in serverless functions requires balancing security and performance because fetching secrets from AWS Secrets Manager or Parameter Store incurs network round-trip latency (20-50ms per call) and API request costs. The common pattern is to fetch secrets during cold start initialization and cache them in global variables for reuse across warm invocations, but this creates a credential rotation problem: if a secret is rotated while a function is warm, the cached value becomes stale. The solution is to implement TTL-based cache invalidation where secrets are refetched every N minutes, or to listen for secret rotation events via EventBridge and proactively invalidate the cache. Alternatively, Lambda extensions like the AWS Parameters and Secrets Lambda Extension run as a sidecar process that maintains a local caching proxy, reducing fetch latency from 50ms to < 1ms while handling rotation transparently.
 
 Event-driven authorization introduces unique challenges because invocations originate from asynchronous event sources—SQS queues, SNS topics, EventBridge rules—rather than authenticated API clients. When a Lambda function is invoked by an SQS queue, the execution role grants the function permission to receive messages, but there is no end-user context to authorize. The architectural solution is to embed authorization metadata in the event payload itself: a signed JWT token, a cryptographic signature computed by the event producer, or a correlation ID that references an authorized session in DynamoDB. The function validates this embedded proof before processing, effectively implementing token-based authorization in an event-driven model where traditional session-based authentication does not apply.
 

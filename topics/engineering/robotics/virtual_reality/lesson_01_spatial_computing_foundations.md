@@ -18,30 +18,24 @@ The temporal aspect of spatial computing introduces additional invariants rooted
 
 The transformation graph that underpins spatial computing in robotic VR systems takes the form of a directed tree where each edge represents a homogeneous transformation and each node represents a coordinate frame anchored to either a physical entity (a robot link, a sensor housing, a tracked object) or a virtual construct (the origin of a CAD model, the root of a scene graph, a waypoint in task space). The world frame—conventionally denoted with a superscript W or subscript 0—serves as the root of this tree, and every other frame's pose can be computed by composing the transformation matrices along the path from the world frame to that target frame. For a manipulator with base frame B, shoulder frame S, elbow frame E, wrist frame W, and end effector frame EE, the transform from world to end effector is T_W_EE = T_W_B · T_B_S · T_S_E · T_E_W · T_W_EE, where each intermediate transform is determined either by a fixed mechanical offset (for static link-to-link relationships) or by a time-varying joint angle parameterizing a revolute or prismatic degree of freedom.
 
-```
-Coordinate Frame Transformation Graph (Robotic VR Teleoperation System)
-
-                              [World Frame]
-                                    |
-                    +---------------+---------------+
-                    |                               |
-              [HMD Base Station]              [Robot Base Frame]
-                    |                               |
-            +-------+-------+                 [Shoulder Joint]
-            |               |                       |
-      [HMD Headset]  [Left Controller]       [Elbow Joint]
-            |                                       |
-      [Left Eye]                               [Wrist Joint]
-      [Right Eye]                                  |
-                                            [End Effector]
-                                                   |
-                                            [Tool Frame]
-
-Legend:
-- Each node is a 6-DOF coordinate frame (position + orientation)
-- Each edge represents a homogeneous 4×4 transformation matrix
-- Frames update at different rates: HMD @ 1000 Hz, Robot @ 250 Hz
-- Timestamps must be synchronized via NTP or IEEE 1588 PTP
+```mermaid
+flowchart TD
+    World["World Frame"]
+    
+    World --> HMDBase["HMD Base Station"]
+    World --> RobotBase["Robot Base Frame"]
+    
+    HMDBase --> HMDHeadset["HMD Headset"]
+    HMDBase --> LeftController["Left Controller"]
+    
+    HMDHeadset --> LeftEye["Left Eye"]
+    HMDHeadset --> RightEye["Right Eye"]
+    
+    RobotBase --> Shoulder["Shoulder Joint"]
+    Shoulder --> Elbow["Elbow Joint"]
+    Elbow --> Wrist["Wrist Joint"]
+    Wrist --> EndEffector["End Effector"]
+    EndEffector --> Tool["Tool Frame"]
 ```
 
 The homogeneous transformation matrix encoding the pose of frame B relative to frame A takes the standard form where the upper-left 3×3 block contains the rotation matrix R_A_B whose columns are the unit vectors of frame B's axes expressed in frame A's coordinates, the upper-right 3×1 block contains the translation vector **t**_A_B pointing from A's origin to B's origin, and the bottom row is [0 0 0 1] to enable affine transformations through matrix multiplication. The rotation component must satisfy the orthogonality constraint R^T R = I and the determinant constraint det(R) = +1 to ensure it represents a proper rotation without reflection or scaling, but floating-point numerical errors accumulated through repeated multiplications can violate these constraints, necessitating periodic renormalization through algorithms like Gram-Schmidt orthogonalization or conversion to unit quaternions that inherently preserve rotation group properties.
@@ -52,30 +46,57 @@ The forward kinematics problem—computing the end effector pose from known join
 
 The sensor fusion architecture that estimates tracked object poses from heterogeneous measurements operates as an Extended Kalman Filter or Unscented Kalman Filter running at the fastest sensor update rate (typically 1000 Hz for IMUs, 60-120 Hz for optical tracking). The state vector being estimated contains the six-dimensional pose (position and orientation), the three-dimensional linear velocity, and the three-dimensional angular velocity, totaling twelve parameters when orientation is represented as a quaternion (with the unit norm constraint enforced as a manifold constraint). The prediction step integrates the IMU's angular velocity measurements to update orientation and integrates accelerometer readings (after subtracting gravity and compensating for centrifugal effects) to update position, accumulating uncertainty according to a process noise model that captures IMU bias drift and environmental vibration. The update step ingests absolute pose measurements from the optical tracking system whenever a new camera frame arrives, computing the innovation (the difference between the predicted and observed pose) and applying a Kalman gain that weights the correction according to the relative uncertainties of the prediction and the measurement.
 
-```
-Sensor Fusion State Estimation Pipeline (HMD Tracking)
+```mermaid
+flowchart TD
+    subgraph imu_stream ["IMU Stream — 1 kHz"]
+        direction LR
+        IMU1["accel, gyro\nt₀"]
+        IMU2["accel, gyro\nt₀+1ms"]
+        IMU3["accel, gyro\nt₀+2ms"]
+        IMU4["accel, gyro\nt₀+8ms"]
+        IMU5["accel, gyro\nt₀+9ms"]
+    end
 
-Time:     t₀        t₀+1ms      t₀+2ms      t₀+8ms      t₀+9ms
-          |          |           |           |           |
-IMU:   [accel,gyro][accel,gyro][accel,gyro][accel,gyro][accel,gyro]
-          |          |           |           |           |
-          v          v           v           v           v
-      [Predict]  [Predict]   [Predict]   [Predict]   [Predict]
-          |          |           |           |           |
-          +----------+-----------+-----------+---------->|
-                                                         |
-Camera:                                          [pose observation]
-                                                         |
-                                                         v
-                                                      [Update]
-                                                         |
-                                                         v
-                                                   [Fused Pose]
+    subgraph predict_steps ["EKF Predict Steps"]
+        direction LR
+        P1["Predict\nt₀"]
+        P2["Predict\nt₀+1ms"]
+        P3["Predict\nt₀+2ms"]
+        P4["Predict\nt₀+8ms"]
+        P5["Predict\nt₀+9ms"]
+    end
 
-State Vector: x = [p_x, p_y, p_z, q_w, q_x, q_y, q_z, v_x, v_y, v_z, ω_x, ω_y, ω_z]
-              (position, quaternion orientation, linear velocity, angular velocity)
+    IMU1 --> P1
+    IMU2 --> P2
+    IMU3 --> P3
+    IMU4 --> P4
+    IMU5 --> P5
 
-Covariance: P ∈ ℝ¹²ˣ¹² (updated with process noise Q and measurement noise R)
+    P1 -->|"propagate state"| P2
+    P2 -->|"propagate state"| P3
+    P3 -->|"·  ·  ·"| P4
+    P4 -->|"propagate state"| P5
+
+    subgraph camera_update ["Camera Update — ~10 Hz"]
+        CAM["Pose Observation\nt₀+9ms"]
+        UPD["EKF Update\nz = [R | t], noise R"]
+    end
+
+    P5 -->|"prior state x⁻, P⁻"| CAM
+    CAM --> UPD
+
+    UPD --> FUSED["Fused Pose\nx⁺, P⁺"]
+
+    subgraph state_vector ["State Vector  x ∈ ℝ¹³"]
+        SV["position: p_x, p_y, p_z\norientation: q_w, q_x, q_y, q_z\nlinear velocity: v_x, v_y, v_z\nangular velocity: ω_x, ω_y, ω_z"]
+    end
+
+    subgraph covariance ["Covariance"]
+        COV["P ∈ ℝ¹²ˣ¹²\nprocess noise Q  |  measurement noise R"]
+    end
+
+    FUSED --> SV
+    FUSED --> COV
 ```
 
 The optical tracking subsystem—whether inside-out camera arrays mounted on the HMD itself or outside-in camera networks observing retroreflective markers on tracked objects—solves a photogrammetry problem known as the Perspective-n-Point problem: given 2D pixel coordinates of n known 3D landmarks and the camera intrinsic parameters (focal length, principal point, radial distortion coefficients), estimate the 6-DOF camera pose. Modern implementations use the EPnP algorithm for computational efficiency when n > 4, falling back to P3P with RANSAC outlier rejection when only three landmarks are visible. The camera calibration that provides the intrinsic parameters must account for both radial lens distortion (modeled by Brown-Conrady polynomial coefficients k₁, k₂, k₃) and tangential distortion (captured by p₁, p₂), and these distortion parameters must be measured through checkerboard calibration procedures or factory characterization to achieve sub-pixel reprojection accuracy. When multiple cameras observe the same tracked object, their individual pose estimates can be fused by transforming all observations into a common frame and computing a weighted average where each camera's weight is inversely proportional to its estimated covariance, which typically grows quadratically with the distance from camera to object due to depth triangulation uncertainty.

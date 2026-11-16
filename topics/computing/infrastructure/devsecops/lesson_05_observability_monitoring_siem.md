@@ -1881,3 +1881,4 @@ class UserBehaviorFeatures:
         country: str = (
             event.get("src_endpoint", {})
             .get("location
+```

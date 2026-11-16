@@ -30,29 +30,33 @@ The Hundred Years War state formation pressures created specific institutional i
 
 Military technology followed deterministic innovation paths driven by tactical problems. English longbowmen at Crécy (1346) and Agincourt (1415) demonstrated that massed archery from common infantry could defeat armored cavalry charges, undermining the military dominance that justified aristocratic social supremacy. Artillery technology progressed from unreliable bombards to effective siege cannon capable of reducing previously impregnable fortifications, shifting advantage toward attackers with capital resources for gunpowder and metallurgy. These technological shifts favored centralized states over dispersed feudal lordships, creating selection pressure for political consolidation.
 
-```
-Feudal Military Organization → War Pressure → State Formation Path
-│                                    │
-├─ Decentralized noble households    ├─ Extended campaigns require
-│  maintaining cavalry through       │  professional troops beyond
-│  agricultural rents                │  40-day feudal obligation
-│                                    │
-├─ Military service as land tenure   ├─ Monarchies develop scutage
-│  obligation (40 days annually)     │  (payment in lieu of service)
-│                                    │  and hire mercenaries
-│                                    │
-├─ Castle networks providing local   ├─ Siege artillery makes castles
-│  defensive strongpoints            │  obsolete; favors offensive
-│                                    │  campaigns with field armies
-│                                    │
-└─ Limited fiscal extraction         └─ Systematic taxation requires
-   through customary dues               bureaucracy: assessors,
-                                        collectors, courts, accounting
+```mermaid
+flowchart TD
+    subgraph feudal ["Feudal Military Organization"]
+        F1["Decentralized noble households\nmaintaining cavalry through\nagricultural rents"]
+        F2["Military service as land tenure\nobligation (40 days annually)"]
+        F3["Castle networks providing local\ndefensive strongpoints"]
+        F4["Limited fiscal extraction\nthrough customary dues"]
+    end
 
-                    ↓
+    subgraph pressure ["War Pressure"]
+        P1["Extended campaigns require\nprofessional troops beyond\n40-day feudal obligation"]
+        P2["Monarchies develop scutage\n(payment in lieu of service)\nand hire mercenaries"]
+        P3["Siege artillery makes castles\nobsolete; favors offensive\ncampaigns with field armies"]
+        P4["Systematic taxation requires\nbureaucracy: assessors,\ncollectors, courts, accounting"]
+    end
 
-Centralized Monarchical States with Professional Armies,
-Permanent Taxation, Administrative Bureaucracies
+    outcome["Centralized Monarchical States\nwith Professional Armies,\nPermanent Taxation,\nAdministrative Bureaucracies"]
+
+    F1 --> P1
+    F2 --> P2
+    F3 --> P3
+    F4 --> P4
+
+    P1 --> outcome
+    P2 --> outcome
+    P3 --> outcome
+    P4 --> outcome
 ```
 
 The Western Schism's mechanics reveal how institutional legitimacy depends on coordination equilibria rather than intrinsic authority. When cardinals elected Urban VI in 1378 under pressure from Roman mobs demanding an Italian pope, then repudiated the election and chose Clement VII, who established himself at Avignon, the Church's governance mechanism fractured. Each pope claimed exclusive legitimacy, ordained bishops, collected revenues, and excommunicated opponents. Secular rulers recognized whichever claimant aligned with their territorial interests: France, Scotland, Castile, and Aragon backed Avignon, while England, the Holy Roman Empire, and most Italian states recognized Rome.

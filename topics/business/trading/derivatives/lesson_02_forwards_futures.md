@@ -64,43 +64,65 @@ Margin technology has advanced with the adoption of portfolio margining and valu
 
 The final settlement price for cash-settled index futures is calculated from the opening prices of constituent stocks on expiration day, a procedure called the "special opening quotation" or "settlement auction." This design prevents manipulation but creates rebalancing flows as index arbitrageurs unwind large hedges simultaneously. The resulting volume surge and price pressure around expiration—called "triple witching" when stock index futures, options, and single-stock options expire concurrently—can distort intraday price discovery.
 
-```
-Futures Contract Lifecycle – Simplified Data Flow
-
-Open position
-    ↓
-[Trader] ──market order──> [Exchange Order Book] ──match──> [Trade Execution]
-    ↓                                                              ↓
-    └──────────────────────────────────────────────────> [Clearinghouse]
-                                                                   ↓
-                                                        Register long/short
-                                                        Calculate initial margin
-                                                                   ↓
-                                                             [FCM Account]
-                                                        Collect margin from trader
-                                                                   ↓
-Daily Settlement Loop (each trading day):
-    ↓
-[Exchange] publishes settlement price
-    ↓
-[Clearinghouse] marks all positions to settlement price
-    ↓
-Calculate P&L: (Settlement_today - Settlement_yesterday) × Contract size × Quantity
-    ↓
-Variation margin call or credit posted to [FCM Account]
-    ↓
-If account equity < maintenance margin → Margin Call → Trader posts funds or liquidates
-    ↓
-Repeat until position closed or delivery
-
-Delivery or Cash Settlement at Expiration:
-    ↓
-[Clearinghouse] sets final settlement = cash index or physical delivery price
-    ↓
-Debit/credit final P&L
-    ↓
-Physical delivery: Short delivers commodity, long pays invoice price
-Cash settlement: No physical transfer, final variation margin settles contract
+```mermaid
+flowchart TD
+    Start([Open Position])
+    Trader[Trader]
+    OrderBook[Exchange Order Book]
+    TradeExec[Trade Execution]
+    CH[Clearinghouse]
+    FCM[FCM Account]
+    
+    Start --> Trader
+    Trader -->|"market order"| OrderBook
+    OrderBook -->|match| TradeExec
+    TradeExec --> CH
+    Trader -.direct relationship.-> CH
+    
+    CH --> Register["Register long/short<br/>Calculate initial margin"]
+    Register --> FCM
+    FCM --> Collect[Collect margin from trader]
+    
+    Collect --> DailyLoop[Daily Settlement Loop]
+    
+    subgraph DailySettlement ["Daily Settlement Loop (each trading day)"]
+        Pub["Exchange publishes<br/>settlement price"]
+        Mark["Clearinghouse marks all positions<br/>to settlement price"]
+        Calc["Calculate P&L:<br/>(Settlement_today - Settlement_yesterday)<br/>× Contract size × Quantity"]
+        VarMargin["Variation margin call or credit<br/>posted to FCM Account"]
+        MarginCheck{Account equity <<br/>maintenance margin?}
+        MarginCall["Margin Call:<br/>Trader posts funds or liquidates"]
+        
+        Pub --> Mark
+        Mark --> Calc
+        Calc --> VarMargin
+        VarMargin --> MarginCheck
+        MarginCheck -->|Yes| MarginCall
+        MarginCall --> Continue
+        MarginCheck -->|No| Continue[Continue]
+    end
+    
+    DailyLoop --> DailySettlement
+    Continue -->|"Repeat until position<br/>closed or delivery"| Expiration
+    
+    Expiration["Delivery or Cash Settlement<br/>at Expiration"]
+    
+    subgraph Settlement ["Final Settlement"]
+        Final["Clearinghouse sets final settlement<br/>= cash index or physical delivery price"]
+        Debit["Debit/credit final P&L"]
+        DeliveryType{Settlement Type}
+        Physical["Physical delivery:<br/>Short delivers commodity<br/>Long pays invoice price"]
+        Cash["Cash settlement:<br/>No physical transfer<br/>Final variation margin settles contract"]
+        
+        Final --> Debit
+        Debit --> DeliveryType
+        DeliveryType -->|Physical| Physical
+        DeliveryType -->|Cash| Cash
+    end
+    
+    Expiration --> Settlement
+    Physical --> End([Position Closed])
+    Cash --> End
 ```
 
 The interplay of these components—order matching, novation, margining, daily settlement, and delivery—transforms bilateral forward commitments into liquid, tradable instruments with minimal counterparty risk. The cost is reduced flexibility: standardized contracts may not precisely match a hedger's underlying exposure in terms of quantity, quality, or timing, introducing basis risk. Over-the-counter forwards retain customization but require credit assessment and bilateral documentation, typically under ISDA master agreements with credit support annexes specifying margin terms.

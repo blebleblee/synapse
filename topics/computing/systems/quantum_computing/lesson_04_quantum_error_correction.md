@@ -30,38 +30,61 @@ The full syndrome extraction cycle for a $d \times d$ surface code proceeds as f
 
 The job of the **classical decoder** is to consume this 3D syndrome history in real time and output a correction operator that, applied to the data qubits, returns the system to the code space. This is a matching problem: given the set of defects, find the minimum-weight set of error chains that could have caused them. The state-of-the-art decoder for the surface code is **Minimum Weight Perfect Matching (MWPM)**, which maps the problem to finding the minimum-weight perfect matching on a graph where defect locations are nodes and edge weights encode the negative log-probability of the corresponding error chain. Blossom V is the classical algorithm of choice for exact MWPM, running in $O(n^3)$ time for $n$ defects. For a $d = 7$ surface code (49 data qubits, 48 ancillas) operating with $O(d)$ rounds per logical gate, the number of defects per syndrome cycle scales with physical error rate and lattice size, but the decoder must process each syndrome cycle faster than the next cycle arrives—typically within a few microseconds on superconducting hardware where the cycle time is roughly $1\mu s$. This real-time classical processing requirement is itself a systems engineering challenge, and union-find decoders (Huang et al., 2020) with near-linear $O(n \alpha(n))$ runtime are increasingly favored for their throughput advantages despite slightly lower accuracy at high error rates.
 
-```
-Surface Code (d=3) Physical Layout
-------------------------------------
-Data qubits: D   Ancilla qubits: A
-
-  D - Az - D - Az - D
-  |        |        |
-  Ax  [X]  Ax  [X]  |
-  |        |        |
-  D - Az - D - Az - D
-  |        |        |
-  Ax  [X]  Ax  [X]  |
-  |        |        |
-  D - Az - D - Az - D
-
-  Az = Z-type parity check (Z⊗Z⊗Z⊗Z)
-  Ax = X-type parity check (X⊗X⊗X⊗X)
-  Boundary ancillas: weight-2 stabilizers
-
-Syndrome Extraction (Z-plaquette, one round):
-  
-  Ancilla    Data qubits in plaquette: q1,q2,q3,q4
-  
-  |0⟩ ──────────●──────────●──────────●──────────●──── M
-                 │          │          │          │
-  q1 ───────────⊕──         │          │          │
-  q2 ──────────────────────⊕──         │          │
-  q3 ──────────────────────────────────⊕──        │
-  q4 ──────────────────────────────────────────────⊕──
-
-  CNOT ordering (N,W,E,S) chosen to minimize hook errors.
-  Measurement outcome: +1 (no error), -1 (syndrome defect).
+```mermaid
+flowchart TD
+    subgraph layout ["Surface Code (d=3) Physical Layout"]
+        D11["D"] --- Az12["Az<br/>(Z-check)"] --- D13["D"] --- Az14["Az<br/>(Z-check)"] --- D15["D"]
+        D11 --- Ax21["Ax<br/>(X-check)"]
+        Az12 --- Ax22["Ax<br/>(X-check)"]
+        D13 --- Ax23["Ax<br/>(X-check)"]
+        Az14 --- Ax24["Ax<br/>(X-check)"]
+        
+        Ax21 --- D31["D"]
+        Ax22 --- Az32["Az<br/>(Z-check)"]
+        Ax23 --- D33["D"]
+        Ax24 --- Az34["Az<br/>(Z-check)"]
+        D31 --- Az32
+        Az32 --- D33
+        D33 --- Az34
+        Az34 --- D35["D"]
+        
+        D31 --- Ax41["Ax<br/>(X-check)"]
+        Az32 --- Ax42["Ax<br/>(X-check)"]
+        D33 --- Ax43["Ax<br/>(X-check)"]
+        Az34 --- Ax44["Ax<br/>(X-check)"]
+        
+        Ax41 --- D51["D"]
+        Ax42 --- Az52["Az<br/>(Z-check)"]
+        Ax43 --- D53["D"]
+        Ax44 --- Az54["Az<br/>(Z-check)"]
+        D51 --- Az52
+        Az52 --- D53
+        D53 --- Az54
+        Az54 --- D55["D"]
+    end
+    
+    subgraph legend ["Legend"]
+        LD["D = Data Qubit"]
+        LAz["Az = Z-type parity<br/>Z⊗Z⊗Z⊗Z"]
+        LAx["Ax = X-type parity<br/>X⊗X⊗X⊗X"]
+        LB["Boundary: weight-2<br/>stabilizers"]
+    end
+    
+    subgraph syndrome ["Syndrome Extraction (Z-plaquette, one round)"]
+        direction LR
+        A0["|0⟩ Ancilla"] --> C1["CNOT q1<br/>(North)"]
+        C1 --> C2["CNOT q2<br/>(West)"]
+        C2 --> C3["CNOT q3<br/>(East)"]
+        C3 --> C4["CNOT q4<br/>(South)"]
+        C4 --> M["Measure<br/>+1 = no error<br/>-1 = defect"]
+        
+        Q1["q1 (Data)"] -.-> C1
+        Q2["q2 (Data)"] -.-> C2
+        Q3["q3 (Data)"] -.-> C3
+        Q4["q4 (Data)"] -.-> C4
+    end
+    
+    layout --> syndrome
 ```
 
 The **logical gate set** for a surface code is severely constrained. The stabilizer formalism provides transversal (bitwise) implementation only for Clifford gates: logical $\bar{X}$ is applied by applying physical $X$ to every data qubit in the logical $\bar{X}$ chain, logical $\bar{Z}$ similarly. The Hadamard $\bar{H}$ swaps $X$-type and $Z$-type stabilizers, which on the standard square surface code requires a 90-degree lattice rotation. The CNOT between two logical qubits is implemented via **lattice surgery**: two adjacent surface code patches are temporarily merged by turning off the boundary stabilizers and introducing joint stabilizer measurements across the seam, then split after a fixed number of rounds with a measurement outcome that implements the logical CNOT up to a Pauli correction. The non-Clifford $T$ gate ($\pi/8$ rotation) cannot be implemented transversally in any known stabilizer code—a result known as the Eastin-Knill theorem—and must instead be synthesized via **magic state distillation**, a resource-intensive procedure where noisy $|T\rangle = T|+\rangle$ states are distilled into high-fidelity copies using only Clifford operations. This asymmetry between cheap Clifford gates and expensive $T$ gates drives the entire resource estimation problem for practical quantum algorithms: the $T$-count of an algorithm circuit directly determines the dominant overhead in fault-tolerant implementation.

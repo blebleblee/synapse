@@ -58,41 +58,44 @@ Experimental investigation of coevolutionary dynamics requires longitudinal fiel
 
 The canonical field protocol for documenting host-parasite coevolution in natural populations follows a spatiotemporal sampling design. Researchers establish replicate study sites spanning environmental gradients or isolated habitat patches, then sample both host and parasite populations at regular intervals (often annually) over multiple generations. At each sampling event, investigators quantify genotype frequencies using molecular markers (microsatellites for population structure, specific loci under selection for resistance/virulence phenotypes), measure fitness correlates (host survival and fecundity, parasite transmission success and within-host replication), and phenotype interaction outcomes through cross-infection experiments. In a typical cross-infection assay, investigators expose each host genotype to each parasite genotype in a fully factorial design, scoring infection success, parasite load, and host damage. The resulting infection matrix reveals the specificity of interactions: generalist parasites infect most host genotypes, while specialist parasites show genotype-specific infectivity matching the gene-for-gene model common in plant-pathogen systems.
 
-```
-Coevolutionary Field Study Architecture:
-
-Site Selection & Replication
-   ├─ Identify 10-20 independent populations across landscape
-   ├─ Record environmental covariates (temperature, precipitation, community composition)
-   └─ Ensure sufficient distance between sites (>10 km) to minimize gene flow
-
-Temporal Sampling (Annual over 5-10 years)
-   ├─ Host sampling: Collect 50-100 individuals per population per year
-   │    ├─ Extract DNA for genotyping (microsatellites + candidate loci)
-   │    ├─ Measure phenotypic traits (morphology, defenses, life history)
-   │    └─ Score natural parasite infection status and load
-   │
-   ├─ Parasite sampling: Isolate from infected hosts, culture if possible
-   │    ├─ Extract DNA for genotyping parallel markers
-   │    ├─ Maintain live cultures for cross-infection experiments
-   │    └─ Quantify transmission stage production
-   │
-   └─ Cross-infection matrix experiment (in laboratory or greenhouse)
-        ├─ Factorial design: Each host genotype × each parasite genotype
-        ├─ Replicate 5-10 times per genotype combination
-        ├─ Score: Infection success (binary), parasite load (qPCR), host fitness impact
-        └─ Statistical analysis: Genotype-by-genotype interaction (G×G) for local adaptation
-
-Evolutionary Analysis
-   ├─ Calculate allele frequency trajectories over time
-   ├─ Perform selection analysis: regress fitness on genotype controlling for environment
-   ├─ Test for time-lagged correlations (host resistance frequency predicts parasite virulence shift)
-   └─ Compare local vs. foreign parasite infectivity (local adaptation signal)
-
-Spatial Analysis
-   ├─ Map resistance/virulence allele frequencies across populations
-   ├─ Correlate with environmental variables and interaction history
-   └─ Test geographic mosaic hypothesis: G×G×E interactions predict spatial variation
+```mermaid
+flowchart TD
+    Start["Coevolutionary Field Study Architecture"]
+    
+    Start --> SiteSelection["Site Selection & Replication"]
+    Start --> TemporalSampling["Temporal Sampling (Annual over 5-10 years)"]
+    Start --> EvolutionaryAnalysis["Evolutionary Analysis"]
+    Start --> SpatialAnalysis["Spatial Analysis"]
+    
+    SiteSelection --> SS1["Identify 10-20 independent populations across landscape"]
+    SiteSelection --> SS2["Record environmental covariates<br/>(temperature, precipitation, community composition)"]
+    SiteSelection --> SS3["Ensure sufficient distance between sites<br/>(>10 km to minimize gene flow)"]
+    
+    TemporalSampling --> HostSampling["Host sampling: Collect 50-100 individuals<br/>per population per year"]
+    TemporalSampling --> ParasiteSampling["Parasite sampling: Isolate from infected hosts,<br/>culture if possible"]
+    TemporalSampling --> CrossInfection["Cross-infection matrix experiment<br/>(in laboratory or greenhouse)"]
+    
+    HostSampling --> HS1["Extract DNA for genotyping<br/>(microsatellites + candidate loci)"]
+    HostSampling --> HS2["Measure phenotypic traits<br/>(morphology, defenses, life history)"]
+    HostSampling --> HS3["Score natural parasite infection<br/>status and load"]
+    
+    ParasiteSampling --> PS1["Extract DNA for genotyping<br/>parallel markers"]
+    ParasiteSampling --> PS2["Maintain live cultures for<br/>cross-infection experiments"]
+    ParasiteSampling --> PS3["Quantify transmission stage<br/>production"]
+    
+    CrossInfection --> CI1["Factorial design: Each host genotype<br/>× each parasite genotype"]
+    CrossInfection --> CI2["Replicate 5-10 times per<br/>genotype combination"]
+    CrossInfection --> CI3["Score: Infection success (binary),<br/>parasite load (qPCR), host fitness impact"]
+    CrossInfection --> CI4["Statistical analysis: G×G interaction<br/>for local adaptation"]
+    
+    EvolutionaryAnalysis --> EA1["Calculate allele frequency<br/>trajectories over time"]
+    EvolutionaryAnalysis --> EA2["Perform selection analysis:<br/>regress fitness on genotype<br/>controlling for environment"]
+    EvolutionaryAnalysis --> EA3["Test for time-lagged correlations<br/>(host resistance predicts<br/>parasite virulence shift)"]
+    EvolutionaryAnalysis --> EA4["Compare local vs. foreign<br/>parasite infectivity<br/>(local adaptation signal)"]
+    
+    SpatialAnalysis --> SA1["Map resistance/virulence allele<br/>frequencies across populations"]
+    SpatialAnalysis --> SA2["Correlate with environmental variables<br/>and interaction history"]
+    SpatialAnalysis --> SA3["Test geographic mosaic hypothesis:<br/>G×G×E interactions predict<br/>spatial variation"]
 ```
 
 Reciprocal transplant experiments partition the contributions of genetic adaptation and plastic responses by moving organisms between environments and measuring performance. In a coevolutionary context, reciprocal transplants test for local adaptation of hosts to sympatric parasites: if coevolution produces population-specific matching between host resistance and parasite virulence, then hosts should perform better when challenged with sympatric parasites (against which they have evolved defenses) than when challenged with allopatric parasites (which may employ different virulence mechanisms). The canonical design compares four treatment combinations: local hosts × local parasites, local hosts × foreign parasites, foreign hosts × local parasites, and foreign hosts × foreign parasites. A local adaptation signature emerges as a significant host origin × parasite origin interaction, with local host-parasite combinations showing either better host defense (in hosts) or better parasite exploitation (in parasites) depending on which species has stronger coevolutionary impact.
@@ -135,7 +138,7 @@ Social evolution experiments manipulating relatedness structure must consider se
 
 Long-term pedigrees in wild populations suffer from paternity uncertainty and incomplete sampling, introducing relatedness estimation error that biases inclusive fitness calculations. Modern approaches integrate behavioral observations, genetic markers, and spatial data into statistical parentage assignment models that account for uncertainty by marginalizing over probable relatedness values. However, when paternity is highly uncertain (e.g., cryptic extra-pair copulations in socially monogamous species), relatedness estimates may be too imprecise to test quantitative predictions of kin selection theory. Supplementing observational data with experimental manipulation—cross-fostering to manipulate relatedness independently of other confounds—provides stronger tests but is logistically challenging and ethically fraught for some vertebrate species.
 
-Ancient DNA analysis faces unique technical challenges and potential pitfalls. Post-mortem DNA damage, especially cytosine deamination producing C-to-T substitutions, creates false variants that must be distinguished from genuine ancient polymorphisms using damage patterns (enrichment of C-to-T at fragment ends) and computational tools that model damage. Contamination with modern human DNA is pervasive, especially in highly manipulated archaeological specimens, and can overwrite ancient genotypes. Authentication criteria include characteristic damage patterns, short fragment lengths consistent with degradation, mitochondrial haplogroups distinct from modern contaminants, and consistency across independent extractions or laboratories. High-coverage sequencing enables confident calling of heterozygous sites and phased haplotypes, but low-coverage data (<1×) require specialized statistical methods that probabilistically call genotypes from sparse observations, accepting higher uncertainty for lower sequencing costs.
+Ancient DNA analysis faces unique technical challenges and potential pitfalls. Post-mortem DNA damage, especially cytosine deamination producing C-to-T substitutions, creates false variants that must be distinguished from genuine ancient polymorphisms using damage patterns (enrichment of C-to-T at fragment ends) and computational tools that model damage. Contamination with modern human DNA is pervasive, especially in highly manipulated archaeological specimens, and can overwrite ancient genotypes. Authentication criteria include characteristic damage patterns, short fragment lengths consistent with degradation, mitochondrial haplogroups distinct from modern contaminants, and consistency across independent extractions or laboratories. High-coverage sequencing enables confident calling of heterozygous sites and phased haplotypes, but low-coverage data (< 1×) require specialized statistical methods that probabilistically call genotypes from sparse observations, accepting higher uncertainty for lower sequencing costs.
 
 Ascertainment bias in ancient genomics arises when variant discovery is performed on modern populations and then ancient samples are genotyped at those sites. Variants private to archaic lineages are systematically undercalled, biasing estimates of archaic genetic diversity and admixture timing. Unbiased approaches call variants de novo in ancient samples, but low coverage makes this challenging. Pooled analysis where modern and ancient samples are jointly called reduces bias but requires comparable data quality across samples. Functional interpretation of archaic variants also requires caution: assigning regulatory effects based on modern epigenomic annotations assumes archaic regulatory landscapes were similar, but gene expression patterns may have diverged.
 

@@ -74,41 +74,62 @@ Pyruvate carboxylase is allosterically activated by acetyl-CoA, ensuring that an
 
 The interconnection architecture of the major pathways can be visualized as follows:
 
-```
-GLUCOSE
-   │
-   ▼ [Hexokinase / Glucokinase] ─── regulated by: G6P, insulin
-   │
-GLUCOSE-6-PHOSPHATE ─────────────────────────────────► PENTOSE PHOSPHATE PATHWAY
-   │                                                        (NADPH, ribose-5P)
-   ▼ [PFK-1] ─── regulated by: AMP(+), ATP(-), F2,6BP(+), citrate(-)
-   │
-FRUCTOSE-1,6-BISPHOSPHATE
-   │
-   ▼ [Aldolase → GAPDH → PK]
-   │
-PYRUVATE ◄────────────────── AMINO ACIDS (alanine, via transamination)
-   │   \
-   │    └─► LACTATE (anaerobic, via LDH)
-   │
-   ▼ [PDC] ─── regulated by: PDK (acetyl-CoA/CoA, NADH/NAD⁺)
-   │
-ACETYL-CoA ──────────────────────────────────────────► FATTY ACID SYNTHESIS
-   │                                                    (cytoplasm, via citrate export)
-   ▼ [Citrate synthase]
-   │
-   ◄── TCA CYCLE ──────────────────────────────────────► AMINO ACID BIOSYNTHESIS
-   │   (oxaloacetate, α-KG, succinyl-CoA)              (Asp, Glu, heme)
-   │
-   ▼ [NADH, FADH₂ → ETC]
-   │
-   ATP  (oxidative phosphorylation, ~32 ATP/glucose net)
+```mermaid
+flowchart TD
+    GLUC["Glucose"]
+    G6P["Glucose-6-Phosphate"]
+    F16BP["Fructose-1,6-Bisphosphate"]
+    PYR["Pyruvate"]
+    LAC["Lactate"]
+    ACoA["Acetyl-CoA"]
+    ATP_OUT["ATP\n(~32 net / glucose,\noxidative phosphorylation)"]
+    PPP["Pentose Phosphate Pathway\n(NADPH, ribose-5P)"]
+    FAS["Fatty Acid Synthesis\n(cytoplasm, via citrate export)"]
+    AA_IN["Amino Acids\n(alanine, via transamination)"]
+    AA_BIO["Amino Acid Biosynthesis\n(Asp, Glu, heme)"]
 
-GLUCONEOGENESIS (reverse flow, liver/kidney):
-  Pyruvate ──[Pyruvate carboxylase]──► OAA
-  OAA ──[PEPCK]──► PEP
-  F1,6BP ──[FBPase-1]──► F6P
-  G6P ──[G6Pase]──► Glucose (ER lumen)
+    HK["Hexokinase / Glucokinase\nRegulated by: G6P↓, insulin↑"]
+    PFK["PFK-1\nRegulated by: AMP↑, ATP↓,\nF-2,6-BP↑, citrate↓"]
+    ALG["Aldolase → GAPDH → PK"]
+    LDH["LDH (anaerobic)"]
+    PDC["PDC\nRegulated by: PDK\n(acetyl-CoA/CoA↑, NADH/NAD⁺↑)"]
+    CS["Citrate Synthase"]
+    ETC["NADH, FADH₂ → ETC"]
+
+    subgraph TCA ["TCA Cycle\n(oxaloacetate, α-KG, succinyl-CoA)"]
+        CS
+        ETC
+    end
+
+    subgraph GNG ["Gluconeogenesis (liver / kidney)"]
+        GNG_OAA["OAA"]
+        GNG_PEP["PEP"]
+        GNG_F6P["Fructose-6-Phosphate"]
+        GNG_GLUC["Glucose (ER lumen)"]
+        PC["Pyruvate Carboxylase"]
+        PEPCK["PEPCK"]
+        FBPase["FBPase-1"]
+        G6Pase["G6Pase"]
+
+        PC --> GNG_OAA
+        GNG_OAA --> PEPCK --> GNG_PEP
+        GNG_PEP -->|"reverse F-1,6-BP → F6P"| FBPase --> GNG_F6P
+        GNG_F6P -->|"reverse G6P → Glucose"| G6Pase --> GNG_GLUC
+    end
+
+    GLUC --> HK --> G6P
+    G6P -->|"branch"| PPP
+    G6P --> PFK --> F16BP
+    F16BP --> ALG --> PYR
+    AA_IN -->|"transamination"| PYR
+    PYR --> LDH --> LAC
+    PYR --> PDC --> ACoA
+    PYR -->|"gluconeogenic precursor"| PC
+    ACoA -->|"branch"| FAS
+    ACoA --> CS
+    CS --> ETC
+    ETC --> ATP_OUT
+    TCA -->|"intermediates"| AA_BIO
 ```
 
 ### $\beta$-Oxidation and Fatty Acid Synthesis: Compartmental Separation as Regulatory Architecture

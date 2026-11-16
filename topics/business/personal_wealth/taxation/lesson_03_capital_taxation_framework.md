@@ -34,47 +34,85 @@ The mechanics of basis adjustment for corporate distributions and non-dividend d
 
 Loss harvesting protocols exploit the asymmetry between realized losses, which offset realized gains dollar-for-dollar plus an additional $3,000 against ordinary income annually, and unrealized gains, which compound tax-deferred indefinitely. The optimal harvesting cadence balances transaction costs, wash sale risk, and tax alpha generation by systematically identifying losing positions during periods of market volatility and executing sales to crystallize losses while maintaining target asset allocation through substitute securities that avoid substantial identity with the sold positions. The technique scales most powerfully in separately managed accounts holding individual securities rather than mutual funds, as the granular position-level visibility enables surgical lot-specific harvesting targeting shares with the highest embedded losses.
 
-```
-Capital Gain/Loss Calculation Flow
-=====================================
+```mermaid
+flowchart TD
+    A["🔔 Realization Event Occurs"]
+    A --> A1["Sale, exchange, or disposition"]
+    A --> A2["Trade date determines tax year"]
+    A --> A3["Proceeds = Cash + FMV of property received"]
 
-1. Realization Event Occurs
-   ├─ Sale, exchange, or disposition
-   ├─ Trade date determines tax year
-   └─ Proceeds = Cash + FMV of property received
+    A1 & A2 & A3 --> B["📋 Identify Shares Sold\n(Basis Identification)"]
 
-2. Identify Shares Sold (basis identification)
-   ├─ Specific ID (if designated to broker)
-   ├─ Average Cost (mutual funds only)
-   ├─ FIFO (default method)
-   └─ Holding period from identified lot
+    subgraph basis ["Basis Identification Methods"]
+        B1["Specific ID\n(if designated to broker)"]
+        B2["Average Cost\n(mutual funds only)"]
+        B3["FIFO\n(default method)"]
+        B4["Holding period from\nidentified lot"]
+    end
 
-3. Calculate Realized Gain/Loss
-   │
-   Gain/Loss = Amount Realized - Adjusted Basis
-   │
-   Amount Realized = Proceeds - Selling Costs
-   Adjusted Basis = Original Cost + Commissions +/- Adjustments
+    B --> B1 & B2 & B3
+    B1 & B2 & B3 --> B4
 
-4. Holding Period Classification
-   ├─ ≤ 1 year → Short-term (ordinary rates)
-   └─ > 1 year → Long-term (preferential rates)
+    B4 --> C["🧮 Calculate Realized Gain / Loss"]
 
-5. Wash Sale Check
-   ├─ Substantially identical purchase within 61-day window?
-   │  ├─ Yes → Disallow loss, add to replacement basis
-   │  └─ No → Loss allowed
-   └─ Holding period tacks to replacement shares
+    subgraph calc ["Gain / Loss Calculation"]
+        C1["Amount Realized =\nProceeds − Selling Costs"]
+        C2["Adjusted Basis =\nOriginal Cost + Commissions\n+/− Adjustments"]
+        C3["Realized Gain/Loss =\nAmount Realized − Adjusted Basis"]
+        C1 --> C3
+        C2 --> C3
+    end
 
-6. Netting Process (Form 8949 → Schedule D)
-   ├─ Net short-term gains/losses
-   ├─ Net long-term gains/losses
-   ├─ Net short-term vs long-term
-   └─ Apply capital loss limitations ($3,000/year ordinary offset)
+    C --> C1
+    C --> C2
 
-7. Carryforward Calculation
-   └─ Excess losses carry forward indefinitely
-      retaining short-term vs long-term character
+    C3 --> D["📅 Holding Period Classification"]
+
+    D --> D1["≤ 1 Year\n→ Short-Term\n(ordinary income rates)"]
+    D --> D2["> 1 Year\n→ Long-Term\n(preferential rates)"]
+
+    D1 & D2 --> E["🔍 Wash Sale Check\n(61-day window)"]
+
+    E --> E1{"Substantially identical\npurchase within\n30 days before/after sale?"}
+    E1 -->|Yes| E2["Disallow loss\nAdd disallowed amount\nto replacement shares' basis"]
+    E1 -->|No| E3["Loss allowed"]
+    E2 --> E4["Holding period tacks\nto replacement shares"]
+    E3 --> F
+    E4 --> F
+
+    F["📊 Netting Process\n(Form 8949 → Schedule D)"]
+
+    subgraph netting ["Netting Sequence"]
+        F1["Net all short-term\ngains and losses"]
+        F2["Net all long-term\ngains and losses"]
+        F3["Net short-term result\nvs long-term result"]
+        F4["Apply capital loss limitation\n($3,000 / year offset\nagainst ordinary income)"]
+        F1 --> F3
+        F2 --> F3
+        F3 --> F4
+    end
+
+    F --> F1
+    F --> F2
+
+    F4 --> G{"Excess losses\nremaining?"}
+    G -->|Yes| H["📦 Carryforward\nExcess losses carry forward\nindefinitely, retaining\nshort-term vs long-term character"]
+    G -->|No| I["✅ Calculation Complete\nNo carryforward"]
+
+    style A fill:#1e3a5f,color:#fff,stroke:#1e3a5f
+    style C fill:#1e3a5f,color:#fff,stroke:#1e3a5f
+    style D fill:#1e3a5f,color:#fff,stroke:#1e3a5f
+    style E fill:#1e3a5f,color:#fff,stroke:#1e3a5f
+    style F fill:#1e3a5f,color:#fff,stroke:#1e3a5f
+    style E1 fill:#5a3e00,color:#fff,stroke:#a07000
+    style G fill:#5a3e00,color:#fff,stroke:#a07000
+    style E2 fill:#5a1a1a,color:#fff,stroke:#a03030
+    style E3 fill:#1a4a1a,color:#fff,stroke:#2e8b2e
+    style H fill:#2a4a2a,color:#fff,stroke:#2e8b2e
+    style I fill:#1a3a1a,color:#fff,stroke:#2e8b2e
+    style basis fill:#0d1f35,color:#ccc,stroke:#2a5a8a
+    style calc fill:#0d1f35,color:#ccc,stroke:#2a5a8a
+    style netting fill:#0d1f35,color:#ccc,stroke:#2a5a8a
 ```
 
 The constructive sale rule under Section 1259 prevents taxpayers from locking in gains through derivative positions while deferring tax recognition by maintaining nominal ownership. When a taxpayer enters into a short sale of the same or substantially identical property they own, purchases an offsetting put option, or enters into certain futures or forward contracts, the tax code treats these economically equivalent positions as deemed sales triggering immediate gain recognition. This anti-abuse provision prevents the separation of economic benefit from legal title, ensuring that taxpayers who eliminate downside risk and cap upside potential through derivatives face the same tax consequences as if they had executed an outright sale.

@@ -38,30 +38,32 @@ The receive path reverses this process. Packets arrive via interrupt or polling 
 
 The TCP state machine governs connection lifecycle through a carefully choreographed sequence of transitions. Connection establishment uses a three-way handshake that synchronizes sequence number spaces and negotiates options. The client sends SYN with its initial sequence number (ISN). The server responds with SYN-ACK, acknowledging the client's ISN and sending its own. The client completes the handshake with ACK. This exchange establishes bidirectional communication and prevents spoofed connections from consuming server resources, since the server doesn't allocate full connection state until receiving the final ACK.
 
-```
-Client State Machine                    Server State Machine
------------------                       -----------------
-CLOSED                                  CLOSED
-  |                                       |
-  | socket() + connect()                  | socket() + bind() + listen()
-  |                                       |
-  v                                       v
-SYN_SENT -------- SYN ------------>   LISTEN
-  |                                       |
-  |                                       v
-  |                                    SYN_RCVD
-  |                                       |
-  | <-------- SYN-ACK -----------------  |
-  |                                       |
-  v                                       |
-ESTABLISHED                               |
-  |                                       |
-  | -------- ACK --------------------->  |
-  |                                       |
-  |                                       v
-  |                                    ESTABLISHED
-  |                                       |
- ...                                     ...
+```mermaid
+flowchart TD
+    subgraph client ["Client State Machine"]
+        C_CLOSED["CLOSED"]
+        C_SYN_SENT["SYN_SENT"]
+        C_ESTABLISHED["ESTABLISHED"]
+    end
+    
+    subgraph server ["Server State Machine"]
+        S_CLOSED["CLOSED"]
+        S_LISTEN["LISTEN"]
+        S_SYN_RCVD["SYN_RCVD"]
+        S_ESTABLISHED["ESTABLISHED"]
+    end
+    
+    C_CLOSED -->|"socket() + connect()"| C_SYN_SENT
+    S_CLOSED -->|"socket() + bind() + listen()"| S_LISTEN
+    
+    C_SYN_SENT -->|SYN| S_LISTEN
+    S_LISTEN --> S_SYN_RCVD
+    
+    S_SYN_RCVD -->|SYN-ACK| C_SYN_SENT
+    C_SYN_SENT --> C_ESTABLISHED
+    
+    C_ESTABLISHED -->|ACK| S_SYN_RCVD
+    S_SYN_RCVD --> S_ESTABLISHED
 ```
 
 Connection termination requires a four-way handshake because TCP connections are bidirectional and each direction must close independently. When an application calls `close()` on a socket, TCP sends FIN to signal that it has no more data to transmit. The peer acknowledges this FIN but may continue sending data in the opposite direction. Eventually the peer also sends FIN, which the first side acknowledges. The final ACK sender enters TIME_WAIT state, persisting for 2*MSL (maximum segment lifetime, typically 60 seconds) to ensure the final ACK isn't lost and to allow old duplicate segments to expire from the network.

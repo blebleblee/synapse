@@ -28,31 +28,25 @@ The Developers are the people who do the work of creating a usable Increment eac
 
 The Sprint is the heart of Scrum. It is a time-box of one month or less during which a "done," usable, and potentially releasable product Increment is created. All Scrum events are contained within a Sprint. A new Sprint starts immediately after the previous one ends, creating a continuous, predictable cadence for inspection and adaptation.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        SPRINT CONTAINER (2-4 weeks)                  │
-│                                                                     │
-│  ┌──────────────┐  ┌──────────────────────────────────────────────┐ │
-│  │   Sprint      │  │                SPRINT EXECUTION              │ │
-│  │   Planning    │  │                                                │ │
-│  │  (Time-boxed: │  │  ┌──────────┐  ┌────────────────────────┐    │ │
-│  │  max 8 hrs    │  │  │  Daily   │  │  Increment Development │    │ │
-│  │  for 1-month  │──│  │  Scrum   │  │  (Continuous work on    │    │ │
-│  │  Sprint)      │  │  │ (15 min  │  │   Sprint Backlog items  │    │ │
-│  └──────────────┘  │  │  daily)  │  │   toward the Sprint     │    │ │
-│                    │  └──────────┘  │   Goal)                  │    │ │
-│                    │                │                          │    │ │
-│                    │                └──────────────────────────┘    │ │
-│                    └──────────────────────────────────────────────┘ │
-│  ┌──────────────┐  ┌──────────────────┐  ┌────────────────────────┐ │
-│  │  Sprint       │  │  Sprint           │  │  Sprint Retrospective  │ │
-│  │  Review       │  │  Review outputs   │  │  (Time-boxed:          │ │
-│  │  (Time-boxed: │  │  feed into next    │  │  max 3 hrs for         │ │
-│  │  max 4 hrs    │  │  Sprint Backlog    │  │  1-month Sprint)       │ │
-│  │  for 1-month  │  │  refinement        │  │                        │ │
-│  │  Sprint)      │  └──────────────────┘  └────────────────────────┘ │
-│  └──────────────┘                                                   │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph sprint_container ["SPRINT CONTAINER (2-4 weeks)"]
+        sprint_planning["Sprint Planning<br/>(Time-boxed: max 8 hrs<br/>for 1-month Sprint)"]
+        
+        subgraph sprint_execution ["SPRINT EXECUTION"]
+            daily_scrum["Daily Scrum<br/>(15 min daily)"]
+            increment_dev["Increment Development<br/>(Continuous work on<br/>Sprint Backlog items<br/>toward the Sprint Goal)"]
+        end
+        
+        sprint_review["Sprint Review<br/>(Time-boxed: max 4 hrs<br/>for 1-month Sprint)"]
+        review_outputs["Sprint Review outputs<br/>feed into next<br/>Sprint Backlog refinement"]
+        sprint_retro["Sprint Retrospective<br/>(Time-boxed: max 3 hrs<br/>for 1-month Sprint)"]
+        
+        sprint_planning --> sprint_execution
+        sprint_execution --> sprint_review
+        sprint_review --> review_outputs
+        sprint_review --> sprint_retro
+    end
 ```
 
 The Sprint Planning event is where the entire Scrum Team collaborates to answer two questions: why is this Sprint valuable, and what can be done in this Sprint, and how will the chosen work get done? The Product Owner proposes how the Sprint could increase the value of the product and discusses the Product Goal that the Sprint should advance. The Developers then select items from the Product Backlog that they believe they can complete within the Sprint, bringing those items into the Sprint Backlog. The team creates a Sprint Goal, which is a single statement of what the Sprint is meant to achieve and why it matters. The Sprint Goal provides coherence: it gives the team a reason to keep working together rather than a list of disconnected tasks.
@@ -77,32 +71,22 @@ The Sprint Backlog is the set of Product Backlog items selected for the Sprint p
 
 The Increment is the concrete artifact produced during a Sprint. It is a stepping stone toward the Product Goal. Each Increment must be usable, which means it must meet the Definition of Done. Multiple Increments may be created within a Sprint, and the team may release them to stakeholders at any point during the Sprint. The commitment of the Increment is the Definition of Done itself: a formal description of the state of the Increment when it meets the quality measures required for the product.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    ARTIFACT → COMMITMENT MAPPING                     │
-│                                                                     │
-│  ┌─────────────────────┐         ┌─────────────────────────┐        │
-│  │  Product Backlog    │────────▶│  Product Goal             │        │
-│  │  (What could be     │         │  (The long-term target    │        │
-│  │   done next,        │         │   the backlog items       │        │
-│  │   ordered by value) │         │   collectively pursue)    │        │
-│  └─────────────────────┘         └─────────────────────────┘        │
-│                                                                     │
-│  ┌─────────────────────┐         ┌─────────────────────────┐        │
-│  │  Sprint Backlog     │────────▶│  Sprint Goal              │        │
-│  │  (What is being      │         │  (The single objective    │        │
-│  │   done this Sprint, │         │   that provides coherence  │        │
-│  │   with a plan)       │         │   to the Sprint Backlog)  │        │
-│  └─────────────────────┘         └─────────────────────────┘        │
-│                                                                     │
-│  ┌─────────────────────┐         ┌─────────────────────────┐        │
-│  │  Increment          │────────▶│  Definition of Done       │        │
-│  │  (The usable,        │         │  (The quality criteria     │        │
-│  │   potentially        │         │   that make the Increment  │        │
-│  │   releasable         │         │   genuinely "done" rather  │        │
-│  │   output)            │         │   than merely "coded")     │        │
-│  └─────────────────────┘         └─────────────────────────┘        │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph mapping["ARTIFACT → COMMITMENT MAPPING"]
+        PB["Product Backlog<br/>(What could be done next,<br/>ordered by value)"]
+        PG["Product Goal<br/>(The long-term target<br/>the backlog items<br/>collectively pursue)"]
+        
+        SB["Sprint Backlog<br/>(What is being done this Sprint,<br/>with a plan)"]
+        SG["Sprint Goal<br/>(The single objective<br/>that provides coherence<br/>to the Sprint Backlog)"]
+        
+        INC["Increment<br/>(The usable,<br/>potentially releasable<br/>output)"]
+        DOD["Definition of Done<br/>(The quality criteria<br/>that make the Increment<br/>genuinely 'done' rather<br/>than merely 'coded')"]
+        
+        PB --> PG
+        SB --> SG
+        INC --> DOD
+    end
 ```
 
 ### Velocity and Estimation Mechanics

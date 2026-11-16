@@ -85,27 +85,24 @@ Steps 1–4 are platform latency. Steps 5–6 are developer-controllable. For Py
 #### Lambda Execution Environment Lifecycle (State Machine)
 
 ```mermaid
-stateDiagram-v2
-    [*] --> COLD_START : First Invoke / No Warm Slot
-    COLD_START --> INIT : MicroVM Boot + Runtime Init
-    INIT --> INVOKE : Handler Called
-    INVOKE --> IDLE : Handler Returns
-    IDLE --> INVOKE : Warm Re-use (within ~15 min)
-    IDLE --> SHUTDOWN : Idle Timeout / Scaling Down
-    INVOKE --> ERROR : Unhandled Exception / Timeout
-    ERROR --> SHUTDOWN : Runtime Poison
-    SHUTDOWN --> [*]
+flowchart TD
+    START((" ")) --> COLD_START["COLD START"]
+    COLD_START -->|"MicroVM Boot + Runtime Init"| INIT["INIT"]
+    INIT -->|"Handler Called"| INVOKE["INVOKE"]
+    INVOKE -->|"Handler Returns"| IDLE["IDLE"]
+    IDLE -->|"Warm Re-use<br/>(within ~15 min)"| INVOKE
+    IDLE -->|"Idle Timeout /<br/>Scaling Down"| SHUTDOWN["SHUTDOWN"]
+    INVOKE -->|"Unhandled Exception /<br/>Timeout"| ERROR["ERROR"]
+    ERROR -->|"Runtime Poison"| SHUTDOWN
+    SHUTDOWN --> END((" "))
 
-    note right of COLD_START
-        Platform latency: 50-500ms
-        Developer latency: runtime + init code
-    end note
-
-    note right of IDLE
-        /tmp contents persist
-        Global vars persist
-        TCP connections reusable
-    end note
+    COLD_START -.->|"Platform: 50-500ms<br/>Developer: runtime + init code"| NOTE1[" "]
+    IDLE -.->|"/tmp contents persist<br/>Global vars persist<br/>TCP connections reusable"| NOTE2[" "]
+    
+    style NOTE1 fill:none,stroke:none
+    style NOTE2 fill:none,stroke:none
+    style START fill:#000,stroke:#000
+    style END fill:#000,stroke:#000
 ```
 
 #### Concurrency Model
@@ -648,22 +645,22 @@ Choreography scales well and has no single point of failure, but it makes system
 For workflows that require explicit state management, compensation logic (sagas), human approval steps, or branching based on intermediate results, AWS Step Functions (Standard or Express Workflows) provides a managed orchestrator.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> ValidateOrder
-    ValidateOrder --> ReserveInventory : Success
-    ValidateOrder --> OrderFailed : ValidationError
+flowchart TD
+    Start([Start]) --> ValidateOrder["Validate Order"]
+    ValidateOrder -->|Success| ReserveInventory["Reserve Inventory"]
+    ValidateOrder -->|ValidationError| OrderFailed["Order Failed"]
     
-    ReserveInventory --> ChargePament : Reserved
-    ReserveInventory --> OrderFailed : OutOfStock
+    ReserveInventory -->|Reserved| ChargePayment["Charge Payment"]
+    ReserveInventory -->|OutOfStock| OrderFailed
     
-    ChargePament --> FulfillOrder : Charged
-    ChargePament --> ReleaseInventory : PaymentFailed
+    ChargePayment -->|Charged| FulfillOrder["Fulfill Order"]
+    ChargePayment -->|PaymentFailed| ReleaseInventory["Release Inventory"]
     
     ReleaseInventory --> OrderFailed
     
-    FulfillOrder --> SendConfirmation
-    SendConfirmation --> [*] : OrderComplete
-    OrderFailed --> [*]
+    FulfillOrder --> SendConfirmation["Send Confirmation"]
+    SendConfirmation -->|OrderComplete| End([End])
+    OrderFailed --> End
 ```
 
 Step Functions Standard Workflows provide exactly-once execution semantics for each state transition (via the history ledger persisted in the service's internal DynamoDB). Express Workflows provide at-least-once semantics at much higher throughput (100,000 state transitions/second) and lower cost, suitable for high-volume event processing.

@@ -89,22 +89,19 @@ Translate your Five-Whys decomposition into a visual causal tree diagram. This d
 
 For the Smoot-Hawley case, your diagram should include:
 
-```
-[Gold Standard Constraint] ──→ [Rigid Monetary Policy] ──→ [Deflation] ──→ [Falling Prices]
-                                                                                    ↓
-                                                    [Agricultural Oversupply] ←─────┘
-                                                              ↓
-                                                    [Farm Income Collapse]
-                                                              ↓
-                                    [Political Pressure from Agricultural Constituencies]
-                                                              ↓
-                                        [Tariff Protection Legislation (1930)]
-                                                              ↓
-                                          [Retaliation by Trading Partners]
-                                                              ↓
-                                          [Global Trade Collapse] ←──┐
-                                                    ↓                 │
-                                    [Further Deflation & Income Loss]─┘
+```mermaid
+flowchart TD
+    A["Gold Standard Constraint"] --> B["Rigid Monetary Policy"]
+    B --> C["Deflation"]
+    C --> D["Falling Prices"]
+    D --> E["Agricultural Oversupply"]
+    E --> F["Farm Income Collapse"]
+    F --> G["Political Pressure from Agricultural Constituencies"]
+    G --> H["Tariff Protection Legislation (1930)"]
+    H --> I["Retaliation by Trading Partners"]
+    I --> J["Global Trade Collapse"]
+    J --> K["Further Deflation & Income Loss"]
+    K --> J
 ```
 
 This diagram reveals a reinforcing feedback loop: tariff protection → retaliation → trade collapse → further deflation → political pressure for more protection. The diagram makes explicit that tariff protection, while politically rational at Why-2, actually deepened the structural problem at Why-5.
@@ -199,4 +196,23 @@ The third exercise trains historians to identify the boundary conditions where t
 
 ### Part A: Historiographical Dissent Mapping
 
-Historical causation is rarely settled. Scholars disa
+Historical causation is rarely settled.
+
+## Exercise 3: Stress Testing, Boundary Failure & Recovery Protocol — Causal Inference Under Extreme Uncertainty and Historiographical Dissent (continued)
+
+### Part A: Historiographical Dissent Mapping
+
+Historical causation is rarely settled. Competing schools of thought—monetarist, Keynesian, institutional, and revisionist frameworks—produce fundamentally different causal narratives even when working from identical primary sources. This exercise trains you to map these dissents systematically rather than dismissing them as mere interpretive noise. Begin by identifying the core causal claim each school advances: monetarists attribute the Depression's severity to monetary contraction and the Federal Reserve's policy errors; Keynesians emphasize demand collapse and insufficient fiscal intervention; institutionalists highlight banking system fragility and structural rigidities; revisionists argue international factors (war debt, reparations, gold standard constraints) were primary drivers. For each school, extract the minimal set of empirical claims required to sustain its narrative. Then construct a dissent matrix: columns represent schools, rows represent causal parameters (monetary multiplier, fiscal effectiveness, trade elasticity, velocity stability). Fill each cell with the parameter range that school's logic requires to remain coherent. Where ranges overlap, consensus exists; where they diverge sharply, historiographical dissent is revealed as genuine disagreement over evidence, not mere semantics.
+
+The boundary failure protocol activates when your causal model encounters contradictory evidence or when sensitivity analysis reveals that small parameter shifts invert your conclusions. At these junctures, do not retreat to hedging language. Instead, explicitly identify which causal mechanisms fail under which conditions, specify the evidence threshold that would force model revision, and document the recovery pathway: either narrow your causal claim to a domain where your model holds robustly, or reconstruct the model to accommodate the anomalous evidence. This discipline—naming failure modes and recovery conditions in advance—is the hallmark of rigorous historical inference. It converts historiographical dissent from an obstacle into a diagnostic tool for identifying genuine uncertainty versus interpretive choice.
+
+## Summary & Verification Matrix
+
+| **Governing Invariant** | **Core Mechanism** | **Diagnostic Criterion** | **Boundary Condition** | **Verification Method** |
+|---|---|---|---|---|
+| Monetary contraction amplifies demand shock | Money supply → velocity → aggregate spending | Velocity stability within ±0.2 range; monetary base decline 25–35% | Velocity collapse >0.3 or monetary base stable despite credit freeze | Compare Federal Reserve balance sheet data to nominal GDP trajectory; test velocity residuals for structural breaks |
+| Fiscal multiplier effectiveness determines counterfactual recovery speed | $1B spending → (1.2 to 1.8)× GDP impact depending on slack and expectations | Multiplier range 0.8–1.8; fiscal stimulus timing aligned with trough | Multiplier < 0.6 (crowding-out dominates) or >2.0 (implausible feedback) | Estimate impulse responses from New Deal spending programs; cross-validate with international comparatives (Sweden, Germany) |
+| Gold standard rigidity constrains policy space and prolongs adjustment | Exchange rate peg → forced deflation → persistent real wage rigidity | Nominal wage adjustment lags price decline by 6+ months; real rates remain positive | Wage/price adjustment synchronizes or real rates turn sharply negative | Measure nominal wages, CPI, and real rates month-to-month; test hypothesis that gold standard exit accelerates nominal adjustment |
+| Trade elasticity determines tariff policy causality | 1% tariff increase → 1.5–3.0% trade decline depending on partner elasticity | Tariff increases correlate with 15–30% trade contraction within 2–4 quarters | Trade decline < 10% (elasticity < 1.0, tariffs not primary driver) or >50% (measurement error or confounding shocks) | Construct bilateral trade flows by commodity; instrument tariff exposure to isolate causality from simultaneous demand shocks |
+| Historiographical dissent reflects genuine parametric uncertainty, not interpretive noise | Parameter ranges across schools (monetarist, Keynesian, institutional) overlap on robust estimates; diverge sharply on contested mechanisms | Dissent mapping reveals schools require different parameter values; consensus exists only where evidence over-determines parameter | Schools invoke mechanisms with opposite signs (e.g., fiscal multiplier >1.5 vs. < 0.8) or contradictory boundary conditions | Construct dissent matrix; identify parameter ranges each school requires; test whether overlapping ranges narrow under additional evidence; flag mechanisms where evidence remains genuinely ambiguous |
+| Recovery protocols activate at model boundary failures | When causal claim fails empirically, specify failure mode and evidence threshold for model revision rather than retreat to hedging | Model revision is explicit and prospective (prior specification of falsifying conditions) not post-hoc rationalization | Model persists unchanged despite contradictory evidence or retreats to unfalsifiable hedging ("complex interactions") | Document in advance which evidence configurations invalidate each causal mechanism; after encountering such evidence, either narrow claim or reconstruct model; report revision publicly |

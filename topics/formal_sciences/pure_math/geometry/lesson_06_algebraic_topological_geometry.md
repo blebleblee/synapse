@@ -62,20 +62,30 @@ The Poincaré duality theorem asserts that for a closed, oriented $n$-manifold $
 
 The de Rham cohomology provides a smooth perspective on cohomology for manifolds. Define $H^k_{\text{dR}}(M) = Z^k(M) / B^k(M)$ where $Z^k$ consists of closed $k$-forms ($d\omega = 0$) and $B^k$ consists of exact $k$-forms ($\omega = d\eta$). The de Rham theorem establishes an isomorphism $H^k_{\text{dR}}(M) \cong H^k(M; \mathbb{R})$, proving that the smooth cohomology defined via differential forms computes the same invariant as singular cohomology with real coefficients. This equivalence enables the use of calculus and differential geometry to compute topological invariants.
 
-```
-Homotopy Groups Hierarchy (π_n)
-================================
-π_0(X) ─── connected components (set, not a group)
-π_1(X,x₀) ─ fundamental group (loops, non-abelian in general)
-π_2(X,x₀) ─ homotopy classes of maps S² → X (abelian)
-π_3(X,x₀) ─ homotopy classes of maps S³ → X (abelian)
-   ⋮
-π_n(X,x₀) ─ homotopy classes of maps Sⁿ → X (abelian for n≥2)
-
-Key fact: π_n is a functor from pointed spaces to groups (or abelian groups for n≥2)
-
-Long Exact Sequence of a Fibration F → E → B:
-⋯ → π_n(F) → π_n(E) → π_n(B) → π_{n-1}(F) → ⋯ → π_1(B) → π_0(F) → π_0(E) → π_0(B)
+```mermaid
+flowchart TD
+    title["Homotopy Groups Hierarchy (π_n)"]
+    
+    title --> pi0["π₀(X)<br/>Connected components<br/>(set, not a group)"]
+    title --> pi1["π₁(X,x₀)<br/>Fundamental group<br/>(loops, non-abelian in general)"]
+    title --> pi2["π₂(X,x₀)<br/>Homotopy classes of maps S² → X<br/>(abelian)"]
+    title --> pi3["π₃(X,x₀)<br/>Homotopy classes of maps S³ → X<br/>(abelian)"]
+    title --> pindots["⋮"]
+    title --> pin["πₙ(X,x₀)<br/>Homotopy classes of maps Sⁿ → X<br/>(abelian for n≥2)"]
+    
+    pin --> functor["π_n is a functor from pointed spaces<br/>to groups or abelian groups for n≥2"]
+    
+    functor --> seq["Long Exact Sequence of a Fibration"]
+    
+    seq --> fiber["F"]
+    seq --> total["E"]
+    seq --> base["B"]
+    
+    subgraph fibration["F → E → B"]
+        fiber -.-> total -.-> base
+    end
+    
+    fibration --> exact["⋯ → πₙ(F) → πₙ(E) → πₙ(B) → πₙ₋₁(F) → ⋯<br/>→ π₁(B) → π₀(F) → π₀(E) → π₀(B)"]
 ```
 
 The long exact sequence of a fibration provides a computational engine for homotopy groups. A fibration $p: E \to B$ is a map with the homotopy lifting property: any homotopy in $B$ can be lifted to a homotopy in $E$ starting from any point in the fiber. The fiber $F = p^{-1}(b_0)$ sits inside $E$, and the sequence relates the homotopy groups of these three spaces through connecting homomorphisms $\partial: \pi_n(B) \to \pi_{n-1}(F)$. The exactness at each point means the kernel of one map equals the image of the previous map, providing precise control over how homotopy classes in the total space decompose in terms of the base and fiber.

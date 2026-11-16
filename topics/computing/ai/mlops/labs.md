@@ -701,7 +701,7 @@ if __name__ == "__main__":
 
 The model registry is the single source of truth for model lifecycle states. It maps versioned model artifacts to deployment stages (Staging, Production, Archived) and enforces promotion gates between them. This separation prevents the most common MLOps failure mode: serving an untested model because someone overwrote a file on a server.
 
-MLflow Model Registry provides three stage annotations: `Staging` (candidate model under evaluation), `Production` (model serving live traffic), and `Archived` (superseded model retained for audit). Transitions between stages should be gated by automated evaluation, not manual approval alone. In a CI/CD pipeline, the gate is a test suite that runs evaluation on a held-out dataset and compares metrics against the current production model. If the candidate outperforms by a defined margin (e.g., +1% F1 with p<0.05), the pipeline auto-promotes; otherwise, it blocks.
+MLflow Model Registry provides three stage annotations: `Staging` (candidate model under evaluation), `Production` (model serving live traffic), and `Archived` (superseded model retained for audit). Transitions between stages should be gated by automated evaluation, not manual approval alone. In a CI/CD pipeline, the gate is a test suite that runs evaluation on a held-out dataset and compares metrics against the current production model. If the candidate outperforms by a defined margin (e.g., +1% F1 with p< 0.05), the pipeline auto-promotes; otherwise, it blocks.
 
 Deployment follows one of three patterns depending on latency and throughput requirements:
 

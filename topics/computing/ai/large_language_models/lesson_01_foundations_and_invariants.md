@@ -670,4 +670,22 @@ The following are facts that hold exactly, not approximations, and should be int
 
 6. Implement a KV-cache in the `generate()` method. The cache should store a tuple `(k_cache, v_cache)` per layer, each of shape `(B, n_kv_heads, T_so_far, d_head)`. Verify that generation results are identical with and without the cache (up to floating-point rounding).
 
-7. Train the `DecoderOnlyLM` on a small character-level dataset (e.g., Shakespeare's
+7.
+
+Implement **rotary positional embeddings (RoPE)** as an alternative to learned absolute position embeddings. RoPE applies a rotation matrix $\mathbf{R}_{\Theta, m}$ to the query and key vectors at each position $m$, where $\Theta = \{\theta_i = 10000^{-2i/d}\}_{i=1}^{d/2}$. For each consecutive pair of dimensions $(2i, 2i+1)$, apply the rotation:
+
+$$
+\begin{bmatrix} q_{m,2i} \\ q_{m,2i+1} \end{bmatrix} = \begin{bmatrix} \cos(m\theta_i) & -\sin(m\theta_i) \\ \sin(m\theta_i) & \cos(m\theta_i) \end{bmatrix} \begin{bmatrix} q_{m,2i}' \\ q_{m,2i+1}' \end{bmatrix}
+$$
+
+and similarly for keys. This encodes relative position into the attention mechanism itself: $\mathbf{q}_m^\top \mathbf{k}_n$ depends only on $m - n$. Compare perplexity and extrapolation behavior on sequences longer than the training context between your RoPE implementation and the baseline learned embeddings.
+
+8. Profile the memory and latency of one forward pass through your 124M-parameter model on a sequence of length 1024. Measure: (a) peak GPU memory, (b) wall-clock time per layer type (embedding, attention, MLP, LayerNorm), (c) fraction of time spent in matrix multiplications versus element-wise operations. Use this to estimate the FLOP/s utilization and identify the bottleneck (memory bandwidth vs. compute).
+
+---
+
+## 10. Conclusion
+
+This lesson established the mathematical and architectural foundations necessary for understanding and implementing large language models. We began with the autoregressive formulation and the statistical underpinnings of maximum likelihood estimation, then derived the cross-entropy loss and its information-theoretic interpretation through perplexity. The Transformer architecture emerged as the natural solution to the problem of capturing long-range dependencies without recurrence: self-attention provides global receptive fields in constant depth, while the FFN sublayers supply the non-linear transformations required for universal approximation. Each component—layer normalization, residual connections, learned embeddings—serves a precise function in enabling stable gradient flow and efficient credit assignment across dozens of layers and billions of parameters.
+
+The transition from theory to implementation revealed the importance of systems-level considerations that are often absent from research papers. Autoregressive generation without KV-caching is computationally wasteful, recomputing the entire past at every step; flash attention reduces memory complexity from quadratic to linear without changing the mathematical operation; and Chinchilla scaling laws dictate that model size and training data must grow in lockstep to achieve compute-optimal performance. These are not optional optimizations—they are the difference between a toy implementation and a production system. The exercises in this lesson are designed to cement these principles through direct engagement with code: implementing GQA to understand the memory-compute tradeoff in attention, profiling to identify bottlenecks, and experimenting with RoPE to see how positional encoding strategies affect extrapolation. Master these fundamentals, and the subsequent lessons on training dynamics, instruction tuning, and RLHF will build naturally on this foundation.

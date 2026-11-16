@@ -116,57 +116,50 @@ where $\nu$ represents the kinematic viscosity. The square-root dependence on ro
 
 Electrochemical impedance spectroscopy probes electrode processes through small-amplitude sinusoidal potential perturbations across a wide frequency range, typically 100 kHz to 1 mHz. The complex impedance $Z(\omega) = E(\omega)/I(\omega)$ encodes both resistive (real) and capacitive/inductive (imaginary) components, with characteristic frequency dependencies revealing mechanistic information. A simple electrode process exhibits a semicircular Nyquist plot (imaginary versus real impedance) with the high-frequency intercept corresponding to solution resistance and the semicircle diameter yielding the charge transfer resistance $R_{\text{ct}} = RT/nFj_0 A$, directly probing the exchange current density. At low frequencies, a linear Warburg impedance component emerges from semi-infinite diffusion, with slope 45° characteristic of coupled diffusion and charge transfer.
 
-```
-Electrochemical Cell Architecture (Three-Electrode Configuration)
-
-    Reference Electrode (RE)
-           |
-           | (High impedance, no current)
-           |
-    ┌──────┴──────┐
-    │             │
-    │ Potentiostat│────────── Voltage Control Signal
-    │             │
-    └──┬──────┬───┘
-       │      │
-       │(V)   │(I)
-       │      │
-    Working   Counter
-    Electrode Electrode
-    (WE)      (CE)
-       │        │
-       └────────┴───────────┐
-                            │
-                      Electrolyte Solution
-                            │
-    Diffusion Layer: δ ~ 10-100 μm
+```mermaid
+flowchart TD
+    RE["Reference Electrode<br/>(RE)"]
+    HI["High Impedance<br/>No Current"]
+    PS["Potentiostat"]
+    VCS["Voltage Control Signal"]
     
-    Concentration Profile:
+    WE["Working Electrode<br/>(WE)"]
+    CE["Counter Electrode<br/>(CE)"]
     
-    C(x) ↑                Bulk concentration
-         │    ┌──────────────────────
-    Cbulk│    │
-         │    │
-         │    │
-    Csurf│────┘  Linear gradient in
-         │       diffusion layer
-         └────────────────────────→ x
-         0      δ        (distance)
-         
-    Potential Distribution (Interfacial Region):
+    ES["Electrolyte Solution"]
+    DL["Diffusion Layer<br/>δ ~ 10-100 μm"]
     
-    φ(x) ↑
-         │
-         │╲  Compact layer   Diffuse layer
-         │ ╲ (Stern)         (Gouy-Chapman)
-         │  ╲___
-         │     ╲___
-         │        ╲___
-         │           ╲________
-         │                   ╲______
-         └──────────────────────────────→ x
-         Electrode  IHP OHP           Bulk
-         surface
+    CONC["Concentration Profile"]
+    CBULK["C_bulk<br/>Bulk Concentration"]
+    CSURF["C_surf<br/>Surface Concentration"]
+    GRAD["Linear Gradient<br/>in Diffusion Layer"]
+    
+    POT["Potential Distribution<br/>Interfacial Region"]
+    COMPACT["Compact Layer<br/>Stern"]
+    DIFFUSE["Diffuse Layer<br/>Gouy-Chapman"]
+    BULK["Bulk Solution"]
+    
+    RE --> HI
+    HI --> PS
+    PS --> VCS
+    
+    PS --> WE
+    PS --> CE
+    
+    WE --> ES
+    CE --> ES
+    
+    ES --> DL
+    DL --> CONC
+    
+    CONC --> CBULK
+    CONC --> CSURF
+    CSURF --> GRAD
+    
+    DL --> POT
+    POT --> COMPACT
+    COMPACT --> DIFFUSE
+    DIFFUSE --> BULK
 ```
 
 The electrical double layer at electrode-electrolyte interfaces governs both the capacitive charging currents and the potential distribution affecting charge transfer kinetics. The Helmholtz-Stern-Goman-Chapman-Gouy model partitions the interfacial region into a compact layer of adsorbed ions and solvent molecules (Stern layer, typical thickness ~0.5 nm) and a diffuse layer where mobile ions distribute according to the Boltzmann equation modified by electrostatic interactions. The differential capacitance $C_{\text{dl}}$, typically 10-40 μF cm⁻² for metallic electrodes in aqueous electrolytes, behaves as two capacitors in series: the Helmholtz capacitance $C_H$ of the compact layer and the diffuse layer (Gouy-Chapman) capacitance $C_{GC}$. At high ionic strengths (compressed diffuse layers), $C_H$ dominates, while at low ionic strengths, the diffuse layer contribution becomes significant.
@@ -235,7 +228,7 @@ independent of time, with a diffusion layer thickness $\delta \approx r_0$ compa
 
 Temperature control stabilizes thermodynamic and kinetic parameters—the Nernst equation predicts approximately 0.2 mV K⁻¹ temperature coefficient for typical cell potentials, while rate constants often exhibit Arrhenius activation energies of 20-60 kJ mol⁻¹, corresponding to doubling or tripling per 10 K increase. Maintaining ±0.1 K stability through jacketed cells and circulating thermostats ensures reproducible measurements. For temperature-dependent studies aiming to extract activation parameters, the temperature range should span at least 20 K with measurements at five or more temperatures, fitting $\ln k$ versus $T^{-1}$ to extract the activation energy from the Arrhenius slope $-E_a/R$.
 
-Reference electrode stability governs measurement reproducibility across experiments. The standard hydrogen electrode, while defining the absolute potential scale, suffers from practical difficulties: hydrogen gas handling hazards, platinum poisoning by trace impurities, and sensitivity to oxygen. The saturated calomel electrode (SCE) offers superior stability based on the equilibrium $\text{Hg}_2\text{Cl}_2(s) + 2e^- \rightleftharpoons 2\text{Hg}(\ell) + 2\text{Cl}^-(aq)$ with saturated potassium chloride ensuring constant chloride activity. The liquid junction potential, arising at the interface between the internal KCl solution and the sample electrolyte, introduces a small (typically <10 mV) systematic error depending on the difference in ionic mobilities and concentrations. Junction potentials minimize with salt bridges containing high-concentration symmetric electrolytes (such as saturated KCl) where the cation and anion exhibit similar mobilities, producing nearly equal migration contributions that cancel.
+Reference electrode stability governs measurement reproducibility across experiments. The standard hydrogen electrode, while defining the absolute potential scale, suffers from practical difficulties: hydrogen gas handling hazards, platinum poisoning by trace impurities, and sensitivity to oxygen. The saturated calomel electrode (SCE) offers superior stability based on the equilibrium $\text{Hg}_2\text{Cl}_2(s) + 2e^- \rightleftharpoons 2\text{Hg}(\ell) + 2\text{Cl}^-(aq)$ with saturated potassium chloride ensuring constant chloride activity. The liquid junction potential, arising at the interface between the internal KCl solution and the sample electrolyte, introduces a small (typically < 10 mV) systematic error depending on the difference in ionic mobilities and concentrations. Junction potentials minimize with salt bridges containing high-concentration symmetric electrolytes (such as saturated KCl) where the cation and anion exhibit similar mobilities, producing nearly equal migration contributions that cancel.
 
 Silver-silver chloride reference electrodes provide a compact, non-toxic alternative based on the equilibrium $\text{AgCl}(s) + e^- \rightleftharpoons \text{Ag}(s) + \text{Cl}^-(aq)$. The potential depends logarithmically on chloride activity through the Nernst equation, necessitating constant chloride concentration via saturation or defined buffer solutions. Commercial Ag/AgCl electrodes use porous frits to contain the chloride solution while maintaining electrical contact, though slow chloride leakage limits lifetime and contaminates samples sensitive to halides. Pseudo-reference electrodes (such as bare silver or platinum wires) offer convenience for non-aqueous or molten salt electrochemistry where traditional aqueous references fail, but require calibration against an internal standard (commonly ferrocene/ferrocenium couple) in each experiment due to drifting potentials.
 

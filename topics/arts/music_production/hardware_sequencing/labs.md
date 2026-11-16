@@ -229,7 +229,7 @@ $$
 \text{PPM} = \frac{50\text{ms}}{3600\text{s}} \times 10^6 \approx 13.9\text{ PPM}
 $$
 
-This drift rate exceeds the acceptable threshold for professional audio applications (typically <5 PPM) and indicates that one of the devices has an unstable clock oscillator.
+This drift rate exceeds the acceptable threshold for professional audio applications (typically < 5 PPM) and indicates that one of the devices has an unstable clock oscillator.
 
 Diagnose the source of clock drift by isolating each device. Disconnect all slave devices except one, and repeat the drift measurement over a one-hour period. If drift disappears, the disconnected device was the source of instability. If drift persists, the master clock or the remaining slave is unstable. Repeat this isolation process for each device until you identify the culprit. Once identified, investigate whether the device offers clock calibration controls; some hardware sequencers and synthesizers provide internal oscillator trimming adjustments that allow you to correct clock frequency drift.
 

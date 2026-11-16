@@ -86,37 +86,65 @@ The stoichiometric relationship between proton flow and ATP synthesis depends on
 
 The physical connection between electron transport and ATP synthesis can be disrupted by uncoupling agents, compounds that allow protons to cross the inner membrane without passing through ATP synthase. 2,4-dinitrophenol (DNP), a lipophilic weak acid, binds protons in the intermembrane space, diffuses across the membrane in its protonated form, releases protons in the matrix, and returns to the intermembrane space to repeat the cycle. This short-circuits the proton gradient, dissipating the proton-motive force as heat without ATP synthesis. The electron transport chain continues operating at maximal rate—even accelerating due to the increased ADP/ATP ratio—but the energy is wasted as heat. This principle operates naturally in brown adipose tissue, where uncoupling protein 1 (UCP1) allows regulated proton leak to generate heat for thermogenesis in newborns and hibernating mammals.
 
-```
-MITOCHONDRIAL BIOENERGETICS ARCHITECTURE
-
-Matrix                  Inner Membrane              Intermembrane Space
-─────────────────────────────────────────────────────────────────────────
-                                                     [H⁺] ↑  ΔΨ = +200mV
-NADH + H⁺ ──→ Complex I ════════════╗
-                  ║ 4H⁺ ───────────→║
-              NAD⁺ + Q ← QH₂         ║
-                                     ║
-Succinate ──→ Complex II ═══════════╣
-                  ║                  ║
-              Fumarate + Q ← QH₂     ║
-                                     ║
-                        QH₂ → Complex III ═════════╗
-                                ║ 4H⁺ ───────────→║
-                        Q + 2 Cyt c (Fe²⁺)         ║
-                                ║                  ║
-                        2 Cyt c (Fe³⁺) → Complex IV ═══╗
-                                        ║ 2H⁺ ───────→║
-                        ½O₂ + 2H⁺ ← H₂O              ║
-                                                     ║
-                                                     ║
-    ADP + Pi  ←══ ATP Synthase ═════════════════════╝
-                       ║  ~2.7 H⁺
-    ATP               (F₀ c-ring rotation drives F₁ catalysis)
-
-Net reaction per NADH:
-NADH + H⁺ + ½O₂ + ~2.5 ADP + ~2.5 Pi → NAD⁺ + H₂O + ~2.5 ATP
-
-Total ΔG°' ≈ -220 kJ/mol → ~130 kJ/mol captured in ATP (59% efficiency)
+```mermaid
+flowchart LR
+    subgraph matrix["Matrix"]
+        NADH["NADH + H⁺"]
+        NAD["NAD⁺"]
+        Succ["Succinate"]
+        Fum["Fumarate"]
+        ADP["ADP + Pi"]
+        ATP["ATP"]
+    end
+    
+    subgraph inner["Inner Membrane"]
+        C1["Complex I<br/>(NADH dehydrogenase)"]
+        C2["Complex II<br/>(Succinate dehydrogenase)"]
+        Q1["Q → QH₂"]
+        Q2["Q → QH₂"]
+        C3["Complex III<br/>(Cytochrome bc₁)"]
+        C4["Complex IV<br/>(Cytochrome c oxidase)"]
+        ATPase["ATP Synthase<br/>(F₀F₁)"]
+    end
+    
+    subgraph ims["Intermembrane Space<br/>[H⁺] ↑ ΔΨ = +200mV"]
+        H1["4H⁺"]
+        H2["4H⁺"]
+        H3["2H⁺"]
+        H4["~2.7 H⁺"]
+        Cytc["2 Cyt c (Fe²⁺)"]
+        CytcOx["2 Cyt c (Fe³⁺)"]
+        O2["½O₂ + 2H⁺"]
+        H2O["H₂O"]
+    end
+    
+    NADH --> C1
+    C1 --> NAD
+    C1 -.->|pumps| H1
+    C1 --> Q1
+    
+    Succ --> C2
+    C2 --> Fum
+    C2 --> Q2
+    
+    Q1 --> C3
+    Q2 --> C3
+    C3 --> Cytc
+    C3 -.->|pumps| H2
+    
+    Cytc --> C4
+    C4 --> CytcOx
+    C4 -.->|pumps| H3
+    O2 --> C4
+    C4 --> H2O
+    
+    H4 -.->|drives rotation| ATPase
+    ATPase --> ATP
+    ADP --> ATPase
+    
+    style matrix fill:#e1f5e1
+    style inner fill:#ffe1e1
+    style ims fill:#e1e5ff
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

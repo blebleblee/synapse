@@ -28,21 +28,46 @@ Understanding these three layers — inventory risk, adverse selection, and orde
 
 The central data structure of modern equity markets is the **limit order book (LOB)**, a priority-sorted queue of resting orders on each side of the market. Understanding its internal mechanics is prerequisite to any execution analysis. The book maintains two sides: the bid side, sorted descending by price (best bid at the top), and the ask side, sorted ascending by price (best ask at the top). Each price level contains a FIFO queue of orders, each carrying a timestamp, size, and participant identifier. The spread is simply the gap between the best ask and the best bid.
 
-```
-ORDER BOOK STATE — AAPL (NASDAQ, illustrative)
-
-ASK SIDE (Offers to Sell)
-Price      Size (shares)   Queue Depth
-─────────────────────────────────────
-$184.05      2,400          [A1: 800] [A2: 1,100] [A3: 500]
-$184.04        900          [B1: 900]
-$184.03      3,100          [C1: 1,200] [C2: 1,900]
-─────── SPREAD = $0.02 ──────────────
-$184.01      1,500          [D1: 700] [D2: 800]       ← Best Bid
-$184.00      4,200          [E1: 2,000] [E2: 2,200]
-$183.99      2,800          [F1: 2,800]
-
-BID SIDE (Offers to Buy)
+```mermaid
+flowchart TD
+    title["ORDER BOOK STATE — AAPL (NASDAQ, illustrative)"]
+    
+    subgraph ask_side ["ASK SIDE (Offers to Sell)"]
+        direction TB
+        ask1["$184.05 | 2,400 shares"]
+        ask1_queue["[A1: 800] [A2: 1,100] [A3: 500]"]
+        
+        ask2["$184.04 | 900 shares"]
+        ask2_queue["[B1: 900]"]
+        
+        ask3["$184.03 | 3,100 shares"]
+        ask3_queue["[C1: 1,200] [C2: 1,900]"]
+        
+        ask1 --> ask1_queue
+        ask2 --> ask2_queue
+        ask3 --> ask3_queue
+    end
+    
+    spread["═══ SPREAD = $0.02 ═══"]
+    
+    subgraph bid_side ["BID SIDE (Offers to Buy)"]
+        direction TB
+        bid1["$184.01 | 1,500 shares ← Best Bid"]
+        bid1_queue["[D1: 700] [D2: 800]"]
+        
+        bid2["$184.00 | 4,200 shares"]
+        bid2_queue["[E1: 2,000] [E2: 2,200]"]
+        
+        bid3["$183.99 | 2,800 shares"]
+        bid3_queue["[F1: 2,800]"]
+        
+        bid1 --> bid1_queue
+        bid2 --> bid2_queue
+        bid3 --> bid3_queue
+    end
+    
+    ask_side --> spread
+    spread --> bid_side
 ```
 
 An incoming **market order** to buy 2,000 shares walks the ask side of the book. It executes first against the best ask at \$184.03, consuming 2,000 shares from the available 3,100 — filling C1 entirely and partially filling C2. The remaining 1,100 shares in C2 stay on the book. No price impact beyond the first level. An incoming market order for 5,000 shares, however, would consume all three ask levels, with the final portion executing at \$184.05. This "walking the book" behavior is the operational definition of **market impact**: the order itself moves the price by consuming available liquidity.
@@ -73,31 +98,27 @@ where $V_\tau^B$ and $V_\tau^S$ are the buy and sell volumes in bucket $\tau$, $
 
 The fragmentation of equity trading across venue types is one of the defining structural features of post-Reg NMS U.S. equity markets. A **lit market** — NYSE, NASDAQ, CBOE BZX, IEX — displays its limit order book publicly in real time. Every quote is visible to any participant connected to the SIP (Securities Information Processor) or directly to the exchange feed. A **dark pool** — operated by broker-dealers such as Goldman Sachs Sigma X, Morgan Stanley MS Pool, or by independent operators like Liquidnet — executes trades without pre-trade transparency. Orders resting in a dark pool are invisible; a match occurs only when an offsetting order enters the same pool.
 
-```
-VENUE SELECTION DECISION TREE — INSTITUTIONAL ORDER ROUTER
+```mermaid
+flowchart TD
+    SOR["Order Arrives at\nSmart Order Router (SOR)"]
+    CLASSIFY["Classify Order Size"]
 
-Order arrives at Smart Order Router (SOR)
-              │
-              ▼
-    ┌─────────────────────┐
-    │  Classify Order Size │
-    └─────────┬───────────┘
-              │
-    ┌─────────▼──────────┐         ┌──────────────────────────┐
-    │   Small (<1,000 sh)│─────────► Lit Exchange (NBBO)       │
-    │   Low impact risk  │         │  NASDAQ/NYSE/CBOE         │
-    └────────────────────┘         └──────────────────────────┘
-              │
-    ┌─────────▼──────────┐         ┌──────────────────────────┐
-    │  Medium (1K–50K)   │─────────► Probe Dark Pool First     │
-    │  Moderate impact   │         │  → If no fill in T+30ms  │
-    └────────────────────┘         │    route residual to lit  │
-              │                    └──────────────────────────┘
-    ┌─────────▼──────────┐         ┌──────────────────────────┐
-    │  Large (>50K)      │─────────► Algorithmic Slicing       │
-    │  High impact risk  │         │  VWAP/TWAP/IS across      │
-    └────────────────────┘         │  multiple sessions/venues │
-                                   └──────────────────────────┘
+    SMALL["Small (&lt;1,000 sh)\nLow impact risk"]
+    MEDIUM["Medium (1K–50K)\nModerate impact"]
+    LARGE["Large (&gt;50K)\nHigh impact risk"]
+
+    LIT["Lit Exchange (NBBO)\nNASDAQ / NYSE / CBOE"]
+    DARK["Probe Dark Pool First\n→ If no fill in T+30ms,\nroute residual to lit"]
+    ALGO["Algorithmic Slicing\nVWAP / TWAP / IS across\nmultiple sessions & venues"]
+
+    SOR --> CLASSIFY
+    CLASSIFY --> SMALL
+    CLASSIFY --> MEDIUM
+    CLASSIFY --> LARGE
+
+    SMALL -->|"Route directly"| LIT
+    MEDIUM -->|"Dark-first strategy"| DARK
+    LARGE -->|"Slice & distribute"| ALGO
 ```
 
 The economic rationale for dark pools is straightforward: a large institutional order routed entirely to a lit exchange signals its presence immediately through the market impact of consuming lit liquidity, inviting front-running by high-frequency participants who detect the aggressive order flow and step ahead. By matching inside the spread in a dark venue — typically at or near the midpoint between the NBBO bid and ask — the institutional buyer captures a portion of the spread rather than paying it, and avoids pre-trade information leakage. The tradeoff is **execution uncertainty**: a dark order may never find a match if the opposing institutional flow does not exist in the same pool.

@@ -80,45 +80,18 @@ in the simple case with no additional controls. This ratio of reduced-form to fi
 
 The execution pipeline in a modern policy research workflow looks as follows:
 
-```
-DATA PREPARATION
-      │
-      ▼
-┌─────────────────────────────────────────────┐
-│  Merge outcome (y), endogenous regressor    │
-│  (x), instrument(s) (z), and controls (W)  │
-│  Inspect joint coverage; handle missing data│
-│  Test instrument relevance: Cov(z, x)       │
-└─────────────────────────┬───────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────┐
-│  FIRST STAGE: Regress x on z, W             │
-│  ─────────────────────────────              │
-│  OLS: x = π₁z + Wδ + ν                     │
-│  Test F-statistic on excluded instruments   │
-│  Rule of thumb: F > 10 (Stock–Yogo)         │
-│  Obtain fitted values: x̂ = π̂₁z + Wδ̂       │
-└─────────────────────────┬───────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────┐
-│  SECOND STAGE: Regress y on x̂, W           │
-│  ─────────────────────────────              │
-│  2SLS: y = β₁x̂ + Wγ + η                   │
-│  Use IV-corrected standard errors           │
-│  (not OLS SEs from manual second stage)     │
-│  Cluster or heteroskedasticity-robust SEs   │
-└─────────────────────────┬───────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────┐
-│  DIAGNOSTICS                                │
-│  ─────────                                  │
-│  Hausman/Wu test: Endogeneity confirmed?    │
-│  Sargan-Hansen J-test: Overidentification   │
-│  Anderson-Rubin: Weak-instrument-robust CI  │
-└─────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["DATA PREPARATION"]
+    B["Merge outcome y, endogenous regressor x,<br/>instrument z, and controls W<br/>Inspect joint coverage; handle missing data<br/>Test instrument relevance: Cov(z, x)"]
+    C["FIRST STAGE: Regress x on z, W<br/>OLS: x = π₁z + Wδ + ν<br/>Test F-statistic on excluded instruments<br/>Rule of thumb: F > 10 Stock–Yogo<br/>Obtain fitted values: x̂ = π̂₁z + Wδ̂"]
+    D["SECOND STAGE: Regress y on x̂, W<br/>2SLS: y = β₁x̂ + Wγ + η<br/>Use IV-corrected standard errors<br/>not OLS SEs from manual second stage<br/>Cluster or heteroskedasticity-robust SEs"]
+    E["DIAGNOSTICS<br/>Hausman/Wu test: Endogeneity confirmed?<br/>Sargan-Hansen J-test: Overidentification<br/>Anderson-Rubin: Weak-instrument-robust CI"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 ### Implementation in Stata and R

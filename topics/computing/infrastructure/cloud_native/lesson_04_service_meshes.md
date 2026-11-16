@@ -169,18 +169,20 @@ Istio implements zero-trust networking using SPIFFE (Secure Production Identity 
 3. **Automatic rotation**: Certificates have short TTL (default 24h) and auto-renew via SDS API
 
 **Mutual TLS handshake**:
-```
-Envoy A                                    Envoy B
-   |                                          |
-   |--- ClientHello (SNI: service-b.ns.svc)-->|
-   |<-- ServerHello + Certificate B ----------|
-   |    (SPIFFE: spiffe://.../ns/prod/sa/b)  |
-   |                                          |
-   |--- Certificate A + Finished ------------>|
-   |    (SPIFFE: spiffe://.../ns/prod/sa/a)  |
-   |<-- Finished -----------------------------|
-   |                                          |
-   |=== Encrypted application data =========>|
+```mermaid
+flowchart LR
+    EA["Envoy A"]
+    EB["Envoy B"]
+
+    EA -->|"ClientHello\n(SNI: service-b.ns.svc)"| EB
+
+    EB -->|"ServerHello + Certificate B\n(SPIFFE: spiffe://.../ns/prod/sa/b)"| EA
+
+    EA -->|"Certificate A + Finished\n(SPIFFE: spiffe://.../ns/prod/sa/a)"| EB
+
+    EB -->|"Finished"| EA
+
+    EA ==>|"Encrypted application data"| EB
 ```
 
 Envoy B validates that Certificate A's SPIFFE ID matches authorization policies (e.g., "only service-a can call POST /admin").
@@ -230,7 +232,7 @@ graph TB
 Unlike Envoy (C++, ~50MB memory baseline), `linkerd2-proxy` is written in Rust for memory safety without garbage collection overhead. Key differences:
 
 - **Memory footprint**: ~10-20MB per proxy (vs. Envoy's ~50-70MB)
-- **Startup time**: <1 second cold start
+- **Startup time**: < 1 second cold start
 - **Protocol focus**: HTTP/1.1, HTTP/2, gRPC only (no TCP proxying, no Kafka/MySQL protocol parsing)
 - **Configuration**: Proxies query the control plane on-demand rather than receiving full xDS snapshots
 
@@ -574,7 +576,7 @@ Aggregate logs in Elasticsearch/Loki for debugging production incidents.
 
 Service meshes add complexity and operational overhead. Avoid them if:
 
-1. **Monolith or few services**: <5 services don't justify mesh complexity
+1. **Monolith or few services**: < 5 services don't justify mesh complexity
 2. **East-west traffic is minimal**: If services rarely call each other, use API gateway + language-specific libraries
 3. **Team lacks Kubernetes expertise**: Mesh requires deep k8s knowledge (CRDs, admission controllers, networking)
 4. **Ultra-low latency requirements**: P50 latency overhead (~0.5ms) may be unacceptable for HFT or real-time systems

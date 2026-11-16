@@ -30,40 +30,34 @@ Field symbols and data references introduce pointer semantics into a language or
 
 Open SQL provides a vendor-neutral database abstraction layer, translating ABAP statements into native SQL dialects for Oracle, DB2, SQL Server, HANA, and other supported databases. The syntax intentionally restricts itself to the common subset of SQL-92: no vendor-specific functions, no outer joins (until recent releases), no subqueries in the SELECT list. This conservatism enables code portability but frustrates developers accustomed to modern SQL expressiveness. The ABAP kernel's SQL preprocessor injects client filters, applies table buffering logic, and rewrites queries for performance—transparently converting `SELECT SINGLE` into indexed lookups and `FOR ALL ENTRIES` into parameterized bulk selects. However, the abstraction leaks under load: a query that performs well on HANA's columnar engine may timeout on Oracle's row-based storage, forcing developers into native SQL escape hatches that sacrifice portability for performance.
 
-```
-ABAP Runtime Execution Model
-┌─────────────────────────────────────────────────────────────┐
-│                    SAP GUI / Fiori Client                    │
-└────────────────────────┬────────────────────────────────────┘
-                         │ RFC/HTTP
-┌────────────────────────┴────────────────────────────────────┐
-│              SAP NetWeaver Application Server                │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │         Dispatcher (Load Balancer)                    │   │
-│  └─────┬────────────────────────────────────────────────┘   │
-│        │ Assigns requests to available work processes         │
-│  ┌─────┴─────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐      │
-│  │  Dialog WP │  │ Dialog  │  │  Batch  │  │ Update  │      │
-│  │  (DIA)     │  │   WP    │  │   WP    │  │   WP    │      │
-│  └─────┬─────┘  └────┬────┘  └────┬────┘  └────┬────┘      │
-│        │             │            │            │             │
-│        └─────────────┴────────────┴────────────┘             │
-│                      │                                        │
-│  ┌───────────────────┴──────────────────────────────────┐   │
-│  │          Shared Memory (Roll Area, Buffers)           │   │
-│  │  - Table Buffer - Program Buffer - Screen Buffer      │   │
-│  └───────────────────┬──────────────────────────────────┘   │
-│                      │                                        │
-└──────────────────────┼────────────────────────────────────────┘
-                       │ Database Protocol (SQL)
-┌──────────────────────┴────────────────────────────────────┐
-│                  Database Layer                            │
-│         (HANA, Oracle, DB2, SQL Server)                    │
-│  ┌────────────────────────────────────────────────────┐   │
-│  │  Tables: Transparent, Pooled, Cluster               │   │
-│  │  Indexes: Primary, Secondary, Full-Text             │   │
-│  └────────────────────────────────────────────────────┘   │
-└───────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Client["SAP GUI / Fiori Client"]
+    
+    Client -->|"RFC/HTTP"| NetWeaver["SAP NetWeaver Application Server"]
+    
+    subgraph NetWeaver_Internal["SAP NetWeaver Application Server"]
+        Dispatcher["Dispatcher<br/>(Load Balancer)"]
+        
+        Dispatcher -->|"Assigns requests to available work processes"| WP_Group["Work Processes"]
+        
+        subgraph WP_Group["Work Processes"]
+            DIA["Dialog WP<br/>(DIA)"]
+            DIA2["Dialog WP"]
+            Batch["Batch WP"]
+            Update["Update WP"]
+        end
+        
+        WP_Group --> SharedMem["Shared Memory<br/>(Roll Area, Buffers)<br/>- Table Buffer<br/>- Program Buffer<br/>- Screen Buffer"]
+    end
+    
+    SharedMem -->|"Database Protocol<br/>SQL"| Database["Database Layer<br/>(HANA, Oracle, DB2, SQL Server)"]
+    
+    subgraph Database_Layer["Database Layer"]
+        Tables["Tables:<br/>Transparent, Pooled, Cluster<br/><br/>Indexes:<br/>Primary, Secondary, Full-Text"]
+    end
+    
+    Database --> Tables
 ```
 
 The work process lifecycle governs resource allocation and transaction boundaries. When a user executes a transaction, the dispatcher allocates an available dialog work process, loading the user's session context from the database into the work process's roll area. The ABAP program executes synchronously within this process until hitting a screen display statement, at which point the work process serializes its context back to the database and returns to the free pool. The next user action may execute in a different work process, requiring context restoration from the database. This stateless model enables massive horizontal scaling—an SAP system with 500 concurrent users might run only 50 dialog work processes—but imposes strict limits on execution time. Dialog work processes abort after 300 seconds of CPU time or 600 seconds of wall-clock time by default, preventing runaway programs from monopolizing resources. Long-running operations must execute in background work processes, which lack time limits but cannot perform screen I/O.

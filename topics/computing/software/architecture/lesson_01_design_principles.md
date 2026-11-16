@@ -24,39 +24,42 @@ To move from principle to structure, consider the architecture of a production-g
 
 The core structural model that best expresses the invariants above is the *dependency inversion principle*: high-level policy modules should not depend on low-level detail modules; both should depend on abstractions. The direction of source-code dependency must be the inverse of the direction of control flow wherever a volatile detail needs to be isolated from stable policy. This gives rise to what is commonly called a *ports and adapters* structure, whose internal mechanics are worth examining precisely.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        APPLICATION CORE                             │
-│                                                                     │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │                     Domain Layer                            │   │
-│  │  ┌────────────────┐    ┌────────────────┐                   │   │
-│  │  │  Aggregates    │    │  Domain Events │                   │   │
-│  │  │  Value Objects │    │  Specifications│                   │   │
-│  │  └────────────────┘    └────────────────┘                   │   │
-│  │          ▲ depends on nothing outside this boundary         │   │
-│  └──────────┼──────────────────────────────────────────────────┘   │
-│             │                                                       │
-│  ┌──────────┼──────────────────────────────────────────────────┐   │
-│  │   Application Services (Use Cases)                          │   │
-│  │          │                                                   │   │
-│  │  ┌───────┴──────────┐    ┌──────────────────────────────┐   │   │
-│  │  │  Command Handlers│    │  Outbound Port Interfaces     │   │   │
-│  │  │  Query Handlers  │    │  (Repository<T>, Notifier,    │   │   │
-│  │  └──────────────────┘    │   Clock, EventBus)            │   │   │
-│  │                          └──────────────────────────────┘   │   │
-│  └─────────────────────────────────────────────────────────────┘   │
-│                                                                     │
-└───────────────────────┬──────────────────────┬─────────────────────┘
-                        │                      │
-            ┌───────────▼───────┐  ┌───────────▼───────────┐
-            │  Inbound Adapters │  │  Outbound Adapters     │
-            │                   │  │                        │
-            │  gRPC Handler     │  │  PostgresRepository    │
-            │  HTTP Handler     │  │  RedisCache            │
-            │  CLI Entrypoint   │  │  KafkaEventBus         │
-            │  Test Harness     │  │  SMTPNotifier          │
-            └───────────────────┘  └────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph APP_CORE["APPLICATION CORE"]
+        subgraph DOMAIN["Domain Layer"]
+            AGG["Aggregates<br/>Value Objects"]
+            EVENTS["Domain Events<br/>Specifications"]
+            NOTE["▲ depends on nothing outside this boundary"]
+            AGG ~~~ EVENTS
+            AGG ~~~ NOTE
+        end
+        
+        subgraph APP_SVC["Application Services (Use Cases)"]
+            HANDLERS["Command Handlers<br/>Query Handlers"]
+            PORTS["Outbound Port Interfaces<br/>(Repository&lt;T&gt;, Notifier,<br/>Clock, EventBus)"]
+            HANDLERS ~~~ PORTS
+        end
+        
+        DOMAIN --> APP_SVC
+    end
+    
+    subgraph INBOUND["Inbound Adapters"]
+        IN1["gRPC Handler"]
+        IN2["HTTP Handler"]
+        IN3["CLI Entrypoint"]
+        IN4["Test Harness"]
+    end
+    
+    subgraph OUTBOUND["Outbound Adapters"]
+        OUT1["PostgresRepository"]
+        OUT2["RedisCache"]
+        OUT3["KafkaEventBus"]
+        OUT4["SMTPNotifier"]
+    end
+    
+    APP_CORE --> INBOUND
+    APP_CORE --> OUTBOUND
 ```
 
 The critical mechanical detail here is the direction of the arrows. The domain layer depends on nothing. The application services depend only on the domain layer and on *interfaces* defined within the application boundary itself—the outbound ports. The adapters depend on those interfaces. At runtime, a dependency injection container or manual wiring inverts control so that a `PostgresRepository` struct implementing the `Repository[T]` interface is injected into the command handler—but at compile time, the application core has zero import of `github.com/lib/pq` or any database driver. The boundary is enforced not by convention but by the import graph, which the compiler validates on every build.

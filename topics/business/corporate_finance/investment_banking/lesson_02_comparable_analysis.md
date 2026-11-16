@@ -56,19 +56,29 @@ Multiple calculation produces a matrix of valuation ratios. The most common trad
 
 The analyst constructs a spreadsheet with peer companies in rows and multiples in columns. Each cell contains the calculated ratio, and summary statistics—mean, median, minimum, maximum, twenty-fifth and seventy-fifth percentiles—appear at the bottom. The median is generally preferred over the mean because multiples distributions are skewed by outliers; a single peer trading at thirty times EBITDA due to a takeover rumor can distort the arithmetic mean, while the median remains robust.
 
-```
-Company Name           Ticker  Mkt Cap  EV      Rev    EBITDA  EV/Rev  EV/EBITDA
-─────────────────────────────────────────────────────────────────────────────────
-Acme Industrial Corp   ACME    $12.3B   $15.8B  $8.2B  $2.1B   1.9x    7.5x
-Beta Manufacturing     BETA    $8.7B    $10.2B  $5.1B  $1.3B   2.0x    7.8x
-Gamma Systems Inc      GMMA    $15.1B   $18.4B  $9.8B  $2.8B   1.9x    6.6x
-Delta Machinery        DLTA    $6.4B    $8.9B   $4.3B  $1.1B   2.1x    8.1x
-Epsilon Tools Co       EPSL    $9.2B    $11.6B  $6.0B  $1.5B   1.9x    7.7x
-─────────────────────────────────────────────────────────────────────────────────
-Mean                                                            2.0x    7.5x
-Median                                                          1.9x    7.7x
-25th Percentile                                                 1.9x    7.1x
-75th Percentile                                                 2.0x    7.9x
+```mermaid
+flowchart TD
+    title["<b>Comparable Company Analysis - Valuation Multiples</b>"]
+    
+    subgraph companies["Public Comparables"]
+        direction TB
+        acme["<b>Acme Industrial Corp (ACME)</b><br/>Mkt Cap: $12.3B | EV: $15.8B<br/>Rev: $8.2B | EBITDA: $2.1B<br/>EV/Rev: 1.9x | EV/EBITDA: 7.5x"]
+        beta["<b>Beta Manufacturing (BETA)</b><br/>Mkt Cap: $8.7B | EV: $10.2B<br/>Rev: $5.1B | EBITDA: $1.3B<br/>EV/Rev: 2.0x | EV/EBITDA: 7.8x"]
+        gamma["<b>Gamma Systems Inc (GMMA)</b><br/>Mkt Cap: $15.1B | EV: $18.4B<br/>Rev: $9.8B | EBITDA: $2.8B<br/>EV/Rev: 1.9x | EV/EBITDA: 6.6x"]
+        delta["<b>Delta Machinery (DLTA)</b><br/>Mkt Cap: $6.4B | EV: $8.9B<br/>Rev: $4.3B | EBITDA: $1.1B<br/>EV/Rev: 2.1x | EV/EBITDA: 8.1x"]
+        epsilon["<b>Epsilon Tools Co (EPSL)</b><br/>Mkt Cap: $9.2B | EV: $11.6B<br/>Rev: $6.0B | EBITDA: $1.5B<br/>EV/Rev: 1.9x | EV/EBITDA: 7.7x"]
+    end
+    
+    subgraph statistics["Statistical Summary"]
+        direction LR
+        mean["<b>Mean</b><br/>EV/Rev: 2.0x<br/>EV/EBITDA: 7.5x"]
+        median["<b>Median</b><br/>EV/Rev: 1.9x<br/>EV/EBITDA: 7.7x"]
+        p25["<b>25th Percentile</b><br/>EV/Rev: 1.9x<br/>EV/EBITDA: 7.1x"]
+        p75["<b>75th Percentile</b><br/>EV/Rev: 2.0x<br/>EV/EBITDA: 7.9x"]
+    end
+    
+    title --> companies
+    companies --> statistics
 ```
 
 Valuation application takes the target company's operational metrics and multiplies them by the peer-derived multiples to generate implied enterprise values. If the target company generated two point four billion dollars of LTM EBITDA and the peer median EV/EBITDA multiple is seven point seven times, the implied enterprise value is eighteen point five billion dollars. To convert this to an equity value, the analyst reverses the enterprise value bridge: subtract net debt, subtract preferred equity, subtract minority interest, add equity investments, yielding the implied market capitalization. Dividing by fully diluted shares outstanding produces the implied share price, which can be compared to the current trading price (for a public company) or used to anchor acquisition price discussions (for a private target).

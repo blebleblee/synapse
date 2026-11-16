@@ -304,4 +304,21 @@ Film scores are never delivered as a stereo master. You deliver **stems** — se
 1. Sketch approval signed off within 1 week of spotting
 2. Orchestration reviewed by the conductor for playability at least 1 week before the recording date
 3. Tech scout: fully test your DAW/sample-library signal chain on one representative cue before committing the whole score to that pipeline
-4. Attend at least one day of the final dub in person — balance issues are far cheaper to fix live at the console than by revision afterward
+4.
+
+4. **Final mix stems delivered** at least 3 days before the dub stage so the re-recording mixer can pre-balance dialogue, music, and effects without the composer present.
+
+These benchmarks assume you are working on a modestly budgeted independent feature with a single composer and a small team. Studio tentpoles compress the schedule (sometimes 6 weeks total) but add personnel — additional orchestrators, a music editor, and dedicated scoring mixers — to maintain throughput. The critical invariant across all budget levels is *never let the recording session be the first time anyone hears the fully realized cue*: internally review mockups with the director, walk through scores with the orchestrator, and pre-mix your template balance before printing stems. Every downstream collaborator (conductor, mixer, music editor) must receive materials early enough to flag problems while you still have time to fix them. Treat each handoff as a one-way gate: once you deliver to the next stage, the cost and political capital required to backtrack rises exponentially, so front-load your quality control and reserve the final week for small adjustments, not structural rewrites.
+
+---
+
+## Summary & Verification Matrix
+
+| **Invariant / Principle** | **Governing Mechanism** | **Diagnostic / Verification Criterion** | **Common Failure Mode** |
+|----------------------------|-------------------------|----------------------------------------|-------------------------|
+| **Spotting precision defines scope** | Spotting session locks cue placement, duration, and emotional intent before composition begins | Every cue has written start/end timecode, agreed emotional target, and editor/director sign-off | Composing without locked timecodes → cues don't fit final cut; vague spotting notes → endless revision cycles |
+| **Thematic coherence over cue-by-cue novelty** | 2-3 core themes recycled in varied keys/modes/instrumentations across 80%+ of the score | Thematic tracking spreadsheet shows each leitmotif appears ≥5 times; new themes reserved for 1-2 pivotal scenes | Every cue introduces new material → no musical identity; audience can't follow emotional through-line |
+| **Sync to picture is non-negotiable** | SMPTE timecode, hit points, and tempo maps lock music to visual action within ±1 frame | Playback in DAW with video overlay confirms downbeats align to cut points, crescendos peak at visual climaxes | Composing to rough cut or ignoring timecode → music-picture drift forces expensive re-recording or rejection |
+| **Orchestration for playability and budget** | Write within the technical range and articulation limits of your ensemble; live players cannot execute impossible passages | Conductor/orchestrator pre-flight review flags unplayable passages ≥1 week before session | Unplayable scores discovered in session → wasted studio time, emergency simplifications, or mockup replacement |
+| **Iterative mockup approval before recording** | Director approves fully produced DAW mockups that preview final emotional impact and timing | Written or email approval on final mockups before orchestration/recording budget is spent | Recording unapproved material → expensive re-records or unused cues; director hears "real" version for first time on dub stage |
+| **Stems and mix handoff preserve flexibility** | Deliver separated stem groups (strings, brass, winds, percussion, synths, etc.) so re-recording mixer can rebalance against dialogue/FX | Stem exports pass null test (sum to original mix); stems delivered ≥3 days before dub stage | Stereo-only delivery forces mixer to mute entire cues when dialogue conflicts arise; no time for stem re-export |

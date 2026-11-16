@@ -28,18 +28,21 @@ To execute a standard mortise and tenon, the mortise width should typically be s
 
 Dovetail architecture abandons the parallel cheek in favor of an angled interface, introducing a wedge geometry that physically prevents withdrawal. The angle of this wedge is critical. If the angle is too shallow, the joint loses its mechanical lock and behaves like a plain box joint; if too steep, the fragile tail board will split along the short grain. 
 
-```text
-[Dovetail Angle Invariants]
-
-  1:8 Ratio (Hardwoods: ~7.1 degrees)
-  +------------+
-  |            | 1
-  +------------+
-     \        /
-      \      /  8
-       \    /
-        \  /
-         \/
+```mermaid
+flowchart TD
+    title["Dovetail Angle Invariants"]
+    
+    ratio["1:8 Ratio<br/>(Hardwoods: ~7.1 degrees)"]
+    
+    base["Base Width: 1 unit"]
+    height["Height: 8 units"]
+    angle["Tapered Angle"]
+    
+    title --> ratio
+    ratio --> base
+    ratio --> height
+    base --> angle
+    height --> angle
 ```
 
 For dense hardwoods like oak or maple, an 1:8 ratio (approximately seven degrees from vertical) provides sufficient lock without compromising the short-grain strength of the tails. For softwoods like pine or cedar, a steeper 1:6 ratio (approximately nine and a half degrees) is required because the softer wood would otherwise crush and deform under the wedge action of a tighter angle. To execute a through dovetail, the tails are laid out using a sliding bevel set to the chosen ratio. The baseline is gauged at the exact depth of the pin board thickness. The tails are cut with a dovetail saw, strictly following a sequence: cut the left side of every tail, reposition, and cut the right side, maintaining a slight outward angle to ensure the inside of the waste falls away cleanly. The waste is removed with a coping saw and pared flush to the baseline with a sharp chisel. The pin board is then placed vertically in the vise, the tail board is laid over it, and the tails are scribed directly onto the end grain of the pin board using a striking knife. This direct transfer eliminates cumulative layout errors. The pins are cut, waste removed, and the two are dry-fitted. A properly cut dovetail should hold together firmly by friction alone before any adhesive is applied.

@@ -43,25 +43,16 @@ The generation counter (`i_generation` in `struct inode`) is set when the inode 
 
 The NFS client implements the full set of VFS abstract operations through function pointer tables registered in `struct inode_operations`, `struct file_operations`, and `struct address_space_operations`. When the kernel builds the VFS layer for an NFS-mounted filesystem, it registers these tables so that generic VFS calls are dispatched to NFS-specific implementations.
 
-```
-Application (syscall interface)
-         │
-         ▼
-┌─────────────────────────────────────────┐
-│          Linux VFS Layer                │
-│  dentry cache │ inode cache │ page cache│
-└──────────────────┬──────────────────────┘
-                   │ nfs_inode_operations
-                   │ nfs_file_operations
-                   │ nfs_address_space_ops
-                   ▼
-┌─────────────────────────────────────────┐
-│         NFS Client (nfs.ko)             │
-│  RPC layer │ auth layer │ xprt layer    │
-└──────────────────┬──────────────────────┘
-                   │ TCP/UDP socket
-                   ▼
-         NFS Server (nfsd)
+```mermaid
+flowchart TD
+    App["Application<br/>(syscall interface)"]
+    VFS["Linux VFS Layer<br/><br/>dentry cache | inode cache | page cache"]
+    NFS["NFS Client<br/>(nfs.ko)<br/><br/>RPC layer | auth layer | xprt layer"]
+    Server["NFS Server<br/>(nfsd)"]
+    
+    App -->|"VFS operations"| VFS
+    VFS -->|"nfs_inode_operations<br/>nfs_file_operations<br/>nfs_address_space_ops"| NFS
+    NFS -->|"TCP/UDP socket"| Server
 ```
 
 The `dentry cache` is the client's mapping from pathname components to inode objects. When a LOOKUP RPC returns a file handle, the client creates a `struct dentry` associating the filename with a `struct inode` that holds the returned file handle in its NFS-specific inode data (`struct nfs_inode`). Subsequent path lookups for the same filename find the dentry in cache and avoid the RPC entirely, until the dentry's validity timeout (`acdirmin`/`acdirmax`) expires.
@@ -111,20 +102,30 @@ In the first phase, the client marks dirty pages in the page cache and, when it 
 
 In the second phase, the client issues a `COMMIT` RPC. The `COMMIT` operation tells the server: "take all the data you have buffered for this file and flush it to stable storage now." The server calls `vfs_fsync()` on the file and returns a 64-bit `verifier` value, which is a server-generated token (typically initialized to the server's boot time) that the client can use to detect server reboots between the WRITE and COMMIT. If the client detects a changed verifier, it knows the server rebooted and potentially lost the unstable writes, and it must re-send the entire dirty range.
 
-```
-Client                              Server
-  │                                   │
-  │── WRITE(fh, offset, UNSTABLE) ───>│  (data buffered in server page cache)
-  │<─ NFS3_OK ────────────────────────│
-  │                                   │
-  │── WRITE(fh, offset+4096, UNSTABLE)│
-  │<─ NFS3_OK ────────────────────────│
-  │                                   │
-  │── COMMIT(fh, 0, 0) ─────────────>│  (server calls fsync, flushes to disk)
-  │<─ NFS3_OK, verifier=0xDEADBEEF ──│
-  │                                   │
-  [verifier stored; next WRITE cycle  │
-   checks verifier hasn't changed]    │
+```mermaid
+flowchart LR
+    Client["Client"]
+    Server["Server"]
+    
+    Client -->|"WRITE(fh, offset, UNSTABLE)"| Server
+    Server -->|"NFS3_OK"| Client
+    
+    Client -->|"WRITE(fh, offset+4096, UNSTABLE)"| Server
+    Server -->|"NFS3_OK"| Client
+    
+    Client -->|"COMMIT(fh, 0, 0)"| Server
+    Server -->|"NFS3_OK, verifier=0xDEADBEEF"| Client
+    
+    subgraph note1 ["Server Side"]
+        direction TB
+        N1["Data buffered in server page cache"]
+        N2["Server calls fsync, flushes to disk"]
+    end
+    
+    subgraph note2 ["Client Side"]
+        direction TB
+        N3["Verifier stored; next WRITE cycle<br/>checks verifier hasn't changed"]
+    end
 ```
 
 The `DATA_SYNC` and `FILE_SYNC` stability levels exist as intermediate options. `FILE_SYNC` requires the server to commit the data *and* all metadata to stable storage before responding, which is equivalent to `O_SYNC | O_DSYNC` semantics on a local filesystem. This is rarely used in practice because it eliminates server-side write buffering entirely and reduces throughput to the speed of the server's storage commit path.

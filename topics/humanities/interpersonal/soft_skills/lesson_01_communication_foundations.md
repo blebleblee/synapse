@@ -18,79 +18,34 @@ These invariants interact to produce a harsh reality: **default human communicat
 
 The canonical model of interpersonal communication follows a seven-stage pipeline architecture, each stage introducing potential failure modes that must be actively mitigated. We begin with **internal representation formation**, where the sender constructs a mental model of the message they wish to transmit. This model exists as a distributed pattern of neural activation across semantic networks, episodic memory systems, and emotional processing centers. The representation is inherently multidimensional, containing propositional content (facts and logical relations), procedural knowledge (how-to sequences), episodic details (specific experiences), emotional valence (positive/negative affect), and relational metadata (how this message positions the sender relative to the receiver).
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    SENDER COGNITIVE SPACE                       │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │ Internal Mental Representation                           │  │
-│  │ • Propositional content (facts, claims, logic)          │  │
-│  │ • Emotional valence & intensity                         │  │
-│  │ • Relational positioning & face management              │  │
-│  │ • Contextual assumptions & shared knowledge estimates   │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-│                       │                                         │
-│                       ▼                                         │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │ ENCODING PROCESS                                         │  │
-│  │ • Lexical selection (word choice from 20k-35k lexicon)  │  │
-│  │ • Syntactic structuring (grammar, clause ordering)      │  │
-│  │ • Prosodic mapping (stress, pitch contours)             │  │
-│  │ • Nonverbal choreography (gesture, facial expression)   │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-└────────────────────────┼──────────────────────────────────────-┘
-                         │
-                         ▼
-         ┌───────────────────────────────┐
-         │   TRANSMISSION CHANNEL        │
-         │                               │
-         │  ┌─────────────────────────┐ │
-         │  │ Signal: Acoustic waves, │ │
-         │  │ photons (visual), text  │ │
-         │  └─────────────────────────┘ │
-         │                               │
-         │  ┌─────────────────────────┐ │
-         │  │ NOISE LAYER             │ │
-         │  │ • Environmental: ambient│ │
-         │  │   sound, visual clutter │ │
-         │  │ • Physiological: fatigue│ │
-         │  │ • Psychological: biases,│ │
-         │  │   emotional state       │ │
-         │  │ • Semantic: jargon gaps │ │
-         │  └─────────────────────────┘ │
-         └───────────┬───────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   RECEIVER COGNITIVE SPACE                      │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │ DECODING PROCESS                                         │  │
-│  │ • Sensory reception (auditory/visual processing)        │  │
-│  │ • Pattern recognition (phoneme/word identification)     │  │
-│  │ • Semantic parsing (meaning construction)               │  │
-│  │ • Pragmatic inference (intent attribution)              │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-│                       │                                         │
-│                       ▼                                         │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │ Reconstructed Mental Representation                      │  │
-│  │ (NEVER identical to sender's original)                   │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-│                       │                                         │
-│                       ▼                                         │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │ FEEDBACK GENERATION                                      │  │
-│  │ • Verbal: "So you're saying..." / questions             │  │
-│  │ • Nonverbal: nodding, facial expression changes         │  │
-│  │ • Behavioral: compliance, resistance, confusion signals │  │
-│  └────────────────────┬─────────────────────────────────────┘  │
-└────────────────────────┼──────────────────────────────────────-┘
-                         │
-                         └──────────────┐
-                                        │
-                         ┌──────────────▼──────────────┐
-                         │  FEEDBACK MONITORING        │
-                         │  (Sender observes & adapts) │
-                         └─────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph sender ["SENDER COGNITIVE SPACE"]
+        A["Internal Mental Representation<br/>• Propositional content (facts, claims, logic)<br/>• Emotional valence & intensity<br/>• Relational positioning & face management<br/>• Contextual assumptions & shared knowledge estimates"]
+        B["ENCODING PROCESS<br/>• Lexical selection (word choice from 20k-35k lexicon)<br/>• Syntactic structuring (grammar, clause ordering)<br/>• Prosodic mapping (stress, pitch contours)<br/>• Nonverbal choreography (gesture, facial expression)"]
+        A --> B
+    end
+
+    subgraph channel ["TRANSMISSION CHANNEL"]
+        C["Signal: Acoustic waves,<br/>photons (visual), text"]
+        D["NOISE LAYER<br/>• Environmental: ambient sound, visual clutter<br/>• Physiological: fatigue<br/>• Psychological: biases, emotional state<br/>• Semantic: jargon gaps"]
+        C --> D
+    end
+
+    subgraph receiver ["RECEIVER COGNITIVE SPACE"]
+        E["DECODING PROCESS<br/>• Sensory reception (auditory/visual processing)<br/>• Pattern recognition (phoneme/word identification)<br/>• Semantic parsing (meaning construction)<br/>• Pragmatic inference (intent attribution)"]
+        F["Reconstructed Mental Representation<br/>(NEVER identical to sender's original)"]
+        G["FEEDBACK GENERATION<br/>• Verbal: 'So you're saying...' / questions<br/>• Nonverbal: nodding, facial expression changes<br/>• Behavioral: compliance, resistance, confusion signals"]
+        E --> F
+        F --> G
+    end
+
+    H["FEEDBACK MONITORING<br/>(Sender observes & adapts)"]
+
+    B --> C
+    D --> E
+    G --> H
+    H -.-> A
 ```
 
 The **encoding stage** transforms the internal representation into transmissible symbols. For verbal communication, this involves simultaneous lexical selection, syntactic structuring, and prosodic mapping. Lexical selection draws from your active vocabulary—typically 20,000 to 35,000 words for educated native speakers—to choose terms that approximate your intended meaning while accounting for estimated audience knowledge. This process operates under severe time pressure in real-time conversation, forcing reliance on high-frequency default words rather than optimal precision terms. Syntactic structuring determines clause ordering, embedding depth, and grammatical marking, all of which affect comprehension load. Center-embedded constructions like "The report that the analyst that the manager hired produced was flawed" impose high working memory demands and increase decoding failure rates. Prosodic mapping overlays stress patterns, pitch contours, and rhythm that carry crucial information about focus structure, sentence type (question versus statement), and emotional state.

@@ -283,15 +283,23 @@ where $f_{\text{vib}}$ represents vibrato rate (Hz) and $t$ represents time. The
 Articulation detection—distinguishing legato (smooth transitions between notes) from staccato (detached, percussive attacks)—requires temporal analysis of fingering and breath patterns. A legato transition exhibits overlapping note events (new note-on before previous note-off) and continuous breath pressure, while staccato exhibits breath re-attacks (pressure drops to near-zero, then re-rises) between notes. The controller firmware implements a finite state machine:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Idle
-    Idle --> Attack: "Breath > Threshold"
-    Attack --> Sustain: "Note On + Breath Stable"
-    Sustain --> Legato: "New Note + Breath Continuous"
-    Sustain --> Release: "Breath < Threshold"
-    Legato --> Sustain: "Previous Note Off"
-    Release --> Idle: "Breath = 0"
-    Legato --> Release: "Breath < Threshold"
+flowchart TD
+    Start([Start]) --> Idle["Idle"]
+    Idle --> Attack["Attack"]
+    Attack --> Sustain["Sustain"]
+    Sustain --> Legato["Legato"]
+    Sustain --> Release["Release"]
+    Legato --> Sustain
+    Legato --> Release
+    Release --> Idle
+    
+    Idle -.->|"Breath > Threshold"| Attack
+    Attack -.->|"Note On + Breath Stable"| Sustain
+    Sustain -.->|"New Note + Breath Continuous"| Legato
+    Sustain -.->|"Breath < Threshold"| Release
+    Legato -.->|"Previous Note Off"| Sustain
+    Release -.->|"Breath = 0"| Idle
+    Legato -.->|"Breath < Threshold"| Release
 ```
 
 In the Legato state, the controller transmits only note-on for the new note, omitting note-off for the previous note until breath pressure drops, creating seamless pitch transitions. In the Release state, note-off is transmitted immediately, creating staccato separation. This state logic operates within the controller firmware before MIDI message generation, demonstrating how gestural interpretation occurs at the sensor-to-MIDI translation layer rather than within the MIDI protocol itself.

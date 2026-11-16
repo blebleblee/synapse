@@ -42,50 +42,20 @@ where $\mathbf{w}$ is the vector of portfolio weights, $\mathbf{b}$ is the vecto
 
 Active managers extend this framework by introducing alpha views: forward-looking expectations about yield curve movements, sector spread widening or tightening, and individual issuer credit performance. The Black-Litterman model, adapted from equities, is widely used to combine these views with the prior distribution implied by the benchmark's risk premia, producing a posterior expected return vector that feeds the optimizer. The practical value of this approach is that it prevents the optimizer from making extreme concentrated bets on individual views with high expressed confidence but noisy underlying signals.
 
-```
-Active Fixed Income Portfolio Construction Flow
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Benchmark                  Alpha Research
-  (Bloomberg                 (Macro/Credit/
-   US Agg Index)              Relative Value)
-       │                           │
-       ▼                           ▼
-  ┌─────────────────────────────────────────┐
-  │   Factor Risk Model                     │
-  │   (BarraOne / Bloomberg MARS)           │
-  │                                         │
-  │   Σ: Factor Covariance Matrix           │
-  │   β: Security Factor Exposures         │
-  └────────────────┬────────────────────────┘
-                   │
-                   ▼
-  ┌─────────────────────────────────────────┐
-  │   Portfolio Optimizer (QP)              │
-  │                                         │
-  │   min  (w - b)ᵀ Σ (w - b)             │
-  │   s.t. duration band: ± 0.5 yrs        │
-  │        DV01 within risk budget          │
-  │        OAS spread: benchmark ± 10bps   │
-  │        sector weights: ± 5% benchmark  │
-  │        min lot size: $1MM face         │
-  └────────────────┬────────────────────────┘
-                   │
-                   ▼
-  ┌─────────────────────────────────────────┐
-  │   Portfolio                             │
-  │   (~150-300 bonds for $1Bn mandate)    │
-  └─────────────────────────────────────────┘
-                   │
-                   ▼
-  ┌─────────────────────────────────────────┐
-  │   Daily Risk Analytics                  │
-  │   • Aggregate DV01                      │
-  │   • Key Rate DV01 by tenor             │
-  │   • OAS contribution by sector         │
-  │   • Tracking error (ex ante)           │
-  │   • Spread duration vs. benchmark     │
-  └─────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Benchmark<br/>(Bloomberg US Agg Index)"]
+    B["Alpha Research<br/>(Macro/Credit/Relative Value)"]
+    C["Factor Risk Model<br/>(BarraOne / Bloomberg MARS)<br/><br/>Σ: Factor Covariance Matrix<br/>β: Security Factor Exposures"]
+    D["Portfolio Optimizer (QP)<br/><br/>min (w - b)ᵀ Σ (w - b)<br/>s.t. duration band: ± 0.5 yrs<br/>DV01 within risk budget<br/>OAS spread: benchmark ± 10bps<br/>sector weights: ± 5% benchmark<br/>min lot size: $1MM face"]
+    E["Portfolio<br/>(~150-300 bonds for $1Bn mandate)"]
+    F["Daily Risk Analytics<br/>• Aggregate DV01<br/>• Key Rate DV01 by tenor<br/>• OAS contribution by sector<br/>• Tracking error (ex ante)<br/>• Spread duration vs. benchmark"]
+    
+    A --> C
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 ### Immunization and Dedication: Liability-Driven Construction

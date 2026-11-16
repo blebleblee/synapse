@@ -23,23 +23,20 @@ A database system exists because two hardware realities are in permanent tension
 
 Before examining any implementation, establish this hierarchy in your mental model:
 
-```
-Hardware Constraints
-    │
-    ▼
-Storage Abstractions (pages, segments, files)
-    │
-    ▼
-Concurrency Abstractions (locks, latches, MVCC versions)
-    │
-    ▼
-Transaction Semantics (ACID)
-    │
-    ▼
-Query Interface (SQL or otherwise)
-    │
-    ▼
-Application Logic
+```mermaid
+flowchart TD
+    A["Hardware Constraints"]
+    B["Storage Abstractions<br/>(pages, segments, files)"]
+    C["Concurrency Abstractions<br/>(locks, latches, MVCC versions)"]
+    D["Transaction Semantics<br/>(ACID)"]
+    E["Query Interface<br/>(SQL or otherwise)"]
+    F["Application Logic"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 Each layer hides complexity from the layer above and relies on guarantees from the layer below. Violations of lower-layer invariants (e.g., a torn write on disk) propagate upward and corrupt every abstraction built on top of them.

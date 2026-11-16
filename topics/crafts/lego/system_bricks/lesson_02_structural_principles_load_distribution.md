@@ -79,22 +79,29 @@ The 5:2 ratio is the geometric key that unlocks offset patterns beyond the stand
 
 Cantilever mechanics deserve careful analysis because they represent the limiting case where the stud-tube interface's weak axis—tension—is the primary load path. A cantilever is a wall or beam that extends beyond its support, with the overhanging mass creating a bending moment at the support edge. The bending moment M equals the overhanging mass m times the distance d from the support edge to the center of mass of the overhang: M = m × d. This moment creates a force couple: compression at the bottom of the wall (pressing the bottom bricks into the support) and tension at the top (pulling the top bricks away from the course below). The tension acts through the stud-tube interfaces at the top of the wall, and when it exceeds the clutch power of those studs, peeling begins.
 
-```
-Cantilever Force Diagram (side view)
-
-         ← overhanging mass →
-    ┌──────────────────────┐
-    │                      │  mass = m
-    │                      │  lever = d
-    └──────────────────────┘
-    ||═════════════════════════════════
-    ||                                │  supported mass
-    ||                                │  (counterweight)
-    ||═════════════════════════════════
-     ▲                              ▲
-    TENSION                    COMPRESSION
-    (top studs peel          (bottom studs pressed
-     from course below)       into support — strong axis)
+```mermaid
+flowchart TD
+    subgraph overhang ["Overhanging Section"]
+        mass["Mass = m<br/>Lever arm = d"]
+    end
+    
+    subgraph support ["Support Point"]
+        pivot["║<br/>Pivot/Fulcrum"]
+    end
+    
+    subgraph counter ["Counterweight Section"]
+        counterweight["Supported Mass<br/>(Counterweight)"]
+    end
+    
+    subgraph forces ["Forces at Support"]
+        tension["▲ TENSION<br/>(Top studs peel<br/>from course below)"]
+        compression["▲ COMPRESSION<br/>(Bottom studs pressed<br/>into support — strong axis)"]
+    end
+    
+    mass -->|"d (distance)"| pivot
+    pivot --> counterweight
+    pivot -.->|"Generates"| tension
+    pivot -.->|"Generates"| compression
 ```
 
 The peeling failure is progressive and top-down. The topmost course peels first because it has the longest lever arm from the support edge. Once it separates, the course below becomes the new topmost, and it peels next. The structure unzips from the top, each course failing in sequence, with the rate of failure accelerating because each peeling course adds its mass to the overhang, increasing the bending moment for the remaining courses.

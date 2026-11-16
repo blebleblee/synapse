@@ -66,29 +66,32 @@ Rebalancing mechanics formalize the "buy low, sell high" intuition into systemat
 
 Withdrawal strategies during retirement determine portfolio longevity under sequence-of-returns risk. The 4% rule suggests initial withdrawals equal to 4% of portfolio value, adjusted annually for inflation, historically provides 95%+ success rates over thirty-year horizons. However, this rule assumes static real returns and ignores valuation dependence—retiring into expensive markets requires lower initial withdrawal rates while retiring into cheap markets permits higher rates. Dynamic withdrawal strategies adjust annual withdrawals based on portfolio performance, sacrificing consumption stability for enhanced longevity and higher long-run average spending.
 
-```
-Basic Capital Allocation Decision Tree:
-
-                     Capital Available
-                            |
-           +----------------+----------------+
-           |                                 |
-    Immediate Consumption              Investment
-           |                                 |
-    Utility Today                    +------+------+
-                                     |             |
-                              Risk-Free      Risky Assets
-                              (Bonds)        (Stocks, RE)
-                                     |             |
-                              +-----+-----+  +----+----+
-                              |           |  |         |
-                           Tax-Deferred  |  Liquid  Illiquid
-                           (IRA, 401k) Taxable     (PE, RE)
-                                          |
-                                    +-----+-----+
-                                    |           |
-                               Growth       Income
-                              (Equity)    (Dividends)
+```mermaid
+flowchart TD
+    A["Capital Available"]
+    B["Immediate Consumption"]
+    C["Investment"]
+    D["Utility Today"]
+    E["Risk-Free<br/>(Bonds)"]
+    F["Risky Assets<br/>(Stocks, RE)"]
+    G["Tax-Deferred<br/>(IRA, 401k)"]
+    H["Taxable"]
+    I["Liquid"]
+    J["Illiquid<br/>(PE, RE)"]
+    K["Growth<br/>(Equity)"]
+    L["Income<br/>(Dividends)"]
+    
+    A --> B
+    A --> C
+    B --> D
+    C --> E
+    C --> F
+    E --> G
+    E --> H
+    F --> I
+    F --> J
+    H --> K
+    H --> L
 ```
 
 This decision tree maps the sequential choices every capital allocator faces. At the root, capital splits between consumption and investment. Investment capital subdivides by risk profile, then by tax treatment, then by liquidity requirement, and finally by return character. Each decision point incorporates the principles established earlier: consumption provides immediate utility but forgoes compounding; risk-free assets preserve capital but limit returns; tax-deferred accounts maximize compounding but restrict access; illiquid assets demand higher returns but sacrifice flexibility.

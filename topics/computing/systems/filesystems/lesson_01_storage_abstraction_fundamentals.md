@@ -24,38 +24,18 @@ The storage hierarchy culminates in device mapper (DM) targets, which provide fl
 
 The block device subsystem architecture in Linux comprises five interconnected layers, each responsible for distinct aspects of the storage abstraction. At the apex, filesystems and applications issue I/O requests through the Virtual Filesystem Switch (VFS) or direct `open(O_DIRECT)` calls. These requests descend into the page cache for buffered I/O or directly into the block layer for direct I/O, where they transform into `struct bio` (block I/O) structures—the kernel's fundamental unit of block device transfer.
 
-```
-┌─────────────────────────────────────────────────────┐
-│  VFS Layer (read/write syscalls, page cache)       │
-└────────────────────┬────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────┐
-│  Block Layer (bio submission, I/O scheduling)       │
-│  - struct bio: segment list (page, offset, length)  │
-│  - I/O scheduler: mq-deadline, kyber, none          │
-│  - Request merging and sorting                      │
-└────────────────────┬────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────┐
-│  Device Mapper / MD (optional transformation)       │
-│  - dm-linear: address translation                   │
-│  - dm-crypt: sector encryption                      │
-│  - dm-raid: redundancy and striping                 │
-└────────────────────┬────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────┐
-│  Block Device Driver (SCSI, NVMe, virtio-blk)      │
-│  - Command queue management                         │
-│  - DMA setup and interrupt handling                 │
-└────────────────────┬────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────┐
-│  Physical Device (HDD, SSD, network-backed storage) │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["VFS Layer<br/>(read/write syscalls, page cache)"]
+    B["Block Layer<br/>(bio submission, I/O scheduling)<br/>• struct bio: segment list<br/>• I/O scheduler: mq-deadline, kyber, none<br/>• Request merging and sorting"]
+    C["Device Mapper / MD<br/>(optional transformation)<br/>• dm-linear: address translation<br/>• dm-crypt: sector encryption<br/>• dm-raid: redundancy and striping"]
+    D["Block Device Driver<br/>(SCSI, NVMe, virtio-blk)<br/>• Command queue management<br/>• DMA setup and interrupt handling"]
+    E["Physical Device<br/>(HDD, SSD, network-backed storage)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 The `struct bio` encapsulates a single block I/O operation directed at a specific block device. Each bio contains a `bi_iter` field specifying the starting sector (expressed as a 512-byte sector number regardless of the device's actual sector size, maintaining a unified kernel addressing convention), and a `bi_io_vec` array of segments describing discontiguous physical memory regions to transfer. This scatter-gather capability proves essential because the page cache allocates memory in discrete page frames that may not occupy contiguous physical addresses—a single 16 KiB read might span four non-contiguous 4 KiB pages, and the bio structure captures this fragmentation without requiring the block layer to perform expensive memory copying or allocation of contiguous bounce buffers.

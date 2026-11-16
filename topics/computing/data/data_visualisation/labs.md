@@ -63,9 +63,9 @@ graph TB
     I -->|"Interactive Viz"| J[Dashboard]
     E -->|"Log + Metrics"| K[Monitoring]
     
-    style D fill:#e1f5ff
-    style I fill:#ffe1e1
-    style E fill:#fff4e1
+    style D fill:#e1f5ff,color:#0f172a
+    style I fill:#ffe1e1,color:#0f172a
+    style E fill:#fff4e1,color:#0f172a
 ```
 
 The pipeline follows these stages:

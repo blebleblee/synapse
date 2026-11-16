@@ -34,10 +34,28 @@ Systematic errors corrupt these raw measurements through multiple mechanisms. Di
 
 Calibration procedures remove these systematic errors through mathematical error correction models. The most rigorous approach, full two-port SOLT (Short-Open-Load-Thru) calibration, requires measuring three known reflection standards (short, open, 50 Ω load) and one transmission standard (direct thru connection) at each port. These twelve measurements (three reflections and one transmission at each of two ports, plus the reciprocal measurements) overdetermine the error model coefficients, enabling least-squares fitting. The error correction transforms raw measured S-parameters $S_m$ into corrected values $S_a$ (actual) through matrix operations:
 
-```
-     [S_a] = [A][S_m] - [B]
-             ─────────────────
-             [C][S_m] - [D]
+```mermaid
+flowchart TD
+    A["A"]
+    B["B"]
+    C["C"]
+    D["D"]
+    Sm["S_m"]
+    Sa["S_a"]
+    
+    A --> Numerator1["A × S_m"]
+    Sm --> Numerator1
+    Numerator1 --> Numerator2["A × S_m - B"]
+    B --> Numerator2
+    
+    C --> Denominator1["C × S_m"]
+    Sm --> Denominator1
+    Denominator1 --> Denominator2["C × S_m - D"]
+    D --> Denominator2
+    
+    Numerator2 --> Division["÷"]
+    Denominator2 --> Division
+    Division --> Sa
 ```
 
 where matrices $[A]$, $[B]$, $[C]$, and $[D]$ contain the extracted error terms. Modern VNAs perform these corrections in real-time during the frequency sweep, displaying corrected S-parameters directly. Calibration quality can be verified by measuring a precision airline or verification kit with known S-parameters, confirming that systematic errors have been reduced below the VNA's noise floor.

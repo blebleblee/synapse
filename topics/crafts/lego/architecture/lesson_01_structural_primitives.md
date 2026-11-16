@@ -22,25 +22,63 @@ The load path through a LEGO structure can be visualized as a network of force v
 
 The mechanics of lateral load resistance are worth examining in structural detail, because they determine every major design decision in a large LEGO architectural model.
 
-```
-LOAD PATH DIAGRAM — Lateral force on a bonded wall vs. a stack-bonded wall
-
-  RUNNING BOND (Structurally effective)         STACK BOND (Structurally weak)
-
-  ┌──────┬──────┬──────┐                        ┌──────┬──────┬──────┐
-  │  B1  │  B2  │  B3  │  ← Course 3            │  B1  │  B2  │  B3  │  ← Course 3
-  └──┬───┴───┬──┴───┬──┘                        └──┬───┴──┬───┴──┬───┘
-  ┌──┴──┬────┴─┬────┴──┐                        ┌──┴──┬──┴───┬──┴───┐
-  │  B4 │  B5  │  B6   │  ← Course 2            │  B4 │  B5  │  B6  │  ← Course 2
-  └─┬───┴──┬───┴──┬────┘                        └──┬──┴──┬───┴──┬───┘
-  ┌─┴──┬───┴─┬───┴──┬──┐                        ┌──┴──┬──┴───┬──┴───┐
-  │ B7 │  B8 │  B9  │B10│  ← Course 1 (base)    │  B7 │  B8  │  B9  │  ← Course 1
-  └────┴─────┴──────┴───┘                        └─────┴──────┴──────┘
-
-  Lateral force F →                              Lateral force F →
-  Distributes across B1–B4–B7                   Runs straight up joint:
-  joint overlap path.                            B3→B6→B9 column walks
-  Multiple columns share load.                  out as one unit.
+```mermaid
+flowchart TD
+    subgraph running ["RUNNING BOND<br/>(Structurally Effective)"]
+        direction LR
+        RB1["B1"]
+        RB2["B2"]
+        RB3["B3"]
+        RB4["B4"]
+        RB5["B5"]
+        RB6["B6"]
+        RB7["B7"]
+        RB8["B8"]
+        RB9["B9"]
+        RB10["B10"]
+        
+        RC3["Course 3"]
+        RC2["Course 2"]
+        RC1["Course 1<br/>Base"]
+        
+        RB1 --> RB4
+        RB4 --> RB7
+        RB2 --> RB5
+        RB5 --> RB8
+        RB3 --> RB6
+        RB6 --> RB9
+    end
+    
+    subgraph stack ["STACK BOND<br/>(Structurally Weak)"]
+        direction LR
+        SB1["B1"]
+        SB2["B2"]
+        SB3["B3"]
+        SB4["B4"]
+        SB5["B5"]
+        SB6["B6"]
+        SB7["B7"]
+        SB8["B8"]
+        SB9["B9"]
+        
+        SC3["Course 3"]
+        SC2["Course 2"]
+        SC1["Course 1"]
+        
+        SB3 --> SB6
+        SB6 --> SB9
+    end
+    
+    force1["Lateral Force F"]
+    force2["Lateral Force F"]
+    
+    load1["Distributes across<br/>B1–B4–B7 joint overlap path<br/>Multiple columns share load"]
+    load2["Runs straight up joint:<br/>B3→B6→B9 column walks<br/>out as one unit"]
+    
+    force1 -.-> running
+    force1 -.-> load1
+    force2 -.-> stack
+    force2 -.-> load2
 ```
 
 Consider what happens when a lateral force is applied to the top course of each wall. In the running bond wall, the offset course pattern means that every brick straddles a joint in the course below it. The lateral force, trying to slide course 3 across course 2, encounters stud columns that are rooted in both the left and right halves of bricks in course 2. It cannot slide course 3 without also bending the stud shafts of multiple bricks in course 2, and to do that, it must simultaneously overcome the friction coupling of those bricks to course 1. The load distributes diagonally through the wall thickness. In the stack-bonded wall, the aligned vertical joints create continuous planes of weakness running full-height; the lateral force simply slides the top course along its interface with the bottom course, and the entire wall folds. The structural difference is not subtle — it is dramatic enough to feel with two fingers.

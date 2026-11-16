@@ -40,33 +40,53 @@ The operational mechanics of threat modeling begin with asset identification and
 
 Asset flow analysis traces the lifecycle of sensitive data through the application architecture. Data enters the system through user input, third-party APIs, or database queries. It flows through validation, business logic, transformation, and storage subsystems before being rendered to users or transmitted to external services. At each stage, the data's security requirements may change: a plaintext password must be hashed before storage, a credit card number must be encrypted in transit and at rest, and query results must be filtered according to the requesting user's authorization context. Data flow diagrams (DFDs) provide a visual representation of these paths, identifying trust boundaries where data crosses from trusted to untrusted contexts or vice versa.
 
-```
-┌─────────────┐         ┌──────────────┐         ┌─────────────┐
-│   Browser   │◄───────►│  Web Server  │◄───────►│  Database   │
-│ (Untrusted) │  HTTPS  │  (App Logic) │   SQL   │  (Backend)  │
-└─────────────┘         └──────────────┘         └─────────────┘
-       │                       │                        │
-       │                       │                        │
-   User Input            Trust Boundary            Persistent
-   (Untrusted)          (Validation &               Storage
-                        Authorization)            (Sensitive)
+```mermaid
+flowchart LR
+    Browser["Browser<br/>(Untrusted)"]
+    WebServer["Web Server<br/>(App Logic)"]
+    Database["Database<br/>(Backend)"]
+    
+    Browser <-->|HTTPS| WebServer
+    WebServer <-->|SQL| Database
+    
+    UserInput["User Input<br/>(Untrusted)"]
+    TrustBoundary["Trust Boundary<br/>(Validation &<br/>Authorization)"]
+    PersistentStorage["Persistent Storage<br/>(Sensitive)"]
+    
+    Browser -.-> UserInput
+    WebServer -.-> TrustBoundary
+    Database -.-> PersistentStorage
 ```
 
 Trust boundaries delineate the zones where security assumptions change. The boundary between the browser and the web server is a trust boundary because the client-side execution environment is fully under adversarial control; any data originating from the client must be treated as untrusted and subjected to rigorous validation. The boundary between the web server and the database is also a trust boundary when the web server is potentially compromised, but in many architectures, both components reside within the same trust zone, protected by network segmentation and authentication at the perimeter. Identifying trust boundaries clarifies where input validation, authentication, authorization, and encryption are required.
 
 Attack tree analysis provides a hierarchical decomposition of adversarial objectives and the techniques available to achieve them. The root of the tree represents the attacker's ultimate goal, such as "exfiltrate customer database" or "execute arbitrary code on production server." Child nodes enumerate the intermediate steps or alternative paths to reach that goal. Leaf nodes represent atomic attack techniques, such as "exploit SQL injection in search parameter" or "brute-force administrative credentials." Each node can be annotated with difficulty estimates, required resources, and the defensive controls that mitigate that path. Attack trees expose the logical structure of threats, revealing bottleneck defenses that, if strengthened, collapse entire branches of the attack tree.
 
-```
-                    [Exfiltrate Customer PII]
-                            │
-           ┌────────────────┼────────────────┐
-           │                │                │
-    [SQL Injection]  [Compromised     [Insider Abuse]
-           │          Admin Acct]            │
-           │                │                │
-    ┌──────┴──────┐  ┌──────┴──────┐  ┌─────┴─────┐
-[Unvalidated  [Blind   [Phishing] [Weak    [Stolen  [Malicious
- Input]       SQLi]              Password]  Backup]   Employee]
+```mermaid
+flowchart TD
+    A["Exfiltrate Customer PII"]
+    
+    B["SQL Injection"]
+    C["Compromised Admin Account"]
+    D["Insider Abuse"]
+    
+    E["Unvalidated Input"]
+    F["Blind SQLi"]
+    G["Phishing"]
+    H["Weak Password"]
+    I["Stolen Backup"]
+    J["Malicious Employee"]
+    
+    A --> B
+    A --> C
+    A --> D
+    
+    B --> E
+    B --> F
+    C --> G
+    C --> H
+    D --> I
+    D --> J
 ```
 
 The STRIDE-per-element methodology applies the STRIDE threat categories systematically to each component in the data flow diagram. External entities, such as users or third-party services, may be spoofed if authentication is absent or weak. Data flows across trust boundaries are subject to tampering if integrity protections like TLS or message authentication are missing. Processes that perform sensitive operations may be repudiated if audit logging is insufficient. Data stores containing sensitive information face information disclosure risks if encryption at rest or access controls are inadequate. All components face denial-of-service threats from resource exhaustion. Processes running with elevated privileges are targets for elevation of privilege attacks through injection flaws, deserialization vulnerabilities, or privilege escalation exploits.

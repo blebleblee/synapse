@@ -71,20 +71,26 @@ The difficulty target adjusts through a simple recalculation after each 2,016-bl
 
 The supply curve visualization plots cumulative bitcoin supply against block height, showing the characteristic step function with gentler slope after each halving. The curve asymptotically approaches 21 million, with over 94% of total supply already issued by 2025. The final 6% will be issued over the next 115 years, with each successive halving contributing progressively smaller increments. This front-loaded issuance schedule ensured wide initial distribution while maintaining permanent scarcity incentives.
 
-```
-Block Height (thousands)
-0     210   420   630   840   1050  1260  1470  ...  6930
+```mermaid
+flowchart LR
+    H0["Block 0\n0 BTC"] -->|"+10.5M BTC\n(Halvings 0–1)"| H1["Block 210,000\n10.5M BTC"]
+    H1 -->|"+5.25M BTC\n(Halvings 1–2)"| H2["Block 420,000\n15.75M BTC"]
+    H2 -->|"+2.625M BTC\n(Halvings 2–3)"| H3["Block 630,000\n18.375M BTC"]
+    H3 -->|"+1.3125M BTC\n(Halvings 3–4)"| H4["Block 840,000\n19.6875M BTC"]
+    H4 -->|"+0.65625M BTC\n(Halvings 4–5)"| H5["Block 1,050,000\n20.34375M BTC"]
+    H5 -->|"+0.328M BTC\n(Halvings 5–6)"| H6["Block 1,260,000\n20.671M BTC"]
+    H6 -->|"+0.164M BTC\n(Halvings 6–7)"| H7["Block 1,470,000\n20.835M BTC"]
+    H7 -->|"⋯ converging ⋯"| CAP["Block ~6,930,000\n≈21,000,000 BTC\n(Hard Cap)"]
 
-Supply (millions BTC)
-|
-21 |                                    _______________
-   |                            _______/
-   |                    _______/
-   |            _______/
-   |    _______/
-10 |___/
-   |
-0  +----------------------------------------------------
+    style H0   fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style H1   fill:#16213e,stroke:#e94560,color:#ffffff
+    style H2   fill:#16213e,stroke:#e94560,color:#ffffff
+    style H3   fill:#16213e,stroke:#e94560,color:#ffffff
+    style H4   fill:#16213e,stroke:#e94560,color:#ffffff
+    style H5   fill:#16213e,stroke:#e94560,color:#ffffff
+    style H6   fill:#16213e,stroke:#e94560,color:#ffffff
+    style H7   fill:#16213e,stroke:#e94560,color:#ffffff
+    style CAP  fill:#0f3460,stroke:#f5a623,stroke-width:3px,color:#f5a623
 ```
 
 The halving cycle introduces four-year periodicity to supply shocks that some analysts correlate with bull-bear market cycles. Each halving reduces new supply by half, abruptly doubling the stock-to-flow ratio overnight. If demand remains constant, this supply shock should theoretically exert upward price pressure. Historical price peaks have occurred 12-18 months after halvings, though causality is difficult to establish given confounding factors like macroeconomic conditions, regulatory developments, and market sentiment cycles that may simply correlate with the four-year halving period without causal connection.

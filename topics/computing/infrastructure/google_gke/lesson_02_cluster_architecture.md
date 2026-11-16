@@ -182,41 +182,41 @@ The `maxUnavailable: 1` form is generally preferable for Deployments because it 
 
 The following architecture diagram illustrates the relationship between node pools, namespaces, quotas, and PDBs across the full cluster topology:
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  GKE Regional Cluster (us-central1)                                     │
-│                                                                          │
-│  Control Plane (Google-Managed, Invisible to Operator)                  │
-│  ┌──────────┐  ┌────────────┐  ┌──────────────┐  ┌──────────────────┐  │
-│  │ API Srvr │  │   etcd     │  │  Scheduler   │  │  Ctrl Manager    │  │
-│  └──────────┘  └────────────┘  └──────────────┘  └──────────────────┘  │
-│       │               │                │                   │            │
-│       └───────────────┴────────────────┴───────────────────┘            │
-│                                       │                                  │
-│                            Admission Controllers                         │
-│                    (ResourceQuota, LimitRange, PDB check)                │
-│                                       │                                  │
-│  Data Plane (Operator-Managed Node Pools)                               │
-│                                                                          │
-│  ┌────────────────────────────────┐  ┌───────────────────────────────┐  │
-│  │  Node Pool: api-pool           │  │  Node Pool: batch-spot-pool   │  │
-│  │  Machine: n2-standard-8        │  │  Machine: n2d-standard-32     │  │
-│  │  Taint: (none)                 │  │  Taint: workload-type=batch   │  │
-│  │  Autoscale: 2–10 nodes         │  │  Autoscale: 0–20 nodes        │  │
-│  │                                │  │  VM Type: Spot                │  │
-│  │  ┌──────────┐  ┌──────────┐   │  │                               │  │
-│  │  │  Node A  │  │  Node B  │   │  │  ┌──────────┐  ┌──────────┐  │  │
-│  │  │          │  │          │   │  │  │  Node C  │  │  Node D  │  │  │
-│  │  │ ns:front │  │ ns:back  │   │  │  │          │  │          │  │  │
-│  │  │  Pod x2  │  │  Pod x2  │   │  │  │ ns:ml    │  │ ns:ml    │  │  │
-│  │  │  PDB✓    │  │  PDB✓    │   │  │  │  Job x4  │  │  Job x4  │  │  │
-│  │  └──────────┘  └──────────┘   │  │  └──────────┘  └──────────┘  │  │
-│  └────────────────────────────────┘  └───────────────────────────────┘  │
-│                                                                          │
-│  Namespace: frontend    ResourceQuota: 16 CPU / 32Gi   LimitRange: ✓    │
-│  Namespace: backend     ResourceQuota: 32 CPU / 64Gi   LimitRange: ✓    │
-│  Namespace: ml-batch    ResourceQuota: 256 CPU / 512Gi LimitRange: ✓    │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph GKE["GKE Regional Cluster (us-central1)"]
+        subgraph ControlPlane["Control Plane (Google-Managed, Invisible to Operator)"]
+            API["API Server"]
+            ETCD["etcd"]
+            SCHED["Scheduler"]
+            CTRL["Controller Manager"]
+        end
+        
+        API --> AdmCtrl["Admission Controllers<br/>(ResourceQuota, LimitRange, PDB check)"]
+        ETCD --> AdmCtrl
+        SCHED --> AdmCtrl
+        CTRL --> AdmCtrl
+        
+        AdmCtrl --> DataPlane["Data Plane (Operator-Managed Node Pools)"]
+        
+        subgraph DataPlane
+            subgraph APIPool["Node Pool: api-pool<br/>Machine: n2-standard-8<br/>Taint: (none)<br/>Autoscale: 2–10 nodes"]
+                NodeA["Node A<br/>ns:front<br/>Pod x2<br/>PDB✓"]
+                NodeB["Node B<br/>ns:back<br/>Pod x2<br/>PDB✓"]
+            end
+            
+            subgraph BatchPool["Node Pool: batch-spot-pool<br/>Machine: n2d-standard-32<br/>Taint: workload-type=batch<br/>Autoscale: 0–20 nodes<br/>VM Type: Spot"]
+                NodeC["Node C<br/>ns:ml<br/>Job x4"]
+                NodeD["Node D<br/>ns:ml<br/>Job x4"]
+            end
+        end
+        
+        subgraph Namespaces["Namespace Configuration"]
+            NSFront["frontend<br/>ResourceQuota: 16 CPU / 32Gi<br/>LimitRange: ✓"]
+            NSBack["backend<br/>ResourceQuota: 32 CPU / 64Gi<br/>LimitRange: ✓"]
+            NSML["ml-batch<br/>ResourceQuota: 256 CPU / 512Gi<br/>LimitRange: ✓"]
+        end
+    end
 ```
 
 ---

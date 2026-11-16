@@ -22,45 +22,55 @@ A mature service operation is best understood as a pipeline with well-defined st
 
 The canonical architecture of that pipeline looks like this:
 
-```
-Customer Contact
-      │
-      ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                     INTAKE & TRIAGE LAYER                           │
-│  Channel Detection → Identity Verification → Intent Classification  │
-│  Contact Reason Taxonomy → Priority Scoring → SLA Assignment        │
-└─────────────────────────┬───────────────────────────────────────────┘
-                          │
-                          ▼
-              ┌───────────────────────┐
-              │  Routing Decision     │
-              │  Self-service? ───────┼──▶ Knowledge Base / IVR / Bot
-              │  Tier 1? ─────────────┼──▶ Frontline Agent Queue
-              │  Tier 2? ─────────────┼──▶ Specialist / Technical Queue
-              │  Tier 3? ─────────────┼──▶ Executive / Escalation Queue
-              └───────────┬───────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                     CASE MANAGEMENT LAYER                           │
-│  Case Record Creation → Work Effort Logging → Status Transitions    │
-│  SLA Timer Tracking → Internal Notes → Resolution Drafting          │
-└─────────────────────────┬───────────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                     RESOLUTION & CLOSURE LAYER                      │
-│  Resolution Action Execution → Customer Confirmation                │
-│  Root Cause Tag → CSAT Survey Dispatch → Case Closure               │
-└─────────────────────────┬───────────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                     FEEDBACK LOOP LAYER                             │
-│  CSAT / NPS Aggregation → Defect Category Analysis                  │
-│  Agent Coaching Triggers → Process Change Backlog → QA Scoring      │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    CC(["Customer Contact"])
+
+    subgraph intake ["INTAKE & TRIAGE LAYER"]
+        direction LR
+        CD["Channel Detection"] --> IV["Identity Verification"] --> IC["Intent Classification"]
+        CRT["Contact Reason Taxonomy"] --> PS["Priority Scoring"] --> SLA["SLA Assignment"]
+    end
+
+    subgraph routing ["Routing Decision"]
+        direction TB
+        RD{{"Route?"}}
+    end
+
+    subgraph case_mgmt ["CASE MANAGEMENT LAYER"]
+        direction LR
+        CRC["Case Record Creation"] --> WEL["Work Effort Logging"] --> ST["Status Transitions"]
+        SLAT["SLA Timer Tracking"] --> IN["Internal Notes"] --> RD2["Resolution Drafting"]
+    end
+
+    subgraph resolution ["RESOLUTION & CLOSURE LAYER"]
+        direction LR
+        RAE["Resolution Action Execution"] --> CCF["Customer Confirmation"]
+        RCT["Root Cause Tag"] --> CSAT["CSAT Survey Dispatch"] --> CLO["Case Closure"]
+    end
+
+    subgraph feedback ["FEEDBACK LOOP LAYER"]
+        direction LR
+        AGG["CSAT / NPS Aggregation"] --> DCA["Defect Category Analysis"]
+        ACT["Agent Coaching Triggers"] --> PCB["Process Change Backlog"] --> QAS["QA Scoring"]
+    end
+
+    SS["Knowledge Base / IVR / Bot"]
+    T1["Frontline Agent Queue"]
+    T2["Specialist / Technical Queue"]
+    T3["Executive / Escalation Queue"]
+
+    CC --> intake
+    intake --> routing
+    RD -->|"Self-service"| SS
+    RD -->|"Tier 1"| T1
+    RD -->|"Tier 2"| T2
+    RD -->|"Tier 3"| T3
+    T1 --> case_mgmt
+    T2 --> case_mgmt
+    T3 --> case_mgmt
+    case_mgmt --> resolution
+    resolution --> feedback
 ```
 
 Each layer carries specific operational mechanics that determine whether the pipeline runs efficiently or degrades under volume.

@@ -102,29 +102,31 @@ The change detection algorithm operates as a depth-first traversal of the compon
 
 Zone.js provides the asynchronous event interception layer that triggers change detection. This library monkey-patches core browser APIs—`setTimeout`, `setInterval`, `addEventListener`, `XMLHttpRequest`, `Promise`, and others—to establish execution contexts called zones. Angular runs the entire application inside a single NgZone, and whenever an asynchronous operation completes within this zone, the framework schedules a change detection cycle. This architecture eliminates the need for manual change notification but introduces a performance consideration: every asynchronous event, regardless of its impact on application state, triggers a full tree traversal. Understanding this behavior is critical for diagnosing performance bottlenecks in applications with deep component hierarchies or high-frequency events.
 
-```
-Application Root Component
-│
-├─ Change Detection Cycle Trigger (Zone.js event)
-│  ├─ ApplicationRef.tick()
-│  └─ Root Component ngDoCheck()
-│
-├─ View Hierarchy Traversal (Depth-First)
-│  ├─ Component A (Default Strategy)
-│  │  ├─ Check all bindings
-│  │  ├─ Update changed DOM nodes
-│  │  ├─ Component A.1 (OnPush Strategy)
-│  │  │  └─ Skip if inputs unchanged and not marked
-│  │  └─ Component A.2 (Default Strategy)
-│  │     └─ Check all bindings
-│  │
-│  └─ Component B (Default Strategy)
-│     ├─ Check all bindings
-│     └─ Component B.1 (OnPush Strategy)
-│        └─ Skip subtree unless @Input changed
-│
-└─ Post-Check Validation (Development Mode)
-   └─ Re-run checks to detect expression changes
+```mermaid
+flowchart TD
+    Root["Application Root Component"]
+    
+    Root --> CDC["Change Detection Cycle Trigger<br/>(Zone.js event)"]
+    CDC --> Tick["ApplicationRef.tick()"]
+    CDC --> RootCheck["Root Component ngDoCheck()"]
+    
+    Root --> VHT["View Hierarchy Traversal<br/>(Depth-First)"]
+    
+    VHT --> CompA["Component A<br/>(Default Strategy)"]
+    CompA --> CompA_Check["Check all bindings"]
+    CompA --> CompA_Update["Update changed DOM nodes"]
+    CompA --> CompA1["Component A.1<br/>(OnPush Strategy)"]
+    CompA1 --> CompA1_Skip["Skip if inputs unchanged<br/>and not marked"]
+    CompA --> CompA2["Component A.2<br/>(Default Strategy)"]
+    CompA2 --> CompA2_Check["Check all bindings"]
+    
+    VHT --> CompB["Component B<br/>(Default Strategy)"]
+    CompB --> CompB_Check["Check all bindings"]
+    CompB --> CompB1["Component B.1<br/>(OnPush Strategy)"]
+    CompB1 --> CompB1_Skip["Skip subtree unless<br/>@Input changed"]
+    
+    Root --> PostCheck["Post-Check Validation<br/>(Development Mode)"]
+    PostCheck --> Rerun["Re-run checks to detect<br/>expression changes"]
 ```
 
 The dependency injection system forms the backbone of Angular's modularity, allowing components to declare constructor dependencies that the framework resolves and instantiates automatically. Providers registered at the module or component level create injector hierarchies mirroring the component tree, where child injectors inherit providers from their parents but can override them locally. This hierarchical injection model enables elegant test isolation, runtime configuration, and lazy-loaded module boundaries. Services decorated with `@Injectable({ providedIn: 'root' })` become application-wide singletons, automatically tree-shaken if unused, while component-level providers create new service instances for each component instantiation.

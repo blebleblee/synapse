@@ -108,27 +108,23 @@ Applying $(D - \lambda_0)$ repeatedly annihilates the polynomial factor degree b
 
 The solution architecture for a constant-coefficient equation is therefore a lookup from the factored characteristic polynomial to a basis of $\ker L$, as summarized schematically:
 
-```
-Characteristic polynomial p(λ)
-        │
-        ▼
-  Factor over ℂ
-        │
-  ┌─────┴──────────────────────────────────────┐
-  │                                            │
-  ▼                                            ▼
-Real roots λ_k                   Complex pairs α ± βi
-(multiplicity m_k)               (multiplicity m)
-        │                                      │
-        ▼                                      ▼
-{ x^j · e^{λ_k x} }             { x^j · e^{αx}cos(βx),
-  j = 0,...,m_k-1                 x^j · e^{αx}sin(βx) }
-                                   j = 0,...,m-1
-        │                                      │
-        └──────────────┬───────────────────────┘
-                       ▼
-           Fundamental solution set
-           (n = Σ m_k functions total)
+```mermaid
+flowchart TD
+    A["Characteristic polynomial p(λ)"]
+    B["Factor over ℂ"]
+    C["Real roots λ_k<br/>(multiplicity m_k)"]
+    D["Complex pairs α ± βi<br/>(multiplicity m)"]
+    E["{ x^j · e^(λ_k x) }<br/>j = 0,...,m_k-1"]
+    F["{ x^j · e^(αx)cos(βx),<br/>x^j · e^(αx)sin(βx) }<br/>j = 0,...,m-1"]
+    G["Fundamental solution set<br/>(n = Σ m_k functions total)"]
+    
+    A --> B
+    B --> C
+    B --> D
+    C --> E
+    D --> F
+    E --> G
+    F --> G
 ```
 
 The total count of basis elements across all roots, respecting multiplicities and conjugate pairs, always equals $n$, confirming that the constructed set spans all of $\ker L$.

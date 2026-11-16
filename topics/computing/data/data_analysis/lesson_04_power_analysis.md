@@ -110,8 +110,8 @@ graph TD
     G["Sample Size n"] --> B
     H["Effect Size δ"] --> B
     
-    style F fill:#e1f5ff
-    style B fill:#fff4e1
+    style F fill:#e1f5ff,color:#0f172a
+    style B fill:#fff4e1,color:#0f172a
 ```
 
 ### 2.3 Computational Methods
@@ -235,8 +235,8 @@ graph LR
     E -->|Feasible| G["Proceed with Study"]
     F --> C
     
-    style D fill:#c8e6c9
-    style F fill:#ffcdd2
+    style D fill:#c8e6c9,color:#0f172a
+    style F fill:#ffcdd2,color:#0f172a
 ```
 
 ## 3. Advanced Topics and Failure Modes

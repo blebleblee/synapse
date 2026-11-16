@@ -30,39 +30,24 @@ The critical architectural insight is that intelligence and processing distribut
 
 The Fog Layer, instantiated as an edge gateway installed in the facility network closet, aggregates features from hundreds of sensors, executes more sophisticated anomaly detection using Gaussian mixture models or isolation forests requiring megabytes of model state, and triggers local alarms or control actions through Modbus TCP or EtherNet/IP to programmable logic controllers. Only detected anomalies, summary statistics, and periodic health reports ascend to the Cloud Layer where they feed into long-term trend analysis, fleet-wide correlation studies, and model retraining pipelines. This tiered processing architecture ensures that a network outage does not disable the protective functions critical to preventing equipment damage while still leveraging cloud scale for analytics that improve over time.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         Cloud Layer                              │
-│  - Long-term data warehousing (petabyte scale)                  │
-│  - ML model training on GPU clusters                            │
-│  - Fleet-wide analytics and correlation                         │
-│  - Device provisioning and software updates                     │
-└────────────────┬────────────────────────────────────────────────┘
-                 │ HTTPS/MQTT over TLS (intermittent)
-                 │ Mbps aggregate, seconds latency
-┌────────────────┴────────────────────────────────────────────────┐
-│                          Fog Layer                               │
-│  - Regional aggregation (100-1000 devices)                      │
-│  - Edge analytics (anomaly detection, filtering)                │
-│  - Protocol translation (Modbus, BACnet, OPC UA)                │
-│  - Store-and-forward buffering during outages                   │
-└────────────────┬────────────────────────────────────────────────┘
-                 │ MQTT/CoAP (persistent connections)
-                 │ kbps per device, 10-100ms latency
-┌────────────────┴────────────────────────────────────────────────┐
-│                        Edge Devices                              │
-│  Device Layer:                                                   │
-│    - Sensors (I2C, SPI, ADC): accelerometers, thermocouples    │
-│    - MCU (ARM Cortex-M4): DMA, timers, FPU                     │
-│    - Radio (Thread/Zigbee): 802.15.4 PHY/MAC                   │
-│    - Power (buck converter, LDO, coin cell)                     │
-│                                                                  │
-│  Embedded Software Layer:                                        │
-│    - RTOS (FreeRTOS): task scheduling, IPC, memory pools       │
-│    - Drivers: SPI/I2C/UART/ADC with DMA                        │
-│    - Network stack: 6LoWPAN, CoAP, DTLS                        │
-│    - Application: sensor fusion, local control loops            │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Cloud["<b>Cloud Layer</b><br/>• Long-term data warehousing (petabyte scale)<br/>• ML model training on GPU clusters<br/>• Fleet-wide analytics and correlation<br/>• Device provisioning and software updates"]
+    
+    Cloud -->|"HTTPS/MQTT over TLS (intermittent)<br/>Mbps aggregate, seconds latency"| Fog
+    
+    Fog["<b>Fog Layer</b><br/>• Regional aggregation (100-1000 devices)<br/>• Edge analytics (anomaly detection, filtering)<br/>• Protocol translation (Modbus, BACnet, OPC UA)<br/>• Store-and-forward buffering during outages"]
+    
+    Fog -->|"MQTT/CoAP (persistent connections)<br/>kbps per device, 10-100ms latency"| Edge
+    
+    subgraph Edge["Edge Devices"]
+        direction TB
+        DeviceLayer["<b>Device Layer</b><br/>• Sensors (I2C, SPI, ADC): accelerometers, thermocouples<br/>• MCU (ARM Cortex-M4): DMA, timers, FPU<br/>• Radio (Thread/Zigbee): 802.15.4 PHY/MAC<br/>• Power (buck converter, LDO, coin cell)"]
+        
+        SoftwareLayer["<b>Embedded Software Layer</b><br/>• RTOS (FreeRTOS): task scheduling, IPC, memory pools<br/>• Drivers: SPI/I2C/UART/ADC with DMA<br/>• Network stack: 6LoWPAN, CoAP, DTLS<br/>• Application: sensor fusion, local control loops"]
+        
+        DeviceLayer -.-> SoftwareLayer
+    end
 ```
 
 Device capabilities taxonomy requires quantitative classification beyond vague labels like "constrained" or "powerful" because firmware developers need concrete memory budgets and cycle counts to architect systems. The IETF RFC 7228 classification scheme defines Class 0 devices possessing less than 10 KB RAM and 100 KB flash as suitable only for highly specialized, minimally-featured implementations of network protocols like CoAP over UDP with pre-shared key DTLS. These devices cannot implement full X.509 certificate chains, cannot buffer more than a few hundred bytes of application data, and must carefully manage every byte of RAM through static allocation strategies. A Nordic nRF52810 with 24 KB RAM and 192 KB flash exemplifies Class 0+, where the "+" suffix indicates slightly relaxed constraints permitting a Bluetooth Low Energy stack while still prohibiting memory-intensive operations like firmware-over-the-air updates without external flash storage.

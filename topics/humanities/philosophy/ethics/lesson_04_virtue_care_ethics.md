@@ -40,38 +40,40 @@ Proficiency represents a qualitative shift toward intuitive situational understa
 
 Expertise integrates intuitive situational perception with intuitive response selection. The expert not only sees immediately what the situation requires but also knows immediately how to respond effectively. Deliberation recedes except in genuinely novel situations or when intuitive responses meet obstacles. The expert surgeon's hands move fluidly through a procedure without conscious attention to individual movements; the master teacher adjusts her pedagogical approach in real-time as she perceives student comprehension shifting. This is not thoughtless automaticity but a form of absorbed coping in which perception, judgment, and action integrate seamlessly. The expert has internalized vast repertoires of patterns such that appropriate responses arise spontaneously from perceptual engagement with situations.
 
-```
-VIRTUE DEVELOPMENT PROGRESSION
-
-Novice
-├─ Explicit rule-following
-├─ Context-free feature recognition
-├─ Mechanical application
-└─ Limited emotional engagement
-
-Advanced Beginner  
-├─ Situational pattern recognition
-├─ Experience-based maxims
-├─ Fragmented perception
-└─ Emerging emotional investment
-
-Competent
-├─ Goal-directed planning
-├─ Hierarchical organization
-├─ Conscious choice among options
-└─ Heightened responsibility and emotional engagement
-
-Proficient
-├─ Intuitive situational understanding
-├─ Holistic perception of what matters
-├─ Automatic goal-setting
-└─ Analytical response deliberation
-
-Expert
-├─ Intuitive situational perception
-├─ Intuitive response selection  
-├─ Seamless integration of perception-judgment-action
-└─ Deliberation only in novel cases or obstacles
+```mermaid
+flowchart TD
+    Start["VIRTUE DEVELOPMENT PROGRESSION"]
+    
+    Start --> Novice
+    Start --> AdvBeg["Advanced Beginner"]
+    Start --> Competent
+    Start --> Proficient
+    Start --> Expert
+    
+    Novice --> N1["Explicit rule-following"]
+    Novice --> N2["Context-free feature recognition"]
+    Novice --> N3["Mechanical application"]
+    Novice --> N4["Limited emotional engagement"]
+    
+    AdvBeg --> AB1["Situational pattern recognition"]
+    AdvBeg --> AB2["Experience-based maxims"]
+    AdvBeg --> AB3["Fragmented perception"]
+    AdvBeg --> AB4["Emerging emotional investment"]
+    
+    Competent --> C1["Goal-directed planning"]
+    Competent --> C2["Hierarchical organization"]
+    Competent --> C3["Conscious choice among options"]
+    Competent --> C4["Heightened responsibility and emotional engagement"]
+    
+    Proficient --> P1["Intuitive situational understanding"]
+    Proficient --> P2["Holistic perception of what matters"]
+    Proficient --> P3["Automatic goal-setting"]
+    Proficient --> P4["Analytical response deliberation"]
+    
+    Expert --> E1["Intuitive situational perception"]
+    Expert --> E2["Intuitive response selection"]
+    Expert --> E3["Seamless integration of perception-judgment-action"]
+    Expert --> E4["Deliberation only in novel cases or obstacles"]
 ```
 
 The doctrine of the mean requires concrete deliberative procedures for navigating its application across domains. The mean is not discovered through theoretical calculation but through practical reasoning that weighs multiple contextual factors and adjusts for the agent's current dispositional state.
@@ -104,37 +106,70 @@ Competence requires developing the skills and capacities needed to provide effec
 
 Responsiveness attends to how the cared-for receives and experiences the care provided. This completes the care circuit by preventing care from devolving into paternalistic imposition. The caregiver attends not only to whether she has met the need as she perceives it but to whether the cared-for experiences her actions as genuinely caring. This requires ongoing communication, vulnerability to feedback, and willingness to adjust one's caring practices in light of the other's response. Responsiveness distinguishes care from control—the former remains oriented toward the good of the cared-for as they experience it, while the latter imposes the caregiver's conception of good regardless of reception.
 
-```
-CARE ETHICS PRACTICE CYCLE
+```mermaid
+flowchart TD
+    ATT["Attentiveness"]
+    RESP["Responsibility"]
+    COMP["Competence"]
+    RSPV["Responsiveness"]
 
-┌─────────────┐
-│Attentiveness│ ──── Suspend own preoccupations
-│             │      Perceive other's needs
-│             │      Resist projection & stereotype  
-└──────┬──────┘
-       │
-       ↓
-┌─────────────┐
-│Responsibility│ ─── Take up obligation to respond
-│             │      Acknowledge relationship-based duties
-│             │      Establish boundaries & limits
-└──────┬──────┘
-       │
-       ↓
-┌─────────────┐
-│ Competence  │ ──── Develop requisite skills
-│             │      Recognize domain-specific expertise
-│             │      Know one's limits
-└──────┬──────┘
-       │
-       ↓
-┌─────────────┐
-│Responsiveness│ ─── Attend to reception of care
-│             │      Invite feedback  
-│             │      Adjust practices accordingly
-└──────┬──────┘
-       │
-       └────── Iterative refinement loops back to Attentiveness
+    ATT_1(["Suspend own preoccupations"])
+    ATT_2(["Perceive other's needs"])
+    ATT_3(["Resist projection & stereotype"])
+
+    RESP_1(["Take up obligation to respond"])
+    RESP_2(["Acknowledge relationship-based duties"])
+    RESP_3(["Establish boundaries & limits"])
+
+    COMP_1(["Develop requisite skills"])
+    COMP_2(["Recognize domain-specific expertise"])
+    COMP_3(["Know one's limits"])
+
+    RSPV_1(["Attend to reception of care"])
+    RSPV_2(["Invite feedback"])
+    RSPV_3(["Adjust practices accordingly"])
+
+    ATT --> RESP
+    RESP --> COMP
+    COMP --> RSPV
+    RSPV -->|"Iterative refinement"| ATT
+
+    ATT --- ATT_1
+    ATT --- ATT_2
+    ATT --- ATT_3
+
+    RESP --- RESP_1
+    RESP --- RESP_2
+    RESP --- RESP_3
+
+    COMP --- COMP_1
+    COMP --- COMP_2
+    COMP --- COMP_3
+
+    RSPV --- RSPV_1
+    RSPV --- RSPV_2
+    RSPV --- RSPV_3
+
+    style ATT  fill:#4A90D9,stroke:#2C5F8A,color:#fff,font-weight:bold
+    style RESP fill:#5BA85A,stroke:#376336,color:#fff,font-weight:bold
+    style COMP fill:#E8A838,stroke:#9C6E1A,color:#fff,font-weight:bold
+    style RSPV fill:#9B59B6,stroke:#6C3483,color:#fff,font-weight:bold
+
+    style ATT_1  fill:#D6E8F7,stroke:#4A90D9,color:#1a1a1a
+    style ATT_2  fill:#D6E8F7,stroke:#4A90D9,color:#1a1a1a
+    style ATT_3  fill:#D6E8F7,stroke:#4A90D9,color:#1a1a1a
+
+    style RESP_1 fill:#D6EDD6,stroke:#5BA85A,color:#1a1a1a
+    style RESP_2 fill:#D6EDD6,stroke:#5BA85A,color:#1a1a1a
+    style RESP_3 fill:#D6EDD6,stroke:#5BA85A,color:#1a1a1a
+
+    style COMP_1 fill:#FCF0D6,stroke:#E8A838,color:#1a1a1a
+    style COMP_2 fill:#FCF0D6,stroke:#E8A838,color:#1a1a1a
+    style COMP_3 fill:#FCF0D6,stroke:#E8A838,color:#1a1a1a
+
+    style RSPV_1 fill:#EDD6F5,stroke:#9B59B6,color:#1a1a1a
+    style RSPV_2 fill:#EDD6F5,stroke:#9B59B6,color:#1a1a1a
+    style RSPV_3 fill:#EDD6F5,stroke:#9B59B6,color:#1a1a1a
 ```
 
 Relational autonomy provides a framework for analyzing how social conditions enable or undermine self-governance. Autonomy requires three interconnected capacities: self-knowledge, self-definition, and self-direction. Each capacity develops and operates through relationships rather than in isolation from them.

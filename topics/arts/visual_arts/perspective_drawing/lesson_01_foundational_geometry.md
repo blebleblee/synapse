@@ -26,30 +26,38 @@ The cone of vision defines the angular boundaries of comfortable, undistorted vi
 
 To construct a perspective view mechanically, you begin by establishing the picture plane as the drawing surface, marking the horizon line at the desired eye level, and determining the viewing distance. In classical descriptive geometry, you work with two views simultaneously: the plan view (looking straight down at the scene from above) and the elevation view (looking at the scene from the side). The plan view shows the position of objects relative to the picture plane and the station point in horizontal space. The elevation view shows vertical relationships and heights. By projecting lines from the station point through key points on objects in the plan view and noting where they intersect the picture plane, you determine horizontal positions in the perspective view. By projecting vertical heights from the elevation view onto the picture plane at these horizontal positions, you complete the three-dimensional projection.
 
-```
-PLAN VIEW (TOP-DOWN):
-          
-          Picture Plane (PP)
-          |
-          |
-    A-----+-----B        Object AB in space
-          |
-          |
-          |
-        [SP]              Station Point
-          
-Projection lines from SP through A and B 
-intersect PP at A' and B'.
+```mermaid
+flowchart TD
+    subgraph plan ["Plan View (Top-Down)"]
+        ObjA["A\n(Object Point A)"]
+        ObjB["B\n(Object Point B)"]
+        PP["PP\n(Picture Plane)"]
+        ProjA["A'\n(Projection of A on PP)"]
+        ProjB["B'\n(Projection of B on PP)"]
+        SP["SP\n(Station Point)"]
 
-ELEVATION VIEW (SIDE):
-          
-    A     |     
-    |     |              Height of point A
-  --+-----+---- HL       Horizon Line (Eye Level)
-    |     |
-    |  [PP] [SP]         Picture Plane & Station Point
-    
-Transfer height of A to position A' in perspective.
+        ObjA -- "projects through PP" --> ProjA
+        ObjB -- "projects through PP" --> ProjB
+        SP -- "projection line to A" --> ObjA
+        SP -- "projection line to B" --> ObjB
+        ProjA -. "lies on" .-> PP
+        ProjB -. "lies on" .-> PP
+    end
+
+    subgraph elevation ["Elevation View (Side)"]
+        EyeLevel["HL\n(Horizon Line / Eye Level)"]
+        HeightA["A\n(Height of Object Point A)"]
+        PP_elev["PP\n(Picture Plane Position)"]
+        SP_elev["SP\n(Station Point Position)"]
+        ProjA_elev["A'\n(Transferred Height in Perspective)"]
+
+        HeightA -- "height transferred horizontally" --> ProjA_elev
+        ProjA_elev -. "sits on" .-> EyeLevel
+        PP_elev -. "vertical plane" .-> EyeLevel
+        SP_elev -- "eye level aligned" --> EyeLevel
+    end
+
+    plan -- "height transfer from elevation" --> elevation
 ```
 
 In practical drawing, you rarely construct full plan and elevation views unless executing architectural or theatrical set designs. Instead, you internalize the geometric principles and use simplified methods. The most direct method for one-point perspective—where one set of parallel lines recedes to a single vanishing point—begins with placing the horizon line and marking the vanishing point anywhere along it. Vertical lines remain vertical. Horizontal lines parallel to the picture plane remain horizontal. All lines receding into depth converge at the vanishing point. To establish depth intervals, such as evenly spaced floor tiles or fence posts, you use the diagonal measuring method: draw a diagonal line through the corners of the first square or interval, and where this diagonal crosses the next receding line indicates the next interval boundary.

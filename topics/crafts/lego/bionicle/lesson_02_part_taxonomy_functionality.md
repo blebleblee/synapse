@@ -36,18 +36,57 @@ The **Inika and Mahri generations (2006–2007)** introduced molded rubber masks
 
 The **2015–2016 reboot** introduced the CCBS (Character and Creature Building System) skull/mask convention, in which the mask plugs into a 3M axle socket on a purpose-molded skull part rather than capping over a post. This is a one-way compatibility break: 2015 masks will not fit 2001–2010 heads without a bridge adapter, and 2001–2010 masks will not fit 2015 skulls directly. However, several practitioners in the MOC community have designed 3D-printable adapter rings (typically printed in PLA at 0.1 mm layer height for surface quality) that press-fit onto a classic mask's inner cavity and expose a 3M axle receptor, enabling cross-generation mask mounting.
 
-```
-KANOHI ATTACHMENT GEOMETRY — CROSS-GENERATION MATRIX
-
-Generation        Head Part         Mask Socket Type       Ball Size   Inter-Gen Mask Fit
-─────────────────────────────────────────────────────────────────────────────────────────
-2001–2003 Mata    43534 (head)      Stud + post friction   Small       Full (all Mata/Nuva)
-2003–2005 Nuva    Modified Mata     Stud + post friction   Small       Mata masks fit Nuva
-2006 Inika        50930 (head)      Widened socket, TPE    Large       No fit to Mata heads
-2007 Mahri        Modified Inika    Widened socket, ABS    Large       Inika masks fit Mahri
-2008–2010 Stars   Various           Mixed conventions      Large       Check per-part
-2015–2016 G2      Various skull     3M axle socket         Small       No fit without adapter
-─────────────────────────────────────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    title["KANOHI ATTACHMENT GEOMETRY — CROSS-GENERATION MATRIX"]
+    
+    subgraph mata["2001–2003 Mata"]
+        mata_head["Head Part: 43534"]
+        mata_socket["Socket: Stud + post friction"]
+        mata_ball["Ball Size: Small"]
+        mata_fit["Inter-Gen: Full (all Mata/Nuva)"]
+    end
+    
+    subgraph nuva["2003–2005 Nuva"]
+        nuva_head["Head Part: Modified Mata"]
+        nuva_socket["Socket: Stud + post friction"]
+        nuva_ball["Ball Size: Small"]
+        nuva_fit["Inter-Gen: Mata masks fit Nuva"]
+    end
+    
+    subgraph inika["2006 Inika"]
+        inika_head["Head Part: 50930"]
+        inika_socket["Socket: Widened socket, TPE"]
+        inika_ball["Ball Size: Large"]
+        inika_fit["Inter-Gen: No fit to Mata heads"]
+    end
+    
+    subgraph mahri["2007 Mahri"]
+        mahri_head["Head Part: Modified Inika"]
+        mahri_socket["Socket: Widened socket, ABS"]
+        mahri_ball["Ball Size: Large"]
+        mahri_fit["Inter-Gen: Inika masks fit Mahri"]
+    end
+    
+    subgraph stars["2008–2010 Stars"]
+        stars_head["Head Part: Various"]
+        stars_socket["Socket: Mixed conventions"]
+        stars_ball["Ball Size: Large"]
+        stars_fit["Inter-Gen: Check per-part"]
+    end
+    
+    subgraph g2["2015–2016 G2"]
+        g2_head["Head Part: Various skull"]
+        g2_socket["Socket: 3M axle socket"]
+        g2_ball["Ball Size: Small"]
+        g2_fit["Inter-Gen: No fit without adapter"]
+    end
+    
+    mata -.-> nuva
+    nuva -.-> inika
+    inika -.-> mahri
+    mahri -.-> stars
+    stars -.-> g2
 ```
 
 ### Armor Shells: Clip Types, Shell Back Geometry, and Coverage Logic

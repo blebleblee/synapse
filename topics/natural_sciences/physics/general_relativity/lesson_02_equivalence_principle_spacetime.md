@@ -128,43 +128,25 @@ This number is extraordinarily small — a part in $10^{15}$ — yet Pound and R
 
 To build real facility with the equivalence principle, one must move from conceptual description to geometric construction. The following diagram represents the layered structure of spacetime geometry as seen from both a global perspective and from within a locally inertial frame.
 
-```
-SPACETIME MANIFOLD  M  (globally curved)
-══════════════════════════════════════════════════════════════════
-
-   Global coordinates: x^μ = (t, x, y, z)
-   Metric tensor:      g_μν(x^λ)  — 10 independent components
-   Connection:         Γ^λ_μν      — 40 independent components
-   Curvature:          R^λ_σμν    — 20 independent components
-
-   ┌──────────────────────────────────────────────────────┐
-   │              CURVED SPACETIME (global)               │
-   │                                                      │
-   │    p₁ ~~geodesic~~ p₂                                │
-   │       \                                              │
-   │        \  tidal deviation ← R^λ_σμν                  │
-   │         p₃                                          │
-   └──────────────────────────────────────────────────────┘
-
-   ZOOM into tangent space T_p(M) at event p:
-
-   ┌──────────────────────────────────────────────────────┐
-   │         LOCALLY INERTIAL FRAME at p                  │
-   │                                                      │
-   │   Riemann normal coordinates: ξ^α                    │
-   │                                                      │
-   │   g_μν(p)         = η_μν  (Minkowski)                │
-   │   ∂_λ g_μν |_p    = 0     (vanishing 1st deriv.)     │
-   │   Γ^λ_μν  |_p     = 0     (no coord. acceleration)   │
-   │                                                      │
-   │   Special Relativity holds exactly here.             │
-   │   Tidal forces ∝ ∂²g_μν ≠ 0  → R^λ_σμν ≠ 0         │
-   └──────────────────────────────────────────────────────┘
-
-   TRANSITION RULE (EEP → General Covariance):
-   ─────────────────────────────────────────────
-   SR equation:   ∂_μ T^μν = 0
-   GR equation:   ∇_μ T^μν = ∂_μ T^μν + Γ^μ_μλ T^λν + Γ^ν_μλ T^μλ = 0
+```mermaid
+flowchart TD
+    M["<b>SPACETIME MANIFOLD M</b><br/>(globally curved)"]
+    
+    M --> coords["Global coordinates: x<sup>μ</sup> = (t, x, y, z)"]
+    M --> metric["Metric tensor: g<sub>μν</sub>(x<sup>λ</sup>)<br/>10 independent components"]
+    M --> connection["Connection: Γ<sup>λ</sup><sub>μν</sub><br/>40 independent components"]
+    M --> curvature["Curvature: R<sup>λ</sup><sub>σμν</sub><br/>20 independent components"]
+    
+    M --> curved[["<b>CURVED SPACETIME (global)</b><br/><br/>p₁ ~~geodesic~~ p₂<br/>tidal deviation ← R<sup>λ</sup><sub>σμν</sub>"]]
+    
+    curved --> zoom["ZOOM into tangent space T<sub>p</sub>(M) at event p"]
+    
+    zoom --> local[["<b>LOCALLY INERTIAL FRAME at p</b><br/><br/>Riemann normal coordinates: ξ<sup>α</sup><br/><br/>g<sub>μν</sub>(p) = η<sub>μν</sub> (Minkowski)<br/>∂<sub>λ</sub> g<sub>μν</sub> |<sub>p</sub> = 0 (vanishing 1st deriv.)<br/>Γ<sup>λ</sup><sub>μν</sub> |<sub>p</sub> = 0 (no coord. acceleration)<br/><br/>Special Relativity holds exactly here.<br/>Tidal forces ∝ ∂²g<sub>μν</sub> ≠ 0 → R<sup>λ</sup><sub>σμν</sub> ≠ 0"]]
+    
+    local --> transition["<b>TRANSITION RULE</b><br/>EEP → General Covariance"]
+    
+    transition --> sr["SR equation: ∂<sub>μ</sub> T<sup>μν</sup> = 0"]
+    transition --> gr["GR equation: ∇<sub>μ</sub> T<sup>μν</sup> = ∂<sub>μ</sub> T<sup>μν</sup> + Γ<sup>μ</sup><sub>μλ</sub> T<sup>λν</sup> + Γ<sup>ν</sup><sub>μλ</sub> T<sup>μλ</sup> = 0"]
 ```
 
 This diagram captures the two-level architecture of GR. At the local level, the EEP guarantees flat Minkowski geometry and the full machinery of special relativity. At the global level, the metric varies from point to point, and that variation — encoded in the Christoffel connection $\Gamma^\lambda_{\mu\nu}$ and ultimately in the Riemann tensor — is the physical content of gravitation.
@@ -189,43 +171,31 @@ This expression makes the identification of $g_{\mu\nu}$ as the gravitational po
 
 The following diagram traces how a photon emitted at a lower gravitational potential propagates to a receiver at higher potential, illustrating the redshift mechanism through the metric structure.
 
-```
-STATIC GRAVITATIONAL FIELD  (Schwarzschild exterior, weak-field limit)
-
-  Receiver B  (r = r_B,  Φ_B = -GM/r_B)       high potential
-  ─────────────────────────────────────────────
-       ↑
-       │   photon in transit
-       │   ν decreases as photon climbs
-       │
-       │   Along null geodesic: ds² = 0
-       │   g_00 dt² = g_rr dr²  (purely radial)
-       │
-       │   Coordinate light travel time:
-       │   dt = dr / c  × √(g_rr / |g_00|)
-       │
-       ↑
-  ─────────────────────────────────────────────
-  Emitter A  (r = r_A < r_B,  Φ_A = -GM/r_A)  low potential
-
-  Proper time at emitter:   dτ_A = √|g_00(r_A)| dt
-  Proper time at receiver:  dτ_B = √|g_00(r_B)| dt
-
-  For a crest-to-crest period of the wave:
-
-       τ_A  = 1/ν_emit
-       τ_B  = 1/ν_recv
-
-  Therefore:
-
-       ν_recv / ν_emit  =  √( |g_00(r_A)| / |g_00(r_B)| )
-
-  Weak field:  g_00(r) ≈ -(1 + 2Φ(r)/c²)
-
-       ν_recv / ν_emit  ≈  ( 1 + Φ_A/c² ) / ( 1 + Φ_B/c² )
-                        ≈  1 - (Φ_B - Φ_A)/c²   <  1
-
-  Since Φ_B > Φ_A:  ν_recv < ν_emit  → GRAVITATIONAL REDSHIFT
+```mermaid
+flowchart TD
+    title["STATIC GRAVITATIONAL FIELD<br/>(Schwarzschild exterior, weak-field limit)"]
+    
+    ReceiverB["<b>Receiver B</b><br/>r = r_B<br/>Φ_B = -GM/r_B<br/>(high potential)"]
+    
+    Transit["<b>Photon in Transit</b><br/>ν decreases as photon climbs<br/><br/>Along null geodesic: ds² = 0<br/>g₀₀ dt² = g_rr dr² (purely radial)<br/><br/>Coordinate light travel time:<br/>dt = dr / c × √(g_rr / |g₀₀|)"]
+    
+    EmitterA["<b>Emitter A</b><br/>r = r_A < r_B<br/>Φ_A = -GM/r_A<br/>(low potential)"]
+    
+    ProperTime["<b>Proper Time Relations</b><br/>At emitter: dτ_A = √|g₀₀(r_A)| dt<br/>At receiver: dτ_B = √|g₀₀(r_B)| dt<br/><br/>For crest-to-crest period:<br/>τ_A = 1/ν_emit<br/>τ_B = 1/ν_recv"]
+    
+    FreqRatio["<b>Frequency Ratio</b><br/>ν_recv / ν_emit = √(|g₀₀(r_A)| / |g₀₀(r_B)|)"]
+    
+    WeakField["<b>Weak Field Approximation</b><br/>g₀₀(r) ≈ -(1 + 2Φ(r)/c²)<br/><br/>ν_recv / ν_emit ≈ (1 + Φ_A/c²) / (1 + Φ_B/c²)<br/>≈ 1 - (Φ_B - Φ_A)/c² < 1"]
+    
+    Result["<b>GRAVITATIONAL REDSHIFT</b><br/>Since Φ_B > Φ_A:<br/>ν_recv < ν_emit"]
+    
+    EmitterA -->|"photon climbs<br/>gravitational field"| Transit
+    Transit --> ReceiverB
+    EmitterA -.->|"proper time"| ProperTime
+    ReceiverB -.->|"proper time"| ProperTime
+    ProperTime --> FreqRatio
+    FreqRatio --> WeakField
+    WeakField --> Result
 ```
 
 This signal-path analysis reveals that gravitational redshift is not an energy loss in the classical sense. The photon does not "slow down" or lose energy to some potential in a Newtonian way. Rather, the metric structure causes proper time intervals at different locations in a gravitational field to be related differently to coordinate time, and this differential time flow directly modulates the received frequency.

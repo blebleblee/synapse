@@ -68,26 +68,32 @@ When `tf.function` traces a Python callable, it populates a `FuncGraph` with `tf
 
 The following ASCII diagram represents a single-layer forward pass through a linear transformation followed by softmax:
 
-```
- [Input Placeholder]       [Weight Variable]    [Bias Variable]
-       x: (B, 784)              W: (784, 128)       b: (128,)
-           |                         |                   |
-           +-----------> MatMul <----+                   |
-                           |                             |
-                           +-----------> BiasAdd <-------+
-                                            |
-                                            v
-                                          ReLU
-                                            |
-                                   [Weight2: (128,10)]  [Bias2: (10,)]
-                                            |                |
-                                            +---> MatMul <---+
-                                                     |
-                                                   Softmax
-                                                     |
-                                             [Loss: SparseCategoricalCE]
-                                                     |
-                                             scalar loss tensor
+```mermaid
+flowchart TD
+    X["Input Placeholder\nx: (B, 784)"]
+    W1["Weight Variable\nW: (784, 128)"]
+    B1["Bias Variable\nb: (128,)"]
+    MM1["MatMul"]
+    BA1["BiasAdd"]
+    RELU["ReLU"]
+    W2["Weight Variable\nW2: (128, 10)"]
+    B2["Bias Variable\nb2: (10,)"]
+    MM2["MatMul"]
+    SOFTMAX["Softmax"]
+    LOSS["Loss: SparseCategoricalCE"]
+    OUT["scalar loss tensor"]
+
+    X --> MM1
+    W1 --> MM1
+    MM1 --> BA1
+    B1 --> BA1
+    BA1 --> RELU
+    RELU --> MM2
+    W2 --> MM2
+    B2 --> MM2
+    MM2 --> SOFTMAX
+    SOFTMAX --> LOSS
+    LOSS --> OUT
 ```
 
 Each arrow in this diagram is a `tf.Tensor` edge — a typed, shaped buffer that is allocated exactly once per execution by the runtime memory allocator and freed (returned to the pool) as soon as the last downstream consumer of that tensor has completed. This is the **BFS-ordered tensor lifetime management** that the runtime uses to minimize peak device memory usage during a forward pass.

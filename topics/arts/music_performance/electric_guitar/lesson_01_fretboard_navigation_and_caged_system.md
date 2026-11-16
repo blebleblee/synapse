@@ -20,13 +20,25 @@ Six strings, 22–24 frets, two hands that must work independently before they w
 
 ### The Six Strings — Names, Notes, and Memory Hooks
 
-```
-String 6 (thickest, lowest) ── E2  ── "Eddie"
-String 5                     ── A2  ── "Ate"
-String 4                     ── D3  ── "Dynamite"
-String 3                     ── G3  ── "Good"
-String 2                     ── B3  ── "Bye"
-String 1 (thinnest, highest) ── E4  ── "Eddie" (octave)
+```mermaid
+flowchart LR
+    String6["String 6<br/>(thickest, lowest)"] --> E2["E2"]
+    E2 --> Eddie1["Eddie"]
+    
+    String5["String 5"] --> A2["A2"]
+    A2 --> Ate["Ate"]
+    
+    String4["String 4"] --> D3["D3"]
+    D3 --> Dynamite["Dynamite"]
+    
+    String3["String 3"] --> G3["G3"]
+    G3 --> Good["Good"]
+    
+    String2["String 2"] --> B3["B3"]
+    B3 --> Bye["Bye"]
+    
+    String1["String 1<br/>(thinnest, highest)"] --> E4["E4"]
+    E4 --> Eddie2["Eddie<br/>(octave)"]
 ```
 
 Memory sentence: **E**ddie **A**te **D**ynamite, **G**ood **B**ye **E**ddie.
@@ -44,15 +56,39 @@ Moving one fret up raises pitch by a semitone. Moving to the adjacent thicker st
 
 **Full note map — frets 0 through 12:**
 
-```
-String │  0    1    2    3    4    5    6    7    8    9   10   11   12
-───────┼────────────────────────────────────────────────────────────────
-  e(1) │  E4   F    F#   G    G#   A    A#   B    C    C#   D    D#   E5
-  B(2) │  B3   C    C#   D    D#   E    F    F#   G    G#   A    A#   B4
-  G(3) │  G3   G#   A    A#   B    C    C#   D    D#   E    F    F#   G4
-  D(4) │  D3   D#   E    F    F#   G    G#   A    A#   B    C    C#   D4
-  A(5) │  A2   A#   B    C    C#   D    D#   E    F    F#   G    G#   A3
-  E(6) │  E2   F    F#   G    G#   A    A#   B    C    C#   D    D#   E3
+```mermaid
+flowchart LR
+    subgraph strings ["Guitar Strings"]
+        e1["e(1)"]
+        B2["B(2)"]
+        G3["G(3)"]
+        D4["D(4)"]
+        A5["A(5)"]
+        E6["E(6)"]
+    end
+    
+    subgraph frets ["Fret Positions: 0-12"]
+        f0["0"]
+        f1["1"]
+        f2["2"]
+        f3["3"]
+        f4["4"]
+        f5["5"]
+        f6["6"]
+        f7["7"]
+        f8["8"]
+        f9["9"]
+        f10["10"]
+        f11["11"]
+        f12["12"]
+    end
+    
+    e1 -->|"E4, F, F#, G, G#, A, A#, B, C, C#, D, D#, E5"| f0
+    B2 -->|"B3, C, C#, D, D#, E, F, F#, G, G#, A, A#, B4"| f0
+    G3 -->|"G3, G#, A, A#, B, C, C#, D, D#, E, F, F#, G4"| f0
+    D4 -->|"D3, D#, E, F, F#, G, G#, A, A#, B, C, C#, D4"| f0
+    A5 -->|"A2, A#, B, C, C#, D, D#, E, F, F#, G, G#, A3"| f0
+    E6 -->|"E2, F, F#, G, G#, A, A#, B, C, C#, D, D#, E3"| f0
 ```
 
 Fret 12 duplicates fret 0, one octave higher — every shape, pattern, and fingering repeats exactly 12 frets up the neck.
@@ -81,33 +117,190 @@ Fingers 3 and 4 share a tendon branch from the extensor digitorum communis, whic
 
 **Exercise 1 — Spider Crawl (60 BPM → 100 BPM):**
 
-```
-e|──5──6──7──8──|
-B|──5──6──7──8──|
-G|──5──6──7──8──|
-D|──5──6──7──8──|
-A|──5──6──7──8──|
-E|──5──6──7──8──|
+```mermaid
+flowchart LR
+    subgraph e_string ["e string"]
+        e5["5"]
+        e6["6"]
+        e7["7"]
+        e8["8"]
+        e5 --> e6 --> e7 --> e8
+    end
+    
+    subgraph B_string ["B string"]
+        B5["5"]
+        B6["6"]
+        B7["7"]
+        B8["8"]
+        B5 --> B6 --> B7 --> B8
+    end
+    
+    subgraph G_string ["G string"]
+        G5["5"]
+        G6["6"]
+        G7["7"]
+        G8["8"]
+        G5 --> G6 --> G7 --> G8
+    end
+    
+    subgraph D_string ["D string"]
+        D5["5"]
+        D6["6"]
+        D7["7"]
+        D8["8"]
+        D5 --> D6 --> D7 --> D8
+    end
+    
+    subgraph A_string ["A string"]
+        A5["5"]
+        A6["6"]
+        A7["7"]
+        A8["8"]
+        A5 --> A6 --> A7 --> A8
+    end
+    
+    subgraph E_string ["E string"]
+        E5["5"]
+        E6["6"]
+        E7["7"]
+        E8["8"]
+        E5 --> E6 --> E7 --> E8
+    end
 ```
 
 Fingers 1–2–3–4, one per fret, on every string pair, then move the whole pattern up and down the neck. No finger lifts until its next note demands it. Every note equal in volume and clarity.
 
 **Exercise 2 — Ring/Pinky isolation (60 BPM):**
 
-```
-e|──7──────9──|  (fingers 3 then 4; fingers 1 and 2 stay down on frets 5 and 6)
-B|──7──────9──|
-G|──7──────9──|
+```mermaid
+flowchart LR
+    Start["Frets 5 & 6\nFingers 1 & 2\n(held down)"]
+
+    subgraph fret7 ["Fret 7 — Finger 3"]
+        E7["e | 7"]
+        B7["B | 7"]
+        G7["G | 7"]
+    end
+
+    subgraph fret9 ["Fret 9 — Finger 4"]
+        E9["e | 9"]
+        B9["B | 9"]
+        G9["G | 9"]
+    end
+
+    Start --> fret7
+    E7 --> E9
+    B7 --> B9
+    G7 --> G9
 ```
 
 Fingers 1 and 2 remain planted on frets 5 and 6 throughout. Only 3 and 4 move. This isolates the exact tendon slip that frees the pinky from the ring finger. Five minutes daily for two weeks produces measurable improvement.
 
 **Exercise 3 — Hammer-on/Pull-off strength (70 BPM):**
 
-```
-e|──5h7──7p5──| (repeat 8 times per string)
-B|──5h7──7p5──|
-G|──5h7──7p5──|
+```mermaid
+flowchart LR
+    subgraph e_string ["e string"]
+        e1["5"] --> e2["h7"]
+        e2 --> e3["7"]
+        e3 --> e4["p5"]
+        e4 --> e5["5"]
+        e5 --> e6["h7"]
+        e6 --> e7["7"]
+        e7 --> e8["p5"]
+        e8 --> e9["5"]
+        e9 --> e10["h7"]
+        e10 --> e11["7"]
+        e11 --> e12["p5"]
+        e12 --> e13["5"]
+        e13 --> e14["h7"]
+        e14 --> e15["7"]
+        e15 --> e16["p5"]
+        e16 --> e17["5"]
+        e17 --> e18["h7"]
+        e18 --> e19["7"]
+        e19 --> e20["p5"]
+        e20 --> e21["5"]
+        e21 --> e22["h7"]
+        e22 --> e23["7"]
+        e23 --> e24["p5"]
+        e24 --> e25["5"]
+        e25 --> e26["h7"]
+        e26 --> e27["7"]
+        e27 --> e28["p5"]
+        e28 --> e29["5"]
+        e29 --> e30["h7"]
+        e30 --> e31["7"]
+        e31 --> e32["p5"]
+    end
+    
+    subgraph B_string ["B string"]
+        B1["5"] --> B2["h7"]
+        B2 --> B3["7"]
+        B3 --> B4["p5"]
+        B4 --> B5["5"]
+        B5 --> B6["h7"]
+        B6 --> B7["7"]
+        B7 --> B8["p5"]
+        B8 --> B9["5"]
+        B9 --> B10["h7"]
+        B10 --> B11["7"]
+        B11 --> B12["p5"]
+        B12 --> B13["5"]
+        B13 --> B14["h7"]
+        B14 --> B15["7"]
+        B15 --> B16["p5"]
+        B16 --> B17["5"]
+        B17 --> B18["h7"]
+        B18 --> B19["7"]
+        B19 --> B20["p5"]
+        B20 --> B21["5"]
+        B21 --> B22["h7"]
+        B22 --> B23["7"]
+        B23 --> B24["p5"]
+        B24 --> B25["5"]
+        B25 --> B26["h7"]
+        B26 --> B27["7"]
+        B27 --> B28["p5"]
+        B28 --> B29["5"]
+        B29 --> B30["h7"]
+        B30 --> B31["7"]
+        B31 --> B32["p5"]
+    end
+    
+    subgraph G_string ["G string"]
+        G1["5"] --> G2["h7"]
+        G2 --> G3["7"]
+        G3 --> G4["p5"]
+        G4 --> G5["5"]
+        G5 --> G6["h7"]
+        G6 --> G7["7"]
+        G7 --> G8["p5"]
+        G8 --> G9["5"]
+        G9 --> G10["h7"]
+        G10 --> G11["7"]
+        G11 --> G12["p5"]
+        G12 --> G13["5"]
+        G13 --> G14["h7"]
+        G14 --> G15["7"]
+        G15 --> G16["p5"]
+        G16 --> G17["5"]
+        G17 --> G18["h7"]
+        G18 --> G19["7"]
+        G19 --> G20["p5"]
+        G20 --> G21["5"]
+        G21 --> G22["h7"]
+        G22 --> G23["7"]
+        G23 --> G24["p5"]
+        G24 --> G25["5"]
+        G25 --> G26["h7"]
+        G26 --> G27["7"]
+        G27 --> G28["p5"]
+        G28 --> G29["5"]
+        G29 --> G30["h7"]
+        G30 --> G31["7"]
+        G31 --> G32["p5"]
+    end
 ```
 
 Hammer-ons must sound loud enough without a pick stroke. Pull-offs need a slight sideways flick rather than a straight lift — the sideways motion is what plucks the lower note.
@@ -133,10 +326,16 @@ Hammer-ons must sound loud enough without a pick stroke. Pull-offs need a slight
 
 **Alternate picking drill (60 BPM → 120 BPM):**
 
-```
-e|──5─6─7─8──8─7─6─5──| (down-up-down-up throughout)
-B|──5─6─7─8──8─7─6─5──|
-(repeat across all strings)
+```mermaid
+flowchart TD
+    e["String e: 5-6-7-8-8-7-6-5"]
+    B["String B: 5-6-7-8-8-7-6-5"]
+    
+    e -->|"pattern repeats"| B
+    B -->|"across all strings"| e
+    
+    style e fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style B fill:#f9f9f9,stroke:#333,stroke-width:2px
 ```
 
 One note per click. Add 5 BPM only when the current tempo feels effortless.
@@ -354,57 +553,176 @@ The offsets (+2, +3, +2, +2, +3) sum to 12 — one octave. The two larger jumps 
 ### The Five Shapes with Scale Degrees Marked
 
 **C shape (key of C, frets 0–3):** R=C, 3=E, 5=G
-```
-e |──0──|──1──|─────|──3──|
-B |─────|──1──|─────|──3──|
-G |─────|─────|──2──|─────|
-D |─────|─────|──2──|──3──|
-A |─────|─────|─────|──3──R
-E |─────|─────|─────|─────|
+```mermaid
+flowchart LR
+    e["e"]
+    B["B"]
+    G["G"]
+    D["D"]
+    A["A"]
+    E["E"]
+    
+    node0["0"]
+    node1["1"]
+    node2["2"]
+    node3["3"]
+    R["R"]
+    
+    e --> node0
+    e --> node1
+    e --> node3
+    
+    B --> node1
+    B --> node3
+    
+    G --> node2
+    
+    D --> node2
+    D --> node3
+    
+    A --> node3
+    A --> R
 ```
 
 **A shape (key of C, frets 3–5):** R=C on A string, fret 3
-```
-e |─────|─────|──5──|
-B |──1──|─────|──5──|
-G |──1──|──2──|─────|
-D |──1──|──2──|─────|
-A |─────|─────|──5──R
-E |─────|─────|─────|
-  Fret:  3    4    5
+```mermaid
+flowchart LR
+    subgraph fret3 ["Fret 3"]
+        B3["B – 1"]
+        G3["G – 1"]
+        D3["D – 1"]
+    end
+
+    subgraph fret4 ["Fret 4"]
+        G4["G – 2"]
+        D4["D – 2"]
+    end
+
+    subgraph fret5 ["Fret 5"]
+        e5["e – 5"]
+        B5["B – 5"]
+        A5["A – 5 (Root)"]
+    end
+
+    B3 --> B5
+    G3 --> G4
+    D3 --> D4
 ```
 
 **G shape (key of C, frets 5–8):** R=C on low E, fret 8
-```
-e |──5──|─────|──7──|──8──|
-B |──5──|─────|──7──|──8──|
-G |──5──|─────|─────|──7──|
-D |──5──|─────|──7──|─────|
-A |──5──|─────|──7──|─────|
-E |─────|─────|──7──|──8──R
-  Fret:  5    6    7    8
+```mermaid
+flowchart LR
+    subgraph strings ["Guitar Strings"]
+        eS["e (high)"]
+        BS["B"]
+        GS["G"]
+        DS["D"]
+        AS["A"]
+        ES["E (low)"]
+    end
+
+    subgraph fret5 ["Fret 5"]
+        e5["e • 5"]
+        B5["B • 5"]
+        G5["G • 5"]
+        D5["D • 5"]
+        A5["A • 5"]
+    end
+
+    subgraph fret7 ["Fret 7"]
+        e7["e • 7"]
+        B7["B • 7"]
+        G7["G • 7"]
+        D7["D • 7"]
+        A7["A • 7"]
+        E7["E • 7"]
+    end
+
+    subgraph fret8 ["Fret 8"]
+        e8["e • 8"]
+        B8["B • 8"]
+        G8["G • 8"]
+        ER["E • 8 (Root)"]
+    end
+
+    eS --> e5 --> e7 --> e8
+    BS --> B5 --> B7 --> B8
+    GS --> G5 --> G7 --> G8
+    DS --> D5 --> D7
+    AS --> A5 --> A7
+    ES --> E7 --> ER
 ```
 
 **E shape (key of C, frets 7–10):** R=C on low E, fret 8
-```
-e |──7──|──8──|─────|──10─|
-B |──8──|─────|──10─|─────|
-G |──7──|──9──|─────|─────|
-D |──7──|─────|──9──|──10─|
-A |──7──|──8──|─────|──10─|
-E |──8──R─────|──10─|─────|
-  Fret:  7    8    9   10
+```mermaid
+flowchart TD
+    subgraph fret7["Fret 7"]
+        e7["e"]
+        B7["B"]
+        G7["G"]
+        D7["D"]
+        A7["A"]
+    end
+    
+    subgraph fret8["Fret 8"]
+        e8["e"]
+        B8["B"]
+        E8["E (Root)"]
+        A8["A"]
+    end
+    
+    subgraph fret9["Fret 9"]
+        G9["G"]
+        D9["D"]
+    end
+    
+    subgraph fret10["Fret 10"]
+        e10["e"]
+        B10["B"]
+        D10["D"]
+        A10["A"]
+        E10["E"]
+    end
+    
+    e7 --> e8 --> e10
+    B7 --> B8 --> B10
+    G7 --> G9
+    D7 --> D9 --> D10
+    A7 --> A8 --> A10
+    E8 --> E10
 ```
 
 **D shape (key of C, frets 9–12):** R=C on D string, fret 10 (octave R on B string fret 12)
-```
-e |──9──|─────|──12─|
-B |─────|──10─|──12─R(octave)
-G |──9──|─────|──12─|
-D |─────|──10─|──12─R
-A |─────|─────|─────|
-E |─────|─────|─────|
-  Fret:  9   10   12
+```mermaid
+flowchart TD
+    subgraph strings["Guitar Strings"]
+        e["e"]
+        B["B"]
+        G["G"]
+        D["D"]
+        A["A"]
+        E["E"]
+    end
+    
+    subgraph frets["Fret Positions"]
+        fret9["Fret 9"]
+        fret10["Fret 10"]
+        fret12["Fret 12"]
+    end
+    
+    e -->|9| fret9
+    e -->|12| fret12
+    
+    B -->|10| fret10
+    B -->|12| fret12
+    
+    G -->|9| fret9
+    G -->|12| fret12
+    
+    D -->|10| fret10
+    D -->|12| fret12
+    
+    fret12 --> octave["R octave"]
 ```
 
 ### CAGED Practice Protocol
@@ -430,14 +748,32 @@ Five notes, two notes per string — the most versatile lead guitar tool on the 
 Formula: Root – b3 – 4 – 5 – b7
 
 **A minor pentatonic, position 1 (frets 5–8):**
-```
-e |──5──────8──|
-B |──5──────8──|
-G |──5──────7──|
-D |──5──────7──|
-A |──5──────7──|
-E |──5──────8──|
-   Fret: 5      8
+```mermaid
+flowchart LR
+    fret5["Fret 5"]
+    fret8["Fret 8"]
+    
+    subgraph strings ["Guitar Strings"]
+        e["e"]
+        B["B"]
+        G["G"]
+        D["D"]
+        A["A"]
+        E["E"]
+    end
+    
+    e -->|5| fret5
+    e -->|8| fret8
+    B -->|5| fret5
+    B -->|8| fret8
+    G -->|5| fret5
+    G -->|7| fret8
+    D -->|5| fret5
+    D -->|7| fret8
+    A -->|5| fret5
+    A -->|7| fret8
+    E -->|5| fret5
+    E -->|8| fret8
 ```
 
 Finger 1 on all lower-fret notes, finger 4 (or 3) on all higher-fret notes — two fingers per string locks the position in cleanly.
@@ -446,26 +782,62 @@ Finger 1 on all lower-fret notes, finger 4 (or 3) on all higher-fret notes — t
 
 The five positions map directly onto the five CAGED shapes — not a coincidence, since the pentatonic scale is the skeleton of the major/minor chord. Know CAGED and you already know where the five pentatonic boxes live.
 
-```
-Position 1 (A shape) — frets 5-8:
-e|──5──────8──|   B|──5──────8──|   G|──5──────7──|
-D|──5──────7──|   A|──5──────7──|   E|──5──────8──|
-
-Position 2 (G shape) — frets 7-10:
-e|──8──────10─|   B|──8──────10─|   G|──7──────9──|
-D|──7──────10─|   A|──7──────10─|   E|──8──────10─|
-
-Position 3 (E shape) — frets 10-12:
-e|──10─────12─|   B|──10─────12─|   G|──9──────12─|
-D|──10─────12─|   A|──10─────12─|   E|──10─────12─|
-
-Position 4 (D shape) — frets 12-15:
-e|──12─────15─|   B|──13─────15─|   G|──12─────14─|
-D|──12─────14─|   A|──12─────14─|   E|──12─────15─|
-
-Position 5 (C shape) — frets 2-5 (or 14-17):
-e|──2──────5──|   B|──1──────3──|   G|──2──────4──|
-D|──2──────5──|   A|──2──────5──|   E|──2──────5──|
+```mermaid
+flowchart TD
+    subgraph pos1 ["Position 1 (A shape) — frets 5-8"]
+        direction LR
+        e1["e: 5────8"]
+        B1["B: 5────8"]
+        G1["G: 5────7"]
+        D1["D: 5────7"]
+        A1["A: 5────7"]
+        E1["E: 5────8"]
+    end
+    
+    subgraph pos2 ["Position 2 (G shape) — frets 7-10"]
+        direction LR
+        e2["e: 8────10"]
+        B2["B: 8────10"]
+        G2["G: 7────9"]
+        D2["D: 7────10"]
+        A2["A: 7────10"]
+        E2["E: 8────10"]
+    end
+    
+    subgraph pos3 ["Position 3 (E shape) — frets 10-12"]
+        direction LR
+        e3["e: 10────12"]
+        B3["B: 10────12"]
+        G3["G: 9────12"]
+        D3["D: 10────12"]
+        A3["A: 10────12"]
+        E3["E: 10────12"]
+    end
+    
+    subgraph pos4 ["Position 4 (D shape) — frets 12-15"]
+        direction LR
+        e4["e: 12────15"]
+        B4["B: 13────15"]
+        G4["G: 12────14"]
+        D4["D: 12────14"]
+        A4["A: 12────14"]
+        E4["E: 12────15"]
+    end
+    
+    subgraph pos5 ["Position 5 (C shape) — frets 2-5 (or 14-17)"]
+        direction LR
+        e5["e: 2────5"]
+        B5["B: 1────3"]
+        G5["G: 2────4"]
+        D5["D: 2────5"]
+        A5["A: 2────5"]
+        E5["E: 2────5"]
+    end
+    
+    pos1 --> pos2
+    pos2 --> pos3
+    pos3 --> pos4
+    pos4 --> pos5
 ```
 
 ### The Blues Scale — Adding the b5
@@ -475,13 +847,21 @@ Add the flattened fifth (b5), the "blue note," to the minor pentatonic.
 A blues scale: A – C – D – D# – E – G
 
 **Position 1 of A blues scale (frets 5–8):**
-```
-e |──5──────8──|
-B |──5──────8──|
-G |──5──────7──|
-D |──5──6───7──|   ← fret 6 = D# (the blue note)
-A |──5──────7──|
-E |──5──────8──|
+```mermaid
+flowchart TD
+    subgraph fretboard["Guitar Fretboard - Blues Scale with Blue Note"]
+        e1["e |──5──────8──|"]
+        B1["B |──5──────8──|"]
+        G1["G |──5──────7──|"]
+        D1["D |──5──6───7──|"]
+        A1["A |──5──────7──|"]
+        E1["E |──5──────8──|"]
+        
+        note["fret 6 on D string = D# (blue note)"]
+        
+        e1 --> B1 --> G1 --> D1 --> A1 --> E1
+        D1 -.-> note
+    end
 ```
 
 The blue note is a passing tone, not a destination — bend through it, slide through it, or hit it and resolve immediately up or down.
@@ -499,15 +879,22 @@ A bend raises pitch by pushing the string toward the ceiling (strings 1–3) or 
 **Verification drill:** Fret the target note (two frets up) first to hear it, then return and bend up to match. If the bend lands on that pitch, it's in tune; if not, adjust the wrist rotation and try again.
 
 **Classic bend positions (A minor pentatonic, position 1):**
-```
-e |──5──────8──|
-B |──5──8b──8──|   ← fret 8 bend = whole step, matches fret 10 pitch
-G |──5──7b──7──|   ← fret 7 bend = whole step, matches fret 9 pitch
-D |──5──7───7──|
-A |──5──7───7──|
-E |──5──────8──|
-
-"b" = whole-step bend
+```mermaid
+flowchart TD
+    subgraph fretboard["Guitar Fretboard - Bend Notation"]
+        e1["e |──5──────8──|"]
+        B1["B |──5──8b──8──| ← fret 8 bend = whole step, matches fret 10 pitch"]
+        G1["G |──5──7b──7──| ← fret 7 bend = whole step, matches fret 9 pitch"]
+        D1["D |──5──7───7──|"]
+        A1["A |──5──7───7──|"]
+        E1["E |──5──────8──|"]
+        
+        e1 --> B1 --> G1 --> D1 --> A1 --> E1
+    end
+    
+    legend["b = whole-step bend"]
+    
+    fretboard --> legend
 ```
 
 ### Lead Guitar Practice Structure (Daily 20 Minutes)
@@ -528,36 +915,69 @@ E |──5──────8──|
 A power chord contains only two pitch classes: root and perfect fifth. Neither major nor minor, which makes it universally compatible with both.
 
 **E5 power chord:**
-```
-E |──0──|
-A |──2──|   ← finger 1
-D |──2──|   ← finger 3 (or barre with finger 1's tip)
-G |──x──| (muted with finger 1's tip)
-B |──x──|
-e |──x──|
+```mermaid
+flowchart TD
+    E["E string: fret 0 (open)"]
+    A["A string: fret 2<br/>← finger 1"]
+    D["D string: fret 2<br/>← finger 3 (or barre with finger 1's tip)"]
+    G["G string: muted ✕<br/>(muted with finger 1's tip)"]
+    B["B string: muted ✕"]
+    e["e string: muted ✕"]
+    
+    E
+    A
+    D
+    G
+    B
+    e
 ```
 
 **A5 power chord:**
-```
-E |──x──|
-A |──0──|
-D |──2──|   ← finger 1
-G |──2──|   ← finger 3
-B |──x──|
-e |──x──|
+```mermaid
+flowchart TD
+    E["E string"]
+    A["A string"]
+    D["D string"]
+    G["G string"]
+    B["B string"]
+    e["e string"]
+    
+    E ---|"x (muted)"|E
+    A ---|"0 (open)"|A
+    D ---|"2 (finger 1)"|D
+    G ---|"2 (finger 3)"|G
+    B ---|"x (muted)"|B
+    e ---|"x (muted)"|e
 ```
 
 The same two-finger root+fifth shape moves freely on strings 6–5 or 5–4. Root name = note on the lower string of the pair.
 
 **Power chord palm-muted rhythm pattern — 120 BPM:**
-```
-E5 on string 6, fret 0
-
-Beat: 1  +  2  +  3  +  4  +
-      ↓  ↓  ↓  ↑  ↓  ↓  ↓  ↑
-      PM PM PM PM ── PM PM ──
-
-PM = palm muted, ── = open (lift palm slightly)
+```mermaid
+flowchart LR
+    A["E5 String 6<br/>Fret 0"]
+    
+    subgraph beat ["Beat Pattern: 1 + 2 + 3 + 4 +"]
+        B1["Beat 1<br/>↓<br/>PM"]
+        B2["+ <br/>↓<br/>PM"]
+        B3["2<br/>↓<br/>PM"]
+        B4["+ <br/>↑<br/>PM"]
+        B5["3<br/>↓<br/>──"]
+        B6["+ <br/>↓<br/>PM"]
+        B7["4<br/>↓<br/>PM"]
+        B8["+ <br/>↑<br/>──"]
+    end
+    
+    A --> B1 --> B2 --> B3 --> B4 --> B5 --> B6 --> B7 --> B8
+    
+    style B1 fill:#e1f5ff
+    style B2 fill:#e1f5ff
+    style B3 fill:#e1f5ff
+    style B4 fill:#e1f5ff
+    style B5 fill:#fff3e0
+    style B6 fill:#e1f5ff
+    style B7 fill:#e1f5ff
+    style B8 fill:#fff3e0
 ```
 
 ### Extended and Suspended Chord Voicings
@@ -571,25 +991,27 @@ Dsus4: move finger 2 from e-string fret 2 to e-string fret 3 (adds 4th)
 Alternating these with D major is a core sound of acoustic and clean electric rhythm playing.
 
 **Gadd9 (320030 or 320033):**
-```
-e |──3──|   ← optional, finger 4
-B |──3──|   ← optional, finger 3
-G |──0──|
-D |──0──|
-A |──2──|   ← finger 1
-E |──3──|   ← finger 2
+```mermaid
+flowchart TD
+    e["e string |──3──| (optional, finger 4)"]
+    B["B string |──3──| (optional, finger 3)"]
+    G["G string |──0──|"]
+    D["D string |──0──|"]
+    A["A string |──2──| (finger 1)"]
+    E["E string |──3──| (finger 2)"]
 ```
 
 Add9 avoids the suspended 4th — it colors the chord without removing the third, keeping major quality while sounding open and contemporary.
 
 **A7 (x02020):**
-```
-e |──0──|
-B |──2──|   ← finger 2
-G |──0──|
-D |──2──|   ← finger 1
-A |──0──|
-E |──x──|
+```mermaid
+flowchart TD
+    e["e string: open"]
+    B["B string: fret 2 (finger 2)"]
+    G["G string: open"]
+    D["D string: fret 2 (finger 1)"]
+    A["A string: open"]
+    E["E string: muted"]
 ```
 
 The A7 → D7 alternation covers a large share of blues and funk rhythm vocabulary.
@@ -767,23 +1189,39 @@ Vibrato is pitch oscillation that sustains and colors a note expressively — id
 Legato phrasing plays fast lines with minimal picking effort, at the cost of each slurred note being slightly quieter unless you apply deliberate extra force.
 
 **Legato scale run (A minor pentatonic, position 1):**
-```
-e |──5h8────────────────|
-B |──5h8────────────────|
-G |──5h7────────────────|
-D |──5h7────────────────|
-A |──5h7────────────────|
-E |──5h8────────────────|
-
-Ascending: pick first note per string, hammer the second.
-Descending: pick top note, pull off to the lower.
-
-Speed target: 80 BPM (16th notes) → 110 BPM → 140 BPM
+```mermaid
+flowchart TD
+    subgraph strings["Guitar Strings (Top to Bottom)"]
+        e["e |──5h8────────────────|"]
+        B["B |──5h8────────────────|"]
+        G["G |──5h7────────────────|"]
+        D["D |──5h7────────────────|"]
+        A["A |──5h7────────────────|"]
+        E["E |──5h8────────────────|"]
+    end
+    
+    subgraph technique["Technique"]
+        asc["Ascending: pick first note per string,<br/>hammer the second"]
+        desc["Descending: pick top note,<br/>pull off to the lower"]
+    end
+    
+    subgraph tempo["Speed Target"]
+        bpm1["80 BPM (16th notes)"]
+        bpm2["110 BPM"]
+        bpm3["140 BPM"]
+        bpm1 --> bpm2 --> bpm3
+    end
+    
+    strings --> technique
+    technique --> tempo
 ```
 
 **Trill exercise (independence and strength):**
-```
-B |──5h7p5h7p5──| (continuous trill, 1 minute per finger pair, fingers 1 and 3)
+```mermaid
+flowchart LR
+    B["B"]
+    trill["5h7p5h7p5<br/>(continuous trill, 1 minute per finger pair, fingers 1 and 3)"]
+    B --- trill --- B
 ```
 
 ### Sliding — Smooth Position Shifts
@@ -795,10 +1233,14 @@ A slide keeps the finger in contact with the string while shifting position, ret
 - **Approach slide (grace slide):** no defined starting pitch — start below the target and slide up quickly for a scooping, vocal quality.
 
 **Connecting pentatonic positions 1 and 2 via slide (G string):**
-```
-|──5──7──────9──|
-     ↑  slide ↑
-Finger 3 at fret 7, slide to fret 9 — now in position 2
+```mermaid
+flowchart LR
+    F5["Fret 5"]
+    F7["Fret 7\n(Finger 3 — start)"]
+    F9["Fret 9\n(Slide destination\nPosition 2)"]
+
+    F5 --> F7
+    F7 -->|"slide →"| F9
 ```
 
 ### Natural and Artificial Harmonics

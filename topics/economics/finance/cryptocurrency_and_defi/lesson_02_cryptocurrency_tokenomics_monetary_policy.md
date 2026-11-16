@@ -58,22 +58,20 @@ This is not an arbitrary number. It is the closed-form sum of a geometric series
 
 Mining economics is best understood as a commodity industry with endogenous cost of production. The key insight — which professional analysts frequently underweight — is that the difficulty adjustment algorithm is a negative feedback loop that sets the network's marginal cost of production in real time.
 
-```
-Block Time Target (10 min)
-        │
-        ▼
-  ┌──────────────┐     Too fast (< 10 min)
-  │  Actual Mean │ ────────────────────────► Difficulty Increases
-  │  Block Time  │
-  └──────────────┘     Too slow (> 10 min)
-        │       └────────────────────────► Difficulty Decreases
-        ▼
-  Miner Profitability
-  = Block Reward × BTC Price − Electricity × Hashrate
-        │
-        ▼
-  Hashrate Entry/Exit
-  (New miners enter when profitable, exit when unprofitable)
+```mermaid
+flowchart TD
+    Target["Block Time Target (10 min)"]
+    Actual["Actual Mean Block Time"]
+    IncDiff["Difficulty Increases"]
+    DecDiff["Difficulty Decreases"]
+    Profit["Miner Profitability<br/>= Block Reward × BTC Price − Electricity × Hashrate"]
+    HashEntry["Hashrate Entry/Exit<br/>(New miners enter when profitable, exit when unprofitable)"]
+    
+    Target --> Actual
+    Actual -->|"Too fast (< 10 min)"| IncDiff
+    Actual -->|"Too slow (> 10 min)"| DecDiff
+    Actual --> Profit
+    Profit --> HashEntry
 ```
 
 This loop means Bitcoin's network has a mechanically enforced tendency toward a marginal cost equal to the block reward value. Miners who can produce hashes at below-average cost earn economic rents; those above average cost are progressively squeezed out as difficulty rises. This is precisely the competitive dynamics of a commodity market, and it has strong empirical support: the correlation between Bitcoin's market price and estimated cost of production — using electricity and hardware metrics — has historically been in the range of 0.70–0.85, though it breaks down sharply during speculative bubbles and miner capitulation events.

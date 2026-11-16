@@ -24,26 +24,37 @@ After the baseline transfer completes, all subsequent SnapMirror updates are inc
 
 The critical failure-resilience property here is that the common Snapshot pointer is never advanced until both sides confirm integrity. If a transfer is interrupted mid-flight, the next scheduled update simply restarts from the last committed common Snapshot, discarding any partially received blocks. The destination cannot enter a corrupted intermediate state because WAFL's copy-on-write geometry ensures that the destination's current consistent Snapshot remains untouched until the new transfer is fully committed.
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  SOURCE CLUSTER (Site A)              DESTINATION CLUSTER (Site B)         │
-│                                                                             │
-│  FlexVol: vol_prod                    FlexVol: vol_prod_mirror (DP mode)   │
-│  ┌────────────────────────┐           ┌───────────────────────────────────┐│
-│  │ WAFL inode tree        │           │ WAFL inode tree (read-only)       ││
-│  │  SM_snap_N (common)    │◄─────────►│  SM_snap_N (common)               ││
-│  │  SM_snap_N+1 (new)     │           │                                   ││
-│  │  user_snap_A           │           │  user_snap_A                      ││
-│  └────────────────────────┘           └───────────────────────────────────┘│
-│                │                                        ▲                  │
-│                │  Delta blocks:                         │                  │
-│                │  SM_snap_N → SM_snap_N+1               │                  │
-│                └────────────── TCP/TLS ────────────────►│                  │
-│                                                         │                  │
-│                              On success:                │                  │
-│                              Advance common pointer     │                  │
-│                              to SM_snap_N+1 on both     │                  │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph SiteA["SOURCE CLUSTER (Site A)"]
+        VolProd["FlexVol: vol_prod"]
+        SourceWAFL["WAFL inode tree"]
+        SnapN_Src["SM_snap_N (common)"]
+        SnapN1_Src["SM_snap_N+1 (new)"]
+        UserSnapA_Src["user_snap_A"]
+        
+        VolProd --> SourceWAFL
+        SourceWAFL --> SnapN_Src
+        SourceWAFL --> SnapN1_Src
+        SourceWAFL --> UserSnapA_Src
+    end
+    
+    subgraph SiteB["DESTINATION CLUSTER (Site B)"]
+        VolMirror["FlexVol: vol_prod_mirror (DP mode)"]
+        DestWAFL["WAFL inode tree (read-only)"]
+        SnapN_Dst["SM_snap_N (common)"]
+        UserSnapA_Dst["user_snap_A"]
+        
+        VolMirror --> DestWAFL
+        DestWAFL --> SnapN_Dst
+        DestWAFL --> UserSnapA_Dst
+    end
+    
+    SnapN_Src <-.."Common snapshot".-> SnapN_Dst
+    
+    SnapN1_Src -->|"Delta blocks:<br/>SM_snap_N → SM_snap_N+1<br/>via TCP/TLS"| DestWAFL
+    
+    DestWAFL -.->|"On success:<br/>Advance common pointer<br/>to SM_snap_N+1 on both"| SnapN_Src
 ```
 
 The RPO of an asynchronous SnapMirror relationship is therefore equal to the interval between successive Snapshot-and-transfer cycles. With a schedule of every five minutes (the minimum for standard SnapMirror in most ONTAP releases), the worst-case data loss is five minutes of writes—those acknowledged by the source after `SM_snap_N+1` was cut but before `SM_snap_N+2` completes transfer. Modern ONTAP deployments running SnapMirror over low-latency metro links can achieve sub-minute RPOs in practice, though the operational floor depends on volume change rate, available bandwidth, and cluster CPU budget for transfer processing.
@@ -128,19 +139,37 @@ SnapVault solves a different problem than SnapMirror. Where SnapMirror maintains
 
 The mechanical difference between SnapMirror and SnapVault is in how they handle Snapshots at the destination. SnapMirror maintains a destination that mirrors the source's Snapshot inventory: when a Snapshot ages off the source, it ages off the destination. The destination is always in approximate topological agreement with the source's current state. SnapVault, by contrast, maintains its own independent Snapshot retention schedule at the destination, governed by a separate retention policy. The destination can hold 90 daily Snapshots, 12 monthly Snapshots, and 7 yearly Snapshots simultaneously, long after the corresponding source Snapshots have been deleted. The SnapVault destination accumulates history that the source has discarded.
 
-```
-SOURCE VOLUME                    SNAPVAULT DESTINATION
-─────────────────                ─────────────────────────────────────────
-snap_daily.0  (today)       ───► sv_daily.0   (today)
-snap_daily.1  (yesterday)   ───► sv_daily.1   (yesterday)
-snap_daily.2  (3 days ago)       sv_daily.2   (3 days ago)
-                                 sv_daily.3   (4 days ago)
-[source retains 3 dailies]       ...
-                                 sv_daily.89  (90 days ago)
-                                 sv_monthly.0 (1 month ago)
-                                 ...
-                                 sv_monthly.11 (12 months ago)
-                             [vault retains 90 dailies + 12 monthly]
+```mermaid
+flowchart LR
+    subgraph src ["SOURCE VOLUME"]
+        d0["snap_daily.0\n(today)"]
+        d1["snap_daily.1\n(yesterday)"]
+        d2["snap_daily.2\n(3 days ago)"]
+        src_note["retains: 3 dailies"]:::note
+    end
+
+    subgraph dst ["SNAPVAULT DESTINATION"]
+        subgraph vault_daily ["Daily Snapshots (90 retained)"]
+            sv_d0["sv_daily.0\n(today)"]
+            sv_d1["sv_daily.1\n(yesterday)"]
+            sv_d2["sv_daily.2\n(3 days ago)"]
+            sv_d3["sv_daily.3\n(4 days ago)"]
+            sv_ellipsis["..."]:::filler
+            sv_d89["sv_daily.89\n(90 days ago)"]
+        end
+        subgraph vault_monthly ["Monthly Snapshots (12 retained)"]
+            sv_m0["sv_monthly.0\n(1 month ago)"]
+            sv_mellipsis["..."]:::filler
+            sv_m11["sv_monthly.11\n(12 months ago)"]
+        end
+    end
+
+    d0 -->|"SnapVault transfer"| sv_d0
+    d1 -->|"SnapVault transfer"| sv_d1
+    d2 -.->|"already present"| sv_d2
+
+    classDef note fill:#fffde7,stroke:#f9a825,color:#5d4037,font-style:italic
+    classDef filler fill:#f5f5f5,stroke:#bdbdbd,color:#9e9e9e,font-style:italic
 ```
 
 The transfer mechanism for SnapVault is identical to SnapMirror at the block transport layer—it transfers deltas between Snapshot boundaries. The divergence is entirely in retention policy semantics. This architectural unification means that in ONTAP 8.2 and later, NetApp merged both capabilities under the "extended data protection" (XDP) relationship type, allowing a single SnapMirror XDP relationship to function as both a disaster recovery mirror and a long-retention vault simultaneously. The relationship type a practitioner chooses—DP (mirror-only) or XDP (unified mirror-vault)—determines which Snapshot retention rules apply at the destination.
@@ -210,28 +239,31 @@ Under `Sync` policy, ONTAP acknowledges the client write as soon as both the sou
 
 Under `StrictSync` policy, ONTAP tightens the consistency guarantee: if replication connectivity to the destination is lost for any reason, the source immediately halts all client I/O rather than continuing to serve writes that cannot be replicated. This prevents any data divergence between source and destination at the cost of I/O availability during link failures. `StrictSync` is appropriate for financial transaction systems, database journals, and any application where split-brain data divergence is architecturally unacceptable. `Sync` policy, by contrast, allows the source to continue serving I/O during a link interruption (entering an "out-of-sync" state) and resynchronizes automatically when connectivity is restored, with the brief window of unreplicated writes representing the actual RPO incurred.
 
-```
-Client Write I/O Path under SM-S (Sync Policy)
-───────────────────────────────────────────────────────────────────────────
-
-APPLICATION
-    │  write(buf, len)
-    ▼
-SOURCE ONTAP CONTROLLER
-    │  1. Receive write, place in NVRAM write-ahead log
-    │  2. Transmit write over synchronous replication link
-    │                              │
-    │                              ▼
-    │                   DESTINATION ONTAP CONTROLLER
-    │                       3. Place write in destination NVRAM
-    │                       4. Send ACK back to source
-    │◄─────────────────────────────│
-    │  5. Receive ACK from destination
-    │  6. Send write ACK to client application
-    ▼
-APPLICATION receives durable write confirmation
-
-[Source WAFL checkpoint later commits NVRAM → disk on both sides independently]
+```mermaid
+flowchart TD
+    A["APPLICATION<br/>write(buf, len)"]
+    B["SOURCE ONTAP CONTROLLER"]
+    C["1. Receive write<br/>Place in NVRAM write-ahead log"]
+    D["2. Transmit write over<br/>synchronous replication link"]
+    E["DESTINATION ONTAP CONTROLLER"]
+    F["3. Place write in<br/>destination NVRAM"]
+    G["4. Send ACK back<br/>to source"]
+    H["5. Receive ACK<br/>from destination"]
+    I["6. Send write ACK<br/>to client application"]
+    J["APPLICATION receives<br/>durable write confirmation"]
+    K["Source WAFL checkpoint later<br/>commits NVRAM → disk on both sides independently"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+    B -.-> K
+    E -.-> K
 ```
 
 Configuring SM-S requires ONTAP 9.5 or later and a cluster peering relationship whose inter-cluster network latency does not exceed 10 ms RTT for `Sync` policy (20 ms for some specific workloads with explicit NetApp validation). The initialization workflow mirrors asynchronous SnapMirror but specifies the `sync` or `strict-sync` policy type:
@@ -281,20 +313,19 @@ Replicating a single volume in isolation is straightforward. Replicating a multi
 
 ONTAP Consistency Groups (CGs), introduced in ONTAP 9.7 for SAN and extended to NAS in later releases, solve this by creating a crash-consistent coordinated Snapshot across all member volumes simultaneously. A Consistency Group is an ONTAP object that groups volumes under a single namespace and exposes a single Snapshot operation that suspends I/O acknowledgment across all member volumes, flushes all pending writes, takes Snapshots on each member simultaneously, and then releases the I/O hold. The entire freeze-and-snapshot operation completes within microseconds from the perspective of the storage system, ensuring that the resulting Snapshot set across all volumes reflects the same crash-consistent storage state.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  CONSISTENCY GROUP: cg_oracle_prod                              │
-│                                                                 │
-│  Member Volumes:                                                │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
-│  │ vol_ora_data │  │ vol_ora_logs │  │ vol_ora_temp         │  │
-│  └──────┬───────┘  └──────┬───────┘  └──────────┬───────────┘  │
-│         │                │                      │              │
-│         └────────────────┼──────────────────────┘              │
-│                          │                                     │
-│         Coordinated Snapshot at T=10:00:00.000                 │
-│         All three volumes frozen and snapped atomically        │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph cg["CONSISTENCY GROUP: cg_oracle_prod"]
+        vol_data["vol_ora_data"]
+        vol_logs["vol_ora_logs"]
+        vol_temp["vol_ora_temp"]
+        
+        vol_data --> snapshot["Coordinated Snapshot<br/>T=10:00:00.000<br/>(Atomic)"]
+        vol_logs --> snapshot
+        vol_temp --> snapshot
+    end
+    
+    snapshot -.->|All volumes frozen & snapped| cg
 ```
 
 Creating and replicating a Consistency Group in ONTAP uses the REST API (ONTAP 9.10+) rather than the CLI, as CG management is fully REST-native:

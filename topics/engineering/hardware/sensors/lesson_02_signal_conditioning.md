@@ -48,31 +48,34 @@ Digital linearization performs lookup table interpolation or polynomial evaluati
 
 Calibration establishes the relationship between conditioned analog-to-digital converter output codes and physical measurand values through application of known reference stimuli and storage of correction coefficients. Two-point calibration determines offset and gain errors by applying zero-scale and full-scale reference inputs, measuring the corresponding ADC codes, then computing `Measurand = (ADC_code - ADC_zero) × (Ref_fullscale - Ref_zero)/(ADC_fullscale - ADC_zero) + Ref_zero`. Three-point or multi-point calibration additionally captures nonlinearity by fitting higher-order polynomials or storing correction tables. Temperature coefficients of offset and gain require calibration at multiple ambient temperatures, storing correction coefficients as functions of temperature measured by a co-located temperature sensor.
 
-```
-Signal Conditioning Architecture Data Flow
-==========================================
-
-                    Impedance                   Differential              Programmable
-Transducer  ───────> Transform ───────> Common-Mode ───────> Gain ───────> Anti-Alias ───────> ADC
-  Output              Buffer            Rejection           Amplifier        Filter          Acquisition
-                                       (Inst-Amp)
-
-    │                   │                   │                   │               │               │
-    │ Unbalanced        │ High Zin          │ CMRR >100dB      │ Gain =        │ fc = 0.4×fs   │ 12-16 bit
-    │ Low-level         │ Low Ib            │ Diff → S.E.      │ 10-1000×      │ Order ≥6      │ Vref stable
-    │ High Zout         │ Buffer            │ Rg programs      │ Low noise     │ Bessel/Butter │ Ratiometric
-    │                   │                   │                   │               │               │
-
-Noise Sources (Cumulative):
-───────────────────────────
-1. Transducer thermal noise:    Vn_trans   = sqrt(4kTRs×BW)
-2. Buffer voltage noise:         Vn_buf     = en_buf × sqrt(BW)
-3. Buffer current noise in Rs:   Vn_ib      = in_buf × Rs × sqrt(BW)
-4. Inst-Amp noise (input-ref):   Vn_ia      = en_ia × sqrt(BW) × Gain
-5. Gain stage noise:             Vn_gain    = en_gain × sqrt(BW)
-6. ADC quantization noise:       Vn_quant   = Vref/(2^N × sqrt(12))
-
-Total input-referred noise:  Vn_total = sqrt(Vn_trans² + Vn_buf² + Vn_ib² + (Vn_ia/G)² + (Vn_gain/G)² + (Vn_quant/G)²)
+```mermaid
+flowchart LR
+    A["Transducer<br/>Output"]
+    B["Impedance<br/>Transform<br/>Buffer"]
+    C["Differential<br/>Common-Mode<br/>Rejection<br/>(Inst-Amp)"]
+    D["Programmable<br/>Gain<br/>Amplifier"]
+    E["Anti-Alias<br/>Filter"]
+    F["ADC<br/>Acquisition"]
+    
+    A -->|"Unbalanced<br/>Low-level<br/>High Zout"| B
+    B -->|"High Zin<br/>Low Ib<br/>Buffer"| C
+    C -->|"CMRR >100dB<br/>Diff → S.E.<br/>Rg programs"| D
+    D -->|"Gain = 10-1000×<br/>Low noise"| E
+    E -->|"fc = 0.4×fs<br/>Order ≥6<br/>Bessel/Butter"| F
+    F -->|"12-16 bit<br/>Vref stable<br/>Ratiometric"| G["Output"]
+    
+    subgraph noise ["Noise Sources (Cumulative)"]
+        direction TB
+        N1["1. Transducer thermal: Vn_trans = sqrt(4kTRs×BW)"]
+        N2["2. Buffer voltage: Vn_buf = en_buf × sqrt(BW)"]
+        N3["3. Buffer current in Rs: Vn_ib = in_buf × Rs × sqrt(BW)"]
+        N4["4. Inst-Amp (input-ref): Vn_ia = en_ia × sqrt(BW) × Gain"]
+        N5["5. Gain stage: Vn_gain = en_gain × sqrt(BW)"]
+        N6["6. ADC quantization: Vn_quant = Vref/(2^N × sqrt(12))"]
+        N7["Total input-referred:<br/>Vn_total = sqrt(Vn_trans² + Vn_buf² + Vn_ib² + (Vn_ia/G)² + (Vn_gain/G)² + (Vn_quant/G)²)"]
+        
+        N1 ~~~ N2 ~~~ N3 ~~~ N4 ~~~ N5 ~~~ N6 ~~~ N7
+    end
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

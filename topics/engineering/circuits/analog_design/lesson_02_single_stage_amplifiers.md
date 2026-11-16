@@ -32,22 +32,29 @@ The common-emitter (CE) amplifier is the workhorse of bipolar analog design. Its
 
 Consider a CE stage built around an NPN transistor — the 2N3904 is a convenient and widely available device — biased for a quiescent collector current of $I_C = 1\,\text{mA}$.
 
-```
-                   +VCC (12V)
-                      |
-                     [RC = 5.6kΩ]
-                      |
-                      +---------> Vout
-                      |
-                     [Q1: 2N3904]
-                      |
-           Vin ---[RB]--+  (Base)
-                      |
-                     [RE = 560Ω]
-                      |
-                    [CE bypass]
-                      |
-                     GND
+```mermaid
+flowchart TD
+    VCC["+VCC (12V)"]
+    RC["RC = 5.6kΩ"]
+    Q1_C["Q1: 2N3904<br/>Collector"]
+    Q1_B["Q1: 2N3904<br/>Base"]
+    Q1_E["Q1: 2N3904<br/>Emitter"]
+    Vout["Vout"]
+    Vin["Vin"]
+    RB["RB"]
+    RE["RE = 560Ω"]
+    CE["CE bypass"]
+    GND["GND"]
+    
+    VCC --> RC
+    RC --> Q1_C
+    Q1_C --> Vout
+    Vin --> RB
+    RB --> Q1_B
+    Q1_B -.-> Q1_E
+    Q1_E --> RE
+    RE --> CE
+    CE --> GND
 ```
 
 At $I_C = 1\,\text{mA}$, the transconductance is $g_m = 1\,\text{mA} / 26\,\text{mV} \approx 38.5\,\text{mA/V}$. The intrinsic base-emitter resistance is $r_\pi = \beta / g_m$, and for a typical $\beta = 150$, this gives $r_\pi \approx 3.9\,\text{k}\Omega$. With a collector resistor $R_C = 5.6\,\text{k}\Omega$ and the emitter fully bypassed, the mid-band voltage gain is:
@@ -82,24 +89,26 @@ The cascode is the single most important topological refinement in high-frequenc
 
 The cascode topology stacks a second transistor — a common-base (CB) configuration for BJTs, or a common-gate (CG) configuration for MOSFETs — on top of the common-emitter or common-source input device. The input device converts the input voltage into a current in the usual way, but instead of delivering that current into a high-impedance load (which would create a large voltage swing and trigger Miller multiplication), it delivers it into the low-impedance emitter (or source) of the cascode device. The cascode device then passes that current upward into the actual load, creating the output voltage swing at its collector (or drain), which is a node that has no capacitive feedback path to the input.
 
-```
-                   +VCC
-                      |
-                   [RD = 5kΩ]
-                      |
-                      +---------> Vout
-                      |
-                     [M2: cascode NMOS]  <--- Vbias2 (gate)
-                      |
-                      +  (drain of M1 = source of M2)
-                      |
-                     [M1: input NMOS]
-                      |
-           Vin -------(gate of M1)
-                      |
-                   [RS = 500Ω]
-                      |
-                     GND
+```mermaid
+flowchart TD
+    VCC["+VCC"]
+    RD["RD = 5kΩ"]
+    M2["M2: cascode NMOS"]
+    M1["M1: input NMOS"]
+    RS["RS = 500Ω"]
+    GND["GND"]
+    Vout["Vout"]
+    Vin["Vin"]
+    Vbias2["Vbias2"]
+    
+    VCC --> RD
+    RD --> M2
+    RD --> Vout
+    M2 --> M1
+    M1 --> RS
+    RS --> GND
+    Vin -.->|gate| M1
+    Vbias2 -.->|gate| M2
 ```
 
 The voltage at the drain of M1 (which is the source of M2) is a low-impedance virtual ground, clamped by the gate bias of M2. Because this node barely moves, the effective drain-source voltage swing at M1 is nearly zero, and the Miller-multiplied $C_{gd}$ of M1 is reduced to approximately $C_{gd1}(1 + g_{m1}/g_{m2}) \approx 2C_{gd1}$ — a dramatic reduction from the full Miller term. The output pole now appears at the high-impedance drain of M2, where the output capacitance $C_{db2}$ combines with the load resistance, but this pole is not Miller-multiplied because there is no feedback path from drain of M2 to gate of M1.
@@ -118,20 +127,22 @@ If the common-source amplifier is the atom of analog design, the differential pa
 
 A differential pair consists of two matched transistors sharing a common tail current source. When the input voltages applied to the two gates (or bases) are equal, the tail current splits equally between the two devices, and the output voltages at their drains (or collectors) are equal. When the inputs differ by a small differential voltage $v_{id}$, the current steers preferentially toward the device with the higher input voltage, and the two output voltages diverge in a push-pull manner.
 
-```
-                      +VCC
-                        |
-              +---------+---------+
-              |                   |
-            [RD]                [RD]
-              |                   |
-Vin+ ---[M1]-+               +-[M2]--- Vin-
-              \               /
-               +------+------+
-                      |
-                   [ITAIL = 2mA]
-                      |
-                     GND
+```mermaid
+flowchart TD
+    VCC["+VCC"]
+    VCC --> RD1["RD"]
+    VCC --> RD2["RD"]
+    
+    VinPlus["Vin+"] --> M1["M1"]
+    M1 --> RD1
+    RD1 --> Junction["Junction"]
+    
+    VinMinus["Vin-"] --> M2["M2"]
+    M2 --> RD2
+    RD2 --> Junction
+    
+    Junction --> ITAIL["ITAIL = 2mA"]
+    ITAIL --> GND["GND"]
 ```
 
 The small-signal differential gain of this topology, taking the output as the difference between the two drain voltages, is:

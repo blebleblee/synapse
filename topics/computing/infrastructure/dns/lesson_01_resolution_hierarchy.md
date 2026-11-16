@@ -58,24 +58,32 @@ On a cache miss, the recursive resolver initiates iterative resolution by queryi
 
 The root server responds with a referral: the NS records for the appropriate top-level domain (TLD) zone, placed in the authority section of the response, accompanied by glue A/AAAA records in the additional section. For a query about `www.example.com`, the root server returns NS records pointing to the thirteen `.com` TLD nameservers operated by Verisign, along with their IPv4 and IPv6 addresses. The response includes no answer section data—only delegation information. The resolver caches both the NS records and the glue records, noting their distinct TTL values.
 
-```
-Iterative Resolution Flow:
+```mermaid
+flowchart TD
+    Client["🖥️ Client"]
+    Resolver["🔄 Recursive Resolver"]
+    RootNS["🌐 Root Nameserver"]
+    TLDNS["📂 TLD Nameserver (.com)"]
+    AuthNS["🏷️ Authoritative Nameserver (example.com)"]
 
-Client               Recursive           Root            TLD             Authoritative
-  |                  Resolver             NS              NS              Nameserver
-  |                     |                 |               |                    |
-  |--RD=1, www.ex.com-->|                 |               |                    |
-  |                     |--RD=0, query--->|               |                    |
-  |                     |<--referral: .com NS + glue------|                    |
-  |                     |                 |               |                    |
-  |                     |--RD=0, query--------------->|   |                    |
-  |                     |<--referral: example.com NS + glue|                   |
-  |                     |                 |               |                    |
-  |                     |--RD=0, query-------------------------------->|       |
-  |                     |<--AA=1, A record--------------------------------|       |
-  |                     |                 |               |                    |
-  |<--RA=1, AA=0, cached A record---------|               |                    |
-  |                     |                 |               |                    |
+    Client -->|"Query: RD=1, www.example.com"| Resolver
+
+    Resolver -->|"Query: RD=0, www.example.com"| RootNS
+    RootNS -->|"Referral: .com NS + glue records"| Resolver
+
+    Resolver -->|"Query: RD=0, www.example.com"| TLDNS
+    TLDNS -->|"Referral: example.com NS + glue records"| Resolver
+
+    Resolver -->|"Query: RD=0, www.example.com"| AuthNS
+    AuthNS -->|"Response: AA=1, A record"| Resolver
+
+    Resolver -->|"Response: RA=1, AA=0, cached A record"| Client
+
+    style Client fill:#4A90D9,stroke:#2C5F8A,color:#fff
+    style Resolver fill:#7B68EE,stroke:#4B3F9A,color:#fff
+    style RootNS fill:#E8A838,stroke:#A97520,color:#fff
+    style TLDNS fill:#E8A838,stroke:#A97520,color:#fff
+    style AuthNS fill:#50C878,stroke:#2E8B57,color:#fff
 ```
 
 The resolver then queries one of the TLD nameservers for `www.example.com`, again with RD=0. The TLD server responds with another referral: the NS records for `example.com` and their corresponding glue records. This second referral identifies the authoritative nameservers that hold the actual zone data for `example.com`. The resolver caches this delegation information and proceeds to query one of the `example.com` authoritative nameservers.

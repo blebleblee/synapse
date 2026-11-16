@@ -414,28 +414,35 @@ stats_period = 60
 
 PgBouncer exposes a virtual `pgbouncer` database with pseudo-tables for runtime introspection:
 
-```sql
--- Connect: psql -p 5432 -U pgbouncer pgbouncer
-
--- Pool health: check for large wait queues (cl_waiting > 0 is a red flag)
-SHOW POOLS;
-/*
- database  | user  | cl_active | cl_waiting | sv_active | sv_idle | sv_used | maxwait
------------+-------+-----------+------------+-----------+---------+---------+---------
- appdb     | app   |        47 |          3 |        50 |       0 |       0 |       1
-*/
-
--- Aggregate statistics: transactions/sec, query time
-SHOW STATS;
-
--- Current server connection states
-SHOW SERVERS;
-
--- Current client connection states  
-SHOW CLIENTS;
-
--- Configuration live reload (no restart required)
-RELOAD;
+```mermaid
+flowchart TD
+    Start["Connect to PgBouncer Admin Console"]
+    Start --> Connect["psql -p 5432 -U pgbouncer pgbouncer"]
+    
+    Connect --> Monitor["Monitor PgBouncer"]
+    
+    Monitor --> ShowPools["SHOW POOLS"]
+    Monitor --> ShowStats["SHOW STATS"]
+    Monitor --> ShowServers["SHOW SERVERS"]
+    Monitor --> ShowClients["SHOW CLIENTS"]
+    
+    ShowPools --> PoolHealth["Check Pool Health"]
+    PoolHealth --> WaitQueue["Inspect cl_waiting<br/>⚠️ cl_waiting > 0 = Red Flag"]
+    PoolHealth --> ActiveConns["Review cl_active vs sv_active"]
+    PoolHealth --> IdleConns["Check sv_idle, sv_used"]
+    PoolHealth --> MaxWait["Monitor maxwait duration"]
+    
+    ShowStats --> TxnRate["Transactions per Second"]
+    ShowStats --> QueryTime["Query Time Metrics"]
+    
+    ShowServers --> ServerState["Server Connection States"]
+    ShowClients --> ClientState["Client Connection States"]
+    
+    Monitor --> Reload["RELOAD"]
+    Reload --> LiveConfig["Live Configuration Reload<br/>No Restart Required"]
+    
+    style WaitQueue fill:#ff9999
+    style LiveConfig fill:#99ff99
 ```
 
 A non-zero `cl_waiting` value means clients are queued waiting for a free server connection. Persistent `cl_waiting` indicates `default_pool_size` is too low for the current workload or that query durations are too long, keeping server connections checked out.

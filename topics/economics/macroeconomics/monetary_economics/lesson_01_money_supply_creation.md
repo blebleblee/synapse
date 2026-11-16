@@ -62,14 +62,28 @@ The operational architecture of money supply creation unfolds across three inter
 
 The central bank balance sheet forms the foundation of the monetary system, its structure reflecting the institution's dual role as currency issuer and lender of last resort. On the asset side, the balance sheet typically comprises:
 
-```
-Central Bank Assets:
-  Government Securities              $4,200 billion
-  Foreign Exchange Reserves          $  400 billion  
-  Lending to Commercial Banks        $   50 billion
-  Other Assets                       $  350 billion
-  ────────────────────────────────────────────────
-  Total Assets                       $5,000 billion
+```mermaid
+flowchart TD
+    Title["<b>Central Bank Assets</b>"]
+    
+    Title --> GovSec["Government Securities<br/>$4,200 billion"]
+    Title --> ForEx["Foreign Exchange Reserves<br/>$400 billion"]
+    Title --> Lending["Lending to Commercial Banks<br/>$50 billion"]
+    Title --> Other["Other Assets<br/>$350 billion"]
+    
+    GovSec --> Total
+    ForEx --> Total
+    Lending --> Total
+    Other --> Total
+    
+    Total["<b>Total Assets</b><br/>$5,000 billion"]
+    
+    style Title fill:#2c3e50,stroke:#34495e,stroke-width:3px,color:#fff
+    style Total fill:#27ae60,stroke:#229954,stroke-width:3px,color:#fff
+    style GovSec fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+    style ForEx fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+    style Lending fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+    style Other fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
 ```
 
 The government securities portfolio accumulates through open market operations, representing the primary tool for injecting or draining base money under normal conditions. These holdings might include Treasury bills, notes, and bonds across the maturity spectrum, with the composition reflecting both monetary policy objectives and market functioning considerations. During quantitative easing programs, central banks deliberately skew purchases toward longer maturities to extract duration risk from private portfolios and compress term premia.
@@ -80,14 +94,28 @@ Lending to commercial banks encompasses discount window borrowing, standing faci
 
 The liability side of the central bank balance sheet mirrors the asset composition:
 
-```
-Central Bank Liabilities:
-  Currency in Circulation            $2,100 billion
-  Commercial Bank Reserves           $2,700 billion
-  Government Deposits                $  150 billion
-  Other Liabilities                  $   50 billion
-  ────────────────────────────────────────────────
-  Total Liabilities                  $5,000 billion
+```mermaid
+flowchart TD
+    CB["Central Bank Liabilities"]
+    
+    CB --> CIC["Currency in Circulation<br/>$2,100 billion"]
+    CB --> CBR["Commercial Bank Reserves<br/>$2,700 billion"]
+    CB --> GD["Government Deposits<br/>$150 billion"]
+    CB --> OL["Other Liabilities<br/>$50 billion"]
+    
+    CIC --> Total
+    CBR --> Total
+    GD --> Total
+    OL --> Total
+    
+    Total["Total Liabilities<br/>$5,000 billion"]
+    
+    style CB fill:#2c3e50,stroke:#34495e,stroke-width:3px,color:#fff
+    style Total fill:#27ae60,stroke:#229954,stroke-width:3px,color:#fff
+    style CIC fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+    style CBR fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+    style GD fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+    style OL fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
 ```
 
 Currency in circulation represents physical notes and coins held by the non-bank public and commercial banks' vault cash. This component responds passively to public demand, fluctuating with seasonal patterns, payment system evolution, and confidence in bank deposits. During financial panics, currency demand surges as depositors withdraw funds, draining reserves and tightening liquidity conditions unless the central bank conducts offsetting open market purchases.
@@ -100,22 +128,35 @@ The monetary base, the sum of currency in circulation and commercial bank reserv
 
 The commercial banking system balance sheet aggregates across all deposit-taking institutions subject to reserve requirements and prudential regulation:
 
-```
-Commercial Banking System Assets:
-  Reserves at Central Bank           $2,700 billion
-  Loans to Non-Bank Sector           $9,500 billion
-  Government Securities              $2,300 billion
-  Other Assets                       $1,500 billion
-  ────────────────────────────────────────────────
-  Total Assets                      $16,000 billion
-
-Commercial Banking System Liabilities:
-  Deposits                          $13,500 billion
-  Borrowing from Central Bank        $   50 billion
-  Other Liabilities                  $  450 billion
-  Equity Capital                     $2,000 billion
-  ────────────────────────────────────────────────
-  Total Liabilities & Equity        $16,000 billion
+```mermaid
+flowchart TD
+    subgraph assets ["Commercial Banking System Assets: $16,000B"]
+        A1["Reserves at Central Bank<br/>$2,700 billion"]
+        A2["Loans to Non-Bank Sector<br/>$9,500 billion"]
+        A3["Government Securities<br/>$2,300 billion"]
+        A4["Other Assets<br/>$1,500 billion"]
+        AT["Total Assets<br/>$16,000 billion"]
+        
+        A1 --> AT
+        A2 --> AT
+        A3 --> AT
+        A4 --> AT
+    end
+    
+    subgraph liabilities ["Commercial Banking System Liabilities & Equity: $16,000B"]
+        L1["Deposits<br/>$13,500 billion"]
+        L2["Borrowing from Central Bank<br/>$50 billion"]
+        L3["Other Liabilities<br/>$450 billion"]
+        L4["Equity Capital<br/>$2,000 billion"]
+        LT["Total Liabilities & Equity<br/>$16,000 billion"]
+        
+        L1 --> LT
+        L2 --> LT
+        L3 --> LT
+        L4 --> LT
+    end
+    
+    AT -.->|Balance Sheet Equation| LT
 ```
 
 The reserve position of $2,700 billion corresponds exactly to the central bank's reserve liability, ensuring consolidation consistency. If the reserve requirement ratio stands at ten percent, required reserves equal $1,350 billion (ten percent of $13,500 billion in deposits), leaving $1,350 billion in excess reserves. This substantial excess reserve position characterizes the post-quantitative easing environment across major advanced economies, where central banks flooded the system with reserves far exceeding regulatory requirements.
@@ -130,24 +171,44 @@ Equity capital of $2,000 billion provides the loss-absorbing buffer required by 
 
 The consolidated non-bank private sector balance sheet captures the asset and liability positions of households, non-financial corporations, and non-bank financial institutions:
 
-```
-Non-Bank Private Sector Assets:
-  Currency Holdings                  $2,100 billion
-  Bank Deposits                     $13,500 billion
-  Government Securities              $3,000 billion
-  Corporate Bonds & Equities        $45,000 billion
-  Real Assets                       $60,000 billion
-  Other Financial Assets             $8,400 billion
-  ────────────────────────────────────────────────
-  Total Assets                     $132,000 billion
-
-Non-Bank Private Sector Liabilities:
-  Bank Loans                         $9,500 billion
-  Corporate Bonds                   $12,000 billion
-  Other Liabilities                  $5,000 billion
-  Net Worth                        $105,500 billion
-  ────────────────────────────────────────────────
-  Total Liabilities & Net Worth    $132,000 billion
+```mermaid
+flowchart TD
+    A["Non-Bank Private Sector<br/>Assets & Liabilities"]
+    
+    subgraph assets ["Assets"]
+        A1["Currency Holdings<br/>$2,100B"]
+        A2["Bank Deposits<br/>$13,500B"]
+        A3["Government Securities<br/>$3,000B"]
+        A4["Corporate Bonds & Equities<br/>$45,000B"]
+        A5["Real Assets<br/>$60,000B"]
+        A6["Other Financial Assets<br/>$8,400B"]
+        A_TOTAL["Total Assets<br/>$132,000B"]
+    end
+    
+    subgraph liabilities ["Liabilities & Net Worth"]
+        L1["Bank Loans<br/>$9,500B"]
+        L2["Corporate Bonds<br/>$12,000B"]
+        L3["Other Liabilities<br/>$5,000B"]
+        L4["Net Worth<br/>$105,500B"]
+        L_TOTAL["Total Liabilities & Net Worth<br/>$132,000B"]
+    end
+    
+    A --> assets
+    A --> liabilities
+    
+    A1 --> A_TOTAL
+    A2 --> A_TOTAL
+    A3 --> A_TOTAL
+    A4 --> A_TOTAL
+    A5 --> A_TOTAL
+    A6 --> A_TOTAL
+    
+    L1 --> L_TOTAL
+    L2 --> L_TOTAL
+    L3 --> L_TOTAL
+    L4 --> L_TOTAL
+    
+    A_TOTAL -.->|Balance| L_TOTAL
 ```
 
 Currency holdings and bank deposits together constitute the liquid monetary wealth available for transaction purposes, corresponding to the $M_1$ or $M_2$ aggregate depending on definitional scope. The sum of $15,600 billion exceeds the banking system's deposit liabilities by the $2,100 billion in currency, matching the monetary base composition and ensuring sectoral consolidation consistency.

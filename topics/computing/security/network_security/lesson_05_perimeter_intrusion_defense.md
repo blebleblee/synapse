@@ -45,22 +45,72 @@ The evaluation mechanism involves hash table lookups or decision tree traversal.
 
 Stateful firewalls maintain a connection tracking table, a hash map keyed by the five-tuple of active connections. Each entry contains the current TCP state (SYN_SENT, ESTABLISHED, FIN_WAIT, etc.), sequence numbers, and timestamps. The state machine transitions mirror the TCP state diagram:
 
-```
-State Machine Transitions:
-CLIENT ---SYN---> FIREWALL ---SYN---> SERVER
-  [Create entry: state=SYN_SENT, seq_init=X]
+```mermaid
+flowchart TD
+    SYN_START((" "))
 
-CLIENT <--SYN/ACK-- FIREWALL <--SYN/ACK-- SERVER
-  [Update entry: state=SYN_RECEIVED, seq_reply=Y]
+    SYN_START -->|"Client sends SYN"| SYN_SENT
 
-CLIENT ---ACK---> FIREWALL ---ACK---> SERVER
-  [Update entry: state=ESTABLISHED]
+    SYN_SENT["**SYN_SENT**
+    ─────────────────
+    seq_init = X"]
 
-CLIENT ---data---> FIREWALL ---data---> SERVER
-  [Validate: seq in window, state=ESTABLISHED]
+    SYN_SENT -->|"SYN forwarded to Server"| SYN_FW1(["Firewall: Create Entry
+    state = SYN_SENT
+    seq_init = X"])
 
-CLIENT ---FIN---> FIREWALL ---FIN---> SERVER
-  [Update entry: state=FIN_WAIT]
+    SYN_FW1 -->|"SYN/ACK from Server"| SYN_RECV
+
+    SYN_RECV["**SYN_RECEIVED**
+    ─────────────────
+    seq_reply = Y"]
+
+    SYN_RECV -->|"SYN/ACK forwarded to Client"| SYN_FW2(["Firewall: Update Entry
+    state = SYN_RECEIVED
+    seq_reply = Y"])
+
+    SYN_FW2 -->|"Client sends ACK"| ESTABLISHED
+
+    ESTABLISHED["**ESTABLISHED**
+    ─────────────────
+    Full duplex active"]
+
+    ESTABLISHED -->|"ACK forwarded to Server"| ACK_FW(["Firewall: Update Entry
+    state = ESTABLISHED"])
+
+    ACK_FW -->|"Client sends data"| DATA_FLOW
+
+    DATA_FLOW["**DATA TRANSFER**
+    ─────────────────
+    seq in window"]
+
+    DATA_FLOW -->|"Data forwarded to Server"| DATA_FW(["Firewall: Validate
+    seq in window
+    state = ESTABLISHED"])
+
+    DATA_FW -->|"Client sends FIN"| FIN_WAIT
+
+    FIN_WAIT["**FIN_WAIT**
+    ─────────────────
+    Teardown initiated"]
+
+    FIN_WAIT -->|"FIN forwarded to Server"| FIN_FW(["Firewall: Update Entry
+    state = FIN_WAIT"])
+
+    FIN_FW --> END_STATE((" "))
+
+    style SYN_START fill:#333,stroke:#333,color:#fff
+    style END_STATE fill:#333,stroke:#666,color:#fff,stroke-width:4px
+    style SYN_SENT fill:#1a3a5c,stroke:#4a90d9,color:#e8f0fe
+    style SYN_RECV fill:#1a3a5c,stroke:#4a90d9,color:#e8f0fe
+    style ESTABLISHED fill:#1a4a2e,stroke:#4caf50,color:#e8f5e9
+    style DATA_FLOW fill:#1a4a2e,stroke:#4caf50,color:#e8f5e9
+    style FIN_WAIT fill:#4a2a1a,stroke:#ff7043,color:#fbe9e7
+    style SYN_FW1 fill:#2d2a1a,stroke:#ffc107,color:#fff9c4
+    style SYN_FW2 fill:#2d2a1a,stroke:#ffc107,color:#fff9c4
+    style ACK_FW fill:#2d2a1a,stroke:#ffc107,color:#fff9c4
+    style DATA_FW fill:#2d2a1a,stroke:#ffc107,color:#fff9c4
+    style FIN_FW fill:#2d2a1a,stroke:#ffc107,color:#fff9c4
 ```
 
 For UDP, which lacks connection state, the firewall uses a timeout-based pseudo-state. When an internal host sends a UDP packet to an external server, the firewall creates an entry allowing return traffic from that server IP/port pair for a limited duration (typically 30 seconds). This permits request-response protocols like DNS while preventing unsolicited inbound UDP traffic.
@@ -145,8 +195,18 @@ For clients failing authentication or lacking 802.1X support, the NAC system can
 
 A standard DMZ architecture employs two firewalls creating three security zones:
 
-```
-[Internet] <---> [Firewall 1] <---> [DMZ] <---> [Firewall 2] <---> [Internal LAN]
+```mermaid
+flowchart LR
+    INET["Internet"]
+    FW1["Firewall 1"]
+    DMZ["DMZ"]
+    FW2["Firewall 2"]
+    LAN["Internal LAN"]
+
+    INET <--> FW1
+    FW1 <--> DMZ
+    DMZ <--> FW2
+    FW2 <--> LAN
 ```
 
 Firewall 1 rules permit inbound traffic to DMZ services:

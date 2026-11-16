@@ -52,28 +52,17 @@ The highest-probability land plays acquire sites with existing entitlements wher
 
 Real estate market cycles propagate through the interaction of demand drivers (employment growth, household formation, business investment), supply responses (construction starts, permit issuance, completions), capital market conditions (mortgage availability, equity risk premiums, REIT valuations), and sentiment feedback loops (momentum-chasing development capital versus contrarian distressed buyers). The cycle's four phases—recovery, expansion, hypersupply, and recession—each exhibit characteristic patterns across occupancy trends, rent growth trajectories, construction activity levels, and transaction volume dynamics.
 
-```
-Real Estate Cycle Phase Transitions
-
-Phase 1: RECOVERY                Phase 2: EXPANSION
-- Vacancy: Declining             - Vacancy: Low/Stable
-- Rent Growth: Flat/Modest       - Rent Growth: Accelerating  
-- Construction: Minimal          - Construction: Ramping Up
-- Pricing: Distressed/Fair       - Pricing: Fair/Full
-
-         │                                  │
-         │  New Supply Lag                  │  Overbuilding
-         ▼                                  ▼
-
-Phase 4: RECESSION               Phase 3: HYPERSUPPLY
-- Vacancy: Rising Fast           - Vacancy: Rising
-- Rent Growth: Negative          - Rent Growth: Slowing
-- Construction: Halted           - Construction: Peak Deliveries  
-- Pricing: Distressed            - Pricing: Full/Excessive
-
-         │                                  │
-         │  Demand Collapse                 │  Absorption Lag
-         └──────────────────────────────────┘
+```mermaid
+flowchart LR
+    P1["<b>Phase 1: RECOVERY</b><br/>• Vacancy: Declining<br/>• Rent Growth: Flat/Modest<br/>• Construction: Minimal<br/>• Pricing: Distressed/Fair"]
+    P2["<b>Phase 2: EXPANSION</b><br/>• Vacancy: Low/Stable<br/>• Rent Growth: Accelerating<br/>• Construction: Ramping Up<br/>• Pricing: Fair/Full"]
+    P3["<b>Phase 3: HYPERSUPPLY</b><br/>• Vacancy: Rising<br/>• Rent Growth: Slowing<br/>• Construction: Peak Deliveries<br/>• Pricing: Full/Excessive"]
+    P4["<b>Phase 4: RECESSION</b><br/>• Vacancy: Rising Fast<br/>• Rent Growth: Negative<br/>• Construction: Halted<br/>• Pricing: Distressed"]
+    
+    P1 -->|"New Supply Lag"| P2
+    P2 -->|Overbuilding| P3
+    P3 -->|"Absorption Lag"| P4
+    P4 -->|"Demand Collapse"| P1
 ```
 
 The recovery phase emerges from recessionary troughs when demand stabilization halts vacancy expansion and distressed asset sales clear the market of overleveraged sellers. Occupancy rates begin gradual improvement from cyclical peaks (15-20% in office, 8-12% in multifamily, depending on severity of prior downturn), but landlords lack pricing power to push rent increases due to shadow inventory of sublease space and tenant negotiating leverage. New construction activity remains dormant as replacement cost economics stay deeply negative—market rents insufficient to support pro forma development yields even at depressed land prices. This supply vacuum creates the setup for subsequent expansion as occupancy improvements eventually tighten markets.

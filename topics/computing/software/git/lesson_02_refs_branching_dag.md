@@ -253,3 +253,4 @@ git tag -a -s v2.0.0 -m "Release 2.0.0 - production deployment"
 # Verify tag signature before building
 git tag -v v2.0.0
 git verify-tag v2.0.0
+```

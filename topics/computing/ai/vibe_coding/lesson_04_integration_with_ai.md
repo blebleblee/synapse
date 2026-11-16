@@ -343,3 +343,4 @@ def register_tool(
         "path": {
             "type": "string",
             "description": "Path to the file, relative to the project root.",
+```

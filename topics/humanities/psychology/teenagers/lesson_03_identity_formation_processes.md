@@ -46,100 +46,64 @@ Ethnic and racial identity development follows distinct trajectories, particular
 
 The structural architecture of identity formation can be modeled as a parallel processing system operating across multiple identity domains simultaneously. Each domain—vocational, ideological, relational, gender, ethnic, moral—undergoes its own exploration-commitment cycle, progressing at different rates with varying degrees of integration. The central executive function of the developing prefrontal cortex coordinates these parallel processes, attempting to resolve conflicts, establish hierarchies, and construct overarching coherence.
 
-```
-IDENTITY FORMATION SYSTEM ARCHITECTURE
-
-Input Layer (Environmental Affordances & Constraints):
-│
-├─ Social Feedback Channels
-│  ├─ Parental expectations & modeling
-│  ├─ Peer group norms & acceptance criteria
-│  ├─ Institutional requirements (school, work, legal)
-│  ├─ Cultural narratives & available identity templates
-│  └─ Media representations & aspirational models
-│
-├─ Biological Substrates
-│  ├─ Pubertal timing & physical maturation rate
-│  ├─ Temperamental traits (Big Five dimensions)
-│  ├─ Cognitive capacity (IQ, executive function)
-│  └─ Mental health baseline (anxiety, depression risk)
-│
-└─ Historical Experiences
-   ├─ Childhood identifications & attachments
-   ├─ Trauma, adversity, & protective factors
-   ├─ Skill development & competence domains
-   └─ Significant life events & turning points
-
-                      ↓
-
-Processing Layer (Identity Work Mechanisms):
-
-┌─────────────────────────────────────────────────────┐
-│  EXPLORATION ENGINE                                 │
-│  ┌──────────────┐  ┌──────────────┐  ┌───────────┐│
-│  │ Vocational   │  │ Ideological  │  │ Relational││
-│  │ Trials       │  │ Investigation│  │ Experiments│
-│  └──────────────┘  └──────────────┘  └───────────┘│
-│                                                     │
-│  Mechanisms: role experimentation, counterfactual  │
-│  reasoning, social comparison, informational       │
-│  interviewing, provisional commitments             │
-└─────────────────────────────────────────────────────┘
-                      ↓
-┌─────────────────────────────────────────────────────┐
-│  EVALUATION PROCESSOR                               │
-│  • Internal consistency checking                    │
-│  • Values alignment assessment                      │
-│  • Competence-aspiration gap analysis              │
-│  • Social validation monitoring                     │
-│  • Authenticity verification (phenomenological fit) │
-└─────────────────────────────────────────────────────┘
-                      ↓
-┌─────────────────────────────────────────────────────┐
-│  INTEGRATION SYNTHESIZER                            │
-│  • Cross-domain conflict resolution                 │
-│  • Hierarchy establishment (core vs. peripheral)    │
-│  • Narrative construction & revision                │
-│  • Temporal integration (past-present-future)       │
-│  • Self-concept consolidation                       │
-└─────────────────────────────────────────────────────┘
-                      ↓
-┌─────────────────────────────────────────────────────┐
-│  COMMITMENT MECHANISM                               │
-│  • Investment of psychological resources            │
-│  • Behavioral alignment with identity content       │
-│  • Public declaration & social validation seeking   │
-│  • Identity protection & defense                    │
-│  • Sunk cost accumulation                          │
-└─────────────────────────────────────────────────────┘
-
-                      ↓
-
-Output Layer (Identity Statuses):
-
-├─ Achievement: High exploration → High commitment
-│  Markers: coherent narrative, value-behavior alignment,
-│  decisional confidence, relational intimacy capacity
-│
-├─ Foreclosure: Skip exploration → High commitment
-│  Markers: rigid adherence, authority dependence,
-│  low self-reflection, fragility under challenge
-│
-├─ Moratorium: High exploration → Low commitment
-│  Markers: active questioning, anxiety, experimentation,
-│  provisional trials, tolerance of uncertainty
-│
-└─ Diffusion: Low exploration → Low commitment
-   Markers: apathy, chaotic shifting, poor planning,
-   external locus of control, relational instability
-
-                      ↓
-
-Feedback Loops:
-• Commitment outcomes generate new social feedback
-• Successes/failures modify exploration strategies
-• Identity structures filter perception of new information
-• Narrative frames shape interpretation of experiences
+```mermaid
+flowchart TD
+    Input["📥 INPUT LAYER<br/>Environmental Affordances & Constraints"]
+    
+    Social["Social Feedback Channels<br/>• Parental expectations & modeling<br/>• Peer group norms & acceptance<br/>• Institutional requirements<br/>• Cultural narratives<br/>• Media representations"]
+    
+    Bio["Biological Substrates<br/>• Pubertal timing & maturation<br/>• Temperamental traits<br/>• Cognitive capacity<br/>• Mental health baseline"]
+    
+    History["Historical Experiences<br/>• Childhood identifications<br/>• Trauma & protective factors<br/>• Skill development<br/>• Significant life events"]
+    
+    Processing["⚙️ PROCESSING LAYER<br/>Identity Work Mechanisms"]
+    
+    Explorer["EXPLORATION ENGINE<br/>• Vocational Trials<br/>• Ideological Investigation<br/>• Relational Experiments"]
+    
+    Evaluator["EVALUATION PROCESSOR<br/>• Internal consistency checking<br/>• Values alignment assessment<br/>• Competence-aspiration gap<br/>• Social validation monitoring<br/>• Authenticity verification"]
+    
+    Integrator["INTEGRATION SYNTHESIZER<br/>• Cross-domain conflict resolution<br/>• Hierarchy establishment<br/>• Narrative construction<br/>• Temporal integration<br/>• Self-concept consolidation"]
+    
+    Commit["COMMITMENT MECHANISM<br/>• Psychological resource investment<br/>• Behavioral alignment<br/>• Public declaration<br/>• Identity protection<br/>• Sunk cost accumulation"]
+    
+    Output["📤 OUTPUT LAYER<br/>Identity Statuses"]
+    
+    Achieve["Achievement<br/>High Exploration → High Commitment<br/>✓ Coherent narrative<br/>✓ Value-behavior alignment<br/>✓ Decisional confidence"]
+    
+    Forecast["Foreclosure<br/>Low Exploration → High Commitment<br/>⚠ Rigid adherence<br/>⚠ Authority dependence<br/>⚠ Low self-reflection"]
+    
+    Morator["Moratorium<br/>High Exploration → Low Commitment<br/>⧗ Active questioning<br/>⧗ Anxiety & experimentation<br/>⧗ Provisional trials"]
+    
+    Diffuse["Diffusion<br/>Low Exploration → Low Commitment<br/>✗ Apathy & chaotic shifting<br/>✗ Poor planning<br/>✗ External locus of control"]
+    
+    Feedback["🔄 FEEDBACK LOOPS<br/>• Commitment outcomes → new social feedback<br/>• Successes/failures → modified strategies<br/>• Identity structures → filter information<br/>• Narrative frames → shape interpretation"]
+    
+    Input --> Social
+    Input --> Bio
+    Input --> History
+    
+    Social --> Processing
+    Bio --> Processing
+    History --> Processing
+    
+    Processing --> Explorer
+    Explorer --> Evaluator
+    Evaluator --> Integrator
+    Integrator --> Commit
+    
+    Commit --> Output
+    
+    Output --> Achieve
+    Output --> Forecast
+    Output --> Morator
+    Output --> Diffuse
+    
+    Achieve --> Feedback
+    Forecast --> Feedback
+    Morator --> Feedback
+    Diffuse --> Feedback
+    
+    Feedback -.->|iterative cycles| Processing
 ```
 
 The exploration engine represents the active investigation phase where adolescents sample different identities, roles, and value systems. This is not abstract contemplation but concrete behavioral experimentation. Vocational exploration involves taking diverse classes, pursuing internships, conducting informational interviews with professionals, and engaging in extracurricular activities that reveal aptitudes and interests. Ideological exploration involves engaging with different philosophical, religious, and political systems, attending various religious services or political meetings, reading diverse intellectual traditions, and debating values with peers holding different worldviews. Relational exploration involves forming friendships and romantic relationships with diverse individuals, observing different relationship models, and discovering what qualities in others resonate with one's emerging values.

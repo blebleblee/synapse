@@ -145,40 +145,39 @@ Opportunities that pass qualification enter the development stage where the acco
 
 The account manager maintains a dynamic expansion pipeline that tracks all opportunities across these stages, estimates their revenue potential and close probability, and forecasts expected booking timing. This pipeline feeds quarterly business reviews with the customer executive sponsor, providing transparency into the vendor's investment in the relationship and creating commitment mechanisms where the customer acknowledges expansion pathways they have validated.
 
-```
-EXPANSION PIPELINE TRACKER
-
-Account: Acme Corp | Current ARR: $485K | Expansion Target: +$180K (2024)
-
-Stage         Opportunity          Type        Value    Prob   Close
-────────────────────────────────────────────────────────────────────
-Identification
-              Product Analytics    Cross-sell  $95K     15%    2024-Q3
-              APAC User Expansion  Consumption $30K     20%    2024-Q2
-
-Exploration
-              Sales Enablement     Department  $140K    30%    2024-Q4
-              (Discovery: 2024-03-10 with Jennifer Park)
-              (Blocker: Integration concerns, arch review needed)
-
-Qualification
-              Marketing Ops +20    Consumption $45K     60%    2024-Q2
-              (Economic Buyer: Marcus Liu - confirmed budget)
-              (Decision Process: No procurement, MSA amendment)
-
-Development
-              EU Subsidiary Deploy Department  $75K     70%    2024-Q2
-              (Business Case: Submitted 2024-03-01)
-              (Approval: Sarah Chen + EU GM - pending)
-
-Proposal
-              Enterprise Tier      Consumption $120K    85%    2024-Q1
-              (Contract: Redlines resolved, awaiting signature)
-              (Implementation: Kickoff scheduled 2024-04-01)
-
-────────────────────────────────────────────────────────────────────
-Pipeline Total: $505K weighted value | Risk-Adjusted Forecast: $240K
-Expansion Target Achievement: 133% of $180K goal (accounting for 50% typical conversion)
+```mermaid
+flowchart TD
+    Header["<b>EXPANSION PIPELINE TRACKER</b><br/>Account: Acme Corp | Current ARR: $485K | Expansion Target: +$180K (2024)"]
+    
+    subgraph Identification["<b>IDENTIFICATION</b>"]
+        I1["Product Analytics<br/>Cross-sell | $95K | 15% prob<br/>Close: 2024-Q3"]
+        I2["APAC User Expansion<br/>Consumption | $30K | 20% prob<br/>Close: 2024-Q2"]
+    end
+    
+    subgraph Exploration["<b>EXPLORATION</b>"]
+        E1["Sales Enablement<br/>Department | $140K | 30% prob<br/>Close: 2024-Q4<br/><br/>Discovery: 2024-03-10 with Jennifer Park<br/>Blocker: Integration concerns, arch review needed"]
+    end
+    
+    subgraph Qualification["<b>QUALIFICATION</b>"]
+        Q1["Marketing Ops +20<br/>Consumption | $45K | 60% prob<br/>Close: 2024-Q2<br/><br/>Economic Buyer: Marcus Liu - confirmed budget<br/>Decision Process: No procurement, MSA amendment"]
+    end
+    
+    subgraph Development["<b>DEVELOPMENT</b>"]
+        D1["EU Subsidiary Deploy<br/>Department | $75K | 70% prob<br/>Close: 2024-Q2<br/><br/>Business Case: Submitted 2024-03-01<br/>Approval: Sarah Chen + EU GM - pending"]
+    end
+    
+    subgraph Proposal["<b>PROPOSAL</b>"]
+        P1["Enterprise Tier<br/>Consumption | $120K | 85% prob<br/>Close: 2024-Q1<br/><br/>Contract: Redlines resolved, awaiting signature<br/>Implementation: Kickoff scheduled 2024-04-01"]
+    end
+    
+    Footer["<b>Pipeline Summary</b><br/>Pipeline Total: $505K weighted value<br/>Risk-Adjusted Forecast: $240K<br/>Expansion Target Achievement: 133% of $180K goal<br/>(accounting for 50% typical conversion)"]
+    
+    Header --> Identification
+    Identification --> Exploration
+    Exploration --> Qualification
+    Qualification --> Development
+    Development --> Proposal
+    Proposal --> Footer
 ```
 
 This pipeline discipline transforms account management from reactive relationship maintenance into proactive revenue generation, providing forecast visibility that enables capacity planning and quota attainment predictability. The weighted pipeline value applies stage-based probability multipliers to raw opportunity values, generating risk-adjusted forecasts that account for typical conversion attrition. A healthy strategic account maintains an expansion pipeline valued at 2.5-3x the annual growth target to absorb the natural qualification failures and timeline slippages that occur even in well-managed opportunities.

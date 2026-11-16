@@ -17,13 +17,16 @@ FORBIDDEN_TEXT_PLACEHOLDERS = [
     r"\bFIXME:\s*",
     r"insert code here",
     r"\[insert\s+",
-    r"\bto be determined\b",
+    r"\[to be determined\]",
+    r"\bTBD\b",
+    r"(?i)\b(?:status|date|author|version):\s*to be determined\b",
     r"\bexercise for the reader\b"
 ]
 
 CROSS_DOMAIN_BLEED_RULES = [
     {
         "pattern": r"\bbpftool\b",
+        "allowed_domains": ["computing"],
         "allowed_topics": [
             "ebpf",
             "observability",
@@ -34,7 +37,7 @@ CROSS_DOMAIN_BLEED_RULES = [
             "cilium",
             "cni"
         ],
-        "message": "Low-level eBPF inspection utility (bpftool) referenced in an off-topic course"
+        "message": "Low-level Linux kernel eBPF utility (bpftool) referenced in an off-topic non-computing domain"
     },
     {
         "pattern": r"The operational verification lab for the Core domain within",
@@ -53,6 +56,8 @@ def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
 
     rel_file = str(file_path.relative_to(WORKSPACE_ROOT))
     parts = file_path.relative_to(TOPICS_DIR).parts if file_path.is_relative_to(TOPICS_DIR) else ()
+    domain = parts[0] if len(parts) >= 1 else ""
+    category = parts[1] if len(parts) >= 2 else ""
     subtopic_id = parts[2] if len(parts) >= 3 else ""
 
     # 1. Outer Code Fence Check (File must not start with ```markdown or ```md)
@@ -87,7 +92,10 @@ def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
 
     # 4. Cross-Domain Bleed & Generic Template Detection
     for rule in CROSS_DOMAIN_BLEED_RULES:
-        if subtopic_id not in rule["allowed_topics"]:
+        allowed_domains = rule.get("allowed_domains", [])
+        allowed_topics = rule.get("allowed_topics", [])
+        is_allowed = (domain in allowed_domains) or (subtopic_id in allowed_topics)
+        if not is_allowed:
             if re.search(rule["pattern"], content, re.IGNORECASE):
                 issues.append({
                     "file": rel_file,
@@ -98,31 +106,58 @@ def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
 
     # 5. File Size & Truncation Checks
     size_bytes = len(content.encode("utf-8"))
-    if size_bytes < 500:
+    min_size = 2500 if "lesson_" in file_path.name else 1200
+    if size_bytes < min_size:
         issues.append({
             "file": rel_file,
             "severity": "error",
-            "code": "CORRUPTED_FILE",
-            "message": f"File is severely truncated or empty ({size_bytes} bytes). Expected complete masterclass content."
+            "code": "TRUNCATED_OR_INCOMPLETE",
+            "message": f"File is truncated or brief ({size_bytes} bytes, expected >= {min_size} bytes for masterclass completeness)"
         })
-    else:
-        min_size = 2500 if "lesson_" in file_path.name else 1200
-        if size_bytes < min_size:
+
+    # 5b. LLM Refusal & Upstream API Failure Stub Detection
+    refusal_patterns = [
+        r"\bI can't write\b",
+        r"\bI cannot write\b",
+        r"\bI won't write\b",
+        r"\bI'm not going to write\b",
+        r"\bI'll decline regardless\b",
+        r"\bUpstream service temporarily unavailable\b"
+    ]
+    for rpat in refusal_patterns:
+        if re.search(rpat, content, re.IGNORECASE):
             issues.append({
                 "file": rel_file,
-                "severity": "warning",
-                "code": "LOW_DEPTH",
-                "message": f"File is brief ({size_bytes} bytes, expected > {min_size} bytes for masterclass rigor)"
+                "severity": "error",
+                "code": "LLM_REFUSAL_STUB",
+                "message": f"File contains an unresolved LLM refusal or API failure stub matching '{rpat}'"
             })
+            break
+
+    # 5c. Prompt / Context Echo Leak Detection
+    context_leak_patterns = [
+        r"--- Newly Discovered Project Context ---",
+        r"--- End of Context from:",
+        r"--- End Project Context ---"
+    ]
+    for cpat in context_leak_patterns:
+        if re.search(cpat, content):
+            issues.append({
+                "file": rel_file,
+                "severity": "error",
+                "code": "CONTEXT_LEAK_CORRUPTION",
+                "message": f"File is corrupted by leaked system prompt context matching '{cpat}'"
+            })
+            break
 
     # 6. Section Heading Completeness
     headings = re.findall(r"^##\s+(.+)$", content, re.MULTILINE)
     if len(headings) < 2 and "labs" not in file_path.name.lower():
         issues.append({
             "file": rel_file,
-            "severity": "warning",
-            "code": "INSUFFICIENT_SECTIONS",
-            "message": f"Found only {len(headings)} top-level sections (expected >= 2)"
+            "severity": "error",
+            "code": "INCOMPLETE_SECTIONS",
+            "message": f"Lesson has only {len(headings)} top-level section(s) (expected >= 2, likely truncated early)"
         })
 
     # 7. Context-Aware Placeholder Detection (Extract text outside code blocks)
@@ -137,25 +172,50 @@ def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
                 "message": f"Contains unfulfilled author placeholder matching '{pattern}' in lesson prose"
             })
 
-    # 8. Untagged Code Blocks
-    untagged = re.findall(r"```\s*\n", content)
-    if untagged:
+    # 8. Untagged Code Blocks (State-aware: inspect opening fences only)
+    untagged_count = 0
+    in_code_block = False
+    for line in content.splitlines():
+        trimmed = line.strip()
+        if trimmed.startswith("```"):
+            if not in_code_block:
+                lang = trimmed[3:].strip()
+                if not lang:
+                    untagged_count += 1
+                in_code_block = True
+            else:
+                in_code_block = False
+
+    if untagged_count > 0:
         issues.append({
             "file": rel_file,
             "severity": "warning",
             "code": "UNTAGGED_CODE_BLOCK",
-            "message": f"Found {len(untagged)} code block(s) without language identifier"
+            "message": f"Found {untagged_count} opening code block(s) without language identifier"
         })
 
     # 9. Operational Labs Integrity Check
     if file_path.name == "labs.md":
-        has_exercises = bool(re.search(r"##\s+(?:Exercise|Lab|Scenario|Mission|\d+\.)", content, re.IGNORECASE))
-        if not has_exercises and len(headings) < 2:
+        has_exercises = bool(re.search(r"##\s+(?:Exercise|Lab|Scenario|Mission|Part|Drill|Project|Phase|Milestone|Track|Workflow|Profiling|\d+\.)", content, re.IGNORECASE))
+        if not has_exercises and len(headings) < 3:
             issues.append({
                 "file": rel_file,
-                "severity": "warning",
+                "severity": "error",
                 "code": "INCOMPLETE_LABS",
                 "message": "Labs file does not appear to contain structured hands-on exercises or operational scenarios"
+            })
+
+    # 10. Abrupt Sentence / File Truncation Check
+    clean_lines = [l.strip() for l in content.splitlines() if l.strip()]
+    if clean_lines:
+        last_line = clean_lines[-1]
+        valid_terminators = ('.', '!', '?', '"', "'", "```", "-->", "$$", "]", "}", ")", ">", ":", ";", "|", "*", "_", "~")
+        if not any(last_line.endswith(c) for c in valid_terminators):
+            issues.append({
+                "file": rel_file,
+                "severity": "error",
+                "code": "ABRUPT_TRUNCATION",
+                "message": f"File appears cut off mid-sentence or mid-word (ends with '{last_line[-40:]}')"
             })
 
     return issues

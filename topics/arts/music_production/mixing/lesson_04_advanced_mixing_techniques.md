@@ -130,7 +130,7 @@ Gain staging is the single highest-leverage fix for muddy, flat, or distorted mi
 | Release | Time to return to no compression | 80–150ms, or auto-release | 100–250ms, tempo-synced if possible |
 | Knee | How gradually ratio ramps in near threshold | Soft knee (transparent) | Hard knee (punchy, obvious) |
 
-**Attack time is the most important creative decision.** A fast attack (<5ms) clamps the transient itself, reducing punch and snap — useful for taming an overly aggressive pick attack on bass. A slower attack (15–30ms) lets the initial transient through uncompressed while controlling the sustain/body that follows — the standard choice when you want drums to stay punchy.
+**Attack time is the most important creative decision.** A fast attack (< 5ms) clamps the transient itself, reducing punch and snap — useful for taming an overly aggressive pick attack on bass. A slower attack (15–30ms) lets the initial transient through uncompressed while controlling the sustain/body that follows — the standard choice when you want drums to stay punchy.
 
 ### Practice drill: setting compression by ear, not just meters
 

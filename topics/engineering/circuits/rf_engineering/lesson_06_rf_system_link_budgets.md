@@ -36,18 +36,42 @@ The local oscillator subsystem generates the frequency references required for m
 
 A representative link budget calculation for a 2.4 GHz Wi-Fi link over 100 meters illustrates the interplay of propagation, antenna gain, and receiver sensitivity. The transmitter outputs $+20$ dBm through a chip antenna with $+2$ dBi gain. Free-space path loss at 2.4 GHz over 100 meters is $20\log_{10}(100) + 20\log_{10}(2400) - 32.45 = 40 + 67.6 - 32.45 = 75.15$ dB. The receiver antenna provides $+2$ dBi gain, and the receiver requires a minimum $-80$ dBm signal for a 54 Mbps OFDM data rate. The link margin becomes $P_r = 20 + 2 - 75.15 + 2 = -51.15$ dBm, yielding $-51.15 - (-80) = 28.85$ dB of margin to absorb multipath fading, body loss, and interference.
 
-```
-Link Budget Summary (2.4 GHz Wi-Fi, 100 m)
-────────────────────────────────────────────
-Transmit Power (dBm):                  +20.0
-Tx Antenna Gain (dBi):                  +2.0
-Free-Space Path Loss (dB):             -75.2
-Rx Antenna Gain (dBi):                  +2.0
-Receiver Sensitivity (dBm):            -80.0
-────────────────────────────────────────────
-Received Power (dBm):                  -51.2
-Link Margin (dB):                      +28.8
-════════════════════════════════════════════
+```mermaid
+flowchart TD
+    TX["📡 Transmit Power\n+20.0 dBm"]
+    TXG["🔺 Tx Antenna Gain\n+2.0 dBi"]
+    FSPL["📉 Free-Space Path Loss\n−75.2 dB"]
+    RXG["🔺 Rx Antenna Gain\n+2.0 dBi"]
+    RXPWR["📊 Received Power\n−51.2 dBm"]
+    RXSEN["🎯 Receiver Sensitivity\n−80.0 dBm"]
+    MARGIN["✅ Link Margin\n+28.8 dB"]
+
+    subgraph budget ["Link Budget Summary — 2.4 GHz Wi-Fi, 100 m"]
+        direction TD
+
+        subgraph gains ["Signal Chain"]
+            direction TD
+            TX --> |"EIRP contribution"| TXG
+            TXG --> |"propagation"| FSPL
+            FSPL --> |"antenna recovery"| RXG
+        end
+
+        RXG --> RXPWR
+
+        subgraph result ["Link Result"]
+            direction TD
+            RXPWR --> |"margin = Rx Power − Sensitivity"| MARGIN
+            RXSEN --> |"threshold"| MARGIN
+        end
+    end
+
+    style TX     fill:#1a6b3c,color:#fff,stroke:#0d4a2a
+    style TXG    fill:#2d8653,color:#fff,stroke:#1a6b3c
+    style FSPL   fill:#8b2020,color:#fff,stroke:#5c1010
+    style RXG    fill:#2d8653,color:#fff,stroke:#1a6b3c
+    style RXPWR  fill:#1a4a8b,color:#fff,stroke:#0d2d5c
+    style RXSEN  fill:#6b4a1a,color:#fff,stroke:#4a3010
+    style MARGIN fill:#0d5c0d,color:#fff,stroke:#083008
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

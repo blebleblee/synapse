@@ -22,35 +22,61 @@ This staggered instrumentation entry follows a frequency-domain logic derived fr
 
 The Camelot Wheel translates circle-of-fifths theory into a practical reference system using a 12-position clock face with dual letter codes. Position 1B represents A♭ major (G# major), 2B represents E♭ major, 3B represents B♭ major, continuing through the sharp-side keys as the numbers ascend. The parallel minor keys occupy the "A" code at each position: 1A is F minor (relative minor of A♭ major), 2A is C minor, 3A is G minor. This encoding creates three categories of compatible mixing relationships, each with distinct harmonic characteristics and optimal use cases.
 
-```
-Camelot Wheel Geometric Structure:
+```mermaid
+flowchart TD
+    subgraph outer_b ["Outer Ring — Major Keys (B)"]
+        n12B["12B — E major"]
+        n11B["11B — A major"]
+        n1B["1B — A♭ major"]
+        n10B["10B — D major"]
+        n2B["2B — E♭ major"]
+        n9B["9B — G major"]
+        n3B["3B — B♭ major"]
+    end
 
-           12B (E major)
-            / | \
-           /  |  \
-      11B /  12A  \ 1B
-    (A)  |  (C♯m)|  (A♭)
-         |        |
-     11A-+--------+-1A
-    (F♯m)|        |(Fm)
-         |        |
-      10B|   *   |2B
-    (D)  |        |(E♭)
-         |        |
-     10A-+--------+-2A
-    (Bm) |        |(Cm)
-          \       /
-       9B  \  9A /  3B
-      (G)   (Em)   (B♭)
-              |
-             3A
-            (Gm)
+    subgraph outer_a ["Inner Ring — Minor Keys (A)"]
+        n12A["12A — C♯ minor"]
+        n11A["11A — F♯ minor"]
+        n1A["1A — F minor"]
+        n10A["10A — B minor"]
+        n2A["2A — C minor"]
+        n9A["9A — E minor"]
+        n3A["3A — G minor"]
+    end
 
-Key Mixing Rules:
-• Same position (8A→8A): Perfect consonance
-• ±1 step same mode (8A→7A/9A): Single chromatic shift
-• Mode switch same number (8A→8B): Relative major/minor
-• ±2 steps: Significant dissonance, requires transition technique
+    subgraph rules ["Key Mixing Rules"]
+        r1["Same position (e.g. 8A → 8A): Perfect consonance"]
+        r2["±1 step same mode (e.g. 8A → 7A / 9A): Single chromatic shift"]
+        r3["Mode switch same number (e.g. 8A → 8B): Relative major / minor"]
+        r4["±2 steps: Significant dissonance — requires transition technique"]
+    end
+
+    %% Relative major/minor pairs (B ↔ A, same number)
+    n12B <-->|"relative major/minor"| n12A
+    n11B <-->|"relative major/minor"| n11A
+    n1B  <-->|"relative major/minor"| n1A
+    n10B <-->|"relative major/minor"| n10A
+    n2B  <-->|"relative major/minor"| n2A
+    n9B  <-->|"relative major/minor"| n9A
+    n3B  <-->|"relative major/minor"| n3A
+
+    %% Adjacent major keys (±1 step, B ring)
+    n12B <-->|"±1 step"| n11B
+    n12B <-->|"±1 step"| n1B
+    n11B <-->|"±1 step"| n10B
+    n1B  <-->|"±1 step"| n2B
+    n10B <-->|"±1 step"| n9B
+    n2B  <-->|"±1 step"| n3B
+    n9B  <-->|"±1 step"| n3B
+
+    %% Adjacent minor keys (±1 step, A ring)
+    n12A <-->|"±1 step"| n11A
+    n12A <-->|"±1 step"| n1A
+    n11A <-->|"±1 step"| n10A
+    n1A  <-->|"±1 step"| n2A
+    n10A <-->|"±1 step"| n9A
+    n2A  <-->|"±1 step"| n3A
+    n9A  <-->|"±1 step"| n3A
 ```
 
 Harmonic mixing execution in the DJ booth proceeds through four distinct workflow patterns, each optimized for different musical contexts and transition durations. The first pattern, **parallel key mixing**, maintains the same Camelot number while switching between A and B codes. When blending a track in 5A (D minor) with one in 5B (F major), the DJ benefits from complete scale-degree alignment—every note in the D minor track belongs to F major and vice versa. This relationship allows extended overlaps of 32-64 bars where both tracks play at full instrumentation without harmonic conflict. The perceptual effect resembles modal interchange, where the D minor track provides a darker, more introspective color while the F major track brightens the emotional palette. DJs exploit this technique during peak-hour sets to maintain intensity while subtly shifting mood, or during opening sets to build energy through major-key uplift while preserving melodic continuity.

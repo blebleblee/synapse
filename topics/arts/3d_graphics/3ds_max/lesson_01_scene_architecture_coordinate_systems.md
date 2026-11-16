@@ -125,28 +125,21 @@ The **Center** of the gizmo (the red, green, and blue arrows) always indicates t
 
 ### Coordinate System Reference Diagram
 
-```
-World Space (Fixed)
-┌─────────────────────────────┐
-│  Origin at (0, 0, 0)        │
-│  X-axis (red) ──────>       │
-│  Y-axis (green) ↑           │
-│  Z-axis (blue) out of page  │
-│                             │
-│  Object A (Position: 5,0,0) │
-│  ┌──────────────────────┐   │
-│  │ Local Space (Mobile) │   │
-│  │ Rotated 45° around Y │   │
-│  │ Pivot at position    │   │
-│  │                      │   │
-│  │ Child B (Local offset)   │
-│  │ relative to A's pivot    │
-│  └──────────────────────┘   │
-│                             │
-└─────────────────────────────┘
-
-Transform Chain:
-World_B = World_A × Local_B
+```mermaid
+flowchart TD
+    WS["World Space (Fixed)<br/>Origin at (0, 0, 0)<br/>X-axis (red) →<br/>Y-axis (green) ↑<br/>Z-axis (blue) ⊙"]
+    
+    subgraph ObjA ["Object A (Position: 5, 0, 0)"]
+        LS["Local Space (Mobile)<br/>Rotated 45° around Y<br/>Pivot at position"]
+        ChildB["Child B<br/>(Local offset relative to A's pivot)"]
+        LS --> ChildB
+    end
+    
+    WS --> ObjA
+    
+    TC["Transform Chain:<br/>World_B = World_A × Local_B"]
+    
+    ObjA -.-> TC
 ```
 
 ## 3. High-Performance Optimization & Failure Modes
@@ -199,8 +192,25 @@ As your scene grows, transformation evaluation becomes a bottleneck. A character
 
 **Step 3: Use transform caching for animated assets.** Point constraints or linked XForm controllers can be optimized by pre-baking transforms to keys rather than evaluating constraints every frame during animation playback.
 
-**Step 4: Reduce constraint depth.** If an object is constrained to an object that is constrained to another object (three levels of constraint chains), the evaluation order becomes complex. Flatten the constraint structure where possible; have all objects constrain directly to root control nulls.
+**Step 4: Reduce constraint depth.** If an object is constrained to an object that is constrained to another object (three levels of constraint chains), the evaluation order becomes complex.
 
-**Step 5: Use LOD (level-of-detail) hierarchies for complex characters.** Create simplified mesh variants for viewport playback and reserve high-polygon geometry for final render passes.
+Simplify by converting constraints to keyframes using the Animation > Constraints > Bake Constraint or Animation > Convert To > Convert to Keyable menu commands, removing the constraint overhead entirely from runtime evaluation. This is particularly effective for one-shot animations or sequences that do not require runtime retargeting.
 
-This discipline—organizing hierarchies intentionally, naming objects consistently, prof
+**Step 5: Freeze transforms on static objects.** For geometry that never moves (environment pieces, static props), right-click the object, select Object Properties, and enable the "Freeze" option. This removes the object from the transformation update pipeline. Alternatively, use the Layer Manager to freeze entire layers of static content. Frozen objects are excluded from per-frame transform evaluation, significantly reducing overhead in complex scenes.
+
+**Step 6: Optimize viewport display.** Disable the display of gizmos, grid, and viewport overlays during playback. Use the Viewport Configuration > Display Performance settings to enable "Adaptive Degradation," which automatically simplifies geometry display when the frame rate drops below a threshold. This does not affect rendering but keeps interactive performance smooth during animation scrubbing. For final verification, always return to full display quality and re-test transform behavior, as adaptive degradation can mask subtle motion artifacts introduced by hierarchy or constraint issues.
+
+By following this workflow systematically, you can maintain real-time playback even in scenes with thousands of objects and deeply nested hierarchies. The key is to treat transformation evaluation as a computational resource with a finite budget, and to allocate that budget intentionally by collapsing, caching, and constraining only where necessary. Every unnecessary constraint, every un-collapsed modifier, every unfrozen static object is a tax on your scene's interactive performance. Measure, optimize, verify—this cycle is the discipline that separates production-grade rigs from prototypes that collapse under load.
+
+---
+
+## Summary & Verification Matrix
+
+| **Invariant / Mechanism** | **Governing Rule** | **Diagnostic Criterion** | **Corrective Action** |
+|---------------------------|--------------------|--------------------------|-----------------------|
+| **World vs. Local Coordinate Systems** | World coordinates are absolute and scene-global; local coordinates are relative to parent transform and change under hierarchy operations. | If object position appears correct in viewport but fails alignment in script or export, inspect coordinate system mode in status bar and verify whether query used `$.pos` (world) or `$.transform.position` (local). | Standardize all queries to world space for inter-object operations; use local space only for hierarchical offsets or child-relative positioning. Convert via `in coordsys world $objectname.pos`. |
+| **Hierarchical Transform Propagation** | Child transforms are evaluated after parent transforms; parent rotation/scale/position directly affects child world-space state via matrix multiplication. | If child object motion is amplified, damped, or skewed unexpectedly, examine parent's non-uniform scale or non-zero pivot offset. Use Transform Toolbox to inspect effective parent matrix. | Reset parent pivot to object center, or apply Reset XForm to collapse inherited scale/rotation into geometry vertices before re-establishing hierarchy. Use Link Constraint instead of direct linking if parent has animated non-uniform scale. |
+| **Pivot Point Independence** | Object pivot position is stored separately from vertex positions; moving pivot does not alter geometry in object space but changes rotation/scale behavior and world-space interpretation. | If rotation or scale behaves erratically, inspect pivot location via Hierarchy panel > Affect Pivot Only. If pivot is offset from logical center, rotations will orbit around that offset. | Center pivot using Hierarchy > Affect Pivot Only > Center to Object, or manually position pivot to desired rotation origin. Verify in Perspective viewport before applying rotational keyframes. |
+| **Transform Constraint Evaluation Order** | Constraints (Position, Orientation, LookAt) are evaluated after base transform but before children; constraint stack depth increases evaluation cost and can introduce order-dependent behavior. | If constraint target changes do not propagate immediately or produce unexpected interpolation, measure constraint chain depth. If depth exceeds 3 levels, suspect evaluation cycle or over-constrained system. | Bake constraints to keyframes using Animation > Bake Constraint for static or one-shot sequences; use scripted controllers only where runtime retargeting is essential. Test constraint removal to isolate whether behavior is constraint-induced. |
+| **Viewport Gizmo Coordinate Reflection** | Viewport transform gizmo axes reflect active coordinate system (View, Screen, World, Local, Parent, Pick); incorrect system produces valid transforms in unintended space. | If user moves object "up" in viewport but object translates diagonally in world space, active coordinate system is not World. Check Gizmo Coordinate dropdown in main toolbar. | Set coordinate system to World for scene-level positioning, Local for parent-relative offsets, or View for camera-aligned motion. Use keyboard shortcut `X` to cycle coordinate systems during interactive transforms. |
+| **Performance: Transform Evaluation Budget** | Every constraint, modifier, and unfrozen object consumes per-frame transform evaluation cycles; deeply nested hierarchies multiply cost via recursive parent updates. | If viewport playback frame rate drops below 24 FPS during scrubbing, enable Frame Statistics (Viewport Canvas properties) and inspect "Transform Eval Time." Values above 5ms per object indicate optimization opportunity. | Freeze static objects via Object Properties; collapse modifier stacks via Edit > Collapse To; bake constraints to keyframes; reduce hierarchy depth by flattening parent chains or using World-space alignment constraints instead of nested links. |

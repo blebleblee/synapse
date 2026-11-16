@@ -87,17 +87,48 @@ The kernel enforces isolation through virtual memory, implemented via the Memory
 When a user process attempts to access a kernel address, the MMU checks the U/S bit in the PTE. If the CPU is in Ring 3 and the bit indicates supervisor-only, the MMU triggers a page fault, trapping into the kernel.
 
 **Example: Linux x86-64 Address Space Layout:**
-```
-0xFFFFFFFFFFFFFFFF ┐
-                   │ Kernel text, data, heap
-0xFFFF800000000000 ┘
-                   ← Canonical hole (non-addressable)
-0x00007FFFFFFFFFFF ┐
-                   │ User stack (grows down)
-                   │ Memory-mapped regions
-                   │ Heap (grows up)
-                   │ BSS, data, text
-0x0000000000000000 ┘
+```mermaid
+flowchart TD
+    KernelTop["0xFFFFFFFFFFFFFFFF"]
+    KernelSpace["Kernel text, data, heap"]
+    KernelBottom["0xFFFF800000000000"]
+
+    CanonicalHole["⟵ Canonical Hole (non-addressable)"]
+
+    UserTop["0x00007FFFFFFFFFFF"]
+    UserStack["User stack (grows ↓)"]
+    MmapRegions["Memory-mapped regions"]
+    Heap["Heap (grows ↑)"]
+    BssDataText["BSS, data, text"]
+    UserBottom["0x0000000000000000"]
+
+    KernelTop --> KernelSpace --> KernelBottom
+    KernelBottom -. "canonical hole" .-> CanonicalHole
+    CanonicalHole -. "canonical hole" .-> UserTop
+    UserTop --> UserStack --> MmapRegions --> Heap --> BssDataText --> UserBottom
+
+    subgraph kernel_space ["Kernel Space"]
+        KernelTop
+        KernelSpace
+        KernelBottom
+    end
+
+    subgraph user_space ["User Space"]
+        UserTop
+        UserStack
+        MmapRegions
+        Heap
+        BssDataText
+        UserBottom
+    end
+
+    style CanonicalHole fill:#d0d0d0,stroke:#999,color:#333,stroke-dasharray: 5 5
+    style kernel_space fill:#fde8e8,stroke:#c00
+    style user_space fill:#e8f0fe,stroke:#336
+    style KernelTop fill:#fff,stroke:#c00,font-weight:bold
+    style KernelBottom fill:#fff,stroke:#c00,font-weight:bold
+    style UserTop fill:#fff,stroke:#336,font-weight:bold
+    style UserBottom fill:#fff,stroke:#336,font-weight:bold
 ```
 
 ## 2. Fundamental System Guarantees & Non-Negotiable Invariants

@@ -20,20 +20,32 @@ Hume's convergence criterion states that when judges meeting these five conditio
 
 Edmund Burke's taxonomy partitions aesthetic phenomena into two fundamental categories with distinct physiological signatures. Beauty, in Burke's analysis, comprises qualities that induce positive pleasure through relaxation and social attraction. Small size, smoothness, gradual variation, delicacy, and clear bright colors all trigger parasympathetic responses—dilation, softening, and approach behaviors. Burke associates beauty with the reproductive instinct and social cohesion, noting that beautiful objects invite extended contemplation and physical proximity. The sublime, by contrast, operates through pain, danger, and terror held at sufficient distance to avoid actual harm. Vastness, obscurity, power, difficulty, magnificence, and sudden transitions activate sympathetic arousal—vasoconstriction, muscle tension, pupil dilation, and elevated heart rate. The sublime involves a dialectical structure: initial threat or inadequacy followed by secondary relief or transcendence. When we confront a towering mountain range or violent storm from a position of safety, we experience simultaneous inadequacy (recognition of our physical insignificance) and exaltation (awareness that our rational faculties can comprehend what our bodies cannot match).
 
-```
-BURKE'S AESTHETIC TAXONOMY
-
-BEAUTY                              SUBLIME
-─────────────────────────────────────────────────────────
-Trigger:      Social/sexual          Self-preservative
-Mechanism:    Relaxation             Tension → Relief
-Scale:        Small, proportioned    Vast, unbounded
-Texture:      Smooth, polished       Rough, rugged
-Variation:    Gradual curves         Sudden transitions
-Light:        Clear, bright          Obscure, dim
-Emotion:      Love, affection        Astonishment, awe
-Physiology:   Parasympathetic        Sympathetic arousal
-Paradigm:     Human form, gardens    Mountains, storms, death
+```mermaid
+flowchart TD
+    Root["BURKE'S AESTHETIC TAXONOMY"]
+    
+    Root --> Beauty["BEAUTY"]
+    Root --> Sublime["SUBLIME"]
+    
+    Beauty --> B1["Trigger: Social/sexual"]
+    Beauty --> B2["Mechanism: Relaxation"]
+    Beauty --> B3["Scale: Small, proportioned"]
+    Beauty --> B4["Texture: Smooth, polished"]
+    Beauty --> B5["Variation: Gradual curves"]
+    Beauty --> B6["Light: Clear, bright"]
+    Beauty --> B7["Emotion: Love, affection"]
+    Beauty --> B8["Physiology: Parasympathetic"]
+    Beauty --> B9["Paradigm: Human form, gardens"]
+    
+    Sublime --> S1["Trigger: Self-preservative"]
+    Sublime --> S2["Mechanism: Tension → Relief"]
+    Sublime --> S3["Scale: Vast, unbounded"]
+    Sublime --> S4["Texture: Rough, rugged"]
+    Sublime --> S5["Variation: Sudden transitions"]
+    Sublime --> S6["Light: Obscure, dim"]
+    Sublime --> S7["Emotion: Astonishment, awe"]
+    Sublime --> S8["Physiology: Sympathetic arousal"]
+    Sublime --> S9["Paradigm: Mountains, storms, death"]
 ```
 
 Burke's framework provides predictive power: given an object's physical properties, we can anticipate whether it will produce experiences of beauty or sublimity and can design aesthetic objects to reliably trigger desired responses. This makes Burke's system particularly valuable for practitioners in architecture, landscape design, and visual composition, where manipulating physical parameters directly controls aesthetic effects. The limitation is that Burke's physiological reductionism struggles to account for the cognitive and cultural dimensions of aesthetic experience—why tragedy produces pleasure, how abstract art generates emotional responses, or why aesthetic judgments claim normativity rather than merely reporting causal regularities.
@@ -44,21 +56,66 @@ Kant's crucial innovation is the concept of purposiveness without purpose (Zweck
 
 The structure of pure aesthetic judgment (the judgment of taste) follows four moments corresponding to the logical functions of judgment. The judgment of taste is disinterested: it takes pleasure in the mere representation of the object without concern for its existence or utility. I can judge a painting of fruit beautiful while having no desire to eat the fruit. This disinterest distinguishes aesthetic pleasure from agreeable sensations (which depend on actual existence and consumption) and moral approval (which concerns the good). The judgment of taste is universal without concepts: it claims agreement from all subjects without relying on determinate concepts or rules. I cannot prove the rose is beautiful by subsuming it under a definition, yet I demand that others see its beauty. The judgment of taste exhibits purposiveness without purpose: aesthetic objects display formal unity and organization without serving actual purposes. Finally, the judgment of taste is necessary: it claims that all subjects ought to agree, yet this necessity is subjective rather than objective—it depends on the assumption that all subjects share the same cognitive faculties operating under the same conditions of harmonious free play.
 
-```
-KANT'S AESTHETIC JUDGMENT ARCHITECTURE
-
-COGNITIVE LAYER          OPERATION                    OUTPUT
-─────────────────────────────────────────────────────────────────
-Sensory Manifold    →   Imagination synthesizes   →  Unified percept
-Unified Percept     →   Understanding seeks form  →  Harmonious play
-Harmonious Play     →   Reflective recognition    →  Aesthetic pleasure
-Aesthetic Pleasure  →   Universal validity claim  →  Demand for agreement
-
-CONSTRAINTS:
-- No determinate concept mediates imagination-understanding relation
-- No interest in object's existence or practical utility
-- No rule or criterion grounds the judgment
-- Claim to universal assent despite subjective origin
+```mermaid
+flowchart TD
+    A["Sensory Manifold"]
+    B["Imagination synthesizes"]
+    C["Unified Percept"]
+    D["Understanding seeks form"]
+    E["Harmonious Play"]
+    F["Reflective recognition"]
+    G["Aesthetic Pleasure"]
+    H["Universal validity claim"]
+    I["Demand for Agreement"]
+    
+    subgraph cognitive["COGNITIVE LAYER"]
+        A
+    end
+    
+    subgraph operation1["OPERATION"]
+        B
+    end
+    
+    subgraph output1["OUTPUT"]
+        C
+    end
+    
+    subgraph operation2["OPERATION"]
+        D
+    end
+    
+    subgraph output2["OUTPUT"]
+        E
+    end
+    
+    subgraph operation3["OPERATION"]
+        F
+    end
+    
+    subgraph output3["OUTPUT"]
+        G
+    end
+    
+    subgraph operation4["OPERATION"]
+        H
+    end
+    
+    subgraph output4["OUTPUT"]
+        I
+    end
+    
+    subgraph constraints["CONSTRAINTS"]
+        J["No determinate concept mediates imagination-understanding relation"]
+        K["No interest in object's existence or practical utility"]
+        L["No rule or criterion grounds the judgment"]
+        M["Claim to universal assent despite subjective origin"]
+    end
+    
+    A --> B --> C --> D --> E --> F --> G --> H --> I
+    C -.-> J
+    E -.-> K
+    G -.-> L
+    I -.-> M
 ```
 
 Kant's sublime introduces a second aesthetic mode where imagination encounters its own limits. The mathematical sublime arises when we confront objects whose magnitude exceeds imagination's capacity to apprehend them as unified wholes—vast oceans, towering mountain ranges, the star-filled night sky. Imagination attempts to generate a representation adequate to reason's demand for totality but fails, producing initial displeasure. Yet this failure simultaneously reveals reason's superiority over imagination: our rational faculty can think the totality (the concept of infinite magnitude) even though imagination cannot represent it. This produces a complex pleasure of rational transcendence, a recognition that our cognitive powers exceed the bounds of sensible representation. The dynamical sublime occurs when we confront overwhelming physical power—violent storms, erupting volcanoes, crushing waterfalls—from a position of physical safety. Nature threatens our physical existence yet reveals that our moral vocation as rational beings transcends natural causality. We recognize ourselves as supersensible subjects whose dignity is independent of physical survival.

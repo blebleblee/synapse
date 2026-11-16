@@ -20,39 +20,54 @@ The lathe bed forms the structural foundation of the entire system and establish
 
 The bed's cross-section determines how components mount and slide. Most modern lathes use either flat ways with dovetailed slides or tubular beds with indexed positions. Flat ways, ground to precise flatness and parallelism, allow infinite positioning of the tailstock and tool rest assembly but require periodic maintenance to compensate for wear. Tubular beds sacrifice infinite positioning for simplified manufacturing and excellent torsional stiffness, with components clamping around the tubes at any desired location. The choice between architectures creates a fundamental tradeoff: flat ways provide better support for heavy faceplate work that generates significant lateral forces, while tubular beds offer superior convenience for production work requiring frequent repositioning.
 
-```
-LATHE ARCHITECTURE - SIDE ELEVATION
+```mermaid
+flowchart TD
+    subgraph headstock ["Headstock (Fixed to Bed)"]
+        MOTOR["Motor"]
+        PULLEY["Pulley Belt Drive"]
+        SPINDLE["Spindle / Nose"]
+        MOTOR --> PULLEY --> SPINDLE
+    end
 
-Headstock        Tool Rest Assembly         Tailstock
-    |                    |                      |
-    |                    |                      |
-    v                    v                      v
-┌─────────┐         ┌────────┐            ┌─────────┐
-│  Motor  │         │  Post  │            │  Quill  │
-│   |||   │         │   ||   │            │   ===>  │ ← Ram advance
-│  Pulley │         │   ||   │            │  Center │
-│   |||   │         │   ||   │            │   Tip   │
-│ Spindle │         │ Platform─────┐      │  Lock   │
-│  Nose ═>│         │              │      └─────────┘
-└─────────┘         └────────────┬─┘            
-     │                           │              │
-═════╧═══════════════════════════╧══════════════╧═════
-           LATHE BED (WAYS)
-     ↑                           ↑              ↑
-  Fixed to bed            Slides on ways    Slides on ways
-                         (locked by lever)  (locked by lever)
+    subgraph toolrest_assy ["Tool Rest Assembly (Slides on Ways)"]
+        POST["Post"]
+        PLATFORM["Platform"]
+        TOOL["Tool"]
+        POST --> PLATFORM --> TOOL
+    end
 
-FORCE VECTORS DURING CUTTING
+    subgraph tailstock_assy ["Tailstock (Slides on Ways)"]
+        QUILL["Quill / Ram"]
+        CENTER["Live / Dead Center Tip"]
+        LOCK["Lock Lever"]
+        QUILL -->|"Ram Advance →"| CENTER
+        LOCK -.->|"locks"| QUILL
+    end
 
-         Tool Rest ──→ [TOOL]
-                         ↓
-                    Cutting Force
-                         ↓
-    Headstock ←═══════[WORK]═══════→ Tailstock
-    (driving)      ↓  rotation  ↓    (support)
-                   ↓             ↓
-              Centrifugal    Reaction
-               loading       to bed
+    subgraph bed ["Lathe Bed — Ways"]
+        WAYS["Bed Ways (Ground Steel Rails)"]
+    end
+
+    subgraph cutting ["Force Vectors During Cutting"]
+        WORK["Workpiece (rotating)"]
+        CF["Cutting Force ↓"]
+        CENTRIFUGAL["Centrifugal Loading"]
+        REACTION["Reaction Force to Bed"]
+    end
+
+    SPINDLE -->|"drives rotation"| WORK
+    TOOL -->|"engages"| CF
+    CF --> WORK
+    WORK -->|"centrifugal"| CENTRIFUGAL
+    WORK -->|"reaction"| REACTION
+    WORK -->|"supported by"| CENTER
+
+    headstock --- WAYS
+    toolrest_assy --- WAYS
+    tailstock_assy --- WAYS
+
+    CENTRIFUGAL --> WAYS
+    REACTION --> WAYS
 ```
 
 The headstock houses the spindle, bearings, and drive system that provide the rotational power for all turning operations. The spindle itself is a precision shaft, typically 1.25 to 2 inches in diameter, supported by heavy-duty ball bearings or tapered roller bearings that must withstand both radial loads from unbalanced workpieces and thrust loads from tailstock pressure during spindle turning. The spindle's nose features standardized threads and tapers—such as 1-8 TPI threads with a #2 Morse taper, or metric M33×3.5—that allow rapid mounting of faceplates, chucks, and drive centers. The through-hole running along the spindle's central axis serves two purposes: it allows mounting of long stock that extends behind the headstock for spindle work, and provides clearance for driving out Morse taper tooling when the headstock is used as a hollow arbor.

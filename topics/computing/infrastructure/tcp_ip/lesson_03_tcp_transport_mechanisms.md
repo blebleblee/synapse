@@ -47,19 +47,15 @@ The TCP header encodes the metadata necessary to maintain connection state and i
 
 Connection establishment begins when a client sends a SYN segment with its initial sequence number. The server responds with SYN-ACK, carrying both its own initial sequence number and an acknowledgment of the client's sequence number plus one. The client completes the handshake with an ACK, acknowledging the server's sequence number. This three-way exchange synchronizes sequence numbers and transitions both endpoints from CLOSED through LISTEN and SYN-SENT or SYN-RECEIVED to ESTABLISHED state. The initial sequence numbers are randomized for security, preventing blind injection attacks that exploit predictable values.
 
-```
-Client                                Server
-  |                                     |
-  |  SYN seq=x                         |
-  |------------------------------------>|
-  |                                     |
-  |         SYN-ACK seq=y, ack=x+1     |
-  |<------------------------------------|
-  |                                     |
-  |  ACK seq=x+1, ack=y+1              |
-  |------------------------------------>|
-  |                                     |
-  |         ESTABLISHED                 |
+```mermaid
+flowchart LR
+    Client["Client"]
+    Server["Server"]
+    
+    Client -->|"SYN seq=x"| Server
+    Server -->|"SYN-ACK seq=y, ack=x+1"| Client
+    Client -->|"ACK seq=x+1, ack=y+1"| Server
+    Server -->|ESTABLISHED| Client
 ```
 
 During data transfer, the sender maintains several key variables. Send.UNA tracks the oldest unacknowledged sequence number, representing data transmitted but not yet confirmed. Send.NXT holds the next sequence number to send. Send.WND stores the receiver's advertised window. The sender may transmit data in the range from Send.UNA to Send.UNA plus the minimum of the congestion window and Send.WND. As acknowledgments arrive, Send.UNA advances, opening the sliding window to permit transmission of additional data.
@@ -100,24 +96,17 @@ Window scaling addresses the limitation of the sixteen-bit window field, which c
 
 Connection termination follows a four-segment exchange, as TCP provides full-duplex communication requiring independent shutdown of each direction. When an application closes its end, TCP sends a FIN segment, transitioning to FIN-WAIT-1 state. Upon receiving an acknowledgment, it moves to FIN-WAIT-2, where it can still receive data from the peer. When the peer's FIN arrives, the endpoint acknowledges it and enters TIME-WAIT, remaining there for twice the maximum segment lifetime (typically one to two minutes). This TIME-WAIT period ensures that delayed segments from the old connection expire before the four-tuple is reused, preventing segment confusion across connection instances.
 
-```
-Client                                Server
-  |                                     |
-  |  FIN seq=x                         |
-  |------------------------------------>|
-  |                                     |
-  |         ACK ack=x+1                |
-  |<------------------------------------|
-  |                                     |
-  |         (Server may send more data) |
-  |                                     |
-  |         FIN seq=y                  |
-  |<------------------------------------|
-  |                                     |
-  |  ACK ack=y+1                       |
-  |------------------------------------>|
-  |                                     |
-  | TIME-WAIT (2×MSL)                  |
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server
+    
+    Client->>Server: FIN seq=x
+    Server->>Client: ACK ack=x+1
+    Note over Server: Server may send more data
+    Server->>Client: FIN seq=y
+    Client->>Server: ACK ack=y+1
+    Note over Client: TIME-WAIT (2×MSL)
 ```
 
 Abrupt termination via RST segments bypasses the graceful shutdown sequence, immediately destroying connection state. A RST may result from a segment arriving for a non-existent connection, a connection reset by the application, or detection of a half-open connection where one endpoint has restarted and lost state while the peer still considers the connection active.

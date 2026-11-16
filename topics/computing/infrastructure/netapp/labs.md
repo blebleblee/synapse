@@ -1078,3 +1078,4 @@ rm -f /tmp/nfs-fio.pcap /tmp/iscsi-fio.pcap /tmp/nfs-baseline.pcap
 
 # Restore network (remove any tc qdisc rules)
 sudo tc qdisc del dev "$WORKER_IFACE" root 2>/dev/null
+```

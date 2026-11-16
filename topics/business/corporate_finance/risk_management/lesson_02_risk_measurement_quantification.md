@@ -70,66 +70,44 @@ where $C$ is the convexity of the instrument. For option-free bonds, convexity i
 
 The computational architecture of an institutional risk measurement system is best understood as a data pipeline with distinct transformation stages: position ingestion, return generation, risk factor mapping, model execution, and reporting aggregation. Understanding where each measure lives in this pipeline — and what it consumes — clarifies why different frameworks answer different questions and why no single metric suffices.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                   RISK QUANTIFICATION PIPELINE                      │
-│                                                                     │
-│  ┌─────────────┐    ┌─────────────┐    ┌──────────────────────┐    │
-│  │  POSITION   │    │  MARKET     │    │   RISK FACTOR        │    │
-│  │  DATABASE   │───▶│  DATA FEED  │───▶│   MAPPING ENGINE     │    │
-│  │             │    │             │    │                      │    │
-│  │ Quantity    │    │ Spot prices │    │ ΔEquity exposure     │    │
-│  │ Instrument  │    │ Yield curves│    │ ΔRate sensitivity    │    │
-│  │ Notional    │    │ FX rates    │    │ ΔFX exposure         │    │
-│  │ Trade date  │    │ Vol surfaces│    │ ΔCredit spread DV01  │    │
-│  └─────────────┘    └─────────────┘    └──────────┬───────────┘    │
-│                                                   │                │
-│               ┌───────────────────────────────────┘                │
-│               │                                                     │
-│               ▼                                                     │
-│  ┌────────────────────────────────────────────────────────────┐    │
-│  │                   MODEL EXECUTION LAYER                     │    │
-│  │                                                             │    │
-│  │   ┌──────────────┐  ┌──────────────┐  ┌────────────────┐  │    │
-│  │   │  Parametric  │  │  Historical  │  │  Monte Carlo   │  │    │
-│  │   │  VaR Engine  │  │  Simulation  │  │  Simulation    │  │    │
-│  │   │              │  │  Engine      │  │  Engine        │  │    │
-│  │   │ Σ covariance │  │ 500-2500     │  │ N=10,000       │  │    │
-│  │   │ matrix       │  │ return       │  │ correlated     │  │    │
-│  │   │ z_α · σ · √t │  │ scenarios    │  │ GBM paths      │  │    │
-│  │   └──────┬───────┘  └──────┬───────┘  └───────┬────────┘  │    │
-│  │          │                 │                   │           │    │
-│  │          └─────────────────┼───────────────────┘           │    │
-│  │                            ▼                               │    │
-│  │                   ┌────────────────┐                       │    │
-│  │                   │  CVaR / ES     │                       │    │
-│  │                   │  Calculator    │                       │    │
-│  │                   │  E[r|r≤-VaR_α] │                       │    │
-│  │                   └────────┬───────┘                       │    │
-│  └────────────────────────────┼───────────────────────────────┘    │
-│                               │                                     │
-│               ┌───────────────┘                                     │
-│               ▼                                                     │
-│  ┌────────────────────────────────────────────────────────────┐    │
-│  │               STRESS TESTING & SCENARIO LAYER               │    │
-│  │                                                             │    │
-│  │  Historical Scenarios    │   Hypothetical Scenarios         │    │
-│  │  ─────────────────────   │   ──────────────────────────     │    │
-│  │  2008 Lehman default     │   +300bp parallel rate shift     │    │
-│  │  2020 COVID vol spike    │   Credit spread widening 400bp   │    │
-│  │  2011 EU sovereign crisis│   USD appreciation 15%           │    │
-│  │  1994 bond market rout   │   Equity drawdown -35%           │    │
-│  └────────────────────────────────────────────────────────────┘    │
-│                               │                                     │
-│               ┌───────────────┘                                     │
-│               ▼                                                     │
-│  ┌────────────────────────────────────────────────────────────┐    │
-│  │            REPORTING & LIMIT MONITORING LAYER               │    │
-│  │                                                             │    │
-│  │   VaR vs. limit   │  CVaR breach alert  │  Stress P&L      │    │
-│  │   Duration report │  Convexity profile  │  Sensitivity grid│    │
-│  └────────────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Pipeline["RISK QUANTIFICATION PIPELINE"]
+        subgraph DataLayer["Data & Mapping Layer"]
+            PosDB["POSITION DATABASE<br/>━━━━━━━━━━━━━━<br/>• Quantity<br/>• Instrument<br/>• Notional<br/>• Trade date"]
+            MktData["MARKET DATA FEED<br/>━━━━━━━━━━━━━━<br/>• Spot prices<br/>• Yield curves<br/>• FX rates<br/>• Vol surfaces"]
+            RiskMap["RISK FACTOR MAPPING ENGINE<br/>━━━━━━━━━━━━━━━━━━━━━━<br/>• Δ Equity exposure<br/>• Δ Rate sensitivity<br/>• Δ FX exposure<br/>• Δ Credit spread DV01"]
+        end
+        
+        subgraph ModelLayer["MODEL EXECUTION LAYER"]
+            ParamVaR["Parametric VaR Engine<br/>━━━━━━━━━━━━━━━━<br/>Σ covariance matrix<br/>z_α · σ · √t"]
+            HistSim["Historical Simulation Engine<br/>━━━━━━━━━━━━━━━━━━━━<br/>500-2500 return scenarios"]
+            MonteCarlo["Monte Carlo Simulation Engine<br/>━━━━━━━━━━━━━━━━━━━━━━<br/>N=10,000 correlated GBM paths"]
+            CVaR["CVaR / ES Calculator<br/>━━━━━━━━━━━━━━━<br/>E[r|r≤-VaR_α]"]
+        end
+        
+        subgraph StressLayer["STRESS TESTING & SCENARIO LAYER"]
+            HistScen["Historical Scenarios<br/>━━━━━━━━━━━━━━━━<br/>• 2008 Lehman default<br/>• 2020 COVID vol spike<br/>• 2011 EU sovereign crisis<br/>• 1994 bond market rout"]
+            HypoScen["Hypothetical Scenarios<br/>━━━━━━━━━━━━━━━━━━<br/>• +300bp parallel rate shift<br/>• Credit spread widening 400bp<br/>• USD appreciation 15%<br/>• Equity drawdown -35%"]
+        end
+        
+        subgraph ReportLayer["REPORTING & LIMIT MONITORING LAYER"]
+            Reports["VaR vs. limit  |  CVaR breach alert  |  Stress P&L<br/>Duration report  |  Convexity profile  |  Sensitivity grid"]
+        end
+        
+        PosDB --> MktData
+        MktData --> RiskMap
+        RiskMap --> ParamVaR
+        RiskMap --> HistSim
+        RiskMap --> MonteCarlo
+        ParamVaR --> CVaR
+        HistSim --> CVaR
+        MonteCarlo --> CVaR
+        CVaR --> HistScen
+        CVaR --> HypoScen
+        HistScen --> Reports
+        HypoScen --> Reports
+    end
 ```
 
 **Building the Variance-Covariance Matrix in Practice**

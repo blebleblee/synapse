@@ -59,25 +59,31 @@ Trap geometry implements a mechanical one-way valve using water as the sealing m
 
 Vent routing follows a set of geometric requirements ensuring atmospheric pressure access. Every fixture requires either an individual vent rising directly from the trap arm to atmosphere, a common vent shared with another fixture, or a connection to the wet vent system where a drain pipe serves simultaneously as drain for one fixture and vent for another. The critical constraint is that the vent connection must occur above the flood level rim of the fixture—the highest point water can reach before overflowing—to prevent water from entering the vent under normal operation. For fixtures located far from the main stack, vents may run horizontally only after rising at least 6 inches above the flood level rim, ensuring that any water that does enter the vent cannot flow backward into the fixture.
 
-```
-Drainage System Architecture
+```mermaid
+flowchart TD
+    FIXTURE["Fixture"]
+    TRAP["P-Trap\n(2–4&quot; seal)"]
+    DRAIN["Drain\n(¼&quot;/ft slope)"]
+    BRANCH["Branch Drain"]
+    VENT["Vent Stack\n(through roof)"]
+    MAIN["Main Stack\n(vertical)"]
+    BLDG["Building Drain"]
+    SEWER["Sewer Connection"]
 
-                         Vent Stack (through roof)
-                                │
-    Fixture → Trap → Drain ────┴──→ Branch Drain
-      (P-trap)  (2–4" seal)  (¼"/ft slope)
-                                │
-                         Main Stack (vertical)
-                                │
-                         Building Drain
-                                │
-                         Sewer Connection
+    FIXTURE --> TRAP
+    TRAP --> DRAIN
+    DRAIN --> BRANCH
+    DRAIN --> VENT
+    BRANCH --> MAIN
+    MAIN --> BLDG
+    BLDG --> SEWER
 
-Critical Distances:
-- Trap arm length: ≤ 3.5' (1¼"), ≤ 5' (1½"), ≤ 6' (2")
-- Vent connection: ≥ 6" above flood rim
-- Branch drain slope: ≥ ¼" per foot (≥ 3" pipe)
-- Stack offset: requires venting above/below offset
+    subgraph critical ["Critical Distances"]
+        C1["Trap arm: ≤ 3.5 ft (1¼&quot;) · ≤ 5 ft (1½&quot;) · ≤ 6 ft (2&quot;)"]
+        C2["Vent connection: ≥ 6&quot; above flood rim"]
+        C3["Branch drain slope: ≥ ¼&quot; per foot (≥ 3&quot; pipe)"]
+        C4["Stack offset: requires venting above and below offset"]
+    end
 ```
 
 Water heater architecture introduces thermal storage and heat transfer considerations. Tank-type heaters maintain 40–80 gallons of water at setpoint temperature (typically 120–140°F) using gas burners or electric resistance elements controlled by mechanical thermostats. The thermostatic control operates on a differential: heat activates when water temperature drops 10–15°F below setpoint and deactivates when reaching setpoint, creating continuous cycling during standby periods as jacket losses cool the stored water. Recovery rate—the time required to reheat a full tank after complete draw—depends on input power (40,000 BTU/hour for typical gas units, 4,500 watts for electric) and water temperature rise. A 40-gallon gas heater with 40,000 BTU/hour input recovers in approximately 30 minutes, while an equivalent electric heater with 4,500-watt elements requires 90 minutes.

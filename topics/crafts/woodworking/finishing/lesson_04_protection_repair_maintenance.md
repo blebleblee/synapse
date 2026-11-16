@@ -63,20 +63,42 @@ The bulk film's flexibility must be matched to the substrate's expected dimensio
 
 Defect formation can be understood as a signal-path problem where each stage of finish application presents specific failure modes:
 
-```
-ENVIRONMENT          APPLICATION          FILM FORMATION          CURE
-   │                    │                     │                   │
-   ├→ Humidity ──→ Blush ──────→ Trapped moisture ──→ Milky haze
-   │                                          
-   ├→ Temp ──→ Viscosity shift ──→ Orange peel (cold) / Runs (hot)
-   │                                          
-   ├→ Air flow ──→ Solvent pop ──→ Trapped volatiles ──→ Pinholes
-   │                                          
-   ├→ Substrate ──→ Silicone ──→ Fish eye / crawling ──→ Craters
-   │                                          
-   ├→ Recoat ──→ Undercoat not dry ──→ Wrinkling ──→ Lifting
-   │                                          
-   └→ Grit/tramp ──→ Nibs ──→ Dust in wet film ──→ Bumps
+```mermaid
+flowchart LR
+    ENV["ENVIRONMENT"]
+    APP["APPLICATION"]
+    FILM["FILM FORMATION"]
+    CURE["CURE"]
+    
+    ENV --> HUM["Humidity"]
+    ENV --> TEMP["Temp"]
+    ENV --> AIR["Air flow"]
+    ENV --> SUB["Substrate"]
+    ENV --> REC["Recoat"]
+    ENV --> GRIT["Grit/tramp"]
+    
+    HUM --> BLUSH["Blush"]
+    BLUSH --> TRAP_MOIST["Trapped moisture"]
+    TRAP_MOIST --> HAZE["Milky haze"]
+    
+    TEMP --> VISC["Viscosity shift"]
+    VISC --> ORANGE["Orange peel (cold) / Runs (hot)"]
+    
+    AIR --> SOLV["Solvent pop"]
+    SOLV --> TRAP_VOL["Trapped volatiles"]
+    TRAP_VOL --> PIN["Pinholes"]
+    
+    SUB --> SIL["Silicone"]
+    SIL --> FISH["Fish eye / crawling"]
+    FISH --> CRAT["Craters"]
+    
+    REC --> UNDER["Undercoat not dry"]
+    UNDER --> WRINK["Wrinkling"]
+    WRINK --> LIFT["Lifting"]
+    
+    GRIT --> NIBS["Nibs"]
+    NIBS --> DUST["Dust in wet film"]
+    DUST --> BUMPS["Bumps"]
 ```
 
 Blush, one of the most common and most misunderstood defects, forms when fast-evaporating solvents—typically acetone, methyl ethyl ketone, or the light fractions of a lacquer thinner—chill the wet film surface below the dew point of the surrounding air. Moisture from the atmosphere condenses into the film, becoming trapped as micro-droplets that scatter light and produce a white, milky haze. The mechanism is identical to the condensation on a cold glass of water: evaporative cooling drops the surface temperature below the dew point, and water condenses. The correction depends on severity. Light blush can often be dissipated by applying a mist coat of lacquer retarder—a slow-evaporating glycol ether such as butyl cellosolve (ethylene glycol monobutyl ether) at approximately 5 to 10 percent of the thinner volume—which re-dissolves the surface of the film and allows trapped moisture to escape before the film sets. Severe blush requires sanding the affected area with 320-grit paper to remove the hazy layer, then reapplying a coat of finish with retarder added to slow the evaporation rate and keep the film surface above the dew point throughout solvent release. Prevention is straightforward: do not spray lacquer when relative humidity exceeds 70 percent, and in borderline conditions, add 5 percent retarder to the first coat as insurance.

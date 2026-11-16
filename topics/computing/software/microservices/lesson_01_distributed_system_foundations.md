@@ -32,41 +32,34 @@ The physical reality of network communication imposes fundamental constraints on
 
 Consider the complete lifecycle of a synchronous HTTP request between two microservices. The calling service's application code invokes a client library that serializes the request payload—typically into JSON or Protocol Buffers—and writes the serialized bytes into a TCP socket. The operating system kernel copies these bytes from userspace into kernel memory buffers, segments them into IP packets sized according to the Maximum Transmission Unit (MTU) of the network interface, and enqueues them for transmission. The network interface card (NIC) fetches packets from the kernel's transmission queue using DMA (Direct Memory Access), prepends Ethernet framing headers, and transmits the electrical or optical signals onto the physical wire.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Request Path (Client → Server)                │
-└─────────────────────────────────────────────────────────────────┘
-
-Client Service                         Server Service
-┌──────────────────┐                  ┌──────────────────┐
-│  Application     │                  │  Application     │
-│  Code (Userspace)│                  │  Code (Userspace)│
-└────────┬─────────┘                  └────────▲─────────┘
-         │ Serialize                           │ Deserialize
-         │ Request                             │ Response
-         ▼                                     │
-┌──────────────────┐                  ┌──────────────────┐
-│ HTTP Client Lib  │                  │ HTTP Server Lib  │
-│ (libcurl/httpcli)│                  │ (accept loop)    │
-└────────┬─────────┘                  └────────▲─────────┘
-         │ write()                             │ read()
-         ▼                                     │
-┌──────────────────┐                  ┌──────────────────┐
-│ TCP Socket       │                  │ TCP Socket       │
-│ (Kernel Space)   │                  │ (Kernel Space)   │
-└────────┬─────────┘                  └────────▲─────────┘
-         │ Segment into                        │ Reassemble
-         │ TCP segments                        │ segments
-         ▼                                     │
-┌──────────────────┐                  ┌──────────────────┐
-│ IP Layer         │                  │ IP Layer         │
-│ (Routing)        │                  │ (Routing)        │
-└────────┬─────────┘                  └────────▲─────────┘
-         │                                     │
-         │ ════════════════════════════════════│
-         │        Physical Network             │
-         │    (Switches, Routers, NICs)        │
-         └─────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph client ["Client Service"]
+        A["Application Code<br/>(Userspace)"]
+        B["HTTP Client Lib<br/>(libcurl/httpcli)"]
+        C["TCP Socket<br/>(Kernel Space)"]
+        D["IP Layer<br/>(Routing)"]
+    end
+    
+    subgraph network ["Physical Network"]
+        E["Switches, Routers, NICs"]
+    end
+    
+    subgraph server ["Server Service"]
+        F["IP Layer<br/>(Routing)"]
+        G["TCP Socket<br/>(Kernel Space)"]
+        H["HTTP Server Lib<br/>(accept loop)"]
+        I["Application Code<br/>(Userspace)"]
+    end
+    
+    A -->|"Serialize<br/>Request"| B
+    B -->|"write()"| C
+    C -->|"Segment into<br/>TCP segments"| D
+    D --> E
+    E --> F
+    F -->|"Reassemble<br/>segments"| G
+    G -->|"read()"| H
+    H -->|"Deserialize<br/>Response"| I
 ```
 
 The network itself introduces variable latency depending on congestion, packet loss requiring retransmission, and routing changes that alter the physical path packets traverse. Once packets arrive at the destination server's NIC, the reverse process occurs: the NIC triggers an interrupt to notify the kernel of packet arrival, the kernel's network stack reassembles TCP segments into a complete stream, and the HTTP server library reads the buffered data from the socket and deserializes it back into structured request objects. Only then does the server's application code begin processing the actual business logic.
@@ -93,27 +86,25 @@ This consensus mechanism ensures that the cluster always has at most one leader 
 
 Service mesh architectures like Istio or Linkerd externalize these distributed system concerns into sidecar proxies that run alongside each microservice instance. Instead of embedding retry logic, circuit breakers, and load balancing into application code, the service mesh intercepts all network traffic through the sidecar proxy, which implements these patterns uniformly across the entire cluster. The application makes a local socket connection to the sidecar proxy, which handles service discovery, connection pooling, TLS termination, request routing, and telemetry collection before forwarding the request to the destination service's sidecar proxy.
 
-```
-Service A Pod                          Service B Pod
-┌────────────────────────────┐        ┌────────────────────────────┐
-│ ┌────────────────────────┐ │        │ ┌────────────────────────┐ │
-│ │  Application Container │ │        │ │  Application Container │ │
-│ │  (Port 8080)           │ │        │ │  (Port 8080)           │ │
-│ └──────────┬─────────────┘ │        │ └─────────▲──────────────┘ │
-│            │ localhost:15001│        │           │ localhost:15001│
-│            ▼                │        │           │                │
-│ ┌────────────────────────┐ │        │ ┌────────────────────────┐ │
-│ │  Envoy Sidecar Proxy   │ │        │ │  Envoy Sidecar Proxy   │ │
-│ │  • Load Balancing      │─┼────────┼▶│  • TLS Termination     │ │
-│ │  • Circuit Breaking    │ │  mTLS  │ │  • Authz Policy        │ │
-│ │  • Retries & Timeouts  │◀┼────────┼─│  • Metrics Collection  │ │
-│ │  • Metrics & Tracing   │ │        │ │  • Request Routing     │ │
-│ └────────────────────────┘ │        │ └────────────────────────┘ │
-└────────────────────────────┘        └────────────────────────────┘
-         ▲                                        │
-         │ Control Plane (xDS APIs)               │
-         └────────────────────────────────────────┘
-              (Service Discovery, Config Push)
+```mermaid
+flowchart TD
+    subgraph PodA["Service A Pod"]
+        AppA["Application Container<br/>(Port 8080)"]
+        EnvoyA["Envoy Sidecar Proxy<br/>• Load Balancing<br/>• Circuit Breaking<br/>• Retries & Timeouts<br/>• Metrics & Tracing"]
+        AppA -->|"localhost:15001"| EnvoyA
+    end
+    
+    subgraph PodB["Service B Pod"]
+        EnvoyB["Envoy Sidecar Proxy<br/>• TLS Termination<br/>• Authz Policy<br/>• Metrics Collection<br/>• Request Routing"]
+        AppB["Application Container<br/>(Port 8080)"]
+        EnvoyB -->|"localhost:15001"| AppB
+    end
+    
+    EnvoyA <-->|"mTLS"| EnvoyB
+    
+    ControlPlane["Control Plane (xDS APIs)<br/>(Service Discovery, Config Push)"]
+    ControlPlane -.-> EnvoyA
+    ControlPlane -.-> EnvoyB
 ```
 
 The sidecar proxy communicates with a central control plane that maintains the service registry and pushes configuration updates using the xDS (Discovery Service) protocol suite. When a new service instance starts, it registers with the control plane, which updates the service discovery data and pushes the new endpoint information to all relevant sidecar proxies. This indirection allows services to be added, removed, or reconfigured without application code changes, and enables sophisticated traffic management like canary deployments where a small percentage of traffic is routed to a new version while the majority continues hitting the stable version.

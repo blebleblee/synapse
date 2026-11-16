@@ -46,145 +46,228 @@ Disjunction rules introduce a new dimension of complexity. The *disjunction intr
 
 The *disjunction elimination rule* is more complex because it must handle the uncertainty introduced by disjunction. If you have proven φ ∨ ψ, and you want to derive some conclusion χ, you must show that χ follows from φ alone *and* that χ follows from ψ alone. Only then can you be certain that χ follows from the disjunction:
 
-```
-φ ∨ ψ    [φ]     [ψ]
-        ⋮  χ    ⋮  χ
-        χ
-─────────────────────  (∨E)
-        χ
+```mermaid
+flowchart TD
+    premise["φ ∨ ψ"]
+    assumption1["[φ]"]
+    assumption2["[ψ]"]
+    derivation1["⋮<br/>χ"]
+    derivation2["⋮<br/>χ"]
+    conclusion1["χ"]
+    conclusion2["χ"]
+    
+    premise --> conclusion1
+    assumption1 --> derivation1
+    derivation1 --> conclusion1
+    assumption2 --> derivation2
+    derivation2 --> conclusion1
+    
+    conclusion1 --> final["χ"]
+    
+    rule["(∨E)"]
+    
+    conclusion1 -.-> rule
+    rule -.-> final
 ```
 
 In this notation, the brackets around φ and ψ indicate that these are *assumptions* introduced locally within subproofs, not global premises. The rule says: given φ ∨ ψ, assume φ and derive χ; then assume ψ and derive χ; then you may discharge both assumptions and conclude χ. This rule captures the logical principle that if a conclusion follows from both disjuncts of a disjunction, it must follow from the disjunction itself.
 
 Implication introduces the most powerful mechanism in natural deduction: the *conditional proof*. The *implication introduction rule* states that to prove φ → ψ, you may assume φ and attempt to derive ψ. If successful, you may discharge the assumption and conclude φ → ψ. This formalizes the fundamental principle that a conditional is proven by showing that the consequent follows from the antecedent:
 
-```
-[φ]
- ⋮
- ψ
-───────  (→I)
-φ → ψ
+```mermaid
+flowchart TD
+    assumption["[φ]"]
+    derivation["⋮"]
+    conclusion["ψ"]
+    rule["φ → ψ"]
+
+    assumption --> derivation
+    derivation --> conclusion
+    conclusion -->|"→I"| rule
 ```
 
 The *implication elimination rule*, also called *modus ponens*, states that if you have proven φ → ψ and you have proven φ, then you may conclude ψ:
 
-```
-φ → ψ    φ
-────────────  (→E)
-ψ
+```mermaid
+flowchart TD
+    premise1["φ → ψ"]
+    premise2["φ"]
+    rule["→E"]
+    conclusion["ψ"]
+    
+    premise1 --> rule
+    premise2 --> rule
+    rule --> conclusion
 ```
 
 These two rules are inverses in a deep sense. The introduction rule packages an assumption and a derivation into a conditional; the elimination rule unpacks a conditional by combining it with an instance of its antecedent. The power of →I lies in its ability to introduce local assumptions, creating subproofs. This is where natural deduction captures the structure of human mathematical reasoning most directly: we frequently assume something "for the sake of argument" and then see what follows.
 
 Negation in classical natural deduction is typically handled through the principle of *reductio ad absurdum* (proof by contradiction). The negation introduction rule states that to prove ¬φ, you may assume φ and derive a contradiction (denoted by the symbol ⊥ or falsum). If you can derive ⊥ from φ, then φ must be false, so ¬φ must be true:
 
-```
-[φ]
- ⋮
- ⊥
-───────  (¬I)
-¬φ
+```mermaid
+flowchart TD
+    phi["φ"]
+    dots["⋮"]
+    bottom["⊥"]
+    neg_i["¬I"]
+    neg_phi["¬φ"]
+    
+    phi --> dots
+    dots --> bottom
+    bottom --> neg_i
+    neg_i --> neg_phi
 ```
 
 The *negation elimination rule* is simply that from φ and ¬φ, we may derive the contradiction ⊥:
 
-```
-φ    ¬φ
-─────────  (¬E)
-  ⊥
+```mermaid
+flowchart TD
+    phi["φ"]
+    notphi["¬φ"]
+    bottom["⊥"]
+    
+    phi --> bottom
+    notphi --> bottom
+    
+    bottom -.-> rule["(¬E)"]
 ```
 
 Additionally, classical logic includes the principle of *ex falso quodlibet* (from a contradiction, anything follows), which states that from ⊥, any formula φ may be derived:
 
-```
-  ⊥
-──────  (⊥E)
-  φ
+```mermaid
+flowchart TD
+    A["⊥"]
+    B["φ"]
+    A -->|"⊥E"| B
 ```
 
 This rule is controversial in intuitionistic logic, where it is rejected as unjustified. In classical logic, it captures the idea that contradictions are so severe they invalidate the entire logical system, allowing us to derive anything we wish from them.
 
 To illustrate how these rules compose into complete proofs, consider proving the law of excluded middle in a classical system augmented with the rule that allows us to derive ¬¬φ → φ (the principle of double negation elimination). Suppose we wish to prove φ ∨ ¬φ. We use a conditional proof to show ¬(φ ∨ ¬φ) → ⊥, then appeal to double negation elimination:
 
-```
-       [¬(φ ∨ ¬φ)]
-            ⋮
-       [φ]
-       ──────────
-       φ ∨ ¬φ
-       ─────────────────────────
-       [¬(φ ∨ ¬φ), φ] ⊥
-       ─────────────────────
-       [¬(φ ∨ ¬φ)] ¬φ
-       ──────────
-       φ ∨ ¬φ
-       ──────────────────────────────
-       [¬(φ ∨ ¬φ)] ⊥
-       ────────────────────────────  (¬I)
-       ¬¬(φ ∨ ¬φ)
-       ────────────────────────────  (DNE)
-       φ ∨ ¬φ
+```mermaid
+flowchart TD
+    A["[¬(φ ∨ ¬φ)]"]
+    B["⋮"]
+    C["[φ]"]
+    D["φ ∨ ¬φ"]
+    E["[¬(φ ∨ ¬φ), φ] ⊥"]
+    F["[¬(φ ∨ ¬φ)] ¬φ"]
+    G["φ ∨ ¬φ"]
+    H["[¬(φ ∨ ¬φ)] ⊥"]
+    I["¬¬(φ ∨ ¬φ)"]
+    J["φ ∨ ¬φ"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H -->|"(¬I)"| I
+    I -->|"(DNE)"| J
 ```
 
 This proof demonstrates the mechanical structure: assumptions are opened and closed, subproofs are nested, and each rule transforms its inputs into outputs according to strict syntactic patterns.
 
 For first-order logic, natural deduction extends with rules for the universal and existential quantifiers. The *universal introduction rule* states that if you have derived φ(x) where x is a variable that does not appear free in any unclosed assumption, then you may conclude ∀x φ(x). The intuition is that if you prove something about an arbitrary individual x (an individual you assumed nothing about except that it exists in the domain), then you have proven it about all individuals:
 
-```
-φ(x)  [x arbitrary]
-────────────────────  (∀I)
-∀x φ(x)
+```mermaid
+flowchart TD
+    premise["φ(x)  [x arbitrary]"]
+    conclusion["∀x φ(x)"]
+    rule["(∀I)"]
+
+    premise -->|"∀I"| conclusion
+    rule -. "Universal Introduction" .-> conclusion
 ```
 
 The *universal elimination rule* states that if you have proven ∀x φ(x), then you may instantiate this universally quantified formula with any term t in the domain, concluding φ(t):
 
-```
-∀x φ(x)
-────────────  (∀E)
-φ(t)
+```mermaid
+flowchart TD
+    premise["∀x φ(x)"]
+    rule["(∀E)"]
+    conclusion["φ(t)"]
+    
+    premise --> rule
+    rule --> conclusion
 ```
 
 The *existential introduction rule* states that if you have proven φ(t) for some specific term t, then you may conclude ∃x φ(x):
 
-```
-φ(t)
-──────────  (∃I)
-∃x φ(x)
+```mermaid
+flowchart TD
+    A["φ(t)"]
+    B["∃x φ(x)"]
+    A -->|∃I| B
 ```
 
 The *existential elimination rule* is more delicate. If you have proven ∃x φ(x), and you wish to derive a conclusion χ, you may assume φ(x) for some arbitrary x (where x does not appear in χ or any unclosed assumption) and derive χ. If you can derive χ under this assumption, then χ must follow from the existential:
 
-```
-∃x φ(x)    [φ(x)]
-            ⋮  χ    [x arbitrary in χ]
-            χ
-─────────────────────────────  (∃E)
-        χ
+```mermaid
+flowchart TD
+    A["∃x φ(x)"]
+    B["φ(x)"]
+    C["χ"]
+    D["x arbitrary in χ"]
+    E["χ"]
+    
+    A --> B
+    B --> C
+    C --> D
+    C -.-> E
+    
+    style E stroke:#000,stroke-width:3px
+    style A stroke:#666
+    style B stroke:#666
+    style C stroke:#666
+    style D stroke:#999,font-style:italic
 ```
 
 These quantifier rules preserve the separation between bound variables (those quantified over) and free variables (those appearing in assumptions or final conclusions), ensuring that the logic remains sound.
 
 The architecture of natural deduction can be visualized through a proof tree diagram. Consider the formula (p → q) ∧ (q → r) ⊢ p → r (if p implies q and q implies r, then p implies r, assuming the conjunction of these two conditionals). The proof tree might look as follows:
 
-```
-────────────────────────────────────────
-[(p → q) ∧ (q → r)]  assumption
-────────────────────────────────────────
-[(p → q) ∧ (q → r)]           [p]
-    ∧E₁                  
-(p → q)    [p]          
-    →E              assumption
-q           [q]
-    [q → r]
-    ∧E₂  (assumption from premise)
-    ────────
-    q → r
-    →E
-    r
-────────────────────  (→I, discharge [p])
-p → r
-────────────────────  (→I, discharge [(p→q)∧(q→r)])
-(p → q) ∧ (q → r) → (p → r)
+```mermaid
+flowchart TD
+    A["[(p → q) ∧ (q → r)] assumption"]
+    B["(p → q) ∧ (q → r)"]
+    C["[p] assumption"]
+    D["∧E₁"]
+    E["p → q"]
+    F["[p]"]
+    G["→E"]
+    H["q"]
+    I["[q]"]
+    J["[q → r]"]
+    K["∧E₂ (from premise)"]
+    L["q → r"]
+    M["→E"]
+    N["r"]
+    O["→I (discharge [p])"]
+    P["p → r"]
+    Q["→I (discharge [(p→q)∧(q→r)])"]
+    R["(p → q) ∧ (q → r) → (p → r)"]
+    
+    A --> B
+    B --> D
+    C --> F
+    D --> E
+    E --> G
+    F --> G
+    G --> H
+    H --> I
+    B --> K
+    K --> J
+    J --> M
+    I --> M
+    M --> N
+    N --> O
+    O --> P
+    P --> Q
+    Q --> R
 ```
 
 Each branch of this tree represents the application of a rule, with subproofs nested beneath it. The leaves are assumptions (shown in brackets) and the root is the final conclusion.

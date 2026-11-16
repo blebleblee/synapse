@@ -34,19 +34,67 @@ The algorithm initializes $n+1$ qubits to $\ket{0}^{\otimes n}\ket{1}$, applies 
 
 For constant functions where $f(x) = c$ for all $x$, the phase factor $(-1)^c$ is global and factors out. The final Hadamard transform recreates $\ket{0}^{\otimes n}$, and measurement yields the all-zeros bitstring with certainty. For balanced functions, the signed sum over all $x$ with phases $(-1)^{f(x)}$ equals zero due to cancellation between the $2^{n-1}$ positive and $2^{n-1}$ negative terms. The amplitude of $\ket{0}^{\otimes n}$ after the final Hadamard transform computes $\frac{1}{2^n} \sum_{x} (-1)^{f(x)} = 0$, and measurement yields a non-zero bitstring with certainty. This deterministic separation demonstrates that quantum interference can extract global parity information inaccessible to classical query models.
 
-```
-Deutsch-Jozsa Circuit (n=3 qubits):
+```mermaid
+flowchart LR
+    subgraph inputs ["Input Qubits"]
+        q0["q₀: |0⟩"]
+        q1["q₁: |0⟩"]
+        q2["q₂: |0⟩"]
+        anc["a: |1⟩"]
+    end
 
-q0: |0⟩ ──H────●────H──┤M├
-              │
-q1: |0⟩ ──H────●────H──┤M├
-              │
-q2: |0⟩ ──H────●────H──┤M├
-              │
-a:  |1⟩ ──H────Uf───────
+    subgraph hadamard1 ["Hadamard Layer 1"]
+        H0["H"]
+        H1["H"]
+        H2["H"]
+        Ha["H"]
+    end
 
-Phase Oracle Uf marks each |x⟩ with (-1)^f(x)
-Measurement outcome: |000⟩ → constant, else → balanced
+    subgraph oracle ["Phase Oracle"]
+        Uf["Uf\n(−1)^f(x)"]
+    end
+
+    subgraph hadamard2 ["Hadamard Layer 2"]
+        H0b["H"]
+        H1b["H"]
+        H2b["H"]
+    end
+
+    subgraph measure ["Measurement"]
+        M0["M\nq₀"]
+        M1["M\nq₁"]
+        M2["M\nq₂"]
+    end
+
+    subgraph result ["Result"]
+        R0["000 → Constant"]
+        R1["≠ 000 → Balanced"]
+    end
+
+    q0 --> H0
+    q1 --> H1
+    q2 --> H2
+    anc --> Ha
+
+    H0 --> Uf
+    H1 --> Uf
+    H2 --> Uf
+    Ha --> Uf
+
+    Uf --> H0b
+    Uf --> H1b
+    Uf --> H2b
+
+    H0b --> M0
+    H1b --> M1
+    H2b --> M2
+
+    M0 --> R0
+    M1 --> R0
+    M2 --> R0
+    M0 --> R1
+    M1 --> R1
+    M2 --> R1
 ```
 
 ### Grover's Algorithm: Amplitude Amplification and Unstructured Search
@@ -59,19 +107,28 @@ Geometrically, the state evolves within the two-dimensional subspace spanned by 
 
 The quadratic speedup is provably optimal for unstructured search under the oracle model, established by lower bounds on quantum query complexity. Extensions include amplitude estimation for counting marked items, fixed-point variants avoiding overshooting, and oblivious amplitude amplification where the number of solutions is unknown. Grover's algorithm underlies many quantum search subroutines, including collision finding, satisfiability solving, and cryptanalytic attacks reducing security levels of symmetric cryptography by square-root factors.
 
-```
-Grover Iterator for n=3 qubits (N=8, single target):
-
-        ┌─────── Grover Iterator G ───────┐
-q0: |+⟩─┤                                  ├─
-        │  Oracle Uω    Diffusion D       │
-q1: |+⟩─┤  (phase flip) (inversion about  ├─
-        │               mean)              │
-q2: |+⟩─┤                                  ├─
-        └──────────────────────────────────┘
-
-Repeat G approximately π√N/4 times, then measure.
-Success probability: sin²((2k+1)θ) with θ = arcsin(1/√N)
+```mermaid
+flowchart TD
+    Start["q0: |+⟩<br/>q1: |+⟩<br/>q2: |+⟩"]
+    
+    subgraph G["Grover Iterator G"]
+        Oracle["Oracle Uω<br/>(phase flip)"]
+        Diffusion["Diffusion D<br/>(inversion about mean)"]
+        Oracle --> Diffusion
+    end
+    
+    Measure["Measure"]
+    
+    Start --> G
+    G -->|"Repeat π√N/4 times"| G
+    G --> Measure
+    
+    Note["Success probability:<br/>sin²((2k+1)θ)<br/>θ = arcsin(1/√N)<br/>n=3 qubits, N=8"]
+    
+    style G fill:#e1f5ff,stroke:#333,stroke-width:2px
+    style Oracle fill:#fff4e6,stroke:#333
+    style Diffusion fill:#fff4e6,stroke:#333
+    style Note fill:#f0f0f0,stroke:#666,stroke-dasharray: 5 5
 ```
 
 ### Quantum Fourier Transform and Phase Estimation
@@ -90,17 +147,34 @@ The quantum subroutine implements phase estimation on the unitary operator $U_a 
 
 The continued fractions algorithm recovers $r$ from $\tilde{\varphi}$ by finding the best rational approximation $s/r$ with denominator $r < N$. Since $s$ is random modulo $r$, multiple trials may be needed to obtain $s$ coprime to $r$, but $O(n)$ repetitions suffice with high probability. The modular exponentiation oracle $U_a$ decomposes into $O(n)$ modular multiplications, each implementable via $O(n^2)$ Toffoli gates using ripple-carry or carry-lookahead adders. Recent optimizations reduce space overhead through reversible pebbling strategies and windowed arithmetic, though fault-tolerant implementations still require millions of physical qubits when accounting for error correction.
 
-```
-Shor's Period Finding Circuit Structure:
-
-Ancilla register (2n qubits):  |0⟩^⊗2n ─── H^⊗2n ─── QFT† ─── Measure → s̃
-                                              │
-System register (n qubits):    |1⟩      ─── Controlled-U_a^(2^j) ───
-                                              │
-                                     U_a|y⟩ = |ay mod N⟩
-
-Output: s̃/2^(2n) ≈ s/r, recover r via continued fractions
-Factors: gcd(a^(r/2) ± 1, N) with classical postprocessing
+```mermaid
+flowchart TD
+    A0["Ancilla register (2n qubits): |0⟩^⊗2n"]
+    H["H^⊗2n<br/>(Hadamard gates)"]
+    S0["System register (n qubits): |1⟩"]
+    
+    CU["Controlled-U_a^(2^j)<br/>U_a|y⟩ = |ay mod N⟩"]
+    
+    QFT["QFT†<br/>(Inverse Quantum Fourier Transform)"]
+    M["Measure"]
+    OUT["Output: s̃"]
+    
+    APPROX["s̃/2^(2n) ≈ s/r"]
+    CF["Recover r via<br/>continued fractions"]
+    GCD["Factors: gcd(a^(r/2) ± 1, N)"]
+    POST["Classical postprocessing"]
+    
+    A0 --> H
+    H --> CU
+    S0 --> CU
+    CU --> QFT
+    QFT --> M
+    M --> OUT
+    
+    OUT --> APPROX
+    APPROX --> CF
+    CF --> GCD
+    GCD --> POST
 ```
 
 ### Variational Quantum Algorithms: Hybrid Classical-Quantum Optimization
@@ -113,24 +187,88 @@ The quantum approximate optimization algorithm (QAOA) addresses combinatorial op
 
 Classical optimization of variational parameters confronts the barren plateau phenomenon, where gradients of random parameterized circuits vanish exponentially with system size for many ansatz families. Gradient-free methods like Nelder-Mead or Bayesian optimization struggle in high-dimensional parameter spaces, while gradient-based methods face shot noise from finite measurement samples. Analytical gradients via the parameter shift rule—computing $\partial_{\theta_i} \langle H \rangle$ from $\langle H \rangle$ evaluated at shifted parameters $\theta_i \pm \pi/2$—reduce sample complexity but still scale poorly for deep circuits. Structure-preserving ansätze respecting problem symmetries, initialization near the optimal solution, and adaptive strategies selecting parameters layer-by-layer mitigate but do not eliminate trainability challenges.
 
-```
-VQE Circuit Structure (simplified):
+```mermaid
+flowchart TD
+    subgraph VQE ["VQE Circuit Structure"]
+        subgraph qubits ["Qubit Lines"]
+            Q1_IN["&#124;0⟩"]
+            Q2_IN["&#124;0⟩"]
 
-|0⟩ ─── Ry(θ₁) ─── CNOT ─── Ry(θ₃) ─── CNOT ───┐
-                    │                     │      │
-|0⟩ ─── Ry(θ₂) ─────●─── Ry(θ₄) ─────●─────────┤ Measure ⟨H⟩
-                                                  │
-Repeat for multiple Pauli terms in H = Σᵢ hᵢ Pᵢ │
-Classical optimizer adjusts θ to minimize ⟨H⟩ ───┘
+            Q1_RY1["Ry(θ₁)"]
+            Q2_RY2["Ry(θ₂)"]
 
-QAOA Circuit for p=1 layer:
+            CNOT1["CNOT"]
 
-|+⟩ ─── exp(-iγ Hc) ─── exp(-iβ Hₘ) ─── Measure
-|+⟩ ─── exp(-iγ Hc) ─── exp(-iβ Hₘ) ─── Measure
-...
+            Q1_RY3["Ry(θ₃)"]
+            Q2_RY4["Ry(θ₄)"]
 
-Hc: problem cost Hamiltonian, Hₘ: mixer (X rotations)
-Optimize (γ, β) to maximize ⟨Hc⟩
+            CNOT2["CNOT"]
+        end
+
+        MEASURE["Measure ⟨H⟩"]
+        PAULI["H = Σᵢ hᵢ Pᵢ\nRepeat for each Pauli term"]
+        OPTIMIZER["Classical Optimizer\nadjusts θ to minimize ⟨H⟩"]
+
+        Q1_IN --> Q1_RY1
+        Q2_IN --> Q2_RY2
+
+        Q1_RY1 --> CNOT1
+        Q2_RY2 --> CNOT1
+
+        CNOT1 --> Q1_RY3
+        CNOT1 --> Q2_RY4
+
+        Q1_RY3 --> CNOT2
+        Q2_RY4 --> CNOT2
+
+        CNOT2 --> MEASURE
+        MEASURE --> PAULI
+        PAULI --> OPTIMIZER
+        OPTIMIZER -->|"updated θ"| Q1_RY1
+    end
+
+    subgraph QAOA ["QAOA Circuit (p = 1 layer)"]
+        subgraph qaoa_qubits ["Qubit Lines"]
+            QA1["&#124;+⟩ qubit 1"]
+            QA2["&#124;+⟩ qubit 2"]
+            QAN["&#124;+⟩ qubit n ..."]
+
+            UC1["exp(-iγ Hc)\ncost unitary — qubit 1"]
+            UC2["exp(-iγ Hc)\ncost unitary — qubit 2"]
+            UCN["exp(-iγ Hc)\ncost unitary — qubit n"]
+
+            UM1["exp(-iβ Hₘ)\nmixer unitary — qubit 1"]
+            UM2["exp(-iβ Hₘ)\nmixer unitary — qubit 2"]
+            UMN["exp(-iβ Hₘ)\nmixer unitary — qubit n"]
+
+            M1["Measure"]
+            M2["Measure"]
+            MN["Measure"]
+        end
+
+        HC_DEF["Hc : problem cost Hamiltonian"]
+        HM_DEF["Hₘ : mixer — X rotations"]
+        QAOA_OPT["Classical Optimizer\nmaximize ⟨Hc⟩ over (γ, β)"]
+
+        QA1 --> UC1 --> UM1 --> M1
+        QA2 --> UC2 --> UM2 --> M2
+        QAN --> UCN --> UMN --> MN
+
+        M1 --> QAOA_OPT
+        M2 --> QAOA_OPT
+        MN --> QAOA_OPT
+
+        QAOA_OPT -->|"updated γ, β"| UC1
+        QAOA_OPT -->|"updated γ, β"| UC2
+        QAOA_OPT -->|"updated γ, β"| UCN
+
+        HC_DEF --> UC1
+        HC_DEF --> UC2
+        HC_DEF --> UCN
+        HM_DEF --> UM1
+        HM_DEF --> UM2
+        HM_DEF --> UMN
+    end
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

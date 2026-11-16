@@ -704,39 +704,56 @@ Multimodal APIs face failure modes across three axes: transport, modality, and m
 **Model failures** include context window overflow (the combined token count exceeds the limit), safety filter triggers (the input or generated output violates safety policies), and model unavailability (the inference service is down or overloaded). The API should distinguish between client errors (4xx, correctable by the caller) and server errors (5xx, requiring retry with backoff).
 
 ```mermaid
-stateDiagram-v2
-    [*] --> "Request Received"
-    "Request Received" --> "Validating": "Always"
+flowchart TD
+    Start(["Request Received"])
+    Validating["Validating"]
+    Rejected400_1["Rejected 400<br/>Schema invalid / Unsupported MIME"]
+    RateLimited429["Rate Limited 429<br/>Quota exceeded"]
+    ResolvingMedia["Resolving Media"]
+    MediaError400["Media Error 400<br/>File not found / Decode failure"]
+    EncodingModalities["Encoding Modalities"]
+    EncodingError400["Encoding Error 400<br/>Unsupported resolution / Empty audio"]
+    CountingTokens["Counting Tokens"]
+    TokenOverflow400["Token Overflow 400<br/>Exceeds context window"]
+    RunningInference["Running Inference"]
+    ModelError503["Model Error 503<br/>Model unavailable / Timeout"]
+    SafetyBlock200_1["Safety Block 200<br/>Input violates policy"]
+    GenerationComplete["Generation Complete"]
+    SafetyFilterTriggered200["Safety Filter Triggered 200<br/>Output flagged"]
+    ReturningResponse["Returning Response"]
+    End1(["End"])
+    End2(["End"])
+    End3(["End"])
+    End4(["End"])
+    End5(["End"])
+    End6(["End"])
+    End7(["End"])
+    End8(["End"])
 
-    "Validating" --> "Rejected 400": "Schema invalid / Unsupported MIME"
-    "Validating" --> "Rate Limited 429": "Quota exceeded"
-    "Validating" --> "Resolving Media": "Valid"
-
-    "Resolving Media" --> "Media Error 400": "File not found / Decode failure"
-    "Resolving Media" --> "Encoding Modalities": "All parts resolved"
-
-    "Encoding Modalities" --> "Encoding Error 400": "Unsupported resolution / Empty audio"
-    "Encoding Modalities" --> "Counting Tokens": "All parts encoded"
-
-    "Counting Tokens" --> "Token Overflow 400": "Exceeds context window"
-    "Counting Tokens" --> "Running Inference": "Within budget"
-
-    "Running Inference" --> "Model Error 503": "Model unavailable / Timeout"
-    "Running Inference" --> "Safety Block 200": "Input violates policy"
-    "Running Inference" --> "Generation Complete": "Inference succeeds"
-
-    "Generation Complete" --> "Safety Filter Triggered 200": "Output flagged"
-    "Generation Complete" --> "Returning Response": "Output clean"
-
-    "Returning Response" --> [*]
-    "Safety Filter Triggered 200" --> [*]
-    "Safety Block 200" --> [*]
-    "Rejected 400" --> [*]
-    "Rate Limited 429" --> [*]
-    "Media Error 400" --> [*]
-    "Encoding Error 400" --> [*]
-    "Token Overflow 400" --> [*]
-    "Model Error 503" --> [*]
+    Start --> Validating
+    Validating -->|"Schema invalid / Unsupported MIME"| Rejected400_1
+    Validating -->|"Quota exceeded"| RateLimited429
+    Validating -->|Valid| ResolvingMedia
+    ResolvingMedia -->|"File not found / Decode failure"| MediaError400
+    ResolvingMedia -->|"All parts resolved"| EncodingModalities
+    EncodingModalities -->|"Unsupported resolution / Empty audio"| EncodingError400
+    EncodingModalities -->|"All parts encoded"| CountingTokens
+    CountingTokens -->|"Exceeds context window"| TokenOverflow400
+    CountingTokens -->|"Within budget"| RunningInference
+    RunningInference -->|"Model unavailable / Timeout"| ModelError503
+    RunningInference -->|"Input violates policy"| SafetyBlock200_1
+    RunningInference -->|"Inference succeeds"| GenerationComplete
+    GenerationComplete -->|"Output flagged"| SafetyFilterTriggered200
+    GenerationComplete -->|"Output clean"| ReturningResponse
+    ReturningResponse --> End1
+    SafetyFilterTriggered200 --> End2
+    SafetyBlock200_1 --> End3
+    Rejected400_1 --> End4
+    RateLimited429 --> End5
+    MediaError400 --> End6
+    EncodingError400 --> End7
+    TokenOverflow400 --> End8
+    ModelError503 --> End1
 ```
 
 Note that safety-filtered responses return HTTP 200 with `finishReason: SAFETY` rather than an error status. This is because the request was successfully processed; the model chose not to complete the generation due to safety constraints. The caller can inspect the `finishReason` field and the `safetyRatings` object to determine what happened.

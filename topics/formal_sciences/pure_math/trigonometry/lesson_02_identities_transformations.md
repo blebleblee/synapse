@@ -60,30 +60,31 @@ The geometric content here is worth pausing over. This formula is precisely what
 
 With the sum formulas established, the remaining identities form a tightly connected network, each derivable from the last by substitution or algebraic manipulation. The clearest way to see this structure is to trace the full derivation of each family in turn, treating the sum formulas as the root node of a dependency graph.
 
-```
-                        cos²θ + sin²θ = 1
-                              │
-                    ┌─────────┴──────────┐
-              ÷cos²θ │              ÷sin²θ│
-          1 + tan²θ = sec²θ    cot²θ + 1 = csc²θ
-                              │
-              ┌───────────────┼───────────────┐
-              │               │               │
-      Sum Formulas      Difference        (reflection
-       α+β forms         α−β forms         symmetry)
-              │               │
-              └───────┬───────┘
-                      │  set α = β = θ
-              Double-Angle Identities
-                      │
-              ┌───────┴───────┐
-              │               │
-         Half-Angle      Power-Reduction
-         (solve for θ/2)   (rearrange)
-                      │
-              Product-to-Sum
-                      │
-              Sum-to-Product
+```mermaid
+flowchart TD
+    A["cos²θ + sin²θ = 1"]
+    B["1 + tan²θ = sec²θ<br/>(÷cos²θ)"]
+    C["cot²θ + 1 = csc²θ<br/>(÷sin²θ)"]
+    D["Sum Formulas<br/>(α+β forms)"]
+    E["Difference Formulas<br/>(α−β forms)"]
+    F["Reflection Symmetry"]
+    G["Double-Angle Identities<br/>(set α = β = θ)"]
+    H["Half-Angle<br/>(solve for θ/2)"]
+    I["Power-Reduction<br/>(rearrange)"]
+    J["Product-to-Sum"]
+    K["Sum-to-Product"]
+
+    A --> |"÷cos²θ"| B
+    A --> |"÷sin²θ"| C
+    A --> D
+    A --> E
+    A --> F
+    D --> G
+    E --> G
+    G --> H
+    G --> I
+    G --> J
+    J --> K
 ```
 
 **The Double-Angle Identities.** Setting $\alpha = \beta = \theta$ in the addition formulas gives the double-angle formulas immediately. For cosine:

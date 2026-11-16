@@ -267,7 +267,7 @@ This is a forward-looking recovery: understanding that this protein was miscooke
 
 | Test | Failure Mechanism | Failure Threshold | Recovery Protocol | Recovery Success (Y/N) | Key Observation |
 |---|---|---|---|---|---|
-| 3A-1: Acid over-dilution | Aqueous phase dilution | pH <3.4 | Fresh yolk incorporation | | |
+| 3A-1: Acid over-dilution | Aqueous phase dilution | pH < 3.4 | Fresh yolk incorporation | | |
 | 3A-2: Thermal break | Protein denaturation | >80°C | Cold water whisk (partial) | | |
 | 3A-3: Emulsifier exhaustion | Lecithin saturation | >250 mL oil/yolk | Fresh yolk addition | | |
 | 3B-1: Over-fermentation | Gluten acid degradation | 150% rise | Cold retard reshape | | |
@@ -287,30 +287,30 @@ The following consolidates every critical parameter established and verified acr
 
 | Parameter | Operational Target | Critical Failure Threshold | Recovery Action |
 |---|---|---|---|
-| Finished mayo pH | 3.8–4.2 | <3.4 (break risk) or >4.5 (safety risk) | Adjust with acid or fresh yolk |
+| Finished mayo pH | 3.8–4.2 | < 3.4 (break risk) or >4.5 (safety risk) | Adjust with acid or fresh yolk |
 | Oil addition rate (initial 100 mL) | 3–5 mL / 10 sec | >12 mL / 10 sec | Slow addition immediately |
-| Yolk temperature at start | 18–22°C | <8°C (sluggish) or >38°C (protein risk) | Temper yolks in warm water bath |
-| Oil:water phase ratio | ≥74% oil by volume | <70% oil (emulsion instability) | Reduce aqueous addition |
+| Yolk temperature at start | 18–22°C | < 8°C (sluggish) or >38°C (protein risk) | Temper yolks in warm water bath |
+| Oil:water phase ratio | ≥74% oil by volume | < 70% oil (emulsion instability) | Reduce aqueous addition |
 | Béarnaise service window | 65–75°C | >82°C (protein scramble) | Bain-marie temperature control |
 
 **Bread Dough Parameters**
 
 | Parameter | Operational Target | Critical Failure Threshold | Recovery Action |
 |---|---|---|---|
-| Autolyse water temp | 28°C | <18°C (slow hydration) or >34°C (early fermentation) | Measure water before addition |
+| Autolyse water temp | 28°C | < 18°C (slow hydration) or >34°C (early fermentation) | Measure water before addition |
 | Bulk fermentation endpoint | 50–75% volume increase | >125% (over-fermented) | Cold retard immediately |
 | Ambient fermentation temp | 22–24°C | >28°C (over-fermentation acceleration) | Move to cooler environment |
-| Bake steam phase temp | 250°C | <230°C (insufficient oven spring) | Extend preheat time |
-| Final internal temp | 96–98°C | <93°C (gummy crumb) | Return to oven, 220°C, 8 min |
-| Dutch oven preheat minimum | 45 minutes | <30 min preheat | Extend preheat; test with water drop |
+| Bake steam phase temp | 250°C | < 230°C (insufficient oven spring) | Extend preheat time |
+| Final internal temp | 96–98°C | < 93°C (gummy crumb) | Return to oven, 220°C, 8 min |
+| Dutch oven preheat minimum | 45 minutes | < 30 min preheat | Extend preheat; test with water drop |
 
 **Protein Cookery Parameters**
 
 | Parameter | Operational Target | Critical Failure Threshold | Recovery Action |
 |---|---|---|---|
-| Chicken SV temp | 65.5°C for 90 min | <60°C (food safety concern) | Extend time to 4 hr at 60°C |
+| Chicken SV temp | 65.5°C for 90 min | < 60°C (food safety concern) | Extend time to 4 hr at 60°C |
 | Pan-sear pull temp | 72°C internal | >78°C (dry/chalky) | Sauce compensation |
-| Pan surface temp (sear) | 210–230°C | <180°C (no Maillard) or >260°C (burning) | Adjust burner/thermometer check |
+| Pan surface temp (sear) | 210–230°C | < 180°C (no Maillard) or >260°C (burning) | Adjust burner/thermometer check |
 | Brine concentration | 6% (60 g salt/1,000 g water) | >8% (over-cure texture) | Reduce brine time proportionally |
 | Brine time | 45 minutes | >90 min in 6% (cured texture onset) | Timer, no exceptions |
 | Carryover rise (pan sear) | 2–4°C | >6°C (overcooking) | Rest in cooler environment |

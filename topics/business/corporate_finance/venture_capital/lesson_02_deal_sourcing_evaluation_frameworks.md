@@ -32,51 +32,40 @@ Inbound deal flow, companies that cold-contact a fund or submit through a websit
 
 The following diagram illustrates the channel architecture and its integration into a fund's operational workflow:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                   DEAL FLOW CHANNEL ARCHITECTURE                │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph high_signal ["🔵 HIGH SIGNAL — Warm / Proprietary"]
+        PFR["Portfolio Founder Referrals\n(Trust Transfer)"]
+        SEN["Scout / Expert Network\n(Domain Embeds)"]
+    end
 
-  HIGH SIGNAL (Warm / Proprietary)
-  ┌──────────────────────┐    ┌──────────────────────┐
-  │  Portfolio Founder   │    │   Scout / Expert     │
-  │  Referrals           │    │   Network            │
-  │  (Trust Transfer)    │    │   (Domain Embeds)    │
-  └──────────┬───────────┘    └──────────┬───────────┘
-             │                           │
-             ▼                           ▼
-  ┌──────────────────────────────────────────────────┐
-  │             DEAL INTAKE & CRM LOGGING            │
-  │   (Affinity, Salesforce, Carta, Spreadsheet)     │
-  └──────────────────────────┬───────────────────────┘
-                             │
-  LOW SIGNAL (Cold / Market) │
-  ┌──────────────────────────┼──────────────────────────┐
-  │                          │                          │
-  ▼                          ▼                          ▼
-┌──────────┐          ┌────────────┐           ┌────────────────┐
-│ Inbound  │          │ Conference │           │ University /   │
-│ Cold     │          │ & Event    │           │ Research Lab   │
-│ Outreach │          │ Sourcing   │           │ Relationships  │
-└──────────┘          └────────────┘           └────────────────┘
-      │                     │                          │
-      ▼                     ▼                          ▼
-  ┌───────────────────────────────────────────────────────┐
-  │               TRIAGE FILTER                           │
-  │  Stage fit? │ Sector fit? │ Team credibility signal?  │
-  └───────────────────┬───────────────────────────────────┘
-                      │
-         ┌────────────┴──────────────┐
-         ▼                           ▼
-  ┌─────────────┐           ┌─────────────────┐
-  │  PURSUE     │           │  MONITOR /      │
-  │  First Call │           │  NO-FIT File    │
-  └──────┬──────┘           └─────────────────┘
-         │
-         ▼
-  ┌─────────────────────────────┐
-  │   DUE DILIGENCE PIPELINE    │
-  └─────────────────────────────┘
+    subgraph low_signal ["🟡 LOW SIGNAL — Cold / Market"]
+        ICO["Inbound Cold Outreach"]
+        CES["Conference & Event Sourcing"]
+        URL["University / Research Lab Relationships"]
+    end
+
+    INTAKE["DEAL INTAKE & CRM LOGGING\nAffinity · Salesforce · Carta · Spreadsheet"]
+
+    TRIAGE["TRIAGE FILTER\nStage fit?  |  Sector fit?  |  Team credibility signal?"]
+
+    PURSUE["PURSUE\nFirst Call"]
+    NOFIT["MONITOR /\nNO-FIT File"]
+
+    DD["DUE DILIGENCE PIPELINE"]
+
+    PFR --> INTAKE
+    SEN --> INTAKE
+
+    ICO --> TRIAGE
+    CES --> TRIAGE
+    URL --> TRIAGE
+    INTAKE --> TRIAGE
+
+    TRIAGE --> PURSUE
+    TRIAGE --> NOFIT
+
+    PURSUE --> DD
 ```
 
 ### Market Risk vs. Technology Risk: The Assessment Matrix

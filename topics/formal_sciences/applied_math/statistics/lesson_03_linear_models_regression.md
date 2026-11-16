@@ -82,38 +82,48 @@ For near-rank-deficient or rank-deficient problems, the **singular value decompo
 
 The computational signal path for a complete regression analysis can be summarized as follows:
 
-```
-Raw Data Matrix X ∈ ℝ^{n×p}
-        │
-        ▼
-  Column centering / scaling
-  (standardization for interpretability,
-   or orthogonal polynomials for numerical stability)
-        │
-        ▼
-  QR Decomposition: X = QR
-  ┌─────────────────────────┐
-  │  Q: n×p orthonormal     │
-  │  R: p×p upper triangular│
-  └─────────────────────────┘
-        │
-        ▼
-  Solve R β̂ = Q^T y   (back substitution, O(p²))
-        │
-        ▼
-  Compute ŷ = QQ^T y, residuals e = y - ŷ
-        │
-        ▼
-  Estimate σ² = ||e||² / (n - p)
-        │
-        ▼
-  Covariance: Var(β̂) = σ² (X^T X)^{-1} = σ² (R^T R)^{-1}
-        │
-        ▼
-  Inference: t-statistics, F-tests, confidence intervals
-        │
-        ▼
-  Diagnostics: leverage h_ii, Cook's distance, VIF
+```mermaid
+flowchart TD
+    A["Raw Data Matrix **X** ∈ ℝⁿˣᵖ"]
+    B["Column Centering / Scaling
+    ─────────────────────────────
+    Standardization for interpretability
+    or orthogonal polynomials for numerical stability"]
+    C["QR Decomposition: X = QR"]
+    D["**Q**: n×p orthonormal matrix
+    **R**: p×p upper triangular matrix"]
+    E["Solve **R β̂ = Qᵀy**
+    via back substitution  O(p²)"]
+    F["Compute ŷ = QQᵀy
+    Residuals  e = y − ŷ"]
+    G["Estimate σ² = ‖e‖² / (n − p)"]
+    H["Covariance
+    Var(β̂) = σ²(XᵀX)⁻¹ = σ²(RᵀR)⁻¹"]
+    I["Inference
+    t-statistics · F-tests · Confidence Intervals"]
+    J["Diagnostics
+    Leverage hᵢᵢ · Cook's Distance · VIF"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+
+    style A fill:#1a1a2e,color:#e0e0ff,stroke:#4a4aff,stroke-width:2px
+    style B fill:#16213e,color:#e0e0ff,stroke:#4a4aff,stroke-width:1.5px
+    style C fill:#16213e,color:#e0e0ff,stroke:#4a4aff,stroke-width:1.5px
+    style D fill:#0f3460,color:#e0e0ff,stroke:#6a6aff,stroke-width:2px,stroke-dasharray:4 3
+    style E fill:#16213e,color:#e0e0ff,stroke:#4a4aff,stroke-width:1.5px
+    style F fill:#16213e,color:#e0e0ff,stroke:#4a4aff,stroke-width:1.5px
+    style G fill:#16213e,color:#e0e0ff,stroke:#4a4aff,stroke-width:1.5px
+    style H fill:#16213e,color:#e0e0ff,stroke:#4a4aff,stroke-width:1.5px
+    style I fill:#1a3a2e,color:#e0ffe0,stroke:#4aff8a,stroke-width:1.5px
+    style J fill:#1a3a2e,color:#e0ffe0,stroke:#4aff8a,stroke-width:1.5px
 ```
 
 ### Estimation of $\sigma^2$ and Its Role in Inference

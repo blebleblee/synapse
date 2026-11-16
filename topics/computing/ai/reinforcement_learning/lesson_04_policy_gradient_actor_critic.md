@@ -54,30 +54,15 @@ The advantage directly measures how much better (or worse) the specific action $
 
 The critical practical implication of using the advantage as a weighting signal is that the value function $V^\pi$ must itself be estimated, and this estimation problem is a regression problem: a second neural network, the critic, is trained to predict expected return from states. The actor is the policy network $\pi_\theta$; the critic is the value network $V_\phi$. These two components form the actor-critic architecture.
 
-```
-              ┌────────────────────────────────────────────────┐
-              │               Environment                      │
-              │   s_t ──────────────────────────► r_t, s_{t+1} │
-              └────────────┬────────────────────────┬──────────┘
-                           │ state s_t              │ reward r_t
-                           │                        │
-              ┌────────────▼──────────┐  ┌──────────▼──────────────────┐
-              │        ACTOR          │  │          CRITIC              │
-              │                       │  │                              │
-              │  π_θ(a | s)           │  │  V_φ(s)                     │
-              │  ─────────────────    │  │  ─────────────────────────  │
-              │  Policy network       │  │  Value network              │
-              │  Outputs action dist  │  │  Outputs scalar V-estimate  │
-              │                       │  │                              │
-              │  Loss: -log π_θ(a|s) │  │  Loss: (V_φ(s) - G_t)²      │
-              │        * Â_t         │  │                              │
-              └────────────┬──────────┘  └──────────┬────────────────-─┘
-                           │ ∇_θ loss               │ ∇_φ loss
-                           │                        │
-              ┌────────────▼────────────────────────▼──────────┐
-              │               Optimizer (Adam)                 │
-              │        Updates θ (actor), φ (critic)           │
-              └────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    ENV["Environment<br/>s_t ──→ r_t, s_{t+1}"]
+    
+    ENV -->|"state s_t"| ACTOR["ACTOR<br/>π_θ(a | s)<br/>Policy network<br/>Outputs action dist<br/>Loss: -log π_θ(a|s) * Â_t"]
+    ENV -->|"reward r_t"| CRITIC["CRITIC<br/>V_φ(s)<br/>Value network<br/>Outputs scalar V-estimate<br/>Loss: (V_φ(s) - G_t)²"]
+    
+    ACTOR -->|"∇_θ loss"| OPT["Optimizer (Adam)<br/>Updates θ actor, φ critic"]
+    CRITIC -->|"∇_φ loss"| OPT
 ```
 
 The critic is trained with a temporal-difference (TD) target, bootstrapping from the next state's value estimate to avoid requiring full trajectory rollouts. The one-step TD target is $r_t + \gamma V_\phi(s_{t+1})$, and the TD error (the difference between this target and the current prediction) serves as a low-variance proxy for the advantage: $\delta_t = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)$.

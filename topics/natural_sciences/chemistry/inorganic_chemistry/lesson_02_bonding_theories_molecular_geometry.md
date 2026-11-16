@@ -142,21 +142,23 @@ This parabolic density of states, combined with the Fermi-Dirac distribution $f(
 
 The Born-Haber cycle is a closed thermodynamic path, and every step must be explicitly accounted for in a Hess's law summation. Constructing it correctly is a practitioner skill that requires precise sign discipline. The standard architecture for a MX salt ($\text{M}^+\text{X}^-$) is:
 
-```
-Elements in Standard States
-    M(s) + ½X₂(g)
-           │
-           │ ΔH_f°  (Formation enthalpy, measured by calorimetry)
-           ▼
-         MX(s) ◄─────────────────────────────────────────────────────┐
-                                                                      │
-                                                                   -U_L (Lattice energy, exothermic assembly)
-                                                                      │
-  ΔH_sub  │   ½D(X-X)  │   IE₁(M)  │   EA(X)  │                    │
-   M(s)   │  ½X₂→X(g)  │  M→M⁺(g)  │  X→X⁻(g) │                    │
-   →M(g)  │             │           │           │                    │
-     ──────┴─────────────┴───────────┴───────────┴────────────────────
-     M(g)   X(g)         M⁺(g)      M⁺(g) + X⁻(g) ──────────► MX(s)
+```mermaid
+flowchart TD
+    START["M(s) + ½X₂(g)\nElements in Standard States"]
+
+    MG["M(g)"]
+    XG["X(g)"]
+    MP["M⁺(g)"]
+    MPXM["M⁺(g) + X⁻(g)"]
+    MX["MX(s)"]
+
+    START -->|"ΔH_sub\nSublimation of M(s) → M(g)"| MG
+    START -->|"½D(X-X)\n½X₂(g) → X(g)"| XG
+    MG -->|"IE₁(M)\nM(g) → M⁺(g)"| MP
+    XG -->|"EA(X)\nX(g) → X⁻(g)"| MPXM
+    MP --> MPXM
+    MPXM -->|"-U_L\nLattice energy (exothermic)"| MX
+    START -->|"ΔH_f°\nFormation enthalpy"| MX
 ```
 
 Applying Hess's law:
@@ -195,36 +197,53 @@ For the heteronuclear diatomic CO — isoelectronic with $\text{N}_2$ but with a
 
 ### VSEPR Geometry Decision Tree
 
-```
-Determine Lewis structure
-        │
-        ▼
-Count electron domains (EDs) around central atom
-(bonds of any order = 1 ED; each lone pair = 1 ED)
-        │
-   ┌────┴────┐
-   │  SN=2  │──► Linear (180°): BeCl₂, CO₂, HCN
-   └─────────┘
-        │
-   ┌────┴────┐
-   │  SN=3  │──► 0 LP: Trigonal planar (120°): BF₃, SO₃
-   └─────────┘   1 LP: Bent (~117°): SO₂, O₃
-        │
-   ┌────┴────┐
-   │  SN=4  │──► 0 LP: Tetrahedral (109.5°): CH₄, SO₄²⁻
-   └─────────┘   1 LP: Trigonal pyramidal (~107°): NH₃, PCl₃
-                 2 LP: Bent (~104.5°): H₂O, SF₂
-        │
-   ┌────┴────┐
-   │  SN=5  │──► 0 LP: Trigonal bipyramidal: PCl₅, PF₅
-   └─────────┘   1 LP: Seesaw: SF₄, XeO₃F
-                 2 LP: T-shaped: ClF₃, BrF₃
-                 3 LP: Linear: XeF₂, I₃⁻
-        │
-   ┌────┴────┐
-   │  SN=6  │──► 0 LP: Octahedral (90°): SF₆, [Co(NH₃)₆]³⁺
-   └─────────┘   1 LP: Square pyramidal (~87°): BrF₅, [Ni(CN)₅]³⁻
-                 2 LP: Square planar (90°): XeF₄, [PtCl₄]²⁻
+```mermaid
+flowchart TD
+    A["Determine Lewis Structure"]
+    B["Count Electron Domains<br/>(bonds of any order = 1 ED;<br/>each lone pair = 1 ED)"]
+    
+    C["SN = 2"]
+    C_result["Linear 180°<br/>BeCl₂, CO₂, HCN"]
+    
+    D["SN = 3"]
+    D1["0 LP: Trigonal Planar 120°<br/>BF₃, SO₃"]
+    D2["1 LP: Bent ~117°<br/>SO₂, O₃"]
+    
+    E["SN = 4"]
+    E1["0 LP: Tetrahedral 109.5°<br/>CH₄, SO₄²⁻"]
+    E2["1 LP: Trigonal Pyramidal ~107°<br/>NH₃, PCl₃"]
+    E3["2 LP: Bent ~104.5°<br/>H₂O, SF₂"]
+    
+    F["SN = 5"]
+    F1["0 LP: Trigonal Bipyramidal<br/>PCl₅, PF₅"]
+    F2["1 LP: Seesaw<br/>SF₄, XeO₃F"]
+    F3["2 LP: T-shaped<br/>ClF₃, BrF₃"]
+    F4["3 LP: Linear<br/>XeF₂, I₃⁻"]
+    
+    G["SN = 6"]
+    G1["0 LP: Octahedral 90°<br/>SF₆, [Co(NH₃)₆]³⁺"]
+    G2["1 LP: Square Pyramidal ~87°<br/>BrF₅, [Ni(CN)₅]³⁻"]
+    G3["2 LP: Square Planar 90°<br/>XeF₄, [PtCl₄]²⁻"]
+    
+    A --> B
+    B --> C
+    C --> C_result
+    B --> D
+    D --> D1
+    D --> D2
+    B --> E
+    E --> E1
+    E --> E2
+    E --> E3
+    B --> F
+    F --> F1
+    F --> F2
+    F --> F3
+    F --> F4
+    B --> G
+    G --> G1
+    G --> G2
+    G --> G3
 ```
 
 ### Band Theory Architecture: From Atom to Solid

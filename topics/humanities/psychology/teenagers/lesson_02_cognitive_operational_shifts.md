@@ -32,31 +32,44 @@ The cognitive architecture supporting adolescent formal operational thinking can
 
 The middle layer comprises associative cortices in temporal, parietal, and posterior frontal regions that construct higher-order conceptual representations through multi-modal integration. The inferior parietal lobule, angular gyrus, and supramarginal gyrus integrate spatial, linguistic, and mathematical information to support abstract symbol manipulation. The superior temporal sulcus processes social cues including biological motion, gaze direction, and vocal prosody. The temporoparietal junction supports perspective-taking and theory of mind reasoning. These associative regions undergo substantial refinement during adolescence through synaptic pruning and myelination, with connectivity patterns becoming increasingly specialized and efficient.
 
-```
-Cognitive Processing Hierarchy During Adolescent Development
-
-┌─────────────────────────────────────────────────────────────┐
-│  EXECUTIVE CONTROL LAYER (Late-Maturing)                    │
-│  Dorsolateral PFC │ Ventromedial PFC │ Anterior Cingulate  │
-│  Working memory   │ Value integration │ Conflict monitoring │
-│  Rule maintenance │ Emotional reg.    │ Error detection     │
-└────────────┬────────────────────────────┬───────────────────┘
-             │ Top-down modulation        │
-             ↓                            ↑ Bottom-up signals
-┌─────────────────────────────────────────────────────────────┐
-│  ASSOCIATIVE INTEGRATION LAYER (Mid-Maturing)               │
-│  Inferior Parietal │ Temporal Cortex  │ Premotor Cortex    │
-│  Symbol manipulation│ Semantic networks│ Action planning    │
-└────────────┬────────────────────────────┬───────────────────┘
-             │                            │
-             ↓                            ↑
-┌─────────────────────────────────────────────────────────────┐
-│  PERCEPTUAL PROCESSING LAYER (Early-Maturing)               │
-│  Visual Cortex │ Auditory Cortex │ Somatosensory Cortex    │
-│  Feature extraction and perceptual binding                  │
-└─────────────────────────────────────────────────────────────┘
-
-     ↑ Sensory Input                       ↓ Motor Output
+```mermaid
+flowchart TD
+    Input["⬆ Sensory Input"]
+    Output["⬇ Motor Output"]
+    
+    Input --> Percept
+    
+    subgraph Percept ["PERCEPTUAL PROCESSING LAYER<br/>(Early-Maturing)"]
+        VisualCx["Visual Cortex<br/>Feature extraction"]
+        AuditoryCx["Auditory Cortex"]
+        SomatoCx["Somatosensory Cortex<br/>Perceptual binding"]
+        VisualCx ---|---AuditoryCx
+        AuditoryCx ---|---SomatoCx
+    end
+    
+    Percept -->|"Bottom-up signals"| Assoc
+    Assoc -->|"Top-down modulation"| Percept
+    
+    subgraph Assoc ["ASSOCIATIVE INTEGRATION LAYER<br/>(Mid-Maturing)"]
+        InfPar["Inferior Parietal<br/>Symbol manipulation"]
+        TempCx["Temporal Cortex<br/>Semantic networks"]
+        Premotor["Premotor Cortex<br/>Action planning"]
+        InfPar ---|---TempCx
+        TempCx ---|---Premotor
+    end
+    
+    Assoc -->|"Bottom-up signals"| Exec
+    Exec -->|"Top-down modulation"| Assoc
+    
+    subgraph Exec ["EXECUTIVE CONTROL LAYER<br/>(Late-Maturing)"]
+        DlPFC["Dorsolateral PFC<br/>Working memory<br/>Rule maintenance"]
+        VmPFC["Ventromedial PFC<br/>Value integration<br/>Emotional regulation"]
+        ACC["Anterior Cingulate<br/>Conflict monitoring<br/>Error detection"]
+        DlPFC ---|---VmPFC
+        VmPFC ---|---ACC
+    end
+    
+    Exec --> Output
 ```
 
 At the apex, prefrontal cortex regions implement executive control functions that orchestrate the entire cognitive system. The dorsolateral prefrontal cortex maintains task goals in working memory, implements rule-based decision strategies, and allocates attentional resources. The ventromedial prefrontal cortex integrates emotional valence with outcome predictions to guide value-based decision-making. The anterior cingulate cortex monitors for response conflict, detects prediction errors, and signals the need for increased cognitive control. These prefrontal regions exhibit the most protracted development trajectory, with structural maturation continuing into the mid-twenties.
@@ -73,29 +86,44 @@ Cognitive flexibility depends on the ability to rapidly update task representati
 
 Risk-taking behavior during adolescence emerges from the relative developmental timing of limbic and prefrontal systems. The nucleus accumbens, a key component of the brain's reward circuitry, undergoes dramatic reorganization during puberty characterized by increased dopaminergic innervation and heightened sensitivity to reward anticipation. Functional MRI studies demonstrate that adolescents show exaggerated nucleus accumbens activation in response to potential rewards compared to both children and adults, with peak sensitivity occurring around age fourteen to sixteen. Simultaneously, connectivity between nucleus accumbens and prefrontal control regions remains immature, limiting top-down regulation of reward-driven impulses.
 
-```
-Developmental Timing Mismatch: Limbic vs. Prefrontal Maturation
+```mermaid
+flowchart TD
+    subgraph concept ["Developmental Timing Mismatch: Limbic vs. Prefrontal Maturation"]
+        subgraph limbic_track ["Limbic System — Nucleus Accumbens"]
+            L1["Ages 10–12\nActivation Rising"]
+            L2["Ages 14–16\n⚡ Reward Sensitivity Peak"]
+            L3["Ages 18–20\nActivation Declining"]
+            L4["Ages 22–26\nLow Baseline"]
+            L1 --> L2 --> L3 --> L4
+        end
 
-Activation
-Magnitude
-    │
-    │         ╱‾‾‾╲      ← Limbic System (Nucleus Accumbens)
-    │        ╱     ╲       Reward Sensitivity Peak: ages 14-16
-    │       ╱       ╲
-    │      ╱         ╲___
-    │     ╱               ‾‾‾╲___
-    │    ╱                       ‾‾‾╲___
-    │   ╱                               ‾‾‾╲___
-    │  ╱                                       ‾‾‾╲___
-    │ ╱              ← Prefrontal Cortex              ‾‾‾╲___
-    │╱                 Regulatory Control                   ‾‾‾
-    └────────────────────────────────────────────────────────────→
-   10y    12y    14y    16y    18y    20y    22y    24y    26y
-                              Age
+        subgraph pfc_track ["Prefrontal Cortex — Regulatory Control"]
+            P1["Ages 10–12\nMinimal Control"]
+            P2["Ages 14–16\nControl Still Developing"]
+            P3["Ages 18–20\nControl Increasing"]
+            P4["Ages 22–26\n✅ Full Integration"]
+            P1 --> P2 --> P3 --> P4
+        end
 
-    ↑                                                    ↑
-Risk-Taking Window: Reward sensitivity peaks before    Full
-regulatory control fully develops                      Integration
+        subgraph risk_window ["⚠️ Risk-Taking Window"]
+            RW["Ages 14–18\nReward sensitivity peaks\nbefore regulatory control\nfully develops"]
+        end
+
+        L2 --> RW
+        P2 --> RW
+
+        RW --> P4
+    end
+
+    style L2 fill:#e74c3c,color:#fff,stroke:#c0392b
+    style P4 fill:#27ae60,color:#fff,stroke:#1e8449
+    style RW fill:#f39c12,color:#fff,stroke:#d68910
+    style L1 fill:#fadbd8,stroke:#e74c3c
+    style L3 fill:#fadbd8,stroke:#e74c3c
+    style L4 fill:#fadbd8,stroke:#e74c3c
+    style P1 fill:#d5f5e3,stroke:#27ae60
+    style P2 fill:#d5f5e3,stroke:#27ae60
+    style P3 fill:#d5f5e3,stroke:#27ae60
 ```
 
 The temporal discounting mechanism operates through competition between two distinct neural systems: an impulsive limbic system that assigns high value to immediate rewards and a deliberative prefrontal system that projects and integrates future outcomes. When choosing between immediate and delayed rewards, the ventral striatum and medial prefrontal cortex encode immediate reward value, while lateral prefrontal and parietal cortices encode the value of delayed rewards. The relative strength of these competing signals determines choice behavior. During early adolescence, the limbic immediate-reward system exerts disproportionate influence, producing steep temporal discounting. As prefrontal regions mature and their connectivity with subcortical structures strengthens, the deliberative system gains influence, enabling more patient, future-oriented decision-making.

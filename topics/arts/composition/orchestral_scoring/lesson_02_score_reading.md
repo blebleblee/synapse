@@ -317,119 +317,71 @@ Knowing range and timbre tells you what to expect on the page before you've full
 
 MusicXML encodes the full coordinate system — staves, clefs, key signatures, pitches, durations, dynamics, articulations, and transpositions — as structured, machine-readable XML. The excerpt below is a four-measure study in C major for flute (non-transposing), B♭ clarinet (transposing), violin, and cello: flute and clarinet state a broken C-major triad in concert pitch, violin plays a staccato ascending line, cello supplies the bass.
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC
-  "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
-  "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="4.0">
-  <work>
-    <work-title>Orchestral Excerpt — C Major Triad Study</work-title>
-  </work>
-  <identification>
-    <creator type="composer">Score Reading Exercise</creator>
-  </identification>
+```mermaid
+flowchart TD
 
-  <part-list>
-    <score-part id="P1">
-      <part-name>Flute</part-name>
-      <part-abbreviation>Fl.</part-abbreviation>
-    </score-part>
-    <score-part id="P2">
-      <part-name>B♭ Clarinet</part-name>
-      <part-abbreviation>B♭ Cl.</part-abbreviation>
-    </score-part>
-    <score-part id="P3">
-      <part-name>Violin I</part-name>
-      <part-abbreviation>Vln. I</part-abbreviation>
-    </score-part>
-    <score-part id="P4">
-      <part-name>Cello</part-name>
-      <part-abbreviation>Vc.</part-abbreviation>
-    </score-part>
-  </part-list>
+    subgraph score ["🎼 Orchestral Excerpt — C Major Triad Study"]
 
-  <!-- Flute: non-transposing, treble clef, concert C major -->
-  <part id="P1">
-    <measure number="1">
-      <attributes>
-        <divisions>4</divisions>
-        <key><fifths>0</fifths></key>
-        <time><beats>4</beats><beat-type>4</beat-type></time>
-        <clef><sign>G</sign><line>2</line></clef>
-      </attributes>
-      <direction placement="above">
-        <direction-type><dynamics><mf/></dynamics></direction-type>
-      </direction>
-      <note><pitch><step>C</step><octave>5</octave></pitch><duration>4</duration><type>quarter</type></note>
-      <note><pitch><step>E</step><octave>5</octave></pitch><duration>4</duration><type>quarter</type></note>
-      <note><pitch><step>G</step><octave>5</octave></pitch><duration>4</duration><type>quarter</type></note>
-      <note><pitch><step>C</step><octave>6</octave></pitch><duration>4</duration><type>quarter</type></note>
-    </measure>
-  </part>
+        subgraph meta ["Score Metadata"]
+            composer["Composer / Creator\nScore Reading Exercise"]
+            timesig["Time Signature\n4/4"]
+            keyconcert["Concert Key\nC Major (0 sharps/flats)"]
+        end
 
-  <!-- B-flat Clarinet: transposing, sounds M2 lower than written.
-       diatonic = -1 (down one letter name), chromatic = -2 (down 2 semitones).
-       Key signature D major (2 sharps) = concert C major transposed up M2.
-       Written D5, F-sharp5, A5, D6 sound as C5, E5, G5, C6. -->
-  <part id="P2">
-    <measure number="1">
-      <attributes>
-        <divisions>4</divisions>
-        <key><fifths>2</fifths></key>
-        <time><beats>4</beats><beat-type>4</beat-type></time>
-        <clef><sign>G</sign><line>2</line></clef>
-        <transpose>
-          <diatonic>-1</diatonic>
-          <chromatic>-2</chromatic>
-        </transpose>
-      </attributes>
-      <direction placement="above">
-        <direction-type><dynamics><mf/></dynamics></direction-type>
-      </direction>
-      <note><pitch><step>D</step><octave>5</octave></pitch><duration>4</duration><type>quarter</type></note>
-      <note><pitch><step>F</step><octave>5</octave><alter>1</alter></pitch><duration>4</duration><type>quarter</type></note>
-      <note><pitch><step>A</step><octave>5</octave></pitch><duration>4</duration><type>quarter</type></note>
-      <note><pitch><step>D</step><octave>6</octave></pitch><duration>4</duration><type>quarter</type></note>
-    </measure>
-  </part>
+        subgraph partlist ["Part List"]
+            P1_def["P1 — Flute (Fl.)"]
+            P2_def["P2 — B♭ Clarinet (B♭ Cl.)"]
+            P3_def["P3 — Violin I (Vln. I)"]
+            P4_def["P4 — Cello (Vc.)"]
+        end
 
-  <!-- Violin I: non-transposing, treble clef, staccato ascending line -->
-  <part id="P3">
-    <measure number="1">
-      <attributes>
-        <divisions>4</divisions>
-        <key><fifths>0</fifths></key>
-        <time><beats>4</beats><beat-type>4</beat-type></time>
-        <clef><sign>G</sign><line>2</line></clef>
-      </attributes>
-      <direction placement="above">
-        <direction-type><dynamics><p/></dynamics></direction-type>
-      </direction>
-      <note><pitch><step>G</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><notations><articulations><staccato/></articulations></notations></note>
-      <note><pitch><step>A</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><notations><articulations><staccato/></articulations></notations></note>
-      <note><pitch><step>B</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><notations><articulations><staccato/></articulations></notations></note>
-      <note><pitch><step>C</step><octave>5</octave></pitch><duration>4</duration><type>quarter</type><notations><articulations><staccato/></articulations></notations></note>
-    </measure>
-  </part>
+        subgraph P1_part ["Part P1 — Flute"]
+            P1_attr["Treble Clef (G2)\nKey: C Major\nDivisions: 4\nNon-transposing"]
+            P1_dyn["Dynamic: mf"]
+            P1_notes["Notes (Concert Pitch)\nC5 · E5 · G5 · C6\n(C Major Triad — ascending)"]
+            P1_attr --> P1_dyn --> P1_notes
+        end
 
-  <!-- Cello: non-transposing, bass clef, bass line -->
-  <part id="P4">
-    <measure number="1">
-      <attributes>
-        <divisions>4</divisions>
-        <key><fifths>0</fifths></key>
-        <time><beats>4</beats><beat-type>4</beat-type></time>
-        <clef><sign>F</sign><line>4</line></clef>
-      </attributes>
-      <direction placement="below">
-        <direction-type><dynamics><p/></dynamics></direction-type>
-      </direction>
-      <note><pitch><step>C</step><octave>3</octave></pitch><duration>8</duration><type>half</type></note>
-      <note><pitch><step>G</step><octave>2</octave></pitch><duration>8</duration><type>half</type></note>
-    </measure>
-  </part>
-</score-partwise>
+        subgraph P2_part ["Part P2 — B♭ Clarinet"]
+            P2_attr["Treble Clef (G2)\nKey: D Major (2♯)\nDivisions: 4"]
+            P2_trans["Transposition\nDiatonic: −1 · Chromatic: −2\n(sounds M2 lower than written)"]
+            P2_written["Written Pitches\nD5 · F♯5 · A5 · D6"]
+            P2_sounds["Concert Pitch (sounds)\nC5 · E5 · G5 · C6\n(C Major Triad)"]
+            P2_dyn["Dynamic: mf"]
+            P2_attr --> P2_trans --> P2_written --> P2_sounds
+            P2_attr --> P2_dyn
+        end
+
+        subgraph P3_part ["Part P3 — Violin I"]
+            P3_attr["Treble Clef (G2)\nKey: C Major\nDivisions: 4\nNon-transposing"]
+            P3_dyn["Dynamic: p"]
+            P3_notes["Notes (staccato ascending)\nG4 · A4 · B4 · C5"]
+            P3_art["Articulation: Staccato\n(all four notes)"]
+            P3_attr --> P3_dyn --> P3_notes --> P3_art
+        end
+
+        subgraph P4_part ["Part P4 — Cello"]
+            P4_attr["Bass Clef (F4)\nKey: C Major\nDivisions: 4\nNon-transposing"]
+            P4_dyn["Dynamic: p"]
+            P4_notes["Notes (bass line)\nC3 (half note) · G2 (half note)"]
+            P4_attr --> P4_dyn --> P4_notes
+        end
+
+        subgraph concert_pitch ["Concert Pitch Alignment (Measure 1)"]
+            CP["All Parts Sound\nC Major Triad\nC · E · G · C"]
+        end
+
+        P1_def --> P1_part
+        P2_def --> P2_part
+        P3_def --> P3_part
+        P4_def --> P4_part
+
+        P1_notes -->|"concert C5–C6"| CP
+        P2_sounds -->|"concert C5–C6"| CP
+        P3_notes -->|"ascending G4–C5"| CP
+        P4_notes -->|"root/fifth bass"| CP
+
+    end
 ```
 
 **What to notice:** the clarinet's `<transpose>` block (`diatonic=-1`, `chromatic=-2`) is the formal statement of "B♭ instrument, sounds a major second below written." Its key signature reads `<fifths>2</fifths>` (D major) while the non-transposing parts read `<fifths>0</fifths>` (C major) — that mismatch is not a different key, it's the transposition artifact you must learn to read past instantly. The `<alter>1</alter>` on the clarinet's F marks F♯ in the written key; in concert pitch that note is E natural, the plain third of C major with no accidental at all.

@@ -46,31 +46,19 @@ The hexagonal architecture, introduced by Alistair Cockburn, inverts the problem
 
 The dependency flow in hexagonal architecture can be visualized clearly:
 
-```
-              ┌────────────────────────────────────────┐
-              │            External World               │
-              │  (HTTP, gRPC, PostgreSQL, Kafka, CLI)  │
-              └───────────────┬────────────────────────┘
-                              │
-              ┌───────────────▼────────────────────────┐
-              │           Adapter Layer                 │
-              │  REST Controller | SQL Repository Impl  │
-              │  Kafka Consumer  | SMTP Email Adapter   │
-              └───────────────┬────────────────────────┘
-                              │  implements
-              ┌───────────────▼────────────────────────┐
-              │            Port Layer                   │
-              │  (Interfaces defined by the Core)       │
-              │  UserRepository | PaymentGateway        │
-              │  OrderEventPublisher | EmailSender      │
-              └───────────────┬────────────────────────┘
-                              │  depends on
-              ┌───────────────▼────────────────────────┐
-              │          Application Core               │
-              │  Domain Entities | Business Rules       │
-              │  Use Case Orchestrators                 │
-              │  Pure functions, no I/O                 │
-              └────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    External["🌐 External World<br/>(HTTP, gRPC, PostgreSQL, Kafka, CLI)"]
+    
+    Adapter["🔌 Adapter Layer<br/>REST Controller | SQL Repository Impl<br/>Kafka Consumer | SMTP Email Adapter"]
+    
+    Port["🚪 Port Layer<br/>(Interfaces defined by the Core)<br/>UserRepository | PaymentGateway<br/>OrderEventPublisher | EmailSender"]
+    
+    Core["⚙️ Application Core<br/>Domain Entities | Business Rules<br/>Use Case Orchestrators<br/>Pure functions, no I/O"]
+    
+    External -->|exposes| Adapter
+    Adapter -->|implements| Port
+    Port -->|"depends on"| Core
 ```
 
 The dependency arrows all point inward. The core never depends on anything outside itself. This is DIP applied at architectural scale.

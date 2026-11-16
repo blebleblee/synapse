@@ -56,26 +56,16 @@ The relationship between tire pressure and contact patch behavior introduces ano
 
 The tire's thermal time constant—the characteristic timescale for temperature changes—plays a crucial role in session management and driver technique development. The tread surface responds rapidly to contact patch sliding events, with temperature measurable within seconds of a significant oversteer moment or locked brake. The underlying carcass structure exhibits much longer thermal time constants, requiring multiple laps of consistent loading to reach equilibrium temperature. This disparity creates the classic warm-up lap challenge: the driver must generate sufficient energy input to bring the tire into its working range without excessive slip that produces surface overheating before the carcass has adequately warmed. Optimal warm-up technique emphasizes gentle but continuous slip angle generation through smooth steering inputs and progressive braking, avoiding harsh transients that spike surface temperature while the underlying structure remains cold.
 
-```
-Tire Force Generation Flow:
-
-Vertical Load (Fz) → Contact Patch Pressure Distribution
-                    ↓
-                Tread Compound Temperature
-                    ↓
-        ┌───────────┴───────────┐
-        ↓                       ↓
-    Lateral Force           Longitudinal Force
-   (slip angle α)          (slip ratio κ)
-        ↓                       ↓
-        └───────────┬───────────┘
-                    ↓
-            Combined Grip Budget
-                    ↓
-        Friction Circle Constraint
-                    ↓
-            Achievable Vehicle
-          Acceleration Envelope
+```mermaid
+flowchart TD
+    A["Vertical Load (Fz)"] --> B["Contact Patch Pressure Distribution"]
+    B --> C["Tread Compound Temperature"]
+    C --> D["Lateral Force<br/>(slip angle α)"]
+    C --> E["Longitudinal Force<br/>(slip ratio κ)"]
+    D --> F["Combined Grip Budget"]
+    E --> F
+    F --> G["Friction Circle Constraint"]
+    G --> H["Achievable Vehicle<br/>Acceleration Envelope"]
 ```
 
 This architectural flow captures the essential dependency chain governing tire performance. Vertical load and temperature establish the instantaneous grip budget available to the contact patch. Lateral and longitudinal force demands, driven by driver inputs and vehicle dynamics, draw against this budget according to slip angle and slip ratio. The vector sum of these force components must remain within the friction circle constraint, defining the accessible acceleration envelope at each instant. Chassis tuning, suspension geometry, and driver technique all aim to optimize this flow—maximizing vertical load at critical moments, maintaining optimal temperature, and efficiently allocating the finite grip budget across corner phases to minimize lap time.

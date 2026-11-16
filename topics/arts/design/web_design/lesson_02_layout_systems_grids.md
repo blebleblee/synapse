@@ -173,22 +173,24 @@ Flexbox integrates with CSS Grid at the component level for distributing navigat
 
 The visual hierarchy diagram of a typical responsive grid system shows three nested layers:
 
-```
-┌─────────────────────────────────────────────────────┐
-│ CONTAINER (max-width, centered, responsive padding) │
-│ ┌─────────────────────────────────────────────────┐ │
-│ │ GRID (12 columns, fixed gap)                    │ │
-│ │ ┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐          │ │
-│ │ │  │  │  │  │  │  │  │  │  │  │  │  │          │ │
-│ │ └──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘          │ │
-│ │ ┌─────────────────────────────────────┐          │ │
-│ │ │ GRID ITEM (span 12, nested grid)    │          │ │
-│ │ │ ┌───────┬───────┬───────┬───────┐  │          │ │
-│ │ │ │ Card  │ Card  │ Card  │ Card  │  │          │ │
-│ │ │ └───────┴───────┴───────┴───────┘  │          │ │
-│ │ └─────────────────────────────────────┘          │ │
-│ └─────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Container["CONTAINER<br/>(max-width, centered, responsive padding)"]
+    Grid["GRID<br/>(12 columns, fixed gap)"]
+    Columns["12 Column Layout<br/>│ │ │ │ │ │ │ │ │ │ │ │"]
+    GridItem["GRID ITEM<br/>(span 12, nested grid)"]
+    Card1["Card 1"]
+    Card2["Card 2"]
+    Card3["Card 3"]
+    Card4["Card 4"]
+    
+    Container --> Grid
+    Grid --> Columns
+    Grid --> GridItem
+    GridItem --> Card1
+    GridItem --> Card2
+    GridItem --> Card3
+    GridItem --> Card4
 ```
 
 Subgrid, introduced in CSS Grid Level 2, permits nested grids to inherit parent grid tracks rather than defining independent column structures. This ensures perfect alignment between parent and child grid items—sidebar content aligns exactly with main content columns despite being in separate containers. Subgrid adoption remains limited due to browser support constraints, but where available, it eliminates the need for complex column calculations in nested layouts.

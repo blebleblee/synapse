@@ -36,26 +36,29 @@ The placeholder system represents PowerPoint's primary mechanism for structured 
 
 The information hierarchy on a slide manifests through three visual encoding channels: spatial position, typographic scale, and chromatic emphasis. Spatial position leverages the universal reading gravity that draws attention to upper-left quadrants in Western cultures, with importance diminishing toward lower-right regions. Placing critical information in prime visual real estate—the top third of the slide centered horizontally—ensures immediate attention capture during the pre-attentive processing phase. Typographic scale establishes hierarchy through size differentiation, where headings at 32-44 point sizes dominate perception while body text at 18-24 points recedes into secondary importance. Chromatic emphasis uses color contrast to create salience, with high-chroma accent colors directing focal attention against neutral background tones.
 
-```
-Visual Hierarchy Encoding Model
-┌─────────────────────────────────────────────────┐
-│                 SLIDE CANVAS                    │
-│  ┌───────────────────────────────────────────┐  │
-│  │  TITLE (44pt, high contrast)             │  │  ← Primary Hierarchy
-│  │  [Pre-attentive capture zone]            │  │
-│  └───────────────────────────────────────────┘  │
-│                                                  │
-│  ┌─────────────────┐  ┌─────────────────────┐  │
-│  │   Key Visual    │  │  Supporting Text    │  │  ← Secondary Hierarchy
-│  │   (Large scale) │  │  (24pt, bullets)    │  │
-│  │                 │  │  • Point one        │  │
-│  │                 │  │  • Point two        │  │
-│  └─────────────────┘  └─────────────────────┘  │
-│                                                  │
-│  ┌─────────────────────────────────────────────┐│
-│  │ Source attribution (14pt, low contrast)     ││  ← Tertiary Hierarchy
-│  └─────────────────────────────────────────────┘│
-└──────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Canvas["SLIDE CANVAS"]
+    
+    subgraph Primary["Primary Hierarchy"]
+        Title["TITLE (44pt, high contrast)<br/>[Pre-attentive capture zone]"]
+    end
+    
+    subgraph Secondary["Secondary Hierarchy"]
+        KeyVisual["Key Visual<br/>(Large scale)"]
+        SupportingText["Supporting Text<br/>(24pt, bullets)<br/>• Point one<br/>• Point two"]
+    end
+    
+    subgraph Tertiary["Tertiary Hierarchy"]
+        Source["Source attribution (14pt, low contrast)"]
+    end
+    
+    Canvas --> Primary
+    Canvas --> Secondary
+    Canvas --> Tertiary
+    
+    Secondary -.-> KeyVisual
+    Secondary -.-> SupportingText
 ```
 
 The gestalt principle of proximity governs spatial grouping on slides. Elements positioned close together—typically within 0.25 inches—are perceived as related units even without explicit containers. This perceptual grouping operates automatically during pre-attentive processing, allowing the designer to create implicit structure through spacing alone. Conversely, elements separated by whitespace greater than 0.5 inches are perceived as distinct units. The strategic manipulation of proximity allows complex slides to communicate categorical relationships without visual clutter from borders, boxes, or connecting lines.

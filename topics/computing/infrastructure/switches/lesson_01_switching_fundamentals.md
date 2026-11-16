@@ -30,65 +30,55 @@ The internal architecture of a switch can be understood as two cooperating plane
 
 When a frame arrives on a switch port, it traverses a deterministic sequence of operations. The following diagram traces that path for a frame entering Port 1 of a VLAN 10 access port, destined for a MAC address already learned on Port 4:
 
-```
-  Frame arrives on Port 1 (Access Port, VLAN 10)
-  │
-  ▼
-  ┌─────────────────────────────────┐
-  │  Layer 1: PHY / MAC layer        │
-  │  Clock recovery, decoding,       │
-  │  frame delineation               │
-  └──────────────┬──────────────────┘
-                 │
-                 ▼
-  ┌─────────────────────────────────┐
-  │  Ingress Buffer & Parsing        │
-  │  Extract: dst_mac, src_mac,      │
-  │  vlan_tag, ethertype             │
-  └──────────────┬──────────────────┘
-                 │
-                 ▼
-  ┌─────────────────────────────────┐
-  │  Ingress ACL / Classification    │
-  │  Apply input ACLs, QoS marking   │
-  │  (TCAM lookup)                   │
-  └──────────────┬──────────────────┘
-                 │
-                 ▼
-  ┌─────────────────────────────────┐
-  │  MAC Learning (Source MAC)       │
-  │  Write (src_mac, port, vlan,     │
-  │  timestamp) → MAC table (CAM)    │
-  └──────────────┬──────────────────┘
-                 │
-                 ▼
-  ┌─────────────────────────────────┐
-  │  Forwarding Lookup (Dest MAC)   │
-  │  CAM lookup: (dst_mac, vlan)    │
-  │  → egress_port(s)                │
-  └──────────────┬──────────────────┘
-                 │
-        ┌────────┴────────┐
-        │                 │
-     Known?            Unknown?
-        │                 │
-        ▼                 ▼
-  Forward to         Flood to all
-  egress port        ports in VLAN 10
-  (Port 4)           except Port 1
-        │                 │
-        ▼                 ▼
-  ┌─────────────────────────────────┐
-  │  Egress Buffer & Scheduling      │
-  │  Output QoS queue selection,     │
-  │  output ACL check, line shaping  │
-  └──────────────┬──────────────────┘
-                 │
-                 ▼
-  ┌─────────────────────────────────┐
-  │  Egress PHY: Encode & transmit   │
-  │  on Port 4 (or all VLAN ports)   │
-  └─────────────────────────────────┘
+```mermaid
+flowchart TD
+    ENTRY(["📥 Frame arrives on Port 1\nAccess Port · VLAN 10"])
+
+    ENTRY --> PHY
+
+    PHY["Layer 1 · PHY / MAC\nClock recovery · decoding\nFrame delineation"]
+
+    PHY --> PARSE
+
+    PARSE["Ingress Buffer & Parsing\nExtract: dst_mac · src_mac\nvlan_tag · ethertype"]
+
+    PARSE --> ACL
+
+    ACL["Ingress ACL / Classification\nApply input ACLs · QoS marking\nTCAM lookup"]
+
+    ACL --> LEARN
+
+    LEARN["MAC Learning — Source MAC\nWrite (src_mac, port, vlan, timestamp)\n→ MAC table (CAM)"]
+
+    LEARN --> FWD
+
+    FWD["Forwarding Lookup — Dest MAC\nCAM lookup: (dst_mac, vlan)\n→ egress_port(s)"]
+
+    FWD --> KNOWN{"Destination\nknown?"}
+
+    KNOWN -->|"Yes — unicast"| UNI["Forward to egress port\nPort 4"]
+    KNOWN -->|"No — unknown unicast"| FLOOD["Flood to all ports in VLAN 10\nexcept ingress Port 1"]
+
+    UNI   --> EBUF
+    FLOOD --> EBUF
+
+    EBUF["Egress Buffer & Scheduling\nOutput QoS queue selection\nOutput ACL check · line shaping"]
+
+    EBUF --> EPHY
+
+    EPHY["Egress PHY · Encode & Transmit\nPort 4  (unicast)\nor all VLAN 10 ports  (flood)"]
+
+    style ENTRY fill:#1a1a2e,color:#e0e0ff,stroke:#4a4aff,stroke-width:2px
+    style PHY   fill:#16213e,color:#cce5ff,stroke:#3a86ff,stroke-width:1.5px
+    style PARSE fill:#16213e,color:#cce5ff,stroke:#3a86ff,stroke-width:1.5px
+    style ACL   fill:#1b2838,color:#ffe0cc,stroke:#ff6b35,stroke-width:1.5px
+    style LEARN fill:#16213e,color:#ccffcc,stroke:#2ecc71,stroke-width:1.5px
+    style FWD   fill:#16213e,color:#ccffcc,stroke:#2ecc71,stroke-width:1.5px
+    style KNOWN fill:#2d2d0d,color:#fff9c4,stroke:#f4d03f,stroke-width:2px
+    style UNI   fill:#0d2b1a,color:#a8f0c6,stroke:#27ae60,stroke-width:1.5px
+    style FLOOD fill:#2b1a0d,color:#f0d0a8,stroke:#e67e22,stroke-width:1.5px
+    style EBUF  fill:#1b2838,color:#ffe0cc,stroke:#ff6b35,stroke-width:1.5px
+    style EPHY  fill:#1a1a2e,color:#e0e0ff,stroke:#4a4aff,stroke-width:2px
 ```
 
 The first stage is physical-layer reception. The port's PHY chip recovers the clock from the incoming signal, decodes the line encoding (64b/66b for 10G+, PAM4 for 25G/50G/100G/400G), and passes the resulting bitstream to the MAC layer for frame delineation. The switch identifies frame boundaries using the preamble and start-of-frame delimiter, then strips those fields and hands the raw frame—destination MAC, source MAC, optional 802.1Q VLAN tag, ethertype, payload, and FCS—to the ingress parsing block.
@@ -322,4 +312,19 @@ bridge br0 state UP mode DEFAULT
 true
 ```
 
-MAC flapping can also occur without a loop. A virtual machine migrating between two hypervisors connected to different switch ports will cause its MAC to appear on a new port. NIC teaming with an active-active configuration (as opposed to active-standby) can cause the same MAC to be sourced from two uplinks simultaneously. In both cases, the switch's behavior is correct—updating the CAM entry to the most recent port—but if the migration or teaming driver sends traffic from both ports concurrently, the entry will flap. The solution is to use Link Aggregation Control Protocol (LACP) with
+MAC flapping can also occur without a loop. A virtual machine migrating between two hypervisors connected to different switch ports will cause its MAC to appear on a new port. NIC teaming with an active-active configuration (as opposed to active-standby) can cause the same MAC to be sourced from two uplinks simultaneously. In both cases, the switch's behavior is correct—updating the CAM entry to the most recent port—but if the migration or teaming driver sends traffic from both ports concurrently, the entry will flap.
+
+Modern troubleshooting workflows distinguish between structural loops and operational MAC flapping through correlation analysis. A true loop produces symmetric bidirectional traffic on the affected links, exponentially increasing broadcast domain load, and triggers STP topology changes or port err-disable actions. MAC flapping without loops shows asymmetric unidirectional traffic patterns, CAM table updates concentrated on specific MACs rather than wholesale table flushing, and correlation with hypervisor migration events (`vMotion`, `Live Migration`) or NIC teaming state changes visible in syslog. Tools like `show mac address-table notification` track flap events per-MAC, while `show spanning-tree inconsistentports` isolates loop-guard violations. In environments where STP is disabled or bypassed—such as VXLAN overlays with MP-BGP EVPN control planes, or Linux bridges with `bridge-stp off`—loop prevention shifts entirely to control-plane route advertisement withdrawal and data-plane TTL expiration. Operators must recognize that disabling STP without deploying a routing-based fabric reintroduces the original Ethernet vulnerability: a single accidental cross-connect or misconfigured LAG creates an undetectable forwarding loop that saturates all links in the broadcast domain within seconds.
+
+The definitive test for loop presence is not MAC flapping itself but the presence of the switch's own BPDUs or packets with its own source MAC returning on ports where they should not appear. Cisco IOS provides `debug spanning-tree bpdu` and `show logging` to detect received BPDUs on unexpected ports; Linux bridges expose this through `bridge monitor fdb` and `tcpdump -i <port> ether proto 0x88cc or ether proto 0x0026`. When diagnosing instability, the correct sequence is: verify STP topology and port states first, capture MAC table snapshots over time (`show mac address-table | redirect`), correlate flap timestamps with infrastructure events (VM migrations, link flaps, configuration changes), and only then consider disabling STP if an alternative loop-prevention mechanism—MLAG with ISC, BGP-based EVPN, or TRILL—has been validated. The boundary between acceptable transient flapping (VM migration, sub-second NIC failover) and pathological instability (persistent oscillation, broadcast amplification) is determined by flap frequency: legitimate operational events produce discrete MAC moves with minutes or hours between occurrences, while loops and misconfigurations cause continuous sub-second oscillations observable through incrementing flap counters and correlated link saturation.
+
+## Summary & Verification Matrix
+
+| Invariant / Mechanism | Governing Rule | Diagnostic Criterion | Verification Command |
+|---|---|---|---|
+| **Spanning Tree Port States** | Blocking → Listening → Learning → Forwarding (STP: 30–50s; RSTP: < 1s) | Root port is shortest path to root bridge; designated port is shortest path from segment to root; alternate ports block | `show spanning-tree [vlan X]` (Cisco/Arista), `brctl showstp <bridge>` (Linux) |
+| **MAC Learning & Aging** | Source MAC learned on ingress port; aged out after inactivity timer (default 300s); destination lookup occurs per-frame | CAM table size limits (4K–128K entries); valid entries show single port per MAC unless MLAG/vPC | `show mac address-table [dynamic]`, `bridge fdb show`, `ovs-appctl fdb/show <bridge>` |
+| **Broadcast Domain Scope** | All ports in same VLAN receive broadcasts; VLANs isolate L2 domains; trunk ports carry tagged frames for multiple VLANs | VLAN mismatches cause silent blackholing; native VLAN mismatches cause double-tagging attacks | `show vlan brief`, `show interfaces trunk`, `bridge vlan show`, `ovs-vsctl list port` |
+| **Loop Prevention (STP/RSTP)** | Single active path between any two bridges; BPDUs elect root bridge (lowest priority+MAC); redundant paths blocked until topology change | Loop detected by own BPDUs/MAC returning; MAC flapping without loop shows unidirectional traffic and VM/NIC correlation | `show spanning-tree inconsistentports`, `debug spanning-tree bpdu`, `bridge monitor fdb`, `show mac address-table notification` |
+| **Forwarding Behavior** | Unknown unicast flooded like broadcast until learned; unicast sent only to known port; broadcast/multicast sent to all ports in VLAN except source | Asymmetric routing or blackholing indicates CAM desync, VLAN mismatch, or incorrect trunk config | `show mac address-table | include <MAC>`, `tcpdump -i <port> -e`, packet capture on suspect ports |
+| **Frame Handling Edge Cases** | Frames exceeding MTU dropped (unless jumbo frames enabled); untagged frames on trunk assigned to native VLAN; pause frames (802.3x) stop transmission temporarily | MTU mismatches cause silent drops of large frames; pause frame storms indicate flow control misconfiguration | `show interfaces [counters errors]`, `ethtool -S <interface>`, `ip -s link show`, `ovs-vsctl get interface <port> statistics` |

@@ -42,33 +42,37 @@ Oxford emerged in the late twelfth century, modeled on Paris but with distinct f
 
 The university system's core architectural innovation was the separation of teaching authority from ecclesiastical and civic governance. Earlier cathedral schools depended on bishops who appointed masters and controlled curriculum; monastic schools served primarily internal educational needs. Universities claimed corporate autonomy analogous to urban communes or craft guilds: self-governing communities with elected officials, internal judicial systems, and monopoly control over credential-granting. This institutional structure created stable career paths for scholars independent of aristocratic patronage or ecclesiastical preferment. A master could pursue intellectual work within the university's protected space, earning income through student fees or benefices attached to teaching positions.
 
-```
-University Institutional Architecture (c. 1250)
+```mermaid
+flowchart TD
+    chancellor["Chancellor\n(Ceremonial)\nTitular head — often bishop's appointee"]
+    rector["Rector / Master of Arts\nElected chief executive — annual rotation"]
 
-                    ┌─────────────────┐
-                    │   Chancellor    │ ← Titular head (often bishop's appointee)
-                    │  (Ceremonial)   │
-                    └────────┬────────┘
-                             │
-                    ┌────────┴────────┐
-                    │ Rector/Master   │ ← Elected chief executive
-                    │   of Arts       │   (annual rotation)
-                    └────────┬────────┘
-                             │
-            ┌────────────────┼────────────────┐
-            │                │                │
-     ┌──────┴──────┐  ┌─────┴─────┐  ┌──────┴──────┐
-     │ Faculty of  │  │ Faculty of│  │ Faculty of  │
-     │    Arts      │  │ Theology  │  │ Law/Medicine│
-     └──────┬──────┘  └─────┬─────┘  └──────┬──────┘
-            │                │                │
-     ┌──────┴──────┐  ┌─────┴─────┐  ┌──────┴──────┐
-     │ Masters'    │  │ Bachelors  │  │ Doctors'    │
-     │ Congregation│  │ Committee  │  │ College     │
-     └──────┬──────┘  └─────┬─────┘  └──────┬──────┘
-            │                │                │
-     [Lecture halls]   [Disputations]   [Examinations]
-     [Student nations] [Textual study] [Licensing]
+    chancellor --> rector
+
+    rector --> arts
+    rector --> theology
+    rector --> law_med
+
+    subgraph arts_col ["Faculty of Arts"]
+        arts["Faculty of Arts"]
+        masters_cong["Masters' Congregation"]
+        arts_activities["Lecture halls\nStudent nations"]
+        arts --> masters_cong --> arts_activities
+    end
+
+    subgraph theology_col ["Faculty of Theology"]
+        theology["Faculty of Theology"]
+        bachelors_comm["Bachelors' Committee"]
+        theology_activities["Disputations\nTextual study"]
+        theology --> bachelors_comm --> theology_activities
+    end
+
+    subgraph law_med_col ["Faculty of Law / Medicine"]
+        law_med["Faculty of Law / Medicine"]
+        doctors_college["Doctors' College"]
+        law_med_activities["Examinations\nLicensing"]
+        law_med --> doctors_college --> law_med_activities
+    end
 ```
 
 The university's operational mechanics depended on several key infrastructures. Student "nations"—regional associations like the English nation, Norman nation, or Picard nation—provided mutual aid, lodging coordination, and political representation. Nations elected proctors who sat on university governing councils. This organizational layer helped integrate foreign students into local communities and gave students collective bargaining power. Colleges, initially charitable foundations providing housing and meals for poor students, gradually evolved into teaching institutions with resident masters offering supplementary instruction. Merton College at Oxford (1264) and the Sorbonne at Paris (1257) exemplified this institutional form, which eventually superseded the older lecture-and-disputation system.
@@ -153,34 +157,20 @@ Flying buttresses resolved the remaining structural challenge: countering the la
 
 The structural analysis underpinning Gothic architecture was empirical rather than mathematical. Medieval builders lacked analytical mechanics—the ability to calculate forces and stresses in structural members—yet they achieved sophisticated structural optimization through iterative experimentation and rule-of-thumb proportional systems. Master masons developed geometric design methods based on squares, equilateral triangles, and ad quadratum (45-degree) proportions that ensured structural stability. These geometric systems, recorded in mason's lodges and transmitted through apprenticeship, encoded accumulated structural knowledge without requiring mathematical calculation.
 
-```
-Gothic Structural System (Cross-Section)
-
-                   │ ┌──── Pinnacle (adds vertical load,
-                   │ │      increases buttress stability)
-                   ├─┤
-                   │ │
-    ┌──────────────┴─┴────┐
-    │   Clerestory         │ ← Large windows possible due to
-    │   (Window Wall)      │   skeletal structure
-    └──────────────┬───────┘
-                   │ ╱
-                   │╱ Flying Buttress
-                  ╱│  (absorbs lateral thrust)
-                ╱  │
-              ╱    │
-    ┌───────╱──────┴───────┐
-    │      Triforium        │
-    │   (Intermediate Level)│
-    └──────────┬────────────┘
-               │
-    ┌──────────┴────────────┐
-    │        Arcade         │ ← Pointed arches supporting
-    │    (Ground Level)     │   ribbed vaults above
-    └───────────────────────┘
-               │
-         Massive Pier
-    (channels loads to foundation)
+```mermaid
+flowchart TD
+    Pinnacle["Pinnacle<br/>(adds vertical load,<br/>increases buttress stability)"]
+    Clerestory["Clerestory<br/>(Window Wall)<br/>Large windows possible due to<br/>skeletal structure"]
+    FlyingButtress["Flying Buttress<br/>(absorbs lateral thrust)"]
+    Triforium["Triforium<br/>(Intermediate Level)"]
+    Arcade["Arcade<br/>(Ground Level)<br/>Pointed arches supporting<br/>ribbed vaults above"]
+    Pier["Massive Pier<br/>(channels loads to foundation)"]
+    
+    Pinnacle --> Clerestory
+    Clerestory --> Triforium
+    FlyingButtress -.->|lateral support| Clerestory
+    Triforium --> Arcade
+    Arcade --> Pier
 ```
 
 Construction knowledge transmission occurred primarily through the institution of the mason's lodge, a semi-permanent structure erected adjacent to a building site where masons worked during inclement weather, stored tools, and trained apprentices. Lodges functioned as craft guilds, maintaining secrecy around design methods and structural principles while providing mutual aid and regulating labor conditions. A master mason would train several apprentices over seven-year terms, teaching geometry, stone-cutting techniques, and design principles through hands-on practice. Journeymen masons traveled between projects, carrying technical knowledge across regions and introducing design innovations from distant workshops.

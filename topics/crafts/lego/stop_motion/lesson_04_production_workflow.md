@@ -16,29 +16,30 @@ The physical architecture of a Lego stop motion production environment consists 
 
 The camera mounting system forms the second stability tier. Friction-based tripod heads, regardless of quality, introduce creep under sustained load—the camera will shift position measurably over the hours required for extended shooting sessions. The only acceptable mounting solutions employ either positive-locking mechanisms (gear-driven pan/tilt heads with friction brakes supplemented by mechanical locks) or fixed-position overhead rigs where the camera is secured to a rigid gantry structure via bolted mounting plates. For complex shots requiring camera motion (dollies, tilts, pans), the movement must be mechanically indexed with reproducible increments, typically achieved through stepper motor-driven sliders or rotary stages controlled via programmable motion control systems like Arduino-based rigs running modified Grbl firmware.
 
-```
-Stop Motion Capture Pipeline Architecture:
+```mermaid
+flowchart LR
+    subgraph physical ["Physical Layer"]
+        stage["Leveled Stage\n(Rigid Surface)"]
+        lego["Lego Set\n(Mechanically Stable Build)"]
+    end
 
-Physical Layer:              Capture Layer:           Data Layer:
-┌─────────────────┐         ┌──────────────┐         ┌─────────────┐
-│ Leveled Stage   │         │ DSLR/Mirrorless      │ Tethered    │
-│ (Rigid Surface) │─────────│ - Manual Mode   │─────│ Capture SW  │
-│                 │         │ - Fixed ISO/WB  │     │ (Dragonframe│
-│ Lego Set        │         │ - Manual Focus  │     │ /Stop Motion│
-│ (Mechanically   │         │                 │     │ Studio)     │
-│  Stable Build)  │         │ Lighting Rig    │     │             │
-└─────────────────┘         │ - LED Panels    │     │ Frame       │
-                            │ - Diffusion     │     │ Sequencing  │
-                            │ - Flag/Control  │     │ & Onion Skin│
-                            └──────────────────┘     └─────────────┘
-                                                              │
-                                                              ▼
-                                                     ┌─────────────────┐
-                                                     │ Post-Production │
-                                                     │ - Frame Assembly│
-                                                     │ - Color Grade   │
-                                                     │ - Sound Design  │
-                                                     └─────────────────┘
+    subgraph capture ["Capture Layer"]
+        camera["DSLR / Mirrorless\n─ Manual Mode\n─ Fixed ISO / WB\n─ Manual Focus"]
+        lighting["Lighting Rig\n─ LED Panels\n─ Diffusion\n─ Flag / Control"]
+    end
+
+    subgraph data ["Data Layer"]
+        software["Tethered Capture SW\n(Dragonframe / Stop Motion Studio)"]
+        sequencing["Frame Sequencing\n& Onion Skin"]
+    end
+
+    post["Post-Production\n─ Frame Assembly\n─ Color Grade\n─ Sound Design"]
+
+    physical --> camera
+    camera --> software
+    lighting --> software
+    software --> sequencing
+    sequencing --> post
 ```
 
 Camera configuration operates under the principle of complete manual control—every automatic function represents a potential source of frame-to-frame inconsistency and must be disabled. The exposure triangle (ISO, aperture, shutter speed) is locked at values chosen during the initial test shoot and never altered mid-sequence. ISO is set to the base native sensitivity of the sensor (typically ISO 100 or 200 for most modern cameras) to minimize electronic noise. Aperture selection balances depth of field against diffraction limits: for Lego scenes where minifigures are the primary subjects, f/5.6 to f/8 provides adequate depth to maintain sharpness across a figure's 4-stud height while avoiding the resolution degradation that emerges beyond f/11 on APS-C sensors due to diffraction-limited resolution. Shutter speed becomes irrelevant for static subjects but should be set to values ensuring motion blur matches the intended aesthetic—1/50 second for 24fps output creates natural blur matching theatrical film conventions, though many Lego animators prefer 1/100 or faster to maintain crisp edges on the plastic elements.

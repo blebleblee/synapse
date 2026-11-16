@@ -44,70 +44,81 @@ Transformer design for isolated converters such as flyback, forward, or resonant
 
 Snubber circuits protect switching devices and passive components from voltage and current transients. An RC snubber placed across a diode consists of a series resistor and capacitor; when the diode turns off and the voltage rises rapidly, the capacitor charges through the resistor, slowing the $dV/dt$ and absorbing the energy stored in the parasitic inductance. The capacitor value is chosen to limit the voltage overshoot to ten to twenty percent, and the resistor is sized to dissipate the stored energy over several cycles without excessive heating. A typical design starts with $C_{snub} = \frac{L_{para} I_{pk}^2}{V_{overshoot}^2}$ and $R_{snub} = \frac{1}{f_{sw} C_{snub}}$, then iterates based on bench measurements. An RCD snubber, adding a diode to separate charging and discharging paths, provides more controlled damping and is common in flyback converters to clamp the primary switch voltage. Active clamp circuits replace the dissipative resistor with a second MOSFET and capacitor, recovering the leakage energy and improving efficiency, but require additional gate drive circuitry and control logic.
 
+```mermaid
+flowchart LR
+    subgraph control_loop ["Voltage-Mode Buck Converter Control Loop"]
+        direction LR
+
+        VREF(["Vref"])
+        SUM["Σ&nbsp;&nbsp;(−)"]
+        COMP["Compensator\nH(s)"]
+        PWM["PWM\nComparator"]
+        GATE["Gate\nDriver"]
+        POWER["Power Stage\nL, C, ESR"]
+        DIV["Feedback\nDivider R1/R2"]
+
+        VREF -->|"+"| SUM
+        SUM --> COMP
+        COMP --> PWM
+        PWM --> GATE
+        GATE -->|"Gate Drive"| POWER
+        POWER -->|"Vout"| DIV
+        DIV -->|"Vfb"| SUM
+    end
+
+    subgraph gvd ["Power Stage Transfer Function — Voltage Mode"]
+        direction TB
+        GVD["Gvd(s) = Vout(s) / D(s) = K · (1 + s/ωz) / (s²/ω₀² + s/(Q·ω₀) + 1)"]
+        PARAMS["ω₀ = 1/√(LC)  |  ωz = 1/(ESR·C)  |  Q = Rload·√(C/L)"]
+        GVD --- PARAMS
+    end
+
+    subgraph comp_tf ["Type II Compensator Transfer Function"]
+        direction TB
+        HS["H(s) = (1 + s·R2·C1) / { s·R1·(C1+C2) · [1 + s·R2·C1·C2/(C1+C2)] }"]
+        TARGETS["fc ≈ fsw/10  |  Phase Margin > 45°  |  Gain Margin > 10 dB"]
+        HS --- TARGETS
+    end
+
+    COMP -. "implements" .-> comp_tf
+    POWER -. "models" .-> gvd
 ```
-Voltage-Mode Buck Converter Control Loop Block Diagram
 
-                +-------+       +-------+       +-------+       +------+
-    Vref ------>|  Σ    |------>| Comp  |------>|  PWM  |------>| Gate |-----> Gate Drive
-                | (-)   |       | H(s)  |       |Compare|       |Driver|
-                +-------+       +-------+       +-------+       +------+
-                    ^                                                |
-                    |                                                v
-                +-------+                                        +-------+
-                |Divider|                                        | Power |
-                | R1/R2 |<---------------------------------------| Stage |
-                +-------+                  Vout                  |L,C,ESR|
-                                                                 +-------+
-
-    Power Stage Transfer Function (Voltage Mode):
-                       Vout(s)              (1 + s/ωz)
-        Gvd(s) = ----------------- = K · -------------------
-                         D(s)               s²/ω₀² + s/(Qω₀) + 1
-
-        where: ω₀ = 1/√(LC)  [LC corner frequency]
-               ωz = 1/(ESR·C) [ESR zero]
-               Q = Rload·√(C/L) [Quality factor]
-
-    Type II Compensator Transfer Function:
-                              1 + s·R2·C1
-        H(s) = ----------------------------------------
-                s·R1·(C1 + C2)·[1 + s·R2·C1·C2/(C1+C2)]
-
-        Crossover frequency: fc ≈ fsw/10
-        Phase margin target: PM > 45°
-        Gain margin target: GM > 10 dB
-```
-
-```
-Peak Current-Mode Control Architecture
-
-                +-------+       +-------+       +------+
-    Vref ------>|  Σ    |------>|Voltage|------>| PWM  |-----> Gate Drive
-                | (-)   |       | Comp  |       | Latch|
-                +-------+       +-------+       +------+
-                    ^                               ^
-                    |                               | Reset
-                +-------+                       +-------+
-                |Divider|                       |Current|
-                | R1/R2 |                       | Comp  |
-                +-------+                       +-------+
-                    ^                               ^
-                    |                               |
-                    |                           +-------+      +--------+
-                    +---------------------------| Rsense|<-----| Inductor|
-                                    Vout        +-------+      | Current|
-                                                               +--------+
-                                                                   |
-                                                               +-------+
-                                                               | Slope |
-                                                               | Comp  |
-                                                               +-------+
-
-        Slope Compensation Requirement (Buck):
-            mc > m2/2 = Vout/(2L)  for duty cycle D > 0.5
-
-        Current Loop effectively makes: Gid(s) ≈ Vin/(1 + s·Rload·C)
-        Single pole system → simpler compensation
+```mermaid
+flowchart TD
+    Vref["Vref"]
+    Summer["Σ<br/>(--)"]
+    VoltComp["Voltage<br/>Comparator"]
+    PWMLatch["PWM<br/>Latch"]
+    GateDrive["Gate Drive"]
+    Divider["Voltage Divider<br/>R1/R2"]
+    CurrentComp["Current<br/>Comparator"]
+    Rsense["Rsense"]
+    Inductor["Inductor<br/>Current"]
+    SlopeComp["Slope<br/>Compensation"]
+    Vout["Vout"]
+    
+    Vref --> Summer
+    Summer --> VoltComp
+    VoltComp --> PWMLatch
+    PWMLatch --> GateDrive
+    
+    Divider --> Summer
+    Vout -.-> Divider
+    
+    CurrentComp -->|Reset| PWMLatch
+    
+    Inductor --> Rsense
+    Rsense --> CurrentComp
+    SlopeComp --> CurrentComp
+    
+    Vout -.-> Rsense
+    
+    subgraph Notes ["Control Law"]
+        Note1["Slope Compensation (Buck): mc > m2/2 = Vout/(2L) for D > 0.5"]
+        Note2["Current Loop: Gid(s) ≈ Vin/(1 + s·Rload·C)"]
+        Note3["Result: Single pole system → simpler compensation"]
+    end
 ```
 
 ```

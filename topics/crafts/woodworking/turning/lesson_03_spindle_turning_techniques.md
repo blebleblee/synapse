@@ -22,23 +22,28 @@ The physical setup for roughing demands that the tool rest be positioned approxi
 
 The cutting action itself proceeds through a presentation where the flute faces approximately 45 degrees away from the direction of travel, with the bevel rubbing and the cutting edge engaging at the 10 o'clock or 2 o'clock position relative to the flute center. This offset presentation ensures that only a small portion of the edge engages the wood at any instant, producing a controlled shearing action rather than a scraping impact. The traverse proceeds in smooth, continuous passes from left to right or right to left, with each pass removing 1 to 3 millimeters of material across the full length of the cylinder. Attempting to remove excessive material in a single pass overloads the edge, generates excessive heat, and risks catching the edge on the far corner of square stock.
 
-```
-ROUGHING GOUGE PRESENTATION GEOMETRY (plan view)
+```mermaid
+flowchart TD
+    subgraph setup ["ROUGHING GOUGE PRESENTATION GEOMETRY (plan view)"]
+        WR["Workpiece Rotation\n↻ Clockwise\n(viewed from headstock)"]
+        TR["Tool Rest\n═══════════════"]
 
-Workpiece rotation: ↻ clockwise (viewed from headstock)
-Tool rest: ═══════════════════════════════
+        subgraph geometry ["Cutting Zone — Plan View"]
+            FL["Flute faces 45° away\nfrom workpiece"]
+            BV["Bevel Rub\n(heel contacts wood)"]
+            CE["Cutting Edge\nat 10 o'clock position"]
+            WS["Workpiece Surface"]
+            DT["Direction of Traverse\n← →"]
 
-                    Flute faces 45° away
-                         ∧ Bevel rub
-                        ╱│╲
-                       ╱ │ ╲ 
-                      ╱  │  ╲
-    Direction of → ═══  Ө   ═══ ← Workpiece surface
-      traverse        ╲  │  ╱
-                       ╲ │ ╱
-                        ╲│╱
-                      Cutting edge at
-                      10 o'clock position
+            FL --> BV
+            BV --> CE
+            CE --> WS
+            DT --> WS
+        end
+
+        WR --> geometry
+        TR --> geometry
+    end
 ```
 
 Transitioning from roughing to detail work requires abandoning the roughing gouge in favor of tools designed for profile generation: the spindle gouge for coves and flowing curves, the skew chisel for beads, V-grooves, and planing cuts, and the parting tool for diameter establishment and separation cuts. The spindle gouge—also termed a detail gouge or fingernail gouge—features a shallower flute, typically 10 to 13 millimeters wide, ground with a swept-back fingernail profile that allows the tool to roll through curves without the wings catching. The grind extends 45 to 50 millimeters back from the tip, creating a continuous curve from center point to wing edges. This geometry allows the turner to present the tool at continuously varying angles while maintaining bevel contact throughout a flowing cut.
@@ -51,20 +56,16 @@ Planing with the skew demands that the tool rest at or slightly above center hei
 
 Bead formation with the skew exploits the tool's ability to make rolling cuts where the cutting point travels through an arc while the bevel maintains continuous contact. The sequence begins with a V-groove scored on either side of the bead's center line using the toe of the skew, establishing the bead's boundaries and preventing fiber migration. The rolling cut initiates at the bead's apex with the skew on edge—nearly perpendicular to the workpiece axis—and the long point positioned at the centerline. As the cut proceeds toward the V-groove, the handle arcs downward and away while the blade rolls around its long axis, maintaining bevel contact throughout. The cutting point scribes a precise arc from the apex to the V-groove floor, creating one hemisphere of the bead. The opposite side receives identical treatment, and when executed symmetrically, the two cuts converge to produce a bead of perfect circular cross-section.
 
-```
-SKEW CHISEL BEAD ROLLING SEQUENCE (elevation view)
-
-Starting position:           Mid-roll position:          Completion:
-Skew nearly vertical         Handle drops, blade rolls   Blade horizontal in V
-
-     │ Long point                  ╱ Blade rotates            ┌────
-     │ at apex                    ╱  ~45° around               │
-     │                           ╱   long axis                 │
-═════●═════                 ════●════                      ════╧════
-  Workpiece                   Cutting point               Blade flat,
-   surface                    traces arc                  cut complete
-
-Handle position:  →  Handle arcs down  →  Handle fully lowered
+```mermaid
+flowchart LR
+    A["Starting Position<br/>───────────────<br/>Skew nearly vertical<br/>Long point at apex<br/><br/>│ Long point<br/>│ at apex<br/>│<br/>═════●═════<br/>Workpiece surface<br/><br/>Handle position: →"]
+    
+    B["Mid-Roll Position<br/>───────────────<br/>Handle drops, blade rolls<br/>Blade rotates ~45° around long axis<br/><br/>╱ Blade rotates<br/>╱  ~45° around<br/>╱   long axis<br/>════●════<br/>Cutting point traces arc<br/><br/>Handle arcs down"]
+    
+    C["Completion<br/>───────────────<br/>Blade horizontal in V<br/>Cut complete<br/><br/>┌────<br/>│<br/>│<br/>════╧════<br/>Blade flat,<br/>cut complete<br/><br/>Handle fully lowered"]
+    
+    A -->|"Roll progression"| B
+    B -->|"Roll progression"| C
 ```
 
 Taper generation represents the most fundamental dimensional control exercise in spindle work, establishing the linear proportions that underpin leg, column, and handle designs. The process begins with caliper-marked layout lines indicating finished diameters at key stations along the blank's length. After roughing to cylinder, the turner selects either the skew in planing mode or the spindle gouge in pull-cut configuration. The taper emerges through progressive passes that remove slightly more material at the large end than the small end, with each pass traversing the full taper length. Visual alignment guides this process: the turner positions their eye line parallel to the intended taper axis and adjusts the tool's angle of attack to maintain this sight line as the traverse proceeds. Frequent caliper checks verify dimensional progress, and the final passes lighten to remove less than 0.5 millimeter per revolution, allowing the bevel friction and cutting dynamics to settle into a steady state that produces consistent surface finish.

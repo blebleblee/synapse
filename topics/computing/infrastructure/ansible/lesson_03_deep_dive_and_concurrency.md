@@ -227,27 +227,28 @@ Compare this to Kubernetes controllers, which are also level-triggered but maint
 Each task transitions through a well-defined state machine on the control node:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Pending : Task queued by StrategyModule
-
-    Pending --> Running : Worker process dispatched
-
-    Running --> Unreachable : SSH connection failed
-    Running --> Failed : Module returned rc != 0 or failed=true
-    Running --> Changed : Module returned changed=true
-    Running --> OK : Module returned changed=false
-
-    Changed --> Notified : Handler registered (notify:)
-    OK --> Notified : Handler registered (notify:)
-
-    Failed --> Rescued : rescue: block matched
-    Rescued --> Always : always: block executes
-    Changed --> Always : always: block executes
-    OK --> Always : always: block executes
-
-    Notified --> [*] : Handler runs at end of play
-    Always --> [*] : Play continues or ends
-    Unreachable --> [*] : Host removed from play (ignore_unreachable: false)
+flowchart TD
+    Start([Start]) --> Pending["Pending<br/><small>Task queued by StrategyModule</small>"]
+    
+    Pending --> Running["Running<br/><small>Worker process dispatched</small>"]
+    
+    Running --> Unreachable["Unreachable<br/><small>SSH connection failed</small>"]
+    Running --> Failed["Failed<br/><small>Module returned rc != 0 or failed=true</small>"]
+    Running --> Changed["Changed<br/><small>Module returned changed=true</small>"]
+    Running --> OK["OK<br/><small>Module returned changed=false</small>"]
+    
+    Changed --> Notified["Notified<br/><small>Handler registered (notify:)</small>"]
+    OK --> Notified
+    
+    Failed --> Rescued["Rescued<br/><small>rescue: block matched</small>"]
+    
+    Rescued --> Always["Always<br/><small>always: block executes</small>"]
+    Changed --> Always
+    OK --> Always
+    
+    Notified --> End1([End - Handler runs at end of play])
+    Always --> End2([End - Play continues or ends])
+    Unreachable --> End3([End - Host removed from play])
 ```
 
 The `Unreachable` state is distinct from `Failed` and is handled differently. An unreachable host is removed from the active host set for the remainder of the play. Subsequent tasks will not attempt to execute against it. This is controlled by the `ignore_unreachable` task parameter and the `any_errors_fatal` play parameter.
@@ -448,4 +449,25 @@ The `free` strategy removes the synchronization barrier. Each host advances thro
         state: restarted
 ```
 
-A handler registered by host A's task may fire before host B has even reached the notifying task. For
+A handler registered by host A's task may fire before host B has even reached the notifying task.
+
+### 5.3 Strategic Implications and Hybrid Considerations
+
+The choice of strategy is not merely a performance optimization—it fundamentally alters the contract between playbook author and execution engine. The `linear` strategy guarantees **causal consistency**: if task B appears after task A in the playbook, and both target the same host, then B observes all state changes from A. This invariant enables idempotent multi-step orchestrations where later tasks depend on earlier configuration (e.g., installing a package repository before installing packages from it). The `free` strategy sacrifices this guarantee for **maximum concurrency**, making it appropriate only for task sets that are mutually independent or where dependencies are enforced through explicit `wait_for` conditions rather than implicit ordering. Hybrid strategies exist (`debug`, `host_pinned`) for specialized debugging or affinity scenarios, but production deployments overwhelmingly choose between `linear` (for safety and predictability) and `free` (for embarrassingly parallel workloads like batch data processing or stateless service restarts). The `serial` keyword provides fine-grained control within `linear`, allowing rolling deploys where `serial: 2` processes two hosts at a time, maintaining the barrier semantics but limiting blast radius.
+
+### 5.4 Concurrency, Failure Propagation, and Recovery Boundaries
+
+Ansible's concurrency model introduces non-obvious interactions between strategy, `max_fail_percentage`, and `any_errors_fatal`. Under `linear`, a task failure on one host does not immediately halt execution on other hosts within the same task—the task batch completes, then Ansible evaluates failure thresholds. With `any_errors_fatal: true`, the first failure aborts the entire play immediately, bypassing normal error accumulation. The `max_fail_percentage` threshold (default: 0%, meaning any failure aborts) is evaluated **after each task batch**, not continuously during task execution. This creates a temporal window where multiple hosts can fail simultaneously before the threshold is checked. The `rescue` and `always` blocks in `block` constructs define **recovery boundaries**: tasks in `rescue` execute only if a task in the `block` fails, while `always` tasks execute unconditionally, providing idempotent cleanup semantics. These boundaries interact with strategy plugins—under `free`, rescue blocks execute per-host as soon as a failure occurs, but under `linear`, all hosts must reach the block's failure state before any rescue logic fires. This distinction is critical for designing robust playbooks that tolerate partial failures without leaving infrastructure in an inconsistent intermediate state.
+
+---
+
+## Summary & Verification Matrix
+
+| **Invariant/Mechanism** | **Governing Principle** | **Observable Behavior** | **Diagnostic Signal** |
+|-------------------------|-------------------------|-------------------------|----------------------|
+| **TaskExecutor Isolation** | Each task runs in a forked worker with copied module code, serialized args, and independent failure domain | Module bugs cannot corrupt controller state; per-task resource cleanup | Traceback in worker subprocess; `ps` shows `ansible-tmp-*` process tree |
+| **Linear Strategy Barrier** | All hosts complete task N before any host begins N+1; slowest host gates global progress | Deterministic ordering; convoy effect visible in timing logs | `TASK [name]` timestamp spread in `-vvv` log; idle CPU on fast hosts between tasks |
+| **Free Strategy Semantics** | Each host advances independently; no inter-host synchronization | Maximum throughput; breaks handler ordering guarantees | Hosts complete playbook at wildly different wall-clock times; handler fires before all notifiers complete |
+| **Action Plugin Execution** | Runs on controller before TaskExecutor; manipulates args, delegates connections, or bypasses remote execution | `template` reads local Jinja2, `copy` checksums locally; `set_fact` never touches managed node | `-vvv` shows `<localhost> EXEC` for action plugins; no SSH connection in packet capture |
+| **Failure Threshold Evaluation** | `max_fail_percentage` checked after each task batch, not during; `any_errors_fatal` aborts immediately on first failure | Temporal window allows multiple simultaneous failures before abort; rescue blocks fire after batch completes under `linear` | Play aborts with "X% of hosts failed" message; `--start-at-task` resumes mid-play after fix |
+| **Block Rescue/Always Boundaries** | `rescue` tasks execute only on failure; `always` tasks execute unconditionally; defines atomicity boundary for error handling | Idempotent cleanup in `always`; fallback logic in `rescue`; prevents partial state corruption | Failed task followed immediately by `RESCUE` section in output; `always` runs even if `rescue` fails |

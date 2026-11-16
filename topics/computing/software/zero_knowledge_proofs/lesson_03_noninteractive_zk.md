@@ -73,30 +73,34 @@ The trust assumption is different from soundness: if $\tau$ is not destroyed, th
 
 A ZK proof in production is not written by hand as an R1CS. The engineering workflow involves a **circuit language compiler** that accepts a high-level description of the computation and emits the R1CS or equivalent constraint representation consumed by the prover backend. Understanding each stage of this pipeline is prerequisite to diagnosing correctness failures, optimizing constraint counts, and choosing the right toolchain.
 
-```
-High-Level Program (Circom / Noir / Halo2 gadgets)
-         │
-         ▼
-   Intermediate Representation
-   (Flat constraints, wire assignments)
-         │
-         ▼
-   R1CS / PLONK Arithmetization
-   (Matrix A, B, C  or gate polynomial columns)
-         │
-         ▼
-   Witness Generation
-   (Evaluate circuit on private + public inputs)
-         │
-         ▼
-   Prover Backend
-   (Multi-Scalar Multiplication, NTT, Polynomial Commitments)
-         │
-         ▼
-   Proof  +  Verification Key
-         │
-         ▼
-   Verifier (On-chain EVM or native binary)
+```mermaid
+flowchart TD
+    A["High-Level Program
+    (Circom / Noir / Halo2 gadgets)"]
+
+    B["Intermediate Representation
+    (Flat constraints, wire assignments)"]
+
+    C["R1CS / PLONK Arithmetization
+    (Matrix A, B, C or gate polynomial columns)"]
+
+    D["Witness Generation
+    (Evaluate circuit on private + public inputs)"]
+
+    E["Prover Backend
+    (Multi-Scalar Multiplication, NTT, Polynomial Commitments)"]
+
+    F["Proof + Verification Key"]
+
+    G["Verifier
+    (On-chain EVM or native binary)"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
 ```
 
 The two stages that consume engineering time are circuit writing (correctness and constraint efficiency) and prover performance (MSM and NTT throughput). The stages in between — constraint compilation and witness generation — are mostly toolchain concerns, though bugs at the witness generation layer are among the most dangerous failure modes in ZK systems, as described in Section 3.
@@ -211,26 +215,38 @@ The critical structural difference is that STARKs are **uniform**: the same cons
 
 The architecture diagram below captures the full pipeline comparison:
 
-```
-                    SNARK PIPELINE (Groth16 / PLONK)
-┌─────────────┐    ┌──────────────┐    ┌──────────────────┐    ┌─────────┐
-│  Circom /   │───▶│  R1CS / PLONK│───▶│ Witness Gen +    │───▶│  Proof  │
-│  Halo2 /    │    │  Arithmetize │    │ MSM + NTT        │    │ 192B–1KB│
-│  Noir       │    └──────────────┘    └──────────────────┘    └─────────┘
-│             │          │                      │
-│             │   Trusted Setup SRS      Verification Key
-└─────────────┘   (circuit-specific      (EVM contract or
-                  or universal)           native verifier)
+```mermaid
+flowchart TD
 
-                    STARK PIPELINE (Stone / RISC Zero / Winterfell)
-┌─────────────┐    ┌──────────────┐    ┌──────────────────┐    ┌─────────┐
-│  Cairo /    │───▶│  AIR (trace  │───▶│ LDE + FRI        │───▶│  Proof  │
-│  RISC-V     │    │  columns,    │    │ (NTT-heavy,      │    │ 100KB+  │
-│  program    │    │  transition  │    │  no pairings,    │    │         │
-│             │    │  constraints)│    │  hash-based)     │    │         │
-└─────────────┘    └──────────────┘    └──────────────────┘    └─────────┘
-                   No trusted setup.
-                   Post-quantum secure.
+    subgraph snark ["SNARK Pipeline (Groth16 / PLONK)"]
+        direction LR
+        S1["Circom / Halo2 / Noir"]
+        S2["R1CS / PLONK\nArithmetize"]
+        S3["Witness Gen +\nMSM + NTT"]
+        S4["Proof\n192B – 1KB"]
+        S5["Trusted Setup SRS\n(circuit-specific\nor universal)"]
+        S6["Verification Key\n(EVM contract or\nnative verifier)"]
+
+        S1 --> S2
+        S2 --> S3
+        S3 --> S4
+        S2 --> S5
+        S3 --> S6
+    end
+
+    subgraph stark ["STARK Pipeline (Stone / RISC Zero / Winterfell)"]
+        direction LR
+        T1["Cairo / RISC-V\nprogram"]
+        T2["AIR\n(trace columns,\ntransition constraints)"]
+        T3["LDE + FRI\n(NTT-heavy,\nno pairings,\nhash-based)"]
+        T4["Proof\n100KB+"]
+        T5["No trusted setup.\nPost-quantum secure."]
+
+        T1 --> T2
+        T2 --> T3
+        T3 --> T4
+        T2 --> T5
+    end
 ```
 
 ### Halo2 and Recursive Proof Composition

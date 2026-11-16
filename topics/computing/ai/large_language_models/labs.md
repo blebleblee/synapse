@@ -328,16 +328,36 @@ if __name__ == "__main__":
 
 **Expected output (approximate, latency will vary by hardware):**
 
-```
-Prompt                                             Hit    Latency (ms)   Output (truncated)
-──────────────────────────────────────────────────────────────────────────────────────────
-The transformer architecture was introduced        MISS   312.4          in 2017 by Vaswani et al…
-Attention mechanisms allow models to               MISS   298.1          focus on relevant parts…
-The transformer architecture was introduced        HIT    0.0            in 2017 by Vaswani et al…
-Attention mechanisms allow models to               HIT    0.0            focus on relevant parts…
-Large language models are trained on               MISS   305.7          vast corpora of text…
-
-Cache stats: hits=2  misses=3  hit_rate=40.0%  evictions=0  saved=610.5ms
+```mermaid
+flowchart TD
+    Start([User Request]) --> Cache{Cache Lookup}
+    
+    Cache -->|HIT| Return1["Return Cached Result<br/>Latency: 0.0ms"]
+    Cache -->|MISS| Process["Process Request<br/>Latency: ~300ms"]
+    
+    Process --> Store["Store in Cache"]
+    Store --> Return2["Return Result"]
+    
+    Return1 --> End([Response])
+    Return2 --> End
+    
+    subgraph Stats ["Cache Statistics"]
+        direction TB
+        H["Hits: 2"]
+        M["Misses: 3"]
+        HR["Hit Rate: 40.0%"]
+        E["Evictions: 0"]
+        S["Time Saved: 610.5ms"]
+    end
+    
+    subgraph Examples ["Request Examples"]
+        direction TB
+        Ex1["'The transformer architecture...'<br/>MISS → 312.4ms"]
+        Ex2["'Attention mechanisms...'<br/>MISS → 298.1ms"]
+        Ex3["'The transformer architecture...'<br/>HIT → 0.0ms"]
+        Ex4["'Attention mechanisms...'<br/>HIT → 0.0ms"]
+        Ex5["'Large language models...'<br/>MISS → 305.7ms"]
+    end
 ```
 
 ---
@@ -1364,3 +1384,4 @@ Exact-match cache hit: eliminates t_prefill + t_decode
 Prefix cache hit:      eliminates t_prefill for the shared prefix portion
 Semantic cache hit:    eliminates t_prefill + t_decode (same as exact-match)
 Speculative decoding:  reduces t_decode by ~(1 − 1/acceptance_rate)/γ
+```

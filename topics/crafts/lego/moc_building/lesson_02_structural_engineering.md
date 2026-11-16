@@ -28,33 +28,39 @@ Triangulation principles from truss engineering translate cleanly into Lego stru
 
 The internal bracing frame represents the most powerful structural technique for large-scale MOCs, particularly those with significant cantilevers or tall vertical elements subject to buckling. Rather than relying solely on the exterior shell to provide structural integrity, advanced builders construct an independent load-bearing skeleton hidden within the model's volume. This internal framework employs thick walls (minimum two studs wide), frequent perpendicular intersections forming a grid pattern, and vertical integration through overlapped plate layers every three to four courses. The exterior surface layers then attach to this framework, carrying only local loads from their immediate connections rather than participating in the primary load path. This architecture mirrors steel-frame construction in full-scale buildings, where the curtain wall provides weather protection and aesthetics while the internal frame resists all significant structural loads.
 
-```
-Vertical Section - Internal Frame with Exterior Cladding:
-(Side view showing load paths and connection details)
+```mermaid
+flowchart TD
+    subgraph exterior ["Exterior Cladding Layer"]
+        PLATE_1N["1×N Plate"]
+        PLATE_OVERLAP["Overlapped 3-Course Plate"]
+    end
 
-╔══════════════════════════════════════════════════════════╗
-║  Exterior                Internal                         ║
-║  Cladding      ┌────┐    Frame        ┌────┐            ║
-║    Layer       │    │     Core        │    │             ║
-║      │         │    │       │         │    │             ║
-║      ▼         └────┘       ▼         └────┘             ║
-║   ╭──────╮   ║║    ║║   ╔════════╗  ║║    ║║           ║
-║   │      │   ║║    ║║   ║        ║  ║║    ║║           ║
-║   │ 1×N  │◄──╫╫────╫╫──►║  2×N   ║◄─╫╫────╫╫─► Lateral ║
-║   │Plate │   ║║    ║║   ║ Double ║  ║║    ║║   Brace   ║
-║   │      │   ║║    ║║   ║  Wall  ║  ║║    ║║           ║
-║   ╰──────╯   ║║    ║║   ╚════════╝  ║║    ║║           ║
-║      │         ║      ║       │         ║      ║         ║
-║      │         ▼      ▼       │         ▼      ▼         ║
-║   ╭──────╮   ╔════════════╗ ╔════════╗ ╔══════════╗     ║
-║   │      │   ║  Overlapped║ ║Interior║ ║Cross-tie ║     ║
-║   │      │   ║  3-Course  ║ ║Diagonal║ ║  Floor   ║     ║
-║   │      │◄──║  Plate     ║ ║ Brace  ║ ║  Plane   ║     ║
-║   ╰──────╯   ╚════════════╝ ╚════════╝ ╚══════════╝     ║
-║                                                           ║
-║   Load Path: Exterior → Frame → Diagonal → Foundation   ║
-║   Connection: 2-stud overlap minimum per layer          ║
-╚══════════════════════════════════════════════════════════╝
+    subgraph frame_core ["Internal Frame Core"]
+        WALL_2N["2×N Double Wall"]
+        BRACE_DIAG["Interior Diagonal Brace"]
+    end
+
+    subgraph connections ["Connections & Lateral System"]
+        STUD_L["Stud Column\n(Left)"]
+        STUD_R["Stud Column\n(Right)"]
+        LATERAL["Lateral Brace"]
+        CROSSTIE["Cross-tie Floor Plane"]
+    end
+
+    PLATE_1N -- "2-stud overlap min." --> STUD_L
+    STUD_L -- "lateral transfer" --> WALL_2N
+    WALL_2N -- "lateral transfer" --> STUD_R
+    STUD_R --> LATERAL
+
+    PLATE_1N -- "load path: exterior → frame" --> PLATE_OVERLAP
+    STUD_L --> PLATE_OVERLAP
+    WALL_2N --> BRACE_DIAG
+    STUD_R --> CROSSTIE
+
+    BRACE_DIAG -- "diagonal → foundation" --> FOUNDATION["Foundation"]
+    PLATE_OVERLAP --> FOUNDATION
+    CROSSTIE --> FOUNDATION
+    LATERAL --> FOUNDATION
 ```
 
 Cantilever construction demands careful attention to moment arm geometry and connection distribution. When a beam extends horizontally from a fixed support, gravitational loads at the free end generate a bending moment that scales linearly with distance from the support. A 10-stud cantilever supporting a 100-gram load experiences 1000 gram-studs of moment at the fixed end; doubling the length to 20 studs doubles the moment to 2000 gram-studs even with identical loading. This moment must be resisted by connection forces distributed across the fixed end's attachment plane. A single 2×4 brick provides approximately six to eight stud-connections to the supporting structure; if the cantilever attaches through this single element, those six connections must collectively resist the entire bending moment. Calculating the force per connection reveals whether the design exceeds clutch capacity: for a 20-stud cantilever with 100-gram tip load, the moment divided by the lever arm of the connection group yields individual connection forces that may approach or exceed the 30 N clutch limit, predicting failure.

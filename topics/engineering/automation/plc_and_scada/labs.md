@@ -921,7 +921,7 @@ runScript("
 - Historian accurately records gap with boundary timestamps (last good value before outage, first good value after restoration)
 - No data corruption or false historical values recorded during outage
 
-Measure communication recovery time using Wireshark packet captures. The reconnection sequence involves OPC UA session re-establishment (client requests new session ID), subscription recreation (client resubscribes to monitored items), and initial data transfer (server publishes current values). Typical recovery times range 2-8 seconds depending on subscription count and server load. Systems requiring faster recovery implement redundant network paths with automatic failover (<1 second using protocols like Parallel Redundancy Protocol per IEC 62439-3).
+Measure communication recovery time using Wireshark packet captures. The reconnection sequence involves OPC UA session re-establishment (client requests new session ID), subscription recreation (client resubscribes to monitored items), and initial data transfer (server publishes current values). Typical recovery times range 2-8 seconds depending on subscription count and server load. Systems requiring faster recovery implement redundant network paths with automatic failover (< 1 second using protocols like Parallel Redundancy Protocol per IEC 62439-3).
 
 **Test Scenario 3: Cascading Failure with Emergency Shutdown (Recovery Time Quantification)**
 
@@ -950,14 +950,14 @@ Simulate a worst-case scenario combining multiple simultaneous failures: Tank A 
 5. Observe simulation reinitialize to default levels
 6. Verify all alarms clear within 30 seconds as tanks return to normal ranges
 7. Confirm pumps resume automatic sequencing without manual intervention
-8. Measure time from reset activation to steady-state operation (Tank C at 50% ±2%): typical target <15 minutes
+8. Measure time from reset activation to steady-state operation (Tank C at 50% ±2%): typical target < 15 minutes
 
 **Quantitative Recovery Metrics**:
 - **Emergency Response Time**: Time from initiating event (Tank A LSL) to emergency stop activation: 180 seconds
 - **Process Shutdown Duration**: Time in emergency-stopped state before recovery initiation: variable (operator-dependent)
-- **Restart Sequence Duration**: Time from reset activation to pumps running: <10 seconds (demonstrates rapid recovery capability)
+- **Restart Sequence Duration**: Time from reset activation to pumps running: < 10 seconds (demonstrates rapid recovery capability)
 - **Return to Normal**: Time from reset to steady-state at setpoint: 840 seconds (14 minutes, acceptable for non-critical processes)
-- **Alarm Flooding Duration**: Time with >5 active alarms: 180 seconds during cascading failure, 25 seconds during recovery (within ISA-18.2 acceptable limits of <10 alarms per 10 minutes per operator)
+- **Alarm Flooding Duration**: Time with >5 active alarms: 180 seconds during cascading failure, 25 seconds during recovery (within ISA-18.2 acceptable limits of < 10 alarms per 10 minutes per operator)
 
 **Data Collection for Post-Event Analysis**:
 Export alarm journal and tag history covering the entire test sequence (T = -60 to T = 1200 seconds). Generate a timeline plot using Python matplotlib showing key events:
@@ -1014,7 +1014,7 @@ t_deplete = (0.50 - 0.10) × V_B_capacity / Q_P2
 t_deplete = 0.40 × 5000 L / 100 L/min = 20 minutes
 ```
 
-This calculation quantifies the time buffer available for corrective action before secondary failures occur. Industrial operators use these time constants for alarm prioritization: failures with short time horizons (<5 minutes to catastrophic outcome) receive highest priority and immediate automatic responses, while slower failures (>30 minutes) permit operator assessment and manual intervention.
+This calculation quantifies the time buffer available for corrective action before secondary failures occur. Industrial operators use these time constants for alarm prioritization: failures with short time horizons (< 5 minutes to catastrophic outcome) receive highest priority and immediate automatic responses, while slower failures (>30 minutes) permit operator assessment and manual intervention.
 
 **Test Scenario 4: Partial Sensor Failure with Voting Logic (Redundancy Validation)**
 
@@ -1131,13 +1131,13 @@ Fault_Count := TO_INT(Sensor_A_Fault) + TO_INT(Sensor_B_Fault) + TO_INT(Sensor_C
 13. Verify Pump P2 automatically restarts per normal sequencing logic
 
 **Acceptance Criteria**:
-- Single sensor failure tolerated with continuous operation and <10ms voting latency
+- Single sensor failure tolerated with continuous operation and < 10ms voting latency
 - Voted value accuracy within ±1.0% of true level during single-sensor fault
 - Degraded mode alarm generates operator notification within 1 second
 - Double sensor failure triggers fail-safe shutdown within 100ms
 - Automatic recovery when sensors restored (no manual reset required for single fault, manual review required for double fault per safety protocols)
 
-Document the voting statistics by logging the voted value, individual sensor values, and fault flags at 100ms resolution during the test. Post-test analysis computes voting latency (time from sensor deviation exceeding tolerance to fault flag activation) and false positive rate (spurious fault detections due to transient noise). Industrial systems target voting latencies <50ms and false positive rates <0.1% (fewer than one spurious fault per 1000 operating hours).
+Document the voting statistics by logging the voted value, individual sensor values, and fault flags at 100ms resolution during the test. Post-test analysis computes voting latency (time from sensor deviation exceeding tolerance to fault flag activation) and false positive rate (spurious fault detections due to transient noise). Industrial systems target voting latencies < 50ms and false positive rates < 0.1% (fewer than one spurious fault per 1000 operating hours).
 
 ## Operational Reference Guide & Diagnostic Checklist
 
@@ -1150,8 +1150,8 @@ Execute this checklist before energizing any PLC or SCADA system in a production
 **Electrical and Hardware Verification**:
 - [ ] All field wiring terminated per approved loop diagrams with wire labels matching P&ID tag numbers
 - [ ] Continuity tests passed on all I/O circuits (24VDC inputs show open-circuit voltage, outputs show relay coil resistance)
-- [ ] Grounding verified: PLC chassis bonded to facility ground grid with <1Ω resistance
-- [ ] Power supply loading: I/O modules draw <80% of supply rated current (measure with clamp ammeter)
+- [ ] Grounding verified: PLC chassis bonded to facility ground grid with < 1Ω resistance
+- [ ] Power supply loading: I/O modules draw < 80% of supply rated current (measure with clamp ammeter)
 - [ ] Network infrastructure: Ethernet switches configured for IGMP snooping to prevent multicast flooding, spanning tree protocol disabled on industrial VLANs (deterministic latency requirement)
 - [ ] Physical security: PLC enclosure locked with tamper-evident seals, network switch accessible only to authorized personnel
 
@@ -1170,7 +1170,7 @@ Execute this checklist before energizing any PLC or SCADA system in a production
 - [ ] Emergency stop response time: all outputs de-energize within 50ms (measure with oscilloscope on output terminals)
 - [ ] Communication recovery: SCADA reconnects to PLC within 10 seconds after network cable disconnect/reconnect
 - [ ] Historian data integrity: export 24 hours of tag history, verify no duplicate timestamps or out-of-order records (sort by timestamp, compare adjacent rows)
-- [ ] Alarm response: generate test alarm (force Tank C level to 92%), verify annunciation on SCADA HMI, confirm alarm email delivered to designated recipients, measure total latency <5 seconds
+- [ ] Alarm response: generate test alarm (force Tank C level to 92%), verify annunciation on SCADA HMI, confirm alarm email delivered to designated recipients, measure total latency < 5 seconds
 
 **Common Diagnostic Procedures**
 
@@ -1203,7 +1203,7 @@ Root Causes:
 Diagnostic Steps:
 1. Check Ignition gateway status: Config → Status → Connections, observe "Comm Errors" counter
 2. Capture network traffic with Wireshark: filter `opcua`, analyze "Publish Response" packets for dropped sequence numbers
-3. Measure network latency: `ping 127.0.0.1 -t` if local, or `ping <PLC_IP>` if remote, verify <10ms average, <50ms maximum
+3. Measure network latency: `ping 127.0.0.1 -t` if local, or `ping <PLC_IP>` if remote, verify < 10ms average, < 50ms maximum
 4. Verify tag paths: Config → Tags, browse PLC_Tags provider, compare tag OPC Node Path against CODESYS symbol configuration
 
 Resolution Strategies:
@@ -1218,7 +1218,7 @@ Root Causes:
 1. Motor starter contactor coil failed or control power fuse blown
 2. Overload relay tripped due to motor overcurrent
 3. Permissive interlock open (external safety relay, local hand/off/auto switch in "Off")
-4. Control voltage insufficient (measure <18VDC on 24VDC system indicates power supply overload or high resistance connection)
+4. Control voltage insufficient (measure < 18VDC on 24VDC system indicates power supply overload or high resistance connection)
 
 Diagnostic Steps:
 1. Measure voltage at PLC output terminals: should read 24VDC when output command active
@@ -1258,13 +1258,13 @@ Industrial automation systems should meet the following quantitative performance
 
 | Metric | Target | Measurement Method | Acceptance Criteria |
 |--------|--------|-------------------|---------------------|
-| PLC Cycle Time Utilization | <70% | CODESYS Task Monitor | Consistent <80%, peaks <90% |
-| SCADA-PLC Communication Latency | <100ms | Wireshark round-trip time | Mean <50ms, 95th percentile <200ms |
-| Alarm Rate | <6 alarms/hour/operator | Ignition alarm journal query | Per ISA-18.2: <10/10min, <1/10min standing alarms |
-| Tag Quality Percentage | >99.5% | Tag historian quality statistics | "Good" quality >99.5% uptime, <0.5% "Bad" samples |
+| PLC Cycle Time Utilization | < 70% | CODESYS Task Monitor | Consistent < 80%, peaks < 90% |
+| SCADA-PLC Communication Latency | < 100ms | Wireshark round-trip time | Mean < 50ms, 95th percentile < 200ms |
+| Alarm Rate | < 6 alarms/hour/operator | Ignition alarm journal query | Per ISA-18.2: < 10/10min, < 1/10min standing alarms |
+| Tag Quality Percentage | >99.5% | Tag historian quality statistics | "Good" quality >99.5% uptime, < 0.5% "Bad" samples |
 | Historian Write Throughput | >1000 samples/sec | Database I/O statistics | No write queue backlog >10 seconds |
-| HMI Screen Refresh Rate | >1 Hz | Browser performance profiler | All screens update <2 seconds |
-| Backup Completion Time | <15 minutes | Gateway backup duration log | Full gateway backup completes <30 minutes |
+| HMI Screen Refresh Rate | >1 Hz | Browser performance profiler | All screens update < 2 seconds |
+| Backup Completion Time | < 15 minutes | Gateway backup duration log | Full gateway backup completes < 30 minutes |
 
 Establish baseline measurements during commissioning and trending plots tracking metrics over time. Gradual degradation (e.g., PLC cycle time increasing from 55% to 75% over six months) indicates pending issues like firmware bugs triggering memory leaks, accumulated diagnostic logs consuming flash memory, or hardware component aging. Proactive replacement before failure prevents unplanned downtime during critical production periods.
 

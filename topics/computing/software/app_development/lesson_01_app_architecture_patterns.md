@@ -20,26 +20,18 @@ State management, independent of the specific rendering pattern chosen, obeys a 
 
 MVC is the oldest of the mainstream patterns, with roots in Smalltalk-80, and it defines three roles. The Model owns domain state and enforces business invariants. The View renders the Model's state to the user. The Controller interprets user input and translates it into mutations on the Model. The critical structural property is that the View observes the Model directly — typically through an Observer or notification mechanism — and updates itself when the Model changes. The Controller does not mediate every display update; it only handles input.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                        MVC Data Flow                     │
-│                                                          │
-│   User Input                                             │
-│       │                                                  │
-│       ▼                                                  │
-│  ┌──────────┐    mutates    ┌───────────┐                │
-│  │Controller│ ─────────────▶│   Model   │                │
-│  └──────────┘               └───────────┘                │
-│                                   │                      │
-│                              notifies (Observer)         │
-│                                   │                      │
-│                                   ▼                      │
-│                            ┌──────────┐                  │
-│                            │   View   │                  │
-│                            └──────────┘                  │
-│                                   │                      │
-│                           renders to screen              │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    UI["User Input"]
+    C["Controller"]
+    M["Model"]
+    V["View"]
+    S["Screen"]
+
+    UI --> C
+    C -->|mutates| M
+    M -->|"notifies (Observer)"| V
+    V -->|"renders to"| S
 ```
 
 The architectural strength of classical MVC is that the Model is completely independent of the View. You can run the entire domain logic in a headless test harness, exercising state transitions through the Controller interface without instantiating any rendering infrastructure. The weakness, which became pronounced in the web era, is that in practice the View and Controller are tightly coupled — in many frameworks they are literally the same class — and the View's direct observation of the Model means that View logic can subtly reach into Model state in ways that violate the boundary. Apple's UIKit, for instance, nominally follows MVC but in practice produces what practitioners call "Massive View Controller": a ViewController class that accumulates layout code, networking code, data transformation code, and business logic because all three roles have natural gravitational pull toward the same location in the codebase.
@@ -50,24 +42,15 @@ The Observer coupling from Model to View also creates a testability hazard that 
 
 MVVM, introduced by John Gossman at Microsoft in 2005 for WPF, restructures the pattern so the View never observes the Model directly. Instead, a ViewModel — one per View, with a one-to-one or one-to-many correspondence — transforms raw Model data into a representation optimized for display, and the View binds to the ViewModel's exposed properties through a reactive or data-binding mechanism. The ViewModel exposes observable properties or streams, and the binding layer handles propagating changes automatically.
 
-```
-┌────────────────────────────────────────────────────────────────────┐
-│                         MVVM Data Flow                              │
-│                                                                     │
-│  ┌────────────┐  data binding  ┌────────────────┐                  │
-│  │    View    │◀───────────────│  ViewModel     │                  │
-│  │  (passive) │                │  (observable   │                  │
-│  └─────┬──────┘                │   properties)  │                  │
-│        │                       └───────┬─────────┘                 │
-│        │ user                          │ queries/                  │
-│        │ commands ──────────────────▶  │ commands                  │
-│        │                               │                           │
-│        │                        ┌──────▼──────┐                    │
-│        │                        │    Model    │                    │
-│        │                        │  (domain +  │                    │
-│        │                        │  services)  │                    │
-│        │                        └─────────────┘                    │
-└────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    View["View<br/>(passive)"]
+    ViewModel["ViewModel<br/>(observable properties)"]
+    Model["Model<br/>(domain + services)"]
+    
+    ViewModel -->|"data binding"| View
+    View -->|"user commands"| ViewModel
+    ViewModel -->|"queries/commands"| Model
 ```
 
 The ViewModel's key mechanical property is that it has *no import of or reference to any View type*. It exposes state as observable values — `LiveData<T>` in Android Jetpack, `@Published` properties in Swift/Combine, `StateFlow<T>` in Kotlin coroutines — and the View subscribes to those streams in its lifecycle-aware setup code. This inversion solves the testability problem cleanly: a unit test for a ViewModel instantiates it in isolation, invokes command methods on it, and asserts on the emitted state values without ever touching a UI thread or a rendering context.
@@ -173,22 +156,17 @@ Several design decisions here carry mechanical weight beyond style preference. `
 
 MVP emerged in the late 1990s and was popularized in the context of testable UI on platforms that lacked data-binding infrastructure. Where MVVM relies on a reactive binding layer to connect ViewModel to View, MVP uses an explicit interface contract. The View implements a `View` interface that the Presenter calls imperatively, and the Presenter receives a reference to that interface. The View delegates every user interaction to the Presenter and renders only what the Presenter tells it to render.
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         MVP Data Flow                             │
-│                                                                   │
-│  ┌─────────────┐  View interface  ┌─────────────┐                │
-│  │    View     │◀─────────────────│  Presenter  │                │
-│  │(implements  │                  │(holds View  │                │
-│  │ IView)      │──────────────────▶ reference)  │                │
-│  └─────────────┘  delegates all   └──────┬──────┘                │
-│                   user events            │                        │
-│                                   queries/mutates                 │
-│                                          │                        │
-│                                   ┌──────▼──────┐                │
-│                                   │    Model    │                │
-│                                   └─────────────┘                │
-└──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph mvp["MVP Data Flow"]
+        View["View<br/>(implements IView)"]
+        Presenter["Presenter<br/>(holds View reference)"]
+        Model["Model"]
+        
+        View -->|"delegates all<br/>user events"| Presenter
+        Presenter -->|"View interface"| View
+        Presenter -->|"queries/mutates"| Model
+    end
 ```
 
 The critical difference from MVVM is that the Presenter *calls the View* rather than *emitting observable state for the View to subscribe to*. This makes the Presenter easy to test using a mock of the View interface, but it also means the Presenter holds a reference to a concrete object — the View — which must be managed carefully with respect to lifecycle. When the Activity or Fragment is destroyed and recreated on an Android configuration change, the Presenter must release its View reference or risk holding a stale reference to a destroyed Activity, causing a memory leak.
@@ -300,38 +278,24 @@ The `weak var view: ProfileView?` on the Presenter is not stylistic hygiene — 
 
 Modern application architectures on both mobile and web platforms have converged on a fourth model that is not strictly one of the classical three: unidirectional data flow (UDF), exemplified by Redux on the web, The Elm Architecture, and MVI (Model-View-Intent) on Android. The core invariant is that state flows in one direction only: from a central state store, through a pure mapping function, to the View. User events flow back as discrete, named Intent objects that are processed by a pure reducer function to produce the next state. No component has a back-channel to mutate state directly.
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│               Unidirectional Data Flow (MVI / Redux)                  │
-│                                                                        │
-│                    ┌────────────────────┐                             │
-│                    │       State        │                             │
-│                    │  (immutable value) │                             │
-│                    └────────┬───────────┘                             │
-│                             │ render                                  │
-│                             ▼                                         │
-│                    ┌────────────────────┐                             │
-│                    │        View        │                             │
-│                    │  (pure function    │                             │
-│                    │   of State)        │                             │
-│                    └────────┬───────────┘                             │
-│                             │ emits Intent                            │
-│                             ▼                                         │
-│                    ┌────────────────────┐                             │
-│                    │     Processor      │                             │
-│                    │  (side effects,    │                             │
-│                    │   async work)      │                             │
-│                    └────────┬───────────┘                             │
-│                             │ produces Result                         │
-│                             ▼                                         │
-│                    ┌────────────────────┐                             │
-│                    │      Reducer       │                             │
-│                    │  (State, Result)   │                             │
-│                    │       → State      │                             │
-│                    └────────┬───────────┘                             │
-│                             │                                         │
-│                             └──────────────────▶ (new State, loop)   │
-└──────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    State["State<br/>(immutable value)"]
+    View["View<br/>(pure function<br/>of State)"]
+    Processor["Processor<br/>(side effects,<br/>async work)"]
+    Reducer["Reducer<br/>(State, Result)<br/>→ State"]
+    
+    State -->|render| View
+    View -->|"emits Intent"| Processor
+    Processor -->|"produces Result"| Reducer
+    Reducer -->|"new State"| State
+    
+    subgraph MVI ["Unidirectional Data Flow (MVI / Redux)"]
+        State
+        View
+        Processor
+        Reducer
+    end
 ```
 
 The reducer function is the most consequential element of this architecture because it is *pure*: given the same prior state and the same result, it always produces the same next state, with no side effects. This purity is what makes time-travel debugging, state snapshots, and deterministic replay possible. It is also what makes the reducer trivially unit-testable: you call `reduce(state, result)` and assert on the output, with no mocking infrastructure required.

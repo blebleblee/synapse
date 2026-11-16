@@ -731,7 +731,7 @@ print(f"Biological variance: {variance_bio:.6f} (h⁻²)")
 print(f"Biological contribution: {(variance_bio / variance_total) * 100:.1f}%")
 ```
 
-Biological variability in growth rate typically exhibits 4–6% coefficient of variation for *E. coli* cultures derived from a single clone, reflecting stochastic gene expression and cell-cycle asynchrony within the population. Technical measurement error contributes <1% CV for calibrated spectrophotometers, making biological variation the dominant uncertainty source. Statistical power analysis reveals that detecting a 10% difference in growth rate between two conditions requires n ≥ 8 replicates per group to achieve 80% power at α = 0.05 significance, assuming CV ≈ 5%.
+Biological variability in growth rate typically exhibits 4–6% coefficient of variation for *E. coli* cultures derived from a single clone, reflecting stochastic gene expression and cell-cycle asynchrony within the population. Technical measurement error contributes < 1% CV for calibrated spectrophotometers, making biological variation the dominant uncertainty source. Statistical power analysis reveals that detecting a 10% difference in growth rate between two conditions requires n ≥ 8 replicates per group to achieve 80% power at α = 0.05 significance, assuming CV ≈ 5%.
 
 This boundary condition analysis establishes the operational limits of microbial growth while quantifying experimental uncertainty through rigorous statistical methodology. The practitioner learns to distinguish biological phenomena from measurement artifacts, design adequately powered experiments, and interpret quantitative results within their uncertainty bounds—essential skills for reproducible microbiological research.
 
@@ -773,13 +773,13 @@ Generation time from discrete measurements: g = t × log(2) / log(N_t / N_0), wh
 
 **Statistical Validation Checkpoints**
 
-Minimum replicate requirements: n ≥ 3 for preliminary data; n ≥ 6 for publication-quality experiments; n ≥ 10 for detecting <15% effect sizes. Report mean ± standard deviation (SD) for parametric data; median ± interquartile range (IQR) for non-normal distributions. Significance testing: two-sample t-test for comparing two groups (assumes normality and equal variance); ANOVA for multiple groups; Mann-Whitney U for non-parametric comparisons.
+Minimum replicate requirements: n ≥ 3 for preliminary data; n ≥ 6 for publication-quality experiments; n ≥ 10 for detecting < 15% effect sizes. Report mean ± standard deviation (SD) for parametric data; median ± interquartile range (IQR) for non-normal distributions. Significance testing: two-sample t-test for comparing two groups (assumes normality and equal variance); ANOVA for multiple groups; Mann-Whitney U for non-parametric comparisons.
 
 Outlier detection: Grubbs' test for single outlier; Dixon's Q-test for small samples (n = 3–7). Remove outliers only with documented justification; rerun experiment if >10% of data points flagged. R² threshold for curve fits: exponential growth R² >0.98; dose-response curves R² >0.95.
 
 **Hemocytometer Cell Counting Procedure**
 
-Load 10 µL diluted culture into chamber; count cells in 25 small squares (0.2 mm × 0.2 mm, 0.1 mm depth). Cell concentration = (cells counted / 25) × 25 × 10⁴ × dilution factor = (cells counted) × 10⁴ × dilution factor per mL. Count >100 total cells for <10% statistical error. Exclude cells touching top/left borders; include cells touching bottom/right borders (standard convention). Clumps: Count as single unit if indistinguishable or divide by estimated cell number.
+Load 10 µL diluted culture into chamber; count cells in 25 small squares (0.2 mm × 0.2 mm, 0.1 mm depth). Cell concentration = (cells counted / 25) × 25 × 10⁴ × dilution factor = (cells counted) × 10⁴ × dilution factor per mL. Count >100 total cells for < 10% statistical error. Exclude cells touching top/left borders; include cells touching bottom/right borders (standard convention). Clumps: Count as single unit if indistinguishable or divide by estimated cell number.
 
 **Antibiotic Stock Preparation Standards**
 

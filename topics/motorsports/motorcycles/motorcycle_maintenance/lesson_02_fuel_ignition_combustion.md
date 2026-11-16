@@ -30,40 +30,38 @@ The ECU calculates base injector pulse width through a three-dimensional lookup 
 
 Closed-loop fuel control adds a feedback layer through a wideband oxygen sensor mounted in the exhaust header collector. The sensor element, typically a planar zirconia cell operating near 700 degrees Celsius, generates a voltage signal proportional to exhaust gas oxygen concentration. The ECU reads this voltage through an analog-to-digital converter and compares it to a target lambda value stored in memory, usually lambda 1.00 representing stoichiometry. If the measured lambda exceeds target, indicating a lean condition, the ECU increments a short-term fuel trim multiplier that enriches subsequent injection pulses. If lambda falls below target, the trim factor decreases to lean out delivery. This closed-loop correction operates continuously during steady-state cruise and light throttle conditions, allowing the ECU to compensate for aging injectors, fuel pressure drift, and atmospheric variations without requiring manual jet swaps or carburetor adjustments.
 
-```
-Fuel Injection Control Flow:
+```mermaid
+flowchart TD
+    subgraph ECU ["Engine Control Unit (ECU)"]
+        SI["Sensor Inputs<br/>• TPS<br/>• MAP<br/>• IAT<br/>• CLT<br/>• CAS<br/>• O2 Sensor"]
 
-┌─────────────────────────────────────────────────────────────────┐
-│                     Engine Control Unit (ECU)                    │
-│                                                                   │
-│  ┌────────────────┐      ┌──────────────────────────────────┐  │
-│  │  Sensor Inputs │──────▶│  Fuel Calculation Algorithm      │  │
-│  │                │      │                                  │  │
-│  │ • TPS          │      │  Base Map[RPM, TPS] ────────┐   │  │
-│  │ • MAP          │      │                             │   │  │
-│  │ • IAT          │      │  Corrections:               ▼   │  │
-│  │ • CLT          │      │   × Temp Factor          ┌────┐ │  │
-│  │ • CAS          │      │   × Altitude Factor  ───▶│ Σ  │ │  │
-│  │ • O2 Sensor    │      │   × Accel Enrich         └──┬─┘ │  │
-│  └────────────────┘      │   × Lambda Trim             │   │  │
-│                          │                             │   │  │
-│                          │  Final Pulse Width ◀────────┘   │  │
-│                          └──────────────┬───────────────────┘  │
-│                                         │                       │
-└─────────────────────────────────────────┼───────────────────────┘
-                                          │
-                         Injector Driver Circuit (12V PWM)
-                                          │
-                                          ▼
-                                  ┌───────────────┐
-                                  │   Solenoid    │
-                                  │   Injector    │
-                                  │               │
-                                  │  ╔═══════╗   │
-                                  │  ║ Pintle║───┼──▶ Fuel Spray
-                                  │  ╚═══════╝   │
-                                  └───────────────┘
-                                   3 bar rail pressure
+        subgraph FCA ["Fuel Calculation Algorithm"]
+            BM["Base Map[RPM, TPS]"]
+
+            subgraph COR ["Corrections"]
+                TF["× Temp Factor"]
+                AF["× Altitude Factor"]
+                AE["× Accel Enrich"]
+                LT["× Lambda Trim"]
+            end
+
+            SUM(("Σ"))
+            FPW["Final Pulse Width"]
+
+            BM --> SUM
+            TF --> SUM
+            AF --> SUM
+            AE --> SUM
+            LT --> SUM
+            SUM --> FPW
+        end
+
+        SI --> BM
+    end
+
+    FPW --> ID["Injector Driver Circuit (12V PWM)"]
+    ID --> INJ["Solenoid Injector<br/>Pintle<br/>3 bar rail pressure"]
+    INJ --> FS["Fuel Spray"]
 ```
 
 Ignition system architecture evolved from mechanical contact breaker points through the transistorized era into modern digital direct-fire systems controlled by the same ECU managing fuel delivery. The fundamental energy storage mechanism remains consistent: primary current flowing through an ignition coil's low-voltage winding generates a magnetic field in the coil's laminated iron core. When the ECU or ignition module abruptly interrupts this primary current, the collapsing magnetic field induces a high voltage in the secondary winding through transformer action. The turns ratio between primary and secondary windings, typically on the order of 1:100, amplifies the twelve-volt primary collapse into twenty to forty thousand volts across the spark plug electrodes, sufficient to ionize the air-fuel mixture gap and initiate a spark discharge lasting one to two milliseconds.

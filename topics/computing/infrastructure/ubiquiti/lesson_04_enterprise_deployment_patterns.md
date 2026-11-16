@@ -27,27 +27,17 @@ The operational invariant for production Ubiquiti networks is **idempotent confi
 
 The canonical enterprise Ubiquiti deployment pattern establishes two or more hub sites hosting high-availability EdgeRouter or UXG pairs, with spoke sites maintaining dual IPsec tunnels to each hub. This topology minimizes tunnel count—scaling as $O(N)$ rather than $O(N^2)$ for full mesh—while providing path redundancy. Each hub router terminates 50 to 100 IPsec tunnels, aggregating spoke traffic and advertising a default route or summary prefixes inbound. Spoke sites receive two default routes with unequal OSPF metrics or BGP local-preference values, ensuring deterministic primary and backup path selection.
 
-```
-                 ┌─────────────┐
-                 │  Internet   │
-                 └──────┬──────┘
-                        │
-          ┌─────────────┼─────────────┐
-          │                           │
-    ┌─────▼─────┐               ┌─────▼─────┐
-    │  Hub-A    │               │  Hub-B    │
-    │ EdgeRouter│               │ EdgeRouter│
-    │ 10.0.0.1  │               │ 10.0.0.2  │
-    └─────┬─────┘               └─────┬─────┘
-          │                           │
-          │   IPsec Tunnels (vti0)    │
-          │                           │
-    ┌─────▼─────┬─────────────────────▼─────┐
-    │           │                           │
-┌───▼───┐   ┌───▼───┐                   ┌───▼───┐
-│Spoke-1│   │Spoke-2│                   │Spoke-N│
-│  UXG  │   │  ER-X │                   │  ER-4 │
-└───────┘   └───────┘                   └───────┘
+```mermaid
+flowchart TD
+    Internet["Internet"]
+    
+    Internet --> HubA["Hub-A<br/>EdgeRouter<br/>10.0.0.1"]
+    Internet --> HubB["Hub-B<br/>EdgeRouter<br/>10.0.0.2"]
+    
+    HubA -.->|IPsec Tunnels<br/>vti0| Spoke1["Spoke-1<br/>UXG"]
+    HubA -.->|IPsec Tunnels<br/>vti0| Spoke2["Spoke-2<br/>ER-X"]
+    
+    HubB -.->|IPsec Tunnels<br/>vti0| SpokeN["Spoke-N<br/>ER-4"]
 ```
 
 Each spoke router configures two virtual tunnel interfaces (vti0, vti1) bound to separate IPsec security associations targeting Hub-A and Hub-B. The VTI interface model decouples IPsec encapsulation from routing, allowing OSPF or BGP to treat tunnels as standard point-to-point links. The EdgeOS configuration for a spoke establishes the IPsec proposal, authentication pre-shared key, and VTI binding:
@@ -130,16 +120,19 @@ Active TCP connections experience packet loss during the convergence window but 
 
 For enterprise deployments where spoke-to-spoke latency is critical—such as real-time VoIP, database replication, or video conferencing—a partial or full mesh overlay reduces hop count and eliminates hub bottlenecks. A full mesh topology among $N$ sites requires $\frac{N(N-1)}{2}$ tunnels, becoming operationally complex beyond 10 sites. Partial mesh strategies connect high-traffic spoke pairs with direct tunnels while maintaining hub-and-spoke as the fallback path.
 
-```
-       ┌────────┐
-       │ Hub-A  │
-       └───┬────┘
-           │
-    ┌──────┼──────┐
-    │      │      │
-┌───▼──┐ ┌─▼────┐ ┌▼─────┐
-│Spoke1│─┤Spoke2│─│Spoke3│
-└──────┘ └──────┘ └──────┘
+```mermaid
+flowchart TD
+    HubA["Hub-A"]
+    Spoke1["Spoke 1"]
+    Spoke2["Spoke 2"]
+    Spoke3["Spoke 3"]
+
+    HubA --> Spoke1
+    HubA --> Spoke2
+    HubA --> Spoke3
+
+    Spoke1 --- Spoke2
+    Spoke2 --- Spoke3
 ```
 
 In this partial mesh, Spoke1 and Spoke2 maintain a direct IPsec tunnel for low-latency data replication, while all three spokes retain hub tunnels for internet egress and connectivity to other sites. The OSPF cost assigned to direct spoke-to-spoke tunnels (cost 5) is lower than the hub-transit path (cost 10 + 10 = 20), causing OSPF to prefer the direct link.

@@ -44,14 +44,26 @@ The header plate alone provides insufficient strength for spans beyond eight stu
 
 Floor construction at minifigure scale operates under constraints distinctly different from wall building, as horizontal surfaces experience distributed loads rather than primarily compressive forces. A floor must support the weight of minifigures, furniture, and interior detailing while spanning between walls that may stand twelve, sixteen, or even twenty studs apart. The canonical solution builds floors from large plate elements (8×16, 6×12, or 6×16 plates) arranged in a brick-pattern overlap and anchored to the perimeter walls through sideways-facing studs achieved via **SNOT (Studs Not On Top) bracket geometry**.
 
-```
-SIDE VIEW - Floor Plate Support System:
-
-Wall → [1×2 brick]╗
-       [1×2 brick]╟── [1×2 plate w/ side studs]
-       [1×2 brick]╝              ↓ (attaches sideways)
-                              [═══floor plate═══]
-                              [════════════════]
+```mermaid
+flowchart TD
+    wall["Wall"]
+    brick1["1×2 Brick"]
+    brick2["1×2 Brick"]
+    brick3["1×2 Brick"]
+    plate_assy["1×2 Plate with Side Studs"]
+    floor_plate1["Floor Plate"]
+    floor_plate2["Floor Plate"]
+    
+    wall --> brick1
+    wall --> brick2
+    wall --> brick3
+    
+    brick1 --> plate_assy
+    brick2 --> plate_assy
+    brick3 --> plate_assy
+    
+    plate_assy --> floor_plate1
+    plate_assy --> floor_plate2
 ```
 
 This bracket technique employs specialized elements such as 1×2 plates with side studs, 1×1 headlight bricks, or 1×2 plates with clips, creating horizontal attachment points that allow floor plates to lock onto the wall structure without relying solely on friction or gravity. For spans exceeding twelve studs, the floor requires internal support through **drop beams**—vertical brick columns that extend downward from the underside of the floor plate to rest on the floor below, effectively creating a hidden post-and-beam structure beneath the smooth upper surface.

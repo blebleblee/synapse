@@ -895,5 +895,5 @@ service pressure. Start with transposing by a 2nd only; add
 | Expression pedal dynamic range | 8–12 dB | Supplement with registration changes for larger shifts |
 | Flue speech onset | 30–120ms | Account for in polyphonic rhythmic precision |
 | Reed speech onset | 10–40ms | Faster than flues — reeds cut through ensemble |
-| Finger legato tolerance | <20ms gap | Audible gaps above this break the legato illusion |
+| Finger legato tolerance | < 20ms gap | Audible gaps above this break the legato illusion |
 | Hymn phrase-breath gap | 100–150ms | Leave space before each new line for congregational breath |

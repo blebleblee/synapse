@@ -110,15 +110,17 @@ The natural ring homomorphism $\pi : R \to R/I$ defined by $\pi(a) = a + I$ is c
 
 The following diagram captures the logical flow from ring to quotient ring:
 
-```
-φ : R ───────────────────────────────► S
-         \                           ▲
-          \                          |
-       π   \                    ι    |
-            ▼                        |
-           R/ker φ ─────────────────►  im φ
-                        φ̄  
-                    (isomorphism)
+```mermaid
+flowchart TD
+    R["R"]
+    S["S"]
+    RK["R/ker φ"]
+    IM["im φ"]
+    
+    R -->|"φ"| S
+    R -->|"π"| RK
+    RK -->|"φ̄ (isomorphism)"| IM
+    IM -->|"ι"| S
 ```
 
 ### The Correspondence Theorem
@@ -159,25 +161,23 @@ Verify: $8 = 2 \cdot 3 + 2 \equiv 2 \pmod{3}$ ✓ and $8 = 1 \cdot 5 + 3 \equiv 
 
 The computational architecture of the CRT is captured in the following flow, which shows how a single computation in $\mathbb{Z}/n\mathbb{Z}$ decomposes into parallel computations in smaller rings:
 
-```
-            Input: a ∈ ℤ/nℤ    (n = n₁·n₂·...·nₖ, pairwise coprime)
-                       │
-          ┌────────────┼────────────┐
-          ▼            ▼            ▼
-      a mod n₁     a mod n₂  ...  a mod nₖ
-      (in ℤ/n₁ℤ)  (in ℤ/n₂ℤ)    (in ℤ/nₖℤ)
-          │            │            │
-      Compute      Compute       Compute
-      in small     in small      in small
-      rings        rings         rings
-          │            │            │
-          └────────────┼────────────┘
-                       ▼
-                 CRT recombination
-                 (Garner's algorithm)
-                       │
-                       ▼
-               Result in ℤ/nℤ
+```mermaid
+flowchart TD
+    Input["Input: a ∈ ℤ/nℤ<br/>(n = n₁·n₂·...·nₖ, pairwise coprime)"]
+    
+    Input --> Mod1["a mod n₁<br/>(in ℤ/n₁ℤ)"]
+    Input --> Mod2["a mod n₂<br/>(in ℤ/n₂ℤ)"]
+    Input --> ModK["a mod nₖ<br/>(in ℤ/nₖℤ)"]
+    
+    Mod1 --> Compute1["Compute<br/>in small rings"]
+    Mod2 --> Compute2["Compute<br/>in small rings"]
+    ModK --> ComputeK["Compute<br/>in small rings"]
+    
+    Compute1 --> CRT["CRT recombination<br/>(Garner's algorithm)"]
+    Compute2 --> CRT
+    ComputeK --> CRT
+    
+    CRT --> Result["Result in ℤ/nℤ"]
 ```
 
 This decomposition structure underlies RSA and many other cryptographic protocols. Computing modular exponentiation $a^e \pmod{n}$ where $n = pq$ is a product of two primes can be done by computing $a^e \pmod{p}$ and $a^e \pmod{q}$ separately — each in roughly half the bit-length — and recombining via CRT, achieving a speedup by a factor of roughly 4 in practice (since modular operations scale quadratically in bit-length).

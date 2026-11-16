@@ -20,37 +20,37 @@ Sealed types, formalized in Java 17, impose exhaustive enumeration constraints o
 
 The in-memory layout of a Java object begins with the object header, a data structure whose size and format vary by platform and JVM configuration but universally serves to anchor the object's identity, locking state, and type information. On 64-bit HotSpot JVM with compressed pointers enabled (the default for heaps under 32GB), the header consists of an 8-byte mark word followed by a 4-byte compressed class pointer. The mark word encodes multiple overlapping interpretations: in its unlocked state, it stores the object's identity hash code in the upper bits and age information for generational garbage collection in the lower bits; when locked, it pivots to encode thin lock ownership through a thread identifier or a pointer to a displaced mark word for heavyweight monitor locks. This polymorphic encoding of the mark word epitomizes space-efficient design, as objects rarely require simultaneous representation of locking state and hash code identity.
 
-```
-Object Memory Layout (64-bit HotSpot, Compressed Oops):
+```mermaid
+flowchart TD
+    subgraph heap ["Heap — Object Instance (64-bit HotSpot, Compressed Oops)"]
+        MW["<b>Mark Word</b> — 8 bytes<br/>Identity hash · GC age · Lock state"]
+        KP["<b>Klass*</b> — 4 bytes<br/>Compressed class metadata pointer"]
+        IF["<b>Instance Fields</b><br/>Subclass fields first, then superclass<br/>Ordered by size: longs/doubles → ints → shorts → bytes/booleans"]
+        PAD["<b>Padding</b><br/>Aligns object size to 8-byte boundary"]
 
-+------------------------+
-| Mark Word (8 bytes)    |  <- Identity hash, age, lock state
-+------------------------+
-| Klass* (4 bytes)       |  <- Compressed class metadata pointer
-+------------------------+
-| Instance Fields        |  <- Subclass fields, then superclass fields
-| (aligned to 8 bytes)   |     ordered by size (longs/doubles first)
-+------------------------+
-| Padding (if needed)    |  <- Align to 8-byte boundary
-+------------------------+
+        MW --> KP --> IF --> PAD
+    end
 
-Klass Metadata (in Metaspace):
+    subgraph meta ["Metaspace — Klass Metadata"]
+        VTL["<b>Vtable Length</b>"]
+        ITL["<b>Itable Length</b>"]
+        SF["<b>Static Fields</b>"]
 
-+------------------------+
-| Vtable Length          |
-+------------------------+
-| Itable Length          |
-+------------------------+
-| Static Fields          |
-+------------------------+
-| Vtable Entries         |  <- Function pointers to virtual methods
-| [0] -> Object.equals   |
-| [1] -> Object.toString |
-| [2] -> Object.hashCode |
-| [n] -> Subclass method |
-+------------------------+
-| Itable Entries         |  <- Interface method dispatch table
-+------------------------+
+        subgraph vtable ["Vtable — Virtual Method Dispatch"]
+            VT0["[0] → Object.equals()"]
+            VT1["[1] → Object.toString()"]
+            VT2["[2] → Object.hashCode()"]
+            VTN["[n] → Subclass override / new virtual method"]
+        end
+
+        subgraph itable ["Itable — Interface Method Dispatch"]
+            IT["Interface method entries<br/>keyed by interface + method index"]
+        end
+
+        VTL --> ITL --> SF --> vtable --> itable
+    end
+
+    KP -- "points to" --> VTL
 ```
 
 The virtual method table construction follows a deterministic algorithm that preserves method offset stability across inheritance hierarchies. When a class `B` extends class `A`, the JVM constructs `B`'s vtable by first copying all entries from `A`'s vtable, then appending new virtual methods declared in `B`, and finally overwriting inherited entries with overriding implementations. This ensures that a method `m()` declared in `A` occupies the same vtable offset in all subclasses of `A`, enabling `invokevirtual` to use a fixed offset computed at compile time regardless of the receiver's runtime type. Consider a three-level hierarchy where `Object` declares `equals()`, `toString()`, and `hashCode()` at vtable offsets 0, 1, and 2; class `A extends Object` inherits these offsets and adds `foo()` at offset 3; class `B extends A` overrides `toString()` at offset 1 and adds `bar()` at offset 4. An `invokevirtual` calling `toString()` on a reference statically typed as `Object` always uses offset 1, dispatching to `Object.toString()` for `Object` instances, to `A`'s inherited `Object.toString()` for `A` instances, and to `B.toString()` for `B` instances.

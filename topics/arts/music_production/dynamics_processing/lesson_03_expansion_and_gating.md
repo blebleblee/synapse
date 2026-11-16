@@ -107,13 +107,17 @@ Same engine as Lab 1 and Lab 2 — only the intent changes, from "hide noise" to
 
 ## 7. Signal Chain Placement — Where Gates and Expanders Go Relative to Other Processors
 
-```
-subgraph chain1 ["Typical Drum Channel Chain"]
-    A["Mic Preamp"] --> B["Gate (peak detection, kills bleed)"]
-    B --> C["EQ (shape tone after cleanup)"]
-    C --> D["Compressor (control dynamics of cleaned signal)"]
-    D --> E["Bus / Mix"]
-end
+```mermaid
+flowchart LR
+    subgraph chain1["Typical Drum Channel Chain"]
+        A["Mic Preamp"]
+        B["Gate (peak detection, kills bleed)"]
+        C["EQ (shape tone after cleanup)"]
+        D["Compressor (control dynamics of cleaned signal)"]
+        E["Bus / Mix"]
+        
+        A --> B --> C --> D --> E
+    end
 ```
 
 **Why the gate goes first, before EQ and compression:**
@@ -124,13 +128,14 @@ end
 
 **Exception:** when you specifically want a gate to react to a *compressed* version of the signal — common in parallel drum processing, where an aggressively compressed, loud drum bus keys a gate on another track for extra punch — you deliberately break this rule. That's a sidechain-keying technique, not a signal-path error.
 
-```
-subgraph chain2 ["Sidechain-Keyed Gate (Parallel Drum Trick)"]
-    F["Snare Mic (main signal)"] --> G["Gate"]
-    H["Snare Mic (parallel path)"] --> I["Heavy Compressor"]
-    I -->|"sidechain key input"| G
-    G --> J["Punchy, Gated-and-Triggered Snare"]
-end
+```mermaid
+flowchart TD
+    subgraph chain2["Sidechain-Keyed Gate (Parallel Drum Trick)"]
+        F["Snare Mic (main signal)"] --> G["Gate"]
+        H["Snare Mic (parallel path)"] --> I["Heavy Compressor"]
+        I -->|"sidechain key input"| G
+        G --> J["Punchy, Gated-and-Triggered Snare"]
+    end
 ```
 
 ---

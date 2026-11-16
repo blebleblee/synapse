@@ -58,7 +58,7 @@ graph TD
 |---|---|---|---|
 | Death grip | White knuckles, rigid forearm, no bounce | Hand cramps in under 5 minutes | Open ring/pinky completely; re-check with the drop test |
 | Loose fulcrum | Stick visibly rotates or walks in the hand | Slippery, unstable | Tighten thumb/index pinch slightly |
-| Fulcrum too close to tip (<1") | Huge stick arc from tiny wrist motion | "Whippy," hard to control volume | Move the pinch point back toward 1.5–2" |
+| Fulcrum too close to tip (< 1") | Huge stick arc from tiny wrist motion | "Whippy," hard to control volume | Move the pinch point back toward 1.5–2" |
 | Fulcrum too far back (>3") | Stick barely moves, you compensate with big arm motion | Tiring, sluggish | Move the pinch point forward toward 1.5–2" |
 
 ## Part 2 — Rebound: Let the Drum Do Half the Work
@@ -215,28 +215,29 @@ Typical starting ceilings: beginners land around 100–120 BPM, intermediate pla
 
 ## Quick Reference Card
 
-```
-GRIP
-├─ Fulcrum: thumb + index, ~1.5" from tip
-├─ Secondary fingers: light contact only, never squeezing
-└─ Drop test: stick falls vertical in 0.5-1.0 sec when released
-
-IMPACT
-├─ Angle: 45° (default), up to 60° for softer playing
-├─ Strike zone: 2-3" from drum center
-└─ Straight-line trajectory into the head, not an arc
-
-REBOUND
-├─ Target height: 5-6" at 90 BPM
-├─ Double-stroke R1→R2: R2 slightly quieter, never forced
-└─ Let the stick finish rising before you ask for the next stroke
-
-WHEN SOMETHING BREAKS
-├─ Rebound dies  → release ring/pinky, re-run drop test
-├─ Stick slips   → tighten fulcrum pinch, dry your hands
-├─ Doubles sound like singles → relax grip right after first hit
-├─ Volume uneven → check strike angle on video
-└─ Pain anywhere → stop. Not negotiable.
+```mermaid
+flowchart TD
+    Root["GRIP"]
+    Root --> G1["Fulcrum: thumb + index, ~1.5\" from tip"]
+    Root --> G2["Secondary fingers: light contact only, never squeezing"]
+    Root --> G3["Drop test: stick falls vertical in 0.5-1.0 sec when released"]
+    
+    Impact["IMPACT"]
+    Impact --> I1["Angle: 45° (default), up to 60° for softer playing"]
+    Impact --> I2["Strike zone: 2-3\" from drum center"]
+    Impact --> I3["Straight-line trajectory into the head, not an arc"]
+    
+    Rebound["REBOUND"]
+    Rebound --> R1["Target height: 5-6\" at 90 BPM"]
+    Rebound --> R2["Double-stroke R1→R2: R2 slightly quieter, never forced"]
+    Rebound --> R3["Let the stick finish rising before you ask for the next stroke"]
+    
+    Breaks["WHEN SOMETHING BREAKS"]
+    Breaks --> B1["Rebound dies → release ring/pinky, re-run drop test"]
+    Breaks --> B2["Stick slips → tighten fulcrum pinch, dry your hands"]
+    Breaks --> B3["Doubles sound like singles → relax grip right after first hit"]
+    Breaks --> B4["Volume uneven → check strike angle on video"]
+    Breaks --> B5["Pain anywhere → stop. Not negotiable."]
 ```
 
 ## Where This Goes Next

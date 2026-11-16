@@ -300,7 +300,7 @@ Structure a due diligence matrix starting at A1. Columns: A "Information Item", 
 
 A2: "Revenue Concentration", B2: "Seller-provided financials", C2: "Request customer contracts and direct customer reference calls", D2: "Any single customer >25% without multi-year contract", E2: "In Progress".
 
-A3: "Customer Contract Terms", B3: "Seller reps", C3: "Legal review of top-10 customer contracts with termination clause analysis", D3: "Termination for convenience <12 months notice", E3: "In Progress".
+A3: "Customer Contract Terms", B3: "Seller reps", C3: "Legal review of top-10 customer contracts with termination clause analysis", D3: "Termination for convenience < 12 months notice", E3: "In Progress".
 
 A4: "Customer Satisfaction", B4: "Seller relationships", C4: "Independent reference calls with key customers focusing on service quality and future intent", D4: "Any top-5 customer expressing dissatisfaction or alternatives evaluation", E4: "In Progress".
 
@@ -310,7 +310,7 @@ A6: "Accounts Receivable Aging", B6: "Balance sheet", C6: "AR aging report with 
 
 Model the scenario where you execute the due diligence protocol. In E2, mark "Complete". You discover one customer represents 32% of revenue. In E3, mark "Red Flag Raised". The seller initially refuses to provide the specific customer contract, claiming confidentiality. You insist, and the seller provides a redacted version that shows a two-year initial term signed three years ago with one-year auto-renewal subject to 180-day termination notice. In E4, mark "Red Flag Raised". When you request a direct reference call, the customer contact initially agrees but then cancels, and the seller discourages rescheduling, stating "They're very busy." In E5, mark "Red Flag Raised". Monthly revenue analysis shows this customer's purchases declined 22% over the past six months.
 
-Create a decision framework in rows 10-15. A10: "Red Flags Detected", B10: 3. A11: "Materiality Assessment", B11: "Single customer represents 32% of revenue, contract permits termination with 6mo notice, recent purchase decline, customer avoiding reference call." A12: "BATNA Impact", B12: "If customer terminates, revenue declines 32% with minimal ability to replace in <12 months. Acquisition value would decline from $4.8M to $3.2M using 1.5x revenue multiple."
+Create a decision framework in rows 10-15. A10: "Red Flags Detected", B10: 3. A11: "Materiality Assessment", B11: "Single customer represents 32% of revenue, contract permits termination with 6mo notice, recent purchase decline, customer avoiding reference call." A12: "BATNA Impact", B12: "If customer terminates, revenue declines 32% with minimal ability to replace in < 12 months. Acquisition value would decline from $4.8M to $3.2M using 1.5x revenue multiple."
 
 A13: "Negotiation Adjustment". B13: "Demand price reduction of $1.6M, customer concentration escrow with 24-month holdback, or contractual representation with full indemnification for customer loss in first 12 months."
 
@@ -324,9 +324,9 @@ Structure a stakeholder matrix starting at A1. Columns: A "Stakeholder", B "Prim
 
 A2: "CFO", B2: "Total cost <$300k", C2: "Payment terms: Quarterly in arrears", D2: "Total cost <$320k AND payment quarterly or better", E2: "Upfront payment >50% of contract value".
 
-A3: "CTO", B3: "API integration support included", C3: "99.9% SLA minimum", D3: "Dedicated integration engineer AND 99.5% SLA minimum", E3: "No integration support OR SLA <99%".
+A3: "CTO", B3: "API integration support included", C3: "99.9% SLA minimum", D3: "Dedicated integration engineer AND 99.5% SLA minimum", E3: "No integration support OR SLA < 99%".
 
-A4: "Chief Legal Officer", B4: "Liability cap at 1x annual fees", C4: "IP indemnification unlimited", D4: "Liability cap <3x annual fees AND IP indemnification >$1M", E4: "Unlimited liability OR no IP indemnification".
+A4: "Chief Legal Officer", B4: "Liability cap at 1x annual fees", C4: "IP indemnification unlimited", D4: "Liability cap < 3x annual fees AND IP indemnification >$1M", E4: "Unlimited liability OR no IP indemnification".
 
 Model the vendor's constraints in row 6. A6: "Vendor Position", B6: "List price $340k, standard liability cap 2x annual fees, IP indemnification capped at $2M, prefers 50% upfront payment, integration support available at $40k, standard SLA 99.5%".
 
@@ -340,7 +340,7 @@ A11: "Integration Support", B11: "Included at no additional cost", C11: "Yes (no
 
 A12: "SLA", B12: "99.7%", C12: "N/A", D12: "Yes (exceeds 99.5% minimum)", E12: "N/A", F12: "Yes (between standard and premium tiers)".
 
-A13: "Liability Cap", B13: "2.5x annual fees (~$775k)", C13: "N/A", D13: "N/A", E13: "Yes (<3x threshold)", F13: "Yes (slightly above standard 2x)".
+A13: "Liability Cap", B13: "2.5x annual fees (~$775k)", C13: "N/A", D13: "N/A", E13: "Yes (< 3x threshold)", F13: "Yes (slightly above standard 2x)".
 
 A14: "IP Indemnification", B14: "$2M", C14: "N/A", D14: "N/A", E14: "Yes (>$1M minimum)", F14: "Yes (vendor standard)".
 

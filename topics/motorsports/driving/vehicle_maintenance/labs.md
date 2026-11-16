@@ -852,7 +852,7 @@ Throttle Position Trace Quality Checklist:
 - Premature lift mid-corner: Understeer or slow-speed balance issue
 
 Brake Pressure Trace Quality Checklist:
-- Rapid rise to 12-15 MPa in <0.2s: Threshold braking technique mastered
+- Rapid rise to 12-15 MPa in < 0.2s: Threshold braking technique mastered
 - Gradual ramp over 0.5s: Driver not attacking limit, coaching required
 - Multiple pressure spikes: ABS intervention or driver modulation compensating for lockup
 - Asymmetric front-rear pressure: Bias adjustment needed or rear brake overheating

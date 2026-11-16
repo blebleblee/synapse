@@ -255,48 +255,40 @@ Application whitelisting inverts traditional antivirus logic. Instead of maintai
 
 On Windows, this is enforced through Windows Defender Application Control (WDAC, formerly Device Guard). The policy defines allowed signers, specific file hashes, and publisher rules:
 
-```xml
-<SiPolicy xmlns="urn:schemas-microsoft-com:sipolicy">
-  <VersionEx>10.0.0.0</VersionEx>
-  
-  <PolicyID>{GUID}</PolicyID>
-  
-  <Rules>
-    <Rule>
-      <!-- Enforce kernel-mode code signing -->
-      <Option>Enabled:UMCI</Option>
-    </Rule>
-    <Rule>
-      <!-- Audit mode disabled: enforcing blocks -->
-      <Option>Enabled:Audit Mode</Option>
-    </Rule>
-  </Rules>
-  
-  <Signers>
-    <!-- Trust Microsoft-signed Windows components -->
-    <Signer ID="ID_SIGNER_MICROSOFT" Name="Microsoft Windows Production PCA 2011">
-      <CertRoot Type="TBS" Value="4E80BE107C860DE896384B3EFF50504DC2D76AC7151DF3102A4450637A032146"/>
-      <CertPublisher Value="Microsoft Windows" />
-    </Signer>
+```mermaid
+flowchart TD
+    A["SiPolicy<br/>Version 10.0.0.0"]
     
-    <!-- Trust corporate-signed applications -->
-    <Signer ID="ID_SIGNER_CORP" Name="Example Corp Code Signing CA">
-      <CertRoot Type="TBS" Value="A3F712D8..."/>
-      <CertPublisher Value="Example Corp" />
-    </Signer>
-  </Signers>
-  
-  <SigningScenarios>
-    <SigningScenario Value="131" ID="ID_SIGNINGSCENARIO_WINDOWS">
-      <ProductSigners>
-        <AllowedSigners>
-          <AllowedSigner SignerId="ID_SIGNER_MICROSOFT" />
-          <AllowedSigner SignerId="ID_SIGNER_CORP" />
-        </AllowedSigners>
-      </ProductSigners>
-    </SigningScenario>
-  </SigningScenarios>
-</SiPolicy>
+    B["Rules"]
+    C["UMCI<br/>Kernel-Mode Code Signing"]
+    D["Audit Mode<br/>Enforcing Blocks"]
+    
+    E["Signers"]
+    F["Microsoft Windows<br/>Production PCA 2011"]
+    G["Example Corp<br/>Code Signing CA"]
+    
+    H["Signing Scenarios<br/>Value 131"]
+    I["Product Signers"]
+    J["Allowed Signers"]
+    K["Microsoft Signer"]
+    L["Corporate Signer"]
+    
+    A --> B
+    B --> C
+    B --> D
+    
+    A --> E
+    E --> F
+    E --> G
+    
+    A --> H
+    H --> I
+    I --> J
+    J --> K
+    J --> L
+    
+    K -.->|References| F
+    L -.->|References| G
 ```
 
 At process creation, the kernel's code integrity module validates the PE executable signature against the policy. If the signature chain does not terminate in a trusted root, the kernel refuses to load the image. The enforcement occurs in kernel mode, making it tamper-resistant: even a local administrator cannot bypass the policy without rebooting into recovery mode and disabling the hypervisor-protected code integrity (HVCI).

@@ -24,36 +24,43 @@ The belief lattice maps the character's model of how reality operates: causal be
 
 The relational network diagrams the character's bonds with other agents in the story. Each relationship should be encoded with a valence (positive, negative, ambivalent), an intensity level (weak, moderate, strong), and a history of significant interactions that established the current relational state. Relationships are never static; they respond dynamically to character behavior and story events. A character's decision to betray an ally converts a positive-valence bond to negative, which then constrains future interactions and generates new dramatic possibilities. The density and diversity of the relational network determine the character's social leverage and vulnerability profile. A character embedded in dense networks can mobilize allies but also faces complex obligation structures; a socially isolated character has fewer resources but also fewer entanglements.
 
-```
-CHARACTER ARCHITECTURE DIAGRAM
+```mermaid
+flowchart TD
+    subgraph MOTIVATION["MOTIVATION STACK"]
+        M1["Surface: Immediate tactical objectives"]
+        M2["Middle: Domain-specific goals"]
+        M3["Foundation: Survival needs, psychological drivers"]
+        M1 --- M2 --- M3
+    end
 
-┌─────────────────────────────────────────────────────┐
-│                 MOTIVATION STACK                     │
-│  Surface: Immediate tactical objectives              │
-│  Middle: Domain-specific goals                       │
-│  Foundation: Survival needs, psychological drivers   │
-└──────────────────┬──────────────────────────────────┘
-                   │
-                   ↓
-┌─────────────────────────────────────────────────────┐
-│              CAPABILITY MATRIX                       │
-│  Skills | Knowledge | Physical | Social Resources   │
-└──────────────────┬──────────────────────────────────┘
-                   │
-                   ↓
-┌─────────────────────────────────────────────────────┐
-│               BELIEF LATTICE                         │
-│  Causal | Normative | Epistemic                     │
-└──────────────────┬──────────────────────────────────┘
-                   │
-                   ↓
-┌─────────────────────────────────────────────────────┐
-│            RELATIONAL NETWORK                        │
-│  Bonds: Valence | Intensity | History               │
-└──────────────────┬──────────────────────────────────┘
-                   │
-                   ↓
-              [BEHAVIOR OUTPUT]
+    subgraph CAPABILITY["CAPABILITY MATRIX"]
+        C1["Skills"]
+        C2["Knowledge"]
+        C3["Physical"]
+        C4["Social Resources"]
+        C1 --- C2 --- C3 --- C4
+    end
+
+    subgraph BELIEF["BELIEF LATTICE"]
+        B1["Causal"]
+        B2["Normative"]
+        B3["Epistemic"]
+        B1 --- B2 --- B3
+    end
+
+    subgraph RELATIONAL["RELATIONAL NETWORK"]
+        R1["Bonds: Valence"]
+        R2["Intensity"]
+        R3["History"]
+        R1 --- R2 --- R3
+    end
+
+    OUTPUT(["BEHAVIOR OUTPUT"])
+
+    MOTIVATION --> CAPABILITY
+    CAPABILITY --> BELIEF
+    BELIEF --> RELATIONAL
+    RELATIONAL --> OUTPUT
 ```
 
 Characterization methods translate this internal architecture into observable narrative data. Direct characterization provides explicit authorial statements about character attributes: "Marcus was cautious by nature" or "Elena had spent a decade mastering forensic accounting." This method is efficient for conveying baseline information but generates low reader engagement because it bypasses inference. Indirect characterization demonstrates attributes through behavior, dialogue, choices, and environmental interaction. When Marcus triple-checks the lock before entering the building, hesitates before answering direct questions, and maintains escape route awareness in unfamiliar spaces, the reader infers caution without being told. This inferential work increases cognitive investment and produces stronger character presence.

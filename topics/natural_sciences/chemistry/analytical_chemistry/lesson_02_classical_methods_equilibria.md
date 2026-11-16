@@ -152,42 +152,47 @@ The extraction of metal ions into organic solvents is typically accomplished by 
 
 The complete analytical workflow from sample to result can be represented as a decision tree that tracks the propagation of chemical state through each operation:
 
-```
-Sample (Unknown Matrix)
-        │
-        ▼
-Dissolution & Matrix Conditioning
-  (pH adjustment, reducing/oxidizing pretreatment,
-   masking agent addition, ionic strength adjustment)
-        │
-        ├──────────────────────────────────────────┐
-        ▼                                          ▼
-GRAVIMETRIC PATH                        TITRIMETRIC PATH
-        │                                          │
-Precipitation (controlled pH,           Titrant addition
-supersaturation, temperature)           (burette, primary standard
-        │                                calibration)
-Digestion / Ostwald Ripening                       │
-        │                               Endpoint detection
-Filtration (Gooch crucible,             (indicator, potentiometric,
-sintered glass, ashless paper)          spectrophotometric)
-        │                                          │
-Washing (minimize solubility loss       Volume reading (meniscus,
-vs. peptization)                        calibrated burette)
-        │                                          │
-Drying (110°C) or Ignition              Calculation (molarity ×
-(800–1200°C in muffle furnace)          volume × gravimetric factor)
-        │                                          │
-Weighing (analytical balance,           ◄──────────┘
-tare/gross protocol)                    
-        │
-Gravimetric factor calculation
-        │
-        ▼
-   RESULT + UNCERTAINTY ESTIMATE
-   (Propagated from mass uncertainty,
-    volume uncertainty, purity
-    of standards, blank correction)
+```mermaid
+flowchart TD
+    A["Sample\n(Unknown Matrix)"]
+    B["Dissolution & Matrix Conditioning\n(pH adjustment, reducing/oxidizing pretreatment,\nmasking agent addition, ionic strength adjustment)"]
+
+    subgraph grav ["GRAVIMETRIC PATH"]
+        G1["Precipitation\n(controlled pH, supersaturation, temperature)"]
+        G2["Digestion / Ostwald Ripening"]
+        G3["Filtration\n(Gooch crucible, sintered glass, ashless paper)"]
+        G4["Washing\n(minimize solubility loss vs. peptization)"]
+        G5["Drying (110°C) or Ignition\n(800–1200°C in muffle furnace)"]
+        G6["Weighing\n(analytical balance, tare/gross protocol)"]
+        G7["Gravimetric Factor Calculation"]
+    end
+
+    subgraph titr ["TITRIMETRIC PATH"]
+        T1["Titrant Addition\n(burette, primary standard calibration)"]
+        T2["Endpoint Detection\n(indicator, potentiometric, spectrophotometric)"]
+        T3["Volume Reading\n(meniscus, calibrated burette)"]
+        T4["Calculation\n(molarity × volume × gravimetric factor)"]
+    end
+
+    Z["RESULT + UNCERTAINTY ESTIMATE\n(Propagated from mass uncertainty, volume uncertainty,\npurity of standards, blank correction)"]
+
+    A --> B
+    B --> grav
+    B --> titr
+
+    G1 --> G2
+    G2 --> G3
+    G3 --> G4
+    G4 --> G5
+    G5 --> G6
+    G6 --> G7
+
+    T1 --> T2
+    T2 --> T3
+    T3 --> T4
+
+    G7 --> Z
+    T4 --> Z
 ```
 
 The critical junctions where systematic error most easily enters are the dissolution step (incomplete dissolution inflates the blank or loses analyte), the precipitation step (incomplete precipitation via incorrect pH or insufficient reagent), the washing step (excessive washing re-dissolves precipitate; insufficient washing contaminates with mother liquor), and the endpoint detection step (indicator choice mismatch, parallax error on meniscus reading).

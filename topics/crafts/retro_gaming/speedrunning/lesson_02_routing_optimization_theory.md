@@ -16,19 +16,33 @@ The speedrunner's optimization framework operates under a critical constraint ab
 
 The game state space in routing optimization is formalized as a directed weighted graph where vertices represent discrete game states and edges represent valid state transitions with associated frame costs. A game state encodes all relevant information determining future routing possibilities: player position coordinates, inventory contents, event flags, enemy spawn states, and internal timer values. The state space is typically sparse and highly structured—most states have only a small number of valid successors determined by player input constraints and game physics. The routing problem then becomes finding the minimum-weight path through this graph from initial state (power-on or category-specific starting conditions) to goal state (credits trigger or final input moment), subject to category-legal transition constraints.
 
-```
-State Graph Representation:
+```mermaid
+flowchart TD
+    S0["S₀ — Start"]
+    S1["S₁ — Sword obtained"]
+    S2["S₂ — Damage boost taken"]
+    S3["S₃ — Boss 1 defeated"]
+    S4["S₄ — Optional item collected"]
 
-S₀ (Start)
- ├─[180f]→ S₁ (Sword obtained)
- │          ├─[420f]→ S₃ (Boss 1 defeated, critical path)
- │          └─[240f]→ S₄ (Optional item collected)
- │                     └─[360f]→ S₃ (converges to critical path)
- └─[90f]──→ S₂ (Damage boost taken)
-            └─[510f]→ S₃ (slower arrival, low health)
+    S0 -->|"180f"| S1
+    S0 -->|"90f"| S2
 
-Critical Path: S₀ → S₁ → S₃ → ... → S_goal
-Off-path optimization: S₁ → S₄ → S₃ costs 600f vs. direct 420f
+    S1 -->|"420f (direct)"| S3
+    S1 -->|"240f"| S4
+    S4 -->|"360f (600f total)"| S3
+
+    S2 -->|"510f (low health)"| S3
+
+    subgraph critical_path ["Critical Path"]
+        direction LR
+        CP0["S₀"] --> CP1["S₁"] --> CP3["S₃ → … → S_goal"]
+    end
+
+    style S0 fill:#4a9eff,stroke:#1a6ecc,color:#fff
+    style S3 fill:#e8a838,stroke:#b07a10,color:#fff
+    style S4 fill:#6abf69,stroke:#3a8f39,color:#fff
+    style S2 fill:#e05c5c,stroke:#a02020,color:#fff
+    style S1 fill:#9b59b6,stroke:#6c3483,color:#fff
 ```
 
 The challenge in applying classical graph algorithms like Dijkstra's shortest path or A* search to speedrun routing lies in the explosion of the state space. A typical NES game might have 256 rooms with 16 possible item combinations, 8 health states, and 128 event flags, yielding a theoretical state space exceeding 2^20 vertices. Practical routing optimization therefore relies on state space pruning through domain knowledge and heuristic constraints. Runners identify equivalence classes of states where minor variations (exact pixel position within a room, specific frame of animation) do not affect subsequent routing viability. The reduced graph collapses these equivalent states into representative nodes, dramatically reducing computational complexity while preserving routing optimality over the coarse-grained state space.

@@ -44,38 +44,30 @@ Once $Y_{base}$ is established, every allocation is built from zero upward. No c
 
 The execution architecture of ZBB in a software environment like YNAB (You Need A Budget) or a structured spreadsheet follows this allocation flow:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                   INCOME RECEIPT EVENT                  │
-│              Y_base = Paycheck / Transfer               │
-└──────────────────────────┬──────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                   ALLOCATION ENGINE                     │
-│                                                         │
-│  Priority 1: Fixed Obligations (Rent, Loan Payments)   │
-│  Priority 2: Sinking Fund Contributions (Pre-commit)   │
-│  Priority 3: Variable Necessities (Groceries, Fuel)    │
-│  Priority 4: Discretionary Wants                       │
-│  Priority 5: Liquid Emergency Reserve (if underfunded) │
-│                                                         │
-│         CONSTRAINT: ΣAllocations = Y_base              │
-└──────────────────────────┬──────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                 TRANSACTION MATCHING                    │
-│    Every expense event decrements a category balance   │
-│    Category balance < 0 triggers reallocation decision │
-└──────────────────────────┬──────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                  VARIANCE REPORTING                     │
-│    Actual vs. Budgeted by category                     │
-│    Rollover decision: carry surplus or zero out?       │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["INCOME RECEIPT EVENT
+    Y_base = Paycheck / Transfer"]
+
+    B["ALLOCATION ENGINE
+
+    Priority 1: Fixed Obligations (Rent, Loan Payments)
+    Priority 2: Sinking Fund Contributions (Pre-commit)
+    Priority 3: Variable Necessities (Groceries, Fuel)
+    Priority 4: Discretionary Wants
+    Priority 5: Liquid Emergency Reserve (if underfunded)
+
+    CONSTRAINT: ΣAllocations = Y_base"]
+
+    C["TRANSACTION MATCHING
+    Every expense event decrements a category balance
+    Category balance < 0 triggers reallocation decision"]
+
+    D["VARIANCE REPORTING
+    Actual vs. Budgeted by category
+    Rollover decision: carry surplus or zero out?"]
+
+    A --> B --> C --> D
 ```
 
 The critical discipline ZBB imposes is the **reallocation decision point**. When a category runs negative — a car repair exceeds the automotive budget, for instance — the practitioner must consciously pull funds from another category. This forced trade-off awareness is ZBB's primary behavioral mechanism. It transforms spending from an unconscious flow into a series of explicit, visible priority decisions.

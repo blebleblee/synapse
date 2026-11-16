@@ -52,45 +52,65 @@ Vertical postural dimensions encode dominance and submission through both absolu
 
 Postural congruence between interaction partners provides a robust rapport and affiliation index. Individuals experiencing positive relational connection unconsciously synchronize postures within seconds to minutes, adopting matching or mirrored configurations—crossed legs, arm positions, forward lean angles. This postural entrainment occurs automatically through mirror neuron activation and creates self-reinforcing rapport cycles: matched postures increase mutual liking, which deepens entrainment, which further enhances affiliation. Skilled negotiators, therapists, and salespeople deliberately cultivate postural matching to accelerate rapport building, though the manipulation becomes detectable if timing appears forced or if matching occurs too rapidly or precisely, exceeding the natural variance of spontaneous entrainment.
 
-```
-Kinesic Signal Flow Architecture
-
-INTERNAL STATE                  MOTOR ENCODING                    OBSERVABLE OUTPUT
-┌─────────────────┐            ┌──────────────────┐             ┌─────────────────────┐
-│ Emotional       │──────────► │ Extrapyramidal   │────────────►│ Affect Displays     │
-│ Activation      │ Automatic  │ (Basal Ganglia,  │  Involuntary│ (facial, postural)  │
-│                 │            │  Limbic System)  │             │                     │
-└─────────────────┘            └──────────────────┘             └─────────────────────┘
-                                                                           │
-┌─────────────────┐            ┌──────────────────┐                      │
-│ Cognitive       │──────────► │ Pyramidal        │────────────►┌────────▼─────────────┐
-│ Intention       │ Voluntary  │ (Motor Cortex,   │  Conscious  │ Emblems              │
-│                 │            │  Premotor)       │   Control   │ Illustrators         │
-└─────────────────┘            └──────────────────┘             └──────────────────────┘
-         │                              │                                 │
-         │                              │                                 │
-         ▼                              ▼                                 ▼
-┌─────────────────┐            ┌──────────────────┐             ┌─────────────────────┐
-│ Internal        │──────────► │ Hybrid           │────────────►│ Regulators          │
-│ Tension/Load    │ Minimal    │ (Semi-voluntary) │  Partial    │ Adaptors            │
-│                 │ Awareness  │                  │  Awareness  │                     │
-└─────────────────┘            └──────────────────┘             └─────────────────────┘
-
-OBSERVER DECODING PATHWAYS
-
-┌─────────────────────┐         ┌────────────────────┐         ┌──────────────────┐
-│ Observable Output   │────────►│ Mirror Neuron      │────────►│ Implicit         │
-│ (Movement Stream)   │ Automatic│ Activation         │ Pre-    │ Understanding    │
-│                     │         │ (IFG, IPL)         │conscious│ ("Gut Feeling")  │
-└─────────────────────┘         └────────────────────┘         └──────────────────┘
-         │
-         │
-         ▼
-┌─────────────────────┐         ┌────────────────────┐         ┌──────────────────┐
-│ Focused Attention   │────────►│ Prefrontal         │────────►│ Explicit         │
-│ + Prior Knowledge   │ Voluntary│ Analytical         │ Conscious│ Interpretation   │
-│                     │         │ Processing         │         │ + Hypothesis Test│
-└─────────────────────┘         └────────────────────┘         └──────────────────┘
+```mermaid
+flowchart TD
+    subgraph producer ["KINESIC SIGNAL PRODUCTION"]
+        direction TB
+        
+        subgraph internal ["INTERNAL STATE"]
+            EA["Emotional<br/>Activation"]
+            CI["Cognitive<br/>Intention"]
+            ITL["Internal<br/>Tension/Load"]
+        end
+        
+        subgraph motor ["MOTOR ENCODING"]
+            EP["Extrapyramidal<br/>(Basal Ganglia,<br/>Limbic System)"]
+            PY["Pyramidal<br/>(Motor Cortex,<br/>Premotor)"]
+            HY["Hybrid<br/>(Semi-voluntary)"]
+        end
+        
+        subgraph output ["OBSERVABLE OUTPUT"]
+            AD["Affect Displays<br/>(facial, postural)"]
+            EMB["Emblems<br/>Illustrators"]
+            REG["Regulators<br/>Adaptors"]
+        end
+        
+        EA -->|Automatic| EP
+        EP -->|Involuntary| AD
+        
+        CI -->|Voluntary| PY
+        PY -->|"Conscious<br/>Control"| EMB
+        
+        ITL -->|"Minimal<br/>Awareness"| HY
+        HY -->|"Partial<br/>Awareness"| REG
+        
+        CI -.-> HY
+        PY -.-> HY
+        AD --> EMB
+        EMB --> REG
+    end
+    
+    subgraph observer ["OBSERVER DECODING PATHWAYS"]
+        direction TB
+        
+        OO["Observable Output<br/>(Movement Stream)"]
+        FA["Focused Attention<br/>+ Prior Knowledge"]
+        
+        MN["Mirror Neuron<br/>Activation<br/>(IFG, IPL)"]
+        PF["Prefrontal<br/>Analytical<br/>Processing"]
+        
+        IU["Implicit<br/>Understanding<br/>(\"Gut Feeling\")"]
+        EI["Explicit<br/>Interpretation<br/>+ Hypothesis Test"]
+        
+        OO -->|Automatic| MN
+        MN -->|Pre-conscious| IU
+        
+        OO --> FA
+        FA -->|Voluntary| PF
+        PF -->|Conscious| EI
+    end
+    
+    REG -.->|Output Stream| OO
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

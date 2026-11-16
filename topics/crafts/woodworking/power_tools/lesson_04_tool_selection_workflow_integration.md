@@ -20,17 +20,46 @@ Dust and chip management forms the fourth and perhaps most underappreciated inva
 
 The practical framework for tool selection in an end-to-end woodworking project can be visualized as a directed workflow where each operation stage has a defined set of tool candidates, filtered by four criteria: **material removal rate requirements, dimensional precision requirements, surface quality requirements, and dust/chip management requirements**. These four axes do not always point in the same direction, and resolving their tensions is where real expertise lives.
 
-```
-ROUGH MILL              DIMENSION              JOINERY              SURFACE PREP
-─────────────           ──────────────         ────────────         ─────────────
-Bandsaw (resaw)    →    Table Saw (rip)   →    Router Table   →    Random Orbit
-Jointer (face)          Miter Saw (xcut)        Domino/Biscuit       Card Scraper
-Planer (thickness)      Track Saw (sheet)       Pocket Hole          Cabinet Scraper
-                        Router Sled (slabs)      Drill Press          Hand Plane (#4)
+```mermaid
+flowchart LR
+    subgraph RM["ROUGH MILL"]
+        direction TB
+        RM1["Bandsaw (resaw)"]
+        RM2["Jointer (face)"]
+        RM3["Planer (thickness)"]
+        RM_NOTE["Stall-torque critical<br/>Power rating primary"]
+    end
 
-    ↑                        ↑                       ↑                    ↑
-Stall-torque critical   Fence/stop accuracy    Bit geometry & RPM    Grit/pressure
-Power rating primary    dominant variable      depth-of-cut critical  sequencing
+    subgraph DIM["DIMENSION"]
+        direction TB
+        DIM1["Table Saw (rip)"]
+        DIM2["Miter Saw (xcut)"]
+        DIM3["Track Saw (sheet)"]
+        DIM4["Router Sled (slabs)"]
+        DIM_NOTE["Fence/stop accuracy<br/>dominant variable"]
+    end
+
+    subgraph JOI["JOINERY"]
+        direction TB
+        JOI1["Router Table"]
+        JOI2["Domino/Biscuit"]
+        JOI3["Pocket Hole"]
+        JOI4["Drill Press"]
+        JOI_NOTE["Bit geometry & RPM<br/>depth-of-cut critical"]
+    end
+
+    subgraph SURF["SURFACE PREP"]
+        direction TB
+        SURF1["Random Orbit"]
+        SURF2["Card Scraper"]
+        SURF3["Cabinet Scraper"]
+        SURF4["Hand Plane (#4)"]
+        SURF_NOTE["Grit/pressure<br/>sequencing"]
+    end
+
+    RM -->|"Process Flow"| DIM
+    DIM -->|"Process Flow"| JOI
+    JOI -->|"Process Flow"| SURF
 ```
 
 The rough milling stage is power-limited. A 13-inch drum planer taking 1/16-inch passes through 8-inch-wide quartersawn white oak is demanding roughly 12 to 14 amps from its motor. If the machine's rated amperage is 15A, there is very little thermal headroom, and feeding at the maximum roller speed will cause the motor to heat, slow the cutterhead, and produce snipe — the characteristic deeper cut at board entry and exit — as the cutterhead speed fluctuates. The correct response is to reduce infeed to 1/32 inch per pass on wide, dense stock, or accept that a 15-amp benchtop planer is the wrong tool for production milling of 8/4 hardwoods and that a 20-amp cabinet planer is what the task requires. This is a power-rating selection decision driven directly by material density and stock width.
@@ -45,16 +74,81 @@ Understanding how dust extraction integrates with power tools requires thinking 
 
 A router produces fine dust and small chips in a tightly localized zone around the bit. The shroud around a router's base port is small-diameter, meaning high static pressure is needed to draw chips through it against the air resistance of the small port area. A shop vacuum connected here is mechanically correct. A table saw, by contrast, produces a high volume of chips that fall into a large cabinet — a geometry that demands high airflow volume to sweep chips out of the enclosed space, not high suction. Connecting a shop vacuum to a table saw's 4-inch dust port starves the machine of airflow; the vacuum's CFM is insufficient to sweep the cabinet clean, chips pack around the splitter and blade guard, and blade cooling is compromised. A single-stage dust collector with a 4-inch hose is the appropriate pairing here.
 
-```
-Tool               Chip Type       Port Size     Required Parameter    Appropriate Unit
-─────────────────  ──────────────  ────────────  ───────────────────   ────────────────
-Random Orbit Sdr.  Fine dust       1.25–2.5 in   High static pressure  HEPA shop vac
-Router (handheld)  Fine + chips    1.5–2.5 in    High static pressure  Shop vac or DC
-Router Table       Mixed           2.5–4 in      Balanced              DC + blast gate
-Table Saw          Coarse chips    4 in          High CFM              Dust collector
-Miter Saw          Fine + coarse   4 in          High CFM + hood       Dust collector
-Thickness Planer   Coarse shavings 4–5 in        High CFM              DC or cyclone
-Bandsaw            Mixed/coarse    4 in          High CFM              Dust collector
+```mermaid
+flowchart LR
+    subgraph tools ["🔧 Tools"]
+        ROS["Random Orbit Sander"]
+        RH["Router (Handheld)"]
+        RT["Router Table"]
+        TS["Table Saw"]
+        MS["Miter Saw"]
+        TP["Thickness Planer"]
+        BS["Bandsaw"]
+    end
+
+    subgraph chips ["💨 Chip Type"]
+        FD["Fine Dust"]
+        FC["Fine + Chips"]
+        MX["Mixed"]
+        CC["Coarse Chips"]
+        FCC["Fine + Coarse"]
+        CS["Coarse Shavings"]
+        MXC["Mixed / Coarse"]
+    end
+
+    subgraph ports ["📏 Port Size"]
+        P125["1.25 – 2.5 in"]
+        P150["1.5 – 2.5 in"]
+        P250["2.5 – 4 in"]
+        P400["4 in"]
+        P450["4 – 5 in"]
+    end
+
+    subgraph params ["⚙️ Required Parameter"]
+        HSP["High Static Pressure"]
+        BAL["Balanced Flow"]
+        HCFM["High CFM"]
+        HCFM_H["High CFM + Hood"]
+    end
+
+    subgraph units ["🏭 Appropriate Unit"]
+        HEPA["HEPA Shop Vac"]
+        SV_DC["Shop Vac or Dust Collector"]
+        DC_BG["Dust Collector + Blast Gate"]
+        DC["Dust Collector"]
+        DC_CY["Dust Collector or Cyclone"]
+    end
+
+    ROS --> FD
+    RH  --> FC
+    RT  --> MX
+    TS  --> CC
+    MS  --> FCC
+    TP  --> CS
+    BS  --> MXC
+
+    FD  --> P125
+    FC  --> P150
+    MX  --> P250
+    CC  --> P400
+    FCC --> P400
+    CS  --> P450
+    MXC --> P400
+
+    P125 --> HSP
+    P150 --> HSP
+    P250 --> BAL
+    P400 --> HCFM
+    P400 --> HCFM_H
+    P450 --> HCFM
+
+    HSP    -->|ROS| HEPA
+    HSP    -->|"Router Handheld"| SV_DC
+    BAL    --> DC_BG
+    HCFM   -->|"Table Saw"| DC
+    HCFM_H --> DC
+    HCFM   -->|Planer| DC_CY
+    HCFM   -->|Bandsaw| DC
 ```
 
 The practical implication is that a shop running multiple large tools simultaneously needs a ducted central dust collection system with blast gates, sized such that the main trunk line supports the CFM demand of the largest simultaneously operated tool pair. The trunk line velocity must stay above 3,500 FPM (feet per minute) to keep chips in suspension rather than dropping and packing in the duct — which means trunk diameter must match airflow: a 1,200 CFM collector needs a 6-inch main trunk to maintain that velocity, calculated from the basic relationship $V = Q / A$ where $Q$ is volumetric flow and $A$ is duct cross-section.
@@ -63,35 +157,62 @@ The practical implication is that a shop running multiple large tools simultaneo
 
 The workflow architecture for a typical cabinet door, treated as an end-to-end case study, illustrates how tool decisions cascade:
 
-```
-Design (target dimensions)
-         │
-         ▼
-Rough lumber selection (species, grain, MC%)
-         │
-         ▼
-Jointer → face joint → reference face  ← [Stall torque critical: 1/32" max on hard maple]
-         │
-         ▼
-Planer → thickness → reference thickness  ← [Snipe management: feed boards end-to-end]
-         │
-         ▼
-Table saw → rip to width + 1/16" over  ← [Fence accuracy critical: 0.003" max]
-         │
-         ▼
-Jointer → edge joint ripped edge  ← [Fence squareness: 90° within 0.1°]
-         │
-         ▼
-Miter saw / sled → crosscut to length  ← [Stop block repeatability: 0.005" or better]
-         │
-         ▼
-Router table → cope & stick or M&T  ← [Bit height: 0.005" tolerance; RPM: per bit dia.]
-         │
-         ▼
-Random orbit sander → 80→120→180 grit  ← [Never skip grits; orbital scratch pattern]
-         │
-         ▼
-Finish-ready component
+```mermaid
+flowchart TD
+    A["Design\n(target dimensions)"]
+    B["Rough lumber selection\n(species, grain, MC%)"]
+    C["Jointer → face joint\nReference face"]
+    C_note["⚠ Stall torque critical:\n1/32&quot; max on hard maple"]
+    D["Planer → thickness\nReference thickness"]
+    D_note["⚠ Snipe management:\nfeed boards end-to-end"]
+    E["Table saw → rip to width\n+1/16&quot; over final"]
+    E_note["⚠ Fence accuracy critical:\n0.003&quot; max"]
+    F["Jointer → edge joint\nripped edge"]
+    F_note["⚠ Fence squareness:\n90° within 0.1°"]
+    G["Miter saw / sled\ncrosscut to length"]
+    G_note["⚠ Stop block repeatability:\n0.005&quot; or better"]
+    H["Router table\ncope & stick or M&T"]
+    H_note["⚠ Bit height: 0.005&quot; tolerance\nRPM: per bit diameter"]
+    I["Random orbit sander\n80 → 120 → 180 grit"]
+    I_note["⚠ Never skip grits;\norbital scratch pattern"]
+    J["✓ Finish-ready component"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+
+    C_note -. constraint .-> C
+    D_note -. constraint .-> D
+    E_note -. constraint .-> E
+    F_note -. constraint .-> F
+    G_note -. constraint .-> G
+    H_note -. constraint .-> H
+    I_note -. constraint .-> I
+
+    style A fill:#1e3a5f,color:#ffffff,stroke:#0d2137
+    style B fill:#2e5984,color:#ffffff,stroke:#1e3a5f
+    style C fill:#2e5984,color:#ffffff,stroke:#1e3a5f
+    style D fill:#2e5984,color:#ffffff,stroke:#1e3a5f
+    style E fill:#2e5984,color:#ffffff,stroke:#1e3a5f
+    style F fill:#2e5984,color:#ffffff,stroke:#1e3a5f
+    style G fill:#2e5984,color:#ffffff,stroke:#1e3a5f
+    style H fill:#2e5984,color:#ffffff,stroke:#1e3a5f
+    style I fill:#2e5984,color:#ffffff,stroke:#1e3a5f
+    style J fill:#1a5c38,color:#ffffff,stroke:#0d3320
+
+    style C_note fill:#4a3000,color:#ffd580,stroke:#7a5500
+    style D_note fill:#4a3000,color:#ffd580,stroke:#7a5500
+    style E_note fill:#4a3000,color:#ffd580,stroke:#7a5500
+    style F_note fill:#4a3000,color:#ffd580,stroke:#7a5500
+    style G_note fill:#4a3000,color:#ffd580,stroke:#7a5500
+    style H_note fill:#4a3000,color:#ffd580,stroke:#7a5500
+    style I_note fill:#4a3000,color:#ffd580,stroke:#7a5500
 ```
 
 Each arrow in this chain represents a handoff where the upstream tool's output becomes the downstream tool's reference condition. The jointer's face does not merely need to be "flat enough" — it needs to be flat to within the planer's acceptable registration tolerance, which for a machine with a solid rubber infeed roller pressing against an uneven face is roughly 0.010 inches across the board width. Beyond that, the board rocks on the planer table and exits with a convex face. This tight coupling between tool tolerances is what makes tool selection a systems problem rather than a per-operation problem.

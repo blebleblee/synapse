@@ -54,189 +54,236 @@ The operational mechanics of agricultural policy interventions require understan
 
 Price support systems operate through government commodity loan programs or standing purchase commitments that establish a floor beneath which market prices cannot sustainably fall. The United States Department of Agriculture's commodity loan program exemplifies this architecture: eligible farmers pledge their harvested grain as collateral for non-recourse loans at the statutory loan rate, receiving immediate cash flow while retaining the option to either repay the loan plus interest and reclaim their commodity, or forfeit the collateral to the government in full satisfaction of the loan obligation when market prices remain below the loan rate. This option structure creates an effective price floor at the loan rate, as rational farmers forfeit whenever market price falls below loan rate plus storage costs, making the government the residual purchaser of surplus production.
 
-```
-Price Support Execution Flow:
-
-Announcement Phase
-└─> Government declares support price p_f and eligible commodities
-    └─> Farmers observe p_f and form production expectations
-        └─> Planted acreage adjusts: A_planted = f(p_f, input costs, weather forecast)
-
-Growing Season
-└─> Weather realization determines yield: Y = g(A_planted, rainfall, temperature)
-    └─> Aggregate supply manifests: Q_s = A_planted × Y
-
-Harvest & Market Phase
-└─> Market price P_m emerges from D(P_m) = Q_d
+```mermaid
+flowchart TD
+    A["Announcement Phase:<br/>Government declares support price p_f<br/>and eligible commodities"]
+    B["Farmers observe p_f and<br/>form production expectations"]
+    C["Planted acreage adjusts:<br/>A_planted = f(p_f, input costs, weather forecast)"]
     
-    IF P_m ≥ p_f:
-        └─> Farmers sell to private buyers at P_m
-        └─> Government purchases zero quantity
-        └─> Market clears without intervention
+    D["Growing Season:<br/>Weather realization determines yield<br/>Y = g(A_planted, rainfall, temperature)"]
+    E["Aggregate supply manifests:<br/>Q_s = A_planted × Y"]
     
-    IF P_m < p_f:
-        └─> Consumers purchase Q_d = D(p_f) at price p_f
-        └─> Government purchases Q_surplus = Q_s - Q_d at price p_f
-        └─> Government storage accumulates inventory
-            └─> Storage costs = s · Q_surplus per period
-            └─> Inventory disposal: export subsidy, food aid, or destruction
-
-Welfare Accounting (P_m < p_f case):
-├─> ΔCS = -[(p_f - p*)·Q_d + ½(p_f - p*)·(Q* - Q_d)]
-├─> ΔPS = +[(p_f - p*)·Q_d + rectangle on expanded production]
-├─> Government cost = p_f·Q_surplus + s·Q_surplus
-└─> DWL = consumption triangle + production triangle + storage costs
+    F["Harvest & Market Phase:<br/>Market price P_m emerges from D(P_m) = Q_d"]
+    
+    G{"P_m ≥ p_f?"}
+    
+    H["Farmers sell to private buyers at P_m"]
+    I["Government purchases zero quantity"]
+    J["Market clears without intervention"]
+    
+    K["Consumers purchase Q_d = D(p_f) at price p_f"]
+    L["Government purchases<br/>Q_surplus = Q_s - Q_d at price p_f"]
+    M["Government storage accumulates inventory"]
+    N["Storage costs = s · Q_surplus per period"]
+    O["Inventory disposal:<br/>export subsidy, food aid, or destruction"]
+    
+    P["Welfare Accounting (P_m < p_f case)"]
+    Q["ΔCS = -["(p_f - p*)·Q_d + ½(p_f - p*)·(Q* - Q_d)"]<br/>(Consumer surplus loss)"]
+    R["ΔPS = +[(p_f - p*)·Q_d + rectangle on expanded production]<br/>(Producer surplus gain)"]
+    S["Government cost = p_f·Q_surplus + s·Q_surplus"]
+    T["DWL = consumption triangle +<br/>production triangle + storage costs"]
+    
+    A --> B --> C
+    C --> D --> E
+    E --> F --> G
+    
+    G -->|Yes| H --> I --> J
+    G -->|No| K --> L --> M --> N --> O
+    
+    L --> P
+    P --> Q
+    P --> R
+    P --> S
+    P --> T
 ```
 
 The deficiency payment mechanism decouples producer and consumer prices through direct subsidy payments calculated as the shortfall between a target price and market-clearing or reference price. Implementation requires administrative determination of eligible production, either through current output monitoring or historical base acreage and yield calculations. The United States employed coupled deficiency payments extensively during the 1970s-1990s under the deficiency payment program, where target prices exceeded market prices for corn, wheat, cotton, and rice, triggering per-bushel payments equal to the difference applied to program acres times program yield.
 
-```
-Deficiency Payment Execution Architecture:
-
-Program Design Phase
-└─> Congress establishes target price p_t for commodity
-    └─> Administrative rules define:
-        ├─> Base acreage: historical planted area or current acres
-        ├─> Program yield: historical average or current yield
-        └─> Payment limitation: maximum payment per producer
-
-Enrollment Phase
-└─> Farmers elect program participation
-    └─> Submit acreage and yield documentation
-    └─> Accept cross-compliance requirements:
-        ├─> Conservation compliance on HEL/wetland
-        ├─> Planting restrictions on program acres
-        └─> Payment limitation certification
-
-Market Outcome Phase
-└─> Market clears at P_m where S(P_m) = D(P_m)
-    └─> No government commodity purchases
-    └─> Consumers face price P_m < p_t
-
-Payment Calculation Phase
-└─> Reference price determined: P_ref (market average or formula)
+```mermaid
+flowchart TD
+    A["Program Design Phase"]
+    B["Congress establishes target price p_t for commodity"]
+    C["Administrative rules define"]
+    D["Base acreage: historical planted area or current acres"]
+    E["Program yield: historical average or current yield"]
+    F["Payment limitation: maximum payment per producer"]
     
-    IF p_t > P_ref:
-        └─> Payment rate = p_t - P_ref per unit
-        └─> Per-farm payment = (payment rate) × (base acres) × (program yield)
-        └─> Subject to maximum payment cap
+    G["Enrollment Phase"]
+    H["Farmers elect program participation"]
+    I["Submit acreage and yield documentation"]
+    J["Accept cross-compliance requirements"]
+    K["Conservation compliance on HEL/wetland"]
+    L["Planting restrictions on program acres"]
+    M["Payment limitation certification"]
     
-    IF p_t ≤ P_ref:
-        └─> No payment triggered
-
-Welfare Implications:
-├─> ΔCS = +[consumers benefit from low market price P_m vs. support p_f]
-├─> ΔPS = +[transfer equal to payment received]
-├─> Government cost = (p_t - P_ref) × Σ(base_i × yield_i) across participants
-└─> DWL = zero if decoupled, production triangle if coupled to current output
+    N["Market Outcome Phase"]
+    O["Market clears at P_m where S(P_m) = D(P_m)"]
+    P["No government commodity purchases"]
+    Q["Consumers face price P_m < p_t"]
+    
+    R["Payment Calculation Phase"]
+    S["Reference price determined: P_ref (market average or formula)"]
+    T{"p_t > P_ref?"}
+    U["Payment rate = p_t - P_ref per unit"]
+    V["Per-farm payment = (payment rate) × (base acres) × (program yield)"]
+    W["Subject to maximum payment cap"]
+    X["No payment triggered"]
+    
+    Y["Welfare Implications"]
+    Z["ΔCS = +[consumers benefit from low market price P_m vs. support p_f]"]
+    AA["ΔPS = +[transfer equal to payment received]"]
+    AB["Government cost = (p_t - P_ref) × Σ(base_i × yield_i) across participants"]
+    AC["DWL = zero if decoupled, production triangle if coupled to current output"]
+    
+    A --> B
+    B --> C
+    C --> D
+    C --> E
+    C --> F
+    
+    G --> H
+    H --> I
+    H --> J
+    J --> K
+    J --> L
+    J --> M
+    
+    N --> O
+    O --> P
+    O --> Q
+    
+    R --> S
+    S --> T
+    T -->|Yes| U
+    U --> V
+    V --> W
+    T -->|No| X
+    
+    Y --> Z
+    Y --> AA
+    Y --> AB
+    Y --> AC
+    
+    A -.-> G
+    G -.-> N
+    N -.-> R
+    R -.-> Y
 ```
 
 Production quota and supply management systems ration output through quantity allocations enforced by penalties for excess production or denial of market access. The Canadian dairy supply management exemplifies comprehensive quota implementation: provincial marketing boards allocate quota measured in kilograms of butterfat production rights, enforce penalties for over-quota production, and prohibit unquoted sales. Quota becomes a capitalizable asset tradable among producers within provincial boundaries, with market prices for quota revealing the present value of expected future rents from restricted supply.
 
-```
-Quota System Operational Structure:
-
-Initial Allocation Phase
-└─> Government determines target supply: Q_target < Q*
-    └─> Allocation method determines quota distribution:
-        ├─> Grandfathering: Q_i = historical share × Q_target
-        ├─> Auction: highest bidders receive quota rights
-        └─> Per-capita equal allocation: Q_i = Q_target / N_farmers
-
-Production Phase with Tradable Quotas
-└─> Each producer i faces quota constraint: q_i ≤ Q_i_quota
+```mermaid
+flowchart TD
+    Start["Quota System Operational Structure"]
     
-    Profit maximization:
-    max[p_q · q_i - C_i(q_i)] subject to q_i ≤ Q_i_quota
+    Start --> Phase1["Initial Allocation Phase"]
     
-    IF MC_i(Q_i_quota) < p_q:
-        └─> Quota constraint binds
-        └─> Shadow value λ_i = p_q - MC_i(Q_i_quota)
-        └─> Producer willing to buy additional quota at price ≤ λ_i
+    Phase1 --> Target["Government determines target supply:<br/>Q_target < Q*"]
+    Target --> AllocMethod["Allocation method determines<br/>quota distribution"]
     
-    IF MC_i(Q_i_quota) ≥ p_q:
-        └─> Producer produces q_i < Q_i_quota
-        └─> Willing to sell quota at price ≥ MC_i(q_i) - p_q
-
-Secondary Quota Market
-└─> Quota price P_quota emerges where:
-    Σ[demand from low-cost producers] = Σ[supply from high-cost producers]
+    AllocMethod --> Grand["Grandfathering:<br/>Q_i = historical share × Q_target"]
+    AllocMethod --> Auction["Auction:<br/>highest bidders receive quota rights"]
+    AllocMethod --> PerCapita["Per-capita equal allocation:<br/>Q_i = Q_target / N_farmers"]
     
-└─> Equilibrium: P_quota = shadow value for marginal producer
-    └─> Quota reallocation continues until MC_i(q_i) = MC_j(q_j) ∀ i,j
-        └─> Cost minimization achieved: Q_target produced at minimum resource cost
-
-Market Price Determination
-└─> Restricted quantity Q_target enters consumer market
-    └─> Price rises to p_q = D^{-1}(Q_target)
-    └─> Producer revenue = p_q · Q_target
-    └─> Quota rent per unit = p_q - MC(Q_target)
-    └─> Capitalized quota value = PV[future rents per unit] × quota_i
-
-Welfare Distribution:
-├─> Consumer loss = area under demand, above p_q, from Q_target to Q*
-├─> Producer gain = quota rent rectangle + triangular quasi-rents
-├─> Quota value capitalization = rents incorporated into land/permit prices
-└─> DWL = consumption triangle only (production efficiency restored by trade)
+    Grand --> Phase2
+    Auction --> Phase2
+    PerCapita --> Phase2
+    
+    Phase2["Production Phase with Tradable Quotas"]
+    
+    Phase2 --> Constraint["Each producer i faces quota constraint:<br/>q_i ≤ Q_i_quota"]
+    
+    Constraint --> ProfitMax["Profit maximization:<br/>max["p_q · q_i - C_i(q_i)"]<br/>subject to q_i ≤ Q_i_quota"]
+    
+    ProfitMax --> Condition1{"MC_i(Q_i_quota) < p_q ?"}
+    ProfitMax --> Condition2{"MC_i(Q_i_quota) ≥ p_q ?"}
+    
+    Condition1 -->|Yes| Binds["Quota constraint binds"]
+    Binds --> Shadow["Shadow value:<br/>λ_i = p_q - MC_i(Q_i_quota)"]
+    Shadow --> Buyer["Producer willing to buy<br/>additional quota at price ≤ λ_i"]
+    
+    Condition2 -->|Yes| UnderProduce["Producer produces q_i < Q_i_quota"]
+    UnderProduce --> Seller["Willing to sell quota at price ≥<br/>MC_i(q_i) - p_q"]
+    
+    Buyer --> SecMarket
+    Seller --> SecMarket
+    
+    SecMarket["Secondary Quota Market"]
+    
+    SecMarket --> QuotaPrice["Quota price P_quota emerges where:<br/>Σ[demand from low-cost producers] =<br/>Σ[supply from high-cost producers]"]
+    
+    QuotaPrice --> Equilibrium["Equilibrium:<br/>P_quota = shadow value for marginal producer"]
+    
+    Equilibrium --> Realloc["Quota reallocation continues until<br/>MC_i(q_i) = MC_j(q_j) ∀ i,j"]
+    
+    Realloc --> CostMin["Cost minimization achieved:<br/>Q_target produced at minimum resource cost"]
+    
+    CostMin --> MarketPrice["Market Price Determination"]
+    
+    MarketPrice --> RestrictQty["Restricted quantity Q_target<br/>enters consumer market"]
+    
+    RestrictQty --> PriceRise["Price rises to:<br/>p_q = D^(-1)(Q_target)"]
+    
+    PriceRise --> Revenue["Producer revenue = p_q · Q_target"]
+    Revenue --> Rent["Quota rent per unit =<br/>p_q - MC(Q_target)"]
+    Rent --> CapValue["Capitalized quota value =<br/>PV[future rents per unit] × quota_i"]
+    
+    CapValue --> Welfare["Welfare Distribution"]
+    
+    Welfare --> ConsLoss["Consumer loss = area under demand,<br/>above p_q, from Q_target to Q*"]
+    Welfare --> ProdGain["Producer gain = quota rent rectangle +<br/>triangular quasi-rents"]
+    Welfare --> QuotaCap["Quota value capitalization =<br/>rents incorporated into land/permit prices"]
+    Welfare --> DWL["DWL = consumption triangle only<br/>(production efficiency restored by trade)"]
 ```
 
 The tariff implementation architecture in agricultural trade transforms border prices through ad valorem percentage charges or specific per-unit duties, creating a wedge between world and domestic prices that protects domestic producers while generating government revenue. Tariff-rate quotas introduce non-linear schedules where imports up to a threshold enter at low in-quota rates while above-quota imports face prohibitive out-of-quota tariffs, creating a kinked effective supply curve facing domestic consumers.
 
-```
-Agricultural Tariff System Mechanics:
-
-Simple Ad Valorem Tariff (rate τ on imports)
-
-World Market
-└─> World price P_w determined by global S_world = D_world
-    └─> Small country assumption: P_w exogenous to domestic policy
-
-Domestic Market with Tariff
-└─> Import supply curve: P_domestic = P_w(1 + τ)
-    └─> Domestic equilibrium:
-        S_domestic(P_w(1+τ)) + Imports = D_domestic(P_w(1+τ))
-        
-        where Imports = D_domestic(P_w(1+τ)) - S_domestic(P_w(1+τ))
-
-Revenue Collection
-└─> Government collects: R = τ · P_w · Imports
-    └─> Distributed through budget to domestic economy
-
-Tariff-Rate Quota (TRQ) Architecture
-
-TRQ Parameters:
-├─> In-quota quantity: Q_iq (low tariff τ_low applies)
-├─> In-quota tariff: τ_low (often zero or minimal)
-└─> Out-of-quota tariff: τ_high (often prohibitive, e.g., 100%+)
-
-Import Supply Curve under TRQ:
+```mermaid
+flowchart TD
+    A["Agricultural Tariff System Mechanics"]
     
-    For M ≤ Q_iq:
-        P_domestic = P_w(1 + τ_low)
+    A --> B["Simple Ad Valorem Tariff"]
+    A --> C["Tariff-Rate Quota System"]
     
-    For M > Q_iq:
-        P_domestic = P_w(1 + τ_high)
+    B --> B1["World Market"]
+    B1 --> B2["World Price P_w<br/>S_world = D_world"]
+    B2 --> B3["Small Country Assumption<br/>P_w Exogenous"]
     
-    Effective supply kinked at (Q_iq, P_w(1+τ_low))
-
-Market Outcome Depends on Demand:
-
-Case A: D(P_w(1+τ_low)) - S(P_w(1+τ_low)) < Q_iq
-    └─> In-quota not filled, out-of-quota tariff irrelevant
-    └─> Effective tariff = τ_low
-    └─> Standard tariff welfare analysis applies
-
-Case B: D(P_w(1+τ_low)) - S(P_w(1+τ_low)) > Q_iq
-      and D(P_w(1+τ_high)) - S(P_w(1+τ_high)) < Q_iq
-    └─> In-quota fills exactly, price determined by demand at Q_iq import level
-    └─> Domestic price P* solves: D(P*) - S(P*) = Q_iq
-    └─> P_w(1+τ_low) < P* < P_w(1+τ_high)
-    └─> In-quota license acquires rent: P* - P_w(1+τ_low) per unit
-
-Case C: D(P_w(1+τ_high)) - S(P_w(1+τ_high)) ≥ Q_iq
-    └─> Out-of-quota imports occur
-    └─> Domestic price = P_w(1+τ_high)
-    └─> In-quota licenses earn full rent: P_w(τ_high - τ_low) per unit
+    B --> B4["Domestic Market with Tariff"]
+    B4 --> B5["Import Supply Curve<br/>P_domestic = P_w(1 + τ)"]
+    B5 --> B6["Domestic Equilibrium<br/>S_domestic + Imports = D_domestic"]
+    B6 --> B7["Imports = D_domestic - S_domestic"]
+    
+    B --> B8["Revenue Collection"]
+    B8 --> B9["R = τ · P_w · Imports"]
+    B9 --> B10["Distributed Through Budget"]
+    
+    C --> C1["TRQ Parameters"]
+    C1 --> C2["In-quota Quantity: Q_iq"]
+    C1 --> C3["In-quota Tariff: τ_low<br/>Often zero or minimal"]
+    C1 --> C4["Out-of-quota Tariff: τ_high<br/>Often prohibitive"]
+    
+    C --> C5["Import Supply Curve"]
+    C5 --> C6["For M ≤ Q_iq:<br/>P_domestic = P_w(1 + τ_low)"]
+    C5 --> C7["For M > Q_iq:<br/>P_domestic = P_w(1 + τ_high)"]
+    C5 --> C8["Kinked at Q_iq"]
+    
+    C --> C9["Market Outcomes"]
+    C9 --> CA["Case A:<br/>Demand &lt; Q_iq"]
+    CA --> CA1["In-quota Not Filled"]
+    CA1 --> CA2["Effective Tariff = τ_low"]
+    CA2 --> CA3["Standard Tariff Analysis"]
+    
+    C9 --> CB["Case B:<br/>Demand Between Tariffs"]
+    CB --> CB1["In-quota Fills Exactly"]
+    CB1 --> CB2["D(P*) - S(P*) = Q_iq"]
+    CB2 --> CB3["P_w(1+τ_low) < P* < P_w(1+τ_high)"]
+    CB3 --> CB4["License Rent = P* - P_w(1+τ_low)"]
+    
+    C9 --> CC["Case C:<br/>Demand > Out-of-quota Level"]
+    CC --> CC1["Out-of-quota Imports Occur"]
+    CC1 --> CC2["P_domestic = P_w(1+τ_high)"]
+    CC2 --> CC3["License Rent = P_w(τ_high - τ_low)"]
 ```
 
 The distribution of quota rents and tariff revenues introduces additional layers to the welfare analysis, as the mechanism for allocating import licenses or quota permits determines who captures the rectangular rent area between world and domestic prices. When governments auction import licenses, the revenue approximates the quota rent rectangle, accruing to the domestic treasury similarly to tariff revenue. When licenses are allocated through historical import shares or political allocation without payment, quota rents transfer to import license holders as windfall profits. When exporting countries negotiate voluntary export restraints—quantitative restrictions imposed by the exporting nation—rents transfer to foreign exporters who can allocate the restricted supply among themselves, representing a pure transfer from the importing country to foreign producers.

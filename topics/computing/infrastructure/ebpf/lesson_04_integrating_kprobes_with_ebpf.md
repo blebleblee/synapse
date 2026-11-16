@@ -582,7 +582,7 @@ eBPF JIT must include speculative execution mitigations. The verifier inserts sp
 
 ### Performance Profiling
 
-Netflix uses eBPF kprobes for continuous profiling in production. By sampling stack traces at 49 Hz across all CPUs, they identify CPU hotspots with <0.1% overhead. The sampling frequency avoids aliasing with common timer frequencies (50Hz, 60Hz).
+Netflix uses eBPF kprobes for continuous profiling in production. By sampling stack traces at 49 Hz across all CPUs, they identify CPU hotspots with < 0.1% overhead. The sampling frequency avoids aliasing with common timer frequencies (50Hz, 60Hz).
 
 ### Security Monitoring
 

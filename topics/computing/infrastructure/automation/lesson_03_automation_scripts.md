@@ -38,22 +38,38 @@ A script that executes silently is operationally blind. Robust automation must e
 Every automation script is a finite-state automaton. Making this model explicit—rather than leaving it implicit in a tangle of conditionals—is the single most effective technique for eliminating entire classes of bugs. The states and transitions for a deployment script are shown below.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Idle
-    Idle --> PreflightCheck : invoke
-    PreflightCheck --> Backup : checks_pass
-    PreflightCheck --> Failed : checks_fail
-    Backup --> Deploy : backup_complete
-    Backup --> Failed : backup_error
-    Deploy --> Validate : deploy_complete
-    Deploy --> Rollback : deploy_error
-    Validate --> Cleanup : validation_pass
-    Validate --> Rollback : validation_fail
-    Rollback --> Failed : rollback_complete
-    Cleanup --> Succeeded : cleanup_complete
-    Cleanup --> Failed : cleanup_error
-    Failed --> [*]
-    Succeeded --> [*]
+flowchart TD
+    START((" ")):::terminal
+    Idle["Idle"]
+    PreflightCheck["Preflight Check"]
+    Backup["Backup"]
+    Deploy["Deploy"]
+    Validate["Validate"]
+    Rollback["Rollback"]
+    Cleanup["Cleanup"]
+    Failed["Failed"]:::failure
+    Succeeded["Succeeded"]:::success
+    END((" ")):::terminal
+
+    START --> Idle
+    Idle -->|"invoke"| PreflightCheck
+    PreflightCheck -->|"checks pass"| Backup
+    PreflightCheck -->|"checks fail"| Failed
+    Backup -->|"backup complete"| Deploy
+    Backup -->|"backup error"| Failed
+    Deploy -->|"deploy complete"| Validate
+    Deploy -->|"deploy error"| Rollback
+    Validate -->|"validation pass"| Cleanup
+    Validate -->|"validation fail"| Rollback
+    Rollback -->|"rollback complete"| Failed
+    Cleanup -->|"cleanup complete"| Succeeded
+    Cleanup -->|"cleanup error"| Failed
+    Failed --> END
+    Succeeded --> END
+
+    classDef terminal fill:#1a1a2e,stroke:#4a4a8a,color:#fff,shape:circle
+    classDef failure fill:#7f1d1d,stroke:#ef4444,color:#fecaca
+    classDef success fill:#14532d,stroke:#22c55e,color:#bbf7d0
 ```
 
 Each transition is guarded by a predicate. No state may be entered unless its preconditions are satisfied. This model eliminates the most common class of automation bugs: assuming the system is in a particular state when it is not. When you encode the state machine explicitly (as a `match` statement in Rust, a `transitions` table in Python, or a workflow definition in a DAG engine), the guard conditions become compile-time or start-time checkable invariants rather than silent runtime assumptions.
@@ -673,32 +689,25 @@ mod tests {
 A circuit breaker is a state machine with three states: **Closed** (normal operation, calls pass through), **Open** (failure threshold exceeded, calls are short-circuited without hitting the downstream), and **Half-Open** (a probe period where a limited number of calls are allowed through to test recovery).
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Closed
-    Closed --> Open : failure_count >= threshold\nwithin window
-    Open --> HalfOpen : probe_timeout_elapsed
-    HalfOpen --> Closed : probe_succeeded
-    HalfOpen --> Open : probe_failed
+flowchart TD
+    INIT((" ")):::init
 
-    note right of Closed
-        Calls pass through.
-        Failures are counted
-        in a sliding window.
-    end note
+    CLOSED["Closed\n──────────────────\nCalls pass through.\nFailures are counted\nin a sliding window."]
 
-    note right of Open
-        Calls are rejected
-        immediately without
-        hitting downstream.
-        Prevents load amplification.
-    end note
+    OPEN["Open\n──────────────────\nCalls are rejected\nimmediately without\nhitting downstream.\nPrevents load amplification."]
 
-    note right of HalfOpen
-        One probe call is
-        allowed through.
-        Result determines
-        next state.
-    end note
+    HALFOPEN["Half-Open\n──────────────────\nOne probe call is\nallowed through.\nResult determines\nnext state."]
+
+    INIT --> CLOSED
+    CLOSED --> OPEN["Open\n──────────────────\nCalls are rejected\nimmediately without\nhitting downstream.\nPrevents load amplification."]
+    CLOSED -->|"failure_count >= threshold\nwithin window"| OPEN
+    OPEN -->|"probe_timeout_elapsed"| HALFOPEN
+    HALFOPEN -->|"probe_succeeded"| CLOSED
+    HALFOPEN -->|"probe_failed"| OPEN
+
+    classDef init fill:#000,stroke:#000,color:#000
+    classDef state fill:#1e1e2e,stroke:#89b4fa,color:#cdd6f4,rx:8,ry:8
+    class CLOSED,OPEN,HALFOPEN state
 ```
 
 The circuit breaker's key parameter is the **failure rate threshold** within a **sliding time window** (not a fixed count). A fixed count is fragile under variable load: at high throughput, 5 failures in 10 seconds may be trivial; at low throughput, it may represent a 100% error rate. Use a sliding window (e.g., 50% failure rate over the last 60 seconds with a minimum request volume of 20) to make the threshold traffic-proportional.

@@ -18,33 +18,49 @@ The deterministic nature of style resolution creates testability guarantees abse
 
 The browser's style resolution engine operates as a multi-stage pipeline transforming author-provided style rules into element-specific property maps. Parsing converts CSS text into an intermediate representation consisting of selector objects and declaration blocks. Selector parsing itself employs recursive descent over a context-free grammar, building abstract syntax trees that capture combinators (descendant, child, sibling) and pseudo-classes. These parsed selectors index into a hash table keyed by the rightmost simple selector—the key selector—enabling rapid candidate rule elimination during matching. A rule targeting `.container > .item:hover` hashes on `.item`, allowing the engine to skip rules entirely when evaluating elements lacking the `item` class.
 
-```
-Style Resolution Pipeline:
+```mermaid
+flowchart TD
+    CSS["CSS Text"]
 
-CSS Text
-   │
-   ├─→ Tokenization (lexical analysis)
-   │
-   ├─→ Parser (syntax tree construction)
-   │      │
-   │      └─→ Selector AST + Declaration Block
-   │
-   ├─→ Selector Matching (DOM traversal)
-   │      │
-   │      ├─→ Hash table lookup by key selector
-   │      └─→ Left-to-right combinator validation
-   │
-   ├─→ Cascade Resolution (per-property conflict resolution)
-   │      │
-   │      ├─→ Origin + Importance ordering
-   │      ├─→ Specificity comparison (lexicographic tuple)
-   │      └─→ Source order tiebreaking
-   │
-   ├─→ Inheritance Propagation (parent → child for inheritable props)
-   │
-   └─→ Computed Value Calculation (resolve %, em, inherit keywords)
-         │
-         └─→ CSSOM getComputedStyle() API
+    TOK["Tokenization\n(lexical analysis)"]
+
+    PARSE["Parser\n(syntax tree construction)"]
+    AST["Selector AST +\nDeclaration Block"]
+
+    MATCH["Selector Matching\n(DOM traversal)"]
+    HASH["Hash table lookup\nby key selector"]
+    LR["Left-to-right\ncombinator validation"]
+
+    CASCADE["Cascade Resolution\n(per-property conflict resolution)"]
+    ORIGIN["Origin + Importance\nordering"]
+    SPEC["Specificity comparison\n(lexicographic tuple)"]
+    SOURCE["Source order\ntiebreaking"]
+
+    INHERIT["Inheritance Propagation\n(parent → child for inheritable props)"]
+
+    COMPUTED["Computed Value Calculation\n(resolve %, em, inherit keywords)"]
+    CSSOM["CSSOM getComputedStyle() API"]
+
+    CSS --> TOK
+    TOK --> PARSE
+    PARSE --> AST
+
+    AST --> MATCH
+    MATCH --> HASH
+    MATCH --> LR
+
+    HASH --> CASCADE
+    LR --> CASCADE
+    CASCADE --> ORIGIN
+    CASCADE --> SPEC
+    CASCADE --> SOURCE
+
+    ORIGIN --> INHERIT
+    SPEC --> INHERIT
+    SOURCE --> INHERIT
+
+    INHERIT --> COMPUTED
+    COMPUTED --> CSSOM
 ```
 
 Selector matching proceeds in reverse, validating the key selector first before evaluating combinators rightward to leftward. This right-to-left evaluation order minimizes wasted work: for a selector `body .container .item`, the engine first confirms the element matches `.item`, then walks upward through ancestors seeking `.container`, and finally validates `body` at the root. Reversing this order would require evaluating all body descendants for every element, a catastrophic complexity blowup. The matching algorithm maintains a working set of candidate rules per element, progressively filtering as it ascends the tree. When multiple rules declare the same property, the engine defers conflict resolution to the cascade phase rather than eagerly selecting winners during matching.

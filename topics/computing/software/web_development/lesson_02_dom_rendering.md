@@ -40,46 +40,28 @@ Event dispatch implements the DOM Events specification with meticulous attention
 
 The event loop orchestrates task scheduling across rendering, JavaScript execution, network callbacks, and timer expiration. Defined by the HTML specification rather than ECMAScript, the loop structures computation into tasks (macrotasks: script tags, user events, network responses) and microtasks (promise reactions, `MutationObserver` callbacks). Each task runs to completion, drains the microtask queue, optionally updates rendering (coalescing multiple script-triggered mutations into a single frame), then yields to the OS scheduler. `requestAnimationFrame` callbacks fire during the rendering update, receiving high-resolution timestamps synchronized to vsync intervals, ideal for animation loops that avoid timer drift and unnecessary reflows. `requestIdleCallback` schedules background work during idle periods, receiving deadlines indicating remaining time before the next frame or input event—a cooperative scheduling primitive for non-urgent analytics, metrics, or prerendering without degrading responsiveness.
 
-```
-Event Loop Cycle (HTML Standard):
+```mermaid
+flowchart TD
+    DEQUEUE["1. Dequeue one task from task queue\n(script, event, timer)"]
+    EXECUTE["2. Execute task to completion\n(JavaScript runs, may mutate DOM,\nschedule new tasks)"]
+    MICROTASK["3. Process microtask queue\n(drain promises, observers until empty)"]
 
-┌─────────────────────────────────────┐
-│  1. Dequeue one task from task      │
-│     queue (script, event, timer)    │
-└──────────────┬──────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────┐
-│  2. Execute task to completion      │
-│     (JavaScript runs, may mutate    │
-│      DOM, schedule new tasks)       │
-└──────────────┬──────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────┐
-│  3. Process microtask queue         │
-│     (drain promises, observers      │
-│      until empty)                   │
-└──────────────┬──────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────┐
-│  4. Update rendering (if needed):   │
-│     a. Run requestAnimationFrame    │
-│        callbacks                    │
-│     b. Recalc styles (if dirty)     │
-│     c. Layout (if geometry dirty)   │
-│     d. Paint (if visual dirty)      │
-│     e. Composite layers             │
-└──────────────┬──────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────┐
-│  5. Run requestIdleCallback (if     │
-│     time remains before next frame) │
-└──────────────┬──────────────────────┘
-               │
-               └──────► Loop
+    subgraph render ["4. Update Rendering (if needed)"]
+        RAF["a. Run requestAnimationFrame callbacks"]
+        STYLES["b. Recalculate styles (if dirty)"]
+        LAYOUT["c. Layout (if geometry dirty)"]
+        PAINT["d. Paint (if visual dirty)"]
+        COMPOSITE["e. Composite layers"]
+        RAF --> STYLES --> LAYOUT --> PAINT --> COMPOSITE
+    end
+
+    IDLE["5. Run requestIdleCallback\n(if time remains before next frame)"]
+
+    DEQUEUE --> EXECUTE
+    EXECUTE --> MICROTASK
+    MICROTASK --> render
+    render --> IDLE
+    IDLE --> DEQUEUE
 ```
 
 Browser APIs extend the platform beyond document manipulation into storage, networking, concurrency, and hardware access. The Fetch API exposes HTTP semantics through promise-returning functions, supporting streaming request bodies via `ReadableStream`, CORS preflight negotiation, and credentials policies. Responses arrive as streams, enabling incremental JSON parsing or progressive image decoding without buffering entire payloads into memory—critical for mobile networks where 10 MB responses over 3G require seconds to transfer. Service Workers intercept fetch events, injecting programmable proxies between web apps and the network. A registered service worker boots in a separate thread upon navigation, claiming clients via `clients.claim()`, and routing fetch events to cache-first, network-first, or stale-while-revalidate strategies implemented in JavaScript. The Cache API provides transactional storage for request/response pairs keyed by URL, persisting across sessions and enabling full offline functionality for progressive web apps.

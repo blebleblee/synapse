@@ -20,26 +20,38 @@ Underpinning all of this is the most fundamental economic mechanism at work: **L
 
 Understanding how a set moves from retail shelf to collector's market requires mapping the full lifecycle with precision. The pipeline has distinct phases, each with its own pricing dynamics and practitioner signals.
 
-```
-RETAIL PHASE                POST-EOL PHASE
-─────────────────────────────────────────────────────────────────────
-
-[Production]──►[Global Launch]──►[Active Retail]──►[EOL Signal]──►[Clearance]──►[Retirement]
-                                                                                      │
-                                                              ┌───────────────────────┘
-                                                              ▼
-                                                   [Secondary Market Opens]
-                                                              │
-                              ┌───────────────────┬──────────┴──────────┬────────────────────┐
-                              ▼                   ▼                     ▼                    ▼
-                       [Sealed Units]      [Opened/Complete]     [Part-Out Pool]     [Display/Used]
-                       (Primary Hold)      (Minifig Premium)     (BrickLink lots)    (Lowest tier)
-                              │
-                    ┌─────────┴──────────┐
-                    ▼                    ▼
-             [Short Hold]          [Long Hold]
-           (6–18 months)          (3–7+ years)
-         [1.5x–2.5x return]    [3x–10x+ return]
+```mermaid
+flowchart TD
+    subgraph retail ["RETAIL PHASE"]
+        A["Production"]
+        B["Global Launch"]
+        C["Active Retail"]
+        D["EOL Signal"]
+        E["Clearance"]
+        
+        A --> B --> C --> D --> E
+    end
+    
+    subgraph post_eol ["POST-EOL PHASE"]
+        F["Retirement"]
+        G["Secondary Market Opens"]
+        H["Sealed Units<br/>(Primary Hold)"]
+        I["Opened/Complete<br/>(Minifig Premium)"]
+        J["Part-Out Pool<br/>(BrickLink lots)"]
+        K["Display/Used<br/>(Lowest tier)"]
+        L["Short Hold<br/>(6–18 months)<br/>1.5x–2.5x return"]
+        M["Long Hold<br/>(3–7+ years)<br/>3x–10x+ return"]
+        
+        F --> G
+        G --> H
+        G --> I
+        G --> J
+        G --> K
+        H --> L
+        H --> M
+    end
+    
+    E --> F
 ```
 
 Lego's active retail phase for a standard set runs approximately two to four years, though flagship sets (the Icons and Ultimate Collector Series lines) often sustain five to seven years. During this window, the set trades at or near its MSRP, occasionally discounting at major retail events (Black Friday at Target, Amazon Lightning Deals, Costco bundles). The practitioner's job during this phase is not to analyze price — it is to **accumulate at discount against a confirmed hold thesis.**

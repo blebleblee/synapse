@@ -20,38 +20,53 @@ The critical invariant governing all underwritten transactions is the principle 
 
 The initial public offering represents the most complex and highest-stakes transaction in ECM because it establishes a company's first public market clearing price with no precedent and a constrained timeline that rarely exceeds eight to twelve weeks from mandate to listing. The execution pipeline can be described as five discrete phases: preparation and filing, pre-marketing, roadshow and book building, pricing and allocation, and aftermarket stabilization. Each phase has specific deliverables, decision gates, and financial mechanics that practitioners must execute with precision.
 
-```
-IPO Execution Timeline (Illustrative 10-Week Process)
+```mermaid
+flowchart TD
+    subgraph w12 ["Week 1–2: Kick-off & Due Diligence"]
+        L12["⚖️ Legal\nEngage counsel, audit confirmation,\n10-K/S-1 data room"]
+        F12["📊 Finance\nThree-statement audit carve-outs,\nnormalized EBITDA bridge"]
+        E12["🏦 ECM Desk\nComparable company analysis,\npreliminary valuation range"]
+    end
 
-Week 1–2: Kick-off & Due Diligence
-  │
-  ├─► Legal: Engage counsel, audit confirmation, 10-K/S-1 data room
-  ├─► Finance: Three-statement audit carve-outs, normalized EBITDA bridge
-  └─► ECM Desk: Comparable company analysis, preliminary valuation range
+    subgraph w35 ["Week 3–5: S-1 / Prospectus Drafting"]
+        M35["💬 Management Q&A\nUnderwriter sessions —\n'Testing the Waters'"]
+        R35["📄 Risk Factors & MD&A\nUse of proceeds,\nrisk factors, MD&A narrative"]
+        S35["🏛️ SEC Submission\nInitial filing —\nconfidential or public"]
+    end
 
-Week 3–5: S-1 / Prospectus Drafting
-  │
-  ├─► Management Q&A sessions with underwriters ("Testing the Waters")
-  ├─► Risk factors, use of proceeds, MD&A narrative
-  └─► SEC submission (initial filing, confidential or public)
+    subgraph w67 ["Week 6–7: Pre-Marketing & Pilot Fishing"]
+        A67["📰 Analyst Research\nPublication — 10-day quiet\nperiod pre-roadshow"]
+        P67["🎣 Pilot Fishing\n10–20 anchor investor calls,\ngauge price sensitivity"]
+        V67["🔄 Revise Price Range\nUpdate preliminary range\nbased on pilot feedback"]
+    end
 
-Week 6–7: Pre-Marketing & Pilot Fishing
-  │
-  ├─► Analyst research publication (10-day quiet period pre-roadshow)
-  ├─► Pilot fishing: 10–20 anchor investor calls, gauge price sensitivity
-  └─► Revise preliminary price range based on pilot feedback
+    subgraph w89 ["Week 8–9: Roadshow & Book Building"]
+        RS89["🗺️ Management Roadshow\n50–80 investor meetings\nover 7–10 days"]
+        OB89["📒 Order Book Opens\nElectronic book via\nbook running manager's syndicate desk"]
+        IC89["📈 Intraday Coverage Reports\nBook coverage shared\nwith management"]
+    end
 
-Week 8–9: Roadshow & Book Building
-  │
-  ├─► Management roadshow: 50–80 investor meetings over 7–10 days
-  ├─► Electronic order book opens (book running manager's syndicate desk)
-  └─► Intraday book coverage reports shared with management
+    subgraph w10 ["Week 10: Pricing, Allocation & Trading"]
+        PC10["📞 Final Pricing Call\nIssuer, management,\nlead bookrunner"]
+        AL10["🗂️ Allocation\nDistribution across\ninvestor tiers"]
+        TR10["🔔 T+1: Listing\nStabilization agent activates\nif needed"]
+    end
 
-Week 10: Pricing, Allocation & Trading
-  │
-  ├─► Final pricing call: issuer, management, lead bookrunner
-  ├─► Allocation: distribution across investor tiers
-  └─► T+1: Listing, stabilization agent activates if needed
+    w12 --> w35
+    w35 --> w67
+    w67 --> w89
+    w89 --> w10
+
+    L12 & F12 & E12 ~~~ M35
+    M35 & R35 & S35 ~~~ A67
+    A67 & P67 & V67 ~~~ RS89
+    RS89 & OB89 & IC89 ~~~ PC10
+
+    style w12 fill:#1a3a5c,color:#ffffff,stroke:#2e6da4
+    style w35 fill:#1a4a3a,color:#ffffff,stroke:#2e9e6e
+    style w67 fill:#4a3a1a,color:#ffffff,stroke:#c8841e
+    style w89 fill:#3a1a4a,color:#ffffff,stroke:#8e4ec6
+    style w10 fill:#4a1a1a,color:#ffffff,stroke:#c64e4e
 ```
 
 The S-1 registration statement is simultaneously a legal document, a marketing document, and a pricing instrument. The financial statements within it must conform to U.S. GAAP (or IFRS for foreign private issuers on Form F-1), audited for three fiscal years, with interim periods reviewed. The Management Discussion & Analysis section is the narrative the equity research analysts will read first, and it must reconcile GAAP figures to the non-GAAP metrics — adjusted EBITDA, free cash flow, annual recurring revenue — that investors will actually use to value the business. When these reconciliations are poorly constructed or inadequately explained, the pilot fishing phase reveals immediate investor skepticism, forcing revisions to the prospectus and delaying the timeline. Getting the MD&A right the first time is a material operational variable, not a cosmetic one.
@@ -82,28 +97,38 @@ Coverage ratio is the single most-watched metric during book building. It measur
 
 Order quality assessment is a practitioner discipline that transforms raw coverage data into actionable pricing intelligence. The syndicate desk categorizes incoming orders across several dimensions: investor type (long-only institutional vs. hedge fund vs. retail), order conviction (hard orders with explicit price limits vs. soft market orders that may be withdrawn), geographic distribution, and anchor investor status. A book showing ten-times coverage composed predominantly of hedge fund soft orders and no anchor participation is a weaker book than one showing three-times coverage with four large long-only accounts at the top of the range and two sovereign wealth fund commitments. The desk builds a "quality-adjusted coverage" view that feeds directly into the pricing recommendation to the issuer.
 
-```
-Book Build Coverage Dashboard (Illustrative)
-
-Shares Offered:          10,000,000
-Greenshoe (15%):          1,500,000
-Total Available:         11,500,000
-
-Day 3 Order Summary
-─────────────────────────────────────────────────────────
-Investor Tier     | Orders (Shares) | Avg. Limit | Type
-─────────────────────────────────────────────────────────
-Tier 1 Anchors    |   18,500,000    |  $21.00    | Hard
-Tier 2 Long-Only  |   24,000,000    |  $20.50    | Mixed
-Tier 3 Hedge Fund |   15,000,000    |  $19.75    | Soft
-Retail (via co.)  |    2,500,000    |  Market    | Soft
-─────────────────────────────────────────────────────────
-Total Demand      |   60,000,000
-Raw Coverage      |   6.0x
-Quality-Adjusted  |   ~4.2x (ex-soft HF orders)
-
-Pricing Signal: Sufficient demand to price at $21.00 (top of range).
-                Greenshoe fully exercisable if aftermarket supports it.
+```mermaid
+flowchart TD
+    Title["<b>Book Build Coverage Dashboard (Illustrative)</b>"]
+    
+    subgraph Offering ["Offering Structure"]
+        SO["Shares Offered: 10,000,000"]
+        GS["Greenshoe (15%): 1,500,000"]
+        TA["Total Available: 11,500,000"]
+    end
+    
+    subgraph Day3 ["Day 3 Order Summary"]
+        T1["<b>Tier 1 Anchors</b><br/>Orders: 18,500,000 shares<br/>Avg. Limit: $21.00<br/>Type: Hard"]
+        T2["<b>Tier 2 Long-Only</b><br/>Orders: 24,000,000 shares<br/>Avg. Limit: $20.50<br/>Type: Mixed"]
+        T3["<b>Tier 3 Hedge Fund</b><br/>Orders: 15,000,000 shares<br/>Avg. Limit: $19.75<br/>Type: Soft"]
+        RT["<b>Retail (via co.)</b><br/>Orders: 2,500,000 shares<br/>Avg. Limit: Market<br/>Type: Soft"]
+    end
+    
+    subgraph Metrics ["Coverage Metrics"]
+        TD["Total Demand: 60,000,000"]
+        RC["Raw Coverage: 6.0x"]
+        QA["Quality-Adjusted: ~4.2x<br/>(ex-soft HF orders)"]
+    end
+    
+    subgraph Signal ["Pricing Signal"]
+        PS["Sufficient demand to price at $21.00<br/>(top of range)"]
+        GSE["Greenshoe fully exercisable<br/>if aftermarket supports it"]
+    end
+    
+    Title --> Offering
+    Title --> Day3
+    Day3 --> Metrics
+    Metrics --> Signal
 ```
 
 ### The Greenshoe Mechanism and Stabilization

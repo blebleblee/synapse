@@ -28,31 +28,18 @@ The TLS handshake begins when the client sends a ClientHello message containing 
 
 Upon receiving the ClientHello, the server selects cryptographic parameters by choosing the most preferred mutually supported cipher suite, selecting a key exchange group, and generating its own ephemeral key pair. The ServerHello response mirrors the ClientHello structure but contains the server's choices and its ephemeral public key share. Both parties now possess sufficient information to derive the shared secret through elliptic curve Diffie-Hellman: the client combines the server's public key with its own private key, while the server performs the reciprocal operation. This shared secret enters a key derivation function that expands it into multiple symmetric keys through HKDF (HMAC-based Key Derivation Function).
 
-```
-Client                                           Server
-
-ClientHello
-+ key_share (ECDHE public key)
-+ supported_groups (x25519, secp256r1)
-+ signature_algorithms (RSA-PSS, ECDSA)
-                          -------->
-                                           ServerHello
-                          + key_share (ECDHE public key)
-                    {EncryptedExtensions}
-                   {CertificateRequest*}
-                          {Certificate}
-                    {CertificateVerify}
-                              {Finished}
-                          <--------
-{Certificate*}
-{CertificateVerify*}
-{Finished}
-                          -------->
-
-Application Data        <------->     Application Data
-
-* indicates optional or situation-dependent messages
-{} indicates messages protected by handshake keys
+```mermaid
+flowchart LR
+    Client["Client"]
+    Server["Server"]
+    
+    Client -->|"ClientHello<br/>+ key_share (ECDHE public key)<br/>+ supported_groups (x25519, secp256r1)<br/>+ signature_algorithms (RSA-PSS, ECDSA)"| Server
+    
+    Server -->|"ServerHello<br/>+ key_share (ECDHE public key)<br/>{EncryptedExtensions}<br/>{CertificateRequest*}<br/>{Certificate}<br/>{CertificateVerify}<br/>{Finished}"| Client
+    
+    Client -->|"{Certificate*}<br/>{CertificateVerify*}<br/>{Finished}"| Server
+    
+    Client <-->|"Application Data"| Server
 ```
 
 The key derivation process produces a hierarchy of secrets through successive HKDF-Expand operations. The initial shared secret becomes the early secret when combined with the PSK (pre-shared key) if session resumption applies, or simply the ECDHE shared secret for full handshakes. This feeds into the handshake secret, which derives client and server handshake traffic secrets. These secrets generate the keys that encrypt all subsequent handshake messages, providing forward secrecy even during the handshake itself. The handshake secret then derives the master secret, which produces application traffic secrets that generate the keys protecting actual application data.

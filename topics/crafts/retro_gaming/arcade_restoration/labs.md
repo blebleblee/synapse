@@ -202,8 +202,8 @@ Every joint you make during a restoration must meet the IPC-A-610 Class 2 standa
 
 | Measurement | Scope Setting | Expected Result | Fault Indicator |
 |---|---|---|---|
-| CPU clock (1 MHz system) | 1 µs/div, 2V/div, DC couple | 1.000 MHz ± 0.5%, <25 ns rise | Clock absent, slow rise, wrong freq |
-| +5V ripple (under load) | 2 ms/div, 50 mV/div, AC couple | <50 mV pk-pk 120 Hz | >100 mV: failed filter cap |
+| CPU clock (1 MHz system) | 1 µs/div, 2V/div, DC couple | 1.000 MHz ± 0.5%, < 25 ns rise | Clock absent, slow rise, wrong freq |
+| +5V ripple (under load) | 2 ms/div, 50 mV/div, AC couple | < 50 mV pk-pk 120 Hz | >100 mV: failed filter cap |
 | Data bus activity | 1 µs/div, 2V/div, DC couple | Chaotic but fast-switching | Static high/low: stuck bus or ROM |
 | ROM chip-select | 500 ns/div, 2V/div, DC couple | Periodic pulses, 0 to 5V clean | No pulses: decoder failure |
 | CRT H-sync | 10 µs/div, 2V/div | Periodic pulse at ~15.75 kHz | Missing: horizontal stage failure |

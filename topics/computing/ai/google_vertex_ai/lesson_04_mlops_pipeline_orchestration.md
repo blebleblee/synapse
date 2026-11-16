@@ -30,52 +30,53 @@ When you annotate a Python function with `@dsl.pipeline` and call component func
 
 The following diagram illustrates the full compilation and execution path.
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                        AUTHORING ENVIRONMENT (Local / Cloud Workbench)          │
-│                                                                                 │
-│   @dsl.component          @dsl.component          @dsl.component               │
-│   def ingest(...):        def train(...):          def evaluate(...):           │
-│       ...                     ...                      ...                      │
-│                                                                                 │
-│   @dsl.pipeline                                                                 │
-│   def ct_pipeline(dataset_uri: str, threshold: float):                          │
-│       ingest_op = ingest(gcs_uri=dataset_uri)                                   │
-│       train_op  = train(dataset=ingest_op.outputs["dataset"])                   │
-│       eval_op   = evaluate(model=train_op.outputs["model"], ...)                │
-│            │                                                                    │
-│            ▼                                                                    │
-│   compiler.Compiler().compile(pipeline_func=ct_pipeline,                        │
-│                               package_path="ct_pipeline.json")                  │
-│            │                                                                    │
-│            ▼ PipelineSpec protobuf (JSON)                                       │
-└────────────────────────────────┬────────────────────────────────────────────────┘
-                                 │  aiplatform.PipelineJob.submit()
-                                 ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                        VERTEX PIPELINES ORCHESTRATION LAYER                     │
-│                                                                                 │
-│  ┌──────────────────────┐    ┌──────────────────────────────────────────────┐  │
-│  │  Pipeline Scheduler  │    │            ML Metadata Store (MLMD)          │  │
-│  │  (Argo Workflows /   │    │  Artifact: Dataset  ──lineage──▶ Model       │  │
-│  │   managed executor)  │    │  Execution: ingest_op, train_op, eval_op     │  │
-│  └──────────┬───────────┘    │  Context: Pipeline Run, Experiment           │  │
-│             │                └──────────────────────────────────────────────┘  │
-│             ▼                                                                   │
-│  ┌──────────────────────────────────────────────────────────────────────────┐  │
-│  │              GKE WORKER POOL (Auto-provisioned)                          │  │
-│  │                                                                          │  │
-│  │   Pod: ingest_op          Pod: train_op          Pod: evaluate_op        │  │
-│  │   ┌─────────────┐         ┌─────────────┐        ┌─────────────┐        │  │
-│  │   │ User image  │         │ User image  │        │ User image  │        │  │
-│  │   │ + KFP launcher│       │ + KFP launcher│      │ + KFP launcher│      │  │
-│  │   │             │         │             │        │             │        │  │
-│  │   │ GCS write──▶│─────────│──▶GCS read  │        │  GCS read   │        │  │
-│  │   │ gs://bucket/│         │ gs://bucket/│        │ gs://bucket/│        │  │
-│  │   │ run_id/data │         │ run_id/model│        │ run_id/model│        │  │
-│  │   └─────────────┘         └─────────────┘        └─────────────┘        │  │
-│  └──────────────────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph authoring["AUTHORING ENVIRONMENT (Local / Cloud Workbench)"]
+        direction TB
+        components["@dsl.component<br/>def ingest(...)<br/>def train(...)<br/>def evaluate(...)"]
+        pipeline["@dsl.pipeline<br/>def ct_pipeline(dataset_uri: str, threshold: float):<br/>    ingest_op = ingest(gcs_uri=dataset_uri)<br/>    train_op = train(dataset=ingest_op.outputs['dataset'])<br/>    eval_op = evaluate(model=train_op.outputs['model'], ...)"]
+        compiler["compiler.Compiler().compile(<br/>    pipeline_func=ct_pipeline,<br/>    package_path='ct_pipeline.json')"]
+        spec["PipelineSpec protobuf (JSON)"]
+        
+        components --> pipeline
+        pipeline --> compiler
+        compiler --> spec
+    end
+    
+    spec -->|"aiplatform.PipelineJob.submit()"| orchestration
+    
+    subgraph orchestration["VERTEX PIPELINES ORCHESTRATION LAYER"]
+        direction TB
+        
+        subgraph control["Control Plane"]
+            scheduler["Pipeline Scheduler<br/>(Argo Workflows / managed executor)"]
+            mlmd["ML Metadata Store (MLMD)<br/>Artifact: Dataset ──lineage──▶ Model<br/>Execution: ingest_op, train_op, eval_op<br/>Context: Pipeline Run, Experiment"]
+        end
+        
+        scheduler --> gke
+        
+        subgraph gke["GKE WORKER POOL (Auto-provisioned)"]
+            direction LR
+            
+            subgraph pod_ingest["Pod: ingest_op"]
+                ingest_container["User image<br/>+ KFP launcher<br/><br/>GCS write──▶<br/>gs://bucket/run_id/data"]
+            end
+            
+            subgraph pod_train["Pod: train_op"]
+                train_container["User image<br/>+ KFP launcher<br/><br/>GCS read/write<br/>gs://bucket/run_id/model"]
+            end
+            
+            subgraph pod_eval["Pod: evaluate_op"]
+                eval_container["User image<br/>+ KFP launcher<br/><br/>GCS read<br/>gs://bucket/run_id/model"]
+            end
+            
+            pod_ingest --> pod_train
+            pod_train --> pod_eval
+        end
+        
+        mlmd -.tracks metadata.-> gke
+    end
 ```
 
 ### Component Specification: Lightweight vs. Containerized
@@ -722,3 +723,4 @@ The data drift trigger typically derives from a Vertex Model Monitoring job, whi
 ```python
 # cloud_functions/trigger_ct_pipeline/main.py
 # Deployed as a Cloud Functions (
+```

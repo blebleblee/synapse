@@ -66,58 +66,54 @@ After namespace and cgroup setup, runc calls `pivot_root(2)` (or `chroot(2)` in 
 
 The following diagram depicts the relationships between the Docker toolchain components, the kernel namespace and cgroup state, and the container process:
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  User Space                                                             │
-│                                                                         │
-│  ┌────────────┐  HTTP/Unix Socket  ┌────────────────────────────────┐  │
-│  │ docker CLI │ ────────────────▶  │          dockerd               │  │
-│  └────────────┘                    │  (image mgmt, API, networking) │  │
-│                                    └───────────────┬────────────────┘  │
-│                                                    │ gRPC               │
-│                                    ┌───────────────▼────────────────┐  │
-│                                    │          containerd             │  │
-│                                    │  (snapshots, OCI bundle,        │  │
-│                                    │   image pull, shim lifecycle)   │  │
-│                                    └───────────────┬────────────────┘  │
-│                                                    │ exec()             │
-│                                    ┌───────────────▼────────────────┐  │
-│                                    │  containerd-shim-runc-v2       │  │
-│                                    │  (per-container shim process)  │  │
-│                                    └───────────────┬────────────────┘  │
-│                                                    │ OCI bundle         │
-│                                    ┌───────────────▼────────────────┐  │
-│                                    │             runc               │  │
-│                                    │  (namespace clone, pivot_root, │  │
-│                                    │   cgroup write, cap drop,      │  │
-│                                    │   execve entry point)          │  │
-│                                    └───────────────┬────────────────┘  │
-└───────────────────────────────────────────────────┼─────────────────────┘
-                                                    │ syscalls
-┌──────────────────────────── Kernel Space ─────────▼─────────────────────┐
-│                                                                          │
-│   clone(CLONE_NEWPID|CLONE_NEWNET|CLONE_NEWNS|CLONE_NEWUTS|CLONE_NEWIPC)│
-│                                                                          │
-│   ┌──────────────────────────────────────────────────────────────────┐  │
-│   │  Namespace Layer                                                  │  │
-│   │  PID ns ── NET ns ── MNT ns ── UTS ns ── IPC ns ── USER ns       │  │
-│   └────────────────────────────────┬─────────────────────────────────┘  │
-│                                    │                                     │
-│   ┌────────────────────────────────▼─────────────────────────────────┐  │
-│   │  Cgroup v2 Hierarchy                                              │  │
-│   │  /sys/fs/cgroup/system.slice/docker-<id>.scope/                  │  │
-│   │      memory.max = 536870912                                       │  │
-│   │      cpu.max = 100000 100000                                      │  │
-│   │      pids.max = 1024                                              │  │
-│   └──────────────────────────────────────────────────────────────────┘  │
-│                                                                          │
-│   ┌──────────────────────────────────────────────────────────────────┐  │
-│   │  Overlayfs Mount                                                  │  │
-│   │  lowerdir=/var/lib/docker/overlay2/<id>/diff (read-only layers)  │  │
-│   │  upperdir=/var/lib/docker/overlay2/<id>/work/upper (writable)    │  │
-│   │  merged  =/var/lib/docker/overlay2/<id>/merged  (container root) │  │
-│   └──────────────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph user_space ["User Space"]
+        CLI["docker CLI"]
+        dockerd["dockerd
+(image mgmt, API, networking)"]
+        containerd["containerd
+(snapshots, OCI bundle,
+image pull, shim lifecycle)"]
+        shim["containerd-shim-runc-v2
+(per-container shim process)"]
+        runc["runc
+(namespace clone, pivot_root,
+cgroup write, cap drop,
+execve entry point)"]
+
+        CLI -->|"HTTP / Unix Socket"| dockerd
+        dockerd -->|"gRPC"| containerd
+        containerd -->|"exec()"| shim
+        shim -->|"OCI bundle"| runc
+    end
+
+    subgraph kernel_space ["Kernel Space"]
+        clone["clone(CLONE_NEWPID | CLONE_NEWNET |
+CLONE_NEWNS | CLONE_NEWUTS | CLONE_NEWIPC)"]
+
+        subgraph ns_layer ["Namespace Layer"]
+            namespaces["PID ns ── NET ns ── MNT ns ── UTS ns ── IPC ns ── USER ns"]
+        end
+
+        subgraph cgroup_layer ["Cgroup v2 Hierarchy"]
+            cgroups["/sys/fs/cgroup/system.slice/docker-&lt;id&gt;.scope/
+memory.max = 536870912
+cpu.max = 100000 100000
+pids.max = 1024"]
+        end
+
+        subgraph overlay_layer ["Overlayfs Mount"]
+            overlayfs["lowerdir = /var/lib/docker/overlay2/&lt;id&gt;/diff  (read-only layers)
+upperdir = /var/lib/docker/overlay2/&lt;id&gt;/work/upper  (writable)
+merged   = /var/lib/docker/overlay2/&lt;id&gt;/merged  (container root)"]
+        end
+
+        clone --> ns_layer
+        ns_layer --> cgroup_layer
+    end
+
+    runc -->|"syscalls"| clone
 ```
 
 ### Inspecting the Live Kernel State

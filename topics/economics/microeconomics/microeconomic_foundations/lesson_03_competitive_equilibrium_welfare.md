@@ -48,21 +48,27 @@ This correspondence selects prices that maximize the value of excess demand, eff
 
 The Edgeworth box visualizes exchange economy equilibria in the two-agent, two-commodity case. The box dimensions equal the total endowments $(\omega_1 + \omega_2, \omega_1' + \omega_2')$. Each point in the box represents an allocation $(x_1, x_2)$ with $x_1 + x_2 = \omega_1 + \omega_2$. Agent 1's indifference curves are drawn from the lower-left origin, while agent 2's curves are drawn from the upper-right origin (the box is rotated for agent 2). The initial endowment point $\omega = (\omega_1, \omega_2)$ lies inside the box. The contract curve is the set of tangencies between the agents' indifference curves—points where $MRS_1^{x/y} = MRS_2^{x/y}$. Any allocation on the contract curve is Pareto efficient; any allocation off the contract curve is Pareto dominated by some point on the contract curve.
 
-```
-Agent 2 origin (ω₁+ω₂, ω₁'+ω₂')
-    ┌─────────────────────────────┐
-    │   ╱╲  Contract Curve  ╱╲    │ 
-    │  ╱  ╲    (tangencies)  ╲   │
-    │ ╱    ╲                  ╲  │
-    │╱      ╲                  ╲ │
-    │        ╲      ω          ╲│
-    │         ╲    (endowment) ││
-    │          ╲                 │
-    │           ╲   Indifference │
-    │            ╲  curves cross │
-    │             ╲               │
-    └─────────────────────────────┘
-Agent 1 origin (0,0)
+```mermaid
+flowchart TD
+    subgraph edgeworth ["Edgeworth Box"]
+        direction TB
+
+        A1["Agent 1 Origin (0, 0)"]
+        A2["Agent 2 Origin (ω₁+ω₂, ω₁'+ω₂')"]
+
+        subgraph interior ["Interior of the Box"]
+            direction TB
+            E["ω — Endowment Point\n(initial allocation)"]
+            CC["Contract Curve\n(locus of Pareto-optimal tangencies)"]
+            IC["Indifference Curves\n(cross at non-optimal allocations)"]
+        end
+
+        A1 -->|"Agent 1 indifference curves\norigin at SW corner"| interior
+        A2 -->|"Agent 2 indifference curves\norigin at NE corner"| interior
+        E -->|"off the contract curve:\ngains from trade exist"| IC
+        E -->|"move toward"| CC
+        CC -->|"defined by\nMRS₁ = MRS₂"| IC
+    end
 ```
 
 A competitive equilibrium in the Edgeworth box corresponds to a point on the contract curve where a price line (budget constraint) is tangent to both agents' indifference curves and passes through the endowment point. The slope of this price line is $-p_x / p_y$. Both agents face the same prices, maximize utility subject to their budget constraints, and their demands sum to the total endowment. The set of competitive equilibrium allocations is a subset of the contract curve, specifically those points reachable via budget lines through the endowment.

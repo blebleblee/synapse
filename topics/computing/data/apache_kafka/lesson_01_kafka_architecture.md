@@ -174,15 +174,24 @@ Consumer group membership is managed by a **Group Coordinator** broker (the brok
 - **Static membership (Kafka 2.3+)**: Assigning consumers a `group.instance.id` causes the Group Coordinator to hold their partition assignment for a configurable `session.timeout.ms` before triggering a rebalance, allowing a consumer to restart (e.g., during a rolling deploy) without triggering rebalance churn.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Empty : Group Created
-    Empty --> PreparingRebalance : Member Joins
-    PreparingRebalance --> CompletingRebalance : All Members Joined / Timeout
-    CompletingRebalance --> Stable : Leader Submits Assignment
-    Stable --> PreparingRebalance : Member Joins/Leaves/Crashes
-    Stable --> Empty : All Members Leave
-    PreparingRebalance --> Empty : Last Member Leaves
-    CompletingRebalance --> PreparingRebalance : New Member Joins During Sync
+flowchart TD
+    INIT((" ")):::initNode
+    EMPTY["Empty"]
+    PREPARING["Preparing\nRebalance"]
+    COMPLETING["Completing\nRebalance"]
+    STABLE["Stable"]
+
+    INIT -->|"Group Created"| EMPTY
+    EMPTY -->|"Member Joins"| PREPARING
+    PREPARING -->|"All Members Joined / Timeout"| COMPLETING
+    COMPLETING -->|"Leader Submits Assignment"| STABLE
+    STABLE -->|"Member Joins / Leaves / Crashes"| PREPARING
+    STABLE -->|"All Members Leave"| EMPTY
+    PREPARING -->|"Last Member Leaves"| EMPTY
+    COMPLETING -->|"New Member Joins During Sync"| PREPARING
+
+    classDef initNode fill:#000,color:#000,width:20px,height:20px
+    classDef default fill:#1a1a2e,stroke:#4a90d9,stroke-width:2px,color:#e0e0e0,rx:6,ry:6
 ```
 
 **Offset commit semantics** determine exactly-once vs. at-least-once processing:
@@ -261,29 +270,29 @@ The implication for capacity planning: Kafka brokers should be provisioned with 
 
 The `sendfile` optimization, implemented in Java via `FileChannel.transferTo(position, count, socketChannel)`, allows the kernel to perform this transfer:
 
-```
-           Traditional                              Zero-Copy (sendfile)
-          ┌──────────┐                             ┌──────────┐
-          │  Disk    │                             │  Disk    │
-          └────┬─────┘                             └────┬─────┘
-               │ read()                                 │ sendfile()
-          ┌────▼─────┐                            ┌────▼──────────────┐
-          │ Page     │                            │ Page Cache (kernel)│
-          │ Cache    │                            └────────┬──────────┘
-          └────┬─────┘                                     │ DMA transfer
-               │ copy to user space                  ┌─────▼──────┐
-          ┌────▼─────┐                               │    NIC     │
-          │ JVM Heap │                               └────────────┘
-          └────┬─────┘
-               │ write to socket buffer
-          ┌────▼─────┐
-          │  Socket  │
-          │  Buffer  │
-          └────┬─────┘
-               │
-          ┌────▼─────┐
-          │   NIC    │
-          └──────────┘
+```mermaid
+flowchart TD
+    subgraph traditional ["Traditional"]
+        T1["Disk"]
+        T2["Page Cache"]
+        T3["JVM Heap"]
+        T4["Socket Buffer"]
+        T5["NIC"]
+        
+        T1 -->|"read()"| T2
+        T2 -->|"copy to user space"| T3
+        T3 -->|"write to socket buffer"| T4
+        T4 --> T5
+    end
+    
+    subgraph zerocopy ["Zero-Copy (sendfile)"]
+        Z1["Disk"]
+        Z2["Page Cache (kernel)"]
+        Z3["NIC"]
+        
+        Z1 -->|"sendfile()"| Z2
+        Z2 -->|"DMA transfer"| Z3
+    end
 ```
 
 The traditional path involves four copies and two context switches. The `sendfile` path involves two copies (page cache → socket buffer via DMA, socket buffer → NIC) and one context switch. For a broker serving millions of records per second, this reduction in CPU overhead per byte transferred is what makes the throughput possible.

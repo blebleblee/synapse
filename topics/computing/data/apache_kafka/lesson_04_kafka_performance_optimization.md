@@ -298,13 +298,14 @@ The assignment algorithm is configurable via `partition.assignment.strategy`:
 **Production recommendation:** Use `CooperativeStickyAssignor` for any consumer group where rebalance-induced downtime is unacceptable (i.e., most production groups).
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Joining : Consumer starts / topic subscription changes
-    Joining --> AwaitingSync : JoinGroup request sent to Group Coordinator
-    AwaitingSync --> Stable : SyncGroup response received with partition assignment
-    Stable --> Joining : Rebalance triggered (member join/leave, topic change)
-    Stable --> HeartbeatFailing : Heartbeat interval exceeded session.timeout.ms
-    HeartbeatFailing --> Joining : Consumer fenced, rejoins group
+flowchart TD
+    Start([Start]) --> Joining
+    Joining["Joining"] -->|"JoinGroup request sent to Group Coordinator"| AwaitingSync["Awaiting Sync"]
+    AwaitingSync -->|"SyncGroup response received with partition assignment"| Stable["Stable"]
+    Stable -->|"Rebalance triggered<br/>(member join/leave, topic change)"| Joining
+    Stable -->|"Heartbeat interval exceeded session.timeout.ms"| HeartbeatFailing["Heartbeat Failing"]
+    HeartbeatFailing -->|"Consumer fenced, rejoins group"| Joining
+    Joining -.->|Consumer starts /<br/>topic subscription changes| Joining
 ```
 
 ### 5.3 Offset Management and Commit Strategy

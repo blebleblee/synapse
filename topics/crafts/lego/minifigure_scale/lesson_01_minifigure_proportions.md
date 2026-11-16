@@ -24,35 +24,15 @@ These dimensional invariants—the 4.0-stud height, 1.6-stud shoulder width, 2.5
 
 The minifigure's proportional system functions as a nested hierarchy of dimensional constraints propagating from the human referent down through architectural typologies and into individual part selection. At the apex of this hierarchy sits the figure itself, whose fixed dimensions establish the primary unit of measurement. Immediately subordinate to the figure are the directly human-interfacing elements: furniture, vehicles, tools, and weapons that must maintain tactile and visual coherence with the figure's anatomy. Further downstream lie the architectural shells that enclose and organize these human-interfacing elements: rooms, corridors, buildings, and urban plans. At the base of the hierarchy reside the non-human-scaled elements—mechanical systems, decorative ornamentation, and environmental texturing—that operate at sub-minifigure resolution but must still cohere with the overall scalar framework.
 
-```
-Scalar Hierarchy of Minifigure-Referenced Design
-
-┌─────────────────────────────────────────────────────────────┐
-│  Minifigure Canonical Dimensions (Non-Negotiable Baseline)  │
-│  Height: 4.0 studs  |  Width: 1.6 studs  |  Seated: 2.5 studs│
-└────────────────────┬────────────────────────────────────────┘
-                     │
-        ┌────────────┴────────────┐
-        ▼                         ▼
-┌──────────────────┐      ┌──────────────────┐
-│  Direct Interface│      │   Architectural  │
-│    Elements      │      │      Shells      │
-│                  │      │                  │
-│ • Furniture      │      │ • Room Height    │
-│ • Vehicle Seats  │      │ • Door Width     │
-│ • Tool Handles   │      │ • Stair Rise/Run │
-│ • Weapon Grips   │      │ • Window Sills   │
-└────────┬─────────┘      └────────┬─────────┘
-         │                         │
-         └────────────┬────────────┘
-                      ▼
-         ┌────────────────────────┐
-         │   Sub-Figure Scale     │
-         │                        │
-         │ • Greebling Detail     │
-         │ • Mechanical Texture   │
-         │ • Decorative Elements  │
-         └────────────────────────┘
+```mermaid
+flowchart TD
+    baseline["Minifigure Canonical Dimensions (Non-Negotiable Baseline)<br/>Height: 4.0 studs | Width: 1.6 studs | Seated: 2.5 studs"]
+    
+    baseline --> direct["Direct Interface Elements<br/>• Furniture<br/>• Vehicle Seats<br/>• Tool Handles<br/>• Weapon Grips"]
+    baseline --> arch["Architectural Shells<br/>• Room Height<br/>• Door Width<br/>• Stair Rise/Run<br/>• Window Sills"]
+    
+    direct --> subfig["Sub-Figure Scale<br/>• Greebling Detail<br/>• Mechanical Texture<br/>• Decorative Elements"]
+    arch --> subfig
 ```
 
 Translating minifigure proportions into architectural dimensions requires establishing clearance standards that account for movement, reach, and visual comfort. A standing minifigure occupies a vertical envelope of 4.5 studs when crowned with typical headgear, but interior ceiling heights that provide only this minimum clearance produce cramped, oppressive spaces. Comfortable interior volumes begin at 6.0 studs of clear height, granting 1.5 studs of overhead clearance that allows the figure to move naturally without the visual tension of near-contact with the ceiling. Monumental or ceremonial spaces—throne rooms, cathedral naves, starship hangars—benefit from ceiling heights of 10 to 15 studs, establishing a sense of grandeur through vertical exaggeration while maintaining proportional coherence with the human-scale figure below.

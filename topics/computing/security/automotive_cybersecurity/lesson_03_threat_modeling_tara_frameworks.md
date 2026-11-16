@@ -46,50 +46,31 @@ In practice, most OEM TARA processes use a hybrid approach. STRIDE provides the 
 
 The relationships between TARA artifacts are best understood as a directed graph. Assets feed threat identification. Threats reference damage scenarios. Damage scenarios carry impact ratings. Threats are refined into attack paths, which carry feasibility ratings. The combination of impact and feasibility yields the risk value. Risk values trigger treatment decisions. Treatment decisions generate cybersecurity goals. Goals decompose into cybersecurity requirements. The following diagram represents this structural flow:
 
-```
-┌───────────────┐
-│  Item         │
-│  Definition   │
-└──────┬────────┘
-       │  decomposes into
-       ▼
-┌───────────────┐      ┌──────────────────────┐
-│  Asset        │─────▶│  Cybersecurity       │
-│  Enumeration  │      │  Properties (CIA)    │
-└──────┬────────┘      └──────────────────────┘
-       │  generates via STRIDE/HEAVENS/EVITA
-       ▼
-┌───────────────┐      ┌──────────────────────┐
-│  Threat       │─────▶│  Damage Scenario     │
-│  Identification│     │  (what harm results) │
-└──────┬────────┘      └────────┬─────────────┘
-       │                        │
-       │  refines               │  rated by
-       ▼                        ▼
-┌───────────────┐      ┌──────────────────────┐
-│  Attack Path  │      │  Impact Rating       │
-│  (EVITA AP)   │      │  (Safety/Fin/Op/Priv)│
-└──────┬────────┘      └────────┬─────────────┘
-       │                        │
-       │  scored by             │
-       ▼                        ▼
-┌───────────────┐      ┌──────────────────────┐
-│  Feasibility  │─────▶│  Risk Value          │
-│  Rating       │      │  (Impact × Feasibility│
-└───────────────┘      └────────┬─────────────┘
-                                │
-                                │  drives
-                                ▼
-                       ┌──────────────────────┐
-                       │  Risk Treatment      │
-                       │  Decision            │
-                       └────────┬─────────────┘
-                                │  produces
-                                ▼
-                       ┌──────────────────────┐
-                       │  Cybersecurity Goals │
-                       │  → Requirements      │
-                       └──────────────────────┘
+```mermaid
+flowchart TD
+    ItemDef["Item Definition"]
+    AssetEnum["Asset Enumeration"]
+    CIAProps["Cybersecurity Properties (CIA)"]
+    ThreatID["Threat Identification"]
+    DamageScenario["Damage Scenario\n(what harm results)"]
+    AttackPath["Attack Path (EVITA AP)"]
+    ImpactRating["Impact Rating\n(Safety / Financial / Operational / Privacy)"]
+    FeasibilityRating["Feasibility Rating"]
+    RiskValue["Risk Value\n(Impact × Feasibility)"]
+    RiskTreatment["Risk Treatment Decision"]
+    CyberGoals["Cybersecurity Goals → Requirements"]
+
+    ItemDef -->|"decomposes into"| AssetEnum
+    AssetEnum -->|"generates via STRIDE / HEAVENS / EVITA"| ThreatID
+    AssetEnum --> CIAProps
+    ThreatID --> DamageScenario
+    ThreatID -->|"refines"| AttackPath
+    DamageScenario -->|"rated by"| ImpactRating
+    AttackPath -->|"scored by"| FeasibilityRating
+    ImpactRating --> RiskValue
+    FeasibilityRating --> RiskValue
+    RiskValue -->|"drives"| RiskTreatment
+    RiskTreatment -->|"produces"| CyberGoals
 ```
 
 ### Attack Feasibility Scoring in Practice

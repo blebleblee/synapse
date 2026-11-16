@@ -26,12 +26,18 @@ Compiler intermediate representations expose the machinery that transforms sourc
 
 Extend the parser with a debug printer that outputs the AST in a human-readable tree format. Implement a `Display` trait for `Selector` that recursively prints each node with indentation. For example, the selector `div > .container + #main` should render as:
 
-```
-Combinator(Adjacent)
-├─ Combinator(Child)
-│  ├─ Type(div)
-│  └─ Class(container)
-└─ Id(main)
+```mermaid
+flowchart TD
+    A["Combinator(Adjacent)"]
+    B["Combinator(Child)"]
+    C["Type(div)"]
+    D["Class(container)"]
+    E["Id(main)"]
+    
+    A --> B
+    A --> E
+    B --> C
+    B --> D
 ```
 
 Add a test that parses a complex selector and asserts the printed output matches the expected structure. Run `cargo test --lib` to verify correctness. Now examine the memory layout. Use `std::mem::size_of::<Selector>()` to measure the enum's size in bytes. On 64-bit systems, `Selector` will occupy at least 24 bytes: 8 bytes for the discriminant tag, 8 bytes for a pointer (in the `Box<Selector>` case), and 8 bytes for the second pointer or inline data. If the enum is larger, the Rust compiler has inserted padding for alignment. Print the sizes of all enum variants to identify which variant drives the overall size. Add `#[repr(u8)]` to force a minimal discriminant and re-measure. Document your findings: does the `Combinator` variant dominate memory usage due to double `Box` indirection? Could you flatten the structure with an arena allocator or `Vec`-based indexing?

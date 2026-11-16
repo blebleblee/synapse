@@ -1,12 +1,40 @@
 import { marked } from 'marked';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import 'katex/dist/contrib/mhchem.mjs';
 import { synthesizeTerminalCommand } from './commandSynthesizer';
 
 let mermaidInitialized = false;
 
-function sanitizeAndRepairMermaid(diagramText: string): string {
+function isLightHexColor(hexStr: string): boolean {
+  const clean = hexStr.replace('#', '').trim();
+  let r = 0, g = 0, b = 0;
+  if (clean.length === 3) {
+    r = parseInt(clean[0] + clean[0], 16);
+    g = parseInt(clean[1] + clean[1], 16);
+    b = parseInt(clean[2] + clean[2], 16);
+  } else if (clean.length === 6) {
+    r = parseInt(clean.slice(0, 2), 16);
+    g = parseInt(clean.slice(2, 4), 16);
+    b = parseInt(clean.slice(4, 6), 16);
+  } else {
+    return false;
+  }
+  return (0.299 * r + 0.587 * g + 0.114 * b) > 140;
+}
+
+export function sanitizeAndRepairMermaid(diagramText: string): string {
   let cleaned = diagramText.trim();
+
+  // Enforce high-contrast dark text on light node fills in dark mode
+  cleaned = cleaned.replace(/style\s+([A-Za-z0-9_-]+)\s+([^;\n]+)/g, (match, id, styleProps) => {
+    if (styleProps.includes('color:')) return match;
+    const fillMatch = styleProps.match(/fill:(#[0-9a-fA-F]{3,6})/i);
+    if (fillMatch && isLightHexColor(fillMatch[1])) {
+      return `style ${id} ${styleProps},color:#0f172a`;
+    }
+    return match;
+  });
 
   // Strip trailing semicolons after graph header or statements: graph TD; -> graph TD
   cleaned = cleaned.replace(/^(\s*(?:graph|flowchart)\s+[A-Za-z]+)\s*;/gim, '$1');
@@ -38,12 +66,11 @@ function sanitizeAndRepairMermaid(diagramText: string): string {
     return `subgraph ${id} ["${trimmed}"]`;
   });
 
-  // Enclose node labels in double quotes if they contain parentheses, slashes, or arithmetic characters
-  // e.g. Node[Some text (with parens)] -> Node["Some text (with parens)"]
-  cleaned = cleaned.replace(/([A-Za-z0-9_-]+)\[([^"\]\n]*[\(\)\/\+\=\*\&][^"\]\n]*)\]/g, '$1["$2"]');
-
-  // Enclose round parenthesis node labels with special chars: Node(text with spaces) -> Node["text with spaces"]
-  cleaned = cleaned.replace(/([A-Za-z0-9_-]+)\(([^"\)\n]*[\s\/\+\=\*\&][^"\)\n]*)\)/g, '$1["$2"]');
+  // Enclose unquoted node labels with special characters in double quotes safely
+  cleaned = cleaned.replace(/([A-Za-z0-9_-]+)\[([^"\]\n]*[\(\)\/\+\=\*\&][^"\]\n]*)\]/g, (match, id, text) => {
+    if (text.startsWith('"') && text.endsWith('"')) return match;
+    return `${id}["${text.replace(/"/g, "'")}"]`;
+  });
 
   return cleaned;
 }
@@ -70,6 +97,9 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string, enableMath
   processed = processed
     .replace(/^###?\s*(?:Ascii diagram|Mermaid flowchart|ASCII Architecture|System Diagram)[\s:]*$/gim, '')
     .trim();
+
+  // Safely escape bare less-than comparisons (e.g. <50ms, <10%, <0.2s) so HTML does not parse them as invalid tags
+  processed = processed.replace(/<(?=\d)/g, '&lt;');
 
   // If math is enabled (formal_sciences, natural_sciences), safely parse LaTeX outside code
   if (enableMath) {

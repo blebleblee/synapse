@@ -24,42 +24,26 @@ The side letter problem erodes the equal-treatment principle embedded in partner
 
 The hedge fund capital structure consists of multiple layers, each with distinct cash flow rights, liquidation priorities, and governance mechanisms. At the apex sits the general partner entity, which owns the management company and employs investment professionals. Below that, the master fund holds all trading positions and serves as the accounting and valuation hub. Feeder funds sit between LPs and the master, channeling capital upward and distributing performance downward. The administrator, typically an independent third-party firm such as SS&C or NAV Consulting, calculates daily or monthly NAV based on position-level pricing data supplied by the prime broker and verified against independent pricing vendors such as Bloomberg or Markit.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                   General Partner LLC                    │
-│                (Management Company)                      │
-│   • Employs portfolio managers, analysts, traders        │
-│   • Receives management fees + performance allocation    │
-│   • Controls investment decisions via investment advisor │
-└────────────────────┬────────────────────────────────────┘
-                     │
-        ┌────────────┴────────────┐
-        │                         │
-┌───────▼──────────┐    ┌────────▼─────────┐
-│  Domestic Feeder │    │  Offshore Feeder │
-│  (Delaware LP)   │    │  (Cayman Corp)   │
-│  U.S. taxable    │    │  Tax-exempt +    │
-│  investors       │    │  non-U.S. LPs    │
-└───────┬──────────┘    └────────┬─────────┘
-        │                        │
-        └────────────┬───────────┘
-                     │
-            ┌────────▼─────────┐
-            │   Master Fund    │
-            │  (Cayman LP)     │
-            │ • Executes trades│
-            │ • Holds positions│
-            │ • Calculates P&L │
-            └────────┬─────────┘
-                     │
-        ┌────────────┴────────────┐
-        │                         │
-┌───────▼──────────┐    ┌────────▼─────────┐
-│  Prime Broker    │    │  Administrator   │
-│  • Custody       │    │  • NAV calc      │
-│  • Financing     │    │  • LP reporting  │
-│  • Trade clearing│    │  • Compliance    │
-└──────────────────┘    └──────────────────┘
+```mermaid
+flowchart TD
+    GP["<b>General Partner LLC</b><br/>(Management Company)<br/>• Employs portfolio managers, analysts, traders<br/>• Receives management fees + performance allocation<br/>• Controls investment decisions via investment advisor"]
+
+    DOM["<b>Domestic Feeder</b><br/>(Delaware LP)<br/>U.S. taxable investors"]
+
+    OFF["<b>Offshore Feeder</b><br/>(Cayman Corp)<br/>Tax-exempt + non-U.S. LPs"]
+
+    MF["<b>Master Fund</b><br/>(Cayman LP)<br/>• Executes trades<br/>• Holds positions<br/>• Calculates P&L"]
+
+    PB["<b>Prime Broker</b><br/>• Custody<br/>• Financing<br/>• Trade clearing"]
+
+    ADM["<b>Administrator</b><br/>• NAV calc<br/>• LP reporting<br/>• Compliance"]
+
+    GP --> DOM
+    GP --> OFF
+    DOM --> MF
+    OFF --> MF
+    MF --> PB
+    MF --> ADM
 ```
 
 The fee waterfall determines the sequence in which cash flows from trading profits to various stakeholders. Gross trading profits first absorb fund-level expenses: administrator fees, audit costs, legal fees, director and officer insurance, exchange connectivity charges, and market data subscriptions. These expenses typically run twenty-five to seventy-five basis points annually depending on fund complexity and asset class specialization. Net profits, after deducting these expenses, flow into the management fee calculation. The management fee accrues daily at an annualized rate applied to the fund's NAV at the beginning of each calendar quarter. For a fund with one billion dollars in AUM charging two percent, the quarterly management fee equals five million dollars, deducted from NAV before calculating performance allocation eligibility.

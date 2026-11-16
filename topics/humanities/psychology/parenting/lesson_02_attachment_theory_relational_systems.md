@@ -22,41 +22,26 @@ The attachment system operates according to control systems principles, continuo
 
 The internal working model constitutes the central data structure of attachment theory, encoding procedural knowledge about self-other relationships in implicit memory systems. These models operate largely outside conscious awareness, particularly when formed during preverbal developmental periods, yet exert powerful influences on attention, interpretation, and behavioral response in social situations. The working model of self encodes the child's sense of worth and efficacy, answering the implicit question: "Am I valuable enough to warrant care and protection?" The working model of others encodes expectations about caregiver availability and responsiveness, answering: "Can I rely on others when I need help?" These models are complementary—a child who experiences consistent rejection develops both a model of others as unavailable and a model of self as unworthy.
 
-```
-Internal Working Model Architecture
-
-┌─────────────────────────────────────────────────────────────┐
-│                    ATTACHMENT SYSTEM                         │
-│                   (Control Hierarchy)                        │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-                ┌───────────┴──────────┐
-                │                      │
-        ┌───────▼────────┐    ┌───────▼────────┐
-        │  Model of Self  │    │ Model of Other │
-        │                │    │                │
-        │ • Worthiness   │    │ • Availability │
-        │ • Efficacy     │    │ • Responsiveness│
-        │ • Lovability   │    │ • Trustworthiness│
-        └───────┬────────┘    └───────┬────────┘
-                │                      │
-                └──────────┬───────────┘
-                           │
-            ┌──────────────▼───────────────┐
-            │   Attentional Biases         │
-            │   Interpretative Filters     │
-            │   Behavioral Strategies      │
-            └──────────────┬───────────────┘
-                           │
-        ┌──────────────────┼──────────────────┐
-        │                  │                  │
-   ┌────▼─────┐      ┌────▼─────┐     ┌─────▼────┐
-   │ Secure   │      │ Avoidant │     │ Resistant│
-   │ Strategy │      │ Strategy │     │ Strategy │
-   │          │      │          │     │          │
-   │ Balanced │      │Deactivate│     │Hyperactivate│
-   │ Approach │      │ Minimize │     │ Maximize │
-   └──────────┘      └──────────┘     └──────────┘
+```mermaid
+flowchart TD
+    A["Attachment System<br/>(Control Hierarchy)"]
+    
+    B["Model of Self<br/>• Worthiness<br/>• Efficacy<br/>• Lovability"]
+    C["Model of Other<br/>• Availability<br/>• Responsiveness<br/>• Trustworthiness"]
+    
+    D["Attentional Biases<br/>Interpretative Filters<br/>Behavioral Strategies"]
+    
+    E["Secure Strategy<br/>Balanced Approach"]
+    F["Avoidant Strategy<br/>Deactivate & Minimize"]
+    G["Resistant Strategy<br/>Hyperactivate & Maximize"]
+    
+    A --> B
+    A --> C
+    B --> D
+    C --> D
+    D --> E
+    D --> F
+    D --> G
 ```
 
 Secure attachment organization emerges when caregivers demonstrate consistent sensitivity to infant signals across diverse contexts and internal states. Sensitivity involves four integrated components: awareness of subtle infant cues, accurate interpretation of those cues in terms of the infant's internal state rather than the caregiver's projections, selection of an appropriate response from the behavioral repertoire, and timely implementation before the infant's state escalates. This sensitivity cannot be reduced to mechanical responsiveness—it requires mentalizing capacity, the ability to hold the infant's mind in mind while simultaneously monitoring one's own reactions. Secure infants develop confidence that distress is manageable because it reliably elicits caregiving, and they learn that positive states can be shared and amplified through social engagement.
@@ -67,29 +52,32 @@ The resistant or ambivalent pattern emerges from inconsistent caregiving in whic
 
 Disorganized attachment represents the collapse of organized strategy when the attachment figure is simultaneously the source of fear and the biological solution to fear. Main and Hesse's theory proposes that frightened or frightening parental behavior creates an irresolvable paradox for the infant. Frightening behavior includes direct threats, looming, aggressive gestures, or harsh vocalization. Frightened behavior includes dissociative episodes, withdrawal, or expressions of terror that signal to the infant that the environment contains overwhelming threat but without indicating the source or appropriate response. The infant approaches to seek comfort but encounters a caregiver who is psychologically unavailable or alarming, activating simultaneous and incompatible behavioral systems. The resulting behavioral indices include contradictory approach-avoidance sequences, interrupted movements, freezing with a trance-like expression, direct apprehension regarding the parent, and disoriented wandering.
 
-```
-Attachment Pattern Classification Flow
-
-SEPARATION EPISODE
-        │
-        ├─→ Moderate distress, maintains some exploration
-        │   ↓
-        │   REUNION BEHAVIOR
-        │   │
-        │   ├─→ Immediate approach, easily soothed, returns to play
-        │   │   → SECURE (B)
-        │   │
-        │   ├─→ Minimal acknowledgment, looks away, focuses on toys
-        │   │   → AVOIDANT (A)
-        │   │
-        │   ├─→ Contact-seeking mixed with anger, hard to soothe
-        │   │   → RESISTANT (C)
-        │   │
-        │   └─→ Contradictory sequences, freezing, apprehension
-        │       → DISORGANIZED (D)
-        │
-        └─→ Extreme distress or complete indifference triggers
-            additional classificatory scrutiny
+```mermaid
+flowchart TD
+    A["SEPARATION EPISODE"]
+    B["Moderate distress, maintains some exploration"]
+    C["REUNION BEHAVIOR"]
+    D["Immediate approach, easily soothed, returns to play"]
+    E["SECURE (B)"]
+    F["Minimal acknowledgment, looks away, focuses on toys"]
+    G["AVOIDANT (A)"]
+    H["Contact-seeking mixed with anger, hard to soothe"]
+    I["RESISTANT (C)"]
+    J["Contradictory sequences, freezing, apprehension"]
+    K["DISORGANIZED (D)"]
+    L["Extreme distress or complete indifference triggers<br/>additional classificatory scrutiny"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    C --> F
+    F --> G
+    C --> H
+    H --> I
+    C --> J
+    J --> K
+    A --> L
 ```
 
 The neurobiological substrate of attachment involves the hypothalamic-pituitary-adrenal axis and its interaction with prefrontal regulatory systems. During the first years of life, the infant's stress response system is largely externally regulated through caregiver co-regulation. When an infant experiences distress, cortisol levels rise, activating arousal and vigilance. Sensitive caregiving provides external regulation that helps terminate the stress response, preventing prolonged elevation of glucocorticoids that can impact developing neural architecture. Repeated experiences of effective co-regulation calibrate the infant's stress response system, establishing set points for reactivity and recovery. Secure attachment is associated with moderate cortisol reactivity and efficient recovery. Avoidant attachment shows elevated baseline cortisol with blunted reactivity, suggesting chronic activation with suppressed behavioral expression. Disorganized attachment shows the most dysregulated patterns, sometimes exhibiting elevated baseline cortisol combined with exaggerated reactivity and impaired recovery.

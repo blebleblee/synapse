@@ -256,8 +256,8 @@ graph TB
     J --> L["Capacity Planner"]
     K --> F
     
-    style D fill:#e1f5ff
-    style H fill:#fff4e1
+    style D fill:#e1f5ff,color:#0f172a
+    style H fill:#fff4e1,color:#0f172a
 ```
 
 **Hybrid Push-Pull Model:**  
@@ -608,10 +608,10 @@ graph TB
     
     AM -->|"Alerts"| CP1
     
-    style CP1 fill:#ffcccc
-    style KV fill:#cce5ff
-    style TSDB fill:#ccffcc
-    style AE fill:#ffffcc
+    style CP1 fill:#ffcccc,color:#0f172a
+    style KV fill:#cce5ff,color:#0f172a
+    style TSDB fill:#ccffcc,color:#0f172a
+    style AE fill:#ffffcc,color:#0f172a
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

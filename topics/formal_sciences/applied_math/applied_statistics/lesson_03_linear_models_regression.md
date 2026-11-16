@@ -86,43 +86,28 @@ which is BLUE under the generalized Gauss-Markov conditions. When $\boldsymbol{\
 
 Understanding linear regression as a practitioner means understanding the full computational and analytical pipeline: from the raw data matrix to fitted values, through the diagnostic statistics that reveal violations of the model's assumptions, to the influence measures that identify observations distorting the entire fit. The following diagram traces this pipeline.
 
-```
-Raw Data (n × p design matrix X, response vector y)
-              │
-              ▼
-   ┌──────────────────────┐
-   │  QR Decomposition    │  X = QR, Q ∈ ℝⁿˣᵖ orthonormal, R ∈ ℝᵖˣᵖ upper triangular
-   │  (Numerical core)    │  β̂ = R⁻¹Qᵀy  (back-substitution, O(np²) flops)
-   └──────────┬───────────┘
-              │
-              ▼
-   ┌──────────────────────┐
-   │  Hat Matrix H = QQᵀ  │  Diagonal entries hᵢᵢ = leverage scores
-   │  Fitted values ŷ=Hy  │  Residuals ε̂ = (I - H)y
-   └──────────┬───────────┘
-              │
-         ┌────┴─────┐
-         ▼           ▼
-  ┌─────────────┐  ┌──────────────────────────────────────┐
-  │  Inference  │  │       Residual Diagnostic Suite       │
-  │  σ̂², F-test │  │  Standardized / Studentized residuals│
-  │  t-tests    │  │  Normality (Shapiro-Wilk, Q-Q plot)   │
-  │  CIs on β̂  │  │  Homoscedasticity (Breusch-Pagan)     │
-  └─────────────┘  │  Independence (Durbin-Watson)         │
-                   └───────────────┬──────────────────────┘
-                                   │
-                                   ▼
-                   ┌──────────────────────────────────────┐
-                   │       Influence Measure Suite         │
-                   │  Leverage hᵢᵢ, Cook's D, DFFITS       │
-                   │  DFBETAS, Covariance Ratio (CVR)      │
-                   └───────────────┬──────────────────────┘
-                                   │
-                                   ▼
-                   ┌──────────────────────────────────────┐
-                   │       Model Selection Suite           │
-                   │  AIC, BIC, Adjusted R², Cp, CV-MSE    │
-                   └──────────────────────────────────────┘
+```mermaid
+flowchart TD
+    RAW["Raw Data\nn × p design matrix X, response vector y"]
+
+    QR["QR Decomposition — Numerical Core\nX = QR, Q ∈ ℝⁿˣᵖ orthonormal, R ∈ ℝᵖˣᵖ upper triangular\nβ̂ = R⁻¹Qᵀy  (back-substitution, O(np²) flops)"]
+
+    HAT["Hat Matrix H = QQᵀ\nFitted values ŷ = Hy\nDiagonal entries hᵢᵢ = leverage scores\nResiduals ε̂ = (I − H)y"]
+
+    INF["Inference\nσ̂², F-test\nt-tests\nCIs on β̂"]
+
+    RDS["Residual Diagnostic Suite\nStandardized / Studentized residuals\nNormality: Shapiro-Wilk, Q-Q plot\nHomoscedasticity: Breusch-Pagan\nIndependence: Durbin-Watson"]
+
+    IMS["Influence Measure Suite\nLeverage hᵢᵢ, Cook's D, DFFITS\nDFBETAS, Covariance Ratio (CVR)"]
+
+    MSS["Model Selection Suite\nAIC, BIC, Adjusted R², Cp, CV-MSE"]
+
+    RAW --> QR
+    QR  --> HAT
+    HAT --> INF
+    HAT --> RDS
+    RDS --> IMS
+    IMS --> MSS
 ```
 
 ### Numerical Solution via QR Decomposition

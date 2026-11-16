@@ -121,28 +121,34 @@ The set of Nash equilibria of a game is the solution set of a system of polynomi
 
 The following diagram illustrates the correspondence structure for a $2 \times 2$ game:
 
-```
-                     MIXED STRATEGY SPACE Σ = Δ(A₁) × Δ(A₂)
-                     ┌──────────────────────────────────────┐
-                     │                                      │
-   σ ∈ Σ  ──────────►│   BR₁(σ₂) × BR₂(σ₁)                 │
-                     │       ↕  correspondence               │
-                     │   graph(BR) closed?  ✓                │
-                     │   BR(σ) convex?      ✓                │
-                     │   Σ compact?         ✓                │
-                     │          │                            │
-                     │          ▼                            │
-                     │    KAKUTANI → ∃ σ* ∈ BR(σ*)          │
-                     │               (Nash Equilibrium)      │
-                     └──────────────────────────────────────┘
-
-   SUPPORT CONDITION (2×2 fully mixed case):
-   ─────────────────────────────────────────
-   Player 2 mixes ⟹ Player 1 indifferent over supp(σ₁*)
-   Player 1 mixes ⟹ Player 2 indifferent over supp(σ₂*)
-
-        p = σ₁*(T) solves:  U₂(L, p) = U₂(R, p)
-        q = σ₂*(L) solves:  U₁(T, q) = U₁(B, q)
+```mermaid
+flowchart TD
+    Start["σ ∈ Σ<br/>MIXED STRATEGY SPACE<br/>Σ = Δ(A₁) × Δ(A₂)"]
+    
+    Start --> BRSpace["Best Response Correspondence<br/>BR₁(σ₂) × BR₂(σ₁)"]
+    
+    subgraph Verification["Kakutani Preconditions"]
+        Closed["graph(BR) closed? ✓"]
+        Convex["BR(σ) convex? ✓"]
+        Compact["Σ compact? ✓"]
+    end
+    
+    BRSpace --> Verification
+    
+    Verification --> Kakutani["KAKUTANI FIXED POINT THEOREM"]
+    
+    Kakutani --> Nash["∃ σ* ∈ BR(σ*)<br/>(Nash Equilibrium)"]
+    
+    Nash --> Support["SUPPORT CONDITION<br/>(2×2 fully mixed case)"]
+    
+    subgraph SupportConditions["Indifference Requirements"]
+        P2Mix["Player 2 mixes ⟹<br/>Player 1 indifferent over supp(σ₁*)"]
+        P1Mix["Player 1 mixes ⟹<br/>Player 2 indifferent over supp(σ₂*)"]
+    end
+    
+    Support --> SupportConditions
+    
+    SupportConditions --> Solutions["p = σ₁*(T) solves: U₂(L, p) = U₂(R, p)<br/>q = σ₂*(L) solves: U₁(T, q) = U₁(B, q)"]
 ```
 
 ### A Complete Worked Example: The Inspection Game

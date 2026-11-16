@@ -35,34 +35,24 @@ The event loop's execution order can be stated precisely:
 
 This diagram illustrates the relationships between these structures:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        V8 / JS Engine                        │
-│                                                              │
-│   ┌──────────────┐        ┌──────────────────────────────┐  │
-│   │  Call Stack  │        │       Microtask Queue        │  │
-│   │              │        │  (Promise .then, queueMT)    │  │
-│   │  [frame n]   │◄───────│  [resolve cb] [resolve cb]   │  │
-│   │  [frame n-1] │        └──────────────────────────────┘  │
-│   │  [frame 0]   │                      ▲                   │
-│   └──────┬───────┘                      │                   │
-│          │  run-to-completion           │ drain after each  │
-│          ▼                              │  macrotask        │
-└──────────┼──────────────────────────────┼───────────────────┘
-           │          Event Loop          │
-           ▼                              │
-┌──────────────────────┐                 │
-│   Macrotask Queue    │─────────────────┘
-│  (setTimeout, I/O,   │
-│   setInterval, ...)  │
-└──────────────────────┘
-           ▲
-           │  enqueue on completion
-┌──────────────────────┐
-│  Web APIs / libuv    │
-│  (Timers, XHR,       │
-│   fs, net, ...)      │
-└──────────────────────┘
+```mermaid
+flowchart TD
+    WebAPIs["Web APIs / libuv<br/>(Timers, XHR, fs, net, ...)"]
+    
+    MacroQueue["Macrotask Queue<br/>(setTimeout, I/O,<br/>setInterval, ...)"]
+    
+    subgraph Engine ["V8 / JS Engine"]
+        CallStack["Call Stack<br/>(frame n, frame n-1, frame 0)"]
+        MicroQueue["Microtask Queue<br/>(Promise .then, queueMT)<br/>[resolve cb] [resolve cb]"]
+    end
+    
+    EventLoop["Event Loop"]
+    
+    WebAPIs -->|"enqueue on completion"| MacroQueue
+    MacroQueue -->|dequeue| EventLoop
+    EventLoop -->|run-to-completion| CallStack
+    CallStack -->|"drain after each macrotask"| MicroQueue
+    MicroQueue -->|drain| EventLoop
 ```
 
 ### Callbacks: Mechanics and Structural Limits

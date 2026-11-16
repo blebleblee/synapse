@@ -28,17 +28,22 @@ The interest excavation protocol follows a structured recursive questioning sequ
 
 Construct an interest map as a hierarchical tree structure:
 
-```
-Position: "I must have sole vendor selection authority"
-    |
-    ├─ Intermediate Interest: Quality assurance control
-    |    |
-    |    ├─ Deep Interest: Professional reputation protection
-    |    └─ Deep Interest: Risk mitigation from past failures
-    |
-    └─ Intermediate Interest: Process efficiency
-         |
-         └─ Deep Interest: Autonomy and respect for expertise
+```mermaid
+flowchart TD
+    A["Position: I must have sole vendor selection authority"]
+
+    B["Intermediate Interest: Quality assurance control"]
+    C["Intermediate Interest: Process efficiency"]
+
+    D["Deep Interest: Professional reputation protection"]
+    E["Deep Interest: Risk mitigation from past failures"]
+    F["Deep Interest: Autonomy and respect for expertise"]
+
+    A --> B
+    A --> C
+    B --> D
+    B --> E
+    C --> F
 ```
 
 This mapping immediately suggests alternative solutions. Rather than ceding total authority, you might propose a joint evaluation framework with clear quality criteria, establish a vendor vetting committee that includes the stakeholder's domain expertise, implement a pilot testing phase that addresses risk concerns, or create a documented decision protocol that provides accountability and reputation protection. Each alternative satisfies the underlying interests without requiring the binary position concession.

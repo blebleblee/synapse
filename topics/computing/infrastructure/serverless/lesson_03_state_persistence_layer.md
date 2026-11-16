@@ -30,45 +30,30 @@ The internal mechanics of serverless state management revolve around three core 
 
 When a serverless platform receives a function invocation request, it first determines whether to reuse an existing container instance or provision a new one. This decision depends on whether a warm container with the function's runtime and code is available in the execution pool. On a cold start, the platform allocates a new execution environment—typically a lightweight Linux container or microVM running on a worker node in the cloud provider's compute fleet. The container starts with a minimal filesystem containing the function runtime (Node.js, Python, JVM, or custom), the function code and dependencies, and a scratch directory under `/tmp` that persists only for the lifetime of that container instance.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Serverless Function                      │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │ Execution Context (Container/MicroVM)                 │  │
-│  │                                                       │  │
-│  │  ┌──────────────┐    ┌──────────────┐              │  │
-│  │  │   Runtime    │    │  /tmp (20MB) │              │  │
-│  │  │  (Node.js)   │    │  ephemeral   │              │  │
-│  │  └──────────────┘    └──────────────┘              │  │
-│  │                                                       │  │
-│  │  ┌────────────────────────────────────────────────┐ │  │
-│  │  │ Network Stack (Outbound Only)                  │ │  │
-│  │  │  - DynamoDB SDK Client                         │ │  │
-│  │  │  - S3 SDK Client                               │ │  │
-│  │  │  - Redis Connection (if pooled externally)     │ │  │
-│  │  └────────────────────────────────────────────────┘ │  │
-│  └───────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            │ Network Calls
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Storage & State Layer                      │
-│                                                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │  DynamoDB    │  │   S3 Object  │  │   RDS Proxy  │     │
-│  │  (Regional)  │  │    Store     │  │ (Connection  │     │
-│  │              │  │              │  │   Pooling)   │     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
-│         │                  │                  │             │
-│         └──────────────────┴──────────────────┘             │
-│                            │                                │
-│                  ┌─────────▼─────────┐                      │
-│                  │  Coordination     │                      │
-│                  │  (Conditional     │                      │
-│                  │   Writes, Locks)  │                      │
-│                  └───────────────────┘                      │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Serverless ["Serverless Function"]
+        subgraph ExecContext ["Execution Context (Container/MicroVM)"]
+            Runtime["Runtime (Node.js)"]
+            Tmp["/tmp (20MB)<br/>ephemeral"]
+            Runtime ~~~ Tmp
+        end
+        NetStack["Network Stack (Outbound Only)<br/>- DynamoDB SDK Client<br/>- S3 SDK Client<br/>- Redis Connection (if pooled externally)"]
+    end
+
+    Serverless -->|"Network Calls"| Storage
+
+    subgraph Storage ["Storage & State Layer"]
+        DynamoDB["DynamoDB (Regional)"]
+        S3["S3 Object Store"]
+        RDS["RDS Proxy<br/>(Connection Pooling)"]
+        Coordination["Coordination<br/>(Conditional Writes, Locks)"]
+
+        DynamoDB ~~~ S3 ~~~ RDS
+        DynamoDB --> Coordination
+        S3 --> Coordination
+        RDS --> Coordination
+    end
 ```
 
 The function code executes within this container, and any state it wishes to persist must be written to an external storage system by making HTTP or TCP calls through the container's network stack. The AWS SDK, Azure SDK, or Google Cloud client libraries encapsulate these calls, translating high-level operations like `dynamodb.putItem()` or `s3.putObject()` into signed HTTP requests sent to the storage service's API endpoint. These requests traverse the cloud provider's internal network fabric, often crossing availability zone boundaries to reach the storage cluster's frontend nodes.
@@ -83,34 +68,19 @@ Connection management becomes a bottleneck when functions interact with traditio
 
 The connection proxy architecture looks like this:
 
-```
-┌────────────┐   ┌────────────┐   ┌────────────┐
-│ Function 1 │   │ Function 2 │   │ Function N │
-│ Invocation │   │ Invocation │   │ Invocation │
-└─────┬──────┘   └─────┬──────┘   └─────┬──────┘
-      │                │                │
-      │  Ephemeral     │  Ephemeral     │  Ephemeral
-      │  Connections   │  Connections   │  Connections
-      │                │                │
-      └────────────────┴────────────────┘
-                       │
-                       ▼
-          ┌────────────────────────┐
-          │     RDS Proxy          │
-          │  ┌──────────────────┐  │
-          │  │ Connection Pool  │  │
-          │  │  (20 persistent  │  │
-          │  │   connections)   │  │
-          │  └──────────────────┘  │
-          └────────────────────────┘
-                       │
-                       │ Persistent
-                       │ Connections
-                       ▼
-          ┌────────────────────────┐
-          │    PostgreSQL RDS      │
-          │  max_connections=100   │
-          └────────────────────────┘
+```mermaid
+flowchart TD
+    F1["Function 1<br/>Invocation"]
+    F2["Function 2<br/>Invocation"]
+    FN["Function N<br/>Invocation"]
+    
+    F1 -->|"Ephemeral<br/>Connections"| Proxy
+    F2 -->|"Ephemeral<br/>Connections"| Proxy
+    FN -->|"Ephemeral<br/>Connections"| Proxy
+    
+    Proxy["RDS Proxy<br/><br/>Connection Pool<br/>(20 persistent<br/>connections)"]
+    
+    Proxy -->|"Persistent<br/>Connections"| DB["PostgreSQL RDS<br/>max_connections=100"]
 ```
 
 Each function invocation opens a short-lived connection to RDS Proxy, which appears as a regular PostgreSQL connection from the function's perspective. The proxy authenticates the function using IAM credentials, borrows a connection from the pool, and proxies SQL queries between the function and the database. When the function finishes and closes its connection, the proxy recycles the pooled connection rather than tearing down the underlying database connection.

@@ -50,26 +50,32 @@ The cost of distress as a fraction of firm value varies by industry. Firms with 
 
 The following diagram illustrates the trade-off model's value components and the optimal leverage point:
 
-```
-Firm Value
-    ^
-    |                        *  <- V_L (max) = V_U + PV(TS) - PV(DC)
-    |                      /   \
-    |                    /       \
-    |        V_U +PV(TS)/           \
-    |               /               |  \
-    |             /                 |    \  PV(Expected Distress Costs)
-    |           /                   |      \
-    |         /                     |        \
-    |       /                       |          \
-    |     /                         |            \
-    |   /                           |              \
-    | /                             |                \
-    |---V_U-------------------------|------------------\----> Leverage (D/V)
-    |                               |
-    |                    D*/V  <- Optimal leverage
-    |
-    +----------------------------------------------------> Debt-to-Value Ratio
+```mermaid
+flowchart TD
+    Start["Leverage (D/V) = 0"]
+    VU["V_U (Unlevered Firm Value)<br/>Baseline"]
+    Rising["V_U + PV(Tax Shield)<br/>Value increases with debt"]
+    Peak["V_L (max)<br/>Optimal Capital Structure<br/>V_U + PV(TS) - PV(DC)"]
+    Declining["Value declines as<br/>PV(Expected Distress Costs)<br/>outweigh tax benefits"]
+    End["High Leverage<br/>Distress costs dominate"]
+    
+    Optimal["D*/V<br/>Optimal Leverage Point"]
+    
+    Start --> VU
+    VU --> Rising
+    Rising --> Peak
+    Peak --> Declining
+    Declining --> End
+    
+    Rising -.->|"Benefits from<br/>Tax Shield"| Peak
+    Peak -.->|"Trade-off:<br/>TS benefits vs DC costs"| Optimal
+    Declining -.->|"Increasing<br/>Distress Costs"| End
+    
+    style VU fill:#e1f5ff
+    style Peak fill:#90EE90
+    style Optimal fill:#FFD700
+    style Declining fill:#FFB6C6
+    style End fill:#FF6B6B
 ```
 
 The upper curve is the levered firm value, which rises above $V_U$ as the tax shield accrues, reaches a maximum at the optimal debt ratio $D^*/V$, and then declines as marginal distress costs exceed marginal tax shield benefits. The gap between the tax shield line and the firm value curve represents the present value of expected distress costs, which grows convexly with leverage.

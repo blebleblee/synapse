@@ -18,45 +18,32 @@ The relationship between perimeter count, wall thickness, and structural perform
 
 The slicer pipeline processes each layer in a strict sequence, and understanding the data transformations at each stage lets you intervene precisely when something goes wrong. The pipeline begins with the slice plane intersection, moves through contour generation and offsetting, then branches into the perimeter ordering engine and the infill region computation, and finally converges on a G-code serializer that sequences all paths with appropriate travel moves and extrusion values.
 
-```
-Mesh (STL/3MF/OBJ)
-        │
-        ▼
-  Slice Plane Intersection
-  (per-layer Z-height, adaptive or uniform)
-        │
-        ▼
-  Raw Contour Extraction
-  (unordered triangle-edge segments → closed loops)
-        │
-        ▼
-  Polygon Offset Engine  ◄──── Extrusion Width, Perimeter Count
-  (Clipper2: Minkwoski sum / parallel offset)
-        │
-        ├─────────────────────────────────────┐
-        ▼                                     ▼
-  Perimeter Toolpaths                  Infill Region
-  (ordered, seam-placed,               (Boolean: slice polygon
-   winding-corrected)                   MINUS all perimeter polygons)
-                                              │
-                                              ▼
-                                        Infill Pattern Generator
-                                        (Grid / Gyroid / Honeycomb /
-                                         Lightning / Adaptive Cubic…)
-                                              │
-                                              ▼
-                                        Infill Toolpaths
-                                        (clipped to infill region)
-                                              │
-        ◄─────────────────────────────────────┘
-        │
-        ▼
-  Path Ordering & Travel Optimization
-  (TSP approximation, retraction logic)
-        │
-        ▼
-  G-code Serialization
-  (E-value computation, pressure advance, fan ramps)
+```mermaid
+flowchart TD
+    A["Mesh<br/>STL/3MF/OBJ"]
+    B["Slice Plane Intersection<br/>per-layer Z-height, adaptive or uniform"]
+    C["Raw Contour Extraction<br/>unordered triangle-edge segments → closed loops"]
+    D["Polygon Offset Engine<br/>Clipper2: Minkwoski sum / parallel offset"]
+    E["Perimeter Toolpaths<br/>ordered, seam-placed, winding-corrected"]
+    F["Infill Region<br/>Boolean: slice polygon MINUS all perimeter polygons"]
+    G["Infill Pattern Generator<br/>Grid / Gyroid / Honeycomb / Lightning / Adaptive Cubic"]
+    H["Infill Toolpaths<br/>clipped to infill region"]
+    I["Path Ordering & Travel Optimization<br/>TSP approximation, retraction logic"]
+    J["G-code Serialization<br/>E-value computation, pressure advance, fan ramps"]
+    
+    K["Extrusion Width<br/>Perimeter Count"]
+    
+    A --> B
+    B --> C
+    C --> D
+    K -.-> D
+    D --> E
+    D --> F
+    F --> G
+    G --> H
+    E --> I
+    H --> I
+    I --> J
 ```
 
 ### Polygon Offset Mathematics in Practice

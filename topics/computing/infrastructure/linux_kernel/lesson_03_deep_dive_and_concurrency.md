@@ -133,18 +133,18 @@ Every kernel subsystem maintains state machines that must recover from failures 
 The memory management subsystem tracks each physical page in a `struct page`, encoding its state in atomic flags: `PG_locked`, `PG_dirty`, `PG_writeback`, `PG_lru`, `PG_active`, `PG_swapcache`, etc. A page transitions through states as it is allocated, mapped to userspace, dirtied, written back, and eventually freed.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Free
-    Free --> Allocated: alloc_pages()
-    Allocated --> Anonymous: userspace write
-    Allocated --> PageCache: file read/write
-    Anonymous --> Dirty: page modified
-    PageCache --> Dirty: page modified
-    Dirty --> Writeback: kswapd / sync
-    Writeback --> Clean: I/O complete
-    Clean --> Free: reclaim
-    Dirty --> Swap: swap_writepage()
-    Swap --> Free: swap reclaim
+flowchart TD
+    Start([Start]) --> Free["Free"]
+    Free -->|alloc_pages| Allocated["Allocated"]
+    Allocated -->|"userspace write"| Anonymous["Anonymous"]
+    Allocated -->|"file read/write"| PageCache["Page Cache"]
+    Anonymous -->|"page modified"| Dirty["Dirty"]
+    PageCache -->|"page modified"| Dirty
+    Dirty -->|"kswapd / sync"| Writeback["Writeback"]
+    Writeback -->|"I/O complete"| Clean["Clean"]
+    Clean -->|reclaim| Free
+    Dirty -->|swap_writepage| Swap["Swap"]
+    Swap -->|"swap reclaim"| Free
 ```
 
 Under memory pressure, the `kswapd` daemon wakes and scans LRU (Least Recently Used) lists to evict pages. The kernel maintains two LRU lists per memory zone: active and inactive. Pages move from active to inactive when not recently accessed, and from inactive to free when reclaimed. Dirty pages are written back before eviction.

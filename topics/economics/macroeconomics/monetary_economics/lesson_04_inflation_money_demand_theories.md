@@ -94,55 +94,39 @@ The central bank policy rate—the federal funds rate in the United States, the 
 
 The transmission from overnight rates to longer-term rates operates through the expectations hypothesis of the term structure, which posits that long-term rates equal expected average short-term rates plus term premia compensating investors for interest rate risk. A 10-year Treasury yield decomposed under this framework reflects market expectations of the average federal funds rate over the next decade plus a term premium typically ranging from 50 to 150 basis points. When the Federal Reserve raises the current policy rate and signals future tightening through forward guidance, both components rise, pushing up long-term rates and mortgage rates, corporate borrowing costs, and discount rates applied to equity valuations.
 
-```
-Policy Rate Transmission Architecture
-=====================================
-
-Fed Sets Target Rate (i_target)
-         |
-         v
-Open Market Operations
-(Treasury Sales/Purchases)
-         |
-         v
-Bank Reserve Adjustment
-         |
-         +------------------------+
-         |                        |
-         v                        v
-   Overnight Rate          Reserve Balances
-   Adjustment              Shift
-         |                        |
-         +------------------------+
-                    |
-                    v
-         Term Structure Response
-                    |
-         +----------+----------+
-         |          |          |
-         v          v          v
-    Treasury    Mortgage   Corporate
-     Yields      Rates      Spreads
-         |          |          |
-         +----------+----------+
-                    |
-         +----------+----------+
-         |                     |
-         v                     v
-    Consumption           Investment
-    (Interest-sensitive)   (Cost of capital)
-         |                     |
-         +----------+----------+
-                    |
-                    v
-           Aggregate Demand (Y)
-                    |
-                    v
-        Output Gap: (Y - Y*)
-                    |
-                    v
-      Inflation via Phillips Curve
-           π = π^e - κ(u - u*)
+```mermaid
+flowchart TD
+    A["Fed Sets Target Rate<br/>(i_target)"]
+    B["Open Market Operations<br/>(Treasury Sales/Purchases)"]
+    C["Bank Reserve Adjustment"]
+    D["Overnight Rate<br/>Adjustment"]
+    E["Reserve Balances<br/>Shift"]
+    F["Term Structure Response"]
+    G["Treasury Yields"]
+    H["Mortgage Rates"]
+    I["Corporate Spreads"]
+    J["Consumption<br/>(Interest-sensitive)"]
+    K["Investment<br/>(Cost of capital)"]
+    L["Aggregate Demand<br/>(Y)"]
+    M["Output Gap<br/>(Y - Y*)"]
+    N["Inflation via Phillips Curve<br/>π = π^e - κ(u - u*)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    C --> E
+    D --> F
+    E --> F
+    F --> G
+    F --> H
+    F --> I
+    G --> J
+    H --> J
+    I --> K
+    J --> L
+    K --> L
+    L --> M
+    M --> N
 ```
 
 Interest rate transmission to real economic activity operates primarily through four channels. The intertemporal substitution channel affects consumption and saving decisions—higher rates increase the return to saving, inducing households to defer consumption and increase saving rates, reducing aggregate demand. The cost of capital channel influences business investment decisions—higher rates raise the present value cost of capital goods and reduce the net present value of investment projects, causing firms to scale back capital expenditures and inventory accumulation.

@@ -30,24 +30,33 @@ During creative blocks, the attentional control network dominates, maintaining a
 
 The fixation dissolution process can be modeled as a state transition problem in a cognitive landscape with multiple stable attractors. Each attractor represents a coherent problem representation with its associated solution operators. The fixated attractor corresponds to an incorrect or incomplete representation that nonetheless feels compelling because it successfully activates familiar knowledge structures and produces pseudo-progress through partial constraint satisfaction. Escaping this attractor requires sufficient perturbation energy to cross the activation barrier into alternative regions of the representational space.
 
-```
-Cognitive State Landscape:
-
-                    Activation
-                    Energy
-                      ↑
-        Barrier       |      Barrier
-                      |
-    ╱────╲          ╱────╲          ╱────╲
-   ╱ Fix- ╲________╱Noise╲_________╱ Soln ╲
-  ╱  ation ╲              ╲       ╱ ution  ╲
- ╱   Basin  ╲              ╲     ╱  Basin   ╲
-╱____________╲______________╲___╱____________╲──→ Representation Space
-
-Phase 1: Trapped in Fixation Basin (high stability)
-Phase 2: Perturbation elevates system (incubation/switching)
-Phase 3: Exploration of intermediate states (noise)
-Phase 4: Collapse into Solution Basin (insight moment)
+```mermaid
+flowchart TD
+    A["Phase 1: Fixation Basin<br/>(High Stability)"]
+    B["Activation Energy<br/>Barrier"]
+    C["Phase 2: Perturbation<br/>(Incubation/Switching)"]
+    D["Phase 3: Noise Exploration<br/>(Intermediate States)"]
+    E["Activation Energy<br/>Barrier"]
+    F["Phase 4: Solution Basin<br/>(Insight Moment)"]
+    G["Representation Space"]
+    
+    A -->|Elevated| C
+    C -->|Traverses| B
+    B -->|"High Energy"| D
+    D -->|Explores| E
+    E -->|Collapse| F
+    
+    A -.->|Trapped| G
+    F -.->|Converges| G
+    D -.->|Navigates| G
+    
+    style A fill:#e1f5ff
+    style B fill:#fff3e0
+    style C fill:#f3e5f5
+    style D fill:#fce4ec
+    style E fill:#fff3e0
+    style F fill:#e8f5e9
+    style G fill:#f5f5f5
 ```
 
 Deliberate incubation exploits this landscape structure through multiple mechanisms operating on different timescales. Immediate incubation effects within minutes derive primarily from attentional release—when the problem exits working memory, the strong top-down bias from the fixated representation ceases, allowing bottom-up perceptual and semantic processes to sample alternative representations. The executive control network's grip releases, permitting the default mode network to engage in unconstrained associative wandering. During this wandering, spreading activation through semantic memory may reach conceptual nodes that the focused state had suppressed as task-irrelevant.
@@ -60,26 +69,25 @@ Cognitive switching mechanisms provide an alternative pathway for fixation disso
 
 One powerful switching mechanism involves alternating between visual-spatial and verbal-analytical processing modes. Many insight problems admit multiple representational formats—the same problem can be encoded as a verbal proposition, a visual diagram, a spatial simulation, or an abstract symbolic structure. Individuals typically default to their preferred or most accessible format, which may not be optimal for the specific problem structure. Deliberately translating the problem into an alternative format forces explicit re-encoding, during which implicit constraints may become visible and questionable.
 
-```
-Representational Translation Cycle:
+```mermaid
+flowchart TD
+    PS["Problem Statement (Verbal)"]
+    TS["Translate to Spatial"]
+    VD["Visual Diagram"]
+    ISC["Identify implicit spatial constraints"]
+    TSy["Translate to Symbolic"]
+    AS["Abstract Structure"]
+    MR["Recognize mathematical relationships"]
+    TK["Translate to Kinesthetic"]
+    PhS["Physical Simulation"]
+    DP["Discover dynamic properties"]
+    SYN["Synthesize insights from all formats"]
+    RPR["Restructured Problem Representation"]
 
-Problem Statement (Verbal)
-        ↓
-  [Translate to Spatial]
-        ↓
-Visual Diagram ──→ Identify implicit spatial constraints
-        ↓
-  [Translate to Symbolic]
-        ↓
-Abstract Structure ──→ Recognize mathematical relationships
-        ↓
-  [Translate to Kinesthetic]
-        ↓
-Physical Simulation ──→ Discover dynamic properties
-        ↓
-  [Synthesize insights from all formats]
-        ↓
-  Restructured Problem Representation
+    PS --> TS --> VD --> TSy --> AS --> TK --> PhS --> SYN --> RPR
+    VD --> ISC
+    AS --> MR
+    PhS --> DP
 ```
 
 Another switching mechanism targets the cognitive distance between the solver and the problem. When deeply engaged, solvers often lose the ability to question fundamental problem assumptions because these assumptions have become part of the automatic processing context. Deliberate perspective shifting—imagining how a child would approach the problem, how a expert from an unrelated domain would interpret it, or how the problem would appear after solution—forces the solver into an observational stance that can reveal hidden assumptions.

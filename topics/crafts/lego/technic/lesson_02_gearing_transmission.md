@@ -22,18 +22,27 @@ Technic's spur gear family is small but complete. The 8-tooth (part 10928), 16-t
 
 The gear train topology governs how ratio and rotation direction propagate through a build. Each external mesh between two spur gears inverts the direction of rotation: driver clockwise means driven counter-clockwise. An odd number of external meshes reverses the input; an even number preserves it. This is entirely predictable, and professional builders diagram rotation direction explicitly when designing multi-stage gearboxes, particularly those driving symmetric outputs like paired drive wheels, where the left and right axles must rotate in the same absolute direction when going straight.
 
-```
-Motor Shaft
-    │
-   [8T] ──────────── STAGE 1 ──► R = 24/8 = 3:1 (torque ×3, speed ÷3)
-         ║
-        [24T]
-         │
-        [8T] ──────── STAGE 2 ──► R = 24/8 = 3:1
-              ║
-             [24T]
-              │
-           Output Shaft           TOTAL R = 9:1 (torque ×9, speed ÷9)
+```mermaid
+flowchart TD
+    MotorShaft["Motor Shaft"]
+    Gear1_8T["8T Gear"]
+    Gear1_24T["24T Gear"]
+    Gear2_8T["8T Gear"]
+    Gear2_24T["24T Gear"]
+    OutputShaft["Output Shaft"]
+    
+    Stage1["STAGE 1<br/>R = 24/8 = 3:1<br/>(torque ×3, speed ÷3)"]
+    Stage2["STAGE 2<br/>R = 24/8 = 3:1"]
+    Total["TOTAL R = 9:1<br/>(torque ×9, speed ÷9)"]
+    
+    MotorShaft --> Gear1_8T
+    Gear1_8T -.->|mesh| Gear1_24T
+    Gear1_8T -.-> Stage1
+    Gear1_24T --> Gear2_8T
+    Gear2_8T -.->|mesh| Gear2_24T
+    Gear2_8T -.-> Stage2
+    Gear2_24T --> OutputShaft
+    OutputShaft -.-> Total
 ```
 
 Cascading stages in this manner is the most space-efficient reduction strategy available in Technic. Each stage requires only two axle holes in a liftarm and one gear mesh, and the entire sequence folds neatly into a compact gearbox housing framed by 5×7 or 5×11 frames. The practical limit on stage count is not mathematics but physical volume: beyond four stages, the reduction shaft stack begins to exceed what a standard Technic frame can accommodate without spilling into the outer envelope of the model.
@@ -58,19 +67,16 @@ A Technic differential (part 62821 or the classic 6573) is a planetary epicyclic
 
 The behavior worth internalizing is that a standard open differential always distributes torque equally between outputs — it cannot send more torque to the wheel with more grip. If one wheel loses traction entirely, the differential delivers zero torque to both wheels because the minimum resistance side sets the ceiling. This is exactly why vehicle models with open differentials lose drive in one-wheel-up situations, and why high-performance Technic MOC designers sometimes lock differentials for off-road models or use dual-motor drives on independent axles.
 
-```
-                    ┌──────────────────────────────┐
-                    │      DIFFERENTIAL SHELL       │
-                    │  (driven by ring/bevel gear)  │
-                    └───────────┬──────────────────┘
-                                │
-           ┌────────────────────┼────────────────────┐
-           │                   │                    │
-      [Side Bevel]       [Cross Pin]           [Side Bevel]
-      Left Output         Pinion(s)            Right Output
-      Axle ◄─────         rotate on            ─────► Axle
-                          cross pin
-                          if Δτ exists
+```mermaid
+flowchart TD
+    Shell["DIFFERENTIAL SHELL<br/>(driven by ring/bevel gear)"]
+    
+    Shell --> LeftBevel["Side Bevel<br/>Left Output Axle"]
+    Shell --> CrossPin["Cross Pin<br/>Pinion(s)<br/>rotate on cross pin<br/>if Δτ exists"]
+    Shell --> RightBevel["Side Bevel<br/>Right Output Axle"]
+    
+    LeftBevel -.->|◄─────| LeftAxle["Left Axle Output"]
+    RightBevel -.->|─────►| RightAxle["Right Axle Output"]
 ```
 
 The classic Technic 3-differential drivetrain used in large 4WD models places one differential per driven axle plus a center differential distributing torque fore-and-aft. The center differential allows the front and rear axles to rotate at different speeds through a turn — essential when both axles are driven and the front wheels must travel a longer arc than the rears. Without a center differential, a full-time 4WD Technic model on a smooth surface will exhibit driveline windup: the rigid axle connection forces the front and rear axles to rotate at the same speed, and on a turn the constrained difference in arc length builds torsional stress that eventually skips teeth or stalls the motor.

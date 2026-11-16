@@ -24,30 +24,32 @@ As frequency decreases into the 1 Hz to 1 kHz range, electrochemical impedance s
 
 Below 1 Hz, the impedance spectrum enters the mass-transport-limited regime where Warburg diffusion impedance dominates, appearing as a 45-degree linear feature in Nyquist plots. This region reflects the time required for lithium ions to diffuse through solid electrode particles and through liquid electrolyte within porous electrode structures. The characteristic diffusion time scales as the square of particle radius divided by the diffusion coefficient—for 10 μm diameter cathode particles with lithium diffusivity around 10⁻¹² cm²/s, the diffusion time approaches 100 seconds, explaining why cells struggle to maintain voltage under sustained high-rate discharge. Graphite anodes typically employ smaller particle sizes (5-20 μm) with faster lithium diffusion, making cathode diffusion the usual rate-limiting process during high-power operation.
 
-```
-Impedance Spectrum Architecture (Nyquist Plane):
-
-Im(Z)     Charge Transfer        Warburg Diffusion
-  ↑        Semicircle              (45° line)
-  │           ___
-  │         /     \___
-  │        /          \___
-  │       /               \___
-  │      |                    \___
-  │      |                        ---___
-  │       \                             
-  │        \___                          
-  │            \___                      
-  └────────────────●────────────────────→ Re(Z)
-              R_ohmic              
-              
-  R_total(ω) = R_ohmic + R_ct/(1+jωτ_ct) + σ/√ω (1-j)
-
-  where:
-    R_ohmic  = bulk + contact + electrolyte resistance
-    R_ct     = charge transfer resistance  
-    τ_ct     = RC time constant of double layer
-    σ        = Warburg coefficient (mass transport)
+```mermaid
+flowchart TD
+    subgraph nyquist["Nyquist Plane: Im(Z) vs Re(Z)"]
+        origin["Origin (0,0)"]
+        semicircle["Charge Transfer Semicircle<br/>High → Mid Frequency"]
+        warburg["Warburg Diffusion<br/>45° Linear Tail<br/>Mid → Low Frequency"]
+        rohmic["R_ohmic<br/>(Real axis intercept)"]
+        
+        origin -->|"High ω"| semicircle
+        semicircle -->|"Decreasing ω"| warburg
+        semicircle -.->|"Intercept at Re(Z)"| rohmic
+    end
+    
+    subgraph model["Equivalent Circuit Model"]
+        R_ohmic["R_ohmic<br/>Bulk + Contact + Electrolyte"]
+        R_ct["R_ct / (1 + jωτ_ct)<br/>Charge Transfer Resistance<br/>τ_ct = RC time constant"]
+        Z_w["σ/√ω · (1 - j)<br/>Warburg Impedance<br/>Mass Transport"]
+        
+        R_ohmic -->|"Series"| R_ct
+        R_ct -->|"Series"| Z_w
+    end
+    
+    equation["R_total(ω) = R_ohmic + R_ct/(1+jωτ_ct) + σ/√ω·(1-j)"]
+    
+    nyquist -.->|"Mathematical form"| equation
+    model -.->|"Physical implementation"| equation
 ```
 
 The voltage-capacity relationship during discharge encodes rich information about cell health and degradation state. A pristine cell exhibits a relatively flat voltage plateau across the middle 60% of its capacity range, bounded by steeply rising voltage at the beginning of charge and steeply falling voltage near complete discharge. This plateau reflects the thermodynamic stability of the two-phase coexistence region during lithium insertion—graphite anodes transition through distinct lithium-graphite intercalation stages (LiC₃₆, LiC₁₈, LiC₁₂, LiC₆) separated by narrow voltage plateaus, while layered oxide cathodes undergo continuous solid-solution lithium extraction with gradually sloping voltage profiles superimposed by occasional phase transition features.

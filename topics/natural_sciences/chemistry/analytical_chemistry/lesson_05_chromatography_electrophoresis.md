@@ -92,30 +92,35 @@ On-column detection occurs through a window in the capillary located 5–10 cent
 
 Capillary coating chemistry controls electroosmotic flow magnitude and direction, enabling optimization for specific applications. Bare fused silica provides strong cathodic EOF above pH 4 through surface silanol ionization, but suffers from irreproducibility as protein or surfactant adsorption alters the surface charge. Covalently bonded neutral coatings like polyacrylamide or polyethylene glycol suppress EOF through steric shielding of surface silanols, enabling separation of anions that require migration against EOF or analysis of proteins that adsorb to bare silica. Cationic coatings reverse EOF direction, creating anodic flow that enables fast separation of anionic analytes migrating with reversed EOF toward the detector at the anodic end.
 
-```
-Capillary Electrophoresis Migration Architecture
-================================================
-
-Inlet (Anode +)                                          Outlet (Cathode -)
-     |                                                            |
-     |    Injection Zone    |    Separation Zone    |   Detection    |
-     |      (1-50 nL)       |     (20-100 cm)       |    Window      |
-     |                      |                       |                |
-     +----------------------+---------------------------------------+
-     
-Electric Field Direction:  ──────────────────────────────────────>
-
-EOF Direction (pH > 7):    ──────────────────────────────────────>
-                           (cathodic flow, μeof ≈ 5×10⁻⁴ cm²/V·s)
-
-Cation Migration:          ═══════════════════════════════════════>
-                           (μep > 0, velocity = μep·E + μeof·E)
-
-Anion Migration:           <───────── (overwhelmed by EOF) ──────>
-                           (μep < 0, but |μeof| > |μep|)
-
-Neutral Migration:         ──────────────────────────────────────>
-                           (μep = 0, velocity = μeof·E only)
+```mermaid
+flowchart LR
+    inlet["<b>Inlet</b><br/>Anode +"]
+    injection["<b>Injection Zone</b><br/>1-50 nL"]
+    separation["<b>Separation Zone</b><br/>20-100 cm"]
+    detection["<b>Detection Window</b>"]
+    outlet["<b>Outlet</b><br/>Cathode -"]
+    
+    inlet --> injection --> separation --> detection --> outlet
+    
+    subgraph electric["Electric Field"]
+        efield["E-field Direction<br/>→→→"]
+    end
+    
+    subgraph eof_flow["EOF (pH > 7)"]
+        eof["Cathodic Flow<br/>μeof ≈ 5×10⁻⁴ cm²/V·s<br/>→→→"]
+    end
+    
+    subgraph cation_flow["Cation Migration"]
+        cation["μep > 0<br/>velocity = μep·E + μeof·E<br/>→→→"]
+    end
+    
+    subgraph anion_flow["Anion Migration"]
+        anion["μep < 0, |μeof| > |μep|<br/>← (overwhelmed by EOF) →"]
+    end
+    
+    subgraph neutral_flow["Neutral Migration"]
+        neutral["μep = 0<br/>velocity = μeof·E only<br/>→→→"]
+    end
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

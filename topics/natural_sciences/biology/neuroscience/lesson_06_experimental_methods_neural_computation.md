@@ -60,34 +60,20 @@ $$\sigma = \text{median}\left(\frac{|x|}{0.6745}\right)$$
 
 This robust estimator of the noise standard deviation, using the median absolute deviation, is preferred over the sample standard deviation because it is insensitive to the spike events themselves. Kilosort2 or Kilosort3, running on a GPU (NVIDIA RTX 3090 or better for practical turnaround time), then performs the template-matching spike sorting that clusters extracted waveforms into putative single units. Cluster quality is evaluated by the fraction of interspike intervals (ISIs) below the absolute refractory period of 1–2 ms, isolation distance, and L-ratio, all computed within Phy2's manual curation interface. A unit with less than 1% ISI violations and isolation distance above 20 is generally considered well-isolated.
 
-```
-Raw binary (.bin, 30 kHz, int16)
-         │
-         ▼
- ┌─────────────────────┐
- │  Phase correction   │   (SpikeGLX / OpenEphys metadata)
- └─────────┬───────────┘
-           │
-           ▼
- ┌─────────────────────┐
- │  High-pass filter   │   (Butterworth, 300 Hz, zero-phase)
- │  CAR subtraction    │
- └─────────┬───────────┘
-           │
-           ▼
- ┌─────────────────────┐
- │  Kilosort3 (GPU)    │   (template matching, drift correction)
- └─────────┬───────────┘
-           │
-           ▼
- ┌─────────────────────┐
- │  Phy2 curation      │   (ISI, waveform shape, amplitude)
- └─────────┬───────────┘
-           │
-           ▼
- ┌─────────────────────┐
- │  Spike train .npy   │   (unit × timestamps, metadata .json)
- └─────────────────────┘
+```mermaid
+flowchart TD
+    A["Raw binary<br/>30 kHz, int16<br/>(.bin)"]
+    B["Phase correction<br/>(SpikeGLX / OpenEphys metadata)"]
+    C["High-pass filter & CAR subtraction<br/>(Butterworth, 300 Hz, zero-phase)"]
+    D["Kilosort3 GPU<br/>(template matching, drift correction)"]
+    E["Phy2 curation<br/>(ISI, waveform shape, amplitude)"]
+    F["Spike train output<br/>unit × timestamps (.npy)<br/>metadata (.json)"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 ### Optical Imaging and Two-Photon Calcium Microscopy

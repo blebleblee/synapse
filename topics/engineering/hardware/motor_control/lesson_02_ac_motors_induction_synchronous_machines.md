@@ -50,45 +50,40 @@ The ADC sampling must synchronize precisely with the PWM cycle to avoid measurin
 
 Rotor position estimation in sensorless control schemes exploits the back-EMF or saliency signatures embedded in the motor's electrical response. For PMSMs and IPM motors, the induced back-EMF voltage provides an inherent position signal at moderate to high speeds, where back-EMF magnitude exceeds the voltage drop across winding resistance. An observer algorithm—commonly a sliding-mode observer or extended Kalman filter—processes the measured phase currents and applied voltages to estimate the back-EMF vector, whose angle in the $\alpha\beta$ plane directly reveals rotor position. However, at low speeds and standstill, back-EMF amplitude diminishes to zero, and position estimation relies instead on inductance saliency. High-frequency voltage injection, typically a 500 Hz to 2 kHz signal superimposed on the fundamental excitation, probes the rotor's $d$-axis and $q$-axis inductances. The resulting high-frequency current response exhibits an amplitude modulation that encodes the rotor position angle, which a demodulation algorithm extracts using bandpass filters and arctangent operations. This sensorless technique enables smooth operation down to zero speed, at the cost of audible noise from the injection frequency and increased computational load on the microcontroller.
 
-```
-Three-Phase AC Motor Control System Architecture
-
-         ┌──────────────────────────────────────────────────────────────┐
-         │                    Microcontroller (ARM Cortex-M4/M7)         │
-         │                                                                │
-         │  ┌────────────────────────────────────────────────────────┐  │
-         │  │  Field-Oriented Control (FOC) Algorithm                │  │
-         │  │                                                         │  │
-         │  │  1. Clarke Transform: abc → αβ                         │  │
-         │  │  2. Park Transform: αβ → dq (using θ_rotor)            │  │
-         │  │  3. PI Controllers: regulate I_d, I_q                  │  │
-         │  │  4. Inverse Park: dq → αβ                              │  │
-         │  │  5. Space Vector Modulation (SVM): αβ → PWM duties     │  │
-         │  └────────────────────────────────────────────────────────┘  │
-         │                                                                │
-         │  ┌─────────────┐  ┌──────────────┐  ┌──────────────────┐    │
-         │  │ Encoder I/F │  │  ADC Sampling│  │  PWM Generators  │    │
-         │  │  (TIM2/3)   │  │  (12-bit)    │  │  (TIM1, 20 kHz)  │    │
-         │  └──────┬──────┘  └──────┬───────┘  └────────┬─────────┘    │
-         └─────────┼─────────────────┼──────────────────┼───────────────┘
-                   │                 │                  │
-                   │ A/B/Z           │ V_shunt          │ PWM_A/B/C
-                   │                 │                  │
-         ┌─────────▼─────┐  ┌────────▼────────┐  ┌─────▼─────────────┐
-         │  Quadrature    │  │  Inline Shunt   │  │  Three-Phase      │
-         │  Encoder       │  │  Resistors      │  │  Inverter Bridge  │
-         │  (4096 CPR)    │  │  (1 mΩ, 3 W)    │  │  (IGBT/SiC FETs)  │
-         └────────────────┘  └─────────────────┘  └─────┬─────────────┘
-                                                          │
-                                                          │ Phase U/V/W
-                                                          │
-                                                  ┌───────▼────────┐
-                                                  │   AC Motor     │
-                                                  │  (PMSM/IM/SRM) │
-                                                  │                │
-                                                  │  Stator: 3φ    │
-                                                  │  Rotor: PM/Cage│
-                                                  └────────────────┘
+```mermaid
+flowchart TD
+    subgraph MCU["Microcontroller (ARM Cortex-M4/M7)"]
+        subgraph FOC["Field-Oriented Control (FOC) Algorithm"]
+            Clarke["1. Clarke Transform: abc → αβ"]
+            Park["2. Park Transform: αβ → dq (using θ_rotor)"]
+            PI["3. PI Controllers: regulate I_d, I_q"]
+            InvPark["4. Inverse Park: dq → αβ"]
+            SVM["5. Space Vector Modulation (SVM): αβ → PWM duties"]
+            
+            Clarke --> Park
+            Park --> PI
+            PI --> InvPark
+            InvPark --> SVM
+        end
+        
+        Encoder["Encoder I/F<br/>(TIM2/3)"]
+        ADC["ADC Sampling<br/>(12-bit)"]
+        PWM["PWM Generators<br/>(TIM1, 20 kHz)"]
+        
+        Encoder -.->|θ_rotor| Park
+        ADC -.->|I_abc| Clarke
+        SVM --> PWM
+    end
+    
+    QuadEnc["Quadrature Encoder<br/>(4096 CPR)"]
+    Shunt["Inline Shunt Resistors<br/>(1 mΩ, 3 W)"]
+    Inverter["Three-Phase Inverter Bridge<br/>(IGBT/SiC FETs)"]
+    Motor["AC Motor<br/>(PMSM/IM/SRM)<br/><br/>Stator: 3φ<br/>Rotor: PM/Cage"]
+    
+    QuadEnc -->|"A/B/Z"| Encoder
+    Shunt -->|V_shunt| ADC
+    PWM -->|"PWM_A/B/C"| Inverter
+    Inverter -->|"Phase U/V/W"| Motor
 ```
 
 The computational burden of FOC at 20 kHz PWM frequency imposes stringent real-time requirements on the microcontroller. A complete control cycle—reading ADC samples, executing Clarke and Park transforms, running PI controllers, performing inverse Park and SVM, and updating PWM compare registers—must complete within 50 microseconds. On an ARM Cortex-M4 clocked at 168 MHz, the Clarke and Park transforms consume approximately 1 microsecond when implemented with floating-point arithmetic (leveraging the FPU), while the two PI controllers (one for $i_d$, one for $i_q$) each require 0.5 microseconds. The inverse Park and SVM operations add another 2 microseconds, and ADC readout plus peripheral updates consume 1 microsecond, totaling 5 microseconds of core algorithm execution. This leaves substantial margin for higher-level speed controllers, communication protocol handlers, and safety monitoring tasks, but the architecture demands careful interrupt prioritization to prevent lower-priority tasks from preempting the time-critical current control interrupt service routine (ISR).

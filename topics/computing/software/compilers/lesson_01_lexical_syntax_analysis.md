@@ -455,23 +455,38 @@ The anatomy of the LR automaton for even a small grammar is best understood thro
 
 and the input `id + id * id`, the LR(1) parse proceeds as follows:
 
-```
-Stack (states)    Symbol Stack       Input Remaining      Action
-─────────────────────────────────────────────────────────────────────
-[0]               []                 id + id * id $       Shift id → state 5
-[0, 5]            [id]               + id * id $          Reduce F → id  (rule 6)
-[0, 3]            [F]                + id * id $          Reduce T → F   (rule 4)
-[0, 2]            [T]                + id * id $          Reduce E → T   (rule 2)
-[0, 1]            [E]                + id * id $          Shift + → state 6
-[0, 1, 6]         [E, +]             id * id $            Shift id → state 5
-[0, 1, 6, 5]      [E, +, id]         * id $               Reduce F → id  (rule 6)
-[0, 1, 6, 3]      [E, +, F]          * id $               Reduce T → F   (rule 4)
-[0, 1, 6, 9]      [E, +, T]          * id $               Shift * → state 7
-[0, 1, 6, 9, 7]   [E, +, T, *]       id $                 Shift id → state 5
-[0, 1, 6, 9, 7,5] [E, +, T, *, id]   $                    Reduce F → id  (rule 6)
-[0, 1, 6, 9, 7,10][E, +, T, *, F]    $                    Reduce T → T*F (rule 3)
-[0, 1, 6, 9]      [E, +, T]          $                    Reduce E → E+T (rule 1)
-[0, 1]            [E]                $                    Accept
+```mermaid
+flowchart TD
+    Start(["Start: [0]<br/>[] | id + id * id $"])
+    S1(["[0, 5]<br/>[id] | + id * id $<br/>Shift id → state 5"])
+    S2(["[0, 3]<br/>[F] | + id * id $<br/>Reduce F → id (rule 6)"])
+    S3(["[0, 2]<br/>[T] | + id * id $<br/>Reduce T → F (rule 4)"])
+    S4(["[0, 1]<br/>[E] | + id * id $<br/>Reduce E → T (rule 2)"])
+    S5(["[0, 1, 6]<br/>[E, +] | id * id $<br/>Shift + → state 6"])
+    S6(["[0, 1, 6, 5]<br/>[E, +, id] | * id $<br/>Shift id → state 5"])
+    S7(["[0, 1, 6, 3]<br/>[E, +, F] | * id $<br/>Reduce F → id (rule 6)"])
+    S8(["[0, 1, 6, 9]<br/>[E, +, T] | * id $<br/>Reduce T → F (rule 4)"])
+    S9(["[0, 1, 6, 9, 7]<br/>[E, +, T, *] | id $<br/>Shift * → state 7"])
+    S10(["[0, 1, 6, 9, 7, 5]<br/>[E, +, T, *, id] | $<br/>Shift id → state 5"])
+    S11(["[0, 1, 6, 9, 7, 10]<br/>[E, +, T, *, F] | $<br/>Reduce F → id (rule 6)"])
+    S12(["[0, 1, 6, 9]<br/>[E, +, T] | $<br/>Reduce T → T*F (rule 3)"])
+    S13(["[0, 1]<br/>[E] | $<br/>Reduce E → E+T (rule 1)"])
+    End(["Accept"])
+
+    Start --> S1
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 --> S5
+    S5 --> S6
+    S6 --> S7
+    S7 --> S8
+    S8 --> S9
+    S9 --> S10
+    S10 --> S11
+    S11 --> S12
+    S12 --> S13
+    S13 --> End
 ```
 
 Notice how the LR automaton correctly handles left recursion in rule (1) and enforces `*` over `+` precedence through the state machine's deferred reduce decisions, without any special-case precedence annotations. The grammar's structure encodes precedence directly.

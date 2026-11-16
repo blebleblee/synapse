@@ -30,7 +30,7 @@ The Spanish trill /r/ and tap /ɾ/ constitute the most challenging articulatory 
 
 Tackle the intervocalic lenition process that converts underlying voiced stops /b d g/ into fricatives [β ð ɣ] between vowels. This allophonic alternation is phonologically conditioned, not orthographically marked, and failure to produce it signals non-native status immediately. Record minimal triplet pairs: "tubo" [ˈtu.βo] (tube) versus "tuvo" [ˈtu.βo] (he/she had), where orthographic 'b' and 'v' both surface as bilabial fricative [β]; "cada" [ˈka.ða] (each) where intervocalic 'd' becomes interdental fricative [ð]; "haga" [ˈa.ɣa] (do-subjunctive) where intervocalic 'g' becomes velar fricative [ɣ]. Drill by alternating stop and fricative realizations: produce "un beso" [um.ˈbe.so] (a kiss) where /b/ surfaces as stop after nasal, then "el beso" [el.ˈβe.so] (the kiss) where /b/ surfaces as fricative after vowel. Verify fricative quality by placing fingers lightly on lips for [β], under chin for [ð], and on throat for [ɣ]; you should feel continuous airflow without complete closure. If you produce full stops intervocalically, slow speech rate to 2 syllables per second and consciously prevent full articulatory closure, maintaining a 2-3 millimeter aperture for frication.
 
-Execute the following hundred-repetition drill protocol. Construct a spreadsheet with five columns: target word, phonetic transcription, your recorded production filename, deviation notes, and iteration count to accurate production. Populate fifty target words emphasizing problematic contrasts: /r/ versus /ɾ/ (caro/carro, pero/perro), dental versus alveolar articulation (tú/two, dos/dose), pure vowels versus English diphthongs (no/know, se/say). Record each word in isolation, embed it in a carrier phrase ("Digo ___ claramente" - I say ___ clearly), then record in spontaneous sentence generation. Analyze each recording in Praat: measure VOT for voiceless stops (target 10-20ms), formant values for vowels (verify within ±10% of target), and tap/trill duration (tap <30ms, trill 60-150ms with 2-5 contacts). Log deviations and execute remediation: if VOT is excessive, drill unaspirated stops using the tissue test; if vowels are off-target, adjust jaw and tongue posture and re-record; if trill fails, execute /dɾi/-sequence ladder for fifty iterations. Repeat until 95% of productions fall within native tolerance ranges.
+Execute the following hundred-repetition drill protocol. Construct a spreadsheet with five columns: target word, phonetic transcription, your recorded production filename, deviation notes, and iteration count to accurate production. Populate fifty target words emphasizing problematic contrasts: /r/ versus /ɾ/ (caro/carro, pero/perro), dental versus alveolar articulation (tú/two, dos/dose), pure vowels versus English diphthongs (no/know, se/say). Record each word in isolation, embed it in a carrier phrase ("Digo ___ claramente" - I say ___ clearly), then record in spontaneous sentence generation. Analyze each recording in Praat: measure VOT for voiceless stops (target 10-20ms), formant values for vowels (verify within ±10% of target), and tap/trill duration (tap < 30ms, trill 60-150ms with 2-5 contacts). Log deviations and execute remediation: if VOT is excessive, drill unaspirated stops using the tissue test; if vowels are off-target, adjust jaw and tongue posture and re-record; if trill fails, execute /dɾi/-sequence ladder for fifty iterations. Repeat until 95% of productions fall within native tolerance ranges.
 
 ### Subsystem B: Ser/Estar Ontological Discrimination
 
@@ -196,33 +196,33 @@ Execute complete phonological inventory audit quarterly. Use this checklist to v
 - /a/ F1=700Hz F2=1200Hz: Record isolated vowel, measure formants in Praat, verify jaw aperture is three-finger-width vertical.
 - /e/ F1=400Hz F2=2000Hz: Verify tongue front is raised, no diphthongization to [eɪ] as in English "say."
 - /i/ F1=250Hz F2=2300Hz: Verify tongue body is fully fronted and raised, lips spread.
-- /o/ F1=400Hz F2=800Hz: Verify lip rounding is tight (aperture <1cm), no diphthongization to [oʊ].
+- /o/ F1=400Hz F2=800Hz: Verify lip rounding is tight (aperture < 1cm), no diphthongization to [oʊ].
 - /u/ F1=300Hz F2=700Hz: Verify extreme lip protrusion, tongue fully retracted and raised.
 
 **Consonant Verification (Target: 95% accurate placement and VOT):**
 - Dental /t d n l/: Verify tongue-tip contacts upper incisors, visible in mirror. VOT for /t/ under 30ms.
-- Tap /ɾ/: Single tongue-tip contact, duration <30ms. Test in *pero, caro, ahora*.
+- Tap /ɾ/: Single tongue-tip contact, duration < 30ms. Test in *pero, caro, ahora*.
 - Trill /r/: 2-5 contacts, duration 60-150ms. Test in *perro, rosa, alrededor*. 80% success rate required.
 - Intervocalic lenition /b d g/ → [β ð ɣ]: Verify fricative airflow without closure in *la boca, cada uno, el agua*.
 - Velar fricative /x/: Verify dorsal-velar articulation in *ojo, gente, México*. Avoid glottal [h] substitution.
 
 **Prosodic Verification:**
-- Syllable-timed rhythm: Record 30-second passage, measure inter-syllable intervals. Coefficient of variation should be <25% (English is typically >40%).
+- Syllable-timed rhythm: Record 30-second passage, measure inter-syllable intervals. Coefficient of variation should be < 25% (English is typically >40%).
 - Intonation: Yes/no questions require sustained high pitch across entire final word (¿Quieres café? - final rise begins on *ca-*, not just *-fé*). Record and verify F0 contour maintains 150-200 Hz pitch elevation for entire final word.
 
 ### Morphological Automation Diagnostic
 
 **Conjugation Speed Test (Execute monthly):**
-- Regular verbs: 50 randomized prompts (infinitive+person+tense), target mean latency <600ms, accuracy >98%.
-- High-frequency irregulars (ser, estar, tener, hacer, ir, poder, poner, saber, venir, decir): 50 prompts, target mean latency <900ms, accuracy >95%.
-- Low-frequency irregulars: 50 prompts, target mean latency <1500ms, accuracy >90%.
+- Regular verbs: 50 randomized prompts (infinitive+person+tense), target mean latency < 600ms, accuracy >98%.
+- High-frequency irregulars (ser, estar, tener, hacer, ir, poder, poner, saber, venir, decir): 50 prompts, target mean latency < 900ms, accuracy >95%.
+- Low-frequency irregulars: 50 prompts, target mean latency < 1500ms, accuracy >90%.
 
 **Ser/Estar Discrimination (Execute biweekly):**
-- 100 forced-choice contextualized sentences, randomized presentation, target accuracy >95%, mean latency <1200ms.
+- 100 forced-choice contextualized sentences, randomized presentation, target accuracy >95%, mean latency < 1200ms.
 - 20 minimal-pair adjective sentences (ser listo/estar listo, etc.), target accuracy 100%.
 
 **Preterite/Imperfect Aspectual Control (Execute monthly):**
-- Narrative production: 5-minute autobiographical story, transcribe, count aspectual errors. Target: <5%.
+- Narrative production: 5-minute autobiographical story, transcribe, count aspectual errors. Target: < 5%.
 - 50 forced-choice sentences requiring aspectual discrimination, target accuracy >92%.
 
 ### Dialectal Competence Assessment
@@ -238,22 +238,22 @@ Execute complete phonological inventory audit quarterly. Use this checklist to v
 ### Communicative Stress Recovery Metrics
 
 **Cognitive Load Performance:**
-- Morphological accuracy under dual-task load should degrade <5 percentage points from baseline.
+- Morphological accuracy under dual-task load should degrade < 5 percentage points from baseline.
 - Self-correction rate should exceed 30% in spontaneous production.
-- Topic-switching error rate should remain <5 errors per 100 words.
+- Topic-switching error rate should remain < 5 errors per 100 words.
 
 **Comprehension Boundary:**
-- Shadow native-speed authentic content with <10% failure rate.
+- Shadow native-speed authentic content with < 10% failure rate.
 - Successful communicative repair rate >80% when comprehension breakdown is simulated.
 - Maintain Spanish-only communication despite lexical gaps (zero code-switching) in 10-minute technical discussion.
 
 ### Remediation Decision Tree
 
-**If phonological accuracy is <90%:** Return to Exercise 1 Subsystem A, execute hundred-repetition drills on problematic phonemes, increase daily practice to 30 minutes focused exclusively on articulatory precision.
+**If phonological accuracy is < 90%:** Return to Exercise 1 Subsystem A, execute hundred-repetition drills on problematic phonemes, increase daily practice to 30 minutes focused exclusively on articulatory precision.
 
 **If morphological latency exceeds targets by >50%:** Forms are not proceduralized. Execute massed practice: 200 repetitions of high-error forms in single session daily until latency criteria met.
 
-**If ser/estar accuracy is <95%:** Semantic features not internalized. Construct semantic feature matrix (permanent/transient, inherent/resultant, etc.), drill 50 contrastive sentence pairs daily, verify with native speaker.
+**If ser/estar accuracy is < 95%:** Semantic features not internalized. Construct semantic feature matrix (permanent/transient, inherent/resultant, etc.), drill 50 contrastive sentence pairs daily, verify with native speaker.
 
 **If preterite/imperfect errors exceed 5%:** Aspectual semantics not automatized. Analyze error types: if confusing punctual/habitual, drill temporal adverbs (ayer/cada día) with forced aspect selection; if confusing bounded/unbounded, drill duration-marked contexts (dos años with preterite, cuando clauses with imperfect).
 

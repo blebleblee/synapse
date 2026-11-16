@@ -40,51 +40,23 @@ The integration of packet capture, protocol parsing, signature matching, and beh
 
 The following diagram illustrates the data flow through a network security monitoring architecture, from packet capture through protocol parsing and signature matching to log aggregation and alert generation:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Network Traffic                          │
-│                   (Switched/Tapped Segments)                    │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             │ SPAN/TAP/Inline
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                  Packet Capture Interface                       │
-│         (AF_PACKET, DPDK, PF_RING, Zero-Copy RX)               │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             │ DMA Transfer
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   Protocol Stack Parser                         │
-│   Ethernet → IP → TCP/UDP → HTTP/DNS/TLS/SMB/...               │
-│   (Fragmentation Reassembly, Stream Reconstruction)            │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                    ┌────────┴────────┐
-                    ▼                 ▼
-┌──────────────────────────┐  ┌──────────────────────────┐
-│  Signature Engine        │  │  Behavioral Analyzer     │
-│  (Suricata Rules)        │  │  (Zeek Scripts)          │
-│  Pattern Matching        │  │  Anomaly Detection       │
-│  Exploit Detection       │  │  Threshold Logic         │
-└──────────┬───────────────┘  └──────────┬───────────────┘
-           │                              │
-           │                              │
-           └──────────┬───────────────────┘
-                      ▼
-┌─────────────────────────────────────────────────────────────────┐
-│               Alert & Log Aggregation Layer                     │
-│   (Alerts, Protocol Logs, Flow Records, PCAP Extracts)         │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             │ JSON/Syslog/Database
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              SIEM / NSM Platform                                │
-│   (Elasticsearch, Splunk, Chronicle, Arkime)                   │
-│   Indexing, Correlation, Visualization, Threat Hunting         │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Network Traffic<br/>(Switched/Tapped Segments)"]
+    B["Packet Capture Interface<br/>(AF_PACKET, DPDK, PF_RING, Zero-Copy RX)"]
+    C["Protocol Stack Parser<br/>Ethernet → IP → TCP/UDP → HTTP/DNS/TLS/SMB/...<br/>(Fragmentation Reassembly, Stream Reconstruction)"]
+    D["Signature Engine<br/>(Suricata Rules)<br/>Pattern Matching<br/>Exploit Detection"]
+    E["Behavioral Analyzer<br/>(Zeek Scripts)<br/>Anomaly Detection<br/>Threshold Logic"]
+    F["Alert & Log Aggregation Layer<br/>(Alerts, Protocol Logs, Flow Records, PCAP Extracts)"]
+    G["SIEM / NSM Platform<br/>(Elasticsearch, Splunk, Chronicle, Arkime)<br/>Indexing, Correlation, Visualization, Threat Hunting"]
+    
+    A -->|"SPAN/TAP/Inline"| B
+    B -->|"DMA Transfer"| C
+    C --> D
+    C --> E
+    D --> F
+    E --> F
+    F -->|"JSON/Syslog/Database"| G
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

@@ -79,49 +79,79 @@ Single-qubit operations in trapped ion systems exploit laser-driven transitions 
 
 Two-qubit entangling gates in trapped ion systems leverage the Mølmer-Sørensen interaction, which couples internal qubit states to shared motional modes of the ion crystal. The protocol applies bichromatic laser beams with frequencies ω_L detuned from the motional sideband frequencies ω_q ± ω_m by a small detuning δ, where ω_q is the qubit frequency and ω_m is a collective motional mode frequency. The effective interaction Hamiltonian after adiabatic elimination of the motional mode becomes H_MS = ℏΩ²/(4δ) · (σ_x^(1) ⊗ σ_x^(2)) where Ω is the Rabi frequency and σ_x^(i) are Pauli operators for ions i=1,2. Running this interaction for time t = π/(2Ω²/(4δ)) generates a maximally entangling XX(π/2) gate, which combined with single-qubit rotations constructs a universal gate set. Typical Mølmer-Sørensen gates require 50-200 microseconds to complete with fidelities in the 99-99.9% range, with error sources including off-resonant coupling to spectator modes, fluctuating mode frequencies from electric field noise, and imperfect cancellation of geometric phases.
 
-```
-Trapped Ion Architecture (Linear Paul Trap):
+```mermaid
+flowchart TD
+    subgraph lasers ["Laser Beams (369 nm · 399 nm · 935 nm for Yb⁺)"]
+        L1["369 nm"]
+        L2["399 nm"]
+        L3["935 nm"]
+    end
 
-         Laser Beams (369 nm, 399 nm, 935 nm for Yb⁺)
-              ↓       ↓       ↓
-    ┌─────────────────────────────────────┐
-    │                                     │
-    │   ┌───┐     ┌───┐     ┌───┐       │  RF Electrode
-    │   │ + │ ... │ + │ ... │ + │       │  (~10 MHz, ~500 V)
-    │   └───┘     └───┘     └───┘       │
-    │     ↑         ↑         ↑         │
-    │     Ion       Ion       Ion       │  (⁴⁰Ca⁺, ¹⁷¹Yb⁺, etc.)
-    │     ↓         ↓         ↓         │
-    │   ┌───┐     ┌───┐     ┌───┐       │
-    │   │ - │ ... │ - │ ... │ - │       │  DC Electrodes
-    │   └───┘     └───┘     └───┘       │  (Axial Confinement)
-    │                                     │
-    └─────────────────────────────────────┘
-                    ↓
-         Photomultiplier Tube (PMT)
-         / EMCCD Camera (State Readout)
+    subgraph trap ["Linear Paul Trap"]
+        subgraph rf ["RF Electrode (~10 MHz, ~500 V)"]
+            RF1["＋"]
+            RF2["＋"]
+            RF3["＋"]
+        end
 
-Motional Mode Structure (3-Ion Chain):
+        subgraph ions ["Ion Chain (⁴⁰Ca⁺ / ¹⁷¹Yb⁺)"]
+            I1["Ion 1"]
+            I2["Ion 2"]
+            I3["Ion 3"]
+        end
 
-    ω_z (Axial Modes):         Frequency
-    
-    Center-of-Mass:  ↔ ↔ ↔    ω_COM = ω₀
-    
-    Breathing:       ↔   ↔    ω_breath = √3 · ω₀
-                       ↔
-    
-    Rocking:         ↔     ↔  ω_rock = √5 · ω₀
-                         ↔
+        subgraph dc ["DC Electrodes (Axial Confinement)"]
+            DC1["－"]
+            DC2["－"]
+            DC3["－"]
+        end
+    end
 
-Two-Qubit Gate (Mølmer-Sørensen):
+    subgraph readout ["State Readout"]
+        PMT["Photomultiplier Tube (PMT)"]
+        CAM["EMCCD Camera"]
+    end
 
-    Laser_1: ω_L = ω_q - ω_m - δ  (Red Sideband)
-    Laser_2: ω_L = ω_q + ω_m + δ  (Blue Sideband)
-    
-    Interaction: H_eff ∝ (σ_x^(1) ⊗ σ_x^(2)) · (b† + b)²
-    
-    After time t = π·δ/(2Ω²):
-    |00⟩ → 1/√2(|00⟩ - i|11⟩)  (Bell State)
+    subgraph modes ["Motional Mode Structure — 3-Ion Chain"]
+        COM["Center-of-Mass\nω_COM = ω₀\n↔ ↔ ↔  (in phase)"]
+        BREATH["Breathing Mode\nω_breath = √3 · ω₀\n↔  ·  ↔  (outer ions out-of-phase with centre)"]
+        ROCK["Rocking Mode\nω_rock = √5 · ω₀\n↔  ·  ·  ↔  (end ions only)"]
+    end
+
+    subgraph msgate ["Mølmer–Sørensen Two-Qubit Gate"]
+        RB["Red Sideband\nω_L = ω_q − ω_m − δ"]
+        BB["Blue Sideband\nω_L = ω_q + ω_m + δ"]
+        HINT["Effective Hamiltonian\nH_eff ∝ (σₓ⁽¹⁾ ⊗ σₓ⁽²⁾)·(b† + b)²"]
+        BELL["Bell State (t = πδ / 2Ω²)\n|00⟩ → 1/√2 (|00⟩ − i|11⟩)"]
+    end
+
+    L1 --> RF1
+    L2 --> RF2
+    L3 --> RF3
+
+    RF1 --> I1
+    RF2 --> I2
+    RF3 --> I3
+
+    I1 --> DC1
+    I2 --> DC2
+    I3 --> DC3
+
+    DC1 --> PMT
+    DC2 --> PMT
+    DC3 --> PMT
+    PMT --> CAM
+
+    I1 & I2 & I3 --> COM
+    COM --> BREATH
+    BREATH --> ROCK
+
+    RB --> HINT
+    BB --> HINT
+    HINT --> BELL
+
+    I1 & I2 --> RB
+    I1 & I2 --> BB
 ```
 
 Photonic quantum computing platforms encode quantum information in discrete photon number states, polarization degrees of freedom, or continuous-variable quadratures of optical modes propagating through integrated photonic circuits or free-space optics. Single photons prepared in specific spatial modes, polarizations, or time bins serve as flying qubits with excellent coherence properties—photons do not decohere through thermalization at room temperature and travel at light speed enabling rapid gate operations—but confront fundamental obstacles in implementing deterministic two-photon gates due to the bosonic commutation relations of electromagnetic field operators. The absence of direct photon-photon interaction in linear optical media necessitates measurement-induced nonlinearity protocols where auxiliary photons undergo detection and postselection conditions herald successful entangling operations, introducing probabilistic gate success and scalability bottlenecks.
@@ -132,57 +162,48 @@ Continuous-variable photonic platforms encode quantum information in the quadrat
 
 Silicon photonics implementations integrate waveguides, beam splitters, phase shifters, and tunable Mach-Zehnder interferometers on CMOS-compatible silicon-on-insulator substrates, offering a pathway to mass-manufactured quantum photonic processors leveraging the semiconductor industry's fabrication capabilities. Photon pair sources based on spontaneous four-wave mixing in silicon waveguides or integrated III-V semiconductor quantum dots bonded to silicon provide on-chip photon generation, while superconducting nanowire single-photon detectors (SNSPDs) wirebonded to photonic chips deliver detection efficiencies exceeding 90% with timing jitter below 50 picoseconds. Thermo-optic phase shifters consuming milliwatts of power enable reconfigurable circuit topologies by tuning local refractive indices through resistive heating, though thermal crosstalk between adjacent components necessitates careful thermal isolation engineering. Current silicon photonic processors demonstrate 10-20 qubit computations with gate fidelities in the 95-99% range, fundamentally limited by photon loss (typically 0.1-1 dB/cm propagation loss plus 0.1-0.5 dB/facet coupling loss), modal mismatch reducing photon indistinguishability, and phase instabilities from thermal drift requiring active stabilization feedback loops.
 
-```
-Photonic Quantum Computing Architectures:
-
-Discrete Variable (Single Photon):
-
-                   Polarization Encoding
-    |H⟩ ≡ |0⟩ (Horizontal)  
-    |V⟩ ≡ |1⟩ (Vertical)
+```mermaid
+flowchart TD
+    A["Photonic Quantum Computing Architectures"]
     
-    Linear Optics Elements:
+    A --> B["Discrete Variable<br/>Single Photon"]
+    A --> C["Continuous Variable"]
+    A --> D["Silicon Photonic<br/>Chip Layout"]
     
-    Beam Splitter:  ────┬────    U_BS = 1/√2 [1   i]
-                        │                   [i   1]
-                    ────┴────
+    B --> B1["Polarization Encoding"]
+    B1 --> B1a["|H⟩ ≡ |0⟩ Horizontal<br/>|V⟩ ≡ |1⟩ Vertical"]
     
-    Phase Shifter:  ───[ϕ]───   U_PS = [1      0   ]
-                                        [0   e^(iϕ)]
-
-Continuous Variable:
-
-    Quadrature Encoding:
+    B --> B2["Linear Optics Elements"]
+    B2 --> B2a["Beam Splitter<br/>U_BS = 1/√2 [1 i; i 1]"]
+    B2 --> B2b["Phase Shifter<br/>U_PS = [1 0; 0 e^iϕ]"]
     
-    |ψ⟩ = ∫ ψ(x) |x⟩ dx    (Position Basis)
+    C --> C1["Quadrature Encoding<br/>|ψ⟩ = ∫ ψ(x)|x⟩ dx"]
     
-    Gaussian Operations:
-    • Displacement: D(α) = exp(αa† - α*a)
-    • Squeezing: S(ξ) = exp[½(ξ*a² - ξa†²)]
-    • Beam Splitter: B(θ) couples modes
+    C --> C2["Gaussian Operations"]
+    C2 --> C2a["Displacement: D(α)"]
+    C2 --> C2b["Squeezing: S(ξ)"]
+    C2 --> C2c["Beam Splitter: B(θ)"]
     
-    Non-Gaussian (Required for Universality):
-    • Photon Counting: Projects onto Fock states |n⟩
-    • Kerr Nonlinearity: H = χ(a†a)²
-
-Silicon Photonic Chip Layout:
-
-    Laser Input → Grating Coupler → Waveguide Array
-                                   ↓
-                  ┌────────────────────────────┐
-                  │  Mach-Zehnder Array        │
-                  │  (Reconfigurable Gates)    │
-                  │  ┌──┐  ┌──┐  ┌──┐         │
-                  │  │PS│→│BS│→│PS│  (Phase/BS)│
-                  │  └──┘  └──┘  └──┘         │
-                  └────────────────────────────┘
-                                   ↓
-                  ┌────────────────────────────┐
-                  │  Detector Array (SNSPD)    │
-                  │  [●] [●] [●] [●] [●]       │
-                  └────────────────────────────┘
-                                   ↓
-                  FPGA Processing / Postselection
+    C --> C3["Non-Gaussian Operations<br/>Required for Universality"]
+    C3 --> C3a["Photon Counting<br/>Projects onto |n⟩"]
+    C3 --> C3b["Kerr Nonlinearity<br/>H = χ(a†a)²"]
+    
+    D --> D1["Laser Input"]
+    D1 --> D2["Grating Coupler"]
+    D2 --> D3["Waveguide Array"]
+    
+    D3 --> D4["Mach-Zehnder Array<br/>Reconfigurable Gates"]
+    
+    subgraph MZ ["Phase/Beam Splitter Stages"]
+        D4a["Phase Shifter"]
+        D4b["Beam Splitter"]
+        D4c["Phase Shifter"]
+        D4a --> D4b --> D4c
+    end
+    
+    D4 --> MZ
+    MZ --> D5["Detector Array<br/>SNSPD"]
+    D5 --> D6["FPGA Processing<br/>Postselection"]
 ```
 
 Topological quantum computing represents a radically different architectural paradigm where quantum information encodes in global topological properties of exotic many-body quantum states rather than local degrees of freedom of individual particles. The prototypical platform seeks non-abelian anyons—quasiparticle excitations in two-dimensional topological phases of matter whose exchange statistics obey non-commutative braiding algebra—with the most experimentally pursued candidate being Majorana zero modes (MZMs) emerging at the ends of one-dimensional topological superconductor nanowires or interfaces. A single computational qubit corresponds to the joint parity state of multiple spatially separated Majorana modes, with quantum gates implemented through adiabatic braiding operations that physically transport anyons around one another in real space. The topological nature of this encoding provides intrinsic protection against local perturbations: any decoherence mechanism must globally perturb the system over length scales comparable to the anyon separation to induce logical errors, exponentially suppressing error rates as the separation increases.

@@ -20,55 +20,26 @@ Moisture is the silent partner in almost every residential structural failure. W
 
 The overwhelming majority of residential construction built after 1940 in North America uses platform framing, in which each floor is built as a complete platform before the walls of the next story are erected on top of it. Understanding this system in mechanical detail is prerequisite to any structural repair work.
 
-```
-                    ┌──────────────────────────────────┐
-                    │         ROOF ASSEMBLY            │
-                    │  Ridge Board / LVL Ridge Beam    │
-                    │  Rafters or Engineered Trusses   │
-                    └────────────┬─────────────────────┘
-                                 │ compression / thrust
-                    ┌────────────▼─────────────────────┐
-                    │       TOP PLATE (doubled)        │
-                    │  load distribution / lateral tie │
-                    └────────────┬─────────────────────┘
-                                 │
-              ┌──────────────────▼──────────────────────┐
-              │            WALL STUDS                   │
-              │   16" or 24" o.c., compression members  │
-              │   Sheathing provides shear resistance   │
-              └──────────────────┬──────────────────────┘
-                                 │
-                    ┌────────────▼─────────────────────┐
-                    │       BOTTOM PLATE               │
-                    │   transfers stud load to floor   │
-                    └────────────┬─────────────────────┘
-                                 │
-              ┌──────────────────▼──────────────────────┐
-              │            RIM JOIST                   │
-              │   perimeter band, shear + uplift tie   │
-              │                                        │
-              │   FLOOR JOISTS  ═══════════════════╗  │
-              │   bending members (tension bottom,  ║  │
-              │   compression top, shear web)       ║  │
-              └─────────────────────────────────────╫──┘
-                                                    ║
-              ┌─────────────────────────────────────╩──┐
-              │            SILL PLATE                  │
-              │   anchor bolted to foundation wall     │
-              │   primary moisture / decay risk zone   │
-              └────────────────────────────────────────┘
-                                 │
-              ┌──────────────────▼──────────────────────┐
-              │        FOUNDATION WALL                  │
-              │   poured concrete or CMU block          │
-              │   lateral soil pressure resistance      │
-              └──────────────────┬──────────────────────┘
-                                 │
-              ┌──────────────────▼──────────────────────┐
-              │            FOOTING                     │
-              │   spreads load over bearing area       │
-              │   below frost line                     │
-              └────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["ROOF ASSEMBLY<br/>Ridge Board / LVL Ridge Beam<br/>Rafters or Engineered Trusses"]
+    B["TOP PLATE (doubled)<br/>load distribution / lateral tie"]
+    C["WALL STUDS<br/>16&quot; or 24&quot; o.c., compression members<br/>Sheathing provides shear resistance"]
+    D["BOTTOM PLATE<br/>transfers stud load to floor"]
+    E["RIM JOIST<br/>perimeter band, shear + uplift tie"]
+    F["FLOOR JOISTS<br/>bending members (tension bottom,<br/>compression top, shear web)"]
+    G["SILL PLATE<br/>anchor bolted to foundation wall<br/>primary moisture / decay risk zone"]
+    H["FOUNDATION WALL<br/>poured concrete or CMU block<br/>lateral soil pressure resistance"]
+    I["FOOTING<br/>spreads load over bearing area<br/>below frost line"]
+    
+    A -->|"compression / thrust"| B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
 ```
 
 Each transition in this diagram is a connection point, and connection points are where structural failures initiate in the vast majority of cases. The sill-to-foundation connection fails when anchor bolts corrode or were never installed with adequate embedment. The joist-to-rim connection fails when rim joist decay allows the floor system to drop off its bearing. The stud-to-top-plate connection fails under seismic or wind uplift when toe-nail fastening alone is insufficient and hurricane ties were omitted.

@@ -146,22 +146,38 @@ The Vibe Coding problem space is bounded by four fundamental axes. These axes ar
 **Axis 4 — Verification Tractability.** How easily can the human verify correctness? A 10-line pure function with no side effects is trivially verifiable by reading. A 500-line module with side effects, database interactions, concurrent goroutines, and external service calls is not. The human's cognitive load on the verification step is a hard constraint on the viability of any single Vibe Coding session. This axis is often underestimated: generation is fast and cheap; rigorous human review is slow and expensive.
 
 ```mermaid
-quadrantChart
-    title Vibe Coding Viability by Task Type
-    x-axis Low Specification Completeness --> High Specification Completeness
-    y-axis High Task Novelty --> Low Task Novelty
-    quadrant-1 "High Risk: Refine prompt or decompose"
-    quadrant-2 "Optimal Zone: High confidence generation"
-    quadrant-3 "Danger Zone: Unpredictable, prefer manual"
-    quadrant-4 "Moderate Risk: Novel but well-specified"
-    "CRUD endpoint": [0.82, 0.88]
-    "JWT auth flow": [0.76, 0.76]
-    "Novel compression algo": [0.65, 0.18]
-    "Vague refactor request": [0.14, 0.60]
-    "Regex from description": [0.72, 0.92]
-    "Custom LLVM pass": [0.54, 0.09]
-    "aiohttp concurrent fetch": [0.78, 0.80]
-    "CRDT merge logic": [0.60, 0.22]
+flowchart TD
+    subgraph legend[" "]
+        direction LR
+        xaxis["← Low Specification Completeness | High Specification Completeness →"]
+        yaxis["↑ High Task Novelty | Low Task Novelty ↓"]
+    end
+    
+    subgraph q3["Danger Zone: Unpredictable, prefer manual"]
+        vague["Vague refactor request<br/>(0.14, 0.60)"]
+    end
+    
+    subgraph q4["Moderate Risk: Novel but well-specified"]
+        novel["Novel compression algo<br/>(0.65, 0.18)"]
+        llvm["Custom LLVM pass<br/>(0.54, 0.09)"]
+        crdt["CRDT merge logic<br/>(0.60, 0.22)"]
+    end
+    
+    subgraph q2["Optimal Zone: High confidence generation"]
+        crud["CRUD endpoint<br/>(0.82, 0.88)"]
+        jwt["JWT auth flow<br/>(0.76, 0.76)"]
+        regex["Regex from description<br/>(0.72, 0.92)"]
+        aiohttp["aiohttp concurrent fetch<br/>(0.78, 0.80)"]
+    end
+    
+    subgraph q1["High Risk: Refine prompt or decompose"]
+    end
+    
+    style q3 fill:#ff9999
+    style q4 fill:#ffeb99
+    style q2 fill:#99ff99
+    style q1 fill:#ffcc99
+    style legend fill:#f0f0f0
 ```
 
 ---

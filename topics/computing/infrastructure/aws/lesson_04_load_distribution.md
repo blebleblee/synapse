@@ -50,37 +50,27 @@ Advanced routing patterns leverage ALB listener rules to implement sophisticated
 
 The internal packet flow for an ALB-forwarded HTTPS request illustrates the full request lifecycle. The client initiates a TCP three-way handshake with the ALB node, then performs a TLS handshake, presenting SNI (Server Name Indication) to select the correct certificate. The ALB decrypts the HTTP request, parses headers, evaluates routing rules, and selects a target. If connection reuse is enabled and the ALB has an existing connection to the chosen target, it writes the request over this persistent connection; otherwise, it establishes a new backend connection, potentially with TLS re-encryption if backend authentication is enabled. The backend processes the request, streams the response back to the ALB, which buffers or streams it to the client depending on the response size and content encoding. Connection keep-alive timers on both client-facing and target-facing connections determine when idle connections are closed, with typical defaults of 60 seconds for client connections and 350 seconds for backend connections.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        Client Application                            │
-└─────────────┬───────────────────────────────────────────────────────┘
-              │ HTTPS Request (TLS 1.3)
-              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                   Route 53 DNS Resolution                            │
-│  Returns A records for ALB nodes in multiple AZs                     │
-└─────────────┬───────────────────────────────────────────────────────┘
-              │ TCP SYN → ALB Node (AZ-1a)
-              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                  Application Load Balancer Node                      │
-│  ┌───────────────────────────────────────────────────────────────┐  │
-│  │  1. TLS Termination (ACM Certificate)                         │  │
-│  │  2. HTTP/2 Parsing & Validation                               │  │
-│  │  3. Routing Rule Evaluation (Priority-Ordered)                │  │
-│  │  4. Target Selection (Least Outstanding Requests)             │  │
-│  │  5. Backend Connection Pool (Keep-Alive)                      │  │
-│  └───────────────────────────────────────────────────────────────┘  │
-└─────────────┬──────────────────────────────┬────────────────────────┘
-              │                              │
-              ▼                              ▼
-    ┌──────────────────┐          ┌──────────────────┐
-    │   Target 1       │          │   Target 2       │
-    │  (EC2 Instance)  │          │  (ECS Task)      │
-    │                  │          │                  │
-    │  Health: Healthy │          │  Health: Healthy │
-    │  Active Reqs: 12 │          │  Active Reqs: 8  │ ← Selected
-    └──────────────────┘          └──────────────────┘
+```mermaid
+flowchart TD
+    client["Client Application"]
+    dns["Route 53 DNS Resolution\nReturns A records for ALB nodes in multiple AZs"]
+    
+    subgraph alb ["Application Load Balancer Node"]
+        step1["1. TLS Termination (ACM Certificate)"]
+        step2["2. HTTP/2 Parsing & Validation"]
+        step3["3. Routing Rule Evaluation (Priority-Ordered)"]
+        step4["4. Target Selection (Least Outstanding Requests)"]
+        step5["5. Backend Connection Pool (Keep-Alive)"]
+        step1 --> step2 --> step3 --> step4 --> step5
+    end
+
+    target1["Target 1 — EC2 Instance\nHealth: Healthy | Active Reqs: 12"]
+    target2["Target 2 — ECS Task\nHealth: Healthy | Active Reqs: 8  ← Selected"]
+
+    client -->|"HTTPS Request (TLS 1.3)"| dns
+    dns -->|"TCP SYN → ALB Node (AZ-1a)"| alb
+    step5 --> target1
+    step5 --> target2
 ```
 
 Network Load Balancer packet forwarding operates at a lower layer, with correspondingly lower latency and higher throughput. When a TCP SYN packet arrives at an NLB node, the node computes a hash of the flow quintuple, uses consistent hashing to select a target, and forwards the SYN with optional source IP preservation. The target responds with SYN-ACK, which the NLB forwards back to the client, completing the handshake. All subsequent packets in this flow are hashed to the same target through connection tracking, with typical per-packet latency under 100 microseconds. The NLB node maintains minimal per-flow state—just the mapping from flow tuple to target address—allowing it to handle millions of concurrent flows with minimal memory overhead.

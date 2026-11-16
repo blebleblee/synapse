@@ -18,7 +18,7 @@ Assemble the following equipment before commencing verification exercises. Each 
 - Infrared non-contact thermometer (−50°C to +550°C range, 0.1°C resolution) for bed and ambient temperature profiling
 - Analytical balance (0.01 g precision) for filament mass flow rate calculation and moisture content assessment
 - Durometer (Shore A and Shore D scales) for hardness characterization of flexible and rigid filaments
-- Desiccant dry box with hygrometer (target: <15% relative humidity) for filament storage and pre-print conditioning
+- Desiccant dry box with hygrometer (target: < 15% relative humidity) for filament storage and pre-print conditioning
 
 **Material Science Test Apparatus:**
 - Convection oven or food dehydrator (40–70°C adjustable) for hygroscopic filament drying protocols
@@ -32,7 +32,7 @@ Procure 250 g spools of the following representative filament chemistries, selec
 - **PETG (Polyethylene Terephthalate Glycol-Modified):** Amorphous copolymer, Tg ~80°C, superior impact resistance, moderate hygroscopicity
 - **ABS (Acrylonitrile Butadiene Styrene):** Amorphous terpolymer, Tg ~105°C, high thermal and chemical resistance, severe warping without enclosure
 - **TPU (Thermoplastic Polyurethane):** Flexible elastomer, Shore 95A typical, elastic recovery >90%, requires direct-drive extruder
-- **Nylon (Polyamide 6 or 6/6):** Semicrystalline engineering polymer, Tg ~50°C, melt temperature ~250–270°C, extreme hygroscopicity requiring <0.2% moisture content
+- **Nylon (Polyamide 6 or 6/6):** Semicrystalline engineering polymer, Tg ~50°C, melt temperature ~250–270°C, extreme hygroscopicity requiring < 0.2% moisture content
 
 ### Laboratory Environmental Control
 
@@ -97,7 +97,7 @@ Set hotend temperature to 260°C and heated bed to 90°C. Nylon's extreme hygros
 Slice the dimensional accuracy cube for PLA using the baseline parameters established in the laboratory setup section. Verify that the slicer generates clean, continuous perimeter paths without gaps or overlaps in the layer preview window. Export G-code and transfer to the printer via SD card or Octoprint network interface. Initiate the print sequence and observe the first layer deposition with critical attention to the following four quality indicators.
 
 **First-Layer Squish and Line Fusion:**
-The first layer must exhibit proper "squish," where the extruded line width measures 0.48–0.52 mm when deposited onto the bed (slightly wider than the commanded 0.45 mm extrusion width due to compression against the build surface). This compression ensures mechanical interlocking between the molten polymer and the microscopic texture of the PEI sheet. Insufficient squish (line width <0.45 mm) indicates excessive Z-offset, producing rounded, distinct extrusion lines that peel away from the bed. Excessive squish (line width >0.55 mm) indicates negative Z-offset, causing the nozzle to plow through deposited material and generate ripples, ridges, or nozzle dragging artifacts.
+The first layer must exhibit proper "squish," where the extruded line width measures 0.48–0.52 mm when deposited onto the bed (slightly wider than the commanded 0.45 mm extrusion width due to compression against the build surface). This compression ensures mechanical interlocking between the molten polymer and the microscopic texture of the PEI sheet. Insufficient squish (line width < 0.45 mm) indicates excessive Z-offset, producing rounded, distinct extrusion lines that peel away from the bed. Excessive squish (line width >0.55 mm) indicates negative Z-offset, causing the nozzle to plow through deposited material and generate ripples, ridges, or nozzle dragging artifacts.
 
 **First-Layer Adhesion and Corner Anchoring:**
 Within the first three perimeter loops, verify that all four corners of the cube remain firmly bonded to the build surface without lifting, curling, or peeling. Corner lifting manifests as visible gaps between the part and bed, indicating insufficient bed temperature, contaminated build surface, or excessive thermal contraction in materials with high shrinkage coefficients (ABS, nylon). If corner lifting occurs, pause the print, increase bed temperature by 5°C, clean the PEI surface with isopropanol, and restart the print from the beginning.
@@ -138,7 +138,7 @@ Fabricate the bridging and overhang benchmark specimen and perform qualitative v
 
 **Bridging Quality Scores (per span length):**
 - **Score 4 (Excellent):** Flat, smooth underside with no visible sagging, individual layer lines barely discernible, no stringing between bridge endpoints
-- **Score 3 (Good):** Slight sagging (<0.5 mm deflection at midspan), minor stringing that can be removed with finger pressure, acceptable surface finish
+- **Score 3 (Good):** Slight sagging (< 0.5 mm deflection at midspan), minor stringing that can be removed with finger pressure, acceptable surface finish
 - **Score 2 (Poor):** Visible sagging (0.5–1.0 mm deflection), heavy stringing requiring cutting tool removal, rough underside texture
 - **Score 1 (Failure):** Complete drooping collapse (>1.0 mm deflection), molten polymer sagging to build plate, bridge unusable without support structures
 
@@ -221,7 +221,7 @@ Examine the standardized regression coefficients ($\beta$ values divided by thei
 
 Fabricate vertical tensile specimens (layers perpendicular to load axis) using a reduced factorial design that explores the two most influential parameters identified in the dimensional accuracy analysis. For PLA (assuming temperature dominates), test five temperature levels (195°C, 202.5°C, 210°C, 217.5°C, 225°C) at the baseline speed and cooling settings, generating five tensile specimens. For PETG (assuming temperature and cooling interact), test a 3×3 grid (three temperatures × three cooling levels) at baseline speed, generating nine specimens.
 
-Perform tensile testing using the Exercise 1 protocol, recording ultimate tensile strength (MPa) and elongation at break (%) for each specimen. Plot strength versus temperature (or strength versus cooling, color-coded by temperature) to visualize the response surface. Identify the optimal parameter combination that maximizes tensile strength while maintaining acceptable dimensional accuracy (RMS error <0.20 mm).
+Perform tensile testing using the Exercise 1 protocol, recording ultimate tensile strength (MPa) and elongation at break (%) for each specimen. Plot strength versus temperature (or strength versus cooling, color-coded by temperature) to visualize the response surface. Identify the optimal parameter combination that maximizes tensile strength while maintaining acceptable dimensional accuracy (RMS error < 0.20 mm).
 
 **Expected PLA Response:**
 PLA tensile strength peaks near 210–215°C, declining at lower temperatures (underextrusion and poor bonding) and higher temperatures (thermal degradation). The strength-temperature curve typically exhibits a sharp optimum with 15–20% strength loss at ±15°C deviations, confirming PLA's reputation as an unforgiving material requiring precise temperature control.
@@ -245,7 +245,7 @@ Synthesize the dimensional accuracy, tensile strength, and bridging quality data
 
 | Part Geometry Class | Temperature Adjustment | Speed Adjustment | Cooling Adjustment | Rationale |
 |---|---|---|---|---|
-| Thin-walled shells (<1.5 mm) | Baseline − 5°C | Baseline − 20 mm/s | Baseline + 10% | Reduce heat accumulation, prevent warping |
+| Thin-walled shells (< 1.5 mm) | Baseline − 5°C | Baseline − 20 mm/s | Baseline + 10% | Reduce heat accumulation, prevent warping |
 | Thick structural parts (>5 mm) | Baseline + 5°C | Baseline (no change) | Baseline − 10% | Improve interlayer bonding, maximize strength |
 | Bridging-heavy models | Baseline (no change) | Baseline − 10 mm/s | Baseline + 20% | Rapid solidification prevents sagging |
 | Precision dimensional features | Baseline − 10°C | Baseline − 20 mm/s | Baseline + 10% | Minimize thermal expansion, tight tolerances |
@@ -277,7 +277,7 @@ Reduce hotend temperature to manufacturer's recommended range (200–220°C for 
 
 ### Failure Mode 2: Moisture Contamination and Steam Bubble Formation
 
-Deliberately hydrate a 50 g sample of nylon filament by exposing it to 80% relative humidity at 25°C for 48 hours in an open container, allowing moisture absorption to reach 2–4% by mass (compared to the required <0.2% for quality printing). Weigh the filament before and after exposure using the analytical balance to quantify moisture uptake.
+Deliberately hydrate a 50 g sample of nylon filament by exposing it to 80% relative humidity at 25°C for 48 hours in an open container, allowing moisture absorption to reach 2–4% by mass (compared to the required < 0.2% for quality printing). Weigh the filament before and after exposure using the analytical balance to quantify moisture uptake.
 
 **Expected Failure Signatures:**
 - Audible hissing or popping sounds during extrusion as absorbed water vaporizes into steam bubbles within the melt
@@ -303,7 +303,7 @@ Print a large-footprint ABS part (dimensional accuracy cube scaled to 60 mm × 6
 - Layer separation visible as horizontal gaps between perimeter shells, indicating interlayer delamination
 
 **Quantitative Diagnostic Test:**
-Measure corner lift height at layer 20 using a feeler gauge or depth caliper. Fabricate an identical part with proper enclosure and 100°C bed temperature as a control: corner lift should reduce to <0.3 mm. Calculate the thermal stress using the differential contraction equation:
+Measure corner lift height at layer 20 using a feeler gauge or depth caliper. Fabricate an identical part with proper enclosure and 100°C bed temperature as a control: corner lift should reduce to < 0.3 mm. Calculate the thermal stress using the differential contraction equation:
 
 $$\sigma = E \cdot \alpha \cdot \Delta T$$
 
@@ -421,7 +421,7 @@ Upon print completion, execute the following measurement and documentation seque
 Implement the following storage procedures to preserve filament quality and prevent moisture-induced degradation:
 
 **Active Use Storage (Daily Access):**
-Store currently active filament spools in heated dry box (40–45°C, <15% RH) with rechargeable silica gel desiccant packs. Route filament to printer through short (<30 cm) PTFE tube to minimize air exposure during printing.
+Store currently active filament spools in heated dry box (40–45°C, < 15% RH) with rechargeable silica gel desiccant packs. Route filament to printer through short (< 30 cm) PTFE tube to minimize air exposure during printing.
 
 **Long-Term Storage (>1 Week):**
 Vacuum-seal filament spools in heat-sealable mylar bags with 10 g silica gel desiccant pack per spool. Store sealed bags in temperature-controlled environment (15–25°C) away from UV light sources that can initiate polymer photodegradation.

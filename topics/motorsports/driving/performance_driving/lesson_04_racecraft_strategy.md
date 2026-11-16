@@ -28,31 +28,39 @@ Overtaking zones are not randomly distributed around a circuit. They follow a co
 
 The structural anatomy of an overtaking move can be decomposed into four sequential zones:
 
-```
-APPROACH        COMMITMENT      APEX            EXIT
-|===========>|==============>|==============>|=======>|
-  Speed delta    Braking point   Trajectory      Line
-  established    divergence      merge point     custody
-                 (attacker       established
-                 commits)
+```mermaid
+flowchart LR
+    A["APPROACH"] -->|"Speed delta<br/>established"| B["COMMITMENT"]
+    B -->|"Braking point<br/>divergence<br/>(attacker commits)"| C["APEX"]
+    C -->|"Trajectory<br/>merge point<br/>established"| D["EXIT"]
+    D -->|"Line<br/>custody"| E(( ))
+    
+    style E fill:#fff,stroke:#fff
 ```
 
 In the approach zone, the attacking driver is managing their slipstream position — close enough to benefit from the aerodynamic draft (reducing drag by operating in the low-pressure wake of the car ahead) but not so close that turbulent airflow over their own front wing reduces downforce enough to compromise the subsequent braking stability. At typical circuit speeds of 250–300 km/h, following within two to three car lengths in a modern aerodynamic car will cost the follower 15–25% of their front downforce due to wake turbulence. This is why drafting past the slipstream benefit point and committing to the braking zone slightly offline is frequently faster than following the racing line precisely through the approach.
 
 At the commitment point, the attacker diverges from the racing line to claim an alternative trajectory into the corner. If they are attacking at the inside, they move to the inside reference line, initiating braking from a wider position than the racing line braking point but arriving at the inside of the apex. If attacking from the outside — a rarer but legitimate tactic on circuits with wide run-off, particularly in the wet — they maintain the outer arc to maximize radius and corner speed, depending on a later apex and earlier exit acceleration rather than an outright braking advantage.
 
-```
-         RACING LINE (DEFENDER)
-         ┌──────────────────────────────────────────┐
-         │                                          │
-  STRAIGHT│                     ◄──APEX(RACING LINE)│
-         │                                          │
-         │   INSIDE LINE (ATTACKER)                 │
-         │  ┌──────────────────────────────────────►│
-         │  │       ◄──APEX(INSIDE)                 │
-         └──┘                                       │
-                                                    │
-         ════════════════════EXIT════════════════════
+```mermaid
+flowchart LR
+    subgraph racing["RACING LINE (DEFENDER)"]
+        direction LR
+        straight["STRAIGHT"]
+        apex_racing["APEX (RACING LINE)"]
+        
+        straight --> apex_racing
+    end
+    
+    subgraph inside["INSIDE LINE (ATTACKER)"]
+        direction LR
+        apex_inside["APEX (INSIDE)"]
+    end
+    
+    apex_inside --> exit["EXIT"]
+    apex_racing --> exit
+    
+    straight -.-> inside
 ```
 
 The inside line gives the attacker geometric apex priority — they own the inside of the corner — but it carries a significant cost: the inside arc is shorter and tighter, requiring a lower mid-corner speed. The defender on the outside racing line, if they survive the entry, will have a wider radius through the corner and a superior exit trajectory. This is the essential trade in most overtaking moves: the attacker wins entry and apex but frequently concedes the exit, leaving them vulnerable to being re-passed on the following straight unless they can defend the inside position through the following complex.
@@ -65,18 +73,26 @@ A tire's functional degradation follows a characteristic curve that experienced 
 
 The lap time signature of these phases is diagnostic. During the heat build phase, lap times improve by several tenths per lap as the front and rear tires come into their operating window. During the peak performance window, lap times stabilize and the driver's confidence in the car's limit behavior is highest. During the degradation plateau, times slowly worsen — typically one to three tenths per lap — as slip angles increase and the driver compensates through reduced entry speed or delayed throttle application. The cliff is identifiable by an abrupt, non-linear lap time increase of a full second or more accompanied by severe over- or understeer that the driver can no longer manage through technique alone.
 
-```
-LAP TIME
-  │
-  │          PEAK WINDOW
-  │        ┌─────────────┐
-  │       /               \          CLIFF
-  │      /                 ───────────\
-  │     /  BUILD                       \─────
-  │    /
-  │   /
-  └─────────────────────────────────────────► LAPS
-       1   3   5   7   9  11  13  15  17  19  21
+```mermaid
+flowchart LR
+    A["Lap 1\n(Baseline)"] --> B["Build Phase\n(Laps 1–5)"]
+    B --> C["Peak Window\n(Laps 5–13)"]
+    C --> D["Cliff\n(Laps 13–15)"]
+    D --> E["Degradation\n(Laps 15–21)"]
+
+    subgraph performance ["Lap Time Performance Curve"]
+        A
+        B
+        C
+        D
+        E
+    end
+
+    style A fill:#d4e6f1,stroke:#2e86c1,color:#000
+    style B fill:#a9dfbf,stroke:#1e8449,color:#000
+    style C fill:#27ae60,stroke:#1e8449,color:#fff,font-weight:bold
+    style D fill:#f0b27a,stroke:#ca6f1e,color:#000
+    style E fill:#e74c3c,stroke:#922b21,color:#fff
 ```
 
 Understanding where in this curve each tire compound sits at any given lap is the engineer's primary real-time job during a stint. This understanding draws from multiple telemetry channels simultaneously: sector time delta versus the theoretical best, minimum corner speeds through reference corners (medium-speed corners are most sensitive to lateral tire degradation), rear axle slip indicators from individual wheel speed sensor comparison, and driver voice feedback describing understeer push or oversteer rotation tendencies.

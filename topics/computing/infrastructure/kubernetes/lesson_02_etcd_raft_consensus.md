@@ -62,14 +62,25 @@ This distinction matters operationally. During a network partition, clients conn
 Every etcd node exists in exactly one of three states at any instant: **follower**, **candidate**, or **leader**. The cluster starts with all nodes as followers. Time is divided into **terms**, each identified by a monotonically increasing integer that serves as a logical clock. Terms are the mechanism for detecting stale authority: any RPC carrying a term older than the receiver's current term is rejected outright; any RPC carrying a newer term causes the receiver to update its term and unconditionally revert to follower state.
 
 ```mermaid
-stateDiagram-v2
-    direction LR
-    [*] --> Follower : boot
-    Follower --> Candidate : election timeout\n(no heartbeat received)
-    Candidate --> Candidate : split vote,\nincrement term
-    Candidate --> Leader : majority votes\nreceived
-    Candidate --> Follower : discovers leader\nwith term >= own
-    Leader --> Follower : discovers higher term\nin any RPC
+flowchart LR
+    Start([Start])
+    Follower["Follower"]
+    Candidate["Candidate"]
+    Leader["Leader"]
+    
+    Start --> Follower
+    Follower --> Candidate
+    Candidate --> Candidate
+    Candidate --> Leader
+    Candidate --> Follower
+    Leader --> Follower
+    
+    Follower -.->|"boot"| Follower
+    Follower -->|"election timeout<br/>(no heartbeat received)"| Candidate
+    Candidate -->|"split vote,<br/>increment term"| Candidate
+    Candidate -->|"majority votes<br/>received"| Leader
+    Candidate -->|"discovers leader<br/>with term >= own"| Follower
+    Leader -->|"discovers higher term<br/>in any RPC"| Follower
 ```
 
 ### Election Mechanics

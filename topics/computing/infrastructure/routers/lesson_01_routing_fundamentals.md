@@ -24,19 +24,18 @@ A router's RIB is a tree-structured database keyed on IP prefix and prefix lengt
 
 The FIB trie is a *level-compressed trie*, also called an LC-trie or Patricia trie. Each node encodes a bit position and two children, left for 0 and right for 1. A lookup traverses from the root toward the leaves, consuming one bit of the destination address per step. The critical optimization is *path compression*: runs of single-child nodes are collapsed into a single node annotated with a skip count, so a 32-bit address does not require 32 node accesses. The result is a structure where worst-case lookup depth is proportional to the logarithm of the prefix count, not the address length. For the global BGP table of roughly 900,000 IPv4 prefixes, a well-balanced trie reaches a forwarding decision in approximately 20 to 30 node comparisons.
 
-```
-FIB LC-Trie: Lookup for 10.4.17.93 (binary: 00001010.00000100.00010001.01011101)
-
-Root
- |
- [skip=4, test bit 4]
- 0 ──────────────────────────────► [10.0.0.0/8 candidate]
-                                       |
-                                   [skip=4, test bit 12]
-                                   0 ──► [10.4.0.0/16 candidate]
-                                             |
-                                         [skip=4, test bit 24]
-                                         0 ──► [10.4.17.0/24] ← LPM winner
+```mermaid
+flowchart TD
+    Root["Root"]
+    Node1["10.0.0.0/8 candidate<br/>skip=4, test bit 12"]
+    Node2["10.4.0.0/16 candidate<br/>skip=4, test bit 24"]
+    Node3["10.4.17.0/24<br/>✓ LPM winner"]
+    
+    Root -->|"skip=4, test bit 4<br/>bit=0"| Node1
+    Node1 -->|"bit=0"| Node2
+    Node2 -->|"bit=0"| Node3
+    
+    style Node3 fill:#90EE90
 ```
 
 The longest prefix match winner is not the first match found but the *deepest* match found during the traversal. The trie naturally produces this because prefix length is encoded in tree depth — a /24 node is always deeper than the /16 node that subsumes it. This is the structural reason LPM is efficient in a trie: you don't need to scan all matching entries; you just descend until no deeper match exists.
@@ -45,38 +44,30 @@ Hardware routers at the spine and edge implement LPM in TCAM (Ternary Content-Ad
 
 The following diagram shows how the control and data planes interact to produce the FIB from routing protocol input:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                     CONTROL PLANE                        │
-│                                                          │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────┐  │
-│  │  OSPF    │  │  BGP     │  │  IS-IS   │  │ Static │  │
-│  │  Process │  │  Process │  │  Process │  │ Routes │  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └───┬────┘  │
-│       │              │              │             │       │
-│       └──────────────┴──────────────┴─────────────┘       │
-│                              │                            │
-│                     ┌────────▼────────┐                  │
-│                     │      RIB        │  (all routes,     │
-│                     │  (ip route show)│   all protocols)  │
-│                     └────────┬────────┘                  │
-│                              │  AD + metric selection     │
-└──────────────────────────────┼──────────────────────────┘
-                               │  RIB → FIB download
-┌──────────────────────────────▼──────────────────────────┐
-│                      DATA PLANE                          │
-│                                                          │
-│                     ┌────────────────┐                  │
-│                     │      FIB       │  (best routes     │
-│                     │  (ip route show│   only, hw        │
-│                     │   table main)  │   programmed)     │
-│                     └────────┬───────┘                  │
-│                              │                           │
-│          ┌───────────────────▼──────────────────┐       │
-│          │        Forwarding Engine              │       │
-│          │  Packet in → LPM → (iface, next-hop)  │       │
-│          └───────────────────────────────────────┘       │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph CP["CONTROL PLANE"]
+        OSPF["OSPF\nProcess"]
+        BGP["BGP\nProcess"]
+        ISIS["IS-IS\nProcess"]
+        STATIC["Static\nRoutes"]
+
+        OSPF --> RIB
+        BGP --> RIB
+        ISIS --> RIB
+        STATIC --> RIB
+
+        RIB["RIB\n(ip route show)\nAll routes, all protocols"]
+    end
+
+    RIB -->|"AD + metric selection\nRIB → FIB download"| FIB
+
+    subgraph DP["DATA PLANE"]
+        FIB["FIB\n(ip route show table main)\nBest routes only, hw programmed"]
+        FWD["Forwarding Engine\nPacket in → LPM → (iface, next-hop)"]
+
+        FIB --> FWD
+    end
 ```
 
 ### Examining the RIB and FIB on Linux

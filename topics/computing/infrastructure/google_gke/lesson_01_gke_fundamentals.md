@@ -18,41 +18,34 @@ The primitive building blocks of Kubernetes—Pods, Services, Deployments, Confi
 
 The anatomy of a GKE cluster begins with its control plane topology, which differs fundamentally between Standard and Autopilot modes yet shares the same underlying components. Google operates the control plane on separate infrastructure from worker nodes, exposing only the API server endpoint to cluster users. This endpoint presents a standard Kubernetes API at a routable IP address, secured by TLS certificates and OAuth2 bearer tokens tied to Google Cloud IAM identities. When an infrastructure architect issues `kubectl apply -f deployment.yaml`, the kubectl binary parses the YAML, serializes it to JSON, and POSTs it to the appropriate API group endpoint—`/apis/apps/v1/namespaces/default/deployments` for a Deployment resource. The API server validates the schema, executes mutating admission webhooks to inject sidecar containers or modify security contexts, runs validating webhooks to enforce organizational policies, and finally commits the object to etcd with an incremental resource version number.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    GKE Control Plane (Google-Managed)            │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │  API Server  │  │ Controller   │  │  Scheduler   │          │
-│  │  (HA Fleet)  │  │  Manager     │  │              │          │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘          │
-│         │                 │                  │                   │
-│         └─────────────────┼──────────────────┘                   │
-│                           │                                      │
-│                    ┌──────▼───────┐                              │
-│                    │  etcd Cluster│                              │
-│                    │  (Multi-AZ)  │                              │
-│                    └──────────────┘                              │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              │ HTTPS + mTLS
-                              │
-        ┌─────────────────────┴─────────────────────┐
-        │                                           │
-┌───────▼────────┐                          ┌───────▼────────┐
-│  Worker Node 1 │                          │  Worker Node N │
-│                │                          │                │
-│ ┌────────────┐ │                          │ ┌────────────┐ │
-│ │  kubelet   │ │                          │ │  kubelet   │ │
-│ └─────┬──────┘ │                          │ └─────┬──────┘ │
-│       │        │                          │       │        │
-│ ┌─────▼──────┐ │                          │ ┌─────▼──────┐ │
-│ │ containerd │ │                          │ │ containerd │ │
-│ └────────────┘ │                          │ └────────────┘ │
-│                │                          │                │
-│ ┌────────────┐ │                          │ ┌────────────┐ │
-│ │   Pods     │ │                          │ │   Pods     │ │
-│ └────────────┘ │                          │ └────────────┘ │
-└────────────────┘                          └────────────────┘
+```mermaid
+flowchart TD
+    subgraph GKE["GKE Control Plane (Google-Managed)"]
+        API["API Server<br/>(HA Fleet)"]
+        CM["Controller<br/>Manager"]
+        SCHED["Scheduler"]
+        
+        API --> ETCD
+        CM --> ETCD
+        SCHED --> ETCD
+        
+        ETCD["etcd Cluster<br/>(Multi-AZ)"]
+    end
+    
+    ETCD -->|"HTTPS + mTLS"| WN1
+    ETCD -->|"HTTPS + mTLS"| WNN
+    
+    subgraph WN1["Worker Node 1"]
+        KUBELET1["kubelet"]
+        KUBELET1 --> CONTAINERD1["containerd"]
+        CONTAINERD1 --> PODS1["Pods"]
+    end
+    
+    subgraph WNN["Worker Node N"]
+        KUBELETN["kubelet"]
+        KUBELETN --> CONTAINERDN["containerd"]
+        CONTAINERDN --> PODSN["Pods"]
+    end
 ```
 
 The controller manager hosts dozens of independent control loops, each watching specific resource types and executing reconciliation logic. The Deployment controller watches for Deployment objects, computes the desired ReplicaSet configuration based on the pod template and revision history, and creates or updates ReplicaSets accordingly. The ReplicaSet controller watches ReplicaSets, compares the current pod count against the desired replica number, and creates or deletes pod objects to match. The scheduler watches for pods with empty NodeName fields, runs filtering predicates to eliminate unsuitable nodes—those lacking sufficient CPU, memory, or matching taints—and scores remaining candidates using priority functions that balance resource utilization and spread across failure domains. The winning node gets written to the pod's NodeName field in a binding operation, an atomic compare-and-swap that prevents double-scheduling if multiple scheduler instances race.

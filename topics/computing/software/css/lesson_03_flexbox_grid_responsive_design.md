@@ -111,29 +111,37 @@ This single declaration creates a grid that accommodates as many 280px-minimum c
 
 The layout data flow through these two algorithms can be visualized as follows:
 
-```
-FLEXBOX ALGORITHM (single axis):
-┌──────────────────────────────────────────────────────┐
-│  1. Collect flex items (direct children only)        │
-│  2. Resolve flex-basis → hypothetical main sizes     │
-│  3. Sum hypothetical sizes vs. container main size   │
-│         free space > 0 → distribute via flex-grow    │
-│         free space < 0 → absorb via flex-shrink      │
-│  4. Determine flex lines (if flex-wrap: wrap)        │
-│  5. Resolve cross-axis sizes via align-items         │
-│  6. Place items + apply justify-content spacing      │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph FLEXBOX ["FLEXBOX ALGORITHM (single axis)"]
+        direction TD
+        F1["1. Collect flex items\n(direct children only)"]
+        F2["2. Resolve flex-basis →\nhypothetical main sizes"]
+        F3{"3. Sum hypothetical sizes\nvs. container main size"}
+        F4A["free space > 0\n→ distribute via flex-grow"]
+        F4B["free space < 0\n→ absorb via flex-shrink"]
+        F5["4. Determine flex lines\n(if flex-wrap: wrap)"]
+        F6["5. Resolve cross-axis sizes\nvia align-items"]
+        F7["6. Place items + apply\njustify-content spacing"]
 
-GRID ALGORITHM (two axes):
-┌──────────────────────────────────────────────────────┐
-│  1. Resolve explicit track sizing (fr, minmax, px)   │
-│  2. Run auto-placement algorithm (row/column order)  │
-│  3. Resolve intrinsic track sizes (min-content,      │
-│     max-content) for tracks sized with auto/fr       │
-│  4. Distribute free space to fr tracks               │
-│  5. Align items within their grid areas              │
-│     (justify-items, align-items, place-items)        │
-└──────────────────────────────────────────────────────┘
+        F1 --> F2 --> F3
+        F3 -->|"free space > 0"| F4A
+        F3 -->|"free space < 0"| F4B
+        F4A --> F5
+        F4B --> F5
+        F5 --> F6 --> F7
+    end
+
+    subgraph GRID ["GRID ALGORITHM (two axes)"]
+        direction TD
+        G1["1. Resolve explicit track sizing\n(fr, minmax, px)"]
+        G2["2. Run auto-placement algorithm\n(row / column order)"]
+        G3["3. Resolve intrinsic track sizes\n(min-content, max-content)\nfor tracks sized with auto / fr"]
+        G4["4. Distribute free space\nto fr tracks"]
+        G5["5. Align items within their grid areas\n(justify-items, align-items, place-items)"]
+
+        G1 --> G2 --> G3 --> G4 --> G5
+    end
 ```
 
 Grid's auto-placement algorithm deserves particular mention for systems engineers thinking about algorithmic complexity. By default, Grid places items using a **sparse packing** strategy: it advances through grid cells in row-major order and places each item in the first cell where it fits without creating overlap. Setting `grid-auto-flow: dense` switches to **dense packing**, where the algorithm backtracks to fill gaps left by larger items. Dense packing can produce more visually compact layouts (useful for image galleries) but changes the visual order relative to DOM order, which has accessibility implications.

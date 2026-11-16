@@ -76,21 +76,27 @@ Expose multiple difficulty presets (Easy, Normal, Hard) but implement each as a 
 
 The internal state machine governing difficulty adjustment operates continuously:
 
-```
-Player State Tracker:
-  ├─ Performance Metrics Buffer (sliding window, N=5 encounters)
-  │   ├─ Completion Time (percentile vs. expected)
-  │   ├─ Resource Efficiency (damage taken / damage dealt)
-  │   ├─ Retry Count
-  │   └─ Time Since Last Death
-  │
-  ├─ Skill Estimate (Bayesian update from metrics)
-  │   └─ Confidence Interval (wider early, narrows with data)
-  │
-  └─ Challenge Generator
-      ├─ Base Difficulty Curve D(t)
-      ├─ Adjustment Factor: α = f(Skill Estimate, Confidence)
-      └─ Output Parameters → Enemy Spawner, Encounter Builder
+```mermaid
+flowchart TD
+    PST["Player State Tracker"]
+    
+    PST --> PMB["Performance Metrics Buffer<br/>(sliding window, N=5 encounters)"]
+    PST --> SE["Skill Estimate<br/>(Bayesian update from metrics)"]
+    PST --> CG["Challenge Generator"]
+    
+    PMB --> CT["Completion Time<br/>(percentile vs. expected)"]
+    PMB --> RE["Resource Efficiency<br/>(damage taken / damage dealt)"]
+    PMB --> RC["Retry Count"]
+    PMB --> TSLD["Time Since Last Death"]
+    
+    SE --> CI["Confidence Interval<br/>(wider early, narrows with data)"]
+    
+    CG --> BDC["Base Difficulty Curve D(t)"]
+    CG --> AF["Adjustment Factor:<br/>α = f(Skill Estimate, Confidence)"]
+    CG --> OP["Output Parameters"]
+    
+    OP --> ES["Enemy Spawner"]
+    OP --> EB["Encounter Builder"]
 ```
 
 Accessibility architecture requires constructing orthogonal configuration spaces that decouple mechanical challenge from perceptual and motor demands. A comprehensive accessibility options menu exposes controls spanning multiple dimensions:

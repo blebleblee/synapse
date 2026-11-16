@@ -26,63 +26,63 @@ Every PyTorch tensor carries several attributes relevant to automatic differenti
 
 The computation graph in PyTorch represents a heterogeneous data structure where nodes correspond to `Function` objects and directed edges encode data dependencies between tensors. Each `Function` subclass implements two critical methods: `forward(*inputs)` which computes the operation's output given input tensors, and `backward(grad_output)` which computes gradients of inputs given the gradient of the output. When you execute a tensor operation like `z = x * y`, PyTorch instantiates a `MulBackward` function object, calls its `forward` method to compute the result, stores references to input tensors `x` and `y` within the function object, and assigns this function as `z.grad_fn`. The backward pass traverses these `grad_fn` references in reverse, calling each function's `backward` method and propagating gradients to predecessor tensors.
 
-```
-Forward Pass (Graph Construction):
+```mermaid
+flowchart TD
+    subgraph leaves ["Leaf Tensors (requires_grad=True)"]
+        X["x (leaf)\nvalue = 2.0\ngrad = None → 60.0"]
+        W["w (leaf)\nvalue = 3.0\ngrad = None → 40.0"]
+        B["b (leaf)\nvalue = 1.0\ngrad = None → 20.0"]
+    end
 
-User Code:  x = torch.tensor([2.0], requires_grad=True)
-            w = torch.tensor([3.0], requires_grad=True)  
-            b = torch.tensor([1.0], requires_grad=True)
-            y = w * x      # Creates MulBackward function
-            z = y + b      # Creates AddBackward function
-            loss = z ** 2  # Creates PowBackward function
+    subgraph forward ["Forward Pass — Computation Graph"]
+        MUL["y : MulBackward\ny = w × x = 6.0\ngrad_fn.inputs = [x, w]"]
+        ADD["z : AddBackward\nz = y + b = 7.0\ngrad_fn.inputs = [y, b]"]
+        POW["loss : PowBackward\nloss = z² = 49.0\ngrad_fn.inputs = [z]"]
+    end
 
-Computation Graph:
-            
-    x (leaf)          w (leaf)          b (leaf)
-    grad=None         grad=None         grad=None
-    requires_grad     requires_grad     requires_grad
-         │                 │                 │
-         └────────┬────────┘                 │
-                  │                          │
-                  ▼                          │
-              y: MulBackward                 │
-              grad_fn → inputs=[x,w]         │
-                  │                          │
-                  └────────┬─────────────────┘
-                           │
-                           ▼
-                      z: AddBackward
-                      grad_fn → inputs=[y,b]
-                           │
-                           │
-                           ▼
-                      loss: PowBackward
-                      grad_fn → inputs=[z]
+    subgraph backward ["Backward Pass — Gradient Propagation"]
+        BACK_POW["Step 1 · PowBackward.backward\ngrad_output = 1.0\nlocal_grad = 2z = 14.0\n→ propagate z.grad = 14.0"]
+        BACK_ADD["Step 2 · AddBackward.backward\ngrad_output = 14.0\nlocal_grad_y = 1.0,  local_grad_b = 1.0\n→ y.grad = 14.0,  b.grad = 14.0"]
+        BACK_MUL["Step 3 · MulBackward.backward\ngrad_output = 14.0\nlocal_grad_x = w = 3.0,  local_grad_w = x = 2.0\n→ x.grad = 42.0,  w.grad = 28.0"]
+    end
 
+    subgraph finals ["Final Gradients (Analytical Verification)"]
+        FINAL_X["x.grad = 42.0\n∂loss/∂x = 2(wx+b)·w = 2(7)·3 = 42 ✓"]
+        FINAL_W["w.grad = 28.0\n∂loss/∂w = 2(wx+b)·x = 2(7)·2 = 28 ✓"]
+        FINAL_B["b.grad = 14.0\n∂loss/∂b = 2(wx+b)   = 2(7)   = 14 ✓"]
+    end
 
-Backward Pass (Gradient Propagation):
+    X -->|"value = 2.0"| MUL
+    W -->|"value = 3.0"| MUL
+    MUL -->|"y = 6.0"| ADD
+    B -->|"value = 1.0"| ADD
+    ADD -->|"z = 7.0"| POW
 
-loss.backward() initiates reverse traversal with grad_output=1.0
+    POW -->|"loss.backward()\ngrad_output = 1.0"| BACK_POW
+    BACK_POW -->|"z.grad = 14.0"| BACK_ADD
+    BACK_ADD -->|"y.grad = 14.0"| BACK_MUL
 
-Step 1: PowBackward.backward(grad_output=1.0)
-        local_grad = 2 * z = 2 * 10.0 = 20.0
-        propagate: z.grad = grad_output * local_grad = 20.0
+    BACK_MUL -->|"x.grad = 42.0"| FINAL_X
+    BACK_MUL -->|"w.grad = 28.0"| FINAL_W
+    BACK_ADD -->|"b.grad = 14.0"| FINAL_B
 
-Step 2: AddBackward.backward(grad_output=20.0)
-        local_grad_y = 1.0, local_grad_b = 1.0
-        y.grad = 20.0 * 1.0 = 20.0
-        b.grad = 20.0 * 1.0 = 20.0  (accumulated in leaf)
+    style leaves fill:#dbeafe,stroke:#2563eb,color:#000
+    style forward fill:#dcfce7,stroke:#16a34a,color:#000
+    style backward fill:#fef9c3,stroke:#ca8a04,color:#000
+    style finals fill:#fce7f3,stroke:#db2777,color:#000
 
-Step 3: MulBackward.backward(grad_output=20.0)
-        local_grad_x = w = 3.0
-        local_grad_w = x = 2.0
-        x.grad = 20.0 * 3.0 = 60.0  (accumulated in leaf)
-        w.grad = 20.0 * 2.0 = 40.0  (accumulated in leaf)
-
-Final State:
-    x.grad = 60.0    ∂loss/∂x verified: 2(wx+b)w = 2(6+1)3 = 42... 
-    w.grad = 40.0    ∂loss/∂w verified: 2(wx+b)x = 2(6+1)2 = 28...
-    b.grad = 20.0    ∂loss/∂b verified: 2(wx+b)  = 2(7)    = 14...
+    style X fill:#bfdbfe,stroke:#1d4ed8,color:#000
+    style W fill:#bfdbfe,stroke:#1d4ed8,color:#000
+    style B fill:#bfdbfe,stroke:#1d4ed8,color:#000
+    style MUL fill:#bbf7d0,stroke:#15803d,color:#000
+    style ADD fill:#bbf7d0,stroke:#15803d,color:#000
+    style POW fill:#bbf7d0,stroke:#15803d,color:#000
+    style BACK_POW fill:#fef08a,stroke:#a16207,color:#000
+    style BACK_ADD fill:#fef08a,stroke:#a16207,color:#000
+    style BACK_MUL fill:#fef08a,stroke:#a16207,color:#000
+    style FINAL_X fill:#fbcfe8,stroke:#be185d,color:#000
+    style FINAL_W fill:#fbcfe8,stroke:#be185d,color:#000
+    style FINAL_B fill:#fbcfe8,stroke:#be185d,color:#000
 ```
 
 The actual implementation leverages C++ for performance-critical graph traversal and gradient computation. PyTorch's `torch/csrc/autograd/` directory contains the autograd engine implemented in C++, exposing Python bindings through pybind11. The `Engine::execute()` method drives the backward pass using a worklist algorithm that maintains a priority queue of ready-to-execute `Function` nodes, processing them in reverse topological order. Each function's `backward()` implementation computes local gradients using saved tensor values and propagates them to predecessor nodes, decrementing reference counts to determine when predecessors become ready for execution.

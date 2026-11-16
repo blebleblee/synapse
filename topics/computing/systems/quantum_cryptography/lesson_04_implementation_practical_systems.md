@@ -24,71 +24,51 @@ Basis reconciliation and sifting extract the correlated bit subset where Alice a
 
 The privacy amplification stage consumes the syndrome information leaked during error correction and extracts a shorter uniformly random key provably decorrelated from adversary knowledge. Universal hash functions implement this compression: Alice and Bob agree on a random Toeplitz matrix $T$ of dimension $m \times n$ with $m < n$, then compute their final key as $K = T \cdot X$ where $X$ is the error-corrected sifted key. The Leftover Hash Lemma guarantees that if the adversary's initial mutual information with $X$ was at most $t$ bits, the output key $K$ satisfies $\varepsilon$-security provided $m \leq n - t - 2\log_2(1/\varepsilon)$. Computing this bound requires estimating the adversary's information through QBER analysis: the phase error rate in the signal basis upper-bounds Eve's information via quantum mutual information formulas derived from optimal collective attack strategies. Finite-size effects dominate practical systems since statistical fluctuations in $10^6$ to $10^9$ sifted bits introduce uncertainty in QBER estimation that must be accounted through confidence intervals, typically reducing the final key length by $10^4$ to $10^5$ bits to maintain security.
 
-```
-QKD System Data Flow Architecture
-==================================
+```mermaid
+flowchart TD
+    subgraph alice ["Alice (Transmitter)"]
+        LASER["Laser + Attenuator\nμ = 0.1 photons"]
+        BASIS_MOD["Basis Modulator\n(4 states: H/V/D/A)"]
+    end
 
-    ┌──────────────────────────────────────────────────────────┐
-    │              Alice (Transmitter)                          │
-    └──────────────────────────────────────────────────────────┘
-              │                                      │
-         Raw Key Bits                          Basis Choices
-              │                                      │
-              ▼                                      ▼
-    ┌─────────────────────┐              ┌──────────────────────┐
-    │ Laser + Attenuator  │              │  Basis Modulator     │
-    │  μ = 0.1 photons    │              │  (4 states: H/V/D/A) │
-    └─────────────────────┘              └──────────────────────┘
-              │                                      │
-              └──────────────┬───────────────────────┘
-                             │ Single photons
-                             ▼
-                    ┌─────────────────┐
-                    │  Quantum Channel │
-                    │  (SMF-28 fiber)  │
-                    │  Loss: 0.2 dB/km │
-                    └─────────────────┘
-                             │
-              ┌──────────────┴──────────────┐
-              ▼                             ▼
-    ┌──────────────────────┐      ┌──────────────────────┐
-    │ Basis Analyzer       │      │ Single-Photon        │
-    │ (Random H/V or D/A)  │      │ Detectors (InGaAs)   │
-    └──────────────────────┘      └──────────────────────┘
-              │                             │
-              └──────────────┬──────────────┘
-                             ▼
-    ┌──────────────────────────────────────────────────────────┐
-    │              Bob (Receiver)                               │
-    │  Detection Events + Basis Choices                         │
-    └──────────────────────────────────────────────────────────┘
-                             │
-                             ▼
-    ╔══════════════════════════════════════════════════════════╗
-    ║          Classical Authenticated Channel                  ║
-    ║  (TLS 1.3 over public network)                           ║
-    ╚══════════════════════════════════════════════════════════╝
-                             │
-              ┌──────────────┼──────────────┐
-              ▼              ▼              ▼
-    ┌─────────────┐  ┌──────────────┐  ┌────────────────┐
-    │   Sifting   │  │Cascade Error │  │   Privacy      │
-    │ (Keep basis │  │  Correction  │  │ Amplification  │
-    │  matches)   │  │  (LDPC/BCH)  │  │ (Toeplitz Hash)│
-    └─────────────┘  └──────────────┘  └────────────────┘
-              │              │                    │
-              └──────────────┼────────────────────┘
-                             ▼
-                    ┌─────────────────┐
-                    │   Secure Key    │
-                    │ Rate: 1-100 kbps│
-                    └─────────────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │  Key Management │
-                    │  (ETSI QKD 014) │
-                    └─────────────────┘
+    RAW["Raw Key Bits"]
+    BASIS_IN["Basis Choices"]
+
+    RAW --> LASER
+    BASIS_IN --> BASIS_MOD
+
+    LASER & BASIS_MOD -->|"Single photons"| QCHAN
+
+    QCHAN["Quantum Channel\n(SMF-28 fiber)\nLoss: 0.2 dB/km"]
+
+    QCHAN --> BASIS_ANA & SPD
+
+    BASIS_ANA["Basis Analyzer\n(Random H/V or D/A)"]
+    SPD["Single-Photon\nDetectors (InGaAs)"]
+
+    BASIS_ANA & SPD --> BOB
+
+    subgraph bob ["Bob (Receiver)"]
+        BOB["Detection Events + Basis Choices"]
+    end
+
+    BOB --> CLASS_CHAN
+
+    CLASS_CHAN[["Classical Authenticated Channel\n(TLS 1.3 over public network)"]]
+
+    CLASS_CHAN --> SIFT & CASCADE & PRIVACY
+
+    SIFT["Sifting\n(Keep basis matches)"]
+    CASCADE["Cascade Error Correction\n(LDPC/BCH)"]
+    PRIVACY["Privacy Amplification\n(Toeplitz Hash)"]
+
+    SIFT & CASCADE & PRIVACY --> SECKEY
+
+    SECKEY["Secure Key\nRate: 1–100 kbps"]
+
+    SECKEY --> KMS
+
+    KMS["Key Management\n(ETSI QKD 014)"]
 ```
 
 Classical synchronization deserves particular attention as it represents a common vulnerability point. The quantum transmitter must notify the receiver of pulse arrival times with sufficient precision for gated detector operation. GPS-disciplined oscillators provide $10$ ns absolute timing accuracy, but this uncertainty exceeds typical detector gate widths by an order of magnitude. Systems therefore establish initial coarse synchronization via GPS timestamps, then perform fine synchronization through optical clock recovery where a strong classical laser pulse precedes the quantum signal, allowing the receiver to lock a phase-locked loop to the transmitter's repetition rate. This synchronization signal travels the same fiber path as quantum states, inheriting identical propagation delays and temperature-induced variations. The PLL bandwidth must be sufficiently narrow to reject high-frequency noise while tracking slow thermal drifts, typically implemented with loop filters having corner frequencies near $100$ Hz.

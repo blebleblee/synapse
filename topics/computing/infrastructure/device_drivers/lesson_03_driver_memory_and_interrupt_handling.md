@@ -66,7 +66,7 @@ Hardware interrupts preempt normal kernel execution, transferring control to reg
 - Cannot sleep or schedule
 - Cannot call functions that might sleep (`kmalloc(GFP_KERNEL)`, `mutex_lock()`, `copy_to_user()`)
 - Stack space is limited (historically 4KB, now typically 8KB but still constrained)
-- Should complete quickly (<1ms typical guideline)
+- Should complete quickly (< 1ms typical guideline)
 - Interrupts may be disabled on the local CPU
 
 **Process Context Rules**:
@@ -76,34 +76,30 @@ Hardware interrupts preempt normal kernel execution, transferring control to reg
 
 This dichotomy drives the split-handler model: interrupt handlers do minimal work (acknowledge hardware, grab data from device registers) while deferring complex processing to schedulable contexts.
 
-```
-Interrupt Execution Flow
-══════════════════════════
-
-Hardware event → CPU interrupt line → IDT/Vector table
-    ↓
-do_IRQ() [arch-specific entry]
-    ↓
-handle_irq() [generic layer]
-    ↓
-┌──────────────────────────────────────┐
-│ Primary Handler (hardirq context)    │  <- Your handler
-│ - IRQs disabled on local CPU         │
-│ - Atomic context                     │
-│ - Acknowledge hardware               │
-│ - Schedule deferred work             │
-└──────────────────────────────────────┘
-    ↓
-Return to interrupted context
-    ↓
-[Later, when kernel schedules deferred work]
-    ↓
-┌──────────────────────────────────────┐
-│ Bottom Half (softirq/tasklet/work)   │
-│ - IRQs enabled                       │
-│ - Can acquire locks                  │
-│ - Process bulk data                  │
-└──────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Hardware Event"] --> B["CPU Interrupt Line"]
+    B --> C["IDT/Vector Table"]
+    C --> D["do_IRQ<br/>arch-specific entry"]
+    D --> E["handle_irq<br/>generic layer"]
+    E --> F
+    
+    subgraph F ["Primary Handler - hardirq context"]
+        F1["IRQs disabled on local CPU"]
+        F2["Atomic context"]
+        F3["Acknowledge hardware"]
+        F4["Schedule deferred work"]
+    end
+    
+    F --> G["Return to Interrupted Context"]
+    G --> H["Later: Kernel Schedules Deferred Work"]
+    H --> I
+    
+    subgraph I ["Bottom Half - softirq/tasklet/work"]
+        I1["IRQs enabled"]
+        I2["Can acquire locks"]
+        I3["Process bulk data"]
+    end
 ```
 
 ### 1.4 Memory Allocation Cost Model
@@ -1525,7 +1521,7 @@ static irqreturn_t device_irq_with_storm_detection(int irq, void *dev_id)
 **Interrupts**:
 - Request IRQs late in probe, after data structures initialized
 - Free IRQs early in remove, before destroying data structures
-- Keep primary handlers fast (<100 microseconds typical)
+- Keep primary handlers fast (< 100 microseconds typical)
 - Use threaded IRQs or workqueues for lengthy processing
 - Disable interrupts at device level before freeing IRQ
 - Use `free_irq()` or `devm_free_irq()`, never just unregister

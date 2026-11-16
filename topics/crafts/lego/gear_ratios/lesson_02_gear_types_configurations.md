@@ -24,28 +24,36 @@ The spur gear serves as the foundational element in LEGO power transmission, a c
 
 Efficiency in spur gear pairs hinges on sliding velocity along the tooth profile. At the pitch point—the instantaneous contact point lying on the line of action where relative sliding is zero—pure rolling occurs. Above and below this point, the involute curves slide relative to one another, dissipating energy as friction. The amount of sliding depends on the pressure angle and contact ratio (the average number of tooth pairs simultaneously in mesh, typically 1.4 to 1.8 for LEGO gears). Higher contact ratios distribute load across more teeth, reducing stress per tooth but increasing total sliding distance. For a well-aligned spur pair spinning under moderate load, empirical measurement shows efficiency near 92% per stage, with losses escalating under high torque where increased normal force amplifies friction proportionally.
 
-```
-Spur Gear Mesh Geometry (Side View)
-
-Driver (8T)          Driven (24T)
-   ___                  _______
-  /   \                /       \
- |  ●  |──────────────|    ●    |
-  \___/                \_______/
-    ↓                      ↓
-   ω₁                     ω₂ = ω₁/3
-   τ₁                     τ₂ = 3τ₁ (ideally)
-
-Line of Action (20° pressure angle):
-      
-      Driver      ╱        Driven
-       ___      ╱         ___
-      /   \    ╱         /   \
-     |  ●  |──●─────────|  ●  |
-      \___/  ╱  Pitch    \___/
-            ╱   Point
-           ╱
-    Base Circle
+```mermaid
+flowchart TD
+    subgraph driver ["Driver Gear (8T)"]
+        D1["● Center"]
+        D2["ω₁ = Input Speed"]
+        D3["τ₁ = Input Torque"]
+    end
+    
+    subgraph driven ["Driven Gear (24T)"]
+        R1["● Center"]
+        R2["ω₂ = ω₁/3"]
+        R3["τ₂ = 3τ₁ (ideal)"]
+    end
+    
+    PP["● Pitch Point<br/>(Contact Point)"]
+    LOA["Line of Action<br/>(20° Pressure Angle)"]
+    BC["Base Circle"]
+    
+    D1 -->|"Mesh Contact"| PP
+    PP -->|"Transmits Force"| R1
+    
+    LOA -.->|"Force Direction"| PP
+    BC -.->|"Defines"| LOA
+    
+    driver -->|"Gear Ratio 1:3"| driven
+    
+    D2 -.-> D1
+    D3 -.-> D1
+    R2 -.-> R1
+    R3 -.-> R1
 ```
 
 The contact pattern sweeps from tooth root to tip as gears rotate. Approaching mesh (dedendum region of driver, addendum of driven), teeth slide in one direction. Receding from mesh (addendum of driver, dedendum of driven), sliding reverses. This bidirectional sliding mandates symmetric tooth profiles to maintain efficiency in both rotation directions, a requirement LEGO meets through standard involute cutting. However, asymmetric wear patterns emerge over thousands of cycles as polymer surfaces burnish differently depending on load direction, a factor in precision robotics where gear trains may exhibit hysteresis when reversing.
@@ -76,19 +84,20 @@ Double-bevel gears—essentially two bevel gears fused back-to-back—simplify c
 
 Idler gears—intermediate gears that do not change the overall ratio but alter center distance or reverse rotation direction—introduce additional friction losses. Each idler adds 5-8% efficiency penalty (per stage) while providing geometric flexibility. For example, connecting an 8-tooth driver to a 40-tooth driven gear directly requires a 24 mm center distance; inserting a 16-tooth idler allows non-colinear routing at the cost of two mesh stages. Minimizing idler count directly correlates with maximizing power delivery to the output.
 
-```
-Compound Gear Train (Two Stages, Shared Axle)
-
-Input Axle        Intermediate Axle       Output Axle
-    8T                24T │ 8T                40T
-    ●─────────────────●──┼──●─────────────────●
-   ω₁                      │                  ω₃
-  τ₁                       │                  τ₃
-
-Stage 1: 24T/8T = 3:1 reduction (η₁ ≈ 0.92)
-Stage 2: 40T/8T = 5:1 reduction (η₂ ≈ 0.92)
-
-Overall: 15:1 reduction, η_total = 0.92 × 0.92 ≈ 0.85 (85%)
+```mermaid
+flowchart LR
+    Input["Input Axle<br/>8T<br/>ω₁, τ₁"]
+    Int1["Intermediate Axle<br/>24T"]
+    Int2["Intermediate Axle<br/>8T"]
+    Output["Output Axle<br/>40T<br/>ω₃, τ₃"]
+    
+    Input -->|"Stage 1<br/>3:1 reduction<br/>η₁ ≈ 0.92"| Int1
+    Int2 -->|"Stage 2<br/>5:1 reduction<br/>η₂ ≈ 0.92"| Output
+    
+    Int1 -.->|"Shared Axle"| Int2
+    
+    subgraph overall ["Overall: 15:1 reduction, η_total ≈ 0.85 (85%)"]
+    end
 ```
 
 Compound gear trains—stacking multiple stages by mounting a driven gear and a new driver gear coaxially on a shared intermediate axle—multiply individual stage ratios while compounding efficiency losses. A two-stage 3:1 followed by 5:1 yields 15:1 overall, but efficiency multiplies: $0.92 \times 0.92 \approx 0.85$. Four stages compounded drop efficiency below 72%, even with well-aligned spur gears. This multiplicative decay imposes practical limits on gear train length; beyond four or five stages, friction dominates and motors stall under load despite theoretically adequate torque multiplication.

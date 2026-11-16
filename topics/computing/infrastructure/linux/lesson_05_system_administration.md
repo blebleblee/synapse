@@ -82,19 +82,21 @@ Linux capabilities (`CAP_NET_ADMIN`, `CAP_SYS_PTRACE`, etc.) decompose the monol
 Every process in Linux is a `task_struct`. The process tree is rooted at PID 1 (`systemd` or `init`), and every new process is created via `fork(2)` (which clones the parent's `task_struct`) followed optionally by `execve(2)` (which replaces the process image). `clone(2)` is the generalized primitive underlying both `fork` and `pthread_create`, accepting flags that control which namespaces and resources are shared between parent and child.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Created : fork() / clone()
-    Created --> Runnable : scheduler enqueues
-    Runnable --> Running : scheduler selects (min vruntime)
-    Running --> Runnable : preempted or time slice expired
-    Running --> InterruptibleSleep : wait for I/O or event
-    Running --> UninterruptibleSleep : wait for kernel I/O (D state)
-    Running --> Zombie : exit() called
-    InterruptibleSleep --> Runnable : signal or event fires
-    UninterruptibleSleep --> Runnable : I/O completes
-    Zombie --> [*] : parent calls wait() reaps
-    Running --> Stopped : SIGSTOP or ptrace attach
-    Stopped --> Runnable : SIGCONT
+flowchart TD
+    Start(["Start"]) --> Created["Created"]
+    Created -->|"scheduler enqueues"| Runnable["Runnable"]
+    Runnable -->|"scheduler selects (min vruntime)"| Running["Running"]
+    Running -->|"preempted or time slice expired"| Runnable
+    Running -->|"wait for I/O or event"| InterruptibleSleep["Interruptible Sleep"]
+    Running -->|"wait for kernel I/O (D state)"| UninterruptibleSleep["Uninterruptible Sleep"]
+    Running -->|"exit() called"| Zombie["Zombie"]
+    InterruptibleSleep -->|"signal or event fires"| Runnable
+    UninterruptibleSleep -->|"I/O completes"| Runnable
+    Zombie -->|"parent calls wait() reaps"| End(["End"])
+    Running -->|"SIGSTOP or ptrace attach"| Stopped["Stopped"]
+    Stopped -->|"SIGCONT"| Runnable
+    
+    Start -.->|"fork() / clone()"| Created
 ```
 
 A process in the `D` (uninterruptible sleep) state is waiting for kernel I/O that cannot be interrupted by a signal. High `D`-state counts indicate storage subsystem bottlenecks or NFS hangs.
@@ -145,17 +147,26 @@ The `dpkg` database in `/var/lib/dpkg/status` is a plain-text stanza format. APT
 
 RPM stores its package database in an SQLite database at `/var/lib/rpm/rpmdb.sqlite` (RPM 4.16+, replacing the legacy Berkeley DB format). DNF uses `libsolv` as its SAT solver. DNF's transaction logic:
 
-```
-dnf install nginx
-  │
-  ├─ Query repos (metalink → mirrorlist → repomd.xml → primary.xml.zst)
-  ├─ libsolv: build SAT problem from universe
-  ├─ Solve: find minimal install set
-  ├─ Download RPMs (with GPG signature verification)
-  ├─ RPM transaction: scriptlet pre-install
-  ├─ RPM: unpack file payload (CPIO archive inside RPM)
-  ├─ RPM transaction: scriptlet post-install
-  └─ Update rpmdb.sqlite
+```mermaid
+flowchart TD
+    Start["dnf install nginx"]
+    Query["Query repos<br/>(metalink → mirrorlist → repomd.xml → primary.xml.zst)"]
+    LibSolv["libsolv: build SAT problem from universe"]
+    Solve["Solve: find minimal install set"]
+    Download["Download RPMs<br/>(with GPG signature verification)"]
+    PreInstall["RPM transaction: scriptlet pre-install"]
+    Unpack["RPM: unpack file payload<br/>(CPIO archive inside RPM)"]
+    PostInstall["RPM transaction: scriptlet post-install"]
+    UpdateDB["Update rpmdb.sqlite"]
+    
+    Start --> Query
+    Start --> LibSolv
+    Start --> Solve
+    Start --> Download
+    Start --> PreInstall
+    Start --> Unpack
+    Start --> PostInstall
+    Start --> UpdateDB
 ```
 
 #### Production Package Management

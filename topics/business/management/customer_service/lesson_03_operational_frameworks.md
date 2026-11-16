@@ -28,10 +28,26 @@ The foundational data structure governing service operations is the case record,
 
 Case state machines define the legal transitions and business rules governing case progression. A canonical service case traverses the following states:
 
-```
-NEW → ASSIGNED → IN_PROGRESS → PENDING_CUSTOMER → PENDING_INTERNAL → RESOLVED → CLOSED
-                        ↓                                    ↓
-                    ESCALATED ──────────────────────────→ (returns to IN_PROGRESS)
+```mermaid
+flowchart LR
+    NEW["NEW"]
+    ASSIGNED["ASSIGNED"]
+    IN_PROGRESS["IN PROGRESS"]
+    PENDING_CUSTOMER["PENDING CUSTOMER"]
+    PENDING_INTERNAL["PENDING INTERNAL"]
+    RESOLVED["RESOLVED"]
+    CLOSED["CLOSED"]
+    ESCALATED["ESCALATED"]
+
+    NEW --> ASSIGNED
+    ASSIGNED --> IN_PROGRESS
+    IN_PROGRESS --> PENDING_CUSTOMER
+    PENDING_CUSTOMER --> PENDING_INTERNAL
+    PENDING_INTERNAL --> RESOLVED
+    RESOLVED --> CLOSED
+    IN_PROGRESS --> ESCALATED
+    PENDING_INTERNAL --> ESCALATED
+    ESCALATED --> IN_PROGRESS
 ```
 
 The NEW state represents initial case creation, typically automated from inbound channel detection. Assignment logic evaluates available agent capacity, skill matching, and current queue depth to bind the case to a specific agent or pool. The IN_PROGRESS state indicates active investigation and resolution work. PENDING_CUSTOMER designates cases awaiting external input where SLA clocks should pause. PENDING_INTERNAL covers dependencies on other teams or systems where the service team retains ownership but lacks immediate control. RESOLVED indicates the service team believes the issue is fixed pending customer confirmation. CLOSED represents final case archival after the verification period expires with no customer objection.

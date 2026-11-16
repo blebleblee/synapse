@@ -26,15 +26,26 @@ The distributed tracing architecture rests on a foundational data model that rep
 
 The OpenTelemetry specification, which has emerged as the industry-standard telemetry framework, defines a context propagation mechanism based on a trace identifier and span identifier pair. When Service A makes an RPC call to Service B, it generates a new span identifier for the outgoing request and injects both the trace ID and the new span ID into the request headers. Service B extracts these identifiers from the incoming request headers, records them in its own span as the parent span context, and continues propagating them to any downstream calls it makes. This header propagation protocol enables the reconstruction of the full request graph even though each service only has local knowledge of its immediate parent and children.
 
-```
-Trace ID: 7f8a3b2c-1d4e-5f6a-9b8c-0d1e2f3a4b5c
-│
-├─ Span: API Gateway (duration: 245ms)
-│  ├─ Span: Auth Service RPC (duration: 12ms)
-│  └─ Span: Order Service RPC (duration: 220ms)
-│     ├─ Span: Inventory Service RPC (duration: 35ms)
-│     ├─ Span: Pricing Service RPC (duration: 28ms)
-│     └─ Span: Database Query (duration: 145ms)
+```mermaid
+flowchart TD
+    TRACE["🔍 Trace ID: 7f8a3b2c-1d4e-5f6a-9b8c-0d1e2f3a4b5c"]
+
+    TRACE --> API_GATEWAY["API Gateway\n⏱ 245ms"]
+
+    API_GATEWAY --> AUTH_SERVICE["Auth Service RPC\n⏱ 12ms"]
+    API_GATEWAY --> ORDER_SERVICE["Order Service RPC\n⏱ 220ms"]
+
+    ORDER_SERVICE --> INVENTORY_SERVICE["Inventory Service RPC\n⏱ 35ms"]
+    ORDER_SERVICE --> PRICING_SERVICE["Pricing Service RPC\n⏱ 28ms"]
+    ORDER_SERVICE --> DB_QUERY["Database Query\n⏱ 145ms"]
+
+    style TRACE fill:#1a1a2e,stroke:#4a90d9,color:#ffffff,font-size:11px
+    style API_GATEWAY fill:#16213e,stroke:#4a90d9,color:#ffffff
+    style AUTH_SERVICE fill:#0f3460,stroke:#57c5b6,color:#ffffff
+    style ORDER_SERVICE fill:#0f3460,stroke:#4a90d9,color:#ffffff
+    style INVENTORY_SERVICE fill:#0f3460,stroke:#57c5b6,color:#ffffff
+    style PRICING_SERVICE fill:#0f3460,stroke:#57c5b6,color:#ffffff
+    style DB_QUERY fill:#1a0a2e,stroke:#e94560,color:#ffffff
 ```
 
 The context propagation mechanism must handle both synchronous request/response patterns and asynchronous message queue patterns. For synchronous HTTP or gRPC calls, the trace context travels in standard headers (`traceparent` and `tracestate` in W3C Trace Context specification). For message queue systems like Kafka or RabbitMQ, the trace context is typically embedded in message metadata or headers, allowing consumer services to continue the trace even when processing events published hours or days earlier. This creates a unified observability model that spans both real-time request paths and eventual-consistency background processing workflows.
@@ -65,32 +76,40 @@ The log volume problem becomes acute in high-throughput microservice environment
 
 The service mesh data plane architecture implements observability through transparent proxies deployed as sidecars in each pod. Envoy proxy, the most widely deployed service mesh data plane, intercepts every TCP connection using iptables rules that redirect traffic through the local proxy. This interception layer can read and modify request/response headers, emit access logs with detailed timing information, and record connection-level metrics—all without application code changes. The sidecar proxy becomes the authoritative source for network-level observability, measuring actual bytes transmitted, TCP retransmissions, and TLS handshake latency that are invisible to application-layer instrumentation.
 
-```
-┌─────────────────────────────────────┐
-│  Kubernetes Pod: order-service      │
-│                                     │
-│  ┌──────────────────────────────┐  │
-│  │  Application Container        │  │
-│  │  order-service:8080           │  │
-│  │                               │  │
-│  │  [App makes HTTP call to      │  │
-│  │   inventory-service:8080]     │  │
-│  └──────────────────────────────┘  │
-│         ↕ (localhost)               │
-│  ┌──────────────────────────────┐  │
-│  │  Envoy Sidecar Proxy          │  │
-│  │  - Intercepts all traffic     │  │
-│  │  - Injects trace headers      │  │
-│  │  - Emits access logs          │  │
-│  │  - Records request metrics    │  │
-│  └──────────────────────────────┘  │
-│         ↕ (network)                 │
-└─────────────────────────────────────┘
-         ↓
-┌─────────────────────────────────────┐
-│  Kubernetes Pod: inventory-service  │
-│  [Same sidecar interception]        │
-└─────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph pod_order ["Kubernetes Pod: order-service"]
+        app["Application Container
+        order-service:8080
+        ────────────────
+        Makes HTTP call to
+        inventory-service:8080"]
+
+        envoy["Envoy Sidecar Proxy
+        ────────────────
+        • Intercepts all traffic
+        • Injects trace headers
+        • Emits access logs
+        • Records request metrics"]
+
+        app <-->|localhost| envoy
+    end
+
+    subgraph pod_inventory ["Kubernetes Pod: inventory-service"]
+        inv_app["Application Container
+        inventory-service:8080"]
+
+        inv_envoy["Envoy Sidecar Proxy
+        ────────────────
+        • Intercepts all traffic
+        • Injects trace headers
+        • Emits access logs
+        • Records request metrics"]
+
+        inv_app <-->|localhost| inv_envoy
+    end
+
+    envoy <-->|network| inv_envoy
 ```
 
 The service mesh control plane manages the configuration of these distributed proxies through a centralized API, allowing operators to define traffic policies, circuit breaker thresholds, and retry behaviors without modifying application code. The observability implications are profound: the control plane can enable detailed tracing for specific services or endpoints dynamically, increasing sampling rates when investigating a production incident and reducing them afterward to minimize overhead. This operational flexibility decouples observability instrumentation from application deployment cycles.

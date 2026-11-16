@@ -119,37 +119,17 @@ The relationship between seccomp and MAC frameworks is additive, not exclusive. 
 
 The following diagram shows the enforcement pipeline a syscall traverses from a sandboxed service process through to the kernel:
 
-```
-Service Process (sandboxed)
-         |
-         | syscall instruction
-         v
-  ┌─────────────────────────────────────────┐
-  │  Seccomp BPF Filter                     │  ← Syscall number allowlist
-  │  (attached to task_struct)              │    EPERM if not in set
-  └─────────────┬───────────────────────────┘
-                │ allowed
-                v
-  ┌─────────────────────────────────────────┐
-  │  Capability Check                       │  ← CAP_* bitmask on cred
-  │  (kernel/capability.c)                  │    EPERM if cap missing
-  └─────────────┬───────────────────────────┘
-                │ capable
-                v
-  ┌─────────────────────────────────────────┐
-  │  LSM Hooks (SELinux / AppArmor)         │  ← Label/profile policy
-  │  (security/selinux or security/apparmor)│    EACCES if denied
-  └─────────────┬───────────────────────────┘
-                │ permitted
-                v
-  ┌─────────────────────────────────────────┐
-  │  DAC Check                              │  ← uid/gid/mode bits
-  │  (fs/namei.c, inode_permission)         │    EACCES if denied
-  └─────────────┬───────────────────────────┘
-                │ permitted
-                v
-         Kernel Syscall Handler
-         (resource operation executes)
+```mermaid
+flowchart TD
+    A["Service Process (sandboxed)"] -->|"syscall instruction"| B["Seccomp BPF Filter<br/>(attached to task_struct)"]
+    B -->|"Syscall number allowlist<br/>EPERM if not in set"| B
+    B -->|allowed| C["Capability Check<br/>(kernel/capability.c)"]
+    C -->|"CAP_* bitmask on cred<br/>EPERM if cap missing"| C
+    C -->|capable| D["LSM Hooks (SELinux / AppArmor)<br/>(security/selinux or security/apparmor)"]
+    D -->|"Label/profile policy<br/>EACCES if denied"| D
+    D -->|permitted| E["DAC Check<br/>(fs/namei.c, inode_permission)"]
+    E -->|"uid/gid/mode bits<br/>EACCES if denied"| E
+    E -->|permitted| F["Kernel Syscall Handler<br/>(resource operation executes)"]
 ```
 
 ---

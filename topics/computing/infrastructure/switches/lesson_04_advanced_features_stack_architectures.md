@@ -26,29 +26,28 @@ Link aggregation groups, also called port channels or bonded interfaces, bundle 
 
 The LACP state machine operates independently on each port, tracking whether the port is selected for aggregation, whether it is synchronized with the partner device, and whether it should actively participate in frame distribution. A port begins in the unselected, out-of-sync state, transmitting LACP PDUs that advertise its parameters but not yet forwarding data frames. When both peers agree on aggregation parameters—matching keys, compatible speeds, and duplex modes—and verify bidirectional LACP PDU exchange, they transition to the selected and synchronized states, enabling data forwarding on that link. The switch ASIC updates its egress hash table to include the newly active port, distributing flows across the expanded member set.
 
-```
-LACP Port State Lifecycle
-==========================
-
-Port Initialization
-        |
-        v
-   [DETACHED] ──────────────────┐
-        |                       │
-        | Physical link up      │
-        v                       │
-  [WAITING] ────────────────────┤
-        |                       │
-        | Rx LACP PDU           │ Timeout (90s)
-        v                       │
-  [CURRENT] ─> Partner validates│
-        |                       │
-        v                       v
-  [SELECTED] ──> Add to LAG    Rx timeout ──> [EXPIRED]
-        |        hash table              |
-        v                                v
-  [DISTRIBUTING] ────────────────> [DEFAULTED]
-   Forward frames                  Remove from LAG
+```mermaid
+flowchart TD
+    init["Port Initialization"]
+    detached["DETACHED"]
+    waiting["WAITING"]
+    current["CURRENT"]
+    selected["SELECTED"]
+    distributing["DISTRIBUTING<br/>Forward frames"]
+    expired["EXPIRED"]
+    defaulted["DEFAULTED<br/>Remove from LAG"]
+    
+    init --> detached
+    detached -->|"Physical link up"| waiting
+    waiting -->|"Rx LACP PDU"| current
+    current -->|"Partner validates"| selected
+    selected -->|"Add to LAG<br/>hash table"| distributing
+    
+    detached -->|"Timeout (90s)"| expired
+    waiting -->|"Timeout (90s)"| expired
+    current -->|"Rx timeout"| expired
+    expired --> defaulted
+    distributing --> defaulted
 ```
 
 Frame distribution across LAG members relies on hash-based load balancing that maintains per-flow ordering while maximizing bandwidth utilization. The switch extracts fields from each ingress frame—typically source and destination MAC addresses for Layer 2 hashing, or source/destination IP addresses and TCP/UDP ports for Layer 3/4 hashing—and feeds them through a hash function that produces an index into the member port array. This deterministic mapping ensures all frames belonging to a single conversation traverse the same physical link, preserving TCP sequence ordering and avoiding the catastrophic performance degradation that occurs when packets arrive out of order and trigger spurious retransmissions.

@@ -245,26 +245,44 @@ The critical observation: the guest's write ACK latency is dominated by the roun
 HCI clusters must maintain consistent metadata state across all nodes despite concurrent writes, node failures, and network partitions. All production HCI platforms use a form of distributed consensus. The Raft algorithm (the dominant choice for newer systems) works as follows:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Follower : Node starts
-    Follower --> Candidate : Election timeout expires\n(no heartbeat from leader)
-    Candidate --> Leader : Receives majority votes\n(quorum = floor(N/2) + 1)
-    Candidate --> Follower : Discovers leader with\nhigher term
-    Leader --> Follower : Discovers higher term\nin RPC response
-    Leader --> Leader : Receives client writes,\nreplicates log entries
+flowchart TD
+    START((" ")):::startNode
 
-    state Leader {
+    START -->|"Node starts"| FOLLOWER
+
+    FOLLOWER["🟡 Follower"]
+    CANDIDATE["🟠 Candidate"]
+    LEADER["🔴 Leader"]
+
+    FOLLOWER -->|"Election timeout expires\n(no heartbeat from leader)"| CANDIDATE
+    CANDIDATE -->|"Receives majority votes\n(quorum = ⌊N/2⌋ + 1)"| LEADER
+    CANDIDATE -->|"Discovers leader with\nhigher term"| FOLLOWER
+    LEADER -->|"Discovers higher term\nin RPC response"| FOLLOWER
+    LEADER -->|"Receives client writes,\nreplicates log entries"| LEADER
+
+    subgraph leader_internals ["Leader — Write Pipeline"]
         direction LR
-        L1 : Append entry to local log
-        L2 : Send AppendEntries RPC\nto all followers
-        L3 : Wait for quorum ACK
-        L4 : Commit entry, apply to state machine
-        L5 : Notify followers to commit
-        L1 --> L2
-        L2 --> L3
-        L3 --> L4
-        L4 --> L5
-    }
+        L1["Append entry\nto local log"]
+        L2["Send AppendEntries RPC\nto all followers"]
+        L3["Wait for\nquorum ACK"]
+        L4["Commit entry,\napply to state machine"]
+        L5["Notify followers\nto commit"]
+
+        L1 --> L2 --> L3 --> L4 --> L5
+    end
+
+    LEADER -.->|"executes"| leader_internals
+
+    classDef startNode fill:#333,stroke:#333,color:#333
+    classDef follower fill:#FFF9C4,stroke:#F9A825,color:#333,font-weight:bold
+    classDef candidate fill:#FFE0B2,stroke:#EF6C00,color:#333,font-weight:bold
+    classDef leaderNode fill:#FFCDD2,stroke:#C62828,color:#333,font-weight:bold
+    classDef pipeline fill:#E3F2FD,stroke:#1565C0,color:#1A237E
+
+    class FOLLOWER follower
+    class CANDIDATE candidate
+    class LEADER leaderNode
+    class L1,L2,L3,L4,L5 pipeline
 ```
 
 For an HCI cluster of N nodes, Raft tolerates `floor((N-1)/2)` simultaneous failures before the cluster loses quorum and becomes read-only (or halts writes to prevent split-brain). This means:

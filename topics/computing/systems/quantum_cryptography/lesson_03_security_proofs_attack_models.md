@@ -38,17 +38,47 @@ An intercept-resend attack is the quantum analog of a classical wiretap. Eve phy
 
 The state space of BB84 uses four states drawn from two mutually unbiased bases. The rectilinear basis $\mathcal{Z} = \{|0\rangle, |1\rangle\}$ and the diagonal basis $\mathcal{X} = \{|+\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle), |-\rangle = \frac{1}{\sqrt{2}}(|0\rangle - |1\rangle)\}$ are mutually unbiased because a measurement of a $\mathcal{Z}$-basis state in the $\mathcal{X}$ basis yields either outcome with equal probability $\frac{1}{2}$, and vice versa. This is not a property of a clever encoding scheme; it is a geometric property of the angle between the measurement bases in Hilbert space.
 
-```
-Alice Prepares                 Eve Intercepts                Bob Measures
-─────────────────              ───────────────────           ───────────────────
-Bit=0, Basis=Z  → |0⟩  ──────→ Measures in X basis         Receives |+⟩
-                               Gets |+⟩ with P=0.5         Measures in Z basis
-                               Gets |-⟩ with P=0.5         Gets 0 with P=0.5  ✓
-                               Sends measured state        Gets 1 with P=0.5  ✗ ← error
-
-                               Measures in Z basis
-                               Gets |0⟩ with P=1    ──────→ Measures in Z basis
-                               Sends |0⟩                   Gets 0 with P=1    ✓ no error
+```mermaid
+flowchart LR
+    A["Alice Prepares<br/>Bit=0, Basis=Z<br/>State: |0⟩"]
+    
+    subgraph eve1["Eve Intercepts - X Basis"]
+        E1["Measures in X basis"]
+        E2["Gets |+⟩ (P=0.5)<br/>or |-⟩ (P=0.5)"]
+        E3["Sends measured state"]
+    end
+    
+    subgraph bob1["Bob Measures - Scenario 1"]
+        B1["Receives |+⟩ or |-⟩"]
+        B2["Measures in Z basis"]
+        B3["Gets 0 (P=0.5) ✓<br/>Gets 1 (P=0.5) ✗ ERROR"]
+    end
+    
+    subgraph eve2["Eve Intercepts - Z Basis"]
+        E4["Measures in Z basis"]
+        E5["Gets |0⟩ (P=1)"]
+        E6["Sends |0⟩"]
+    end
+    
+    subgraph bob2["Bob Measures - Scenario 2"]
+        B4["Receives |0⟩"]
+        B5["Measures in Z basis"]
+        B6["Gets 0 (P=1) ✓<br/>NO ERROR"]
+    end
+    
+    A --> E1
+    E1 --> E2
+    E2 --> E3
+    E3 --> B1
+    B1 --> B2
+    B2 --> B3
+    
+    A --> E4
+    E4 --> E5
+    E5 --> E6
+    E6 --> B4
+    B4 --> B5
+    B5 --> B6
 ```
 
 The asymmetric structure above is what makes partial intercept-resend attacks interesting from an engineering perspective. If Eve only intercepts a fraction $f$ of photons and performs intercept-resend on those, she introduces a QBER of $f/4$. For small $f$, this may be hidden within the noise floor of the channel. Eve gains information about $f$ bits in the sifted key but introduces a detectable signature. Privacy amplification is designed to account for exactly this: given an observed QBER $Q$, we can bound the maximum fraction of the key that Eve may have learned, and compress the key by a sufficient factor to remove that information.

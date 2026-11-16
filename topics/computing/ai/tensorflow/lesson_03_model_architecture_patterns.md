@@ -128,27 +128,58 @@ The projection shortcut in `residual_block` is a critical correctness detail tha
 
 The data flow through this model's construction can be visualized as a directed acyclic graph where each node is a layer invocation and each edge is a tensor:
 
-```
-image_input (None, 32, 32, 3)
-       │
-   stem_conv → stem_bn → stem_relu
-       │
-   stage1_block1 ┌──────────────────────┐
-       │         │  conv1→bn1→relu1     │
-       │         │  conv2→bn2           │
-       │         │          ↓           │
-       └─────────┤        Add → relu2   │
-                 └──────────────────────┘
-       │
-   stage1_block2 (same pattern)
-       │
-   stage2_block1 (stride=2, projection shortcut)
-       │
-       ...
-       │
-   GlobalAveragePooling2D
-       │
-   Dense(10, softmax)
+```mermaid
+flowchart TD
+    input["image_input\n(None, 32, 32, 3)"]
+
+    stem_conv["stem_conv"]
+    stem_bn["stem_bn"]
+    stem_relu["stem_relu"]
+
+    input --> stem_conv --> stem_bn --> stem_relu
+
+    subgraph block1 ["stage1_block1 — Residual Block"]
+        direction TB
+        b1_conv1["conv1"] --> b1_bn1["bn1"] --> b1_relu1["relu1"]
+        b1_relu1 --> b1_conv2["conv2"] --> b1_bn2["bn2"]
+        b1_bn2 --> b1_add(("Add"))
+        b1_add --> b1_relu2["relu2"]
+    end
+
+    stem_relu --> b1_conv1
+    stem_relu --> b1_add
+
+    subgraph block2 ["stage1_block2 — Residual Block"]
+        direction TB
+        b2_conv1["conv1"] --> b2_bn1["bn1"] --> b2_relu1["relu1"]
+        b2_relu1 --> b2_conv2["conv2"] --> b2_bn2["bn2"]
+        b2_bn2 --> b2_add(("Add"))
+        b2_add --> b2_relu2["relu2"]
+    end
+
+    b1_relu2 --> b2_conv1
+    b1_relu2 --> b2_add
+
+    subgraph block3 ["stage2_block1 — Residual Block (stride=2, projection shortcut)"]
+        direction TB
+        b3_conv1["conv1 (stride=2)"] --> b3_bn1["bn1"] --> b3_relu1["relu1"]
+        b3_relu1 --> b3_conv2["conv2"] --> b3_bn2["bn2"]
+        b3_bn2 --> b3_add(("Add"))
+        b3_proj["proj_conv\n(1×1, stride=2)"] --> b3_proj_bn["proj_bn"] --> b3_add
+        b3_add --> b3_relu2["relu2"]
+    end
+
+    b2_relu2 --> b3_conv1
+    b2_relu2 --> b3_proj
+
+    ellipsis["... additional stages (same pattern) ..."]
+    b3_relu2 --> ellipsis
+
+    gap["GlobalAveragePooling2D"]
+    ellipsis --> gap
+
+    output["Dense(10, softmax)"]
+    gap --> output
 ```
 
 The model subclassing API provides the greatest expressive power by letting you define forward logic as an arbitrary Python function inside `call()`. This is appropriate for architectures whose computation graph cannot be statically determined from tensor shapes alone, such as recurrent networks with dynamic sequence lengths, models with conditional branching based on input values, or research architectures in rapid flux. The cost is that subclassed models are harder to serialize, their internal layer graph is not fully visible to `model.summary()` without calling `model.build()`, and they cannot be visualized with `tf.keras.utils.plot_model` without an explicit `Input` layer.
@@ -238,3 +269,4 @@ class TransformerEncoder(tf.keras.Model):
         self.ffn_proj = [
             tf.keras.layers.Dense(d_model,
                                   kernel_initializer='glor
+```

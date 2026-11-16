@@ -32,24 +32,33 @@ The analog-to-digital conversion stage quantizes the continuous-amplitude I and 
 
 Sampling rate selection must satisfy the Nyquist criterion while accounting for aliasing and practical filter rolloff characteristics. An ideal brick-wall anti-aliasing filter with infinite attenuation beyond half the sampling rate cannot be physically realized; real filters exhibit gradual transition bands where attenuation increases progressively. To prevent aliasing from signals in the transition region, sampling rates typically exceed twice the signal bandwidth by 20-30 percent, providing guardband for realistic filter characteristics. A 10 MHz bandwidth signal might be sampled at 12.5 or 15 MHz to accommodate filter rolloff. Alternatively, oversampling at rates far exceeding the Nyquist minimum spreads quantization noise across a wider bandwidth; subsequent digital filtering and decimation then removes out-of-band noise, effectively increasing resolution at the cost of higher instantaneous data rates.
 
-```
-RF Signal Flow Architecture:
-
-Antenna → LNA → Mixer (×cos) → LPF → ADC (I) ┐
-              ↑                                  ├→ Complex Baseband Stream
-              LO                                 │   (I + jQ samples)
-              ↓                                  │
-         Mixer (×sin) → LPF → ADC (Q) ──────────┘
-         
-Key Parameters:
-  LNA Gain: 15-20 dB, NF < 1 dB
-  Mixer LO: Tunable 70 MHz - 6 GHz (device-dependent)
-  ADC Resolution: 8-16 bits
-  Sample Rate: 0.25 - 61.44 MHz complex samples/s (device-dependent)
-  
-Frequency Translation:
-  f_baseband = f_signal - f_LO
-  Bandwidth captured: ±(f_sample/2)
+```mermaid
+flowchart TD
+    A["Antenna"]
+    B["LNA<br/>Gain: 15-20 dB<br/>NF &lt; 1 dB"]
+    C["Mixer (×cos)"]
+    D["LPF"]
+    E["ADC (I-channel)<br/>8-16 bits"]
+    F["LO<br/>70 MHz - 6 GHz"]
+    G["Mixer (×sin)"]
+    H["LPF"]
+    I["ADC (Q-channel)<br/>8-16 bits"]
+    J["Complex Baseband Stream<br/>I + jQ samples<br/>0.25 - 61.44 MHz"]
+    
+    A --> B
+    B --> C
+    B --> G
+    F -.-> C
+    F -.-> G
+    C --> D
+    D --> E
+    G --> H
+    H --> I
+    E --> J
+    I --> J
+    
+    K["Frequency Translation<br/>f_baseband = f_signal - f_LO<br/>Bandwidth: ±f_sample/2"]
+    K -.->|Reference| J
 ```
 
 Digital signal processing on the I/Q sample stream begins with Fourier transformation to convert time-domain samples into frequency-domain spectra. The discrete Fourier transform computes N complex frequency bins from N complex time samples, revealing the power spectral density across the captured bandwidth. Each bin corresponds to a frequency resolution of f_sample/N, establishing a tradeoff between frequency precision and time resolution—longer transforms provide finer frequency resolution but average over longer time intervals, obscuring rapid signal variations. The Fast Fourier Transform algorithm reduces computational complexity from O(N²) to O(N log N) through divide-and-conquer decomposition, making real-time spectrum analysis feasible. Security researchers analyzing frequency-hopping spread spectrum systems must carefully select FFT size to balance temporal resolution needed to track hops against frequency resolution required to distinguish adjacent channels.

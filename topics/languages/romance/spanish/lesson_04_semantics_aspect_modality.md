@@ -74,14 +74,18 @@ Spanish organizes temporal reference through a layered system of deictic center,
 
 The *pretérito perfecto compuesto* (*he comido*) in Peninsular Spanish encodes E=R, R=S or touching-S: the event is viewed from the present reference point and maintains some relevance or connection to the present moment. This form diverges significantly across dialect regions. In most of Latin America, the compound perfect is used far less frequently and the simple preterite takes over its functions; *comí* and *he comido* are largely interchangeable in Mexican and Argentine Spanish. In Spain, the two remain functionally distinct: *Hoy he comido paella* (today, still part of my present) versus *Ayer comí paella* (yesterday, closed off from today). Advanced practitioners must calibrate to their target dialect.
 
-```
-Reichenbachian Tense Architecture in Spanish
-
-PAST PERFECT       PRETERITE      PRESENT PERFECT    PRESENT
-  (había V)         (comí)          (he comido)       (como)
-─────────────────────────────────────────────────────────────▶ Timeline
-     E──R                E,R              E──R,S            E,R,S
-     E < R < S           E=R < S          E ≤ S, R=S        E=R=S
+```mermaid
+flowchart LR
+    PP["PAST PERFECT<br/>(había V)<br/>E──R<br/>E < R < S"]
+    PR["PRETERITE<br/>(comí)<br/>E,R<br/>E=R < S"]
+    PrP["PRESENT PERFECT<br/>(he comido)<br/>E──R,S<br/>E ≤ S, R=S"]
+    Pr["PRESENT<br/>(como)<br/>E,R,S<br/>E=R=S"]
+    
+    PP --> PR --> PrP --> Pr
+    
+    Pr -.->|Timeline| Arrow["▶"]
+    
+    style Arrow fill:none,stroke:none
 ```
 
 The *pretérito pluscuamperfecto* (*había hablado*, *habías comido*) uses the imperfect of *haber* as its auxiliary, which is significant: the imperfective framing of the auxiliary signals that the anterior reference point is itself embedded in an ongoing imperfective context. This is why *había comido* appears so naturally in clauses subordinated to other imperfects — *Cuando llegué, ya había cenado* — where the past perfect event is anterior to the preterite arrival event, which itself punctured an imperfect frame.
@@ -156,32 +160,42 @@ Concessive and conditional clauses follow parallel logic. *Aunque* introduces a 
 
 The following diagram maps the subjunctive trigger architecture by operator type and epistemic distance:
 
-```
-SUBJUNCTIVE SCOPE ARCHITECTURE
+```mermaid
+flowchart LR
+    subgraph main_clause ["MAIN CLAUSE OPERATOR TYPE"]
+        V["Volitional\nquerer, pedir, exigir, permitir"]
+        E["Epistemic Doubt / Negated Belief\ndudar, no creer, negar,\nes posible/probable"]
+        A["Affective-Evaluative\nalegrarse, lamentar,\nsorprender, temer"]
+        F["Future Adverbial Clauses\ncuando, en cuanto, hasta que,\nantes de que, para que"]
+        C["Concessive-Hypothetical\naunque + subjunctive,\nsi + imperfect subj."]
+    end
 
-MAIN CLAUSE OPERATOR TYPE          EMBEDDED CLAUSE STATUS
-────────────────────────────────────────────────────────────
-Volitional (querer, pedir,  ───▶   Desired, not asserted
- exigir, permitir)                 [different subjects only]
+    subgraph embedded_clause ["EMBEDDED CLAUSE STATUS"]
+        V_S["Desired, not asserted\n(different subjects only)"]
+        E_S["Doubted, suspended,\nnot-asserted"]
+        A_S["Presupposed true, but\nevaluated, not freshly asserted"]
+        F_S["Projected, not yet factual;\nevent at R > S"]
+        C_S["Entertained as possible\nor counterfactual, not\npresented as real"]
+    end
 
-Epistemic doubt / negated   ───▶   Doubted, suspended,
- belief (dudar, no creer,          not-asserted
- negar, es posible/probable)
+    subgraph legend ["MOOD CONTRAST"]
+        IND["INDICATIVE = asserted"]
+        SUB["SUBJUNCTIVE = not-asserted"]
+    end
 
-Affective-evaluative        ───▶   Presupposed true,
- (alegrarse, lamentar,             but evaluated, not
- sorprender, temer)                freshly asserted
+    V  -->|triggers| V_S
+    E  -->|triggers| E_S
+    A  -->|triggers| A_S
+    F  -->|triggers| F_S
+    C  -->|triggers| C_S
 
-Future adverbial clauses    ───▶   Projected, not yet
- (cuando, en cuanto, hasta         factual; event at R > S
- que, antes de que, para que)
+    V_S  -.->|mood used| SUB
+    E_S  -.->|mood used| SUB
+    A_S  -.->|mood used| SUB
+    F_S  -.->|mood used| SUB
+    C_S  -.->|mood used| SUB
 
-Concessive-hypothetical     ───▶   Entertained as possible
- (aunque + subjunctive,            or counterfactual, not
- si + imperfect subj.)             presented as real
-────────────────────────────────────────────────────────────
-                                   INDICATIVE = asserted
-                                   SUBJUNCTIVE = not-asserted
+    IND -.-|contrast| SUB
 ```
 
 ---
@@ -208,19 +222,24 @@ Sequence-of-tenses violations produce sentences that are grammatical in isolatio
 
 The practitioner should internalize the sequence-of-tenses architecture as a dependency graph: the main clause tense selects one of two temporal planes — present/future or past — and the subjunctive form must track that plane consistently throughout the sentence and its discourse environment.
 
-```
-SEQUENCE OF TENSES (Concordancia de Tiempos)
-
-MAIN CLAUSE TENSE        SUBORDINATE SUBJUNCTIVE   TEMPORAL RELATION
-─────────────────────────────────────────────────────────────────────
-Present / Future         Pres. Subj. (hable)       Simultaneous/future
-                         Pres. Perf. Subj.          Prior to main
-                          (haya hablado)
-
-Preterite / Imperfect /  Imperf. Subj. (hablara)   Simultaneous/future
-Conditional              Past Perf. Subj.           Prior to main
-                          (hubiera hablado)
-─────────────────────────────────────────────────────────────────────
+```mermaid
+flowchart TD
+    Start["SEQUENCE OF TENSES<br/>(Concordancia de Tiempos)"]
+    
+    Start --> Present["Main Clause Tense:<br/>Present / Future"]
+    Start --> Past["Main Clause Tense:<br/>Preterite / Imperfect / Conditional"]
+    
+    Present --> PresSubj["Pres. Subj.<br/>(hable)"]
+    Present --> PresPerfSubj["Pres. Perf. Subj.<br/>(haya hablado)"]
+    
+    Past --> ImperfSubj["Imperf. Subj.<br/>(hablara)"]
+    Past --> PastPerfSubj["Past Perf. Subj.<br/>(hubiera hablado)"]
+    
+    PresSubj --> SimFut1["Simultaneous/Future"]
+    PresPerfSubj --> Prior1["Prior to Main"]
+    
+    ImperfSubj --> SimFut2["Simultaneous/Future"]
+    PastPerfSubj --> Prior2["Prior to Main"]
 ```
 
 ### Failure Mode 4: Blocking Aspectual Coercion Readings

@@ -51,33 +51,32 @@ Fingers are numbered 1 (index) through 4 (pinky); the thumb never stops strings 
 
 **First-Position Finger Pattern Drill:**
 
-```
-FIRST-POSITION PATTERN DRILL (Violin, A string)
-─────────────────────────────────────────────
-Pattern 1 (G major, low 2):
-  Open A - 1(B) - 2low(C) - 3(D)
-  Half steps: 2-3 is a half step, 1-2 is a
-  half step. Listen for the close finger
-  spacing between 1 and 2.
-
-Pattern 2 (D major, high 2):
-  Open A - 1(B) - 2high(C#) - 3(D)
-  Half steps: 2-3 is a half step, 1-2 is a
-  WHOLE step. The 2nd finger sits noticeably
-  higher up (closer to 3rd finger).
-
-Drill: Alternate Pattern 1 and Pattern 2,
-four times each, listening for the shift in
-2nd-finger spacing. Use open A as a drone
-reference — stop the bow between patterns
-and check the 2nd finger against the open
-string's overtone (harmonic 3rd/C# should
-ring sympathetically if in tune for Pattern 2).
-
-Metronome: 60 BPM, quarter notes.
-Progression: Week 1: 60 BPM. Week 2: 80 BPM.
-             Week 3: 110 BPM, slurred 2 notes
-             per bow.
+```mermaid
+flowchart TD
+    Start["FIRST-POSITION PATTERN DRILL<br/>(Violin, A string)"]
+    
+    Start --> P1["Pattern 1: G major, low 2"]
+    Start --> P2["Pattern 2: D major, high 2"]
+    
+    P1 --> P1_Notes["Open A → 1(B) → 2low(C) → 3(D)"]
+    P1_Notes --> P1_Half["Half steps: 1-2, 2-3<br/>Close finger spacing between 1 and 2"]
+    
+    P2 --> P2_Notes["Open A → 1(B) → 2high(C#) → 3(D)"]
+    P2_Notes --> P2_Half["Half steps: 2-3<br/>WHOLE step: 1-2<br/>2nd finger sits higher, closer to 3rd"]
+    
+    P1_Half --> Drill["DRILL: Alternate Pattern 1 and Pattern 2<br/>Four times each"]
+    P2_Half --> Drill
+    
+    Drill --> Listen["Listen for shift in 2nd-finger spacing"]
+    Listen --> Ref["Use open A as drone reference<br/>Stop bow between patterns<br/>Check 2nd finger against open string overtone<br/>(C# should ring sympathetically for Pattern 2)"]
+    
+    Ref --> Metro["Metronome: 60 BPM, quarter notes"]
+    
+    Metro --> Prog["PROGRESSION"]
+    
+    Prog --> W1["Week 1: 60 BPM"]
+    Prog --> W2["Week 2: 80 BPM"]
+    Prog --> W3["Week 3: 110 BPM<br/>slurred 2 notes per bow"]
 ```
 
 ### 3.2 Shifting Mechanics
@@ -90,42 +89,58 @@ A shift is a controlled, single smooth motion of the entire hand/arm along the n
 
 **Shifting Drill — 1st to 3rd Position, One String:**
 
-```
-SHIFTING DRILL (Violin, D string)
-─────────────────────────────────────────────
-Goal: Clean, inaudible shifts using guide-
-      finger continuity.
-
-Step 1: Play 1st finger E (1st position).
-Step 2: Lighten pressure (not fully releasing
-         contact), slide 1st finger up the
-         string to 3rd position (now sounding
-         G if held, but you're passing through).
-Step 3: Drop 3rd finger firmly to sound B
-         (3rd position).
-Step 4: Reverse: release 3rd finger, guide
-         with 1st finger sliding back down to
-         1st position E.
-
-Bow: One long down-bow through the entire
-     up-shift, one long up-bow through the
-     down-shift. This forces you to coordinate
-     bow speed with arm travel time — rushing
-     the bow produces a rushed, audible shift.
-
-Metronome: 60 BPM. Each shift = 2 beats up,
-           2 beats down.
-Progression:
-  Week 1: 60 BPM, exaggerate the slide feeling
-          to internalize guide-finger motion.
-  Week 2: 72 BPM, reduce slide audibility —
-          aim for near-silent transit.
-  Week 3: 90 BPM, same drill on G and A
-          strings.
-  Week 4: Apply to a real shift from your
-          repertoire; isolate just that shift
-          and loop it 10 times slowly before
-          returning to tempo.
+```mermaid
+flowchart TD
+    Start["SHIFTING DRILL (Violin, D string)"]
+    Goal["Goal: Clean, inaudible shifts using<br/>guide-finger continuity"]
+    
+    Start --> Goal
+    Goal --> Technique
+    
+    subgraph Technique ["Core Technique"]
+        S1["Step 1: Play 1st finger E<br/>(1st position)"]
+        S2["Step 2: Lighten pressure<br/>(maintain contact)<br/>Slide 1st finger → 3rd position"]
+        S3["Step 3: Drop 3rd finger firmly<br/>Sound B (3rd position)"]
+        S4["Step 4: Reverse shift<br/>Release 3rd finger<br/>Guide 1st finger back → 1st position E"]
+        
+        S1 --> S2
+        S2 --> S3
+        S3 --> S4
+        S4 -.-> S1
+    end
+    
+    subgraph Bowing ["Bow Technique"]
+        B1["Up-shift: One long down-bow"]
+        B2["Down-shift: One long up-bow"]
+        B3["Coordinate bow speed with arm travel<br/>Rushing bow = audible shift"]
+        
+        B1 --> B2
+        B2 --> B3
+    end
+    
+    subgraph Metro ["Metronome & Timing"]
+        M1["60 BPM baseline"]
+        M2["Each shift = 2 beats up + 2 beats down"]
+        
+        M1 --> M2
+    end
+    
+    Technique --> Progression
+    Bowing --> Progression
+    Metro --> Progression
+    
+    subgraph Progression ["4-Week Progression"]
+        W1["Week 1: 60 BPM<br/>Exaggerate slide feeling<br/>Internalize guide-finger motion"]
+        W2["Week 2: 72 BPM<br/>Reduce slide audibility<br/>Aim for near-silent transit"]
+        W3["Week 3: 90 BPM<br/>Same drill on G and A strings"]
+        W4["Week 4: Apply to repertoire<br/>Isolate one shift<br/>Loop 10× slowly before tempo"]
+        
+        W1 --> W2
+        W2 --> W3
+        W3 --> W4
+    end
+    
+    Progression --> Mastery["Mastery: Silent, controlled<br/>positional shifts"]
 ```
 
 ### 3.3 Vibrato Mechanics (Mechanical, Not Just Expressive)
@@ -135,37 +150,38 @@ Vibrato is a controlled oscillation of pitch below (primarily) and slightly abov
 - **Wrist vibrato drill:** finger planted on a note, forearm still, rock the hand at the wrist so the fingertip rolls slightly forward and back. Produces a faster, narrower oscillation — suited to Baroque/Classical repertoire and fast passages.
 - **Arm vibrato drill:** finger planted, wrist relatively fixed relative to forearm, the entire forearm oscillates from the elbow. Produces a wider, slower, more Romantic sound.
 
-```
-VIBRATO ISOLATION DRILL
-─────────────────────────────────────────────
-Setup: 3rd finger, D string, 3rd position (G).
-       Thumb maintains light contact with neck
-       (do not grip harder to compensate).
+```mermaid
+flowchart TD
+    SETUP["<b>VIBRATO ISOLATION DRILL</b><br/>─────────────────────────────<br/>Setup: 3rd finger · D string · 3rd position (G)<br/>Thumb maintains light contact — do not grip harder"]
 
-Step 1 (wrist only): Rock hand forward/back
-  at the wrist joint, 2 oscillations/sec,
-  for 8 beats at 60 BPM. Forearm stays still —
-  check in a mirror.
+    STEP1["<b>Step 1 — Wrist Only</b><br/>Rock hand forward/back at the wrist joint<br/>2 oscillations/sec · 8 beats at 60 BPM<br/>Forearm stays still — check in a mirror"]
 
-Step 2 (arm only): Lock the wrist relative to
-  the forearm (use the other hand briefly to
-  feel the wrist staying neutral), oscillate
-  from the elbow, 1.5 oscillations/sec, for
-  8 beats.
+    STEP2["<b>Step 2 — Arm Only</b><br/>Lock wrist relative to forearm<br/>(use other hand briefly to verify wrist stays neutral)<br/>Oscillate from the elbow · 1.5 oscillations/sec · 8 beats"]
 
-Step 3 (combined): Blend both, let the wrist
-  initiate and the forearm follow in a single
-  fluid rock. This is the mature vibrato motion
-  used in performance.
+    STEP3["<b>Step 3 — Combined</b><br/>Blend both: wrist initiates, forearm follows<br/>Single fluid rock motion<br/>This is the mature vibrato used in performance"]
 
-Metronome: 60 BPM throughout.
-Progression: Increase oscillation speed weekly
-  by roughly 10%, capping around 6-7
-  oscillations/sec for fast, intense vibrato.
-Daily: 5 minutes, rotate through 1st, 2nd,
-       3rd, 4th fingers (4th finger/pinky
-       vibrato is weakest — budget extra
-       repetitions here).
+    METRONOME["<b>Metronome</b><br/>60 BPM throughout all steps"]
+
+    PROGRESSION["<b>Weekly Progression</b><br/>Increase oscillation speed ~10% per week<br/>Cap at 6–7 oscillations/sec<br/>for fast, intense vibrato"]
+
+    DAILY["<b>Daily Practice</b><br/>5 minutes total<br/>Rotate through 1st · 2nd · 3rd · 4th fingers<br/>⚠ 4th finger (pinky) is weakest — budget extra reps"]
+
+    SETUP --> STEP1
+    STEP1 --> STEP2
+    STEP2 --> STEP3
+    STEP3 --> PROGRESSION
+    METRONOME -. "governs tempo" .-> STEP1
+    METRONOME -. "governs tempo" .-> STEP2
+    METRONOME -. "governs tempo" .-> STEP3
+    PROGRESSION --> DAILY
+
+    style SETUP fill:#1a1a2e,color:#e0e0ff,stroke:#7b68ee,stroke-width:2px
+    style STEP1 fill:#16213e,color:#e0e0ff,stroke:#4a9eff,stroke-width:2px
+    style STEP2 fill:#16213e,color:#e0e0ff,stroke:#4a9eff,stroke-width:2px
+    style STEP3 fill:#16213e,color:#e0e0ff,stroke:#4a9eff,stroke-width:2px
+    style METRONOME fill:#0f3460,color:#e0e0ff,stroke:#e94560,stroke-width:2px
+    style PROGRESSION fill:#1a1a2e,color:#e0e0ff,stroke:#7b68ee,stroke-width:2px
+    style DAILY fill:#0d2137,color:#e0e0ff,stroke:#f5a623,stroke-width:2px
 ```
 
 ---
@@ -178,41 +194,31 @@ Cello fingering uses 1-2-3-4 like the violin in lower positions but with wider f
 
 **Thumb Position Entry Drill:**
 
-```
-THUMB POSITION ENTRY DRILL (Cello, A string)
-─────────────────────────────────────────────
-Goal: Establish thumb-as-anchor without
-      collapsing hand shape.
-
-Step 1: Place thumb flat across A and D
-        strings at the octave harmonic node
-        (where the string naturally produces
-        a harmonic octave — roughly the
-        halfway point of the string length).
-        Press enough to stop both strings
-        cleanly, not just touch.
-
-Step 2: Drop 1st finger a whole step above the
-        thumb on A string. Check pitch against
-        open A harmonic.
-
-Step 3: Add 2nd and 3rd fingers in sequence,
-        whole step then half step spacing
-        (standard thumb-position hand frame).
-
-Step 4: Practice octaves: thumb note on A
-        string, 3rd finger simultaneously on D
-        string one octave above where the open
-        D would ring — builds the octave hand
-        frame used constantly in upper-register
-        cello repertoire.
-
-Metronome: 50 BPM, half notes (slow — thumb
-           position accuracy depends on
-           careful proprioceptive calibration,
-           not speed).
-Daily: 5 minutes before any thumb-position
-       repertoire work.
+```mermaid
+flowchart TD
+    Start["THUMB POSITION ENTRY DRILL<br/>(Cello, A string)"]
+    Goal["Goal: Establish thumb-as-anchor<br/>without collapsing hand shape"]
+    
+    Start --> Goal
+    Goal --> Step1
+    
+    Step1["Step 1: Place Thumb<br/>──────────────<br/>Position thumb flat across A and D strings<br/>at octave harmonic node (halfway point).<br/>Press to stop both strings cleanly."]
+    
+    Step2["Step 2: Add 1st Finger<br/>──────────────<br/>Drop 1st finger a whole step above thumb<br/>on A string.<br/>Check pitch against open A harmonic."]
+    
+    Step3["Step 3: Add 2nd & 3rd Fingers<br/>──────────────<br/>Add fingers in sequence:<br/>whole step, then half step spacing<br/>(standard thumb-position hand frame)."]
+    
+    Step4["Step 4: Practice Octaves<br/>──────────────<br/>Thumb note on A string,<br/>3rd finger simultaneously on D string<br/>one octave above open D.<br/>Builds octave hand frame for<br/>upper-register repertoire."]
+    
+    Step1 --> Step2
+    Step2 --> Step3
+    Step3 --> Step4
+    
+    Step4 --> Practice
+    
+    Practice["Practice Parameters<br/>──────────────<br/>Metronome: 50 BPM, half notes<br/>(slow for proprioceptive calibration)<br/>Daily: 5 minutes before<br/>any thumb-position repertoire work"]
+    
+    Practice --> End["Ready for Thumb Position Repertoire"]
 ```
 
 ### 4.2 Double Bass: Simandl 1-2-4 and the Position System
@@ -223,76 +229,110 @@ From roughly 5th/6th position and above (thumb position territory on bass, usual
 
 **Simandl 1-2-4 Drill:**
 
-```
-SIMANDL 1-2-4 DRILL (Double Bass, G string)
-─────────────────────────────────────────────
-Goal: Internalize the 1-2-4 spacing so lower-
-      position passages don't strain the hand.
-
-Half Position:
-  Open G - 1(Ab) - 2(A) - 4(Bb)
-  Spacing: 1 to 2 = whole step, 2 to 4 = half
-  step. Keep 3rd finger relaxed and trailing
-  just behind 4th — do not lift it away from
-  the hand.
-
-1st Position (shift up a half step):
-  1(A) - 2(Bb) - 4(B)
-
-Thumb anchor check: thumb sits opposite
-  roughly between fingers 1 and 2, behind the
-  neck, applying light counter-pressure only —
-  never squeezing.
-
-Metronome: 50 BPM, quarter notes, down-up bow
-           or pizzicato alternating i-m fingers.
-Progression:
-  Week 1: 50 BPM, half position only.
-  Week 2: 60 BPM, add 1st position, practice
-          the half-position-to-1st-position
-          shift using guide-finger continuity
-          (same principle as violin family).
-  Week 3: 70 BPM, full half-through-4th-
-          position scale, two octaves.
-  Week 4: Introduce OFPF above 5th position,
-          noting the hand-frame contraction.
+```mermaid
+flowchart TD
+    Start["SIMANDL 1-2-4 DRILL<br/>(Double Bass, G string)"]
+    Goal["Goal: Internalize 1-2-4 spacing<br/>for lower-position passages<br/>without hand strain"]
+    
+    Start --> Goal
+    Goal --> HalfPos
+    Goal --> FirstPos
+    
+    subgraph HalfPos ["Half Position"]
+        HP1["Open G → 1(Ab) → 2(A) → 4(Bb)"]
+        HP2["Spacing:<br/>1→2 = whole step<br/>2→4 = half step"]
+        HP3["Keep 3rd finger relaxed,<br/>trailing just behind 4th"]
+    end
+    
+    subgraph FirstPos ["1st Position"]
+        FP1["Shift up a half step"]
+        FP2["1(A) → 2(Bb) → 4(B)"]
+    end
+    
+    HalfPos --> ThumbCheck
+    FirstPos --> ThumbCheck
+    
+    ThumbCheck["Thumb Anchor Check:<br/>Opposite between fingers 1 & 2,<br/>behind neck, light counter-pressure,<br/>never squeezing"]
+    
+    ThumbCheck --> Metro
+    
+    subgraph Metro ["Metronome Setup"]
+        M1["50 BPM, quarter notes"]
+        M2["Down-up bow or<br/>pizzicato alternating i-m fingers"]
+    end
+    
+    Metro --> Progression
+    
+    subgraph Progression ["4-Week Progression"]
+        W1["Week 1: 50 BPM<br/>Half position only"]
+        W2["Week 2: 60 BPM<br/>Add 1st position<br/>Practice half→1st shift<br/>using guide-finger continuity"]
+        W3["Week 3: 70 BPM<br/>Full half-through-4th position<br/>Two octaves"]
+        W4["Week 4: Introduce OFPF<br/>above 5th position<br/>Note hand-frame contraction"]
+        
+        W1 --> W2
+        W2 --> W3
+        W3 --> W4
+    end
 ```
 
 ### 4.3 Floating Thumb Mute (Electric Bass Guitar)
 
 On electric bass, resting the plucking-hand thumb across the lower adjacent string (rather than anchoring on the pickup) kills sympathetic ringing from unplayed lower strings while giving the thumb a mobile mute point as you move across strings.
 
-```
-FLOATING THUMB MUTE DRILL (4-string bass)
-─────────────────────────────────────────────
-Setup: Rest thumb on the E string while
-       playing a line on the A string. As
-       you move to the D string, thumb moves
-       to rest on A string. As you move to G
-       string, thumb rests on D string.
+```mermaid
+flowchart TD
+    TITLE["🎸 Floating Thumb Mute Drill — 4-String Bass"]
 
-Exercise: Play a chromatic walking line:
-  E string: E-F-F#-G (frets 0-1-2-3)
-  A string: A-Bb-B-C (frets 0-1-2-3)
-  D string: D-Eb-E-F (frets 0-1-2-3)
-  G string: G-Ab-A-Bb (frets 0-1-2-3)
+    subgraph setup ["Thumb Mute Setup — String Tracking"]
+        S1["Playing: A string\nThumb rests on: E string"]
+        S2["Playing: D string\nThumb rests on: A string"]
+        S3["Playing: G string\nThumb rests on: D string"]
+        S1 -->|"move up one string"| S2
+        S2 -->|"move up one string"| S3
+    end
 
-  Move the thumb one string higher each time
-  you move your plucking fingers one string
-  higher. Check for zero ringing from the
-  strings below the one you're playing by
-  listening for a clean, dry low end — any
-  buzz or hum indicates the thumb isn't
-  seated firmly enough.
+    subgraph exercise ["Chromatic Walking Exercise — Frets 0–3"]
+        E1["E string\nE – F – F♯ – G\nFrets 0 1 2 3"]
+        E2["A string\nA – B♭ – B – C\nFrets 0 1 2 3"]
+        E3["D string\nD – E♭ – E – F\nFrets 0 1 2 3"]
+        E4["G string\nG – A♭ – A – B♭\nFrets 0 1 2 3"]
+        E1 -->|"thumb: E → A"| E2
+        E2 -->|"thumb: A → D"| E3
+        E3 -->|"thumb: D stays off G"| E4
+    end
 
-Left hand: Use 1-2-4 (Simandl logic applies
-  to bass guitar too, in frets 1-4) OR OFPF
-  from fret 5 upward, matching the double
-  bass logic to prevent tendon strain in the
-  wide low frets.
+    subgraph check ["Mute Quality Check"]
+        C1["Listen for clean, dry low end\nbelow the string being played"]
+        C2{{"Buzz or hum audible?"}}
+        C3["Thumb not seated firmly enough\n→ reposition and re-check"]
+        C4["✅ Mute is effective\n→ continue exercise"]
+        C1 --> C2
+        C2 -->|"Yes"| C3
+        C3 --> C1
+        C2 -->|"No"| C4
+    end
 
-Metronome: 70 BPM eighth notes → 90 → 110 BPM
-           over 3 weeks.
+    subgraph lefthand ["Left Hand Fingering"]
+        L1["Frets 1–4 (low positions)\nSimandl 1-2-4 fingering"]
+        L2["Fret 5 and above\nOne Finger Per Fret (OFPF)"]
+        L3["Matches double bass logic\n→ prevents tendon strain"]
+        L1 --- L3
+        L2 --- L3
+    end
+
+    subgraph tempo ["Metronome Progression — Eighth Notes"]
+        T1["Week 1\n70 BPM"]
+        T2["Week 2\n90 BPM"]
+        T3["Week 3\n110 BPM"]
+        T1 -->|"+1 week"| T2
+        T2 -->|"+1 week"| T3
+    end
+
+    TITLE --> setup
+    setup --> exercise
+    exercise --> check
+    check --> lefthand
+    check --> tempo
 ```
 
 ---
@@ -314,71 +354,98 @@ Concretely for root C (E string, fret 8): Root = E-string fret 8 (C), Major 3rd 
 
 **Minor box (same root):** Minor 3rd = A-string fret 6 instead of 7. One-fret difference between major and minor box — drill both back-to-back so your fretting hand learns the half-step distinction kinesthetically, not just theoretically.
 
-```
-MOVABLE BOX DRILL (Bass guitar)
-─────────────────────────────────────────────
-Goal: Play root-3rd-5th-octave in both major
-      and minor qualities, movable to any root,
-      without looking at the fretboard.
+```mermaid
+flowchart TD
+    GOAL["🎯 Goal\nPlay root–3rd–5th–octave\n(major & minor), any root,\nno looking at fretboard"]
 
-Step 1: Starting root = E string, fret 5 (A).
-        Play major box: A - C# - E - A.
-        Ascend and descend, quarter notes.
-Step 2: Same root, minor box: A - C - E - A.
-Step 3: Slide the whole shape up 2 frets
-        (root = B), repeat major then minor.
-        Continue chromatically up to fret 12,
-        then back down.
+    GOAL --> STEP1
 
-Fingering: 1-2-1-3 (approx.) for major;
-           1-1-1-3 for minor (shift-free since
-           minor 3rd and root fall closer) —
-           adapt per your hand span, but lock
-           in ONE consistent fingering pattern
-           and drill it until automatic.
+    subgraph drill ["🔁 Movable Box Drill — E String"]
+        STEP1["Step 1 — Root: A (fret 5)\nMajor box: A – C# – E – A\nAscend & descend, quarter notes"]
+        STEP2["Step 2 — Same root: A (fret 5)\nMinor box: A – C – E – A"]
+        STEP3["Step 3 — Slide shape +2 frets → B\nRepeat major, then minor\nContinue chromatically → fret 12\nthen back down"]
 
-Metronome: 60 BPM quarter notes → 90 BPM →
-           120 BPM over 3 weeks.
-Application: Once automatic, call out random
-             roots and qualities (major/minor)
-             and execute the box in under 2
-             seconds — this is the speed real
-             walking-bass and function-playing
-             demands.
+        STEP1 --> STEP2 --> STEP3
+        STEP3 -->|"repeat each root"| STEP3
+    end
+
+    subgraph fingering ["✋ Fingering"]
+        FIN_MAJ["Major: 1 – 2 – 1 – 3"]
+        FIN_MIN["Minor: 1 – 1 – 1 – 3\n(minor 3rd sits closer to root)"]
+        FIN_RULE["Lock ONE consistent pattern\nand drill until automatic"]
+
+        FIN_MAJ --> FIN_RULE
+        FIN_MIN --> FIN_RULE
+    end
+
+    subgraph tempo ["🎚️ Metronome Progression (3 weeks)"]
+        T60["60 BPM\nquarter notes"]
+        T90["90 BPM"]
+        T120["120 BPM"]
+
+        T60 -->|"week 1 → 2"| T90 -->|"week 2 → 3"| T120
+    end
+
+    subgraph application ["🎸 Application Test"]
+        APP["Caller names random root + quality\n(e.g. F# minor)"]
+        EXEC["Execute box in < 2 seconds"]
+        CONTEXT["Real-world demand:\nwalking bass & function playing"]
+
+        APP --> EXEC --> CONTEXT
+    end
+
+    STEP3 --> FIN_MAJ
+    STEP3 --> FIN_MIN
+    FIN_RULE --> T60
+    T120 --> APP
 ```
 
 ### 5.2 Walking Bass Chromatic Approach Rule
 
 The chromatic approach note rule: on the beat *before* a target chord's root, play a note a half step above or below that root (whichever is closer to your current position) to create forward pull into the next downbeat.
 
-```
-WALKING BASS CHROMATIC APPROACH DRILL
-─────────────────────────────────────────────
-Progression: C - F - G - C (one bar each,
-             4/4, quarter-note walking bass)
-
-Bar 1 (C):   C - E - G - B  (root-3rd-5th-
-             chromatic approach to F, i.e. a
-             half step below F = E natural...
-             use B here since it's a half step
-             below C's octave, or target F:
-             beat 4 = F# or E, whichever is
-             closer from your beat-3 note)
-Bar 2 (F):   F - A - C - F#  (F# approaches G
-             from below by half step)
-Bar 3 (G):   G - B - D - C#  (C# approaches D...
-             adjust target: beat 4 approaches
-             bar 4's root C, so use B or Db)
-Bar 4 (C):   C - E - G - E
-
-Rule of thumb for drilling: on beat 4 of every
-bar, insert a note a half step above or below
-NEXT bar's root. Practice this rule over any
-I-IV-V progression in all 12 keys, one key
-per day, ascending chromatically.
-
-Metronome: 70 BPM quarter notes → 100 BPM →
-           130 BPM (swing feel) over 4 weeks.
+```mermaid
+flowchart TD
+    title["WALKING BASS CHROMATIC APPROACH DRILL"]
+    
+    progression["Progression: C - F - G - C<br/>(one bar each, 4/4, quarter-note walking bass)"]
+    
+    title --> progression
+    
+    progression --> bar1
+    progression --> bar2
+    progression --> bar3
+    progression --> bar4
+    
+    subgraph bar1 ["Bar 1 (C Chord)"]
+        b1["Beat 1: C (root)<br/>Beat 2: E (3rd)<br/>Beat 3: G (5th)<br/>Beat 4: B (chromatic approach to next root)"]
+    end
+    
+    subgraph bar2 ["Bar 2 (F Chord)"]
+        b2["Beat 1: F (root)<br/>Beat 2: A (3rd)<br/>Beat 3: C (5th)<br/>Beat 4: F# (chromatic approach to G)"]
+    end
+    
+    subgraph bar3 ["Bar 3 (G Chord)"]
+        b3["Beat 1: G (root)<br/>Beat 2: B (3rd)<br/>Beat 3: D (5th)<br/>Beat 4: B or Db (chromatic approach to C)"]
+    end
+    
+    subgraph bar4 ["Bar 4 (C Chord)"]
+        b4["Beat 1: C (root)<br/>Beat 2: E (3rd)<br/>Beat 3: G (5th)<br/>Beat 4: E (resolution)"]
+    end
+    
+    bar1 --> bar2
+    bar2 --> bar3
+    bar3 --> bar4
+    
+    rule["RULE OF THUMB:<br/>On beat 4 of every bar, insert a note<br/>a half step above or below the NEXT bar's root"]
+    
+    practice["PRACTICE PLAN:<br/>• Apply this rule over any I-IV-V progression<br/>• Practice in all 12 keys<br/>• One key per day, ascending chromatically"]
+    
+    tempo["METRONOME PROGRESSION (4 weeks):<br/>70 BPM (quarter notes) → 100 BPM → 130 BPM (swing feel)"]
+    
+    bar4 --> rule
+    rule --> practice
+    practice --> tempo
 ```
 
 ### 5.3 Slap and Pop Biomechanics
@@ -387,42 +454,35 @@ Metronome: 70 BPM quarter notes → 100 BPM →
 
 **Pop (index or middle):** Hook the finger under the string, pull perpendicular to the fretboard (upward), and release sharply so the string snaps back against the frets, producing the "pop" transient.
 
-```
-SLAP/POP MECHANICS DRILL
-─────────────────────────────────────────────
-Step 1 — Thumb bounce isolation:
-  Mute all strings with left hand (no pitch,
-  pure mechanics). Slap the E string with the
-  thumb, focusing ONLY on the bounce-off
-  rebound — the thumb should never rest on
-  the string after contact.
-  Reps: 20 strikes, check for consistent
-  rebound height and sound.
-
-Step 2 — Pop isolation:
-  Hook index finger under G string, pull up
-  1cm, release. Listen for a sharp snap
-  against the frets, not a dull pluck.
-  Reps: 20 pops.
-
-Step 3 — Combine, open strings:
-  Thumb slap on E, pop on G, alternating.
-  Pattern: Slap-Pop-Slap-Pop
-  Metronome: 70 BPM eighth notes.
-
-Step 4 — Apply to a line (fretted):
-  Thumb slap root note, pop the octave or
-  5th. Classic pattern:
-  Slap(root, fret 3 A string) -
-  Pop(octave, fret 5 G string) -
-  Slap(root) - Pop(5th)
-
-Progression: 70 BPM → 90 BPM → 110 BPM over
-             3 weeks. Do not increase tempo
-             until the rebound mechanic stays
-             clean — rushing calcifies a dead-
-             strike habit that is hard to
-             unlearn later.
+```mermaid
+flowchart TD
+    Start["SLAP/POP MECHANICS DRILL"]
+    
+    Step1["Step 1 — Thumb Bounce Isolation"]
+    Step1Details["Mute all strings with left hand<br/>(no pitch, pure mechanics)<br/>Slap E string with thumb<br/>Focus on bounce-off rebound<br/>Thumb never rests on string<br/><b>Reps: 20 strikes</b><br/>Check for consistent rebound height & sound"]
+    
+    Step2["Step 2 — Pop Isolation"]
+    Step2Details["Hook index finger under G string<br/>Pull up 1cm, release<br/>Listen for sharp snap against frets<br/>(not a dull pluck)<br/><b>Reps: 20 pops</b>"]
+    
+    Step3["Step 3 — Combine, Open Strings"]
+    Step3Details["Thumb slap on E, pop on G, alternating<br/>Pattern: Slap-Pop-Slap-Pop<br/><b>Metronome: 70 BPM eighth notes</b>"]
+    
+    Step4["Step 4 — Apply to Line (Fretted)"]
+    Step4Details["Thumb slap root note, pop octave or 5th<br/>Classic pattern:<br/>Slap (root, fret 3 A string) →<br/>Pop (octave, fret 5 G string) →<br/>Slap (root) → Pop (5th)"]
+    
+    Progression["Tempo Progression"]
+    ProgressionDetails["70 BPM → 90 BPM → 110 BPM<br/>Over 3 weeks<br/><br/><b>⚠ Do NOT increase tempo until<br/>rebound mechanic stays clean</b><br/>Rushing calcifies dead-strike habit<br/>that is hard to unlearn later"]
+    
+    Start --> Step1
+    Step1 --> Step1Details
+    Step1Details --> Step2
+    Step2 --> Step2Details
+    Step2Details --> Step3
+    Step3 --> Step3Details
+    Step3Details --> Step4
+    Step4 --> Step4Details
+    Step4Details --> Progression
+    Progression --> ProgressionDetails
 ```
 
 ---
@@ -433,43 +493,87 @@ Progression: 70 BPM → 90 BPM → 110 BPM over
 
 CAGED maps the open-position C, A, G, E, and D chord shapes as movable barre/partial-barre forms that tile the entire neck, so any chord has five accessible voicings/positions. For a C major chord, the five CAGED-derived shapes appear (in order up the neck) as: C-shape (open position), A-shape (barre at fret 3), G-shape (barre at fret 5), E-shape (barre at fret 8), D-shape (barre at fret 10) — each shape's root notes connect to the next shape's root notes, forming a continuous lattice.
 
-```
-CAGED DRILL — C MAJOR ACROSS THE NECK
-─────────────────────────────────────────────
-Shape 1 (C-shape, open):
-  x-3-2-0-1-0 (low E to high E)
+```mermaid
+flowchart TD
+    subgraph shapes ["CAGED Shapes — C Major Across the Neck"]
+        S1["**Shape 1 — C-shape**
+        Open Position
+        ───────────────
+        Frets: x-3-2-0-1-0
+        (Low E → High E)"]
 
-Shape 2 (A-shape, barre fret 3):
-  x-3-5-5-5-3  (barre 1st finger across fret 3,
-  3rd finger A-shape body)
+        S2["**Shape 2 — A-shape**
+        Barre Fret 3
+        ───────────────
+        Frets: x-3-5-5-5-3
+        1st finger barre @ fret 3
+        3rd finger A-shape body"]
 
-Shape 3 (G-shape, barre fret 5):
-  3-5-5-4-3-3  (modified G shape, barre with
-  partial 1st finger)
+        S3["**Shape 3 — G-shape**
+        Barre Fret 5
+        ───────────────
+        Frets: 3-5-5-4-3-3
+        Modified G-shape
+        Partial 1st finger barre"]
 
-Shape 4 (E-shape, barre fret 8):
-  8-10-10-9-8-8  (full barre 1st finger,
-  E-shape body)
+        S4["**Shape 4 — E-shape**
+        Barre Fret 8
+        ───────────────
+        Frets: 8-10-10-9-8-8
+        Full 1st finger barre
+        E-shape body"]
 
-Shape 5 (D-shape, barre fret 10):
-  x-x-10-12-13-12  (D-shape body, root on
-  D string)
+        S5["**Shape 5 — D-shape**
+        Barre Fret 10
+        ───────────────
+        Frets: x-x-10-12-13-12
+        D-shape body
+        Root on D string"]
+    end
 
-Drill: Play each shape as a quarter-note
-       strum, 4 beats per shape, moving up
-       the neck in order. Then reverse.
-       Say the shape name aloud as you play
-       it — this cements the CAGED letter
-       association.
+    subgraph drill ["Drill Instructions"]
+        D1["**Strum Pattern**
+        Quarter-note strums
+        4 beats per shape
+        60 BPM metronome"]
 
-Metronome: 60 BPM.
-Progression: Week 1: shapes in isolation.
-  Week 2: connect shape 1→2 with a smooth
-  slide of the lowest note, finding the
-  shared root. Week 3: all 5 shapes, 2 beats
-  each. Week 4: apply to a different key
-  (e.g., G major) — the shapes are identical,
-  only the fret positions shift.
+        D2["**Direction**
+        Ascending: S1 → S2 → S3 → S4 → S5
+        Descending: S5 → S4 → S3 → S2 → S1
+        Say shape name aloud on each change"]
+    end
+
+    subgraph prog ["Weekly Progression"]
+        W1["**Week 1**
+        Shapes in isolation
+        Master each voicing individually"]
+
+        W2["**Week 2**
+        Connect Shape 1 → 2
+        Smooth slide on lowest note
+        Find the shared root"]
+
+        W3["**Week 3**
+        All 5 shapes
+        2 beats each shape"]
+
+        W4["**Week 4**
+        Transpose to new key (e.g. G major)
+        Same shapes — fret positions shift only"]
+    end
+
+    S1 -->|"shared root / slide up"| S2
+    S2 -->|"shared root / slide up"| S3
+    S3 -->|"shared root / slide up"| S4
+    S4 -->|"shared root / slide up"| S5
+    S5 -.->|"reverse"| S4
+    S4 -.->|"reverse"| S3
+    S3 -.->|"reverse"| S2
+    S2 -.->|"reverse"| S1
+
+    shapes --> drill
+    drill --> prog
+    W1 --> W2 --> W3 --> W4
 ```
 
 **Why this works:** every CAGED shape contains the same interval structure (root-3rd-5th stacked across strings); only the open strings versus barred strings change which shape name applies. Internalizing this lets you find any chord tone, arpeggio, or scale fragment anywhere on the neck without hunting.
@@ -482,75 +586,95 @@ Progression: Week 1: shapes in isolation.
 
 **Pick slant:** tilting the pick so its leading edge angles slightly away from the direction of travel reduces string-catching during fast alternate picking. **Downward pick slant** (edge angled toward the floor) suits outside-string escapes; **upward pick slant** suits inside-string escapes. Most players need both depending on the lick's string-crossing pattern.
 
-```
-ECONOMY PICKING DRILL (3-notes-per-string scale)
-─────────────────────────────────────────────
-G major, 3-notes-per-string ascending from
-low E string fret 3:
-  E string: 3-5-7 (down-up-down)
-  A string: 4-5-7 (up-down-up — note the
-            direction continues naturally
-            because you're moving to an
-            adjacent string after a down-
-            stroke, so the next stroke
-            economizes as an up... adapt
-            per your picking-hand habit,
-            the key is consistency)
-  D string: 4-5-7 (down-up-down)
-  G string: 4-5-7 (up-down-up)
+```mermaid
+flowchart TD
+    TITLE["🎸 ECONOMY PICKING DRILL\n3-Notes-Per-String Scale — G Major"]
 
-Drill: Ascend 2 octaves, descend 2 octaves.
-       Focus on minimal pick travel distance
-       at each string change — the pick
-       should almost graze the new string on
-       its way through, not lift and reset.
+    subgraph STRINGS ["String Sequence — Ascending 2 Octaves"]
+        E["Low E String\nFrets: 3 · 5 · 7\nPicking: ↓ ↑ ↓"]
+        A["A String\nFrets: 4 · 5 · 7\nPicking: ↑ ↓ ↑"]
+        D["D String\nFrets: 4 · 5 · 7\nPicking: ↓ ↑ ↓"]
+        G["G String\nFrets: 4 · 5 · 7\nPicking: ↑ ↓ ↑"]
+        E --> A --> D --> G
+    end
 
-Metronome: 60 BPM eighth-note triplets (3
-           notes per click) → 90 BPM → 120 BPM
-           over 4 weeks.
-Hand muting: Palm-mute lightly with picking
-             hand edge resting on the bridge
-             to control unwanted string noise
-             from the 3-note-per-string shifts.
+    subgraph DRILL ["Drill Pattern"]
+        ASC["Ascend 2 Octaves\n→ economy pick through each string change"]
+        DESC["Descend 2 Octaves\n→ mirror the pick direction sequence"]
+        ASC --> DESC --> ASC
+    end
+
+    subgraph TECHNIQUE ["Key Technique Cues"]
+        TRAVEL["Minimal Pick Travel\nPick grazes the next string\non the way through — no lift & reset"]
+        MUTE["Palm Muting\nPicking-hand edge rests lightly\non the bridge to suppress noise"]
+    end
+
+    subgraph TEMPO ["Metronome Progression (8th-note triplets — 3 notes per click)"]
+        T60["Week 1–2\n60 BPM"]
+        T90["Week 3\n90 BPM"]
+        T120["Week 4\n120 BPM"]
+        T60 --> T90 --> T120
+    end
+
+    TITLE --> STRINGS
+    STRINGS --> DRILL
+    DRILL --> TECHNIQUE
+    DRILL --> TEMPO
 ```
 
 ### 6.3 Fingerstyle: Travis Picking
 
 Travis picking alternates a bass note pattern (thumb, usually alternating between two bass strings on the beat) with syncopated treble notes (index/middle fingers) filling in off-beats, producing the illusion of two independent parts from one guitar.
 
-```
-TRAVIS PICKING DRILL (Key of C, PIMA fingering)
-─────────────────────────────────────────────
-Chord: C major (x-3-2-0-1-0)
+```mermaid
+flowchart TD
+    ROOT["🎸 Travis Picking Drill\nKey of C · PIMA Fingering"]
 
-Thumb (p) pattern, steady quarter notes:
-  Beat 1: C string (bass, fret 3, A string)
-  Beat 2: C string (same, root) — or alternate
-          to G string (open) for alternating
-          bass
-  Beat 3: A string (root) again
-  Beat 4: G string (open, alternate bass)
+    ROOT --> CHORD
+    ROOT --> PATTERN
+    ROOT --> TEMPO
+    ROOT --> PROGRESS
 
-Fingers (i, m) pattern, off-beat eighth notes
-  (the "and" of each beat):
-  "and" of 1: m plucks B string (open)
-  "and" of 2: i plucks G string (open)
-  "and" of 3: m plucks B string (open)
-  "and" of 4: i plucks G string (open)
+    CHORD["Chord: C Major\nx-3-2-0-1-0"]
 
-Combined: p-i-p-m-p-i-p-m (one full measure),
-  thumb always on the downbeats, i/m always
-  on the upbeats. This interlocking is the
-  core Travis-picking mechanic.
+    subgraph PATTERN ["Full Measure Pattern: p · i · p · m · p · i · p · m"]
 
-Metronome: 50 BPM (slow is essential — the
-           independence between thumb and
-           fingers must be solid before
-           speed) → 70 BPM → 90 BPM over
-           4 weeks.
-Progression: once C is automatic, apply the
-  identical p-i-p-m pattern to G, D, Em, Am —
-  the pattern is movable across chord shapes.
+        subgraph THUMB ["👍 Thumb (p) — Downbeats (Quarter Notes)"]
+            B1["Beat 1\nA string, fret 3\n(bass root)"]
+            B2["Beat 2\nA string (root)\nor G string open\n(alternating bass)"]
+            B3["Beat 3\nA string\n(root)"]
+            B4["Beat 4\nG string open\n(alternate bass)"]
+            B1 --> B2 --> B3 --> B4
+        end
+
+        subgraph FINGERS ["🤞 Fingers (i, m) — Upbeats (Off-beat Eighth Notes)"]
+            A1["'and' of Beat 1\nm → B string open"]
+            A2["'and' of Beat 2\ni → G string open"]
+            A3["'and' of Beat 3\nm → B string open"]
+            A4["'and' of Beat 4\ni → G string open"]
+            A1 --> A2 --> A3 --> A4
+        end
+
+        INTERLOCK["⚙️ Core Mechanic\nThumb locks downbeats\nFingers lock upbeats\nNeither hand overlaps"]
+        B1 & B2 & B3 & B4 --> INTERLOCK
+        A1 & A2 & A3 & A4 --> INTERLOCK
+    end
+
+    subgraph TEMPO ["🎚️ Metronome Progression (4 Weeks)"]
+        T1["50 BPM\nBuild thumb/finger\nindependence first"]
+        T2["70 BPM\nSolidify the\npattern feel"]
+        T3["90 BPM\nFull fluency\ntarget"]
+        T1 -->|"Week 1–2"| T2 -->|"Week 3–4"| T3
+    end
+
+    subgraph PROGRESS ["🔄 Pattern Transfer — Same p·i·p·m Shape"]
+        PC["C Major\n(start here)"]
+        PG["G Major"]
+        PD["D Major"]
+        PEm["E minor"]
+        PAm["A minor"]
+        PC --> PG --> PD --> PEm --> PAm
+    end
 ```
 
 ### 6.4 Classical Guitar Right-Hand: Apoyando, Tirando, and Nail Shaping
@@ -561,37 +685,31 @@ Progression: once C is automatic, apply the
 
 Nail shape directly determines tone: the nail edge should follow the natural curve of the fingertip with a smooth ramp, filed so the string first contacts the nail slightly left of center (for right-handed players) and glides off smoothly. A nail with a sharp catch produces click; a nail filed too short produces a thin, fleshy tone with no definition.
 
-```
-APOYANDO/TIRANDO ISOLATION DRILL
-─────────────────────────────────────────────
-Setup: Classical guitar, right hand in
-       standard position, thumb anchored on
-       a bass string for stability.
-
-Step 1 — Apoyando, index finger:
-  Strike G string (3rd string), rest against
-  B string (2nd string). 8 repetitions.
-  Listen: full, round tone, no click.
-
-Step 2 — Apoyando, middle finger: same string,
-  8 reps.
-
-Step 3 — Tirando, index and middle alternating
-  (i-m-i-m) on the G string, clearing the
-  string each time, no resting.
-  8 reps, listen for even volume between
-  i and m strokes (middle finger is often
-  weaker — isolate and strengthen if uneven).
-
-Step 4 — Scale application: play a one-octave
-  C major scale using apoyando throughout
-  (melody simulation), then the same scale
-  using tirando throughout (arpeggio
-  simulation). Compare volume and tone by ear.
-
-Metronome: 60 BPM quarter notes.
-Daily: 5 minutes before repertoire, as part
-       of standard warm-up.
+```mermaid
+flowchart TD
+    A["APOYANDO/TIRANDO ISOLATION DRILL"]
+    
+    B["Setup: Classical Guitar<br/>Right hand standard position<br/>Thumb anchored on bass string"]
+    
+    C["Step 1: Apoyando Index Finger<br/>Strike G string 3rd<br/>Rest against B string 2nd<br/>8 repetitions<br/>Listen: full round tone no click"]
+    
+    D["Step 2: Apoyando Middle Finger<br/>Same string as Step 1<br/>8 repetitions"]
+    
+    E["Step 3: Tirando Index-Middle Alternating<br/>i-m-i-m pattern on G string<br/>Clear each stroke no resting<br/>8 repetitions<br/>Listen: even volume between i and m"]
+    
+    F["Step 4: Scale Application<br/>One-octave C major scale<br/>Apoyando throughout melody simulation<br/>Then same scale Tirando throughout<br/>Arpeggio simulation<br/>Compare volume and tone by ear"]
+    
+    G["Metronome: 60 BPM Quarter Notes"]
+    
+    H["Daily Practice<br/>5 minutes before repertoire<br/>Part of standard warm-up"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
 ```
 
 ---

@@ -67,24 +67,24 @@ This leads to a practical classification of text types and their reading-rate ce
 
 The chart below illustrates the comprehension-retention curve across different reading rates for a representative academic text (business strategy article, approximately 2,500 words, moderate semantic density):
 
-```
-Comprehension & Retention Performance by Reading Rate
-(Baseline: 250 WPM = 100% immediate comprehension, 60% 24-hour retention)
-
-Reading Rate │ Immediate Comprehension │ 24-Hour Retention │ Notes
-─────────────┼───────────────────────┼──────────────────┼──────────────────
-150 WPM      │ 98%                   │ 82%              │ Deep encoding,
-             │                       │                  │ multiple passes
-250 WPM      │ 95%                   │ 65%              │ Normal reading,
-             │                       │                  │ baseline reference
-400 WPM      │ 88%                   │ 48%              │ Accelerated, shallow
-             │                       │                  │ encoding begins
-600 WPM      │ 76%                   │ 32%              │ Skimming mode,
-             │                       │                  │ significant loss
-800 WPM      │ 62%                   │ 18%              │ Rapid visual scanning,
-             │                       │                  │ minimal retention
-1000 WPM     │ 48%                   │ 8%               │ Extreme skimming,
-             │                       │                  │ near-illegible
+```mermaid
+flowchart TD
+    title["<b>Comprehension & Retention Performance by Reading Rate</b><br/>(Baseline: 250 WPM = 100% immediate comprehension, 60% 24-hour retention)"]
+    
+    title --> rate150["<b>150 WPM</b><br/>Immediate: 98%<br/>24-Hour: 82%<br/>Deep encoding, multiple passes"]
+    title --> rate250["<b>250 WPM (Baseline)</b><br/>Immediate: 95%<br/>24-Hour: 65%<br/>Normal reading, baseline reference"]
+    title --> rate400["<b>400 WPM</b><br/>Immediate: 88%<br/>24-Hour: 48%<br/>Accelerated, shallow encoding begins"]
+    title --> rate600["<b>600 WPM</b><br/>Immediate: 76%<br/>24-Hour: 32%<br/>Skimming mode, significant loss"]
+    title --> rate800["<b>800 WPM</b><br/>Immediate: 62%<br/>24-Hour: 18%<br/>Rapid visual scanning, minimal retention"]
+    title --> rate1000["<b>1000 WPM</b><br/>Immediate: 48%<br/>24-Hour: 8%<br/>Extreme skimming, near-illegible"]
+    
+    style title fill:#e1f5ff,stroke:#0288d1,stroke-width:3px
+    style rate150 fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
+    style rate250 fill:#fff9c4,stroke:#f57c00,stroke-width:2px
+    style rate400 fill:#ffe0b2,stroke:#e64a19,stroke-width:2px
+    style rate600 fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    style rate800 fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+    style rate1000 fill:#f8bbd0,stroke:#880e4f,stroke-width:2px
 ```
 
 ## 3. High-Performance Optimization & Failure Modes
@@ -107,6 +107,19 @@ The failure mode occurs when you need comprehensive understanding or when text s
 
 The failure mode is prediction error—when context leads you to predict the wrong continuation, and that misprediction contaminates subsequent comprehension. This occurs most readily when text contains plot twists, counterintuitive arguments, or deliberate misdirection. If you predict "The economy recovered" but the next phrase is "the economy collapsed despite analyst predictions," your initial prediction contaminates semantic integration, and you may misunderstand the actual claim. Technical writing is particularly vulnerable to this failure mode because technical prose often contains unexpected semantic turns (conditions under which normal assumptions fail, counterexamples, edge cases) that deliberately violate prediction.
 
-**Integrating Techniques Into a Practitioner Workflow.** Speed reading expertise is not a single monolithic capability but a portfolio of context-sensitive techniques. The practitioner's workflow involves rapid assessment of text type and semantic density, selection of appropriate reading strategy, and continuous calibration of comprehension depth to match task requirements.
+**Integrating Techniques Into a Practitioner Workflow.** Speed reading expertise is not a single monolithic capability but a portfolio of context-sensitive techniques.
 
-For information triage (deciding whether detailed reading is warranted), use strategic skimming at 800+ words per minute, focusing on structu
+The practitioner workflow therefore demands **strategic technique selection based on text properties and reading goals**. Narrative fiction benefits maximally from expanded saccades and predictive reading—the semantic redundancy is high, plot structure is conventional, and moderate prediction errors are tolerable since narrative comprehension is robust to local misunderstandings. Technical documentation, legal contracts, and mathematical proofs demand the opposite profile: reduced saccade distance, increased fixation duration, deliberate subvocalization on critical definitions and logical connectives, and conservative prediction (or prediction disabled entirely in sections with high information density). Academic reading often requires a hybrid approach: rapid skimming with expanded saccades during literature review to assess relevance, followed by intensive close reading with subvocalization and reduced saccade distance when extracting methodological details or evaluating empirical claims. The expert speed reader is not someone who reads everything at 800 wpm; the expert is someone who accurately selects 800 wpm for low-density text, 400 wpm for moderate-density text, and 150 wpm for high-density text, and who transitions fluidly between these regimes without conscious deliberation. Mastery is **contextual calibration**, not maximal speed.
+
+The governing principle across all techniques is **information bandwidth matching**: your reading rate should match the information density of the text and the precision required by your comprehension goals. Reading faster than the text's information density permits yields correct comprehension with reduced time cost. Reading slower than necessary yields correct comprehension but wastes time. Reading faster than the text's information density permits yields comprehension failure—either missing critical content entirely (skipping past it) or constructing incorrect semantic representations (prediction errors, inadequate integration). The optimization problem is therefore to identify the maximum sustainable rate for each text type and purpose, and to develop automatic calibration so that technique selection occurs without executive control overhead. This calibration is acquired through deliberate practice with feedback: read passages at varying rates, test comprehension, and identify the rate at which accuracy begins to degrade for each text category.
+
+## Summary & Verification Matrix
+
+| **Invariant / Mechanism** | **Core Principle** | **Failure Mode** | **Diagnostic Test** | **Mitigation Strategy** |
+|---------------------------|-------------------|------------------|---------------------|------------------------|
+| **Foveal bottleneck** | Only ~15 characters processable per fixation; parafoveal preview is degraded | Attempting to process too many words per fixation yields skipping or misrecognition | Read technical term-dense text at high speed; check for term confusion or omission | Reduce saccade distance in high-density text; increase fixation count on unfamiliar terms |
+| **Subvocalization constraint** | Articulatory loop limits processing to ~250 wpm when phonological encoding is required | Suppressing subvocalization on semantically complex or ambiguous text yields comprehension loss | Read conditional logic or nested clauses at 600+ wpm without subvocalization; test logical inference | Selectively enable subvocalization for complex syntax, definitions, logical operators |
+| **Semantic integration demand** | Working memory must assemble sentence-level and discourse-level representations; integration failures accumulate | High speed with inadequate integration time yields local comprehension without global coherence | Speed-read multi-paragraph argument, then summarize the logical structure; check for missing steps or incoherence | Insert deliberate pauses at paragraph boundaries; reduce speed during argumentative transitions |
+| **Prediction-verification tradeoff** | Contextual prediction accelerates processing but introduces error risk when predictions fail | Over-reliance on prediction in technical or twist-heavy text yields persistent misunderstanding | Speed-read text with deliberate misdirection or counterexamples; check for prediction-contaminated interpretations | Disable or limit prediction in low-redundancy text; verify predictions when semantic context shifts unexpectedly |
+| **Contextual calibration** | Optimal reading rate varies by text density and comprehension goal; technique selection must match context | Applying uniform high-speed techniques across all text types yields either time waste (too slow) or comprehension failure (too fast) | Read three passages (narrative, expository, technical) at same rate; measure comprehension and efficiency across types | Develop automatic technique switching; practice deliberate rate adjustment based on text properties and reading purpose |
+| **Regressions as diagnostic signal** | Regression frequency indicates comprehension difficulty; suppressing regressions eliminates error-correction mechanism | Forced elimination of regressions in difficult text yields undetected comprehension failures that propagate forward | Read challenging text while monitoring regression impulses; correlate regression frequency with post-reading accuracy | Allow regressions on first-pass reading of dense material; use regression frequency to trigger technique downshift (slower rate, more fixations) |

@@ -118,42 +118,21 @@ Circuit breaking implements adaptive backpressure, preventing cascading failures
 
 The interaction between Virtual Services and Destination Rules forms a two-stage pipeline. When a request arrives, the sidecar first consults the Virtual Service to resolve the destination *host* and *subset*. This mapping is purely symbolic—no network I/O occurs yet. Next, the sidecar looks up the Destination Rule corresponding to the resolved host and subset, retrieving the connection policy and endpoint list. Finally, it applies the load balancing algorithm to select a concrete IP:port pair, establishes a connection (or reuses an existing pooled connection), and forwards the request.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  Application Container (issues HTTP GET /recommendations)       │
-└────────────────┬────────────────────────────────────────────────┘
-                 │ Transparent iptables redirect
-                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Envoy Sidecar Proxy                                            │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │ 1. Virtual Service Evaluation                          │    │
-│  │    - Match headers, URI, source labels                 │    │
-│  │    - Select destination host + subset + weight         │    │
-│  └────────────┬───────────────────────────────────────────┘    │
-│               │                                                  │
-│               ▼                                                  │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │ 2. Destination Rule Lookup                             │    │
-│  │    - Resolve subset labels to endpoint list            │    │
-│  │    - Retrieve connection pool, load balancer, circuit  │    │
-│  └────────────┬───────────────────────────────────────────┘    │
-│               │                                                  │
-│               ▼                                                  │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │ 3. Load Balancing & Connection Pooling                 │    │
-│  │    - Apply algorithm (round-robin, least-request, etc.)│    │
-│  │    - Check outlier detection status                    │    │
-│  │    - Reuse pooled connection or establish new TCP      │    │
-│  └────────────┬───────────────────────────────────────────┘    │
-│               │                                                  │
-└───────────────┼──────────────────────────────────────────────────┘
-                │ HTTP request over TCP socket
-                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Upstream Pod (recommendation-v2-7d8f9c6b-xz4k)                 │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    App["Application Container<br/>(issues HTTP GET /recommendations)"]
+    App -->|"Transparent iptables redirect"| Envoy
+    
+    subgraph Envoy["Envoy Sidecar Proxy"]
+        VS["1. Virtual Service Evaluation<br/>- Match headers, URI, source labels<br/>- Select destination host + subset + weight"]
+        DR["2. Destination Rule Lookup<br/>- Resolve subset labels to endpoint list<br/>- Retrieve connection pool, load balancer, circuit"]
+        LB["3. Load Balancing & Connection Pooling<br/>- Apply algorithm (round-robin, least-request, etc.)<br/>- Check outlier detection status<br/>- Reuse pooled connection or establish new TCP"]
+        
+        VS --> DR
+        DR --> LB
+    end
+    
+    LB -->|"HTTP request over TCP socket"| Pod["Upstream Pod<br/>(recommendation-v2-7d8f9c6b-xz4k)"]
 ```
 
 Timeout propagation extends this pipeline with temporal constraints. Istio allows operators to attach timeout policies at both the Virtual Service (request-level) and Destination Rule (connection-level) layers. A Virtual Service timeout specifies the maximum end-to-end duration for a request, including all retries. If the cumulative time exceeds this budget, the sidecar immediately cancels the request and returns a timeout error to the caller. Destination Rule timeouts apply per retry attempt; the `connectTimeout` bounds the TCP handshake, while an HTTP-level `timeout` (often configured via route-specific overrides) constrains the time between sending the request and receiving the first response byte.

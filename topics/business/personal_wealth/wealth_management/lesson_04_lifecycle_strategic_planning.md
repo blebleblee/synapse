@@ -72,36 +72,22 @@ However, a single glide path ignores heterogeneous goals with different time hor
 
 The following diagram illustrates the mechanics of multi-bucket allocation:
 
-```
-Portfolio: $3,000,000
-
-┌─────────────────────────────────────────────────────────┐
-│ Bucket 1 (Yr 0–2):    $240,000 (8%)                    │
-│ Purpose: Current obligations + 2-yr buffer              │
-│ Allocation: 100% MM/STBD/Stable Value                   │
-│ Role: Volatility-free cash supply                        │
-└─────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────┐
-│ Bucket 2 (Yr 2–7):    $420,000 (14%)                    │
-│ Purpose: College, early discretionary spending          │
-│ Allocation: 40% Eq / 50% FI / 10% Commodity             │
-│ Role: Moderate volatility absorption                     │
-└─────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────┐
-│ Bucket 3 (Yr 7–20):   $1,440,000 (48%)                  │
-│ Purpose: Core retirement reserves                        │
-│ Allocation: 75% Equity / 20% FI / 5% Alternatives       │
-│ Role: Long-term compounding                             │
-└─────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────┐
-│ Bucket 4 (Yr 20+):    $900,000 (30%)                    │
-│ Purpose: Legacy + contingency                           │
-│ Allocation: 85% Equity / 10% FI / 5% Alternatives       │
-│ Role: Maximum compounding, minimal draw pressure        │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Portfolio["Portfolio: $3,000,000"]
+    
+    Bucket1["Bucket 1 (Yr 0–2): $240,000 (8%)<br/>Purpose: Current obligations + 2-yr buffer<br/>Allocation: 100% MM/STBD/Stable Value<br/>Role: Volatility-free cash supply"]
+    
+    Bucket2["Bucket 2 (Yr 2–7): $420,000 (14%)<br/>Purpose: College, early discretionary spending<br/>Allocation: 40% Eq / 50% FI / 10% Commodity<br/>Role: Moderate volatility absorption"]
+    
+    Bucket3["Bucket 3 (Yr 7–20): $1,440,000 (48%)<br/>Purpose: Core retirement reserves<br/>Allocation: 75% Equity / 20% FI / 5% Alternatives<br/>Role: Long-term compounding"]
+    
+    Bucket4["Bucket 4 (Yr 20+): $900,000 (30%)<br/>Purpose: Legacy + contingency<br/>Allocation: 85% Equity / 10% FI / 5% Alternatives<br/>Role: Maximum compounding, minimal draw pressure"]
+    
+    Portfolio --> Bucket1
+    Portfolio --> Bucket2
+    Portfolio --> Bucket3
+    Portfolio --> Bucket4
 ```
 
 This architecture solves a critical problem: it decouples sequence-of-returns risk from long-term growth objectives. A market crash in year one affects only Bucket 1 and Bucket 2 (22% of the portfolio). Buckets 3 and 4 remain fully invested in equities, allowing them to compound through the downturn and recover. As Bucket 1 and 2 assets are deployed for spending, they are replenished from Bucket 3 distributions, which in turn receive fresh capital from contributions. This creates a systematic rebalancing mechanism that automatically buys equities when they are cheap (after downturns) and sells when they are expensive (when cash is needed from Bucket 3).
@@ -191,30 +177,34 @@ A revocable living trust circumvents probate entirely. The household transfers a
 
 The trust architecture looks conceptually as follows:
 
-```
-Estate Transfer Architecture:
-
-┌──────────────────────────────┐
-│ Decedent: Estate Value $3M   │
-└──────────────────────────────┘
-                │
-        ┌───────┴────────┐
-        │                │
-    ┌───▼───┐      ┌────▼────┐
-    │ Probate│     │  Revocable
-    │ Route │     │  Trust
-    └───┬───┘     └────┬────┘
-        │               │
-  Fees: $90-150K   Fees: $5-15K
-  Time: 6-18 mo.   Time: 0-3 mo.
-        │               │
-        └───────┬───────┘
-                │
-        ┌───────▼────────┐
-        │ Heirs Receive  │
-        │ Remaining Amt  │
-        │ After Costs    │
-        └────────────────┘
+```mermaid
+flowchart TD
+    Decedent["Decedent: Estate Value $3M"]
+    Probate["Probate Route"]
+    Trust["Revocable Trust"]
+    ProbateFees["Fees: $90-150K<br/>Time: 6-18 mo."]
+    TrustFees["Fees: $5-15K<br/>Time: 0-3 mo."]
+    Heirs["Heirs Receive<br/>Remaining Amt<br/>After Costs"]
+    
+    Decedent --> Probate
+    Decedent --> Trust
+    Probate --> ProbateFees
+    Trust --> TrustFees
+    ProbateFees --> Heirs
+    TrustFees --> Heirs
 ```
 
-For estates approaching federal exemption thresholds ($13.61M+), additional estate tax planning becomes critical. An **irrevocable life insurance trust** (ILIT) removes life insurance death benefits from taxable estate. A $2 million life insurance policy on the grantor would normally add $2 million to taxable estate, incurring $800,000 federal estate tax (40% rate) plus state taxes. If the same policy is owned by an ILIT, the death benefit flows outside the taxable estate, saving the $800,000 tax
+For estates approaching federal exemption thresholds ($13.61M+), additional estate tax planning becomes critical. An **irrevocable life insurance trust** (ILIT) removes life insurance death benefits from taxable estate. A $2 million life insurance policy on the grantor would normally add $2 million to taxable estate, incurring $800,000 federal estate tax (40% rate) plus state taxes.
+
+By structuring the ILIT properly, the $2 million death benefit passes directly to trust beneficiaries outside the taxable estate, eliminating the $800,000+ tax liability while preserving full liquidity for estate settlement costs or heir distributions. The grantor makes annual premium payments through Crummey withdrawal notices (providing beneficiaries temporary withdrawal rights to qualify gifts for the annual exclusion), funding the policy without gift tax consequences. This architecture transforms insurance from a tax liability into a tax-efficient wealth transfer vehicle, particularly powerful when combined with generation-skipping provisions that extend benefits across multiple generations without additional transfer taxation. For ultra-high-net-worth households, dynasty trusts in favorable jurisdictions (Delaware, South Dakota, Alaska) leverage perpetuities law reforms to create multi-generational wealth preservation structures lasting 360+ years, compounding tax-free growth across five or six generations while maintaining creditor protection and divorce insulation for beneficiaries.
+
+The strategic architecture across lifecycle stages operates as an integrated system: accumulation-phase households maximize tax-deferred growth and establish insurance scaffolding; peak-earning households execute systematic Roth conversions during income valleys and implement estate freeze techniques (GRATs, installment sales to IDGTs) before asset appreciation; distribution-phase households sequence withdrawals to minimize lifetime tax drag while positioning assets for step-up basis reset; and estate transfer deploys trust structures to eliminate probate friction, minimize transfer taxation, and extend wealth preservation across generations. Each transition point—career changes, business liquidity events, inheritance receipts, retirement commencement—requires recalibration of the strategic framework, integrating tax positioning, risk management, liquidity planning, and transfer mechanics into a cohesive long-term optimization strategy. Households that execute disciplined lifecycle planning consistently outperform reactive counterparts by 150–300 basis points annually after adjusting for risk, compounding to wealth differentials of 40–60% over a 30-year horizon.
+
+## Summary & Verification Matrix
+
+| Lifecycle Stage | Governing Invariant | Core Mechanism | Diagnostic Criteria |
+|---|---|---|---|
+| **Accumulation (Age 25–45)** | Maximize tax-deferred compound growth; establish insurance scaffolding early when premiums are lowest | 401(k)/IRA contributions up to match threshold → Roth IRA (backdoor if income exceeds limits) → taxable brokerage; term life insurance 10–15× income | Annual savings rate ≥20% gross income; insurance coverage verified via capital needs analysis; emergency fund 6+ months expenses |
+| **Peak Earnings (Age 45–60)** | Execute tax arbitrage during income valleys; implement estate freeze before asset appreciation accelerates | Systematic Roth conversions in lower-income years (job transitions, sabbaticals); GRATs or installment sales to IDGTs for high-growth assets; spousal lifetime access trusts (SLATs) for exemption utilization | Effective tax rate on conversions ≤24%; estate freeze locks asset values below exemption threshold; annual gifting utilizes $18K exclusion per beneficiary |
+| **Distribution (Age 60–75)** | Sequence withdrawals to minimize lifetime tax drag; position assets for step-up basis reset | Taxable accounts first (harvesting losses, realizing long-term gains at 0–15% rates) → tax-deferred accounts → Roth accounts last; qualified charitable distributions (QCD) from IRA at age 70½+ | Tax bracket maintained at ≤24% marginal rate; RMDs minimized through strategic drawdown; charitable intent satisfied via QCD (no itemization required) |
+| **Estate Transfer (Age 75+)** | Eliminate probate friction; minimize transfer taxation; extend wealth preservation across generations | Revocable living trust for probate avoidance; irrevocable life insurance trust (ILIT) removes death benefits from taxable estate; dynasty trusts for multi-generational wealth preservation | Estate plan updated within 3–5 years; trust funding verified (assets titled to trust); life insurance beneficiaries coordinate with estate plan (no unintended probate exposure) |

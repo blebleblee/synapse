@@ -20,22 +20,24 @@ The analog input stage begins at the transducer—the physical device converting
 
 Professional microphone preamps operate in balanced differential mode, where the audio signal rides on two conductors carrying opposite polarity (hot and cold) with a ground reference. The receiving preamp circuit subtracts cold from hot, which doubles the desired signal while canceling common-mode interference that couples identically to both conductors. This explains why balanced XLR and TRS cables reject electromagnetic interference far better than unbalanced TS connections. Phantom power (+48V DC) rides on both signal conductors simultaneously, powering condenser microphone capsules and active electronics without interfering with the audio signal due to blocking capacitors in the circuit path.
 
-```
-Microphone Signal Path (Balanced Differential):
-
-Acoustic         Capsule         Preamp                ADC
-Pressure    -->  (mV range) -->  Gain Stage      -->   Digital
-Wave             ±0.001V         to Line Level         Samples
-                                 (±1.23V)
-                                 
-                 Phantom Power (+48V DC)
-                       ↓
-                 [Blocking Cap] → Signal path isolated
-                 
-Common-Mode Rejection:
-   Hot  (+):  Signal + Noise
-   Cold (-): -Signal + Noise
-   Diff Amp: (Hot - Cold) = 2×Signal, Noise cancels
+```mermaid
+flowchart TD
+    A["Acoustic Pressure Wave"] --> B["Capsule<br/>(mV range, ±0.001V)"]
+    B --> C["Preamp Gain Stage<br/>(to Line Level ±1.23V)"]
+    C --> D["ADC<br/>(Digital Samples)"]
+    
+    P["Phantom Power<br/>(+48V DC)"] --> BC["Blocking Cap"]
+    BC -.->|Signal path isolated| C
+    
+    subgraph CMR ["Common-Mode Rejection"]
+        H["Hot (+): Signal + Noise"]
+        CL["Cold (-): -Signal + Noise"]
+        DA["Diff Amp:<br/>(Hot - Cold) = 2×Signal<br/>Noise cancels"]
+        H --> DA
+        CL --> DA
+    end
+    
+    C -.->|Uses| CMR
 ```
 
 The analog-to-digital converter samples this voltage at your selected sample rate, taking instantaneous amplitude measurements at precise time intervals. Anti-aliasing filters precede this conversion, removing frequency content above the Nyquist frequency (half the sample rate) to prevent aliasing artifacts where high frequencies fold back down as spurious tones within the audible spectrum. Modern converters employ steep digital reconstruction filters rather than older analog designs, achieving sharper cutoff slopes with minimal phase distortion in the passband.
@@ -46,26 +48,40 @@ Within the digital domain, your DAW routes audio through a sophisticated graph o
 
 Routing topologies organize how signals split, combine, and process through the mixing graph. Series processing chains plugins sequentially, where each plugin's output feeds the next plugin's input. Parallel processing splits a signal into multiple paths that eventually recombine, either through auxiliary send-and-return configurations or through specialized parallel compression routing. Sidechain routing feeds one signal's amplitude envelope to control another processor's behavior—the classic application being ducking, where a kick drum triggers compression on the bassline, creating rhythmic pumping. Understanding the difference between pre-fader and post-fader auxiliary sends prevents common mistakes: pre-fader sends remain unaffected by the source track's fader position (useful for creating independent reverb mixes), while post-fader sends scale proportionally with the track's volume.
 
-```
-Digital Domain Routing Topology:
-
-Input Track → [Plugin Chain: Series Processing]
-              EQ → Comp → Saturation
-                    ↓
-              [Parallel Split]
-              ↓           ↓
-        Direct Path   Send Bus (Pre/Post Fader)
-              ↓           ↓
-              └─→ [Combine at Mix Bus] ←─ Return
-                         ↓
-                  Master Fader (Final Fixed-Point Conversion)
-                         ↓
-                      DAC Output
-
-Sidechain Example:
-    Kick Track ──→ [Amplitude Detector] ──→ [Gain Reduction]
-                                                    ↓
-    Bass Track ──────────────────────────────→ [Apply Gain Reduction]
+```mermaid
+flowchart TD
+    Input["Input Track"]
+    
+    subgraph PluginChain ["Plugin Chain: Series Processing"]
+        EQ["EQ"]
+        Comp["Compressor"]
+        Sat["Saturation"]
+        EQ --> Comp --> Sat
+    end
+    
+    Input --> PluginChain
+    
+    PluginChain --> Split["Parallel Split"]
+    
+    Split --> Direct["Direct Path"]
+    Split --> SendBus["Send Bus<br/>Pre/Post Fader"]
+    
+    Direct --> MixBus["Combine at Mix Bus"]
+    SendBus --> Return["Return"]
+    Return --> MixBus
+    
+    MixBus --> Master["Master Fader<br/>Final Fixed-Point Conversion"]
+    Master --> DAC["DAC Output"]
+    
+    subgraph Sidechain ["Sidechain Example"]
+        Kick["Kick Track"]
+        Detector["Amplitude Detector"]
+        GainRed["Gain Reduction"]
+        Bass["Bass Track"]
+        
+        Kick --> Detector --> GainRed
+        Bass --> GainRed
+    end
 ```
 
 The digital-to-analog converter reconstructs continuous voltage from discrete samples using interpolation and reconstruction filtering. Modern DACs employ oversampling techniques, generating many intermediate sample points mathematically before applying gentle analog filters to smooth the final waveform. This approach achieves better performance than older designs required steep analog filters with problematic phase response. The DAC's output drives your monitor controller or headphone amplifier, which must possess adequate power and current delivery to move the speaker drivers or headphone transducers accurately without distortion.

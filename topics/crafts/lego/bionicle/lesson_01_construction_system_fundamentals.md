@@ -50,21 +50,26 @@ The critical failure mode in such chains is **moment-induced joint creep at the 
 
 CCBS architecture fundamentally alters this load distribution through its dual-axle joint topology. The mechanical behavior of a dual-axle connection under applied moment can be modeled as a simply supported beam subjected to transverse loading. Consider the axle stubs as two parallel cantilever beams fixed at the plug element and bearing against the socket walls. When a bending moment attempts to rotate the joint, one axle experiences compression against the upper socket wall while the opposite axle experiences compression against the lower socket wall, creating a couple that resists the applied moment.
 
-```
-CCBS Dual-Axle Moment Resistance:
-
-     Socket Housing                Applied Moment (M)
-    ┌────────────────┐                    ↻
-    │  ╭─ Axle 1     │ ←── Compression force F₁
-    │  │             │      (distance d/2 above center)
-    │  │   Center    │
-    │  │             │
-    │  ╰─ Axle 2     │ ←── Compression force F₂  
-    └────────────────┘      (distance d/2 below center)
-         Plug
-         
-    Moment resistance: M = F₁ × (d/2) + F₂ × (d/2) = F × d
-    where d ≈ 8mm (axle spacing)
+```mermaid
+flowchart TD
+    M["Applied Moment (M) ↻"]
+    
+    subgraph housing ["Socket Housing"]
+        axle1["Axle 1<br/>Compression Force F₁<br/>(distance d/2 above center)"]
+        center["Center"]
+        axle2["Axle 2<br/>Compression Force F₂<br/>(distance d/2 below center)"]
+    end
+    
+    plug["Plug"]
+    
+    formula["Moment Resistance:<br/>M = F₁ × (d/2) + F₂ × (d/2) = F × d<br/>where d ≈ 8mm (axle spacing)"]
+    
+    M -.-> axle1
+    M -.-> axle2
+    axle1 --- center
+    center --- axle2
+    housing --- plug
+    housing -.-> formula
 ```
 
 The mechanical advantage becomes apparent when comparing equivalent loading scenarios. For a G1 ball joint with 10-millimeter diameter, a given frictional holding force F at the ball surface creates moment resistance M = F × 5mm (the ball radius). For a CCBS joint with 8-millimeter axle spacing, the same bearing force magnitude at each axle creates moment resistance M = F × 8mm, providing a 60% improvement in moment capacity from geometric factors alone. Additionally, the bearing contact mode (compression of plastic against rigid cylindrical axle) exhibits less wear and plastic deformation over time compared to the sliding friction contact at ball-socket interfaces, accounting for the superior long-term stability of CCBS joints in sustained cantilever applications.

@@ -89,17 +89,14 @@ Union filesystems enable layering multiple directories into a single view, criti
 
 **OverlayFS Architecture:**
 
-```
-┌─────────────────────────┐
-│   Merged View (Union)   │
-└───────────┬─────────────┘
-            │
-    ┌───────┴────────┐
-    │                │
-┌───▼────┐    ┌─────▼─────┐
-│ Upper  │    │   Lower   │
-│ (R/W)  │    │   (R/O)   │
-└────────┘    └───────────┘
+```mermaid
+flowchart TD
+    MergedView["Merged View (Union)"]
+    Upper["Upper<br/>(R/W)"]
+    Lower["Lower<br/>(R/O)"]
+    
+    MergedView --> Upper
+    MergedView --> Lower
 ```
 
 **Layer Properties:**
@@ -235,29 +232,32 @@ graph TB
 ### 2.2 Container Lifecycle State Machine
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Created: docker create
-    Created --> Running: docker start
-    Running --> Paused: docker pause
-    Paused --> Running: docker unpause
-    Running --> Stopped: docker stop/exit
-    Stopped --> Running: docker start
-    Created --> Removed: docker rm
-    Stopped --> Removed: docker rm
-    Running --> Removed: docker rm -f
-    Removed --> [*]
-    
-    note right of Running
-        Process tree active
-        Resources allocated
-        Network connected
-    end note
-    
-    note right of Paused
-        SIGSTOP to all processes
-        Memory frozen
-        CPU released
-    end note
+flowchart TD
+    START((" ")):::terminal
+    END((" ")):::terminal
+
+    Created["Created"]
+    Running["Running\n────────────────\nProcess tree active\nResources allocated\nNetwork connected"]
+    Paused["Paused\n────────────────\nSIGSTOP to all processes\nMemory frozen\nCPU released"]
+    Stopped["Stopped"]
+    Removed["Removed"]
+
+    START -->|"docker create"| Created
+    Created -->|"docker start"| Running
+    Running -->|"docker pause"| Paused
+    Paused -->|"docker unpause"| Running
+    Running -->|"docker stop / exit"| Stopped
+    Stopped -->|"docker start"| Running
+    Created -->|"docker rm"| Removed
+    Stopped -->|"docker rm"| Removed
+    Running -->|"docker rm -f"| Removed
+    Removed --> END
+
+    classDef terminal fill:#1a1a2e,stroke:#e94560,color:#e94560,font-size:18px
+    classDef state fill:#16213e,stroke:#0f3460,color:#e0e0e0,font-size:13px,rx:6,ry:6
+
+    class START,END terminal
+    class Created,Running,Paused,Stopped,Removed state
 ```
 
 ### 2.3 Image Layer Architecture
@@ -2842,13 +2842,23 @@ Containerization represents a fundamental abstraction in cloud-native computing,
 9. **Operations**: Debugging techniques, performance profiling, and troubleshooting
 10. **Production**: Hardening checklists, security configurations, and monitoring
 
-Mastery of container technologies provides the foundation for cloud-native architectures, enabling scalable, resilient, and efficient deployment of modern applications. The next lesson will build on these foundations to explore Kubernetes and container orchestration at scale.
+Mastery of container technologies provides the foundation for cloud-native architectures, enabling scalable, resilient, and efficient deployment of modern applications.
 
-## References
+## Summary
 
-- **Linux Kernel Documentation**: Namespaces, cgroups, and security features
-- **OCI Specifications**: Image and runtime specifications
-- **Docker Documentation**: Official architecture and best practices
-- **Kubernetes Documentation**: Container runtime interface (CRI)
-- **NIST SP 800-190**: Application Container Security Guide
-- **CIS Docker Benchmark**: Security configuration best practices
+Containerization represents a fundamental abstraction in cloud-native computing, providing process isolation, resource control, and portability through kernel-level virtualization. This lesson covered:
+
+1. **Theoretical foundations**: Namespaces, cgroups, and union filesystems that enable containerization
+2. **Docker architecture**: Component model, image layers, and runtime lifecycle
+3. **Networking**: Bridge, host, and overlay networks with DNS-based service discovery
+4. **Storage**: Volume types, drivers, and production patterns
+5. **Security**: Capabilities, seccomp, AppArmor, and defense-in-depth strategies
+6. **Resource management**: CPU, memory, I/O, and PID limits with precise control
+7. **Alternatives**: Podman, gVisor, and Kata Containers with different isolation models
+8. **Orchestration**: systemd integration, Docker Swarm, and service mesh patterns
+9. **Operations**: Debugging techniques, performance profiling, and troubleshooting
+10. **Production**: Hardening checklists, security configurations, and monitoring
+
+The layered architecture of containerization—from kernel primitives through runtime abstractions to orchestration frameworks—enables precise control over application deployment while maintaining operational flexibility. Production containerization demands rigorous attention to security boundaries, resource allocation, and observability. The proliferation of alternative runtimes reflects evolving requirements: Podman addresses daemon-less workflows and rootless operation, gVisor provides defense against kernel exploits through user-space kernel emulation, and Kata Containers delivers VM-level isolation with container-like ergonomics. Each approach trades performance, isolation strength, and operational complexity differently, requiring architectural decisions aligned with specific threat models and performance requirements.
+
+Mastery of container technologies provides the foundation for cloud-native architectures, enabling scalable, resilient, and efficient deployment of modern applications. The principles explored—immutable infrastructure, declarative configuration, resource isolation, and observable systems—extend beyond individual container runtimes into orchestration platforms like Kubernetes. Effective container adoption requires disciplined image construction (minimal base images, explicit dependencies, reproducible builds), defensive runtime configuration (read-only filesystems, dropped capabilities, resource limits), and comprehensive monitoring (resource utilization, application metrics, security events). Organizations that treat containerization as an engineering discipline rather than merely an operational tool achieve superior reliability, security posture, and operational velocity. The next lesson advances these foundations into orchestration at scale, where container primitives become building blocks for distributed systems management.

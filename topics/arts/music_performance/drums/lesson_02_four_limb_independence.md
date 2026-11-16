@@ -46,8 +46,8 @@ graph TD
     sixteenth --> standard["Execution grid — singles, doubles, paradiddles"]
     thirtysecond --> micro["Micro-timing — groove feel, swing, flams"]
 
-    style pulse fill:#e1f5ff
-    style sixteenth fill:#ffe1e1
+    style pulse fill:#e1f5ff,color:#0f172a
+    style sixteenth fill:#ffe1e1,color:#0f172a
 ```
 
 ---
@@ -175,9 +175,9 @@ graph LR
     rebound -->|"capture + redirect"| second
     second -->|"active squeeze"| rest
 
-    style first fill:#e1ffe1
-    style second fill:#ffe1e1
-    style rest fill:#f0f0f0
+    style first fill:#e1ffe1,color:#0f172a
+    style second fill:#ffe1e1,color:#0f172a
+    style rest fill:#f0f0f0,color:#0f172a
 ```
 
 **Troubleshooting:**
@@ -199,31 +199,33 @@ The paradiddle is asymmetric — each hand has a different job. Right phrase: R-
 **Say it as you play it:** "PAR-a-DID-dle" → R-L-R-R, with a light accent on "PAR" and "DID" — this maps naturally onto beat 1 and the first stroke of the double, and speaking it recruits motor planning that speeds up learning the sequence.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> sub_r1
+flowchart TD
+    Start([Start]) --> sub_r1
 
-    state "Right Phrase" as sub_right {
-        sub_r1: R - single, full wrist
-        sub_l1: L - single, full wrist
-        sub_r2: R - single, prep for double
-        sub_r3: R - double (rebound + flick)
+    subgraph sub_right ["Right Phrase"]
+        sub_r1["R - single, full wrist"]
+        sub_l1["L - single, full wrist"]
+        sub_r2["R - single, prep for double"]
+        sub_r3["R - double (rebound + flick)"]
+        
         sub_r1 --> sub_l1
         sub_l1 --> sub_r2
         sub_r2 --> sub_r3
-    }
+    end
 
-    state "Left Phrase" as sub_left {
-        sub_l2: L - single, full wrist
-        sub_r4: R - single, full wrist
-        sub_l3: L - single, prep for double
-        sub_l4: L - double (rebound + flick)
+    subgraph sub_left ["Left Phrase"]
+        sub_l2["L - single, full wrist"]
+        sub_r4["R - single, full wrist"]
+        sub_l3["L - single, prep for double"]
+        sub_l4["L - double (rebound + flick)"]
+        
         sub_l2 --> sub_r4
         sub_r4 --> sub_l3
         sub_l3 --> sub_l4
-    }
+    end
 
-    sub_r3 --> sub_l2: transition to left phrase
-    sub_l4 --> sub_r1: loop back to right phrase
+    sub_r3 -->|"transition to left phrase"| sub_l2
+    sub_l4 -->|"loop back to right phrase"| sub_r1
 ```
 
 **Critical checkpoints:** strokes 1–3 of each phrase should feel exactly like alternating singles. Stroke 4 is a controlled double, not a rushed buzz. The hardest spot is the handoff — right double (beat 4) into left single (beat 5) — with zero hesitation.
@@ -331,7 +333,7 @@ Drill: at 60 BPM quarters, exaggerate "tight at impact, loose on rebound" consci
 
 | Std. deviation (σ) at 120 BPM | Level | Sounds like |
 |---|---|---|
-| <5 ms | Elite | "locked in," "in the pocket" |
+| < 5 ms | Elite | "locked in," "in the pocket" |
 | 5–10 ms | Advanced | solid, groove-enhancing micro-variation |
 | 10–15 ms | Intermediate | noticeably loose |
 | 15–25 ms | Beginner | rushed or dragging |
@@ -366,7 +368,7 @@ graph TD
     drift --> fix2["Miscalibrated internal tempo.<br/>Fix: record 64 bars with no click, compare elapsed time to expected"]
     periodic --> fix3["One hand rushes/drags.<br/>Fix: isolate each hand, measure separately, drill the weaker one"]
 
-    style issue fill:#ffe1e1
+    style issue fill:#ffe1e1,color:#0f172a
 ```
 
 **4-week subdivision strengthening:**
@@ -401,9 +403,9 @@ Left-hand weakness shows up as: louder right hits in alternating patterns, right
 
 | Metric | Elite | Intermediate | Needs work |
 |---|---|---|---|
-| Velocity difference | <5% | <10% | >10% |
-| Timing offset | <3 ms | <8 ms | >8 ms |
-| Max tempo gap (R-lead vs L-lead) | <5 BPM | <10 BPM | >10 BPM |
+| Velocity difference | < 5% | < 10% | >10% |
+| Timing offset | < 3 ms | < 8 ms | >8 ms |
+| Max tempo gap (R-lead vs L-lead) | < 5 BPM | < 10 BPM | >10 BPM |
 
 **12-week corrective plan:**
 
@@ -490,8 +492,8 @@ Left-hand weakness shows up as: louder right hits in alternating patterns, right
 | Double stroke endurance | 3 min @ 100 | 5 min @ 120 | 10 min @ 140 |
 | Paradiddle max tempo (16ths) | 100 BPM | 120 BPM | 140 BPM |
 | Paradiddle endurance | 3 min @ 80 | 5 min @ 100 | 10 min @ 120 |
-| Timing precision (σ) | <15 ms @ 100 | <10 ms @ 120 | <8 ms @ 120 |
-| Bilateral velocity gap | <15% | <10% | <5% |
+| Timing precision (σ) | < 15 ms @ 100 | < 10 ms @ 120 | < 8 ms @ 120 |
+| Bilateral velocity gap | < 15% | < 10% | < 5% |
 
 Retest every 4 weeks, record audio/video, and direct extra practice time at whichever metric is behind schedule.
 

@@ -38,35 +38,51 @@ This angular measurement technique proves especially valuable for capturing gest
 
 The measurement cycle proceeds iteratively through progressively finer levels of detail. The artist begins with large structural masses—the overall head height, the torso's length, the distance from head crown to feet. Once these primary proportions lock into place, the artist subdivides each mass into secondary features: within the head, establishing the brow line, nose base, and chin subdivision; within the torso, marking the nipple line, navel, and pubic symphysis landmarks. Each subdivision measurement references back to the established structural framework, maintaining proportional consistency. The final measurement passes capture subtle details: the thickness of eyelids, the width of nostril openings, the precise curvature of fingernails. This hierarchical approach prevents the common novice error of rendering a beautifully detailed eye in a head with incorrect proportions.
 
-```
-MEASUREMENT HIERARCHY
+```mermaid
+flowchart TD
+    subgraph L1["Level 1 · Structural Masses (Primary Anchors)"]
+        L1A["Total Figure Height"]
+        L1B["Head Height\n(primary unit)"]
+        L1C["Torso Length\n(crown → pubic symphysis)"]
+        L1D["Leg Length\n(pubic symphysis → floor)"]
+    end
 
-Level 1: Structural Masses (Primary Anchors)
-  ├─ Total figure height
-  ├─ Head height (primary unit)
-  ├─ Torso length (crown to pubic symphysis)
-  └─ Leg length (pubic symphysis to floor)
+    subgraph L2["Level 2 · Major Divisions (Secondary Features)"]
+        L2A["Head: Crown → Brow\n(0.33 unit)"]
+        L2B["Head: Brow → Nose Base\n(0.33 unit)"]
+        L2C["Head: Nose Base → Chin\n(0.33 unit)"]
+        L2D["Torso: Nipple Line\n(1.0 head from crown)"]
+        L2E["Torso: Navel\n(2.0 heads from crown)"]
+        L2F["Torso: Pubic Symphysis\n(3.0 heads from crown)"]
+    end
 
-Level 2: Major Divisions (Secondary Features)
-  ├─ Head: Crown → Brow (0.33 unit)
-  ├─ Head: Brow → Nose Base (0.33 unit)
-  ├─ Head: Nose Base → Chin (0.33 unit)
-  ├─ Torso: Nipple Line (1.0 head from crown)
-  ├─ Torso: Navel (2.0 heads from crown)
-  └─ Torso: Pubic Symphysis (3.0 heads from crown)
+    subgraph L3["Level 3 · Feature Details (Tertiary Refinement)"]
+        L3A["Eye Width & Spacing"]
+        L3B["Nose Width at Base"]
+        L3C["Mouth Width\n(corner to corner)"]
+        L3D["Ear Height & Placement"]
+        L3E["Hand Proportions\n(palm vs. fingers)"]
+    end
 
-Level 3: Feature Details (Tertiary Refinement)
-  ├─ Eye width and spacing
-  ├─ Nose width at base
-  ├─ Mouth width corner-to-corner
-  ├─ Ear height and placement
-  └─ Hand proportions (palm vs fingers)
+    subgraph L4["Level 4 · Surface Micro-Details (Final Pass)"]
+        L4A["Eyelid Thickness"]
+        L4B["Nostril Shape"]
+        L4C["Lip Curvature\nInflection Points"]
+        L4D["Fingernail Dimensions"]
+    end
 
-Level 4: Surface Micro-Details (Final Pass)
-  ├─ Eyelid thickness
-  ├─ Nostril shape
-  ├─ Lip curvature inflection points
-  └─ Fingernail dimensions
+    L1A --> L1B --> L1C --> L1D
+
+    L1B --> L2A & L2B & L2C
+    L1C --> L2D & L2E & L2F
+
+    L2A & L2B & L2C --> L3A & L3B & L3C & L3D
+    L2D & L2E & L2F --> L3E
+
+    L3A --> L4A
+    L3B --> L4B
+    L3C --> L4C
+    L3E --> L4D
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

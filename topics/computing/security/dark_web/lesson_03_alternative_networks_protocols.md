@@ -30,47 +30,95 @@ The tunnel message format embodies I2P's core cryptographic construction. Each m
 
 Garlic routing multiplexes these tunnel messages by bundling multiple independent messages into a single encrypted garlic clove. The sender constructs each individual message (termed a "garlic clove") with its own delivery instructions, encryption layer, and payload, then combines multiple cloves into a garlic bulb. The bulb includes a session key encrypted to the recipient's public key, a session tag allowing the recipient to recognize subsequent messages using symmetric key caching, and the AES-encrypted aggregate of all cloves. This session tag mechanism converts expensive public key operations into fast symmetric lookups after the first message in a session, amortizing ElGamal decryption costs across extended conversations. The recipient decrypts the garlic bulb using either the provided session key (for first contact) or a cached symmetric key (for subsequent messages), extracts the individual cloves, and processes each according to its embedded delivery instructions—some may be destined for local applications, others forwarded to outbound tunnels toward remote destinations.
 
-```
-I2P Tunnel Architecture (Bidirectional Communication)
-
-Client A                                          Service B
-    |                                                 |
-    |-- Outbound Tunnel (3 hops) ----------------->  |
-    |   [A] -> [R1] -> [R2] -> [R3] -> Gateway       |
-    |         (layered encryption)                    |
-    |                                                 |
-    |                                    Inbound <----|
-    |              Gateway <- [R6] <- [R5] <- [R4]   |
-    |                          (layered decryption)   |
-    |<-- Inbound Tunnel (3 hops) ------------------   |
-    |                                                 |
-    |   Response follows symmetric path:              |
-    |-- Outbound -->  [R7,R8,R9] --> Gateway -------->|
-    |                                                 |
-    |<-- Inbound  <-- Gateway <-- [R12,R11,R10] <----|
-
-Each tunnel hop maintains:
-- Tunnel ID (16 bytes): Local identifier for message routing
-- Session key (32 bytes): AES-256 key for this hop
-- Next-hop router identity: Where to forward after processing
-- Expiration time: Tunnel validity window (typically 10 minutes)
-
-Garlic message structure at tunnel entry:
-+------------------+
-| ElGamal Session  | (514 bytes, encrypted to gateway's public key)
-+------------------+
-| Session Tags     | (32 bytes × N, for symmetric key lookup)
-+------------------+
-| AES Payload      | (variable, containing multiple cloves)
-|  +-------------+ |
-|  | Clove 1     | | (delivery instructions + encrypted message)
-|  +-------------+ |
-|  | Clove 2     | |
-|  +-------------+ |
-|  | ...         | |
-+------------------+
-| HMAC-SHA256      | (32 bytes, integrity protection)
-+------------------+
+```mermaid
+flowchart TD
+    subgraph ClientA ["Client A"]
+        A["Client A"]
+    end
+    
+    subgraph OutboundTunnel1 ["Outbound Tunnel (3 hops)"]
+        R1["Router R1<br/>Layered Encryption"]
+        R2["Router R2"]
+        R3["Router R3"]
+        GW1["Gateway"]
+    end
+    
+    subgraph ServiceB ["Service B"]
+        B["Service B"]
+    end
+    
+    subgraph InboundTunnel1 ["Inbound Tunnel (3 hops)"]
+        R4["Router R4"]
+        R5["Router R5"]
+        R6["Router R6"]
+        GW2["Gateway<br/>Layered Decryption"]
+    end
+    
+    subgraph OutboundTunnel2 ["Response Outbound (3 hops)"]
+        R7["Router R7"]
+        R8["Router R8"]
+        R9["Router R9"]
+        GW3["Gateway"]
+    end
+    
+    subgraph InboundTunnel2 ["Response Inbound (3 hops)"]
+        R10["Router R10"]
+        R11["Router R11"]
+        R12["Router R12"]
+        GW4["Gateway"]
+    end
+    
+    subgraph TunnelHopData ["Each Tunnel Hop Maintains"]
+        TH1["Tunnel ID: 16 bytes"]
+        TH2["Session Key: 32 bytes (AES-256)"]
+        TH3["Next-hop Router Identity"]
+        TH4["Expiration Time: ~10 minutes"]
+    end
+    
+    subgraph GarlicMessage ["Garlic Message Structure"]
+        GM1["ElGamal Session<br/>514 bytes"]
+        GM2["Session Tags<br/>32 bytes × N"]
+        GM3["AES Payload (variable)"]
+        GM4["Clove 1: Instructions + Encrypted"]
+        GM5["Clove 2"]
+        GM6["Clove N"]
+        GM7["HMAC-SHA256<br/>32 bytes"]
+    end
+    
+    A -->|"Send Request"| R1
+    R1 --> R2
+    R2 --> R3
+    R3 --> GW1
+    GW1 -->|"Deliver"| B
+    
+    B -->|"Response Path"| R4
+    R4 --> R5
+    R5 --> R6
+    R6 --> GW2
+    GW2 -->|"Deliver Response"| A
+    
+    B -.->|"Symmetric Response"| R7
+    R7 -.-> R8
+    R8 -.-> R9
+    R9 -.-> GW3
+    GW3 -.->|"Forward"| A
+    
+    A -.->|"Return Path"| GW4
+    GW4 -.-> R12
+    R12 -.-> R11
+    R11 -.-> R10
+    R10 -.->|"Complete"| B
+    
+    GM1 --> GM2
+    GM2 --> GM3
+    GM3 --> GM4
+    GM4 --> GM5
+    GM5 --> GM6
+    GM6 --> GM7
+    
+    TH1 --> TH2
+    TH2 --> TH3
+    TH3 --> TH4
 ```
 
 Freenet's architecture abandons I2P's explicit tunneling in favor of a probabilistic routing protocol operating over a distributed data store. The network maintains two distinct modes: opennet, where nodes connect to arbitrary peers discovered through UDP bootstrapping, and darknet (F2F mode), where connections exist only between manually configured trusted relationships. In both modes, content addressing relies on cryptographic keys rather than location identifiers. Content-Hash Keys (CHKs) derive from the SHA-256 hash of the encrypted data block itself, creating self-verifying identifiers where successful decryption proves data integrity. Signed-Subspace Keys (SSKs) correspond to public keys from asymmetric key pairs, allowing content publishers to create mutable namespaces where updates can be verified against the original signing key.
@@ -85,56 +133,84 @@ Mixnet architectures formalize message unlinkability through explicit cryptograp
 
 This batching and reordering operation provides the core unlinkability guarantee: an adversary observing messages entering and exiting the mix cannot correlate specific inputs to outputs because the random permutation destroys temporal ordering information. The cryptographic layering ensures that mix server $i$ cannot read message contents beyond its own layer, learning only the next hop in the path. Even if an adversary compromises $n-1$ of $n$ mix servers in a path, the one honest server suffices to maintain sender-receiver unlinkability by performing its shuffle operation correctly.
 
-```
-Classical Mixnet Message Flow (Chaum Mix Cascade)
-
-Sender A: M_A encrypted for path [Mix1, Mix2, Mix3]
-Sender B: M_B encrypted for path [Mix1, Mix2, Mix3]  
-Sender C: M_C encrypted for path [Mix1, Mix2, Mix3]
-
-Time Epoch T:
+```mermaid
+flowchart TD
+    subgraph senders ["Senders (Time Epoch T)"]
+        A["Sender A"]
+        B["Sender B"]
+        C["Sender C"]
+    end
     
-    Sender A ──→ E_K3(E_K2(E_K1(M_A))) ─┐
-                                          ├──→ Mix1 (accumulate)
-    Sender B ──→ E_K3(E_K2(E_K1(M_B))) ─┤
-                                          │
-    Sender C ──→ E_K3(E_K2(E_K1(M_C))) ─┘
-
-Mix1 Processing (batch threshold reached):
-    1. Decrypt outer layer from all messages
-    2. Verify message integrity and replay tags
-    3. Shuffle array randomly: [B, A, C] (example permutation)
-    4. Forward batch to Mix2
-
-    E_K2(E_K1(M_B)) ─┐
-                      ├──→ Mix2 (accumulate)
-    E_K2(E_K1(M_A)) ─┤
-                      │
-    E_K2(E_K1(M_C)) ─┘
-
-Mix2 Processing:
-    1. Decrypt outer layer
-    2. Shuffle: [C, B, A]
-    3. Forward to Mix3
-
-    E_K1(M_C) ─┐
-                ├──→ Mix3 (accumulate)
-    E_K1(M_B) ─┤
-                │
-    E_K1(M_A) ─┘
-
-Mix3 Processing:
-    1. Decrypt final layer
-    2. Shuffle: [A, C, B]
-    3. Deliver to recipients
-
-    M_A ──→ Recipient X
-    M_C ──→ Recipient Y
-    M_B ──→ Recipient Z
-
-Adversary observing Mix1 input and Mix3 output cannot correlate:
-- Sender A sent M_A (could be M_A, M_B, or M_C with equal probability)
-- Message M_C came from Sender C (could be A, B, or C)
+    subgraph mix1_input ["Mix1 Input Queue"]
+        MA1["E_K3(E_K2(E_K1(M_A)))"]
+        MB1["E_K3(E_K2(E_K1(M_B)))"]
+        MC1["E_K3(E_K2(E_K1(M_C)))"]
+    end
+    
+    subgraph mix1_proc ["Mix1 Processing"]
+        MX1["1. Decrypt outer layer<br/>2. Verify integrity & replay<br/>3. Shuffle: [B, A, C]"]
+    end
+    
+    subgraph mix2_input ["Mix2 Input Queue"]
+        MB2["E_K2(E_K1(M_B))"]
+        MA2["E_K2(E_K1(M_A))"]
+        MC2["E_K2(E_K1(M_C))"]
+    end
+    
+    subgraph mix2_proc ["Mix2 Processing"]
+        MX2["1. Decrypt outer layer<br/>2. Shuffle: [C, B, A]"]
+    end
+    
+    subgraph mix3_input ["Mix3 Input Queue"]
+        MC3["E_K1(M_C)"]
+        MB3["E_K1(M_B)"]
+        MA3["E_K1(M_A)"]
+    end
+    
+    subgraph mix3_proc ["Mix3 Processing"]
+        MX3["1. Decrypt final layer<br/>2. Shuffle: [A, C, B]"]
+    end
+    
+    subgraph recipients ["Recipients"]
+        RX["Recipient X"]
+        RY["Recipient Y"]
+        RZ["Recipient Z"]
+    end
+    
+    subgraph adversary ["Adversary Observation"]
+        ADV["Cannot correlate:<br/>• Sender A → M_A<br/>• M_C ← Sender C<br/>(Equal probability distribution)"]
+    end
+    
+    A --> MA1
+    B --> MB1
+    C --> MC1
+    
+    MA1 --> MX1
+    MB1 --> MX1
+    MC1 --> MX1
+    
+    MX1 --> MB2
+    MX1 --> MA2
+    MX1 --> MC2
+    
+    MB2 --> MX2
+    MA2 --> MX2
+    MC2 --> MX2
+    
+    MX2 --> MC3
+    MX2 --> MB3
+    MX2 --> MA3
+    
+    MC3 --> MX3
+    MB3 --> MX3
+    MA3 --> MX3
+    
+    MX3 --> |M_A| RX
+    MX3 --> |M_C| RY
+    MX3 --> |M_B| RZ
+    
+    mix1_input -.-> |Observable| ADV
+    mix3_proc -.-> |Observable| ADV
 ```
 
 Cover traffic mechanisms augment these architectural protections by injecting dummy messages into the network to obscure genuine traffic patterns. In low-latency networks like I2P, routers generate random-destination messages at intervals calibrated to smooth out bursty application traffic, making it harder for adversaries to distinguish active communication periods from idle periods. The statistical distribution of cover traffic must match legitimate traffic characteristics—message size distribution, inter-arrival times, and destination entropy—or adversaries can filter dummy traffic statistically and focus analysis on the remaining genuine messages. This requirement imposes substantial bandwidth overhead: doubling network capacity to achieve 50% cover traffic ratio, or quadrupling capacity for 75% cover ratio.

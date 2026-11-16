@@ -321,24 +321,32 @@ render_heatmap_ascii(data)
 An interactive dashboard is a reactive system. When a user clicks a data point, the event must fan out to every dependent visualization. The correct mental model is a directed acyclic graph of reactive computations, not a central mutable state object.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Idle
+flowchart TD
+    IDLE["Idle"]
+    FILTERING["Filtering"]
+    SELECTING["Selecting"]
+    ZOOMING["Zooming"]
+    QUERY_PENDING["Query Pending"]
+    HIGHLIGHT_PENDING["Highlight Pending"]
+    LOD_PENDING["LOD Pending"]
+    RENDERING["Rendering"]
+    ERROR["Error"]
 
-    Idle --> Filtering     : "User applies filter"
-    Idle --> Selecting     : "User clicks mark"
-    Idle --> Zooming       : "User scrolls / pinches"
+    IDLE -->|"User applies filter"| FILTERING
+    IDLE -->|"User clicks mark"| SELECTING
+    IDLE -->|"User scrolls / pinches"| ZOOMING
 
-    Filtering --> QueryPending : "Emit filter predicate to data engine"
-    Selecting --> HighlightPending : "Emit selection mask to render layer"
-    Zooming   --> LODPending : "Compute new LOD level"
+    FILTERING -->|"Emit filter predicate to data engine"| QUERY_PENDING
+    SELECTING -->|"Emit selection mask to render layer"| HIGHLIGHT_PENDING
+    ZOOMING -->|"Compute new LOD level"| LOD_PENDING
 
-    QueryPending    --> Rendering : "Data engine returns result set"
-    HighlightPending --> Rendering : "Render layer receives mask"
-    LODPending      --> Rendering : "Aggregation recomputed at new resolution"
+    QUERY_PENDING -->|"Data engine returns result set"| RENDERING
+    HIGHLIGHT_PENDING -->|"Render layer receives mask"| RENDERING
+    LOD_PENDING -->|"Aggregation recomputed at new resolution"| RENDERING
 
-    Rendering --> Idle : "Frame committed to display"
-    Rendering --> Error : "Render timeout / data error"
-    Error --> Idle : "Error boundary recovery"
+    RENDERING -->|"Frame committed to display"| IDLE
+    RENDERING -->|"Render timeout / data error"| ERROR
+    ERROR -->|"Error boundary recovery"| IDLE
 ```
 
 The key architectural decision is **where filters are applied**. Pushing filter predicates down to the data engine (predicate pushdown) means only the necessary rows are transferred and aggregated. Applying filters in the visualization layer after fetching full result sets wastes bandwidth and CPU. All mature visualization systems implement filter pushdown, but developers who build custom integrations frequently miss this optimization.

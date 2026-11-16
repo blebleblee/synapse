@@ -44,34 +44,25 @@ Viscosity in oil-based systems is temperature-sensitive in a way that directly a
 
 The selection of a topcoat is never arbitrary; it is driven by the intersection of four variables: the substrate's expected use environment, the desired optical character of the final surface, the application method available, and the reversibility requirements of the piece. A piece of antique furniture entering a conservation workshop has different finish requirements than a commercial kitchen table, and both differ from a musical instrument neck. The following diagram maps the principal decision paths from substrate and use-case to finish chemistry.
 
-```
-SUBSTRATE + USE ENVIRONMENT
-         │
-         ▼
-┌────────────────────────────────────────────────────────────────────┐
-│          REVERSIBILITY REQUIRED?                                   │
-│   (museum object, antique restoration, instrument)                 │
-└──────────────────┬─────────────────────────────────────────────────┘
-                   │ YES                              │ NO
-                   ▼                                  ▼
-         ┌─────────────────┐              ┌───────────────────────┐
-         │ EVAPORATIVE     │              │   REACTIVE or         │
-         │ Shellac / NC    │              │   COALESCING          │
-         │ Lacquer         │              │                       │
-         └─────────────────┘              └──────────┬────────────┘
-                                                     │
-                              ┌──────────────────────┼─────────────────────┐
-                              │                      │                     │
-                              ▼                      ▼                     ▼
-                   HARD USE / CHEMICAL      CLARITY / UV         LOW VOC /
-                   RESISTANCE              RESISTANCE            SHOP SAFETY
-                   (table, floor)          (light wood,          (enclosed space,
-                                           blond maple)          production)
-                              │                      │                     │
-                              ▼                      ▼                     ▼
-                   Oil-Based Polyurethane    Waterborne         Waterborne
-                   2K Urethane              Acrylic-Urethane    Polyurethane
-                   Alkyd Varnish            Lacquer             w/ Co-solvent
+```mermaid
+flowchart TD
+    Start["SUBSTRATE + USE ENVIRONMENT"]
+    
+    Start --> Decision{"REVERSIBILITY REQUIRED?<br/>(museum object, antique restoration, instrument)"}
+    
+    Decision -->|YES| Evaporative["EVAPORATIVE<br/>Shellac / NC<br/>Lacquer"]
+    
+    Decision -->|NO| Reactive["REACTIVE or<br/>COALESCING"]
+    
+    Reactive --> HardUse["HARD USE / CHEMICAL<br/>RESISTANCE<br/>(table, floor)"]
+    Reactive --> Clarity["CLARITY / UV<br/>RESISTANCE<br/>(light wood,<br/>blond maple)"]
+    Reactive --> LowVOC["LOW VOC /<br/>SHOP SAFETY<br/>(enclosed space,<br/>production)"]
+    
+    HardUse --> HardUseSolution["Oil-Based Polyurethane<br/>2K Urethane<br/>Alkyd Varnish"]
+    
+    Clarity --> ClaritySolution["Waterborne<br/>Acrylic-Urethane<br/>Lacquer"]
+    
+    LowVOC --> LowVOCSolution["Waterborne<br/>Polyurethane<br/>w/ Co-solvent"]
 ```
 
 ### Film Build Architecture by Finish System
@@ -82,17 +73,24 @@ In a lacquer or shellac stack, every coat is chemically fused to the previous on
 
 Oil-based polyurethane builds as discrete laminations. The first coat soaks partially into the wood surface and cross-links in place, forming an anchoring layer. Subsequent coats bond to the previous one through mechanical adhesion (tooth created by sanding) and, within the open recoat window (typically 24–72 hours depending on formulation), through partial chemical cross-link bonding at the interface. If you exceed the recoat window without sanding, you are relying entirely on mechanical adhesion between fully cured thermoset layers, and intercoat adhesion is significantly compromised.
 
-```
-OIL-BASED POLYURETHANE FILM STACK (Cross-Section)
-
-─────────────────────────────────────────────  ← Final polished surface
-  COAT 3: 2–3 mil DFT (dry film thickness)
-─────────────────────────────────────────────  ← Sanded interface (320g)
-  COAT 2: 2–3 mil DFT
-─────────────────────────────────────────────  ← Sanded interface (220g)
-  COAT 1: 1–2 mil DFT (penetrating anchor)
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ← Sealed wood surface
-  Wood cells partially filled with crosslinked resin
+```mermaid
+flowchart TD
+    A["Final polished surface"]
+    B["COAT 3: 2–3 mil DFT<br/>(dry film thickness)"]
+    C["Sanded interface (320g)"]
+    D["COAT 2: 2–3 mil DFT"]
+    E["Sanded interface (220g)"]
+    F["COAT 1: 1–2 mil DFT<br/>(penetrating anchor)"]
+    G["Sealed wood surface"]
+    H["Wood cells partially filled<br/>with crosslinked resin"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
 ```
 
 Waterborne finishes build thinner films per coat (typically 0.5–1.5 mil per application) because of their lower solids content by volume compared to oil-based alternatives. This means more coats are required to achieve equivalent film protection — typically five to six coats of a quality waterborne topcoat to match the protection of three coats of full-strength oil-based polyurethane. The coalesced film, once fully cured (which requires 24–72 hours for initial cure and up to two weeks for full hardness development), exhibits greater clarity than oil-based alternatives due to the absence of the yellow-tinting alkyd resins present in oil-based systems.

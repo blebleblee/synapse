@@ -74,51 +74,37 @@ The thermodynamic efficiency of oxidative phosphorylation—defined as the fract
 
 Experimental protocols for dissecting respiratory chain architecture in novel extremophiles follow a systematic sequence. First, grow the organism under defined conditions using the electron donor and acceptor of interest, confirming substrate consumption and product formation by HPLC, GC-MS, or ion chromatography. Second, prepare membrane vesicles or intact cells and measure oxygen consumption, nitrate reduction, or sulfate reduction rates in the presence of various electron donors (NADH, succinate, H₂, formate), identifying which donors support respiration. Third, solubilize membranes with detergents (dodecyl maltoside, Triton X-100) and fractionate respiratory complexes by anion exchange chromatography, gel filtration, or density gradient centrifugation, monitoring enzyme activities in each fraction. Fourth, purify individual complexes to homogeneity, confirm purity by SDS-PAGE and mass spectrometry, and measure redox potentials via spectroelectrochemistry or potentiometric titrations. Fifth, reconstitute purified complexes into proteoliposomes (artificial lipid vesicles), impose defined redox gradients or membrane potentials, and measure electron transfer rates, proton pumping stoichiometries, and ATP synthesis rates, isolating the function of each complex from the complexity of the intact membrane.
 
-```
-Modular Respiratory Chain Architecture (General Schematic)
-
-Cytoplasm/Matrix                 Membrane                 Periplasm/Intermembrane Space
-─────────────────────────────────────────────────────────────────────────────────────
-
-   Electron Donors                                          Terminal Acceptors
-        │                                                          │
-    ┌───▼───┐                                                ┌────▼────┐
-    │ NADH  │───┐                                       ┌───│   O₂    │
-    │Succ.  │   │                                       │   │  NO₃⁻   │
-    │ H₂    │   │                                       │   │  SO₄²⁻  │
-    │Formate│   │                                       │   │  CO₂    │
-    └───────┘   │                                       │   └─────────┘
-                │                                       │
-         ┌──────▼─────────┐                    ┌────────▼──────────┐
-         │ Dehydrogenases │──e⁻──────────────▶│Quinone Pool (Q/QH₂)│
-         │  (Complex I,   │    (flavins, Fe-S) │ (mobile carrier)  │
-         │   II, etc.)    │◀──H⁺ pumping──────│                    │
-         └────────────────┘                    └────────┬───────────┘
-                                                        │
-                                               ┌────────▼─────────┐
-                                               │  bc₁ Complex     │──────▶ H⁺ out
-                                               │  (Complex III)   │
-                                               │  Q-cycle pumping │
-                                               └────────┬─────────┘
-                                                        │
-                                                        │ cyt c
-                                                        │
-                                               ┌────────▼─────────┐
-                                               │Terminal Oxidase/ │──────▶ H⁺ out
-                                               │  Reductase       │
-                                               │(Complex IV, Nar, │
-                                               │ Dsr, etc.)       │
-                                               └──────────────────┘
-
-                                                Proton-Motive Force
-                                                   (Δψ, ΔpH)
-                                                        │
-                                               ┌────────▼─────────┐
-                                               │   ATP Synthase   │◀──── H⁺ in
-                                               │  (F₀F₁ complex)  │
-                                               │                  │
-                                               │  ADP + Pi → ATP  │
-                                               └──────────────────┘
+```mermaid
+flowchart TD
+    subgraph cytoplasm ["Cytoplasm/Matrix"]
+        donors["Electron Donors<br/>NADH, Succinate,<br/>H₂, Formate"]
+    end
+    
+    subgraph membrane ["Membrane"]
+        dehydro["Dehydrogenases<br/>(Complex I, II, etc.)<br/>flavins, Fe-S clusters"]
+        quinone["Quinone Pool (Q/QH₂)<br/>(mobile carrier)"]
+        bc1["bc₁ Complex<br/>(Complex III)<br/>Q-cycle pumping"]
+        terminal["Terminal Oxidase/Reductase<br/>(Complex IV, Nar, Dsr, etc.)"]
+        synthase["ATP Synthase<br/>(F₀F₁ complex)<br/>ADP + Pi → ATP"]
+    end
+    
+    subgraph periplasm ["Periplasm/Intermembrane Space"]
+        acceptors["Terminal Acceptors<br/>O₂, NO₃⁻, SO₄²⁻, CO₂"]
+        cytc["cytochrome c"]
+    end
+    
+    donors -->|"e⁻"| dehydro
+    dehydro -->|"e⁻"| quinone
+    dehydro -.->|"H⁺ pumping"| periplasm
+    quinone --> bc1
+    bc1 -->|"H⁺ out"| periplasm
+    bc1 --> cytc
+    cytc --> terminal
+    terminal -->|"H⁺ out"| periplasm
+    acceptors --> terminal
+    
+    periplasm -.->|"Proton-Motive Force<br/>(Δψ, ΔpH)"| synthase
+    periplasm -->|"H⁺ in"| synthase
 ```
 
 This modular architecture permits mix-and-match assembly: organisms select dehydrogenases matching available electron donors, choose quinone species matching the midpoint potential range, and install terminal reductases or oxidases appropriate for environmental electron acceptors. The quinone pool decouples donor from acceptor, allowing independent regulation of each respiratory branch. Proton (or sodium) pumping occurs at multiple sites, summing to generate the total pmf. ATP synthase dissipates this gradient with a stoichiometry determined by the c-ring size: organisms optimizing for maximal ATP yield per substrate molecule evolve smaller c-rings (8–10 subunits), requiring fewer protons per ATP but generating lower torque; organisms prioritizing rapid growth under high pmf conditions tolerate larger c-rings (12–15 subunits), sacrificing some efficiency for increased rotational velocity and ATP synthesis rate.

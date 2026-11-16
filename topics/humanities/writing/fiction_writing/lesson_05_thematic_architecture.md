@@ -78,45 +78,64 @@ The technical mechanism involves distinguishing between infrastructural clarity 
 
 The controlled ambiguity technique involves staging scenes that permit multiple equally-defensible interpretations without supporting all possible readings. An ambiguous ending might leave unclear whether the protagonist achieves redemption, but it should not leave unclear what actually happened in plot terms. The famous spinning top conclusion of *Inception* works because the factual question—does it fall?—remains open, but the thematic question—whether Cobb still cares about the distinction between dream and reality—achieves resolution. The architecture preserves interpretive space while providing sufficient closure for emotional satisfaction.
 
-```
-THEMATIC ARCHITECTURE SYSTEM MAP
-
-Story World & Events
-         ↓
-┌────────────────────────────────────────────┐
-│   SYMBOLIC SYSTEM LAYER                     │
-│   (concrete recurring elements:             │
-│    objects, colors, weather, spaces)        │
-└────────────────────────────────────────────┘
-         ↓
-┌────────────────────────────────────────────┐
-│   MOTIF REPETITION PATTERN                  │
-│   (temporal distribution + variation)       │
-│   • Introduction (baseline meaning)         │
-│   • Development (complication)              │
-│   • Transformation (inversion/deepening)    │
-│   • Resolution/Suspension                   │
-└────────────────────────────────────────────┘
-         ↓
-┌────────────────────────────────────────────┐
-│   SUBTEXT GENERATION LAYER                  │
-│   • Dialogue ≠ Action                       │
-│   • Stated Goal ≠ Revealed Desire           │
-│   • Surface Genre ≠ Deep Structure          │
-└────────────────────────────────────────────┘
-         ↓
-┌────────────────────────────────────────────┐
-│   INTERPRETIVE SPACE                        │
-│   (reader meaning-construction zone)        │
-│   ↓                                         │
-│   THEME (emergent semantic field)           │
-└────────────────────────────────────────────┘
-
-RESONANCE MULTIPLIERS:
-→ Juxtaposition (structural placement)
-→ Accumulation (semantic density over time)
-→ Variation (same motif, different context)
-→ Silence (strategic withholding)
+```mermaid
+flowchart TD
+    A["Story World & Events"]
+    
+    B["SYMBOLIC SYSTEM LAYER<br/>(concrete recurring elements:<br/>objects, colors, weather, spaces)"]
+    
+    C["MOTIF REPETITION PATTERN<br/>(temporal distribution + variation)"]
+    C1["• Introduction (baseline meaning)"]
+    C2["• Development (complication)"]
+    C3["• Transformation (inversion/deepening)"]
+    C4["• Resolution/Suspension"]
+    
+    D["SUBTEXT GENERATION LAYER"]
+    D1["• Dialogue ≠ Action"]
+    D2["• Stated Goal ≠ Revealed Desire"]
+    D3["• Surface Genre ≠ Deep Structure"]
+    
+    E["INTERPRETIVE SPACE<br/>(reader meaning-construction zone)"]
+    
+    F["THEME<br/>(emergent semantic field)"]
+    
+    R1["Juxtaposition<br/>(structural placement)"]
+    R2["Accumulation<br/>(semantic density over time)"]
+    R3["Variation<br/>(same motif, different context)"]
+    R4["Silence<br/>(strategic withholding)"]
+    
+    A --> B
+    B --> C
+    C --> C1
+    C --> C2
+    C --> C3
+    C --> C4
+    C1 --> D
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    D --> D1
+    D --> D2
+    D --> D3
+    D1 --> E
+    D2 --> E
+    D3 --> E
+    E --> F
+    
+    R1 -.->|influences| F
+    R2 -.->|influences| F
+    R3 -.->|influences| F
+    R4 -.->|influences| F
+    
+    style B fill:#e1f5ff
+    style C fill:#fff4e1
+    style D fill:#ffe1f5
+    style E fill:#e1ffe1
+    style F fill:#f5e1ff
+    style R1 fill:#ffd0d0
+    style R2 fill:#ffd0d0
+    style R3 fill:#ffd0d0
+    style R4 fill:#ffd0d0
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

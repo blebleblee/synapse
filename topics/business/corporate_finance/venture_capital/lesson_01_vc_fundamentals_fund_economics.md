@@ -34,33 +34,23 @@ Vintage year comparison is the standard methodology for benchmarking venture fun
 
 The operating architecture of a venture fund involves four distinct stakeholders whose economic interests are aligned in some dimensions and in tension in others. The diagram below maps the capital flow and governance structure:
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                      LIMITED PARTNERSHIP                            │
-│                                                                     │
-│  ┌──────────────────────┐         ┌──────────────────────────────┐  │
-│  │   LIMITED PARTNERS   │         │      GENERAL PARTNER         │  │
-│  │  (LPs)               │         │      (GP / Fund Manager)     │  │
-│  │                      │         │                              │  │
-│  │  Pension Funds        │ ──────► │  Investment Committee        │  │
-│  │  Endowments          │ Capital  │  Partners / Principals      │  │
-│  │  Sovereign Wealth    │  Calls   │  Associates / Analysts      │  │
-│  │  Family Offices      │         │                              │  │
-│  │  Fund of Funds       │ ◄─────── │                              │  │
-│  │                      │Distribu- │                              │  │
-│  │  97–99% of Capital   │  tions   │  1–3% of Capital (GP Commit) │  │
-│  └──────────────────────┘         └──────────────┬───────────────┘  │
-│                                                  │                  │
-│                                          Capital Deployment         │
-│                                                  │                  │
-│                                    ┌─────────────▼─────────────┐    │
-│                                    │     PORTFOLIO COMPANIES    │    │
-│                                    │                            │    │
-│                                    │  Seed / Series A / B / C   │    │
-│                                    │  Board Seats, Pro-Rata     │    │
-│                                    │  Rights, Information Rights│    │
-│                                    └────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph LP_STRUCTURE["LIMITED PARTNERSHIP"]
+        subgraph LPs["LIMITED PARTNERS (LPs)"]
+            LP_LIST["• Pension Funds<br/>• Endowments<br/>• Sovereign Wealth<br/>• Family Offices<br/>• Fund of Funds<br/><br/>97–99% of Capital"]
+        end
+        
+        subgraph GP["GENERAL PARTNER (GP / Fund Manager)"]
+            GP_LIST["• Investment Committee<br/>• Partners / Principals<br/>• Associates / Analysts<br/><br/>1–3% of Capital (GP Commit)"]
+        end
+        
+        PC["PORTFOLIO COMPANIES<br/><br/>Seed / Series A / B / C<br/>Board Seats, Pro-Rata Rights,<br/>Information Rights"]
+        
+        LP_LIST -->|"Capital Calls"| GP_LIST
+        GP_LIST -->|Distributions| LP_LIST
+        GP_LIST -->|"Capital Deployment"| PC
+    end
 ```
 
 The fund agreement — formally the Limited Partnership Agreement, or LPA — is the constitutional document of this structure. It governs the investment mandate (stage focus, geography, sector), the fee and carry structure, the GP commitment amount, the investment period duration, the distribution waterfall mechanics, and the LP advisory committee (LPAC) rights. The LPAC is composed of the fund's largest and most sophisticated LP investors and holds consent rights over material conflict-of-interest situations, such as a GP investing in a portfolio company that competes with another existing position, or approving fund extensions beyond the base ten-year term.
