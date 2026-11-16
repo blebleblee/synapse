@@ -591,7 +591,7 @@ metadata:
   namespace: argocd
 type: Opaque
 stringData:
-  slack-token: xoxb-1234567890123-1234567890123-aBcDeFgHiJkLmNoPqRsTuVwXyZ
+  slack-token: xoxb-YOUR-SLACK-BOT-TOKEN
   webhook-token: 7f4a8c2e9b1d3f5a8c2e9b1d3f5a8c2e
   pagerduty-routing-key: 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d
 ```

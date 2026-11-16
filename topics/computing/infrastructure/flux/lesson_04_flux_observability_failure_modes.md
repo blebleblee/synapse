@@ -250,7 +250,7 @@ metadata:
 spec:
   type: slack
   channel: flux-alerts
-  address: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
+  address: https://example.com/slack-webhook-endpoint
 ```
 
 The notification-controller watches Kubernetes Events emitted by Flux controllers, filters them by severity and source, and posts notifications to the configured provider. This event-driven alerting model operates independently of Prometheus, providing redundancy in case the Prometheus stack is unavailable. However, it lacks the aggregation, deduplication, and routing sophistication of Prometheus Alertmanager, making it better suited for low-volume notifications on critical resources.
