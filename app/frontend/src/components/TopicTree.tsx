@@ -351,7 +351,24 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
       </div>
 
       <div className="tree-content">
-        {sortedDomainEntries.map(([domain, ddata]) => {
+        {sortedDomainEntries.length === 0 ? (
+          <div className="empty-tree-state" style={{ padding: '32px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            <Package size={32} style={{ opacity: 0.4, color: 'var(--text-muted)' }} />
+            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>No Curriculum Installed Yet</div>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: '1.5', margin: 0 }}>
+              Synapse runs as a modular app shell. Sideload a <code>.synpack</code> addon or install topics from the Store.
+            </p>
+            <button
+              className="btn-primary"
+              style={{ fontSize: '11px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}
+              onClick={onOpenStore || onOpenSettings}
+            >
+              <Package size={13} />
+              Open Curriculum Store
+            </button>
+          </div>
+        ) : (
+          sortedDomainEntries.map(([domain, ddata]) => {
           const disciplines = ddata.disciplines || {};
 
           let sortedDisciplines = Object.entries(disciplines);
@@ -781,7 +798,8 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
               )}
             </div>
           );
-        })}
+        })
+      )}
       </div>
 
       {/* Clean 4-Level Add Topic Modal */}

@@ -132,6 +132,57 @@ The Windows desktop distribution is packaged as a **standalone portable binary**
 
 ---
 
+## 📦 How Synapse Works: App Shell + Modular `.synpack` Addons
+
+Synapse separates the **Application Engine** (the reader, Socratic AI mentor, KaTeX math engine, and terminal) from the **Curriculum Knowledge Base**. The desktop installer is a lightweight, zero-dependency binary (~90 MB), while masterclasses are packaged as modular `.synpack` curriculum archives.
+
+```mermaid
+flowchart TD
+    subgraph App ["Synapse Workbench Core (~90 MB)"]
+        SHELL["Electron Shell & FastAPI Backend<br/>(Reader · Socratic Mentor · KaTeX Math · PTY Terminal)"]
+    end
+
+    subgraph Addons ["Curriculum Addons (*.synpack)"]
+        MASTER["synapse_complete_curriculum.synpack<br/>(All 12 Domains · 539 Topics · ~33.5 MB)"]
+        MODULAR["Modular Domain Packs<br/>(computing.synpack · engineering.synpack · arts.synpack · etc.)"]
+    end
+
+    MASTER -->|"1-Click Sideload or Store"| SHELL
+    MODULAR -->|"Download specific subjects"| SHELL
+
+    style App fill:#1e293b,stroke:#38bdf8,color:#f8fafc
+    style Addons fill:#0f172a,stroke:#a855f7,color:#f8fafc
+```
+
+### How to Install Curriculum Addons
+
+#### Option 1: 1-Click Master Pack (Recommended)
+Download the complete global curriculum from the [Project Releases](https://github.com/blebleblee/synapse/releases):
+1. Download **`synapse_complete_curriculum.synpack`** (33.5 MB).
+2. Open Synapse Workbench $\rightarrow$ Click **Settings ⚙** $\rightarrow$ **Curriculum Store & Addons**.
+3. Under **Sideload Local Package**, drop or select `synapse_complete_curriculum.synpack`.
+4. *Done!* All 12 domains and 539 masterclass topics will immediately appear in your sidebar.
+
+#### Option 2: Individual Modular Domain Packs
+If you only need specific subjects (e.g., just Computing or Engineering):
+- Download only the `.synpack` files you want from Releases (`computing.synpack`, `engineering.synpack`, etc.).
+- Sideload them via Settings ⚙ $\rightarrow$ Curriculum Store.
+
+#### Option 3: Command Line / Air-Gapped Sideloading
+For server, Docker, or headless environments:
+```bash
+# Sideload any .synpack package from the terminal
+synapse pack install path/to/synapse_complete_curriculum.synpack
+
+# List installed packages
+synapse pack list
+```
+
+#### Option 4: Portable Desktop (Drop & Go)
+If using the portable Windows binary (`Synapse-Workbench-Portable.exe`) or macOS `.app`, you can place an uncompressed `topics/` folder directly alongside the executable. Synapse detects local topics automatically without installation.
+
+---
+
 ### Option 2: Python Wheel (`.whl`) Installation (Linux, macOS, Windows WSL2)
 
 Install and run Synapse via standard Python packaging across Linux, macOS, or Windows (WSL2):
