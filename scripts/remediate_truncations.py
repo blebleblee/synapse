@@ -165,12 +165,9 @@ def main():
         print("[✔] No truncated files found! Curriculum is 100% complete.")
         return
 
-    v_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app")
-    v_key = os.environ.get("VNAIPRO_API_KEY")
-    if v_key:
-        provider = AnthropicProvider(base_url=v_url, api_key=v_key, model="claude-sonnet-5")
-    else:
-        provider = AnthropicProvider(model="claude-sonnet-5")
+    v_url = os.environ.get("ANTHROPIC_BASE_URL") or os.environ.get("VNAIPRO_BASE_URL") or "https://api.anthropic.com"
+    v_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("VNAIPRO_API_KEY")
+    provider = AnthropicProvider(base_url=v_url, api_key=v_key, model="claude-sonnet-5")
 
     success_count = 0
     fail_count = 0

@@ -189,14 +189,11 @@ def main():
     args = parser.parse_args()
 
     provider_override = None
-    if args.provider == "anthropic" or (args.provider == "auto" and (os.environ.get("VNAIPRO_API_KEY") or os.environ.get("ANTHROPIC_API_KEY"))):
+    if args.provider == "anthropic" or (args.provider == "auto" and (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("VNAIPRO_API_KEY"))):
         target_model = args.model or os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5")
-        v_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app")
-        v_key = os.environ.get("VNAIPRO_API_KEY")
-        if v_key:
-            provider_override = AnthropicProvider(base_url=v_url, api_key=v_key, model=target_model)
-        else:
-            provider_override = AnthropicProvider(model=target_model)
+        v_url = os.environ.get("ANTHROPIC_BASE_URL") or os.environ.get("VNAIPRO_BASE_URL") or "https://api.anthropic.com"
+        v_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("VNAIPRO_API_KEY")
+        provider_override = AnthropicProvider(base_url=v_url, api_key=v_key, model=target_model)
         print(f"[*] Engine: Anthropic Claude [{provider_override.model}] via {provider_override.base_url}")
     else:
         print("[*] Engine: Ollama Multi-Node Local Cluster")

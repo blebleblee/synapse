@@ -698,6 +698,7 @@ class AnthropicProvider(LLMProvider):
         self.base_url = (
             base_url or 
             os.environ.get("ANTHROPIC_BASE_URL") or 
+            os.environ.get("VNAIPRO_BASE_URL") or
             anthropic_cfg.get("base_url") or 
             settings.get("anthropic_base_url") or
             "https://api.anthropic.com"
@@ -706,15 +707,19 @@ class AnthropicProvider(LLMProvider):
         self.api_key = (
             api_key or 
             os.environ.get("ANTHROPIC_API_KEY") or 
+            os.environ.get("VNAIPRO_API_KEY") or
             os.environ.get("ANTHROPIC_AUTH_TOKEN") or 
             anthropic_cfg.get("api_key") or
             settings.get("anthropic_api_key")
         )
 
-        # Strict blacklist for AIAPIFLOW credit exhaustion: automatically route to VNAIPRO
-        if "aiapiflow" in self.base_url.lower() and os.environ.get("VNAIPRO_API_KEY"):
-            self.base_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app").rstrip("/")
-            self.api_key = os.environ.get("VNAIPRO_API_KEY")
+        # Automatic fallback if legacy AIAPIFLOW URL is still referenced
+        if "aiapiflow" in self.base_url.lower():
+            fallback_url = os.environ.get("ANTHROPIC_BASE_URL") or os.environ.get("VNAIPRO_BASE_URL") or "https://apikey.vnaipro.app"
+            if "aiapiflow" not in fallback_url.lower():
+                self.base_url = fallback_url.rstrip("/")
+            if not self.api_key:
+                self.api_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("VNAIPRO_API_KEY")
 
         resolved_req_model = model or os.environ.get("ANTHROPIC_MODEL") or anthropic_cfg.get("model") or "claude-sonnet-5"
         self.model = self._resolve_model_name(resolved_req_model)
@@ -765,7 +770,19 @@ class AnthropicProvider(LLMProvider):
                 err_str = str(e)
                 # Automatic key failover if active key runs out of credit (403 / 用户额度不足 / insufficient_quota)
                 if any(q in err_str for q in ["403", "用户额度不足", "额度不足", "insufficient_quota"]):
-                    keys = [k for k in [os.environ.get("VNAIPRO_API_KEY"), os.environ.get("VNAIPRO_API_KEY_2"), os.environ.get("VNAIPRO_API_KEY_3")] if k]
+                    raw_keys = [
+                        os.environ.get("ANTHROPIC_API_KEY"),
+                        os.environ.get("ANTHROPIC_API_KEY_2"),
+                        os.environ.get("ANTHROPIC_API_KEY_3"),
+                        os.environ.get("ANTHROPIC_API_KEY_4"),
+                        os.environ.get("VNAIPRO_API_KEY"),
+                        os.environ.get("VNAIPRO_API_KEY_2"),
+                        os.environ.get("VNAIPRO_API_KEY_3"),
+                        os.environ.get("VNAIPRO_API_KEY_4"),
+                    ]
+                    # Deduplicate preserving order
+                    seen = set()
+                    keys = [k for k in raw_keys if k and not (k in seen or seen.add(k))]
                     if len(keys) > 1:
                         try:
                             curr_idx = keys.index(self.api_key)
@@ -778,11 +795,10 @@ class AnthropicProvider(LLMProvider):
                             continue
 
                 # Automatic gateway failover if current gateway returns 503 (No available accounts) or 502
-                if ("503" in err_str or "No available accounts" in err_str or "Upstream access forbidden" in err_str) and os.environ.get("VNAIPRO_API_KEY"):
-                    v_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app").rstrip("/")
-                    if self.base_url != v_url:
-                        self.base_url = v_url
-                        self.api_key = os.environ.get("VNAIPRO_API_KEY")
+                if ("503" in err_str or "No available accounts" in err_str or "Upstream access forbidden" in err_str):
+                    fallback_gateway = (os.environ.get("ANTHROPIC_BASE_URL") or os.environ.get("VNAIPRO_BASE_URL") or "https://apikey.vnaipro.app").rstrip("/")
+                    if self.base_url != fallback_gateway:
+                        self.base_url = fallback_gateway
                         continue
                 if attempt < retries:
                     # Exponential backoff with stagger

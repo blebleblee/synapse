@@ -94,16 +94,16 @@ def main():
         print(f"[★] Loaded domain mandate from {gemini_path.name}")
 
     # Build provider pool
-    vnaipro_key = os.environ.get("VNAIPRO_API_KEY")
-    vnaipro_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app")
+    cloud_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("VNAIPRO_API_KEY")
+    cloud_url = os.environ.get("ANTHROPIC_BASE_URL") or os.environ.get("VNAIPRO_BASE_URL") or "https://api.anthropic.com"
     providers = []
-    if vnaipro_key:
-        p_vnaipro = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key, model=args.model)
-        providers.append(("VNAIPRO-1", p_vnaipro))
-        providers.append(("VNAIPRO-2", p_vnaipro))
+    if cloud_key:
+        p_cloud = AnthropicProvider(base_url=cloud_url, api_key=cloud_key, model=args.model)
+        providers.append(("ANTHROPIC-1", p_cloud))
+        providers.append(("ANTHROPIC-2", p_cloud))
     
     p_primary = AnthropicProvider(model=args.model)
-    providers.append(("AIAPIFLOW", p_primary))
+    providers.append(("PRIMARY", p_primary))
 
     print(f"[*] Initialized multi-gateway scoping pool ({len(providers)} workers)")
 

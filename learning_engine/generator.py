@@ -708,62 +708,62 @@ def generate_subtopic_content(
     """
     subtopic_dir = validate_canonical_topic_path(subtopic_dir)
     workers = None
-    vnaipro_key = os.environ.get("VNAIPRO_API_KEY")
-    vnaipro_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app")
-    vnaipro_key_2 = os.environ.get("VNAIPRO_API_KEY_2")
-    vnaipro_key_3 = os.environ.get("VNAIPRO_API_KEY_3")
-    vnaipro_key_4 = os.environ.get("VNAIPRO_API_KEY_4")
+    cloud_url = os.environ.get("ANTHROPIC_BASE_URL") or os.environ.get("VNAIPRO_BASE_URL") or "https://api.anthropic.com"
+    cloud_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("VNAIPRO_API_KEY")
+    cloud_key_2 = os.environ.get("ANTHROPIC_API_KEY_2") or os.environ.get("VNAIPRO_API_KEY_2")
+    cloud_key_3 = os.environ.get("ANTHROPIC_API_KEY_3") or os.environ.get("VNAIPRO_API_KEY_3")
+    cloud_key_4 = os.environ.get("ANTHROPIC_API_KEY_4") or os.environ.get("VNAIPRO_API_KEY_4")
 
-    if vnaipro_key:
+    if cloud_key:
         workers = []
-        p_vnaipro_1 = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key, model="claude-sonnet-5")
-        p_vnaipro_2 = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key_2, model="claude-sonnet-5") if vnaipro_key_2 else p_vnaipro_1
-        p_vnaipro_3 = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key_3, model="claude-sonnet-5") if vnaipro_key_3 else None
-        p_vnaipro_4 = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key_4, model="claude-sonnet-5") if vnaipro_key_4 else None
+        p_cloud_1 = AnthropicProvider(base_url=cloud_url, api_key=cloud_key, model="claude-sonnet-5")
+        p_cloud_2 = AnthropicProvider(base_url=cloud_url, api_key=cloud_key_2, model="claude-sonnet-5") if cloud_key_2 else p_cloud_1
+        p_cloud_3 = AnthropicProvider(base_url=cloud_url, api_key=cloud_key_3, model="claude-sonnet-5") if cloud_key_3 else None
+        p_cloud_4 = AnthropicProvider(base_url=cloud_url, api_key=cloud_key_4, model="claude-sonnet-5") if cloud_key_4 else None
 
-        if p_vnaipro_4:
+        if p_cloud_4:
             # 4-Key Architecture: Deploy 11 parallel workers across 4 keys (3 on Key 1, 3 on Key 2, 3 on Key 3, 2 on Key 4)
-            workers.append(("VNAIPRO-A1", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-B1", "claude-sonnet-5", p_vnaipro_2))
-            workers.append(("VNAIPRO-C1", "claude-sonnet-5", p_vnaipro_3))
-            workers.append(("VNAIPRO-D1", "claude-sonnet-5", p_vnaipro_4))
-            workers.append(("VNAIPRO-A2", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-B2", "claude-sonnet-5", p_vnaipro_2))
-            workers.append(("VNAIPRO-C2", "claude-sonnet-5", p_vnaipro_3))
-            workers.append(("VNAIPRO-D2", "claude-sonnet-5", p_vnaipro_4))
-            workers.append(("VNAIPRO-A3", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-B3", "claude-sonnet-5", p_vnaipro_2))
-            workers.append(("VNAIPRO-C3", "claude-sonnet-5", p_vnaipro_3))
-        elif p_vnaipro_3:
+            workers.append(("ANTHROPIC-A1", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-B1", "claude-sonnet-5", p_cloud_2))
+            workers.append(("ANTHROPIC-C1", "claude-sonnet-5", p_cloud_3))
+            workers.append(("ANTHROPIC-D1", "claude-sonnet-5", p_cloud_4))
+            workers.append(("ANTHROPIC-A2", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-B2", "claude-sonnet-5", p_cloud_2))
+            workers.append(("ANTHROPIC-C2", "claude-sonnet-5", p_cloud_3))
+            workers.append(("ANTHROPIC-D2", "claude-sonnet-5", p_cloud_4))
+            workers.append(("ANTHROPIC-A3", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-B3", "claude-sonnet-5", p_cloud_2))
+            workers.append(("ANTHROPIC-C3", "claude-sonnet-5", p_cloud_3))
+        elif p_cloud_3:
             # 3-Key Architecture: Deploy 11 parallel workers across 3 keys (4 on Key 1, 4 on Key 2, 3 on Key 3)
             # This drafts all 10 lessons + 1 lab simultaneously in a single wave!
-            workers.append(("VNAIPRO-A1", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-B1", "claude-sonnet-5", p_vnaipro_2))
-            workers.append(("VNAIPRO-C1", "claude-sonnet-5", p_vnaipro_3))
-            workers.append(("VNAIPRO-A2", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-B2", "claude-sonnet-5", p_vnaipro_2))
-            workers.append(("VNAIPRO-C2", "claude-sonnet-5", p_vnaipro_3))
-            workers.append(("VNAIPRO-A3", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-B3", "claude-sonnet-5", p_vnaipro_2))
-            workers.append(("VNAIPRO-C3", "claude-sonnet-5", p_vnaipro_3))
-            workers.append(("VNAIPRO-A4", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-B4", "claude-sonnet-5", p_vnaipro_2))
-        elif vnaipro_key_2:
+            workers.append(("ANTHROPIC-A1", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-B1", "claude-sonnet-5", p_cloud_2))
+            workers.append(("ANTHROPIC-C1", "claude-sonnet-5", p_cloud_3))
+            workers.append(("ANTHROPIC-A2", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-B2", "claude-sonnet-5", p_cloud_2))
+            workers.append(("ANTHROPIC-C2", "claude-sonnet-5", p_cloud_3))
+            workers.append(("ANTHROPIC-A3", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-B3", "claude-sonnet-5", p_cloud_2))
+            workers.append(("ANTHROPIC-C3", "claude-sonnet-5", p_cloud_3))
+            workers.append(("ANTHROPIC-A4", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-B4", "claude-sonnet-5", p_cloud_2))
+        elif cloud_key_2:
             # 2-Key Architecture: Deploy 8 parallel workers (4 on Key 1, 4 on Key 2 = fast 2 waves)
-            workers.append(("VNAIPRO-A1", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-B1", "claude-sonnet-5", p_vnaipro_2))
-            workers.append(("VNAIPRO-A2", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-B2", "claude-sonnet-5", p_vnaipro_2))
-            workers.append(("VNAIPRO-A3", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-B3", "claude-sonnet-5", p_vnaipro_2))
-            workers.append(("VNAIPRO-A4", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-B4", "claude-sonnet-5", p_vnaipro_2))
+            workers.append(("ANTHROPIC-A1", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-B1", "claude-sonnet-5", p_cloud_2))
+            workers.append(("ANTHROPIC-A2", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-B2", "claude-sonnet-5", p_cloud_2))
+            workers.append(("ANTHROPIC-A3", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-B3", "claude-sonnet-5", p_cloud_2))
+            workers.append(("ANTHROPIC-A4", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-B4", "claude-sonnet-5", p_cloud_2))
         else:
             # Single-Key Architecture: Deploy 4 parallel workers safely on the active key
-            workers.append(("VNAIPRO-1", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-2", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-3", "claude-sonnet-5", p_vnaipro_1))
-            workers.append(("VNAIPRO-4", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("ANTHROPIC-1", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-2", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-3", "claude-sonnet-5", p_cloud_1))
+            workers.append(("ANTHROPIC-4", "claude-sonnet-5", p_cloud_1))
     elif provider:
         p_model = getattr(provider, "model", "custom")
         workers = [(p_model, p_model, provider)]

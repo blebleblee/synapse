@@ -70,7 +70,7 @@ def get_latest_log_lines(n=14):
 
 def get_engine_info():
     """Dynamically extracts active model and concurrency details from the engine logs."""
-    if os.environ.get("VNAIPRO_API_KEY"):
+    if os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("VNAIPRO_API_KEY"):
         return "Anthropic Claude [claude-sonnet-5] (Multi-Gateway Parallel Pool)"
     if not LOG_FILE.exists():
         return "Anthropic Claude [claude-sonnet-5] (Sequential Cloud Stream)"
