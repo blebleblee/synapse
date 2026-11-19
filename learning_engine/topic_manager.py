@@ -68,71 +68,156 @@ def get_topic_tree() -> Dict[str, Any]:
             "categories": {}
         }
 
-        if not syllabus_file.exists():
-            continue
-
-        content = syllabus_file.read_text(encoding="utf-8")
-        pattern = r"-\s+\*\*(.*?)\*\*\s+\(\`(.*?)/\`\)"
-        matches = re.findall(pattern, content)
-
+        found_courses = set()
         course_display_names = {}
-        current_section = ""
-        for line in content.splitlines():
-            line_str = line.strip()
-            if line_str.startswith("### "):
-                current_section = line_str.lstrip("#").strip()
-            elif line_str.startswith("- **"):
-                m = re.match(r"-\s+\*\*(.*?)\*\*\s+\(\`(.*?)/\`\)", line_str)
-                if m:
-                    _, u_rel = m.groups()
-                    u_parts = u_rel.split("/")
-                    u_disc = u_parts[0] if len(u_parts) >= 2 else "general"
-                    u_course = u_parts[1] if len(u_parts) >= 2 else u_parts[0]
 
-                    if current_section and (u_disc, u_course) not in course_display_names:
-                        c_title = current_section.split(":", 1)[1].strip() if ":" in current_section else current_section
-                        course_display_names[(u_disc, u_course)] = c_title if c_title.lower() != u_disc.lower() else u_course.replace("_", " ").title()
+        if syllabus_file.exists():
+            content = syllabus_file.read_text(encoding="utf-8")
+            pattern = r"-\s+\*\*(.*?)\*\*\s+\(\`(.*?)/\`\)"
+            matches = re.findall(pattern, content)
 
-        for display_name, rel_path in matches:
-            parts = rel_path.split("/")
-            disc = parts[0] if len(parts) >= 1 else "general"
-            course = parts[1] if len(parts) >= 2 else parts[0]
-            unit = "core"
-            clean_rel = f"{disc}/{course}"
+            current_section = ""
+            for line in content.splitlines():
+                line_str = line.strip()
+                if line_str.startswith("### "):
+                    current_section = line_str.lstrip("#").strip()
+                elif line_str.startswith("- **"):
+                    m = re.match(r"-\s+\*\*(.*?)\*\*\s+\(\`(.*?)/\`\)", line_str)
+                    if m:
+                        _, u_rel = m.groups()
+                        u_parts = u_rel.split("/")
+                        u_disc = u_parts[0] if len(u_parts) >= 2 else "general"
+                        u_course = u_parts[1] if len(u_parts) >= 2 else u_parts[0]
 
-            if disc not in tree[domain]["disciplines"]:
-                tree[domain]["disciplines"][disc] = {"courses": {}}
-                tree[domain]["categories"][disc] = {}
+                        if current_section and (u_disc, u_course) not in course_display_names:
+                            c_title = current_section.split(":", 1)[1].strip() if ":" in current_section else current_section
+                            course_display_names[(u_disc, u_course)] = c_title if c_title.lower() != u_disc.lower() else u_course.replace("_", " ").title()
 
-            c_display_title = display_name if len(parts) <= 2 else course_display_names.get((disc, course), course.replace("_", " ").title())
+            for display_name, rel_path in matches:
+                parts = rel_path.split("/")
+                disc = parts[0] if len(parts) >= 1 else "general"
+                course = parts[1] if len(parts) >= 2 else parts[0]
+                unit = "core"
+                clean_rel = f"{disc}/{course}"
+                found_courses.add((disc, course))
 
-            if course not in tree[domain]["disciplines"][disc]["courses"]:
-                tree[domain]["disciplines"][disc]["courses"][course] = {
+                if disc not in tree[domain]["disciplines"]:
+                    tree[domain]["disciplines"][disc] = {"courses": {}}
+                    tree[domain]["categories"][disc] = {}
+
+                c_display_title = display_name if len(parts) <= 2 else course_display_names.get((disc, course), course.replace("_", " ").title())
+
+                if course not in tree[domain]["disciplines"][disc]["courses"]:
+                    tree[domain]["disciplines"][disc]["courses"][course] = {
+                        "display_name": c_display_title,
+                        "units": {}
+                    }
+
+                full_path = TOPICS_DIR / domain / disc / course
+                status = utils_scan(full_path)
+
+                node_data = {
                     "display_name": c_display_title,
-                    "units": {}
+                    "domain": domain,
+                    "discipline": disc,
+                    "course": course,
+                    "course_title": course_display_names.get((disc, course), course.replace("_", " ").title()),
+                    "unit": unit,
+                    "rel_path": f"{domain}/{clean_rel}",
+                    "full_path": str(full_path),
+                    "status": status,
+                    "lessons": utils_get_lessons(full_path),
+                    "completed_lessons": get_completed_lessons(f"{domain}/{clean_rel}"),
+                    "has_summary": (full_path / "SUMMARY.md").exists()
                 }
 
-            full_path = TOPICS_DIR / domain / disc / course
-            status = utils_scan(full_path)
+                tree[domain]["disciplines"][disc]["courses"][course]["units"][unit] = node_data
+                flat_key = f"{course}_{unit}" if unit != "core" else course
+                tree[domain]["categories"][disc][flat_key] = node_data
 
-            node_data = {
-                "display_name": c_display_title,
-                "domain": domain,
-                "discipline": disc,
-                "course": course,
-                "course_title": course_display_names.get((disc, course), course.replace("_", " ").title()),
-                "unit": unit,
-                "rel_path": f"{domain}/{clean_rel}",
-                "full_path": str(full_path),
-                "status": status,
-                "lessons": utils_get_lessons(full_path),
-                "completed_lessons": get_completed_lessons(f"{domain}/{clean_rel}"),
-                "has_summary": (full_path / "SUMMARY.md").exists()
-            }
+        # Dynamic filesystem discovery for topics not listed in SYLLABUS.md (or if SYLLABUS.md is missing)
+        if domain_dir.exists():
+            for disc_dir in sorted(domain_dir.iterdir(), key=lambda p: p.name):
+                if not disc_dir.is_dir() or disc_dir.name.startswith("."):
+                    continue
 
-            tree[domain]["disciplines"][disc]["courses"][course]["units"][unit] = node_data
-            flat_key = f"{course}_{unit}" if unit != "core" else course
-            tree[domain]["categories"][disc][flat_key] = node_data
+                # Check if disc_dir is directly a course (has lesson_*.md or labs.md)
+                direct_lessons = list(disc_dir.glob("lesson_*.md")) or ((disc_dir / "labs.md").exists())
+                if direct_lessons:
+                    disc = "general"
+                    course = disc_dir.name
+                    if (disc, course) not in found_courses:
+                        found_courses.add((disc, course))
+                        if disc not in tree[domain]["disciplines"]:
+                            tree[domain]["disciplines"][disc] = {"courses": {}}
+                            tree[domain]["categories"][disc] = {}
+
+                        c_display_title = course.replace("_", " ").title()
+                        tree[domain]["disciplines"][disc]["courses"][course] = {
+                            "display_name": c_display_title,
+                            "units": {}
+                        }
+                        clean_rel = f"{disc}/{course}"
+                        node_data = {
+                            "display_name": c_display_title,
+                            "domain": domain,
+                            "discipline": disc,
+                            "course": course,
+                            "course_title": c_display_title,
+                            "unit": "core",
+                            "rel_path": f"{domain}/{clean_rel}",
+                            "full_path": str(disc_dir),
+                            "status": utils_scan(disc_dir),
+                            "lessons": utils_get_lessons(disc_dir),
+                            "completed_lessons": get_completed_lessons(f"{domain}/{clean_rel}"),
+                            "has_summary": (disc_dir / "SUMMARY.md").exists()
+                        }
+                        tree[domain]["disciplines"][disc]["courses"][course]["units"]["core"] = node_data
+                        tree[domain]["categories"][disc][course] = node_data
+                    continue
+
+                disc = disc_dir.name
+                for course_dir in sorted(disc_dir.iterdir(), key=lambda p: p.name):
+                    if not course_dir.is_dir() or course_dir.name.startswith("."):
+                        continue
+                    course = course_dir.name
+                    if (disc, course) in found_courses:
+                        continue
+
+                    has_lessons = any(course_dir.glob("lesson_*.md")) or (course_dir / "labs.md").exists()
+                    if not has_lessons:
+                        continue
+
+                    found_courses.add((disc, course))
+                    if disc not in tree[domain]["disciplines"]:
+                        tree[domain]["disciplines"][disc] = {"courses": {}}
+                        tree[domain]["categories"][disc] = {}
+
+                    c_display_title = course.replace("_", " ").title()
+                    if course not in tree[domain]["disciplines"][disc]["courses"]:
+                        tree[domain]["disciplines"][disc]["courses"][course] = {
+                            "display_name": c_display_title,
+                            "units": {}
+                        }
+
+                    clean_rel = f"{disc}/{course}"
+                    node_data = {
+                        "display_name": c_display_title,
+                        "domain": domain,
+                        "discipline": disc,
+                        "course": course,
+                        "course_title": c_display_title,
+                        "unit": "core",
+                        "rel_path": f"{domain}/{clean_rel}",
+                        "full_path": str(course_dir),
+                        "status": utils_scan(course_dir),
+                        "lessons": utils_get_lessons(course_dir),
+                        "completed_lessons": get_completed_lessons(f"{domain}/{clean_rel}"),
+                        "has_summary": (course_dir / "SUMMARY.md").exists()
+                    }
+
+                    tree[domain]["disciplines"][disc]["courses"][course]["units"]["core"] = node_data
+                    tree[domain]["categories"][disc][course] = node_data
 
     return tree
 

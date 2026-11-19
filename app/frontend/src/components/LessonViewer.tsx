@@ -95,6 +95,8 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onToggleLessonCompletion,
 }) => {
   const [isSpeakingVoice, setIsSpeakingVoice] = useState(false);
+  const [readingLang, setReadingLang] = useState<'en' | 'cs' | 'de' | 'es'>('en');
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [translatedMarkdown, setTranslatedMarkdown] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
@@ -158,6 +160,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   useEffect(() => {
     stopSpeaking();
     setIsSpeakingVoice(false);
+    setReadingLang('en');
+    setTranslatedMarkdown(null);
+    setIsTranslating(false);
   }, [topic?.path, activeTab, currentLevel, activeLessonId]);
 
   const rawMarkdown = useMemo(() => {
@@ -172,36 +177,34 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     return '';
   }, [topic, activeTab, activeLessonId]);
 
-  useEffect(() => {
-    if (!targetLanguage || targetLanguage === 'en' || !rawMarkdown) {
-      setTranslatedMarkdown(null);
-      setIsTranslating(false);
+  const handleSelectLanguage = async (lang: 'en' | 'cs' | 'de' | 'es') => {
+    setLangMenuOpen(false);
+    if (lang === 'en') {
+      setReadingLang('en');
       return;
     }
+    setReadingLang(lang);
+    if (!rawMarkdown) return;
 
-    let isMounted = true;
     setIsTranslating(true);
-
-    fetch('/api/translate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: rawMarkdown, target_lang: targetLanguage }),
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (isMounted && data?.translated) {
+    try {
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: rawMarkdown, target_lang: lang }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.translated) {
           setTranslatedMarkdown(data.translated);
         }
-      })
-      .catch((err) => console.error('Translation error:', err))
-      .finally(() => {
-        if (isMounted) setIsTranslating(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [rawMarkdown, targetLanguage]);
+      }
+    } catch (err) {
+      console.error('Translation error:', err);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   const [bilingualSplit, setBilingualSplit] = useState<boolean>(() => {
     return localStorage.getItem('synapse_bilingual_split') === 'true';
@@ -231,7 +234,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     };
   }, [topic?.path]);
 
-  const activeMarkdown = (targetLanguage && targetLanguage !== 'en' && translatedMarkdown) ? translatedMarkdown : rawMarkdown;
+  const activeMarkdown = (readingLang !== 'en' && translatedMarkdown) ? translatedMarkdown : rawMarkdown;
 
   const handleToggleVoice = () => {
     if (isSpeakingVoice) {
@@ -478,29 +481,25 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           {/* Quick Language Switcher */}
           <div className="dropdown-container">
             <button
-              className={`nav-action-btn`}
-              title="Change active language"
+              className={`nav-action-btn ${readingLang !== 'en' ? 'active-lang-btn' : ''}`}
+              onClick={() => setLangMenuOpen(!langMenuOpen)}
+              title="Change reading language (English is default)"
             >
-              🌐 {targetLanguage ? targetLanguage.toUpperCase() : 'EN'} {isTranslating ? '...' : '▾'}
+              🌐 {isTranslating ? 'Translating...' : readingLang.toUpperCase()} ▾
             </button>
-            <div className="nav-dropdown-menu language-dropdown">
-              {['en', 'cs', 'de', 'es'].map(lang => (
-                <button 
-                  key={lang} 
-                  className={`dropdown-item ${targetLanguage === lang ? 'active-lang' : ''}`}
-                  onClick={() => {
-                     const stored = JSON.parse(localStorage.getItem('synapse_app_settings') || '{}');
-                     stored.language = lang;
-                     localStorage.setItem('synapse_app_settings', JSON.stringify(stored));
-                     // Dispatch storage event to trigger global setting re-render across the app
-                     window.dispatchEvent(new Event('storage'));
-                     window.location.reload();
-                  }}
-                >
-                  {lang === 'en' ? '🇬🇧 English' : lang === 'cs' ? '🇨🇿 Čeština' : lang === 'de' ? '🇩🇪 Deutsch' : '🇪🇸 Español'}
-                </button>
-              ))}
-            </div>
+            {langMenuOpen && (
+              <div className="nav-dropdown-menu language-dropdown">
+                {(['en', 'cs', 'de', 'es'] as const).map((lang) => (
+                  <button 
+                    key={lang} 
+                    className={`dropdown-item ${readingLang === lang ? 'active-lang' : ''}`}
+                    onClick={() => handleSelectLanguage(lang)}
+                  >
+                    {lang === 'en' ? '🇬🇧 English (Original)' : lang === 'cs' ? '🇨🇿 Čeština' : lang === 'de' ? '🇩🇪 Deutsch' : '🇪🇸 Español'}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* 1. Audio Reader */}
@@ -752,7 +751,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             <h3>{activeTab === 'labs' ? 'Labs not yet generated' : `Content not yet generated`}</h3>
             <p>You can generate this unit using the action button in the top right.</p>
           </div>
-        ) : bilingualSplit && targetLanguage && targetLanguage !== 'en' ? (
+        ) : bilingualSplit && readingLang && readingLang !== 'en' ? (
           <div className="bilingual-split-container">
             <div className="bilingual-col original">
               <div className="bilingual-col-header">
@@ -765,7 +764,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             </div>
             <div className="bilingual-col translated">
               <div className="bilingual-col-header">
-                <span>TRANSLATED ({targetLanguage.toUpperCase()})</span>
+                <span>TRANSLATED ({readingLang.toUpperCase()})</span>
                 {isTranslating && <span className="translating-indicator">Translating...</span>}
               </div>
               <article
@@ -775,10 +774,28 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             </div>
           </div>
         ) : (
-          <article
-            className="markdown-body"
-            dangerouslySetInnerHTML={{ __html: htmlContent }}
-          />
+          <div>
+            {isTranslating && (
+              <div className="translating-banner" style={{
+                padding: '8px 14px',
+                marginBottom: '14px',
+                borderRadius: '6px',
+                background: 'rgba(59, 130, 246, 0.12)',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                color: '#3b82f6',
+                fontSize: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span>Translating section to {readingLang === 'cs' ? 'Čeština' : readingLang === 'de' ? 'Deutsch' : 'Español'}...</span>
+              </div>
+            )}
+            <article
+              className="markdown-body"
+              dangerouslySetInnerHTML={{ __html: htmlContent }}
+            />
+          </div>
         )}
 
         {/* Sequential Study Progression Navigation Footer */}
