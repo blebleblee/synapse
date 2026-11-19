@@ -24,17 +24,16 @@ GITEA_PASS = os.environ.get("GITEA_PASS", "")
 GITEA_REPO = os.environ.get("GITEA_REPO", "ai/synapse")
 GITHUB_REPO = os.environ.get("GITHUB_REPO", "blebleblee/synapse")
 TAG = "v1.1.1"
+VER = "1.1.1"
 
 # Target binary files to publish/replace
 ASSETS_TO_PUBLISH = {
-    "Synapse-Workbench-Portable-1.1.0.exe": WORKSPACE_ROOT / "dist/desktop/Synapse-Workbench-Portable-1.1.0.exe",
-    "Synapse-Workbench-Setup-1.1.0.exe": WORKSPACE_ROOT / "dist/desktop/Synapse Workbench Setup 1.1.0.exe",
-    "Synapse-Workbench-Portable-1.1.0-win-x64.zip": WORKSPACE_ROOT / "dist/desktop/Synapse-Workbench-Portable-1.1.0-win-x64.zip",
+    f"Synapse-Workbench-Portable-{VER}.exe": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-Portable-{VER}.exe",
+    f"Synapse-Workbench-Setup-{VER}.exe": WORKSPACE_ROOT / f"dist/desktop/Synapse Workbench Setup {VER}.exe",
+    f"Synapse-Workbench-Portable-{VER}-win-x64.zip": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-Portable-{VER}-win-x64.zip",
     "Synapse-Portable-Windows.zip": WORKSPACE_ROOT / "dist/desktop/Synapse-Portable-Windows.zip",
-    "Synapse.Workbench-1.1.0-arm64.dmg": WORKSPACE_ROOT / "dist/desktop/Synapse.Workbench-1.1.0-arm64.dmg",
-    "Synapse.Workbench-1.1.0-arm64-mac.zip": WORKSPACE_ROOT / "dist/desktop/Synapse.Workbench-1.1.0-arm64-mac.zip",
-    "Synapse Workbench-1.1.0-arm64.dmg": WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.0-arm64.dmg",
-    "Synapse Workbench-1.1.0-arm64-mac.zip": WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.0-arm64-mac.zip",
+    f"Synapse-Workbench-{VER}-arm64.dmg": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-{VER}-arm64.dmg",
+    f"Synapse-Workbench-{VER}-arm64-mac.zip": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-{VER}-arm64-mac.zip",
 }
 
 def publish_gitea():

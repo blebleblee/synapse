@@ -49,15 +49,28 @@ def main():
         desc="Compiling Electron Windows Portable and Installer Executables"
     )
 
-    portable_exe = desktop_dist / "Synapse-Workbench-Portable-1.1.0.exe"
+    import json
+    pkg_ver = "1.1.1"
+    pkg_file = desktop_dir / "package.json"
+    if pkg_file.exists():
+        try:
+            pkg_ver = json.loads(pkg_file.read_text(encoding="utf-8")).get("version", "1.1.1")
+        except Exception:
+            pass
+
+    portable_exe = desktop_dist / f"Synapse-Workbench-Portable-{pkg_ver}.exe"
     if not portable_exe.exists():
-        print(f"[✘] Error: {portable_exe} was not generated.")
-        sys.exit(1)
+        candidates = list(desktop_dist.glob("Synapse-Workbench-Portable-*.exe"))
+        if candidates:
+            portable_exe = candidates[0]
+        else:
+            print(f"[✘] Error: {portable_exe} was not generated.")
+            sys.exit(1)
 
     print(f"[✔] Found standalone portable executable: {portable_exe.name} ({portable_exe.stat().st_size / (1024*1024):.1f} MB)")
 
     # 2. Assemble Portable Bundle Directory
-    bundle_name = "Synapse-Workbench-Portable-1.1.0-win-x64"
+    bundle_name = f"Synapse-Workbench-Portable-{pkg_ver}-win-x64"
     portable_bundle = dist_dir / bundle_name
     if portable_bundle.exists():
         shutil.rmtree(portable_bundle)
@@ -65,7 +78,7 @@ def main():
 
     # Copy the self-contained portable executable into the bundle
     shutil.copy2(portable_exe, portable_bundle / "Synapse-Workbench-Portable.exe")
-    shutil.copy2(portable_exe, portable_bundle / "Synapse-Workbench-Portable-1.1.0.exe")
+    shutil.copy2(portable_exe, portable_bundle / f"Synapse-Workbench-Portable-{pkg_ver}.exe")
 
     # Copy embedded Python runtime into the portable bundle
     python_win_src = dist_dir / "python-win"
