@@ -26,35 +26,38 @@ ASSETS = [
     WORKSPACE_ROOT / "exports/packages/economics.synpack",
     WORKSPACE_ROOT / "exports/packages/natural_sciences.synpack",
     WORKSPACE_ROOT / "exports/packages/health_sciences.synpack",
-    WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.0-arm64.dmg",
-    WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.0-arm64-mac.zip",
-    WORKSPACE_ROOT / "dist/python/synapse-1.1.0-py3-none-any.whl",
-    WORKSPACE_ROOT / "dist/python/synapse-1.1.0.tar.gz",
-    WORKSPACE_ROOT / "dist/desktop/Synapse-Portable-Windows.zip"
+    WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.1-arm64.dmg",
+    WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.1-arm64-mac.zip",
+    WORKSPACE_ROOT / "dist/desktop/Synapse-Workbench-Portable-1.1.1.exe",
+    WORKSPACE_ROOT / "dist/desktop/Synapse-Portable-Windows.zip",
+    WORKSPACE_ROOT / "dist/python/synapse-1.1.1-py3-none-any.whl",
+    WORKSPACE_ROOT / "dist/python/synapse-1.1.1.tar.gz"
 ]
 
 def main():
-    parser = argparse.ArgumentParser(description="Upload Synapse v1.1.0 Release Assets to Gitea")
-    parser.add_argument("--url", default=os.environ.get("GITEA_URL", "https://gitea.com"), help="Gitea instance URL")
+    parser = argparse.ArgumentParser(description="Upload Synapse v1.1.1 Release Assets to Gitea")
+    parser.add_argument("--url", default=os.environ.get("GITEA_URL", "https://gitea.2464.cz"), help="Gitea instance URL")
     parser.add_argument("--token", default=os.environ.get("GITEA_TOKEN"), help="Gitea Personal Access Token")
-    parser.add_argument("--repo", default="blebleblee/synapse", help="Target Gitea repo (default: blebleblee/synapse)")
+    parser.add_argument("--user", default=os.environ.get("GITEA_USER", "ai"), help="Gitea username")
+    parser.add_argument("--password", default=os.environ.get("GITEA_PASS", "Linux123."), help="Gitea password")
+    parser.add_argument("--repo", default=os.environ.get("GITEA_REPO", "ai/synapse"), help="Target Gitea repo (default: ai/synapse)")
     parser.add_argument("--tag", default="v1.1.1", help="Release tag (default: v1.1.1)")
     args = parser.parse_args()
 
-    token = args.token
-    if not token:
-        print("[✘] Error: Gitea token required. Pass --token <PAT> or set GITHUB_TOKEN environment variable.")
+    auth = None
+    headers = {"Accept": "application/json"}
+    if args.token:
+        headers["Authorization"] = f"token {args.token}"
+    elif args.user and args.password:
+        auth = (args.user, args.password)
+    else:
+        print("[✘] Error: Gitea authentication required. Pass --token <PAT> or --user / --password.")
         sys.exit(1)
-
-    headers = {
-        "Authorization": f"token {token}",
-        "Accept": "application/json",
-    }
 
     # 1. Create or fetch Release
     releases_url = f"{args.url.rstrip('/')}/api/v1/repos/{args.repo}/releases"
     print(f"[*] Checking existing releases for {args.repo} on {args.url}...")
-    res = requests.get(f"{releases_url}/tags/{args.tag}", headers=headers)
+    res = requests.get(f"{releases_url}/tags/{args.tag}", headers=headers, auth=auth)
     
     if res.status_code == 200:
         rel_data = res.json()
@@ -116,6 +119,7 @@ Download and sideload curriculum addons via Settings ⚙ → Sideload, or drop i
                     up_res = requests.post(
                         upload_url,
                         headers=headers,
+                        auth=auth,
                         files={"attachment": (p.name, f)},
                         params={"name": p.name},
                         timeout=600
