@@ -67,21 +67,34 @@ def main():
         payload = {
             "tag_name": args.tag,
             "target_commitish": "main",
-            "name": f"Synapse {args.tag} — Complete Global Curriculum (539 Topics) & Master SynPack Suite",
-            "body": """## Synapse v1.1.0 Milestone Release
+            "name": f"Synapse {args.tag} — Hosted Instance Protection, Async Terminal Streaming & Translation Polish",
+            "body": """## Synapse v1.1.1 Release
 
-### 🎓 100% Global Curriculum Complete (539 Topics across 12 Domains)
-This milestone release marks the full completion of the Synapse masterclass curriculum spanning 2,945 lessons and operational labs, with 3,172 vector Mermaid.js diagrams and full KaTeX math formatting.
+### 🛡️ Hosted Instance Password Protection
+- Zero-dependency instance password gating via `SYNAPSE_PASSWORD`.
+- 30-day signed HMAC bearer tokens stored in browser `localStorage`.
+- Gated `/api/*` endpoints and `/ws/terminal` PTY WebSocket with 401 interceptor.
+- Sleek React login modal with brute-force rate-limiting.
 
-### 📦 Modular SynPack Curriculum Addons
-Download and sideload curriculum addons via Settings ⚙ → Sideload, or drop into your portable folder:
-- **`synapse_complete_curriculum.synpack` (33.5 MB)**: Complete master pack containing all 12 domains and 539 topics.
-- **12 Individual Domain Addons**: Computing, Arts, Crafts, Business, Engineering, Motorsports, Formal Sciences, Humanities, Languages, Economics, Natural Sciences, Health Sciences.
+### ⚡ Terminal Independence (Windows Event Loop Fix)
+- Non-blocking async queue streaming for `/api/chat` and `/api/translate`.
+- Eliminates PTY starvation and keystroke input lag during AI generation.
 
-### 💻 Application Binaries
-- **macOS Apple Silicon**: `Synapse Workbench-1.1.0-arm64.dmg` / `.zip`
-- **Windows Portable**: `Synapse-Portable-Windows.zip`
-- **Python Distribution**: `synapse-1.1.0-py3-none-any.whl` / `.tar.gz`
+### 🌐 On-Demand Curriculum Translation
+- One-click language switcher with English default and on-demand translation.
+- Immediate in-place translation rendering powered by Claude Sonnet (~2.4s).
+- Seamless alignment with Socratic Mentor conversational language.
+
+### 📦 Private SynPack Distribution & Dynamic Discovery
+- Sideloading and dynamic filesystem discovery for custom curriculum packages without `SYLLABUS.md`.
+- Headless CLI `synapse pack` subsystem (`install`, `list`, `uninstall`).
+- Configurable private Gitea registries via `SYNAPSE_PACKAGE_REGISTRY`.
+- Automatic pre-extraction backups in `exports/backups/`.
+- Cross-runtime workspace default aligned to `~/.synapse`.
+
+### 🚀 Performance & Caching
+- In-memory topic tree RAM caching (drops warm tree queries from 2.3s to 3 microseconds).
+- Fast parallel Ollama cluster node probing with 1.5s timeouts (eliminates 12–20s startup hangs).
 """,
             "draft": False,
             "prerelease": False
