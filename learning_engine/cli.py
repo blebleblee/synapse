@@ -11,22 +11,22 @@ import shutil
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-from .topic_manager import (
+from learning_engine.topic_manager import (
     get_topic_tree,
     list_domains,
     resolve_subtopic,
     add_subtopic,
     get_domain_persona
 )
-from .models import get_provider, OllamaProvider, OllamaCluster, load_env_file, get_node_name
-from .generator import generate_subtopic_content
-from .search import search_curriculum
-from .graph import get_prerequisite_graph
-from .linter import lint_curriculum
-from .exporter import export_handbook
-from .mastery import get_mastery_summary, set_subtopic_mastery
-from .flashcards import generate_flashcards
-from .reviewer import review_and_fix_unit, audit_content
+from learning_engine.models import get_provider, OllamaProvider, OllamaCluster, load_env_file, get_node_name
+from learning_engine.generator import generate_subtopic_content
+from learning_engine.search import search_curriculum
+from learning_engine.graph import get_prerequisite_graph
+from learning_engine.linter import lint_curriculum
+from learning_engine.exporter import export_handbook
+from learning_engine.mastery import get_mastery_summary, set_subtopic_mastery
+from learning_engine.flashcards import generate_flashcards
+from learning_engine.reviewer import review_and_fix_unit, audit_content
 from learning_engine.database import get_connection
 import json
 
@@ -412,6 +412,35 @@ def cmd_clean(args):
 
     print(f"[✔] Cleaned {cleaned_count} transient artifacts. Authored curriculum is 100% intact.")
 
+def cmd_pack(args):
+    from learning_engine.packages import install_topic_pack, list_installed_packs, uninstall_topic_pack
+    from pathlib import Path
+    
+    if args.pack_cmd == "install":
+        print(f"[*] Installing package: {args.source}")
+        path = Path(args.source)
+        try:
+            res = install_topic_pack(path)
+            print(f"[+] Successfully installed: {res['domain']}")
+        except Exception as e:
+            print(f"[-] Installation failed: {e}")
+            sys.exit(1)
+            
+    elif args.pack_cmd == "list":
+        packs = list_installed_packs()
+        print(f"\n[*] Installed Packages ({len(packs)}):")
+        for p in packs:
+            print(f"    - {p.get('domain')} ({p.get('title', 'No title')}) - {p.get('lesson_count', 0)} lessons")
+            
+    elif args.pack_cmd == "uninstall":
+        print(f"[*] Uninstalling package: {args.domain}")
+        try:
+            res = uninstall_topic_pack(args.domain)
+            print(f"[+] {res['message']}")
+        except Exception as e:
+            print(f"[-] Uninstall failed: {e}")
+            sys.exit(1)
+
 def main():
     load_env_file()
     parser = argparse.ArgumentParser(
@@ -431,6 +460,16 @@ def main():
     p_desktop = subparsers.add_parser("desktop", help="Launch the native Electron desktop shell wrapper")
     p_desktop.add_argument("--dev", action="store_true", help="Connect to local Vite development server")
     p_desktop.set_defaults(func=cmd_desktop)
+    
+    # pack
+    p_pack = subparsers.add_parser("pack", help="Manage .synpack curriculum packages")
+    pack_subs = p_pack.add_subparsers(dest="pack_cmd")
+    p_pack_inst = pack_subs.add_parser("install", help="Install a .synpack file or from URL")
+    p_pack_inst.add_argument("source", help="Path to .synpack file")
+    p_pack_list = pack_subs.add_parser("list", help="List installed packages")
+    p_pack_uninst = pack_subs.add_parser("uninstall", help="Uninstall a package")
+    p_pack_uninst.add_argument("domain", help="Domain to uninstall")
+    p_pack.set_defaults(func=cmd_pack)
 
     # serve
     p_serve = subparsers.add_parser("serve", help="Launch the integrated Web Workbench (UI + Backend + Terminal)")

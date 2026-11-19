@@ -475,11 +475,33 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
         </div>
 
         <div className="tabs-actions-group">
-          {targetLanguage && targetLanguage !== 'en' && (
-            <span className={`nav-lang-badge ${isTranslating ? 'translating' : ''}`} title="AI translation active">
-              🌐 {targetLanguage.toUpperCase()}{isTranslating ? '...' : ''}
-            </span>
-          )}
+          {/* Quick Language Switcher */}
+          <div className="dropdown-container">
+            <button
+              className={`nav-action-btn`}
+              title="Change active language"
+            >
+              🌐 {targetLanguage ? targetLanguage.toUpperCase() : 'EN'} {isTranslating ? '...' : '▾'}
+            </button>
+            <div className="nav-dropdown-menu language-dropdown">
+              {['en', 'cs', 'de', 'es'].map(lang => (
+                <button 
+                  key={lang} 
+                  className={`dropdown-item ${targetLanguage === lang ? 'active-lang' : ''}`}
+                  onClick={() => {
+                     const stored = JSON.parse(localStorage.getItem('synapse_app_settings') || '{}');
+                     stored.language = lang;
+                     localStorage.setItem('synapse_app_settings', JSON.stringify(stored));
+                     // Dispatch storage event to trigger global setting re-render across the app
+                     window.dispatchEvent(new Event('storage'));
+                     window.location.reload();
+                  }}
+                >
+                  {lang === 'en' ? '🇬🇧 English' : lang === 'cs' ? '🇨🇿 Čeština' : lang === 'de' ? '🇩🇪 Deutsch' : '🇪🇸 Español'}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* 1. Audio Reader */}
           <button

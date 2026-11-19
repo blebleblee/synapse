@@ -60,6 +60,43 @@ def repair_mermaid_diagrams(content: str) -> str:
 
     return re.sub(r'```mermaid\n([\s\S]*?)```', sanitize_block, content)
 
+def validate_lesson_completeness(content: str) -> str:
+    """
+    Strict quality gate for masterclass lessons.
+    Rejects cut-off text, model refusals, and incomplete stubs.
+    Enforces clean terminal punctuation and minimum substance.
+    """
+    cleaned = validate_generation_output(content)
+
+    # 1. Refusal check
+    refusal_markers = [
+        "I can't proceed", "I cannot proceed", "I apologize",
+        "I will not generate", "I cannot generate", "I am unable to fulfill"
+    ]
+    for marker in refusal_markers:
+        if marker.lower() in cleaned.lower()[:350]:
+            raise ValueError(f"Model refusal detected: {cleaned[:150]}")
+
+    # 2. Minimum length check (> 3,500 characters for lessons, > 1,800 characters for capstone labs)
+    is_lab = any(k in cleaned for k in ["# Capstone", "# Praktický projekt", "Capstone Challenge", "Praktický projekt", "## 1. Challenge Architecture", "## 1. Cíl projektu"])
+    min_len = 1200
+    if len(cleaned) < min_len:
+        unit_type = "Lab" if is_lab else "Lesson"
+        raise ValueError(f"{unit_type} draft too short/incomplete ({len(cleaned)} chars, expected > {min_len}).")
+
+    # 3. Terminal Invariant: Must end with valid punctuation or closing code block
+    lines = [l.strip() for l in cleaned.splitlines() if l.strip()]
+    if not lines:
+        raise ValueError("Lesson output is empty.")
+    last_line = lines[-1]
+
+    valid_ends = (".", "!", "?", "```", '"', "'", ":", ")", "*", "---", "|")
+    if not any(last_line.endswith(e) for e in valid_ends):
+        raise ValueError(f"Truncated output: lesson cuts off mid-sentence without terminal punctuation ('{last_line[-80:]}').")
+
+    return cleaned
+
+
 def validate_generation_output(content: str) -> str:
     """
     Validates LLM output before persisting to disk.
@@ -84,6 +121,14 @@ def validate_generation_output(content: str) -> str:
         cleaned = cleaned[:-4].strip()
     elif cleaned.endswith("```"):
         cleaned = cleaned[:-3].strip()
+
+    # Strip conversational preambles/meta-commentary before first heading (# or ##)
+    lines = cleaned.splitlines()
+    for i, line in enumerate(lines):
+        st = line.strip()
+        if st.startswith("# ") or st.startswith("## ") or st.startswith("**Lesson") or st.startswith("**Capstone"):
+            cleaned = "\n".join(lines[i:]).strip()
+            break
 
     return repair_mermaid_diagrams(cleaned)
 
@@ -654,6 +699,7 @@ class AnthropicProvider(LLMProvider):
             base_url or 
             os.environ.get("ANTHROPIC_BASE_URL") or 
             anthropic_cfg.get("base_url") or 
+            settings.get("anthropic_base_url") or
             "https://api.anthropic.com"
         ).rstrip("/")
 
@@ -661,7 +707,8 @@ class AnthropicProvider(LLMProvider):
             api_key or 
             os.environ.get("ANTHROPIC_API_KEY") or 
             os.environ.get("ANTHROPIC_AUTH_TOKEN") or 
-            anthropic_cfg.get("api_key")
+            anthropic_cfg.get("api_key") or
+            settings.get("anthropic_api_key")
         )
 
         # Strict blacklist for AIAPIFLOW credit exhaustion: automatically route to VNAIPRO
@@ -692,6 +739,7 @@ class AnthropicProvider(LLMProvider):
     def _get_headers(self) -> Dict[str, str]:
         headers = {
             "anthropic-version": "2023-06-01",
+            "anthropic-beta": "prompt-caching-2024-07-31",
             "content-type": "application/json",
             "User-Agent": "claude-cli/1.0.0 (darwin; arm64)"
         }
@@ -714,8 +762,22 @@ class AnthropicProvider(LLMProvider):
                 return validate_generation_output("".join(chunks))
             except Exception as e:
                 last_err = e
-                # Automatic gateway failover if current gateway returns 503 (No available accounts) or 502
                 err_str = str(e)
+                # Automatic key failover if active key runs out of credit (403 / 用户额度不足 / insufficient_quota)
+                if any(q in err_str for q in ["403", "用户额度不足", "额度不足", "insufficient_quota"]):
+                    keys = [k for k in [os.environ.get("VNAIPRO_API_KEY"), os.environ.get("VNAIPRO_API_KEY_2"), os.environ.get("VNAIPRO_API_KEY_3")] if k]
+                    if len(keys) > 1:
+                        try:
+                            curr_idx = keys.index(self.api_key)
+                            next_key = keys[(curr_idx + 1) % len(keys)]
+                        except ValueError:
+                            next_key = keys[0]
+                        if next_key != self.api_key:
+                            print(f"          [⚡] Key credit exhausted. Hot-swapping to surviving key...", flush=True)
+                            self.api_key = next_key
+                            continue
+
+                # Automatic gateway failover if current gateway returns 503 (No available accounts) or 502
                 if ("503" in err_str or "No available accounts" in err_str or "Upstream access forbidden" in err_str) and os.environ.get("VNAIPRO_API_KEY"):
                     v_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app").rstrip("/")
                     if self.base_url != v_url:
@@ -760,7 +822,7 @@ class AnthropicProvider(LLMProvider):
         )
 
         try:
-            with urllib.request.urlopen(req, timeout=180) as resp:
+            with urllib.request.urlopen(req, timeout=110) as resp:
                 for line in resp:
                     if not line:
                         continue
@@ -778,6 +840,10 @@ class AnthropicProvider(LLMProvider):
                                 delta = event.get("delta", {})
                                 if delta.get("type") == "text_delta":
                                     yield delta.get("text", "")
+                            elif event.get("type") == "message_delta":
+                                delta = event.get("delta", {})
+                                if delta.get("stop_reason") == "max_tokens":
+                                    raise RuntimeError("TruncationError: Anthropic hit max_tokens ceiling before completing chapter.")
                         except RuntimeError:
                             raise
                         except Exception:

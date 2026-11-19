@@ -70,6 +70,7 @@ interface SettingsModalProps {
   settings: AppSettings;
   onSaveSettings: (newSettings: AppSettings) => void;
   initialTab?: 'appearance' | 'cluster' | 'models' | 'store' | 'maintenance' | 'inference' | 'storage';
+  onTreeChange?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -78,6 +79,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   settings,
   onSaveSettings,
   initialTab,
+  onTreeChange,
 }) => {
   type SettingsTab = 'appearance' | 'inference' | 'storage';
   const resolveTab = (tab?: string): SettingsTab => {
@@ -236,6 +238,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       if (!res.ok) throw new Error('Package installation failed');
       setStoreMessage({ text: `Package for ${domain} installed and registered!`, type: 'success' });
       await fetchPackages();
+      onTreeChange?.();
     } catch (err: any) {
       setStoreMessage({ text: err.message || 'Install failed', type: 'error' });
     } finally {
@@ -253,6 +256,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       if (!res.ok) throw new Error('Package uninstall failed');
       setStoreMessage({ text: `Package ${domain} uninstalled`, type: 'success' });
       await fetchPackages();
+      onTreeChange?.();
     } catch (err: any) {
       setStoreMessage({ text: err.message || 'Uninstall failed', type: 'error' });
     } finally {
@@ -279,6 +283,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       const result = await res.json();
       setStoreMessage({ text: `Successfully installed ${result.domain || 'custom'} package!`, type: 'success' });
       await fetchPackages();
+      onTreeChange?.();
     } catch (err: any) {
       setStoreMessage({ text: err.message || 'Upload installation failed', type: 'error' });
     } finally {
@@ -379,8 +384,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hosts: clusterNodes }),
       });
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          anthropic_api_key: formData.anthropicApiKey,
+          anthropic_base_url: formData.anthropicBaseUrl,
+          gemini_api_key: formData.geminiApiKey,
+          gemini_base_url: formData.geminiBaseUrl,
+          primary_model: formData.primaryModel,
+          reviewer_model: formData.reviewerModel,
+          mentor_model: formData.mentorModel,
+          ollama_host: clusterNodes[0] || formData.ollamaHost,
+        }),
+      });
     } catch (err) {
-      console.error('Failed to save cluster hosts:', err);
+      console.error('Failed to save settings:', err);
     }
     onSaveSettings({
       ...formData,

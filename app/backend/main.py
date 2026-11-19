@@ -73,9 +73,16 @@ def get_terminal_text(count: int = 50) -> str:
     return "\n".join(list(TERMINAL_HISTORY)[-count:])
 
 # Ensure workspace root is in sys.path
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-if str(WORKSPACE_ROOT) not in sys.path:
-    sys.path.insert(0, str(WORKSPACE_ROOT))
+_DEV_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_DEV_ROOT) not in sys.path:
+    sys.path.insert(0, str(_DEV_ROOT))
+
+from learning_engine.security import (
+    WORKSPACE_ROOT,
+    TOPICS_DIR,
+    validate_workspace_path,
+    sanitize_query
+)
 from learning_engine.topic_manager import (
     get_topic_tree,
     get_domain_persona,
@@ -117,10 +124,19 @@ from learning_engine.packages import (
     install_topic_pack,
     list_installed_packs,
     uninstall_topic_pack,
-    get_domain_pack_info
+    get_domain_pack_info,
+    resolve_or_download_pack,
+    seed_starter_curriculum
 )
 
 app = FastAPI(title="AI Learning Workbench Backend", version="1.1.0")
+
+@app.on_event("startup")
+def startup_event():
+    try:
+        seed_starter_curriculum()
+    except Exception as e:
+        print(f"[!] Startup curriculum seed note: {e}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -189,6 +205,10 @@ class TranslateRequest(BaseModel):
 # -----------------------------------------------------------------------------
 # REST Endpoints
 # -----------------------------------------------------------------------------
+
+@app.get("/api/health")
+def get_health():
+    return {"status": "ok", "app": "synapse-backend"}
 
 @app.get("/api/status")
 def get_status():
@@ -486,7 +506,7 @@ async def api_install_package(
     elif domain:
         domain = sanitize_query(domain)
         try:
-            pack_path = export_topic_pack(domain)
+            pack_path = resolve_or_download_pack(domain)
             result = install_topic_pack(pack_path)
             return result
         except Exception as e:
@@ -577,7 +597,7 @@ LANGUAGE_NAMES = {
 }
 
 @app.post("/api/translate")
-def api_translate_content(req: TranslateRequest):
+async def api_translate_content(req: TranslateRequest):
     if req.target_lang == "en" or not req.text.strip():
         return {"translated": req.text, "cached": True}
 
@@ -607,8 +627,10 @@ Text to translate:
 \"\"\""""
 
     try:
-        provider = get_provider(model=req.model)
-        translated_text = provider.generate(prompt).strip()
+        import asyncio
+        provider, used_model = get_chat_provider(model=req.model)
+        translated_text = await asyncio.to_thread(provider.generate, prompt)
+        translated_text = translated_text.strip()
         cache_file.write_text(translated_text + "\n", encoding="utf-8")
         return {"translated": translated_text, "cached": False}
     except Exception as e:
@@ -1029,7 +1051,7 @@ def save_chat_session(sub_path: Optional[Path], user_msg: str, tutor_reply: str,
         if sub_path:
             sessions_dir = sub_path / "sessions"
         else:
-            sessions_dir = WORKSPACE_ROOT / "topics" / ".workspace_sessions"
+            sessions_dir = TOPICS_DIR / ".workspace_sessions"
         sessions_dir.mkdir(parents=True, exist_ok=True)
 
         active_session_file = sessions_dir / "active_session.md"
@@ -1150,19 +1172,39 @@ async def chat_with_tutor(req: ChatRequest):
     prompt = "\n\n".join(conversation_text)
 
     if req.stream:
-        async def stream_generator():
-            full_reply = []
-            try:
-                for chunk in provider.generate_stream(prompt, system_instruction=system_instruction, max_tokens=250):
-                    full_reply.append(chunk)
-                    yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+        import asyncio
+        import threading
 
-                reply_text = "".join(full_reply).strip()
-                save_chat_session(sub_path, req.message, reply_text, req.history)
-                yield f"data: {json.dumps({'done': True, 'full_reply': reply_text, 'model': used_model})}\n\n"
-            except Exception as stream_err:
-                err_text = f"⚠️ Socratic Mentor stream error ({used_model}): {stream_err}. Please verify your active model or cluster node in Settings ⚙."
-                yield f"data: {json.dumps({'chunk': err_text, 'done': True, 'full_reply': err_text, 'model': used_model})}\n\n"
+        async def stream_generator():
+            q = asyncio.Queue()
+            loop = asyncio.get_running_loop()
+
+            def worker():
+                try:
+                    for chunk in provider.generate_stream(prompt, system_instruction=system_instruction, max_tokens=250):
+                        loop.call_soon_threadsafe(q.put_nowait, ("chunk", chunk))
+                    loop.call_soon_threadsafe(q.put_nowait, ("done", None))
+                except Exception as e:
+                    loop.call_soon_threadsafe(q.put_nowait, ("error", e))
+
+            threading.Thread(target=worker, daemon=True).start()
+
+            full_reply = []
+            while True:
+                msg_type, data = await q.get()
+                if msg_type == "chunk":
+                    full_reply.append(data)
+                    yield f"data: {json.dumps({'chunk': data})}\n\n"
+                elif msg_type == "done":
+                    break
+                elif msg_type == "error":
+                    err_text = f"⚠️ Socratic Mentor stream error ({used_model}): {data}. Please verify your active model or cluster node in Settings ⚙."
+                    yield f"data: {json.dumps({'chunk': err_text, 'done': True, 'full_reply': err_text, 'model': used_model})}\n\n"
+                    return
+
+            reply_text = "".join(full_reply).strip()
+            save_chat_session(sub_path, req.message, reply_text, req.history)
+            yield f"data: {json.dumps({'done': True, 'full_reply': reply_text, 'model': used_model})}\n\n"
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
 
@@ -1729,6 +1771,42 @@ async def terminal_websocket(websocket: WebSocket):
 # -----------------------------------------------------------------------------
 from fastapi.staticfiles import StaticFiles
 
-DIST_DIR = WORKSPACE_ROOT / "app/frontend/dist"
-if DIST_DIR.exists():
+def resolve_dist_dir() -> Optional[Path]:
+    # 1. PyInstaller frozen onefile mode
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        p = Path(sys._MEIPASS) / "app" / "frontend" / "dist"
+        if p.exists():
+            return p
+
+    # 2. Bundled in site-packages/app/frontend/dist (e.g. Windows embedded Python sidecar)
+    app_pkg_dist = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+    if app_pkg_dist.exists():
+        return app_pkg_dist
+
+    # 3. Electron resources path or development workspace root
+    env_res = os.environ.get("SYNAPSE_RESOURCES_PATH")
+    candidates = [
+        Path(env_res) / "frontend" / "dist" if env_res else None,
+        Path(sys.executable).resolve().parent.parent / "frontend" / "dist",
+        WORKSPACE_ROOT / "app" / "frontend" / "dist",
+        Path.cwd() / "app" / "frontend" / "dist",
+    ]
+    for c in candidates:
+        if c and c.exists():
+            return c
+    return None
+
+DIST_DIR = resolve_dist_dir()
+
+@app.get("/")
+def get_spa_root():
+    dist = resolve_dist_dir()
+    if dist and (dist / "index.html").exists():
+        from fastapi.responses import FileResponse
+        return FileResponse(str(dist / "index.html"), media_type="text/html")
+    return {"detail": "Synapse Workbench Backend Online. Initializing frontend assets..."}
+
+if DIST_DIR and DIST_DIR.exists():
+    if (DIST_DIR / "assets").exists():
+        app.mount("/assets", StaticFiles(directory=str(DIST_DIR / "assets")), name="assets")
     app.mount("/", StaticFiles(directory=str(DIST_DIR), html=True), name="static")

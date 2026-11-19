@@ -9,32 +9,49 @@ def get_workspace_root() -> Path:
     Returns the root directory for the workspace.
     Supports:
     1. SYNAPSE_WORKSPACE environment variable override.
-    2. Frozen binary (PyInstaller / Electron portable sidecar): resolves to folder containing executable.
-    3. Normal Python development mode: Path(__file__).resolve().parent.parent.
+    2. Local development mode: Path(__file__).parent.parent if 'topics' or 'app' exists there.
+    3. Safe user fallback for installed desktop/binary: ~/.synapse
     """
     if os.environ.get("SYNAPSE_WORKSPACE"):
-        return Path(os.environ["SYNAPSE_WORKSPACE"]).resolve()
-    if getattr(sys, "frozen", False):
-        return Path(sys.executable).resolve().parent
-    return Path(__file__).resolve().parent.parent
+        ws = Path(os.environ["SYNAPSE_WORKSPACE"]).resolve()
+        ws.mkdir(parents=True, exist_ok=True)
+        return ws
+
+    # If running from source (development), use the repo root
+    dev_root = Path(__file__).resolve().parent.parent
+    if (dev_root / "topics").exists() or (dev_root / "app").exists():
+        if not getattr(sys, "frozen", False):
+            return dev_root
+
+    # Default to ~/.synapse for all standalone, packaged, and desktop runtimes
+    fallback = Path.home() / ".synapse"
+    fallback.mkdir(parents=True, exist_ok=True)
+    return fallback
 
 def get_topics_dir() -> Path:
     """
     Returns the external, platform-independent topics addon directory.
     Supports:
     1. SYNAPSE_TOPICS_DIR environment variable override.
-    2. Addon directory './topics' next to the portable executable or workspace root.
+    2. Addon directory './topics' in workspace root.
     3. Addon directory './topics' in current working directory.
     """
     if os.environ.get("SYNAPSE_TOPICS_DIR"):
-        return Path(os.environ["SYNAPSE_TOPICS_DIR"]).resolve()
+        t_dir = Path(os.environ["SYNAPSE_TOPICS_DIR"]).resolve()
+        t_dir.mkdir(parents=True, exist_ok=True)
+        return t_dir
+
     ws = get_workspace_root()
     if (ws / "topics").exists():
         return (ws / "topics").resolve()
+
     cwd_topics = Path.cwd() / "topics"
     if cwd_topics.exists():
         return cwd_topics.resolve()
-    return (ws / "topics").resolve()
+
+    target = ws / "topics"
+    target.mkdir(parents=True, exist_ok=True)
+    return target.resolve()
 
 WORKSPACE_ROOT = get_workspace_root()
 TOPICS_DIR = get_topics_dir()
