@@ -5,12 +5,23 @@ Scans, navigates, and modifies the learning workspace filesystem hierarchy.
 """
 
 import re
+import time
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
 
 from learning_engine.mastery import get_completed_lessons
 from learning_engine.security import sanitize_topic_path, validate_workspace_path, WORKSPACE_ROOT, TOPICS_DIR, get_topics_dir
 from learning_engine.utils import scan_subtopic_status as utils_scan, get_unit_lessons as utils_get_lessons
+
+_TOPIC_TREE_CACHE: Dict[str, Any] = {}
+_TOPIC_TREE_CACHE_TS: float = 0.0
+TOPIC_TREE_CACHE_TTL = 60.0  # Cache topic tree for 60 seconds
+
+def invalidate_topic_tree_cache():
+    """Invalidates the in-memory topic tree cache so next query reads fresh disk state."""
+    global _TOPIC_TREE_CACHE, _TOPIC_TREE_CACHE_TS
+    _TOPIC_TREE_CACHE = {}
+    _TOPIC_TREE_CACHE_TS = 0.0
 
 def sanitize_rel_path(rel_path: str) -> Path:
     """Deprecated: Use validate_workspace_path instead."""
@@ -50,8 +61,13 @@ def get_unit_lessons(unit_dir: Path) -> List[Dict[str, str]]:
 def scan_subtopic_status(unit_dir: Path) -> Dict[str, Any]:
     return utils_scan(unit_dir)
 
-def get_topic_tree() -> Dict[str, Any]:
-    """Generates the full canonical 3-level taxonomy hierarchy."""
+def get_topic_tree(force_refresh: bool = False) -> Dict[str, Any]:
+    """Generates the full canonical 3-level taxonomy hierarchy (with in-memory cache)."""
+    global _TOPIC_TREE_CACHE, _TOPIC_TREE_CACHE_TS
+    now = time.time()
+    if not force_refresh and _TOPIC_TREE_CACHE and (now - _TOPIC_TREE_CACHE_TS < TOPIC_TREE_CACHE_TTL):
+        return _TOPIC_TREE_CACHE
+
     tree = {}
     for domain in list_domains():
         domain_dir = TOPICS_DIR / domain
@@ -219,6 +235,8 @@ def get_topic_tree() -> Dict[str, Any]:
                     tree[domain]["disciplines"][disc]["courses"][course]["units"]["core"] = node_data
                     tree[domain]["categories"][disc][course] = node_data
 
+    _TOPIC_TREE_CACHE = tree
+    _TOPIC_TREE_CACHE_TS = now
     return tree
 
 def resolve_subtopic(query: str) -> Optional[Tuple[str, str, str, Path]]:
@@ -293,6 +311,7 @@ def add_subtopic(domain: str, category: str, subtopic_id: str, display_name: Opt
     else:
         syllabus_file.write_text(f"# Syllabus: {domain.replace('_', ' ').title()}\n\n### {category.replace('_', ' ').title()}\n\n{syllabus_entry}\n", encoding="utf-8")
 
+    invalidate_topic_tree_cache()
     return target_dir
 
 def delete_subtopic(rel_path: str) -> bool:
@@ -337,6 +356,7 @@ def delete_subtopic(rel_path: str) -> bool:
     except Exception:
         pass
 
+    invalidate_topic_tree_cache()
     return True
 
 def rename_subtopic(rel_path: str, new_title: str) -> bool:
@@ -376,4 +396,5 @@ def rename_subtopic(rel_path: str, new_title: str) -> bool:
     except Exception:
         pass
 
+    invalidate_topic_tree_cache()
     return True

@@ -157,6 +157,12 @@ def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
             ON CONFLICT(key) DO UPDATE SET value=excluded.value
         """, (f"pack:{domain}", json.dumps(manifest)))
 
+    try:
+        from .topic_manager import invalidate_topic_tree_cache
+        invalidate_topic_tree_cache()
+    except Exception:
+        pass
+
     return {
         "status": "installed",
         "domain": domain,
@@ -260,6 +266,12 @@ def uninstall_topic_pack(domain: str) -> Dict[str, Any]:
     with get_db_connection() as conn:
         conn.execute("DELETE FROM settings WHERE key = ?", (f"pack:{domain}",))
         conn.execute("DELETE FROM mastery WHERE path LIKE ? OR path LIKE ?", (f"{domain}/%", f"topics/{domain}/%"))
+
+    try:
+        from .topic_manager import invalidate_topic_tree_cache
+        invalidate_topic_tree_cache()
+    except Exception:
+        pass
 
     return {
         "status": "uninstalled",

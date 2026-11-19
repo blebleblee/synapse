@@ -291,7 +291,7 @@ class OllamaProvider(LLMProvider):
         # Check native Ollama /api/tags
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/api/tags", headers={"User-Agent": "LearningEngine"})
-            with urllib.request.urlopen(req, timeout=10) as resp:
+            with urllib.request.urlopen(req, timeout=1.5) as resp:
                 if resp.status == 200:
                     return True
         except Exception:
@@ -300,7 +300,7 @@ class OllamaProvider(LLMProvider):
         # Check LocalAI / OpenAI compatible /v1/models
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/v1/models", headers={"User-Agent": "LearningEngine"})
-            with urllib.request.urlopen(req, timeout=10) as resp:
+            with urllib.request.urlopen(req, timeout=1.5) as resp:
                 return resp.status == 200
         except Exception:
             return False
@@ -311,7 +311,7 @@ class OllamaProvider(LLMProvider):
         # 1. Native Ollama format
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/api/tags", headers={"User-Agent": "LearningEngine"})
-            with urllib.request.urlopen(req, timeout=10) as resp:
+            with urllib.request.urlopen(req, timeout=2.0) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 models = [m["name"] for m in data.get("models", [])]
                 if models:
@@ -323,7 +323,7 @@ class OllamaProvider(LLMProvider):
         if not raw_models:
             try:
                 req = urllib.request.Request(f"{host.rstrip('/')}/v1/models", headers={"User-Agent": "LearningEngine"})
-                with urllib.request.urlopen(req, timeout=10) as resp:
+                with urllib.request.urlopen(req, timeout=2.0) as resp:
                     data = json.loads(resp.read().decode("utf-8"))
                     raw_models = [m["id"] for m in data.get("data", [])]
             except Exception:

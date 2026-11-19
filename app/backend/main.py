@@ -147,6 +147,12 @@ def startup_event():
     except Exception as e:
         print(f"[!] Startup curriculum seed note: {e}")
 
+    try:
+        # Pre-warm topic tree cache at startup so initial browser GET /api/tree returns in 1ms
+        threading.Thread(target=get_topic_tree, daemon=True).start()
+    except Exception:
+        pass
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
