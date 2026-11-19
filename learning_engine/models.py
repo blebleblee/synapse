@@ -897,12 +897,52 @@ def get_provider(provider_type: Optional[str] = None, model: Optional[str] = Non
     chosen_model = model or "gemini-2.5-flash"
     return GeminiProvider(model=chosen_model)
 
+def get_translation_provider(model: Optional[str] = None) -> Tuple[LLMProvider, str]:
+    """
+    Returns an LLM provider optimized for high-context technical curriculum translation.
+    Prioritizes Anthropic Claude Sonnet and Gemini when configured, as their large context
+    windows (200k+ tokens) translate multi-page chapters in ~2-4 seconds without truncation.
+    """
+    settings = get_settings()
+    anthropic_key = (
+        os.environ.get("ANTHROPIC_API_KEY") or
+        os.environ.get("ANTHROPIC_API_KEY_2") or
+        os.environ.get("VNAIPRO_API_KEY") or
+        settings.get("anthropic_api_key")
+    )
+    if anthropic_key:
+        chosen_model = model or os.environ.get("ANTHROPIC_MODEL") or "claude-sonnet-5"
+        return AnthropicProvider(model=chosen_model, api_key=anthropic_key), chosen_model
+
+    gemini_key = os.environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key")
+    if gemini_key:
+        chosen_model = model or "gemini-2.5-flash"
+        return GeminiProvider(model=chosen_model, api_key=gemini_key), chosen_model
+
+    return get_chat_provider(model=model)
+
 def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -> Tuple[LLMProvider, str]:
     """
     Returns a model provider optimized for interactive Socratic mentoring.
     Respects explicit user-specified host/model, falling back to auto-discovery
     or cloud services if necessary.
     """
+    settings = get_settings()
+    anthropic_key = (
+        os.environ.get("ANTHROPIC_API_KEY") or
+        os.environ.get("ANTHROPIC_API_KEY_2") or
+        os.environ.get("VNAIPRO_API_KEY") or
+        settings.get("anthropic_api_key")
+    )
+
+    # 0. If Claude / Anthropic is explicitly requested or set as preferred primary/mentor model
+    if anthropic_key and (
+        (model and any(c in model.lower() for c in ["claude", "sonnet", "opus", "anthropic"])) or
+        (not model and not host and settings.get("primary_model") in ["claude-sonnet-5", "claude-3-5-sonnet-20241022"])
+    ):
+        chosen_model = model or settings.get("primary_model") or os.environ.get("ANTHROPIC_MODEL") or "claude-sonnet-5"
+        return AnthropicProvider(model=chosen_model, api_key=anthropic_key), chosen_model
+
     # 1. Validate explicitly requested configuration
     if host and model:
         if OllamaProvider.check_connectivity(host, model):

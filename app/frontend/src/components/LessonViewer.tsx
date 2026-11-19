@@ -99,6 +99,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [translatedMarkdown, setTranslatedMarkdown] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [translationError, setTranslationError] = useState<string | null>(null);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [optionsMenuOpen, setOptionsMenuOpen] = useState(false);
 
@@ -163,6 +164,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     setReadingLang('en');
     setTranslatedMarkdown(null);
     setIsTranslating(false);
+    setTranslationError(null);
   }, [topic?.path, activeTab, currentLevel, activeLessonId]);
 
   const rawMarkdown = useMemo(() => {
@@ -179,8 +181,10 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
 
   const handleSelectLanguage = async (lang: 'en' | 'cs' | 'de' | 'es') => {
     setLangMenuOpen(false);
+    setTranslationError(null);
     if (lang === 'en') {
       setReadingLang('en');
+      setTranslatedMarkdown(null);
       return;
     }
     setReadingLang(lang);
@@ -193,14 +197,17 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: rawMarkdown, target_lang: lang }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.translated) {
-          setTranslatedMarkdown(data.translated);
-        }
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || `Translation service error (${res.status})`);
       }
-    } catch (err) {
+      const data = await res.json();
+      if (data?.translated) {
+        setTranslatedMarkdown(data.translated);
+      }
+    } catch (err: any) {
       console.error('Translation error:', err);
+      setTranslationError(err.message || 'Translation failed');
     } finally {
       setIsTranslating(false);
     }
@@ -788,7 +795,23 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <span>Translating section to {readingLang === 'cs' ? 'Čeština' : readingLang === 'de' ? 'Deutsch' : 'Español'}...</span>
+                <span>Translating section to {readingLang === 'cs' ? 'Čeština' : readingLang === 'de' ? 'Deutsch' : 'Español'} with Claude...</span>
+              </div>
+            )}
+            {translationError && (
+              <div className="translating-error-banner" style={{
+                padding: '8px 14px',
+                marginBottom: '14px',
+                borderRadius: '6px',
+                background: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                color: '#ef4444',
+                fontSize: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span>⚠️ Translation error: {translationError}</span>
               </div>
             )}
             <article

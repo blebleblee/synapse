@@ -98,6 +98,7 @@ from learning_engine.generator import generate_subtopic_content
 from learning_engine.models import (
     get_provider,
     get_chat_provider,
+    get_translation_provider,
     OllamaProvider,
     OllamaCluster,
     get_configured_hosts,
@@ -707,11 +708,11 @@ Text to translate:
 
     try:
         import asyncio
-        provider, used_model = get_chat_provider(model=req.model)
+        provider, used_model = get_translation_provider(model=req.model)
         translated_text = await asyncio.to_thread(provider.generate, prompt)
         translated_text = translated_text.strip()
         cache_file.write_text(translated_text + "\n", encoding="utf-8")
-        return {"translated": translated_text, "cached": False}
+        return {"translated": translated_text, "cached": False, "model": used_model}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
