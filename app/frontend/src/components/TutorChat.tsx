@@ -145,20 +145,19 @@ export const TutorChat: React.FC<TutorChatProps> = ({
       />
 
       <div className="chat-header">
-        <div className="chat-header-main">
+        <div className="chat-header-top">
           <div
             className="persona-info clickable"
             onClick={() => setPersonaExpanded((prev) => !prev)}
             title={personaExpanded ? "Collapse Socratic mentor directives" : "Expand full Socratic mentor directives"}
           >
             <div className="persona-avatar-wrapper">
-              <Bot size={18} className="persona-icon" />
+              <Bot size={16} className="persona-icon" />
               <span className={`persona-online-dot ${mentorConnected}`} />
             </div>
             <div className="persona-text">
               <div className="persona-label-row">
                 <span className="persona-label">{ui.mentorTitle}</span>
-                <span className="persona-badge">{topic?.domain ? topic.domain.replace('_', ' ') : 'Polymath'}</span>
                 {personaExpanded ? <ChevronUp size={12} className="persona-chevron" /> : <ChevronDown size={12} className="persona-chevron" />}
               </div>
               <span className="persona-role" title={personaRole}>
@@ -167,28 +166,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
             </div>
           </div>
 
-          <div className="chat-header-actions">
-            <span
-              className={`mentor-status-badge ${mentorConnected}`}
-              title={
-                mentorConnected === 'connected'
-                  ? ui.mentorOnline
-                  : mentorConnected === 'checking'
-                  ? ui.mentorConnecting
-                  : ui.mentorOffline
-              }
-            >
-              {mentorConnected === 'connected' ? `● ${ui.mentorOnline}` : mentorConnected === 'checking' ? `○ ${ui.mentorConnecting}` : `○ ${ui.mentorOffline}`}
-            </span>
-            <button
-              type="button"
-              className={`terminal-link-badge ${isTerminalConnected ? 'online' : 'offline'}`}
-              onClick={onToggleTerminal}
-              title={ui.terminalConnected}
-            >
-              <Terminal size={11} />
-              <span>{isTerminalConnected ? ui.terminalConnected : ui.terminal}</span>
-            </button>
+          <div className="chat-header-top-actions">
             {onClearChat && (
               <button
                 type="button"
@@ -214,6 +192,34 @@ export const TutorChat: React.FC<TutorChatProps> = ({
               </button>
             )}
           </div>
+        </div>
+
+        {/* Stacked Meta & Status Badges Row */}
+        <div className="chat-header-badges-row">
+          <span className="persona-badge" title={topic?.domain ? topic.domain.replace('_', ' ') : 'Polymath'}>
+            {topic?.domain ? topic.domain.replace('_', ' ') : 'Polymath'}
+          </span>
+          <span
+            className={`mentor-status-badge ${mentorConnected}`}
+            title={
+              mentorConnected === 'connected'
+                ? ui.mentorOnline
+                : mentorConnected === 'checking'
+                ? ui.mentorConnecting
+                : ui.mentorOffline
+            }
+          >
+            {mentorConnected === 'connected' ? `● ${ui.mentorOnline}` : mentorConnected === 'checking' ? `○ ${ui.mentorConnecting}` : `○ ${ui.mentorOffline}`}
+          </span>
+          <button
+            type="button"
+            className={`terminal-link-badge ${isTerminalConnected ? 'online' : 'offline'}`}
+            onClick={onToggleTerminal}
+            title={ui.terminalConnected}
+          >
+            <Terminal size={11} />
+            <span>{isTerminalConnected ? ui.terminalConnected : ui.terminal}</span>
+          </button>
         </div>
 
         {/* Active Lesson Context Bar */}

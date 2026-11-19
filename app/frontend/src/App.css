@@ -1211,11 +1211,27 @@ body, html, #root {
   gap: 8px;
 }
 
-.chat-header-main {
+.chat-header-main,
+.chat-header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+}
+
+.chat-header-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.chat-header-badges-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 2px;
 }
 
 .persona-info {
