@@ -26,7 +26,8 @@ import {
   X,
   Activity,
   Check,
-  Zap
+  Zap,
+  LogOut
 } from 'lucide-react';
 import type { TopicTreeData, UnitNode, WorkspaceStatus } from '../types';
 
@@ -43,6 +44,7 @@ interface TopicTreeProps {
   onOpenGraph: () => void;
   onOpenSettings: () => void;
   onOpenStore?: () => void;
+  onLogout?: () => void;
   onDeleteTopic?: (path: string) => Promise<void>;
   onRenameTopic?: (path: string, newTitle: string) => Promise<void>;
   onToggleLessonCompletion?: (path: string, lessonId: string, completed?: boolean) => Promise<void>;
@@ -81,6 +83,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   onOpenGraph,
   onOpenSettings,
   onOpenStore,
+  onLogout,
   onDeleteTopic,
   onRenameTopic,
   onToggleLessonCompletion,
@@ -274,6 +277,11 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         </div>
 
         <div className="sidebar-header-actions">
+          {onLogout && (
+            <button className="icon-btn" onClick={onLogout} title="Lock / Logout">
+              <LogOut size={14} />
+            </button>
+          )}
           <button className="icon-btn" onClick={onOpenStore || onOpenSettings} title="Curriculum Store & Addons">
             <Package size={14} />
           </button>

@@ -78,3 +78,28 @@ To ensure local SQLite caches and temporary files never pollute source control, 
 ```
 
 By anchoring `/data/` to root, legitimate curriculum courses under `topics/computing/data/` (such as `big_data`, `postgresql`, `database_internals`) remain fully tracked by Git without collision.
+
+---
+
+## 5. Hosted Instance Protection & Password Authentication
+
+When deploying Synapse on a VPS, server, or cloud container accessible over a network, you can protect the entire workbench with instance-level password authentication:
+
+### Enabling Protection
+Set `SYNAPSE_PASSWORD` in your environment or in `~/.config/synapse/env`:
+
+```bash
+# Set instance protection password
+export SYNAPSE_PASSWORD="YourStrongPasswordHere"
+
+# Launch Synapse
+synapse serve --host 0.0.0.0 --port 8000
+```
+
+### Security Architecture:
+1. **Zero-Dependency Token Signing:** Generates HMAC-SHA256 bearer tokens signed with a persistent SQLite-backed server secret key (`auth:server_secret`), ensuring sessions persist across server restarts for 30 days.
+2. **API Gating:** FastAPI HTTP middleware intercepts all `/api/*` endpoints (except `/api/auth/*` and `/api/health`), returning `401 Unauthorized` unless a valid token is provided in `Authorization: Bearer <token>` or `X-Synapse-Token`.
+3. **PTY Terminal Handshake Verification:** The `/ws/terminal` WebSocket checks `?token=<token>` before accepting the connection, rejecting unauthenticated shell requests with WebSocket code `1008`.
+4. **Brute-Force Protection:** Automatically locks out client IPs after 5 failed password attempts within a 60-second window.
+5. **Open Local Default:** When `SYNAPSE_PASSWORD` is omitted, Synapse runs without authentication prompts, preserving instant offline startup for local desktop use.
+

@@ -29,7 +29,7 @@ except ImportError:
     termios = None
     HAS_POSIX_PTY = False
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query, UploadFile, File
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
@@ -128,8 +128,17 @@ from learning_engine.packages import (
     resolve_or_download_pack,
     seed_starter_curriculum
 )
+from learning_engine.auth import (
+    is_auth_enabled,
+    verify_password,
+    generate_auth_token,
+    verify_auth_token,
+    is_rate_limited,
+    record_failed_attempt,
+    reset_failed_attempts
+)
 
-app = FastAPI(title="AI Learning Workbench Backend", version="1.1.0")
+app = FastAPI(title="AI Learning Workbench Backend", version="1.1.1")
 
 @app.on_event("startup")
 def startup_event():
@@ -145,6 +154,29 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    path = request.url.path
+    if is_auth_enabled() and path.startswith("/api/"):
+        # Public endpoints that don't require authorization
+        if path in ["/api/auth/status", "/api/auth/login", "/api/health"]:
+            return await call_next(request)
+
+        auth_header = request.headers.get("Authorization")
+        token = None
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header[7:].strip()
+        if not token:
+            token = request.headers.get("X-Synapse-Token")
+        if not token:
+            token = request.query_params.get("token")
+
+        if not verify_auth_token(token):
+            from fastapi.responses import JSONResponse
+            return JSONResponse(status_code=401, content={"detail": "Authentication required"})
+
+    return await call_next(request)
 
 # -----------------------------------------------------------------------------
 # Data Models
@@ -200,11 +232,52 @@ class TranslateRequest(BaseModel):
     text: str = Field(..., max_length=50000)
     target_lang: str = Field(..., pattern=r'^[a-z]{2}$')
 
+class LoginRequest(BaseModel):
+    password: str = Field(..., min_length=1, max_length=512)
+
 # ... update chat_with_tutor to use GenerateRequest and ChatRequest ...
 
 # -----------------------------------------------------------------------------
 # REST Endpoints
 # -----------------------------------------------------------------------------
+
+@app.get("/api/auth/status")
+def get_auth_status(request: Request):
+    auth_header = request.headers.get("Authorization")
+    token = None
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header[7:].strip()
+    if not token:
+        token = request.headers.get("X-Synapse-Token")
+    if not token:
+        token = request.query_params.get("token")
+
+    auth_required = is_auth_enabled()
+    authenticated = verify_auth_token(token) if auth_required else True
+    return {
+        "auth_required": auth_required,
+        "authenticated": authenticated
+    }
+
+@app.post("/api/auth/login")
+def api_login(req: LoginRequest, request: Request):
+    client_ip = request.client.host if request.client else "unknown"
+    if is_rate_limited(client_ip):
+        raise HTTPException(
+            status_code=429,
+            detail="Too many failed login attempts. Please wait 60 seconds before retrying."
+        )
+
+    if not is_auth_enabled():
+        return {"token": generate_auth_token(), "status": "authenticated", "auth_required": False}
+
+    if not verify_password(req.password):
+        record_failed_attempt(client_ip)
+        raise HTTPException(status_code=401, detail="Invalid instance password.")
+
+    reset_failed_attempts(client_ip)
+    token = generate_auth_token()
+    return {"token": token, "status": "authenticated", "auth_required": True}
 
 @app.get("/api/health")
 def get_health():
@@ -1409,6 +1482,11 @@ Output clean, production-ready Markdown."""
 @app.websocket("/ws/terminal")
 async def terminal_websocket(websocket: WebSocket):
     global LAST_TERMINAL_COMMAND
+    token = websocket.query_params.get("token")
+    if is_auth_enabled() and not verify_auth_token(token):
+        await websocket.close(code=1008, reason="Authentication required")
+        return
+
     await websocket.accept()
 
     env_type = websocket.query_params.get("env", "host")

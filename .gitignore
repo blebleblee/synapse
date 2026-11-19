@@ -13,6 +13,7 @@ node_modules/
 app/frontend/node_modules/
 app/desktop/node_modules/
 dist/
+build/
 app/frontend/dist/
 
 # Operating System & IDE

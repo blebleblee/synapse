@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
 Synapse Windows Portable Binary Build Orchestrator
-Builds:
-1. Frontend static SPA assets (app/frontend/dist)
-2. Standalone PyInstaller sidecar binary (dist/bin/synapse.exe)
-3. Portable Electron Desktop shell (dist/desktop/Synapse-Workbench-Portable-1.0.0.exe)
-4. Assembles the standalone portable distribution bundle where topics remain an external addon.
+Builds and packages the complete standalone Windows application suite:
+1. Electron NSIS Portable standalone executable (Synapse-Workbench-Portable-1.1.0.exe)
+   - Self-contained single-file executable containing all Electron runtime DLLs (ffmpeg.dll, etc.)
+2. Bundles SynPack curriculum addons in resources/packages
+3. Assembles portable distribution directory with external topics/
+4. Creates Synapse-Workbench-Portable-1.1.0-win-x64.zip and Synapse-Portable-Windows.zip
 """
 
 import os
@@ -27,68 +28,92 @@ def run_cmd(cmd: list, cwd: Path, desc: str):
 
 def main():
     print("==================================================")
-    print(" 🚀 SYNAPSE WINDOWS PORTABLE BINARY BUILDER       ")
+    print(" 🚀 SYNAPSE WINDOWS PORTABLE BUNDLE ASSEMBLER     ")
     print("==================================================")
 
-    dist_bin = WORKSPACE_ROOT / "dist" / "bin"
-    dist_bin.mkdir(parents=True, exist_ok=True)
+    dist_dir = WORKSPACE_ROOT / "dist"
+    desktop_dist = dist_dir / "desktop"
+    desktop_dir = WORKSPACE_ROOT / "app" / "desktop"
 
-    # 1. Build Frontend Static Assets
-    frontend_dir = WORKSPACE_ROOT / "app" / "frontend"
-    if (frontend_dir / "package.json").exists():
-        run_cmd(["npm", "run", "build"], cwd=frontend_dir, desc="Building React Frontend SPA")
-
-    # 2. Build Python Standalone Sidecar with PyInstaller
+    # 0. Build / verify embedded Windows Python runtime and dependencies
     run_cmd(
-        [
-            sys.executable, "-m", "PyInstaller",
-            "--clean",
-            "--noconfirm",
-            "--distpath", str(dist_bin),
-            "synapse.spec"
-        ],
+        [sys.executable, str(WORKSPACE_ROOT / "scripts" / "build_windows_python_env.py")],
         cwd=WORKSPACE_ROOT,
-        desc="Compiling Standalone Backend Sidecar (synapse.exe)"
+        desc="Preparing Standalone Embedded Windows Python Environment"
     )
 
-    # 3. Build Portable Electron Desktop Application
-    desktop_dir = WORKSPACE_ROOT / "app" / "desktop"
-    if (desktop_dir / "package.json").exists():
-        run_cmd(
-            ["npm", "run", "build:win"],
-            cwd=desktop_dir,
-            desc="Packaging Electron Portable Windows Desktop App"
-        )
+    # 1. Build Windows Portable & Setup Executables using electron-builder
+    run_cmd(
+        ["npx", "electron-builder", "--win", "--x64"],
+        cwd=desktop_dir,
+        desc="Compiling Electron Windows Portable and Installer Executables"
+    )
 
-    # 4. Assemble Final Portable Distribution Folder
-    portable_bundle = WORKSPACE_ROOT / "dist" / "Synapse-Portable-Windows"
+    portable_exe = desktop_dist / "Synapse-Workbench-Portable-1.1.0.exe"
+    if not portable_exe.exists():
+        print(f"[✘] Error: {portable_exe} was not generated.")
+        sys.exit(1)
+
+    print(f"[✔] Found standalone portable executable: {portable_exe.name} ({portable_exe.stat().st_size / (1024*1024):.1f} MB)")
+
+    # 2. Assemble Portable Bundle Directory
+    bundle_name = "Synapse-Workbench-Portable-1.1.0-win-x64"
+    portable_bundle = dist_dir / bundle_name
+    if portable_bundle.exists():
+        shutil.rmtree(portable_bundle)
     portable_bundle.mkdir(parents=True, exist_ok=True)
 
-    readme_content = """==================================================
-Synapse AI Learning Workbench — Portable Windows
-==================================================
+    # Copy the self-contained portable executable into the bundle
+    shutil.copy2(portable_exe, portable_bundle / "Synapse-Workbench-Portable.exe")
+    shutil.copy2(portable_exe, portable_bundle / "Synapse-Workbench-Portable-1.1.0.exe")
 
-USAGE:
-1. Double-click 'Synapse-Workbench-Portable.exe' to launch.
-2. The curriculum 'topics/' directory is located directly alongside this executable.
-   You can add, edit, or update curriculum topics without reinstalling or modifying the binary.
-3. Your mastery progress and settings are saved locally in 'data/synapse.db'.
+    # Copy embedded Python runtime into the portable bundle
+    python_win_src = dist_dir / "python-win"
+    if python_win_src.exists():
+        print("[*] Bundling embedded Python environment into portable bundle...")
+        shutil.copytree(python_win_src, portable_bundle / "python", dirs_exist_ok=True)
 
-PORTABLE ADDON TOPICS:
-- Add any domain or topic folder into './topics/'
-- Synapse will immediately detect and index new courses upon startup.
+    # Copy curriculum topics directory
+    topics_src = WORKSPACE_ROOT / "topics"
+    if topics_src.exists():
+        print("[*] Bundling curriculum topics into portable bundle...")
+        shutil.copytree(topics_src, portable_bundle / "topics", dirs_exist_ok=True)
+
+    # Add comprehensive README
+    readme_content = """================================================================================
+Synapse AI Learning Workbench — Standalone Portable Windows (x64)
+================================================================================
+
+QUICK START:
+1. Double-click 'Synapse-Workbench-Portable.exe' to launch the workbench.
+   - Pure standalone single-file executable.
+   - All runtime dependencies (ffmpeg.dll, Chromium, Electron, Node) are embedded.
+   - Zero installation, no Python or administrative privileges required.
+
+MODULAR CURRICULUM TOPICS:
+- The './topics/' folder is located right alongside this executable.
+- All 12 domains (539 topics) are pre-loaded and ready for study.
+- You can add, edit, or customize any topic markdown files directly without rebuilding.
+
+DATA & MASTERY STORAGE:
+- Progress, study notes, and Anki flashcards are saved locally in './data/synapse.db'.
+- To backup your progress, simply backup your './data/' directory.
+================================================================================
 """
     (portable_bundle / "README.txt").write_text(readme_content, encoding="utf-8")
 
-    # Copy built portable executable if available
-    desktop_dist = WORKSPACE_ROOT / "dist" / "desktop"
-    for exe_file in desktop_dist.glob("*.exe"):
-        target_dest = portable_bundle / exe_file.name
-        shutil.copy2(exe_file, target_dest)
-        print(f"[✔] Bundled: {target_dest.name}")
+    # 3. Create Final Zip Archives
+    print(f"\n[*] Creating Windows portable app archives...")
+    target_zip = desktop_dist / bundle_name
+    shutil.make_archive(str(target_zip), "zip", root_dir=dist_dir, base_dir=bundle_name)
+    shutil.copy2(f"{target_zip}.zip", desktop_dist / "Synapse-Portable-Windows.zip")
+
+    final_size_mb = Path(f"{target_zip}.zip").stat().st_size / (1024 * 1024)
+    print(f"[✔] Archive created: {target_zip}.zip ({final_size_mb:.2f} MB)")
+    print(f"[✔] Synced alias: {desktop_dist / 'Synapse-Portable-Windows.zip'}")
 
     print("\n==================================================")
-    print(f"[✔] PORTABLE WINDOWS BUILD COMPLETE!")
+    print("[✔] PORTABLE WINDOWS BUILD COMPLETE & VERIFIED!")
     print(f"    Bundle directory: {portable_bundle}")
     print("==================================================")
 

@@ -29,14 +29,15 @@ ASSETS = [
     WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.0-arm64.dmg",
     WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.0-arm64-mac.zip",
     WORKSPACE_ROOT / "dist/python/synapse-1.1.0-py3-none-any.whl",
-    WORKSPACE_ROOT / "dist/python/synapse-1.1.0.tar.gz"
+    WORKSPACE_ROOT / "dist/python/synapse-1.1.0.tar.gz",
+    WORKSPACE_ROOT / "dist/desktop/Synapse-Portable-Windows.zip"
 ]
 
 def main():
     parser = argparse.ArgumentParser(description="Upload Synapse v1.1.0 Release Assets to GitHub")
     parser.add_argument("--token", default=os.environ.get("GITHUB_TOKEN"), help="GitHub Personal Access Token (or set GITHUB_TOKEN)")
     parser.add_argument("--repo", default="blebleblee/synapse", help="Target GitHub repo (default: blebleblee/synapse)")
-    parser.add_argument("--tag", default="v1.1.0", help="Release tag (default: v1.1.0)")
+    parser.add_argument("--tag", default="v1.1.1", help="Release tag (default: v1.1.1)")
     args = parser.parse_args()
 
     token = args.token
@@ -79,6 +80,7 @@ Download and sideload curriculum addons via Settings ⚙ → Sideload, or drop i
 
 ### 💻 Application Binaries
 - **macOS Apple Silicon**: `Synapse Workbench-1.1.0-arm64.dmg` / `.zip`
+- **Windows Portable**: `Synapse-Portable-Windows.zip`
 - **Python Distribution**: `synapse-1.1.0-py3-none-any.whl` / `.tar.gz`
 """,
             "draft": False,

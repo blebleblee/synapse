@@ -170,10 +170,14 @@ def test_api_packages_endpoints():
     res_list = client.get("/api/packages")
     assert any(p.get("domain") == "arts" for p in res_list.json()["installed"])
 
-    # 5. Uninstall domain package
-    res_del = client.delete("/api/packages/arts")
-    assert res_del.status_code == 200
-    assert res_del.json()["status"] == "uninstalled"
+    try:
+        # 5. Uninstall domain package
+        res_del = client.delete("/api/packages/arts")
+        assert res_del.status_code == 200
+        assert res_del.json()["status"] == "uninstalled"
+    finally:
+        # Restore arts domain for subsequent test isolation
+        client.post("/api/packages/install?domain=arts")
 
 def test_dangerous_command_detection():
     from learning_engine.security import is_dangerous_host_command

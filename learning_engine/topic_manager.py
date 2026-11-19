@@ -32,6 +32,9 @@ DOMAIN_ORDER = [
 ]
 
 def list_domains() -> List[str]:
+    if not TOPICS_DIR.exists():
+        TOPICS_DIR.mkdir(parents=True, exist_ok=True)
+        return []
     raw = [d.name for d in TOPICS_DIR.iterdir() if d.is_dir() and not d.name.startswith(".")]
     return sorted(raw, key=lambda d: DOMAIN_ORDER.index(d) if d in DOMAIN_ORDER else 999)
 
@@ -54,8 +57,13 @@ def get_topic_tree() -> Dict[str, Any]:
         domain_dir = TOPICS_DIR / domain
         syllabus_file = domain_dir / "SYLLABUS.md"
 
+        try:
+            rel_domain_path = str(domain_dir.relative_to(WORKSPACE_ROOT))
+        except ValueError:
+            rel_domain_path = f"topics/{domain}"
+
         tree[domain] = {
-            "path": str(domain_dir.relative_to(WORKSPACE_ROOT)),
+            "path": rel_domain_path,
             "disciplines": {},
             "categories": {}
         }

@@ -4,7 +4,7 @@
   <p><strong>AI Learning Workspace & Socratic Curriculum Engine</strong></p>
 
   <a href="CHANGELOG.md">
-    <img src="https://img.shields.io/badge/version-1.1.0-emerald?style=flat" alt="Version 1.1.0">
+    <img src="https://img.shields.io/badge/version-1.1.1-emerald?style=flat" alt="Version 1.1.1">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
@@ -116,10 +116,10 @@ Download the standalone, zero-dependency desktop application from the project re
 
 | Platform | Download | Instructions |
 | :--- | :--- | :--- |
-| **Windows (Portable)** | **`Synapse-Workbench-Portable-1.1.0.exe`** | Standalone portable `.exe` (no Python or installation required). Place `./topics/` alongside the executable and launch! |
-| **macOS (Apple Silicon)** | **`Synapse-Workbench-1.1.0-arm64.dmg`** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
-| **macOS (Portable)** | **`Synapse-Workbench-1.1.0-arm64-mac.zip`** | Unzip and launch **Synapse Workbench.app** directly. |
-| **Linux (CLI / Server)** | **`synapse-1.1.0-py3-none-any.whl`** | See Python Wheel Installation below. |
+| **Windows (Portable)** | **`Synapse-Workbench-Portable-1.1.1.exe`** | Standalone portable `.exe` (no Python or installation required). Place `./topics/` alongside the executable and launch! |
+| **macOS (Apple Silicon)** | **`Synapse-Workbench-1.1.1-arm64.dmg`** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
+| **macOS (Portable)** | **`Synapse-Workbench-1.1.1-arm64-mac.zip`** | Unzip and launch **Synapse Workbench.app** directly. |
+| **Linux (CLI / Server)** | **`synapse-1.1.1-py3-none-any.whl`** | See Python Wheel Installation below. |
 | **Any Platform** | **Docker Compose** | See Docker Deployment below. |
 
 ---
@@ -193,7 +193,7 @@ python3 -m venv synapse-env
 source synapse-env/bin/activate
 
 # 2. Install the official wheel
-pip install dist/python/synapse-1.1.0-py3-none-any.whl
+pip install dist/python/synapse-1.1.1-py3-none-any.whl
 
 # 3. Launch the Socratic Workbench
 synapse serve --port 8000
@@ -287,6 +287,7 @@ python3 scripts/monitor.py
 
 ## 🛡️ Security, Host Safety & Credential Isolation
 
+- **Hosted Instance Protection:** Secure cloud/VPS deployments by defining `SYNAPSE_PASSWORD`. Unauthenticated users are gated by a styled login modal, while API endpoints and the interactive `/ws/terminal` PTY bridge enforce signed 30-day HMAC token verification with brute-force rate-limiting.
 - **Isolated Credentials:** Cloud API keys (Anthropic, Gemini) are stored strictly outside the repository tree in `~/.config/synapse/env` with restricted `600` file permissions. They are never committed to git.
 - **Host Safety Guard:** The integrated PTY terminal actively intercepts destructive command patterns (`rm -rf /`, `mkfs`, raw block writes, fork bombs) and pauses execution until you explicitly type `CONFIRM`.
 - **Root-Anchored Runtime DB:** Runtime caches and SQLite databases (`/data/`, `/exports/`) are anchored to root in `.gitignore`, guaranteeing authored topics in `topics/computing/data/` are never accidentally ignored.

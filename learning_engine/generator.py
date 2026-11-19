@@ -22,6 +22,7 @@ from .models import (
     OllamaProvider,
     LLMProvider,
     validate_generation_output,
+    validate_lesson_completeness,
     CLUSTER_HOST_SPECS,
     AnthropicProvider
 )
@@ -30,7 +31,7 @@ from .security import validate_canonical_topic_path
 from .domain_strategies import build_topic_modules, GLOBAL_REGISTRY
 
 # Global semaphore to limit concurrent LLM requests and avoid rate limits
-_LLM_SEMAPHORE = threading.Semaphore(8)
+_LLM_SEMAPHORE = threading.Semaphore(24)
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
@@ -44,7 +45,7 @@ def purge_legacy_topic_files(topic_dir: Path):
 
     # Delete all markdown files and subdirectories
     for item in topic_dir.iterdir():
-        if item.is_file() and item.suffix == ".md":
+        if item.is_file() and item.suffix == ".md" and item.name != "TOPIC_OUTLINE.md":
             try:
                 item.unlink()
             except Exception:
@@ -65,6 +66,7 @@ def scope_topic_curriculum(
     category: str,
     subtopic_id: str,
     subtopic_title: str,
+    subtopic_dir: Optional[Path] = None,
     scoping_provider: Optional[LLMProvider] = None
 ) -> List[Dict[str, str]]:
     """
@@ -78,6 +80,257 @@ def scope_topic_curriculum(
     category_title = category.replace("_", " ").title()
 
     fallback_modules = build_topic_modules(domain, category, subtopic_id, subtopic_title)
+
+    if subtopic_dir:
+        outline_path = subtopic_dir / "TOPIC_OUTLINE.md"
+        if outline_path.exists():
+            try:
+                content = outline_path.read_text(encoding="utf-8")
+                pattern = r"\*\s+\*\*Lesson\s+(\d+):\s+(.*?)(?:\s+\(.*?\))?\*\*"
+                matches = list(re.finditer(pattern, content))
+                if len(matches) >= 3:
+                    parsed_lessons = []
+                    for i, m in enumerate(matches):
+                        num = int(m.group(1))
+                        raw_title = m.group(2).strip()
+                        slug = re.sub(r"[^a-z0-9]+", "_", raw_title.lower()).strip("_")
+                        filename = f"lesson_{num:02d}_{slug}.md"
+                        start_pos = m.end()
+                        end_pos = matches[i+1].start() if i + 1 < len(matches) else len(content)
+                        block = content[start_pos:end_pos]
+                        focus_match = re.search(r"\*\s+\*Focus:\*\s+(.*?)(?=\n\s*\*|\n\n|\Z)", block, re.DOTALL)
+                        focus = focus_match.group(1).strip() if focus_match else raw_title
+                        hands_match = re.search(r"\*\s+\*(?:Hands-On|Practice|Terminal Lab|Written Practice|Oral Practice|DAW Exercise):\*\s+(.*?)(?=\n\s*\*|\n\n|\Z)", block, re.DOTALL)
+                        hands_on = hands_match.group(1).strip() if hands_match else ""
+                        parsed_lessons.append({"num": num, "title": f"Lesson {num}: {raw_title}", "filename": filename, "focus": focus, "hands_on": hands_on})
+
+                    print(f"      [★] Using Blueprint Outline: {len(parsed_lessons)} Curated Lessons from TOPIC_OUTLINE.md", flush=True)
+                    strategy = GLOBAL_REGISTRY.get_strategy(domain, category)
+                    blueprint = strategy.get_blueprint(subtopic_title, category_title)
+                    default_audience = blueprint.lessons[0].audience if blueprint.lessons else f"Practitioners and specialists in {category_title}"
+
+                    dynamic_modules = []
+                    for l in parsed_lessons:
+                        fname = l["filename"]
+                        title = l["title"]
+                        focus = l["focus"]
+                        hands_on = l["hands_on"]
+
+                        if domain in ["suse", "suse-bootcamp"] or "suse" in domain.lower():
+                            structure_text = f"""ENTERPRISE MASTERCLASS CHAPTER BLUEPRINT:
+Author a full-length, authoritative, deeply technical masterclass chapter (~1,800 to 2,400 words) on '{title}'.
+Write like a Senior SUSE Enterprise Solutions Architect and Linux Systems Specialist: deeply articulate, intellectually rigorous, and immediately practical.
+
+CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
+- Blend rich, insightful narrative prose with clean, scannable bullet points, numbered step-by-step procedures, and actionable checklists.
+- DO NOT write an unbroken wall of dense text. Break down concepts with clear bullet points, comparative tables, YAML/CLI blocks, and bold highlights.
+- Structure your chapter with these organic, topic-specific headings (DO NOT use generic numbered labels like 'Section 1' or 'The Enterprise Problem'):
+  1. The Enterprise Context & Architectural Foundations: Deep systems-level exposition explaining why this technology/subsystem matters. Explain the problem space, official SUSE documentation invariants, and core concepts in plain, precise technical English.
+  2. Subsystem Architecture & Low-Level Mechanics: Clear narrative exposition on daemon lifecycles, kernel/systemd interactions, network datapath, or resource reconciliation. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing the component topology, state transitions, or dataflow.
+  3. Step-by-Step Command Walkthrough & Configuration: Numbered step-by-step procedures with exact CLI commands, configuration stanzas (/etc/ configs, systemd units, zypper, yast2, kubectl, crmsh), and detailed explanations of all flags and parameters.
+  4. Core Reference Matrix Table: Include a clear Markdown table summarizing configuration parameters, CLI flags, port numbers, or system states.
+  5. Practical Hands-On Terminal Lab: A concrete 15-minute terminal lab ({hands_on}) with exact commands, expected output blocks, and verification commands.
+  6. Production Hardening & Troubleshooting Pro-Tips: Conclude with 4-5 memorable 'Golden Rules' of production administration, common failure signatures, and log debugging."""
+                            relevance_mandate = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
+- Focus 80% on actionable, hands-on Linux system administration, Kubernetes orchestration, and official SUSE documentation workflows for '{subtopic_title}' in '{category_title}'.
+- STRICT TOOLCHAIN ISOLATION: Utilize ONLY official Linux, SUSE, and Kubernetes tools, commands, and configuration schemas native to '{category_title}'. ABSOLUTELY NEVER mention music production, DAWs, Ableton, Cubase, or audio engineering."""
+
+                        elif domain == "studio_equipment" or category in ["hardware_synthesizers", "drum_machines_and_grooveboxes", "audio_interfaces_and_mixers", "guitar_pedals_and_outboard_fx", "midi_controllers_and_sequencers", "studio_monitors_and_acoustics", "studio_routing_and_utilities"]:
+                            structure_text = f"""HARDWARE MASTERCLASS CHAPTER BLUEPRINT:
+Author a full-length, authoritative, highly engaging hardware masterclass chapter (~1,800 to 2,400 words) on '{title}'.
+Write like a Senior Recording Studio Hardware Technician and Audio Engineer: deeply articulate, passionate, and immediately practical.
+
+CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
+- Blend rich, insightful narrative prose with clean, scannable bullet points, numbered step-by-step procedures, and actionable checklists.
+- DO NOT write an unbroken wall of dense text.
+- Structure your chapter with these organic, topic-specific headings:
+  1. The Hardware Dilemma & Circuit Foundations: Plain-English exposition of what this hardware circuit/engine does, demystifying audio engineering jargon.
+  2. Circuit Topography & Signal Flow Mechanics: Dissect physical controls, signal path from inputs to converters, or DSP engine. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing signal flow or routing.
+  3. Step-by-Step Physical Controls & Menu Navigation: Numbered steps detailing exact knob names, switch positions, and secondary shift-functions.
+  4. Core Hardware Parameter Reference Table: A clear Markdown table summarizing knob functions, dB ranges, I/O levels, or MIDI CCs.
+  5. Hybrid Studio Rig Integration (Mackie, Apollo & Midihub): Dedicated cabling and routing steps connecting this unit into the Mackie 1202 mixer, UAD Apollo Twin, and Blokas Midihub.
+  6. Hands-On Studio Lab & Calibration: A concrete 15-minute patching and calibration drill ({hands_on}).
+  7. Technician Golden Rules & Traps: 4-5 bulleted pro-tips on gain staging, +22 dBu headroom, and ground loops."""
+                            relevance_mandate = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
+- Focus 80% on physical hardware manipulation, analog/digital signal flow, and authentic studio routing for '{subtopic_title}' in '{category_title}'.
+- STRICT TOOLCHAIN ISOLATION: Utilize ONLY physical hardware controls, jacks, and circuits native to this specific unit. NEVER mention enterprise software or IT infrastructure."""
+
+                        elif domain == "languages":
+                            structure_text = f"""LINGUISTIC MASTERCLASS CHAPTER BLUEPRINT:
+Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}'.
+Write like a Senior Applied Linguist and Native-Speaker Coach: articulate, culturally grounded, and immediately practical for a native Czech speaker.
+
+CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
+- Blend rich, insightful narrative prose with clean, scannable bullet points, grammatical tables, and conversational dialogues.
+- Structure your chapter with these organic, topic-specific headings:
+  1. The Communicative Challenge & Czech Contrastive Foundations: Explain the communicative problem, demystify grammatical jargon, and contrast directly with Czech linguistic patterns and Slavic traps.
+  2. Phonetic & Grammatical Mechanics: Dissect the phonetic articulation, morphological declension, or syntactic word order. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing the grammatical decision tree or phonological map.
+  3. Authentic Conversational Dialogues & Register Nuance: Realistic colloquial and professional dialogues demonstrating the concept in action with side-by-side translations.
+  4. Core Declension / Conjugation / Vocabulary Reference Table: Comprehensive Markdown reference table.
+  5. Practical Oral & Written Lab: A concrete 15-minute active recall drill ({hands_on}).
+  6. Linguist Golden Rules & Slavic Traps: 4-5 bulleted pro-tips on false friends, word order (slovosled), and pronunciation."""
+                            relevance_mandate = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
+- Focus 80% on authentic language acquisition, phonetic accuracy, and conversational fluency for '{subtopic_title}' in '{category_title}'.
+- Contrast directly against Czech native speaker patterns. NEVER mention unrelated IT or audio tools."""
+
+                        elif domain in ["mathematics", "physics", "chemistry"]:
+                            domain_cz = {"mathematics": "matematika", "physics": "fyzika", "chemistry": "chemie"}.get(domain, domain)
+                            teacher_cz = {
+                                "mathematics": "špičkový český gymnaziální profesor matematiky a autor gymnaziálních sbírek úloh",
+                                "physics": "špičkový český gymnaziální profesor fyziky a autor učebnic pro gymnázia",
+                                "chemistry": "špičkový český gymnaziální profesor chemie a autor gymnaziálních učebnic"
+                            }.get(domain, "český středoškolský profesor a didaktik")
+
+                            structure_text = f"""ČESKÁ GYMNAZIÁLNÍ UČEBNICE – STRUKTURA LEKCE:
+Napište plnohodnotnou, autoritativní a didakticky propracovanou kapitolu gymnaziální učebnice (~1,800 až 2,400 slov) na téma '{title}'.
+Pište jako {teacher_cz}: spisovnou češtinou, srozumitelně, pedagogicky poutavě a s maximální odbornou přesností podle RVP pro gymnázia v ČR.
+
+KRITICKÁ PRAVIDLA PRO DYNAMICKOU ROVNOVÁHU A STRUKTURU:
+- Pište bohatým, souvislým výkladovým textem v odstavcích, doplněným o přehledné odrážky, rámečky s definicemi, tabulky a detailně komentované vzorové příklady.
+- NEPIŠTE pouze heslovitý přehled ani suché shrnutí. Každý pojem důkladně vysvětlete na reálné a geometrické intuici.
+- Každou lekci strukturuujte podle následujících tematických sekcí (v češtině):
+  1. Motivace a reálná/geometrická intuice: Proč tento koncept potřebujeme, kde vzniká v praxi nebo v přírodě a jaký problém řeší.
+  2. Přesná vědecká teorie, definice a vzorce: Formální matematické/fyzikální/chemické definice, věty, předpoklady platnosti, význam všech symbolů a jednotek SI / názvosloví.
+  3. Názorné schéma / Myšlenková mapa (Mermaid diagram): Přehledný diagram (```mermaid ... ```) znázorňující rozhodovací strom řešení, silový rozklad, reakční mechanismus nebo myšlenkový postup.
+  4. Krok za krokem řešené vzorové příklady: Detailní didaktický rozbor (zadání, podmínky řešitelnosti / zápis veličin, algebraické odvození / výpočet, kontrolní zkouška, grafická či věcná interpretace).
+  5. Samostatná cvičení s výsledky: Sada úloh od základních po maturitní chytáky s uvedenými výsledky pro sebekontrolu ({hands_on}).
+  6. Časté chyby u písemek a maturitní chytáky: 4-5 konkrétních varování před typickými omyly studentů (znaménka, dělení nulou, jednotky, oxidační čísla)."""
+
+                            relevance_mandate = f"""KRITICKÝ MANDÁT PRO ČISTOTU OBORU A JAZYKA:
+- Pište VÝHRADNĚ 100% SPISOVNOU ČEŠTINOU s použitím standardního českého názvosloví pro obor {domain_cz} (RVP pro gymnázia v ČR).
+- STRIKTNÍ IZOLACE OBORU: Zaměřte se výhradně na {domain_cz} pro téma '{subtopic_title}' v okruhu '{category_title}'.
+- ABSOLUTNĚ ZAKÁZÁNO: Jakýkoliv IT žargon (Linux, servery, Kubernetes, Docker, kódování) a jakýkoliv hudební žargon (hudba, DAW, Berklee, syntezátory, kytary)."""
+                        else: # composing, music, daw
+                            structure_text = f"""MUSIC PRODUCTION MASTERCLASS CHAPTER BLUEPRINT:
+Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}'.
+Write like a world-class Berklee professor and master producer: deeply articulate, passionate, intellectually rigorous, and immediately practical.
+
+CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
+- Blend rich, insightful narrative prose with clean, scannable bullet points, numbered step-by-step procedures, and actionable checklists.
+- DO NOT write an unbroken wall of dense text. Break down concepts with clear bullet points, comparative tables, and bold highlights.
+- Structure your chapter with these organic, topic-specific headings:
+  1. The Core Creative Dilemma & Human Perception: Deep psychoacoustic and emotional exposition explaining why this concept matters. Demystify all jargon in plain English.
+  2. The Acoustic & Musical Mechanics: Clear narrative exposition on voice-leading, frequency real estate, rhythm, or arrangement dynamics. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing the musical structure or decision tree.
+  3. Measure-by-Measure Commercial Case Studies: Multi-paragraph breakdowns of 2 real-world commercial records with exact timestamps, tracking measure-by-measure what stems enter/exit and why it works.
+  4. Core Reference Matrix Table: Include a clear Markdown table summarizing parameters, frequency allocations, or structural metrics.
+  5. Compact DAW Quick Reference Box: A concise 10-line bullet cheat-sheet giving exact shortcuts and track setups for Ableton Live (e.g. [A] for Automation, Utility) and Steinberg Cubase (e.g. [V] Volume Automation, Draw tool [8]). Keep this compact so software steps never overshadow the musical lesson.
+  6. Practical Listening & Production Lab: A concrete 15-minute auditory audit drill on the student's own project ({hands_on}).
+  7. Golden Mentor Invariants: Conclude with 4-5 memorable 'Golden Rules' of the craft."""
+                            relevance_mandate = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
+- Focus 80% on actionable, hands-on music production, arrangement, and audio engineering workflows for '{subtopic_title}' in '{category_title}'.
+- STRICT TOOLCHAIN ISOLATION: Utilize ONLY musical instruments, composition techniques, and DAW tools native to '{category_title}'. NEVER mention Linux, Kubernetes, or enterprise IT software."""
+
+                        lesson_prompt = f"""Write {title} for the masterclass curriculum on '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
+
+Target Audience: {default_audience}
+Lesson Focus: {focus}
+Hands-On Goal: {hands_on}
+
+{relevance_mandate}
+
+{structure_text}
+
+CRITICAL BUDGETING & TERMINAL INVARIANT:
+- Budget your response to approximately 1,800 to 2,400 words so that all sections and the final mentor rules are completely and cleanly finished BEFORE reaching output limits.
+- ABSOLUTELY NEVER cut off mid-sentence. You MUST cleanly conclude with valid terminal punctuation.
+Output publication-grade Markdown only."""
+
+                        dynamic_modules.append({
+                            "filename": fname,
+                            "title": title,
+                            "prompt": lesson_prompt
+                        })
+
+                    # Extract focused Capstone Challenge directly from TOPIC_OUTLINE.md
+                    cap_match = re.search(r"##\s+🏁\s+Capstone Challenge:\s+(.*?)\n\*\s+\*\*Objective:\*\*\s+(.*?)\n\*\s+\*\*Deliverable:\*\*\s+(.*?)(?=\n\n|\Z)", content, re.DOTALL)
+                    if cap_match:
+                        cap_title = cap_match.group(1).strip()
+                        cap_obj = cap_match.group(2).strip()
+                        cap_del = cap_match.group(3).strip()
+                    else:
+                        cap_title = f"{subtopic_title} Capstone Sprint"
+                        cap_obj = f"Deploy and verify {subtopic_title} in a realistic production scenario."
+                        cap_del = "Verifiable implementation passing diagnostic health checks."
+
+                    if domain in ["mathematics", "physics", "chemistry"]:
+                        domain_cz = {"mathematics": "matematika", "physics": "fyzika", "chemistry": "chemie"}.get(domain, domain)
+                        capstone_prompt = f"""Napište průvodce praktickým maturitním projektem / laboratorní výzvou: '{cap_title}' pro '{subtopic_title}'.
+Obor: '{domain_title}' | Okruh: '{category_title}'.
+
+Cílová skupina: Studenti a maturanti gymnázií v ČR
+Cíl výzvy: {cap_obj}
+Požadovaný výstup: {cap_del}
+
+STRUKTURA ZADÁNÍ MATURITNÍHO / LABORATORNÍHO PROJEKTU (~1,000 až 1,400 slov):
+Navrhněte ucelený, didakticky promyšlený praktický projekt / laboratorní měření ověřující hluboké zvládnutí látky.
+
+Struktura dokumentu v češtině:
+# Praktický projekt / Maturitní sprint: {cap_title}
+
+## 1. Cíl projektu, kontext a teoretická východiska
+(Formulace problému, význam v praxi/přírodě, myšlenková mapa / schéma v Mermaid (```mermaid ... ```) a předpoklady)
+
+## 2. Krok za krokem řešený postup a metodika
+(Podrobný metodický postup řešení, odvození vztahů, bilance, laboratorní postup měření bez vynechání kroků)
+
+## 3. Komentované vzorové řešení a výpočetní protokol
+(Kompletní numerické či algebraické řešení s dosazením, jednotkami SI / chemickými rovnicemi a mezivýpočty)
+
+## 4. Analýza chyb, mezních stavů a diskuze výsledků
+(Rozbor možných nepřesností, diskuze fyzikálního/chemického/matematického smyslu výsledku, zkouška správnosti)
+
+## 5. Závěrečná hodnoticí kritéria a kontrolní přehled
+(Přehledná tabulka v Markdownu s kritérii úspěšného splnění a ověřovacími body)
+
+KRITICKÝ MANDÁT:
+- Pište výhradně 100% spisovnou češtinou s platným českým názvoslovím pro {domain_cz}.
+- Žádný IT žargon (žádný Linux, Kubernetes, skripty), žádný hudební žargon.
+Rozpočet: cca 1,000 až 1,400 slov s čistým formátováním.
+Výstupem je pouze čistý Markdown."""
+                    else:
+                        capstone_prompt = f"""Author the Practical Capstone Challenge Guide: '{cap_title}' for '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
+
+Target Audience: {default_audience}
+Challenge Objective: {cap_obj}
+Required Deliverable: {cap_del}
+
+CAPSTONE LAB BLUEPRINT (~1,000 to 1,400 words):
+Design a focused, hands-on 15–20 minute implementation sprint that allows the practitioner to prove mastery of {subtopic_title}.
+
+Structure your capstone lab guide with these organic headings:
+# Capstone Challenge: {cap_title}
+
+## 1. Challenge Architecture & Objective
+(Provide a crisp, realistic production scenario, the architectural topology diagram (```mermaid ... ```), and prerequisites)
+
+## 2. Step-by-Step Implementation Procedure
+(Numbered step-by-step CLI commands, YAML stanzas, or routing patches with exact flags and zero placeholders)
+
+## 3. Automated Verification & Diagnostic Health Checks
+(Concrete verification commands and expected terminal output blocks proving the system is healthy)
+
+## 4. Failure Injection & Resilience Triage
+(Inject a realistic edge failure, demonstrate the triage command, and restore the service)
+
+## 5. Production Sign-Off Checklist
+(A clean Markdown table with verification criteria and pass/fail indicators)
+
+CRITICAL BUDGETING & TERMINAL INVARIANT:
+- Budget your response to approximately 1,000 to 1,400 words so that all 5 sections are cleanly concluded BEFORE reaching output limits.
+- ABSOLUTELY NEVER cut off mid-sentence. You MUST cleanly conclude with valid terminal punctuation.
+Output publication-grade Markdown only."""
+
+                    dynamic_modules.append({
+                        "filename": "labs.md",
+                        "title": f"Capstone Challenge: {cap_title}",
+                        "prompt": capstone_prompt
+                    })
+                    return dynamic_modules
+            except Exception as e:
+                print(f"      [!] Note on parsing TOPIC_OUTLINE.md ({e}), falling back to AI scoping.", flush=True)
+
     if not scoping_provider:
         return fallback_modules
 
@@ -135,6 +388,77 @@ Output JSON only in this exact format:
                 title = l.get("title") or f"Lesson {num}"
                 focus = l.get("focus") or ""
 
+                if domain in ["composing", "songwriting", "daw", "music"] or category in ["songwriting", "orchestral_composing", "daw_arrangement", "music_theory", "film_and_game_scoring"]:
+                    structure_text = f"""MASTERCLASS CHAPTER BLUEPRINT:
+Author a full-length, deeply authoritative textbook chapter (~2,800 to 3,500 words) on '{title}'.
+Write like a world-class Berklee professor and master producer: deeply articulate, passionate, intellectually rigorous, and immediately practical.
+
+MANDATORY SECTIONS TO DEVELOP WITH ORGANIC, BESPOKE HEADINGS (DO NOT use generic numbered labels like 'Section 1' or 'The Creative Problem'):
+1. The Core Creative Dilemma & Human Perception: Deep psychoacoustic exposition on auditory habituation, emotional narrative, and why naive approaches fail. Demystify all jargon in plain English.
+2. The Acoustic & Musical Mechanics: Deep narrative exposition on voice-leading, frequency real estate, internal velocity, and arrangement dynamics. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing the musical structure or decision tree.
+3. Measure-by-Measure Commercial Case Studies: Provide exhaustive, multi-paragraph breakdowns of 2-3 well-known commercial records across genres with exact timestamps, tracking measure-by-measure what stems enter/exit and why it works.
+4. Comprehensive Reference Matrix Table: Include a detailed Markdown reference table summarizing parameters, frequency allocations, or structural metrics.
+5. Compact DAW Quick Reference Box: A concise 10-12 line bullet cheat-sheet giving the exact shortcuts and track setups for Ableton Live (e.g. [A] for Automation, Utility Gain/Width) and Steinberg Cubase (e.g. Marker Track, [V] Volume Automation, Draw tool [8]). Keep this compact so software steps never overshadow the musical lesson.
+6. Practical Listening & Production Lab: A concrete 15-minute auditory audit drill on the student's own project.
+7. Mentor Invariants: Conclude with 4-5 memorable 'Golden Rules' of the craft."""
+                elif domain == "studio_equipment" or category in ["hardware_synthesizers", "drum_machines_and_grooveboxes", "audio_interfaces_and_mixers", "guitar_pedals_and_outboard_fx", "midi_controllers_and_sequencers", "studio_monitors_and_acoustics", "studio_routing_and_utilities"]:
+                    structure_text = f"""Structure:
+# {title}
+
+## 1. The Hardware Dilemma & The "Why"
+(Plain-English exposition of what this hardware function or circuit does, demystifying any technical audio engineering jargon, and explaining why it matters in a modern studio workflow)
+
+## 2. Circuit Architecture & Signal Flow Mechanics
+(Dissect the physical hardware controls, signal path from input/oscillators to output converters, or DSP engine. You MUST include an authoritative, richly styled Mermaid diagram (```mermaid ... ```) showing signal flow, knob routing, or patch architecture. NEVER use raw ASCII art boxes)
+
+## 3. Physical Control Walkthrough & Menu Navigation
+(Exact knob names, button combinations, secondary shift-functions, and display menu paths)
+
+## 4. Hybrid Studio Rig Integration (Apollo, Mackie & Midihub)
+(Explicit step-by-step instructions on patching and routing into the Mackie 1202 mixer, UAD Apollo Twin audio interface, and Blokas Midihub MIDI matrix)
+
+## 5. Hands-On Hardware Lab & Calibration
+(A concrete 15-minute patching/calibration exercise with verification steps and auditory checks)
+
+## 6. Technician Advice & Common Traps
+(Highlight the #1 mistake users make with this unit, ground loop / gain staging warnings, and maintenance tips)"""
+                elif domain == "languages":
+                    structure_text = f"""Structure:
+# {title}
+
+## 1. The Linguistic Challenge & The "Why"
+(Plain-English exposition of the communicative problem, demystifying linguistic jargon, and explaining why this concept is vital for natural fluency, framed specifically for a native Czech speaker)
+
+## 2. Phonetic & Grammatical Mechanics (Czech Contrastive Framework)
+(Deep narrative exposition dissecting the phonetic articulation, morphological declension, or syntactic word order. Contrast directly against Czech patterns, highlighting Slavic false friends and common traps. You MUST include an authoritative Mermaid diagram (```mermaid ... ```) illustrating the grammatical decision tree or phonological map)
+
+## 3. Authentic Conversational Dialogues & Contexts
+(Rich, realistic colloquial and professional dialogues demonstrating the concept in action with side-by-side translations and register notes)
+
+## 4. Guided Spoken & Written Lab
+(Concrete 15-minute active recall exercise, minimal pair drills, and sentence reconstruction tasks)
+
+## 5. Linguist Advice & Slavic Native Traps
+(Highlight the #1 mistake Czech speakers make with this concept and mnemonic tricks to internalize native pronunciation and syntax)"""
+                else:
+                    structure_text = f"""Structure:
+# {title}
+
+## 1. Enterprise Problem & Architectural Foundations
+(Deep narrative exposition establishing theoretical grounding, problem space, and official documentation invariants)
+
+## 2. Core Architecture & Mechanics
+(Dissect internal data structures, daemon lifecycles, or execution models. You MUST include an authoritative, richly styled Mermaid diagram (```mermaid ... ```) showing component topology, dataflow, or state transitions)
+
+## 3. Step-by-Step Command Walkthrough & Configuration
+(Exact CLI commands, configuration stanzas, and verification procedures with detailed explanations of flags and parameters)
+
+## 4. Guided Hands-On Lab
+(A concrete hands-on terminal exercise with verification commands, expected outputs, and triage steps)
+
+## 5. Administrator Pro-Tips & Production Hardening
+(Production guidelines, common gotchas, and security/performance hardening recommendations)"""
+
                 lesson_prompt = f"""Write {title} for the masterclass curriculum on '{subtopic_title}'.
 Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
 
@@ -145,24 +469,11 @@ CRITICAL RELEVANCE & ANTI-BLEED MANDATE:
 - Focus 80% on actionable, hands-on practitioner execution, physical/software mechanics, and authentic workflows for '{subtopic_title}' in '{category_title}'.
 - STRICT TOOLCHAIN ISOLATION: Utilize ONLY tools, software, instruments, and concepts native to '{category_title}'. ABSOLUTELY NEVER mention bpftool, eBPF, Linux kernel tracing, or unrelated software boilerplate in arts, music, visual media, or business topics.
 
-Structure:
-# {title}
-
-## 1. First-Principles Intuition & Invariants
-(Deep narrative exposition establishing theoretical grounding, problem space, and core invariants)
-
-## 2. Core Architecture & Mechanics
-(Dissect internal data structures, signal paths, physical mechanics, or execution models. You MUST include an authoritative, richly styled Mermaid diagram (```mermaid ... ```) showing component topology, dataflow, or state transitions. NEVER use raw ASCII art boxes)
-
-## 3. High-Performance Optimization & Failure Modes
-(Workflow optimization, resource scaling, boundary edge cases, and failure mitigations)
-
-## 4. Summary & Verification Matrix
-(Conclude with a comprehensive 4-6 row Markdown table summarizing governing invariants, mechanisms, diagnostic criteria, and failure modes)
+{structure_text}
 
 CRITICAL BUDGETING & TERMINAL INVARIANT:
-- Budget your response to approximately 2,800 to 3,500 words so that all 4 numbered sections are completely and cleanly finished BEFORE reaching output limits.
-- ABSOLUTELY NEVER cut off mid-sentence. You MUST cleanly conclude Section 3 and provide the complete final Summary & Verification Matrix with valid terminal punctuation.
+- Budget your response to approximately 2,800 to 3,500 words so that all sections and the final mentor rules are completely and cleanly finished BEFORE reaching output limits.
+- ABSOLUTELY NEVER cut off mid-sentence. You MUST cleanly conclude with valid terminal punctuation.
 Remember: Write in rich, continuous book prose like an O'Reilly or MIT Press author. Avoid lazy bullet point lists.
 Output publication-grade Markdown only."""
 
@@ -207,7 +518,7 @@ def generate_topic_parallel(
         workers = cluster.get_parallel_workers()
 
     scoping_prov = (workers[0][2] if workers else fallback_provider)
-    modules = scope_topic_curriculum(domain, category, subtopic_id, subtopic_title, scoping_provider=scoping_prov)
+    modules = scope_topic_curriculum(domain, category, subtopic_id, subtopic_title, subtopic_dir=subtopic_dir, scoping_provider=scoping_prov)
 
     tasks_to_run = []
     results = {}
@@ -249,12 +560,15 @@ def generate_topic_parallel(
             for attempt in range(1, 4):
                 try:
                     with _LLM_SEMAPHORE:
-                        content = active_provider.generate(mod_item["prompt"], system_instruction=system_instruction)
-                    validated = validate_generation_output(content)
+                        content = active_provider.generate(mod_item["prompt"], system_instruction=system_instruction, max_tokens=8192)
+                    validated = validate_lesson_completeness(content)
                     elapsed = time.time() - t0
-                    print(f"          [✔] [{active_label:9s}] Drafted {mod_item['filename']} in {elapsed:.1f}s", flush=True)
+                    w_count = len(validated.split())
+                    kb_size = len(validated.encode("utf-8")) / 1024
+                    print(f"          [✔] [{active_label:10s}] Drafted {mod_item['filename']} ({w_count} words, {kb_size:.1f} KB) in {elapsed:.1f}s", flush=True)
                     return mod_item["filename"], True, validated, mod_item, active_label, w_host, elapsed, None
                 except Exception as e:
+                    print(f"          [!] [{active_label:10s}] Quality Gate Reject on {mod_item['filename']} (Attempt {attempt}/3): {e}", flush=True)
                     # Gateway failover: if active provider fails and fallback is available, failover immediately
                     if fallback_provider and active_provider != fallback_provider:
                         print(f"          [!] [{active_label:9s}] Gateway error on {mod_item['filename']}: {e}. Failing over to backup gateway...", flush=True)
@@ -396,16 +710,60 @@ def generate_subtopic_content(
     workers = None
     vnaipro_key = os.environ.get("VNAIPRO_API_KEY")
     vnaipro_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app")
+    vnaipro_key_2 = os.environ.get("VNAIPRO_API_KEY_2")
+    vnaipro_key_3 = os.environ.get("VNAIPRO_API_KEY_3")
+    vnaipro_key_4 = os.environ.get("VNAIPRO_API_KEY_4")
 
     if vnaipro_key:
-        # High-throughput parallel pool with VNAIPRO:
         workers = []
-        p_vnaipro = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key, model="claude-sonnet-5")
-        
-        # Deploy triple-redundancy on VNAIPRO gateways
-        workers.append(("VNAIPRO-1", "claude-sonnet-5", p_vnaipro))
-        workers.append(("VNAIPRO-2", "claude-sonnet-5", p_vnaipro))
-        workers.append(("VNAIPRO-3", "claude-sonnet-5", p_vnaipro))
+        p_vnaipro_1 = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key, model="claude-sonnet-5")
+        p_vnaipro_2 = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key_2, model="claude-sonnet-5") if vnaipro_key_2 else p_vnaipro_1
+        p_vnaipro_3 = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key_3, model="claude-sonnet-5") if vnaipro_key_3 else None
+        p_vnaipro_4 = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key_4, model="claude-sonnet-5") if vnaipro_key_4 else None
+
+        if p_vnaipro_4:
+            # 4-Key Architecture: Deploy 11 parallel workers across 4 keys (3 on Key 1, 3 on Key 2, 3 on Key 3, 2 on Key 4)
+            workers.append(("VNAIPRO-A1", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-B1", "claude-sonnet-5", p_vnaipro_2))
+            workers.append(("VNAIPRO-C1", "claude-sonnet-5", p_vnaipro_3))
+            workers.append(("VNAIPRO-D1", "claude-sonnet-5", p_vnaipro_4))
+            workers.append(("VNAIPRO-A2", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-B2", "claude-sonnet-5", p_vnaipro_2))
+            workers.append(("VNAIPRO-C2", "claude-sonnet-5", p_vnaipro_3))
+            workers.append(("VNAIPRO-D2", "claude-sonnet-5", p_vnaipro_4))
+            workers.append(("VNAIPRO-A3", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-B3", "claude-sonnet-5", p_vnaipro_2))
+            workers.append(("VNAIPRO-C3", "claude-sonnet-5", p_vnaipro_3))
+        elif p_vnaipro_3:
+            # 3-Key Architecture: Deploy 11 parallel workers across 3 keys (4 on Key 1, 4 on Key 2, 3 on Key 3)
+            # This drafts all 10 lessons + 1 lab simultaneously in a single wave!
+            workers.append(("VNAIPRO-A1", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-B1", "claude-sonnet-5", p_vnaipro_2))
+            workers.append(("VNAIPRO-C1", "claude-sonnet-5", p_vnaipro_3))
+            workers.append(("VNAIPRO-A2", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-B2", "claude-sonnet-5", p_vnaipro_2))
+            workers.append(("VNAIPRO-C2", "claude-sonnet-5", p_vnaipro_3))
+            workers.append(("VNAIPRO-A3", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-B3", "claude-sonnet-5", p_vnaipro_2))
+            workers.append(("VNAIPRO-C3", "claude-sonnet-5", p_vnaipro_3))
+            workers.append(("VNAIPRO-A4", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-B4", "claude-sonnet-5", p_vnaipro_2))
+        elif vnaipro_key_2:
+            # 2-Key Architecture: Deploy 8 parallel workers (4 on Key 1, 4 on Key 2 = fast 2 waves)
+            workers.append(("VNAIPRO-A1", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-B1", "claude-sonnet-5", p_vnaipro_2))
+            workers.append(("VNAIPRO-A2", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-B2", "claude-sonnet-5", p_vnaipro_2))
+            workers.append(("VNAIPRO-A3", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-B3", "claude-sonnet-5", p_vnaipro_2))
+            workers.append(("VNAIPRO-A4", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-B4", "claude-sonnet-5", p_vnaipro_2))
+        else:
+            # Single-Key Architecture: Deploy 4 parallel workers safely on the active key
+            workers.append(("VNAIPRO-1", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-2", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-3", "claude-sonnet-5", p_vnaipro_1))
+            workers.append(("VNAIPRO-4", "claude-sonnet-5", p_vnaipro_1))
     elif provider:
         p_model = getattr(provider, "model", "custom")
         workers = [(p_model, p_model, provider)]

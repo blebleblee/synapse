@@ -80,7 +80,9 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/ws/terminal?env=${env}`;
+    const token = localStorage.getItem('synapse_auth_token');
+    const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
+    const wsUrl = `${protocol}//${host}/ws/terminal?env=${env}${tokenParam}`;
 
     const ws = new WebSocket(wsUrl);
     ws.binaryType = 'arraybuffer';

@@ -14,9 +14,62 @@ process.title = 'Synapse Workbench';
 app.name = 'Synapse Workbench';
 app.setName('Synapse Workbench');
 
+// Prevent unhandled EPIPE crashes when launched as a GUI app without a terminal
+if (process.stdout) {
+  process.stdout.on('error', (err) => {
+    if (err && err.code === 'EPIPE') return;
+  });
+}
+if (process.stderr) {
+  process.stderr.on('error', (err) => {
+    if (err && err.code === 'EPIPE') return;
+  });
+}
+
+process.on('uncaughtException', (err) => {
+  if (err && (err.code === 'EPIPE' || err.message?.includes('EPIPE'))) {
+    return;
+  }
+  try {
+    console.error('[UncaughtException]', err);
+  } catch (_) {}
+});
+
+let logStream = null;
+const origLog = console.log;
+const origError = console.error;
+
+console.log = function (...args) {
+  if (logStream) {
+    try {
+      logStream.write(`[LOG ${new Date().toISOString()}] ${args.join(' ')}\n`);
+    } catch (_) {}
+  }
+  try {
+    origLog.apply(console, args);
+  } catch (err) {
+    if (err && err.code === 'EPIPE') return;
+  }
+};
+
+console.error = function (...args) {
+  if (logStream) {
+    try {
+      logStream.write(`[ERR ${new Date().toISOString()}] ${args.join(' ')}\n`);
+    } catch (_) {}
+  }
+  try {
+    origError.apply(console, args);
+  } catch (err) {
+    if (err && err.code === 'EPIPE') return;
+  }
+};
+
 let mainWindow = null;
 let backendProcess = null;
 let isQuitting = false;
+let lastBackendError = '';
+let activeWorkspaceDir = '';
 
 const BACKEND_PORT = process.env.SYNAPSE_PORT || 8000;
 const BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
@@ -25,16 +78,43 @@ const WORKSPACE_ROOT = path.resolve(__dirname, '../../..');
 /**
  * Checks if the Synapse FastAPI backend is responsive.
  */
-function checkBackendHealth(timeoutMs = 1500) {
+function checkBackendHealth(timeoutMs = 4000) {
   return new Promise((resolve) => {
-    const req = http.get(`${BACKEND_URL}/api/status`, { timeout: timeoutMs }, (res) => {
-      resolve(res.statusCode === 200);
-    });
-    req.on('error', () => resolve(false));
-    req.on('timeout', () => {
-      req.destroy();
-      resolve(false);
-    });
+    const urls = [
+      `http://127.0.0.1:${BACKEND_PORT}/api/health`,
+      `http://localhost:${BACKEND_PORT}/api/health`,
+      `http://127.0.0.1:${BACKEND_PORT}/api/status`,
+    ];
+
+    let settled = false;
+    let attemptsLeft = urls.length;
+
+    for (const url of urls) {
+      try {
+        const req = http.get(url, { timeout: timeoutMs }, (res) => {
+          res.resume();
+          if (!settled && res.statusCode === 200) {
+            settled = true;
+            resolve(true);
+          } else {
+            attemptsLeft -= 1;
+            if (attemptsLeft === 0 && !settled) resolve(false);
+          }
+        });
+        req.on('error', () => {
+          attemptsLeft -= 1;
+          if (attemptsLeft === 0 && !settled) resolve(false);
+        });
+        req.on('timeout', () => {
+          req.destroy();
+          attemptsLeft -= 1;
+          if (attemptsLeft === 0 && !settled) resolve(false);
+        });
+      } catch (_) {
+        attemptsLeft -= 1;
+        if (attemptsLeft === 0 && !settled) resolve(false);
+      }
+    }
   });
 }
 
@@ -51,29 +131,57 @@ async function ensureBackendRunning() {
   console.log(`[Desktop] Spawning local Synapse backend service on port ${BACKEND_PORT}...`);
 
   const isWin = process.platform === 'win32';
-  const exeName = isWin ? 'synapse.exe' : 'synapse';
-
-  // Candidate paths for standalone portable binary sidecar
-  const candidateBins = [
-    path.join(process.resourcesPath || '', 'bin', exeName),
-    path.join(process.resourcesPath || '', exeName),
-    path.join(path.dirname(process.execPath), 'bin', exeName),
-    path.join(path.dirname(process.execPath), exeName),
-    path.join(WORKSPACE_ROOT, 'dist', 'bin', exeName),
-  ];
-
   let spawnCmd = null;
-  let spawnArgs = ['serve', '--port', String(BACKEND_PORT)];
+  let spawnArgs = null;
 
-  for (const binPath of candidateBins) {
-    if (fs.existsSync(binPath)) {
-      spawnCmd = binPath;
-      console.log(`[Desktop] Found standalone backend sidecar: ${spawnCmd}`);
-      break;
+  // 1. On Windows, prioritize bundled embedded Python runtime (resources/python/python.exe)
+  if (isWin) {
+    const candidatePythons = [
+      path.join(process.resourcesPath || '', 'python', 'python.exe'),
+      path.join(path.dirname(process.execPath), 'python', 'python.exe'),
+      path.join(path.dirname(process.execPath), 'resources', 'python', 'python.exe'),
+      path.join(WORKSPACE_ROOT, 'dist', 'python-win', 'python.exe'),
+    ];
+
+    for (const pyPath of candidatePythons) {
+      if (fs.existsSync(pyPath)) {
+        spawnCmd = pyPath;
+        spawnArgs = ['-m', 'learning_engine.cli', 'serve', '--port', String(BACKEND_PORT)];
+        console.log(`[Desktop] Found bundled embedded Windows Python sidecar: ${spawnCmd}`);
+        break;
+      }
     }
   }
 
-  // Fallback to Python venv in development mode
+  // 2. On macOS/Linux (or Windows if standalone PyInstaller binary is present), check compiled sidecar
+  if (!spawnCmd) {
+    const exeName = isWin ? 'synapse.exe' : 'synapse';
+    const candidateBins = [
+      path.join(process.resourcesPath || '', 'bin', exeName),
+      path.join(process.resourcesPath || '', exeName),
+      path.join(path.dirname(process.execPath), 'bin', exeName),
+      path.join(path.dirname(process.execPath), exeName),
+      path.join(WORKSPACE_ROOT, 'dist', 'bin', exeName),
+    ];
+
+    for (const binPath of candidateBins) {
+      if (fs.existsSync(binPath)) {
+        try {
+          if (fs.statSync(binPath).size > 1024 * 1024) {
+            spawnCmd = binPath;
+            spawnArgs = ['serve', '--port', String(BACKEND_PORT)];
+            if (process.platform !== 'win32') {
+              try { fs.chmodSync(spawnCmd, 0o755); } catch (_) {}
+            }
+            console.log(`[Desktop] Found standalone backend sidecar: ${spawnCmd}`);
+            break;
+          }
+        } catch (_) {}
+      }
+    }
+  }
+
+  // 3. Fallback to Python venv in development mode
   if (!spawnCmd) {
     const pythonBin = isWin
       ? path.join(WORKSPACE_ROOT, '.venv', 'Scripts', 'python.exe')
@@ -89,51 +197,105 @@ async function ensureBackendRunning() {
     }
   }
 
-  // Resolve external addon topics directory next to portable executable or workspace
-  const portableTopics = path.join(path.dirname(process.execPath), 'topics');
-  const topicsDir = fs.existsSync(portableTopics)
-    ? portableTopics
-    : path.join(WORKSPACE_ROOT, 'topics');
+  // Resolve persistent writable workspace and topics directories
+  let workspaceDir;
+  let topicsDir;
+
+  const isDev = !app.isPackaged;
+  if (isDev && fs.existsSync(path.join(WORKSPACE_ROOT, 'topics'))) {
+    workspaceDir = WORKSPACE_ROOT;
+    topicsDir = path.join(WORKSPACE_ROOT, 'topics');
+  } else {
+    const portableBase = process.env.PORTABLE_EXECUTABLE_DIR || path.dirname(process.execPath);
+    const portableTopics = path.join(portableBase, 'topics');
+
+    if (process.platform === 'win32' && (fs.existsSync(portableTopics) || process.env.PORTABLE_EXECUTABLE_DIR)) {
+      workspaceDir = portableBase;
+      topicsDir = portableTopics;
+    } else {
+      const userData = app.getPath('userData');
+      workspaceDir = userData;
+      topicsDir = path.join(userData, 'topics');
+    }
+  }
+
+  try {
+    fs.mkdirSync(topicsDir, { recursive: true });
+    fs.mkdirSync(path.join(workspaceDir, 'data'), { recursive: true });
+    fs.mkdirSync(path.join(workspaceDir, 'exports', 'packages'), { recursive: true });
+  } catch (err) {
+    console.error('[Desktop] Failed to prepare workspace directories:', err);
+  }
+
+  activeWorkspaceDir = workspaceDir;
+  const logFile = path.join(workspaceDir, 'backend.log');
+  if (!logStream) {
+    try {
+      logStream = fs.createWriteStream(logFile, { flags: 'a' });
+    } catch (_) {}
+  }
 
   const spawnEnv = {
     ...process.env,
     PYTHONUNBUFFERED: '1',
-    SYNAPSE_WORKSPACE: path.dirname(process.execPath),
+    SYNAPSE_WORKSPACE: workspaceDir,
     SYNAPSE_TOPICS_DIR: topicsDir,
+    SYNAPSE_RESOURCES_PATH: process.resourcesPath || '',
   };
+
+  if (spawnCmd) {
+    const pyDir = path.dirname(spawnCmd);
+    const sitePkgs = path.join(pyDir, 'site-packages');
+    const pathSep = isWin ? ';' : ':';
+    spawnEnv.PATH = `${pyDir}${pathSep}${path.join(pyDir, 'Scripts')}${pathSep}${process.env.PATH || ''}`;
+    spawnEnv.PYTHONPATH = `${sitePkgs}${pathSep}${pyDir}${pathSep}${process.env.PYTHONPATH || ''}`;
+  }
 
   try {
     backendProcess = spawn(spawnCmd, spawnArgs, {
-      cwd: path.dirname(process.execPath),
+      cwd: workspaceDir,
       env: spawnEnv,
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: false,
     });
 
     backendProcess.stdout.on('data', (data) => {
-      console.log(`[Backend stdout] ${data.toString().trim()}`);
+      const msg = data.toString().trim();
+      console.log(`[Backend stdout] ${msg}`);
     });
 
     backendProcess.stderr.on('data', (data) => {
-      console.error(`[Backend stderr] ${data.toString().trim()}`);
+      const msg = data.toString().trim();
+      console.error(`[Backend stderr] ${msg}`);
+      lastBackendError = (lastBackendError + '\n' + msg).slice(-1500);
     });
 
     backendProcess.on('exit', (code, signal) => {
       console.log(`[Desktop] Backend process exited with code ${code}, signal ${signal}`);
+      if (code !== 0 && code !== null) {
+        lastBackendError = (lastBackendError + `\nProcess exited with code ${code}`).slice(-1500);
+      }
       backendProcess = null;
     });
 
-    // Poll until backend is online (up to 20 seconds)
+    // Poll until backend is online (up to 45 seconds on cold launch)
     const startTime = Date.now();
-    while (Date.now() - startTime < 20000) {
-      await new Promise((r) => setTimeout(r, 600));
+    while (Date.now() - startTime < 45000) {
+      await new Promise((r) => setTimeout(r, 800));
       if (await checkBackendHealth()) {
         console.log(`[Desktop] Synapse backend online and verified at ${BACKEND_URL}`);
         return true;
       }
+      if (!backendProcess) {
+        break;
+      }
     }
 
     console.error('[Desktop] Backend failed to start within timeout');
+    if (fs.existsSync(logFile)) {
+      const lastLogs = fs.readFileSync(logFile, 'utf8').split('\n').slice(-20).join('\n');
+      console.error(`[Desktop] Recent backend log output:\n${lastLogs}`);
+    }
     return false;
   } catch (err) {
     console.error('[Desktop] Failed to spawn backend process:', err);
@@ -322,9 +484,11 @@ app.whenReady().then(async () => {
 
   const ready = await ensureBackendRunning();
   if (!ready) {
+    const detail = lastBackendError.trim() || 'Backend process exited prematurely or timed out waiting for http://127.0.0.1:8000/api/status.';
+    const logPath = path.join(activeWorkspaceDir || app.getPath('userData'), 'backend.log');
     dialog.showErrorBox(
       'Backend Launch Error',
-      'Synapse backend service could not be started. Ensure python and dependencies are installed in .venv.'
+      `Synapse backend service could not be started.\n\nDiagnostic Output:\n${detail}\n\nLog file location:\n${logPath}`
     );
   }
 

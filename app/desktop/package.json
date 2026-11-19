@@ -1,7 +1,7 @@
 {
   "name": "synapse-desktop",
   "productName": "Synapse Workbench",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Synapse AI Learning Workbench - Standalone Native Desktop Shell",
   "main": "src/main.js",
   "scripts": {
@@ -43,7 +43,9 @@
         "zip"
       ],
       "hardenedRuntime": true,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
     },
     "win": {
       "target": [
@@ -54,13 +56,28 @@
     "portable": {
       "artifactName": "Synapse-Workbench-Portable-${version}.exe"
     },
+    "afterPack": "scripts/after-pack.js",
     "extraResources": [
       {
         "from": "../../dist/bin",
         "to": "bin",
         "filter": [
-          "synapse*",
-          "synapse.exe"
+          "synapse*"
+        ]
+      },
+      {
+        "from": "../../dist/python-win",
+        "to": "python"
+      },
+      {
+        "from": "../../app/frontend/dist",
+        "to": "frontend/dist"
+      },
+      {
+        "from": "../../exports/packages",
+        "to": "packages",
+        "filter": [
+          "*.synpack"
         ]
       }
     ],

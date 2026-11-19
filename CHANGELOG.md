@@ -7,18 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.1.1] - 2026-11-19
 
-### Features & Enhancements
-* **Terminal Independence (Windows Starvation Fix):** Refactored FastAPI LLM streaming (`/api/chat` and `/api/translate`) to use background thread queues (`asyncio.Queue` + `asyncio.to_thread`), fully unblocking the asynchronous event loop and eliminating PTY starvation during model inference on Windows.
-* **Translation UI & External Endpoints:** 
-  * Added direct Language Flag switchers (🇬🇧 / 🇨🇿 / 🇩🇪 / 🇪🇸) to the `LessonViewer` toolbar. Toggling flags instantaneously applies Socratic Mentor system-prompt language shifts and section translations.
-  * Added `anthropic_api_key` and `anthropic_base_url` persistence to `SettingsModal` (`POST /api/settings`), allowing Claude Sonnet/Opus to power long-context translation and chat tasks without requiring environment variables.
-* **Private SynPack Architecture & Custom Registries:**
-  * Enabled dynamic Gitea custom package repository fetching via the `SYNAPSE_PACKAGE_REGISTRY` environment variable, enabling private cloud distribution of corporate masterclasses.
-  * Extracted safe `install_topic_pack` non-destructive merge logic, creating automatic backups in `exports/backups/<domain>_<timestamp>` before extracting into the active workspace.
-  * Extended Python CLI interface (`cli.py`) with complete `pack` subsystem: `synapse pack install`, `synapse pack list`, and `synapse pack uninstall`.
-* **Cross-Runtime Workspace Alignment:** Redefined data path hierarchy in `security.py` to default safely to `~/.synapse` instead of the local working directory (unless launched directly within a development git repository). This guarantees the WebUI (`synapse serve`), electron desktop apps, and standalone binaries share the same active `topics/` directory and progress database by default.
+### Summary
+Maintenance and security release introducing instance-level password protection for cloud/VPS web deployments, non-blocking asynchronous terminal streaming on Windows, integrated multi-language toolbar flag toggling, and private SynPack curriculum distribution support.
+
+---
+
+### Key Features & Enhancements
+
+#### 1. Hosted Instance Protection & Authentication
+* **Zero-Dependency Instance Auth (`learning_engine/auth.py`):** Added optional instance password protection via `SYNAPSE_PASSWORD` (or `SYNAPSE_AUTH_PASSWORD`). When unset, Synapse operates in open single-user mode for seamless local development and desktop use.
+* **Persistent Signed HMAC Tokens:** Implemented 30-day signed bearer tokens stored in browser `localStorage` and verified against a persistent SQLite secret.
+* **Secured Terminal & APIs:** Integrated FastAPI HTTP middleware blocking unauthenticated `/api/*` endpoints with `401 Unauthorized`, and secured the `/ws/terminal` PTY WebSocket with connection-time token validation.
+* **Brute-Force Rate Limiting:** Enforced IP-based rate limiting (5 failed attempts per 60 seconds) with constant-time password comparison (`hmac.compare_digest`).
+* **Sleek React Login Modal:** Built an in-app authentication card (`LoginModal.tsx`) with automatic 401 interception and instant unlock/lock mechanics.
+
+#### 2. Terminal Independence & Windows PTY Starvation Fix
+* **Async Queue Streaming:** Refactored LLM chunk streaming in `/api/chat` and `/api/translate` to execute through a background thread queue (`asyncio.Queue` + `asyncio.to_thread`).
+* **Zero Event Loop Blocking:** Completely unblocked the FastAPI asyncio event loop during model generation, resolving shell input lag and keystroke freezes on Windows.
+
+#### 3. Translation UI & External Endpoint Routing
+* **Reader Toolbar Language Switcher:** Added a one-click Quick Language Switcher to the `LessonViewer` toolbar (`🌐 EN ▾` with 🇬🇧 English, 🇨🇿 Čeština, 🇩🇪 Deutsch, 🇪🇸 Español).
+* **Unified AI & Content Shift:** Toggling flags immediately updates both the active lesson translation and the Socratic Mentor conversational prompt language.
+* **Cloud API Key Persistence:** Updated `SettingsModal` (`POST /api/settings`) and `models.py` to persist and prioritize Anthropic Claude and Gemini API keys and custom gateway URLs directly in SQLite.
+
+#### 4. Private SynPacks & Addon Workflows
+* **CLI Package Subsystem:** Added the `synapse pack` CLI command suite (`install`, `list`, `uninstall`) for air-gapped and headless package management.
+* **Private Gitea Registry Support:** Enabled downloading `.synpack` archives from custom endpoints via `SYNAPSE_PACKAGE_REGISTRY` with optional bearer token authorization (`SYNAPSE_PACKAGE_TOKEN`).
+* **Non-Destructive Backups:** Automated pre-extraction backups into `exports/backups/<domain>_<timestamp>` when installing an updated package over an existing domain directory.
+* **Unified Cross-Runtime Workspace:** Aligned `learning_engine/security.py` to default safely to `~/.synapse` for all desktop, standalone binary, and web server runtimes, ensuring shared curriculum sources and mastery progress out of the box.
 
 ---
 

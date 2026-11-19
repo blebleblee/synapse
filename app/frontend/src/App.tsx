@@ -7,6 +7,7 @@ import { SearchModal } from './components/SearchModal';
 import { GraphModal } from './components/GraphModal';
 import { SettingsModal, DEFAULT_SETTINGS, type AppSettings } from './components/SettingsModal';
 import { FlashcardStudyModal } from './components/FlashcardStudyModal';
+import { LoginModal } from './components/LoginModal';
 import type { TerminalDrawerHandle } from './components/TerminalDrawer';
 import type { TopicTreeData, TopicDetails, ChatMessage, WorkspaceStatus, QuizQuestion } from './types';
 import './App.css';
@@ -34,6 +35,23 @@ export function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState<'appearance' | 'cluster' | 'models' | 'store'>('appearance');
   const [flashcardModalOpen, setFlashcardModalOpen] = useState(false);
+  const [authRequired, setAuthRequired] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+
+  const checkAuth = useCallback(async () => {
+    try {
+      const res = await fetch('/api/auth/status');
+      if (res.ok) {
+        const data = await res.json();
+        setAuthRequired(Boolean(data.auth_required));
+        setIsAuthenticated(Boolean(data.authenticated));
+        return !data.auth_required || Boolean(data.authenticated);
+      }
+    } catch {
+      // ignore
+    }
+    return true;
+  }, []);
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
       const saved = localStorage.getItem('synapse_app_settings');
@@ -143,9 +161,33 @@ export function App() {
   };
 
   useEffect(() => {
+    const initApp = async () => {
+      const ok = await checkAuth();
+      if (ok) {
+        fetchTree();
+        fetchStatus();
+      }
+    };
+    initApp();
+
+    const handleUnauthorized = () => {
+      setIsAuthenticated(false);
+      setAuthRequired(true);
+    };
+    window.addEventListener('synapse:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('synapse:unauthorized', handleUnauthorized);
+  }, [checkAuth]);
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
     fetchTree();
     fetchStatus();
-  }, []);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('synapse_auth_token');
+    setIsAuthenticated(false);
+  };
 
   const handleGenerate = async (query: string, force = false, level = currentLevel) => {
     setIsGenerating(true);
@@ -634,6 +676,7 @@ export function App() {
         onDeleteTopic={handleDeleteTopic}
         onRenameTopic={handleRenameTopic}
         onToggleLessonCompletion={handleToggleLessonCompletion}
+        onLogout={authRequired ? handleLogout : undefined}
         targetLanguage={settings.language}
       />
 
@@ -702,10 +745,18 @@ export function App() {
 
       <SettingsModal
         isOpen={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
+        onClose={() => {
+          setSettingsOpen(false);
+          fetchTree();
+          fetchStatus();
+        }}
         settings={settings}
         onSaveSettings={handleSaveSettings}
         initialTab={settingsTab}
+        onTreeChange={() => {
+          fetchTree();
+          fetchStatus();
+        }}
       />
 
       <FlashcardStudyModal
@@ -713,6 +764,11 @@ export function App() {
         onClose={() => setFlashcardModalOpen(false)}
         topicPath={selectedPath || ''}
         topicTitle={topicDetails?.subtopic.replace(/_/g, ' ') || 'Flashcard Deck'}
+      />
+
+      <LoginModal
+        isOpen={authRequired && !isAuthenticated}
+        onLoginSuccess={handleLoginSuccess}
       />
     </div>
   );

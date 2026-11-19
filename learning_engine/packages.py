@@ -201,8 +201,8 @@ def resolve_or_download_pack(domain: str) -> Path:
         remote_urls.append(f"{custom_registry.rstrip('/')}/{domain}.synpack")
         
     remote_urls.extend([
-        f"https://github.com/blebleblee/synapse/releases/download/v1.1.0/{domain}.synpack",
-        f"https://gitea.2464.cz/ai/synapse/releases/download/v1.1.0/{domain}.synpack",
+        f"https://github.com/blebleblee/synapse/releases/download/v1.1.1/{domain}.synpack",
+        f"https://gitea.2464.cz/ai/synapse/releases/download/v1.1.1/{domain}.synpack",
     ])
 
     import urllib.request
@@ -210,7 +210,7 @@ def resolve_or_download_pack(domain: str) -> Path:
     for url in remote_urls:
         try:
             print(f"[*] Downloading curriculum pack for '{domain}' from {url}...")
-            req = urllib.request.Request(url, headers={"User-Agent": "Synapse-Workbench/1.1.0"})
+            req = urllib.request.Request(url, headers={"User-Agent": "Synapse-Workbench/1.1.1"})
             
             # Allow basic token auth for private registries if provided
             if "github.com" not in url.lower() and os.environ.get("SYNAPSE_PACKAGE_TOKEN"):
