@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Features & Enhancements
+* **Terminal Independence (Windows Starvation Fix):** Refactored FastAPI LLM streaming (`/api/chat` and `/api/translate`) to use background thread queues (`asyncio.Queue` + `asyncio.to_thread`), fully unblocking the asynchronous event loop and eliminating PTY starvation during model inference on Windows.
+* **Translation UI & External Endpoints:** 
+  * Added direct Language Flag switchers (🇬🇧 / 🇨🇿 / 🇩🇪 / 🇪🇸) to the `LessonViewer` toolbar. Toggling flags instantaneously applies Socratic Mentor system-prompt language shifts and section translations.
+  * Added `anthropic_api_key` and `anthropic_base_url` persistence to `SettingsModal` (`POST /api/settings`), allowing Claude Sonnet/Opus to power long-context translation and chat tasks without requiring environment variables.
+* **Private SynPack Architecture & Custom Registries:**
+  * Enabled dynamic Gitea custom package repository fetching via the `SYNAPSE_PACKAGE_REGISTRY` environment variable, enabling private cloud distribution of corporate masterclasses.
+  * Extracted safe `install_topic_pack` non-destructive merge logic, creating automatic backups in `exports/backups/<domain>_<timestamp>` before extracting into the active workspace.
+  * Extended Python CLI interface (`cli.py`) with complete `pack` subsystem: `synapse pack install`, `synapse pack list`, and `synapse pack uninstall`.
+* **Cross-Runtime Workspace Alignment:** Redefined data path hierarchy in `security.py` to default safely to `~/.synapse` instead of the local working directory (unless launched directly within a development git repository). This guarantees the WebUI (`synapse serve`), electron desktop apps, and standalone binaries share the same active `topics/` directory and progress database by default.
+
+---
+
 ## [1.1.0] - 2026-11-16
 
 ### Summary
