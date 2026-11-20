@@ -162,7 +162,9 @@ async def lifespan(app: FastAPI):
     except Exception:
         pass
 
-app = FastAPI(title="AI Learning Workbench Backend", version="1.2.0", lifespan=lifespan)
+from learning_engine.version import __version__
+
+app = FastAPI(title="AI Learning Workbench Backend", version=__version__, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -298,7 +300,7 @@ def api_login(req: LoginRequest, request: Request):
 
 @app.get("/api/health")
 def get_health():
-    return {"status": "ok", "app": "synapse-backend", "version": "1.1.1"}
+    return {"status": "ok", "app": "synapse-backend", "version": __version__}
 
 @app.get("/api/status")
 def get_status():
@@ -1545,17 +1547,14 @@ async def terminal_websocket(websocket: WebSocket):
 
     env_type = websocket.query_params.get("env", "host")
 
+    # Determine default terminal working directory (user's home directory by default)
+    term_cwd = Path.home()
+    if not term_cwd.exists():
+        term_cwd = WORKSPACE_ROOT
+
     pty_available = HAS_POSIX_PTY
-    winpty_available = False
     master = -1
     slave = -1
-
-    if sys.platform == "win32":
-        try:
-            import winpty
-            winpty_available = True
-        except ImportError:
-            winpty_available = False
 
     if HAS_POSIX_PTY and sys.platform != "win32":
         try:
@@ -1573,58 +1572,59 @@ async def terminal_websocket(websocket: WebSocket):
         except OSError:
             pty_available = False
 
-    if winpty_available and sys.platform == "win32":
-        import winpty
-        shell = os.environ.get("COMSPEC", "powershell.exe")
-        proc = winpty.PTY(80, 24)
-        proc.spawn(shell)
-        
-        notice = "\r\n\x1b[1;32m[i] Connected to Synapse Windows ConPTY Shell\x1b[0m\r\n"
-        await websocket.send_text(notice)
+    if sys.platform == "win32":
+        try:
+            from winpty import PtyProcess
+            shell = os.environ.get("COMSPEC", "cmd.exe")
+            proc = PtyProcess.spawn([shell], cwd=str(term_cwd), dimensions=(24, 80))
+            notice = "\r\n\x1b[1;32m[i] Connected to Synapse Windows ConPTY Shell\x1b[0m\r\n"
+            await websocket.send_text(notice)
 
-        async def winpty_read_loop():
+            async def winpty_read_loop():
+                try:
+                    while proc.isalive():
+                        data = await asyncio.to_thread(proc.read, 1024)
+                        if data:
+                            b_data = data.encode("utf-8", errors="replace")
+                            append_terminal_bytes(b_data)
+                            await websocket.send_bytes(b_data)
+                        else:
+                            await asyncio.sleep(0.01)
+                except Exception:
+                    pass
+
+            pipe_task = asyncio.create_task(winpty_read_loop())
             try:
                 while True:
-                    data = await asyncio.to_thread(proc.read, 1024, True)
-                    if not data:
-                        await asyncio.sleep(0.01)
-                        continue
-                    b_data = data.encode("utf-8", errors="replace")
-                    append_terminal_bytes(b_data)
-                    await websocket.send_bytes(b_data)
-            except Exception:
+                    msg = await websocket.receive()
+                    if "text" in msg and msg["text"]:
+                        text = msg["text"]
+                        if text.startswith("{") and "cols" in text:
+                            try:
+                                dim = json.loads(text)
+                                proc.set_winsize(dim.get("rows", 24), dim.get("cols", 80))
+                            except Exception:
+                                pass
+                            continue
+                        proc.write(text)
+                    elif "bytes" in msg and msg["bytes"]:
+                        proc.write(msg["bytes"].decode("utf-8", errors="replace"))
+            except WebSocketDisconnect:
                 pass
+            finally:
+                pipe_task.cancel()
+                try:
+                    proc.close()
+                except Exception:
+                    pass
+            return
+        except Exception as winpty_err:
+            print(f"[!] WinPTY unavailable or failed: {winpty_err}. Using fallback pipe bridge.")
 
-        pipe_task = asyncio.create_task(winpty_read_loop())
-        try:
-            while True:
-                msg = await websocket.receive()
-                if "text" in msg and msg["text"]:
-                    text = msg["text"]
-                    if text.startswith("{") and "cols" in text:
-                        try:
-                            dim = json.loads(text)
-                            proc.set_size(dim.get("cols", 80), dim.get("rows", 24))
-                        except Exception:
-                            pass
-                        continue
-                    proc.write(text)
-                elif "bytes" in msg and msg["bytes"]:
-                    proc.write(msg["bytes"].decode("utf-8", errors="replace"))
-        except WebSocketDisconnect:
-            pass
-        finally:
-            pipe_task.cancel()
-            try:
-                del proc
-            except Exception:
-                pass
-        return
-
-    # Resilient Pipe Bridge Fallback if host kern.tty.ptmx_max limit is reached or on Windows without pywinpty
-    if not pty_available:
+    # Resilient Pipe Bridge Fallback if host kern.tty.ptmx_max limit is reached or on Windows
+    if not pty_available or sys.platform == "win32":
         if sys.platform == "win32":
-            shell = os.environ.get("COMSPEC", "powershell.exe")
+            shell = os.environ.get("COMSPEC", "cmd.exe")
             args = []
         else:
             shell = "/bin/bash" if os.path.exists("/bin/bash") else "/bin/sh"
@@ -1635,7 +1635,7 @@ async def terminal_websocket(websocket: WebSocket):
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
-            cwd=str(WORKSPACE_ROOT),
+            cwd=str(term_cwd),
             env=os.environ.copy()
         )
         notice = "\r\n\x1b[1;32m[i] Connected to Synapse Interactive Shell (Cross-Platform Pipe Mode)\x1b[0m\r\n"
@@ -1829,7 +1829,7 @@ async def terminal_websocket(websocket: WebSocket):
         os.dup2(slave, 2)
         os.close(slave)
 
-        os.chdir(str(WORKSPACE_ROOT))
+        os.chdir(str(term_cwd))
         env = os.environ.copy()
         env["TERM"] = "xterm-256color"
         env["ZDOTDIR"] = str(zdot_dir)

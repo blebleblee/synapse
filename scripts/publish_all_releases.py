@@ -2,12 +2,14 @@
 """
 Synapse Multi-Platform Release Publisher for Gitea and GitHub
 Dynamically reads version from VERSION / learning_engine.version.
-Automatically creates releases if they do not yet exist, and synchronizes
-verified binary assets across Gitea and GitHub.
+Automatically creates releases if they do not yet exist, extracts the
+authoritative changelog from CHANGELOG.md, and synchronizes all verified
+binary assets across Gitea and GitHub.
 """
 
 import os
 import sys
+import re
 import shutil
 import subprocess
 import requests
@@ -46,6 +48,18 @@ GITEA_USER = os.environ.get("GITEA_USER", "")
 GITEA_PASS = os.environ.get("GITEA_PASS", "")
 GITEA_REPO = os.environ.get("GITEA_REPO", "ai/synapse")
 GITHUB_REPO = os.environ.get("GITHUB_REPO", "blebleblee/synapse")
+
+def extract_changelog_notes(ver: str) -> str:
+    """Extracts the exact release section for `[ver]` from CHANGELOG.md."""
+    changelog_path = WORKSPACE_ROOT / "CHANGELOG.md"
+    if not changelog_path.exists():
+        return ""
+    content = changelog_path.read_text(encoding="utf-8")
+    pattern = rf"##\s+\[{re.escape(ver)}\][^\n]*\n([\s\S]*?)(?=\n##\s+\[|\Z)"
+    match = re.search(pattern, content)
+    if match:
+        return match.group(1).strip()
+    return ""
 
 def upload_via_curl(url: str, filepath: Path, headers: dict = None, auth: tuple = None, form_field: str = None) -> bool:
     """Robust binary file upload using curl with automated retries and socket resilience."""
@@ -89,30 +103,29 @@ if packages_dir.exists():
 
 def generate_release_body(endpoint_url: str, repo_name: str, is_github: bool = False) -> str:
     dl_base = f"https://github.com/{repo_name}/releases/download/{TAG}" if is_github else f"{endpoint_url.rstrip('/')}/{repo_name}/releases/download/{TAG}"
-    return f"""## Synapse {TAG} Milestone Release
+    notes = extract_changelog_notes(VER)
 
-### 🎓 100% Global Polymath Masterclass Curriculum (1,541 Topics across 21 Domains)
-This milestone release marks the full completion and code-fence normalization of the Synapse curriculum (12,426 lessons and 1,541 operational verification labs, with zero linter errors and zero warnings).
+    body = f"## Synapse {TAG} Release Notes\n\n"
+    if notes:
+        body += f"{notes}\n\n---\n\n"
 
----
+    body += f"""### 📥 Verified Direct Download Links
 
-### 📥 Direct Download Links
-
-#### 1. Application Binaries (macOS & Windows Desktop, Python)
+#### 1. Native Application Binaries (Desktop & Python)
 | Platform / Environment | File Artifact | Direct Download |
 | :--- | :--- | :--- |
 | **macOS Apple Silicon (DMG)** | `Synapse-Workbench-{VER}-arm64.dmg` | [Download .dmg]({dl_base}/Synapse-Workbench-{VER}-arm64.dmg) |
 | **macOS Portable (.zip)** | `Synapse-Workbench-{VER}-arm64.zip` | [Download .zip]({dl_base}/Synapse-Workbench-{VER}-arm64.zip) |
 | **Windows Portable (.exe)** | `Synapse-Workbench-Portable-{VER}.exe` | [Download Portable .exe]({dl_base}/Synapse-Workbench-Portable-{VER}.exe) |
 | **Windows Installer (.exe)** | `Synapse-Workbench-Setup-{VER}.exe` | [Download Installer .exe]({dl_base}/Synapse-Workbench-Setup-{VER}.exe) |
-| **Windows Portable Bundle (.zip)** | `Synapse-Workbench-Portable-{VER}-win-x64.zip` | [Download Portable Zip]({dl_base}/Synapse-Workbench-Portable-{VER}-win-x64.zip) |
+| **Windows Complete Bundle (.zip)** | `Synapse-Workbench-Portable-{VER}-win-x64.zip` | [Download Portable Zip]({dl_base}/Synapse-Workbench-Portable-{VER}-win-x64.zip) |
 | **Python Wheel (.whl)** | `synapse-{VER}-py3-none-any.whl` | [Download .whl]({dl_base}/synapse-{VER}-py3-none-any.whl) |
 | **Python Source (.tar.gz)** | `synapse-{VER}.tar.gz` | [Download .tar.gz]({dl_base}/synapse-{VER}.tar.gz) |
 
 ---
 
 #### 2. Curriculum Package Addons
-| Package | Description | Direct Download |
+| Package | Scope | Direct Download |
 | :--- | :--- | :--- |
 | **`synapse_complete_curriculum.synpack`** | All Core Masterclass Domains | [Download Complete Set]({dl_base}/synapse_complete_curriculum.synpack) |
 | **`computing.synpack`** | Computing & Distributed Systems | [Download computing.synpack]({dl_base}/computing.synpack) |
@@ -135,6 +148,7 @@ This milestone release marks the full completion and code-fence normalization of
 2. Click **Settings ⚙** → **Curriculum Store & Addons**.
 3. Sideload a downloaded `.synpack` file or click **Install** next to any domain to download it automatically.
 """
+    return body
 
 def publish_gitea():
     print("\n" + "=" * 60)
@@ -207,7 +221,7 @@ def publish_gitea():
         json={"body": gitea_body}
     )
     if patch_res.status_code == 200:
-        print("[✔] Updated Gitea release description and download tables.")
+        print("[✔] Synchronized Gitea release notes with CHANGELOG.md.")
     else:
         print(f"[✘] Failed to update Gitea release body: {patch_res.status_code}")
 
@@ -278,6 +292,24 @@ def publish_github():
                 print(f" [✘ Failed: {del_res.status_code}]")
 
         print(f"[*] Uploading '{name}' ({sz_mb:.2f} MB) to GitHub...", end="", flush=True)
+
+        # Prefer gh release upload if available for large files, otherwise curl
+        if shutil.which("gh") and GITHUB_TOKEN:
+            env = os.environ.copy()
+            env["GH_TOKEN"] = GITHUB_TOKEN
+            proc = subprocess.run(
+                ["gh", "release", "upload", TAG, str(path), "--repo", GITHUB_REPO, "--clobber"],
+                env=env,
+                capture_output=True,
+                text=True,
+                timeout=1200
+            )
+            if proc.returncode == 0:
+                print(" [✔ Done (gh)]")
+                continue
+            else:
+                print(f" [gh fallback: {proc.stderr.strip()[:60]}...]", end="", flush=True)
+
         up_headers = {
             "Authorization": f"token {GITHUB_TOKEN}",
             "Content-Type": "application/octet-stream",
@@ -285,7 +317,7 @@ def publish_github():
         }
         target_upload_url = f"{upload_url_base}?name={name}"
         if upload_via_curl(target_upload_url, path, headers=up_headers):
-            print(" [✔ Done]")
+            print(" [✔ Done (curl)]")
         else:
             print(" [✘ Upload Failed]")
 
@@ -296,7 +328,7 @@ def publish_github():
         json={"body": github_body}
     )
     if patch_res.status_code == 200:
-        print("[✔] Updated GitHub release description and download tables.")
+        print("[✔] Synchronized GitHub release notes with CHANGELOG.md.")
     else:
         print(f"[✘] Failed to update GitHub release body: {patch_res.status_code}")
 
