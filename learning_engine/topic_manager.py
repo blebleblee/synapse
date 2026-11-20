@@ -88,7 +88,11 @@ def get_topic_tree(force_refresh: bool = False) -> Dict[str, Any]:
         course_display_names = {}
 
         if syllabus_file.exists():
-            content = syllabus_file.read_text(encoding="utf-8")
+            try:
+                content = syllabus_file.read_text(encoding="utf-8", errors="replace")
+            except Exception:
+                content = ""
+                
             pattern = r"-\s+\*\*(.*?)\*\*\s+\(\`(.*?)/\`\)"
             matches = re.findall(pattern, content)
 

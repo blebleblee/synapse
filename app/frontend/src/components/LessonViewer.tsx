@@ -12,6 +12,8 @@ import {
   Volume2,
   VolumeX,
   Columns,
+  FileText,
+  Globe,
   ChevronLeft,
   ChevronRight,
   MoreHorizontal,
@@ -213,9 +215,20 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     }
   };
 
-  const [bilingualSplit, setBilingualSplit] = useState<boolean>(() => {
-    return localStorage.getItem('synapse_bilingual_split') === 'true';
+  type TranslationViewMode = 'translated' | 'original' | 'split';
+  const [translationViewMode, setTranslationViewMode] = useState<TranslationViewMode>(() => {
+    const saved = localStorage.getItem('synapse_translation_view_mode');
+    if (saved === 'translated' || saved === 'original' || saved === 'split') {
+      return saved;
+    }
+    return 'translated'; // Default to single-column translated view
   });
+
+  const handleSetViewMode = (mode: TranslationViewMode) => {
+    setTranslationViewMode(mode);
+    localStorage.setItem('synapse_translation_view_mode', mode);
+  };
+
   const [dependencies, setDependencies] = useState<{
     prerequisites: { id: string; label: string; domain: string }[];
     unlocks: { id: string; label: string; domain: string }[];
@@ -241,7 +254,13 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     };
   }, [topic?.path]);
 
-  const activeMarkdown = (readingLang !== 'en' && translatedMarkdown) ? translatedMarkdown : rawMarkdown;
+  const activeMarkdown = useMemo(() => {
+    if (readingLang !== 'en') {
+      if (translationViewMode === 'original') return rawMarkdown;
+      return translatedMarkdown || rawMarkdown;
+    }
+    return rawMarkdown;
+  }, [readingLang, translationViewMode, translatedMarkdown, rawMarkdown]);
 
   const handleToggleVoice = () => {
     if (isSpeakingVoice) {
@@ -278,7 +297,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     if (contentRef.current) {
       renderMermaidDiagramsInElement(contentRef.current);
     }
-  }, [htmlContent, originalHtmlContent, translatedHtmlContent, activeTab, bilingualSplit]);
+  }, [htmlContent, originalHtmlContent, translatedHtmlContent, activeTab, translationViewMode]);
 
   const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
@@ -492,7 +511,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
               onClick={() => setLangMenuOpen(!langMenuOpen)}
               title="Change reading language (English is default)"
             >
-              🌐 {isTranslating ? 'Translating...' : readingLang.toUpperCase()} ▾
+              <Globe size={13} />
+              <span>{isTranslating ? 'Translating...' : readingLang.toUpperCase()}</span>
+              <span className="dropdown-arrow">▾</span>
             </button>
             {langMenuOpen && (
               <div className="nav-dropdown-menu language-dropdown">
@@ -509,6 +530,41 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             )}
           </div>
 
+          {/* Translation View Mode Segmented Switcher (Visible when reading in non-English) */}
+          {readingLang !== 'en' && (
+            <div className="translation-view-segmented" role="group" aria-label="Translation View Mode">
+              <button
+                type="button"
+                className={`segmented-btn ${translationViewMode === 'original' ? 'active' : ''}`}
+                onClick={() => handleSetViewMode('original')}
+                title="Single column: Original English"
+              >
+                <FileText size={11} />
+                <span>Original</span>
+              </button>
+              <button
+                type="button"
+                className={`segmented-btn ${translationViewMode === 'translated' ? 'active' : ''}`}
+                onClick={() => handleSetViewMode('translated')}
+                title={`Single column: ${readingLang.toUpperCase()} Translation`}
+              >
+                <Globe size={11} />
+                <span>{readingLang.toUpperCase()}</span>
+              </button>
+              <button
+                type="button"
+                className={`segmented-btn ${translationViewMode === 'split' ? 'active' : ''}`}
+                onClick={() => handleSetViewMode('split')}
+                title="Dual column: Original & Translation Side-by-Side"
+              >
+                <Columns size={11} />
+                <span>Dual</span>
+              </button>
+            </div>
+          )}
+
+          <div className="nav-action-divider" />
+
           {/* 1. Audio Reader */}
           <button
             className={`nav-action-btn ${isSpeakingVoice ? 'active-voice' : ''}`}
@@ -516,7 +572,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             disabled={!rawMarkdown}
             title={isSpeakingVoice ? 'Stop audio playback' : 'Listen to this section (Speech Synthesis)'}
           >
-            {isSpeakingVoice ? <VolumeX size={12} className="voice-pulse" /> : <Volume2 size={12} />}
+            {isSpeakingVoice ? <VolumeX size={13} className="voice-pulse" /> : <Volume2 size={13} />}
             <span>{isSpeakingVoice ? 'Stop' : 'Listen'}</span>
           </button>
 
@@ -526,7 +582,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             onClick={onOpenFlashcards}
             title="Interactive in-app spaced repetition flashcards"
           >
-            <Layers size={12} />
+            <Layers size={13} />
             <span>Flashcards</span>
           </button>
 
@@ -541,8 +597,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
               }}
               title="Export curriculum documents and flashcards"
             >
-              <Download size={12} />
-              <span>Export ▾</span>
+              <Download size={13} />
+              <span>Export</span>
+              <span className="dropdown-arrow">▾</span>
             </button>
             {exportMenuOpen && (
               <div className="nav-dropdown-menu">
@@ -595,24 +652,10 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
               }}
               title="More options and maintenance"
             >
-              <MoreHorizontal size={13} />
+              <MoreHorizontal size={14} />
             </button>
             {optionsMenuOpen && (
               <div className="nav-dropdown-menu right-aligned">
-                {targetLanguage && targetLanguage !== 'en' && (
-                  <button
-                    className="dropdown-item"
-                    onClick={() => {
-                      setOptionsMenuOpen(false);
-                      const next = !bilingualSplit;
-                      setBilingualSplit(next);
-                      localStorage.setItem('synapse_bilingual_split', String(next));
-                    }}
-                  >
-                    <Columns size={13} />
-                    <span>{bilingualSplit ? 'Single Column View' : 'Side-by-Side Dual View'}</span>
-                  </button>
-                )}
                 {topic.summary && (
                   <button
                     className="dropdown-item"
@@ -758,7 +801,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             <h3>{activeTab === 'labs' ? 'Labs not yet generated' : `Content not yet generated`}</h3>
             <p>You can generate this unit using the action button in the top right.</p>
           </div>
-        ) : bilingualSplit && readingLang && readingLang !== 'en' ? (
+        ) : readingLang !== 'en' && translationViewMode === 'split' ? (
           <div className="bilingual-split-container">
             <div className="bilingual-col original">
               <div className="bilingual-col-header">
@@ -816,7 +859,13 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             )}
             <article
               className="markdown-body"
-              dangerouslySetInnerHTML={{ __html: htmlContent }}
+              dangerouslySetInnerHTML={{
+                __html: readingLang !== 'en' && translationViewMode === 'original'
+                  ? originalHtmlContent
+                  : readingLang !== 'en' && translationViewMode === 'translated' && translatedHtmlContent
+                    ? translatedHtmlContent
+                    : htmlContent
+              }}
             />
           </div>
         )}

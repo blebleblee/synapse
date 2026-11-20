@@ -288,7 +288,7 @@ def api_login(req: LoginRequest, request: Request):
 
 @app.get("/api/health")
 def get_health():
-    return {"status": "ok", "app": "synapse-backend"}
+    return {"status": "ok", "app": "synapse-backend", "version": "1.1.1"}
 
 @app.get("/api/status")
 def get_status():
@@ -1559,7 +1559,19 @@ async def terminal_websocket(websocket: WebSocket):
                     text = msg["text"]
                     if text.startswith("{") and "cols" in text:
                         continue
-                    proc.stdin.write(text.encode("utf-8"))
+                    
+                    if sys.platform == "win32":
+                        # Echo back for visual feedback since we lack a PTY
+                        # and map carriage return to CRLF for cmd/powershell
+                        if text == "\r":
+                            await websocket.send_text("\r\n")
+                            proc.stdin.write(b"\r\n")
+                        else:
+                            await websocket.send_text(text)
+                            proc.stdin.write(text.encode("utf-8"))
+                    else:
+                        proc.stdin.write(text.encode("utf-8"))
+                        
                     await proc.stdin.drain()
         except WebSocketDisconnect:
             pass

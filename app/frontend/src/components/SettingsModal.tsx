@@ -1154,6 +1154,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <Coffee size={14} />
               <span>Buy Me a Coffee</span>
             </a>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Version: 1.1.1</span>
 
             <div style={{ display: 'flex', gap: '8px' }}>
               <button type="button" className="btn-secondary" onClick={onClose}>

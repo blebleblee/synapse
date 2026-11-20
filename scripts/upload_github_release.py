@@ -12,6 +12,21 @@ from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
+# Load external user credentials from outside the codebase
+def _load_external_env():
+    user_env = Path.home() / ".config" / "synapse" / "env"
+    if user_env.exists():
+        for line in user_env.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                k = k.strip()
+                v = v.strip().strip("'\"")
+                if k and k not in os.environ:
+                    os.environ[k] = v
+
+_load_external_env()
+
 ASSETS = [
     WORKSPACE_ROOT / "exports/packages/synapse_complete_curriculum.synpack",
     WORKSPACE_ROOT / "exports/packages/computing.synpack",

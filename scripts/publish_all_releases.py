@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Synapse v1.1.0 Release Publisher for Gitea and GitHub
-Updates and synchronizes verified binary assets for v1.1.0:
+Synapse v1.1.1 Release Publisher for Gitea and GitHub
+Updates and synchronizes verified binary assets for v1.1.1:
 1. macOS DMG & ZIP (with bundled Python sidecar, all curriculum SynPacks, sealed ad-hoc signature, and zero-EPIPE logger)
-2. Windows Portable Single-File Executable (Synapse-Workbench-Portable-1.1.0.exe, embedded ffmpeg.dll, NSIS self-contained)
+2. Windows Portable Single-File Executable (Synapse-Workbench-Portable-1.1.1.exe, embedded ffmpeg.dll, NSIS self-contained)
 3. Windows Portable ZIP Bundle (with pre-loaded topics) and 1-Click Installer Setup
 4. Updates release descriptions on both platforms with direct download links.
 """
@@ -11,10 +11,49 @@ Updates and synchronizes verified binary assets for v1.1.0:
 import os
 import sys
 import time
+import shutil
+import subprocess
 import requests
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+
+# Load external user credentials from outside the codebase
+def _load_external_env():
+    user_env = Path.home() / ".config" / "synapse" / "env"
+    if user_env.exists():
+        for line in user_env.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                k = k.strip()
+                v = v.strip().strip("'\"")
+                if k and k not in os.environ:
+                    os.environ[k] = v
+
+_load_external_env()
+
+def upload_via_curl(url: str, filepath: Path, headers: dict = None, auth: tuple = None, form_field: str = None) -> bool:
+    """Robust binary file upload using curl with automated retries and socket resilience."""
+    cmd = ["curl", "-sS", "-X", "POST", "--retry", "3", "--retry-delay", "2", "-w", "\n%{http_code}"]
+    if headers:
+        for k, v in headers.items():
+            cmd.extend(["-H", f"{k}: {v}"])
+    if auth:
+        cmd.extend(["-u", f"{auth[0]}:{auth[1]}"])
+    if form_field:
+        cmd.extend(["-F", f"{form_field}=@{filepath}"])
+    else:
+        cmd.extend(["--data-binary", f"@{filepath}"])
+    cmd.append(url)
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=900)
+        output_lines = [l.strip() for l in proc.stdout.strip().splitlines() if l.strip()]
+        http_code = output_lines[-1] if output_lines else ""
+        return proc.returncode == 0 and http_code in ["200", "201"]
+    except Exception as e:
+        print(f" [curl err: {e}]", end="")
+        return False
 
 # Credentials
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
@@ -58,12 +97,12 @@ def publish_gitea():
     existing_assets = {a["name"]: a["id"] for a in rel_data.get("assets", [])}
 
     gitea_targets = [
-        ("Synapse-Workbench-Portable-1.1.0.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.0.exe"]),
-        ("Synapse-Workbench-Setup-1.1.0.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Setup-1.1.0.exe"]),
-        ("Synapse-Workbench-Portable-1.1.0-win-x64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.0-win-x64.zip"]),
+        ("Synapse-Workbench-Portable-1.1.1.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.1.exe"]),
+        ("Synapse-Workbench-Setup-1.1.1.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Setup-1.1.1.exe"]),
+        ("Synapse-Workbench-Portable-1.1.1-win-x64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.1-win-x64.zip"]),
         ("Synapse-Portable-Windows.zip", ASSETS_TO_PUBLISH["Synapse-Portable-Windows.zip"]),
-        ("Synapse Workbench-1.1.0-arm64.dmg", ASSETS_TO_PUBLISH["Synapse Workbench-1.1.0-arm64.dmg"]),
-        ("Synapse Workbench-1.1.0-arm64-mac.zip", ASSETS_TO_PUBLISH["Synapse Workbench-1.1.0-arm64-mac.zip"]),
+        ("Synapse-Workbench-1.1.1-arm64.dmg", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64.dmg"]),
+        ("Synapse-Workbench-1.1.1-arm64-mac.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64-mac.zip"]),
     ]
 
     existing_asset_sizes = {a["name"]: a["size"] for a in rel_data.get("assets", [])}
@@ -89,31 +128,12 @@ def publish_gitea():
                 print(f" [✘ Failed: {del_res.status_code}]")
 
         print(f"[*] Uploading '{name}' ({sz_mb:.2f} MB) to Gitea...", end="", flush=True)
-        uploaded = False
-        for attempt in range(1, 4):
-            try:
-                with open(path, "rb") as f:
-                    up_res = requests.post(
-                        assets_url,
-                        auth=auth,
-                        files={"attachment": (name, f)},
-                        params={"name": name},
-                        timeout=900
-                    )
-                    if up_res.status_code in [200, 201]:
-                        print(" [✔ Done]")
-                        uploaded = True
-                        break
-                    else:
-                        print(f" [Retry {attempt}: {up_res.status_code}]", end="", flush=True)
-            except Exception as e:
-                print(f" [Retry {attempt}: {e}]", end="", flush=True)
-                time.sleep(2)
-
-        if not uploaded:
+        if upload_via_curl(assets_url, path, auth=auth, form_field="attachment"):
+            print(" [✔ Done]")
+        else:
             print(" [✘ Upload Failed]")
 
-    gitea_body = f"""## Synapse v1.1.0 Milestone Release
+    gitea_body = f"""## Synapse v1.1.1 Milestone Release
 
 ### 🎓 100% Global Curriculum Complete (539 Topics across 12 Domains)
 This milestone release marks the full completion of the Synapse masterclass curriculum spanning 2,945 lessons and operational labs, with 3,172 vector Mermaid.js diagrams and full KaTeX math formatting.
@@ -132,13 +152,13 @@ This milestone release marks the full completion of the Synapse masterclass curr
 #### 2. Application Binaries (Desktop & Python)
 | Platform / Environment | File Artifact | Size | Direct Download |
 | :--- | :--- | :---: | :--- |
-| **Windows Portable (.exe)** | `Synapse-Workbench-Portable-1.1.0.exe` | 163.2 MB | [Download Portable .exe]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.0.exe) |
-| **Windows Installer (.exe)** | `Synapse-Workbench-Setup-1.1.0.exe` | 163.2 MB | [Download Installer .exe]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Setup-1.1.0.exe) |
-| **Windows Portable Bundle (.zip)** | `Synapse-Workbench-Portable-1.1.0-win-x64.zip` | 363.1 MB | [Download Portable Zip]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.0-win-x64.zip) |
-| **macOS Apple Silicon (DMG)** | `Synapse Workbench-1.1.0-arm64.dmg` | 190.0 MB | [Download .dmg]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse%20Workbench-1.1.0-arm64.dmg) |
-| **macOS Portable (.zip)** | `Synapse Workbench-1.1.0-arm64-mac.zip` | 186.2 MB | [Download .zip]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse%20Workbench-1.1.0-arm64-mac.zip) |
-| **Python Wheel (.whl)** | `synapse-1.1.0-py3-none-any.whl` | 76 KB | [Download .whl]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/synapse-1.1.0-py3-none-any.whl) |
-| **Python Source (.tar.gz)** | `synapse-1.1.0.tar.gz` | 84 KB | [Download .tar.gz]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/synapse-1.1.0.tar.gz) |
+| **Windows Portable (.exe)** | `Synapse-Workbench-Portable-1.1.1.exe` | 163.2 MB | [Download Portable .exe]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.1.exe) |
+| **Windows Installer (.exe)** | `Synapse-Workbench-Setup-1.1.1.exe` | 163.2 MB | [Download Installer .exe]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Setup-1.1.1.exe) |
+| **Windows Portable Bundle (.zip)** | `Synapse-Workbench-Portable-1.1.1-win-x64.zip` | 363.1 MB | [Download Portable Zip]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.1-win-x64.zip) |
+| **macOS Apple Silicon (DMG)** | `Synapse-Workbench-1.1.1-arm64.dmg` | 190.0 MB | [Download .dmg]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse%20Workbench-1.1.1-arm64.dmg) |
+| **macOS Portable (.zip)** | `Synapse-Workbench-1.1.1-arm64-mac.zip` | 186.2 MB | [Download .zip]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse%20Workbench-1.1.1-arm64-mac.zip) |
+| **Python Wheel (.whl)** | `synapse-1.1.1-py3-none-any.whl` | 76 KB | [Download .whl]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/synapse-1.1.1-py3-none-any.whl) |
+| **Python Source (.tar.gz)** | `synapse-1.1.1.tar.gz` | 84 KB | [Download .tar.gz]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/synapse-1.1.1.tar.gz) |
 
 ---
 
@@ -203,12 +223,12 @@ def publish_github():
     existing_asset_sizes = {a["name"]: a["size"] for a in rel_data.get("assets", [])}
 
     github_targets = [
-        ("Synapse-Workbench-Portable-1.1.0.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.0.exe"]),
-        ("Synapse-Workbench-Setup-1.1.0.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Setup-1.1.0.exe"]),
-        ("Synapse-Workbench-Portable-1.1.0-win-x64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.0-win-x64.zip"]),
+        ("Synapse-Workbench-Portable-1.1.1.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.1.exe"]),
+        ("Synapse-Workbench-Setup-1.1.1.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Setup-1.1.1.exe"]),
+        ("Synapse-Workbench-Portable-1.1.1-win-x64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.1-win-x64.zip"]),
         ("Synapse-Portable-Windows.zip", ASSETS_TO_PUBLISH["Synapse-Portable-Windows.zip"]),
-        ("Synapse.Workbench-1.1.0-arm64.dmg", ASSETS_TO_PUBLISH["Synapse.Workbench-1.1.0-arm64.dmg"]),
-        ("Synapse.Workbench-1.1.0-arm64-mac.zip", ASSETS_TO_PUBLISH["Synapse.Workbench-1.1.0-arm64-mac.zip"]),
+        ("Synapse-Workbench-1.1.1-arm64.dmg", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64.dmg"]),
+        ("Synapse-Workbench-1.1.1-arm64-mac.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64-mac.zip"]),
     ]
 
     for name, path in github_targets:
@@ -235,37 +255,32 @@ def publish_github():
                 print(f" [✘ Failed: {del_res.status_code}]")
 
         print(f"[*] Uploading '{name}' ({sz_mb:.2f} MB) to GitHub...", end="", flush=True)
-        up_headers = {
-            "Authorization": f"Bearer {GITHUB_TOKEN}",
-            "Content-Type": "application/octet-stream",
-            "Content-Length": str(sz_bytes),
-            "Accept": "application/vnd.github+json"
-        }
-        uploaded = False
-        for attempt in range(1, 4):
-            try:
-                with open(path, "rb") as f:
-                    up_res = requests.post(
-                        upload_url_base,
-                        headers=up_headers,
-                        params={"name": name},
-                        data=f,
-                        timeout=900
-                    )
-                    if up_res.status_code in [200, 201]:
-                        print(" [✔ Done]")
-                        uploaded = True
-                        break
-                    else:
-                        print(f" [Retry {attempt}: {up_res.status_code}]", end="", flush=True)
-            except Exception as e:
-                print(f" [Retry {attempt}: {e}]", end="", flush=True)
-                time.sleep(2)
+        if shutil.which("gh") and GITHUB_TOKEN:
+            env = os.environ.copy()
+            env["GH_TOKEN"] = GITHUB_TOKEN
+            proc = subprocess.run(
+                ["gh", "release", "upload", TAG, str(path), "--repo", GITHUB_REPO, "--clobber"],
+                env=env,
+                capture_output=True,
+                text=True
+            )
+            if proc.returncode == 0:
+                print(" [✔ Done]")
+            else:
+                print(f" [✘ Upload Failed: {proc.stderr.strip()}]")
+        else:
+            up_headers = {
+                "Authorization": f"Bearer {GITHUB_TOKEN}",
+                "Content-Type": "application/octet-stream",
+                "Accept": "application/vnd.github+json"
+            }
+            target_upload_url = f"{upload_url_base}?name={name}"
+            if upload_via_curl(target_upload_url, path, headers=up_headers):
+                print(" [✔ Done]")
+            else:
+                print(" [✘ Upload Failed]")
 
-        if not uploaded:
-            print(" [✘ Upload Failed]")
-
-    github_body = f"""## Synapse v1.1.0 Milestone Release
+    github_body = f"""## Synapse v1.1.1 Milestone Release
 
 ### 🎓 100% Global Curriculum Complete (539 Topics across 12 Domains)
 This milestone release marks the full completion of the Synapse masterclass curriculum spanning 2,945 lessons and operational labs, with 3,172 vector Mermaid.js diagrams and full KaTeX math formatting.
@@ -284,13 +299,13 @@ This milestone release marks the full completion of the Synapse masterclass curr
 #### 2. Application Binaries (Desktop & Python)
 | Platform / Environment | File Artifact | Size | Direct Download |
 | :--- | :--- | :---: | :--- |
-| **Windows Portable (.exe)** | `Synapse-Workbench-Portable-1.1.0.exe` | 163.2 MB | [Download Portable .exe](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.0.exe) |
-| **Windows Installer (.exe)** | `Synapse-Workbench-Setup-1.1.0.exe` | 163.2 MB | [Download Installer .exe](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-Setup-1.1.0.exe) |
-| **Windows Portable Bundle (.zip)** | `Synapse-Workbench-Portable-1.1.0-win-x64.zip` | 363.1 MB | [Download Portable Zip](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.0-win-x64.zip) |
-| **macOS Apple Silicon (DMG)** | `Synapse.Workbench-1.1.0-arm64.dmg` | 190.0 MB | [Download .dmg](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse.Workbench-1.1.0-arm64.dmg) |
-| **macOS Portable (.zip)** | `Synapse.Workbench-1.1.0-arm64-mac.zip` | 186.2 MB | [Download .zip](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse.Workbench-1.1.0-arm64-mac.zip) |
-| **Python Wheel (.whl)** | `synapse-1.1.0-py3-none-any.whl` | 76 KB | [Download .whl](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/synapse-1.1.0-py3-none-any.whl) |
-| **Python Source (.tar.gz)** | `synapse-1.1.0.tar.gz` | 84 KB | [Download .tar.gz](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/synapse-1.1.0.tar.gz) |
+| **Windows Portable (.exe)** | `Synapse-Workbench-Portable-1.1.1.exe` | 163.2 MB | [Download Portable .exe](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.1.exe) |
+| **Windows Installer (.exe)** | `Synapse-Workbench-Setup-1.1.1.exe` | 163.2 MB | [Download Installer .exe](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-Setup-1.1.1.exe) |
+| **Windows Portable Bundle (.zip)** | `Synapse-Workbench-Portable-1.1.1-win-x64.zip` | 363.1 MB | [Download Portable Zip](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.1-win-x64.zip) |
+| **macOS Apple Silicon (DMG)** | `Synapse-Workbench-1.1.1-arm64.dmg` | 190.0 MB | [Download .dmg](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-1.1.1-arm64.dmg) |
+| **macOS Portable (.zip)** | `Synapse-Workbench-1.1.1-arm64-mac.zip` | 186.2 MB | [Download .zip](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-1.1.1-arm64-mac.zip) |
+| **Python Wheel (.whl)** | `synapse-1.1.1-py3-none-any.whl` | 76 KB | [Download .whl](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/synapse-1.1.1-py3-none-any.whl) |
+| **Python Source (.tar.gz)** | `synapse-1.1.1.tar.gz` | 84 KB | [Download .tar.gz](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/synapse-1.1.1.tar.gz) |
 
 ---
 
@@ -331,7 +346,7 @@ This milestone release marks the full completion of the Synapse masterclass curr
 
 def main():
     print("=" * 60)
-    print(" SYNAPSE v1.1.0 MULTI-PLATFORM RELEASE PUBLISHER")
+    print(" SYNAPSE v1.1.1 MULTI-PLATFORM RELEASE PUBLISHER")
     print("=" * 60)
 
     ok_gitea = publish_gitea()

@@ -12,6 +12,21 @@ from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
+# Load external user credentials from outside the codebase
+def _load_external_env():
+    user_env = Path.home() / ".config" / "synapse" / "env"
+    if user_env.exists():
+        for line in user_env.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                k = k.strip()
+                v = v.strip().strip("'\"")
+                if k and k not in os.environ:
+                    os.environ[k] = v
+
+_load_external_env()
+
 ASSETS = [
     WORKSPACE_ROOT / "exports/packages/synapse_complete_curriculum.synpack",
     WORKSPACE_ROOT / "exports/packages/computing.synpack",
@@ -38,8 +53,8 @@ def main():
     parser = argparse.ArgumentParser(description="Upload Synapse v1.1.1 Release Assets to Gitea")
     parser.add_argument("--url", default=os.environ.get("GITEA_URL", "https://gitea.2464.cz"), help="Gitea instance URL")
     parser.add_argument("--token", default=os.environ.get("GITEA_TOKEN"), help="Gitea Personal Access Token")
-    parser.add_argument("--user", default=os.environ.get("GITEA_USER", "ai"), help="Gitea username")
-    parser.add_argument("--password", default=os.environ.get("GITEA_PASS", "Linux123."), help="Gitea password")
+    parser.add_argument("--user", default=os.environ.get("GITEA_USER", ""), help="Gitea username")
+    parser.add_argument("--password", default=os.environ.get("GITEA_PASS", ""), help="Gitea password")
     parser.add_argument("--repo", default=os.environ.get("GITEA_REPO", "ai/synapse"), help="Target Gitea repo (default: ai/synapse)")
     parser.add_argument("--tag", default="v1.1.1", help="Release tag (default: v1.1.1)")
     args = parser.parse_args()

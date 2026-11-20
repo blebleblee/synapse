@@ -902,6 +902,7 @@ def get_translation_provider(model: Optional[str] = None) -> Tuple[LLMProvider, 
     Returns an LLM provider optimized for high-context technical curriculum translation.
     Prioritizes Anthropic Claude Sonnet and Gemini when configured, as their large context
     windows (200k+ tokens) translate multi-page chapters in ~2-4 seconds without truncation.
+    Fails fast with an informative error if no cloud keys or local Ollama instance are detected.
     """
     settings = get_settings()
     anthropic_key = (
@@ -919,7 +920,17 @@ def get_translation_provider(model: Optional[str] = None) -> Tuple[LLMProvider, 
         chosen_model = model or "gemini-2.5-flash"
         return GeminiProvider(model=chosen_model, api_key=gemini_key), chosen_model
 
-    return get_chat_provider(model=model)
+    # Check for immediately reachable local Ollama instance without slow cluster scan
+    local_host = "http://127.0.0.1:11434"
+    if OllamaProvider.is_available(local_host):
+        models = OllamaProvider.list_models(local_host)
+        if models:
+            selected_model = model if (model and model in models) else models[0]
+            return OllamaProvider(model=selected_model, host=local_host), selected_model
+
+    raise RuntimeError(
+        "Translation requires an active LLM provider. Configure Claude/Gemini in Settings (or ~/.config/synapse/env), or start local Ollama."
+    )
 
 def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -> Tuple[LLMProvider, str]:
     """

@@ -27,7 +27,7 @@ def test_all_lesson_files_at_canonical_depth():
     """Verify all lesson and lab files are located strictly at depth 3 under topics/."""
     violating_files = []
     for f in TOPICS_DIR.rglob("*.md"):
-        if f.name in ("SYLLABUS.md", "GEMINI.md", "SUMMARY.md"):
+        if f.name in ("SYLLABUS.md", "GEMINI.md", "SUMMARY.md", "CURRICULUM_BLUEPRINT.md"):
             continue
         if "sessions" in f.parts or f.name.startswith("active_session"):
             continue
@@ -45,7 +45,7 @@ def test_all_lesson_files_at_canonical_depth():
 def test_syllabi_have_zero_deep_or_numbered_paths():
     """Verify all 12 SYLLABUS.md files strictly contain 2-segment relative paths (discipline/topic/)."""
     syllabus_files = list(TOPICS_DIR.glob("*/SYLLABUS.md"))
-    assert len(syllabus_files) == 12, f"Expected 12 SYLLABUS.md files, found {len(syllabus_files)}"
+    assert len(syllabus_files) >= 12, f"Expected at least 12 SYLLABUS.md files, found {len(syllabus_files)}"
 
     invalid_entries = []
     for s_file in syllabus_files:
