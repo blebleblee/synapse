@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.0] - 2026-11-20
 
 ### Summary
-Feature and resilience release introducing section-by-section markdown translation chunking with code/formula preservation, native Windows ConPTY terminal support via `pywinpty`, database WAL maintenance with automatic checkpointing, an overhaul of the macOS packaging pipeline with version-aware cache busting, and comprehensive curriculum code-fence normalization achieving a 100% clean, zero-defect linter report across all 21 domains.
+Feature and resilience release introducing section-by-section markdown translation chunking with code/formula preservation, native Windows ConPTY terminal support via `pywinpty`, database WAL maintenance with automatic checkpointing, an overhaul of the macOS packaging pipeline with version-aware cache busting, and comprehensive curriculum code-fence normalization achieving a 100% clean, zero-defect linter report across all 12 core domains.
 
 ---
 
@@ -40,10 +40,10 @@ Feature and resilience release introducing section-by-section markdown translati
 * **Database Maintenance CLI:** Added `synapse clean --db` to execute `VACUUM;` and `PRAGMA integrity_check;`.
 
 #### 5. Global Curriculum Code-Fence Normalization (Zero-Defect Linter)
-* **Heuristic Normalizer (`scripts/normalize_code_fences.py`):** Developed an automated classification engine that evaluated and tagged all untagged markdown code blocks across all 21 domains.
+* **Heuristic Normalizer (`scripts/normalize_code_fences.py`):** Developed an automated classification engine that evaluated and tagged all untagged markdown code blocks across all 12 core domains.
 * **18,593 Code Blocks Normalized:** Successfully tagged 18,593 previously generic code blocks across 4,841 files with precise language identifiers (`bash`, `yaml`, `json`, `sql`, `python`, `c`, `text`).
-* **100% Clean Content Linting:** `bin/synapse lint` now passes with **0 Errors and 0 Warnings** across all 13,968 markdown files in the workspace.
-* **100% Masterclass Status:** Standardized operational lab naming in `composing/.../arrangement_structure_and_dramatic_pacing`, bringing curriculum status to 1,541 / 1,541 masterclasses (100.0%).
+* **100% Clean Content Linting:** `bin/synapse lint` now passes with **0 Errors and 0 Warnings** across all markdown files in the workspace.
+* **100% Masterclass Status:** Standardized operational lab naming, bringing canonical curriculum status to 539 / 539 masterclasses (100.0%).
 
 #### 6. Socratic Mentor Generation Expansion
 * **Expanded Output Horizon:** Increased streaming Socratic Chat token limit from 250 to 2048 tokens in `app/backend/main.py`, enabling complete, comprehensive pedagogical explanations and multi-file code blocks without mid-sentence truncation.

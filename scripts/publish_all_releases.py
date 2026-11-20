@@ -95,11 +95,19 @@ ASSETS_TO_PUBLISH = {
     f"synapse-{VER}.tar.gz": WORKSPACE_ROOT / f"dist/python/synapse-{VER}.tar.gz",
 }
 
-# Add SynPacks if present
+# Add SynPacks if present (strictly whitelisted to public core domains)
+CORE_SYNPACKS = {
+    "synapse_complete_curriculum.synpack",
+    "computing.synpack", "arts.synpack", "crafts.synpack", "business.synpack",
+    "engineering.synpack", "motorsports.synpack", "formal_sciences.synpack",
+    "humanities.synpack", "languages.synpack", "economics.synpack",
+    "natural_sciences.synpack", "health_sciences.synpack"
+}
 packages_dir = WORKSPACE_ROOT / "exports" / "packages"
 if packages_dir.exists():
     for synpack in packages_dir.glob("*.synpack"):
-        ASSETS_TO_PUBLISH[synpack.name] = synpack
+        if synpack.name in CORE_SYNPACKS:
+            ASSETS_TO_PUBLISH[synpack.name] = synpack
 
 def generate_release_body(endpoint_url: str, repo_name: str, is_github: bool = False) -> str:
     dl_base = f"https://github.com/{repo_name}/releases/download/{TAG}" if is_github else f"{endpoint_url.rstrip('/')}/{repo_name}/releases/download/{TAG}"

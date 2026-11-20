@@ -63,7 +63,19 @@
           "from": "../../exports/packages",
           "to": "packages",
           "filter": [
-            "*.synpack"
+            "synapse_complete_curriculum.synpack",
+            "computing.synpack",
+            "arts.synpack",
+            "crafts.synpack",
+            "business.synpack",
+            "engineering.synpack",
+            "motorsports.synpack",
+            "formal_sciences.synpack",
+            "humanities.synpack",
+            "languages.synpack",
+            "economics.synpack",
+            "natural_sciences.synpack",
+            "health_sciences.synpack"
           ]
         }
       ]
@@ -86,7 +98,19 @@
           "from": "../../exports/packages",
           "to": "packages",
           "filter": [
-            "*.synpack"
+            "synapse_complete_curriculum.synpack",
+            "computing.synpack",
+            "arts.synpack",
+            "crafts.synpack",
+            "business.synpack",
+            "engineering.synpack",
+            "motorsports.synpack",
+            "formal_sciences.synpack",
+            "humanities.synpack",
+            "languages.synpack",
+            "economics.synpack",
+            "natural_sciences.synpack",
+            "health_sciences.synpack"
           ]
         }
       ]
