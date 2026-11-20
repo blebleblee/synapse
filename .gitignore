@@ -50,3 +50,24 @@ audit_*.txt
 # Private Local Planning & Task Scratchpads
 BACKLOG.md
 *.backlog.md
+
+# Sideloaded & Private SynPacks (preserve core 12 curriculum domains)
+topics/*/
+!topics/arts/
+!topics/business/
+!topics/computing/
+!topics/crafts/
+!topics/economics/
+!topics/engineering/
+!topics/formal_sciences/
+!topics/health_sciences/
+!topics/humanities/
+!topics/languages/
+!topics/motorsports/
+!topics/natural_sciences/
+
+# Private SynPack blueprints & sideloaded language tracks
+topics/**/CURRICULUM_BLUEPRINT.md
+topics/languages/czech/
+topics/languages/english/
+topics/languages/german/
