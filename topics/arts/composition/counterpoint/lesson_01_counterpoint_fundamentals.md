@@ -125,7 +125,7 @@ graph TD
 
 **Hands-on test for parallel fifths.** Play this at the keyboard slowly, listening specifically for the moment the two voices seem to "collapse":
 
-```
+```text
 Right hand (CP):  C4  D4
 Left hand (CF):   F3  G3
 Interval:         5th  5th   <- ILLEGAL, play it and listen for the fusion
@@ -133,7 +133,7 @@ Interval:         5th  5th   <- ILLEGAL, play it and listen for the fusion
 
 Now play the fix, contrary motion into the same destination fifth:
 
-```
+```text
 Right hand (CP):  B3  C4
 Left hand (CF):   F3  G3
 Interval:         ... voices converge from a sixth into a fifth, from opposite directions
@@ -151,7 +151,7 @@ The suspension is a three-step physical gesture: **prepare (consonant) → hold 
 
 **4-3 suspension drill at the keyboard**, slow tempo (quarter note = 50 BPM):
 
-```
+```text
 Beat:        1 (weak)         2 (strong)         3 (weak, resolution)
 CF (LH):     C                F                   F
 CP (RH):     F  <- prepared   F  <- held/tied,     E  <- step down
@@ -210,7 +210,7 @@ When your own exercise sounds wrong at the keyboard, run this checklist in order
 **Cause:** melodic tritone or augmented second. Play the suspect interval melodically (not harmonically) and try to sing it back.
 **Fix:** insert an intervening step-wise note, or reverse the leap direction so it resolves by step immediately after.
 
-```
+```text
 Failure: Parallel Fifths               Correct: Contrary Motion to Fifth
 RH:  C4  D4                            RH:  C4  B3
 LH:  F3  G3                            LH:  F3  G3
@@ -223,7 +223,7 @@ Int: 5th  5th  <- ILLEGAL              Int: 4th  5th  <- opposite-direction appr
 
 First species, C major, CF in the left hand (lower voice). Rather than show failed attempts and patch them, here is a solution built with motion type decided *before* pitch — which is the practical compositional order: decide what kind of motion you want against each CF note, then pick the pitch that satisfies it.
 
-```
+```text
 Beat:       1    2    3    4    5    6    7    8
 CF (LH):    C4   D4   F4   E4   G4   A4   G4   C4
 CP (RH):    C5   A4   A4   C5   B4   C5   D5   C5
@@ -413,7 +413,7 @@ Goal: instant recognition by beat 20 of the week. Track your error rate daily.
 
 ### Exercise 2 — Fix This by Ear First, Then on Paper
 
-```
+```text
 Beat:      1    2    3    4    5    6
 CF:        D    E    F    G    A    D
 CP:        A    B    C    D    E    A
@@ -424,7 +424,7 @@ Play it exactly as written at the keyboard. You should hear the voices fuse. The
 
 ### Exercise 3 — First-Species Composition, Dorian Cantus Firmus
 
-```
+```text
 CF: D4  E4  F4  A4  G4  F4  E4  D4
 ```
 
@@ -432,7 +432,7 @@ Compose CP above it. Constraints: begin and end on a perfect consonance, approac
 
 ### Exercise 4 — Suspension Chain, Composition and Performance
 
-```
+```text
 CF: G  A  B  C  D  C  B  A  G
 ```
 
@@ -450,7 +450,7 @@ Test against your Exercise 3 solution. Note any false positives caused by enharm
 
 ### Exercise 6 — Five-Species Composition Over One Cantus Firmus
 
-```
+```text
 CF: C  D  E  C  F  E  D  C
 ```
 

@@ -26,7 +26,7 @@ Value mapping begins with identifying the lightest and darkest points in the com
 
 The block-in phase establishes the major planes without modulation. Using broad strokes with the side of a charcoal stick or a flat graphite pencil held at a low angle, the artist masses in the shadow family as a unified silhouette. This shape—the boundary between the light family and shadow family—must read as a coherent, well-designed abstract shape independent of the subject matter. If this shadow shape lacks visual interest or fails to describe the form's major structural features, the drawing will struggle regardless of how refined the rendering becomes. At this stage, the shadow mass should be a single value, typically around value 6 or 7 on a nine-step scale, with no internal variation. The light family remains untouched white paper. This extreme simplification forces clarity about the fundamental form decisions.
 
-```
+```text
 Light Logic Hierarchy:
 
     Light Source
@@ -52,7 +52,7 @@ Planar analysis decomposes organic forms into geometric facets that can be indiv
 
 The gradient exercise provides the fundamental technical skill for value control. Using graphite, the artist creates a smooth transition from value 1 (white paper) to value 9 (maximum pencil pressure) across a rectangular strip, then reverses direction to return to white. This requires understanding how pencil pressure, stroke density, and layering interact to produce darker values. Most beginners cannot produce more than four or five distinct values on first attempt, jumping from light to dark with conspicuous banding. Achieving nine clearly separated values demands learning to hold the pencil at various angles, varying pressure from feather-light to firm, and building darkness gradually through multiple passes rather than attempting to reach target values in a single stroke. This exercise, repeated until smooth transitions become automatic, provides the motor control foundation for volumetric rendering.
 
-```
+```text
 Five-Value Structure (Minimum Viable Form):
 
 Value 1: Highlight          → Specular reflection point

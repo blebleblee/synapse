@@ -52,7 +52,7 @@ The internal architecture of an embedded SQL database like SQLite reveals the la
 
 The B-tree structure organizes data as a balanced tree where each internal node contains keys and pointers to child pages, while leaf nodes store actual row data. SQLite employs a variant called a B+ tree where all data resides in leaf nodes, and internal nodes serve purely as an index. This concentrates sequential scans at the leaf level and increases fan-out in internal nodes, reducing tree height and thus the number of disk seeks required to locate a record. A typical page size of 4KB with 32-bit page numbers allows internal nodes to hold hundreds of child pointers, yielding a three-level tree sufficient for millions of rows.
 
-```
+```text
                     [Root Page]
                     /    |     \
                    /     |      \
@@ -70,7 +70,7 @@ Recovery after a crash scans the WAL for the most recent valid commit record, th
 
 Log-Structured Merge trees approach persistence from a fundamentally different angle, optimized for write-heavy workloads on flash storage. New writes accumulate in an in-memory structure called a memtable, typically implemented as a skip list or red-black tree to maintain sorted order. When the memtable reaches a size threshold (often 64MB to 256MB), it is frozen and asynchronously flushed to disk as an immutable sorted string table (SSTable). The SSTable consists of a sequence of key-value pairs in lexicographic order, along with an index and bloom filter to accelerate lookups.
 
-```
+```text
 Memory Tier:
   [MemTable: Active (32 MB)] → [MemTable: Frozen (64 MB)] → Flush Thread
   
@@ -92,7 +92,7 @@ The write amplification inherent in LSM-trees becomes apparent through analysis 
 
 Key-value stores intended for high-performance caching, like Redis, employ completely different architectural strategies optimized for in-memory operation. Redis maintains a single global hash table mapping keys to values, with each value tagged with a type identifier (string, list, hash, set, sorted set). The hash table uses chaining for collision resolution, with each bucket pointing to a linked list of entries. Incremental rehashing spreads the cost of growing the hash table: when load factor exceeds a threshold, Redis allocates a new larger table but migrates buckets lazily during subsequent operations rather than blocking for a full rehash.
 
-```
+```text
 Primary Hash Table (size: 65536)
   [0] → {key: "user:1001", value: {type: HASH, ptr: 0x...}} → NULL
   [1] → {key: "session:abc", value: {type: STRING, ptr: 0x...}} 
@@ -111,7 +111,7 @@ Persistence in Redis offers two modes reflecting different durability trade-offs
 
 Network communication in REST APIs builds upon the HTTP protocol's request-response cycle, encapsulating application semantics in URL paths, query parameters, headers, and body payloads. A well-designed REST API models resources as nouns and operations as HTTP verbs: GET retrieves a representation, POST creates a new resource, PUT replaces an existing resource entirely, PATCH applies partial modifications, and DELETE removes the resource. This mapping provides uniform interface semantics that clients can reason about generically without knowledge of server implementation details.
 
-```
+```text
 HTTP Request:
   POST /api/v1/orders HTTP/1.1
   Host: api.example.com
@@ -134,7 +134,7 @@ Authentication typically flows through bearer tokens, most commonly JSON Web Tok
 
 GraphQL restructures this interaction model by exposing a single endpoint that accepts POST requests containing query documents. The query language allows clients to specify nested selections, where each field in the selection set maps to a resolver function on the server. The server constructs a query execution plan that invokes resolvers breadth-first or depth-first depending on implementation, batches requests to backend datastores, and assembles a response matching the query shape.
 
-```
+```text
 GraphQL Query:
   query {
     user(id: "1001") {
@@ -163,7 +163,7 @@ The N+1 query problem emerges when naive resolvers issue a separate database que
 
 Synchronization mechanisms between local and remote state must handle conflicts, retries, and partial failures. A simple approach maintains a queue of pending operations with monotonically increasing sequence numbers. When connectivity exists, the client uploads queued operations in order, receiving acknowledgments that allow discarding successfully applied operations. If an operation fails due to conflict (e.g., attempting to update a record that was concurrently modified), the server returns the current server state and the client invokes application-specific merge logic to reconcile differences.
 
-```
+```text
 Local Operation Queue:
   [Seq:1001, Type:UPDATE, Entity:Contact, ID:C-5, Fields:{phone:"+1-206-555-0199"}, Status:PENDING]
   [Seq:1002, Type:CREATE, Entity:Note, Fields:{text:"Call back", contactId:"C-5"}, Status:PENDING]
@@ -185,7 +185,7 @@ CRDTs avoid operational transformation's complexity by designing data structures
 
 Background task systems must coordinate work across threads or processes while respecting application lifecycle constraints. On mobile platforms, background execution involves requesting system-managed background time through APIs like iOS's `beginBackgroundTask(expirationHandler:)` or Android's WorkManager. The application enqueues a work request with constraints (network connectivity, charging state, battery level) and the system schedules execution during appropriate maintenance windows, potentially hours after the request.
 
-```
+```text
 Work Request Specification:
   class SyncWorkRequest {
     workType: "DATA_SYNC"
@@ -294,7 +294,7 @@ Request batching reduces network overhead by combining multiple logically indepe
 
 Caching at the HTTP layer leverages `Cache-Control` headers to communicate freshness constraints. A response with `Cache-Control: max-age=3600` instructs clients and intermediate proxies that the response remains fresh for one hour, eliminating the need to contact the server for subsequent requests. Conditional requests using `If-None-Match` (with `ETag`) or `If-Modified-Since` (with `Last-Modified`) allow clients to revalidate potentially stale cached responses: if the resource hasn't changed, the server responds with `304 Not Modified` and no body, saving bandwidth.
 
-```
+```text
 Initial Request:
   GET /api/users/1001 HTTP/1.1
   
@@ -413,7 +413,7 @@ Database connection leaks represent a common failure mode where connections are 
 
 Race conditions in background synchronization manifest when UI state and sync state diverge. A user edits a record while a background sync is simultaneously uploading a previous version of that record to the server. If the upload completes after the local edit, the server version is now newer, and the next sync might overwrite the local edit with the older server state. Versioning with monotonic counters or Lamport timestamps orders updates correctly: each modification increments the version, and syncs include both data and version. The server accepts updates only if the client version matches the current server version, rejecting stale updates that might overwrite newer data.
 
-```
+```text
 Timeline:
   t₀: Local state = {name: "Alice", version: 5}
   t₁: Background sync uploads version 5

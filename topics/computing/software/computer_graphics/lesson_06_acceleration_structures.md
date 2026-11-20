@@ -28,7 +28,7 @@ K-d trees generalize octrees by selecting a single splitting axis per node rathe
 
 Both octrees and k-d trees confront the primitive straddling problem: when a triangle spans a splitting plane, the construction algorithm must either duplicate the primitive in both child nodes, split the triangle into sub-primitives, or extend one child's volume to fully contain the straddling primitive. Duplication leads to redundant intersection tests and memory bloat—a triangle intersecting all eight octants of a node replicates across every child. Geometric splitting maintains strict spatial partitioning but fragments primitives, increasing total primitive count and intersection test overhead. Volume extension preserves primitive counts but introduces overlapping child volumes that violate strict spatial partitioning, complicating traversal correctness.
 
-```
+```text
 Octree Node Structure (64 bytes, cache-line aligned):
 ┌─────────────────────────────────────────────────────────────┐
 │ bbox_min: float3 (12 bytes)  │  bbox_max: float3 (12 bytes) │
@@ -56,7 +56,7 @@ Construction algorithms fall into three categories trading build time against tr
 
 The surface area heuristic (SAH) transforms BVH construction into a discrete optimization problem by modeling expected traversal cost. For a candidate split partitioning primitives into left and right subsets with bounding box surface areas S_L and S_R contained within parent surface area S_P, the SAH cost function estimates the expected number of ray-box intersection tests:
 
-```
+```text
 cost(split) = C_traverse + P(hit_left) · C_intersect · |primitives_left| 
                          + P(hit_right) · C_intersect · |primitives_right|
 
@@ -67,7 +67,7 @@ This formulation models rays as uniformly distributed across solid angles, estim
 
 Bottom-up construction algorithms, exemplified by agglomerative clustering, begin with each primitive in its own leaf node and iteratively merge the pair of nodes whose union minimizes SAH cost until reaching the root. This approach naturally produces high-quality hierarchies but scales poorly, requiring O(n²) pairwise distance computations per level without sophisticated acceleration. Linear bounding volume hierarchy (LBVH) construction exploits spatial hashing to achieve near-linear build times suitable for dynamic scenes: compute a Morton code for each primitive's centroid by interleaving x, y, and z coordinate bits, radix sort primitives by Morton code to establish spatial coherence, and partition the sorted array recursively using high-order bit splits as tree structure. While LBVH sacrifices traversal quality compared to SAH optimization, construction completes in O(n log n) time with excellent GPU parallelization characteristics.
 
-```
+```text
 BVH Node Structure (64 bytes, cache-aligned):
 ┌─────────────────────────────────────────────────────────────┐
 │ bbox_min: float3 (12 bytes)  │  bbox_max: float3 (12 bytes) │
@@ -101,7 +101,7 @@ uint32_t morton_encode(float3 centroid, float3 bbox_min, float3 bbox_max) {
 
 Efficient ray tracing demands highly optimized primitive intersection routines, as even the best acceleration structure cannot eliminate intersection tests entirely—it merely focuses them on relevant geometry. The Möller-Trumbore algorithm computes ray-triangle intersection through barycentric coordinate calculation, solving the system simultaneously for the ray parameter t and triangle barycentric coordinates (u, v):
 
-```
+```text
 Ray: R(t) = origin + t · direction
 Triangle: T(u,v) = v0 + u·(v1-v0) + v·(v2-v0)
 
@@ -337,7 +337,7 @@ Path tracing exhibits optimal convergence for direct illumination and diffuse su
 
 Photon mapping decouples lighting computation from visibility by tracing photons from light sources, storing their energy deposits in a spatial data structure, and later querying nearby photons during final gathering. The photon tracing pass launches photons from light sources according to emission profiles, propagating them through the scene by sampling BRDFs at each bounce and depositing photon records encoding position, incoming direction, and energy. Spatial organization—typically k-d trees or hash grids—enables efficient radius searches during final gathering, where camera rays collect nearby photons within a search radius and estimate incident radiance through kernel density estimation:
 
-```
+```text
 L(x, ω_out) ≈ (1 / (π r²)) · Σ [φ_i · f_r(x, ω_in,i, ω_out)]
 
 where φ_i = photon energy, r = search radius, 

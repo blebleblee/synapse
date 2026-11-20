@@ -63,7 +63,7 @@ The cognitive walkthrough method structures expert evaluation around specific us
 
 The practical mechanics of conducting moderated usability tests require preparation protocols that maximize session productivity. The test plan document specifies participant recruiting criteria, task scenarios with success criteria, observation metrics to collect, and post-task questionnaires. The physical or virtual testing environment eliminates distractions—quiet room, minimal visual clutter, recording equipment positioned non-intrusively. The facilitator script structures the session flow: opening briefing explaining informed consent and think-aloud expectations, warmup task to acclimate participants to verbal narration, core task sequence, post-task subjective preference surveys, and closing debrief allowing open-ended feedback. Audio and screen recordings capture evidence for later analysis and enable team members who did not attend live sessions to observe participant behavior directly.
 
-```
+```text
 MODERATED TEST SESSION STRUCTURE
 ================================
 

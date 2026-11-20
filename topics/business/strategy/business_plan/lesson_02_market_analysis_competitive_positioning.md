@@ -30,7 +30,7 @@ Market sizing follows a dual-track approach that combines top-down validation wi
 
 The bottom-up construction provides validation and granular insight. Begin by identifying the atomic customer unit and the revenue per unit. For enterprise software, this might be revenue per employee seat or revenue per transaction volume tier. Enumerate the total population of potential customers using census data, business registration databases, or industry directories. Apply qualification filters that match your ideal customer profile: company size, industry vertical, technology stack, geographic location, and behavioral indicators. Multiply the qualified population by average revenue per customer and annual purchase frequency to derive TAM.
 
-```
+```text
 TAM Calculation Structure:
 
 Total Universe = All entities matching broad category definition

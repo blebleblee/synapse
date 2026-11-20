@@ -149,7 +149,7 @@ Scale length is the vibrating string length, nut to saddle. It changes three thi
 
 ### The 6-String Standard Tuning Map
 
-```
+```text
 String:  6     5     4     3     2     1
 Open:    E2    A2    D3    G3    B3    E4
 
@@ -190,7 +190,7 @@ graph LR
 ### CAGED Shape Chord Diagrams (Key of C Major)
 
 **C Shape — open position**
-```
+```text
    x  3  2  0  1  0
    |  |  |  |  |  |
    ○  |  |  ○  |  ○   ← Nut
@@ -200,7 +200,7 @@ graph LR
 ```
 
 **A Shape — C chord at fret 3 (barre)**
-```
+```text
    x  3  3  3  3  x
    |  |  |  |  |  |
 3: ①①①①           ← Barre fret 3 with index
@@ -209,7 +209,7 @@ graph LR
 ```
 
 **G Shape — C chord at fret 8**
-```
+```text
    8  10 10 9  8  8
    |  |  |  |  |  |
 8: ①  |  |  |  ①  ①  ← Index covers 1st, 5th, 6th strings
@@ -218,7 +218,7 @@ graph LR
 ```
 
 **D Shape — C chord at fret 10**
-```
+```text
    x  x  10 12 13 12
    |  |  |  |  |  |
 10:|  |  ①  |  |  |
@@ -235,13 +235,13 @@ The E-shape version of C sits with the barre at fret 8, using the open-E chord f
 Learn strings 6 and 5 first — they carry the roots of E-shape and A-shape barre chords, your two most-used movable forms.
 
 **String 6 (low E):**
-```
+```text
 Fret: 0   1   2   3   4   5   6   7   8   9   10  11  12
 Note: E   F   F#  G   G#  A   A#  B   C   C#  D   D#  E
 ```
 
 **String 5 (A):**
-```
+```text
 Fret: 0   1   2   3   4   5   6   7   8   9   10  11  12
 Note: A   A#  B   C   C#  D   D#  E   F   F#  G   G#  A
 ```
@@ -282,26 +282,26 @@ Note: A   A#  B   C   C#  D   D#  E   F   F#  G   G#  A
 Every strumming pattern comes from one physical motion: a **continuous pendulum swing**, downstrokes on the beat, upstrokes on the off-beat. Never stop the arm. Decide only which strings you contact on each pass.
 
 **Pattern 1 — Quarter-note strum (60–90 BPM)**
-```
+```text
 Beat:   1    2    3    4
 Strum:  ↓    ↓    ↓    ↓
 ```
 
 **Pattern 2 — Eighth-note down-up (70–100 BPM)**
-```
+```text
 Beat:   1  +  2  +  3  +  4  +
 Strum:  ↓  ↑  ↓  ↑  ↓  ↑  ↓  ↑
 ```
 
 **Pattern 3 — Folk/pop "missing" downstroke (80–110 BPM)**
-```
+```text
 Beat:   1  +  2  +  3  +  4  +
 Strum:  ↓  ↑  ↓     ↓  ↑  ↓  ↑
 ```
 Miss the downstroke on beat 3 but keep the arm's motion going through that gap — the "ghost" swing is what creates the groove. Stopping the arm there is the most common beginner mistake with this pattern.
 
 **Pattern 4 — Reggae/skank, upstroke only (80–100 BPM)**
-```
+```text
 Beat:   1  +  2  +  3  +  4  +
 Strum:     ↑     ↑     ↑     ↑
 ```
@@ -321,7 +321,7 @@ The thumb runs independently of the fingers, alternating bass strings on the bea
 **Hand position**: wrist arched 3-4 cm off the soundboard. Fingers curved, attacking with a slight pull toward the palm rather than straight up — this is what gives fingerstyle its characteristic warmth instead of a thin "flick" sound. Nail-to-flesh ratio sets brightness: more nail contact brightens the tone, more flesh warms it.
 
 **Foundation drill — alternating thumb, strings 6 and 5**:
-```
+```text
 Beat:  1    2    3    4
 Thumb: 6    5    6    5
 ```
@@ -347,7 +347,7 @@ This is the single most injury-prone area of guitar technique. Fix posture befor
 
 ### 5.2 Fretting Accuracy: The 3-Zone Rule
 
-```
+```text
 |--- Fret wire ---|--- Dead zone ---|--- Optimal zone ---|--- Buzz zone ---|--- Next fret wire ---|
    (buzzes here)                      (press here, just      (too far back,
                                        behind fret wire)      inconsistent)
@@ -376,7 +376,7 @@ Barre chords stall most beginners. The problem is almost always technique, not h
 | Buzzing on fretted notes | Supporting fingers not arched enough | Curl fingers more; check each note individually |
 
 **Recommended F Major fingering** (most players find this easiest):
-```
+```text
 Fret:  1     2     3
   6:   ① barre
   5:   ① barre
@@ -411,7 +411,7 @@ Fret 1 is the hardest barre position on the neck because the frets are widest he
 ### Core Open Chords
 
 **G Major**:
-```
+```text
    3  2  0  0  0  3
    |  |  |  |  |  |
 2: |  ②  |  |  |  |
@@ -425,7 +425,7 @@ Fingers: ①=index (string 6, fret 3), ②=middle (string 5, fret 2),
 ```
 
 **C Major**:
-```
+```text
    x  3  2  0  1  0
 2: |  |  |  |  ①  |
 3: |  |  ②  |  |  |
@@ -433,21 +433,21 @@ Fingers: ①=index (string 6, fret 3), ②=middle (string 5, fret 2),
 ```
 
 **D Major**:
-```
+```text
    x  x  0  2  3  2
 2: |  |  |  ①  |  ①   ← index covers strings 1 and 3, fret 2 (mini-barre)
 3: |  |  |  |  ③  |
 ```
 
 **E Major**:
-```
+```text
    0  2  2  1  0  0
 1: |  |  |  ①  |  |
 2: |  ③  ②  |  |  |
 ```
 
 **A Major**:
-```
+```text
    x  0  2  2  2  0
 Three-finger option:
 2: |  |  ②  ③  ④  |
@@ -456,20 +456,20 @@ Barred option (frees ring+pinky for licks):
 ```
 
 **E Minor**:
-```
+```text
    0  2  2  0  0  0
 2: |  ②  ③  |  |  |
 ```
 
 **A Minor**:
-```
+```text
    x  0  2  2  1  0
 1: |  |  |  |  ①  |
 2: |  |  ③  ②  |  |
 ```
 
 **D Minor**:
-```
+```text
    x  x  0  2  3  1
 1: |  |  |  |  |  ①
 2: |  |  |  ②  |  |
@@ -532,7 +532,7 @@ Harder than E-shape because the full barre must also clear or mute string 1.
 
 Power chords — root plus 5th, no 3rd — give a full, clean punch that works surprisingly well on acoustic for rock-leaning rhythm parts.
 
-```
+```text
 Root on string 6 (e.g. G5 at fret 3):
    3  5  5  x  x  x
    ①  |  |
@@ -546,17 +546,17 @@ Root on string 5 (e.g. D5 at fret 5):
 ### Sus and Add Chords: Instant Color
 
 **Dsus2** — remove the fretted note on string 1, let it ring open (E, the major 2nd of D):
-```
+```text
    x  x  0  2  3  0
 ```
 
 **Gsus4** — replace B on string 2 with C at fret 1:
-```
+```text
    3  3  0  0  1  3
 ```
 
 **Cadd9** — move string 2 from fret 1 to fret 3 (D, the 9th of C), string 1 stays open (E):
-```
+```text
    x  3  2  0  3  0
 ```
 
@@ -572,7 +572,7 @@ Travis picking is the backbone of American acoustic fingerstyle — country, fol
 
 **Chord: G major open position. Thumb alternates strings 6 and 4.**
 
-```
+```text
 Beat:   1     2     3     4
 String: 6     4     6     4
 Thumb:  p     p     p     p
@@ -581,7 +581,7 @@ Metronome 50 BPM, 10 minutes, no stopping. Move to the 6-5 alternation for A and
 
 ### Phase 2: Add the Simultaneous Pinch on Beat 1
 
-```
+```text
 Beat:    1        2     3        4
 String:  6+1      4     6+1      4
 Hand:    p+a      p     p+a      p
@@ -590,7 +590,7 @@ Thumb and ring finger (a) strike together on beats 1 and 3. Metronome 50-60 BPM.
 
 ### Phase 3: Full Travis Pattern
 
-```
+```text
 Beat:   1     +     2     +     3     +     4     +
 String: 6     3     4     2     6     3     4     1
 Hand:   p     i     p     m     p     i     p     a
@@ -614,7 +614,7 @@ Apply the Phase 3 pattern to **G (8 beats) → C (8 beats) → G (8 beats) → D
 
 Once the pattern runs on its own, substitute target notes from the chord's scale on the upbeats instead of always hitting the same open string.
 
-```
+```text
 G major melodic variation:
 Beat:   1     +     2     +     3     +     4     +
 String: 6     3fr2  4     2     6     3fr4  4     1
@@ -624,7 +624,7 @@ This is the vocabulary of Chet Atkins, Merle Travis, and the fingerstyle side of
 
 ### Fingerstyle Arpeggio Pattern: p-i-m-a-m-i
 
-```
+```text
 4/4 time:
 Beat:   1     +     2     +     3     +     4     +
 String: 5     3     2     1     2     1     2     3
@@ -651,7 +651,7 @@ From standard EADGBE:
 **Check**: strum all six strings open — you should hear a clean G major chord. If it sounds off, retune string by string against a reference pitch before troubleshooting anything else.
 
 **Key chord positions in Open G**:
-```
+```text
 Chord:    G      C      D      G (octave)
 Position: open   5      7      12
 Barre:    none   5th    7th    12th
@@ -677,7 +677,7 @@ From standard EADGBE:
 Open D is the classic blues and folk fingerstyle tuning used by Robert Johnson, Son House, and in many Joni Mitchell arrangements.
 
 **Key positions in Open D**:
-```
+```text
 Chord:    D      G      A      D (octave)
 Position: open   5      7      12
 
@@ -695,14 +695,14 @@ The slide sits directly over the fret wire, not behind it — the opposite of no
 - Keep the slide perfectly parallel to the fret wire; any tilt causes pitch smearing across the strings.
 
 **Common slide positions in Open G**:
-```
+```text
 Fret:   0     3     5     7     10    12
 Chord:  G     Bb    C     D     F     G (octave)
 Degree: Root  b3    4th   5th   b7    Octave
 ```
 
 **Slide drill — basic blues box in Open G**:
-```
+```text
 Strings 1-2-3 together, slide through frets 0 → 3 → 5 → 3 → 0
 Metronome 60 BPM, quarter notes per fret position
 Add vibrato once landed on fret 5: rock the slide ±1-2 mm around the fret wire

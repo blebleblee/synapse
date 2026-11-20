@@ -66,7 +66,7 @@ The transition to **anaphase** is triggered when the last kinetochore achieves b
 
 The overall architecture of these regulatory relationships can be visualized as a state machine:
 
-```
+```text
 G1 ──[Cyclin D/CDK4,6 → pRb phosphorylation → E2F release]──► S Phase
  │                                                                   │
  │  ◄── Restriction Point (irreversible commitment)                 │

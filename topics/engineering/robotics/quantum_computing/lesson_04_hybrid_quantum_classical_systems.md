@@ -65,7 +65,7 @@ The variational quantum algorithm handles the combinatorial decision (which wayp
 
 The data flow through this system can be visualized as follows:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │ Robot Sensors (LIDAR, odometry, inertial measurement)      │
 └────────────────────────┬────────────────────────────────────┘

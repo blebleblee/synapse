@@ -22,7 +22,7 @@ React's fiber architecture provides the structural foundation for hooks. Each co
 
 A single hook node conforms to this internal structure:
 
-```
+```text
 Hook Node {
     memoizedState: any,           // Current state value or effect descriptor
     baseState: any,               // Base state for update queue reduction
@@ -38,7 +38,7 @@ The dispatch function returned by `useState` has a stable identity across render
 
 Effect hooks operate through a distinct mechanism. When `useEffect` executes during render, it creates or updates a hook node where `memoizedState` holds an effect descriptor object:
 
-```
+```text
 Effect Descriptor {
     tag: number,                  // Bitfield indicating effect lifecycle phase
     create: () => void | (() => void),  // Effect function
@@ -56,7 +56,7 @@ Custom hooks are simply functions that call built-in hooks, with no special runt
 
 Consider the execution flow when a component with multiple hooks re-renders:
 
-```
+```text
 Component Render Invocation
   ↓
 React positions hook cursor at fiber.memoizedState

@@ -563,7 +563,7 @@ flowchart TD
 
 The keepalived configuration defines VRRP instances for each firewall interface, ensuring that the virtual IP addresses move to the backup firewall if the master fails. The conntrackd configuration synchronizes the connection state table over a dedicated sync link, so the backup firewall has a complete copy of all active connections and can seamlessly continue filtering established sessions after failover.
 
-```
+```bash
 # /etc/keepalived/keepalived.conf
 
 global_defs {
@@ -636,7 +636,7 @@ vrrp_instance VI_DMZ {
 
 The `vrrp_sync_group` binds the three VRRP instances together, ensuring that if any interface fails on the master, all virtual IPs fail over to the backup as a unit. Without the sync group, a single interface failure could split the traffic path: inbound traffic might reach FW-1 via the WAN VIP while outbound traffic routes through FW-2 via the LAN VIP, causing asymmetric routing that breaks conntrack state on both firewalls. The `track_interface` directive extends this by monitoring all three interfaces—if any one goes down, the VRRP instance transitions to FAULT state and triggers failover.
 
-```
+```bash
 # /etc/conntrackd/conntrackd.conf
 
 Sync {

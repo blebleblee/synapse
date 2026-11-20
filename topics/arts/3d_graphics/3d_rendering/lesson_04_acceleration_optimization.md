@@ -26,7 +26,7 @@ The axis-aligned bounding box establishes the fundamental spatial primitive unde
 
 Frustum culling executes a sequence of plane-AABB tests against the six planes defining the view frustum: near, far, left, right, top, and bottom. Each plane is represented by a normal vector and distance from the origin, typically extracted from the view-projection matrix through row or column operations. For each plane, the algorithm computes the AABB's "positive vertex"—the corner farthest along the plane's normal direction—by selecting minimum or maximum extents based on normal sign:
 
-```
+```text
 positive_vertex.x = (plane.normal.x >= 0) ? aabb.max.x : aabb.min.x
 positive_vertex.y = (plane.normal.y >= 0) ? aabb.max.y : aabb.min.y
 positive_vertex.z = (plane.normal.z >= 0) ? aabb.max.z : aabb.min.z
@@ -36,7 +36,7 @@ If the signed distance from the positive vertex to the plane is negative, the en
 
 Bounding volume hierarchy construction follows a recursive partitioning pattern that balances tree depth against primitive distribution. Consider a scene containing 10,000 mesh instances. The builder begins by computing a single AABB encompassing all geometry centroids, establishing the root node. It then selects a split axis—often the longest AABB dimension to minimize surface area—and partitions objects into left and right subsets based on a split plane positioned at the spatial median or through SAH optimization. Each subset recursively spawns child nodes until reaching a stopping criterion: typically a maximum leaf primitive count (8-16 meshes) or minimum node volume threshold.
 
-```
+```text
 struct BVHNode {
     AABB bounds;
     uint32_t left_child;   // Index of left child, or LEAF_SENTINEL
@@ -55,7 +55,7 @@ Hierarchical occlusion queries extend binary visibility testing to spatial hiera
 
 Level-of-detail systems manage geometric complexity through discrete resolution tiers. A typical LOD chain for an architectural asset might include four meshes: the full-detail hero model at 50,000 triangles, a medium-detail version at 12,000 triangles, a low-detail distant representation at 3,000 triangles, and a billboard imposter at two triangles textured with a pre-rendered orthographic view. The renderer selects the appropriate tier based on **screen-space error metrics**—the projected pixel coverage of the object's bounding sphere or the maximum edge length after perspective division.
 
-```
+```text
 float screen_space_diameter = (object_radius * viewport_height) 
                                / (distance_to_camera * tan(fov_y / 2))
                                

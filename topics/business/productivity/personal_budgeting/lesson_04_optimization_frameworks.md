@@ -26,7 +26,7 @@ The mechanical implementation requires transaction-level data capture rather tha
 
 The calculation proceeds through a systematic decomposition protocol. For each budget category, extract all transactions that occurred during the measurement period and calculate the actual mean transaction value and actual transaction count. Compare these empirical statistics against the budgeted assumptions that generated your spending target. The volume variance equals the budgeted unit cost multiplied by the difference between actual and planned transaction counts. The rate variance equals the actual transaction count multiplied by the difference between actual and budgeted unit costs. The mix variance, when present, requires weighting calculations across subcategories and emerges as the residual after volume and rate effects are isolated.
 
-```
+```text
 Variance Decomposition for Category C:
 
 Budgeted Spend = Planned_Count × Planned_Unit_Cost
@@ -132,7 +132,7 @@ The rebalancing subsystem implements goal-aligned resource reallocation when qua
 
 The rebalancing optimization problem seeks to minimize deviation from target allocation weights while satisfying floor and ceiling constraints. Target allocation weights emerge from goal-aligned priority analysis: if retirement security becomes a dominant priority, the target allocation increases savings categories while reducing discretionary spending. If career development emerges as critical, the target allocation might increase professional development and networking budgets while constraining entertainment. The optimization solver adjusts actual category allocations iteratively toward targets while checking constraint violations at each step, producing a feasible rebalancing plan that respects practical limitations.
 
-```
+```text
 Rebalancing Optimization Framework:
 
 Input Parameters:
@@ -171,7 +171,7 @@ For stable essential categories like housing and insurance, variance thresholds 
 
 The notification protocol should distinguish between variance magnitude and variance persistence. A single month of high dining variance might reflect a birthday celebration or visiting guests rather than systematic drift. High-performance implementations employ persistence filters that suppress notifications until a category shows elevated variance for two consecutive measurement periods, reducing false positives from one-time events while reliably detecting sustained drift. The persistence filter operates as a digital low-pass filter analogous to electrical engineering noise reduction: rapid transient spikes pass through undetected while sustained signals trigger notification.
 
-```
+```text
 Behavioral Notification Logic:
 
 For each category C with budgeted allocation B[C]:
@@ -215,7 +215,7 @@ Behavioral friction index quantifies the subjective difficulty of maintaining bu
 
 Goal attainment velocity measures the rate of progress toward major financial objectives relative to planned timelines. An emergency fund target of six months' expenses reached in fourteen months when the plan projected eighteen months indicates positive velocity, suggesting the optimization framework effectively channels resources toward priorities. Systematic negative velocity across multiple goals indicates either overly ambitious targets that should be recalibrated or structural problems with the budget's savings capacity that require comprehensive rebalancing.
 
-```
+```text
 Efficiency Metric Dashboard:
 
 Variance Trend Trajectory:

@@ -188,7 +188,7 @@ Above the 7th position (roughly G2 and up on the G string), switch to one-finger
 
 ### Full string-section voicing: C major triad, correctly spaced
 
-```
+```text
 Violin I (16):   C5, E5 divisi a2       ← melody register, close spacing fine here
 Violin II (14):  G4, C5 divisi a2       ← upper harmony
 Viola (12):      E4, G4 divisi a2       ← middle harmony
@@ -220,7 +220,7 @@ Range C4-C7+. Pure, hollow tone from a cylindrical bore dominated by the fundame
 
 **Simplified fingering reference, first octave:**
 
-```
+```text
 C4:  ●●●●●●●   (all keys closed)
 D4:  ●●●●●●○
 E4:  ●●●●●○○
@@ -233,7 +233,7 @@ C5:  ○○○○○○○   (thumb key only)
 
 **Tonguing drill (practice at 60 → 80 → 110 bpm):**
 
-```
+```text
 Single tonguing:  Ta Ta Ta Ta Ta Ta Ta Ta   (quarter or eighth notes)
 Double tonguing:  Ta-Ka Ta-Ka Ta-Ka Ta-Ka    (for passages faster than single tongue can clear)
 Triple tonguing:  Ta-Ta-Ka Ta-Ta-Ka          (for compound/triplet subdivisions)
@@ -253,7 +253,7 @@ Range B♭3-A6. Conical bore + double reed = strong odd *and* even harmonics, co
 
 Range E3-C7 (B♭ clarinet, written pitch). Cylindrical bore overblowing at the 12th creates **three genuinely different instruments in one**:
 
-```
+```text
 Chalumeau (E3-Bb4):   dark, hollow, reedy — odd harmonics dominate
 Clarion (B4-C6):      bright, clear, even, singing
 Altissimo (C#6-C7):   shrill, penetrating, needs careful voicing to not scream
@@ -265,7 +265,7 @@ Clarinet has the widest dynamic range of any woodwind (40+ dB) — it is the woo
 
 **Transposition, memorize this:**
 
-```
+```text
 B♭ Clarinet: written C5 sounds B♭4 (down a major 2nd)
 A  Clarinet: written C5 sounds A4  (down a minor 3rd) — darker key color, used for
              passages in keys awkward on B♭ (many sharps)
@@ -276,7 +276,7 @@ Bass Clarinet (B♭): written C4 sounds B♭2 (down a major 9th)
 
 Range B♭1-E5+ (experienced players go higher). Double reed, long folded conical bore.
 
-```
+```text
 Low (Bb1-Eb2):    deep, resonant, can sound gruff at loud dynamics — good for comic/grotesque effects
 Tenor (E2-Bb3):   warm, vocal, THE register for lyrical bassoon solos
 Upper (B3-E5+):   thin, reedy, plaintive — effective but needs careful support underneath
@@ -286,7 +286,7 @@ Contrabassoon (3rd bassoonist doubles) sounds an octave below written, down to B
 
 ### A playable woodwind chord, properly spaced
 
-```
+```text
 Flute 1:     C6   ← brightness
 Oboe 1:      E5   ← penetrating upper harmony
 Clarinet 1:  C5   ← blends with flute
@@ -357,7 +357,7 @@ flowchart LR
 
 **Four-horn chord, safe voicing (F major, sounding):**
 
-```
+```text
 Horn 1 (written C5 → sounds F4)
 Horn 2 (written A4 → sounds D4)
 Horn 3 (written F4 → sounds Bb3)
@@ -370,7 +370,7 @@ Sounding result: F3-Bb3-D4-F4 — root position F major, wide spacing, safe midd
 
 Written F#3-C6+, B♭ trumpet sounds a major 2nd lower (C trumpet sounds as written). Three valves: 2nd = semitone down, 1st = whole tone down, 3rd = minor third down, combinations fill the chromatic scale.
 
-```
+```text
 Open (0):   written C4 → sounds Bb3
 2nd valve:  written C4 → sounds A3
 1st valve:  written C4 → sounds Ab3
@@ -386,7 +386,7 @@ Bright, high-harmonic-content, penetrating — built for fanfare and brilliant m
 
 Tenor: E2-B♭4+. Bass trombone: C2-F4, extended lower with F/G♭ attachment. Slide, not valves — **this means true continuous glissando is a trombone-exclusive capability.**
 
-```
+```text
 Position 1 (closed, shortest): Bb2 F3 Bb3 D4 F4 Ab4 Bb4...
 Position 7 (fully extended):   E2  B2 E3 G#3 B3 D4  E4...
 ```
@@ -399,7 +399,7 @@ Contrabass tuba in C: D1-F4. Bass tuba in F/E♭: E♭1-B♭3. Deepest, most res
 
 ### Full brass choir, properly voiced (B♭ major)
 
-```
+```text
 Trumpet 1: written D5 → sounds C5
 Trumpet 2: written Bb4 → sounds Ab4
 Trumpet 3: written F4 → sounds Eb4
@@ -425,13 +425,13 @@ Wide at the bottom, closer toward the top — same spacing logic as strings.
 Standard 4-drum set covers D2-A3, pedal-tunable mid-performance. Membrane vibration is inharmonic relative to a true harmonic series — this gives timpani their characteristic "pitch with noise" character rather than a pure tone.
 
 **Classical-style tuning convention** (Beethoven Symphony No. 5, C minor, movement I):
-```
+```text
 Timpani 1: C3 (tonic)
 Timpani 2: G2 (dominant)
 ```
 
 **Roll drill (60 → 90 → 120 bpm):**
-```
+```text
 R L R L R L R L R L R L R L R L   — single-stroke roll, even spacing,
                                       goal: individual strokes disappear into
                                       one sustained tone
@@ -447,7 +447,7 @@ Mallet hardness changes the attack character drastically — soft felt mallets f
 
 ### Pitched auxiliary percussion — ranges you need memorized
 
-```
+```text
 Xylophone:    F4-C8    bright, hard attack
 Marimba:      C2-C7    warm, mellow
 Vibraphone:   F3-F6    sustained, motor-driven shimmer
@@ -482,7 +482,7 @@ Apply the spacing rule from Section 1 relentlessly: wide at the bottom, closer a
 
 **Klangfarbenmelodie** — a single melodic line fragmented across instruments, each contributing only a few notes, so timbre itself becomes the melodic parameter (Webern, Schoenberg):
 
-```
+```text
 Flute: C5 → Oboe: D5 → Clarinet: E5 → Bassoon: F5
 (each instrument plays 1-2 notes, then hands off — the ear tracks the
 pitch contour but the color changes every note or two)
@@ -490,7 +490,7 @@ pitch contour but the color changes every note or two)
 
 **Spectral orchestration** — distributing the natural harmonic series of a fundamental across different instruments to build a composite "super-timbre":
 
-```
+```text
 Contrabassoon: C2 (fundamental)        Horn:    C4 (4th harmonic)
 Bass:          C2 (reinforcement)      Trumpet: E4 (5th harmonic)
 Bassoon:       C3 (2nd harmonic)       Flute:   G4 (6th harmonic)
@@ -522,7 +522,7 @@ Cello:         G3 (3rd harmonic)
 
 ## 8. Idiomatic vs. Unidiomatic Writing — Don't Do These
 
-```
+```text
 BAD: fast scalar passagework for tuba, low register
      → sluggish valve/slide response, intonation drifts, rarely reads clearly
 GOOD: broad sustained lines, measured melodic motion for tuba
@@ -546,7 +546,7 @@ GOOD: pizzicato bass at 60-120 bpm with clear articulation
 
 **Step 3 — Analyze one passage in depth.** Example framework, using Ravel's *Daphnis et Chloé*, "Lever du jour," opening 90 seconds:
 
-```
+```text
 1. Dynamic arc: ppp → mf over 90 seconds
 2. Timbral layering order: solo flute → clarinets → oboes → strings
 3. Registral spacing: flute at C6, strings down at C2-C3 — 4 octaves apart

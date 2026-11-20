@@ -32,7 +32,7 @@ The data structures for indirect block traversal form a sparse tree where most b
 
 Extent-based indexing in ext4 replaces the indirect block tree with a compact B-tree variant optimized for range queries. Each extent header occupies 12 bytes, encoding a 32-bit logical block number, 48-bit physical block number, and 16-bit length field allowing spans up to 32,768 contiguous blocks (128MB at 4KB block size). The inode's `i_block` region stores an extent tree header followed by up to four inline extent entries, sufficient for files with up to four distinct contiguous regions totaling arbitrary size. When a file's allocation pattern requires more than four extents, the filesystem constructs an index node containing up to 340 child pointers (given 12-byte extent entries and 60-byte available space). The tree grows depth-first, maintaining sorted order by logical block number to enable binary search during lookups.
 
-```
+```text
 Extent Tree Structure (conceptual layout):
 
 Inode (256 bytes)

@@ -32,7 +32,7 @@ $$L = \frac{\Delta y}{\sqrt{P_b} - \sqrt{P_a}}$$
 
 where $P_a$ and $P_b$ bound the price range. A tightly concentrated position provides 10-100x the effective liquidity of a V2 full-range position with the same capital, but experiences proportionally amplified rebalancing effects.
 
-```
+```text
 Uniswap V2 Pool State Transition:
 
 Initial State:
@@ -76,7 +76,7 @@ When account liquidity turns negative, the position becomes undercollateralized 
 
 Aave extends Compound's model with additional features including flash loans, variable versus stable rate borrowing options, and collateral delegation. The flash loan primitive allows anyone to borrow unlimited amounts with zero collateral, provided the loan is repaid within the same atomic transaction. This enables capital-efficient arbitrage strategies, collateral swapping, and self-liquidation mechanisms. A user can flash borrow 10,000 ETH, execute a complex DeFi arbitrage across Uniswap, Curve, and Balancer, and repay the loan plus a 0.09% fee, all within a single transaction costing only gas fees. If any step fails, the entire transaction reverts atomically, eliminating default risk.
 
-```
+```text
 Compound Liquidation Scenario:
 
 Initial Position:
@@ -117,7 +117,7 @@ The fatal flaw emerged during reflexive collapse scenarios. When confidence in t
 
 Modern stablecoin designs converge toward hybrid models combining elements of collateralization with algorithmic supply adjustment. Frax implements a fractional reserve model where USDC provides partial backing while algorithmic mechanisms manage the remainder. Liquity's LUSD maintains 110% ETH collateralization with interest-free loans but implements redemption mechanisms where LUSD can always be swapped for $1 of ETH from the lowest-collateralized trove, creating a hard price floor. These architectures recognize that pure algorithmic pegs face existential risk during market stress while pure collateralized models sacrifice capital efficiency.
 
-```
+```text
 Stablecoin Peg Maintenance Mechanisms:
 
 MakerDAO (Crypto-Collateralized):

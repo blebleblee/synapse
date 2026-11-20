@@ -58,7 +58,7 @@ The operational architecture of money management systems revolves around three i
 
 The cash flow projection engine serves as the foundational data structure. At its core lies a time-indexed sequence of expected inflows and outflows, typically organized in a matrix where rows represent distinct cash flow categories and columns represent time periods. For a household, categories include labor income, investment income (dividends, interest, capital gains), government transfers, and irregular receipts on the inflow side, with consumption spending, debt service, taxes, and savings contributions on the outflow side. For a corporation, categories expand to include operating revenue, asset sales, debt issuance, equity issuance on the inflow side, and operating expenses, capital expenditures, debt repayment, dividends, share repurchases, and taxes on the outflow side.
 
-```
+```text
 Time Period:        t=0    t=1    t=2    t=3    t=4    t=5
 -----------------------------------------------------------
 Labor Income        5000   5200   5400   5600   5800   6000

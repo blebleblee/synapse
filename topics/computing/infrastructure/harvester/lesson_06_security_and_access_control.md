@@ -12,7 +12,7 @@ The classical CIA triad — Confidentiality, Integrity, Availability — maps di
 
 Understanding *why* these mechanisms are architecturally necessary requires understanding the trust boundaries in a Kubernetes-hosted storage system:
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │  Kubernetes Control Plane (etcd, kube-apiserver)                 │
 │  Trust boundary: cluster admin credentials, RBAC policies        │
@@ -254,7 +254,7 @@ Longhorn maintains a checksum for every data block it writes. The checksum algor
 
 The checksum is stored in a separate sidecar file adjacent to each replica's data file:
 
-```
+```text
 /var/lib/longhorn/replicas/<volume-name>-<uuid>/
 ├── volume-head-000.img          # Active data file (sparse, up to 2GB segments)
 ├── volume-head-000.img.meta     # Metadata: size, sequence number, checksum table

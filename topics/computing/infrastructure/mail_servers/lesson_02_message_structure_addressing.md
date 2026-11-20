@@ -22,7 +22,7 @@ Address syntax under RFC 5322 defines two forms: the **addr-spec** (`user@domain
 
 Consider a complete, real message header as it appears at the wire level, before any client rendering:
 
-```
+```text
 Received: from smtp.sender.com (smtp.sender.com [203.0.113.42])
         by mx1.example.com (Postfix) with ESMTPS id 4A3B2C1D2E
         for <alice@example.com>; Thu, 12 Jun 2025 14:23:11 +0000 (UTC)
@@ -49,7 +49,7 @@ MIME's multipart encoding solves a problem the original RFC 822 design could not
 
 The boundary string is chosen by the sender to be a sequence of characters guaranteed not to appear as a line start in any of the enclosed parts. The boundary marker line takes the form `--<boundary>`, and the terminal boundary marker takes the form `--<boundary>--`. The structure for a message with a plain-text body and a PDF attachment looks like this at the wire level:
 
-```
+```text
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="==BOUNDARY_ABC=="
 
@@ -76,7 +76,7 @@ The `Content-Disposition` header governs client presentation behavior: `inline` 
 
 The canonical multipart type hierarchy for a modern HTML email with an attachment is `multipart/mixed` at the outer level, containing a `multipart/alternative` part (which holds both `text/plain` and `text/html` alternatives) and an attachment part. The `multipart/alternative` semantics specify that parts are ordered from least preferred to most preferred, and the client should render the last part it understands. This is why `text/plain` precedes `text/html` in a well-formed alternative container.
 
-```
+```text
 multipart/mixed
 ├── multipart/alternative
 │   ├── text/plain; charset=UTF-8
@@ -314,7 +314,7 @@ The more serious parsing failure mode is **header injection**. If any code path 
 
 The related issue of **encoded words** (RFC 2047) adds another layer of complexity. Because RFC 5322 header values are nominally restricted to US-ASCII, non-ASCII characters in display names, subjects, and other header fields must be encoded using the `=?charset?encoding?encoded-text?=` syntax. A subject of "Vérification du système" would appear in the wire header as:
 
-```
+```text
 Subject: =?UTF-8?Q?V=C3=A9rification_du_syst=C3=A8me?=
 ```
 

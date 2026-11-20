@@ -52,7 +52,7 @@ The perceptual input layer receives signals from both external environment and i
 
 The perceptual filtering mechanism operates through a combination of automatic attention allocation and deliberate information search. Automatic attention, driven by System 1 processing, orients toward novelty, threat, and social signals. This evolutionary-tuned system excels at detecting predators, reading facial expressions, and identifying deviations from expected patterns. However, it also generates false positives, pulling attention toward emotionally salient but strategically irrelevant information—the availability bias in action. Deliberate information search, driven by System 2 processing, queries the environment based on existing mental models and strategic hypotheses. This top-down attention asks: what data would confirm or disconfirm my current understanding? Where are the gaps in my situational awareness?
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    ADAPTIVE LEADERSHIP ARCHITECTURE              │
 ├─────────────────────────────────────────────────────────────────┤
@@ -132,7 +132,7 @@ This optimal decision time varies dramatically across contexts. Tactical operati
 
 The calibration mechanism relies on explicit decision classification. Each decision gets tagged with two attributes: stakes (the magnitude of consequences) and reversibility (the ease of correcting errors). High-stakes, low-reversibility decisions receive maximum attention and deliberation. Low-stakes, high-reversibility decisions receive minimal attention, with rapid execution and learning from outcomes. This classification can be formalized in a decision matrix:
 
-```
+```text
                         Reversibility
                    High              Low
             ┌─────────────────┬─────────────────┐

@@ -16,7 +16,7 @@ The IMU streams data over I2C to a Raspberry Pi 4 (or any Linux SBC), which logs
 
 Before any experimental session, verify your scientific Python environment from the terminal. Each of the following commands should return a version string without errors.
 
-```
+```text
 python -c "import numpy; print('NumPy:', numpy.__version__)"
 python -c "import scipy; print('SciPy:', scipy.__version__)"
 python -c "import matplotlib; print('Matplotlib:', matplotlib.__version__)"
@@ -27,7 +27,7 @@ The minimum acceptable versions are NumPy 1.24, SciPy 1.10, Matplotlib 3.7, and 
 
 Install or upgrade any missing packages with:
 
-```
+```text
 pip install --upgrade numpy scipy matplotlib astropy
 ```
 

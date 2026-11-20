@@ -82,7 +82,7 @@ The product topology, one of the most important constructions in all of topology
 
 The layered construction from subbasis to basis to full topology can be visualized as follows:
 
-```
+```text
 SUBBASIS S
   (arbitrary collection of subsets)
          |

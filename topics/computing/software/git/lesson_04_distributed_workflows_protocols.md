@@ -48,7 +48,7 @@ The server-side `git pack-objects` process constructs the pack file once the com
 
 Delta compression applies a binary diff between a base object and a target object, producing an instruction stream of copy operations (`copy N bytes from offset O in base`) and insert operations (`insert these N literal bytes`). The delta search runs a sliding window of configurable depth (default 10, tunable via `pack.window` and `pack.depth`) over the sorted object list, attempting to find the best base for each object within the window. The resulting pack format stores objects as either non-deltified raw zlib-compressed content or as `OBJ_OFS_DELTA` / `OBJ_REF_DELTA` entries pointing to their base. The pack index file (`.idx`) maps SHA hashes to byte offsets within the pack, enabling O(log n) random access to any object without decompressing the entire pack.
 
-```
+```text
 Pack File Layout (v2):
 
 ┌─────────────────────────────────────────────────────┐

@@ -285,7 +285,7 @@ Now instrument the server with CPU performance counters to capture cache miss ra
 
 In the second terminal, run the same `wrk` load test. Allow it to complete the full 60-second duration to accumulate statistically significant event counts. When the load test finishes, stop the server with Ctrl+C. The `perf stat` output displays event counts and computed ratios:
 
-```
+```text
  Performance counter stats for 'cargo run --release':
 
     45,234,891,234      cache-references
@@ -302,7 +302,7 @@ Profile cache behavior at a finer granularity using `perf record` to sample stac
 
 Run the `wrk` load test again, allow it to complete, then stop the server. The `perf record` command writes profile data to `perf.data` in the current directory. Analyze the profile with `perf report --stdio` to generate a text-based report sorted by cache miss frequency. The output shows a hierarchical tree of functions ordered by sample count:
 
-```
+```bash
 # Overhead  Command     Shared Object       Symbol
 # ........  ..........  ..................  .................................
 #
@@ -430,7 +430,7 @@ criterion_main!(benches);
 
 This benchmark exercises the handler with three input sizes, measuring throughput in elements processed per second. The `black_box` calls prevent the compiler from optimizing away unused computations. Run the benchmark suite with `cargo bench` and observe the output:
 
-```
+```text
 compute_handler/size/10   time:   [1.2345 ms 1.2389 ms 1.2435 ms]
                           thrpt:  [8.0420 Kelem/s 8.0717 Kelem/s 8.1008 Kelem/s]
 compute_handler/size/100  time:   [11.234 ms 11.289 ms 11.347 ms]
@@ -588,7 +588,7 @@ Start the instrumented server with `TSAN_OPTIONS="halt_on_error=1 history_size=7
 
 Within seconds, ThreadSanitizer detects the data race and terminates the server with a detailed report printed to stderr:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7f8a4c001a80 by thread T2:
     #0 hashbrown::raw::RawTable<K,V>::insert rest_bench/src/unsafe_endpoint.rs:35
@@ -659,7 +659,7 @@ Clean and rebuild with `cargo clean && cargo build --bin unsafe_server`. Start t
 
 Upon termination, LeakSanitizer performs a final sweep of allocated memory, identifying blocks without remaining references:
 
-```
+```text
 =================================================================
 ==23456==ERROR: LeakSanitizer: detected memory leaks
 

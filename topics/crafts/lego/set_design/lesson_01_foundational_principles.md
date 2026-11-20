@@ -18,7 +18,7 @@ Understanding brick properties at the material level closes the first-principles
 
 A set design has a layered internal architecture, and understanding how those layers interact determines whether the finished build feels like a coherent object or a collection of parts that happen to be touching. The layers, from innermost to outermost, are the **structural skeleton**, the **infill and transition zone**, and the **surface shell**. Each layer has distinct mechanical requirements, and the expert designer makes deliberate material choices at each one rather than allowing the aesthetic choices of the shell to dictate the structural logic of the skeleton.
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │                   SURFACE SHELL                     │
 │  (Tiles, smooth plates, SNOT panels, printed parts) │

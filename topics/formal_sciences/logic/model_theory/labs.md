@@ -6,7 +6,7 @@ Model theory occupies the intersection where algebraic structure meets logical l
 
 The computational environment requires Python 3.11 or later, SymPy for symbolic algebra, and either SageMath (for its integrated number-theoretic and combinatorial machinery) or a Lean 4 / Coq installation for proof-assistant exercises. Install and verify the core stack as follows.
 
-```
+```text
 pip install sympy numpy networkx
 python -c "import sympy; print('SymPy', sympy.__version__)"
 python -c "import numpy; print('NumPy', numpy.__version__)"
@@ -15,14 +15,14 @@ python -c "import networkx; print('NetworkX', networkx.__version__)"
 
 For SageMath, the preferred path on Linux or macOS is through the conda-forge distribution:
 
-```
+```text
 conda install -c conda-forge sage
 sage --version
 ```
 
 For Lean 4, install through the official `elan` toolchain manager and then scaffold a Mathlib-dependent project:
 
-```
+```bash
 curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
 lake new model_theory_lab
 cd model_theory_lab
@@ -206,7 +206,7 @@ for name, axiom in [('Associativity', assoc),
 
 Running this produces:
 
-```
+```text
 Z/3Z |= Associativity: True
 Z/3Z |= Left Identity: True
 Z/3Z |= Left Inverse: True
@@ -1131,7 +1131,7 @@ end ModelTheoryLab
 
 To build and check this proof:
 
-```
+```text
 cd model_theory_lab
 cp ModelTheoryLab.lean lakefile/src/ModelTheoryLab.lean
 lake build ModelTheoryLab
@@ -1157,7 +1157,7 @@ This reference consolidates the formal definitions, theorems, and verification c
 
 **Gödel Numbering.** The encoding $\ulcorner \sigma \urcorner = \prod_{i} p_i^{c_i}$ where $p_i$ is the $i$th prime and $c_i$ is the code of the $i$th symbol. Verification: `decode_godel_number(sequence_godel_number(seq)) == seq`. Run with:
 
-```
+```text
 python godel_numbering.py
 ```
 
@@ -1165,7 +1165,7 @@ python godel_numbering.py
 
 **Quantifier Elimination (RCF).** For every $\mathcal{L}_{\text{ring}}$-formula $\varphi(\bar{x})$, there exists a quantifier-free $\psi(\bar{x})$ with $\text{RCF} \vdash \varphi(\bar{x}) \leftrightarrow \psi(\bar{x})$. Computational oracle: SymPy's `solve` and Sturm sequence count over `Poly`. Verification command:
 
-```
+```text
 python quantifier_elimination.py
 ```
 
@@ -1175,7 +1175,7 @@ python quantifier_elimination.py
 
 **Complete Diagnostic Run.** To execute the entire lab sequence in order:
 
-```
+```text
 python model_theory_lab.py
 python group_axiom_check.py
 python ef_game.py

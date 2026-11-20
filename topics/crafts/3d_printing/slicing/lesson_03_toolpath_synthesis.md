@@ -32,7 +32,7 @@ where $d_{\text{filament}}$ is the nominal filament diameter (1.75 or 2.85 mm). 
 
 The acceleration planning stage analyzes the entire sequence of moves to compute achievable velocities at each junction. The planner begins by assigning each move its requested feedrate as the maximum allowable velocity, then performs a backward pass to propagate deceleration constraints. For each junction $i$ between moves $i-1$ and $i$, the planner computes the maximum entry velocity $v_{\text{entry},i}$ based on the junction angle and allowable centripetal acceleration. If the previous move's exit velocity exceeds this safe junction velocity, the planner inserts a deceleration constraint that propagates backward, potentially reducing velocities along an entire chain of preceding moves. The forward pass then resolves these constraints by computing actual entry and exit velocities, ensuring that the printer can physically achieve the commanded motion profile without exceeding acceleration limits.
 
-```
+```text
 Acceleration Planning Pseudocode:
 
 for each move M in toolpath:
@@ -65,7 +65,7 @@ Dynamic speed modulation for thermal management requires distinguishing between 
 
 The resulting G-code stream encodes this multi-layered motion plan as a sequence of `G1` (linear move) commands with X, Y, Z, E, and F parameters. A typical segment looks like:
 
-```
+```text
 G1 X105.342 Y87.234 E0.02145 F2400
 ```
 

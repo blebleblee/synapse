@@ -74,7 +74,7 @@ When the scheduler switches from `prev` to `next`, `context_switch()` carries ou
 
 Modern 64-bit architectures (x86-64 / ARM64) employ 4-level or 5-level hierarchical page tables to translate a 48-bit or 57-bit virtual address into a physical memory address:
 
-```
+```text
 Virtual Address [47:0]:
 [47:39] Page Global Directory (PGD) - 9 bits (512 entries)
 [38:30] Page Upper Directory (PUD)   - 9 bits (512 entries)

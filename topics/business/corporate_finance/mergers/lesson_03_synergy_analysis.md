@@ -52,7 +52,7 @@ Transfer pricing optimization creates tax synergies in cross-border transactions
 
 The synergy quantification model integrates identified synergies into a detailed pro forma financial model showing the combined entity's projected income statement, balance sheet, and cash flow statement over a five-year forecast horizon. Each synergy initiative is modeled as a discrete line item with specific cash flow timing, implementation costs, and risk adjustments. A workforce reduction synergy targeting fifteen million dollars of annual run-rate savings might require twelve million dollars of upfront severance payments, spread across the first two quarters post-closing, with savings phasing in over quarters three through six as terminated employees depart and positions remain unfilled.
 
-```
+```text
 Synergy Realization Model: Workforce Reduction Example
 
 Initiative: Consolidate redundant finance and accounting functions
@@ -76,7 +76,7 @@ Each synergy category receives a probability-weighted adjustment reflecting exec
 
 The consolidated synergy model aggregates all identified initiatives into summary categories—total cost synergies, total revenue synergies, total financial synergies—and calculates the net present value of the synergy stream using the combined company's weighted average cost of capital. This NPV figure represents the incremental value creation available to justify the acquisition premium paid to target shareholders.
 
-```
+```text
 Consolidated Synergy Valuation Summary
 
 Cost Synergies:
@@ -144,7 +144,7 @@ The governance framework for synergy tracking must balance transparency with rea
 
 Synergy realization dashboards provide executive leadership with real-time visibility into progress against plan, structured around three core metrics: run-rate achieved, net present value realized, and confidence-adjusted forecast. Run-rate achieved measures the annualized cash flow impact of implemented synergies, comparing actual quarterly results to the originally modeled trajectory. Net present value realized calculates the cumulative discounted value delivered to date, adjusting for timing delays and implementation cost overruns that erode value. Confidence-adjusted forecast updates the total expected synergy value based on execution experience, applying revised probability weights to remaining initiatives as the team gains information about realization rates and market responses.
 
-```
+```text
 Synergy Realization Dashboard: Quarter 6 Post-Close
 
 Cost Synergies:

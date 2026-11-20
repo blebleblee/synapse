@@ -115,7 +115,7 @@ The `ErrorException` class is part of PHP's standard distribution and exists pre
 
 PHP's exception handling compiles each `try` block into an exception handler entry in the opcode array's exception table. The table is a flat array of `zend_try_catch_element` structs, each recording the opcode offset range covered by the try block, the catch opcode offset, and the finally opcode offset. When an exception is thrown, the executor scans this table backward from the current opcode offset until it finds an enclosing range, then jumps to the corresponding catch or finally handler. If no handler is found in the current frame, the frame is popped and the scan continues in the calling frame, repeating until either a handler is found or the bottom of the call stack is reached.
 
-```
+```text
 Call Stack at throw point:
 
 Frame 3: processRecord()       ← throw new DatabaseException(...)

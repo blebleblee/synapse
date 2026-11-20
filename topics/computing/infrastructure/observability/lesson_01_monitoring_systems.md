@@ -602,7 +602,7 @@ Distributed tracing's core mechanism is **context propagation** — the passing 
 
 The W3C Trace Context specification defines the `traceparent` header:
 
-```
+```text
 traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01
              version-trace_id                  -parent_span_id-flags
 ```

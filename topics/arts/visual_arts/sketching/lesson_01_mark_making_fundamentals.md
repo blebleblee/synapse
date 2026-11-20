@@ -28,7 +28,7 @@ Tool angle relative to the surface directly modulates mark character. Holding th
 
 Pressure modulation operates on a spectrum from feather-light construction lines barely visible at arm's length to maximum-pressure anchor darks that approach the blackest value the medium can achieve. Beginning draftsmen universally apply excessive, uniform pressure—a manifestation of fine motor tension and lack of kinesthetic calibration. Developing pressure control requires conscious practice of the full dynamic range. Start by making marks so light they barely register on the page, then gradually increase pressure through ten discrete steps until reaching the tool's maximum deposit capacity. This exercise programs your proprioceptive system to recognize and reproduce specific pressure levels on demand, identical to how percussionists develop dynamic control from pianissimo ghost notes to fortissimo accents.
 
-```
+```text
 Pressure Calibration Scale (Graphite 2B):
 
 Level 1:  ————————  (Construction lines, barely visible)

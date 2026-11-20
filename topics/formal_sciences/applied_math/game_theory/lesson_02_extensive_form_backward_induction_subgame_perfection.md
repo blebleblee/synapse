@@ -42,7 +42,7 @@ Backward induction computes subgame perfect equilibria in finite perfect-informa
 
 The backward induction algorithm is depicted procedurally as follows. Let $V^{(k)}$ denote the set of nodes at depth $k$ from the terminal layer, where depth zero corresponds to terminal nodes.
 
-```
+```text
 Algorithm: Backward Induction
 
 Input: Extensive-form game tree Γ = (V, E), assignment ρ, payoffs u

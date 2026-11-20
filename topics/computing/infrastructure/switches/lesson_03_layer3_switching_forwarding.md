@@ -38,7 +38,7 @@ TCAM cells store bit patterns in ternary form: each position holds 0, 1, or X (d
 
 The winning TCAM entry contains an associated data field pointing into adjacent SRAM that stores the complete forwarding action: egress interface, adjacency index, and any additional metadata like QoS class or policer identifiers. The ASIC fetches this SRAM entry, retrieves the adjacency table entry to obtain Layer 2 rewrite data, and constructs the outgoing packet by decrementing TTL, recalculating checksums, and overwriting Ethernet headers. Modern switch ASICs pipeline these operations across multiple stages:
 
-```
+```text
 [Ingress Port] → [Packet Parse] → [TCAM Lookup] → [Adjacency Fetch] 
     → [TTL/Checksum Update] → [Header Rewrite] → [Egress Queue] → [Physical Port]
 ```
@@ -63,7 +63,7 @@ Fabric bandwidth oversubscription is common in cost-optimized designs. A top-of-
 
 Multilayer switches implement Access Control Lists (ACLs) and Quality of Service (QoS) policies through additional TCAM lookups integrated into the forwarding pipeline. An ingress ACL might filter packets based on 5-tuple matching (source IP, destination IP, protocol, source port, destination port), requiring TCAM entries that combine IP prefix wildcards with exact-match or range-match port numbers. Because TCAM supports ternary matching natively, ACL rules compile directly into TCAM patterns with associated permit/deny actions. A rule permitting TCP traffic from 10.0.0.0/8 to any destination on port 443 becomes:
 
-```
+```text
 Source IP:     00001010.XXXXXXXX.XXXXXXXX.XXXXXXXX
 Dest IP:       XXXXXXXX.XXXXXXXX.XXXXXXXX.XXXXXXXX
 Protocol:      00000110 (TCP)
@@ -122,7 +122,7 @@ Production troubleshooting of multilayer switching issues demands visibility int
 
 Examining the FIB on Cisco IOS-based switches uses `show ip cef` commands:
 
-```
+```text
 Router# show ip cef 192.168.1.0 detail
 192.168.1.0/24, epoch 0, flags [rib defined all labels]
   nexthop 10.0.0.2 GigabitEthernet0/1
@@ -133,7 +133,7 @@ This output reveals the FIB entry for 192.168.1.0/24, the associated next-hop IP
 
 Inspecting adjacency details exposes Layer 2 rewrite information:
 
-```
+```text
 Router# show adjacency detail
 IP Address       Interface            MAC Address        Encap
 10.0.0.2         GigabitEthernet0/1   0050.56A1.2345     Arpa
@@ -143,7 +143,7 @@ Missing adjacencies—entries in glean state—indicate unresolved ARP and point
 
 TCAM utilization monitoring through `show platform tcam utilization` reveals capacity consumption:
 
-```
+```text
 Switch# show platform tcam utilization
 Resource          Used    Max     Percent
 IPv4 Routes       187234  262144  71%
@@ -155,7 +155,7 @@ Approaching 100% utilization in any category triggers capacity planning, either 
 
 Fabric and queueing statistics expose congestion and drop behavior:
 
-```
+```text
 Switch# show interface GigabitEthernet0/1 counters errors
 Port           Tx-Drop    Rx-Drop    Queue-Drop
 Gi0/1          0          0          15823

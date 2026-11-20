@@ -72,7 +72,7 @@ The critical innovation is the introduction of *hierarchical mediation*. Between
 
 This creates a signal-path architecture:
 
-```
+```text
 THE ONE (Absolute Transcendence)
       ↓ (Emanation)
 INTELLECT (Intelligible Multiplicity - the Ideas/Forms)
@@ -96,7 +96,7 @@ Augustine's crucial contribution is the concept of *ordo* (order). Beauty consis
 
 The signal path becomes:
 
-```
+```text
 GOD (Eternal Ideas)
     ↓ (Creation ex nihilo)
 CREATED REALITY (Physical & Moral Order)

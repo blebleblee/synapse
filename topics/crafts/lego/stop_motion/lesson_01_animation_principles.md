@@ -50,7 +50,7 @@ Temporal remapping—speed adjustments via frame resampling—enables creative t
 
 The data pipeline architecture for a modest production scales rapidly:
 
-```
+```text
 Single 10-second sequence (24fps) = 240 frames
 RAW capture @ 24MP × 14-bit depth = ~30MB per frame
 Sequence storage = 240 × 30MB = 7.2GB raw

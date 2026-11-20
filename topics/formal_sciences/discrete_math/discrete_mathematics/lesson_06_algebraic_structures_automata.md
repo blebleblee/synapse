@@ -137,7 +137,7 @@ The language recognized by $M$ is $L(M) = \{w \in \Sigma^* : \delta^*(q_0, w) \i
 
 **Example: DFA for strings over $\{0, 1\}$ ending in $01$.** Define $Q = \{q_0, q_1, q_2\}$, $\Sigma = \{0, 1\}$, $F = \{q_2\}$, and:
 
-```
+```text
 State | Input 0      | Input 1
 ------|--------------|------------
 q0    | q1           | q0
@@ -162,7 +162,7 @@ Initialize the partition $\Pi$ with two blocks: $F$ and $Q \setminus F$. Iterati
 
 **Example:** Consider a DFA with states $\{q_0, q_1, q_2, q_3\}$, accepting states $\{q_3\}$, and transitions:
 
-```
+```text
 State | Input a | Input b
 ------|---------|--------
 q0    | q1      | q2

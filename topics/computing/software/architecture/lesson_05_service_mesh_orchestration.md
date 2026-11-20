@@ -74,7 +74,7 @@ Each xDS resource type—Listener (LDS), Route (RDS), Cluster (CDS), Endpoint (E
 
 The control plane must also handle proxy churn gracefully. In large Kubernetes clusters, pods are constantly being created and destroyed due to autoscaling, rolling updates, and node failures. Each new proxy must perform an initial synchronization with the control plane, fetching the full configuration snapshot before it can begin forwarding traffic. To reduce cold-start latency, the control plane caches compiled configurations and serves them from memory, allowing new proxies to retrieve their initial state in milliseconds.
 
-```
+```text
 Application A → Local Envoy Proxy → [iptables REDIRECT]
                     ↓
             [Policy Evaluation: AuthN, AuthZ, Rate Limit]
@@ -116,7 +116,7 @@ A retry budget is a cluster-level quota that limits the ratio of retries to orig
 
 Adaptive retry policies further refine this by distinguishing retriable failures (such as 503 Service Unavailable, connection refused, or request timeout) from non-retriable failures (such as 400 Bad Request, 401 Unauthorized, or 409 Conflict). The proxy's retry logic is configured with a set of retriable status codes, maximum retry attempts, and backoff strategies. Exponential backoff with jitter is the standard approach: the delay between retries grows exponentially (e.g., 100ms, 200ms, 400ms) with random jitter added to prevent thundering herd effects when many clients retry simultaneously. Jittered backoff is computed as:
 
-```
+```text
 delay = base_delay * (2 ^ attempt) * (1 + random(-jitter, +jitter))
 ```
 

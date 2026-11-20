@@ -20,7 +20,7 @@ Color discipline emerges as a non-negotiable requirement for visual professional
 
 Structural systems in Lego divide into three fundamental categories: compression-dominant, tension-resistant, and bending-resistant assemblies. Compression structures—stacked walls, columns, and arches—rely on gravitational preloading to maintain cohesion, with connection friction preventing lateral displacement rather than resisting separation forces. A brick wall 30 studs tall experiences roughly 0.3 N of compression per stud at its base from the weight of bricks above, trivial compared to the 24 N stud-tube separation force, meaning pure compression structures remain stable primarily through geometric interlocking rather than weight. This explains why hollow-core construction, where internal cavities reduce element count without compromising stability, works so effectively for large vertical structures. The outer skin provides lateral bracing while the hollow interior prevents unnecessary mass accumulation. Corner interlocking, where walls turn 90 degrees with offset brick patterns, creates mechanical keying that resists shear forces trying to slide walls apart.
 
-```
+```text
 Compression Wall Cross-Section (Hollow-Core):
 
 Exterior face:        Interior cavity:      Structural principle:
@@ -39,7 +39,7 @@ Tension-resistant systems counter forces trying to pull the structure apart—ca
 
 Bending-resistant structures, which include floors spanning between supports, vehicle chassis, and aircraft wings, require composite construction that mimics engineered I-beams. A solid plate floor spanning 16 studs sags visibly under minimal load because thin plastic lacks bending stiffness. The solution applies beam theory: place structural material at maximum distance from the neutral axis. A floor built as a sandwich—plates on top and bottom with a brick lattice core—increases bending stiffness by 8× compared to the same element count in solid plate form. The brick lattice, oriented perpendicular to the span direction, acts as the I-beam web, resisting shear forces while the plate skins provide tensile and compressive capacity.
 
-```
+```text
 Composite Floor Span (Side View):
 
 Weak: Solid plates
@@ -62,7 +62,7 @@ Bracket elements extend SNOT into three-dimensional space with pre-engineered an
 
 Mechanical assemblies in Lego employ Technic elements to implement rotational joints, linear actuators, and power transmission systems. The fundamental building block, the Technic liftarm, replaces traditional bricks with a perforated beam accepting pins and axles at half-stud precision. Liftarm construction achieves frame rigidity through triangulation: three liftarms pinned into a triangle create an infinitely rigid structure (barring material flex), while four elements forming a rectangle remain a compliant parallelogram until diagonal bracing pins it into two triangles. This principle scales from minifigure-accessible hinges to crane booms spanning a meter—every successful mechanical linkage resolves to triangulated sub-assemblies.
 
-```
+```text
 Triangulated Liftarm Rigidity:
 
 Unstable rectangle:         Stabilized with diagonal:

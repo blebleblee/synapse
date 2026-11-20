@@ -136,7 +136,7 @@ The "free shipping" pricing strategy absorbs shipping costs into product price r
 
 A/B testing framework implementation must follow statistical rigor requirements that most dropshipping operators violate, generating false positive conclusions that destroy profitability through scaled deployment of inferior variations. The correct testing methodology requires calculating minimum sample size before launching tests to ensure statistical power sufficient to detect realistic effect sizes, typically eight to twelve percent conversion rate differences. The sample size calculation depends on baseline conversion rate and desired confidence level but typically requires five hundred to two thousand visitors per variation to achieve ninety-five percent confidence in detecting ten percent conversion differences. Tests deployed without pre-calculated sample sizes frequently terminate early when one variation shows apparent advantage, introducing selection bias that results in type one errors—false positives—fifty percent of the time.
 
-```
+```text
 A/B Test Sample Size Calculation
 
 Given:

@@ -24,7 +24,7 @@ Modern parametric CAD tools — Fusion 360, FreeCAD with its Part Design workben
 
 The feature tree sits above the sketch solver and manages the parametric history. Its architecture looks like this:
 
-```
+```text
 Root
 └── Origin Planes (XY, XZ, YZ)
     └── Sketch_Base
@@ -79,7 +79,7 @@ The most common source of parametric model instability in maker workflows is *to
 
 The data flow through a well-structured parametric model follows this pattern:
 
-```
+```text
 Parameter Table (named variables)
         │
         ▼

@@ -26,7 +26,7 @@ Modern x86-64 hardware uses a four-level page table (PML4, PDP, PD, PT) under th
 
 A 48-bit virtual address is decoded by the hardware as five fields:
 
-```
+```text
 Bits [47:39]  →  PML4 index     (9 bits, 512 entries)
 Bits [38:30]  →  PDP index      (9 bits, 512 entries)
 Bits [29:21]  →  PD index       (9 bits, 512 entries)

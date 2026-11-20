@@ -103,13 +103,13 @@ Explicit type annotations impose syntactic overhead and reduce code flexibility.
 
 Full Hindley-Milner type inference, as implemented in ML and Haskell, is a constraint-based algorithm operating in two phases. The constraint generation phase walks the AST and assigns a fresh type variable to each expression whose type is not immediately known. It then generates equality constraints based on the program's structure. If `f` is applied to argument `a`, we generate constraints that `f` has a function type `α → β` and that the type of `a` equals `α`. If two branches of a conditional return values, their types must be equal. If a variable is referenced in multiple contexts, all uses must agree on the type.
 
-```
+```text
 let id = λx. x in id 5
 ```
 
 The constraint generation phase produces:
 
-```
+```text
 id : τ₁
 x : τ₂
 λx. x : τ₂ → τ₂
@@ -129,7 +129,7 @@ Subtyping complicates inference significantly. With subtyping, we must track not
 
 Beyond type checking, semantic analysis enforces constraints that require understanding control flow. Definite assignment analysis ensures that every local variable is assigned a value before it is read. This prevents the undefined behavior that results from reading uninitialized stack memory. The analysis operates on the control flow graph, propagating definite-assignment states along edges. At each use of a variable, the compiler checks that the variable is definitely assigned on all paths reaching that use.
 
-```
+```text
 int x;
 if (cond) {
     x = 1;
@@ -151,7 +151,7 @@ The semantic analyzer often produces an enriched AST that serves as the input to
 
 Three-address code (TAC) is a common IR where each instruction performs a single operation and stores the result in a temporary variable. Complex expressions are decomposed into sequences of primitive operations:
 
-```
+```text
 // Source: a = b * c + d * e
 t1 = b * c
 t2 = d * e
@@ -162,7 +162,7 @@ This form exposes instruction-level parallelism and simplifies optimization pass
 
 Static single assignment (SSA) form extends three-address code with the constraint that each variable is assigned exactly once. To accommodate control flow merges where a variable may have different values depending on the path taken, SSA introduces phi functions:
 
-```
+```text
 if (cond) {
     x1 = 1;
 } else {

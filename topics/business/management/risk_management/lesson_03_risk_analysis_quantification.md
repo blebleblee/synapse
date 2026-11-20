@@ -32,7 +32,7 @@ The distinction between independent and correlated risks determines whether simp
 
 Monte Carlo implementation requires sampling from multivariate distributions that preserve correlation structure. The Cholesky decomposition method provides the standard solution: begin with uncorrelated standard normal random variables, construct the correlation matrix capturing pairwise dependencies, compute the Cholesky factor (lower triangular matrix L such that LL^T equals the correlation matrix), multiply the random vector by L to induce correlations, then apply the inverse cumulative distribution function for each variable's target distribution. This transformation ensures that sampled values exhibit the specified marginal distributions and correlation structure simultaneously.
 
-```
+```text
 Risk Aggregation Data Flow
 ═══════════════════════════════════════════════════════════════════
 

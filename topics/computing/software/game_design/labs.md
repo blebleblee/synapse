@@ -389,7 +389,7 @@ Compile this program in release mode with `cargo build --release` and execute `t
 
 Enable ThreadSanitizer by recompiling with sanitizer flags. Rust's nightly toolchain supports TSan via RUSTFLAGS environment variables. Execute `RUSTFLAGS="-Z sanitizer=thread" cargo +nightly build --target x86_64-unknown-linux-gnu` to build with instrumentation, then run the resulting binary with `./target/x86_64-unknown-linux-gnu/debug/job_scheduler`. ThreadSanitizer detects the race immediately, printing a diagnostic report:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7f8c4c001020 by thread T2:
     #0 job_scheduler::JobQueue::increment_unsafe job_scheduler/src/main.rs:28
@@ -460,7 +460,7 @@ Each worker allocates a 1MB buffer and intentionally leaks it via `std::mem::for
 
 To detect the leak automatically, enable Rust's LeakSanitizer via AddressSanitizer. Compile with `RUSTFLAGS="-Z sanitizer=address" cargo +nightly build --target x86_64-unknown-linux-gnu` and execute the binary. LeakSanitizer runs at program exit, scanning for unreachable heap allocations. It reports:
 
-```
+```text
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 
 Direct leak of 1048576 bytes in 1000 object(s) allocated from:

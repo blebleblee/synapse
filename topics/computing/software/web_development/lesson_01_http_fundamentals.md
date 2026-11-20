@@ -26,7 +26,7 @@ Header fields follow the request-line as colon-delimited key-value pairs, one pe
 
 Connection lifecycle management evolved significantly across protocol versions. HTTP/1.0 defaulted to closing connections after each response, requiring explicit `Connection: keep-alive` header negotiation to reuse TCP sockets. HTTP/1.1 inverted the default to persistent connections, demanding explicit `Connection: close` to trigger teardown. This shift amortized the three-way TCP handshake (SYN, SYN-ACK, ACK) and slow-start congestion window growth across multiple requests, critical for page loads requiring dozens of subresources. The server signals response message completion through Content-Length for known payload sizes or chunked transfer encoding for streaming generation, allowing pipelined requests to accurately frame subsequent responses.
 
-```
+```bash
 # HTTP/1.1 Request with Persistent Connection
 GET /api/users/1234 HTTP/1.1
 Host: api.example.com
@@ -56,7 +56,7 @@ Content negotiation mechanics leverage Accept headers for proactive negotiation 
 
 Caching semantics transform HTTP from a document retrieval protocol into a globally distributed eventual-consistency system. The Cache-Control header encodes freshness and validation policies through a directive vocabulary. The `max-age` directive specifies the number of seconds a response may be served from cache before requiring revalidation. The `no-cache` directive mandates revalidation before serving cached responses, despite its misleading name that suggests cache prohibition. The `no-store` directive actually prohibits caching entirely, critical for sensitive financial or personal data. The `private` directive restricts caching to single-user browser caches, preventing shared proxy caches from serving responses to multiple users. The `public` directive explicitly permits shared caching, overriding default restrictions for authenticated requests.
 
-```
+```bash
 # Cache-Control Directive Examples
 
 # Fresh for 1 hour, may be cached by proxies
@@ -92,7 +92,7 @@ Cache hierarchy optimization requires understanding the multi-tiered architectur
 
 Cache invalidation strategies balance consistency against performance. Time-based expiration through max-age provides eventual consistency with bounded staleness, suitable for immutable resources like JavaScript bundles with content-hashed filenames. Event-driven invalidation through cache purge APIs provides immediate consistency for mutable resources, requiring careful coordination between application writes and CDN purge propagation. Stale-while-revalidate policies serve stale responses while asynchronously fetching fresh content, masking revalidation latency from user-facing requests. Cache tags enable efficient bulk invalidation by associating multiple URLs with logical entities—purging the `user:1234` tag invalidates all cached responses related to that user without enumerating individual URLs.
 
-```
+```bash
 # Stale-While-Revalidate Optimization
 # Serves stale for 86400s (24h) during async 300s revalidation
 Cache-Control: max-age=300, stale-while-revalidate=86400

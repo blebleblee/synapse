@@ -72,7 +72,7 @@ A practical detection sequence: observe the subject's baseline gesture frequency
 
 The practitioner's analytical task is not to identify single cues but to recognize *cluster co-occurrence*—multiple channels signaling consistent deception patterns simultaneously. This is conceptualized in the following diagnostic matrix:
 
-```
+```text
 ┌─────────────────────┬──────────────────────────────────────────────────┐
 │ Channel             │ Deception Signature (Under Load)                 │
 ├─────────────────────┼──────────────────────────────────────────────────┤

@@ -24,7 +24,7 @@ The secondary structures—smaller buildings, market stalls, trees—distribute 
 
 Vertical stratification introduces the Z-axis dimension that transforms flat staging into genuinely three-dimensional environments. The fundamental technique employs **plate-level incrementing** to create gentle slopes and terraced ground planes. Standard LEGO plates measure 3.2mm in height; stacking three plates (9.6mm) equals one brick height. To build a hillside rising from the front edge of a baseplate to a summit six bricks tall (57.6mm) over a horizontal distance of 32 studs (256mm), we create a staircase profile using plate layers:
 
-```
+```text
 Level 0 (Front edge):     0mm height, 8 studs depth
 Level 1 (+3 plates):      9.6mm height, 8 studs depth  
 Level 2 (+3 plates):      19.2mm height, 8 studs depth

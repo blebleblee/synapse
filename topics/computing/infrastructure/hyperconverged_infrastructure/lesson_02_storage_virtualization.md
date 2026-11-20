@@ -580,7 +580,7 @@ Modern systems use distributed rebuild: read from all surviving drives in parall
 
 Storage I/O follows a power-law distribution: a small fraction of blocks accounts for most accesses. Caching exploits this temporal locality.
 
-```
+```text
 L1: DRAM cache (64 GB)       — 100 ns latency, hit rate ~70%
 L2: NVMe SSD cache (1 TB)    — 100 µs latency, hit rate ~95%
 L3: SATA SSD pool (10 TB)    — 500 µs latency, hit rate ~99%

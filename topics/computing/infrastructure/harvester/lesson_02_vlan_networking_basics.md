@@ -87,7 +87,7 @@ flowchart TD
 
 Switches maintain a CAM table (or MAC address table) per VLAN. Each entry maps:
 
-```
+```text
 [VLAN ID][MAC Address] -> [Port, Timestamp]
 ```
 
@@ -279,7 +279,7 @@ Switch(config)# no vtp file
 
 An attacker on an access port in the native VLAN sends a frame with two 802.1Q tags:
 
-```
+```text
 [Dest MAC][Src MAC][0x8100][VLAN 1][0x8100][VLAN 20][Payload]
 ```
 
@@ -490,7 +490,7 @@ Switch(config-if-range)# exit
 
 Q-in-Q tunnels 802.1Q tags inside another 802.1Q tag, allowing service providers to preserve customer VLANs across the provider network. The outer tag (S-TAG, TPID 0x88a8) belongs to the provider; the inner tag (C-TAG, TPID 0x8100) belongs to the customer.
 
-```
+```text
 [Dest MAC][Src MAC][0x88a8][Provider VLAN][0x8100][Customer VLAN][Payload]
 ```
 
@@ -508,7 +508,7 @@ The provider VLAN (200) encapsulates customer VLAN tags.
 VXLAN (RFC 7348) overlays Layer 2 networks over Layer 3 infrastructure using UDP encapsulation. VXLAN addresses VLAN scaling limits (4094 VLANs) by using a 24-bit VXLAN Network Identifier (VNI), supporting 16 million segments.
 
 VXLAN encapsulation:
-```
+```text
 [Outer Ethernet][Outer IP][Outer UDP (port 4789)][VXLAN Header (VNI)][Inner Ethernet][Payload]
 ```
 

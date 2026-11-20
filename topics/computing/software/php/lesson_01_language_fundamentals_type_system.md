@@ -178,7 +178,7 @@ function add_typed(int $a, int $b): int {
 
 Using `php -d vld.active=1 -d vld.execute=0 -r` or dumping via OPcache's internal API, the compiled opcode stream for `add_typed` looks conceptually like:
 
-```
+```text
 line   opcode          op1       op2       result
 ----   ------          ---       ---       ------
   3    RECV            $a        [CV 0]           # receive param, store to CV slot 0

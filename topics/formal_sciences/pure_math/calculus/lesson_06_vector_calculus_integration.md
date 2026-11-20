@@ -238,7 +238,7 @@ The Jacobian determinant has a geometric meaning beyond formal computation: it m
 
 The diagrammatic structure below summarizes how the integral theorems relate domains, boundaries, and differential operators:
 
-```
+```text
 Dimension 0: Points (endpoints)
         ↑  FTC for Line Integrals:  ∫_{a}^{b} df = f(b) - f(a)
 

@@ -71,7 +71,7 @@ The cavity modes of a Fabry-Pérot laser diode are longitudinal modes spaced by 
 
 The following ASCII energy diagram illustrates the band structure of a double-heterojunction LED operating under forward bias. Solid lines represent band edges; the Fermi level is shown for both electrons and holes under applied bias.
 
-```
+```text
 Conduction Band (EC):
 
                 p-AlGaAs    |   p-GaAs       |   n-AlGaAs

@@ -22,7 +22,7 @@ The cognitive architecture of domain transfer operates through a multi-stage pip
 
 The first phase requires selecting and thoroughly encoding a source domain—a field, system, or process whose mechanisms you understand deeply. Effective encoding goes beyond memorizing facts; it demands constructing an explicit relational structure that captures causal dependencies, constraint hierarchies, feedback dynamics, and optimization criteria. Consider the domain of natural selection in evolutionary biology. A surface-level encoding might list facts: organisms reproduce, mutations occur, environments exert selection pressure. A structural encoding, by contrast, maps the generative algorithm:
 
-```
+```text
 Source Domain: Natural Selection
 
 Core Components:
@@ -49,7 +49,7 @@ This structural encoding isolates the relational machinery independent of its bi
 
 Effective domain transfer requires operating at the correct level of abstraction—neither so concrete that mappings become trivial nor so abstract that they lose predictive power. Abstraction hierarchies organize knowledge from specific instantiations at the bottom to general principles at the top:
 
-```
+```text
 Level 4 (Most Abstract): General Systems Theory
          ↓ (Optimization through iterative filtering)
 Level 3: Evolutionary Algorithms
@@ -68,7 +68,7 @@ The practitioner's task is identifying the **minimal viable abstraction**—the 
 
 Before mapping can occur, the target domain problem must be structured in compatible terms. This stage demands translating the target problem from its native vocabulary into a neutral relational schema that exposes mappable structure. Suppose the target problem is: "How can a technology startup accelerate product-market fit discovery?" A naive approach treats this as a business strategy question, searching only within entrepreneurship literature. A domain-transfer approach re-structures the problem abstractly:
 
-```
+```text
 Target Problem (Re-structured):
 
 Search Space: possible product configurations × possible customer segments
@@ -84,7 +84,7 @@ This re-structuring exposes the problem's deep structure: it is fundamentally a 
 
 With source domain structure extracted and target problem structured compatibly, the practitioner can now establish explicit component-to-component correspondences:
 
-```
+```text
 Source Domain          →    Target Domain
 (Natural Selection)         (Startup Product-Market Fit)
 

@@ -32,7 +32,7 @@ In traditional animation terminology, the senior animator draws keyframes and br
 
 Digital animation software replicates this structure through pose-to-pose keyframing systems. The animator sets keyframe poses at specific frame numbers. The software generates interpolated inbetween frames automatically via mathematical interpolation curves. However, naive linear interpolation produces the mechanical uniform-velocity motion that traditional animators learned to avoid. Modern animation software provides control over interpolation curves through tangent handles—Bézier curve controls that shape the velocity profile between keyframes.
 
-```
+```text
 Keyframe A (frame 0)          Breakdown (frame 8)       Keyframe B (frame 20)
     Position: 0                   Position: 150               Position: 200
          ●                             ●                           ●

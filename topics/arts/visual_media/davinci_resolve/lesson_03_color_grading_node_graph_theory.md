@@ -22,7 +22,7 @@ These three invariants—signal flow isolation, channel independence, and non-de
 
 The simplest and most common node graph structure is serial: a linear chain where Output Node A feeds into Input of Node B, which feeds into Node C, and so on. In DaVinci Resolve's interface, you construct this by selecting a node and pressing the "Append" button (or Alt+S on keyboard). The new node is automatically connected downstream.
 
-```
+```text
 Input Image → [Node 1: Input Levels] → [Node 2: Curves] → [Node 3: Hue Rotation] → [Node 4: Output] → Final Grade
 ```
 
@@ -140,14 +140,14 @@ The critical issue with LUTs is **LUT application order in the node graph**. A L
 Consider two scenarios:
 
 **Scenario A: LUT Early**
-```
+```text
 Input → [Node 1: Exposure Adjustment] → [Node 2: Apply Film LUT] → [Node 3: Saturation] → Output
 ```
 
 Here, the film LUT is applied after the exposure is adjusted. If you subsequently change the exposure, the interaction between the new exposure values and the LUT will change the appearance of the grade.
 
 **Scenario B: LUT Late**
-```
+```text
 Input → [Node 1: Film LUT] → [Node 2: Color Balance] → [Node 3: Saturation] → Output
 ```
 

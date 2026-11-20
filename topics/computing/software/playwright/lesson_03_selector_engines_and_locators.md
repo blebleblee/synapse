@@ -103,7 +103,7 @@ The role-based selector engine queries elements using their computed ARIA roles,
 
 Locator chaining implements **scope inheritance** through a linked evaluation chain where each locator maintains a reference to its parent scope. When we construct `page.locator('.container').getByRole('button')`, the resulting locator stores both the CSS selector `.container` and the role query `button`, along with metadata indicating the role selector must evaluate within the subtree of the container match. During evaluation, Playwright first resolves the parent locator to obtain a set of container elements, then iterates over this set invoking the child selector engine with each container as the root node, finally collecting all descendant matches into a unified result set. This compositional approach extends arbitrarily: `page.locator('.sidebar').locator('.menu').getByText('Settings')` creates a three-level chain where each stage narrows the search space, producing deterministic selection even when generic selectors would otherwise match multiple candidates.
 
-```
+```text
 Locator Evaluation Chain:
 
 User Code:

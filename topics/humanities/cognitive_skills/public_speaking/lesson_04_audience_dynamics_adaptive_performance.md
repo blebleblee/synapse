@@ -34,7 +34,7 @@ The key insight is that these are not random behavioral noise; they are outputs 
 
 The critical detail is that interventions should be *pre-planned but contextually triggered*. You prepare a repertoire of interventions—stories, questions, visual shifts, structural breaks, physical movements—during preparation, but you deploy them based on real-time diagnosis, not on a rigid script. This is the distinction between adaptive performance and mere recitation.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    REAL-TIME FEEDBACK LOOP                  │
 ├─────────────────────────────────────────────────────────────┤

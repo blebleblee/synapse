@@ -49,7 +49,7 @@ A baseline grid locks every line of text in every frame to the same horizontal r
 
 Rather than eyeballing margins, use `Layout > Margins and Columns` and derive numbers from a module. For an 8.5×11in page:
 
-```
+```text
 Margins: Top 0.75in, Bottom 1in (bottom slightly larger — optical weight,
          prevents the page from feeling like it's falling forward)
 Columns: 3, Gutter 0.1667in (1/6 in — divides cleanly into picas)
@@ -173,7 +173,7 @@ Select the image frame → `Window > Text Wrap` (`Cmd/Ctrl + Opt/Alt + W`):
 `Paragraph panel flyout > Hyphenation`. Default settings are too aggressive for narrow columns and produce ladders of hyphens down the left margin — a clear failure mode in professional work.
 
 Fix for narrow (under 2in) columns:
-```
+```text
 Words with at least: 6 letters (up from default 5)
 After first: 3 letters
 Before last: 3 letters
@@ -182,7 +182,7 @@ Hyphenation zone: increase for more ragged-right, fewer hyphens
 ```
 
 For **justified** text specifically, open `Justification` in the same flyout menu and tighten the word/letter spacing ranges:
-```
+```text
 Word Spacing: Min 85% / Desired 100% / Max 115%
 Letter Spacing: Min -2% / Desired 0% / Max 2%
 ```

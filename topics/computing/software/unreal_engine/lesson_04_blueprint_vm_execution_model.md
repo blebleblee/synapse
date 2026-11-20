@@ -32,7 +32,7 @@ The linearization pass converts the validated, optimized graph into a sequential
 
 Blueprint bytecode instructions encode as variable-length byte sequences where the first byte specifies the opcode and subsequent bytes encode operands like literal values, property offsets, or branch targets. Common opcodes include:
 
-```
+```text
 EX_LocalVariable        // Push local variable value onto stack
 EX_InstanceVariable     // Push instance property value onto stack  
 EX_CallFunction         // Invoke native or Blueprint function
@@ -47,7 +47,7 @@ EX_StructMemberContext // Access structure member through offset
 
 The instruction stream for a simple Blueprint function that adds two floats might serialize as:
 
-```
+```text
 EX_LocalVariable    [param_A offset]   // Push parameter A
 EX_LocalVariable    [param_B offset]   // Push parameter B  
 EX_CallMath         [Add_FloatFloat]   // Call native add operator
@@ -62,7 +62,7 @@ The latent action system provides the mechanism for Blueprints to express tempor
 
 Consider a Blueprint implementing a simple traffic light controller that cycles through red, yellow, and green states with delays between transitions:
 
-```
+```text
 BeginPlay
   → Set Light Color: Red
     → Delay (10 seconds)

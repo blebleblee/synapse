@@ -32,7 +32,7 @@ Functional group nomenclature imposes additional structural requirements. Carbox
 
 The nomenclature of polyfunctional molecules requires strict adherence to the functional group priority hierarchy. In a molecule containing both a carboxylic acid and a ketone, the carboxylic acid commands naming priority: the molecule becomes a substituted carboxylic acid with an "oxo-" prefix indicating the ketone. The decision tree proceeds:
 
-```
+```text
 1. Identify all functional groups present
 2. Determine highest-priority group (defines suffix)
 3. Select parent chain containing highest-priority group

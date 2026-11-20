@@ -24,7 +24,7 @@ The `BEGIN` and `END` blocks are not special patterns in the same sense as a reg
 
 To understand awk's mechanics concretely, it helps to model its execution as pseudocode. The following is a faithful representation of what gawk (GNU awk) does for a program containing `k` pattern-action rules:
 
-```
+```text
 open_next_input_file()
 while read_next_record() into $0:
     split($0, fields[], FS)          # populate $1..$NF
@@ -40,7 +40,7 @@ This loop is the entire runtime. There is no event loop, no callback registratio
 
 The field array is not built from scratch on every record in a naive implementation. Gawk uses a lazy evaluation strategy: `$0` is stored as a raw string, and fields are split only when a field variable is first accessed. This matters for programs that test only `$0` with a regex — the split is avoided entirely on non-matching records. Conversely, assigning to a field variable (e.g., `$2 = "new"`) triggers *reconstruction* of `$0` by joining all fields with the current value of `OFS` (output field separator). This is a critical invariant: **modifying a field mutates `$0`**, and the reconstructed `$0` uses `OFS`, not the original separator characters. This catches engineers who set `FS=":"` to parse `/etc/passwd`, then assign a field, and are surprised to find `$0` now contains spaces.
 
-```
+```text
 Input record:  "root:x:0:0:root:/root:/bin/bash"
 FS = ":"
 $1 = "root", $2 = "x", $3 = "0" ... $7 = "/bin/bash"

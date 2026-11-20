@@ -465,7 +465,7 @@ perf stat -e cycles,instructions,cache-references,cache-misses,L1-dcache-loads,L
 
 The perf output reveals the cache miss rate: the ratio of cache misses to cache references. A high miss rate indicates poor locality, while a low miss rate confirms effective cache utilization. Compare the L1 data cache load misses between AoS and SoA—the SoA implementation should exhibit significantly fewer misses because each iteration accesses contiguous memory within the same cache line.
 
-```
+```bash
 # Example perf stat output for AoS (poor locality)
   12,345,678,901      cycles
    8,765,432,109      instructions              #    0.71  insn per cycle
@@ -660,7 +660,7 @@ cargo +nightly test --target x86_64-unknown-linux-gnu --lib resource_pool::tests
 
 ThreadSanitizer reports the data race with precise source locations for the conflicting accesses. The output identifies the two threads, the memory address involved, and the call stacks leading to each access.
 
-```
+```text
 ==================
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7fff12345678 by thread T2:
@@ -811,7 +811,7 @@ cargo +nightly test --target x86_64-unknown-linux-gnu --lib resource_pool::tests
 
 LeakSanitizer reports the leaked allocation with a call stack showing where the memory was allocated.
 
-```
+```text
 =================================================================
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 

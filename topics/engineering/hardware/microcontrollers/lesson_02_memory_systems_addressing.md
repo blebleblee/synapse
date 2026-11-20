@@ -30,7 +30,7 @@ EEPROM occupies a middle ground. Unlike Flash, EEPROM can be written byte-by-byt
 
 The address space layout reflects these technologies and their roles. A representative mapping on an ARM Cortex-M4 with 256 KB of Flash and 64 KB of SRAM might look like this:
 
-```
+```text
 Address Range         | Contents              | Size
 --------------------|------------------------|----------
 0x00000000–0x0003FFFF | Flash Memory          | 256 KB
@@ -49,7 +49,7 @@ Memory-mapped I/O is the architectural pattern by which the microcontroller inte
 
 Peripheral registers are typically organized into a structure, with each register at a fixed offset from a base address. For example, an UART peripheral might be mapped starting at `0x4000_8000`, with control registers at fixed offsets:
 
-```
+```text
 Base Address: 0x4000_8000 (UART0)
 +0x00: DATA Register (read/write character data)
 +0x04: STATUS Register (read-only flags)
@@ -104,7 +104,7 @@ CPU instruction sets provide multiple addressing modes—syntactic mechanisms fo
 
 **Immediate Addressing** is the simplest: the operand is encoded directly in the instruction. For example, `MOV R0, #0x42` loads the constant `0x42` into register R0. In Thumb-2, immediate values are limited to an 8-bit value rotated by an even number of bits, a constraint driven by instruction encoding space. This restriction means not all constants can be encoded directly; loading an arbitrary 32-bit constant might require two instructions:
 
-```
+```text
 MOVW R0, #0x1234     ; Load lower 16 bits
 MOVT R0, #0x5678     ; Load upper 16 bits (R0 now contains 0x56781234)
 ```
@@ -115,7 +115,7 @@ The MOVW (move wide) and MOVT (move top) instructions are essential for loading 
 
 **Direct Addressing** (also called **PC-Relative Addressing** in some contexts) encodes an address directly in the instruction or derives it from the program counter. For example, `LDR R0, [PC, #8]` loads a 32-bit value from 8 bytes after the current instruction. This mode is commonly used to load constants stored in code memory immediately following a function:
 
-```
+```text
     LDR R0, [PC, #12]     ; Load constant from address PC+12+8
     BL  some_function
     ; ... more code ...
@@ -134,7 +134,7 @@ int value = array_ptr[0];  // LDR R0, [R1] where R1 holds the address
 
 **Indexed Addressing** combines a base register with an offset. `LDR R0, [R1, #4]` loads a value from the address (R1 + 4). The offset can be an immediate value or another register:
 
-```
+```text
 LDR R0, [R1, #4]      ; Offset by constant (address = R1 + 4)
 LDR R0, [R1, R2]      ; Offset by register (address = R1 + R2)
 LDR R0, [R1, R2, LSL #2]  ; Scaled by register (address = R1 + (R2 << 2))
@@ -144,7 +144,7 @@ Scaled indexing is particularly valuable for array access. If R1 points to an ar
 
 **Auto-Increment and Auto-Decrement Addressing** modifies the base register after the memory access, enabling efficient iteration:
 
-```
+```text
 LDR R0, [R1], #4      ; Load from R1, then increment R1 by 4
 LDR R0, [R1, #-4]!    ; Decrement R1 by 4, then load from new R1
 ```
@@ -182,7 +182,7 @@ int compute(int arg) {
 
 When `main` calls `compute`, the ARM calling convention (AArch32 for 32-bit ARM) dictates that `x` (the argument) is passed in register R0, and the return address is stored in the Link Register (LR, R14). Inside `compute`, the function might save callee-saved registers (those it intends to modify) by pushing them onto the stack:
 
-```
+```json
 [Before call]  SP -> [Top of main's local variables]
 [At function entry] PUSH {R4-R11, LR}  ; Save callee-saved regs and return address
                SP -> [Saved R4]
@@ -195,7 +195,7 @@ When `main` calls `compute`, the ARM calling convention (AArch32 for 32-bit ARM)
 
 When `compute` returns, the sequence is reversed:
 
-```
+```text
                POP {R4-R11, PC}  ; Restore saved registers and jump to return address
                SP -> [Previous SP position]
 ```
@@ -210,7 +210,7 @@ The Interrupt Vector Table (IVT) is a critical metadata structure residing at th
 
 A typical ARM Cortex-M4 IVT layout begins with a reserved region and standard ARM exceptions, followed by vendor-specific interrupts:
 
-```
+```text
 Offset  | Vector Name              | Address / Meaning
 --------|--------------------------|----------------------------------
 0x00    | Initial SP               | Stack pointer value at startup
@@ -271,7 +271,7 @@ const isr_t vector_table[] = {
 
 The linker script ensures this array is placed at the very start of Flash:
 
-```
+```text
 SECTIONS {
     .flash_start 0x00000000 : {
         KEEP(*(.isr_vector))

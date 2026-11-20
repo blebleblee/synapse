@@ -95,7 +95,7 @@ The arithmetic: 5 plates × 3.2 mm = 16 mm. Two stud pitches = 2 × 8 mm = 16 mm
 
 The bracket family — especially the 1×2–1×2 bracket and the 1×2–2×2 bracket — is the most common tool for introducing sideways stud faces into a standard stacking layout. Each bracket occupies a known volume in the standard grid and presents an outward stud face at a precisely defined offset from the base plane. Getting SNOT assemblies right is primarily an exercise in counting this offset carefully and verifying that the bracket's outward stud face is positioned to accept exactly the number of plates or bricks required to close the gap to the nearest grid surface.
 
-```
+```text
 SNOT vertical registration (side view):
 
 Standard stack:                    SNOT panel (sideways brick):

@@ -91,7 +91,7 @@ Every pattern you'll ever play on a kit is built from four stroke types. Learn t
 | **Up stroke** | Low | High | Quiet note followed immediately by an accent |
 
 **Drill: Four-Stroke Switching**
-```
+```text
 Tempo: 60 BPM, quarter notes, right hand only on practice pad
 Bar 1: Full stroke x4 (high-high-high-high)
 Bar 2: Down stroke, tap, tap, up stroke (high→low, low→low, low→low, low→high)
@@ -112,7 +112,7 @@ This drill looks trivial and is not. Most "uneven" playing at speed traces back 
 Hands alternate, each hand getting a full prep cycle while the other strikes. This is why single strokes can go faster than either hand could manage alone — you're time-sharing the workload.
 
 **Drill ladder:**
-```
+```text
 Pad, metronome, sixteenth notes, hands RLRL throughout.
 Week 1: 80 BPM — focus: identical stick height both hands (use mirror)
 Week 2: 90 BPM
@@ -128,7 +128,7 @@ Rule of thumb: never grind at a tempo that breaks your stroke evenness. Five min
 First stroke of each pair is a full, active stroke. The second is a **caught rebound** — you let the head's elastic kickback do the work and simply close your fingers at the top to stop the stick at the right height, rather than actively re-striking.
 
 **Isolating the rebound — the single most important double-stroke drill:**
-```
+```text
 Pad, one hand at a time, tempo 70 BPM quarter notes.
 1. Drop the stick from ~15cm (let gravity do it, don't push).
 2. Let it bounce once off the pad on its own — don't touch it.
@@ -144,7 +144,7 @@ Pad, one hand at a time, tempo 70 BPM quarter notes.
 The genius of the sticking is that both the single-stroke-alternation skill and the double-stroke-rebound skill get used in the same pattern. Notes 1-2 are a single-stroke pair (full alternation); notes 3-4 are a double on one hand (rebound-catch).
 
 **Drill:**
-```
+```text
 Pad, tempo 80 BPM, sixteenth notes: R L R R L R L L (continuous)
 Phase 1 (weeks 1-2): all notes even volume — isolates the sticking pattern itself
 Phase 2 (weeks 3-4): accent note 1 of each group of four (>R L R R >L R L L) — this is how paradiddles get used musically, as an accent pattern around the kit
@@ -178,7 +178,7 @@ graph LR
 Two strokes landing almost together: a quiet grace note (low height, ~2-5cm) immediately before a full-volume primary stroke (~15cm), roughly 20-30ms apart. The ear hears it as one "fat" note, not two separate hits.
 
 **Drill:**
-```
+```text
 Tempo 80 BPM, quarter notes, pad.
 Right flam: L grace (low, quiet) lands just before R primary (full height, full volume)
 Left flam: R grace just before L primary
@@ -196,7 +196,7 @@ Weeks 5-6: 100 BPM, apply to toms — flam accents moving around the kit
 Two very fast, very quiet grace notes (a controlled double-bounce, 2-10ms apart) followed by a full primary stroke. Think of it as a mini buzz feeding into an accent.
 
 **Drill:**
-```
+```text
 Tempo 70 BPM, quarter notes, pad.
 Right drag: L-L rapid quiet double-bounce → R primary full stroke
 Left drag: R-R rapid quiet double-bounce → L primary full stroke
@@ -212,7 +212,7 @@ Key technique: let the grace notes come from a controlled finger bounce, not two
 Very quiet strokes (roughly 15-20% of accent volume) played from minimal height (1-2cm), used to fill rhythmic space without disrupting the groove's main pulse. This is the backbone of funk, hip-hop, and shuffle feels.
 
 **Drill — the funk pocket builder:**
-```
+```text
 Tempo 90 BPM
 Pattern: R L R L (sixteenth notes), hands alternating
 Dynamics: ghost - ACCENT - ghost - ghost (accent on beat 2 and 4 positions within each grouping)
@@ -232,7 +232,7 @@ Week 4: 110 BPM, add hi-hat eighth notes with foot/other hand — full groove in
 Too loose and the stick flies out of your hand on an accent. Too tight and you choke your own rebound, burn out your forearm, and your fast passages fall apart. The zone you want: light enough that the stick can still bounce freely, firm enough that you control where it goes.
 
 **Calibration drill — do this before every fast session:**
-```
+```text
 Pad, 80 BPM quarter notes, one hand at a time.
 1. Play 2 minutes gripping as lightly as possible — stick should feel loose, almost uncontrolled
 2. Play 2 minutes gripping moderately — note the difference in control
@@ -244,7 +244,7 @@ Pad, 80 BPM quarter notes, one hand at a time.
 **Death grip symptoms:** forearm burning out in minutes, stick rebound feels "dead," accidental loss of speed ceiling, and — the tell — your knuckles visibly whiten on the stick. Death grip is almost always caused by trying to force a tempo or pattern you haven't earned yet. The fix is never "grip harder," it's drop the tempo and rebuild with a relaxed grip at a speed where control doesn't require tension.
 
 **Fix-it protocol:**
-```
+```text
 Week 1: single strokes, 80 BPM, deliberately light grip, 5 min continuous. If tension creeps in, stop, shake hands out, restart.
 Week 2: same grip feel, 8 min continuous.
 Week 3: same grip feel, raise to 90 BPM.
@@ -267,7 +267,7 @@ Rough practical reference (sixteenth notes, single strokes):
 This is why blast-beat and fast-metal drumming sounds compressed in dynamics compared to a slow ballad groove — it's not a stylistic limitation, it's a mechanical one. Plan your dynamics around this: don't try to crescendo into a passage that's about to double in speed, because the height you need for the crescendo won't physically fit in the time available.
 
 **Height-matching drill:**
-```
+```text
 Mirror, pad, 70 BPM quarter notes.
 1. Play RLRL at a fixed 10cm target height, watching both hands in the mirror
 2. Close your eyes for 8 strokes, open and check — are both sticks still matching?
@@ -276,7 +276,7 @@ Progress: extend the eyes-closed block to 16, then 32 strokes as your kinestheti
 ```
 
 **Tempo ceiling drill — building speed the right way:**
-```
+```text
 Pad, metronome, single strokes.
 1. Play 2 minutes at your current comfortable tempo.
 2. Raise 4 BPM. Play 2 minutes.
@@ -298,7 +298,7 @@ After any stroke, the stick wants to keep bouncing. Sometimes you want that (buz
 Close your fingers around the stick immediately after the stroke lands, absorbing the leftover bounce energy into your grip instead of letting it rattle the head. This is especially necessary on tight, high-tension snares with coated heads, which rebound more and buzz more easily than looser heads.
 
 **To control a buzz roll on purpose:**
-```
+```text
 Pad or snare, tempo 60 BPM, whole notes.
 1. Press the stick down with just enough pressure to sustain a multi-bounce buzz, not a single clean strike.
 2. Aim for roughly 6-8 bounces per buzz — consistent density, not a ragged rattle.
@@ -323,7 +323,7 @@ The wrist's neutral position — hand in line with the forearm — is the safest
 - American grip spreads the load between both, which is part of why it's the common professional default for high-volume playing.
 
 **Warm-up before every session (5 minutes, non-negotiable at fast tempos or long sessions):**
-```
+```text
 1. Wrist circles — 10 each direction, both hands
 2. Finger spreads — spread wide, hold 5 sec, relax, x10
 3. Light taps on pad at 1cm height, 60 BPM, 2 minutes — wakes up fine motor control before loading the wrist
@@ -340,7 +340,7 @@ The wrist's neutral position — hand in line with the forearm — is the safest
 Unstructured practice — noodling without targets — produces slow, inconsistent gains. This session has a clear objective in every block.
 
 **Warm-up (12 min)**
-```
+```text
 0-3 min: Finger taps, 2cm height, 60 BPM, each finger isolated, both hands — wakes up fine motor control
 3-6 min: Single strokes RLRL, 8cm height, 90 BPM — wrist-only motion, arm stays still
 6-9 min: Double strokes RRLLRRLL, 80 BPM — focus entirely on matching rebound volume to first stroke
@@ -348,7 +348,7 @@ Unstructured practice — noodling without targets — produces slow, inconsiste
 ```
 
 **Technical block (20 min)**
-```
+```text
 12-17 min: Tempo ceiling push — single strokes, +4 BPM every 2 min until form breaks, log the ceiling, descend back down
 17-22 min: Paradiddles at 70% of your single-stroke ceiling — 2 min accented, 2 min even volume, 1 min crescendo/decrescendo
 22-27 min: Flams at 80 BPM — alternate right-lead and left-lead flams, 20-30ms grace spacing
@@ -356,7 +356,7 @@ Unstructured practice — noodling without targets — produces slow, inconsiste
 ```
 
 **Musical application (20 min)**
-```
+```text
 32-37 min: Basic rock groove with ghost notes, 90 BPM — kick 1&3, snare accent 2&4, sixteenth-note ghosts between
 37-42 min: Fill construction, 100 BPM — 3 bars groove + 1 bar fill, rotating through paradiddle fills, flam fills, double-stroke fills
 42-47 min: Play along to a song at or near practice tempo — lock with the kick/bass, keep ghost intensity consistent, clean fills without rushing
@@ -364,7 +364,7 @@ Unstructured practice — noodling without targets — produces slow, inconsiste
 ```
 
 **Cool-down (8 min)**
-```
+```text
 52-55 min: Free, quiet, no-metronome playing — focus on how relaxed, efficient motion physically feels
 55-57 min: Wrist extensor and flexor stretches, 30 sec each, finger spreads x10
 57-60 min: Log entry — tempo ceiling reached, biggest breakthrough or sticking point, next session's focus
@@ -372,7 +372,7 @@ Unstructured practice — noodling without targets — produces slow, inconsiste
 
 ### Practice Log Template
 
-```
+```text
 Date: _______  Duration: _____ min  Level: Beginner / Intermediate / Advanced
 
 WARM-UP

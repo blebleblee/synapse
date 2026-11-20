@@ -30,7 +30,7 @@ Critical to understanding the Voynich's resistance to decryption is recognizing 
 
 The pedagogically useful framework for analyzing the Voynich involves a systematic diagnostic tree:
 
-```
+```text
 Analytical Decision Tree for Voynich Interpretation
 
                     Unreadable Text

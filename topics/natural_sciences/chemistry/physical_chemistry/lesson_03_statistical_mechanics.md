@@ -136,7 +136,7 @@ where $\Delta E_0$ is the difference in ground-state electronic energies between
 
 For practical calculations, computational chemistry software (Gaussian, ORCA, Q-Chem) provides vibrational frequencies and electronic energies from which partition functions can be constructed. A typical workflow proceeds as follows:
 
-```
+```text
 Geometry Optimization → Frequency Calculation → Thermochemistry Analysis
         ↓                       ↓                         ↓
     E_electronic           ν₁, ν₂, ..., ν_3N-6        Q, U, S, G, C_V

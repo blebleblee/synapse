@@ -336,7 +336,7 @@ Implement adjustments one axle at a time to isolate effects. Begin with front da
 
 Document the adjustment sequence in a setup log with the following structure:
 
-```
+```text
 Setup Change Log - Damper Tuning Exercise
 
 Baseline Configuration:
@@ -369,7 +369,7 @@ The anti-roll bar (stabilizer bar) is a torsion spring connecting left and right
 
 The total roll stiffness at each axle comprises the geometric spring stiffness plus the anti-roll bar storsional stiffness. For a given corner weight, track width, and motion ratio, calculate the roll stiffness contribution of the anti-roll bar using:
 
-```
+```text
 K_roll_ARB = (F_arm^2 * K_torsion * eta^2) / t^2
 ```
 
@@ -601,7 +601,7 @@ plt.show()
 
 If the front-left tire shows a gradient of +8 degrees Celsius (inside significantly hotter), reduce front-left camber from -2.5 degrees to -2.0 degrees. Measure temperatures after the next session to confirm the gradient reduces toward the target range. Document the change in the setup log:
 
-```
+```text
 Tire Tuning Log - Camber Optimization
 
 Initial Setup (Lap 5):
@@ -786,7 +786,7 @@ This model quantifies the cost of tire wear in lap time, enabling strategic deci
 
 Synthesize the camber, pressure, and wear analysis into a comprehensive tire tuning matrix documenting optimal settings for each corner of the vehicle. This matrix serves as the reference document for trackside setup decisions and ensures consistent configuration across sessions.
 
-```
+```text
 TIRE TUNING MATRIX - Final Configuration
 
 FRONT LEFT:
@@ -972,7 +972,7 @@ This library correlates common telemetry trace patterns with specific vehicle dy
 
 The setup matrix documents the interdependencies between adjustable parameters and their effects on vehicle dynamic behavior. Each row represents a parameter adjustment, and columns indicate the resulting effects on handling balance, aerodynamic platform, tire loading, and lap time sensitivity.
 
-```
+```text
 PARAMETRIC SETUP MATRIX
 
 Parameter: Front Spring Rate Increase (+10%)
@@ -1066,7 +1066,7 @@ This systematic workflow prevents the common pitfall of making multiple simultan
 
 Standardize post-session debriefs using this structured template to capture critical information and maintain longitudinal setup records:
 
-```
+```text
 SESSION DEBRIEF TEMPLATE
 
 Date: [YYYY-MM-DD]

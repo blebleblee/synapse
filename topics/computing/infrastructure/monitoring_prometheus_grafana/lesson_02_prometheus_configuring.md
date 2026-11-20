@@ -17,7 +17,7 @@ The tradeoff is that Prometheus requires **network-level reachability** from the
 
 Prometheus organizes metrics as **labeled time series**. Each unique combination of metric name and label set defines a distinct series:
 
-```
+```text
 http_requests_total{method="GET", handler="/api/users", status="200"}
 http_requests_total{method="POST", handler="/api/users", status="201"}
 ```
@@ -35,7 +35,7 @@ These are two distinct series. The cardinality (number of unique series) is the 
 
 Prometheus stores data in a local on-disk TSDB, optimized for write-heavy append-only workloads. The storage layout is:
 
-```
+```text
 data/
 ├── 01HQZX0000000000000000/   # Block directory (ULID timestamp)
 │   ├── chunks/
@@ -155,7 +155,7 @@ relabel_configs:
 
 **Disk space estimation**:
 
-```
+```text
 bytes_per_sample ≈ 1.3 (compressed)
 samples_per_second = (number_of_series) × (1 / scrape_interval)
 disk_per_day = samples_per_second × 86400 × bytes_per_sample
@@ -164,7 +164,7 @@ disk_for_retention = disk_per_day × retention_days
 
 Example: 100k series, 15s scrape interval, 30-day retention:
 
-```
+```text
 samples_per_second = 100,000 / 15 ≈ 6,667
 disk_per_day = 6,667 × 86400 × 1.3 ≈ 749 MB/day
 disk_for_retention = 749 MB × 30 ≈ 22 GB
@@ -184,7 +184,7 @@ storage:
 
 **Memory usage**: Prometheus keeps the head block (last 2 hours) entirely in RAM. Memory usage is roughly:
 
-```
+```text
 memory_bytes ≈ number_of_series × 3KB (metadata + index) + chunk_memory
 chunk_memory ≈ number_of_series × 1KB (active chunks)
 ```

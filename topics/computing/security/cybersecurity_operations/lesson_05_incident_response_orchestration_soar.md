@@ -30,7 +30,7 @@ The automation decision boundary separates actions that can safely execute witho
 
 The incident response data model represents each incident as a structured case object containing metadata fields (creation timestamp, severity classification, assigned analyst), a collection of observables (indicators of compromise), and an audit log of all actions taken. Observables are typed entities—IP addresses, domain names, file hashes, email addresses, user accounts—that link to external threat intelligence databases for reputation scoring. Each observable has a provenance chain documenting how it was discovered: which detection rule fired, which sensor generated the alert, what enrichment sources contributed to its analysis. This chain of custody is critical for legal proceedings and post-incident reviews.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                     INCIDENT CASE OBJECT                    │
 ├─────────────────────────────────────────────────────────────┤
@@ -139,7 +139,7 @@ Automated triage uses multi-stage filtering pipelines that progressively enrich 
 
 Confidence scoring combines multiple weak signals into a strong aggregate indicator. A single suspicious process execution has low confidence (many legitimate programs exhibit unusual behavior), but when correlated with a network connection to a known-bad IP, a registry modification for persistence, and a user account with recent privilege escalation, confidence rises above actionable thresholds. Bayesian inference models compute posterior probability of compromise given observed evidence:
 
-```
+```text
 P(Compromise | Evidence) = P(Evidence | Compromise) * P(Compromise) / P(Evidence)
 ```
 

@@ -46,7 +46,7 @@ async fn echo_line(mut stream: TcpStream) {
 
 The compiler sees two await points and generates an enum with three variants, one per state between awaits plus the initial state:
 
-```
+```text
 State 0 (Start):       hold `stream`, `buf`; begin polling `read` future
 State 1 (AfterRead):   hold `stream`, `buf`, `n`; begin polling `write_all` future
 State 2 (Done):        terminal state

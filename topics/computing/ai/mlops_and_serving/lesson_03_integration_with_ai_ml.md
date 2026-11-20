@@ -442,7 +442,7 @@ sequenceDiagram
 
 A production Triton model repository for a TensorRT-optimized model:
 
-```
+```text
 model_repository/
 ├── credit_risk_v3/
 │   ├── config.pbtxt

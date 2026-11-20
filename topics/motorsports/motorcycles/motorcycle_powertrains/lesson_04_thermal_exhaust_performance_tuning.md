@@ -50,7 +50,7 @@ Air-cooled engines require substantially larger displacement per cylinder than l
 
 Exhaust header design begins with primary pipe length and diameter selection based on target scavenging RPM. The fundamental acoustic tuning relationship provides the starting point:
 
-```
+```text
 Engine Speed (RPM) = 30 × Speed of Sound (m/s) / Primary Pipe Length (m)
 ```
 
@@ -58,7 +58,7 @@ This formula derives from the four-stroke cycle where each cylinder fires once e
 
 Consider a performance inline-four engine targeting peak power at thirteen thousand RPM. Assuming exhaust gas temperature of eight hundred degrees Celsius yields a speed of sound near five hundred fifty meters per second. Solving for primary pipe length:
 
-```
+```text
 Primary Length = 30 × 550 / 13000 = 1.27 meters
 ```
 
@@ -76,7 +76,7 @@ Racing exhausts often eliminate the silencer entirely, accepting noise levels ex
 
 Dynamometer testing provides the empirical foundation for engine tuning by measuring crankshaft torque and power across the engine speed range under controlled conditions. The eddy-current or AC-motoring dynamometer absorbs engine power through electromagnetic induction, generating a reaction torque measured by load cells mounted to the dynamometer housing. The fundamental relationship governing power measurement is:
 
-```
+```text
 Power (kW) = Torque (N⋅m) × Angular Velocity (rad/s) / 1000
             = Torque (N⋅m) × RPM × 2π / 60000
             = Torque (N⋅m) × RPM / 9549

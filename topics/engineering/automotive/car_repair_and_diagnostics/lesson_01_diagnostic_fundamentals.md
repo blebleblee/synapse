@@ -20,7 +20,7 @@ This regulatory history explains why OBD-II diagnostics are simultaneously power
 
 The OBD-II diagnostic connector occupies a fixed physical location in every vehicle—within three feet of the steering column, accessible without tools—because regulatory compliance officers must be able to verify emissions monitor readiness during inspection programs. The 16-pin connector follows the SAE J1962 pinout standard, which reserves specific pins for protocol communication while allowing manufacturers flexibility in others. Pins 4 and 5 provide chassis ground. Pin 16 supplies battery voltage, typically unswitched and hot at all times, allowing scan tools to power themselves and maintain communication even with the ignition off. The communication pins—2, 7, 10, 14, and 15—carry different protocols depending on vehicle manufacturer and model year.
 
-```
+```text
 OBD-II J1962 Connector Pinout (Female at Vehicle)
     ___________________
    /  8  7  6  5  4  3  2  1  \
@@ -49,7 +49,7 @@ OBD-II diagnostic communication rides atop the CAN physical layer using the ISO 
 
 The trouble code taxonomy follows a structured format that encodes fault domain, subsystem, and specific failure mode into a five-character alphanumeric string. The first character identifies the system: P for powertrain, C for chassis, B for body, U for network communication. The second character distinguishes generic codes (0) mandated by OBD-II from manufacturer-specific codes (1, 2, 3). The third character narrows the subsystem—for powertrain codes, values 1 and 2 indicate fuel and air metering, 3 denotes ignition system, 4 and 5 cover emission controls, 6 addresses computer and output circuits, 7 and 8 implicate transmission. The final two digits specify the exact fault condition.
 
-```
+```text
 Trouble Code Structure: P0171
 
 P: Powertrain system

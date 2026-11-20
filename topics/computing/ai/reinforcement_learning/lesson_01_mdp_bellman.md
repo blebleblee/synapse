@@ -46,7 +46,7 @@ These are not merely definitional identities. They are simultaneous linear equat
 
 The backup diagram below captures the structural relationship encoded in the Bellman equation. Reading it correctly is essential: the agent stands at node $s$, selects action $a$ according to $\pi$, and the environment stochastically transitions to one of several possible next states $s'$.
 
-```
+```text
         s
         |
    π(a|s): action selection

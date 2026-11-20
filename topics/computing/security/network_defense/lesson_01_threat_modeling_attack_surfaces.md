@@ -26,7 +26,7 @@ For hardware security researchers and embedded engineers, adversary modeling mus
 
 A practical adversary model for an embedded system might look like this:
 
-```
+```text
 Actor: Nation-State APT (Tier 1)
   Capability: Hardware implant fabrication, JTAG-based firmware extraction,
               side-channel analysis (DPA/SPA), supply chain access

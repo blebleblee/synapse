@@ -74,7 +74,7 @@ Voice leading means tracking what each individual note does when you move from o
 
 **Rule 1 — keep common tones still.** C major (C–E–G) → F major (F–A–C) shares the note C. If you're voicing this on piano, keep C in the same hand position and only move E→A and G→F.
 
-```
+```text
 C major:  C  E  G
 F major:  C  F  A
           |  |  |
@@ -218,7 +218,7 @@ flowchart TD
 ### Step-by-step build (concrete, in C major)
 
 **1. Verse (8 bars) — vi–IV–I–V, 2 bars each.**
-```
+```text
 Bars 1–2: Am   | melody opens on A or C, stepwise motion
 Bars 3–4: F    | melody moves to F or A
 Bars 5–6: C    | melody settles on C, G, or E
@@ -227,7 +227,7 @@ Bars 7–8: G    | melody rises toward B (leading tone), left unresolved
 Metronome: 85 BPM. The verse ends on an unresolved V — this is a half cadence, and it's deliberate. It pulls the listener into the pre-chorus.
 
 **2. Pre-chorus (4 bars) — accelerate toward the dominant.**
-```
+```text
 Bar 1: F          (full bar)
 Bar 2: F          (full bar)
 Bar 3: F (2 beats) → D7 (2 beats)   [V7/V — secondary dominant]
@@ -236,7 +236,7 @@ Bar 4: G          (full bar, held, unresolved — setup for chorus)
 The melody should rise in pitch across these 4 bars, mirroring the harmonic acceleration. Try ending bar 4 on a sustained high note over G, then cut it off right as the chorus hits — the silence before the downbeat does as much work as the chord does.
 
 **3. Chorus (8 bars) — I–V–vi–IV loop, repeated once, catchy and repetitive on purpose.**
-```
+```text
 Bars 1–2: C
 Bars 3–4: G
 Bars 5–6: Am
@@ -245,7 +245,7 @@ Bars 7–8: F  → loop back to C, or on final repeat resolve V→I for a PAC
 Melody rule: land on the root or fifth of each chord on beat 1, keep rhythm identical across all four chords (this repetition is what makes hooks memorable — the harmony changes, the rhythmic shape doesn't).
 
 **4. Bridge (8 bars) — contrast via relative minor or borrowed chords.**
-```
+```text
 Bars 1–2: Am  (i in A minor — reframe the vi chord as a new home)
 Bars 3–4: E   (V of A minor — secondary dominant, raises tension)
 Bars 5–6: Dm  (iv — emotional low point)

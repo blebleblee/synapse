@@ -20,7 +20,7 @@ The generative capacity of English syntax derives from **phrase structure rules*
 
 Consider the derivation of a simple transitive sentence: "The committee approved the proposal." The verb "approve" projects a VP with the direct object "the proposal" as its complement. This VP merges with a light verb head *v* that introduces the external argument "the committee" as its specifier, forming vP. The vP then merges with a tense head T bearing present-tense and third-person-singular features, projecting TP. The subject "the committee" moves from its base-generated position in Spec-vP to Spec-TP to satisfy the Extended Projection Principle, which requires all finite clauses to have an overt subject in the specifier of TP. The verb "approve" raises from V⁰ to v⁰ (to collect the external argument) and then to T⁰ (to realize tense and agreement morphology), surfacing as the inflected form "approved" in the linear string.
 
-```
+```text
                     TP
                    /  \
                   /    \
@@ -50,7 +50,7 @@ Auxiliary verb constructions reveal the hierarchical stacking of functional proj
 
 The sentence "The document should have been being reviewed" instantiates this functional hierarchy:
 
-```
+```text
                          ModP
                         /    \
                        /      \
@@ -82,7 +82,7 @@ Each auxiliary head imposes categorial selection on its complement: the modal "s
 
 **Movement operations** permute underlying hierarchical structures into surface linear orders while leaving interpretive relationships intact. Wh-movement displaces interrogative phrases from their base-generated argument positions to the specifier of CP, creating long-distance dependencies that can span multiple clause boundaries. In the question "What did the committee approve?", the wh-element "what" originates as the direct object of "approve" but moves to Spec-CP, leaving behind a trace that marks its extraction site. Subject-auxiliary inversion accompanies this movement: the auxiliary "did" raises from T⁰ to C⁰, yielding the characteristic verb-second configuration of English matrix questions.
 
-```
+```text
                       CP
                      /  \
                     /    \

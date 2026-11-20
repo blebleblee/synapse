@@ -64,7 +64,7 @@ Topology change notification (TCN) handles MAC address table coherence during ne
 
 Rapid Spanning Tree Protocol (RSTP), codified in 802.1w and backward compatible with 802.1D, accelerates convergence through explicit handshakes and new port roles. RSTP introduces the alternate port role, representing a backup path to the root that can immediately transition to forwarding if the current root port fails, and the backup port role, representing a redundant connection to the same segment as a designated port. Rather than relying on timers, RSTP uses proposal-agreement handshakes: when a switch's root port receives a superior BPDU and transitions to forwarding, it sends proposals on all designated ports asking downstream switches to synchronize; downstream switches respond with agreements after ensuring their own designated ports are synchronized. This recursive synchronization propagates down the tree, allowing the entire topology to converge in twice the hello time plus link propagation delays, typically under 6 seconds.
 
-```
+```text
 RSTP Port States (Simplified from 802.1D's Five States):
   Discarding: Combines Blocking, Listening, Disabled
   Learning: Builds MAC table, doesn't forward data
@@ -82,7 +82,7 @@ Multiple Spanning Tree Protocol (MSTP), defined in 802.1s, addresses spanning tr
 
 VLAN configuration on Cisco IOS syntax demonstrates the practical mechanics:
 
-```
+```text
 ! Create VLANs in global configuration
 vlan 10
   name Engineering
@@ -113,7 +113,7 @@ Trunk configuration specifies 802.1Q encapsulation, sets a non-default native VL
 
 Inter-VLAN routing on a multilayer switch using Switched Virtual Interfaces:
 
-```
+```text
 ! Enable IP routing
 ip routing
 
@@ -148,7 +148,7 @@ Each SVI represents a Layer 3 interface in a specific VLAN, with the switch perf
 
 Dynamic Trunking Protocol (DTP) automatically negotiates trunk formation between Cisco switches but introduces security vulnerabilities through switch spoofing attacks where an attacker forces a trunk to form and gains access to all VLANs. Production environments should disable DTP:
 
-```
+```text
 interface GigabitEthernet0/24
   switchport mode trunk
   switchport nonegotiate
@@ -160,7 +160,7 @@ The nonegotiate command disables DTP, requiring manual trunk configuration on bo
 
 Root bridge placement fundamentally determines spanning tree topology and, consequently, traffic flow patterns. The root bridge should be the topological center of the network with the highest aggregate bandwidth to all other switches. Placing the root at a network edge or on a low-capacity switch creates suboptimal paths where traffic must traverse multiple hops when direct paths exist. Enterprise networks typically deploy two switches as primary and secondary root candidates through manual priority configuration:
 
-```
+```text
 ! Primary root bridge
 spanning-tree vlan 1-4094 priority 4096
 
@@ -172,7 +172,7 @@ Priority values must be multiples of 4096 due to the priority field's 4-bit gran
 
 Per-VLAN root placement allows load distribution in PVST+ environments where different VLANs use different root bridges to balance traffic across redundant links:
 
-```
+```text
 ! Core Switch A: Root for VLANs 1-50
 spanning-tree vlan 1-50 priority 4096
 spanning-tree vlan 51-100 priority 8192
@@ -186,7 +186,7 @@ This configuration causes half the VLANs to prefer Switch A as root while the ot
 
 PortFast and BPDU Guard acceleration mitigate convergence delays on access ports connecting end devices. Without PortFast, a workstation port requires 30 seconds to transition from blocking through listening and learning to forwarding, causing DHCP timeouts and user complaints. PortFast bypasses these states, immediately forwarding upon link up, but this creates a loop risk if a switch is accidentally connected to a PortFast port. BPDU Guard detects this misconfiguration by shutting down any PortFast port that receives a BPDU, forcing manual intervention to re-enable the port:
 
-```
+```text
 ! Global PortFast and BPDU Guard
 spanning-tree portfast default
 spanning-tree portfast bpduguard default
@@ -202,7 +202,7 @@ The global commands apply to all access ports, streamlining configuration, but r
 
 Root Guard prevents unauthorized root bridge election on specific ports. When enabled on a designated port, Root Guard monitors received BPDUs for superior root claims. If a BPDU arrives advertising a better root bridge ID, Root Guard transitions the port to root-inconsistent state, effectively blocking it until the superior BPDUs cease:
 
-```
+```text
 interface GigabitEthernet0/24
   spanning-tree guard root
 ```
@@ -211,7 +211,7 @@ This mechanism protects the core network from rogue switches or misconfiguration
 
 Loop Guard addresses unidirectional link failures where a port stops receiving BPDUs but the physical link remains up. Traditional spanning tree interprets the absence of BPDUs as evidence that the port should become designated—a correct conclusion if the neighboring switch has failed, but disastrous if the link is merely unidirectional since this creates a loop. Loop Guard places a port in loop-inconsistent state if BPDUs stop arriving when expected:
 
-```
+```text
 ! Global Loop Guard on all ports
 spanning-tree loopguard default
 
@@ -224,7 +224,7 @@ Loop Guard and Root Guard are mutually exclusive on a given port since they resp
 
 VLAN hopping attacks exploit trunk misconfigurations to inject traffic into unauthorized VLANs through two primary techniques. Double-tagging pushes two 802.1Q tags onto a frame, with the outer tag matching the native VLAN of the attacker's switch port. When the frame traverses the first trunk, the native VLAN tag is stripped since native VLAN traffic travels untagged, exposing the inner tag. The next switch interprets the inner tag as the frame's VLAN, forwarding it into a VLAN the attacker should not access. Mitigation requires ensuring the native VLAN is unused:
 
-```
+```text
 ! Change native VLAN away from default
 interface GigabitEthernet0/24
   switchport trunk native vlan 999
@@ -236,7 +236,7 @@ vlan 999
 
 Switch spoofing convinces an access port to become a trunk through DTP negotiation, granting the attacker access to all VLANs. Disabling DTP eliminates this vector:
 
-```
+```text
 ! Disable DTP on all access ports
 interface range GigabitEthernet0/1-23
   switchport mode access
@@ -245,7 +245,7 @@ interface range GigabitEthernet0/1-23
 
 Private VLANs (PVLANs) segment a primary VLAN into isolated, community, and promiscuous sub-VLANs, allowing multiple customers to share a VLAN number space while preventing inter-customer communication at Layer 2. An isolated port can communicate only with promiscuous ports (typically gateways or servers), never with other isolated ports. Community ports can communicate with each other within their community and with promiscuous ports but not with other communities or isolated ports. This architecture is common in hosting environments where many customers connect to the same Layer 3 gateway but must not sniff each other's traffic:
 
-```
+```text
 ! Primary VLAN
 vlan 100
   private-vlan primary
@@ -281,7 +281,7 @@ Spanning tree scalability limitations emerge in large networks where thousands o
 
 Rapid convergence under RSTP depends on proper tuning of proposal-agreement timers and link-type configuration. RSTP assumes point-to-point links (full-duplex connections between two switches) transition faster than shared media (half-duplex or hub-connected segments). Modern networks are almost exclusively point-to-point, but RSTP may auto-detect half-duplex links as shared, slowing convergence:
 
-```
+```text
 interface GigabitEthernet0/24
   spanning-tree link-type point-to-point
 ```
@@ -290,7 +290,7 @@ Explicitly setting link-type to point-to-point ensures rapid transition mechanic
 
 Monitoring spanning tree topology requires correlating BPDU statistics, port state transitions, and root bridge stability. Key verification commands on Cisco IOS:
 
-```
+```text
 ! Display spanning tree summary per VLAN
 show spanning-tree vlan 10
 
@@ -313,7 +313,7 @@ STP inconsistency troubleshooting isolates the failure domain through systematic
 
 VLAN troubleshooting starts with verifying end-to-end VLAN consistency. A workstation cannot communicate with another workstation in the same VLAN if the intervening trunk does not carry that VLAN:
 
-```
+```text
 ! Verify VLAN exists on all switches
 show vlan id 10
 
@@ -327,7 +327,7 @@ Inter-VLAN routing failures isolate through traceroute and routing table verific
 
 Production networks often deploy spanning tree alongside link aggregation (EtherChannel/LACP) to combine redundancy and bandwidth. An EtherChannel bundles multiple physical links into a single logical link, appearing as a single spanning tree port. This allows active use of all bundled links rather than blocking redundant paths, sidestepping spanning tree's limitation of using only one path per segment. However, misconfigured EtherChannels create loops if the bundle fails to form correctly while the physical links remain up, causing each physical link to independently participate in spanning tree and potentially forwarding in a loop topology. Guard against this by enabling port suspension on inconsistency:
 
-```
+```text
 interface Port-channel1
   switchport mode trunk
   switchport trunk allowed vlan 10,20,30

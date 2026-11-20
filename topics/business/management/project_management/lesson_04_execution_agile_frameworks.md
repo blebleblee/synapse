@@ -48,7 +48,7 @@ PBIs are estimated in story points, a unit of relative complexity rather than ab
 
 **Team velocity** is the sum of story points of PBIs completed (meeting the Definition of Done) over a sprint. It is a planning tool, not a performance metric. Using velocity as a KPI creates perverse incentives: teams inflate estimates to protect velocity figures, the numbers become dishonest, and the planning tool breaks. Velocity is calculated as a rolling average of the last three to five sprints and used to answer one question only: given this team's historical throughput, how many story points can we credibly commit to in the next sprint?
 
-```
+```text
 Sprint Capacity Calculation:
 
 Team Size:            7 developers
@@ -69,7 +69,7 @@ The **Daily Scrum** (standup) is a 15-minute synchronization ceremony, not a sta
 
 The sprint's mechanical flow looks like this:
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────────┐
 │                     SCRUM SPRINT CYCLE (2 weeks)                   │
 ├────────────┬───────────────────────────────────────┬───────────────┤
@@ -107,7 +107,7 @@ The WIP limit is the most powerful and most frequently violated mechanism in Kan
 
 The key metrics in Kanban are **cycle time** (elapsed calendar time from when a work item is pulled into active development to when it is Done), **lead time** (elapsed time from when an item enters the backlog to when it is Done), and **throughput** (number of items completed per unit time). These metrics are more operationally honest than story point velocity because they are not subject to estimation inflation. A team whose cycle time is trending upward has a workflow problem, regardless of how many story points they claim to complete per sprint.
 
-```
+```text
 KANBAN BOARD — WIP LIMITS ENFORCED
 
 ┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐

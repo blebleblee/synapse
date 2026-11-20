@@ -136,7 +136,7 @@ Progress gate: don't move to Week 3 content until you hit 85% accuracy at 3-seco
 3. **Functional context (7 min):** Play and identify ii-V-I and I-vi-IV-V progressions by function, not just by chord name.
 
 **Progression drill, key of C:**
-```
+```text
 Dm7 - G7 - Cmaj7           (ii - V - I)
 Cmaj7 - Am7 - Fmaj7 - G7   (I - vi - IV - V)
 ```
@@ -197,7 +197,7 @@ Use these as instant quality checks when you're unsure what you just heard:
 **Hardware setup:** MIDI keyboard into your DAW or ear-training app for instant visual feedback on misses. Guitarists: loop pedal to record a progression, then solo over your own loop and call out each chord as it comes back around.
 
 **Practice log (copy this block daily):**
-```
+```text
 Date: _______
 Duration: ____ min
 Drill type: [ ] Triads  [ ] Sevenths  [ ] Progressions  [ ] Transcription

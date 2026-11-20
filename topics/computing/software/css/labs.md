@@ -330,7 +330,7 @@ RUSTFLAGS="-Z sanitizer=thread" cargo +nightly test --target x86_64-unknown-linu
 
 ThreadSanitizer instruments memory accesses and lock operations, detecting races at runtime. If a race exists, TSan prints a report:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7f1234567890 by thread T2:
     #0 HashMap::insert ...
@@ -387,7 +387,7 @@ RUSTFLAGS="-Z sanitizer=address" cargo +nightly test --target x86_64-unknown-lin
 
 ASan intercepts allocations and tracks which allocations are never freed. At program exit, it prints a leak report:
 
-```
+```text
 =================================================================
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 
@@ -409,7 +409,7 @@ pub fn buggy_peek(tokens: &Vec<Token>, index: usize) -> Token {
 
 Call `buggy_peek` with an out-of-bounds index in a test. Run under ASan. ASan detects the overflow and prints:
 
-```
+```text
 =================================================================
 ==12345==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7f1234567890 at pc 0x7f123456789a bp 0x7fffabcdef00 sp 0x7fffabcdef08
 READ of size 8 at 0x7f1234567890 thread T0

@@ -32,7 +32,7 @@ The statement of cash flows partitions into three sections that map cleanly onto
 
 The indirect method operating section begins with net income, then systematically adjusts for non-cash items and changes in operating assets and liabilities. Consider the canonical structure:
 
-```
+```text
 Operating Activities (Indirect Method)
 Net Income                                           $XXX
 Adjustments to reconcile net income to cash flow:
@@ -80,7 +80,7 @@ Dividends represent explicit, committed capital returns. Unlike buybacks, which 
 
 The net change in cash reconciles these three sections:
 
-```
+```text
 Cash flow from operating activities        $XXX
 Cash flow from investing activities        $(XXX)
 Cash flow from financing activities        $(XXX)
@@ -104,7 +104,7 @@ Disaggregating growth and quality effects prevents misattribution of cash flow c
 
 Working capital analysis requires granular decomposition. Aggregate changes in current assets and liabilities mask offsetting movements in individual line items. A company reporting flat working capital might simultaneously suffer receivables deterioration offset by inventory liquidation—a dangerous pattern suggesting both demand weakness and collection problems. The analyst constructs a waterfall chart showing individual components:
 
-```
+```text
 Beginning Working Capital                    $500M
   Increase in receivables (sales growth)     $(30M)
   Increase in receivables (DSO expansion)    $(45M)

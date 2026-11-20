@@ -48,7 +48,7 @@ graph LR
 
 Using any analog-modeled subtractive synth:
 
-```
+```text
 Oscillator: Sawtooth, 1 voice, root note C2 (65.4 Hz)
 Filter: Low-pass, 24 dB/oct (ladder-style if available)
 ```

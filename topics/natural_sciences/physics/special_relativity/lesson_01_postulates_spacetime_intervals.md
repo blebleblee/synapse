@@ -43,7 +43,7 @@ The operational machinery of special relativity revolves around systematic appli
 
 To construct a Minkowski diagram for frame $S'$ moving at velocity $v$ relative to frame $S$, we draw the $ct'$ axis (worldline of $S'$'s origin at $x' = 0$) at angle $\theta = \arctan(\beta)$ from the $ct$ axis, and the $x'$ axis (surface of simultaneity at $t' = 0$) at the same angle from the $x$ axis but reflected across the $45°$ light line. The crucial geometric insight is that simultaneity tilts: events simultaneous in $S'$ lie along lines parallel to the $x'$ axis, which are not horizontal in $S$. This explains the relativity of simultaneity—spatially separated events that are simultaneous in one frame occur at different times in another frame.
 
-```
+```text
      ct
       |          ct'
       |         /

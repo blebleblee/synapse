@@ -205,7 +205,7 @@ Make the script executable: `chmod +x concurrent-push.sh`. Run it and observe TS
 
 Analyze a specific race report from the output. TSan reports include the memory address of the conflicting access, the operation type (read or write), and the call stack. For example:
 
-```
+```text
 WARNING: ThreadSanitizer: data race
   Write of size 8 at 0x7f1234567890 by thread T2:
     #0 write_in_full refs.c:123
@@ -325,7 +325,7 @@ Combine TSan and ASan by compiling with both sanitizers (supported in Clang): `c
 
 Analyze false positives in sanitizer reports. TSan may report races in intentionally lock-free data structures (e.g., atomic counters in `progress.c`) or benign races where correctness is guaranteed by external synchronization (e.g., filesystem locks). To suppress false positives, create a TSan suppression file `tsan-suppressions.txt`:
 
-```
+```text
 race:progress.c
 race:lockfile.c
 ```

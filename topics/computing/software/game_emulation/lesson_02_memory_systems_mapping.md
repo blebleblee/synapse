@@ -140,7 +140,7 @@ Different guest architectures impose radically different address space topologie
 
 The original Game Boy's 65C816-less Sharp LR35902 operates over a plain 16-bit address space. The layout is fixed by hardware:
 
-```
+```text
 0x0000 - 0x3FFF : ROM Bank 0 (always mapped, 16 KB)
 0x4000 - 0x7FFF : ROM Bank N (switchable via MBC, 16 KB)
 0x8000 - 0x9FFF : Video RAM (VRAM, PPU-accessible)
@@ -159,7 +159,7 @@ Each region in this map has distinct behavioral semantics. The Echo RAM region a
 
 The SNES address space is geometrically more complex because the 65C816 uses a 24-bit effective address (`[bank][address]`), and the mapping between those 24 bits and physical hardware differs by cartridge type. The two dominant cartridge ROM layouts, LoROM and HiROM, map ROM into the address space differently:
 
-```
+```text
 LoROM layout (simplified):
   Bank 0x00-0x3F, Addr 0x8000-0xFFFF  : ROM (lower 32 KB of each bank slot)
   Bank 0x00-0x3F, Addr 0x0000-0x1FFF  : Low RAM mirror

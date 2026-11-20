@@ -18,7 +18,7 @@ The internal representation of a bone begins with a **rest pose transform matrix
 
 Forward kinematics (FK) computation proceeds through simple matrix multiplication down the hierarchy. Starting from the root bone—whose world transform equals its local transform since it has no parent—each child bone's world matrix is computed by multiplying its parent's world matrix by its own local matrix:
 
-```
+```text
 M_world_child = M_world_parent × M_local_child
 ```
 
@@ -28,7 +28,7 @@ Inverse kinematics (IK) inverts this problem: given a desired world-space positi
 
 The most common IK algorithm in production rigs is the **iterative Cyclic Coordinate Descent (CCD)** method. CCD begins at the joint nearest the end effector and works backward toward the chain root. For each joint, it computes the angle required to rotate the current joint such that the end effector moves closer to the target, keeping all other joints temporarily fixed. After adjusting one joint, it moves to the parent and repeats, cycling through the entire chain multiple times until the end effector converges within a tolerance threshold of the target or a maximum iteration count is reached. The per-joint angle calculation involves vector geometry: construct two vectors from the joint position—one pointing toward the current effector position, another toward the target—and compute the rotation axis and angle that aligns them using the cross product and dot product:
 
-```
+```text
 v_current = normalize(effector_pos - joint_pos)
 v_target = normalize(target_pos - joint_pos)
 rotation_axis = normalize(cross(v_current, v_target))
@@ -39,7 +39,7 @@ This rotation is then clamped by any joint constraints (elbow bending limits, fo
 
 The transformation from bone rotations to vertex positions occurs through the **skinning algorithm**, historically called "skeletal subspace deformation" in academic literature. The simplest and most widely deployed method is **linear blend skinning (LBS)**, also known as smooth skinning. Each vertex in the character mesh is assigned a set of bone influences, represented as (bone_index, weight) pairs where weights sum to 1.0. During animation evaluation, the vertex's rest-pose position is transformed by each influencing bone's animated transform matrix, and the resulting positions are blended using the weights:
 
-```
+```text
 v_final = Σ(w_i × M_bone_i × v_rest)
 ```
 
@@ -55,7 +55,7 @@ Constraint systems extend the skeletal hierarchy beyond pure parent-child relati
 
 The evaluation order of constraints relative to FK propagation and IK solving defines the rig's effective behavior. Blender's animation system processes constraints after computing the bone's base transform from keyframed channels but before passing that transform to child bones, creating a pipeline:
 
-```
+```text
 keyframed_transform → constraints → FK_propagation → IK_solving → skinning
 ```
 

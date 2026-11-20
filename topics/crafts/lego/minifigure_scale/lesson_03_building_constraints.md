@@ -20,7 +20,7 @@ The clutch force variability between new and worn elements introduces a temporal
 
 The geometric skeleton of minifigure-scale architecture rests on a vocabulary of wall-building patterns that translate structural engineering principles into stud-based modules. The most fundamental pattern, **running bond** or **stretcher bond**, staggers each course of bricks by half a brick length relative to the course below, ensuring that no vertical seam extends through more than one layer. For a two-stud-thick wall built from 1×4 bricks, this pattern alternates between courses where bricks run longitudinally along the wall axis and courses where they span perpendicular, locking the two parallel planes together. The resulting assembly achieves what structural engineers term **composite action**, where the two-stud wall behaves as a single unified member rather than two independent columns that could delaminate under stress.
 
-```
+```text
 TOP VIEW - Running Bond Wall (two-stud thickness):
 
 Layer 1 (odd-numbered courses):

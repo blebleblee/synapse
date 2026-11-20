@@ -40,7 +40,7 @@ The NetApp ONTAP QoS architecture decomposes into four primary subsystems: the P
 
 The Policy Management Engine maintains the authoritative database of all active QoS policies within the cluster. Policies are defined at multiple scopes—system-wide default policies, per-SVM policies, per-volume policies, and per-LUN policies—forming a hierarchical inheritance structure. Each policy object encodes one or more performance constraints: minimum IOPS guarantee, maximum IOPS limit, maximum throughput limit, or target latency. Policies can be fixed or adaptive—fixed policies specify absolute numerical limits, while adaptive policies express limits as formulas that scale with allocated storage capacity or provisioned volume size. The engine exposes a RESTful API and CLI interface for policy creation, modification, and deletion, with transactional consistency guarantees that ensure policy updates propagate atomically across all nodes in the cluster.
 
-```
+```text
 Policy Inheritance Hierarchy:
 
 Cluster Default QoS Policy
@@ -115,7 +115,7 @@ Headroom calculation must account for non-linear resource consumption patterns. 
 
 The QoS telemetry subsystem exposes per-policy performance metrics through multiple interfaces. The `qos statistics` CLI commands provide real-time snapshots of admitted IOPS, throttled IOPS, average latency, and token bucket fill levels. The REST API exports these metrics as time-series data consumable by external monitoring platforms like Grafana or Splunk. For deep troubleshooting, the `statistics show` framework allows operators to drill into specific QoS counters at millisecond granularity, revealing patterns like periodic throttling (indicating burst exhaustion) or consistent high latency (suggesting backend saturation rather than QoS limiting).
 
-```
+```bash
 # Real-time QoS monitoring workflow
 
 # Display per-policy statistics

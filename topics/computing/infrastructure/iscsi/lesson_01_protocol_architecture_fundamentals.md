@@ -26,7 +26,7 @@ The CmdSN is a 32-bit monotonically increasing counter maintained at the session
 
 The PDU is iSCSI's atomic unit of communication. Every operation — login, command, data transfer, status, error — is expressed as a PDU with a fixed 48-byte Basic Header Segment (BHS) followed by optional Additional Header Segments (AHS), Header Digest, Data Segment, and Data Digest fields. The BHS layout is worth examining at byte resolution because every field directly controls protocol behavior.
 
-```
+```text
 iSCSI PDU Basic Header Segment (48 bytes)
 
 Byte  0: Opcode[5:0] | I-bit | Reserved

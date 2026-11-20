@@ -18,7 +18,7 @@ Cycles' rendering pipeline begins with camera ray generation. The virtual camera
 
 When a ray intersects a surface, the shader evaluation phase computes material response. Blender's node-based shader system compiles to an internal bytecode representation that the render kernel executes at each intersection point. The Principled BSDF node decomposes into multiple BSDF lobes: a diffuse Lambert layer, a specular microfacet distribution following the GGX model, clearcoat for layered materials, sheen for fabrics, and transmission for glass. Each lobe contributes to the total BSDF through weighted addition, with Fresnel effects modulating the blend. The shader outputs both a surface color and a sampling direction for the next ray segment. Cycles alternates between BSDF sampling and light sampling, choosing one strategy per bounce based on a random coin flip, then weights the result through multiple importance sampling to correct for probability mismatches.
 
-```
+```text
 Ray Path Lifecycle (Cycles):
 
 Camera → Pixel[x,y] → Generate Ray(origin, direction, weight=1.0)

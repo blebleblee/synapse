@@ -49,7 +49,7 @@ Regression testing is not synonymous with "running all tests after every commit.
 
 The formal model is a bipartite dependency graph $G = (S \cup T, E)$ where $S$ is the set of source units, $T$ is the set of test cases, and an edge $(s, t) \in E$ exists if test $t$ exercises code path $s$. A change to source unit $s$ potentially invalidates exactly the tests $\{t \in T : (s, t) \in E\}$. This set is the **regression frontier** for that change.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                    REGRESSION FRONTIER MODEL                        │
 │                                                                     │

@@ -32,13 +32,13 @@ Block I/O control is expressed through `IOReadBandwidthMax=` and `IOWriteBandwid
 
 The relationship between slices and services is a delegation tree that determines which controllers are active at each level. Under cgroup v2's "domain controller" model, a controller must be enabled at every ancestor node between the root and the target node. Systemd manages this automatically: when you set `CPUQuota=` on a service, systemd ensures that the `cpu` controller is listed in `cgroup.subtree_control` at the slice and root levels. You can observe the active controllers on any cgroup node with:
 
-```
+```text
 cat /sys/fs/cgroup/system.slice/cgroup.subtree_control
 ```
 
 The following diagram traces the cgroup tree for a typical systemd deployment, showing the inheritance path from the root slice down to an individual service:
 
-```
+```text
 / (root cgroup)
 └── -.slice  [cpu, memory, io, pids active]
     ├── system.slice

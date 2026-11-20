@@ -20,7 +20,7 @@ Stress assignment in German follows a predominantly trochaic pattern, placing pr
 
 The German monophthong system distributes across the vowel space with geometric precision. High vowels occupy the upper periphery: front unrounded /iː, ɪ/ and front rounded /yː, ʏ/, back rounded /uː, ʊ/. Mid vowels fill the intermediate zone: front unrounded /eː, ɛ/, front rounded /øː, œ/, and back rounded /oː, ɔ/. The low region contains central /a, aː/ and the near-open central vowel /ɐ/ in unstressed syllables, particularly in the syllabic *-er* suffix. Each long-short pair exhibits not only durational contrast but qualitative differences: long vowels maintain peripheral positions with maximal tongue displacement, while short vowels centralize toward the schwa region, reducing articulatory effort.
 
-```
+```text
 HIGH FRONT          HIGH BACK
   iː    yː      ←→     uː
   ɪ     ʏ       ←→     ʊ

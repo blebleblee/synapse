@@ -8,7 +8,7 @@ The practitioner will work across two complementary environments. The first is P
 
 Before proceeding to the exercises, establish the environment and confirm all dependencies are present and version-consistent.
 
-```
+```text
 python -c "import sympy; print('SymPy', sympy.__version__)"
 python -c "import numpy; print('NumPy', numpy.__version__)"
 python -c "from sympy.geometry import *; print('sympy.geometry OK')"
@@ -17,7 +17,7 @@ sage --version
 
 The expected output confirms SymPy 1.12 or later, NumPy 1.26 or later, and SageMath 10.x. If SageMath is unavailable, every SageMath block in this guide has a pure SymPy alternative provided inline. Install the Python stack via:
 
-```
+```text
 pip install sympy==1.12 numpy==1.26.4 scipy==1.13.0
 ```
 

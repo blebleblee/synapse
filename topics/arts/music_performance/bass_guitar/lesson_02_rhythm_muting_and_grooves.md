@@ -67,7 +67,7 @@ flowchart TD
 
 **Alternating i-m pattern — the essential drill:**
 
-```
+```text
 String:    G  D  A  E  G  D  A  E
 Finger:    i  m  i  m  i  m  i  m
 
@@ -92,7 +92,7 @@ BPM targets (eighth notes, 4/4):
 
 Solves the #1 beginner problem: sympathetic ringing from unplucked strings. Instead of anchoring statically, rest the thumb on the string immediately below whichever string you're playing. As you move down in strings, the thumb rolls with you, muting everything above your current position.
 
-```
+```text
 Playing the A string:
   Thumb rests on E string (muting it)
   i and m fingers pluck A string
@@ -113,7 +113,7 @@ Practice on a single string first. It feels awkward for roughly two weeks, then 
 
 Rest the hypothenar eminence (the fleshy heel of the palm, pinky side) on the strings just above the bridge saddles. Distance from the bridge sets the muting depth:
 
-```
+```text
 Contact zone (distance from bridge saddles):
   < 1 cm    →  Near-dead thud, almost no pitch
   1–3 cm    →  "Thumpy" muted tone — funk, reggae, old-school R&B ✓
@@ -123,7 +123,7 @@ Contact zone (distance from bridge saddles):
 
 **Palm mute drill — reggae one-drop pattern:**
 
-```
+```text
 Tempo: quarter = 70 BPM, 4/4
 
 E: |–––2–––2–––2–––2–|  (all notes palm-muted)
@@ -143,7 +143,7 @@ Adding the ring finger (a) raises your speed ceiling and spreads fatigue across 
 
 **Setup:** Ring finger arcs to match index and middle; equal string contact angle across all three. Before chasing speed, practice any existing two-finger pattern with all three fingers at a slow tempo to establish the motion.
 
-```
+```text
 Week 1: i-m-a triplets on single string (quarter-note pulse)
 E: |–––––––|–––––––|–––––––|–––––––|
    i m a   i m a   i m a   i m a
@@ -176,7 +176,7 @@ Week 4: Integrate into real bass lines
 
 **Frets 1–5 (Simandl 1-2-4):** The hand cannot comfortably spread four fingers over four consecutive frets this low on the neck without tendon strain — the frets are too wide apart. Borrow upright bass technique:
 
-```
+```text
 Finger 1 (index)   = covers fret n
 Finger 2 (middle)  = covers fret n+1
 Finger 4 (pinky)   = covers fret n+2 or n+3
@@ -193,7 +193,7 @@ Ring finger (3) braces behind the pinky — it never frets independently down he
 
 **Frets 7+ (One-Finger-Per-Fret, OFPF):** The neck narrows enough that all four fingers reach four consecutive frets without strain. Standard guitar-style fingering: finger 1 = lowest fret, finger 4 = highest.
 
-```
+```text
 Example — A string, OFPF at 7th position:
   Fret 7 (E)  → finger 1
   Fret 8 (F)  → finger 2
@@ -263,7 +263,7 @@ flowchart LR
 
 **Draping:** fingers not actively fretting a lower string rest lightly across it to kill sympathetic vibration.
 
-```
+```text
 Example: Fretting D string, fret 7 (A note)
   E string: index finger (1) lightly touches to mute
   A string: muted by floating thumb (right hand)
@@ -273,7 +273,7 @@ Example: Fretting D string, fret 7 (A note)
 
 **Release muting:** the instant a note ends, drop fretting pressure to zero **without lifting the finger off the string**. Contact stays, pressure disappears — that's the fastest, most reliable mute available.
 
-```
+```text
 Drill: Quarter notes with full muting between each
 Tempo: quarter = 60 BPM
 
@@ -295,7 +295,7 @@ Every bass line starts with knowing where root, fifth, and octave sit relative t
 
 **Shape 1 — Root on E string:**
 
-```
+```text
 E: |–R–––|
 A: |–––5–|  (same fret, two strings up)
 D: |–––5–|  (octave — same fret as fifth, next string up)
@@ -308,7 +308,7 @@ D: |–––5–|  G (octave)
 
 **Shape 2 — Root on A string:**
 
-```
+```text
 A: |–R–––|
 D: |–––5–|
 G: |–––5–|  (octave)
@@ -321,7 +321,7 @@ G: |–––5–|  C (octave)
 
 **Shape 3 — Root on D string:**
 
-```
+```text
 D: |–R–––|
 G: |–––5–|
 
@@ -333,7 +333,7 @@ A: |–––5–|  F (octave, drop to A string same fret as fifth)
 
 **Memorization drill:**
 
-```
+```text
 Day 1–3: Shape 1 only (E string roots)
   Call out random notes: "G" → find G on E string → play R-5-Oct
   Tempo: quarter = 60, whole notes
@@ -352,7 +352,7 @@ Add the third to get the full chord-tone vocabulary.
 
 **Minor box (root on E string):**
 
-```
+```text
 E: |–R–––––––m3–|  Root and minor 3rd (3 frets up)
 A: |–––––5–––––|  Fifth
 D: |–––––R–––––|  Octave
@@ -365,7 +365,7 @@ D: |–––––7––––|   A (octave)
 
 **Major box (root on E string):**
 
-```
+```text
 E: |–R–––––M3–––|  Root and major 3rd (4 frets up)
 A: |–––––5–––––|  Fifth
 D: |–––5–R–––––|  Octave
@@ -378,7 +378,7 @@ D: |–––7–|     A (octave)
 
 **Minor box (root on A string):**
 
-```
+```text
 A: |–R–––––––m3–|
 D: |–––––5–––––|
 G: |–––––R–––––|
@@ -391,7 +391,7 @@ G: |–––––7––––|   D (octave)
 
 **Major box (root on A string):**
 
-```
+```text
 A: |–R–––––M3–––|
 D: |–––––5–––––|
 G: |–––5–R–––––|
@@ -404,7 +404,7 @@ G: |–––7–|     D (octave)
 
 ### 4.3 Position Map: Notes on Each String
 
-```
+```text
 E string natural notes:
 Fret:  0    2    3    5    7    8    10   12
 Note:  E    F#   G    A    B    C    D    E
@@ -426,7 +426,7 @@ Note:  G    A    Bb   C    D    Eb   F    G
 
 **Drill — Root finder:** set a metronome to quarter = 60. Call a random note name every 4 beats; find it on both E and A strings before time runs out. Tighten to 2 beats per note as you improve. This single drill rebuilds fretboard navigation faster than any scale exercise.
 
-```
+```text
 Week 1: 4 beats per note, naturals only (A B C D E F G)
 Week 2: 4 beats per note, add sharps/flats
 Week 3: 2 beats per note, all notes
@@ -437,7 +437,7 @@ Week 4: 2 beats per note + state the fifth and octave fret numbers
 
 The most common harmonic motion in Western music. In C major, with real fingering:
 
-```
+```text
 Key of C major: Dm7 – G7 – Cmaj7
 Tempo: quarter = 80 BPM
 
@@ -456,7 +456,7 @@ Fingering: 1-1-1-1
 
 **ii–V–I practice protocol:**
 
-```
+```text
 Week 1: Whole notes only (one note per chord)      tempo = 60
 Week 2: Add passing tones (root + one approach note) tempo = 70
 Week 3: Full 4-note pattern per chord                tempo = 80
@@ -468,7 +468,7 @@ Week 4: Transpose through all 12 keys, descending
 
 **Dominant 7th box (root on E string):**
 
-```
+```text
 E: |–R–––––M3–––|  Root, major 3rd
 A: |–––––5––m7–|  Fifth, minor 7th
 D: |–––––R–––––|  Octave
@@ -481,7 +481,7 @@ D: |–––5––––|   G (octave)
 
 **Major 7th box (root on E string):**
 
-```
+```text
 E: |–R–––––M3–––|
 A: |–––––5––M7–|  Fifth, major 7th
 D: |–––––R–––––|
@@ -494,7 +494,7 @@ D: |–––5––––|   G (octave)
 
 **9th (major 9) box (root on A string):**
 
-```
+```text
 A: |–R–––––M3–––9–|  Root, major 3rd, major 9th
 D: |–––––5–––––––|  Fifth
 G: |–––––R–––––––|  Octave
@@ -559,7 +559,7 @@ graph TD
 
 At quarter = 120 BPM, know the time grid you're actually working in:
 
-```
+```text
 1 beat (quarter note)     = 500 ms
 1 eighth note             = 250 ms
 1 sixteenth note          = 125 ms
@@ -572,7 +572,7 @@ Sixteenth notes at 125 ms spacing sit near the edge of rhythmic perception (roug
 
 **Subdivision fluency drill:**
 
-```
+```text
 Week 1: Count quarters aloud while playing quarters
         "1 2 3 4", foot taps each count     tempo = 60
 
@@ -590,7 +590,7 @@ Week 4: Play sixteenths, count aloud, then drop the
 
 Every note lands somewhere in a roughly 40 ms window around the beat:
 
-```
+```text
 |<–––– 20ms ––––>|<–––– 20ms ––––>|
      PUSH         CENTER      LAY BACK
   (anticipate)    (on beat)   (behind beat)
@@ -611,7 +611,7 @@ Reggae:        heavy lay back — languid, meditative feel
 
 **Genre-specific pocket training:**
 
-```
+```text
 Funk (James Brown style):
   E: |–0–.–3–5–|–0–.–3–5–|   tempo = 100
   Pocket: push 5–10ms early on all notes
@@ -633,7 +633,7 @@ Metal (Steve Harris style):
 
 Bass note attacks should land with or just after the kick's initial transient. The kick is brief and percussive; the bass sustains the low end underneath it.
 
-```
+```text
 Stage 1: Kick and bass always together (unison)
          E: |–0–.–0–.–|  on beats 1 and 3 only
 
@@ -658,7 +658,7 @@ Ghost notes are muted, percussive attacks that fill rhythmic space with zero har
 
 **Mechanics:** fretting hand lies across the strings with zero pressure, just enough contact to kill pitch. Plucking hand attacks with the same force and angle as a normal note. Result: a "thk" with no discernible pitch.
 
-```
+```text
 Notation: lowercase x = ghost note, uppercase O = pitched note
 
 Classic funk ghost pattern (G string root = G):
@@ -668,7 +668,7 @@ G: |–O–x–x–O–|–x–O–x–x–|
 
 **Ghost note drill:**
 
-```
+```text
 Tempo: quarter = 70 BPM — 4/4, A string only
 
 Beat: 1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
@@ -683,7 +683,7 @@ Week 3: tempo = 90, integrate into a D–G two-chord vamp
 
 **Dynamics:** ghost notes should sit at **50–60% the volume** of pitched notes, not vanish entirely.
 
-```
+```text
 DAW verification:
   Pitched note (O): target –6 dB
   Ghost note (x):   target –12 to –14 dB
@@ -696,7 +696,7 @@ Above –10 dB  → increase left-hand muting pressure
 
 Swing turns the even 50/50 eighth-note split into an uneven one, roughly 67/33:
 
-```
+```text
 Straight eighths (rock/funk):
 Beat: 1   &   2   &   3   &   4   &
       250ms   250ms   250ms   250ms
@@ -709,7 +709,7 @@ Beat: 1   &   2   &   3   &   4   &
 
 **Swing practice drill:**
 
-```
+```text
 Week 1: Metronome on triplet subdivision (quarter = 60, triplets)
         Count "1 trip let 2 trip let..."
         Play on "1" and "let" only (that's swing eighths)
@@ -723,7 +723,7 @@ Week 4: Apply over a 12-bar blues in swing, tempo = 100
 
 **Shuffle bass line (classic blues, key of E):**
 
-```
+```text
 Tempo: quarter = 90, swing eighths
 
 Bars 1–4 (E7):
@@ -758,7 +758,7 @@ Slap is a rotational wrist motion, not an arm swing. The thumb is a hammer that 
 
 **Setup:** right hand with thumb pointing roughly upward, parallel to strings; wrist neutral to slightly pronated; thumb extended slightly away from the palm.
 
-```
+```text
 1. PREP:    Wrist pronated (rotated inward), thumb above string
 2. STRIKE:  Rapid wrist supination (40–60°)
             Thumb's bony outer edge hits string near the
@@ -775,7 +775,7 @@ damps it instead of striking it.
 
 **Calibration drill:**
 
-```
+```text
 Week 1: Thumb only, open E string
         Find the thumb angle / wrist rotation that gives
         maximum snap with minimum effort
@@ -794,7 +794,7 @@ Week 3: Alternate open E and fret 5
 
 Pop targets the G or D string. Index finger is the standard; middle finger gives a slightly different tonal color.
 
-```
+```text
 1. HOOK:    Slide fingertip under the target string from below
             (displacement roughly 1–1.5 cm perpendicular to the fretboard)
 2. PULL:    Lift the string straight up, perpendicular to the body —
@@ -805,7 +805,7 @@ Pop targets the G or D string. Index finger is the standard; middle finger gives
 
 Too close to the neck gives a weak, dull pop. Too close to the bridge gives a thin, brittle one. The sweet spot is usually over or just behind the neck pickup.
 
-```
+```text
 Displacement test (G string open, over neck pickup):
   5mm pull → compare
   10mm pull → compare
@@ -817,7 +817,7 @@ Most players land between 8–12mm displacement.
 
 **Pop practice drill:**
 
-```
+```text
 Week 1: G open, index pop only, tempo = 60
         Count "pop 2 3 4", focus on straight-up pull direction
 
@@ -834,7 +834,7 @@ Week 3: Alternate G open (index) and G fret 5 (middle)
 
 **Level 1 — Thumb only:**
 
-```
+```text
 E string, fret 5 (A note), tempo = 60
 T = thumb slap
 |–T–.–T–.–|–T–.–T–.–|
@@ -843,7 +843,7 @@ Progress to: 80 → 100 → 120
 
 **Level 2 — T and Pop alternating:**
 
-```
+```text
 E string slap (A, fret 5), G string pop (open G)
 T = thumb slap, P = pop
 |–T–P–T–P–|–T–P–T–P–|
@@ -852,7 +852,7 @@ Progress: 60 → 70 → 80 → 90 → 100 → 110
 
 **Level 3 — Classic funk slap pattern (key of D):**
 
-```
+```text
 G: |–––––––––7–––––––7–|  pop on & of 2 and & of 4
 A: |–––5–––––––5–––––––|  thumb on & of 1, beat 3
 E: |–0–––0–––––––0–––––|  thumb on beats 1, &-of-1, beat 2
@@ -868,14 +868,14 @@ aloud at 50 before attempting at tempo.
 
 After the downstroke, let the thumb continue through and strike again on the upstroke, doubling note density without adding fingers:
 
-```
+```text
 T↓ = downstroke, T↑ = upstroke, P = pop
 
 |–T↓–T↑–P–T↓–|–T↑–P–T↓–T↑–|
 16th notes, target tempo = 80
 ```
 
-```
+```text
 Week 1: E open, T↓-T↑-T↓-T↑, no pop, tempo = 50
 Week 2: add one pop per bar on beat 3, tempo = 60
 Week 3: full double-thumb + pop pattern, tempo = 70
@@ -886,7 +886,7 @@ Week 4: apply over a chord vamp, tempo = 80
 
 Thumb is naturally louder because it's heavier and strikes harder. Consciously reduce thumb force by about 25% from instinct, increase pop displacement slightly, and verify with a DAW meter — target under 3 dB difference between T and P peaks.
 
-```
+```text
 Record 8 bars of T-P alternation, measure peaks:
   Thumb –3 dB, Pop –12 dB → 9 dB gap, too much
     → reduce thumb force, increase pop displacement, re-measure
@@ -897,7 +897,7 @@ Record 8 bars of T-P alternation, measure peaks:
 
 Advanced: the fretting hand slaps open strings against the fretboard for extra percussive punctuation.
 
-```
+```text
 1. RELEASE: fully release fretting pressure on the current note
 2. FLATTEN: lay all four fingers flat across the strings
 3. SLAP:    rapid downward motion, strings hit the fretboard
@@ -906,7 +906,7 @@ Advanced: the fretting hand slaps open strings against the fretboard for extra p
             unless muting is the goal
 ```
 
-```
+```text
 E: |–T–––T–––T–––T–|  right-hand thumb slaps
 G: |–––P–––P–––P–.–|  right-hand pops
 LH:|–.–.–.–X–.–.–.–|  left-hand slap on "a" of beat 2
@@ -928,7 +928,7 @@ Master right-hand slap and pop for six months minimum before layering this in.
 3. Use passing or approach tones on beats 2 and 4.
 4. Approach each new root by half-step or whole-step from above or below.
 
-```
+```text
 Primary targets (beats 1 and 3):
   Root (1) — strongest, most common
   Fifth (5) — second strongest
@@ -942,7 +942,7 @@ Passing tones (beats 2 and 4):
 
 ### 7.2 Chromatic Approach Note Rules
 
-```
+```text
 From BELOW:  target minus 1 semitone (one fret lower)
 From ABOVE:  target plus 1 semitone (one fret higher)
 Encirclement: above → below → target
@@ -955,7 +955,7 @@ Approaching G (fret 10 / A string):
 
 **Approach note drill (target: C on beat 1 of bar 2, A string fret 3):**
 
-```
+```text
 Option 1 — from below:
   A: |–.–.–.–2–|–3–.–.–.–|   beat 4 = B (fret 2)
 
@@ -968,7 +968,7 @@ Option 3 — encirclement:
 
 ### 7.3 Walking Bass Over a 12-Bar Blues (Key of G)
 
-```
+```text
 Tempo: quarter = 90 BPM, swing eighths
 
 Bar 1  (G7): G-A-Bb-B   fret 5-7-8-9 (A string)
@@ -987,7 +987,7 @@ Bar 12 (D7): fret 10-9-8-7, turnaround into repeat
 
 **Detailed bar 1 and 2 analysis:**
 
-```
+```text
 Bar 1 (G7): G-A-Bb-B
   Beat 1: G (root, fret 5 / A string)
   Beat 2: A (2nd, fret 7)
@@ -1003,7 +1003,7 @@ Bar 2 (G7): D-C#-C-B
 
 **Walking bass practice protocol:**
 
-```
+```text
 Week 1: Roots only, whole notes               tempo = 60
 Week 2: Roots + fifths, half notes            tempo = 70
 Week 3: Add chromatic approach on beat 4      tempo = 80
@@ -1015,7 +1015,7 @@ Month 2: Build your own lines using the 4 rules over the same changes
 
 Anticipations play the **root of the next chord** on the "&" of beat 4, creating forward harmonic pull. Common in jazz and R&B.
 
-```
+```text
 Without anticipation:
 Bar 1 (Dm7): D–F–A–B
 Bar 2 (G7):  G–A–F–F#   (G lands on beat 1, as expected)
@@ -1027,7 +1027,7 @@ Bar 2 (G7):  G–A–F–F#–C  (& of 4 = C, anticipates bar 3)
              1 2 3 4 &
 ```
 
-```
+```text
 Use when: chords change every 1–2 bars, tempo 90–160,
           harmonic rhythm is clear, and the band also anticipates
 
@@ -1040,14 +1040,14 @@ Avoid when: chords change every 2 beats (too dense),
 
 **Major scale run (G major, one octave, A string then D string):**
 
-```
+```text
 A: |–5–7–9–10–|–12–14–16–17–|
    G A B C     D  E  F#  G
 ```
 
 **Arpeggio — Gmaj7 (two octaves):**
 
-```
+```text
 A: |–5–––––9–––––12–|  G (root), B (3rd), D (5th)
 D: |–––––––––––––––17–|  G (octave)
 G: |–––––––––––––––––19–|  B (3rd, second octave)
@@ -1065,7 +1065,7 @@ Most working gigs hand you either a lead sheet (chord symbols over a melody) or 
 
 Numbers represent scale degrees of the key, not fixed notes:
 
-```
+```text
 Key of G major: G=1  A=2  B=3  C=4  D=5  E=6  F#=7
 
 A chart showing "1 - 4 - 5 - 1" in the key of G means:
@@ -1084,7 +1084,7 @@ Chord quality symbols stack on the number:
 
 **Rhythmic notation on the chart:**
 
-```
+```text
 "1 . . ."       = chord 1 held for the full bar
 "1 4"           = chord 1 for 2 beats, chord 4 for 2 beats
 "1 ^"           = chord 1 anticipated — hit it on the "&" before
@@ -1095,7 +1095,7 @@ Chord quality symbols stack on the number:
 
 ### 8.2 Reading a Chart in Real Time
 
-```
+```text
 Practical reading drill:
 
 1. Scan the whole chart before playing a note.
@@ -1117,7 +1117,7 @@ Practical reading drill:
 
 **Transposition speed drill:**
 
-```
+```text
 Take any 12-bar progression you know in one key.
 Call a new key every 4 bars without stopping the groove:
   Bars 1–4:  Key of C
@@ -1131,7 +1131,7 @@ a Nashville chart demands in a live setting.
 
 ### 8.3 Common Chart Shorthand Cheat Sheet
 
-```
+```text
 NC       = no chord (band stops, or drums/other instrument only)
 X4       = repeat the previous section 4 times
 1st X / 2nd X = different ending on first vs. second pass
@@ -1148,7 +1148,7 @@ rit.     = ritardando, slow down (usually at the very end)
 
 String type changes right-hand feel and left-hand pressure requirements, not just tone.
 
-```
+```text
 Roundwound (most common):
   Bright, articulate, higher string tension feel
   Best for: slap, funk, rock, general versatility
@@ -1172,7 +1172,7 @@ String gauge and setup interaction:
 
 ### 9.2 Action, Relief, and Intonation — What You Can Check Yourself
 
-```
+```text
 Action check (string height at 12th fret, no capo):
   Low action:  ~1.5–2.0mm (fast feel, more buzz risk)
   Medium:      ~2.0–2.5mm (balanced, most players' default)
@@ -1197,7 +1197,7 @@ not confident, a setup at a shop costs far less than a repair.
 
 ### 9.3 Amp and DI Gain Staging
 
-```
+```text
 Signal chain gain-staging checklist:
   1. Bass output: active basses run hotter than passive —
      check your amp/DI input isn't clipping with an active bass
@@ -1221,7 +1221,7 @@ Common live problem: "I can't hear myself"
 
 ### 9.4 Practice Signal Chain for Home Practice
 
-```
+```text
 Minimal effective setup for serious practice:
   Bass → Audio interface (or headphone amp) → Headphones
   
@@ -1245,7 +1245,7 @@ Minimal effective setup for serious practice:
 
 **Week 1 — Single-String Muting & Timing**
 
-```
+```text
 Exercise 1A: Muted quarter notes (E string, open)
   Rest stroke pluck, mute exactly on the next beat
   Each note sounds for EXACTLY one beat, no more
@@ -1265,7 +1265,7 @@ Exercise 1C: Root-Fifth-Octave (G major box, E string)
 
 **Week 2 — Floating Thumb & String Crossing**
 
-```
+```text
 Exercise 2A: Cross-string alternation (E→A→D→G and back)
   One note per string, i-m alternating, floating thumb active
   Tempo: 60 → 80 across the week
@@ -1283,7 +1283,7 @@ Exercise 2C: Two-string pattern
 
 **Week 3 — Ghost Notes & Sixteenth-Note Feel**
 
-```
+```text
 Exercise 3A: Ghost note integration
   G: |–O–x–O–x–|–O–x–x–O–|
   Tempo: 70 → 85
@@ -1300,7 +1300,7 @@ Exercise 3C: Mixed subdivision
 
 **Week 4 — Chord Tone Navigation & ii–V–I**
 
-```
+```text
 Exercise 4A: ii–V–I in C (A string roots)
   Am7:   |–12–12–12–14–|
   D7:    |–5–5–7–9–|
@@ -1321,7 +1321,7 @@ Exercise 4C: Transpose through all 12 keys
 
 The single most effective groove tool available with no extra gear:
 
-```
+```text
 Stage 1 (Week 1):  Click on all 4 beats
 Stage 2 (Week 2):  Click only on beats 2 and 4 (backbeats)
 Stage 3 (Week 3):  Click only on beat 1 of each bar
@@ -1332,7 +1332,7 @@ Stage 5 (Month 2): Click on "&" of beat 2 only (hardest)
 Advance only after 2 clean minutes with zero tempo drift.
 ```
 
-```
+```text
 Stage 5 visual:
 Beat:  1   &   2   &   3   &   4   &
 Click: .   .   .   X   .   .   .   .
@@ -1347,7 +1347,7 @@ Suggested pattern:
 
 ### 10.3 Simandl Chromatic Crawl (Injury Prevention + Fingerboard Mapping)
 
-```
+```text
 Simandl 1-2-4 ascending all 4 strings:
 E: |–1–2–4–|
 A: |–1–2–4–|
@@ -1369,7 +1369,7 @@ safely and maps the neck simultaneously.
 
 ### 10.4 Slap Endurance Builder
 
-```
+```text
 Week 1: 30 sec thumb-only slap (E open), rest 30 sec, x4 sets, tempo = 80
 Week 2: 45 sec T-P alternation, x4 sets, tempo = 80
 Week 3: 60 sec full slap groove, x4 sets, tempo = 90
@@ -1382,7 +1382,7 @@ Endurance through degraded technique builds bad habits, not strength.
 
 ### 10.5 Ear Training for Bassists
 
-```
+```text
 Root recognition drill:
   Week 1: Songs with slow harmonic rhythm (roots change every 2 bars)
   Week 2: Moderate rhythm (roots change every bar)
@@ -1398,7 +1398,7 @@ Interval recognition (from root):
 
 ### 10.6 The 12-Week Complete Practice Routine
 
-```
+```text
 Weeks 1–4: Foundation (Section 10.1)
 
 Weeks 5–8: Genre expansion
@@ -1431,7 +1431,7 @@ Daily structure (60 minutes):
 
 **Symptom:** metallic rattle on certain notes.
 
-```
+```text
 Check in order:
 
 1. Finger placement — landing 1–2mm behind the fret?
@@ -1459,7 +1459,7 @@ Check in order:
    can raise bridge saddles.
 ```
 
-```
+```text
 Emergency on-stage fix:
   1. Increase fretting pressure slightly
   2. Move plucking position toward the neck pickup (softer attack)
@@ -1471,7 +1471,7 @@ Emergency on-stage fix:
 
 **Symptom:** some notes ring too long, others cut short — uneven rhythm despite accurate note timing.
 
-```
+```text
 Fix protocol:
 1. Metronome to quarter = 50
 2. Quarter notes on one string, each sounding EXACTLY
@@ -1483,7 +1483,7 @@ Fix protocol:
 5. Progress to eighth notes only once quarters are consistent
 ```
 
-```
+```text
 DAW measurement example:
   Note 1: 480ms (target 500ms ± 20ms) ✓
   Note 2: 520ms ✓
@@ -1491,7 +1491,7 @@ DAW measurement example:
   Note 4: 650ms ✗ too long → mute firing too late
 ```
 
-```
+```text
 Advanced duration-control drill:
 Bar 1: beat 1 = whole note, let ring through beats 2-4
 Bar 2: beat 1 = half note, silence, beat 3 = half note, silence
@@ -1504,7 +1504,7 @@ Tempo: quarter = 60 — trains independent control of duration
 
 **Symptom:** slowing through hard passages, speeding through easy ones.
 
-```
+```text
 Diagnostic: record a 2-minute bass line alone, lay a grid over it
 in a DAW. Drift shows as transients sliding off the grid lines.
 
@@ -1519,7 +1519,7 @@ Fix protocol:
 4. If 16ths cause drift, count "1-e-and-a" aloud until stable.
 ```
 
-```
+```text
 Preventive structure for any new bass line:
   Day 1: 50% tempo, click on all beats
   Day 2: 60% tempo, click on 2 and 4
@@ -1536,7 +1536,7 @@ Advance only if the prior day measured under 5 BPM drift.
 
 **Symptom:** thumb slaps dominate the pop, or vice versa.
 
-```
+```text
 Calibration:
 1. Record 8 bars of T-P alternation, no effects
 2. Measure peaks in DAW: Thumb –2dB, Pop –14dB → 12dB gap, unacceptable
@@ -1554,7 +1554,7 @@ Adjustments if Pop is too quiet:
 Target after re-measuring: Thumb –6dB, Pop –8dB (2dB gap is fine)
 ```
 
-```
+```text
 Practice-only compressor settings (remove for performance):
   Ratio: 4:1, Attack: 10ms, Release: 100ms
   Catches the thumb transient and brings the pop up in the mix —
@@ -1565,7 +1565,7 @@ Practice-only compressor settings (remove for performance):
 
 **Stop immediately on sharp pain.** Dull fatigue during early technique development is normal; sharp, shooting, or persistent pain is not.
 
-```
+```text
 Ergonomic checklist:
   Strap height:  bass body at or slightly above hip level standing.
                  Too low = severe wrist angle. Too high = shoulder
@@ -1580,7 +1580,7 @@ Ergonomic checklist:
                  down the kinetic chain into your hands
 ```
 
-```
+```text
 Sitting:
   ✓ Bass on right thigh (right-handed), right foot on footstool, knee at 90°
   ✓ Neck angled up 30–45°, both hands neutral
@@ -1594,7 +1594,7 @@ Standing:
   looks cool, destroys wrist ergonomics
 ```
 
-```
+```text
 Stretching routine (before and after practice, 3.5 min total):
   1. Wrist flexion/extension — fist, bend down 15s, open hand, bend up 15s
   2. Forearm rotation — arm extended, palm up/down, 30s slow rotations
@@ -1603,7 +1603,7 @@ Stretching routine (before and after practice, 3.5 min total):
   5. Neck and shoulder rolls — slow circles both directions, 60s
 ```
 
-```
+```text
 Seek medical evaluation immediately for:
   ✗ Sharp, shooting pain persisting after stopping
   ✗ Numbness/tingling not resolving within 10 minutes
@@ -1614,7 +1614,7 @@ These may indicate tendonitis, carpal tunnel, or RSI.
 Do not push through serious pain.
 ```
 
-```
+```text
 Return-to-play protocol after injury:
   Week 1: 10 min/day, 50% tempo, easy material only
   Week 2: 15 min/day, 60% tempo
@@ -1632,7 +1632,7 @@ and consult a medical professional.
 
 **Symptom:** index-finger notes sound louder or harder than middle-finger notes — uneven groove at the sixteenth-note level.
 
-```
+```text
 Fix:
 1. 5 min/session, two weeks, middle finger only:
    E: |–0–0–0–0–|–0–0–0–0–|   m m m m   m m m m   tempo = 60
@@ -1651,7 +1651,7 @@ Fix:
      needs correction. Target under 2dB.
 ```
 
-```
+```text
 Root cause: index has more flexor muscle mass and a more
 favorable string-attack angle. Middle finger often approaches
 steeper, reducing power transfer. Fix by rotating the wrist
@@ -1663,7 +1663,7 @@ angle as index.
 
 **Symptom:** fretted notes sound sharp or flat even with open strings in tune.
 
-```
+```text
 1. Excess fretting pressure (most common):
    pressing hard stretches the string and raises pitch.
    Test: fret a note, reduce pressure until it buzzes,
@@ -1685,7 +1685,7 @@ angle as index.
    daily playing, acidic sweat, or humid/outdoor conditions.
 ```
 
-```
+```text
 Verification with an electronic tuner:
 1. Tune open strings accurately
 2. Play 12th fret (octave) on each string — should match
@@ -1701,7 +1701,7 @@ technique or ear, not the instrument.
 
 **Symptom:** bass lines sound monotonous even with correct notes and rhythm.
 
-```
+```text
 1. Static plucking position — practice the same 4-bar pattern
    over the neck pickup (warm), between pickups (balanced), and
    over the bridge pickup (bright). Use position changes to match

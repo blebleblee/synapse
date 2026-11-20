@@ -32,7 +32,7 @@ Network forensic analysis centers on packet capture reconstruction and flow anal
 
 Consider analyzing potential data exfiltration. The analyst starts with flow data extracted from full packet captures:
 
-```
+```text
 Flow Summary: 10.50.2.15:49321 -> 185.220.101.45:443
 Protocol: TCP/TLS 1.3
 Duration: 47 minutes
@@ -109,7 +109,7 @@ The `pstree` output reveals process parent-child relationships, exposing anomali
 
 Disk forensics operates on bitstream images acquired through write-blocking hardware or software to prevent contamination. Tools like FTK Imager or dd create sector-by-sector copies preserving slack space, deleted files, and filesystem metadata. Analysts mount images read-only and use tools like Autopsy or Sleuth Kit to parse NTFS Master File Table entries, extract file metadata including MAC (Modified, Accessed, Created) times, and recover deleted artifacts. Timeline analysis correlates filesystem changes, registry modifications, prefetch entries, and log events into a chronological attack narrative.
 
-```
+```text
 Timeline Reconstruction: Initial Compromise to Exfiltration
 
 2025-01-15 14:23:17 UTC - Inbound HTTP POST to /api/upload.php (webserver logs)

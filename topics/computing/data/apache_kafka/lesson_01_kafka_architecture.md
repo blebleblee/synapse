@@ -87,7 +87,7 @@ KRaft eliminates the external ZooKeeper dependency. Cluster metadata is stored i
 
 A Kafka broker is fundamentally a **log segment manager**. Each partition replica maps to a directory on disk containing a series of **segment files**.
 
-```
+```text
 /kafka-logs/
 └── orders-0/                        # Topic "orders", partition 0
     ├── 00000000000000000000.log      # Raw record data (message set format)
@@ -103,7 +103,7 @@ The filename prefix is the **base offset** of the first record in that segment. 
 
 **Zero-copy transfer** is the key I/O optimization. Rather than copying data from disk into the broker's heap and then into a socket buffer, the broker invokes the OS `sendfile(2)` system call (exposed in Java as `FileChannel.transferTo`), which transfers data directly from the page cache to the network interface buffer via DMA, entirely bypassing the JVM heap. This is why Kafka's read throughput scales with network bandwidth rather than CPU speed.
 
-```
+```text
 Traditional copy path:
 Disk → Kernel page cache → User space (broker heap) → Kernel socket buffer → NIC
 
@@ -301,7 +301,7 @@ The traditional path involves four copies and two context switches. The `sendfil
 
 Log compaction is a retention policy alternative to time/size-based deletion. For topics with `cleanup.policy=compact`, the broker's **log cleaner** (a background thread pool) periodically rewrites log segments, retaining only the **last** value for each key. Records with a `null` value (tombstones) are retained briefly to allow consumers to observe the deletion, then removed.
 
-```
+```text
 Before compaction (partition P0, offsets 0-7):
 Offset: 0     1     2     3     4     5     6     7
 Key:    K1    K2    K1    K3    K2    K1    K4    K3
@@ -342,7 +342,7 @@ This is a direct application of the **CAP theorem** tradeoff: you cannot have bo
 
 Consumer lag — the difference between the partition's **log end offset** (LEO) and the consumer group's **committed offset** for that partition — is the most important operational metric in a Kafka deployment. Rising lag indicates that consumers are falling behind producers, which eventually leads to unbounded memory/disk pressure (if the topic's `retention.bytes` is large) and increasing end-to-end processing latency.
 
-```
+```text
 Lag = LEO - CommittedOffset
 
 For partition P0:

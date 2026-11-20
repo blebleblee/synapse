@@ -141,19 +141,19 @@ Run the identical 60→120 BPM protocol as Drill 1, as its own separate session 
 ### Drill 3 — Rhythm Reading With Spoken Subdivision
 
 **Stage 1 (quarters/eighths), 60 BPM, 4/4:**
-```
+```text
 | ♩ | ♪♪ | ♩ | 𝅗𝅥 |
 ```
 Count: **"1, 2-and, 3, 4"** (hold the half note through beats 3–4 into beat 1 of the next bar's silence if none follows).
 
 **Stage 2 (adds sixteenths):**
-```
+```text
 | ♩ | ♬♬ ♪ | ♪♪ ♪♪ | ♩ |
 ```
 Count: **"1, 2-e-and-a, 3-and 4-and"**
 
 **Stage 3 (syncopation — off-beat accents):**
-```
+```text
 | 𝅘𝅥𝅮-rest ♪ | ♩ | 𝅘𝅥𝅮-rest ♪ | ♩ |
 ```
 Count: **"1-(silent)-and, 2, 3-(silent)-and, 4"** — clap only on "and."
@@ -165,21 +165,21 @@ Count: **"1-(silent)-and, 2, 3-(silent)-and, 4"** — clap only on "and."
 ### Drill 4 — Grand Staff Two-Hand Independence (Piano-Specific)
 
 **Stage 1 — Block chords, both hands attack together:**
-```
+```text
 Treble: C5 (half note)
 Bass:   C3 (half note)
 ```
 Both hands land exactly on the click. This builds the habit of reading both staves in one glance rather than sequentially.
 
 **Stage 2 — Contrary motion, quarter notes:**
-```
+```text
 Treble: C5 → B4 → A4 → G4
 Bass:   C3 → D3 → E3 → F3
 ```
 Hands move in mirror-opposite directions — this is deliberately easier than parallel motion because the visual symmetry helps your eyes track both staves.
 
 **Stage 3 — Rhythmic independence:**
-```
+```text
 Treble: quarter notes (4 per bar)
 Bass:   eighth notes (8 per bar)
 ```
@@ -243,7 +243,7 @@ A metronome marking like **♩ = 120** is the unambiguous version of these words
 
 A short melody in C major, 4/4, with every layer of notation stacked together:
 
-```
+```text
 Measure 1:
   Clef: Treble | Key: C major (no sharps/flats) | Meter: 4/4
   Beat 1: C5, quarter note, staccato, mf

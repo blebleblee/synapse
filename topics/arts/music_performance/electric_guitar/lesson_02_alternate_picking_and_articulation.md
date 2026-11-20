@@ -168,7 +168,7 @@ Work through these in order. Each one builds on the last.
 **Execution**: continuous 16th notes, strict down-up alternation. Keep the motion wrist-primary — the forearm stays relatively still, not pumping up and down. The movement is rotational at the wrist, not a vertical bounce. Keep the slant consistent throughout.
 
 **Metronome targets**:
-```
+```text
 Week 1-2:   60 BPM -> 80 BPM
 Week 3-4:   80 BPM -> 100 BPM
 Week 5-6:  100 BPM -> 120 BPM
@@ -184,13 +184,13 @@ Advance only when the current tempo feels effortless for 60 continuous seconds w
 
 **Fretboard position**: E minor pentatonic, 7th position, strings 3 and 2.
 
-```
+```text
 String 3 (G): fret 7 = G | fret 9 = A
 String 2 (B): fret 7 = E | fret 8 = F# | fret 10 = B
 ```
 
 **Pattern A — 2 notes per string**:
-```
+```text
 Ascending:   G(3)-A(3) -> E(2)-B(2)
              D    U       D    U
 
@@ -199,7 +199,7 @@ Descending:  B(2)-E(2) -> A(3)-G(3)
 ```
 
 **Pattern B — 3-note grouping, string-change awareness**:
-```
+```text
 G - A - E - A - G
 D   U   D   U   D
         ^
@@ -216,7 +216,7 @@ D   U   D   U   D
 ### Exercise 3: Three-Note-Per-String G Major Scale — Full-Neck Alternate Picking
 
 **Fingering**, starting at the 3rd fret:
-```
+```text
 String 6 (E low):  3-5-7   (G-A-B)
 String 5 (A):      4-5-7   (C-D-E)
 String 4 (D):      4-5-7   (F#-G-A)
@@ -226,7 +226,7 @@ String 1 (E high): 7-8-10  (A-B-C)
 ```
 
 **Pick pattern**, strict alternation starting on a downstroke:
-```
+```text
 String 6:   D-U-D   (ends on downstroke)
 String 5:   U-D-U   (string change lands on upstroke)
 String 4:   D-U-D
@@ -251,7 +251,7 @@ The most common intermediate plateau is sync, not speed: the pick fires at the r
 
 **Fix — Accent Lock Drill**: use the G major scale from Exercise 3 at 80 BPM. Accent (hit harder) beats 1 and 3. The fret finger must land exactly on the accented pick stroke — not before, not after.
 
-```
+```text
 Beat:  1       +   2   +   3       +   4   +
 Pick:  D(acc)  U   D   U   D(acc)  U   D   U
 Note:  G           A           B           C
@@ -265,7 +265,7 @@ The landing of the fretting finger is the accent. Note before the click means th
 ### Exercise 5: Musical Application — Pentatonic Runs with Phrasing
 
 **Material**: A minor pentatonic, 5th position.
-```
+```text
 String 6 (E): fret 5 = A | fret 8 = D
 String 5 (A): fret 5 = D | fret 7 = E
 String 4 (D): fret 5 = G | fret 7 = A
@@ -275,7 +275,7 @@ String 1 (E): fret 5 = A | fret 8 = D
 ```
 
 **Phrase 1 — Canonical rock lick, strings 2–1**:
-```
+```text
 String 2: fret 8 (A) - fret 5 (E)
 String 1: fret 8 (D) - fret 5 (A) - fret 8 (D)
 Pick:        D             U           D     U    D
@@ -285,7 +285,7 @@ Phrasing: accent note 1, back off the last two, slight crescendo over the phrase
 ```
 
 **Phrase 2 — Descending run with dynamic shaping**:
-```
+```text
 Strings 1-6, 2 notes per string, descending
 D-A(str1) -> E-A(str2) -> D-G(str3) -> A-E(str4) -> D-A(str5)
 Pick: D U | D U | D U | D U | D U
@@ -363,7 +363,7 @@ Strict alternate picking is the foundation. Once it's solid, two variations beco
 
 When moving to an adjacent string in the same direction as your current stroke, sweep both with one continuous motion instead of reversing.
 
-```
+```text
 Strict alternate:  D-U-D-U-D   (string change 3->4 is an upstroke)
 Economy picking:   D-U-D       (notes 1-2 on strings 4-3 as D-U,
                                  then one downstroke sweeps 3->2)

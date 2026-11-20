@@ -38,7 +38,7 @@ The **proxy table** tracks the relationship between original clips and their pro
 
 Here is a simplified entity-relationship diagram illustrating these core tables:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                       PROJECTS                              │
 │  project_id | project_name | db_location | created_date    │
@@ -109,7 +109,7 @@ The **media pool** is the user-facing interface to the clips and bins database. 
 
 **Traditional bins** are static containers. You manually drag clips into them, creating an explicit organizational hierarchy. For a documentary project, you might create a structure like:
 
-```
+```text
 Project_Root_Bin
 ├── Raw Footage
 │   ├── Scene 01

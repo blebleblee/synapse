@@ -102,7 +102,7 @@ Geodesics in the Poincaré disk are circular arcs orthogonal to the boundary cir
 
 The parallel postulate fails dramatically here. Take a geodesic $\ell$ (a circular arc) and a point $P$ not on it. The collection of all geodesics through $P$ that do not intersect $\ell$ forms an open family: there are infinitely many parallels, bounded by exactly two **limiting parallels** that meet $\ell$ asymptotically at ideal boundary points. Everything between the two limiting parallels (in angular terms around $P$) gives a parallel geodesic. This is illustrated schematically below:
 
-```
+```text
         ∂𝔻 (ideal boundary)
        /         \
       /  P         \
@@ -136,7 +136,7 @@ $$z = \frac{x_1 + ix_2}{x_3 + 1} \in \mathbb{D}$$
 
 One verifies directly that this map pulls back the Poincaré metric to the hyperboloid metric, establishing the isometry. The relationship among the three models is summarized structurally as:
 
-```
+```text
 Hyperboloid ℍ² ⊂ ℝ^{2,1}
         |                   \
   gnomonic projection    stereographic projection

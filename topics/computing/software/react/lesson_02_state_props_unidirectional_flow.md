@@ -18,7 +18,7 @@ The state lifting pattern emerges when sibling components need coordinated acces
 
 React's state management implementation revolves around fiber nodes, the internal data structure representing component instances in the reconciliation tree. Each fiber maintains a `memoizedState` field storing the component's current state, implemented as a linked list of state hooks for functional components. When you call `useState`, React appends a new state cell to this list during the initial render. Subsequent renders traverse the same list in order, which explains why hooks must execute in consistent sequence—reordering breaks the position-based lookup mechanism.
 
-```
+```text
 Component Fiber Node Memory Layout:
 
 ┌─────────────────────────────┐

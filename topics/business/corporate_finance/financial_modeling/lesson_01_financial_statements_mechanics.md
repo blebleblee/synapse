@@ -48,7 +48,7 @@ Financing cash flow tracks transactions with capital providers. Debt issuances g
 
 The three sections sum to the net change in cash, which must reconcile exactly to the difference between the ending cash balance and beginning cash balance on sequential balance sheets. This mechanical constraint enforces articulation and serves as the primary error-checking mechanism in three-statement models:
 
-```
+```text
 Ending Cash (Balance Sheet Period 2) = Beginning Cash (Balance Sheet Period 1) 
                                        + Operating Cash Flow
                                        + Investing Cash Flow  
@@ -57,7 +57,7 @@ Ending Cash (Balance Sheet Period 2) = Beginning Cash (Balance Sheet Period 1)
 
 The transmission mechanisms linking statements operate through specific formula patterns. Net income flows from the income statement bottom line into the change in retained earnings on the balance sheet via the equity rollforward:
 
-```
+```text
 Retained Earnings (End) = Retained Earnings (Begin) 
                           + Net Income 
                           - Dividends Paid
@@ -65,7 +65,7 @@ Retained Earnings (End) = Retained Earnings (Begin)
 
 Depreciation expense on the income statement links to the accumulated depreciation schedule, which links to the balance sheet PP&E section:
 
-```
+```text
 Accumulated Depreciation (End) = Accumulated Depreciation (Begin)
                                  + Depreciation Expense
                                  - Accumulated Depreciation on Disposed Assets
@@ -73,7 +73,7 @@ Accumulated Depreciation (End) = Accumulated Depreciation (Begin)
 
 The net PP&E balance then appears on the balance sheet as gross PP&E less accumulated depreciation. Capital expenditures link the investing cash flow to the gross PP&E schedule:
 
-```
+```text
 Gross PP&E (End) = Gross PP&E (Begin)
                    + Capital Expenditures
                    - Gross PP&E Disposed
@@ -81,13 +81,13 @@ Gross PP&E (End) = Gross PP&E (Begin)
 
 Interest expense on the income statement derives from the debt balance and applicable interest rate, creating a circular reference that requires iterative calculation or careful sequencing:
 
-```
+```text
 Interest Expense = Average Debt Balance × Interest Rate
 ```
 
 The debt balance itself changes through financing cash flows (new borrowings less repayments) and may also change through non-cash accretion mechanisms like original issue discount amortization:
 
-```
+```text
 Debt Balance (End) = Debt Balance (Begin)
                      + New Debt Issuances
                      - Debt Repayments
@@ -104,7 +104,7 @@ For practitioner efficiency, the indirect method dominates institutional modelin
 
 Working capital modeling represents the highest-frequency failure mode in three-statement construction. The mechanical relationship requires precision: an increase in a current asset account represents a use of cash (cash deployed into that asset), requiring a subtraction in the operating cash flow section. An increase in a current liability account represents a source of cash (financing provided by the liability), requiring an addition in the operating cash flow section. Practitioners frequently reverse these signs, particularly when modeling year-over-year changes that alternate between positive and negative values. The error manifests as cash flow statements that fail to reconcile to balance sheet cash changes, forcing iterative debugging through change-tracking formulas:
 
-```
+```text
 Change in Accounts Receivable = AR (End) - AR (Begin)
 Operating Cash Flow Adjustment = -1 × Change in Accounts Receivable
 ```
@@ -115,7 +115,7 @@ Depreciation and amortization schedules require careful architecture to avoid fo
 
 The architectural pattern for this schedule creates separate rollforward tables for gross PP&E, accumulated depreciation, and net PP&E, linked through consistent formulas:
 
-```
+```text
 Gross PP&E (End) = Gross PP&E (Begin) + CapEx - Disposals (Gross)
 Accumulated Depreciation (End) = Accum Depr (Begin) + Depr Expense - Disposals (Accum)
 Net PP&E (End) = Gross PP&E (End) - Accumulated Depreciation (End)
@@ -123,7 +123,7 @@ Net PP&E (End) = Gross PP&E (End) - Accumulated Depreciation (End)
 
 Disposal accounting requires tracking both the gross asset value disposed and the accumulated depreciation attributable to that asset, calculated as the gross disposal amount minus the net book value at disposal:
 
-```
+```text
 Accumulated Depr on Disposal = Gross Disposal - Net Book Value at Disposal
 Gain/Loss on Disposal = Sale Proceeds - Net Book Value at Disposal
 ```
@@ -138,7 +138,7 @@ The equity rollforward schedule completes the balance sheet articulation by reco
 
 The mechanical formula structure ensures that the change in total shareholders' equity reconciles to all equity-affecting items:
 
-```
+```text
 Shareholders' Equity (End) = Shareholders' Equity (Begin)
                              + Net Income
                              - Dividends

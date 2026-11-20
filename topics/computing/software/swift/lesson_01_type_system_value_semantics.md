@@ -52,7 +52,7 @@ The heap block for `Vector3Ref` contains a two-word header—on a 64-bit system,
 
 The architectural difference is visualized in the following diagram:
 
-```
+```text
 VALUE SEMANTICS (struct Vector3)
 ─────────────────────────────────────────────────────────────────
  Stack frame (or inline in parent struct/class):

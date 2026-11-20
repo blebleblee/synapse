@@ -20,7 +20,7 @@ Observability in distributed Next.js applications requires correlating telemetry
 
 The deployment architecture of a Next.js application begins with the build phase where the framework performs static analysis of the application source, identifies rendering strategies for each route, and emits multiple output artifacts. The `next build` command traverses the file-system routing structure in the `app/` or `pages/` directory, analyzes each route's data dependencies through static extraction of Server Component imports and data fetching patterns, and categorizes routes into static (fully pre-rendered at build time), dynamic (server-rendered on each request), or hybrid (statically generated with Incremental Static Regeneration). This categorization determines the deployment topology: static routes compile to HTML files and JSON payloads suitable for CDN distribution, dynamic routes require a persistent Node.js server process, and hybrid routes need both static hosting and a revalidation endpoint.
 
-```
+```text
 Build Output Structure (.next directory):
 
 .next/

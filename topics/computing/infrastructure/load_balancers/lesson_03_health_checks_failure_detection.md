@@ -186,7 +186,7 @@ This configuration issues an HTTP GET to `/health` every five seconds, expecting
 
 HAProxy provides similarly sophisticated health checking through its `option httpchk` directive:
 
-```
+```text
 global
     maxconn 50000
     log stdout format raw local0
@@ -218,7 +218,7 @@ The `inter 3s` parameter sets the probe interval to three seconds. The `fall 3` 
 
 Connection pooling mechanics in HAProxy are controlled through the `http-reuse` directive:
 
-```
+```text
 backend app_servers
     mode http
     balance roundrobin

@@ -37,7 +37,7 @@ regardless of idler presence. Idlers absorb radial load and spatial positioning 
 
 The physical implementation in LEGO demands attention to axle support density and gear alignment tolerance. A typical high-ratio compound train might appear as follows (ASCII sectional view):
 
-```
+```text
     [Motor]---Axle#1---[12t pinion]
                             |
                          (mesh)

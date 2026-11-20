@@ -117,7 +117,7 @@ Top to bottom in the score: piccolo, flutes, oboes, English horn, clarinets, bas
 
 A common stage plan (audience at bottom; orchestras vary):
 
-```
+```text
                    Timpani   Percussion
         Trumpets      Trombones     Tuba
    Horns       Bassoons      Clarinets
@@ -201,7 +201,7 @@ All grids below are in 4/4. "1 & 2 &" marks eighth-note positions.
 - Dynamic one to two steps under the melody.
 - Use when the melody is lyrical and exposed.
 
-```
+```text
 Violas (div. a2):  E4 (whole)   | E4 (whole)   |
                    C4 (whole)   | C4 (whole)   |   p, molto legato
 Cellos:            G3 (whole)   | G3 (whole)   |
@@ -212,7 +212,7 @@ Horns 3 & 4:       G3 / C3 (whole notes)        |
 - Violins II and violas, pizzicato or light detached. Or harp, rolled upward.
 - Alternate flutes and clarinets on the top note of each beat for timbral variation.
 
-```
+```text
 Violin II:  E4 G4 C5 E5 | G5 E5 C5 G4 |    (eighths, 1 & 2 & 3 & 4 &)
 Harp:       C2 ..  G3 ..  E4 ..  C5 ..     (rolled upward, mp)
 Cello:      C3 (half)     | G3 (half)     |  pizz.
@@ -220,7 +220,7 @@ Cello:      C3 (half)     | G3 (half)     |  pizz.
 
 **Texture C: Rhythmic ostinato (♩=132, f, marcato)**
 
-```
+```text
 Beat:         1  &  2  &  3  &  4  &
 Violins:      -  C5 -  C5 -  C5 C5 C5      (detached, near the bow tip)
 Horns 1-4:    -  C4/E4 chord -  C4/E4 chord -  -  -   (short stabs)
@@ -234,7 +234,7 @@ Cut the ostinato whenever a melody enters at p or mp, or the pulse will bury it.
 - Give each line a different timbre and separate registers by at least an octave.
 - Both lines at mf, one clearly articulated, one legato.
 
-```
+```text
 Oboe:     C5 D5 E5 F5 E5 D5 C5 B4     (eighths, descending shape)
 Bassoon:  C3 .  G3 .  F3 .  E3 .      (quarters, leaps)
 ```
@@ -427,7 +427,7 @@ Use these as writing guidelines, not hard limits.
 
 **Staggered breathing for held notes (Flute 1 and 2):**
 
-```
+```text
 Bar:      1     2     3     4     5     6
 Flute 1:  C5 ------------ (dim.) breathe   C5 -------- 
 Flute 2:                  C5 (cresc.) ------------------ (dim.)
@@ -525,7 +525,7 @@ flowchart LR
 
 **Stage 2: Instrumentation plan.** Annotate the short score by phrase. Example:
 
-```
+```text
 Bars 1-8:   Melody: oboe.     Harmony: strings (div.).    Bass: cellos + basses pizz.
 Bars 9-16:  Melody: Vln I.    Harmony: flutes, clarinets. Bass: bassoons.
 Bars 17-24: Transition: oboe to Vln I overlap, add horns.

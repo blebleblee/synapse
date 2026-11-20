@@ -615,7 +615,7 @@ clang++ -O1 -pthread -fsanitize=thread -fno-omit-frame-pointer \
 
 TSan will produce a report similar to the following (abbreviated for readability; your output will include source locations):
 
-```
+```text
 ==================
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x... by thread T2:

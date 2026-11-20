@@ -105,7 +105,7 @@ john --wordlist=/usr/share/wordlists/rockyou.txt hash.txt
 
 Next, locate the Tor daemon binary and configuration. Common paths include `/usr/bin/tor`, `/usr/sbin/tor`, or `/opt/tor/bin/tor`. Extract the `torrc` configuration file from `/etc/tor/torrc` and examine its parameters. To sabotage the device's anonymity without triggering obvious failures, modify the configuration to disable connection padding. Edit the extracted `torrc` and append:
 
-```
+```text
 ConnectionPadding 0
 ReducedConnectionPadding 1
 ```
@@ -149,7 +149,7 @@ telnet localhost 4444
 
 From the OpenOCD console, dump the contents of DRAM to a file:
 
-```
+```text
 reset halt
 dump_image dram_dump.bin 0x80000000 0x40000000
 ```
@@ -243,7 +243,7 @@ Each peak corresponds to a Diffie-Hellman exponentiation during circuit extensio
 
 Deploy a covert exfiltration implant to demonstrate long-term traffic metadata collection. Solder a small RF transmitter module—such as an HC-12 433 MHz transceiver—to the target device's UART TX pin. Configure the HC-12 in transparent serial mode at 115200 baud. Modify the Tor daemon's logging configuration to emit circuit events to the serial console by editing `/etc/tor/torrc`:
 
-```
+```text
 Log notice file /dev/ttyS0
 ```
 
@@ -271,7 +271,7 @@ tcpdump -i eth1 -w control_traffic.pcap host <entry_guard_ip>
 
 Run both devices through identical browsing patterns—load the same onion services in the same sequence with fixed delays. Use Wireshark to analyze inter-packet arrival times:
 
-```
+```text
 Statistics → I/O Graph → Y-Axis: Advanced → Compute: COUNT(frame) → Interval: 0.1 seconds
 ```
 

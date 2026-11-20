@@ -126,7 +126,7 @@ Every `Page` in Playwright contains a **frame tree** rooted at the main frame. W
 
 The frame tree is not static. Navigating an iframe creates a new execution context and destroys the old one. Cross-origin iframes are hosted in separate renderer processes due to Chrome's Site Isolation policy, which means their JavaScript heaps are physically in different memory address spaces. Playwright abstracts this correctly: `frame.evaluate()` sends a `Runtime.evaluate` CDP command with the correct `contextId` for that frame's current document, regardless of whether the frame is cross-origin or same-origin. The invariant to remember is that **you cannot pass live JavaScript object handles across frame boundaries**—a `JSHandle` created in one frame's execution context has a context-scoped reference ID that is meaningless to another frame's evaluator.
 
-```
+```text
 Page
 └── MainFrame (contextId: 1, origin: https://example.com)
     ├── ChildFrame (contextId: 2, origin: https://example.com)

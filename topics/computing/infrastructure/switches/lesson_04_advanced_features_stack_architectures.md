@@ -88,7 +88,7 @@ Election proceeds through a priority comparison where each switch advertises its
 
 The stacking backplane interconnects member switches through dedicated high-speed links—typically 40G or 100G bandwidth—that form a ring topology for redundancy. Traffic ingressing on one member switch can egress on any other member without traversing the master, leveraging the distributed forwarding tables that each member maintains as a synchronized copy of the master's authoritative database. When a frame arrives destined for a MAC address on a different stack member, the local ASIC encapsulates it in a stacking header that identifies the destination switch and egress port, transmits it across the ring, and the receiving switch strips the stacking header and forwards the original frame.
 
-```
+```text
 Stack Topology and Traffic Flow
 ================================
 

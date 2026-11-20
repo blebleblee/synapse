@@ -60,7 +60,7 @@ The BP curve represents balance of payments equilibrium, the condition that the 
 
 The mechanical operation of the Mundell-Fleming system under alternative regimes can be visualized through the adjustment dynamics following policy shocks. Consider an expansionary monetary policy under flexible exchange rates with perfect capital mobility. The initial equilibrium lies at the intersection of IS, LM, and the horizontal BP curve at $i = i^*$. The monetary expansion shifts LM rightward, creating excess money supply that puts downward pressure on interest rates. As $i$ begins to fall below $i^*$, capital flows outward, triggering immediate currency depreciation. The depreciation shifts IS rightward as net exports improve, generating an additional expansionary impulse. The system reaches a new equilibrium where output is higher, the interest rate remains at $i^*$ (pinned by capital mobility), and the exchange rate has depreciated. The money supply increase generates output expansion entirely through the exchange rate channel rather than through interest rate reduction.
 
-```
+```text
 Flexible Rates, Perfect Capital Mobility: Monetary Expansion
 
     i
@@ -89,7 +89,7 @@ Under fixed exchange rates with perfect capital mobility, the same monetary expa
 
 Fiscal expansion under fixed rates presents the opposite pattern. Government spending increases shift IS rightward, raising both output and the interest rate. The higher domestic interest rate attracts capital inflows, creating upward pressure on the currency. To maintain the fixed peg, the central bank must intervene by buying foreign reserves and selling domestic currency, expanding the money supply and shifting LM rightward. This accommodative monetary expansion amplifies the fiscal stimulus, generating larger output increases than would occur in a closed economy where rising interest rates crowd out private investment.
 
-```
+```text
 Fixed Rates, Perfect Capital Mobility: Fiscal Expansion
 
     i

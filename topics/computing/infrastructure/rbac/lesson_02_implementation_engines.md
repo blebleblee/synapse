@@ -139,7 +139,7 @@ When a PDP fetches this manifest, it compares the revision field against its cur
 
 The decision engine is the computational core where policy evaluation occurs. In high-performance systems, the engine maintains an in-memory index mapping subjects and resources to applicable policies, enabling constant-time or logarithmic-time lookup. Kubernetes implements this as a nested map structure:
 
-```
+```text
 type PolicyRule struct {
     APIGroups       []string
     Resources       []string
@@ -163,7 +163,7 @@ Authorization checks acquire a read lock on the cache, look up the subject ident
 
 Open Policy Agent's evaluation engine operates differently because Rego policies express arbitrary logic rather than simple permission tables. The engine compiles Rego source into an intermediate representation consisting of a directed acyclic graph of query operations: variable bindings, predicate tests, function calls, and set operations. At evaluation time, the engine walks this graph, maintaining a binding environment that maps logical variables to concrete values. When a rule reference like `data.role_bindings[input.user.id]` appears, the engine performs a trie-based lookup into the preloaded data document, which is an immutable tree structure optimized for prefix queries.
 
-```
+```text
 Query: data.kubernetes.admission.deny_deployment
 
 Compilation Output:

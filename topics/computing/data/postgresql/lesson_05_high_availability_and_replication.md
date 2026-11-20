@@ -148,7 +148,7 @@ FROM pg_replication_slots;
 
 **The Operational Trap:** If a standby goes offline and its slot is not dropped, the primary accumulates WAL indefinitely. With default configuration (`max_slot_wal_keep_size = -1`, meaning unlimited), this will fill the primary's disk to 100% and crash the entire cluster with:
 
-```
+```text
 FATAL: could not write to file "pg_wal/xlogtemp.NNNN": No space left on device
 ```
 

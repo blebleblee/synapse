@@ -18,7 +18,7 @@ Track Changes in Microsoft Word operates through a dual-layer document represent
 
 The data structure for a tracked insertion might be represented conceptually as:
 
-```
+```text
 Revision {
   id: UUID("7a3f-4c2e-9b1d-8e5f"),
   type: INSERT,
@@ -36,7 +36,7 @@ Comment systems introduce a parallel annotation layer that references specific t
 
 The threading model for comments supports hierarchical reply structures, transforming flat annotations into conversational threads. A comment object contains a parent reference that chains replies together:
 
-```
+```text
 Comment {
   id: UUID("2b8c-6d4a-1e7f-9a3c"),
   parent_id: UUID("5f1d-8e2c-4b9a-7c6e"),
@@ -54,7 +54,7 @@ Multi-author conflict resolution in real-time collaborative editing systems like
 
 Consider two authors editing the sentence "The company achieved revenue targets." Author A inserts "strong" before "revenue" while Author B simultaneously replaces "achieved" with "exceeded." Without coordination, these operations could produce inconsistent states depending on application order. Operational transformation computes position adjustments:
 
-```
+```text
 Initial: "The company achieved revenue targets."
          Position: 0....5.....13......22......30....
 
@@ -80,7 +80,7 @@ Modern cloud platforms favor optimistic concurrency control where users edit fre
 
 Version history systems maintain snapshots of document states at discrete points in time, enabling rollback and comparison operations. Microsoft Word's native versioning tracks major and minor versions with timestamps and author metadata:
 
-```
+```text
 Version History:
   v1.0 (Baseline) - 2025-01-10T09:15:00Z - john.doe@corp.com
   v1.1 (Draft) - 2025-01-12T14:30:00Z - jane.smith@corp.com
@@ -92,7 +92,7 @@ Each version snapshot stores a complete copy of the document or a delta encoding
 
 Comparison algorithms compute visual diffs between document versions using longest common subsequence (LCS) methods adapted for word and paragraph boundaries rather than line-based diffing. The system identifies inserted, deleted, and moved text blocks, rendering them with color-coded annotations:
 
-```
+```text
 Version 2.0 → Version 2.1 Diff:
   Paragraph 3: [DELETED] "The Q4 projections indicate moderate growth."
   Paragraph 3: [INSERTED] "The Q4 projections exceed targets by 15%."
@@ -105,7 +105,7 @@ Real-time co-authoring protocols introduce presence awareness and cursor broadca
 
 The protocol operates through periodic heartbeat messages exchanged over WebSocket connections:
 
-```
+```text
 Presence Broadcast:
 {
   client_id: "a3f7-9c2e-4b8d",
@@ -120,7 +120,7 @@ Clients receiving these broadcasts render ephemeral overlays showing where remot
 
 Session reconciliation handles network partitions and conflicting offline edits when clients reconnect after working in disconnected mode. The system must merge local changes accumulated during the partition with remote changes made by other authors during the same period. This requires maintaining a causality graph that tracks which edits each client has seen:
 
-```
+```text
 Causality Graph (Vector Clocks):
   Client A: [3, 1, 0]  # Seen 3 local ops, 1 from B, 0 from C
   Client B: [2, 4, 1]  # Seen 2 from A, 4 local ops, 1 from C
@@ -135,7 +135,7 @@ Large document collaboration introduces performance bottlenecks that scale non-l
 
 Optimization strategies partition revision processing into viewport chunks, deferring layout computation for off-screen content until the user scrolls. Modern implementations maintain a spatial index mapping revision objects to document regions:
 
-```
+```text
 Revision Spatial Index:
   Section 1 (pages 1-50): 234 revisions
   Section 2 (pages 51-100): 567 revisions
@@ -146,7 +146,7 @@ When rendering a specific page range, the system queries only revisions intersec
 
 Comment resolution workflows at scale require batch processing capabilities to avoid UI thrashing when marking hundreds of comments resolved after a major document review. Naive implementations that trigger full document re-renders for each comment state change can freeze the application for tens of seconds. Production systems buffer resolution operations into transaction batches:
 
-```
+```text
 Comment Resolution Batch:
   BEGIN TRANSACTION
     UPDATE comments SET resolved=true WHERE id IN (...500 IDs...)
@@ -161,7 +161,7 @@ Network latency in real-time co-authoring creates observable inconsistencies whe
 
 Predictive UI rendering mitigates this by applying local operations immediately while queuing them for server confirmation. The system maintains separate local and authoritative document states, rendering the optimistic local state to the user while reconciling with authoritative updates in the background:
 
-```
+```text
 State Management:
   Local State: "The company exceeded strong revenue targets."
   Pending Operations: [INSERT("strong ", pos=22)]
@@ -175,7 +175,7 @@ If the server rejects a pending operation due to conflicts, the system must roll
 
 Version history explosion occurs when frequent auto-save intervals generate thousands of version snapshots for long-lived documents. A document edited continuously over six months with auto-save every 5 minutes produces over 50,000 version entries, overwhelming storage systems and making version history UIs unusable. Enterprise platforms implement version coalescing policies that merge adjacent auto-save versions into fewer major milestones:
 
-```
+```text
 Coalescing Policy:
   Auto-save versions < 1 hour old: Retain all
   Auto-save versions 1 hour - 1 day old: Coalesce to hourly snapshots
@@ -187,7 +187,7 @@ This reduces storage growth from linear to logarithmic while preserving sufficie
 
 Merge conflict resolution failure modes arise when operational transformation cannot preserve both authors' intentions simultaneously. Consider two authors restructuring the same outline hierarchy concurrently—Author A promoting a nested bullet to a top-level heading while Author B deleting the parent section containing that bullet. The transformation system must choose between contradictory operations:
 
-```
+```text
 Initial Structure:
   1. Executive Summary
     a. Revenue Analysis
@@ -230,7 +230,7 @@ Access control conflicts emerge in enterprise environments where document permis
 
 Audit trail integrity for regulated industries requires immutable change logs that survive document format conversions and system migrations. Pharmaceutical companies documenting clinical trial protocols must maintain FDA-compliant revision histories that trace every substantive change through multiple review cycles and regulatory submissions. This demands exporting revision metadata to external logging systems independent of the document file format:
 
-```
+```text
 Audit Log Entry:
 {
   document_id: "CTP-2025-001",
@@ -250,7 +250,7 @@ Performance degradation under concurrent load manifests when dozens of authors s
 
 Sharding strategies partition documents into independently editable sections, each handled by separate server processes:
 
-```
+```text
 Document Sharding:
   Section 1-5: Server Instance A (15 active editors)
   Section 6-10: Server Instance B (12 active editors)

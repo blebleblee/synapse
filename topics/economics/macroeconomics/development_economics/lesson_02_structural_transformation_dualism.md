@@ -46,7 +46,7 @@ The Lewis turning point occurs when $\frac{\partial F}{\partial L_A} = \frac{F(L
 
 The diagrammatic representation of the Lewis model employs a dual-panel framework. The left panel depicts the agricultural sector with labor on the horizontal axis and output per worker on the vertical axis. The average product curve slopes downward due to diminishing returns, while the marginal product curve lies below the average product, intersecting it at the technically optimal labor allocation. The right panel shows the modern sector with labor on the horizontal axis and output, wages, and profits on the vertical axis. The modern sector labor demand expands as capital accumulates, shifting rightward over time. The horizontal line at $w_A + \delta$ represents the unlimited labor supply at constant wages. The turning point arrives when the two panels meet at the technically optimal agricultural labor allocation.
 
-```
+```text
 Agricultural Sector                    Modern Sector
 Output/Worker                          Output, Wages
 

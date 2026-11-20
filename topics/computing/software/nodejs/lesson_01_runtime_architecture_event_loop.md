@@ -171,7 +171,7 @@ console.log('[synchronous]  call stack (runs first, always)');
 
 Executing this program produces the following output with consistent ordering:
 
-```
+```text
 [synchronous]  call stack (runs first, always)
 [nextTick]     nextTick queue
 [Promise.then] microtask queue

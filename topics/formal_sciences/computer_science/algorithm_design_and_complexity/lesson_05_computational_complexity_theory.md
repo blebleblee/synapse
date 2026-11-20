@@ -130,7 +130,7 @@ Conversely, suppose $G_\phi$ has a vertex cover of size at most $n + 2m$. Since 
 
 The structure of the reduction machinery is now visible in its full generality. The diagram below summarizes the reduction hierarchy connecting the central NP-complete problems:
 
-```
+```text
                        Every problem in NP
                               |
                               | (Cook-Levin tableau construction)

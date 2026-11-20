@@ -106,7 +106,7 @@ This is called **finger legato** and it is the fundamental technical skill of or
 
 **Finger legato drill — C major five-finger position:**
 
-```
+```text
 Right hand, C4–G4, quarter notes at ♩= 50 BPM:
 
 Fingers: 1  2  3  4  5  4  3  2  1
@@ -130,7 +130,7 @@ Because the organ is legato-dependent, you will frequently need to change finger
 
 **Basic substitution drill:**
 
-```
+```text
 Hold C4 with finger 1. Without releasing C4:
   - Silently slide finger 2 onto C4
   - Confirm C4 is still sounding
@@ -151,7 +151,7 @@ The pedalboard is a 32-note concave radiating keyboard played entirely with your
 
 **Toe-heel exercises — foundation drill:**
 
-```
+```text
 Both feet, alternating toe-heel on single notes:
 Right foot: C3 (toe), C3 (heel), D3 (toe), D3 (heel)...
 Left foot:  mirrors on lower octave
@@ -169,7 +169,7 @@ Watch for:
 
 **Pedal scale — G major (one octave):**
 
-```
+```text
 Right foot leads:
 G2  A2  B2  C3  D3  E3  F#3  G3
  T   T   H   T   T   H   T    T
@@ -187,7 +187,7 @@ G2(T-R) A2(T-L) B2(T-R) C3(T-L) D3(T-R) E3(T-L) F#3(T-R) G3(T-L)
 
 **Pedal legato drill with substitution:**
 
-```
+```text
 Pedal, one foot only, C2 held while changing toe to heel:
 
 1. Depress C2 with right toe
@@ -204,7 +204,7 @@ Target: zero audible gap at ♩= 50, then 65, then 80.
 
 Playing melody on Swell, accompaniment on Great, bass line on Choir (with left hand), and a pedal line simultaneously is the fundamental independence challenge. Build it in layers:
 
-```
+```text
 Layer 1 — Pedal alone: Root-movement bass line, C major scale,
            ♩= 60, eyes closed, smooth toe-heel
 
@@ -235,7 +235,7 @@ Always build registrations from the lowest-pitched stop upward. Never begin with
 
 **Standard registration-building order:**
 
-```
+```text
 Step 1: Principal 8'           → Core foundation, always first
 Step 2: + Octave 4'            → Adds brightness, reinforces 2nd harmonic
 Step 3: + Super Octave 2'      → More shimmer; can omit for softer effect
@@ -284,7 +284,7 @@ Step 5: + Trumpet 8' (or Oboe) → Reed cap; adds cutting edge and warmth
 
 Modern consoles have programmable combination action: thumb pistons under each manual and toe studs above the pedalboard, each storable with a specific stop combination.
 
-```
+```text
 Practical piston workflow for a recital:
 
 1. Before rehearsal, write out your FULL registration plan bar-by-bar
@@ -312,7 +312,7 @@ while actively playing a pedal line — you will miss the next note.
 
 Because the organ sustains all notes equally regardless of key pressure, articulation is controlled entirely by **how long you hold each key relative to the beat.** These four touch types are your complete dynamic vocabulary within a single registration:
 
-```
+```text
 1. LEGATO (Full value):
    Note duration = 100% of rhythmic value
    Key held for entire note value, released on the next attack
@@ -338,7 +338,7 @@ Because the organ sustains all notes equally regardless of key pressure, articul
 
 **Quick reverb-correction formula:**
 
-```
+```text
 If RT60 (reverberation time) > 2.5 seconds:
   → Use portato as default touch (80% value)
   → Reduce tempo by 10–15 BPM below your rehearsal tempo
@@ -355,7 +355,7 @@ The organ does not breathe, but the music must. Phrase shaping on the organ happ
 
 **Phrasing drill — Bach Chorale "Jesu, Joy of Man's Desiring" opening:**
 
-```
+```text
 Phrase 1: G4–A4–B4–D5–C5–B4–A4 (bars 1–3)
   → Hold each note full value (legato throughout phrase)
   → Release last note (A4) for approximately one beat duration
@@ -380,7 +380,7 @@ Since you cannot crescendo through a single note, phrase climax must be shown th
 
 ### Drill 1: Legato Scales with Finger Substitution
 
-```
+```text
 Setup: Principal 8', Great manual, ♩= 50 BPM
 
 Right Hand — C major, two octaves (C4 → C6 → C4):
@@ -400,7 +400,7 @@ Progressive targets:
 
 ### Drill 2: Pedal Scales — Alternating Toe
 
-```
+```text
 Setup: Principal 8' + Octave 4', Pedal, ♩= 40
 
 C major scale, two octaves:
@@ -418,7 +418,7 @@ Progressive targets:
 
 ### Drill 3: Four-Limb Coordination — Cantus Firmus Exercise
 
-```
+```text
 Setup:
   Great:  Principal 8'
   Swell:  Flute 8' (box half open)
@@ -445,7 +445,7 @@ Week 4:
 
 A critical performance skill is changing stops mid-piece without disrupting the music. On most organs this requires removing a hand from the keys to reach the stop jambs.
 
-```
+```text
 Technique: "Dead Hand" Stop Change
 
 Setup: Principal 8' + Octave 4' drawn on Great
@@ -467,7 +467,7 @@ Blindfold drill: Eyes on score, locate Mixture by feel alone.
 
 ### Drill 5: Reverberation-Adapted Articulation
 
-```
+```text
 Setup: Imagine (or test in) a reverberant room (RT60 ≈ 3–4s)
        Registration: Great — Principal 8' + Octave 4' + Mixture
 
@@ -487,7 +487,7 @@ BPM adjustment: Reduce from ♩= 72 (dry room) → ♩= 60 (reverberant room)
 
 ### Drill 6: Manual-Change Agility Under Tempo
 
-```
+```text
 Setup: Great — Principal 8', Swell — Flute 8', box fixed half-open
 
 Exercise: Alternate hands between manuals every bar, same melodic
@@ -583,7 +583,7 @@ You will not tune the organ — that is the tuner's job. But you need to underst
 
 **Pre-concert checklist:**
 
-```
+```text
 □ Organ blower ON minimum 2 hours before rehearsal
   → Circulates air through pipes, stabilizes temperature distribution
 □ Building temperature: target 18-22C, locked before arrival
@@ -628,7 +628,7 @@ flowchart TD
 
 ### Dead Note: Key Pressed, No Sound
 
-```
+```text
 Diagnosis sequence:
 
 1. Does the key feel lighter than normal?
@@ -666,7 +666,7 @@ Diagnosis sequence:
 
 When a fault occurs mid-performance, the single worst response is stopping. Organists train specific recovery behaviors:
 
-```
+```text
 1. A cipher appears on a sustained chord:
    -> Keep playing the remaining voices; let the audience perceive
       it as an unusual sustained pedal point if registration allows
@@ -715,7 +715,7 @@ flowchart TD
 
 This is one of the most common errors in live organ performance: playing at the tempo that felt right in a practice room (dry or moderate acoustic) in a live reverberant space.
 
-```
+```text
 RT60 Correction Table:
 
 RT60 (seconds) | Tempo multiplier | Example: J=80 becomes...
@@ -732,7 +732,7 @@ causes rhythmic instability.
 
 ### Repertoire-Specific Registration Quick Reference
 
-```
+```text
 BAROQUE (Bach, Buxtehude, Frescobaldi):
   Small-scale works:    Principal 8' alone, pure, transparent
   Trio sonatas:         Differentiated stops on each manual + pedal
@@ -758,7 +758,7 @@ CONTEMPORARY (Messiaen, Langlais):
 
 ### Practice Session Structure (90-Minute Template)
 
-```
+```text
 0:00 - 0:10  Physical warm-up
               Legato five-finger patterns, both hands separately
               Pedal alternating-toe scales, C major and G major
@@ -794,7 +794,7 @@ This is the organist's most frequent real-world job and it has its own technical
 
 ### Introductions and Leading Congregational Singing
 
-```
+```text
 Standard hymn introduction structure:
   - Play the final phrase of the hymn (not the first) as the introduction
     if the congregation knows the tune, OR
@@ -816,7 +816,7 @@ Unlike solo repertoire, hymn playing requires a **slightly early release before 
 
 ### Varying Verses: The Standard Toolkit
 
-```
+```text
 Verse 1: Full congregation registration (as above), straightforward harmony
 Verse 2: Reduce to Swell only (softer, reflective text verses)
 Verse 3 (if a descant or alternate harmonization exists):
@@ -835,7 +835,7 @@ Final verse: Full organ, add couplers (Swell to Great, Swell to Pedal),
 
 Organ repertoire, especially trio sonatas and much modern music, is frequently printed on three staves (two manual staves plus a pedal staff in bass clef, sometimes with a C clef for an inner voice). Fluency here is a distinct skill from piano two-stave reading.
 
-```
+```text
 Building the skill, progressive drill:
 
 Stage 1: Read pedal line alone, silently, naming notes aloud
@@ -862,7 +862,7 @@ new unfamiliar material at the current tempo with fewer than
 
 Service playing frequently requires on-the-spot transposition (a cantor pitches a verse differently, or an instrumentalist requests a key change). The practical method is interval mapping, not key-signature analysis:
 
-```
+```text
 Quick method for transposing up a whole step (common request):
 
 1. Identify the key signature shift (e.g., C major -> D major:

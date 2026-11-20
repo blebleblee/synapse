@@ -186,7 +186,7 @@ This is the optimal export subsidy under Cournot competition. It represents 25 p
 
 Under Bertrand price competition, the strategic logic reverses. Firms set prices rather than quantities, and the domestic firm's best response is to undercut the foreign rival. An export subsidy lowers the domestic firm's marginal cost, inducing even more aggressive price cuts. The foreign firm retaliates, and equilibrium prices fall toward marginal cost, dissipating profits. The optimal policy becomes an export tax that commits the domestic firm to softer pricing, sustaining higher equilibrium prices and profits. The fundamental insight is that the optimal policy depends on the mode of competition: quantity-setting (Cournot) favors subsidies, while price-setting (Bertrand) favors taxes.
 
-```
+```text
 Welfare Decomposition: Small Country Tariff
 
 Price

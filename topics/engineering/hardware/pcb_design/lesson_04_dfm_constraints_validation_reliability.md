@@ -40,7 +40,7 @@ The layer stackup defines the board's electrical and mechanical architecture thr
 
 Impedance control requires precise management of trace geometry relative to reference planes within the stackup. The characteristic impedance of a microstrip transmission line—a trace on an outer layer with a reference plane below—follows from electromagnetic field solution of Maxwell's equations for the specific geometry, but working engineers employ empirical formulas verified against field solvers. For a microstrip over a ground plane:
 
-```
+```text
 Z₀ ≈ (87 / √(εᵣ + 1.41)) × ln(5.98h / (0.8w + t))
 ```
 
@@ -48,7 +48,7 @@ where `h` represents the dielectric thickness from trace to plane, `w` denotes t
 
 Differential pairs for high-speed serial interfaces (PCIe, USB, HDMI, Ethernet) require not only controlled single-ended impedance but also controlled differential impedance and tight coupling between the pair. Differential impedance emerges from the interaction between the two traces when driven with opposite polarity signals, creating a coupled transmission line system where the return current divides between the reference plane and the opposite conductor. The differential impedance formula for edge-coupled microstrip pairs extends the single-ended case:
 
-```
+```text
 Z_diff ≈ 2 × Z₀ × (1 - 0.48 × e^(-0.96s/h))
 ```
 
@@ -62,7 +62,7 @@ Power distribution network (PDN) design represents a parallel challenge where th
 
 The plane capacitance contribution is often overestimated in casual analysis. Two planes separated by five mils of FR-4 dielectric form a parallel-plate capacitor with capacitance per unit area:
 
-```
+```text
 C = (ε₀ × εᵣ × A) / d
 ```
 
@@ -84,7 +84,7 @@ Silkscreen legend rules ensure that component designators, company logos, and as
 
 Impedance test methodology provides the validation framework ensuring that controlled impedance specifications translate into manufactured reality. Time-domain reflectometry sends a fast-edge pulse down the trace under test and measures reflections from impedance discontinuities. The oscilloscope display shows the transmitted pulse, reflections from any impedance changes along the trace, and the far-end reflection that arrives after twice the propagation delay. For a perfectly matched transmission line terminated in its characteristic impedance, no reflection returns from the far end. Impedance mismatch creates reflections with magnitude proportional to the reflection coefficient:
 
-```
+```text
 ρ = (Z_load - Z₀) / (Z_load + Z₀)
 ```
 
@@ -108,7 +108,7 @@ Failure mode and effects analysis (FMEA) systematically enumerates potential fai
 
 Thermal cycling stress represents the dominant reliability threat for most commercial electronics. The Coffin-Manson relationship predicts fatigue life from cyclic plastic strain amplitude:
 
-```
+```text
 N_f = C × (Δε_p)^(-m)
 ```
 

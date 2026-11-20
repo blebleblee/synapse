@@ -99,7 +99,7 @@ Spotify's streaming payout model operates on a pro-rata system that distributes 
 
 Patreon's direct patronage model circumvents algorithmic gatekeepers by establishing recurring payment relationships between creators and supporters. The platform charges creators five to twelve percent fees depending on service tier, plus payment processing costs of approximately 2.9 percent plus thirty cents per transaction. This structure makes small-dollar subscriptions inefficient—a two-dollar monthly pledge loses roughly fifty cents to fees, yielding a one-dollar-fifty net return. Creators optimize by offering higher-value tiers and emphasizing annual subscriptions that amortize per-transaction fees across twelve months of access.
 
-```
+```text
 Monetization Threshold Comparison:
 
 Platform      | Follower Req. | Watch Time | Min. Payout | Avg. RPM*

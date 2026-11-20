@@ -30,7 +30,7 @@ The frequency-domain mixing strategy employed during overlap depends on arrangem
 
 Digital DJ systems abstract this physical control surface into software-defined parameters while introducing grid-based quantization. When a track is loaded into Traktor, Serato, or Rekordbox, the software performs beat grid analysis by scanning the audio waveform for transient peaks, calculating inter-onset intervals (the time elapsed between successive kick hits), then fitting these intervals to a constant-tempo model using least-squares regression. The resulting beat grid consists of a downbeat marker (the phase-zero reference point corresponding to the first kick of bar one) and a tempo value in beats per minute. Every subsequent beat position is computed deterministically from these two parameters according to the formula:
 
-```
+```text
 beat_position[n] = downbeat_offset + (n × 60 / BPM × sample_rate)
 ```
 

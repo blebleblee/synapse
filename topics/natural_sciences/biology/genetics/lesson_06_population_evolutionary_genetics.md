@@ -128,7 +128,7 @@ $$\frac{\partial f}{\partial t} = -\frac{\partial}{\partial x}\left[M(x) f\right
 
 where the drift coefficient $M(x)$ captures deterministic forces (selection, mutation, migration) and the diffusion coefficient $V(x) = x(1-x)/(2N)$ captures stochastic drift. This equation is the population-genetic analog of the diffusion equation in physics, with allele frequency playing the role of a spatial coordinate, and it admits analytical solutions for many standard combinations of forces.
 
-```
+```text
 Wright-Fisher Allele Frequency Dynamics
 ========================================
 
@@ -159,7 +159,7 @@ Expected fixation time: ~4Nₑ generations
 
 The qualitative behavior of an allele under combined selection and drift is determined by the product $N_e s$. This parameter partitions the state space of evolutionary dynamics into three qualitatively different regimes:
 
-```
+```text
 Selection-Drift Phase Diagram
 ==============================
 
@@ -366,7 +366,7 @@ print(f"Simulated FST: {FST:.4f}")
 
 **Forward-time simulation with SLiM** models evolution forward in time, making it straightforward to implement arbitrary selection models, spatial population structures, and time-varying parameters. SLiM uses a scripting language (Eidos) to specify complex evolutionary scenarios that are impossible or awkward to implement in coalescent frameworks — including soft sweeps (selection on standing variation), background selection, and gene drive dynamics.
 
-```
+```text
 // SLiM script: directional selection on a quantitative trait
 initialize() {
     initializeMutationRate(1e-8);

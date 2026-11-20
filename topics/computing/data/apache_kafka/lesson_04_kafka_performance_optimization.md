@@ -61,7 +61,7 @@ graph TD
 
 Since Kafka 0.11, the on-disk format uses the RecordBatch structure (magic byte = 2). Understanding this format is prerequisite to understanding compression efficiency and consumer parse overhead.
 
-```
+```text
 RecordBatch {
     baseOffset:           int64   // offset of the first record in this batch
     batchLength:          int32   // total byte length of the batch from partitionLeaderEpoch onward
@@ -85,7 +85,7 @@ Compression is applied to the `records` array as a whole, not to individual reco
 
 Kafka's most important OS-level optimization is zero-copy transfer. When a consumer fetches data, the broker does not read bytes into JVM heap memory and then write them to a socket. Instead, the broker calls `sendfile(2)` (or `transferTo` in Java NIO, which maps to the same syscall), which instructs the kernel to transfer data directly from the page cache to the network socket buffer without any copy into user space.
 
-```
+```text
 Traditional copy path (4 copies, 4 context switches):
   disk → kernel page cache → user buffer (JVM heap) → socket buffer → NIC
 
@@ -403,7 +403,7 @@ sysctl -w net.ipv4.tcp_window_scaling=1
 ```
 
 **Filesystem:** Use `ext4` or `XFS` mounted with `noatime` to avoid inode access time updates on every read. XFS performs better than ext4 under heavy write loads due to its superior allocation algorithms and journal scalability.
-```
+```bash
 # /etc/fstab entry for Kafka data directory
 /dev/nvme0n1p1  /kafka/data  xfs  defaults,noatime  0  0
 ```

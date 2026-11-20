@@ -21,7 +21,7 @@ That's the only theory you need up front. Everything else below is hands-on.
 
 ### Zone layout inside MixConsole (left to right, per channel strip)
 
-```
+```text
 Input Gain (trim) → Phase/Polarity → Pre-Fader Inserts (8 slots) → EQ (4-band + curve) →
 Post-Fader Inserts (8 slots) → Sends (up to 8) → Fader + Pan → Mute/Solo → Output routing
 ```

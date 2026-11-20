@@ -321,7 +321,7 @@ UPDATE concurrent_table SET value = value + 1 WHERE id = 1;
 ```
 
 **Expected Result**: PostgreSQL's deadlock detector (runs every `deadlock_timeout`, default 1s) will abort one transaction with:
-```
+```text
 ERROR:  deadlock detected
 DETAIL:  Process X waits for ShareLock on transaction Y; blocked by process Z.
 Process Z waits for ShareLock on transaction X; blocked by process X.
@@ -478,7 +478,7 @@ sudo -u postgres /usr/lib/postgresql/16/bin/pg_waldump $LATEST_WAL | head -50
 ```
 
 **Sample Output**:
-```
+```text
 rmgr: Heap        len (rec/tot):     59/    59, tx:        750, lsn: 0/01001A28, prev 0/010019F0, desc: INSERT off 3, blkref #0: rel 1663/16384/16385 blk 0
 rmgr: Transaction len (rec/tot):     34/    34, tx:        750, lsn: 0/01001A68, prev 0/01001A28, desc: COMMIT 2024-01-15 10:23:45.123456 UTC
 ```
@@ -504,7 +504,7 @@ sudo tail -f /var/lib/postgresql/16/main/log/postgresql-*.log
 ```
 
 **Expected Log Messages**:
-```
+```text
 LOG:  database system was interrupted; last known up at 2024-01-15 10:23:44 UTC
 LOG:  database system was not properly shut down; automatic recovery in progress
 LOG:  redo starts at 0/01000028

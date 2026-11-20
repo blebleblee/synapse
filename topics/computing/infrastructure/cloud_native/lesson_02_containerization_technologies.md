@@ -716,7 +716,7 @@ CNI defines a plugin interface for configuring network interfaces in containers.
 
 **CNI Plugin Execution Flow:**
 
-```
+```text
 Container Created → CNI ADD → IP Allocated → Interface Configured
                        ↓
                    Plugin Chain
@@ -802,7 +802,7 @@ Docker provides built-in DNS resolution for container names.
 
 **DNS Resolution Flow:**
 
-```
+```text
 Container "web" → DNS Query for "api" → Embedded DNS Server (127.0.0.11)
                                                ↓
                                     Container IP Resolution
@@ -1712,7 +1712,7 @@ docker run -d \
 
 **Memory Hierarchy:**
 
-```
+```text
 Total Memory = Container Memory + Swap
               ↓                    ↓
          Hard Limit           Hard Limit

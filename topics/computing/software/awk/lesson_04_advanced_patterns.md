@@ -45,7 +45,7 @@ This program writes numbers 1 through 5 to a `sort -rn` process, which buffers i
 
 The `getline` function presents multiple invocation forms that differ in their data source and assignment target, each with distinct return semantics:
 
-```
+```text
 getline              # Read next record from current input into $0, update fields
 getline var          # Read next record into variable, do not update $0 or fields
 getline < "file"     # Read from named file into $0, update fields
@@ -115,7 +115,7 @@ BEGIN { OFS = "," }
 ```
 
 Given input `foo bar baz` with default space separator, this program produces:
-```
+```text
 Original: foo bar baz
 Modified: foo,BAR,baz
 ```
@@ -130,7 +130,7 @@ For a three-field input, this creates fields `$4` through `$9` as empty strings,
 
 The `FILENAME`, `FNR`, and `NR` variables update according to a precise protocol as Awk processes multiple input files. Consider processing three files with record counts 10, 15, and 5:
 
-```
+```text
 Input:    file1.txt  file2.txt  file3.txt
 Records:  10         15         5
 

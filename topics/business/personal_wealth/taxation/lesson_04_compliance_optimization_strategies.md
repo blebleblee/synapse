@@ -40,7 +40,7 @@ The passive activity loss limitation regime segregates income and losses into th
 
 The estimated tax calculation methodology follows a quarterly cadence aligned to April 15, June 15, September 15, and January 15 payment deadlines. The annualized income installment method permits taxpayers with seasonal or lumpy income patterns to calibrate quarterly payments to actual year-to-date earnings rather than equal 25% allocations. This calculation reconstructs estimated annual income after each quarter, computes the tentative tax liability, multiplies by the applicable period percentage (22.5% for Q1, 45% for Q2, 67.5% for Q3, 90% for Q4), and subtracts prior quarter payments to derive the current installment amount.
 
-```
+```text
 Annualized Income Method (Q2 Example):
 
 YTD Income (Jan-Jun):        $180,000
@@ -69,7 +69,7 @@ High-performance compliance optimization exploits timing arbitrage across tax ye
 
 Income acceleration versus deferral decisions pivot on the spread between current and projected future marginal rates combined with the time value of deferred payment obligations. When current rates sit at historic lows relative to projected increases, accelerating income through Roth conversions, accelerated depreciation recapture, or intentional capital gain harvesting locks in favorable current treatment. The break-even analysis compares the present value of current-year tax on accelerated income against the present value of future tax on deferred income, adjusting for growth rates on the retained funds:
 
-```
+```text
 Acceleration Break-Even:
 
 Current Rate:                 24%

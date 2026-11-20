@@ -142,7 +142,7 @@ Without private ownership and genuine exchange, the price vector $\mathbf{p}$ lo
 
 The interventionist spiral follows a predictable state machine:
 
-```
+```text
 [Equilibrium State] 
      ↓ 
 [Intervention: Price Ceiling on Good X]

@@ -106,7 +106,7 @@ a formula that is otherwise non-trivial to derive directly. The Inclusion-Exclus
 
 The structural pattern of an Inclusion-Exclusion computation can be visualized as a traversal of the Boolean lattice $2^{[n]}$, assigning signed weights to each node, then summing. The following diagram captures the architecture for $n = 3$:
 
-```
+```text
                     ∅  (weight +1)
                  /  |  \
                {1} {2} {3}  (weight −1 each)

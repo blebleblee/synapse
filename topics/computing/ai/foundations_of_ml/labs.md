@@ -313,7 +313,7 @@ if __name__ == "__main__":
 ```
 
 **Expected output (approximate):**
-```
+```text
 [INFO] Using device: cpu
 Epoch   50 | train_loss=0.0821 | train_acc=0.9917 | test_loss=0.0953 | test_acc=0.9667 | lr=0.050000
 Epoch  100 | train_loss=0.0634 | train_acc=1.0000 | test_loss=0.0768 | test_acc=0.9667 | lr=0.050000

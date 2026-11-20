@@ -50,7 +50,7 @@ Stripe size determines the granularity at which data is distributed across drive
 
 The RAID 5 read-modify-write cycle imposes a four-I/O penalty for small writes. To update a single 4 KB block in a stripe, the controller must read the old data (I/O 1), read the old parity (I/O 2), compute new parity as P_new = P_old ⊕ D_old ⊕ D_new, write new data (I/O 3), and write new parity (I/O 4). Full-stripe writes avoid this penalty: if the write spans all data blocks in a stripe, the controller computes parity directly without reading old values. RAID 6 incurs even higher overhead due to Galois field arithmetic for dual parity. Workloads dominated by small random writes—databases, virtual machine disk images—perform poorly on RAID 5/6 compared to RAID 10 or SSD-backed storage.
 
-```
+```text
 RAID 5 Stripe Layout (4 data drives + 1 parity)
 
 ┌─────┬─────┬─────┬─────┬─────┐
@@ -121,7 +121,7 @@ Monitoring and alerting detect degraded arrays, failing drives, and performance 
 
 Performance testing with fio (Flexible I/O Tester) characterizes storage behavior under controlled workloads. Sequential read and write tests with large block sizes measure throughput; random read and write tests with small block sizes measure IOPS and latency. Mixed workloads simulate real applications. Example fio job for random 4 KB writes:
 
-```
+```text
 [random-write]
 ioengine=libaio
 direct=1

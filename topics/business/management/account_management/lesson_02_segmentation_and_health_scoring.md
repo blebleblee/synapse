@@ -38,7 +38,7 @@ The process of assigning expansion ceiling requires a structured estimation appr
 
 A production-grade health score is a weighted composite of signals organized into four behavioral pillars: Engagement, Adoption, Outcomes, and Risk. The architecture below maps the full signal path from raw data sources through normalization to the composite score and the action trigger layer.
 
-```
+```text
 Raw Data Sources
 │
 ├── Product Telemetry (event streams, feature flags, session depth)

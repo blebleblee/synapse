@@ -16,7 +16,7 @@ The other foundational invariant is transfer accounting. Every SCSI Command PDU 
 
 The BHS occupies the first 48 bytes of every PDU. Its layout is opcode-driven, but the first 8 bytes are common across every opcode: an opcode byte carrying the immediate flag, opcode-specific flags in byte 1, two reserved or opcode-specific bytes in bytes 2 and 3, then a one-byte `TotalAHSLength` and a three-byte `DataSegmentLength` occupying bytes 4 through 7. From byte 8 onward the layout branches by opcode, but a few fields are reused often enough to deserve naming: the 8-byte LUN at offset 8, the ITT at offset 16, and the sequence numbers at offsets 24 and 28.
 
-```
+```text
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

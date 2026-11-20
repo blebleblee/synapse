@@ -28,7 +28,7 @@ The reference namespace hierarchy uses forward slashes as path separators, but G
 
 Branch mechanics center on HEAD manipulation and reference updates. The HEAD file lives at `.git/HEAD` and contains either a symbolic reference like `ref: refs/heads/main` or a direct commit hash. When HEAD points to a branch reference, Git operates in normal mode: commits advance the branch pointer, merges update the branch, and checkouts preserve the symbolic link. The actual branch file at `.git/refs/heads/main` contains only the commit hash representing the branch tip. During `git commit`, Git reads HEAD, resolves it to the branch reference, reads the branch reference to get the current commit hash, creates a new commit with the current hash as parent, writes the new commit to the object database, and atomically updates the branch reference to the new commit's hash.
 
-```
+```bash
 # Physical reference structure
 .git/
 ├── HEAD                          # ref: refs/heads/main
@@ -53,7 +53,7 @@ Branch mechanics center on HEAD manipulation and reference updates. The HEAD fil
 
 The commit DAG structure emerges from parent pointers embedded in commit objects. Each commit object contains a tree reference, author metadata, committer metadata, and zero or more parent references. The parent field stores complete 40-character SHA-1 hashes, creating cryptographically strong edges in the graph. Single-parent commits form linear history chains, while multi-parent commits document merge operations. Orphan commits with no parents represent initial commits or disconnected history grafts. Git stores commit objects in `.git/objects/` using content-addressable storage: the object's SHA-1 hash determines its storage path, with the first two hash characters forming a directory and the remaining 38 characters forming the filename.
 
-```
+```bash
 # Commit object internal structure
 commit 245
 tree 8c3b9d1e5f7a9b1c3d5e7f9a1b3c5d7e9f1a3b5c
@@ -71,7 +71,7 @@ Graph traversal algorithms power Git's core operations. Ancestry determination u
 
 Reachability queries determine commit visibility and garbage collection eligibility. A commit is reachable if any reference can reach it through parent traversal, including direct refs, symbolic refs, reflogs, and the stash. Git's garbage collection scans all references, builds the reachable set through graph traversal, and marks unreachable objects for deletion after a grace period. The grace period (default 30 days for loose objects, 90 days for packed objects) prevents data loss when developers hold local references not yet pushed. Pruning operations walk the object database, checking each object against the reachable set, and removing objects that fall outside this set and exceed the grace period.
 
-```
+```bash
 # DAG structure with merge commits
       A---B---C  (main)
            \

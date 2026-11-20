@@ -56,7 +56,7 @@ Beyond even these refined absorption states lies the domain of *non-dual conscio
 
 The diagram below illustrates the phenomenological architecture of this gradient:
 
-```
+```text
 ORDINARY CONSCIOUSNESS
      |
      | (attentional stabilization)

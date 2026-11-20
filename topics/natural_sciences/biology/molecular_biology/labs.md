@@ -432,7 +432,7 @@ Begin by designing PCR primers targeting the *lacZ* gene using nearest-neighbor 
 
 Example primer sequences designed using these criteria:
 
-```
+```text
 Forward primer (lacZ-F):
 5′-ATGACCATGATTACGGATTCACTG-3′
 Length: 24 nt
@@ -472,7 +472,7 @@ Calculate the total volume required for all reactions plus 10% overage to accoun
 
 Program the thermal cycler for a standard three-step PCR protocol with the following cycling parameters:
 
-```
+```text
 Initial denaturation:   95°C for 3 minutes (activates Taq polymerase)
 
 Cycling (35 cycles):

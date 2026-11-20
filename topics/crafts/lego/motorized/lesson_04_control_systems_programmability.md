@@ -34,7 +34,7 @@ The software architecture layers firmware, runtime, and user programs. SPIKE Pri
 
 State machine implementation in MicroPython leverages enumeration types and dictionary dispatch. A typical structure defines states as enumerated constants—`State.IDLE`, `State.SEEKING`, `State.GRASPING`—and encodes transition logic in a dispatch table mapping (current_state, event) tuples to next_state values. The main control loop polls sensors, evaluates transition conditions, and dispatches to state-specific handler functions:
 
-```
+```text
 from enum import Enum
 
 class State(Enum):
@@ -65,7 +65,7 @@ PID controller implementation requires tracking error history and derivative est
 
 A complete position hold implementation in MicroPython operates as follows:
 
-```
+```text
 from hub import port
 import time
 
@@ -94,7 +94,7 @@ Synchronized multi-motor control demands coordinated state updates to prevent sk
 
 Communication protocols between hub and external devices—Bluetooth controllers, computer IDEs, networked peers—follow packet-oriented architectures. SPIKE Prime and EV3 expose serial-over-Bluetooth interfaces that accept line-delimited JSON or binary command messages. A remote control application transmits motor velocity commands at 20 Hz: `{"left": 50, "right": -30}` to drive the left motor forward at 50% and right motor backward at 30%, effecting a pivot turn. The hub receives these packets via interrupt-driven UART handlers, parses the JSON, and updates motor targets within the main control loop. Latency accumulates from input sampling, wireless transmission, packet buffering, parsing overhead, and motor response lag, typically totaling 50 to 150 milliseconds round-trip. Predictive dead reckoning can compensate: the hub extrapolates control inputs forward by the observed latency, issuing motor commands that anticipate operator intent rather than reacting to outdated state.
 
-```
+```text
        [User Input Device]
               |
               | Bluetooth LE (20 Hz packet rate)

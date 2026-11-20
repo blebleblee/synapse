@@ -71,7 +71,7 @@ The single most common beginner injury is fretting-hand tension — gripping the
 
 Trains finger independence and builds the arch automatically, because each finger has to work alone without the others collapsing into it.
 
-```
+```text
 Strings: 6  5  4  3  2  1
 Fret:    1  1  1  1  1  1   (all index, one per string)
          2  2  2  2  2  2   (all middle finger)
@@ -114,7 +114,7 @@ Chord diagrams use the format `[E A D G B e]` where numbers are fret positions, 
 
 **C Major** — `x 3 2 0 1 0`
 
-```
+```text
   E  A  D  G  B  e
   x  3  2  0  1  0
   —  ring  mid  —  idx  —
@@ -124,7 +124,7 @@ Watch: the ring finger on A/3rd fret must arch enough to let the open D string r
 
 **G Major** — `3 2 0 0 0 3`
 
-```
+```text
   E  A  D  G  B  e
   3  2  0  0  0  3
   mid  idx  —  —  —  ring (or pinky)
@@ -134,7 +134,7 @@ Alternate fingering: `2 1 0 0 0 3` (index on A, middle on low E, pinky on high e
 
 **D Major** — `x x 0 2 3 2`
 
-```
+```text
   E  A  D  G  B  e
   x  x  0  2  3  2
   —  —  —  idx  ring  mid
@@ -142,7 +142,7 @@ Alternate fingering: `2 1 0 0 0 3` (index on A, middle on low E, pinky on high e
 
 **A Minor** — `x 0 2 2 1 0`
 
-```
+```text
   E  A  D  G  B  e
   x  0  2  2  1  0
   —  —  mid  ring  idx  —
@@ -150,7 +150,7 @@ Alternate fingering: `2 1 0 0 0 3` (index on A, middle on low E, pinky on high e
 
 **E Minor** — `0 2 2 0 0 0`
 
-```
+```text
   E  A  D  G  B  e
   0  2  2  0  0  0
   —  mid  ring  —  —  —
@@ -158,7 +158,7 @@ Alternate fingering: `2 1 0 0 0 3` (index on A, middle on low E, pinky on high e
 
 **F Major (barre, first position)** — `1 3 3 2 1 1`
 
-```
+```text
   E  A  D  G  B  e
   1  3  3  2  1  1
   idx(barre)  ring  pinky  mid  idx  idx
@@ -168,7 +168,7 @@ The F chord is where most players stall, and it's rarely a strength problem — 
 
 **F Major (cheater voicing for beginners)** — `x x 3 2 1 1`
 
-```
+```text
   E  A  D  G  B  e
   x  x  3  2  1  1
   —  —  ring  mid  idx  idx (mini-barre)
@@ -241,7 +241,7 @@ Drill pairs in order of difficulty:
 
 **Movable 5th-chord shape:** Index on the root, ring two frets up on the string below, pinky doubling the root an octave up on the next string below the ring.
 
-```
+```text
 Root on E string (e.g. fret 3 = G5):     Root on A string (e.g. fret 5 = D5):
   E    A    D    G    B    e               E   A    D    G    B    e
   idx  ring pinky  x    x    x              x   idx  ring pinky  x   x
@@ -283,7 +283,7 @@ graph LR
 
 **E-shape G major scale (frets 2–5, most common starting position):**
 
-```
+```text
 String:  e  |--2--3--5--|
          B  |--3--5-----|
          G  |--2--4--5--|
@@ -296,7 +296,7 @@ Fingering: index covers every 2nd-fret note, middle covers every 3rd-fret note, 
 
 **A-shape G major scale (frets 9–12):**
 
-```
+```text
 String:  e  |--9--10--12--|
          B  |--10--12-----|
          G  |--9--10--12--|
@@ -313,7 +313,7 @@ The minor pentatonic is the most practical scale in rock, blues, pop, and countr
 
 **A minor pentatonic — Position 1 (box):**
 
-```
+```text
 String:  e  |--5--8--|
          B  |--5--8--|
          G  |--5--7--|
@@ -326,7 +326,7 @@ Root notes (A) fall at: low E/5th fret, D/7th fret, G/5th fret, B/8th fret, high
 
 **Blues scale:** Add the ♭5 ("blue note") to the minor pentatonic:
 
-```
+```text
 String:  e  |--5--8------|
          B  |--5--8------|
          G  |--5--6--7---|  ← 6th fret = ♭5 blue note
@@ -339,7 +339,7 @@ String:  e  |--5--8------|
 
 Blues phrasing lives in short, deliberate phrases with silence between them — the rest is as expressive as the notes. Practice this pattern at **♩ = 70 BPM** with a swing (12/8) feel:
 
-```
+```text
 Bar 1: A(E/5) → C(E/8) → D(e/10), bend D up a whole step | rest rest rest
 Bar 2: A(E/5) → C(E/8) → slide C→D (e string) → A(e/5) | rest
 ```
@@ -364,7 +364,7 @@ The major scale across all five CAGED positions gives full-neck coverage. Each p
 
 G major 3NPS starting from the low E string at the 2nd fret:
 
-```
+```text
 E:  2-3-5
 A:  2-3-5
 D:  2-4-5
@@ -411,28 +411,28 @@ The strumming stroke comes from the wrist, with the forearm staying relatively s
 Notation: **D** = downstroke, **U** = upstroke, **(D)/(U)** = ghost stroke (arm keeps moving, pick doesn't strike the strings), used to keep the hand's physical rhythm constant even on beats you're not actually playing.
 
 **Pattern 1 — Basic quarter-note strum (4/4):**
-```
+```text
 Beat:   1   2   3   4
 Strum:  D   D   D   D
 ```
 Metronome target: **♩ = 70 → 90 → 110 BPM**. Every downstroke should land exactly on the click, not slightly before or after.
 
 **Pattern 2 — Pop/folk eighth-note pattern (4/4):**
-```
+```text
 Beat:    1    +    2    +    3    +    4    +
 Strum:   D    U    D    U    D    U    D    U
 ```
 Keep the wrist moving in continuous 8th notes even when you later add rests — the motion is the metronome, the strings are just where you choose to make contact.
 
 **Pattern 3 — "Island strum" with syncopation (4/4):**
-```
+```text
 Beat:    1    +    2    +    3    +    4    +
 Strum:   D   (U)   U    D   (D)   U    D   (U)
 ```
 The skipped downstroke on "2" and the ghost on "3+" create the syncopated pocket common in reggae and island-style folk strumming. Practice the ghost strokes audibly at first (let the pick lightly brush the strings) before muting them completely.
 
 **Pattern 4 — Rock drive pattern (4/4, with palm mute on downstrokes):**
-```
+```text
 Beat:    1    +    2    +    3    +    4    +
 Strum:   D    U    D    U    D    U    D    U
 Mute:    PM   -    PM   -    PM   -    PM   -
@@ -449,7 +449,7 @@ Travis picking creates the illusion of two guitars — a steady alternating bass
 
 **Basic Travis pattern over a C chord** (P = thumb, i = index, m = middle):
 
-```
+```text
 Beat:     1     +     2     +     3     +     4     +
 Bass(p):  C/3   —     G/2   —     C/3   —     G/2   —
 Treble:   —     G(i)  —     C(m) —     G(i)  —     C(m)

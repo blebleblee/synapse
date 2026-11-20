@@ -101,7 +101,7 @@ The four elements are $\{\text{id}, \sigma, \tau, \sigma\tau\}$, and the automor
 
 The subgroup lattice and the corresponding fixed field lattice illustrate the inclusion-reversing bijection:
 
-```
+```text
    Intermediate Fields              Subgroups of G = Z₂ × Z₂
 
      E = Q(√2, √3)  ←———→  {e}

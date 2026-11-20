@@ -127,7 +127,7 @@ The following diagrams illustrate the internal mechanics of Huffman coding and 0
 
 **Huffman Tree Construction (Min-Heap):**
 
-```
+```text
 Input frequencies: a:5, b:9, c:12, d:13, e:16, f:45
 
 Step 1 — Min-Heap (by frequency):
@@ -163,7 +163,7 @@ Codewords: f=0, c=100, d=101, a=1100, b=1101, e=111
 
 **0/1 Knapsack DP Table Fill Order:**
 
-```
+```text
 Items: (w=2,v=3), (w=3,v=4), (w=4,v=5), (w=5,v=6)
 Capacity W = 5
 
@@ -179,7 +179,7 @@ Optimal value: dp[4][5] = 7  (select items 1 and 2)
 
 **Subproblem Dependency Graph (Interval DP):**
 
-```
+```text
 Interval lengths and fill order:
 
 Length 1:  [1,1] [2,2] [3,3] [4,4]   ← base cases, cost = 0
@@ -253,7 +253,7 @@ Several implementation-level invariants determine the difference between a corre
 
 For **space-optimized tabulation**, always identify whether row $i$ depends only on row $i-1$ before allocating the full table. For knapsack, iterating the capacity loop in reverse (from $W$ down to $w_i$) when updating a 1D table in-place prevents the double-counting that would arise from using updated values within the same item's transition:
 
-```
+```text
 for i in 1..n:
     for w in W..w[i]:       # reverse iteration prevents reuse within same item
         dp[w] = max(dp[w], v[i] + dp[w - w[i]])

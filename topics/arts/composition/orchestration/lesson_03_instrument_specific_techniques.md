@@ -124,7 +124,7 @@ These three settings span the *normal* expressive range of the instrument, not j
 
 #### Range and Character by String
 
-```
+```text
 Violin:   G3 – A7 (orchestral ceiling: E7)
 Viola:    C3 – E6
 Cello:    C2 – C6 (soloists to G6)

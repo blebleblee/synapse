@@ -159,7 +159,7 @@ The Completely Fair Scheduler (CFS), introduced in Linux 2.6.23 (2007) by Ingo M
 
 The formula for `vruntime` increment per real-time delta `Δt` is:
 
-```
+```text
 vruntime_delta = Δt × (NICE_0_WEIGHT / task_weight)
 ```
 
@@ -192,7 +192,7 @@ graph TD
 
 Understanding how the MMU translates a virtual address is essential to reasoning about memory performance and security. On x86-64 with 4-level paging (48-bit virtual addresses), a linear address is decomposed as:
 
-```
+```text
 Bits [47:39] → PML4 index  (9 bits, 512 entries)
 Bits [38:30] → PDPT index  (9 bits, 512 entries)
 Bits [29:21] → PD index    (9 bits, 512 entries)

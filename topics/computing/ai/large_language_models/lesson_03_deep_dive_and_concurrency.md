@@ -14,13 +14,13 @@ This analysis drives the entire serving optimization stack. Every technique desc
 
 During autoregressive generation, the transformer attention mechanism must attend over the full context accumulated so far. Rather than recompute every key and value vector from raw activations on each step, the runtime caches them. For a model with `L` layers, `H` attention heads, head dimension `d_head`, and a current sequence of `S` tokens, the KV-cache occupies:
 
-```
+```text
 KV_cache_bytes = 2 × L × H × d_head × S × bytes_per_element
 ```
 
 The factor of 2 accounts for both keys and values. For LLaMA-3 70B (80 layers, 8 KV heads via Grouped Query Attention, `d_head = 128`, FP16):
 
-```
+```text
 2 × 80 × 8 × 128 × S × 2 bytes = 327,680 × S bytes ≈ 320 KB per token
 ```
 
@@ -112,7 +112,7 @@ class PagedKVCacheManager:
 
 Quantization maps floating-point values to lower-bit integer representations. For uniform symmetric quantization of a tensor `W` to `n` bits:
 
-```
+```text
 scale   = max(|W|) / (2^(n-1) - 1)
 W_quant = round(W / scale)          # integer in [-2^(n-1)+1, 2^(n-1)-1]
 W_dequant = W_quant * scale         # floating-point reconstruction
@@ -282,7 +282,7 @@ class RowParallelLinear(nn.Module):
 
 Speculative decoding (Leviathan et al., 2023; Chen et al., 2023) exploits the observation that a small draft model can propose K tokens in one forward pass, which a large target model then verifies in a single batch — accepting or rejecting each proposed token via a rejection sampling scheme that provably preserves the target model's output distribution. The expected speedup is:
 
-```
+```text
 speedup ≈ (1 - alpha^(K+1)) / ((1 - alpha) × (1 + K × c))
 ```
 

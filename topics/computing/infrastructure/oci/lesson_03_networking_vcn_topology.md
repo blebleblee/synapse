@@ -74,7 +74,7 @@ Each gateway object (Internet Gateway, NAT Gateway, DRG, LPG) may also have a ro
 
 The ingress routing architecture looks like this in a hub-and-spoke topology:
 
-```
+```text
                     Internet
                        |
               [Internet Gateway]
@@ -174,7 +174,7 @@ The route distribution mechanism uses a statement-based policy model. An import 
 
 A transit routing scenario illustrates why this matters. Consider a hub-and-spoke architecture where multiple spoke VCNs (each in a separate compartment, owned by different business units) need to communicate with each other and with an on-premises network through a central hub VCN. The hub VCN contains the DRG and an NVA for East-West inspection. The spoke VCNs are attached to the same DRG.
 
-```
+```text
 On-Premises DC
    10.200.0.0/16
         |

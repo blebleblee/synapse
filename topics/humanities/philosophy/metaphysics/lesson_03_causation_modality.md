@@ -38,7 +38,7 @@ Similarly, essentialist arguments require specifying which variety of necessity 
 
 The logical architecture connecting causation, modality, and essentialism can be represented through a series of increasingly complex formal structures, each adding expressive power while introducing additional ontological commitments. The simplest structure is the regularity schema, which analyzes causal statements as universally quantified material conditionals augmented with spatiotemporal restrictions. To say that C-type events cause E-type events is to assert:
 
-```
+```text
 ∀x ∀t [(C(x,t) ∧ Background(x,t)) → ∃t' (t' > t ∧ E(x,t') ∧ Contiguous(x,t,t'))]
 ```
 
@@ -48,7 +48,7 @@ Yet this schema immediately encounters the structural problems that motivated ri
 
 Counterfactual semantics addresses these limitations by replacing material conditionals with counterfactual conditionals and analyzing these in terms of possible-worlds accessibility relations. The basic counterfactual conditional C □→ E (read "if C were the case, E would be the case") receives truth conditions via the Stalnaker-Lewis semantics:
 
-```
+```text
 C □→ E is true at world w iff:
   (i) there are no accessible C-worlds (vacuously true), or
   (ii) some accessible C-world where E is true is closer to w than any accessible C-world where E is false
@@ -62,7 +62,7 @@ This architecture encounters its own characteristic pathologies, however, partic
 
 Powers-based ontologies adopt a fundamentally different architecture, one that grounds causation in intrinsic dispositional properties rather than patterns of coinstantiation or possible-worlds relations. The core formal structure is the stimulus-manifestation conditional, but analyzed not as a material or counterfactual conditional but as a primitive modal relation expressing the directedness inherent in powers. Object x has power P when x stands in the manifestation relation M to property Q given stimulus condition S:
 
-```
+```text
 Power(x, P) ↔ ∀w [(w metaphysically accessible ∧ x exists in w ∧ S(x,w)) → M(x,Q,w)]
 ```
 
@@ -76,7 +76,7 @@ The most sophisticated contemporary approach, interventionist causation as devel
 
 This framework can be formalized using causal graphs where nodes represent variables and directed edges represent causal relations. For variables C and E:
 
-```
+```text
 C → E (C causes E) iff:
   ∃I [intervention(I,C) ∧ (I ⊥ E | C) ∧ ∀v₁,v₂ (I sets C to v₁ vs v₂ → E(v₁) ≠ E(v₂))]
   ∧ ¬∃I' [intervention(I',E) ∧ changes C]
@@ -98,14 +98,14 @@ The accessibility relation generates a modal logic through its structural proper
 
 Within this framework, the de dicto/de re distinction emerges from scope interactions between modal operators and quantifiers. Consider the sentence "Necessarily, the number of planets is greater than seven." Interpreted de dicto, the necessity operator takes wide scope:
 
-```
+```text
 □[the number of planets > 7]
 □[∃!n (n = |planets|) ∧ n > 7]
 ```
 
 This asserts that in all accessible possible worlds, whatever number happens to equal the count of planets is greater than seven. This is false—there are possible worlds with fewer planets. Interpreted de re, the necessity operator takes narrow scope within the predicate:
 
-```
+```text
 ∃!n [(n = |planets|) ∧ □(n > 7)]
 ```
 
@@ -115,7 +115,7 @@ The semantic evaluation of de re modal predications requires trans-world identit
 
 Essentialism emerges naturally within this formal framework as the thesis that objects have some properties in all accessible worlds where they exist (essential properties) and other properties only in some such worlds (accidental properties). Property F is essential to object x iff:
 
-```
+```text
 ∀w [(w accessible ∧ x exists in w) → F(x) in w]
 ```
 

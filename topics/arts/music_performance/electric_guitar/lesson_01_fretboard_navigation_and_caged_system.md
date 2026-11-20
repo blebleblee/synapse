@@ -350,7 +350,7 @@ Palm muting is dynamic, not fixed — roll the wrist forward mid-phrase to deepe
 
 Without a pick, assign the right-hand fingers:
 
-```
+```text
 Thumb (p) → strings 6, 5, 4 (bass strings)
 Index (i) → string 3
 Middle (m) → string 2
@@ -359,7 +359,7 @@ Ring (a)   → string 1
 
 **Travis picking pattern — foundational (60 BPM), over an open G chord (320033):**
 
-```
+```text
   T = thumb, i = index, m = middle, a = ring
 
   Beat: 1  +  2  +  3  +  4  +
@@ -376,7 +376,7 @@ The thumb alternates bass strings on beats 1 and 3 while the fingers independent
 ### The Five Essential Open Chord Shapes
 
 **E major (022100):**
-```
+```text
    E A D G B e
    0 2 2 1 0 0
 
@@ -387,7 +387,7 @@ The thumb alternates bass strings on beats 1 and 3 while the fingers independent
 ```
 
 **A major (x02220):**
-```
+```text
    E A D G B e
    x 0 2 2 2 0
 
@@ -396,7 +396,7 @@ The thumb alternates bass strings on beats 1 and 3 while the fingers independent
 ```
 
 **D major (xx0232):**
-```
+```text
    E A D G B e
    x x 0 2 3 2
 
@@ -407,7 +407,7 @@ The thumb alternates bass strings on beats 1 and 3 while the fingers independent
 ```
 
 **G major (320003) — two fingerings:**
-```
+```text
    Version 1 (beginner):
    Finger 1: A string, fret 2
    Finger 2: low E string, fret 3
@@ -422,7 +422,7 @@ The thumb alternates bass strings on beats 1 and 3 while the fingers independent
 Version 2 frees fingers 1 and 2 to drop straight into Cadd9, D, or Em — the key to smooth open-position transitions.
 
 **C major (x32010):**
-```
+```text
    E A D G B e
    x 3 2 0 1 0
 
@@ -460,7 +460,7 @@ Pick two chords. Metronome at 60 BPM. Change chord on beat 1 of every other meas
 The open E major shape, barred at any fret with the index finger, becomes a movable major chord with its root on string 6.
 
 **F major barre (133211) — the first barre chord:**
-```
+```text
    Fret 1, full barre, finger 1 across all 6 strings
    Finger 2: G string, fret 2
    Finger 3: A string, fret 3
@@ -477,7 +477,7 @@ The barre fails in predictable ways:
 | Wrist pain | Excess grip force | You're using far more force than needed; relax consciously |
 
 **E-shape barre root map (string 6):**
-```
+```text
 Fret:  1    2    3    4    5    6    7    8    9   10   11   12
 Root:  F    F#   G    G#   A    A#   B    C    C#   D    D#   E
 ```
@@ -491,7 +491,7 @@ Memorize this row. Once you know the note on the low E string at any fret, you k
 The open A major shape, barred at any fret, becomes a movable major chord with root on string 5.
 
 **B major barre (x24442):**
-```
+```text
    Barre fret 2 with finger 1 (strings 1–5)
    Finger 2: D string, fret 4
    Finger 3: G string, fret 4
@@ -501,7 +501,7 @@ The open A major shape, barred at any fret, becomes a movable major chord with r
 ```
 
 **A-shape barre root map (string 5):**
-```
+```text
 Fret:  1    2    3    4    5    6    7    8    9   10   11   12
 Root:  A#   B    C    C#   D    D#   E    F    F#   G    G#   A
 ```
@@ -511,7 +511,7 @@ Root:  A#   B    C    C#   D    D#   E    F    F#   G    G#   A
 For any major chord you have two barre options: root on string 6 or root on string 5. Use whichever keeps your hand closer to its current position.
 
 **Example — I–IV–V in G:**
-```
+```text
 G major: E-shape barre, fret 3  (root on string 6)
 C major: A-shape barre, fret 3  (root on string 5) — hand stays in place
 D major: A-shape barre, fret 5  (root on string 5) — shift up two frets
@@ -899,7 +899,7 @@ flowchart TD
 
 ### Lead Guitar Practice Structure (Daily 20 Minutes)
 
-```
+```text
 0:00-5:00    Pentatonic position 1, up and down, alternate picking (60-90 BPM)
 5:00-10:00   Bending drill: 5 bends on G string, 5 on B string, each held 2 beats then released. Tune each one.
 10:00-15:00  Play along with an A minor backing track, staying inside position 1 only. Focus on phrasing, not speed.
@@ -983,7 +983,7 @@ flowchart LR
 ### Extended and Suspended Chord Voicings
 
 **Dsus2 (xx0230) and Dsus4 (xx0233):**
-```
+```text
 Dsus2: remove finger 1 from D major → B string rings open (major 2nd)
 Dsus4: move finger 2 from e-string fret 2 to e-string fret 3 (adds 4th)
 ```
@@ -1023,7 +1023,7 @@ Rhythm guitar is about locking with the drums and placing notes with intention, 
 **Strum pattern fundamentals:** The right hand moves in a constant down-up pendulum, one stroke per eighth note at all times — what changes is whether the pick actually contacts the strings. Ghost strums (motion without contact) preserve the groove pocket while accented hits create rhythmic interest.
 
 **Standard rock strum pattern (100 BPM):**
-```
+```text
 Beat: 1  +  2  +  3  +  4  +
 Str:  ↓  ↑  ↓     ↓  ↑  ↓  ↑
       ✓  ✓  ✓  ✗  ✓  ✓  ✓  ✓
@@ -1032,7 +1032,7 @@ Str:  ↓  ↑  ↓     ↓  ↑  ↓  ↑
 ```
 
 **Funk 16th-note pattern (90 BPM):**
-```
+```text
 Beat: 1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
 Str:  ↓  ✗  ↑  ✗  ↓  ✗  ↑  ↓  ✗  ✗  ↑  ✗  ↓  ✗  ✗  ↑
 PM:   PM          PM    PM                PM
@@ -1091,7 +1091,7 @@ The tone control is a first-order RC low-pass filter: a capacitor in series with
 
 ### Effects Chain Ordering and Why It Matters
 
-```
+```text
 Guitar → Tuner → Compressor → Overdrive/Distortion →
 EQ → Modulation (Chorus/Phaser) → Delay → Reverb → Amp
 ```
@@ -1112,7 +1112,7 @@ EQ → Modulation (Chorus/Phaser) → Delay → Reverb → Amp
 Chords in a progression are named by scale degree within the key, not by letter name — this lets you transpose any progression to any key instantly.
 
 In G major:
-```
+```text
 I   = G major
 ii  = A minor
 iii = B minor
@@ -1137,7 +1137,7 @@ The V chord pulls toward I because of the tritone tension between its third and 
 **V/V in G major:** V is D; V of D is A7. Playing A7 → D inside a G major context tonicizes D momentarily without leaving the key.
 
 **Common secondary dominants in G major:**
-```
+```text
 V/ii  → E7  → Am
 V/iii → F#7 → Bm
 V/IV  → G7  → C
@@ -1152,7 +1152,7 @@ Each one creates a brief intensification before resolving to its target — the 
 Smooth voice leading moves each chord tone to the nearest available chord tone in the next chord. Jumping position for every change is a beginner habit; advanced players keep the hand as stationary as possible.
 
 **Example: I–V–vi–IV in C major using open/CAGED voicings:**
-```
+```text
 Cmaj7  (x32000):  static — no barre needed
 G/B    (x20033):  bass note moves C → B (A string, fret 3 → fret 2)
 Am7    (x02010):  finger 2 stays on D string fret 2; finger 1 moves to B string fret 1
@@ -1164,7 +1164,7 @@ Three of four changes involve minimal finger movement, producing a connected, pi
 **Rootless voicings for clean electric and jazz:**
 In a band, the bass covers the root. This frees the guitarist to voice from the third upward for less muddy, more harmonically interesting textures.
 
-```
+```text
 Cmaj7 rootless: strings 4-1 at frets 3-5-4-3 (no root C)
 Dm7 rootless:   strings 4-1 at frets 5-6-5-5
 G7 rootless:    strings 4-1 at frets 4-3-3-3 (or 4-5-3-4 for the tritone-sub voicing)
@@ -1247,7 +1247,7 @@ flowchart LR
 
 **Natural harmonics:** touch the string directly above a fret wire (don't press down) and pluck, producing a bell-like tone at that harmonic.
 
-```
+```text
 Fret 12 → octave above open string (2nd harmonic)
 Fret 7  → octave + perfect 5th above open string (3rd harmonic)
 Fret 5  → two octaves above open string (4th harmonic)
@@ -1295,7 +1295,7 @@ This guarantees the fretted octave matches the harmonic octave within tuner accu
 
 ### Daily Practice Template (45 Minutes)
 
-```
+```text
 0:00-5:00    Physical warm-up
              Spider crawl, frets 5-8, all strings, 60 BPM
              Chromatic runs, alternate picking, 60-70 BPM
@@ -1383,7 +1383,7 @@ A plucked string vibrates at its fundamental and simultaneously at all integer m
 
 ### Fret-to-Note Reference (Low E string, the navigation spine)
 
-```
+```text
 Fret:   0    1    2    3    4    5    6    7    8    9   10   11   12
 Note:   E    F    F#   G    G#   A    A#   B    C    C#   D    D#   E
 ```

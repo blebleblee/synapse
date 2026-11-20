@@ -10,7 +10,7 @@ For an NVIDIA H100 SXM5 GPU, peak BF16/FP16 tensor core throughput is approximat
 
 During the **decode phase** (generating one token at a time), each weight parameter W is read from HBM once per token and contributes exactly two FLOPs—one multiply and one accumulate—in a multiply-accumulate (MAC) operation. This gives an arithmetic intensity of approximately 2 FLOPs/byte, roughly **148× below the ridge point**. The decode phase is catastrophically memory-bound. Tensor core utilization during decode is effectively zero: the GPU's 989 TFLOPS of compute sits idle because HBM cannot supply data fast enough to exercise it. The practical ceiling on token generation throughput is therefore:
 
-```
+```text
 decode_throughput (tokens/s) ≈ HBM_bandwidth / total_weight_bytes
                               = 3.35 TB/s / (70×10⁹ × 2 bytes)
                               ≈ 23.9 tokens/s   [70B model, BF16, single GPU]
@@ -59,7 +59,7 @@ The key-value (KV) cache eliminates redundant attention computation during autor
 
 The cache stores the **projected** K and V tensors, not raw activations. For a standard multi-head attention (MHA) layer with hidden dimension *d_model* and *h* heads, each head has *d_head = d_model / h* dimensions. Each token contributes one K vector and one V vector per head per layer, giving the exact memory formula:
 
-```
+```text
 KV_cache_bytes = 2 × n_layers × n_heads × d_head × seq_len × batch_size × bytes_per_element
                = 2 × n_layers × d_model × seq_len × batch_size × bytes_per_element
 ```
@@ -202,7 +202,7 @@ The attention kernel in PagedAttention must scatter-gather across non-contiguous
 
 Standard scaled dot-product attention materializes the full *n×n* score matrix in HBM:
 
-```
+```text
 S = QK^T / sqrt(d_head)      [n × n matrix, written to HBM]
 P = softmax(S)               [n × n matrix, written to HBM]
 O = PV                       [n × d_head, written to HBM]
@@ -256,14 +256,14 @@ Quantization maps continuous floating-point weights (and optionally activations)
 
 **Uniform symmetric INT8 quantization** uses a single scale factor *s* to map the floating-point range [-max_abs, +max_abs] to the integer range [-127, 127]:
 
-```
+```text
 q = clamp(round(w / s), -127, 127)    where s = max_abs / 127
 w̃ = q × s                              (dequantized approximation)
 ```
 
 The quantization error *e = w - w̃* follows a uniform distribution U[-s/2, s/2] for well-behaved weight distributions. The mean squared error (MSE) of this error is:
 
-```
+```text
 E[e²] = s² / 12 = (max_abs / 127)² / 12
 ```
 
@@ -526,7 +526,7 @@ The acceptance/rejection procedure preserves the exact output distribution of th
 
 The expected number of tokens generated per target model forward pass is:
 
-```
+```text
 E[accepted tokens] = γ × α + 1    where α = E[min(1, p(x̃)/q(x̃))]
 ```
 
@@ -534,14 +534,14 @@ The term α is the **acceptance rate**, which depends on how well the draft mode
 
 The practical speedup is:
 
-```
+```text
 speedup = E[tokens per target pass] / (1 + γ × (latency_draft / latency_target))
         ≈ (γα + 1) / (1 + γ × (latency_draft / latency_target))
 ```
 
 For a draft model 10× faster than the target (latency_draft / latency_target = 0.1), γ=4, α=0.8:
 
-```
+```text
 speedup ≈ (4×0.8 + 1) / (1 + 4×0.1) = 4.2 / 1.4 ≈ 3.0×
 ```
 

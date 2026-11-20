@@ -56,7 +56,7 @@ After semantic analysis, compilers lower the abstract syntax tree into one or mo
 
 Consider transforming the following code to SSA form:
 
-```
+```text
 x = 1
 if (condition)
     x = 2
@@ -65,7 +65,7 @@ print(x)
 
 SSA transformation produces:
 
-```
+```text
 x₁ = 1
 if (condition)
     x₂ = 2

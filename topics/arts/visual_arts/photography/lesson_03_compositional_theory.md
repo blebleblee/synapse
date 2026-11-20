@@ -24,7 +24,7 @@ The structural foundation of photographic composition begins with the frame itse
 
 Within the frame, compositional architecture operates through a nested hierarchy of spatial divisions. The rule of thirds grid overlays the frame with four intersection points, each representing a zone of perceptual intensity. Positioning the horizon line along the upper or lower third rather than the midpoint prevents the frame from splitting into competing halves—a violation of gestalt grouping principles that creates visual bifurcation. Placing a subject's eyes at the upper-third intersections in portraiture ensures the face occupies the dominant upper zone where attention naturally gravitates, while leaving breathing room in the direction of the subject's gaze prevents edge collision and maintains spatial tension.
 
-```
+```text
 ┌─────────┬─────────┬─────────┐
 │         │         │         │
 │    ×    │         │    ×    │  Upper third (sky, negative space)

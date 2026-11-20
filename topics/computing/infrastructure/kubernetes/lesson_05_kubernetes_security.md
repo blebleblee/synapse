@@ -106,7 +106,7 @@ This replaces the legacy auto-mounted secret-based tokens, which were static (no
 
 For human users in production, OpenID Connect (OIDC) is the correct mechanism. An external Identity Provider (IdP) — Dex, Okta, Google Workspace, Keycloak — issues JWTs. The API server validates them without contacting the IdP on each request (it verifies the signature using the IdP's public JWKS endpoint, cached locally).
 
-```
+```text
 kube-apiserver flags:
   --oidc-issuer-url=https://accounts.google.com
   --oidc-client-id=my-k8s-cluster
@@ -724,7 +724,7 @@ kubectl get clusterrolebindings -o json | \
 
 ### 9.4 Production Hardening Checklist
 
-```
+```text
 Control Plane
   ✓ Enable encryption at rest for Secrets (AES-GCM or KMS provider)
   ✓ Enable audit logging with RequestResponse for RBAC and Secret mutations

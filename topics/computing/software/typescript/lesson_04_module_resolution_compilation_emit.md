@@ -201,7 +201,7 @@ The emitted IIFE creates a bidirectional mapping where `Direction.Up === 1` and 
 
 Source map generation occurs in parallel with JavaScript emit. As the compiler writes each token to the output file, it records a mapping segment: the generated column offset, the source file index (for projects with multiple input files), the original line and column numbers, and optionally the original identifier name. These segments are encoded using Base64 Variable-Length Quantity (VLQ) encoding, a space-efficient format that stores relative offsets rather than absolute positions:
 
-```
+```text
 Example Source Map Segment Encoding:
 Generated Position: Column 12
 Source File: Index 0

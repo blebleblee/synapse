@@ -186,7 +186,7 @@ Picocom (lightweight): `picocom -b 115200 /dev/ttyUSB0`
 **For CH341A programmers, replace interface specification:** `flashrom -p ch341a_spi`
 
 **Common flash chip pinouts (SOIC-8 package, looking at chip top with pin 1 marked):**
-```
+```text
 Pin 1: CS (Chip Select)
 Pin 2: MISO (Master In Slave Out)
 Pin 3: WP (Write Protect, connect to VCC)
@@ -200,7 +200,7 @@ Pin 8: VCC (3.3V)
 ### OpenOCD Debug Access
 
 **Basic FTDI interface configuration (save as ftdi.cfg):**
-```
+```text
 interface ftdi
 ftdi_vid_pid 0x0403 0x6014
 ftdi_layout_init 0x0008 0x000b

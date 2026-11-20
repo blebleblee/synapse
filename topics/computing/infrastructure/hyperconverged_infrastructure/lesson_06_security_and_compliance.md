@@ -100,7 +100,7 @@ HCI storage is not a traditional SAN; it is a distributed key-value or object st
 - **Data encryption key (DEK):** A per-object or per-disk-group AES-256 key used to encrypt user data. In Ceph, DEKs are managed by the Ceph Key Management Service or delegated to Vault via the KMIP/KMS interface. In vSAN, the DEK is a per-disk-group key fetched from an external KMS at mount time.
 - **Key encryption key (KEK):** Wraps the DEK using RSA-4096 or AES-256-GCM. The KEK never touches the HCI node's storage. Stored in an external KMIP-compliant server (e.g., Thales CipherTrust, HashiCorp Vault with KMIP secrets engine). The sequence during node boot is:
 
-```
+```text
 Node Boot
   → TPM Attestation passes
   → Node authenticates to KMS (mTLS client cert)

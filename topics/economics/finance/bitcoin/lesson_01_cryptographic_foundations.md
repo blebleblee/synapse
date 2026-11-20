@@ -72,7 +72,7 @@ The signature hash type flags provide fine-grained control over which parts of t
 
 The block header data structure captures the essential cryptographic commitments that link blocks into a chain. A block header contains exactly six fields across 80 bytes: a 4-byte version number, a 32-byte hash of the previous block header, a 32-byte Merkle root of all transactions in the block, a 4-byte timestamp, a 4-byte target encoding, and a 4-byte nonce. When miners search for a valid block, they iterate the nonce field and optionally manipulate the timestamp or transaction set to alter the Merkle root, recomputing the double-SHA-256 hash of the header until finding a value below the target.
 
-```
+```text
 Block Header Structure (80 bytes):
 
 ┌────────────────┬────────────────────────────────────────────────────┐
@@ -102,7 +102,7 @@ The interaction between transaction signing and Merkle tree construction creates
 
 Bitcoin's address encoding adds checksum and version information to public key hashes to prevent transcription errors and distinguish different address types. The process of generating a P2PKH address from a public key involves several distinct hashing and encoding steps. First, the compressed or uncompressed public key is hashed with SHA-256, then the result is hashed with RIPEMD-160, producing a 20-byte public key hash. A version byte is prepended (0x00 for mainnet P2PKH addresses), then this 21-byte string is double-hashed with SHA-256 and the first four bytes of the result are appended as a checksum. Finally, the entire 25-byte payload is encoded in Base58Check, a custom encoding that avoids ambiguous characters like '0', 'O', 'I', and 'l' to reduce transcription errors.
 
-```
+```text
 Address Generation Flow:
 
 Public Key (33 or 65 bytes)

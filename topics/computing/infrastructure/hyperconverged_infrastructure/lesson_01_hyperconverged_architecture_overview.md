@@ -155,7 +155,7 @@ All HCI storage systems maintain a distributed metadata service that maps logica
 
 Erasure coding applies a systematic linear code over `k` data shards to produce `m` parity shards, such that any `k` of the `k+m` shards suffice to reconstruct the original data. For a (4,2) Reed-Solomon code over GF(2^8), the encoding operation for a stripe is:
 
-```
+```text
 parity_1 = d1 ⊕ d2 ⊕ d3 ⊕ d4         (simplified XOR parity)
 parity_2 = g^0·d1 ⊕ g^1·d2 ⊕ g^2·d3 ⊕ g^3·d4  (Galois field multiplication)
 ```
@@ -904,7 +904,7 @@ Sizing an HCI cluster requires modeling four independent resource dimensions sim
 
 **Storage capacity formula:**
 
-```
+```text
 Raw capacity per node = Σ(NVMe capacity tier device sizes per node)
 
 Usable capacity (RF=N) = (Raw cluster capacity) / N
@@ -921,7 +921,7 @@ HCI storage processing consumes approximately 1 CPU core per 2–4 Gbps of stora
 
 The cluster must sustain its full workload even when one (or two, for RF=3) node is unavailable. This means usable capacity must account for the reduction in available storage during a node failure:
 
-```
+```text
 Effective workload capacity = Total usable capacity × ((N - failure_tolerance) / N)
 ```
 
@@ -929,7 +929,7 @@ For a 4-node RF=2 cluster: `Usable × (3/4) = 75% of usable capacity` is the saf
 
 **Network bandwidth sanity check:**
 
-```
+```text
 Required replication bandwidth per node = Write IOPS × IO block size × (RF - 1)
 
 Example: 50,000 write IOPS × 16 KiB × 1 replication copy = 800 MiB/s ≈ 6.4 Gbps

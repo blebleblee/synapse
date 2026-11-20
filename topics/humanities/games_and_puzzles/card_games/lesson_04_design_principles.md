@@ -42,7 +42,7 @@ The card library structure determines how many unique effects the game can expre
 
 The diagram below illustrates how the five core systems interact:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    CARD GAME ARCHITECTURE                   │
 ├─────────────────────────────────────────────────────────────┤

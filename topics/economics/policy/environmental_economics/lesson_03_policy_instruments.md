@@ -108,7 +108,7 @@ where each firm's emission demand function $e_i(p_a)$ derives from equating its 
 
 The trading mechanism can be visualized through a supply-demand diagram where the supply curve is a vertical line at $\bar{E}$ (perfectly inelastic permit supply) and the demand curve represents the horizontal sum of firm-level marginal abatement cost curves reflected across the vertical axis. The intersection determines the equilibrium permit price and the allocation of abatement effort across firms. High-cost abaters purchase permits from low-cost abaters, with the permit price serving as the shadow price of the emission constraint.
 
-```
+```text
 Permit Market Equilibrium
 
 Price ($/ton)

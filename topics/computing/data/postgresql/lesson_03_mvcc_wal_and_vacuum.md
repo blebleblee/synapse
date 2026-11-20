@@ -41,7 +41,7 @@ typedef struct HeapTupleHeaderData {
 
 A tuple version is visible to transaction T with XID = T_xid and snapshot time T_snap if:
 
-```
+```text
 VISIBLE(tuple, T) ⟺ 
     (tuple.t_xmin < T_snap) ∧                    // Inserted before snapshot
     (tuple.t_xmin committed at T_snap) ∧         // Inserting tx committed
@@ -198,7 +198,7 @@ The 32-bit XID space wraps around at 2³² (4.3 billion transactions). PostgreSQ
 
 **XID Comparison:**
 
-```
+```text
 Transaction ages are compared using:
 age(xid) = (current_xid - xid) mod 2³²
 
@@ -231,7 +231,7 @@ WAL ensures the D in ACID: durability. All changes are written to a sequential l
 
 **Core Principle:**
 
-```
+```text
 ∀ change C: log(C) must be persisted to disk before data(C) is visible to other transactions
 ```
 
@@ -349,7 +349,7 @@ def wait_for_wal_flush(lsn):
 
 An LSN is a 64-bit integer representing a byte offset into the WAL stream:
 
-```
+```text
 LSN = (segment_number << 32) | offset_within_segment
 ```
 
@@ -439,7 +439,7 @@ SELECT pg_reload_conf();
 
 The `checkpoint_completion_target` parameter spreads I/O over the checkpoint interval:
 
-```
+```text
 write_rate = dirty_buffers / (checkpoint_timeout × checkpoint_completion_target)
 ```
 
@@ -690,7 +690,7 @@ Autovacuum is a background daemon that automatically triggers VACUUM when thresh
 
 **Autovacuum Trigger Logic:**
 
-```
+```text
 A table is vacuumed when:
 n_dead_tuples > autovacuum_vacuum_threshold + (autovacuum_vacuum_scale_factor × n_live_tuples)
 

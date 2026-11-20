@@ -154,7 +154,7 @@ Dovecot's `dbox` format, available in single-dbox (`sdbox`) and multi-dbox (`mdb
 
 RFC 2342 defines the IMAP namespace extension, which allows a server to expose multiple mailbox hierarchies to a single authenticated client. The personal namespace contains the user's own mailboxes (typically with an empty prefix or `INBOX.` prefix). The shared namespace and the other-users namespace expose mailboxes owned by other accounts — shared calendars, distribution list archives, public folders — that the authenticated user has been granted access to. For infrastructure architects building collaborative mail systems, the namespace configuration in Dovecot's `namespace` blocks in `dovecot.conf` is the mechanism that makes shared mailboxes discoverable to clients without requiring manual subscription management.
 
-```
+```bash
 # dovecot.conf: Personal, shared, and public namespace configuration
 
 namespace inbox {

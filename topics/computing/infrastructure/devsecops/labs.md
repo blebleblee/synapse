@@ -68,7 +68,7 @@ Semgrep compiles source code into a language-specific Abstract Syntax Tree (AST)
 
 Entropy-based secret scanning (used by Gitleaks) takes a different approach: it measures the Shannon entropy of a candidate string. High-entropy strings with the right length and character distribution are unlikely to be natural language and likely to be cryptographic material. The formula:
 
-```
+```text
 H(X) = -Σ p(x) * log₂(p(x))
 ```
 

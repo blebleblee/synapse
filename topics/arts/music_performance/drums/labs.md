@@ -127,7 +127,7 @@ graph LR
 
 ### 30-minute session template
 
-```
+```text
 0–5 min    60 BPM warm-up — drop test, posture check
 5–10 min   70 BPM — bilateral symmetry (L vs R identical)
 10–15 min  80 BPM — film 30 seconds for review
@@ -157,7 +157,7 @@ Record yourself playing R R L L and listen to the volume relationship between th
 
 ### 15-minute double-stroke drill
 
-```
+```text
 1. R-hand bounce only, observe natural rebound       2 min
 2. R1-R2 controlled catch, 70 BPM                     3 min
 3. L-hand bounce only, observe natural rebound        2 min

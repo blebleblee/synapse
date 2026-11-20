@@ -68,7 +68,7 @@ The codec stress test involves encoding your master to various lossy formats at 
 
 The mono compatibility verification process involves summing your stereo master to mono either through your DAW's utility plugin or by importing the stereo file and applying a mono sum, then listening for elements that disappear or change character drastically. Phase cancellation occurs when stereo content contains out-of-phase components that algebraically cancel when the left and right channels are combined. Stereo width enhancement plugins, Haas effect delays, and certain reverb algorithms can introduce phase relationships that sound impressive in stereo but cause destructive interference in mono. Bass-heavy material particularly suffers from mono incompatibility issues because low-frequency phase cancellation removes fundamental energy, leaving the mix thin and anemic. The test proves especially relevant for broadcast delivery where mono summation remains common in certain contexts, and for club playback where large venue sound systems may sum bass frequencies to mono for even low-frequency distribution.
 
-```
+```text
 Delivery Master Signal Flow Architecture
 
 Source Session (24/32-bit float, 44.1-96 kHz)

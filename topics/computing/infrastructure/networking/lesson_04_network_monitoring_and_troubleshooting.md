@@ -16,7 +16,7 @@ Four metrics form the basis of all network performance characterization:
 
 **Packet Loss Rate (PLR)** is the fraction of transmitted packets that do not reach the destination. At the IP layer, loss is caused by queue overflow (tail-drop or AQM-triggered), hardware errors, or routing black holes. TCP interprets loss as a congestion signal (via CUBIC, BBR, RENO, etc.) and reduces its sending rate. UDP delivers loss directly to the application. Even 0.1% PLR on a 10 Gbps link degrades a single TCP flow's throughput to roughly 100 Mbps under classical Reno congestion control, as described by the Mathis throughput formula:
 
-```
+```text
 Throughput ≈ (MSS / RTT) × (1 / √PLR)
 ```
 
@@ -878,7 +878,7 @@ if __name__ == "__main__":
 
 Understanding TCP congestion control is mandatory for diagnosing throughput problems. The congestion window (`cwnd`) limits how much unacknowledged data can be in flight. The effective send rate is:
 
-```
+```text
 effective_rate = min(cwnd, rwnd) / RTT
 ```
 

@@ -38,7 +38,7 @@ The cost per board foot calculation must account for every input. Direct costs i
 
 Equipment downtime analysis requires tracking both planned and unplanned stoppages. Planned downtime includes scheduled blade changes, maintenance intervals, and setup time for different cut lists. Unplanned downtime encompasses blade failures, bearing seizures, hydraulic leaks, and electrical faults. The distinction matters because planned downtime can be optimized through batching strategies and predictive scheduling, while unplanned downtime represents pure loss that compounds through schedule disruption and potential damage to work in progress. A milling operation that experiences thirty minutes of unplanned downtime per eight-hour shift operates at 93.75% availability, but that 6.25% loss multiplies across labor costs, fixed overhead, and lost production opportunity.
 
-```
+```text
 Downtime Cost Model:
 
 Hourly Operating Cost = (Labor + Energy + Overhead) / Hours Available

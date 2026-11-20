@@ -116,7 +116,7 @@ Inside `swapHelper`, the compiler binds the wildcard to the fresh type variable 
 
 The following diagram shows the subtype relationship under Java's invariant generics and use-site variance:
 
-```
+```text
 Object
   │
   ├── Animal

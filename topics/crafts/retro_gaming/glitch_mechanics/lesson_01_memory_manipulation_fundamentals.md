@@ -164,7 +164,7 @@ The path from a simple memory corruption to full arbitrary code execution follow
 
 The *Pokémon Red* and *Blue* 8F item glitch is the canonical example of this chain in retro gaming. The glitch item 8F, when used from the inventory, triggers a jump to a RAM address determined by the contents of the third and fourth inventory slots. By placing specific items in specific quantities at those positions, the player controls the target address of this jump. The remaining inventory slots, each consisting of an item ID byte and a quantity byte, encode a sequence of 6502 opcodes and operands that the CPU executes directly from RAM. A minimal payload to write a byte to a specific address looks like this in 6502 assembly:
 
-```
+```text
 Address   Bytes       Disassembly
 $D158     A9 42       LDA #$42        ; Load value $42 into accumulator
 $D15A     8D 00 02    STA $0200       ; Store at RAM address $0200

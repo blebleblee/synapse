@@ -160,7 +160,7 @@ $$\text{rank}(A) + \text{nullity}(A) = n$$
 
 where $n$ is the number of columns of $A$. This follows from the structure of solutions to $A\mathbf{x} = \mathbf{0}$: free variables correspond to vectors in the null space, while pivot variables correspond to dimensions in the column space. The theorem encapsulates a fundamental conservation law: the total degrees of freedom in $F^n$ partition between the solution space and the range of the linear transformation defined by $A$.
 
-```
+```text
 Subspace Hierarchy in ℝ³
 
          V = ℝ³

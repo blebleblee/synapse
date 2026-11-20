@@ -24,7 +24,7 @@ To dissect the hardware architecture of arcade systems, we begin with the signal
 
 The memory map of a typical early-1980s Z80 arcade board reveals the physical layout of the system's address space:
 
-```
+```text
 $0000 - $7FFF : Program ROM (32 KB, multiple 2764 EPROMs)
 $8000 - $87FF : Work RAM (2 KB, 6116 SRAM)
 $8800 - $8FFF : Video RAM - Tile Map (2 KB)
@@ -54,7 +54,7 @@ The watchdog timer enforces this real-time constraint from the hardware side. A 
 
 The interaction between memory-mapped I/O and hardware registers reveals the granular control arcade programmers exercised. Writing to the AY-3-8910 sound chip's registers required a two-step protocol: first, write the register index to the chip's address port ($A000), then write the data value to the data port ($A001). Setting channel A's tone period to generate a 440 Hz tone (concert A) required calculating the period value from the formula period = clock_frequency / (16 × desired_frequency). With a 1.789 MHz clock, the period value equals 1,789,000 / (16 × 440) ≈ 254. The code sequence would be:
 
-```
+```text
 LD A, $00        ; Register 0 = Channel A Tone Period Low
 OUT ($A000), A
 LD A, $FE        ; Period low byte = 254
@@ -75,7 +75,7 @@ Each OUT instruction consumed eleven cycles on the Z80, meaning the six register
 
 Optimization in arcade systems began with cycle-accurate instruction selection and addressing mode choice. Consider the task of clearing 2 kilobytes of work RAM to zero at system startup. The naive approach uses a loop with indexed addressing:
 
-```
+```text
 LD HL, $8000      ; Start address
 LD BC, $0800      ; Byte count (2048)
 CLEAR_LOOP:
@@ -89,7 +89,7 @@ JR NZ, CLEAR_LOOP
 
 This loop consumes twenty-eight cycles per iteration: seven for `LD (HL), $00`, six for `INC HL`, six for `DEC BC`, four for `LD A, B`, four for `OR C`, and seven for the conditional jump when taken. Clearing 2048 bytes requires 2048 iterations at twenty-eight cycles each, totaling 57,344 cycles—nearly an entire frame budget. Unrolling the loop by four reduces loop overhead:
 
-```
+```text
 CLEAR_LOOP:
 LD (HL), $00      ; 7 cycles
 INC HL            ; 6 cycles
@@ -114,7 +114,7 @@ Sprite management represents the canonical optimization problem in arcade game d
 
 Collision detection on 8-bit hardware without floating-point units or hardware multipliers required integer-only bounding box algorithms. The separating axis theorem provides a cycle-efficient test: two axis-aligned rectangles overlap if and only if their projections overlap on both the X and Y axes. For rectangles defined by (X1, Y1, W1, H1) and (X2, Y2, W2, H2), the overlap condition is:
 
-```
+```text
 (X1 < X2 + W2) AND (X1 + W1 > X2) AND (Y1 < Y2 + H2) AND (Y1 + H1 > Y2)
 ```
 

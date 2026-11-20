@@ -188,7 +188,7 @@ spec:
 
 Apply the VirtualService with `kubectl apply -f ratings-delay.yaml`. Generate traffic to the productpage and observe the end-to-end latency impact. Execute `curl -w "@curl-format.txt" -o /dev/null -s http://$INGRESS_HOST/productpage` where `curl-format.txt` contains:
 
-```
+```text
     time_namelookup:  %{time_namelookup}s\n
        time_connect:  %{time_connect}s\n
     time_appconnect:  %{time_appconnect}s\n

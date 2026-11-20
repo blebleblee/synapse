@@ -52,7 +52,7 @@ The Nintendo MMC3, mapper number 4 in the iNES standard, is the most widely depl
 
 The MMC3 sits on the cartridge PCB between the CPU's address/data bus and the PRG and CHR ROMs. It decodes CPU writes to addresses in the $8000 through $FFFF range, using the lowest bit of the address to distinguish between even and odd register pairs. The chip maintains eight internal bank registers, a scanline counter for IRQ generation, and two mode bits that determine how the PRG and CHR banks are organized.
 
-```
+```text
 MMC3 Register Map (Accessed via CPU Writes to $8000–$FFFF)
 ┌──────────┬──────────────────────────────────────────────────────────┐
 │ Address  │ Function                                                  │
@@ -110,7 +110,7 @@ The Neo-Geo MVS applies the same banking principles to an arcade context. The 68
 
 The MVS cartridge itself is a massive PCB, approximately 14 centimeters by 20 centimeters, with up to 330 megabits of ROM across multiple chips. The program ROMs, graphics ROMs, and sound ROMs are organized by the cartridge's onboard address decoding logic, which routes the 68000's address lines and the LSPC video chipset's address lines to the correct chips. The cartridge has no active mapper IC in the NES sense. The banking logic lives on the motherboard, not the cartridge. The cartridge simply presents its ROMs on a wide parallel bus, and the motherboard's bank registers determine which slice of that bus the CPUs and video chip see.
 
-```
+```text
 Neo-Geo MVS Three-Layer Architecture
 ┌─────────────────────────────────────────────────────────────┐
 │                     Arcade Cabinet                           │
@@ -181,7 +181,7 @@ The Neo-Geo MVS faces a more complex synchronization problem because it has two 
 
 At the cabinet level, the JAMMA harness provides the final layer of system integration. Every signal that crosses the boundary between the arcade PCB and the cabinet hardware passes through the JAMMA edge connector.
 
-```
+```text
 JAMMA Standard Pinout (56-Pin Edge Connector)
 ┌─────┬──────────────────┬─────┬──────────────────────────┐
 │ Pin │ Side A (Parts)   │ Pin │ Side B (Solder)          │
@@ -331,7 +331,7 @@ Save state serialization must capture every mapper register. A common bug in emu
 
 ROM identification for mapper selection relies on the iNES header, a 16-byte prefix appended to every NES ROM image. The header's format is precise and must be parsed correctly to initialize the right mapper:
 
-```
+```text
 iNES Header Format (16 Bytes, Offset from ROM Start)
 ┌────────┬──────┬──────────────────────────────────────────────┐
 │ Offset │ Size │ Field                                        │

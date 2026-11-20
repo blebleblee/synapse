@@ -1553,7 +1553,7 @@ print(f"\nMean sensitivity: {np.mean(np.abs(sensitivity)):.6f} F1 per tree")
 
 Use this checklist before deploying a new model version to production. Each item prevents a common category of production failure.
 
-```
+```text
 □ Data Loading
   □ CSV files parse without errors
   □ Column names match expected schema

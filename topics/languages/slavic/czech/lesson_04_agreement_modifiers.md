@@ -37,7 +37,7 @@ Genitive plural *nových* applies uniformly across all genders, as do dative plu
 
 The complete hard-stem paradigm for *nový* "new" across all gender-number-case combinations:
 
-```
+```text
 SINGULAR
                  Masculine        Feminine     Neuter
 Nominative       nový             nová         nové
@@ -71,7 +71,7 @@ Plural forms introduce the same animate/inanimate masculine split seen in hard-s
 
 The complete soft-stem paradigm for *cizí* "foreign":
 
-```
+```text
 SINGULAR
                  Masculine        Feminine     Neuter
 Nominative       cizí             cizí         cizí
@@ -135,7 +135,7 @@ Plural personal pronouns show nominative *my* "we," *vy* "you (plural/formal)," 
 
 The complete personal pronoun paradigm for first-person singular:
 
-```
+```text
 Nominative       já
 Genitive         mě / mne (long)
 Dative           mi / mně (long)
@@ -156,7 +156,7 @@ The numerals *dva/dvě* "two," *tři* "three," and *čtyři* "four" occupy an in
 
 The complete paradigm for *dva* "two" masculine:
 
-```
+```text
 Nominative       dva      (+ nominative plural noun)
 Genitive         dvou     (+ genitive plural noun)
 Dative           dvěma    (+ genitive plural noun)
@@ -169,7 +169,7 @@ Numerals from *pět* "five" upward govern genitive plural unconditionally in nom
 
 The paradigm for *pět* "five":
 
-```
+```text
 Nominative       pět      (+ genitive plural noun)
 Genitive         pěti     (+ genitive plural noun)
 Dative           pěti     (+ genitive plural noun)

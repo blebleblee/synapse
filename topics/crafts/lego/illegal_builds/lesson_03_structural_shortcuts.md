@@ -20,7 +20,7 @@ Bracket bending represents perhaps the most elegant geometric violation because 
 
 The mechanics of bracket bending follow classical beam theory with modifications for the geometry's compound curvature. Consider a 1×2–2×2 bracket with both mounting faces fixed, but with the second face displaced by a linear offset δ perpendicular to the nominal right-angle geometry. The semicircular web experiences combined bending and torsional stress, with maximum fiber stress σ occurring at the inner radius of the bend. For small deflections (δ < 2mm), the relationship approximates:
 
-```
+```text
 σ ≈ (E · t · δ) / (R² · θ)
 
 where:
@@ -127,7 +127,7 @@ Measuring and characterizing tolerance bias requires simple mechanical testing. 
 
 Cantilever stress engineering applies structural mechanics principles to distribute concentrated loads across multiple redundant load paths. When a plate cantilevers from a rigid mounting point, the maximum bending moment M occurs at the fixed end and equals the applied force F multiplied by the lever arm length L. The resulting fiber stress in the plate web scales as:
 
-```
+```text
 σ = (M · c) / I = (F · L · c) / I
 
 where:

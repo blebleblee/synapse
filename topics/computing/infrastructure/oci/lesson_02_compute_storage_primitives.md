@@ -44,7 +44,7 @@ The boot volume is not local disk. OCI separates compute from storage at the phy
 
 The block volume service presents storage to instances via iSCSI over the storage network. For para-virtualized VM instances, OCI's hypervisor intercepts iSCSI commands and presents them to the guest through a paravirtualized virtio-scsi interface, which the guest OS sees as a standard SCSI block device (typically `/dev/sda` on Linux). For bare metal instances and for high-performance VMs using the **iSCSI attachment** mode, the host OS or VM runs a full iSCSI initiator and talks directly to the OCI storage targets. The attachment mode choice has measurable performance implications:
 
-```
+```text
 Paravirtual attachment (VM default):
   Guest OS → virtio-scsi driver → KVM hypervisor → iSCSI → Storage network → Block volume server
 
@@ -56,7 +56,7 @@ The paravirtual path adds roughly one context switch per I/O, introducing 10–2
 
 Internally, the block volume service replicates every write to multiple storage nodes before acknowledging the write to the host. OCI does not publish the exact replication factor, but the durability guarantee of "multiple copies across multiple fault domains" implies a minimum replication factor of 3 across at least 3 distinct failure domains within an Availability Domain. The replication protocol is a synchronous quorum write: the storage front-end does not return a successful write acknowledgment until a quorum of replica nodes have confirmed the write to their local storage. This means the effective write latency is bounded by the slowest node in the write quorum, which is why block volume baseline latency is specified in terms of a 99th percentile rather than a mean.
 
-```
+```text
                     ┌─────────────────────────────────────────┐
                     │          OCI Block Volume Service        │
                     │                                          │
@@ -271,7 +271,7 @@ oci os bucket update \
 
 For IAM-controlled bucket access, the principle of least privilege means granting only the verbs a given principal actually requires. A data pipeline that reads from a bucket but never writes should receive a policy granting `OBJECT_READ` and `OBJECT_INSPECT` but not `OBJECT_CREATE` or `OBJECT_DELETE`. A CI/CD system that writes build artifacts should receive `OBJECT_CREATE` but not `OBJECT_DELETE`. Separating these verbs prevents a compromised pipeline credential from being weaponized to destroy an entire artifact repository. The policy syntax in OCI IAM expresses this granularity directly:
 
-```
+```text
 Allow group DataPipelineReaders to read objects in compartment production
   where target.bucket.name = 'ml-training-data'
 

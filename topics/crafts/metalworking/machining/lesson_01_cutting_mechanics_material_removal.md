@@ -36,7 +36,7 @@ where $A$, $B$, $n$, $C$, and $m$ are material constants, $\varepsilon$ represen
 
 The force system acting on the chip comprises the shear force $F_s$ along the shear plane and the normal force $F_n$ perpendicular to it. These internal forces manifest as external cutting force $F_c$ (in the direction of cutting velocity) and thrust force $F_t$ (perpendicular to the cut surface):
 
-```
+```text
                     Chip (thickness t₂)
                          ↑
                          |

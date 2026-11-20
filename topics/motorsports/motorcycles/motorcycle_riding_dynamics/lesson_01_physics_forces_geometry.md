@@ -50,7 +50,7 @@ Tire construction and geometry introduce additional complexity through contact p
 
 The motorcycle's pitch plane dynamics couple longitudinal acceleration with suspension compression through load transfer. During hard braking, weight transfers forward onto the front tire, compressing the front suspension and extending the rear suspension. This pitch attitude change alters the effective wheelbase and center of mass height, creating a nonlinear feedback loop where suspension compression affects load transfer, which in turn affects suspension position. The natural frequency of pitch oscillations depends on suspension spring rates, wheelbase geometry, and the distribution of mass moments of inertia. Underdamped pitch oscillations create a "pogo stick" sensation during aggressive braking, while overdamped suspension produces sluggish pitch response that prevents rapid weight transfer during corner entry.
 
-```
+```text
 Motorcycle Force Diagram - Steady-State Cornering
 
                      F_inertial (centrifugal)

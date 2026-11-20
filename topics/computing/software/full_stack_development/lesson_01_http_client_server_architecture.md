@@ -28,7 +28,7 @@ An HTTP transaction begins when the client establishes a TCP connection to the s
 
 The request line encodes operation intent in a space-delimited ASCII string:
 
-```
+```text
 GET /api/users/42 HTTP/1.1
 ```
 
@@ -36,7 +36,7 @@ The method (`GET`) specifies the desired operation. The request target (`/api/us
 
 Headers follow as key-value pairs separated by colons, one per line, terminated by an empty line signaling header completion:
 
-```
+```text
 Host: api.example.com
 User-Agent: ServiceClient/2.1.0
 Accept: application/json
@@ -56,7 +56,7 @@ Application logic executes, interacting with databases, external services, and b
 
 The status line declares outcome through a three-component format:
 
-```
+```text
 HTTP/1.1 200 OK
 ```
 
@@ -64,7 +64,7 @@ The protocol version matches the request. The status code (200) signals successf
 
 Response headers communicate result metadata:
 
-```
+```text
 Content-Type: application/json; charset=utf-8
 Content-Length: 512
 Content-Encoding: gzip
@@ -121,7 +121,7 @@ sequenceDiagram
 
 Chunked transfer encoding solves the problem of streaming responses with unknown lengths. Instead of requiring `Content-Length`, the server transmits the body as a sequence of chunks, each prefixed by its hexadecimal size:
 
-```
+```text
 HTTP/1.1 200 OK
 Transfer-Encoding: chunked
 
@@ -137,7 +137,7 @@ Each chunk starts with its size in hexadecimal (0x1a = 26 octets), followed by C
 
 Content negotiation operates through multiple dimensions simultaneously. A comprehensive `Accept` header might declare:
 
-```
+```text
 Accept: application/json; q=1.0, application/xml; q=0.8, text/html; q=0.5, */*; q=0.1
 Accept-Language: en-US, en; q=0.9, es; q=0.7
 Accept-Encoding: br, gzip, deflate, identity; q=0.1
@@ -148,7 +148,7 @@ The server parses quality values, ranks combinations by preference, selects the 
 
 Idempotency guarantees inform retry strategies and distributed transaction protocols. Consider a payment processing API endpoint `POST /payments` that charges a customer's account. Network failures introduce ambiguity: did the server receive the request, process it, and fail to deliver the response? Or did the request never arrive? Retrying risks double-charging. Introducing idempotency keys solves this:
 
-```
+```text
 POST /payments HTTP/1.1
 Host: payments.example.com
 Content-Type: application/json
@@ -177,7 +177,7 @@ Conditional requests optimize bandwidth through validation mechanisms. After cac
 
 Range requests enable resumable downloads and video streaming through selective content retrieval. A client requests specific byte ranges:
 
-```
+```text
 GET /video.mp4 HTTP/1.1
 Host: media.example.com
 Range: bytes=1048576-2097151
@@ -185,7 +185,7 @@ Range: bytes=1048576-2097151
 
 The server responds with 206 Partial Content:
 
-```
+```text
 HTTP/1.1 206 Partial Content
 Content-Type: video/mp4
 Content-Length: 1048576
@@ -202,7 +202,7 @@ Failure modes in HTTP systems propagate through cascading layers. Network partit
 
 Server overload triggers various defensive responses. Rate limiting returns 429 Too Many Requests with `Retry-After` headers specifying backoff periods:
 
-```
+```text
 HTTP/1.1 429 Too Many Requests
 Retry-After: 120
 X-RateLimit-Limit: 5000

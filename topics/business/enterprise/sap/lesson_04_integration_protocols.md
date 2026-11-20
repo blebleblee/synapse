@@ -32,7 +32,7 @@ An IDoc is a three-tier document. The control record occupies a fixed 524-byte s
 
 The status code sequence is the primary diagnostic instrument for ALE operations. Status 01 means the IDoc was created in the sending system. Status 03 means it was successfully dispatched to the RFC layer. Status 12 means dispatching failed. Status 53 means the receiving system posted the IDoc successfully. Any status in the 60s typically indicates an application-level error on the receiver side. A practitioner troubleshooting an ALE failure reads the status records chronologically to identify the precise handoff point where the failure occurred.
 
-```
+```text
 IDoc Lifecycle (Outbound)
 ─────────────────────────────────────────────────────────────────────
  Application Event

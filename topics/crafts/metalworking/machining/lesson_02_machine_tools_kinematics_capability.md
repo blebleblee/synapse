@@ -20,7 +20,7 @@ The third invariant is the structural loop concept. The accuracy of any cut is d
 
 The engine lathe is the oldest general-purpose machine tool, and its architecture reflects the elegant simplicity of turning: one primary rotary axis (the spindle, designated **C** in modern CNC nomenclature but historically just the headstock), one linear feed axis parallel to that spindle (the **Z** axis, the carriage), and one linear cross-feed axis perpendicular to it in the horizontal plane (the **X** axis, the cross-slide). The compound rest adds a manually settable angular slide that sits atop the cross-slide, allowing taper turning at an arbitrary angle, but it is not a powered axis in a conventional manual machine.
 
-```
+```text
 Lathe Kinematic Chain (Headstock View)
 
   [Headstock / Spindle / C-axis]
@@ -50,7 +50,7 @@ where $d$ is workpiece diameter (m), $a_p$ is depth of cut (mm), $f_r$ is feed r
 
 The vertical machining center (VMC) defines the dominant architecture of modern CNC milling. The spindle is oriented vertically (the **Z** axis), and the table moves in X (left-right) and Y (front-back) relative to the stationary column. In a typical knee-less VMC, the Z axis is the spindle quill or the entire spindle head traveling on the column, while X and Y motion is entirely in the table. This architecture is called a **moving table, fixed column** design.
 
-```
+```text
 VMC Kinematic Chain (Front View)
 
   [Column (fixed to base)]
@@ -80,7 +80,7 @@ The spindle in a machining center is characteristically more complex than in a l
 
 The surface grinder represents a different tier of the machine tool hierarchy: its purpose is not bulk material removal but geometric refinement and surface quality. The architecture is deceptively simple — a reciprocating table (X axis), a cross-feed slide (Y axis), and a vertical wheel head (Z axis) — but the geometric discipline demanded is an order of magnitude tighter than in milling.
 
-```
+```text
 Surface Grinder Axes (Top View)
 
   ←————————— X (Table Reciprocation) ——————————→

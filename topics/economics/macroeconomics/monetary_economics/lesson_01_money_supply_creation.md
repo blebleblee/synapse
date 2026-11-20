@@ -217,7 +217,7 @@ Bank loans appear as liabilities on the non-bank private sector balance sheet, t
 
 The flow of funds through the money creation process can be visualized as a series of linked balance sheet transformations:
 
-```
+```text
 Stage 1: Central Bank Open Market Purchase
 
 Central Bank Balance Sheet:
@@ -231,7 +231,7 @@ Bank A Balance Sheet:
 
 At this initial stage, the central bank has purchased government bonds from Bank A, crediting Bank A's reserve account. The monetary base expands by $100 billion (the reserve creation), but broad money remains unchanged—the transaction merely swaps one bank asset (government securities) for another (reserves) without affecting deposit liabilities.
 
-```
+```text
 Stage 2: Bank A Extends Credit
 
 Bank A Balance Sheet:
@@ -245,7 +245,7 @@ Borrower Balance Sheet:
 
 Bank A, holding excess reserves after the central bank purchase, extends $100 billion in loans to creditworthy borrowers. In the act of lending, the bank creates new deposits in borrowers' accounts, expanding both sides of its balance sheet. Broad money has now increased by $100 billion, as new deposits have been created. Bank A's reserve position remains at $100 billion, but its deposit liabilities have risen by $100 billion, creating a required reserve obligation of $10 billion (assuming a ten percent reserve requirement), leaving $90 billion in excess reserves.
 
-```
+```text
 Stage 3: Borrower Expenditure and Interbank Settlement
 
 Borrower Balance Sheet:
@@ -263,7 +263,7 @@ Bank B Balance Sheet:
 
 Borrowers spend the newly created deposits, writing checks or initiating electronic transfers to suppliers and vendors who bank at other institutions. When Bank B receives payment instructions for $100 billion, it claims settlement through the interbank payment system, transferring $100 billion in reserves from Bank A to Bank B. Bank A's balance sheet contracts back toward its original position, while Bank B now holds new reserves and new deposits. Bank B faces a required reserve holding of $10 billion against its new deposits, leaving it with $90 billion in excess reserves available for lending.
 
-```
+```text
 Stage 4: Bank B Extends Credit (Round 2)
 
 Bank B Balance Sheet:
@@ -285,7 +285,7 @@ Thus, the initial $100 billion reserve injection generates $1,000 billion in tot
 
 Incorporating currency leakage complicates the mechanics. If depositors withdraw twenty percent of each new deposit as currency rather than leaving it in the banking system, each round of lending loses reserves to currency withdrawals, dampening the multiplier effect:
 
-```
+```text
 Stage 2 (Revised): Bank A Extends Credit with Currency Withdrawal
 
 Bank A Balance Sheet:
@@ -317,7 +317,7 @@ The interbank federal funds market equilibrates reserve distribution across bank
 
 In a traditional scarce-reserves regime, the reserve demand curve slopes downward: at high federal funds rates, banks minimize excess reserve holdings and operate close to required minimums, accepting payment settlement risk and potential discount window borrowing to avoid the opportunity cost of idle reserves. At low federal funds rates, banks willingly hold larger excess reserve buffers, as the foregone interest income is minimal. The central bank's open market operations determine the level of aggregate reserves, and the federal funds rate adjusts to clear the market at that quantity.
 
-```
+```text
 Federal Funds Market (Scarce Reserves Regime):
 
 Rate (%)
@@ -342,7 +342,7 @@ The vertical supply curve reflects the central bank's exogenous reserve provisio
 
 In a floor system with abundant reserves and interest on excess reserves, the reserve demand curve exhibits a near-horizontal segment at the interest on reserves rate:
 
-```
+```text
 Federal Funds Market (Abundant Reserves Regime):
 
 Rate (%)

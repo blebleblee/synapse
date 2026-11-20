@@ -99,7 +99,7 @@ The Kerberos pre-authentication mechanism (PKINIT) addresses password-based vuln
 
 RADIUS packet structure reveals the protocol's UDP-based, request-response design optimized for low-latency network device authentication. A RADIUS Access-Request packet contains a Code field (1 for Access-Request), a unique Identifier for matching requests to responses, a Length field, a Request Authenticator (a 16-byte random value), and a variable-length Attributes section carrying username, password, client IP address, and other authentication context. The password attribute is obfuscated (not encrypted) by XORing it with MD5 hashes of the shared secret concatenated with the Request Authenticator, providing protection against passive eavesdropping but not against active man-in-the-middle attacks that can modify packets and recompute the obfuscation.
 
-```
+```text
 RADIUS Packet Format:
 
  0                   1                   2                   3
@@ -139,7 +139,7 @@ RADIUS accounting packets (Code 4 for Accounting-Request, Code 5 for Accounting-
 
 TACACS+ separates authentication, authorization, and accounting into distinct packet types, enabling fine-grained control over each phase. The authentication phase verifies the user's identity through a challenge-response sequence that can involve multiple round trips: the client sends an authentication start packet, the server responds with a challenge (e.g., "Password:"), the client sends the user's response, and the server sends an authentication reply indicating success or failure. This multi-round-trip design supports complex authentication methods like token-based one-time passwords or interactive password changes that require prompting the user for multiple inputs.
 
-```
+```text
 TACACS+ Packet Header:
 
  0                   1                   2                   3

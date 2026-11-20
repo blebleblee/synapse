@@ -72,7 +72,7 @@ The adaptive immune system is architecturally built around three functional requ
 
 MHC class I molecules, expressed on virtually all nucleated cells, present peptides derived from proteins synthesized endogenously within the cell — including viral proteins produced during active infection. The processing pathway involves proteasomal degradation of cytosolic proteins into 8–10 amino acid peptides, transport across the ER membrane by the TAP1/TAP2 heterodimer, and loading onto newly synthesized MHC-I / β₂-microglobulin complexes with the assistance of the PLC (peptide loading complex). Stably loaded pMHC-I complexes traffic to the cell surface where they are surveyed by CD8⁺ cytotoxic T lymphocytes (CTLs). MHC class II molecules, expressed primarily on professional APCs (dendritic cells, macrophages, B cells), present peptides derived from exogenously acquired proteins degraded in lysosomes. The invariant chain (Ii, CD74) blocks the MHC-II groove during synthesis, preventing premature endogenous peptide loading; in the late endosome, Ii is cleaved, leaving the CLIP fragment, which is exchanged for pathogen-derived peptides with the assistance of the HLA-DM chaperone. Resulting pMHC-II complexes activate CD4⁺ T helper cells.
 
-```
+```text
 ANTIGEN PRESENTATION PATHWAY
 
 ENDOGENOUS ANTIGEN                      EXOGENOUS ANTIGEN

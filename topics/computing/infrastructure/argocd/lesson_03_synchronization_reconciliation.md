@@ -26,7 +26,7 @@ Resource hooks extend the sync wave concept by allowing operators to inject arbi
 
 The synchronization engine's architecture consists of three primary components: the Application Controller, the Repo Server, and the sync operation execution state machine. The Application Controller acts as the orchestrator, continuously watching application custom resources for changes and triggering reconciliation loops. The Repo Server provides a caching and abstraction layer over Git repositories, handling authentication, manifest rendering with tools like Helm or Kustomize, and caching of rendered manifests to reduce Git clone overhead. The sync operation state machine encodes the multi-phase workflow of detecting drift, computing diffs, and applying changes with proper ordering and health checks.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                       Application Controller                         │
 │  ┌──────────────────────────────────────────────────────────────┐  │

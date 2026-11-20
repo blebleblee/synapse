@@ -32,7 +32,7 @@ Memory hierarchy organization in microcontrollers reflects aggressive optimizati
 
 To mask flash latency, most microcontrollers implement a small instruction cache or prefetch buffer. A prefetch buffer speculatively reads ahead of the current program counter, loading the next several cache lines from flash into SRAM-speed buffers while the processor executes from previously fetched instructions. Linear code sequences hit the prefetch buffer nearly 100% of the time, but branches that jump to distant addresses miss and stall while new cache lines load. Some microcontrollers add a data cache for flash-resident constant arrays, though this remains rare below the Cortex-M7 tier due to transistor budget constraints.
 
-```
+```text
 Memory Map (Typical ARM Cortex-M4):
 
 0x0000_0000  ┌─────────────────────┐

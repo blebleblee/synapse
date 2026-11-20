@@ -125,7 +125,7 @@ Cassandra's storage engine is built around a Log-Structured Merge-Tree (LSM-tree
 
 The cost of this write path arrives on reads. Reading a key requires checking the in-memory Memtable, then checking potentially dozens of on-disk SSTables. Cassandra uses a Bloom filter per SSTable — a probabilistic data structure that answers "is this key definitely not in this SSTable?" — to avoid reading most SSTables on a typical point lookup. The remaining SSTables are checked via their partition summary and partition index to locate the key's position within the SSTable's data file. Compaction, the process of merging and re-sorting multiple SSTables into fewer, larger SSTables while discarding tombstones and superseded values, is what prevents read amplification from growing unboundedly. Leveled Compaction Strategy (LCS) is preferred for read-heavy workloads because it enforces strict size ratios between compaction levels, capping read amplification at approximately one SSTable per level.
 
-```
+```text
 LSM-Tree Write Path (Cassandra)
 ┌──────────────────────────────────────────────────────────────┐
 │  Write Request                                               │
@@ -208,7 +208,7 @@ ORDER BY lifetime_value DESC;
 
 A representative plan output for this query might read:
 
-```
+```text
 Sort  (cost=18420.33..18425.33 rows=2000 width=48)
       (actual time=312.004..312.218 rows=1847 loops=1)
   Sort Key: (sum(o.total_amount)) DESC

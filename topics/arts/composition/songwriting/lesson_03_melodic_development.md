@@ -61,7 +61,7 @@ Left hand simultaneously plays root-position triads (C, F, G) so you hear each m
 
 Take the C-shape CAGED pattern at the open position. On the high E and B strings, the scale degrees in C major fall like this:
 
-```
+```text
 High E string:  open=E(3̂)  1st fret=F(4̂)  3rd fret=G(5̂)
 B string:        open=B(7̂)  1st fret=C(1̂)  3rd fret=D(2̂)
 ```
@@ -142,7 +142,7 @@ At a typical pop tempo (100–130 BPM), 8 bars runs about 15–20 seconds — ro
 
 An 8-bar phrase splits into two 4-bar halves:
 
-```
+```text
 Bars 1-4 (Antecedent):  raises a question, usually ends on 5̂ or 3̂
 Bars 5-8 (Consequent):  answers it, usually ends on 1̂
 ```
@@ -162,7 +162,7 @@ A cadence is the melody note + underlying chord motion that closes a phrase. Cha
 
 ### 4.3 Worked Phrase: Verse (Half Cadence) into Chorus (Authentic Cadence)
 
-```
+```text
 VERSE (bars 1-8), chords | C | F | G | C | F | G | C | G |
 Melody degrees:  3̂-5̂-6̂-5̂ | (bar 4) | 5̂-3̂-2̂ | lands on 5̂ (bar 8, half cadence)
 Feel: "there's more to come" — do not resolve the melody here.
@@ -233,7 +233,7 @@ Use this section like a troubleshooting manual. Record your melody (voice memo i
 - End the phrase deliberately on 1̂, 3̂, or 5̂.
 
 **Before/after at the piano:**
-```
+```text
 Before: C-G-B-F#-D-A-E-C   (MIDI 60,67,71,66,62,69,64,60)
          leaps everywhere, no stepwise repayment — sounds like a scale exercise gone wrong
 

@@ -143,13 +143,13 @@ The leaky bucket is defined by two parameters:
 
 The available capacity at any moment is calculated as:
 
-```
+```text
 available(t) = min(B, current_level + R × t)
 ```
 
 Where `current_level` is the number of requests remaining in the bucket and `t` is elapsed time since the last request. When a request arrives, if `available(t) >= 1`, the request succeeds and one unit is consumed. If `available(t) < 1`, the request fails with HTTP 429, and the `Retry-After` header is set to:
 
-```
+```text
 Retry-After = ceil((1 - available(t)) / R)
 ```
 
@@ -159,7 +159,7 @@ The GraphQL Admin API has historically used a **query cost-based model** rather 
 
 The cost calculation follows a model where each returned object node costs a fixed number of points and each connection (paginated list) has a base cost plus a per-node cost multiplied by the requested page size. For a query that fetches 50 products with 10 variants each:
 
-```
+```text
 query_cost = connection_base + (products_count × (product_base + variants_count × variant_base))
 ```
 
@@ -211,7 +211,7 @@ Building a reliable Shopify app requires treating rate limits as a first-class a
 
 **Implement exponential backoff with jitter.** When your app receives an HTTP 429 response, it must back off and retry. A naive retry strategy that immediately re-sends the request will only make the problem worse, as will a fixed-delay retry that causes all clients to retry simultaneously (the thundering herd problem). The correct approach is exponential backoff with jitter:
 
-```
+```text
 delay(attempt) = min(max_delay, base_delay × 2^attempt) + random(0, jitter)
 
 Where:
@@ -292,7 +292,7 @@ This tells the browser to start fetching the image immediately, before the HTML 
 
 The throughput calculation for sustained operations is:
 
-```
+```text
 max_sustained_throughput = refill_rate  (requests per second)
 max_burst = bucket_capacity  (requests)
 

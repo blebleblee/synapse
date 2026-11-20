@@ -38,7 +38,7 @@ XDR encoding operates recursively on typed data structures. Integers serialize a
 
 The NFSv3 `READ` operation demonstrates this encoding concretely. The client XDR-encodes a structure containing the file handle, a 64-bit byte offset, and a 32-bit count of bytes to read. The server decodes these parameters, performs security validation against the export's access control list, translates the file handle into an in-kernel inode reference, invokes the underlying filesystem's `read` method to fetch data from the page cache or disk, XDR-encodes a reply containing status, post-operation file attributes, and the actual data bytes, then transmits the response with the matching XID. If the requested read size exceeds the network MTU, the transport layer fragments the reply into multiple packets, each carrying a fragment header that allows the receiver to reassemble the complete message.
 
-```
+```text
 NFSv3 READ Request Wire Format:
 ┌─────────────────────────────────────────┐
 │ RPC Header (80 bytes)                   │
@@ -97,7 +97,7 @@ The duplicate request cache in NFSv3 presents a fascinating exercise in bounded 
 
 NFSv4's compound operation model transforms the request-response paradigm into a transactional sequence. A single compound RPC bundles multiple operations that execute atomically in order, with each operation's results available to subsequent operations in the same compound. The client constructs an array of operation structures, each specifying an operation type and arguments. The server processes operations sequentially, halting on the first failure and returning results for all operations up to and including the failure point.
 
-```
+```text
 NFSv4 Compound Structure:
 SEQUENCE         → renew lease, provide sequence number
 PUTFH (handle)   → set current file handle to directory

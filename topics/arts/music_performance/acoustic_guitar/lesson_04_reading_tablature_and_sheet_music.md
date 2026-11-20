@@ -21,7 +21,7 @@ The bridge between the two is standard tuning: **E2 – A2 – D3 – G3 – B3 
 
 Six horizontal lines represent six strings. The bottom line is the lowest string (6th, E2); the top line is the highest (1st, E4). A number is a fret; `0` is open.
 
-```
+```text
 e |-------------------------------------------| 1st string (E4, highest)
 B |-------------------------------------------|
 G |-------------------------------------------|
@@ -56,7 +56,7 @@ Left to right = time. Numbers stacked vertically = play together (chord). Number
 
 The McCartney classic is the standard first fingerstyle reading piece because the thumb and two fingers each lock onto one string and never cross.
 
-```
+```text
 e |-------0-------0-------0-------0-------|
 B |-----0---0---1---1---0---0---1---1-----|
 G |---0-------0-------0-------0-----------|
@@ -98,7 +98,7 @@ Guitar is written in **treble clef** but sounds **one octave lower than written*
 
 ### 2.4 Rhythm Notation
 
-```
+```text
 Whole note     𝅝       4 beats  (hold for the full measure in 4/4)
 Half note      𝅗𝅥       2 beats
 Quarter note   ♩       1 beat   (the "tap your foot" unit)
@@ -110,7 +110,7 @@ Sixteenth      ♬       1/4 beat (four per foot tap)
 
 **Count subdivisions aloud before you touch the guitar:**
 
-```
+```text
 Eighth-note subdivision in 4/4:
 Beat:    1    &    2    &    3    &    4    &
 Clap:    X    X    X    X    X    X    X    X
@@ -128,7 +128,7 @@ Clap and count the rhythm of any new piece before fretting a single note. Pitche
 
 Order of sharps: **F C G D A E B**. Order of flats is the reverse: **B E A D G C F**.
 
-```
+```text
 Key of G (1 sharp):   F♯ everywhere
 Key of D (2 sharps):  F♯ C♯
 Key of A (3 sharps):  F♯ C♯ G♯
@@ -170,7 +170,7 @@ graph TD
 
 **C major scale, three playable realizations of the same pitches (C4–C5):**
 
-```
+```text
 Open position (most resonant, best for beginners):
 e |------------------0--1--|
 B |----------0--1----------|
@@ -207,7 +207,7 @@ CAGED gives you five overlapping fretboard "boxes" that together cover the whole
 
 **C major scale across the five CAGED boxes:**
 
-```
+```text
 C Shape (frets 0-3, open position):
 e |--0--1------|
 B |--0--1------|
@@ -259,7 +259,7 @@ E |--10--12------|
 
 **Drill — Flashcard on the neck:** write 30 index cards, one note per card, covering the grid below. Shuffle, draw one, find it on the staff, then play it on the guitar without looking at a chart.
 
-```
+```text
 String 1 (e): E4(0)  F4(1)  F#4(2)  G4(3)  G#4(4)
 String 2 (B): B3(0)  C4(1)  C#4(2)  D4(3)  D#4(4)
 String 3 (G): G3(0)  G#3(1) A3(2)   A#3(3) B3(4)
@@ -276,7 +276,7 @@ String 6 (E): E2(0)  F2(1)  F#2(2)  G2(3)  G#2(4)
 
 Play everything on the open 1st string — no fretting decisions competing for attention, so you can focus entirely on rhythm.
 
-```
+```text
 Exercise A — quarters and eighths, count aloud while playing:
 e |---0---0---0-0-0-0---0---0-0-0-0-0-0-0-0---|
    1   2   3  &  4  &  1   2  e  &  ah  3  e  &  ah  4
@@ -294,11 +294,11 @@ Metronome: 60 -> 80 -> 100 BPM. Move up only after 3 clean passes.
 
 Stepwise motion, all quarter notes, stays in open position — the ideal first real sight-reading piece.
 
-```
+```text
 Pitches:  E  E  F#  G  |  G  F#  E  D  |  C  C  D  E  |  E.  D  D
 ```
 
-```
+```text
 e |--0--0--2--3--|-3--2--0----|-----------|-0-----------|
 B |--------------|----------3-|-1--1--3---|-----------3-|
 G |--------------|------------|-----------|-0-----------|
@@ -322,7 +322,7 @@ The Am–C–D–F progression in 3/4 with a repeating six-note arpeggio pattern
 
 **Open chord shapes:**
 
-```
+```text
 Am        C         D         F
 e--0--    e--0--    e--2--    e--1--
 B--1--    B--1--    B--3--    B--1--
@@ -334,7 +334,7 @@ E-----    E-----    E-----    E--1--
 
 **Arpeggio pattern, Am then C:**
 
-```
+```text
 e |----0-------------|----0-------------|
 B |--1---1------------|--1---1------------|
 G |------2-----2------|------0-----0------|
@@ -357,7 +357,7 @@ The staff version notates this as a quarter-note bass pulse (the thumb's A2 or C
 
 Stems up = melody (fingers), stems down = bass (thumb) — standard convention in classical guitar and fingerstyle scores.
 
-```
+```text
 e |---3-----------3---2---0---|
 B |-----3---3-------3---------|
 G |-------0---0---------------|
@@ -386,7 +386,7 @@ Melody (fingers, stems up): D D  G G  B E
 
 **Reinforcement drill — key filter:**
 
-```
+```text
 1. Metronome at 60 BPM
 2. Play a one-octave scale, holding every altered note one extra beat
 3. Continue through the octave
@@ -446,7 +446,7 @@ graph LR
 
 **Fix — position isolation:**
 
-```
+```text
 Week 1: lock into 5th position only for every exercise. No open strings.
 Week 2: lock into 7th position only.
 Week 3: lock into 9th position only.
@@ -523,7 +523,7 @@ Track these four metrics weekly, with a timer and metronome, logged honestly.
 - Week 2: under 4 seconds. Week 8: under 2 seconds. Week 16: under 1 second, automatic.
 
 **Sight-reading accuracy** — play a piece you've never seen for exactly 2 minutes, count notes and errors.
-```
+```text
 Accuracy = (Total Notes - Errors) / Total Notes x 100%
 Target: 70% at week 1, 85% at week 12, 95% at week 24
 ```

@@ -26,7 +26,7 @@ The power and elegance of transformation mathematics emerge when we represent al
 
 Consider a translation by the vector **t** = (t_x, t_y, t_z). The corresponding 4×4 transformation matrix is:
 
-```
+```text
 T = | 1  0  0  t_x |
     | 0  1  0  t_y |
     | 0  0  1  t_z |
@@ -35,7 +35,7 @@ T = | 1  0  0  t_x |
 
 Multiplying this matrix by a homogeneous point vector yields:
 
-```
+```text
 | 1  0  0  t_x |   | x |   | x + t_x |
 | 0  1  0  t_y | · | y | = | y + t_y |
 | 0  0  1  t_z |   | z |   | z + t_z |
@@ -46,7 +46,7 @@ The result is the translated point (x + t_x, y + t_y, z + t_z, 1), with the four
 
 Rotation matrices are similarly constructed. A rotation by angle θ about the Z-axis is represented as:
 
-```
+```text
 R_z(θ) = | cos θ  -sin θ   0   0 |
          | sin θ   cos θ   0   0 |
          |   0       0     1   0 |
@@ -57,7 +57,7 @@ Rotations about the X-axis and Y-axis permute the sine and cosine terms accordin
 
 Scaling by factors s_x, s_y, s_z along the respective axes is encoded as:
 
-```
+```text
 S = | s_x  0    0   0 |
     | 0   s_y   0   0 |
     | 0    0   s_z  0 |

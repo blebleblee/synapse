@@ -60,7 +60,7 @@ Islamic geometric ornament followed rigorous construction protocols, visible in 
 
 The characteristic Islamic star polygons—five-pointed, six-pointed, eight-pointed, ten-pointed, twelve-pointed, sixteen-pointed—were constructed through iterative subdivision. An eight-pointed star began with a square inscribed in a circle; diagonals drawn from square corners to opposite circle midpoints generated the star points when connected sequentially. The spaces between star polygons were filled with secondary polygons (pentagons, hexagons, bow-ties, rhombuses) that interlocked to produce continuous all-over patterns. The craftsman's manual known as the Tashkent Scrolls preserves construction diagrams showing how to generate complete tessellations from simple geometric kernels.
 
-```
+```text
 Islamic Geometric Pattern Construction (8-fold System):
 
 Step 1: Establish primary circle

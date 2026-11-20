@@ -268,7 +268,7 @@ Cause: The two SNOT panels meeting at the corner are at slightly different heigh
 
 Draw the following grid on your graph paper at 1:1 scale (each square = 8 mm × 8 mm). Use it as a physical layout reference when planning SNOT assemblies. Mark each bracket position with a "B", each headlight position with an "H", and each spacer count with a numeral inside the symbol. The grid allows you to plan an entire SNOT facade before physical assembly, verify that all bracket heights are consistent, and identify any position that requires a non-standard spacer count before you discover it mid-build.
 
-```
+```text
  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐  ← 10 studs wide
  │   │   │   │   │   │   │   │   │   │   │  Row 10 (80 mm)
  ├───┼───┼───┼───┼───┼───┼───┼───┼───┼───┤

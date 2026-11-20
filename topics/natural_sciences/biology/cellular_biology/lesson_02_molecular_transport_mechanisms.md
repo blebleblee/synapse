@@ -64,7 +64,7 @@ Voltage-gated and ligand-gated ion channels mediate rapid, high-flux ion transpo
 
 The bacterial KcsA potassium channel, crystallographically resolved at 2 Å resolution, revealed the canonical K⁺ selectivity mechanism. The selectivity filter presents carbonyl oxygen atoms arranged to precisely mimic the hydration shell of K⁺ (ionic radius 1.33 Å) but not Na⁺ (0.95 Å). The energetic cost of partial dehydration for K⁺ entry is compensated by favorable protein-ion coordination, while the smaller Na⁺ cannot simultaneously contact all coordinating oxygens, resulting in 10,000-fold K⁺/Na⁺ selectivity despite only 0.38 Å difference in ionic radii.
 
-```
+```text
     Extracellular
          |
     [Selectivity Filter]  ← 4 K⁺ binding sites (S1-S4)
@@ -84,7 +84,7 @@ The voltage-gated sodium channel Nav exemplifies sophisticated gating architectu
 
 The Na⁺/K⁺-ATPase maintains essential ionic gradients across animal cell membranes, extruding three Na⁺ ions while importing two K⁺ ions per ATP hydrolyzed. This 3:2 stoichiometry renders the pump electrogenic, contributing -10 to -15 mV to resting membrane potential. The enzyme cycles through the Post-Albers scheme, alternating between E1 (high Na⁺ affinity, cytoplasmic-facing) and E2 (high K⁺ affinity, extracellular-facing) conformations:
 
-```
+```text
 E1 + 3Na⁺(in) + ATP → E1-P·3Na⁺ → E2-P·3Na⁺ → E2-P + 3Na⁺(out)
 E2-P + 2K⁺(out) → E2-P·2K⁺ → E1·2K⁺ → E1 + 2K⁺(in) + Pi
 ```

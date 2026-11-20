@@ -136,7 +136,7 @@ This two-phase protocol—**replication then commitment**—is the crux of durab
 
 A follower that receives `AppendEntries(term, leaderId, prevLogIndex, prevLogTerm, entries[], leaderCommit)` applies this logic:
 
-```
+```text
 if term < currentTerm:
     return Reject(currentTerm)                        # stale leader
 if log[prevLogIndex].term != prevLogTerm:
@@ -175,7 +175,7 @@ sequenceDiagram
 
 The most subtle safety constraint in Raft is this: **a leader may not commit entries from previous terms by counting replicas alone**. Consider the following scenario adapted directly from Figure 8 of the Ongaro/Ousterhout paper:
 
-```
+```text
 Term:   1   2   3   4
 S1:    [1] [2] [4]      <- new leader at term 4
 S2:    [1] [2]
@@ -281,7 +281,7 @@ Several details deserve emphasis:
 
 **Write path latency.** A write to etcd under normal conditions completes in roughly the following time budget on a well-tuned cluster:
 
-```
+```text
 API server validation:   ~1–5 ms
 etcd leader append:      ~0.1 ms (local disk fsync: ~1–5 ms with fdatasync)
 AppendEntries RPC RTT:   ~1–3 ms (intra-datacenter)

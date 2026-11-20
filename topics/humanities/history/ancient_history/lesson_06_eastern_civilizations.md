@@ -232,7 +232,7 @@ The collapse mechanism was systemic overload. The Qin demanded excessive corvée
 
 Han bureaucratic mechanics refined Qin structures while moderating their severity. The Han retained standardized script, currency, and legal codes but reduced punishment harshness and lowered corvée obligations. The examination system, initially informal, gradually institutionalized. Local officials recommended talented individuals (*xiaolian*, meaning "filial and incorrupt") who traveled to the capital for testing on Confucian classics. Successful candidates entered the bureaucracy at junior ranks, with promotion based on performance evaluations.
 
-```
+```text
 HAN BUREAUCRATIC MACHINERY
 
 RECRUITMENT:
@@ -330,7 +330,7 @@ The Achaemenid monetary system created economic integration across vast territor
 
 Vedic ritual architecture operated through precise specification of spatial, temporal, and performative parameters. The *Shrauta Sutras*, technical manuals for ritual practice, prescribed exact altar geometries using sophisticated mathematical principles. The *agnicayana* (fire altar construction) required arranging 10,800 bricks in five layers following precise geometric patterns including circles, squares, and falcon shapes. This was not arbitrary symbolism but encoded astronomical and mathematical knowledge—the altar dimensions incorporated calculations of the year's length and lunar cycles.
 
-```
+```text
 VEDIC RITUAL STRUCTURE
 
 PREPARATION PHASE:
@@ -362,7 +362,7 @@ The Upanishadic philosophical revolution challenged this structure by internaliz
 
 Buddhist monastic organization developed alternative governance structures based on collective decision-making and codified regulations. The *sangha* operated through periodic assemblies (*uposatha*) where monks confessed infractions, debated doctrinal points, and resolved disputes. Major decisions required consensus, with elaborate voting procedures for ordaining new members or expelling transgressors. This was remarkably egalitarian compared to hierarchical Brahmanical systems—in principle, all fully ordained monks had equal voice regardless of background.
 
-```
+```text
 BUDDHIST SANGHA GOVERNANCE
 
 MEMBERSHIP TIERS:
@@ -394,7 +394,7 @@ The Buddhist economic model was parasitic-symbiotic with lay society. Monks reno
 
 Confucian philosophical architecture rested on the claim that social harmony emerges from cultivated virtue rather than legal coercion. The *Analects* structured this argument through pithy dialogues between Confucius and disciples exploring concepts like *ren* (benevolence), *yi* (righteousness), *li* (ritual propriety), and *xiao* (filial piety). These were not abstract virtues but practical dispositions meant to guide behavior in specific social contexts.
 
-```
+```text
 CONFUCIAN VIRTUE HIERARCHY
 
 FOUNDATIONAL:

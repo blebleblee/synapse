@@ -106,7 +106,7 @@ The final term—electron-electron repulsion, with $r_{12} = |\mathbf{r}_1 - \ma
 
 The solution architectures in modern quantum chemistry form a well-defined hierarchy, ordered by both accuracy and computational cost.
 
-```
+```text
 Full Many-Electron Problem
 │
 │   Exact: H, He (analytical)

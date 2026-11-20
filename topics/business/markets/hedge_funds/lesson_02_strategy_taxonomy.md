@@ -70,7 +70,7 @@ Quantitative long/short equity strategies employ similar mechanical principles a
 
 The diagram below illustrates how different strategy types map to the alpha-beta decomposition framework:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Alpha-Beta Decomposition Mapping              │
 ├─────────────────────────────────────────────────────────────────┤

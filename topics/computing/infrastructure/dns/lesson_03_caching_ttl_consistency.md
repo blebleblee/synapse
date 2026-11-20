@@ -33,7 +33,7 @@ The TTL countdown mechanism operates through one of two implementation strategie
 
 When a recursive resolver receives a query, it first performs a cache lookup using the QNAME, QTYPE, and QCLASS tuple. If a matching entry exists and has not yet expired—determined by comparing current time against the expiration timestamp—the resolver constructs a response packet containing the cached RRset but crucially must adjust the TTL values in the response to reflect remaining time rather than the original TTL. This TTL decrementing requirement in responses prevents downstream caches from extending the lifetime of stale data beyond the authoritative server's intent. If example.com was cached 1800 seconds ago with an original TTL of 3600, the resolver must return the record with TTL 1800 to downstream clients. Failure to implement proper TTL decrementing creates pathological scenarios where records propagate through multiple caching layers with constant TTLs, effectively extending their lifetime indefinitely through cache chaining.
 
-```
+```text
 TTL Countdown Flow:
 
 T₀: Authoritative Server Returns Record
@@ -85,7 +85,7 @@ Aggressive cache prefetching addresses TTL expiration misses for high-traffic do
 
 Implementing cache prefetching requires careful consideration of query timing to avoid thundering herd effects where multiple resolver instances simultaneously refresh the same expiring entry. One robust approach uses deterministic jittering based on hashing the domain name combined with resolver instance identity to distribute refresh queries across a time window. For a domain with TTL 3600 seconds and prefetch trigger at twenty-five percent remaining (900 seconds before expiration), the resolver calculates a refresh window spanning from 1000 to 900 seconds before expiration, selecting a specific refresh time within that window using a deterministic hash function. This ensures different resolver instances naturally stagger their refresh queries without requiring distributed coordination.
 
-```
+```text
 Prefetch Logic Pseudocode:
 
 function check_prefetch_candidates():
@@ -113,7 +113,7 @@ Negative caching optimization focuses on protecting resolver infrastructure from
 
 RFC 8198 introduces aggressive negative caching using DNSSEC-authenticated denial of existence through NSEC and NSEC3 records. When a resolver receives an NXDOMAIN response with DNSSEC signatures and NSEC records proving that no names exist in a specific range, it can cache not just the specific queried name but the entire authenticated gap. Future queries for any name falling within that proven-empty range receive immediate NXDOMAIN responses without network traffic. This cryptographically-authenticated range caching transforms negative caching from per-name to per-zone-region granularity, dramatically improving defense against random subdomain attacks while requiring DNSSEC deployment by authoritative zones.
 
-```
+```text
 Aggressive Negative Caching (NSEC Range):
 
 Query: random1.example.com (NXDOMAIN)
@@ -134,7 +134,7 @@ Monitoring and observability for DNS caching systems must capture both the resol
 
 Cache poisoning defenses in production resolvers layer multiple randomization and validation techniques to exponentially increase attack difficulty. Source port randomization spreads outbound queries across the full ephemeral port range (32768–60999 on Linux systems), adding approximately fifteen bits of entropy beyond the sixteen-bit transaction ID. DNS0x20 encoding randomizes the case of ASCII letters in query names, then validates that responses preserve this randomization, encoding an additional entropy channel that off-path attackers cannot predict. Combined, these techniques expand the effective keyspace an attacker must brute-force from 2^16 (65536 possibilities) to approximately 2^31 or higher, transforming practical attacks into computationally infeasible endeavors.
 
-```
+```text
 Port Randomization Implementation:
 
 # Outbound query construction
@@ -163,7 +163,7 @@ The operational overhead of DNSSEC includes increased response sizes due to sign
 
 Cache flushing operations during security incidents or troubleshooting require surgical precision to avoid cascading failures. Flushing the entire resolver cache forces every subsequent query to perform full recursive resolution, potentially overloading authoritative infrastructure and creating a self-induced denial of service. Production incident response procedures implement targeted flushing that removes only specific problematic domains or zone-level subtrees while preserving cache state for unaffected infrastructure. Modern resolver management APIs expose fine-grained cache control interfaces allowing operators to flush by domain suffix, query type, or even individual resource records. Some resolvers implement negative flushing that removes only negative cache entries, useful during rapid new subdomain provisioning scenarios where stale NXDOMAIN entries block legitimate traffic without affecting cached positive records.
 
-```
+```text
 Surgical Cache Flush Examples:
 
 # Flush specific domain and all subdomains (Unbound)

@@ -54,7 +54,7 @@ The proof calculus operates through assumption discharge, a mechanism that tempo
 
 Consider a concrete derivation illustrating the difference between classical and intuitionistic logic. Classically, we can prove ¬¬(A ∨ ¬A)—the double negation of excluded middle—by assuming ¬(A ∨ ¬A) and deriving a contradiction. In intuitionistic logic, this proof remains valid:
 
-```
+```text
 1. | [¬(A ∨ ¬A)]      Assumption
 2. | | [A]             Assumption
 3. | | A ∨ ¬A          ∨I, 2

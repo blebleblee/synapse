@@ -34,7 +34,7 @@ Rollup aggregation applies a designated aggregation function—determined by met
 
 The rollup interval selected during query evaluation critically determines the temporal resolution of returned data. When constructing a dashboard graph spanning the past 24 hours, Datadog must decide how many datapoints to return to the frontend visualization library. Returning one point per ten seconds would yield 8,640 points, exceeding typical browser rendering budgets. Instead, the query engine selects a rollup interval balancing temporal fidelity and payload size, perhaps choosing 300-second (five-minute) windows to produce 288 points. The query language exposes explicit rollup control via the `.rollup()` function, allowing operators to specify both the interval and aggregation method.
 
-```
+```text
 avg:system.cpu.user{env:prod}.rollup(avg, 300)
 ```
 
@@ -44,7 +44,7 @@ This query computes the average CPU user time across all production hosts, rolli
 
 Datadog's query evaluator processes metric expressions through a rigidly defined phase sequence that encodes semantic invariants about aggregation precedence. Consider the query:
 
-```
+```text
 avg:avg:system.mem.used{env:prod} by {host}
 ```
 
@@ -56,7 +56,7 @@ The evaluation proceeds in three distinct stages, each transforming the result s
 
 Contrast this with:
 
-```
+```text
 avg:avg:system.mem.used{env:prod}
 ```
 
@@ -64,13 +64,13 @@ Omitting the `by` clause triggers global space aggregation. After temporal rollu
 
 The semantic distinction between temporal and space aggregation becomes stark when considering non-commutative functions. The query:
 
-```
+```text
 max:avg:system.cpu.user{service:api}
 ```
 
 computes the maximum CPU user time across all API service hosts after first averaging each host's samples within rollup intervals. This yields the peak per-host average CPU, identifying which host exhibited the highest average load. Conversely:
 
-```
+```text
 avg:max:system.cpu.user{service:api}
 ```
 
@@ -78,7 +78,7 @@ first computes the maximum CPU sample within each rollup interval for each host 
 
 **Phase Three: Arithmetic and Functions.** After temporal rollup and space aggregation, the query engine supports arithmetic operations, boolean logic, and scalar transformations. The query:
 
-```
+```text
 ( sum:system.net.bytes_rcvd{env:prod} + sum:system.net.bytes_sent{env:prod} ) / 1000000
 ```
 
@@ -96,7 +96,7 @@ Distributions store sketches at discrete timestamps and do not interpolate missi
 
 Operators can override interpolation behavior using the `.fill()` function:
 
-```
+```text
 avg:system.load.1{env:prod}.fill(null)
 ```
 
@@ -110,7 +110,7 @@ Datadog's backend imposes cardinality limits to prevent individual metrics from 
 
 The query language provides cardinality estimation and reduction tools. The `top()` and `bottom()` functions select a subset of series ranked by a summary statistic:
 
-```
+```text
 top(avg:system.cpu.user{env:prod} by {host}, 10, 'mean', 'desc')
 ```
 
@@ -130,7 +130,7 @@ Distribution queries incur additional overhead due to sketch merging. Each distr
 
 The phase-ordering invariants of temporal rollup followed by space aggregation create correctness hazards when combining non-commutative functions. Percentile calculations are the most notorious failure mode. The query:
 
-```
+```text
 p95:system.mem.pct_usable{env:prod}
 ```
 
@@ -138,7 +138,7 @@ applied to a classic histogram metric computes the 95th percentile within each r
 
 The correct approach mandates distribution metrics:
 
-```
+```text
 p95:dist.mem.pct_usable{env:prod}
 ```
 
@@ -168,7 +168,7 @@ Datadog's query backend operates under strict latency and memory budgets. Querie
 
 Proactive query optimization begins with tag filter specificity. The query:
 
-```
+```text
 avg:aws.ec2.cpuutilization{*}
 ```
 
@@ -176,7 +176,7 @@ matches every EC2 instance across all AWS accounts, regions, and availability zo
 
 For exploratory ad-hoc queries over high-cardinality metrics, the `topk()` function provides a safety valve:
 
-```
+```text
 topk(avg:http.requests{*} by {endpoint}, 20)
 ```
 

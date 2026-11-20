@@ -124,7 +124,7 @@ LTL embeds into CTL* by wrapping any LTL formula $\phi$ as $\mathbf{A}\phi$, sin
 
 ### The Expressive Hierarchy: A Formal Diagram
 
-```
+```text
                            CTL*
                           /    \
                         CTL    LTL

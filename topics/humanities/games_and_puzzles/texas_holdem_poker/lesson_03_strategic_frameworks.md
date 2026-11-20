@@ -54,7 +54,7 @@ The concept of minimum defense frequency provides a complementary perspective. W
 
 Range organization can be visualized through a matrix representation where rows represent hand categories (premium pairs, strong broadways, suited connectors, suited aces, offsuit broadways, weak pairs, weak aces) and columns represent actions (open, call, fold, three-bet, four-bet). Each cell contains a frequency value. For an under-the-gun opening range:
 
-```
+```text
 Hand Category          | Open % | Call % | Fold % | Notes
 -----------------------|--------|--------|--------|------------------------
 AA-QQ                  | 100    | 0      | 0      | Always open, never flat

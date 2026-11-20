@@ -38,7 +38,7 @@ Martingale construction under the risk-neutral measure Q proceeds through the Gi
 
 The operational architecture for a production derivatives pricing system organizes around the following data flow:
 
-```
+```text
 Market Data Feed (tick prices, volatility surface)
          ↓
 Calibration Engine (fit model parameters to market observables)

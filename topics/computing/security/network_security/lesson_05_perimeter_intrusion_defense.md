@@ -30,7 +30,7 @@ The core invariant across all perimeter defenses is the principle of layered sec
 
 Packet filtering operates on a linear rule set where each rule specifies match criteria and an action. The firewall evaluates rules in order, and the first match determines the packet's fate. A typical rule contains five-tuple match fields (source IP, destination IP, protocol, source port, destination port) and an action (accept, drop, or reject).
 
-```
+```text
 Rule 1: src=192.168.1.0/24 dst=any proto=tcp dport=443 action=accept
 Rule 2: src=192.168.1.0/24 dst=any proto=tcp dport=80  action=accept
 Rule 3: src=192.168.1.0/24 dst=any proto=any dport=any action=drop
@@ -137,7 +137,7 @@ This architecture introduces significant latency because the firewall cannot for
 
 Signature-based IDS relies on pattern matching against a rule database. A signature specifies protocol filters, packet content patterns, and metadata. A Snort rule for detecting SQL injection might appear as:
 
-```
+```text
 alert tcp any any -> any 80 (msg:"SQL Injection Attempt"; 
   flow:to_server,established; 
   content:"UNION"; nocase; 
@@ -167,7 +167,7 @@ The performance bottleneck is the pattern matching stage. A signature database w
 
 Anomaly-based IDS constructs a baseline profile during a training phase, then compares operational metrics against this profile. A simple approach models packet size distribution using a Gaussian mixture model. During training, the IDS observes packet sizes over a representative period and fits the distribution:
 
-```
+```text
 P(size) = Σ w_k * N(μ_k, σ_k²)
 ```
 
@@ -211,7 +211,7 @@ flowchart LR
 
 Firewall 1 rules permit inbound traffic to DMZ services:
 
-```
+```text
 allow tcp any -> dmz_subnet port 80,443
 allow tcp any -> dmz_subnet port 25 (mail relay)
 allow udp any -> dmz_subnet port 53 (DNS)
@@ -220,7 +220,7 @@ deny all else
 
 Firewall 2 rules restrict DMZ-to-internal communication:
 
-```
+```text
 allow tcp dmz_web_server -> internal_db_server port 3306 (MySQL)
 deny tcp dmz_subnet -> internal_lan any
 deny udp dmz_subnet -> internal_lan any

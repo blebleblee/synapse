@@ -313,7 +313,7 @@ A performance budget establishes quantitative targets for latency, throughput, a
 
 The budget allocation process mirrors financial budgeting. The total latency budget is divided among system components—database queries might receive 20ms, business logic 15ms, rendering 10ms, network overhead 5ms. Within each component, individual operations receive sub-budgets. A database query budget might allocate 5ms to primary key lookups, 10ms to indexed range queries, and prohibit full table scans. This hierarchical decomposition makes performance requirements concrete at every level of the architecture.
 
-```
+```text
 Example Performance Budget: E-commerce Checkout Flow
 
 Total Latency Budget: 500ms (95th percentile)

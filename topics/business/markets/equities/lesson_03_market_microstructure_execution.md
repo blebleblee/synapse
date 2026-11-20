@@ -24,7 +24,7 @@ The limit order book (LOB) is the central data structure of a continuous double-
 
 Each price level on the book is itself a queue. Within a given price level, orders are typically ordered first by time of arrival under price-time priority, though some venues also implement pro-rata matching or size-pro-rata hybrid schemes, as described below. A simplified representation of the LOB for a hypothetical equity mid-session might look like this:
 
-```
+```text
 ASK SIDE
 Price     Qty (shares)   # Orders
 $150.08   2,400          6

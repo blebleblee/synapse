@@ -353,12 +353,12 @@ Implement a piecewise model that switches between different behavioral regimes b
 **Regime 3 (Utilization ≥ 0.95)**: Implement queue growth model with overflow: Wait_Time(t) = Wait_Time(t−1) + (Arrival_Rate − Service_Rate) × 0.25, where Service_Rate = Capacity / 0.25. Additionally, implement overflow valve: when Wait_Time exceeds 8 hours, divert 30% of arrivals to alternative care sources, reducing effective Arrival_Rate.
 
 Implement this piecewise model in your spreadsheet using IF statements:
-```
+```text
 =IF(Utilization<0.85, 0.25/(1-Utilization), IF(Utilization<0.95, 0.25/(1-Utilization)^1.5, Previous_Wait_Time + (Arrival_Rate - Capacity/0.25)*0.25))
 ```
 
 Additionally, modify the Arrival Rate equation for Regime 3:
-```
+```text
 =IF(Wait_Time>8, Arrival_Rate*0.7, Arrival_Rate)
 ```
 

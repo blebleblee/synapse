@@ -144,7 +144,7 @@ sudo bpftrace -e 'BEGIN { printf("bpftrace OK\n"); exit(); }'
 
 Expected output for `lspci -nnk` on a QEMU/KVM guest:
 
-```
+```text
 00:03.0 Ethernet controller [0200]: Intel Corporation 82540EM Gigabit Ethernet [8086:100e]
         Kernel driver in use: e1000
         Kernel modules: e1000
@@ -259,7 +259,7 @@ sudo ethtool -c enp0s3
 sudo ethtool -g enp0s3
 ```
 
-```
+```text
 Ring parameters for enp0s3:
 Pre-set maximums:
 RX:         4096
@@ -942,7 +942,7 @@ Production driver code must be validated with the kernel's built-in sanitizers. 
 
 KASAN detects out-of-bounds accesses and use-after-free in kernel memory. Enable with `CONFIG_KASAN=y`, `CONFIG_KASAN_GENERIC=y`. When a violation occurs, KASAN prints a full report to `dmesg`:
 
-```
+```text
 ==================================================================
 BUG: KASAN: slab-out-of-bounds in e1000_clean_rx_irq+0x1a2/0x4f0 [e1000]
 Read of size 4 at addr ffff888112345678 by task ksoftirqd/0/18

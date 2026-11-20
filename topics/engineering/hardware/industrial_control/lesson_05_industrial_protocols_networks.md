@@ -34,7 +34,7 @@ EtherCAT's application layer implements distributed clocks for nanosecond-precis
 
 The internal structure of a CAN frame exposes the protocol's priority arbitration mechanism at the bit level. Each frame begins with a start-of-frame bit, immediately followed by the 11-bit standard identifier or 29-bit extended identifier. During arbitration, all nodes simultaneously transmit their identifier bits, monitoring the bus state after each bit cell. The identifier encodes both message content and priority, with lower numerical values representing higher priority—a consequence of the dominant-zero electrical convention. Consider three nodes simultaneously attempting transmission with identifiers 0x123, 0x124, and 0x125 in binary. All three transmit identical bits for positions 10 through 3. At bit position 2, node 0x123 transmits dominant while the others transmit recessive. Nodes 0x124 and 0x125 observe the dominant bus state contradicting their recessive transmission and immediately cease, entering receive mode. Node 0x123 completes its transmission uncontested. This bitwise arbitration requires no collision detection or recovery protocol; the highest-priority message experiences zero arbitration delay.
 
-```
+```text
 CAN Standard Frame Structure (11-bit identifier):
 
 |SOF|---Identifier---|RTR|IDE|r0|DLC|---Data Payload---|---CRC---|ACK|EOF|
@@ -61,7 +61,7 @@ The CAN data link layer implements sophisticated error detection through five co
 
 Modbus frame encapsulation varies between serial (RTU and ASCII variants) and Ethernet (Modbus TCP) implementations. Modbus RTU, the dominant serial encoding, structures each frame as a slave address byte, function code byte, variable-length data field, and 16-bit CRC. The protocol defines no explicit start-of-frame delimiter; instead, receivers detect frame boundaries through inter-character timing. The specification mandates a silent interval of at least 3.5 character times between frames at the configured baud rate. A slave monitoring the bus accumulates received bytes until detecting a gap exceeding 3.5 character times, then processes the accumulated buffer as a complete frame. This timing-based framing creates a critical implementation constraint: the serial UART hardware must provide precise interrupt timing or FIFO buffering to prevent character loss during burst reception.
 
-```
+```text
 Modbus RTU Frame Structure:
 
 Silent (≥3.5 char) | Address | Function | Data | CRC-16 | Silent (≥3.5 char)
@@ -93,7 +93,7 @@ Timing analysis at 19200 baud:
 
 Profibus-DP token passing introduces a logical ring topology overlaid on the physical bus. Active masters form a consecutive address sequence; when a master completes its allocated tasks, it transmits a token frame to the numerically next master address. The token frame contains the destination address and a simple checksum. Upon receiving the token, the new token holder gains bus mastership for a configured duration specified by the slot time parameter. During its slot, the master polls assigned slaves, issuing read or write data frames. Slaves respond within a fixed timeout; if no response arrives, the master retransmits up to a configured retry count before marking the slave as failed. This deterministic scheduling permits precise calculation of worst-case token rotation time: sum each master's maximum slot time plus the token-passing overhead multiplied by the number of masters.
 
-```
+```text
 Profibus-DP Token Passing Sequence:
 
 Master 1 [slot time: 2ms] → Token → Master 2 [slot time: 3ms] → Token → Master 3 [slot time: 1ms] → Token → Master 1 ...
@@ -124,7 +124,7 @@ The Profibus physical layer employs RS-485 differential signaling with specific 
 
 EtherCAT's processing-on-the-fly architecture demands detailed examination. Each slave ASIC contains dedicated field-programmable gate array logic implementing a four-port Ethernet switch with specialized datagram processing units. When a frame enters the slave's first port, the ASIC analyzes the EtherCAT header to identify relevant datagrams—self-contained data units within the larger Ethernet frame. Each datagram contains an addressing mode (position-based, node-based, or logical), offset, and data length. The slave's processing unit checks if the datagram targets its assigned memory region. If matched, the ASIC performs the read or write operation directly to dual-port RAM accessible by the slave's microcontroller, then updates a working counter field in the datagram to indicate successful processing. This operation completes in hardware within tens of nanoseconds. The modified frame continues propagating to the next slave without software intervention.
 
-```
+```text
 EtherCAT Frame Structure (simplified):
 
 Ethernet Header | EtherCAT Header | Datagram 1 | Datagram 2 | ... | Datagram N | FCS
@@ -158,7 +158,7 @@ Compare to traditional switched Ethernet (100 slaves, 5 switches):
 
 EtherCAT distributed clocks implement nanosecond synchronization through hardware timestamping at the physical layer. The master designates one slave as the reference clock, typically the first slave in the chain. During initialization, the master measures the propagation delay to each slave by transmitting a broadcast read datagram containing a timestamp. Each slave captures the frame arrival time in its local clock domain and inserts this timestamp into the datagram. The master receives the modified frame and computes the round-trip delay to each slave. Assuming symmetric propagation (valid for full-duplex links), half the round-trip delay estimates the one-way delay. The master then distributes offset corrections to each slave, instructing them to adjust their local clocks to compensate for propagation differences. This synchronization repeats periodically to compensate for clock drift, achieving alignment within ±100 nanoseconds across the entire network.
 
-```
+```text
 Distributed Clock Synchronization Sequence:
 
 1. Reference Clock Selection:

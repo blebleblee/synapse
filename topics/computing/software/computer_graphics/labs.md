@@ -10,7 +10,7 @@ The exercises are written in Rust and C++. Rust provides ownership-enforced memo
 
 Install `rustup` first. It manages the Rust toolchain and gives you `cargo`, `rustc`, and `rustfmt` in one shot.
 
-```
+```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 source $HOME/.cargo/env
 rustup install nightly
@@ -19,7 +19,7 @@ rustup component add rust-src llvm-tools-preview
 
 Install LLVM/Clang and the supporting native toolchain on Debian/Ubuntu:
 
-```
+```text
 sudo apt-get update
 sudo apt-get install -y clang llvm lld lldb valgrind \
     linux-perf libasan6 libtsan0 \
@@ -29,14 +29,14 @@ sudo apt-get install -y clang llvm lld lldb valgrind \
 
 Install `cargo-flamegraph` and `cargo-asm`:
 
-```
+```text
 cargo install flamegraph
 cargo install cargo-show-asm
 ```
 
 Verify the full stack is wired together:
 
-```
+```text
 rustc --version
 clang --version
 lldb --version
@@ -60,7 +60,7 @@ The objective of this exercise is threefold: inspect the Rust compiler's MIR (Mi
 
 Create a new Cargo project:
 
-```
+```text
 cargo new --lib vtransform
 cd vtransform
 ```
@@ -240,7 +240,7 @@ mod tests {
 
 Run the tests first to confirm correctness:
 
-```
+```text
 cargo test
 ```
 
@@ -250,7 +250,7 @@ All four tests must pass before you proceed to IR inspection. Never inspect the 
 
 Rust's MIR is the control-flow graph the borrow checker operates on. It is desugared from the source but not yet lowered to LLVM IR. Reading it teaches you how the compiler models ownership, borrows, and panics before any optimization occurs.
 
-```
+```text
 RUSTFLAGS="--emit=mir" cargo build --release 2>/dev/null
 find target/ -name "*.mir" | head -5
 ```
@@ -259,7 +259,7 @@ Open the MIR file for `vtransform`. The `transform_vertices` function in MIR wil
 
 ### Dumping the LLVM IR
 
-```
+```text
 RUSTFLAGS="--emit=llvm-ir -C opt-level=3 -C target-cpu=native" \
     cargo build --release 2>/dev/null
 find target/ -name "*.ll" | xargs grep -l "transform_vertices"
@@ -267,7 +267,7 @@ find target/ -name "*.ll" | xargs grep -l "transform_vertices"
 
 Open the `.ll` file and search for `transform_vertices`. You will find the inner loop body expressed as a sequence of `fmul` and `fadd` instructions operating on `float` scalars. If LLVM's loop vectorizer ran (which it should at `-O3` with `target-cpu=native`), you will instead see `<4 x float>` vector types and `shufflevector` instructions interleaving the four multiply-accumulate chains into a single SIMD lane. The vectorization report can be surfaced explicitly:
 
-```
+```text
 RUSTFLAGS="-C opt-level=3 -C target-cpu=native \
     -C llvm-args=-rpass=loop-vectorize \
     -C llvm-args=-rpass-missed=loop-vectorize" \
@@ -280,7 +280,7 @@ A vectorization miss at this point is a serious finding. The most common cause i
 
 `cargo-show-asm` queries the compiler for the final object code without requiring you to locate the binary manually:
 
-```
+```text
 cargo asm --release vtransform::transform_vertices
 ```
 
@@ -322,7 +322,7 @@ void transform_vertices(const Mat4* __restrict__ mvp,
 }
 ```
 
-```
+```text
 clang++ -O3 -march=native -ffast-math -S -o vtransform.s vtransform.cpp
 grep -E "vmulps|vfmadd|vaddps|vmovups" vtransform.s | head -20
 ```
@@ -343,7 +343,7 @@ This exercise implements two versions of a software rasterizer's depth buffer up
 
 Create a second Cargo project:
 
-```
+```text
 cargo new --lib depthbuf
 cd depthbuf
 ```
@@ -525,7 +525,7 @@ mod tests {
 }
 ```
 
-```
+```text
 cargo test
 ```
 
@@ -605,7 +605,7 @@ criterion_group!(benches, bench_depth_strategies);
 criterion_main!(benches);
 ```
 
-```
+```text
 cargo bench
 ```
 
@@ -615,7 +615,7 @@ You should observe that `sequential` runs in roughly 1–3 ms on a modern laptop
 
 Criterion reports wall time. To confirm the cache miss hypothesis rather than simply observing the timing difference, use `perf stat`:
 
-```
+```text
 cargo build --release --benches
 perf stat -e cache-references,cache-misses,L1-dcache-loads,\
 L1-dcache-load-misses,LLC-loads,LLC-load-misses \
@@ -626,7 +626,7 @@ L1-dcache-load-misses,LLC-loads,LLC-load-misses \
 
 Repeat with `strided`:
 
-```
+```text
 perf stat -e cache-references,cache-misses,L1-dcache-loads,\
 L1-dcache-load-misses,LLC-loads,LLC-load-misses \
     target/release/deps/depth_bench-* \
@@ -638,7 +638,7 @@ Compare `L1-dcache-load-misses` between the two runs. For the strided case you s
 
 ### Generating a Flame Graph
 
-```
+```text
 cargo flamegraph --bench depth_bench -- \
     --bench depth_buffer/strided/1920x1080 --profile-time 10
 ```
@@ -759,14 +759,14 @@ int main() {
 
 Compile and run without sanitizers first to observe that the program appears to work correctly:
 
-```
+```text
 clang++ -O1 -g -std=c++17 -pthread -o tilerender tilerender.cpp
 ./tilerender
 ```
 
 Now compile and run with ThreadSanitizer:
 
-```
+```text
 clang++ -O1 -g -fsanitize=thread -std=c++17 -pthread \
         -o tilerender_tsan tilerender.cpp
 ./tilerender_tsan
@@ -774,7 +774,7 @@ clang++ -O1 -g -fsanitize=thread -std=c++17 -pthread \
 
 ThreadSanitizer will emit a report similar to the following:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=XXXXX)
   Write of size 4 at 0x... by thread T5:
     #0 render_tile(Framebuffer*, int, int, int, int) tilerender.cpp:44
@@ -791,7 +791,7 @@ The report names the exact source line, the two threads involved, and the memory
 
 Create a new Cargo project:
 
-```
+```text
 cargo new --lib tilerust
 cd tilerust
 ```
@@ -968,13 +968,13 @@ mod tests {
 
 Run the safe tests:
 
-```
+```text
 cargo test
 ```
 
 Now run with ThreadSanitizer to exercise the `unsafe` path. TSAN requires the nightly toolchain and the `rust-src` component that you installed during setup:
 
-```
+```text
 RUSTFLAGS="-Z sanitizer=thread" \
     cargo +nightly test --target x86_64-unknown-linux-gnu -- \
     --nocapture 2>&1 | head -60
@@ -994,7 +994,7 @@ fn main() {
 }
 ```
 
-```
+```text
 RUSTFLAGS="-Z sanitizer=thread" \
     cargo +nightly run --bin race_demo \
     --target x86_64-unknown-linux-gnu 2>&1 | head -40
@@ -1043,14 +1043,14 @@ int main() {
 }
 ```
 
-```
+```text
 clang++ -O1 -g -fsanitize=address -o asan_demo asan_demo.cpp
 ./asan_demo
 ```
 
 ASAN will halt execution and print a detailed report:
 
-```
+```text
 ==XXXXX==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x...
 WRITE of size 4 at 0x... thread T0
     #0 fill_span asan_demo.cpp:18
@@ -1140,7 +1140,7 @@ echo ""
 echo "Any FAIL above must be resolved before running the lab exercises."
 ```
 
-```
+```text
 chmod +x verify_toolchain.sh
 ./verify_toolchain.sh
 ```

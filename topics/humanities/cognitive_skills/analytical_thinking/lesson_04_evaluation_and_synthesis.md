@@ -24,7 +24,7 @@ The practical execution of evaluation and synthesis requires mastery of four dis
 
 The validity assessment engine processes natural language arguments through a three-stage pipeline: formalization, structural analysis, and fallacy detection. The formalization stage translates prose arguments into canonical logical forms that expose their underlying structure. Consider the argument: "We should implement strict data privacy regulations because major technology companies have repeatedly violated user trust, and without regulatory oversight, profit-maximizing firms will always prioritize revenue over user rights." Formalization extracts the core logical structure:
 
-```
+```text
 Premise 1: Technology companies have repeatedly violated user trust
 Premise 2: Without regulatory oversight, profit-maximizing firms prioritize revenue over user rights
 Implicit Premise 3: User trust violations indicate prioritization of revenue over rights

@@ -24,7 +24,7 @@ For hardware security researchers and embedded engineers, the practical implicat
 
 SELinux does not exist as a monolithic kernel module that intercepts system calls by patching syscall handlers. It operates through the **Linux Security Module** framework, a series of hook functions embedded throughout the kernel at security-relevant decision points. The LSM framework was itself designed to accommodate multiple MAC implementations, and SELinux uses it to register callbacks that the kernel calls before completing any security-sensitive operation: opening a file, creating a socket, sending a signal, loading a kernel module. The architectural relationship between a system call, the LSM hooks, and the SELinux decision engine looks like this:
 
-```
+```text
 Userspace Process
        │
        │  syscall (e.g., open(2))

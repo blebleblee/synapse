@@ -66,7 +66,7 @@ Write behavior deserves explicit attention. L1 caches are almost universally **w
 
 The prefetch engine is not a single unit. Intel's microarchitecture exposes at least four distinct prefetchers: the L1 Streamer (detects forward and backward sequential access), the L1 Stride Prefetcher (detects constant-stride patterns in a specific IP context), the L2 Streamer (operates on L2 miss streams), and the L2 Spatial Prefetcher (speculatively fills neighboring cache lines in the same 4 KB page). These are independent engines with separate hardware tables tracking access histories indexed by instruction pointer. The important engineering implication is that the stride prefetcher operates per-PC (instruction pointer), so a single load instruction touching memory at a constant stride will train it correctly, while a function that handles varying strides from different call sites may confuse it.
 
-```
+```text
 Access Pattern vs. Prefetch Effectiveness:
 
 Pattern: A[0], A[1], A[2], A[3]...     (stride 8B)

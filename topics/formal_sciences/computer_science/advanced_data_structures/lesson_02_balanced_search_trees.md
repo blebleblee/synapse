@@ -48,7 +48,7 @@ for a fixed balance parameter $\alpha \in (1 - 1/\sqrt{2},\ 1/\sqrt{2}) \approx 
 
 The rotation is the primitive operation underlying every BST rebalancing scheme. A **right rotation** at node $y$ promotes $y$'s left child $x$ to $y$'s position, making $y$ the right child of $x$ and $x$'s former right subtree $B$ the left subtree of $y$. The operation preserves the BST order property because the original in-order sequence $(\text{left}(x), x, B, y, \text{right}(y))$ is preserved after the rotation:
 
-```
+```text
       y                x
      / \              / \
     x   C    →       A   y
@@ -90,7 +90,7 @@ The total cost is $O(\log n)$ for traversal plus $O(1)$ rotations at termination
 
 Every 2-3-4 tree has a corresponding red-black tree, and vice versa. The correspondence maps each 2-3-4 node to a small cluster of red-black nodes: a 2-node (one key, two children) becomes a single black node. A 3-node (two keys $a < b$, three children) becomes a black node with key $b$ and a red left child with key $a$, or equivalently a black node with key $a$ and a red right child with key $b$. A 4-node (three keys $a < b < c$, four children) becomes a black node with key $b$, a red left child with key $a$, and a red right child with key $c$.
 
-```
+```text
 2-node: [B]           →    B(black)
 
 3-node: [A|B]         →    B(black)
@@ -116,7 +116,7 @@ B-tree insertion uses a **proactive split** strategy to avoid a second upward pa
 
 A new node $z$ is allocated. The upper $t-1$ keys of $y$ (positions $t+1$ through $2t-1$) move to $z$, along with $y$'s upper $t$ children. The median key $y.\text{key}[t]$ moves up into $x$ at position $i$. Node $y$ now holds $t-1$ keys. This split increases the number of nodes by one and may propagate upward, but because every full node was split on the way down, the parent of any node being split is guaranteed to have room for the promoted median key.
 
-```
+```text
 Before split of y (full, 2t-1 keys):
      x: [..., k_i, k_{i+1}, ...]
             |

@@ -84,7 +84,7 @@ Do this setup pass monthly if you practice daily, or any time string gauge chang
 
 In any fixed position, each finger owns one fret, no shifting:
 
-```
+```text
 5th position:  finger 1 → fret 5
                finger 2 → fret 6
                finger 3 → fret 7
@@ -105,7 +105,7 @@ CAGED maps the five open-chord shapes (C, A, G, E, D) as movable templates cover
 
 **G major, all five CAGED positions, ascending the neck:**
 
-```
+```text
 G-shape (open, root 6th string open):
 e|--3--|
 B|--0--|
@@ -186,7 +186,7 @@ Wrapping the thumb over the top edge of the neck to fret or mute the low E is st
 
 Chromatic exercise, one string, strict down-up alternation:
 
-```
+```text
 E|--5-6-7-8--5-6-7-8--5-6-7-8--5-6-7-8--|
    ∏ V ∏ V   ∏ V ∏ V   ∏ V ∏ V   ∏ V ∏ V
 ```
@@ -209,7 +209,7 @@ When a passage moves across strings in one direction, sweep the pick through in 
 
 **A minor five-string sweep arpeggio:**
 
-```
+```text
 E|--------------------------------17-|
 B|---------------------------17-20---|
 G|---------------------17-19---------|
@@ -234,7 +234,7 @@ E|--17-20-----------------------------|
 
 **p-i-m-a arpeggio pattern (classical basic form):**
 
-```
+```text
 C major:
 e|-----0-------0-----|
 B|-------1-------1---|
@@ -257,7 +257,7 @@ Thumb (p) takes the bass note, index (i), middle (m), ring (a) take the top thre
 
 C major formula: W-W-H-W-W-W-H. Learn it as five overlapping box shapes so you're never stuck in one patch of the neck.
 
-```
+```text
 Position I (open):
 e|---0---1---3---|
 B|---0---1---3---|
@@ -326,7 +326,7 @@ Add the 7th (another third stacked on top) for jazz/soul harmony:
 
 A secondary dominant briefly treats a non-tonic chord as if it were a new tonic, using its own V7 to approach it. Notation: `V7/x` ("five-seven of x").
 
-```
+```text
 Key of C:  | C  | D7      | G  | C |
             I     V7/V      V    I
 ```
@@ -337,7 +337,7 @@ D7 contains F♯, outside the C major key — that borrowed tension pulls strong
 
 Borrowing a chord from the parallel minor key injects a quick shadow of darkness into a major progression.
 
-```
+```text
 Standard:  | C | F  | G | C |
 Borrowed:  | C | Fm | G | C |   (iv borrowed from C minor)
 ```

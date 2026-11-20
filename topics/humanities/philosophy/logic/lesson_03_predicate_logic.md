@@ -24,7 +24,7 @@ The semantic interpretation machinery constructs meaning through a three-stage p
 
 Satisfaction—the recursive truth definition—proceeds by structural induction on formula complexity. For an atomic formula P(t₁...tₙ), we evaluate each term tᵢ under interpretation I and assignment s to obtain domain elements, then check whether the resulting tuple belongs to I(P). Term evaluation interprets constants through I, variables through s, and function applications by recursively evaluating arguments then applying the interpreted function. The satisfaction relation, notated I ⊨_s φ (read "I satisfies φ under assignment s"), extends to complex formulas through the standard truth-functional clauses for connectives, then introduces novel clauses for quantifiers. The formula ∀x φ is satisfied by I under s if and only if I satisfies φ under every x-variant of s—that is, under every assignment s' differing from s at most in what it assigns to x. Dually, ∃x φ is satisfied if and only if I satisfies φ under at least one x-variant of s. These clauses capture the intuitive ranging behavior: universal quantifiers demand satisfaction across all domain elements, existential quantifiers require satisfaction for some witness element.
 
-```
+```text
 First-Order Satisfaction Recursion:
 
 Atomic:     I ⊨_s P(t₁...tₙ)  iff  〈I_s(t₁),...,I_s(tₙ)〉 ∈ I(P)

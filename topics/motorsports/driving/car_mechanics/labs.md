@@ -461,7 +461,7 @@ Common CAN arbitration IDs and signal definitions for generic ECU telemetry:
 
 Maintain a chronological record of all setup modifications with corresponding telemetry session references:
 
-```
+```text
 Date: 2025-04-15
 Circuit: Circuit de Barcelona-Catalunya
 Session: FP2 (Free Practice 2)

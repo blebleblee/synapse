@@ -34,7 +34,7 @@ Industrial transducers fall into several families, each with distinct conditioni
 
 A complete industrial measurement chain consists of several stages, each with a specific purpose. Understanding this cascade and the specifications at each stage is essential for successful system design.
 
-```
+```text
 [Sensor] → [Transimpedance/Bridge] → [Filter] → [PGA] → [ADC] → [Digital Filter & Scaling]
 ```
 

@@ -30,7 +30,7 @@ The bilateral controller implements one of several possible control architecture
 
 The wave variable transformation originated in the work of Niemeyer and Slotine at MIT in the early 1990s, reconceptualizing bilateral control through the lens of transmission line theory. Define wave variables encoding outgoing and reflected power flows:
 
-```
+```text
 u_m = (b * v_m + f_m) / sqrt(2 * b)
 u_s = (b * v_s - f_s) / sqrt(2 * b)
 ```
@@ -39,13 +39,13 @@ where `v_m` and `f_m` represent master velocity and force, `v_s` and `f_s` repre
 
 Time-domain passivity control takes a fundamentally different approach, monitoring the instantaneous power flow at both master and slave interfaces through numerical integration of the inner product of velocity and force vectors. Define the passivity observer as the time integral of power:
 
-```
+```text
 E_obs(t) = integral from 0 to t of (f(τ) · v(τ)) dτ
 ```
 
 When this observed energy becomes negative, the system has generated energy and violated passivity. A passivity controller injects damping proportional to the magnitude of negative energy, dissipating the excess and restoring passivity. Mathematically, this appears as an adaptive damping coefficient:
 
-```
+```text
 f_damping = -α * max(0, -E_obs) * v
 ```
 
@@ -61,7 +61,7 @@ The sensory feedback renderer integrates haptic, visual, auditory, and thermal m
 
 The coordinate transformation pipeline reconciles multiple reference frames: the master device base frame, the operator's head-mounted display frame, the slave robot base frame, and the task frame defining the manipulation goal. Operators naturally control slave motion relative to their visual perspective, requiring transformation of master device motions from the HMD frame to the slave base frame. For mobile manipulation tasks, the slave base frame itself moves relative to a global navigation frame, necessitating continuous state estimation through sensor fusion of wheel odometry, inertial measurement units, and SLAM-derived pose corrections. Frame misalignment—spatial discordance between visual and haptic reference frames—induces perceptual disorientation and degrades task performance measurably.
 
-```
+```text
 Immersive Teleoperation Signal Flow Architecture
 
 ┌─────────────────────────────────────────────────────────────────┐

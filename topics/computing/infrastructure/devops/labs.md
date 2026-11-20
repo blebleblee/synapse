@@ -428,7 +428,7 @@ CMD ["/shipit"]
 
 File: `.dockerignore`
 
-```
+```text
 .git
 .github
 .secrets
@@ -442,7 +442,7 @@ Dockerfile.naive
 
 File: `.gitignore`
 
-```
+```text
 dist/
 .secrets
 sbom*.json

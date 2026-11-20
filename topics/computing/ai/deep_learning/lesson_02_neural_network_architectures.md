@@ -4,7 +4,7 @@
 
 A neural network is a parameterized, differentiable function composition. Given an input vector **x** ∈ ℝⁿ, a network of *L* layers computes:
 
-```
+```text
 f(x) = f_L(f_{L-1}(... f_1(x)))
 ```
 
@@ -26,7 +26,7 @@ Before examining individual architectures, it is essential to understand what en
 
 Backpropagation applies the chain rule of calculus to compute ∂L/∂W_i for every weight matrix in the network:
 
-```
+```text
 ∂L/∂W_i = (∂L/∂a_L) · (∂a_L/∂a_{L-1}) · ... · (∂a_{i+1}/∂a_i) · (∂a_i/∂W_i)
 ```
 
@@ -40,7 +40,7 @@ The ReLU activation `σ(z) = max(0, z)` resolves vanishing gradients for positiv
 
 A 2-D convolution layer applies a bank of *C_out* learned filters of spatial extent *k × k* across a feature map of *C_in* channels. For input **X** ∈ ℝ^{C_in × H × W}, the output at spatial position (i, j) for output channel *c* is:
 
-```
+```text
 Y[c, i, j] = Σ_{c'} Σ_{p=0}^{k-1} Σ_{q=0}^{k-1} W[c, c', p, q] · X[c', i·s + p, j·s + q] + b[c]
 ```
 
@@ -154,7 +154,7 @@ def build_resnet50_stem() -> nn.Sequential:
 
 Sequential data violates the i.i.d. assumption that most feedforward models rely on. An RNN processes a sequence **x₁, x₂, ..., x_T** by maintaining a hidden state **h_t** that encodes all information seen up to step *t*:
 
-```
+```text
 h_t = σ(W_hh · h_{t-1} + W_xh · x_t + b_h)
 y_t = W_hy · h_t + b_y
 ```
@@ -225,7 +225,7 @@ graph TD
 
 **Gated Recurrent Unit (GRU).** Cho et al. (2014) proposed the GRU, which merges the forget and input gates into a single *update gate* z_t and eliminates the separate cell state. With fewer parameters, GRUs often match LSTM performance on shorter sequences and train faster:
 
-```
+```text
 z_t = σ(W_z · [h_{t-1}, x_t])        # update gate
 r_t = σ(W_r · [h_{t-1}, x_t])        # reset gate
 n_t = tanh(W · [r_t ⊙ h_{t-1}, x_t]) # candidate
@@ -344,7 +344,7 @@ Since Vaswani et al. (2017), the Transformer has supplanted RNNs as the dominant
 
 Given query matrix Q ∈ ℝ^{n×d_k}, key matrix K ∈ ℝ^{m×d_k}, and value matrix V ∈ ℝ^{m×d_v}:
 
-```
+```text
 Attention(Q, K, V) = softmax(Q·Kᵀ / √d_k) · V
 ```
 
@@ -352,7 +352,7 @@ The 1/√d_k scaling prevents the dot products from growing large in magnitude a
 
 **Multi-Head Attention** projects Q, K, V into *h* lower-dimensional subspaces, runs attention in parallel, then concatenates:
 
-```
+```text
 MultiHead(Q, K, V) = Concat(head_1, ..., head_h) · W_O
 head_i = Attention(Q·W_i^Q, K·W_i^K, V·W_i^V)
 ```
@@ -401,7 +401,7 @@ graph TD
 
 **Positional encoding** is necessary because attention is permutation-equivariant — it has no intrinsic notion of order. The original Transformer uses sinusoidal encodings:
 
-```
+```text
 PE(pos, 2i)   = sin(pos / 10000^{2i/d_model})
 PE(pos, 2i+1) = cos(pos / 10000^{2i/d_model})
 ```

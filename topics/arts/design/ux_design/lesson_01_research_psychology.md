@@ -36,7 +36,7 @@ The principle of progressive disclosure advocates revealing complexity gradually
 
 User research in the design context operates through a structured pipeline that transforms raw observation into actionable insights. Understanding this architecture is essential because the rigor with which research is conducted directly determines whether design decisions rest on evidence or assumption.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │  RESEARCH PIPELINE: FROM OBSERVATION TO DESIGN DECISION         │
 ├─────────────────────────────────────────────────────────────────┤

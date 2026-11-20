@@ -97,7 +97,7 @@ The master shot is a wide, continuous recording of the entire scene. It function
 
 Coverage expands from master with increasing magnification and selectivity:
 
-```
+```text
 Master (Wide) → Medium shots → Close-ups → Inserts
 ```
 
@@ -106,7 +106,7 @@ All cameras must remain on one side of an imaginary axis (the "line") connecting
 
 Mathematical basis: consistent angular relationships preserve relative positions in viewer's mental model.
 
-```
+```text
 Subject A ←——— line ———→ Subject B
      ↓                          ↓
 Camera hemisphere          Camera hemisphere
@@ -198,7 +198,7 @@ Violations can be motivated by:
 **The Pace Curve**
 Narrative typically follows rising tension architecture:
 
-```
+```text
 Act 1: Slower pace (exposition, character establishment)
   ↓ ASL: 6-8s, information density moderate
 Act 2: Accelerating pace (conflict escalation)

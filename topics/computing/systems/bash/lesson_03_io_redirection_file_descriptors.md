@@ -858,7 +858,7 @@ strace -c command arg1 arg2
 
 `strace` output for a simple `echo hello > /tmp/out.txt` reveals the full redirection mechanism:
 
-```
+```text
 openat(AT_FDCWD, "/tmp/out.txt", O_WRONLY|O_CREAT|O_TRUNC|O_CLOEXEC, 0666) = 3
 dup2(3, 1)                              = 1
 close(3)                                = 0

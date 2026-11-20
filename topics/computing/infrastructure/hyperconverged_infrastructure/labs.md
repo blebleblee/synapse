@@ -997,7 +997,7 @@ rados -p test-pool cleanup
 ```
 
 **Expected Results (3-node, 10GbE, SSD):**
-```
+```text
 Write:
   Bandwidth: ~400 MB/s (1200 MB/s total across 3 replicas ≈ 10Gbps network limit)
   Latency: 8-12ms

@@ -78,7 +78,7 @@ The periodical press created a continuous public discourse that operated faster 
 
 The mechanisms of public sphere operation can be schematized:
 
-```
+```text
 Information Flow Architecture:
 
 AUTHORS → CENSORSHIP → PUBLISHERS → DISTRIBUTION → READERS → DISCUSSION SPACES

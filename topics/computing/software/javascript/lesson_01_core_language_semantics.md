@@ -22,7 +22,7 @@ JavaScript's type system builds upon seven primitive types (`Undefined`, `Null`,
 
 Type coercion algorithms follow strict specification rules that cascade through operator evaluation. Consider the abstract equality operator `==`, which implements the following decision tree for operands `x` and `y`:
 
-```
+```text
 If Type(x) === Type(y): perform strict equality check
 If x is null and y is undefined (or vice versa): return true
 If x is Number and y is String: coerce y to Number, retry
@@ -40,7 +40,7 @@ Numeric coercion via `ToNumber` implements specific rules for each input type. S
 
 Prototype chains implement the fundamental mechanism for property access and inheritance. Every object maintains an internal `[[Prototype]]` reference accessible via `Object.getPrototypeOf()` or the non-standard but widely-implemented `__proto__` accessor. Property access follows this chain until finding the property or reaching `null`:
 
-```
+```text
 GetProperty(object, key):
   current = object
   while current !== null:
@@ -54,7 +54,7 @@ Setting a property never traverses the prototype chain for the write operationâ€
 
 Constructor functions and the `new` operator implement a mechanical translation of class-like patterns into prototype manipulation. When evaluating `new Constructor(args)`, the runtime performs this sequence:
 
-```
+```text
 1. Create new object: obj = Object.create(Constructor.prototype)
 2. Bind this to obj for the constructor call
 3. Execute: result = Constructor.apply(obj, args)
@@ -73,7 +73,7 @@ Execution contexts form a stack-based activation record system. Each function in
 
 Lexical environments implement nested scope through environment record chaining. When a function is created, it captures a reference to the lexical environment active at creation time (the "outer environment reference"). Identifier resolution walks from the current environment to outer environments until finding the binding or reaching the global environment:
 
-```
+```text
 ResolveBinding(identifier):
   env = current lexical environment
   while env !== null:
@@ -87,7 +87,7 @@ This structure enables closures: when a function object captures its creation en
 
 The event loop integrates synchronous JavaScript execution with asynchronous operations through a structured queuing system. The conceptual model consists of:
 
-```
+```text
 while (true) {
   task = dequeue_next_macrotask()
   if (task === null) break

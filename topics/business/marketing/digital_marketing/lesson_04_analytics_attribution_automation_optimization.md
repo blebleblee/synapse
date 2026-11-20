@@ -32,7 +32,7 @@ Enhanced e-commerce tracking extends basic conversion pixels with granular produ
 
 Attribution modeling implementation transforms the raw event stream into a structured journey dataset where each conversion links to its complete sequence of preceding marketing touchpoints. The data structure typically materializes as a conversion-level table where each row represents a single conversion event with array-valued columns containing the ordered sequence of touchpoint sources, mediums, campaigns, and timestamps that preceded it. A sample journey might encode as:
 
-```
+```text
 conversion_id: ORD-29384
 conversion_timestamp: 2024-01-15 14:32:18
 conversion_revenue: $127.50
@@ -66,7 +66,7 @@ The overall conversion rate from visitor to customer is 0.18%, but the stage-lev
 
 Lifetime value modeling for subscription businesses typically employs a cohort retention approach where customers are grouped by acquisition month and their survival curve tracked forward. The retention formula calculates the percentage of the original cohort still subscribing in each subsequent month:
 
-```
+```text
 Month 0 (Acquisition): 1,000 customers, 100% retained, $50 MRR = $50,000
 Month 1: 920 customers, 92% retained, $50 MRR = $46,000
 Month 2: 857 customers, 85.7% retained, $50 MRR = $42,850

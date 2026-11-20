@@ -148,7 +148,7 @@ This single drill, run consistently, improves your mixing more than any plugin p
 
 Every parametric EQ band you touch on a plugin is implemented under the hood as a **biquad filter**, a second-order IIR filter computed sample by sample:
 
-```
+```text
 y[n] = (b0/a0)*x[n] + (b1/a0)*x[n-1] + (b2/a0)*x[n-2] - (a1/a0)*y[n-1] - (a2/a0)*y[n-2]
 ```
 

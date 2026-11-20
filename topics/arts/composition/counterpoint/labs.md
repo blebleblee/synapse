@@ -57,7 +57,7 @@ Rules of construction:
 
 **D Dorian cantus firmus** (D-E-F-G-A-B♭-C-D, final D, no key signature so write B♭ explicitly when it occurs):
 
-```
+```text
 D4 - E4 - F4 - G4 - A4 - G4 - F4 - E4 - D4
 ```
 
@@ -102,7 +102,7 @@ One counterpoint (CP) note per CF note. This is where you learn the consonance v
 
 **Written-out example above the D Dorian CF**:
 
-```
+```text
 CF:   D4   E4   F4   G4   A4   G4   F4   E4   D4
 CP:   D5   C5   A4   B4   C5   E5   D5   C5   D5
 Int:  P8   m6   M3   M3   m3   M6   M6   m6   P8
@@ -160,7 +160,7 @@ Two CP notes against each CF note (CF in half notes, CP in quarters). This is wh
 - No leaping to or from a dissonance, ever, in this species.
 - Final measure: fully consonant, no dissonance even on the weak beat.
 
-```
+```text
 CF:   D4    —   | E4    —   | F4    —   | G4    —   | A4    —   | G4    —   | F4    —   | E4    —   | D4   —
 CP:   A4   B4   | C5   B4   | A4   G4   | B4   C5   | C5   D5   | E5   D5   | D5   C5   | C5   B4   | D5   —
 Int:  P5   M6   | m6   P5   | M3   M2*  | M3   P4   | m3   P4   | M6   P5   | M6   m7*  | m6   P5   | P8
@@ -200,7 +200,7 @@ graph TD
 
 Four CP notes per CF note (CF half or whole notes, CP quarters). Same dissonance law as second species — downbeats consonant, weak beats stepwise-passing — but now with room for **arpeggiation** and **neighbor figures**.
 
-```
+```text
 CF:   D4              | E4              | F4              | G4
 CP:   D5  C5  B4  A4  | G4  A4  B4  C5  | A4  B4  C5  D5  | B4  C5  D5  E5
 Int:  P8  m7* M6  P5  | m3  P4  P5  m6  | M3  P4  P5  M6  | M3  P4  P5  M6
@@ -237,7 +237,7 @@ This is the single most important contrapuntal device in the entire tradition �
 | 9-8 | Compound 2nd resolving to octave | Cadential, powerful |
 | 2-3 | 2nd resolving *up* to 3rd, when CP is the bass | Only upward-resolving type in strict style |
 
-```
+```text
 CF:   D4   —   | E4   —   | F4   —   | G4   —   | A4   —   | G4   —   | F4   —   | E4   —   | D4
 CP:    —  A4   | A4  G4   | G4  F4   | F4  E4   | E4  F4   | F4  E4   | E4  D5   | D5  C#5  | D5
 Phase:  r   p  |  s   r   |  s   r   |  s   r   |  s   r   |  s   r   |  s   r   |  s   r   |
@@ -289,7 +289,7 @@ Mixed note values — whole, half, quarter, occasional eighth-note pairs — com
 - **Cambiata**: the one sanctioned dissonant *leap* in strict counterpoint. Pattern: consonant downbeat → leap of a 3rd to a dissonant note on the weak beat → step down to a consonance → continue (step or consonant skip). Example against CF note E4: `C5 (M6, consonant) → E5 (M7, dissonant, reached by leap) → D5 (m7, consonant) → C5 (m6, step)`. The ear accepts the dissonant leap because it's immediately corrected by a step in the same direction — the leap is a controlled detour, not an error.
 - Final two measures: increase rhythmic density (quarters/eighths) to build momentum into the cadence, typically closing with a 7-6 suspension.
 
-```
+```text
 CF:   D4                      | E4                      | F4                     | G4
 CP:   D5  E5  F5  E5          | D5  C5    (half+half)   | C5 B4 A4 G4            | F4   (whole note)
 Int:  P8  M7* m3  M7*         | P8  m7                   | m6 P5 P4 m3            | M2*
@@ -317,7 +317,7 @@ Play each of the four modal cantus firmi — Dorian/D, Phrygian/E, Mixolydian/G,
 
 ### Step 1 — Four CFs, Four Modes (9 notes each)
 
-```
+```text
 Dorian:      D4 E4 F4 G4 A4 G4 F4 E4 D4
 Phrygian:    E4 F4 G4 A4 B4 A4 G4 F4 E4
 Mixolydian:  G4 A4 B4 C5 D5 C5 B4 A4 G4
@@ -409,7 +409,7 @@ plt.show()
 The fastest way to internalize a rule is to violate it on purpose and listen to the exact flavor of wrongness it produces. Do each of these at the piano, slowly, and narrate out loud what you hear.
 
 **A — Parallel fifths**:
-```
+```text
 CF:  D4 - E4 - F4 - G4 ...
 CP:  A4 - B4 - C5 - D5 ...
 Int: P5 - P5   (VIOLATION — same perfect interval twice in a row)
@@ -417,7 +417,7 @@ Int: P5 - P5   (VIOLATION — same perfect interval twice in a row)
 Play it. The sound: flat, static, like the harmony stalled. Fix: change the second CP note to G4 (creates a m3, contrary motion) or C5 (m6, similar motion but non-parallel).
 
 **B — Dissonant interval on a strong position**:
-```
+```text
 CF:  D4 - E4 - ...
 CP:  D5 - F5 - ...
 Int: P8 - M2   (VIOLATION)
@@ -425,20 +425,20 @@ Int: P8 - M2   (VIOLATION)
 Sound: jarring, unresolved clash with no stepwise justification. Fix: move F5 to C5 (m6) or G5 (m3).
 
 **C — Improper opening**:
-```
+```text
 CP opens on F4 against CF's D4 → m3.   (VIOLATION — must be P1/P5/P8)
 ```
 Sound: ambiguous, lacks the grounding "this is the key" signal a perfect interval gives at the start. Fix: open on D5 (P8), A4 (P5), or D4 (P1).
 
 **D — Improper cadential approach**:
-```
+```text
 ... CP: ... - A4 - D5
 Int:        ... - P5 - P8   (VIOLATION — penultimate should be m6 or m3, not P5)
 ```
 Sound: abrupt, no "pull" into the final. Fix: change A4 to C5 (m6 expanding outward to P8).
 
 **E — Melodic tritone**:
-```
+```text
 ... C5 - F#5 ...   (VIOLATION — augmented 4th leap)
 ```
 Sound: angular, almost impossible to sing cleanly. Fix: replace F#5 with D5 or E5.
@@ -460,7 +460,7 @@ Sound: angular, almost impossible to sing cleanly. Fix: replace F#5 with D5 or E
 
 ### Worked Example
 
-```
+```text
 CF (Tenor):  D4 - E4 - F4 - G4 - A4 - G4 - F4 - E4 - D4
 CP1 (Alto):  A4 - C5 - A4 - B4 - C5 - E5 - D5 - C5 - D5
 CP2 (Bass):  D3 - C3 - F3 - G3 - A3 - C3 - D3 - E3 - D3
@@ -468,7 +468,7 @@ CP2 (Bass):  D3 - C3 - F3 - G3 - A3 - C3 - D3 - E3 - D3
 
 Check each vertical sonority by naming the triad:
 
-```
+```text
 M1: D3-D4-A4  → D minor, root doubled
 M2: C3-E4-C5  → C major, root doubled
 M3: F3-F4-A4  → F major, root doubled
@@ -509,7 +509,7 @@ This is the technique that makes fugue possible — a subject and countersubject
 ### Worked Pair
 
 **Original**:
-```
+```text
 CF:  D4 - E4 - F4 - G4 - A4 - G4 - F4 - E4 - D4
 CP:  D5 - C5 - A4 - B4 - C5 - E5 - D5 - C5 - D5
 Int: P8 - m6 - M3 - M3 - m3 - M6 - M6 - m6 - P8
@@ -517,7 +517,7 @@ Int: P8 - m6 - M3 - M3 - m3 - M6 - M6 - m6 - P8
 No P4s anywhere — safe to invert.
 
 **Inverted** (CP drops an octave below CF, or equivalently CF rises above CP):
-```
+```text
 CP (low):  D4 - C4 - A3 - B3 - C4 - E4 - D4 - C4 - D4
 CF (high): D5 - E5 - F5 - G5 - A5 - G5 - F5 - E5 - D5
 Int:       P8 - M3 - M6 - M6 - M6 - m3 - M3 - M3 - P8
@@ -535,12 +535,12 @@ All consonant, no parallels introduced — valid.
 Sixteen measures, binary form, D minor (Dorian-inflected), modeled on Bach's Two-Part Inventions. This is where species discipline becomes free compositional instinct.
 
 **Subject** (mm. 1–2, right hand) — outline the tonic triad, mix steps and small leaps, land on a half cadence:
-```
+```text
 D5 - E5 - F5 - E5 - D5 - C#5 - D5  |  A4 - B4 - C5 - D5
 ```
 
 **Countersubject** (mm. 1–2, left hand) — contrary-motion complement, with a tied suspension for rhythmic contrast:
-```
+```text
 D3 - (rest) - A3 (tied into bar 2)  |  A3 - G3 - F3 - E3
 ```
 

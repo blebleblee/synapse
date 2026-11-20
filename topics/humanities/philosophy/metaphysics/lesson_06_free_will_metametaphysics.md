@@ -24,7 +24,7 @@ Contemporary compatibilists, particularly Frankfurt and his hierarchical model, 
 
 Fischer and Ravizza develop this into a reasons-responsiveness account. An agent is morally responsible for an action when the mechanism producing that action is appropriately responsive to reasons. This requires both receptivity—the capacity to recognize reasons—and reactivity—the disposition to translate recognized reasons into action. A person who acts from anger after careful deliberation exhibits reasons-responsiveness; a person in the grip of a phobia or compulsion does not. Determinism is irrelevant because responsibility tracks this structural feature of the deliberative mechanism, not the presence of alternative possibilities.
 
-```
+```text
 Compatibilist Decision Architecture:
 
 External World State → Perception → Belief Formation
@@ -68,7 +68,7 @@ Kane's model of self-forming actions (SFAs) identifies crucial junctures—momen
 
 Critics object that introducing indeterminacy creates a luck problem. If at the moment of decision, with identical prior conditions, the agent could choose either option, then the actual outcome seems to depend on chance rather than agency. If the businesswoman's neural state could resolve either way, how is she responsible for which way it does resolve? She appears to be a passive observer of a cosmic coin flip rather than an active author of her decision.
 
-```
+```text
 Libertarian Decision Architecture:
 
 Agent (Substance)
@@ -150,7 +150,7 @@ Each premise invites scrutiny. Premise 2 is ambiguous: does "power over" mean th
 
 Construct a comparative matrix to clarify positions:
 
-```
+```text
 Position Matrix: Free Will Theories
 
                   | Alternative       | Ultimate      | Determinism  | Moral

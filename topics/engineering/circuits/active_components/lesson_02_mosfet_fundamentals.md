@@ -56,7 +56,7 @@ $$I_{DS,sat} = \frac{\mu_n C_{ox}}{2} \frac{W}{L}\left(V_{GS} - V_T\right)^2$$
 
 The physical mechanism here is subtle and frequently misunderstood. Pinch-off does not mean current stops. It means the high-field region at the drain sweeps carriers across in velocity saturation, and the channel from source to pinch-off point behaves as if the device sees a fixed $V_{DS} = V_{GS} - V_T$. The remaining voltage $V_{DS} - (V_{GS}-V_T)$ drops across a short depletion region at the drain.
 
-```
+```text
 NMOS I-V Operating Regions
 
       I_DS
@@ -96,7 +96,7 @@ $$V_T(V_{SB}) = V_{T0} + \gamma\left(\sqrt{2\phi_F + V_{SB}} - \sqrt{2\phi_F}\ri
 
 The body effect coefficient $\gamma = \sqrt{2\varepsilon_{si}qN_A}/C_{ox}$ has units of $\text{V}^{1/2}$. For a standard 180 nm process, $\gamma \approx 0.5 \ \text{V}^{1/2}$. Consider a source follower where the output node is several hundred millivolts above ground: the source-body reverse bias increases $V_T$, reducing $V_{GS} - V_T$ and decreasing the buffer's drive strength. This is not a simulation artifact. It is a real, bench-measurable effect that explains why source-follower linearity degrades with signal swing and why well-aware designers tie the bulk to the source wherever the process allows isolated N-wells or triple-well structures.
 
-```
+```text
 Body Effect: V_T vs. V_SB
 
      V_T (V)

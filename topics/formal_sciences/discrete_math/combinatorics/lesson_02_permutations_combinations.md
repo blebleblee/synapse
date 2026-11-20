@@ -102,7 +102,7 @@ where the sum extends over all non-negative integer $m$-tuples $(k_1, k_2, \ldot
 
 A useful computational architecture for binomial coefficients exploits Pascal's identity to construct values iteratively. Given the boundary conditions $\binom{n}{0} = 1$ and $\binom{n}{n} = 1$ for all $n \ge 0$, and $\binom{n}{k} = 0$ for $k > n$, we build Pascal's triangle row by row:
 
-```
+```text
 Row 0:                    1
 Row 1:                  1   1
 Row 2:                1   2   1
@@ -119,7 +119,7 @@ computes the coefficient through a sequence of $k$ multiplications and divisions
 
 The diagram below illustrates the recursive decomposition underlying Pascal's identity, showing how $\binom{n}{k}$ decomposes into subproblems $\binom{n-1}{k-1}$ and $\binom{n-1}{k}$:
 
-```
+```text
                      C(n, k)
                     /       \
                    /         \

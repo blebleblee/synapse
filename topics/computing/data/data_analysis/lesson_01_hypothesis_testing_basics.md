@@ -21,7 +21,7 @@ The asymmetry is deliberate and load-bearing. Failing to reject H₀ does **not*
 
 **Example — systems engineering context.** A team deploys a new memory allocator. Let μ_old and μ_new be the true mean allocation latencies:
 
-```
+```text
 H₀: μ_new − μ_old = 0  (allocator has no effect)
 H₁: μ_new − μ_old < 0  (allocator reduces latency; one-tailed)
 ```
@@ -41,7 +41,7 @@ The decision rule maps sample data to one of two actions: reject H₀ or fail to
 
 For a one-sample z-test against H₁: μ > μ₀ with known σ, the power at a true mean μ₁ > μ₀ is:
 
-```
+```text
 π(μ₁) = 1 − Φ(z_α − δ√n / σ)
 ```
 
@@ -59,7 +59,7 @@ The theoretical foundation for choosing *which* test statistic to use is the Ney
 
 The likelihood ratio is:
 
-```
+```text
 Λ(X) = L(θ₁ | X) / L(θ₀ | X)
 ```
 
@@ -93,7 +93,7 @@ The test statistic T(**X**) is a scalar function of the sample designed so that 
 
 **One-sample t-statistic.** For a sample X₁, ..., Xₙ from a normal distribution with unknown mean μ and unknown variance σ²:
 
-```
+```text
 T = (X̄ − μ₀) / (S / √n)
 ```
 
@@ -101,13 +101,13 @@ where X̄ is the sample mean and S is the corrected sample standard deviation. U
 
 **Two-sample Welch's t-statistic.** For independent samples from two populations with potentially unequal variances (the standard case in A/B testing):
 
-```
+```text
 T = (X̄₁ − X̄₂) / √(S₁²/n₁ + S₂²/n₂)
 ```
 
 The degrees of freedom are approximated by the Welch–Satterthwaite equation:
 
-```
+```text
 ν = (S₁²/n₁ + S₂²/n₂)² / ((S₁²/n₁)²/(n₁−1) + (S₂²/n₂)²/(n₂−1))
 ```
 
@@ -117,7 +117,7 @@ This is not a round number. Using Student's equal-variance t-test when variances
 
 The p-value is defined as:
 
-```
+```text
 p = P(T(X*) ≥ T(x_obs) | H₀)
 ```
 
@@ -135,7 +135,7 @@ The p-value is a continuous measure of the *compatibility* between the data and 
 
 For a two-tailed test at significance level α, the rejection region is:
 
-```
+```text
 R = {T : |T| > t_{α/2, ν}}
 ```
 
@@ -492,7 +492,7 @@ flowchart TD
 
 Underpowered studies are the primary reproducibility failure mode in empirical systems research. A study with 80% power has a 20% chance of missing a true effect even when it exists. When the prior probability of a true effect is moderate (say, 50%), an underpowered study at α = 0.05 has a positive predictive value (PPV) of only:
 
-```
+```text
 PPV = (1−β) · π / ((1−β) · π + α · (1−π))
     = 0.80 · 0.50 / (0.80 · 0.50 + 0.05 · 0.50)
     = 0.40 / 0.425
@@ -503,13 +503,13 @@ This looks acceptable. But when π = 0.10 (most optimization hypotheses are wron
 
 The required sample size formula for a two-sample, two-tailed t-test at target power 1−β:
 
-```
+```text
 n_per_group = 2σ² · (z_{α/2} + z_β)² / δ²
 ```
 
 For δ = 0.5σ (medium effect, Cohen's d = 0.5), α = 0.05, power = 0.80:
 
-```
+```text
 n = 2 · (1.96 + 0.84)² / 0.25 ≈ 2 · 7.84 / 0.25 ≈ 63 per group
 ```
 
@@ -611,7 +611,7 @@ The following failure modes are not edge cases — they are endemic in applied e
 
 When k independent hypotheses are tested simultaneously at α, the **family-wise error rate (FWER)** is:
 
-```
+```text
 FWER = 1 − (1 − α)^k
 ```
 
@@ -714,7 +714,7 @@ The duality theorem states: a 95% CI contains exactly those values θ₀ such th
 
 For the two-sample Welch test, the CI for (μ_A − μ_B) is:
 
-```
+```text
 (X̄_A − X̄_B) ± t_{α/2, ν_W} · √(S_A²/n_A + S_B²/n_B)
 ```
 
@@ -728,7 +728,7 @@ Classical (frequentist) hypothesis testing answers: "What is P(data | H₀)?" Ba
 
 The **Bayes factor** B₁₀ quantifies the evidence ratio:
 
-```
+```text
 B₁₀ = P(data | H₁) / P(data | H₀)
 ```
 

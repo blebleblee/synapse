@@ -64,7 +64,7 @@ The APT resolver represents the package universe as a directed graph where nodes
 
 The Linux security model at the POSIX layer reduces identity to two integers: UID and GID (and supplementary GIDs, stored in `struct group_info` within `struct cred`). The kernel does not know usernames — those are a user-space convention resolved by `getpwuid(3)` via NSS (Name Service Switch, configured in `/etc/nsswitch.conf`). The kernel's access check for a file open is:
 
-```
+```text
 if (euid == 0) → grant (traditional root bypass, partially modified by capabilities)
 if (euid == file.st_uid) → apply owner bits
 if (egid == file.st_gid || egid ∈ supplementary_gids) → apply group bits
@@ -132,7 +132,7 @@ cat /proc/1/maps
 
 APT's on-disk state is split across several directories:
 
-```
+```text
 /var/lib/apt/lists/          # Fetched package indices (compressed)
 /var/lib/dpkg/info/          # Per-package maintainer scripts (.preinst, .postinst, .prerm, .postrm)
 /var/lib/dpkg/status         # Installed package database (plain text)
@@ -211,7 +211,7 @@ rpm -V nginx                   # verify installed RPM file checksums
 
 The `/etc/passwd` format is a colon-delimited flat file. Modern systems have moved password hashes to `/etc/shadow` (readable only by root) to prevent offline dictionary attacks against world-readable `/etc/passwd`.
 
-```
+```bash
 # /etc/passwd fields:
 # username:x:UID:GID:GECOS:home:shell
 # 'x' means: check /etc/shadow for the hash
@@ -429,7 +429,7 @@ graph TD
 
 When the kernel cannot satisfy a memory allocation after kswapd has reclaimed all reclaimable pages, it invokes the OOM killer. The OOM killer selects a victim process by computing an `oom_score` for each process:
 
-```
+```text
 oom_score ≈ (resident_set_size / total_physical_ram) × 1000 + oom_score_adj
 ```
 

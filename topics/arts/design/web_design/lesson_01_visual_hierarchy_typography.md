@@ -18,7 +18,7 @@ The construction of visual hierarchy begins with the establishment of a modular 
 
 Consider a base body text size of 16 pixels (the browser default and a comfortable reading size for sustained engagement at typical viewing distances). Applying a Perfect Fourth scale generates the following progression:
 
-```
+```text
 Level 1 (Body):     16px  × 1.000 = 16px
 Level 2 (Small):    16px  × 1.333 = 21.33px  ≈ 21px
 Level 3 (Subhead):  21px  × 1.333 = 28px

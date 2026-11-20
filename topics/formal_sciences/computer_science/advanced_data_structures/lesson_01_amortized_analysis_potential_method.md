@@ -139,7 +139,7 @@ which is $O((m + n)\log n)$, confirming the $O(\log n)$ amortized bound per oper
 
 The rank potential has a compelling structural interpretation. High potential means the tree has many deep nodes with large subtrees — precisely the shape in which future access patterns will be expensive. The splay operation, by moving the accessed node to the root and partially rebalancing the tree, dissipates this potential. It is not attempting to maintain balance for balance's sake; it is converting structural disorder (high potential) into actual work, in a way that the potential method makes quantitatively precise.
 
-```
+```text
 Zig-Zig case: x is left child of p, p is left child of g
 
 Before splay step:          After splay step:

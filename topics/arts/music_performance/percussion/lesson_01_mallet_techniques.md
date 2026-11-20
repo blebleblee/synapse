@@ -271,7 +271,7 @@ flowchart TD
 
 **Purpose:** equalize hands in tone, timing, and velocity.
 
-```
+```text
 Exercise 1A — Single Pitch Alternating
 Marimba or vibraphone, C4 or A4, metronome on.
 
@@ -285,7 +285,7 @@ Fix: drop to ♩=50, exaggerate the weaker hand until both sound identical,
 then bring the tempo back up.
 ```
 
-```
+```text
 Exercise 1B — Dynamic Arc, Single Pitch
 Tempo ♩=72. 8-beat crescendo, 8-beat decrescendo.
 
@@ -299,7 +299,7 @@ enough — drop to pure finger motion, mallet head barely 2 cm off the bar.
 
 #### 6.2 Four-Mallet Chord Voicing Drill (Burton Grip)
 
-```
+```text
 Exercise 2A — Interval Ladder, right hand, then left, then both
 Tempo ♩=60. Marimba C4–C5, bars C–E–G–C.
 
@@ -313,7 +313,7 @@ arrives first, your wrist rotation is driving it more than the inner —
 deliberately lead with the inner mallet until arrival is simultaneous.
 ```
 
-```
+```text
 Exercise 2B — Four-Mallet Block Chords
 Tempo ♩=60 → 80.
 
@@ -332,7 +332,7 @@ If inner voices disappear, isolate inner mallets alone and drill at
 
 A roll is alternating strokes fast enough to blur into continuous tone at your dynamic and the listener's distance.
 
-```
+```text
 Exercise 3A — Roll Speed Ladder, single pitch C4
 ♩= 60  8th notes  (2 strokes/sec)
 ♩= 80  8th notes
@@ -399,7 +399,7 @@ If you can't execute all four cleanly in isolation, everything built on top of t
 
 **Up stroke:** starts low, taps, and rebounds up to full height, preparing for the next accent.
 
-```
+```text
 Four Core Strokes Drill — snare only
 Tempo ♩=60, right hand first, then left, then alternating
 
@@ -421,7 +421,7 @@ Moeller is a whipping motion that pulls multiple notes out of one arm impulse by
 
 **Mechanics:** a forearm-driven downward whip strikes the drum; as the stick rebounds, the forearm keeps traveling upward in an arc, and the hand/stick lag behind on inertia, arriving high again ready for the next stroke. One whip produces: accent (the whip strike) → tap (finger rebound) → up (return to high), a three-note sequence from one muscular impulse.
 
-```
+```text
 Drill 9A — Single-Hand Moeller Foundation
 Tempo ♩=60, right hand on snare
 
@@ -459,7 +459,7 @@ Step 3 — full sequence (accent–tap–up):
 - **Free beater:** springs back after contact, head resonates fully — open, full kick sound.
 - **Buried beater:** stays pressed against the head — punchy, dry, controlled thud.
 
-```
+```text
 Drill 10A — Kick Accuracy Grid, ♩=80, 4/4, 8 bars each
 
 Pattern 1 (quarters):    K - - -  K - - -  K - - -  K - - -
@@ -482,7 +482,7 @@ Target: identical volume and rock-solid timing on every kick. No rushing beat 1.
 
 #### 11.2 Open/Closed Range
 
-```
+```text
 Hi-Hat Articulation Drill, ♩=80
 Right hand steady 8th notes on hi-hat, left foot articulating:
 
@@ -515,7 +515,7 @@ Independence is a motor-program acquisition problem, solved by systematic layeri
 
 #### 12.2 Level 1 — Beginner (♩=70)
 
-```
+```text
 RH Ride:     R    -    R    -    R    -    R    -
 LF Hi-hat:   -    -    H    -    -    -    H    -
 RF Kick:     K    -    -    -    K    -    -    -
@@ -524,7 +524,7 @@ LH Snare:    -    -    S    -    -    -    S    -
 
 #### 12.3 Level 2 — Intermediate (♩=80), Funk 16ths
 
-```
+```text
 RH Hi-hat:   R    r    r    r    R    r    r    r   (R=accent, r=ghost)
 LF Hi-hat:   -    -    H    -    -    -    H    -
 RF Kick:     K    -    -    K    -    -    K    -
@@ -535,7 +535,7 @@ Ghost notes ≈ pp, 1–2 cm stroke height. If audible across the room, too loud
 
 #### 12.4 Level 3 — Advanced (♩=90–110), Jazz Ride
 
-```
+```text
 RH Ride:     R    -    r    R    -    r    R    r   (swung, triplet feel)
 LF Hi-hat:   -    -    H    -    -    -    H    -   (beats 2 & 4)
 RF Kick:     K    -    -    -    -    K    -    -   (sparse, melodic)
@@ -566,7 +566,7 @@ graph LR
 
 #### 13.1 Single Stroke Roll
 
-```
+```text
 R L R L R L R L   (all equal dynamic)
 
 Pyramid drill: ♩=60 8ths → accelerate to ♩=120 over 16 bars → decelerate back.
@@ -576,7 +576,7 @@ equalize before continuing.
 
 #### 13.2 Double Stroke Roll
 
-```
+```text
 R R L L  R R L L   (16th notes, each pair = one beat)
 
 ♩=60: Full-Full / Tap-Tap, muscled deliberately.
@@ -591,7 +591,7 @@ muscling that second note.
 
 #### 13.3 Paradiddle
 
-```
+```text
 R L R R   L R L L
 >       >     >       >   (accent on first note of each group)
 
@@ -604,7 +604,7 @@ Tempo target: ♩=60 → 80 → 100 → 120, 16th notes (4 per beat).
 
 #### 13.4 Flam
 
-```
+```text
 lR  rL  lR  rL    (lowercase = grace note, uppercase = primary)
 
 Grace note height: 2–3 cm. Primary: 20–25 cm (f) or 10–12 cm (mf).
@@ -616,7 +616,7 @@ Drill: lR - rL - lR - rL at ♩=60, then 80, then 100.
 
 #### 13.5 Ghost Notes and Dynamic Stratification
 
-```
+```text
 Three-layer model:
   ACCENT (ff): full strokes, rim shots, backbeats
   NORMAL (mf): standard strokes, ride attacks
@@ -650,7 +650,7 @@ Concert snare demands a dynamic range wider than most drumset playing ever asks 
 
 #### 14.2 Dynamic Range Drill
 
-```
+```text
 Concert Snare Dynamic Mapping, ♩=60, alternating R-L
 
 ppp: height 1–2 cm, fingers only, barely audible
@@ -680,7 +680,7 @@ pp→p (where fine motor control first starts to break down).
 
 **Open tone:** upper area, relaxed flat fingers, immediate bounce-back. Mid-range tone, moderate sustain.
 
-```
+```text
 Cajón Basic Groove, ♩=70
 
 Beat:   1    +    2    +    3    +    4    +
@@ -700,7 +700,7 @@ Hand:   RH   LH   RH   LH   RH   LH   RH   LH
 
 **Slap:** same position as tone, but fingers relaxed and slightly fanned — tips snap down and rebound immediately for a high, dry crack.
 
-```
+```text
 Djembe Tone Check:
   Bass sounds like a slap → hand isn't fully open/flat.
   Tone sounds like a thud → hand too tense, relax the fingers.

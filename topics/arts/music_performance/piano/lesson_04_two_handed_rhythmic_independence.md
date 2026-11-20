@@ -55,7 +55,7 @@ Picture holding a small apple in your palm:
 
 ### 3.1 Five-Finger Position Box
 
-```
+```text
 Right Hand (C4–G4):
   C    D    E    F    G
   1    2    3    4    5
@@ -69,7 +69,7 @@ Both hands number fingers from their own thumb (1), making them geometric mirror
 
 ### 3.2 Two-Hand Interval Spacing Rule
 
-```
+```text
 LH plays:   C    E    G    C (octave up)
 RH plays:   C    E    G    C (octave up)
 Interval:  Uni   3rd  5th  Oct
@@ -163,13 +163,13 @@ Work these in order. Don't advance until the current drill is clean at target te
 **Goal:** even tone, no accent bump on the 3–4 crossing.
 
 **Right Hand, C position:**
-```
+```text
 Fingers:  1-2-3-4-5-4-3-2 | 2-3-4-5-4-3-2-1 | ...up by half step each group
 Notes:    C-D-E-F-G-F-E-D | D-E-F-G-F-E-D-C | ...
 ```
 
 **Left Hand, same position:**
-```
+```text
 Fingers:  5-4-3-2-1-2-3-4 | 4-3-2-1-2-3-4-5 | ...up by half step each group
 Notes:    C-D-E-F-G-F-E-D | D-E-F-G-F-E-D-C | ...
 ```
@@ -187,7 +187,7 @@ Notes:    C-D-E-F-G-F-E-D | D-E-F-G-F-E-D-C | ...
 Targets the actual anatomical bottleneck.
 
 **Setup, Right Hand:**
-```
+```text
 Hold finger 1 on C4 — sustained, do not release.
 Play D-E-F-G with fingers 2-3-4-5, ascending then descending.
 ```
@@ -208,7 +208,7 @@ Play D-E-F-G with fingers 2-3-4-5, ascending then descending.
 
 ### Drill 3: Trill Pairs — The 4–5 Problem Solver
 
-```
+```text
 Right Hand pairs, weakest to strongest:
   4-5 on E-F  (adjacent semitone — hardest)
   3-4 on D-E
@@ -236,7 +236,7 @@ Right Hand pairs, weakest to strongest:
 
 This is where real coordination starts: both hands move at once, in opposite directions.
 
-```
+```text
 Both hands start on middle C (C4):
   RH ascends: C-D-E-F-G-A-B-C
   Fingering:  1-2-3-1-2-3-4-5
@@ -261,7 +261,7 @@ The LH thumb tucks under at G3→F3 (between fingers 4 and 1), mirroring the RH 
 
 Every polyrhythm has a hidden common grid — the least common multiple of the two subdivisions. Internalize the grid away from the piano first.
 
-```
+```text
 2:1 → grid of 2:    LH hits 1       RH hits 1, 2
 3:2 → grid of 6:    LH hits 1, 3, 5     RH hits 1, 4
 4:3 → grid of 12:   LH hits 1, 4, 7, 10     RH hits 1, 5, 9
@@ -276,7 +276,7 @@ Grid size = LCM(LH subdivision, RH subdivision). Count the grid number aloud bef
 - RH: quarter-note scale fragment, C-D-E-F | G-F-E-D repeating
 - Metronome: ♩ = 72
 
-```
+```text
 Beat:  1    2    3    4
 LH:    C --(hold)-- G --(hold)--
 RH:    C    D    E    F
@@ -298,14 +298,14 @@ The most useful polyrhythm in the repertoire — Chopin nocturnes, ragtime, jazz
 **Mnemonic, away from the piano:** say "*not dif-fi-cult*" (3 syllables) against "*hard*" said twice evenly (2 syllables) in the same span. Feel beat 1 land together and everything else diverge.
 
 **The 6-unit grid for one measure of 2 beats:**
-```
+```text
 Sub-beat:   1   2   3   4   5   6
 LH (3):     X           X           X        ← hits on 1, 3, 5
 RH (2):     X                   X            ← hits on 1, 4
 ```
 
 **Piano voicing:**
-```
+```text
 LH: C3-E3-G3, arpeggiated upward, one triplet per beat
 RH: C5 and G5, one duplet per beat
 ```
@@ -323,7 +323,7 @@ RH: C5 and G5, one duplet per beat
 ### 5.4 Drill: 4:3 — The Advanced Grid
 
 **The 12-unit grid, spanning 3 beats:**
-```
+```text
 Sub-beat:   1  2  3  4  5  6  7  8  9  10  11  12
 LH (4):     X        X        X        X          ← hits on 1, 4, 7, 10
 RH (3):     X              X              X       ← hits on 1, 5, 9
@@ -390,19 +390,19 @@ graph LR
 
 For a standard four-voice chord, split it evenly:
 
-```
+```text
 Right Hand: the two upper voices (soprano + alto, or the melodic top notes)
 Left Hand:  the two lower voices (tenor + bass, or root + 5th / root + 7th)
 ```
 
 **Cmaj7 (C-E-G-B), close position:**
-```
+```text
 RH: G4 (finger 2) + B4 (finger 5) — upper voices
 LH: C3 (finger 5) + E3 (finger 3) — lower voices
 ```
 
 **G7 (G-B-D-F), second inversion with D in the bass:**
-```
+```text
 RH: F5 (finger 4) + B5... more practically keep it compact:
 RH: D5 (finger 2) + F5 (finger 4)
 LH: B2 (finger 5) + G3 (finger 2)
@@ -412,7 +412,7 @@ LH: B2 (finger 5) + G3 (finger 2)
 
 The point of this drill is minimizing motion in every voice except the bass.
 
-```
+```text
          I         IV        V         I
 Chord:   C major   F major   G major   C major
 Soprano: E5   →    F5   →    G5   →    E5     (up a step, up a step, down a third)
@@ -440,7 +440,7 @@ Jazz pianists typically drop the root — the bassist has it covered — and voi
 **Guide tones rule:** the 3rd and 7th of a dominant or major 7th chord define its quality. Everything else (9th, 11th, 13th) is color on top. Train your left hand to find the 3rd–7th pair automatically before adding anything else.
 
 **ii–V–I in C major, rootless:**
-```
+```text
 Dm7:    LH: F3 + C4   (3rd + b7th)     RH: E4 + A4   (9th + 5th)
 G7:     LH: B2 + F3   (3rd + b7th)     RH: A4 + D5   (13th + 5th)
 Cmaj7:  LH: E3 + B3   (3rd + 7th)      RH: D5 + G5   (9th + 5th)
@@ -501,7 +501,7 @@ Cmaj7:  LH: E3 + B3   (3rd + 7th)      RH: D5 + G5   (9th + 5th)
 
 **Piece: Invention No. 1 in C Major, BWV 772**
 
-```
+```text
 RH, bars 1-2:  C-D-E-F-E-D | C-E-G-C-B-C
 Fingering:     1-2-3-4-3-2 | 1-2-3-5-4-5
 
@@ -708,13 +708,13 @@ These determine whether practice time converts into skill or just burns time.
 The damper pedal is effectively a third hand — and the one most self-taught players use backwards.
 
 **Legato pedaling:**
-```
+```text
 Attack the note first → wait roughly 30-50ms → then depress the pedal
 ```
 That brief delay is what keeps the attack of each new note clean instead of blurring it into whatever was ringing before it.
 
 **Timing across a chord progression:**
-```
+```text
 Beat:    1                2                3                4
 Keys:    [chord 1]        [chord 2]        [chord 3]        [chord 4]
 Pedal:   down, holds      up-then-down     up-then-down     up-then-down

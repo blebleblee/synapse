@@ -40,7 +40,7 @@ Aldus Manutius and the Aldine Press in Venice (established 1494) developed the f
 
 The architecture of early printing generated specific technical demands that shaped textual practices:
 
-```
+```text
 Manuscript Acquisition → Comparative Analysis → Copytext Selection → 
 Compositorial Setting → Proof Reading & Correction → Distribution
 ```
@@ -57,7 +57,7 @@ The key methodological invariants that emerged during this period were these:
 
 **Manuscript genealogy** depended on systematic collation—the side-by-side comparison of multiple manuscript copies to identify which readings were unique to individual copies, which were shared variants suggesting manuscript relationship, and which readings represented the likely original text. A collation produced a visual representation of textual variance:
 
-```
+```text
 MS A: "the kingdom of heaven"
 MS B: "the kingdom of God"
 MS C: "God's kingdom"

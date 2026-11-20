@@ -52,7 +52,7 @@ The rasterization kernel itself operates in screen space using a modified z-buff
 
 The G-buffer structure consists of multiple render targets bound simultaneously during the rasterization pass:
 
-```
+```text
 RT0 (RGBA32F): World Position (XYZ) + Depth (W)
 RT1 (RGBA16F): View Normal (XY packed) + Curvature (ZW)
 RT2 (RGBA8):   Material ID (R) + Polygroup (G) + Cavity (B) + AO (A)
@@ -63,7 +63,7 @@ The normal packing scheme compresses three-component normals into two channels b
 
 Material evaluation proceeds through a channel compositor that blends multiple texture inputs according to the material definition's channel graph. ZBrush materials consist of named channels (Diffuse, Specular, Gloss, Bump, Displacement, Ambient, etc.) that accept either procedural generators or bitmap texture sources. The compositor evaluates each channel independently, then combines results using blend modes specified in the material editor. A typical skin material might define:
 
-```
+```text
 Diffuse Channel:
   - Base Color: Polypaint vertex colors
   - Cavity Multiplier: Procedural cavity map (intensity 0.7)
@@ -92,7 +92,7 @@ The lighting computation implements a simplified energy-conservative model that 
 
 The final composition stage combines all lighting contributions with material modulation, applies tone mapping to compress high dynamic range values into displayable range, and writes the result to the viewport framebuffer. ZBrush's tone mapping operator employs a modified Reinhard curve that preserves color saturation in highlights while compressing luminance:
 
-```
+```text
 L_out = L_in / (1 + L_in)
 C_out = C_in × (L_out / L_in)^saturation_factor
 ```
@@ -107,7 +107,7 @@ MatCap materials represent a unique rendering mode where illumination derives en
 
 The mathematical transformation from surface normal to MatCap UV coordinates proceeds through view-space normal mapping:
 
-```
+```text
 N_view = ModelViewMatrix × N_world
 u = (N_view.x + 1.0) × 0.5
 v = (N_view.y + 1.0) × 0.5
@@ -120,7 +120,7 @@ The cavity map generator deserves detailed examination due to its ubiquity in ZB
 
 The curvature values undergo normalization and remapping to produce displayable grayscale intensities:
 
-```
+```text
 curvature_sum = Σ signed_distance(neighbor, tangent_plane)
 curvature_normalized = curvature_sum / neighbor_count
 intensity = 0.5 + curvature_normalized × sensitivity × 0.5
@@ -156,7 +156,7 @@ The export process proceeds by iterating through ZBrush's timeline (if animation
 
 GoZ transfers bypass file format concerns entirely by operating at the in-memory scene graph level. When you initiate a GoZ send operation, ZBrush serializes the active subtool into its internal `.GoZ` file format—a proprietary binary structure containing:
 
-```
+```text
 Header:
   - Format version identifier
   - Geometry vertex count
@@ -206,7 +206,7 @@ Performance profiling reveals that SSAO dominates rendering time for high-resolu
 
 Memory consumption constitutes another critical performance boundary. BPR's G-buffer architecture allocates multiple render targets sized to match the viewport resolution. A 4K render at 3840×2160 pixels with the four-target G-buffer configuration described earlier consumes:
 
-```
+```text
 RT0 (RGBA32F): 3840 × 2160 × 16 bytes = 132 MB
 RT1 (RGBA16F): 3840 × 2160 × 8 bytes  = 66 MB
 RT2 (RGBA8):   3840 × 2160 × 4 bytes  = 33 MB

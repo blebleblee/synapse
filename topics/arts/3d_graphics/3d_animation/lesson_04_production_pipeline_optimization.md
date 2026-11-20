@@ -38,7 +38,7 @@ Lattice deformation modifiers embed geometry inside a volumetric control cage of
 
 The modifier stack's dataflow becomes explicit through this execution diagram:
 
-```
+```text
 Base Mesh (Immutable)
     ↓
 Mirror Modifier (Reflect geometry across symmetry plane)

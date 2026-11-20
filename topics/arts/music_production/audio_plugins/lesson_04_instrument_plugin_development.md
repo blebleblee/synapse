@@ -98,7 +98,7 @@ flowchart LR
 
 ### 3.1 Project layout
 
-```
+```text
 MiniPoly/
 ├── CMakeLists.txt
 └── Source/

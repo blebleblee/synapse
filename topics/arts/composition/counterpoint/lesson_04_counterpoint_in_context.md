@@ -55,14 +55,14 @@ One counterpoint note per CF note. Every interval is exposed — nothing to hide
 ### Drill 1 — First Species Above the Cantus Firmus
 
 **Cantus Firmus (bass, whole notes):**
-```
+```text
 C3 — D3 — E3 — F3 — E3 — D3 — C3
 ```
 
 **Your task:** write a counterpoint voice above it in treble clef. Give yourself five minutes before looking at the solution.
 
 **Worked solution:**
-```
+```text
 CF (bass):   C3  D3  E3  F3  E3  D3  C3
 CP (treble): C5  B4  G4  A4  G4  F4  C5
 ```
@@ -92,14 +92,14 @@ No parallel fifths, no parallel octaves, both lines singable. **This passes.**
 ### Drill 2 — First Species Below the Cantus Firmus
 
 **Cantus Firmus (treble):**
-```
+```text
 G4 — A4 — B4 — C5 — B4 — A4 — G4
 ```
 
 Write your CP in bass clef, below. Same checklist applies — just mirrored.
 
 **Worked solution:**
-```
+```text
 CF (treble): G4  A4  B4  C5  B4  A4  G4
 CP (bass):   G2  F2  G2  E2  G2  F2  G2
 ```
@@ -121,7 +121,7 @@ Strongly contrary throughout, all consonant, clean octave bookends. This is the 
 This is the error you will make most often. Train your eye to catch it on sight.
 
 **Faulty fragment:**
-```
+```text
 CF (bass):   C3  D3  E3  F3
 CP (treble): G4  A4  B4  C5
 ```
@@ -129,7 +129,7 @@ CP (treble): G4  A4  B4  C5
 Check bars 1–2: C3–G4 = P5. D3–A4 = P5. **Both voices moved up by step into the same interval class — parallel fifths.** This is banned because, as covered above, the two voices momentarily fuse into one acoustic object; independence is destroyed exactly at the moment it matters.
 
 **Fix — change the offending note, not the CF:**
-```
+```text
 CF (bass):   C3  D3  E3  F3
 CP (treble): G4  F4  G4  A4
 ```
@@ -137,7 +137,7 @@ CP (treble): G4  F4  G4  A4
 Now C3–G4 (P5) moves to D3–F4 (m3): the CP moved *against* the CF (contrary), landing on an imperfect consonance instead. Problem solved, and the contrary motion is actually more interesting to the ear than the plain parallel line was.
 
 **Also watch for the "hidden fifth" (similar motion into a perfect interval with a leap):**
-```
+```text
 CF: C3 — F3
 CP: E4 — C5
 ```
@@ -159,12 +159,12 @@ A passing tone is legal only when all three of these hold:
 ### Drill 4 — Second Species Above the Cantus Firmus
 
 **Cantus Firmus:**
-```
+```text
 C3 — D3 — E3 — F3 — E3 — D3 — C3
 ```
 
 **Worked solution (write this out and play both voices on piano, one hand each):**
-```
+```text
 Bar:        1          2          3          4          5          6          7
 CF:         C3         D3         E3         F3         E3         D3         C3
 CP:    C5 — B4    A4 — B4    C5 — B4    A4 — G4    G4 — A4    F4 — G4    E4 — C5
@@ -186,7 +186,7 @@ CP:    C5 — B4    A4 — B4    C5 — B4    A4 — G4    G4 — A4    F4 — G
 
 ### Drill 5 — Passing Tone vs. Neighbor Tone, Ear Training
 
-```
+```text
 CF:  G2          A2          B2
 CP:  D4 — E4     F4 — E4     D4 — C4
 ```
@@ -201,7 +201,7 @@ Same weak/strong logic as 2nd species, but now you have four quarter notes per C
 
 **Cambiata shape:** step down, skip down a 3rd, step up. Example in C major: **E–D–B–C**. The dissonant note is the second one (D, if approached as a passing tone) — actually the licensed dissonance sits on the note left by skip (commonly the third note of the figure), which resolves the tension retroactively once the line steps back up. Practice this shape in isolation on your instrument until it's automatic:
 
-```
+```text
 Quarter notes: E4 – D4 – B3 – C4   (over a sustained C or similar CF note)
 ```
 
@@ -231,12 +231,12 @@ These two patterns are the literal DNA of the V7–I cadence in tonal harmony �
 Suspension chains need a cooperating bass — not every CF supports a clean chain without adjustment. Here's a bass written specifically to let the chain work (this is a real compositional skill: when you write your own CF for a suspension exercise, work backward from the chain).
 
 **Cantus Firmus (bass):**
-```
+```text
 C3 — B2 — A2 — G2
 ```
 
 **Counterpoint (treble), built as tied half notes:**
-```
+```text
 Bar:        1                2                3                4
 CF:         C3               B2               A2               G2
 CP:    [rest] — A4 ———tie——— A4 — G4 ———tie——— G4 — F4 ———tie——— F4 — E4
@@ -264,12 +264,12 @@ Before major/minor tonality, Renaissance counterpoint (Palestrina, Victoria, Las
 ### Drill 7 — Phrygian Cadence in Two Voices
 
 **Cantus Firmus (Phrygian on E):**
-```
+```text
 E3 — F3 — G3 — F3 — E3
 ```
 
 **Counterpoint:**
-```
+```text
 E4 — D4 — E4 — D4 — E4
 ```
 
@@ -294,7 +294,7 @@ Write two voices so that swapping which one is on top (transposing the lower voi
 ### Drill 8 — Writing and Testing an Invertible Pair
 
 **Original (avoiding 5ths from the start):**
-```
+```text
 Voice 1 (upper): C5 — D5 — E5 — D5 — E5 — D5 — C5
 Voice 2 (lower): C4 — B3 — C4 — B3 — G3 — F3 — C4
 ```
@@ -302,7 +302,7 @@ Voice 2 (lower): C4 — B3 — C4 — B3 — G3 — F3 — C4
 Check the original for any perfect 5ths before inverting — there are none (M3, M3, M3, M6, M6 throughout). Good start.
 
 **Now invert** — Voice 2 moves up an octave to become the new top, Voice 1 moves down an octave to become the new bottom:
-```
+```text
 Voice 1 (upper): C5 — B4 — C5 — B4 — G4 — F4 — C5
 Voice 2 (lower): C4 — D4 — E4 — D4 — E4 — D4 — C4
 ```
@@ -318,7 +318,7 @@ The IV–V–I cadence you already know from harmony class is counterpoint in di
 ### Drill 9 — Four-Voice Chorale with Voice-Leading Priority
 
 **Soprano given:**
-```
+```text
 C5 — D5 — E5 — F5 — E5 — D5 — C5
 ```
 
@@ -329,7 +329,7 @@ C5 — D5 — E5 — F5 — E5 — D5 — C5
 4. Resolve the leading tone up by step whenever it appears in any voice, unless it's in an outer voice moving as part of a deliberate melodic descent at a deceptive or plagal gesture.
 
 **First attempt (deliberately includes a common student error, for diagnostic purposes):**
-```
+```text
 Soprano: C5   D5   E5   F5   E5   D5   C5
 Alto:    E4   F4   G4   A4   G4   F4   E4
 Tenor:   G3   A3   C4   C4   C4   B3   G3
@@ -343,7 +343,7 @@ Bass:    C3   D3   C3   F2   C3   G2   C3
 Both voices moved up by step into the same interval class. **Parallel fifths between soprano and tenor** — easy to miss because you were watching soprano/bass and alto/tenor, and this pair slipped through. This is exactly why you check all six pairs, every time, without exception.
 
 **Corrected:**
-```
+```text
 Soprano: C5   D5   E5   F5   E5   D5   C5
 Alto:    E4   F4   G4   A4   G4   F4   E4
 Tenor:   G3   G3   C4   C4   C4   B3   G3

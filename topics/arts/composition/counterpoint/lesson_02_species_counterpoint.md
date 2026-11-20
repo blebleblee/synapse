@@ -17,7 +17,7 @@ Every exercise starts from a cantus firmus (CF) — a slow, stepwise melody, 8�
 5. The note before the final approaches it by step — this is what makes a cadence feel landed.
 
 **Working CF** (D Dorian) — memorize this, you'll reuse it all lesson:
-```
+```text
 D – E – F – E – D – C – D – E – F – G – F – E – D
 ```
 Sing it right now on solfège or note names at a slow, steady pulse before reading further. If you can't sing your CF cleanly, don't start counterpoint against it — fix the CF first.
@@ -67,7 +67,7 @@ Sing it right now on solfège or note names at a slow, steady pulse before readi
 - Final interval: P8 or P1.
 - Second-to-last interval: M6 or m6, set up so the CP voice steps into the final while the CF also steps — ideally in contrary motion.
 
-```
+```text
 CF:   C  – D
 CP:   E  – D
 Ivl:  M6 – P8     (contrary motion: CF up, CP down)
@@ -85,7 +85,7 @@ Ivl:  M6 – P8     (contrary motion: CF up, CP down)
 
 CF (D Dorian): `D – E – F – E – D – C – D`
 
-```
+```text
 CF:         D  –  E  –  F  –  E  –  D  –  C  –  D
 CP:         D  –  C  –  D  –  C  –  F  –  E  –  D
 Interval:   P8    m6    m6    m6    M3    M3    P8
@@ -115,7 +115,7 @@ CF (G Dorian): `G – A – Bb – A – G – F – G`
 
 **Rhythm**: two half notes of CP per CF whole note. Beat 1 (strong) must be consonant with the CF. Beat 2 (weak) may be dissonant **only if** it is approached by step and left by step in the same direction — that's the definition of a passing tone.
 
-```
+```text
 Beat:      1    2
 CF:        D  — (held)
 CP:        F    E
@@ -126,7 +126,7 @@ Interval:  M3   M2 (dissonant, legal passing tone)
 
 Start from a known-good 1:1 skeleton and insert a stepwise passing note on every weak beat:
 
-```
+```text
 Skeleton:  CF: D – E – F     CP: F – G – A   (all M3, all consonant)
 
 Expanded:  CF:    D        E        F
@@ -140,7 +140,7 @@ Every weak beat dissonance resolves by continuing in the same stepwise direction
 
 The standard Species 2 cadence drops the final CP note down an octave register shift or simply uses a passing 7th-to-step-down into the close:
 
-```
+```text
 CF:         D       E       F       E       D
 CP:         F   E   G   F   A   G   G   F   D
 Interval:   M3  M2  M3  m2  M3  M2  M3  M2  P8
@@ -157,7 +157,7 @@ Interval:   M3  M2  M3  m2  M3  M2  M3  M2  P8
 
 **Rhythm**: four quarter notes of CP per CF whole note. Beat 1 should be consonant. Beats 2–4 may be dissonant if they function as passing tones (stepping through) or **neighbor tones** (step away and immediately back).
 
-```
+```text
 Beat:      1    2    3    4
 CF:        D  — (held) — — 
 CP:        F    E    F    G
@@ -178,7 +178,7 @@ Over a CF note of D, with D/F/A as your home triad:
 
 CF (D Dorian): `D – E – F`
 
-```
+```text
 CF:        D               E               F
 CP:        A  G  F  E      E  D  C  D      F  E  D  C
 Interval:  P5 P4 m3 M2     P8 m7 m6 m7     P8 m7 m6 P5
@@ -200,7 +200,7 @@ This is the species where counterpoint starts sounding emotionally loaded, becau
 2. **Suspension**: that same pitch is held (tied) into the next *strong* beat, where it now clashes with a new CF note — this is where the dissonance lives.
 3. **Resolution**: the suspended note steps *down* to a consonance, landing on the following weak beat.
 
-```
+```text
 Beat:      weak   strong   weak   strong
 CF:        D      E        E      F
 CP:        A ——————————    A      G
@@ -219,7 +219,7 @@ Phase:     Prep   SUSP    (held)  Res
 
 ### Drill 4A — Label an existing suspension chain
 
-```
+```text
 CF:         D   –   E   –   F   –   E   –   D
 CP:             A   –   G   –   F   –   E   –   D
 Interval:       P5  –   M3  –   P8  –   P8  –   P8
@@ -231,7 +231,7 @@ Interval:       P5  –   M3  –   P8  –   P8  –   P8
 
 CF (D Dorian): `D – E – F – E – D`
 
-```
+```text
 CF:         D       E       F       E       D
 CP:     –   A   –   G   –   F   –   E   –   D
 Interval:   P5   (4) M3   (2) P8   (7) P8   (–) P8
@@ -256,7 +256,7 @@ Read this as: prepare A on the upbeat before D, carry it into E to create the (4
 
 CF (D Dorian): `D (whole) – E (whole) – F (whole)`
 
-```
+```text
 CP:        F   F |  E F G F E  |  D  |  E - (tie) F |  E  D  C
 Rhythm:    ♩   ♩ |   six ♪'s   |  𝅗𝅥  |   𝅗𝅥 (tied)  |  ♩  ♩  ♩
 ```
@@ -266,7 +266,7 @@ Bar 1 is Species-2-style motion, the eighth-note run is Species-3-style accelera
 
 CF (G Dorian): `G – A – Bb – A – G`. Requirement: at least one suspension, one four-note figure, one sustained note.
 
-```
+```text
 CF:      G              A            Bb           A            G
 CP:      G  A  Bb C  |  D — (tie) D  |  D  C   |  D  C  Bb A  |  G
 Rhythm:  ♩  ♪ ♪  ♪  |  𝅗𝅥         |  𝅗𝅥 (tied) ♩ |  ♪  ♪  ♪  ♪  |  𝅗𝅥
@@ -306,7 +306,7 @@ Fux's system predates functional tonal harmony. There's no V–I pull here — t
 
 **Standard modal cadence** — lower voice steps up by a half or whole step into the final while the upper voice steps down into it, producing a major sixth expanding out to an octave:
 
-```
+```text
 CF (lower): C  – D
 CP (upper): E  – D
 Interval:   M6 – P8
@@ -421,7 +421,7 @@ Run this against every exercise you write by hand before moving to the next spec
 
 **Palestrina, *Missa Papae Marcelli*, "Kyrie"** — simplified two-voice reduction, tenor and soprano:
 
-```
+```text
 Measure:     1       2       3       4       5
 Tenor (CF):  D   –   E   –   F   –   E   –   D
 Soprano:         A   –   G   –   F   –   E   –   D
@@ -447,7 +447,7 @@ CF (middle voice, D Dorian): `D – E – F – E – D`
 
 Add a voice above and below, checking **three** voice pairs independently (upper/CF, CF/lower, upper/lower) at every single bar — this is the real difficulty jump from two voices to three.
 
-```
+```text
 Upper:    A – C – A – C – A
 CF:       D – E – F – E – D
 Lower:    D – A – D – A – D
@@ -460,7 +460,7 @@ Check every pair:
 
 This is the single most common failure mode in three-voice writing: you check each voice against the CF and both pass, but you forget to check the outer two voices against *each other*. **Fix**: move the lower voice's second note from A to F, changing Upper/Lower bar 2 to a sixth:
 
-```
+```text
 Upper:    A – C – A – C – A
 CF:       D – E – F – E – D
 Lower:    D – F – D – A – D

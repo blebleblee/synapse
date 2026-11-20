@@ -60,7 +60,7 @@ In matrix terms, if $V = \mathbb{F}^n$ and the vectors $v_i$ are columns of a ma
 
 The **Gram-Schmidt algorithm** operates by iteratively orthogonalizing vectors against previously constructed orthonormal vectors. Given a basis $\{v_1, \ldots, v_n\}$, the algorithm maintains an orthonormal set $\{u_1, \ldots, u_{k-1}\}$ and constructs $u_k$ by projecting $v_k$ onto the orthogonal complement of $\text{span}(u_1, \ldots, u_{k-1})$. In pseudocode:
 
-```
+```text
 GramSchmidt(v_1, ..., v_n):
   u_1 = v_1 / ||v_1||
   for k = 2 to n:
@@ -71,7 +71,7 @@ GramSchmidt(v_1, ..., v_n):
 
 Each iteration requires $O(k)$ inner products and vector operations, yielding total complexity $O(n^2 m)$ for vectors in $\mathbb{R}^m$. The algorithm is numerically unstable in finite precision arithmetic: rounding errors accumulate, causing the computed vectors to lose orthogonality. The **modified Gram-Schmidt algorithm** improves stability by orthogonalizing $v_k$ sequentially against each $u_i$ rather than computing the full projection at once:
 
-```
+```text
 ModifiedGramSchmidt(v_1, ..., v_n):
   for i = 1 to n:
     u_i = v_i
@@ -104,7 +104,7 @@ The singular value decomposition (SVD) generalizes the Spectral Theorem to arbit
 
 The following ASCII diagram illustrates the projection architecture:
 
-```
+```text
 Vector space V = W ⊕ W⊥
          |
          v

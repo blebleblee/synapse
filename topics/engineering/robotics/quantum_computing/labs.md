@@ -802,7 +802,7 @@ The operational practitioner must select appropriate quantum computing approache
 
 Estimate computational costs before executing quantum algorithms on cloud hardware, where billing is per-shot (circuit execution). The following formula computes the total quantum processing unit (QPU) time required for a complete optimization run.
 
-```
+```text
 Total QPU Time = (Circuit Depth × Gate Time) × Shots × Optimization Iterations
 
 For VQE trajectory optimization (Exercise 2):

@@ -22,7 +22,7 @@ The shape system in TensorFlow supports both static and dynamic dimensions. Stat
 
 Broadcasting mechanics operate through a two-phase protocol: shape compatibility checking followed by implicit stride manipulation. When TensorFlow encounters an element-wise binary operation, it first aligns operand shapes by prepending ones to the lower-rank tensor, then walks backward through dimension pairs. For each pair `(d1, d2)`, the operation succeeds if `d1 == d2`, `d1 == 1`, or `d2 == 1`, with the output dimension taking the maximum. If `d1 == 1` and `d2 > 1`, the runtime conceptually tiles the first operand by repeating data `d2` times along that axis—though the actual implementation reuses the same memory addresses across iterations, achieving zero-copy broadcasting. This stride manipulation, visible through the internal `strides` attribute on eager tensors, transforms a shape `(3, 1, 5)` tensor into an effective `(3, 4, 5)` broadcast view by setting the middle stride to zero, causing index increments along that axis to read the same memory location repeatedly.
 
-```
+```text
 Original tensor: shape (3, 1, 5), strides (5, 5, 1) bytes
 Memory layout: [a₀ a₁ a₂ a₃ a₄] [b₀ b₁ b₂ b₃ b₄] [c₀ c₁ c₂ c₃ c₄]
 

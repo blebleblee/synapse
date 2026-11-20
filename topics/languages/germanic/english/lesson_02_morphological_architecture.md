@@ -148,7 +148,7 @@ Each compound instantiates a different semantic relationship between the two ele
 
 The phonological signature of a compound, as opposed to an adjective-noun or noun-noun phrase, is **primary stress on the first element**: *a GREENhouse* (compound, a specific structure) versus *a green HOUSE* (phrase, a house that happens to be green). This prosodic distinction is functional and testable:
 
-```
+```text
 Compound:         [GREEN·house]  → Primary stress left
 Phrase:           [green HOUSE]  → Primary stress right (on head noun)
 

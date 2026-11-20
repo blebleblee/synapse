@@ -16,7 +16,7 @@ Software dependencies include a modern Linux distribution (Ubuntu 22.04 LTS or F
 
 Configuration proceeds in phases. First, install gem5 dependencies and compile the simulator targeting the x86-64 and ARM instruction set architectures. The gem5 build system uses SCons; practitioners execute `scons build/X86/gem5.opt -j8` to generate the optimized x86-64 binary and `scons build/ARM/gem5.opt -j8` for ARM. Compilation requires approximately 45 minutes on an 8-core workstation and produces executables in the `build/` directory tree. Second, configure the Linux `perf` subsystem by enabling kernel symbol resolution (`sudo sysctl kernel.kptr_restrict=0` and `sudo sysctl kernel.perf_event_paranoid=-1`) to grant unprivileged access to performance counters. Third, install OpenOCD via package manager (`sudo apt install openocd` on Debian-derived distributions) and configure interface files for the specific JTAG/SWD hardware probe. For an FTDI FT2232H-based probe, create `/usr/local/share/openocd/scripts/interface/ftdi_custom.cfg` containing:
 
-```
+```text
 adapter driver ftdi
 ftdi vid_pid 0x0403 0x6010
 ftdi layout_init 0x0008 0x000b

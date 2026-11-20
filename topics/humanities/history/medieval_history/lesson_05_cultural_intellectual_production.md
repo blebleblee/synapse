@@ -95,7 +95,7 @@ The Toledo translations faced substantial technical challenges. Arabic philosoph
 
 The socio-political context profoundly shaped translation outcomes. Christian rulers like Alfonso X of Castile (r. 1252–1284) patronized translation projects as expressions of monarchical power and cultural sophistication. Alfonso's court produced Castilian translations of Arabic astronomical tables, legal codes, and historical chronicles, positioning Castilian as a literary language competitive with Latin. Jewish scholars like Abraham ibn Ezra served as intermediaries, translating Arabic texts into Hebrew or Latin and facilitating knowledge circulation across religious communities. This multidirectional translation activity—Arabic to Latin, Arabic to Hebrew, Hebrew to Latin, Latin to Romance vernaculars—created a complex textual network where ideas could flow through multiple linguistic channels.
 
-```
+```text
 Translation Knowledge Flow (9th–13th centuries)
 
 Greek Philosophical/Scientific Corpus

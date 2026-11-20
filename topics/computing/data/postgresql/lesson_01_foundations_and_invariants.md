@@ -288,7 +288,7 @@ PostgreSQL's MVCC model avoids this entirely by treating all updates as **append
 2. A new tuple version is written to the page (either the same page, in the case of a HOT update, or a new page if the row grew). This new version has `t_xmin` set to the updating transaction's XID and `t_xmax = 0`.
 3. A `SELECT` running concurrently takes a snapshot at statement start. The snapshot captures the set of all in-progress XIDs at that moment. Visibility evaluation for each scanned tuple is:
 
-```
+```text
 tuple is visible to snapshot S if:
     t_xmin is committed AND t_xmin < S.xmax AND t_xmin ∉ S.xip_list
     AND (t_xmax = 0
@@ -388,7 +388,7 @@ This design avoids the per-access cost of maintaining a true LRU doubly-linked l
 
 Before any backend can read or modify a page's bytes, it must **pin** the buffer — incrementing the pin count in the buffer descriptor atomically. A pinned buffer cannot be evicted by the clock-sweep. The sequence for a page access is:
 
-```
+```text
 1. Compute buffer tag: (relfilenode, fork, block_number)
 2. Acquire BufMappingLock (partition) to look up the buffer tag in the
    shared buffer hash table.

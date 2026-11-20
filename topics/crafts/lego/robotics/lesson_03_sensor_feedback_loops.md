@@ -24,7 +24,7 @@ The Lego touch sensor embodies mechanical simplicity: a spring-loaded button act
 
 Software debouncing filters this noise through temporal hysteresis, ignoring state changes unless they persist beyond a minimum duration threshold. The canonical implementation maintains a state variable and timestamp, updating the stable state only after the raw sensor reading remains constant for 20 to 50 milliseconds. Within the EV3 Python API, the `TouchSensor.pressed()` method returns the debounced state, abstracting the filtering logic from application code. For timing-critical applications requiring custom debouncing, the pattern follows:
 
-```
+```text
 previous_state ← read_touch_sensor()
 debounce_timer ← current_time()
 
@@ -54,7 +54,7 @@ Reflected light intensity depends nonlinearly on surface albedo, sensor-to-targe
 
 Line-following algorithms exploit the sharp reflectance contrast between light tracking surfaces and dark guide lines. The canonical two-threshold approach defines a white reference reading obtained by positioning the sensor over the tracking surface and a black reference from positioning over the line, then computes the midpoint threshold:
 
-```
+```text
 calibrate_white() → white_value = 85
 calibrate_black() → black_value = 12
 threshold = (white_value + black_value) / 2 = 48.5
@@ -72,7 +72,7 @@ loop:
 
 This binary classification, while robust against moderate lighting variations, sacrifices the continuous intensity gradient available near the line edge. Proportional control exploits the full intensity range by treating the reflected value as a continuous error signal:
 
-```
+```text
 error ← reflected_intensity - threshold
 
 motor_power_left = BASE_SPEED + (Kp × error)
@@ -91,7 +91,7 @@ Minimum range limitations arise from acoustic pulse duration and receiver gating
 
 Obstacle avoidance control laws leverage ultrasonic ranging to maintain safe following distances. The simplest threshold-based approach defines a critical proximity distance, initiating emergency stop or evasive maneuvers when measured range falls below the threshold:
 
-```
+```text
 CRITICAL_DISTANCE ← 15 centimeters
 
 loop:
@@ -106,7 +106,7 @@ loop:
 
 Proportional distance control enables smoother behavior by scaling motor speed with proximity:
 
-```
+```text
 TARGET_DISTANCE ← 30 centimeters
 Kp ← 2.0
 
@@ -132,7 +132,7 @@ Mitigating gyro drift begins with proper initialization. The `GyroSensor.reset_a
 
 Turn-to-heading control illustrates practical gyroscope integration. The objective is to rotate the robot to a target absolute heading angle with respect to the initial orientation:
 
-```
+```text
 TARGET_HEADING ← 90 degrees
 Kp ← 1.5
 
@@ -164,7 +164,7 @@ The error normalization step prevents the controller from selecting the long-way
 
 Compass-assisted gyroscope fusion extends useful heading estimation duration by periodically correcting accumulated drift against an absolute magnetic heading reference. The approach maintains a gyro-derived heading estimate for fast control loop updates, then applies slow corrections based on magnetometer readings:
 
-```
+```text
 gyro_heading ← 0
 compass_heading ← magnetometer.heading()
 
@@ -186,7 +186,7 @@ Robust autonomous behavior requires integrating multiple sensor modalities, each
 
 The subsumption architecture organizes sensor-behavior mappings into a hierarchy where higher-priority behaviors suppress lower-priority ones. A simple three-layer architecture might define: collision avoidance (highest priority) responding to touch sensor activation with immediate motor reversal, obstacle avoidance (medium priority) using ultrasonic proximity to steer around detected objects, and baseline wall-following (lowest priority) regulating lateral distance via proportional control. Each layer runs concurrently, but only the highest-priority layer detecting its trigger condition commands the actuators:
 
-```
+```text
 loop:
     # Layer 0: Baseline wall following
     distance_error ← ultrasonic.distance() - TARGET_WALL_DISTANCE
@@ -218,7 +218,7 @@ Voting and averaging methods provide alternative fusion strategies for sensors m
 
 Kalman filtering offers a statistically optimal sensor fusion framework for estimating system state from noisy measurements, though the computational complexity and tuning requirements often exceed Lego EV3 computational budgets. The simplified alpha-beta filter provides a practical compromise, blending predicted state evolution with new sensor measurements:
 
-```
+```text
 estimated_position ← initial_position
 estimated_velocity ← 0
 
@@ -247,7 +247,7 @@ Actuator saturation imposes nonlinear constraints that degrade controller perfor
 
 Anti-windup strategies prevent integral accumulation during saturation by clamping the integrator when actuator limits are reached:
 
-```
+```text
 integral ← 0
 
 loop:
@@ -272,7 +272,7 @@ This back-calculation resets the integral term to the maximum value consistent w
 
 Derivative kick—sudden large derivative terms arising from abrupt setpoint changes rather than process disturbances—generates undesirable actuator transients. When the setpoint suddenly jumps, the error derivative momentarily becomes very large even if the process variable has not moved, commanding aggressive corrective action before the system has had opportunity to respond. Derivative-on-measurement avoids this artifact by computing the derivative term from process variable changes rather than error changes:
 
-```
+```text
 previous_measured ← initial_value
 
 loop:
@@ -292,7 +292,7 @@ Sensor readings contain measurement noise from quantization, electromagnetic int
 
 The moving average filter suppresses high-frequency noise by averaging the most recent $N$ sensor samples, effectively implementing a low-pass filter with cutoff frequency inversely proportional to the averaging window duration:
 
-```
+```text
 WINDOW_SIZE ← 5
 measurement_buffer ← [0, 0, 0, 0, 0]
 buffer_index ← 0
@@ -309,7 +309,7 @@ A five-sample window at 50 Hz loop rate spans 100 milliseconds, attenuating nois
 
 Exponential moving average (EMA) filtering offers an alternative with single-sample memory and tunable responsiveness:
 
-```
+```text
 ALPHA ← 0.3  # Smoothing factor
 filtered_value ← initial_measurement
 
@@ -322,7 +322,7 @@ The smoothing factor $\alpha$ ranges from 0 (infinite smoothing, no response to 
 
 Median filtering excels at rejecting outlier spikes while preserving edge sharpness, making it ideal for ultrasonic sensors prone to occasional far-range spurious echoes when acoustic pulses reflect off unintended surfaces. The three-sample median sorts the most recent measurements and selects the middle value:
 
-```
+```text
 sample_buffer ← [0, 0, 0]
 
 loop:
@@ -354,7 +354,7 @@ Gyroscope bias calibration requires the robot to remain absolutely stationary du
 
 Temperature compensation extends calibration to dynamic conditions by modeling sensor parameter drift with temperature. The EV3 brick provides battery voltage and ambient temperature telemetry accessible through system APIs. Advanced implementations correlate gyro bias with measured temperature, applying correction factors derived from thermal characterization:
 
-```
+```text
 BIAS_AT_25C ← 0.3 degrees/sec
 THERMAL_COEFFICIENT ← 0.02 degrees/sec per °C
 
@@ -383,7 +383,7 @@ This heuristic often produces aggressive control suitable for disturbance reject
 
 Gain scheduling adapts control parameters based on operating regime, recognizing that optimal gains vary with error magnitude and system state. A line-following robot benefits from high gain when far from the line—enabling rapid return—and low gain when near the line—providing smooth tracking. The scheduled controller switches gains based on error magnitude:
 
-```
+```text
 if abs(error) > LARGE_ERROR_THRESHOLD:
     Kp ← HIGH_GAIN_Kp
     Kd ← HIGH_GAIN_Kd
@@ -400,7 +400,7 @@ Robust autonomous systems anticipate sensor failures, mechanical malfunctions, a
 
 Watchdog timers detect control loop stalls arising from software defects, sensor communication timeouts, or deadlocks. The watchdog mechanism requires the control loop to reset a timer within every expected iteration; if the timer expires without reset, the system invokes a failsafe routine—stopping motors, activating alert indicators, entering safe mode. Implementation on the EV3 brick requires a separate timing thread:
 
-```
+```text
 watchdog_last_reset ← current_time()
 
 thread watchdog_monitor:
@@ -424,7 +424,7 @@ If the control loop hangs—blocking on a sensor read that never completes, ente
 
 Battery voltage sag affects actuator performance and sensor operation. As LiPo or NiMH batteries discharge, terminal voltage drops, reducing motor torque and LED illumination intensity for color sensors. A robot calibrated at full battery charge exhibits different behavior at 50 percent discharge: motor responses become sluggish, proportional control gains become effectively weaker, color thresholds shift as illumination dims. Voltage monitoring and compensation compensates by scaling motor commands inversely with battery voltage:
 
-```
+```text
 NOMINAL_VOLTAGE ← 7.4 volts  # Fresh 2S LiPo
 
 current_voltage ← battery.voltage()

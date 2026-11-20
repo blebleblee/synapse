@@ -28,7 +28,7 @@ The production pipeline architecture decomposes into a layered system where each
 
 Above the storage layer resides the asset database layer, which maintains the canonical registry of all media entities in the production. This database stores not the media files themselves but rather metadata records that describe each asset's properties, version history, dependency relationships, and filesystem paths. The schema design of this database profoundly impacts the pipeline's capabilities and flexibility. A well-architected asset database implements a hierarchical structure that mirrors the production's organizational breakdown: productions contain sequences, sequences contain shots, shots contain elements, and elements reference versioned asset files. Each level of the hierarchy inherits metadata from its parent while adding its own specific attributes.
 
-```
+```text
 Production: "Nebula"
 ├── Sequence: "seq010_opening"
 │   ├── Shot: "seq010_sh0010"
@@ -52,7 +52,7 @@ Render farm architecture typically employs a heterogeneous hardware strategy whe
 
 The color pipeline implementation requires careful attention to OpenColorIO (OCIO) configuration files that define color space transforms and viewing environments. A production's OCIO config specifies the scene-referred working space where artists light and shade (typically ACES AP1 or DaVinci Wide Gamut), display transforms for various viewing contexts (sRGB for web, P3 for theatrical DI), and look modification transforms (LMTs) that implement the director's creative color intent. Every application in the pipeline—3D software, compositing tools, editorial systems—must load the same OCIO config to ensure consistent color reproduction across the entire workflow.
 
-```
+```text
 ocio_profile_v1
 
 search_path: luts

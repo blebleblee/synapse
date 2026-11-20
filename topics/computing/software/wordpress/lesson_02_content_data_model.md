@@ -18,7 +18,7 @@ The `wp_posts` table schema reveals WordPress's strategic use of denormalization
 
 The complete schema structure follows this pattern:
 
-```
+```text
 wp_posts
 ├── ID                  BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY
 ├── post_author         BIGINT UNSIGNED (FK → wp_users.ID)
@@ -179,7 +179,7 @@ add_action('init', 'register_product_taxonomies');
 
 The taxonomy relationship tables form a three-table normalized structure that prevents duplication while enabling efficient querying. The `wp_terms` table stores the term name and slug, the `wp_term_taxonomy` table adds the taxonomy type and term metadata, and the `wp_term_relationships` table creates the many-to-many mapping between posts and term-taxonomy pairs. This separation allows the same term (e.g., "Blue") to exist in multiple taxonomies (product colors, category colors, tag colors) with different parent relationships and descriptions in each context.
 
-```
+```text
 wp_terms
 ├── term_id       BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY
 ├── name          VARCHAR(200)

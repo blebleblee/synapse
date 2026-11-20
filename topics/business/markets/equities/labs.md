@@ -150,7 +150,7 @@ Each cell in the grid must be a live formula that recalculates the entire DCF in
 
 The practical approach is to write one master formula that takes WACC and g as parameters:
 
-```
+```text
 =( (IS!$C$Net_Income + CF!$C$DA - CF!$C$ΔNWC - CF!$C$Capex) / (1+WACC_cell)^1
  + (IS!$D$Net_Income + CF!$D$DA - CF!$D$ΔNWC - CF!$D$Capex) / (1+WACC_cell)^2
  + (IS!$E$Net_Income + CF!$E$DA - CF!$E$ΔNWC - CF!$E$Capex) / (1+WACC_cell)^3

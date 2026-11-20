@@ -32,7 +32,7 @@ The practical consequence of this design is that the MPT's on-disk representatio
 
 The following diagram illustrates the two-level trie structure and the hash propagation path for a single storage write:
 
-```
+```text
 Block Header
 └── state_root (keccak256)
       │

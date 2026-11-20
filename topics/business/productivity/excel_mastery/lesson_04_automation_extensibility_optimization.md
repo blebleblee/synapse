@@ -24,7 +24,7 @@ The calculation engine itself is event-driven and lazy. Excel does not recalcula
 
 The Excel object model is hierarchical and compositional. Below is the structural relationship:
 
-```
+```text
 Application (Root)
 ├── Workbooks (Collection)
 │   └── Workbook (Single Instance)
@@ -76,7 +76,7 @@ Calculation dependencies in Excel form a directed acyclic graph (DAG). Each form
 
 Events in VBA fire in a specific sequence tied to user actions and macro operations. The lifecycle looks like this:
 
-```
+```text
 User Action
     ↓
 Application-Level Event (e.g., Workbook_Open)

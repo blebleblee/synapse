@@ -22,7 +22,7 @@ The purchase price architecture in a definitive agreement decomposes the headlin
 
 The enterprise value to equity value bridge follows a rigid accounting identity that both parties must reconcile to the penny at closing. Beginning with the stated enterprise value, the buyer subtracts the target's total debt obligations—senior secured credit facilities, subordinated notes, capital leases, pension liabilities, and any other interest-bearing obligations that will be repaid or assumed at closing. The buyer adds back the target's cash and cash equivalents, since these liquid assets convey to the acquirer and effectively reduce the net consideration paid. The formula takes the form:
 
-```
+```text
 Equity Value = Enterprise Value - Net Debt + Cash - Transaction Expenses ± Working Capital Adjustment
 ```
 

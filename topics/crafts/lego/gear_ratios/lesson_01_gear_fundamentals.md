@@ -38,7 +38,7 @@ The worm gear, a specialized helical gear wrapped into a single-tooth spiral, me
 
 Gear meshing quality depends critically on center-to-center spacing accuracy. Too little distance causes binding, where teeth jam against each other, generating excessive friction and potentially stripping plastic under load. Too much distance produces backlash—the angular play between meshed gears that allows rattling and imprecise motion transmission. A properly meshed gear pair exhibits slight backlash, typically 0.2–0.5 mm of circumferential clearance at the pitch circle, allowing smooth rotation while minimizing lost motion. LEGO's standardized 8 mm grid and the integer/half-integer pitch diameter design mostly ensure correct spacing when builders follow traditional straight-beam construction, but diagonal or off-grid assemblies require careful dimensional validation.
 
-```
+```text
 Standard LEGO Gear Center-to-Center Distances (in mm and studs):
 
 8T + 8T:   (8+8)/2  =  8 mm  = 1.0 stud

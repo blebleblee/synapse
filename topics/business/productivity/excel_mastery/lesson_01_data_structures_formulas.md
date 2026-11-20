@@ -26,7 +26,7 @@ The Excel calculation engine operates as a multi-stage pipeline: formula parsing
 
 The dependency graph construction phase inserts edges between the newly parsed formula and every cell it references. Excel maintains this graph in a sparse adjacency list structure: each cell stores a list of dependent cells (cells that reference it) and precedent cells (cells it references). When cell A1 changes, Excel traverses A1's dependent list to identify all cells that need recalculation, then recursively traverses their dependents, constructing a subgraph of affected cells. This traversal stops at cells with no dependents, which represent terminal nodes in the calculation chain. The graph is bidirectional—Excel can traverse both forward (from inputs to outputs) and backward (from outputs to inputs)—which enables features like Trace Precedents and Trace Dependents in the Formula Auditing toolbar. These auditing tools are not post-hoc analysis utilities but direct visualizations of the live dependency graph that governs calculation order.
 
-```
+```text
 Dependency Graph Structure (Simplified):
 
 A1: [value=100]

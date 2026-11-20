@@ -40,7 +40,7 @@ The internal geometry of morphological structure obeys hierarchical organizing p
 
 Consider the English word *denationalization*, which decomposes into the following hierarchical structure:
 
-```
+```text
          [denationalization]N
                 |
           [de-  [nationalization]N  ]V→N
@@ -60,7 +60,7 @@ Inflectional morphology exhibits less hierarchical depth than derivation but imp
 
 Within inflectional domains, languages organize morpheme sequences according to feature hierarchies and scope principles. The universal template for nominal morphology tends to follow the schema:
 
-```
+```text
 ROOT - DERIVATION - NUMBER - CASE
 ```
 
@@ -68,7 +68,7 @@ Turkish exemplifies this ordering transparently: *ev-cik-ler-de* (house-DIM-PL-L
 
 Verbal inflectional templates exhibit greater cross-linguistic variation but consistently organize person, number, tense, aspect, mood, and voice features into hierarchical zones. The Bantu verb template positions aspectual prefixes internal to tense prefixes, with subject agreement preceding the root and object agreement following it:
 
-```
+```text
 SUBJECT.AGR - TENSE - ASPECT - ROOT - APPLICATIVE - CAUSATIVE - OBJECT.AGR
 ```
 
@@ -92,7 +92,7 @@ Distributed Morphology as a theoretical framework reconceptualizes the morpholog
 
 This architecture captures systematic allomorphy through competition among vocabulary items specified with different contextual restrictions. For English past tense, multiple vocabulary items compete to realize the feature [+past]:
 
-```
+```text
 [+past] ↔ /wɛnt/ / √GO __
 [+past] ↔ /ɛd/ / X[+alveolar stop] __
 [+past] ↔ /d/ / X[+voiced] __
@@ -111,7 +111,7 @@ Minimal pairs constitute the fundamental discovery tool: forms differing in sing
 
 For fusional languages with cumulative exponence, paradigm comparison proves essential. Latin noun paradigms across declension classes reveal systematic patterns:
 
-```
+```text
            SG.NOM   SG.GEN   SG.DAT   PL.NOM   PL.GEN   PL.DAT
 1st (fem)  rosa     rosae    rosae    rosae    rosarum  rosis
 2nd (masc) dominus  domini   domino   domini   dominorum dominis

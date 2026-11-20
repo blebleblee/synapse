@@ -51,14 +51,14 @@ Each problem has an information-theoretic lower bound that probabilistic structu
 - k independent hash functions h₁, h₂, ..., h_k mapping elements to [0, m-1]
 
 **Insertion protocol**:
-```
+```text
 Insert(x):
     for i = 1 to k:
         M[h_i(x)] = 1
 ```
 
 **Query protocol**:
-```
+```text
 Query(x):
     for i = 1 to k:
         if M[h_i(x)] = 0:
@@ -70,13 +70,13 @@ Query(x):
 
 After inserting n elements, the probability that a specific bit remains 0 is:
 
-```
+```text
 P(bit = 0) = (1 - 1/m)^(kn) ≈ e^(-kn/m)
 ```
 
 False positive probability for a query on element not in set:
 
-```
+```text
 P(false positive) = (1 - e^(-kn/m))^k
 ```
 
@@ -84,7 +84,7 @@ P(false positive) = (1 - e^(-kn/m))^k
 
 Given n elements and desired false positive rate ε:
 
-```
+```text
 m = -n ln(ε) / (ln 2)²  ≈ 1.44 n log₂(1/ε)
 k = (m/n) ln 2          ≈ 0.693 m/n
 ```
@@ -100,14 +100,14 @@ With optimal k, false positive rate becomes ε = (0.6185)^(m/n).
 - d independent hash functions h₁, h₂, ..., h_d mapping elements to [0, w-1]
 
 **Update protocol**:
-```
+```text
 Update(x, count):
     for i = 1 to d:
         C[i, h_i(x)] += count
 ```
 
 **Query protocol**:
-```
+```text
 Query(x):
     return min(C[i, h_i(x)] for i = 1 to d)
 ```
@@ -116,13 +116,13 @@ Query(x):
 
 With probability at least 1 - δ:
 
-```
+```text
 count(x) ≤ Query(x) ≤ count(x) + ε·N
 ```
 
 where N is the sum of all counts, given:
 
-```
+```text
 w = ⌈e/ε⌉
 d = ⌈ln(1/δ)⌉
 ```
@@ -140,7 +140,7 @@ d = ⌈ln(1/δ)⌉
 **Algorithmic insight**: Uses the position of the first 1-bit in hashed values as a geometric distribution proxy for cardinality.
 
 **Update protocol**:
-```
+```text
 Add(x):
     v = h(x)                          // Hash to uniform bit string
     j = first_b_bits(v)               // Register index
@@ -149,7 +149,7 @@ Add(x):
 ```
 
 **Estimation protocol**:
-```
+```text
 Estimate():
     raw_estimate = α_m · m² / Σ(2^(-M[j]))
     return apply_bias_correction(raw_estimate)
@@ -166,7 +166,7 @@ The probability that ρ(h(x)) ≥ k is exactly 2^(-k). If we've seen n distinct 
 
 Maximum observed ρ grows as log₂(n). By partitioning into m registers and using harmonic mean, standard error becomes:
 
-```
+```text
 σ = 1.04/√m
 ```
 
@@ -181,19 +181,19 @@ Maximum observed ρ grows as log₂(n). By partitioning into m registers and usi
 
 **Key innovation**: Partial-key cuckoo hashing with the relocatable property:
 
-```
+```text
 h₁(x) = hash(x)
 h₂(x) = h₁(x) ⊕ hash(f(x))
 ```
 
 This allows computing alternate position from fingerprint alone:
 
-```
+```text
 alternate_index(i, f) = i ⊕ hash(f)
 ```
 
 **Insertion protocol**:
-```
+```text
 Insert(x):
     f = fingerprint(x)
     i₁ = h₁(x)
@@ -216,7 +216,7 @@ Insert(x):
 ```
 
 **Query protocol**:
-```
+```text
 Query(x):
     f = fingerprint(x)
     return f in bucket[h₁(x)] or f in bucket[h₂(x)]
@@ -224,7 +224,7 @@ Query(x):
 
 **Deletion support**: Unlike Bloom filters, Cuckoo filters support deletion:
 
-```
+```text
 Delete(x):
     f = fingerprint(x)
     if f in bucket[h₁(x)]:
@@ -240,7 +240,7 @@ Delete(x):
 
 With c-bit fingerprints and load factor α:
 
-```
+```text
 P(false positive) ≈ 2α/2^c
 ```
 
@@ -257,7 +257,7 @@ For 8-bit fingerprints at 95% load: ε ≈ 0.74%.
 - For each set, store k signature values (minimum hash values)
 
 **Signature construction**:
-```
+```text
 CreateSignature(S):
     sig = []
     for i = 1 to k:
@@ -266,7 +266,7 @@ CreateSignature(S):
 ```
 
 **Similarity estimation**:
-```
+```text
 EstimateSimilarity(sig_A, sig_B):
     matches = count(i where sig_A[i] = sig_B[i])
     return matches / k
@@ -276,7 +276,7 @@ EstimateSimilarity(sig_A, sig_B):
 
 For any hash function h and sets A, B:
 
-```
+```text
 P(min(h(A)) = min(h(B))) = |A ∩ B| / |A ∪ B| = J(A, B)
 ```
 
@@ -284,7 +284,7 @@ P(min(h(A)) = min(h(B))) = |A ∩ B| / |A ∪ B| = J(A, B)
 
 **Error bounds**: With k hash functions, estimated similarity J' has expected value J and standard error:
 
-```
+```text
 σ = √(J(1-J)/k)
 ```
 
@@ -618,7 +618,7 @@ public:
 
 **Bloom Filter saturation**:
 
-```
+```text
 Symptom: False positive rate increases beyond design target
 Cause: Inserted more elements than capacity (n >> expected_n)
 Detection: Monitor bit saturation ratio
@@ -669,7 +669,7 @@ public:
 
 **Hash function collision attacks**:
 
-```
+```text
 Symptom: Degraded performance or inflated error rates
 Cause: Adversarial input designed to cause hash collisions
 Detection: Monitor distribution statistics
@@ -678,7 +678,7 @@ Mitigation: Use cryptographic hash (SipHash) with secret key
 
 **Count-Min Sketch underflow**:
 
-```
+```text
 Symptom: Negative counts or incorrect decrements
 Cause: Deleting elements never inserted, or hash collision with actual elements
 Detection: Check for negative values (impossible in uint representation)
@@ -687,7 +687,7 @@ Mitigation: Use signed integers and validate operations, or use Count Sketch var
 
 **HyperLogLog precision mismatch**:
 
-```
+```text
 Symptom: Cannot merge HLL instances
 Cause: Different precision parameters across distributed components
 Detection: Explicit precision check before merge
@@ -696,7 +696,7 @@ Mitigation: Standardize precision across system, or implement precision conversi
 
 **Cuckoo filter insertion failure**:
 
-```
+```text
 Symptom: Insert returns false despite low load factor
 Cause: Pathological hash patterns create local clustering
 Detection: Track insertion failure rate
@@ -705,7 +705,7 @@ Mitigation: Rebuild with new hash seed, or implement automatic rehashing
 
 **Memory alignment issues**:
 
-```
+```text
 Symptom: Performance degradation or crashes on certain architectures
 Cause: Unaligned memory access in bit manipulation
 Detection: Address sanitizer, valgrind
@@ -874,7 +874,7 @@ BenchmarkResults benchmark_structure(
 ### 4.3 Parameter Selection Guidelines
 
 **Bloom Filter sizing**:
-```
+```text
 Given: n elements, target FPR ε
 Calculate:
     m = ⌈-n ln(ε) / (ln 2)²⌉ bits
@@ -886,7 +886,7 @@ Example: n=1M, ε=0.01
 ```
 
 **Count-Min Sketch sizing**:
-```
+```text
 Given: accuracy ε, confidence 1-δ
 Calculate:
     w = ⌈e/ε⌉ counters wide
@@ -899,7 +899,7 @@ Example: ε=0.001, δ=0.05
 ```
 
 **HyperLogLog sizing**:
-```
+```text
 Given: target relative error σ
 Calculate:
     m = ⌈(1.04/σ)²⌉ registers
@@ -912,7 +912,7 @@ Example: σ=0.01 (1%)
 ```
 
 **Cuckoo Filter sizing**:
-```
+```text
 Given: n elements, target FPR ε, load factor α
 Calculate:
     fingerprint_bits = ⌈log₂(1/ε) + log₂(2α)⌉

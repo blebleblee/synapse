@@ -52,7 +52,7 @@ The lagging strand presents a more complex synthetic challenge due to the antipa
 
 The coordination between leading- and lagging-strand synthesis requires dynamic trombone loop formation. As the CMG helicase unwinds the parental duplex and leading-strand synthesis proceeds continuously, the lagging-strand polymerase synthesizes in the opposite direction, creating a loop of single-stranded DNA coated with replication protein A (RPA). When the lagging-strand polymerase completes an Okazaki fragment and encounters the 5' end of the previous fragment, the loop collapses, the polymerase dissociates, and a new primer is synthesized to initiate the next fragment. This cyclical process can be visualized as:
 
-```
+```text
         Leading strand synthesis (continuous)
               ↓
     5'━━━━━━━━━━━━━━━━━━━━━━━→ 3' (new strand)

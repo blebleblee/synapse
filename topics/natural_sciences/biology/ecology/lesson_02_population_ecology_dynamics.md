@@ -80,7 +80,7 @@ For open populations where births, deaths, and migration occur between sampling 
 
 **Life table construction** for sessile or easily observable organisms proceeds through cohort following or age structure snapshots. For a cohort life table tracking a group of annual plant seedlings, we establish permanent plots, tag or map each seedling at emergence, then revisit plots at regular intervals (weekly, monthly, seasonally depending on organism longevity) to record survival status and reproductive output. The raw data consist of individual-level records:
 
-```
+```text
 Individual_ID  | Census_1 | Census_2 | Census_3 | ... | Seeds_Produced
 ---------------|----------|----------|----------|-----|----------------
 Seedling_001   | Alive    | Alive    | Dead     | ... | 0

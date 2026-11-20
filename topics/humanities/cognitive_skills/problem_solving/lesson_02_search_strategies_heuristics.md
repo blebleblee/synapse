@@ -24,7 +24,7 @@ Consider a corporate restructuring problem. The start state describes the curren
 
 Breadth-first search (BFS) expands nodes in strict order of their distance from the start state. It evaluates all states reachable in one step before considering any states reachable in two steps, proceeding outward in concentric wavefronts. Mechanically, BFS maintains a **queue** of discovered but unexplored nodes. At each iteration, it dequeues the shallowest node, generates all successor states by applying available operators, and enqueues successors not previously visited. The search terminates when a goal state emerges from the queue.
 
-```
+```text
 Queue initialization:
   Enqueue(start_state)
   
@@ -51,7 +51,7 @@ Practically, BFS suits problems with shallow solution depths, expensive backtrac
 
 Depth-first search (DFS) pursues a single path aggressively until reaching a goal or a dead end, then backtracks to the most recent unexplored alternative. Mechanically, DFS replaces BFS's queue with a **stack**. At each iteration, it pops the most recently discovered node, generates successors, and pushes them onto the stack. The last-in-first-out discipline drives the search downward along a single branch before exploring siblings.
 
-```
+```text
 Stack initialization:
   Push(start_state)
   
@@ -83,7 +83,7 @@ IDDFS combines BFS's optimality with DFS's memory efficiency. Although it revisi
 
 Hill-climbing abandons systematic space traversal in favor of **greedy optimization**: at each state, evaluate all neighboring states reachable via a single operator, then move to the neighbor with the highest heuristic score. Repeat until no neighbor improves upon the current state. The "hill" metaphor arises from visualizing the solution space as a fitness landscape where elevation represents solution quality; hill-climbing ascends the steepest gradient until reaching a peak.
 
-```
+```text
 current ← start_state
 
 Loop:
@@ -104,7 +104,7 @@ To overcome hill-climbing's vulnerability to local maxima, practitioners deploy 
 
 **Simulated annealing** offers a more sophisticated escape mechanism inspired by metallurgical annealing processes. Instead of accepting only uphill moves, simulated annealing occasionally accepts downhill moves with probability determined by a **temperature** parameter. Early in the search, high temperature permits frequent downhill moves, allowing exploration of distant regions. As temperature gradually decreases according to a **cooling schedule**, the algorithm becomes increasingly conservative, eventually behaving like pure hill-climbing. The probability of accepting a downhill move to a state with heuristic score *h'* when currently at a state with score *h* typically follows the formula *e*^((*h'* - *h*) / *T*), where *T* is the current temperature.
 
-```
+```text
 current ← start_state
 T ← initial_temperature
 
@@ -131,7 +131,7 @@ Means-ends analysis tackles problems by recursively decomposing the gap between 
 
 The canonical example is Newell and Simon's General Problem Solver (GPS), which formalized this strategy in the 1950s. When transforming an initial configuration into a target configuration, GPS maintains a goal stack. If the current state differs from the goal in property *P*, GPS pushes a subgoal "reduce difference in *P*" onto the stack. If achieving that subgoal requires precondition *Q*, GPS pushes "establish precondition *Q*" onto the stack. The system works through the stack, achieving subgoals until the main goal is satisfied.
 
-```
+```text
 Function Solve(current, goal):
   If current matches goal:
     Return success
@@ -162,7 +162,7 @@ Best-first search generalizes hill-climbing by maintaining a **priority queue** 
 
 **A* search** extends best-first search to guarantee optimal solutions by evaluating nodes using *f*(*n*) = *g*(*n*) + *h*(*n*), where *g*(*n*) is the actual path cost from the start to node *n*, and *h*(*n*) is a heuristic estimate of the cost from *n* to the nearest goal. The function *f*(*n*) estimates the total cost of the cheapest path passing through *n*. A* expands nodes in order of increasing *f*-value, ensuring that when a goal is expanded, no cheaper path can exist.
 
-```
+```text
 Priority queue initialization:
   Enqueue(start_state, priority = h(start_state))
   g(start_state) ← 0

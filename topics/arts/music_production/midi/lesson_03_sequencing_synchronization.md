@@ -112,7 +112,7 @@ The complete timecode address arrives over eight consecutive frames. At 30 fps, 
 
 MTC also defines a Full Frame message transmitted as a System Exclusive:
 
-```
+```text
 0xF0 0x7F 0x7F 0x01 0x01 hr mn sc fr 0xF7
 ```
 
@@ -122,13 +122,13 @@ This ten-byte message provides immediate timecode without waiting for eight quar
 
 Song Position Pointer is a three-byte message:
 
-```
+```text
 0xF2 <LSB> <MSB>
 ```
 
 The two data bytes encode a 14-bit position value in MIDI beats (sixteenth notes since song start):
 
-```
+```text
 Position = (MSB << 7) | LSB
 ```
 

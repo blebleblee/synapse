@@ -12,7 +12,7 @@ This is not an aesthetic choice — it is an algebraic necessity. A linear SVM c
 
 The relevance of a feature X to a target Y is captured by mutual information:
 
-```
+```text
 I(X; Y) = Σ_{x,y} p(x,y) log [ p(x,y) / (p(x)·p(y)) ]
 ```
 
@@ -76,7 +76,7 @@ No feature engineering logic should run against data whose schema or statistical
 
 PSI is defined as:
 
-```
+```text
 PSI = Σᵢ (Actual%ᵢ − Expected%ᵢ) × ln(Actual%ᵢ / Expected%ᵢ)
 ```
 
@@ -359,7 +359,7 @@ sequenceDiagram
 
 **Rolling statistics** (mean, standard deviation, min, max over a window W) provide a smoothed view of local behavior. When computing rolling statistics in a streaming environment (online inference), use exponentially weighted moving averages (EWMAs) rather than fixed windows — they require O(1) state per entity:
 
-```
+```text
 EWMAₜ = α · xₜ + (1 − α) · EWMAₜ₋₁
 ```
 
@@ -367,7 +367,7 @@ where α = 2 / (W + 1) for an equivalent window size of W.
 
 **Fourier features** are the correct tool for encoding cyclical temporal patterns (hour of day, day of week, month of year). Encoding hour h as a single integer causes the model to treat hour 23 and hour 0 as maximally distant, when they are adjacent. The correct encoding is:
 
-```
+```text
 sin_hour = sin(2π · h / 24)
 cos_hour = cos(2π · h / 24)
 ```

@@ -33,7 +33,7 @@ Shellac occupies the universal barrier position because it is soluble in ethanol
 
 The internal architecture of a multi-layer film can be modeled as a gradient structure with distinct functional zones:
 
-```
+```text
 ┌─────────────────────────────────────────────────┐
 │           UV PROTECTION LAYER (Topcoat)          │
 │  • UV absorbers (benzotriazoles) + HALS           │

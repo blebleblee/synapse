@@ -46,7 +46,7 @@ The structure-conduct-performance paradigm, despite its conceptual elegance and 
 
 The conduct parameter approach provides the modern structural alternative to reduced-form structure-conduct-performance regressions. Rather than inferring conduct from observed concentration, this method directly estimates the first-order conditions characterizing profit maximization under alternative competitive regimes. Consider $N$ firms producing differentiated products, each choosing price or quantity to maximize individual profit given beliefs about rival responses. The first-order condition for firm $i$ takes the general form $(P_i - MC_i) + P_i'(Q_i) Q_i \lambda_i = 0$, where $\lambda_i \in [0,1]$ indexes the degree of competitiveness—$\lambda_i = 1$ under Bertrand with differentiated products (where firms ignore the impact of their quantity on market price), while $\lambda_i = 0$ represents perfect competition. Intermediate values reflect departures from competitive conduct, with the conduct parameter estimated from data rather than imposed by assumption.
 
-```
+```text
 Market Structure Analysis Pipeline:
 
 [Market Definition] 

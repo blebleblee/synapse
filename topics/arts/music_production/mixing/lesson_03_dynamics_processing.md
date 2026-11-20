@@ -6,7 +6,7 @@ Every sound has an **amplitude envelope** — its loudness shape over time. A sn
 
 The transfer function you actually need:
 
-```
+```text
 Above threshold:  Output dB = Threshold + (Input dB − Threshold) / Ratio
 Below threshold:  Output dB = Input dB (unity, unprocessed)
 ```

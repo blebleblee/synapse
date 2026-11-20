@@ -119,7 +119,7 @@ The critical implementation detail is that prefill (processing the prompt in par
 ### 2.4 Attention Kernel: FlashAttention
 
 Standard attention computes:
-```
+```text
 Attention(Q, K, V) = softmax(QKᵀ / √d_k) · V
 ```
 
@@ -187,7 +187,7 @@ Quantization maps floating-point weights (and optionally activations) to lower-p
 
 **GPTQ** (Frantar et al., 2022) applies second-order weight quantization per-layer. It minimizes the layer-wise reconstruction error:
 
-```
+```text
 min_{Ŵ} || WX - ŴX ||²_F
 ```
 
@@ -248,7 +248,7 @@ Autoregressive generation is fundamentally serial: token t+1 cannot be computed 
 
 The correctness guarantee: the token distribution produced by speculative decoding is **exactly identical** to the distribution of the target model alone. The acceptance/rejection criterion uses a modified rejection sampling procedure:
 
-```
+```text
 For each draft token x_i with draft probability q(x_i) and target probability p(x_i):
   Accept with probability min(1, p(x_i) / q(x_i))
   On rejection: resample from the adjusted distribution (p - q)+ normalized.
@@ -412,7 +412,7 @@ ncu --metrics \
 
 vLLM exposes a `/metrics` Prometheus endpoint. Key counters to monitor in production:
 
-```
+```bash
 # TTFT histogram — alert if P99 > 500ms
 vllm:time_to_first_token_seconds_bucket
 

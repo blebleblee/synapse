@@ -323,7 +323,7 @@ A CVL specification is organized around rules (which assert properties of indivi
 
 The following specification encodes the core invariants for `SecureVault`:
 
-```
+```text
 // spec/vault.spec — Certora CVL specification for SecureVault
 
 // Ghost variable tracking the sum of all individual balances.

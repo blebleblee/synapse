@@ -62,7 +62,7 @@ Construct a multi-leg options strategy analyzer that aggregates individual optio
 
 Begin by defining a standardized position file format as a CSV with columns: Symbol, Contract Type (C/P), Strike, Expiration Date, Quantity, Entry Premium, Current Implied Vol. Example position for an iron condor on SPY:
 
-```
+```text
 Symbol,Type,Strike,Expiration,Quantity,EntryPremium,ImpliedVol
 SPY,P,440,2025-03-21,-10,2.15,0.16
 SPY,P,445,2025-03-21,10,3.40,0.17
@@ -86,7 +86,7 @@ Iron condor components: short 440 put collected $2.15, long 445 put paid $3.40, 
 
 Rebuild the position file with corrected iron condor structure:
 
-```
+```text
 Symbol,Type,Strike,Expiration,Quantity,EntryPremium,ImpliedVol
 SPY,P,445,2025-03-21,-10,3.40,0.17
 SPY,P,440,2025-03-21,10,2.15,0.16
@@ -104,7 +104,7 @@ Extend the analyzer to compute portfolio margin requirements under Regulation T 
 
 Analyze a second multi-leg strategy: long straddle for volatility expansion. Structure: buy 1 ATM call and 1 ATM put on SPY, strike $455, expiration in 30 days, each option costs $8.50, total debit $17.00 per share × 100 = $1,700 per straddle. Position file:
 
-```
+```text
 Symbol,Type,Strike,Expiration,Quantity,EntryPremium,ImpliedVol
 SPY,C,455,2025-03-21,1,8.50,0.18
 SPY,P,455,2025-03-21,1,8.50,0.18
@@ -229,7 +229,7 @@ This reference guide consolidates the analytical infrastructure, risk protocols,
 - American option binomial tree (N=100 steps) yields premium within $0.05 of Black-Scholes European premium for non-dividend calls
 
 **Position File Data Schema**:
-```
+```text
 Symbol: underlying ticker (string)
 Type: C (call) or P (put) (char)
 Strike: strike price (float, USD)

@@ -61,7 +61,7 @@ The 5-12-13 and 3-4-5 Pythagorean liftarm configurations deserve emphasis here b
 
 The engineering of module-to-module seam joints is where most large display builds either succeed or quietly fail over time. The anatomy of a good seam joint requires careful thought. Consider two adjacent modules, each internally rigid. Where they meet, there is a planar seam. The joint must prevent the following:
 
-```
+```text
 Six degrees of freedom at a module seam:
 
       Z (vertical)

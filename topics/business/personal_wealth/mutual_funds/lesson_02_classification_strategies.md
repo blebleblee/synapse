@@ -62,7 +62,7 @@ Portfolio construction flows from mandate constraints through a hierarchical dec
 
 Security selection then populates each sector allocation through bottom-up analysis. Fundamental equity analysts construct financial models for individual companies, projecting revenue growth, margin evolution, capital intensity, and free cash flow generation over multi-year horizons. These projections feed discounted cash flow models that estimate intrinsic value by discounting future cash flows at the company's weighted average cost of capital. The cost of capital itself requires estimation of equity risk premium, company-specific beta, and debt financing costs, introducing multiple layers of assumption risk.
 
-```
+```text
 Intrinsic Value (DCF) = Σ [FCF_t / (1 + WACC)^t] + Terminal Value / (1 + WACC)^n
 
 Where:
@@ -81,7 +81,7 @@ The portfolio construction system aggregates individual security positions into 
 
 Tracking error measures the standard deviation of portfolio returns relative to benchmark returns, quantifying how much the fund's performance diverges from its index over time. Passive funds target tracking errors below twenty basis points annually, while active managers might operate with tracking errors ranging from two hundred to six hundred basis points depending on their conviction level and mandate flexibility. Higher tracking error creates greater potential for both outperformance and underperformance, reflecting the fundamental tradeoff between risk-taking and consistency.
 
-```
+```text
 Tracking Error = σ(R_p - R_b)
 
 Where:
@@ -100,7 +100,7 @@ Active share complements tracking error by measuring how much the portfolio's ho
 
 Fixed income portfolio construction introduces duration and convexity management as primary risk controls. Duration measures linear price sensitivity to yield changes, while convexity captures non-linear effects that become material for large rate movements. A bond portfolio with positive convexity gains more from rate declines than it loses from equivalent rate increases, creating an embedded option value that enhances return asymmetry.
 
-```
+```text
 Modified Duration = - (1/P) × (dP/dy)
 
 Where:
@@ -125,7 +125,7 @@ Investment-grade corporate bond portfolios typically layer exposures across matu
 
 High-yield bond portfolio construction emphasizes credit research and default risk modeling rather than duration management, as credit spread volatility dominates interest rate sensitivity in below-investment-grade markets. High-yield managers build models estimating default probabilities from financial leverage ratios, interest coverage multiples, asset coverage, and industry-specific stress scenarios. The Merton distance-to-default model provides a structural framework by treating equity as a call option on firm assets with strike price equal to debt face value, allowing estimation of default probability from equity volatility and capital structure.
 
-```
+```text
 Distance to Default = [ln(V_A / D) + (μ - 0.5σ_A²) × T] / (σ_A × √T)
 
 Where:
@@ -143,7 +143,7 @@ Sector allocation decisions within equity portfolios flow from top-down macro an
 
 The style box classification system extends into portfolio holdings analysis through statistical attribution. Each portfolio holding receives a style classification based on its valuation multiples, growth rates, and profitability metrics. Securities trading below median price-to-book ratios and exhibiting above-median dividend yields classify as value, while those with elevated price-to-earnings ratios and high revenue growth rates classify as growth. The weighted average of individual holdings' style scores determines the portfolio's aggregate style box placement, which may drift over time as market conditions shift relative valuations.
 
-```
+```text
 Value Score = f(P/E, P/B, Dividend Yield, P/CF)
 Growth Score = f(Revenue Growth, Earnings Growth, ROE, Margin Expansion)
 
@@ -155,7 +155,7 @@ and higher scores indicate more growth orientation
 
 Diversification measurement extends beyond simple security counts to risk decomposition through factor models. The Fama-French three-factor model decomposes equity returns into market risk, size premium, and value premium components, allowing quantification of how much portfolio risk derives from systematic factors versus idiosyncratic security selection. Portfolios with high systematic factor exposure exhibit lower residual volatility but also reduced differentiation from passive alternatives.
 
-```
+```text
 R_p - R_f = α + β_mkt(R_m - R_f) + β_SMB × SMB + β_HML × HML + ε
 
 Where:
@@ -171,7 +171,7 @@ HML = High Minus Low (value premium)
 
 Passive replication strategies employ one of three approaches depending on benchmark composition and fund scale. Full replication purchases every constituent security in exact index weights, ensuring minimal tracking error but requiring significant capital and operational complexity for broad indices containing thousands of securities. Stratified sampling partitions the index into cells based on sector, market cap, and style characteristics, then selects representative securities from each cell to match aggregate index properties while reducing position count. Optimization-based sampling uses quadratic programming to select a subset of securities that minimizes expected tracking error subject to practical constraints like minimum position sizes and transaction cost budgets.
 
-```
+```text
 Minimize: w'Σw (portfolio variance)
 
 Subject to:
@@ -201,7 +201,7 @@ Optimal execution algorithms minimize these costs through time-slicing and liqui
 
 Tax optimization in taxable accounts requires modeling the present value of future tax liabilities to make sound trade-off decisions between current tax realization and portfolio optimization. Selling a highly appreciated position to rebalance toward target weights triggers immediate capital gains tax, but maintaining the overweight position exposes the portfolio to concentration risk and factor drift. The optimal decision depends on the magnitude of unrealized gain, remaining holding period horizon, expected return difference between current and target allocations, and the investor's marginal tax rate.
 
-```
+```text
 After-Tax Value = Pre-Tax Gain × (1 - τ_current) + Deferred_Tax_Benefit
 
 Deferred_Tax_Benefit = Pre-Tax Gain × (τ_current - τ_future × PV_factor)
@@ -229,7 +229,7 @@ However, factor timing introduces new sources of error and transaction costs. Fa
 
 International portfolio construction confronts currency hedging optimization across multiple dimensions. Unhedged international equity exposure embeds currency volatility that historically exhibits low correlation with equity returns, potentially enhancing diversification. However, currency movements introduce path-dependent outcomes where strong equity returns in local currency terms convert to weak dollar returns following adverse exchange rate moves. The decision framework requires modeling currency risk premium, hedging costs from interest rate differentials, and correlation stability assumptions.
 
-```
+```text
 Hedging Cost = (i_domestic - i_foreign) × Notional
 
 Where:
@@ -253,7 +253,7 @@ Stale data creates execution risk when portfolio management systems rely on dela
 
 Estimation error dominates long-term strategic allocation decisions where expected returns, volatility forecasts, and correlation assumptions drive optimization outputs. Small changes in expected return assumptions—shifting large-cap equity expectations from seven percent to eight percent annually—can produce massive allocation swings in unconstrained mean-variance optimization. Practical portfolio construction addresses this sensitivity through Bayesian approaches that blend historical sample estimates with theoretical priors, through Black-Litterman frameworks that start from equilibrium market-implied returns and incorporate active views, or through robust optimization that seeks allocations performing acceptably across multiple scenarios rather than optimizing for a single point estimate.
 
-```
+```text
 Black-Litterman Expected Returns:
 E[R] = [(τΣ)^(-1) + P'Ω^(-1)P]^(-1) × [(τΣ)^(-1)π + P'Ω^(-1)Q]
 
@@ -274,7 +274,7 @@ The inverse occurs during market corrections when systematic rebalancing require
 
 Performance attribution completes the optimization feedback loop by decomposing realized returns into systematic factor exposures and active management contributions. Brinson attribution separates allocation effects from selection effects, quantifying whether outperformance derived from sector bets or security selection within sectors. A portfolio that overweighted technology before a sector rally generates allocation alpha, while one that selected higher-performing individual stocks within each sector generates selection alpha.
 
-```
+```text
 Allocation Effect = Σ(w_p,i - w_b,i) × (R_b,i - R_b)
 
 Selection Effect = Σ w_b,i × (R_p,i - R_b,i)

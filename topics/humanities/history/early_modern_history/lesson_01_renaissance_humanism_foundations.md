@@ -110,7 +110,7 @@ The production workflow operated in stages. An editor prepared a manuscript copy
 
 Quality control was critical but difficult. Compositors made errors—wrong letters, transposed words, omitted lines—that, if uncaught, would perpetuate across all copies. Printers employed scholarly proofreaders who checked sheets against manuscript copy, marking corrections. Errata lists were often included with finished books, acknowledging errors discovered after printing. High-quality editions like Aldus Manutius's Greek texts employed multiple rounds of proofing and invited scholarly readers to submit corrections for subsequent editions.
 
-```
+```text
 Print Production Workflow:
 
 [Manuscript Copy] 

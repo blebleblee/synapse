@@ -86,7 +86,7 @@ Logic restructuring exploits Boolean equivalence transformations to reduce gate 
 
 The synthesis of arbitrary Boolean functions from universal gate sets proceeds through systematic reduction. Given a truth table or Boolean expression, the designer first expands the function into sum-of-products canonical form, yielding an expression composed of AND, OR, and NOT operations. Conversion to NAND-only implementation applies a two-step transformation. First, the output OR gate transforms into a NAND gate preceded by inverters on all inputs, exploiting the identity that OR equals NAND-of-inverted-inputs via De Morgan's law. Second, each NOT gate merges with the preceding AND gate by converting the AND-followed-by-NOT pattern into a single NAND gate. The resulting circuit contains only NAND gates, though it may require additional inverters if input signals arrive in uncomplemented form only.
 
-```
+```text
 Original sum-of-products: Y = AB + CD
 
 Transform OR to NAND:     Y = NAND(NOT(AB), NOT(CD))

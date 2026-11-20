@@ -29,7 +29,7 @@ The App Router fundamentally restructures this pipeline by eliminating the artif
 
 The RSC wire protocol serializes the component tree into a compact stream format that encodes three primitive types: serialized React elements (containing tag name, props, and children), references to Client Component modules (identified by manifest chunk IDs), and async suspense boundaries (which stream subsequent chunks as promises resolve). A simplified representation of the protocol might look like this:
 
-```
+```text
 M1:{"id":"./components/Header.client.js","name":"Header","chunks":["client:123"]}
 S2:"div"
 J0:{"children":[["$","$L1",null,{"userId":"abc123"}],["$","$2",null,{"children":"Welcome"}]]}

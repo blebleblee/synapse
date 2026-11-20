@@ -42,7 +42,7 @@ The internal architecture of these systematic frameworks becomes visible when we
 
 The Hegelian idealist architecture operates through a triadic structure that appears at multiple scales. At the grandest level, world history divides into Oriental, Greek-Roman, and Germanic epochs, each representing a developmental stage in the realization of freedom. Within each epoch, the same dialectical pattern repeats: a principle achieves institutional embodiment, generates contradictions through its one-sided development, produces its negation, and synthesizes into a higher form. At the individual level, consciousness develops through parallel stages from immediate sense-certainty through perception and understanding to self-consciousness and reason.
 
-```
+```text
 HEGELIAN DIALECTICAL STRUCTURE
 
 World-Historical Development:
@@ -68,7 +68,7 @@ The operational workflow for Hegelian analysis proceeds through several phases. 
 
 The materialist architecture inverts this structure by positioning economic relations as determinative and tracing upward causation from base to superstructure. The fundamental unit of analysis becomes the mode of production, which comprises forces of production (technology, labor organization, natural resources) and relations of production (property forms, class structures, surplus extraction mechanisms). The mode of production determines the general character of social, political, and intellectual life processes.
 
-```
+```text
 MATERIALIST BASE-SUPERSTRUCTURE ARCHITECTURE
 
 SUPERSTRUCTURE (determined by base)
@@ -113,7 +113,7 @@ The fifth operation is ideology critique, already outlined but worth emphasizing
 
 Positivist-evolutionary architecture differs fundamentally from both idealist and materialist dialectics by rejecting teleological development in favor of incremental adaptation and empirical generalization. The core structure is Comtean: observation generates hypotheses, hypotheses are tested against further observation, validated generalizations become laws, and laws form the basis for prediction and intervention. Applied to history, this produces stage theories where societies evolve through universal sequences based on increasing complexity and differentiation.
 
-```
+```text
 POSITIVIST-EVOLUTIONARY STRUCTURE
 
 Spencer's Social Evolution:

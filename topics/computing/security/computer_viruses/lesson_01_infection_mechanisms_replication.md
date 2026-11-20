@@ -90,7 +90,7 @@ Metamorphic engines transcend encryption by disassembling the viral code into an
 
 Code transposition reorders basic blocks and inserts compensating jumps to maintain control flow. The metamorphic engine constructs a topological sort of the CFG, permutes blocks that have no sequential dependency, and patches branch targets to reflect the new layout. Subroutine inlining and outlining further obfuscate structure: inlining expands function calls into their definitions, eliminating call/return pairs, while outlining extracts instruction sequences into new subroutines, increasing the call graph complexity. The reassembly phase encodes the transformed CFG back into machine code, resolving jump offsets and updating any position-dependent addressing. The resulting binary preserves the computational semantics of the original virus but exhibits a completely distinct instruction sequence, defeating signature-based detection and complicating static analysis.
 
-```
+```text
 Metamorphic Transformation Pipeline:
 
 Original Code:

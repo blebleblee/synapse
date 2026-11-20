@@ -28,7 +28,7 @@ Fire a single five-shot group. Do not adjust the rifle between shots. Do not cal
 
 The `GroupData` sheet is structured as follows. Row 1 contains headers. Columns A through C contain the shot number, X coordinate, and Y coordinate. For a five-shot group in rows 2 through 6, the formulas are:
 
-```
+```text
 Cell A2: 1
 Cell A3: 2
 Cell A4: 3
@@ -40,32 +40,32 @@ Cell C2: [Y coordinate of shot 1, in inches]
 
 Continue entering raw data through B6 and C6. The group centroid is computed in row 8:
 
-```
+```text
 Cell B8 (Centroid X): =AVERAGE(B2:B6)
 Cell C8 (Centroid Y): =AVERAGE(C2:C6)
 ```
 
 The distance from each shot to the centroid is computed in column D:
 
-```
+```text
 Cell D2: =SQRT((B2-$B$8)^2+(C2-$C$8)^2)
 ```
 
 Copy this formula down through D6. The Mean Radius is:
 
-```
+```text
 Cell D8: =AVERAGE(D2:D6)
 ```
 
 The Standard Deviation of the radius:
 
-```
+```text
 Cell D9: =STDEV.S(D2:D6)
 ```
 
 The Extreme Spread requires computing all ten pairwise distances between the five shots and taking the maximum. Place these in column E, rows 2 through 11:
 
-```
+```text
 Cell E2:  =SQRT((B2-B3)^2+(C2-C3)^2)  // Pair 1-2
 Cell E3:  =SQRT((B2-B4)^2+(C2-C4)^2)  // Pair 1-3
 Cell E4:  =SQRT((B2-B5)^2+(C2-C5)^2)  // Pair 1-4
@@ -80,13 +80,13 @@ Cell E11: =SQRT((B5-B6)^2+(C5-C6)^2)  // Pair 4-5
 
 The Extreme Spread:
 
-```
+```text
 Cell E12: =MAX(E2:E11)
 ```
 
 Convert all measurements to MOA for distance-independent comparison:
 
-```
+```text
 Cell F8 (MR in MOA):  =D8/1.047  // at 100 yards, 1 MOA = 1.047 inches
 Cell E13 (ES in MOA):  =E12/1.047
 ```
@@ -95,14 +95,14 @@ Fire three five-shot groups in this configuration, entering each into a separate
 
 The diagnostic rubric for group shape is applied as follows. Compute the standard deviation of the X coordinates and the standard deviation of the Y coordinates separately:
 
-```
+```text
 Cell B9 (SD_X): =STDEV.S(B2:B6)
 Cell C9 (SD_Y): =STDEV.S(C2:C6)
 ```
 
 The aspect ratio:
 
-```
+```text
 Cell B10: =B9/C9
 ```
 
@@ -116,7 +116,7 @@ The second exercise shifts from static baseline measurement to controlled parame
 
 The session begins with chronograph data collection. Set up the chronograph ten feet from the muzzle, following the manufacturer's recommended distance to avoid powder-fragment false readings. Fire ten rounds over the chronograph, recording each velocity in the `Chronograph` sheet. The sheet structure is:
 
-```
+```text
 Cell A2 through A11: Shot 1 through 10
 Cell B2 through B11: Velocity (fps) for each shot
 Cell B13 (Mean):   =AVERAGE(B2:B11)
@@ -136,7 +136,7 @@ Record this calculation in the workbook and use it as a predictive baseline agai
 
 The dope collection phase fires five-shot groups at 200, 300, 400, and 500 yards. At each distance, record the atmospheric conditions using the Kestrel: temperature, barometric pressure, and humidity. Record the wind speed and direction at the firing line and at the target if possible. Enter these into the `DopeCard` sheet alongside the measured drop and windage corrections. The `DopeCard` sheet structure is:
 
-```
+```text
 Row 1: Headers: Range | Drop_raw | Drop_MIL | Drop_MOA | Wind_1mph_MIL | Wind_1mph_MOA | Temp | BP | Humidity | TOF | V_remaining
 Row 2: 100 | [measured drop in inches] | =B2/3.6 | =B2/1.047 | [measured] | [measured] | [temp] | [bp] | [hum] | [TOF] | [vel]
 Row 3: 200 | ... | ...
@@ -155,7 +155,7 @@ Where W is wind speed in mph, R is range in yards, θ is the wind angle relative
 
 The positional degradation phase returns to 100 yards and fires three five-shot groups from each of four positions: prone with bipod (the baseline from Exercise 1), prone with a sling and no bipod, kneeling with a sling, and standing with a sling. For each group, measure the mean radius and extreme spread as before. Enter the results into a summary table in the `GroupData` sheet:
 
-```
+```text
 Position          | Group MR (MOA) | Group ES (MOA) | Aspect Ratio | Notes
 Prone Bipod       | [from Ex 1]    | [from Ex 1]   | [from Ex 1]  | Baseline
 Prone Sling       | [measured]     | [measured]    | [measured]    | 
@@ -177,7 +177,7 @@ The third exercise removes the comfort of the static range and introduces contro
 
 The first drill is the Box Drill, a timed multi-target engagement that tests target acquisition, scope manipulation, and trigger control under a clock. Set up four targets at 100 yards, arranged in a square pattern two yards apart. The practitioner begins at the low ready, and on the start signal (a shot timer beep), engages each target with one round in a clockwise pattern, then one round each in a counterclockwise pattern, for a total of eight rounds. The par time is 30 seconds. Run the drill three times. Record the total time and the extreme spread of the two-shot group on each target in the `StressTest` sheet:
 
-```
+```text
 Run | Time (s) | T1 ES | T2 ES | T3 ES | T4 ES | Avg ES | Pass/Fail
 1   | [time]   | [ES]  | [ES]  | [ES]  | [ES]  | =AVERAGE(C2:F2) | =IF(G2<2.094,"PASS","FAIL")
 2   | [time]   | [ES]  | [ES]  | [ES]  | [ES]  | =AVERAGE(C3:F3) | =IF(G3<2.094,"PASS","FAIL")
@@ -188,7 +188,7 @@ The pass threshold of 2.094 inches represents 2 MOA at 100 yards (2 × 1.047). A
 
 The second drill is the Cold Bore Protocol, which tests the shooter's ability to deliver a first-round hit from a cold, uncompensated condition. The practitioner sets up a single target at 300 yards and, from a cold rifle that has not been fired that day, fires a single shot. The shot is followed immediately by a four-shot group. Measure the distance of the cold bore shot from the point of aim, then measure the mean radius and extreme spread of the subsequent four-shot group. Record in `StressTest`:
 
-```
+```text
 Run | Cold Shot Offset (in) | Cold Shot Offset (MOA) | 4-shot MR (in) | 4-shot ES (in) | 4-shot MR (MOA) | 4-shot ES (MOA) | Notes
 1   | [measured] | =B2/3.141 | [measured] | [measured] | =D2/3.141 | =E2/3.141 | 
 ```
@@ -197,7 +197,7 @@ The 3.141 divisor converts inches to MOA at 300 yards (1 MOA = 1.047 × 3 = 3.14
 
 The third drill is the Malfunction Clearance Protocol. The practitioner's assistant randomly loads a magazine with a mix of live rounds and dummy rounds (inert cartridges with no primer or powder) that will not fire. The practitioner does not know the order. When the trigger is pressed and the rifle does not fire, the practitioner executes the immediate action drill. For a bolt-action rifle, this is: lift the bolt handle, pull the bolt fully rearward, push the bolt forward, push the bolt handle down, and fire. For a semi-automatic rifle, the drill is: slap the magazine to ensure it is seated, pull the charging handle fully rearward, release it, and fire. The timer records the time from the click of the dummy round to the next shot. Run this drill ten times with the dummy rounds randomly distributed. Record each clearance time:
 
-```
+```text
 Run | Clearance Time (s) | Hit (Y/N) | Notes
 1   | [time]            | [Y/N]     | 
 2   | [time]            | [Y/N]     | 
@@ -211,7 +211,7 @@ A competent clearance time is under 3 seconds for a bolt action and under 2.5 se
 
 The fourth drill is the Fatigue Protocol, which measures the effect of elevated heart rate and muscle tremor on precision. The practitioner fires a five-shot group from prone at 100 yards as a baseline. Then performs 30 push-ups and 30 bodyweight squats in rapid succession, immediately drops into the prone position, and fires a second five-shot group. The elapsed time from completing the squats to firing the first shot is recorded. After a three-minute rest, a third five-shot group is fired to measure recovery. Record all three groups:
 
-```
+```text
 Condition      | MR (MOA) | ES (MOA) | Time to 1st shot (s) | Notes
 Baseline       | [calc]   | [calc]   | N/A                  | 
 Post-Fatigue   | [calc]   | [calc]   | [measured]           |
@@ -268,7 +268,7 @@ When a group does not meet the expected performance standard, apply this rubric 
 
 After completing the distance dope collection in Exercise 2, validate the dope card against theoretical predictions before trusting it in the field. For each distance, compute the theoretical drop using the ballistics solver or the simplified kinematic model and compare to the measured drop:
 
-```
+```text
 Distance | Measured Drop (MOA) | Theoretical Drop (MOA) | Delta (MOA) | Validated
 100      | [from data]         | [from solver]          | =B-C        | =IF(ABS(D)<0.5,"YES","NO")
 200      | [from data]         | [from solver]          | =B-C        | =IF(ABS(D)<0.5,"YES","NO")

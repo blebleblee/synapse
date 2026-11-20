@@ -36,13 +36,13 @@ Network topology profoundly impacts reliability and performance. Star topologies
 
 The internal architecture of a Modbus RTU frame exposes the protocol's minimalist elegance. Each frame begins with a slave address byte, permitting 247 unique devices on a single multidrop segment. Function code 0x03 requests reading holding registers, and function code 0x10 writes multiple registers. The read request specifies a starting address (two bytes, big-endian) and quantity of registers (two bytes, 1–125 registers), followed by the CRC. The response echoes the slave address and function code, then provides a byte count (equal to twice the register quantity) and the register values in big-endian order. For example, reading four registers starting at address 1000 from slave 17 produces the request frame:
 
-```
+```text
 11 03 03 E8 00 04 44 77
 ```
 
 where 0x11 (17 decimal) is the slave address, 0x03 is the function code, 0x03E8 (1000 decimal) is the starting address, 0x0004 (4 registers), and 0x4477 is the CRC. The slave responds:
 
-```
+```text
 11 03 08 00 0A 00 14 00 1E 00 28 CB 4A
 ```
 
@@ -143,7 +143,7 @@ The serial port configuration disables canonical mode and echo, sets minimum rea
 
 Modbus TCP replaces the serial framing with the MBAP header and TCP socket semantics. The MBAP header consists of a two-byte transaction identifier (incremented by the client for each request to match responses), a two-byte protocol identifier (always zero), a two-byte length field (byte count of remaining data, including unit identifier and PDU), and a one-byte unit identifier. The PDU follows immediately, omitting the CRC because TCP checksums already protect data integrity. A Modbus TCP client establishes a persistent connection to port 502 and streams requests:
 
-```
+```text
 Transaction ID: 0x0001
 Protocol ID: 0x0000
 Length: 0x0006
@@ -161,7 +161,7 @@ Session creation atop the SecureChannel involves ActivateSessionRequest, which c
 
 Profibus DP's token-passing discipline relies on precise timing calculations. The target token rotation time (T_TR) must accommodate the worst-case transaction time for every master and its slaves. The token hold time for a master is calculated as:
 
-```
+```text
 T_TH = T_TR / (n_masters) - T_TT
 ```
 

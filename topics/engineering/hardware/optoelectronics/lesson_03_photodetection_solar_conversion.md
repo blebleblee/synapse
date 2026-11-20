@@ -28,7 +28,7 @@ Under reverse bias operation, the depletion region expands into the lightly-dope
 
 The PIN photodiode architecture inserts an intrinsic (or lightly-doped) region between heavily-doped p⁺ and n⁺ layers, providing independent control over absorption depth and junction capacitance. This structure dominates high-speed telecommunications applications where the thick intrinsic layer (10–50 μm) ensures high quantum efficiency while the wide depletion region minimizes capacitance. The InGaAs/InP PIN photodiode, lattice-matched at the composition In₀.₅₃Ga₀.₄₇As, provides optimal responsivity across the 1300–1550 nm telecommunications bands. The InGaAs absorption layer (2–4 μm typical) sits atop a transparent InP substrate, with epitaxial growth controlling the precise doping profiles and interface abruptness.
 
-```
+```text
 PIN Photodiode Cross-Section (Not to Scale)
                                               
     hν ↓   ↓   ↓   ↓   ↓                      Optical Illumination

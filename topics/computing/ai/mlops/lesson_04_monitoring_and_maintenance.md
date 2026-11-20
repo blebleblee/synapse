@@ -26,7 +26,7 @@ Understanding *what* shifts is prerequisite to instrumenting a system to detect 
 
 Let `D_train` be the training data distribution and `D_t` be the production data distribution at time `t`. Model performance at time `t` is bounded by:
 
-```
+```text
 Error(t) ≥ Error_Bayes + d_H(D_train, D_t)
 ```
 
@@ -98,7 +98,7 @@ The selection of a drift detection test is not arbitrary — different tests hav
 
 **Population Stability Index (PSI)** is a symmetric divergence metric originating in credit risk and widely used in production because it is fast and interpretable:
 
-```
+```text
 PSI = Σ (P_actual_i - P_expected_i) × ln(P_actual_i / P_expected_i)
 ```
 
@@ -106,7 +106,7 @@ Convention: PSI < 0.1 = no significant shift; 0.1–0.2 = moderate shift, invest
 
 **Kolmogorov-Smirnov (KS) Test** measures the maximum absolute difference between two empirical CDFs. It is non-parametric, distribution-free, and powerful for detecting location and scale shifts. The KS statistic is:
 
-```
+```text
 D = sup_x |F_ref(x) - F_prod(x)|
 ```
 
@@ -114,7 +114,7 @@ For high-cardinality categorical features, the chi-squared test on frequency dis
 
 **CUSUM (Cumulative Sum Control Chart)** and **ADWIN (Adaptive Windowing)** are sequential drift detection algorithms suited for streaming data. ADWIN maintains a sliding window and uses a Hoeffding bound to detect when two halves of the window have statistically different means:
 
-```
+```text
 |μ_W0 - μ_W1| ≥ ε_cut = √((1/(2m)) × ln(4n/δ))
 ```
 
@@ -579,7 +579,7 @@ A common mistake in canary analysis is using a fixed-horizon test: "run the cana
 
 The correct approach is **sequential hypothesis testing**, specifically the **Sequential Probability Ratio Test (SPRT)** or **always-valid confidence intervals** (via e-values). SPRT allows you to stop as soon as you have enough evidence for or against the null hypothesis, with controlled error rates at any stopping time:
 
-```
+```text
 Λ_n = Π_{i=1}^{n} [p_1(x_i) / p_0(x_i)]
 
 Stop and reject H_0 if Λ_n ≥ B = (1-β)/α

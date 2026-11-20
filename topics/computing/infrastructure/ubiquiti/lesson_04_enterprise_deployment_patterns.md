@@ -42,7 +42,7 @@ flowchart TD
 
 Each spoke router configures two virtual tunnel interfaces (vti0, vti1) bound to separate IPsec security associations targeting Hub-A and Hub-B. The VTI interface model decouples IPsec encapsulation from routing, allowing OSPF or BGP to treat tunnels as standard point-to-point links. The EdgeOS configuration for a spoke establishes the IPsec proposal, authentication pre-shared key, and VTI binding:
 
-```
+```text
 set vpn ipsec ipsec-interfaces interface eth0
 set vpn ipsec esp-group ESP-HUB lifetime 3600
 set vpn ipsec esp-group ESP-HUB pfs enable
@@ -83,7 +83,7 @@ The MTU reduction to 1436 bytes accounts for IPsec ESP overhead (50 bytes) and I
 
 With IPsec tunnels established, OSPF Area 0 runs across all VTI interfaces to exchange routing information and detect link failures. Each hub router advertises a default route with a baseline metric, while spokes advertise their local LAN prefixes. The OSPF dead-interval timer governs failover speed; setting it to 10 seconds with hello-interval of 3 seconds ensures sub-15-second convergence. The spoke router OSPF configuration:
 
-```
+```text
 set protocols ospf area 0 network 172.16.1.0/30
 set protocols ospf area 0 network 172.16.2.0/30
 set protocols ospf area 0 network 192.168.10.0/24
@@ -96,21 +96,21 @@ set protocols ospf timers throttle spf max-holdtime 10000
 
 Hub routers inject a default route into OSPF with controlled metrics to steer traffic. Hub-A advertises 0.0.0.0/0 with metric 10, while Hub-B uses metric 50, establishing Hub-A as the primary egress path under normal conditions:
 
-```
+```text
 set protocols ospf area 0 area-type stub default-cost 10
 set protocols ospf default-information originate always metric 10 metric-type 1
 ```
 
 When vti0 fails due to ISP outage or hub-side router failure, OSPF withdraws the route learned via vti0 and installs the route via vti1 within one SPF calculation cycle. The spoke router's routing table before failure shows:
 
-```
+```text
 O*E1 0.0.0.0/0 [110/11] via 172.16.1.1, vti0
                 [110/51] via 172.16.2.1, vti1
 ```
 
 After failure detection and convergence:
 
-```
+```text
 O*E1 0.0.0.0/0 [110/51] via 172.16.2.1, vti1
 ```
 
@@ -145,7 +145,7 @@ Traditional enterprise designs require extending Layer 2 broadcast domains acros
 
 For legacy applications mandating Layer 2 adjacency, the EdgeRouter VXLAN configuration binds a VXLAN tunnel endpoint (VTEP) to the VTI interface and bridges it to a local VLAN:
 
-```
+```text
 set interfaces vxlan vxlan0 address 10.255.255.1/24
 set interfaces vxlan vxlan0 vni 100
 set interfaces vxlan vxlan0 remote 10.255.255.2
@@ -160,7 +160,7 @@ This configuration tunnels VLAN 100 traffic from eth1.100 over vxlan0, which its
 
 Critical hub sites deploy pairs of EdgeRouters in active-passive VRRP configuration, presenting a single virtual IP to spoke routers and downstream clients. VRRP (Virtual Router Redundancy Protocol) coordinates master election through multicast advertisements at one-second intervals. The master router owns the virtual IP and forwards packets, while the backup monitors advertisements and assumes mastership if three consecutive intervals elapse without hearing from the master.
 
-```
+```text
 set high-availability vrrp group 1 interface eth1
 set high-availability vrrp group 1 virtual-address 10.0.1.254/24
 set high-availability vrrp group 1 priority 200
@@ -174,7 +174,7 @@ The priority value (200 on the primary, 100 on the backup) determines initial ma
 
 For stateful services—NAT connection tracking, firewall session tables—EdgeRouters support conntrack-sync via the conntrackd daemon, replicating TCP and UDP session state to the backup router. This ensures established connections survive failover without application-layer resets:
 
-```
+```text
 set service conntrack-sync accept-protocol tcp,udp,icmp
 set service conntrack-sync failover-mechanism vrrp sync-group FAILOVER
 set service conntrack-sync interface eth2
@@ -289,7 +289,7 @@ show ubnt offload
 
 The output indicates which features are offloaded:
 
-```
+```text
 IP offload module   : loaded
 IPv4 forwarding     : enabled
 IPv4 vlan           : enabled
@@ -305,7 +305,7 @@ When IPsec offload shows disabled, the router forwards encrypted traffic through
 
 Queue depth tuning and traffic shaping prevent buffer bloat and reduce latency variance. The default pfifo_fast qdisc introduces head-of-line blocking under congestion, causing interactive traffic to suffer. Replacing it with fq_codel (Fair Queuing with Controlled Delay) isolates flows and actively manages queue depth:
 
-```
+```text
 set traffic-policy shaper WAN-SHAPER bandwidth 100mbit
 set traffic-policy shaper WAN-SHAPER default bandwidth 95%
 set traffic-policy shaper WAN-SHAPER default ceiling 100%
@@ -321,7 +321,7 @@ Enterprises with multiple ISP connections leverage BGP to influence inbound and 
 
 For dual-homed sites with ISP-A and ISP-B, the router configuration establishes eBGP sessions and applies local-preference to prefer ISP-A for outbound traffic:
 
-```
+```text
 set protocols bgp 65001 neighbor 198.51.100.1 remote-as 65100
 set protocols bgp 65001 neighbor 198.51.100.1 soft-reconfiguration inbound
 set protocols bgp 65001 neighbor 198.51.100.1 route-map PREFER-ISP-A in
@@ -335,7 +335,7 @@ set policy route-map PREFER-ISP-A rule 10 set local-preference 200
 
 For inbound traffic steering, the router prepends its AS number multiple times to routes advertised via the less-preferred ISP, artificially lengthening the AS path and discouraging inbound traffic:
 
-```
+```text
 set policy route-map PREPEND-ISP-B rule 10 action permit
 set policy route-map PREPEND-ISP-B rule 10 set as-path-prepend "65001 65001 65001"
 
@@ -350,7 +350,7 @@ IPsec tunnels occasionally enter flapping states where they oscillate between up
 
 The default DPD interval of 30 seconds causes slow failover. Reducing it to 10 seconds accelerates detection but increases false positives when transient packet loss occurs. The optimal configuration depends on link characteristics:
 
-```
+```text
 set vpn ipsec site-to-site peer 203.0.113.10 ike-group IKE-HUB dead-peer-detection action restart
 set vpn ipsec site-to-site peer 203.0.113.10 ike-group IKE-HUB dead-peer-detection interval 10
 set vpn ipsec site-to-site peer 203.0.113.10 ike-group IKE-HUB dead-peer-detection timeout 30
@@ -358,7 +358,7 @@ set vpn ipsec site-to-site peer 203.0.113.10 ike-group IKE-HUB dead-peer-detecti
 
 For tunnels crossing NAT devices, operators must configure UDP encapsulation to prevent NAT binding expiration:
 
-```
+```text
 set vpn ipsec ipsec-interfaces interface eth0
 set vpn ipsec nat-traversal enable
 set vpn ipsec nat-networks allowed-network 0.0.0.0/0
@@ -378,14 +378,14 @@ show ip ospf neighbor
 
 If neighbors remain in EXSTART or EXCHANGE states, MTU mismatch is likely. The solution is either reducing MTU on VTI interfaces or disabling MTU verification (discouraged):
 
-```
+```text
 set interfaces vti vti0 mtu 1436
 set protocols ospf area 0 interface vti0 mtu-ignore
 ```
 
 Split-brain scenarios occur when inter-hub connectivity fails, causing each hub to believe the other is down and both advertising default routes with equal metrics. Spoke routers receive conflicting routing information and may distribute traffic unpredictably. The mitigation is deploying a third hub or using BGP with deterministic tie-breaking via router-id comparison:
 
-```
+```text
 set protocols bgp 65001 parameters router-id 10.0.0.1
 ```
 
@@ -397,7 +397,7 @@ Large UniFi deployments experience periodic adoption storms when multiple device
 
 The failure mode manifests as devices stuck in "Adopting" state, controller UI becoming unresponsive, and MongoDB query times exceeding 10 seconds. The resolution involves rate-limiting device adoption via firewall rules and scaling MongoDB with read replicas:
 
-```
+```text
 set firewall name RATE-LIMIT-INFORM rule 10 action accept
 set firewall name RATE-LIMIT-INFORM rule 10 state new enable
 set firewall name RATE-LIMIT-INFORM rule 10 state established enable
@@ -413,7 +413,7 @@ This rule limits each source IP to 10 new TCP connections to port 8080 (UniFi in
 
 Production observability requires continuous polling of interface statistics, tunnel status, and system health metrics. Ubiquiti devices expose SNMP MIB-II objects and vendor-specific OIDs for granular visibility. Operators configure SNMP v3 for authenticated and encrypted metric collection:
 
-```
+```text
 set service snmp v3 group MONITORING mode ro
 set service snmp v3 user monitor auth type sha
 set service snmp v3 user monitor auth plaintext-key "REDACTED_AUTH_KEY"
@@ -447,7 +447,7 @@ groups:
 
 Syslog centralization aggregates authentication events, configuration changes, and kernel messages for forensic analysis. The EdgeRouter syslog configuration forwards messages to a remote collector:
 
-```
+```text
 set system syslog host 10.1.1.50 facility all level info
 set system syslog host 10.1.1.50 facility auth level notice
 ```

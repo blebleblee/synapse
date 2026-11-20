@@ -72,7 +72,7 @@ Two classical execution models bound the design space:
 
 Real systems operate in the **partially synchronous model** (Dwork, Lynch, Stockmeyer 1988): the system behaves asynchronously during fault periods but eventually enters a synchronous phase of duration at least GST (Global Stabilisation Time). This model is what Raft, Paxos, and Zab are actually designed for.
 
-```
+```text
 Timeline of partial synchrony:
 
 t=0          t=GST          t=∞

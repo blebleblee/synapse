@@ -66,7 +66,7 @@ A* maintains two data structures:
 
 **Algorithm:**
 
-```
+```text
 function A_STAR(s₀, G, h):
     open ← priority_queue()
     open.insert(s₀, f = h(s₀))

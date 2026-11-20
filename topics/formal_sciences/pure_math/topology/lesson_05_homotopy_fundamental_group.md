@@ -98,7 +98,7 @@ The **path-lifting property** is what makes covering spaces computationally powe
 
 The following diagram captures the universal property of path lifting:
 
-```
+```text
          [0,1]
            |
   γ̃        | (unique lift, starting at x̃₀)

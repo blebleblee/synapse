@@ -250,7 +250,7 @@ flowchart TD
 
 The progressive emergence of band structure from discrete MO levels can be visualized as a function of the number of interacting atoms $N$:
 
-```
+```text
 N=1 (atom)       N=2 (dimer)      N=4             N→∞ (solid)
                                                  ┌──────────┐
      ─ ─               ─ ─ *          ─ ─ ─ ─ * │  empty   │ Conduction

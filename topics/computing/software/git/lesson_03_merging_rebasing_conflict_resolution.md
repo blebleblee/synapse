@@ -32,7 +32,7 @@ If main changed the function `verify_token()` while feature-auth changed the unr
 
 If instead both branches modified overlapping lines in `verify_token()`, Git inserts conflict markers:
 
-```
+```text
 <<<<<<< HEAD
 int verify_token(const char *token) {
     if (strlen(token) < MIN_TOKEN_LENGTH) return -1;
@@ -60,7 +60,7 @@ The rebase state is managed through files in `.git/rebase-merge/` or `.git/rebas
 
 The topology transformations can be visualized through commit graph diagrams. Before merge:
 
-```
+```text
       A---B---C feature
      /
 D---E---F---G main
@@ -68,7 +68,7 @@ D---E---F---G main
 
 After `git merge feature` on main:
 
-```
+```text
       A---B---C feature
      /         \
 D---E---F---G---M main
@@ -76,7 +76,7 @@ D---E---F---G---M main
 
 Before rebase:
 
-```
+```text
       A---B---C feature
      /
 D---E---F---G main
@@ -84,7 +84,7 @@ D---E---F---G main
 
 After `git rebase main` on feature:
 
-```
+```text
               A'--B'--C' feature
              /
 D---E---F---G main

@@ -4,7 +4,7 @@
 
 Observability emerges from control theory, where a system is deemed observable if its internal state can be determined from knowledge of its external outputs over a finite time interval. For a linear time-invariant system with state vector **x**, output vector **y**, and matrices **A** (state transition) and **C** (output), the system is observable if and only if the observability matrix **O** has full rank:
 
-```
+```text
 O = [C; CA; CA²; ...; CA^(n-1)]
 ```
 
@@ -161,7 +161,7 @@ async fn process_payment(
 
 Distributed tracing requires propagating trace context across process boundaries. The W3C Trace Context standard defines HTTP headers:
 
-```
+```text
 traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
              |  |                                |                | 
              |  trace-id (16 bytes)              span-id (8 bytes) flags
@@ -241,7 +241,7 @@ FOR 2m
 
 Logs are unstructured or semi-structured text with high cardinality. Efficient log storage requires inverted indices mapping terms to document identifiers. Elasticsearch uses Lucene's inverted index with the following structure:
 
-```
+```text
 Term Dictionary:
   "error"     -> [doc1, doc5, doc7, doc23, ...]
   "timeout"   -> [doc5, doc12, doc23, ...]
@@ -1199,7 +1199,7 @@ slos:
 
 Error budgets track SLO violations:
 
-```
+```text
 Error Budget = (1 - SLO) × Total Requests
 Remaining Budget = Error Budget - Actual Errors
 ```

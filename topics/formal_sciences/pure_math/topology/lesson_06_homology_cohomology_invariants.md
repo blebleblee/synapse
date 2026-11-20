@@ -78,7 +78,7 @@ This operation satisfies the Leibniz rule $\delta(\varphi \smile \psi) = \delta(
 
 For the torus $T^2$, the cohomology ring structure is particularly rich. We have $H^0(T^2) \cong \mathbb{Z}$, $H^1(T^2) \cong \mathbb{Z}^2$, and $H^2(T^2) \cong \mathbb{Z}$. Let $\alpha$ and $\beta$ be generators of $H^1(T^2)$ dual to the meridian and longitude cycles. The cup product $\alpha \smile \beta$ generates $H^2(T^2) \cong \mathbb{Z}$, while $\alpha \smile \alpha = 0$ and $\beta \smile \beta = 0$. This ring structure encodes intersection information: the meridian and longitude loops intersect transversely at a single point (with multiplicity $1$), while each loop has zero self-intersection number. The cohomology ring completely determines the diffeomorphism type of the torus among compact orientable surfaces.
 
-```
+```text
 Chain Complex Structure for Torus T²:
 
 C₂(K)                C₁(K)                C₀(K)                0

@@ -34,7 +34,7 @@ The neurophysiological substrate underlying memory encoding involves coordinated
 
 The standard model of memory consolidation distinguishes between encoding, consolidation, storage, and retrieval as functionally distinct phases, though these operations overlap temporally and interact dynamically. Encoding begins when sensory information captured by modality-specific cortical regions—visual cortex for written text, auditory cortex for spoken information, somatosensory regions for tactile input—receives sufficient attentional enhancement to trigger hippocampal engagement. The hippocampus does not store memories directly but rather binds together the distributed cortical patterns representing different features of an experience into a coherent episodic trace.
 
-```
+```text
 ENCODING PATHWAY ARCHITECTURE
 
 Sensory Input (Visual/Auditory/Semantic)

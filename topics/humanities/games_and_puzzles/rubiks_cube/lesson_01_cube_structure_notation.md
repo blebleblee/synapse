@@ -32,7 +32,7 @@ Notation systems provide the linguistic foundation for communicating algorithms 
 
 For advanced algorithms, notation extends to middle layer moves and rotations of the entire cube. The letter M denotes a middle slice turn parallel to the L and R faces, rotating the same direction as an L turn. The letter E denotes the equatorial slice between U and D, rotating the same direction as D. The letter S denotes the standing slice between F and B, rotating the same direction as F. Whole-cube rotations, which change the solver's reference frame without altering the puzzle state, use lowercase letters: x rotates the entire cube along the R-L axis (same direction as R), y rotates along U-D (same direction as U), and z rotates along F-B (same direction as F). These rotations are critical in finger-friendly algorithms where repositioning the cube mid-sequence proves faster than maintaining a fixed grip.
 
-```
+```text
 Face Turn Notation Summary:
 R  = Right face 90° clockwise
 R' = Right face 90° counterclockwise  

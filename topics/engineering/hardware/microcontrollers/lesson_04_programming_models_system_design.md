@@ -30,7 +30,7 @@ Bare-metal programming begins with the startup code, a short assembly routine th
 
 A minimal Cortex-M startup file in ARM assembly begins by declaring the vector table as a read-only data section aligned to the required boundary (256 bytes for Cortex-M3/M4). The first entry holds the initial stack pointer, typically the top of SRAM. The second entry holds the address of the reset handler. Subsequent entries define handlers for NMI, hard fault, memory management fault, bus fault, usage fault, and the sixteen user-configurable interrupt channels. Unused vectors typically point to a default handler that enters an infinite loop, allowing a debugger to catch unexpected interrupts.
 
-```
+```text
     .syntax unified
     .cpu cortex-m4
     .thumb
@@ -98,7 +98,7 @@ Default_Handler:
 
 The linker script defines memory regions and section placements. Flash starts at address `0x0800_0000` on STM32 microcontrollers, while SRAM starts at `0x2000_0000`. The script places the vector table at the beginning of flash, followed by program code, read-only data, and initialized data. The data section gets loaded into flash but linked to run from SRAM addresses, requiring the startup code to perform the copy. The BSS section consumes SRAM space but occupies zero bytes in the flash image.
 
-```
+```text
 MEMORY
 {
     FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 512K

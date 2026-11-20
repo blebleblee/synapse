@@ -103,7 +103,7 @@ struct net {
 
 **User Namespace (CLONE_NEWUSER)**: Maps UIDs and GIDs between namespaces via `/proc/<pid>/uid_map` and `/proc/<pid>/gid_map`. This mapping is one-way and hierarchical: a process in a user namespace can map its UIDs to the parent namespace but not vice versa. This enables rootless containers where UID 0 inside the container maps to an unprivileged UID on the host.
 
-```
+```bash
 # Example uid_map: inside_uid outside_uid count
 0 1000 1       # Map container root (0) to host UID 1000
 1 100000 65536 # Map container UIDs 1-65536 to host UIDs 100000-165535
@@ -186,7 +186,7 @@ When a process reads a file, OverlayFS searches layers top-to-bottom (upperdir â
 
 **Layer Caching Algorithm**: During image builds, the Docker daemon computes a cache key for each Dockerfile instruction:
 
-```
+```text
 cache_key = SHA256(parent_layer_id + instruction_type + instruction_args + context_files)
 ```
 
@@ -477,7 +477,7 @@ COPY . /app                                       # Only this layer regenerates
 
 2. **AppArmor/SELinux**: Mandatory Access Control (MAC) policies restrict file access, network operations, and capabilities beyond discretionary access control (DAC):
 
-```
+```bash
 # AppArmor profile snippet
 profile docker-default flags=(attach_disconnected,mediate_deleted) {
   # Deny write access to /proc/sys, /sys except for specific paths

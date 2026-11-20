@@ -38,13 +38,13 @@ The eGFR column requires the CKD-EPI 2021 equation. For a male patient, the form
 
 where κ = 80 µmol/L and α = −0.302 for males; κ = 62 µmol/L and α = −0.241 for females. Because spreadsheet implementation of the min/max operator requires nested IF logic, enter the following formula into the eGFR column for PT-001 (male, creatinine in N2, age in B2):
 
-```
+```text
 =142*IF(N2/80<1,(N2/80)^(-0.302),(N2/80)^0)*IF(N2/80>1,(N2/80)^(-1.2),1)*0.9938^B2
 ```
 
 For PT-002 (female), the formula changes κ and α:
 
-```
+```text
 =142*IF(N3/62<1,(N3/62)^(-0.241),(N3/62)^0)*IF(N3/62>1,(N3/62)^(-1.2),1)*0.9938^B3*1.012
 ```
 
@@ -54,7 +54,7 @@ Apply the sex-appropriate formula for each patient. Expected eGFR values: PT-001
 
 The MetSyn_Criteria_Count column requires you to evaluate five Boolean conditions per patient and sum them. In the Q column, enter:
 
-```
+```text
 =((C2="M")*(G2>=102)+(C2="F")*(G2>=88))
 +((H2>=130)+(I2>=85)>0)
 +(J2>=5.6)
@@ -65,7 +65,7 @@ The MetSyn_Criteria_Count column requires you to evaluate five Boolean condition
 
 This formula evaluates waist circumference against sex-specific cut-offs, flags either SBP or DBP breach as a single criterion, checks fasting glucose, HbA1c (as a glucose surrogate within the screening context), triglycerides, and HDL-C. The maximum possible score is 6 because HbA1c and FPG both reflect the glycemia criterion and may both be elevated simultaneously — the formula counts them independently for scoring purposes, but clinically the glycemia criterion is counted only once. Adjust the formula by wrapping the FPG and HbA1c terms in a combined OR-style cap:
 
-```
+```text
 =((C2="M")*(G2>=102)+(C2="F")*(G2>=88))
 +MIN(1,((H2>=130)+(I2>=85)))
 +MIN(1,((J2>=5.6)+(K2>=6.5)))
@@ -77,7 +77,7 @@ The expected MetSyn_Criteria_Count results are: PT-001 = 4, PT-002 = 3, PT-003 =
 
 In the S column (DM_Status), apply the following tiered classification:
 
-```
+```text
 =IF(OR(J2>=7.0,K2>=6.5),"T2DM",IF(OR(J2>=5.6,K2>=5.7),"Pre-DM","Normoglycemic"))
 ```
 
@@ -95,19 +95,19 @@ where A is the peak amplitude above fasting, k₁ is the absorption rate constan
 
 In column A of the OGTT_Plotter tab, enter time points 0, 15, 30, 45, 60, 90, 120, 150, 180 in rows 2–10. In columns B, C, D enter the respective G(t) formulas. For the normoglycemic column B, with fasting glucose of 4.8 mmol/L:
 
-```
+```text
 =4.8+4.5*(EXP(-0.012*A2)-EXP(-0.025*A2))
 ```
 
 For pre-diabetic (fasting 5.6 mmol/L) in column C:
 
-```
+```text
 =5.6+6.2*(EXP(-0.008*A2)-EXP(-0.018*A2))
 ```
 
 For T2DM (fasting 7.2 mmol/L) in column D:
 
-```
+```text
 =7.2+8.8*(EXP(-0.005*A2)-EXP(-0.012*A2))
 ```
 
@@ -133,7 +133,7 @@ where L is the linear predictor:
 
 In column A, label rows as: Age_at_diagnosis, Duration_years, SBP_mmHg, TC_HDL_ratio, HbA1c_pct, L_value, CHD_Risk_10yr. In column B, enter the input values, and in column C, enter the computed values. For PT-003 (61 years old, diagnosed at age 55, 6 years duration, SBP 152, TC = LDL + HDL + TG/2.2 = 4.1 + 0.8 + 3.8/2.2 = 6.63 mmol/L, TC/HDL = 6.63/0.8 = 8.29, HbA1c 8.4%):
 
-```
+```text
 L = (0.0112 × 55) + (0.0171 × 6) + (0.0115 × 152) + (0.4728 × LN(8.29)) + (0.3337 × 8.4)
 L = 0.616 + 0.103 + 1.748 + 0.993 + 2.803
 L = 6.263
@@ -143,7 +143,7 @@ CHD_Risk = 1 − 0.9333^exp(6.263 − 3.8524) = 1 − 0.9333^exp(2.411) = 1 − 
 
 In spreadsheet formula form in cell C6:
 
-```
+```text
 =1-(0.9333^EXP((0.0112*B1)+(0.0171*B2)+(0.0115*B3)+(0.4728*LN(B4))+(0.3337*B5)-3.8524))
 ```
 
@@ -175,7 +175,7 @@ Compute the QUICKI (Quantitative Insulin Sensitivity Check Index) for each patie
 
 Convert FPG from mmol/L to mg/dL by multiplying by 18.0182. For PT-007: Glucose = 6.4 × 18.0182 = 115.3 mg/dL.
 
-```
+```text
 QUICKI = 1 / (LOG10(22.7) + LOG10(115.3))
        = 1 / (1.356 + 2.062)
        = 1 / 3.418
@@ -208,7 +208,7 @@ Consider a patient with the following values: Age 52, Male, waist 103 cm, SBP 13
 
 This is the analytical boundary failure of threshold-based models. Your recovery protocol has two components. First, implement a "proximity flag" column in the spreadsheet that marks any criterion as "borderline" when it falls within 10% below the diagnostic threshold:
 
-```
+```text
 =IF(AND(C2="M",G2>=92,G2<102),"Borderline-Waist",
    IF(AND(C2="F",G2>=79,G2<88),"Borderline-Waist",""))
 ```
@@ -217,7 +217,7 @@ Apply equivalent formulas for TG (flag when 1.53–1.69 mmol/L), HDL-M (flag whe
 
 Second, implement the continuous MetSyn severity score proposed by Kassi et al. by z-scoring each of the five components against the population mean and summing the absolute deviations. Use the following population reference values for a Western adult population: waist mean = 94 cm, SD = 14 cm; SBP mean = 122 mmHg, SD = 18 mmHg; FPG mean = 5.1 mmol/L, SD = 0.9 mmol/L; TG mean = 1.4 mmol/L, SD = 0.6 mmol/L; HDL mean = 1.3 mmol/L, SD = 0.3 mmol/L (inverted, since lower is worse). For PT-011:
 
-```
+```text
 Z_waist = (103 − 94) / 14 = 0.643
 Z_SBP   = (131 − 122) / 18 = 0.500
 Z_FPG   = (5.5 − 5.1) / 0.9 = 0.444
@@ -245,7 +245,7 @@ Build a Medication_Stress tab in your workbook. The following medications carry 
 
 For each patient-medication combination, write a formula that applies the effect delta to the baseline value and then re-runs the DM_Status classification and MetSyn scoring. For PT-001 (Pre-DM, MetSyn positive) initiated on a thiazide diuretic for hypertension management:
 
-```
+```text
 Stressed_FPG  = 6.2 + 0.5 = 6.7 mmol/L
 Stressed_HbA1c = 6.8 + 0.3 = 7.1%
 Stressed_TG   = 2.1 + 0.3 = 2.4 mmol/L
@@ -270,7 +270,7 @@ PT-003 (eGFR 65) and PT-005 (eGFR 54) require eGFR-adjusted pharmacotherapy deci
 
 Enter each patient's eGFR in column B of this tab and use nested IF formulas to output the appropriate drug action automatically. For PT-005 (eGFR 54) on dapagliflozin:
 
-```
+```text
 =IF(B2>=60,"Standard 10mg",IF(AND(B2>=45,B2<60),"Reduce to 5mg - efficacy reduced",IF(AND(B2>=30,B2<45),"STOP",IF(B2<30,"STOP","Check eGFR"))))
 ```
 

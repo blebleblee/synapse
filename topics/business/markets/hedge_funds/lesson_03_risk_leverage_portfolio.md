@@ -26,7 +26,7 @@ Value-at-Risk calculation begins with return covariance matrix estimation. Histo
 
 Monte Carlo VaR simulation addresses non-normal return distributions and nonlinear derivatives exposure. Generate 10,000 random return scenarios by sampling from historical distribution or fitted parametric form (Student-t distribution with estimated degrees of freedom, skewed generalized error distribution), revalue the entire portfolio under each scenario incorporating option Greeks and convexity effects, sort resulting P&L distribution, and extract the 1st percentile. For a portfolio containing equity positions, put options, and variance swaps, Monte Carlo captures the joint distribution dynamics: when equities fall 5%, implied volatility typically rises 20-30% (negative correlation between spot and vol), making variance swap gains partially offset equity losses—a correlation structure that linear VaR misses entirely.
 
-```
+```text
 Portfolio Revaluation Engine (Monte Carlo VaR)
 
 For each simulation i = 1 to N:

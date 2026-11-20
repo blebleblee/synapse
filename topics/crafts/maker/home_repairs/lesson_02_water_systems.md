@@ -26,7 +26,7 @@ The distribution network architecture follows one of two topologies: trunk-and-b
 
 Pipe sizing follows velocity-limited design principles rather than pressure-drop minimization alone. Maintaining flow velocity below 8 feet per second prevents erosion of pipe materials and reduces noise, while velocities below 2 feet per second risk sediment accumulation. For typical residential flow rates (2.5 GPM per fixture unit), ¾-inch pipe provides adequate flow for trunk lines serving up to six fixtures, while ½-inch branch lines handle individual fixtures. The relationship between pipe diameter and flow capacity follows the continuity equation: Q = A × v, where flow rate Q equals cross-sectional area A times velocity v. Doubling pipe diameter quadruples cross-sectional area, allowing four times the flow at the same velocity—this explains why upgrading from ½-inch to ¾-inch piping so dramatically improves system performance.
 
-```
+```text
 Main Supply Entry (Municipal)
      │
      ├─── Meter Assembly

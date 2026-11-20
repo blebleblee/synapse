@@ -32,7 +32,7 @@ The exit multiple method for terminal value instead applies a valuation multiple
 
 The WACC derivation begins with the cost of equity, typically estimated through the Capital Asset Pricing Model, which decomposes required equity returns into a risk-free rate, a market risk premium, and a beta coefficient that measures the company's systematic risk relative to the broad market. The risk-free rate draws from long-term government bond yields, matching the duration of the DCF projection period; practitioners typically use ten-year Treasury yields for US-based valuations. The equity risk premium represents the excess return investors demand for bearing market risk rather than holding risk-free bonds, empirically estimated from long-term historical averages of equity returns over government bonds, typically calibrated between five and six percent for developed markets. Beta captures the company's correlation with market movements, estimated through regression analysis of historical stock returns against market index returns, with adjustments for leverage and statistical reliability.
 
-```
+```text
 WACC Calculation Architecture:
 
 Cost of Equity (Re) = Rf + β × ERP

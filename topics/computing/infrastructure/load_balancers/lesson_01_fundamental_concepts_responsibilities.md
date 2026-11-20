@@ -82,7 +82,7 @@ The load balancer's I/O layer (typically epoll on Linux) waits for the first rea
 
 The routing table is the core data structure of an L7 load balancer. In Nginx terminology these are `upstream` blocks with `server` directives and routing `location` blocks. In HAProxy they are `backend` sections and ACL-based `use_backend` rules. In Envoy they are `RouteConfiguration` objects populated by the xDS (discovery service) control plane. Despite differing syntax, all of them reduce to the same abstract structure: a set of match predicates over request attributes, ordered by priority, each associated with a named backend pool.
 
-```
+```text
 RouteTable {
   entry[0]: match(host="api.example.com", path_prefix="/v2/")
             → pool: api-v2-backends (round-robin, 3 members)

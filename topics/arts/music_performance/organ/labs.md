@@ -56,7 +56,7 @@ With no sustain pedal, true legato through a hand repositioning requires swappin
 
 Metronome progression: ♩=50 → 60 → 72 → 84. Each note a quarter note.
 
-```
+```text
 C(1) D(2) E(3) F(4)
 — hold F, substitute 3 for 4 (no release) —
 G(4) — play G while 3 releases F
@@ -74,7 +74,7 @@ The hand "walks" up the scale: play with 4, substitute 3 while held, play the ne
 
 Tempo: ♩=60 → 72 → 84.
 
-```
+```text
 Left hand holds middle C (finger 2) for 4 beats, unmoving.
 Right hand, legato quarter notes:
   E(1) — hold, substitute 2 for 1 — F(1)
@@ -88,7 +88,7 @@ This mirrors real repertoire texture: one voice sustains while another moves ind
 
 Tempo: ♩=50 → 60 → 72.
 
-```
+```text
 Beat 1: C-E-G-C (fingers 1-2-3-5), hold through beat 2
 Beat 2: substitute 4 for 3 on G, freeing finger 3
 Beat 3: move to F-A-C-F (fingers 1-2-3-5), outer voices stay legato through the change
@@ -102,7 +102,7 @@ Where two adjacent notes must connect legato but the fingering strands the thumb
 
 Tempo: ♩=60 → 80 → 100.
 
-```
+```text
 E(1) → F(1, slide thumb right) → G(3) → F(1) → E(1, slide thumb left) → D(3)
 ```
 
@@ -110,7 +110,7 @@ Keep the thumb pad in contact with the key surface through the whole slide. Prac
 
 **Drill 5 — Glissando in scale context (D major)**
 
-```
+```text
 D(1) E(2) F#(3) G(1) A(2) B(3) C#(1 — glide — ) D(3)
 ```
 
@@ -124,7 +124,7 @@ Standard piano fingering logic applies, but plan crossings more carefully: there
 
 Tempo: ♩=60 → 72 → 84 → 96.
 
-```
+```text
 C(1) D(2) E(3) — cross 1 under to F(1) — G(2) A(3) — cross 1 under to B♭(1) — C(2)
 ```
 
@@ -203,7 +203,7 @@ B♭ sits in sharp position: right toe (opposite the preceding A, which took lef
 
 **Drill 1 — C major scale, one octave, both directions**
 
-```
+```text
 Notes: C3 D3 E3 F3 G3 A3 B3 C4 B3 A3 G3 F3 E3 D3 C3
 Feet:  RT RH LT LH RT RH LT LH LT RH RT LH LT RH RT
 Tempo: ♩=50 → 60 → 72 → 84
@@ -215,7 +215,7 @@ Feel for the ankle pivot: toe presses, then heel presses while the toe lifts, fo
 
 **Drill 2 — Pedal arpeggios, C major triad**
 
-```
+```text
 Notes: C3 E3 G3 C4 G3 E3 C3
 Feet:  RT LT RT LT RT LT RT   (all toes — intervals exceed a second)
 Tempo: ♩=50 → 60 → 72 → 84
@@ -224,7 +224,7 @@ Reps:  4× up, 4× down, 4× round trip
 
 **Drill 3 — Pedal point with moving second foot**
 
-```
+```text
 Hold low C (RT) for 8 beats.
 Left foot, quarter notes while C sustains:
   E3(LT) F3(LH) G3(LT) A3(LH)
@@ -235,7 +235,7 @@ Reps: 4×
 
 **Drill 4 — Chromatic approach notes** (common walking-bass / service-playing figure)
 
-```
+```text
 Notes: F#3 G3 — C#4 D4 — G#3 A3
 Feet:  LT RT — LT RT — LT RT
 Tempo: ♩=60 → 72 → 84
@@ -245,7 +245,7 @@ Reps: 4× per pattern
 
 **Drill 5 — Octave jumps**
 
-```
+```text
 Notes: C3 C4 C3 C4 — repeat across 4 octaves
 Feet:  RT RT RT RT (same foot, jump the distance)
 Tempo: ♩=40 → 50 → 60 → 72
@@ -377,7 +377,7 @@ The swell box encloses a division behind louvers; the expression pedal opens and
 
 **Drill — swell crescendo/decrescendo**
 
-```
+```text
 Sustain a C major chord on Swell (8′ Gedeckt + 4′ Flute) for 8 beats.
 Beats 1–2: shutters closed (pp)
 Beats 3–4: open gradually to mf
@@ -440,7 +440,7 @@ Steps 5 and 6 (hand + pedal) are the hardest and the most commonly skipped. Skip
 
 **Drill 1 — Static pedal point (beginner)**
 
-```
+```text
 RH: C major scale ascending, quarter notes, one octave
 LH: steady half notes on middle C, fingers 1-3-1-3 alternating
 Pedal: hold low C (RT) for 8 beats
@@ -450,7 +450,7 @@ Reps: 4×
 
 **Drill 2 — Contrary motion (intermediate)**
 
-```
+```text
 RH: C major scale ascending, quarter notes
 LH: C major scale descending (mirror fingering), quarter notes
 Pedal: point on C (RT) for 4 beats, then G (LT) for 4 beats
@@ -460,7 +460,7 @@ Reps: 4×
 
 **Drill 3 — Moving pedal, static hands (intermediate)**
 
-```
+```text
 RH: hold C-E-G, whole notes
 LH: hold lower C-E-G, whole notes
 Pedal: C-G-A-F bass pattern, quarter notes
@@ -473,7 +473,7 @@ Purpose: feet move independently while hands hold — guards against the common 
 
 First phrase of "Amazing Grace," G major:
 
-```
+```text
 Soprano + alto (RH, Great): melody + inner voice
 Tenor (LH, Great or Swell)
 Bass (pedal)
@@ -490,7 +490,7 @@ Bass (pedal)
 
 **Drill 5 — Rhythmic independence (advanced)**
 
-```
+```text
 RH: quarter notes
 LH: eighth notes (2× RH speed)
 Pedal: half notes (0.5× RH speed)
@@ -515,7 +515,7 @@ Hymn playing is the service organist's most practical daily coordination workout
 
 **Practice hymn — "Amazing Grace," G major**
 
-```
+```text
 Soprano: G B D G B D B G E D B G
 Alto:    D G B D G G B G C# B G D
 Tenor:   B D G B D D D D E D B B
@@ -668,7 +668,7 @@ Pipe organ access is scarce. Most organists practice at home on a digital instru
 sudo apt install grandorgue
 ```
 
-```
+```text
 1. File → Settings → MIDI — map keyboards and pedal
 2. File → Settings → Audio — buffer 256, sample rate 48 kHz
 3. Load an ODF (Hauptwerk-format sample set definition)
@@ -681,7 +681,7 @@ Lacks the wind model and some advanced features but is fully sufficient for tech
 
 The console is the worst seat in the house for objective listening — you're too close. Record every serious practice session.
 
-```
+```text
 1. DAW: Reaper, Ableton Live, or Logic Pro
 2. Route organ software audio to the DAW via loopback or virtual cable
 3. Record 24-bit/48 kHz
@@ -689,7 +689,7 @@ The console is the worst seat in the house for objective listening — you're to
 ```
 
 **Checklist:**
-```
+```text
 □ Every note speaking? (missed pedal or manual notes)
 □ Articulation consistent? (legato/non-legato where intended)
 □ Tempo steady? (tap-tempo check on playback)
@@ -739,7 +739,7 @@ The console is the worst seat in the house for objective listening — you're to
 
 ### Daily Practice Checklist
 
-```
+```text
 Warm-up (10 min)
 □ Manual drills 1-6, ♩=50 → target
 □ Pedal scale drills 1-2, ♩=50 → target

@@ -66,7 +66,7 @@ where $r_E$ and $r_P$ denote Earth's and the planet's/spacecraft's distances fro
 
 Gravitational wave detection requires measuring strain amplitudes $h \sim 10^{-21}$ from astrophysical sources. The Laser Interferometer Gravitational-Wave Observatory (LIGO) accomplishes this through laser interferometry between test masses separated by 4 kilometers. The operational principle exploits the differential effect of a gravitational wave on perpendicular arms: as the wave passes, one arm lengthens while the perpendicular arm shortens, introducing a differential phase shift in the recombined laser beams.
 
-```
+```text
 Simplified LIGO Optical Layout:
 
                    Input Test Mass (ITMx)

@@ -61,7 +61,7 @@ On a pre-synaptic spike, the weight is updated by $\Delta w = -A_- \cdot x_{post
 
 The brain does not use rate coding exclusively. While firing rate averaged over 100–500 ms windows correlates with stimulus intensity, the nervous system also exploits the precise timing of individual spikes to encode information at millisecond resolution. Time-to-first-spike coding, for instance, encodes stimulus intensity inversely in the latency of the first spike after stimulus onset—a stronger stimulus drives faster depolarization, producing an earlier spike. This scheme allows a downstream network to decode an entire stimulus frame from a single spike per neuron rather than waiting for statistical averages to accumulate over hundreds of milliseconds.
 
-```
+```text
 Temporal Coding Schemes: Information Encoding in Spike Trains
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

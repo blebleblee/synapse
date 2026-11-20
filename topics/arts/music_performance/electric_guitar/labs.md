@@ -30,7 +30,7 @@ The neck is a linear grid: one fret equals one semitone. String-to-string tuning
 
 Each CAGED shape is an open chord with a barre substituting for the nut. The five shapes tile the neck with no gaps:
 
-```
+```text
 E-shape → D-shape → C-shape → A-shape → G-shape → E-shape (one octave up)
 ```
 
@@ -46,7 +46,7 @@ Every diagram below reads low string (E6) to high string (e1), top to bottom.
 
 Practical example — **G major** (E-shape, fret 3):
 
-```
+```text
 e |--3--|  Index (barre)
 B |--3--|  Index (barre)
 G |--4--|  Pinky
@@ -63,7 +63,7 @@ E |--3--|  Index (barre)
 
 Practical example — **C major** (A-shape, fret 3):
 
-```
+```text
 e |--3--|  optional, often muted
 B |--5--|  Ring (mini-barre) or Pinky
 G |--5--|  Ring (mini-barre)
@@ -84,7 +84,7 @@ For A-shape **minor**, simply lift the B-string note — the chord becomes minor
 
 Practical example — **C major** (D-shape, fret 10):
 
-```
+```text
 e |--10--|  Index (barre)
 B |--10--|  Index (barre)
 G |--12--|  Ring or Pinky
@@ -97,7 +97,7 @@ E |---X--|  muted
 
 **C-Shape Barre Chord (Root on String 5)** — a wide stretch, most useful as an upper-neck partial voicing or in jazz voice leading, rarely as a full low-position barre.
 
-```
+```text
           E   A   D   G   B   e
 Fret X:   3   R   .   .   .   .   ← Ring: E string; Index: A string
 Fret X+1: .   .   5   .   .   .   ← Middle: D string
@@ -137,7 +137,7 @@ You don't need five new shapes for minor chords — one note moves, usually by a
 
 **E-shape minor:**
 
-```
+```text
 e |--3--|  Index (barre)
 B |--3--|  Index (barre)
 G |--4--|  Middle (NOT pinky — one fret lower than major)
@@ -227,7 +227,7 @@ Thinner picks flex on contact, producing a softer, broader attack transient with
 
 **Pattern 1 — Basic quarter-note (beginner):**
 
-```
+```text
 1    2    3    4
 ↓    ↓    ↓    ↓
 ```
@@ -237,7 +237,7 @@ Thinner picks flex on contact, producing a softer, broader attack transient with
 
 **Pattern 2 — Standard rock eighth-note:**
 
-```
+```text
 1    &    2    &    3    &    4    &
 ↓    ↑    ↓    ↑    ↓    ↑    ↓    ↑
 ```
@@ -247,7 +247,7 @@ Thinner picks flex on contact, producing a softer, broader attack transient with
 
 **Pattern 3 — Syncopated pop:**
 
-```
+```text
 1    &    2    &    3    &    4    &
 ↓   (↑)   ↓    ↑   (↓)   ↑    ↓    ↑
 ```
@@ -257,7 +257,7 @@ Thinner picks flex on contact, producing a softer, broader attack transient with
 
 **Pattern 4 — Reggae/ska chop:**
 
-```
+```text
 1    &    2    &    3    &    4    &
 (↓)  ↑   (↓)   ↑   (↓)   ↑   (↓)   ↑
 ```
@@ -267,7 +267,7 @@ Only upstrokes land. Downstrokes are pure ghost motion. Mute immediately with th
 
 **Pattern 5 — Sixteenth-note funk:**
 
-```
+```text
 1  e  &  a   2  e  &  a   3  e  &  a   4  e  &  a
 ↓  ×  ↑  ↓   ×  ↑  ×  ↓   ↑  ×  ↓  ×   ↑  ↓  ×  ↑
 ```
@@ -285,7 +285,7 @@ Rest the heel of your picking hand lightly on the bridge saddles for an optional
 
 **Basic pattern, 4/4:**
 
-```
+```text
 1    &    2    &    3    &    4    &
 p         p         p         p
      i         m         i         m
@@ -293,7 +293,7 @@ p         p         p         p
 
 On an open **G chord:**
 
-```
+```text
 1    &    2    &    3    &    4    &
 E6        G3        A5        G3
      B2        B2        B2        B2
@@ -431,7 +431,7 @@ An amp stage is linear only within a voltage window. Push the input past that wi
 **Starting points for three common tones:**
 
 *Clean, Fender-style:*
-```
+```text
 Amp: Blackface Deluxe or Twin model
 Gain: 2-3 (just below breakup)
 Bass 5 / Mid 4 / Treble 6
@@ -440,7 +440,7 @@ Reverb: 2-3 (spring)
 ```
 
 *Classic rock crunch, Marshall-style:*
-```
+```text
 Amp: Plexi 1959 or JCM800 model
 Gain: 5-6
 Bass 5 / Mid 7 / Treble 6
@@ -449,7 +449,7 @@ Master: 7
 ```
 
 *High-gain modern metal:*
-```
+```text
 Amp: Recto, Diezel, or EVH model
 Gain: 7-8
 Bass 4 (avoid mud) / Mid 5-6 / Treble 7
@@ -624,7 +624,7 @@ A coil can read in-spec resistance but still have a partial turns-short, showing
 
 A minor pentatonic, fret 5, the foundation box for blues and rock lead.
 
-```
+```text
 e |--5--8--|
 B |--5--8--|
 G |--5--7--|
@@ -636,13 +636,13 @@ E |--5--8--|
 Fingering: Index on fret 5 throughout, Pinky on fret 8, Ring covers fret 7 on the middle strings. Scale degrees: Root – ♭3 – 4 – 5 – ♭7.
 
 **Pattern A — technique builder, strict alternate picking:**
-```
+```text
 E: 5-8   A: 5-7   D: 5-7   G: 5-7   B: 5-8   e: 5-8 (then descend)
 ```
 60 → 80 → 100 → 120 BPM.
 
 **Pattern B — cross-string phrasing, pull-offs:**
-```
+```text
 e: 8-5 (pull-off)
 B: 8-5 (pull-off)
 G: 7-5 (pull-off)
@@ -650,7 +650,7 @@ G: 7-5 (pull-off)
 Finish with a bend: fret 7 on the G string, bend a whole step up to the fret-9 pitch, hold two beats, release.
 
 **Pattern C — classic blues ending lick:**
-```
+```text
 Fret:   5    8    5    7    5    7    5
 String: B    B    B    G    G    A    A
 Pick:   ↓    ↑    ↓    ↑    ↓    ↑    ↓
@@ -678,14 +678,14 @@ Pick:   ↓    ↑    ↓    ↑    ↓    ↑    ↓
 Power chords (Root + 5th) are harmonically neutral — neither major nor minor — which is exactly why they cut cleanly through distortion without sounding muddy.
 
 **Open E5:**
-```
+```text
 E |--0--|
 A |--2--|  Middle
 D |--2--|  Ring (optional octave doubling)
 ```
 
 **Movable shape, root on E string:**
-```
+```text
       E    A    D
 Fret: R    .    .
 +2:   .    5    R    Middle (A) / Ring (D), or Ring/Pinky for independence
@@ -693,7 +693,7 @@ Fret: R    .    .
 
 **Classic rock riff — E blues progression, 120 BPM straight eighths:**
 
-```
+```text
 Bar 1-2: E5
 Bar 3-4: A5 (fret 5, E-string shape, or open-position A power chord)
 Bar 5:   B5 (fret 7, same shape)
@@ -707,7 +707,7 @@ Build from 80 BPM clean → 100 BPM → 120 BPM performance tempo.
 
 ### 6.4 Structured 30-Minute Practice Session
 
-```
+```text
 0:00-5:00    Warm-up
              Chromatic 1-2-3-4 exercise, every string, 60 BPM
              No musical content — pure mechanics, relaxed grip
@@ -789,7 +789,7 @@ Build from 80 BPM clean → 100 BPM → 120 BPM performance tempo.
 
 ### 7.6 CAGED Quick Reference — Key of A Major
 
-```
+```text
 Shape      Root Fret   Notes
 ---------  ----------  --------------------------
 A-shape    Open (0)    Open A chord
@@ -812,7 +812,7 @@ A-shape    Fret 12     Octave repeat
 
 ### 7.7 Strumming Pattern Quick Reference
 
-```
+```text
 Legend: down arrow, up arrow, x muted, parentheses ghost strum
 
 Quarter-note:      1 2 3 4         (all downstrokes)

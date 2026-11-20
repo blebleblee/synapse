@@ -18,7 +18,7 @@ The AOT compiler's tree-shaking capability derives from its ability to generate 
 
 The router's internal architecture centers on the `Router` service, which orchestrates a pipeline of pure functions that transform a URL string into an activated component tree. When a navigation begins—whether triggered by clicking a `routerLink`, calling `router.navigate()`, or the user pressing the back button—the router captures the target URL and begins constructing a `UrlTree`, which is an immutable data structure representing the parsed URL segments, matrix parameters, query parameters, and fragment. The `UrlTree` structure mirrors the nested nature of routes, with primary and auxiliary outlets forming a tree where each node represents a segment and its associated parameters. This parsing phase is entirely synchronous and produces a canonical representation of the target state, divorced from the current component tree.
 
-```
+```text
 Navigation Pipeline:
 
 URL String

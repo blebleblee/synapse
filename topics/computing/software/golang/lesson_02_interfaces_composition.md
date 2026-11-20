@@ -18,7 +18,7 @@ The invariant that governs all interface mechanics is this: an interface value i
 
 The runtime representation of an interface value consists of a two-word structure known as an `iface` for non-empty interfaces or `eface` for the empty interface. The first word points to an `itab` structure, which contains a pointer to the interface type metadata and a pointer to the concrete type metadata, along with a function pointer table mapping each interface method to the corresponding concrete implementation. The second word holds the actual data pointer to the concrete value. This indirection layer enables dynamic dispatch: when a method is invoked on an interface variable, the runtime indexes into the `itab` function table, retrieves the concrete function pointer, and invokes it with the data pointer as the receiver.
 
-```
+```text
 ┌─────────────────┐
 │ Interface Value │
 ├─────────────────┤

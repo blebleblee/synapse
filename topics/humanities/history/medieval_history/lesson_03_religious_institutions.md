@@ -60,7 +60,7 @@ Medieval religious institutions operated through layered hierarchical structures
 
 The ecclesiastical hierarchy formed a strict pyramid with the pope at the apex, cardinals forming an advisory and electoral college, archbishops supervising metropolitan provinces, bishops governing dioceses, and parish priests administering local congregations. Each tier possessed defined jurisdictional authority and reporting relationships, though considerable ambiguity existed at boundaries. The archbishop functioned as intermediate supervisor, hearing appeals from diocesan courts and coordinating multi-diocese activities. The cardinal college, originally Roman clergy, evolved into an international body of senior prelates advising the pope and electing his successor. Cardinals often served simultaneously as bishops of major sees or as papal legates with plenipotentiary authority to act in the pope's name.
 
-```
+```text
 Ecclesiastical Hierarchy (Simplified)
 
 Pope (Bishop of Rome, Vicar of Christ)
@@ -168,7 +168,7 @@ Monastic governance structures varied by order but shared common architectural e
 
 Daily monastic schedules synchronized individual practice with communal liturgy through the canonical hours:
 
-```
+```text
 Monastic Horarium (Canonical Hours)
 
 Night:

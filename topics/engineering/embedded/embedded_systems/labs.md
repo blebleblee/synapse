@@ -51,7 +51,7 @@ Compile the firmware with `arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -O2 -g3 -c 
 
 Disassemble the compiled object file with `arm-none-eabi-objdump -d gpio.o` and locate the `gpio_toggle_fast` function. The disassembly should reveal a tight loop structure:
 
-```
+```text
 08000400 <gpio_toggle_fast>:
  8000400:   4b02        ldr     r3, [pc, #8]
  8000402:   6819        ldr     r1, [r3, #0]
@@ -459,13 +459,13 @@ Begin by constructing a supply voltage margining test that sweeps VDD from 3.6V 
 
 Configure the brownout detection level to BOR Level 3 (rising threshold 2.7V, falling threshold 2.6V) by writing the FLASH option bytes. Use ST-LINK Utility or OpenOCD to modify the option bytes register:
 
-```
+```text
 openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c "init; reset halt; flash read_bank 0 option_bytes.bin 0x1FFFC000 16; exit"
 ```
 
 Examine the option bytes with a hex editor and verify that byte 8 (BOR_LEV bits in FLASH_OPTCR register) equals 0b11 for Level 3. If modification is required:
 
-```
+```text
 openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c "init; reset halt; stm32f2x unlock 0; flash write_bank 0 modified_option_bytes.bin 0x1FFFC000; stm32f2x lock 0; reset; exit"
 ```
 

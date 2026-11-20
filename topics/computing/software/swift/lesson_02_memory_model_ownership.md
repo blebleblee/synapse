@@ -28,7 +28,7 @@ The Swift ownership model received a formal elaboration with the introduction of
 
 Every Swift class instance begins life as a contiguous region of heap memory laid out as follows. The first word (8 bytes on a 64-bit platform) holds a pointer to the class's metadata — its vtable, its type descriptor, its field offsets. The second word holds the `InlineRefCounts` field. Beginning at byte 16, the instance's stored properties are laid out in declaration order, subject to alignment padding. The pointer the programmer holds in source code points to byte 0 of this structure, specifically to the metadata pointer, so dereferencing it immediately yields dispatch information.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────┐
 │  Offset +0  │  Metadata Pointer (8 bytes)                    │
 ├─────────────────────────────────────────────────────────────-┤

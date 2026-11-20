@@ -24,7 +24,7 @@ Understanding these patterns requires moving beyond the visual metaphor of block
 
 The practical implementation of autonomous behavior begins with the construction of a main program loop that executes at a consistent, predictable frequency. In LEGO programming environments, this loop typically runs as fast as the hardware allows, often achieving 20-50 Hz (20-50 iterations per second) on EV3 hardware and 40-100 Hz on SPIKE Prime hardware, depending on sensor polling overhead and computational load. The loop structure must balance three competing demands: maximizing update frequency for responsive control, minimizing jitter for consistent behavior, and managing sensor read latency for accurate perception.
 
-```
+```text
 State ← INITIAL_STATE
 Timer ← 0
 Previous_Sensor_Values ← empty
@@ -53,7 +53,7 @@ The state transition function forms the behavioral heart of the autonomous syste
 
 A concrete example clarifies the pattern. Consider a line-following robot with three operational states: SEARCHING (rotating in place to find the line), FOLLOWING (tracking the line), and STOPPING (emergency halt triggered by obstacle detection). The state transition function implements a directed graph where nodes represent states and edges represent transitions triggered by specific events:
 
-```
+```text
 SEARCHING:
     on event LINE_FOUND → transition to FOLLOWING, action START_LINE_FOLLOW
     on event OBSTACLE_DETECTED → transition to STOPPING, action EMERGENCY_STOP

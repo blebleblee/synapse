@@ -215,7 +215,7 @@ flowchart TD
 
 Run every item below before handoff. Treat any failure as a blocking issue, not a note.
 
-```
+```text
 [ ] Video Gamut: Lumetri Waveform shows 0 IRE minimum, 100 IRE maximum — zero illegal pixels.
 [ ] Color Space: Output tagged Rec.709 (SDR) with correct NCLC color primaries, or Rec.2020/PQ for HDR masters.
 [ ] Audio Loudness — Broadcast (EBU R128 / ATSC A/85):

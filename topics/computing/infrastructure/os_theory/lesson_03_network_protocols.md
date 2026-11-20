@@ -24,7 +24,7 @@ Understanding *why* traps exist at the hardware level—not merely *that* they e
 
 Operating system kernels fall along a spectrum defined by how much code runs in ring 0:
 
-```
+```text
 Monolithic  ←————————————————————————————→  Microkernel
  (Linux)                                      (seL4, Mach)
 

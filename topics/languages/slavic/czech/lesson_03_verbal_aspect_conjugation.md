@@ -62,7 +62,7 @@ The secondary imperfective retains the semantic contribution of the prefix while
 
 Conjugation class mechanics hinge on stem-final phonology and the morphophonological rules governing vowel-consonant interactions. The **-á- class** verbs take present-tense endings *-m*, *-š*, *-Ø* (third singular often null after vowel), *-me*, *-te*, *-jí* (or *-í*), yielding paradigms like:
 
-```
+```text
 dělat (to do, impf.) — Infinitive
 dělám     (I do)
 děláš     (you do, sg.)
@@ -76,7 +76,7 @@ The thematic vowel *-á-* surfaces consistently before consonantal endings but m
 
 The **-í- class** exhibits stem-final palatal softening and thematic *-í-*:
 
-```
+```text
 myslit (to think, impf.) — Infinitive
 myslím    (I think)
 myslíš    (you think, sg.)
@@ -90,7 +90,7 @@ Note the homophony in third-person singular and plural forms (*myslí*), disambi
 
 The **-uje-/-ova- class** is maximally regular and transparent:
 
-```
+```text
 pracovat (to work, impf.) — Infinitive
 pracuji    (I work)
 pracuješ   (you work, sg.)
@@ -104,7 +104,7 @@ The infinitive suffix *-ovat* drops its *-va-* component in the present tense, y
 
 Past-tense l-participle formation applies uniformly across conjugation classes but respects stem phonology. The l-participle suffix is *-l* (masc. sg.), *-la* (fem. sg.), *-lo* (neut. sg.), *-li* (masc. animate pl.), *-ly* (fem. or masc. inanimate pl.), *-la* (neut. pl.). For *dělat*, the l-participle stem is *dělal*:
 
-```
+```text
 dělal jsem     (I did, masc.)
 dělala jsem    (I did, fem.)
 dělal jsi      (you did, masc. sg.)
@@ -124,7 +124,7 @@ The auxiliary *jsem*, *jsi* often contracts in colloquial speech (*dělal sem*, 
 
 Conditional mood formation layers the conditional auxiliary onto the l-participle, mirroring past-tense structure but introducing hypothetical modality:
 
-```
+```text
 dělal bych     (I would do, masc.)
 dělala bych    (I would do, fem.)
 dělal bys      (you would do, masc. sg.)
@@ -146,7 +146,7 @@ Imperative formation varies by conjugation class but follows derivable patterns.
 
 The irregular verb *být* demands exhaustive memorization due to its suppletion and high frequency:
 
-```
+```text
 PRESENT:
 jsem    (I am)
 jsi     (you are, sg.)

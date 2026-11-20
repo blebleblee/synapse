@@ -38,7 +38,7 @@ The authentication flow for managed identities merits detailed examination becau
 
 Pod Security Standards, which replaced PodSecurityPolicies in Kubernetes 1.25, are enforced through namespace labels rather than admission webhooks. Each namespace is labeled with one of three security profiles: Privileged, which allows unrestricted pod creation; Baseline, which prohibits known privilege escalation paths such as hostPath mounts, host networking, and running as root; and Restricted, which enforces a hardened configuration including mandatory seccomp profiles, read-only root filesystems, and dropped Linux capabilities. The API server's PodSecurity admission plugin evaluates these labels synchronously during pod creation, comparing the pod's security context against the namespace's required profile and rejecting the pod if it violates constraints. The enforcement is deterministic and does not depend on external webhooks, eliminating the latency and availability concerns of PodSecurityPolicy, but it also eliminates the ability to write custom policy logic or generate audit events in external systems.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                         AAD-Integrated AKS Cluster                      │
 └─────────────────────────────────────────────────────────────────────────┘

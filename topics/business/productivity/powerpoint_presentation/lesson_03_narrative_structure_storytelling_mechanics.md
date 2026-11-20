@@ -26,7 +26,7 @@ The Complication section introduces tension by revealing that the current situat
 
 The Resolution section presents the recommended path forward, but its mechanical structure must reverse-engineer the complication's architecture. If the complication identified three root causes through an issue tree, the resolution must address all three branches explicitly. This creates a satisfying cognitive closure loop where every problem element finds its corresponding solution element. The resolution implementation typically spans eight to twelve slides in a standard business presentation, opening with a crisp statement of the core recommendation (often as a single headline on a visually simple slide for maximum impact), then expanding into implementation mechanics, resource requirements, timeline phasing, expected outcomes, and risk mitigation approaches. The terminal slide in the resolution section should create forward momentum, typically by specifying the immediate next actions or decisions required from the audience.
 
-```
+```text
 SCR Narrative Flow State Machine:
 
 [SITUATION] → establishes baseline context

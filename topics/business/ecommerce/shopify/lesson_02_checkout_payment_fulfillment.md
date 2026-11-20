@@ -28,7 +28,7 @@ The cart object exists as a session-scoped container indexed by a persistent car
 
 When a customer navigates to checkout, Shopify instantiates a checkout object distinct from the cart, copying line items but adding validation layers. The checkout object introduces shipping address capture, which triggers multiple downstream calculations. First, the shipping address determines tax jurisdiction through postal code lookup, initiating communication with the tax service provider. Second, the address establishes the destination zone for carrier rate calculation, where zones are merchant-defined geographic groupings like "Domestic," "Canada," or "European Union." Third, the address influences payment gateway routing, as some processors charge different interchange rates for domestic versus international cards, and certain fraud detection rules apply different risk scores based on billing-shipping address mismatches.
 
-```
+```text
 Cart Object Schema:
 - token: string (persistent identifier)
 - line_items: array

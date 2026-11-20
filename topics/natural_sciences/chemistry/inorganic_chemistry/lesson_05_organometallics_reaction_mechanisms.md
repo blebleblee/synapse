@@ -52,7 +52,7 @@ Tetrahedral d¹⁰ complexes like [Ni(CO)₄] and [Zn(CH₃)₄]²⁻ achieve 18
 
 Oxidative addition of a substrate H-X to a square planar d⁸ M(I) complex proceeds through a three-center, two-electron transition state. The metal's filled d$_{z^2}$ orbital (or an appropriate d-hybrid) donates electron density into the σ* antibonding orbital of H-X, weakening the substrate bond. Simultaneously, the H-X σ bonding orbital donates into a vacant metal p-orbital or hybrid orbital, forming nascent M-H and M-X bonds.
 
-```
+```text
           H-X substrate
           σ    σ*
            \  /
@@ -87,7 +87,7 @@ Reductive elimination from an octahedral d⁶ M(III) complex to form a new C-C b
 
 For the complex [Pd(CH₃)₂(PPh₃)₂], ethane elimination proceeds via a T-shaped transition state where the two methyl groups approach each other while the metal center slips toward a Pd(0) coordination geometry:
 
-```
+```text
 Initial (square planar):
      CH₃
       |
@@ -151,7 +151,7 @@ Mechanistic probes include kinetic isotope effect measurements (replacing Ar-Br 
 
 The Wilkinson catalyst [Rh(Cl)(PPh₃)₃] hydrogenates terminal and internal alkenes under mild conditions with high chemoselectivity, leaving carbonyl, ester, and nitrile groups intact. The mechanism proceeds through a five-step cycle: phosphine dissociation, oxidative addition of H₂, alkene coordination, migratory insertion, and reductive elimination.
 
-```
+```text
 Mechanistic Steps:
 
 [Rh(Cl)(PPh₃)₃]  ⇌  [Rh(Cl)(PPh₃)₂] + PPh₃
@@ -188,7 +188,7 @@ Stereochemical outcomes can be probed using deuterium-labeled substrates. For ex
 
 The classical Ziegler-Natta catalyst for propylene polymerization consists of TiCl₄ deposited on MgCl₂ microcrystals, activated with Al(C₂H₅)₃ as a cocatalyst and external donor molecules (esters or ethers) to control stereoselectivity. The active site resides at coordinatively unsaturated Ti(III) centers on the (110) lateral facets of MgCl₂ crystallites, where chloride vacancies create Lewis-acidic coordination pockets.
 
-```
+```text
 Active Site Geometry (simplified):
 
       Cl      Cl

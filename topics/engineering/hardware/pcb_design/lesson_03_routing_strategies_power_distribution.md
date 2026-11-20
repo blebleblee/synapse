@@ -26,7 +26,7 @@ Trace width calculation begins with the fundamental relationship between current
 
 The cross-sectional geometry of a trace directly impacts its DC resistance. For a trace with width *W* = 50 mils, thickness *T* = 1.4 mils (1 oz copper), and length *L* = 5 inches, the resistance calculates as:
 
-```
+```text
 R = ρ × L / (W × T)
   = (1.68e-8 Ω·m) × (5 in × 0.0254 m/in) / (50 mil × 25.4 μm/mil × 1.4 mil × 25.4 μm/mil)
   = (1.68e-8) × (0.127) / (1.27e-3 × 35.56e-6)
@@ -45,7 +45,7 @@ Decoupling capacitor placement theory derives from the need to suppress power su
 
 The placement strategy for decoupling capacitors follows a distance-based hierarchy. Bulk capacitors can reside anywhere on the power rail, typically near the voltage regulator output. Mid-frequency capacitors should be placed within a few centimeters of load clusters. High-frequency ceramic capacitors must be placed within millimeters of IC power pins, with the shortest possible via path to the ground plane. The inductance of the connection loop—from IC power pin, through capacitor body, to ground via, through ground plane, and back to IC ground pin—dominates the high-frequency impedance. For a typical 0805-size ceramic capacitor with 5 mm distance to the IC and two vias (power and ground), the loop inductance approximates:
 
-```
+```text
 L_loop ≈ 2 × L_via + L_trace
        ≈ 2 × (1.2 nH) + 1 nH/mm × 5 mm
        ≈ 2.4 nH + 5 nH
@@ -60,7 +60,7 @@ Thermal relief connections pose a subtle trade-off: direct solid connection of a
 
 Thermal via arrays beneath high-power components provide a conductive path for heat to escape into internal copper planes, which then spread the heat over a larger area. A 1 mm × 1 mm thermal pad beneath a voltage regulator might accommodate a 3×3 array of 12 mil vias on 0.5 mm pitch, with the vias plated through to a continuous ground plane on Layer 2. The thermal resistance of this via array can be approximated by modeling each via as a cylindrical copper conductor with thermal conductivity *k*_copper = 400 W/m·K, diameter *d* = 12 mil (0.3 mm), and length *L* = 1.6 mm (for a standard 1.6 mm thick PCB):
 
-```
+```text
 R_via = L / (k × A)
       = 1.6e-3 / (400 × π × (0.15e-3)²)
       ≈ 56.6 °C/W per via
@@ -78,7 +78,7 @@ The parallel resonance between capacitors introduces potential impedance peaks t
 
 Advanced power plane design employs embedded capacitance materials, where the dielectric layer between power and ground planes is replaced with a high-permittivity ceramic-filled resin (εᵣ = 10–50 instead of FR-4's εᵣ ≈ 4). This dramatically increases the intrinsic capacitance of the plane pair according to the parallel-plate formula *C* = ε₀εᵣ*A* / *d*, where *A* is the overlapping plane area and *d* is the dielectric thickness. A 4-inch × 4-inch plane pair with 3 mil dielectric thickness and εᵣ = 16 yields:
 
-```
+```text
 C = (8.85e-12 F/m) × 16 × (0.1 m × 0.1 m) / (76.2e-6 m)
   ≈ 1.86 μF
 ```

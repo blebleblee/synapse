@@ -30,7 +30,7 @@ Do this before any writing. Counterpoint is an ear-and-hand skill first.
 
 ### Drill 1 — Contrary motion scales (builds the physical feel of independence)
 Play C major scale, both hands starting on middle C, **moving in opposite directions**:
-```
+```text
 RH (ascending): C(1) D(2) E(3) F(1) G(2) A(3) B(4) C(5)
 LH (descending): C(1) B(2) A(3) G(4) F(1) E(2) D(3) C(4)
 ```
@@ -39,7 +39,7 @@ Metronome: 60 BPM, quarter notes, hands strictly together rhythmically but oppos
 ### Drill 2 — Two-voice first species at the keyboard
 Play this cantus firmus (LH, whole notes) against a counterpoint (RH, whole notes) — classic 1st species, note against note:
 
-```
+```text
 LH (cantus, fingers 5-4-3-2-1 roughly, adjust to hand size):
 C  D  E  F  E  D  C
 
@@ -53,7 +53,7 @@ Metronome 50 BPM (slow enough to listen to each interval), hold each whole note 
 ### Drill 3 — Add rhythmic independence (2nd/3rd species feel)
 Same cantus firmus, LH whole notes, RH now in quarter notes with a passing tone on the weak beat:
 
-```
+```text
 LH: C -------- D -------- E -------- F
 RH: E F G | F G A | G A B | A B C
      (beats: 1 2 3  1 2 3  1 2 3  1 2)
@@ -83,7 +83,7 @@ graph LR
 
 **Keyboard drill — 7-6 suspension chain in C major.** LH plays a descending bass line in half notes; RH holds each note across the barline then resolves down a step before moving to the next suspension:
 
-```
+```text
 LH (bass, half notes):  C   B   A   G   F   E   D   C
 RH (upper, tied/resolved): 
    bar1: C (held)—B (resolve)   [C/C=8ve→C/B=7th... ]
@@ -91,7 +91,7 @@ RH (upper, tied/resolved):
 
 To make this concrete, here is a fully worked 4-bar chain, both hands, counted in 4/4 at quarter-note pulse (half notes = 2 beats):
 
-```
+```text
 Beat:     1    2    3    4    |  5    6    7    8   |  9   10   11  12
 LH:       C ------- B ------- |  A ------- G ------- |  F ------ E -----
 RH:       D ------- C ------- |  C ------- B ------- |  B ------ A -----
@@ -111,13 +111,13 @@ This is the single most useful "trick" in contrapuntal writing: write two voices
 
 ### Hands-on test
 Play this original pairing:
-```
+```text
 RH (upper): E  F  G  A  G  F
 LH (lower): C  D  E  F  E  D
 Intervals:  3  3  3  3  3  3   (all thirds)
 ```
 Now physically swap: play the former LH line with RH an octave higher, and the former RH line with LH an octave lower:
-```
+```text
 RH (was lower): C  D  E  F  E  D   (now up an octave)
 LH (was upper): E  F  G  A  G  F   (now down an octave)
 Intervals:      6  6  6  6  6  6   (all sixths — still consonant)
@@ -131,11 +131,11 @@ Play both versions back to back at 70 BPM. You now *own* the 9-minus-rule intuit
 Composing a subject/answer pair is a practical skill, not an abstract one. Work through this complete, playable example.
 
 **Subject (Voice 1, mm. 1–2, in C major):**
-```
+```text
 C(q) D(q) E(h) | F(q) E(q) D(h)
 ```
 **Answer (Voice 2 enters m.3, transposed to the dominant, G major, while Voice 1 continues with a countersubject):**
-```
+```text
 Voice 1 — Countersubject (mm.3-4, eighth notes, contrary stepwise motion to contrast the subject's quarter notes):
 G8 A8 G8 F8 E8 D8 C8 D8 | E8 F8 E8 D8 C8 D8 E8 F8
 
@@ -190,7 +190,7 @@ graph TD
 
 ### Parallel-fifth fix drill (do this until it's reflex)
 Play the error, hear it, then play the fix immediately after, back to back:
-```
+```text
 ERROR (parallel 5ths):
 RH: C  D      LH: G  A     → beat1: P5, beat2: P5 (both ascend) — BANNED
 
@@ -206,19 +206,19 @@ Metronome 60 BPM, alternate error/fix four times. This builds the ear-reflex tha
 A complete, playable three-voice exposition in C major. Hands: pianists play V1+V2 together (both hands), then add V3 as a third layer once comfortable, or use two players.
 
 **Subject** (2 bars):
-```
+```text
 C(q) D(q) E(h) | F(q) E(q) D(h)
 ```
 **Answer** (transposed to dominant, G major, enters m.3 in Voice 2):
-```
+```text
 G(q) A(q) B(h) | C(q) B(q) A(h)
 ```
 **Countersubject** (Voice 1 continues under the Answer, mm.3–4, faster values for rhythmic contrast):
-```
+```text
 A8 G8 F8 E8 D8 E8 F8 G8 | A8 G8 F8 E8 D8 C8 B8 C8
 ```
 **Voice 3 entry** (subject returns in tonic, m.5, while V1/V2 continue with free counterpoint or restated countersubject fragments):
-```
+```text
 C(q) D(q) E(h) | F(q) E(q) D(h)
 ```
 
@@ -253,11 +253,11 @@ gantt
 Writing a canon forces you to compose a melody that harmonizes with *itself*. This is the sharpest possible training for contrapuntal hearing.
 
 **Leader:**
-```
+```text
 C(q) E(q) G(q) A(q) | G(q) F(q) E(q) D(q) | C(h)
 ```
 **Follower** (identical line, enters 2 beats later, one octave lower):
-```
+```text
     (rest, rest)  C(q) E(q)  G(q) A(q) | G(q) F(q) E(q) D(q) | C(h)
 ```
 

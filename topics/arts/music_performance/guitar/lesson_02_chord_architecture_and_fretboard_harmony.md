@@ -45,7 +45,7 @@ All diagrams below use the notation *low-string : middle-string : high-string* e
 
 **C Major — String Set E-A-D (strings 6-5-4)**
 
-```
+```text
 Root Position (C/C): 1st inv (E/C): 2nd inv (G/C):
 C = root            E = bass        G = bass
 
@@ -65,7 +65,7 @@ Fret notation: 8-3-5     7-3-5     3-2-5
 
 **C Major — String Set A-D-G (strings 5-4-3)**
 
-```
+```text
 Root Position (C):  1st Inv (E):    2nd Inv (G):
 Fret:               Fret:           Fret:
 
@@ -82,7 +82,7 @@ Notation: 3-5-5     2-2-5     5-5-4
 
 The G-B boundary (major third instead of perfect fourth) shifts the shapes on this string set.
 
-```
+```text
 Root Position (C):  1st Inv (E):    2nd Inv (G):
 
 B |-5-|             B |-5-|         B |-3-|
@@ -100,7 +100,7 @@ Notation: 5-5-5     2-2-5     5-5-3
 
 This string set, sitting entirely within the standard guitar chord range, produces the brightest, most penetrating voicings.
 
-```
+```text
 Root Position (C):  1st Inv (E):    2nd Inv (G):
 
 e |-8-|             e |-8-|         e |-3-|
@@ -118,7 +118,7 @@ Using C minor (C – E♭ – G) as the reference, the same inversion logic appl
 
 **C Minor — String Set G-B-E**
 
-```
+```text
 Root Position (Cm): 1st Inv (Eb):   2nd Inv (G):
 
 e |-8-|             e |-8-|         e |-3-|
@@ -136,7 +136,7 @@ The only change from the major shapes is a one-fret drop of the third throughout
 
 **C Diminished — G-B-E**
 
-```
+```text
 Root Position (Cdim): 1st Inv (Eb): 2nd Inv (Gb):
 
 e |-7-|              e |-7-|        e |-2-|
@@ -148,7 +148,7 @@ Notation: 5-4-7      3-4-7     11-4-2
 
 **C Augmented — G-B-E**
 
-```
+```text
 Root Position (Caug): 1st Inv (E):  2nd Inv (G#):
 
 e |-9-|              e |-9-|        e |-4-|
@@ -194,7 +194,7 @@ Each shape below is shown as a full six-string chord diagram for the key of C ma
 
 **C Shape — C Major (open position)**
 
-```
+```text
 e |--0--|
 B |--1--|  ← 3rd (E)
 G |--0--|  ← 5th (G)  
@@ -212,7 +212,7 @@ The C shape is asymmetrical and physically demanding to barre cleanly, which is 
 
 **A Shape — C Major (barred at fret 3)**
 
-```
+```text
 e |--3--|  ← Root (C)
 B |--5--|  ← 5th (G)
 G |--5--|  ← 3rd (E)
@@ -230,20 +230,20 @@ The A shape produces a dense, mid-range voicing with the root on the A string. I
 
 **G Shape — C Major (barred at fret 7 — partial capo concept)**
 
-```
+```text
 e |--7--|  ← 5th (G)... wait — recalibrate:
 ```
 
 For C major in the G shape, the geometric position sits at fret 7 with the root on strings 1 and 6:
 
-```
+```text
 e |--8--|  ← Root (C)
 B |--8--|  ← 5th (G)... 
 ```
 
 Let us build this carefully. The open G chord has the shape: 3-2-0-0-0-3. Transposing this shape to produce C major requires moving every note up by 5 semitones (C is 5 semitones above G):
 
-```
+```text
 Open G:   3-2-0-0-0-3
 C (G shape, +5 frets): 8-7-5-5-5-8
 
@@ -265,7 +265,7 @@ The G shape requires a full barre plus two additional fretting fingers, making i
 
 The open E chord: 0-2-2-1-0-0. Transposing to C (+8 semitones):
 
-```
+```text
 e |--8--|  ← Root (C) ← ROOT
 B |--8--|  ← 5th (G)
 G |--9--|  ← 3rd (E)
@@ -285,7 +285,7 @@ The E shape barre chord is the most universally played of the five, drilled into
 
 The open D chord: x-x-0-2-3-2. Transposing to C (+10 semitones):
 
-```
+```text
 e |--10-|  ← 3rd (E)
 B |--10-|  ← Root (C) ← ROOT on string 2
 G |--9--|  ← 5th (G)
@@ -305,7 +305,7 @@ The D shape sits highest on the neck and uses only the top four strings, making 
 
 Place the five shapes in sequence along the neck for C major:
 
-```
+```text
 Fret:  0    2    4    5    7    8    10   12
        |    |    |    |    |    |    |    |
        C    C    A    A    G    E    E    D    (back to C, oct up)
@@ -377,7 +377,7 @@ Drop-2 voicings appear on two primary string sets: strings 4-3-2-1 (D-G-B-e) and
 
 Close position root: C–E–G–B → Drop-2 (drop G) → G–C–E–B
 
-```
+```text
 Root position (G on str 4):
 e |--7--|  B (maj7)
 B |--5--|  E (3rd)
@@ -387,7 +387,7 @@ D |--5--|  G (5th, dropped)
 Fret notation: 5-5-5-7
 ```
 
-```
+```text
 1st inversion (E on str 4, E is 3rd):
 Close: E–G–B–C → drop G → G–E–B–C
 
@@ -399,7 +399,7 @@ D |--5--|  G (5th)
 Fret notation: 5-4-7-8
 ```
 
-```
+```text
 2nd inversion (G on str 4, G is 5th):
 Close: G–B–C–E → drop B → B–G–C–E
 
@@ -410,7 +410,7 @@ B |--0--|  ...
 
 For clarity and playability, let us anchor all four Cmaj7 drop-2 inversions at positions where the shapes fall within a comfortable fret range. The following four voicings are the standard jazz practitioner's set for Cmaj7, all on strings 4-3-2-1:
 
-```
+```text
 Cmaj7 Drop-2: Root Position
   Voices (low to high): G  C  E  B
   Strings 4–3–2–1
@@ -482,7 +482,7 @@ The following diagrams present the most practical, frequently used drop-2 drop v
 
 **Major 7 (Cmaj7)**
 
-```
+```text
   Position 1 (root pos.): x-x-5-5-5-7
   
   e |--7--|
@@ -502,7 +502,7 @@ For a clean presentation without arithmetic errors, let us present the five most
 
 **Cmaj7** *(Root on A-string, 3rd fret — A-shape CAGED zone)*
 
-```
+```text
   Strings: E  A  D  G  B  e
 
   Voicing 1 — x-3-2-4-5-x
@@ -542,7 +542,7 @@ Close-position Cmaj7 root: C–E–G–B. Drop the third from top (E down one oc
 
 Bottom to top: E–C–G–B
 
-```
+```text
   e |--x--|
   B |--7--|  B (7th)
   G |--5--|  G (5th)
@@ -559,7 +559,7 @@ Close C7 root: C–E–G–B♭. Drop E:
 
 Bottom to top: E–C–G–Bb
 
-```
+```text
   e |--x--|
   B |--6--|  Bb (b7th)
   G |--5--|  G (5th)
@@ -576,7 +576,7 @@ Close Cm7 root: C–E♭–G–B♭. Drop E♭:
 
 Bottom to top: Eb–C–G–Bb
 
-```
+```text
   e |--x--|
   B |--6--|  Bb (b7th)
   G |--5--|  G (5th)
@@ -599,7 +599,7 @@ Shell voicings are the vocabulary of Freddie Green, Joe Pass in his comping work
 
 Root on E string, third and seventh on adjacent middle strings (D-G or G-B). This is the guitarist's equivalent of the pianist's left-hand shell.
 
-```
+```text
 Cmaj7 Shell (root E-string):   C7 Shell:        Cm7 Shell:
 
 e |--x--|                       e |--x--|         e |--x--|
@@ -614,7 +614,7 @@ Cmaj7: 8-x-x-2-4-x  |  C7: 8-x-x-2-3-x  |  Cm7: 8-x-x-1-3-x
 
 **Type B shell (root on string 5):**
 
-```
+```text
 Cmaj7 Shell (root A-string):   C7 Shell:        Cm7 Shell:
 
 e |--x--|                       e |--x--|         e |--x--|
@@ -639,7 +639,7 @@ The following progression demonstrates smooth voice leading through a IIm7–V7�
 
 **Dm7 – G7 – Cmaj7 (ii–V–I in C major)**
 
-```
+```text
   Dm7:            G7:             Cmaj7:
   x-x-5-7-6-5    x-x-5-4-3-3    x-x-5-5-5-7
 
@@ -700,7 +700,7 @@ The basic funk strum pattern divides each bar into sixteen sixteenth notes and a
 
 Standard notation for a one-bar funk vamp in 4/4 (D = downstroke, U = upstroke, X = muted chunk):
 
-```
+```text
   Sixteenth note: 1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
   Stroke:         D  U  D  U  D  U  D  U  D  U  D  U  D  U  D  U
   Sound:          C  X  X  C  X  X  C  X  C  X  X  C  X  X  C  X
@@ -736,7 +736,7 @@ In a jazz chord melody context, the thumb plays the bass note of each chord on t
 
 A refinement used in country, folk, and certain jazz styles alternates the thumb between the root and fifth of the chord on successive beats while the fingers add chord tones on the upbeats. For a C major chord (x-3-2-0-1-0):
 
-```
+```text
   Beat:         1    +    2    +    3    +    4    +
   Thumb (bass): A5   -    E6   -    A5   -    E6   -
                 (C)       (C)       (C)       (C)
@@ -764,7 +764,7 @@ Degree of muting is controlled by the distance from the bridge: contact directly
 
 In a solo guitar performance, alternating between fully sounded chords, palm-muted versions of the same chord, and left-hand ghost strums within a single rhythmic pattern produces a layered, drum-like foundation. Practice the following pattern (using E major shape at fret 7 for B major, as an example):
 
-```
+```text
   Beat:  1   e   +   a   2   e   +   a
   Type:  Chord  -   Ghost  -   PM   -   Chord  Ghost
          (full)     (mute)     (palm)    (full) (mute)

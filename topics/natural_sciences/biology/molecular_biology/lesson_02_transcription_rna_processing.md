@@ -24,7 +24,7 @@ The RNA polymerase II holoenzyme comprises a 12-subunit catalytic core with a mo
 
 Promoter architecture in eukaryotic genes exhibits modular organization, with core promoter elements residing within approximately 100 base pairs upstream and downstream of the transcription start site (TSS). The TATA box, located roughly 25-30 base pairs upstream of the TSS, conforms to the consensus sequence TATAAA and serves as the primary recognition element for the TATA-binding protein (TBP), a component of the general transcription factor TFIID. TBP binding induces a dramatic 90-degree bend in the DNA through insertion of phenylalanine residues into the minor groove, widening the minor groove and compressing the major groove. This structural distortion facilitates assembly of the pre-initiation complex (PIC) by creating proper geometric alignment for subsequent GTF recruitment.
 
-```
+```text
 DNA Template Strand:    5'---[Upstream Regulatory]---[TATA Box]---[Inr]---[TSS]---[DPE]---3'
                                                          -30      -1    +1     +30
 
@@ -61,7 +61,7 @@ Splicing proceeds through spliceosome assembly on pre-mRNA substrates in a highl
 
 The tri-snRNP particle, consisting of pre-assembled U4/U6 and U5 snRNPs, then joins the A complex to form the B (pre-catalytic) complex. Extensive structural rearrangements follow, including unwinding of U4 and U6 base pairing to allow U6 to interact with both the 5' splice site and U2 snRNA near the branch point. U1 and U4 snRNPs dissociate, yielding the activated Bact complex, which further rearranges into the catalytically competent B* complex. The U2 and U6 snRNAs position two catalytic metal ions (typically Mg2+) in the active site through coordination by specific nucleotides, establishing the geometry required for the first transesterification reaction. Following exon ligation in the C complex, the spliceosome disassembles, releasing the ligated exons and the excised intron lariat for degradation.
 
-```
+```text
 Spliceosome Catalytic Mechanism:
 
 Exon 1      Intron           Exon 2
@@ -107,7 +107,7 @@ Nascent RNA sequencing (NET-seq and related methods) maps RNA polymerase positio
 
 Quantitative analysis of splicing kinetics using metabolic labeling with 4-thiouridine (4sU) followed by time-resolved RNA-seq reveals that splicing occurs predominantly cotranscriptionally, with median splicing completion times of 5-10 minutes for introns in human cells. Intron length correlates inversely with splicing rate, as longer introns require more time for spliceosome assembly across the full intron span. First introns are often retained longer than downstream introns, potentially serving as quality control checkpoints. Splicing efficiency can be quantified by calculating the ratio of spliced to unspliced transcripts for each intron junction, typically measured using junction-spanning reads in RNA-seq data. Well-defined splice sites with strong consensus sequences exhibit splicing efficiencies exceeding 95%, while weak or alternative splice sites may show efficiencies below 50%.
 
-```
+```text
 Experimental Protocol: Nuclear Run-On Transcription Assay
 
 Objective: Measure transcription rates and map active RNA polymerase positions

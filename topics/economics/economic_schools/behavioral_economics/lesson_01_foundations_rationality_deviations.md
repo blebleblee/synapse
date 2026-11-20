@@ -131,7 +131,7 @@ These elicitation procedures confront methodological challenges. The isolation e
 
 The workflow for testing rationality axioms in economic data integrates theoretical prediction, experimental implementation, statistical analysis, and model comparison. A canonical procedure unfolds as follows:
 
-```
+```text
 1. Theoretical Stage:
    - Formalize the axiom (WARP, SARP, independence, etc.)
    - Derive testable predictions for choice patterns

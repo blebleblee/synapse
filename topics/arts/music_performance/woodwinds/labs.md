@@ -165,7 +165,7 @@ Notation: ● = covered, ○ = open. L1–L4 = left hand index to pinky, R1–R4
 
 **Chalumeau register (written E3–C5):**
 
-```
+```text
 Note    L.T  L1  L2  L3  L4   R1  R2  R3  R4   Notes
 E3      ●    ●   ●   ●   ●    ●   ●   ●   ●    All holes covered
 F3      ●    ●   ●   ●   ●    ●   ●   ●   ○    RH pinky lifts
@@ -198,7 +198,7 @@ C5      ○    ○   ○   ○   ○    ○   ○   ○   ○    All holes open
 
 Notation: T = octave key (left thumb), L1–L3 = left hand index–middle–ring, R1–R3 = right hand index–middle–ring, ★ = palm keys.
 
-```
+```text
 Note     Oct  L1  L2  L3   R1  R2  R3   Notes
 Bb2      ○    ●   ●   ●    ●   ●   ●    + front Bb key (LH side)
 B2       ○    ●   ●   ●    ●   ●   ●    + LH pinky low-B key
@@ -225,7 +225,7 @@ C4       ●    ●   ●   ●    ●   ○   ○
 
 Notation: T = thumb Bb lever, 1–6 = the six main tone holes (left hand 1–3, right hand 4–6), Foot = foot joint keys.
 
-```
+```text
 Note     T    1    2    3    4    5    6    Foot   Notes
 C4       ●    ●    ●    ●    ●    ●    ●    ●      B-foot needed for low C
 D4       ○    ●    ●    ●    ●    ●    ●    ●
@@ -352,7 +352,7 @@ Target rate for orchestral playing: 5–6 oscillations per second at a moderate 
 
 Use a comfortable middle-register note (written G4 clarinet/sax, A4 flute, A3 oboe).
 
-```
+```text
 Exercise A — Even 8th notes:
 ♩ = 60, 72, 84, 100, 116: G G G G G G G G, single-tongued each note
 Typical clean ceiling for beginners: 120-132 BPM
@@ -376,7 +376,7 @@ Once single-tongue speed plateaus around 132–144 BPM 16ths, double tonguing un
 
 **Drill 7 — Double tongue builder**
 
-```
+```text
 Step 1: T only, 4 notes at ♩ = 80 — establish reference tone quality
 Step 2: K only, 4 notes at ♩ = 80 — K must sound as clear as T
 Step 3: T-K pairs, 2 notes at ♩ = 60 — slow and deliberate, listen for evenness
@@ -397,7 +397,7 @@ Legato means no re-articulation between notes; the only disturbance should be th
 
 **Drill 8 — Slow legato scale for finger coordination**
 
-```
+```text
 ♩ = 40: play a one-octave major scale, 2 beats per note, no tongue
 Focus entirely on simultaneous finger placement
 Raise tempo by 4 BPM every two passes
@@ -418,7 +418,7 @@ The break separates the chalumeau register (up to written G#4/Ab4) from the clar
 
 **Drill 9 — Clarinet break ladder (♩ = 60 → 100)**
 
-```
+```text
 Level 1: Long tone crossing — G4 (chalumeau) to G5 (clarion), slurred, 4 beats each
 Level 2: G4 <-> G5 alternating every beat
 Level 3: Scale crossing — E4 F4 F#4 G4 | G4 A4 B4 C5 slurred, break at the bar line
@@ -439,7 +439,7 @@ No register key exists on flute. The third octave is purely embouchure and air s
 
 **Drill 10 — Flute octave slurs**
 
-```
+```text
 ♩ = 60: D4 (open) -slur-> D5 -slur-> D6, 4 beats each
 Focus on the jaw-forward adjustment, not embouchure squeezing.
 Common fault: D6 goes flat, player rolls in to "help," it goes even flatter.
@@ -452,7 +452,7 @@ Fix: hold the roll-out position steady, increase air speed instead.
 
 ### 7.1 Clarinet Intonation Map
 
-```
+```text
 SHARP by nature (open or relax to compensate):
 - G#4/Ab4: use the alternate fingering (register key + G) when the passage allows
 - Bb5 (clarion): often very sharp — drop jaw 1-2mm
@@ -468,7 +468,7 @@ FLAT by nature (firm up to compensate):
 
 ### 7.2 Flute Intonation Map
 
-```
+```text
 SHARP by nature:
 - Middle Bb4: most flutes run sharp here; use the thumb Bb lever, not the bis key
 - High D6/E6: relax the aperture slightly, keep air speed high
@@ -483,7 +483,7 @@ FLAT by nature:
 
 ### 7.3 Saxophone Intonation Map
 
-```
+```text
 SHARP by nature:
 - Palm keys D5/E5/F5: sharp on nearly every horn — drop jaw, relax corners
 - G#5/A5: sharp — try the alternate long-C-key fingering for A5
@@ -653,7 +653,7 @@ The interval logic transfers directly to flute, sax, oboe, and bassoon — adapt
 
 **Foundation scale drill (all 12 major scales, one octave):**
 
-```
+```text
 ♩ = 60:  quarter notes              Week 1-2
 ♩ = 80:  eighth notes               Week 3-4
 ♩ = 100: eighth notes               Month 2
@@ -681,7 +681,7 @@ The interval logic transfers directly to flute, sax, oboe, and bassoon — adapt
 Arpeggios expose finger synchronization problems that scales hide, because the intervals are wider and the break gets crossed abruptly.
 
 **G major arpeggio (Bb clarinet, written):**
-```
+```text
 G4 - B4 - D5 - G5 - D5 - B4 - G4
 Fingering: standard G, cross the break to B clarion, D clarion, G clarion
 ```
@@ -692,7 +692,7 @@ Fingering: standard G, cross the break to B clarion, D clarion, G clarion
 
 **Clarinet chromatic fingering decisions:**
 
-```
+```text
 Bb4: Bis key (index side key) for speed in fast passages;
      side Bb key is flatter and better for sustained notes
 F#4: side Bb/F# spatula for cleaner descending passages
@@ -702,7 +702,7 @@ G#4/Ab4: left pinky G# key as the default; right-hand spatula alternate
 
 **Practice format:**
 
-```
+```text
 ♩ = 60, two beats per note -> ♩ = 80, one beat per note -> ♩ = 100, 16th notes
 Full range: low E3 up to written C6 or higher
 ```
@@ -713,7 +713,7 @@ Full range: low E3 up to written C6 or higher
 
 ### 11.1 Warm-Up Sequence — 15 Minutes Before Any Performance
 
-```
+```text
 Minutes 0-3:   Long tones, middle register only, mf, no vibrato
                Settles the embouchure, saturates and warms the reed
 Minutes 3-6:   Scales, one octave, ♩ = 60
@@ -772,7 +772,7 @@ Technique gets you in the room; listening keeps you in tune once you're there.
 
 ### Saxophone Altissimo Entry Fingerings (Alto, written)
 
-```
+```text
 D5 (palm):  L1 + palm 1
 E5:         L1 + palm 1 + palm 2
 F5:         L1 + palm 1 + palm 2 + palm 3

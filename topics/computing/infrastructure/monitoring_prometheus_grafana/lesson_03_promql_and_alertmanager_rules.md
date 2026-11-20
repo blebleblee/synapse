@@ -219,7 +219,7 @@ topk(10, sum by (endpoint) (rate(http_requests_total{status=~"5.."}[5m])))
 
 Prometheus represents histograms as a set of counter metrics with the `_bucket`, `_count`, and `_sum` suffixes. Each bucket is a cumulative counter of observations less than or equal to its boundary.
 
-```
+```bash
 # Raw histogram metrics for HTTP request duration
 http_request_duration_seconds_bucket{le="0.005"}     = 100
 http_request_duration_seconds_bucket{le="0.01"}      = 200

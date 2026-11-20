@@ -124,7 +124,7 @@ This means your service can be unavailable for up to 43.2 minutes in any rolling
 
 Datadog tracks two types of SLOs with different underlying data sources. A **Metric-based SLO** is defined by a good/total request ratio query:
 
-```
+```text
 SLI = sum:trace.web.request.hits{env:prod,service:api,http.status_code:2xx}.as_count()
     / sum:trace.web.request.hits{env:prod,service:api}.as_count()
 ```
@@ -139,7 +139,7 @@ A burn rate of 1.0 means you are consuming errors at exactly the pace that will 
 
 Google's SRE workbook establishes a multi-window, multi-burn-rate alerting scheme that Datadog's SLO alerting directly implements. The scheme uses two burn rate thresholds evaluated over two different time windows simultaneously:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │          MULTI-WINDOW BURN RATE ALERT CONFIGURATION                 │
 │                        (99.9% SLO, 30-day window)                   │
@@ -196,7 +196,7 @@ The `@pagerduty-{service-name}` mention triggers an event in PagerDuty that crea
 
 The critical operational detail is that Datadog resolves `@mention` routing at notification time by evaluating conditional blocks inside the monitor message:
 
-```
+```text
 {{#is_alert}}
   @pagerduty-api-oncall
   @slack-incidents-prod
@@ -230,7 +230,7 @@ The practical scalability limit of Datadog's alerting infrastructure is not the 
 
 The mitigation is to design multi-alert monitors with the minimum cardinality sufficient to serve your incident routing needs. If you need per-service alerting, use `by {service}` and not `by {service, host, availability_zone, pod_name}`. The more granular dimensions can always be added to the alert notification as template variables that resolve to the top-offending value at notification time:
 
-```
+```bash
 # In the monitor query:
 avg:trace.web.request.duration{env:prod} by {service}
 

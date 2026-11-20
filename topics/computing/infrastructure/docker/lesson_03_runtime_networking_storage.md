@@ -26,7 +26,7 @@ The content store implements a content-addressable storage system where image la
 
 Containerd's snapshot service translates this flat content-addressed layer store into a hierarchical filesystem view suitable for container execution. The service supports pluggable **snapshotters**—overlay, btrfs, zfs, devicemapper—each implementing the same interface with storage-driver-specific semantics. The overlay snapshotter, Docker's default for modern kernels, leverages Linux's OverlayFS to construct a unified filesystem view from multiple read-only lower directories (image layers) and a single read-write upper directory (container layer). When containerd prepares a container's root filesystem, it invokes `snapshotter.Prepare()`, which creates a new snapshot inheriting from the image's layer chain. This operation manifests as an OverlayFS mount combining all image layers as `lowerdir` entries and a fresh empty directory as `upperdir`:
 
-```
+```text
 mount -t overlay overlay \
   -o lowerdir=/layer5:/layer4:/layer3:/layer2:/layer1,\
      upperdir=/container/upper,\
@@ -62,7 +62,7 @@ Inter-container communication within the same bridge network bypasses the host's
 
 External connectivity requires NAT translation through iptables. Docker installs a POSTROUTING rule in the `nat` table that masquerades outbound traffic:
 
-```
+```text
 iptables -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
 ```
 
@@ -70,7 +70,7 @@ This rule matches packets originating from the Docker subnet that are not destin
 
 Port publishing (`-p 8080:80`) introduces a DNAT rule in the PREROUTING chain, intercepting packets destined for the host's external IP on port 8080 and rewriting the destination to the container's IP and port 80:
 
-```
+```text
 iptables -t nat -A DOCKER ! -i docker0 -p tcp --dport 8080 -j DNAT --to-destination 172.17.0.2:80
 ```
 

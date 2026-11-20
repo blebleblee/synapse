@@ -104,7 +104,7 @@ Envoy is a high-performance C++ L7 proxy developed by Lyft. Key architectural pr
 4. **Cluster**: Upstream service endpoints with load balancing policy
 
 **Connection Flow Example**:
-```
+```text
 [Client] → [Listener :15006] → [TLS termination] → [HTTP Connection Manager]
          → [Router filter] → [Load balancer] → [Cluster: service-b] → [Upstream connection pool]
          → [Service B via mTLS]
@@ -549,7 +549,7 @@ Traffic flows: User in US → web-v1 (US) → reviews-v1 (EU, if US replicas una
 Service meshes generate rich telemetry without application code changes:
 
 **Metrics**: Envoy exports per-request metrics (latency histograms, error rates, throughput) via Prometheus:
-```
+```text
 envoy_cluster_upstream_rq_total{cluster="reviews.prod.svc.cluster.local"} 1500
 envoy_cluster_upstream_rq_time_bucket{cluster="reviews.prod.svc.cluster.local",le="10"} 1350
 envoy_cluster_upstream_rq_time_bucket{cluster="reviews.prod.svc.cluster.local",le="50"} 1480

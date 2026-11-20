@@ -42,7 +42,7 @@ The mechanical process of constraint propagation is a breadth-first search throu
 
 The constraint propagation graph can be visualized as a bipartite network:
 
-```
+```text
 Across Clues          Down Clues
 -----------          -----------
 1A: [S][O][L][V][E]    1D: [S][ ][ ][ ]

@@ -70,7 +70,7 @@ The molecular implementation of multi-site phosphorylation creates inherent coop
 
 Scaffold proteins organize kinase cascade components into specific spatial arrangements that control signal flow. The yeast mating pathway scaffold protein Ste5 binds the kinases Ste11 (MAP kinase kinase kinase), Ste7 (MAP kinase kinase), and Fus3 (MAP kinase) simultaneously, creating a dedicated signaling complex insulated from crosstalk with other MAP kinase pathways sharing the same kinase components. Scaffold concentration critically determines pathway output: at low scaffold concentrations, not all kinases can find scaffold binding sites, reducing signal transmission; at high concentrations, kinases partition onto separate scaffold molecules, again reducing signal efficiency. Optimal signaling occurs at intermediate scaffold concentrations where most kinases reside on the same scaffold molecule, maximizing productive kinase-substrate encounters while minimizing non-productive interactions.
 
-```
+```text
 Receptor Tyrosine Kinase Signaling Architecture
 
 Ligand (EGF) ──> [EGFR]───┬──> Grb2-SOS ──> Ras-GTP ──> Raf ──> MEK ──> ERK

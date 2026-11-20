@@ -44,7 +44,7 @@ Dihybrid cross execution extends this workflow to two traits simultaneously. Con
 
 Generate the F₂ by intercrossing F₁ siblings. Each F₁ dihybrid produces four gamete types (*e*^+^ *vg*^+^, *e*^+^ *vg*, *e* *vg*^+^, *e vg*) with equal frequency 0.25, assuming the loci reside on different chromosomes or are unlinked by sufficient recombination distance. The 16-cell Punnett square predicts four phenotypic classes in the F₂:
 
-```
+```text
 9/16  gray body, normal wings    (e⁺_ vg⁺_)
 3/16  gray body, vestigial wings (e⁺_ vgvg)
 3/16  ebony body, normal wings   (ee vg⁺_)

@@ -189,7 +189,7 @@ Structure your liner notes as follows:
 
 Example:
 
-```
+```text
 1. Prelude in D Minor [3:47]
 2. Nocturne: Variations I–III [7:22]
 3. Cadenza for Solo Cello [5:11]

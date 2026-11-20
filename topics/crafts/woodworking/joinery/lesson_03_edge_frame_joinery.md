@@ -28,7 +28,7 @@ A hand-planed or machine-jointed edge presents open, clean wood cells at the sur
 
 For a glued edge joint in a typical shop setting with PVA (polyvinyl acetate) adhesive, the working sequence runs as follows. Mill your stock to rough thickness and rip your boards to rough width, leaving 3–5 mm on each dimension for final processing. Joint the mating edges within two hours of glue-up to prevent oxidation of the fresh surface. Apply glue to both faces using a notched spreader or a chip brush, targeting a coverage rate of approximately 150–180 g/m², which produces a continuous wet film without puddles or dry patches. Align the boards so the faces are coplanar, assemble parallel bar clamps at 200–250 mm intervals along the joint, and apply pressure until glue squeezes out uniformly along the full length of the joint. Clamp pressure for typical hardwoods with PVA is in the range of 0.7–1.0 MPa (100–150 psi) on the joint face. Excess pressure beyond this range starves the joint by squeezing out too much adhesive before it can gel, producing a "starved joint" that is weaker than one clamped at moderate pressure.
 
-```
+```text
 Edge Joint Glue-Up: Clamping Pressure & Open Time Reference
 
 Species Class     | Optimal Joint Pressure | PVA Open Time (70°F, 50% RH)
@@ -60,7 +60,7 @@ For a practitioner building a dining table top from 150 mm-wide flat-sawn hardwo
 
 The frame-and-panel system deserves examination as a mechanical architecture rather than simply a visual style. Its geometry can be understood through the following diagram:
 
-```
+```text
 Frame-and-Panel: Force Distribution Model
 
   ┌─────────────────────────────────────────────────────────┐
@@ -98,7 +98,7 @@ The haunch is a refinement that serves two purposes simultaneously. It fills the
 
 Bent lamination works because thin strips of wood can be deformed elastically to a radius that would cause thick stock to fracture, and the adhesive fixes the deformation permanently by restraining the internal stresses that would cause springback. When a strip of wood is bent, the outer face is stretched in tension along its length while the inner face is compressed. The neutral axis—the line of zero strain—lies at the mid-thickness of the strip. For a given radius of curvature, the maximum strain at the outer face equals half the strip thickness divided by the bend radius. As long as this strain remains below the modulus of rupture (MOR) of the species in bending, the strip will conform to the form without fracturing.
 
-```
+```text
 Springback & Ply Thickness Reference for Common Bent-Lamination Species
 (Target bend radius: 150 mm, 12-ply construction)
 

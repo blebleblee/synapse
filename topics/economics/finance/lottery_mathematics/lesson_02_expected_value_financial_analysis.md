@@ -38,7 +38,7 @@ Constructing the complete probability distribution requires calculating this exp
 
 The prize determination module maps each match outcome to a monetary award. In typical lottery architectures, prizes follow a two-tiered structure: fixed prizes for lower tiers and pari-mutuel allocation for upper tiers. A representative prize schedule for a 6/49 lottery might specify:
 
-```
+```text
 Match 6 numbers: Pari-mutuel jackpot (50% of prize pool)
 Match 5 numbers: Pari-mutuel (15% of prize pool)  
 Match 4 numbers: Fixed $100

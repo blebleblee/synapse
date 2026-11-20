@@ -20,7 +20,7 @@ Determinism represents a critical but often overlooked invariant in multiplayer 
 
 A production physics engine decomposes into several tightly coupled subsystems, each operating on shared object state through carefully orchestrated phases. The simulation pipeline typically follows this execution model:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    Physics Tick (Δt)                        │
 ├─────────────────────────────────────────────────────────────┤

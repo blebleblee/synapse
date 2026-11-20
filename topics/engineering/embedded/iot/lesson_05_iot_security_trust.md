@@ -79,7 +79,7 @@ The application processor communicates with the HSM exclusively through a narrow
 
 The secure boot implementation leverages this HSM architecture to create an immutable root of trust. When the microcontroller powers on, the CPU reset vector points to boot ROM physically located in the HSM itself, not in the application processor's flash memory. This first-stage bootloader code executes entirely within the HSM's isolated environment:
 
-```
+```text
 First-Stage Bootloader (Immutable ROM in HSM):
 
 1. Initialize HSM hardware: configure clock trees, enable crypto engines
@@ -102,7 +102,7 @@ The public key used for signature verification lives in OTP fuses programmed dur
 
 The second-stage bootloader follows an identical verification pattern before loading the application firmware, creating a chain of trust that extends through every software layer:
 
-```
+```text
 Second-Stage Bootloader (Verified by First-Stage):
 
 1. Initialize application peripherals: UART, GPIO, flash controller
@@ -123,7 +123,7 @@ Second-Stage Bootloader (Verified by First-Stage):
 
 The memory protection unit configuration deserves careful attention, because secure boot means nothing if the application can later overwrite the bootloader or jump back into bootloader code to bypass signature checks. The MPU establishes three distinct memory regions with different access permissions:
 
-```
+```text
 Memory Protection Unit Configuration:
 
 Region 0: Boot ROM (0x0000_0000 - 0x0000_FFFF)
@@ -161,7 +161,7 @@ The key insight is that application code runs in unprivileged user mode and cann
 
 Firmware update mechanisms must maintain these security properties while allowing legitimate updates signed by the device manufacturer. The update protocol implements a challenge-response authentication flow combined with incremental signature verification to handle updates that exceed available RAM:
 
-```
+```text
 Secure Firmware Update Protocol:
 
 Phase 1: Authentication
@@ -281,7 +281,7 @@ Temperature sensors provide another layer of tamper detection by monitoring die 
 
 The tamper response itself depends on the severity of the detected attack. For momentary anomalies that might represent environmental noise rather than deliberate attacks, the HSM logs the event to secure NVM and increments a tamper attempt counter but continues operating. If the counter exceeds a configured threshold (typically 10-100 events depending on deployment environment), or if the tamper detection indicates an unambiguous physical attack (mesh circuit open, temperature spike >20°C), the HSM executes an emergency response sequence:
 
-```
+```text
 Tamper Emergency Response Sequence:
 
 1. Disable all crypto engines (AES, ECC, RSA accelerators)
@@ -296,7 +296,7 @@ Tamper Emergency Response Sequence:
 
 The key derivation for filesystem encryption uses HKDF with multiple input parameters to ensure that different data contexts receive cryptographically independent keys:
 
-```
+```text
 Storage Encryption Key Derivation:
 
 Inputs:
@@ -322,7 +322,7 @@ The inclusion of firmware version in the context string provides crypto-agility:
 
 Zero-trust network architecture for IoT requires mutual authentication on every connection, not just device-to-cloud but also device-to-device for peer communication. The protocol flow establishes a secure channel before any application data flows:
 
-```
+```text
 Zero-Trust Mutual Authentication Flow:
 
 Device A (Temperature Sensor) wants to send data to Device B (Gateway):
@@ -457,7 +457,7 @@ The security tradeoff here is that cached certificates remain trusted even if th
 
 Firmware update performance over constrained wireless links becomes critical when deploying security patches to thousands of devices with limited upload bandwidth. A naive update protocol would transfer the complete new firmware image (typically 128 KB - 2 MB) even when only a small security patch changed a few hundred bytes. Binary delta updates optimize this by computing the difference between old and new firmware images during the build process, then transmitting only the delta:
 
-```
+```text
 Binary Delta Update Protocol:
 
 Server-side preparation:

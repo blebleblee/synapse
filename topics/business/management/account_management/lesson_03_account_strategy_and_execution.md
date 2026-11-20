@@ -26,7 +26,7 @@ The organizational intelligence system functions as a living database that maps 
 
 A complete stakeholder map documents each individual across five critical dimensions that predict their influence on account outcomes. First, role classification tags each stakeholder according to their functional relationship to the vendor: economic buyer with budget authority, technical buyer with implementation veto power, end user consuming the product, executive sponsor providing political cover, or coach providing insider intelligence. Second, influence magnitude quantifies their decision-making weight through a calibrated scale: ultimate authority (can single-handedly approve or kill initiatives), strong influence (opinion heavily shapes decisions), moderate influence (consulted but not decisive), or minimal influence (aware but not consulted). Third, disposition assessment evaluates their current stance toward the vendor relationship: champion (actively promotes expansion), supporter (positively inclined but passive), neutral (no strong opinion), skeptic (questions value), or blocker (actively opposes initiatives). Fourth, success criteria documentation identifies the specific personal and organizational metrics that determine their performance evaluation and therefore drive their priorities: revenue targets, cost reduction mandates, operational efficiency metrics, user satisfaction scores, or strategic initiative milestones. Fifth, engagement history tracks all vendor interactions, communication frequency, response patterns, and relationship quality indicators that inform future outreach strategies.
 
-```
+```text
 STAKEHOLDER MAP STRUCTURE
 
 ┌─────────────────────────────────────────────────────────────────┐
@@ -84,7 +84,7 @@ The challenge in success criteria systems lies in attribution complexity and mea
 
 The formal artifact that codifies this framework is the Mutual Success Plan, a living document that both parties review quarterly and update based on achievement progress and evolving priorities. The plan structure begins with a strategic context section documenting the customer's business objectives that motivated the initial purchase and any evolved priorities that have emerged since contract signature. The objectives section translates these business goals into specific, measurable, achievable, relevant, and time-bound (SMART) success criteria with unambiguous definitions and measurement methodologies. For each objective, the plan assigns clear ownership: which customer stakeholders are accountable for internal enablement and adoption, which vendor resources are committed to support achievement, and what external dependencies or blockers exist that require executive escalation.
 
-```
+```text
 MUTUAL SUCCESS PLAN STRUCTURE
 
 Account: Acme Corp | Contract Period: 2024-01-01 to 2026-12-31
@@ -192,7 +192,7 @@ The QBR represents the highest-leverage governance mechanism because it creates 
 
 The governance system also defines escalation protocols that specify when and how to elevate issues beyond the normal touchpoint cadence. Technical escalations follow a tiered support structure where routine issues resolve through customer success manager coordination, complex technical problems escalate to solutions architects or product engineering, and systemic product gaps escalate to product management for roadmap consideration. Commercial escalations address pricing disputes, contract interpretation conflicts, or procurement challenges through progressive involvement of sales leadership and ultimately executive sponsors who can authorize special terms or pricing exceptions. Relationship escalations respond to stakeholder dissatisfaction, organizational changes that threaten the account, or competitive threats through immediate account team mobilization, executive sponsorship activation, and potentially crisis response protocols that include on-site visits and dedicated recovery resources.
 
-```
+```text
 GOVERNANCE CALENDAR STRUCTURE
 
 Account: Acme Corp | 2024-Q2 Planning

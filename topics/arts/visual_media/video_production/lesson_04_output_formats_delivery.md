@@ -28,7 +28,7 @@ Temporal redundancy exploits the fact that consecutive video frames are nearly i
 
 The architecture of a typical video codec pipeline looks like this:
 
-```
+```text
 Input Frame → Color Space Transform → Block Partitioning → Frequency Transform (DCT/CABAC)
     ↓
 Quantization (Q-parameter) → Entropy Coding → Bitstream Assembly → Output File

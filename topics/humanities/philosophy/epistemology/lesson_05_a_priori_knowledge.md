@@ -76,7 +76,7 @@ The architecture of logical and mathematical knowledge presents a special case r
 
 The formal structure of logical truth admits precise characterization through the apparatus of model theory:
 
-```
+```text
 Logical Truth Verification Procedure:
 1. Express the proposition in formal logical notation
 2. Identify all non-logical constants (predicates, individual constants, function symbols)

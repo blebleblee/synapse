@@ -51,7 +51,7 @@ A TAS (tool-assisted superplay) file is a structured binary format that encodes 
 
 A BK2 header for a research session should minimally contain:
 
-```
+```text
 [Input Record]
 SHA1Hash        9AA9762819E1E9D0DADA6F27B2B2C4A91DF1A02D
 Platform        NES

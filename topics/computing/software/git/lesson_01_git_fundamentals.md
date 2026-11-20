@@ -84,7 +84,7 @@ git cat-file -p <core-tree-hash>
 
 A commit object binds a root tree hash to authorship metadata and to zero or more parent commit hashes. Its format is a simple text record:
 
-```
+```text
 tree <root-tree-hash>
 parent <parent-commit-hash>
 author Name <email> <unix-timestamp> <tz-offset>
@@ -130,7 +130,7 @@ git cat-file -t refs/tags/v1.0  # prints: tag
 
 The relationships among these four types form a complete, self-describing data structure:
 
-```
+```text
 HEAD
  │
  ▼

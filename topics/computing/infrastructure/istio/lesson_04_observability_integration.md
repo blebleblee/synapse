@@ -36,7 +36,7 @@ Metrics collection operates through Envoy's statistics subsystem, which maintain
 
 The Prometheus exporter transforms Envoy's internal metric representation into Prometheus text format through a scrape endpoint handler. When Prometheus polls the proxy's `/stats/prometheus` endpoint, Envoy iterates its metric registry, applies configured tag extractors to generate labels, and serializes each metric as a type declaration and sample lines. Istio's metric configuration injects standard labels into every metric: `source_workload`, `source_version`, `destination_service`, `destination_version`, `response_code`, and `response_flags`. These labels derive from Envoy's dynamic metadata system: the Istio authentication filter extracts peer identity from the mTLS certificate's SPIFFE URI and populates metadata keys like `istio_peer_service` and `istio_peer_namespace`, which the stats system reads during label injection. The resulting Prometheus output looks like this:
 
-```
+```bash
 # TYPE istio_requests_total counter
 istio_requests_total{source_workload="frontend-v1",destination_service="backend",response_code="200"} 1523
 istio_requests_total{source_workload="frontend-v1",destination_service="backend",response_code="503"} 47

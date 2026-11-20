@@ -427,7 +427,7 @@ Compile this racy implementation with ThreadSanitizer enabled. ThreadSanitizer (
 
 The TSan report format includes the address of the racing memory location, the type of access (read or write), and the source code line numbers for both accesses. A typical report reads:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 4 at 0x7fff12345678 by thread T2:
     #0 Network::step_racy src/main.rs:156
@@ -500,7 +500,7 @@ Compile with AddressSanitizer: `RUSTFLAGS="-Z sanitizer=address" cargo build --t
 
 The ASan report format includes the heap address, the type of violation (heap-use-after-free, heap-buffer-overflow, etc.), and the shadow byte state encoding the memory's allocation status. A typical report reads:
 
-```
+```text
 ==12345==ERROR: AddressSanitizer: heap-use-after-free on address 0x60300000eff0 at pc 0x... bp 0x... sp 0x...
 WRITE of size 4 at 0x60300000eff0 thread T0
     #0 trigger_use_after_free src/main.rs:23
@@ -541,7 +541,7 @@ fn trigger_leak() {
 
 Compile with LeakSanitizer: `RUSTFLAGS="-Z sanitizer=leak" cargo build --target x86_64-unknown-linux-gnu`. Insert a call to `trigger_leak()` in `main()` and run the binary. LeakSanitizer reports detected leaks at program termination:
 
-```
+```text
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 
 Direct leak of 1048576 byte(s) in 1 object(s) allocated from:

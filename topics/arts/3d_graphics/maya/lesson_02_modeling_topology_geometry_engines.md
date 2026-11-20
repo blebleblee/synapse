@@ -20,7 +20,7 @@ Polygonal mesh data structures store geometry as indexed vertex arrays coupled w
 
 The internal edge-loop data structure deserves particular attention because it directly affects modeling efficiency. When you select an edge and invoke "Select Edge Loop," Maya traverses the mesh by following a specific topological pattern: at each quad vertex, the algorithm crosses to the opposite edge, continuing until it returns to the starting edge or encounters a non-quad face. This traversal is only well-defined in all-quad topology where each vertex has exactly four incident edges forming two perpendicular edge loops. Triangles and n-gons disrupt this pattern, forcing the edge loop selection to terminate prematurely or branch ambiguously. Maintaining quad-dominant topology is therefore not merely an aesthetic preference—it directly enables Maya's most powerful modeling tools to function predictably.
 
-```
+```text
 Polygonal Mesh Node Graph:
 transform (worldMatrix) 
     → polyCube (output mesh)

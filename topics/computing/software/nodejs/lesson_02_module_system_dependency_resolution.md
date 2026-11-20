@@ -38,7 +38,7 @@ If `X` begins with `./`, `../`, or `/`, it is a relative or absolute specifier. 
 
 If `X` is a bare specifier — no leading dot or slash — Node enters the node_modules walk. Starting from `dirname(Y)`, it looks for `dirname(Y)/node_modules/X`, then `dirname(dirname(Y))/node_modules/X`, and so on up to the filesystem root. At each candidate directory, the same file-then-directory resolution applies. The walk stops at the filesystem root or at a directory boundary marked by a `package.json` with `"workspaces"`, though workspace boundaries are a Yarn/npm convention Node itself does not enforce at the loader level — Node simply walks the tree.
 
-```
+```text
 require('chalk') from /project/src/server/routes/api.js
 
 Walk sequence:

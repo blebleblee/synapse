@@ -64,7 +64,7 @@ The key derivation schedule in TLS 1.3 uses HKDF (HMAC-based Key Derivation Func
 
 When the server sends its certificate during the handshake, the browser must answer two questions: "Is this certificate cryptographically valid?" and "Should I trust the entity who issued it?" The first question is answered by verifying the certificate's signature against the issuer's public key, checking that the certificate has not expired, and confirming that the domain in the TLS SNI extension matches a name in the certificate's Subject Alternative Names field. The second question requires walking the certificate chain.
 
-```
+```text
 Root CA Certificate (self-signed, in OS/browser trust store)
     |
     | signs
@@ -123,7 +123,7 @@ CSP (Content Security Policy, specified in the W3C CSP Level 3 specification) op
 
 The policy is delivered as an HTTP response header or a `<meta>` element (with significant limitations in the meta form). A realistic strict CSP for a modern single-page application looks like this:
 
-```
+```text
 Content-Security-Policy:
   default-src 'none';
   script-src 'self' https://cdn.example.com 'nonce-r4nd0mb4s364';
@@ -287,7 +287,7 @@ A subtler variant exploits origins with broken prefix or suffix matching. If a s
 
 CSP bypasses fall into several categories that follow directly from the design of the directive grammar. The most common production bypass involves `unsafe-inline` or overly broad source allowlists. If `script-src` includes a CDN origin that hosts a JSONP endpoint — a URL that wraps arbitrary attacker-controlled data in a JavaScript callback — that CDN origin becomes a scriptable bypass:
 
-```
+```bash
 # If script-src includes https://www.googleapis.com
 # and googleapis.com hosts this JSONP endpoint:
 <script src="https://www.googleapis.com/customsearch/v1?callback=alert(1)">

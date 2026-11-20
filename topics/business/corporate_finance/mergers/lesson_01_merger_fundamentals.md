@@ -88,7 +88,7 @@ Following the NDA, the target provides access to a virtual data room (VDR) conta
 
 The merger agreement itself is the governing legal document of the transaction and runs 80–150 pages for a typical public company deal. Its critical commercial provisions include the **material adverse change (MAC) clause**, which defines what conditions permit the acquirer to walk away from the signed deal before closing; the **representations and warranties** made by the target about the accuracy of disclosed information; the **termination fee** (also called a "break fee"), typically 2–4% of deal value, which the target must pay if its board withdraws its recommendation in favor of a superior proposal; and the **reverse termination fee**, which the acquirer pays if it fails to close due to its own breach or financing failure. The relative size of the reverse termination fee compared to the deal value is a precise signal of how much deal certainty the acquirer is offering: a reverse termination fee of 3% signals that the acquirer is essentially purchasing an option to walk away at a fixed cost, while a reverse termination fee of 7–9% signals genuine commitment to close.
 
-```
+```text
 Public M&A Transaction Timeline (Negotiated Deal)
 
 Week  0:   Board authorization; financial advisor engagement letter signed

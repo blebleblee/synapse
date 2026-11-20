@@ -49,7 +49,7 @@ int binary_search(const int *arr, int n, int target) {
 
 The control flow graph for this function contains nine basic blocks with the following edge structure:
 
-```
+```text
 BB1 → BB2
 BB2 → BB3 (loop entry)
 BB2 → BB9 (loop exit)

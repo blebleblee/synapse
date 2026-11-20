@@ -28,7 +28,7 @@ The sensor fusion pipeline for robotic AR follows a predict-update cycle synchro
 
 State representation encodes both geometric quantities and sensor error parameters in a 15-dimensional vector. Position occupies three dimensions as the IMU frame's origin expressed in world coordinates, typically initialized at the robot's starting location or a globally referenced coordinate system like a building's floor plan. Velocity spans another three dimensions, representing the time derivative of position in world coordinates—not the robot-centric body frame velocity that IMU accelerometers directly measure. Orientation requires four dimensions encoded as a unit quaternion, a hypercomplex number $q = q_w + q_x i + q_y j + q_z k$ satisfying the constraint $q_w^2 + q_x^2 + q_y^2 + q_z^2 = 1$. This quaternion representation avoids the gimbal lock singularities that plague Euler angles when pitch approaches ±90 degrees, and it enables singularity-free interpolation for smooth AR object rendering. The final six dimensions encode IMU sensor biases: three for accelerometer offsets and three for gyroscope offsets, modeled as slowly varying parameters that drift on timescales of minutes to hours.
 
-```
+```text
 State Vector (15D):
 x = [p_x, p_y, p_z,           # Position in world frame (meters)
      v_x, v_y, v_z,           # Velocity in world frame (m/s)
@@ -39,7 +39,7 @@ x = [p_x, p_y, p_z,           # Position in world frame (meters)
 
 The prediction step integrates IMU measurements through continuous-time differential equations discretized using numerical integration methods. Given accelerometer measurement $a_m$ and gyroscope measurement $\omega_m$ sampled at time $t_k$, the true acceleration and angular velocity are $a = a_m - b_a$ and $\omega = \omega_m - b_g$ after bias correction. Position updates through $p_{k+1} = p_k + v_k \Delta t + \frac{1}{2} a \Delta t^2$, velocity through $v_{k+1} = v_k + a \Delta t$, and quaternion through the differential equation $\dot{q} = \frac{1}{2} q \otimes [\omega]$ where $[\omega]$ denotes the quaternion with zero real part and imaginary components equal to the angular velocity vector. This quaternion kinematics equation encodes rotation through the quaternion product, which for small timesteps can be approximated using a first-order Taylor expansion or implemented exactly through exponential map methods that convert angular velocity to a rotation quaternion via Rodrigues' formula.
 
-```
+```text
 IMU Prediction (200-1000 Hz):
 
 For each IMU sample at t_k:
@@ -71,7 +71,7 @@ Covariance propagation accompanies state propagation, accounting for how uncerta
 
 Visual measurement updates occur at camera frame rate, typically 30-60 Hz for stereo rigs or RGB-D cameras. The measurement model relates the robot's pose to observed feature locations in image space through camera projection geometry. Given a three-dimensional landmark position $p_w$ in world coordinates, the predicted pixel location follows the chain: (1) transform landmark to IMU frame via the inverse of the state's position and orientation, (2) transform from IMU frame to camera frame via the calibrated extrinsic transformation $T_{cam}^{IMU}$, (3) project to normalized image coordinates through perspective division, (4) distort through radial and tangential distortion polynomials, (5) scale by focal length and shift by principal point to pixel coordinates.
 
-```
+```text
 Visual Measurement Model:
 
 Given landmark p_world in world coordinates:

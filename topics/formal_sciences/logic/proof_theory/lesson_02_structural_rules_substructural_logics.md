@@ -84,7 +84,7 @@ This rule requires that every hypothesis in context is itself an unlimited resou
 
 The following diagram illustrates how the structural rules and connectives of classical logic decompose into the linear logic architecture:
 
-```
+```text
 Classical Logic
       │
       ├── Structural Rules ──────────────────────────┐

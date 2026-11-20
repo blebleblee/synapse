@@ -28,7 +28,7 @@ The feudal contract's enforcement mechanism relied on a combination of force, ho
 
 The ceremony of homage itself deserves technical analysis as the primary interface protocol for establishing feudal relationships. The prospective vassal would kneel before the lord, place his hands between the lord's hands, and speak a formula acknowledging his status as "your man" for the specified fief. The lord would then raise the vassal and exchange a ritual kiss, symbolizing the personal bond. Following homage came the oath of fealty, sworn on holy relics, which added a religious sanction to the relationship and specified the duties owed. Finally, the investiture ceremony would grant symbolic possession through the transfer of an object—a clod of earth, a banner, a ring—representing the fief. These ritualized steps created legal facts recognized across the feudal network, analogous to cryptographic signatures establishing identity in modern distributed systems.
 
-```
+```text
 Feudal Hierarchy Recursive Delegation Chain
 
 ┌─────────────────────────────────────────┐

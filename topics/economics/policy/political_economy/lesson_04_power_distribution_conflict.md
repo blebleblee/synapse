@@ -70,7 +70,7 @@ The machinery through which organized interests translate economic resources int
 
 The following diagram traces the signal paths through which a concentrated interest group converts economic resources into distributional policy outcomes in a legislative-regulatory system:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                   DISTRIBUTIONAL CONFLICT ARCHITECTURE                  │
 └─────────────────────────────────────────────────────────────────────────┘

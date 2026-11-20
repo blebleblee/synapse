@@ -60,7 +60,7 @@ In this example, your A♠K♠ is currently behind QQ (a made pair). You win if 
 
 In practice, modern poker training tools and solvers compute equity by exact enumeration for any two-hand matchup and board state. These tools allow you to input your hand, an opponent's hand or range, and the board, and they instantly return exact equity percentages. By running thousands of these calculations, you internalize patterns: how much does flopping a pair improve your equity? How much does an overcard on the board help someone? How many outs does a flush draw actually provide? This pattern recognition, grounded in exact calculation, becomes intuition.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │  Equity Calculation Workflow (Conceptual)               │
 ├─────────────────────────────────────────────────────────┤

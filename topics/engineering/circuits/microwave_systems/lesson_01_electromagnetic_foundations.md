@@ -44,7 +44,7 @@ Waveguide structures confine electromagnetic energy through conducting boundarie
 
 The wave impedance Z_TE = η₀/√[1 - (f_c/f)²] for TE modes increases as frequency approaches cutoff, while Z_TM = η₀√[1 - (f_c/f)²] for TM modes decreases toward zero. At the center of the operating band where f ≈ 1.3f_c, typical wave impedances are Z_TE ≈ 500 Ω and Z_TM ≈ 300 Ω, considerably higher than the 50 Ω standard of coaxial and microstrip systems. This impedance mismatch necessitates careful transition design at waveguide-to-coaxial adapters and waveguide-to-microstrip probes, often employing quarter-wave transformers or tapered sections to achieve acceptable return loss across the operating bandwidth. Attenuation in rectangular waveguides arises primarily from conductor losses, with attenuation constant α_c ∝ R_s/a³ for the TE₁₀ mode, where R_s = √(πfμ/σ) is the surface resistance. Larger waveguides exhibit lower attenuation; WR-90 has α ≈ 0.04 dB/m at 10 GHz, while WR-430 (operating at 2 GHz) achieves α ≈ 0.005 dB/m—making waveguides attractive for long-distance, low-loss transmission despite their bulk and single-mode bandwidth limitations.
 
-```
+```text
 Rectangular Waveguide Field Structure (TE₁₀ mode):
                       
      _______________________________________________

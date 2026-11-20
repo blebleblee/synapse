@@ -136,7 +136,7 @@ In practice, this theoretical insight translates into the specific cost-sharing 
 
 A visual representation of the equilibrium under moral hazard and cost-sharing illustrates the trade-off:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                  Consumption and Health Trade-off                │
 ├─────────────────────────────────────────────────────────────────┤

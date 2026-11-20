@@ -48,7 +48,7 @@ For typical differential pairs targeting 100-ohm differential impedance (the USB
 
 Layer stackup architectures follow several canonical patterns optimized for different board complexities and performance requirements. The minimal four-layer stackup arranges:
 
-```
+```text
 Layer 1: Signal (top, component side)
 Layer 2: Ground plane
 Layer 3: Power plane
@@ -59,7 +59,7 @@ This configuration provides reference planes adjacent to both signal layers, ena
 
 The superior six-layer stackup staggers signal layers between ground planes:
 
-```
+```text
 Layer 1: Signal (high-speed, controlled impedance)
 Layer 2: Ground plane
 Layer 3: Signal (stripline routing, shielded)

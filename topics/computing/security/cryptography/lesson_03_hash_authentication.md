@@ -30,7 +30,7 @@ The theoretical foundations underlying secure PRFs and MACs trace to computation
 
 SHA-256's compression function operates as a 64-round Feistel-like network that updates an 8-word (256-bit) state through message schedule expansion and nonlinear mixing. The algorithm initializes state with fractional square roots of the first eight primes, producing the initial hash values `H₀ = 0x6a09e667, H₁ = 0xbb67ae85, ..., H₇ = 0x5be0cd19`. Each 512-bit input block undergoes message schedule expansion, transforming 16 initial message words `M₀...M₁₅` into 64 scheduled words `W₀...W₆₃` through recursive mixing:
 
-```
+```text
 W[t] = σ₁(W[t-2]) + W[t-7] + σ₀(W[t-15]) + W[t-16]  for t ∈ [16, 63]
 ```
 
@@ -38,14 +38,14 @@ The schedule functions `σ₀` and `σ₁` implement bitwise rotations and shift
 
 The compression round function updates eight working variables `{a, b, c, d, e, f, g, h}` initialized from prior state, applying two temporary variables per round:
 
-```
+```text
 T₁ = h + Σ₁(e) + Ch(e, f, g) + K[t] + W[t]
 T₂ = Σ₀(a) + Maj(a, b, c)
 ```
 
 Round constants `K[t]` derive from fractional cube roots of the first 64 primes, injecting number-theoretic structure that prevents related-key attacks and eliminates symmetric fixed points. The functions `Σ₀` and `Σ₁` provide additional diffusion through rotations: `Σ₀(x) = ROTR²(x) ⊕ ROTR¹³(x) ⊕ ROTR²²(x)` and `Σ₁(x) = ROTR⁶(x) ⊕ ROTR¹¹(x) ⊕ ROTR²⁵(x)`. After computing temporaries, the algorithm rotates working variables and updates with modular addition:
 
-```
+```text
 h = g
 g = f  
 f = e
@@ -468,7 +468,7 @@ Merkle-Damgård hash constructions suffer from a structural weakness: given `H(m
 
 Consider a naive API authentication scheme: `token = SHA256(secret || user_id || timestamp)`. An attacker observing a valid token for `user_id=1234` can append `&admin=true` to the signed data by computing:
 
-```
+```text
 forged_token = SHA256_resume(token, padding(secret || "1234" || timestamp) || "&admin=true")
 ```
 

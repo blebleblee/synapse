@@ -24,7 +24,7 @@ The financial dimension of spot instance optimization cannot be separated from a
 
 The architecture of an EKS node group is a composition of AWS primitives: an Auto Scaling Group defines instance lifecycle policy, a Launch Template encodes instance configuration, an IAM instance profile grants AWS API permissions, and security groups constrain network traffic. When an operator creates a managed node group via the EKS API, AWS constructs these resources automatically, injecting cluster-specific parameters and maintaining internal bookkeeping that links the node group to the parent cluster. The Launch Template specifies AMI identifier, instance type, key pair, block device mappings, and user data script, which executes during instance initialization to bootstrap the kubelet and join the cluster. The Auto Scaling Group monitors instance health, maintains the desired capacity, and integrates with EC2 Spot to request capacity across multiple instance types and Availability Zones.
 
-```
+```text
 EKS Cluster (API Server Endpoint, CA Certificate)
     │
     ├─── Managed Node Group

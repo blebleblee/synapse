@@ -57,7 +57,7 @@ The mempool's economic function resembles an order book in traditional financial
 
 Block relay implements a distinct propagation pathway optimized for the larger data volumes and critical timing requirements of newly-mined blocks. When a miner discovers a valid proof-of-work solution, they immediately broadcast the block header to connected peers using compact block relay protocols that minimize bandwidth consumption. Nodes receiving the compact block can reconstruct the full block from transactions already present in their mempool, requesting only the small fraction of transactions they have not yet seen. This optimization reduces block propagation latency from several seconds to under 500 milliseconds for well-connected nodes, critical for minimizing orphan risk and ensuring rapid consensus convergence across the global network.
 
-```
+```text
 Block Relay Protocol Sequence
 
 Mining Pool discovers valid nonce

@@ -18,7 +18,7 @@ The model rests on a single architectural bet: that the marginal cost of abstrac
 
 Serverless billing is typically expressed as `GB-seconds × invocation_count`. On AWS Lambda, as of 2024, this is $0.0000166667 per GB-second and $0.20 per 1 million requests. This pricing structure has a direct architectural consequence: memory is a performance dial. Lambda allocates CPU proportionally to memory — a 1,769 MB function receives exactly one full vCPU. Doubling memory from 512 MB to 1024 MB may more than halve execution time, resulting in *lower* cost despite higher per-second price. Profiling memory allocation is therefore a first-class optimization task.
 
-```
+```text
 Cost = (Memory_GB × Duration_s × $0.0000166667) + (Invocations × $0.0000002)
 ```
 

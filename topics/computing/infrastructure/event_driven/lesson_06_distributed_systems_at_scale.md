@@ -38,7 +38,7 @@ Leader election for partitions, distinct from consumer group leadership, determi
 
 The in-sync replica set (ISR), a critical concept in Kafka's replication model, identifies the set of replicas that are sufficiently caught up with the leader to be eligible for leadership in the event of leader failure. A follower is considered in-sync if it has fetched events from the leader within a configurable time window (replica.lag.time.max.ms) and if its log is not more than a configurable number of messages behind the leader's log. When the leader fails, the Kafka controller, a broker elected through ZooKeeper (or KRaft in newer versions), selects a new leader from the ISR. Choosing the new leader from the ISR ensures that no committed events are lost, as all ISR members have replicated all committed events by definition. If the ISR is empty—a scenario that occurs only if all replicas have fallen behind or failed—the controller can either wait for an ISR member to recover, preserving consistency at the cost of availability, or elect a non-ISR member, preserving availability at the cost of potential data loss.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                      Kafka Cluster Topology                      │
 ├─────────────────────────────────────────────────────────────────┤

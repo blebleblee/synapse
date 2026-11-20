@@ -36,7 +36,7 @@ The mechanical enforcement of Bitcoin's monetary properties begins with the bloc
 
 The subsidy calculation operates on satoshi-denominated integers to avoid floating-point arithmetic. The initial subsidy of 50 BTC equals 5,000,000,000 satoshis. After the first halving at block 210,000, the subsidy becomes 2,500,000,000 satoshis (25 BTC). The function determines the current halving epoch by integer-dividing the block height by 210,000, then right-shifts the initial subsidy by that epoch count. This yields the precise subsidy for any given block height:
 
-```
+```text
 nSubsidy = COIN * 50
 nSubsidy >>= (nHeight / 210000)
 ```
@@ -45,7 +45,7 @@ The right-shift operation guarantees that the subsidy eventually reaches zero wh
 
 The difficulty adjustment mechanism maintains the ten-minute average block time that underpins the supply issuance schedule. Every 2,016 blocks (approximately two weeks at ten-minute intervals), the network recalculates the difficulty target based on the actual time elapsed since the previous adjustment. If blocks arrived faster than ten minutes on average, difficulty increases; if slower, difficulty decreases. The adjustment formula implements a bounded feedback loop:
 
-```
+```text
 New Difficulty = Old Difficulty × (Actual Time / Target Time)
 ```
 

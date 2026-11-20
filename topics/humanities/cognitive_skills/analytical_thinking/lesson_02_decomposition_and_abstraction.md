@@ -56,7 +56,7 @@ In organizational contexts, interfaces might look like: "The Product Requirement
 
 A useful tool for visualizing decomposition and abstraction is the hierarchical decomposition diagram. Below is an example of decomposing a complex organizational problem—understanding causes of customer churn:
 
-```
+```text
                             CUSTOMER CHURN (System Level)
                                       |
                     __________________|__________________

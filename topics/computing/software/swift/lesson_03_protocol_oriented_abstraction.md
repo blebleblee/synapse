@@ -82,7 +82,7 @@ func render<T: Drawable>(drawable: T) {
 
 If the compiler cannot determine `T` at compile time, it lowers this to an SIL representation equivalent to:
 
-```
+```text
 sil @render : $@convention(thin) <T where T : Drawable> (@in T, @thick T.Type, @in T.Drawable) -> ()
 ```
 
@@ -95,7 +95,7 @@ render(drawable: circle)
 
 It specializes `render` for `Circle`, generating:
 
-```
+```text
 sil @render_specialized_Circle : $@convention(thin) (Circle) -> () {
 bb0(%0 : $Circle):
   %1 = function_ref @Circle.draw : $@convention(method) (Circle) -> ()

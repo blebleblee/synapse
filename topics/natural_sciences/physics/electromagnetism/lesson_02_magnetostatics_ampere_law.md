@@ -128,7 +128,7 @@ Transform measured Cartesian components to spherical coordinates and plot normal
 
 The energy stored in magnetic fields provides another experimental observable. For a solenoid with inductance $L = \mu_0 n^2 V$ (where $V$ is interior volume), the magnetic energy $U = (1/2)LI^2 = (B^2/2\mu_0)V$ equals the field energy density integrated over volume. Measure the solenoid inductance using an LCR meter at 1 kHz: for the 1000-turn, 20 cm long, 2.5 cm diameter solenoid, theory predicts $L = 31.4$ mH. At $I = 2$ A, the stored energy reaches $U = 62.8$ mJ. Experimental inductance measurements typically agree within 5% of theoretical predictions, with discrepancies arising from interwinding capacitance, imperfect winding density, and magnetic coupling to nearby conductors.
 
-```
+```text
 Magnetostatics Experimental Data Flow:
 
 Current Source (4-wire sensing)

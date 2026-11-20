@@ -82,7 +82,7 @@ A health factor below 1.0 means the borrower's collateral value (adjusted for co
 
 Flash loans are implemented as a specialized function that transfers tokens to a borrower contract, calls a user-defined callback function on that contract, and then verifies that the loan plus fee has been repaid within the same transaction. The Aave V2 implementation follows this pattern:
 
-```
+```text
 function flashLoan(
     address receiverAddress,
     address[] calldata assets,

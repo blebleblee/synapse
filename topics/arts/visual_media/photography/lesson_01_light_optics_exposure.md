@@ -40,7 +40,7 @@ This is the critical tradeoff: increasing ISO allows faster shutter speeds or sm
 
 The interplay of these three parameters can be visualized as a three-dimensional constraint space. Any given scene has a target exposure—a "correct" combination of aperture, shutter, and ISO that produces a well-exposed image with the desired depth of field and motion rendering.
 
-```
+```text
 ┌─────────────────────────────────────────────────┐
 │  EXPOSURE TRIANGLE: Reciprocity Space           │
 ├─────────────────────────────────────────────────┤

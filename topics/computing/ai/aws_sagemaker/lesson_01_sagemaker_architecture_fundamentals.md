@@ -30,7 +30,7 @@ Model artifact persistence follows a deterministic protocol upon training comple
 
 The CloudWatch integration streams execution metrics and logs throughout the job lifecycle. The SageMaker agent tails logs written to stdout and stderr by the training container, batching them into log events sent to CloudWatch Logs under the log group `/aws/sagemaker/TrainingJobs` with a log stream named after the training job and instance identifier. Custom metrics emitted by the training script through print statements matching regex patterns like `"[METRIC] train_loss=0.42"` are parsed by the agent and published as CloudWatch metrics in the `AWS/SageMaker` namespace with dimensions `TrainingJobName` and `Host`. SageMaker also publishes system-level metrics including `CPUUtilization`, `MemoryUtilization`, `GPUUtilization`, and `GPUMemoryUtilization` at one-minute intervals, enabling operational visibility into resource consumption patterns. The control plane monitors these metrics and log streams to detect job failures, and users can configure CloudWatch Alarms to trigger notifications when training losses fail to converge or GPU utilization drops below expected thresholds.
 
-```
+```text
 SageMaker Training Job Architecture:
 
 ┌─────────────────────────────────────────────────────────────────┐

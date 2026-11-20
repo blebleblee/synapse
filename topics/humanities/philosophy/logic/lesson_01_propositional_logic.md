@@ -30,7 +30,7 @@ Truth tables provide the canonical computational instrument for evaluating propo
 
 Consider the truth table for the formula (*p* → *q*) ↔ (¬*p* ∨ *q*), which asserts logical equivalence between the material conditional and a disjunction involving negation:
 
-```
+```text
 p  q  | ¬p | p→q | ¬p∨q | (p→q)↔(¬p∨q)
 ------|-------|-------|---------|------------------
 T  T  |  F  |  T  |  T   |       T

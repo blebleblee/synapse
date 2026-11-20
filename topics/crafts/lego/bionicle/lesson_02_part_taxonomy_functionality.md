@@ -103,7 +103,7 @@ The original 2001 Toa Mata introduced one of Bionicle's most distinctive mechani
 
 The transmission itself uses a **1:1 bevel gear pair** (two matching 12-tooth bevel gears from the standard Technic catalog, part 6589), which changes the axis of rotation by 90 degrees without altering the angular velocity. The practical result is that one full rotation of the thumb-driven back gear produces one full rotation of the arm drive axle, which through the arm's geometry produces approximately 60–70 degrees of arm sweep depending on the specific Toa figure. The key practitioner constraint here is that the driving gear must not be loaded with excessive friction from the torso housing, because the thumb-force available to rotate it is small. If you are rebuilding or modifying a Toa Mata torso and the gear binds, check first for misaligned axle holes (straighten any bent axles before assembly), then check that the bevel gears are meshed at the correct tooth-depth: too deep and they bind, too shallow and they skip under load.
 
-```
+```text
 TOA MATA GEAR ACTIVATION — TRANSMISSION DIAGRAM
 
 [Thumb Drive Gear]        [Bevel Input]       [Bevel Output]       [Arm Drive Axle]

@@ -120,7 +120,7 @@ Each shape carries an embedded triad, a pentatonic box, and the full diatonic sc
 
 **Position 1: E shape (frets 2-5, root on low E string fret 3)**
 
-```
+```text
          Fret:  2    3    4    5
 e  |-----|-----|--1--|-----|--3--|
 B  |-----|-----|--1--|-----|--3--|
@@ -133,7 +133,7 @@ Fingering: index covers fret 2, ring covers fret 4-5 depending on string (3NPS v
 
 **Position 2: D shape (frets 4-8, root on D string fret 5)**
 
-```
+```text
          Fret:  4    5    6    7    8
 e  |-----|--1--|-----|--3--|-----|--4--|
 B  |-----|--1--|-----|--3--|-----|--4--|
@@ -146,7 +146,7 @@ Root on D string fret 5; octave root on B string fret 8.
 
 **Position 3: C shape (frets 7-10, root on A string fret 10)**
 
-```
+```text
          Fret:  7    8    9    10
 e  |-----|--1--|-----|-----|--4--|
 B  |-----|--1--|-----|-----|--4--|
@@ -158,7 +158,7 @@ E  |-----|--1--|-----|-----|--4--|
 
 **Position 4: A shape (frets 9-12, root on A string fret 10)**
 
-```
+```text
          Fret:  9    10   11   12
 e  |-----|--1--|-----|-----|--4--|
 B  |-----|-----|--2--|-----|--4--|
@@ -170,7 +170,7 @@ E  |-----|--1--|-----|-----|--4--|
 
 **Position 5: G shape (frets 12-15, root on low E string fret 15)**
 
-```
+```text
          Fret:  12   13   14   15
 e  |-----|-----|-----|--2--|--4--|
 B  |-----|--1--|-----|--2--|-----|
@@ -186,7 +186,7 @@ E  |-----|-----|-----|--2--|--R--|
 
 **Box 1, root position (5th fret, A string)**
 
-```
+```text
          Fret:  5    6    7    8
 e  |-----|--1--|-----|--3--|--4--|
 B  |-----|--1--|-----|--3--|--4--|
@@ -199,7 +199,7 @@ Roots: A string fret 5, G string fret 2, E string fret 5 and fret 17 (octave).
 
 **Box 2, second position (7th fret)**
 
-```
+```text
          Fret:  7    8    9    10
 e  |-----|--1--|--2--|-----|--4--|
 B  |-----|--1--|--2--|-----|--4--|
@@ -214,7 +214,7 @@ E  |-----|--1--|--2--|-----|--4--|
 The core vocabulary of blues, rock, and most lead playing. Learn all five boxes and, more importantly, how they connect into one continuous fretboard map.
 
 **Box 1, root at 5th fret**
-```
+```text
          Fret:  5    8
 e  |-----|--1--|-----|--4--|
 B  |-----|--1--|-----|--4--|
@@ -226,7 +226,7 @@ E  |-----|--1--|-----|--4--|
 Notes: A C D E G.
 
 **Box 2, root at 7th fret**
-```
+```text
          Fret:  7    8    10
 e  |-----|--1--|--2--|-----|
 B  |-----|--1--|--2--|-----|
@@ -237,7 +237,7 @@ E  |-----|--1--|--2--|-----|
 ```
 
 **Box 3, root at 10th fret**
-```
+```text
          Fret:  10   12
 e  |-----|--1--|-----|--3--|
 B  |-----|--1--|-----|--3--|
@@ -248,7 +248,7 @@ E  |-----|--1--|-----|--3--|
 ```
 
 **Box 4, root at 12th fret**
-```
+```text
          Fret:  12   15
 e  |-----|--1--|-----|--4--|
 B  |-----|--1--|-----|--4--|
@@ -259,7 +259,7 @@ E  |-----|--1--|-----|--4--|
 ```
 
 **Box 5, 3rd position (wraps back to Box 1 an octave up)**
-```
+```text
          Fret:  3    5
 e  |-----|--1--|-----|--4--|
 B  |-----|--1--|-----|--4--|
@@ -270,7 +270,7 @@ E  |-----|--1--|-----|--4--|
 ```
 
 **The full connected neck map** (fret numbers per string, boxes labeled):
-```
+```text
 e  |--5--|--8--|--10--|--12--|--15--|--17--|
 B  |--5--|--8--|--10--|--12--|--15--|--17--|
 G  |--5--|--7--|--9---|--12--|--14--|--17--|
@@ -286,7 +286,7 @@ Run this as a single ascending line, low E string to high e string and back, acr
 3NPS patterns assign exactly three notes to every string. Because the rhythmic grouping never changes string to string, alternate picking and legato runs stay mechanically even at speed — your picking hand does the same down-up-down motion on every string, with no awkward 2-then-3 switch mid-pattern.
 
 **G major 3NPS, starting low E string fret 3**
-```
+```text
          Fret:  2    3    4    5
 E  |-----|--1--|-----|--3--|--4--|
 A  |-----|--1--|-----|--3--|--4--|
@@ -320,7 +320,7 @@ graph TD
 
 D Dorian shares every note with C major, rooted on D instead. The major 6th (B natural) is what separates it from D Aeolian, which has Bb. Make that B land on strong beats.
 
-```
+```text
 D Dorian, 5th-10th position (root on A string fret 5, octave at low E string fret 10)
 
          Fret:  5    7    8    10
@@ -338,7 +338,7 @@ E  |-----|--1--|-----|--3--|--4--|
 
 G Mixolydian is G major with a flatted 7th: F natural instead of F#. This is the sound of classic rock rhythm parts, country leads, and funk. Target F natural on strong beats over a G7 chord.
 
-```
+```text
 G Mixolydian, 2nd-5th position (root on low E string fret 3)
 
          Fret:  2    3    5
@@ -356,7 +356,7 @@ E  |-----|--1--|--2--|-----|--4--|
 
 The b2 (F natural against an E root, a minor second above) is the flamenco and metal signature. It sits literally one fret above the open string.
 
-```
+```text
 E Phrygian, open position (same shape movable from fret 12)
 
          Fret:  0    1    2    3
@@ -404,7 +404,7 @@ The goal: zero hesitation and zero dead notes crossing from one CAGED box into t
 3. Continue ascending into Box 2 without pausing or re-picking the pivot note twice.
 4. Descend back through Box 2, pivot again at the bottom, and return through Box 1.
 
-```
+```text
 Box 1 (frets 2-5) -> pivot at high e string fret 5 -> Box 2 (frets 4-8)
 
 Box 1 exit:   high e string, frets 3-5, ascending
@@ -421,7 +421,7 @@ Box 2 entry:  high e string, frets 5-7, continuing ascent
 Playing a scale in diatonic intervals (thirds, sixths) instead of straight runs trains your ear to hear harmony living inside a single melodic line, and builds the vocabulary that separates "running scales" from phrasing like a soloist.
 
 **Thirds (skip one scale degree):**
-```
+```text
 G major in ascending thirds: G-B, A-C, B-D, C-E, D-F#, E-G, F#-A
 
 Tab (starting low E string fret 3):
@@ -435,7 +435,7 @@ E  |--3--|--5--|-----|-----|
 ```
 
 **Sixths (skip four scale degrees):**
-```
+```text
 e  |--2--|--4--|--5--|--7--|
 A  |--2--|--3--|--5--|--7--|
      G-E   A-F#  B-G   C-A
@@ -448,7 +448,7 @@ A  |--2--|--3--|--5--|--7--|
 Sequences impose a repeating melodic shape on the scale, which trains your fingers to execute actual musical phrases rather than undifferentiated up-down motion.
 
 **Sequence 1, ascending groups of 3 (step up one scale degree each group):**
-```
+```text
 G major: G-A-B, A-B-C, B-C-D, C-D-E, D-E-F#, E-F#-G...
 
 Tab (Box 1, low E string):
@@ -458,13 +458,13 @@ E  |--3--5--7--|--5--7--8--|--7--8--10-|
 Play as triplets at 60 BPM, each group of three starting on a fresh downbeat.
 
 **Sequence 2, four-note enclosure (pattern: 1-2-3-1, 2-3-4-2, 3-4-5-3...):**
-```
+```text
 G-A-B-G, A-B-C-A, B-C-D-B, C-D-E-C...
 ```
 Sits naturally as 16th notes at 70-90 BPM. This pattern is the backbone of a huge amount of neoclassical and fusion lead vocabulary.
 
 **Sequence 3, descending groups of 4:**
-```
+```text
 ...E-D-C-B, D-C-B-A, C-B-A-G
 ```
 Every group resolves downward, which is why this reads as "classic rock shredding" — the ear hears continuous resolution rather than a flat run.
@@ -481,7 +481,7 @@ This drill trains you to hear modal color, not just execute a fingering pattern.
 3. Build a 4-bar phrase that begins and ends on D, landing the B natural on beat 1 or beat 3 of at least one bar.
 4. Add the minor 3rd (F) as a passing tone on a weak beat — it adds color without destabilizing the Dorian sound.
 
-```
+```text
 Example D Dorian phrase over a D drone, 4/4:
 
 Beat:   1    +    2    +    3    +    4    +
@@ -508,7 +508,7 @@ This bridges the comfort of pentatonic playing into full modal fluency by adding
 
 **Step 4.** Swap F# for F natural at A string fret 8. You now have A Aeolian. Alternate between F and F# against the drone and listen to how the 6th alone flips the emotional color of the whole scale.
 
-```
+```text
 Pentatonic -> Dorian/Aeolian expansion (A, 5th-position area):
 
 Pentatonic:    A  C  D  E  G
@@ -557,7 +557,7 @@ flowchart TD
 
 A sustainable routine beats an occasional marathon session. This covers technique, ear training, and fretboard knowledge every day in five minutes.
 
-```
+```text
 Minute 1 — Single-position scale, slow and clean (60 BPM, full box ascend/descend)
 Minute 2 — Intervallic drill: same box in diatonic thirds (70 BPM)
 Minute 3 — Sequence pattern: ascending triads or reverse 4s (60 BPM)

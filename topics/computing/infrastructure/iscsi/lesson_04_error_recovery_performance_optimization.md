@@ -216,7 +216,7 @@ The two approaches are not equivalent. Multiple connections within a single iSCS
 
 A correct `multipath.conf` for iSCSI storage requires careful attention to the hardware handler and the path checker:
 
-```
+```text
 defaults {
     polling_interval      5
     path_selector         "round-robin 0"

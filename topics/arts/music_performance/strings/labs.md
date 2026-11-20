@@ -78,14 +78,14 @@ If parasitic motion (coin sliding) reappears at a given tempo, drop back 20 BPM 
 For a ii-V-I in C major (Dm7 – G7 – Cmaj7), here are both forms with real voice leading:
 
 **A-form voicings (3rd in bass):**
-```
+```text
 Dm7:   F-A-C-E   (fingers 1-2-3-5)
 G7:    B-D-F-A   (fingers 1-2-3-5)
 Cmaj7: E-G-B-D   (fingers 1-2-3-5)
 ```
 
 **B-form voicings (7th in bass):**
-```
+```text
 Dm7:   C-E-F-A   (fingers 1-2-3-5)
 G7:    F-A-B-D   (fingers 1-2-3-5)
 Cmaj7: B-D-E-G   (fingers 1-2-3-5)
@@ -97,7 +97,7 @@ Play through the A-form progression as whole notes and *watch your hand shape st
 
 A pianist who plays a chord on every beat 1 sounds stiff and gets in the drummer's way. Real comping anticipates or delays the attack:
 
-```
+```text
 Beat:     1    2    3    4
 Comp:     .    C    .    .     ← chord lands on beat 2
 Beat:     1    2    3    4
@@ -132,7 +132,7 @@ Comp:     .    .    .    D+    ← chord lands on the "and" of 4 (anticipating n
 
 Metronome at 80 BPM, eighth notes. One finger per fret, frets 5-6-7-8 on the low E string:
 
-```
+```text
 e|------------------------------
 B|------------------------------
 G|------------------------------
@@ -166,7 +166,7 @@ CAGED maps the five open-position chord shapes (C, A, G, E, D) as movable templa
 **G major pentatonic (G-A-B-D-E) across the five CAGED positions:**
 
 **Position 1 — E-shape (root on 6th string, fret 3):**
-```
+```text
 e|--------------------3--5--
 B|------------------3--5----
 G|------------2--5----------
@@ -176,7 +176,7 @@ E|---3------------------------
 ```
 
 **Position 2 — D-shape (root on 4th string, fret 5):**
-```
+```text
 e|-----------------------5--8--
 B|-------------------5--8------
 G|-----------5--7---------------
@@ -186,7 +186,7 @@ E|---------------------------------
 ```
 
 **Position 3 — C-shape (root on 5th string, fret 10):**
-```
+```text
 e|------------------8--10--
 B|----------------8--10----
 G|-----------7--10----------
@@ -196,7 +196,7 @@ E|----------------------------
 ```
 
 **Position 4 — A-shape (root on 5th string, fret 12):**
-```
+```text
 e|-------------------10--12--
 B|-------------10--13--------
 G|--------10--12--------------
@@ -206,7 +206,7 @@ E|----------------------------
 ```
 
 **Position 5 — G-shape (root on 6th string, fret 15):**
-```
+```text
 e|--12--15--
 B|--13--15--
 G|--12--14--
@@ -288,7 +288,7 @@ Modes are the same seven notes as a major scale, starting from a different degre
 | Mixolydian | major but bluesy/rock | lowered 7th |
 
 **D Dorian (D-E-F-G-A-B-C), mapped in CAGED position 2 (D-shape, root fret 5):**
-```
+```text
 e|----------------------------5--7--8--10--12--
 B|----------------------6--8--10---------------
 G|----------------7--9--------------------------
@@ -314,7 +314,7 @@ E|------------------------------------------------
 **Where and how to strike:** tap roughly 5 cm above the sound hole, using a quick wrist-rotation strike (think bouncing a basketball — rebound off the wood immediately, don't press in). Striking closer to the bridge gives a higher-pitched knock; closer to the edge of the lower bout gives a deeper thump. Experiment and pick the spot that gives you the clearest "thwack" without buzzing against nearby strings.
 
 **Basic bass-tap pattern (right-hand thumb):**
-```
+```text
 Beat:     1       2       3       4
 Action:   Bass    Tap     Bass    Tap
 ```
@@ -374,7 +374,7 @@ graph TD
 - **Pinky (4):** covers one fret further, doing the reaching work instead of the weaker ring finger
 
 **Example on the low E string, frets 1–5:**
-```
+```text
 Note:    F    F#   G    G#   A
 Fret:    1    2    3    4    5
 Finger:  1    2    1    2    4
@@ -387,7 +387,7 @@ Notice index (1) covers both fret 1 and fret 2 by *shifting*, not stretching —
 **Wrist:** keep it straight. A bent wrist under load is the single biggest contributor to tendon irritation in bass players. If your wrist is bending noticeably to reach a fret, your elbow/shoulder should be adjusting position instead.
 
 **Switch to one-finger-per-fret (OFPF) at fret 7 and above** — the frets are close enough that each finger comfortably covers one fret without shifting:
-```
+```text
 Fret:    7    8    9    10
 Finger:  1    2    3    4
 ```
@@ -408,7 +408,7 @@ Finger:  1    2    3    4
 
 **Worked example over Cmaj7 | Dm7 | G7 | Cmaj7:**
 
-```
+```text
 Bar 1 (Cmaj7, C-E-G-B):
 Beat:    1       2       3       4
 Note:    C       E       G       A
@@ -490,7 +490,7 @@ A tight funk groove is built from **negative space** — bass and guitar deliber
 
 ### 5.2 Bass Pattern with Ghost Notes (Em7, 90 BPM, 16th-note feel)
 
-```
+```text
 Count:   1   e   &   a   2   e   &   a   3   e   &   a   4   e   &   a
 Note:    E   .   g   .   .   .   g   .   E   .   .   .   .   .   g   B
 Fret:    0   .   0   .   .   .   0   .   0   .   .   .   .   .   0   2
@@ -504,7 +504,7 @@ Attack:  ^   .   (   .   .   .   (   .   ^   .   .   .   .   .   (   ^
 
 ### 5.3 Guitar Chord Stabs (Em9, voiced at fret 7)
 
-```
+```text
 e|---7---  (B)
 B|---8---  (F#, the 9th)
 G|---7---  (D)
@@ -513,7 +513,7 @@ A|---7---  (E, root)
 E|---X---  (muted)
 ```
 
-```
+```text
 Count:   1   e   &   a   2   e   &   a   3   e   &   a   4   e   &   a
 Hit:     .   .   X   .   X   .   .   .   .   .   X   .   .   .   .   X
 ```
@@ -522,7 +522,7 @@ Hit:     .   .   X   .   X   .   .   .   .   .   X   .   .   .   .   X
 
 ### 5.4 Locking Them Together
 
-```
+```text
 Bass:    E   .   g   .   .   .   g   .   E   .   .   .   .   .   g   B
 Guitar:  .   .   X   .   X   .   .   .   .   .   X   .   .   .   .   X
 ```
@@ -614,7 +614,7 @@ Natural harmonics only give you the pitches that live at the string's fixed noda
 **Coordination tip:** the touching finger and the pick attack need to happen almost simultaneously — pluck right as the touching finger lands, don't wait. This is awkward the first several tries; that's normal, it's a three-way coordination task (fret, touch, pluck) your hand hasn't done before.
 
 **Drill:** play a one-octave major scale entirely in artificial harmonics on the low E string:
-```
+```text
 Fretted note:   E   F#   G#   A   B   C#   D#   E
 Fret:           0   2    4    5   7   9    11   12
 Touch point:    12  14   16   17  19  21   23   24
@@ -626,7 +626,7 @@ Start at 40 BPM, one note every two beats to give yourself time to coordinate al
 Once natural harmonics at frets 12, 7, and 5 feel reliable, you can write entire melodic lines using only harmonics — a distinctly glassy, bell-choir texture used in pieces like Mason Williams' "Classical Gas" intro.
 
 **Available pitches (standard tuning, natural harmonics):**
-```
+```text
 String:   E    A    D    G    B    E
 Fret 12:  E    A    D    G    B    E   (octave above open string)
 Fret 7:   B    E    A    D    F#   B   (octave + fifth above open string)
@@ -685,7 +685,7 @@ graph TD
 
 ### 7.3 Combined Pattern (Em, Funk Feel)
 
-```
+```text
 Count:    1      &      2      &      3      &      4      &
 Action:   Slap   .      Pop    .      Slap   .      Pop    Pop
 String:   E      .      G      .      E      .      D      G

@@ -143,7 +143,7 @@ Span **events** are the correct mechanism for recording discrete points of inter
 Propagation is the mechanism by which the trace's causal identifier travels across process boundaries. The **W3C Trace Context** specification (W3C Recommendation, 2021) defines two HTTP headers:
 
 **`traceparent`**: A single header encoding four fields in a fixed format:
-```
+```text
 traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
               ^^ version (always 00)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ trace-id (128-bit hex, 32 chars)
@@ -679,7 +679,7 @@ Neither pure head-based nor pure tail-based sampling handles **traffic spikes** 
 
 Adaptive sampling dynamically adjusts the sampling rate to maintain a target spans-per-second output, independent of input throughput. The OpenTelemetry Collector's `probabilistic_sampler` processor with the `hash_seed` configuration provides a rudimentary version of this. More sophisticated implementations use a **token bucket** or **leaky bucket** algorithm: each service instance replenishes sampling tokens at a fixed rate (e.g., 100 tokens/second) and consumes one token per sampled trace. When the bucket is empty, new root spans are unsampled until tokens are replenished.
 
-```
+```text
 Adaptive sampling target rate: T samples/second
 Observed request rate: R requests/second
 Sampling fraction: f = min(1.0, T / R)

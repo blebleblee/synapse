@@ -176,7 +176,7 @@ Deduplication identifies and eliminates redundant data blocks, storing a single 
 
 Inline deduplication processes writes synchronously, computing block hashes and consulting the deduplication table before acknowledging client writes. This approach maximizes space savings but introduces write latency proportional to hash computation and table lookup costs—typically 20-50% additional latency for 4 KB block granularity. Post-process deduplication writes data initially in non-deduplicated form, then asynchronously scans for duplicates during idle periods. Write latency remains unaffected, but space savings lag behind data ingestion, requiring 10-20% additional capacity headroom to accommodate temporarily duplicated data awaiting post-process analysis.
 
-```
+```text
 Sample Capacity Planning Calculation:
 
 Given:

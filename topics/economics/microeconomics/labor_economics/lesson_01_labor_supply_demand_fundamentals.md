@@ -62,7 +62,7 @@ Market equilibrium equates aggregate labor supply $L^s(w)$ with aggregate labor 
 
 Comparative statics characterize how equilibrium responds to exogenous shocks. A rightward shift in labor demand, perhaps from technological progress that increases labor productivity, raises both equilibrium employment and wages. The magnitude of wage and employment changes depends on labor supply elasticity: with inelastic supply, wage increases absorb most of the adjustment, while with elastic supply, employment increases dominate. Conversely, a rightward shift in labor supply, such as from immigration or rising female labor force participation, reduces equilibrium wages and raises employment, with the wage reduction larger when labor demand is inelastic.
 
-```
+```text
 Labor Market Equilibrium Diagram:
 
 Wage

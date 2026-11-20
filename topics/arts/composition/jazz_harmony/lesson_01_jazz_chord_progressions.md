@@ -46,7 +46,7 @@ Notice G7's shell contains the tritone B–F directly — play it and you'll hea
 ### Drill 1: Shells in Both Hands, Root Motion by 4ths
 Metronome 60 BPM, quarter notes, one chord per 2 beats.
 
-```
+```text
 Left hand (root only):   D  -  G  -  C  -
 Right hand (3rd+7th):    F C - B F - E B -
 ```
@@ -64,21 +64,21 @@ Once shells are automatic, split the labor: **left hand carries root + one guide
 ### ii–V–I in C, full comping pattern
 
 **Bar 1 — Dm7**
-```
+```text
 Left hand:   D (beat 1)         F (beat 3)
 Right hand:  A-C-E (beat 1, held)
 ```
 Fingering, right hand: 2 (A) – 3 (C) – 5 (E), thumb free for later extensions.
 
 **Bar 2 — G7**
-```
+```text
 Left hand:   G (beat 1)         F (beat 3 — tritone anchor)
 Right hand:  B (beat 1, let it ring)   rest   add D (beat 3, the 9th for color)
 ```
 Right-hand fingering: 2 (B), then 2-4 (B-D) on beat 3.
 
 **Bar 3 — Cmaj7**
-```
+```text
 Left hand:   C (beat 1)         E (beat 3)
 Right hand:  G-B (beat 1)       D (beat 3, 9th added for lift)
 ```
@@ -102,7 +102,7 @@ A guide-tone line strips the progression down to one note per chord — just the
 - Am7: C (3rd) or G (7th)
 
 **Choosing for minimum motion:**
-```
+```text
 Dm7 → G7 → Cmaj7 → Am7 → Dm7 → G7 → Cmaj7
  C  →  B →  E    →  C  →  F  →  F →  E
      (½ up)  (whole up) (6th down) (4th up) (same)  (½ down)
@@ -123,18 +123,18 @@ Guitarists learn five movable shapes across the neck (CAGED). Pianists benefit f
 Used constantly in combo playing where the bassist states the root.
 
 **For Cmaj7 (voiced E-G-B-D, built from the 3rd up):**
-```
+```text
 Right hand:  E (thumb, 1) – G (2) – B (4) – D (5)
 ```
 No root at all — the 3rd is now your lowest note. This is THE standard jazz-combo right-hand voicing because it leaves maximum space in the low register for the bass and avoids muddying the bottom.
 
 **For Dm7 (voiced F-A-C-E, 3-5-7-9):**
-```
+```text
 Right hand:  F (1) – A (2) – C (4) – E (5)
 ```
 
 **For G7 (voiced F-A-B-D... more commonly F-B-D-A as 7-3-5-9):**
-```
+```text
 Right hand:  F (1) – B (2) – D (4) – A (5)
 ```
 
@@ -142,17 +142,17 @@ Right hand:  F (1) – B (2) – D (4) – A (5)
 A second inversion-feeling shape, used to alternate with Shape A so your voicings don't jump register awkwardly.
 
 **For Cmaj7:**
-```
+```text
 Right hand:  B (1) – D (2) – E (3) – G (5)
 ```
 
 **For Dm7:**
-```
+```text
 Right hand:  C (1) – E (2) – F (3) – A (5)
 ```
 
 **For G7:**
-```
+```text
 Right hand:  F (1) – A (2) – B (3) – D (5)
 ```
 
@@ -167,7 +167,7 @@ This A/B shape alternation is the real pianistic analog to CAGED — not fixed f
 
 Every diatonic chord can get its own personal V7 — a **secondary dominant** that temporarily tonicizes it. In C major, to strongly approach Dm7 (the ii chord), borrow its dominant: A7.
 
-```
+```text
 A7 → Dm7 → G7 → Cmaj7
 ```
 
@@ -176,7 +176,7 @@ A7 is "V of ii," written V/ii. It contains C# (not in C major) — the raised no
 ### Drill 4: Secondary Dominant Chain (bebop vocabulary)
 Expand to full ii–V pairs for a Charlie Parker-style cascading progression:
 
-```
+```text
 Em7♭5 – A7  →  Dm7 – G7  →  Cmaj7
 (ii-V of ii)    (ii-V of I)   (arrival)
 ```
@@ -193,7 +193,7 @@ Left hand: roots only, quarter notes — E, A, D, G, C. Right hand: Shape A or B
 
 **Hands-on application — turn any ii–V–I into its tritone-sub twin:**
 
-```
+```text
 Standard:    Dm7  →  G7   →  Cmaj7
 Substituted: Dm7  →  D♭7  →  Cmaj7   (keep the ii chord, sub only the V)
 ```
@@ -216,14 +216,14 @@ An altered dominant (G7alt) piles every available dissonant tension — ♭9, �
 Rather than calculating ♭9/♯11/♭13 individually, play a *simple major triad* in your right hand positioned to automatically contain those tensions, with guide tones in the left hand underneath.
 
 **G7alt, built as A♭ major triad over the 3rd+7th of G7:**
-```
+```text
 Left hand:   B (3rd) – F (7th)
 Right hand:  A♭ – C – E♭   (A♭ major triad, fingers 1-2-3 or 1-3-5)
 ```
 Check the math by ear, not formula: A♭ = ♭9 of G, C is already a guide tone (reinforced), E♭ = ♭13 of G. You're playing one easy triad shape, and the "altered dominant" sound happens automatically because of where that triad sits relative to the bass.
 
 ### Drill 6: Upper-Structure Triad Resolution
-```
+```text
 Step 1:  Left hand holds B-F (guide tones of G7).
 Step 2:  Right hand plays A♭ major triad (upper structure) — hold 2 beats.
 Step 3:  Resolve: left hand moves B→C, F→E (into Cmaj7).
@@ -233,7 +233,7 @@ Step 3:  Resolve: left hand moves B→C, F→E (into Cmaj7).
 Metronome 60 BPM, 8 repetitions. The point of this drill is feeling how little your hand actually has to move to go from maximum tension to full resolution — that economy of motion is why professional players can play altered dominants at high tempo without scrambling.
 
 **Second upper structure to learn immediately — D♭maj7 over Cmaj7's guide tones**, for a bright Lydian-colored tonic sound:
-```
+```text
 Left hand:   B (7th) – E (3rd) of Cmaj7
 Right hand:  D♭ – F – A♭ – C  (D♭maj7 shape)
 Result:      Cmaj7#11#5 — exotic but stable-sounding tonic color
@@ -257,13 +257,13 @@ Result:      Cmaj7#11#5 — exotic but stable-sounding tonic color
 ### Two borrowed chords to put in your hands today
 
 **♭VII (B♭maj7 in C)** — borrowed from Mixolydian/Aeolian. No leading tone, so it doesn't pull hard toward resolution — it floats. Use it as a color substitute right before returning to I.
-```
+```text
 Left hand:  B♭ (root)
 Right hand: D-F-A  (upper triad, giving B♭maj7's 3-5-7)
 ```
 
 **iv (Fm7 in C)** — borrowed from Aeolian/Dorian. The ♭6 (A♭) wants to sink down to G, producing the "sighing" quality under ballad bridges.
-```
+```text
 Left hand:  F (root)
 Right hand: A♭-C-E♭  (Fm triad)
 Resolve to: Cmaj7, feeling A♭ settle down to G
@@ -278,7 +278,7 @@ Half notes, metronome 60 BPM. Play the resolution four times, paying attention t
 
 This progression stacks every technique above into one playable form. Work through it section by section before attempting it at tempo.
 
-```
+```text
 Bar 1-2:   | Cmaj7         | Am7           |   I → vi (tonic prolongation)
 Bar 3-4:   | Dm7           | G7            |   ii → V (half cadence)
 Bar 5-6:   | Cmaj7         | E♭maj7        |   I → ♭III (modal interchange, Phrygian borrow)

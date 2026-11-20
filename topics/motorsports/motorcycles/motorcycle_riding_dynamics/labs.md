@@ -18,7 +18,7 @@ The laboratory computer must also host MATLAB R2023b or later with the Curve Fit
 
 Before commencing the exercises, ensure the following directory structure exists on the analysis workstation to maintain organized separation of raw telemetry logs, processed channel exports, suspension setup sheets, and tire temperature field data:
 
-```
+```text
 C:\RaceData\
 ├── RawLogs\
 │   ├── Session_2025-05-15_Qualifying\
@@ -59,7 +59,7 @@ Throttle application timing analysis reveals another critical lap time different
 
 To automate this qualitative trace comparison into quantitative metrics, construct a custom math channel in i2 Pro that calculates the time integral of throttle position percentage from apex to corner exit. Navigate to Analysis → Math Channels → New Math Channel and define the channel using the following expression syntax:
 
-```
+```text
 ThrottleIntegralApexToExit = Integrate(ThrottlePos, ApexMarkerTime, ExitMarkerTime)
 ```
 

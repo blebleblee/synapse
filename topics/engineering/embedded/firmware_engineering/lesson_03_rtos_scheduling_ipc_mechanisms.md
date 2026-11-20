@@ -40,7 +40,7 @@ Task stack sizing represents a pragmatic engineering challenge with no general a
 
 The scheduler constitutes the RTOS kernel's beating heart, orchestrating task execution through data structures and algorithms that must operate in microseconds while maintaining mathematical correctness. At its core sits the ready queue, a data structure answering the question: which task should run next? The naive implementation—a single linked list sorted by priority—immediately fails the determinism requirement because inserting a task requires O(n) traversal time proportional to the number of tasks. Instead, production RTOS kernels employ a two-level structure: a priority bitmap and an array of per-priority FIFO queues.
 
-```
+```text
 Priority Bitmap (32-bit, one bit per priority level):
 Bit 31: Priority 31 (highest)
 Bit 30: Priority 30
@@ -60,7 +60,7 @@ The bitmap provides O(1) identification of the highest-priority non-empty queue 
 
 Context switching—the mechanical act of saving one task's execution state and restoring another's—exposes the intimate coupling between RTOS kernel and processor architecture. On ARM Cortex-M processors, the hardware itself performs partial context switching through automatic stacking. When an interrupt fires, the processor automatically pushes eight registers (R0-R3, R12, LR, PC, xPSR) to the current task's stack, then loads the vector table entry into PC to begin executing the ISR. The RTOS PendSV (Pendable Service) interrupt handler completes the context switch by manually saving the remaining registers (R4-R11) and switching the stack pointer.
 
-```
+```text
 PendSV_Handler (ARM Cortex-M4 assembly):
 
     ; Disable interrupts

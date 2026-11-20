@@ -118,7 +118,7 @@ submit_button = driver.find_element(
 
 The WebDriver protocol encodes these locator strategies as JSON objects transmitted over HTTP or WebSocket connections to the browser driver. A typical element location request looks like:
 
-```
+```text
 POST /session/{session-id}/element
 {
   "using": "css selector",
@@ -128,7 +128,7 @@ POST /session/{session-id}/element
 
 The browser driver parses this request, executes the corresponding DOM API call, and if successful, generates an opaque element identifier stored in its internal element reference map. The response returns this identifier serialized as a JSON object:
 
-```
+```json
 {
   "value": {
     "element-6066-11e4-a52e-4f735466cecf": "node-uuid-12345"
@@ -140,7 +140,7 @@ Your host-side Selenium library deserializes this response into a `WebElement` p
 
 The architecture of this reference system creates the conditions for stale element exceptions. Consider the following sequence:
 
-```
+```text
 Timeline: DOM Mutations and Element Reference Lifecycle
 
 T0: driver.find_element(By.ID, "button-1") 
@@ -289,7 +289,7 @@ The second principle is **selector performance hierarchy**: prefer ID lookups ov
 
 Benchmark data from a production single-page application with approximately 2,500 DOM nodes illustrates these performance differences:
 
-```
+```text
 Locator Strategy                               Avg Time (ms)    Std Dev
 --------------------------------------------------------------------
 By.ID                                          2.3              0.4

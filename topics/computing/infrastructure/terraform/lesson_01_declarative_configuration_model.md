@@ -163,7 +163,7 @@ When an engineer runs `terraform apply`, Terraform acquires a lock by writing a 
 
 The resource lifecycle model determines how Terraform handles configuration changes requiring resource replacement. Certain attribute modifications cannot be applied in-place; changing an EC2 instance AMI requires destroying the old instance and creating a new one. Terraform encodes these constraints through provider schema definitions marking attributes as `ForceNew`. When such attributes change, Terraform generates a replacement plan:
 
-```
+```text
 Terraform will perform the following actions:
 
   # aws_instance.web must be replaced

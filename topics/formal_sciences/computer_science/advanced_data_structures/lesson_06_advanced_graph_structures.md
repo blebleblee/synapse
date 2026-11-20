@@ -28,7 +28,7 @@ Kinetic data structures address scenarios where graph vertices move continuously
 
 The union-find data structure represents each set as a rooted tree, stored implicitly through a parent array $\texttt{parent}[1..n]$ where $\texttt{parent}[i]$ contains the index of $i$'s parent in the tree, or $i$ itself if $i$ is a root. The find operation follows parent pointers until reaching a root, then returns the root as the canonical representative. Path compression modifies the tree during find traversal: after identifying the root $r$, we make a second pass (or use recursion) to set $\texttt{parent}[v] = r$ for every vertex $v$ on the path from the query vertex to the root, effectively flattening the tree.
 
-```
+```text
 function find(x):
     if parent[x] ≠ x:
         parent[x] = find(parent[x])  // path compression via recursion
@@ -37,7 +37,7 @@ function find(x):
 
 This recursive implementation performs path compression in a single traversal: as the recursion unwinds, each vertex on the path has its parent pointer updated to the root. The iterative two-pass variant first finds the root, then retraverses the path to perform compression:
 
-```
+```text
 function find_iterative(x):
     root = x
     while parent[root] ≠ root:
@@ -53,7 +53,7 @@ function find_iterative(x):
 
 Union by rank maintains an additional array $\texttt{rank}[1..n]$ that stores an upper bound on the height of each tree. Initially, all ranks are zero. When uniting two trees with roots $r_1$ and $r_2$, we compare their ranks: if $\texttt{rank}[r_1] < \texttt{rank}[r_2]$, we set $\texttt{parent}[r_1] = r_2$, making the shorter tree a subtree of the taller tree. If ranks are equal, we arbitrarily choose one root as the new parent and increment its rank by one, since the merged tree's height increases by exactly one layer.
 
-```
+```text
 function union(x, y):
     root_x = find(x)
     root_y = find(y)
@@ -76,7 +76,7 @@ Link-cut trees decompose each represented tree into vertex-disjoint preferred pa
 
 The $\texttt{expose}(v)$ operation restructures the auxiliary tree decomposition to make the path from $v$ to the root of its represented tree into a single preferred path, encoded as a single splay tree with $v$ as the minimum element (leftmost in in-order traversal). The procedure repeatedly splays $v$ to the root of its auxiliary tree, making $v$ have no right child (since $v$ is the lowest element on its preferred path), then follows the path-parent pointer to the next auxiliary tree and repeats until reaching the root of the represented tree. At each step, the right child of the splayed vertex is detached (demoting the previous continuation of the preferred path) and the vertex just visited from above becomes the new right child (promoting it to the preferred path).
 
-```
+```text
 function expose(v):
     last = null
     while v ≠ null:
@@ -89,7 +89,7 @@ function expose(v):
 
 The $\texttt{link}(v, w)$ operation makes $v$ a child of $w$ in the represented tree, requiring that $v$ is a root and $w$ is not a descendant of $v$ (preserving acyclicity). We first expose $v$ to ensure it becomes the sole element of its auxiliary tree, making it have neither left nor right children in the splay structure (since it is both the root and a leaf in its single-vertex tree). Then we expose $w$, creating a preferred path from $w$ to its tree root, and set $\texttt{parent}[v] = w$ and $\texttt{path\_parent}[v] = w$, linking $v$'s auxiliary tree below $w$ in the decomposition.
 
-```
+```text
 function link(v, w):
     expose(v)
     expose(w)
@@ -99,7 +99,7 @@ function link(v, w):
 
 The $\texttt{cut}(v)$ operation removes the edge from $v$ to its parent in the represented tree. We expose $v$ to place it at the bottom of a preferred path from its tree root to $v$, ensuring $v$ is the minimum element (leftmost) in its auxiliary tree with no left child. The parent of $v$ in the represented tree must be the next element in in-order traversal, which is the root of $v$'s right subtree (since $v$ has no left child). We splay $v$ to the root, verify it has a right child but no left child, then sever the connection by setting $\texttt{right\_child}[v] = \texttt{null}$ and clearing parent pointers, splitting the auxiliary tree and the represented tree simultaneously.
 
-```
+```text
 function cut(v):
     expose(v)
     if left_child[v] ≠ null:
@@ -112,7 +112,7 @@ Euler tour trees encode each tree as a circular sequence maintained in a balance
 
 To link vertex $v$ (currently a root) as a child of vertex $w$, we first locate an occurrence of $w$ in its Euler tour sequence—any occurrence suffices, but we typically choose the first. We split the balanced BST at $w$, producing two subsequences: the portion before $w$ and the portion from $w$ onward. We then concatenate these pieces with $v$'s entire Euler tour inserted between them:
 
-```
+```text
 sequence_w = EulerTourTree[w]
 left, right = split(sequence_w, first_occurrence(w))
 sequence_v = EulerTourTree[v]
@@ -123,7 +123,7 @@ The concatenation produces a valid Euler tour for the merged tree: traversing $w
 
 To cut the edge from $v$ to its parent, we locate the first and last occurrences of $v$ in the Euler tour, which bracket $v$'s entire subtree. We split the sequence at these two positions, extracting the segment between them (inclusive) as $v$'s new independent Euler tour, and concatenate the remaining pieces to form the reduced tour of the original tree minus $v$'s subtree:
 
-```
+```text
 sequence = EulerTourTree[root]
 left, middle_right = split(sequence, first_occurrence(v))
 middle, right = split(middle_right, last_occurrence(v) + 1)

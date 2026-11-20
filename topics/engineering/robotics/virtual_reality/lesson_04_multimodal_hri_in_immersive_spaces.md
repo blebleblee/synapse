@@ -88,7 +88,7 @@ When a potential collision is detected in the prediction horizon, the safety lay
 
 The innermost safety layer consists of hardware-enforced limits implemented in the robot's servo drives and control electronics. Joint torque sensors continuously measure interaction forces, and a comparator circuit triggers an immediate power cutoff when measured torques exceed safety thresholds (typically configured 20–30% below the biomechanical injury limits to provide margin for sensor noise and dynamics). This hardware layer operates with sub-millisecond response latency, independent of the software control loops, providing a final fail-safe against control software failures or unmodeled collision scenarios.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │              Multimodal Sensor Fusion Architecture              │
 ├─────────────────────────────────────────────────────────────────┤

@@ -30,7 +30,7 @@ Construct a master calendar aligned to trading days, excluding weekends, market 
 
 Organize the laboratory workspace into a hierarchical directory structure that separates raw data, processed datasets, model code, backtest results, and diagnostic outputs. The recommended layout follows software engineering best practices for reproducible quantitative research:
 
-```
+```text
 quant_lab/
 ├── data/
 │   ├── raw/              # Unmodified vendor data

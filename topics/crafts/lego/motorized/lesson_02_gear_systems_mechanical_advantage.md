@@ -75,7 +75,7 @@ The self-locking behavior arises from the same geometry. When the worm drives th
 
 The practical consequence for design is to place the worm stage last in the gear train, after all spur reduction. This maximizes the torque the worm shaft receives (and therefore the output torque it can deliver after losses), and it means only the final, slow shaft experiences the worm's inefficiency. If you put the worm early in the train and then follow it with spur gears, the spur stages downstream must carry enormous torques while the upstream spur stages are starved of the power eaten by the worm.
 
-```
+```text
 Gear Train Architecture Decision Map:
 
 Motor → [Spur reduction stages] → [Bevel turn if needed] → [Worm final stage] → Load

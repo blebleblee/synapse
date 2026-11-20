@@ -22,7 +22,7 @@ Begin by stating the immediate, surface-level observation: "The United States ra
 
 Document this causal chain using a plain-text structured format. Create a file named `causal_chain_smoot_hawley.txt` and enter the following structure:
 
-```
+```text
 EVENT: Smoot-Hawley Tariff Act (1930) and Global Trade Collapse
 
 WHY-1 (Immediate Trigger):

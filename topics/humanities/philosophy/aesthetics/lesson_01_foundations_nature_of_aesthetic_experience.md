@@ -34,7 +34,7 @@ The critical transition occurs in the adoption of the aesthetic attitude, the de
 
 Once aesthetic attitude is established, attention focuses on formal properties: compositional structure, color relationships, tonal patterns, rhythmic organization, proportional harmonies, textural contrasts. This formal analysis operates partly through explicit conceptual recognition (identifying sonata form, detecting symmetry, recognizing meter) and partly through non-conceptual perceptual discrimination (sensing tension in color juxtaposition, feeling rhythmic momentum, experiencing spatial depth). The interplay between these modes constitutes Kant's free play of imagination and understanding.
 
-```
+```text
 AESTHETIC JUDGMENT ARCHITECTURE
 
 Perceptual Input

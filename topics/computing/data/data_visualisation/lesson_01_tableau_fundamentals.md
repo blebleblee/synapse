@@ -90,7 +90,7 @@ The semantic layer is Tableau's most architecturally significant innovation. It 
 
 **Level of Detail (LOD) Expressions** allow an aggregation to be computed at a *different* granularity than the view, then joined back. This is the key mechanism that makes complex analytical patterns expressible without sub-queries written by hand:
 
-```
+```text
 // FIXED LOD: compute customer lifetime value independent of view granularity
 { FIXED [Customer ID] : SUM([Sales]) }
 
@@ -123,7 +123,7 @@ Misplacing a filter in this order — for instance, applying a year filter as a 
 
 Tableau's expression language compiles to SQL or, for Hyper extracts, to native Hyper SQL. The compiler performs type inference, null-safety injection, and dialect translation. Consider:
 
-```
+```text
 // Tableau calculated field
 IF DATEDIFF('day', [Order Date], [Ship Date]) > 7
     THEN "Late"

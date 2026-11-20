@@ -32,7 +32,7 @@ The depth of your hierarchy affects performance and control flexibility. A hiera
 
 Consider the following skeletal structure for a humanoid character:
 
-```
+```text
 Root (Pelvis)
 ├── Spine01, Spine02, Spine03 (Torso)
 │   └── Neck, Head
@@ -89,7 +89,7 @@ A critical architectural pattern is the **control rig** separate from the deform
 
 Here is a schematic of a typical arm control rig:
 
-```
+```text
 Animator Manipulates
          ↓
     ArmL_CTRL (Elbow IK control)

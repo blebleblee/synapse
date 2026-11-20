@@ -16,7 +16,7 @@ The node taxonomy divides into several functional categories, each with distinct
 
 Connections between nodes form through explicit attribute-to-attribute wiring, creating the dependency graph's edges. Maya represents connections as directed arrows: the source attribute computes a value that flows into the destination attribute, overriding any default or manually set value. When you bind a character mesh to a skeleton, the smooth skin deformer node connects its output geometry attribute to the mesh shape's input mesh attribute, while simultaneously reading world-space transformation matrices from every joint's world matrix attribute. This many-to-one topology—multiple joint matrices feeding a single deformer, which feeds a single mesh—demonstrates the graph's flexibility. The Node Editor interface visualizes these connections as a flowchart-style network, rendering nodes as boxes and connections as splines. Artists construct procedural rigs by chaining nodes: a curve's control vertex positions drive a motion path node, which outputs position and rotation values connected to a transform's translate and rotate attributes, causing a camera to sweep along the spline automatically.
 
-```
+```text
 Scene Graph Hierarchy (Transform DAG):
 
 world

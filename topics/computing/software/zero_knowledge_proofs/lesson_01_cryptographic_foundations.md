@@ -40,7 +40,7 @@ Projective coordinates eliminate the expensive field inversions required for poi
 
 Scalar multiplication, the operation of computing $Q = kP$ for a large integer $k$, is the workhorse of elliptic curve cryptography. The double-and-add algorithm is the naive approach: scan the bits of $k$ from most significant to least significant, doubling the accumulator for each bit and adding $P$ when the bit is one. This requires approximately $\log_2 k$ doublings and $(\log_2 k)/2$ additions on average. The window method improves performance by precomputing small multiples of $P$—say $P, 2P, 3P, \ldots, 15P$—and then processing $k$ in four-bit chunks. This trades memory for speed, reducing the number of point additions at the cost of storing more precomputed points.
 
-```
+```text
 Scalar Multiplication: Q = k * P
 
 Initialization:

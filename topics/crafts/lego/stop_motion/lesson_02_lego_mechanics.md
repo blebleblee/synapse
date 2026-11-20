@@ -24,7 +24,7 @@ For minifigure-based animation, the primary armature is the figure itself—tors
 
 When minifigure joint ranges prove insufficient, the animator must construct hybrid armatures that blend minifigure surface components with Technic skeletal structures. A common pattern for extended arm reach places a minifigure torso onto a 2×2 turntable base for full 360-degree rotation, then attaches Technic ball joint assemblies at the shoulder points using 1×1 headlight bricks as adapter interfaces. The ball joints terminate in clip plates that grip minifigure hands, creating a kinematic chain with shoulder flexion, abduction, rotation, and wrist flexion—four degrees of freedom versus the stock minifigure's two. The tradeoff manifests in visual authenticity; the Technic components protrude visibly unless carefully cladded with slopes, cheese wedges, and other smoothing elements, and the extended mass of the hybrid arm reduces pose stability compared to the compact original.
 
-```
+```text
 Minifigure Hybrid Armature Cross-Section:
 
     [Minifigure Head]

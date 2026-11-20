@@ -30,7 +30,7 @@ When the animator sets two keyframes 10 frames apart, they are creating a tempor
 
 The mathematical representation of a transformation state typically uses a 4×4 homogeneous transformation matrix:
 
-```
+```text
 [ R_xx  R_xy  R_xz  T_x ]
 [ R_yx  R_yy  R_yz  T_y ]
 [ R_zx  R_zy  R_zz  T_z ]

@@ -42,7 +42,7 @@ Prokaryotic cell architecture reflects a minimalist design philosophy where ever
 
 The bacterial cell wall's mechanical architecture can be understood through structural analysis of peptidoglycan's macromolecular organization. Each glycan strand consists of repeating NAG-NAM disaccharides polymerized through β-1,4-glycosidic linkages, with short peptide stems attached to the lactyl group of NAM residues. In most bacteria, these stems contain L-alanine, D-glutamate, meso-diaminopimelic acid (or L-lysine in Gram-positives), and D-alanine, though variations abound. Cross-linking occurs between peptide stems on adjacent glycan strands: in Gram-negative bacteria, direct peptide bonds form between the meso-DAP of one stem and the terminal D-alanine of another; in Gram-positive organisms, pentaglycine bridges (or other oligopeptide linkers) connect L-lysine to D-alanine. This cross-linking generates a mesh-like macromolecule that completely ensheaths the cell, functioning as a single molecule as large as the entire cell itself.
 
-```
+```text
 Peptidoglycan Structure (Gram-negative):
 
 Glycan strand:  -NAG-NAM-NAG-NAM-NAG-NAM-

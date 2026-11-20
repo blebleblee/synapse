@@ -128,7 +128,7 @@ Observability tooling captures NFS performance metrics through multiple instrume
 The configuration below implements a hardened NFS deployment with RPCSEC_GSS authentication, tuned caching parameters, and defensive timeouts suitable for production multi-tenant environments. The server exports a filesystem with synchronous writes enforced, Kerberos-only authentication, and root squashing. Clients mount with hard semantics to prevent data loss, reduced cache timeouts to improve consistency, and explicit timeout values chosen for a datacenter network with < 5 ms RTT.
 
 Server configuration (`/etc/exports`):
-```
+```text
 /exports/shared  192.168.1.0/24(rw,sync,no_subtree_check,root_squash,sec=krb5p)
 ```
 

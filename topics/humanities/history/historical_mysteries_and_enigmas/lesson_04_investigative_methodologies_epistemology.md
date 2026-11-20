@@ -32,7 +32,7 @@ Once authenticity is established, the analysis shifts to reliability and bias as
 
 Tax records and administrative documents generally offer higher reliability than narrative sources because their creators had different incentive structures. A Byzantine grain requisition papyrus provides trustworthy data about agricultural productivity not because its author valued historical accuracy but because fiscal administration required accurate accounting. Conversely, the document may systematically underreport peasant grain reserves if tax evasion was widespread, or overreport if administrators inflated figures to demonstrate bureaucratic efficiency. The investigator models these incentive structures explicitly:
 
-```
+```text
 Reliability Assessment Matrix:
 
 Source Type: [Administrative / Narrative / Legal / Private]
@@ -96,7 +96,7 @@ The investigator employs **inference to the best explanation** (abductive reason
 
 The Bayesian probability framework provides formal architecture for this synthesis:
 
-```
+```text
 P(H|E) = P(E|H) × P(H) / P(E)
 
 Where:

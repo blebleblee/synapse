@@ -18,7 +18,7 @@ The correct model has two components: a **work factor** and a **salt**. The salt
 
 **bcrypt**, designed by Niels Provos and David Mazières in 1999, was the first widely deployed algorithm to combine both properties. It uses a modified Blowfish cipher setup as its computational core and encodes the salt and cost factor directly in its output string. The cost parameter is a base-2 exponent: cost 12 means 2¹² iterations of key stretching. The critical property is that increasing the cost by 1 doubles the computation time. The bcrypt output format is self-describing:
 
-```
+```text
 $2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/lewdBdXIG97E1Obf2
 ```
 
@@ -213,7 +213,7 @@ The `Domain` and `Path` attributes narrow the scope of cookie delivery. Setting 
 
 A complete `Set-Cookie` header for a production session:
 
-```
+```text
 Set-Cookie: sid=BRgLJm9q2vY8T1xKfN4pWc; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=1800
 ```
 
@@ -302,7 +302,7 @@ The `redirect_uri` must be validated with exact string matching, not prefix matc
 
 JSON Web Tokens (RFC 7519) are a compact, URL-safe format for representing claims as a JSON object signed or encrypted by a cryptographic key. Their three-part structure — header, payload, signature — is base64url-encoded and dot-separated:
 
-```
+```text
 BASE64URL(header) . BASE64URL(payload) . BASE64URL(signature)
 ```
 

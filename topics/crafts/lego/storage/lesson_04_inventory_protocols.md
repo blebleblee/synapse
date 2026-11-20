@@ -30,7 +30,7 @@ For collections under five thousand pieces, the drawer-based system provides an 
 
 The drawer assignment protocol follows a hybrid strategy balancing access frequency and geometric clustering. High-velocity parts—the 1×2, 1×4, 2×2, and 2×4 bricks in neutral colors (Black, White, Light Bluish Grey, Dark Bluish Grey)—occupy the chest-height zone between the third and eighth drawer rows, minimizing reach distance during active building. Within these prime drawers, color clustering takes precedence: drawer D3 might contain all Black 1×n bricks, while D4 holds White variants of the same family. Lower drawers accommodate larger elements and specialized geometries: baseplates, long Technic beams, and curved slopes. Upper drawers, requiring stepstool access, store low-frequency exotics: boat hulls, vehicle chassis, and printed tiles from specific sets.
 
-```
+```text
 Storage Cabinet Layout (Drawer Grid: 4 columns × 12 rows)
 
      [A] [B] [C] [D]
@@ -56,7 +56,7 @@ The bin labeling strategy employs a three-tier addressing scheme: zone, shelf, a
 
 The database schema supporting this infrastructure follows a normalized relational model with four core tables. The **Parts** table catalogs geometric definitions:
 
-```
+```text
 Parts Table
 -----------
 part_id (PK)      : INTEGER
@@ -68,7 +68,7 @@ has_variants      : BOOLEAN
 
 The **Colors** table enumerates the palette:
 
-```
+```text
 Colors Table
 ------------
 color_id (PK)     : INTEGER
@@ -80,7 +80,7 @@ is_obsolete       : BOOLEAN
 
 The **Inventory** table tracks physical stock:
 
-```
+```text
 Inventory Table
 ---------------
 inventory_id (PK) : INTEGER
@@ -94,7 +94,7 @@ notes             : TEXT
 
 The **Transactions** table logs all movements:
 
-```
+```text
 Transactions Table
 ------------------
 transaction_id (PK) : INTEGER

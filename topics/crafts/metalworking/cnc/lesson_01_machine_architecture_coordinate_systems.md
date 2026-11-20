@@ -24,7 +24,7 @@ Driving this Y-axis assembly, a ballscrew converts rotary motor motion into line
 
 The servo motor, typically a brushless permanent magnet design rated 1-5 kW, mounts to the ballscrew through a flexible coupling that accommodates minor misalignment while transmitting torque. The motor's construction reveals the elegance of electromagnetic force generation: rare-earth neodymium magnets mounted to the rotor shaft create a permanent magnetic field, while stator windings carrying three-phase AC current generate a rotating magnetic field. The motor controller modulates current amplitude and phase to maintain constant torque across the speed range, with peak torque capability reaching 300% of continuous rating for brief acceleration bursts. A rotary encoder—either optical with 16,000-20,000 lines per revolution or magnetic with comparable resolution—mounts to the motor's rear shaft, providing position feedback at sub-arc-second resolution.
 
-```
+```text
 Machine Coordinate Frame & Servo Control Loop
 
                         ┌─────────────────────┐

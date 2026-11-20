@@ -52,7 +52,7 @@ Quarter notes, one per beat in 4/4, moving through chord tones and approach tone
 
 B♭ is the standard jam-session blues key — comfortable range for horns. Form: B♭7–E♭7–B♭7–B♭7–E♭7–E♭7–B♭7–B♭7–F7–E♭7–B♭7–F7.
 
-```
+```text
 Bar  Beat1        Beat2        Beat3        Beat4           Chord      Fingering (Simandl 1-2-4)
 1    Bb A-str f1  D  A-str f3  F  D-str f3  Ab D-str f1     Bb7        1-2-1-1
 2    Bb A-str f1  D  A-str f3  F  D-str f3  D  A-str f3     Bb7        same box, beat4 = color tone
@@ -100,7 +100,7 @@ Learn three positional shapes and you can walk any progression in any key by shi
 
 **Box 1 — Root on A string (frets 1–3, your main walking territory)**
 
-```
+```text
 A string  | R  |    | 5  |      R = fret 1
 D string  | b7 | 3  |    |      b7 = same fret as R, 3 = one fret above R (both on D string)
              1    2    3     (frets)
@@ -109,7 +109,7 @@ B♭7 example: R = B♭ (A str f1), 3 = D (D str f3), 5 = F (A str f3), ♭7 = A
 
 **Box 2 — Root on E string (frets 1–5, used for F7 and low-register color)**
 
-```
+```text
 E string  | R  |    |    |    |
 A string  | 5  |    |    | 3  |     5 = same fret as R, 3 = R+3 frets
              1    2    3    4    5   (frets)
@@ -118,7 +118,7 @@ F7 example: R = F (E str f1), 5 = C (A str f1), ♭7 = E♭ (D str f1 at same po
 
 **Box 3 — Root on D string (frets 3–7, turnarounds and register lift)**
 
-```
+```text
 D string  | b7 | R  |    | 3  |     b7 = one fret below R, 3 = R+2 frets
 G string  | 5  |    |    |    |     5 = same fret as R, one string up
              1    2    3    4   (frets, relative to the root fret)
@@ -155,13 +155,13 @@ Fingerboard shortcuts, read straight off that map: same string, +2 frets = whole
 
 **Simandl 1-2-4 drill (frets 1–5).** Index=1, middle=2, pinky=4. Ring finger stays relaxed, riding just behind the pinky, not stretched out on its own:
 
-```
+```text
 E(open) -> F(fret1, finger1) -> F#(fret2, finger2) -> G(fret3, finger4) -> G#(fret4, finger4 slide) -> A(fret5, finger4 stretch)
 ```
 Repeat identically on A, D, G strings. Metronome at 60 BPM, one note per click, zero fret buzz, zero sympathetic ring from neighboring strings. Progress 60 → 80 → 110 BPM before moving to the next drill.
 
 **OFPF drill (frets 7+).** Index→middle→ring→pinky across four consecutive frets:
-```
+```text
 A string: E(f7, finger1) -> F(f8, finger2) -> F#(f9, finger3) -> G(f10, finger4)
 ```
 Same 60 → 80 → 110 BPM progression, repeated on all four strings.
@@ -170,7 +170,7 @@ Same 60 → 80 → 110 BPM progression, repeated on all four strings.
 
 **Right-hand alternation.** Strict index/middle (i-m) alternation on every note, no exceptions above ♩=100. Plucking everything with one finger fatigues it asymmetrically and your time destabilizes as it tires.
 
-```
+```text
 A string: i  m  i  m   (Bb Bb Bb Bb)
 D string: m  i  m  i   (F  F  F  F)
 ```
@@ -198,7 +198,7 @@ When a bassist plays G (5th of C7) → E (3rd of C7) → E♭ (♭7 of F7) → F
 
 ### ii–V–I Voice-Leading Drill in F
 
-```
+```text
 Bar1 (Gm7):   G(E str f3) -> Bb(A str f1) -> D(A str f5) -> C(A str f3)
 Bar2 (C7):    C(A str f3) -> E(D str f2)  -> G(D str f5) -> B(D str f4)
 Bar3 (Fmaj7): F(E str f1) -> A(E str f5)  -> C(A str f3) -> E(D str f2)
@@ -239,7 +239,7 @@ flowchart LR
 **Phase 3 (♩=120, weeks 5–6) — Approach notes.** One chorus using only chromatic-from-below approaches. Next chorus, only chromatic-from-above. Next, alternate between them. Next, use enclosures throughout. Goal: hear the next root in your head *before* you play the approach note.
 
 **Phase 4 (♩=140–160, weeks 7–8) — Pattern automation.** Stop thinking note-by-note; think in phrase shapes instead. Cycle of fifths ii–V–I, one bar per chord:
-```
+```text
 Dm7 -> G7 -> Cmaj7 -> F#m7 -> B7 -> Emaj7 -> Bbm7 -> Eb7 -> Abmaj7 -> Dbm7 -> Gb7 -> Bmaj7 -> (back to Dm7)
 ```
 Every clean pass through all 12 keys earns +10 BPM. Target 140 BPM by the end of week 8.
@@ -269,7 +269,7 @@ Every clean pass through all 12 keys earns +10 BPM. Target 140 BPM by the end of
 ### Drill Set A — Chord Tone Fluency (♩=60 → 120)
 
 **A1: Arpeggio permutations.** On B♭7 (A string root), play every ordering below, four reps each:
-```
+```text
 1. R  3  5  b7  -> Bb D  F  Ab   (finger 1-2-1-1)
 2. R  5  b7 3   -> Bb F  Ab D    (finger 1-1-1-2)
 3. 3  R  5  b7  -> D  Bb F  Ab   (finger 2-1-1-1)
@@ -278,7 +278,7 @@ Every clean pass through all 12 keys earns +10 BPM. Target 140 BPM by the end of
 Transpose through F7, C7, G7, D7, A7, E7 — one new key per day. Add 10 BPM per week until you reach 120.
 
 **A2: Two-chord connectors.** Walk between every adjacent chord pair in a B♭ blues using a chromatic beat-4 approach:
-```
+```text
 Bb7 -> Eb7:  Bb(R) D(3) F(5) D(down to Eb)  |  Eb(R) G(3) Bb(5) Db(b7)
 Eb7 -> Bb7:  Eb(R) G(3) Bb(5) A(down to Bb) |  Bb(R) D(3) F(5) Ab(b7)
 Bb7 -> F7:   Bb(R) D(3) F(5) E(down to F)   |  F(R) A(3) C(5) Eb(b7)
@@ -289,7 +289,7 @@ F7 -> Bb7:   F(R) A(3) C(5) B(down to Bb)   |  Bb(R) D(3) F(5) Ab(b7)
 
 **B1: Chromatic-from-below only, full 12-bar.** Every beat 4 is the semitone below the *next* chord's root — including repeats of the same chord.
 
-```
+```text
 Bar  Beat1   Beat2   Beat3   Beat4(approach)   Chord
 1    Bb(R)   D(3)    F(5)    A (-> Bb)         Bb7
 2    Bb(R)   D(3)    F(5)    A (-> Bb)         Bb7
@@ -307,7 +307,7 @@ Bar  Beat1   Beat2   Beat3   Beat4(approach)   Chord
 This drill isn't meant to be melodically perfect — it trains your hand to reflexively find the semitone below any target, so later you can *choose* approach strategies instead of defaulting to whatever's under your fingers.
 
 **B2: Enclosure drill.** Beat 3 = semitone above the next root, beat 4 = semitone below it, resolve on beat 1:
-```
+```text
 Eb7 -> Bb7:  Eb(R) G(3) B(above Bb)  A(below Bb)  | Bb(R) ...
 Bb7 -> F7:   Bb(R) F(5) Gb(above F)  E(below F)   | F(R) ...
 ```
@@ -317,7 +317,7 @@ Start at 60 BPM — having beat 3 *not* be a chord tone takes some getting used 
 
 Cycle of fifths, one bar per chord. Template: Bar 1 (ii) plays R-3-5-♭7 with beat 4 chromatic into V's root. Bar 2 (V) plays R-3-5-♭7 with beat 4 chromatic into I's root. Bar 3 (I) plays R-3-5-7 (natural 7th) with beat 4 chromatic into the next ii.
 
-```
+```text
 C: Dm7-G7-Cmaj7 | F: Gm7-C7-Fmaj7 | Bb: Cm7-F7-Bbmaj7 | Eb: Fm7-Bb7-Ebmaj7
 Ab: Bbm7-Eb7-Abmaj7 | Db: Ebm7-Ab7-Dbmaj7 | Gb: Abm7-Db7-Gbmaj7 | B: C#m7-F#7-Bmaj7
 E: F#m7-B7-Emaj7 | A: Bm7-E7-Amaj7 | D: Em7-A7-Dmaj7 | G: Am7-D7-Gmaj7
@@ -325,7 +325,7 @@ E: F#m7-B7-Emaj7 | A: Bm7-E7-Amaj7 | D: Em7-A7-Dmaj7 | G: Am7-D7-Gmaj7
 Start at 80 BPM. Each clean pass through all 12 keys earns +10 BPM, target 140 by week 4 of this drill.
 
 **C2: Two-feel to four-feel.** One chorus in "two" (half notes, root-fifth only), next chorus in "four" (full quarter-note walk), same tempo throughout — this mimics the standard ballad-to-swing transition heard on real gigs:
-```
+```text
 Two-feel:   Bb --- Eb --- Bb --- Bb ---
 Four-feel:  Bb D F Ab | Eb G Bb Db | Bb D F Ab | Bb D F Ab
 ```

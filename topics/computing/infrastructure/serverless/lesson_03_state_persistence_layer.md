@@ -161,7 +161,7 @@ This compare-and-swap operation ensures that only one function instance can hold
 
 Event-driven state transitions leverage message queues and event streams to coordinate multi-step workflows without distributed transactions. An e-commerce order workflow might decompose into separate functions triggered by events:
 
-```
+```text
 Order Created Event → Reserve Inventory Function
                       ↓ (publishes)
                       Inventory Reserved Event → Charge Payment Function

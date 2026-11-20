@@ -24,7 +24,7 @@ The experimental matrix for this exercise varies radial width of cut (RDOC) and 
 
 Program the first test cut as a simple rectangular pocket 2.000 inches long in the X-direction and 0.500 inches wide in the Y-direction, machined to a depth of 0.125 inches using a helical ramping entry at 3.0-degree helix angle to minimize plunge forces. The G-code structure follows this pattern:
 
-```
+```text
 G21 G90 G54 (Metric absolute mode, work coordinate system 1)
 G0 X1.000 Y1.500 (Rapid to pocket start position)
 G0 Z5.000 (Rapid to safe height)

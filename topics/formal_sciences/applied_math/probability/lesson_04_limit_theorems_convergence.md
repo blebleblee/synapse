@@ -52,7 +52,7 @@ An equivalent characterization via bounded continuous test functions states that
 
 The logical relationships between these convergence modes are captured by the following implications:
 
-```
+```text
 Almost Sure Convergence
          |
          v

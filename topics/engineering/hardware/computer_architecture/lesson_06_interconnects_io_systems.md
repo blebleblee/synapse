@@ -26,7 +26,7 @@ The simplest interconnect remains the hierarchical bus, found in microcontroller
 
 The ARM AMBA AHB protocol exemplifies this hierarchy. A transaction on the AHB bus consists of an address phase and a data phase, both synchronized to the rising edge of the system clock. The master (CPU or DMA controller) drives the address, write/read control signals, and data (for writes) on clock edge N. The slave (memory controller or peripheral) observes these signals, decodes the address, accesses its internal storage, and drives the read data back onto the bus by clock edge N+1 or later, depending on latency. A slave can assert a HREADY signal to indicate it is ready; if HREADY is low, the transaction is stalled and repeats on the next clock cycle.
 
-```
+```text
 Clock    |  1  |  2  |  3  |  4  |  5  |  6  |
 ---------|-----|-----|-----|-----|-----|-----|
 Master   | Addr| Addr| Addr| Addr| Addr| Addr|
@@ -58,7 +58,7 @@ As systems scale to 100+ cores (as in modern GPU dies and data center accelerato
 
 The simplest NoC topology is a **mesh grid**. Imagine a 4×4 grid of router nodes, with each node connected to its four neighbors (north, south, east, west). A transaction originating from a core in the top-left corner that targets a memory controller in the bottom-right corner is routed through intermediate routers using a routing algorithm (typically dimension-ordered routing: move east 3 hops, then south 3 hops). The transaction occupies one link at a time as it traverses the mesh. Other transactions can simultaneously use different links, enabling massive transaction-level parallelism.
 
-```
+```text
     [M0]  [M1]  [M2]  [M3]
      |     |     |     |
     [R]--[R]--[R]--[R]

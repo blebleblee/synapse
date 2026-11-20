@@ -152,7 +152,7 @@ The distribution of multiples within the peer group reveals the market's implici
 
 The precision of valuation outputs depends critically on the quality and stability of input assumptions, yet practitioners frequently underestimate the sensitivity of intrinsic value to seemingly minor parameter adjustments. A systematic approach to sensitivity analysis reveals which assumptions drive valuation outcomes and which exist as computational noise. The practitioner constructs a sensitivity table varying discount rate and terminal growth rate across plausible ranges:
 
-```
+```text
 Terminal Value Sensitivity ($MM)
                     Terminal Growth Rate
 WACC       2.0%      2.5%      3.0%      3.5%

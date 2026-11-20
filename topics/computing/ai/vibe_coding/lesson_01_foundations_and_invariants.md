@@ -379,7 +379,7 @@ The following illustrates a complete Vibe Coding session for a specific, well-sp
 
 **Prompt (Stage 3)**:
 
-```
+```text
 Language: Go 1.22, standard library only (no third-party dependencies).
 Task: Implement function `LoadConfig` that reads a JSON file from a given path
 and unmarshals it into a Config struct. Use fmt.Errorf with %w for all error
@@ -452,7 +452,7 @@ func LoadConfig(path string) (*Config, error) {
 
 One issue is identified: the function does not validate that mandatory fields (`Host`, `Port`) are non-zero after unmarshaling. JSON unmarshaling into a struct with no required-field validation will succeed on `{}`, leaving `Host = ""` and `Port = 0`. This is a **behavioral constraint** ($\phi_{behav}$) that was implicit in the reviewer's domain knowledge but absent from the prompt. A corrective prompt is issued:
 
-```
+```text
 Add validation after json.Unmarshal: return an error if cfg.Host is empty
 or cfg.Port is not in the range [1, 65535]. Use a named error variable or
 fmt.Errorf (no third-party validation library). Keep all existing behavior.

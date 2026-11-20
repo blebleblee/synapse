@@ -227,7 +227,7 @@ kafka-acls.sh \
 
 Kafka's binary record format (Magic byte = 2, introduced in Kafka 0.11) uses CRC32C over the record batch. The checksum covers the entire batch header and payload:
 
-```
+```text
 RecordBatch:
   baseOffset         int64
   batchLength        int32
@@ -309,7 +309,7 @@ kafka-consumer-groups.sh \
 
 **Request latency (MBean: `kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce`)**
 
-```
+```text
 Percentiles: 50th, 95th, 99th, 999th
 Alert: p99 > 500ms sustained for Produce requests
 Alert: p999 > 2000ms for any request type
@@ -391,7 +391,7 @@ histogram_quantile(0.99,
 
 Consumer lag is the single most important operational metric for a Kafka-backed pipeline. It measures accumulated work, not just instantaneous throughput. The correct mental model is:
 
-```
+```text
 lag(t) = log_end_offset(t) - committed_offset(t)
 ```
 
@@ -533,7 +533,7 @@ The default `AclAuthorizer` caches ACL rules in memory and refreshes from ZooKee
 
 The relationship between replication configuration and durability/availability is a classic distributed systems tradeoff captured in Kafka through three configuration parameters that must be set coherently:
 
-```
+```text
 replication.factor = R        (topic-level: number of replicas)
 min.insync.replicas = M       (topic-level: minimum ISR size for acks=all)
 acks = all                    (producer-level: wait for all ISR to acknowledge)

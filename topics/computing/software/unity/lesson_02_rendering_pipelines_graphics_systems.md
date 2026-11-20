@@ -22,7 +22,7 @@ The shader compilation pipeline compounds these architectural differences. Unity
 
 The Built-in pipeline's render loop is an event-driven callback system layered over a fixed C++ render path. The engine iterates over cameras, culls scene objects against each camera's frustum, sorts visible objects by render queue and material, and issues draw calls through an internal command recorder. Programmers intercept this process through `Camera.onPreCull`, `Camera.onPreRender`, `CommandBuffer` hooks attached to `CameraEvent` injection points, and custom `MonoBehaviour` callbacks. The critical limitation is that you cannot change the fundamental structure: a Camera always produces a forward or deferred lighting pass in a fixed order, and extensions attach to the edges of that structure rather than replacing it.
 
-```
+```text
 Built-in Render Loop (Simplified):
 
 foreach Camera in scene:
@@ -39,7 +39,7 @@ foreach Camera in scene:
 
 URP replaces this with a `ScriptableRenderer` that owns a list of `ScriptableRenderPass` instances. Each pass declares its input attachments, output attachments, and the render queue range it consumes. The `UniversalRenderPipeline.Render()` method collects per-camera render data, calls `renderer.Setup()` to populate the pass list, then calls `renderer.Execute()` which records each pass's draw commands into a `CommandBuffer` that is submitted to the graphics API in a single batch.
 
-```
+```text
 URP Execution Model:
 
 RenderPipelineAsset.Render(ScriptableRenderContext, Camera[]):
@@ -68,7 +68,7 @@ The `ScriptableRenderContext` is the key abstraction. It buffers rendering comma
 
 HDRP's architecture is significantly more complex, targeting deferred rendering with a compute-heavy lighting pipeline. Its frame graph is not a linear pass list but a dependency graph of render passes with explicit resource lifetimes tracked through `HDCamera.historyRTSystem` for temporal data (TAA, motion vectors, SSAO history). The core HDRP loop executes a geometry pass, populates a full GBuffer (albedo, normals, roughness, metallic, emission, motion vectors, depth), then dispatches a tile/cluster-based deferred lighting compute shader that reads the GBuffer and writes radiance. This is not a single draw call but a hierarchical lighting structure: lights are binned into 3D frusta tiles at 16×16 pixel resolution, and the compute shader reads only the lights that intersect each tile, avoiding the O(lights × fragments) cost of naive forward rendering.
 
-```
+```text
 HDRP GBuffer Layout (8 render targets, MRT):
 
 GBuffer0: Albedo (RGB) + Specular Occlusion (A)       [RGBA8]
@@ -85,7 +85,7 @@ The GBuffer's fixed layout is an architectural commitment. If you write a custom
 
 A Unity `.shader` file is a HLSL program wrapped in a ShaderLab declaration block. The ShaderLab layer is not part of HLSL—it is a Unity-specific metadata format that declares render state (blending, culling, depth test), pass structure, and property bindings. The relationship looks like this:
 
-```
+```c
 Shader "Custom/MyShader" {
     Properties {
         _BaseColor ("Base Color", Color) = (1,1,1,1)

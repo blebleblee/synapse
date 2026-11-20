@@ -108,7 +108,7 @@ This loop runs consciously at first; expert playing compresses it into a sub-50m
 
 ### 3.2 Position Map: Violin First Through Fifth Position
 
-```
+```text
                 1st     2nd     3rd     4th     5th
 Finger 1:       B/F#    C/G     D/A     Eb/Bb   E/B
 Finger 2:       C/G     D/A     E/B     F/C     F#/C#
@@ -184,7 +184,7 @@ The critical coupling: **F and v must scale together** to stay in the Helmholtz 
 
 **Whole-bow long tones (Kreutzer No. 2 framework), ♩ = 60, 4/4, one whole bow per note:**
 
-```
+```text
 Exercise 1 — Even Distribution:
 Bar 1: Open G, down bow, frog → tip, 4 beats
 Bar 2: Open G, up bow, tip → frog, 4 beats
@@ -306,7 +306,7 @@ flowchart TD
 
 Two strings sounding together need the bow sitting in the channel between them at a steady angle. Arm height sets which pair is engaged:
 
-```
+```text
 String level and approximate elbow height (violin, right arm):
 
 G string:   Elbow highest (~hip level), bow tilted toward scroll
@@ -565,7 +565,7 @@ This operationalizes Flesch's principle of "practicing faults one at a time." Th
 
 Slow and fast movement are different motor programs. At performance tempo, fast passages run **ballistic** — pre-planned, no real-time correction. Slow practice builds the **feedback-controlled** version. Both are required, and connecting them explicitly matters.
 
-```
+```text
 Phase 1 — Structural Encoding     40-50% of target tempo
   Goal: every note, bow change, and shift is conscious and correct
   Advance when: 5 consecutive error-free reps
@@ -680,7 +680,7 @@ Motor memory consolidates preferentially during slow-wave and REM sleep. A passa
 
 **Artificial harmonics** use the left hand to set a new nut position (fully stopped note) while a lightly placed second finger creates the node. Standard pattern: stop a note with finger 1, touch a perfect fourth higher with finger 4 (lightly). This sounds two octaves above the stopped note, with a predictable, usable pitch.
 
-```
+```text
 Artificial harmonic interval map (violin):
 
 P4 above stopped note (finger 4 lightly) -> 2 octaves above stopped note

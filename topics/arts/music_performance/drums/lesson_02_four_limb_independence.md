@@ -499,7 +499,7 @@ Retest every 4 weeks, record audio/video, and direct extra practice time at whic
 
 ### Weekly Practice Log Template
 
-```
+```text
 Date: ____________
 
 Tempo ceilings (max clean tempo before breakdown):

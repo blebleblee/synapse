@@ -22,7 +22,7 @@ Locking protocols implement a lease-based mutual exclusion pattern where a Terra
 
 The state file structure follows a versioned schema that has evolved across Terraform releases, with the current lineage version encoded in the `version` integer field at the document root. This version field enables Terraform to detect state files produced by newer CLI versions and abort operations rather than risk corrupting state through incompatible schema interpretations. The `terraform_version` string field records the exact semantic version of the Terraform binary that last modified the state, providing forensic metadata useful for debugging behavioral changes across version upgrades and ensuring operator awareness of potential compatibility constraints.
 
-```
+```json
 {
   "version": 4,
   "terraform_version": "1.6.5",

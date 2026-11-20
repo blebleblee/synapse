@@ -16,14 +16,14 @@ Any serial bus must solve one fundamental problem: *the receiver does not know w
 
 A UART peripheral derives its bit clock by dividing the system peripheral clock (PCLK) by a programmable integer divisor. On an STM32F4, for example:
 
-```
+```text
 BRR = PCLK / (16 × BaudRate)   (oversampling-by-16 mode)
 BRR = PCLK / (8  × BaudRate)   (oversampling-by-8 mode, for higher speeds)
 ```
 
 The divisor is split into a 12-bit mantissa and a 4-bit fraction, giving 0.0625-bit resolution. With a 42 MHz APB1 clock and a target baud rate of 115200:
 
-```
+```text
 BRR = 42,000,000 / (16 × 115,200) = 22.786...
 Mantissa = 22  (0x16)
 Fraction = round(0.786 × 16) = 13 (0x0D)
@@ -38,7 +38,7 @@ The EIA-232 / TIA-232 standard requires that the cumulative timing error across 
 
 The receiver does not simply wait one bit period after the start bit. It oversamples the line (typically 16× or 8× the baud rate) and uses a *voting* or *majority* scheme to determine the bit value, rejecting narrow glitches. The sampling point is placed at the center of the bit period — the point of maximum setup and hold margin.
 
-```
+```text
 Oversampling factor: 16
 Start bit detected on falling edge at sample 0
 Wait 8 samples (half a bit period) → center of start bit (verify it is still low)
@@ -81,14 +81,14 @@ UART always transmits the **LSB first**. This is in contrast to network byte ord
 
 For the byte `0x48` (ASCII `'H'`):
 
-```
+```text
 Binary (MSB→LSB): 0100 1000
 Transmitted order (LSB first): 0, 0, 0, 1, 0, 0, 1, 0
 ```
 
 The complete wire encoding for 8N1 (8 data bits, no parity, 1 stop bit):
 
-```
+```text
 Idle  Start  D0  D1  D2  D3  D4  D5  D6  D7  Stop  Idle
   1     0     0   0   0   1   0   0   1   0    1     1
 ```
@@ -248,7 +248,7 @@ I²C uses open-drain outputs with pull-up resistors on both SDA and SCL. No devi
 
 Pull-up resistor selection critically affects signal integrity. The I²C specification defines maximum bus capacitance as 400 pF. The pull-up resistor must charge this capacitance fast enough for the target speed:
 
-```
+```text
 t_rise_max (Standard mode, 100 kHz) = 1000 ns
 t_rise_max (Fast mode, 400 kHz)     = 300 ns
 t_rise_max (Fast-mode Plus, 1 MHz)  = 120 ns

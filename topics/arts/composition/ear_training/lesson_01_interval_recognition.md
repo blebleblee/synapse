@@ -233,7 +233,7 @@ Relative pitch, not perfect pitch, is what makes intonation reliable.
 
 **Daily 30-minute template:**
 
-```
+```text
 0:00–0:10  Single interval focus, 20 reps ascending + descending
 0:10–0:20  Random interval ID, 30 reps mixed melodic/harmonic
 0:20–0:25  Harmonic intervals only, 10 reps

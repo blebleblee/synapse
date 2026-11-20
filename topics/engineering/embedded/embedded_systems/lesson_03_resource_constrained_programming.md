@@ -30,7 +30,7 @@ The distinction between `.text`, `.data`, `.bss`, and `.rodata` sections in the 
 
 The memory map of a typical ARM Cortex-M4 microcontroller partitions the 4-gigabyte address space into architectural regions with distinct access characteristics and intended purposes. The following diagram illustrates the canonical layout:
 
-```
+```text
 0xFFFFFFFF ┌─────────────────────────────────┐
            │   Vendor-Specific (Reserved)    │
 0xE0100000 ├─────────────────────────────────┤

@@ -71,7 +71,7 @@ The cost of this transition is non-trivial: on modern CPUs, a null syscall (e.g.
 
 Each process operates within a *virtual address space*—a private, contiguous range of addresses (0 to 2^48-1 on x86-64 with 4-level paging) that the Memory Management Unit (MMU) translates to physical memory. The page table, a multi-level tree structure stored in physical memory, defines this translation:
 
-```
+```text
 Virtual Address (48 bits):
 [47:39] [38:30] [29:21] [20:12] [11:0]
   PML4    PDPT     PD      PT    Offset

@@ -59,7 +59,7 @@ Every orchestral instrument is an acoustic resonator governed by three constrain
 
 #### Practical Scoring Example: String-Only Tremolo Crescendo (A minor, from silence)
 
-```
+```text
 Violin I (div. a 2):  Staff 1 – A5 tremolo, pp → ff over 4 bars
                        Staff 2 – E5 tremolo, pp → ff over 4 bars
 Violin II (unis.):    C5 tremolo, pp → ff over 4 bars
@@ -96,7 +96,7 @@ Double Bass (unis.):  A2 tremolo, pp → ff over 4 bars
 
 A wind player needs to breathe roughly every 8–12 seconds at a moderate tempo and dynamic (less at ff, where air consumption is higher). **Always place a breath mark (,) at a real phrase boundary** — never mid-word of a melodic idea. For a sustained chord that must not break, stagger the breaths across doubled parts:
 
-```
+```text
 Flute I:  C5 whole note tied across 4 bars — breathe after bar 2
 Flute II: C5 whole note tied across 4 bars — breathe after bar 1 and bar 3
 ```
@@ -143,7 +143,7 @@ Result: the ear hears one continuous tone; no single player's breath gap lines u
 
 #### Practical Scoring: 4-Part Brass Chorale
 
-```
+```text
 Trumpet in Bb (a 2):     top two voices, mf
 Horn in F (4 players):   alto and tenor voices, mp   <- one dynamic softer than trumpet
 Trombone (3 players):    tenor and bass voices, mf
@@ -242,7 +242,7 @@ C major (C–E–G–C).
 
 ### Condensed Score Sketch
 
-```
+```text
 Bar 1:
 Vln II:  G4 tremolo, pp, sul tasto
 Vla:     E4 tremolo, pp, sul tasto
@@ -377,7 +377,7 @@ graph TB
 **Assignment 3 — Orchestration Transcription.** Score: Mussorgsky/Ravel, *Pictures at an Exhibition*, "The Great Gate of Kiev." Reduce the final tutti climax to a 3–4 stave short score, identifying which instruments carry melody, harmony, and rhythm. Then re-orchestrate the same passage for 2 Flutes, 2 Clarinets, 2 Horns, and strings, preserving the dramatic arc with a fraction of the forces.
 
 **Assignment 4 — Idiomatic Revision.** You are handed this piano-reduction-derived draft:
-```
+```text
 Clarinet in Bb: rapid arpeggios crossing the B4–C5 break, ♩=160
 Trumpet in Bb:  sustained written B5, pp, held for 8 bars
 Timpani:        pedal changes D→G→C→F#→Bb, one beat per change

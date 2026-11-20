@@ -391,7 +391,7 @@ tee >(gzip > archive.gz) >(wc -l > line_count.txt) > /dev/null < input.txt
 
 A process transitions through a well-defined set of kernel states. On Linux, these are defined in `include/linux/sched.h` as `task_state_array`. The states visible via `ps` are:
 
-```
+```text
 R — TASK_RUNNING: on a CPU or on the run queue, ready to run
 S — TASK_INTERRUPTIBLE: sleeping, woken by signal or event
 D — TASK_UNINTERRUPTIBLE: sleeping in uninterruptible I/O (cannot be killed with SIGKILL)

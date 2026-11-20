@@ -281,7 +281,7 @@ After a START, the master transmits a 7-bit slave address followed by a read/wri
 
 Here is a high-level state diagram for an I2C bus cycle:
 
-```
+```text
 ┌─────────────────┐
 │  START Condition│  SDA: High→Low while SCL=High
 └────────┬────────┘

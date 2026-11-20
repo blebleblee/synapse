@@ -89,7 +89,7 @@ graph LR
 
 ### C Major Across the Full Neck (Same Pitches, Five Locations)
 
-```
+```text
 Position 1: C Shape (open)        Position 2: A Shape (barre, fret 3)
 e |--0--                          e |--3--
 B |--1--  index                   B |--5--  barre (index)
@@ -123,7 +123,7 @@ E |--x--
 
 Diagram convention used throughout: strings listed low to high (**E A D G B e**), numbers are fret positions, **x** = don't play that string, **0** = open string, finger numbers 1=index, 2=middle, 3=ring, 4=pinky.
 
-```
+```text
 E Major (022100)          E Minor (022000)
 e |--0--                  e |--0--
 B |--0--                  B |--0--
@@ -209,7 +209,7 @@ flowchart LR
 
 The nut end of the neck has the highest string tension and widest fret spacing, making it the hardest place to barre. Start higher up where it's physically easier, then work down.
 
-```
+```text
 Week 1: Barre at fret 7  (easiest)  → A-shape fingering = B major chord
 Week 2: Barre at fret 5             → E-shape fingering = A major chord
 Week 3: Barre at fret 3             → E-shape fingering = G major chord
@@ -226,7 +226,7 @@ Week 4: Barre at fret 1  (hardest)  → E-shape fingering = F major chord
 
 Key of G: **G – D – Em – C**
 
-```
+```text
 G (320003) → D (xx0232) → Em (022000) → C (x32010)
 
 Strum (one bar each, 4/4):
@@ -242,7 +242,7 @@ Same progression, key of C: **C – G – Am – F**
 
 Key of E: **E – A – B7**
 
-```
+```text
 E (022100) → A (x02220) → B7 (x21202)
 
 B7 fingering:
@@ -262,7 +262,7 @@ Strum:  D  .  D  U  .  U  D  U
 
 Key of C: **C – Am – F – G**
 
-```
+```text
 C (x32010) → Am (x02210) → F (133211) → G (320003)
 ```
 
@@ -272,7 +272,7 @@ Notice the pivot: ring finger stays planted on the 3rd fret of the A string thro
 
 Key of G: **Am7 – D7 – Gmaj7**
 
-```
+```text
 Am7 (x02010)          D7 (xx0212)           Gmaj7 (320002)
 e |--0--              e |--2-- (2)           e |--2-- (2)
 B |--1-- (1)           B |--1-- (1)           B |--0--
@@ -289,7 +289,7 @@ E |--x--              E |--x--              E |--3-- (3)
 ### Four Core Patterns — Learn in This Order
 
 **Pattern 1 — All Downstrokes**
-```
+```text
 Beat:   1    2    3    4
         D    D    D    D
 Metronome: 60 → 80 → 100 BPM
@@ -297,7 +297,7 @@ Feel: driving, locked — country and rock ballad foundation
 ```
 
 **Pattern 2 — 8th Note Down-Up**
-```
+```text
 Beat:   1   &   2   &   3   &   4   &
         D   U   D   U   D   U   D   U
 Metronome: 60 → 90 → 120 BPM
@@ -305,7 +305,7 @@ Feel: even and flowing — the pattern everything else builds from
 ```
 
 **Pattern 3 — "Skip" Pattern (the most common pop/folk feel)**
-```
+```text
 Beat:   1   &   2   &   3   &   4   &
         D   .   D   U   .   U   D   U
 Metronome: 70 → 90 → 110 BPM
@@ -313,7 +313,7 @@ Feel: syncopated, appears in thousands of recorded songs
 ```
 
 **Pattern 4 — 16th Note Syncopation with Ghost Strokes**
-```
+```text
 Beat:   1  e  &  a  2  e  &  a  3  e  &  a  4  e  &  a
         D  .  U  .  D  .  U  U  D  .  U  .  D  U  .  U
 Metronome: 60 → 80 BPM (16ths feel fast — do not rush this)
@@ -326,7 +326,7 @@ Feel: funk/R&B-tinged contemporary acoustic pop
 
 Mid-phrase, relax fretting-hand pressure just enough that fingers stay on the strings but don't fret a clean note. Strum through — you get a percussive "chk" with no pitch, notated **X**.
 
-```
+```text
 Beat:   1   &   2   &   3   &   4   &
         D   X   D   U   X   U   D   X
 ```
@@ -360,7 +360,7 @@ sequenceDiagram
 
 Pick two chords. Set a metronome to a tempo where you can change cleanly even if slow. Play each chord for one beat, switch, repeat for 60 seconds, count every clean change. That number is your baseline — write it down.
 
-```
+```text
 Week 1 target (clean changes per minute, 60 BPM):
   C ↔ G:  20+
   G ↔ D:  20+
@@ -375,14 +375,14 @@ Week 8 target: 40+ at 100 BPM
 
 Before switching, find any finger that lands on the same string and fret in both chords. That finger stays down through the transition — it's your anchor and your timing reference.
 
-```
+```text
 C → Am:
   C  (x32010): index on B1, middle on D2, ring on A3
   Am (x02210): index on B1, middle on D2, ring on A2
   → Index and middle never move. Only the ring finger shifts one fret (A3 → A2).
 ```
 
-```
+```text
 G → Cadd9, using the pinky G voicing (320004):
   G (pinky on e, ring on A2, middle on E3)
   Cadd9 (x32033): ring shifts to A3, pinky stays open on e,
@@ -425,7 +425,7 @@ Travis picking is the backbone of folk, country, and solo acoustic fingerstyle. 
 
 ### Right Hand Assignment
 
-```
+```text
 Thumb  (p) → alternates between 6th and 4th strings
              (use 5th and 4th instead for A-root chords like Am, C)
 Index  (i) → 3rd string
@@ -435,7 +435,7 @@ Ring   (a) → 1st string
 
 ### Basic Pattern on G Major
 
-```
+```text
 e |--------3---------3---------3---------3--|
 B |------0---0-----0---0-----0---0-----0---0|
 G |----0-------0-0-------0-0-------0-0-------|
@@ -450,7 +450,7 @@ Thumb hits E6 on beat 1, D4 on beat 3; index and middle fill in the off-beats on
 
 ### Travis Metronome Progression
 
-```
+```text
 Phase 1 — Thumb only, 50 BPM
   Alternate E6–D4 every beat, no other fingers playing.
   Goal: the bass line is rock solid with zero hesitation before
@@ -536,7 +536,7 @@ flowchart TD
 **Stop immediately if you feel**: sharp or shooting pain (distinct from normal muscle fatigue), tingling or numbness in fingers or palm, or any pain lasting more than 24 hours after playing. These are nerve or tendon signals, not something to practice through.
 
 **Pre-practice warm-up (5 minutes, every session):**
-```
+```text
 1. Wrist circles — 10 slow rotations each direction, both wrists
 2. Finger spreads — splay fingers wide, hold 5 sec, 5 reps
 3. Forearm extensor stretch — arm out, palm down, gently
@@ -568,7 +568,7 @@ flowchart LR
 
 ### Pick Angle
 
-```
+```text
 15° (near parallel):  thin, bright, fast attack — bluegrass lead feel
 25° (moderate):        balanced warmth and clarity — general strumming
 40° (steep):           full, round, slightly slower attack — ballads
@@ -627,7 +627,7 @@ flowchart LR
 
 ### Progress Log
 
-```
+```text
 Date      | Chord Pair | Tempo | Clean Changes/min | Target
 ----------|-------------|-------|--------------------|--------
 Day 1     | C → G       | 60    | 14                 | 20

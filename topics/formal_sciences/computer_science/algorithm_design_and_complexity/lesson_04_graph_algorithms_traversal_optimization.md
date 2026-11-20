@@ -26,7 +26,7 @@ The edge classification scheme produced by DFS provides immediate structural dia
 
 Topological ordering exploits the completion-time ordering produced by DFS to construct a linearization of a directed acyclic graph. Upon completing the recursive exploration of a vertex $v$, prepending $v$ to an output list ensures that all vertices reachable from $v$ appear later in the final sequence. This reverse postorder traversal respects all edge directions: for any edge $(u, v)$, vertex $u$ must complete after $v$ (since $v$ is reachable from $u$), placing $u$ before $v$ in the final ordering. The presence of any back edge during DFS immediately invalidates the existence of a topological order, as back edges encode cycles that preclude any consistent linearization.
 
-```
+```text
 DFS-Topological-Sort(G):
     Initialize all vertices as unvisited
     Initialize empty list L
@@ -53,7 +53,7 @@ Tarjan's single-pass algorithm achieves the same decomposition through simultane
 
 Breadth-first search implements level-synchronous exploration through explicit queue management, ensuring that all vertices at distance $k$ from the source are discovered before any vertex at distance $k+1$. Initialization sets the source vertex distance to zero and enqueues it, while all other vertices receive infinite distance sentinels. The exploration loop dequeues the front vertex $u$, examines all neighbors $v$, and for each unvisited neighbor, sets $\text{dist}[v] = \text{dist}[u] + 1$, records $u$ as the parent of $v$, and enqueues $v$. This parent-pointer chain encodes the shortest-path tree rooted at the source, enabling path reconstruction through backward traversal from any destination vertex.
 
-```
+```text
 BFS(G, s):
     For each vertex v in V:
         dist[v] = ∞
@@ -75,7 +75,7 @@ The extension to weighted graphs with non-negative edge weights transforms BFS i
 
 The relaxation primitive admits a clean algebraic interpretation as iterative application of the edge-induced distance operator. For an edge $(u, v)$ with weight $w(u, v)$, relaxation tests the triangle inequality $\text{dist}[v] \leq \text{dist}[u] + w(u, v)$ and restores it if violated. Bellman-Ford generalizes this observation to universal relaxation: in iteration $i$, all edges are relaxed, ensuring that shortest paths using at most $i$ edges are correctly computed. After $|V| - 1$ iterations, all shortest paths in acyclic scenarios are finalized, as any simple path contains at most $|V| - 1$ edges. A final $(|V|)$-th iteration detects negative cycles: if any relaxation succeeds, a shorter path with $|V|$ edges exists, necessarily containing a cycle of negative total weight.
 
-```
+```text
 Bellman-Ford(G, s):
     For each vertex v in V:
         dist[v] = ∞
@@ -96,7 +96,7 @@ Floyd-Warshall computes all-pairs shortest paths through dynamic programming on 
 
 Kruskal's minimum spanning tree algorithm processes edges in non-decreasing weight order, greedily adding edges that connect previously disconnected components. The union-find data structure maintains disjoint-set membership, supporting near-constant-time find and union operations through path compression and union-by-rank heuristics. For each edge $(u, v)$ in sorted order, if $\text{find}(u) \neq \text{find}(v)$, the edge is added to the spanning tree and $\text{union}(u, v)$ merges their components. After processing $|V| - 1$ accepted edges, the algorithm terminates with a minimum spanning tree. Correctness follows from the cut property: for any cut $(S, V \setminus S)$ with no spanning tree edges crossing it, the minimum-weight crossing edge is safe to add.
 
-```
+```text
 Kruskal(G):
     Sort edges E by weight in non-decreasing order
     Initialize union-find structure for V
@@ -118,7 +118,7 @@ The Ford-Fulkerson method for maximum flow iteratively finds augmenting paths in
 
 The max-flow min-cut theorem establishes that upon termination, the maximum flow value equals the minimum capacity of any cut separating source from sink. When no augmenting path exists, the set $S$ of vertices reachable from $s$ in the final residual graph forms one side of a minimum cut, with $V \setminus S$ forming the other side. All edges from $S$ to $V \setminus S$ must be saturated (carry flow equal to capacity), while all edges from $V \setminus S$ to $S$ must carry zero flow, else residual capacity would permit further augmentation. The cut capacity equals the sum of capacities of edges from $S$ to $V \setminus S$, exactly matching the achieved flow value.
 
-```
+```text
 Ford-Fulkerson(G, s, t):
     Initialize flow f(u, v) = 0 for all edges (u, v)
     

@@ -26,7 +26,7 @@ Beyond allocation strategy, memory models define the semantics of concurrent acc
 
 The virtual address space layout on Linux x86-64 divides the 48-bit address range into user and kernel halves. User space occupies addresses from `0x0000000000000000` to `0x00007fffffffffff`, while kernel space spans `0xffff800000000000` to `0xffffffffffffffff`. The canonical address constraint requires that addresses sign-extend bit 47, creating a non-canonical hole in the middle that triggers general protection faults on access. Within user space, the kernel maps text (executable code) at low addresses starting around `0x400000` for position-independent executables or randomized under ASLR. Data and BSS sections follow immediately after text, containing initialized and zero-initialized globals. The heap begins after BSS and grows upward through `brk` or `mmap` calls. Memory-mapped regions—shared libraries, anonymous mappings, file mappings—occupy the middle range. The stack begins at high addresses, typically around `0x7fffffffffff`, and grows downward. Guard pages with no permissions sit below the stack to catch overflow, triggering segmentation faults rather than silently corrupting adjacent memory.
 
-```
+```text
 High Addresses (0x00007fffffffffff)
     ┌─────────────────────────────────┐
     │       Kernel Space              │  (0xffff8000... - not accessible)

@@ -28,7 +28,7 @@ Preventive maintenance intervals derive from stress factors that accumulate as f
 
 The charging system electrical topology begins with the stator coil assembly, a three-phase winding embedded within the left engine cover and positioned concentrically around the flywheel rotor. Unlike automotive alternators that employ electromagnetic field coils powered by rotor slip rings, the motorcycle stator relies on permanent magnets affixed to the flywheel perimeter, eliminating brushes and field control but sacrificing output regulation at the source. The stator consists of three independent coil groups, each comprising multiple turns of magnet wire wound onto laminated silicon-steel poles arranged in a circular pattern. As the flywheel rotates, the permanent magnet poles sweep past the stator teeth, inducing voltage according to Faraday's law. The three coil groups produce sinusoidal voltages phase-shifted by one hundred twenty electrical degrees, enabling efficient rectification and reducing torque ripple on the crankshaft.
 
-```
+```text
 Stator Three-Phase Output Waveform & Rectification Topology:
 
 Phase A  ───┐     ┌────┐     ┌────

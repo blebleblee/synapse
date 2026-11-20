@@ -40,7 +40,7 @@ Suppletion operates for a small set of high-frequency verbs where the aspectual 
 
 The architectural schematic of aspectual pairing proceeds as follows:
 
-```
+```text
 BASE IMPERFECTIVE (unprefixed)
     ↓
 PREFIX ATTACHMENT → PERFECTIVE (prefixed)
@@ -50,7 +50,7 @@ SECONDARY IMPERFECTIVIZING SUFFIX → SECONDARY IMPERFECTIVE (prefixed + suffix)
 
 For the concrete example of the root *писать* (to write):
 
-```
+```text
 писать (to write, imperfective, unprefixed)
     ↓ [prefix на-]
 написать (to write/finish writing, perfective, prefixed)

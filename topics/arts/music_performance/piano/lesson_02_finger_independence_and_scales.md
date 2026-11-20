@@ -131,7 +131,7 @@ This is the most important drill in the lesson for most players. Give it the mos
 
 #### 1A — Hold 1+2+3, Move 4
 
-```
+```text
 Key:     C4   D4   E4   F4   G4
 Finger:   1    2    3    4    5
          hold hold hold MOVE hold
@@ -149,7 +149,7 @@ Press finger 4 to the keybed and release, repeatedly. Fingers 1, 2, 3 must not l
 
 #### 1B — Hold 2+3+5, Move 4
 
-```
+```text
 Key:     C4   D4   E4   F4   G4
 Finger:   1    2    3    4    5
          free hold hold MOVE hold
@@ -167,7 +167,7 @@ Harder: holding 5 as well removes the escape route of letting 4 and 5 move toget
 
 Most players train the press and never train the lift, leaving extensor crosstalk completely unaddressed.
 
-```
+```text
 Hold fingers 2, 3, 5 lightly on their keys.
 Lift finger 4 off F4 as high as you comfortably can — held fingers must not move.
 Lower it back to the key surface WITHOUT pressing.
@@ -188,7 +188,7 @@ Dismissed as mechanical when practiced mindlessly. Used with a specific listenin
 
 **Pattern (C position, right hand ascending):**
 
-```
+```text
 Finger:  1  2  3  4  5  4  3  2  |  1  2  3  4  5  4  3  2
 Note:    C  D  E  F  G  F  E  D  |  C  D  E  F  G  F  E  D
 Beat:    1  +  2  +  3  +  4  +  |  (repeat, shifting up a step each bar)

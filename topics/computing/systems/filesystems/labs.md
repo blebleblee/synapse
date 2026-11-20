@@ -308,7 +308,7 @@ time ./target/release/fslab
 
 Expected output structure:
 
-```
+```text
 Starting sync-write benchmark...
 Block size: 4096 bytes
 Write count: 1000
@@ -337,7 +337,7 @@ perf stat -e cycles,instructions,branches,branch-misses,cache-references,cache-m
 
 Output example:
 
-```
+```text
 Performance counter stats for './target/release/fslab':
 
     87,459,234,891      cycles
@@ -539,7 +539,7 @@ valgrind --tool=cachegrind \
 
 Cachegrind emits a summary report to stderr and writes detailed per-function statistics to a file named `cachegrind.out.<pid>`. The summary resembles:
 
-```
+```text
 ==12345== Cachegrind, a cache and branch-prediction profiler
 ==12345== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.
 ==12345== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
@@ -582,7 +582,7 @@ cg_annotate cachegrind.out.12345 > ~/fslab/profiles/cachegrind_annotated.txt
 
 Open `~/fslab/profiles/cachegrind_annotated.txt` and locate the `scan_directory_recursive` function. The annotation displays instruction fetch (Ir), L1 data read (Dr), L1 data write (Dw), and corresponding miss counts alongside each source line:
 
-```
+```text
 --------------------------------------------------------------------------------
 -- User-annotated source: src/main.rs
 --------------------------------------------------------------------------------
@@ -615,7 +615,7 @@ LLC-loads,LLC-load-misses,dTLB-loads,dTLB-load-misses \
 
 Expected output structure:
 
-```
+```text
 Scanning directory: /usr
 Worker threads: 4
 
@@ -810,7 +810,7 @@ Execute the instrumented binary:
 
 If the workload contains data races (unlikely in this carefully synchronized example), TSan will emit reports resembling:
 
-```
+```text
 ==================
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7f8a4c001000 by thread T2:
@@ -867,7 +867,7 @@ ASAN_OPTIONS=detect_leaks=1:log_path=~/fslab/sanitizer-logs/asan.log \
 
 ASan writes leak reports to the specified log file. Examine `~/fslab/sanitizer-logs/asan.log.*`:
 
-```
+```text
 =================================================================
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 
@@ -911,7 +911,7 @@ ASAN_OPTIONS=detect_leaks=1 ./target/x86_64-unknown-linux-gnu/debug/fslab
 
 Expected output for a race-free, leak-free implementation:
 
-```
+```text
 Starting filesystem race condition stress test
 Test directory: /tmp/fslab_race_test
 

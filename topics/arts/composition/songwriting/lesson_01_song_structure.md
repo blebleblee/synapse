@@ -26,7 +26,7 @@ That's the entire theory section. Everything from here is execution.
 
 **Guitar/piano chart (C major, 16 bars, verse that actually breathes):**
 
-```
+```text
 Bars 1–4:   | C      | Am     | F      | G      |
 Bars 5–8:   | C      | Am     | F      | G      |
 Bars 9–12:  | Dm     | G      | Em     | Am     |
@@ -55,7 +55,7 @@ Bars 1–8 repeat the I–vi–IV–V loop so the ear settles in. Bars 9–12 wa
 
 **The progression to learn cold: I–V–vi–IV ("the axis")**
 
-```
+```text
 Bars 1–4:   | C      | G      | Am     | F      |
 Bars 5–8:   | C      | G      | F      | G      |
 ```
@@ -73,7 +73,7 @@ Why this exact progression shows up in hundreds of hits: the top note of each ch
 Keep your hand roughly in the same five-key zone; let your thumb and pinky do the small adjustments instead of relocating your whole hand.
 
 **Melody (scale degrees):**
-```
+```text
 Bars 1–4:   1̂ 2̂ 3̂ 4̂ | 1̂ 2̂ 3̂ 4̂ |
 Bars 5–8:   5̂ 5̂ 5̂ 5̂ | 3̂ 2̂ 1̂ rest |
 ```
@@ -89,7 +89,7 @@ The ascending run in bars 1–4 tracks the chord roots moving upward, so it feel
 
 **The move:** park on the V chord (or ii–V) and don't resolve it.
 
-```
+```text
 Bars 1–4:   | G      | G      | Am     | D      |
 Bars 5–8:   | G      | G      | G      | G      |
 ```
@@ -110,20 +110,20 @@ Here, Am–D briefly acts like a ii–V aimed at G (the dominant of C), then bar
 By the time the bridge arrives, the listener has heard verse-chorus twice. Their brain has the pattern memorized and is coasting. The bridge's entire value comes from refusing to continue that pattern — harmonically, melodically, rhythmically, or texturally.
 
 **Strategy A — Start on vi instead of I:**
-```
+```text
 Bars 1–4:   | Am     | F      | C      | G      |
 Bars 5–8:   | Dm     | Am     | F      | G      |
 ```
 Opening on Am instead of C is immediately audible as "not a verse, not a chorus." Bar 8 lands on G (dominant), which resolves hard into C when the final chorus hits.
 
 **Strategy B — Secondary dominant chain (more chromatic pull):**
-```
+```text
 | D      | G      | E      | F      |
 ```
 D is the V of G (which is the V of C) — it tonicizes G briefly before E tonicizes F. This creates a stepwise chromatic bassline (D→G is a leap, but the overall sequence pulls the ear forward through unfamiliar chords before snapping back to the home key).
 
 **Strategy C — Strip everything and rebuild (works great live and in the studio):**
-```
+```text
 Bars 1–4:   | C      | C      | C      | C      |
 Bars 5–8:   | G      | G      | G      | G      |
 ```
@@ -250,7 +250,7 @@ Differentiating verse from chorus isn't only a harmony problem — it's an arran
 
 Pick a key you can comfortably sing in (test this first — hum your melody idea before committing to a key, not after). Write out the chord chart for every section before touching melody:
 
-```
+```text
 Intro (8 bars):   | C | Am | F | G | C | Am | F | G |
 Verse (16 bars):  | C | Am | F | G | C | Am | F | G | Dm | G | Em | Am | F | G | C | C |
 Chorus (8 bars):  | C | G | Am | F | C | G | F | G |

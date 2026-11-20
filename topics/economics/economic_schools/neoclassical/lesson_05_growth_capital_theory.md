@@ -42,7 +42,7 @@ The steady state occurs where $\dot{k}_t = 0$, implying $s f(k^*) = (n + \delta)
 
 Graphical analysis illuminates the convergence dynamics. Plot capital per worker $k$ on the horizontal axis. The curve $s f(k)$ represents gross investment per worker, rising with $k$ but at a decreasing rate due to diminishing returns. The line $(n+\delta)k$ represents effective depreciation, growing linearly with $k$. The steady state occurs at the unique intersection point. To the left of $k^*$, gross investment exceeds depreciation, so $\dot{k} > 0$ and capital per worker rises. To the right of $k^*$, depreciation dominates, so $\dot{k} < 0$ and capital per worker falls. The steady state is globally stable: regardless of initial conditions, the economy converges monotonically to $k^*$.
 
-```
+```text
            s·f(k)
               ^
               |     (n+δ)k

@@ -154,7 +154,7 @@ OSPF detects link failure through Hello timer expiration (default 40 seconds: 10
 
 Configure BFD alongside OSPF in FRRouting to demonstrate this in practice:
 
-```
+```text
 router ospf
   ospf router-id 10.0.0.1
   network 10.0.0.0/8 area 0
@@ -171,7 +171,7 @@ bfd
 
 BGP convergence is structurally slower due to the MRAI (Minimum Route Advertisement Interval), which rate-limits UPDATE messages to 30 seconds for eBGP by default (0 seconds for iBGP). Operators running BGP over datacenter fabrics where fast convergence matters set `advertisement-interval 0` and pair it with BFD to achieve sub-second convergence:
 
-```
+```text
 router bgp 65001
   neighbor 10.0.1.2 remote-as 65002
   neighbor 10.0.1.2 advertisement-interval 0
@@ -188,7 +188,7 @@ For OSPF and IS-IS, the equivalent mechanism is SPF throttling. Rather than runn
 
 Configure SPF throttling in FRRouting:
 
-```
+```text
 router ospf
   timers throttle spf 50 200 5000
 ```

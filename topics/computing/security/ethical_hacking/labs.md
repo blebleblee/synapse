@@ -26,7 +26,7 @@ Once the UART baud rate is identified, establish a bidirectional terminal sessio
 
 Next, investigate JTAG presence and functionality. JTAG is a boundary-scan standard (IEEE 1149.1) originally designed for PCB manufacturing test but widely repurposed for in-circuit debugging. A functional JTAG interface allows full control over the processor core: halting execution, reading and writing memory, setting breakpoints, and single-stepping through instructions. Connect the JTAG adapter's TDI, TDO, TCK, TMS, and GND lines to the corresponding target board pins. If TRST is present, connect it as well; otherwise, leave it floating. Power the target device and launch OpenOCD with an appropriate configuration. For an STM32F4 microcontroller using an FTDI-based adapter, execute `openocd -f interface/ftdi/um232h.cfg -f target/stm32f4x.cfg`. OpenOCD will enumerate the JTAG chain, reporting detected TAP (Test Access Port) controllers and their IDCODE values. A successful connection yields output resembling:
 
-```
+```text
 Info : clock speed 1000 kHz
 Info : JTAG tap: stm32f4x.cpu tap/device found: 0x4ba00477 (mfg: 0x23b (ARM Ltd), part: 0xba00, ver: 0x4)
 Info : stm32f4x.cpu: hardware has 6 breakpoints, 4 watchpoints
@@ -49,7 +49,7 @@ Begin by extracting firmware from an external SPI flash chip using flashrom. Dis
 
 Execute `flashrom -p ft2232_spi:type=232H,port=A` to probe the flash chip. Flashrom queries the JEDEC ID (manufacturer and device code) and reports the detected chip model, capacity, and supported erase block sizes. For a typical Winbond W25Q32 (32 Mbit / 4 MiB) flash, the output resembles:
 
-```
+```text
 Found Winbond flash chip "W25Q32.V" (4096 kB, SPI) on ft2232_spi.
 ```
 
@@ -57,7 +57,7 @@ To read the entire flash contents into a file, execute `flashrom -p ft2232_spi:t
 
 Analyze the extracted firmware with binwalk to identify embedded filesystems, compressed archives, and cryptographic signatures. Execute `binwalk firmware_dump.bin` to generate a summary of detected structures. Common findings include U-Boot bootloader headers at offset 0x0000, kernel images (zImage or uImage) compressed with gzip or LZMA, and SquashFS or JFFS2 filesystems containing the root directory tree. For example:
 
-```
+```text
 DECIMAL       HEXADECIMAL     DESCRIPTION
 --------------------------------------------------------------------------------
 0             0x0             U-Boot uImage header, ARM, Linux Kernel Image, Tue Jul 18 14:32:10 2023
@@ -81,7 +81,7 @@ Fault injection attacks manipulate a device's physical operating conditions—vo
 
 The target firmware implements a simple password check: the user enters a password via UART, and the device compares it against a hardcoded reference string stored in flash. If the strings match, the device grants access to a diagnostic shell; otherwise, it denies access and resets. The comparison is performed by a byte-wise loop that returns immediately upon detecting a mismatch. The assembly code for the comparison function, disassembled via GDB, resembles:
 
-```
+```text
 08000a10:  ldrb r2, [r0], #1
 08000a12:  ldrb r3, [r1], #1
 08000a14:  cmp  r2, r3

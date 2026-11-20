@@ -201,7 +201,7 @@ ctx.restore();
 
 The transformation matrix forms a 3×3 affine matrix in homogeneous coordinates:
 
-```
+```text
 [ a  c  e ]   [ scaleX  skewX   translateX ]
 [ b  d  f ] = [ skewY   scaleY  translateY ]
 [ 0  0  1 ]   [   0       0         1     ]

@@ -186,7 +186,7 @@ Readiness probe failures isolate unhealthy pods from load balancing without rest
 
 Rolling updates orchestrate Deployment changes through a carefully controlled dance between two ReplicaSets. When you modify the Deployment's pod template, the Deployment controller creates a new ReplicaSet with zero replicas. It then begins incrementally scaling up the new ReplicaSet while scaling down the old ReplicaSet, maintaining the total pod count within bounds set by `maxSurge` and `maxUnavailable`. The update proceeds in waves, creating new pods, waiting for them to pass readiness probes, and only then terminating old pods.
 
-```
+```text
 Rolling Update State Progression:
 
 Initial State: Deployment with 4 replicas

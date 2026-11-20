@@ -50,7 +50,7 @@ The key architectural insight here is that the kernel's active policy is a *link
 
 The building block of every SELinux policy is the *type declaration*. A type is simply a named label — an integer in the kernel's internal representation — associated with either a process domain or a file/resource class. The declaration syntax is minimal:
 
-```
+```text
 type httpd_t;
 type httpd_exec_t;
 type httpd_log_t;
@@ -61,7 +61,7 @@ These four declarations define a process domain (`httpd_t`), an entry point file
 
 Attributes are the mechanism by which SELinux policy achieves composability without combinatorial explosion. Rather than writing allow rules for every domain that needs to read a configuration file, the policy author declares an attribute and writes the rule once against the attribute. All types that inherit the attribute automatically benefit from the rule.
 
-```
+```text
 attribute domain;
 attribute file_type;
 attribute exec_type;
@@ -77,7 +77,7 @@ This pattern is pervasive in the Reference Policy, the upstream SELinux policy m
 
 Domain transitions are the mechanism by which a process changes its security label across an `execve`. The kernel enforces three conditions for a transition to occur: the calling domain must have `execute` permission on the executable's type, it must have `transition` permission to the new domain, and the entry point type must have `entrypoint` permission for the new domain. All three conditions expressed in policy look like this:
 
-```
+```text
 allow httpd_t httpd_exec_t : file { execute read open getattr };
 allow httpd_t httpd_t      : process transition;
 allow httpd_t httpd_exec_t : file entrypoint;
@@ -107,7 +107,7 @@ SELinux implements RBAC as a layer above TE, governing which users may enter whi
 
 A role declaration establishes a named role, and `role_allow` rules determine which roles can transition to other roles. A type is associated with a role through `role` declarations:
 
-```
+```text
 role staff_r;
 role sysadm_r;
 
@@ -127,7 +127,7 @@ Multi-Level Security (MLS) adds a fourth dimension to the security context — t
 
 The practical relevance of MLS for the security practitioner audience is not in its theoretical purity but in its operational mechanics. MLS policy constraints are expressed as `mlsconstrain` rules that operate on pairs of contexts and are evaluated alongside TE rules. A process in `httpd_t` at `s0` trying to access a file at `s1` will be denied not by an `allow` rule but by the MLS constraint on the `file` class's `read` permission, which checks `h1 dom h2` (the high-clearance of the subject dominates the high-clearance of the object). This constraint evaluates independently of TE, meaning you can have a correct TE `allow` rule and still be denied by MLS — a source of confusion in multi-category deployments.
 
-```
+```text
 mlsconstrain file { read getattr }
     ( l1 dom l2 );
 
@@ -252,7 +252,7 @@ For practitioners performing security audits of third-party SELinux policies —
 
 The audit workflow is to compile a set of `neverallow` assertions representing your security model and attempt to load them as a separate module:
 
-```
+```text
 neverallow ~kernel_t self : capability sys_module;
 neverallow ~sysadm_t ~shadow_t : file { read write };
 neverallow httpd_t { etc_t passwd_file_t shadow_t } : file write;

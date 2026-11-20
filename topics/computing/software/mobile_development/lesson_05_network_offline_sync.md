@@ -34,7 +34,7 @@ The reachability monitor is responsible for maintaining an accurate view of netw
 
 A robust reachability implementation maintains a three-state model: online, offline, and degraded. The online state indicates that the network is reachable and the application has successfully completed a recent health check against its backend API. The offline state is entered when the platform reports no available network interfaces or when active probing has failed repeatedly. The degraded state represents an ambiguous condition where the network appears available but quality is poor—high packet loss, extreme latency, or intermittent failures. In the degraded state, the sync engine should reduce its retry aggressiveness and might choose to defer large payloads until connectivity improves.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    Reachability Monitor                      │
 │                                                              │

@@ -22,7 +22,7 @@ The third invariant concerns the **lifecycle of a symbol**. A symbol name is bor
 
 An ELF file is organized around a small set of precisely defined data structures. The root of the entire format is the **ELF header** (`Elf64_Ehdr` in 64-bit), which occupies the first 64 bytes of any ELF file. Its magic bytes, `0x7f 0x45 0x4c 0x46` (`\x7fELF`), serve as the first check in every binary identification routine. The header encodes the file class (32-bit or 64-bit), the data encoding (little-endian or big-endian), the ELF version, the OS/ABI (which is almost always `ELFOSABI_NONE` = 0 for Linux, since Linux-specific extensions are negotiated through other mechanisms), the object file type (`ET_EXEC` for a non-PIE executable, `ET_DYN` for a shared object or PIE executable, `ET_REL` for a relocatable object file, `ET_CORE` for a core dump), the target ISA, the entry point virtual address, and the file offsets of both the Program Header Table and the Section Header Table.
 
-```
+```text
 ELF File Structure (64-bit)
 ─────────────────────────────────────────────────────
  Offset 0x00  ┌─────────────────────────────────────┐
@@ -97,7 +97,7 @@ For a security researcher, the GOT is a high-value target. GOT overwrite attacks
 
 The Portable Executable format carries significant historical baggage from DOS compatibility. Every PE file begins with an **MS-DOS stub**, a minimal DOS executable whose only purpose is to print "This program cannot be run in DOS mode" and exit. The DOS header (`IMAGE_DOS_HEADER`) is 64 bytes, and its last meaningful field is `e_lfanew`, a 32-bit offset pointing to the actual PE signature `PE\0\0` followed by the **COFF File Header** (`IMAGE_FILE_HEADER`) and the **Optional Header** (`IMAGE_OPTIONAL_HEADER`). The Optional Header is not optional; it is mandatory for executables and contains the most operationally significant fields in the entire format.
 
-```
+```text
 PE File Structure
 ─────────────────────────────────────────────────────
  0x00   ┌─────────────────────────────────────────┐
@@ -135,7 +135,7 @@ Malware frequently uses IAT obfuscation to defeat this analysis. Common techniqu
 
 Mach-O organizes a binary as a sequence of variable-length **load commands** immediately following a fixed-size header. The header (`mach_header_64` for 64-bit) encodes a magic number (`0xFEEDFACF` for 64-bit little-endian, `0xCFFAEDFE` as it appears in memory on a little-endian system when read as a 32-bit integer), the CPU type and subtype (which distinguish x86-64 from ARM64 and further distinguish Apple Silicon variants), the file type (`MH_EXECUTE`, `MH_DYLIB`, `MH_BUNDLE`, `MH_KEXT_BUNDLE`, `MH_FILESET` for the new merged kernel cache format used in Apple Silicon), and flags encoding properties like `MH_PIE` (address space randomization), `MH_TWOLEVEL` (two-level namespace symbol resolution, which binds symbols to their source library rather than searching a flat global namespace), and `MH_NO_HEAP_EXECUTION` (the macOS equivalent of NX on the heap).
 
-```
+```text
 Mach-O File Structure (64-bit)
 ─────────────────────────────────────────────────────
  0x00  ┌─────────────────────────────────────────┐

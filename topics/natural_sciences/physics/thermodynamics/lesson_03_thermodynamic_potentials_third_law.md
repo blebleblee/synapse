@@ -98,7 +98,7 @@ The unattainability principle, a corollary of the Third Law, asserts that no fin
 
 The mathematical architecture of thermodynamic potentials reveals an elegant hierarchical structure. Each potential derives from internal energy through successive Legendre transformations, and each potential's natural variables determine which experimental conditions it describes most efficiently. The following transformation diagram captures this structure:
 
-```
+```text
                     U(S,V,N)
                    /        \
         -TS       /          \      +PV

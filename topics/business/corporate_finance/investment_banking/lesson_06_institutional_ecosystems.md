@@ -86,7 +86,7 @@ The arranger bank's syndication risk is the central operational concern for LevF
 
 The following diagram maps the capital structure waterfall and cash flow priority in a typical LBO:
 
-```
+```text
   ENTERPRISE VALUE (EV)
   ┌─────────────────────────────────────────────┐
   │                                             │

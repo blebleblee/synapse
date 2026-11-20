@@ -546,7 +546,7 @@ clang++ -std=c++17 -O1 -pthread \
 
 TSan will emit a report immediately on the first detected race, before the program exits. The report structure is:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=XXXXX)
   Write of size 8 at 0x... by thread T2:
     #0 increment_loop(unsigned long)
@@ -737,7 +737,7 @@ ASAN_OPTIONS=detect_leaks=1 ./asan_demo 2>&1
 
 ASan will halt the program on the out-of-bounds write to `raw[sizeof(Config)]` and print:
 
-```
+```text
 ==XXXXX==ERROR: AddressSanitizer: heap-buffer-overflow
 WRITE of size 1 at 0x... thread T0
     #0 0x... in init_config asan_demo.cpp:28
@@ -758,7 +758,7 @@ ASAN_OPTIONS=detect_leaks=1 ./asan_demo 2>&1
 
 Now LSan reports at process exit:
 
-```
+```text
 =================================================================
 ==XXXXX==ERROR: LeakSanitizer: detected memory leaks
 

@@ -46,7 +46,7 @@ Secondary structure elements arise from regular backbone conformations stabilize
 
 Experimental characterization of secondary structure exploits circular dichroism (CD) spectroscopy, which measures differential absorption of left versus right circularly polarized light. α-Helices produce characteristic double minima at 208 nm and 222 nm corresponding to π→π* and n→π* amide transitions, while β-sheets exhibit a minimum near 215 nm and maximum near 195 nm. Quantitative deconvolution of CD spectra using reference protein datasets yields secondary structure composition estimates accurate to ±5%.
 
-```
+```text
 Secondary Structure Hydrogen Bonding Patterns:
 
 α-Helix (i → i+4):

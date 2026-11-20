@@ -263,7 +263,7 @@ if __name__ == "__main__":
 
 Vertex AI's custom training requires either a pre-built container or a custom Docker image pushed to Artifact Registry. Create the following `Dockerfile` and `trainer/requirements.txt`:
 
-```
+```bash
 # trainer/requirements.txt
 torch==2.2.2
 transformers==4.40.1

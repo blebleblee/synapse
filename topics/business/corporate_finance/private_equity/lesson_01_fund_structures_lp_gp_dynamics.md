@@ -125,7 +125,7 @@ The catch-up calculation warrants careful attention. The GP's target is to recei
 
 The capital call process is a formal, time-sensitive operational workflow with legal and financial consequences for failure. When the GP identifies a deal that has passed investment committee approval, it calculates the equity check required, accounts for any existing fund-level credit facilities (subscription lines), and issues a capital call notice to each LP based on its pro-rata share of unfunded commitments.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                   CAPITAL CALL SEQUENCE                         │
 ├─────────────────────────────────────────────────────────────────┤

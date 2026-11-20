@@ -59,7 +59,7 @@ The rule-based architecture typically implements a two-tier scoring system. Low-
 
 Consider a canonical heuristic rule for detecting packer usage. Legitimate software rarely exhibits the combination of extremely high entropy in the primary code section (suggesting compression or encryption), minimal import table entries (because actual API dependencies are hidden until runtime unpacking), and an entry point that immediately jumps to a different section (the unpacking stub). Each individual characteristic appears in some benign contexts—high entropy occurs in compressed installers, minimal imports in tiny utilities, cross-section jumps in legitimate bootloaders—but their conjunction strongly correlates with packing, a technique predominantly used by malware to evade signature detection.
 
-```
+```text
 Heuristic Scoring Example (Pseudo-Logic):
 
 FEATURES:

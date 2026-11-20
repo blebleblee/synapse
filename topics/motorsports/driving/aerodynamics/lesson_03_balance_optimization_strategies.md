@@ -46,7 +46,7 @@ Modern data acquisition systems record aerodynamic-relevant channels at 100-1000
 
 The fundamental data processing workflow converts raw sensor voltages into engineering units, applies calibration coefficients derived from static load cell testing, and computes derived channels representing aerodynamic forces. The vertical force measured at each suspension corner includes contributions from static weight, inertial forces during acceleration, mechanical spring and damper forces, and aerodynamic downforce. Isolating the aerodynamic component requires subtracting static weight (measured during corner weighting with the car stationary), inertial forces (calculated from body-referenced accelerometer measurements multiplied by sprung and unsprung mass distributions), and mechanical suspension forces (computed from spring displacement multiplied by spring rate plus damper velocity multiplied by damper coefficient).
 
-```
+```text
 Vertical Force Balance Architecture:
 
 F_total,front = F_static,front + F_inertial,front + F_spring,front + F_damper,front + F_aero,front

@@ -160,7 +160,7 @@ The commit phase executes in three sub-phases: before mutation, mutation, and la
 
 After the layout phase, React schedules passive effects—primarily `useEffect` hooks—to run asynchronously after the browser has painted. This deferred execution ensures that effect code does not block the main thread and delay visual updates. The browser's event loop processes the paint and then executes the passive effects in a subsequent task:
 
-```
+```text
 [Render Phase] → [Commit: Before Mutation] → [Commit: Mutation] → 
 [Commit: Layout] → [Browser Paint] → [Passive Effects]
 ```
@@ -171,7 +171,7 @@ The virtual DOM concept, while central to React's marketing, is somewhat misname
 
 Understanding the rendering pipeline's control flow clarifies when various operations execute:
 
-```
+```text
 Component State Update
   ↓
 Scheduler enqueues work

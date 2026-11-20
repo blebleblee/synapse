@@ -420,7 +420,7 @@ The `StrategyModule` determines the order in which tasks are dispatched to worke
 
 The `linear` strategy (the default) enforces a **global synchronization barrier** between tasks. All hosts must complete task N before any host begins task N+1. This provides deterministic, easy-to-reason-about execution but introduces a **convoy effect**: the slowest host in the inventory becomes the rate-limiting factor for every task transition.
 
-```
+```text
 Time →
 
 Host 1: [Task 1 ████]  [Task 2 ████████]  [Task 3 ██]

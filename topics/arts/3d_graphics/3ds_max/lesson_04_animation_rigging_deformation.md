@@ -18,7 +18,7 @@ The core invariants governing skeletal animation are these: (1) bone hierarchies
 
 In 3ds Max, skeletal hierarchies are constructed by creating a series of bones (primitive objects or CAT Bones, Biped, or custom bone geometry) and linking them via the Link tool or hierarchy panel. Each bone has a local transform matrix that encodes its position, rotation, and scale relative to its parent. The world transform of any bone is computed recursively:
 
-```
+```text
 World_Transform(bone) = World_Transform(parent) × Local_Transform(bone)
 ```
 
@@ -26,7 +26,7 @@ This multiplication is noncommutative matrix algebra; the order matters. When yo
 
 A practical bone hierarchy for a humanoid character typically follows this structure:
 
-```
+```text
 Root (Pelvis)
 ├── Spine_01
 │   ├── Spine_02
@@ -60,7 +60,7 @@ In 3ds Max's Track View (also called Dope Sheet or Graph Editor), each bone's an
 
 Inverse kinematics reformulates the animation problem: given a target position for the end effector and a desired chain configuration, find the joint angles that satisfy the constraint. Mathematically, this is a nonlinear optimization problem:
 
-```
+```text
 Minimize: ||End_Effector_Position(θ) - Target_Position||²
 Subject to: Joint_Angle_Limits ≤ θ ≤ Joint_Angle_Limits
 ```
@@ -79,7 +79,7 @@ Skinning is the process of binding a mesh to a skeleton such that when bones mov
 
 Each vertex in the mesh is assigned a set of bone influence weights that sum to 1.0. When a bone transforms, it contributes to the vertex's final position proportionally to its weight. The formula for a vertex's deformed position is:
 
-```
+```text
 Final_Position = Σ(weight_i × Bone_Transform_i × Bind_Pose_Position)
 ```
 

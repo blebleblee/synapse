@@ -52,7 +52,7 @@ Advanced PLL solvers memorize twenty-one distinct algorithms covering all permut
 
 The complete layer-by-layer architecture can be represented as a state-transition diagram:
 
-```
+```text
 SCRAMBLED CUBE
       ↓
   [Cross Construction: Intuitive manipulation, ~12 moves]

@@ -47,7 +47,7 @@ Electrical failures in integrated systems work are almost never purely electrica
 
 The following diagram traces a typical integrated failure cascade from a single point of origin — a failed pan flashing at a window rough opening — through all three domains:
 
-```
+```text
 Window Flashing Failure
         │
         ▼

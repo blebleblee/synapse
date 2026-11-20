@@ -64,7 +64,7 @@ In the `AB_Test_Model` tab, build a sample size calculator. Enter the following 
 
 The required sample size per variant is calculated from the formula derived from the normal approximation to the binomial distribution. In a dedicated cell, enter:
 
-```
+```text
 =2 * ((NORM.S.INV(1 - B6/2) + NORM.S.INV(B5))^2 * (B2*(1-B2) + (B2*(1+B4))*(1-(B2*(1+B4))))) / (B2*B4)^2
 ```
 
@@ -78,7 +78,7 @@ In a new section of the `AB_Test_Model` tab, build a 12-week cohort retention mo
 
 For the control cohort retention curve, use an exponential decay model calibrated to realistic SaaS retention benchmarks. A healthy PLG (product-led growth) product retains approximately 60% of activated users at Week 1, 42% at Week 4, 30% at Week 8, and 24% at Week 12. Enter Week 0 as 1.0 (100% by definition), and in each subsequent week apply the decay formula. In B2 through N2 for weeks 0 through 12, enter:
 
-```
+```text
 Week 0: 1.0
 Week 1: =B2 * 0.60
 Week 2: =C2 * 0.85
@@ -97,7 +97,7 @@ For a cohort of 1,000 activated users, a Week 1 retention improvement from 60% t
 
 After your experiment runs, record the observed conversion rates for control and variant in the results section of your model. Calculate the observed lift as `=(VariantRate - ControlRate) / ControlRate`. Calculate the z-statistic using:
 
-```
+```text
 =( (VariantRate - ControlRate) ) / SQRT( ControlRate*(1-ControlRate)/ControlN + VariantRate*(1-VariantRate)/VariantN )
 ```
 

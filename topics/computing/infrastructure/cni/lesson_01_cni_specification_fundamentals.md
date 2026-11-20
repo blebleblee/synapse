@@ -26,7 +26,7 @@ The runtime-to-plugin communication channel is worth examining at the systems le
 
 When a Kubernetes node's container runtime (containerd, using its CNI library) needs to network a new pod, it does not open a socket or send a message to a running daemon. It constructs an execution environment and calls `exec()`. The plugin receives its operational context through two channels: environment variables carry the control plane parameters (operation type, container ID, namespace path, interface name, network name, CNI version, and plugin search path), while the full network configuration JSON is delivered on the plugin's standard input stream. The plugin performs its work — allocating an IP, configuring the interface, installing routes — and writes its result as a JSON object to standard output. Any diagnostic output goes to stderr and is captured by the runtime for logging. The plugin's exit code is the success signal: zero means success, nonzero means failure, and the stderr content is the error payload.
 
-```
+```text
 Runtime Process
 │
 │  fork()

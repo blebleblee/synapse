@@ -443,7 +443,7 @@ The `SharedDriver` wraps the `WebDriver` in an `Arc<Mutex<...>>`, serializing ac
 
 Compile and run the tests with ThreadSanitizer enabled. ThreadSanitizer requires nightly Rust and specific target flags. Install the nightly toolchain with `rustup install nightly`, then run `RUSTFLAGS="-Z sanitizer=thread" cargo +nightly test --target x86_64-unknown-linux-gnu test_racy_driver_concurrent`. ThreadSanitizer instruments every memory access with shadow memory tracking and vector clock updates, significantly slowing execution (typically 5-15x). The output reports data races with stack traces for both conflicting accesses:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7f8b4c001a80 by thread T2:
     #0 thirtyfour::webdriver::WebDriver::goto
@@ -458,7 +458,7 @@ ThreadSanitizer identifies the race on the WebDriver's internal state. Thread T2
 
 Detect memory leaks using AddressSanitizer's leak detector. AddressSanitizer tracks all heap allocations and, on program exit, reports any memory not reachable from roots (stack variables, global variables, and thread-local storage). Enable AddressSanitizer with `RUSTFLAGS="-Z sanitizer=address" cargo +nightly test --target x86_64-unknown-linux-gnu`. If the test suite leaks memory—for example, by failing to call `driver.quit()`, which closes the WebDriver session and terminates the browser process—AddressSanitizer reports:
 
-```
+```text
 SUMMARY: AddressSanitizer: 32768 byte(s) leaked in 1 allocation(s).
 ```
 
@@ -494,7 +494,7 @@ async fn test_use_after_free() -> Result<()> {
 
 This code obtains a raw pointer to a `WebElement`, then accesses it after the element has been dropped (when the inner scope exits). Running under AddressSanitizer triggers:
 
-```
+```text
 ERROR: AddressSanitizer: heap-use-after-free on address 0x60300000eff0
 READ of size 8 at 0x60300000eff0 thread T0
     #0 thirtyfour::webelement::WebElement::text

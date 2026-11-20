@@ -48,7 +48,7 @@ The interplay of voltage, current, and resistance manifests in predictable circu
 
 The circuit topology—series, parallel, or complex combinations—dictates how voltages and currents distribute. In series circuits, current remains constant through all components while voltage divides proportionally by resistance. In parallel circuits, voltage remains constant across all branches while current divides inversely proportional to resistance. When diagnosing a multi-branch circuit, measure the voltage at the common node to confirm it is stable, then measure current into each branch or calculate it from voltage drops across known resistances. A branch drawing excessive current indicates a low resistance fault; a branch drawing no current points to an open connection.
 
-```
+```text
 Series Circuit (LED + Resistor):
 
     +12V

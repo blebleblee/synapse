@@ -8,7 +8,7 @@ The exercises that follow use a computational stack built around Python 3.11, Sy
 
 Before beginning, verify your environment with the following sequence. These commands confirm that all required packages are present and at the correct versions.
 
-```
+```text
 python -c "import sympy; print('SymPy:', sympy.__version__)"
 python -c "import numpy; print('NumPy:', numpy.__version__)"
 python -c "import scipy; print('SciPy:', scipy.__version__)"

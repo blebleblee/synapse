@@ -128,7 +128,7 @@ An RPN transaction consists of four controller messages transmitted sequentially
 
 For example, setting the pitch bend range to ±12 semitones requires addressing RPN 0 (pitch bend sensitivity) with a value of 12:
 
-```
+```text
 0xB0 0x65 0x00   // CC 101 (RPN MSB) = 0
 0xB0 0x64 0x00   // CC 100 (RPN LSB) = 0 → RPN address = 0
 0xB0 0x06 0x0C   // CC 6 (Data Entry MSB) = 12 semitones
@@ -167,7 +167,7 @@ NRPN operates identically to RPN but uses CC 99 (NRPN MSB) and CC 98 (NRPN LSB) 
 
 The statefulness of RPN/NRPN introduces a persistent hazard: after selecting an RPN or NRPN address, subsequent Data Entry messages continue to modify that parameter until a new selection occurs. If a sequencer transmits RPN 0 (pitch bend sensitivity) at measure 1, then transmits unrelated CC 6 messages at measures 2, 3, and 4 (intending to modulate synthesizer volume via a different mapping), those CC 6 messages will instead repeatedly re-write the pitch bend sensitivity, producing erratic behavior. The specification recommends transmitting a null parameter selection—RPN 127, 127 or NRPN 127, 127—after each parameter edit to explicitly close the parameter context:
 
-```
+```text
 0xB0 0x65 0x00   // RPN MSB = 0
 0xB0 0x64 0x00   // RPN LSB = 0
 0xB0 0x06 0x0C   // Data Entry = 12 (set pitch bend range)
@@ -224,7 +224,7 @@ The finite bandwidth of DIN MIDI (31,250 baud) creates a hard upper limit on con
 
 Running status operates via implicit state: when a transmitter sends a status byte, all subsequent data-only messages (data bytes lacking a status byte MSB) are interpreted as belonging to the most recent status. For example:
 
-```
+```text
 0xB0 0x07 0x64   // CC 7 = 100 (volume), channel 0, 3 bytes
 0x07 0x65        // CC 7 = 101 (volume), channel 0, 2 bytes (running status)
 0x07 0x66        // CC 7 = 102 (volume), channel 0, 2 bytes (running status)

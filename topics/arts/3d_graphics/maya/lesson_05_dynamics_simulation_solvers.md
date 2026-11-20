@@ -26,7 +26,7 @@ The Nucleus solver architecture organizes simulation entities into a three-tier 
 
 Establishing a basic nParticle emission system requires constructing this connection graph explicitly. You create an emitter object that generates particle birth events, an nParticle shape node that holds particle attribute arrays, and a nucleus node that integrates particle motion. The emitter-to-nParticle connection streams new particle IDs and initial positions into the shape node's internal array structures, while the nParticle-to-nucleus connection registers the particle system as a simulation target, and the nucleus-to-nParticle feedback connection writes solved positions back to the shape node for viewport display and downstream rendering.
 
-```
+```text
 [Emitter Node]
     ↓ (particle birth stream)
 [nParticle Shape]
@@ -42,7 +42,7 @@ Particle attribute arrays store per-particle data in structure-of-arrays format,
 
 Field force evaluation uses spatial sampling to calculate influence at each particle's current position. A gravity field applies a uniform constant acceleration vector—typically [0, -9.8, 0] m/s² in Y-down coordinate systems—independent of particle position, while more complex fields like turbulence or vortex must evaluate position-dependent force functions. The turbulence field's force calculation uses multi-octave Perlin noise:
 
-```
+```text
 F_turbulence(p, t) = amplitude × Σ(n=0 to octaves-1) [ 
     2^(-persistence × n) × noise(frequency × 2^n × p + phase + speed × t)
 ]
@@ -56,7 +56,7 @@ Rigid body dynamics introduces the constraint solver subsystem, which enforces n
 
 The contact constraint formulation for a single collision point becomes:
 
-```
+```text
 J × v_post = -ε × J × v_pre + bias/dt
 J^T × λ = impulse applied to bodies
 ```
@@ -67,7 +67,7 @@ Friction modeling extends this impulse framework by decomposing contact impulses
 
 Soft body cloth simulation constructs its spring network from the input mesh topology. For each edge in the mesh, Maya creates a distance constraint attempting to maintain the edge's rest length. The spring force on vertex `i` connected to vertex `j` follows Hooke's law:
 
-```
+```text
 F_spring = k_s × (|p_j - p_i| - L_rest) × normalize(p_j - p_i)
 ```
 
@@ -75,7 +75,7 @@ Where `k_s` is the stretch stiffness coefficient and `L_rest` is the original ed
 
 The cloth solver integrates these spring forces using implicit integration methods—specifically the backward Euler scheme—which solve for vertex positions at time `t+dt` by constructing and solving a large sparse linear system:
 
-```
+```text
 (M - dt² × K) × x_new = M × x_old + dt × v_old + dt² × F_external
 ```
 

@@ -14,7 +14,7 @@ Kubernetes is not a monolithic system — it is a distributed state machine that
 
 ### Threat Model Axes
 
-```
+```text
                         Threat Surface Map
 ┌─────────────────────────────────────────────────────────────┐
 │  External   │  API server auth bypass, ETCD exposure,       │

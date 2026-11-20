@@ -46,7 +46,7 @@ The critical operation is the all-to-all exchange that redistributes tokens acco
 
 The implementation uses MPI's `Alltoallv` primitive or NCCL's `GroupedAlltoall`, which pipeline data transfers to overlap communication with local computation. Modern interconnects support full-duplex operation, enabling simultaneous send and receive, but bandwidth is still shared across all concurrent transfers. The all-to-all latency is therefore dominated by the largest message size in the batch, not the average, making load balance critical for performance.
 
-```
+```text
 All-to-All Communication Flow (8 devices, 2 experts selected per token)
 
 Device 0                    Device 1                    Device 7
@@ -217,7 +217,7 @@ However, most MoE models combine expert parallelism with data parallelism to pro
 
 Within each data-parallel group, devices hold the same subset of experts but process different data. After the backward pass, these devices must reduce gradients for their shared experts via all-reduce collectives. Critically, this all-reduce happens independently within each data-parallel group—there is no communication between groups because they hold disjoint expert parameters. This localized gradient reduction exploits network topology: devices within a data-parallel group are typically colocated in the same rack or node, enabling high-bandwidth reduction over NVLink or local InfiniBand.
 
-```
+```text
 Two-Dimensional Parallelism Grid (32 devices, 8 expert groups, 4 data replicas)
 
 Data-Parallel Dimension (4 replicas)

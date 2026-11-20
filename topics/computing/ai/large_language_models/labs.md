@@ -972,7 +972,7 @@ if __name__ == "__main__":
 
 The break-even hit rate is derived from: `E[latency_with_cache] = E[latency_no_cache]`.
 
-```
+```text
 Let:
   h  = hit rate  (0 ≤ h ≤ 1)
   Lᵢ = inference latency (ms)
@@ -1346,7 +1346,7 @@ Work through this list top-to-bottom before marking the lab complete.
 
 ### Cache strategy selection
 
-```
+```text
 Is the prompt always identical?            → Exact-match output cache
 Does the prompt share a fixed prefix?      → KV prefix cache
 Are prompts semantically similar but
@@ -1372,7 +1372,7 @@ Is decode latency the bottleneck and
 
 ### Latency decomposition
 
-```
+```text
 Total latency = t_tokenize + t_prefill + t_decode + t_detokenize
 
 t_tokenize    ~  0.1–0.5 ms   (CPU, Python)

@@ -36,7 +36,7 @@ The operational translation of regulatory compliance into algorithmic trading in
 
 The foundational data structure governing regulatory compliance is the **Order Compliance Envelope**, a metadata container that accompanies each order through its lifecycle, accumulating validation checkpoints, risk limit consumption, and audit trail evidence. This envelope encapsulates multiple dimensional constraints that must simultaneously hold true for an order to proceed to market:
 
-```
+```text
 Order Compliance Envelope {
     order_id: UUID
     parent_strategy_id: UUID
@@ -133,7 +133,7 @@ flowchart TD
 
 The **Price Collar Validation** module implements dynamic reference price tracking and percentage-based deviation bands. The reference price updates continuously from market data feeds, typically using the last traded price, the midpoint of the NBBO, or a volume-weighted average over a sliding time window. Collar bands vary by instrument type and regulatory regime: U.S. equity markets commonly employ ±5-10% bands for normal market conditions, tightening to ±2% during high volatility periods or for lower-priced securities. The validation logic rejects orders where the limit price falls outside the computed collar range:
 
-```
+```text
 if order.side == BUY:
     max_acceptable_price = reference_price × (1 + collar_band_pct)
     if order.limit_price > max_acceptable_price:
@@ -149,7 +149,7 @@ The critical implementation detail is the timeliness of the reference price upda
 
 The **Rate Limiting & Cancel-to-Fill Ratio** validation addresses spoofing and layering detection at the pre-trade level. Regulatory guidance from FINRA and the SEC identifies high cancel-to-fill ratios—typically exceeding 90-95% over short time windows—as a potential indicator of manipulative intent, though legitimate market-making strategies may also exhibit elevated cancellation rates due to rapid quote updates in response to adverse selection. The validation module maintains sliding window counters of order placements, cancellations, and executions per symbol and per strategy:
 
-```
+```text
 rate_window = 60 seconds
 cancel_fill_window = 300 seconds
 
@@ -171,7 +171,7 @@ This validation logic does not automatically reject orders with high cancel-to-f
 
 The **Credit Aggregation & Exposure Limit** validation implements the most computationally intensive pre-trade control, requiring aggregation of open orders, filled positions, and pending settlement obligations across all venues and accounts to compute real-time gross and net exposure. This aggregation must account for multi-leg strategies where exposure in one instrument hedges exposure in correlated instruments:
 
-```
+```text
 gross_exposure = Σ |position_i × price_i| for all instruments i
 net_exposure = Σ (position_i × price_i × beta_i) for all instruments i
 
@@ -189,7 +189,7 @@ The beta coefficient represents the correlation between the instrument being tra
 
 The **Duplicate Order Detection** validation prevents accidental resubmission of orders due to network retries or system failures, a requirement under SEC Rule 15c3-5 to manage operational risk. The validation module maintains a hash table of recent order identifiers, typically using a sliding window of 10-60 seconds:
 
-```
+```text
 order_hash = hash(order_id, account_id, symbol, side, quantity, price)
 
 if order_hash in recent_orders_cache:
@@ -202,7 +202,7 @@ The hash function must balance collision resistance with computational speed, of
 
 Best execution obligations under MiFID II require algorithmic trading systems to implement **Smart Order Router (SOR) Evaluation Logic** that selects execution venues based on quantitative analysis of execution quality dimensions. The router maintains real-time statistics on each venue's performance across multiple metrics:
 
-```
+```text
 Venue Performance Metrics {
     venue_id: string
     symbol: string
@@ -221,7 +221,7 @@ Venue Performance Metrics {
 
 The router evaluates each candidate venue using a weighted scoring function that combines these dimensions according to the order characteristics and strategy objectives:
 
-```
+```text
 venue_score = w_spread × (-effective_spread_avg) +
               w_fill × fill_rate +
               w_latency × (-latency_p50) +
@@ -234,7 +234,7 @@ For large orders requiring execution over multiple time periods, the router impl
 
 The **Circuit Breaker Coordination** mechanism interfaces with exchange-provided Limit Up-Limit Down (LULD) price bands, which dynamically adjust based on rolling five-minute average prices and predefined percentage bands. Algorithmic trading systems receive LULD band updates via market data feeds and must preemptively reject orders with limit prices outside the current bands:
 
-```
+```text
 LULD Band Structure {
     symbol: string
     reference_price: decimal
@@ -255,7 +255,7 @@ The state field indicates whether the security is in normal trading (price withi
 
 Post-trade surveillance for market manipulation detection operates on archived order flow data, reconstructing temporal sequences of orders, cancellations, and executions to identify statistical anomalies. The core surveillance algorithm for **spoofing detection** examines patterns where large non-executed orders on one side correlate with small executed orders on the opposite side and subsequent rapid cancellation:
 
-```
+```text
 Spoofing Detection Pattern:
 
 Time T: Place large buy order at bid (e.g., 10,000 shares at $50.00)
@@ -282,7 +282,7 @@ A high risk score—typically exceeding 0.8 on a normalized scale—triggers man
 
 The **layering detection** algorithm extends spoofing detection to multiple price levels, identifying orders placed in a graduated sequence across the order book that are cancelled in reverse order of placement after opposite-side execution:
 
-```
+```text
 Layering Detection Pattern:
 
 Time T: Place buy orders at multiple levels:
@@ -304,7 +304,7 @@ Detection Logic:
 
 Wash trading detection requires cross-account correlation analysis, identifying matched trades where the buyer and seller are under common control or exhibit coordination patterns:
 
-```
+```text
 Wash Trade Detection:
 
 Pattern: Account A sells 1,000 shares to Account B at $50.00
@@ -321,7 +321,7 @@ Detection Logic:
 
 Front-running detection in algorithmic trading contexts focuses on identifying correlation between proprietary trading and subsequent client order flow, requiring access to timestamped order flow logs that preserve the sequence of principal trades and agency executions:
 
-```
+```text
 Front-Running Detection:
 
 Pattern: Firm proprietary account buys 1,000 shares at $50.00
@@ -476,7 +476,7 @@ The economic failure mode of **over-compliance** manifests when excessively cons
 
 Firms implement **adaptive compliance parameterization** that tightens controls during periods of heightened regulatory scrutiny (post-enforcement actions, market stress events, increased surveillance activity) and relaxes controls during stable market conditions when detection risk is lower. This dynamic adjustment operates continuously based on real-time risk metrics:
 
-```
+```text
 compliance_tightness_factor = 
     baseline_factor +
     (recent_surveillance_queries × 0.15) +

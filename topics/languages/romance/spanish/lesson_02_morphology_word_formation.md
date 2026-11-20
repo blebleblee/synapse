@@ -20,7 +20,7 @@ Stem alternations—vowel mutations triggered by stress placement—constitute o
 
 The Spanish verb organizes into three conjugation classes distinguished by thematic vowel: **-ar** (first conjugation), **-er** (second conjugation), and **-ir** (third conjugation). The infinitive form consists of root plus thematic vowel plus infinitive marker *-r*. Regular inflection proceeds by stripping the infinitive ending and appending tense-aspect-mood markers plus person-number agreement suffixes according to a fixed template:
 
-```
+```text
 [ROOT] + [THEMATIC_VOWEL] + [TAM_MARKER] + [AGREEMENT]
 ```
 

@@ -60,7 +60,7 @@ Multi-period models extend single-period optimization by recognizing that today'
 
 Convex optimization formulations handle constraints systematically through Lagrangian duality. The primal problem min**w** ½**w**ᵀ**Σ****w** − ν**w**ᵀ**μ** subject to **A****w** ≤ **b** and **C****w** = **d** introduces inequality and equality constraints through matrices **A** and **C**. The Lagrangian L(**w**, **λ**, **μ**) = ½**w**ᵀ**Σ****w** − ν**w**ᵀ**μ** + **λ**ᵀ(**A****w** − **b**) + **μ**ᵀ(**C****w** − **d**) augments the objective with weighted constraint violations. The dual function g(**λ**, **μ**) = inf**w** L(**w**, **λ**, **μ**) provides a lower bound on the primal optimal value for any **λ** ≥ **0**. Strong duality holds when the primal is convex and satisfies Slater's condition, ensuring that the dual optimum equals the primal optimum. Numerical solution employs interior-point methods or active-set algorithms, iteratively refining primal and dual variables until complementary slackness conditions λᵢ((**A****w**)ᵢ − bᵢ) = 0 hold.
 
-```
+```text
 Constrained Mean-Variance Optimization Flow
 
 Input: μ (expected returns), Σ (covariance), λ (risk aversion), constraints

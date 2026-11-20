@@ -180,7 +180,7 @@ Blockchain.com Charts: Access `https://www.blockchain.com/charts/{metric_name}` 
 
 **Recovery Protocol Decision Tree:**
 
-```
+```text
 IF single-day portfolio loss > 15% THEN
     EXECUTE immediate de-risking:
         - Liquidate 50% of all positions to stablecoins

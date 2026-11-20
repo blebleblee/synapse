@@ -20,13 +20,13 @@ The invariants that follow from resource modeling are three. First, the resource
 
 A well-formed URL in a REST API is a sentence in a grammar. The path segments encode the resource hierarchy, and that hierarchy should directly reflect the ownership and containment relationships in your domain model. The basic production rule is:
 
-```
+```text
 /{collection}/{resource-id}/{sub-collection}/{sub-resource-id}
 ```
 
 A collection is a plural noun representing a set of homogenous resources. A resource identifier follows, selecting a specific member. If that member owns a collection of subordinate resources with independent identity and lifecycle, a second collection segment follows. This grammar produces paths that are navigable by inspection:
 
-```
+```text
 GET    /orders                          → list all orders
 POST   /orders                          → create a new order
 GET    /orders/ord_8f3a                 → retrieve order ord_8f3a
@@ -43,7 +43,7 @@ Relationships that are many-to-many, or that represent an association as a first
 
 The following diagram captures the resource graph for an e-commerce domain and shows how the URL hierarchy maps to ownership, with cross-cutting relationships handled as top-level resources rather than nested paths:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                      API Resource Graph                         │
 ├──────────────────────┬──────────────────────────────────────────┤
@@ -72,13 +72,13 @@ This means that any attribute that participates in the resource's identity belon
 
 Filtering a collection is always a query parameter concern. A client asking for all orders placed by a specific user, in a specific status window, is not addressing a different collection; it is asking for a constrained view of the same `/orders` collection:
 
-```
+```text
 GET /orders?user_id=usr_42&status=shipped&created_after=2024-01-01
 ```
 
 Sorting and field projection follow the same rule:
 
-```
+```text
 GET /orders?sort=created_at:desc&fields=id,status,total_amount
 ```
 
@@ -90,7 +90,7 @@ Offset-based pagination is the most common and the most dangerous at scale. `GET
 
 Cursor-based pagination resolves this by encoding position rather than row count. The server returns a cursor — typically an opaque base64-encoded token wrapping the last seen primary key or a composite sort key — and the client passes it back on the next request:
 
-```
+```text
 GET /orders?after=eyJpZCI6Im9yZF84ZjNhIn0=&limit=20
 ```
 
@@ -346,7 +346,7 @@ The most underappreciated performance failure mode in versioned REST APIs is cac
 
 The correct response headers for a versioned API serving `gzip`-compressed JSON are:
 
-```
+```text
 Content-Type: application/json
 Content-Encoding: gzip
 Vary: Accept-Encoding, API-Version, Accept
@@ -490,7 +490,7 @@ Removing a version cleanly requires a deprecation lifecycle that gives clients e
 
 A response from a deprecated API version should carry both the `Deprecation` and `Sunset` headers alongside a `Link` header pointing to the migration guide:
 
-```
+```text
 Deprecation: Sat, 01 Jun 2024 00:00:00 GMT
 Sunset: Mon, 01 Dec 2025 00:00:00 GMT
 Link: <https://docs.example.com/api/migration/v3>; rel="deprecation"

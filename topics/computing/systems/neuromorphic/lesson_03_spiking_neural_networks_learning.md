@@ -30,7 +30,7 @@ Simulating spiking neural networks demands algorithms that efficiently handle th
 
 The internal state of a spiking neural network is distributed across three primary data structures: the membrane potential vector, the synaptic weight matrix, and the spike event queue. Each neuron i maintains a scalar membrane potential V_i(t), initialized to the resting potential V_rest at the start of simulation. As the network evolves, V_i decays exponentially toward V_rest with time constant τ_m. When a presynaptic neuron j fires at time t_spike, a synaptic current is injected into neuron i after an axonal delay d_ij, incrementing V_i by the synaptic weight w_ji scaled by the exponential postsynaptic potential kernel. The accumulated effect of all incoming spikes drives V_i toward the threshold V_th. Upon crossing threshold, neuron i emits a spike, V_i is reset to V_reset, and a refractory period τ_ref begins during which V_i is clamped and further threshold crossings are suppressed.
 
-```
+```text
 Leaky Integrate-and-Fire Neuron State Transition:
 
 Time t:  V_i(t) = V_rest + (V_i(t-Δt) - V_rest) * exp(-Δt/τ_m) + Σ_j w_ji * δ(t - t_j - d_ij)
@@ -52,7 +52,7 @@ The synaptic weight matrix W is typically sparse, with connectivity fractions ra
 
 The spike event queue is the central orchestrator of event-driven simulation. Each entry in the queue is a tuple (time, neuron_id, event_type), where event_type distinguishes between spike emissions, PSP deliveries, and refractory period expirations. The queue is implemented as a priority heap or calendar queue, with time as the priority key. The simulator repeatedly dequeues the next event, advances the simulation clock to that event's timestamp, updates the affected neuron's state, and enqueues any consequent events. For a spike event, the simulator increments the postsynaptic neurons' membrane potentials and checks for threshold crossings. For a refractory expiration, it enables threshold detection for that neuron again.
 
-```
+```text
 Event-Driven Simulation Loop:
 
 Initialize:
@@ -89,7 +89,7 @@ WHILE Queue not empty OR external input pending:
 
 Spike-timing-dependent plasticity introduces temporal state into each synapse beyond the static weight value. To implement the STDP learning rule, each synapse must track the time of the most recent presynaptic and postsynaptic spikes. When a new presynaptic spike arrives at time t_pre, the synapse computes the time difference Δt = t_pre - t_post_last relative to the last postsynaptic spike. If Δt < 0 (pre before post, causal), the weight is potentiated: w ← w + A_+ exp(Δt/τ_+). If Δt > 0 (pre after post, acausal), the weight is depressed: w ← w - A_- exp(-Δt/τ_-). The synapse then updates t_pre_last ← t_pre. Symmetrically, when the postsynaptic neuron fires at t_post, the synapse updates t_post_last ← t_post and recomputes the weight update relative to t_pre_last.
 
-```
+```text
 STDP Weight Update at Synapse (j → i):
 
 State: w_ji, t_pre_last, t_post_last
@@ -118,7 +118,7 @@ The asymmetry of the STDP window creates a temporal credit assignment mechanism 
 
 Surrogate gradient training bridges this gap by treating the spiking nonlinearity as a pseudo-differentiable function during backpropagation. The forward pass computes spikes exactly: S_i(t) = Heaviside(V_i(t) - V_th). The backward pass replaces the Heaviside derivative—which is zero almost everywhere and a Dirac delta at threshold—with a smooth surrogate, such as the derivative of a fast sigmoid: dS/dV ≈ β / (1 + β|V - V_th|)^2, where β controls the width of the surrogate window. This allows gradients to flow from the loss through spike times to membrane potentials to synaptic weights. The trained network then executes in event-driven mode using the learned weights, with spikes computed exactly as Heaviside functions.
 
-```
+```text
 Surrogate Gradient Backpropagation Through Time:
 
 Forward Pass (exact spikes):

@@ -66,7 +66,7 @@ Right-click "Application" in the Device Tree, select "Add Object → POU (Progra
 
 Open `FB_Tank_Simulation` and declare the function block interface with input, output, and internal variables. The simulation integrates flow rates numerically using Euler forward approximation with fixed time steps matching the PLC cycle time. This approach trades integration accuracy for computational simplicity, acceptable for automation verification where physical plant dynamics typically operate at timescales much slower than PLC cycle rates.
 
-```
+```text
 FUNCTION_BLOCK FB_Tank_Simulation
 VAR_INPUT
     Pump_P1_Command : BOOL;      // Pump P1 start command from PLC
@@ -177,7 +177,7 @@ This function block encapsulates the physical plant behavior, isolating control 
 Open `PRG_Tank_Control` and declare global variables at the top of the program. CODESYS ladder logic follows IEC 61131-3 conventions: left power rail (implicit TRUE), contact symbols (—| |— for normally open, —|/|— for normally closed), coil symbols (—( )— for output energization, —(S)— for set-latch, —(R)— for reset-unlatch), and right power rail (implicit evaluation termination). Each rung implements a discrete control function, progressing from safety interlocks to pump sequencing logic.
 
 Declare the following variables in the declaration section:
-```
+```text
 PROGRAM PRG_Tank_Control
 VAR
     Sim : FB_Tank_Simulation;           // Hydraulic simulation instance
@@ -208,7 +208,7 @@ Implement the ladder logic rungs in the graphical LD editor. Each rung is descri
 
 **Rung 1-3: Simulation Function Block Call**
 The first three rungs invoke the hydraulic simulation and map outputs to process variables. In LD, function block calls appear as rectangular boxes with input pins on the left and output pins on the right.
-```
+```text
 (* Rung 1: Call simulation FB *)
 Sim(
     Pump_P1_Command := Pump_P1_Running,
@@ -225,7 +225,7 @@ Tank_C_Level_Pct := Sim.Tank_C_Level;
 
 **Rung 4-5: Pump P1 Interlock Logic**
 Pump P1 operates only when Tank A has sufficient volume (above LSL) and Tank B has capacity to receive flow (below LSH). Emergency stop immediately disables interlocks.
-```
+```text
 (* Rung 4: P1 interlock conditions *)
 —|/|—Emergency_Stop—| |—Sim.Tank_A_LSL—|/|—Sim.Tank_B_LSH—( )—Pump_P1_Interlock_OK
     (NOT E-stop)    (NOT A_LSL)       (NOT B_LSH)
@@ -233,7 +233,7 @@ Pump P1 operates only when Tank A has sufficient volume (above LSL) and Tank B h
 
 **Rung 6-7: Pump P1 Start/Stop Command Generation**
 Start P1 when interlock permits, Tank A above medium level, and Tank B below medium level. Stop P1 when interlock fails or Tank B reaches high level.
-```
+```text
 (* Rung 6: P1 start conditions *)
 —| |—Pump_P1_Interlock_OK—| |—Sim.Tank_A_LSM—|/|—Sim.Tank_B_LSM—( )—Pump_P1_Start_Cmd
                                             (B below medium)
@@ -247,7 +247,7 @@ Start P1 when interlock permits, Tank A above medium level, and Tank B below med
 
 **Rung 8: Pump P1 Status Latch**
 Implement seal-in logic with set/reset coils. Start command sets the latch, stop command resets it.
-```
+```text
 (* Rung 8: P1 latch *)
 —| |—Pump_P1_Start_Cmd—(S)—Pump_P1_Running
 —| |—Pump_P1_Stop_Cmd—(R)—Pump_P1_Running
@@ -255,7 +255,7 @@ Implement seal-in logic with set/reset coils. Start command sets the latch, stop
 
 **Rung 9-13: Pump P2 Interlock and Control (Parallel Structure)**
 Replicate the P1 logic structure for P2, substituting Tank B/C level switches.
-```
+```text
 (* Rung 9: P2 interlock *)
 —|/|—Emergency_Stop—| |—Sim.Tank_B_LSL—|/|—Sim.Tank_C_LSH—( )—Pump_P2_Interlock_OK
 
@@ -273,7 +273,7 @@ Replicate the P1 logic structure for P2, substituting Tank B/C level switches.
 
 **Rung 14: System Reset Logic**
 The reset button clears all latches and reinitializes simulation volumes. Implement as a one-shot (rising edge detection) to prevent continuous reset during button hold.
-```
+```text
 VAR
     Reset_Button : BOOL;
     Reset_Trigger : R_TRIG;  // Rising edge detector
@@ -332,7 +332,7 @@ Configure tag history by right-clicking each level and flow tag, selecting "Edit
 Open Designer, navigate to the Perspective section, and create a new view named `Main_Overview` with portrait orientation (1920×1080 resolution). The Perspective canvas uses flexbox-based responsive layout; components automatically adapt to screen sizes from desktop monitors to tablets. Add a "Coordinate Container" from the component palette to enable absolute positioning suitable for mimics (process graphics resembling P&ID diagrams).
 
 Drag three "Tank" components from the Symbols palette into the coordinate container, positioning them horizontally at coordinates (200, 300), (600, 300), and (1000, 300). Configure each tank's bindings: right-click Tank A, select "Bindings," and add a "Tag Binding" to `Tank_A/Level` with bidirectional mode disabled (read-only). Set the tank's `fillPercent` property to `{Tank_A/Level.value}`. Change the tank color property to a conditional expression:
-```
+```text
 if({Tank_A/LSH.value}, "red", if({Tank_A/LSL.value}, "yellow", "blue"))
 ```
 This expression renders the tank red during high-level alarm, yellow during low-level alarm, and blue during normal operation, providing immediate situational awareness.
@@ -458,7 +458,7 @@ This script produces a CSV file with 19 rows specifying parameter combinations f
 **CODESYS Project Parameterization and Batch Execution**
 
 Modify the `PRG_Tank_Control` program to read parameters from global variables rather than hard-coded constants. Create a new Global Variable List (GVL) named `GVL_Parameters`:
-```
+```text
 VAR_GLOBAL
     PARAM_Cycle_Time_ms : REAL := 10.0;
     PARAM_P1_Flow_Lpm   : REAL := 150.0;
@@ -794,7 +794,7 @@ The FMEA table guides test scenario development by prioritizing high-RPN failure
 Simulate a Tank C level transmitter catastrophic failure by forcing the analog input to a constant value independent of actual tank level. In CODESYS, add a sensor health monitoring function block that compares the rate-of-change of level readings against physical plausibility limits. Water levels in closed vessels cannot change instantaneously; typical maximum rates equal pump flow divided by tank cross-sectional area. For Tank C with 3000L capacity and 2-meter diameter (3.14 m² area), maximum fill rate with P2 running equals (100 L/min) / (3140 L/m) = 0.0318 m/min = 1.91 m/hour ≈ 95% per hour for a 2m tall tank. Any rate exceeding 2%/second indicates sensor failure rather than physical level change.
 
 Implement the sensor validation function block:
-```
+```text
 FUNCTION_BLOCK FB_Sensor_Validator
 VAR_INPUT
     Raw_Value      : REAL;      // Raw sensor reading [%]
@@ -836,7 +836,7 @@ END_IF
 ```
 
 Integrate this function block into the main control program by replacing direct sensor reads with validated values. Add an alarm in the ladder logic:
-```
+```text
 (* Rung: Tank C Sensor Fault Alarm *)
 VAR
     Tank_C_Validator : FB_Sensor_Validator;
@@ -1009,7 +1009,7 @@ This timeline visualization serves multiple purposes: engineering review during 
 
 **Failure Propagation Analysis**:
 Calculate the time constants governing cascading failures by modeling the system as coupled differential equations. Tank B depletion rate after P1 stops equals `dV_B/dt = -Q_P2` (assuming constant P2 flow and zero inflow). Time to deplete from 50% to LSL (10%) equals:
-```
+```text
 t_deplete = (0.50 - 0.10) × V_B_capacity / Q_P2
 t_deplete = 0.40 × 5000 L / 100 L/min = 20 minutes
 ```
@@ -1022,7 +1022,7 @@ Extend the system with triple-redundant level sensors on Tank C, implementing 2-
 
 **Sensor Redundancy Implementation**:
 Modify `FB_Tank_Simulation` to output three independent sensor readings with injected random noise and calibration offsets:
-```
+```text
 VAR_OUTPUT
     Tank_C_Level_Sensor_A : REAL;
     Tank_C_Level_Sensor_B : REAL;
@@ -1044,7 +1044,7 @@ Tank_C_Level_Sensor_C := Tank_C_Level + Calibration_Offset_C + (Noise_Generator.
 ```
 
 Implement the 2oo3 voting logic function block:
-```
+```text
 FUNCTION_BLOCK FB_2oo3_Voter
 VAR_INPUT
     Sensor_A : REAL;

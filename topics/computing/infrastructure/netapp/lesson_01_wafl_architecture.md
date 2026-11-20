@@ -145,7 +145,7 @@ Each buffer header in the WAFL buffer cache carries a 255-bit snapshot presence 
 
 The space consumed by a snapshot is not the full volume size but the **differential**: the set of blocks that existed at snapshot time and have since been modified or deleted in the live filesystem. This is the **changed block tracking** property that makes WAFL snapshots space-efficient and nearly instantaneous to create. The `snap list` command (in ONTAP 7-Mode) or `volume snapshot show` (in ONTAP 9 Cluster Mode) reports the cumulative and differential space consumed by each snapshot, which reflects this incremental accounting.
 
-```
+```text
 Snapshot Space Accounting:
 
 Live volume blocks:    [B1'][B2'][B3'][B4'][B5]  ← current versions

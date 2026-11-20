@@ -16,7 +16,7 @@ The third invariant addresses **piece coordination and overload**. Many tactical
 
 The **fork** represents the most elementary tactical motif: a single piece simultaneously attacks two or more enemy pieces, guaranteeing material gain because the opponent can save at most one target. The knight fork constitutes the prototypical example due to the knight's unique movement geometry—its L-shaped move pattern allows it to attack squares of opposite color from its current position, enabling attacks on pieces that cannot simultaneously defend each other. The "family fork" or "royal fork" describes a knight simultaneously attacking king and queen, where the forcing nature of check compels the king to move, abandoning the queen to capture.
 
-```
+```text
 Royal Fork Example Position:
 
 8  . . . . k . . .
@@ -38,7 +38,7 @@ Fork mechanics extend beyond knights. Pawns execute forks with devastating effic
 
 The **pin** exploits linear geometry—ranks, files, and diagonals—to immobilize enemy pieces by threatening a more valuable piece behind them. Pins partition into two categories with fundamentally different characteristics. An **absolute pin** occurs when a piece cannot legally move because doing so would expose the king to check. The pinned piece becomes functionally frozen, unable to move for any purpose. A **relative pin** immobilizes a piece by threatening a more valuable piece behind it, but moving the pinned piece remains legal—merely materially unfavorable. Against an absolute pin, the pinned piece offers no defensive resistance; against a relative pin, the defender must calculate whether breaking the pin and accepting material loss enables sufficient counterplay to justify the sacrifice.
 
-```
+```text
 Absolute Pin Structure:
 
 8  . . . . k . . .
@@ -61,7 +61,7 @@ Pins create secondary tactical opportunities beyond the immediate material threa
 
 The **skewer** reverses the pin's geometry: a high-value piece stands in front of a less valuable piece along a rank, file, or diagonal, and a long-range piece attacks along that line. The high-value piece must move to escape attack, exposing the piece behind it to capture. The skewer with check proves particularly forcing—when a bishop delivers check to a king with a rook positioned behind the king on the same diagonal, the king must move, and the rook falls on the subsequent move. Skewers function as "reverse pins" where the more valuable piece occupies the front position rather than the rear.
 
-```
+```text
 Skewer with Check Pattern:
 
 8  r . . . k . . .
@@ -84,7 +84,7 @@ The distinction between creating and exploiting geometric vulnerability determin
 
 **Discovered attacks** activate when a piece moves, unveiling an attack from a piece behind it along a rank, file, or diagonal. The moving piece simultaneously creates its own threats while the discovered piece delivers its attack. This dual-threat mechanism frequently proves unstoppable because the defender cannot address both threats simultaneously. The **discovered check** variant elevates the forcing quality further: because the discovered piece delivers check, the opponent must respond to the check immediately, granting the moving piece complete freedom to execute any threat without fear of counterattack. The moving piece can capture an undefended queen with impunity if the discovered check forces the opponent to address the king's safety first.
 
-```
+```text
 Discovered Check Architecture:
 
 8  . . . . k . . .

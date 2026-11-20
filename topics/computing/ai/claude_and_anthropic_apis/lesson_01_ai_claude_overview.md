@@ -45,7 +45,7 @@ This two-stage process is why Claude exhibits different refusal and hedging beha
 
 As of the current API (v1), the primary endpoint for text generation is:
 
-```
+```text
 POST https://api.anthropic.com/v1/messages
 ```
 

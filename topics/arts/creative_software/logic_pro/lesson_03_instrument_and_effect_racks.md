@@ -52,7 +52,7 @@ Logic's Channel Strip insert slots process **strictly top to bottom**, pre-fader
 
 ### 4.1 The Standard Ordering Logic (and why)
 
-```
+```text
 sub_chain ["Standard Effect Chain Order"]
 ```
 

@@ -1832,7 +1832,7 @@ systemd implements a **directed acyclic graph (DAG)** of unit dependencies:
 - `dbus`: Service acquires D-Bus name
 
 **Restart Logic**:
-```
+```text
 Restart=on-failure
 RestartSec=10s
 StartLimitBurst=5
@@ -2451,7 +2451,7 @@ systemd timers provide several advantages over traditional cron:
 - `OnUnitInactiveSec=`: Relative to last deactivation
 
 **Calendar Syntax**:
-```
+```text
 OnCalendar=Mon,Fri *-*-* 10:00:00  # Every Monday and Friday at 10:00
 OnCalendar=*-*-01 02:00:00          # First day of each month at 2:00 AM
 OnCalendar=quarterly                # Every 3 months

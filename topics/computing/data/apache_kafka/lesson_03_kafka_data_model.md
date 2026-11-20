@@ -144,7 +144,7 @@ flowchart LR
 
 Since Kafka 0.11, the on-disk and on-wire format is the **record batch** (v2). A single produce request contains one or more batches, each of which contains one or more records. This nesting is important for understanding compression and atomicity:
 
-```
+```text
 RecordBatch
 ├── Header
 │   ├── baseOffset (int64)       — offset of the first record in the batch
@@ -385,7 +385,7 @@ Partition count is the primary scaling knob in Kafka. Each partition:
 
 The original content incorrectly claims Kafka provides "automatic partitioning." Kafka does **not** auto-scale partitions. The partition count is set at topic creation time and can only be increased (not decreased) afterward via `kafka-topics.sh --alter --partitions N`. Choosing the right count upfront is a capacity planning exercise:
 
-```
+```text
 Target throughput / Per-partition throughput ≈ required partitions
 
 Example: 100 MB/s target, ~10 MB/s per partition (conservative for typical workloads)

@@ -73,7 +73,7 @@ In practice, most bassists play this scale by shifting position rather than stre
 
 The CAGED system gives you five movable scale/chord zones across the neck. For C major in open position:
 
-```
+```text
 e|--0--1--3--|
 B|--1--3-----|
 G|--0--2-----|
@@ -148,7 +148,7 @@ Metronome 60 BPM, one chord per bar (whole notes), left hand plays the root as a
 
 The same C major triad (C-E-G) appears in five positions as you move up the neck. Learn all five before calling a chord "known":
 
-```
+```text
 C shape (open):      x-3-2-0-1-0
 A shape (3rd fret):  x-3-5-5-5-3
 G shape (5th fret):  3-5-5-4-3-3 (barre)

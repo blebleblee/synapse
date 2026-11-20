@@ -188,7 +188,7 @@ Imprinted loci exhibit three defining features. First, **parent-of-origin-specif
 
 The **Igf2/H19** locus on mouse chromosome 7 (human 11p15) exemplifies imprinting mechanisms. This cluster contains the paternally expressed insulin-like growth factor 2 gene (*Igf2*), which encodes a fetal growth factor, and the maternally expressed *H19* gene, which produces a non-coding RNA. The ICR, located between *Igf2* and *H19*, is methylated on the paternal chromosome but unmethylated on the maternal chromosome. On the maternal chromosome, the unmethylated ICR binds the insulator protein CTCF, which blocks enhancers located downstream of *H19* from activating *Igf2*, instead directing them to activate *H19*. On the paternal chromosome, ICR methylation prevents CTCF binding, permitting enhancers to loop past *H19* and activate *Igf2* while DNA methylation spreads from the ICR to the *H19* promoter, silencing *H19* expression.
 
-```
+```text
 Igf2/H19 Imprinting Mechanism:
 
 Maternal Chromosome (ICR unmethylated):

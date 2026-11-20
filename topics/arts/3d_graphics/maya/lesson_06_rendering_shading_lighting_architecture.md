@@ -46,7 +46,7 @@ Arnold's adaptive sampling reduces render time by concentrating samples in high-
 
 The complete rendering pipeline flow is:
 
-```
+```text
 Scene Graph Evaluation (Maya DG)
     ↓
 Geometry Export (mesh positions, UVs, normals)

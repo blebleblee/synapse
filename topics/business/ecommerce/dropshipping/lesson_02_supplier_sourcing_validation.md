@@ -32,7 +32,7 @@ The fourth stage, **operational integration testing**, validates technical integ
 
 Quality assurance mechanisms layer continuous monitoring atop initial vetting, treating supplier performance as a time-series regression problem rather than a binary pass-fail gate. The fundamental operational primitive is the **supplier scorecard**, a dashboard aggregating five core performance dimensions refreshed weekly:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │ SUPPLIER SCORECARD: Q4 2024                                 │
 ├─────────────────────────────────────────────────────────────┤

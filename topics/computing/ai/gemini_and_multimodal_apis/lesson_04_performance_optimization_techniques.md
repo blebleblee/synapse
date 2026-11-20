@@ -451,7 +451,7 @@ The KV-cache stores the key and value matrices for every attention layer compute
 
 **When context caching pays off.** The minimum cacheable size is 32,768 tokens, and there is a storage cost per token-hour. The break-even analysis is straightforward:
 
-```
+```text
 cost_without_cache = N_requests × prefix_tokens × input_price_per_token
 cost_with_cache    = (1 × prefix_tokens × input_price_per_token)
                    + (N_requests × query_tokens × input_price_per_token)

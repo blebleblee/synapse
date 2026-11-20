@@ -34,7 +34,7 @@ This mechanical distinction shapes Rousseau's entire theory. If inequality is th
 
 The following diagram maps these three architectural systems, showing how each thinker repositions the natural state and derives distinct legitimacy mechanisms:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │ NATURAL STATE ARCHITECTURES & LEGITIMACY DERIVATION             │
 ├─────────────────────────────────────────────────────────────────┤

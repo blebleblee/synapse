@@ -46,7 +46,7 @@ This process demands sophisticated organizational infrastructure. Physical or di
 
 The strategic selection among these modes requires explicit purpose definition before beginning any reading task. A researcher conducting a literature review uses scanning to identify relevant articles from citation lists, skimming to determine which merit full reading, analytical reading for paradigmatic studies that shape the field, and syntopical reading to synthesize findings across methodological approaches. A lawyer preparing for trial uses scanning to locate precedent citations, skimming to identify applicable holdings, analytical reading for closely analogous cases, and syntopical reading to construct legal arguments integrating multiple precedents. The cognitive overhead of mode selection drops dramatically when explicit decision criteria are established:
 
-```
+```text
 Purpose: Information Location → Scanning
 Purpose: Gist Extraction, Relevance Filtering → Skimming  
 Purpose: Full Comprehension, General Learning → Adaptive Reading

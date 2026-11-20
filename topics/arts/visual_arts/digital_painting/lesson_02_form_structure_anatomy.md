@@ -126,7 +126,7 @@ Only once the structure is solid do you begin to add *anatomical detail*: muscle
 
 Finally, you apply *color, tone, and atmosphere*. The value hierarchy is established, the light direction is consistent, and the three-dimensional form reads clearly. Now you can apply color temperature shifts, atmospheric perspective, texture variation, and stylistic flourishes without the risk of destroying the underlying coherence.
 
-```
+```text
 Workflow Hierarchy: From Spatial Logic to Surface Detail
 
 ┌─────────────────────────────────────────────┐

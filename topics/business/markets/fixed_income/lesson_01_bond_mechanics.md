@@ -72,7 +72,7 @@ The convexity term always adds positive value to the price change because it car
 
 The cash flow timeline for a standard ten-year Treasury note issued with a 4.00% coupon illustrates the temporal distribution of payments:
 
-```
+```text
 Time (periods):    1    2    3    4   ...   19   20
 Coupon ($):       20   20   20   20  ...   20   20
 Principal ($):     0    0    0    0  ...    0  1000

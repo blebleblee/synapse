@@ -30,7 +30,7 @@ The fifth component is **forward-looking specification**. Feedback that describe
 
 The architecture of these five components can be visualized as a sequence:
 
-```
+```text
 Context → Behavior → Impact → Exploration → Forward Path
 (Why?)    (What?)    (So what?) (Your input?) (Now what?)
 ```
@@ -51,7 +51,7 @@ The mechanics of assertiveness deserve particular attention because assertivenes
 
 The structure of assertive communication follows a specific formula that can be taught and practiced:
 
-```
+```text
 I notice [specific situation] → I feel [emotion] → because [impact on me/us] → I need [specific request]
 ```
 
@@ -79,7 +79,7 @@ A fourth failure mode appears in what might be called **false repair**. This occ
 
 The architecture of genuine repair follows this structure:
 
-```
+```text
 Acknowledgment → Understanding → Commitment → Changed behavior
 (What I did)    (Why it mattered)  (I will...)  (Over time)
 ```

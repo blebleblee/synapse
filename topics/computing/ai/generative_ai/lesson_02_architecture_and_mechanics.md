@@ -34,7 +34,7 @@ Einstein summation makes the contraction axes explicit. Any dimension appearing 
 
 A 2D convolution is not a general tensor contraction — it is a *structured* one that enforces weight sharing across spatial positions. Given input `X` of shape `[N, C_in, H, W]` and a filter bank `K` of shape `[C_out, C_in, kH, kW]`, the output at position `(n, c_out, h, w)` is:
 
-```
+```text
 Y[n, c_out, h, w] = sum_{c_in, kh, kw} X[n, c_in, h*s + kh, w*s + kw] * K[c_out, c_in, kh, kw] + b[c_out]
 ```
 
@@ -136,13 +136,13 @@ For large models, the Hessian spectrum has a characteristic shape: a dense bulk 
 
 Backpropagation is the application of the chain rule to a computational graph. For a scalar loss `L` and a parameter `w_ij` buried deep in the graph, the chain rule gives:
 
-```
+```text
 dL/dw_ij = sum_{paths from w_ij to L} (product of local Jacobians along path)
 ```
 
 In a neural network with layers `f_1, f_2, ..., f_n`, the total Jacobian of `L` with respect to `x_0` (the input) is the matrix product of all layer Jacobians:
 
-```
+```text
 dL/dx_0 = (df_n/dx_{n-1}) * (df_{n-1}/dx_{n-2}) * ... * (df_1/dx_0) * (dL/dx_n)
 ```
 
@@ -200,7 +200,7 @@ def train_one_epoch(
 
 SGD with momentum maintains a single first-moment estimate of the gradient. Adam (Kingma & Ba, 2014) maintains both a first-moment estimate `m` (direction) and a second-moment estimate `v` (per-coordinate gradient variance), using them to compute an adaptive per-parameter learning rate:
 
-```
+```text
 m_t = beta1 * m_{t-1} + (1 - beta1) * g_t        # exponential moving average of gradient
 v_t = beta2 * v_{t-1} + (1 - beta2) * g_t^2       # exponential moving average of squared gradient
 m_hat = m_t / (1 - beta1^t)                        # bias-corrected first moment
@@ -212,7 +212,7 @@ The key insight: dividing by `sqrt(v_hat)` normalizes updates so that parameters
 
 **AdamW** (Loshchilov & Hutter, 2019) corrects a subtle but important error in Adam's original weight decay formulation. Standard Adam with L2 regularization adds `lambda * theta` to the gradient before the adaptive step, which causes the effective weight decay to be scaled by `1/sqrt(v_hat)` — meaning parameters with large gradients experience *less* regularization, the opposite of what is intended. AdamW decouples weight decay from the gradient update:
 
-```
+```text
 theta_t = theta_{t-1} - lr * m_hat / (sqrt(v_hat) + epsilon) - lr * lambda * theta_{t-1}
 ```
 
@@ -222,7 +222,7 @@ The weight decay term is now applied uniformly, independent of the gradient magn
 
 The GAN objective function is:
 
-```
+```text
 min_G max_D E_{x~p_data}[log D(x)] + E_{z~p_z}[log(1 - D(G(z)))]
 ```
 
@@ -232,13 +232,13 @@ The fundamental training instability of GANs arises from the fact that this mini
 
 Wasserstein GAN (WGAN, Arjovsky et al., 2017) addresses this by replacing the Jensen-Shannon divergence implicit in the original loss with the Wasserstein-1 (Earth Mover's) distance, which is defined even when the generated and real distributions have non-overlapping support:
 
-```
+```text
 L_WGAN = E_{x~p_data}[D(x)] - E_{z~p_z}[D(G(z))]
 ```
 
 The discriminator is now called a *critic* and is not constrained to `[0,1]`. To enforce the Lipschitz constraint required by the Wasserstein metric, WGAN-GP (Gulrajani et al., 2017) adds a gradient penalty:
 
-```
+```text
 L_GP = lambda * E_{x_hat}[(||grad_{x_hat} D(x_hat)||_2 - 1)^2]
 ```
 
@@ -308,7 +308,7 @@ Attention can be derived from a soft database lookup. Given a query vector `q`, 
 
 The compatibility function (unnormalized weight) between `q` and `k_i` is their dot product `q · k_i`. Dot products grow in magnitude proportionally to `sqrt(d_k)` for random unit vectors in `d_k` dimensions because the variance of the sum of `d_k` products of independent unit normals is `d_k`. Without scaling, feeding large dot products into softmax pushes the output into the near-zero-gradient saturation regime. The scaling by `1/sqrt(d_k)` restores unit variance:
 
-```
+```text
 Attention(Q, K, V) = softmax(Q·K^T / sqrt(d_k)) · V
 ```
 
@@ -316,7 +316,7 @@ The softmax ensures the output is a convex combination of the values (weights su
 
 Multi-head attention runs `H` independent attention heads in parallel, each with its own projection matrices `W_Q^h, W_K^h, W_V^h`, then concatenates and projects the results:
 
-```
+```text
 MultiHead(Q, K, V) = Concat(head_1, ..., head_H) · W_O
 where head_h = Attention(Q·W_Q^h, K·W_K^h, V·W_V^h)
 ```
@@ -417,7 +417,7 @@ Three families of approaches address this:
 
 **Kernel Trick / Linear Attention** (Performer, Katharopoulos et al., 2020): rewrite the softmax attention as a kernel function and use the associativity of matrix multiplication to swap the order of operations:
 
-```
+```text
 standard: (softmax(Q·K^T/sqrt(d_k))) · V  — O(T^2 d) due to T×T intermediate
 linear:   phi(Q) · (phi(K)^T · V)         — O(T d^2) by computing K^T·V first
 ```
@@ -450,7 +450,7 @@ The attention mechanism is permutation-equivariant by construction: shuffling th
 
 **Sinusoidal PE** (Vaswani et al., 2017): adds fixed, non-learned vectors to the input embeddings:
 
-```
+```text
 PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))
 PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
 ```
@@ -459,7 +459,7 @@ The rationale: for any fixed offset `k`, `PE(pos+k)` can be expressed as a linea
 
 **Relative PE** (Shaw et al., 2018; Transformer-XL): modifies the attention score computation to include a learned bias for each relative position `(i-j)`:
 
-```
+```text
 score(i, j) = (q_i + u)·k_j + (q_i + v)·r_{i-j}
 ```
 
@@ -467,7 +467,7 @@ where `r_{i-j}` is a sinusoidal encoding of the relative distance and `u, v` are
 
 **Rotary PE (RoPE)** (Su et al., 2021), used in LLaMA, GPT-NeoX, and PaLM 2: encodes position by rotating query and key vectors in 2D subspaces. The dot product `q_m · k_n` between a query at position `m` and a key at position `n` depends only on the relative position `(m - n)`:
 
-```
+```text
 RoPE(x, pos) = x * cos(pos * theta) + rotate_half(x) * sin(pos * theta)
 ```
 
@@ -520,14 +520,14 @@ An autoencoder maps input `x` through an encoder `E` to a latent code `z = E(x)`
 
 The Variational Autoencoder (VAE, Kingma & Welling, 2013) addresses this by treating `z` as a latent random variable with a learned posterior distribution `q(z|x)` and a fixed prior `p(z) = N(0, I)`. The encoder outputs the parameters of the posterior distribution: mean `mu` and log-variance `log_var`. The Evidence Lower BOund (ELBO) on the log-likelihood is:
 
-```
+```text
 log p(x) >= E_{z~q(z|x)}[log p(x|z)] - KL(q(z|x) || p(z))
          = reconstruction_term          - regularization_term
 ```
 
 Maximizing the ELBO simultaneously pushes the decoder to reconstruct `x` faithfully and pushes the posterior `q(z|x)` toward the prior `N(0, I)`. The KL term has a closed form for Gaussian distributions:
 
-```
+```text
 KL(N(mu, sigma^2) || N(0, I)) = -0.5 * sum(1 + log_var - mu^2 - exp(log_var))
 ```
 
@@ -634,13 +634,13 @@ class BetaVAE(nn.Module):
 
 Diffusion models (Ho et al., 2020; Song et al., 2021) define a *forward process* that gradually corrupts data with Gaussian noise over `T` timesteps, and a learned *reverse process* that iteratively denoises. The forward process is a fixed Markov chain:
 
-```
+```text
 q(x_t | x_{t-1}) = N(x_t; sqrt(1-beta_t) * x_{t-1}, beta_t * I)
 ```
 
 where `beta_t` is a noise schedule (linear, cosine, or learned). By the Markov property, we can sample `x_t` directly from `x_0` in closed form:
 
-```
+```text
 q(x_t | x_0) = N(x_t; sqrt(alpha_bar_t) * x_0, (1 - alpha_bar_t) * I)
 where alpha_bar_t = product_{s=1}^{t} (1 - beta_s)
 ```
@@ -649,7 +649,7 @@ This means `x_t = sqrt(alpha_bar_t) * x_0 + sqrt(1 - alpha_bar_t) * eps`, where 
 
 The reverse process is parameterized by a neural network `eps_theta(x_t, t)` trained to predict the noise `eps` that was added at timestep `t`. The simplified training objective (Ho et al., 2020) is just an L2 loss on this noise prediction:
 
-```
+```text
 L_simple = E_{t, x_0, eps}[||eps - eps_theta(sqrt(alpha_bar_t)*x_0 + sqrt(1-alpha_bar_t)*eps, t)||^2]
 ```
 
@@ -716,7 +716,7 @@ Several design decisions in this architecture are non-obvious:
 
 **FFN Architecture**: The two-layer FFN with expansion factor 4 (`d_model -> 4*d_model -> d_model`) implements a bottleneck that filters and recombines features. The `4×` expansion is empirically stable across scales; the choice of GELU over ReLU preserves small negative values that help preserve gradient flow. Gated Linear Unit (GLU) variants (SwiGLU, used in LLaMA and PaLM) further improve performance:
 
-```
+```text
 FFN_SwiGLU(x) = (SiLU(x·W_1) ⊗ (x·W_3)) · W_2
 ```
 
@@ -787,7 +787,7 @@ class DecoderBlock(nn.Module):
 
 Kaplan et al. (2020) established that the loss of a transformer language model follows predictable power laws as a function of three quantities: parameter count `N`, dataset tokens `D`, and compute budget `C = 6ND` (FLOPs for a single forward+backward pass on one token):
 
-```
+```text
 L(N) ≈ (N_c / N)^(alpha_N)    with alpha_N ≈ 0.076, N_c ≈ 8.8e13
 L(D) ≈ (D_c / D)^(alpha_D)    with alpha_D ≈ 0.095, D_c ≈ 5.4e13
 ```
@@ -796,7 +796,7 @@ These laws hold across six orders of magnitude of compute and are approximately 
 
 The critical operational insight from Chinchilla (Hoffmann et al., 2022): the Kaplan et al. compute-optimal frontier was derived while holding dataset size constant and scaling only parameters. When both `N` and `D` are optimized simultaneously for a fixed compute budget `C`, the optimal allocation is:
 
-```
+```text
 N_opt ∝ C^0.5
 D_opt ∝ C^0.5
 ```

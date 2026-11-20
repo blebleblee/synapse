@@ -42,7 +42,7 @@ Create field overlay plots to visualize the electric field magnitude on the subs
 
 Export the S-parameter data to a Touchstone (.s2p) file for later use in circuit simulation. This file encodes the complex S-parameters at each frequency point in the standard two-port format:
 
-```
+```text
 ! HFSS S-parameter export: Quarter-wave transformer
 # GHz S MA R 50
 4.000 0.287 -165.3 0.982 -21.5 0.982 -21.5 0.287 165.3

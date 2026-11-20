@@ -42,7 +42,7 @@ The canonical fill algorithm is a depth-first search (DFS) with backtracking, au
 
 The pseudocode structure is as follows:
 
-```
+```text
 function fill_grid(grid, answer_slots, dictionary):
     if all_slots_filled(grid):
         return grid  // Success

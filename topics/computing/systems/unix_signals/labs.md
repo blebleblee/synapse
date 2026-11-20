@@ -582,7 +582,7 @@ Compile without sanitizers first to observe the race: `clang -o signal_race sign
 
 Now compile with ThreadSanitizer: `clang -fsanitize=thread -o signal_race_tsan signal_race.c -pthread -g3 -O1` and execute: `./signal_race_tsan`. TSAN immediately reports data races:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 4 at 0x... by signal handler:
     #0 racing_handler signal_race.c:12

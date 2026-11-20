@@ -24,7 +24,7 @@ The operational infrastructure of modern tax administration consists of five int
 
 Taxpayer identification begins with the assignment of a unique identifier—Social Security Numbers for individuals in the United States, National Insurance Numbers in the United Kingdom, Tax File Numbers in Australia—that persists across tax years and links disparate information returns. The registration database maintains demographic attributes, filing status, dependents, and historical compliance patterns. Modern systems implement de-duplication algorithms to detect synthetic identity fraud and identity theft, cross-referencing birth records, employment authorization documents, and financial account applications. The identification layer enables longitudinal tracking of income trajectories, wealth accumulation, and mobility patterns essential for both audit selection and economic research.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │         TAX ADMINISTRATION INFORMATION ARCHITECTURE         │
 └─────────────────────────────────────────────────────────────┘

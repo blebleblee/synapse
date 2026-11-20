@@ -117,7 +117,7 @@ The `$MFT` (Master File Table) is an equally critical artifact. Every file and d
 
 Parsing the raw MFT with a tool like `MFTECmd.exe` from Eric Zimmermann's toolkit produces a CSV with one row per file, exposing both timestamp sets and allowing timeline reconstruction even when the attacker has attempted to falsify timestamps.
 
-```
+```text
 MFTECmd.exe -f "\\.\C:" --csv C:\output --csvf mft_output.csv
 ```
 
@@ -205,7 +205,7 @@ At the EDR kernel sensor level, the `ObRegisterCallbacks` API allows registratio
 
 Defensive hardening against LSASS dumping operates at three independent layers, each of which raises the attack cost. Enabling *Protected Process Light* (PPL) for LSASS, via the registry key `HKLM\SYSTEM\CurrentControlSet\Control\Lsa` → `RunAsPPL = 1`, forces the kernel to enforce access restrictions on the LSASS process object such that only processes signed by Microsoft at the Windows Trusted Computing Base level can open it with memory-access rights. This defeats Mimikatz running as a local administrator without a kernel exploit.
 
-```
+```text
 reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v RunAsPPL /t REG_DWORD /d 1 /f
 ```
 

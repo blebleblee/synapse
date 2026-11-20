@@ -100,7 +100,7 @@ Each column has exactly two 1's, corresponding to the two endpoints of the respe
 
 The adjacency list representation is:
 
-```
+```text
 1: [2, 3]
 2: [1, 3]
 3: [1, 2, 4]

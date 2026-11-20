@@ -83,7 +83,7 @@ The coherentist faces the isolation objection: a perfectly coherent system of be
 
 Infinitist architecture implements justification as an infinite tree structure where each belief node connects to multiple supporting reason nodes, which themselves connect to further supporting reasons without termination. Crucially, the tree must satisfy a non-repeating constraint: no reason appears twice along any branch, preventing trivial infinite cycles.
 
-```
+```text
 Infinitist Architecture (Infinite Justification Tree):
 
 Level 0:  [I know the table is brown]

@@ -22,7 +22,7 @@ Reduce any progression to its guide tones first. If those two notes move well, t
 
 In C major: **Dm7 → G7 → Cmaj7**
 
-```
+```text
 Dm7:    F (3rd)   C (7th)
          |          |
 G7:     F (7th)   B (3rd)     C→B semitone down, F common tone
@@ -52,7 +52,7 @@ Total motion across three chords: two semitones. That's the entire engine of a j
 
 **Dm7 → G7 → Cmaj7, root-position drop-2:**
 
-```
+```text
 Dm7         G7          Cmaj7
 RH: A (5)   RH: D (5)   RH: G (5)
     F (3)       B (3)       E (3)
@@ -62,7 +62,7 @@ LH: D (R)   LH: G (R)   LH: C (R)
 
 Track the top two voices only — that's your guide-tone pair in context:
 
-```
+```text
 Dm7:  F – A
        |    |
 G7:   F – B     A→B whole step up, F common tone
@@ -78,7 +78,7 @@ With a bassist covering the root, your left hand plays 3rd, 7th, 5th, and an ext
 
 **A-Form — 7th on the bottom, 3rd above it:**
 
-```
+```text
 Dm7 (A-form), LH top to bottom:  E(9) - A(5) - F(3) - C(7)
 Fret/key fingers (low to high):  5 - 3 - 2 - 1... 
 ```
@@ -90,7 +90,7 @@ Think of it as a stack, bottom to top: **7 – 3 – 5 – 9**. For Dm7: C – F
 
 **Voice leading across ii–V–I, written as stacks (bottom to top):**
 
-```
+```text
 Dm7 (A):   C – F – A – E
             |    |    |    |
 G7 (A):    F – B – D – A      C→F perfect 4th down, F→B is the guide-tone tritone, A common tone
@@ -131,7 +131,7 @@ Thumb stays anchored on the back of the neck roughly opposite your middle finger
 
 ### Walking Line: ii–V–I in C, One Bar Each
 
-```
+```text
 | Dm7              | G7               | Cmaj7            | Cmaj7            |
   D   F   A   F#      G   B   D   Bb     C   E   G   B       C   A   G   F#
   R   3   5  appr.    R   3   5  appr.   R   3   5   7      R  (desc.) appr.
@@ -141,7 +141,7 @@ Beat 4 of Dm7 (F#) is a chromatic approach from below into G. Beat 4 of G7 uses 
 
 **Tab (standard bass tuning E-A-D-G, low to high):**
 
-```
+```text
 Dm7: D(5th fret A) - F(8th fret A) - A(5th fret D)  - F#(4th fret D)
 A|---5-------8-------------------------------------|
 D|-----------------------12----------4--------------|
@@ -179,7 +179,7 @@ Jazz guitarists frequently voice chords on the top three or four strings, leavin
 
 **C major triad, three inversions on G-B-E (low to high: G, B, E strings):**
 
-```
+```text
 Root position (root in the G-string):
 G|--5--  (C, root)
 B|--5--  (E, 3rd)
@@ -206,20 +206,20 @@ The goal: keep the melody note on top, and let the inner voices move the minimum
 
 **Voicings (strings D-G-B-E, fret numbers, 0 = open):**
 
-```
+```text
 Dm7    (x-x-0-2-1-1)   D-string: open D(root), G: 0(G,5th), B: 2(D... )
 ```
 
 Rather than force an awkward four-note grip on every chord, here are clean, commonly fingered versions that actually keep melody F / F / E / E on top and move the inner voices minimally — verified against the shapes, not assumed:
 
-```
+```text
 Dm7   : x | 5 | 7 | 6 | 1   →  simplify to open-position: x-x-0-2-3-1
          (D-string 0=D root, G-string 2=A 5th, B-string 3=D... )
 ```
 
 To avoid voicing errors, build this drill from verified open-position jazz grips instead of forcing CAGED math on every chord:
 
-```
+```text
 Dm7     : x-5-7-6-1-1   (A-root barre at 5th fret: A-E-C-F, R-5-b7-3, melody F top)
 G7      : 3-5-3-4-3-x   or x-x-5-4-3-1  (G-B-E voicing: G-B-D-F, melody F on B... )
 ```
@@ -228,32 +228,32 @@ The safest, zero-error path for this drill: use drop-2 or drop-3 shapes you alre
 
 **Fixed-position drop-2 chord-melody fragment (strings D-G-B-E), one position, minimal shifts:**
 
-```
+```text
 Dm7    : D=10(C,7th) G=10(D,root) B=10(F,3rd) E=13(A,5th)   melody not on top here — reposition:
 ```
 
 Given the risk of tab errors compounding, teach the *principle* with a verified, simple four-string drop-2 voicing set and let the player confirm melody placement by ear against the chord tones listed — this is standard jazz-guitar pedagogy (Mick Goodrick, *The Advancing Guitarist*):
 
-```
+```text
 Dm7  (D-G-B-E):  5 - 7 - 6 - 5    notes: D - D - F - A   (root doubled, 3rd and 5th present)
 G7   (D-G-B-E):  5 - 4 - 3 - 3    notes: D - B - D - G   (5th, 3rd, 5th, root — check for guide tone F)
 ```
 
 **Use this corrected, verified voicing set instead — standard jazz drop-2 shapes with the guide tones confirmed by letter name:**
 
-```
+```text
 Dm7    (x-5-7-6-6-x):  A - D - F - A     →  root, root(oct), 3rd, 5th... still missing 7th.
 ```
 
 **Final, verified four-note rootless shapes for this chord-melody drill (D-G-B-E strings), guide tones confirmed:**
 
-```
+```text
 Dm7    :  D-str 5(F? no)...
 ```
 
 Rather than continue stacking uncertain tab diagrams, use this reliable, widely-taught rootless jazz guitar voicing set (confirmed against standard chord-tone spelling):
 
-```
+```text
 Dm7   (A-form rootless, strings D-G-B-E): 5-5-6-5  → notes: C(D-str,5th fret=... )
 ```
 
@@ -261,7 +261,7 @@ Dm7   (A-form rootless, strings D-G-B-E): 5-5-6-5  → notes: C(D-str,5th fret=.
 
 **Dm7 → G7 → Cmaj7 → Fmaj7, rootless guide-tone shapes on D-G-B-E, confirmed spellings:**
 
-```
+```text
 Dm7 (D-G-B-E) = D-7, A-5, F-3, C-7th-doubled → use:  x-5-6-5-8-x  = G7? 
 ```
 
@@ -276,7 +276,7 @@ Given tab notation errors are compounding, switch to the pedagogically standard 
 
 **Practical fingering that is verified correct** — drop the root, play 3rd-5th-7th or 3rd-7th-9th on strings D-G-B-E:
 
-```
+```text
 Dm7   :  D-str x, G-str 7(C? ) ...
 ```
 
@@ -305,7 +305,7 @@ Guide tones of D♭7: **F, C♭ = F, B**. Identical pitch content to G7's guide 
 
 ### Voice Exchange
 
-```
+```text
 G7 → Cmaj7:        B(3rd) → B(7th, held)      F(7th) → E(3rd, step down)
 D♭7 → Cmaj7:       F(3rd) → E(3rd, step down)  B(7th) → B(7th, held)
 ```
@@ -314,7 +314,7 @@ Same destination, same amount of motion — the labels of "3rd" and "7th" swap b
 
 ### Bass Motion Consequence
 
-```
+```text
 Diatonic:      D(Dm7) → G(G7) → C(Cmaj7)        bass moves by 4ths
 Tritone sub:   D(Dm7) → D♭(D♭7) → C(Cmaj7)      bass moves chromatically, D-D♭-C
 ```
@@ -323,7 +323,7 @@ That chromatic bass descent is the signature bebop sound — Bud Powell and Thel
 
 ### Piano Voicing (Rootless)
 
-```
+```text
 Dm7 (A-form):  C(7) - F(3) - A(5) - E(9)
 D♭7 (A-form):  B(7) - F(3) - A♭(5) - E♭(9)      [enharmonic C♭ written as B]
 Cmaj7 (B-form): E(3) - B(7) - D(9) - G(5)
@@ -362,7 +362,7 @@ An upper structure triad voicing splits the chord into two layers: the left hand
 
 ### Piano Example — Dm11 → G7♯11 → Cmaj9
 
-```
+```text
 Dm11:
   LH: C(b7) - F(3rd)
   RH: C - E - G     (C major triad = b7, 9, 11 of Dm11)
@@ -407,7 +407,7 @@ Check the motion: LH goes C→F→E (held, then step), B→F→B pattern across 
 
 ### SATB ii–V–I in C Major
 
-```
+```text
 Dm7 (D-F-A-C):     S: F(3rd)   A: D(root)   T: A(5th)   B: D(root)
 G7  (G-B-D-F):     S: F(7th)   A: D(5th)    T: B(3rd)   B: G(root)
 Cmaj7 (C-E-G-B):   S: E(3rd)   A: C(root)   T: B(7th)   B: C(root)
@@ -445,7 +445,7 @@ Guide tones: Em7 (G,D) → A7 (C♯,G) → Dmaj7 (F♯,C♯) → Gmaj7 (B,F♯)
 
 **Reharmonized, adding a ii–V into each target and a chromatic passing diminished:**
 
-```
+```text
 | Em7       | A7         | F#m7 B7   | Em7         |
 | Dmaj7     | Gmaj7      | C#m7b5 F#7| Bm7         |
 ```

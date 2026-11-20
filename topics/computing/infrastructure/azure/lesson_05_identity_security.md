@@ -24,7 +24,7 @@ Azure Active Directory federation operates as a distributed system with geograph
 
 The OAuth 2.0 authorization code flow, the most secure flow for interactive user authentication, proceeds through a sequence of cryptographic redirects and token exchanges:
 
-```
+```text
 ┌──────────┐                                  ┌──────────────┐
 │  Client  │                                  │   Azure AD   │
 │  (Web    │                                  │  (Identity   │
@@ -101,7 +101,7 @@ The `aud` claim specifies the resource URI, ensuring tokens issued for Azure Res
 
 Managed identities eliminate the need for explicit credential management by leveraging the Azure Instance Metadata Service as a credential broker. When a VM or container requests an access token, the IMDS endpoint validates the caller's identity through kernel-enforced network isolation—only processes running on the specific compute resource can reach 169.254.169.254, and the hypervisor ensures one VM cannot spoof another's metadata requests. The IMDS then contacts Azure AD on behalf of the compute resource, presenting the resource's Azure Resource Manager identifier as proof of identity. Azure AD issues an access token scoped to the managed identity's assigned roles, and the IMDS returns this token to the calling process. The entire exchange occurs without the workload ever possessing long-term credentials:
 
-```
+```text
 ┌───────────────┐       ┌──────────────┐       ┌───────────┐
 │  Application  │       │     IMDS     │       │ Azure AD  │
 │   (VM/Pod)    │       │  (Hypervisor │       │  (Token   │
@@ -134,7 +134,7 @@ Role-Based Access Control operates on a graph model where resources form a direc
 
 The RBAC permission check algorithm implements a union of allows with explicit denies taking precedence:
 
-```
+```text
 function HasPermission(principal, resource, action):
     assignments = CollectRoleAssignments(principal, resource)
     allows = []
@@ -163,7 +163,7 @@ Key Vault access policies define permissions as a combination of secret permissi
 
 Conditional Access policies implement a decision engine that evaluates multi-dimensional signals at authentication time and dynamically adjusts access requirements. A policy consists of assignments (which users, groups, or workload identities it applies to), cloud apps (which resources it governs), conditions (contextual factors that trigger the policy), and access controls (the enforcement action). The evaluation flow proceeds as a series of boolean expressions:
 
-```
+```text
 function EvaluateConditionalAccess(request):
     applicable_policies = []
     

@@ -30,7 +30,7 @@ The invariant across auction systems is **information asymmetry arbitrage**. Pla
 
 The operational architecture of search ranking begins with the inverted index, a data structure mapping terms to document lists sorted by relevance signals. When a user submits a query, the retrieval system performs set intersection across the term document lists to identify candidates containing all query terms (or relaxed variants using stemming, synonyms, and semantic embeddings). This retrieval phase completes in 10-50 milliseconds for a billion-document corpus through distributed index shards stored in RAM across thousands of servers.
 
-```
+```text
 Query: "enterprise SaaS pricing models"
 
 Inverted Index Lookup:
@@ -54,7 +54,7 @@ Technical SEO addresses crawl efficiency and indexability. Robots.txt directives
 
 Social feed ranking architecture operates through a two-tower neural network model. The user tower encodes profile attributes (demographics, historical engagement patterns, connection graph embeddings) into a dense vector representation. The content tower encodes post attributes (creator, content type, captions, visual embeddings, engagement velocity) into a parallel dense vector. The model predicts engagement probability through dot product similarity between the user and content vectors, then applies post-processing calibration to convert raw scores into probability distributions across engagement types.
 
-```
+```text
 User Tower Input:
   - Historical engagement features (like rate, comment rate, share rate by content type)
   - Connection graph embeddings (2nd and 3rd degree network density)
@@ -77,7 +77,7 @@ Content virality emerges from network cascade dynamics. When a user engages with
 
 Auction mechanics unfold through a continuous sequence of impression opportunities resolved in 50-150 milliseconds. When a user triggers an ad-eligible event (loading a search results page, scrolling into a feed ad slot), the platform broadcasts a bid request to all eligible advertisers based on targeting criteria. Each advertiser's campaign management system evaluates the opportunity against budget pacing, frequency caps, and conversion probability predictions, then submits a bid. The platform collects bids, applies Quality Score adjustments to compute Ad Rank, and awards the impression to the highest-ranked advertiser at a second-price clearing cost.
 
-```
+```text
 Search Auction Example: Keyword "project management software"
 
 Advertiser A: Bid $4.50, Quality Score 8/10 → Ad Rank = 36.0

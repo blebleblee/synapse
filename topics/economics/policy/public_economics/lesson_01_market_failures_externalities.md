@@ -137,7 +137,7 @@ $$\sum_{i=1}^{N} e_i = \sum_{i=1}^{N} \ell_i = \bar{E}$$
 
 The permit market automatically adjusts $p_e$ to clear supply and demand. If abatement costs are lower than anticipated, firms buy fewer permits, demand falls, and $p_e$ drops until the market clears at the cap. If costs are higher, permit demand rises, $p_e$ increases, and marginal abatement shifts toward lower-cost sources. This iterative price adjustment aggregates dispersed information about abatement costs without requiring the regulator to observe individual cost functions.
 
-```
+```text
 Permit Market Equilibrium Dynamics:
 
 Initial Allocation: ℓᵢ for each firm i, Σℓᵢ = Ē
@@ -213,7 +213,7 @@ Valuation methods translate physical impacts into monetary damages. Hedonic prop
 
 The resulting integrated assessment pipeline transforms emission scenarios into monetary damage estimates through a sequence of disciplinary models:
 
-```
+```text
 Integrated Assessment Pipeline:
 
 Emission Inventory

@@ -121,13 +121,13 @@ Open a new spreadsheet (Excel / LibreOffice / Google Sheets). Create the followi
 
 Enter all data from Table 2.1 beginning in Row 2. In Column F (PP), enter the pulse pressure formula for Row 2:
 
-```
+```text
 =B2-C2
 ```
 
 In Column G (MAP), enter:
 
-```
+```text
 =C2+(B2-C2)/3
 ```
 
@@ -135,72 +135,72 @@ Copy both formulas down through all data rows.
 
 For Column H (SBP_Awake_Flag), which marks awake readings that exceed the ABPM awake SBP threshold of 135 mmHg:
 
-```
+```text
 =IF(AND(E2="Awake",B2>=135),1,0)
 ```
 
 For Column I (DBP_Awake_Flag), awake DBP threshold of 85 mmHg:
 
-```
+```text
 =IF(AND(E2="Awake",C2>=85),1,0)
 ```
 
 For Column J (SBP_Sleep_Flag), sleep SBP threshold of 120 mmHg:
 
-```
+```text
 =IF(AND(E2="Asleep",B2>=120),1,0)
 ```
 
 For Column K (DBP_Sleep_Flag), sleep DBP threshold of 70 mmHg:
 
-```
+```text
 =IF(AND(E2="Asleep",C2>=70),1,0)
 ```
 
 Now create a summary analysis block below the data (starting approximately row 30):
 
 **Mean Awake SBP:**
-```
+```text
 =AVERAGEIF(E2:E24,"Awake",B2:B24)
 ```
 
 **Mean Awake DBP:**
-```
+```text
 =AVERAGEIF(E2:E24,"Awake",C2:C24)
 ```
 
 **Mean Sleep SBP:**
-```
+```text
 =AVERAGEIF(E2:E24,"Asleep",B2:B24)
 ```
 
 **Mean Sleep DBP:**
-```
+```text
 =AVERAGEIF(E2:E24,"Asleep",C2:C24)
 ```
 
 **24-Hour Mean SBP:**
-```
+```text
 =AVERAGE(B2:B24)
 ```
 
 **24-Hour Mean DBP:**
-```
+```text
 =AVERAGE(C2:C24)
 ```
 
 **Standard Deviation — 24-Hour SBP (SBP variability index):**
-```
+```text
 =STDEV(B2:B24)
 ```
 
 **Nocturnal SBP Dip % (the percentage drop from awake mean to sleep mean):**
-```
+```text
 =(AVERAGEIF(E2:E24,"Awake",B2:B24)-AVERAGEIF(E2:E24,"Asleep",B2:B24))/AVERAGEIF(E2:E24,"Awake",B2:B24)*100
 ```
 
 **Morning Surge SBP** (defined as the difference between the mean SBP in the 2 hours after waking and the mean sleep SBP). Using the dataset above, the morning surge window is 06:30–07:30 (rows 21–23):
-```
+```text
 =AVERAGE(B21:B23)-AVERAGEIF(E2:E24,"Asleep",B2:B24)
 ```
 

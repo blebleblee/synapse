@@ -26,7 +26,7 @@ Aspiration and deletion of syllable-final /s/ constitutes the third cardinal dim
 
 The consonantal inventory of Spanish comprises nineteen phonemic segments organized into a natural class hierarchy based on manner and place of articulation. The obstruent stops divide into voiceless /p, t, k/ and voiced /b, d, g/, with the voiceless series exhibiting unaspirated release in all prosodic positions—a feature distinguishing Spanish from English, where voiceless stops receive aspiration in syllable-initial position. The voiced stop series /b, d, g/ exhibits categorical allophonic alternation conditioned by prosodic environment: stop realization [b, d, g] occurs in absolute initial position and after homorganic nasals, while continuant approximant realization [β, ð, ɣ] occurs in all other contexts, including intervocalic position, post-liquid position, and post-fricative position.
 
-```
+```text
 SPANISH CONSONANT INVENTORY (19 PHONEMES)
 
 OBSTRUENTS:
@@ -57,7 +57,7 @@ The lateral consonants consist of the alveolar /l/ and the palatal /ʎ/, though 
 
 The vowel system of Spanish instantiates a maximally symmetric five-vowel pattern arrayed across the acoustic vowel space. The high vowels /i, u/ occupy the extreme corners of the F1-F2 formant space, with /i/ exhibiting first formant values around 300 Hz and second formant values around 2300 Hz, while /u/ exhibits first formant values around 300 Hz and second formant values around 700 Hz. The mid vowels /e, o/ occupy intermediate positions, with /e/ showing F1 around 400 Hz and F2 around 2000 Hz, and /o/ showing F1 around 500 Hz and F2 around 900 Hz. The low vowel /a/ anchors the system at the base of the trapezoid with F1 around 700 Hz and F2 around 1200 Hz.
 
-```
+```text
 SPANISH VOWEL INVENTORY (5 PHONEMES)
 
 Acoustic Formant Space (approximate Hz values):
@@ -88,7 +88,7 @@ Unlike English, where vowels undergo both qualitative and quantitative alternati
 
 Syllable structure in Spanish adheres to the universal sonority sequencing principle, which requires that segments within the syllable be arranged in order of increasing sonority from the margin to the nucleus, then decreasing sonority from the nucleus to the coda. The sonority hierarchy ranks segment classes from least to most sonorous: obstruent stops < fricatives < nasals < liquids < glides < vowels. This hierarchy constrains permissible onset clusters to combinations where the second element is more sonorous than the first: /pl, pr, bl, br, kl, kr, gl, gr, fl, fr, tr, dr/ all satisfy sonority sequencing, while hypothetical clusters like */lp, rp, lb/ violate it and are systematically prohibited.
 
-```
+```text
 SPANISH SYLLABLE STRUCTURE TEMPLATE
 
 Maximum Template: (C₁)(C₂)V(C₃)(C₄)
@@ -126,7 +126,7 @@ Resyllabification redistributes segments across syllable boundaries to maximize 
 
 Stress assignment in Spanish operates according to a weight-insensitive moraic system where the three-syllable window constrains possible stress locations. The default rules predict stress placement with approximately 85% accuracy: words ending in vowel, /n/, or /s/ receive penultimate stress ("casa," "examen," "libros"), while words ending in any other consonant receive final stress ("papel," "reloj," "ciudad"). Exceptions to these defaults receive orthographic marking via acute accent diacritics: "café" overrides the vowel-final default, "última" overrides the vowel-final default, "difícil" overrides the consonant-final default.
 
-```
+```text
 SPANISH STRESS ASSIGNMENT ALGORITHM
 
 Input: Phonological word W with syllables σ₁, σ₂, ... σₙ
@@ -160,7 +160,7 @@ Stress in Spanish carries both demarcative and culminative functions: it marks w
 
 Intonation in Spanish is organized around a system of boundary tones and pitch accents that combine to create melodic contours encoding pragmatic meaning. Declarative sentences exhibit a falling boundary tone (L%) that signals finality and assertion, with the pitch contour descending from a high target on the stressed syllable of the final content word to a low target at the utterance boundary. Interrogative sentences divide into two types: yes-no questions exhibit a rising boundary tone (H%) that signals uncertainty and solicits confirmation, while wh-questions exhibit a falling boundary tone identical to declaratives, with the interrogative force encoded lexically by the wh-word rather than prosodically by intonational melody.
 
-```
+```text
 SPANISH INTONATION PATTERNS
 
 Declarative Statement (Final Fall):

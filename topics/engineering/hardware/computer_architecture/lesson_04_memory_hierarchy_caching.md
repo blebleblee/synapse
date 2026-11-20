@@ -18,7 +18,7 @@ A CPU cache is fundamentally organized as an array of small, fixed-size blocks c
 
 Consider a concrete example: a 32 KB L1 data cache with 64-byte lines and 8-way associativity. The total number of cache lines is C/L = 32,768 / 64 = 512 lines. With 8 ways per set, the number of sets is 512 / 8 = 64 sets. When the CPU issues a memory request for address `0x4A7C`, the cache uses a portion of that address to determine which set to search. Specifically, the byte offset within the line is log₂(64) = 6 bits (bits 5:0 of the address). The set index uses the next log₂(64) = 6 bits (bits 11:6). The remaining bits (bits 63:12) form the tag. So address `0x4A7C` would be split as follows:
 
-```
+```text
 Address:  0x4A7C = 0100 1010 0111 1100 (binary)
           |--------|-------|------|
              Tag     Set    Offset
@@ -62,7 +62,7 @@ The final address presented to the memory subsystem is almost never the same add
 
 The translation process involves a hierarchy of lookups. On an x86-64 system, a virtual address is split into multiple fields:
 
-```
+```text
 Virtual Address (48-bit):  [47:39] [38:30] [29:21] [20:12] [11:0]
                             PML4    PDPT     PD      PT      Offset
 ```

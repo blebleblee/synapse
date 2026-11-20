@@ -20,7 +20,7 @@ Braking systems on high-performance motorcycles represent perhaps the most safet
 
 The multi-plate wet clutch assembly consists of alternating friction plates and steel separator plates compressed together by a diaphragm spring or coil spring pack. Each friction interface contributes to total torque capacity according to the equation:
 
-```
+```text
 T_clutch = n × μ × F_normal × r_mean
 
 where:
@@ -58,7 +58,7 @@ The measurement protocol requires precision and repeatability. Begin with the mo
 
 Spring rate calculations for fork springs involve the mass supported by the front end and the desired natural frequency of the sprung mass system. The front end typically supports 45-50% of the combined motorcycle and rider mass, approximately 140-160 kg for a 175 kg total system mass. The target natural frequency for race suspension typically falls between 1.8-2.2 Hz, providing responsive bump absorption while maintaining chassis stability. The relationship between spring rate, sprung mass, and natural frequency follows:
 
-```
+```text
 f_n = (1/2π) × √(k/m)
 
 Rearranging to solve for spring rate:
@@ -86,7 +86,7 @@ The practical tuning approach begins with establishing a baseline setting, typic
 
 The hydraulic brake system consists of a master cylinder actuated by the brake lever, rigid or braided stainless steel brake lines, and one or more calipers housing pistons that clamp brake pads against the rotor. The master cylinder contains a piston and bore, with lever force applied to the piston generating pressure in the hydraulic fluid according to:
 
-```
+```text
 P = F_lever / A_master
 
 where:
@@ -97,7 +97,7 @@ A_master = master cylinder piston area (mm²)
 
 This pressure transmits through incompressible brake fluid to the caliper pistons. The clamping force at each caliper piston equals pressure multiplied by piston area. Modern sport bike front brake systems typically employ dual rotors with four-piston calipers, providing eight total pistons. If the master cylinder piston diameter measures 16 mm (area = 201 mm²) and each caliper piston measures 30 mm diameter (area = 707 mm² each), the system creates substantial force multiplication:
 
-```
+```text
 For 100 N lever force:
 P = 100 N / 201 mm² = 0.498 MPa
 
@@ -112,7 +112,7 @@ This 28:1 force multiplication allows a rider to generate brake torque sufficien
 
 Brake rotor diameter and caliper mounting radius determine brake torque for a given clamping force. Larger diameter rotors increase the moment arm between pad friction force and wheel center, providing greater brake torque per unit clamping force. A 320 mm rotor with pads clamping at 140 mm radius generates brake torque:
 
-```
+```text
 T_brake = F_clamp × μ_pad × r_rotor
 
 For F_clamp = 2,816 N, μ_pad = 0.45, r_rotor = 140 mm:
@@ -163,7 +163,7 @@ The friction material microstructure determines temperature performance characte
 
 Temperature management during track sessions requires understanding the thermal mass and heat dissipation characteristics of the brake system. A typical 320 mm rotor with 5 mm thickness and 16 mm width weighs approximately 1.8 kg with heat capacity around 450 J/kg⋅K. During a single threshold braking event from 200 km/h to 50 km/h lasting 4 seconds, approximately 180 kJ of kinetic energy converts to heat in the front brakes. Assuming 70% of this energy (126 kJ) is absorbed by a single rotor, temperature rise calculates as:
 
-```
+```text
 ΔT = Q / (m × c_p) = 126,000 J / (1.8 kg × 450 J/kg⋅K) = 156°C
 ```
 

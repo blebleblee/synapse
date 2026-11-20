@@ -189,7 +189,7 @@ $$\sinh x = x + \frac{x^3}{3!} + \frac{x^5}{5!} + \cdots = \sum_{n=0}^{\infty} \
 
 The structural diagram of these relationships is worth making explicit. The exponential function $e^z$ over $\mathbb{C}$ is the common ancestor; circular and hyperbolic trigonometry are two orthogonal slices through it.
 
-```
+```text
                         e^z  (entire function on ℂ)
                        /           \
             z = iθ (imaginary)    z = x (real)

@@ -212,7 +212,7 @@ int check_license(uint32_t key) {
 
 Transforms into VM bytecode:
 
-```
+```text
 PUSH_IMM 0xDEADBEEF
 PUSH_REG r0           ; Assume key passed in r0
 XOR
@@ -413,7 +413,7 @@ The build process computes the hash, embeds it at the specified offset, then rec
 
 Defeating integrity checks requires locating all verification routines and either patching them to always succeed or modifying the expected hash values. Tools like `radare2` can search for CRC32 constants and suspicious comparison instructions:
 
-```
+```text
 r2 -A binary
 [0x00001000]> /c 0xEDB88320   # Search for CRC32 polynomial
 [0x00001000]> /c 0xDEADBEEF   # Search for embedded checksums

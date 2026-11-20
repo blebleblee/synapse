@@ -61,7 +61,7 @@ The **residual stream** is the central concept in transformer mechanistic interp
 
 For a single attention head with queries Q ∈ ℝ^(T×d_k), keys K ∈ ℝ^(T×d_k), values V ∈ ℝ^(T×d_v):
 
-```
+```text
 Attention(Q, K, V) = softmax(QK^T / √d_k) · V
 ```
 
@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
 Integrated Gradients is the gold standard for gradient-based feature attribution because it satisfies both the **completeness** axiom and **sensitivity** (non-zero gradient for features that change the output). For input x and baseline x' (typically the zero vector or a padding token):
 
-```
+```text
 IG_i(x) = (x_i - x'_i) · ∫₀¹ [∂F(x' + α(x - x')) / ∂x_i] dα
 ```
 
@@ -267,7 +267,7 @@ def token_level_attribution(
 
 Raw attention weights do not propagate through the network's depth—head at layer L attends to layer L's residual stream, not raw tokens. Attention rollout recursively multiplies attention matrices across layers to approximate how much each input token influences each output position:
 
-```
+```text
 Ã_l = 0.5 · A_l + 0.5 · I   (add residual identity connection)
 Rollout_L = Ã_L · Ã_{L-1} · ... · Ã_1
 ```
@@ -399,7 +399,7 @@ def logit_lens(model: HookedTransformer, prompt: str, top_k: int = 5) -> pd.Data
 
 The current frontier in mechanistic interpretability (Cunningham et al., 2023; Anthropic's MoS series) uses **sparse autoencoders (SAEs)** to decompose polysemantic neuron activations into monosemantic feature directions. An SAE is trained on a large corpus of model activations with an L1 penalty to enforce sparsity:
 
-```
+```text
 min_{W_enc, W_dec, b_enc, b_dec} ‖x - x̂‖₂² + λ · ‖f‖₁
 
 where f = ReLU(W_enc · x + b_enc)       (sparse feature activations)
@@ -728,7 +728,7 @@ For production interpretability pipelines, Integrated Gradients steps should be 
 
 **Gradient sharpening**: In very deep networks, gradients concentrate on a small number of high-frequency input features (high pixel-gradient regions in images, rare tokens in language). This is not a reflection of causal importance—it reflects the structure of the loss landscape's curvature. SmoothGrad (Smilkov et al., 2017) mitigates this by averaging gradients over n_samples inputs with added Gaussian noise σ:
 
-```
+```text
 SmoothGrad(x) = (1/n) Σᵢ ∇F(x + εᵢ),  εᵢ ~ N(0, σ²I)
 ```
 

@@ -17,27 +17,27 @@ The correctness of any rewrite rule is grounded in relational algebra. The five 
 The key equivalences exploited by optimizers are:
 
 **Commutativity of join:**
-```
+```text
 R ⋈ S ≡ S ⋈ R
 ```
 
 **Associativity of join:**
-```
+```text
 (R ⋈ S) ⋈ T ≡ R ⋈ (S ⋈ T)
 ```
 
 **Selection pushdown (cascading selections):**
-```
+```text
 σ_p1 AND p2 (R) ≡ σ_p1(σ_p2(R))
 ```
 
 **Selection-join commutativity (pushing filters below joins):**
-```
+```text
 σ_p(R ⋈ S) ≡ σ_p(R) ⋈ S     [when p references only attributes of R]
 ```
 
 **Projection-join interaction:**
-```
+```text
 π_L(R ⋈ S) ≡ π_L(π_{L∪attr(R)}(R) ⋈ π_{L∪attr(S)}(S))
 ```
 
@@ -69,13 +69,13 @@ This invariant creates a maintenance problem. Given a base table update `ΔR`, w
 
 For a view defined as `V = σ_p(R ⋈ S)`, insertion of tuple `t` into `R` produces:
 
-```
+```text
 ΔV_insert = σ_p({t} ⋈ S)
 ```
 
 For deletion of `t` from `R`:
 
-```
+```text
 ΔV_delete = σ_p({t} ⋈ S)
 ```
 
@@ -168,7 +168,7 @@ The optimizer's choice of join algorithm has first-order impact on performance. 
 
 For each row in the outer relation R, scan the inner relation S for matching rows.
 
-```
+```text
 Cost = |R| × Cost(scan S per probe)
      = |R| × (|S| / buffer_pages)   [without index]
      = |R| × Cost(index lookup on S)  [with index]
@@ -181,7 +181,7 @@ NLJ is optimal when the outer relation is tiny and the inner has an index on the
 Build phase: scan the smaller relation and build an in-memory hash table on the join key.
 Probe phase: scan the larger relation and probe the hash table.
 
-```
+```text
 Cost = Cost(scan R) + Cost(build hash table)
      + Cost(scan S) + Cost(probe hash table)
      ≈ 3 × (|R| + |S|)   [with two-pass grace hash join]
@@ -193,7 +193,7 @@ Hash join requires `O(min(|R|, |S|))` memory for the build phase. When memory is
 
 Both relations are sorted on the join key, then merged in a single linear scan.
 
-```
+```text
 Cost = Cost(sort R) + Cost(sort S) + Cost(merge)
      ≈ 2×|R|×log(|R|/B) + 2×|S|×log(|S|/B) + |R| + |S|
 ```
@@ -222,7 +222,7 @@ graph LR
 
 The classical execution model is the **Volcano (iterator) model**, introduced by Graefe (1994). Each operator implements a `next()` interface that returns one tuple at a time. The plan tree is a composition of iterators, and execution proceeds by pulling tuples up from leaves to the root.
 
-```
+```text
 root_operator.next()
   → join_operator.next()
       → scan_operator.next()   // returns tuple from storage
@@ -357,7 +357,7 @@ An index is a separate data structure that provides an alternative access path t
 
 The **index selectivity threshold** determines when a sequential scan beats an index scan. For a non-clustered index with random heap I/O:
 
-```
+```text
 Cost(index scan) = Cost(index traversal) + selectivity × |table| × Cost(random page I/O)
 Cost(seq scan)   = |table pages| × Cost(sequential page I/O)
 ```
@@ -561,7 +561,7 @@ ORDER BY revenue DESC;
 
 Interpreting the plan output:
 
-```
+```text
 HashAggregate  (cost=18420.33..18421.33 rows=100 width=72)
                (actual time=342.1..342.3 rows=15 loops=1)
   Group Key: c.country, c.tier
@@ -945,7 +945,7 @@ func validateReadOnlyQuery(query string) error {
 
 The most dangerous failure mode in query optimization is **cardinality estimate error compounding**. Consider a 5-table join where each table's row estimate is off by 5×. The join cardinality estimate compounds multiplicatively:
 
-```
+```text
 Estimated join cardinality error ≈ 5¹ × 5² × 5³ × 5⁴ = 5^(10) ≈ 10,000,000×
 ```
 

@@ -477,7 +477,7 @@ location / {
 
 This eliminates the waterfall delay between receiving the HTML, parsing link tags, and initiating stylesheet requests. However, server push has fallen out of favor due to cache invalidation problems—if the browser already has `styles.css` cached, the pushed bytes waste bandwidth. Modern best practice prefers `preload` link headers, which provide prioritization hints without transferring unnecessary data:
 
-```
+```text
 Link: </styles.css>; rel=preload; as=style
 Link: </app.js>; rel=preload; as=script
 ```

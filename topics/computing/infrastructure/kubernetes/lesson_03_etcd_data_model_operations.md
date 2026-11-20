@@ -563,7 +563,7 @@ Disk space planning follows from the write rate and compaction retention window.
 
 Monitoring the following metrics (exposed via etcd's Prometheus endpoint at `/metrics`) is essential for proactive capacity management:
 
-```
+```text
 etcd_mvcc_db_total_size_in_bytes          # current bbolt file size
 etcd_mvcc_db_total_size_in_use_bytes      # bytes actually in use (after logical compaction)
 etcd_mvcc_put_total                       # cumulative put operations

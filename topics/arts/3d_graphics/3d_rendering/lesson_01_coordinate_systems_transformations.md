@@ -35,7 +35,7 @@ World space establishes a shared universal coordinate system for an entire scene
 
 A model matrix is a four-by-four affine transformation built from simpler component transformations. Consider positioning an object: you rotate it around its local Y-axis by forty-five degrees, scale it uniformly by a factor of two, then translate it five units along the world X-axis. Each operation corresponds to a specific matrix:
 
-```
+```text
 Translation Matrix T:
 | 1  0  0  Tx |
 | 0  1  0  Ty |
@@ -59,7 +59,7 @@ The composite model matrix M results from right-to-left multiplication: M = T ×
 
 View transformation reinterprets world-space geometry from the camera's perspective, translating and rotating the entire world such that the camera sits at the origin facing down the negative Z-axis. This standardized orientation simplifies subsequent operations; the rendering pipeline can assume a fixed camera pose rather than handling arbitrary camera positions. Constructing the view matrix requires computing the inverse of the camera's world-space model matrix. If the camera's position vector is **C**, its forward direction is **F**, its right vector is **R**, and its up vector is **U**, the view matrix V becomes:
 
-```
+```text
 | Rx  Ry  Rz  -dot(R,C) |
 | Ux  Uy  Uz  -dot(U,C) |
 | Fx  Fy  Fz  -dot(F,C) |
@@ -72,7 +72,7 @@ Projection transformation compresses the view-space frustum—the truncated pyra
 
 The perspective projection matrix for a symmetric frustum defined by field-of-view angle FOV, aspect ratio A, near clipping plane N, and far clipping plane F takes the form:
 
-```
+```text
 | 1/(A·tan(FOV/2))      0              0                0          |
 |        0         1/tan(FOV/2)        0                0          |
 |        0              0         -(F+N)/(F-N)   -2·F·N/(F-N)    |
@@ -87,7 +87,7 @@ Clip space serves as the domain for clipping operations. The rendering engine di
 
 The viewport transformation maps normalized device coordinates to window coordinates, the discrete integer pixel grid of your framebuffer. Given a viewport origin (Ox, Oy) and dimensions (W, H), the viewport transformation scales and offsets the normalized coordinates:
 
-```
+```text
 Xwindow = (Xn + 1) · W/2 + Ox
 Ywindow = (Yn + 1) · H/2 + Oy
 ```
@@ -96,7 +96,7 @@ The Z coordinate typically maps to the depth buffer range, often zero to one, th
 
 Visualizing the complete pipeline as a signal flow diagram clarifies the data dependencies:
 
-```
+```text
 Object Space Vertex (Xo, Yo, Zo, 1)
             ↓
     [Model Matrix M]

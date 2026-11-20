@@ -20,7 +20,7 @@ Git's architecture centers on the object database, a content-addressable store w
 
 The tree object format encodes directory structure through a simple binary protocol. Each entry consists of the Unix permission mode in ASCII (typically "100644" for regular files or "040000" for subdirectories), a space, the filename as UTF-8 bytes, a null byte, and the 20-byte binary SHA-1 hash of the referenced blob or tree. Entries are sorted lexicographically by name with a special rule: directory entries sort as if they had a trailing slash. This canonical ordering ensures that identical directory structures always produce identical tree hashes, regardless of the order files were added.
 
-```
+```text
 100644 blob a906cb2a4a904a152e80877d4088654daad0c859    README.md
 100644 blob 8f94139338f9404f26296befa88755fc2598c289    main.c
 040000 tree 99f1a6d12cb4b6f19c8655fca46c3ecf317074e0    src
@@ -28,7 +28,7 @@ The tree object format encodes directory structure through a simple binary proto
 
 The commit object ties everything together through a structured text format that's both human-readable and precisely parseable. It begins with a line identifying the root tree hash, then zero or more parent lines for merge commits, followed by author and committer lines with timestamps encoded as Unix epoch seconds plus timezone offset, a blank line, and finally the commit message. Git stores this as a blob with type "commit" rather than "blob", enabling different handling by porcelain commands.
 
-```
+```text
 tree 99f1a6d12cb4b6f19c8655fca46c3ecf317074e0
 parent 3a0874c6f8b5e6d9a2c8b7f1e5d4c3b2a1098765
 author Alice Engineer <alice@example.com> 1704931200 -0800

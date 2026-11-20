@@ -89,7 +89,7 @@ The JAMMA edge connector is a 2×28 position (56-pin total) PCB edge connector w
 
 The control inputs on the JAMMA connector are active-low logic signals. Each button or joystick direction connects between the JAMMA pin and cabinet ground; when the button is pressed, it closes the circuit and pulls the signal to ground, which the PCB's input logic reads as a logic LOW and interprets as an active input. This means that any break in the ground path — a corroded connector pin, a broken wire in the harness, a failed crimp — manifests as a permanently inactive control, while a short to ground manifests as a permanently active one. Diagnosing a stuck-left joystick condition, for example, begins by measuring continuity from the joystick microswitch common terminal to the cabinet chassis ground, not by measuring voltage at the JAMMA pin.
 
-```
+```text
 JAMMA Connector Partial Pinout (Component Side / Solder Side)
 
 Component Side (A)          |  Pin  |  Solder Side (B)

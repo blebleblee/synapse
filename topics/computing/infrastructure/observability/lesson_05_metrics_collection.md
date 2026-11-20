@@ -6,7 +6,7 @@ Observability, in the information-theoretic sense, asks whether the internal sta
 
 A metric is a **named, time-stamped, dimensioned scalar**. Formally, a single sample can be expressed as:
 
-```
+```text
 (name, {label_key: label_value, ...}, value, timestamp_unix_ms)
 ```
 
@@ -134,7 +134,7 @@ Key files and their semantic content:
 
 The de facto standard for the pull model is the Prometheus text exposition format (and its binary successor, OpenMetrics). An agent at `/metrics` emits UTF-8 text:
 
-```
+```bash
 # HELP http_requests_total Total number of HTTP requests
 # TYPE http_requests_total counter
 http_requests_total{method="GET",status="200",handler="/api/v1/users"} 142756 1710000000000

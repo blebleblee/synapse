@@ -79,7 +79,7 @@ The `i_links_count` field maintains the hard link reference count. Each director
 
 The `i_block` array represents the most architecturally significant component of the inode structure. In traditional ext2/ext3 filesystems, this array contains exactly 15 32-bit block numbers. The first 12 entries are direct block pointers, meaning they store the physical block addresses of the file's first 12 data blocks. For filesystems with 4KB block size, this allows files up to 48KB to be addressed with zero indirection overhead—the kernel reads the inode and immediately knows where every data block resides.
 
-```
+```text
 Direct blocks (i_block[0..11]):
 inode → block₀, block₁, ..., block₁₁
 
@@ -142,7 +142,7 @@ Large directories in ext4 can use hashed tree indexes (htree) to improve lookup 
 
 The kernel maintains a per-superblock inode cache implemented as a hash table keyed by inode number. When opening a file, the VFS layer first checks this cache. If the inode is already resident in memory, the kernel increments its reference count and returns immediately. On cache miss, the kernel calculates the inode's physical location using the formula:
 
-```
+```text
 block_group = (inode_number - 1) / inodes_per_group
 inode_index = (inode_number - 1) % inodes_per_group
 inode_block = group_descriptor[block_group].inode_table + 

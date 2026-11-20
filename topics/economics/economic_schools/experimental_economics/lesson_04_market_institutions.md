@@ -86,7 +86,7 @@ Multi-unit auction extensions confront exposure problems and complementarity com
 
 Matching market experiments implement stable allocation algorithms for assignment problems where monetary transfers are prohibited or constrained. The Gale-Shapley deferred acceptance mechanism for two-sided matching—schools and students, hospitals and residents, workers and firms—operates through iterative proposal and rejection rounds. In the student-proposing version, each round $t$ proceeds as follows:
 
-```
+```text
 Initialize: all students and schools unmatched
 Round t:
   1. Each unmatched student proposes to their highest-ranked school not yet rejected

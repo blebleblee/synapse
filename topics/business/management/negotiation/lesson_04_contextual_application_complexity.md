@@ -18,7 +18,7 @@ The tension between transactional optimization and long-term relationship preser
 
 Multiparty negotiation architecture begins with coalition formation analysis. The Shapley value from cooperative game theory provides the fundamental allocation rule for distributing surplus across coalition members. Consider a three-party joint venture between a pharmaceutical manufacturer, a biotechnology research firm, and a clinical trials network. The total value created by the partnership—defined as revenues minus standalone costs for each participant—must be allocated in proportion to each party's marginal contribution across all possible coalition orderings.
 
-```
+```text
 Coalition Structure Analysis Framework:
 
 Party A: Pharmaceutical Manufacturer (distribution network, regulatory expertise)
@@ -77,7 +77,7 @@ Personal ethical boundaries manifest through walk-away constraints that override
 
 The relationship preservation versus transactional optimization tradeoff requires explicit net present value calculation. Define the current negotiation surplus as S₀ and the expected annual surplus from future transactions as Sₜ for periods t = 1 to T. Aggressive negotiation tactics increase current surplus by α but reduce future transaction probability by β. The discount rate r captures time value of money and relationship decay risk. Cooperation maximizes total value when:
 
-```
+```text
 NPV(Cooperation) > NPV(Aggression)
 
 S₀ + Σ(Sₜ / (1 + r)ᵗ) for t=1 to T > (1 + α)S₀ + (1 - β)Σ(Sₜ / (1 + r)ᵗ)

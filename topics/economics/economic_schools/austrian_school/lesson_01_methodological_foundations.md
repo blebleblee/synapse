@@ -48,7 +48,7 @@ Böhm-Bawerk's concept of production roundaboutness captures the intertemporal c
 
 Hayek's triangle diagram provides a geometric representation of this intertemporal production structure:
 
-```
+```text
 Consumption Goods (Stage 1)
           ↑
           |

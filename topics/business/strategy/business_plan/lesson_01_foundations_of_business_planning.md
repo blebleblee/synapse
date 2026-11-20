@@ -102,7 +102,7 @@ The financial model represents the quantitative integration of all business mode
 
 The cost structure divides into cost of goods sold (direct costs of delivering the product or service), sales and marketing (customer acquisition costs), research and development (product development and engineering), and general and administrative (overhead functions). Each category requires driver-based modeling—costs that scale with specific activity metrics rather than arbitrary percentage growth assumptions. COGS for SaaS products scales with customer count and usage volume through cloud infrastructure consumption. Sales and marketing scales with rep headcount, quota attainment, and program spend. R&D scales with engineering headcount and technology infrastructure.
 
-```
+```text
 Revenue Model Flow:
 
 Marketing Spend → Marketing Qualified Leads (MQL)

@@ -74,7 +74,7 @@ The responding stage also encompasses strategic silence. After the listener deli
 
 Here is the overall architecture of the listening process stages rendered as a state diagram:
 
-```
+```text
 Receiving
   ↓
   [Environmental simplification]

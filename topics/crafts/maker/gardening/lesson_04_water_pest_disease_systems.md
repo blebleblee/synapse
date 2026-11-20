@@ -129,7 +129,7 @@ Install sensors at 1/3 the distance from the plant to the midpoint between plant
 
 **Interpretation algorithm**:
 
-```
+```text
 IF tension_15cm > trigger_threshold AND tension_45cm > 0.5 × trigger_threshold:
     Irrigate immediately (both zones depleted)
 ELSE IF tension_15cm > trigger_threshold AND tension_45cm < 0.5 × trigger_threshold:

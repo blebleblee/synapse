@@ -278,7 +278,7 @@ struct cred {
 
 The CFS, introduced in Linux 2.6.23, models an "ideal multitasking CPU" where each task receives `1/n` of CPU time instantaneously. In reality, CFS tracks virtual runtime and schedules the task with the smallest `vruntime`:
 
-```
+```text
 vruntime_i(t) = physical_runtime_i(t) × (NICE_0_LOAD / weight_i)
 ```
 
@@ -353,7 +353,7 @@ static void update_curr(struct cfs_rq *cfs_rq) {
 
 SCHED_DEADLINE guarantees schedulability if:
 
-```
+```text
 Σ (runtime_i / period_i) ≤ 1
 ```
 
@@ -762,7 +762,7 @@ dma_free_coherent(dev, size, cpu_addr, dma_handle);
 
 Amdahl's Law quantifies scalability limits imposed by serialization:
 
-```
+```text
 Speedup = 1 / (S + (1-S)/N)
 ```
 
@@ -972,7 +972,7 @@ panic("Unable to mount root fs on %s", root_device_name);
 
 **Kernel oops**: Recoverable error (e.g., NULL dereference in driver):
 
-```
+```text
 BUG: unable to handle kernel NULL pointer dereference at 0000000000000008
 IP: [<ffffffffa0123456>] my_driver_read+0x12/0x50 [mydriver]
 ```

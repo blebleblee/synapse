@@ -223,7 +223,7 @@ Implement a Markov chain pitch generator to create melodic sequences with contro
 
 In REAPER's JSFX scripting environment, implement a Markov pitch generator as follows. Create a new JSFX script (File → New → JSFX) and enter:
 
-```
+```text
 desc: Markov Pitch Generator
 
 slider1:60<0,127,1>Starting Pitch

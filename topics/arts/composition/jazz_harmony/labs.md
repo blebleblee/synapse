@@ -44,7 +44,7 @@ In C major, Dm7 → G7 → Cmaj7, watch what the 7th of each chord does:
 
 A-form stacks: **3rd – 7th – 9th – 5th**, read bottom to top, left hand only.
 
-```
+```text
 Dm9     LH: F3  C4  E4  A4      (3rd, b7, 9th, 5th)
 G13     LH: B3  F4  A4  E5      (3rd, b7, 9th, 13th)
 Cmaj9   LH: E3  B3  D4  G4      (3rd, 7th, 9th, 5th)
@@ -71,7 +71,7 @@ Cmaj9   LH: E3  B3  D4  G4      (3rd, 7th, 9th, 5th)
 
 Write out the motion between adjacent chords, note by note, bottom to top:
 
-```
+```text
 Dm9 → G13:     F→B (tritone)   C→F (4th up)   E→A (4th up)   A→E (4th down)
 G13 → Cmaj9:   B→E (4th up)    F→B (tritone)  A→D (4th up)   E→G (m3 up)
 ```
@@ -82,7 +82,7 @@ Three of four voices move by a perfect 4th in each transition. A 4th on the keyb
 
 Static whole-note chords are a practice scaffold, not real comping. Add this syncopated pattern once Drill 1A is solid (x = attack, dash = held/rest within the beat):
 
-```
+```text
 Dm9 (1 bar):   x . x .  (beats 1 and 3)
 G13 (1 bar):   . x . x  (beats 2 and 4, anticipating resolution)
 Cmaj9 (2 bars): x . . .  | . . . .
@@ -92,7 +92,7 @@ Run the full 4-bar phrase at 60, then 80, then 100, then 120 BPM. Do not advance
 
 ### Drill 1D — Two-hand independence: RH melody over LH comping
 
-```
+```text
 Bar 1 (LH: Dm9 held):   RH quarter notes: A4(5) C5(5) E5(5) G5(5)
 Bar 2 (LH: G13 held):   RH quarter notes: G4(5) B4(4) D5(5) F5(5)
 Bar 3 (LH: Cmaj9 held): RH quarter notes: E4(5) G4(5) C5(5) rest
@@ -105,7 +105,7 @@ The point of this drill is hand independence: the left hand's rhythm (from Drill
 
 B-form stacks: **7th – 3rd – 5th – 9th**. This is the A-form voicing inverted up — same four pitch classes, different note on the bottom.
 
-```
+```text
 Dm9     LH: C4  F4  A4  E5
 G13     LH: F4  B4  E5  A5
 Cmaj9   LH: B3  E4  G4  D5
@@ -123,7 +123,7 @@ Fingering: **5–3–2–1** again. Notice B-form sits roughly an octave higher 
 
 Use the circle of fifths for transposition order, not alphabetical or random order — fifths-related keys share the most voicing shapes, so this order builds transfer fastest:
 
-```
+```text
 C → F → Bb → Eb → Ab → Db → Gb → B → E → A → D → G → C
 ```
 
@@ -167,7 +167,7 @@ The payoff is the bass line. A standard ii–V–I moves D (ii) → G (V) → C 
 
 ### Drill 2A — Side by side (60 BPM)
 
-```
+```text
 Standard:     Dm9 (LH: F3 C4 E4 A4) → G13 (LH: B3 F4 A4 E5) → Cmaj9 (LH: E3 B3 D4 G4)
 Tritone sub:  Dm9 (same)           → Db13(LH: F3 B3 Eb4 Ab4) → Cmaj9 (same)
 ```
@@ -178,7 +178,7 @@ Play four bars standard, immediately four bars substituted. Listen specifically 
 
 Strip each chord to just 3rd and 7th, two notes:
 
-```
+```text
 G7:  B3 F4   (3rd, 7th)
 Db7: F3 B3   (3rd, 7th — same two pitch classes, inverted)
 ```
@@ -187,7 +187,7 @@ Play G7's guide tones, then Db7's guide tones, back and forth, ten times, listen
 
 ### Drill 2C — All twelve keys (80 → 120 BPM)
 
-```
+```text
 C major:  Dm9 – Db13 – Cmaj9
 F major:  Gm9 – Gb13 – Fmaj9
 Bb major: Cm9 – B13  – Bbmaj9
@@ -197,7 +197,7 @@ Continue around the circle of fifths. Two beats per chord, 80 BPM to start, push
 
 ### Applying it: "Autumn Leaves," first 8 bars (G minor)
 
-```
+```text
 Original:        | Cm7   | F7    | Bbmaj7 | Ebmaj7 |
                  | Am7b5 | D7    | Gm7    | Gm7    |
 
@@ -232,7 +232,7 @@ graph TD
 
 "Borrowing from the parallel minor" means: you're in C major, but you reach into C minor's key signature (Eb, Ab, Bb) and pull out a chord. The four most useful borrowed chords, and what they replace:
 
-```
+```text
 iv   (Fm7)     replaces IV (Fmaj7)    — introduces Ab
 bVI  (Abmaj7)  replaces vi (Am7)      — introduces Ab, Eb
 bVII (Bb7)     replaces vii° (Bm7b5)  — introduces Bb, Eb
@@ -243,7 +243,7 @@ Why it works without sounding "wrong": you're keeping the chord in a *functional
 
 ### Drill 3A — Major vs. minor plagal cadence (60 BPM)
 
-```
+```text
 Major plagal:  Fmaj7 (LH: E3 A3 C4 F4) → Cmaj7 (LH: E3 B3 D4 G4)
 Minor plagal:  Fm7   (LH: Eb3 Ab3 C4 F4) → Cmaj7 (same)
 ```
@@ -252,7 +252,7 @@ Play each cadence, 4 beats per chord, ten times alternating. Listen for the Ab i
 
 ### Drill 3B — bVI borrowed chord (80 BPM)
 
-```
+```text
 Diatonic:  Am7(G3 C4 E4 B4) – Dm7(F3 C4 E4 A4) – G7(B3 F4 A4 D5) – Cmaj7(E3 B3 D4 G4)
 Borrowed:  Abmaj7(G3 C4 Eb4 Ab4) – Dm7 – G7 – Cmaj7
 ```
@@ -265,7 +265,7 @@ An upper-structure triad is a major or minor triad played in the right hand, sit
 
 **The three you'll use constantly, over G7:**
 
-```
+```text
 LH shell (all three): G2  B2  F3   (root, 3rd, b7)
 
 RH Db major triad (Db F Ab):  → chord tones added: b5, b7(dup), b9  → sounds as G7(b5,b9)
@@ -287,7 +287,7 @@ Keep the RH triad voiced at least an octave above the LH shell. If you stack the
 
 ### Drill 3D — Insert into a ii-V-I
 
-```
+```text
 | Dm9 (2 bars) | G7-shell + Eb-major-triad (2 bars) | Cmaj9 (2 bars) |
 ```
 Run this in all twelve keys. This is the actual comping vocabulary you'll use behind a soloist on a standard — static ii-V-I with a colored V chord.
@@ -295,12 +295,12 @@ Run this in all twelve keys. This is the actual comping vocabulary you'll use be
 ### "All the Things You Are" bridge — modal interchange in the wild
 
 Original key Ab major, bridge (measures 17–24):
-```
+```text
 | Fmaj7  | Fmaj7  | Bbm7 | Eb7 |   (Bbm7 is borrowed iv, in the key of F)
 | Abmaj7 | Abmaj7 | Am7  | D7  |   (Am7-D7 is a ii-V into G major)
 ```
 Transposed to C major for practice:
-```
+```text
 | Cmaj7  | Cmaj7  | Fm7  | Bb7 |
 | Ebmaj7 | Ebmaj7 | Em7  | A7  |
 ```
@@ -338,7 +338,7 @@ A diminished 7th chord stacks four notes a minor 3rd apart: C–Eb–Gb–A. Fou
 
 ### Drill 4A — The four inversions of Cdim7 (60 BPM)
 
-```
+```text
 Root:      C  Eb  Gb  A     fingering 1-2-3-5
 1st inv:   Eb Gb  A   C     fingering 1-2-3-5
 2nd inv:   Gb A   C   Eb    fingering 1-2-3-5
@@ -348,7 +348,7 @@ Play each as a whole note, ascend through all four, then descend. Every inversio
 
 ### Drill 4B — The three diminished families (80 BPM)
 
-```
+```text
 Family 1: C / Eb / Gb / A     — all spell the same four notes
 Family 2: Db / E / G / Bb
 Family 3: D / F / Ab / B
@@ -358,18 +358,18 @@ Pick Family 1 and play it ascending through its four enharmonic "roots": C-Eb-Gb
 ### Chromatic approach chords — the real-world use
 
 The most common jazz use of a dim7 chord is as a half-step approach to a diatonic target, inserted between two chords that are a step apart. Standard ii-V-I:
-```
+```text
 Dm7 – G7 – Cmaj7
 ```
 Insert a diminished chord a half step above Dm7's root to approach the next diatonic chord up (iii, i.e. Em7), and you get a longer, smoother line:
-```
+```text
 Dm7 – D#dim7 – Em7 – G7 – Cmaj7
 ```
 Wait — notice this inserts an *extra* chord (iii) that wasn't in the original progression at all. That's intentional: diminished approach chords are often used to connect two chords a *whole step* apart by inserting a passing diatonic chord plus its diminished approach, turning two chords into four and creating a stepwise bass line: D (ii) – D# (passing dim) – E (iii) – ... – G (V) – C (I).
 
 ### Drill 4C — Chromatic approach pattern (60 BPM)
 
-```
+```text
 Dm7:     LH F3 C4 E4 A4
 D#dim7:  LH F#3 C4 D#4 A4
 Em7:     LH G3 D4 F#4 B4
@@ -384,7 +384,7 @@ Template: ii7 – #ii°7 – iii7 – V7 – Imaj7. Example in F major: Gm7 – 
 
 ### The diminished (octatonic) scale for soloing
 
-```
+```text
 C whole-half diminished: C D Eb F Gb Ab A B C
 ```
 Alternating whole step, half step. This scale is what you improvise with over any of these dim7 chords.
@@ -397,16 +397,16 @@ Alternating whole step, half step. This scale is what you improvise with over an
 
 ### Applying it: Joe Henderson's "Inner Urge"
 
-```
+```text
 | Ebm7  | Ab7   | Dbmaj7 | Dbmaj7 |
 | Ddim7 | Ddim7 | Ebm7   | Ebm7   |
 ```
 The Ddim7 in bars 5-6 is not resolving anywhere immediately — it functions as a floating, ambiguous color before the return to Ebm7. Voice it as:
-```
+```text
 Ddim7: LH F3 B3 D4 Ab4   (1st inversion — F in the bass gives a smoother link from Dbmaj7's bass)
 ```
 Improvise over it with the D whole-half diminished scale. Transpose the whole passage to C minor for a second key:
-```
+```text
 | Cm7   | F7    | Bbmaj7 | Bbmaj7 |
 | Bdim7 | Bdim7 | Cm7    | Cm7    |
 ```
@@ -441,7 +441,7 @@ graph TD
 
 ### The standard form (Bb major, AABA, 32 bars)
 
-```
+```text
 A section (8 bars):
 | Bbmaj7 | G7    | Cm7   | F7    |
 | Dm7    | G7    | Cm7   | F7    |
@@ -453,7 +453,7 @@ B section / bridge (8 bars):
 
 ### Step 1 — Learn the plain A section with rootless voicings (60 → 120 BPM)
 
-```
+```text
 Bbmaj7: LH A3 D4 F4 C5     G7:  LH B3 F4 A4 D5
 Cm7:    LH Bb3 Eb4 G4 D5   F7:  LH A3 Eb4 G4 C5
 Dm7:    LH C4 F4 A4 E5     G7:  LH B3 F4 A4 D5
@@ -462,11 +462,11 @@ Two beats per chord. This is your unreharmonized baseline — don't skip it. You
 
 ### Step 2 — Tritone-sub the dominants
 
-```
+```text
 Original:    | Bbmaj7 | G7  | Cm7 | F7 |
 Substituted: | Bbmaj7 | Db7 | Cm7 | B7 |
 ```
-```
+```text
 Db7 voicing: LH F3 B3 Eb4 Ab4
 B7 voicing:  LH Eb3 A3 C#4 F#4
 ```
@@ -476,12 +476,12 @@ Play original, then substituted, at 80 → 100 → 120 BPM.
 
 Chain the ii, the diminished approach, and the tritone sub together so the left-hand *lowest note* walks chromatically through the bar:
 
-```
+```text
 Bbmaj7 (bass A) → Bdim7 (bass B) → Cm7 (bass Bb) → C#dim7 (bass C#) →
 Dm7 (bass C) → Db7 (bass F, tritone sub) → Cm7 (bass Bb) → B7 (bass Eb, tritone sub)
 ```
 Voicings:
-```
+```text
 Bbmaj7: A3 D4 F4 C5         Bdim7:  B3 D4 F4 Ab4
 Cm7:    Bb3 Eb4 G4 D5       C#dim7: C#4 E4 G4 Bb4
 Dm7:    C4 F4 A4 E5         Db7:    F3 B3 Eb4 Ab4
@@ -491,7 +491,7 @@ Practice this bass line alone first, left hand only, slowly — your ear should 
 
 ### Step 4 — Modal interchange on the bridge
 
-```
+```text
 Standard bridge:  | D7  | D7  | G7  | G7  |
                   | C7  | C7  | F7  | F7  |
 
@@ -502,7 +502,7 @@ Here each original secondary dominant (D7, G7, C7, F7) is preceded by its relate
 
 ### Full 32-bar reharmonized chart
 
-```
+```text
 A (1-8):    | Bbmaj7 | Bdim7  | Cm7   | C#dim7 |
             | Dm7    | Db7    | Cm7   | B7     |
 A (9-16):   (repeat bars 1-8)
@@ -521,7 +521,7 @@ A (25-32):  | Bbmaj7 | Bdim7  | Cm7   | C#dim7 |
 
 ### Drill 5E — Chord-scale map for soloing over the reharmonization
 
-```
+```text
 Bbmaj7:  Bb major (Ionian)
 Bdim7:   B whole-half diminished
 Cm7:     C Dorian
@@ -587,7 +587,7 @@ graph TB
 
 ### Weekly maintenance after day 30
 
-```
+```text
 Mon: rootless voicings, all 12 keys
 Tue: tritone substitution and chromatic bass lines
 Wed: modal interchange and upper-structures

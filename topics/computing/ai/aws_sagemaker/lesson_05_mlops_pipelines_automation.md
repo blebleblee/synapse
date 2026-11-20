@@ -92,7 +92,7 @@ The lineage graph also enables compliance reporting for regulatory frameworks li
 
 Modern MLOps practices treat pipeline definitions as source-controlled infrastructure-as-code, versioned in Git repositories and deployed through automated CI/CD workflows. The canonical pattern separates pipeline definition code (Python SDK invocations constructing the pipeline object) from pipeline execution (API calls triggering runs with specific parameters). The pipeline definition resides in a Git repository with a directory structure like:
 
-```
+```text
 pipelines/
   training_pipeline/
     pipeline.py          # Pipeline definition using SageMaker SDK

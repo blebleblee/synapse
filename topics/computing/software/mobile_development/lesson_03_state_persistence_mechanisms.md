@@ -20,7 +20,7 @@ The persistence abstractions available to mobile engineers exist on a spectrum d
 
 The persistence stack on both iOS and Android can be understood as a layered hierarchy where each layer provides progressively richer semantics in exchange for progressively more structural overhead. Visualizing this hierarchy makes the tradeoffs concrete:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │              Application Domain Layer                        │
 │   (ViewModels, UseCases, Repositories, Domain Models)       │

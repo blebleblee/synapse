@@ -48,7 +48,7 @@ Analyze the verbal constituent with equal precision. The verbal stem *gör* "see
 
 Construct the three-tier interlinear gloss following Leipzig Glossing Rules conventions. The first tier presents the original utterance with morpheme boundaries marked by hyphens. The second tier provides morpheme-by-morpheme translations, using language-specific glosses for lexical morphemes and standardized abbreviations for grammatical morphemes. The third tier offers a free translation capturing the natural English rendering:
 
-```
+```text
 Çocuk-lar-ımız-ı        gör-e-me-di-niz              mi?
 child-PL-POSS.1PL-ACC   see-AOR-NEG-PST-2PL          Q
 "Couldn't you see our children?" / "Didn't you see our children?"
@@ -64,7 +64,7 @@ Segment the single phonological word into its constituent morphemes. The nominal
 
 The complete gloss reveals the sentence's internal structure:
 
-```
+```text
 aliikuseq-suar-tuaannar-sinnaa-nngi-vip-putit
 entertainment-big-only-can-NEG-INTR.IND-2SG
 "Can't you just have some fun?" (lit. "Are you not able to only great-entertainment?")
@@ -86,7 +86,7 @@ Apply the coordination test by joining parallel structures with conjunctions. Tw
 
 Construct the hierarchical tree diagram encoding the constituent structure. Begin with the sentence node S at the root. The sentence immediately dominates a noun phrase subject and a verb phrase predicate. The subject NP branches into a determiner "the" and a nominal constituent N', which further branches into the adjective "experienced" and the noun head "linguist." The verb phrase branches into a transitive verb "analyzed" and its NP complement, which mirrors the subject structure with determiner "the," adjective "complex," and noun head "data."
 
-```
+```text
                     S
           __________|__________
          |                     |
@@ -110,7 +110,7 @@ Extend the analysis to embedded clauses. Analyze the sentence: "The researcher d
 
 The tree structure now includes recursive embedding:
 
-```
+```text
                           S
               ____________|____________
              |                         |

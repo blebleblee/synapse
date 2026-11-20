@@ -541,7 +541,7 @@ ThreadSanitizer instruments every memory access and lock operation, tracking the
 
 The output will include a detailed report like:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7fff12345678 by thread T2:
     #0 race_stress::RacyCounter::increment_racy race_stress.rs:32
@@ -563,7 +563,7 @@ RUSTFLAGS="-Z sanitizer=address" cargo +nightly build --bin race_stress --target
 
 AddressSanitizer replaces the default allocator with an instrumented version that tracks every allocation and deallocation, maintaining shadow memory that records the state of each byte (allocated, freed, poisoned). When the program exits, ASan reports any allocations that were never freed:
 
-```
+```text
 =================================================================
 ==12346==ERROR: LeakSanitizer: detected memory leaks
 
@@ -578,7 +578,7 @@ The report shows that 500 allocations totaling 512 KB were leaked, providing sta
 
 For the use-after-free, ASan reports:
 
-```
+```text
 =================================================================
 ==12347==ERROR: AddressSanitizer: heap-use-after-free on address 0x603000001234 at pc 0x5555abcdef04
 READ of size 1 at 0x603000001234 thread T0

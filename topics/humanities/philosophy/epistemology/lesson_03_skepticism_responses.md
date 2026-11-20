@@ -28,7 +28,7 @@ The recognition that traditional strategies for refuting skepticism seemed to fa
 
 The internal mechanics of skeptical arguments can be precisely diagrammed to expose their inferential structure and identify the specific premises that anti-skeptical strategies target for rejection or reinterpretation. The canonical skeptical argument exploiting closure proceeds through the following deductive steps:
 
-```
+```text
 Premise 1 (Closure): If S knows P, and S knows that P entails ~SK, 
                       then S knows ~SK.
                       (Where SK is a skeptical scenario incompatible with P)
@@ -60,7 +60,7 @@ In ordinary contexts, the standards for knowing you have hands are relatively mo
 
 The contextualist architecture can be represented through the relationship between knowledge ascriptions and contextual parameters:
 
-```
+```text
 Context C₁ (ordinary): K_C₁(S, P) iff S's evidence rules out relevant₁ alternatives to P
 Context C₂ (skeptical): K_C₂(S, P) iff S's evidence rules out relevant₂ alternatives to P
 
@@ -75,7 +75,7 @@ Semantic externalism approaches the skeptical puzzle from a different angle enti
 
 The semantic externalist argument can be formalized:
 
-```
+```text
 Premise 1: If I am a brain in a vat (always envatted), 
            then "vat" in my language refers to vat-images, not actual vats.
 

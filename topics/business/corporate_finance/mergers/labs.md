@@ -103,7 +103,7 @@ Tax at 25%: $67.50M × (1 − 0.25) = $50.63M net income Year 1. Year 3: EBITDA 
 
 Write the following Excel formula in cell B_NetIncome under the Year 1 column (replace row references with your actual layout):
 
-```
+```text
 =(ProForma_EBITDA_Y1 - CombinedDA_Y1 - CombinedInterest) * (1 - TaxRate)
 ```
 
@@ -161,7 +161,7 @@ In your spreadsheet, create a tab called `Collar_Analysis`. Build a table with A
 
 The formula in column D (Excel syntax, row 4 as example, with AcqSharePrice_Close in A4):
 
-```
+```text
 =IF(A4 < 38, 162 / A4, IF(A4 > 46, 198 / A4, 4.286))
 ```
 
@@ -206,7 +206,7 @@ print(f"Total NPV of Synergies:           ${npv_synergies:.2f}M")
 
 Running this produces:
 
-```
+```text
 PV of Explicit Period Synergies: $71.52M
 PV of Terminal Synergy Value:     $148.63M
 Total NPV of Synergies:           $220.15M
@@ -243,7 +243,7 @@ for label, npv in scenarios.items():
 
 Output:
 
-```
+```text
 Management (100%/100%):   $220.15M
 Conservative (75%/50%):   $148.52M
 Stress (50%/25%):          $83.14M
@@ -343,7 +343,7 @@ print(f"Synergy Capture at P10:      {df['synergy_capture'].quantile(0.10)*100:.
 
 Running this simulation produces output along these lines (actual values will match given the fixed seed):
 
-```
+```text
 === Monte Carlo Summary (10,000 Simulations) ===
 Mean Pro Forma EPS:          $0.4631
 Median Pro Forma EPS:        $0.4648

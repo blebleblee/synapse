@@ -136,7 +136,7 @@ Check the waveform in any voice-memo app or DAW: attack transients should line u
 
 On one pitch (concert Bb, comfortable middle register), eight repetitions at 72 BPM:
 
-```
+```text
 pp-staccato -> p-staccato -> mp-staccato -> mf-staccato
 mp-accent   -> mf-accent   -> f-marcato   -> ff-sforzando
 ```
@@ -145,7 +145,7 @@ Keep tongue speed and syllable identical throughout — only air pressure and em
 
 **Drill 3 — Mixed Articulation Sequences**
 
-```
+```text
 Pattern: [ tah tah | dah -- | tah tah | dah -- ]
 Rhythm:  [ ♩   ♩   | ♩.  ♪ | ♩   ♩   |  𝅗𝅥     ]
 ```
@@ -238,7 +238,7 @@ Success condition: the pitch *center* stays glued to A440 — the needle oscilla
 
 **Drill 7 — On/Off Control**
 
-```
+```text
 Bar 1: Straight tone (4 beats)
 Bar 2: Vibrato (4 beats, enters cleanly on beat 1)
 Bar 3: Straight tone (4 beats, exits cleanly on beat 1)
@@ -249,7 +249,7 @@ At 60 BPM. Any volume blip or swell at a transition point means vibrato is coupl
 
 **Drill 8 — Vibrato + Dynamic Independence**
 
-```
+```text
 pp (4 beats) -> mp (4 beats) -> f (4 beats) -> mp (4 beats) -> pp (4 beats)
 Vibrato continuous throughout - same rate, same extent
 ```
@@ -336,7 +336,7 @@ Unsynchronized vibrato across a section creates phase interference — multiple 
 
 Applies to trumpet, French horn, trombone, euphonium, or tuba — adjust register to your instrument. Assumes 60-minute sessions.
 
-```
+```text
 Day 1 (Technical Foundation - 60 min)
   :00-:10  Long tones, straight tone, biofeedback tuner
   :10-:25  Single tongue drills - Drill 1 (60 -> 100 -> 132 BPM)
@@ -365,7 +365,7 @@ Day 5-7: Repeat cycle, raising metronome targets 4-6 BPM where applicable
 
 ## Quick-Reference Summary
 
-```
+```text
 ARTICULATION CORE RULES
   Staccato  -> Build pressure first. Tongue = ballistic release. Embouchure pre-set.
   Legato    -> Air never stops. Embouchure anticipates valve change by 10-20 ms.

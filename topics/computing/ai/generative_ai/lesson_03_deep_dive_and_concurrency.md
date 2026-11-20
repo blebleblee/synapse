@@ -8,7 +8,7 @@ Modern transformer-based language models are, at inference time, fundamentally *
 
 **Arithmetic intensity** is defined as the ratio of floating-point operations (FLOPs) to bytes transferred from DRAM:
 
-```
+```text
 Arithmetic Intensity = FLOPs / Bytes
 ```
 
@@ -29,13 +29,13 @@ In a standard multi-head attention block, for a sequence of tokens [t₁, t₂, 
 
 **KV-cache memory footprint** (per layer, per token):
 
-```
+```text
 bytes = 2 × n_heads × d_head × bytes_per_element
 ```
 
 For a 70B model with 64 layers, 8 KV heads (GQA), d_head=128, in FP16:
 
-```
+```text
 per_token = 2 × 8 × 128 × 2 = 4096 bytes = 4 KB
 total_for_4096_ctx = 64 × 4096 × 4 KB ≈ 1 GB
 ```
@@ -159,7 +159,7 @@ class BlockManager:
 
 Quantization maps a floating-point value x ∈ [α, β] to an integer q ∈ [0, 2^b − 1] via:
 
-```
+```text
 q = round( (x - α) / scale )
 scale = (β - α) / (2^b − 1)
 x̂ = q × scale + α
@@ -167,7 +167,7 @@ x̂ = q × scale + α
 
 The quantization error is bounded: |x − x̂| ≤ scale/2. For uniform quantization to b bits over a range of width (β − α):
 
-```
+```text
 max_error = (β - α) / (2 × (2^b − 1))
 ```
 
@@ -270,7 +270,7 @@ flowchart LR
 
 **Pipeline Parallelism (PP):** The model is partitioned **by layer** into stages, each stage assigned to one or more GPUs. A micro-batch flows through stages sequentially. The critical challenge is the **pipeline bubble**: with P stages and M micro-batches, the fraction of time stages are idle is:
 
-```
+```text
 bubble_fraction = (P - 1) / (M + P - 1)
 ```
 
@@ -288,7 +288,7 @@ For an attention block with projection matrices Q, K, V ∈ ℝ^(d × d):
 
 **Row-parallel (output projection):** Each GPU i holds a row partition W_i and computes a partial sum. The final output requires AllReduce across GPUs to sum partial products:
 
-```
+```text
 Y = X₀W₀ + X₁W₁ + ... (AllReduce sum)
 ```
 
@@ -365,7 +365,7 @@ This is why tensor parallelism is typically restricted to intra-node (NVLink) co
 
 Each AllReduce transfers approximately `2 × batch × seq_len × d_model × 2 bytes`. For batch=1, seq_len=1 (decode step), d_model=8192:
 
-```
+```text
 message = 2 × 1 × 1 × 8192 × 2 = 32 KB per AllReduce
 latency ≈ 32 KB / 600 GB/s ≈ 0.053 µs (bandwidth-bound for large tensors)
 ```
@@ -705,7 +705,7 @@ The verification step uses a modified rejection sampling scheme that guarantees 
 
 **Acceptance rate** α is the key metric: if the draft model agrees with the target model at rate α per token, the expected tokens generated per target model call is:
 
-```
+```text
 E[accepted_tokens] = (1 - α^(K+1)) / (1 - α)
 ```
 

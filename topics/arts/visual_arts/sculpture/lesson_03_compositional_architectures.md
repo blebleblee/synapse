@@ -176,7 +176,7 @@ Digital modeling tools accelerate this analysis dramatically. Software like Blen
 
 Scale distortion at monumental proportions demands proactive optical correction. Forms that appear balanced at 30 centimeters can read as bottom-heavy when scaled to 10 meters because the viewer's low angle of regard compresses the upper portions through foreshortening. Classical sculptors compensated by elongating upper elements—the head of a column capital is carved slightly larger than geometric proportion would dictate, so when viewed from below, it reads as proportionally correct. Modern sculptors working with fabricated elements must calculate these corrections during the engineering phase, adjusting dimensions in the digital model to account for the anticipated viewing angle at the installation site. This requires site-specific trigonometric analysis: the sculpture's height, the typical viewing distance, and the viewer's eye height combine to determine the sightline angle, from which the necessary vertical exaggeration can be derived.
 
-```
+```text
 VIEWING ANGLE CALCULATION
 
 Site Parameters:

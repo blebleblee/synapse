@@ -24,7 +24,7 @@ A mature dropshipping operation typically runs traffic from several channels sim
 
 The mechanical architecture of a Meta campaign for dropshipping follows a three-tier funnel structure that maps directly to campaign objective and audience temperature.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                    META ADS FUNNEL ARCHITECTURE                   │
 ├──────────────────────────────────────────────────────────────────┤

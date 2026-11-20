@@ -235,7 +235,7 @@ React 16's rewrite of the reconciler replaced the recursive call-stack traversal
 
 Each fiber node carries a `return` pointer to its parent, a `child` pointer to its first child, and a `sibling` pointer to its next sibling. This three-pointer structure forms a singly-linked representation of the tree that can be traversed iteratively without a call stack. The traversal order—down through the first child, across through siblings, then up through the return pointer—is identical to a depth-first pre-order walk, but it is performed by a loop rather than by recursive function calls.
 
-```
+```text
 Fiber Tree Traversal (iterative, no call stack):
 
      App (Fiber root)

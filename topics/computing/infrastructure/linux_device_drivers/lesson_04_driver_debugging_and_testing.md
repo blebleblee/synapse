@@ -145,7 +145,7 @@ Dynamic debug (`CONFIG_DYNAMIC_DEBUG=y`) is the correct mechanism for high-frequ
 
 KASAN detects out-of-bounds accesses and use-after-free bugs by inserting shadow memory checks around every memory access. Each byte of kernel memory has a corresponding shadow byte indicating whether the access is valid. When a driver overwrites a `kmalloc` buffer, KASAN intercepts the write before it corrupts other kernel data and produces a report like this:
 
-```
+```text
 ==================================================================
 BUG: KASAN: slab-out-of-bounds in my_driver_rx_handler+0x1a4/0x2c0 [my_driver]
 Write of size 4 at addr ffff888104e3c850 by task irq/45-eth0/312

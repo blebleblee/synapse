@@ -89,7 +89,7 @@ Every triad has three positions: **root position** (root on the bottom), **1st i
 
 ### C Major Through All Inversions
 
-```
+```text
 Root Position      1st Inversion      2nd Inversion
    G (5th)             C (8va)            E (8va)
    E (3rd)             G (5th)            C (5th)
@@ -105,7 +105,7 @@ LH: 5–3–1           LH: 5–3–1          LH: 5–2–1
 
 The most important inversion exercise in this lesson. Goal: no finger moves more than a step between chords.
 
-```
+```text
   I (root)      IV (2nd inv.)    V (1st inv.)     I (root)
   G             C (held)         B                G
   E             F                G (held)         E
@@ -185,7 +185,7 @@ Stack a seventh above the root of any diatonic triad and you get a seventh chord
 
 ### V7 → I Resolution — Feel the Tritone Snap
 
-```
+```text
 G7 (V7)        Cmaj (I)
    F        →     E       (down a half-step)
    D        →     C       (down a step)
@@ -251,7 +251,7 @@ Work these in order. Do not advance to the next drill until the current one is e
 
 Play all seven diatonic chords up the scale in root position, both hands together, then back down. Legato touch; listen for even volume across all three notes of each chord.
 
-```
+```text
 RH: C/E/G — D/F/A — E/G/B — F/A/C — G/B/D — A/C/E — B/D/F — back down
 LH: mirrors one octave lower, fingering 5–3–1 on each chord
 
@@ -265,7 +265,7 @@ Target: quarter note = 80 BPM
 
 The fundamental harmonic motion of tonal music. Start RH alone, then add LH bass.
 
-```
+```text
 I (root)   →  IV (2nd inv.)  →  V (1st inv.)  →  I (root)
 C/E/G      →  C/F/A          →  B/G/D          →  C/E/G
 
@@ -282,7 +282,7 @@ Transpose to G major, D major, F major, and A minor before moving on. Each trans
 
 The single most important three-chord cell in jazz and pop harmony.
 
-```
+```text
 Key of C, with 7ths:
 ii7 (Dm7)   →   V7 (G7)   →   Imaj7 (Cmaj7)
 
@@ -304,7 +304,7 @@ C → F → B♭ → E♭ → A♭ → D♭ → G♭ → B → E → A → D →
 
 Practice in C major first, then transpose to three keys of your choice.
 
-```
+```text
 1. Authentic (Perfect): V → I
    G (1st inv: B/G/D) → C (root: C/E/G)
    The strongest possible full stop.
@@ -328,7 +328,7 @@ Tempo: quarter note = 60 BPM, hold each chord 2 full beats.
 
 The low–high–middle–high broken-chord pattern in the LH, under a sustained RH melody note, is the foundational Classical-era texture (Mozart sonatas run on this pattern).
 
-```
+```text
 Key of C, 4/4, one chord per bar:
 LH pattern per bar (Alberti on C major): C2 – G2 – E2 – G2
 RH: sustain E4 for bar 1, then G4, then G4, then C4
@@ -404,7 +404,7 @@ Three progression templates that account for a huge share of recorded popular mu
 
 ### Template A: I – V – vi – IV (The Pop Axis)
 
-```
+```text
 C major: C — G — Am — F
 
 Voicing (inversions chosen for smooth voice leading):
@@ -419,7 +419,7 @@ Metronome: quarter note = 70 BPM, 4/4, one chord per bar.
 
 ### Template B: i – VII – VI – VII (Natural Minor Loop)
 
-```
+```text
 A minor: Am — G — F — G
 
   Am (root): A/C/E   1–3–5
@@ -433,7 +433,7 @@ Metronome: quarter note = 72 BPM.
 
 ### Template C: ii – V – I (Jazz Cadence, Rootless Voicings)
 
-```
+```text
 Dm7 — G7 — Cmaj7
 
 LH: single roots D — G — C

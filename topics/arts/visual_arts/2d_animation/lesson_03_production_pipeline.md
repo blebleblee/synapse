@@ -22,7 +22,7 @@ The shot assembly system, typically implemented in software such as Toon Boom Ha
 
 The layer stacking order within a shot follows a standardized convention that mirrors depth sorting in 3D graphics but is manually specified rather than computed. A typical stack from bottom to top reads:
 
-```
+```text
 Background Sky/Distant Elements
 Background Midground Architecture/Landscape
 Shadow Layer (multiply blend mode)
@@ -39,7 +39,7 @@ The compositing graph extends the simple layer stack into a node-based dataflow 
 
 A typical compositing node graph for a character animation shot might flow as follows:
 
-```
+```text
 [Background Image File]
          ↓
 [Background Color Correct: Lift shadows, cool color temperature]

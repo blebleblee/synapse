@@ -42,7 +42,7 @@ The practical implementation of discounted cash flow valuation begins with finan
 
 Free cash flow projections require translating income statement profitability into cash generation by accounting for working capital dynamics and capital intensity. The bridge from net income to free cash flow follows a standard sequence: begin with normalized operating income, subtract cash taxes (not reported tax expense, which includes non-cash deferred components), add back depreciation and amortization (non-cash charges that reduce reported income but not cash), subtract increases in net working capital (inventory builds and receivables growth that consume cash), and subtract capital expenditures required to sustain operations (maintenance capex) and fund growth (expansion capex). The resulting unlevered free cash flow represents cash available to all capital providers before the effects of financial leverage.
 
-```
+```text
 Free Cash Flow Calculation Architecture:
 
 Operating Income (EBIT)
@@ -74,7 +74,7 @@ Relative valuation implementation requires constructing a comparable company set
 
 For each comparable company, the analyst calculates standardized multiples using consistent data sources and fiscal period alignment. Trailing multiples use historical financial results from the most recent fiscal year or last twelve months, while forward multiples incorporate consensus analyst estimates for the coming fiscal year. Forward multiples theoretically provide better valuation signals because they reflect expectations embedded in current prices, though they introduce forecast error and potential analyst bias. The median multiple across the comparable set establishes a benchmark; the target company's position relative to this median should reflect observable differences in growth, profitability, and risk rather than mispricing.
 
-```
+```text
 Comparable Company Valuation Matrix:
 
 Company        | Mkt Cap | EV/EBITDA | P/E  | EV/Sales | ROIC | Revenue Growth

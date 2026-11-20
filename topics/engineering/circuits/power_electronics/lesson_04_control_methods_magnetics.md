@@ -121,7 +121,7 @@ flowchart TD
     end
 ```
 
-```
+```text
 Inductor Design Procedure for Buck Converter
 
 Step 1: Specify Requirements

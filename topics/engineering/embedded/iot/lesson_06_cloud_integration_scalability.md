@@ -100,7 +100,7 @@ A canonical digital twin architecture uses a time-sequenced state model. Each pr
 
 Consider a concrete example. A temperature sensor reports readings every five minutes. The device maintains a sequence counter that increments with each report. The device sends:
 
-```
+```json
 {
   "timestamp": 1699564800,
   "sensor_id": "temp_01",
@@ -111,7 +111,7 @@ Consider a concrete example. A temperature sensor reports readings every five mi
 
 The cloud backend receives this message, looks up the digital twin for this device, and compares the sequence number. The twin currently holds:
 
-```
+```json
 {
   "temperature": 22.1,
   "temperature_sequence": 12344,
@@ -203,7 +203,7 @@ The core principle is immutability with fine-grained time partitioning. Data is 
 
 Consider the storage schema for a device telemetry table:
 
-```
+```sql
 CREATE TABLE telemetry (
     device_id VARCHAR(64),
     metric_name VARCHAR(128),
@@ -272,7 +272,7 @@ This decoupling is critical for scalability. If a backend service crashes or bec
 
 The architecture uses topic sharding for load distribution. Instead of a single telemetry topic, the system uses multiple shards: `telemetry_shard_0`, `telemetry_shard_1`, etc. Devices are assigned to a shard based on their device ID (using consistent hashing), ensuring that telemetry from a given device always arrives at the same shard. This enables backend services to independently consume and process telemetry from a subset of shards without coordination.
 
-```
+```text
 Devices 1-1000    →  [MQTT Broker] → telemetry_shard_0 → [Backend Service Instance 1]
 Devices 1001-2000 →  [MQTT Broker] → telemetry_shard_1 → [Backend Service Instance 2]
 Devices 2001-3000 →  [MQTT Broker] → telemetry_shard_2 → [Backend Service Instance 3]

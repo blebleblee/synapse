@@ -38,7 +38,7 @@ zcat /proc/config.gz 2>/dev/null || cat /boot/config-$(uname -r) | grep -E \
 
 Expected output for a lab-capable kernel:
 
-```
+```text
 CONFIG_DEBUG_INFO_BTF=y
 CONFIG_BPF_SYSCALL=y
 CONFIG_PERF_EVENTS=y

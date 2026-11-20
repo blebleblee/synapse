@@ -44,7 +44,7 @@ The VDP rasterizes layers in fixed priority order: Plane B low-priority tiles, S
 
 Direct Memory Access on the Genesis offloads bulk VRAM transfers from the CPU. The 68000 can configure the VDP to DMA from 68000 address space to VRAM, CRAM (color RAM), or VSRAM (vertical scroll RAM) at 16 bits per VDP access cycle. DMA during active display consumes VDP memory bandwidth, potentially disrupting sprite or plane rendering if overused, but DMA during vertical blank is safe and fast, transferring 7 KB in approximately 500 microseconds. DMA fill and copy modes further accelerate clearing or duplicating VRAM regions. Effective Genesis programming relies heavily on DMA scheduling, using horizontal interrupts to queue transfers and vertical blank to execute them atomically.
 
-```
+```text
 NES PPU Fetch Sequence (per tile, 8 dots):
 Dot 0-1: Fetch nametable byte → tile_index
 Dot 2-3: Fetch attribute byte → palette_bits
@@ -72,7 +72,7 @@ The Game Boy and Game Boy Color represent constrained variations on the tilemap-
 
 The Super Nintendo Mode 7 represents a radical departure from fixed tilemap rendering. Mode 7 treats the background as a single large 128×128 tile canvas rendered through an affine transformation matrix. The SNES applies a 2D rotation, scaling, and translation matrix to map screen coordinates to tilemap coordinates, enabling rotation and zooming effects that simulate 3D perspective. The transformation matrix is programmable per-scanline via HDMA, allowing the famous pseudo-3D road and horizon effects in F-Zero and Super Mario Kart. The CPU writes matrix coefficients A, B, C, D (for rotation/scale) and origin offsets X₀, Y₀ to PPU registers, and the hardware performs the inverse mapping for each pixel:
 
-```
+```text
 tilemap_x = A × (screen_x - X₀) + B × (screen_y - Y₀)
 tilemap_y = C × (screen_x - X₀) + D × (screen_y - Y₀)
 tile_index = nametable[tilemap_x / 8][tilemap_y / 8]

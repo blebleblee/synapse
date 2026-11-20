@@ -18,7 +18,7 @@ The invariant that governs all three tiers is this: attackers operate on the bou
 
 A single HTTP request traversing a modern web application is not a simple two-party transaction. It passes through a layered architecture in which each component boundary represents a distinct trust decision — and a distinct attack surface.
 
-```
+```text
 Client Browser / API Consumer
          │
          │  (TLS, DNS, TCP/IP)
@@ -57,7 +57,7 @@ An HTTP session token is, mechanically, a capability: possession of the token gr
 
 The state machine for session lifecycle looks like this:
 
-```
+```text
 [Unauthenticated]
       │
       │  POST /login (credentials validated)

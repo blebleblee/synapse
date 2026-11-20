@@ -388,7 +388,7 @@ HDCP (High-bandwidth Digital Content Protection) integrates authentication and e
 
 HDMI cables face stringent signal integrity requirements as data rates approach multi-gigabit-per-second frequencies where transmission line effects dominate. The cable's differential impedance must remain within ±15 percent of 100 ohms across the entire signal bandwidth, requiring matched twisted pairs with controlled dielectric thickness and cable geometry. Attenuation increases with frequency and cable length, with a 10-meter HDMI 2.1 cable exhibiting insertion loss exceeding 20 dB at 6 GHz. HDMI receivers compensate through adaptive equalization—adjustable analog filters and decision feedback equalizers that boost high-frequency content and compensate for inter-symbol interference. Premium High-Speed HDMI cables undergo certification testing verifying error-free transmission of 18 Gbps patterns representing worst-case transition density, ensuring reliable operation of 4K 60Hz HDR video across the cable's rated length.
 
-```
+```text
 TMDS 8b/10b Encoding Algorithm:
 
 Input: D[7:0] (8-bit pixel data)
@@ -665,7 +665,7 @@ Radiated emissions testing occurs in anechoic chambers or open-area test sites w
 
 Emission mechanisms arise from high-frequency current loops in PCB layouts, switching transients in power supplies and digital logic, and antenna-mode radiation from cables. Clock signals and their harmonics dominate digital product emissions, with a 100 MHz clock generating harmonics at 200, 300, 400 MHz extending into the gigahertz range. The fundamental Fourier decomposition of a trapezoidal clock waveform with rise time t_r reveals that spectral energy remains flat up to a frequency f_knee = 1/(πt_r), then rolls off at 20 dB per decade thereafter. Modern ICs with sub-nanosecond edge rates generate significant energy above 1 GHz, necessitating aggressive filtering, shielding, and controlled-impedance routing. Spread-spectrum clocking intentionally dithers the clock frequency across a small range—typically ±1 to 5 percent—distributing energy over bandwidth and reducing peak spectral density by 10 to 15 dB without affecting digital functionality, though this technique proves unsuitable for synchronous interfaces where tight frequency tolerance matters.
 
-```
+```text
 EMI/EMC Measurement Setup (Radiated Emissions):
 
 Anechoic Chamber Configuration:

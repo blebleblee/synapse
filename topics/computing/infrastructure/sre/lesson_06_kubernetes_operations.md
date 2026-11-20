@@ -169,7 +169,7 @@ The kubelet reconciles the set of Pods assigned to its node (`spec.nodeName == t
 
 The kubelet's control loop:
 
-```
+```text
 syncLoop:
   for event in [podUpdates, fileWatcher, httpSource, livenessManager, readinessManager, ...]:
       syncPod(pod)
@@ -193,7 +193,7 @@ The kubelet also runs three probe types in parallel goroutines:
 
 kube-proxy watches `Services` and `EndpointSlices` and programs the node's packet-forwarding rules. In `iptables` mode (the default), it creates `DNAT` rules in the `PREROUTING` and `OUTPUT` chains that rewrite the Service's ClusterIP to a randomly selected backend Pod IP. In `ipvs` mode, it uses the kernel's IP Virtual Server for O(1) connection dispatch instead of O(N) iptables rule traversal — critical at clusters with thousands of Services.
 
-```
+```bash
 # iptables rule chain for a ClusterIP Service (simplified)
 -A KUBE-SERVICES -d 10.96.0.1/32 -p tcp --dport 443 -j KUBE-SVC-<hash>
 -A KUBE-SVC-<hash> -m statistic --mode random --probability 0.33 -j KUBE-SEP-<pod1>
@@ -952,7 +952,7 @@ A PDB with `minAvailable: 1` on a Deployment with `replicas: 1` makes the node u
 
 Kubernetes guarantees N-2 version skew between `kube-apiserver` and `kubelet`. A cluster on v1.28 can have nodes running v1.26, v1.27, or v1.28 — but not v1.25. The upgrade sequence for a managed control plane (EKS, GKE, AKS):
 
-```
+```text
 1. Upgrade control plane (API server, controller-manager, scheduler, etcd)
    → managed via cloud provider CLI or Cluster API
    → verify: kubectl version --short

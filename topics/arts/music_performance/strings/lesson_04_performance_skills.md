@@ -344,7 +344,7 @@ flowchart TD
 Bass lines are built from movable fretboard "boxes" anchored on the root note. Learn these two universal shapes on the E string (movable to any root by sliding the whole shape):
 
 **Major box (root on E string, e.g., root = C at fret 8):**
-```
+```text
 G string: -------10------  (octave)
 D string: ---7-----------  (5th)
 A string: -5-------------  (major 3rd, fret 5 relative = whole step+half from root... )

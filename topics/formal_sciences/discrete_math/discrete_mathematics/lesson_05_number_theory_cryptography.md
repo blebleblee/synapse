@@ -36,7 +36,7 @@ The extended Euclidean algorithm maintains auxiliary variables to track the line
 
 Let us trace the extended Euclidean algorithm computing $\gcd(240, 46)$ with full state tracking:
 
-```
+```text
 i  |  r_i   q_i   s_i   t_i
 ---|------------------------
 0  |  240    -     1     0
@@ -57,7 +57,7 @@ The multiplicative inverse of $a$ modulo $n$ exists if and only if $\gcd(a, n) =
 
 Consider computing $13^{-1} \bmod 60$. We execute the extended Euclidean algorithm on $(13, 60)$:
 
-```
+```text
 i  |  r_i   q_i   s_i   t_i
 ---|------------------------
 0  |   60    -     1     0
@@ -102,7 +102,7 @@ The square-and-multiply algorithm for $a^k \bmod n$ proceeds as follows. Initial
 
 Computing $3^{47} \bmod 23$ illustrates the method. The binary representation of $47$ is $101111_2$, scanning right to left as bits $(1, 1, 1, 1, 0, 1)$:
 
-```
+```text
 Bit  |  r         b         Operation
 -----|------------------------------------
 Init |  1         3

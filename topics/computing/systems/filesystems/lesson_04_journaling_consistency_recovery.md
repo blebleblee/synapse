@@ -22,7 +22,7 @@ A journal transaction groups multiple filesystem operations into a single atomic
 
 The critical ordering constraint is that the commit block must not reach the disk before all preceding descriptor and journal blocks are stable. If the commit block is visible but some journal blocks are missing, replay would apply an incomplete transaction, violating atomicity. Storage devices complicate this ordering through write caching: when the operating system issues a write request, the data typically sits in the device's volatile cache until the device chooses to flush it to the actual medium. To enforce ordering, filesystems issue **cache flush commands**—FUA (Force Unit Access) flags on writes or explicit FLUSH CACHE commands—at transaction boundaries. Modern journaling protocols issue writes for all journal blocks, then issue a cache flush, then write the commit block with another cache flush. This ensures that even if the device reorders writes within each batch, the commit block cannot become visible before its dependencies.
 
-```
+```text
 Journal Structure (Circular Buffer):
 ┌─────────────────────────────────────────────────────────┐
 │  Tail                          Head                      │

@@ -122,7 +122,7 @@ Since $H_k$ is positive definite by induction and $y_k^T s_k > 0$, we have $v^T 
 
 The limited-memory BFGS (L-BFGS) variant addresses storage constraints in high-dimensional problems by retaining only the most recent $m$ correction pairs $\{s_i, y_i\}$ (typically $m = 5$ to $20$). Rather than storing the full dense matrix $H_k \in \mathbb{R}^{n \times n}$, L-BFGS represents $H_k$ implicitly through a two-loop recursion requiring only $O(mn)$ storage. The algorithm computes $p_k = H_k g_k$ via:
 
-```
+```text
 q ← g_k
 for i = k-1, k-2, ..., k-m do
     α_i ← ρ_i s_i^T q   where ρ_i = 1/(y_i^T s_i)

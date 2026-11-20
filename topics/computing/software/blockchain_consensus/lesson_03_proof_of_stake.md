@@ -50,7 +50,7 @@ Validator selection must be unpredictable by any single participant. If a valida
 
 Ethereum's production solution is RANDAO: a commit-reveal scheme where every block proposer mixes their BLS signature over the current epoch number into an accumulator stored in the Beacon Chain state. The accumulated value after all slots in an epoch serves as the randomness seed for the next epoch's shuffles. The BLS signature is used rather than an arbitrary nonce because it is deterministic given a private key—a validator cannot compute multiple valid signatures over the same message and pick the most advantageous one. The RANDAO accumulation is simply:
 
-```
+```text
 randao_mix[epoch + 1] = RANDAO_mix[epoch] XOR BLSSig(proposer_key, epoch)
 ```
 
@@ -103,7 +103,7 @@ Once blocks are proposed and attested, nodes must agree on the canonical chain t
 
 The algorithm works by tracking, for each validator, its most recent attestation message—the block it most recently voted for. Starting from the genesis block, at each fork it recursively selects the branch whose subtree has accumulated the most stake-weighted votes from the latest messages of all validators. The "latest message" qualifier is critical: it prevents old votes from influencing the present fork choice, which would allow an attacker to store up old attestations and replay them to cause a chain reorg.
 
-```
+```text
 LMD-GHOST(store, justified_checkpoint):
     head = justified_checkpoint.block
     loop:

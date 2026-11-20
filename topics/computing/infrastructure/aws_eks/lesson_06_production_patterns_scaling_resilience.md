@@ -1234,7 +1234,7 @@ Comprehensive disaster recovery requires replicating both cluster infrastructure
 
 An active-active multi-region architecture deploys identical EKS clusters in two regions, both serving production traffic through global load balancing:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    AWS Global Accelerator                       │
 │              (Anycast IPs: 1.2.3.4, 5.6.7.8)                   │

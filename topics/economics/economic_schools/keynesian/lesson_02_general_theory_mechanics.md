@@ -38,7 +38,7 @@ This reduced-form expression reveals fiscal and monetary policy multipliers. The
 
 The architectural diagram clarifies transmission channels:
 
-```
+```text
 Fiscal Expansion (↑G):
   ↓
 IS Curve shifts right

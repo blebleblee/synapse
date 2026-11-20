@@ -20,7 +20,7 @@ The structural foundation of any design system begins with the establishment of 
 
 The mechanics of baseline grid implementation demand particular attention to vertical rhythm. In typography, the baseline grid aligns the bottom edge of letterforms across columns and components, creating invisible horizontal registration that the eye perceives as coherence even without conscious awareness. To achieve this, you must first establish a line-height value that is an integer multiple of your spatial quantum. If your base font size is 16 pixels and your quantum is 8 pixels, a line-height of 24 pixels (1.5× the font size, equivalent to 3 quantum units) ensures that text baselines fall on grid intersections. All vertical spacing between typographic elements—paragraph margins, list item gaps, section breaks—must then conform to 8-pixel increments to preserve grid registration.
 
-```
+```text
 Baseline Grid Calculation:
 Base Font Size: 16px
 Spatial Quantum: 8px
@@ -50,7 +50,7 @@ Color tokenization follows a three-tier hierarchy: primitive tokens define raw h
 
 Component specification within a design system demands rigorous documentation of states, dimensions, spacing, and interaction behavior. A button component might define four size variants (small, medium, large, extra-large) derived from the spacing scale, three semantic types (primary, secondary, tertiary) that inherit color tokens, and five interaction states (default, hover, active, focus, disabled) with corresponding visual treatments. The specification must account for content reflow—how the button adapts when text wraps or an icon is added—and accessibility requirements such as minimum touch target sizes (44×44 pixels per iOS Human Interface Guidelines, 48×48 per Material Design) and WCAG 2.1 AA contrast ratios (4.5:1 for normal text, 3:1 for large text and UI components).
 
-```
+```text
 Button Component Specification:
 
 Size Variants (padding = quantum units × 8px):

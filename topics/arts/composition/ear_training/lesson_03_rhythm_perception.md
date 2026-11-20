@@ -142,7 +142,7 @@ Physically conduct these meters using standard baton patterns:
 5. Progress: 60 → 80 → 100 BPM.
 
 **Visualization:**
-```
+```text
 Left:   |--1--|--2--|--3--|
 Right:  |-1-|-2-|
 ```
@@ -161,13 +161,13 @@ Right:  |-1-|-2-|
 Learn these foundational rhythms by tapping and singing:
 
 **Son Clave (3-2):**
-```
+```text
 Measure 1: |X . . X . . X . . . . . . . . .|
 Measure 2: |. . X . . . X . . . . . . . . .|
 ```
 
 **Rumba Clave (3-2):**
-```
+```text
 Measure 1: |X . . X . . . X . . . . . . . .|
 Measure 2: |. . X . . . X . . . . . . . . .|
 ```
@@ -191,7 +191,7 @@ Measure 2: |. . X . . . X . . . . . . . . .|
 6. Speed back to 100% and check accuracy.
 
 **Notation example (4 bars of basic rock):**
-```
+```text
 HH: |x-x-x-x-x-x-x-x-|x-x-x-x-x-x-x-x-|
 SD: |----X-------X---|----X-------X---|
 KD: |X-------X-------|X-------X-X-----|
@@ -320,7 +320,7 @@ When playing in a band, rhythm perception is collaborative:
 - New tempo: 180 BPM (120 × 1.5).
 
 **Notation:**
-```
+```text
 Old tempo: ♩ = 120
 Transition: ♪₃ = ♩ (triplet eighth becomes new quarter)
 New tempo: ♩ = 180

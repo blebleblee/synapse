@@ -34,7 +34,7 @@ Register renaming eliminates false dependencies between instructions that use th
 
 The rename stage maintains several critical structures. The Register Alias Table (RAT) maps each architectural register to its current physical register. The reorder buffer (ROB) tracks all in-flight instructions in program order, recording their state (issued, executed, completed) and holding the results until instructions can retire in order. The physical register file holds the actual data values. When an instruction is decoded, the rename logic reads the RAT to find the physical registers holding the current values of the source architectural registers, allocates a free physical register for the destination, and updates the RAT to point to this new physical register. The previous physical register mapping is recorded in the ROB so it can be freed once the instruction retires and no older instructions could possibly need that value.
 
-```
+```text
 Rename Map Table (RAT) Example:
 Before: ADD RAX, RBX  →  RAX maps to P42, RBX maps to P17
 Rename: Allocate P73 for destination RAX
@@ -50,7 +50,7 @@ Out-of-order execution reorders instructions dynamically to expose more parallel
 
 The reorder buffer enforces precise exceptions and in-order retirement even though execution occurs out of order. Instructions are allocated ROB entries in program order during rename and retire from the head of the ROB in program order once they complete execution and all older instructions have retired. If an instruction encounters an exception or a mispredicted branch, the processor flushes all younger instructions from the pipeline by deallocating their ROB entries and freeing their physical registers, then redirects instruction fetch to the correct path.
 
-```
+```text
 ROB Structure (circular buffer, program order):
 [Head] → Oldest in-flight instruction, next to retire
   ↓
@@ -104,7 +104,7 @@ ARM's NEON extension provided 128-bit vector registers (which could be viewed as
 
 SIMD programming requires data to be arranged in memory so that consecutive elements can be loaded into vector registers efficiently. Array-of-Structures (AoS) layouts intermix different fields of a structure, which is natural for scalar code but inefficient for vector code that operates on a single field. Structure-of-Arrays (SoA) layouts separate each field into its own array, allowing vector loads to fetch consecutive elements of the same field. Transforming between AoS and SoS representations often requires explicit data reorganization passes.
 
-```
+```text
 Array of Structures (inefficient for SIMD):
 struct Particle { float x, y, z, mass; };
 Particle particles[N];
@@ -125,7 +125,7 @@ Memory bandwidth becomes the bottleneck for SIMD-intensive workloads. A 512-bit 
 
 Software prefetching mitigates memory latency by issuing prefetch instructions that bring cache lines into the cache hierarchy before they are accessed by load instructions. The compiler or programmer inserts prefetch instructions far enough ahead of the actual access to hide the memory latency, typically targeting a memory address several iterations ahead in a loop. Prefetch distance depends on memory latency (typically 100-300 cycles for DRAM) and the loop's iteration rate.
 
-```
+```text
 Prefetch example (x86 intrinsics):
 for (int i = 0; i < N; i++) {
     _mm_prefetch((char*)&array[i + 16], _MM_HINT_T0);
@@ -157,7 +157,7 @@ Multicore processors maintain a coherent view of shared memory through hardware 
 
 The MESI protocol (Modified, Exclusive, Shared, Invalid) is the foundation of most coherence protocols. A cache line in the Modified state has been written by the local core and is the only valid copy in any cache; the main memory copy is stale. Exclusive state indicates the line is clean but present in only this cache, allowing a write to transition to Modified without notifying other cores. Shared state indicates the line is clean and may be present in other caches; a write must first invalidate other copies. Invalid state indicates the line is not present in this cache.
 
-```
+```text
 MESI State Transitions (read/write actions):
 Invalid → Exclusive:  Read, no other cache has the line
 Invalid → Shared:     Read, another cache supplies the line
@@ -171,7 +171,7 @@ Directory-based coherence scales to large core counts by avoiding broadcast prot
 
 Coherence traffic becomes a scalability bottleneck as core count increases. False sharing occurs when independent variables allocated on the same cache line are written by different cores, causing the entire cache line to bounce between cores even though the variables are logically independent. Aligning frequently-written variables to cache line boundaries and padding data structures to avoid false sharing are critical optimization techniques.
 
-```
+```text
 False Sharing Example:
 struct Counters {
     long counter_a;  // Written by core 0
@@ -211,7 +211,7 @@ Software prefetching inserts explicit prefetch instructions to bring data into c
 
 Branch misprediction mitigation involves reducing branch frequency, making branches more predictable, or removing branches through predication. Loop unrolling reduces branch frequency by executing multiple iterations per branch. Profile-guided optimization uses runtime profiles to inform the compiler which branches are heavily biased, enabling better code layout and prediction hints. Replacing unpredictable branches with predicated or branchless code using conditional moves or bit manipulation eliminates mispredictions at the cost of executing both paths.
 
-```
+```text
 Branchless selection (x86):
 // Predictable branch version:
 if (x > threshold) result = a; else result = b;
@@ -229,7 +229,7 @@ SIMD optimization begins with data layout transformation to enable aligned, cont
 
 Compiler vectorization reports identify why loops were not vectorized, revealing dependencies, aliasing concerns, or unsupported patterns. Restrict keywords on pointers assert that pointer-based accesses do not alias, enabling more aggressive optimization. Alignment directives inform the compiler that array bases are aligned to vector boundaries, eliminating alignment checks and unaligned loads. Trip count hints and bounds expressions allow the compiler to infer that loops iterate a sufficient number of times to amortize vector setup costs.
 
-```
+```text
 Compiler vectorization hints (GCC/Clang):
 void process(float * __restrict__ a, 
              float * __restrict__ b,
@@ -254,7 +254,7 @@ Lock contention serializes parallel threads, degrading scalability. Fine-grained
 
 False sharing detection uses performance counters tracking cache coherence messages. Intel VTune and Linux perf record events like `mem_load_l3_miss_retired.remote_hitm` indicating that a load missed in local caches but hit in a remote core's cache in Modified state, signaling false sharing. Hardware transactional memory (TSM) can sometimes mitigate false sharing by allowing conflicting transactions to serialize in hardware rather than bouncing cache lines, though transaction aborts introduce overhead.
 
-```
+```text
 Detecting false sharing with perf:
 perf c2c record -a -- ./workload
 perf c2c report

@@ -115,7 +115,7 @@ The skilled shooter integrates all available indicators: the Kestrel at the firi
 
 Shooting at an upward or downward angle introduces a correction that, again, is counterintuitive. The common expectation is that shooting uphill requires more elevation because the bullet is climbing against gravity. This is wrong. Gravity acts perpendicular to the horizontal plane, not along the line of sight, and the bullet's drop is determined by the horizontal distance to the target, not the slant distance.
 
-```
+```text
          Target
            /|
           / |

@@ -76,7 +76,7 @@ An IPv4 address is a 32-bit integer, conventionally written in dotted-decimal no
 
 The network address is computed by bitwise-ANDing the IP address with the subnet mask. The broadcast address is the network address with all host bits set to 1. Usable host addresses occupy the range between these two extremes.
 
-```
+```text
 Address:   192.168.1.100   = 11000000.10101000.00000001.01100100
 Mask /24:  255.255.255.0   = 11111111.11111111.11111111.00000000
 Network:   192.168.1.0     = 11000000.10101000.00000001.00000000
@@ -90,7 +90,7 @@ A `/30` subnet yields exactly 2 usable host addresses, which is why it is used c
 
 Understanding the IPv4 header fields is essential for diagnosing real-world network behavior:
 
-```
+```text
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -119,7 +119,7 @@ Key fields:
 
 A router's forwarding table (FIB, Forwarding Information Base) maps destination prefixes to next-hop addresses and egress interfaces. When a packet arrives, the router performs a *longest-prefix match* (LPM) lookup: among all table entries whose prefix matches the destination address, it selects the most specific one (the longest prefix length).
 
-```
+```text
 Destination     Prefix Len  Next Hop        Interface
 10.0.0.0        /8          192.0.2.1       eth0
 10.1.0.0        /16         192.0.2.5       eth1
@@ -196,7 +196,7 @@ Under high connection-rate workloads (HTTP/1.1 short connections), TIME_WAIT exh
 
 #### TCP Segment Header
 
-```
+```text
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -384,12 +384,12 @@ SACK interacts with congestion control via the FACK (Forward Acknowledgment) alg
 
 The **bandwidth-delay product (BDP)** is the amount of data that can be "in flight" on a network path at any given time:
 
-```
+```text
 BDP = Bandwidth (bits/sec) × RTT (sec)
 ```
 
 For a path with 100 Mbps bandwidth and 100 ms RTT:
-```
+```text
 BDP = 100 × 10⁶ × 0.1 = 10 × 10⁶ bits = 10 Mbps × 0.1s = 1.25 MB
 ```
 

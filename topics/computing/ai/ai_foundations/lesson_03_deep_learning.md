@@ -456,7 +456,7 @@ The key performance metric for a neural network operation is **arithmetic intens
 
 Modern training uses **BF16 or FP16 arithmetic** for the forward and backward passes, with FP32 **master weights** for parameter updates:
 
-```
+```text
 FP16 Forward → FP16 Backward → FP32 Gradient Accumulation → FP32 Weight Update → Copy to FP16
 ```
 

@@ -60,7 +60,7 @@ A creator dashboard also exposes A/B testing tools—the ability to test multipl
 
 ### Data Flow Diagram: The Content-to-Viewer Signal Path
 
-```
+```text
 ┌──────────────┐
 │ Creator      │ Uploads source video file (1080p60, H.264)
 │ Ingestion    │

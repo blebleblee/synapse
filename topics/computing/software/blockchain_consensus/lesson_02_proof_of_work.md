@@ -176,7 +176,7 @@ Compile and run with `gcc -O2 -o miner miner.c -lssl -lcrypto && ./miner`. At di
 
 The `MerkleRoot` field commits the entire set of transactions in the block to the header without including their full data in the 80 bytes being hashed. The construction is a binary hash tree where leaf nodes are double-SHA-256 hashes of serialized transactions, and each internal node is the double-SHA-256 of the concatenation of its two children. The root is the single 32-byte value at the apex.
 
-```
+```text
         MerkleRoot
            H(AB || CD)
           /           \
@@ -307,7 +307,7 @@ The 32-bit nonce field in the block header provides only $2^{32} \approx 4.3 \ti
 
 The coinbase transaction — the first transaction in every block, which creates new Bitcoin and pays the block reward to the miner — contains an arbitrary data field called the `coinbase` scriptSig. Miners embed an *extra-nonce* counter here, typically 4–8 bytes. Each increment of the extra-nonce produces a different coinbase transaction serialization, a different coinbase transaction hash, a different leaf at position zero of the Merkle tree, and therefore a different Merkle root in the header. The miner now has an effectively unlimited search space: for each extra-nonce value, it exhausts the 32-bit header nonce, then increments the extra-nonce and recomputes the Merkle root. The two-level search is:
 
-```
+```text
 outer loop: extra_nonce from 0 to 2^64
     coinbase_tx.extra_nonce = extra_nonce
     merkle_root = compute_merkle_root(coinbase_tx, other_transactions)

@@ -24,7 +24,7 @@ The observability architecture for production AKS clusters operates across four 
 
 Azure Monitor Container Insights provides the foundational metrics pipeline for AKS clusters. When enabled through the Azure CLI or portal, it deploys a DaemonSet running the containerized Azure Monitor agent (ama-logs) onto every cluster node. This agent scrapes the kubelet read-only metrics endpoint exposed on port 10255, which aggregates resource usage statistics from cAdvisor—the container advisor daemon embedded in kubelet that queries cgroup accounting files in /sys/fs/cgroup/. The metrics flow follows this data path:
 
-```
+```text
 cgroup accounting (/sys/fs/cgroup/cpu,cpuacct,memory/)
     ↓
 cAdvisor (embedded in kubelet)

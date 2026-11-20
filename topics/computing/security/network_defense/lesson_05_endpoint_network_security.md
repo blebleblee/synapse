@@ -36,7 +36,7 @@ The reference architecture for Zero Trust endpoint security consists of six inte
 
 The identity provider (IdP) issues cryptographic tokens that assert user identity and authorization claims. Modern Zero Trust deployments standardize on OAuth 2.0 and OpenID Connect (OIDC), replacing legacy Kerberos and NTLM protocols. When a user authenticates, the IdP returns a signed JSON Web Token (JWT) containing identity claims, group memberships, and authorization scopes. The JWT structure separates the header (algorithm and token type), payload (claims), and signature:
 
-```
+```text
 Header:   {"alg": "RS256", "typ": "JWT", "kid": "2024-key-01"}
 Payload:  {"sub": "alice@corp.example", "groups": ["developers", "oncall"], 
            "exp": 1704153600, "iat": 1704067200, "device_id": "tpm-sha256:a3f7..."}
@@ -47,7 +47,7 @@ The signature binds the token to the IdP's private key, preventing tampering. An
 
 Multi-factor authentication (MFA) strengthens the initial authentication by requiring proof of possession of a second factor. Modern deployments favor FIDO2/WebAuthn hardware tokens over SMS or TOTP because hardware tokens resist phishing—the cryptographic challenge-response is bound to the origin, preventing attackers from proxying authentication to a fake login page. The authentication flow proceeds in phases:
 
-```
+```text
 User → IdP: Authentication Request (username, password)
 IdP → User: Challenge (nonce, require FIDO2)
 User → Authenticator: Sign challenge with hardware key
@@ -295,7 +295,7 @@ At process creation, the kernel's code integrity module validates the PE executa
 
 Linux environments implement similar controls through IMA (Integrity Measurement Architecture) and EVM (Extended Verification Module). The kernel maintains a runtime measurement list of all executed binaries, and policies enforce signature verification:
 
-```
+```bash
 # /etc/ima/ima-policy
 measure func=BINFMT_CHECK mask=MAY_EXEC
 appraise func=BINFMT_CHECK mask=MAY_EXEC appraise_type=imasig

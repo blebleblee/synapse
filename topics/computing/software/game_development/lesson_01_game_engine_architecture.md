@@ -34,7 +34,7 @@ Consider the naive implementation where each iteration begins by computing the e
 
 The fixed timestep pattern resolves these issues by decoupling simulation time from rendering time. The engine maintains an accumulator that stores leftover time from the previous frame. Each frame begins by adding the actual elapsed time to this accumulator, then consuming fixed-size timesteps from the accumulator until it drains below the timestep threshold. If the accumulator contains 23ms and our physics tick is 16ms, we run one physics update and carry forward 7ms to the next frame. If the next frame takes 30ms, the accumulator reaches 37ms, we run two physics ticks, and carry forward 5ms. This pattern ensures physics always advances in consistent increments regardless of frame rate variance.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                   Fixed Timestep Loop                    │
 ├─────────────────────────────────────────────────────────┤
@@ -60,7 +60,7 @@ Input handling must occur at the start of each frame to minimize latency between
 
 Scene graph traversal implements hierarchical transform propagation where each node stores a local transform relative to its parent and computes a world transform by multiplying up the ancestor chain. A character's hand bone might have a local rotation of 30 degrees relative to the forearm. The forearm rotates 45 degrees relative to the upper arm, which rotates 15 degrees relative to the shoulder, which translates 1.5 meters along the spine, which in turn is positioned at world coordinates (10, 2, 5). Computing the hand's world position requires multiplying this chain of transforms: world = parent_world * local.
 
-```
+```text
 struct SceneNode {
     Transform local;           // Position, rotation, scale relative to parent
     Transform world;           // Cached world-space transform
@@ -88,7 +88,7 @@ This recursive traversal is conceptually clean but poses performance challenges.
 
 Entity-Component-System architecture inverts the scene graph's object-oriented structure into a data-oriented layout. Rather than encapsulating data and behavior within entity objects, ECS separates entities (integer IDs), components (plain-old-data structures), and systems (functions operating on component collections). A typical ECS manages components in dense arrays or hash maps keyed by entity ID, with systems querying for entities that match specific component signatures.
 
-```
+```text
 // Component definitions: pure data, no behavior
 struct Position { float x, y, z; };
 struct Velocity { float dx, dy, dz; };
@@ -126,7 +126,7 @@ void render_system() {
 
 This example uses hash maps for clarity, but production ECS implementations use archetypes or sparse sets to achieve superior cache locality. An archetype is a unique combination of component types—entities with Position+Velocity form one archetype, entities with Position+Velocity+Renderable form another. Components for all entities in an archetype pack into contiguous arrays, allowing iteration without hash lookups or pointer indirection. When a component is added or removed from an entity, the entity migrates between archetypes, requiring data copying but maintaining the critical property that iterating entities within an archetype is a simple linear scan.
 
-```
+```text
 struct Archetype {
     std::vector<Entity> entities;
     std::vector<Position> positions;     // Parallel array
@@ -147,7 +147,7 @@ The inner loop here is trivially vectorizable—modern compilers can emit SIMD i
 
 Handling entity relationships within ECS requires explicit encoding. Parent-child hierarchies can be represented with Parent and Children components, where Parent stores the parent entity ID and Children stores a vector of child IDs. Transform propagation becomes a system that queries entities with LocalTransform and Parent components, looks up the parent's WorldTransform, and computes the child's WorldTransform. This works but introduces indirection—accessing the parent's transform requires looking up its entity ID in the WorldTransform component storage, which may be a hash lookup or archetype traversal.
 
-```
+```text
 struct LocalTransform { /* relative to parent */ };
 struct WorldTransform { /* absolute in world space */ };
 struct Parent { Entity parent_id; };
@@ -173,7 +173,7 @@ This two-pass approach ensures parents update before children, but it assumes a 
 
 Frame synchronization between subsystems becomes explicit in ECS through system ordering. If the AI system must see updated positions from physics before making decisions, the physics system must execute first in the frame. If rendering must see final positions after both physics and AI, it must execute last. This ordering is specified declaratively, allowing the engine to detect cycles and parallelize independent systems automatically.
 
-```
+```text
 // System dependency graph
 movement_system();        // Updates Position from Velocity
 physics_system();         // Resolves collisions, updates Position/Velocity
@@ -186,7 +186,7 @@ Dependencies are not always simple sequences. Consider a particle system that sp
 
 State management at frame boundaries requires distinguishing between mutable gameplay state and immutable reference data. Gameplay state includes entity positions, health values, inventory contents—anything that changes during a frame. Reference data includes mesh assets, material parameters, audio samples—data loaded once and read by many systems. Gameplay state typically double-buffers to allow rendering to read the previous frame's state while gameplay updates the current frame. Reference data can be shared across frames because it is immutable.
 
-```
+```text
 struct GameState {
     // Gameplay state: active, being updated
     ComponentStorage positions_current;
@@ -224,7 +224,7 @@ Multithreading game engines is notoriously challenging because gameplay code is 
 
 The critical constraint in parallel game engines is not Amdahl's law (sequential bottlenecks) but synchronization overhead. If parallelizing a 2ms system requires 0.5ms of mutex acquisition, atomic operations, and thread waking, you need the parallel speedup to exceed 1.25x just to break even. For tasks under 1ms, the synchronization cost often dominates the computation cost, making parallelization counterproductive. Job systems with lightweight work stealing are designed to minimize this overhead by amortizing thread management across thousands of small tasks, allowing fine-grained parallelism to become viable.
 
-```
+```text
 // Sequential update: 5ms total
 for (Entity e : entities) {
     update_physics(e);   // 2ms
@@ -253,7 +253,7 @@ The job-based approach succeeds because it batches synchronization—instead of 
 
 Memory allocation during gameplay is a primary source of frame hitches. Standard allocators like malloc and new acquire global locks, walk free lists, and potentially invoke the operating system to request additional pages. These operations can take hundreds of microseconds, causing visible frame spikes. Object pools preallocate fixed-size blocks at initialization, eliminating runtime allocation. When a particle system needs a new particle, it pulls from a free list in the pool, requiring only a pointer assignment. When a particle dies, it returns to the pool. This pattern reduces allocation from hundreds of microseconds to tens of nanoseconds.
 
-```
+```text
 template<typename T, size_t Capacity>
 struct ObjectPool {
     std::array<T, Capacity> storage;

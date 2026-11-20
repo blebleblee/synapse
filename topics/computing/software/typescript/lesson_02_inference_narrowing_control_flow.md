@@ -30,7 +30,7 @@ When checking the callback `s => s.length`, the type checker queries the context
 
 Control flow analysis in TypeScript builds upon a graph representation that models the branching and merging structure of imperative control flow. The compiler constructs this control flow graph during semantic analysis, creating flow nodes at each point where type information might be refined: variable declarations, assignments, conditional expressions, type guard assertions, and discriminant checks. Each flow node maintains references to its antecedent nodes—the set of flow nodes that might have executed immediately before reaching the current point. The graph structure is immutable and cached, allowing efficient reanalysis when declaration files change without requiring full rebuilding of the control flow representation.
 
-```
+```text
 FlowStart (function entry)
     ↓
 FlowLabel (x: string | number)

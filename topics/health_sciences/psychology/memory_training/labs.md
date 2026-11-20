@@ -83,13 +83,13 @@ For each of the four sessions, administer the encoding condition exactly as spec
 
 After completing all four sessions for a given participant, create a summary pivot table in the session log spreadsheet. Set rows as the four conditions (Passive/Short, Passive/Long, Elaborative/Short, Elaborative/Long), set columns as `Mean_Correct`, `SD_Correct`, `Mean_Intrusions`, and `Percent_Retention`. Use the following Excel/LibreOffice formulas for a data range where column H holds `Recall_Score_Raw` and column B identifies condition:
 
-```
+```text
 Mean Passive/Short:    =AVERAGEIF(D:D,"Passive",AVERAGEIF(F:F,"Short",H:H))
 ```
 
 Because nested AVERAGEIF does not function as a combined filter in standard Excel, use the array-entered formula instead:
 
-```
+```text
 =AVERAGE(IF((D2:D100="Passive")*(F2:F100="Short"),H2:H100))
 ```
 

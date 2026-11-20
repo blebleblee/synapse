@@ -76,7 +76,7 @@ graph LR
 
 ### Spotting Notes Template (copy this verbatim into your notes doc)
 
-```
+```text
 CUE: 1M1 (Reel 1, Music cue 1)
 TIMECODE IN:  00:02:34:12
 TIMECODE OUT: 00:03:48:00
@@ -112,7 +112,7 @@ Keep this as a living spreadsheet (one row per cue) with columns for cue number,
 
 ### Worked example: a Hero Theme in C major, built for reharmonization
 
-```
+```text
 PRIMARY STATEMENT (strings, mf, moderate tempo):
 Bar 1: C4 - E4 - G4 - A4      (stepwise rise toward dominant color)
 Bar 2: G4 - F4 - E4 - D4      (descending resolution)
@@ -217,7 +217,7 @@ VARIATION B — "Action" (rhythmic augmentation/diminution):
 
 **MIDI programming workflow (Cubase/Logic/Pro Tools, applies to any DAW):**
 
-```
+```text
 1. Set project frame rate to match delivery spec exactly (24fps vs 23.976 —
    confirm with post before you start, not after).
 2. Import picture reference synced to timecode 00:00:00:00.

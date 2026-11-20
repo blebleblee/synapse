@@ -22,7 +22,7 @@ The OCI control plane architecture resembles a distributed state machine where t
 
 The compartment tree itself exists as a specialized index structure within the control plane's metadata service. Each compartment object contains a parent OCID reference, a name, a description, and a lifecycle state field (ACTIVE, INACTIVE, DELETED). The tree traversal algorithm begins at any compartment and walks parent references until reaching the root tenancy, building a path vector used during policy evaluation. This path vector caching strategy means that policy evaluation for a resource five levels deep requires at most five OCID lookups and a bounded number of policy statement scans proportional to the depth, not the total number of compartments. The control plane maintains inverted indices mapping resource OCIDs to compartment OCIDs, enabling efficient queries like "list all compute instances in compartment X and all descendant compartments."
 
-```
+```text
 Compartment Tree Structure & Policy Evaluation Path
 
 Tenancy (Root)
@@ -64,7 +64,7 @@ Identity Domains introduce a federated directory service that operates as a logi
 
 The policy language itself is a domain-specific syntax built atop a formal grammar that compiles to an abstract syntax tree (AST) for evaluation. A canonical policy statement takes the form:
 
-```
+```text
 Allow group <group_name> to <verb> <resource_type> in <location> where <conditions>
 ```
 

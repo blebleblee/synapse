@@ -97,7 +97,7 @@ Conflating these passes produces reviews that are simultaneously too pedantic ab
 
 GitHub's review model gives reviewers three responses: `COMMENT` (non-blocking feedback), `REQUEST_CHANGES` (blocking), and `APPROVE`. Many projects add a convention layer on top of this. The Rust compiler project uses `r+` and `r-` comments as explicit signals to their `bors` merge bot, which will only merge a PR after a designated reviewer posts `@bors r+`. This separates the human approval signal from the mechanical merge action and allows merge batching and serialization through a queue. Chromium uses a similar pattern with `LGTM` and `CQ+2` signals gated by Gerrit's Code Review tooling. The underlying invariant is the same: no code reaches the mainline without at least one human reviewer who is authorized by the project's trust hierarchy to approve that category of change.
 
-```
+```bash
 # Practical reviewer workflow using the GitHub CLI
 gh pr checkout 4821
 # read the diff with full context
@@ -119,7 +119,7 @@ gh pr review 4821 --comment --body "nit: see inline" \
 
 A merge conflict in Git is a precise technical event: two commits that share a common ancestor have both modified the same region of the same file, and the three-way merge algorithm cannot determine which change takes precedence without human judgment. The file is annotated with conflict markers that identify the ours side (the branch being merged into) and the theirs side (the branch being merged), along with the common base.
 
-```
+```text
 <<<<<<< HEAD
     let result = parse_header(buf)?;
 ||||||| base
@@ -143,7 +143,7 @@ The most common bottleneck in open source projects is not the rate at which cont
 
 CODEOWNERS files, introduced by GitHub and supported by most platforms, map file paths to reviewer groups and automatically request reviews from the right people when a PR touches their domain. A well-structured CODEOWNERS file distributes review load proportionally to expertise and prevents the common failure mode where every PR ends up in the queue of two or three overloaded core maintainers.
 
-```
+```bash
 # .github/CODEOWNERS
 # Global default owners
 *                   @org/core-team
@@ -192,7 +192,7 @@ The `--force-with-lease` flag verifies that your local ref for the remote branch
 
 A single PR that changes 2,000 lines across 40 files is effectively unreviewable. No reviewer can hold that much context simultaneously, and the probability of significant review feedback requiring structural rework is high, meaning the entire large PR may need to be revised. The stacked PR pattern addresses this by decomposing the large change into a linear sequence of small, independently reviewable PRs, each building on the previous.
 
-```
+```text
 main
  │
  ├── PR1: add trait definitions and public API surface

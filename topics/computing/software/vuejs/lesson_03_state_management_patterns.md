@@ -100,7 +100,7 @@ This is worth making architectural: Pinia does not implement its own observer or
 
 The signal flow for a store state change is:
 
-```
+```text
 Action called in Component A
     │
     ▼
@@ -142,7 +142,7 @@ The `createPinia()` call allocates the store registry — the Map that caches in
 
 Production applications with dozens of stores require a file organization strategy that keeps the codebase navigable. The pattern that scales best follows a domain-driven layout: each store lives in a file named after the domain slice it manages, all under a `stores/` directory at the source root.
 
-```
+```text
 src/
 ├── stores/
 │   ├── auth.ts          # User identity, JWT lifecycle, permissions

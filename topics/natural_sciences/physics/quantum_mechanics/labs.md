@@ -822,7 +822,7 @@ python -c 'import scipy.constants as const; print(f"h = {const.h:.6e} J·s\nRydb
 
 Expected output confirms installation correctness and constant value access:
 
-```
+```text
 NumPy 1.24.3
 SciPy 1.10.1
 Matplotlib 3.7.1

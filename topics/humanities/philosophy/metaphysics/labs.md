@@ -136,7 +136,7 @@ Create a visual argument map representing the logical structure of the Aristotel
 
 For Aristotelian substance ontology, the dependency structure should resemble:
 
-```
+```text
 Independent Entities (Foundational)
 ├── Particular Substances
 │   └── Individual things: Socrates, this table, this horse

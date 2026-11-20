@@ -34,7 +34,7 @@ The operational mechanics of user experience design translate abstract principle
 
 The foundational architectural element is the **information hierarchy**, which organizes content and controls into nested levels of importance and specificity. This hierarchy manifests visually through size, position, contrast, and typographic weight. Primary actions—the operations users perform most frequently or the content they need to access first—occupy prominent positions: larger buttons, top-left screen regions in left-to-right reading cultures, high-contrast colors against neutral backgrounds. Secondary actions recede through smaller size, lower contrast, or peripheral placement. Tertiary controls hide in collapsible panels, right-click menus, or preference dialogs, accessible when needed but visually subordinated to primary workflows.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ [Application Title]            [Minimize] [Maximize] [X]│
 ├─────────────────────────────────────────────────────────┤

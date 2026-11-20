@@ -26,7 +26,7 @@ The encoding phase transforms domain-specific problem representations into abstr
 
 This encoding must preserve three critical structural features: causal direction, temporal sequence, and relational arity. Causal direction specifies whether A causes B or B causes A—reversing this arrow fundamentally changes the problem structure. Temporal sequence distinguishes between simultaneous relationships and sequential dependencies—whether events must occur in a specific order or can happen concurrently. Relational arity defines whether relations are unary (properties of single entities), binary (relations between two entities), or higher-order (relations involving three or more entities or relations between relations).
 
-```
+```text
 Structural Encoding Pipeline:
 
 Domain-Specific Problem Statement
@@ -110,7 +110,7 @@ Schema induction executes a generalization operation across multiple analogical 
 
 The induction process must distinguish between essential structure (present in all instances and causally necessary for the solution to work) and accidental structure (present in some instances but not required for solution effectiveness). This distinction emerges through variation: structural elements that remain constant across diverse instances are more likely essential, while elements that vary or disappear in some instances are more likely accidental.
 
-```
+```text
 Schema Induction Through Progressive Alignment:
 
 Example 1: Traffic Jam (constrained flow problem)

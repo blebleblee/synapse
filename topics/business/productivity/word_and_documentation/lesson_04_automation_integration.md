@@ -63,7 +63,7 @@ Mail merge operations leverage field codes to bind external data sources into te
 
 A practical mail merge template for customer contract amendments illustrates the pattern. The data source Excel file contains columns: `CustomerName`, `ContractNumber`, `CurrentARR`, `NewARR`, `EffectiveDate`. The template document structures the amendment with merge fields embedded in prose:
 
-```
+```text
 CONTRACT AMENDMENT
 
 This Amendment to Agreement { MERGEFIELD ContractNumber } is entered into as of { MERGEFIELD EffectiveDate } by and between Acme Corporation and { MERGEFIELD CustomerName }.
@@ -81,7 +81,7 @@ The Open XML format architecture exposes Word documents as ZIP-compressed archiv
 
 A document generation pipeline for quarterly board reports might operate entirely outside Word, using an XML templating engine to inject financial data from a PostgreSQL database into a pre-designed Open XML structure:
 
-```
+```text
 word/document.xml (simplified excerpt):
 
 <w:p>

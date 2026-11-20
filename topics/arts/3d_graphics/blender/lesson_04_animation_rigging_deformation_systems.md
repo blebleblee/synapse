@@ -55,7 +55,7 @@ Skinning deformation occurs in the Armature modifier, which appears in the modif
 
 Inverse kinematics solving in Blender uses iterative numerical methods rather than closed-form analytic solutions, even for simple two-bone chains, because the generalized solver must handle arbitrary chain lengths, rotation constraints, and pole targets. The IK constraint operates during the constraint evaluation phase, which occurs after the initial forward kinematic pass has set all bone world matrices based on their local transforms and hierarchy. The IK solver retrieves the target object's world position, computes the current end effector position by reading the tip of the last bone in the IK chain, calculates the error vector between them, and iteratively adjusts the local rotations of the bones in the chain to reduce this error. The solver employs a Jacobian-based method: it computes the partial derivatives of the end effector position with respect to each joint angle, forming the Jacobian matrix, then uses its pseudo-inverse to determine the incremental rotation adjustments that will move the end effector closer to the target. This iteration repeats for a fixed number of steps (controlled by the IK constraint's iterations parameter), converging toward a solution that minimizes the positional error while respecting joint angle limits and pole target orientation hints.
 
-```
+```text
 IK Solver Iteration Loop
 
 1. Read current end effector world position P_current

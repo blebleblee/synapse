@@ -22,7 +22,7 @@ The HTML5 parsing process begins with byte stream decoding, where raw bytes are 
 
 The tokenizer is a finite state machine with over eighty distinct states governing character consumption and token emission. The machine begins in the data state, consuming characters and emitting them as character tokens until it encounters a `<` character, which transitions to the tag open state. The tag open state examines the next character: if it is an ASCII letter, the machine transitions to tag name state and begins accumulating tag name characters; if it is `!`, the machine transitions to markup declaration open state to handle comments and DOCTYPE declarations; if it is `/`, the machine enters end tag open state. Each state specifies explicit transitions for every possible input character, including EOF, with defined error handling for unexpected inputs.
 
-```
+```text
 Tokenizer State Machine (Simplified Core States):
 
 Data State:
@@ -58,7 +58,7 @@ The adoption agency algorithm handles misnested formatting elements by maintaini
 
 Table parsing represents the most complex insertion mode due to foster parenting rules. Tables have strict content models: a `<table>` element must contain only `<caption>`, `<colgroup>`, `<thead>`, `<tbody>`, `<tfoot>`, and `<tr>` elements, never raw text or other flow content. When the parser encounters unexpected content inside a table—a common occurrence with malformed markup—it invokes foster parenting, which moves the unexpected content before the table in the DOM tree. This behavior prevents content loss but can produce surprising structures. Consider `<table><div>text</div><tr><td>cell</td></tr></table>`. The parser foster-parents the `<div>` before the table, resulting in a DOM where the div is a sibling preceding the table, not a child.
 
-```
+```text
 Simplified Tree Construction Algorithm:
 
 function processToken(token, insertionMode):

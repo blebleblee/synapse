@@ -24,7 +24,7 @@ The technical architecture of valuation integration follows a sequential four-st
 
 The variance decomposition stage begins with a reconciliation matrix that arrays the point estimates or ranges from each methodology alongside the key assumptions and data sources that drive each result. For a representative middle-market acquisition, the matrix might appear as follows:
 
-```
+```text
 Methodology               Low      Base     High     Key Drivers
 ---------------------------------------------------------------------------
 DCF (WACC 12.5%)         $780M    $850M    $920M    Revenue CAGR 8-12%
@@ -54,7 +54,7 @@ The sensitivity analysis stage maps how changes in key input assumptions propaga
 
 For the DCF methodology, a two-dimensional sensitivity table typically examines the intersection of revenue growth and discount rate assumptions:
 
-```
+```text
 DCF Enterprise Value Sensitivity ($ millions)
 Revenue CAGR →        6%      8%      10%     12%     14%
 WACC ↓
@@ -69,7 +69,7 @@ This table reveals that a 200 basis point increase in revenue growth from the 8 
 
 The trading comparable methodology requires sensitivity analysis across multiple dimensions: the selection of the peer group, the choice of valuation multiple, and the application of discounts or premiums for size, liquidity, or business model differences. A common approach constructs a matrix showing how enterprise value varies with different peer group compositions and multiple selections:
 
-```
+```text
 Trading Comp EV Range ($ millions)
 Peer Group                    EV/EBITDA    EV/Revenue   EV/EBIT
 ------------------------------------------------------------------------
@@ -120,7 +120,7 @@ The comparable company selection process benefits from quantitative clustering a
 
 The clustering algorithm typically operates on a feature vector constructed from trailing twelve-month and forward-estimate financial metrics:
 
-```
+```text
 Feature Vector = [Revenue Growth, EBITDA Margin, ROIC, Revenue per Employee, 
                   Revenue Size (log-scaled), Debt/EBITDA, CapEx/Revenue]
 ```

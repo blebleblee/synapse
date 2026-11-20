@@ -54,7 +54,7 @@ The practical implementation of Lagrangian mechanics follows a systematic protoc
 
 The complete Lagrangian analysis workflow proceeds through five distinct phases:
 
-```
+```text
 Physical System Description
           ↓
 Configuration Space Analysis

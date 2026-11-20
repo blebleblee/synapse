@@ -103,7 +103,7 @@ One shape, moved anywhere on the neck, gives you the core tones of any major or 
 
 **Major box, root on E string fret 3 (G major):**
 
-```
+```text
 E string:  fret 3  — Root (G)          — finger 1
 A string:  fret 2  — Major 3rd (B)     — finger 1
 A string:  fret 5  — Perfect 5th (D)   — finger 4
@@ -112,7 +112,7 @@ D string:  fret 5  — Octave (G)        — finger 4
 
 **Minor box, same root:**
 
-```
+```text
 E string:  fret 3  — Root (G)          — finger 1
 A string:  fret 1  — Minor 3rd (B♭)    — finger 1
 A string:  fret 5  — Perfect 5th (D)   — finger 4
@@ -123,7 +123,7 @@ Only the third moves — one fret lower for minor. Fifth and octave stay put. In
 
 **Second box, root on A string (D major/minor):**
 
-```
+```text
 A string:  fret 5  — Root (D)              — finger 1
 D string:  fret 4  — Major 3rd (F♯)        — finger 1   [fret 3 for minor: F]
 D string:  fret 7  — Perfect 5th (A)       — finger 4
@@ -194,7 +194,7 @@ CAGED maps five open-position chord shapes (C-A-G-E-D) as movable barre forms ac
 
 **E Shape** — root on low E string, the standard barre chord shape, barre at fret 3:
 
-```
+```text
 fret:   3   4   5
 E  --- R  ---  5  ---
 B  --- -- ---  R  ---
@@ -206,7 +206,7 @@ E  --- R  ---  5  ---
 
 **D Shape** — root on D string, barre at fret 10:
 
-```
+```text
 fret:  10  11  12
 E  --- -- ---  5  ---
 B  --- -- ---  R  ---
@@ -216,7 +216,7 @@ D  --- R  ---  -- ---
 
 **C Shape** — root on A string, barre at fret 15 (one octave above the original C-shape G chord at the open position):
 
-```
+```text
 fret:  15  16  17
 E  --- -- ---  R  ---
 B  --- 3  ---  -- ---
@@ -227,7 +227,7 @@ A  --- R  ---  -- ---
 
 **A Shape** — root on low E and high E strings, barre at fret 5 (moved up from the open-position A shape):
 
-```
+```text
 fret:   5   6   7
 E  --- R  ---  -- ---
 B  --- -- ---  5  ---
@@ -239,7 +239,7 @@ E  --- R  ---  -- ---
 
 **G Shape** — root on low E string, barre at fret 7, widest stretch of the five:
 
-```
+```text
 fret:   7   8   9  10
 E  --- R  ---  --  3
 B  --- -- ---  R  ---
@@ -291,7 +291,7 @@ Down-up-down-up, unconditionally, regardless of string changes. This removes the
 
 **Drill — Chromatic staircase**, frets 1-2-3-4 on each string, picking D-U-D-U, fingers 1-2-3-4:
 
-```
+```text
 High E → B → G → D → A → low E, frets 1-2-3-4 each string, descending
 then reverse: low E → high E, ascending
 ```
@@ -302,7 +302,7 @@ Start at 70 BPM sixteenth notes, build to 120 BPM.
 
 A single downstroke crossing to a thinner (higher-pitched) string, a single upstroke crossing to a thicker (lower-pitched) string — this removes the extra stroke alternate picking forces on string crossings.
 
-```
+```text
 Alternate picking (3-note-per-string run):
 E str: D-U-D | B str: U-D-U | G str: D-U-D   ← extra stroke at each crossing
 
@@ -473,7 +473,7 @@ A small circle above the notated pitch marks a harmonic in the score.
 
 ### Bass: One-Octave G Major, Simandl Position
 
-```
+```text
 String:  E    E    A    A    A    D    D    D
 Fret:    3    5    2    4    5    2    4    5
 Note:    G    A    B    C    D    E    F♯   G
@@ -484,7 +484,7 @@ Metronome ladder: 60 → 80 → 100 → 120 BPM quarters, then 80 → 100 → 12
 
 ### Guitar: Two-Octave G Major, E-Shape Root (barre fret 3)
 
-```
+```text
 String:  E   E   A   A   A   D   D   D   G   G   B   B   e   e
 Fret:    3   5   2   4   5   2   4   5   2   4   3   5   3   5
 Note:    G   A   B   C   D   E   F♯  G   A   B   C   D   E   G
@@ -496,7 +496,7 @@ Alternate picking throughout. Watch the pick angle stay consistent across every 
 
 **Minor scale fingering** (G natural minor, same position):
 
-```
+```text
 String:  E   E   A   A   A   D   D   D   G   G   B   B   e   e
 Fret:    3   5   1   3   5   1   3   5   1   3   2   3   3   5
 Note:    G   A   B♭  C   D   E♭  F   G   A   B♭  C   D   E♭  G
@@ -507,7 +507,7 @@ Only the minor 3rd (B♭, A string fret 1) and minor 6th (E♭, D string fret 1)
 
 ### Violin: Two-Octave G Major, First Position with Pivot Shift
 
-```
+```text
 String:  G   G   A   A   A   D   D   D   D   A   A   A   A   E   E   E
 Finger:  0   1   2   3   0   1   2   3   0   1   2   3   0   1   2   3
 Note:    G   A   B   C   D   E   F♯  G   A   B   C   D   E   F♯  G   A

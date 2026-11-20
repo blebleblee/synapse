@@ -42,7 +42,7 @@ World contexts isolate multiple active worlds within a single process, essential
 
 The following ASCII diagram illustrates the layered dependency structure and initialization order:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ Game Mode / Player Controllers / Actors                 │ ← User gameplay code
 ├─────────────────────────────────────────────────────────┤

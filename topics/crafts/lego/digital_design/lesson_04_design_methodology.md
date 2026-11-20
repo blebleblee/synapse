@@ -44,7 +44,7 @@ Critical to successful decomposition is ensuring modules truly exhibit functiona
 
 The output of Phase 2 is a module hierarchy diagram and interface specification document. A simple ASCII representation suffices for planning:
 
-```
+```text
 Vehicle Design Root
 ├── Chassis Frame Module
 │   └── Interface: Provides 16×8 stud top mounting surface

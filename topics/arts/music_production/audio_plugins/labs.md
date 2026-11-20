@@ -42,7 +42,7 @@ We will build with **CMake directly**, not the Projucer GUI. The Projucer is fin
 
 Create this directory structure:
 
-```
+```text
 GainLab/
 ├── CMakeLists.txt
 ├── Source/

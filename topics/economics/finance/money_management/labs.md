@@ -111,7 +111,7 @@ These parameters define a simple but realistic trading system: a coin-flip win r
 
 Return to the `PositionSizing` sheet and modify the Exit Price column (column F) to generate randomized outcomes. Replace the user input cells with the following formula in F17:
 
-```
+```text
 =IF(RAND()<Win_Rate, D17+(D17-E17)*Avg_Win_Multiple, E17)
 ```
 
@@ -138,25 +138,25 @@ The Realized Win Rate (B57) confirms whether the simulated sequence matches the 
 
 For accurate Maximum Drawdown calculation, create a helper column in column K titled "Running Peak Equity" with the formula in K17:
 
-```
+```text
 =MAX(J$17:J17)
 ```
 
 Copy this formula down through K50. This running maximum tracks the highest equity achieved up to each point in the trade sequence. In column L, titled "Drawdown $", calculate the current drawdown at each point with the formula in L17:
 
-```
+```text
 =J17-K17
 ```
 
 Copy down through L50. The Maximum Drawdown metric in B61 then becomes:
 
-```
+```text
 =MIN(L17:L50)
 ```
 
 This value represents the largest temporary loss of capital experienced during the simulation, a critical operational metric for psychological resilience and margin management. Calculate the Maximum Drawdown percentage in cell B62:
 
-```
+```text
 =B61/MAX(K17:K50)
 ```
 
@@ -202,7 +202,7 @@ Rows 76-85: Win rates from 0.40 to 0.65 in 0.025 increments
 
 Populate cell B76 with the formula:
 
-```
+```text
 =(A76*B$75-(1-A76))/B$75
 ```
 
@@ -480,7 +480,7 @@ Extend the stress test to include automatic stop-loss execution and dynamic posi
 
 Modify the position return formula in G201 to incorporate the stop-loss:
 
-```
+```text
 =IF(F201*$B$211<$B$214, $B$214, F201*$B$211)
 ```
 
@@ -488,7 +488,7 @@ This formula checks whether the daily position return would breach the stop-loss
 
 Implement a dynamic risk reduction protocol that halves position sizing after any drawdown exceeding 10%:
 
-```
+```text
 =IF(H201/MAX(H$200:H201)-1<-0.10, $B$211*0.5, $B$211)
 ```
 
@@ -543,7 +543,7 @@ Create a recovery protocol state machine in the `PositionSizing` sheet beginning
 
 Implement the phase determination logic in B103:
 
-```
+```text
 =IF(B102<-0.25, "EMERGENCY", IF(B102<-0.10, "CONSOLIDATION", "NORMAL"))
 ```
 
@@ -590,7 +590,7 @@ Copy down through multiple trades and observe margin call triggers. In leveraged
 
 Professional risk management imposes leverage limits well below theoretical maximums to ensure survival through multi-sigma volatility events. A common institutional rule: maximum leverage ratio = 1 / (3 × daily volatility). For a portfolio with 1.5% daily volatility, maximum safe leverage becomes 1 / (3 × 0.015) = 22.2, but practical implementation typically imposes 2-3× as conservative operating limits. Implement this rule-based leverage governor:
 
-```
+```text
 =MIN(Desired_Leverage, 1/(3*Historical_Daily_Volatility))
 ```
 

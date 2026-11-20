@@ -42,7 +42,7 @@ Switchover—the planned role reversal between primary and standby—executes as
 
 Failover—the unplanned activation of a standby after primary failure—sacrifices graceful coordination for speed. The Data Guard Broker continuously monitors the primary database's heartbeat; when heartbeat loss exceeds a configured threshold, the broker immediately begins activating the best standby candidate. The activation process must reconcile potentially incomplete redo application, as the primary may have committed transactions whose redo had not yet reached the standby. In Maximum Performance mode, this creates a data loss window measured by the redo transport lag—typically under five seconds for well-provisioned networks. The activated standby database resets all pending redo beyond its last complete archive, advancing to a new incarnation of the database timeline and forcing clients to reconnect.
 
-```
+```text
 Primary Database                    Standby Database
 ┌─────────────┐                    ┌─────────────┐
 │   User      │                    │             │
@@ -107,7 +107,7 @@ Flash Cache extends Exadata's storage hierarchy by placing 6.4TB to 25.6TB of NV
 
 Cell offload efficiency is quantified through two key performance metrics exposed in AWR reports: **cell physical IO interconnect bytes** (data transmitted over the network) versus **cell physical IO bytes eligible for predicate offload** (data scanned by storage cells before filtering). The offload ratio—typically expressed as 1 - (interconnect bytes / eligible bytes)—measures Smart Scan's effectiveness. Ratios above 90% indicate successful predicate pushdown, while ratios below 50% suggest query patterns that bypass Smart Scan due to index access paths or non-offloadable predicates like PL/SQL functions.
 
-```
+```text
 Database Server Node                Storage Cell
 ┌──────────────────┐               ┌──────────────────┐
 │                  │               │                  │

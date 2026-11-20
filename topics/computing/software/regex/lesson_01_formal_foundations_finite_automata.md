@@ -22,7 +22,7 @@ The transition function *δ* is the whole machine. For a DFA with *n* states ove
 
 Consider the DFA for the language *L = { w ∈ {a,b}* | w ends in `ab` }*. The machine needs to track only three conditions: it has seen no promising suffix, it has seen a trailing `a`, or it has seen a trailing `ab`. That is three states.
 
-```
+```text
 States: q0 (start), q1 (seen 'a'), q2 (seen 'ab', accept)
 Transitions:
   δ(q0, 'a') = q1    δ(q0, 'b') = q0
@@ -95,7 +95,7 @@ The pipeline has four stages: **parsing**, **NFA construction**, **NFA simulatio
 
 **Stage 1: Parsing.** The regex string is parsed into an **Abstract Syntax Tree** (AST) where each node is a regex operator (literal, concatenation, alternation, repetition, group) and leaves are character classes or literals. The parser must enforce the syntax of the regex dialect—POSIX ERE, PCRE, RE2, Rust's `regex`—and reject patterns that are syntactically malformed. The AST is the semantic representation; it makes the recursive structure of the pattern explicit and is the input to NFA construction.
 
-```
+```text
 Regex: (ab|c)*d
 
 AST:

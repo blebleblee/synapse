@@ -20,7 +20,7 @@ At the heart of every transform in 3ds Max lies the transformation matrix, a 4×
 
 A typical transformation matrix looks like this:
 
-```
+```text
 | Xx  Xy  Xz  Tx |
 | Yx  Yy  Yz  Ty |
 | Zx  Zy  Zz  Tz |
@@ -31,7 +31,7 @@ The upper-left 3×3 block encodes rotation and scale. The three columns represen
 
 To illustrate concretely: imagine you have created a cube at world origin (0, 0, 0) with no rotation and 1× scale on all axes. Its transformation matrix is the identity matrix:
 
-```
+```text
 | 1  0  0  0 |
 | 0  1  0  0 |
 | 0  0  1  0 |
@@ -40,7 +40,7 @@ To illustrate concretely: imagine you have created a cube at world origin (0, 0,
 
 Now move that cube 5 units along the X axis and 3 units along the Z axis. The matrix becomes:
 
-```
+```text
 | 1  0  0  5 |
 | 0  1  0  0 |
 | 0  0  1  3 |
@@ -49,7 +49,7 @@ Now move that cube 5 units along the X axis and 3 units along the Z axis. The ma
 
 The right column now encodes [5, 0, 3], the object's world position. If you scale the object 2× uniformly, the upper-left 3×3 block scales proportionally:
 
-```
+```text
 | 2  0  0  5 |
 | 0  2  0  0 |
 | 0  0  2  3 |
@@ -58,7 +58,7 @@ The right column now encodes [5, 0, 3], the object's world position. If you scal
 
 If you rotate the object 90 degrees around the Z axis, the upper-left 3×3 block encodes the new orientation (the columns become the rotated local axes):
 
-```
+```text
 | 0  -1  0  5 |
 | 1   0  0  0 |
 | 0   0  1  3 |
@@ -81,7 +81,7 @@ The screen coordinate system (or view-space coordinate system) is relative to th
 
 When object B is parented to object A, the relationship is expressed through matrix multiplication. If object A has transformation matrix M_A (relative to world space) and object B has a local transformation relative to A of M_B_local, then object B's world transformation is computed as:
 
-```
+```text
 M_B_world = M_A * M_B_local
 ```
 

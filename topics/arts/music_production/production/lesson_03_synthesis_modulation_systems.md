@@ -22,7 +22,7 @@ Synthesis architectures are best understood as **signal flow topologies**—dire
 
 Subtractive synthesis begins with **harmonically rich oscillator waveforms**—sawtooth, square, pulse-width modulated pulse, or noise—and progressively removes frequency content using filters. The signal flow is linear and intuitive:
 
-```
+```text
 [Oscillator(s)] → [Mixer] → [Filter] → [VCA] → [Output]
        ↑                         ↑        ↑
        |                         |        |
@@ -55,7 +55,7 @@ Additive synthesis inverts the subtractive philosophy: instead of carving away h
 
 The signal flow for an eight-partial additive synthesizer:
 
-```
+```text
 [Sine Osc 1: 1x fund] → [Env 1] → [Amp 1] →
 [Sine Osc 2: 2x fund] → [Env 2] → [Amp 2] →
 [Sine Osc 3: 3x fund] → [Env 3] → [Amp 3] →     [Mixer] → [Output]
@@ -75,7 +75,7 @@ FM synthesis, canonized by Yamaha's DX7 in 1983, generates complex harmonic and 
 
 The mathematical formula governing two-operator FM:
 
-```
+```text
 output(t) = sin(2π * f_carrier * t + I * sin(2π * f_modulator * t))
 ```
 
@@ -99,7 +99,7 @@ A typical wavetable might contain 64 single-cycle waveforms arranged in a progre
 
 The signal flow:
 
-```
+```text
 [Wavetable Oscillator] → [Filter] → [VCA] → [Output]
          ↑                    ↑        ↑
          |                    |        |

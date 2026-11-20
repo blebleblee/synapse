@@ -147,7 +147,7 @@ Both encryption and decryption in CTR mode are identical operations (keystream X
 
 GCM (Galois/Counter Mode) extends CTR mode with a polynomial authentication tag computed over GF(2¹²⁸). This provides **AEAD** — authenticated encryption with associated data — combining confidentiality and integrity in a single primitive. The authentication tag is computed by evaluating a polynomial whose coefficients are the ciphertext blocks, with a secret hash key H derived by encrypting the zero block under the cipher key. GCM's authentication is multiplicative over GF(2¹²⁸), which enables hardware acceleration via carry-less multiplication (the CLMUL instruction on x86 and the `pmull` instruction on ARM), making GCM the dominant AEAD construction in TLS 1.3, IPsec, and secure boot chains.
 
-```
+```text
 GCM Authentication Tag Computation
 
 H = AES_K(0¹²⁸)                   (hash subkey)

@@ -34,7 +34,7 @@ Privilege escalation occurs when an attacker leverages a lower-privileged contex
 
 Server-side session management operates through a three-component system: the session store, the session middleware, and the session cookie. When a user submits valid credentials, the authentication handler generates a cryptographically secure random session identifier using a function equivalent to 32 bytes from `/dev/urandom` on Unix systems or `CryptGenRandom` on Windows. The handler constructs a session object containing the authenticated user ID, privilege level, creation timestamp, and last access timestamp, then stores this object in the session store indexed by the session ID.
 
-```
+```text
 ┌─────────────┐                    ┌──────────────────┐
 │   Browser   │                    │  Application     │
 │             │                    │  Server          │
@@ -103,7 +103,7 @@ Session invalidation, triggered by explicit logout or administrative revocation,
 
 A JSON Web Token encodes three distinct segments: the JOSE header, the JWT claims set, and the cryptographic signature. The JOSE header, itself a JSON object, declares the signing algorithm (`alg`) and optionally the key ID (`kid`) used to locate the correct verification key in a multi-key environment. Common algorithms include `HS256` (HMAC-SHA256 using a symmetric secret), `RS256` (RSA signature with SHA-256), and `ES256` (ECDSA with the P-256 curve and SHA-256 hash). The choice of algorithm carries security implications: symmetric algorithms require the verifying party to possess the secret key, preventing use in zero-trust architectures where third parties must verify tokens without access to signing secrets.
 
-```
+```text
 Header (Base64URL encoded JSON):
 {
   "alg": "RS256",
@@ -145,7 +145,7 @@ JWT signature verification introduces a subtle timing side-channel vulnerability
 
 The Authorization Code flow with Proof Key for Code Exchange (PKCE) represents the current best practice for web and mobile applications. PKCE, specified in RFC 7636, prevents authorization code interception attacks by binding the code exchange to the original requesting client through a cryptographic challenge-response mechanism.
 
-```
+```text
 ┌──────────┐                                     ┌───────────────┐
 │  Client  │                                     │ Authorization │
 │  (SPA)   │                                     │    Server     │
@@ -231,7 +231,7 @@ Refresh tokens enable long-lived access without storing perpetual access tokens.
 
 Cross-Origin Resource Sharing governs how browsers enforce the Same-Origin Policy for HTTP requests initiated by JavaScript. Simple requests—GET, HEAD, or POST with standard content types and no custom headers—proceed directly to the target server, but the browser blocks JavaScript from reading the response unless the server includes the `Access-Control-Allow-Origin` header. Preflighted requests, which include custom headers like `Authorization` or non-standard HTTP methods like PUT or DELETE, trigger an OPTIONS preflight request before the actual request, allowing the server to declare which cross-origin requests it permits.
 
-```
+```text
 Preflight Request (Browser → Server):
 OPTIONS /api/profile HTTP/1.1
 Host: api.example.com
@@ -544,7 +544,7 @@ The application queries OPA by posting a JSON payload containing the user, resou
 
 Relationship-based access control models authorization as a graph where nodes represent objects (users, resources, organizations) and edges represent typed relationships (owner, member, viewer). A user gains access to a resource if a path exists through the relationship graph satisfying the required relationship type. Google's Zanzibar system, described in their 2019 paper, implements ReBAC at planet scale, evaluating billions of authorization checks per second with sub-10ms latency. Open-source implementations such as SpiceDB and Ory Keto provide Zanzibar-inspired authorization for application developers.
 
-```
+```bash
 # Relationship tuples (subject, relation, object)
 user:alice, owner, document:doc1
 user:bob, viewer, document:doc1
@@ -702,7 +702,7 @@ Server-side request forgery (SSRF) represents another confused deputy variant wh
 
 Session fixation occurs when an attacker tricks a victim into authenticating using a session ID controlled by the attacker. The attacker obtains a session ID from the target application (often by simply visiting the login page), sends the victim a crafted link containing that session ID as a query parameter or crafted cookie, and waits for the victim to authenticate. After successful authentication, the server upgrades the attacker-supplied session ID to an authenticated session, granting the attacker access to the victim's account without ever learning their password.
 
-```
+```text
 1. Attacker visits https://bank.example.com/login
    Server responds: Set-Cookie: sessionId=attacker123
 

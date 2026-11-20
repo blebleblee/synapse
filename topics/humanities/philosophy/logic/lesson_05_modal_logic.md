@@ -54,7 +54,7 @@ The frame conditions corresponding to major axiom systems operate by constrainin
 
 The following diagram illustrates the hierarchy and frame properties:
 
-```
+```text
                            S5 (Universal Frame)
                         /  Equivalence Relation  \
                        /                          \

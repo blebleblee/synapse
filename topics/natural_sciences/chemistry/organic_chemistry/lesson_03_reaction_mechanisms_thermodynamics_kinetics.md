@@ -22,7 +22,7 @@ The curved arrow notation system constitutes the symbolic language for represent
 
 Consider the $S_N2$ nucleophilic substitution mechanism as the canonical exemplar of curved arrow formalism. The nucleophile $\mathrm{Nu}^-$ approaches the electrophilic carbon of an alkyl halide $\mathrm{R{-}X}$ from the backside, anti to the leaving group $\mathrm{X}^-$. The mechanism representation requires two curved arrows: the first arrow originates from the nucleophile's lone pair and points to the electrophilic carbon, indicating formation of the new $\mathrm{C{-}Nu}$ bond; the second arrow originates from the $\mathrm{C{-}X}$ $\sigma$ bond and points to the halogen atom $\mathrm{X}$, indicating heterolytic bond cleavage and departure of $\mathrm{X}^-$ as the leaving group. The synchronous nature of bond formation and bond breaking is captured by drawing both arrows in the same mechanistic step.
 
-```
+```text
          Nu:⁻
           ↓  (curved arrow from lone pair to C)
           |
@@ -67,7 +67,7 @@ Energy diagrams (reaction coordinate diagrams) graphically represent the potenti
 
 For a simple one-step reaction, the diagram features a single maximum (transition state) separating reactant and product wells. For multistep mechanisms, multiple transition states and intermediate valleys appear. Consider the $S_N1$ mechanism proceeding through carbocation intermediate formation:
 
-```
+```text
 Energy
   ↑
   |     TS₁ (ionization)

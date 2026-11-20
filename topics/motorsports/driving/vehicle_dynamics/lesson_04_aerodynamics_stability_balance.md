@@ -59,7 +59,7 @@ Front and rear ride heights are set independently, and the difference between th
 
 Aero balance is the fraction of total downforce acting on the front axle:
 
-```
+```text
 Aero Balance (% Front) = F_front_downforce / F_total_downforce × 100
 ```
 
@@ -71,7 +71,7 @@ The critical practical metric is dynamic aero balance, measured across the speed
 
 Aerodynamic yaw stability is the tendency of the bodywork to generate a restoring yaw moment when the car adopts a slip angle relative to the incoming airflow. A car traveling straight sees airflow aligned with its longitudinal axis. In a corner, the car yaws relative to the airflow direction, and the bodywork begins to generate side force. If this side force acts ahead of the center of gravity, it destabilizes the car, pushing the nose further into the slip. If it acts behind the center of gravity, it stabilizes, creating a restoring moment.
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │              YAW STABILITY: SIDE FORCE MOMENT               │
 │                                                            │
@@ -109,7 +109,7 @@ Every aero setup is a compromise among three axes: downforce level, aero balance
 
 The practical approach is to work the axes in order of sensitivity. Start with ride height, because everything else depends on it. Set the front and rear static ride heights to put the car on the productive part of the downforce curve with sufficient pitch margin. The margin should account for the worst-case compression, which is peak braking at the highest-speed braking zone plus the static aero compression at that speed. If the car bottoms out, or if the damper pot traces show the front splitter within 3 mm of the ground under braking, raise the front ride height and accept the downforce loss.
 
-```
+```text
 AERO SETUP WORKFLOW (track-side)
 
 1. Set static ride heights (front, rear) on setup pad
@@ -145,7 +145,7 @@ Once ride height is fixed, tune the aero balance. The tool is usually rear wing 
 
 Porpoising is the aeroelastic oscillation that occurs when a car operates near the stall boundary of its underfloor flow. The mechanism is a feedback loop between ride height and downforce. As ride height decreases, downforce increases, compressing the suspension further. If the ride height drops below the stall threshold, the underbody flow separates, downforce drops abruptly, and the suspension rebounds. The ride height rises, the flow reattaches, downforce returns, and the cycle repeats. The frequency is typically 5 to 10 Hz, set by the spring rate and the aero pressure recovery time, and the amplitude can be 10 to 20 mm of heave oscillation at the floor.
 
-```
+```text
 PORPOISING MECHANISM
 
   Ride Height (mm)

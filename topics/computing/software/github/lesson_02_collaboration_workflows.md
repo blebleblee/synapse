@@ -289,7 +289,7 @@ Protected branch configuration provides the enforcement mechanism for organizati
 
 Code ownership patterns extend the review routing mechanism with filesystem-based rules. The `.github/CODEOWNERS` file (or `CODEOWNERS` in the root or `docs/` directory) contains pattern-matching rules mapping paths to GitHub usernames or team identifiers. When a pull request modifies files, GitHub parses the CODEOWNERS file, matches changed paths against ownership patterns, and automatically requests reviews from the corresponding owners.
 
-```
+```bash
 # .github/CODEOWNERS example for a database system project
 
 # Default owners for anything not explicitly specified
@@ -376,7 +376,7 @@ Review distribution optimization addresses the human bottleneck in pull request 
 
 Implementing review load balancing through GitHub's CODEOWNERS file combined with team-based ownership enables round-robin review distribution. Rather than assigning ownership to individuals, assigning ownership to GitHub teams allows GitHub to automatically select available team members for review requests, spreading load across the team. Team members can configure their notification preferences and GitHub status to signal availability, enabling GitHub to intelligently route reviews to available reviewers.
 
-```
+```bash
 # Load-balanced ownership using teams
 /src/planner/**     @org/planner-team
 /src/executor/**    @org/executor-team

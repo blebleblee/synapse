@@ -87,7 +87,7 @@ Before developing solution concepts, it is valuable to understand the computatio
 
 The following diagram shows the structural relationships among the key solution concepts and their mathematical dependencies.
 
-```
+```text
 Characteristic Function (N, v)
 │
 ├─── Structural Properties

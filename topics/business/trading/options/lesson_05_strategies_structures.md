@@ -40,7 +40,7 @@ The volatility term structure and skew provide additional signals for strategy s
 
 The mechanical construction of a vertical spread begins with the selection of strikes and expiration. Consider a bull call spread on a stock trading at $100, where the trader buys the $100 call for $5.00 and sells the $105 call for $2.50, paying a net debit of $2.50. The payoff at expiration is zero if the stock is below $100, increases linearly as the stock rises to $105, and caps at $5.00 for any stock price above $105. The maximum profit is $5.00 - $2.50 = $2.50, and the maximum loss is the $2.50 debit. The breakeven stock price is $100 + $2.50 = $102.50. The position's delta at initiation is the difference between the delta of the long call (approximately 0.50) and the delta of the short call (approximately 0.30), yielding a net delta of +0.20, meaning the position gains $0.20 for every $1 move up in the stock.
 
-```
+```text
 Vertical Bull Call Spread Payoff Structure
 
 Stock Price at Expiration  | Long $100 Call | Short $105 Call | Net P&L
@@ -60,7 +60,7 @@ The Greeks of the spread evolve as the underlying moves and time passes. Initial
 
 Horizontal calendar spreads require understanding the relationship between time decay and volatility. A calendar spread on the same $100 stock might buy the 90-day $100 call for $6.00 and sell the 30-day $100 call for $3.00, paying a net debit of $3.00. The position profits if the stock remains near $100 and the short-dated call expires worthless, allowing the trader to keep the $3.00 premium and retain the long 90-day call. If the stock moves sharply to $110, both calls are deep in-the-money, and the spread value collapses because the extrinsic value in both legs evaporates. The Greeks of a calendar spread are complex: the position is vega-positive, theta-positive in the short leg but theta-negative in the long leg, and gamma-neutral at initiation but develops large negative gamma if the stock moves away from the strike.
 
-```
+```text
 Calendar Spread Mechanics
 
 Time to Expiration (Short Leg)  | Short Call Value | Long Call Value | Spread Value
@@ -78,7 +78,7 @@ Diagonal spreads layer strike and time differentials. A diagonal call spread mig
 
 Straddles and strangles are simpler in construction but more sensitive to volatility. A straddle on a $100 stock might buy the $100 call for $5.00 and the $100 put for $5.00, paying $10.00 total. The breakeven points are $90 and $110, meaning the stock must move more than 10% in either direction to profit at expiration. The delta is zero at initiation because the call's positive delta offsets the put's negative delta, but gamma is large and positive, meaning delta swings rapidly as the stock moves. Vega is also large, approximately twice the vega of a single option, so the straddle profits from implied volatility expansion even if the stock does not move immediately.
 
-```
+```text
 Straddle Payoff and Greeks
 
 Stock Price | Call P&L | Put P&L | Net P&L | Delta | Gamma | Vega
@@ -96,7 +96,7 @@ A strangle widens the strikes to reduce cost. Buying the $95 put for $3.00 and t
 
 Iron butterflies and iron condors are credit strategies constructed by combining a bull put spread and a bear call spread. An iron condor on a $100 stock might sell the $95 put for $1.00, buy the $90 put for $0.50, sell the $105 call for $1.00, and buy the $110 call for $0.50, collecting a net credit of $1.00. The maximum profit is $1.00 if the stock stays between $95 and $105, and the maximum loss is $4.00 if the stock moves beyond $90 or $110. The position is delta-neutral at initiation, theta-positive, and vega-negative, profiting from time decay and collapsing volatility.
 
-```
+```text
 Iron Condor Structure
 
 Leg                | Action | Strike | Premium | Risk

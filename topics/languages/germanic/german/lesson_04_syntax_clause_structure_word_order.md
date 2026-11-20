@@ -37,7 +37,7 @@ flowchart LR
 
 A concrete main clause fills this topology as follows. Take the sentence *Dem alten Mann hat sie das Buch leider nicht gegeben* ("She unfortunately did not give the book to the old man"):
 
-```
+```text
 ┌──────────────────┬─────┬───────────────────────────────────────────┬─────────┬──────────┐
 │    VORFELD       │  LK │            MITTELFELD                     │   RK    │ NACHFELD │
 ├──────────────────┼─────┼───────────────────────────────────────────┼─────────┼──────────┤

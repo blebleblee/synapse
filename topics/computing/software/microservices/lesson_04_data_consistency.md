@@ -40,7 +40,7 @@ This distinction is critical. A database rollback is a physical operation: it re
 
 A Saga for an e-commerce checkout flow has the following structure, where each step is a local transaction with a corresponding compensation:
 
-```
+```text
 Step 1: ORDER SERVICE      → Create Order (status: PENDING)
          Compensation      → Cancel Order (status: CANCELLED)
 

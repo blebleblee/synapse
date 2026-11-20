@@ -26,7 +26,7 @@ When the learner encounters a flashcard or trivia fact, they assign a quality ra
 
 The interval scheduling follows a precise formula. After the first successful recall at quality three or higher, the item schedules for review in one day. After the second consecutive success, the interval extends to six days. For subsequent reviews, the new interval equals the previous interval multiplied by the easiness factor. Items failing to achieve quality three reset to a one-day interval and restart the sequence. This creates an exponential spacing function that asymptotically approaches the optimal rehearsal schedule for permanent retention.
 
-```
+```text
 Item State: {
   fact_id: unique_identifier
   interval: days_until_next_review
@@ -65,7 +65,7 @@ Calibration training requires implementing a structured feedback protocol that s
 
 The Brier score provides a single-number metric quantifying both calibration and resolution. For each question, the competitor assigns a probability to their selected answer. The Brier score equals the mean squared difference between the assigned probability and the actual outcome, where correct answers receive a value of one and incorrect answers receive zero. A competitor who assigns ninety percent confidence to a correct answer receives a Brier score of 0.01 for that question. The same ninety percent confidence on an incorrect answer yields a Brier score of 0.81. Across many questions, lower Brier scores indicate superior metacognitive accuracy.
 
-```
+```text
 Calibration Tracking Structure:
 confidence_bins = {
   0-10%: {predictions: [], outcomes: []},
@@ -100,7 +100,7 @@ Within each category, semantic trigger phrases map to high-probability answer ca
 
 Power marking identifies the critical inflection point where answer probability crosses actionable thresholds. Questions contain deliberate ambiguity in early phrases before converging on unique identification. A question reading "This physicist developed a theory" could reference hundreds of candidates. Adding "of electromagnetic radiation" narrows to dozens. "Involving quantized energy packets" reduces to a handful. "Leading to the explanation of the photoelectric effect" uniquely identifies Einstein. The power mark represents the minimal information sufficient for high-confidence identification, typically occurring sixty to seventy-five percent through the question for standard difficulty levels.
 
-```
+```text
 Question Processing Pipeline:
 
 Input: real-time question text stream
@@ -136,7 +136,7 @@ The immediate expected value of buzzing equals the probability of correctness mu
 
 The decision requires incorporating opportunity cost and opponent interception probability. Each additional phrase revealed increases personal confidence but also grants opponents additional information. If waiting one more clause would raise confidence from seventy to eighty-five percent but carries a forty percent probability that an opponent buzzes first, the expected value calculation must discount the higher confidence scenario by opponent interception risk. The optimal policy buzzes when the current expected value exceeds the discounted expected value of waiting, accounting for both information gain and competitive risk.
 
-```
+```text
 Expected Value Calculation:
 
 EV_buzz_now = (confidence × points_correct) - ((1 - confidence) × points_penalty)

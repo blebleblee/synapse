@@ -46,7 +46,7 @@ The J-curve return profile inherent to private equity reflects early negative ca
 
 Hedge funds pursuing absolute return strategies through long-short equity, global macro, event-driven, or relative value arbitrage typically charge one to two percent management fees plus ten to twenty percent performance fees on gains, with high-water mark provisions ensuring performance fees accrue only after recovering prior losses. Redemption terms range from monthly liquidity with thirty-day notice for liquid strategies like equity long-short, to annual or multi-year lockups for distressed debt and private credit vehicles that invest in illiquid securities. Side pockets segregate illiquid positions from the main fund, preventing exiting investors from forcing premature liquidations at distressed prices while giving remaining investors full exposure to ultimate recoveries.
 
-```
+```text
 Portfolio Expected Return Decomposition
 
 Total Return = ∑ (w_i × r_i)

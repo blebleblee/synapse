@@ -24,7 +24,7 @@ A Karnaugh map is a two-dimensional rearrangement of the truth table in which th
 
 Consider a concrete example. Suppose we have a four-input function *F(A, B, C, D)* specified by the following K-map, where rows are *AB* and columns are *CD*:
 
-```
+```text
          CD
       00  01  11  10
 AB 00  1   1   0   0

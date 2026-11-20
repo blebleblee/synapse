@@ -6,7 +6,7 @@ This guide treats dynamical systems as objects of formal mathematical verificati
 
 The computational environment requires Python 3.11 or later, with SymPy for symbolic algebra and calculus, NumPy for numerical cross-validation, and SageMath for Gröbner basis computations and polynomial system solving. Install and verify the environment as follows.
 
-```
+```text
 pip install sympy numpy matplotlib scipy
 python -c "import sympy; print(sympy.__version__)"
 python -c "import numpy; print(numpy.__version__)"
@@ -14,7 +14,7 @@ python -c "import numpy; print(numpy.__version__)"
 
 For SageMath, use the standalone distribution or the SageMath kernel inside JupyterLab. The Lean 4 proof assistant with the Mathlib4 library handles formal structural verification in Exercise 3. Install via the `elan` toolchain manager:
 
-```
+```bash
 curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
 lake new dynamical_systems_lab
 cd dynamical_systems_lab

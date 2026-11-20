@@ -38,7 +38,7 @@ Informational conformity adds a second pathway. When facing ambiguous stimuli or
 
 The mathematical structure of informational cascades can be modeled formally. Let each individual receive a private signal about the true state of the world, with signal accuracy p > 0.5. If individuals decide sequentially and observe prior decisions, an information cascade occurs when the social information overwhelms private signals. Once two people have made the same choice, the third person should rationally ignore their own signal and conform, regardless of signal strength. This cascades forward: all subsequent individuals conform, and private information stops being incorporated into the collective decision.
 
-```
+```text
 Informational Cascade Dynamics:
 
 Person 1: Private signal S₁ → Decision D₁ = f(S₁)
@@ -65,7 +65,7 @@ Groupthink emerges from the interaction between conformity pressures and informa
 
 The pooling failure occurs because information that contradicts emerging group consensus gets filtered before reaching collective consideration. Self-appointed mindguards intercept dissenting information, framing it as irrelevant, unreliable, or demoralizing. Leaders signal preferred conclusions through subtle cues—tone, emphasis, dismissiveness toward alternatives—that shape which arguments members feel comfortable advancing. The group's information diet becomes systematically biased toward confirming the emerging consensus.
 
-```
+```text
 Groupthink Information Dynamics:
 
 Stage 1: Initial preference distribution

@@ -52,7 +52,7 @@ The Kalman filter fuses multiple measurement streams to estimate the true SOC de
 
 In pseudocode:
 
-```
+```text
 function EKF_SOC_Update(state, current, measured_voltage, dt):
   // Prediction: propagate state forward
   state.SOC += (current / C_nominal) * dt  // Coulomb counting

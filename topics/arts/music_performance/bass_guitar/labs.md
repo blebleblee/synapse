@@ -38,7 +38,7 @@ Each fret raises pitch one semitone. Frets get physically closer together as you
 
 ### Note Map, Frets 0–12
 
-```
+```text
 Fret:  0    1    2    3    4    5    6    7    8    9    10   11   12
 G:     G    Ab   A    Bb   B    C    Db   D    Eb   E    F    Gb   G
 D:     D    Eb   E    F    Gb   G    Ab   A    Bb   B    C    Db   D
@@ -65,7 +65,7 @@ These move to any key by sliding the root to a new fret. Learn them in one key, 
 
 **Box 1 — Root on E string.** Key of G, root at fret 3.
 
-```
+```text
 G |——————————————————|
 D |———————5——————————|
 A |———5——————————————|
@@ -77,7 +77,7 @@ Finger 1 on fret 3, finger 3 on fret 5 (Simandl zone).
 
 **Box 2 — Root on A string.** Key of G, root at fret 10.
 
-```
+```text
 G |———————12—————————|
 D |——10———————12—————|
 A |——10——————————————|
@@ -89,7 +89,7 @@ Fret 10 = finger 1, fret 12 = finger 3 (OFPF zone — frets are close together u
 
 **Box 3 — Octave-pair box.** Root + octave only. This is your most-used shape when locking tight with a kick drum pattern.
 
-```
+```text
 G |——————————5———————|   octave (G, fret 5)
 D |——————————————————|
 A |———————5——————————|   5th above root
@@ -98,7 +98,7 @@ E |———3——————————————|   root (G, fret 3)
 
 **Box 4 — Minor pentatonic box.** Key of G minor, root on E string fret 3. This is the backbone of R&B and funk bass lines.
 
-```
+```text
 Fret:    3    5    6    8    10
 Interval R   m3   P4   P5   m7/R(oct)
 Notes:   G   Bb    C    D    F/G
@@ -107,7 +107,7 @@ Fingers: fret 3 = 1, fret 5 = 3, fret 6 = 4 (Simandl through fret 6, OFPF from f
 
 **Box 5 — Dorian box.** Key of D Dorian, root on A string fret 5. Every minor 7th chord in jazz and funk — Dm7, Am7, Cm7 — lives in this shape relative to its root.
 
-```
+```text
 Fret:     5    6    7    8    9    10
 Interval  R   M2   m3   P4   P5   M6/m7
 Notes:    D    E    F    G    A    B/C
@@ -156,7 +156,7 @@ A string has to be pushed far enough to make clean contact with the fret wire �
 
 On a 34" scale, the stretch from fret 1 to fret 4 is wide enough that one-finger-per-fret in open position strains the hand. The Simandl system handles this with three working fingers:
 
-```
+```text
 Finger 1 (index)  — covers the lowest fret of the position
 Finger 2 (middle) — covers the next fret up
 Finger 4 (pinky)  — covers the top two frets, stretching back one fret when needed
@@ -164,7 +164,7 @@ Finger 3 (ring)   — supports finger 4 laterally, doesn't fret alone
 ```
 
 E string, frets 1–4:
-```
+```text
 Fret 1 → F1  → finger 1
 Fret 2 → F#1 → finger 2
 Fret 3 → G1  → finger 4 (stretched back)
@@ -179,7 +179,7 @@ Fret 4 → Ab1 → finger 4 (natural position)
 
 Metronome at 60 BPM, quarter notes, one note per beat.
 
-```
+```text
 Pass 1 (ascending, Simandl):
   E: 1-2-3-4 (fingers 1-2-4-4)   A: 1-2-3-4   D: 1-2-3-4   G: 1-2-3-4
 
@@ -240,7 +240,7 @@ This becomes reflex within two weeks of deliberate practice. Don't skip it becau
 
 60 BPM, quarter notes, open E string, no fretting:
 
-```
+```text
 Beat:    1    2    3    4    1    2    3    4
 Finger:  i    m    i    m    i    m    i    m
 ```
@@ -250,7 +250,7 @@ Then apply strict i-m alternation to the full Drill 1A chromatic crawl. Never pl
 **Common error:** resetting to index on beat 1 every time. Record yourself and check — this habit collapses under real groove tempo because it isn't true independence, it's a crutch.
 
 **String-crossing drill, 100 BPM target:**
-```
+```text
 4 notes on E (i-m-i-m) → 4 on A → 4 on D → 4 on G → reverse: G → D → A → E
 ```
 Alternation continues unbroken across every crossing. Zero same-finger hits at 100 BPM = consolidated.
@@ -287,7 +287,7 @@ Three jobs per bar:
 2. **Beats 2–3: arpeggiate chord tones** — establish the chord's quality (major, minor, dominant)
 3. **Beat 4: chromatic approach to the next root** — semitone pull that creates forward motion
 
-```
+```text
 Beat 1: Root
 Beat 2: 3rd or 5th
 Beat 3: diatonic or chromatic passing note
@@ -306,7 +306,7 @@ Beat 4 is the most important note in the bar. Approaching from a semitone *below
 | Eb△7 | Eb | G | Bb | D |
 
 Basic chord-tone line:
-```
+```text
 Bar 1 (Cm7):  C   Eb   G    Bb
 Bar 2 (F7):   F   A    C    Eb
 Bar 3 (Bb7):  Bb  D    F    Ab
@@ -314,7 +314,7 @@ Bar 4 (Eb△7): Eb  G    Bb   D
 ```
 
 With chromatic leading tones on beat 4:
-```
+```text
 Bar 1 (Cm7):  C   Eb   G    E    ← E, semitone below F, pulls into bar 2
 Bar 2 (F7):   F   A    C    A    ← A moves back toward the Bb approach
 Bar 3 (Bb7):  Bb  D    F    D    ← D, semitone below Eb, pulls into bar 4
@@ -325,7 +325,7 @@ This E-natural-into-F move on bar 1 is the single most common jazz walking conve
 #### Fretboard mapping, bar by bar
 
 **Bar 1 (Cm7):**
-```
+```text
 Beat 1 — C:  A string fret 3   finger 1
 Beat 2 — Eb: A string fret 6   finger 4
 Beat 3 — G:  D string fret 5   finger 3 (string cross, same hand position)
@@ -333,7 +333,7 @@ Beat 4 — E:  E string fret 7   finger 3 (shift up, leading into F)
 ```
 
 **Bar 2 (F7), option A — drop back to open position:**
-```
+```text
 Beat 1 — F:  E string fret 1   finger 1
 Beat 2 — A:  open A string
 Beat 3 — C:  A string fret 3   finger 1
@@ -341,7 +341,7 @@ Beat 4 — A:  open A string
 ```
 
 **Bar 3 (Bb7):**
-```
+```text
 Beat 1 — Bb: A string fret 1   finger 1
 Beat 2 — D:  A string fret 5   finger 3
 Beat 3 — F:  E string fret 1   finger 1
@@ -349,7 +349,7 @@ Beat 4 — D:  A string fret 5   finger 3
 ```
 
 **Bar 4 (Eb△7):**
-```
+```text
 Beat 1 — Eb: A string fret 6   finger 4
 Beat 2 — G:  D string fret 5   finger 3
 Beat 3 — Bb: A string fret 1   finger 1
@@ -359,7 +359,7 @@ Beat 4 — B:  A string fret 2   finger 2
 The beat-4-into-beat-1 transitions are the hardest to play cleanly at tempo. Find your two worst bar connections and loop them in isolation before attempting a full pass.
 
 **Smaller-hand alternative** — stay on A and E strings only, more position shifts, fewer string crossings:
-```
+```text
 Bar 1: C (A3) / Eb (A6) / G (E3) / E (E7)
 Bar 2: F (E1) / A (E5) / C (A3) / A (E5)
 ```
@@ -411,21 +411,21 @@ sequenceDiagram
 Notation: T = thumb slap, P = pop, H = hammer-on, x = ghost note, . = rest
 
 **Pattern 1 — entry, 60 BPM:**
-```
+```text
 16th:  1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
        T  .  .  .  .  .  .  .  T  .  .  .  .  .  .  .
 ```
 Just two thumb slaps, beats 1 and 3. Lock this to the kick drum before adding anything else.
 
 **Pattern 2 — add the pop:**
-```
+```text
 16th:  1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
        T  .  .  .  .  .  P  .  T  .  .  .  .  .  P  .
 ```
 Pops on the "and" of 2 and "and" of 4 — the classic backbeat subdivision, aligning slap with the kick and pop with the snare.
 
 **Pattern 3 — the Marcus Miller octave move:**
-```
+```text
 16th:  1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
        T  .  H  .  .  .  P  .  T  .  H  .  .  .  P  .
 Fret:  0  .  7  .  .  .  G  .  0  .  7  .  .  .  G  .
@@ -433,7 +433,7 @@ Fret:  0  .  7  .  .  .  G  .  0  .  7  .  .  .  G  .
 T = open E slap, H = left-hand hammer-on to fret 7 on the E string (B natural), P = open G pop. No right hand on the hammer-on — the left-hand finger drops onto the fret using the energy the slap already put into the string.
 
 **Pattern 4 — ghost note integration (intermediate):**
-```
+```text
 16th:  1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
        T  .  .  x  .  .  P  .  T  .  .  x  .  .  P  .
 ```
@@ -509,7 +509,7 @@ Play both back. Version B should sound like it's breathing; a poorly executed ve
 
 Add ghost notes on the "and" of beat 2 in the Cm7 bar:
 
-```
+```text
 Beat:    1    +    2    +    3    +    4    +
 Notes:   C    .   Eb    x    G    .   Bb    .
 ```
@@ -554,7 +554,7 @@ Lay your index finger flat across the strings near the bridge instead of resting
 
 **Fault 1: Wrong chord tones in the walking line**
 
-```
+```text
 Wrong:   C  E   Ab   B    (E = major 3rd clashing against a minor chord, Ab = dim5, B = major 7th)
 Correct: C  Eb  G    Bb
 ```
@@ -649,7 +649,7 @@ Technique only matters once it shows up in real music. These three lines each is
 
 Styled after the James Jamerson approach to a I-vi-IV-V in C, quarter notes, heavy thumb-over-the-pickup-style mute (approximate with the floating thumb or a foam mute under the strings at the bridge):
 
-```
+```text
 Bar 1 (C):   C(A3) E(A7) G(D5) C(D8... use D5+oct, or G string fret 0 oct up)
 Simplify to single-octave box:
 Bar 1 (C):   E:3   A:0   A:4   A:2     (C  E  G  B — outlines Cmaj7 color tone)
@@ -663,7 +663,7 @@ Palm position: 20–30 mm from the bridge throughout. This is section 1C's Motow
 
 16th-note funk in G, built from Box 3's root/octave relationship plus Pattern 3's hammer-on move:
 
-```
+```text
 16th:  1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
 Tech:  T  .  H  .  .  .  P  .  T  .  .  x  H  .  P  .
 Fret:  3  .  7  .  .  .  5   .  3  .  .  x  5  .  5   .
@@ -675,7 +675,7 @@ T on fret 3 (G, root) of the E string, H hammers to fret 7 (B), P pops the G str
 
 ii–V–I in C major, quarter notes, demonstrating the encircle approach (diatonic from above, chromatic from below) into each new root:
 
-```
+```text
 Bar 1 (Dm7):  D(A5)  F(A8... or D string 3)  A(A10 or D string 5)  Eb(E string 6, chromatic approach)
 Bar 2 (G7):   G(E3)  B(A2)  D(A5)             F#(A4, chromatic approach from below into G)
 Bar 3 (Cmaj7):C(A3)  E(A7)  G(D5)             Db(A4, chromatic approach from above into C... loop back)

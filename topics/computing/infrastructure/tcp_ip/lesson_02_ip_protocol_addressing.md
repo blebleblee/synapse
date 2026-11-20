@@ -42,7 +42,7 @@ Routing tables employ longest-prefix matching to resolve overlapping routes. Whe
 
 The physical forwarding pipeline in modern routers implements this lookup using specialized data structures optimized for prefix matching. Early implementations used Patricia tries or radix trees, which organize prefixes in a binary tree structure where each node represents a bit position. Descending the tree according to the destination address bits leads to the longest matching prefix in O(log N) time. Contemporary high-performance routers employ Ternary Content-Addressable Memory (TCAM), which performs parallel comparisons across all entries in a single clock cycle, achieving O(1) lookup latency at the cost of high power consumption and limited capacity.
 
-```
+```text
 Routing Table Lookup Example:
 
 Destination: 10.20.30.40
@@ -77,7 +77,7 @@ IPv6 replaces ARP with Neighbor Discovery Protocol, which uses ICMPv6 messages a
 
 The kernel's routing decision pipeline proceeds through several stages. When an application writes data to a socket, the kernel extracts the destination IP from the socket's connected address or from the ancillary destination address in the sendmsg system call. The networking stack consults the routing table to determine the next-hop gateway and outbound interface. If the destination resides on a directly connected subnet (a route with no gateway), the kernel uses ARP or ND to resolve the MAC address. For non-local destinations, the kernel resolves the gateway's MAC address instead. The resulting Ethernet frame encapsulates the IP packet with the destination MAC set to either the final host or the next-hop router.
 
-```
+```text
 Kernel Routing Pipeline:
 
 Application Layer:

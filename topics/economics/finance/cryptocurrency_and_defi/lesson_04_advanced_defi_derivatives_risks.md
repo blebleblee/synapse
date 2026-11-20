@@ -30,7 +30,7 @@ $$MMR = \frac{\text{Equity}}{\text{Position Notional}}$$
 
 where Equity is the account's total collateral value adjusted for unrealized P&L. When the mark price moves such that $MMR$ falls below the protocol's maintenance threshold (typically 5% to 10% depending on the asset and leverage tier), the position becomes eligible for liquidation. Liquidators—often automated bots—can submit orders to close the undercollateralized position, receiving a portion of the remaining margin as a "liquidation penalty" or "keeper fee" for providing this service. The rest is returned to the liquidated user. If the market gaps severely and the liquidated position's losses exceed its remaining collateral, the insurance fund absorbs the shortfall. If the insurance fund is exhausted—a catastrophic failure mode—the exchange enters socialized loss mode, where profitable traders' gains are haircut to cover the deficit.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                  PERPETUAL FUTURES ARCHITECTURE                  │
 ├─────────────────────────────────────────────────────────────────┤

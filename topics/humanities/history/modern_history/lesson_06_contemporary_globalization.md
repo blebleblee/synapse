@@ -26,7 +26,7 @@ The World Trade Organization, established in 1995 as the successor to the Genera
 
 The mechanics of financial globalization operated through several interconnected channels. Capital account liberalization removed restrictions on cross-border investment flows, allowing investors to rapidly shift assets between markets in search of higher returns. This mobility gave financial markets effective veto power over government policies; any proposal threatening investor confidence could trigger capital flight, currency depreciation, and economic crisis. The Asian Financial Crisis illustrated this dynamic: when Thailand's currency peg collapsed in July 1997, contagion spread to Indonesia, South Korea, Malaysia, and beyond as investors indiscriminately withdrew from all "emerging market" assets. The IMF's crisis response—demanding fiscal austerity, high interest rates, and accelerated liberalization in economies already in deep recession—exacerbated the downturn and generated widespread social dislocation.
 
-```
+```text
 Financial Contagion Propagation (Asian Crisis 1997-98)
 
 July 1997: Thailand floats baht → 50% depreciation
@@ -57,7 +57,7 @@ The business models that monetized this infrastructure underwent several evoluti
 
 The technical architecture of surveillance capitalism, as scholar Shoshana Zuboff termed it, operated through continuous data extraction and behavioral prediction. Every click, scroll, pause, and interaction generated data streams fed into machine learning models that predicted future behavior with increasing accuracy. Facebook's EdgeRank algorithm determined which content appeared in users' feeds based on predicted engagement probability, creating filter bubbles that reinforced existing beliefs and social networks. YouTube's recommendation engine optimized for watch time, systematically promoting increasingly extreme content to maintain attention. Twitter's timeline algorithms amplified emotionally charged and polarizing content that generated high engagement rates. These design choices, while serving corporate revenue maximization, had profound externalities for democratic discourse, social cohesion, and mental health.
 
-```
+```text
 Algorithmic Content Distribution Architecture
 
 User Behavioral Data Collection:
@@ -95,7 +95,7 @@ The National Security Agency's post-9/11 programs, revealed by Edward Snowden in
 
 The climate politics architecture centered on the United Nations Framework Convention on Climate Change process, which produced successive negotiating rounds attempting to forge binding emissions reduction commitments. The Kyoto Protocol of 1997 required developed nations to reduce emissions by an average of 5% below 1990 levels by 2012, while exempting developing nations including China and India. The United States signed but never ratified the agreement; Canada withdrew in 2011 after failing to meet its targets. The protocol's market mechanisms—emissions trading, clean development mechanism offsets, joint implementation projects—created new financial instruments but failed to bend the global emissions curve.
 
-```
+```text
 Global Carbon Emissions Trajectory 1990-2020
 
 Region          1990    2000    2010    2020    Change
@@ -138,7 +138,7 @@ The second failure mode involves presentism: interpreting past actors' decisions
 
 The third failure mode involves monocausal explanation for overdetermined outcomes. The 2008 financial crisis exemplifies this: explanations focusing exclusively on deregulation, monetary policy, housing bubbles, credit default swaps, or rating agency failures each capture necessary but insufficient causal factors. A complete account requires tracing how securitization technology allowed mortgage originators to transfer default risk to investors, eliminating incentives for careful underwriting; how credit rating agencies faced conflicts of interest in evaluating securities issued by their paying clients; how monetary policy maintained low interest rates after the 2001 recession, fueling asset price inflation; how regulatory agencies lacked authority over shadow banking institutions; how political pressure to expand homeownership reduced lending standards; how global savings imbalances created demand for dollar-denominated assets; and how leverage ratios at major financial institutions reached unsustainable levels. These factors interacted to create systemic fragility that crystallized when housing prices stopped rising.
 
-```
+```text
 Financial Crisis Causal Chain Analysis (2008)
 
 Structural Conditions (1980-2006):

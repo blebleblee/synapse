@@ -42,7 +42,7 @@ The practical execution of movement allowance requires knowing the species-speci
 
 Understanding how force travels through a joint requires visualizing the complete load path: where the force enters, through which members it travels, across which interfaces it transfers, and how it exits into the opposing support structure. The following diagram represents the generalized load transfer model for a mortise-and-tenon joint in a table frame carrying a vertical downward load from the top.
 
-```
+```text
          VERTICAL LOAD (V)
                │
                ▼

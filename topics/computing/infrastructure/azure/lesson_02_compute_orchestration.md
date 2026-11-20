@@ -24,7 +24,7 @@ An Azure Virtual Machine, from the host's perspective, is a Hyper-V partition. T
 
 The lifecycle of a VM from CLI invocation to running guest looks like the following sequence:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Azure Control Plane                          │
 │                                                                  │

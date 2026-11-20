@@ -20,7 +20,7 @@ The concept of **natural point of aim (NPA)** operates at a level deeper than si
 
 The mechanical relationship between shooter, sighting system, and target is best understood as a three-node alignment chain, where each node introduces a potential error axis.
 
-```
+```text
 [ Eye / Master Eye ]
         |
         | Optical focus plane (front sight)

@@ -570,7 +570,7 @@ The reflection operation is the node scoring function. Pruned branches (shown in
 
 Reflection is not free. Each critic call and each reflection generation adds latency proportional to the token count of the execution trace. In a production system with p99 latency SLAs, the reflection budget must be explicitly managed:
 
-```
+```text
 Total latency budget = T_plan + T_execute + T_reflect
 T_reflect = T_critic + T_reflector + T_retrieval
 ```

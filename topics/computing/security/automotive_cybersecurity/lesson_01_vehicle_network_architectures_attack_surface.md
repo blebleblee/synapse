@@ -30,7 +30,7 @@ To dissect the attack surface of automotive networks, we must first establish a 
 
 A CAN frame originates when an application layer process within an ECU generates a message to be transmitted. For instance, the Engine Control Unit may determine that the current engine RPM (5200) must be broadcast to the instrument cluster for display and to the transmission control unit for shift logic. The ECU's CAN controller—typically a dedicated microcontroller peripheral or integrated IP block—constructs a frame with the following structure:
 
-```
+```text
 Start of Frame (SOF): 1 dominant bit
 Identifier (CAN ID): 11 bits (standard) or 29 bits (extended)
 Remote Transmission Request (RTR): 1 bit (0 for data frame)

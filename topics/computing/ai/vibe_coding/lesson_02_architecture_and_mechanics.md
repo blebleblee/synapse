@@ -10,7 +10,7 @@
 
 A tensor is a typed, densely-packed, contiguous block of numerical values stored in row-major (C-order) or column-major (Fortran-order) layout, together with a **shape** tuple and a **stride** tuple. The stride tuple encodes, in bytes, how far to advance in memory to reach the next element along each axis. This is what makes zero-copy reshaping, transposing, and slicing possible: changing strides changes how the same memory is *interpreted*, not what is stored.
 
-```
+```text
 Physical memory (row-major, float32, 4 bytes/element):
 [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
  ^0   ^4   ^8   ^12  ^16  ^20   ← byte offsets
@@ -67,7 +67,7 @@ The contraction axis (K=4 above) must match between the two operands. This is no
 
 In practice, tensors carry a leading **batch** dimension and sometimes a **heads** dimension. The shape convention used throughout this lesson is:
 
-```
+```text
 (B, T, D)      — batch size B, sequence length T, model dimension D
 (B, H, T, D_h) — per-head query/key/value tensor; D_h = D / H
 (B, H, T, T)   — attention score matrix for H heads over T positions

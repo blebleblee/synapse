@@ -608,7 +608,7 @@ if __name__ == "__main__":
 
 The output of this analysis suite for the strong-field section reads immediately as:
 
-```
+```text
 I = 1e+13 W/cm²:  Up = 0.6 eV,  γ_K = 3.65 (multiphoton),  HHG cutoff ≈ 17 eV
 I = 1e+14 W/cm²:  Up = 6.0 eV,  γ_K = 1.15 (multiphoton),  HHG cutoff ≈ 34 eV
 I = 1e+15 W/cm²:  Up = 59.6 eV, γ_K = 0.36 (tunnel ionization), HHG cutoff ≈ 195 eV

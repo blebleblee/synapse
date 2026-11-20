@@ -32,7 +32,7 @@ The VLAN invariant at the host level is that any frame carrying a dot1q tag with
 
 The mathematical framing in the original material is imprecise. A more accurate model is a function:
 
-```
+```text
 attach : NAD × VMLauncherPod → (netns, iface, VLANContext)
 ```
 

@@ -20,7 +20,7 @@ Gutenberg, introduced in WordPress 5.0 and iteratively extended through the Full
 
 The template loader walks a prioritized candidate list for each query type. For a singular post of type `product` with slug `blue-widget`, the loader checks for candidates in this order:
 
-```
+```text
 single-product-blue-widget.php
 single-product.php
 single.php
@@ -137,7 +137,7 @@ The dependency array `[ 'jquery' ]` instructs the asset loader to output jQuery 
 
 Template parts are reusable sub-templates loaded via `get_template_part( $slug, $name )`. The function performs the same child-before-parent file resolution as the main template loader, so a child theme can override a specific template part—say, `template-parts/header/site-branding.php`—without duplicating the entire parent header template. The resolution follows the pattern `{slug}-{name}.php` → `{slug}.php`, mirroring the main hierarchy logic.
 
-```
+```text
 get_template_part( 'template-parts/content', get_post_type() )
 
 Resolves to (for post type 'product'):

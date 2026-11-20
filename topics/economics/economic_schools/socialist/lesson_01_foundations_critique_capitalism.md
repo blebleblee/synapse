@@ -46,7 +46,7 @@ This abstraction is not a conceptual trick but a real social process effected th
 
 The circuit of capital provides the architectural framework for understanding how value transforms across production and circulation phases. We can represent the complete circuit with explicit phase transitions:
 
-```
+```text
 M → C{MP, LP} → P → C' → M'
 
 Where:
@@ -76,7 +76,7 @@ where $p_i$ is the price of production in industry $i$, and $r$ is the economy-w
 
 The accumulation schema elaborated in Capital Volume II demonstrates capitalism's expanded reproduction requirements through a two-sector model dividing social production into Department I (means of production) and Department II (means of consumption). The equilibrium conditions for expanded reproduction specify the quantitative relationships that must obtain for accumulation to proceed smoothly:
 
-```
+```text
 Department I:  C₁ + V₁ + S₁ = W₁
 Department II: C₂ + V₂ + S₂ = W₂
 

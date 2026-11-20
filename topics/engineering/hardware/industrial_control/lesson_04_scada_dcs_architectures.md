@@ -60,7 +60,7 @@ To ground this architecture concretely, consider a typical PID control loop runn
 
 At each cycle, the RTU performs the following operations in sequence. First, it reads the current process variable (PV) from an analog input channel—for instance, the current temperature in a vessel, acquired via a thermocouple connected to an analog-to-digital converter. Next, the RTU computes the error as E = Setpoint − PV. The RTU then applies the PID algorithm:
 
-```
+```text
 U = Kp × E + Ki × (integral of E over time) + Kd × (dE/dt)
 ```
 

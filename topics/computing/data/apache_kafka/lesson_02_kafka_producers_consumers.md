@@ -46,7 +46,7 @@ This creates a mathematical tradeoff: `throughput = partitions × per-partition-
 
 #### 2.1.1 The Producer Buffer Chain
 
-```
+```text
 Application Thread → Serializer → Partitioner → Accumulator → Sender Thread → Network
 ```
 
@@ -126,7 +126,7 @@ Controlled by `acks` configuration:
 
 **Rebalance Protocol** (Eager Rebalancing, pre-2.4):
 
-```
+```text
 1. Consumer sends JoinGroup request to coordinator
 2. Coordinator waits for all consumers to join (within session.timeout.ms)
 3. Coordinator selects leader consumer
@@ -231,7 +231,7 @@ while (true) {
 
 #### 2.3.1 Record Batch Format (v2, Kafka 2.1+)
 
-```
+```text
 RecordBatch:
   baseOffset: int64           # First offset in batch
   batchLength: int32          # Bytes in batch
@@ -296,14 +296,14 @@ public class UserSerializer implements Serializer<User> {
 #### 3.1.1 Throughput Tuning
 
 **Batch Size vs. Latency**:
-```
+```text
 batch.size=16384          # 16 KB (default)
 linger.ms=10              # Wait 10ms for batch to fill
 ```
 Larger batches improve compression ratio and reduce per-message overhead. `linger.ms=0` sends immediately (latency-optimized). `linger.ms=100` waits longer (throughput-optimized).
 
 **Compression**:
-```
+```text
 compression.type=lz4      # Fast compression, good ratio
 ```
 Benchmarks (1 KB messages, 1000-message batches):
@@ -313,13 +313,13 @@ Benchmarks (1 KB messages, 1000-message batches):
 - `zstd`: 80 µs CPU, 2.8 MB wire (5.7x reduction)
 
 **Buffer Memory**:
-```
+```text
 buffer.memory=67108864    # 64 MB (double default)
 ```
 Larger buffer prevents blocking under load, but increases producer-side memory.
 
 **In-Flight Requests**:
-```
+```text
 max.in.flight.requests.per.connection=5
 ```
 Default is 5. Higher values increase throughput but can reorder messages if retries occur (unless idempotence enabled).
@@ -358,14 +358,14 @@ public class PriorityPartitioner implements Partitioner {
 #### 3.2.1 Parallelism Scaling
 
 **Single Consumer Group**:
-```
+```text
 Partitions: 12
 Consumers: 4
 Assignment: 3 partitions per consumer
 ```
 
 **Multiple Consumer Groups**:
-```
+```text
 Group A: Real-time processing (4 consumers)
 Group B: Analytics (2 consumers)
 Group C: Archival (1 consumer)
@@ -373,7 +373,7 @@ All groups read same data independently
 ```
 
 **Over-Provisioning**:
-```
+```text
 Partitions: 12
 Consumers: 20
 Active: 12 (one per partition)
@@ -384,7 +384,7 @@ Idle consumers react immediately to failures but waste resources.
 #### 3.2.2 Fetch Optimization
 
 **Throughput Configuration**:
-```
+```text
 fetch.min.bytes=1048576        # 1 MB
 fetch.max.wait.ms=500          # 500ms max wait
 max.partition.fetch.bytes=10485760  # 10 MB
@@ -392,14 +392,14 @@ max.partition.fetch.bytes=10485760  # 10 MB
 Consumer waits until 1 MB available OR 500 ms elapsed, then fetches up to 10 MB per partition.
 
 **Latency Configuration**:
-```
+```text
 fetch.min.bytes=1              # Return immediately
 fetch.max.wait.ms=100          # Short timeout
 ```
 Minimizes latency at cost of more frequent requests.
 
 **Read Isolation**:
-```
+```text
 isolation.level=read_committed  # Only see committed transactional messages
 isolation.level=read_uncommitted  # See all messages (default)
 ```
@@ -441,7 +441,7 @@ Input consumption and output production committed atomically.
 #### 3.3.1 Producer Failures
 
 **Network Timeout**:
-```
+```text
 request.timeout.ms=30000      # 30s timeout for broker response
 delivery.timeout.ms=120000    # 2min total time including retries
 ```
@@ -454,14 +454,14 @@ If broker doesn't respond within `request.timeout.ms`, request retried. After `d
 - Retry count: `retries=2147483647` (infinite by default)
 
 **Buffer Full**:
-```
+```text
 buffer.memory=33554432        # 32 MB
 max.block.ms=60000            # Block 60s if buffer full
 ```
 If buffer full, `send()` blocks up to `max.block.ms`, then throws `TimeoutException`.
 
 **Message Too Large**:
-```
+```text
 max.request.size=1048576      # 1 MB (default)
 ```
 Broker has `message.max.bytes` (default 1 MB). If producer message exceeds, broker rejects with `RecordTooLargeException`.
@@ -469,14 +469,14 @@ Broker has `message.max.bytes` (default 1 MB). If producer message exceeds, brok
 #### 3.3.2 Consumer Failures
 
 **Heartbeat Timeout**:
-```
+```text
 session.timeout.ms=45000      # 45s (default 10s in older versions)
 heartbeat.interval.ms=3000    # Heartbeat every 3s
 ```
 If coordinator doesn't receive heartbeat for `session.timeout.ms`, consumer ejected, rebalance triggered.
 
 **Poll Interval Timeout**:
-```
+```text
 max.poll.interval.ms=300000   # 5 minutes
 ```
 If `poll()` not called within 5 minutes, consumer assumed dead, rebalance triggered. Prevents slow processing from blocking group.
@@ -487,7 +487,7 @@ If `poll()` not called within 5 minutes, consumer assumed dead, rebalance trigge
 - Mitigation: Increase `max.poll.interval.ms`, reduce `max.poll.records`, optimize processing
 
 **Offset Reset**:
-```
+```text
 auto.offset.reset=earliest    # Start from beginning if no committed offset
 auto.offset.reset=latest      # Skip to end (lose data)
 auto.offset.reset=none        # Throw exception
@@ -501,7 +501,7 @@ auto.offset.reset=none        # Throw exception
 #### 3.3.3 Data Loss Scenarios
 
 **Unclean Leader Election**:
-```
+```text
 unclean.leader.election.enable=false  # (default)
 ```
 If true and all ISRs fail, out-of-sync replica becomes leader → data loss. If false, partition unavailable until ISR replica recovers.
@@ -531,7 +531,7 @@ If true and all ISRs fail, out-of-sync replica becomes leader → data loss. If 
 - `buffer-available-bytes`: Available memory in buffer
 
 **Logs**:
-```
+```text
 WARN NetworkClient: [Producer] Got error produce response with correlation id X on topic-partition, retrying
 ```
 

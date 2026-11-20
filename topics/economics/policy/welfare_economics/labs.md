@@ -100,7 +100,7 @@ Execute the script and inspect `output/dwl_gasoline_tax.png`. The diagram should
 
 Store the welfare metrics in a structured data file `output/dwl_gasoline_baseline.csv`:
 
-```
+```text
 metric,value,unit
 pre_tax_price,13.33,dollars_per_gallon
 pre_tax_quantity,333.5,million_gallons
@@ -191,7 +191,7 @@ print(f"Utility check: U={U_check:.2f} (should equal {U0:.2f})")
 
 Execute the script. Expected output:
 
-```
+```text
 Initial bundle: x=37.50, y=700.00, U=281.48
 CV bundle: x=22.93, y=778.57, Expenditure=1100.00
 Compensating Variation: CV = 100.00 dollars
@@ -352,7 +352,7 @@ print("\nPlot saved to output/swf_optimization.png")
 
 Execute the script. Expected output:
 
-```
+```text
 Utilitarian optimal tax rate: t* = 0.2887
 Optimal utilitarian welfare: W = 22.8156
 Post-tax consumption: c_A = 58608.62, c_B = 133391.38
@@ -370,7 +370,7 @@ The operational insight is that inequality aversion $\epsilon$ governs the optim
 
 Store the optimization results in `output/swf_optimal_taxes.csv`:
 
-```
+```text
 criterion,optimal_tax_rate,post_tax_consumption_A,post_tax_consumption_B,social_welfare,deadweight_loss
 utilitarian,0.2887,58608.62,133391.38,22.8156,16687.24
 rawlsian,0.4226,76356.16,76356.16,11.3644,47287.68
@@ -879,7 +879,7 @@ Apply social welfare function selection. Define a utilitarian SWF $W = U^A + U^B
 
 Document the operational protocol: when Pareto efficiency yields multiple equilibria (due to non-convex preferences, thick indifference curves, or externalities), apply the social welfare function mandated by policymakers or inferred from revealed social preferences. Utilitarian SWFs prioritize aggregate efficiency; Rawlsian SWFs prioritize equity and avoid extreme inequality. For intermediate cases, use Atkinson SWFs with calibrated inequality aversion parameters. Store the selected allocation in `output/nonconvex_social_optimum.csv`:
 
-```
+```text
 allocation,x_A,y_A,x_B,y_B,U_A,U_B,social_welfare_criterion
 utilitarian,0.0,0.0,12.0,12.0,0.0,24.0,maximizes sum
 rawlsian,9.6,4.8,2.4,7.2,9.6,9.6,maximizes minimum

@@ -30,7 +30,7 @@ The Ethereum Virtual Machine (EVM), the canonical smart contract execution subst
 
 The machine state consists of several distinct memory regions, each with different gas cost characteristics. The stack holds up to 1024 elements and supports only the topmost 16 elements for direct access through `SWAP` and `DUP` instructions. Temporary memory is a linear byte array that expands dynamically but clears between transaction boundaries. Persistent storage is a key-value mapping from 256-bit keys to 256-bit values, maintained in the Merkle Patricia trie and surviving across transactions. Reading from storage costs 200 gas for a cold access (first read of a slot in the transaction) and 100 gas for warm access (subsequent reads), while writing to storage costs 20,000 gas for setting a zero slot to non-zero, 5,000 gas for modifying an existing non-zero value, and refunds 15,000 gas for clearing a slot back to zero.
 
-```
+```text
 ┌─────────────────────────────────────────────┐
 │         EVM Execution Environment           │
 ├─────────────────────────────────────────────┤

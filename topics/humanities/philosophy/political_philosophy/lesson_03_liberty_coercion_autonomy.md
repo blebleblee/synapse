@@ -72,7 +72,7 @@ The narrow proportionality inquiry requires commensuration of incommensurable va
 
 Document this entire analytical sequence in structured argument form:
 
-```
+```text
 Liberty Interest Analysis: [Proposed State Action]
 
 1. LIBERTY INTEREST IDENTIFICATION

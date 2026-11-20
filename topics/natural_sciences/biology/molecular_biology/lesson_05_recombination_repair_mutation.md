@@ -30,7 +30,7 @@ In *E. coli*, the MutS homodimer serves as the primary mismatch sensor, continuo
 
 The subsequent excision process exhibits remarkable directional flexibility. UvrD helicase loads at the MutH incision point and translocates in either the 3'-to-5' or 5'-to-3' direction depending on the relative positions of the nick and the mismatch. Single-strand exonucleases—ExoI for 3'-to-5' degradation or ExoVII/RecJ for 5'-to-3' degradation—digest the unwound strand past the mismatch site. DNA polymerase III holoenzyme then resynthesizes the excised tract using the intact template strand, and DNA ligase seals the final nick. This bidirectional excision capability ensures that MMR can correct mismatches regardless of their location relative to strand discrimination signals.
 
-```
+```text
 Mismatch Repair Pathway Architecture (E. coli):
 
 Parent strand (methylated):   5'---[GATC*]===============X===============[GATC*]---3'
@@ -67,7 +67,7 @@ The glycosylase reaction mechanism involves nucleophilic attack by an enzyme-bou
 
 APE1 (apurinic/apyrimidinic endonuclease 1) incises the phosphodiester backbone immediately 5' to the AP site through metal-ion-coordinated hydrolysis, generating a 3'-hydroxyl and a 5'-deoxyribose phosphate (dRP) moiety. The dRP group blocks DNA polymerase substrate recognition and must be removed before gap-filling synthesis can proceed. DNA polymerase β possesses intrinsic dRP lyase activity mediated by a Schiff base mechanism analogous to that of bifunctional glycosylases: the N-terminal domain lysine 72 attacks the dRP aldehyde, followed by β-elimination that releases the sugar fragment and generates a 5'-phosphate suitable for ligation.
 
-```
+```text
 Base Excision Repair Pathway (Short-Patch):
 
 1. Damaged base recognition and excision:
@@ -114,7 +114,7 @@ Transcription-coupled NER (TC-NER) bypasses the XPC recognition step, instead in
 
 Following damage verification, the core NER excision machinery assembles around the bubble structure. XPA binds the kinked DNA backbone and coordinates factor positioning. RPA (replication protein A) coats the undamaged single-stranded region, protecting it from nuclease attack and orienting the excision endonucleases. XPG, a structure-specific endonuclease with FEN1-like architecture, cleaves the phosphodiester backbone on the 3' side of the lesion, 2–8 nucleotides from the damage site. The ERCC1-XPF heterodimeric endonuclease cleaves the 5' side, approximately 15–24 nucleotides from the lesion. These dual incisions release a 24–32 nucleotide oligomer containing the damaged base, leaving a gapped duplex substrate.
 
-```
+```text
 Nucleotide Excision Repair Pathway Architecture:
 
 1. Damage recognition (GG-NER pathway):
@@ -164,7 +164,7 @@ The 3' single-stranded DNA is immediately coated by RPA, preventing secondary st
 
 Homology search proceeds through a three-dimensional diffusion process where the RAD51 filament non-specifically associates with duplex DNA, then uses Watson-Crick base pairing to test sequence complementarity. Upon finding an 8–15 nucleotide region of perfect homology, the filament stabilizes and invades the duplex, displacing the original complementary strand to form a displacement loop (D-loop) structure. This strand invasion reaction is directionally biased: the invading 3' end must have sufficient complementarity to initiate stable pairing, and the reaction is accelerated by RAD51's ATP hydrolysis activity, which drives filament disassembly behind the invasion point.
 
-```
+```text
 Homologous Recombination Pathway:
 
 1. DSB recognition and end resection:
@@ -203,7 +203,7 @@ Non-homologous end joining operates through a distinct biochemical logic that pr
 
 The Artemis nuclease, activated by DNA-PKcs phosphorylation, removes 5' and 3' overhangs through endonucleolytic cleavage. Polynucleotide kinase phosphatase (PNKP) phosphorylates 5'-hydroxyl termini and dephosphorylates 3'-phosphate groups. Aprataxin processes adenylated 5' termini. These end-processing steps are iterative and non-templated, leading to variable nucleotide loss (typically 1–10 bp) at the repair junction. DNA ligase IV, in complex with XRCC4 and XLF (NHEJ factor), catalyzes the final ligation step, bridging the processed ends through its dual DNA-binding interfaces.
 
-```
+```text
 Non-Homologous End Joining Pathway:
 
 1. DSB recognition:
@@ -272,7 +272,7 @@ Pol κ specializes in bypassing bulky minor-groove adducts such as benzo[a]pyren
 
 TLS polymerase recruitment to stalled replication forks occurs through PCNA ubiquitination. Monoubiquitination of PCNA at lysine 164 by RAD6-RAD18 E2-E3 ubiquitin ligases creates a binding platform for Y-family polymerases, which possess ubiquitin-binding motifs (UBM or UBZ domains) that recognize ubiquitinated PCNA with nanomolar affinity. This post-translational modification switches PCNA's binding preference from replicative Pol δ to TLS polymerases, enabling polymerase exchange at the lesion site. Following lesion bypass, PCNA deubiquitination by USP1-UAF1 deubiquitinase restores high-fidelity replication.
 
-```
+```text
 Translesion Synthesis Polymerase Exchange Mechanism:
 
 1. Replicative polymerase stalling at lesion:
@@ -310,7 +310,7 @@ Transposable elements exert mutagenic pressure through mobilization events that 
 
 L1 mobilization proceeds through a "copy-and-paste" mechanism initiated by L1 mRNA transcription from the element's internal RNA polymerase II promoter. ORF1p and ORF2p bind their encoding mRNA in *cis* preference (preferential mobilization of the mRNA from which they were translated), forming a ribonucleoprotein (RNP) complex that translocates to the nucleus. The ORF2p endonuclease makes a single-strand nick at AT-rich target sites, preferentially at the consensus sequence 5'-TTAAAA-3'. The liberated 3'-hydroxyl primes reverse transcription of the L1 mRNA by ORF2p reverse transcriptase, directly synthesizing L1 cDNA into the chromosomal break site—a process termed target-primed reverse transcription (TPRT).
 
-```
+```text
 LINE-1 Retrotransposition Mechanism:
 
 1. Transcription and RNP formation:

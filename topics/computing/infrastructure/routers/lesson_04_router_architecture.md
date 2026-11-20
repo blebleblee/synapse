@@ -135,7 +135,7 @@ Segment Routing (SR), defined in RFC 8402, eliminates per-flow transit state by 
 
 The operational workflow for configuring a segment routing traffic-engineered path on a Juniper MX router running JUNOS involves defining the SR-TE policy, binding it to a color community for BGP-based steering, and validating the forwarding state through the CLI:
 
-```
+```bash
 # Define SR-TE policy with explicit segment list
 set routing-options source-packet-routing segment-list CORE-LSP-TO-NYC
 set routing-options source-packet-routing segment-list CORE-LSP-TO-NYC hop 1 label 16003
@@ -155,7 +155,7 @@ show route forwarding-table label 16003
 
 Quality of Service in the forwarding pipeline operates across two domains: **classification** at ingress (mapping packet markings or 5-tuple flows to internal forwarding classes) and **scheduling** at egress (determining the order and rate at which queued packets are transmitted). Modern NPUs implement a hierarchical queuing architecture — typically 8 traffic classes per physical interface, with weighted deficit round robin (WDRR) or strict priority scheduling between classes. Strict priority scheduling guarantees that high-priority traffic (voice, control plane traffic, BFD sessions) is dequeued before any lower-priority traffic, at the cost of potential starvation of lower queues under sustained load. WDRR provides weighted fairness: each queue is assigned a weight, and the scheduler cycles through queues proportionally to their weights, draining a quantum of bytes from each per round. The quantum must be at least MTU-sized to ensure that large packets in one queue do not cause unfairness against queues carrying small packets.
 
-```
+```bash
 # Cisco IOS-XR: Define class-map for DSCP EF (voice/low-latency)
 class-map match-any VOICE
   match dscp ef
@@ -184,7 +184,7 @@ The most operationally consequential failure mode in a production router is **FI
 
 The diagnostic procedure for FIB capacity monitoring requires regular polling of platform-specific TCAM utilization:
 
-```
+```bash
 # Juniper MX: Monitor TCAM utilization per FPC/PIC
 show pfe statistics traffic
 show route summary
@@ -207,7 +207,7 @@ show card 1 fp 1 resource-usage
 
 **Microbursts and tail-drop** represent a failure mode that is invisible to most monitoring systems. A microburst occurs when multiple high-speed ingress ports simultaneously direct traffic to the same egress port, filling the egress queue in microseconds. Because standard SNMP monitoring polls at 5-minute intervals, the burst is completely invisible to conventional monitoring — the average utilization appears well within capacity. The result is tail-drop: packets at the back of the queue when it fills are discarded, causing TCP retransmits and significantly degraded application throughput. The diagnostic instrument for microburst detection is **in-hardware traffic statistics at sub-second granularity**, available on platforms supporting streaming telemetry via gNMI/gRPC:
 
-```
+```bash
 # Configure gNMI streaming telemetry on Cisco IOS-XR
 # to export per-interface queue depth at 1-second intervals
 grpc
@@ -234,7 +234,7 @@ The streaming telemetry pipeline exports queue depth and drop counters at 1-seco
 
 **Asymmetric routing** causes a subtle but widespread failure mode in stateful deployments. When traffic from host A to host B follows a different physical path than the return traffic from B to A, stateful firewalls, NAT devices, and load balancers that see only one direction of a TCP flow cannot maintain correct session state and will drop return packets. The root cause is usually ECMP (Equal-Cost Multi-Path) with a misconfigured or inconsistent hash algorithm — if the ingress router hashes on a different field tuple than the egress router, bidirectional flows are split across different paths. The diagnostic procedure is to verify ECMP hash policies consistently across all routers in the forwarding domain:
 
-```
+```bash
 # Verify ECMP hash algorithm and fields on Juniper MX
 show pfe route summary
 show route forwarding-table destination 10.0.0.0/8 extensive | match "ECMP|Weight"

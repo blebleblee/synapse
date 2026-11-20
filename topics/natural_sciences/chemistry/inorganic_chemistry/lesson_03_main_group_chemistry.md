@@ -60,7 +60,7 @@ Thermogravimetric analysis (TGA) monitors the mass loss as temperature increases
 
 The inert pair effect manifests experimentally in redox titrations and electrochemical measurements. Lead(II) acetate solutions are readily oxidized to lead(IV) by strong oxidizers like sodium bismuthate in acidic solution. The oxidation proceeds quantitatively, enabling spectrophotometric determination of Pb²⁺ concentrations. The reduction potential for the Pb⁴⁺/Pb²⁺ couple in 1 M H₂SO₄ is E° = +1.69 V versus the standard hydrogen electrode, indicating that Pb⁴⁺ is a potent oxidizer. In contrast, thallium(I) salts resist oxidation; the Tl³⁺/Tl⁺ couple exhibits E° = +1.25 V, and atmospheric oxygen cannot oxidize Tl⁺ to Tl³⁺ under normal conditions.
 
-```
+```text
 Experimental Protocol: Determination of Acid Strength via UV-Vis Spectrophotometry
 
 Objective: Measure the pKₐ of an indicator in a non-aqueous solvent using the Hammett acidity function.

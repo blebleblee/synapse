@@ -40,7 +40,7 @@ Piston rings create the gas seal between piston and cylinder wall. The top compr
 
 Cylinder wall finish critically affects ring sealing and wear. A proper crosshatch hone pattern, created by oscillating a honing tool while rotating it within the bore, leaves microscopic scratches at approximately 45 degrees to the bore axis. This pattern retains oil in the valleys while the ring seals against the peaks, optimizing the balance between sealing and lubrication. Surface roughness is measured in micro-inches Ra (arithmetic average roughness)—modern cylinder bores target 8-15 Ra for optimal ring break-in and long-term sealing. Too smooth and rings skate across the surface without sealing; too rough and accelerated wear results.
 
-```
+```text
 Four-Stroke Cycle Timing Diagram (Single Cylinder):
 
 Crank Angle:  0°      180°     360°     540°     720°

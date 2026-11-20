@@ -94,7 +94,7 @@ Clitic positioning obeys the **Tobler-Mussafia Law**, a Romance-wide generalizat
 
 Clitic climbing in restructuring configurations demonstrates clause union or syntactic transparency. With verbs like *querer* (want), *poder* (can), *ir a* (going to), and *empezar a* (begin to), the embedded infinitive loses its independent CP layer, forming a monoclausal extended projection that allows the clitic to attach either to the embedded infinitive or climb to the matrix finite verb:
 
-```
+```text
 Restructuring (Monoclausal Domain):
 
 Structure: [TP Subj [T' quiero [AspP [VP [V ver] DP-lo]]]]
@@ -107,7 +107,7 @@ Both variants grammatical; clitic satisfies attachment at either V or T.
 
 Non-restructuring verbs like *lamentar* (regret), *prometer* (promise), and factive predicates retain full CP embedding, blocking clitic climbing:
 
-```
+```text
 Non-Restructuring (Biclausal Domain):
 
 Structure: [TP Subj [T' lamento [CP [C que/Ø] [TP pro [VP haber perdido DP-lo]]]]]
@@ -120,7 +120,7 @@ Clitic cannot climb across CP boundary.
 
 Subject-verb inversion to VSO order occurs systematically with unaccusative verbs—intransitives whose single argument is an underlying object rather than an external agent. Verbs of appearance (*aparecer, llegar*), existence (*existir, ocurrir*), and change of state (*caer, morir*) are unaccusative, assigning their theme argument inside VP and failing to project an external argument in Spec-VoiceP. The theme argument raises to Spec-TP for case and agreement but may surface post-verbally if an expletive or locative element occupies the higher position:
 
-```
+```text
 Unaccusative VSO:
 
 Llegó el tren. (Arrived the train = "The train arrived.")
@@ -135,7 +135,7 @@ This post-verbal subject position contrasts with transitive VSO orders, which re
 
 Interrogative wh-movement to Spec-CP follows familiar cross-linguistic patterns but interacts distinctively with Spanish's null-subject parameter. Wh-fronting is obligatory in matrix questions:
 
-```
+```text
 Wh-Fronting (Matrix):
 
 ¿Qué compró Juan?
@@ -149,7 +149,7 @@ leaving a trace/copy in VP.
 
 Long-distance wh-extraction crosses clause boundaries without overt resumptive pronouns or island violations, provided no intervening barriers (adjunct islands, complex NP islands) block movement:
 
-```
+```text
 Long-Distance Wh-Movement:
 
 ¿Qué dijo María que compró Juan?
@@ -163,7 +163,7 @@ transiting through the embedded Spec-CP (successive-cyclic movement).
 
 Subjunctive mood selection is syntactically encoded in the feature specification of the matrix predicate and the embedded complementizer. Verbs selecting subjunctive complements bear an irrealis or non-veridical feature that propagates to the embedded C head, which in turn transmits subjunctive morphology to the embedded T. This featural agreement explains the obligatory subjunctive in complements of volitional, dubitative, and emotive predicates:
 
-```
+```text
 Subjunctive Selection:
 
 Quiero que vengas.
@@ -176,7 +176,7 @@ Structure: [TP yo quiero [CP que [TP pro vengas]]]
 
 Indicative complements surface when the matrix predicate lacks irrealis features, asserting the complement proposition as actual or epistemically certain:
 
-```
+```text
 Indicative Selection:
 
 Sé que vienes.
@@ -189,7 +189,7 @@ Structure: [TP yo sé [CP que [TP pro vienes]]]
 
 In relative clauses, subjunctive mood correlates with the (in)definiteness and specificity of the antecedent. Definite or specific antecedents license indicative mood, while indefinite or non-specific antecedents trigger subjunctive:
 
-```
+```text
 Indicative Relative (Specific Antecedent):
 
 Conozco a una mujer que habla ruso.
@@ -205,7 +205,7 @@ This distribution reflects the semantic correlation between definiteness, presup
 
 Copular constructions with *ser* and *estar* project distinct aspectual structures. *Ser* merges directly as a copular head without aspectual features, combining with predicate nominals and individual-level adjectives:
 
-```
+```text
 Ser Copula (Individual-Level Predicate):
 
 Es inteligente.
@@ -218,7 +218,7 @@ No aspectual layer; property predication is stative and permanent.
 
 *Estar*, by contrast, projects an additional aspectual layer encoding resultativity or temporary state:
 
-```
+```text
 Estar Copula (Stage-Level Predicate):
 
 Está cansado.
@@ -233,7 +233,7 @@ This structural difference explains why certain adjectives alternate in meaning 
 
 Passive constructions instantiate argument-structure reduction, suppressing the external argument and promoting the internal argument to subject. The periphrastic passive with *ser* explicitly encodes passive voice morphology on the participle:
 
-```
+```text
 Periphrastic Passive:
 
 El libro fue escrito por Cervantes.
@@ -247,7 +247,7 @@ the agent surfaces in an optional adjunct PP "por Cervantes."
 
 The reflexive *se*-passive suppresses the agent through *se*-insertion in Voice or v, absorbing the external argument role:
 
-```
+```text
 Reflexive Passive:
 
 Se venden casas.

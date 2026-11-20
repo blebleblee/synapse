@@ -26,7 +26,7 @@ The sequential gearbox architecture centers on three primary shafts arranged par
 
 Consider the power flow through a representative six-speed transmission in third gear. The clutch hub drives the input shaft, which carries six gears—one for each speed ratio—all spinning at input shaft velocity. The output shaft carries the corresponding six mating gears, each in constant mesh with its input shaft partner, but free-spinning on the output shaft via needle roller bearings. In neutral, no gear is locked to either shaft; both shafts rotate independently with no torque transfer. When the rider shifts into third gear, the shift drum rotates to its third-gear indexing position, and the shift fork associated with the third-gear output shaft gear slides that gear laterally along the shaft's splines until its dog engagement ring interlocks with the corresponding dog pockets machined into the output shaft itself or an adjacent locking collar. Now rigidly coupled to the output shaft, the third-gear output gear transmits torque from its meshing input gear through to the final drive sprocket. The remaining gears continue free-spinning on their respective shafts, idling harmlessly while third gear carries the entire torque load.
 
-```
+```text
 INPUT SHAFT (from clutch)              OUTPUT SHAFT (to final drive)
         |                                      |
    [1st gear]---mesh---[1st gear]         [engaged]

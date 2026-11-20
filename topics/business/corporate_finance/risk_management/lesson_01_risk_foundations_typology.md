@@ -47,7 +47,7 @@ The cash conversion cycle governs funding liquidity risk for operating companies
 
 Refinancing risk manifests when a corporation has lumpy debt maturity schedules. A firm that issued $1.5 billion of seven-year notes in 2018 faces a maturity wall in 2025; if credit markets seize or the firm's credit rating has deteriorated, it may confront prohibitively expensive refinancing terms or outright market closure. Prudent liability management ladders maturities such that no single year concentrates more than 20-25% of total debt maturities, and maintains committed revolving credit facilities with tenors extending beyond the nearest bond maturity to provide a backstop funding source.
 
-```
+```text
 Liquidity Risk Waterfall Analysis
 
 Sources of Liquidity (Priority Order):

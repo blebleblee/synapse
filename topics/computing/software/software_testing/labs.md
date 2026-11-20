@@ -702,7 +702,7 @@ RUSTFLAGS="-Z sanitizer=thread" cargo build --target x86_64-unknown-linux-gnu
 
 Note that TSan requires the `nightly` Rust toolchain because sanitizers are unstable features. If you encounter errors, switch to nightly via `rustup default nightly`, then retry. TSan output is verbose and diagnostic. When a race is detected, TSan prints a detailed report:
 
-```
+```text
 ==================
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7f3c4000abc0 by thread T2:
@@ -752,7 +752,7 @@ RUSTFLAGS="-Z sanitizer=address" cargo build --target x86_64-unknown-linux-gnu
 
 LSan reports leaked allocations at the end of execution:
 
-```
+```text
 =================================================================
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 
@@ -958,7 +958,7 @@ go build -race -o race_testing race_testing.go
 
 Go's race detector reports:
 
-```
+```text
 ==================
 WARNING: DATA RACE
 Write at 0x00c0000a6010 by goroutine 7:

@@ -64,7 +64,7 @@ The analytical framework reaches its most sophisticated form in the construction
 
 The dialectical process of proposing theories, testing them against cases, refining them to handle counterexamples, and comparing them for explanatory power constitutes the core methodology of philosophical investigation into meaning. This process mirrors the method in other areas of philosophy—in epistemology where theories of knowledge face Gettier cases, in ethics where moral theories face dilemma cases, in metaphysics where theories of personal identity face puzzle cases. The same rigorous argumentative structure applies to meaning despite the subject matter's apparent softness or subjectivity.
 
-```
+```text
 MEANING ANALYSIS FRAMEWORK
 
 Subjective Pole ←――――――――――――→ Objective Pole

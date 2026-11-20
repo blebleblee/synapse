@@ -68,7 +68,7 @@ Consider matching an HTML tag attribute with `<.*>` versus `<.*?>` against the i
 
 The execution trace makes this concrete. For greedy `a.*b` against `aXbYb`:
 
-```
+```text
 Position:  a  X  b  Y  b
            0  1  2  3  4
 
@@ -99,7 +99,7 @@ Named capturing groups `(?P<name>...)` in Python's `re`, or `(?<name>...)` in PC
 
 Non-capturing groups `(?:...)` group a subexpression for quantification without allocating a capture slot. In engines where slot allocation has non-trivial overhead (or where the resulting match object is serialized), using `(?:...)` instead of `(...)` wherever capture semantics are not needed reduces both memory allocation and the size of the match object. In Python, `re.compile` with many capturing groups produces a `Match` object whose internal `regs` tuple grows with group count; on a hot path processing millions of lines, this matters.
 
-```
+```text
 Pattern breakdown: (?P<year>\d{4})-(?P<month>0[1-9]|1[0-2])-(?P<day>0[1-9]|[12]\d|3[01])
 
 Group structure:

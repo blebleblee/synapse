@@ -216,7 +216,7 @@ Bend your wheel fully up and play a note. Most patches default to ±2 semitones.
 
 Create a **Drum Machine Designer** or **Drum Kit Designer** track at **92 BPM**. Use either the Step Sequencer or the Piano Roll with these pitches: kick = 36 (C1), snare = 38 (D1), closed hi-hat = 42 (F#1).
 
-```
+```text
 Step:   1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
 Count:  1  e  &  a  2  e  &  a  3  e  &  a  4  e  &  a
 Kick:   X  .  .  .  .  .  X  .  .  .  X  .  .  .  .  .

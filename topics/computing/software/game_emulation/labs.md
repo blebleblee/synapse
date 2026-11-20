@@ -676,7 +676,7 @@ pub fn gpu_thread_unsafe(state: Arc<Mutex<SharedStateUnsafe>>) {
 
 Re-run `cargo +nightly test` with ThreadSanitizer enabled. TSan will detect the race and report output similar to:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 4 at 0x7b0400000000 by thread T1:
     #0 emu_core::threading::cpu_thread_unsafe
@@ -710,7 +710,7 @@ fn test_leak_detection() {
 
 Run `cargo +nightly test` with AddressSanitizer enabled. LSan reports the leak at program exit:
 
-```
+```text
 =================================================================
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 

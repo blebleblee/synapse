@@ -98,7 +98,7 @@ The I/Q samples, now at baseband and decimated to a manageable rate, enter the d
 
 The signal flow diagram captures the cascade:
 
-```
+```text
 Antenna (50Ω) → [RF Bandpass Filter] → [LNA] → [Mixer] ← [LO Synthesizer]
                      |                      |         ↓
                      ↓                      ↓    [90° Phase Shift]

@@ -31,7 +31,7 @@ The engine then executes `LateUpdate()` callbacks, designed for logic that must 
 
 Transform hierarchy propagation occurs next. The engine walks the scene graph in breadth-first order, recomputing world-space transformation matrices for every GameObject marked dirty since the last frame. Each transform's local-to-world matrix is computed as the product of its parent's local-to-world matrix and its own local-space TRS (translation, rotation, scale) matrix:
 
-```
+```text
 worldMatrix[child] = worldMatrix[parent] × localMatrix[child]
 ```
 
@@ -45,7 +45,7 @@ After rendering commands are submitted to the GPU, the engine invokes `OnRenderO
 
 The following diagram illustrates the complete frame pipeline with explicit callback invocation points:
 
-```
+```text
 Frame Start
     ↓
 Input Sampling (polls platform input APIs)

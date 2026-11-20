@@ -22,7 +22,7 @@ Position functions as poker's temporal dimension, converting the spatial game tr
 
 The game tree architecture of Texas Hold'em expands across four distinct betting rounds, each introducing new public information that triggers Bayesian belief updating among all active players. Preflop action commences with players holding maximum uncertainty about opponents' holdings, constrained only by positional tendencies and prior betting history. As community cards reveal themselves, the state space collapses dramatically: the flop reduces the set of possible board textures from approximately 19,600 to a single realized outcome, forcing players to reassess their hand's equity against plausible opponent ranges given the texture.
 
-```
+```text
 Game State Progression:
 
 Preflop: Hole Cards Only

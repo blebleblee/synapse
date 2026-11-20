@@ -22,7 +22,7 @@ Linux partitions hardware into three canonical abstractions, each reflecting a f
 
 Every character and block device node in the filesystem (`/dev/*`) carries a **major number** and a **minor number**, encoded as a `dev_t` (a `u32` split 12:20 since kernel 2.6). The major number identifies the driver registered to handle the device class; the minor number is an opaque cookie passed to the driver to distinguish individual devices or sub-units within that class. The kernel uses `MAJOR()`, `MINOR()`, and `MKDEV()` macros to manipulate `dev_t` values.
 
-```
+```text
 dev_t = MKDEV(major, minor)   /* encodes both into one u32 */
 major = MAJOR(dev)            /* extracts upper 12 bits    */
 minor = MINOR(dev)            /* extracts lower 20 bits    */

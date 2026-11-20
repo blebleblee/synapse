@@ -32,7 +32,7 @@ The third panel presents lateral acceleration alongside steering angle, revealin
 
 Construct a calculated math channel quantifying the understeer gradient across varying speeds. In MoTeC's Math Channel editor, define a new channel named "Aero_Understeer_Index" using the expression:
 
-```
+```text
 (SteeringAngle / LateralAccel) - ReferenceGradient
 ```
 
@@ -76,7 +76,7 @@ Address lateral aerodynamic balance through anti-roll bar stiffness optimization
 
 Create a calculated channel quantifying roll angle from left-right ride height differentials. Define a new math channel "Front_Roll_Angle" using the expression:
 
-```
+```text
 atan((RideHeight_FR - RideHeight_FL) / FrontTrackWidth) * (180 / pi())
 ```
 
@@ -108,7 +108,7 @@ Quantify rear tire temperature distributions to validate rear downforce levels a
 
 Construct an aerodynamic balance inference from tire temperature ratios. Calculate the average front tire temperature (averaging all six front tire measurement points) and average rear tire temperature. Define an empirical "Tire Temp Balance Index" as:
 
-```
+```text
 Tire_Temp_Balance = (AvgFrontTemp - AvgRearTemp) / AvgFrontTemp
 ```
 
@@ -197,7 +197,7 @@ The operational verification exercises completed above establish a systematic te
 Aerodynamic downforce generation scales with air density, demanding correction factors when atmospheric conditions deviate from baseline test sessions. Use the following empirical corrections to normalize setup recommendations across varying conditions:
 
 **Air Density Correction Formula:**
-```
+```text
 Density_Ratio = (Pressure_mbar / 1013) * (288 / (Temp_Kelvin))
 Corrected_Downforce = Measured_Downforce * Density_Ratio
 ```

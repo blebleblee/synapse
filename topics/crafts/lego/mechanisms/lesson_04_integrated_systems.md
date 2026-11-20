@@ -24,7 +24,7 @@ The prime mover in contemporary Lego Technic systems is typically a brushed DC e
 
 The transmission block transforms the motor's output speed and torque to match the application requirements. In Lego Technic, this is almost universally accomplished through spur gear trains, which offer simplicity, reliability, and the ability to change direction or split power to multiple outputs. The fundamental gear ratio equation governs each mesh:
 
-```
+```text
 R = N_driven / N_driver = ω_driver / ω_driven = T_driven / T_driver
 ```
 
@@ -44,7 +44,7 @@ Pin and axle connections represent discrete failure modes that must be managed. 
 
 A representative integrated system architecture might resemble the following signal flow:
 
-```
+```text
 [Battery 9V] → [Motor M, τ_stall = 0.4 Nm, ω_max = 380 RPM]
                     ↓
           [Compound Gear Train: 8t→24t, 8t→24t = 9:1 reduction]

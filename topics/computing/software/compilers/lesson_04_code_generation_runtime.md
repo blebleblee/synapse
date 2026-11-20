@@ -55,7 +55,7 @@ Register allocation follows instruction selection and assigns physical registers
 
 The liveness analysis prerequisite computes which virtual registers are live at each program point. A variable is live at a point if there exists a path to a use of that variable without an intervening definition. The analyzer typically computes live-in and live-out sets for each basic block using iterative dataflow equations:
 
-```
+```text
 live_in[B] = use[B] ∪ (live_out[B] - def[B])
 live_out[B] = ⋃(live_in[S] for S in successors(B))
 ```
@@ -66,7 +66,7 @@ Graph coloring is NP-complete in the general case, so production compilers emplo
 
 Linear scan allocation offers a faster alternative suitable for just-in-time compilers where compilation speed matters. This algorithm sorts live intervals by their starting points, then iterates through them in order, assigning each to a free register or spilling when none are available. Linear scan runs in O(n log n) time compared to the potentially exponential complexity of graph coloring, but typically produces slightly lower quality allocations because it cannot handle complex interference patterns as effectively.
 
-```
+```text
 LinearScanAllocate(intervals):
     active = []
     sort intervals by start point
@@ -222,7 +222,7 @@ Instruction scheduling reorders instructions within basic blocks to hide latency
 
 List scheduling algorithms maintain a ready queue of instructions whose dependencies are satisfied and greedily select instructions based on priority heuristics. The priority function might favor instructions with many dependent instructions (to expose parallelism early), instructions with long latency (to issue them early and hide latency), or instructions that free registers (to reduce pressure). Constructing an optimal schedule is NP-complete, but effective heuristics produce near-optimal results for most code.
 
-```
+```text
 ListSchedule(basic_block):
     ready = instructions with no predecessors
     scheduled = []

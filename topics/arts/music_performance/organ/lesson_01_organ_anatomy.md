@@ -172,7 +172,7 @@ graph TB
 
 A "Swell to Great 8'" coupler routes every depressed Swell key into the Great windchest at unison pitch, so pressing one key on the Great now sounds both the Great pipe and the corresponding Swell pipe.
 
-```
+```text
 Swell/Great 16'   - Swell adds sub-octave to Great keys
 Swell/Great 8'    - Swell unison added to Great
 Swell/Great 4'    - Swell super-octave added to Great
@@ -204,7 +204,7 @@ The swell pedal moves wooden shutters forming one wall of the enclosed division'
 
 Always add ranks bottom-up. Each new rank should reinforce, not compete with, what's already sounding.
 
-```
+```text
 Step 1: 8' Principal/Open Diapason     -> foundation, unison pitch
 Step 2: 4' Octave                      -> clarity, cuts through room reverb
 Step 3: 2' Super Octave                -> brilliance
@@ -265,7 +265,7 @@ graph TD
 
 ### 3.4 Combination Action: Setting Pistons Before You Play
 
-```
+```text
 Memory Level 1 (general worship service)
 P1 -> Soft: Swell Salicional + Céleste, Pedal Bourdon 16'
 P2 -> Medium: add Great 8' Principal + Flute, Great/Pedal coupler
@@ -304,7 +304,7 @@ Organ tone has no decay — a held note sounds at full volume for its entire dur
 
 **Finger substitution — the core tool for sustaining a voice while freeing a finger:**
 
-```
+```text
 Hold note G with finger 3.
 Silently slide finger 2 (or 1) onto the same key, no audible change in tone.
 Finger 3 is now free to reach the next note.
@@ -328,7 +328,7 @@ AGO standard pedalboards are concave and radiating (following the natural arc of
 
 **Notation used below:** `RT` = right toe, `LT` = left toe, `RH` = right heel, `LH` = left heel.
 
-```
+```text
 C major scale, right foot led:
 C  D  E  F  G  A  B  C
 RT LT RT LT RT LT LH RT
@@ -336,7 +336,7 @@ RT LT RT LT RT LT LH RT
 
 **Pedal progression — practice in this order, each line until comfortable before moving on:**
 
-```
+```text
 Drill 1 - single foot, whole notes (draw 16' Subbass alone, hands silent on keys)
 C (hold 4 beats) D (4) E (4) F (4)      ♩=50, no looking down.
 
@@ -357,7 +357,7 @@ C(RT) D(LT) E(RT) F(LT) G(RT) A(LH) B(RT) C(LT) D(RT) E(LT) F(RT) G(LT) A(RT)
 
 The central technical problem of organ playing: coordinating two hands on different manuals plus an independent pedal bass line, often in three different rhythms and articulations at once.
 
-```
+```text
 Pedal:   C --- --- --- G --- --- --- C --- --- --- G --- --- ---   (whole notes, legato)
 LH:      C E G E  C E G E  C E G E  C E G E                         (quarters, staccato)
 RH:      C D E F  G A B C  ...                                      (melody, legato)
@@ -373,7 +373,7 @@ Do not skip the isolation steps. Combining layers before each one is individuall
 
 ### 4.5 Manual Transfers and Echo Effects
 
-```
+```text
 Great (mf): 8' Principal + 4' Octave
 Choir (pp): 8' Gedackt alone
 
@@ -412,7 +412,7 @@ In a Bach fugue, each voice ideally keeps its own articulation character even wh
 
 **BWV 578 ("Little" G minor Fugue), subject entry drill:**
 
-```
+```text
 Subject (one hand):         G  A  Bb  C | D  Eb — —
 Touch:                      P  P  P   P | P  P  hold
                             (P = portato, ~85% of written value)
@@ -486,7 +486,7 @@ graph TB
 
 ### 6.3 Cipher Diagnosis — A Note Sounds Without Being Played
 
-```
+```text
 1. Mechanical cipher (tracker/pallet stuck open)
    Test: does it stop if you slowly press and release that key?
    If yes -> mechanical. Fix: locate the pallet, check for a warped board
@@ -542,20 +542,20 @@ Register the piece only at Layer 6, once coordination is secure. Registering too
 ### 7.2 Pedal Progression — 8-Week Curriculum
 
 **Weeks 1–2, single-foot toe exercises:**
-```
+```text
 Right toe, one-octave C major scale, all RT, heel lifted. ♩=40. 10 reps/session.
 Repeat left toe only.
 ```
 
 **Weeks 3–4, heel-toe alternation:**
-```
+```text
 Right heel-toe ascending:  C  D  E  F  G  A  B  C
                             RH RT RH RT RH RT RH RT    ♩=50 -> 70
 Repeat with left heel-toe.
 ```
 
 **Weeks 5–6, two-foot alternation and crossing:**
-```
+```text
 Alternating feet:  C  D  E  F  G  A  B  C
                     RT LT RT LT RT LT RT LT             ♩=60 -> 80
 
@@ -565,7 +565,7 @@ RT LT RT LT LH  RT LT RT                                ♩=50 -> 70
 ```
 
 **Weeks 7–8, legato pedal with hands:**
-```
+```text
 LH (Alberti): C E G E  C E G E  F A C A  G B D B
 Pedal:        C --- --- --- C --- --- --- F --- --- --- G --- --- ---
               RT              RT              LT              RT
@@ -574,7 +574,7 @@ Pedal:        C --- --- --- C --- --- --- F --- --- --- G --- --- ---
 
 ### 7.3 Four-Voice Chorale Drill
 
-```
+```text
 Soprano (RH):  C  D  E  F  E  D  C
 Alto (RH):     G  F  G  A  G  F  E
 Tenor (LH):    E  A  C  C  C  A  G
@@ -589,7 +589,7 @@ Tempo: ♩=52 to establish, then ♩=63 (comfortable hymn tempo)
 
 ### 7.4 Articulation Isolation Drill (One Hand, Two Voices)
 
-```
+```text
 Soprano (held): C --- C --- C --- C ---     (legato, sustained)
 Alto (moving):  E  F  G  F  E  F  G  F       (staccato eighths)
 
@@ -606,7 +606,7 @@ substitute to finger 4 when the thumb needs to move for the soprano line.
 
 ### 7.5 Registration Change (Piston) Drill
 
-```
+```text
 P1 = Soft (8' Flute alone)
 P2 = Medium (8' + 4' Principal)
 P3 = Full (Principals + Mixture + Trumpet)
@@ -648,7 +648,7 @@ Goal: zero audible gap between the piston press and the new phrase.
 - Grand Jeu: Trompette + Clairon 4' + Cornet V + Tierce + Nazard
 - Tierce en Taille: Cornet combination in the tenor register, LH plays the solo melody there while RH accompanies
 
-```
+```text
 Tierce en Taille setup:
 8' Flûte + 4' Flûte + 2⅔' Nazard + 2' Doublette + 1⅗' Tierce
 LH: solo melody in tenor range (C3-B3)
@@ -683,7 +683,7 @@ Pedal: 16' Flûte or Bourdon, soft foundation only
 - Opens with full principal chorus plus Great reeds from the very first note — theatrical, unambiguous registration
 - Double pedal passages (each foot playing an independent voice) require each foot's heel-toe technique to be fully secure alone before combining
 
-```
+```text
 Double pedal drill:
 RH: sustained simple harmony
 LH: rest, or simple melody
@@ -699,7 +699,7 @@ Pedal: two independent voices
 
 Fast diagnosis under performance pressure, organized by symptom.
 
-```
+```text
 SYMPTOM: Note sustains after releasing the key
   -> Cipher. Pull that stop's knob immediately. Diagnose per Section 6.3 later.
 
@@ -733,7 +733,7 @@ SYMPTOM: Instrument feels "sharp" or "flat" compared to rehearsal
 
 ## Quick Reference: Console Checklist Before Playing
 
-```
+```text
 [ ] Bench height: thighs horizontal, feet reach pedals with ankle flexibility
 [ ] Confirm correct memory level for the repertoire
 [ ] Swell box closed for a soft opening, if that's the intended start
@@ -748,7 +748,7 @@ SYMPTOM: Instrument feels "sharp" or "flat" compared to rehearsal
 
 ## Quick Reference: Stop Footage and Pitch Relationships
 
-```
+```text
 Footage   Pitch Relationship          Example Stops
   32'     Two octaves below 8'        Sub-Principal, Contra Bourdon, Resultant
   16'     One octave below 8'         Principal, Sub-Bass, Bourdon, Contra Fagotto

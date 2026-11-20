@@ -30,7 +30,7 @@ HTA decomposes a goal into sub-goals and sub-tasks in a tree structure, governed
 
 CTA operates at a deeper cognitive level, surfacing the knowledge, judgments, and mental models a user must bring to a task. It is particularly valuable for complex decision-support products — financial dashboards, clinical informatics systems, logistics planning tools — where the interface failure is not in navigation mechanics but in cognitive support. A CTA of a supply chain analyst's work might reveal that the user must simultaneously hold three different time horizons in working memory, reconcile conflicting data signals from two upstream systems, and apply tacit domain knowledge about supplier reliability that the interface does not encode. Each of these findings generates a specific design requirement: progressive disclosure of time horizons, explicit conflict flagging, and decision aids that surface historical supplier performance.
 
-```
+```text
 HTA: Enterprise Expense Report Submission
 ─────────────────────────────────────────────────────────────────────────────
 Goal: Submit approved expense report for reimbursement

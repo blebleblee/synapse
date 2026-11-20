@@ -765,7 +765,7 @@ For responses expected to exceed a few seconds of generation time, streaming via
 
 The Anthropic streaming protocol emits the following event sequence:
 
-```
+```text
 event: message_start
 data: {"type":"message_start","message":{"id":"msg_...","type":"message","role":"assistant","content":[],"model":"claude-sonnet-4-5","stop_reason":null,"usage":{"input_tokens":68,"output_tokens":0}}}
 

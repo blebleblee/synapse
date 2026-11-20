@@ -628,7 +628,7 @@ func main() {
 
 The scanner's `go.mod` pins the Kubernetes client library to a version matching the cluster's API server to avoid compatibility drift:
 
-```
+```text
 module internal.corp/infra/rbac-auditor
 
 go 1.22

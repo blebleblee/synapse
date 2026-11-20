@@ -14,7 +14,7 @@ That's the whole theory section. Everything else in this lesson is where to put 
 
 ## 1. The Polar Pattern Decision Tree (Use This Before You Touch a Mic)
 
-```
+```text
 sub_decision ["Mic Pattern Selection"]
 ```
 

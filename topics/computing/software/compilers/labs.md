@@ -337,7 +337,7 @@ This code exhibits a time-of-check-to-time-of-use race: each thread locks the mu
 
 Enable ThreadSanitizer to detect the race condition at runtime. Set sanitizer flags and rebuild: `export RUSTFLAGS="-Z sanitizer=thread" && cargo clean && cargo build --release`. Run the instrumented binary with `cargo run --release`. ThreadSanitizer immediately detects the race and prints a diagnostic report:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7f8a3c000d00 by thread T2:
     #0 compiler_lab::racy_counter::stress_test_racy::{{closure}} src/racy_counter.rs:25
@@ -405,7 +405,7 @@ fn test_use_after_free() {
 
 Enable AddressSanitizer with `export RUSTFLAGS="-Z sanitizer=address" && export ASAN_OPTIONS="detect_leaks=1:abort_on_error=1"`, then clean and rebuild: `cargo clean && cargo test --test use_after_free`. AddressSanitizer detects the illegal write and aborts with a detailed report:
 
-```
+```text
 ERROR: AddressSanitizer: heap-use-after-free on address 0x602000000010 at pc 0x55a8e7b2c3a1
 WRITE of size 4 at 0x602000000010 thread T0
     #0 0x55a8e7b2c3a0 in use_after_free::test_use_after_free tests/use_after_free.rs:8
@@ -441,7 +441,7 @@ fn test_double_free() {
 
 Run with AddressSanitizer enabled: `cargo test --test use_after_free test_double_free`. ASAN detects the double-free and aborts immediately:
 
-```
+```text
 ERROR: AddressSanitizer: attempting double-free on 0x602000000010 in thread T0:
     #0 0x55a8e7a2b567 in __rust_dealloc AddressSanitizer interceptor
     #1 0x55a8e7b2d4a2 in std::alloc::dealloc ...
@@ -472,7 +472,7 @@ fn test_memory_leak() {
 
 Run with LeakSanitizer enabled through AddressSanitizer: `cargo test --test memory_leak`. At process exit, LeakSanitizer scans all reachable memory starting from roots (stack, registers, global variables) and marks reachable allocations. Any heap allocation not marked is reported as a leak:
 
-```
+```text
 ERROR: LeakSanitizer: detected memory leaks
 
 Direct leak of 92160 bytes in 90 objects allocated from:

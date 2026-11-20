@@ -217,7 +217,7 @@ Define the baseline transfer program with a means-tested structure resembling th
 
 Construct the benefit function in a calculation area. In column D, create an earnings grid from 0 to 50,000 dollars in 1,000-dollar increments (cells `D2:D52`). In column E, calculate the corresponding benefit for each earnings level. In cell `E2`, implement the piecewise benefit function:
 
-```
+```text
 =IF(D2 <= $B$10, $B$9 * D2, IF(D2 <= $B$11, $B$13, IF(D2 <= $B$11 + $B$13 / $B$12, $B$13 - $B$12 * (D2 - $B$11), 0)))
 ```
 
@@ -225,7 +225,7 @@ This formula encodes: if earnings $\leq Y_{\text{in}}$, benefit is $\tau_{\text{
 
 In column F, calculate the implicit marginal tax rate (IMTR) for each earnings level, defined as the reduction in net transfer benefit per additional dollar earned. The IMTR in the phase-in region is negative (benefits rise with earnings, effectively a wage subsidy); in the plateau, it is zero; in the phase-out, it equals the phase-out rate. Additionally, combine with the statutory income tax rate and payroll tax rate. Assume a statutory marginal tax rate of 10% (federal income tax) and 7.65% (payroll tax) for this income range, totaling 17.65%. In cell `F2`, calculate the IMTR: in the phase-in, $-\tau_{\text{in}}$ plus statutory taxes; in phase-out, $+\tau_{\text{out}}$ plus statutory taxes. Implement as:
 
-```
+```text
 =IF(D2 <= $B$10, -$B$9 + 0.1765, IF(D2 <= $B$11, 0.1765, IF(D2 <= $B$11 + $B$13 / $B$12, $B$12 + 0.1765, 0.1765)))
 ```
 
@@ -233,13 +233,13 @@ Copy down through `F52`. Convert to percentage format. Visualize the benefit sch
 
 Model the household's labor supply decision. The household chooses hours $L$ to maximize utility subject to the budget constraint $C = w \cdot L + B(w \cdot L)$. In cell `B15`, designate the decision variable: hours worked $L$. Initialize with `2000` hours (full-time). In cell `B16`, calculate earned income: `=B2 * B15`. In cell `B17`, calculate transfer benefit by referencing the benefit function: use `VLOOKUP` or `INDEX-MATCH` to find the benefit corresponding to the earned income in cell `B16` from the schedule in columns D and E. For smooth optimization, implement a piecewise formula directly: replicate the benefit formula from column E, replacing `D2` with `B16`:
 
-```
+```text
 =IF(B16 <= $B$10, $B$9 * B16, IF(B16 <= $B$11, $B$13, IF(B16 <= $B$11 + $B$13 / $B$12, $B$13 - $B$12 * (B16 - $B$11), 0)))
 ```
 
 In cell `B18`, calculate total consumption: `=B16 + B17`. In cell `B19`, calculate leisure: `=B3 - B15`. In cell `B20`, calculate utility using the specified functional form:
 
-```
+```text
 =(B18^(1 - $B$5)) / (1 - $B$5) + $B$7 * ((B19^(1 - $B$6)) / (1 - $B$6))
 ```
 

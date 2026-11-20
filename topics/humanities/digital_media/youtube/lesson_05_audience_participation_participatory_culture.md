@@ -40,7 +40,7 @@ Simultaneously, the upload process extracts metadata that seeds the recommendati
 
 The comment infrastructure operates as a distributed database with real-time synchronization constraints. Each video maintains a comment thread stored in Google's Bigtable infrastructure, optimized for high write throughput and eventual consistency. When a user posts a comment, the system timestamps the entry, associates it with the user's account identifier, and publishes it to the thread. Replies create a tree structure with limited depth—typically two levels, preventing threading from becoming cognitively unmanageable. The system calculates engagement scores by tracking likes on comments, factoring in temporal decay (older comments naturally accumulate more likes, so recent comments receive recency bonuses), and detecting velocity (rapid like accumulation signals viral potential).
 
-```
+```text
 Comment Ranking Algorithm (Conceptual Model):
 
 Score = (Likes × Recency_Multiplier × Creator_Heart_Bonus) / (Time_Since_Post^0.5)

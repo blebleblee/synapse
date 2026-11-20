@@ -26,7 +26,7 @@ The pawn skeleton determines which squares become weak, which files open for hea
 
 **Pawn Chains** arise when pawns on adjacent files support each other diagonally, forming an interlocking structure. The chain possesses a base (the rearmost pawn) and a head (the most advanced pawn). Nimzowitsch's principle states that the proper strategy against a pawn chain involves attacking its base, as the base's collapse undermines the entire structure. Consider a white chain on d4-e5-f4 confronting a black chain on c6-d5-e6. White should target the c6 base with moves like b4-b5, while Black aims at d4 with moves like c5 or f6-followed-by-e5. Premature attacks on the chain's head prove ineffective—the head enjoys maximal support from the pawns behind it. Only after the base weakens does attacking the advanced links become viable.
 
-```
+```text
 Pawn Chain Structure (White's perspective):
 
 8  . . . . . . . .
@@ -48,7 +48,7 @@ Black attacks White's base (d4) with ...c5 or ...f6/...e5
 
 **Backward Pawns** cannot advance safely because the adjacent files lack friendly pawns to provide support, and the square immediately ahead falls under enemy control. A backward pawn on c6, with no pawns on the b or d files to support ...c5, exemplifies this structural defect. The square in front (c5 in this case) becomes an outpost—a secure location where the opponent can station a piece immune to pawn attacks. Backward pawns prove difficult to defend, as pieces must substitute for the absent pawn support. They become chronic targets, and their eventual loss often becomes inevitable despite defensive efforts.
 
-```
+```text
 Backward Pawn (Black on c6):
 
 8  . . . . . . . .

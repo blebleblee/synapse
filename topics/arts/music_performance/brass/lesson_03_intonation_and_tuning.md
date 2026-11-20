@@ -246,7 +246,7 @@ Drills are sequenced fundamental to advanced. Use a clip-on or strobe tuner, and
 
 **Sequence (B♭ Trumpet):**
 
-```
+```text
 Open -> 2 -> 1 -> 1+2 -> 3 -> 2+3 -> 1+3 -> 1+2+3
 Pitches: Bb -> A -> Ab -> G -> Gb -> F -> E -> Eb
 ```
@@ -313,7 +313,7 @@ For each interval:
 
 **Setup:** 4-part brass section (or any 4 players). Sustain this B♭ major chord in root position:
 
-```
+```text
 Soprano (Trumpet 1):            B-flat5  - Root, 8th partial - 0 cents
 Alto (Trumpet 2 / Flugel):      D5       - Major 3rd - target -14 cents
 Tenor (Trombone / Horn):        F4       - Perfect 5th - target +2 cents
@@ -346,7 +346,7 @@ Bass (Tuba / Bass Trombone):    B-flat2  - Root - 0 cents
 
 **Method:** slow chromatic scale, descending.
 
-```
+```text
 Scale:   Bb4 -> A4 -> Ab4 -> G4 -> Gb4 -> F4 -> E4 -> Eb4 -> D4 -> Db4 -> C4 -> B3 -> Bb3
 Valves:  0   -> 1+2 -> 2  -> 0  -> 1+2 -> 1  -> 1+2 -> 2+3 -> 1+3* -> 1+2+3* -> 0 -> 1+2 -> 0
                                                              ^TRIGGER   ^TRIGGER+LIP

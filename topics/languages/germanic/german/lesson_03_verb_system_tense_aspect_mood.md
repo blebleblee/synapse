@@ -24,7 +24,7 @@ Strong verbs distribute across seven ablaut classes, each defined by a character
 
 **Class I** exhibits the pattern *ei* (infinitive) → *i* (preterite singular) → *i* (preterite plural) → *i* (past participle). The verb *bleiben* (to remain) instantiates this pattern:
 
-```
+```text
 Infinitive:          bleiben
 Preterite 1sg/3sg:   blieb
 Preterite 1pl/3pl:   blieben
@@ -35,7 +35,7 @@ Other Class I members include *schreiben* (to write), *steigen* (to climb), and 
 
 **Class II** follows the pattern *ie* → *o* → *o* → *o*. The verb *fliegen* (to fly) demonstrates:
 
-```
+```text
 Infinitive:          fliegen
 Preterite 1sg/3sg:   flog
 Preterite 1pl/3pl:   flogen
@@ -46,7 +46,7 @@ This class includes *biegen* (to bend), *ziehen* (to pull), and *schließen* (to
 
 **Class III** subdivides into three patterns based on the consonant following the stem vowel. The prototypical pattern involves liquid (*l*, *r*) or nasal (*m*, *n*) plus consonant: *i* → *a* → *u* → *u*. The verb *binden* (to bind) exemplifies:
 
-```
+```text
 Infinitive:          binden
 Preterite 1sg/3sg:   band
 Preterite 1pl/3pl:   banden
@@ -57,7 +57,7 @@ Class III members include *finden* (to find), *gelingen* (to succeed), *schwimme
 
 **Class IV** exhibits *e* → *a* → *a* → *o*. The verb *nehmen* (to take) demonstrates:
 
-```
+```text
 Infinitive:          nehmen
 Preterite 1sg/3sg:   nahm
 Preterite 1pl/3pl:   nahmen
@@ -68,7 +68,7 @@ Other Class IV verbs include *brechen* (to break), *sprechen* (to speak), and *t
 
 **Class V** follows the pattern *e* → *a* → *a* → *e*. The verb *geben* (to give) illustrates:
 
-```
+```text
 Infinitive:          geben
 Preterite 1sg/3sg:   gab
 Preterite 1pl/3pl:   gaben
@@ -79,7 +79,7 @@ This class includes *essen* (to eat), *lesen* (to read), *sehen* (to see), and *
 
 **Class VI** shows *a* → *u* → *u* → *a*. The verb *fahren* (to drive, to travel) exemplifies:
 
-```
+```text
 Infinitive:          fahren
 Preterite 1sg/3sg:   fuhr
 Preterite 1pl/3pl:   fuhren
@@ -90,7 +90,7 @@ Other members include *graben* (to dig), *laden* (to load), *schlagen* (to hit),
 
 **Class VII** originally constituted a reduplicating class in Proto-Germanic but has been reanalyzed in modern German with idiosyncratic vowel patterns. The verb *laufen* (to run) demonstrates:
 
-```
+```text
 Infinitive:          laufen
 Preterite 1sg/3sg:   lief
 Preterite 1pl/3pl:   liefen
@@ -105,7 +105,7 @@ Weak verbs form the productive default conjugation class in German. All neologis
 
 The verb *machen* (to make, to do) instantiates the canonical weak paradigm:
 
-```
+```text
 Infinitive:          machen
 Preterite 1sg:       machte
 Preterite 2sg:       machtest
@@ -118,7 +118,7 @@ Past Participle:     gemacht
 
 Stem-final dental stops trigger epenthetic *-e-* to prevent phonotactically illicit clusters. The verb *arbeiten* (to work) demonstrates:
 
-```
+```text
 Infinitive:          arbeiten
 Preterite 1sg:       arbeitete
 Preterite 2sg:       arbeitetest
@@ -135,7 +135,7 @@ Verbs with stem-final *-m* or *-n* preceded by consonants other than liquids sim
 
 Mixed verbs combine strong ablaut with weak dental suffixation. The closed class includes *brennen* (to burn), *bringen* (to bring), *denken* (to think), *kennen* (to know), *nennen* (to name), *rennen* (to run), *senden* (to send), and *wenden* (to turn). The verb *bringen* exemplifies:
 
-```
+```text
 Infinitive:          bringen
 Preterite 1sg/3sg:   brachte
 Preterite 1pl/3pl:   brachten
@@ -148,7 +148,7 @@ Note the stem vowel /ɪ/ → /a/ ablaut combined with the weak *-te* suffix. The
 
 The present tense inflects for person and number across all verb classes. The canonical weak paradigm (*machen*) demonstrates:
 
-```
+```text
 1sg:  ich mache     (I make)
 2sg:  du machst     (you make - informal singular)
 3sg:  er/sie/es macht  (he/she/it makes)
@@ -160,7 +160,7 @@ The present tense inflects for person and number across all verb classes. The ca
 
 Strong verbs with stem vowels *e* undergo i-mutation in 2sg and 3sg forms. The verb *geben* (to give) shows:
 
-```
+```text
 1sg:  ich gebe
 2sg:  du gibst
 3sg:  er/sie/es gibt
@@ -171,7 +171,7 @@ Strong verbs with stem vowels *e* undergo i-mutation in 2sg and 3sg forms. The v
 
 The vowel /eː/ raises to /ɪ/ in the 2sg/3sg forms: *gibst*, *gibt*. Similarly, *nehmen* (to take) exhibits:
 
-```
+```text
 1sg:  ich nehme
 2sg:  du nimmst
 3sg:  er/sie/es nimmt
@@ -184,7 +184,7 @@ Note the additional consonant gemination (*-mm-*) in the 2sg/3sg forms, reflecti
 
 Strong verbs with stem vowel *a* in Classes VI and VII undergo a-umlaut (fronting to *ä* = /ɛ/) in 2sg/3sg. The verb *fahren* shows:
 
-```
+```text
 1sg:  ich fahre
 2sg:  du fährst
 3sg:  er/sie/es fährt
@@ -199,7 +199,7 @@ The verb *halten* (to hold) similarly exhibits *ich halte*, *du hältst*, *er h�
 
 The present perfect (*Perfekt*) is formed with the present tense of *haben* or *sein* plus the past participle. Auxiliary selection follows semantic-syntactic principles. Transitive verbs and most intransitive verbs denoting activities select *haben*:
 
-```
+```text
 ich habe gemacht     (I have made)
 du hast geschrieben  (you have written)
 er hat gegessen      (he has eaten)
@@ -208,7 +208,7 @@ wir haben gearbeitet (we have worked)
 
 Unaccusative intransitive verbs—those denoting change of location, change of state, or the initiation/termination of a state—select *sein*:
 
-```
+```text
 ich bin gefahren     (I have driven/traveled)
 du bist gekommen     (you have come)
 er ist gestorben     (he has died)
@@ -220,7 +220,7 @@ The auxiliary *sein* itself selects *sein* in the perfect: *ich bin gewesen* (I 
 
 Certain motion verbs exhibit auxiliary alternation based on argument structure. When *fahren*, *fliegen*, *laufen* appear with a direct object (displaced from unaccusative to transitive syntax), they select *haben*:
 
-```
+```text
 Ich bin nach Berlin gefahren.     (I have driven to Berlin - intransitive)
 Ich habe das Auto gefahren.       (I have driven the car - transitive)
 
@@ -230,7 +230,7 @@ Er hat das Flugzeug geflogen.     (He has flown the airplane)
 
 The past perfect (*Plusquamperfekt*) substitutes the preterite of *haben*/*sein* for the present:
 
-```
+```text
 ich hatte gemacht     (I had made)
 du hattest geschrieben (you had written)
 er war gefahren       (he had driven)
@@ -243,7 +243,7 @@ The pluperfect encodes anteriority relative to a past reference time, establishi
 
 The future tense (*Futur I*) is formed with *werden* plus infinitive:
 
-```
+```text
 ich werde machen      (I will make)
 du wirst schreiben    (you will write)
 er wird fahren        (he will drive)
@@ -252,14 +252,14 @@ wir werden arbeiten   (we will work)
 
 However, the *Futur I* rarely encodes pure futurity in contemporary spoken German. Instead, the present tense with temporal adverbs serves for future reference: *Ich fahre morgen nach Berlin* (I'm driving to Berlin tomorrow). The *Futur I* instead encodes epistemic modality—speaker conjecture or assumption about present or future states:
 
-```
+```text
 Er wird jetzt zu Hause sein.  (He is probably at home now - epistemic)
 Sie wird wohl krank sein.     (She is probably sick - epistemic)
 ```
 
 The future perfect (*Futur II*) combines *werden* with the perfect infinitive (*haben*/*sein* + past participle):
 
-```
+```text
 ich werde gemacht haben       (I will have made)
 du wirst geschrieben haben    (you will have written)
 er wird gefahren sein         (he will have driven)
@@ -267,7 +267,7 @@ er wird gefahren sein         (he will have driven)
 
 Like *Futur I*, the *Futur II* primarily encodes epistemic modality—conjecture about completed past events:
 
-```
+```text
 Er wird schon angekommen sein.  (He has probably already arrived)
 Sie wird es vergessen haben.    (She has probably forgotten it)
 ```
@@ -276,7 +276,7 @@ Sie wird es vergessen haben.    (She has probably forgotten it)
 
 *Konjunktiv I* is constructed from the present stem with subjunctive suffixes. The paradigm for *machen* demonstrates:
 
-```
+```text
 1sg:  ich mache
 2sg:  du machest
 3sg:  er/sie/es mache
@@ -287,7 +287,7 @@ Sie wird es vergessen haben.    (She has probably forgotten it)
 
 Note the distinctive *-e-* in 2sg (*machest*) and 2pl (*machet*), contrasting with indicative *machst*/*macht*. The 3sg form *mache* (versus indicative *macht*) serves as the primary morphological marker of indirect discourse:
 
-```
+```text
 Indicative:   Er sagt, dass er krank ist.
               (He says that he is sick - direct endorsement)
 
@@ -297,14 +297,14 @@ Subjunctive:  Er sagt, dass er krank sei.
 
 Strong verbs with stem vowel alternation in the present indicative revert to the unaltered stem in *Konjunktiv I*. The verb *geben* shows:
 
-```
+```text
 Indicative 3sg:    er gibt
 Konjunktiv I 3sg:  er gebe
 ```
 
 The verb *sein* exhibits suppletive subjunctive forms:
 
-```
+```text
 1sg:  ich sei
 2sg:  du seiest
 3sg:  er/sie/es sei
@@ -315,14 +315,14 @@ The verb *sein* exhibits suppletive subjunctive forms:
 
 The perfect subjunctive combines *Konjunktiv I* of *haben*/*sein* with the past participle:
 
-```
+```text
 er habe gemacht   (he has allegedly made)
 er sei gefahren   (he has allegedly driven)
 ```
 
 The future subjunctive uses *Konjunktiv I* of *werden*:
 
-```
+```text
 er werde machen   (he will allegedly make)
 ```
 
@@ -330,7 +330,7 @@ er werde machen   (he will allegedly make)
 
 *Konjunktiv II* derives from the preterite stem. For weak verbs, *Konjunktiv II* is identical to the preterite indicative, rendering it functionally ambiguous. Consequently, weak verbs employ the *würde* + infinitive periphrastic construction:
 
-```
+```text
 Preterite Indicative:  ich machte
 Konjunktiv II:         ich machte (ambiguous)
 Periphrastic:          ich würde machen (unambiguous counterfactual)
@@ -338,14 +338,14 @@ Periphrastic:          ich würde machen (unambiguous counterfactual)
 
 Strong verbs form *Konjunktiv II* from the preterite stem with umlaut (when the stem vowel is *a*, *o*, or *u*) and subjunctive suffixes. The verb *geben* demonstrates:
 
-```
+```text
 Preterite Indicative:  ich gab
 Konjunktiv II:         ich gäbe
 ```
 
 Full paradigm:
 
-```
+```text
 1sg:  ich gäbe
 2sg:  du gäbest
 3sg:  er/sie/es gäbe
@@ -356,21 +356,21 @@ Full paradigm:
 
 The verb *fahren* shows:
 
-```
+```text
 Preterite Indicative:  ich fuhr
 Konjunktiv II:         ich führe
 ```
 
 The verb *kommen* exhibits:
 
-```
+```text
 Preterite Indicative:  ich kam
 Konjunktiv II:         ich käme
 ```
 
 Modal verbs and *haben*, *werden*, *wissen* retain productive *Konjunktiv II* forms:
 
-```
+```text
 können:   ich könnte    (I could)
 müssen:   ich müsste    (I would have to)
 dürfen:   ich dürfte    (I would be allowed)
@@ -384,7 +384,7 @@ wissen:   ich wüsste    (I would know)
 
 The *Konjunktiv II* encodes counterfactuality in conditional sentences:
 
-```
+```text
 Wenn ich Zeit hätte, würde ich kommen.
 (If I had time, I would come - counterfactual present)
 
@@ -394,14 +394,14 @@ Wenn ich Zeit gehabt hätte, wäre ich gekommen.
 
 It also encodes polite modality:
 
-```
+```text
 Könnten Sie mir helfen?      (Could you help me? - polite request)
 Ich hätte gern einen Kaffee.  (I would like a coffee - polite desire)
 ```
 
 The perfect *Konjunktiv II* combines *hätte*/*wäre* with the past participle:
 
-```
+```text
 ich hätte gemacht   (I would have made)
 ich wäre gefahren   (I would have driven)
 ```
@@ -410,7 +410,7 @@ ich wäre gefahren   (I would have driven)
 
 German distinguishes three imperative forms: informal singular (*du*), informal plural (*ihr*), and formal (*Sie*). The informal singular drops the *-st* ending and optionally the stem vowel *-e*:
 
-```
+```text
 machen:   Mach(e)!      (Make!)
 geben:    Gib!          (Give!)
 nehmen:   Nimm!         (Take!)
@@ -421,7 +421,7 @@ Strong verbs with i-mutation (*geben* → *gibst*, *nehmen* → *nimmst*) retain
 
 The informal plural imperative mirrors the 2pl present indicative:
 
-```
+```text
 machen:   Macht!        (Make!)
 geben:    Gebt!         (Give!)
 nehmen:   Nehmt!        (Take!)
@@ -430,7 +430,7 @@ fahren:   Fahrt!        (Drive!)
 
 The formal imperative employs the infinitive followed by *Sie*:
 
-```
+```text
 machen:   Machen Sie!   (Make!)
 geben:    Geben Sie!    (Give!)
 nehmen:   Nehmen Sie!   (Take!)
@@ -439,7 +439,7 @@ fahren:   Fahren Sie!   (Drive!)
 
 The verb *sein* exhibits suppletive imperative forms:
 
-```
+```text
 Informal singular:  Sei!        (Be!)
 Informal plural:    Seid!       (Be!)
 Formal:             Seien Sie!  (Be!)
@@ -447,7 +447,7 @@ Formal:             Seien Sie!  (Be!)
 
 Negative imperatives are formed with *nicht*:
 
-```
+```text
 Mach das nicht!       (Don't do that!)
 Fahrt nicht so schnell! (Don't drive so fast!)
 Seien Sie nicht traurig! (Don't be sad!)
@@ -457,7 +457,7 @@ Seien Sie nicht traurig! (Don't be sad!)
 
 German distinguishes between processual (*werden*-passive) and stative (*sein*-passive). The *werden*-passive is formed with *werden* + past participle, denoting dynamic events:
 
-```
+```text
 Present:   Das Haus wird gebaut.      (The house is being built)
 Preterite: Das Haus wurde gebaut.     (The house was being built)
 Perfect:   Das Haus ist gebaut worden. (The house has been built)
@@ -465,7 +465,7 @@ Perfect:   Das Haus ist gebaut worden. (The house has been built)
 
 Note the irregular past participle *worden* (not *\*geworden*) in the perfect passive. The *werden*-passive foregrounds the process or event itself, backgrounding or entirely omitting the agent. Agent phrases, when expressed, appear in *von* + dative (prototypical agents) or *durch* + accusative (means or intermediary causes):
 
-```
+```text
 Das Haus wird von der Firma gebaut.
 (The house is being built by the company)
 
@@ -475,34 +475,34 @@ Das Haus wurde durch einen Sturm zerstört.
 
 The *sein*-passive denotes resultant states rather than ongoing processes:
 
-```
+```text
 Das Haus ist gebaut.   (The house is built - completed state)
 Die Tür ist geschlossen. (The door is closed - resultant state)
 ```
 
 The semantic distinction creates minimal pairs:
 
-```
+```text
 Die Tür wird geschlossen.  (The door is being closed - process)
 Die Tür ist geschlossen.   (The door is closed - state)
 ```
 
 Only transitive verbs and a subset of intransitive verbs that allow impersonal passives can be passivized. Intransitive verbs passivize in impersonal constructions with the expletive *es*:
 
-```
+```text
 Es wird getanzt.      (There is dancing / Dancing is happening)
 Es wurde viel gelacht. (There was much laughter / Much laughter occurred)
 ```
 
 The expletive *es* occupies the clause-initial position in verb-second syntax but is omitted when another constituent fronts:
 
-```
+```text
 Gestern wurde viel gelacht.  (Yesterday there was much laughter)
 ```
 
 Ditransitive verbs allow the dative object to remain in the passive, creating a so-called "dative passive":
 
-```
+```text
 Active:   Der Arzt hilft dem Patienten.
           (The doctor helps the patient)
 
@@ -518,7 +518,7 @@ German employs six modal verbs: *können* (can, to be able to), *müssen* (must,
 
 The verb *können* demonstrates:
 
-```
+```text
 Present:
 1sg:  ich kann
 2sg:  du kannst
@@ -538,7 +538,7 @@ Preterite:
 
 Modals govern bare infinitives (infinitives without *zu*):
 
-```
+```text
 Ich kann Deutsch sprechen.   (I can speak German)
 Du musst jetzt gehen.         (You must go now)
 Er darf nicht rauchen.        (He may not smoke)
@@ -546,14 +546,14 @@ Er darf nicht rauchen.        (He may not smoke)
 
 In perfect constructions, modals employ a double infinitive structure when governing another verb:
 
-```
+```text
 Ich habe Deutsch sprechen können.  (I have been able to speak German)
 Du hast gehen müssen.               (You have had to go)
 ```
 
 Note the infinitive *können*, *müssen* rather than the expected past participles *\*gekonnt*, *\*gemusst*. When modals appear without a dependent infinitive, they form regular perfect constructions:
 
-```
+```text
 Ich habe es gekonnt.   (I have been able to do it)
 Ich habe es gewollt.   (I have wanted it)
 ```
@@ -580,14 +580,14 @@ Incorrect auxiliary selection (*\*Ich habe gegangen*, *\*Er ist gemacht*) persis
 
 Subjunctive morphology, particularly *Konjunktiv I*, is systematically avoided by learners, who substitute indicative forms in indirect discourse or fail to mark counterfactuality in conditional sentences. This avoidance reflects both morphological complexity and functional opacity—learners perceive subjunctive forms as optional stylistic variants rather than semantically load-bearing. Optimization requires explicit functional instruction. For *Konjunktiv I*, learners must understand that its use in indirect discourse signals epistemic distancing: the speaker reports a claim without endorsing it. Contrast pairs should highlight this:
 
-```
+```text
 Er sagt, dass er krank ist.   (Indicative - speaker endorses the claim)
 Er sagt, dass er krank sei.   (Subjunctive - speaker reports neutrally)
 ```
 
 For *Konjunktiv II*, learners should recognize its counterfactual semantics through conditional drilling:
 
-```
+```text
 Wenn ich Zeit habe, komme ich.         (Real conditional - indicative)
 Wenn ich Zeit hätte, würde ich kommen. (Counterfactual - subjunctive)
 ```
@@ -598,14 +598,14 @@ Production practice should begin with high-frequency *Konjunktiv II* forms (*hä
 
 Learners underuse passive constructions, defaulting to active voice even when discourse-pragmatic factors favor passive fronting. Simultaneously, learners misuse passive constructions by failing to distinguish processual *werden*-passive from stative *sein*-passive. Sentences like *\*Das Haus ist gebaut geworden* (double-marking resultativity and process) reveal misunderstanding of the aspectual distinction. Optimization requires contrastive drilling with minimal pairs:
 
-```
+```text
 Das Haus wird gebaut.   (The house is being built - process)
 Das Haus ist gebaut.    (The house is built - state)
 ```
 
 Learners should also practice topicalization contexts where passive is pragmatically preferred. For example, when the patient is discourse-given and the agent is new or irrelevant, passive fronts the patient to clause-initial position:
 
-```
+```text
 A: Was ist mit dem alten Rathaus passiert?
 B: Es wurde letztes Jahr abgerissen.
    (It was torn down last year - patient-fronting passive)
@@ -615,7 +615,7 @@ B: Es wurde letztes Jahr abgerissen.
 
 The double infinitive construction required in modal perfect forms (*Ich habe gehen müssen* not *\*Ich habe gemusst gehen*) persistently eludes learners, who produce past participial forms or incorrect word orders. This construction violates the elsewhere-default pattern (past participle in perfect) and requires explicit acquisition. Drilling should isolate the double infinitive structure:
 
-```
+```text
 Ich habe es machen können.     (I have been able to do it)
 Du hast früh aufstehen müssen.  (You have had to get up early)
 Er hat nicht kommen dürfen.     (He has not been allowed to come)
@@ -623,7 +623,7 @@ Er hat nicht kommen dürfen.     (He has not been allowed to come)
 
 Learners should also acquire the contrast between double infinitive (with dependent verb) and regular perfect (without dependent verb):
 
-```
+```text
 Ich habe es gekonnt.   (I have been able to do it - no dependent verb)
 Ich habe es machen können. (I have been able to make it - with dependent verb)
 ```
@@ -640,14 +640,14 @@ Auxiliary selection, subjunctive use, and passive voice deployment are not purel
 
 Since English lacks the *werden*-passive versus *sein*-passive distinction, learners benefit from translation drills that force aspectual disambiguation. Sentences like "The door is closed" are ambiguous in English but must be disambiguated in German:
 
-```
+```text
 The door is closed.  (state result)     → Die Tür ist geschlossen.
 The door is being closed. (process)     → Die Tür wird geschlossen.
 ```
 
 Similarly, English "He has been sick" maps to German indicative or subjunctive depending on evidentiality:
 
-```
+```text
 He has been sick.  (direct knowledge)   → Er ist krank gewesen.
 He is said to have been sick. (reported) → Er sei krank gewesen.
 ```
@@ -658,7 +658,7 @@ These translation drills cultivate metalinguistic awareness of semantic distinct
 
 Verb morphology cannot be mastered in isolation from syntactic positioning. German's verb-second (V2) constraint in main clauses and verb-final (VF) constraint in subordinate clauses create positional templates that interact with auxiliary, modal, and infinitive placement. Learners must internalize that finite verbs (tensed forms) occupy second position in main clauses but final position in subordinate clauses:
 
-```
+```text
 Main clause:      Ich habe das Buch gelesen.
                    (I have read the book - V2: finite auxiliary in position 2)
 
@@ -668,7 +668,7 @@ Subordinate:      …weil ich das Buch gelesen habe.
 
 Modal verb constructions stack infinitives in descending order in subordinate clauses:
 
-```
+```text
 Main clause:      Ich muss das Buch lesen können.
                    (I must be able to read the book)
 

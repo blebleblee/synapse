@@ -55,7 +55,7 @@ The server transmits its Certificate, CertificateVerify, and Finished messages a
 
 The HKDF key schedule derives five distinct secret values from a single early secret and the ECDHE output:
 
-```
+```text
 Early Secret
      |
      +-- (binder_key, early_traffic_secret, early_exporter_secret)
@@ -157,7 +157,7 @@ A correct response includes `OCSP Response Status: successful` and a `Cert Statu
 
 HTTP Strict Transport Security (HSTS, RFC 6797) is the mechanism by which a server instructs compliant clients to refuse all future plaintext HTTP connections for a configured duration. The header:
 
-```
+```text
 Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 ```
 
@@ -185,7 +185,7 @@ DNSSEC (RFC 4033–4035) addresses this by adding a chain of cryptographic signa
 
 The DNSSEC validation chain for a query to `mail.example.com` resolves as follows. The root zone's KSK is used to verify the root's DNSKEY RRset. The root's ZSK signs the `.com` zone's DS record. The `.com` zone's KSK is verified against that DS record, and `.com`'s ZSK signs the `example.com` DS record. Finally, `example.com`'s KSK is verified against its DS record, and its ZSK covers all RRsets in the zone, including the A record for `mail.example.com`.
 
-```
+```text
 Root KSK (trust anchor)
     |-- signs Root ZSK (DNSKEY)
         |-- Root ZSK signs .com DS record
@@ -215,7 +215,7 @@ Email's historical design contains no sender authentication at the protocol leve
 
 SPF (Sender Policy Framework, RFC 7208) is a DNS record that declares which IP addresses or hostnames are authorized to send mail for a domain. When a receiving MTA accepts an SMTP connection, it queries the `TXT` record for the envelope sender's domain and checks whether the connecting IP is listed. A complete SPF record for a domain that sends only via Google Workspace and a single on-premise relay:
 
-```
+```text
 v=spf1 include:_spf.google.com ip4:203.0.113.42/32 -all
 ```
 
@@ -225,7 +225,7 @@ DKIM (DomainKeys Identified Mail, RFC 6376) signs the message body and selected 
 
 A DKIM signature header looks like this:
 
-```
+```text
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=example.com; s=selector1;
   h=from:to:subject:date:message-id;
@@ -239,7 +239,7 @@ DMARC (Domain-based Message Authentication, Reporting, and Conformance, RFC 7489
 
 A production DMARC record implementing reject policy with aggregate and forensic reporting:
 
-```
+```text
 _dmarc.example.com. IN TXT "v=DMARC1; p=reject; sp=reject;
   rua=mailto:dmarc-rua@example.com;
   ruf=mailto:dmarc-ruf@example.com;
@@ -270,7 +270,7 @@ dig +short TXT _dmarc.example.com
 
 For end-to-end authentication testing, sending a test message through the full delivery path and examining the `Authentication-Results` header inserted by the receiving MTA is the definitive check:
 
-```
+```text
 Authentication-Results: mx.google.com;
    dkim=pass header.i=@example.com header.s=selector1;
    spf=pass (google.com: domain of sender@example.com

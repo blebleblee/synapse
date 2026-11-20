@@ -32,7 +32,7 @@ Every interpersonal encounter begins with unconscious environmental scanning. Th
 
 This contextual sensing operation can be formalized as a rapid mental model executed in the first 10-30 seconds of an interaction:
 
-```
+```text
 Context Classification Matrix
 ├── Stakes Level: [Routine / Elevated / Critical]
 ├── Time Horizon: [Strategic (weeks+) / Tactical (days-hours) / Operational (minutes)]
@@ -61,7 +61,7 @@ The four primary calibration dimensions are *formality register*, *decision-maki
 
 These four calibration dimensions interact as follows:
 
-```
+```text
 Calibration Mapping: Context → Presence Adjustment
 
 SCENARIO 1: Crisis Response (Equipment Failure, Safety Issue)

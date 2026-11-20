@@ -214,7 +214,7 @@ Once you can name these two sensations from the inside, you can catch yourself d
 
 ### 4.3 The Standard Rock Beat
 
-```
+```text
 Count:                1   +   2   +   3   +   4   +
 Right hand (hi-hat):  x   x   x   x   x   x   x   x     (even eighth notes)
 Left hand (snare):    .   .   O   .   .   .   O   .     (backbeat, 2 & 4)
@@ -247,7 +247,7 @@ x = hi-hat tip strike   O = accent   o = medium   X = pedal close   . = rest
 
 ### Funk — sixteenth-note density with ghost notes
 
-```
+```text
 Count:                1 e + a 2 e + a 3 e + a 4 e + a
 Right hand (hi-hat):  x x x x x x x x x x x x x x x x
 Left hand (snare):    . g . g O . g g . . g g O . g g
@@ -257,7 +257,7 @@ Right foot (bass):    O . . . . o . o . . . . . o . .
 
 ### Jazz — swing ride pattern
 
-```
+```text
 Right hand (ride):    long-short-long-short pattern ("ding-ding-a-ding")
 Left foot (hi-hat):   X on 2 and 4 ("chick")
 Left hand (snare):    sparse, improvised comping, responds to the soloist

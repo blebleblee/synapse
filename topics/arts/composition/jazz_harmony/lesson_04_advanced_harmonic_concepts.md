@@ -22,7 +22,7 @@ Rootless voicings exist because in a trio or combo, the bassist already plays th
 
 **A Form (7th on the bottom of the LH shape):**
 
-```
+```text
 Dm7     F – A – C – E      (♭7 – 9 – 11 – 5)
 G7      F – A – B – E      (♭7 – 9 – 3 – 13)
 Cmaj7   E – G – B – D      (3 – 5 – 7 – 9)
@@ -30,7 +30,7 @@ Cmaj7   E – G – B – D      (3 – 5 – 7 – 9)
 
 **B Form (3rd on the bottom — use when the A form sits awkwardly, or to alternate register with your right hand):**
 
-```
+```text
 Dm7     F – A – C – E
 G7      B – E – F – A      (3 – 13 – ♭7 – 9)
 Cmaj7   E – G – B – D
@@ -55,7 +55,7 @@ A "drop-2" voicing takes a close-position four-note chord and drops the second-f
 
 **Dm7 → G7 → Cmaj7, starting around the 5th fret (string set D-G-B-E, i.e. strings 4-3-2-1):**
 
-```
+```text
 Dm7 (root-position voicing):
 e |---5---|   A  (5th)
 B |---6---|   D  (root)
@@ -89,14 +89,14 @@ D |---5---|   G  (5th)
 
 **Mechanism:** G7 contains the tritone B–F. D♭7 contains the tritone F–C♭ (enharmonically F–B). Same two pitches, different chord root. Because that shared tritone is what creates the harmonic pull toward C, either chord can deliver you to Cmaj7 — but D♭7 gets you there with the bass walking down chromatically instead of jumping a 4th.
 
-```
+```text
 Original:      Dm7 → G7  → Cmaj7     (bass: D → G  → C, a 4th + a 4th)
 Tritone sub:   Dm7 → D♭7 → Cmaj7     (bass: D → D♭ → C, chromatic half steps)
 ```
 
 **Piano voicing comparison:**
 
-```
+```text
 Dm7:   F – A – C  – E
 G7:    F – A – B  – E
 D♭7:   B(C♭) – E – F – A♭     (♭7–9–3–♯11, enharmonic respelling of the same tritone)
@@ -119,7 +119,7 @@ A diminished 7th chord (1–♭3–♭5–♭♭7) is built from four stacked mi
 
 **Practical use #1 — dominant substitute:** B°7 shares the tritone B–F with G7, so it functions as a V7 substitute resolving to Cmaj7:
 
-```
+```text
 Dm7:   F – A – C – E
 B°7:   B – D – F – A♭      (any inversion — try D-F-A♭-B for smoother top-voice motion)
 Cmaj7: E – G – B – D
@@ -127,7 +127,7 @@ Cmaj7: E – G – B – D
 
 **Practical use #2 — chromatic passing chord between diatonic chords:**
 
-```
+```text
 Cmaj7   →  C♯°7         →  Dm7
 E-G-B-D →  E-G-B♭-C♯   →  F-A-C-E
 ```
@@ -136,7 +136,7 @@ Track each voice: E→E→F, G→G→A, B→B♭→C, D→C♯→E. Every single
 
 **Guitar arpeggio drill (diminished shapes repeat every minor 3rd, i.e. every 3 frets — use this to navigate the whole neck with one fingering):**
 
-```
+```text
 C♯°7 arpeggio, 6th string root at fret 9, 1-2-4 fingering per string:
 e |---8---11---14---17---|
 B |---8---11---14---17---|
@@ -160,7 +160,7 @@ Check the resolutions into C major: A♭→G (♭9 to root, half step), B♭→C
 
 **Piano voicing:**
 
-```
+```text
 G7alt:  B – E♭ – F – A♭     (3 – ♭13 – ♭7 – ♭9)
         LH fingering: 5–3–2–1
 ```
@@ -169,7 +169,7 @@ This grabs the essential tritone (B–F) plus two altered colors in one four-not
 
 **Right-hand altered scale fingering starting on G:**
 
-```
+```text
 G  A♭  B♭  B  D♭  E♭  F  G
 1   2   3  1   2   3  4  5     (thumb crosses under on B)
 ```
@@ -178,7 +178,7 @@ Drill: ascending/descending quarter notes at ♩=60, then eighth notes at ♩=10
 
 **Guitar altered scale shape (G7alt, low root around 3rd fret):**
 
-```
+```text
 e |---4---5---7---8---|
 B |---4---6---7---9---|
 G |---4---5---7---8---|
@@ -195,7 +195,7 @@ Extensions correspond to the 9th, 11th, and 13th partials of the harmonic series
 
 **Cmaj7(♯11) — the "Lydian" sound (Bill Evans, Herbie Hancock territory):**
 
-```
+```text
 E – G – B – F♯      (3 – 5 – 7 – ♯11)
 LH fingering: 5–4–2–1
 ```
@@ -204,14 +204,14 @@ The raised 4th replaces the "avoid note" (natural F against C-E) with a consonan
 
 **G13 — dominant function, 5th omitted:**
 
-```
+```text
 B – E – F – A       (3 – 13 – ♭7 – 9)
 LH fingering: 5–3–2–1
 ```
 
 **Guitar G13, drop-2, 3rd-fret position:**
 
-```
+```text
 e |---5---|   E (13th)
 B |---5---|   F (♭7)
 G |---4---|   B (3rd)
@@ -271,7 +271,7 @@ graph TB
 
 Am7 (A–C–E–G) shares three of four notes with Cmaj7 (C–E–G–B). When the melody is sitting on C, E, or G, you can substitute Am7 for Cmaj7 without clashing — it changes the color (relative minor darkness) while keeping the melody fully consonant.
 
-```
+```text
 Original:       Cmaj7 | Dm7 | G7 | Cmaj7 |
 Reharmonized:   Am7   | Dm7 | G7 | Cmaj7 |
 ```
@@ -280,14 +280,14 @@ Reharmonized:   Am7   | Dm7 | G7 | Cmaj7 |
 
 Any diatonic chord can be preceded by its own dominant 7th a 5th above its root. To intensify the arrival at Dm7 (the ii chord), insert A7 (the V7 of Dm7) right before it:
 
-```
+```text
 Original:       Cmaj7 | Dm7 | G7 | Cmaj7 |
 Reharmonized:   Cmaj7 | A7  | Dm7 | G7 | Cmaj7 |
 ```
 
 Piano voicing for the new A7→Dm7 motion:
 
-```
+```text
 A7:    G – C♯ – E – G     (♭7 – 3 – 5 – ♭7, top note doubled for a full sound)
 Dm7:   F – A  – C – E     (voice leading: C♯→C half step, G→F whole step)
 ```
@@ -296,12 +296,12 @@ Dm7:   F – A  – C – E     (voice leading: C♯→C half step, G→F whole 
 
 The backdoor progression swaps the usual V7 for a dominant chord built on the lowered 7th degree, approaching the tonic from a different chromatic direction (a whole step above rather than a half step below):
 
-```
+```text
 Original:   Dm7 | G7         | Cmaj7 |
 Backdoor:   Dm7 | Fm7 → B♭7  | Cmaj7 |
 ```
 
-```
+```text
 Fm7:    F – A♭ – C – E♭
 B♭7:    A♭ – D – E♭ – F      (♭7 – 3 – ♯11 – 5)
 Cmaj7:  E – G – B – D        (A♭ resolves down to G; D resolves up to E)
@@ -313,7 +313,7 @@ This gives tunes like "Just Friends" and "I Got Rhythm" bridges their distinctiv
 
 Because major 3rds divide the octave into three equal parts (symmetry again), you can insert a dominant-tonic pair at each of the three points and create rapid, cyclical modulation instead of a single cadence:
 
-```
+```text
 | Cmaj7  | E7     | Amaj7  | C7     |
 | Fmaj7  | A♭7    | D♭maj7 | G7     | Cmaj7 ||
 ```
@@ -322,7 +322,7 @@ Each dominant resolves down a 4th to its own tonic (E7→Amaj7, C7→Fmaj7, A♭
 
 **Guitar — drop-2 maj7/dom7 shapes moving by major 3rds (strings 4-3-2-1):**
 
-```
+```text
 Cmaj7 (5th fret):
 e |---5---|
 B |---5---|
@@ -407,7 +407,7 @@ graph TB
 **Altered dominants sound "wrong" against the melody.**
 Cause: the melody is sitting on a natural extension (e.g. natural 9th) that your alteration contradicts.
 Fix: if the melody has A over G7, do not voice ♭9 or ♯9 underneath it. Switch to Mixolydian or Lydian Dominant, which keep the natural 9th available.
-```
+```text
 Melody note A over G7 → use G7 (Mixolydian) or G7(#11) (Lydian Dominant)
                        → avoid G7b9 / G7#9 (creates an unintended half-step clash)
 ```

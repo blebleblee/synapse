@@ -110,7 +110,7 @@ grows as $\sigma^2 n$ for some constant $\sigma^2$ depending on $f$ and the mixi
 
 The spectral analysis of the Koopman operator $U_T: L^2(M, \mu) \to L^2(M, \mu)$ provides a functional-analytic framework for ergodic theory. For mixing systems, the spectrum of $U_T$ consists of the simple eigenvalue $1$ (corresponding to constant functions) together with a continuous spectrum contained in the open unit disk. The rate of mixing is governed by the spectral gap $\gamma = 1 - \sup\{|\lambda| : \lambda \in \sigma(U_T), \lambda \ne 1\}$. For Anosov diffeomorphisms, the Ruelle-Perron-Frobenius theorem establishes that the transfer operator acting on appropriate Banach spaces of distributions has a spectral gap, yielding exponential mixing with explicit rates.
 
-```
+```text
 Phase Space Architecture for Hyperbolic Systems
 
     Manifold M with Riemannian metric

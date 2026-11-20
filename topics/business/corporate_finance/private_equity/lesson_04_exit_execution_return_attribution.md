@@ -33,7 +33,7 @@ Multiple arbitrage dynamics arise from the difference between entry and exit val
 
 MOIC and IRR decomposition begins with the relationship between these two return metrics, where MOIC measures absolute cash-on-cash returns without regard to timing and IRR incorporates the time value of money by solving for the discount rate that equates the present value of distributions to the initial equity investment. For a given MOIC, the IRR increases with shorter hold periods because the same absolute return is achieved more quickly, creating more time for reinvestment at the target return threshold. This relationship creates tension between maximizing MOIC by holding assets longer to capture additional growth versus maximizing IRR by exiting earlier to recycle capital into new investments. The mathematical decomposition expresses total MOIC as the product of three multiplicative factors:
 
-```
+```text
 MOIC_total = (EBITDA_exit / EBITDA_entry) × (Multiple_exit / Multiple_entry) × (1 + Leverage_effect)
 ```
 
@@ -41,7 +41,7 @@ The EBITDA growth ratio captures operational value creation from revenue expansi
 
 Portfolio-level diversification strategies balance concentration risk, capital efficiency, and GP bandwidth constraints. Industry diversification protects against sector-specific downturns by ensuring that a cyclical downturn in one vertical does not impair the entire portfolio simultaneously. Geographic diversification mitigates exposure to regional economic shocks, regulatory changes, or currency fluctuations, particularly for funds investing across multiple countries or continents. Stage diversification, where the fund holds a mix of early-stage high-growth companies and mature cash-flowing businesses, smooths return distributions over time and provides natural liquidity from the mature assets to fund operating losses or growth capital needs in earlier-stage investments. However, excessive diversification reduces the GP's ability to add operational value because domain expertise and playbook transferability diminish as the portfolio spans too many disparate business models. Leading private equity firms typically concentrate in two to four core industry verticals, developing deep expertise in regulatory dynamics, customer buying behavior, technology trends, and operational best practices that can be applied systematically across portfolio companies in the same sector.
 
-```
+```text
 Portfolio Construction Framework
 ═══════════════════════════════════════════════════════════════
 

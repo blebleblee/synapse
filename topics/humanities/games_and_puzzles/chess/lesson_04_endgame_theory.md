@@ -58,7 +58,7 @@ The critical insight is that connected pawns create mutual support: each pawn gu
 
 This technique requires calculating the race: can the defending king capture the outside passed pawn and return in time to stop the attacking king's invasion? The calculation accounts for king travel distance (how many moves to reach and capture the passed pawn), the attacking king's invasion route (how many moves to penetrate the pawn structure), and whether the resulting position after the defending king returns allows a successful defense. Experienced players develop intuition for these races, estimating outcomes through tempo-counting rather than exhaustive calculation.
 
-```
+```text
 Outside Passed Pawn Example:
 White: Kd4, pawns a5, f3, g4, h3
 Black: Kf6, pawns a7, f7, g6, h7

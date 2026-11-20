@@ -70,7 +70,7 @@ This hybrid architecture exploits the different failure modes of longest-chain a
 
 The mathematical model for hybrid consensus protocols views them as composition of two state machines: a proposal machine that extends the chain optimistically, and a finalization machine that checkpoints agreed-upon prefixes. The proposal machine operates under weak synchrony assumptions—it remains live even under asynchrony but may produce temporary forks. The finalization machine operates under stronger synchrony and honesty assumptions—it provides safety guarantees only when the network is synchronous and fewer than 1/3 of validators are Byzantine. By layering these machines, the protocol achieves a security profile that matches the stronger machine's guarantees when its assumptions hold, while falling back to the weaker machine's guarantees when assumptions are violated.
 
-```
+```text
 DAG Block Structure:
 
 Block B_i = {

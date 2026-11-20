@@ -30,7 +30,7 @@ Velocity integration advances the simulation forward one timestep by adding acce
 
 Collision detection proceeds through the two-phase hierarchy. The broad phase maintains a dynamic bounding volume hierarchy (BVH)—a binary tree where each node stores an axis-aligned bounding box enclosing its child nodes' geometry. Tree traversal quickly identifies potentially colliding pairs by testing AABB overlaps, a cheap operation requiring only six scalar comparisons per box pair. Only pairs passing this filter proceed to narrow-phase testing. For convex hulls, the GJK algorithm iteratively constructs a simplex (point, line, triangle, or tetrahedron) in Minkowski difference space—the set of all difference vectors between points on hull A and points on hull B. If this difference set contains the origin, the hulls overlap; otherwise, GJK computes the minimum separating distance. Concave meshes require pre-decomposition into convex pieces or exhaustive triangle-pair testing, making collision cost super-linear in triangle count.
 
-```
+```text
 BVH Traversal Pseudocode:
 
 function detectCollisions(nodeA, nodeB):
@@ -93,7 +93,7 @@ Soft body constraints in 3ds Max's Cloth and Skin modifiers implement position-b
 
 The fundamental cloth constraint is the distance preservation constraint between connected vertices. For each edge connecting vertices i and j, the constraint computes the current distance, compares it to the rest length, and moves both vertices along the connecting vector to restore the rest length. The position adjustment magnitude depends on the stiffness parameter k (0 to 1): zero stiffness makes no adjustment (infinitely stretchy), while unity stiffness fully corrects the distance in one iteration (infinitely stiff). This direct position manipulation avoids the numerical instability issues plaguing force-based spring systems, enabling larger timesteps and more robust simulations at the cost of less physically accurate energy conservation.
 
-```
+```text
 Distance Constraint Projection:
 
 function satisfyDistanceConstraint(v_i, v_j, restLength, stiffness):
@@ -164,7 +164,7 @@ fn batchSimulateAndExport sceneFiles outputDir =
 
 Alembic file structure organizes geometric data hierarchically as a scene graph of transform nodes (Xform) and polymesh nodes (PolyMesh). Each polymesh stores point positions as a time-varying array—one position vector per vertex per frame—along with topology data (face vertex indices) that typically remains static across frames. This separation allows efficient storage: topology encodes once, while positions write per-frame. Subdivision surface schemes can be tagged on meshes to indicate the geometry represents a control cage for Catmull-Clark subdivision, deferring high-resolution tessellation to the rendering engine. This strategy drastically reduces cache file sizes: a subdivided mesh with 100,000 final triangles might cache only 6,000 control vertices.
 
-```
+```text
 Alembic Scene Graph Structure:
 
 /root

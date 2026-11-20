@@ -32,7 +32,7 @@ The calculation of goodwill proceeds as follows. The fair value of identifiable 
 
 The acquisition date consolidation elimination entries are structured as follows. Entry one eliminates the investment account against SubCo's equity accounts and establishes the fair-value adjustments and goodwill. The debit side of the entry increases inventory by five million dollars, increases fixed assets by twenty million dollars, records intangible assets of thirty million dollars, and records goodwill of fifteen million dollars. The credit side eliminates the investment account carried on ParentCo's balance sheet (one hundred fifty million dollars) and eliminates SubCo's equity accounts (common stock of ten million dollars, additional paid-in capital of twenty million dollars, and retained earnings of fifty million dollars). The entry is:
 
-```
+```text
 Debit: Inventory                       5,000,000
 Debit: Fixed Assets                   20,000,000
 Debit: Intangible Assets              30,000,000
@@ -51,7 +51,7 @@ The consolidation elimination entry at December 31 must accomplish three objecti
 
 The elimination entry structure shifts to reflect the changed balances:
 
-```
+```text
 Debit: Common Stock (SubCo)           10,000,000
 Debit: Additional Paid-In Capital     20,000,000
 Debit: Retained Earnings (SubCo)      58,000,000
@@ -63,7 +63,7 @@ Credit: Investment in SubCo          148,000,000
 
 The consolidated income statement must eliminate the equity method income recorded by ParentCo (twelve million dollars) and replace it with SubCo's individual revenues and expenses. Additionally, the consolidation must recognize the amortization of fair-value adjustments (five million dollars), which reduces consolidated net income. The elimination entries on the income statement are:
 
-```
+```text
 Debit: Equity Method Income           12,000,000
 Credit: SubCo Revenues                (included in consolidation)
 Credit: SubCo Expenses                (included in consolidation)
@@ -78,14 +78,14 @@ Intercompany transaction elimination introduces a second layer of adjustments. A
 
 The intercompany sale elimination removes the revenue and cost of goods sold associated with the intercompany transaction:
 
-```
+```text
 Debit: Intercompany Revenue (ParentCo)  20,000,000
 Credit: Intercompany COGS (SubCo)       20,000,000
 ```
 
 This entry eliminates twenty million dollars of revenue and twenty million dollars of cost of goods sold, leaving no net impact on consolidated gross profit for the portion sold externally. However, SubCo's ending inventory includes four million dollars of inventory purchased from ParentCo at a transfer price that includes a one-million-dollar markup (twenty-five percent gross margin on the twenty-million-dollar sale). The unrealized profit in ending inventory must be eliminated:
 
-```
+```text
 Debit: Cost of Goods Sold               1,000,000
 Credit: Inventory                       1,000,000
 ```
@@ -94,7 +94,7 @@ This entry increases consolidated cost of goods sold by one million dollars and 
 
 Intercompany loans and interest elimination follows a similar pattern. Assume ParentCo loaned ten million dollars to SubCo at a six percent annual interest rate. SubCo accrued and paid six hundred thousand dollars of interest expense during the year, which ParentCo recorded as interest income. The consolidation must eliminate both the intercompany loan balance and the intercompany interest:
 
-```
+```text
 Debit: Notes Payable (SubCo)          10,000,000
 Credit: Notes Receivable (ParentCo)   10,000,000
 
@@ -106,14 +106,14 @@ These entries remove the intercompany loan from the consolidated balance sheet a
 
 Dividend elimination is straightforward. SubCo paid four million dollars in dividends to ParentCo during the year. ParentCo recorded the dividends as a reduction in the investment account under the equity method. SubCo recorded the dividends as a reduction in retained earnings. The consolidation elimination is implicit in the investment elimination entry, as the investment account balance already reflects the dividend reduction. No separate dividend elimination entry is required when the parent uses the equity method, because the equity method automatically eliminates the dividend through the investment account adjustment. If the parent used the cost method (rare in practice), a separate entry would be required:
 
-```
+```text
 Debit: Dividend Income (ParentCo)      4,000,000
 Credit: Dividends Declared (SubCo)     4,000,000
 ```
 
 Noncontrolling interest introduces allocation mechanics. Assume ParentCo owns eighty percent of SubCo, with the remaining twenty percent owned by outside investors. The consolidation still includes one hundred percent of SubCo's assets, liabilities, revenues, and expenses, but must allocate twenty percent of SubCo's equity and net income to the noncontrolling interest. At the acquisition date, if the fair value of SubCo's identifiable net assets is one hundred thirty-five million dollars and ParentCo paid one hundred twenty million dollars for eighty percent (implying a one hundred-fifty-million-dollar enterprise value), the noncontrolling interest is initially recorded at thirty million dollars (twenty percent of one hundred fifty million dollars). The acquisition date elimination entry becomes:
 
-```
+```text
 Debit: Inventory                       5,000,000
 Debit: Fixed Assets                   20,000,000
 Debit: Intangible Assets              30,000,000

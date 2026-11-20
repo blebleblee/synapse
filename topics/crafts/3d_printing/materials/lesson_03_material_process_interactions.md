@@ -31,7 +31,7 @@ The melt zone geometry is critical. A typical all-metal hot end has a melt zone 
 
 The pressure required to extrude the polymer is a function of the melt viscosity and the nozzle geometry. For a circular nozzle orifice, the volumetric flow rate $Q$ is related to the pressure drop $\Delta P$ by the Hagen-Poiseuille equation, modified for non-Newtonian (shear-thinning) polymer behavior:
 
-```
+```text
 Q = (π R⁴ ΔP) / (8 η L)
 ```
 
@@ -41,7 +41,7 @@ The extruder motor torque must overcome this pressure resistance. A direct-drive
 
 The solidification process on the build platform is governed by transient heat conduction. When a molten bead at temperature $T_{\text{nozzle}}$ contacts a substrate at temperature $T_{\text{bed}}$, the initial heat flux is determined by the thermal contact conductance, which depends on surface roughness and the polymer's thermal conductivity (typically 0.1–0.3 W/m·K for common thermoplastics). The cooling rate can be approximated by:
 
-```
+```text
 dT/dt = -h A (T - T_ambient) / (m c_p)
 ```
 
@@ -51,7 +51,7 @@ The part cooling fan introduces convective heat transfer, dramatically accelerat
 
 Warping arises from the combination of anisotropic thermal contraction and geometric constraints. Consider a rectangular base layer firmly adhered to a heated bed. As subsequent layers are deposited and cool, they contract, pulling inward on the base. The corners, being farthest from the center, experience the highest bending moment and are the first to lift. The lifting force $F$ is proportional to the integral of the thermal stress over the cross-section:
 
-```
+```text
 F ≈ E α ΔT A
 ```
 
@@ -61,7 +61,7 @@ Mitigation strategies include increasing bed temperature (reducing $\Delta T$), 
 
 Layer adhesion at the molecular scale is a time-temperature-dependent diffusion process. The reptation model of polymer dynamics describes how long-chain molecules disentangle and re-entangle across an interface. The characteristic time for a polymer chain to diffuse a distance equal to its radius of gyration is:
 
-```
+```text
 τ_rep ≈ (N³ b² ζ) / (k_B T)
 ```
 

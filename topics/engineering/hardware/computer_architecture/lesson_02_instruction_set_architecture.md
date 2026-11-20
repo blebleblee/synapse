@@ -26,7 +26,7 @@ Every instruction begins as a sequence of bits arriving from the instruction cac
 
 The format of an instruction word is therefore a critical engineering lever. RISC architectures like MIPS, SPARC, and ARM typically use a fixed 32-bit format (or alternatively, a variable-length encoding where instructions are 32-bit or 16-bit). Within that fixed width, they partition bits into opcode, source registers, destination register, and immediate fields. For example, a MIPS R-format (register) instruction allocates 6 bits for opcode, 5 bits each for two source registers, 5 bits for a destination register, 5 bits for a shift amount, and 6 bits for a function code:
 
-```
+```text
 Bits [31:26] : Opcode (6 bits)
 Bits [25:21] : RS (Source register 1)
 Bits [20:16] : RT (Source register 2)
@@ -115,7 +115,7 @@ The ISA defines the data dependencies between instructions: if instruction A wri
 
 Consider a sequence like:
 
-```
+```text
 add r1, r2, r3       ; r1 = r2 + r3
 add r4, r1, r5       ; r4 = r1 + r5 (depends on r1)
 mul r6, r7, r8       ; r6 = r7 * r8 (independent)
@@ -126,7 +126,7 @@ In sequential execution, these instructions take 4 cycles (assuming each complet
 
 However, memory operations create a subtle complication. Consider:
 
-```
+```text
 load r1, [r2]         ; r1 = *r2 (read from memory)
 add r3, r1, r4        ; r3 = r1 + r4 (depends on load result)
 store r3, [r5]        ; *r5 = r3
@@ -138,7 +138,7 @@ The ISA's addressing mode choices influence how effectively the processor can pa
 
 For example, a loop like:
 
-```
+```text
 loop:
   mov rax, [rbx + rcx*8]    ; load array[i]
   add rax, rdx
@@ -150,7 +150,7 @@ loop:
 
 The second store address depends on rcx, which is only known after the `add rcx, 1` completes. The processor must stall or speculate about the store address, potentially misspeculating and requiring recovery. A simpler ISA might use explicit address registers:
 
-```
+```text
 loop:
   mov rax, [rsi]           ; load from [rsi]
   add rax, rdx

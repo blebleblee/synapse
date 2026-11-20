@@ -42,7 +42,7 @@ The cooling rate from extrusion temperature to room temperature determines the f
 
 The mechanical load-bearing architecture of an FDM part is fundamentally anisotropic due to the layer-by-layer deposition process. Tensile strength in the print direction (parallel to deposited beads within a layer) can approach 80–90% of injection-molded strength because continuous polymer chains run the length of the extrusion path, resisting load through chain backbone covalent bonds. Tensile strength perpendicular to layers (the Z-direction) is typically only 30–50% of in-plane strength because load is carried across layer interfaces by chain entanglements and van der Waals forces rather than covalent bonds. This anisotropy demands part orientation awareness during print planning: loading axes should align with in-plane directions whenever possible, and stress concentrations should be positioned away from layer interfaces.
 
-```
+```text
 Material Thermal Property Reference Table:
 ┌────────────┬─────────┬─────────┬─────────────┬───────────────────┐
 │  Material  │ Tg (°C) │ Tm (°C) │ Print Temp  │ Bed Temp (°C)     │

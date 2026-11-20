@@ -20,7 +20,7 @@ Consider the baseline DSP slice on a modern Xilinx UltraScale+ device. Each slic
 
 The arithmetic-pipeline structure looks like this:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │  Cycle N: Input Registers (AREG, BREG, DREG, CREG)         │
 │  A[26:0] ──┐                                               │
@@ -93,7 +93,7 @@ A PCIe hard IP block, found on high-end Xilinx UltraScale+ and similar devices, 
 
 The architecture of a PCIe Gen3 x4 interface (four lanes, 8 Gbps each, 32 Gbps aggregate bandwidth) looks conceptually like this:
 
-```
+```text
 ┌──────────────────────────────────┐
 │  PCIe Hard IP Block              │
 │  ┌────────────────────────────┐  │
@@ -186,7 +186,7 @@ The fundamental design decision in FPGA architecture is whether the application 
 
 The architecture for a dataflow system is a **directed acyclic graph (DAG)** of computation stages:
 
-```
+```text
 Input Stream → [Stage 0] → [Stage 1] → [Stage 2] → [Stage 3] → Output Stream
 (LUT filter)   (DSP mult)   (BRAM accu)  (DSP div)
    Latency = 4 cycles

@@ -22,7 +22,7 @@ The invariant that ties all three axes together is this: **the correct grain siz
 
 Translating the three taxonomic axes into a physical storage architecture requires a layered model that moves from the coarsest organizational unit to the finest. Think of this as a containment hierarchy: the **zone**, the **drawer or bin**, and the **cell or compartment**. Each layer handles a different level of the classification tree, and the mapping between taxonomy and physical layer is not arbitrary — it is dictated by the volumetric and retrieval characteristics of the elements themselves.
 
-```
+```text
 Classification Hierarchy → Physical Storage Mapping
 
 COLLECTION

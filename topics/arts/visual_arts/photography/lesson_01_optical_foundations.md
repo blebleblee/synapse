@@ -16,7 +16,7 @@ Understanding optical foundations means learning to predict and control this tra
 
 A camera is an optical instrument composed of discrete functional stages. Light from a subject enters the lens assembly, travels through the iris (aperture), passes through the interior of the camera body, and finally strikes the sensor. Each stage filters or transforms the light field.
 
-```
+```text
 Scene (3D) → Lens Element 1 → Lens Element 2 → ... → Lens Element N
         ↓
     [Refraction & Convergence]

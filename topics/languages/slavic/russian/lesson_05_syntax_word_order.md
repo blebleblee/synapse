@@ -18,7 +18,7 @@ Understanding free word order in Russian thus requires tracking three simultaneo
 
 The clausal architecture of Russian exemplifies a split-IP structure, where the traditional Inflectional Phrase decomposes into multiple functional projections, each hosting specific grammatical features. At the foundational level, we begin with the Verb Phrase (VP), which contains the lexical verb and its complement structure. For a transitive verb like *читать* (to read), the VP contains the verb and its theme argument (the direct object) in complement position. The external argument (the agent subject) is introduced in a higher functional projection, typically analyzed as Voice Phrase (VoiceP) in contemporary frameworks, positioned immediately above VP. The Voice head assigns the external theta-role and structural accusative case to the object in its complement domain.
 
-```
+```text
       VoiceP
      /      \
    DP        Voice'
@@ -31,7 +31,7 @@ The clausal architecture of Russian exemplifies a split-IP structure, where the 
 
 Above VoiceP sits the TP (Tense Phrase), which hosts temporal features. In Russian, tense morphology is relatively impoverished compared to Romance languages—essentially a three-way distinction between past, present, and future, with future often analytically formed using the perfective aspect or the auxiliary *быть*. The T head attracts the verb to adjoin to it, yielding the surface position of finite verbs. The nominative subject raises from [Spec,VoiceP] to [Spec,TP] to satisfy the Extended Projection Principle (EPP), which requires that [Spec,TP] be filled in finite clauses. This movement also establishes the Agree relationship between the subject's phi-features (person, number, gender in past tense) and the finite T head, which values its uninterpretable phi-features through this syntactic dependency.
 
-```
+```text
            TP
           /  \
         DP    T'
@@ -46,7 +46,7 @@ The highest layer of the clause proper is the CP (Complementizer Phrase), which 
 
 Critically, between TP and CP lie the discourse-functional projections that mediate information structure. The Topic Phrase (TopP) hosts discourse-old information—referents already established in the discourse context or recoverable from shared knowledge. The specifier position [Spec,TopP] is a landing site for topicalized constituents, which move from their base positions to this high structural position. Topicalization in Russian typically involves fronting a constituent to clause-initial position with a characteristic "aboutness" interpretation: the clause predicates some information about the topic. For instance, in *Книгу студент прочитал* (book.ACC student.NOM read), the accusative object *книгу* has moved to [Spec,TopP], marking it as the discourse anchor—perhaps answering the implicit question "What about the book?" or signaling that the book was mentioned in prior discourse.
 
-```
+```text
            TopP
           /    \
         DP      Top'

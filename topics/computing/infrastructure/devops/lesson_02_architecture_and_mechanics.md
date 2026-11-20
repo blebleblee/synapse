@@ -167,7 +167,7 @@ Modern processors implement a multi-level memory hierarchy to bridge the speed g
 
 Virtual memory decouples logical addresses (used by programs) from physical addresses (actual RAM locations). The Memory Management Unit (MMU) translates virtual addresses to physical addresses using multi-level page tables. On x86-64 with 4KB pages, a 48-bit virtual address decomposes into five fields:
 
-```
+```text
 | PML4 index (9 bits) | PDP index (9 bits) | PD index (9 bits) | PT index (9 bits) | Offset (12 bits) |
 ```
 

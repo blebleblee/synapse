@@ -24,7 +24,7 @@ The transformer pipeline architecture in scikit-learn decomposes preprocessing i
 
 The execution model for a standard preprocessing workflow begins with raw data in a NumPy array or Pandas DataFrame `X` of shape (n_samples, n_features). For supervised learning tasks, a label array `y` of shape (n_samples,) accompanies the feature matrix. During training, the pipeline executes:
 
-```
+```text
 StandardScaler.fit(X_train, y_train):
     self.mean_ = np.mean(X_train, axis=0)
     self.scale_ = np.std(X_train, axis=0)
@@ -38,7 +38,7 @@ The learned parameters `mean_` and `scale_` persist in the transformer instance,
 
 The `Pipeline` class orchestrates sequences of transformers terminated by a final estimator. Internally, a pipeline stores an ordered list of (name, transformer) tuples and implements the estimator interface itself. When `Pipeline.fit(X, y)` executes, it iterates through transformers, calling `fit_transform()` on each and passing the output to the next stage, until reaching the final estimator which receives `fit()`. The transformation chain computes:
 
-```
+```text
 X1 = transformer1.fit_transform(X, y)
 X2 = transformer2.fit_transform(X1, y)
 X3 = transformer3.fit_transform(X2, y)
@@ -91,13 +91,13 @@ This composition pattern enables modular, maintainable preprocessing graphs wher
 
 Scaling transformations address the problem of heterogeneous feature magnitudes through normalization and standardization. The `StandardScaler` applies z-score normalization, transforming each feature to zero mean and unit variance:
 
-```
+```text
 X_scaled = (X - μ) / σ
 ```
 
 where μ and σ are computed per-feature across training samples. This transformation assumes features follow approximately Gaussian distributions; heavy-tailed or skewed distributions may yield outliers with extreme z-scores that dominate distance-based algorithms. The `RobustScaler` addresses this by using median and interquartile range instead of mean and standard deviation:
 
-```
+```text
 X_robust = (X - median(X)) / IQR(X)
 ```
 
@@ -105,7 +105,7 @@ This statistic-based approach reduces sensitivity to outliers but sacrifices exa
 
 The `MinMaxScaler` applies affine transformations to bound features within a specified range, typically [0, 1]:
 
-```
+```text
 X_minmax = (X - X_min) / (X_max - X_min)
 ```
 
@@ -113,7 +113,7 @@ This preserves the original distribution shape while ensuring bounded outputs su
 
 The `MaxAbsScaler` divides each feature by its maximum absolute value, producing values in [-1, 1] without shifting the center:
 
-```
+```text
 X_maxabs = X / max(|X|)
 ```
 
@@ -121,7 +121,7 @@ This transformation preserves sparsity—zero entries remain zero—making it su
 
 Categorical encoding strategies transform discrete labels into numerical representations consumable by learning algorithms. The `OrdinalEncoder` maps each category to an integer, preserving a single column per feature but introducing an artificial ordering:
 
-```
+```json
 ["red", "blue", "green"] → [0, 1, 2]
 ```
 
@@ -129,7 +129,7 @@ This encoding is appropriate for ordinal variables (education level, rating scal
 
 The `OneHotEncoder` creates binary indicator columns for each category, expanding a single feature with k unique values into k or k-1 binary columns:
 
-```
+```json
 ["red", "blue", "green", "red"] →
 [[1, 0, 0],
  [0, 1, 0],
@@ -161,7 +161,7 @@ These strategies compute independent statistics per column, ignoring correlation
 
 The `KNNImputer` leverages multivariate structure by finding k-nearest neighbors for each sample with missing values, measuring distance using available features. For each missing entry, it computes a weighted average of neighbor values:
 
-```
+```text
 X[i, j] is missing
 neighbors = k_nearest(X[i, :], metric='euclidean', exclude_missing=True)
 X[i, j] ← weighted_mean(neighbors[:, j], weights=distances)
@@ -171,7 +171,7 @@ This approach captures local dependencies and produces more accurate imputations
 
 The `IterativeImputer` implements MICE by modeling each feature with missing values as a function of others, iteratively refining predictions:
 
-```
+```text
 Initialize: fill missing with mean/median
 Repeat for max_iter epochs:
     For each feature j with missing values:
@@ -185,7 +185,7 @@ This iterative refinement converges to a fixed point where each feature's imputa
 
 Feature extraction transformers construct derived representations from raw inputs, exposing latent structure to learning algorithms. The `PolynomialFeatures` transformer generates interaction terms and polynomial expansions:
 
-```
+```text
 X = [[a, b]]
 PolynomialFeatures(degree=2, include_bias=True)
   → [[1, a, b, a², ab, b²]]
@@ -193,7 +193,7 @@ PolynomialFeatures(degree=2, include_bias=True)
 
 This transformation enables linear models to fit nonlinear decision boundaries by explicitly constructing basis functions. The number of output features grows combinatorially with degree and input dimensionality:
 
-```
+```text
 n_output = (n_input + degree)! / (n_input! × degree!)
 ```
 
@@ -217,13 +217,13 @@ The critical failure mode is inadvertently densifying sparse data through transf
 
 Categorical encoding for high-cardinality variables introduces another scaling challenge: a feature with millions of unique values (user IDs, IP addresses, product SKUs) produces an intractably high-dimensional one-hot encoding. Target encoding addresses this by replacing categories with aggregate statistics of the target variable:
 
-```
+```text
 category_map[c] = mean(y | X[:, j] == c)
 ```
 
 This compression maintains a single numerical column while incorporating supervised information. However, target encoding risks severe overfitting and requires careful cross-validated computation: encoding training samples using statistics computed on the same samples introduces direct label leakage, artificially inflating validation performance. The correct procedure computes target statistics on out-of-fold samples during cross-validation, or uses additive smoothing with global priors:
 
-```
+```text
 encoded[c] = (n[c] × mean[c] + α × global_mean) / (n[c] + α)
 ```
 

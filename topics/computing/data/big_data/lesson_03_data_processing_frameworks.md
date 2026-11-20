@@ -66,7 +66,7 @@ The DAG Scheduler cuts the RDD dependency graph into *stages* at *wide dependenc
 
 **The Catalyst Optimizer (Spark SQL).** When the user employs the DataFrame or Dataset API, queries are compiled through the Catalyst optimizer, a functional rule-based query planner implemented in Scala using algebraic data types (ADTs). The pipeline is:
 
-```
+```text
 Unresolved Logical Plan
     → Analysis (resolve attributes via catalog)
     → Logical Optimization (predicate pushdown, constant folding, column pruning)

@@ -66,7 +66,7 @@ The dynamics of coupled rigid bodies—such as double pendulums, linked gyroscop
 
 Practical measurement of inertia tensors for complex objects employs torsional pendulum techniques. Suspending the body from a wire and measuring the oscillation period $T$ for small-amplitude rotations about the suspension axis yields the moment of inertia through $I = \frac{\kappa T^2}{4\pi^2}$, where $\kappa$ is the torsional spring constant determined by calibration. Repeating measurements for different suspension orientations maps out the full inertia tensor. Modern techniques augment this approach with 3D scanning to compute inertia properties directly from CAD models, validating against experimental measurements for quality assurance.
 
-```
+```text
 Inertia Tensor Architecture (Body-Fixed Principal Axis Frame)
 
       ω₃ (spin axis, I₃)

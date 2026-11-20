@@ -24,7 +24,7 @@ The write path is where copy-on-write semantics enter. If a process inside a con
 
 When the container runtime creates a container from an image with four layers, it assembles those layers into an OverlayFS mount with a precisely defined directory layout. The runtime creates a working directory on the host's backing filesystem, allocates an upper directory for the container's writable layer, and passes all four image layers as a colon-separated `lowerdir` argument to the mount syscall.
 
-```
+```text
 mount -t overlay overlay \
   -o lowerdir=/var/lib/docker/overlay2/L4:L3:L2:L1,\
      upperdir=/var/lib/docker/overlay2/<container-id>/diff,\
@@ -36,7 +36,7 @@ The `workdir` is an internal OverlayFS requirement for atomic rename and copy-up
 
 The directory hierarchy Docker's overlay2 storage driver maintains on the host looks like this:
 
-```
+```text
 /var/lib/docker/overlay2/
 ├── <layer-sha256-A>/
 │   ├── diff/            ← filesystem delta for layer A
@@ -128,7 +128,7 @@ The **Image Config** is a JSON document that is not a filesystem layer at all. I
 
 The relationship among these three documents can be visualized as follows:
 
-```
+```text
 Registry Tag Reference (ubuntu:22.04)
         │
         ▼

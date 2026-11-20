@@ -162,7 +162,7 @@ The standard contour strategies are organized by the form of the integrand:
 
 For rational functions $\int_{-\infty}^{\infty} R(x) \, dx$ where $R(z)$ decays like $1/z^2$ or faster, the **semicircular contour** in the upper half-plane closes the integral. For integrands of the form $R(x) e^{i\lambda x}$ or $R(x) \cos\lambda x$, Jordan's lemma justifies the same closure. For integrands involving $\log z$ or $z^\alpha$ with $\alpha \notin \mathbb{Z}$, the **keyhole contour** wraps around the branch cut on the positive real axis. For integrands of the form $R(\cos\theta, \sin\theta)$ over $[0, 2\pi]$, the **unit circle parametrization** $z = e^{i\theta}$ converts the problem to a contour integral around the unit circle.
 
-```
+```text
 SEMICIRCULAR CONTOUR                 KEYHOLE CONTOUR
 
          Im(z)                              Im(z)

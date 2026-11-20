@@ -22,7 +22,7 @@ This architecture is not merely a record-keeping system; it is an information co
 
 The balance sheet is structured as a two-sided ledger, with assets on the left and liabilities plus equity on the right, though modern financial reporting often presents it in vertical format with assets listed first, followed by liabilities, and finally equity. Assets are ordered by liquidity—the speed with which they can be converted to cash without significant loss of value. Current assets, those expected to be realized within one operating cycle or one year, appear first: cash and cash equivalents, marketable securities, accounts receivable, inventory, and prepaid expenses. Non-current assets follow: property, plant, and equipment (net of accumulated depreciation), intangible assets including goodwill, long-term investments, and deferred tax assets.
 
-```
+```text
 BALANCE SHEET STRUCTURE (Vertical Format)
 
 ASSETS
@@ -76,7 +76,7 @@ Equity represents the residual claim, the buffer that absorbs asset volatility. 
 
 The income statement operates on a different architectural principle. It begins with revenue—the top line—and subtracts various expense categories in a waterfall structure that progressively refines the profitability measure. Revenue recognition under modern standards follows a five-step model: identify the contract, identify performance obligations, determine the transaction price, allocate price to performance obligations, and recognize revenue as obligations are satisfied. This framework ensures revenue is recognized only when control transfers to the customer, not merely when cash changes hands.
 
-```
+```text
 INCOME STATEMENT STRUCTURE (Multi-Step Format)
 
 Revenue (Net Sales)

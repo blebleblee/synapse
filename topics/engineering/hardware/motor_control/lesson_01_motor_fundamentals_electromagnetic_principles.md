@@ -26,7 +26,7 @@ The electrical circuit model for a brushed DC motor reveals surprisingly simple 
 
 The mechanical dynamics of motor-load systems follow from Newton's second law applied to rotational motion. The fundamental torque balance equation states τ_motor − τ_load − *B*ω = *J* (*dω*/*dt*), where *B* represents the viscous damping coefficient (combining bearing friction and aerodynamic drag) and *J* denotes the total system inertia (rotor plus coupled load). Substituting the motor's electrical-to-mechanical relationships yields a second-order differential equation coupling electrical input voltage to mechanical shaft velocity. For a step voltage input, the characteristic response exhibits either overdamped, critically damped, or underdamped behavior depending on the relative magnitudes of electrical resistance, mechanical damping, and system inertia. High-performance servo applications deliberately shape these parameters through drive electronics and mechanical design to achieve critically damped responses, settling to commanded velocities within 2–5 electrical time constants without overshoot.
 
-```
+```text
 Brushed DC Motor Equivalent Circuit:
 
     +V_supply
@@ -56,7 +56,7 @@ The relationship between mechanical rotation and electrical cycles introduces th
 
 Sensorless BLDC control techniques eliminate Hall sensors by extracting rotor position from back-EMF zero-crossing measurements on the unpowered phase. During each commutation state, one phase remains undriven and exhibits back-EMF proportional to rotor velocity. By monitoring this floating phase voltage relative to the motor's neutral point (or virtual neutral reconstructed from powered phase voltages), the controller detects the instant when back-EMF crosses zero—an event occurring 30 electrical degrees after the previous commutation. The controller then delays an additional 30 electrical degrees before executing the next commutation, maintaining proper synchronization. This technique fails at low speeds where back-EMF magnitude falls below detection thresholds, necessitating open-loop startup sequences that ramp frequency gradually until sufficient back-EMF develops for closed-loop operation.
 
-```
+```text
 BLDC Three-Phase Inverter Bridge Topology:
 
          +V_DC

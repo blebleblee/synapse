@@ -26,7 +26,7 @@ The critical architectural property of the OFA is that it executes concurrently 
 
 The frame generation data flow assembles five primary inputs. The current rendered frame $F_N$ and the previously rendered frame $F_{N-1}$ provide the visual content between which interpolation occurs. The optical flow field $V_{OF}$ from the OFA provides image-space motion independent of scene geometry. The engine motion vectors $V_{eng}$ provide per-pixel geometric displacement from the game's own transform and projection pipeline. The depth buffer $D$ provides geometric occlusion information. These inputs feed a convolutional neural network — the frame generation model — which produces a single output: the interpolated frame $F_{interp}$ at time $t_{mid} = (t_{N-1} + t_N) / 2$.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                     DLSS 3 FRAME GENERATION PIPELINE                 │
 ├─────────────────────────────────────────────────────────────────────┤

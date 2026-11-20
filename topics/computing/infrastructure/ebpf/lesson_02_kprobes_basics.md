@@ -208,7 +208,7 @@ Kprobe overhead consists of three components:
 3. **Single-step exception** (if used): Another ~100-500 cycles.
 
 **Optprobes optimization**: On x86, optprobes replace the `int3` breakpoint with a 5-byte `jmp` instruction to a detour buffer containing:
-```
+```text
 call optimized_handler
 jmp back_to_original_code
 ```

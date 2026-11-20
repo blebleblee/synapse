@@ -46,7 +46,7 @@ Vowels are characterized primarily through tongue position and lip configuration
 
 Acoustic phonetics analyzes speech as time-varying waveforms and spectrograms. The spectrogram displays frequency on the vertical axis, time horizontally, and amplitude through darkness or color intensity. Vowels exhibit clear formant structure—resonant frequency bands corresponding to vocal tract resonances. The first formant (F1) correlates inversely with tongue height: high vowels have low F1, low vowels high F1. The second formant (F2) correlates with tongue backness: front vowels exhibit high F2, back vowels low F2. Lip rounding lowers all formants, particularly F2 and F3. Consonants display characteristic spectral signatures: stop bursts appear as transient vertical spikes, fricatives as broad-band noise concentrated in frequency regions determined by place of articulation, and nasals as low-frequency energy with antiformant damping.
 
-```
+```text
 Vowel Formant Space (schematic F1-F2 plot)
 
 F2 (Hz)
@@ -100,7 +100,7 @@ This hierarchy predicts spreading domains in assimilation. When a nasal consonan
 
 Syllable structure imposes hierarchical constituent organization on segment sequences. The syllable (σ) dominates onset and rhyme constituents. The onset contains prevocalic consonants; the rhyme branches into nucleus (typically a vowel) and coda (postvocalic consonants):
 
-```
+```text
        σ
       / \
   Onset  Rhyme
@@ -132,7 +132,7 @@ Phonological rules formalize sound alternations through context-sensitive transf
 
 Autosegmental representations employ multiple parallel tiers linked by association lines, allowing one-to-many and many-to-one mappings impossible in strictly linear models. Tone melodies occupy a separate autosegmental tier from tone bearing units, spreading or delinking independently:
 
-```
+```text
 Linear model (inadequate for spreading):
       m  a  m  a
       |  |  |  |

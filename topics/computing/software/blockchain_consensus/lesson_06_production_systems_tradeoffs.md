@@ -30,7 +30,7 @@ Ethereum's Gasper consensus architecture merges two distinct protocols: Casper F
 
 The epoch state machine begins with the beacon chain randomly shuffling all active validators into committees using a RANDAO-based entropy source that cannot be biased by any single validator. Each committee is assigned to attest at a specific slot within the epoch, creating a temporal partitioning of the validator set. At the start of each slot (twelve seconds), a single validator is pseudorandomly selected as the block proposer for that slot, determined by hashing the slot number with the RANDAO reveal. The proposer's duty is threefold: aggregate execution layer transactions into a block, compute the state transition, and broadcast the resulting beacon block to the network. The remaining validators in the slot's committee wait two-thirds into the slot (eight seconds), then broadcast attestations containing their LMD-GHOST vote (the head of their view of the chain) and their FFG vote (the current and previous justified checkpoints).
 
-```
+```text
 Epoch Structure (32 slots × 12 seconds = 384 seconds)
 
 Slot 0: [Proposer A] [Committee 1 attestations @ t+8s]
@@ -54,7 +54,7 @@ Casper FFG operates on a slower timescale, finalizing epoch checkpoints rather t
 
 The proposer-builder separation (PBS) architecture, introduced through MEV-Boost, fundamentally restructures block production to mitigate MEV extraction centralization. Rather than proposers building blocks directly, they now sign a commitment to the highest-value block header from a competitive builder market. The flow works as follows: builders construct full blocks including execution payloads and MEV-optimized transaction ordering, then submit sealed bids to relays specifying the value they will pay the proposer. Relays verify the block's validity and simulate its execution, then forward the headers to proposers. The proposer selects the highest-value header, signs it, and broadcasts the signed beacon block to the network. Only after the signed block propagates do relays release the full block body to the network, ensuring the proposer cannot unbundle and steal the MEV.
 
-```
+```text
 PBS Flow (MEV-Boost):
 
 1. Searchers → Builders: MEV bundles (sandwich, arb, liquidation txs)
@@ -74,7 +74,7 @@ Polkadot's consensus separates block production from finalization through a hybr
 
 BABE assigns block production slots to validators using a verifiable random function (VRF) evaluated with each validator's private key and the epoch's randomness. Each validator privately computes whether they won the right to produce a block in the next slot by hashing their VRF output and comparing it against a threshold derived from their stake weight. If the output is below the threshold, they produce a block, sign it, and broadcast it to the network. The VRF proves that the validator legitimately won the slot without revealing which other validators won, preventing targeted denial-of-service attacks. Multiple validators can win the same slot, creating temporary forks that GRANDPA resolves.
 
-```
+```text
 BABE Slot Leadership:
 
 For each slot s and validator v with stake weight w:
@@ -95,7 +95,7 @@ GRANDPA operates independently of block production, running a multi-round voting
 
 The critical innovation is that GRANDPA finalizes chains rather than individual blocks. If validators agree on block N as the head, all blocks from genesis to N become finalized simultaneously. This enables the protocol to recover quickly from temporary forks or network partitions: when the partition heals, validators can finalize hundreds of blocks in a single GRANDPA round, catching up to the current head. The finality proof consists of the precommit signatures from two-thirds of validators, creating a compact certificate that light clients can verify without replaying the entire voting protocol.
 
-```
+```text
 GRANDPA Finalization Round:
 
 Round r with validator set V, stake S:
@@ -124,7 +124,7 @@ Solana's consensus architecture abandons traditional leader election and fork ch
 
 The PoH construction is deceptively simple: start with a random seed, then repeatedly hash the output to produce a sequence of hashes that define discrete time ticks. Each tick represents approximately four hundred nanoseconds of real-world time, calibrated to the speed of the validator's CPU. The leader for the current slot appends transactions and consensus votes to the PoH stream, hashing each event into the chain at the tick when it occurred. This creates a canonical ordering where the PoH hash proves that transaction A happened before transaction B without requiring validators to synchronize clocks or exchange messages.
 
-```
+```text
 Proof of History Chain:
 
 Tick 0:  H_0 = SHA256(seed)
@@ -141,7 +141,7 @@ Transaction ordering proven by hash chain: tx_a < tx_b
 
 Leader scheduling in Solana uses a deterministic stake-weighted round-robin where the validator set is sorted by stake, then each validator is assigned slots proportional to their stake weight. The current leader is responsible for generating the PoH chain, executing transactions, and producing blocks. Other validators receive the leader's blocks, verify the PoH chain (checking that the hashes are correct and required enough sequential computation), re-execute all transactions to confirm the state transition, then broadcast their votes back to the leader. Votes are themselves transactions that get included in the PoH stream, creating a recursive structure where consensus on block N is recorded in block N+k.
 
-```
+```text
 Solana Block Production:
 
 Leader epoch: 4 slots (1.6 seconds)
@@ -171,7 +171,7 @@ The parallel execution engine (Sealevel) exploits PoH's transaction ordering to 
 
 Solana's fork choice mechanism differs radically from GHOST-based protocols. Rather than following the heaviest chain, validators follow the chain with the most recent supermajority vote. Each validator maintains a voting tower where each vote commits to a specific fork at a specific slot. Switching forks requires unwinding the tower, which exponentially increases the lockout period before the validator can vote again. This creates an economic incentive to stay on the majority fork: validators who switch to minority forks fall behind in earning rewards while their stake remains locked. The lockout doubling schedule means that after voting on a fork for thirty-two slots, a validator must wait thirty-two slots before voting for a conflicting fork at the same depth, making deep reorgs exponentially expensive.
 
-```
+```text
 Voting Tower Lockout:
 
 Vote at slot N for fork F:
@@ -201,7 +201,7 @@ Ethereum's primary performance bottleneck is sequential execution. Each block mu
 
 The interaction between block propagation and fork choice creates subtle performance degradation under load. When blocks take longer than four seconds to propagate across the validator network, late-arriving validators miss the attestation deadline at eight seconds, reducing the attestation participation rate. Lower participation reduces the weight of the canonical chain, making it easier for adversaries to cause temporary reorgs by withholding attestations strategically. The protocol includes a mechanism called proposer boost that gives the most recent block a fixed weight advantage (roughly twenty-five percent of committee size) to mitigate this, but under sustained high latency, participation can drop below eighty percent, increasing reorg frequency.
 
-```
+```text
 Block Propagation Performance:
 
 Target: <1s for 90% of validators to receive block
@@ -227,7 +227,7 @@ Polkadot's performance characteristics reflect its parachain-oriented architectu
 
 The availability and validity protocol (AnV) represents Polkadot's most sophisticated engineering challenge. When a parachain collator submits a block to the relay chain, the assigned validation group must not only verify the state transition but also ensure the block data remains available even if the collator goes offline. This requires distributing erasure-coded chunks of the block across all relay chain validators, with each validator storing one chunk. If a fisherman (a third-party auditor) later challenges the block's validity, the relay chain can reconstruct the full block from any one-third of chunks to adjudicate the dispute. The erasure coding and distribution impose significant network overhead: a one-megabyte parachain block generates approximately thirty megabytes of erasure-coded data that must propagate across a thousand validators.
 
-```
+```text
 Availability and Validity Flow:
 
 1. Collator produces parachain block (PoV: Proof of Validity)
@@ -253,7 +253,7 @@ Solana's performance envelope pushes hardest against the decentralization-throug
 
 The Proof of History mechanism's dependency on sequential computation creates a single point of failure in block production. If the current leader's PoH generation thread crashes or falls behind due to CPU contention, the entire network stalls until the leader's slot expires and leadership rotates to the next validator. This has caused multiple multi-hour outages in Solana's history, most notably the September 2021 incident where a sudden transaction flood overwhelmed validators' memory pools, causing validators to fall out of consensus as they diverged on which transactions to include. The network remained halted for seventeen hours while validators manually coordinated a restart from a common snapshot.
 
-```
+```text
 Solana Outage Anatomy (September 2021):
 
 T+0:00: Bot spam floods network (400k tx/s, 4× capacity)
@@ -288,7 +288,7 @@ Polkadot's GRANDPA handles the same scenario by halting finalization in both par
 
 Solana's behavior under partition is more chaotic: each partition's validators continue generating their own PoH chains and voting within their partition. If the partitions are roughly equal, both chains may achieve local supermajority confirmation within their partition, leading to two conflicting finalized chains. When the partition heals, the chain with more total stake-weighted votes wins, and the minority partition's chain disappears atomically, reverting all transactions. This is acceptable for low-value transactions but catastrophic for applications like exchanges or bridges that require irreversibility.
 
-```
+```text
 Partition Behavior Comparison:
 
 Scenario: 50/50 network split for 10 minutes

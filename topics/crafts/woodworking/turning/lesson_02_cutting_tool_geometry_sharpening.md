@@ -30,7 +30,7 @@ The spindle detail gouge, by contrast, features a deeper flute and a fingernail 
 
 Bowl gouges extend gouge architecture to faceplate work, where the grain orientation shifts to perpendicular or end-grain configurations and the workpiece geometry demands reach into deep concave forms. A bowl gouge features a deeper, narrower flute than spindle tools and a significantly more aggressive fingernail grind—often termed an Irish grind, Ellsworth grind, or swept-back grind depending on the specific wing geometry. The bevel angle remains in the forty to fifty-five degree range, but the swept-back wings allow presentation angles approaching ninety degrees to the lathe axis. This geometry permits the turner to reach over the tool rest and into the interior of a bowl, with the wing cutting while the long bevel provides stability against the interior curve. The acute angle between the wing edge and the tool axis creates a slicing action rather than a scraping action, essential for clean cuts in the difficult grain orientations encountered in bowl interiors.
 
-```
+```text
 GOUGE CROSS-SECTION PROFILES (viewed from handle toward edge)
 
 Spindle Roughing Gouge:

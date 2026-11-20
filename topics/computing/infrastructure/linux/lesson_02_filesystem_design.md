@@ -109,7 +109,7 @@ Ext4 chooses performance and consistency (at the cost of fragmentation over time
 
 ext4 divides the block device into **block groups**, each containing:
 
-```
+```text
 Block Group N:
   - Superblock (replicated in groups 0, 1, 3, 5, 7, 9, 25, 49, 81, ...)
   - Group Descriptor Table (GDT)
@@ -211,7 +211,7 @@ struct ext4_extent_idx {
 
 A fully-packed inode holds 4 extents inline. For files requiring more, the tree grows:
 
-```
+```text
 Depth 0 (leaf):    [extent1] [extent2] [extent3] [extent4]
                         ↓
 Depth 1 (index): [idx→block1] [idx→block2] ...
@@ -252,7 +252,7 @@ Delayed allocation defers step 1-4 until writeback, allowing the allocator to se
 
 Large directories use a hash tree:
 
-```
+```text
 Directory Inode
     ↓
 Root Block: [hash(name) → block_index] (sorted array)
@@ -282,7 +282,7 @@ Lookup: O(log n) to find leaf block (binary search on root), O(k) to scan leaf (
 
 ext4 uses JBD2 (Journaling Block Device 2) for metadata journaling:
 
-```
+```text
 Circular Journal:
   [Descriptor Block: txn metadata]
   [Data Block 1: modified block copy]
@@ -383,7 +383,7 @@ This packs a 128-bit extent into (start_logical, start_physical, length, flags).
 
 Small files store extents inline in the inode (inode "fork"). Large files use a B+ tree of extents, keyed by logical offset:
 
-```
+```text
 Inode Fork:
   [extent1: log 0-100 → phys 5000]
   [extent2: log 101-500 → phys 6000]
@@ -395,7 +395,7 @@ Inode Fork:
 
 XFS uses logical journaling, logging intent rather than physical blocks:
 
-```
+```text
 Log Record Types:
   - Inode Core: Changed inode fields
   - Extent List: Added/removed extents
@@ -448,7 +448,7 @@ Btrfs (B-tree filesystem) is a modern CoW filesystem started at Oracle in 2007, 
 
 Every write allocates a new location:
 
-```
+```text
 Old State:
   Root → Node A → Leaf Block 100 [data1]
 
@@ -467,7 +467,7 @@ The root pointer update is atomic (a single block write), providing crash consis
 
 Btrfs natively supports multiple devices with integrated RAID:
 
-```
+```text
 Chunk Tree (maps logical → physical):
   Logical 0-1GB     → [dev1: 0-1GB] (single)
   Logical 1-2GB     → [dev1: 1-2GB, dev2: 1-2GB] (RAID1)
@@ -492,7 +492,7 @@ struct btrfs_key {
 
 Keys sort by (objectid, type, offset). All metadata lives in this tree:
 
-```
+```text
 Root Tree:
   Key (256, ROOT_ITEM, 0) → FS Tree root pointer
   Key (257, ROOT_ITEM, 0) → Snapshot 1 root pointer
@@ -516,7 +516,7 @@ Extent Tree (objectid=5):
 
 Every data and metadata block has a CRC32C checksum stored in the checksum tree:
 
-```
+```text
 Checksum Tree:
   Key (EXTENT_CSUM, logical_addr, 0) → [csum1, csum2, ..., csumN]
 ```
@@ -613,7 +613,7 @@ Scrub reads every block, verifies checksums, and repairs from alternate copies i
 
 ext4 uses a hierarchical locking scheme:
 
-```
+```text
 Global locks (rare, short-held):
   - s_lock: Protects superblock fields
   - s_group_info_lock: Protects group descriptor array
@@ -653,7 +653,7 @@ unlock(journal);
 
 XFS uses more fine-grained locks for parallelism:
 
-```
+```text
 Per-AG locks:
   - agf_lock: AG free space tree modifications
   - agi_lock: AG inode tree modifications
@@ -706,7 +706,7 @@ The four-lock hierarchy allows:
 
 Btrfs locking is more complex due to CoW and multi-root structures:
 
-```
+```text
 Global locks:
   - fs_info->tree_log_mutex: Serializes tree log commits
   - chunk_mutex: Chunk allocation (short-held)
@@ -730,7 +730,7 @@ This minimizes contention at the cost of occasional retries.
 
 **Deadlock scenario** in Btrfs extent tree:
 
-```
+```text
 Thread 1: Writing file A
   - Locks FS tree (writes extent data item)
   - Needs Extent tree lock (to update extent refs)
@@ -775,7 +775,7 @@ Btrfs: No journal, but CoW requires updating parent blocks up to root. Write amp
 
 **Performance comparison** (creating 1M 4KB files):
 
-```
+```text
 ext4 (128MB journal):  120 seconds (8333 files/sec)
 ext4 (1GB journal):     90 seconds (11111 files/sec)
 XFS (delayed logging):  45 seconds (22222 files/sec)
@@ -1103,7 +1103,7 @@ sync();
 
 **Performance comparison** (1GB file write + sync):
 
-```
+```text
 No sync:             100 MB/s (buffered write only)
 fdatasync():          80 MB/s (data flush)
 fsync():              75 MB/s (data + metadata flush)
@@ -1234,7 +1234,7 @@ Configuration:
 
 Results (transactions/sec):
 
-```
+```text
 ext4 (data=ordered):       12,000 tps
 ext4 (data=writeback):     15,000 tps
 XFS (default):             18,000 tps
@@ -1254,7 +1254,7 @@ Configuration:
 
 Results (MB/s):
 
-```
+```text
 ext4:   450 MB/s
 XFS:    520 MB/s
 Btrfs:  380 MB/s (with compression)
@@ -1272,7 +1272,7 @@ Configuration:
 
 Results (build time):
 
-```
+```text
 ext4 (128 MB journal):   180 seconds
 ext4 (1 GB journal):     165 seconds
 XFS (delayed logging):   140 seconds

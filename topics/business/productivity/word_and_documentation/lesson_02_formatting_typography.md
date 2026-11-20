@@ -22,7 +22,7 @@ Modern word processing documents exist as ZIP archives containing XML manifests,
 
 The content tree in `document.xml` represents the document as a hierarchy of nested elements: body contains sections, sections contain paragraphs and tables, paragraphs contain runs (character sequences sharing identical formatting), runs contain text nodes. Every element carries zero or more properties that specify direct formatting overrides, style references, or both. The rendering engine walks this tree in document order, resolving the effective formatting for each run through a cascading merge:
 
-```
+```text
 Document Defaults (docDefaults)
     ↓ overridden by
 Theme Definitions (theme1.xml)
@@ -74,7 +74,7 @@ This inheritance graph means that modifying the Normal style's typeface instantl
 
 Themes introduce parametric design through twelve semantic color slots and two font slots (major for headings, minor for body text). The theme engine substitutes these tokens at render time:
 
-```
+```text
 <w:color w:val="accent1" w:themeColor="accent1"/>
 ```
 
@@ -122,7 +122,7 @@ The keyboard-driven editing workflow eliminates mouse friction by binding style 
 
 Multi-level list configuration represents one of the most powerful and most misconfigured features in word processing. A properly configured list binds each nesting level to a style (List Paragraph Level 1, List Paragraph Level 2, etc.), defines the numbering format (1., a., i., or custom patterns like 1.1, 1.1.1), and sets the indent progression (typically 0.5 inches per level). The critical invariant is that **tab key demotes list level, Shift+Tab promotes**, enabling rapid outline construction:
 
-```
+```text
 1. Executive Summary [type, Enter]
 2. [Tab] converts to 1.1.
    Background [type, Enter]

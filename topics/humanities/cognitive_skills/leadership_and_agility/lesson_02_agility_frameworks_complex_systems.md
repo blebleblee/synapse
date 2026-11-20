@@ -40,7 +40,7 @@ The agility frameworks examined in this lesson represent distinct approaches to 
 
 Systems thinking provides the conceptual foundation for all agility frameworks, so we begin by dissecting its core primitives: stocks, flows, feedback loops, delays, and nonlinearities. A **stock** represents any accumulation or reservoir within a system—inventory, knowledge, capital, morale, technical debt. A **flow** represents the rate of change of a stock, either inflow (increasing) or outflow (decreasing). The fundamental accounting identity governs all stock dynamics: the stock level at time t+1 equals the stock level at time t plus all inflows minus all outflows during the interval.
 
-```
+```text
 Stock(t+1) = Stock(t) + Σ(Inflows) - Σ(Outflows)
 ```
 
@@ -121,7 +121,7 @@ Cognitive load management frameworks distinguish three load types that compete f
 
 The mathematical constraint states that total cognitive load must remain below working memory capacity to maintain effective performance. When total load exceeds capacity, performance degrades catastrophically through task-switching overhead, error propagation, and decision fatigue. The optimization objective involves minimizing extraneous load, managing intrinsic load through appropriate sequencing, and maximizing germane load within the remaining capacity budget.
 
-```
+```text
 Cognitive_Capacity ≥ Intrinsic_Load + Extraneous_Load + Germane_Load
 ```
 

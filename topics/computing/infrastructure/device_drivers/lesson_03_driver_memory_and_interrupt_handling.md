@@ -8,7 +8,7 @@ Device drivers operate at the intersection of hardware and kernel software, mana
 
 Unlike user space with its generous virtual memory and demand paging, kernel code runs in a constrained physical memory region where allocation failures are real and consequences are immediate. The kernel divides its address space into distinct zones, each serving specific hardware and allocation requirements.
 
-```
+```text
 Kernel Virtual Address Space Layout (x86_64)
 ┌─────────────────────────────────────┐ 0xFFFFFFFFFFFFFFFF
 │   Fixmap & vsyscall                 │

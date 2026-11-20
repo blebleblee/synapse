@@ -54,7 +54,7 @@ PFI was introduced by Breiman (2001) in the context of Random Forests and later 
 
 **Algorithm:**
 
-```
+```text
 Given: trained model f, validation set D = {(x^(n), y^(n))}, metric L
 Baseline: s_0 = L(f, D)
 For each feature j in {1, ..., d}:

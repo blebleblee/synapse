@@ -24,7 +24,7 @@ The **microtask queue** holds callbacks scheduled by Promise resolutions and the
 
 The event loop's execution order can be stated precisely:
 
-```
+```text
 1. Dequeue one macrotask from the task queue and run it to completion.
 2. Drain the entire microtask queue (process all pending microtasks,
    including any that are added during this drain).

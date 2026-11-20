@@ -22,7 +22,7 @@ The depth-first search algorithm maintains three vertex states: **white** (undis
 
 The DFS procedure begins with all vertices colored white. For each white vertex $u$ encountered during the outer loop, we invoke a recursive exploration subroutine that colors $u$ gray, records its discovery time, recursively visits all white neighbors, and finally colors $u$ black upon completion. The recursive structure naturally implements backtracking: when we exhaust all neighbors of a vertex, we return to its parent and continue exploring siblings.
 
-```
+```text
 DFS(G):
     for each vertex u in V:
         color[u] = WHITE
@@ -57,7 +57,7 @@ The fundamental theorem of DFS states: **A directed graph $G$ is acyclic if and 
 
 Breadth-first search replaces the recursion stack with an explicit queue, fundamentally altering the exploration order. BFS discovers vertices in order of increasing distance from a source vertex $s$, where distance $\delta(s, v)$ denotes the minimum number of edges in any path from $s$ to $v$. The algorithm maintains a queue $Q$ of discovered but unprocessed vertices, initializing $Q$ with the source $s$. In each iteration, we dequeue a vertex $u$, examine all its neighbors, and enqueue any undiscovered neighbors, coloring them gray to prevent duplicate enqueueing.
 
-```
+```text
 BFS(G, s):
     for each vertex u in V \ {s}:
         color[u] = WHITE
@@ -89,7 +89,7 @@ The parent pointers maintained during traversal enable **path reconstruction**. 
 
 **Topological ordering** of a directed acyclic graph (DAG) $G = (V, E)$ is a linear ordering of vertices such that for every edge $(u, v) \in E$, vertex $u$ precedes $v$ in the ordering. Topological orderings exist if and only if $G$ is acyclic. The DFS-based topological sort algorithm runs DFS on $G$ and outputs vertices in reverse order of their finishing times. The correctness follows from the key observation: for any edge $(u, v)$ in a DAG, the finishing time $f[u]$ exceeds $f[v]$. If $v$ is discovered before $u$, it must finish before $u$ is discovered (otherwise we would have a back edge). If $u$ is discovered before $v$, then $v$ is a descendant of $u$ and finishes before $u$ finishes. Thus, ordering vertices by decreasing finishing time respects all edge directions.
 
-```
+```text
 Topological-Sort(G):
     run DFS(G) to compute finishing times f[v] for all v
     as each vertex is finished, insert it at the head of a linked list
@@ -112,7 +112,7 @@ In BFS, the queue implementation critically impacts performance. Naive linked-li
 
 DFS recursion depth poses stack overflow risks for graphs with large diameter. Iterative DFS using an explicit stack avoids system stack limits and enables finer control over memory allocation. The stack stores vertex-iterator pairs $(u, \text{iter})$ representing the current position in the adjacency list of $u$, allowing resumption after recursive returns. This transformation preserves the DFS traversal order while replacing $O(d)$ system stack frames (where $d$ is depth) with a single growable data structure.
 
-```
+```text
 Iterative-DFS(G, s):
     S = empty stack
     Push(S, (s, iterator to Adj[s]))
@@ -137,7 +137,7 @@ Cycle detection in massive graphs benefits from randomized algorithms. A **rando
 
 Topological sorting failure modes arise when the input graph contains cycles. The DFS-based algorithm detects this condition when encountering a back edge. An alternative algorithm due to Kahn performs topological sorting incrementally by maintaining in-degrees: repeatedly remove vertices with in-degree zero and decrement the in-degrees of their neighbors. If fewer than $|V|$ vertices are removed, the graph contains a cycle. This approach enables online topological sorting where edges are added dynamically, and we maintain a valid ordering by recomputing only the affected subgraph.
 
-```
+```text
 Kahn-Topological-Sort(G):
     compute in-degree[v] for all vertices v
     Q = queue containing all vertices with in-degree 0

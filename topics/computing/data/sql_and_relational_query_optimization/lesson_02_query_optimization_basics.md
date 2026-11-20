@@ -36,7 +36,7 @@ Relational algebra is *referentially transparent*: any sub-expression can be rep
 
 The optimizer reduces the problem of "how much data flows through each operator?" to cardinality estimation. A naive independence assumption (that predicate selectivities multiply) produces:
 
-```
+```text
 sel(A AND B) ≈ sel(A) × sel(B)
 ```
 
@@ -88,14 +88,14 @@ Key rules:
 
 **Predicate Pushdown**: Move `σ` operators as far down the tree as possible, reducing the cardinality of intermediate results.
 
-```
+```text
 σ_p(R ⨝ S)  →  (σ_p(R)) ⨝ S,   if p references only R
 ```
 
 **Projection Pushdown**: Drop columns not needed by upstream operators early to reduce tuple width.
 
 **Join Commutativity and Associativity**:
-```
+```text
 R ⨝ S  ≡  S ⨝ R
 (R ⨝ S) ⨝ T  ≡  R ⨝ (S ⨝ T)
 ```
@@ -159,7 +159,7 @@ The choice depends on estimated cardinalities, available memory (`work_mem` in P
 
 The cost model assigns a numeric cost to each operator. PostgreSQL's cost model is representative:
 
-```
+```text
 cost = cpu_cost + io_cost
 
 io_cost  = pages_read × seq_page_cost      (sequential I/O)
@@ -173,7 +173,7 @@ The key parameters (`seq_page_cost`, `random_page_cost`, `cpu_tuple_cost`) are u
 
 **Hash Join cost model example:**
 
-```
+```text
 Build phase:  cost = N_inner × cpu_tuple_cost + N_inner/B × seq_page_cost
 Probe phase:  cost = N_outer × cpu_tuple_cost + N_outer/B × seq_page_cost
 Total memory: work_mem ≥ N_inner × avg_tuple_width  (to avoid batch spill)
@@ -231,7 +231,7 @@ A B+ tree of height *h* with branching factor *b* can index *b^h* entries. For a
 
 The optimizer performs a break-even analysis. An index scan on a heap table incurs a *random* I/O per qualifying row (each row may be in a different page). If selectivity is low enough that most pages will be visited anyway, a sequential scan is cheaper:
 
-```
+```text
 Use index if: selectivity × table_pages > index_scan_break_even
 ```
 
@@ -294,7 +294,7 @@ This is the essential logic behind PostgreSQL's `ineq_histogram_selectivity`. Wh
 
 ### Nested Loop Join (NLJ)
 
-```
+```text
 for each outer_tuple in R:
     for each inner_tuple in S where join_predicate(outer_tuple, inner_tuple):
         emit(outer_tuple, inner_tuple)
@@ -308,7 +308,7 @@ for each outer_tuple in R:
 
 ### Hash Join
 
-```
+```text
 -- Build phase
 for each inner_tuple in S:
     h = hash(inner_tuple[join_key])
@@ -328,7 +328,7 @@ for each outer_tuple in R:
 
 ### Sort-Merge Join (SMJ)
 
-```
+```text
 sort R on join key
 sort S on join key
 
@@ -398,14 +398,14 @@ The query optimizer's most impactful decision for multi-table queries is join or
 
 The optimal strategy is to perform the most selective joins first to minimize intermediate result sizes:
 
-```
+```text
 -- Bad order: orders ⨝ order_items → 500M intermediate → ⨝ customers
 -- Good order: orders ⨝ customers → 1M intermediate → ⨝ order_items
 ```
 
 A systematic way to understand the optimizer's choice is to compute the *join selectivity*:
 
-```
+```text
 |R ⨝ S| ≈ |R| × |S| × selectivity(join_predicate)
 ```
 
@@ -563,7 +563,7 @@ LIMIT 10;
 
 Annotated output interpretation:
 
-```
+```text
 HashAggregate  (cost=184321.00..184331.00 rows=1000 width=48)
                (actual time=2341.221..2342.108 rows=987 loops=1)
   --  ^^^^^ estimated cost / rows vs. actual time (ms) / rows
@@ -651,12 +651,12 @@ For queries with more than `join_collapse_limit` (default 8) tables, PostgreSQL'
 Hash joins and hash aggregations both require memory for hash tables. When `work_mem` is insufficient, they spill to disk using multiple passes. A single query can open multiple sort/hash operations simultaneously; total memory consumption is `work_mem × number_of_operators`.
 
 **Rule of thumb for setting `work_mem`:**
-```
+```text
 work_mem = (available_RAM × 0.25) / (max_concurrent_queries × avg_operators_per_query)
 ```
 
 For an OLTP server with 64GB RAM, 100 concurrent connections, and ~3 operators per query:
-```
+```text
 work_mem ≈ (64GB × 0.25) / (100 × 3) ≈ 53MB
 ```
 

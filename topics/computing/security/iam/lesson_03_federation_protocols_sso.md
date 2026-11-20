@@ -92,7 +92,7 @@ SAML signature verification requires XML canonicalization to eliminate semantica
 
 The OAuth 2.0 Authorization Code flow decouples authentication from resource access by introducing two distinct token types: the authorization code (a short-lived nonce) and the access token (a bearer credential for API access). The flow begins when the client application (Service Provider equivalent) redirects the user to the authorization server's (Identity Provider equivalent) `/authorize` endpoint with parameters including `client_id`, `redirect_uri`, `response_type=code`, `scope`, and `state` (a CSRF token). The authorization server authenticates the user, obtains consent for the requested scopes, and redirects back to the client's `redirect_uri` with an authorization code and the original state value as query parameters.
 
-```
+```text
 GET /authorize?
   response_type=code&
   client_id=s6BhdRkqt3&
@@ -107,7 +107,7 @@ Host: idp.example.com
 
 The client receives the authorization code in the front channel but cannot use it directly to access protected resources. Instead, the client's backend server makes a direct HTTPS POST request to the authorization server's `/token` endpoint, exchanging the code for an access token. This backchannel request includes the authorization code, the client's credentials (`client_id` and `client_secret`), and the original `redirect_uri` for validation. The authorization server verifies the code has not been used previously (single-use property), validates the client credentials, and returns a JSON payload containing an access token, token type (typically `Bearer`), expiration time, and optionally a refresh token.
 
-```
+```text
 POST /token HTTP/1.1
 Host: idp.example.com
 Content-Type: application/x-www-form-urlencoded
@@ -134,7 +134,7 @@ The authorization server's response encodes the access token as an opaque string
 
 OpenID Connect extends OAuth 2.0 by introducing the ID Token, a JWT specifically encoding authentication event metadata rather than authorization grants. When a client requests the `openid` scope during the authorization flow, the authorization server returns both an access token (for API access) and an ID Token (for authentication proof) in the token endpoint response. The ID Token contains standard claims including `iss` (issuer), `sub` (subject identifier), `aud` (audience—the client's client_id), `exp` (expiration), `iat` (issued-at), and optionally `nonce` (client-provided nonce for replay protection). Additional claims such as `email`, `email_verified`, `name`, and `picture` are included when the client requests corresponding scopes.
 
-```
+```text
 eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJzYS0yMDQ4In0.eyJpc3MiOiJodHRwczovL2lkcC5leGFtcGxlLmNvbSIsInN1YiI6IjI0ODI4OTc2MTAwMSIsImF1ZCI6InM2QmhkUmtxdDMiLCJleHAiOjE3MzY5NTYxMDAsImlhdCI6MTczNjk1MjUwMCwibm9uY2UiOiJuLTBTNl9XekEyTWoiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IkpvaG4gRG9lIiwicGljdHVyZSI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcGhvdG8uanBnIn0.signature_bytes
 ```
 
@@ -157,7 +157,7 @@ Decoding the base64url-encoded payload reveals the claims structure. The client 
 
 The JSON Web Token structure consists of three base64url-encoded segments separated by periods: the JOSE header, the payload (claims set), and the cryptographic signature. The JOSE header specifies the signing algorithm (`alg`) and key identifier (`kid`) referencing a specific public key in the issuer's JWKS. The payload contains the claims set as a flat JSON object mapping claim names to values. The signature is computed by concatenating the encoded header, a period, and the encoded payload, then applying the specified signature algorithm using the issuer's private key.
 
-```
+```text
 Header (base64url encoded):
 {
   "alg": "RS256",
@@ -227,7 +227,7 @@ Federation across organizational boundaries requires establishing trust through 
 
 Token introspection provides a mechanism for resource servers to validate opaque access tokens issued by an authorization server. The resource server makes an authenticated POST request to the authorization server's introspection endpoint, sending the access token. The response indicates whether the token is active and, if so, returns associated metadata including `scope`, `client_id`, `username`, `exp`, and token type. This pattern centralizes token validation logic at the authorization server but introduces latency and availability dependencies on every API request unless the resource server caches introspection results (trading freshness for performance).
 
-```
+```text
 POST /introspect HTTP/1.1
 Host: idp.example.com
 Content-Type: application/x-www-form-urlencoded

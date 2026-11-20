@@ -79,7 +79,7 @@ The microscale design process inverts normal workflows. Instead of conceiving a 
 
 Critical to microscale success is the establishment of a *scale key*—a consistent visual language defining what real-world dimensions each LEGO dimension represents. If 1 stud width = 4 meters of real-world building width, then a 1-plate height represents approximately 1.6 meters of building story height (maintaining realistic proportions). Once established, this scale key must remain consistent throughout the model. Violations are immediately perceptible: a door that should be 3 plates tall according to the scale key but is actually 2 plates reads as "wrong" even to viewers who cannot articulate why. The human visual system is exquisitely sensitive to proportion violations, an evolutionary adaptation for face recognition co-opted for architectural assessment.
 
-```
+```text
 MICROSCALE SCALE KEY EXAMPLE (1:200 architectural)
 1 stud width (8mm)        → 1.6m real-world
 1 plate height (3.2mm)    → 0.64m real-world

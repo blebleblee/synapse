@@ -80,7 +80,7 @@ The hypervisor's CPU scheduler manages the mapping of virtual CPUs (vCPUs) to ph
 
 **Proportional-Share Scheduling**: Assigns each VM a weight *w_i*, guaranteeing that VM *i* receives a CPU share of *w_i / Σw_j*. VMware ESXi uses a hierarchical scheduler that enforces resource pools with reservations (minimum CPU), limits (maximum CPU), and shares (relative priority). The scheduler runs every 20ms (default quantum), selecting the VM with the highest **effective priority**, computed as:
 
-```
+```text
 effective_priority = base_priority + (entitled_time - actual_time) / time_quantum
 ```
 

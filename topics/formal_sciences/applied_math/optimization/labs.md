@@ -6,7 +6,7 @@ These labs treat optimization not as a numerical black box but as a mathematical
 
 The target environment is Python 3.11+ with SymPy 1.12+, NumPy 1.26+, and SageMath 10.x. Before proceeding, verify your symbolic stack is intact.
 
-```
+```text
 python -c "import sympy; print('SymPy', sympy.__version__)"
 python -c "import numpy; print('NumPy', numpy.__version__)"
 sage --version
@@ -726,7 +726,7 @@ example : ⨅ x : ℝ, x ^ 2 = 0 := by
 
 To build and verify this module, run from the project root:
 
-```
+```text
 lake build Optverify.Basic
 ```
 

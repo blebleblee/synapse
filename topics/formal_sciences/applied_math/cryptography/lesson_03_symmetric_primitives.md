@@ -80,7 +80,7 @@ Stream ciphers offer advantages in scenarios requiring low latency or encryption
 
 RC4, despite its historical significance and continued use in legacy systems, illustrates both the appeal and pitfalls of stream cipher design. The cipher maintains a 256-byte state array $S[0], S[1], \ldots, S[255]$ that represents a permutation of the integers $\{0, 1, \ldots, 255\}$, along with two index pointers $i$ and $j$. Initialization processes the key through a **key scheduling algorithm (KSA)** that pseudorandomly shuffles the state array:
 
-```
+```text
 for i = 0 to 255:
     S[i] = i
 j = 0
@@ -91,7 +91,7 @@ for i = 0 to 255:
 
 The **pseudorandom generation algorithm (PRGA)** then produces keystream bytes through:
 
-```
+```text
 i = 0
 j = 0
 loop:
@@ -105,7 +105,7 @@ The state space size of $256! \approx 2^{1684}$ far exceeds security requirement
 
 Modern stream ciphers like ChaCha20 address these vulnerabilities through explicit diffusion structures. ChaCha20 organizes its state as sixteen 32-bit words arranged in a $4 \times 4$ matrix, initialized with a 256-bit key, 96-bit nonce, and 32-bit counter. The core operation, iterated 20 times (hence "20" in ChaCha20), applies a **quarter-round function** to specific state word tuples:
 
-```
+```text
 a += b; d ^= a; d <<<= 16;
 c += d; b ^= c; b <<<= 12;
 a += b; d ^= a; d <<<= 8;

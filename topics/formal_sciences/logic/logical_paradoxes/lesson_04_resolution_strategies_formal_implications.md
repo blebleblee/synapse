@@ -45,7 +45,7 @@ Resolution strategies are classified by which invariant they sacrifice. This is 
 
 The Curry paradox deserves special attention because it does not rely on negation. Given a sentence C such that `C ↔ (True(C) → ⊥)`, naive truth plus the material conditional lets us derive `⊥` outright:
 
-```
+```text
 1. C ↔ (True(C) → ⊥)          [fixed point construction]
 2. C → (True(C) → ⊥)           [from 1, ↔ elimination]
 3. True(C)                     [from 1, ↔ introduction reversed: C holds, so True(C)]
@@ -94,7 +94,7 @@ Tarski (1933) proposed a resolution to the liar paradox that is the semantic ana
 
 The truth predicate `True₀(·)` is a predicate of `L₁`, not of `L₀`. It is defined by the T-schema restricted to `L₀`:
 
-```
+```text
 For every sentence φ of L₀:  True₀(⌜φ⌝) ↔ φ
 ```
 
@@ -102,7 +102,7 @@ where `⌜φ⌝` is the Gödel code of φ, a term of `L₁`. The liar sentence "
 
 The construction is iterated into a transfinite hierarchy:
 
-```
+```text
 L₀ ⊂ L₁ ⊂ L₂ ⊂ ... ⊂ L_ω ⊂ L_{ω+1} ⊂ ...
 ```
 
@@ -182,7 +182,7 @@ Gupta and Belnap's **revision theory of truth** (1993) takes a different approac
 
 Formally, let `h: Sentences → {T, F}` be a hypothesis (a total assignment of classical truth values to all sentences). The revision operator `τ` maps `h` to `τ(h)` where:
 
-```
+```text
 τ(h)(⌜φ⌝) = T  if φ evaluates to T under hypothesis h
 τ(h)(⌜φ⌝) = F  if φ evaluates to F under hypothesis h
 ```
@@ -231,7 +231,7 @@ Kripke's fixed-point construction can be implemented as an iterated evaluation p
 
 **Algorithm:**
 
-```
+```text
 function kripke_fixed_point(sentences: Set[Sentence]) → Valuation:
     v := {s → Unknown for all s in sentences}
     repeat:

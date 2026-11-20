@@ -56,7 +56,7 @@ Sensor boards, when present, mount beneath the stator assembly with three Hall-e
 
 Drivetrain architecture follows force flow from motor shaft through primary reduction, through secondary gearing (if present), to the differential, then to axles and wheels. Single-stage spur gear reduction places the motor parallel to the main shaft, with a small pinion on the motor shaft meshing directly with a large spur attached to the differential input. This layout minimizes part count and power loss (each gear mesh consumes 2-5% of transmitted power through friction) but forces a compromise between motor position and gear ratio flexibility—adjusting ratio requires changing both pinion and spur, and physical space within the chassis limits maximum spur diameter.
 
-```
+```text
 Single-Stage Spur Gear Layout
 
 Motor → [Pinion] → [Spur/Differential] → Axles → Wheels
@@ -65,7 +65,7 @@ Motor → [Pinion] → [Spur/Differential] → Axles → Wheels
 
 Two-stage gearing inserts an idler shaft between motor and differential, carrying an intermediate gear that meshes with the motor pinion and drives a second pinion that engages the differential spur. This configuration isolates motor position from gear ratio selection—changing the intermediate gear cluster alters ratio without moving the motor mount. The cost is doubled gear mesh losses (now 4-10% total) and increased part count that adds weight and introduces additional potential failure points. Competition vehicles prioritize single-stage efficiency; scale crawlers accept two-stage losses to achieve extreme reduction ratios (50:1 or greater) necessary for torque multiplication.
 
-```
+```text
 Two-Stage Gear Layout
 
 Motor → [Pinion] → [Int. Gear] → [Int. Pinion] → [Diff Spur] → Diff → Axles

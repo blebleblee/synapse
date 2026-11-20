@@ -36,7 +36,7 @@ Stack bond is the weakest pattern. Every brick sits directly above the one below
 
 Running bond—also called stretcher bond—is the standard structural pattern and the one you will use for the majority of walls. Each course is offset from the course below by half the brick length. For 2×4 bricks, this means a 2-stud (16mm) offset. Every brick spans across the joint between two bricks below it, engaging two studs on each neighbor. The shear plane is disrupted at every course: a lateral crack cannot propagate through the wall because it must cross through a brick at every other course.
 
-```
+```text
 Running Bond (top view, 2×4 bricks, 2-stud wall)
 
 Course 3: |[][]  [][]  []|    ← each [] is one 2×4 brick
@@ -49,7 +49,7 @@ Header bond places bricks perpendicular to the wall's running direction, so that
 
 English bond alternates courses of stretchers and headers, combining the longitudinal overlap of running bond with the transverse tying of header bond. It is the strongest of the four patterns and should be used for walls that must resist significant lateral force or that carry structural load from upper floors or roof elements. The alternating pattern means that every other course ties the wall's two faces together, and the stagger between stretcher and header courses disrupts shear planes in both the longitudinal and transverse directions.
 
-```
+```text
 English Bond (top view, 2×4 bricks, 2-stud wall)
 
 Course 2: [HH][  str  ][  str  ][HH]    (header, stretcher, stretcher, header)
@@ -60,7 +60,7 @@ Course 1: [  str  ][  str  ][  str  ]    (stretcher, stretcher, stretcher)
 
 Corner construction is where most walls fail in practice. A corner is the intersection of two walls running in perpendicular directions, and its structural integrity determines whether the walls brace each other or merely butt against each other with no mechanical connection. A tied corner interlocks: the last brick of each course in one wall extends into the other wall's course, and the two walls alternate which provides the tying brick on successive courses. In a running bond corner with 2×4 bricks, the tying brick is a 2×4 placed perpendicular to its wall's direction, spanning into the other wall. This creates a header-bond transverse tie at every corner. The pattern repeats with each course: wall A provides the tying brick on course 1, wall B on course 2, wall A on course 3, and so on. The result is that neither wall can topple outward without tearing studs from the tying brick, which is itself held by the perpendicular wall's course. Plate courses at corners are especially valuable: a single 2×4 plate spanning across the corner, bonded to bricks in both walls, creates a continuous diaphragm that resists corner opening in both directions simultaneously.
 
-```
+```text
 Corner Interlock (top view)
 
 Course 1:  [  2×4  ][  2×4  ][2×4→]     wall A →  last brick turns corner

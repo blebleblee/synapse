@@ -18,7 +18,7 @@ The invariant that unifies hardware abstraction layer design is that register-le
 
 The canonical entry point for register-level programming on ARM Cortex-M microcontrollers begins with the system memory map defined in the ARM Architecture Reference Manual. The Cortex-M4 implements a fixed memory architecture where the lowest 512 megabytes (`0x00000000` to `0x1FFFFFFF`) contain code regions including Flash memory and boot ROM, the next 512 megabytes (`0x20000000` to `0x3FFFFFFF`) contain SRAM, and the critical peripheral region spans `0x40000000` to `0x5FFFFFFF`. This standardization enables bootloader code and interrupt vector tables to operate without vendor-specific knowledge, while individual microcontroller families populate the peripheral region with vendor-specific controllers.
 
-```
+```text
 Memory Map (STM32F407 Example):
 ┌─────────────────────────────────────────┐ 0xFFFFFFFF
 │  Vendor-Specific (Reserved)             │

@@ -30,7 +30,7 @@ The position control layer operates at the outermost level of the control hierar
 
 Synchronization between multiple motors demands coordination beyond simple independent control. When two motors must maintain precise angular relationship—such as the drive wheels of a differential drive robot traveling in a straight line—small variations in motor performance, gear friction, or load distribution cause the motors to drift out of synchronization. The EV3 firmware provides synchronized motion commands that actively compensate for these discrepancies by measuring the position error between the motors and applying corrective velocity adjustments to the lagging motor. This synchronization operates as a coupled control system where each motor's velocity setpoint includes both the base trajectory velocity and a correction term proportional to the inter-motor position error:
 
-```
+```text
 Synchronization Control Architecture:
 
 Base Trajectory → ω_target → [+] → Motor A Velocity Controller → Motor A

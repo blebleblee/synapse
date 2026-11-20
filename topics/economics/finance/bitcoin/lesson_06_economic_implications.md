@@ -76,7 +76,7 @@ $$
 
 NVT functions as a price-to-earnings analogue for Bitcoin. High NVT suggests the market is pricing in future adoption that has not yet materialized in transaction volume; low NVT suggests transaction activity is robust relative to valuation. In practice, NVT is noisy because on-chain transaction volume includes transfers that are not economic payments—internal exchange transfers, wallet consolidation, and self-sends. Adjusted variants like NVT Signal, which uses moving averages, and the Reserve Risk metric, which compares unspent transaction output (UTXO) age distributions to price, attempt to filter this noise. None of these metrics is a reliable standalone trading signal, but their convergence with other indicators—hashpower growth, exchange balance depletion, funding rates—provides a richer valuation framework than price-chart analysis alone.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                  Bitcoin Market Microstructure Map               │
 ├──────────────────────────────────────────────────────────────────┤
@@ -139,7 +139,7 @@ For practitioners deploying capital into Bitcoin at institutional scale, executi
 
 Several execution techniques mitigate this. Algorithmic order routing splits large orders across venues and over time. A volume-weighted average price (VWAP) algorithm participates in market volume at a measured pace, targeting the day's average price as a benchmark. A time-weighted average price (TWAP) algorithm slices orders into uniform time intervals, useful when volume is expected to be stable. Implementation shortfall algorithms front-load execution when momentum is favorable and slow down when price moves adversely, balancing the urgency of completion against the cost of market impact. Most institutional crypto desks—Coinbase Institutional, FalconX, Cumberland—offer smart order routing across venues, and some provide algorithmic execution strategies directly.
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────────┐
 │              Institutional Execution Decision Tree                 │
 ├────────────────────────────────────────────────────────────────────┤
@@ -183,7 +183,7 @@ Bitcoin's ecosystem has experienced several systemic crises that provide empiric
 
 The common mechanism across these episodes is leverage and counterparty risk, not Bitcoin's protocol. In each case, intermediaries—exchanges, lenders, hedge funds—took on leverage or credit exposure that was not transparent to their counterparties. When an initial shock triggered withdrawals or margin calls, the intermediary's illiquidity or insolvency became apparent, and the resulting forced liquidations and withdrawals cascaded through the ecosystem. Bitcoin's spot price fell in each case, not because the protocol failed, but because leveraged holders were forced to sell to meet margin calls and depositors withdrew from distressed intermediaries.
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────────┐
 │            Systemic Risk Contagion Pathway Model                    │
 ├────────────────────────────────────────────────────────────────────┤

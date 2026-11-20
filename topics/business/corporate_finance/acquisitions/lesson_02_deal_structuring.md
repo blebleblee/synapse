@@ -91,7 +91,7 @@ Bridge financing provides committed capital between signing and close when perma
 
 The complete financing structure for a leveraged acquisition typically layers these instruments in a waterfall that determines the priority of claims in a downside scenario:
 
-```
+```text
     Acquisition Financing Capital Stack
     ====================================
 
@@ -135,7 +135,7 @@ The election requires the consent of both the acquirer and the target (as the ta
 
 For transactions that do not qualify for or do not benefit from a 338(h)(10) election, the tax treatment depends on the consideration mix. In a taxable stock purchase for cash, the seller's shareholders recognize capital gain equal to the cash received minus their basis in the target stock. In a tax-free stock-for-stock merger under Section 368(a)(1)(B), the seller's shareholders take a substituted basis in the acquirer stock equal to their basis in the target stock, deferring all gain recognition. In a mixed transaction, the seller's shareholders recognize gain to the extent of cash received, and take a substituted basis in the stock portion equal to their allocable basis, calculated under Section 358 as follows:
 
-```
+```text
     Basis Allocation in Mixed Consideration
     ========================================
 
@@ -180,7 +180,7 @@ A fourth failure mode is the impairment of goodwill under ASC 350. Goodwill is n
 
 The following decision framework summarizes the structuring logic for a representative transaction:
 
-```
+```text
     Deal Structuring Decision Framework
     ===================================
 

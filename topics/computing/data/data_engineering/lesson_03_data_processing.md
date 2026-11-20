@@ -51,7 +51,7 @@ Frameworks like Spark enforce this separation explicitly. Users write against th
 
 An RDD is defined formally as a 5-tuple:
 
-```
+```text
 RDD = (Partitions, Dependencies, ComputeFunction, PreferredLocations, Partitioner)
 ```
 
@@ -150,7 +150,7 @@ The all-to-all nature of shuffle is why it is the most expensive operation in an
 
 Spark's memory model (since Spark 1.6) uses a **unified memory manager** that shares a single memory pool between execution memory (used for shuffles, sorts, aggregations) and storage memory (used for caching RDD/DataFrame partitions). The pool is bounded by:
 
-```
+```text
 usable_memory = (JVM Heap − 300 MB reserved) × spark.memory.fraction  (default 0.6)
 ```
 
@@ -256,7 +256,7 @@ AQE makes salting largely unnecessary for SQL workloads in Spark 3.x, but explic
 
 The number of post-shuffle partitions (`spark.sql.shuffle.partitions`, default 200) is frequently the most impactful single configuration parameter. The optimal value depends on the total data volume processed by the shuffle:
 
-```
+```bash
 # Rule of thumb: target 100–200 MB per post-shuffle partition
 optimal_partitions = ceil(total_shuffle_bytes / (128 * 1024 * 1024))
 ```

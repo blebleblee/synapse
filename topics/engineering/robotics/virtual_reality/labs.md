@@ -1033,7 +1033,7 @@ With Unity running in Play mode, observe the robot executing the four test phase
 
 To validate the recovery protocol, implement a manual reset command. Create a new ROS 2 service definition at `~/vr_robotics_lab/src/ur5e_description/srv/ResetEstop.srv`:
 
-```
+```yaml
 ---
 bool success
 string message

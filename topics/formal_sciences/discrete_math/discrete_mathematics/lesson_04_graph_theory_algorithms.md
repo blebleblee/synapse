@@ -52,7 +52,7 @@ The adjacency list representation stores, for each vertex $v$, the list of its n
 
 A third representation, the incidence matrix $B$, is an $|V| \times |E|$ matrix where $B[v][e] = 1$ if vertex $v$ is incident to edge $e$ and $0$ otherwise. The product $B B^\top$ yields $D - A$, where $D$ is the diagonal degree matrix — this combination, $L = D - A$, is the graph Laplacian, an object central to spectral graph theory, random walks, and the analysis of electrical resistor networks.
 
-```
+```text
 Adjacency Matrix (G on 4 vertices: edges {1,2},{1,3},{2,4},{3,4})
 
       1   2   3   4
@@ -143,7 +143,7 @@ The time complexity is $O(|E| \log |E|)$ dominated by the initial sort; with a u
 
 **Prim's algorithm** grows the MST outward from a designated start vertex. Maintain a priority queue of edges crossing the boundary between the current tree $T$ and the rest of $V$. At each step, extract the minimum-weight boundary edge, add its non-tree endpoint to $T$, and push all new boundary edges into the queue.
 
-```
+```text
 Prim's Algorithm on a 5-vertex weighted graph:
 
 V = {A, B, C, D, E}

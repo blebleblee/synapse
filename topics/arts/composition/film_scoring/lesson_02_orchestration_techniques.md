@@ -35,7 +35,7 @@ Everything below operationalizes this: frequency-range mapping, divisi voicing, 
 
 **Four-part harmony example — C major triad (C–E–G):**
 
-```
+```text
 Violin I   (div. a2): high C + E   — 6 players per note
 Violin II  (div. a2): G + high C   — 5 players per note
 Viola      (non div.): middle C
@@ -78,7 +78,7 @@ Mark *div. a2* / *div. a3* in the part at the bar where the split starts, and *n
 4. Play back. If brass still dominates, pull brass down one dynamic step (*ff → f*) rather than pushing strings past their comfortable ceiling — strings distort tonally when forced loud, brass doesn't.
 
 **Woodwind choir, dark to bright:**
-```
+```text
 2 Bassoons  — low harmony / bass doubling
 2 Clarinets — mid harmony / lyrical doubling
 2 Oboes     — top melody / expressive lead
@@ -100,7 +100,7 @@ Stagger by register or role. Four pairs in rigid unison reads as one flat color 
 | B♭ Bass Clarinet | transpose UP a major 9th | write D (next octave) |
 
 **Concert C major triad (C–E–G) written for each:**
-```
+```text
 Horn in F:        G – B – D
 Trumpet in B♭:    D – F♯ – A
 Alto Sax in E♭:   A – C♯ – E
@@ -156,7 +156,7 @@ graph TD
 
 **Scenario 1 — Tense underscore, low string cluster (90 sec, no melody, slow dread build):**
 
-```
+```text
 Cello (div. a4):     sustained C–D♭–D–E♭ cluster, no vibrato, pp → mp
 Bass (div. a2):      low C pedal + slow gliss C → B♭, ppp → p
 Bassoon (a2):        doubles cello top two notes (D–E♭), mp
@@ -167,7 +167,7 @@ Entrances: strings 0:00, bassoons 0:30, timpani 1:00. Dynamic swell *ppp → mp*
 
 **Scenario 2 — Heroic fanfare, brass-led (8 bars, 120 BPM, 4/4):**
 
-```
+```text
 4 Horns:     unison melody, ff, marcato attacks
 3 Trumpets:  melody doubled an octave up, ff, short articulation
 3 Trombones: harmony a 3rd/5th below melody, f
@@ -177,7 +177,7 @@ Timpani:     downbeats, ff, reinforcing tonic/dominant
 ```
 
 Bar 1, beat 1 voicing on a C major triad:
-```
+```text
 Trumpet:   high C   (fff)
 Horn:      middle C (ff)
 Trombone:  E + G    (f)
@@ -193,7 +193,7 @@ Note the dynamic markings differ by instrument for the *same perceived loudness*
 
 **Scenario 3 — Intimate love theme, solo + strings (32 bars, 60 BPM, 3/4 waltz):**
 
-```
+```text
 Solo Cello:         melody, espressivo, mp → mf, rich vibrato
 Vln I (div. a2):    sustained root + 5th harmony, pp, no vibrato
 Vln II:             gentle arpeggiated accompaniment, p
@@ -205,26 +205,26 @@ Keep the solo cello 10–20 dB above the string bed in the mockup/mix. The strin
 ### Modular Orchestration Blocks
 
 **Block A — String Pad Foundation**
-```
+```text
 Vln I+II (div. a2 each): 4-note chord, pp–mp, sustained
 Viola (div. a2):          2-note harmony, pp
 Cello+Bass (unison):      bass note, pp
 ```
 **Block B — Woodwind Color Layer**
-```
+```text
 2 Flutes:    top melody or shimmer, p–mf
 2 Clarinets: mid doubling or countermelody, p
 2 Bassoons:  low harmony or bass doubling, p
 ```
 **Block C — Brass Power Accent**
-```
+```text
 4 Horns:     sustained chord, mf–ff
 3 Trumpets:  short fanfare/punctuation, f–ff
 3 Trombones: low harmony, f
 Tuba:        bass reinforcement, f
 ```
 **Block D — Percussion Rhythm & Color**
-```
+```text
 Timpani:            downbeats or rolls, p–ff
 Snare/Bass Drum:    rhythmic hits, mf–f
 Cymbal/Triangle:    accents or shimmer, p–mf

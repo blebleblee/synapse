@@ -12,7 +12,7 @@ This invariant must hold continuously across all controllers. The practical cons
 
 The object ownership hierarchy for a Deployment breaks down as follows:
 
-```
+```text
 Deployment  → owns →  ReplicaSet(s)  → owns →  Pod(s)
 ```
 
@@ -371,7 +371,7 @@ graph LR
 
 The HPA controller computes the desired replica count using the following formula for each metric:
 
-```
+```text
 desiredReplicas = ceil(currentReplicas × (currentMetricValue / desiredMetricValue))
 ```
 

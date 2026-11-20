@@ -32,7 +32,7 @@ The physics of multi-element wings deserves careful examination. When a single-e
 
 The front wing endplates serve a dual function that extends far beyond simple aesthetic enclosures. Structurally, they resist the bending moment imposed by the enormous downforce acting at the center of pressure, but aerodynamically, they prevent lateral spillage of high-pressure air from below the wing to the low-pressure suction surface above. This pressure differential would otherwise drive a strong crossflow around the wing tips, creating intense trailing vortices that represent wasted energy—pure induced drag with no downforce benefit. The endplates contain this spanwise flow, but they also generate their own vortex structures through carefully sculpted cutouts and turning vanes. These Y250 vortices, named for their formation point 250mm from the vehicle centerline, persist downstream and serve to guide airflow around the front tires, preventing the low-energy turbulent tire wake from contaminating the underbody floor inlet.
 
-```
+```text
 Freestream Air → Front Wing Multi-Element Cascade → Tire Wake Management
                          ↓
                  Y250 Vortex Generation → Outboard Flow Conditioning

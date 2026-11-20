@@ -24,7 +24,7 @@ The raw gyroscope data passes through a filtering cascade before reaching the PI
 
 The PID controller executes at the gyroscope sample rate of 4 kHz to 8 kHz, though some flight controllers run PID at half the gyroscope rate to reduce CPU load. Each axis—roll, pitch, yaw—has independent P, I, and D gains. The PID calculation proceeds as follows for each axis each iteration:
 
-```
+```text
 error = setpoint_rate - gyro_rate_filtered
 P_term = Kp * error
 I_term += Ki * error * dt
@@ -39,7 +39,7 @@ The setpoint rate comes from the pilot's stick input scaled by the rate profile:
 
 The motor mixer takes the PID outputs for roll, pitch, and yaw, plus the throttle command, and distributes them across the four motors. For an X-frame quadcopter with motors numbered 1 (front-right), 2 (rear-right), 3 (rear-left), 4 (front-left), and clockwise propellers on 1 and 3, counterclockwise on 2 and 4, the mixer is:
 
-```
+```text
 M1 = throttle + roll_output - pitch_output - yaw_output
 M2 = throttle + roll_output + pitch_output + yaw_output
 M3 = throttle - roll_output + pitch_output - yaw_output
@@ -50,13 +50,13 @@ Each motor command is then constrained to the range [1000, 2000] microseconds (s
 
 The angle mode outer loop runs at 500 Hz to 1 kHz and compares the desired angle (from stick input) to the current attitude estimate (from sensor fusion). The attitude estimate comes from a complementary filter that blends gyroscope integration with accelerometer tilt measurement. Gyroscope integration is performed by numerically integrating gyroscope rate to update the attitude quaternion or rotation matrix each loop iteration. Over time, gyroscope bias and integration error cause the attitude estimate to drift. The accelerometer measures the direction of the gravity vector relative to the airframe; assuming the quad is not accelerating linearly, the accelerometer directly indicates pitch and roll angles. The complementary filter computes:
 
-```
+```text
 attitude_estimate = 0.98 * (attitude_previous + gyro_rate * dt) + 0.02 * accelerometer_angle
 ```
 
 This time-constant weighting (98% gyroscope, 2% accelerometer) means the gyroscope dominates short-term response while the accelerometer corrects long-term drift. The Kalman filter, used in some flight stacks, is a more sophisticated sensor fusion that also estimates gyroscope bias and can incorporate GPS velocity to correct accelerometer errors during maneuvering flight. Once the attitude estimate is available, the angle mode controller computes the rate setpoint required to drive the attitude error to zero:
 
-```
+```text
 angle_error = setpoint_angle - attitude_estimate
 rate_setpoint = Kp_angle * angle_error
 ```

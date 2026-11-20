@@ -54,7 +54,7 @@ This feedback loop was reinforcing: military success bred financial capacity, wh
 
 The following diagram illustrates the causal dependencies within the fiscal-military state:
 
-```
+```text
 Military Competition (Wars)
         ↓
 Standing Armies & Navies (High Cost)

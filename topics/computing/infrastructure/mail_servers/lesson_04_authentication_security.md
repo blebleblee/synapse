@@ -24,7 +24,7 @@ The SASL authentication exchange begins when a client issues the EHLO command to
 
 The PLAIN mechanism encapsulates both username and password in a single exchange formatted as a null-separated string with authorization identity, authentication identity, and password components. The client concatenates these fields with null bytes as separators, encodes the result in Base64, and transmits it in the initial AUTH PLAIN response. The server decodes the Base64 payload, extracts username and password, validates credentials against its authentication backend, and returns success or failure. This mechanism provides no protection against eavesdropping or replay attacks, making TLS encryption absolutely mandatory. The mechanical simplicity of PLAIN makes it universally supported but places the entire security burden on the transport layer.
 
-```
+```text
 S: 220 mail.example.com ESMTP Postfix
 C: EHLO client.example.org
 S: 250-mail.example.com
@@ -52,7 +52,7 @@ The certificate validation chain during TLS negotiation determines whether the c
 
 The SPF validation mechanism operates through DNS TXT records that enumerate IP addresses authorized to send mail for a domain. When a receiving server accepts an inbound connection, it extracts the domain from the SMTP envelope MAIL FROM address and queries DNS for an SPF record at that domain. The SPF record contains a series of mechanisms such as "ip4" for IPv4 addresses, "ip6" for IPv6 addresses, "a" to authorize the domain's A record, "mx" to authorize the domain's MX hosts, and "include" to incorporate another domain's SPF policy. Each mechanism has an implicit or explicit qualifier indicating the policy action: "+" for pass, "-" for fail, "~" for soft fail, and "?" for neutral. The validator processes mechanisms in order until finding a match, then applies the associated qualifier as the SPF result.
 
-```
+```text
 example.com.  IN TXT "v=spf1 ip4:192.0.2.0/24 ip6:2001:db8::/32 include:_spf.google.com -all"
 ```
 
@@ -60,7 +60,7 @@ This SPF record authorizes mail from IPv4 addresses in the 192.0.2.0/24 subnet, 
 
 The DKIM signing mechanism attaches a cryptographic signature to outbound messages that recipients can verify using public keys published in DNS. The sending mail server computes a hash of selected message headers and the message body, encrypts this hash using a private key held exclusively by the sending domain, and inserts the resulting signature as a DKIM-Signature header field. This header includes the signing domain, the selector identifying which public key to use, the algorithm, the signed header list, the body hash, and the signature value itself. The signature covers both the message content and critical headers such as From, To, Subject, and Date, preventing tampering with signed elements during transit.
 
-```
+```text
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=example.com; s=2024; t=1704067200;
   h=from:to:subject:date:message-id;
@@ -73,7 +73,7 @@ The receiving server extracts the domain and selector from the DKIM-Signature he
 
 The DMARC policy framework unifies SPF and DKIM results with alignment requirements and enforcement policies. A DMARC record published in DNS at "_dmarc.example.com" specifies how receiving servers should handle messages that fail authentication checks. The policy includes the enforcement level which can be "none" for monitoring only, "quarantine" to treat failures as suspicious, or "reject" to refuse delivery entirely. The alignment mode specifies whether SPF and DKIM domains must exactly match the From header domain or merely share the organizational domain. The record also includes a reporting email address where aggregate reports should be sent, allowing domain owners to monitor authentication success rates and detect spoofing attempts.
 
-```
+```text
 _dmarc.example.com.  IN TXT "v=DMARC1; p=reject; sp=quarantine; adkim=s; aspf=s; rua=mailto:dmarc@example.com; pct=100"
 ```
 
@@ -83,7 +83,7 @@ The anti-spam architecture integrates authentication results with content analys
 
 The Postfix policy service interface allows external policy engines to participate in SMTP transaction decisions at multiple protocol points. At the RCPT TO phase, the policy service can reject recipients based on authentication state, rate limits, or recipient validation. At the END-OF-MESSAGE phase, the policy service receives the complete message content and can perform deep content inspection, spam scoring through systems like SpamAssassin, and virus scanning through ClamAV integration. The policy service returns an action such as OK to accept, REJECT to refuse with a permanent error, DEFER to refuse with a temporary error, or HOLD to accept but quarantine for manual review. This architecture separates policy logic from protocol implementation, allowing sophisticated anti-spam systems to integrate without modifying core SMTP code.
 
-```
+```text
 smtpd_recipient_restrictions =
   permit_mynetworks
   permit_sasl_authenticated
@@ -108,7 +108,7 @@ The certificate validation performance depends on the certificate chain length a
 
 The SPF validation performance degrades with excessive DNS lookups in complex SPF records. Each "include" mechanism triggers a recursive SPF evaluation for the included domain, and each "a" or "mx" mechanism triggers additional DNS queries. The SPF specification limits validators to 10 DNS lookups per evaluation to prevent denial-of-service attacks through deeply nested includes. Domains with numerous sending sources often exceed this limit, causing validation failures for legitimate mail. The optimization strategy flattens include chains by replacing them with explicit IP ranges or consolidates multiple include statements into a single delegated SPF record. Large organizations with diverse sending infrastructure must carefully architect their SPF records to stay within lookup limits while accurately representing authorized senders.
 
-```
+```text
 example.com.  IN TXT "v=spf1 ip4:192.0.2.0/24 ip4:198.51.100.0/24 ip6:2001:db8::/32 -all"
 ```
 

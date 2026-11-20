@@ -16,7 +16,7 @@ Temporal stability in neural super-resolution also depends on maintaining consis
 
 The motion vector generation pipeline begins in the vertex shader, where each vertex receives transformation by both current and previous frame matrices. The vertex structure includes a world-space position, and the shader maintains a per-draw-call uniform buffer containing the current view-projection matrix alongside a cached copy from the prior frame. For animated geometry, skeletal or blend-shape transformations must be applied using both current and previous pose data, requiring dual bone matrix palettes or morph target weights. The shader computes two clip-space positions: the current frame position via standard transformation, and the previous frame position by applying the cached matrix to the previous vertex state. These positions are written to separate interpolants and passed to the pixel shader.
 
-```
+```text
 // Vertex shader motion vector generation
 struct VertexInput {
     float3 position : POSITION;
@@ -70,7 +70,7 @@ VertexOutput VSMain(VertexInput input) {
 
 In the pixel shader, the interpolated clip-space coordinates undergo perspective division to yield normalized device coordinates (NDC), where X and Y range from -1 to +1. The motion vector is computed as the difference between current and previous NDC positions, scaled by 0.5 to convert from the symmetric [-1, 1] range to a [0, 1] texture coordinate space. For surfaces that were occluded in the previous frame or did not exist, the pixel shader must write a sentinel value or zero vector, signaling to DLSS that no valid history exists at this location. Depth testing complications arise when a surface is visible in the current frame but was occluded previously—the depth buffer from frame N-1 may contain a different surface's depth, making the reprojected coordinate geometrically invalid. Some engines resolve this by writing motion vectors before depth testing, while others use a depth comparison threshold to invalidate vectors where the reprojected depth differs significantly from the stored history depth.
 
-```
+```text
 // Pixel shader motion vector output
 struct PixelInput {
     float4 positionCS : SV_POSITION;
@@ -99,7 +99,7 @@ PixelOutput PSMain(PixelInput input) {
 
 The temporal accumulation buffer forms the core of DLSS's history management. This buffer stores the previously reconstructed super-resolution frame at full output resolution—4K for a 1080p input rendering at 2× scale. During each frame's DLSS invocation, the network reads both the current low-resolution input and the warped history buffer, blending them according to learned confidence weights. The warping operation uses the motion vector texture to sample the history buffer at offset coordinates: for each output pixel (x, y), the shader reads the motion vector at the corresponding input pixel coordinate (x/2, y/2), scales it to output resolution, and samples the history buffer at (x - dx, y - dy). This reprojection step requires bilinear filtering to handle sub-pixel motion vector precision, as motion vectors are generated at the lower input resolution but applied at the higher output resolution.
 
-```
+```text
 // Temporal history reprojection
 Texture2D<float4> historyBuffer : register(t0);
 Texture2D<float2> motionVectors : register(t1);
@@ -131,7 +131,7 @@ DLSS's neural network architecture processes this reprojected history alongside 
 
 The confidence metric for temporal blending derives from multiple geometric and photometric cues. Geometric confidence is highest when the motion vector magnitude is small relative to the pixel size, indicating minimal camera or object motion. Photometric confidence is computed by comparing the luminance of the reprojected history pixel to the neighborhood of current frame pixels in a 3×3 or 5×5 window around the corresponding input location. If the reprojected color falls outside the min-max range of this neighborhood—a condition known as color clamping violation—it signals that the history does not match current scene content, likely due to disocclusion or a specular highlight change. DLSS also incorporates reactive masks, which are optional artist-authored or procedurally generated per-pixel flags indicating regions where temporal accumulation should be reduced, such as alpha-tested foliage, transparent effects, or HUD elements that move independently of the 3D scene.
 
-```
+```text
 // Temporal confidence evaluation
 float ComputeTemporalConfidence(
     float3 currentColor,
@@ -175,7 +175,7 @@ Temporal accumulation introduces latency and memory bandwidth constraints that c
 
 Disocclusion represents the most challenging failure mode for temporal techniques. When a previously occluded surface becomes visible—such as an object emerging from behind a wall during camera rotation—no valid history exists for the newly exposed pixels. The motion vector at the disoccluded location points to the occluder's surface in the previous frame, causing the reprojection to sample incorrect color data. Classical TAA handles this through aggressive color clamping, which constrains the reprojected history to lie within the current frame's neighborhood color distribution. However, strict clamping discards valuable temporal information and reintroduces aliasing. DLSS addresses disocclusion through learned disocclusion masks, where the network detects geometric inconsistencies between the current depth buffer and the reprojected depth derived from the previous frame's depth and motion vectors. When depth mismatch exceeds a threshold, the network reduces the history contribution and relies more heavily on spatial hallucination from the current frame's texture gradients and learned priors.
 
-```
+```text
 // Disocclusion detection via depth comparison
 float DetectDisocclusion(
     float currentDepth,

@@ -185,7 +185,7 @@ dmesg -w | grep -E "oom_reaper|Out of memory"
 ```
 
 **Reclaim Path:**
-```
+```text
 Allocation Failure → try_to_free_pages() → shrink_zone()
     → shrink_lruvec() → shrink_list(ACTIVE/INACTIVE)
     → pageout() → write to swap
@@ -307,7 +307,7 @@ wait
 ```
 
 **TCP State Machine:**
-```
+```text
 CLOSED → SYN_SENT → (SYN-ACK) → ESTABLISHED
     tcp_v4_connect() → tcp_transmit_skb(SYN) → tcp_rcv_state_process()
 ```

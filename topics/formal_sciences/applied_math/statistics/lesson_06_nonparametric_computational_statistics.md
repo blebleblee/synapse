@@ -96,7 +96,7 @@ $$Z = \frac{W^+ - n(n+1)/4}{\sqrt{n(n+1)(2n+1)/24}} \xrightarrow{d} \mathcal{N}(
 
 The computational workflow proceeds through sorting, ranking, and summation phases:
 
-```
+```text
 Input: paired differences D = (D_1, ..., D_n)
 1. Compute absolute differences A = (|D_1|, ..., |D_n|)
 2. Sort A to obtain order statistics A_(1) <= ... <= A_(n)
@@ -119,7 +119,7 @@ $$p = \frac{1 + \#\{\pi\!: T(\mathbf{Z}, \pi(\mathbf{G})) \ge T(\mathbf{Z}, \mat
 
 where the sum ranges over $N_{\text{perm}}$ randomly sampled permutations and the "$+1$" terms ensure conservatism. The computational architecture involves the permutation generator, test statistic evaluator, and rank accumulator:
 
-```
+```text
 Input: data Z, group labels G, test statistic function T, nperm
 1. Compute observed statistic T_obs = T(Z, G)
 2. Initialize counter: count = 0
@@ -158,7 +158,7 @@ where $\hat{\theta}_{(-i)} = T(\mathbf{X}_{-i})$ denotes the statistic computed 
 
 The bootstrap computational workflow centers on efficient resampling and statistic evaluation:
 
-```
+```text
 Input: data X = (X_1, ..., X_n), statistic function T, nboot
 1. Compute observed statistic theta_hat = T(X)
 2. Initialize storage: theta_star = array of length nboot
@@ -223,7 +223,7 @@ $$\sigma^2 \mid \mathbf{Y}, \mu \sim \text{Inverse-Gamma}\left(a + \frac{n}{2}, 
 
 The Gibbs sampler alternates between these conditionals:
 
-```
+```text
 Input: data Y, priors (mu_0, tau^2, a, b), niter
 1. Initialize mu^(0), sigma2^(0)
 2. For t = 1 to niter:

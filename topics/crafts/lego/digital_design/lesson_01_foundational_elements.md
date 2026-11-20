@@ -14,7 +14,7 @@ The third invariant is the tube. Inside every standard LEGO brick, beneath the a
 
 The LEGO geometric system operates as a three-dimensional integer lattice, and every connection point in any model can be described by its coordinates in that lattice. The X and Y axes are governed by the 8mm stud pitch. The Z axis is governed by the 1.2mm plate height (the smallest vertical increment), which means the brick height of 9.6mm resolves to exactly 8 plate increments. Understanding this lattice is what separates a builder who can assemble a kit from one who can design original models, because original design requires you to know where every element will terminate relative to every other element, before any parts are joined.
 
-```
+```text
 LEGO Lattice Geometry (1×1 Brick Reference)
 
  俯视图 (Top View)         侧视图 (Side View)

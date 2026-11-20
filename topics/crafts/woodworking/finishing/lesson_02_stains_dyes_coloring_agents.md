@@ -26,7 +26,7 @@ The application geometry of pigment versus dye fundamentally differs in how mate
 
 The timing constraints for dye application derive from solvent evaporation kinetics and surface tension effects. Alcohol-based dyes flash off so rapidly that application must proceed in continuous, overlapping strokes without pause. A spray application atomizes the dye into fine droplets that wet the surface uniformly and dry within seconds, making spray the preferred method for large panels or uniform color fields. Brush or rag application of alcohol dyes demands that the applicator move fast enough to maintain a wet edge—if the leading edge dries before the next stroke arrives, a visible lap line appears as the new material redissolves and redistributes dye already deposited. Water-based dyes extend this working window to several minutes, allowing time to feather edges and blend transitions, but they also provide more opportunity for drips to form on vertical surfaces and for uneven absorption to manifest as blotchiness.
 
-```
+```text
 Penetration Depth Model (Simplified Washburn)
 
 d = sqrt((r * γ * cos(θ) * t) / (2 * η))

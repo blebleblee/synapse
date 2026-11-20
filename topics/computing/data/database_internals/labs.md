@@ -272,7 +272,7 @@ sudo -u postgres psql -c "CREATE DATABASE tracetest;"
 ```
 
 3. Enable query logging in `/etc/postgresql/*/main/postgresql.conf`:
-```
+```text
 log_statement = 'all'
 log_duration = on
 ```

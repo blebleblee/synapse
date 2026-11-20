@@ -96,7 +96,7 @@ The slider (tracker) chest is a physical AND gate. A pipe sounds only when both 
 1. The **key pallet** is open (you are holding the key down)
 2. The **stop slider** is drawn (the knob is pulled out, uncovering the pipe's toe hole)
 
-```
+```text
 Pipe sounds = Pallet[key] AND Slider[stop]
 ```
 
@@ -105,7 +105,7 @@ That's the entire selection logic of a mechanical organ: a 61-key × N-stop matr
 ### 3.2 Electro-Pneumatic and Direct-Electric Action
 Modern consoles replace the mechanical slider with an electromagnet per pipe:
 
-```
+```text
 Electromagnet[stop][key] = Stop_enabled[stop] AND Key_pressed[key]
 ```
 
@@ -138,31 +138,31 @@ The plenum is not a color choice — it's the organ's maximum-clarity ensemble. 
 **Build it in five deliberate steps (Great manual):**
 
 **Step 1 — Foundation**
-```
+```text
 Draw: 8' Principal
 ```
 Your unison pitch reference. Everything else is measured against this.
 
 **Step 2 — Octave reinforcement**
-```
+```text
 Draw: 8' Principal + 4' Octave
 ```
 Adds the 2nd partial. Brightens the attack; pitch center doesn't move.
 
 **Step 3 — Complete the lower series**
-```
+```text
 Draw: 8' + 4' + 2' Superoctave
 ```
 Harmonics 1, 2, 4 now present. Already a complete, usable registration for smaller textures.
 
 **Step 4 — Add the mixture**
-```
+```text
 Draw: 8' + 4' + 2' + Mixture IV
 ```
 Fills in harmonics 8, 10, 12, 16+. The ensemble snaps into a single fused timbre — the ear stops tracking separate pitches and hears one blazing composite color. This fusion point is the plenum's defining moment; if it doesn't happen, your 8'/4' foundation is too weak relative to the mixture (see Section 8).
 
 **Step 5 — Add 16' for weight (optional)**
-```
+```text
 Draw: 16' Principal + 8' + 4' + 2' + Mixture
 ```
 Extends below the fundamental for gravity in large rooms.
@@ -173,7 +173,7 @@ Extends below the fundamental for gravity in large rooms.
 
 Opposite logic from the plenum: flutes fuse into a soft unified wash, not a brilliant choral blaze.
 
-```
+```text
 Soft accompaniment:     8' Bourdon (stopped flute) alone
 Add warmth:             8' Bourdon + 8' Flûte Harmonique
 Add gentle brightness:  8' Bourdon + 8' Flûte Harmonique + 4' Flûte
@@ -186,14 +186,14 @@ The celeste belongs to the flute/string family only — it never appears in a pr
 
 The **Cornet** is a five-rank solo combination, drawn either from one knob or assembled by hand:
 
-```
+```text
 Cornet = 8' Open Flute + 4' Flute + 2⅔' Nazard + 2' Flute + 1⅗' Tierce
 ```
 
 Maps directly onto harmonics 1, 2, 3, 4, 5. The ear fuses all five into a single brilliant, slightly nasal solo voice — the organ's answer to a solo oboe or cornet (brass). Standard for cantus firmus statements in the treble in French Classical repertoire.
 
 **Sesquialtera (2-rank solo):**
-```
+```text
 2⅔' Nazard + 1⅗' Tierce — no 8' or 4' foundation
 ```
 A niche English combination for pastoral solo lines. The deliberately *missing* fundamental gives it a plaintive, slightly unstable quality — useful for exactly one melodic line, never for chords. Playing full triads on Sesquialtera alone produces an unintelligible harmonic smear; reserve it for single-note melody only.
@@ -201,13 +201,13 @@ A niche English combination for pastoral solo lines. The deliberately *missing* 
 ### 4.4 Reed Registrations
 
 **Solo reed over soft accompaniment:**
-```
+```text
 Melody (Great, or Swell closed):  8' Trumpet
 Accompaniment (Swell, softer):    8' Bourdon + 4' Flûte
 ```
 
 **Reed chorus (full Romantic weight):**
-```
+```text
 Build:  8' Principal + 4' Principal → add 8' Trumpet → add 16' Trombone
 ```
 
@@ -221,14 +221,14 @@ Build:  8' Principal + 4' Principal → add 8' Trumpet → add 16' Trombone
 
 A celeste rank is deliberately mistuned — sharp or flat by roughly 2–6 Hz at any given pitch — relative to a companion rank of the same pipe length. Sounding both together produces a beat frequency:
 
-```
+```text
 f_beat = |f₁ − f₂|
 ```
 
 At ~1 Hz the ensemble seems to breathe. At ~3 Hz you get the classic slow shimmer organists call "celeste." At 5–6 Hz it turns agitated, almost tremulous. Above that it stops sounding musical and starts sounding detuned.
 
 **Practical combinations:**
-```
+```text
 Soft lush pad:   8' Voix Céleste + 8' Salicional         (string pair, classic)
 Warmer blend:    8' Voix Céleste + 8' Flûte Harmonique    (flute-string hybrid)
 Ultra-soft:      Céleste rank alone, no companion          (thin, haunting — not all instruments permit this)
@@ -286,7 +286,7 @@ flowchart LR
 
 Thumb pistons (under each manual) and toe pistons (above the pedal clavier) instantly recall a preset stop combination. Program a graduated sequence:
 
-```
+```text
 Piston 1 (pp):   8' Bourdon alone
 Piston 2 (p):    8' Bourdon + 4' Flûte
 Piston 3 (mp):   8' Principal + 4' Octave
@@ -310,19 +310,19 @@ Each era's registration vocabulary is a direct consequence of its organ-building
 Organs built in independent **Werks** (Hauptwerk, Rückpositiv, Brustwerk, Pedal), each with its own complete principal chorus. No swell boxes, no expression pedal, no Romantic-weight reeds.
 
 **Hauptwerk plenum:**
-```
+```text
 16' Principal + 8' Principal + 4' Octave + 2⅔' Quinte + 2' Superoctave + Mixture IV-VI + Zimbel II
 ```
 
 **Rückpositiv contrast chorus (softer, behind the player):**
-```
+```text
 8' Principal + 4' Octave + 2' Flachflöte + Mixture III
 ```
 
 **Echo dialogue (Praetorius-style):** alternate full phrases between Hauptwerk plenum and Rückpositiv plenum — the dynamic contrast comes from switching manuals entirely, not from adding or removing single stops.
 
 **Schübler-style cantus firmus:**
-```
+```text
 Right hand (Hauptwerk): 8' Trompette, solo
 Left hand (Rückpositiv): 8' Flute + 4' Flute, soft accompaniment
 Pedal: 16' Principal + 8' Octave, independent bass
@@ -336,26 +336,26 @@ Pedal: 16' Principal + 8' Octave, independent bass
 French organs are built around rich reed batteries and a distinctive mutation palette rather than large mixture ranks. Two governing registrations cover almost the whole repertoire, and they do not mix:
 
 **Plein Jeu (foundations, no reeds):**
-```
+```text
 8' Montre + 8' Bourdon + 4' Prestant + Mixture (Fourniture) + Cymbale
 ```
 Clear, shimmering, liturgical — used for versets and slow movements.
 
 **Grand Jeu (full organ, reed-dominant):**
-```
+```text
 8' Montre + 4' Prestant + Cornet V (treble) + 8' Trompette + 4' Clairon + 16' Bombarde (if available)
 ```
 No mixture here — the reed battery supplies the spectral density instead.
 
 **Cromorne en taille (tenor solo reed):**
-```
+```text
 Récit:       8' Cromorne, solo, middle register (tenor clef line)
 Grand Orgue: 8' Bourdon + 4' Flûte, soft accompaniment
 ```
 The Cromorne — capped, cylindrical resonator — has a round, buzzy tone distinct from the Trompette's blaze. Marked *en taille* calls for exactly this combination for the inner-voice solo.
 
 **Récit de Nazard (flute-mutation solo):**
-```
+```text
 Récit:       8' Bourdon + 2⅔' Nazard (+ optional 2' Doublette)
 Grand Orgue: 8' Bourdon alone
 ```
@@ -367,7 +367,7 @@ De Grigny and Couperin specify this for pastoral solos — the Nazard over a bar
 High wind pressure (100–250 mm WC, versus roughly 70 mm Baroque) powers heavier reeds and more assertive flue stops. The swell box, now standard, introduces genuinely continuous dynamic shading that no earlier organ could produce.
 
 **Franck-style crescendo build:**
-```
+```text
 pp:  Swell 8' Voix Céleste + 8' Flûte, box closed
 p:   add Swell 4' Flûte; open box slightly
 mp:  add Swell 8' Oboe; Great 8' Principal + 4' Octave
@@ -378,7 +378,7 @@ fff: full Pedal reeds (16' Bombarde, 8' Trompette); crescendo pedal to maximum
 ```
 
 **Vierne/Widor toccata tutti:**
-```
+```text
 Great:  8' + 4' + 2' Principals + Mixture + 8' Trompette
 Swell:  8' + 4' Principals + Oboe, box open
 Pedal:  16' + 8' + 4' Principals + 16' Trombone + Gt/Ped coupler
@@ -391,7 +391,7 @@ The massive sustained "orchestral tutti" — enclosed Swell layered over the Gre
 The Orgelbewegung revived tracker action and lower wind pressure, but modern instruments freely combine historical and Romantic resources on one console. Modern registration mixes eras deliberately:
 
 **Messiaen, "Dieu parmi nous" (opening, fff rhythmic drive):**
-```
+```text
 Great:    8' + 4' + 2' Principals + Mixture + 8' Trompette
 Swell:    Plein Jeu + Mixture + 8' Trombone
 Pedal:    32' + 16' + 8' Principals + 16' + 8' Reeds
@@ -399,7 +399,7 @@ Couplers: Sw/Gt, Gt/Ped, Sw/Ped
 ```
 
 **Messiaen, "Le banquet céleste" (slow meditation, pp):**
-```
+```text
 Swell:  8' Flûte Harmonique + 8' Voix Céleste, box nearly closed
 Great:  8' Bourdon alone
 Pedal:  16' Bourdon, no reeds
@@ -439,7 +439,7 @@ Stop knobs sit on both sides of the manuals. You must draw or push them while th
 ### Drill 3 — Manual Transfer (Day 2–3)
 **Goal:** move a melodic line between manuals with contrasting colors, seamlessly.
 
-```
+```text
 Great: 8' + 4' Principals + Mixture (full plenum)
 Swell: 8' Oboe, box half-open
 ```
@@ -466,7 +466,7 @@ Program pistons 1–6 from Section 5.3.
 ### Drill 5 — French Classical Color Matching (Day 5–7)
 **Goal:** execute a clean Plein Jeu → Grand Jeu transition, de Grigny style.
 
-```
+```text
 Piston A — Plein Jeu: 8' Montre + 8' Bourdon + 4' Prestant + Mixture (no reeds)
 Piston B — Grand Jeu: 8' Montre + 4' Prestant + 8' Trompette + 4' Clairon
 ```
@@ -499,7 +499,7 @@ Piston B — Grand Jeu: 8' Montre + 4' Prestant + 8' Trompette + 4' Clairon
 
 ### Starting a New Piece — The Registration Protocol
 
-```
+```text
 1. Read the score: dynamic markings, era, composer, nationality.
 2. Assign manuals: which keyboard carries the melody voice?
 3. Build from 8' up. Never start with mutations or reeds.

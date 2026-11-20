@@ -34,7 +34,7 @@ Control flow translation transforms structured control constructs into explicit 
 
 The control flow graph emerges from partitioning the linear three-address code into basic blocks. The algorithm identifies leader instructions that begin basic blocks: the first instruction in the program, any target of a jump, and any instruction immediately following a jump. Each basic block extends from its leader to the instruction immediately before the next leader. Edges connect basic blocks according to control flow: a conditional jump creates edges to both the fall-through successor and the jump target, an unconditional jump creates a single edge to the target, and sequential flow creates an edge to the immediately following block. Function calls typically create edges both to the call target and to the return continuation, though intraprocedural analysis may treat calls as single instructions.
 
-```
+```text
 Original Code:
   1: x = 0
   2: y = 1

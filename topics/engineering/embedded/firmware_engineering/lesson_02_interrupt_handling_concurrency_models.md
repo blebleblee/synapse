@@ -20,7 +20,7 @@ The interrupt vector table (IVT) is a data structure that resides in memory at a
 
 Consider an ARM Cortex-M4 microcontroller. The processor has 16 built-in exceptions (resets, faults, SVCall, PendSV, SysTick) at fixed vector positions 0–15, and then external interrupts (GPIO, UART, SPI, timers) at positions 16 and beyond. The IVT for a Cortex-M4 is typically placed at address `0x00000000` (or `0x20000000` for RAM-based vectors on some devices). Each entry is a 32-bit address pointing to the corresponding handler.
 
-```
+```text
 Interrupt Vector Table Layout (ARM Cortex-M4)
 ==================================================
 Address     | Vector # | Handler
@@ -56,7 +56,7 @@ On ARM Cortex-M, priority levels are configured in the Interrupt Priority regist
 
 The following diagram illustrates the priority arbitration flow:
 
-```
+```text
 Interrupt Arbitration Flow
 ===================================
 

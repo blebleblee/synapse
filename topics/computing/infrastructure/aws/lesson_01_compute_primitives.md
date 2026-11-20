@@ -22,7 +22,7 @@ When an EC2 RunInstances API call arrives, a multi-stage provisioning workflow b
 
 The Nitro Hypervisor allocates physical memory pages to the instance using second-level address translation tables (Intel EPT or AMD NPT) that map guest physical addresses to host physical addresses. The allocated memory is zero-filled before being exposed to the guest to prevent information leakage from previous tenants—a mandatory security invariant. CPU pinning assigns specific physical cores to the instance's vCPUs using affinity masks, and NUMA-aware allocation attempts to localize memory allocations to the same CPU socket to minimize cross-socket memory access latency. The Nitro I/O subsystem then attaches an Elastic Block Store (EBS) volume or instance store volume as the root device, provisioning the storage through either NVMe-over-TCP to remote EBS servers or direct NVMe attachment for local SSDs.
 
-```
+```text
 EC2 Instance State Machine:
 
 pending → running → stopping → stopped → terminated

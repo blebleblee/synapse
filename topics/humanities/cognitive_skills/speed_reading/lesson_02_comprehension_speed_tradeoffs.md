@@ -22,7 +22,7 @@ This brings us to the retention curve—the inevitable temporal decay of memory 
 
 Understanding the mechanical architecture of reading reveals why certain optimizations work and others produce false gains. Reading involves three principal processing streams: the visual-orthographic stream (perceiving letter sequences), the lexical-semantic stream (accessing word meanings and syntactic roles), and the integration stream (constructing propositional meaning from words and integrating that meaning with prior context). These streams operate in rough parallel, but they have hard sequential dependencies: you cannot access word meaning without first perceiving the orthographic form, and you cannot integrate meaning without first accessing it.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                    Reading Processing Pipeline                          │
 ├─────────────────────────────────────────────────────────────────────────┤

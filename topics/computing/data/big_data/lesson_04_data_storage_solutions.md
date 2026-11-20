@@ -34,7 +34,7 @@ Two strategies provide fault tolerance:
 
 **Erasure coding** splits data into N data shards and M parity shards (RS(N+M, N)). Storage overhead is (N+M)/N. It tolerates M simultaneous failures. Reconstruction of a lost shard requires reading N surviving shards — a read amplification of N×. Erasure coding trades read latency and CPU cost for storage efficiency.
 
-```
+```text
 Replication (3x):     [A][A][A]           Storage: 300%, Fail tolerance: 2
 Erasure coding (10+4): [A1][A2]...[A10][P1][P2][P3][P4]  Storage: 140%, Fail tolerance: 4
 ```

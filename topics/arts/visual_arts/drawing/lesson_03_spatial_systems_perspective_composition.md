@@ -30,7 +30,7 @@ To construct a simple hallway interior in one-point perspective, begin by drawin
 
 Adding detail to this space requires subdividing the receding planes into measured intervals. To divide a wall into equal vertical sections—say, to place evenly spaced window frames—use the diagonal measuring technique. Draw a diagonal line from one corner of the front wall rectangle to the opposite corner of the back wall rectangle. This diagonal crosses the vertical edges of the wall at proportionally equal intervals. Where the diagonal intersects a vertical edge, draw a horizontal line perpendicular to the depth axis. This horizontal marks a subdivided section. Repeat this process to generate as many equal divisions as needed. The same technique applies to floor or ceiling grids, allowing you to construct tile patterns or coffered ceiling designs that recede convincingly into depth.
 
-```
+```text
 One-Point Perspective Construction Sequence:
 
 Step 1: Horizon Line (HL) + Vanishing Point (VP)
@@ -74,7 +74,7 @@ To complete the box form, you need to establish the depth of each face. Draw two
 
 Constructing complex architectural scenes in two-point perspective follows an additive process. Start with the primary building mass as a simple box. Subdivide this box using the same diagonal measuring technique described for one-point perspective, but apply it independently to each receding face. To place evenly spaced windows along a facade, divide the face into equal horizontal sections by drawing diagonals from corner to corner and marking their intersections with vertical construction lines. To add a roof, extend the top edges of the building upward and converge them toward their respective vanishing points, then draw a horizontal ridge line connecting the peaks of the two roof planes.
 
-```
+```text
 Two-Point Perspective Box Construction:
 
 Step 1: Horizon Line + Two Vanishing Points

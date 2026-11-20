@@ -26,7 +26,7 @@ To understand how a software firewall processes packets in a Linux infrastructur
 
 The five canonical netfilter hooks in the IPv4 path are:
 
-```
+```text
 NF_INET_PRE_ROUTING   → after checksum validation, before routing decision
 NF_INET_LOCAL_IN      → packets destined for the local host
 NF_INET_FORWARD       → packets being routed through the host

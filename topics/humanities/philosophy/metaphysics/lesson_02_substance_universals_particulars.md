@@ -209,7 +209,7 @@ Trope theory retains particularity at the most fundamental level while still acc
 
 The principle of identity of indiscernibles (PII) functions as a constraint across all these architectures:
 
-```
+```text
 PII Logical Form:
 For all x and y: If (for all properties P: x has P iff y has P) 
                  Then x = y
@@ -227,7 +227,7 @@ If spatiotemporal properties are excluded from the scope of PII (treated as exte
 
 The bare particular theory responds to this puzzle:
 
-```
+```text
 Bare Particular Model:
 Object A = Bare Particular (A) + Properties {red, round, 2kg, ...}
 Object B = Bare Particular (B) + Properties {red, round, 2kg, ...}
@@ -242,7 +242,7 @@ A bare particular is an abstract particular—a component of a concrete object t
 
 The thick particular alternative rejects bare particulars:
 
-```
+```text
 Thick Particular Model:
 Object A = {red, round, 2kg, located-at-spacetime-point-1}
 Object B = {red, round, 2kg, located-at-spacetime-point-2}

@@ -24,7 +24,7 @@ SageMaker Model Monitor's architecture decomposes into three primary execution l
 
 The data capture mechanism hooks into SageMaker's inference serving infrastructure at the endpoint level. When enabled, it streams a configurable percentage of requests and responses to S3 in JSON Lines format, preserving both the input feature vector and the model's prediction output. This capture happens asynchronously to avoid adding latency to the critical path—the endpoint returns predictions to clients immediately while capture buffers accumulate in memory and flush to S3 every few seconds. The capture format encodes timestamps with millisecond precision, enabling temporal correlation analysis and latency profiling. For multi-model endpoints serving multiple models behind a single inference gateway, capture files include routing metadata that disambiguates which model variant processed each request.
 
-```
+```text
 Inference Request Flow with Capture Enabled:
 
 Client Request

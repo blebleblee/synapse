@@ -181,7 +181,7 @@ Scene management in multiplayer introduces challenges around asset streaming and
 
 The IL2CPP compilation pipeline begins with Unity's C# compiler producing Common Intermediate Language assemblies from source scripts. These assemblies undergo bytecode postprocessing: Unity's code weaver injects NetworkBehaviour synchronization hooks, serialization helpers, and performance instrumentation. The processed IL then feeds into the IL2CPP transpiler, a complex multi-stage compiler written in C# that lives in the Unity Editor. The transpiler performs type analysis, generic instantiation, method table construction, and virtual dispatch resolution before generating C++ source files—one per assembly, containing class definitions, method implementations, and metadata tables.
 
-```
+```text
 IL2CPP Compilation Flow:
 
 C# Source Code (Assets/Scripts/*.cs)

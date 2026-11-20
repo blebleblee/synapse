@@ -52,7 +52,7 @@ Next, the linear RGB values are encoded using either a gamma curve (Rec. 709 gam
 
 The final stage is compression. Intraframe codecs (ProRes, DNxHD/DNxHR) compress each frame independently, allowing random access to any frame without decoding predecessors. Long-GOP codecs (H.264, H.265) compress sequences of frames, storing keyframes plus differential information for intervening frames. Intraframe codecs produce larger file sizes but superior image quality and edit-friendly random access. H.265 (HEVC) achieves roughly 50% smaller file sizes than H.264 at equivalent quality, but requires more CPU power to decode.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Image Capture Pipeline                        │
 ├─────────────────────────────────────────────────────────────────┤

@@ -24,7 +24,7 @@ The physical implementation stack for a superconducting quantum processor begins
 
 Control and readout of superconducting qubits proceeds through microwave engineering techniques adapted from classical radar and communication systems. Each qubit couples capacitively to a dedicated coplanar waveguide resonator with resonance frequency ω_r typically detuned by hundreds of MHz from the qubit frequency ω_q, creating a dispersive shift χ = g²/(Δ), where Δ = ω_q - ω_r and g is the qubit-resonator coupling strength. When the qubit occupies state |1⟩, the resonator frequency shifts by 2χ relative to the |0⟩ state, enabling quantum non-demolition readout through heterodyne detection of reflected or transmitted microwave signals. Single-qubit gates exploit resonant microwave pulses shaped according to derivative-removal-by-adiabatic-gate (DRAG) protocols to minimize leakage to non-computational states, with typical X or Y rotation gates requiring 20-50 ns with fidelities exceeding 99.9%. Two-qubit entangling gates leverage either the cross-resonance effect, where driving one qubit at the frequency of its neighbor induces conditional rotations, or tunable coupling schemes where an intermediate coupler element's frequency is modulated to turn interaction on and off. The cross-resonance gate typically requires 200-400 ns to implement a CNOT operation with fidelities in the 98-99.5% range, with gate time fundamentally limited by the coupling strength g and detuning Δ according to the Rabi frequency formula.
 
-```
+```text
 Superconducting Transmon Qubit Physical Stack:
 
                     ┌─────────────────────────────────┐
@@ -214,7 +214,7 @@ The computational model for topological quantum computing with Ising anyons (sup
 
 Readout in topological systems measures the joint fermion parity of multiple Majorana modes by coupling them through Josephson junctions and monitoring the 4π-periodic (rather than 2π-periodic) supercurrent-phase relation characteristic of topologically protected ground states. For a qubit encoded in four Majorana modes γ₁, γ₂, γ₃, γ₄ arranged with γ₁-γ₂ and γ₃-γ₄ forming two conventional fermion operators f₁ = (γ₁ + iγ₂)/2 and f₂ = (γ₃ + iγ₄)/2, the logical qubit states correspond to the total fermion parity P = (f₁†f₁ + f₂†f₂) mod 2, with P=0 and P=1 defining the computational basis. The measurement destructively projects the topological state but preserves the logical information encoded in parity, with readout fidelities theoretically reaching 99.9% but experimentally undemonstrated at scale due to the immature state of Majorana qubit platforms. As of 2025, no experimental group has demonstrated a single topologically protected logical qubit with coherence times or gate fidelities exceeding conventional platforms, positioning topological computing as a long-term research direction rather than near-term hardware solution.
 
-```
+```text
 Topological Qubit Encoding (Majorana Zero Modes):
 
 Nanowire Heterostructure:

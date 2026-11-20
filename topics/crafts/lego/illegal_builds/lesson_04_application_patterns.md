@@ -22,7 +22,7 @@ To reason precisely about illegal connections, you need a working model of how l
 
 The diagram below maps the principal load paths for three connection archetypes — a legal orthogonal connection, a classic SNOT offset rotation, and a torque-angle illegal — to give you a spatial grammar for the analysis that follows.
 
-```
+```text
 LEGAL (Orthogonal)          SNOT OFFSET (Semi-Legal)      TORQUE-ANGLE (Illegal)
                                                            
    [Brick B]                  [Brick B rotated 90°]         [Brick B at ~15° angle]

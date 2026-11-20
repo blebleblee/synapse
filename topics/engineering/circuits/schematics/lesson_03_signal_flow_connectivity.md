@@ -38,7 +38,7 @@ Bus notation mechanics vary significantly across CAD vendors but converge on a c
 
 The ASCII representation of these connectivity primitives in SPICE netlists and other textual interchange formats strips away all graphical information, reducing the schematic to a pure adjacency list. A typical SPICE subcircuit definition begins with a `.SUBCKT` directive listing the subcircuit's port names, followed by component instantiation lines that reference net names and component values:
 
-```
+```text
 .SUBCKT LowPassFilter IN OUT GND
 R1 IN N001 4.7k
 C1 N001 GND 100p

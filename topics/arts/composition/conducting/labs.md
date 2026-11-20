@@ -94,7 +94,7 @@ flowchart TD
 
 ### The Two-Pattern (2/4, or cut time)
 
-```
+```text
     1 (down)
      |
     2 (up)

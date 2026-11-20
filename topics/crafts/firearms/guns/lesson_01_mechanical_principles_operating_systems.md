@@ -86,7 +86,7 @@ Short recoil-operated pistols achieve their lock through geometric engagement be
 
 The timing of this unlock is determined purely by geometry—the distance the coupled assembly travels before the cam geometry forces barrel tilt. This distance, typically 4–6 millimeters, corresponds to the time required for chamber pressure to drop from 35,000 psi peak to roughly 12,000 psi safe unlocking pressure. The exact cam profile is derived from pressure-time curves for the specific cartridge, accounting for barrel length and port pressure.
 
-```
+```text
 Short Recoil Sequence (Browning Tilting Barrel):
 
 Locked: [Barrel]≡≡≡[Slide]  ← Lugs engaged
@@ -116,7 +116,7 @@ The AR-15 direct impingement system eliminates the piston, routing gas through a
 
 The rotation required for unlocking is precisely 15 degrees in the AR-15, derived from the 22.5-degree helix angle of the cam pin slot and the geometry of the lugs. This rotation must occur over approximately 6–8 millimeters of carrier travel to provide primary extraction—the initial case movement that breaks the friction seal—before the case is unsupported by the chamber walls.
 
-```
+```text
 AR-15 Gas System (Direct Impingement):
 
 Locked: [Barrel Extension]⟲[Bolt Lugs Engaged]

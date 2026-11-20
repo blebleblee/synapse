@@ -120,7 +120,7 @@ Comparative statics analysis traces the impact of parameter changes on equilibri
 
 The graphical apparatus complements these algebraic solutions by providing geometric intuition for policy transmission. The IS-LM diagram plots the interest rate $i$ on the vertical axis and output $Y$ on the horizontal axis, with the downward-sloping IS curve and upward-sloping LM curve intersecting at equilibrium:
 
-```
+```text
         i
         |
         |     LM

@@ -28,7 +28,7 @@ The most direct approach begins with the forward kinematics function expressed i
 
 The geometric interpretation provides a more intuitive and computationally tractable alternative. Consider the contribution of the i-th joint to the end-effector velocity. For a revolute joint, the joint rotation rate **q̇**ᵢ generates two effects: an angular velocity **ω**ᵢ = **q̇**ᵢ **ẑ**ᵢ₋₁ about the joint axis (where **ẑ**ᵢ₋₁ is the unit vector along the i-th joint's rotation axis expressed in the base frame), and a linear velocity **v**ᵢ = **ω**ᵢ × **r**ᵢ at the end-effector, where **r**ᵢ is the vector from the i-th joint axis to the end-effector. For a prismatic joint, the motion **q̇**ᵢ along the axis contributes only a linear velocity **v**ᵢ = **q̇**ᵢ **ẑ**ᵢ₋₁ with no angular component. The total end-effector velocity is the superposition of contributions from all joints, leading to a column-by-column construction of the Jacobian:
 
-```
+```text
 For revolute joint i:
   J_v,i = z_{i-1} × (p_n - p_{i-1})
   J_ω,i = z_{i-1}
@@ -40,7 +40,7 @@ For prismatic joint i:
 
 Here **p**ₙ is the end-effector position, **p**ᵢ₋₁ is the origin of frame i-1, and **z**ᵢ₋₁ is the unit vector along the i-th joint axis, all expressed in the base frame. The complete 6×n Jacobian is assembled by stacking the linear velocity rows **J**ᵥ and angular velocity rows **J**ω, giving the structure:
 
-```
+```text
 J(q) = [ J_v ]  = [ J_v,1  J_v,2  ⋯  J_v,n ]
        [ J_ω ]    [ J_ω,1  J_ω,2  ⋯  J_ω,n ]
 ```
@@ -49,7 +49,7 @@ This geometric derivation not only simplifies hand computation but also provides
 
 For a concrete six-joint manipulator with axes aligned as typical in industrial robots (vertical base rotation, followed by shoulder, elbow, and three-axis spherical wrist), the Jacobian assembly proceeds as follows. First, compute the homogeneous transformation matrices **T**₀¹, **T**₀², …, **T**₀⁶ by successive multiplication, extracting the rotation matrix **R**₀ⁱ and origin **p**₀ⁱ from each. The joint axes in the base frame are **z**₀ = [0 0 1]ᵀ (base rotation), **z**₁ = **R**₀¹[0 0 1]ᵀ (shoulder pitch), **z**₂ = **R**₀²[0 0 1]ᵀ (elbow pitch), and so forth. The Jacobian columns are:
 
-```
+```text
 Column 1 (revolute): J_v,1 = z_0 × (p_6 - p_0), J_ω,1 = z_0
 Column 2 (revolute): J_v,2 = z_1 × (p_6 - p_1), J_ω,2 = z_1
 Column 3 (revolute): J_v,3 = z_2 × (p_6 - p_2), J_ω,3 = z_2

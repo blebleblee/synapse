@@ -26,7 +26,7 @@ The contract between event producers and consumers differs fundamentally from th
 
 The fundamental data structure underlying event-driven infrastructure is the append-only log. This deceptively simple abstraction—a totally ordered sequence of records that supports only append operations and sequential reads—provides the foundation for distributed consensus, stream processing, and event sourcing. The log's append-only nature enables aggressive optimization: writes always proceed to the end, eliminating random disk seeks; reads typically scan sequentially, maximizing throughput; and immutability permits lockless concurrent reads without coordination overhead.
 
-```
+```text
 Append-Only Event Log Structure
 ═══════════════════════════════════════════════════════════════════════════
 

@@ -93,7 +93,7 @@ Structural studies reveal that cognate base pairing induces three universally co
 
 Translocation after peptidyl transfer involves coordinated movement of two tRNAs and three nucleotides of mRNA through the ribosome. Prior to translocation, the P-site tRNA, now deacylated, and the A-site tRNA, now peptidyl-tRNA, occupy classical binding states with their anticodon stems in the small subunit A- and P-sites and their acceptor stems in the large subunit A- and P-sites. Spontaneous fluctuations rotate the small subunit body relative to the large subunit, shifting the tRNAs into hybrid states: the P-site tRNA adopts a P/E configuration (anticodon in small subunit P-site, acceptor in large subunit E-site) and the A-site tRNA adopts an A/P configuration. EF-G binding to the hybrid-state ribosome stabilizes the rotated configuration and, upon GTP hydrolysis, drives the small subunit back to its non-rotated position. This return motion drags the mRNA-tRNA complex forward, completing translocation and restoring the tRNAs to classical E-site and P-site positions.
 
-```
+```text
 Elongation Cycle State Transitions
 
 Classical State (pre-translocation):

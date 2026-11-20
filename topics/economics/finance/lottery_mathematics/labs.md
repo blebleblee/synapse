@@ -289,7 +289,7 @@ Create a new spreadsheet titled "Annuity vs Lump Sum". In cell A1, enter "Year",
 
 The annuity structure typically pays increasing amounts each year to offset inflation. Model this as a 5% annual growth rate in payments. In B2, the initial payment equals the jackpot divided by the present value of a growing annuity: $\text{PMT}_0 = \frac{J}{\frac{1 - (1+g)^n(1+r)^{-n}}{r-g}}$ where $g=0.05$ is the growth rate, $r$ is the discount rate, and $n=30$ is the number of periods. Implement this in B2 as:
 
-```
+```text
 =J$1/((1-(1+0.05)^30*(1+J$2)^-30)/(J$2-0.05))
 ```
 

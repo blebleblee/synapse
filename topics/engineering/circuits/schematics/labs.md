@@ -78,7 +78,7 @@ Re-inspect the schematic for wiring errors. The collector resistor RC must conne
 
 Generate a SPICE netlist for external inspection by selecting `View → SPICE Netlist`. The netlist enumerates all components, nodes, and their interconnections in ASCII text format. Verify that RE and RL connect in parallel between the emitter node and ground node 0. The netlist entry should resemble:
 
-```
+```text
 RE VOUT 0 470
 RL VOUT 0 1k
 ```

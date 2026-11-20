@@ -31,13 +31,13 @@ By the end of this lesson you will understand the mathematical models that under
 
 The empirical observation that drives shift-left is economic. The cost to remediate a defect scales exponentially with the phase in which it is discovered. Let the lifecycle phases be an ordered set:
 
-```
+```text
 P = { requirements, design, implementation, testing, staging, production }
 ```
 
 Define a remediation cost function `C(p)` for phase `p ∈ P`. Empirical studies across NASA, IBM, and NIST consistently show:
 
-```
+```text
 C(pₙ) ≈ C(p₀) · 10^n
 ```
 
@@ -59,7 +59,7 @@ A security defect is a triple `(A, V, I)` where:
 
 The **risk** of a defect is:
 
-```
+```text
 R(A, V) = P(exploit | V) · I(A, V)
 ```
 
@@ -69,7 +69,7 @@ Where `P(exploit | V)` is the probability of exploitation given the vulnerabilit
 
 The total attack surface of a system at time `t` can be modeled as:
 
-```
+```text
 S(t) = ∫₀ᵗ [ dE(τ)/dτ - dR(τ)/dτ ] dτ
 ```
 
@@ -90,17 +90,17 @@ Every security control maps to at least one of three invariants:
 **Confidentiality**: For all subjects `s` and objects `o`, if subject `s` is not authorized to read object `o`, then `s` cannot obtain the value of `o`.
 
 Formally, using Bell-LaPadula notation:
-```
+```text
 ∀s ∈ S, ∀o ∈ O: ¬authorized(s, read, o) → ¬can_obtain(s, value(o))
 ```
 
 **Integrity**: The value of an object `o` can only be modified by authorized transformations.
-```
+```text
 ∀s ∈ S, ∀o ∈ O: value(o, t₂) ≠ value(o, t₁) → ∃s: authorized(s, write, o) ∧ acted(s, t₁, t₂)
 ```
 
 **Availability**: Authorized subjects can access authorized objects within acceptable latency bounds.
-```
+```text
 ∀s ∈ S, ∀o ∈ O, ∀t ∈ T: authorized(s, read, o) → response_time(s, o, t) ≤ SLA
 ```
 
@@ -121,7 +121,7 @@ The STRIDE threat model (Spoofing, Tampering, Repudiation, Information Disclosur
 
 Formally, for every subject `s` with capability set `Caps(s)`, PoLP states:
 
-```
+```text
 Caps(s) = min{ C ⊆ AllCaps : task(s) can be completed using C }
 ```
 
@@ -136,13 +136,13 @@ This is a minimization over capability sets. Any capability granted beyond this 
 
 Defense in depth is the architectural invariant that no single control failure should lead to full system compromise. It can be modeled as a layered probability product:
 
-```
+```text
 P(full_compromise) = ∏ᵢ P(bypass_layer_i)
 ```
 
 If each of `n` independent layers has a bypass probability of `p`, then:
 
-```
+```text
 P(full_compromise) = pⁿ
 ```
 
@@ -227,7 +227,7 @@ flowchart TD
 
 Each threat is scored using DREAD:
 
-```
+```text
 DREAD_score = (Damage + Reproducibility + Exploitability + Affected_users + Discoverability) / 5
 ```
 
@@ -286,7 +286,7 @@ flowchart LR
 
 Each gate has a formal contract:
 
-```
+```text
 Gate(phase) = {
     input:    artifact(phase - 1),
     checks:   [check₁, check₂, ..., checkₙ],
@@ -658,7 +658,7 @@ Has the property that a vulnerability in any `v ∈ V` potentially compromises t
 
 The Common Vulnerability Scoring System (CVSS v3.1) computes a base score using:
 
-```
+```text
 ISCBase = 1 - [(1 - ImpactConf) × (1 - ImpactInteg) × (1 - ImpactAvail)]
 
 If Scope = Unchanged:
@@ -1292,7 +1292,7 @@ Policy as Code externalizes authorization and compliance decisions into a versio
 
 The evaluation model is:
 
-```
+```text
 input (JSON) + data (JSON) + policy (Rego) → decision (JSON)
 ```
 

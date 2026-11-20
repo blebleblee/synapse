@@ -26,7 +26,7 @@ The previous block hash creates the cryptographic linkage that gives the blockch
 
 The Merkle root embeds a cryptographic commitment to the block's entire transaction set using a binary hash tree. Transactions occupy the leaf positions, with each parent node computed as the double-SHA-256 hash of its two children, recursing upward until a single 32-byte root emerges. This structure enables compact fraud proofs: to verify a transaction's inclusion in a block, a client need only receive the transaction itself plus a logarithmic number of sibling hashes forming the authentication path to the root. A block containing 2,000 transactions requires merely 11 intermediate hashes for inclusion proof, enabling lightweight clients to validate payments without downloading gigabytes of blockchain history.
 
-```
+```text
 Block Header Structure (80 bytes)
 ┌─────────────────────────────────────────────────────────────┐
 │ Version (4 bytes)                                            │
@@ -56,7 +56,7 @@ The difficulty target encodes the proof-of-work threshold in compact 4-byte nota
 
 Transaction structure in Bitcoin follows a rigorous input-output accounting model. Each transaction contains a version number, an input count, a vector of inputs, an output count, a vector of outputs, and a locktime field enabling time-delayed spending. Inputs reference specific UTXOs from prior transactions using a transaction identifier (TXID) and output index, along with an unlocking script proving spending authority. Outputs specify a value denominated in satoshis—the atomic unit equal to $10^{-8}$ BTC—and a locking script defining future spending conditions.
 
-```
+```text
 Transaction Structure
 ┌────────────────────────────────────────────────────────────┐
 │ Version (4 bytes)                                           │

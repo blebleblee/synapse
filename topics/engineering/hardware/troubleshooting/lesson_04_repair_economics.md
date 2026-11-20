@@ -34,13 +34,13 @@ Downtime cost D represents lost productivity, missed revenue, or contractual pen
 
 The repair-replace decision reduces to comparing total repair cost T_total_repair against total replacement cost T_total_replace. The repair cost expands as:
 
-```
+```text
 T_total_repair = L × (T_diag + T_repair) + C_part + D × (T_diag + T_repair)
 ```
 
 The replacement cost simplifies to:
 
-```
+```text
 T_total_replace = C_assembly + D × T_replace
 ```
 
@@ -48,7 +48,7 @@ where T_replace represents the time required to install and validate a replaceme
 
 The breakeven condition occurs when these costs equal, yielding a critical assembly cost threshold:
 
-```
+```text
 C_assembly_critical = L × (T_diag + T_repair - T_replace) + C_part + D × (T_diag + T_repair - T_replace)
 ```
 
@@ -56,13 +56,13 @@ When market assembly cost falls below this threshold, replacement dominates. Whe
 
 Failure rate prediction employs Weibull analysis to characterize the time-dependent hazard function. The two-parameter Weibull probability density function describes time-to-failure:
 
-```
+```text
 f(t) = (β/η) × (t/η)^(β-1) × exp(-(t/η)^β)
 ```
 
 where β represents the shape parameter encoding failure mechanism physics and η represents the scale parameter or characteristic life. The instantaneous failure rate evolves as:
 
-```
+```text
 λ(t) = (β/η) × (t/η)^(β-1)
 ```
 
@@ -70,7 +70,7 @@ For constant failure rate systems with β equal to unity, this reduces to λ(t) 
 
 Estimating Weibull parameters from field failure data requires maximum likelihood estimation or graphical probability plotting. Given a population of N components with observed failure times t₁, t₂, ..., tₙ, the median rank method assigns each failure an empirical cumulative probability:
 
-```
+```text
 F(tᵢ) = (i - 0.3) / (N + 0.4)
 ```
 
@@ -78,19 +78,19 @@ Plotting ln(-ln(1 - F(t))) versus ln(t) on Cartesian coordinates produces a stra
 
 Spare parts inventory optimization balances carrying cost against stockout risk using queueing theory and renewal process models. For a component with Weibull failure distribution and mean failure rate λ, the expected number of failures over time horizon T follows a renewal equation. When λT remains small (fewer than 0.1 expected failures), the Poisson approximation holds:
 
-```
+```text
 P(k failures) ≈ (λT)^k × exp(-λT) / k!
 ```
 
 The optimal spare parts stocking level S minimizes the sum of carrying cost and expected stockout cost:
 
-```
+```text
 Total_Cost(S) = C_carry × S + C_stockout × Σ(k > S) [(k - S) × P(k)]
 ```
 
 where C_carry represents annual carrying cost per unit and C_stockout represents the financial impact of not having a spare available when needed, including expedite fees and extended downtime. Taking the derivative and setting to zero yields the critical stockout probability:
 
-```
+```text
 P(stockout) = C_carry / C_stockout
 ```
 

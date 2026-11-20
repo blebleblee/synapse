@@ -113,7 +113,7 @@ EOF
 
 PostgreSQL stores every table as a collection of 8 KB heap pages (the default `block_size`, compile-time configurable). Understanding the page layout is prerequisite to understanding MVCC, vacuuming, and I/O amplification.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────┐  offset 0
 │  PageHeaderData (24 bytes)                               │
 │  pd_lsn (8)  pd_checksum (2)  pd_flags (2)               │
@@ -138,7 +138,7 @@ Each `ItemId` entry is a 32-bit word encoding three fields: a 15-bit offset (`lp
 
 Every heap tuple begins with a `HeapTupleHeaderData` (23 bytes, padded to 24):
 
-```
+```text
 xmin   (4 bytes) — transaction ID that inserted this tuple version
 xmax   (4 bytes) — transaction ID that deleted/updated this tuple (0 = live)
 cid    (4 bytes) — command ID (or combo CID for same-xact visibility)
@@ -599,7 +599,7 @@ graph LR
 
 Each WAL record begins with an `XLogRecord` header (24 bytes):
 
-```
+```text
 xl_tot_len  (uint32) — total length of record including header
 xl_xid      (TransactionId) — originating transaction XID
 xl_prev     (XLogRecPtr) — LSN of previous record (backlink)
@@ -709,7 +709,7 @@ pg_waldump \
 
 Expected output lines (decoded WAL records):
 
-```
+```text
 rmgr: Heap        len (rec/tot):     59/    59, tx:    745, lsn: 0/030000A8, ...
     XLOG_HEAP_INSERT: rel 1663/16384/16400; off 1; flags 0x08; blkref #0: rel 1663/16384/16400 blk 0
 rmgr: Transaction len (rec/tot):     46/    46, tx:    745, lsn: 0/030001E0, ...
@@ -738,7 +738,7 @@ pg_controldata "${PGDATA}" | grep -E "state|checkpoint|LSN|wal"
 
 Expected `pg_controldata` output after a crash (not a clean shutdown):
 
-```
+```text
 Database cluster state:               in production
 Latest checkpoint location:           0/3001000
 Prior checkpoint location:            0/2001000
@@ -766,7 +766,7 @@ echo "Server ready."
 
 The PostgreSQL log during crash recovery will contain:
 
-```
+```text
 LOG:  database system was shut down at ... (incorrect — it was crashed)
 LOG:  database system was not properly shut down; automatic recovery in progress
 LOG:  starting point-in-time recovery to latest

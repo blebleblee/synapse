@@ -26,7 +26,7 @@ The value-added tax architecture operates through a multi-stage collection mecha
 
 Consider a simplified production chain: a lumber mill sells timber to a furniture manufacturer for $1,000 plus 20% VAT ($200), remitting the full $200 to tax authorities. The furniture manufacturer transforms that timber into chairs, selling them to a retailer for $2,500 plus $500 VAT. However, the manufacturer's net remittance to tax authorities equals only $300 because the $200 VAT paid to the lumber mill generates an offsetting credit. The retailer finally sells the chairs to consumers for $4,000 plus $800 VAT, but remits only $300 after claiming credit for the $500 paid to the manufacturer. The total tax collected equals $800 across all three remittance events, precisely 20% of the final retail price, with each business effectively prepaying a portion of the total liability corresponding to its contribution to the value chain.
 
-```
+```text
 Production Chain VAT Flow (20% rate):
 
 Lumber Mill → Furniture Manufacturer → Retailer → Consumer

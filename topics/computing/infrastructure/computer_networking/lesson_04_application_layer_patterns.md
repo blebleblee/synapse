@@ -22,7 +22,7 @@ The Domain Name System is a globally distributed, hierarchically organized, even
 
 The resolution process begins at a stub resolver — the libc function `getaddrinfo()` called by every application, backed by `/etc/resolv.conf` on Linux systems. The stub resolver delegates all actual query work to a recursive resolver, typically provided by the operating system's configured DNS server or, in container environments, by a cluster-local component like CoreDNS. The recursive resolver is the workhorse of the system. If it does not have the answer in cache, it begins iterative resolution: it queries a root nameserver to learn the authoritative nameserver for the top-level domain, queries that nameserver to learn the authoritative nameserver for the second-level domain, and so on down the delegation chain until it reaches the zone that holds the actual record.
 
-```
+```text
 Client Process
      │  getaddrinfo("api.payments.internal")
      ▼
@@ -268,7 +268,7 @@ kubectl -n kube-system get configmap coredns -o yaml
 
 A CoreDNS `Corefile` for a production Kubernetes cluster with negative caching and forward-to-upstream properly configured:
 
-```
+```text
 .:53 {
     errors
     health {

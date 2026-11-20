@@ -26,7 +26,7 @@ The more formidable challenge involves finding a bio-based substitute for ABS it
 
 The most technically viable candidate emerging from research programs is bio-attributed ABS, where one or more of the three monomers derives from renewable feedstock while maintaining the terpolymer architecture. Acrylonitrile can be synthesized through ammoxidation of bio-derived propylene, itself produced from bioethanol or bio-propanol. Styrene production from biomass remains more challenging, but catalytic pathways from lignin derivatives show laboratory-scale feasibility. Butadiene presents the greatest hurdle—conventional production through steam cracking of naphtha has no direct biological analogue, though fermentation routes producing butanol followed by catalytic dehydration offer a potential pathway.
 
-```
+```text
 Bio-ABS Synthesis Pathway (Conceptual):
 
 Sugarcane/Corn → Fermentation → Bioethanol (C₂H₅OH)

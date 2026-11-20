@@ -20,7 +20,7 @@ Motor-load matching is the discipline of aligning the motor's torque-speed curve
 
 Before committing liftarms to pins, a Technic engineer works through a decision process that moves from application requirements down to specific part choices. The structure of this reasoning looks like the following:
 
-```
+```text
 Application Requirement
         │
         ▼

@@ -82,7 +82,7 @@ The purchase price allocation process under ASC 805 establishes the accounting f
 
 Identifiable intangible assets require specialized valuation analysis conducted by independent appraisal firms using income, market, or cost approaches depending on asset characteristics. Customer relationship intangibles value the present value of projected cash flows from existing customer contracts, incorporating attrition assumptions and contributory asset charges for working capital, fixed assets, and workforce supporting those relationships. Developed technology intangibles capture the fair value of patented innovations, proprietary software, or engineering know-how using relief-from-royalty methods that estimate the hypothetical licensing fees avoided by owning rather than licensing the technology. Trade names and trademarks receive valuation through comparable market royalty rates adjusted for relative brand strength and market position.
 
-```
+```text
 Purchase Price Allocation Example: $500M Acquisition
 
 Total Consideration Transferred: $500,000,000

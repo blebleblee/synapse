@@ -98,7 +98,7 @@ IIR filter architectures balance computational efficiency against numerical stab
 
 For a second-order biquad section with transfer function H(z) = (b0 + b1·z⁻¹ + b2·z⁻²) / (1 + a1·z⁻¹ + a2·z⁻²), the direct-form II transposed structure computes:
 
-```
+```text
 w[n] = x[n] - a1·w[n-1] - a2·w[n-2]
 y[n] = b0·w[n] + b1·w[n-1] + b2·w[n-2]
 ```
@@ -153,7 +153,7 @@ Windowing function application precedes Fourier transform computation in spectra
 
 Each FFT stage consists of butterfly operations, which combine pairs of samples with complex multiplication by twiddle factors. For a decimation-in-time radix-2 FFT:
 
-```
+```text
 Stage 0 (butterfly span = 1):
 X[k] = x[k] + W_N^0 · x[k+1]
 X[k+N/2] = x[k] - W_N^0 · x[k+1]

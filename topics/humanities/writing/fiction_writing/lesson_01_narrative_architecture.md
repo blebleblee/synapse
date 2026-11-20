@@ -22,7 +22,7 @@ This scene-sequel structure is not rigid formula but rather a description of how
 
 The overarching structure of a complete narrative typically follows an arc that can be visualized as follows:
 
-```
+```text
                           Climax
                             /\
                            /  \

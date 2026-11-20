@@ -302,7 +302,7 @@ The reference implementation above iterates over experts in a Python loop, which
 
 The workflow proceeds in three phases. In the **gather phase**, tokens are sorted by their expert assignment and packed into contiguous memory. The scatter matrix looks like this for a batch of 8 tokens, 4 experts, and top-1 routing:
 
-```
+```text
 Token → Expert assignment: [2, 0, 1, 2, 0, 3, 1, 3]
 
 After sort by expert:

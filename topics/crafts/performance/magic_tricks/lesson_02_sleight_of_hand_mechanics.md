@@ -66,7 +66,7 @@ In reality, the left thumb pushes the bottom half rightward while the left finge
 
 The pass succeeds because the motion vectors of both hands conform to expected kinematics for a legitimate cut. The upward component of the right hand's trajectory matches the lift pattern observers expect when removing a packet. The left hand's rotation appears to be natural reorientation in response to reduced deck weight, not deliberate repositioning.
 
-```
+```text
 HERMAN PASS PACKET DYNAMICS (overhead view)
 
 Initial State:

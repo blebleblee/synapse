@@ -26,7 +26,7 @@ Establish a systematic workspace organization that separates raw hardware captur
 
 Configure your USB subsystem to grant non-root access to SDR devices and analysis tools by creating appropriate udev rules that assign connected hardware to a dedicated user group. Write a udev rules file at `/etc/udev/rules.d/99-sdr-security.rules` containing device matching patterns for RTL-SDR, HackRF, and USRP hardware along with mode and group assignments that enable unprivileged access while maintaining audit trail capabilities:
 
-```
+```bash
 # RTL-SDR dongles using RTL2832U
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0bda", ATTRS{idProduct}=="2832", GROUP="sdr", MODE="0660"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0bda", ATTRS{idProduct}=="2838", GROUP="sdr", MODE="0660"

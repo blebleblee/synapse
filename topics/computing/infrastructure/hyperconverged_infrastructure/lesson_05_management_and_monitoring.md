@@ -36,7 +36,7 @@ A production-grade HCI management system comprises five layers, each with distin
 
 The control plane is a replicated state machine (RSM) implementing a consensus protocol. Most HCI systems use Raft or a variant (etcd in Nutanix, vSAN consensus in VMware). The RSM maintains the **desired state** in a strongly consistent key-value store, typically sharded by resource type:
 
-```
+```text
 /vms/<uuid> → VM specification (CPU, memory, disks, networks)
 /volumes/<uuid> → Volume metadata (size, replication factor, placement)
 /hosts/<uuid> → Host resources (capacity, health, placement group)

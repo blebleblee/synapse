@@ -74,7 +74,7 @@ Debt sizing constraints impose practical limits on total leverage, derived from 
 
 The debt sizing calculation begins with a projection of unlevered free cash flow, defined as EBITDA minus cash taxes, minus capital expenditures, minus working capital increases, plus or minus non-recurring adjustments. This cash flow stream must cover three mandatory uses: required amortization payments on term loans, cash interest expense on all debt tranches, and a minimum cash balance to fund operations and provide a liquidity buffer. The residual constitutes excess cash flow available for optional debt prepayment, dividend distributions, or reinvestment in growth initiatives.
 
-```
+```text
 Annual Debt Service Coverage Calculation:
 
 EBITDA                                                $100.0 million
@@ -121,7 +121,7 @@ The leverage deployment decision determines the quantum of debt capital in the i
 
 The mathematical relationship between leverage and equity returns derives from the fundamental IRR decomposition in LBO modeling. Sponsor equity returns compound from three sources: EBITDA growth over the holding period, valuation multiple expansion or contraction at exit relative to entry, and debt paydown that increases equity value per dollar of enterprise value growth. Leverage amplifies the first two effects while the third provides a mechanical return boost independent of operating performance.
 
-```
+```text
 Equity Value Bridge (Entry to Exit):
 
 Entry Enterprise Value = $850M (8.5x × $100M EBITDA)

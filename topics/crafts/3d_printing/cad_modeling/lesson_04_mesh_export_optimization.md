@@ -72,7 +72,7 @@ The third type is the **inverted normal**, where a triangle's winding order is r
 
 The boundary between mesh validation and slicer preparation is not sharp in practice, but it is conceptually useful to treat them as sequential pipeline stages. Validation ensures the mesh is geometrically sound. Preparation ensures it is optimally configured for the specific printing process — FDM, MSLA, or SLS — in terms of orientation, support requirements, and mesh resolution.
 
-```
+```text
 Repaired Mesh (manifold, consistent normals, correct scale)
          │
          ├──► Orientation Optimization

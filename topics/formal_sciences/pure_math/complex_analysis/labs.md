@@ -8,7 +8,7 @@ The goal throughout is a specific discipline: you derive a result by hand, forma
 
 Before any exercise, verify that your environment is correctly configured. Run the following from your terminal:
 
-```
+```text
 python -c "import sympy; print('SymPy', sympy.__version__)"
 python -c "import numpy; print('NumPy', numpy.__version__)"
 python -c "from sympy import I, exp, pi, integrate, symbols, residue; print('Core imports OK')"
@@ -16,7 +16,7 @@ python -c "from sympy import I, exp, pi, integrate, symbols, residue; print('Cor
 
 For SageMath, verify independently:
 
-```
+```text
 sage --version
 sage -c "from sage.all import CC, ComplexField, integrate, var; print('SageMath OK')"
 ```

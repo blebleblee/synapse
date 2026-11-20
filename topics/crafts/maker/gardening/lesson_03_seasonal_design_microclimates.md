@@ -44,7 +44,7 @@ Wind deserves more engineering attention than it receives. A 15 km/h wind does n
 
 The spatial architecture of a well-designed garden system puts these principles into a coherent layout. The following diagram represents the cross-sectional wind and thermal logic of a three-zone garden design:
 
-```
+```text
 N                                                           S
 |                                                           |
 |  [Windbreak hedge / 2m]  [Cold frame / masonry wall]     |

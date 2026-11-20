@@ -30,7 +30,7 @@ Applying the diagonal lemma to the formula $\psi(x) := \neg \exists p \, \text{P
 
 The Second Incompleteness Theorem elevates this result to a meta-level. Define $\text{Con}_{\text{PA}}$ to be the sentence asserting the consistency of PA, formalized as $\neg \exists p \, \text{Proof}(p, \ulcorner 0 = 1 \urcorner)$—no proof exists for a blatant contradiction like $0 = 1$. Gödel showed that under reasonable assumptions about the formalization of provability (captured by the Hilbert-Bernays-Löb derivability conditions), the sentence $G$ is provably equivalent to $\text{Con}_{\text{PA}}$ within PA. The intuition is that if PA were consistent, then $G$ would be unprovable, making $G$ true; conversely, if $G$ were true, then PA could not prove a contradiction because provability of $0 = 1$ would imply provability of everything, including $G$. Since PA cannot prove $G$ (by the First Incompleteness Theorem), it follows that PA cannot prove $\text{Con}_{\text{PA}}$. Any consistent extension of PA that remains recursively axiomatizable also cannot prove its own consistency. Hilbert's goal of a finitistic consistency proof for arithmetic evaporates—the system lacks the deductive strength to vouch for its own reliability.
 
-```
+```text
 Gödel Numbering Schema:
 
 Symbols:        0 → 1,  S → 3,  + → 5,  × → 7,  = → 9

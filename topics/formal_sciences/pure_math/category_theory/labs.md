@@ -8,7 +8,7 @@ The goal across these three exercises is to build a working symbolic and proof-t
 
 Your environment must satisfy the following requirements before proceeding.
 
-```
+```text
 python --version          # must report 3.11 or higher
 python -c "import sympy; print(sympy.__version__)"    # must report 1.12 or higher
 python -c "import numpy; print(numpy.__version__)"    # must report 1.25 or higher
@@ -18,7 +18,7 @@ lean --version            # Lean 4 with Mathlib for formal proof verification
 
 If SageMath is not available as a system command, the Python exercises are fully self-contained with SymPy. SageMath is used in Exercise 2 for Galois category computations where its built-in group and field machinery accelerates verification. Install the Python stack with:
 
-```
+```text
 pip install sympy numpy networkx matplotlib
 ```
 
@@ -1597,7 +1597,7 @@ Both directions are verified computationally by `verify_yoneda_roundtrip` and co
 
 ### Complete Verification Command Reference
 
-```
+```bash
 # Environment check
 python -c "import sympy, numpy; print(sympy.__version__, numpy.__version__)"
 

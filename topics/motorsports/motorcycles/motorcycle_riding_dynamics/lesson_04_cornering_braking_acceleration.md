@@ -42,7 +42,7 @@ The execution requires a progressive, non-linear release of brake pressure. As l
 
 The qualitative signal the rider uses to calibrate this release is the sensation in the front end: a well-executed trail-brake entry feels like a gradual softening of the front contact patch's "bite," a tactile migration of loading from the compressed fork feeling of deceleration toward the lateral resistance of a tire working against centripetal acceleration. At the elite level, riders like Dani Pedrosa were extraordinary precisely because their modulation of this transition was so fine that telemetry traces showed brake-pressure release curves that were nearly perfectly inversely proportional to lean-angle increase rates—a feat of neuromuscular calibration that takes years to develop.
 
-```
+```text
 Corner Entry: Combined Force Budget During Trail Braking
 
 BRAKE PRESSURE (bar)

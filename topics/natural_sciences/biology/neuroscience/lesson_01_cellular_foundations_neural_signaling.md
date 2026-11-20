@@ -79,7 +79,7 @@ Single-channel recording configurations (cell-attached, inside-out, outside-out)
 
 The molecular architecture of voltage-gated sodium channels illuminates the structural basis of neuronal excitability. These channels comprise a single large α subunit (approximately 260 kDa) organized into four homologous domains (DI–DIV), each containing six transmembrane helices (S1–S6). The S5 and S6 helices from each domain contribute to the central ion-conducting pore, while S1–S4 segments form the voltage-sensing domains. The S4 helix contains positively charged residues (typically four to seven arginine or lysine residues) positioned at every third position, creating a helical array of positive charges that sense the transmembrane electric field.
 
-```
+```text
 Voltage-Gated Sodium Channel Architecture
 
 Extracellular

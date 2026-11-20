@@ -42,7 +42,7 @@ The critical insight about this architecture is that the loops are not independe
 
 The following diagram represents the feedback loop architecture of a standard two-week Scrum sprint, embedded within the larger product lifecycle:
 
-```
+```text
 STRATEGY LOOP (Quarterly / Annually)
  ┌──────────────────────────────────────────────────────────┐
  │   Product Vision → Roadmap → Prioritized Product Backlog │

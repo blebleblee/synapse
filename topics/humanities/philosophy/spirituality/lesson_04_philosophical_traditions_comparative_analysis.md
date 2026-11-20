@@ -34,7 +34,7 @@ Buddhism emerges from a radically different metaphysical starting point: the sys
 
 The architectural diagram of dependent origination unfolds as a twelve-linked causal chain:
 
-```
+```text
 (1) Ignorance → (2) Karmic Formations → (3) Consciousness →
 (4) Name-and-Form → (5) Six Sense Bases → (6) Contact →
 (7) Feeling → (8) Craving → (9) Clinging → (10) Becoming →

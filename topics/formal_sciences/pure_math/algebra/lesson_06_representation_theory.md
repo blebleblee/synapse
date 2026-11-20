@@ -211,7 +211,7 @@ flowchart TD
 
 The key categorical reformulation of a group representation is itself illuminating. A group $G$ can be viewed as a category $\mathbf{B}G$ with a single object $\star$ and morphism set $\mathrm{Hom}(\star, \star) = G$, where composition is group multiplication. A representation of $G$ on a vector space $V$ is then exactly a functor $\rho: \mathbf{B}G \to \mathbf{Vect}_\mathbb{F}$: the single object $\star$ maps to $V$, and each group element (morphism in $\mathbf{B}G$) maps to a linear automorphism of $V$. A morphism of representations is exactly a natural transformation between the corresponding functors. This reformulation:
 
-```
+```text
        BG (one-object category)
         |
         |   functor rho

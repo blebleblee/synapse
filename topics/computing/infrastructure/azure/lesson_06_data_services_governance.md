@@ -30,7 +30,7 @@ Consistent prefix and eventual consistency further relax ordering guarantees. Co
 
 The request unit abstraction unifies these consistency levels into a single billing model by normalizing the compute and I/O cost of each operation into a synthetic metric. A single request unit represents approximately the cost of a 1KB point read operation under eventual consistency, with more expensive operations like range queries, updates, and stronger consistency levels consuming proportionally more request units. The physical implementation maps request units to backend compute threads, storage IOPS, and inter-region bandwidth, dynamically adjusting partition assignments to balance load. Practitioners provision request units at the database or container scope, with Cosmos DB enforcing throttling through HTTP 429 responses when workload demand exceeds the provisioned ceiling.
 
-```
+```text
 Cosmos DB Consistency Lattice:
 
   Strong           ← Linearizable, all replicas synchronized
@@ -254,7 +254,7 @@ Dead-letter queues capture messages that exceed maximum delivery attempts or vio
 
 Sessions extend Service Bus with strict message ordering within session boundaries, enabling scenarios like multi-step workflows where messages must process in the order they were sent. Each session maps to a unique session ID, with Service Bus ensuring that only one receiver holds the session lock at any time. Messages within a session queue until a receiver accepts the session, processes all enqueued messages in sequence, and closes the session. This provides stronger ordering guarantees than partitioned Event Hubs at the cost of reduced parallelism, since the maximum concurrent session count limits receiver scalability.
 
-```
+```text
 Service Bus Peek-Lock Protocol:
 
 Queue:  [M1] [M2] [M3] [M4] [M5]
@@ -375,7 +375,7 @@ The inheritance model for tags operates through Azure Policy definitions that au
 
 Budget alerts provide proactive cost control by evaluating accumulated spending against configured thresholds and triggering email notifications or webhook callbacks when forecasts predict overspend. The alerting engine evaluates budgets every 6-24 hours based on the previous day's metered consumption, introducing up to 48 hours of latency between actual resource usage and alert delivery. This delay renders budget alerts unsuitable for real-time cost enforcement, requiring complementary controls like service-level spending limits or automated shutdown logic triggered by Azure Functions.
 
-```
+```text
 Cost Management Data Flow:
 
 Azure Service Meters (every 1-24h depending on service)

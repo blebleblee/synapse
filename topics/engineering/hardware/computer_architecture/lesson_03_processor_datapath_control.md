@@ -66,7 +66,7 @@ Forwarding (also called bypassing) eliminates most stalls by routing values dire
 
 The forwarding logic implements a priority scheme. If both EX/MEM and MEM/WB contain hazards for the same source register (three instructions in sequence all using the same register), the most recent value (from EX/MEM) takes precedence. The forwarding conditions formally express as:
 
-```
+```text
 Forward ALU operand A from EX/MEM if:
   (EX/MEM.RegWrite = 1) AND
   (EX/MEM.rd ≠ 0) AND

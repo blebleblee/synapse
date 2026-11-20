@@ -22,7 +22,7 @@ What the 6502 lacks in registers it compensates for with an unusually rich set o
 
 Indexed indirect addressing (often written `(zp,X)`) and indirect indexed addressing (`(zp),Y`) are the two modes that give the 6502 its pointer capability. In `(zp,X)`, the processor takes the zero-page address, adds X, reads a 16-bit pointer from that location, and uses the pointer as the effective address — powerful for table lookups. In `(zp),Y`, it reads a 16-bit base pointer from zero page, then adds Y to form the effective address — ideal for walking through data structures sequentially. The difference matters enormously in practice: `(zp),Y` is the workhorse of NES sprite data writes and nametable streaming because it allows linear traversal with minimal register manipulation. A developer porting rendering code between these two modes without understanding their mechanical difference would produce code that is either correct and slow or fast and broken.
 
-```
+```text
 6502 Register Model
 ┌─────────────────────────────────────────────┐
 │  A  │ 8-bit Accumulator (all ALU ops here)  │
@@ -62,7 +62,7 @@ The Z80 presents a different personality entirely. Its register model includes A
 
 The Z80's 16-bit register pairs (BC, DE, HL) are particularly significant. HL acts as the primary memory pointer register, and many memory-to-register and register-to-memory operations are only available through HL. The `LDIR` block transfer instruction — load, increment, repeat — moved a contiguous block of memory at approximately one byte per 21 clock cycles, making it the standard tool for DMA-less bulk memory copies on the Master System. At 3.58 MHz on the Master System's Z80, an `LDIR` transferring 1 KB of tile data to VRAM took roughly 21,000 / 3,580,000 seconds ≈ 5.86 ms, which consumed a significant fraction of the 16.7 ms PAL frame budget. This was not a theoretical observation; it directly shaped how Master System games structured their asset streaming and determined which graphical tricks were feasible mid-frame.
 
-```
+```text
 Z80 Register Model
 ┌──────────┬──────────┐  ┌──────────┬──────────┐
 │    A     │    F     │  │    A′    │    F′    │  ← Shadow (EX AF,AF')
@@ -168,7 +168,7 @@ The load delay slot described in the pipeline discussion manifests as a systemat
 
 GTE latency introduces an analogous hazard. After issuing a GTE computation instruction (`cop2 0x...`), the result registers are not valid for 1 to 3 cycles depending on the specific operation. The GTE instruction reference documentation (Sony's official Developer Technical Reference, available through preservation archives) specifies the latency for each opcode. The correct pattern inserts independent CPU work — incrementing a vertex pointer, loading the next input vector, updating a loop counter — between the GTE instruction and the `mfc2`/`ctc2` read of its output. A transformation loop that issues a GTE RTPT (perspective transform of three vertices), immediately reads the output with no intervening work, then issues the next RTPT will read stale data on the first read and waste cycles on the second. The optimized loop structure interleaves GTE issue, independent CPU work, and GTE result read across two iterations simultaneously — a software-pipelined design that extracts close to the GTE's theoretical throughput of 15–20 transformed vertices per millisecond.
 
-```
+```text
 Naive GTE Loop (incorrect / suboptimal):
   cop2 RTPT              ; transform vertices 0,1,2
   nop

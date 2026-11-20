@@ -122,7 +122,7 @@ Query results are cached in memory (Redis, Memcached) with TTLs tuned to data fr
 
 The API layer abstracts database complexity behind a stable interface. RESTful APIs expose endpoints for each dashboard resource:
 
-```
+```text
 GET /api/dashboards/sales/metrics?start_date=2024-01-01&region=EMEA
 ```
 

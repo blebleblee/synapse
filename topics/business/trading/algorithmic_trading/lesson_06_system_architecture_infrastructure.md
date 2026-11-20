@@ -32,7 +32,7 @@ The **state reconciliation layer** continuously validates that the firm's intern
 
 Here is a simplified data flow diagram showing how a market event propagates through the stack:
 
-```
+```text
 Market Data Feed (Exchange)
     |
     v
@@ -66,7 +66,7 @@ The FIX (Financial Information Exchange) protocol is the lingua franca of electr
 
 FIX messages are structured as ASCII text with pipe delimiters (field separators). A typical FIX order message looks like this:
 
-```
+```text
 8=FIX.4.4|9=180|35=D|49=SENDER|56=EXCHANGE|34=1|52=20240115-10:30:45.123|
 11=ORDER123|55=AAPL|54=1|38=1000|40=2|44=150.50|59=0|108=30|
 ```
@@ -119,7 +119,7 @@ The canonical implementation of this pattern in trading systems is the **event l
 
 Here is a pseudocode sketch of a typical event loop:
 
-```
+```text
 while (true) {
   events = network_interface.poll_with_timeout(1_microsecond);
   

@@ -163,7 +163,7 @@ sudo sh -c 'ulimit -l unlimited'
 
 For production systems, calculate required memory as:
 
-```
+```text
 total_map_memory = Σ (max_entries * (key_size + value_size + elem_overhead))
 ```
 

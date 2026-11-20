@@ -624,7 +624,7 @@ cargo test -- --nocapture
 
 Expected output:
 
-```
+```text
 running 6 tests
 test tests::test_initial_state_is_zero_ket ... ok
 test tests::test_hadamard_preserves_norm ... ok
@@ -694,7 +694,7 @@ branch-instructions,branch-misses \
 
 A representative output for a 16-qubit QFT might look like:
 
-```
+```text
  Performance counter stats for './target/release/simulate':
 
      4,821,340,112      cycles
@@ -720,7 +720,7 @@ perf report --stdio --no-children | head -50
 
 Expected output structure:
 
-```
+```bash
 # Overhead  Command       Shared Object        Symbol
 # ........  ............  ...................  ...................................
 #
@@ -743,7 +743,7 @@ cargo bench 2>&1 | tee /tmp/bench_results.txt
 
 Criterion writes HTML reports to `target/criterion/`. Open `target/criterion/hadamard_sweep/report/index.html` in a browser to see the violin plot and regression lines. The terminal output will resemble:
 
-```
+```text
 hadamard_sweep/8        time:   [4.3122 µs 4.3344 µs 4.3611 µs]
                         thrpt:  [58.699 Melem/s 58.994 Melem/s 59.302 Melem/s]
 hadamard_sweep/10       time:   [19.221 µs 19.388 µs 19.564 µs]
@@ -895,7 +895,7 @@ RUSTFLAGS="-Zsanitizer=thread" \
 
 TSan will produce output structured like this:
 
-```
+```text
 ==================
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7f3a2b4c1080 by thread T3:
@@ -960,7 +960,7 @@ RUSTFLAGS="-Zsanitizer=address" \
 
 For the in-bounds tests, ASan produces no errors. For any test that exercises the unsafe pointer path with an out-of-bounds target qubit index, ASan reports:
 
-```
+```text
 =================================================================
 ==12346==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x...
 READ of size 16 at 0x... thread T0
@@ -1013,7 +1013,7 @@ RUSTFLAGS="-Zsanitizer=leak" \
 
 LSan output:
 
-```
+```text
 =================================================================
 ==12347==ERROR: LeakSanitizer: detected memory leaks
 
@@ -1045,7 +1045,7 @@ RUSTFLAGS="-Zsanitizer=address" \
 
 A clean run produces:
 
-```
+```text
 running 8 tests
 test tests::test_initial_state_is_zero_ket ... ok
 test tests::test_hadamard_preserves_norm ... ok

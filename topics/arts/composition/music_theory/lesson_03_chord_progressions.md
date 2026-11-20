@@ -44,7 +44,7 @@ flowchart LR
 
 **Voicing (whole notes, LH root / RH triad):**
 
-```
+```text
 I   (C major): LH: C2        RH: E4–G4–C5
 IV  (F major): LH: F2        RH: F4–A4–C5   (C5 common tone — don't move that finger)
 V   (G major): LH: G2        RH: D4–G4–B4
@@ -62,7 +62,7 @@ CAGED gives you five movable shapes that cover the whole neck without relearning
 
 **Key of A, root on the 5th string:**
 
-```
+```text
 I  (A major, E-shape, 12th fret):
 e|---12---
 B|---12---
@@ -96,7 +96,7 @@ Below the 5th fret, stretching one-finger-per-fret damages tendons over time. Si
 
 **C major scale on the E string:**
 
-```
+```text
 Fret:    3   5   7   8   10  12
 Finger:  2   4   1   2   4   1
 Note:    C   D   E   F   G   A
@@ -106,7 +106,7 @@ Thumb stays anchored on the back of the neck, roughly opposite your middle finge
 
 **I–IV–V–I walking bass, quarter notes, 80 BPM:**
 
-```
+```text
 |C (E-str fret 8) – E – G – G | F (E-str fret 1) – A – C – C |
 |G (E-str fret 3) – B – D – F | C (E-str fret 8) – E – G – C |
 ```
@@ -120,14 +120,14 @@ Thumb stays anchored on the back of the neck, roughly opposite your middle finge
 #### Authentic Cadence (V→I) — Maximum Closure
 
 **Keyboard:**
-```
+```text
 V⁷:  LH: G2   RH: F4–G4–B4–D5
 I:   LH: C2   RH: E4–G4–C5–E5
 ```
 B4 (leading tone) resolves up to C5; F4 (chordal 7th) resolves down to E4. Both are half-step motions — that's what makes this cadence feel locked shut, not just finished.
 
 **Guitar, open position:**
-```
+```text
 G7 (V⁷):          Cmaj (I):
 e|---1---          e|---0---
 B|---0---          B|---1---
@@ -175,7 +175,7 @@ graph LR
 
 **Piano rootless shell voicing** (bassist or LH covers the root, RH plays the color):
 
-```
+```text
 Dm7:   LH: D2   RH: F4–A4–C5
 G7:    LH: G2   RH: F4–A4–B4   (F, A held as common tones; C drops to B)
 Cmaj7: LH: C2   RH: E4–G4–B4
@@ -188,7 +188,7 @@ Cmaj7: LH: C2   RH: E4–G4–B4
 
 **Guitar drop-2 voicings, 6th-string roots:**
 
-```
+```text
 Dm7 (10th position):        G7 (10th position):
 e|---10---                  e|---10---
 B|---10---                  B|---12---
@@ -208,7 +208,7 @@ E|---8---
 
 **Bass line with chromatic approach:**
 
-```
+```text
 |Dm7 (A-str fret 5: D) – F – A – C♯ (chromatic approach) |
 |G7 (E-str fret 3: G) – B – D – F |
 |Cmaj7 (A-str fret 3: C) – E – G – B |
@@ -223,7 +223,7 @@ C♯ doesn't belong to Dm7 — it's a passing tone that leans into D, the root o
 G7 and D♭7 share the exact same tritone (G7 has B–F; D♭7 has Cb/B–F, same two pitches spelled differently). Swap one for the other and the chord's pull to C stays intact, but now the bass moves chromatically: D → D♭ → C, a smooth stepwise descent instead of a fifth leap.
 
 **Keyboard:**
-```
+```text
 Dm7:   LH: D2   RH: F4–A4–C5
 D♭7:   LH: D♭2  RH: E4–A♭4–B4   (♭II7 substituting for G7)
 Cmaj7: LH: C2   RH: E4–G4–B4
@@ -232,7 +232,7 @@ Cmaj7: LH: C2   RH: E4–G4–B4
 D♭7 contains F (its natural 3rd) and Cb/B (its major 7th) — this combination is the **Lydian dominant** sound (D♭7♯11), common in modern jazz reharmonization.
 
 **Guitar, 9th-fret barre:**
-```
+```text
 D♭7:
 e|---9---
 B|---10---
@@ -243,7 +243,7 @@ E|---9---
 ```
 
 **Drill, 80 BPM swing eighths:**
-```
+```text
 | Dm7 (4 beats) | D♭7 (4 beats) | Cmaj7 (4 beats) | Cmaj7 (4 beats) |
 ```
 Isolate the bass line alone first — D, D♭, C descending — before adding chords on top. The chromatic bass is the whole point of the substitution; if you can't hear it clearly by itself, the chord voicings won't save it.
@@ -261,7 +261,7 @@ Borrow chords from C minor while staying centered on C major — this darkens th
 | ♭VI (A♭ major) | A♭–C–E♭ | Chromatic mediant | "Creep" (Radiohead) |
 
 **Keyboard, I–iv–V–I:**
-```
+```text
 I  (C major):  RH: C4–E4–G4
 iv (F minor):  RH: C4–E♭4–A♭4   (E→E♭, G→A♭ — both drop a half/whole step)
 V  (G major):  RH: B3–D4–G4
@@ -269,7 +269,7 @@ I  (C major):  RH: C4–E4–G4
 ```
 
 **Guitar, open position:**
-```
+```text
 C major:         Fm:              G major:         C major:
 e|---0---        e|---1---        e|---3---        e|---0---
 B|---1---        B|---1---        B|---0---        B|---1---
@@ -288,13 +288,13 @@ E|--------       E|---1---        E|---3---        E|--------
 To temporarily spotlight any chord X, precede it with the dominant seventh built a fifth above it — V7/X.
 
 **Tonicizing ii (Dm) with V7/ii (A7):**
-```
+```text
 | Cmaj | A7 (V7/ii) | Dm | G7 | Cmaj |
 ```
 A7 contains C♯, a note foreign to C major that acts as a temporary leading tone pulling into D.
 
 **Keyboard:**
-```
+```text
 Cmaj:  RH: C4–E4–G4
 A7:    RH: C♯4–E4–G4–A4
 Dm:    RH: D4–F4–A4
@@ -303,7 +303,7 @@ Cmaj:  RH: C4–E4–G4
 ```
 
 **Guitar barre chords, 5th fret:**
-```
+```text
 A7:                      Dm:
 e|---5---                e|---5---
 B|---5---                B|---6---
@@ -331,7 +331,7 @@ graph LR
 ```
 
 **Keyboard drill — ascending major triads around the circle, starting C3:**
-```
+```text
 C3–E3–G3 | G3–B3–D4 | D4–F♯4–A4 | A4–C♯5–E5 | E5–G♯5–B5 | ...
 ```
 Fingering: 1-3-5 (thumb-middle-pinky) for white-key triads; shift fingering slightly for black-key roots (often 2-3-5 feels more stable on F♯ or C♯ major).
@@ -349,14 +349,14 @@ Harmonic rhythm is simply how often the chords change, and it's a compositional 
 3. **Accelerating** (chord density increases approaching a cadence): common in Baroque/Classical phrasing — the harmony speeds up right before the resolution, like a held breath.
 
 **12-bar blues in A, shuffle feel, 120 BPM:**
-```
+```text
 | A7 (I) | A7 | A7 | A7 |
 | D7 (IV) | D7 | A7 | A7 |
 | E7 (V) | D7 (IV) | A7 | E7 (turnaround) |
 ```
 
 **Walking bass:**
-```
+```text
 Bar 1 (A7):  A (5th str, open) – C♯ – E – G
 Bar 2 (A7):  A – C♯ – E – G♯ (chromatic approach back to A)
 Bar 5 (D7):  D (5th str, 5th fret) – F♯ – A – C
@@ -371,13 +371,13 @@ Keep the floating thumb mute engaged on adjacent lower strings throughout — in
 The rule: hold common tones, move everything else the shortest distance possible.
 
 **Keyboard, C major → G major:**
-```
+```text
 C major:  RH: C4–E4–G4
 G major:  RH: B3–D4–G4   (G4 held; E4→D4 step; C4→B3 step)
 ```
 
 **Guitar, open position:**
-```
+```text
 C major:         G major:
 e|---0---        e|---3---
 B|---1---        B|---0---   (1→0)
@@ -395,7 +395,7 @@ E|--------       E|---3---
 
 I in second inversion (5th in the bass) sits before V, with the bass holding G throughout while the upper voices resolve down by step: C→B, E→D.
 
-```
+```text
 I⁶₄:  LH: G2   RH: C4–E4–G4
 V:    LH: G2   RH: B3–D4–G4   (C→B, E→D)
 I:    LH: C2   RH: C4–E4–G4
@@ -427,19 +427,19 @@ This is a **double suspension** resolving over a static dominant bass — a stap
 ### Real-World Application: Arranging a 16-Bar AABA Phrase
 
 **A (bars 1–4):**
-```
+```text
 | Cmaj7 | Dm7 | G7 | Cmaj7 |
 ```
 
 **A repeat (bars 5–8):** identical.
 
 **B / bridge (bars 9–12), tonicizing IV then returning to ii:**
-```
+```text
 | Fmaj7 | Fm7 (borrowed iv) | Em7 | A7 (V7/ii) |
 ```
 
 **A return (bars 13–16):**
-```
+```text
 | Dm7 | G7 | Cmaj7 | Cmaj7 (add 9th for color) |
 ```
 
@@ -450,7 +450,7 @@ This is a **double suspension** resolving over a static dominant bass — a stap
 4. Push tempo to 100, then 120 BPM.
 
 **Rootless comping voicings:**
-```
+```text
 Cmaj7:  LH: E2–G2   RH: B3–D4–E4
 Dm7:    LH: F2–A2   RH: C4–E4–F4
 G7:     LH: F2–B2   RH: D4–E4–A4   (emphasizes the tritone F–B)
@@ -460,7 +460,7 @@ G7:     LH: F2–B2   RH: D4–E4–A4   (emphasizes the tritone F–B)
 
 Thumb (p) alternates bass notes on beats 1 and 3; index (i), middle (m), ring (a) pick treble strings on beats 2 and 4.
 
-```
+```text
   1   +   2   +   3   +   4   +
   p       i m a       p   i m a
  (G bass)            (C bass)
@@ -492,22 +492,22 @@ Fix: go rootless in the comping hand. For Dm7, play F–A–C–E and let the ba
 ### Reharmonization: Progressive Layering
 
 **Original:**
-```
+```text
 | C | Am | F | G |
 ```
 
 **Step 1 — add passing ii–V motion:**
-```
+```text
 | Cmaj7 | A7 (V7/ii) | Dm7 | G7 |
 ```
 
 **Step 2 — tritone sub on the final V:**
-```
+```text
 | Cmaj7 | A7 | Dm7 | D♭7 (sub for G7) |
 ```
 
 **Step 3 — modal interchange plus chromatic passing diminished:**
-```
+```text
 | Cmaj7 | A7 | Dm7 | G♯dim7 (passing) | Am7 | D♭7 | Cmaj7 |
 ```
 G♯dim7 is a symmetrical diminished seventh chord that shares tones with both its neighbors — it works as connective tissue between Dm7 and Am7 without belonging functionally to either.

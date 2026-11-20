@@ -77,7 +77,7 @@ The computational architecture of number-theoretic algorithms rests on efficient
 
 In pseudocode, the bit-by-bit division algorithm for $a, b \ge 0$ with $b > 0$ proceeds as:
 
-```
+```text
 DivMod(a, b):
   q ← 0, r ← 0
   for i from (bit-length of a - 1) down to 0:
@@ -92,7 +92,7 @@ This algorithm maintains the invariant $a = bq + r$ with $0 \le r < 2b$ after ea
 
 **Euclidean Algorithm Implementation.** The Euclidean Algorithm computes $\gcd(a, b)$ by iterating the Division Algorithm: replace $(a, b)$ with $(b, r)$ where $r = a \bmod b$, until $b = 0$. The termination and correctness proofs rely on two observations: the sequence of remainders strictly decreases, and $\gcd(a, b) = \gcd(b, r)$ for all $r = a \bmod b$. The latter follows from the fact that any common divisor of $a$ and $b$ divides $r = a - bq$, and any common divisor of $b$ and $r$ divides $a = bq + r$, so the two pairs have the same set of common divisors.
 
-```
+```text
 GCD(a, b):
   while b ≠ 0:
     r ← a mod b
@@ -107,7 +107,7 @@ Combining the $O(\log b)$ iterations with the $O((\log a)^2)$ cost per division 
 
 **Extended Euclidean Algorithm.** The Extended Euclidean Algorithm (XGCD) augments the Euclidean Algorithm to compute Bézout coefficients $x, y$ satisfying $\gcd(a, b) = ax + by$ alongside the gcd itself. The algorithm maintains the invariant that at each stage, the current remainders $r_i$ and $r_{i-1}$ can be expressed as $r_i = ax_i + by_i$ and $r_{i-1} = ax_{i-1} + by_{i-1}$ for some integers $x_i, y_i, x_{i-1}, y_{i-1}$. The recurrence $r_{i+1} = r_{i-1} - q_i r_i$ (from the Division Algorithm) translates to $(x_{i+1}, y_{i+1}) = (x_{i-1} - q_i x_i, y_{i-1} - q_i y_i)$.
 
-```
+```text
 ExtendedGCD(a, b):
   (old_r, r) ← (a, b)
   (old_x, x) ← (1, 0)
@@ -130,7 +130,7 @@ Modern factorization algorithms exploit algebraic structure to achieve subexpone
 
 For small integers and pedagogical purposes, the Sieve of Eratosthenes generates all primes up to $n$ in $O(n \log \log n)$ time by iteratively marking multiples of each prime:
 
-```
+```text
 SieveOfEratosthenes(n):
   is_prime ← array of True, indexed from 2 to n
   for p from 2 to √n:
@@ -160,7 +160,7 @@ The practical deployment of number-theoretic algorithms in computational algebra
 
 **Modular Arithmetic and Montgomery Reduction.** Cryptographic protocols perform millions of modular exponentiations $a^e \bmod n$, each decomposing into $O(\log e)$ modular multiplications $(ab \bmod n)$. Naive modular reduction via the Division Algorithm costs $O((\log n)^2)$ per multiplication, dominating the runtime. Montgomery reduction replaces division by $n$ with division by a power of two $R = 2^k > n$, exploiting the efficiency of bitwise operations. The Montgomery representation of $a$ is $\bar{a} = aR \bmod n$, and Montgomery multiplication computes $\overline{ab} = \bar{a} \bar{b} R^{-1} \bmod n$ without explicit division by $n$:
 
-```
+```text
 MontgomeryReduce(T, n, n', R):
   // Inputs: T < Rn, n < R, n' = -n^(-1) mod R
   m ← ((T mod R) · n') mod R

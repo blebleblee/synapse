@@ -108,7 +108,7 @@ follows an $F(a-1, ab(n-1))$ distribution exactly when the normality and constan
 
 The two-way ANOVA table organizes these computations with explicit degrees of freedom, mean squares, and F-ratios:
 
-```
+```text
 Source        | SS       | df             | MS                         | F
 --------------|----------|----------------|----------------------------|---------
 A             | SS_A     | a - 1          | SS_A / (a-1)               | MS_A / MS_E

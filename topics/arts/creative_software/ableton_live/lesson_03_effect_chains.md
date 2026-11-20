@@ -18,7 +18,7 @@ That's the full theory budget. Everything below is hands-on.
 
 Every device slot in a chain falls into one of four functional roles. Memorize this order — it's the default blueprint for 90% of chains, and you deviate from it deliberately, not accidentally.
 
-```
+```text
 Gain Staging → Dynamics (corrective) → Tone Shaping (EQ) → Character/Color (Saturation, Distortion) → Modulation (Chorus, Phaser) → Time-Based (Delay, Reverb) → Dynamics (bus-glue, limiting)
 ```
 
@@ -94,7 +94,7 @@ Not everything should be processed serially. Live's **Audio Effect Rack** lets y
 
 **Why parallel beats serial here:** a fully serial distortion crushes the entire dynamic range of the source. A parallel blend keeps the original transient and low-end intact (from the dry chain) while layering harmonic aggression on top (from the wet chain) — this is the "New York compression" trick applied to distortion, standard in modern drum bus processing.
 
-```
+```text
 graph LR
     subgraph input_stage ["Audio Effect Rack Input"]
         A["Track Signal"]
@@ -142,7 +142,7 @@ This is the single biggest workflow decision for time-based effects (reverb, del
 
 **Pre/Post Send switch:** right-click the Send knob → toggle **Pre** (sends the signal before the track's fader, so muting/riding the fader doesn't affect the reverb send — useful for cue mixes) vs **Post** (default; send level tracks the fader, so turning a track down also reduces its reverb contribution — correct for 95% of mix use cases).
 
-```
+```text
 graph TB
     subgraph tracks ["Individual Tracks"]
         T1["Snare Track"]

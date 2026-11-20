@@ -31,7 +31,7 @@ The Internet's forwarding invariant—that packets advance monotonically toward 
 
 A router's internal architecture separates control-plane routing from data-plane forwarding. The control plane executes routing protocols, computes shortest paths, and populates the Forwarding Information Base (FIB). The data plane, implemented in specialized hardware or optimized software, performs high-speed lookups and packet rewriting. This separation allows the control plane to run on a general-purpose CPU while the data plane leverages Application-Specific Integrated Circuits (ASICs), Field-Programmable Gate Arrays (FPGAs), or smart Network Interface Cards (SmartNICs).
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                      Control Plane                          │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
@@ -76,7 +76,7 @@ The Routing Information Base (RIB) stores all routing protocol outputs, while th
 
 Dijkstra's algorithm underpins OSPF and IS-IS path computation. Given a weighted graph where vertices represent routers and edges represent links, Dijkstra computes the shortest path from a source to all destinations. The algorithm maintains a priority queue of vertices ordered by tentative distance and iteratively extracts the minimum-distance vertex, relaxing its outbound edges. Pseudocode for the algorithm follows:
 
-```
+```text
 function Dijkstra(graph, source):
     for each vertex v in graph:
         distance[v] := INFINITY

@@ -20,7 +20,7 @@ Natural deduction proofs are tree structures where each node represents a formul
 
 Consider the simplest rules first: conjunction introduction and elimination. The *conjunction introduction rule*, denoted ∧I, states that if you have proven φ and you have proven ψ, then you may conclude φ ∧ ψ. In natural deduction notation, this is written:
 
-```
+```text
 φ    ψ
 -------  (∧I)
 φ ∧ ψ
@@ -28,7 +28,7 @@ Consider the simplest rules first: conjunction introduction and elimination. The
 
 The horizontal line represents the inference; above it are the premises required by the rule, below it is what the rule licenses us to conclude. The *conjunction elimination rules* (there are two, ∧E₁ and ∧E₂) state that if you have φ ∧ ψ, you may conclude either φ or ψ:
 
-```
+```text
 φ ∧ ψ          φ ∧ ψ
 -------  (∧E₁) -------  (∧E₂)
 φ              ψ
@@ -38,7 +38,7 @@ These rules formalize the intuition that a conjunction contains both of its conj
 
 Disjunction rules introduce a new dimension of complexity. The *disjunction introduction rules* state that if you have proven φ, you may conclude φ ∨ ψ (for any ψ), and similarly if you have proven ψ, you may conclude φ ∨ ψ:
 
-```
+```text
 φ              ψ
 -------  (∨I₁) -------  (∨I₂)
 φ ∨ ψ          φ ∨ ψ

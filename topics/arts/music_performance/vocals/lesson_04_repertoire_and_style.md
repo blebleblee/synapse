@@ -117,7 +117,7 @@ Built from:
 
 Sustain one comfortable middle pitch (E4 for tenor, A3 for baritone, A4 for soprano/mezzo). Crescendo from pianissimo to fortissimo and back, on one breath, one pitch.
 
-```
+```text
 Pitch:    [sustained — 8 counts]
 Dynamic:  pp -> mp -> mf -> f -> ff -> f -> mf -> mp -> pp
 Tempo:    MM = 60, one beat per dynamic step
@@ -143,7 +143,7 @@ The mechanics:
 - Voice still feels tired 24+ hours later.
 
 **Drill — The Belt Staircase**
-```
+```text
 Pattern:        Root -> 3rd -> 5th -> Octave  (C4 - E4 - G4 - C5)
 Vowel:          "NAY" (AES narrowing engaged)
 Tempo:          MM = 72
@@ -157,7 +157,7 @@ Cap each session at 3–4 transpositions until the pattern feels free at every s
 A professional vocal run is not improvised at speed — it's a memorized pattern executed with the same muscle memory as a scale on an instrument.
 
 **Anatomy of a run (A minor pentatonic, descending):**
-```
+```text
 A4 -> G4 -> E4 -> D4 -> A3
 Sung on one syllable: "oh" or "yeah"
 ```
@@ -166,7 +166,7 @@ Sung on one syllable: "oh" or "yeah"
 
 Light head-mix register, no scooping — attack each pitch cleanly from directly below with a slight aspirate onset, then lock the pitch immediately.
 
-```
+```text
 Week 1:  MM = 60 -> 80   every note deliberate, clean separate onset
 Week 2:  MM = 80 -> 100  begin connecting notes legato
 Week 3:  MM = 100 -> 130 the run starts to feel like one gesture
@@ -224,7 +224,7 @@ graph LR
 
 ### 5.3 Weekly Practice Schedule
 
-```
+```text
 Mon / Wed / Fri — Technique Day (45 min)
   0:00-0:05  Alignment, breath reset, appoggio hiss
   0:05-0:12  Semi-occluded: straw phonation, lip trills (C3-C5 sirens)
@@ -322,7 +322,7 @@ What you hear inside your own skull (bone conduction adds warmth and bass you're
 
 A singer who can't hear a minor third internally will never land one reliably on stage. Five minutes a day, every day.
 
-```
+```text
 Day 1:  Perfect unison and octave  — "do-do"
 Day 2:  Perfect 5th                — "do-sol"
 Day 3:  Perfect 4th                — "do-fa"
@@ -362,7 +362,7 @@ Vibrato isn't added on top of a note — it's what naturally happens when breath
 **Trill**: rapid alternation between two adjacent pitches, a half or whole step apart. Requires the CT muscle to oscillate cleanly at 6–8 Hz while breath support stays rock steady underneath.
 
 **Trill drill:**
-```
+```text
 Start on D4 (comfortable mid-range for most voices).
 Sing D4 -> E4 as a slow shake: MM = 60, one pitch per beat.
 Accelerate gradually: MM = 80 -> 100 -> 130, until the motion blurs into a continuous oscillation.

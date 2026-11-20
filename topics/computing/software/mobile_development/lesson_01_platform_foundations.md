@@ -30,7 +30,7 @@ The foundation of mobile process isolation rests on hardware memory management u
 
 iOS extends hardware memory protection through the Sandbox kernel extension, which implements a profile-based mandatory access control policy. Each application runs with a unique sandbox profile derived from entitlements declared in its provisioning profile and additional restrictions based on application type. The sandbox profile compiles to a compact bytecode representation loaded into the kernel at process creation. System calls that access files, sockets, or IPC mechanisms traverse sandbox policy checks before traditional UNIX permission checks. A typical application profile forbids access to file paths outside the application's container directory (located at `/var/mobile/Containers/Data/Application/<UUID>`), prevents raw socket creation, prohibits dynamic linking against system private frameworks, and restricts inter-process communication to explicitly entitled Mach services. Violations trigger immediate `SIGKILL` with diagnostic messages logged to the syslog subsystem.
 
-```
+```text
 Application Address Space (iOS/ARM64)
 ┌────────────────────────────────────────┐ 0xFFFFFFFFFFFFFFFF
 │ Kernel Space (TTBR1)                   │ 
@@ -63,7 +63,7 @@ Android's application sandbox builds on Security-Enhanced Linux (SELinux) polici
 
 The binder IPC mechanism deserves detailed examination because it forms the substrate for all cross-process communication on Android. Binder is a custom kernel driver exposing a character device at `/dev/binder`, implementing synchronous remote procedure calls with reference-counted object passing. When an application invokes a method on a system service, the client-side proxy marshals parameters into a `Parcel` buffer, issues an `ioctl` to the binder driver with the service handle and transaction code, and blocks waiting for a reply. The kernel validates that the caller's SELinux context permits communication with the target service, delivers the transaction buffer to the service's binder thread pool, and suspends the caller until the service writes a reply. Object references passed through binder become reference-counted capabilities; the kernel translates local object pointers into global handles and manages lifecycle across process boundaries, preventing use-after-free and double-free vulnerabilities.
 
-```
+```text
 Android Binder Transaction Flow
 ┌─────────────┐                ┌──────────────┐                ┌─────────────┐
 │ Application │                │ Binder Driver│                │ System      │

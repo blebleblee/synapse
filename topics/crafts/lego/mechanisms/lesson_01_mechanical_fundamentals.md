@@ -18,7 +18,7 @@ Friction is the central paradox of LEGO mechanical design. The same physical phe
 
 The stud-tube clutch mechanism is the most fundamental connection in the LEGO system. Each standard stud measures approximately 4.9mm in diameter at its base and 1.7mm in height. Each standard brick contains hollow tubes on its underside, with an inner diameter of approximately 4.9mm. When a stud is inserted into a tube, the slight interference—typically 0.0–0.1mm depending on manufacturing tolerance—creates radial pressure that generates friction along the cylindrical contact surface. This friction is what resists separation of the parts. Consider a standard 2×4 brick: it has eight studs on top and three tubes underneath. When another brick is placed on top, each of the eight upper studs engages with a corresponding tube or wall surface on the lower brick, producing a total clutch force of approximately 16–24 N. This is the force required to pull the bricks straight apart. Shear force—the lateral force required to slide one brick across the other—is higher, because the shear path engages the full cross-section of multiple studs simultaneously, with the friction between the top surface of the lower brick and the underside of the upper brick also contributing.
 
-```
+```text
     Stud-Tube Clutch Cross-Section (simplified)
     
          ┌─────┐   ┌─────┐
@@ -90,7 +90,7 @@ Force path analysis is the discipline of tracing how a load travels through a st
 
 A vertical stack of bricks under compressive load has a straightforward force path: the load passes through each brick in sequence, from the top brick down through the stud-tube interfaces to the base. The load per stud is simply the total load divided by the number of engaged studs. A lateral load introduces a more complex force path. A horizontal force applied to the top of a vertical brick stack creates a moment (force × height) that must be resisted by the base. The moment is resisted by a couple: the studs on one side of the base are placed in tension—the clutch friction resists uplift—and the studs on the other side are placed in compression. The taller the stack, the greater the moment arm, and the greater the tensile load on the uplift-side studs. A stack of twenty bricks under a 1 N lateral load at the top generates a base moment of $1\text{N} \times 192\text{mm}$ (20 × 9.6mm) = 192 N·mm. If the base is a 2×4 brick (8 studs, 32mm wide), the resisting couple arm is approximately 32mm, giving a tensile force per side of $192\text{N·mm} / 32\text{mm} = 6\text{N}$, or roughly 1.5 N per stud if four studs are on the uplift side. This is within the clutch capacity of the studs, but a forty-brick stack under the same load would exceed the clutch capacity and topple.
 
-```
+```text
     Lateral Force Path Through a Brick Stack
 
          F → ┌───┐

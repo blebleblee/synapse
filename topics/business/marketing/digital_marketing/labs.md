@@ -22,7 +22,7 @@ The exported data represents last-click attribution, where each conversion credi
 
 Open `conversion_paths.csv` in your spreadsheet application. Each row represents a unique conversion path with columns showing Step -5, Step -4, Step -3, Step -2, Step -1, and Conversion event, plus a Count column indicating how many users followed that exact sequence. The raw path data appears as concatenated strings like "google / organic / (not set)" for each step. Before applying attribution logic, you must parse these strings into structured channel categories. Create a new column labeled Channel_Step_5 and use the following formula in cell G2 (assuming Step -5 data starts in column A):
 
-```
+```text
 =IF(A2="(entrance)","None",IF(ISNUMBER(SEARCH("google",A2)),IF(ISNUMBER(SEARCH("cpc",A2)),"Paid Search","Organic Search"),IF(ISNUMBER(SEARCH("facebook",A2)),"Paid Social",IF(ISNUMBER(SEARCH("direct",A2)),"Direct",IF(ISNUMBER(SEARCH("email",A2)),"Email","Other")))))
 ```
 
@@ -32,25 +32,25 @@ With structured channel data prepared, implement a U-shaped attribution model th
 
 Return to the conversion_paths sheet and create a calculated column for each path's conversion count. In cell M2 (assuming Count appears in column F), calculate first touch attribution credit:
 
-```
+```text
 =IF(G2="None",0,F2*0.4)
 ```
 
 This formula assigns 40% of the conversion count to the first touch channel, or zero if the path started with direct entry (no prior touchpoint). In cell N2, calculate middle touch credit. The formula must determine how many middle touchpoints exist (between first and last) and distribute 20% of conversions evenly:
 
-```
+```text
 =F2*0.2/MAX(1,COUNTIF(H2:K2,"<>None")-COUNTIF(H2:K2,K2))
 ```
 
 This counts non-empty middle steps, excludes the last touch, and divides 20% by that count. If only two touchpoints exist (first and last with no middle), the denominator becomes 1 to avoid division errors. In cell O2, calculate last touch credit:
 
-```
+```text
 =IF(K2="None",0,F2*0.4)
 ```
 
 Copy these formulas down for all paths. Now aggregate attribution credit by channel. In the Attribution_Calculations sheet, use SUMIF to collect first touch credit. In cell B2 (for Paid Search row), enter:
 
-```
+```text
 =SUMIF(conversion_paths!$G$2:$G$1000,Attribution_Calculations!$A2,conversion_paths!$M$2:$M$1000)
 ```
 
@@ -58,7 +58,7 @@ Adjust the range $G$2:$G$1000 to match your actual data rows. This sums all firs
 
 In cell E2, sum the total attributed conversions:
 
-```
+```text
 =B2+C2+D2
 ```
 
@@ -66,7 +66,7 @@ Copy down for all channels. You now possess a complete attribution model showing
 
 The operational value emerges when you calculate return on ad spend (ROAS) using attributed conversions rather than last-click conversions. In your Attribution_Calculations sheet, add column F labeled "Ad Spend" and column G labeled "Revenue per Conversion". Manually enter your actual monthly ad spend for Paid Search, Paid Social, and any other paid channels (organic channels have zero ad spend). For Revenue per Conversion, either use a blended average from your e-commerce data or calculate it from Google Analytics 4 by dividing Total Revenue by Conversions in your original export. In cell H2, calculate attributed ROAS:
 
-```
+```text
 =(E2*G2)/F2
 ```
 
@@ -90,13 +90,13 @@ Formulate a testable hypothesis using the PICOT framework from clinical research
 
 Before launching the test, calculate the required sample size to achieve statistical significance. Use the following formula for sample size per variant in an A/B test:
 
-```
+```text
 n = (Z_α + Z_β)² × (p₁(1-p₁) + p₂(1-p₂)) / (p₁ - p₂)²
 ```
 
 Where n equals sample size per variant, Z_α equals the Z-score for your significance level (1.96 for 95% confidence), Z_β equals the Z-score for your desired statistical power (0.84 for 80% power), p₁ equals baseline conversion rate (0.12), and p₂ equals expected improved rate (0.138). Substituting these values:
 
-```
+```text
 n = (1.96 + 0.84)² × (0.12(1-0.12) + 0.138(1-0.138)) / (0.12 - 0.138)²
 n = (2.8)² × (0.1056 + 0.1189) / (0.018)²
 n = 7.84 × 0.2245 / 0.000324
@@ -120,19 +120,19 @@ Launch the experiment and establish a monitoring protocol. Create a spreadsheet 
 
 The two-proportion z-test formula calculates whether the observed difference between control and treatment CTR is statistically significant or likely due to random chance:
 
-```
+```text
 z = (p̂₁ - p̂₂) / sqrt(p̂(1-p̂)(1/n₁ + 1/n₂))
 ```
 
 Where p̂₁ equals treatment CTR, p̂₂ equals control CTR, p̂ equals pooled proportion (total clicks / total visitors across both variants), n₁ equals treatment visitor count, and n₂ equals control visitor count. After 10 days, suppose the control has 2,650 visitors with 318 clicks (12.0% CTR) and treatment has 2,680 visitors with 382 clicks (14.3% CTR). Calculate pooled proportion:
 
-```
+```text
 p̂ = (318 + 382) / (2650 + 2680) = 700 / 5330 = 0.1313
 ```
 
 Calculate the z-score:
 
-```
+```text
 z = (0.143 - 0.120) / sqrt(0.1313(1-0.1313)(1/2680 + 1/2650))
 z = 0.023 / sqrt(0.1141 × 0.000748)
 z = 0.023 / sqrt(0.0000854)
@@ -144,13 +144,13 @@ A z-score of 2.49 exceeds the critical value of 1.96 for 95% confidence, indicat
 
 Calculate the 95% confidence interval for the treatment effect size to quantify the improvement range:
 
-```
+```text
 CI = (p̂₁ - p̂₂) ± 1.96 × sqrt(p̂₁(1-p̂₁)/n₁ + p̂₂(1-p̂₂)/n₂)
 ```
 
 Substituting final test values at day 22 (5,430 visitors per variant, assume treatment finishes at 14.2% CTR):
 
-```
+```text
 CI = (0.142 - 0.120) ± 1.96 × sqrt(0.142(0.858)/5430 + 0.120(0.880)/5430)
 CI = 0.022 ± 1.96 × sqrt(0.0000224 + 0.0000194)
 CI = 0.022 ± 1.96 × 0.00647
@@ -174,7 +174,7 @@ The stress test begins by analyzing a campaign failure scenario using real histo
 
 Open the CSV in your spreadsheet application and create a diagnostic dashboard. Calculate rolling 7-day averages for Cost_per_Conversion to smooth daily volatility and reveal trends. In cell G2 (assuming Cost_per_Conversion appears in column F), enter:
 
-```
+```text
 =AVERAGE(F2:F8)
 ```
 
@@ -184,7 +184,7 @@ Suppose your chart reveals that CPA jumped from $42 to $67 (60% increase) betwee
 
 Navigate back to Google Ads and drill into day 48 performance. Go to Campaigns → Select your campaign → Click on Keywords for the date range of day 48 only. Export the keyword performance table including columns Keyword, Match_Type, Clicks, Cost, Conversions, CPA, Avg_Position, Quality_Score, Search_Impr_Share. Open this export and calculate each keyword's contribution to the overall CPA increase. In a new column labeled CPA_Impact, use the formula:
 
-```
+```text
 =(Keyword_Cost / Total_Campaign_Cost) × (Keyword_CPA - Prior_Day_Campaign_CPA)
 ```
 
@@ -202,13 +202,13 @@ Implement a manual CPC recovery protocol when automated bidding fails. Create a 
 
 Use the position-to-bid adjustment formula to calculate new manual bids:
 
-```
+```text
 New_Bid = Current_Bid × (Current_Position / Target_Position)
 ```
 
 If a keyword with current bid $3.20 sits at average position 2.8 and you want position 1.5, calculate:
 
-```
+```text
 New_Bid = $3.20 × (2.8 / 1.5) = $3.20 × 1.867 = $5.97
 ```
 
@@ -244,13 +244,13 @@ The third stress test addresses budget pacing failures where campaigns exhaust m
 
 Create a budget pacing monitor spreadsheet named `Budget_Pacing_Monitor.xlsx`. Export daily spend data for all campaigns for the current month. In column A, list each day of the month (1-31). In column B, enter actual daily spend. In column C, calculate cumulative spend. In column D, calculate the ideal cumulative spend for even pacing:
 
-```
+```text
 Ideal_Cumulative_Spend = (Monthly_Budget / Days_in_Month) × Current_Day
 ```
 
 If your monthly budget is $15,000 and today is day 7, ideal cumulative spend equals ($15,000 / 30) × 7 = $3,500. In column E, calculate pacing variance:
 
-```
+```text
 Pacing_Variance = (Actual_Cumulative_Spend - Ideal_Cumulative_Spend) / Ideal_Cumulative_Spend
 ```
 
@@ -283,7 +283,7 @@ For each touchpoint i days before conversion:
 - All middle touches: 20% credit divided equally
 
 **Channel ROAS Calculation:**
-```
+```text
 ROAS = (Attributed_Conversions × Revenue_Per_Conversion) / Ad_Spend
 ```
 Where Attributed_Conversions comes from your selected attribution model, not last-click.
@@ -291,7 +291,7 @@ Where Attributed_Conversions comes from your selected attribution model, not las
 ### A/B Test Statistical Formulas
 
 **Sample Size Calculation for Two-Proportion Test:**
-```
+```text
 n = (Z_α + Z_β)² × (p₁(1-p₁) + p₂(1-p₂)) / (p₁ - p₂)²
 ```
 - Z_α: Z-score for significance level (1.96 for 95% confidence, 2.58 for 99%)
@@ -301,7 +301,7 @@ n = (Z_α + Z_β)² × (p₁(1-p₁) + p₂(1-p₂)) / (p₁ - p₂)²
 - Result: Sample size required per variant
 
 **Two-Proportion Z-Test for Significance:**
-```
+```text
 z = (p̂₁ - p̂₂) / sqrt(p̂(1-p̂)(1/n₁ + 1/n₂))
 ```
 - p̂₁: Treatment conversion rate
@@ -310,12 +310,12 @@ z = (p̂₁ - p̂₂) / sqrt(p̂(1-p̂)(1/n₁ + 1/n₂))
 - Critical value: |z| > 1.96 for 95% confidence
 
 **Confidence Interval for Difference in Proportions:**
-```
+```text
 CI = (p̂₁ - p̂₂) ± Z_α × sqrt(p̂₁(1-p̂₁)/n₁ + p̂₂(1-p̂₂)/n₂)
 ```
 
 **Minimum Detectable Effect Given Sample Size:**
-```
+```text
 MDE = (Z_α + Z_β) × sqrt(p₁(1-p₁)/n₁ + p₂(1-p₂)/n₂)
 ```
 

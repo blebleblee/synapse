@@ -10,7 +10,7 @@ The objective is not merely to understand trading abstractly, but to build opera
 
 Your analytical environment consists of three integrated layers: market data infrastructure, quantitative execution models, and diagnostic audit frameworks. Begin by establishing a structured workspace directory with the following hierarchy:
 
-```
+```text
 stock_trading_labs/
 ├── data/
 │   ├── market_snapshots/
@@ -114,7 +114,7 @@ $$
 
 In your spreadsheet, create log-transformed columns: `ln_Impact`, `ln_Volatility`, `ln_Participation`. Use the built-in regression tool (Data Analysis > Regression in Excel) to estimate:
 
-```
+```text
 ln_Impact = β₀ + β₁ · ln_Volatility + β₂ · ln_Participation + ε
 ```
 
@@ -404,7 +404,7 @@ Compute performance metrics for each protocol:
 
 Construct a decision tree for protocol selection based on pre-shock conditions:
 
-```
+```text
 IF order_urgency == HIGH AND deadline < 2 hours:
     SELECT Protocol 2 (Aggressive Completion)
 ELIF liquidity_depth > 50% of normal:
@@ -628,7 +628,7 @@ $$
 - Compute expected cost under current conditions vs. expected cost if waiting
 
 **Phase 3: Protocol Selection**
-```
+```text
 IF (deadline < 1 hour) OR (recovery_probability < 0.3):
     Execute Protocol: Aggressive Completion
     Actions: Route remaining inventory to all available venues, accept elevated costs

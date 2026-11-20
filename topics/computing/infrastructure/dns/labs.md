@@ -152,7 +152,7 @@ Test DNS query timeout behavior under various timeout configurations to understa
 
 Inject SERVFAIL responses from an authoritative nameserver to observe negative caching and retry behavior. Deploy a local authoritative nameserver that intentionally returns SERVFAIL using the BIND9 nameserver. Install BIND with `apt-get install -y bind9`, then configure a minimal zone file `/etc/bind/named.conf.local`:
 
-```
+```text
 zone "testfail.local" {
     type master;
     file "/etc/bind/db.testfail.local";
@@ -161,7 +161,7 @@ zone "testfail.local" {
 
 Create the zone database file `/etc/bind/db.testfail.local`:
 
-```
+```text
 $TTL    60
 @       IN      SOA     ns.testfail.local. admin.testfail.local. (
                         1         ; Serial
@@ -177,7 +177,7 @@ Modify BIND configuration to return SERVFAIL for all queries by adding `rate-lim
 
 Simulate DNS cache poisoning by deploying a rogue DNS server responding with incorrect A records, then testing whether DNSSEC validation prevents acceptance of forged responses. Deploy a second BIND instance on an alternate port (5353) configured to return attacker-controlled IP addresses for legitimate domains. Modify `/etc/bind/named.conf.local` to add a zone hijacking `google.com`:
 
-```
+```text
 zone "google.com" {
     type master;
     file "/etc/bind/db.google.com.poisoned";
@@ -186,7 +186,7 @@ zone "google.com" {
 
 Create `/etc/bind/db.google.com.poisoned`:
 
-```
+```text
 $TTL    300
 @       IN      SOA     ns.google.com. admin.google.com. (
                         1         ; Serial

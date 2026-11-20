@@ -290,7 +290,7 @@ This program spawns ten threads that each increment a shared counter one hundred
 
 To detect this race automatically, rebuild with ThreadSanitizer enabled. Rust's `cargo` build system does not directly support ThreadSanitizer, but you can invoke `rustc` with the appropriate flags. First, install the nightly toolchain if not already present: `rustup toolchain install nightly`. Set the nightly toolchain as active for this project: `rustup override set nightly`. Now build with ThreadSanitizer: `RUSTFLAGS="-Z sanitizer=thread" cargo build --target x86_64-unknown-linux-gnu`. Note that ThreadSanitizer is only available on Linux and macOS. After the build completes, run the instrumented binary: `./target/x86_64-unknown-linux-gnu/debug/race_detector`. ThreadSanitizer will detect the data race and print a detailed report:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7ffabcdef000 by thread T2:
     #0 Counter::increment race_detector.rs:13
@@ -373,7 +373,7 @@ This program allocates a vector, obtains a raw pointer to its data, deallocates 
 
 Build with AddressSanitizer: `RUSTFLAGS="-Z sanitizer=address" cargo build --target x86_64-unknown-linux-gnu`. Run the instrumented binary: `./target/x86_64-unknown-linux-gnu/debug/asan_test`. AddressSanitizer detects the use-after-free and aborts with a detailed report:
 
-```
+```text
 ==12345==ERROR: AddressSanitizer: heap-use-after-free on address 0x60300000eff0 at pc 0x000000401234
 READ of size 4 at 0x60300000eff0 thread T0
     #0 0x401234 in asan_test::main asan_test.rs:9
@@ -407,7 +407,7 @@ fn main() {
 
 This program allocates one thousand 1KB blocks and never frees them. Build with AddressSanitizer, which includes LeakSanitizer by default: `RUSTFLAGS="-Z sanitizer=address" cargo build --target x86_64-unknown-linux-gnu`. Run the binary. At program exit, LeakSanitizer scans for unreachable allocations and reports:
 
-```
+```text
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 Direct leak of 1024000 bytes in 1000 objects allocated from:
     #0 0x401000 in malloc

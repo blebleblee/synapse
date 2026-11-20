@@ -100,14 +100,14 @@ Skip muting and even a technically perfect slap pattern sounds like mud.
 Work these with a metronome, not by feel. Each pattern lists a starting tempo — don't skip ahead until it's clean.
 
 ### Pattern 1 — Alternating Slap-Pop (the foundation)
-```
+```text
 T  i  T  i
 E  A  E  A
 ```
 Start at **60 BPM quarter notes**. Move to 8th notes at 70 BPM once even, then 16ths at 80 BPM.
 
 ### Pattern 2 — Double-Pop
-```
+```text
 T  i  m  T  i  m
 E  A  A  E  A  A
 ```
@@ -116,14 +116,14 @@ E  A  A  E  A  A
 The middle finger is anatomically weaker — it'll sound 10–15% quieter unless you compensate. Isolate it: 100 consecutive middle-finger pops at 60 BPM, matching the index finger's volume by ear.
 
 ### Pattern 3 — Triplet Feel (funk staple)
-```
+```text
 T  i  T | T  i  T |
 1  &  a | 2  &  a |
 ```
 Slap on the numbered beats, pop on the "&". Start at **80 BPM** with the metronome set to click triplet subdivisions.
 
 ### Pattern 4 — Syncopated 16ths
-```
+```text
 -  i  T  - | i  T  i  - |
 e  &  a    | &  a  e    |
 ```
@@ -136,7 +136,7 @@ Leaving the downbeat empty forces you to feel the subdivision instead of default
 Fret with the tip of the finger just behind the fretwire, perpendicular to the neck — standard left-hand posture doesn't change just because the right hand is slapping. After releasing a fretted note, let the finger flatten slightly onto the adjacent strings to mute.
 
 **E minor pentatonic box (open to 5th fret), Simandl 1-2-4 fingering below the 5th fret:**
-```
+```text
 G|--0-2-3------------|
 D|--0-2-3------------|
 A|--0---2-3----------|
@@ -145,7 +145,7 @@ E|--0-----3-5--------|
 Index (1) covers frets 1–2, middle (2) covers fret 3, pinky (4) covers frets 4–5. Ring finger stays in reserve for fret 4 passages — don't improvise fingerings here, the 1-2-4 system exists specifically to keep tendon strain off the lower frets where the stretch is widest.
 
 **Sample groove, E minor pentatonic:**
-```
+```text
 E|--S-------0-P-3-0----|
 A|-----S----------------|
        1 &  2  &  3  & 4 &
@@ -153,7 +153,7 @@ A|-----S----------------|
 S = slap (open E), P = pop. Slap E on 1, pop A on &, slap open E on 2, pop fretted 3rd-fret E on &, and so on — the point of the exercise is switching cleanly between open-string slaps and fretted pops without losing the pocket.
 
 **Extended box, 7th–10th fret zone (same key, octave up):**
-```
+```text
 G|--------9-10-----------|
 D|--------9-10-----------|
 A|-----7--9--------------|
@@ -216,13 +216,13 @@ Daily check: no pain, all unused strings muted, consistent tone slap-to-slap.
 
 - **Dynamic scaling**: Pattern 1 at 80 BPM 16ths, crescendo pp→ff over 8 bars, decrescendo back over 8 bars. Smooth, no sudden jumps.
 - **Accents**: baseline at mf, accent beats 1 and 3 to f.
-  ```
+  ```text
   T   i   T   i   T   i   T   i
   f   mf  mf  mf  f   mf  mf  mf
   1   &   2   &   3   &   4   &
   ```
 - **Ghost notes**: same pattern, with some slaps dropped to barely-audible pp (notate as lowercase `t`):
-  ```
+  ```text
   T   i   t   i   T   i   t   i
   f   mf  pp  mf  f   mf  pp  mf
   ```
@@ -234,7 +234,7 @@ If you have a phone recorder or DAW, record a pass and eyeball the waveform — 
 - **Tempo pyramid**: start 70 BPM 16ths, play 2 minutes, bump 5 BPM, repeat until accuracy breaks down, then step back down the same way.
 - **Burst training**: metronome at 130 BPM 16ths, play flat-out for 15 seconds, rest 45 seconds, repeat 10 times. The goal is clean execution in the burst, not grinding through sloppy reps.
 - **Odd meters**, 90 BPM:
-  ```
+  ```text
   5/4:  T  i  T  i  T | i  T  i  T  i |
         1  &  2  &  3 | &  1  &  2  & |
   7/8:  T  i  T | i  T  i  T |
@@ -305,7 +305,7 @@ Play the same 4-bar groove in all three zones and listen to how much the tone ch
 
 ### Double-thumb technique
 The thumb strikes on both the downstroke (pronation, standard slap) and the upstroke (supination, catching the string with the thumbnail-side edge on the way back). This doubles your articulation rate without involving the fingers.
-```
+```text
 T  t  T  t
 1  &  2  &
 ```

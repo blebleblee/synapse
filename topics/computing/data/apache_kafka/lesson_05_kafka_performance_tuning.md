@@ -48,7 +48,7 @@ Each Kafka partition maps to a directory on the broker's filesystem. Within that
 
 The `base_offset` in the filename is the offset of the first message in that segment. The active segment is the one currently being written to; all prior segments are immutable and eligible for direct `sendfile` transfer.
 
-```
+```text
 /kafka-logs/my-topic-3/
 ├── 00000000000000000000.index
 ├── 00000000000000000000.log
@@ -65,7 +65,7 @@ The `.index` file is a **sparse** index: not every message gets an entry. The br
 
 Kafka's on-disk and on-wire format since version 0.11 is the **RecordBatch** (also called the "magic byte 2" format). Understanding this format is essential for tuning because compression, checksums, and producer idempotency all operate at the batch level.
 
-```
+```text
 RecordBatch
 ├── baseOffset          (int64)
 ├── batchLength         (int32)
@@ -466,7 +466,7 @@ quota.consumer.default=104857600
 
 The number of partitions is the primary horizontal scalability lever in Kafka. The relationship is:
 
-```
+```text
 max_cluster_throughput ≈ min(
     num_partitions × per_partition_producer_throughput,
     num_brokers × per_broker_disk_throughput,
@@ -482,7 +482,7 @@ Each partition is a linearized unit of work: only one consumer in a group reads 
 
 A practical formula for initial partition sizing (from the Confluent documentation and original LinkedIn engineering work) is:
 
-```
+```text
 num_partitions = max(
     target_throughput / max_producer_throughput_per_partition,
     target_throughput / max_consumer_throughput_per_partition

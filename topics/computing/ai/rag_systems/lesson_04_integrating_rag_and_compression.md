@@ -816,7 +816,7 @@ CRAG (Yan et al., 2024) adds an evaluator module that scores the retrieved docum
 
 For multi-hop questions where a single retrieval pass is insufficient, the LLM acts as a ReAct agent (Yao et al., 2022), iteratively calling retrieval tools based on intermediate reasoning:
 
-```
+```text
 Query: "Who directed the film starring the actor born in the same city as Marie Curie?"
 Step 1 → [retrieve("Marie Curie birthplace")] → Warsaw
 Step 2 → [retrieve("famous actors born in Warsaw")] → ...

@@ -166,7 +166,7 @@ where $T_{ij}$ encodes matter and energy distribution.
 
 Given a parametric surface $\mathbf{r}(u,v)$, the canonical workflow proceeds:
 
-```
+```text
 1. Compute partial derivatives:
    r_u, r_v, r_uu, r_uv, r_vv
 

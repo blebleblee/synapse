@@ -365,7 +365,7 @@ The state-of-the-art MSM algorithm is Pippenger's algorithm, which groups scalar
 
 A concrete benchmark illustrates the regime. For a Groth16 prover over a circuit with $2^{23}$ constraints on a machine with an NVIDIA RTX 3090 (24 GB VRAM):
 
-```
+```text
 MSM (G1, 2^23 scalars):  ~8.4s   (Pippenger, CUDA, BN254 curve)
 NTT (2^23 field elems):  ~1.2s   (radix-2, CUDA, BN254 scalar field)
 Total prover time:       ~11.3s

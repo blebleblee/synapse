@@ -44,7 +44,7 @@ The JVM runtime consists of several interacting subsystems: the class file parse
 
 The class file format encodes a compiled Java class as a sequence of binary structures. The file begins with a magic number (0xCAFEBABE), followed by minor and major version numbers indicating the Java platform version. The constant pool follows, encoded as a count plus an array of constant pool entries. Each entry has a tag byte identifying its type (CONSTANT_Class, CONSTANT_Fieldref, CONSTANT_Methodref, CONSTANT_String, CONSTANT_Integer, etc.) followed by type-specific data. For example, a CONSTANT_Methodref entry contains two u2 indices: one pointing to a CONSTANT_Class entry (the class containing the method) and one pointing to a CONSTANT_NameAndType entry (encoding the method name and descriptor).
 
-```
+```text
 ClassFile {
     u4 magic;                    // 0xCAFEBABE
     u2 minor_version;
@@ -69,7 +69,7 @@ The access flags encode visibility (public, private, protected), finality (final
 
 The Code attribute structure reveals the stack frame layout:
 
-```
+```text
 Code_attribute {
     u2 attribute_name_index;
     u4 attribute_length;
@@ -88,7 +88,7 @@ The `max_stack` field specifies the maximum depth the operand stack reaches duri
 
 Bytecode instructions operate on this stack frame. Consider the sequence computing `(a + b) * c` where `a`, `b`, and `c` are local variables at indices 0, 1, and 2:
 
-```
+```text
 iload_0        // push local variable 0 (a) onto stack
 iload_1        // push local variable 1 (b) onto stack
 iadd           // pop two ints, add, push result
@@ -154,7 +154,7 @@ After optimization, C2 performs register allocation using graph coloring or a li
 
 The JVM's garbage collector interacts with compiled code through GC barriers. Write barriers track reference updates for generational and concurrent collectors. When a reference field is written, the write barrier checks whether the update crosses a generational boundary (old-to-young pointer) or needs to be logged for concurrent marking. The barrier may involve a simple conditional check (is the referent in a different generation?) and a call to a slow-path function if logging is required. JIT-compiled code embeds these barriers inline, minimizing overhead while preserving correctness.
 
-```
+```text
 Memory Layout of a Java Object (64-bit HotSpot):
 
 | Object Header (12 bytes)          |

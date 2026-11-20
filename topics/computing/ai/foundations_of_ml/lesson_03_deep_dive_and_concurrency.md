@@ -80,7 +80,7 @@ This is why **continuous batching** (Orca, vLLM) is the highest-impact systems o
 
 In transformer autoregressive decoding, the attention operation for token `t` requires computing:
 
-```
+```text
 Attention(Q_t, K_{1..t}, V_{1..t})
 ```
 
@@ -100,7 +100,7 @@ For a transformer with:
 
 The factor of 2 accounts for both K and V tensors. For LLaMA-3 70B (80 layers, 8 KV heads, d_head=128, BF16):
 
-```
+```text
 2 × 80 × 8 × 128 × seq × B × 2 bytes
 = 327,680 × seq × B bytes
 ≈ 0.32 MB per token per sequence
@@ -414,7 +414,7 @@ Stochastic gradient descent with a fixed learning rate `η` exhibits three failu
 
 Adam (Kingma & Ba, 2015) maintains per-parameter exponential moving averages of the gradient (`m`, first moment) and squared gradient (`v`, second moment):
 
-```
+```text
 m_t = β₁ · m_{t-1} + (1 - β₁) · g_t
 v_t = β₂ · v_{t-1} + (1 - β₂) · g_t²
 m̂_t = m_t / (1 - β₁ᵗ)      # bias correction
@@ -426,7 +426,7 @@ The `1/√v̂_t` term implements **adaptive per-parameter learning rates**: para
 
 **AdamW** (Loshchilov & Hutter, 2019) decouples weight decay from the gradient update. In Adam, L2 regularization and weight decay are *not* equivalent because the adaptive scaling `1/√v̂_t` modulates the regularization term. AdamW applies weight decay directly to `θ` before the gradient step:
 
-```
+```text
 θ_t = θ_{t-1} · (1 - η · λ) - η · m̂_t / (√v̂_t + ε)
 ```
 

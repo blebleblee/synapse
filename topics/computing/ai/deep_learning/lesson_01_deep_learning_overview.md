@@ -16,7 +16,7 @@ A feedforward neural network organizes neurons into layers with unidirectional c
 
 The computational graph structure determines both forward computation and gradient flow. Each layer l maintains parameters theta^(l) = {W^(l), b^(l)} and computes:
 
-```
+```text
 z^(l) = W^(l) @ a^(l-1) + b^(l)
 a^(l) = sigma(z^(l))
 ```

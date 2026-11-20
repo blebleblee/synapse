@@ -1170,7 +1170,7 @@ The POSIX standard reserves exit codes 1 and 2 for general errors. Exit code 0 i
 
 A well-designed script defines a semantic exit code namespace that allows the caller (a CI system, an orchestration engine, an alerting rule) to categorize failures without parsing log output:
 
-```
+```text
 0   — Success
 1   — Unhandled/unexpected error (should not occur; indicates a script bug)
 2   — Input validation / configuration error (do not retry; fix the config)

@@ -22,7 +22,7 @@ The distinction between authoritative and non-authoritative responses encodes th
 
 The DNS resolution pipeline begins with a stub resolver embedded in the operating system's name service switch (NSS) layer on UNIX systems or the DNS Client service on Windows. When an application invokes `getaddrinfo()` or `gethostbyname()`, the stub resolver reads `/etc/resolv.conf` (or registry keys on Windows) to identify configured recursive resolvers. This configuration typically specifies two or three nameserver IP addresses, enabling failover when the primary resolver becomes unreachable. The stub resolver constructs a DNS query message with a random 16-bit transaction ID, sets the Recursion Desired (RD) bit in the header flags, and transmits the query via UDP to port 53 of the first configured recursive resolver.
 
-```
+```text
 DNS Query Message Structure (Wire Format):
 
 +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+

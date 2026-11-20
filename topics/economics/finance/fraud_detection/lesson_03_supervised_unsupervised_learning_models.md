@@ -32,7 +32,7 @@ Supervised classification models ingest these engineered features as input vecto
 
 Gradient boosted decision trees address non-linearity through sequential ensemble construction. The algorithm initializes with a constant prediction (the base fraud rate), then iteratively adds weak learners—shallow decision trees—that correct residual errors from the previous ensemble. Each tree partitions feature space through recursive binary splits: at each node, the algorithm selects the feature and threshold that maximally reduce Gini impurity or cross-entropy loss in child nodes. For instance, the root split might separate transactions above and below $1,000; the left child node then splits on merchant category, while the right splits on velocity count. Final predictions aggregate leaf scores across all trees. Gradient boosting handles missing values natively, automatically learns feature interactions, and provides feature importance rankings through split frequency and gain metrics.
 
-```
+```text
 Transaction Event Stream
          ↓
    Feature Engineering

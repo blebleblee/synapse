@@ -137,7 +137,7 @@ The optimizer will consider: Can the `hire_date` filter be applied before the jo
 
 Most classical query engines implement the **Volcano model** (also called the iterator model), introduced by Graefe (1994). Every operator in the physical plan exposes a single interface: `next()`. The root operator calls `next()` on its children, which recursively call `next()` on their children, until a row is produced and bubbles up to the root.
 
-```
+```text
 Executor.next() → Sort.next() → HashAggregate.next() → HashJoin.next() → ...
 ```
 
@@ -208,7 +208,7 @@ The optimizer selects among three physical join algorithms. Understanding their 
 
 **Nested Loop Join**
 
-```
+```text
 for each row r in Outer:
     for each row s in Inner where s.key = r.key:
         emit (r, s)
@@ -222,7 +222,7 @@ Catastrophic when: both relations are large and no index exists on the inner sid
 
 **Hash Join**
 
-```
+```text
 Phase 1 (Build): Scan smaller relation, build an in-memory hash table on join key
 Phase 2 (Probe): Scan larger relation, probe hash table for matches
 ```
@@ -235,7 +235,7 @@ Failure mode: **hash spill**. If the build-side hash table exceeds `work_mem`, P
 
 **Merge Join (Sort-Merge Join)**
 
-```
+```text
 Phase 1 (Sort): Sort both relations on the join key (if not already sorted)
 Phase 2 (Merge): Walk both sorted lists with two pointers, emitting matches
 ```
@@ -277,7 +277,7 @@ ORDER  BY avg_salary DESC;
 
 A representative output:
 
-```
+```text
 Sort  (cost=1842.33..1842.83 rows=200 width=48) (actual time=52.4..52.5 rows=12 loops=1)
   Sort Key: (avg(e.salary)) DESC
   Sort Method: quicksort  Memory: 25kB
@@ -852,7 +852,7 @@ LIMIT  100;
 
 **Step 1: Run EXPLAIN ANALYZE**
 
-```
+```text
 Limit  (actual rows=100)
   -> Sort  (actual rows=100)
      -> HashAggregate  (actual rows=84321)

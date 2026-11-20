@@ -93,7 +93,7 @@ $$\begin{aligned}
 
 where $g^F$ represents frontier technology growth. This system admits multiple steady states with different income levels, some stable (poverty traps and high-income equilibria) and others unstable (threshold points separating basins of attraction). The phase diagram reveals why escape from poverty is difficult: multiple reinforcing mechanisms must be overcome simultaneously.
 
-```
+```text
 Income Level (y)
     ↑
     │         High-Income

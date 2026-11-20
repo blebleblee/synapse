@@ -84,7 +84,7 @@ Proper classes arise as definable collections that are not sets. The class $\mat
 
 The mechanics of membership and inclusion underpin all proof techniques in set theory. To show $A \subseteq B$, we let $x \in A$ be arbitrary and prove $x \in B$. To show $A = B$, we prove mutual inclusion. To show $x \in A \cup B$, we establish $x \in A$ or $x \in B$. To extract an element from $A \cap B$, we reason about objects simultaneously in both sets. Set-builder notation $\{x \in A : P(x)\}$ always specifies a bounding set $A$ from which elements are drawn, preventing paradoxical formations. Universal quantification over sets $\forall x \, \phi(x)$ means "for all sets $x$, $\phi(x)$ holds," not "for all objects in some absolute universe," sidestepping reference to proper classes in the object language.
 
-```
+```text
 Cumulative Hierarchy Stratification (Visual Structure):
 
 V₀ = ∅

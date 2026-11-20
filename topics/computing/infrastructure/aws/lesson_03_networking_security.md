@@ -74,7 +74,7 @@ NAT Gateways enable private subnet instances to initiate outbound internet conne
 
 Security groups attach to elastic network interfaces, forming a stateful firewall that filters traffic at the instance level. Each security group contains inbound and outbound rules specified as five-tuple patterns: protocol (TCP, UDP, ICMP, or protocol number), port range (single port or range), and source or destination (CIDR block, security group ID, or prefix list). An inbound rule permitting TCP port 443 from 0.0.0.0/0 allows any internet client to initiate HTTPS connections to the instance, while the security group's stateful tracking automatically permits return traffic without requiring an explicit outbound rule. Security groups default to deny-all inbound, permit-all outbound, forcing you to explicitly enumerate allowed ingress paths. You can reference other security groups as sources, enabling rule patterns like "allow TCP 3306 from sg-database-clients," which dynamically adjusts as instances join or leave the client security group without manual rule updates.
 
-```
+```text
 Security Group: web-servers (sg-web123)
   Inbound:
     - Protocol: TCP, Port: 443, Source: 0.0.0.0/0
@@ -93,7 +93,7 @@ The security group engine evaluates rules in parallel rather than sequentially, 
 
 Network Access Control Lists complement security groups with stateless, subnet-level filtering. Each NACL contains numbered rules evaluated in ascending order, with processing stopping at the first match. A rule consists of a rule number (1-32766), protocol, port range, source or destination CIDR, and action (allow or deny). Unlike security groups, NACLs support explicit deny rules, enabling you to block specific IP ranges while allowing broader patterns. For example, rule 100 might allow TCP port 443 from 0.0.0.0/0, while rule 90 denies TCP port 443 from 198.51.100.0/24, effectively blacklisting that subnet while permitting the rest of the internet. The NACL evaluates inbound and outbound traffic separately with distinct rule sets, and because it is stateless, you must explicitly permit return traffic in the opposite direction. An inbound HTTPS rule requires a corresponding outbound rule allowing TCP ports 1024-65535 to handle ephemeral return ports from clients.
 
-```
+```text
 Network ACL: public-subnet-acl
   Inbound Rules:
     100: TCP, Port 443, Source 0.0.0.0/0, Allow
@@ -153,7 +153,7 @@ Encryption in transit relies on Transport Layer Security negotiated through cert
 
 Encryption at rest employs envelope encryption managed by AWS Key Management Service. A KMS Customer Master Key—a 256-bit AES key that never leaves KMS hardware security modules—encrypts per-object data encryption keys. When storing an object in S3 with server-side encryption, S3 generates a random 256-bit data key, encrypts the object with that key via AES-256-GCM, requests KMS to encrypt the data key with the CMK, and stores both the ciphertext object and the encrypted data key. Retrieval reverses the process: S3 calls KMS to decrypt the data key, uses the plaintext key to decrypt the object, and returns the object to the client while discarding the plaintext data key from memory. KMS enforces policy-based access control on CMKs, requiring principals to possess both `kms:Decrypt` permissions and network access to the KMS API, providing cryptographic access control independent of network-layer security groups.
 
-```
+```text
 Envelope Encryption Flow:
 
 1. Encrypt:

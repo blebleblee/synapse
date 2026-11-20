@@ -38,7 +38,7 @@ Relief venting becomes essential in tall buildings where the length of vertical 
 
 The mechanical execution of vent system installation demands meticulous attention to grade, joint integrity, and support spacing. Unlike drainage piping which slopes at 1/4 inch per foot to maintain self-scouring velocities, vent piping must slope at a minimum 1/8 inch per foot toward the drainage system to prevent condensate accumulation that would reduce effective flow area and promote corrosion. All vent pipe joints—whether solvent-welded PVC, brazed copper, or no-hub cast iron—must achieve airtight seals capable of withstanding ±3 inches water column test pressure for a 15-minute duration per IPC Section 312.3. Support spacing follows material-specific requirements: PVC vent piping requires support every 4 feet, copper DWV every 10 feet, and cast iron every floor level or 15 feet maximum.
 
-```
+```text
 Typical Residential Vent System Topology (2-Story Single-Family Dwelling)
 
 Roof Penetration: 3" PVC Vent Stack

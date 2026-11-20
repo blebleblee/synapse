@@ -26,7 +26,7 @@ The mining process begins with block template construction. A mining node assemb
 
 The block header structure is precisely 80 bytes and contains the following fields in serialized order: a four-byte version number, the 32-byte hash of the previous block header, the 32-byte Merkle root of transactions, a four-byte Unix timestamp, a four-byte compact representation of the difficulty target, and a four-byte nonce. The mining process consists of incrementing the nonce and hashing the 80-byte header with SHA-256 twice (SHA-256d) until the resulting hash is numerically less than the difficulty target. The target is a 256-bit number, and difficulty is the ratio of the maximum target (used at genesis) to the current target. Higher difficulty means a smaller target space and exponentially more hashing attempts required on average to find a valid block.
 
-```
+```text
 Block Header Structure (80 bytes):
 ┌─────────────────────────────────────────────────────────────┐
 │ Version (4 bytes)                                            │

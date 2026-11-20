@@ -34,7 +34,7 @@ Indian periodization presents even greater complexity due to subcontinental regi
 
 The operational workflow for deploying periodization in research practice follows this sequence:
 
-```
+```text
 1. Research Question Formulation
    ↓
 2. Identify Relevant Temporal Scales
@@ -60,7 +60,7 @@ The practical challenge of cross-regional comparison requires explicit translati
 
 Synchronic comparative analysis requires constructing temporal correlation tables that map regional periodizations onto absolute chronology:
 
-```
+```text
 Year | Western Europe        | Byzantine Empire      | Islamic World         | Tang/Song China
 -----|----------------------|----------------------|----------------------|-------------------
 750  | Carolingian Rise     | Iconoclasm Crisis    | Abbasid Consolidation| An Lushan Rebellion

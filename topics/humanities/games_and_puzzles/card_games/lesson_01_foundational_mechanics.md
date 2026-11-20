@@ -36,7 +36,7 @@ The computational architecture of card games instantiates through three primary 
 
 State representation begins with the fundamental data structure: the deck itself. Formally, a deck D constitutes an ordered sequence of n cards drawn from a universal set U of possible card types. The state space S encompasses all possible configurations of this deck across different zones—library (undrawn cards), hands (private player zones), battlefield or tableau (public zones), graveyard or discard (depleted cards), and exile or removed-from-game regions. Each zone maintains distinct visibility properties and accessibility rules that constrain legal actions.
 
-```
+```text
 Game State Architecture:
 
 Zones:
@@ -61,7 +61,7 @@ Digital implementations replace physical shuffling with Fisher-Yates algorithm e
 
 Action resolution engines implement the turn-based state machine governing legal move generation and state updates. At each decision point, the engine computes the set of legal actions A(S) available to the active player given current state S. This computation requires checking multiple constraint predicates: Does the player possess required resources? Do card costs satisfy budget constraints? Do targeting requirements have valid targets? Are timing restrictions satisfied? Each action a ∈ A(S) maps the current state to a successor state through a deterministic or probabilistic transition function.
 
-```
+```text
 Turn Structure:
 
 Phase Sequence:
@@ -103,7 +103,7 @@ Hand size limits impose storage capacity constraints that force periodic optimiz
 
 Mana or action point systems introduce temporal coupling between card deployment and turn advancement. Magic's mana system requires players to sacrifice lands—cards that generate mana—from their hands to the battlefield before using that mana to play other cards. This two-stage resource pipeline creates early-game bottlenecks where powerful cards remain uncastable due to insufficient mana base development. The strategic tension between playing lands for future mana versus playing immediate threats defines opening strategy, with optimal sequences depending on deck composition and opponent deck archetype.
 
-```
+```text
 Resource Flows:
 
 Card Economy:

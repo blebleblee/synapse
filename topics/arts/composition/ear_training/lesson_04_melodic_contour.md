@@ -214,7 +214,7 @@ This is the sequence to run on *any* melody you're trying to learn by ear — a 
 
 ### 5.1 "Happy Birthday" — Contour Stays Fixed Across Keys
 
-```
+```text
 Key of C:           C   C   D   C   F   E
 Solfège:             Do  Do  Re  Do  Fa  Mi
 Contour:               →   ↑   ↓   ↑   ↓
@@ -229,7 +229,7 @@ Sing all three back to back. The *letter names* change completely; the →↑↓
 
 ### 5.2 "Somewhere Over the Rainbow" — The Octave Leap Signature
 
-```
+```text
 "Some - where      o    -   ver the rain - bow"
 C        C       C(+8ve)    Bb   A    G    F
 Do       Do       Do          Ti   La   Sol  Fa
@@ -240,7 +240,7 @@ Contour: repeated note, massive leap up, then unbroken stepwise descent — an a
 
 ### 5.3 Beethoven's 5th — Plateau-Then-Drop
 
-```
+```text
 G    G    G    Eb
 Sol  Sol  Sol  Mi♭
   →    →    ↓
@@ -250,7 +250,7 @@ Three repeated notes build rhythmic tension (accented, short-short-short-LONG rh
 
 ### 5.4 "My Bonnie Lies Over the Ocean" — Wide Leap, Gentle Resolve
 
-```
+```text
 F         F         D          C      Bb     A
 Fa        Fa(+6th)   Re          Do     Ti     La
   →         ↑(leap)    ↓           ↓      ↓      ↓
@@ -267,7 +267,7 @@ Contrast this leap against the Rainbow octave: both open with a repeated note th
 A sequence repeats the *same internal contour* starting from a new pitch each time. The internal shape is constant; the overall trajectory across repetitions can itself be ascending, descending, or static.
 
 **Vivaldi "Spring," opening violin figure:**
-```
+```text
 Unit A: C  D  E   (↑↑)
 Unit B: D  E  F♯  (↑↑)  — same shape, whole step higher
 Unit C: E  F♯ G♯  (↑↑)  — same shape, another whole step higher

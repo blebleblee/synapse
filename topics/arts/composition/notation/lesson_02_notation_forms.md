@@ -157,7 +157,7 @@ The point of this drill is *voice-leading economy* — each chord's right-hand v
 
 TAB encodes *where to put your fingers*, not pitch names. Six horizontal lines = six strings, top line = highest-pitched string (thin high E), bottom line = lowest-pitched string (thick low E). A number is a fret; "0" is open string.
 
-```
+```text
 e |--0--1--3--5--|
 B |--0--1--3--5--|
 G |--0--2--4--5--|
@@ -168,7 +168,7 @@ E |--0--1--3--5--|
 
 **C Major Scale, Open Position:**
 
-```
+```text
 e |--------------------0--1--3--|
 B |--------------0--1--3--------|
 G |--------0--2------------------|
@@ -181,7 +181,7 @@ Fingering: A-string 3rd fret (C, index), D-string open (D), D-string 2nd fret (E
 
 **Chord diagram convention (open C major):**
 
-```
+```text
   E A D G B e
   x 3 2 0 1 0
 ```
@@ -202,7 +202,7 @@ x = mute/don't play, 3 = A-string 3rd fret (index), 2 = D-string 2nd fret (middl
 
 1. **A minor pentatonic, Box 1**, ascending/descending at 60 BPM, one note per beat:
 
-```
+```text
 e |--5--8--|
 B |--5--8--|
 G |--5--7--|
@@ -217,7 +217,7 @@ E |--5--8--|
 
 Four lines, E-A-D-G low to high (five-string adds low B below the E).
 
-```
+```text
 G |-----------------|
 D |-----------------|
 A |--3--5--7--8-----|
@@ -226,7 +226,7 @@ E |-----------------|
 
 **Walking bass line, C major, 4/4** (chord tones + chromatic/diatonic passing tones):
 
-```
+```text
 G |---------------------|
 D |--------2-----0------|
 A |--3-----------3------|
@@ -267,7 +267,7 @@ graph TD
 
 **Basic Rock Beat, 4/4:**
 
-```
+```text
 HH  x   x   x   x   x   x   x   x
 SD      o       o       o       o
 BD  o       o       o       o
@@ -289,7 +289,7 @@ Build independence additively, never all four limbs at once from a cold start:
 
 **Ghost notes** sit between the main backbeat hits, played at low velocity to add groove texture without competing with the backbeat:
 
-```
+```text
 SD  (o) o (o) o (o) o (o) o
 ```
 
@@ -407,7 +407,7 @@ Standard chart order: **Head** (melody, unison) → **Solos** (changes repeat pe
 
 Combines fret numbers with diagonal rhythm slashes for strum pattern, letting a session guitarist see both exact voicing and the rhythmic feel without full notation:
 
-```
+```text
 Gtr 1 (Verse), C5 power chord, straight eighths:
 e |----------------------------|
 B |----------------------------|

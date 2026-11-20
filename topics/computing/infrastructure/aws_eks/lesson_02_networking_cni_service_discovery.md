@@ -37,7 +37,7 @@ When the CNI binary receives an IP address from ipamd, it configures the pod's n
 
 The plugin then installs routing rules in both the pod and host namespaces. Inside the pod, a default route is added pointing to the gateway IP address 169.254.1.1, a link-local address that exists only for routing purposes and is not bound to any interface. A static ARP entry is installed mapping this gateway IP to the MAC address of the host-side veth interface, ensuring the pod can send traffic without ARP resolution. In the host namespace, ipamd has already configured policy routing rules that direct traffic from the pod's IP address to the appropriate ENI based on which interface owns the IP in its secondary address pool. This policy routing layer is essential because Linux's default routing behavior would send all traffic out the primary ENI, breaking connectivity for pods assigned to secondary ENIs.
 
-```
+```bash
 # Pod network namespace configuration (simplified view)
 # Interface: eth0@if42 (veth pair, pod side)
 # IP: 10.0.1.50/32
@@ -77,7 +77,7 @@ Pod-to-pod communication within the same node follows a short-circuit path that 
 
 Pod-to-pod communication across nodes traverses the full VPC routing layer. A packet from 10.0.1.50 on instance A to 10.0.1.51 on instance B is routed out instance A's ENI based on policy routing rules, traverses the VPC fabric, and arrives at instance B's ENI where reverse policy routing directs it to the correct veth interface. The VPC flow logs capture this traffic with the ENI ID of both source and destination interfaces, enabling network forensics and compliance auditing. The latency of this path includes ENI queueing delay, VPC fabric forwarding, and destination instance processing, typically adding several hundred microseconds compared to same-node communication.
 
-```
+```text
 Packet flow for pod-to-Service communication across nodes:
 
 1. Source pod (10.0.1.50) sends packet to Service ClusterIP (172.20.0.10)

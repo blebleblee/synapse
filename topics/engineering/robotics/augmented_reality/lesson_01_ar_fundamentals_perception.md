@@ -71,7 +71,7 @@ Feature matching establishes correspondences between the current frame and eithe
 
 The pose estimation module solves for the camera's 6-DOF transformation relative to the map coordinate frame. Given a set of 2D-3D correspondences—each pairing a current-frame feature at pixel (*u*, *v*) with a 3D map point **P**—the PnP solver minimizes reprojection error. RANSAC iterations select minimal subsets (three correspondences for P3P), compute candidate poses, and count inliers within a reprojection threshold. Once a consensus set is identified, a non-minimal least-squares refinement optimizes all six pose parameters to minimize the sum of squared reprojection residuals. This refinement uses the Levenberg-Marquardt algorithm, iteratively computing the Jacobian of the projection function with respect to the pose and updating the pose estimate. For efficiency, the Jacobian is often evaluated analytically: for rotation perturbations in the tangent space so(3), the derivative of the projection function decomposes into the product of the camera intrinsic Jacobian and the extrinsic transformation Jacobian.
 
-```
+```text
 [ 2D-3D Correspondences: { (u_i, v_i, P_i) } ]
           |
           v

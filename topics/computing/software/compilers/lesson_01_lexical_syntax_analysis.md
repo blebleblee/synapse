@@ -220,7 +220,7 @@ Recursive-descent parsing is the dominant approach for hand-written production c
 
 The core invariant of recursive descent is that **each nonterminal in the grammar corresponds to exactly one function** in the parser, and each production rule for that nonterminal corresponds to a branch within that function. The parser maintains a single-token lookahead — the current token returned by the lexer — and uses it to select the correct production without consuming the token. Consider a minimal arithmetic grammar:
 
-```
+```text
 expr    ::= term (('+' | '-') term)*
 term    ::= factor (('*' | '/') factor)*
 factor  ::= INT_LIT | IDENT | '(' expr ')'
@@ -424,7 +424,7 @@ int main(void) {
 
 Compiling and running this program against `x + 42 * (y - 7)` produces the following AST printout, confirming correct operator precedence (multiplication binds tighter than addition, and the parenthesized sub-expression is correctly isolated):
 
-```
+```text
 BinOp('+')
   Ident(x)
   BinOp('*')
@@ -444,7 +444,7 @@ These decisions are encoded in two tables — the **action table** (indexed by s
 
 The anatomy of the LR automaton for even a small grammar is best understood through a concrete parse trace. Given the grammar:
 
-```
+```text
 (1) E → E + T
 (2) E → T
 (3) T → T * F
@@ -497,7 +497,7 @@ The distinction between a **parse tree** (also called a concrete syntax tree or 
 
 Production compilers almost universally build ASTs, not parse trees, because every downstream pass — name resolution, type inference, borrow checking, IR lowering — operates on tree structure. Carrying parse-tree nodes through those passes would impose constant overhead: every pass would need to skip syntactic scaffolding nodes to reach the semantic content. The transition from parse tree to AST is typically performed during the parse itself, in the semantic actions attached to each production rule, rather than as a separate tree-transformation pass.
 
-```
+```text
 Parse tree for: x + 42 * (y - 7)         AST for: x + 42 * (y - 7)
 
         E                                        BinOp(+)

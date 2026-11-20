@@ -54,7 +54,7 @@ When systemd starts a service, it creates a cgroup at the path `/sys/fs/cgroup/<
 
 The `CPUWeight=`, `MemoryMax=`, `MemoryHigh=`, `IOWeight=`, and `TasksMax=` directives translate directly into writes to the cgroup's controller files. `MemoryMax=` writes to `memory.max` and enforces a hard limit that triggers the OOM killer when exceeded. `MemoryHigh=` writes to `memory.high`, a soft limit that triggers memory reclaim pressure without immediately killing processes, which is the correct knob for production services where you want to constrain memory usage without risking an ungraceful kill. The distinction between these two limits matters enormously in practice: a service that slowly leaks memory will trigger `memory.high` long before it hits `memory.max`, giving you time to observe the trend through `systemctl status` or journal inspection before processes start dying.
 
-```
+```text
 systemd (PID 1)
      │
      ├── system.slice

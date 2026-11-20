@@ -517,7 +517,7 @@ The X-Ray daemon receives trace segments over UDP on port 2000, batches them, an
 
 Performance debugging in EKS begins with establishing baseline metrics for normal operation, then detecting deviations through statistical anomaly detection or threshold-based alerting. CloudWatch Logs Insights provides a SQL-like query language for ad-hoc log analysis, enabling operators to filter, aggregate, and correlate log entries across multiple log streams. A common troubleshooting pattern involves querying for error-level logs emitted during a specific time window, then correlating those errors with changes in resource utilization metrics or API server audit events indicating configuration changes.
 
-```
+```text
 fields @timestamp, kubernetes.namespace_name, kubernetes.pod_name, log
 | filter kubernetes.namespace_name = "production"
 | filter log like /ERROR|Exception|Traceback/
@@ -527,7 +527,7 @@ fields @timestamp, kubernetes.namespace_name, kubernetes.pod_name, log
 
 More sophisticated queries aggregate error counts by pod or container, revealing whether failures concentrate in specific replicas or distribute uniformly across a deployment. This distinction helps diagnose issues like memory leaks that manifest only after hours of uptime, versus misconfigurations that affect all pods immediately.
 
-```
+```text
 fields @timestamp, kubernetes.pod_name, log
 | filter kubernetes.namespace_name = "production"
 | filter kubernetes.labels.app = "payment-service"

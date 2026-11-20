@@ -243,7 +243,7 @@ kubectl -n twelve-factor exec "$POD" -- env | grep DB_PASSWORD
 ```
 
 Expected output pattern:
-```
+```text
 CACHE_TTL_SECONDS=300
 CACHE_URL=redis://redis-svc.twelve-factor.svc.cluster.local:6379/0
 DATABASE_URL=postgresql://appuser:s3cur3-lab-p4ssword@postgres-svc.twelve-factor.svc.cluster.local:5432/appdb?sslmode=require
@@ -481,7 +481,7 @@ fi
 ```
 
 Expected cgroup v2 output interpretation:
-```
+```text
 cpu.max:    50000 100000   # 500m CPU = 50ms per 100ms period
 memory.max: 134217728      # 128Mi in bytes
 ```

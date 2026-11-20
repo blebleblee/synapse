@@ -48,7 +48,7 @@ flowchart TD
 
 The attention computation for a single head is:
 
-```
+```text
 Attention(Q, K, V) = softmax( Q * K^T / sqrt(d_k) ) * V
 ```
 

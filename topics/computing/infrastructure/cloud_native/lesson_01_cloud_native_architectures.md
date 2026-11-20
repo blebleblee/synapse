@@ -10,7 +10,7 @@ The foundational invariant is **declarative state reconciliation**. Unlike imper
 
 Mathematically, the reconciliation loop implements a control system:
 
-```
+```text
 e(t) = s_desired - s_actual(t)
 u(t) = K * e(t)
 s_actual(t+1) = s_actual(t) + Δs(u(t))
@@ -218,7 +218,7 @@ Kubernetes components are designed for high concurrency. The API server handles 
 
 **Horizontal Pod Autoscaling (HPA)**: Adjusts the number of pod replicas based on observed metrics (CPU utilization, memory, custom metrics). The HPA controller queries the metrics server every 15 seconds, calculates the desired replica count using:
 
-```
+```text
 desiredReplicas = ceil(currentReplicas * (currentMetric / targetMetric))
 ```
 

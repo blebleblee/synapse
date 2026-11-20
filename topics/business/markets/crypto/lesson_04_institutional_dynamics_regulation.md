@@ -50,7 +50,7 @@ Options pricing follows the Black-Scholes model (or variants accounting for cryp
 
 The diagram below illustrates the cascading relationship between spot, futures, and options markets:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │ INSTITUTIONAL CRYPTO MARKET ARCHITECTURE                     │
 └─────────────────────────────────────────────────────────────┘

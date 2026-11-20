@@ -106,7 +106,7 @@ Robust portfolio construction techniques address estimation uncertainty through 
 
 A practical strategic allocation for a moderate-risk investor with 25-year horizon might comprise:
 
-```
+```text
 Asset Class          | Target Weight | Expected Return | Volatility | Sharpe Ratio
 ---------------------|---------------|-----------------|------------|-------------
 U.S. Large Cap Equity|     30%       |      9.5%       |    18%     |    0.42

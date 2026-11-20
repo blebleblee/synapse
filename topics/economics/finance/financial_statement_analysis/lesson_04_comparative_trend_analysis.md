@@ -50,7 +50,7 @@ A common-size balance sheet revealing that inventory comprises forty-three perce
 
 The analyst constructs comparative exhibits presenting multiple periods simultaneously, creating visual pattern recognition opportunities. A five-year common-size income statement array displays cost structure evolution, revealing whether margin expansion derives from gross margin improvement through operational efficiency or operating leverage through SG&A scaling. Consider this structure:
 
-```
+```text
                           FY20    FY21    FY22    FY23    FY24
 Revenue                   100%    100%    100%    100%    100%
 Cost of Goods Sold         68%     67%     66%     64%     62%

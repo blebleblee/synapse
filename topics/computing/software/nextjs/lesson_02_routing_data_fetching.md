@@ -24,7 +24,7 @@ A *static segment* is any directory named with a plain string, such as `app/dash
 
 The routing tree for a typical application looks like this:
 
-```
+```text
 app/
 ├── layout.tsx                 # Root layout (always rendered)
 ├── page.tsx                   # Route: /

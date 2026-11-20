@@ -26,7 +26,7 @@ With TPACKET_V3, the kernel batches packets into fixed-size blocks in a shared m
 
 Once packets land in a capture buffer, they flow through a multi-stage pipeline that can be visualized as follows:
 
-```
+```text
                     ┌─────────────────────────────────────────────────────────┐
                     │               NIDS/NIPS Processing Pipeline              │
                     └─────────────────────────────────────────────────────────┘
@@ -93,7 +93,7 @@ The practical limit of classic Aho-Corasick at 10+ Gbps is that it was designed 
 
 A complete Suricata rule that illustrates the structure of a production signature for a real vulnerability class (the EternalBlue SMBv1 exploitation chain, MS17-010) is worth examining at the byte level:
 
-```
+```text
 alert tcp $EXTERNAL_NET any -> $HOME_NET 445 (
     msg:"ET EXPLOIT Possible ETERNALBLUE MS17-010 Echo Request (set)";
     flow:to_server,established;

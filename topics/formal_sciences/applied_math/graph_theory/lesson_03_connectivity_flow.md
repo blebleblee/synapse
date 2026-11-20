@@ -105,7 +105,7 @@ Depth-first search (DFS) and breadth-first search (BFS) form the foundation of c
 
 For computing connected components in an undirected graph, we perform DFS or BFS from each unvisited vertex, labeling all vertices reached in each traversal with a component identifier:
 
-```
+```text
 Algorithm: ConnectedComponents(G = (V, E))
 Input: Undirected graph G
 Output: Component label comp[v] for each vertex v
@@ -134,7 +134,7 @@ This algorithm runs in $O(n + m)$ time, performing a single traversal of the ent
 
 For strongly connected components in directed graphs, Kosaraju's algorithm provides an elegant two-pass approach:
 
-```
+```text
 Algorithm: KosarajuSCC(G = (V, E))
 Input: Directed graph G
 Output: SCC label scc[v] for each vertex v
@@ -169,7 +169,7 @@ Kosaraju's algorithm also runs in $O(n + m)$ time. The key insight is that verti
 
 Tarjan's algorithm computes SCCs in a single DFS traversal by maintaining additional bookkeeping. Each vertex $v$ is assigned a discovery time $disc[v]$ when first visited and a lowlink value $low[v]$ representing the smallest discovery time reachable from $v$ via a directed path in the DFS tree. When a vertex completes its DFS and $low[v] = disc[v]$, the vertex is an SCC root:
 
-```
+```text
 Algorithm: TarjanSCC(G = (V, E))
 Input: Directed graph G
 Output: SCC label scc[v] for each vertex v
@@ -207,7 +207,7 @@ The lowlink update in step 6 distinguishes between two cases: if $w$ is an unvis
 
 Network flow algorithms require more elaborate data structures to manage the residual graph and efficiently find augmenting paths. The Ford-Fulkerson method in its simplest form maintains a residual capacity matrix $c_f[u][v]$ for each pair of vertices, updated after each augmentation:
 
-```
+```text
 Algorithm: FordFulkerson(G = (V, E), c, s, t)
 Input: Directed graph G, capacity function c, source s, sink t
 Output: Maximum flow value
@@ -229,7 +229,7 @@ Finding augmenting paths can be done using DFS or BFS. The Edmonds-Karp algorith
 
 For Edmonds-Karp, the augmenting path search becomes:
 
-```
+```text
 Subroutine: BFS_AugmentingPath(G_f, s, t)
 1. Initialize parent[v] = -1 for all v in V
 2. Create queue Q
@@ -250,7 +250,7 @@ This BFS ensures that each augmenting path has the minimum number of edges, whic
 
 Dinic's algorithm introduces the concept of a level graph, constructed by assigning to each vertex $v$ a level $level[v]$ equal to its distance from $s$ in the residual graph. A level graph includes only edges $(u, v)$ where $level[v] = level[u] + 1$:
 
-```
+```text
 Algorithm: Dinic(G = (V, E), c, s, t)
 Input: Directed graph G, capacity function c, source s, sink t
 Output: Maximum flow value
@@ -272,7 +272,7 @@ The push-relabel framework maintains a preflow $f$ (which may have excess at ver
 - **Push:** If a vertex $u$ has excess and there exists an edge $(u, v)$ with residual capacity $c_f[u][v] > 0$ and $d[u] = d[v] + 1$, push flow from $u$ to $v$.
 - **Relabel:** If a vertex $u$ has excess and no admissible push is possible, increase $d[u]$ to $1 + \min\{d[v] : c_f[u][v] > 0\}$.
 
-```
+```text
 Algorithm: PushRelabel(G = (V, E), c, s, t)
 Input: Directed graph G, capacity function c, source s, sink t
 Output: Maximum flow value
@@ -297,7 +297,7 @@ The push-relabel algorithm's efficiency comes from careful implementation choice
 
 For computing the Gomory-Hu tree, we start with an initial tree where all vertices are in a single supernode, then iteratively refine the tree by computing minimum cuts between vertices and splitting supernodes based on cut structure:
 
-```
+```text
 Algorithm: GomoryHuTree(G = (V, E), c)
 Input: Undirected graph G, capacity function c
 Output: Gomory-Hu tree T
@@ -322,7 +322,7 @@ To compute the global vertex connectivity $\kappa(G)$, we need to compute the mi
 
 The **Karger-Stein algorithm** for minimum cut uses randomized edge contraction. To contract an edge $(u, v)$, we merge $u$ and $v$ into a single vertex, combining their adjacency lists and removing self-loops. The algorithm repeatedly contracts random edges until only two vertices remain, and the edges between them form a cut. By repeating this process many times and taking the minimum cut found, we obtain the global minimum cut with high probability:
 
-```
+```text
 Algorithm: KargerMinCut(G = (V, E))
 Input: Undirected graph G
 Output: Minimum cut (estimated)

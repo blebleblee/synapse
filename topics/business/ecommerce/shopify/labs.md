@@ -341,7 +341,7 @@ The resulting 1.34-day backlog delays shipment timing by two business days, incr
 
 Architect fulfillment capacity buffers through three mechanisms: flexible labor pools via temporary staffing agencies with 48-hour activation lead time, pre-positioned inventory in multiple warehouse locations to distribute order volume geographically, and predictive capacity planning based on promotional calendar and historical surge patterns. Create a "Fulfillment Capacity Model" worksheet that projects order volume by day over the next 30 days incorporating known promotional events, historical day-of-week seasonality, and growth trajectories:
 
-```
+```text
 Date | Base_Orders | Promo_Lift_% | Adjusted_Orders | Capacity | Buffer
 Jan-20 | 50 | 0% | 50 | 64 | 14
 Jan-21 | 50 | 150% | 125 | 64 | -61 ← capacity shortfall

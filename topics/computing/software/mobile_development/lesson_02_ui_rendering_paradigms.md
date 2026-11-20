@@ -30,7 +30,7 @@ The critical architectural detail in React Native's original architecture is tha
 
 The New Architecture (Fabric + JSI) replaces the bridge with a C++ shared memory model. JSI (JavaScript Interface) exposes native C++ objects directly to the JavaScript VM as host objects, eliminating serialization entirely for synchronous calls. Fabric is the new renderer built on top of JSI, and it introduces a three-tree model that is worth examining in detail.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     React Native Fabric: Three-Tree Model        │
 ├─────────────────────┬──────────────────────┬────────────────────┤

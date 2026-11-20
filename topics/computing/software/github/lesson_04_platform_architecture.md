@@ -26,7 +26,7 @@ The architectural invariants that govern GitHub's platform design can be summari
 
 The repository access control model begins with the fundamental entity graph: users, organizations, teams, and repositories. Every repository has an owner—either a user or an organization—and permissions flow through explicit grants or inherited memberships. When a user attempts to access a repository, GitHub resolves their effective permissions by querying the intersection of direct collaborator permissions, team memberships, and organization-level role assignments. This resolution occurs in a specific precedence order: repository-specific collaborator permissions override team permissions, and explicit denials take precedence over any grants.
 
-```
+```text
 Repository Permission Resolution Flow:
 
 User → Organization Membership → Base Role (Owner, Member)
@@ -44,7 +44,7 @@ The permission cache operates as a multi-tiered hierarchy. The first tier caches
 
 Webhook delivery begins when repository events trigger the creation of webhook job records in a persistent queue. Each job contains the event payload serialized as JSON, the target URL, and metadata including the repository ID and event type. The webhook worker pool continuously polls this queue, claiming jobs through optimistic locking and dispatching HTTP POST requests with HMAC-SHA256 signatures in the `X-Hub-Signature-256` header. These signatures allow consumers to verify payload authenticity by recomputing the HMAC using a shared secret configured during webhook registration.
 
-```
+```text
 Webhook Delivery State Machine:
 
 Event Occurs → Job Enqueued (State: Pending)
@@ -116,7 +116,7 @@ The resolver layer employs DataLoader batching to prevent N+1 query problems. Wh
 
 Git protocol negotiations begin with reference advertisement, where the server sends all branch and tag refs along with their current commit SHAs. In the smart HTTP protocol, this occurs during the initial GET request to `/info/refs?service=git-upload-pack`, which returns a text-based protocol stream containing lines of the form `<sha1> <refname>`. The client parses this advertisement, compares it against local refs, and constructs a "want" list of missing commits alongside a "have" list of commits it already possesses.
 
-```
+```text
 Git Protocol Negotiation (Smart HTTP):
 
 Client → GET /info/refs?service=git-upload-pack
@@ -139,7 +139,7 @@ The server's `git-upload-pack` process performs a reachability analysis, computi
 
 Storage backend abstractions isolate Git protocol logic from the physical storage layer. GitHub's DGit system intercepts Git object reads and writes, translating them into operations against a distributed object store. When a client pushes new commits, the platform unpacks incoming objects, validates their integrity by recomputing SHA hashes, and writes them to multiple storage replicas before acknowledging the push. This write path employs a quorum protocol—a push succeeds only after a majority of replicas confirm durable persistence, ensuring that subsequent reads will observe the new state even if individual replicas fail.
 
-```
+```text
 Storage Backend Write Path:
 
 Client Push → git-receive-pack Process
@@ -157,7 +157,7 @@ Read operations traverse the inverse path. When a client clones or fetches a rep
 
 Distributed repository synchronization propagates updates from the primary datacenter to global read replicas through a change data capture pipeline. Every mutation to repository state—pushes, branch updates, tag creations—generates a changelog event containing the repository ID, reference name, old SHA, and new SHA. These events stream through Kafka topics partitioned by repository ID, ensuring that updates to a single repository arrive at replicas in causal order. Replica consumers apply updates by fetching missing objects from the primary datacenter's object store and updating local reference pointers, eventually converging to consistency with the authoritative state.
 
-```
+```text
 Distributed Synchronization Flow:
 
 Primary DC: Push Event → Changelog Record → Kafka Topic
@@ -215,7 +215,7 @@ Complexity analysis prevents denial-of-service attacks where adversaries craft m
 
 Git protocol negotiation performance hinges on minimizing round trips during the want/have exchange. The naive protocol requires multiple client-server round trips as the client incrementally reports "have" commits and the server responds with "ACK" or "NAK" packets. Modern Git implementations employ multi-ack modes where the client batches hundreds of "have" lines in a single packet, and the server responds with multiple ACKs indicating which commits it can use as delta bases. GitHub's protocol implementation further optimizes this by maintaining a bitmap index mapping commits to reachable objects, allowing the server to instantly compute object reachability without traversing the commit graph.
 
-```
+```text
 Optimized Git Protocol with Multi-Ack:
 
 Client → want <sha1> (single round trip with all wants)

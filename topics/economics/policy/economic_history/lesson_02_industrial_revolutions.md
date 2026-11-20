@@ -44,7 +44,7 @@ Capital accumulation dynamics shift fundamentally across industrial eras. The Fi
 
 The production function transformation can be visualized through isoquant analysis. Pre-industrial production exhibited low elasticity of substitution between capital and labor; blacksmiths required both an anvil and skilled hands, with limited substitutability. Mechanization increased substitutability, allowing unskilled machine operators to replace artisans. The policy tension arises because higher elasticity of substitution erodes labor's bargaining power. When firms can easily replace workers with machines, wage demands trigger automation, flattening the labor share of income. This mechanism underlies recent debates about robots and artificial intelligence: if capital-labor substitutability continues rising, the distribution of productivity gains becomes entirely a political question rather than a market outcome.
 
-```
+```text
 Pre-Industrial Isoquant Map:
 Labor
   ^

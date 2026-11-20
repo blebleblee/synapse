@@ -42,7 +42,7 @@ Navigational precision depended on the integration of multiple measurement syste
 
 A simplified representation of the latitude calculation illustrates the geometric principle:
 
-```
+```text
 Solar Altitude Measurement (Noon Observation)
 
        * Sun
@@ -67,7 +67,7 @@ The longitude problem remained unsolved until the development of accurate marine
 
 The strategic response to this navigational asymmetry was route optimization that exploited reliable latitude determination while minimizing longitudinal uncertainty. The Portuguese route to India illustrates this principle. Rather than sailing directly southeast from Lisbon along the African coast, which would have required repeatedly correcting for longitudinal drift and fighting contrary winds and currents, Portuguese navigators developed the volta do mar—sailing southwest into the Atlantic until reaching the latitude of the Cape of Good Hope, then turning east at constant latitude to make landfall. This route appears inefficient on a map, adding thousands of miles to the voyage, but it minimized navigational uncertainty and exploited the South Atlantic gyre's favorable wind and current patterns.
 
-```
+```text
 Portuguese Route to India (Simplified)
 
                 North Atlantic
@@ -128,7 +128,7 @@ The gang labor system solved this coordination problem through direct supervisio
 
 The metabolic flows of the plantation system can be represented as a network of extraction, transformation, and waste:
 
-```
+```text
 Plantation Metabolic Circuit
 
 External Inputs:

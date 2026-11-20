@@ -8,7 +8,7 @@ The field rests on a core empirical conjecture: **the superposition hypothesis**
 
 The **residual stream** in a transformer is architecturally central. Each attention layer and MLP layer reads from and writes to a shared residual stream `x ∈ ℝ^{d_model}`. The final representation is thus:
 
-```
+```text
 x_final = x_embed + Σ_l (Attn_l(x_l) + MLP_l(x_l))
 ```
 
@@ -578,7 +578,7 @@ Polysemanticity—where a single neuron responds to multiple unrelated concepts�
 
 The SAE is trained to reconstruct an activation `x` via a sparse intermediate code:
 
-```
+```text
 z = ReLU(W_enc · x + b_enc)          # sparse feature activations
 x̂ = W_dec · z + b_dec               # reconstruction
 L = ||x - x̂||² + λ ||z||₁          # reconstruction + sparsity

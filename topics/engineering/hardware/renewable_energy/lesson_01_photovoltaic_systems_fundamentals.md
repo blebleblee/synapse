@@ -32,7 +32,7 @@ Surface passivation layers serve the critical function of suppressing interface 
 
 Contact metallization schemes employ screen-printed silver paste fired through the anti-reflection coating to form direct ohmic contact with the underlying emitter. The firing process must achieve precise temperature-time profiles: insufficient firing leaves high contact resistance while excessive temperatures dissolve the shallow junction, creating shunt paths. The grid pattern itself represents an optimization problem balancing series resistance losses in the emitter sheet against optical shadowing losses from the metal fingers. State-of-the-art designs use approximately 60-80 fingers with widths of 30-50 micrometers, covering 5-8% of the front surface area while maintaining total series resistance below 0.5 ohm-cm².
 
-```
+```text
 Crystalline Silicon Solar Cell Cross-Section (Side View):
 
 Anti-reflection coating (SiNx, ~75nm)

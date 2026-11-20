@@ -16,7 +16,7 @@ The physical layout of data on disk follows a block-aligned structure where ONTA
 
 The aggregate serves as ONTAP's foundational storage pool, constructed from one or more RAID groups that stripe data across physical disks according to protection policies. When creating an aggregate, administrators specify the RAID type (RAID-DP for dual parity, RAID-TEC for triple parity, or RAID4 for single parity), disk count per RAID group, and the selection of storage media from the available disk shelf inventory. ONTAP then formats these disks with the WAFL file system metadata structures, establishing the block allocation bitmaps, inode tables, and snapshot metadata regions that govern all subsequent storage operations.
 
-```
+```text
 Aggregate Physical Layout:
 
 ┌─────────────────────────────────────────────────────────────┐
@@ -46,7 +46,7 @@ Within each aggregate, ONTAP maintains a root volume that stores system configur
 
 FlexVol creation establishes a new WAFL file system instance rooted within the parent aggregate, with its own inode space, block pointer trees, and snapshot infrastructure. The volume's space guarantee parameter determines whether the aggregate immediately reserves physical blocks or allows optimistic oversubscription. A volume with guarantee type "volume" causes the aggregate to mark a quantity of blocks as reserved, preventing their allocation to other volumes even while the current volume leaves them unwritten. This reservation math must account for the volume's snapshot reserve percentage, as snapshots consume space from the volume's allocation when older data blocks become referenced exclusively by snapshot metadata after newer writes overwrite the active file system blocks.
 
-```
+```text
 FlexVol Internal Structure:
 
 Volume "vol1" (500 GB nominal, volume guarantee, 5% snap reserve)
@@ -96,7 +96,7 @@ Thin provisioning emerges naturally from the volume guarantee model when adminis
 
 Storage efficiency primitives in ONTAP operate as post-process or inline transformations that modify the block pointer graph to maximize sharing and minimize physical block consumption. Deduplication identifies duplicate 4 KB blocks by computing cryptographic fingerprints (SHA-256 hashes) of block contents, building an index that maps fingerprints to physical block numbers, and rewriting block pointers so that duplicate blocks all reference the same PBN. The system maintains reference counts for each shared block to prevent premature reclamation when one referencing object is deleted. Inline deduplication performs this fingerprinting and lookup during the write path, potentially rejecting duplicate blocks before they reach disk, while post-process deduplication runs as a scheduled background scanner that reads existing blocks, computes fingerprints, and consolidates matches.
 
-```
+```text
 Deduplication Block Sharing:
 
 Before Deduplication:

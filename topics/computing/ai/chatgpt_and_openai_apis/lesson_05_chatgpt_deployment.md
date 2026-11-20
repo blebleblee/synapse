@@ -12,7 +12,7 @@ A standard transformer (Vaswani et al., 2017) consists of an encoder stack and a
 
 The core computation in a single attention head is:
 
-```
+```text
 Attention(Q, K, V) = softmax( (Q * K^T) / sqrt(d_k) ) * V
 ```
 
@@ -55,7 +55,7 @@ GPT-4 supports context windows of up to 128,000 tokens (GPT-4o). At roughly 0.75
 
 All OpenAI API endpoints operate over HTTPS. Authentication uses a **Bearer token** scheme: the API key is passed in the `Authorization` header on every request. Keys are scoped to an organization and optionally to a project. There is no session handshake or token exchange — the key itself is the credential.
 
-```
+```text
 Authorization: Bearer sk-...
 Content-Type: application/json
 ```

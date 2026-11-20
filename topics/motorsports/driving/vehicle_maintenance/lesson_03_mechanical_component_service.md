@@ -24,7 +24,7 @@ Fastener installation procedures begin with material property verification. High
 
 Stage three executes initial torque application to sixty percent of final specification using a calibrated beam-type or electronic torque wrench. This partial torque seats the joint faces and eliminates gross alignment errors. Stage four implements the final torque application following a tightening pattern that distributes load uniformly across multi-bolt joints. For circular bolt patterns such as wheel hubs or brake rotor mounting, teams employ star patterns where each fastener receives partial torque increments in sequence rather than tightening any single bolt to final torque before moving to adjacent positions. This pattern prevents distortion of the clamped components that would introduce stress concentrations and geometric errors.
 
-```
+```text
 Wheel Hub Bolt Tightening Sequence (5-bolt pattern):
 Start position: 12 o'clock (bolt 1)
 

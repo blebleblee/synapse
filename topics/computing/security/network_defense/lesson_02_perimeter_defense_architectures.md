@@ -60,7 +60,7 @@ When a permit rule matches a new connection attempt, the firewall creates a conn
 
 The DMZ segmentation pattern requires multiple firewall rulesets governing distinct trust boundaries. The external firewall implements highly restrictive ingress rules that permit only specific destination ports on DMZ services while denying all other inbound traffic. A representative ruleset might appear as:
 
-```
+```bash
 # External Firewall (Internet -> DMZ)
 permit tcp any host 203.0.113.10 eq 443    # HTTPS to web server
 permit tcp any host 203.0.113.11 eq 25     # SMTP to mail relay
@@ -71,7 +71,7 @@ deny ip any any log                         # Block and log everything else
 
 The internal firewall operates under different semantics, permitting outbound flows from the trusted network while restricting inbound access from the DMZ. Internal hosts should initiate connections to DMZ services for administrative purposes, but DMZ servers must not establish inbound connections to internal resources except through explicitly authorized channels like database queries to a dedicated backend tier.
 
-```
+```bash
 # Internal Firewall (DMZ -> Internal)
 deny ip 10.20.30.0/24 10.0.0.0/8           # Block DMZ to internal
 permit tcp 10.20.30.10 10.0.50.20 eq 3306  # Web server to DB

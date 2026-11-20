@@ -162,7 +162,7 @@ php -d vld.active=1 -d vld.execute=0 opcode_dump.php
 
 The disassembly output will resemble the following structure, showing exact opcode offsets and operand addressing modes. The `CV` prefix denotes compiled variables allocated in the function's local variable table, while `TMP` indicates temporaries allocated on the VM stack. Jump targets appear as absolute offsets, and the opcode sequence reveals that the conditional expression uses a computed jump—the comparison result determines whether execution falls through or jumps to the false branch assignment.
 
-```
+```text
 function compute_discount:
 line     #* I O op                       fetch  ext  return  operands
 -------------------------------------------------------------------------------------
@@ -555,7 +555,7 @@ php race_condition.php
 
 The TSan output will include a report like the following, showing two conflicting writes to the counter variable. The access stacks trace back through the Swoole coroutine scheduler and into the user code, proving that the increments from different coroutines interleave without synchronization. The `Previous write` section shows the stack trace of the earlier conflicting access, while the `Write` section shows the current access that triggered the race detection.
 
-```
+```text
 ==================
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7fff1234abcd by thread T2:
@@ -650,7 +650,7 @@ Let the server handle a small number of requests (100–1000 to keep the Valgrin
 
 The Valgrind output will resemble the following, showing the total leaked bytes and the allocation call stacks. The `still reachable` category indicates memory that was allocated but not freed, though it remained accessible via global pointers. In a long-lived server, "still reachable" leaks are as problematic as "definitely lost" leaks because they accumulate indefinitely.
 
-```
+```text
 ==12345== LEAK SUMMARY:
 ==12345==    definitely lost: 0 bytes in 0 blocks
 ==12345==    indirectly lost: 0 bytes in 0 blocks

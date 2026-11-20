@@ -102,7 +102,7 @@ This result follows from the envelope theorem applied to the expenditure minimiz
 
 The Slutsky matrix $S(\mathbf{p}, w)$ with elements $S_{ij} = \partial x_i / \partial p_j + (\partial x_i / \partial w) x_j$ records the substitution effects obtained by differentiating Hicksian demand with respect to prices. The substitution matrix is symmetric ($S_{ij} = S_{ji}$) and negative semidefinite, with $\mathbf{z}^T S \mathbf{z} \leq 0$ for all $\mathbf{z} \in \mathbb{R}^n$. These properties encode the implications of convex preferences and constrain the cross-price elasticities observable in demand systems.
 
-```
+```text
 Utility Maximization Flow:
 
 Preferences (axioms: completeness, transitivity, continuity)

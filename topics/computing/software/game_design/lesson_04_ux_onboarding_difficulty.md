@@ -23,7 +23,7 @@ The cognitive load management architecture decomposes into three distinct subsys
 
 Optimal game architecture minimizes extraneous load to zero, moderates intrinsic load through staged revelation, and maximizes germane load within working memory constraints. Consider the onboarding architecture for a real-time strategy game. The complete mechanical system encompasses resource harvesting, unit production, technology trees, tactical combat, map control, and economic optimization—easily exceeding working memory capacity if presented simultaneously. The tutorial architecture must therefore construct a staged revelation pipeline:
 
-```
+```text
 Stage 1: Movement & Selection
   Intrinsic: 2 verbs (move, select)
   Duration: 60-90 seconds
@@ -49,7 +49,7 @@ Each stage introduces mechanical complexity only after the player demonstrates p
 
 Teaching through mechanics exploits environmental constraints as implicit instruction sets. Consider designing a platformer's first level. Rather than displaying text explaining "Press A to jump," the level architecture itself becomes the tutorial:
 
-```
+```text
 Spatial Layout (side view):
 
 Player Spawn → [===========] gap [===========] → Progress

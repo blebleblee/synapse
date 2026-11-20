@@ -109,7 +109,7 @@ flowchart TD
 - **`version`**: `4`. Page layout version (PostgreSQL 8.3+). Incompatible changes increment this number.
 
 **Free Space Calculation:**
-```
+```text
 free_space = upper - lower = 7968 - 56 = 7912 bytes
 ```
 Of the 8192-byte page, 7912 bytes remain unallocated.
@@ -290,7 +290,7 @@ VACUUM VERBOSE accounts;
 ```
 
 **Expected Log:**
-```
+```text
 INFO:  vacuuming "public.accounts"
 INFO:  finished vacuuming "public.accounts": index scans: 1
 pages: 0 removed, 1 remain, 0 scanned (0.00% of total)
@@ -566,7 +566,7 @@ pg_waldump -n 30 $WAL_FILE
 ```
 
 **Expected Output (truncated):**
-```
+```text
 rmgr: Heap        len (rec/tot):     54/   186, tx:    737, lsn: 0/0193F3A8, prev 0/0193F370, desc: UPDATE off 2 xmax 737 flags 0x00 ; new off 5 xmax 0, blkref #0: rel 1663/5/16384 blk 0 FPW
 rmgr: Heap        len (rec/tot):     54/    54, tx:    737, lsn: 0/0193F468, prev 0/0193F3A8, desc: UPDATE off 3 xmax 737 flags 0x00 ; new off 6 xmax 0, blkref #0: rel 1663/5/16384 blk 0
 rmgr: Heap        len (rec/tot):    198/   198, tx:    737, lsn: 0/0193F4A0, prev 0/0193F468, desc: INSERT off 7 flags 0x00, blkref #0: rel 1663/5/16384 blk 0
@@ -594,7 +594,7 @@ pg_waldump --xid=737 $WAL_FILE
 ```
 
 **Expected Output:**
-```
+```text
 rmgr: Heap        len (rec/tot):     54/   186, tx:    737, lsn: 0/0193F3A8, prev 0/0193F370, desc: UPDATE off 2 xmax 737 flags 0x00 ; new off 5 xmax 0, blkref #0: rel 1663/5/16384 blk 0 FPW
 rmgr: Heap        len (rec/tot):     54/    54, tx:    737, lsn: 0/0193F468, prev 0/0193F3A8, desc: UPDATE off 3 xmax 737 flags 0x00 ; new off 6 xmax 0, blkref #0: rel 1663/5/16384 blk 0
 rmgr: Heap        len (rec/tot):    198/   198, tx:    737, lsn: 0/0193F4A0, prev 0/0193F468, desc: INSERT off 7 flags 0x00, blkref #0: rel 1663/5/16384 blk 0
@@ -612,7 +612,7 @@ pg_waldump $WAL_FILE | grep "rmgr: XLOG.*CHECKPOINT"
 ```
 
 **Expected Output:**
-```
+```text
 rmgr: XLOG        len (rec/tot):    114/   114, tx:      0, lsn: 0/0193E000, prev 0/0193DF80, desc: CHECKPOINT_ONLINE redo 0/0193E000; tli 1; prev tli 1; fpw true; xid 0:738; oid 16386; multi 1; offset 0; oldest xid 726 in DB 1; oldest multi 1 in DB 1; oldest/newest commit timestamp xid: 0/0; oldest running xid 0; online
 ```
 
@@ -649,7 +649,7 @@ SELECT pg_current_wal_lsn();
 ```
 
 **Expected Output:**
-```
+```text
  pg_current_wal_lsn 
 --------------------
  0/0193F6D0
@@ -675,7 +675,7 @@ docker logs pg-lab 2>&1 | tail -20
 ```
 
 **Expected Output:**
-```
+```text
 2024-01-15 10:35:21.456 UTC [1] LOG:  database system was interrupted; last known up at 2024-01-15 10:32:15 UTC
 2024-01-15 10:35:21.789 UTC [1] LOG:  database system was not properly shut down; automatic recovery in progress
 2024-01-15 10:35:21.791 UTC [1] LOG:  redo starts at 0/0193E000

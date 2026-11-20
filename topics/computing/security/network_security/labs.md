@@ -170,7 +170,7 @@ telnet localhost 4444
 
 At the `openocd` prompt, run the following commands to halt the target and inspect registers:
 
-```
+```text
 init
 halt
 regs
@@ -178,7 +178,7 @@ regs
 
 The `regs` command dumps the full MIPS general-purpose register file (`$0` through `$31`), the Program Counter (`PC`), and the status registers. This gives a live snapshot of the CPU state at the moment of the halt. To dump a region of memory—for example, the first 256 bytes of the exception vector at `0xBFC00000` (MIPS unmapped, uncached bootstrap vector):
 
-```
+```text
 mdw 0xBFC00000 64
 ```
 
@@ -315,7 +315,7 @@ cat /proc/kallsyms | grep nf_hooks
 
 If the symbol is in `.rodata` and the kernel has memory protection enabled (MIPS `CP0 Status` register `KX`/`UX` bits), writing to `.rodata` via JTAG requires bypassing the CPU's write protection. On MIPS, the JTAG EJTAG probe can write to any physical address through the debug mode DMA (Direct Memory Access) facility, which bypasses the virtual memory translation and protection checks. In `openocd`, use the `mww` (memory write word) command:
 
-```
+```bash
 # In the openocd telnet session:
 init
 halt
@@ -329,7 +329,7 @@ mww 0xc03567d8 0x00000000
 
 After zeroing the hook pointer, resume the CPU:
 
-```
+```text
 resume
 ```
 

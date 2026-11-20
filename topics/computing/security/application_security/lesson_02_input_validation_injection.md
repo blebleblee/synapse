@@ -39,7 +39,7 @@ SELECT id, role FROM users WHERE username='admin'--' AND password='anything'
 
 The double-dash initiates a line comment that consumes the password check entirely. Union-based injection extends this technique to extract arbitrary data by appending additional SELECT statements:
 
-```
+```text
 ' UNION SELECT credit_card, ssn FROM payment_info WHERE '1'='1
 ```
 
@@ -232,7 +232,7 @@ def send_email():
 
 An attacker requests `/send_email?name={{config.items()}}` to dump application configuration including secret keys. More dangerous payloads leverage Python's introspection capabilities to achieve remote code execution:
 
-```
+```text
 {{''.__class__.__mro__[1].__subclasses__()[396]('cat /etc/passwd',shell=True,stdout=-1).communicate()}}
 ```
 
@@ -406,7 +406,7 @@ Connection pooling amortizes statement preparation across multiple requests, ens
 
 Input validation failure modes often manifest as denial-of-service vulnerabilities when validation logic consumes excessive resources. Regular expression denial of service (ReDoS) exploits backtracking behavior in regex engines to trigger exponential time complexity. Consider a vulnerable email validation pattern:
 
-```
+```text
 ^([a-zA-Z0-9._%+-]+)*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
 ```
 

@@ -86,7 +86,7 @@ Simulate TLS negotiation failures by forcing incompatible protocol versions with
 
 Test file descriptor exhaustion by lowering the process file descriptor limit with `ulimit -n 100`, restricting each process to a maximum of 100 open files. This limit applies to the current shell session and any processes spawned from it. To apply the limit to Postfix, create a systemd drop-in with `systemctl edit postfix` and add the following override:
 
-```
+```text
 [Service]
 LimitNOFILE=100
 ```
@@ -107,7 +107,7 @@ The following reference tables distill the essential diagnostic commands, config
 
 **SMTP Connection State Inspection:**
 
-```
+```text
 ss -tlnp '( sport = :25 or sport = :587 )'    # List SMTP listeners
 ss -tnp 'sport = :25' | grep ESTAB             # Active inbound connections
 ss -tnp 'dport = :25' | grep ESTAB             # Active outbound connections
@@ -117,7 +117,7 @@ netstat -an | grep :25 | wc -l                 # Total SMTP socket count
 
 **Queue Management and Inspection:**
 
-```
+```text
 postqueue -p                                    # Display all queued messages
 postqueue -p | tail -n 1                        # Show queue summary (count, size)
 qshape active                                   # Queue depth by destination domain
@@ -132,7 +132,7 @@ mailq                                           # Alias for postqueue -p
 
 **Configuration and Policy Verification:**
 
-```
+```text
 postconf | grep tls                             # Display all TLS configuration
 postconf -n                                     # Show non-default parameters
 postconf -d                                     # Show all default parameters
@@ -145,7 +145,7 @@ postalias /etc/aliases                          # Rebuild alias database
 
 **Log Analysis and Pattern Matching:**
 
-```
+```text
 tail -f /var/log/mail.log                       # Real-time log streaming
 journalctl -u postfix -f                        # Systemd journal streaming
 grep "status=sent" /var/log/mail.log | wc -l   # Count successful deliveries
@@ -159,7 +159,7 @@ grep "panic:" /var/log/mail.log                 # Critical failure detection
 
 **TLS and Certificate Testing:**
 
-```
+```text
 openssl s_client -connect localhost:25 -starttls smtp -showcerts
 openssl s_client -connect localhost:25 -starttls smtp 2>/dev/null | openssl x509 -noout -dates
 openssl s_client -connect localhost:25 -starttls smtp 2>/dev/null | openssl x509 -noout -subject
@@ -169,7 +169,7 @@ openssl x509 -in /etc/postfix/ssl/cert.pem -noout -text
 
 **DNS Resolution Testing:**
 
-```
+```text
 dig mx example.com +short                       # Query MX records
 dig a smtp.example.com +short                   # Query A records
 dig -x 192.0.2.1 +short                         # Reverse DNS (PTR) lookup
@@ -181,7 +181,7 @@ host -t mx example.com                          # Alternative MX query tool
 
 **Process and Resource Monitoring:**
 
-```
+```text
 ps aux | grep postfix                           # List all Postfix processes
 pgrep -fa postfix                               # Find Postfix process IDs
 pidstat -p $(pgrep -d, postfix) 1              # Per-process CPU and I/O stats
@@ -193,7 +193,7 @@ lsof -p <pid>                                   # Open file descriptors
 
 **Performance Profiling:**
 
-```
+```text
 perf record -F 99 -a -g -- sleep 30            # CPU profiling with call graphs
 perf report --stdio                             # Display profiling results
 iostat -x 1                                     # Disk I/O statistics
@@ -204,7 +204,7 @@ vmstat 1                                        # Virtual memory statistics
 
 **Load Generation and Testing:**
 
-```
+```text
 swaks --to user@example.com --from sender@domain.com --server localhost
 swaks --to user@localhost --from test@localhost --server localhost --show-time
 for i in {1..100}; do swaks --to user@localhost --from test@localhost --server localhost --hide-all & done
@@ -214,7 +214,7 @@ time bash -c 'for i in {1..100}; do swaks --to user@localhost --from test@localh
 
 **Fault Injection and Recovery:**
 
-```
+```text
 iptables -A OUTPUT -p tcp --dport 25 -j DROP   # Block outbound SMTP
 iptables -D OUTPUT -p tcp --dport 25 -j DROP   # Restore outbound SMTP
 tc qdisc add dev lo root netem delay 100ms     # Add network latency

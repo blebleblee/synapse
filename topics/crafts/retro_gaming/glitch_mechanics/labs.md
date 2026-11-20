@@ -18,7 +18,7 @@ The analytical environment consists of three layers. First, a cycle-accurate or 
 
 ### Project Directory Structure
 
-```
+```text
 glitch_mechanics_lab/
 ├── smb/
 │   ├── smb_wallclip_monitor.lua
@@ -182,7 +182,7 @@ Import the CSV and apply the following analysis:
 
 Enter your findings into the analysis results template:
 
-```
+```text
 Event,Frame,PageLoc,X_Pos,X_Subpix,Y_Pos,Y_Subpix,AutoCtrl,Observation
 Normal entry pipe,,,,,,,,
 Wall clip penetration,,,,,,,,
@@ -450,7 +450,7 @@ The level of each encounter is determined by the even-positioned characters (2nd
 
 Create a spreadsheet file `pokemon/encounter_matrix.csv` with the following column structure:
 
-```
+```text
 TestName,Char3,Char3_Hex,Char3_Species,Char5,Char5_Hex,Char5_Species,Char7,Char7_Hex,Char7_Species,Encounter1_Name,Encounter1_Level,Encounter2_Name,Encounter2_Level,Encounter3_Name,Encounter3_Level,Glitch_Flag,Notes
 ```
 
@@ -506,7 +506,7 @@ The wall clip in SMB depends on Mario's subpixel position at the moment the duck
 
 Build a boundary map in `smb/boundary_map.csv`:
 
-```
+```text
 Subpix_Target,Subpix_Actual,Clip_Result,X_Pos_After,X_Subpix_After,Notes
 0x00,,,,,
 0x20,,,,,
@@ -538,7 +538,7 @@ Test the following edge cases to document failure modes:
 
 If the game crashes during stress testing (black screen, frozen frame, garbage graphics), the recovery is simple: reset the emulator. However, document the crash condition in a crash log:
 
-```
+```text
 Crash_Condition,PowerUp,Subpix,PageLoc,AutoCtrl,Symptom,Reproducible
 Small Mario clip at subpix 0x80,0,0x80,?,?,Black screen,Yes
 ```
@@ -563,7 +563,7 @@ The MissingNo. encounter depends on the name buffer contents, but several bounda
 
 MissingNo. encounters can corrupt save data, particularly the Hall of Fame data and item inventory. Document any corruption observed:
 
-```
+```text
 Condition,Name,Species_Encountered,Level,Corruption_Type,Corrupted_Addresses,Reproducible
 9999999,9999999,?,?,Crash/Black screen,,Yes
 All spaces,[7 spaces],?,?,?,?,No
@@ -583,7 +583,7 @@ After completing all boundary tests, compile a diagnostic audit rubric that veri
 
 Create the file `shared/audit_rubric.csv`:
 
-```
+```text
 Test_ID,Glitch_Type,Condition,Expected_Result,Actual_Result,Pass_Fail,Reproducibility_Score,Notes
 SMB-01,Wall Clip,Super Mario, clip succeeds at subpix 0x40-0x80,Minus World reached,,,1 of 5 attempts
 SMB-02,Wall Clip,Small Mario, clip succeeds at subpix ?,???,,,1 of 5 attempts

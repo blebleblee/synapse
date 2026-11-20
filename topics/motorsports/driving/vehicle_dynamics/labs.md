@@ -147,7 +147,7 @@ plt.show()
 
 Execute the script from the project root directory with the command `python scripts/telemetry_correlation.py`. The script loads both driver sessions, identifies the fastest lap from each driver based on lap number, computes corner statistics for the Turn 1 braking zone, and generates a five-trace overlay plot saved to `figures/turn1_driver_comparison.png`. The console output displays the quantitative performance deltas:
 
-```
+```text
 Turn 1 Performance Comparison:
 Reference minimum speed: 94.2 km/h
 Comparison minimum speed: 91.8 km/h
@@ -705,7 +705,7 @@ The wear prediction model output indicates that after 40 laps, the front-left ti
 
 Validate the wear model predictions through physical tread depth measurements using a digital depth gauge. The tire specification documents nominal new tread depth of 6.0mm with measurement uncertainty ±0.1mm. After the 40-lap stint, measure tread depth at three circumferential positions (0°, 120°, 240° around the tire) and three lateral positions (inside edge 25mm from sidewall, center, outside edge 25mm from sidewall) for a total of nine measurements per tire. Average the nine measurements to compute mean remaining tread depth and compare against the model prediction:
 
-```
+```text
 Front-Left Measured Mean Tread Depth: 4.12 mm (±0.08 mm)
   Predicted wear: 1.84 mm
   Measured wear: 1.88 mm

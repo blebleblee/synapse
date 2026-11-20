@@ -28,7 +28,7 @@ The second architectural layer, clitic placement, operates under prosodic rather
 
 The internal ordering within the clitic cluster follows a rigid template that reflects both syntactic hierarchy and prosodic integration. The templatic positions proceed in this sequence:
 
-```
+```text
 [Interrogative Clitic] > [Conditional Auxiliary] > [Present Auxiliary] > [Dative Pronoun] > [Accusative Pronoun] > [Reflexive se/si]
 ```
 

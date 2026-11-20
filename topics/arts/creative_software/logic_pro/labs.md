@@ -12,7 +12,7 @@ You already know your way around Logic's window layout. This masterclass is abou
 
 Every audio interface moves sound in blocks, not a continuous stream. The **I/O buffer** is the size of that block in samples. Latency from input to monitored output is approximately:
 
-```
+```text
 Round-trip latency (ms) ≈ (Buffer Size / Sample Rate) × 2 × 1000
 ```
 
@@ -100,7 +100,7 @@ flowchart TD
 
 ### Step 2 — "NY Compression" parallel bus
 
-```
+```text
 flowchart LR
     subgraph sub_dmd ["DMD Sub-Channels"]
         K["Kick"]
@@ -156,7 +156,7 @@ flowchart LR
 4. Calibration: **Threshold -22 dBFS, Ratio 4:1, Attack 2.5 ms, Release 65 ms**. The attack is fast enough to catch the kick's transient but not so instant that it clicks; the 65 ms release clears before the next 8th-note kick at most tempos, avoiding a "breathing" artifact.
 5. Confirm in the plugin's gain reduction meter: **3.5 dB** of momentary reduction precisely timed to kick hits. If reduction reads over 6 dB, raise the threshold — you want the bass to visibly duck for clarity, not pump audibly as an effect (unless that's the genre, e.g. EDM sidechain pumping, in which case push ratio to 8:1 and exaggerate release to taste).
 
-```
+```text
 flowchart TD
     subgraph sub_strings ["Orchestral Summing Stack"]
         V1["8x Violin I"] --> SS["STRINGS_SUB Aux"]
@@ -197,7 +197,7 @@ flowchart TD
    - **Spread 25%**: diffuses the point source into a small cloud rather than a pinpoint — useful for synths/pads so they don't feel like an unnaturally precise laser dot in space; keep spread near 0% for effects meant to feel like a specific physical object (a bird call, a footstep).
 3. **Automating a 360° orbit**: write azimuth automation across a 4-bar transition, keyframing at minimum every beat (more keyframes = smoother arc; the renderer interpolates linearly between points, so sparse keyframes on a circular path can cause audible "stepping" through quadrants). Check the result in **Binaural** mode specifically — phase smearing during fast pans is far more audible on headphones than on a discrete speaker array, because binaural rendering is doing continuous HRTF crossfades rather than switching between fixed drivers.
 
-```
+```text
 flowchart TD
     subgraph sub_bed ["Bed Channel Routing"]
         DRUMS["Drums & Bass"] --> SURR["Surround Panner (Fixed Position)"]
@@ -222,7 +222,7 @@ flowchart TD
 
 Run this before any client delivery or streaming upload. These aren't arbitrary numbers — each maps to a real platform spec or a real playback-compatibility risk.
 
-```
+```text
 [ ] Integrated Loudness (use Logic's built-in Loudness Meter, Mix -> Loudness Meter):
     - Streaming (Apple Music / Spotify / YouTube): -14.0 LUFS integrated (±0.5 LUFS)
     - EBU R128 Broadcast/TV delivery: -23.0 LUFS integrated (±0.5 LUFS)

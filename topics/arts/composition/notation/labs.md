@@ -150,11 +150,11 @@ If your quarter notes land at 479 or 481 ticks instead of exactly 480, you have 
 A time signature tells the performer the meter; the **beaming** tells them where the strong pulses fall inside it. Get this wrong and a competent sightreader will misplace the beat even if every pitch and duration is correct.
 
 **5/8 as 3+2** (the Bulgarian/Eastern-European convention, strong-weak feel: ONE-two-three, ONE-two):
-```
+```text
 ♪ ♪ ♪ | ♪ ♪
 ```
 **5/8 as 2+3** (equally valid, different feel: ONE-two, ONE-two-three):
-```
+```text
 ♪ ♪ | ♪ ♪ ♪
 ```
 
@@ -286,7 +286,7 @@ Large scores (full orchestra, 30+ staves) get sluggish in any notation software 
 
 ### MuseScore 4 essential shortcuts
 
-```
+```text
 Note entry:
   N                Enter note input mode
   0–9              Set duration (5=quarter, 6=eighth, 4=half, etc. — MuseScore 4 uses number row)

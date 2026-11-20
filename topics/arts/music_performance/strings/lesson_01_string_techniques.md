@@ -149,7 +149,7 @@ Metronome targets, drone scale work:
 
 First position on violin spans roughly a minor third per string, with finger spacing alternating half-step / half-step / whole-step patterns depending on key:
 
-```
+```text
 E string:  E  F  F# G  G# A
            0  1  1  2  2  3    (finger numbers, low-to-high)
 
@@ -221,7 +221,7 @@ Drill: weight-drop exercise.
 **Parameter 3 — Sounding point**
 
 Standard sounding-point zones, violin:
-```
+```text
 Sul tasto:      over the fingerboard        — soft, flute-like, pp-mp
 Normal:         roughly 1/5 of string length from the bridge — full tone, mp-mf
 Sul ponticello: very close to the bridge    — glassy, nasal, harmonics emphasized, ff
@@ -280,7 +280,7 @@ The floating thumb is non-negotiable for clean tone on any string above the lowe
 - Standard pattern anatomy: slap on strings 4–5 (low E, A); pop on strings 1–2 (G, D).
 
 **Slap coordination drill (bass guitar):**
-```
+```text
 Pattern: S = Slap (thumb), P = Pop (index hook), . = rest
 
 Beat:    1    +    2    +    3    +    4    +
@@ -384,7 +384,7 @@ graph TD
 
 ### 5.1 Position Geography (Violin/Viola Reference)
 
-```
+```text
 Position    First Finger on:    Range (A string)
 1st         B                   B - E (4th finger)
 2nd         C                   C - F#
@@ -410,7 +410,7 @@ A shift is a controlled glide along the string, with the bow sustaining tone thr
 4. **Confirm** — the ear checks the landed pitch immediately and the finger micro-adjusts if needed.
 
 **Shift drill (violin, 1st to 3rd position, single string):**
-```
+```text
 On the A string, one finger throughout:
 
 1st pos: D (3rd finger) - hold 2 beats
@@ -430,7 +430,7 @@ reduction during the slide prevents the slide itself from sounding.
 The movable box covers root, 3rd (major or minor), 5th, and octave — core vocabulary for walking bass lines and groove construction, and it transposes to any key by sliding the entire shape up or down the neck.
 
 **Root-position box, major (example rooted on G, 3rd fret of E string):**
-```
+```text
 E --3--5--      Root (G)  -- 5th (D)
 A --3--5--      4th (C)   -- 5th (D, higher octave)
 D --5--7--      Root (G, 8va) -- Maj2nd (A)
@@ -516,7 +516,7 @@ flowchart TD
 
 A full 60-minute session for an intermediate-to-advanced string player:
 
-```
+```text
 1. Physical warm-up (5 min)
    - Long bows on open strings, all four strings
    - Slow finger taps on the neck, no bowing (activates left hand independently)
@@ -661,7 +661,7 @@ String playing demands sustained, asymmetric muscle loading held for long period
 
 Before touching the instrument:
 
-```
+```text
 1. Wrist circles: 10 clockwise, 10 counterclockwise, both hands
 2. Finger fans: spread fingers wide, hold 3 sec, relax, repeat 5x
 3. Forearm stretch: extend arm, flex hand back toward you (hold 20 sec),
@@ -727,7 +727,7 @@ A harmonic is produced by touching the string lightly at a nodal point — a loc
 
 **Harmonic nodes and resulting pitches (violin E string, open = E5):**
 
-```
+```text
 Node position         Fraction    Resulting pitch    Interval above open
 Midpoint (~12th fret) 1/2         E6                  Octave
 1/3 from the nut      1/3         B6                  Octave + 5th
@@ -745,7 +745,7 @@ Midpoint (~12th fret) 1/2         E6                  Octave
 
 The first finger stops the string normally, creating a new fundamental. The fourth finger then touches lightly — not pressing — at a perfect fourth above that stopped note, which is itself a natural node of the now-shortened string. The resulting pitch sounds two octaves above the first finger's stopped note.
 
-```
+```text
 Example: 1st finger stops A (D string, violin) = new fundamental
 4th finger touches D (a perfect fourth above) = node at 1/4 of the remaining string length
 Result: A, two octaves above the first finger (A6 on violin)
@@ -773,7 +773,7 @@ Double stops sound two strings simultaneously. The left hand must hold accurate 
 | Seconds | Hardest | Adjacent semitones on neighboring strings are brutally exposed if either is off |
 
 **Thirds drill (violin, A and E strings together, 1st position):**
-```
+```text
 A string: 1st finger B -> 2nd finger C# -> 3rd finger D#
 E string: 1st finger F# -> 2nd finger G# -> 3rd finger A#
 
@@ -788,7 +788,7 @@ Professional-level phrasing distributes the bow strategically to create natural 
 **Principle:** more bow length and speed = more sound and energy. Less bow = restraint, intimacy, hesitation — used deliberately, not as a fallback when you're running out of bow unexpectedly.
 
 **Practical phrase-shaping example (8-bar melody, violin):**
-```
+```text
 Bar 1-2: start near the frog, slow bow (conserved bow = soft, quiet arrival)
 Bar 3-4: move toward the middle, bow speed increasing (phrase building)
 Bar 5-6: full bow, middle to tip (the peak — full tone, sounding point edges toward the bridge)

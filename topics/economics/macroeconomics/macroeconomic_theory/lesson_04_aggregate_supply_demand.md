@@ -80,7 +80,7 @@ The long-run price level becomes purely a monetary phenomenon—determined by th
 
 The classical dichotomy principle also implies that long-run real interest rates are independent of monetary policy. The real interest rate must equate investment and saving at full employment. This natural real interest rate $r^*$ is determined by time preference (impatience), productivity of capital, demographic structure, and other real fundamentals. If the central bank holds the nominal interest rate below $r^*$ for an extended period, inflation accelerates until the real interest rate $r_t = i_t - \pi_t$ rises back to $r^*$. Conversely, sustained nominal rate elevation above $r^*$ generates deflation until the real rate normalizes.
 
-```
+```text
 TIME HORIZON DECOMPOSITION: AGGREGATE SUPPLY DYNAMICS
 
 Short-Run (Quarters to 1-2 Years):

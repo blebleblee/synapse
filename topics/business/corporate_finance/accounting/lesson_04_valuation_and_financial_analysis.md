@@ -18,13 +18,13 @@ Under the historical cost convention, an asset is initially recognized at the co
 
 After initial recognition, the carrying amount is computed as:
 
-```
+```text
 Carrying Amount = Historical Cost − Accumulated Depreciation − Accumulated Impairment Losses
 ```
 
 Depreciation systematically allocates the depreciable amount (historical cost minus residual value) over the useful life on a basis reflecting the pattern in which the asset's future economic benefits are consumed. The straight-line method allocates equal amounts per period:
 
-```
+```text
 Annual Depreciation = (Historical Cost − Residual Value) / Useful Life
 ```
 
@@ -54,14 +54,14 @@ A practical illustration of the sensitivity problem: consider a Level 3 asset co
 
 Amortized cost applies to financial assets that meet two conditions under IFRS 9: the asset is held within a business model whose objective is to collect contractual cash flows, and the contractual terms give rise to cash flows that are solely payments of principal and interest on the principal amount outstanding. US GAAP applies a similar standard under ASC 326 with the Current Expected Credit Loss (CECL) model. The amortized cost formula is:
 
-```
+```text
 Amortized Cost = Initial Recognition Amount − Principal Repayments ± Cumulative Amortization 
                  Using the Effective Interest Method − Cumulative Expected Credit Losses
 ```
 
 The effective interest rate is the rate that exactly discounts all future cash payments received back to the initial recognition amount. It is computed at inception and held constant over the instrument's life unless the cash flow schedule is modified, at which point a new effective rate is computed. For a bond purchased at a premium or discount, the effective interest method amortizes the premium or discount over the remaining life, producing a constant yield on the declining carrying amount:
 
-```
+```text
 Interest Income = Carrying Amount at Beginning of Period × Effective Interest Rate
 Amortization Adjustment = Interest Income − Coupon Cash Flow
 Carrying Amount at End of Period = Carrying Amount at Beginning + Amortization Adjustment
@@ -75,7 +75,7 @@ Stage 1 covers performing assets where credit risk has not increased significant
 
 The ECL computation itself is:
 
-```
+```text
 ECL = Σ (Probability of Default × Loss Given Default × Exposure at Default)
 ```
 
@@ -85,13 +85,13 @@ Each component requires estimation. Probability of Default (PD) is typically der
 
 Impairment testing under IAS 36 (and the analogous provisions under ASC 350 and ASC 360 in US GAAP) is the mechanism by which the carrying amount of an asset is compared against its recoverable amount. If the carrying amount exceeds the recoverable amount, an impairment loss is recognized to bring the carrying amount down to the recoverable amount. The recoverable amount is the higher of fair value less costs of disposal (FVLCD) and value in use (VIU):
 
-```
+```text
 Recoverable Amount = max(FVLCD, VIU)
 ```
 
 Value in use is the present value of the future cash flows expected to be derived from the asset:
 
-```
+```text
 VIU = Σ [Future Cash Flow_t / (1 + r)^t] for t = 1 to n
 ```
 
@@ -101,7 +101,7 @@ For most non-goodwill assets, impairment is tested when there is an indicator of
 
 Goodwill impairment testing requires the identification of Cash Generating Units (CGUs), which are the smallest identifiable group of assets that generates cash inflows largely independent of other assets. Goodwill acquired in a business combination is allocated to the CGUs expected to benefit from the synergies of the combination. The impairment test compares the carrying amount of the CGU (including allocated goodwill) against the recoverable amount:
 
-```
+```text
 If CGU Carrying Amount > CGU Recoverable Amount:
     Impairment Loss = CGU Carrying Amount − CGU Recoverable Amount
     Impairment allocated first to goodwill, then to other assets pro rata
@@ -131,13 +131,13 @@ Earnings quality refers to the degree to which reported net income reflects the 
 
 The accruals ratio, developed from the work of Richard Sloan, decomposes earnings into its cash flow and accrual components:
 
-```
+```text
 Accruals = Net Income − Operating Cash Flow − (Change in Financial Assets + Change in Current Tax Liabilities − Depreciation)
 ```
 
 A simplified version suitable for cross-sectional comparison:
 
-```
+```text
 Accruals Ratio = (Net Income − Cash Flow from Operations) / Average Total Assets
 ```
 
@@ -156,7 +156,7 @@ The Beneish M-Score is a composite model designed to detect earnings manipulatio
 | Leverage Index (LVGI) | TotalDebt_t / TotalAssets_t divided by same ratio_t-1 | >1 indicates increasing leverage |
 | Total Accruals to Total Assets (TATA) | (Net Income − CFO) / TotalAssets | Higher values indicate lower quality earnings |
 
-```
+```text
 M-Score = -4.84 + 0.92×DSRI + 0.528×GMI + 0.404×AQI + 0.892×SGI 
          + 0.115×DEPI - 0.172×SGAI + 4.679×TATA - 0.327×LVGI
 ```
@@ -165,7 +165,7 @@ An M-Score exceeding -1.78 indicates a higher probability of earnings manipulati
 
 Cash conversion ratio provides a direct measure of how effectively accounting earnings translate to cash:
 
-```
+```text
 Cash Conversion Ratio = Cash Flow from Operations / Net Income
 ```
 
@@ -179,7 +179,7 @@ Ratio analysis translates raw accounting data into standardized metrics that ena
 
 The DuPont decomposition of return on equity separates the aggregate return into three components:
 
-```
+```text
 ROE = (Net Income / Revenue) × (Revenue / Average Total Assets) × (Average Total Assets / Average Equity)
      = Net Profit Margin × Asset Turnover × Equity Multiplier (Leverage)
 ```
@@ -188,14 +188,14 @@ Each component carries a different analytical story. Net profit margin reflects 
 
 The extended DuPont model separates operating from non-operating components:
 
-```
+```text
 ROE = [Net Income / EBIT × EBIT / Revenue × Revenue / Total Assets] × Total Assets / Equity
      = [Tax Burden × Operating Margin × Asset Turnover] × Leverage
 ```
 
 Or more precisely, the five-factor decomposition:
 
-```
+```text
 ROE = (Net Income / Pretax Income)           ← Tax Effect
     × (Pretax Income / EBIT)                 ← Interest Burden
     × (EBIT / Revenue)                        ← Operating Margin
@@ -207,7 +207,7 @@ This decomposition isolates the effect of tax rate changes (driven by jurisdicti
 
 Return on Invested Capital (ROIC) is the metric that most directly links accounting performance to enterprise value, because it measures the return generated on all capital invested in the business, regardless of financing structure:
 
-```
+```text
 NOPAT = EBIT × (1 − Effective Tax Rate)
 Invested Capital = Total Debt + Equity − Cash and Equivalents − Non-Operating Assets
 ROIC = NOPAT / Average Invested Capital
@@ -215,7 +215,7 @@ ROIC = NOPAT / Average Invested Capital
 
 The adjusted invested capital should include capitalized operating leases under IFRS 16 / ASC 842, which moved lease obligations onto the balance sheet but may still require adjustments for off-balance-sheet items in older financial statements. The comparison of ROIC against the weighted average cost of capital (WACC) is the fundamental test of value creation: if ROIC exceeds WACC, the company earns a spread on its invested capital and creates economic value; if ROIC is below WACC, the company destroys value with each dollar of incremental investment. The spread between ROIC and WACC, multiplied by invested capital, yields the economic profit:
 
-```
+```text
 Economic Profit = (ROIC − WACC) × Invested Capital
 ```
 
@@ -223,7 +223,7 @@ A company with $5 billion in invested capital, a ROIC of 14%, and a WACC of 9% g
 
 The bridge from accounting book value to enterprise value requires adjustments for every item where the carrying amount does not reflect economic value:
 
-```
+```text
 Enterprise Value = Market Capitalization + Total Debt − Cash & Equivalents 
                   + Minority Interest + Preferred Stock − Associates/Investments
 ```
@@ -266,7 +266,7 @@ Revenue recognition is the most common vector for earnings management because it
 
 Common manipulation patterns include channel stuffing (shipping excess inventory to distributors at period-end, which inflates current period revenue but generates returns or reduced future orders), premature revenue recognition (recognizing revenue before control has transferred, particularly in long-term contracts where the percentage-of-completion method allows significant estimation latitude), and the use of bill-and-hold arrangements where the entity bills the customer but retains physical possession of the product. The analyst detects these patterns by computing the days sales outstanding (DSO) trend and comparing it to revenue growth:
 
-```
+```text
 DSO = (Accounts Receivable / Revenue) × Days in Period
 ```
 
@@ -278,7 +278,7 @@ The accounts receivable turnover and days sales outstanding should also be exami
 
 Ratio analysis fails most commonly when the analyst compares ratios across companies without adjusting for differences in accounting policies, capital structures, and business models that make the headline numbers non-comparable. A company that leases its retail locations under operating leases (pre-IFRS 16) shows lower debt and lower assets than a company that owns its locations, making its return on assets and debt-to-equity ratios appear superior despite the economic equivalence of the two arrangements. The adjustment requires capitalizing the operating lease commitments by computing the present value of future lease payments and adding the result to both debt and assets:
 
-```
+```text
 Operating Lease Liability = Σ [Lease Payment_t / (1 + r)^t] for t = 1 to n
 Adjusted Total Assets = Reported Assets + Operating Lease Liability
 Adjusted Total Debt = Reported Debt + Operating Lease Liability
@@ -295,7 +295,7 @@ A third failure mode involves the treatment of non-recurring items. Companies ro
 
 The optimized workflow for translating accounting data into enterprise value proceeds through a structured sequence of adjustments that transforms reported financial statements into an analytically consistent basis for valuation. The first step is to restate the income statement to a normalized EBITDA figure by removing non-recurring items (genuine one-time charges, not recurring restructuring), adjusting for fair value changes in Level 3 instruments, and eliminating the effect of acquisition accounting on depreciation and amortization (which inflates D&A because acquired assets are stepped up to fair value at acquisition, while the organic equivalent is carried at historical cost). The second step is to restate the balance sheet to a fair-value-adjusted, lease-adjusted, goodwill-adjusted basis, producing an adjusted invested capital figure that is comparable across companies regardless of their accounting choices. The third step is to compute the adjusted ROIC using the normalized NOPAT and adjusted invested capital, and to compare this against the company's WACC to determine whether value is being created or destroyed. The fourth step is to apply the selected valuation methodology—whether a multiple-based approach using adjusted EV/EBITDA, EV/NOPAT, or EV/Invested Capital, or a DCF approach using the normalized cash flow projections with a terminal value based on the sustainable ROIC and reinvestment rate:
 
-```
+```text
 Terminal Value = NOPAT_t+1 × (1 − Reinvestment Rate) / (WACC − Long-term Growth Rate)
 where Reinvestment Rate = (Long-term Growth Rate) / Long-term ROIC
 ```

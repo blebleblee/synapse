@@ -963,7 +963,7 @@ flowchart TD
 
 The relationship between context length and latency is a core architectural fact, not a coincidence. Each autoregressive step requires a full attention computation over all prior tokens in the KV-cache. Without Flash Attention or other optimizations, the attention operation for step `t` has complexity O(t · d_model) for the query-key dot product across the cached sequence. The KV-cache itself consumes:
 
-```
+```text
 memory_bytes = 2 · num_layers · num_heads · head_dim · seq_len · bytes_per_element
 ```
 

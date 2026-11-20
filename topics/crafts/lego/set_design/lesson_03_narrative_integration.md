@@ -20,7 +20,7 @@ Every Lego element carries semantic weight. A 1x4 tiles surface reads as clean, 
 
 The practical workflow begins with constructing a **thematic part inventory** before building. This means identifying the five to eight element types that will carry the dominant texture language of the set and committing to them as the primary vocabulary. For a medieval tavern, that vocabulary might include the 1x2 brick (for rubble stone walls), the 1x2 jumper plate (for half-offset timber framing), the 1x1 round plate (for nail heads and iron detail), the 1x2 grille tile (for ventilation and ironwork), the 1x4 dark brown beam (for exposed structural timber), the 1x1 headlight brick (for recessed window openings and interior lighting), and the 1x2 hinge plate (for doors and shutters). These seven element types, combined in disciplined variation, can produce a structure that reads unmistakably as pre-industrial European vernacular architecture. The temptation to introduce a 1x3 curved slope because it fills a gap must be resisted if it does not belong to the vocabulary, because a single anachronistic element in a textured wall functions like a modern word dropped into a period novel: it breaks the register.
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │          NARRATIVE SIGNAL PATH: LEGO SET             │
 ├─────────────────────────────────────────────────────┤
@@ -63,7 +63,7 @@ Color is the most information-dense narrative channel in a Lego set, because the
 
 A practical palette specification for a narrative build typically includes four to six colors organized by role. The **dominant color** covers roughly 60% of visible surfaces and establishes the base mood. The **secondary color** covers roughly 25% and provides contrast or structural differentiation. The **accent color** covers roughly 10% and draws the eye to narrative focal points — a door, a sign, a window, a figure's clothing. The **detail colors** — one or two additional shades — appear in small quantities for texture variation and narrative props. For a Nordic fishing village scene, a disciplined palette might specify Light Bluish Gray as the dominant (stone foundations and walls), Dark Orange or Medium Nougat as the secondary (timber cladding and roofing), Dark Red as the accent (doors and window frames, signaling warmth and human habitation), and White and Dark Bluish Gray as detail colors (snow on surfaces, iron hardware and rope detail). This palette communicates "cold-climate coastal vernacular" instantly and without ambiguity. Adding a Bright Light Blue element because it fills a gap would introduce a color that does not belong to the Nordic vernacular register and would degrade the narrative signal, even if the structural fit were perfect.
 
-```
+```text
 ┌──────────────────────────────────────────────────┐
 │        COLOR PALETTE ROLE DISTRIBUTION            │
 ├───────────────┬──────────┬────────────────────────┤

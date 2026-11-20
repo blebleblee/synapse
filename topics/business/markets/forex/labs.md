@@ -12,7 +12,7 @@ At its core, forex (foreign exchange) is the marketplace where one nation's curr
 
 Forex is a **zero-sum game** before transaction costs and a **negative-sum game** after costs. For every dollar gained by one participant on a price movement, another participant loses that dollar. This is an immutable physical constraint:
 
-```
+```text
 Participant A profit + Participant B profit + Transaction costs = 0
 ```
 
@@ -34,7 +34,7 @@ Forex operates as an **over-the-counter (OTC) decentralized network**, not a cen
 Forex markets enable high leverage (50:1, 100:1, or higher in some jurisdictions) because currency pairs exhibit relatively low volatility compared to equities. The standard deviation of daily returns for major pairs (EUR/USD, USD/JPY) is typically 0.5-1.0%, versus 1-2% for equity indices.
 
 **The leverage equation**:
-```
+```text
 Effective exposure = Capital × Leverage ratio
 Required margin = Exposure / Leverage ratio
 ```
@@ -45,7 +45,7 @@ Required margin = Exposure / Leverage ratio
 
 The **covered interest rate parity** condition represents an arbitrage-free equilibrium:
 
-```
+```text
 F/S = (1 + i_d) / (1 + i_f)
 ```
 
@@ -118,7 +118,7 @@ Example: `EUR/USD = 1.0850`
 - Pipette: 0.00001 (fractional pip, fifth decimal)
 
 **Position sizing mathematics**:
-```
+```text
 Position value = Lot size × Contract size
 Standard lot = 100,000 units of base currency
 Mini lot = 10,000 units
@@ -138,7 +138,7 @@ Simplified: Pip value = 0.0001 × Position size (for pairs quoted in account cur
 
 **The bid-ask spread** is the transaction cost in forex:
 
-```
+```text
 Spread = Ask price - Bid price
 ```
 
@@ -146,7 +146,7 @@ Spread = Ask price - Bid price
 - **Ask**: Price at which broker sells base currency (your buying price)
 
 **Example**:
-```
+```text
 EUR/USD: 1.0850 / 1.0852
 Spread = 2 pips
 ```
@@ -164,7 +164,7 @@ Spread = 2 pips
 ### 2.4 Leverage and Margin Mechanics
 
 **Initial margin requirement**:
-```
+```text
 Required margin = (Position size × Current price) / Leverage
 ```
 
@@ -176,12 +176,12 @@ Required margin = (Position size × Current price) / Leverage
 **Maintenance margin and margin calls**:
 
 Brokers monitor **margin level**:
-```
+```text
 Margin level = (Equity / Used margin) × 100%
 ```
 
 Where:
-```
+```text
 Equity = Balance + Floating P&L
 Used margin = Sum of all required margins
 ```
@@ -241,7 +241,7 @@ Used margin = Sum of all required margins
 
 Forex positions held overnight incur **rollover (swap)** based on interest rate differential:
 
-```
+```text
 Rollover = (Position size × (Interest rate differential / 365)) × (Days held)
 ```
 
@@ -283,7 +283,7 @@ Currency pairs exhibit **correlation** ranging from -1.0 to +1.0:
 - Reason: Swiss franc as safe haven inversely related to euro
 
 **Portfolio volatility with correlation**:
-```
+```text
 σ_portfolio = √(w₁²σ₁² + w₂²σ₂² + 2w₁w₂σ₁σ₂ρ₁₂)
 ```
 
@@ -323,7 +323,7 @@ Central banks intervene when exchange rates threaten economic stability:
 Professional forex traders obsess over **position sizing** because it determines survival probability over time.
 
 **Kelly Criterion** (optimal bet sizing):
-```
+```text
 f* = (p × b - q) / b
 ```
 
@@ -347,7 +347,7 @@ Probability of blowing up entire account given:
 - R = Risk-reward ratio
 - U = Risk per trade as % of capital
 
-```
+```text
 Risk of ruin ≈ ((1-W) / W)^(C/U × 2)
 ```
 
@@ -384,7 +384,7 @@ Support/resistance levels work because:
 - Win rate: ~70% when aligned with higher timeframe trend
 
 **Trend Following with Moving Averages**:
-```
+```text
 EMA(n) = Price(t) × k + EMA(t-1) × (1-k)
 Where k = 2 / (n+1)
 ```
@@ -407,7 +407,7 @@ Where k = 2 / (n+1)
 **Interest Rate Differentials** (primary driver):
 
 Central bank policy creates sustained trends:
-```
+```text
 Currency strength ∝ (Real interest rate - Inflation expectations)
 ```
 
@@ -501,7 +501,7 @@ Markets oscillate between **trending** and **mean-reverting** regimes. Using the
 - Failed breakout + reversal → Regime change
 
 **Adaptive position sizing**:
-```
+```text
 Position size = Base size × (1 / Current ATR) × (Average ATR)
 ```
 
@@ -514,7 +514,7 @@ Automatically reduces size during high volatility, increases during low volatili
 Traders hold losers too long (hoping for recovery) and cut winners too early (fear of giving back gains). This inverts the required win/loss ratio.
 
 **Math of required win rate**:
-```
+```text
 Win rate required = 1 / (1 + Reward/Risk ratio)
 ```
 
@@ -547,7 +547,7 @@ Each round-trip trade costs 1-3 pips in spread. At $10/pip per lot:
 - 220 trading days = $22,000-$66,000 annually
 
 **Break-even analysis**:
-```
+```text
 Annual return required to break even = (Annual costs / Starting capital) × 100%
 ```
 
@@ -573,7 +573,7 @@ Traders see what confirms their existing position and ignore contrary evidence.
 
 **Critical threshold**: **20% drawdown** requires 25% return to recover. **50% drawdown** requires 100% return to recover.
 
-```
+```text
 Return required to recover = Drawdown / (1 - Drawdown)
 ```
 
@@ -586,7 +586,7 @@ Examples:
 **Drawdown prevention**:
 
 **Portfolio heat**: Total % of capital at risk across all positions
-```
+```text
 Portfolio heat = Σ (Position size × Distance to stop loss × Pip value) / Total capital
 ```
 
@@ -601,7 +601,7 @@ Professional standard: **5-10% maximum portfolio heat**
 
 **Correlation adjustment**:
 If EUR/USD and GBP/USD are 85% correlated, effective risk is higher:
-```
+```text
 Adjusted risk ≈ 1% + 1.2% × 0.85 = 2.02% (not 2.2%)
 ```
 
@@ -655,7 +655,7 @@ Historical tests often use bid price or mid-price, ignoring:
 Need minimum **100-300 trades** to determine if edge is real or random luck.
 
 **Confidence interval calculation**:
-```
+```text
 Standard error = σ / √n
 95% confidence interval = Mean ± (1.96 × SE)
 ```
@@ -710,7 +710,7 @@ Identify correlated currency pairs with temporary divergence.
 - Exit when ratio reverts to 1.05
 
 **Mean reversion logic**:
-```
+```text
 z-score = (Current ratio - Mean ratio) / Standard deviation
 Enter: |z-score| > 2.0
 Exit: |z-score| < 0.5
@@ -895,7 +895,7 @@ Can you explain without notes:
 You have a $10,000 account and want to risk 1% on a EUR/USD trade. Current price is 1.0850. Your stop loss is 50 pips away. What position size should you use?
 
 **Solution**:
-```
+```text
 Risk = $10,000 × 0.01 = $100
 Pip value needed = $100 / 50 pips = $2 per pip
 Position size = $2 per pip / $10 per pip per lot = 0.2 lots (2 mini lots)
@@ -920,7 +920,7 @@ Correlation EUR/USD and GBP/USD: 0.85. Broker leverage: 50:1. Margin call at 100
 Calculate: (a) required margin, (b) portfolio heat, (c) equity level at which margin call occurs.
 
 **Solution**:
-```
+```text
 (a) Required margin:
 EUR/USD: 2 lots × 100,000 × 1.0850 / 50 = $4,340
 GBP/USD: 1.5 lots × 100,000 × 1.2750 / 50 = $3,825
@@ -953,7 +953,7 @@ Fed signals 0.50% surprise rate hike. Current EUR/USD = 1.0850. ECB on hold. Con
 5. Correlated pairs to avoid/exploit
 
 **Solution outline**:
-```
+```text
 1. Direction: USD strength → EUR/USD down
    Magnitude: 0.50% surprise ≈ 150-200 pip move over 1-2 weeks
    
@@ -994,7 +994,7 @@ Design a recovery protocol:
 4. Psychological safeguards
 
 **Solution**:
-```
+```text
 1. Position sizing:
    Reduce risk to 1% per trade (half normal)
    Calculate on current equity ($88,000), not starting capital
@@ -1064,7 +1064,7 @@ Design a recovery protocol:
 Professional forex trading is a **survival game first**, profit game second.
 
 **The survivorship equation**:
-```
+```text
 P(survival) = f(Position sizing, Risk management, Regime detection, Execution quality, Psychology)
 ```
 

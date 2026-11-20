@@ -26,7 +26,7 @@ The sed execution engine can be described precisely as a state machine over two 
 
 The execution model for a single cycle looks like this:
 
-```
+```text
 READ line into pattern space
 FOR EACH command in script:
     IF address matches current line:

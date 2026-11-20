@@ -20,7 +20,7 @@ The foundational technique for achieving composition density is disciplined vert
 
 Upon this foundation, intermediate layers build outward or inward to create the characteristic stepped profiles that suggest architectural features without explicitly modeling them. A recessed upper story, represented by stacking two or three plates of slightly reduced footprint atop a larger base, immediately communicates the presence of setbacks, parapets, or distinct floor levels. The critical insight is that these layer transitions do not require slopes, hinges, or complex geometry—a simple reduction from a 6×6 plate to a 4×4 plate, centered on the lower layer, creates a four-plate-high vertical wall that registers as a distinct architectural element. The mason's rule applies here: keep your courses level and your transitions deliberate. Random or arbitrary offsets create visual confusion, while systematic geometric progression creates rhythm and coherence.
 
-```
+```text
 Side view of three-tier vertical stacking (basic):
 
 ▄▄▄▄▄▄▄▄  ← 6-wide base (dark gray)

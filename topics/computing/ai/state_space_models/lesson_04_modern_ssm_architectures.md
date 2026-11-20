@@ -35,7 +35,7 @@ The selective SSM computation begins by projecting the expanded input to produce
 The discretization step converts the continuous-time parameters to discrete-time using the zero-order hold method. For diagonal **A**, this simplifies dramatically: **Ā(x) = exp(Δ(x) · A)** and **B̄(x) = (Ā(x) - I) · A⁻¹ · B(x)** where both operations are computed element-wise. In practice, since **A** is initialized with negative real values (to ensure stability), the exponential **exp(Δ · A)** produces values between 0 and 1 that act as forgetting factors. When **Δ(x)** is large, the forgetting factor approaches zero (aggressive filtering), and when **Δ(x)** is small, it approaches one (strong retention).
 
 The core recurrence implements the discrete-time state space model:
-```
+```text
 h(t) = Ā(x(t)) ⊙ h(t-1) + B̄(x(t)) ⊙ x(t)
 y(t) = C(x(t)) ⊙ h(t)
 ```
@@ -50,7 +50,7 @@ The implementation details involve careful memory layout and instruction-level o
 After the selective scan produces the SSM output **y_ssm**, it undergoes point-wise multiplication with the gated pathway: **y = y_ssm ⊙ σ(x_gate)** where the gate acts as a learned filter deciding which components of the SSM output to propagate forward. This gating mechanism serves multiple purposes: it provides an additional source of input-dependent modulation, allows the model to learn to suppress irrelevant state dimensions, and creates a gradient path that bypasses the recurrence during backpropagation (similar to residual connections).
 
 The complete Mamba block combines this selective SSM core with normalization and a projection back to the model dimension. The typical structure follows:
-```
+```text
 x_norm = LayerNorm(x)
 x_expanded = Linear(D → E)(x_norm)
 x_gate, x_ssm_input = split(x_expanded, dim=-1)

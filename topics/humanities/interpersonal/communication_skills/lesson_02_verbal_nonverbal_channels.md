@@ -22,7 +22,7 @@ The core invariant underlying all effective interpersonal communication is **sig
 
 The communication system can be visualized as a parallel transmission network where each channel carries distinct but overlapping information:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │               MESSAGE SENDER (ENCODER)                      │
 ├─────────────────────────────────────────────────────────────┤

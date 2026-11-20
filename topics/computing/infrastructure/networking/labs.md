@@ -129,7 +129,7 @@ ss -ti state established | awk '/retrans/ && $0 !~ /retrans:0/'
 
 Annotated output breakdown:
 
-```
+```text
 Netid State Recv-Q Send-Q  Local Address:Port  Peer Address:Port
 tcp   ESTAB  0      0       192.168.1.5:54312  93.184.216.34:443
 

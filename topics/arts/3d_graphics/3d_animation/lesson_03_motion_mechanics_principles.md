@@ -76,7 +76,7 @@ Arc trajectories emerge from coordinating multiple interpolation curves across o
 
 Physics simulation replaces keyframe interpolation with numerical integration of differential equations governing force accumulation and constraint satisfaction. The simulation loop executes each frame through discrete time steps, typically subdivided into multiple solver iterations for stability. Each particle or rigid body maintains state vectors encoding position, velocity, and acceleration in three-dimensional space, plus orientation quaternions and angular velocity for rotational dynamics. The force accumulator sums gravitational attraction, spring tension, drag resistance, and user-applied forces, then divides by mass to compute acceleration according to Newton's second law. The integrator—commonly a semi-implicit Euler or fourth-order Runge-Kutta method—updates velocity by the acceleration increment scaled by the timestep duration, then updates position by the velocity increment. Collision detection algorithms identify interpenetrating geometry, generating constraint forces that redirect velocity vectors to resolve overlaps while conserving momentum.
 
-```
+```text
 Physics Simulation Loop (per frame, subdivided timesteps):
 
 FOR each substep dt:

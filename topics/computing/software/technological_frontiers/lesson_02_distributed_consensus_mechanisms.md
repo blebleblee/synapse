@@ -28,7 +28,7 @@ Proof-of-work implements eventual consistency through the longest-chain rule. Wh
 
 The concrete execution flow proceeds through block construction, proof-of-work mining, and chain reorganization. A miner aggregates pending transactions into a candidate block, computes a Merkle root over the transaction set, and references the previous block hash to maintain chain integrity. The mining loop increments a nonce field and computes:
 
-```
+```text
 hash = SHA256(SHA256(version || prev_hash || merkle_root || timestamp || difficulty || nonce))
 ```
 
@@ -44,7 +44,7 @@ Slashing conditions enforce protocol rules through economic penalties. Validator
 
 The concrete validator workflow proceeds through beacon chain subscription, slot duties, and attestation aggregation. At the start of each epoch (32 slots), the beacon state pseudo-randomly assigns validators to committees and designates block proposers for each slot. When a validator's slot arrives, they retrieve the current head block using LMD GHOST, validate the beacon state transition, and broadcast an attestation containing:
 
-```
+```text
 Attestation {
     aggregation_bits: BitList[MAX_VALIDATORS_PER_COMMITTEE],
     data: AttestationData {
@@ -84,7 +84,7 @@ Quorum-based consensus protocols generalize voting to flexible quorum intersecti
 
 The vector clock mechanism tracks causality without coordination. Each process maintains a vector of logical timestamps, incrementing its own counter on every local event and merging received vectors on message receipt. A vector timestamp $V_a$ happens before $V_b$ if $V_a[i] \leq V_b[i]$ for all $i$ and $V_a \neq V_b$—all of A's observed events occurred before B's observation of them. When timestamps are incomparable (neither happened before the other), the events are concurrent—neither causally influenced the other. This partial order enables systems to distinguish genuine conflicts from causally ordered updates, deferring conflict resolution to application logic while preserving causal consistency.
 
-```
+```text
 Process P1:
     V1 = [0, 0, 0]
     local_write()

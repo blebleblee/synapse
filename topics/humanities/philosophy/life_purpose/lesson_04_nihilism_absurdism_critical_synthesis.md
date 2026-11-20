@@ -26,7 +26,7 @@ This question opens the space for synthesis frameworks that attempt to honor bot
 
 To visualize the logical territory, it helps to map the core positions as a decision tree structured around two independent variables: (1) whether cosmic purpose exists, and (2) whether subjective purpose has value. This produces a logical landscape we can then navigate.
 
-```
+```text
                     Cosmic Purpose Exists?
                     /                    \
                   YES                      NO
@@ -50,7 +50,7 @@ The hybrid frameworks attempt to reconcile these through what we might call the 
 
 Consider the following model of purpose-evaluation, which attempts to capture how advanced practitioners might assess whether a chosen purpose is worth sustained commitment:
 
-```
+```text
 Purpose Evaluation Framework
 ┌────────────────────────────────────────────────────────────────┐
 │ Dimension 1: Phenomenological Authenticity                     │

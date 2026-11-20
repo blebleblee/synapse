@@ -8,20 +8,20 @@ Modern distributed systems operate in a permanent state of partial failure. The 
 
 The mathematical foundation of reliability engineering begins with the exponential failure distribution. If a component has a constant hazard rate λ (failures per unit time), the probability that it survives beyond time t follows:
 
-```
+```text
 P(T > t) = e^(-λt)
 ```
 
 The mean time to failure is MTTF = 1/λ. For systems composed of n independent components arranged in series (where any single component failure causes total system failure), the combined failure rate is:
 
-```
+```text
 λ_sys = Σ λ_i   for i = 1..n
 MTTF_sys = 1 / λ_sys = 1 / (Σ λ_i)
 ```
 
 This inverse relationship is the core argument for redundancy. Adding more components—more microservices, more network hops, more intermediate caches—increases failure probability unless each component achieves dramatically higher individual reliability. For components in parallel (where all must fail before the system fails), the system reliability is the product of individual unreliabilities:
 
-```
+```text
 R_parallel(t) = 1 - Π (1 - R_i(t))   for i = 1..n
 ```
 
@@ -43,7 +43,7 @@ Each additional nine requires roughly an order-of-magnitude investment in redund
 
 The M/M/1 queue—a single server with Poisson arrivals at rate λ and exponentially distributed service times at rate μ—produces one of the most important results in capacity planning. The utilization factor is ρ = λ/μ, and average queue length is:
 
-```
+```text
 E[N] = ρ / (1 - ρ)
 ```
 

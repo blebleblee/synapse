@@ -34,7 +34,7 @@ STANDBY or SHUTDOWN modes represent the deepest sleep states where only the back
 
 Dynamic voltage and frequency scaling manifests through programmable clock dividers and adjustable voltage regulator output taps controlled via configuration registers. The clock tree architecture follows a hierarchical distribution model where a primary oscillator—either an internal RC ring oscillator (less accurate but lower power) or an external crystal oscillator (high accuracy at higher quiescent cost)—feeds into a phase-locked loop multiplier that synthesizes the core clock frequency. This core clock then fans out through prescalers to peripheral bus domains: the AHB (Advanced High-performance Bus) supplying CPU, DMA, and memory controllers; the APB1 and APB2 (Advanced Peripheral Bus) feeding timers, communication interfaces, and analog peripherals at potentially reduced frequencies to minimize peripheral power while maintaining core throughput.
 
-```
+```text
 Primary Oscillator (HSI/HSE)
     │
     ├──> PLL (×N, ÷M) ──> PLL Output (up to 120MHz for STM32L4)

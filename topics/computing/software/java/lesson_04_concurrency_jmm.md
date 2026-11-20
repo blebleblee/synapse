@@ -52,7 +52,7 @@ When threads contend for a lock but hold it only briefly, the JVM escalates to a
 
 The mark word of an object on a 64-bit HotSpot JVM is a 64-bit field whose layout shifts depending on lock state:
 
-```
+```text
 Unlocked:   [hashcode:31 | age:4 | bias_flag:1 | 00]
 Biased:     [thread_id:54 | epoch:2 | age:4 | 1 | 01]
 Thin lock:  [lock_record_ptr:62 | 00]

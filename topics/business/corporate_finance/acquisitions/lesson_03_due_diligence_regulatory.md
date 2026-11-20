@@ -36,7 +36,7 @@ Working capital diligence focuses on the target's operating cycle, measuring the
 
 The working capital adjustment calculation follows a standardized formula:
 
-```
+```text
 Purchase Price Adjustment = (Closing Working Capital - Working Capital Peg) + (Closing Cash - Minimum Cash) - (Closing Debt - Assumed Debt) + Other Adjustments
 
 Where:
@@ -60,7 +60,7 @@ Regulatory approval processes follow jurisdiction-specific procedural requiremen
 
 The HHI calculation sums the squared market shares of all competitors in the relevant market:
 
-```
+```text
 HHI = Σ(Market Share_i)²
 
 For example, a market with five competitors holding market shares of 30%, 25%, 20%, 15%, and 10%:

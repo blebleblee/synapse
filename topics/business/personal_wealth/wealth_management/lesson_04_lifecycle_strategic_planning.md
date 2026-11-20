@@ -30,7 +30,7 @@ The foundation begins with explicit liability mapping. Most households think abo
 
 This disaggregation transforms abstract retirement planning into concrete liability schedules. A spreadsheet capturing these timings becomes the master reference:
 
-```
+```text
 Goal                    | Start Year | End Year | Annual Amount | Total Needed | Current Funding
 College Year 1 (Child A)| 2033       | 2037     | 30,000        | 120,000      | 45,000
 College Year 1 (Child B)| 2035       | 2039     | 30,000        | 120,000      | 32,000
@@ -46,7 +46,7 @@ Lifecycle allocation operates across three time dimensions: the investor's age c
 
 A more granular framework employs explicit glide paths. Rather than a single static allocation, the portfolio follows a predetermined trajectory that automatically shifts more conservative as the investor ages or as each liability approaches. A 35-year-old targeting retirement at 65 might follow this glide path:
 
-```
+```text
 Age   | Years to Retirement | Equity % | Fixed Income % | Alternatives %
 35    | 30                  | 85       | 10             | 5
 40    | 25                  | 80       | 12             | 8
@@ -138,7 +138,7 @@ This mechanical discipline—withdraw from appreciated assets, avoid selling dep
 
 A practical distribution algorithm operates as follows:
 
-```
+```text
 Annual Withdrawal Algorithm:
 
 1. Calculate required withdrawal: $100,000

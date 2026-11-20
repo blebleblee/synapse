@@ -22,7 +22,7 @@ The directionality of wood grain introduces two additional invariants that overr
 
 Understanding how a blade's macro-geometry converts rotational power into linear cutting action requires tracing the signal path from motor spindle to chip ejection. The following diagram maps that flow for a standard carbide-tipped table saw blade.
 
-```
+```text
 Motor Torque (N·m)
         │
         ▼
@@ -72,7 +72,7 @@ The relationship between cutting circle diameter and chip geometry adds another 
 
 In router operations, the same first principles apply but the geometry is fully three-dimensional. A straight two-flute bit and an upcut spiral bit have nearly identical cross-sectional profiles, but their chip evacuation behavior could not be more different. The upcut spiral's helical flutes pull chips upward and out of the cut — ideal for through-cuts in solid wood where the top surface is the finished face, since chip evacuation prevents re-cutting of swarf. However, that upward thrust also lifts the workpiece fibers just ahead of the cutting zone, creating tearout on the top face. The **downcut spiral** pushes chips downward, holding fibers in compression as they are cut and producing a clean top face — the right choice for spoilboard work and veneered panels where the top surface must remain pristine. The **compression spiral**, which runs an upcut geometry on the lower half and a downcut geometry on the upper half, is the production solution for routing through 3/4-inch veneered MDF: it cleans both faces simultaneously by shearing the bottom fibers upward and the top fibers downward, meeting in the middle of the substrate.
 
-```
+```text
 Router Bit Helix Comparison (cross-section view, cutting in X):
 
   Upcut Spiral:          Downcut Spiral:        Compression:

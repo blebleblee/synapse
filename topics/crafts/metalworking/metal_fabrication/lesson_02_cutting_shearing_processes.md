@@ -77,7 +77,7 @@ Hydraulic ironworkers represent the most versatile mechanical cutting platform i
 
 The calculation of required shearing force must account for material shear strength, thickness, and blade geometry. For a guillotine shear with raked blade cutting mild steel with ultimate shear strength τ_u = 60,000 psi:
 
-```
+```text
 F_max = τ_u × t × L × K
 
 where:
@@ -131,7 +131,7 @@ The standoff distance between nozzle face and workpiece critically affects cut q
 
 Kerf width in plasma cutting exhibits a characteristic taper with the narrowest dimension at the top surface where the plasma column enters the material. This angularity, quantified as bevel angle, results from the plasma jet's natural divergence as it penetrates through the material thickness and loses energy to conduction and radiation. The bevel angle θ can be estimated from cutting current, gas flow rate, and material thickness:
 
-```
+```text
 θ ≈ arctan((k_b × I) / (v × t × √P_gas))
 
 where:
@@ -151,7 +151,7 @@ Fiber lasers replace gas-filled resonator tubes with rare-earth-doped silica fib
 
 The focusing optics must achieve diffraction-limited performance across the full working range of material thicknesses and beam powers. A plano-convex zinc-selenide lens with 5.0-inch focal length represents the standard for CO₂ systems, providing a focused spot diameter of approximately 0.008 inches at the focal point. The depth of focus—the range over which spot size remains within tolerance—follows from Rayleigh range calculations:
 
-```
+```text
 DOF = 2 × z_R = (π × w₀²) / λ
 
 where:
@@ -183,7 +183,7 @@ When edge quality degrades, systematic diagnosis proceeds through a decision tre
 
 Plasma cutting optimization balances three competing objectives: maximum traverse speed, minimal edge bevel, and low dross adhesion. The fundamental constraint arises from the finite thermal energy available from the arc; this energy must heat material to melting temperature, provide the enthalpy of fusion, and overcome conductive losses into the surrounding material. These energy flows establish a maximum theoretical cutting speed:
 
-```
+```text
 v_max = (η × P_arc) / (ρ × t × w_k × (C_p × ΔT + H_f))
 
 where:

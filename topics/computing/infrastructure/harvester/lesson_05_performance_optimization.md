@@ -10,7 +10,7 @@ Longhorn is a cloud-native distributed block storage system built for Kubernetes
 
 Longhorn's Engine synchronously mirrors every write to all healthy replicas before acknowledging the write to the caller. This is a **synchronous, multi-replica write quorum** identical in semantics to the "chain replication" or "primary-backup" model. The practical consequence is that **write latency is bounded below by the slowest replica**, not the average. For a volume with three replicas spread across three nodes:
 
-```
+```text
 write_latency ≥ max(RTT_replica_1, RTT_replica_2, RTT_replica_3) + disk_fsync_time
 ```
 
@@ -241,7 +241,7 @@ ping -M do -s 8972 <replica-node-ip>
 
 **TCP buffer sizing.** The default Linux TCP send/receive buffers (87 KiB) are too small for high-bandwidth, low-latency storage traffic. The Bandwidth-Delay Product (BDP) formula determines the minimum useful buffer size:
 
-```
+```text
 BDP = bandwidth_bps × RTT_seconds
 # Example: 10 Gbps link, 100 µs RTT
 BDP = 10,000,000,000 × 0.0001 = 1,000,000 bytes ≈ 1 MiB

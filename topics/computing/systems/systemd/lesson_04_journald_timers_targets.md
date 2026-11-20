@@ -157,7 +157,7 @@ Calendar expressions follow a pattern of `DayOfWeek Year-Month-Day Hour:Minute:S
 systemd-analyze calendar "Mon *-*-* 02:00:00"
 ```
 
-```
+```text
   Original form: Mon *-*-* 02:00:00
 Normalized form: Mon *-*-* 02:00:00
     Next elapse: Mon 2025-01-13 02:00:00 CET
@@ -171,7 +171,7 @@ The `systemd-analyze timespan` command parses and normalizes time span expressio
 systemd-analyze timespan "1d 6h 30min"
 ```
 
-```
+```text
 Original: 1d 6h 30min
 μs: 109800000
 Human: 1d 6h 30min
@@ -241,7 +241,7 @@ The `systemd-analyze` tool suite provides visibility into the boot transaction. 
 systemd-analyze blame
 ```
 
-```
+```text
          8.123s plymouth-quit-wait.service
          4.567s dev-mapper-root.device
          2.891s systemd-udevd.service
@@ -396,7 +396,7 @@ The `systemctl --failed` command lists all units in the `failed` state:
 systemctl --failed
 ```
 
-```
+```text
   UNIT                     LOAD   ACTIVE SUB    DESCRIPTION
 ● postgresql.service       loaded failed failed PostgreSQL RDBMS
 ● networking.service       loaded failed failed Raise network interfaces
@@ -414,7 +414,7 @@ The `systemctl status` command for a failed unit shows the last 10 log lines and
 systemctl status postgresql.service
 ```
 
-```
+```text
 ● postgresql.service - PostgreSQL RDBMS
      Loaded: loaded (/lib/systemd/system/postgresql.service; enabled)
      Active: failed (Result: exit-code) since Mon 2025-01-13 09:42:01 UTC; 3min ago
@@ -434,7 +434,7 @@ For deeper boot transaction analysis, the `systemctl list-jobs` command shows th
 systemctl list-jobs
 ```
 
-```
+```text
 JOB UNIT                        TYPE  STATE
 1234 postgresql.service         start waiting
 1235 pg-backup.service           start waiting
@@ -459,7 +459,7 @@ The `journalctl --list-boots` command shows every boot session recorded in the j
 journalctl --list-boots
 ```
 
-```
+```text
 IDX    BOOT ID             FIRST ENTRY                 LAST ENTRY
 -3     a1b2c3d4e5f6...     Mon 2025-01-10 08:00:01      Mon 2025-01-10 18:42:33
 -2     b2c3d4e5f6a1...     Tue 2025-01-11 08:01:12      Tue 2025-01-11 19:01:45

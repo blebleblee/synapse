@@ -28,7 +28,7 @@ The document object model in Microsoft Word represents each document as a hierar
 
 Within each section, the `Body` object contains a `Paragraphs` collection, where each `Paragraph` represents a semantic unit terminated by a carriage return character. Paragraphs carry formatting through two mechanisms: direct formatting applied to the paragraph object itself, and inherited formatting cascaded from associated `Style` objects. The style system implements a two-tier hierarchy—paragraph styles governing block-level formatting like alignment, spacing, and indentation, and character styles applying to inline spans within paragraphs. This separation allows precise typographic control: a paragraph might use the "Body Text" style for overall structure while applying the "Emphasis" character style to specific phrases.
 
-```
+```text
 Document
 ├── Sections [Collection]
 │   └── Section

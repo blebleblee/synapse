@@ -58,7 +58,7 @@ The SAD maintains per-flow cryptographic state indexed by the tuple (destination
 
 The IPsec ESP header structure reflects these operational requirements through a carefully designed format optimized for both security and processing efficiency:
 
-```
+```text
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

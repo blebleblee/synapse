@@ -34,7 +34,7 @@ UV coordinate generation determines which texture pixels map to each surface poi
 
 Examining the data flow within a projection operation clarifies the coordinate transformation chain. World-space vertex positions undergo transformation into the projection gizmo's local coordinate system, then project onto the chosen geometric primitive (plane, cylinder, sphere). The resulting 2D coordinates normalize into the 0-to-1 range regardless of gizmo scale, ensuring that texture mapping remains independent of scene units. This normalization explains why adjusting gizmo size changes texture scale rather than UV values directly—the projection calculations incorporate gizmo dimensions as denominators in the coordinate conversion.
 
-```
+```text
 Projection Pipeline:
 Vertex World Position (X, Y, Z)
          ↓

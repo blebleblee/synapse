@@ -40,7 +40,7 @@ Cash from investing activities captures capital expenditures, proceeds from asse
 
 Cash from financing activities includes proceeds from debt issuance, repayment of debt principal, proceeds from equity issuance, repurchase of shares, and payment of dividends. Borrowing is a source, repayment is a use. Equity raises are sources, buybacks and dividends are uses. The sum yields net cash provided by or used in financing activities. Adding the three category subtotals produces the net increase or decrease in cash for the period. Adding this net change to the beginning cash balance yields the ending cash balance, which must match the cash line on the period-end balance sheet.
 
-```
+```text
 Accounting Equation: Assets = Liabilities + Equity
 
 Balance Sheet Snapshot (Period End):

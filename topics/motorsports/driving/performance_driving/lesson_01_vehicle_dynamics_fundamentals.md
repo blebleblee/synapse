@@ -58,7 +58,7 @@ A limited-slip differential addresses this limitation by introducing a torque bi
 
 The interaction between these subsystems can be visualized through a force flow diagram. Driver steering input generates slip angles at the front tires, producing lateral forces that create a yaw moment. The yaw moment rotates the chassis, which in turn induces slip angles at the rear tires, producing rear lateral forces. The balance between front and rear lateral forces determines whether the car understeers, oversteers, or neutrally steers. Simultaneously, the lateral acceleration creates a rolling moment that transfers load from inside tires to outside tires, modulated by the suspension roll stiffness distribution. The suspension kinematics convert this roll motion into camber changes and contact patch orientation shifts, which feedback into the tire force generation. Finally, the dampers control the transient rates of all these processes, determining how quickly the car settles into steady-state cornering or responds to a mid-corner correction.
 
-```
+```text
 Driver Steering Input
     ↓
 Front Tire Slip Angle (α_f)

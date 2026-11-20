@@ -20,7 +20,7 @@ Three additional invariants structure the problem space. First, the **feasibilit
 
 The debate over global justice can be mapped along several axes, each of which generates distinct positions, and each position's power lies in how it answers a specific set of generative questions. We can visualize this conceptual architecture as a decision tree, where answers at each node cascade into downstream commitments.
 
-```
+```text
 Global Justice Architecture
 ├── Scope Question: Does justice apply globally?
 │   ├── YES → Cosmopolitanism branch

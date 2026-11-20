@@ -218,7 +218,7 @@ Implementation requires discrete Fourier transforms over spatial grid with $N$ p
 
 Pseudocode for split-operator propagation:
 
-```
+```text
 Initialize: psi(x,0), spatial grid x[N], time step dt
 For each time step:
     1. Apply potential evolution (position space):

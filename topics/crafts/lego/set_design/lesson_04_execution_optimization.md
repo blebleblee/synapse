@@ -24,7 +24,7 @@ In candidate selection, the designer works in a digital environment — primaril
 
 Availability validation should produce a tiered classification for every part in your design. Tier 1 parts are in active LEGO production and appear in multiple current retail sets — these carry zero sourcing risk. Tier 2 parts are recently retired but appear in high enough quantities across BrickLink stores (typically 1,000+ units) that a small production run remains viable. Tier 3 parts are rare, expensive per-unit, or geographically concentrated in a single regional market — these should be flagged for substitution unless they are truly irreplaceable to the design's function. Any design submitted for IDEAS review or produced as an independent MOC kit should ideally carry fewer than 5% Tier 3 parts by count.
 
-```
+```text
 Parts Inventory Validation Flow
 ─────────────────────────────────────────────────────────────
   Studio 2.0 Design
@@ -60,7 +60,7 @@ A well-structured build sequence is not simply a recording of how you *happened*
 
 The standard professional approach is to map the build sequence using what experienced designers call a **dependency graph** — an informal diagram showing which subassemblies must exist before other subassemblies can be attached. This graph reveals the critical path of your build, which is always the longest chain of dependent subassemblies. Shortening the critical path by enabling parallel subassembly construction (the left landing gear and the right landing gear built simultaneously before attachment to the fuselage, for example) dramatically improves the building experience, because it creates natural rest points and variety rather than a monotonous single-thread progression.
 
-```
+```text
 Dependency Graph Example: Vehicle Chassis Build
 ─────────────────────────────────────────────────────────────
   [Baseplate Frame]

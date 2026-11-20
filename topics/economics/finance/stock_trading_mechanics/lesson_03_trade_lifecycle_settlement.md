@@ -48,7 +48,7 @@ The trade lifecycle architecture spans multiple organizational boundaries and te
 
 Immediately after a trade executes on an exchange or alternative trading venue, the execution venue sends trade reports to both the buy-side and sell-side parties, typically through the FIX protocol. The FIX ExecutionReport message contains key-value pairs specifying the security identifier, quantity, execution price, trade timestamp, and unique execution identifiers. For an institutional trade, this message routes from the execution venue to the sell-side broker's order management system, and from there to the buy-side client's order management or portfolio management system.
 
-```
+```text
 Execution Venue (Exchange/ATS)
          |
          | FIX ExecutionReport
@@ -91,7 +91,7 @@ The optimization problem can be formulated as a maximum flow problem on a direct
 
 When the optimization identifies a feasible settlement set, the depository executes the atomic update: securities ownership records change hands in the depository's ledger, and corresponding cash debits and credits post to settlement accounts. This update is irreversible once committed. If insufficient liquidity exists to settle all obligations, the unsettled trades remain in a pending state and may participate in subsequent settlement cycles later the same day or on the next business day, depending on the market's operating procedures.
 
-```
+```text
 Settlement Day T+2 Timeline (US Equity Market):
 
 09:00 - 11:30:  Input window for settlement instructions

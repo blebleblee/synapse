@@ -11,7 +11,7 @@ Two things matter for intuition, and you can stop there:
 
 One formula worth internalizing because it changes how you read a compressor's GUI:
 
-```
+```text
 Gain Reduction (dB) = (Input Level - Threshold) × (1 - 1/Ratio)     [above threshold only]
 ```
 

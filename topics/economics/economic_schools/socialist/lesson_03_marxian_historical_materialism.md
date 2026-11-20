@@ -40,7 +40,7 @@ Crisis theory synthesizes these dynamics into periodic ruptures. Overaccumulatio
 
 The reproduction schemas in *Capital* Volume II formalize the inter-sectoral dynamics of accumulation. Marx divided the economy into Department I (means of production) and Department II (wage goods). Balanced reproduction requires that Department I surplus value plus variable capital equals Department II constant capital replacement demand, $s_I + v_I = c_{II}$. Expanded reproduction—accumulation rather than simple replacement—requires surplus value division between capitalist consumption and reinvestment, with precise proportionality conditions between sectors to avoid disproportionality crises. These schemas remain mechanical and abstract but establish the principle that capitalist coordination through anarchic market competition generates systematic imbalances, as no mechanism ensures sectoral outputs align with inter-industry demand.
 
-```
+```text
 CIRCUIT OF CAPITAL VALORIZATION
 
 M (money capital) 

@@ -40,7 +40,7 @@ $$M_{R^+} = M_R \lor M_R^2 \lor M_R^3 \lor \cdots \lor M_R^n$$
 
 where $M_R^k$ is the $k$-fold Boolean matrix product and $n = |A|$ suffices because any path longer than $n$ in a graph on $n$ vertices must revisit a vertex and thus contains a cycle whose intermediate segment can be removed. This leads directly to **Warshall's algorithm**, which computes $M_{R^+}$ in $O(n^3)$ time by iteratively relaxing intermediate vertices:
 
-```
+```text
 for k in 1..n:
     for i in 1..n:
         for j in 1..n:
@@ -121,7 +121,7 @@ The prototypical example is the power set $\mathcal{P}(S)$ ordered by inclusion 
 
 A **Hasse diagram** is a graphical representation of a finite poset that strips away reflexivity and transitivity, drawing only the **cover relations**: $a$ is covered by $b$ (written $a \prec b$) if $a < b$ and there is no $c$ with $a < c < b$. The diagram places $b$ above $a$ and connects them with a line. For the divisibility poset on $\{1, 2, 3, 4, 6, 12\}$:
 
-```
+```text
          12
         /  \
        4    6

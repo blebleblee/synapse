@@ -45,7 +45,7 @@ where h is the measurement model, H_k is its Jacobian, and R_k is the measuremen
 
 The temporal synchronization of quantum and classical sensors presents a critical challenge. The CSAC provides a 1 pulse-per-second (1PPS) reference with timing jitter below 1 nanosecond, disciplining a local GPS-style timescale. Each sensor timestamps its measurements relative to this reference, enabling the EKF to correctly sequence and fuse asynchronous data. The latency compensation is essential: the cold-atom gyroscope's 100 millisecond interrogation time means its measurement reflects the average rotation rate over the past integration period, not the instantaneous rate at the timestamp. The EKF must therefore back-propagate the state estimate to the effective measurement time, apply the update, and forward-propagate to the current time.
 
-```
+```text
 Cold-Atom Gyroscope Data Flow:
 
 ┌─────────────────────────────────────────────────┐

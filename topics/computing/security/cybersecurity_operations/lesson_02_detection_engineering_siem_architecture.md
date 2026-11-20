@@ -46,13 +46,13 @@ Parsing failures introduce a critical failure mode: when an event does not match
 
 Field extraction employs named capture groups in regular expressions or structured parsing libraries. Consider a parsing rule for an SSH authentication failure log:
 
-```
+```text
 Failed password for invalid user admin from 203.0.113.45 port 54321 ssh2
 ```
 
 The parser applies a regular expression with named groups:
 
-```
+```text
 ^Failed password for invalid user (?<username>\S+) from (?<source_ip>\d+\.\d+\.\d+\.\d+) port (?<source_port>\d+)
 ```
 
@@ -86,13 +86,13 @@ Detection rule logic encodes the core intellectual property of a security operat
 
 Consider a rule detecting credential dumping via the Windows LSASS process. A naive rule might match exact process names:
 
-```
+```text
 process.name == "mimikatz.exe"
 ```
 
 An attacker evades this by renaming the binary. A more robust rule matches process access patterns:
 
-```
+```text
 process.name != "lsass.exe" AND
 process.accessed_memory_region(target="lsass.exe") AND
 process.access_rights CONTAINS "PROCESS_VM_READ"

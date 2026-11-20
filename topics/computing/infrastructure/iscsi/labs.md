@@ -26,7 +26,7 @@ The first operational discipline is passive state inspection: reading kernel dat
 
 Begin by discovering available targets from the known storage appliance. Execute `iscsiadm --mode discovery --type sendtargets --portal 192.168.100.10`. The `sendtargets` discovery method queries the target's TCP port 3260 (the default iSCSI port) and retrieves a list of available IQNs and portal addresses. The output resembles:
 
-```
+```text
 192.168.100.10:3260,1 iqn.2025-01.com.storage:san.array01
 192.168.101.10:3260,1 iqn.2025-01.com.storage:san.array01
 ```
@@ -35,7 +35,7 @@ Each line specifies a portal address, a TPGT (Target Portal Group Tag, here `1`)
 
 Log in to the target via the primary portal with `iscsiadm --mode node --targetname iqn.2025-01.com.storage:san.array01 --portal 192.168.100.10:3260 --login`. The initiator daemon establishes a TCP connection, performs iSCSI Full Feature Phase negotiation, and transitions the session to the logged-in state. Upon successful login, the kernel's SCSI mid-layer enumerates attached LUNs and creates corresponding block devices in `/dev/`. Observe kernel messages in real time with `journalctl -kf` or `dmesg -w`. You should see:
 
-```
+```text
 scsi host3: iSCSI Initiator over TCP/IP
 scsi 3:0:0:0: Direct-Access     VENDOR   MODEL            REV  PQ: 0 ANSI: 5
 sd 3:0:0:0: [sdc] 209715200 512-byte logical blocks: (107 GB/100 GiB)
@@ -47,13 +47,13 @@ sd 3:0:0:0: [sdc] Attached SCSI disk
 
 The SCSI address `3:0:0:0` decodes as `host:channel:target:lun`. Here, host 3 corresponds to the iSCSI HBA (Host Bus Adapter) emulated by the kernel module, channel 0 is unused in iSCSI, target 0 represents the target IQN, and LUN 0 is the first logical unit. The block device name `sdc` is assigned dynamically; use `lsscsi` to establish a stable SCSI-to-device mapping:
 
-```
+```text
 lsscsi
 ```
 
 Output:
 
-```
+```text
 [3:0:0:0]    disk    VENDOR   MODEL            REV   /dev/sdc
 [3:0:0:1]    disk    VENDOR   MODEL            REV   /dev/sdd
 ```
@@ -62,7 +62,7 @@ LUN 1 appears as `/dev/sdd`. These device names are kernel-assigned and may chan
 
 Inspect active iSCSI sessions with `iscsiadm --mode session`. The output lists each active session by target IQN and portal:
 
-```
+```text
 tcp: [1] 192.168.100.10:3260,1 iqn.2025-01.com.storage:san.array01 (non-flash)
 ```
 
@@ -72,7 +72,7 @@ Critical parameters include `node.session.timeo.replacement_timeout`, which defi
 
 Examine the TCP connection state underlying the iSCSI session with `ss -tnp | grep :3260`. The output shows established TCP sessions between the initiator's ephemeral port and the target's port 3260:
 
-```
+```text
 ESTAB  0      0      192.168.100.50:47832  192.168.100.10:3260   users:(("iscsid",pid=1234,fd=8))
 ```
 
@@ -86,7 +86,7 @@ Log in to the secondary portal to establish a second session: `iscsiadm --mode n
 
 Enable device-mapper multipath to aggregate paths. Edit `/etc/multipath.conf` to define the storage array's device characteristics. A minimal configuration for the lab target:
 
-```
+```text
 defaults {
     user_friendly_names yes
     find_multipaths yes
@@ -113,7 +113,7 @@ The `path_grouping_policy multibus` directive places all paths in a single activ
 
 Restart the multipath daemon with `systemctl restart multipathd.service`. The daemon scans existing SCSI devices, identifies those with matching WWIDs across multiple paths, and creates aggregate multipath devices in `/dev/mapper/`. Query the multipath topology with `multipath -ll`. The output displays a tree structure:
 
-```
+```text
 mpatha (36001405abcdef1234567890abcdef12) dm-0 VENDOR,MODEL
 size=100G features='1 queue_if_no_path' hwhandler='0' wp=rw
 |-+- policy='service-time 0' prio=1 status=active
@@ -128,7 +128,7 @@ Verify that I/O to the mounted filesystem generates traffic on both network path
 
 Inspect the device-mapper table for `mpatha` with `dmsetup table mpatha`. The output is a space-separated list of sector ranges and target specifications:
 
-```
+```text
 0 209715200 multipath 2 0 1 1 service-time 0 2 1 8:32 1 1 8:64 1
 ```
 
@@ -136,7 +136,7 @@ This cryptic line decodes as: starting at sector 0, covering 209715200 sectors (
 
 Query per-path I/O statistics with `dmsetup status mpatha`. The output includes each path's current state, I/O count, and failure count:
 
-```
+```text
 0 209715200 multipath 2 0 1 1 1 8:32 A 0 1 0 8:64 A 0
 ```
 
@@ -156,7 +156,7 @@ Install `fio` (Flexible I/O Tester), the industry-standard block I/O benchmark: 
 
 Begin with a sequential write saturation test to establish maximum throughput. Create a fio job file `/tmp/iscsi_seq_write.fio`:
 
-```
+```text
 [global]
 ioengine=libaio
 direct=1
@@ -174,7 +174,7 @@ numjobs=4
 
 This job spawns four threads, each issuing asynchronous I/O (`libaio`) with a queue depth of 32 against the multipath device. The `direct=1` flag bypasses the page cache, ensuring I/O reaches the iSCSI layer. The 1 MB block size (`bs=1m`) maximizes per-I/O efficiency by amortizing protocol overhead across large transfers. Execute with `fio /tmp/iscsi_seq_write.fio`. The output reports aggregate bandwidth, IOPS (I/O Operations Per Second), and latency distribution:
 
-```
+```text
   write: IOPS=950, BW=950MiB/s (996MB/s)(55.7GiB/60001msec)
     slat (usec): min=12, max=2340, avg=45.3, stdev=78.2
     clat (msec): min=8, max=234, avg=134.5, stdev=23.4
@@ -191,7 +191,7 @@ Isolate network latency by measuring unloaded RTT with `ping -c 100 192.168.100.
 
 Test random read IOPS, which stress the target's ability to handle concurrent small-block requests. Create `/tmp/iscsi_rand_read.fio`:
 
-```
+```text
 [global]
 ioengine=libaio
 direct=1
@@ -231,7 +231,7 @@ Begin by establishing a steady-state I/O workload. Start a long-running fio job:
 
 Inject a network partition by disabling one interface. Identify which interface corresponds to the primary iSCSI session with `ip route get 192.168.100.10`. If the output shows `dev eth1`, then `eth1` carries the primary path. Disable it: `ip link set dev eth1 down`. Within seconds, observe kernel messages indicating connection loss:
 
-```
+```text
 connection1:0: detected conn error (1011)
 session1: session recovery timed out after 15 secs
 sd 3:0:0:0: rejecting I/O to offline device
@@ -239,7 +239,7 @@ sd 3:0:0:0: rejecting I/O to offline device
 
 The connection error code `1011` corresponds to `ISCSI_ERR_CONN_FAILED`. The session recovery timer (`node.session.timeo.replacement_timeout`, default 120 seconds) begins counting. During this window, the multipath layer redirects I/O to the surviving path on `eth2`. Verify with `multipath -ll`:
 
-```
+```text
 mpatha (36001405...) dm-0 VENDOR,MODEL
 |-+- policy='service-time 0' prio=1 status=enabled
 | `- 3:0:0:0 sdc 8:32 failed faulty offline
@@ -255,7 +255,7 @@ Inject a target-side fault by simulating a controller reboot. If you control the
 
 During this dual-path failure, the multipath device's `queue_if_no_path` feature (configured in Exercise 1) queues I/O requests internally rather than failing them immediately. Verify by checking `dmsetup status mpatha`:
 
-```
+```text
 0 209715200 multipath 2 0 0 0 0 8:32 F 0 0 8:64 F 0
 ```
 
@@ -269,7 +269,7 @@ Test the initiator daemon's resilience by killing the `iscsid` process. Execute 
 
 Simulate a SCSI command timeout by suspending the target's response processing. This is difficult to achieve without target-side instrumentation, but you can approximate it by introducing extreme latency with `tc qdisc add dev eth1 root netem delay 5000ms`. This adds a 5-second delay to all packets, exceeding the typical SCSI command timeout (`node.session.timeo.replacement_timeout` divided by the number of retry attempts). The kernel logs SCSI command timeouts:
 
-```
+```text
 sd 3:0:0:0: [sdc] tag#12 FAILED Result: hostbyte=DID_TIME_OUT driverbyte=DRIVER_OK
 sd 3:0:0:0: [sdc] tag#12 CDB: Read(10) 28 00 00 12 34 56 00 00 08 00
 ```

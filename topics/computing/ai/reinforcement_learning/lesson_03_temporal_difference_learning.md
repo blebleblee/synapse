@@ -74,7 +74,7 @@ where $\mathbb{E}_{\pi}[Q(s',a') | s'] = \sum_{a'} \pi(a'|s') Q(s',a')$. For an 
 
 The architectural dataflow in a complete Q-learning system with experience replay proceeds as follows:
 
-```
+```text
 Environment Interaction Loop:
   s ← current state
   a ← ε-greedy(s; Q)

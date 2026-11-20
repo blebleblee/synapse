@@ -66,7 +66,7 @@ SACK blocks are encoded as (left edge, right edge) pairs in the TCP options fiel
 
 Retransmission timing is governed by the Retransmission Timeout (RTO). If a sent segment is not acknowledged within the RTO, TCP assumes it is lost and retransmits. The RTO is computed dynamically from Round Trip Time (RTT) samples using the algorithm from RFC 6298, which maintains a smoothed RTT estimate (SRTT) and a mean deviation (RTTVAR):
 
-```
+```text
 SRTT  = (1 - α) × SRTT + α × RTTsample     where α = 1/8
 RTTVAR = (1 - β) × RTTVAR + β × |SRTT - RTTsample|   where β = 1/4
 RTO   = SRTT + 4 × RTTVAR

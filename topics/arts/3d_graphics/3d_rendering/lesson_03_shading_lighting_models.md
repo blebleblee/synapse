@@ -30,7 +30,7 @@ The Phong model decomposes reflected light into three independent components: am
 
 The Phong equation in its complete form reads:
 
-```
+```text
 L_out = k_a * I_ambient + k_d * I_light * max(0, N·L) + k_s * I_light * max(0, R·V)^shininess
 ```
 
@@ -60,7 +60,7 @@ Computing the TBN matrix is a common source of confusion. The normal and tangent
 
 In the fragment shader, you read the normal map texture, convert from [0, 1] range to [-1, 1] range, and transform using the TBN matrix:
 
-```
+```text
 vec3 normal_tangent = texture(normalMap, uv).rgb * 2.0 - 1.0;
 vec3 normal_world = normalize(TBN * normal_tangent);
 ```

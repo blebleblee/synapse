@@ -26,7 +26,7 @@ Program execution begins when the scheduler's high-resolution timer—typically 
 
 Consider a concrete Function Block Diagram implementing a temperature control loop for an industrial oven. The diagram begins with an analog input block reading a thermocouple signal from address `%IW100`, scaling the raw 0–27648 integer value to a temperature range of 0–1200 degrees Celsius. This scaled temperature feeds into a PID controller block configured with proportional gain `Kp = 2.5`, integral time `Ti = 120 seconds`, and derivative time `Td = 30 seconds`. The PID block's output, a control signal ranging from 0–100%, drives a pulse-width modulation block that generates a duty cycle signal for a solid-state relay controlling the oven's heating element. The PWM block writes its digital output to address `%QX0.5` at the hardware I/O interface.
 
-```
+```text
 FUNCTION_BLOCK FB_TemperatureController
 VAR_INPUT
     ProcessVariable : REAL;       (* Current temperature in °C *)
@@ -78,7 +78,7 @@ Sequential Function Chart programs introduce a fundamentally different execution
 
 A practical SFC implementing an automated bottle filling station demonstrates these semantics. The sequence begins with an initial step `S0_Idle` waiting for a photoelectric sensor to detect a bottle presence. The transition `T0` guards against false triggers by requiring both `BottleSensor = TRUE` and a 200-millisecond debounce timer expiration. Step `S1_Position` activates a servo motor to align the fill nozzle, with transition `T1` checking for position feedback within tolerance. Step `S2_Fill` opens a solenoid valve and monitors a load cell, advancing to `S3_Retract` when the measured weight reaches the target fill quantity. The final step `S4_Complete` pulses an output signal to the downstream conveyor system before returning to `S0_Idle`.
 
-```
+```text
 (* Sequential Function Chart for Bottle Filling *)
 
 PROGRAM BottleFillingSequence

@@ -49,7 +49,7 @@ flowchart TD
 
 A professional visual composition relies on a mathematically disciplined grid structure to enforce rhythm and alignment across viewport resolutions:
 
-```
+```text
 [Margin: 24px] | [Col 1] (Gutter: 16px) [Col 2] ... [Col 12] | [Margin: 24px]
 Baseline Grid: 8px vertical baseline rhythm (8px, 16px, 24px, 32px, 48px)
 ```
@@ -65,7 +65,7 @@ $$S_n = S_{\text{base}} \cdot r^n$$
 
 Using a base size of $16\text{px}$ and a Perfect Fourth ratio ($r = 1.333$):
 
-```
+```text
 Level      Exponent   Calculated Size   Rounded Size   Line Height (8px grid)
 Caption    n = -1     12.00 px          12 px          16 px
 Body       n = 0      16.00 px          16 px          24 px

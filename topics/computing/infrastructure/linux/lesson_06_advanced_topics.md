@@ -86,7 +86,7 @@ Key controllers:
 
 Cgroup hierarchy example (v2):
 
-```
+```text
 /sys/fs/cgroup/
 ├── cgroup.controllers       (available controllers: cpu, memory, io, pids)
 ├── cgroup.subtree_control   (enabled controllers for children: +cpu +memory)
@@ -441,7 +441,7 @@ The **Out-of-Memory (OOM) killer** terminates processes when the system exhausts
 
 **OOM killer heuristic**:
 
-```
+```text
 oom_score = (total_vm_pages * 1000) / total_memory_pages
             + oom_score_adj
 ```

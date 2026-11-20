@@ -10,7 +10,7 @@ The kernel enforces strict architectural boundaries between these classes. A cha
 
 **Device Class Decision Matrix:**
 
-```
+```text
 ┌─────────────────┬──────────────┬─────────────┬──────────────┐
 │ Characteristic  │ Character    │ Block       │ Network      │
 ├─────────────────┼──────────────┼─────────────┼──────────────┤

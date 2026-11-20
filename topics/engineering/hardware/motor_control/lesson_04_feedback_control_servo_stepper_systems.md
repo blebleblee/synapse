@@ -27,7 +27,7 @@ Motion profiling—the generation of time-optimal position trajectories subject 
 
 The canonical feedback control loop for a servo motor system comprises five functional blocks: the trajectory generator, the PID compensator, the power stage (motor drive amplifier), the motor and mechanical load, and the feedback sensor. The trajectory generator outputs a time-varying position command and, optionally, velocity and acceleration feedforward terms. The compensator computes the error between commanded and actual position, applies PID gains, and sums feedforward terms to produce a torque or current command. The power stage converts this command into phase voltages or currents that drive the motor windings. The motor converts electrical power into mechanical torque, accelerating or decelerating the load inertia. The encoder or resolver measures the resulting shaft position and velocity, closing the loop.
 
-```
+```text
 ┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
 │   Trajectory    │       │  PID Controller │       │   Power Stage   │
 │   Generator     ├──────>│   + Feedforward ├──────>│  (H-Bridge or   │
@@ -54,7 +54,7 @@ In a discrete-time digital controller, the PID algorithm executes at fixed sampl
 
 The discrete-time PID equation in its textbook form is:
 
-```
+```text
 u[k] = Kp * e[k] + Ki * Ts * Σ(e[i]) + (Kd / Ts) * (e[k] - e[k-1])
 ```
 
@@ -62,7 +62,7 @@ where u[k] is the control output at sample k, e[k] is the error at sample k, and
 
 Velocity feedforward injects a term proportional to the commanded velocity directly into the control output, reducing the burden on the PID loop to track constant-velocity motion. Acceleration feedforward similarly adds a term proportional to commanded acceleration, compensating for inertial lag. The complete control law with feedforward becomes:
 
-```
+```text
 u[k] = Kp * e[k] + Ki * Ts * Σ(e[i]) + (Kd / Ts) * (e[k] - e[k-1])
        + Kv * v_cmd[k] + Ka * a_cmd[k]
 ```
@@ -79,7 +79,7 @@ Stepper motor control diverges from servo control in that the fundamental contro
 
 The commanded phase currents for microstepping follow:
 
-```
+```text
 I_A = I_max * cos(θ)
 I_B = I_max * sin(θ)
 ```
@@ -103,7 +103,7 @@ PID tuning in practice begins with proportional gain. Starting from zero, the en
 
 Ziegler-Nichols tuning, a classical empirical method, determines PID gains from the ultimate gain Ku (the proportional gain at the onset of sustained oscillation) and the ultimate period Tu (the oscillation period at Ku). The method prescribes:
 
-```
+```text
 Kp = 0.6 * Ku
 Ki = 1.2 * Ku / Tu
 Kd = 0.075 * Ku * Tu
@@ -115,7 +115,7 @@ Frequency-domain tuning leverages Bode plots of the open-loop transfer function 
 
 Mechanical resonances manifest as peaks in the frequency response, indicating frequencies where the system preferentially oscillates. A flexible coupling or a long lead screw may introduce a resonance at 50 Hz to 200 Hz, causing the closed-loop system to ring or become unstable. Notch filters placed in the feedback path or the command path attenuate gain at the resonant frequency, restoring stability at the cost of reduced bandwidth. A digital notch filter with center frequency f₀ and quality factor Q is implemented as a biquad IIR filter with coefficients derived from the bilinear transform:
 
-```
+```text
 H(z) = (b₀ + b₁ z⁻¹ + b₂ z⁻²) / (1 + a₁ z⁻¹ + a₂ z⁻²)
 ```
 

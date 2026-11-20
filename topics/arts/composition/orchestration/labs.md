@@ -38,7 +38,7 @@ Here's a spaced C major chorale, string quartet voicing, correctly spaced by the
 | Viola | Alto | G3 | 55 | perfect 12th above Cello |
 | Cello | Bass | C2 | 36 | — |
 
-```
+```text
 Violin I   : ----------------●---
 Violin II  : -----------●-------
 Viola      : -------●-----------

@@ -78,19 +78,19 @@ The API server's storage layer abstracts etcd through a pluggable `storage.Inter
 
 Every Kubernetes resource maps to a single etcd key constructed by a deterministic naming scheme. The key format is hierarchical:
 
-```
+```text
 /registry/{resource-type}/{namespace}/{name}
 ```
 
 For cluster-scoped resources such as `Node`, `ClusterRole`, or `Namespace` itself, the namespace path component is omitted:
 
-```
+```text
 /registry/{resource-type}/{name}
 ```
 
 Representative examples from a live cluster:
 
-```
+```text
 /registry/pods/default/nginx-7d8b9c6f4-xk2p1
 /registry/deployments/kube-system/coredns
 /registry/nodes/ip-10-0-1-25.ec2.internal
@@ -104,7 +104,7 @@ This deterministic mapping enables efficient **range scans**. Listing all Pods i
 
 Custom Resource Definitions use the following scheme, where the plural resource name is lowercased:
 
-```
+```text
 /registry/{group}/{plural-resource}/{namespace}/{name}
 # e.g.:
 /registry/apps.example.com/frobulators/production/my-frobulator
@@ -155,7 +155,7 @@ The `resourceVersion` field in `ObjectMeta` is an opaque string from the client'
 
 Concretely, the API server constructs the etcd compare operation as:
 
-```
+```text
 Compare(CompareModRevision, key, Equal, strconv.ParseInt(resourceVersion))
 ```
 
@@ -426,7 +426,7 @@ This behavior has an important operational implication: watch clients that consi
 
 The `--watch-cache-sizes` flag syntax is:
 
-```
+```text
 --watch-cache-sizes=pods=1500,deployments=500,configmaps=200
 ```
 
@@ -471,7 +471,7 @@ When serving reads from the watch cache during quorum loss, the API server inclu
 
 Network latency between the API server and etcd propagates into every write operation with a fixed one-way multiplier. For a synchronous `kubectl apply`:
 
-```
+```text
 latency(apply) ≈ latency(admission webhooks) + 2 × RTT(apiserver→etcd) + disk_fsync(etcd)
 ```
 

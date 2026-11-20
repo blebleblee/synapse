@@ -294,21 +294,21 @@ Unlike a taut drumhead, a bar doesn't rebound the mallet for you the same way �
 
 **Single independent stroke (Stevens grip):** strike with only the inside mallet, then only the outside, alternating, to build independent thumb/ring-finger control.
 
-```
+```text
 Exercise: R(inside) R(outside) L(inside) L(outside)
 Tempo: 50 → 60 → 70 → 80 BPM, eighth notes
 ```
 
 **Double vertical strokes:** both mallets in one hand strike simultaneously, same interval. Practice major 3rds, 4ths, 5ths, octaves. The target is simultaneity and equal volume between the two mallets, not just hitting two notes.
 
-```
+```text
 Exercise: RH (C-E) — LH (G-C) — RH (C-E) — LH (G-C)
 Tempo: 50 → 60 → 70 → 80 BPM
 ```
 
 **Rolls:** on marimba, sustained sound comes from fast alternating single strokes, not a drum-style buzz. Keep mallets close to the bar (2–3 in) for fast, light contact. On vibraphone, the motor can supplement a slower hand roll.
 
-```
+```text
 Roll exercise on one note (e.g. middle C):
 R(in) L(in) R(in) L(in) — eighths at 60 BPM
 same pattern as triplets at 60 BPM
@@ -446,7 +446,7 @@ Small instrument, deceptively demanding — a shimmering, consistent tone takes 
 
 **Clave pattern (3-2):**
 
-```
+```text
 3-2 Clave (in 4/4):
 Beat:  1  e & a 2  e & a 3  e & a 4  e & a
 Clave: X . . . X . . . X . . . . . X . . .
@@ -499,7 +499,7 @@ Works like Xenakis's *Psappha* demand 70+ instruments with rapid switching betwe
 
 **Intermediate 4/4 pattern:**
 
-```
+```text
 Beat: 1     2    3     4
 R:    Stomp Clap Stomp Clap
 L:    Pat   -    Pat   -
@@ -508,7 +508,7 @@ H:    Snap  -    Snap  -
 
 Layer a clave on top:
 
-```
+```text
 Beat:  1  e & a 2  e & a 3  e & a 4  e & a
 Stomp: X  . . . .  . . . X  . . . .  . . .
 Clap:  .  . X . .  . X . .  . X . .  . X .
@@ -630,7 +630,7 @@ Practice each at 80 → 100 → 120 → 140 BPM. The fill must land exactly on t
 
 **3:2 polyrhythm:** over a 6-pulse cycle, the "2" side hits pulses 1 and 4; the "3" side hits pulses 1, 3, 5.
 
-```
+```text
 Pulse:  1  2  3  4  5  6
 Side 2: X  .  .  X  .  .
 Side 3: X  .  X  .  X  .
@@ -640,7 +640,7 @@ Left hand taps steady quarters (the 2-side) at 60 BPM; right hand taps triplets 
 
 **4:3 polyrhythm:** over a 12-pulse cycle, "3" hits pulses 1, 5, 9; "4" hits pulses 1, 4, 7, 10.
 
-```
+```text
 Pulse:  1  2  3  4  5  6  7  8  9  10  11  12
 Side 3: X  .  .  .  X  .  .  .  X  .   .   .
 Side 4: X  .  .  X  .  .  X  .  .  X   .   .

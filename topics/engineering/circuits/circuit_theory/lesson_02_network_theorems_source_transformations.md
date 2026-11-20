@@ -107,7 +107,7 @@ $$
 
 Each star resistance equals the product of its two adjacent delta resistances divided by the sum of all three delta resistances. For the special case of a balanced three-phase system where all star resistances equal $R_Y$ and all delta resistances equal $R_\Delta$, the transformation simplifies to $R_\Delta = 3R_Y$.
 
-```
+```text
 Star (Wye) Configuration:          Delta Configuration:
 
         A                               A

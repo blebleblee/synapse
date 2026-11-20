@@ -1117,7 +1117,7 @@ The key-value cache stores intermediate attention tensors for all prior tokens, 
 
 For Gemini 1.5 Pro's 1M token context, the KV cache for a fully loaded context at `d_model=4096`, 128 heads, 100 layers is approximately:
 
-```
+```text
 KV cache size ≈ 2 × num_layers × num_heads × d_head × context_length × sizeof(bfloat16)
               ≈ 2 × 100 × 128 × 32 × 1,000,000 × 2 bytes
               ≈ 1.6 TB

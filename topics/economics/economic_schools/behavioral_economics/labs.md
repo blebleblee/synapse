@@ -102,7 +102,7 @@ Design a choice set of 30 binary lottery pairs spanning four domains: small-prob
 
 Implement the choice set in a spreadsheet with columns: `choice_id`, `lottery_A_outcome1`, `lottery_A_prob1`, `lottery_A_outcome2`, `lottery_A_prob2`, `lottery_B_outcome1`, `lottery_B_prob1`, `lottery_B_outcome2`, `lottery_B_prob2`. Calculate expected values for each lottery to verify that the choice set includes sufficient variation in risk-return tradeoffs. For example:
 
-```
+```text
 choice_id, A_out1, A_p1, A_out2, A_p2, B_out1, B_p1, B_out2, B_p2
 1, 100, 0.10, 0, 0.90, 10, 1.00, 0, 0.00
 2, 50, 0.50, 0, 0.50, 20, 1.00, 0, 0.00

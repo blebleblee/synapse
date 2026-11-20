@@ -46,7 +46,7 @@ Chisel geometry varies more dramatically than plane irons because chisels serve 
 
 The micro-bevel or secondary bevel represents a critical refinement in edge geometry, a compromise between sharpening speed and edge longevity. Grinding or honing the primary bevel at 25 degrees removes significant steel volume, requiring 10 to 20 minutes on coarse stones for full reshaping. Instead, after establishing the primary bevel, the craftsman creates a narrow (1 to 2 mm wide) micro-bevel at 30 degrees, steepening only the final edge facet. This steeper angle increases edge durability by thickening the steel directly behind the cutting edge, extending time between sharpenings. When the micro-bevel dulls, re-honing requires only 30 seconds to one minute on fine stones to restore sharpness, removing perhaps 0.01 mm of steel. After multiple micro-bevel restorations, the primary bevel is re-established to prevent the micro-bevel from widening excessively, then the cycle repeats.
 
-```
+```text
         Micro-bevel (30°, 1-2mm wide)
               /|
              / |

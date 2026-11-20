@@ -66,7 +66,7 @@ As the packet descends the stack, each layer *reserves space* at the head of the
 
 At the bottom of the software stack, the Link layer is responsible for framing packets for transmission on a specific physical medium. For the vast majority of cloud infrastructure, this means Ethernet, governed by IEEE 802.3. An Ethernet frame has this structure:
 
-```
+```text
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 ├─────────────────────────────────────────────────────────────────┤
@@ -88,7 +88,7 @@ The maximum Ethernet payload is 1500 bytes by default, a limit established in th
 
 IP is the narrow waist of the internet's hourglass architecture. Every transport protocol sits above it; every link-layer technology sits below it. Its job is exactly one thing: forward a datagram from a source address to a destination address, one hop at a time, based solely on the destination IP address.
 
-```
+```text
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 ├───────┬───────┬───────────────┬───────────────────────────────┤
@@ -114,7 +114,7 @@ The *Fragment Offset* and *Flags* fields manage IP fragmentation. The Don't Frag
 
 TCP transforms IP's unreliable, unordered datagram service into a reliable, ordered, full-duplex byte stream. It achieves this through a combination of sequence numbers, acknowledgments, retransmission timers, flow control via a receive window, and congestion control. The TCP header is correspondingly more complex than IP's.
 
-```
+```text
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 ├───────────────────────────────┬───────────────────────────────┤
@@ -142,7 +142,7 @@ TCP connection establishment follows the three-way handshake. The client sends a
 
 When a process writes 100 bytes to a TCP socket, the data traverses every layer, accumulating headers. A concrete example illustrates the total overhead:
 
-```
+```text
 Application Data:         100 bytes
 + TCP Header:              20 bytes  (minimum, no options)
 = TCP Segment:            120 bytes

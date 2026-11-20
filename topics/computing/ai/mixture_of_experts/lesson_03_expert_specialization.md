@@ -24,7 +24,7 @@ The interplay between expert capacity, dropout, and pruning defines the training
 
 The architecture of expert specialization begins with the gating network's parametric form. For a given input token representation **x** ∈ ℝ^d_model, the router computes expert logits through a projection matrix **W_g** ∈ ℝ^(N_experts × d_model):
 
-```
+```text
 logits = x · W_g^T
 routing_weights = softmax(logits)
 top_k_indices, top_k_weights = top_k(routing_weights, k)
@@ -34,7 +34,7 @@ The top-k selection imposes hard sparsity, zeroing out all but the k highest-wei
 
 The forward pass for a token assigned to experts {e₁, e₂, ..., eₖ} with normalized weights {w₁, w₂, ..., wₖ} proceeds as:
 
-```
+```text
 expert_outputs = [FFN_eᵢ(x) for eᵢ in selected_experts]
 moe_output = Σᵢ wᵢ · expert_outputs[i]
 ```
@@ -43,7 +43,7 @@ Each expert FFN_eᵢ is an independent feed-forward network, typically a two-lay
 
 Capacity constraints introduce buffer management mechanics. When implementing capacity factor α, each expert maintains a token budget:
 
-```
+```text
 budget_per_expert = ⌊α × (total_tokens / N_experts)⌋
 ```
 
@@ -51,19 +51,19 @@ Tokens compete for expert slots through their routing weights. A common implemen
 
 The auxiliary load balancing loss enforces capacity utilization across experts. The standard formulation computes per-expert load fractions:
 
-```
+```text
 fᵢ = (number of tokens assigned to expert i) / total_tokens
 ```
 
 and per-expert routing probability mass:
 
-```
+```text
 Pᵢ = (sum of routing weights to expert i) / total_tokens
 ```
 
 The load balancing loss then penalizes correlation between these quantities:
 
-```
+```text
 L_balance = N_experts · Σᵢ fᵢ · Pᵢ
 ```
 
@@ -71,7 +71,7 @@ This loss is minimized when load is uniform (fᵢ = 1/N_experts for all i) and r
 
 Expert dropout operates by masking the routing distribution before top-k selection. During training, with probability p_drop each expert is independently marked unavailable. The routing weights for dropped experts are zeroed before renormalization:
 
-```
+```text
 if training:
     dropout_mask = bernoulli(1 - p_drop, size=N_experts)
     routing_weights = routing_weights * dropout_mask

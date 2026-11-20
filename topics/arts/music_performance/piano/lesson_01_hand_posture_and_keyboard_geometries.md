@@ -66,14 +66,14 @@ Right hand, thumb on C: 1-2-3-4-5 sit naturally on C-D-E-F-G. This is your home 
 ### Major Scale Fingering — The Two Patterns You Need First
 
 **C Major (both hands), right hand ascending:**
-```
+```text
 Finger:  1  2  3  1  2  3  4  5
 Note:    C  D  E  F  G  A  B  C
 ```
 Thumb crosses under after finger 3 (on E) to reach F with the thumb again.
 
 **C Major, left hand ascending:**
-```
+```text
 Finger:  5  4  3  2  1  3  2  1
 Note:    C  D  E  F  G  A  B  C
 ```
@@ -84,7 +84,7 @@ Thumb crosses under after finger 1 (on G) to continue up with finger 3 on A.
 **G, D, A, E major (one sharp through four sharps):** use the identical fingering pattern as C major — this is the payoff of equal-tempered, geometrically uniform keyboard layout. Learn the C major shape once; it transposes directly.
 
 **F major (one flat) is the exception:** right hand uses finger 4 on B♭ instead of the expected finger pattern:
-```
+```text
 Finger:  1  2  3  4  1  2  3
 Note:    F  G  A  B♭ C  D  E  (then 4 again on F)
 ```

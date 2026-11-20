@@ -20,7 +20,7 @@ Incremental Static Regeneration (ISR) operates on a completely different axis of
 
 The request lifecycle inside a Next.js deployment can be represented as a linear pipeline with a branch point at the middleware layer:
 
-```
+```text
                         ┌─────────────────────────────────────────────────┐
                         │           EDGE NETWORK (PoP)                    │
                         │                                                 │

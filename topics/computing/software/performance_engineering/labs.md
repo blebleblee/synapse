@@ -351,7 +351,7 @@ RUSTFLAGS="-Z sanitizer=thread" cargo +nightly run --target x86_64-unknown-linux
 
 If ThreadSanitizer is correctly enabled, the program will report a data race upon execution. The output includes both conflicting accesses with full stack traces:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=...)
   Write of size 8 at 0x7f... by thread T2:
     #0 RacyCounter::increment src/main.rs:10
@@ -422,7 +422,7 @@ RUSTFLAGS="-Z sanitizer=address" cargo +nightly run --target x86_64-unknown-linu
 
 AddressSanitizer reports a heap-use-after-free error:
 
-```
+```text
 ERROR: AddressSanitizer: heap-use-after-free on address 0x... at pc 0x... bp 0x... sp 0x...
 READ of size 4 at 0x... thread T0
     #0 test_use_after_free src/main.rs:6
@@ -463,7 +463,7 @@ RUSTFLAGS="-Z sanitizer=address" cargo +nightly run --target x86_64-unknown-linu
 
 At program exit, LeakSanitizer reports:
 
-```
+```text
 ERROR: LeakSanitizer: detected memory leaks
 
 Direct leak of 1048576 byte(s) in 1 object(s) allocated from:

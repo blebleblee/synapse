@@ -48,7 +48,7 @@ flowchart LR
 
 The user store must never hold plaintext passwords or reversible encodings. The stored record for a credential looks like a serialized Argon2id parameter set alongside the hash output:
 
-```
+```text
 $argon2id$v=19$m=65536,t=3,p=4$<base64_salt>$<base64_hash>
 ```
 

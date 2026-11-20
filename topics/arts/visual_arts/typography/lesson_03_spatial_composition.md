@@ -26,7 +26,7 @@ Digital typography's spacing mechanics are built atop a coordinate system inheri
 
 Horizontal spacing architecture operates through a three-component system for each glyph:
 
-```
+```text
 [Origin] ← Left Sidebearing → [Glyph Outline] ← Right Sidebearing → [Advance Width]
     ↑                              ↑                                        ↑
   (x=0)                      Inked Strokes                          Next Glyph Origin

@@ -24,7 +24,7 @@ Relational operators in awk implement a dual-mode comparison strategy determined
 
 Regex matching operators `~` and `!~` compile their right-hand patterns into internal finite automata (DFA or NFA depending on implementation) and execute them against the left-hand string. The expression `$3 ~ /^[0-9]{3}-[0-9]{4}$/` tests whether field 3 matches the phone number pattern. Awk caches compiled regex patterns: if the pattern is a literal `/.../, the compiled automaton persists across records, amortizing compilation cost. If the pattern is a variable, awk recompiles on every evaluation unless the variable remains unchanged—a performance trap when matching against the same dynamic pattern in a tight loop. The match updates no global state; it simply returns 1 (true) or 0 (false). For capturing substrings, awk provides the `match` function, which sets the `RSTART` and `RLENGTH` variables indicating the matched substring's position and length.
 
-```
+```text
 BEGIN {
     text = "Invoice #A1234 dated 2024-01-15"
     if (match(text, /[0-9]{4}-[0-9]{2}-[0-9]{2}/)) {
@@ -40,7 +40,7 @@ Logical operators `&&` and `||` implement short-circuit evaluation: `expr1 && ex
 
 Conditional statements in awk follow C syntax: `if (condition) statement` and `if (condition) statement else statement`. Curly braces delimit compound statements. The ternary operator `condition ? expr1 : expr2` provides inline conditional evaluation, common in field transformations: `$4 = ($3 > 100) ? "high" : "low"` assigns "high" or "low" to field 4 based on field 3's value. Because awk actions execute once per record, conditional logic typically filters or transforms the current record. For example, normalizing inconsistent date formats:
 
-```
+```json
 {
     if ($2 ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) {
         date = $2
@@ -61,7 +61,7 @@ Loops in awk provide bounded iteration over arrays, fields, or computed sequence
 
 The `break` statement exits the innermost loop immediately, transferring control to the statement following the loop. The `continue` statement skips the remainder of the loop body and re-evaluates the loop condition. These semantics match C's exactly. However, awk introduces `next` and `exit` for non-local control flow. The `next` statement abandons the current action block and begins processing the next input record, skipping any remaining action blocks for the current record. The `exit` statement terminates the entire awk program, executing `END` blocks before exiting. Passing an integer argument to `exit` sets the program's exit status for the shell. These constructs enable early termination patterns:
 
-```
+```text
 NF == 0 { next }  # Skip blank lines
 /^#/ { next }     # Skip comments
 $3 > threshold { print; next }  # Print high values and skip further processing
@@ -69,7 +69,7 @@ $3 > threshold { print; next }  # Print high values and skip further processing
 
 The `next` statement is awk's idiomatic filter mechanism, allowing early rejection of records without nesting the entire action block in an `if` statement. The `exit` statement handles fatal errors or early termination:
 
-```
+```text
 /FATAL/ {
     print "Fatal error encountered:", $0
     exit 1
@@ -83,7 +83,7 @@ In this pattern, encountering a "FATAL" line immediately terminates processing b
 
 Awk's loop semantics differ subtly from C in their interaction with field modification. Modifying `NF` inside a loop changes the iteration bound mid-flight: `for (i = 1; i <= NF; i++) if ($i == "") NF--` attempts to remove empty fields by decrementing `NF`, but the loop bound updates dynamically, potentially skipping fields or re-evaluating the same index. Safe field manipulation requires separate passes or copying fields into arrays. Similarly, modifying array keys during `for-in` iteration produces undefined behavior—most implementations invalidate the iterator, causing skipped or duplicate keys.
 
-```
+```bash
 # Compute running average of field 3 across records
 {
     sum += $3
@@ -118,7 +118,7 @@ Division by zero in awk produces infinity or NaN rather than crashing, but propa
 
 The interaction between `next`, `exit`, and multiple pattern-action rules can surprise. A record matching multiple patterns triggers their actions sequentially unless `next` or `exit` intervenes. The script:
 
-```
+```text
 /ERROR/ { error_count++; next }
 /WARN/  { warn_count++ }
 { total_count++ }
@@ -128,7 +128,7 @@ Counts errors, warnings, and total lines. An "ERROR" line increments `error_coun
 
 Awk's lack of exceptions or error propagation mechanisms forces practitioners to encode error states in variables and test them explicitly. A function chain computing derived fields cannot signal failure upward except through return values or global flags:
 
-```
+```text
 function parse_date(s) {
     if (s ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) return s
     return ""

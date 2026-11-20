@@ -26,7 +26,7 @@ The first phase is problem specification and framing, which establishes the scop
 
 The stakeholder analysis that follows must be both comprehensive and structured according to morally relevant dimensions. The naive approach simply lists everyone affected by a decision, but this fails to capture important moral distinctions. Stakeholders differ in their proximity to the decision (direct participants versus distant parties affected by ripple effects), their vulnerability and dependency (those who can protect their own interests versus those who cannot), their moral status (paradigm rights-holders versus entities of uncertain or partial status), and the nature of the relationship between decision-maker and stakeholder (fiduciary obligations, contractual commitments, professional role responsibilities, or mere shared humanity). A properly structured stakeholder analysis creates a matrix that maps stakeholder groups against these dimensions, revealing patterns of differential vulnerability and highlighting where special obligations arise from role-relationships or power asymmetries.
 
-```
+```text
 STAKEHOLDER MORAL TOPOLOGY MATRIX
 
 Stakeholder Group | Proximity | Vulnerability | Status | Relational Basis
@@ -48,7 +48,7 @@ The architecture of moral reasoning in applied ethics includes several specializ
 
 For questions involving moral status and boundary cases, the practitioner deploys a status criteria analysis that makes explicit the grounds on which moral considerability depends. The traditional criteria include sentience (capacity for pleasure and pain), sapience (rational agency and self-awareness), autonomy (capacity for self-governance), relational embeddedness (participation in communities of mutual recognition), and potentiality (capacity to develop morally significant properties). Each criterion is independently defensible but they dissociate in hard cases: a sleeping person has potentiality and relational status but not current sapience; a great ape may have sentience and partial sapience but not autonomy; an embryo has potentiality but none of the other properties; an AI system might exhibit functional sapience without biological sentience. The status criteria analysis does not resolve these questions definitively but makes transparent which philosophical commitments different positions require and enables more productive disagreement by locating precisely where views diverge.
 
-```
+```text
 MORAL STATUS CRITERIA DISSOCIATION MAP
 
 Entity Type        | Sentience | Sapience | Autonomy | Relational | Potentiality

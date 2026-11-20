@@ -25,7 +25,7 @@ Critical invariants govern pipeline correctness. **Exactly-once processing** is 
 
 The design of a RESTful API begins with identifying domain entities and their relationships, then mapping that domain model onto a URI hierarchy. Consider a simplified e-commerce domain comprising users, products, orders, and reviews. The resource model emerges from entity lifecycle and ownership:
 
-```
+```text
 /users                    (collection)
 /users/{userId}           (singleton)
 /users/{userId}/orders    (sub-collection, scoped by user)
@@ -60,7 +60,7 @@ Hypermedia decouples clients from URI construction logic and enables server-driv
 
 Pagination is essential for collection endpoints. Offset-based pagination (`?offset=100&limit=20`) is simple but fragile under concurrent writes; inserting items before the cursor causes duplicates, deleting items causes skips. Cursor-based pagination encodes an opaque position token that survives insertions and deletions. Keyset pagination uses the last seen primary key as a range predicate (`?after=uuid&limit=20`), combining efficiency with correctness at the cost of requiring indexed, unique, sortable keys. The HTTP `Link` header can encode pagination URIs following RFC 5988:
 
-```
+```text
 Link: </users?after=uuid123&limit=20>; rel="next",
       </users?before=uuid098&limit=20>; rel="prev"
 ```
@@ -237,7 +237,7 @@ Rate limiting protects APIs from abuse and ensures fair resource allocation. Tok
 
 GraphQL's flexibility enables clients to request deeply nested, expensive queries that overwhelm backend systems. Query cost analysis assigns weights to fields and enforces budget limits, rejecting queries exceeding thresholds. A naive cost model assigns uniform weights; sophisticated models account for collection sizes, join complexities, and downstream service latencies. For example:
 
-```
+```text
 Query cost = 1 (baseline)
            + count(scalar fields) × 1
            + count(list fields) × (size × 10)

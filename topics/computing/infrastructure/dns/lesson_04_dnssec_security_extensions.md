@@ -257,7 +257,7 @@ KSK rollover is more involved because it requires parent interaction. The double
 
 The operational state machine for a ZSK rollover can be visualized as:
 
-```
+```text
 State 1: ACTIVE
   DNSKEY: [ZSK-old, KSK]
   Signs:  ZSK-old → all RRSets

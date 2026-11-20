@@ -40,7 +40,7 @@ Every group $G$ has two trivial subgroups: $\{e\}$ and $G$ itself. Proper nontri
 
 The **subgroup lattice** of $G$, denoted $\mathcal{L}(G)$, is the partially ordered set of all subgroups of $G$ under inclusion. For finite groups, this lattice visualizes the hierarchical containment structure. In $\mathbb{Z}_12$, the subgroups are $\{0\}$, $\langle 1 \rangle = \mathbb{Z}_{12}$, $\langle 2 \rangle = \{0, 2, 4, 6, 8, 10\}$, $\langle 3 \rangle = \{0, 3, 6, 9\}$, $\langle 4 \rangle = \{0, 4, 8\}$, and $\langle 6 \rangle = \{0, 6\}$. The lattice has $\mathbb{Z}_{12}$ at the top, $\{0\}$ at the bottom, and intermediate subgroups partially ordered by inclusion:
 
-```
+```text
             ⟨1⟩ = ℤ₁₂
            /  |  \
           /   |   \

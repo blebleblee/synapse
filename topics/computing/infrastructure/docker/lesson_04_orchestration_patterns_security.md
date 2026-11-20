@@ -177,7 +177,7 @@ Resource limits defined in the `deploy.resources` section translate directly to 
 
 AppArmor profile attachment occurs at container creation through the `security_opt` directive. The `apparmor=docker-default` value instructs the daemon to load the default Docker AppArmor profile and apply it to the container's initial process. This profile resides at `/etc/apparmor.d/docker-default` on most systems and consists of allow rules expressed in AppArmor's policy language. A representative fragment:
 
-```
+```text
 profile docker-default flags=(attach_disconnected,mediate_deleted) {
   #include <abstractions/base>
 

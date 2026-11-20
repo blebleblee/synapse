@@ -34,7 +34,7 @@ The inspection and testing workflow for electrical distribution begins with de-e
 
 Circuit mapping, essential before panel modification or troubleshooting intermittent faults, employs systematic enumeration with a plug-in circuit tracer or the manual method of switching breakers individually while another person checks receptacles and lights. The resulting map should document not only which receptacles belong to which breaker but also mid-circuit junction locations, wire gauge verification at accessible points, and any anomalies such as aluminum wiring, ungrounded receptacles, or shared neutrals. Thermal imaging, increasingly accessible through smartphone-attachable infrared cameras ($200-400 range), reveals overheating connections as hot spots 10-30°C above ambient, allowing preventive intervention before catastrophic failure. The main panel bus bars should exhibit uniform temperature distribution within 5°C across all breaker positions when loaded; any breaker or bus section exhibiting elevated temperature warrants immediate investigation of contact integrity.
 
-```
+```text
 Typical Residential Service Panel Architecture
 (200A main panel, 120/240V split-phase)
 

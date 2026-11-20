@@ -28,7 +28,7 @@ A critical architectural decision involves the placement of mechanical fuses—t
 
 The following ASCII diagram illustrates a representative two-stage compound reduction with clutch protection:
 
-```
+```text
 Motor Shaft (M-motor, 80 RPM @ 9V)
     |
     +-- 8t clutch gear (slip @ 0.5 Nm) --+

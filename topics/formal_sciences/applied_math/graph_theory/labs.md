@@ -8,7 +8,7 @@ The mathematical objects we work with are precise. A graph $G = (V, E)$ consists
 
 Your environment requires Python 3.11 or later with SymPy, NumPy, and NetworkX. SageMath provides higher-level algebraic graph invariants and is used in Exercise 3. Lean 4 (with Mathlib) handles formal proof obligations. Verify the core stack before proceeding.
 
-```
+```text
 pip install sympy numpy networkx
 python -c "import sympy; print('SymPy', sympy.__version__)"
 python -c "import networkx as nx; print('NetworkX', nx.__version__)"
@@ -17,14 +17,14 @@ python -c "import numpy as np; print('NumPy', np.__version__)"
 
 For SageMath, the recommended path is the official Docker image, which ships a self-contained environment with no dependency conflicts:
 
-```
+```bash
 docker pull sagemath/sagemath:latest
 docker run -it sagemath/sagemath:latest sage
 ```
 
 For Lean 4 with Mathlib, initialize a project using the Lake build system:
 
-```
+```bash
 curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh
 lake new graph_proofs math
 cd graph_proofs
@@ -807,7 +807,7 @@ def cubeGraph : SimpleGraph (Fin 8) where
 
 Build and type-check the project with:
 
-```
+```text
 lake build
 lean --run GraphProofs/Handshaking.lean
 ```

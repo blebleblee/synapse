@@ -48,7 +48,7 @@ The multivariate Gaussian distribution $\mathcal{N}_d(\boldsymbol{\mu}, \boldsym
 
 The characteristic function $\varphi_X(t) = \mathbb{E}[e^{itX}]$ extends the moment generating function to the complex exponential, always existing due to the boundedness $|e^{itX}| = 1$. The inversion formula $f_X(x) = \frac{1}{2\pi} \int_{-\infty}^\infty e^{-itx} \varphi_X(t) \, dt$ recovers the density from the characteristic function, establishing a Fourier duality between the distribution and its characteristic function. The continuity theorem asserts that convergence of characteristic functions pointwise to a continuous limit implies convergence in distribution, providing a powerful tool for proving limit theorems. For the Cauchy distribution with density $f_X(x) = \frac{1}{\pi(1+x^2)}$, the characteristic function is $\varphi_X(t) = e^{-|t|}$, and the moment generating function fails to exist since $\mathbb{E}[e^{tX}]$ diverges for all $t \ne 0$. This illustrates the broader applicability of characteristic functions in distributions with heavy tails.
 
-```
+```text
 Probability Space → Random Variable → Distribution
      (Ω, F, P)            X: Ω → ℝ         μ_X on ℝ
                                                  |

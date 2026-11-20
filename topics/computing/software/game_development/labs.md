@@ -269,7 +269,7 @@ The first test uses a `Mutex` correctly, ensuring mutual exclusion. The second t
 
 Run the tests with ThreadSanitizer: `RUSTFLAGS="-Zsanitizer=thread" cargo +nightly test --target x86_64-unknown-linux-gnu`. TSan will report any detected races with stack traces showing the conflicting accesses. For the correctly synchronized tests, TSan will report no issues. For the racy test (if you introduce one by removing locks), TSan will output:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 4 at 0x7f8c4800a010 by thread T1:
     #0 integrate_motion src/component.rs:35
@@ -297,7 +297,7 @@ rustflags = ["-Zsanitizer=address"]
 
 Run the use-after-free test: `RUSTFLAGS="-Zsanitizer=address" cargo +nightly test test_use_after_free_simulation --target x86_64-unknown-linux-gnu`. ASan will abort with a detailed report:
 
-```
+```text
 ==12345==ERROR: AddressSanitizer: heap-use-after-free on address 0x60300000eff0 at pc 0x00000051a2b4 bp 0x7ffc8e3b5a90 sp 0x7ffc8e3b5a88
 WRITE of size 4 at 0x60300000eff0 thread T0
     #0 0x51a2b3 in integrate_motion src/component.rs:35:13
@@ -317,7 +317,7 @@ The report shows the allocation, deallocation, and illegal access stack traces, 
 
 Run the leak test: `RUSTFLAGS="-Zsanitizer=address" ASAN_OPTIONS=detect_leaks=1 cargo +nightly test test_memory_leak --target x86_64-unknown-linux-gnu`. LeakSanitizer will report:
 
-```
+```text
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 
 Direct leak of 96000 byte(s) in 1000 object(s) allocated from:

@@ -42,7 +42,7 @@ The action enforcement subsystem implements verdicts computed by the policy engi
 
 The data flow through these subsystems forms a pipeline where each stage consumes from the previous stage's output queue and produces into the next stage's input queue:
 
-```
+```text
 [NIC RX Queues] → [Packet Capture / RSS Fanout]
                           ↓
               [Per-Core Reassembly Tables]

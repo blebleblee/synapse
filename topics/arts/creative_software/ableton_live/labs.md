@@ -229,7 +229,7 @@ Static, identical hi-hat hits every 16th note sound programmed and lifeless. Thi
 
 Run through this before bouncing stems or a final master. Each line is a concrete, checkable action, not a vague aspiration.
 
-```
+```text
 [ ] Master Bus peak meter: peaks sit at or below -6.0 dBFS with zero red clip indicators,
     even on the loudest downbeat of the arrangement.
 [ ] Individual channel gain staging: open each track's meter, confirm RMS (average) level

@@ -373,7 +373,7 @@ A typical signature verification request from the bootloader to the HSM contains
 
 The secure firmware update process implements a state machine that coordinates verification, programming, and atomic activation of new images. Dual-bank flash organization dedicates separate memory regions for active and inactive firmware copies, enabling safe updates without losing the working configuration. The update sequence begins with the backend server signing the new firmware image and distributing it through an OTA gateway. The vehicle's telematics unit downloads the encrypted update package, verifies the transport-layer signature, and decrypts the payload using a symmetric key established during secure channel setup.
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────┐
 │  Dual-Bank Flash Layout for Fail-Safe Firmware Updates         │
 └────────────────────────────────────────────────────────────────┘

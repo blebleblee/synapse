@@ -359,7 +359,7 @@ watch -n 1 'ip -s link show veth2 | grep -A 4 "RX:"'
 
 The `-u` flag switches to UDP, `-b 10G` requests 10 Gbps transmission rate (the sender will transmit at this rate regardless of losses). Compare the RX packet count on `veth2` with the TX count on `veth1`. Packet loss percentage is:
 
-```
+```text
 Loss% = 100 * (1 - RX_packets / TX_packets)
 ```
 

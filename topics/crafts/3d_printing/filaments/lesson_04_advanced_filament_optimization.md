@@ -75,7 +75,7 @@ Layer height selection is not merely a resolution choice; it directly determines
 
 The practical rule of thumb is to keep layer height within 25–75% of the nozzle diameter. Below 25% (e.g., 0.1 mm with a 0.4 mm nozzle), you are pushing the limits of the nozzle's ability to generate enough back-pressure to form a consistent bead, and flow inconsistencies become visible as surface noise. Above 75% (e.g., 0.35 mm with a 0.4 mm nozzle), the bead is so tall relative to its width that bonding area drops sharply and the layer interface becomes the mechanical weak point.
 
-```
+```text
 Nozzle Ø 0.4 mm — Bead Width/Height Relationship
 
 Layer Height | Approx Bead Width | W:H Ratio | Z-Strength | Print Speed Potential

@@ -32,7 +32,7 @@ The implementation requires careful pointer management. Each node stores its key
 
 Consider a concrete example with a binary search tree initially containing keys $\{3, 7, 10, 14\}$ in the structure:
 
-```
+```text
       7
      / \
     3   10
@@ -42,7 +42,7 @@ Consider a concrete example with a binary search tree initially containing keys 
 
 Suppose we insert key $12$ into this tree. The insertion path descends right from $7$, then right again from $10$. We allocate a new node for $12$, insert it as the left child of a new copy of node $14$, then create a new copy of node $10$ with this modified right subtree, and finally create a new copy of the root $7$ with this modified right subtree. The left subtree rooted at $3$ is shared unchanged. The new version has root:
 
-```
+```text
       7'
      / \
     3   10'

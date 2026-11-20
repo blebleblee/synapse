@@ -1286,7 +1286,7 @@ This reference section consolidates essential parameters, diagnostic procedures,
 
 ### Diagnostic Flowchart: Strategy Underperformance
 
-```
+```text
 Is Sharpe Ratio < 0.5 for 6+ months?
 ├── YES: Proceed to next check
 │   └── Is Win Rate < 45%?

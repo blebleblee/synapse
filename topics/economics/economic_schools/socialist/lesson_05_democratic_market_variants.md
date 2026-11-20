@@ -94,7 +94,7 @@ The institutional architecture of democratic socialism consists of nested organi
 
 The internal organizational chart inverts the conventional corporate hierarchy:
 
-```
+```text
 General Assembly (all worker-members)
         ↓ (elects)
 Governing Council (worker-elected board)
@@ -112,7 +112,7 @@ The practical mechanics of democratic decision-making within enterprises involve
 
 The internal capital account system serves as the financial backbone of worker ownership. Each member holds an individual capital account that accumulates over time through profit allocations, appreciates with enterprise value increases, and pays out upon departure. The mechanics follow this accounting flow:
 
-```
+```text
 Annual Net Income
     ↓
 Mandatory Allocations:
@@ -144,7 +144,7 @@ Upon departure, the member receives the capital account balance subject to vesti
 
 The second organizational tier consists of cooperative federations providing shared services and mutual support. Mondragon's structure illustrates the federation architecture:
 
-```
+```text
 Mondragon Corporation (holding structure)
     |
     |-- Caja Laboral (cooperative bank)
@@ -184,7 +184,7 @@ The solidarity fund mechanism provides insurance against idiosyncratic shocks an
 
 The participatory planning architecture overlays market coordination with deliberative resource allocation mechanisms. The practical implementation follows an iterative cycle operating annually or semi-annually:
 
-```
+```text
 Phase 1: Proposal Submission (Month 1-2)
     Worker Councils submit:
         - Production capacity & plans

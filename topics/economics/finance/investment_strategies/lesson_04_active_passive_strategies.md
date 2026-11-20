@@ -34,7 +34,7 @@ Passive strategies are deceptively complex to implement well. The public narrati
 
 The replication decision tree maps as follows:
 
-```
+```text
 Index Characteristics
         │
         ├─── Constituent count < 500 & liquid?

@@ -20,7 +20,7 @@ The fundamental unit of LEGO geometry is the module, defined as 8.0 mm × 8.0 mm
 
 The 5:6 ratio manifests most visibly in the relationship between plates and studs: five plate heights (5 × 3.2 mm = 16.0 mm) equal precisely two horizontal stud spacings (2 × 8 mm = 16.0 mm). This Pythagorean relationship allows builders to "turn corners" by stacking five plates vertically to achieve a connection that aligns with two studs horizontally. When executed with perfect element alignment, this remains a legal technique. However, attempting to force intermediate ratios—such as connecting three plates vertically to one stud horizontally—introduces angular distortion that bends studs beyond their elastic recovery capacity.
 
-```
+```text
 Legal 5:2 Plate-to-Stud Relationship:
     
     ╔═══════════════╗ ← 2 studs horizontal = 16.0 mm

@@ -120,7 +120,7 @@ Good scale technique is a continuous lateral shift of forearm weight from finger
 
 **C Major Scale — Right Hand:**
 
-```
+```text
 Key:    C   D   E   F   G   A   B   C
 Finger: 1   2   3   1   2   3   4   5
                     ↑
@@ -129,7 +129,7 @@ Finger: 1   2   3   1   2   3   4   5
 
 **C Major Scale — Left Hand:**
 
-```
+```text
 Key:    C   B   A   G   F   E   D   C
 Finger: 5   4   3   2   1   3   2   1
                      ↑
@@ -162,7 +162,7 @@ Fingers 4 and 5 share a branch of the flexor digitorum profundus tendon, which i
 
 Right hand in C major five-finger position: thumb on C4, fingers 2–5 on D–E–F–G.
 
-```
+```text
 RH: 1-2-3-4-5-4-3-2 | 1-2-3-4-5-4-3-2 | ...
     C-D-E-F-G-F-E-D | C-D-E-F-G-F-E-D
 
@@ -191,7 +191,7 @@ One note per quarter note at target tempo.
 
 The ascending figure stresses the 1-2 and 4-5 stretches; the descent stresses 5-4 and 2-1 coordination.
 
-```
+```text
 RH Ascending (C4 → C6):
 C-E-D-F-E-G-F-A-G-B-A-C-B-D-C...
 1-3-2-4-3-5-4-5-4-5-4-5-4-5-4
@@ -269,7 +269,7 @@ The pedal changes *after* the new chord attacks, never before. This clears the o
 
 **Foot mechanics for a I–IV–V–I cadence (C–F–G–C):**
 
-```
+```text
 Hands:   C (strike)    F (strike)    G (strike)    C (strike)
 Foot:    ↓hold    ↑↓hold      ↑↓hold      ↑↓hold     ↑
                   release+re-depress   release+re-depress   release+re-depress
@@ -313,14 +313,14 @@ Root position on every chord change is the fastest way to sound amateur. The ear
 
 **C major → F major, two approaches:**
 
-```
+```text
 Root position (leaps):         C-E-G  →  F-A-C
 First inversion (smooth):      C-E-G  →  C-F-A    (C stays, E→F, G→A, all by step or held)
 ```
 
 **Four-voice SATB, C major → G major:**
 
-```
+```text
 Soprano: E → D   (step down)
 Alto:    C → B   (step down)
 Tenor:   G → G   (common tone, held)
@@ -331,7 +331,7 @@ Bass:    C → G   (fifth down, conventional root motion)
 
 Jazz comping drops the root (the bassist covers it) to pack more color into the mid-register. Two forms cover every ii–V–I.
 
-```
+```text
 Cmaj7:
 A Form (3rd on bottom): LH: E-G-B-D   (3-5-7-9)
 B Form (7th on bottom): LH: B-D-E-G   (7-9-3-5)
@@ -343,7 +343,7 @@ B Form: LH: F-A-B-D   (b7-9-3-5)
 
 **ii–V–I in C, rootless:**
 
-```
+```text
 Dm7 (A Form)     G7 (B Form)      Cmaj7 (A Form)
 LH: F-A-C-E  →   LH: F-A-B-D  →   LH: E-G-B-D
 ```
@@ -383,7 +383,7 @@ Polyrhythms are not a trick — they're foundational to jazz, West African percu
 
 Speak aloud: **"Not-dif-fi-cult"** (four syllables, but the rhythm maps to a 6-unit grid):
 
-```
+```text
 6-unit grid:   1    2    3    4    5    6
 RH (triplet):  X         X         X
 LH (duplet):   X              X
@@ -393,7 +393,7 @@ LH (duplet):   X              X
 
 **At the keyboard:**
 
-```
+```text
 RH: C5 three times evenly across one measure (triplet feel)
 LH: C3 two times evenly across the same measure (duplet feel)
 ```
@@ -429,7 +429,7 @@ gantt
 
 LCM of 4 and 3 is 12 — both hands' attacks land on a shared 12-unit grid.
 
-```
+```text
 12-unit grid:  1  2  3  4  5  6  7  8  9  10 11 12
 RH (4 notes):  X        X        X        X
 LH (3 notes):  X           X           X

@@ -142,7 +142,7 @@ ansible all -i hosts.ini -m ping
 
 The `ping` module is not an ICMP ping. It verifies that Ansible can establish an SSH connection, transfer a module, execute it under the remote Python interpreter, and parse the returned JSON. A successful response looks like:
 
-```
+```text
 worker1 | SUCCESS => {
     "changed": false,
     "ping": "pong"
@@ -407,7 +407,7 @@ ansible-playbook -i hosts.ini benchmark.yml
 
 With the `profile_tasks` callback enabled, Ansible outputs a per-task timing summary sorted by execution time:
 
-```
+```text
 Wednesday 15 January 2025  10:32:14 -0500 (0:00:00.012)       0:00:12.347 *******
 ===============================================================================
 benchmarking : Measure TCP loopback round-trip latency ------------ 8.23s
@@ -788,7 +788,7 @@ ansible worker1 -i hosts.ini -m ping -vvvv
 
 The `vvvv` verbosity level prints the raw SSH command, including all options Ansible passes to OpenSSH:
 
-```
+```text
 <worker1> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s \
   -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
   -o KbdInteractiveAuthentication=no \
@@ -811,7 +811,7 @@ ansible-galaxy role init roles/webserver
 
 This generates the standard directory structure:
 
-```
+```text
 roles/webserver/
 ├── defaults/
 │   └── main.yml        # Low-precedence default variables

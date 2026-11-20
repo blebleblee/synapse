@@ -33,7 +33,7 @@ A standard bass has a 34-inch scale length, with thicker, higher-tension strings
 
 ### 2.1 Standard Tuning, Open Strings
 
-```
+```text
 String 4 (thickest, lowest):  E1
 String 3:                     A1
 String 2:                     D2
@@ -210,7 +210,7 @@ Adapted from double bass technique:
 
 **Simandl hand shape, first position (frets 1–3):**
 
-```
+```text
 Fret 1  →  Index   (1)
 Fret 2  →  Middle  (2)
 Fret 3  →  Pinky   (4)  ← ring finger stacked behind it, not hovering independently
@@ -218,7 +218,7 @@ Fret 3  →  Pinky   (4)  ← ring finger stacked behind it, not hovering indepe
 
 You cover three frets per position. To reach fret 4 or 5, execute a **half-shift**: the whole hand, thumb included, slides up one fret as a unit. Fingers don't stretch — the hand translates.
 
-```
+```text
 Home position:    Fret 1 (Index) · Fret 2 (Middle) · Fret 3 (Pinky)
 Half-shift up:     thumb leads, elbow adjusts, wrist angle unchanged
 Result:            Fret 2 (Index) · Fret 3 (Middle) · Fret 5 (Pinky)
@@ -239,7 +239,7 @@ As fret spacing narrows going up the neck, each finger can cover one fret indepe
 
 **Example, 7th position, String 4:**
 
-```
+```text
 Fret 7   →  Index  (1)  =  B
 Fret 8   →  Middle (2)  =  C
 Fret 9   →  Ring   (3)  =  C♯
@@ -309,7 +309,7 @@ A box shape is defined by the **geometric relationship between frets and strings
 
 **The octave shape in practice:**
 
-```
+```text
 Root:    String 4, Fret 3  =  G
 Octave:  String 2, Fret 5  =  G
 
@@ -323,7 +323,7 @@ Index finger on any fret, String 4; pinky two strings up, two frets forward, lan
 
 The harmonic skeleton of rock, punk, and metal: the tonal center plus its strongest support tone.
 
-```
+```text
 Root  (R):   String 4, Fret X        —  Index  (1)
 Fifth (P5):  String 3, Fret X+2      —  Ring   (3) or Middle (2)
 Octave(Oct): String 2, Fret X+2      —  Pinky  (4)
@@ -331,7 +331,7 @@ Octave(Oct): String 2, Fret X+2      —  Pinky  (4)
 
 **Example, G root at String 4, Fret 3:**
 
-```
+```text
 String 4, Fret 3  →  G   (Root)        —  Index  (1)
 String 3, Fret 5  →  D   (Perfect 5th) —  Ring   (3)
 String 2, Fret 5  →  G   (Octave)      —  Pinky  (4)
@@ -339,7 +339,7 @@ String 2, Fret 5  →  G   (Octave)      —  Pinky  (4)
 
 The fifth and octave share the same fret number on adjacent strings, so ring and pinky land in a vertical column — fast to execute as a block. Test both the 1-2-4 and 1-3-4 fingering options and use whichever keeps your wrist straightest.
 
-```
+```text
 Rock/punk foundation:   R (2 beats) -> P5 (2 beats) -> repeat
 Power chord stab:       R + P5 + Oct struck together
 Walking approach:       R -> P5 -> Oct -> P5 -> R
@@ -347,7 +347,7 @@ Walking approach:       R -> P5 -> Oct -> P5 -> R
 
 ### 5.3 The Minor Box Shape (Root–m3–P5–Octave)
 
-```
+```text
 Root      (R):   String 4, Fret X     —  Index (1)
 Minor 3rd (m3):  String 4, Fret X+3   —  Pinky (4) in Simandl / Ring (3) in OFPF
 Perfect 5th(P5): String 3, Fret X+2   —  Middle (2)
@@ -356,7 +356,7 @@ Octave    (Oct): String 2, Fret X+2   —  Ring (3) or Pinky (4)
 
 **Example, A minor box, root at String 4, Fret 5:**
 
-```
+```text
 String 4, Fret 5  →  A   (Root)        —  Index  (1)
 String 4, Fret 8  →  C   (Minor 3rd)   —  Ring   (3) [or Pinky in Simandl]
 String 3, Fret 7  →  E   (Perfect 5th) —  Middle (2)
@@ -371,7 +371,7 @@ String 2, Fret 7  →  A   (Octave)      —  Pinky  (4)
 
 Swap the minor 3rd for a major 3rd — one fret higher on String 4.
 
-```
+```text
 Root      (R):   String 4, Fret X     —  Index (1)
 Major 3rd (M3):  String 4, Fret X+4   —  Pinky (4)
 Perfect 5th(P5): String 3, Fret X+2   —  Middle (2)
@@ -380,7 +380,7 @@ Octave    (Oct): String 2, Fret X+2   —  Ring (3) or Pinky (4)
 
 **Example, A major box, root at String 4, Fret 5:**
 
-```
+```text
 String 4, Fret 5  →  A   (Root)        —  Index (1)
 String 4, Fret 9  →  C♯  (Major 3rd)   —  Pinky (4)
 String 3, Fret 7  →  E   (Perfect 5th) —  Middle (2)
@@ -395,7 +395,7 @@ String 2, Fret 7  →  A   (Octave)      —  Pinky (4)
 
 The minor 7th sits at the same fret number as the root, two strings higher.
 
-```
+```text
 Root      (R):   String 4, Fret X     —  Index (1)
 Major 3rd (M3):  String 4, Fret X+4   —  Pinky (4)
 Perfect 5th(P5): String 3, Fret X+2   —  Middle (2)
@@ -404,7 +404,7 @@ Minor 7th (m7):  String 2, Fret X     —  Index (1) — same fret as root, two 
 
 **Example, A7 box, root at String 4, Fret 5:**
 
-```
+```text
 String 4, Fret 5  →  A   (Root)        —  Index (1)
 String 4, Fret 9  →  C♯  (Major 3rd)   —  Pinky (4)
 String 3, Fret 7  →  E   (Perfect 5th) —  Middle (2)
@@ -479,7 +479,7 @@ graph TD
 
 **Universal rules across all six drills:**
 
-```
+```text
 Starting tempo:   60 BPM  — mechanics first, speed second
 Target tempo:     80 BPM  — smooth, controlled, musical
 Advanced tempo:  100 BPM  — confident, locked in, no hesitation
@@ -500,7 +500,7 @@ Turn the metronome on before you pick up the bass, every time. Use a physical me
 
 **Setup:** left-hand fingers 1, 2, 4 on frets 1, 2, 3 of String 4. Right hand strictly alternates i–m–i–m on every note, no exceptions.
 
-```
+```text
 String 4: Frets 1 - 2 - 3 - 2 - 1
 String 3: Frets 1 - 2 - 3 - 2 - 1
 String 2: Frets 1 - 2 - 3 - 2 - 1
@@ -548,7 +548,7 @@ Reverse direction back to String 4
 
 **Core principle:** the thumb leads the shift by roughly 50–100 ms, arriving just before the fingers. This keeps the thumb-to-finger relationship constant through the transition.
 
-```
+```text
 Position 1 (Fret 1 anchor): Fret 1 (Index) -> Fret 2 (Middle) -> Fret 3 (Pinky)
   -- rest beat, thumb slides, hand follows as a unit --
 Position 2 (Fret 2 anchor): Fret 2 (Index) -> Fret 3 (Middle) -> Fret 4 (Pinky)
@@ -579,7 +579,7 @@ Continue up to Fret 7-9, then descend back to Position 1.
 
 **Setup, starting at fret 7, String 4:** Index=7, Middle=8, Ring=9, Pinky=10.
 
-```
+```text
 Ascending, String 4 to String 1:
 String 4: 7-8-9-10 (Index-Middle-Ring-Pinky)
 String 3: 7-8-9-10
@@ -624,7 +624,7 @@ String 4: 10-9-8-7
 
 **Minor box, seven keys, one continuous run — no pauses between keys:**
 
-```
+```text
 Key of E:   Root = String 4, Fret 0 (open)
 Key of F:   Root = String 4, Fret 1
 Key of G:   Root = String 4, Fret 3
@@ -636,7 +636,7 @@ Key of D:   Root = String 4, Fret 10
 
 **For each key, one beat per note at 60 BPM, naming each interval aloud:**
 
-```
+```text
 Beat 1: Root           ("Root")
 Beat 2: Minor 3rd       ("Minor third")
 Beat 3: Root            ("Root")
@@ -663,7 +663,7 @@ Then repeat with the **major box** (major 3rd, one fret higher) across the same 
 
 **Musicality integration (from Phase 2 on):** try rhythmic variations —
 
-```
+```text
 Two-note rhythm:     R (half, 2 beats) -> m3 (quarter) -> P5 (quarter) -> Oct (half)
 Swung eighths:       Play the arpeggio with a long-short swing feel
 Walking bass feel:   R-m3-P5-Oct, all quarter notes, steady pulse
@@ -677,7 +677,7 @@ Walking bass feel:   R-m3-P5-Oct, all quarter notes, steady pulse
 
 **Full chromatic pattern on String 4:**
 
-```
+```text
 ASCENDING, SIMANDL ZONE (frets 1-5):
   Fret 1 (Index 1)  -> F
   Fret 2 (Middle 2) -> F#
@@ -732,7 +732,7 @@ DESCENDING back through the transition and down to:
 - When you move up a string, the thumb follows, muting the one you just left
 - Light contact only — damping, not dead-stopping
 
-```
+```text
 Playing String 4: thumb rests on pickup/body edge (nothing below to mute)
 Playing String 3: thumb rests on String 4
 Playing String 2: thumb rests on String 3
@@ -761,7 +761,7 @@ Playing String 1: thumb rests on String 2
 
 Use this structure for the first 4–6 weeks. Expand to 45 minutes once endurance builds (typically week 3–4).
 
-```
+```text
 00:00-03:00  Warm-up: Drill 1 at 60 BPM, String 4 only
              No metronome pressure - wake up the hands, check wrist and thumb
 
@@ -923,7 +923,7 @@ Stop entirely if you notice any of:
 
 **Build session duration gradually:**
 
-```
+```text
 Month 1: 20-30 minutes, 5-6 days/week
 Month 2: 30-40 minutes
 Month 3: 40-50 minutes
@@ -957,7 +957,7 @@ Before every repetition of Drill 4 (box shapes), hum or sing the root pitch, the
 
 ### 9.2 Interval Ear Drill (10 Minutes, Paired with Section 5)
 
-```
+```text
 Step 1: Play Root, then Perfect 5th. Sing the 5th back without the bass.
 Step 2: Play Root, then minor 3rd. Sing it back. Compare the "darker" color to the 5th.
 Step 3: Play Root, then Major 3rd. Sing it back. Compare the "brighter" color to the minor 3rd.

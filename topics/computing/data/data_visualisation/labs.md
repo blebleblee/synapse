@@ -338,7 +338,7 @@ if __name__ == '__main__':
 
 4. **Data Interpreter**: Enable if CSV has leading metadata rows
 5. **Create Calculated Fields**:
-   ```
+   ```text
    // Price Tier (redundant with CSV, shown for demo)
    IF [Price] < 5 THEN "Budget"
    ELSEIF [Price] < 10 THEN "Mid-range"
@@ -492,7 +492,7 @@ pytest benchmark.py --benchmark-compare=baseline
 
 On a typical system (3.0 GHz CPU, 100 Mbps network):
 
-```
+```text
 === Performance Profile ===
 01_http_request               : 0.342s (71.2%)
 02_dataframe_creation         : 0.015s ( 3.1%)
@@ -707,7 +707,7 @@ pytest test_chaos.py --cov=etl_pipeline --cov-report=html
 
 **Expected Output:**
 
-```
+```text
 test_chaos.py::test_retry_on_500_error PASSED              [ 12%]
 test_chaos.py::test_timeout_handling PASSED                [ 25%]
 test_chaos.py::test_invalid_json_handling PASSED           [ 37%]
@@ -849,7 +849,7 @@ graph LR
 
 **Calculated Fields for Advanced Analysis:**
 
-```
+```text
 // Price Positioning Score (0-100)
 [Price Percentile]
 

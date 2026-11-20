@@ -24,7 +24,7 @@ The professional mindset here is one of directed skepticism. You do not assume t
 
 To diagnose a board systematically, you need a clear mental model of how signals flow from the power supply, through the logic, and out to the monitor and speaker. The following diagram represents a generalized JAMMA-era arcade PCB architecture at the signal-path level.
 
-```
+```text
                         ┌─────────────────────────────────────────────────────────┐
                         │                   ARCADE PCB                            │
                         │                                                         │

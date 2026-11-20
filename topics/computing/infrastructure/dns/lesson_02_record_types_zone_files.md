@@ -26,7 +26,7 @@ The `$TTL` directive sets the default TTL for all records that follow it without
 
 The general resource record format is:
 
-```
+```text
 [name] [ttl] [class] type rdata
 ```
 
@@ -34,7 +34,7 @@ All fields except `type` and `rdata` are optional in the sense that they fall ba
 
 A complete, production-grade zone file for `example.com.` demonstrates the full range of common record types:
 
-```
+```text
 $ORIGIN example.com.
 $TTL 3600
 
@@ -101,7 +101,7 @@ Multiple A or AAAA records for the same owner name form a resource record set. A
 
 The SOA record is the most structurally complex record in the zone file and the most operationally consequential. Its rdata contains seven fields that govern zone synchronization between primary and secondary nameservers and the behavior of negative caching.
 
-```
+```text
 zone.  IN  SOA  mname  rname  ( serial refresh retry expire minimum )
 ```
 

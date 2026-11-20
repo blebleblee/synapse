@@ -93,7 +93,7 @@ The cognitive cost of network architectures is disorientation. Without a fixed h
 
 Sequential flows impose a linear progression where users advance through stages in a predetermined order. Onboarding tutorials, checkout processes, and multi-step configuration wizards employ sequential navigation. The cognitive advantage is clarity: users need only understand "what is the next step?" rather than mapping the entire system. Sequential flows prevent premature optimization—the tendency for novice users to skip foundational steps and attempt advanced tasks without prerequisite knowledge. A synthesizer patch tutorial might enforce a sequence: oscillator waveform selection, filter cutoff and resonance, envelope shaping, LFO modulation, and finally effects processing. Each stage builds on the previous, and the interface prevents users from jumping to stage five without completing stages one through four.
 
-```
+```text
 Sequential Flow — Synthesizer Patch Tutorial
 
 Step 1: Oscillator Selection

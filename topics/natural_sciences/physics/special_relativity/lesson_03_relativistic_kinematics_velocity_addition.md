@@ -148,7 +148,7 @@ To measure the transverse Doppler effect experimentally, we need a system where 
 
 Modern astrophysical applications of relativistic Doppler shifts include pulsar timing, where the periodic modulation of pulse arrival times due to binary orbital motion encodes the system's velocity curve. For a pulsar in a circular orbit of radius $a$ and period $P$, the orbital velocity is $v = 2\pi a/P$. The radial velocity component varies sinusoidally as $v_r = v\sin(2\pi t/P)$, producing a time-varying Doppler shift. By fitting the observed pulse times of arrival to a kinematic model including the relativistic Doppler correction, we can extract orbital parameters with extraordinary precision—sufficient to detect post-Newtonian corrections and gravitational radiation damping in compact binary systems like the Hulse-Taylor pulsar.
 
-```
+```text
 Relativistic Kinematics Calculation Workflow:
 
 1. Frame Identification

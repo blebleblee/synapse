@@ -18,7 +18,7 @@ Grid-based alignment begins with understanding the stud lattice as a two-dimensi
 
 The most fundamental bonding pattern—the running bond—offsets consecutive layers by exactly half the brick length, creating a brick-and-half overlap that prevents vertical shear planes. For 2×4 bricks arranged in running bond, each upper brick spans across two lower bricks, engaging eight studs while its weight distributes across sixteen underlying tubes. This creates a connection density of 0.5 bonds per stud, representing the minimum viable overlap for load-bearing walls. More sophisticated patterns increase this density through strategic use of mixed brick sizes: a 2×2 brick placed between two offset 2×4 bricks engages all four studs while bridging the seam below, raising local connection density to 0.75 bonds per stud and dramatically increasing shear resistance.
 
-```
+```text
 Running Bond Pattern (2×4 bricks, plan view):
 Layer N:   [====]  [====]  [====]
               ↓       ↓       ↓
@@ -38,7 +38,7 @@ Technic-based constructions extend this principle into three dimensions through 
 
 Connection redundancy emerges from the principle that structural reliability increases with the number of independent load paths between any two points. Consider a simple cantilever beam extending eight studs from a vertical wall: a single 1×8 plate provides minimal rigidity, deflecting visibly under its own weight beyond six studs. Adding a second 1×8 plate directly beneath the first doubles the effective bending stiffness (proportional to the cube of thickness), but creates no redundancy—failure of either connection point causes total collapse. True redundancy requires perpendicular bracing: two 1×6 plates forming an L-bracket beneath the cantilever create an alternative load path where bending moments convert to compression in the horizontal member and tension in the vertical member, distributing stress across multiple connection interfaces.
 
-```
+```text
 Non-Redundant Cantilever (side view):
 Wall |━━━━━━━━━━━━> (1x8 plate)
      |━━━━━━━━━━━━> (1x8 plate)

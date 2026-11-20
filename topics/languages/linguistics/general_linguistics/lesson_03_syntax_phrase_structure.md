@@ -56,7 +56,7 @@ The selection of which input projects the label follows from a head-feature hier
 
 Feature structures encode grammatical properties as attribute-value pairs. A lexical item carries a feature bundle specifying its category [N], [V], [A], [P], or functional label [T], [C], [D], [v], along with phi-features [person], [number], [gender], Case features [Nom], [Acc], [Gen], and selectional features [uCase], [uPhi] (uninterpretable features requiring valuation). A transitive verb enters the derivation with a feature matrix:
 
-```
+```text
 [V]
 [+transitive]
 [uCase: ___ ]  (unvalued Accusative, to be checked by v)
@@ -65,7 +65,7 @@ Feature structures encode grammatical properties as attribute-value pairs. A lex
 
 A noun phrase enters with:
 
-```
+```text
 [N]
 [person: 3]
 [number: sg]
@@ -81,7 +81,7 @@ The c-command relation underpins both Agree and Binding theory. A node α c-comm
 
 Consider the derivation of "The student read the book." The numeration contains:
 
-```
+```text
 {D[def], N[student], T[past], v[transitive], V[read], D[def], N[book]}
 ```
 
@@ -99,7 +99,7 @@ The derivation proceeds as follows:
 
 6. Internal Merge: The EPP feature on T triggers raising of DP[the student] to Spec-TP:
 
-```
+```text
          TP
         /  \
    DP[the student]  T′
@@ -133,7 +133,7 @@ Wh-movement introduces additional derivational complexity. Consider "What did Jo
 
 8. Internal Merge: DP[what] undergoes wh-movement to Spec-CP to check the [uWh] feature on C:
 
-```
+```text
               CP
              /  \
         DP[what]  C′
@@ -155,7 +155,7 @@ The surface order "What did John read?" reflects the positions of the highest co
 
 Island constraints block extraction from certain syntactic configurations. The Complex NP Constraint prohibits extraction from within a relative clause or a complement clause embedded within a noun phrase:
 
-```
+```text
 *What did John meet [DP the student [CP who read t_what]]?
 ```
 
@@ -163,7 +163,7 @@ The wh-phrase "what" cannot escape the relative clause embedded within the DP "t
 
 The Coordinate Structure Constraint blocks extraction from one conjunct of a coordinate structure:
 
-```
+```text
 *What did John read the book and t_what?
 ```
 
@@ -171,7 +171,7 @@ Coordination forms a syntactic island because neither conjunct asymmetrically c-
 
 Binding theory applies c-command and locality conditions to regulate the distribution of anaphors, pronouns, and R-expressions. The local domain (binding domain) for an anaphor is the minimal XP containing the anaphor, a subject, and a governing head (typically, the minimal TP or NP). An anaphor must be bound (have a c-commanding antecedent) within this domain:
 
-```
+```text
 John_i said that [TP Bill_j hurt himself_j/*i].
 ```
 
@@ -179,7 +179,7 @@ John_i said that [TP Bill_j hurt himself_j/*i].
 
 Pronouns must be free (not bound) within their binding domain but can be bound outside it:
 
-```
+```text
 John_i said that [TP Bill_j hurt him_i/*j].
 ```
 
@@ -187,7 +187,7 @@ John_i said that [TP Bill_j hurt him_i/*j].
 
 R-expressions (referential noun phrases like "John" or "the book") must be free everywhere:
 
-```
+```text
 He_i said that [TP John_*i left].
 ```
 
@@ -197,7 +197,7 @@ Reconstruction effects demonstrate that LF interprets the lower copy of a moved 
 
 Dependency grammar formalizes syntactic structure through labeled arcs connecting words. A dependency tree for "The student read the book" takes the form:
 
-```
+```text
        read (root)
        /   |    \
     det   subj   obj
@@ -215,7 +215,7 @@ Dependency representations foreground the head-dependent asymmetry. Every word e
 
 Non-projective structures arise in languages with free word order. Consider Czech "Student knihu četl" (Student book read), where the object precedes the verb:
 
-```
+```text
        četl (root)
        /       \
      subj      obj
@@ -225,7 +225,7 @@ Non-projective structures arise in languages with free word order. Consider Czec
 
 If we linearize as "Student knihu četl," the subject arc and object arc do not cross. But consider scrambling to "Knihu student četl" (Book student read):
 
-```
+```text
        četl (root)
        /       \
      subj      obj
@@ -237,7 +237,7 @@ Linearizing as "Knihu student četl," the object arc from "četl" to "Knihu" cro
 
 Unification-based formalisms integrate phrase structure and feature constraints through attribute-value matrices. An LFG f-structure for "The student read the book" takes the form:
 
-```
+```text
 [PRED: 'read⟨SUBJ, OBJ⟩'
  TENSE: past
  SUBJ: [PRED: 'student'
@@ -254,7 +254,7 @@ Unification-based formalisms integrate phrase structure and feature constraints 
 
 The f-structure encodes grammatical functions (SUBJ, OBJ), semantic predicates (PRED attributes), agreement features (NUM, PERS), and tense. The c-structure is a phrase structure tree annotated with functional equations:
 
-```
+```text
           S
          / \
         NP  VP
@@ -272,7 +272,7 @@ Each c-structure node is annotated with equations specifying how its f-structure
 
 HPSG encodes syntactic and semantic information in typed feature structures. A simplified HPSG sign for the transitive verb "read" takes the form:
 
-```
+```text
 [PHON: ⟨read⟩
  CAT: [HEAD: verb
        VAL: [SUBJ: ⟨NP[nom]⟩
@@ -285,7 +285,7 @@ HPSG encodes syntactic and semantic information in typed feature structures. A s
 
 The CAT attribute specifies the category (verb) and valence (subcategorization) information: "read" selects a nominative subject and an accusative object. The CONT attribute encodes semantic content, including the predicate and theta roles. The ARG-ST attribute lists the argument structure, co-indexing syntactic arguments with semantic roles (indices 1 and 2). Phrase structure emerges from head-complement and head-specifier schemata that unify mother and daughter features:
 
-```
+```text
 Head-Complement Schema:
 [CAT: [HEAD: 1
        VAL: [SUBJ: 2
@@ -300,7 +300,7 @@ This schema requires that the head daughter's first complement (3) unifies with 
 
 Tree-Adjoining Grammar represents syntactic structure through elementary trees. An elementary tree for the transitive verb "read" includes both the subject and object positions:
 
-```
+```text
        S
       / \
     NP↓  VP
@@ -312,7 +312,7 @@ Tree-Adjoining Grammar represents syntactic structure through elementary trees. 
 
 The ↓ symbol marks substitution nodes where other elementary trees can be inserted. An elementary tree for "the student" is:
 
-```
+```text
     NP
    /  \
   Det  N
@@ -322,7 +322,7 @@ The ↓ symbol marks substitution nodes where other elementary trees can be inse
 
 Substitution inserts this tree into the subject NP↓ node of the "read" tree. Adjunction models modification. An auxiliary tree for "carefully" is:
 
-```
+```text
     VP
    /  \
  Adv  VP*
@@ -332,7 +332,7 @@ carefully
 
 The VP* node marks the foot of the auxiliary tree, the position where the original VP is spliced back in. Adjoining this tree into the VP node of "read the book" produces:
 
-```
+```text
        S
       / \
     NP   VP

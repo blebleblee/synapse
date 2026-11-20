@@ -73,7 +73,7 @@ Consider a wheel speed sensor that reads zero. The possible physical explanation
 
 The cross-validation matrix for the most common racing diagnostic scenarios is built around four physical domains — kinematic, thermal, hydraulic, and electrical — and the principle that a true mechanical event will produce correlated anomalies in at least two domains simultaneously. A sensor failure typically produces an anomaly in only one domain, and usually with a characteristic signature: a step-change to zero (open circuit), a step-change to full-scale (short to supply), or a jump to a fixed intermediate value (stuck bit in ADC or failed sample-and-hold).
 
-```
+```text
 Diagnostic Scenario: Rear Brake Anomaly
 
 Primary Channel:          Rear brake temperature rising above threshold

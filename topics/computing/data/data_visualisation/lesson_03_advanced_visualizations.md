@@ -8,7 +8,7 @@ Effective data visualization is not decoration — it is a lossless (or delibera
 
 Shannon entropy provides the first lens. A visualization encodes $n$ data dimensions into a fixed set of visual channels: position, length, area, angle, color hue, color saturation/luminance, texture, and shape. Bertin's semiotics of graphics (1967) ranks these channels by their discriminability and quantitative accuracy. Position along a common scale is the most precise channel; color hue is among the least precise for quantitative comparison but highly effective for categorical separation. The practical implication is that the highest-variance, most decision-critical dimension of your data should map to the most discriminable visual channel available.
 
-```
+```text
 Discriminability ranking (Cleveland & McGill, 1984):
 1. Position on common scale
 2. Position on non-aligned scale

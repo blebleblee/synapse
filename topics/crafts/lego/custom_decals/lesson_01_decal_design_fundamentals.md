@@ -59,7 +59,7 @@ Third, establish a white underbase layer as the bottommost element in the design
 
 The following workflow diagram traces the complete design-to-application pipeline for a minifigure torso decal:
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                    DECAL PRODUCTION PIPELINE                     │
 ├──────────────────────────────────────────────────────────────────┤

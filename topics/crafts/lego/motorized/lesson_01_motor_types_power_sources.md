@@ -26,7 +26,7 @@ The XL-Motor (part 8882 in Power Functions, 88014 in Powered Up) is the high-tor
 
 The Powered Up Smart Motors deserve their own conceptual category, because they do not behave like passive actuators. The Powered Up Medium Linear Motor (88008) and the Technic Large Angular Motor (88013) each contain a quadrature encoder — a pair of optical or magnetic sensors that detect shaft rotation in discrete increments. This encoder data is transmitted back to the hub over the connector's data lines, allowing the hub's firmware to implement position control. When you command a Powered Up motor to rotate 90 degrees and hold, the hub is running a software PID loop: it reads encoder position, computes the error between actual and target position, and adjusts motor drive voltage to close that error. This closed-loop behavior is what makes Powered Up builds capable of repeatable, precise movements that Power Functions systems simply cannot achieve without external sensors.
 
-```
+```text
 Motor Family Specification Reference
 
 ┌────────────────────────┬──────────────┬────────────────┬──────────────┬─────────────────┐

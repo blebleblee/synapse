@@ -22,7 +22,7 @@ Integrating DLSS into a real-time rendering engine requires instrumenting the gr
 
 The rendering pipeline structure transforms from the traditional sequence of geometry processing, rasterization, fragment shading, and post-processing into a bifurcated architecture where the fragment shader outputs a low-resolution color buffer and auxiliary motion/depth targets, DLSS consumes these outputs as inference inputs, and post-processing operates on the upscaled reconstruction. This architectural split materializes through explicit render pass boundaries and image layout transitions managed by the graphics API.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                       Frame N Execution Timeline                     │
 ├─────────────────────────────────────────────────────────────────────┤

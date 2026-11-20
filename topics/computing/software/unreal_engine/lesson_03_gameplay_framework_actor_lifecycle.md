@@ -208,7 +208,7 @@ The component attachment hierarchy is governed by `USceneComponent::AttachToComp
 
 The following diagram illustrates the attachment graph for a typical character actor, showing how the transform hierarchy flows from the actor's root component down through skeletal mesh bones to attached child meshes:
 
-```
+```text
 ACharacter
  │
  ├── CapsuleComponent (RootComponent, USceneComponent)

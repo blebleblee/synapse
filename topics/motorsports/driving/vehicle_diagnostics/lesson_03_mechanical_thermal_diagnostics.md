@@ -32,7 +32,7 @@ Valve train vibration provides insight into cam lobe wear, valve spring fatigue,
 
 The practical workflow for powertrain vibration diagnosis begins with establishing a baseline signature during engine commissioning or after fresh rebuild. We mount triaxial accelerometers at strategic locations: one on the engine block near the crankshaft centerline, one on the transmission casing, and one on a rigid chassis mounting point. We record vibration data across the entire RPM operating range in 500 RPM increments, capturing ten seconds of data at each RPM step to ensure statistical stability. We then compute the power spectral density (PSD) using Fast Fourier Transform (FFT) algorithms, typically employing a Hanning window to reduce spectral leakage and averaging across multiple time segments to reduce noise.
 
-```
+```text
 Vibration Diagnostic Workflow:
 
 Time Domain Signal (Engine Block Accelerometer, Z-axis)
@@ -106,7 +106,7 @@ By integrating this thermal model in real-time during practice sessions, we pred
 
 The practical implementation employs rotor-mounted thermocouples at multiple radial positions (inner, mid, and outer diameter) to validate model predictions and provide real-time temperature feedback to the driver. Modern racing series permit surface-mounted infrared temperature sensors that scan the rotor surface during each wheel rotation, providing continuous temperature profiles without physical contact. We correlate these measured temperatures with brake pressure, vehicle deceleration, and cooling airflow velocity to refine model parameters and improve prediction accuracy.
 
-```
+```text
 Brake Thermal Model Architecture:
 
 Telemetry Inputs:
@@ -156,7 +156,7 @@ Differential losses exhibit strong dependence on torque split between left and r
 
 The diagnostic workflow for drivetrain efficiency analysis correlates power loss with operating conditions—vehicle speed, gear selection, corner radius, and lateral acceleration—to isolate failure modes. A sudden increase in transmission loss at a specific gear indicates gear mesh wear or bearing degradation within that gear pair. A progressive increase in differential loss across multiple sessions signals clutch pack wear or gear tooth scuffing requiring replacement. We establish efficiency baselines during initial vehicle commissioning and monitor deviation trends across the season.
 
-```
+```text
 Drivetrain Efficiency Diagnostic Workflow:
 
 Measured Inputs:
@@ -220,7 +220,7 @@ A strain gauge converts local material strain into a resistance change that tran
 
 The rainflow cycle counting algorithm processes the strain time history, extracting individual stress reversals and binning them by amplitude and mean stress. This algorithm identifies closed hysteresis loops in the stress-strain response, where each loop represents a fatigue cycle consuming damage according to the S-N curve. A typical 30-minute practice session generates thousands of rainflow cycles spanning from minor stress fluctuations (5-10 MPa amplitude) to major events (150-200 MPa amplitude). We weight each cycle by its damage contribution using the S-N curve, summing to compute incremental damage for the session.
 
-```
+```text
 Fatigue Damage Accumulation Workflow:
 
 Strain Gauge Time History (1000 Hz sampling)
@@ -264,7 +264,7 @@ If pressure drops of this magnitude occur in 80% of bearing failures (P(pressure
 
 The practical implementation streams telemetry data through a sliding window analysis pipeline that computes diagnostic features—spectral content, trend slopes, correlation metrics—over the most recent 30 seconds of data. These features feed into pre-trained machine learning classifiers (random forests, gradient boosted trees) that output failure probability estimates for each monitored failure mode. The classifier training dataset comprises historical telemetry from both normal operation and confirmed failure cases, establishing the statistical distributions that distinguish healthy from failing components.
 
-```
+```text
 Real-Time Diagnostic Fusion Architecture:
 
 Raw Telemetry Stream (100+ channels @ 100 Hz)

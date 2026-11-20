@@ -24,7 +24,7 @@ The architecture of a production-grade risk management system for systematic tra
 
 The position database serves as the single source of truth for all portfolio holdings, open orders, and pending settlements. This database must reconcile positions across multiple execution venues, prime brokers, and custodians, maintaining separate records for gross positions, net positions, and notional exposures. For multi-asset strategies spanning equities, futures, options, and currencies, the position database must also store derivative Greeks, funding rates, margin requirements, and collateral allocations. Position reconciliation occurs at multiple frequencies: intraday reconciliation every fifteen minutes to catch execution errors, end-of-day reconciliation against broker confirms, and monthly prime broker statement reconciliation to detect discrepancies that compound over time. Any mismatch between internal records and external confirms triggers an immediate halt to trading in the affected instruments until resolution.
 
-```
+```text
 Position Database Schema
 ├── Instruments
 │   ├── SecurityID (CUSIP, ISIN, Bloomberg Ticker)
@@ -65,7 +65,7 @@ Expected Shortfall, also known as Conditional Value-at-Risk (CVaR), extends VaR 
 
 Stress testing complements VaR and Expected Shortfall by evaluating portfolio losses under specific adverse scenarios rather than relying on historical or probabilistic distributions. A stress test defines a severe but plausible market event—such as a 10% equity market decline, a 200 basis point spike in interest rates, or a 30% increase in implied volatility—and computes the resulting portfolio loss. Historical stress scenarios replay past crises: the 1987 crash, the 1998 Long-Term Capital Management failure, the 2008 financial crisis, and the 2020 COVID shock. Hypothetical stress scenarios construct synthetic events that have not occurred historically but represent plausible tail risks, such as a sudden currency devaluation, a geopolitical crisis disrupting energy markets, or a flash crash in a major equity index.
 
-```
+```text
 Stress Test Framework
 ┌─────────────────────────────────────────────┐
 │ Historical Scenarios                        │

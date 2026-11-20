@@ -50,7 +50,7 @@ The entire protocol takes roughly three to four minutes. For high-stakes convers
 
 Different contexts demand different listening postures. Rather than a generic active listening stance, you need a modular set of listening configurations. The following map illustrates the primary contexts and their corresponding listening mechanics:
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────┐
 │ CONFLICT RESOLUTION / MEDIATION LISTENING                       │
 ├────────────────────────────────────────────────────────────────┤

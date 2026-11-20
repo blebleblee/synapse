@@ -20,7 +20,7 @@ The document principle is FI's foundational mechanical rule: every posting in Fi
 
 The account determination framework is where FI connects to operational modules. When a goods receipt is posted in MM, SAP does not ask the user which GL account to debit and credit. It executes a rules engine called the Material Ledger / Account Determination, specifically the transaction OBYC configuration, which maps a combination of transaction key (such as BSX for inventory postings, WRX for GR/IR clearing, PRD for price differences) to a GL account based on the valuation class of the material and the chart of accounts. This means the finance team configures the rules once, and every subsequent operational posting uses those rules automatically without requiring human intervention for account coding. The same logic applies in SD via the condition technique and revenue account determination, where a combination of account assignment group on the customer master, account assignment group on the material master, and the chart of accounts maps to a revenue GL account in transaction VKOA.
 
-```
+```text
 FI Document Structure (Classic ECC)
 
 BKPF (Document Header)
@@ -103,7 +103,7 @@ A purchase order line item carries quantity, net price, delivery date, plant, st
 
 When the vendor invoice arrives and the accounts payable team posts it via MIRO, SAP debits the GR/IR clearing account and credits the vendor sub-ledger. If the invoice price matches the purchase order price within tolerance, the GR/IR clears cleanly. If there is a discrepancy, SAP posts a price difference to the variance account if the material is managed at standard price, or adjusts the moving average price if the material is on moving average. The tolerance check in MIRO is configured via transaction OMR6, where you define percentage and absolute tolerances for price variances, quantity variances, and delivery cost variances. Violations above tolerance block the invoice for payment pending manual review.
 
-```
+```text
 MM Procurement Document Chain & FI Integration
 
 Purchase Requisition (PR)

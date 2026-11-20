@@ -272,7 +272,7 @@ A design decision with deep correctness implications is **how artifacts are refe
 
 Each task writes output to a path derived from a hash of its inputs and code version:
 
-```
+```text
 s3://artifacts/{pipeline_id}/{run_id}/{task_name}/{content_hash}/output.pkl
 ```
 

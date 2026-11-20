@@ -197,7 +197,7 @@ for $i = 1, 2, \ldots, n-1$, yielding the characteristic $1/i$ decay of the neut
 
 To simulate coalescent genealogies and DNA sequences in practice, use software such as `ms`, `msms`, `msprime`, or `SLiM`. These tools accept demographic models specifying population size trajectories $N_e(t)$, migration matrices, recombination rates, and selection coefficients, then generate genealogies and sequence polymorphism data consistent with those models. For example, the command-line tool `ms` uses syntax:
 
-```
+```text
 ms nsam nreps -t theta -r rho nsites -I npop n1 n2 ... m -en t pop size -ej t pop1 pop2
 ```
 

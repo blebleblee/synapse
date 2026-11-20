@@ -34,7 +34,7 @@ The interaction between phenomenal consciousness (qualia) and intentionality gen
 
 Understanding mental causation requires precise mapping of the logical space of positions and their internal structural commitments. We can represent the primary positions along two axes: ontological commitment (what exists) and causal architecture (how causation flows).
 
-```
+```text
 Ontological Inventory Dimension
 │
 │  Substance Dualism
@@ -107,7 +107,7 @@ The exclusion argument's logical structure demands precise articulation to evalu
 
 **Exclusion Argument Formal Structure:**
 
-```
+```text
 Premises:
 (1) Causal Closure: Every physical effect has a sufficient physical cause
     ∀x[Physical(x) ∧ HasCause(x) → ∃y(Physical(y) ∧ Causes(y,x))]

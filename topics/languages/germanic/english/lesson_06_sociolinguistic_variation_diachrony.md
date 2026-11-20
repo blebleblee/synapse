@@ -24,7 +24,7 @@ The first movement is **Grimm's Law**, the consonantal chain shift that separate
 
 The second great movement is the **Great Vowel Shift**, and it is the reason Modern English spelling is such a poor guide to pronunciation. The shift affected the seven long monophthongs of Middle English, raising each one step higher in the oral cavity in a chain reaction, and the two that could not raise further — the high vowels /iː/ and /uː/ — diphthongized instead. The cascade can be visualized as a movement through vowel space:
 
-```
+```text
 MIDDLE ENGLISH        MODERN ENGLISH
 Long Vowel → Shift Target → Reflex
 

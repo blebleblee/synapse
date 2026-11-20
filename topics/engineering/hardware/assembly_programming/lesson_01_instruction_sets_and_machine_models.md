@@ -54,7 +54,7 @@ ARM64's fixed 32-bit instruction format divides instructions into broad categori
 
 Consider the ARM64 instruction `ADD X0, X1, X2` which sums registers X1 and X2, writing the result to X0. The encoding reserves bits [31:24] for the primary opcode identifying this as a data processing register instruction, bits [23:16] specify additional operation details and shift amounts, bits [20:16] encode the second source register (X2), bits [9:5] encode the first source register (X1), and bits [4:0] encode the destination register (X0). The fixed format enables single-cycle decode, as the processor knows where to find each register specifier without sequential parsing.
 
-```
+```text
 ARM64 ADD X0, X1, X2 Encoding:
 31        24 23     21 20    16 15  10 9     5 4     0
 |----------|---------|--------|------|-------|-------|
@@ -66,7 +66,7 @@ x86 variable-length encoding permits instructions ranging from one byte for simp
 
 The x86 instruction `MOV RAX, [RBX + RCX*8 + 0x12345678]` demonstrates complex encoding. The REX prefix byte (`0x48`) specifies 64-bit operand size and extended register usage. The opcode byte (`0x8B`) indicates a register-from-memory move. The ModR/M byte encodes indirect addressing with SIB. The SIB byte specifies RBX as base, RCX as index with scale factor 8. Finally, a four-byte displacement (`0x12345678`) completes the encoding, yielding a seven-byte instruction.
 
-```
+```text
 x86-64 MOV RAX, [RBX + RCX*8 + 0x12345678]:
 REX   Opcode ModR/M  SIB     Displacement
 0x48  0x8B   0x84    0xCB    0x78 0x56 0x34 0x12

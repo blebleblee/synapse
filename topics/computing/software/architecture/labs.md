@@ -605,7 +605,7 @@ cargo +nightly test --target x86_64-unknown-linux-gnu -- --test-threads=1
 
 ThreadSanitizer instruments memory accesses and synchronization operations, maintaining shadow state to detect conflicting accesses. Run the atomic counter stress test. ThreadSanitizer will report a data race in the `increment_if_even` method, identifying the load and store operations that conflict without proper synchronization:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Read of size 8 at 0x7fff12345678 by thread T2:
     #0 AtomicCounter::increment_if_even src/lib.rs:24
@@ -653,7 +653,7 @@ cargo +nightly test --target x86_64-unknown-linux-gnu leak_test
 
 LeakSanitizer runs at program exit and reports memory that was allocated but never freed. The `leak_test` creates 100 counter instances, each leaking 1 MB, for a total of 100 MB leaked. LeakSanitizer will report:
 
-```
+```text
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 
 Direct leak of 104857600 byte(s) in 100 object(s) allocated from:

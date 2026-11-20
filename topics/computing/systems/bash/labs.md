@@ -425,7 +425,7 @@ The raw strace output merits careful reading. Three patterns are essential:
 
 **1. Interrupted syscall (EINTR)**
 
-```
+```text
 14:23:17.441302 nanosleep({tv_sec=0, tv_nsec=300000000}, {tv_sec=0, tv_nsec=182441000}) = -1 EINTR (Interrupted system call) <0.117559>
 14:23:17.441350 --- SIGUSR1 {si_signo=SIGUSR1, si_code=SI_USER, si_pid=12345, si_uid=1000} ---
 ```
@@ -436,7 +436,7 @@ The `nanosleep` returned early (`= -1 EINTR`) with the remaining sleep time in t
 
 Had the signal handler been registered with `SA_RESTART`, you would see:
 
-```
+```text
 nanosleep({tv_sec=0, tv_nsec=300000000}, 0x...) = ? ERESTART_RESTARTBLOCK (Interrupted by signal)
 --- SIGUSR1 ... ---
 nanosleep({tv_sec=0, tv_nsec=182441000}, NULL) = 0
@@ -446,7 +446,7 @@ The kernel automatically reissues `nanosleep` with the *remaining* duration, tra
 
 **3. Exit via signal handler**
 
-```
+```text
 14:23:19.100221 --- SIGUSR2 {si_signo=SIGUSR2, si_code=SI_USER, ...} ---
 14:23:19.100301 exit_group(42)              = ?
 14:23:19.100412 +++ exited with 42 +++
@@ -1549,7 +1549,7 @@ chmod +x core_verification_suite.sh
 
 `perf stat` output requires careful interpretation. A minimal example:
 
-```
+```text
  Performance counter stats for './memory_faults 128':
 
     1,048,576      page-faults               #  128.00 K/sec

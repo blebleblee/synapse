@@ -52,7 +52,7 @@ For track riding, cold pressures are set anticipating thermal rise. A typical sp
 
 Temperature profiling across the tire's contact patch reveals load distribution and camber utilization. Using an infrared pyrometer or contact thermometer, the engineer measures temperatures at the inner edge, center, and outer edge of the tread immediately after the rider returns to pit lane. For a properly set up tire operating at the intended lean angles, the temperature profile should show relative uniformity, with the center and edges within five to ten degrees Celsius. A cold center with hot edges indicates insufficient pressure, excessive carcass flex, and poor crown contact. Hot center with cold edges suggests over-inflation, insufficient lean angle utilization, or excessive crown loading. The absolute temperature provides a sanity check: slick compounds demand temperatures above ninety degrees for optimal grip, while sustained temperatures above one hundred fifteen degrees signal thermal distress.
 
-```
+```text
 Contact Patch Force Generation Model:
 
 Lateral Force (Fy):

@@ -22,7 +22,7 @@ The hardware architecture of a representative UniFi access point—the U6-LR ser
 
 The datapath flow begins when a client device transmits an 802.11 frame. The RF front-end—consisting of power amplifiers, low-noise amplifiers, and transmit/receive switches—captures the analog signal and routes it through dual diversity antennas to maximize spatial reception. The radio chipset performs OFDM demodulation, converting the frequency-domain subcarriers back into binary data streams, applies forward error correction, and de-interleaves the spatial streams according to the negotiated MCS (Modulation and Coding Scheme) index. For WiFi 6 frames, the chipset additionally parses OFDMA resource unit allocations and trigger frames that coordinate uplink multi-user transmissions. The resulting Ethernet frame emerges from the radio subsystem and enters the SoC's integrated Gigabit Ethernet switch fabric.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    UniFi U6-LR Access Point                  │
 ├─────────────────────────────────────────────────────────────┤

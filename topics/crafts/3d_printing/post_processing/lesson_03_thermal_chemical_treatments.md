@@ -56,7 +56,7 @@ For PLA parts, ethyl acetate replaces acetone. Ethyl acetate has a boiling point
 
 The process flow from print to finished part looks like this:
 
-```
+```text
 Print → Support Removal → Sand to 220 grit (optional) → Clean with IPA → 
 Vapor Chamber Exposure → 15–30 min outgas in ventilated area → 
 Final inspection → Secondary sanding if needed (600+ grit)

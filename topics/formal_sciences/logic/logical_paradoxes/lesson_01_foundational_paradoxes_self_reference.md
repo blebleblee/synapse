@@ -32,7 +32,7 @@ The internal architecture of a self-referential paradox consists of three functi
 
 The proof of the diagonal lemma proceeds by constructing a formula $\text{diag}(x)$ that computes the diagonalization operation: given the Gödel number of a formula $\theta(x)$ with one free variable, $\text{diag}$ outputs the Gödel number of $\theta(\ulcorner \theta \urangle)$, the formula with its own Gödel number substituted for the free variable. We then define $\psi$ as $\phi(\text{diag}(\ulcorner \phi \urangle))$. The formula $\psi$ asserts that $\phi$ holds of the diagonalization of $\phi$'s Gödel number. By the properties of the $\text{diag}$ function, $\text{diag}(\ulcorner \phi \urangle)$ computes to $\ulcorner \psi \urangle$, yielding the equivalence $\psi \leftrightarrow \phi(\ulcorner \psi \urangle)$.
 
-```
+```text
 Self-Reference Construction Pipeline:
 
 Formula φ(x) with free variable

@@ -18,7 +18,7 @@ The security invariants that govern production session systems crystallize into 
 
 The classic server-side session architecture stores session state in a central data store—typically Redis, Memcached, or PostgreSQL—indexed by a random session identifier transmitted via HTTP cookies. When a user authenticates, the server generates a cryptographically random session ID using a CSPRNG, creates a session record containing user identity and metadata, stores it with a time-to-live (TTL), and returns the session ID to the client in a Set-Cookie header with HttpOnly, Secure, and SameSite attributes. Subsequent requests include the session cookie, allowing the server to retrieve the session record, validate its existence and expiration, and load user context.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Session Lifecycle Flow                       │
 └─────────────────────────────────────────────────────────────────┘

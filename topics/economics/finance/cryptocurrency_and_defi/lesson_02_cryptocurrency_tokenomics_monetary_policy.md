@@ -110,7 +110,7 @@ When network activity is high enough that the burn rate exceeds the issuance rat
 
 The flow architecture of EIP-1559 can be represented as follows:
 
-```
+```text
 User Transaction
        │
        ▼

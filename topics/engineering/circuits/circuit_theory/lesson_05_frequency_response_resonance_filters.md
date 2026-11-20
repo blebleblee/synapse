@@ -104,7 +104,7 @@ Ladder network topologies provide the canonical realization for passive LC filte
 
 Consider a third-order Butterworth lowpass ladder normalized to 1 rad/s and 1 Ω:
 
-```
+```text
        L₁          L₃
 v_in ----LLLL--------LLLL---- v_out
               |          |
@@ -128,7 +128,7 @@ The scaled filter maintains the same -3 dB point at 1 kHz and -60 dB/decade roll
 
 Highpass filters emerge from lowpass prototypes via the impedance transformation s → ω₀²/s, which maps lowpass poles at s = -σ_k to highpass poles at s = -ω₀²/σ_k. This transformation interchanges inductors and capacitors: a series inductor L in the lowpass ladder becomes a series capacitor C_HP = 1/(ω₀²L) in the highpass ladder, while a shunt capacitor C becomes a shunt inductor L_HP = 1/(ω₀²C). The third-order Butterworth lowpass ladder above transforms into:
 
-```
+```text
        C₁          C₃
 v_in ----||||--------||||---- v_out
               |          |

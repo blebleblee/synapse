@@ -68,7 +68,7 @@ Digital delay is implemented via a circular buffer—a block of memory addressed
 
 Implementation: maintain a single delay buffer. The feedback calculation routes the delayed sample to both channels but sets a pan coefficient that alternates with each repeat cycle. In pseudocode:
 
-```
+```text
 for each sample:
   output_L = input_L + delayed_sample * pan_L * feedback
   output_R = input_R + delayed_sample * pan_R * feedback
@@ -88,7 +88,7 @@ Example: at 120 BPM, quarter-note delay time = (60 / 120) * 1000 = 500 ms. Eight
 
 A simple 4-line FDN delay network:
 
-```
+```text
 Input → [Mixing Matrix] → 4 parallel delay lines → [Mixing Matrix] → Output
                          ↓
                    [Feedback loop]
@@ -96,7 +96,7 @@ Input → [Mixing Matrix] → 4 parallel delay lines → [Mixing Matrix] → Out
 
 Each delay line operates at a different rate. For 120 BPM, the four lines might be clocked at quarter, eighth, triplet eighth, and sixteenth tempos. The mixing matrix applies gain and pan coefficients:
 
-```
+```text
 Matrix:
 [0.5   0.3  −0.2   0.1] [L1]
 [0.2   0.6   0.1  −0.15] [L2]
@@ -163,25 +163,25 @@ Algorithmic reverbs generate reverb-like acoustic characteristics via mathematic
 
 The Moorer design employs parallel comb filters followed by series all-pass filters. The topology:
 
-```
+```text
 Input → [4 Comb Filters in Parallel] → [2 All-Pass Filters in Series] → Output
 ```
 
 Each comb filter implements:
 
-```
+```text
 y(n) = x(n) + feedback * y(n − delay_samples)
 ```
 
 where delay_samples corresponds to a musical note duration (typically 40–120 ms for a compact reverb). The feedback coefficient determines the RT60:
 
-```
+```text
 feedback = 10^(−3 * delay_ms / RT60_ms)
 ```
 
 For a 60 ms comb delay with 2 second (2000 ms) RT60:
 
-```
+```text
 feedback = 10^(−3 * 60 / 2000) = 10^(−0.09) = 0.813
 ```
 
@@ -189,7 +189,7 @@ Four parallel combs at delays of 50, 60, 70, and 80 ms create early reflections 
 
 All-pass filters introduce phase shift without changing magnitude:
 
-```
+```text
 y(n) = −x(n) + feedback * x(n − delay_samples) + feedback * y(n − delay_samples)
 ```
 
@@ -199,7 +199,7 @@ All-pass filters do not attenuate; they diffuse—spreading early reflections te
 
 The Dattorro topology employs a more complex FDN structure with cross-coupled delay lines and a unique early reflection section. The topology:
 
-```
+```text
 Input → [Input All-Pass] → [Early Reflection Matrix] → [Parallel FDN with 8 Delays] → Output
 ```
 
@@ -207,7 +207,7 @@ The input all-pass (typically 4 ms) initially diffuses the input signal. The ear
 
 The unitary matrix ensures energy conservation—no net gain or loss across the network. A simple unitary matrix for 4 delay lines:
 
-```
+```text
 1/2 * [1   1   1   1]
       [1  −1   1  −1]
       [1   1  −1  −1]
@@ -234,7 +234,7 @@ Real acoustic spaces do not exhibit flat frequency response in their reverb tail
 
 The damping filter is implemented as a first-order shelving low-pass:
 
-```
+```text
 y(n) = damping * y(n−1) + (1 − damping) * x(n)
 ```
 
@@ -255,7 +255,7 @@ Convolution reverbs operate from a fundamentally different principle: they captu
 
 The convolution operation is defined as:
 
-```
+```text
 y(n) = Σ h(k) * x(n − k) for k = 0 to N−1
 ```
 

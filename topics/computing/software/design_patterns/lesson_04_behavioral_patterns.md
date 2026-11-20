@@ -95,7 +95,7 @@ impl Handler for BusinessLogicHandler {
 
 The chain assembly occurs at initialization, creating a linked sequence where each handler knows only its immediate successor. This topology enables dynamic reconfiguration—handlers can be inserted, removed, or reordered at runtime without affecting other handlers. The request flows through the chain like a packet through a network pipeline, with each handler acting as a filter or transformer.
 
-```
+```text
 Request → [Auth] → [RateLimit] → [Validation] → [BusinessLogic] → Response
            ↓ reject   ↓ reject      ↓ reject       ↓ process
         401 Unauthorized  429 TooManyRequests  400 BadRequest
@@ -209,7 +209,7 @@ The command history maintains two stacks: executed commands (for undo) and undon
 
 Commands can be composed into macro commands that execute multiple operations atomically. A "bold text" command might compose a "select range" command with a "apply formatting" command. Macro commands execute their sub-commands in sequence during `execute()` and reverse them during `undo()`, implementing transaction-like all-or-nothing semantics.
 
-```
+```text
 CommandQueue: [Insert("h")] → [Insert("e")] → [Insert("l")] → [Delete(2,3)] → [Insert("lp")]
                     ↓              ↓              ↓               ↓                ↓
 State:         ""  → "h"        → "he"         → "hel"         → "he"          → "help"
@@ -434,7 +434,7 @@ impl Checkbox {
 
 The mediator centralizes coordination logic that would otherwise be distributed across multiple widgets. Without the mediator, the email field would need references to both the checkbox and submit button, the checkbox would need a reference to the button, and so on, creating a densely coupled mesh. The mediator reduces this coupling to a star topology where each widget connects only to the mediator.
 
-```
+```text
 Without Mediator (N*(N-1)/2 connections):
 EmailField ←→ SubmitButton
      ↕            ↕
@@ -550,7 +550,7 @@ The memento's opacity is critical: the caretaker stores mementos in a vector and
 
 Mementos can be optimized through copy-on-write semantics or delta compression. Rather than storing complete snapshots, each memento can store only the changes from the previous state. This reduces memory overhead but increases restoration time, as restoring requires replaying all deltas from the nearest full snapshot. Text editors often use a hybrid approach: full snapshots every N operations with deltas in between, balancing memory usage and restore performance.
 
-```
+```text
 Snapshot Strategy:
 Time:    t0     t1     t2     t3     t4     t5     t6
 State:  [Full] [Δ1]  [Δ2]  [Full] [Δ3]  [Δ4]  [Full]
@@ -661,7 +661,7 @@ The observer list enables dynamic subscription—observers can attach and detach
 
 Observer can be implemented in push or pull styles. In push style (shown above), the subject sends detailed event information to observers. In pull style, the subject only notifies observers of a change, and observers query the subject for specific information they need. Push style reduces coupling at the cost of sending data observers might not need. Pull style minimizes data transfer but requires observers to know the subject's query interface.
 
-```
+```text
 Push Style:
 Subject: notify(Event { symbol: "AAPL", price: 150.0 })
 Observer: receives complete event data
@@ -1257,7 +1257,7 @@ The Visitor pattern allows adding new operations (evaluation, code generation, t
 
 The double dispatch mechanism resolves method selection at runtime based on two types. Without Visitor, implementing evaluation would require adding an `evaluate()` method to each node class. Adding code generation would require adding `generate()`, and so on, polluting node classes with unrelated concerns. Visitor inverts this: node classes remain focused on structure, while visitors focus on operations.
 
-```
+```text
 Method Dispatch Flow:
 Client: root.accept(&mut evaluator)
            ↓

@@ -66,7 +66,7 @@ Myelination—the progressive wrapping of axons in insulating myelin sheaths—i
 
 Synaptic density follows an inverted-U trajectory: exuberant early proliferation followed by experience-dependent pruning. The visual cortex reaches peak synaptic density around four months, then prunes throughout childhood. Prefrontal cortex peaks later, around puberty, then undergoes extensive adolescent pruning. This proliferation-and-pruning architecture enables an initial period of high plasticity where the brain can adapt to a wide range of environmental inputs, followed by consolidation where frequently-used connections are strengthened and rarely-used connections eliminated. The computational logic parallels machine learning: initial overparameterization allows learning complex mappings, then regularization prevents overfitting and increases efficiency. From a parenting perspective, this architecture implies that early experience shapes which synaptic connections are retained and which are pruned, literally sculpting brain structure. Enriched early environments provide varied inputs that preserve diverse synaptic ensembles; impoverished or traumatic early environments produce overpruning of adaptive connections and preservation of maladaptive ones.
 
-```
+```text
 Developmental Cascade Dynamics:
 
 Initial Risk Factor (Domain A)

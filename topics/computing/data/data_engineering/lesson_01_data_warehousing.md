@@ -274,7 +274,7 @@ Understanding *why* columnar storage outperforms row-oriented storage for analyt
 
 In a **row-oriented** store, all column values for a given row are stored contiguously on disk. Reading a single column across 1 million rows requires seeking through the full row width for each row:
 
-```
+```text
 Row 1: [cust_id=1001][name="Alice"][country="US"][amount=49.99][ts=2024-01-15]
 Row 2: [cust_id=1002][name="Bob"][country="DE"][amount=129.00][ts=2024-01-15]
 ...
@@ -283,7 +283,7 @@ Row 1000000: [...]
 
 In a **column-oriented** store, all values for a single column are stored contiguously:
 
-```
+```text
 cust_id column:  [1001][1002][1003]...[1000000]
 amount column:   [49.99][129.00][9.99]...[850.00]
 country column:  [US][DE][US]...[JP]
@@ -307,7 +307,7 @@ Column co-location enables aggressive compression because values within a column
 
 Apache Parquet is the dominant open columnar storage format for data lakes and lakehouses. Its internal structure is critical to understanding query performance:
 
-```
+```text
 Parquet File
 ├── Row Group 0  (128 MB default)
 │   ├── Column Chunk: order_date_key

@@ -144,7 +144,7 @@ flashrom -p ft2232_spi:type=232H,port=A
 
 `flashrom` queries the chip's JEDEC ID by transmitting the 0x9F command over SPI and interpreting the response bytes. A successful detection prints the chip's manufacturer, model, and capacity:
 
-```
+```text
 Found Winbond flash chip "W25Q128.V" (16384 kB, SPI) on ft2232_spi.
 ```
 
@@ -164,7 +164,7 @@ binwalk -e firmware_dump.bin
 
 `binwalk` scans the image for magic bytes indicating file boundaries: U-Boot header signatures, Linux kernel compressed formats (gzip, LZMA, LZ4), and filesystem superblocks (SquashFS, JFFS2, UBIFS). The `-e` flag automatically extracts recognized structures into subdirectories. A typical embedded firmware image yields:
 
-```
+```text
 DECIMAL       HEXADECIMAL     DESCRIPTION
 --------------------------------------------------------------------------------
 0             0x0             U-Boot legacy image, header size: 64 bytes, header CRC: 0x7A2B3C4D
@@ -266,7 +266,7 @@ i2cdetect -y 1
 
 `i2cdetect` probes all 127 possible 7-bit I²C addresses, printing a table showing which addresses acknowledge. A typical result:
 
-```
+```text
      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
 00:          -- -- -- -- -- -- -- -- -- -- -- -- --
 10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

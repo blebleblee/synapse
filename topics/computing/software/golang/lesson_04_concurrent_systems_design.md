@@ -336,7 +336,7 @@ A deadlock in Go occurs when every goroutine in the program is blocked waiting f
 
 The classic deadlock topology involves two goroutines each holding one lock and waiting for the other:
 
-```
+```text
 Goroutine A holds lockX, waiting for lockY
 Goroutine B holds lockY, waiting for lockX
 ```
@@ -503,7 +503,7 @@ func main() {
 
 No treatment of concurrent correctness in Go is complete without the race detector. Enabled with `-race`, it instruments every memory access at compile time, using ThreadSanitizer's shadow memory algorithm to track the set of goroutines that have recently accessed each memory location. When a read and a write, or two writes, to the same location occur in different goroutines with no synchronization between them, the detector fires with a detailed stack trace of both goroutines.
 
-```
+```text
 go test -race ./...
 go run -race main.go
 go build -race -o myapp_racecheck .

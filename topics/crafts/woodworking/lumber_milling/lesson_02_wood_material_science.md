@@ -30,7 +30,7 @@ The practical invariant is this: mill to a moisture content slightly above your 
 
 The growth ring geometry relative to the saw kerf determines the character of every board that comes off the mill. The three primary orientations — flat-sawn, quarter-sawn, and rift-sawn — are not merely aesthetic choices. They are structural decisions with direct consequences for dimensional stability, surface figure, and workability.
 
-```
+```text
                         Cross-section of a log showing cut orientations:
 
                               ┌───────────────────────────────┐
@@ -104,7 +104,7 @@ Interlocked grain, common in tropical hardwoods like sapele, utile, and certain 
 
 Drying is not simply the removal of water. It is a time-dependent diffusion process that creates internal stress gradients within the board as the shell dries faster than the core, and those stresses can remain locked into the wood long after the target moisture content is reached. Understanding this gradient is essential to diagnosing and preventing the most common milling defects: surface checking, end-checking, honeycombing, and case hardening.
 
-```
+```text
    Moisture gradient during early kiln drying (cross-section of a 4/4 board):
 
    Surface (dry)   ├────────────────────────────────────────┤  Surface (dry)

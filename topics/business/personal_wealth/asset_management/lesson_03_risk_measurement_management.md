@@ -34,7 +34,7 @@ The Sortino ratio refines the Sharpe by replacing standard deviation with downsi
 
 Risk budgeting allocates portfolio risk capacity across asset classes and strategies rather than capital, recognizing that equal dollar allocations produce vastly unequal risk contributions. A traditional sixty-forty stock-bond portfolio allocates sixty percent of capital to equities but over ninety percent of risk, since equities carry three to four times the volatility of investment-grade bonds. Risk parity frameworks invert this, targeting equal risk contributions by overweighting bonds and using modest leverage to achieve target returns. The mathematical formulation decomposes portfolio variance into marginal contributions: $\sigma_p^2 = \sum_{i=1}^{n} w_i \frac{\partial \sigma_p}{\partial w_i} \sigma_p$, where each term $w_i \frac{\partial \sigma_p}{\partial w_i}$ represents asset $i$'s risk contribution. Setting these contributions equal and solving for weights $w_i$ produces the risk-parity allocation.
 
-```
+```text
 Risk Budget Decomposition for 60/40 Portfolio:
 Portfolio Value: $1,000,000
 Equity Allocation: $600,000 (60%), Volatility: 16%
@@ -77,7 +77,7 @@ Stress testing subjects portfolios to historical crisis scenarios and hypothetic
 
 Regime-dependent risk behavior recognizes that volatility, correlation, and tail probabilities vary across market regimes characterized by growth-inflation dynamics. During goldilocks regimes with stable growth and low inflation, equities and bonds exhibit negative correlation, volatilities compress, and Sharpe ratios inflate, lulling investors into complacency. Inflationary regimes flip equity-bond correlations positive, demolishing sixty-forty portfolio diversification, as observed in 2022 when both stocks and bonds suffered double-digit losses simultaneously. Deflationary regimes amplify equity drawdowns while bonds rally, and stagflation combines negative equity returns with bond losses. Portfolio construction must either maintain robustness across all regimes through diversification into commodities, real assets, and alternatives, or employ tactical overlays that shift exposures dynamically as regime indicators shift.
 
-```
+```text
 Regime-Dependent Correlation Matrix Example:
 
 Goldilocks Regime (2010-2019):

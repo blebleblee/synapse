@@ -32,7 +32,7 @@ The cooling architecture must deliver precise airflow management tailored to mat
 
 The material flow path from spool to nozzle introduces mechanical constraints often overlooked until catastrophic failure occurs. Filament path friction accumulates through every guide tube, angle change, and extruder gear interface. PTFE guide tubes, standard in Bowden-style printers where the extruder motor mounts to the printer frame rather than the moving print head, impose frictional resistance proportional to tube length and the number of direction changes. A 700mm Bowden tube with three 90-degree bends requires substantially more extrusion force than a 300mm straight tube, directly increasing the likelihood of extruder motor skipping on high-temperature materials with elevated melt viscosity. Direct-drive configurations eliminate this friction by mounting the extruder directly on the print head, trading mechanical simplicity for increased moving mass that limits acceleration and print speed.
 
-```
+```text
 Material Thermal-Mechanical Reference Map:
 
 Material     T_nozzle  T_bed   Fan    Contraction  Bed Surface       Chamber

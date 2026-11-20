@@ -32,7 +32,7 @@ Free cash flow calculation requires precise navigation of accrual accounting adj
 
 The working capital component introduces subtle complexity. A rapidly growing business typically consumes working capital as receivables and inventory scale faster than payables, creating a cash drain despite accounting profitability. This drain reverses during maturity as growth decelerates, liberating trapped working capital. The model must project working capital as a dynamic function of revenue growth rates rather than applying static turnover ratios. The formulation tracks days sales outstanding for receivables, inventory turns for stock, and days payable outstanding for vendor financing, then calculates period-over-period changes:
 
-```
+```text
 ΔWorking Capital = (Receivablesₜ - Receivablesₜ₋₁) 
                   + (Inventoryₜ - Inventoryₜ₋₁) 
                   - (Payablesₜ - Payablesₜ₋₁)
@@ -40,7 +40,7 @@ The working capital component introduces subtle complexity. A rapidly growing bu
 
 where each component derives from:
 
-```
+```text
 Receivables = Revenue × (DSO / 365)
 Inventory = COGS × (Days Inventory / 365)
 Payables = COGS × (DPO / 365)
@@ -48,7 +48,7 @@ Payables = COGS × (DPO / 365)
 
 Terminal value represents the present value, as of the final projection year, of all subsequent perpetuity cash flows. Two methodologies dominate practitioner workflows: the perpetuity growth method and the exit multiple method. The perpetuity growth formula assumes free cash flow grows at a constant rate forever:
 
-```
+```text
 Terminal Value = FCFₙ × (1 + g) / (WACC - g)
 ```
 
@@ -56,7 +56,7 @@ where FCFₙ represents normalized final-year free cash flow, g denotes the perp
 
 The exit multiple method applies a valuation multiple to a terminal year metric, typically EBITDA:
 
-```
+```text
 Terminal Value = EBITDAₙ × Exit Multiple
 ```
 
@@ -66,7 +66,7 @@ Crucially, terminal value contributions typically dominate total enterprise valu
 
 Weighted average cost of capital synthesizes the blended cost of debt and equity financing, weighted by target capital structure proportions. The formula integrates three distinct components:
 
-```
+```text
 WACC = (E/V) × rₑ + (D/V) × rᴅ × (1 - Tc)
 ```
 
@@ -74,7 +74,7 @@ where E represents equity market value, D represents debt market value, V equals
 
 Cost of equity derives from the capital asset pricing model, which decomposes required returns into systematic risk premiums:
 
-```
+```text
 rₑ = Rf + β × (Rm - Rf) + Size Premium + Company-Specific Premium
 ```
 
@@ -84,7 +84,7 @@ Size and company-specific premiums adjust for empirical return patterns where sm
 
 Cost of debt reflects the current market yield the company would pay to issue new debt, not historical coupon rates on existing obligations. For rated issuers, this derives directly from credit spreads over benchmark rates for the company's credit rating. For unrated middle-market firms, practitioners synthesize implied ratings from interest coverage ratios and leverage multiples, then apply corresponding credit spreads:
 
-```
+```text
 rᴅ = Rf + Credit Spread
 ```
 
@@ -92,7 +92,7 @@ The capital structure weights (E/V) and (D/V) require careful specification. Usi
 
 The discount mechanism translates future cash flows into present value through compound discounting:
 
-```
+```text
 PV = Σ [FCFₜ / (1 + WACC)ᵗ] + [TV / (1 + WACC)ⁿ]
 ```
 
@@ -100,7 +100,7 @@ where the summation spans years 1 through n of the explicit forecast period, and
 
 The model architecture flows through a dependency graph where revenue assumptions propagate through operating statements into free cash flow calculations, capital structure assumptions feed into WACC derivation, and both streams converge in the discounting calculation yielding enterprise value. From enterprise value, the bridge to equity value requires adjustments for non-operating assets and claims:
 
-```
+```text
 Equity Value = Enterprise Value 
              + Cash & Marketable Securities
              + Non-Operating Assets
@@ -134,7 +134,7 @@ Another critical failure involves terminal value assumptions disconnected from e
 
 WACC derivation failures cluster around beta estimation and capital structure assumptions. Analysts frequently pull betas from financial data terminals without validating relevancy—a diversified conglomerate's beta captures its current business mix, not the specific division being valued. Proper technique requires identifying pure-play comparables in the target business's specific industry, calculating unlevered betas that strip out comparable firms' capital structure impacts, then re-levering at the target capital structure:
 
-```
+```text
 βunlevered = βlevered / [1 + (1 - Tc) × (D/E)]
 βrelevered = βunlevered × [1 + (1 - Tc) × (D/E)target]
 ```

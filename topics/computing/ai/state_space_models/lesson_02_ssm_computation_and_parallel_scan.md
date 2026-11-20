@@ -24,7 +24,7 @@ The parallel prefix scan, also called the parallel prefix sum or Blelloch scan i
 
 The algorithm proceeds in two phases. The upsweep phase builds a binary reduction tree over the sequence, computing partial reductions at each level. The downsweep phase distributes prefix information back down the tree. For a sequence of length $L = 8$, this proceeds as follows:
 
-```
+```text
 Input pairs: (A1,b1) (A2,b2) (A3,b3) (A4,b4) (A5,b5) (A6,b6) (A7,b7) (A8,b8)
 
 Upsweep (reduce):

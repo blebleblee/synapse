@@ -46,7 +46,7 @@ The humanist curriculum reform project targeted the trivium—grammar, rhetoric,
 
 The operational diagram of humanist knowledge production can be represented as:
 
-```
+```text
 [Manuscript Recovery] → [Philological Analysis] → [Critical Edition]
          ↓                                              ↓
 [Textual Comparison] ← [Scholarly Correspondence] → [Printing Press]

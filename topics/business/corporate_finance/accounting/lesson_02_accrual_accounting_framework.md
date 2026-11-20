@@ -26,7 +26,7 @@ The fundamental architecture of double-entry bookkeeping means that every econom
 
 **Accrued revenue** (also called unbilled receivables) arises when a company has earned revenue but has not yet invoiced or collected. A management consulting firm that completes 300 hours of engagement work in December at $350 per hour has earned $105,000 of revenue in December. If the invoice goes out January 5th, the December close requires the following entry:
 
-```
+```text
 DR  Accounts Receivable (or Unbilled Revenue)    $105,000
     CR  Revenue                                              $105,000
 ```
@@ -35,14 +35,14 @@ This entry records the economic substance of the transaction — value delivered
 
 **Deferred revenue** operates as the mirror image: cash has arrived, but the performance obligation is not yet satisfied. The SaaS example from Section 1 illustrates this precisely. At contract signing on November 1st, the entry is:
 
-```
+```text
 DR  Cash                                         $1,200,000
     CR  Deferred Revenue (Current Liability)                 $1,200,000
 ```
 
 Each subsequent month, as one-twelfth of the annual obligation is satisfied, the company records:
 
-```
+```text
 DR  Deferred Revenue                             $100,000
     CR  Revenue                                              $100,000
 ```
@@ -51,14 +51,14 @@ From a modeling standpoint, deferred revenue is a gift to the analyst who knows 
 
 **Prepaid expenses** apply the matching principle to costs paid in advance of consumption. A company pays $120,000 on January 1st for a twelve-month insurance policy. The initial entry moves cash to an asset:
 
-```
+```text
 DR  Prepaid Insurance (Current Asset)            $120,000
     CR  Cash                                                 $120,000
 ```
 
 Each month, as one-twelfth of the coverage period lapses, the company expenses $10,000:
 
-```
+```text
 DR  Insurance Expense                            $10,000
     CR  Prepaid Insurance                                    $10,000
 ```
@@ -67,14 +67,14 @@ The income statement absorbs the cost ratably over the period it protects the bu
 
 **Accrued liabilities** capture expenses incurred but not yet invoiced or paid, the reverse of accrued revenue. The year-end bonus example is archetypal. If a company has $600,000 in earned bonuses that will be paid in February, the December 31st journal entry is:
 
-```
+```text
 DR  Compensation Expense                         $600,000
     CR  Accrued Liabilities (Current Liability)             $600,000
 ```
 
 When payment occurs in February, the entry is simply:
 
-```
+```text
 DR  Accrued Liabilities                          $600,000
     CR  Cash                                                 $600,000
 ```

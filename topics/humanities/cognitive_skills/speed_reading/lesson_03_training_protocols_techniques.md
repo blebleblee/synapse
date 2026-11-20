@@ -22,7 +22,7 @@ Effective chunking respects linguistic structure rather than imposing arbitrary 
 
 Visual fixation training employs spatial markers to externalize chunk boundaries until pattern recognition becomes automatic. A simple notation system using vertical bars or brackets segments practice text into target chunks:
 
-```
+```text
 [The industrialized nations] / [of the late nineteenth century] / 
 [experienced unprecedented] / [economic expansion and] / 
 [technological innovation] / [that fundamentally transformed] / 

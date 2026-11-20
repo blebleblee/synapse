@@ -94,7 +94,7 @@ Spacetime diagrams provide the essential visualization tool for understanding re
 
 The worldlines of the $x'$ and $ct'$ axes in the $(ct, x)$ diagram reveal the geometric structure of Lorentz transformations. The $x'$-axis consists of all events with $t' = 0$, which from the transformation $t' = \gamma(t - vx/c^2)$ implies $t = vx/c^2$, or equivalently $ct = \beta x$. This line has slope $\beta = v/c$ in the $(x, ct)$ plane. Similarly, the $ct'$-axis consists of events with $x' = 0$, which from $x' = \gamma(x - vt)$ implies $x = vt$, or $ct = x/\beta$, giving slope $1/\beta$ in the $(x, ct)$ plane. 
 
-```
+```text
                        ct
                         |
                         |    ct' axis (x'=0)

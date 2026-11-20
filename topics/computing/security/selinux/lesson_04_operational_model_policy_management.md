@@ -24,7 +24,7 @@ Integration into the active policy occurs through `semodule`, the policy module 
 
 The policy rebuild process invoked by `semodule` generates a monolithic binary policy file at `/etc/selinux/targeted/policy/policy.XX` where `XX` represents the policy version number, typically 31 or 33 corresponding to the maximum policy format version supported by the running kernel. This binary database contains several critical data structures that enable efficient runtime enforcement. The type enforcement table encodes all `allow` rules as a sparse matrix mapping (source_type, target_type, class) tuples to permission bitmasks, using hash tables or compressed bitmap representations to minimize memory footprint while preserving constant-time lookup characteristics. The role-based access control table defines which roles can assume which types, enforcing the intermediate layer between user identities and process domains. The conditional policy table stores boolean switch states alongside the rule sets they conditionally enable, permitting runtime toggling without policy recompilation.
 
-```
+```text
 Policy Compilation Pipeline:
 
 ┌─────────────────────────────────────────────────────────────────┐

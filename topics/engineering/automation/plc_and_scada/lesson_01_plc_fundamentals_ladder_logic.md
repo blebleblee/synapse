@@ -38,7 +38,7 @@ Analog I/O modules introduce quantization and conversion time considerations abs
 
 The scan cycle's internal structure partitions into five distinct phases executed sequentially. The housekeeping phase validates system integrity: the CPU verifies memory checksums, monitors supply voltages, checks I/O module health via backplane communication, and services the watchdog timer—a hardware circuit that resets the processor if not periodically strobed, providing fail-safe protection against infinite loops. The input acquisition phase bulk-reads all input modules in a single backplane transaction, copying physical input states into the input image table. The program execution phase evaluates every rung of the ladder logic program sequentially from top to bottom, performing Boolean logic, arithmetic operations, timer/counter updates, and function block executions. The output update phase bulk-writes the computed output image table to all output modules. Finally, the communication phase services network messages, HMI requests, and programming terminal connections before immediately beginning the next scan.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                    SCAN CYCLE PHASES                     │
 ├─────────────────────────────────────────────────────────┤

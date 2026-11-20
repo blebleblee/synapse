@@ -10,7 +10,7 @@ The key insight is **delegation**. No single authority needs to know the entire 
 
 The DNS namespace is a rooted label tree. Each node carries a label of 0–63 octets; the root node carries the empty label. A fully qualified domain name (FQDN) is the sequence of labels from a leaf to the root, separated by dots and terminated with a trailing dot (e.g., `mail.google.com.`). The trailing dot is almost always elided in practice but is structurally significant — its absence is what distinguishes a relative name from an absolute one.
 
-```
+```text
                         . (root)
                        / \
                      com   org
@@ -78,7 +78,7 @@ Each referral response carries the NS records for the next tier and, critically,
 
 DNS messages are binary-encoded, not text. Every implementation eventually confronts the wire format directly (debugging with `tcpdump`, writing a stub resolver, or implementing a custom authoritative server). Understanding it prevents the category of bugs that arise from treating DNS as a text protocol.
 
-```
+```text
 DNS Message Wire Format (RFC 1035 §4.1)
 ─────────────────────────────────────────
   0                   1                   2                   3
@@ -657,7 +657,7 @@ A subtle source of latency spikes in recursive resolvers is **TTL expiry under l
 
 The stub resolver's behavior is governed by `/etc/resolv.conf` on Unix systems (or the DNS Client service on Windows). Key directives:
 
-```
+```bash
 # /etc/resolv.conf
 nameserver 1.1.1.1          # Primary recursive resolver
 nameserver 8.8.8.8          # Fallback (tried after ~5s timeout)

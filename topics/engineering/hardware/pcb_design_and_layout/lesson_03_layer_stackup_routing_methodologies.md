@@ -24,7 +24,7 @@ The practical construction of a PCB stackup begins with the selection of a core 
 
 For a six-layer stackup targeting high-speed serial differential pairs and DDR memory interfaces, the layer assignment typically follows this architecture from top to bottom: Layer 1 (top signals), Layer 2 (ground plane), Layer 3 (internal signal routing), Layer 4 (power plane), Layer 5 (ground plane), Layer 6 (bottom signals). This arrangement provides three signal routing layers with adjacent reference planes, dedicates two internal planes to power distribution, and maintains a power-ground plane pair with minimal separation for high-frequency decoupling capacitance. The critical electromagnetic parameters emerge from the vertical spacing between layers. A thin dielectric of 4 mils between Layer 1 and Layer 2 creates a tightly-coupled microstrip transmission line, where the signal trace rides on the top surface with its return current flowing directly beneath on the ground plane. The characteristic impedance of this microstrip structure follows the approximate closed-form expression:
 
-```
+```text
 Z₀ ≈ (87 / √(εᵣ + 1.41)) × ln(5.98h / (0.8w + t))
 ```
 
@@ -32,7 +32,7 @@ where h represents the dielectric height in mils, w denotes trace width in mils,
 
 The internal signal layer on Layer 3 employs a stripline configuration, where the trace is embedded between two reference planes—ground above and power below. Stripline geometry offers superior electromagnetic containment compared to microstrip because the field lines terminate exclusively on adjacent copper planes without fringing into free space. The stripline impedance equation accounts for the symmetric field distribution:
 
-```
+```text
 Z₀ ≈ (60 / √εᵣ) × ln(4b / (0.67πw(0.8 + t/w)))
 ```
 
@@ -40,7 +40,7 @@ where b represents the total dielectric thickness between the two reference plan
 
 Differential pair routing for high-speed serial standards such as PCI Express, USB, SATA, and Ethernet requires maintaining not only single-ended impedance but also differential impedance and common-mode impedance simultaneously. A differential pair consists of two traces carrying complementary signals—when one transitions high, the other transitions low—creating magnetic field cancellation in the far field and reducing electromagnetic emissions. The differential impedance Zdiff relates to the single-ended impedance Z₀ and the coupling coefficient k through:
 
-```
+```text
 Zdiff = 2 × Z₀ × √(1 - k)
 ```
 

@@ -26,7 +26,7 @@ Having established the physical principles governing tire behavior, we now exami
 
 The Magic Formula expresses lateral force as a function of slip angle through a transcendental equation of the form:
 
-```
+```text
 Fy = D × sin(C × arctan(B × α - E × (B × α - arctan(B × α))))
 ```
 

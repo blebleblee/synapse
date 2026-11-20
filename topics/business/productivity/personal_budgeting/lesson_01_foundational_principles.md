@@ -28,7 +28,7 @@ The operational architecture of a functioning budget system consists of five int
 
 The allocation engine performs the initial budget period setup by distributing expected income across expense categories according to the predetermined allocation schema. The canonical implementation begins with fixed obligations, subtracts them from expected income, then distributes the remainder across variable categories according to either historical averages or normative targets. The mathematical constraint is simple: the sum of all allocations must equal expected income, with any surplus explicitly assigned to savings or investment categories rather than left unallocated.
 
-```
+```text
 Expected Income: $5,200
 Fixed Obligations:
   Rent:               $1,800
@@ -68,7 +68,7 @@ Modern budget implementations typically employ a hybrid capture architecture: au
 
 The categorization resolver maps ambiguous transaction descriptions to budget categories using a combination of rule-based matching and historical pattern learning. Consider a credit card transaction that appears in your feed as "SQ *HOMETOWN CAFE". A naive string matching system might fail to categorize this transaction because the merchant name contains a payment processor prefix ("SQ" for Square) that obscures the actual vendor name. The resolver must therefore maintain a merchant alias table that maps various payment processor formats to canonical merchant names, then apply category rules to the resolved name.
 
-```
+```text
 Transaction Categorization Pipeline:
 
 1. Raw Transaction:
@@ -127,7 +127,7 @@ Category boundary ambiguity creates systematic categorization errors that persis
 
 Budget optimization under income volatility requires a fundamental architecture shift from allocation-based to priority-based budgeting. If your income varies by more than 15% month-to-month (common for commissioned sales roles, freelancers, and seasonal workers), pre-allocating fixed dollar amounts to each category creates constant rebalancing churn. The priority-based approach instead ranks categories by necessity, then funds them sequentially until the available income pool is exhausted.
 
-```
+```text
 Priority Budget Architecture:
 
 Tier 1 (Survival): Fund First

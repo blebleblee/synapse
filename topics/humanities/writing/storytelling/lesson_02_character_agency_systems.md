@@ -26,7 +26,7 @@ The desire architecture operates as a hierarchical stack with surface wants mask
 
 Strong characterization exploits the tension between stack levels. The protagonist pursues surface objectives while the narrative gradually reveals misalignment with deeper needs. The detective's drive to solve cases may mask an unhealthy need for control stemming from childhood chaos. The story's transformation architecture succeeds when external plot resolution (solving the case) fails to satisfy deeper need (accepting uncertainty), forcing the character to confront the real obstacle: their own psychological architecture.
 
-```
+```text
 DESIRE STACK ARCHITECTURE
 
 Surface Layer:     Concrete Objective
@@ -56,7 +56,7 @@ Transition mechanics operate through specific crucible experiences—scenes wher
 
 Terminal state characterization must demonstrate changed values on the same dimensions established at initialization. The character who began emotionally closed now initiates vulnerable conversations. The character who began selfish now sacrifices personal goals for collective benefit. The terminal state need not represent absolute reversal—nuanced transformation often produces moderated rather than inverted values—but the difference must be measurable and causally connected to the specific obstacles encountered.
 
-```
+```text
 TRANSFORMATION STATE MACHINE
 
 INITIALIZE:

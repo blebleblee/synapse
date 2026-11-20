@@ -164,7 +164,7 @@ cat /proc/net/vlan/config
 
 The output of `bridge vlan show` on a correctly configured trunk port carrying VLANs 1, 10, and 20 should resemble the following, where `pvid` indicates the native untagged VLAN and the remaining entries are carried as tagged frames:
 
-```
+```text
 port              vlan-id
 eth0              1 PVID Egress Untagged
                   10

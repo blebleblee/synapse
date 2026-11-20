@@ -20,7 +20,7 @@ A filter is a linear, time-invariant system. Its impulse response `h[n]` fully d
 
 One difference equation covers every filter in this lesson, with `H(z) = B(z)/A(z)`:
 
-```
+```text
 y[n] = b0·x[n] + b1·x[n-1] + ... + bM·x[n-M]  -  a1·y[n-1] - ... - aN·y[n-N]
 ```
 

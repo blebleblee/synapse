@@ -24,7 +24,7 @@ Each **topic** in Kafka is divided into one or more **partitions**. A partition 
 
 The performance of this design is not accidental. Kafka exploits the operating system's page cache aggressively. When a producer writes to a partition, the broker issues a `write(2)` syscall that copies data into the kernel's page cache; the fsync is deferred to a configurable interval or batch size. When a consumer reads from the same partition, the broker issues a `sendfile(2)` syscall that transfers data directly from the page cache to the network socket via zero-copy DMA, bypassing any userspace buffer. On a broker where producers and consumers are in rough parity, the data never touches disk at all — it flows from producer network card, through kernel page cache, to consumer network card entirely in kernel memory.
 
-```
+```text
 Kafka Partition Segment Layout (physical on disk)
 ─────────────────────────────────────────────────
   Segment 0  [00000000000000000000.log]

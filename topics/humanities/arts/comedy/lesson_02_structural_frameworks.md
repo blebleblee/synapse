@@ -26,7 +26,7 @@ The mechanical requirement for setup-punchline is that the setup must contain al
 
 Consider the structural diagram of a competent setup-punchline:
 
-```
+```text
 Setup Phase:
   [Context Establishment] → [Character/Scenario Introduction] → [Problem/Situation Definition]
                                                                               ↓
@@ -68,7 +68,7 @@ The mechanical requirement for an effective callback is that the original moment
 
 Consider the structural relationship between original moment and callback:
 
-```
+```text
 Original Moment [Establishes Memory Anchor + Comic Element]
                               ↓
         [Time Passes; Memory Consolidates]
@@ -116,7 +116,7 @@ Escalation operates on a principle of **diminishing acceptability**. The first i
 
 Consider the structural mechanics:
 
-```
+```text
 Iteration 1: [Baseline Acceptable Behavior/Consequence]
                     ↓
 Iteration 2: [Pushes Boundary; Still Plausible]

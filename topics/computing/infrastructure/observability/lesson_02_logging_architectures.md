@@ -380,7 +380,7 @@ The `filter` clause is preferred over `must` for term-level queries because filt
 
 Loki takes a fundamentally different approach inspired by the information-theoretic insight from Section 1: since log templates carry negligible entropy, indexing the full text is wasteful. Loki indexes only a small set of metadata labels (similar to Prometheus metric labels) and stores the log content as compressed chunks. Queries filter by label first, then scan and parse log content at query time using LogQL:
 
-```
+```text
 {namespace="production", service="checkout-service"} |= "ERROR" 
   | json 
   | line_format "{{.order_id}}: {{.message}}"

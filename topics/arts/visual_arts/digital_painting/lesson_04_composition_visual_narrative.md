@@ -24,7 +24,7 @@ When you divide a rectangular canvas into thirds both horizontally and verticall
 
 The deeper principle underlying the rule of thirds is the avoidance of static bisection. A horizon line running precisely through the center of the canvas divides the composition into equal halves—sky above, landscape below—creating a stalled, unmotivated spatial arrangement. Shift the horizon to the lower third, and the sky suddenly dominates the composition, suggesting aspiration, lightness, or transcendence. Move the horizon to the upper third, and the landscape or foreground ground becomes dominant, creating a sense of weight, confinement, or earthly particularity. The same physical landscape transforms narratively through repositioning along the third lines.
 
-```
+```text
 ┌─────────────────────────┐
 │         sky             │
 ├─────┬─────┬─────────────┤

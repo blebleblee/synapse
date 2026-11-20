@@ -56,7 +56,7 @@ The metrics collection architecture in modern observability stacks centers on ti
 
 The metric types—counters, gauges, histograms, and summaries—encode different semantic meanings that affect aggregation behavior. A counter represents a monotonically increasing value (total requests processed) and should be queried using rate functions that calculate the per-second increase. A gauge represents a snapshot of current state (active connections, memory usage) and can be averaged or sampled. Histograms bucket observations into configurable ranges, enabling percentile calculations like p95 latency, but require careful bucket boundary selection to balance precision and cardinality. The histogram aggregation property is critical: individual service histograms can be summed across replicas to compute cluster-wide percentiles, unlike summaries which pre-calculate percentiles locally and cannot be meaningfully aggregated.
 
-```
+```bash
 # Counter: total requests, always increasing
 http_requests_total{service="api", endpoint="/users"} 15234
 

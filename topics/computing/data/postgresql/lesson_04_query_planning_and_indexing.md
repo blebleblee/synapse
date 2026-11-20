@@ -139,7 +139,7 @@ If the visibility map bit is not set for a heap page, the executor must still vi
 ```sql
 EXPLAIN SELECT * FROM orders WHERE customer_id = 42 ORDER BY created_at;
 ```
-```
+```text
 Sort  (cost=1842.33..1867.33 rows=10000 width=96)
   ->  Index Scan using idx_orders_customer on orders
         (cost=0.43..943.00 rows=10000 width=96)
@@ -346,7 +346,7 @@ A standard B-Tree maps `key → TID` (each key appears at most once per row). GI
 - **Main B-Tree:** The primary index structure maps each distinct item value to a posting list. For high-cardinality items (many TIDs), the posting list is stored in its own overflow pages.
 - **Cleanup (Autovacuum / `gin_clean_pending_list`):** Autovacuum merges the pending list into the main B-Tree periodically, performing the expensive posting list updates in one batch rather than per-row.
 
-```
+```text
 GIN Index for tsvector column containing:
   Row 1: 'postgresql' | 'query' | 'plan'
   Row 2: 'query' | 'optimizer' | 'cost'
@@ -384,7 +384,7 @@ GiST is inherently lossy at internal nodes: the `consistent` function may return
 
 BRIN exploits a property that B-Tree cannot: **physical correlation between column values and heap block numbers**. If rows are physically inserted in timestamp order (append-only workloads: event logs, IoT telemetry, financial trades, audit tables), then the `MIN(ts)` and `MAX(ts)` within any contiguous block range are tightly bounded.
 
-```
+```text
 Heap layout for append-only event log (physical correlation = 1.0):
 
 Block 0:    events with ts ∈ [2024-01-01 00:00, 2024-01-01 00:05]
@@ -494,7 +494,7 @@ ORDER BY revenue_cents DESC
 LIMIT 20;
 ```
 
-```
+```text
 Limit  (cost=24830.15..24830.20 rows=20 width=52)
        (actual time=312.44..312.45 rows=20 loops=1)
   ->  Sort  (cost=24830.15..24855.15 rows=10000 width=52)

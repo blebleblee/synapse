@@ -24,7 +24,7 @@ The vertical deflection circuit, by contrast, drives its coils with a true sawto
 
 The deflection yoke itself can fail in ways that are easy to misdiagnose. A partial short between turns in the horizontal winding will not necessarily prevent the monitor from scanning; it will appear as an S-curve distortion or a compressed image region that no potentiometer adjustment can correct. Measuring yoke winding resistance and comparing it against the service manual specification — typically 1–4 Ω for the horizontal winding, 10–50 Ω for vertical — will reveal the fault immediately. Yoke replacement on most arcade monitors requires removing the tube from the chassis, loosening the yoke clamp ring, noting the original position and tilt angle precisely with a marker line before removal, and re-seating the replacement to the same angular position before performing convergence.
 
-```
+```text
 SIGNAL AND POWER FLOW — ARCADE CRT MONITOR
 
 Video Input (JAMMA/RGB)

@@ -132,7 +132,7 @@ The power of STRIDE lies in its systematic completeness. Because it forces the p
 
 PASTA (Process for Attack Simulation and Threat Analysis) operates at a higher level of abstraction than STRIDE. It is a seven-stage risk-centric framework that begins with business objectives and regulatory constraints, works down through technical scope definition and application decomposition, and arrives at a threat enumeration and risk scoring exercise that produces results in business-impact language. For practitioners who must communicate findings to non-technical stakeholders or who are operating within a formal risk management framework, PASTA's output is significantly more actionable than a raw STRIDE enumeration.
 
-```
+```text
 STRIDE per DFD Element - Example: IoT Firmware Update Service
 ┌──────────────────┬──────────┬────────────────────────────────────────────┐
 │ DFD Element      │ Threat   │ Attack Vector                              │

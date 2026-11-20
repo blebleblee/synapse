@@ -101,7 +101,7 @@ ACID is not a marketing acronym — it is a precise specification of transaction
 
 **Durability** guarantees that committed data survives a crash. This is implemented via the write-ahead logging (WAL) protocol: a log record describing a change must be flushed to durable storage *before* the data page containing that change is considered committed. The key invariant is:
 
-```
+```text
 LSN(log record) must reach durable storage before LSN(data page dirty bit is cleared)
 ```
 
@@ -241,7 +241,7 @@ The `BUFFERS` option reveals cache behavior: `shared hit` indicates a page was f
 
 The execution engine instantiates the physical plan as a tree of **operator nodes** (iterators). The classic model — introduced by Volcano/Iterator (Graefe, 1990) — has each operator implement a `next()` interface: calling `next()` on the root operator pulls one tuple at a time through the entire plan tree. This is the **pull model** or **iterator model**.
 
-```
+```text
 Root: Sort
   └── Aggregate (SUM, GROUP BY)
         └── Hash Join (orders ⋈ order_items)
@@ -360,7 +360,7 @@ The Write-Ahead Log is a sequential, append-only file that records every modific
 
 ARIES recovery proceeds in three passes:
 
-```
+```text
 1. Analysis Pass (forward scan from last checkpoint):
    - Reconstruct which transactions were active at crash time (loser transactions)
    - Reconstruct the dirty page table (pages that had unflushed modifications)
@@ -545,7 +545,7 @@ This recursive self-description is powerful: the same code paths used to query u
 
 The lock manager maintains a **lock table** — typically a hash table keyed on the lockable object (relation OID, page ID, tuple TID, or advisory lock key). Each entry contains a list of granted locks and a list of waiting locks. Lock modes and their compatibility define the protocol:
 
-```
+```text
 PostgreSQL lock mode compatibility matrix (excerpt):
                 AS  RS  RE  SU  S   SE  E   AE
 AccessShare     ✓   ✓   ✓   ✓   ✓   ✓   ✓   ✗
@@ -587,7 +587,7 @@ A DBMS manages storage at the granularity of **pages** (also called blocks). A p
 
 The near-universal internal format for heap pages is the **slotted page** layout:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │  Page Header (24 bytes in PostgreSQL)                           │
 │  - LSN (8 bytes): WAL position of last modification             │

@@ -79,7 +79,7 @@ graph TB
 
 G major scale starting on the low E string, Simandl fingering:
 
-```
+```text
 E string:  fret 3 (G) = finger 1
            fret 5 (A) = finger 2
 A string:  fret 2 (B) = finger 1   [shift down a string]
@@ -102,7 +102,7 @@ The CAGED system gives five movable shapes covering the whole neck, named for th
 
 **C major, two octaves, starting 3rd fret A string:**
 
-```
+```text
 e |---------------------------5--7--8--|
 B |------------------5--7--8-----------|
 G |------------4--5--7------------------|
@@ -122,7 +122,7 @@ Fingering per string: 1-3-4 or 1-2-4 depending on stretch comfort — keep finge
 
 **D Dorian box, same fretboard region:**
 
-```
+```text
 e |----------------------10-12----------|
 B |-----------------10-12---------------|
 G |------------9-10----------------------|

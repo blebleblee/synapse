@@ -30,7 +30,7 @@ GPU-driven rendering represents the rendering pipeline's latest evolution, shift
 
 The rendering pipeline's execution begins with scene visibility determination, a process that must identify which objects contribute to the final image and discard those outside the camera frustum or occluded by opaque geometry. Unreal's visibility system employs a hierarchical approach: coarse frustum culling first rejects entire octree nodes that lie outside the view volume, then finer-grained tests evaluate individual primitives. Each primitive maintains an axis-aligned bounding box in world space, which the visibility system transforms into clip space and tests against the frustum's six planes. Primitives that survive frustum culling proceed to occlusion testing, where the engine queries hierarchical Z-buffer structures built from the previous frame's depth buffer to estimate whether the primitive is likely occluded.
 
-```
+```text
 Camera View Frustum → Octree Traversal → Per-Primitive Frustum Test
                                                      ↓
                                           AABB vs Frustum Planes

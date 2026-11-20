@@ -22,7 +22,7 @@ Classical color harmony systems—complementary, analogous, triadic, and tetradi
 
 Open your **Composition Base** track and insert a software instrument capable of realistic MIDI expression: Spitfire Audio's BBCSO Core (which offers immediate timbral variety), Native Instruments Komplete, or your DAW's native orchestral library. Create the following harmonic progression over eight bars, each bar spanning a whole note:
 
-```
+```text
 Bar 1: F major (F–A–C)
 Bar 2: D minor (D–F–A) [vi chord]
 Bar 3: B♭ major (B♭–D–F) [IV chord]
@@ -43,7 +43,7 @@ Complementary color pairs (red–cyan, yellow–blue, magenta–green) create ma
 
 Extend your composition by inserting a new four-bar section immediately following bar 8. Create a *complementary harmonic tension* by introducing a secondary chord progression that sits outside the F major diatonic collection:
 
-```
+```text
 Bar 9: F major (F–A–C) [original I chord]
 Bar 10: D♭ major (D♭–F–A♭) [tritone substitution of the V chord]
 Bar 11: B major (B–D♯–F♯) [chromatic mediant, maximum distance from F]
@@ -60,7 +60,7 @@ Analogous color harmonies (neighboring hues: yellow, yellow-green, green) create
 
 Compose a new eight-bar passage using exclusively the following instruments: viola (warm, mid-range), English horn (darker oboe, overlapping upper-mid frequencies), and a warm pad synthesized with a complex sawtooth wave filtered to a 1 kHz center with moderate resonance (Q ≈ 4). All three instruments occupy the frequency range between approximately 200 Hz and 3 kHz. Construct the harmonic progression as a diatonic sequence in G major:
 
-```
+```text
 Bar 1: G major (G–B–D)
 Bar 2: E minor (E–G–B)
 Bar 3: A minor (A–C–E)
@@ -83,7 +83,7 @@ Timbre—the perceived "color" of a sound—is fundamentally defined by the ampl
 
 Open your **Synthesis Lab** track and insert a wavetable synthesizer capable of additive harmonic editing (Native Instruments Massive X, Serum, or your DAW's native synth). Create a custom wavetable representing a warm, clarinet-like timbre by programming the following harmonic series:
 
-```
+```text
 Harmonic 1 (fundamental): Amplitude 1.0 (0 dB)
 Harmonic 3 (3rd partial): Amplitude 0.7 (–3 dB)
 Harmonic 5 (5th partial): Amplitude 0.4 (–8 dB)
@@ -96,7 +96,7 @@ This harmonic profile—odd-only, descending amplitude—produces a mellow, warm
 
 Now, create a second wavetable representing a *bright, cool timbre* by programming this harmonic profile:
 
-```
+```text
 Harmonic 1 (fundamental): Amplitude 1.0 (0 dB)
 Harmonic 2 (1st overtone): Amplitude 0.6 (–4 dB)
 Harmonic 3 (3rd partial): Amplitude 0.8 (–2 dB)

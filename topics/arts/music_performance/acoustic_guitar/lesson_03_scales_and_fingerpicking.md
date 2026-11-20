@@ -34,7 +34,7 @@ The ring and middle fingers share a flexor tendon (flexor digitorum profundus) a
 
 ### Standard Tuning Reference
 
-```
+```text
 String:   6     5     4     3     2     1
 Name:     E2    A2    D3    G3    B3    E4
 Gauge:   .053  .042  .032  .024  .016  .012  (light acoustic set)
@@ -66,7 +66,7 @@ graph LR
 
 **Position 1 — C Shape (Open / Frets 0–3)**
 
-```
+```text
 e |---0---1---3---|
 B |---0---1---3---|
 G |---0---2-------|
@@ -78,7 +78,7 @@ Root notes: A-string fret 3 (C), B-string fret 1 (C). Skip the low E string — 
 
 **Position 2 — A Shape (Frets 2–5)**
 
-```
+```text
 e |-------5-------|
 B |-------5-------|
 G |-------4-------|
@@ -91,7 +91,7 @@ Root: A-string fret 3 (C). The stretch from fret 3 to fret 5 is where beginners 
 
 **Position 3 — G Shape (Frets 4–8)**
 
-```
+```text
 e |---5---7---8---|
 B |---5---6---8---|
 G |---4---5---7---|
@@ -104,7 +104,7 @@ Root: low E-string fret 8 (C), high e-string fret 8 (C). This position spans a 4
 
 **Position 4 — E Shape (Frets 7–10)**
 
-```
+```text
 e |---8---10------|
 B |---8---10------|
 G |---7---9-------|
@@ -117,7 +117,7 @@ Root: low E-string fret 8 (C). Same geometry as the open E chord — most player
 
 **Position 5 — D Shape (Frets 9–12)**
 
-```
+```text
 e |---10---12-----|
 B |---10---12-----|
 G |---9----10--12-|
@@ -201,7 +201,7 @@ All patterns below use **G major, open position (3-2-0-0-0-3)** unless noted. Se
 
 The foundation pattern. The thumb lays down a steady quarter-note bass pulse; the fingers answer on the off-beats.
 
-```
+```text
 Chord: G major (320003)
 Time:  4/4
 
@@ -227,7 +227,7 @@ Beat: 1  &  2  &  3  &  4  &
 
 The signature pattern of country, folk, and acoustic blues guitar. The thumb alternates between two bass strings on a steady pulse while the fingers fill syncopated gaps independently of it.
 
-```
+```text
 Chord: C major (x32010)
 Time:  4/4
 
@@ -248,7 +248,7 @@ Beat: 1  &  2  &  3  &  4  &
 
 **Four-chord Travis exercise** — the most useful vehicle for locking the pattern into muscle memory:
 
-```
+```text
 | C (x32010) | Am (x02210) | F (xx3211) | G (320003) |
   1 measure each, loop 8 times.
   Chord changes must not interrupt the thumb's steady alternation.
@@ -263,7 +263,7 @@ Beat: 1  &  2  &  3  &  4  &
 
 Essential for ballads, folk waltzes, and classically-influenced pieces.
 
-```
+```text
 Chord: Am (x02210)          then          E (022100)
 Time:  3/4
 
@@ -283,7 +283,7 @@ Beat: 1   &  2  &  3  &
 
 A "pinch" fires the thumb and a finger together, anchoring the beat with a percussive downbeat. Common in folk strumming-picking hybrids and singer-songwriter accompaniment.
 
-```
+```text
 Chord: D major (xx0232)
 Time:  4/4
 
@@ -301,7 +301,7 @@ The pinch (p+a together) on beats 1 and 3 gives the pattern its rhythmic anchor.
 
 A continuous stream of 8th notes — the backbone of fingerstyle arrangements and bluegrass-influenced playing.
 
-```
+```text
 Forward Roll:  p  i  m  p  i  m  p  i
 String order:  5  3  1  4  3  1  5  3   (varies by chord voicing)
 
@@ -362,7 +362,7 @@ Before tackling full 7-note scales, own the minor pentatonic. Five notes, no hal
 
 **A Minor Pentatonic — Box 1 (Frets 5–8, the most-used position on the neck)**
 
-```
+```text
 e |---5---8---|
 B |---5---8---|
 G |---5---7---|
@@ -374,7 +374,7 @@ E |---5---8---|
 
 **Scale degree map for Box 1:**
 
-```
+```text
 e |--R---4--|   R = root (A)
 B |--5---b7-|   5 = perfect 5th
 G |--b3--4--|   b3 = minor 3rd, 4 = perfect 4th
@@ -384,7 +384,7 @@ E |--R---4--|
 ```
 
 **Box 1 drill sequence:**
-```
+```text
 Ascending:  E6-str 5 → A-str 5 → 7 → D-str 5 → 7 → G-str 5 → 7 → B-str 5 → 8 → e-str 5 → 8
 Descending: reverse the exact same path
 Fingering:  1-4 | 1-4 | 1-3 | 1-3 | 1-4 | 1-4
@@ -396,7 +396,7 @@ Metronome: ♩ = 60 → 80 → 100, all notes as even 8ths.
 
 The five boxes chain together seamlessly, each one starting where the previous one ends. Learn them in order.
 
-```
+```text
    Fret:   1   2   3   4   5   6   7   8   9  10  11  12
            |----|----|----|----|----|----|----|----|----|----|----|
 E6:        |    |    |    |    |[1] |    |    |[4] |    |[5] |    |[1]
@@ -417,7 +417,7 @@ The minor pentatonic omits the natural 2nd and the ♭6th. Adding those two note
 
 **A Natural Minor — Position 1 (Frets 5–8)**
 
-```
+```text
 e |---5---7---8---|
 B |---5---6---8---|
 G |---5---7-------|
@@ -431,7 +431,7 @@ Compare directly to the pentatonic Box 1 above: the only changes are fret 6 on t
 
 **Harmonic Minor variation:** raise the ♭7th by one fret (fret 7 → fret 8 on the A-string, G natural → G#). One fret change produces the dramatic, Spanish/Middle-Eastern character associated with harmonic minor — because it creates a half-step pull directly into the root.
 
-```
+```text
 A Harmonic Minor — difference from natural minor:
 A-string: fret 7 (G natural) → fret 8 (G#)  <- the only change
 ```
@@ -440,7 +440,7 @@ A-string: fret 7 (G natural) → fret 8 (G#)  <- the only change
 
 **G Major, E-Shape Position (Frets 2–5), root G on the low E string at fret 3**
 
-```
+```text
 e |---3---5-------|
 B |---3---5-------|
 G |---2---4---5---|
@@ -453,7 +453,7 @@ E |---3---5-------|
 Root notes (G): low E-string fret 3, high e-string fret 3.
 
 **Fingering across the strings, ascending:**
-```
+```text
 E6-str:  1(fret 3)  ->  3(fret 5)
 A-str:   1(fret 2)  ->  2(fret 4)  ->  4(fret 5)
 D-str:   1(fret 2)  ->  2(fret 4)  ->  4(fret 5)
@@ -468,7 +468,7 @@ Where CAGED organizes the neck by chord shape, 3NPS organizes it for raw picking
 
 **G Major 3NPS — Pattern 1, starting on the low E string**
 
-```
+```text
 e |---3---5---7---|
 B |---3---5---7---|
 G |---2---4---5---|
@@ -490,7 +490,7 @@ E |---3---5---7---|
 Playing scales only straight up and down is a practice habit, not a musical skill. These sequences train you to actually use scale tones the way real melodies and solos do.
 
 **Sequence 1 — Thirds** (harmonically rich, strong for melodic lines)
-```
+```text
 Scale degrees:  1-3, 2-4, 3-5, 4-6, 5-7, 6-8, 7-9...
 In G major:     G-B, A-C, B-D, C-E, D-F#, E-G, F#-A...
 
@@ -501,14 +501,14 @@ B |---3---3---5---5---3---3---5---5---7---7---|
 ```
 
 **Sequence 2 — Triads up the scale**
-```
+```text
 1-3-5, 2-4-6, 3-5-7, 4-6-1, 5-7-2, 6-1-3, 7-2-4
 In G:  G-B-D, A-C-E, B-D-F#, C-E-G, D-F#-A, E-G-B, F#-A-C
 ```
 Play each triad as a hammer-on triplet: pick the root, hammer the 3rd, hammer the 5th. This produces an arpeggiated, lyrical phrasing that sounds musical immediately, without any improvisational decision-making.
 
 **Sequence 3 — 4-note groups with accent on beat 1**
-```
+```text
 1-2-3-4, 2-3-4-5, 3-4-5-6, 4-5-6-7...
 Accent (play louder): note 1 of each group
 Feel: a marching staircase — excellent for building toward a phrase climax
@@ -616,7 +616,7 @@ If the wrist shakes loosely, tension is under control. If it feels rigid, or the
 
 Never jump more than 5 BPM without earning it. The standard: **100 consecutive clean repetitions** at the current tempo before adding another 5 BPM. This feels slow, and it is — which is exactly why most players plateau. They spend their practice time grinding at 80% speed instead of fully automating 70% speed first.
 
-```
+```text
 Target tempo: quarter = 100
 Path: 55 -> 60 -> 65 -> 70 -> 75 -> 80 -> 85 -> 90 -> 95 -> 100
       100 clean reps required at each step before advancing
@@ -638,7 +638,7 @@ The common beginner error is accidentally rushing Layer 1 (the bass pulse) while
 
 A free parameter most players never touch deliberately.
 
-```
+```text
 Bridge                     Soundhole                  Neck (near 12th fret)
   |---------------------------|----------------------------|
 Bright, cutting,           Warm, balanced,             Dark, hollow,
@@ -658,7 +658,7 @@ Every musical phrase implies a breath. Singers and wind players are forced to br
 2. The phrase following the rest begins with slightly more energy — the "exhale."
 3. The last note of a phrase resolves dynamically downward (fading into silence), not just harmonically.
 
-```
+```text
 Phrase structure example (4-bar unit):
 
 Bar 1: Statement (forte, start of phrase)

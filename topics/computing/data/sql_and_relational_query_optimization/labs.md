@@ -111,7 +111,7 @@ sudo systemctl restart postgresql-14
 
 PostgreSQL, like most relational databases, organizes disk storage into fixed-size **pages** (typically 8 KB). Each page uses a **slotted page structure**:
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │ Page Header (24 bytes)                              │
 ├─────────────────────────────────────────────────────┤
@@ -528,7 +528,7 @@ UPDATE employee SET department = 'Engineering' WHERE id = 3;
 
 PostgreSQL's deadlock detector runs every `deadlock_timeout` (default 1 second). One transaction will receive:
 
-```
+```text
 ERROR:  deadlock detected
 DETAIL:  Process 12345 waits for ShareLock on transaction 730; blocked by process 12346.
 Process 12346 waits for ShareLock on transaction 729; blocked by process 12345.
@@ -859,7 +859,7 @@ sudo -u postgres pg_waldump \
 ```
 
 Example output:
-```
+```text
 rmgr: Heap        len (rec/tot):     59/   59, tx:        730, lsn: 0/01E8F4A8, prev 0/01E8F470, desc: INSERT off 1, blkref #0: rel 1663/16384/16385 fork main blk 0
 rmgr: Transaction len (rec/tot):     46/   46, tx:        730, lsn: 0/01E8F4E8, prev 0/01E8F4A8, desc: COMMIT 2023-10-15 14:32:10.123456 UTC
 rmgr: Heap        len (rec/tot):     59/   59, tx:        731, lsn: 0/01E8F518, prev 0/01E8F4E8, desc: INSERT off 2, blkref #0: rel 1663/16384/16385 fork main blk 0
@@ -889,7 +889,7 @@ sudo -u postgres pg_controldata /var/lib/postgresql/14/main/ | grep -A 10 "Lates
 ```
 
 Output:
-```
+```text
 Latest checkpoint location:           0/2A3C5F0
 Latest checkpoint's REDO location:    0/2A3C5B8
 Latest checkpoint's TimeLineID:       1
@@ -934,7 +934,7 @@ sudo tail -f /var/log/postgresql/postgresql-14-main.log
 ```
 
 Expected log entries:
-```
+```text
 2023-10-15 14:35:22.456 UTC [12345] LOG:  server process (PID 12350) was terminated by signal 9: Killed
 2023-10-15 14:35:22.457 UTC [12345] LOG:  terminating any other active server processes
 2023-10-15 14:35:22.458 UTC [12345] LOG:  all server processes terminated; reinitializing
@@ -954,7 +954,7 @@ sudo tail -f /var/log/postgresql/postgresql-14-main.log
 ```
 
 Recovery log sequence:
-```
+```text
 2023-10-15 14:35:25.123 UTC [12400] LOG:  database system was interrupted; last known up at 2023-10-15 14:32:15 UTC
 2023-10-15 14:35:25.234 UTC [12400] LOG:  database system was not properly shut down; automatic recovery in progress
 2023-10-15 14:35:25.345 UTC [12400] LOG:  redo starts at 0/2A3C5B8

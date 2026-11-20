@@ -22,7 +22,7 @@ iSCSI defines three discovery mechanisms: SendTargets, iSNS (Internet Storage Na
 
 SendTargets operates by opening a discovery session — a special iSCSI session whose only purpose is to retrieve a list of targets from a known portal. The initiator connects to TCP port 3260 (or a configured alternative) and enters the Login phase with the SessionType operational parameter set to `Discovery`. After the Login phase completes, the initiator issues a single Text request PDU carrying the key-value pair `SendTargets=All`. The target responds with one or more Text response PDUs containing a flat, ordered sequence of key-value pairs. The critical ones are `TargetName`, which carries an iSCSI Qualified Name (IQN) or EUI-64 formatted name, and `TargetAddress`, which carries a `host:port,portal-group-tag` triple. Consider a minimal response body:
 
-```
+```text
 TargetName=iqn.2024-01.com.storagevendor:array01.lun0
 TargetAddress=10.10.1.50:3260,1
 TargetAddress=10.10.1.51:3260,1
@@ -100,7 +100,7 @@ The CHAP exchange is a three-step challenge-response protocol. Consider unidirec
 
 The target begins by sending a CHAP_A parameter (algorithm list, currently only `5` for HMAC-MD5 as defined in RFC 1994, though implementations commonly extend to SHA-256 by vendor agreement). The initiator selects an algorithm and the target responds with CHAP_I (an identifier byte) and CHAP_C (a randomly generated challenge value, encoded as a hex string prefixed with `0x`). The initiator computes the CHAP response as:
 
-```
+```text
 CHAP_R = MD5(CHAP_I || SharedSecret || CHAP_C)
 ```
 

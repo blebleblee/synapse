@@ -54,7 +54,7 @@ A leitmotif is a 4-bar idea compact enough to be recognized when it returns frag
 
 **Theme, D minor, 4/4, quarter note = 72 (adjust per tempo map above):**
 
-```
+```text
 Bar 1: D4 (dotted half) — F4 (quarter)
 Bar 2: A4 (half) — G4 (quarter) — F4 (quarter)
 Bar 3: E4 (whole, held)
@@ -83,7 +83,7 @@ Rest your left-hand thumb on the mod wheel at all times while your right hand pl
 
 **Progression under the theme, D minor:**
 
-```
+```text
 Bar 1: Dm   (D–F–A)
 Bar 2: B♭   (B♭–D–F)
 Bar 3: C    (C–E–G)

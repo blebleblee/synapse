@@ -17,7 +17,7 @@ Establish a production SLI/SLO framework for a multi-tier application, instrumen
 
 A Service Level Objective (SLO) is a target reliability goal expressed as a percentage (e.g., 99.9% availability). A Service Level Indicator (SLI) is the actual measured metric that determines whether you're meeting that SLO. The relationship is simple:
 
-```
+```text
 SLI (measured) → compared against → SLO (target) → error budget = (100 - SLO) × time window
 ```
 
@@ -497,7 +497,7 @@ Alerts should be:
 3. **Proportional**: Severity reflects expected customer impact
 
 The alerting workflow:
-```
+```text
 Prometheus Rule → fires alert → AlertManager → routes by label → notifies (Slack/PagerDuty/etc.)
 ```
 

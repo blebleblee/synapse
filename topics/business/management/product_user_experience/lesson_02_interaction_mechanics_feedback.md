@@ -34,7 +34,7 @@ Progressive disclosure further collapses Hick complexity by deferring infrequent
 
 Feedback architecture operates on multiple parallel channels with different latency requirements. Visual feedback is immediate and persistent: button depression animations, progress bars, inline validation messages. Auditory feedback is optional but powerful for confirming non-visual state changes: a subtle click sound when a toggle switches, a chime when a file upload completes. Haptic feedback on mobile devices provides tactile confirmation that bridges the perceptual gap between glass touch and mechanical button depression. These channels must be synchronized; a button that plays a click sound 200 milliseconds after visual depression feels broken because human perception integrates multisensory input within a narrow temporal window.
 
-```
+```text
 [User Action] → [Input Event] → [State Transition] → [Feedback Rendering]
       ↓              ↓                  ↓                     ↓
    Click         onClick()         pristine → submitting    Spinner appears

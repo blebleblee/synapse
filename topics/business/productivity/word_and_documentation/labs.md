@@ -75,7 +75,7 @@ Save the template after defining all styles. These styles enforce visual hierarc
 
 Insert the document skeleton structure. Type the following section headings, applying the corresponding heading styles as you go (use the keyboard shortcuts you assigned):
 
-```
+```text
 1. Executive Summary
 2. Business Context and Objectives
    2.1 Problem Statement
@@ -111,7 +111,7 @@ Insert sample requirement rows:
 
 Below the table, insert three paragraphs using the BRD Requirement style. Type:
 
-```
+```text
 REQ-001: The system shall authenticate users via single sign-on (SSO) integration with the corporate Active Directory, completing the authentication handshake within 2 seconds for 95% of requests under normal load conditions.
 
 REQ-002: The system shall log all user access attempts, including successful logins, failed login attempts, and session terminations, to a centralized audit database with tamper-evident cryptographic signatures.

@@ -36,7 +36,7 @@ The ranking neural network architecture typically employs deep feedforward netwo
 
 The score aggregation function represents YouTube's encoded values and strategic priorities. Early implementations weighted watch time almost exclusively, but contemporary systems incorporate satisfaction signals more heavily. A simplified representation of the scoring function might take the form:
 
-```
+```text
 Score = (P_click × E_watch_time × W_time) + (P_positive × W_pos) - (P_negative × W_neg) + (Completion_rate × W_comp)
 ```
 

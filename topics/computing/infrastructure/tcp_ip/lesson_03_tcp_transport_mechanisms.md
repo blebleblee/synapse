@@ -25,7 +25,7 @@ Understanding TCP requires recognizing it as a closed-loop control system. The s
 
 The TCP header encodes the metadata necessary to maintain connection state and implement reliability. Following the IP header, the TCP header spans a minimum of twenty bytes, expandable to sixty bytes with options. The source and destination port numbers form a four-tuple with the IP addresses, uniquely identifying the connection. Sequence and acknowledgment numbers occupy thirty-two bits each, tracking the byte stream in both directions. Nine flag bits control connection state transitions: URG for urgent data, ACK indicating valid acknowledgment number, PSH requesting immediate data delivery, RST forcing connection reset, SYN and FIN for connection establishment and teardown. The window field advertises receive buffer space, while the checksum covers header and data to detect corruption.
 
-```
+```text
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -66,7 +66,7 @@ Acknowledgments in TCP are cumulative, meaning an acknowledgment number N confir
 
 The retransmission timer calculation employs Karn's algorithm and Jacobson's method for estimating smoothed round-trip time and variance. Each acknowledgment provides an RTT sample, which updates the smoothed RTT (SRTT) and RTT variance (RTTVAR) through exponential weighted moving averages:
 
-```
+```text
 RTTVAR = (1 - β) × RTTVAR + β × |SRTT - R|
 SRTT = (1 - α) × SRTT + α × R
 RTO = SRTT + max(G, 4 × RTTVAR)
@@ -82,7 +82,7 @@ Upon reaching ssthresh, TCP transitions to congestion avoidance, where cwnd grow
 
 CUBIC, the default algorithm in Linux, modifies this additive-increase multiplicative-decrease pattern for high-bandwidth-delay-product networks. CUBIC maintains a cubic function of time since the last congestion event, growing the window aggressively when far from the previous maximum and cautiously as it approaches that point. The window function takes the form:
 
-```
+```text
 W(t) = C × (t - K)³ + W_max
 ```
 
@@ -118,7 +118,7 @@ Modern high-throughput TCP implementations demand careful attention to send and 
 
 Examining TCP state on a live system reveals the protocol machinery in action. The ss utility (socket statistics) provides detailed per-connection information including state, send and receive queues, congestion window, slow-start threshold, and retransmission metrics:
 
-```
+```text
 ss -tin 'sport = :80'
 ```
 

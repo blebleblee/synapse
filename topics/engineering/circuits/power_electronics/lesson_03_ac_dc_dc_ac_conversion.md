@@ -56,7 +56,7 @@ Anti-islanding protection prevents inverters from continuing to energize local l
 
 The single-phase diode bridge rectifier consists of four power diodes arranged in a diamond configuration with AC input terminals at opposite corners and DC output terminals at the remaining corners. When AC input voltage swings positive, current flows from the top AC terminal through the upper-right diode to the positive DC bus, through the load, back to the negative DC bus through the lower-left diode, and returns via the bottom AC terminal. During negative AC half-cycles, current flows from the bottom AC terminal through the upper-left diode to positive DC, through the load, back through the lower-right diode, and returns via the top AC terminal. The load always sees current flowing in the same direction regardless of AC polarity.
 
-```
+```text
          D1 (1N5408, 600V PIV, 3A avg)
     AC1 -------|>|------- +Vdc (311V peak, 220V avg for 240VAC input)
                 |
@@ -85,7 +85,7 @@ A practical 500W single-phase rectifier operating from 240VAC mains employs four
 
 The filter capacitor following the bridge rectifier smooths pulsating DC into quasi-constant voltage but introduces severe current stress. When the rectified voltage exceeds the capacitor voltage by approximately one diode drop, the bridge conducts and rapidly charges the capacitor to the instantaneous AC peak. This charging interval lasts only 10-30 degrees of the AC cycle, compressing all load current delivery into narrow pulses. RMS capacitor current can reach 3-5 times DC load current, generating I²R heating in the capacitor's internal ESR. Electrolytic capacitors designed for switch-mode power supplies specify ripple current ratings from 1-15 A RMS at 120 Hz for common sizes.
 
-```
+```text
 Capacitor Ripple Current and Lifetime Calculation:
 
 For a 500W load at 220V DC output:
@@ -111,7 +111,7 @@ Lifetime derating:
 
 Three-phase diode bridge rectifiers employ six diodes arranged in two groups of three. The upper group (cathodes connected to positive DC bus) consists of diodes with anodes connected to phases A, B, and C. The lower group (anodes connected to negative DC bus) has cathodes connected to the same three phases. At any instant, the most positive phase conducts through its upper diode to the DC bus, while the most negative phase conducts through its lower diode from the DC bus. The third phase remains uncommitted, neither sourcing nor sinking current.
 
-```
+```text
                   D1             D3             D5
            A -----|>|----- +     B -----|>|----- +     C -----|>|----- +
                    |                      |                      |
@@ -137,7 +137,7 @@ Voltage Relationships:
 
 The thyristor-based phase-controlled rectifier replaces diodes with silicon-controlled rectifiers that block forward voltage until triggered by a gate pulse. Each SCR requires a gate driver circuit that detects AC zero crossings, delays by the programmed firing angle α, then injects 50-500 mA gate current for 10-100 microseconds to latch the device into conduction. Once triggered, the SCR behaves identically to a diode, conducting until forward current drops below the holding threshold at the next AC zero crossing or commutation point.
 
-```
+```text
 Gate Drive Timing for Single-Phase Controlled Rectifier:
 
 Zero-Cross Detector (comparator with hysteresis):
@@ -166,7 +166,7 @@ Example: 480V line-line three-phase, α = 60°
 
 Active power factor correction employs a boost converter topology inserted between the bridge rectifier and bulk storage capacitor. The boost inductor connects in series with the rectified voltage, feeding a high-frequency switch (MOSFET or IGBT) to ground and a fast-recovery diode to the output capacitor. A current-mode control loop adjusts switch duty cycle to force inductor current to follow a rectified sine wave template synchronized to input voltage. The controller employs a dual-loop architecture: an outer voltage loop regulates output DC voltage to the target setpoint (typically 380-400V for universal input PFC), while an inner current loop ensures inductor current tracks the commanded waveform.
 
-```
+```text
 Boost PFC Stage Component Selection (500W, Universal Input 90-265VAC):
 
 Boost Inductor:
@@ -207,7 +207,7 @@ The current-mode control IC (such as the UC3854 or L6563) generates PWM gate sig
 
 Voltage source inverters implement the three-phase bridge using six power switches arranged in three parallel phase legs. Each phase leg comprises an upper switch connecting to the positive DC bus and a lower switch connecting to the negative DC bus, with the motor phase terminal at the midpoint junction. Antiparallel freewheeling diodes across each switch provide a path for inductive motor current when the switch is off. Modern designs employ IGBTs for switching frequencies below 20 kHz or SiC MOSFETs for frequencies up to 100 kHz where reduced switching loss justifies the component cost premium.
 
-```
+```text
 Three-Phase Voltage Source Inverter (10 kW, 480V AC output):
 
 DC Bus Configuration:
@@ -249,7 +249,7 @@ Switching Frequency Selection:
 
 Carrier-based PWM generation compares three sinusoidal modulation signals (120° phase-shifted for phases A, B, C) against a common triangular carrier waveform. The comparator outputs directly drive the gate signals for the three upper switches, while inverted signals (with dead time insertion) drive the lower switches. Modulation index m ranges from 0 to 1.15, where m = 1.0 corresponds to full linear operation before entering overmodulation.
 
-```
+```text
 Sinusoidal PWM Implementation (Microcontroller or DSP):
 
 Reference Generation (Phase A example):
@@ -293,7 +293,7 @@ Resulting Output Voltage (Phase A to DC midpoint):
 
 Space vector modulation divides the space of possible output voltage vectors into six triangular sectors, each bounded by two adjacent active vectors. The algorithm computes which sector contains the desired output vector, then calculates the dwell times for the two adjacent active vectors and the zero vector to synthesize the commanded voltage.
 
-```
+```text
 Space Vector Modulation Algorithm:
 
 Step 1: Clarke Transformation (abc → αβ)
@@ -350,7 +350,7 @@ Step 5: Vector to Gate Signal Mapping
 
 Dead-time compensation addresses the voltage error introduced when both switches in a phase leg are forced off during transitions. The correction voltage magnitude depends on dead time duration, switching frequency, and DC bus voltage. Current polarity determines whether the upper or lower freewheeling diode conducts during dead time.
 
-```
+```text
 Dead-Time Compensation Algorithm:
 
 Voltage Error per Switching Cycle:

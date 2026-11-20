@@ -72,7 +72,7 @@ Random number generation in retro games typically implements lightweight pseudor
 
 More complex manipulation schemes emerge in games where RNG state updates based on player actions rather than just frame counts. The Legend of Zelda increments its RNG value whenever Link swings his sword, opens a menu, or kills an enemy, and this same RNG state governs enemy movement patterns, item drops, and combat damage. Runners manipulate outcomes by performing extra sword swings or menu opens to advance the RNG to states that yield favorable results. For example, if the runner needs a specific enemy to move left rather than right, they might open and close the inventory menu six times to advance the RNG precisely six steps to the state where that enemy's movement decision yields the desired behavior. This transforms randomness into execution: "good RNG" means performing the correct manipulation sequence, not getting lucky.
 
-```
+```text
 RNG Manipulation Example (Simplified):
 
 Initial RNG State: 0xA3

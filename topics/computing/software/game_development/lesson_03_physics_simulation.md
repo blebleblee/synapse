@@ -20,7 +20,7 @@ Determinism emerges as a nonnegotiable requirement for networked multiplayer gam
 
 The physics engine organizes itself around a **world** object that aggregates rigid bodies, collision shapes, constraints, and persistent contact state. Each rigid body encapsulates mass properties, kinematic variables (position, orientation, linear velocity, angular velocity), and pointers to attached collision geometry. The collision geometry itself decouples from the body, allowing multiple bodies to share immutable shape definitions—a memory optimization that proves essential when thousands of identical crates or bullets populate the scene.
 
-```
+```text
 World
 ├── RigidBody[] bodies
 │   ├── Transform { position: vec3, orientation: quat }

@@ -96,7 +96,7 @@ Production deployments address this with one of three strategies. The first is s
 
 The file for a leaked `host-local` allocation — left behind when a pod was forcibly deleted or the node was restarted mid-attachment — looks like this:
 
-```
+```text
 /var/lib/cni/networks/production-net/
 ├── 10.0.1.2    (contains: "abc123def456...containerid")
 ├── 10.0.1.3    (contains: "deadbeef...containerid")

@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
 The span context propagation mechanism adheres to the W3C Trace Context specification while extending it with Datadog-specific metadata for origin detection and distributed sampling decisions. When the inventory service invokes the downstream pricing API, the tracer injects trace context into HTTP headers following this wire protocol:
 
-```
+```text
 traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
 tracestate: dd=s:2;o:rum;t.dm:-4;t.usr.id:baz64
 x-datadog-trace-id: 5476001284438097686
@@ -198,7 +198,7 @@ Upon ingestion, the trace pipeline splits into two parallel paths: the hot path 
 
 The cold path indexes traces into a columnar storage system optimized for temporal range queries and high-cardinality tag filtering. Each span is decomposed into a set of indexed dimensions—service name, operation name, resource identifier, HTTP status code, error flag—and stored in sorted string table structures that enable efficient bloom filter lookups and inverted index scans. Datadog's trace search query language allows operators to construct complex predicates combining temporal bounds, service topology filters, and tag-based constraints:
 
-```
+```text
 service:inventory-api AND resource_name:"GET /api/inventory/*" 
 AND @http.status_code:[500 TO 599] 
 AND @duration:[1s TO *]
@@ -227,7 +227,7 @@ This graph visualization reveals not only the direct dependencies between servic
 
 Flame graphs provide a complementary view of trace structure, transforming the tree of spans into a horizontal stacked visualization where the x-axis represents cumulative time and the y-axis represents call stack depth. Each span appears as a colored rectangle whose width is proportional to its duration, nested under its parent span. This layout makes the critical path immediately visible—the sequence of spans that contribute to the overall trace duration—and highlights parallelization opportunities where sibling spans execute concurrently.
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────────┐
 │ inventory-api.request [85.1ms]                                     │
 ├────────────────────────────────────────────────────────────────────┤

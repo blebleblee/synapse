@@ -81,7 +81,7 @@ Sensor dynamics and quantization effects impose hard physical limits on achievab
 
 Actuator bandwidth and nonlinearities constrain control authority at high frequencies and introduce distortions that degrade performance. A servo motor drive with PWM switching at 20 kHz exhibits current loop bandwidth limited to roughly 2-3 kHz by inductance and switching deadtime, preventing torque commands from tracking references above this frequency. Valve actuators driven by pneumatic cylinders respond in tens to hundreds of milliseconds, making them suitable only for slow process control. Saturation, deadband, hysteresis, and stiction in actuators introduce amplitude-dependent nonlinearities that invalidate linear control theory, often requiring describing function analysis or gain scheduling to maintain stability across operating points.
 
-```
+```text
 ┌─────────────┐         ┌──────────────┐         ┌──────────┐
 │  Setpoint   │ e(t)    │              │  u(t)   │          │  y(t)
 │   r(t)      ├────(+)──┤  Controller  ├─────────┤  Plant   ├──────┬───►

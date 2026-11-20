@@ -47,7 +47,7 @@ The EV3 (2013) is architecturally the most sophisticated and, for advanced pract
 
 Under ev3dev, motors are controlled by writing values to files in the sysfs filesystem. A large Technic motor attached to output port A is accessible at `/sys/class/tacho-motor/motor0/`. Setting speed, position, and run commands is a matter of writing to the appropriate attribute files. This architecture matters because it means every language with file I/O capability — Python, C, Ruby, JavaScript via Node.js — can control EV3 hardware with no special SDK required. The practical workflow for a Python session looks like this:
 
-```
+```bash
 # Navigating the ev3dev sysfs interface for motor control
 # Motor attached to output port A
 

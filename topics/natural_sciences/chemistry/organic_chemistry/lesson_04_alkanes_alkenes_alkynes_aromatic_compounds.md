@@ -22,7 +22,7 @@ The σ/π bond distinction is fundamental:
 
 **Mathematical Invariant: Bond Strength and Length Correlation**
 
-```
+```text
 Bond Type          Length (pm)      Strength (kJ/mol)      s-character
 C-C (sp³-sp³)         154                348                   25%
 C=C (sp²-sp²)         134                614                   33%
@@ -88,7 +88,7 @@ Every carbon: sp³ hybridized (25% s-character, 75% p-character)
 3. **Name substituents alphabetically** with position numbers
 4. **Use multiplying prefixes** (di-, tri-, tetra-) for identical substituents
 
-```
+```text
 Example: 3-ethyl-2,4-dimethylhexane
 
         CH₃
@@ -108,7 +108,7 @@ Boiling point trend: **Intermolecular forces dominate**
 - **Linear alkanes**: BP increases with molecular weight (greater surface area → stronger London dispersion)
 - **Branched alkanes**: BP decreases with branching at same MW (reduced surface contact)
 
-```
+```text
 n-pentane:     36°C
 isopentane:    28°C
 neopentane:     9°C
@@ -120,7 +120,7 @@ Energy barrier for C-C rotation: ~12-15 kJ/mol
 
 **Newman Projection Mechanics for Ethane:**
 
-```
+```text
     H           H
     |           |
 H - C - H   H - C - H
@@ -141,7 +141,7 @@ Staggered       Eclipsed
 
 Total strain = **Angle strain** + **Torsional strain** + **Steric strain**
 
-```
+```text
 Ring Size    Strain Energy (kJ/mol)    Primary Source
 Cyclopropane      115                  Angle strain (60° vs 109.5°)
 Cyclobutane        110                  Angle + torsional strain
@@ -172,7 +172,7 @@ Alkanes are chemically inert except for:
    Mechanism: Initiation → Propagation → Termination
 
 **Propagation steps:**
-```
+```text
 Cl• + CH₃-H → HCl + •CH₃        (ΔH ≈ +4 kJ/mol, slow)
 •CH₃ + Cl₂ → CH₃Cl + Cl•        (ΔH ≈ -100 kJ/mol, fast)
 ```
@@ -208,7 +208,7 @@ sp² carbons at C=C:
 - **(E)**: *Entgegen* (opposite) - high priority groups on opposite sides
 - **(Z)**: *Zusammen* (together) - high priority groups on same side
 
-```
+```text
        H         CH₃              CH₃        H
         \       /                  \       /
          C = C                      C = C
@@ -244,7 +244,7 @@ $$R_2C=CR_2 > R_2C=CHR > R_2C=CH_2 > RCH=CHR > RCH=CH_2 > CH_2=CH_2$$
 
 **Fundamental Mechanism Architecture:**
 
-```
+```text
 Step 1: π electrons attack electrophile → carbocation intermediate
 Step 2: Nucleophile attacks carbocation → product
 ```
@@ -257,24 +257,24 @@ Step 2: Nucleophile attacks carbocation → product
 **Key Reactions:**
 
 1. **Hydrohalogenation** (HX)
-   ```
+   ```text
    RCH=CH₂ + HBr → RCH(Br)-CH₃  (Markovnikov)
    ```
    With peroxides (anti-Markovnikov via radical mechanism)
 
 2. **Hydration** (H₂O/H⁺)
-   ```
+   ```text
    RCH=CH₂ + H₂O/H⁺ → RCH(OH)-CH₃  (Markovnikov)
    ```
 
 3. **Halogenation** (X₂)
-   ```
+   ```text
    RCH=CHR + Br₂ → RCH(Br)-CHR(Br)  (anti addition)
    ```
    Mechanism: Cyclic bromonium ion intermediate → backside attack
 
 4. **Hydrogenation** (H₂/catalyst)
-   ```
+   ```text
    RCH=CHR + H₂/Pt → RCH₂-CH₂R  (syn addition)
    ```
    Heterogeneous catalysis on metal surface
@@ -315,7 +315,7 @@ Example: **hex-3-yne** (CH₃CH₂C≡CCH₂CH₃)
 
 Terminal alkynes (RC≡CH) are weak acids:
 
-```
+```text
 RC≡CH + NaNH₂ → RC≡C⁻Na⁺ + NH₃
 ```
 
@@ -335,17 +335,17 @@ Similar to alkenes but generally less reactive (π electrons held more tightly d
    - **Dissolving metal** (Na/NH₃): alkyne → trans-alkene
 
 2. **Hydrohalogenation** (2 equiv HX)
-   ```
+   ```text
    RC≡CH + 2HBr → RCBr₂CH₃  (Markovnikov)
    ```
 
 3. **Hydration** (H₂O/H⁺/HgSO₄)
-   ```
+   ```text
    RC≡CH + H₂O/H⁺ → RCH₂CHO (via enol tautomerization)
    ```
 
 4. **Halogenation** (2 equiv X₂)
-   ```
+   ```text
    RC≡CR + 2Br₂ → RCBr₂-CBr₂R
    ```
 
@@ -393,7 +393,7 @@ Determined by comparing:
 
 **Disubstituted**: Use ortho/meta/para or 1,2-/1,3-/1,4- numbering
 
-```
+```text
         2 (ortho)
        /
    1--6
@@ -413,7 +413,7 @@ Determined by comparing:
 
 **General Mechanism Architecture:**
 
-```
+```text
 Step 1: Electrophile generation (E⁺)
 Step 2: π system attacks E⁺ → σ complex (arenium ion, cyclohexadienyl cation)
 Step 3: Base removes H⁺ → aromaticity restored
@@ -428,32 +428,32 @@ Step 3: Base removes H⁺ → aromaticity restored
 **Key EAS Reactions:**
 
 1. **Halogenation** (X₂/FeX₃)
-   ```
+   ```text
    C₆H₆ + Br₂/FeBr₃ → C₆H₅Br + HBr
    Electrophile: Br⁺ (from Br₂ + FeBr₃ → Br⁺ + FeBr₄⁻)
    ```
 
 2. **Nitration** (HNO₃/H₂SO₄)
-   ```
+   ```text
    C₆H₆ + HNO₃/H₂SO₄ → C₆H₅NO₂ + H₂O
    Electrophile: NO₂⁺ (nitronium ion)
    ```
 
 3. **Sulfonation** (H₂SO₄/SO₃)
-   ```
+   ```text
    C₆H₆ + H₂SO₄/SO₃ → C₆H₅SO₃H
    Electrophile: SO₃ (or HSO₃⁺)
    ```
 
 4. **Friedel-Crafts Alkylation** (RX/AlCl₃)
-   ```
+   ```text
    C₆H₆ + CH₃Cl/AlCl₃ → C₆H₅CH₃ + HCl
    Electrophile: R⁺ (carbocation)
    Limitations: Carbocation rearrangement, over-alkylation
    ```
 
 5. **Friedel-Crafts Acylation** (RCOCl/AlCl₃)
-   ```
+   ```text
    C₆H₆ + CH₃COCl/AlCl₃ → C₆H₅COCH₃ + HCl
    Electrophile: RCO⁺ (acylium ion)
    No rearrangement, no over-acylation
@@ -543,7 +543,7 @@ Relative rates for nitration at 25°C (benzene = 1):
 
 **Problem**: Carbocations rearrange via 1,2-hydride or 1,2-alkyl shifts to more stable carbocations
 
-```
+```text
 Example: Addition of HCl to 3-methylbut-1-ene
 
 Expected: CH₃-CH(CH₃)-CH₂-CH₂Cl
@@ -563,7 +563,7 @@ Mechanism:
 
 **Problem**: E2 elimination requires antiperiplanar geometry (H and leaving group at 180°)
 
-```
+```text
 cis-1-bromo-2-methylcyclohexane with conformational constraint:
 
 If Br is equatorial → No adjacent H is antiperiplanar → No elimination or very slow
@@ -579,7 +579,7 @@ Must have Br axial for E2 to proceed efficiently
 
 **Problem**: Alkyl groups are activating → product is more reactive than starting material
 
-```
+```text
 C₆H₆ + CH₃Cl/AlCl₃ → C₆H₅CH₃ → C₆H₄(CH₃)₂ → C₆H₃(CH₃)₃...
 ```
 
@@ -591,7 +591,7 @@ C₆H₆ + CH₃Cl/AlCl₃ → C₆H₅CH₃ → C₆H₄(CH₃)₂ → C₆H₃
 
 **Problem**: F-C reactions fail with strongly deactivated rings or basic substituents
 
-```
+```text
 Nitrobenzene + RX/AlCl₃ → NO REACTION (too deactivated)
 Aniline + RX/AlCl₃ → NO REACTION (NH₂ binds AlCl₃, deactivating)
 ```
@@ -604,7 +604,7 @@ Aniline + RX/AlCl₃ → NO REACTION (NH₂ binds AlCl₃, deactivating)
 
 **Problem**: Multiple substituents with conflicting directing effects
 
-```
+```text
 p-nitrotoluene nitration:
 
 -CH₃ (ortho/para director, activating) at position 1
@@ -622,7 +622,7 @@ Reason: CH₃ activates ring; NO₂ deactivates → reaction occurs in activated
 
 **Problem**: Stereochemical outcome depends on mechanism
 
-```
+```text
 Br₂ addition to alkene: Anti addition (via bromonium ion)
 OsO₄ dihydroxylation: Syn addition (via cyclic osmate ester)
 Hydrogenation (H₂/Pt): Syn addition (surface catalysis)
@@ -634,7 +634,7 @@ Hydrogenation (H₂/Pt): Syn addition (surface catalysis)
 
 **Problem**: Assuming aromatic compounds react like alkenes
 
-```
+```text
 Attempted: C₆H₆ + Br₂ → C₆H₆Br₂ (addition)
 Actual: C₆H₆ + Br₂/FeBr₃ → C₆H₅Br + HBr (substitution)
 
@@ -649,7 +649,7 @@ Reason: Addition would destroy aromaticity (~150 kJ/mol penalty)
 
 Given: C₅H₈
 
-```
+```text
 Step 1: Calculate DoU
 DoU = (2×5 + 2 - 8)/2 = 2
 
@@ -683,7 +683,7 @@ Step 3: Use spectroscopic data to differentiate
 
 **Problem**: Heat 2-bromo-2-methylbutane with NaOCH₂CH₃/ethanol
 
-```
+```text
 Competing reactions:
 - E2 elimination (strong base, high T)
 - SN2 (tertiary substrate → very slow)
@@ -727,7 +727,7 @@ Major product: 2-methylbut-2-ene
 - Product: Less substituted alcohol
 - Advantages: No rearrangement, syn stereochemistry
 
-```
+```text
 Example: Methylcyclohexene
 
 Markovnikov → 1-methylcyclohexanol (3°)
@@ -785,7 +785,7 @@ CₙHₓ compared to CₙH₂ₙ₊₂:
 
 **Pattern 2: Reactivity prediction from structure**
 
-```
+```text
 Alkane < Aromatic < Alkyne < Alkene
 (increasing reactivity toward electrophiles)
 
@@ -816,7 +816,7 @@ Exception: Aromatic undergoes substitution preferentially
 
 ### 4.1 Conceptual Hierarchy Map
 
-```
+```text
 Hydrocarbons
 │
 ├── Saturated (Alkanes)
@@ -876,7 +876,7 @@ Hydrocarbons
 
 **Decision Tree 1: Predicting Major Product**
 
-```
+```text
 Is carbocation involved?
 ├── Yes: Check for rearrangement possibility
 │   ├── Can form more stable carbocation? → Rearrangement occurs
@@ -888,7 +888,7 @@ Is carbocation involved?
 
 **Decision Tree 2: Aromatic Substitution Pattern**
 
-```
+```text
 Identify all substituents
 │
 For each EAS reaction:
@@ -905,7 +905,7 @@ For each EAS reaction:
 
 **Decision Tree 3: Synthesis Strategy Selection**
 
-```
+```text
 Target molecule analysis:
 │
 ├── Contains aromatic ring?

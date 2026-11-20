@@ -18,7 +18,7 @@ The foundation of any LEGO sorting system rests upon three mechanical primitives
 
 The simplest barrier is a screen or mesh with fixed aperture size. A screen with 10 mm square openings will pass 1×1 and 1×2 plates while retaining 2×2 bricks and larger. The critical parameter is the aperture-to-part ratio: apertures must be sized to allow reliable passage of desired parts while maintaining adequate structural integrity of the screen itself. LEGO builders commonly employ hardware cloth with 6.35 mm (¼-inch) or 12.7 mm (½-inch) mesh, window screening at 1.6 mm, and perforated sheet metal with custom hole patterns. The angle of inclination determines whether small parts actively migrate through apertures or require agitation. Screens inclined beyond 30 degrees relative to horizontal typically exhibit self-clearing behavior for non-interlocking parts, while shallower angles may require mechanical vibration or manual stirring to overcome static friction.
 
-```
+```text
 Cascading Screen System (Side View):
 
 User Input

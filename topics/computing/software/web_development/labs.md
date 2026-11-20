@@ -544,7 +544,7 @@ RUSTFLAGS="-Z sanitizer=thread" cargo +nightly test --target x86_64-unknown-linu
 
 TSan reports any detected race conditions with detailed information: the conflicting access locations, their call stacks, and the synchronization operations (or lack thereof) between them. A typical race report looks like this:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7fff12345678 by thread T2:
     #0 connection_pool::Connection::execute_query src/lib.rs:14
@@ -605,7 +605,7 @@ pub fn leak_connection(&self) {
 
 When the test completes, LSan will report the leaked allocation:
 
-```
+```text
 SUMMARY: AddressSanitizer: 24 byte(s) leaked in 1 allocation(s).
 ```
 

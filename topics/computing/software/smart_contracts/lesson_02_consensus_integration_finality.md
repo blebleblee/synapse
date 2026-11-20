@@ -59,7 +59,7 @@ The separation between *validator* (who proposes and attests) and *builder* (who
 
 Each Ethereum block contains an ordered list of transactions. The EVM processes them sequentially against a shared state trie. The state trie is a Merkle Patricia Trie over all account states, keyed by address. Each account state contains a nonce, a balance, a code hash (for contract accounts), and a storage root (the root of a second Merkle Patricia Trie containing the contract's storage slots).
 
-```
+```text
 Block Header
 ├── parentHash
 ├── stateRoot       ◄── Root of global state trie after all txs executed
@@ -120,7 +120,7 @@ MEV extraction manifests in three canonical forms, each exploiting a different o
 
 The mechanics of a sandwich attack on a Uniswap v2-style pool follow directly from the constant product invariant `x * y = k`:
 
-```
+```text
 Initial state: pool has x=1000 ETH, y=2,000,000 USDC, k=2×10⁹
 
 User intends: swap 10 USDC in, expects ~0.005 ETH out (approximate)

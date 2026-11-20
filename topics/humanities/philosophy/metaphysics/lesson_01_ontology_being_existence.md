@@ -68,7 +68,7 @@ Contemporary metaphysics formalizes these intuitions through rigorous dependence
 
 This framework generates a hierarchical architecture:
 
-```
+```text
 ONTOLOGICAL DEPENDENCE HIERARCHY
 
 Independent Existents (Substances)

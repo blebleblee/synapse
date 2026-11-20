@@ -64,7 +64,7 @@ sequenceDiagram
 
 Given a baud rate *B*, one symbol period is:
 
-```
+```text
 T_bit = 1 / B  seconds
 ```
 
@@ -72,7 +72,7 @@ At 115200 baud: `T_bit ≈ 8.68 µs`. A logic analyzer must sample at a minimum 
 
 Standard embedded UART baud rates in descending frequency of occurrence on IoT/embedded targets:
 
-```
+```text
 115200, 57600, 38400, 19200, 9600, 4800, 2400, 1200
 ```
 
@@ -418,14 +418,14 @@ done
 
 If the target runs U-Boot, the UART console is the primary attack surface before the OS loads. The autoboot countdown (default 3–5 seconds) is the interrupt window.
 
-```
+```text
 Hit any key to stop autoboot:  3
 => 
 ```
 
 At the U-Boot prompt, the following commands expose critical device information:
 
-```
+```bash
 # System information
 => bdinfo                        # Board info: memory map, clock frequencies, MAC
 => printenv                      # All environment variables (boot args, server IPs, etc.)

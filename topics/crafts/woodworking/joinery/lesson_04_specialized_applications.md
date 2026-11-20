@@ -26,7 +26,7 @@ Half-blind dovetails conceal the tail ends within the drawer front, presenting a
 
 Lock miter joints, executed on a router table with a specialized lock miter bit, provide an alternative that balances speed and strength. The joint profile interweaves a 45-degree miter face with interlocking rabbets and tongues, creating mechanical resistance to both tensile pull-out and perpendicular separation. The setup requires exacting fence and bit height adjustment—errors of even 0.010 inch result in misaligned faces—but once dialed in, the joint cuts rapidly and delivers consistent results across production runs. The interlocking geometry distributes glue surface area across multiple faces, and the 45-degree mitered outer corner presents a clean aesthetic when drawer fronts will be left exposed. However, lock miters lack the pull-out resistance of dovetails because the mechanical interlock relies on small tongues that can shear under sustained tensile stress, and the joint is intolerant of wood movement perpendicular to the drawer axis.
 
-```
+```text
 Through-Dovetail Force Distribution:
 
        Tail (side piece)

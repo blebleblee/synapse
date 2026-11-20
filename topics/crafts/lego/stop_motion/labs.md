@@ -304,7 +304,7 @@ Service protocol: After 200 manipulation cycles or when clutch reaches "loose" s
 
 **Project Directory Structure Template:**
 
-```
+```text
 project-name/
 ├── sequences/
 │   ├── seq-01-walk/

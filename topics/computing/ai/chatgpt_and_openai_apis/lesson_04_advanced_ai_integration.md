@@ -558,7 +558,7 @@ print(event.model_dump_json(indent=2))
 
 ### Cost and Latency Optimization Checklist
 
-```
+```text
 [ ] Use gpt-4o-mini for classification, routing, and simple extraction tasks.
     Reserve gpt-4o for tasks requiring complex reasoning.
 

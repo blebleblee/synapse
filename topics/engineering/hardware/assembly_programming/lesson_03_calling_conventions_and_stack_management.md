@@ -36,7 +36,7 @@ A canonical function call sequence on x86-64 System V proceeds as follows. The c
 
 Upon entry, the callee's prologue typically saves the frame pointer and establishes a new frame:
 
-```
+```text
 push   %rbp
 mov    %rsp, %rbp
 sub    $N, %rsp
@@ -46,7 +46,7 @@ This sequence first saves the caller's `%rbp`, then sets `%rbp` to the current s
 
 The callee performs its computation, accessing parameters via `%rdi`, `%rsi`, and so on, or via positive offsets from `%rbp` for stack-passed arguments (e.g., `16(%rbp)` accesses the seventh argument, since `8(%rbp)` holds the return address and `0(%rbp)` holds the saved frame pointer). Local variables reside at negative offsets from `%rbp`, such as `-8(%rbp)` for the first local, `-16(%rbp)` for the second, and so forth. Before returning, the epilogue restores callee-saved registers, deallocates local storage, and restores the caller's frame pointer:
 
-```
+```text
 mov    %rbp, %rsp
 pop    %rbp
 ret
@@ -62,7 +62,7 @@ The frame pointer on ARM64 is `X29`, often abbreviated `FP`, and `X19` through `
 
 A typical ARM64 function prologue and epilogue pair looks like this:
 
-```
+```text
 stp    x29, x30, [sp, #-16]!
 mov    x29, sp
 sub    sp, sp, #N

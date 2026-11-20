@@ -263,7 +263,7 @@ For small price changes, EV and CV approximately coincide. But for large changes
 
 The following diagram illustrates the tangency of indifference and budget curves:
 
-```
+```text
 x₂
  |
  |     IC₃ (U = 3)

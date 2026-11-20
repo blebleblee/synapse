@@ -66,7 +66,7 @@ The amortization schedule itself reveals critical cash flow dynamics that determ
 
 This front-loaded interest schedule creates a critical insight: early mortgage years function as leveraged rental yield vehicles, not equity-building mechanisms. Cash-on-cash returns in early years derive almost entirely from rental income exceeding mortgage interest and operating expenses, with negligible contribution from principal paydown. Only after year twelve does principal reduction begin contributing meaningfully to equity returns, accelerating dramatically in the final decade as the outstanding balance shrinks and each payment allocates increasingly to principal retirement.
 
-```
+```text
 Year 1 Payment Allocation:
   Total Annual Payment: $152,328
   Interest Portion: $117,188 (77%)

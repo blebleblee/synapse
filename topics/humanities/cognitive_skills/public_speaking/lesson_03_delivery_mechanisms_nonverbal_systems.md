@@ -26,7 +26,7 @@ Resonance amplifies the acoustic signal generated at the larynx. The pharynx, or
 
 Articulation transforms resonant sound into linguistic units through rapid, precise movements of the articulators: lips, tongue, teeth, alveolar ridge, hard palate, soft palate. English phonology requires articulatory gestures completing in under one hundred milliseconds for plosive consonants. Imprecise articulation manifests as mumbling, where coarticulation—the blending of adjacent phonemes—becomes excessive and phonemic distinctions collapse. Training protocols isolate individual articulators through exaggerated consonant drills, progressively reducing exaggeration while maintaining clarity.
 
-```
+```text
 Vocal Production Pipeline:
 
 [Breath Support]      [Phonation]        [Resonance]        [Articulation]
@@ -82,7 +82,7 @@ Hand shape carries meaning independent of trajectory. Open palms signal honesty,
 
 Gesture timing must synchronize with speech at syllable-level precision. The gesture stroke—the phase of maximum effort and semantic meaning—should align with the prosodic stress of the corresponding spoken phrase. Asynchronous gesture-speech coupling produces the uncanny effect observers label as "unnatural" or "rehearsed" without consciously identifying the temporal mismatch.
 
-```
+```text
 Gesture Classification System:
 
 Iconic:      [Visual Depiction of Concrete Referents]

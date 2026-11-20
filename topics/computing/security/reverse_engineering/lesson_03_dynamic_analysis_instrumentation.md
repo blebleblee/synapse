@@ -440,7 +440,7 @@ For firmware analysis over JTAG, the equivalent optimization is trace buffer exp
 
 A concrete OpenOCD session for Cortex-M ETM trace configuration:
 
-```
+```bash
 # Connect to target via SWD
 target remote | openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg --pipe
 

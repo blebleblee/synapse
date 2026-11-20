@@ -22,7 +22,7 @@ The primary milling system architecture divides into three functional stages: lo
 
 The head saw represents the mill's primary conversion tool, responsible for the initial log breakdown into cants, flitches, or dimensional lumber. Two dominant head saw architectures compete based on scale and application: the horizontal bandmill and the circular headrig. The horizontal bandmill employs a continuous band blade ranging from 7 to 12 inches in width and 0.045 to 0.065 inches in thickness, stretched between two or three wheels in a vertical or horizontal configuration. Blade speed varies from 8,000 to 10,000 surface feet per minute for hardwoods and up to 12,000 SFPM for softwoods, driven by motor assemblies ranging from 50 to 200 horsepower depending on blade width and cutting capacity. The log rests on a hydraulic carriage riding precision rails, indexed laterally by digital setworks that position each cut to tolerances of ±0.010 inches. As the carriage advances through the stationary blade at feed speeds between 80 and 200 feet per minute, the blade severs a slab or board, which falls onto an outfeed conveyor for sorting.
 
-```
+```text
 HORIZONTAL BANDMILL GEOMETRY (Side View)
 
         Upper Wheel (Drive)

@@ -375,7 +375,7 @@ The chronological future replaces the inequality with a strict inequality exclud
 
 We can visualize the causal structure using a Minkowski diagram. In $(ct, x)$ coordinates, we plot $ct$ vertically and $x$ horizontally. The light cone has slopes $\pm 1$ (in units where $c = 1$). Timelike curves lie within the cone, with slopes $|dx/dt| < c$. Spacelike curves lie outside the cone, with slopes $|dx/dt| > c$.
 
-```
+```text
      ct
       ^
       |        /|

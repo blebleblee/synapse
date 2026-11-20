@@ -64,7 +64,7 @@ graph LR
 
 ### Working difference equation (feedback delay)
 
-```
+```text
 y[n] = x[n] + g * y[n - N]
 ```
 
@@ -127,7 +127,7 @@ private:
 
 ### Tempo-synced delay times (the number every live/studio musician actually needs)
 
-```
+```text
 delay_ms = (60000 / BPM) * note_division_multiplier
 ```
 

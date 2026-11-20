@@ -18,7 +18,7 @@ DNS is a hierarchical, eventually-consistent, distributed database whose entries
 
 The DNS wire format is a single UDP datagram (or TCP segment for responses exceeding 512 bytes, with EDNS0 extension) containing a 12-byte header followed by question, answer, authority, and additional sections. The header carries a 16-bit transaction ID for matching responses to queries, flags indicating query vs. response, recursion desired/available, and a response code. Resource records follow a consistent format: name, type, class, TTL, RDLENGTH, and RDATA. Names are encoded as a sequence of length-prefixed labels terminated by a zero byte, and DNS name compression allows repeated suffixes to be replaced by 2-byte pointers to earlier offsets in the message, reducing wire size at the cost of parsing complexity.
 
-```
+```text
 DNS Message Layout (RFC 1035, Section 4.1)
 
 +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+

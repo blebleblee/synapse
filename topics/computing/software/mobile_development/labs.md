@@ -705,7 +705,7 @@ go test -bench=. -benchmem -benchtime=5s ./... 2>&1 | tee bench_results.txt
 
 The race detector report will identify the two goroutines, their stack traces at the point of conflicting access, and the first observed access that the second one raced against. It looks like this:
 
-```
+```text
 ==================
 WARNING: DATA RACE
 Write at 0x00c0001b4000 by goroutine 8:
@@ -823,7 +823,7 @@ cat asan_report.txt
 
 The ASan report will identify the exact freed allocation, the stack trace at the point of `free()`, and the stack trace at the point of the use-after-free read:
 
-```
+```text
 ==12345==ERROR: AddressSanitizer: heap-use-after-free on address 0x602000000050
 READ of size 2 at 0x602000000050 thread T0
     #0 0x... in audio_buffer_rms uaf_demo.c:46

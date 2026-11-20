@@ -24,7 +24,7 @@ Tablet drivers report stylus events in native hardware coordinates measured in t
 
 Raw input events arrive at irregular intervals determined by hardware sampling rates and operating system scheduler timing. A 133 Hz tablet generates events every 7.5 milliseconds during continuous motion, but hand movement speed varies dramatically—a slow detail pass might move the stylus only two pixels between samples, while a quick gestural swipe could cover 50 pixels or more. Depositing a single brush stamp at each input event would create a dotted-line effect with visible gaps during fast motion and excessive over-painting during slow motion. Stroke interpolation solves this problem by calculating intermediate sample points spaced at user-defined intervals measured in pixels or as a percentage of brush diameter. A spacing value of 25% means the renderer will place brush stamps such that their edges overlap by 75%, creating smooth continuous coverage. The interpolation algorithm walks along the path between two consecutive input events, calculating intermediate positions, pressures, and tilt angles through linear interpolation. Hermite spline interpolation offers smoother curvature reproduction but introduces slight latency since it requires lookahead to the next input point.
 
-```
+```text
 Input Event Stream (irregular):
 t0: pos=(100,100) pressure=0.3
 t1: pos=(150,105) pressure=0.5  [35ms later]
@@ -56,7 +56,7 @@ Textured brushes require bilinear or bicubic texture sampling with proper mipmap
 
 The final stage combines the rasterized brush stamp with the existing canvas content according to the selected blending mode and opacity/flow settings. For Normal blending mode, the operation reduces to standard alpha compositing:
 
-```
+```text
 output_color = (stamp_color × stamp_alpha × opacity) + (canvas_color × (1 - stamp_alpha × opacity))
 ```
 
@@ -64,7 +64,7 @@ Flow implementation requires maintaining a separate accumulation buffer that tra
 
 Multiply and Screen blending modes require gamma-correct color mathematics to avoid perceptual distortions. sRGB colors must be converted to linear space before multiplication or screening operations, then converted back to gamma space for display. The conversion formulas involve piecewise functions:
 
-```
+```text
 sRGB to Linear:
 if (c <= 0.04045) then linear = c / 12.92
 else linear = ((c + 0.055) / 1.055)^2.4

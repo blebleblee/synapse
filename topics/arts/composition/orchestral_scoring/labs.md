@@ -88,7 +88,7 @@ This is why legato spacing matters mechanically, not just musically:
 
 Organize your project by orchestral family, left to right in the mixer matching stage position, so your panning decisions are intuitive rather than arbitrary:
 
-```
+```text
 Strings (L→R stage position)
 ├── Violin I   — hard left, 16 desks
 ├── Violin II  — center-left, 14 desks
@@ -130,7 +130,7 @@ Four-part voice leading rules that keep this sounding like real orchestration ra
 - Viola (alto): C3–E5
 - Cello (bass): C2–C4
 
-```
+```text
 Bar 1 (C major):    Vln I = C5   Vla = E4   Cello = C3
 Bar 2 (F major):    Vln I = F5   Vla = C5   Cello = F3   (soprano leaps 4th, alto moves up step)
 Bar 3 (G major):    Vln I = G5   Vla = B4   Cello = G3
@@ -141,7 +141,7 @@ Check it on paper before you touch the DAW: Violin I and Cello at bar 1→2 move
 
 **MIDI entry (Violin I, as reference — apply the corrected voicing to Viola and Cello similarly):**
 
-```
+```text
 Bar 1, Beat 1: C5, whole note, velocity 80, CC11 ramp 70→90
 Bar 2, Beat 1: F5, whole note, velocity 85, CC11 ramp 90→95
 Bar 3, Beat 1: G5, whole note, velocity 90, CC11 ramp 95→100
@@ -159,7 +159,7 @@ Note the velocity range: 75–90. This stays inside a single sample velocity lay
 
 Flute entrance at bar 3, under legato, moving in eighth notes against the sustained string chorale — this is where you practice interval-specific legato spacing in a real musical context, not an isolated drill.
 
-```
+```text
 Bar 2, Beat 4 (triplet subdivision, slightly before bar 3): keyswitch D-1 (legato), zero-length
 Bar 3, Beat 1:    D5, eighth, velocity 70, CC11 80
 Bar 3, Beat 1.5:  E5, eighth, velocity 72, CC11 82

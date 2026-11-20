@@ -30,7 +30,7 @@ Top-down functional decomposition begins with the high-level goal and progressiv
 
 The architecture of top-down decomposition forms a tree structure where the root represents the ultimate goal, internal nodes represent intermediate sub-goals, and leaves represent executable primitive actions. This tree embeds critical structural information: the parent-child relationship captures necessity (all children must be satisfied to satisfy the parent), sibling relationships may capture dependencies or independence (can tasks be executed in parallel or must they sequence?), and the depth of the tree reflects the granularity of planning. A well-formed decomposition tree exhibits what might be called clean factoring: each node is decomposed into children that are mutually exclusive (no overlapping responsibilities) and collectively exhaustive (together they fully satisfy the parent's requirements).
 
-```
+```text
 Goal: Launch Software Product
 ├── Develop Core Functionality
 │   ├── Requirements Analysis
@@ -69,7 +69,7 @@ Bottom-up assembly exploits component reusability and emergent properties. Rathe
 
 The architectural pattern of bottom-up assembly resembles evolutionary tinkering more than hierarchical planning. Components connect through interfaces and contracts, with composition relationships emerging opportunistically rather than being dictated by a master plan. This flexibility grants significant advantages in rapidly changing environments where requirements drift and where discovering what is possible often precedes articulating what is desired. The corresponding risk is solution-driven problem definition: allowing the availability of particular tools or components to warp the problem definition itself, solving problems because solutions are convenient rather than because the problems genuinely matter.
 
-```
+```text
 Available Components:
 - Message Queue (asynchronous communication)
 - Stream Processor (real-time transformation)
@@ -90,7 +90,7 @@ Divide-and-conquer decomposition exploits recursive problem structure—situatio
 
 The architectural pattern of divide-and-conquer forms a balanced tree where each node represents a subproblem, edges represent the decomposition into smaller subproblems, and leaves represent base cases small enough to solve directly. The critical structural requirement is independence: subproblems must be solvable without coordination, with all necessary information passed down during decomposition and all results aggregated during the merge or combine phase. When subproblems exhibit dependencies—where solving one affects the optimal solution to another—divide-and-conquer degrades into divide-and-coordinate, losing its elegance and much of its efficiency advantage.
 
-```
+```text
 Problem: Sort Array [8, 3, 1, 7, 0, 10, 2]
 
 Divide Phase (Top-Down):

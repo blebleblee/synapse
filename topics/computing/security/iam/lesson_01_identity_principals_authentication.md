@@ -20,7 +20,7 @@ The security invariants that must hold in any correct IAM implementation are unf
 
 Identity principal representation in production systems maps to concrete data structures optimized for both storage efficiency and access control evaluation performance. A user principal consists of an immutable globally unique identifier (typically a UUID or cryptographically random 128-bit value), a mutable set of identity attributes (email addresses, organizational units, group memberships), and a credential binding table linking the principal to one or more authentication mechanisms. The separation between immutable identity and mutable attributes prevents authorization bypass attacks where adversaries manipulate identity properties to gain elevated permissions.
 
-```
+```text
 User Principal Schema (normalized storage):
 
 principal_id: UUID                    -- Immutable, globally unique

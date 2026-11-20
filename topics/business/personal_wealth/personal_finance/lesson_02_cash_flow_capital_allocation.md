@@ -26,7 +26,7 @@ Income arrives through distinct channels, each with different tax treatment, sta
 
 The architecture of income stability can be visualized through a matrix that considers both predictability and accessibility:
 
-```
+```text
 INCOME STABILITY MATRIX
 
                           HIGH PREDICTABILITY          LOW PREDICTABILITY

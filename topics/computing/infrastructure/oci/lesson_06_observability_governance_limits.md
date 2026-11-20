@@ -60,7 +60,7 @@ This query retrieves `CpuUtilization` metric data points at one-minute resolutio
 
 Alarm creation transforms a metric query into a stateful threshold-crossing detector. Each alarm maintains an internal state machine with three states: OK (metric value below threshold), FIRING (metric value exceeded threshold for the specified evaluation period), and INSUFFICIENT_DATA (missing metric data points). The state transition logic implements hysteresis to prevent alarm flapping: a metric must exceed the threshold for a consecutive number of evaluation intervals (the trigger count) before transitioning to FIRING state. Similarly, it must fall below the threshold for a recovery period before returning to OK state.
 
-```
+```text
 Alarm: Database IOPS Saturation
   Query: DiskIopsRead[1m]{resourceDisplayName="prod-db-volume-01"}.max()
   Threshold: > 8000
@@ -75,7 +75,7 @@ OCI Logging Analytics operates on a fundamentally different data model than stru
 
 Log parsing happens at ingestion time through a library of predefined and custom parsers. OCI Logging Analytics ships with hundreds of built-in parsers for common log formats: Apache access logs, Nginx error logs, MySQL slow query logs, syslog RFC 5424 format. Each parser defines extraction rules using regular expressions or structured format grammars:
 
-```
+```text
 Apache Access Log Parser:
   Pattern: ^(?<clientIp>\S+) \S+ \S+ \[(?<timestamp>[^\]]+)\] "(?<method>\S+) (?<uri>\S+) (?<protocol>\S+)" (?<statusCode>\d+) (?<bytes>\d+)
   
@@ -90,7 +90,7 @@ Apache Access Log Parser:
 
 Parsed logs flow into a distributed indexing layer built on inverted indices for full-text search and columnar indices for structured field queries. The architecture resembles Elasticsearch or Splunk: each log event becomes a document with extracted fields as searchable attributes. Query execution supports complex Boolean logic, regular expression matching, and temporal windowing:
 
-```
+```text
 source='prod-webserver-logs' AND statusCode >= 500 AND uri =~ '/api/.*' | stats count() by statusCode, uri
 ```
 
@@ -127,7 +127,7 @@ Service limits manifest as quota objects stored in the regional control plane da
 
 Quota increases require submitting a service request through the OCI Console, specifying the resource type, current limit, requested new limit, and business justification. Oracle's support team reviews the request against regional capacity availability—if the requested capacity exceeds physical infrastructure, they may offer an alternative region or availability domain. The approval process typically completes within 24-48 hours for standard requests, though urgent production-impacting requests can escalate to a dedicated account team.
 
-```
+```text
 Service Limit Request:
   Resource Type: compute-core-count (VM.Standard.E4.Flex)
   Region: us-ashburn-1
@@ -161,7 +161,7 @@ Query performance in Logging Analytics degrades catastrophically with overly bro
 
 Tagging governance breaks down when tag application policies lack enforcement mechanisms. Defining a mandatory `CostCenter` tag has no effect if resource creation APIs accept requests without that tag. OCI Tag Defaults provide one enforcement layer: a compartment-level policy that automatically applies default tag values to new resources. However, this only provides defaults—users can still override them. Full enforcement requires OCI Policy statements that deny resource creation without required tags:
 
-```
+```text
 Allow group 'developers' to manage instance-family in compartment 'production' where request.tag.CostTracking.CostCenter exists
 ```
 

@@ -32,7 +32,7 @@ Quantum circuit compilation transforms high-level gate sequences into hardware-n
 
 The quantum instruction set architecture (ISA) abstracts the pulse-level control into discrete gate operations, analogous to how classical ISAs abstract transistor-level details into machine instructions. Qiskit's transpilation pipeline proceeds through stages: translation to the target basis gate set, routing through the coupling map to satisfy connectivity, optimization passes to reduce depth and gate count, and scheduling to respect hardware timing constraints (gate concurrency, resonator measurement conflicts). The resulting circuit, expressed in OpenQASM (Open Quantum Assembly Language), specifies gate types, target qubits, and classical control flow:
 
-```
+```text
 OPENQASM 2.0;
 include "qelib1.inc";
 qreg q[3];

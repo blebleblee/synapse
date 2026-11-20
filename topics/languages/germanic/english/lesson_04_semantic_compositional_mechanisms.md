@@ -28,7 +28,7 @@ Predicate modification enables semantic composition when two constituents denote
 
 Quantificational determiners introduce generalized quantifier denotations relating two sets. The determiner *every* denotes the function λP.λQ.∀x[P(x) → Q(x)], taking two property-denoting arguments and returning a truth value. In "Every student passed," the noun *student* supplies the restrictor P, the verb phrase *passed* supplies the nuclear scope Q, and the determiner asserts that the student-set forms a subset of the passed-set. Quantifier raising, a covert syntactic operation applying at Logical Form, moves quantificational phrases to clause-peripheral positions where they bind traces in their base positions. This movement establishes scope relations and resolves ambiguities. In "A student read every book," quantifier raising generates two distinct LF representations:
 
-```
+```text
 Surface scope: [A student]₁ [every book]₂ [t₁ read t₂]
   ∃x[student(x) ∧ ∀y[book(y) → read(x, y)]]
 

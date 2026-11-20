@@ -88,7 +88,7 @@ Empirical calibration of prospect theory parameters requires experimental elicit
 
 The boundaries between prospect theory and cumulative prospect theory warrant clarification. The original 1979 formulation applied decision weights directly to outcome probabilities, leading to violations of stochastic dominance in prospects with more than two non-zero outcomes. Cumulative prospect theory, developed by Tversky and Kahneman in 1992, resolves these violations by applying the weighting function to cumulative probabilities rather than individual outcome probabilities. For a prospect with outcomes ranked from worst to best, decision weights are computed as differences of weighted cumulative probabilities, ensuring that stochastically dominated prospects receive lower valuations. The cumulative formulation has become the standard reference in contemporary behavioral economics, though both versions share the core features of reference dependence, loss aversion, and probability weighting that distinguish prospect theory from expected utility.
 
-```
+```text
 Prospect Theory Evaluation Workflow
 ====================================
 

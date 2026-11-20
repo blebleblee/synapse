@@ -55,7 +55,7 @@ The universal property of free modules characterizes them through lifting diagra
 
 Projective modules satisfy a lifting property with respect to surjective homomorphisms. An $R$-module $P$ is projective if for every surjective homomorphism $\pi: M \to N$ and every homomorphism $f: P \to N$, there exists a homomorphism $\tilde{f}: P \to M$ such that $\pi \circ \tilde{f} = f$. Diagrammatically:
 
-```
+```text
         P
         |  \
       ∃ |   \ f
@@ -69,7 +69,7 @@ This asserts that $P$ has enough "freedom" to lift maps through surjections. The
 
 Injective modules dualize projectivity through an extension property. An $R$-module $E$ is injective if for every injective homomorphism $\iota: N \to M$ and every homomorphism $g: N \to E$, there exists a homomorphism $\tilde{g}: M \to E$ such that $\tilde{g} \circ \iota = g$. Diagrammatically:
 
-```
+```text
         0 -> N -> M
              |    |
            g |   ∃| tilde_g

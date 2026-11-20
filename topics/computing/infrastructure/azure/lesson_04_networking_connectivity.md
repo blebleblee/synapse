@@ -85,7 +85,7 @@ Application Gateway's Layer 7 processing introduces significantly higher latency
 
 The gateway's routing engine evaluates rules in priority order against request properties:
 
-```
+```text
 Request: GET https://api.contoso.com/v2/users/123
 
 Rule Evaluation:
@@ -103,7 +103,7 @@ Private endpoints leverage Azure Private Link's reverse-proxy architecture. When
 
 Traffic flow through a private endpoint follows this path:
 
-```
+```text
 VM (10.0.1.4) → Storage Account (storageacct.blob.core.windows.net)
 
 Traditional Service Endpoint Path:

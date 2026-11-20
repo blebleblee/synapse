@@ -20,13 +20,13 @@ Formally, let the input space be 𝒳 ⊆ ℝᵈ and the output space be 𝒴. A
 
 The **true risk** (generalization error) of a hypothesis h is:
 
-```
+```text
 R(h) = E_{(x,y)~P} [ L(h(x), y) ]
 ```
 
 where L is a loss function. Because P is unknown, R(h) cannot be computed directly. What can be computed is the **empirical risk**:
 
-```
+```text
 R̂(h) = (1/n) * Σᵢ L(h(xᵢ), yᵢ)
 ```
 
@@ -40,7 +40,7 @@ R̂(h) = (1/n) * Σᵢ L(h(xᵢ), yᵢ)
 
 The key theorem that justifies ERM states that if ℋ is not too complex and n is large enough, then with high probability, empirical risk is uniformly close to true risk *for all h ∈ ℋ simultaneously*. The standard finite-class bound is:
 
-```
+```text
 P[ sup_{h ∈ ℋ} |R(h) - R̂(h)| > ε ] ≤ 2|ℋ| · exp(-2nε²)
 ```
 
@@ -52,7 +52,7 @@ The VC dimension VC(ℋ) is the size of the largest finite set of points that �
 
 The VC generalization bound states that with probability at least 1 - δ:
 
-```
+```text
 R(h_S) ≤ R̂(h_S) + O( sqrt( (VC(ℋ) · log(n/VC(ℋ)) + log(1/δ)) / n ) )
 ```
 
@@ -76,7 +76,7 @@ A **probability space** is a triple (Ω, 𝒻, P) where Ω is a sample space, �
 
 **Bayes' Theorem** is the cornerstone of probabilistic inference:
 
-```
+```text
 P(θ | D) = P(D | θ) · P(θ) / P(D)
 ```
 
@@ -94,7 +94,7 @@ where P(D | θ) is the likelihood, P(θ) is the prior, P(D) = ∫ P(D|θ)P(θ)d�
 
 **Information-theoretic quantities** underpin many loss functions. The **entropy** H(P) = -Σ_x P(x) log P(x) measures the irreducible uncertainty in a distribution. The **KL divergence** (Kullback–Leibler) measures the information lost when approximating P with Q:
 
-```
+```text
 KL(P || Q) = Σ_x P(x) · log( P(x) / Q(x) )
 ```
 
@@ -122,7 +122,7 @@ Learning is an optimization problem: find the parameter vector θ* ∈ ℝᵖ th
 
 **The gradient ∇_θ ℒ(θ) ∈ ℝᵖ** is the vector of partial derivatives ∂ℒ/∂θᵢ. It points in the direction of steepest ascent of ℒ in parameter space. Gradient descent moves in the opposite direction:
 
-```
+```text
 θ_{t+1} = θ_t - η · ∇_θ ℒ(θ_t)
 ```
 
@@ -130,7 +130,7 @@ where η > 0 is the learning rate (step size). This is a first-order method: it 
 
 **The Hessian H = ∇²_θ ℒ(θ) ∈ ℝᵖˣᵖ** contains second-order curvature information. At a local minimum, H ≽ 0. Newton's method uses H to correct the gradient step:
 
-```
+```text
 θ_{t+1} = θ_t - H⁻¹ · ∇_θ ℒ(θ_t)
 ```
 
@@ -138,7 +138,7 @@ Newton's method is scale-invariant and converges quadratically near a minimum, b
 
 **Stochastic Gradient Descent (SGD)** approximates the full-batch gradient using a mini-batch B ⊂ {1,...,n}:
 
-```
+```text
 ∇_θ ℒ(θ) ≈ (1/|B|) · Σ_{i ∈ B} ∇_θ L(h_θ(xᵢ), yᵢ)
 ```
 
@@ -152,7 +152,7 @@ This introduces noise into the optimization trajectory, which is paradoxically b
 
 For squared error loss, the generalization error of any estimator decomposes exactly as:
 
-```
+```text
 E[(y - f̂(x))²] = Bias²[f̂(x)] + Var[f̂(x)] + σ²_noise
 ```
 
@@ -173,7 +173,7 @@ Loss functions are not chosen arbitrarily. They are derived from probabilistic m
 
 **Mean Squared Error (MSE)** for regression assumes y | x ~ N(f_θ(x), σ²):
 
-```
+```text
 -log P(y|x,θ) = (y - f_θ(x))² / (2σ²) + const
 ```
 
@@ -181,25 +181,25 @@ Minimizing NLL is identical to minimizing MSE. The Gaussian noise assumption is 
 
 **Binary Cross-Entropy** for classification assumes y | x ~ Bernoulli(σ(f_θ(x))), where σ is the sigmoid function:
 
-```
+```text
 -log P(y|x,θ) = -[ y · log σ(f_θ(x)) + (1-y) · log(1 - σ(f_θ(x))) ]
 ```
 
 **Categorical Cross-Entropy (Softmax Loss)** for K-class classification assumes y | x ~ Categorical(softmax(f_θ(x))):
 
-```
+```text
 -log P(y=k|x,θ) = -log [ exp(f_θ(x)_k) / Σⱼ exp(f_θ(x)_j) ]
 ```
 
 **Hinge Loss** for Support Vector Machines does not arise from a probabilistic model but from a geometric margin maximization criterion:
 
-```
+```text
 L(y, f(x)) = max(0, 1 - y · f(x)),   y ∈ {-1, +1}
 ```
 
 **Huber Loss** combines the quadratic behavior of MSE for small errors with the linear behavior of MAE for large errors, providing robustness to outliers:
 
-```
+```text
 L_δ(y, ŷ) = { (1/2)(y - ŷ)²          if |y - ŷ| ≤ δ
              { δ · (|y - ŷ| - δ/2)    otherwise
 ```
@@ -674,7 +674,7 @@ if __name__ == "__main__":
 **Exercise 2 — Bias-Variance Tradeoff via Polynomial Regression.** Generate 50 noisy observations from f*(x) = sin(2πx) + ε, ε ~ N(0, 0.1²), on [0, 1]. Fit polynomial regression models of degree k ∈ {1, 3, 7, 15} using MSE loss. For each degree, use 200 independent trials: plot the decomposed bias², variance, and noise terms as a function of k. Verify that bias² + variance + noise ≈ mean test MSE across trials.
 
 **Exercise 3 — Gradient Check.** Implement the softmax cross-entropy loss in NumPy:
-```
+```text
 L(logits, y_true) = -log( exp(logits[y_true]) / sum_j exp(logits[j]) )
 ```
 Implement its analytic gradient with respect to `logits`, then verify correctness using central-difference numerical gradients (Exercise: why is central-difference preferred over forward-difference for gradient checking?).

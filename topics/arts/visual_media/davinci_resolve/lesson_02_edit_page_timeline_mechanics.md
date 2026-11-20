@@ -18,7 +18,7 @@ Finally, understanding *gap resolution* is essential. When you remove a clip and
 
 A DaVinci timeline is internally represented as a collection of ordered tracks, each containing a list of clips and gaps, all time-indexed. When you place a clip at timeline position 00:00:10:00 with a duration of five seconds, you are not storing the raw media file; you are creating a *reference pointer* to that media along with in-point, out-point, and transform metadata. The clip object encapsulates the source file path, timecode offset, and all applied effects as a linked chain.
 
-```
+```text
 Timeline (Sequence)
 ├── Video Track 1 (V1)
 │   ├── Clip A [00:00:00:00 – 00:00:05:00] (In: 01:00:00:00, Out: 01:00:05:00)

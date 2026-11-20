@@ -22,7 +22,7 @@ The internal architecture of a weld joint comprises three metallurgically distin
 
 A complete joint geometry specification requires defining the root face dimension (the flat surface at the bottom of the groove that provides a thermal dam preventing burn-through during the root pass), the groove angle or included angle (which determines the total volume requiring filler metal and the accessibility for electrode or torch manipulation), the root opening or gap between faying surfaces (which must be large enough to permit full penetration but small enough to prevent excessive drop-through), and any land or backing configuration that supports the molten pool during root pass execution. Consider a single-V groove butt joint in 12 mm plate specified with 60-degree included angle, 2 mm root face, and 3 mm root opening:
 
-```
+```text
 Section View (Dimensions in mm):
 
      |←— 12 —→|

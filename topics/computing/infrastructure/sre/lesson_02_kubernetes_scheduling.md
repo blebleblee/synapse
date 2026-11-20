@@ -250,7 +250,7 @@ func (sched *Scheduler) scheduleOne(ctx context.Context) {
 
 Each node reports two resource quantities: `capacity` (total physical resources) and `allocatable` (capacity minus system reservations). The kubelet computes allocatable as:
 
-```
+```text
 allocatable = capacity - kube-reserved - system-reserved - eviction-threshold
 ```
 

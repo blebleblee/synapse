@@ -34,7 +34,7 @@ Mechanical polishing using rotary buffing wheels operates at 1500-3000 RPM with 
 
 The buffing technique demands light, moving contact with the wheel periphery, never holding the part against the wheel in one location. Friction heat accumulates rapidly—thermoplastics begin to soften within 2-3 seconds of stationary contact, causing localized melting and loss of dimensional accuracy. The part must be kept moving across the wheel face in smooth, continuous passes, with periodic cooling breaks to prevent bulk temperature rise. Edge details are particularly vulnerable, as the compound's cutting action is most aggressive where the wheel first contacts the part. Sharp corners and fine features require reduced pressure or manual polishing with compound on a microfiber cloth to maintain definition.
 
-```
+```text
 Sanding Progression Summary for FFF Parts (PLA/ABS/PETG):
 
 Surface Prep → 120-grit (dry, block sanding) → Remove layer lines
@@ -80,7 +80,7 @@ Portable surface roughness testers using diamond stylus profilometry provide fie
 
 Protocol selection matrices guide the decision process based on material type, current surface condition, and target finish quality:
 
-```
+```text
 Material: PLA
 Current State: As-printed (0.2mm layers, Ra ~25 μm)
 Target: Functional prototype, minimal visibility of layers

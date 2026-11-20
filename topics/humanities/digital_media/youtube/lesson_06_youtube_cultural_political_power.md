@@ -28,7 +28,7 @@ The third stage applies various filtering and debiasing adjustments. YouTube app
 
 The recommendation pipeline can be visualized as follows:
 
-```
+```text
 User Behavior Signal
         |
         v

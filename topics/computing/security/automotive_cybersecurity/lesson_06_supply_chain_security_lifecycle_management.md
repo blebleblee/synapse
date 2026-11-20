@@ -36,7 +36,7 @@ Software Bill of Materials represent the cornerstone of supply chain transparenc
 
 The SBOM data model follows the Software Package Data Exchange (SPDX) ISO/IEC 5962:2021 standard, augmented with automotive-specific extensions. Each SBOM document contains three core sections: package information, relationship graphs, and vulnerability mappings. The package information section enumerates every software artifact deployed on an ECU: the real-time operating system kernel, middleware stacks, application binaries, shared libraries, and firmware blobs. Each package entry specifies the exact version string, cryptographic hash (SHA-256), supplier identity, and license classification (permissive, copyleft, proprietary). For example, an ADAS camera ECU SBOM might list:
 
-```
+```text
 Package: libopencv
 Version: 4.5.3
 PackageFileName: libopencv.so.4.5.3
@@ -52,7 +52,7 @@ The vulnerability mapping section correlates package identifiers against Common 
 
 The SBOM generation pipeline integrates into the supplier's build infrastructure. For compiled languages (C, C++, Rust), the build system instruments linker invocations to capture all linked libraries and their version symbols. For interpreted languages (Python, JavaScript), dependency lock files (requirements.txt, package-lock.json) are parsed to extract exact package versions. For proprietary binary blobs, suppliers must provide signed SBOM fragments that enumerate internal components. The OEM aggregates these supplier-provided SBOMs into a hierarchical master SBOM representing the entire vehicle platform. Each ECU has its own SBOM document, and the vehicle-level SBOM links to ECU-level SBOMs through `CONTAINS` relationships.
 
-```
+```text
 Vehicle Platform SBOM
 ├── Body Control Module (BCM) SBOM
 │   ├── FreeRTOS v10.4.3
@@ -80,7 +80,7 @@ The vulnerability scanning pipeline consists of four stages: threat intelligence
 
 The vulnerability correlation engine cross-references this threat intelligence against the SBOM repository to identify affected vehicle platforms. The correlation algorithm must handle version range matching, accounting for semantic versioning schemes where a vulnerability disclosed in version 1.2.3 affects all versions from 1.2.0 to 1.2.5 but not 1.3.0 due to a security-motivated API redesign. The engine generates a vulnerability exposure report enumerating every affected ECU, the vulnerable software package, the severity score, and the deployment count across the vehicle fleet. For example, a critical remote code execution vulnerability in the OpenSSL TLS implementation might affect the Telematics Control Unit in fifteen vehicle models spanning model years 2019-2023, representing 2.3 million vehicles in active service.
 
-```
+```text
 Vulnerability ID: CVE-2022-0778
 Package: openssl
 Affected Versions: 1.1.1 - 1.1.1m, 3.0.0 - 3.0.1

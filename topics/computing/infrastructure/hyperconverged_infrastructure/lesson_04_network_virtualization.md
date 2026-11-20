@@ -173,7 +173,7 @@ This achieves 10-40 Mpps (million packets per second) per core, compared to 1-2 
 
 VXLAN creates L2 overlay networks over L3 underlay infrastructure. The encapsulation format:
 
-```
+```text
 Original Ethernet Frame:
 [Dest MAC|Src MAC|VLAN|EtherType|IP|TCP|Payload|FCS]
 
@@ -241,7 +241,7 @@ graph LR
 
 **Implementation via Flow Rules**: The SDN controller installs flows implementing the chain:
 
-```
+```bash
 # Classifier flow at ingress switch
 match: in_port=10, eth_type=0x0800, ip_proto=6, tcp_dst=80
 actions: set_field:vni=6001, output:VXLAN_tunnel_to_FW
@@ -339,7 +339,7 @@ Network virtualization introduces indirection and centralization that can become
 
 **Solution 2: Hierarchical Flow Caching**: Use megaflows (wildcarded flows) to handle multiple specific flows with single table entry:
 
-```
+```bash
 # Instead of installing one flow per (src_ip, dst_ip) pair:
 match: ip_src=10.0.1.5, ip_dst=10.0.2.8 → forward to port 3
 match: ip_src=10.0.1.5, ip_dst=10.0.2.9 → forward to port 3
@@ -456,7 +456,7 @@ This amortizes encapsulation overhead across multiple packets.
 
 **Solution: Hierarchical Flow Table Design**: Use OpenFlow multi-table pipeline:
 
-```
+```text
 Table 0 (Tenant Classifier):
   match: in_port=1 → set_metadata=tenant_A, goto_table=1
   match: in_port=2 → set_metadata=tenant_B, goto_table=1
@@ -571,7 +571,7 @@ In `standalone` mode, switch falls back to MAC learning and forwards based on lo
 
 **Failure Mode: MTU Black Hole**: Intermediate router drops oversized VXLAN packets without sending ICMP fragmentation needed.
 
-```
+```text
 VM sends 1500-byte packet → VXLAN encaps to 1550 bytes → Router with 1500 MTU drops silently
 ```
 
@@ -859,7 +859,7 @@ This prevents MAC spoofing and VXLAN injection across tenant boundaries.
 
 **Flow Table Dimensioning**: Estimate required flow table size:
 
-```
+```text
 Total flows = (Active VMs) × (Avg connections per VM) × (Flow table entries per connection)
 
 Example: 
@@ -873,7 +873,7 @@ Hardware requirement: Switches with ≥2M flow capacity, or software-based tieri
 
 **Bandwidth Provisioning**: Account for encapsulation overhead:
 
-```
+```text
 Effective bandwidth = Physical bandwidth × (1 - Encapsulation overhead)
 
 For VXLAN with 1500-byte average packet size:

@@ -240,7 +240,7 @@ Schema validation (null checks, type checks, range checks) catches *data quality
 
 PSI quantifies how much a distribution has shifted relative to a baseline (typically the training set distribution). It is computed as:
 
-```
+```text
 PSI = Σ (Actual% - Expected%) × ln(Actual% / Expected%)
 ```
 

@@ -105,7 +105,7 @@ This lets a composer stack a bass drum note and a snare note on the same beat an
 
 ### 4.1 Basic Rock Beat — Read It, Then Play It
 
-```
+```text
 Hi-Hat:  x   x   x   x   x   x   x   x    (steady 8th notes)
 Snare:       ●           ●                (beats 2 and 4)
 Kick:    ●               ●                (beats 1 and 3)
@@ -122,7 +122,7 @@ Count:   1   &   2   &   3   &   4   &
 
 ### 4.2 Adding the Backbeat Ghost Note
 
-```
+```text
 Hi-Hat:  x   x   x   x   x   x   x   x
 Snare:   (●) ●   (●) ●   (●) ●   (●) ●     ((parens) = ghost note, soft)
 Kick:    ●               ●

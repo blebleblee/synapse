@@ -26,7 +26,7 @@ To analyze the mechanical architecture of Bionicle construction systems with app
 
 The G1 skeleton assembly provides the canonical example. A typical Toa torso consists of a central chest plate featuring multiple ball-joint sockets positioned at biomechanically relevant locations—shoulders, neck attachment, and sometimes lateral hip connections. The chest plate itself functions as the ground reference for the kinematic chain, analogous to the base coordinate frame in robotic kinematics. Each limb extends outward from this central reference as an open kinematic chain, typically consisting of three or four segments: upper arm (or thigh), lower arm (or shin), hand (or foot), and sometimes additional connector segments for proportional adjustment.
 
-```
+```text
 Kinematic Chain Topology (G1 Arm Assembly):
 
   Torso Socket (Ground)

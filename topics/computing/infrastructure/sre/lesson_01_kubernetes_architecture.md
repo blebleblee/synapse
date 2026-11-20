@@ -82,7 +82,7 @@ The kube-apiserver is stateless and horizontally scalable. Multiple replicas can
 
 etcd stores all Kubernetes state under the `/registry/` prefix, organized by resource type and namespace:
 
-```
+```text
 /registry/pods/default/nginx-7d4b8c9f6-xk2p9
 /registry/services/default/my-service
 /registry/deployments/default/nginx

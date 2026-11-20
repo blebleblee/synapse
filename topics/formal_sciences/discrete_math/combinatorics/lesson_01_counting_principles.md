@@ -102,7 +102,7 @@ Third, you look for a *bijection* from $S$ to a set $T$ whose cardinality is eas
 
 The following diagram illustrates the decision logic of a counting argument as a flow:
 
-```
+```text
 Start: Describe the set S explicitly
          |
          v

@@ -30,7 +30,7 @@ A classic five-stage pipeline partitions the execute cycle into five independent
 
 Under ideal conditions (no data dependencies, no branches), the pipeline sustains one instruction per cycle throughput once it is primed. A three-instruction sequence might look like this:
 
-```
+```text
 Cycle 1: Fetch(I1)
 Cycle 2: Fetch(I2)  Decode(I1)
 Cycle 3: Fetch(I3)  Decode(I2)  Execute(I1)

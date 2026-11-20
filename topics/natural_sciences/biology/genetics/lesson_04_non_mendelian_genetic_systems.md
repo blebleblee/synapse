@@ -64,7 +64,7 @@ Epistasis describes situations where the phenotypic effect of one gene depends o
 
 The Labrador retriever coat color system provides experimental clarity through straightforward breeding experiments. Two loci interact: the *E* locus (extension) controls melanin deposition in hair shafts, while the *B* locus (brown) determines eumelanin versus phaeomelanin synthesis. Genotypes *E_* (at least one dominant *E* allele) permit normal melanin deposition, while *ee* homozygotes block pigment deposition entirely, producing yellow dogs regardless of *B* genotype. Within *E_* dogs, the *B* locus determines black (*B_*) versus brown (*bb*) coloration through variations in the melanocortin 1 receptor and tyrosinase-related protein 1.
 
-```
+```text
 Epistatic Interaction Matrix (Labrador Coat Color)
 
 B Locus Genotype
@@ -130,7 +130,7 @@ where 1 cM corresponds to 1% recombination frequency. Physical distance in base 
 
 Thomas Hunt Morgan's experiments with *Drosophila melanogaster* established linkage mapping principles through three-point crosses analyzing recombination between multiple markers simultaneously. Consider three linked genes (*A*, *B*, *C*) on the X chromosome. Cross a triply heterozygous female (*ABC/abc*) to a hemizygous recessive male (*abc/Y*). Count offspring phenotypic classes to identify parental types (most frequent, no recombination), single recombinants between adjacent intervals, and double recombinants (least frequent, recombination in both intervals).
 
-```
+```text
 Three-Point Cross Offspring Classes:
 
 Parental types (no recombination):

@@ -26,7 +26,7 @@ Deadband configuration emerges as the central tuning parameter for exception-bas
 
 The SCADA system architecture manifests as a distributed computing fabric spanning multiple physical sites and network domains. At each remote site, a remote telemetry unit or programmable logic controller interfaces with field instrumentation through analog input modules converting 4-20 mA current loops and 0-10 VDC voltage signals into digital counts, discrete input modules reading contact closures and voltage-free relay states, analog output modules driving valve positioners and variable frequency drives, and discrete output modules commanding motor contactors and solenoid valves. These I/O modules connect to a backplane providing power distribution and high-speed serial communication to the controller's CPU.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    SCADA Architecture Layers                     │
 ├─────────────────────────────────────────────────────────────────┤
@@ -104,7 +104,7 @@ OPC Unified Architecture emerges as the dominant standard for vendor-neutral SCA
 
 OPC UA security architecture provides authentication, authorization, encryption, and integrity protection addressing vulnerabilities in legacy industrial protocols. Certificate-based authentication verifies client and server identities using X.509 digital certificates, preventing unauthorized systems from accessing industrial networks. Message-level encryption using AES-128 or AES-256 protects data in transit against eavesdropping, critical for SCADA systems traversing public internet links. Role-based access control restricts operations based on user credentials: operators can read values and acknowledge alarms but cannot modify setpoints, while engineers possess full read-write access and maintenance personnel can reset devices without changing process parameters.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────┐
 │              OPC UA Subscription Data Flow                    │
 ├──────────────────────────────────────────────────────────────┤

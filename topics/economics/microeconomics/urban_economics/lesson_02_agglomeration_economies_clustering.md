@@ -68,7 +68,7 @@ The practical implication for policy analysis and location strategy is direct. A
 
 The following diagram maps the three Marshall channels and the urbanization/localization decomposition into a single causal architecture, tracing how firm density translates into productivity outcomes through each distinct mechanism.
 
-```
+```text
 FIRM DENSITY (Geographic Concentration)
               │
     ┌─────────┴──────────────────────────────────────────┐

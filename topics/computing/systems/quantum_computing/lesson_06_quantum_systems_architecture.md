@@ -36,7 +36,7 @@ Qubit-qubit coupling architectures determine the native two-qubit gate set and c
 
 The qubit connectivity topology profoundly impacts compilation overhead. A heavy-hexagon lattice provides degree-three connectivity where each qubit couples to three neighbors, balancing gate fidelity against routing flexibility. This topology naturally supports the surface code error correction structure, where each physical qubit participates in multiple stabilizer measurements. Linear or one-dimensional qubit chains, common in ion trap systems, minimize control complexity but maximize SWAP gate overhead for non-local interactions. All-to-all connectivity, achievable in small trapped-ion systems through shared motional modes, eliminates routing overhead entirely but scales poorly beyond tens of qubits due to increasing crosstalk and control field complexity.
 
-```
+```text
 Superconducting Qubit Lattice Topology (Heavy-Hexagon):
 
         Q0 --- Q1 --- Q2
@@ -332,7 +332,7 @@ Compilation bugs produce circuits that are syntactically valid but semantically 
 
 Algorithmic failures occur when quantum circuits produce incorrect results due to flawed algorithm design rather than hardware noise. A VQE optimization converging to a local minimum far from the true ground state suggests poor ansatz design or insufficient parameter initialization. A quantum phase estimation algorithm returning incorrect eigenvalues may indicate too few precision qubits or improper controlled-unitary decomposition. Debugging requires classical simulation of ideal noiseless circuits to establish ground truth, then introducing noise models incrementally to identify sensitivity to specific error mechanisms.
 
-```
+```text
 Systematic Quantum Debugging Workflow:
 
 1. Isolate failure scope:

@@ -139,7 +139,7 @@ Recording all three simultaneously while sight-reading a complex line produces j
 
 **Real-time articulation switching (Cubase Expression Maps example):**
 
-```
+```text
 Expression Map: Spitfire Studio Strings
 Slot 1: Long       (Keyswitch C-2)
 Slot 2: Legato     (Keyswitch C#-2)

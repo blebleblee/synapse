@@ -28,7 +28,7 @@ Postman's authentication system architecture separates credential storage, reque
 
 The request preprocessing pipeline executes immediately before HTTP transmission, transforming the user's configured authentication settings into concrete protocol artifacts that appear in the outbound request. For HTTP Basic authentication, the preprocessor concatenates the username and password with a colon delimiter, base64-encodes the resulting string, and injects it into the Authorization header with the "Basic" scheme prefix. The operation appears straightforward but contains subtle protocol requirements: the credentials must undergo UTF-8 encoding before base64 transformation, and the header value must not include line breaks that would violate HTTP header syntax. Postman's implementation handles these edge cases automatically, though engineers debugging authentication failures must recognize that whitespace in usernames or special characters in passwords can produce valid base64 strings that fail server-side validation due to encoding mismatches.
 
-```
+```text
 Base64 Credential Encoding Flow:
 Username: api_user
 Password: s3cr3t!key
@@ -50,7 +50,7 @@ Bearer token authentication follows a simpler preprocessing path where Postman i
 
 OAuth 2.0 flow execution introduces substantial complexity through its multi-step authorization dance that coordinates the client, authorization server, and resource server across several HTTP exchanges. The authorization code flow—mandatory for confidential clients—begins when Postman redirects the user to the authorization server's authorization endpoint, passing the client ID, requested scopes, redirect URI, and a cryptographically random state parameter. The authorization server authenticates the user through its own credential mechanism—often username/password or federated identity—then redirects back to Postman's local callback server with an authorization code and the state parameter. Postman validates that the returned state matches the transmitted value, preventing CSRF attacks where an attacker tricks the user into authorizing their malicious application. The client then exchanges the authorization code for an access token by posting to the token endpoint with the code, client ID, client secret, and redirect URI. This exchange occurs directly between Postman and the authorization server without browser involvement, protecting the client secret from JavaScript-based exfiltration.
 
-```
+```text
 OAuth 2.0 Authorization Code Flow:
 
 ┌─────────┐                                           ┌──────────────────┐

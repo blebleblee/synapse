@@ -26,7 +26,7 @@ Vocal modulation operates through five primary parameters: **pitch range, tempo 
 
 Tempo control governs information density and processing time. Rapid-fire delivery compresses information, creating cognitive pressure that amplifies surprise when punchlines arrive with velocity. Decelerated tempo allows space for audience processing, useful when material requires conceptual assembly or when callbacks reference earlier segments. The critical skill is **adaptive tempo scaling**, where the performer monitors audience comprehension in real-time and adjusts pacing accordingly. Signs of cognitive overload include delayed laughter, confused facial expressions, and attention drift. The corrective action is not merely slowing down but strategic pause insertion, allowing the audience's internal processing to complete before introducing new information.
 
-```
+```text
 Tempo-Pressure Relationship Model:
 
 High Tempo (4-6 words/sec)  →  Cognitive pressure  →  Heightened surprise

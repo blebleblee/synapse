@@ -58,7 +58,7 @@ The convergence of the binomial model to Black-Scholes as $N \to \infty$ can be 
 
 The lattice structure provides transparency that the Black-Scholes formula obscures. Each node in the binomial tree corresponds to a specific price and time, and the option value at that node reflects the risk-neutral expected payoff conditional on reaching that state. Traders can visualize the evolution of the hedge ratio (delta) through time and across price paths, build intuition about early exercise boundaries for American options, and debug pricing anomalies by inspecting individual nodes. This pedagogical clarity makes the binomial model indispensable for training junior traders and for explaining complex structures to clients, even when Black-Scholes or more sophisticated models are used for production pricing.
 
-```
+```text
 Binomial Lattice Structure (3-period example, N=3)
 
 Time:     0           1           2           3

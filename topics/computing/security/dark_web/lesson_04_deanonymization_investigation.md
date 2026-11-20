@@ -261,7 +261,7 @@ Traffic analysis attacks exploit the fundamental reality that anonymity networks
 
 The foundational traffic analysis attack involves a global passive adversary that monitors both the client's connection to the entry node and the exit node's connection to the destination. When a client initiates a Tor circuit, the entry guard receives a sequence of fixed-size cells (512 bytes in Tor) that follows a characteristic temporal pattern determined by the client's application behavior. These cells traverse intermediate relays, potentially experiencing independent delays and reordering, before emerging at the exit node with their decrypted payload. The exit node then makes standard TCP connections to destination servers, generating traffic with different packet sizes (determined by TCP segmentation and MTU) but correlated timing patterns. The adversary computes correlation coefficients between entry and exit traffic sequences using techniques like Pearson correlation, mutual information, or dynamic time warping. High correlation across a temporal window statistically links the entry client to the exit destination.
 
-```
+```text
 Entry Guard Observation              Exit Node Observation
 ==================                   =================
 

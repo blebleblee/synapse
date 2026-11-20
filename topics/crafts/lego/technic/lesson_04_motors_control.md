@@ -36,7 +36,7 @@ The **XL Motor** (88014) sacrifices encoder precision for maximum torque (approx
 
 Sensor options are more limited than in the MINDSTORMS ecosystem but sufficient for sophisticated Technic work. The **Color Sensor** (45605) detects eight discrete colors plus ambient light intensity and reflected light intensity, making it useful for line following, object detection, and state-machine triggers (a conveyor that stops when it detects a red tile has arrived at a station). The **Distance Sensor** (45604) uses infrared time-of-flight measurement to report range from roughly 5 cm to 200 cm, enabling proximity braking, obstacle avoidance, and position homing. The **Force Sensor** (45606), introduced with MINDSTORMS Robot Inventor, measures applied force and binary contact state — an elegant solution for gripper control that needs to know when fingers have closed on an object without crushing it.
 
-```
+```text
 Technic Hub (88012)
 │
 ├── Port A ──► Large Angular Motor  [torque output + encoder feedback]

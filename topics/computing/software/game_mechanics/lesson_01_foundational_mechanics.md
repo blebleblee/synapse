@@ -350,7 +350,7 @@ void update_physics_good(EntityTransform* entities, size_t count, float dt) {
 
 Benchmarking 10,000 entities across 1000 iterations on a Zen 3 processor with `perf stat`:
 
-```
+```text
 update_physics_poor:
   - 45.2M cycles
   - 12.3M L1 cache misses

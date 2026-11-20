@@ -37,7 +37,7 @@ Step 1. Sing the whole phrase on one vowel at a time and rate the high A (6th de
 
 Step 2. Now set real words and check where they land:
 
-```
+```text
 Scale deg: 1    1    5    5    6     6     5
 Melody:    C    C    G    G    A     A     G
 Words:     I    wish I    could go    home  to-night
@@ -64,7 +64,7 @@ Given a clash — "living" placing /ɪ/ on a sustained high A — you have three
 
 Metronome at 80 BPM, 4/4. Clap on beats 1 and 3 only. Speak this phrase so the capitalized syllables land exactly on your claps:
 
-```
+```text
 Beat:     1        2    3        4
 Clap:     X             X
 Words:    I  WALKED down an  EMP-ty  STREET  last  night
@@ -72,7 +72,7 @@ Words:    I  WALKED down an  EMP-ty  STREET  last  night
 
 Say it at tempo until it feels unforced. Now say the deliberately broken version and notice the physical wrongness:
 
-```
+```text
 Beat:     1        2    3        4
 Clap:     X             X
 Words:    WALKED I down   an  STREET EMP- last  ty  night
@@ -90,14 +90,14 @@ Mark stress the way you'd say the phrase to a friend, not how you think it shoul
 
 Correct placement (content words on strong beats 1 and 3):
 
-```
+```text
 1      &    2      &    3     &    4    &
 I don't    WANT    to   LOSE  you  to-  night
 ```
 
 Broken placement (stress forced onto weak beats):
 
-```
+```text
 1      &    2      &    3     &    4    &
 I      WANT don't  to   you   LOSE to-  night
 ```
@@ -139,7 +139,7 @@ Scene: leaving home at dawn.
 
 Select 2–3, not all 5 — a verse crammed with every sense reads like a checklist, not a scene:
 
-```
+```text
 Headlights cut through fog on the county road
 Cold vinyl seat, my hands locked on the wheel
 Coffee smell mixing with gasoline
@@ -163,7 +163,7 @@ I'm leaving this town but I still can't feel
 
 **Drill 2.4.1 — Identify Rhyme Type by Ear**
 
-```
+```text
 "I walked alone down Maple Street"   (A)
 "The rain was falling at my feet"    (A)  — masculine: street/feet
 
@@ -187,7 +187,7 @@ Pick your song's key word (e.g., "home"). Spend five minutes generating every rh
 
 Quatrain from this bank:
 
-```
+```text
 I left my keys inside that chrome-plated dome   (A)
 Three thousand miles from anywhere like home     (A)
 The static on the line said you're alone         (A)
@@ -198,7 +198,7 @@ I'm driving through the dark, no map, just known (A)
 
 End rhyme alone leaves the middle of the line acoustically flat. Internal rhyme (rhymes inside a line) and assonance (repeated vowel sound without a full rhyme) add density without changing the structural rhyme scheme:
 
-```
+```text
 "I left my HEART in the DARK of the PARK where we used to meet"
    internal: heart / dark / park
 
@@ -214,7 +214,7 @@ End rhyme alone leaves the middle of the line acoustically flat. Internal rhyme 
 
 Say each sentence the way you'd actually say it to someone, mark the stress, then fit it to quarter notes in 4/4:
 
-```
+```text
 "I want to go home" → "I WANT to go HOME"
 
 Beat:     1       2      3      4
@@ -230,7 +230,7 @@ If the natural stress doesn't fit the bar, you have three fixes, in order of how
 
 **Drill 2.5.2 — Syncopation for Emphasis**
 
-```
+```text
 On-beat (expected):
 1     &    2     &    3     &    4    &
 I     got  no-   thing left  to   say
@@ -268,7 +268,7 @@ graph LR
 
 **Drill 2.6.1 — Contrast Analysis**
 
-```
+```text
 Verse 1 (specific, narrative):
 I found your photograph inside a book
 You're standing on the pier, your hair blown back
@@ -286,7 +286,7 @@ The verse's nouns are all countable, specific objects (photograph, book, pier, d
 
 **Drill 2.6.2 — Write the Chorus First, Then the Verse That Earns It**
 
-```
+```text
 Chorus (write this first — 4 lines, universal):
 I can't go home again
 The door is locked, the lights are out
@@ -320,7 +320,7 @@ For every line in a draft, score it against four questions: does it advance the 
 
 **Drill 2.7.2 — The 10% Cut**
 
-```
+```text
 Original (32 words):
 I'm walking down this empty road alone tonight
 The stars are shining bright but I can't see the light
@@ -376,7 +376,7 @@ Each cut removes a weak word ("I'm," "the," "down," "alone") without losing a si
 
 Neutral source lyric:
 
-```
+```text
 I left you standing by the door
 You didn't say a word to me
 I walked away and didn't look back
@@ -385,7 +385,7 @@ Now I'm wondering if I'm free
 
 Pop (add repetition, simplify vocabulary):
 
-```
+```text
 I left you standing at the door (door, door)
 Didn't say goodbye, didn't say goodbye
 Walked away but now I'm not sure (sure, sure)
@@ -394,7 +394,7 @@ If I'm free or just alone tonight
 
 Country (add place, make conversational):
 
-```
+```text
 Left you standin' on that old front porch
 You didn't say a word, just watched me go
 I drove that truck 'til I hit the county line
@@ -403,7 +403,7 @@ Now I'm wonderin' if I'm free or just alone
 
 Hip-hop (internal rhyme, syncopated delivery):
 
-```
+```text
 Left you standing, understanding this is war
 Didn't utter, just a shutter when I'm out the door
 Walked away, dismay written on my face for sure
@@ -424,7 +424,7 @@ Now I'm pondering if freedom's what I'm searching for
 
 **One-Week Song Challenge**
 
-```
+```text
 Day 1: Concept + 20 images
 Day 2: Three chorus drafts, select one
 Day 3: Verse 1 and Verse 2 drafts
@@ -490,21 +490,21 @@ graph TD
 
 **Compound rhyme** (rap/hip-hop) rhymes multi-word phrases rather than single syllables:
 
-```
+```text
 "I never let a setback get me off track when I'm stacking facts"
 (setback / get-back, off-track / stacking-facts)
 ```
 
 **Enjambment** lets the grammatical thought run past the line break, creating forward pull instead of a full stop:
 
-```
+```text
 I thought I saw you in the crowd but it was just another face
 That looked like someone I used to know
 ```
 
 **Slant rhyme** (near rhyme) works when a perfect rhyme would force an awkward word choice:
 
-```
+```text
 I walked away from home   (A)
 The rain was in my face   (B)
 I couldn't find a place   (B)
@@ -513,7 +513,7 @@ To rest my tired bones    (A — slant: home/bones)
 
 **Conversational syntax** drops formal grammar to match spoken rhythm and improve singability:
 
-```
+```text
 Formal: "I do not want to see you anymore"
 Natural: "Don't wanna see you anymore"
 ```

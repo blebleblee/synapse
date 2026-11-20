@@ -133,7 +133,7 @@ The failure mode in scaling is attempting to coordinate through centralized plan
 
 For sprint-to-sprint forecasting, a rolling three-Sprint median provides a more stable predictor than a single Sprint's velocity, because it smooths out one-time disruptions such as holidays, sick days, or particularly difficult backlog items. The formula is straightforward:
 
-```
+```text
 Rolling Velocity (Sprint N) = median(Velocity[Sprint N-3], Velocity[N-2], Velocity[N-1])
 
 Sprint Commitment Range:

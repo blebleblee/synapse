@@ -46,7 +46,7 @@ Switching and sorting mechanisms enable complex routing topologies where balls c
 
 The standardized interface between modules codifies the spatial relationship between upstream output and downstream input positions. The receiving basket at the input of module N must align with the delivery trajectory from module N-1 such that balls ejected from the upstream module land reliably within the downstream basket despite minor variations in ejection velocity and trajectory angle. The 11-brick height standard evolved as a compromise between minimizing lift energy requirements and providing sufficient elevation to maintain gravitational flow through subsequent track sections. Positioning the input basket center approximately 18 to 20 studs horizontally from the upstream output creates a forgiving target zone that accommodates ejection velocity variations of ±20% while maintaining better than 95% capture reliability.
 
-```
+```text
 GBC Module Signal Flow (Conceptual):
 
 Input Basket (Height: 11 bricks)

@@ -82,7 +82,7 @@ Empirical studies show that $\alpha$ often exceeds 0.8 in natural environments, 
 
 The fast-and-frugal trees developed by Gigerenzer's group provide a general computational architecture for sequential heuristic decision-making. A fast-and-frugal tree is a binary decision tree where each node corresponds to a single cue, and branches lead either to a decision (exit) or to the next cue. The tree structure minimizes information search by ordering cues by validity and stopping as soon as a decision threshold is reached:
 
-```
+```text
          [Cue 1: High validity]
          /                    \
      Exit: A             [Cue 2: Medium validity]

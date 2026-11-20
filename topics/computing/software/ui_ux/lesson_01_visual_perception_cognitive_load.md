@@ -56,7 +56,7 @@ Whitespace functions not as empty space but as a structural element that defines
 
 Consider the representation of hierarchical data structures, a common task in developer tools. A file tree, a DOM inspector, or a nested configuration editor must map tree topology onto two-dimensional screen space. Indentation provides a spatial encoding of depth, exploiting the visual system's sensitivity to alignment and relative position. Each level of indentation constitutes a visual channel that encodes tree depth, and consistent indentation increments allow rapid depth estimation without explicit counting. However, deeply nested structures—say, ten levels of indentation—can exceed the effective resolution of peripheral vision, requiring horizontal scrolling or eliding intermediate levels.
 
-```
+```text
 project/
 ├── src/
 │   ├── main.rs

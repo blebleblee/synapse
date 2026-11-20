@@ -35,7 +35,7 @@ This is context-dependent, not fixed per note-name. F is a chord tone on Fmaj7, 
 
 The seven diatonic modes share one interval pattern rotated to different starting points. What makes a mode *sound* like itself in improvisation isn't playing all seven notes — it's landing on the **characteristic interval**, the one note that differs from the nearest parallel major or minor.
 
-```
+```text
 Mode        Formula (W/H)      Characteristic tone   Color
 Ionian      W W H W W W H      —                      Resolved major
 Dorian      W H W W W H W      ♮6                     Minor, lifted
@@ -112,7 +112,7 @@ Record it. The goal isn't novelty — it's noticing which transformations still 
 
 ## 6. The ii–V–I Engine: Internalizing the Voice Leading
 
-```
+```text
 Dm7 → G7 → Cmaj7
 
 3rd:  F → B → E     (F→B tritone leap, B→E resolves down a 4th... 
@@ -152,14 +152,14 @@ sequenceDiagram
 
 Mixolydian has 7 notes; dividing a bar of continuous eighth notes by 7 means chord tones drift off the strong beats as you ascend. Add one chromatic passing tone — the major 7th — between ♭7 and the root, and you get an 8-note scale that lines chord tones up with the beat every time, regardless of which chord tone you start on.
 
-```
+```text
 C Mixolydian:      C  D  E  F  G  A  B♭ (C)        — 7 notes
 C Bebop Dominant:  C  D  E  F  G  A  B♭  B♮ (C)     — 8 notes
 ```
 
 **Proof by example** — start on E (the 3rd) and descend in eighth notes:
 
-```
+```text
 Beat:   1    +    2    +    3    +    4    +
 Note:   E    D    C    B♭   A    G    F    E
 Type:   CT   PT   CT   CT   PT   CT   PT   CT
@@ -179,7 +179,7 @@ The 3rd and 7th define a seventh chord's quality and function more than any othe
 
 Turnaround in C: Dm7 → G7 → Cmaj7 → A7
 
-```
+```text
 3rd line:  F → B → E → C#
 7th line:  C → F → B → G
 ```
@@ -200,7 +200,7 @@ Swing subdivides the beat unevenly — roughly 2:1 rather than a straight triple
 
 **Metric superimposition (3-over-4):**
 
-```
+```text
 4/4 grid:        | 1 + 2 + 3 + 4 + | 1 + 2 + 3 + 4 + |
 Grouped in 3s:   [1 2 3][1 2 3][1 2 3][1 2 3]
                  realigns with the downbeat every 3 bars of 4/4 (12 eighth notes)
@@ -422,7 +422,7 @@ if __name__ == "__main__":
 ```
 
 **Sample output:**
-```
+```text
 ### ii-V-I in C major ###
 
 Chord       Guide Tones       Scales

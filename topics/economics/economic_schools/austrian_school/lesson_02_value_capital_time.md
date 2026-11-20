@@ -51,7 +51,7 @@ where $\text{MPK}$ denotes the marginal product of capital in temporal terms, th
 
 The Austrian capital structure can be visualized through the Hayekian triangle, a geometric representation that maps the temporal sequence of production stages. The horizontal axis measures time from present to future, and the vertical axis measures cumulative value added. At time $t = 0$, raw materials enter production with value $v_1$. At $t = t_1$, stage 2 adds value $v_2$, yielding cumulative value $v_1 + v_2$. The process continues until $t = T$, when the consumption good emerges with total value $V_{\text{final}} = \sum_{i=1}^n v_i$. The hypotenuse of the triangle represents the value trajectory, and the area under the curve corresponds to the total capital invested over time.
 
-```
+```text
 Value
   |
   |                                    * (T, V_final)

@@ -28,7 +28,7 @@ Gaussian elimination transforms a matrix $A$ into upper triangular form by a seq
 
 The algorithm proceeds in $n-1$ major steps. At step $k$, the entries below the diagonal in column $k$ are eliminated using the pivot $a_{kk}$. For each row $i > k$, the multiplier is $\ell_{ik} = a_{ik}/a_{kk}$, and the update to the trailing submatrix (rows and columns $k+1$ through $n$) is $a_{ij} \leftarrow a_{ij} - \ell_{ik}\, a_{kj}$. After all steps, the upper triangle stores $U$ and the strictly lower triangle (with an implicit unit diagonal) stores the multipliers in $L$.
 
-```
+```text
     k=1          k=2          k=3          Result
   [ * * * * ]  [ * * * * ]  [ * * * * ]  [ * * * * ]
   [ * * * * ]  [ 0 * * * ]  [ 0 * * * ]  [ 0 * * * ]

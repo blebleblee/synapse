@@ -28,7 +28,7 @@ The x86-64 system call mechanism exemplifies hardware-software co-design optimiz
 
 Before the kernel can service system calls, it must initialize the relevant MSRs during early boot. The IA32_LSTAR MSR receives the address of the kernel's system call entry point, typically `entry_SYSCALL_64` in Linux. IA32_STAR encodes both the kernel and userland code segment selectors, allowing the CPU to switch segment registers atomically during privilege transitions. IA32_FMASK specifies which RFLAGS bits to clear upon syscall entry, typically masking interrupts to ensure atomic handler execution. When userland executes `syscall`, the CPU performs the following atomic sequence:
 
-```
+```text
 1. RCX ← RIP (save return address)
 2. R11 ← RFLAGS (save flags)
 3. RFLAGS ← RFLAGS & ~IA32_FMASK (clear specified flags)
@@ -154,7 +154,7 @@ The `sysretq` instruction atomically restores the code segment, stack segment, p
 
 Interrupt handling follows a distinct path optimized for asynchronous hardware events. The Interrupt Descriptor Table (IDT) resides in kernel memory at an address loaded into the IDTR register during boot. Each 128-bit IDT entry encodes an interrupt handler's segment selector, offset, and attributes:
 
-```
+```text
 struct idt_entry {
     uint16_t offset_low;    // bits 0-15 of handler address
     uint16_t selector;      // kernel code segment

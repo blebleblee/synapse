@@ -22,7 +22,7 @@ What connects these four invariants is the concept of intentional orientation: t
 
 To reason precisely about visibility, it helps to construct a simplified geometric model of the display environment. The following ASCII diagram represents a side-elevation cross-section of a typical convention or competition display, with the viewer standing at table edge:
 
-```
+```text
 Eye Level (~165 cm)
     *
      \
@@ -54,7 +54,7 @@ A concrete example illuminates this clearly. Consider a LEGO castle built on a 4
 
 The following diagram shows this line convergence principle in elevation view:
 
-```
+```text
                     /\
                    /  \  <- Keep apex (focal point)
                   /    \

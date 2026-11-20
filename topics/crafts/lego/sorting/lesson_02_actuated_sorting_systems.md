@@ -62,7 +62,7 @@ Synchronization is the problem that separates a Technic sorting machine that wor
 
 The timing model for a two-stage sorting system looks like this:
 
-```
+```text
 Timeline (ms):
 
 t=0     Object detected by color sensor at P_detect

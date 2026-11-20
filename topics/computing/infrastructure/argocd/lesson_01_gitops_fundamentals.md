@@ -36,7 +36,7 @@ Once manifests are materialized, the controller fetches live cluster state throu
 
 The diff computation employs structured comparison libraries that recursively walk JSON object trees, identifying added, removed, and modified fields at arbitrary nesting depths. For array fields, ArgoCD implements intelligent matching heuristics that correlate list elements by stable identifiers like container names within pod specs, avoiding false positives where array reordering triggers spurious diffs. The system renders differences in unified diff format similar to Git's textual diffs, providing operators with human-readable change summaries that highlight exactly which fields diverge between Git and cluster state.
 
-```
+```yaml
 apiVersion: v1
 kind: Application
 metadata:
@@ -81,7 +81,7 @@ Resource health assessment extends beyond Kubernetes built-in readiness probes t
 
 The API Server provides northbound interfaces for human operators and automation systems to interact with ArgoCD, exposing both gRPC and REST endpoints secured through RBAC policies. It serves the web UI, processes CLI commands, and webhooks from Git providers. The server maintains session state in Redis, enabling horizontal scaling where multiple API Server replicas share authentication tokens and user preferences. Role-based access control maps Kubernetes ServiceAccount tokens or OIDC identity claims to ArgoCD projects and applications, allowing fine-grained permissions where platform teams manage cluster configuration while application teams deploy only their services.
 
-```
+```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:

@@ -75,7 +75,7 @@ Animation and transition mechanics in PowerPoint implement temporal control over
 
 The animation pane interface manages temporal choreography through a timeline-based sequencing system. Animations can be configured to trigger automatically after previous animations complete, trigger on click events providing presenter control, or trigger simultaneously with other animations. The duration property controls animation speed—faster animations (0.25-0.5 seconds) create snappy reveals, while slower animations (1-2 seconds) build dramatic emphasis. The delay property introduces pause intervals between animations, controlling pacing rhythm.
 
-```
+```text
 Animation Sequence Architecture
 ┌────────────────────────────────────────────────┐
 │ Slide Timeline                                 │

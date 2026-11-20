@@ -20,7 +20,7 @@ The technical architecture of a design system decomposes into four layers, each 
 
 The component layer builds upon tokens to provide reusable UI building blocks with encapsulated behavior and documented APIs. A Button component might expose props for `variant` (primary, secondary, tertiary), `size` (small, medium, large), `disabled` (boolean), `loading` (boolean), and `icon` (optional leading or trailing icon component). The implementation must handle state management for hover, focus, active, and disabled conditions, ensure keyboard accessibility with proper tab order and Enter/Space key activation, provide ARIA attributes for screen reader compatibility, and maintain visual consistency across browsers and devices. Component documentation requires specification of the complete interface contract:
 
-```
+```text
 Button Component Specification
 
 Props:

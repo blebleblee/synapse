@@ -102,7 +102,7 @@ The sequence is not strictly linear — there is extensive feedback between laye
 
 The working architecture of Labovian variationist analysis is a multivariate logistic regression over a coded corpus of naturalistic speech tokens. The practitioner's workflow proceeds from data collection through coding through analysis through interpretation, and each transition involves irreversible decisions that must be made with explicit theoretical motivation.
 
-```
+```text
 NATURALISTIC SPEECH DATA
 (Sociolinguistic interview / corpus)
             │

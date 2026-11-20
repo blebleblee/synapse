@@ -40,7 +40,7 @@ After filtering, the gyroscope angular velocities ($\omega_x$, $\omega_y$, $\ome
 
 The mixer stage converts PID outputs into individual motor throttle commands. For an X-frame quadcopter, the mixer implements the following transformation:
 
-```
+```text
 Motor 1 (front-right, CW):  Throttle + Pitch - Roll - Yaw
 Motor 2 (front-left, CCW):  Throttle + Pitch + Roll + Yaw
 Motor 3 (rear-left, CW):    Throttle - Pitch + Roll - Yaw

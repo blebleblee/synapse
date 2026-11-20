@@ -28,7 +28,7 @@ The second stage is a voltage gain stage—typically a common-emitter or common-
 
 The third stage is an output buffer, commonly a Class AB push-pull emitter follower or source follower pair, whose purpose is to drive low-impedance loads without disturbing the gain-sensitive second stage. The quiescent bias of this output stage determines crossover distortion characteristics and sets the minimum supply current of the device.
 
-```
+```text
                         ┌──────────────────────────────────┐
                         │          INTERNAL OP-AMP          │
                         │                                   │

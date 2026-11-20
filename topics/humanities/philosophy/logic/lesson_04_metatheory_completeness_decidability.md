@@ -68,7 +68,7 @@ Decidability is the property that there exists an algorithm that, given any sent
 
 The practical implication is stark: **you cannot write a finite algorithm that correctly solves all first-order satisfiability queries**. You can write *semi-decision procedures*—algorithms that terminate and correctly answer "yes" when a formula is satisfiable but may loop indefinitely on unsatisfiable formulas. Resolution theorem provers and other first-order reasoning systems are semi-decidable procedures; they work well in practice for many problems but offer no guarantee of termination.
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │  Computational Landscape of Logic                  │
 ├─────────────────────────────────────────────────────┤

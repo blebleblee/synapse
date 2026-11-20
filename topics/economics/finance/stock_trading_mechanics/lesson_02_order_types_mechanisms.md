@@ -63,7 +63,7 @@ The microstructure implications of stop orders concentrate around round-number p
 
 Iceberg orders, also called reserve or hidden orders, display only a visible portion of total quantity, automatically refreshing the displayed size from hidden reserves as fills occur. An iceberg order for ten thousand shares with a displayed quantity of five hundred might show:
 
-```
+```text
 Visible: 500 shares @ $50.00
 Hidden: 9,500 shares @ $50.00
 ```
@@ -78,7 +78,7 @@ Order matching algorithms implement the priority rules that determine execution 
 
 Consider a bid queue at $50.00 with three orders:
 
-```
+```text
 Order A: 1,000 shares, timestamp 09:30:00.000
 Order B: 2,000 shares, timestamp 09:30:00.125  
 Order C: 1,500 shares, timestamp 09:30:00.250
@@ -114,7 +114,7 @@ The order book state at any moment defines the market's liquidity profile. Depth
 
 Order book visualization typically displays multiple price levels on each side:
 
-```
+```text
          BIDS                  |                ASKS
     Price    Size    Orders    |    Orders    Size    Price
    -------  -------  -------   |   -------  -------  -------

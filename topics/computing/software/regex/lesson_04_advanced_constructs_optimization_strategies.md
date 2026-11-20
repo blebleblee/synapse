@@ -26,7 +26,7 @@ Recursive patterns, introduced in PCRE as `(?R)` (recurse to the whole pattern) 
 
 The internal execution model of a backtracking NFA engine is best understood as an explicit depth-first search through a nondeterministic transition graph, managed by a call stack (or in PCRE's case, an internal heap-allocated match frame stack to avoid C stack overflows). Each frame on this stack records the current pattern position, the current input position, and all captured group offsets accumulated so far. When the engine encounters a quantifier or alternation, it pushes a *choice point* onto the stack representing the alternative paths it has not yet explored. When a match fails, it pops the most recent choice point and resumes execution from there.
 
-```
+```text
 Pattern: (a|ab)c
 Input:   "abc"
 
@@ -55,7 +55,7 @@ For large Unicode character classes, PCRE2 uses a bitmap approach: a 256-bit (32
 
 The RE2 engine and Rust's `regex` crate take a fundamentally different architectural path. Rather than a depth-first search, they simulate the NFA by tracking the *set* of active NFA states at each input position. The state set is represented as a bitset (for small NFAs) or a sparse list with a generation counter (for larger ones). At each input character, the engine applies the transition function to every active state simultaneously, producing the next state set. This is Thompson's original algorithm, and its key property is that the size of the state set is bounded by the number of NFA states, which is O(m) in the pattern length. The input scan is strictly left-to-right with no backtracking.
 
-```
+```text
 Pattern: (a|ab)c  (NFA has ~6 states: s0..s5)
 Input:   "abc"
 
@@ -73,7 +73,7 @@ The Rust `regex` crate goes further by offering a *hybrid execution engine* that
 
 The lifecycle of a compiled pattern moves through several stages that mirror a compiler's frontend-to-backend pipeline:
 
-```
+```text
 Source Pattern String
         │
         ▼
@@ -253,7 +253,7 @@ The mechanical refactoring procedure for eliminating catastrophic backtracking f
 
 The refactoring `(X+)+` → `(?>X+)+` or `X++` is the canonical case. A more practical industrial example involves tokenizing log lines:
 
-```
+```bash
 # Vulnerable: nested quantifier on \S (non-whitespace), catastrophic on lines
 # with no colon separator if the outer repetition is long
 Pattern (bad):  (\S+:)+\s+(.+)
@@ -269,7 +269,7 @@ A subtler but equally important case involves character class precision. Many en
 
 For lookahead-heavy patterns, the principal optimization is *hoisting*: moving fixed-string assertions out of lookaheads and into the main match sequence where the engine's literal-extraction prepass can use them. Consider a pattern that validates identifiers that must not start with a digit and must not be a reserved word:
 
-```
+```bash
 # Slow: lookahead runs at every attempted match position
 (?!(?:int|float|void)\b)[a-zA-Z_]\w*
 

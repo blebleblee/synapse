@@ -14,7 +14,7 @@ The discipline emerged operationally from Sun Microsystems' DTrace (2003), Jonat
 
 Formally, a probe is a 4-tuple:
 
-```
+```text
 P = (location, condition, action, side-effect-budget)
 ```
 

@@ -34,7 +34,7 @@ All diagrams below are **A minor pentatonic (A-C-D-E-G)**. To transpose: slide t
 
 ### Position 1 — E-form (root on 6th string, fret 5)
 
-```
+```text
 e|---------------5--8--
 B|---------------5--8--
 G|---------------5--7--
@@ -46,7 +46,7 @@ E|---------------5--8--
 
 ### Position 2 — D-form (root on 4th string, fret 7)
 
-```
+```text
 e|------------7--8-----
 B|------------8--10----
 G|------------7--9-----
@@ -58,7 +58,7 @@ E|------------7--8-----
 
 ### Position 3 — C-form (root on 5th string, fret 10)
 
-```
+```text
 e|--------10--12-------
 B|--------10--13-------
 G|--------9---12-------
@@ -70,7 +70,7 @@ E|--------10--12-------
 
 ### Position 4 — A-form (root on 5th string, fret 12)
 
-```
+```text
 e|--12--15-------------
 B|--13--15-------------
 G|--12--14-------------
@@ -82,7 +82,7 @@ E|--12--15-------------
 
 ### Position 5 — G-form (root on 6th string, open or fret 12)
 
-```
+```text
 e|--0---3--------------
 B|--1---3--------------
 G|--0---2--------------
@@ -96,13 +96,13 @@ E|--0---3--------------
 
 Boxes get you playing fast, but they also trap your ear into thinking vertically. Break that habit by playing the entire scale on one string:
 
-```
+```text
 G string:  5  7  9  10  12  14  15  17  19
            A  B  C  D   E   F#  G   A   B    <- notice F# is NOT in A minor pent;
                                                  skip straight 9->10 steps as marked
 ```
 Correct fret sequence for A minor pentatonic on the G string only:
-```
+```text
 G|--5--7--9--10--12--14--15--17--19--
 ```
 Play this ascending and descending at 60 BPM, one note per click, saying the interval out loud (whole step, whole step, half step, whole step...). This builds the *sound* of the scale independent of box shapes, which is what lets you eventually improvise across the whole neck instead of hopping between five memorized patterns.
@@ -166,7 +166,7 @@ Every note rings clean, picking stays strictly alternating, no tension in the ha
 Straight ascending/descending scales don't train your ear to hear harmony — interval sequences do.
 
 **Thirds sequence (Position 1, A minor pentatonic)**:
-```
+```text
 e|---------------------
 B|---------------------
 G|--5--7--5--7---------
@@ -176,7 +176,7 @@ E|---------------------
 ```
 
 **Fourths sequence (Position 1)**:
-```
+```text
 e|---------------------
 B|--5--8---------------
 G|--5-------7----------
@@ -192,7 +192,7 @@ Run both sequences through all five positions at 80, then 90, then 100 BPM. This
 Connect adjacent positions with same-finger slides, keeping string contact through the shift.
 
 **Position 1 → Position 2**:
-```
+```text
 e|---------------5--8--7--8-----
 B|---------------5--8-----8--10-
 G|---------------5--7-----7--9--
@@ -213,7 +213,7 @@ Legato — hammer-ons and pull-offs — removes picking from every note and open
 **Pull-off**: with two notes fretted, release the higher finger with a slight pluck motion toward your palm (perpendicular to the string) rather than just lifting straight up. That lateral flick is what actually re-excites the string.
 
 **Basic legato drill (Position 1)**:
-```
+```text
 e|---------------------
 B|---------------------
 G|--5h7p5--------------
@@ -224,7 +224,7 @@ E|---------------------
 Pick only the first note on each string; everything else is hammer/pull. Practice at 120 BPM eighth notes, matching legato volume to picked volume.
 
 **Three-note-per-string progression**:
-```
+```text
 e|---------------------
 B|---------------------
 G|--5h7h9--9p7p5-------
@@ -253,7 +253,7 @@ Push toward 140 BPM once volume consistency is solid — don't chase speed befor
 Set the metronome to click on **beats 2 and 4** instead of 1 and 3. This is how you internalize the backbeat feel that blues and rock live on. Run your positions and sequences against this click.
 
 **Syncopation**: deliberately start licks on the "and" of a beat instead of the downbeat.
-```
+```text
 Count:  1   +   2   +   3   +   4   +
 Pick:       ↓       ↓       ↓       ↓
 ```
@@ -312,7 +312,7 @@ Pure pentatonic playing goes stale fast without chromatic color. Add the ♭5 as
 
 **A minor blues scale**: A-C-D-**E♭**-E-G
 
-```
+```text
 Position 1 with b5 added:
 e|---------------5--8--
 B|---------------5--8--
@@ -331,7 +331,7 @@ Never land on the ♭5 as a target — it's a tension tone that wants resolution
 Pentatonic scales work over many chords, but landing on **chord tones** (root, 3rd, 5th, ♭7th) on strong beats and using scale tones as connective material on weak beats makes your lines sound intentional instead of generic.
 
 **12-bar blues in A**:
-```
+```text
 | A7 (4 bars) | D7 (2 bars) | A7 (2 bars) | E7 (1 bar) | D7 (1 bar) | A7 (2 bars) |
 ```
 

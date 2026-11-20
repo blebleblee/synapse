@@ -28,7 +28,7 @@ Concurrent rendering introduces tearing risks where different parts of the UI re
 
 The fiber data structure is the fundamental unit of React's reconciler. Each fiber corresponds to one component instance, DOM node, or fragment, forming a tree that mirrors the component hierarchy. Unlike the virtual DOM representation, which is ephemeral and regenerated on each render, fibers persist across updates, accumulating state and side effects as the reconciler processes them. A fiber contains pointers to its parent (`return`), first child (`child`), and next sibling (`sibling`), forming a linked tree traversable without recursion. This structure enables incremental traversal: the reconciler can pause at any fiber, save its position, and resume later without maintaining a call stack.
 
-```
+```text
 Fiber Node Structure (Conceptual)
 
 ┌─────────────────────────────────────────────────┐
@@ -79,7 +79,7 @@ The Fiber scheduler coordinates work execution across multiple priorities. When 
 
 Time-slicing emerges from the scheduler's work loop structure. React processes fibers until either the work completes or a deadline expires. The deadline defaults to 5 milliseconds, leaving 11ms of each 16ms frame for browser layout, paint, and script execution. When the deadline expires, React checks for higher-priority work. If none exists and the frame budget remains, React continues processing the current priority. Otherwise, it yields control to the browser via `MessageChannel` or `setTimeout`, resuming work in a future event loop turn.
 
-```
+```text
 Time-Slicing Execution Flow
 
 Frame 1 (16ms):                Frame 2 (16ms):

@@ -71,7 +71,7 @@ An LCG computes each new state as `state = (a × state + c) mod m`, where *a*, *
 
 The Generation 1 *Pokémon* RNG maintains two bytes in the CPU's high RAM (HRAM) region: `hRandomAdd` at address `$FFD3` and `hRandomSub` at `$FFD4`. During each VBlank, the game reads the hardware divider register `rDIV` at `$FF04`, which increments at approximately 16,384 Hz (incrementing once every 256 CPU cycles on the Game Boy's ~4.19 MHz clock), and updates the two bytes:
 
-```
+```text
 hRandomAdd = (hRandomAdd + rDIV) mod 256
 hRandomSub = (hRandomSub - rDIV) mod 256
 ```

@@ -34,7 +34,7 @@ The central data structure in any algorithmic trading system is the limit order 
 
 A performant book implementation uses a two-level structure: a sorted map (typically a red-black tree or skip list) to store price levels, and at each price level, a FIFO queue to store individual orders. The price-level map is indexed by price, enabling $O(\log n)$ insertion and deletion of price levels. Within each level, the FIFO queue enforces time priority, ensuring that the oldest order at a given price executes first. The top of the book—the best bid and best ask—is cached separately to enable $O(1)$ access to the inside market, the most frequently queried state.
 
-```
+```text
 OrderBook:
   bids: SortedMap<Price, PriceLevel>
   asks: SortedMap<Price, PriceLevel>

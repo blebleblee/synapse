@@ -96,7 +96,7 @@ The operational architecture of international tax compliance flows through a mul
 
 The transfer pricing engine overlays pricing logic onto these operational transactions. When the German manufacturing subsidiary orders components from the Polish distribution center, the ERP system retrieves the arm's-length price from the transfer pricing database—a centrally maintained repository documenting comparable transactions, profit splits, cost-plus markups, and pricing methodologies for each intercompany flow. The pricing engine applies the methodology to the specific transaction, generating an invoice price and simultaneously creating documentation support for the pricing decision.
 
-```
+```text
 Intercompany Transaction Flow Architecture
 
 [Operating Entity A - Poland]
@@ -160,7 +160,7 @@ The substance carve-out excludes 5% of tangible asset carrying value plus 5% of 
 
 The permanent establishment risk assessment engine monitors activities in each jurisdiction against treaty-defined thresholds. The system tracks personnel days on-site, warehouse inventory levels, contract signature authority, and dependent agent arrangements. A dashboard flags jurisdictions approaching material presence thresholds:
 
-```
+```text
 PE Risk Dashboard - Q3 2024
 
 Jurisdiction: Germany
@@ -212,7 +212,7 @@ The system generates quarterly compliance reports demonstrating that CIGA occur 
 
 The multilateral instrument (MLI) impact tracker maps bilateral treaty modifications resulting from MLI adoption. Over 100 jurisdictions signed the MLI, opting into various articles that modify existing bilateral treaties. The system maintains a matrix showing which provisions apply to each treaty relationship:
 
-```
+```text
 MLI Impact Matrix - Treaty US-Netherlands
 
 Article 6 (Purpose of Treaty): OPTED IN

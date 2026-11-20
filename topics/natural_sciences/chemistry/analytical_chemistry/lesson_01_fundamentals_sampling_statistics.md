@@ -64,7 +64,7 @@ Chain-of-custody protocols ensure sample integrity from collection through analy
 
 The analytical measurement workflow can be decomposed into six interconnected operational stages, each contributing distinct error components to the final uncertainty budget. Understanding this architectural segmentation allows targeted optimization and rational resource allocation during method development.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     ANALYTICAL WORKFLOW                         │
 ├─────────────────────────────────────────────────────────────────┤

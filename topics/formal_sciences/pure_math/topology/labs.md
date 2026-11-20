@@ -8,7 +8,7 @@ The exercises span three tiers of increasing structural depth. The first tier ve
 
 Before writing a single line of topology code, verify your environment is correctly constituted.
 
-```
+```text
 python -c 'import sympy; print(sympy.__version__)'
 python -c 'import numpy; print(numpy.__version__)'
 python -c 'from sage.all import *; print(version())'
@@ -18,7 +18,7 @@ The expected output is SymPy 1.12 or later, NumPy 1.26 or later, and SageMath 10
 
 The working Python environment requires three additional packages beyond the standard scientific stack:
 
-```
+```text
 pip install sympy numpy networkx itertools-more
 ```
 

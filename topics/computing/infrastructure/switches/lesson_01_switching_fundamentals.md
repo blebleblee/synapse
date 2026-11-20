@@ -99,14 +99,14 @@ Cut-through switching begins egress transmission as soon as the forwarding looku
 
 On a Cisco Nexus 3000 or 9000 series switch, you can verify the forwarding mode per port:
 
-```
+```text
 N9K# show interface Ethernet1/1 | include "Forwarding mode"
   Forwarding mode: store-and-forward
 ```
 
 On Arista platforms, cut-through is enabled by default on supported models and reported in the interface counters:
 
-```
+```text
 Arista# show interfaces Ethernet1 counters
 ...
 Ethernet1:
@@ -118,7 +118,7 @@ Ethernet1:
 
 On a Cisco switch running IOS or NX-OS, the MAC address table is inspected with the `show mac address-table` command. The output reveals the structure of the CAM directly:
 
-```
+```text
 SW1# show mac address-table
           Mac Address Table
 -------------------------------------------
@@ -139,7 +139,7 @@ Total Mac Addresses for this criterion: 8
 
 The `DYNAMIC` entries are learned from traffic and will age out after 300 seconds of inactivity. The `STATIC` entries are built into the switch: `0180.c200.0000` is the STP bridge protocol data unit multicast address, which must always be directed to the CPU for control-plane processing. `ffff.ffff.ffff` is the broadcast address, which is always flooded. You can filter the table by VLAN, by MAC, or by port to narrow your diagnostic scope:
 
-```
+```text
 SW1# show mac address-table vlan 10
 SW1# show mac address-table address aaaa.bbbb.0001
 SW1# show mac address-table interface GigabitEthernet0/1
@@ -147,13 +147,13 @@ SW1# show mac address-table interface GigabitEthernet0/1
 
 The aging timer is configurable. Lowering it makes the table more responsive to topology changes but increases flooding for briefly silent hosts. Raising it reduces flooding overhead but delays convergence when a host moves ports:
 
-```
+```text
 SW1(config)# mac address-table aging-time 600
 ```
 
 On a Linux bridge—the software switch that underpins Kubernetes CNI plugins, KVM/QEMU networking, and many container runtimes—the equivalent command is `bridge fdb show`:
 
-```
+```bash
 # bridge fdb show
 33:33:00:00:00:01 dev eth0 master br0
 01:80:c2:00:00:0e dev eth0 master br0
@@ -164,7 +164,7 @@ aa:bb:cc:00:00:03 dev veth-a3 master br0 vlan 10
 
 The Linux bridge maintains the forwarding database (FDB) in a kernel hash table keyed on (MAC, VLAN, bridge). Each entry records the device (port) through which the MAC was learned. The aging timer is controlled by the `gc_stale_time` sysfs parameter, defaulting to 300 seconds:
 
-```
+```bash
 # ip -d link show br0
 # cat /sys/class/net/br0/bridge/gc_stale_time
 300
@@ -172,7 +172,7 @@ The Linux bridge maintains the forwarding database (FDB) in a kernel hash table 
 
 Open vSwitch, which powers many production Kubernetes and OpenStack deployments, maintains its own FDB and exposes it through `ovs-appctl`:
 
-```
+```bash
 # ovs-appctl fdb/show br0
 port  VLAN  MAC                Age
   1      10  aa:bb:cc:00:00:01  127
@@ -182,7 +182,7 @@ port  VLAN  MAC                Age
 
 The flow-based forwarding model in OVS is richer than a simple MAC table. The OpenFlow pipeline allows match-action rules that can forward based on any combination of L2–L4 fields, and the `ovs-ofctl dump-flows` command shows the active flow entries:
 
-```
+```bash
 # ovs-ofctl dump-flows br0
  cookie=0x0, duration=342.1s, table=0, n_packets=18472, n_bytes=2787421,
    priority=1,in_port=1,dl_vlan=10 actions=output:2
@@ -196,7 +196,7 @@ The `NORMAL` action delegates to the switch's internal MAC learning and forwardi
 
 The distinction between collision domains and broadcast domains is the most consequential architectural concept in switched network design, and it is worth grounding in concrete topology.
 
-```
+```text
   ┌───────────────────────────────────────────────────────────┐
   │                    SWITCH (SW1)                            │
   │                                                            │
@@ -237,7 +237,7 @@ The MAC address table has a finite size. Enterprise switches typically support 3
 
 The MAC flooding attack exploits this limitation deliberately. An attacker generates frames with thousands of unique random source MAC addresses, rapidly filling the CAM table. Once the table is saturated, all subsequent frames—legitimate or not—are flooded to every port in the VLAN. The attacker can then capture traffic on their port that was never intended for them, turning the switch into a hub. Port security mitigates this by limiting the number of MAC addresses learned per port:
 
-```
+```text
 SW1(config)# interface GigabitEthernet0/1
 SW1(config-if)# switchport mode access
 SW1(config-if)# switchport access vlan 10
@@ -251,14 +251,14 @@ The `sticky` keyword causes the switch to dynamically learn and persist the firs
 
 On a Linux bridge, the equivalent protection is the ` ageing_time` and per-port MAC limit through `bridge link`:
 
-```
+```bash
 # bridge link set dev veth-a1 learning on
 # echo 100 > /sys/class/net/br0/bridge/group_fwd_mask
 ```
 
 For Open vSwitch in production, MAC limiting is configured per-port through OpenFlow rules or the OVSDB:
 
-```
+```bash
 # ovs-vsctl set interface veth-a1 options:mac_limit=2
 ```
 
@@ -268,7 +268,7 @@ When a single MAC address is learned on two different ports in rapid succession,
 
 The most common cause is a physical Layer 2 loop. Switch A forwards a broadcast to Switch B, which forwards it back to Switch A, which forwards it to Switch B again. The same frame circulates indefinitely, and the source MAC is learned on alternating ports with each loop iteration. Spanning Tree Protocol (STP) or its faster successor Rapid Spanning Tree Protocol (RSTP) is the standard mitigation: it blocks redundant paths to break loops while maintaining a path to every segment. Every switch port in a production network should have STP enabled, even if the topology appears loop-free, because a single misconfigured cable can create a loop.
 
-```
+```text
 SW1# show spanning-tree vlan 10
 VLAN0010
   Spanning tree enabled protocol rstp
@@ -295,7 +295,7 @@ The `Altn BLK` state on Gi0/2 indicates that RSTP has identified a redundant pat
 
 On Linux bridges and OVS, STP is controlled at the bridge level:
 
-```
+```bash
 # ip link set br0 type bridge stp_state 1
 # ip -d link show br0
 bridge br0 state UP mode DEFAULT
@@ -306,7 +306,7 @@ bridge br0 state UP mode DEFAULT
     stp_state 1
 ```
 
-```
+```bash
 # ovs-vsctl set bridge br0 stp_enable=true
 # ovs-vsctl get bridge br0 stp_enable
 true

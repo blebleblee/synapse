@@ -24,7 +24,7 @@ Boundary value analysis refines equivalence partitioning by concentrating tests 
 
 Decision tables provide structured representation for systems with multiple interacting conditions. Consider a loan approval system with three binary conditions: credit score above threshold, income sufficient for loan amount, and existing debt below limit. Each combination of these conditions maps to a specific action: approve, approve with conditions, refer to underwriter, or deny. The decision table contains eight columns representing all 2^3 combinations:
 
-```
+```text
 ┌─────────────────┬───┬───┬───┬───┬───┬───┬───┬───┐
 │ Condition       │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │
 ├─────────────────┼───┼───┼───┼───┼───┼───┼───┼───┤
@@ -73,7 +73,7 @@ This yields four test cases minimum: `(true, true, false)`, `(false, true, false
 
 Combinatorial testing employs algebraic structures to generate covering arrays. A pairwise covering array for N parameters with k values each guarantees every pair of parameter values appears together in at least one test case. For three parameters A, B, C each with values {0, 1, 2}, exhaustive testing requires 3^3 = 27 test cases. Pairwise testing reduces this to 9:
 
-```
+```text
 Test  A  B  C
   1   0  0  0
   2   0  1  1

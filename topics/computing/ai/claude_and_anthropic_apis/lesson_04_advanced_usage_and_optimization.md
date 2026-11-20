@@ -207,7 +207,7 @@ For any user-facing application, streaming is non-negotiable.
 
 The streaming endpoint emits the following event types in sequence:
 
-```
+```text
 event: message_start         # Contains full Message object (empty content)
 event: content_block_start   # Marks start of a content block (text, tool_use, etc.)
 event: ping                  # Keepalive. Ignore for content processing.
@@ -558,7 +558,7 @@ A "token" in Claude's BPE vocabulary is roughly 3–4 characters of English text
 
 In a multi-turn application, every request re-sends the entire conversation history. This creates a quadratic cost profile relative to conversation turns if each turn has similar token volume.
 
-```
+```text
 Turn 1:  500 tokens in  → $0.0015
 Turn 5:  2,500 tokens in → $0.0075
 Turn 20: 10,000 tokens in → $0.030

@@ -24,7 +24,7 @@ The mechanics of this preprocessing depend critically on the asymmetric span of 
 
 This asymmetric distribution of attention coordinates tightly with saccade programming. The where decision—selecting the next fixation location—occurs in parallel with ongoing visual processing at the current fixation. Saccade targets typically land on the optimal viewing position of the next word, generally slightly left of center (between the first and middle letter for words of typical length). This targeting reflects a compromise: landing too early on a long word may require a corrective saccade to process the ending; landing too late may leave insufficient parafoveal preview of the following word.
 
-```
+```text
 Fixation Pattern Analysis:
 Text: "The quick brown fox jumps over the lazy dog."
 

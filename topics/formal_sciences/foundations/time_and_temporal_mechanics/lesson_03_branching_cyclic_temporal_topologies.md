@@ -84,7 +84,7 @@ The CTL formula $AG(p \implies EF q)$ exemplifies the alternating quantifier str
 
 The computational semantics of branching time models emerges naturally from Kripke structures representing state-transition systems. A Kripke structure $\mathfrak{K} = \langle S, S_0, R, L \rangle$ consists of a finite set $S$ of states, a set $S_0 \subseteq S$ of initial states, a left-total transition relation $R \subseteq S \times S$ (every state has at least one successor), and a labeling function $L : S \to 2^{AP}$ assigning atomic propositions to states. The unwinding of $\mathfrak{K}$ from an initial state $s_0$ produces an infinite tree model where moments correspond to finite paths in $\mathfrak{K}$ and the ordering relation is prefix ordering. Each maximal path through $\mathfrak{K}$ starting from $s_0$ corresponds to one history in the tree model.
 
-```
+```text
 Tree unwinding from Kripke structure:
 
 Kripke Structure:          Unwound Tree:

@@ -86,7 +86,7 @@ The philosophical depth of identity types emerged fully only with Voevodsky's Ho
 
 Before examining the derivation mechanics in detail, it is essential to understand that MLTT is built on **four fundamental judgments**, not one. This multiplicity is not a notational accident; it is architecturally necessary because the propositions-as-types identification requires the same kind of definitional checking that computation requires. The four judgments are:
 
-```
+```text
 Γ ⊢ A : 𝒰        (A is a type in context Γ)
 Γ ⊢ a : A          (a is a term of type A in context Γ)
 Γ ⊢ A ≡ B : 𝒰    (A and B are definitionally equal types)

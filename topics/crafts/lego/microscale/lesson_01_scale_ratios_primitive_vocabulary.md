@@ -18,7 +18,7 @@ Color theory operates under different constraints at microscale. While minifigur
 
 The geometric foundation of microscale construction rests on the stud grid as an absolute coordinate system, with all design decisions constrained by this 8-millimeter lattice. Unlike larger scales where builders can afford to place elements intuitively and refine through iteration, microscale demands that practitioners plan dimensions with millimeter precision before physical assembly, often sketching stud-grid overlays on reference photographs or architectural elevations to determine which features land on stud boundaries and which require SNOT (Studs Not On Top) techniques or half-stud offsets to represent accurately. The stud grid imposes a fundamental quantization on design: curves become stairstepped approximations, diagonal lines emerge from strategic corner placement, and radial symmetry requires careful calculation to ensure equidistant feature placement around a central axis.
 
-```
+```text
 Stud Grid Coordinate System (Top View):
 ┌─────┬─────┬─────┬─────┬─────┐
 │ 0,4 │ 1,4 │ 2,4 │ 3,4 │ 4,4 │

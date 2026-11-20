@@ -44,7 +44,7 @@ Pressure dynamics in real systems deviate from steady-state assumptions due to t
 
 Air chambers, historically fabricated as vertical pipe stubs capped at the top, provide cushioning by compressing trapped air as pressure rises. Modern implementations use precharged hydropneumatic tanks with a flexible diaphragm separating water and gas, preventing air absorption into solution. Sizing requires estimating the surge volume, desired pressure rise limit, and applying the ideal gas law to determine the required gas volume at pre-charge pressure. A typical residential air chamber might contain 1-2 gallons at 50 psi pre-charge, sufficient to attenuate pressure surges from washing machine solenoid valves or dishwasher inlet valves that close in under 100 milliseconds.
 
-```
+```text
 Simplified Hydraulic Network Topology (Residential Single-Story Home)
 
                     [Municipal Main @ 70 psi]

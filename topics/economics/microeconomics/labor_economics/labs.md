@@ -180,7 +180,7 @@ Construct a calibration spreadsheet with the following columns: hours worked $H$
 
 In Excel, create a sheet with cells A1:B5 containing parameter labels and values:
 
-```
+```text
 A1: w (wage)          B1: 25
 A2: Y (nonlabor inc)  B2: 5000
 A3: T (time endow)    B3: 5840
@@ -190,7 +190,7 @@ A5: rho               B5: -0.5
 
 In column A starting at row 7, generate hours worked from 0 to 4000 in steps of 10:
 
-```
+```text
 A7: 0
 A8: =A7+10
 [drag down to row 407]
@@ -198,28 +198,28 @@ A8: =A7+10
 
 In column B, compute leisure:
 
-```
+```text
 B7: =$B$3 - A7
 [drag down]
 ```
 
 In column C, compute consumption:
 
-```
+```text
 C7: =$B$1*A7 + $B$2
 [drag down]
 ```
 
 In column D, compute CES utility:
 
-```
+```text
 D7: =($B$4*C7^$B$5 + (1-$B$4)*B7^$B$5)^(1/$B$5)
 [drag down]
 ```
 
 Identify the maximum utility row using Excel's `MAX` function and `INDEX-MATCH`:
 
-```
+```text
 F7: =MAX(D7:D407)
 F8: =INDEX(A7:A407, MATCH(F7, D7:D407, 0))
 ```

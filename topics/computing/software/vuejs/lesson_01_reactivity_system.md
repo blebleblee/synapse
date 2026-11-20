@@ -261,7 +261,7 @@ The dependency graph structure that emerges from these mechanisms forms a direct
 
 The reaction graph visualization reveals the power of this architecture. Consider a component that displays a filtered and sorted list, where the filter criteria and sort order are stored in reactive state:
 
-```
+```text
 Reactive State Layer:
   items: [...]          → Set<Effect>
   filterText: ""        → Set<Effect>

@@ -28,7 +28,7 @@ Design tokens are the foundational primitives of the system, the immutable const
 
 The canonical structure of a token includes the token name, the raw value, and optional metadata such as category, description, and scope. Consider a foundational color token:
 
-```
+```text
 color:
   brand:
     primary:
@@ -93,7 +93,7 @@ This continuous integration pipeline ensures that design and code converge towar
 
 The architecture of this pipeline is straightforward but requires discipline:
 
-```
+```text
 Figma Master Library
        |
        | (Tokens Plugin Export)

@@ -94,7 +94,7 @@ Higher-order QAM schemes achieve greater spectral efficiency at the cost of redu
 
 Symbol mapping and bit-to-symbol encoding employ Gray coding to minimize bit errors when a symbol error occurs. In Gray-coded constellations, adjacent symbols differ by only one bit, so most demodulation errors caused by noise pushing a received sample across a decision boundary result in only a single bit error rather than multiple bits. For 16-QAM, the bit assignments might be:
 
-```
+```text
 0000  0001  0011  0010
 0100  0101  0111  0110
 1100  1101  1111  1110
@@ -107,7 +107,7 @@ Pulse shaping controls the time-domain waveform of each symbol to limit spectral
 
 In a GNU Radio flowgraph implementing QPSK transmission, the signal path proceeds as:
 
-```
+```text
 Random Source → Pack K Bits → Chunks to Symbols → 
 RRC Filter → Frequency Xlating FIR Filter → 
 USRP/HackRF Sink

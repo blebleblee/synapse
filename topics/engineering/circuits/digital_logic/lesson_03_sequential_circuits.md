@@ -43,7 +43,7 @@ The gated SR latch introduces an enable control that synchronizes state changes 
 
 The D latch eliminates the SR latch's forbidden state by accepting a single data input and internally generating complementary set and reset signals. The circuit places an inverter between the D input and the Reset gate input, ensuring that Set and Reset always drive opposite logic levels. When the Enable strobe is high, the Q output transparently follows the D input: D high sets Q high, D low resets Q low. When Enable falls low, the latch freezes, retaining the last D value sampled before the enable transition. This transparency property, where output tracks input during the enable window, classifies the D latch as level-sensitive or transparent, distinguishing it from the edge-triggered flip-flop.
 
-```
+```text
 D Latch Internal Structure:
 
               ┌─── D
@@ -135,7 +135,7 @@ The T flip-flop simplifies the JK flip-flop by providing a single toggle input. 
 
 Synchronous counters improve on ripple counter timing by clocking all flip-flops simultaneously and generating the next state through combinational logic. A 4-bit synchronous binary counter uses four D or JK flip-flops sharing a common clock, with each flip-flop's D input computed as `D[i] = Q[i] ⊕ (Q[i-1] · Q[i-2] · ... · Q[0])`, implementing the binary increment function. This parallel state transition eliminates the cumulative propagation delay of ripple counters, where a transition in the least significant bit must sequentially ripple through all higher bits, limiting maximum counting frequency. Synchronous design also simplifies timing analysis, as all flip-flop transitions occur within a single clock period, bounded by worst-case combinational logic delay plus flip-flop setup time.
 
-```
+```text
 4-Bit Synchronous Binary Counter:
 
         ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐

@@ -58,7 +58,7 @@ Market microstructure effects complicate hedging for large positions. A market m
 
 Greeks-based risk management aggregates exposures across portfolios of options and other derivatives. A book containing hundreds of option positions can be summarized through its net delta, gamma, vega, and theta exposures, providing a compressed representation of risk that traders and risk managers monitor continuously. Delta limits cap directional exposure, preventing portfolios from accumulating large bets on market direction. Gamma limits constrain convexity risk, ensuring that delta hedges remain effective even during large price movements. Vega limits prevent concentrated bets on volatility changes that could produce catastrophic losses during volatility spikes. Stress testing complements Greeks-based analysis by computing portfolio value changes under extreme scenarios—Black Monday crashes, volatility explosions, or sharp interest rate moves—that push beyond the local sensitivities captured by first and second derivatives.
 
-```
+```text
 Option Risk Dashboard Structure:
 
 Portfolio Net Greeks:

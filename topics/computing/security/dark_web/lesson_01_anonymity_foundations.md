@@ -34,13 +34,13 @@ The fundamental tension in anonymity system design emerges from the latency-anon
 
 The canonical mix network architecture, first proposed by David Chaum in 1981, establishes the foundational design pattern for anonymous communication. A mix node receives messages encrypted in layers, decrypts the outer layer to reveal the next hop, and forwards messages in batched, shuffled order. The sender constructs an onion-encrypted message by recursively encrypting the payload and routing information under the public keys of each mix node in the path. For a three-hop path through mixes M₁, M₂, M₃ to recipient R, the sender computes:
 
-```
+```text
 E_M₁(M₂, E_M₂(M₃, E_M₃(R, message)))
 ```
 
 Each mix node peels one encryption layer, seeing only the next hop, never the full route or final destination. The batching and shuffling prevent a passive observer from correlating inputs to outputs through timing or ordering.
 
-```
+```text
 Sender → [M₁: Decrypt, Batch, Shuffle] → [M₂: Decrypt, Batch, Shuffle] → [M₃: Decrypt, Batch, Shuffle] → Recipient
 
 Observer sees:
@@ -54,7 +54,7 @@ The **threshold mix** variant requires n input messages before producing n outpu
 
 Modern anonymity networks like Tor adopt a circuit-switched streaming model rather than message-based mixing due to latency requirements. A Tor client establishes a circuit through three relay nodes: guard, middle, and exit. The client performs a telescoping circuit construction, negotiating ephemeral Diffie-Hellman keys with each relay in sequence:
 
-```
+```text
 Client ↔ Guard:   TLS + DH₁ → K₁ (forward secrecy key layer 1)
 Client ↔ Middle:  Encrypted in K₁: DH₂ → K₂ (forward secrecy key layer 2)  
 Client ↔ Exit:    Encrypted in K₁,K₂: DH₃ → K₃ (forward secrecy key layer 3)
@@ -76,7 +76,7 @@ The relay cell contains a stream ID, digest for integrity, length, and command s
 
 Traffic correlation attacks target the fundamental observability that network flows must exhibit. The **packet counting attack** counts packets entering and exiting the anonymity network within time windows. If 100 packets enter through guard G at times {t₁, ..., t₁₀₀} and 100 packets exit through exit E at times {t₁+δ, ..., t₁₀₀+δ} where δ represents circuit latency, correlation probability increases. The mutual information between packet count sequences:
 
-```
+```text
 I(X;Y) = H(X) + H(Y) - H(X,Y)
 ```
 
@@ -84,7 +84,7 @@ quantifies correlation strength. High mutual information indicates strong statis
 
 The **size sequence correlation** exploits burst patterns. Web page loads generate characteristic sequences: a small request, a large HTML response, multiple concurrent resource fetches of varying sizes, then idle periods. Even with fixed-size cells, the sequence of cell counts in each direction per time window creates a fingerprint:
 
-```
+```text
 Upstream:   [1, 0, 3, 1, 0, 0, 1, 2, ...]
 Downstream: [0, 15, 8, 23, 12, 0, 1, 3, ...]
 ```
@@ -93,7 +93,7 @@ Cross-correlating these sequences between entry and exit points using dynamic ti
 
 The **active timing attack** manipulates traffic to embed detectable patterns. An adversary controlling an entry guard delays or drops specific packets to modulate the flow rate:
 
-```
+```text
 Normal flow:     ████████████████████████████ (constant rate)
 Watermarked:     ██  ████  ██████  ████  ████ (modulated rate)
 ```
@@ -108,7 +108,7 @@ Defense mechanisms operate at multiple layers. **Padding** adds dummy traffic to
 
 The **entropy measurement framework** quantifies anonymity formally. Given n users in the anonymity set with observed traffic features f₁, ..., fₙ, the adversary computes posterior probabilities p(sender = i | observations) for each user. Anonymity entropy:
 
-```
+```text
 H = -Σᵢ p(i) log₂ p(i)
 ```
 

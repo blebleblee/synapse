@@ -22,7 +22,7 @@ The immune system analogy, while imperfect, provides useful intuition for unders
 
 The memory protection unit (MPU) in modern processors provides the hardware foundation for isolation enforcement. At boot, the operating system configures page tables that map virtual addresses to physical frames and associate each page with permission bits: readable, writable, executable. When a process attempts to access memory, the processor's memory management unit (MMU) walks the page table hierarchy, validates permissions, and either completes the access or raises a page fault exception. This mechanism is unavoidable—there is no way for user-mode code to access physical memory without traversing the MMU. The page table structure itself resides in privileged memory and can only be modified through kernel-mode instructions, satisfying the tamperproofness requirement of a reference monitor.
 
-```
+```text
 Virtual Address (x86-64, 4-level paging):
 ┌────────────┬────────────┬────────────┬────────────┬────────────┐
 │   Sign Ext │    PML4    │    PDPT    │     PD     │     PT     │  Page Offset
@@ -56,7 +56,7 @@ Address space layout randomization exploits this hardware mechanism by randomizi
 
 Stack canaries provide a complementary defense against stack buffer overflows. The compiler inserts a random value, generated at program startup, between local variables and the return address on each function's stack frame. Before a function returns, it verifies that the canary has not been modified. If corruption is detected, the program terminates immediately rather than transferring control to an attacker-controlled address. The canonical implementation places the canary immediately before the saved frame pointer and return address:
 
-```
+```text
 Stack Frame Layout (x86-64, growing downward):
 ┌──────────────────────────┐  Higher addresses
 │  Function arguments      │
@@ -135,7 +135,7 @@ The policy itself can express complex invariants through type enforcement and mu
 
 Execution whitelisting inverts the traditional blacklist-based malware detection model. Rather than attempting to recognize all possible malicious programs—a task that is fundamentally unsolvable given that malice is not a static property but depends on context and intent—whitelisting permits only explicitly approved binaries to execute. Windows Defender Application Control (WDAC), formerly known as Device Guard, implements this through code integrity policies that specify allowed signers, file hashes, or path rules. The kernel-mode Code Integrity component verifies each executable and library against the policy before mapping it into memory. If the binary does not match an allowed rule, the load is denied.
 
-```
+```text
 WDAC Policy Rule Types:
 
 1. Signer Rule (certificate-based):

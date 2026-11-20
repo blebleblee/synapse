@@ -20,7 +20,7 @@ The practical implication for the financial modeler is that the capital structur
 
 The debt schedule is the component of the financial model where every financing instrument is tracked individually across the forecast horizon. Each instrument has a beginning balance, optional drawdowns, scheduled amortization, optional prepayments, and an ending balance. The schedule feeds interest expense calculations back to the income statement and feeds debt balances to the balance sheet, while drawing from the cash flow statement to determine repayment capacity. To understand the wiring, consider the following schematic of how data flows through a fully integrated capital structure model:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                     INCOME STATEMENT                                 │
 │  Revenue → EBITDA → EBIT → (Interest Expense) → EBT → Net Income    │

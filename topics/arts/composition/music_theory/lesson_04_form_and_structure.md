@@ -21,7 +21,7 @@ Sonata form governs most Classical/Romantic first movements. Before analyzing it
 
 Play this sequence slowly, listening for the *character* of each key relative to your starting tonic. Use C major as home.
 
-```
+```text
 C major (I) — hold 4 beats, feel "home"
    ↓
 G major (V) — hold 4 beats, feel "related, lifted, bright"

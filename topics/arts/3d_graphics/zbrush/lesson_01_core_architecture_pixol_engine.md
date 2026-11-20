@@ -30,7 +30,7 @@ Memory management for high-resolution meshes hinges on ZBrush's subdivision leve
 
 The viewport mathematics underlying ZBrush's canvas projection operate as a hybrid orthographic/perspective system controlled by the Perspective slider in the Draw palette. At zero perspective, ZBrush employs a pure orthographic projection where parallel lines remain parallel regardless of depth, simulating an infinitely distant camera with no foreshortening. Increasing the perspective value introduces a vanishing-point projection that mimics human vision and photographic lenses, with the slider effectively controlling the field-of-view angle. The projection matrix updates the pixol buffer's depth encoding such that objects closer to the camera occupy larger screen-space regions and exhibit stronger foreshortening. This camera-less projection system—where perspective is a canvas-wide slider rather than a positioned camera object—reflects ZBrush's document-centric philosophy: you are rendering a 2D image of a 3D form, not navigating a 3D scene with a virtual camera rig.
 
-```
+```text
 ZBrush Rendering Pipeline (Simplified)
 
    Tool Mesh (Subdivision Surface or Polymesh)

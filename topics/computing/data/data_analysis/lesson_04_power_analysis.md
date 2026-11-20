@@ -24,7 +24,7 @@ Power depends on four interrelated quantities:
 
 These quantities are bound by the constraint that fixing any three determines the fourth. For a two-sample t-test with equal variances, the relationship is:
 
-```
+```text
 Power = Φ(√(n·δ²/2) - z₁₋α/₂) + Φ(-√(n·δ²/2) - z₁₋α/₂)
 ```
 
@@ -53,27 +53,27 @@ Consider a clinical trial for a drug with true effect size δ = 0.3 (small but c
 Effect sizes provide a common scale for comparing results across studies with different measurement units. The three most common families are:
 
 **Standardized mean difference (Cohen's d family)**:
-```
+```text
 d = (μ₁ - μ₂) / σ
 ```
 
 For paired samples (within-subjects):
-```
+```text
 d_z = μ_diff / σ_diff
 ```
 
 **Correlation family** (for relationship strength):
-```
+```text
 r = Cov(X,Y) / (σ_X · σ_Y)
 ```
 
 Converted to Cohen's f² for ANOVA/regression:
-```
+```text
 f² = r² / (1 - r²)
 ```
 
 **Proportion difference**:
-```
+```text
 h = 2·arcsin(√p₁) - 2·arcsin(√p₂)  [Cohen's h]
 ```
 
@@ -83,18 +83,18 @@ Cohen proposed conventional benchmarks (small: d=0.2, medium: d=0.5, large: d=0.
 
 All power calculations ultimately derive from the non-central distribution of the test statistic under H₁. For a t-test:
 
-```
+```text
 t ~ t_{n-1}(λ)  under H₁
 ```
 
 where the non-centrality parameter λ encodes both effect size and sample size:
 
-```
+```text
 λ = δ · √(n/2)  [two-sample case]
 ```
 
 Power is then:
-```
+```text
 Power = P(|T| > t_{1-α/2,n-1} | λ)
 ```
 
@@ -245,13 +245,13 @@ graph LR
 
 When testing k hypotheses simultaneously, the family-wise error rate (FWER) under the global null is:
 
-```
+```text
 FWER = P(at least one Type I error) = 1 - (1 - α)^k
 ```
 
 For k = 20 tests at α = 0.05, FWER ≈ 0.64. Bonferroni correction (α_corrected = α/k) controls FWER but reduces power by requiring larger sample sizes. The power penalty for a single test becomes:
 
-```
+```text
 n_bonf / n_uncorrected ≈ k  [rough approximation]
 ```
 
@@ -263,7 +263,7 @@ When studies are underpowered, significant results systematically overestimate e
 
 The Type M (magnitude) error quantifies this bias:
 
-```
+```text
 E[|δ̂| | significant] / |δ_true|
 ```
 
@@ -317,12 +317,12 @@ Rather than asking "what sample size do I need?", the scientifically principled 
 
 Given budget constraint n_max, the MDES is:
 
-```
+```text
 MDES = z₁₋β + z₁₋α/₂) · √(2/n_max)
 ```
 
 For n_max = 100 per group, α = 0.05, power = 0.80:
-```
+```text
 MDES = (0.84 + 1.96) · √(2/100) = 0.396
 ```
 
@@ -374,13 +374,13 @@ Sequential designs can reduce expected sample size by 20-40% when the true effec
 
 Frequentist power analysis conditions on a single point value for δ. Bayesian sample size methods integrate over a prior distribution of plausible effect sizes:
 
-```
+```text
 P(reject H₀) = ∫ Power(n, δ) · π(δ) dδ
 ```
 
 This "assurance" or "average power" accounts for uncertainty in the true effect size. Alternatively, the Bayesian approach can target a desired posterior probability or credible interval width:
 
-```
+```text
 n : P(|θ - θ̂| < ε | data) ≥ 0.95
 ```
 
@@ -432,7 +432,7 @@ print(result_sens$d)
 
 For clustered or longitudinal data, effective sample size depends on intraclass correlation (ICC) and cluster size. The design effect (DEFF) inflates required sample size:
 
-```
+```text
 n_effective = n_independent · DEFF
 DEFF = 1 + (m - 1) · ICC
 ```

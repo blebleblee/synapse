@@ -369,7 +369,7 @@ Measure temperature sensitivity by carefully warming one of the IC packages usin
 
 Construct a parameter sensitivity table documenting these measurements:
 
-```
+```text
 Operating Condition          | Cin→Cout Delay | Change from Nominal
 ---------------------------- | -------------- | -------------------
 Nominal (5.0V, 25°C, no load)| 165 ns         | baseline

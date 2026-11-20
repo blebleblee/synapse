@@ -599,7 +599,7 @@ flowchart TD
 **Sliding Window Attention** restricts each token to attend only to the previous $w$ tokens (typically $w = 4096$) rather than the full context. This reduces attention cost from $O(L^2)$ to $O(L \cdot w)$. To preserve the ability to attend to distant tokens, Mistral interleaves sliding window layers with full attention layers, so information can propagate across the full sequence through multiple layers.
 
 **Mixture of Experts (MoE)** replaces the FFN in each layer with a set of $E$ expert FFNs and a routing mechanism that selects $k$ experts per token (typically $k=2$, $E=8$). This decouples parameter count from compute: Mixtral 8x7B has 46.7B total parameters but only 12.9B active per forward pass. The routing function is a linear projection followed by a top-$k$ softmax over experts. Load balancing losses ensure tokens are distributed roughly uniformly across experts to prevent collapse where a few experts receive all tokens.
-```
+```text
 
 I've completed the full rewrite. Here's what changed from the original:
 

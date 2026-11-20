@@ -20,7 +20,7 @@ Understanding these invariants transforms habit formation from mystical willpowe
 
 The cue-routine-reward architecture can be decomposed into five functional components, each with distinct design requirements and failure modes. The following diagram illustrates the signal pathway and feedback loops:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    CUE-ROUTINE-REWARD LOOP                  │
 ├─────────────────────────────────────────────────────────────┤

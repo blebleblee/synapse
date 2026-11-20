@@ -82,7 +82,7 @@ Dimensional interchangeability and safety depend upon international standardizat
 
 Headspace is the linear distance from the breech face (bolt face) to the feature of the chamber that arrests forward cartridge seating:
 
-```
+```text
 Rimmed:          [Bolt Face] |===================| [Cartridge Rim Front Edge]
 Rimless (Rifle): [Bolt Face] |===================| [Shoulder Datum Line Diameter]
 Rimless (Pistol):[Bolt Face] |===================| [Cartridge Case Mouth]

@@ -38,7 +38,7 @@ The multiple calculation executes through simple division—EV/EBITDA equals ent
 
 The distribution analysis examines the full multiple range across the comparable set, calculating minimum, maximum, mean, median, twenty-fifth percentile, and seventy-fifth percentile statistics. The median provides the most robust central tendency measure because it resists distortion from outlier companies trading at depressed multiples due to idiosyncratic distress or premium multiples reflecting takeover speculation. The interquartile range between the first and third quartiles captures the middle fifty percent of observations, providing a defensible valuation corridor that excludes extreme outliers while preserving meaningful dispersion. The presentation architecture typically manifests as:
 
-```
+```text
 Comparable Company Analysis - Software Infrastructure
 Metric: EV / NTM Revenue
 

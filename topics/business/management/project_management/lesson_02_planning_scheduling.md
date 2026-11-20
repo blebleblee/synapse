@@ -30,7 +30,7 @@ A well-constructed WBS follows the 100% rule: each level of the hierarchy must c
 
 The following diagram represents a simplified three-level WBS for a SaaS product launch:
 
-```
+```text
 Project: SaaS Platform Launch (Level 0)
 │
 ├── 1.0 Product Development (Level 1)

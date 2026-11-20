@@ -82,7 +82,7 @@ Advanced procedural generation systems construct task curricula that gradually i
 
 The integration of these subsystems into a complete training pipeline requires careful orchestration to maximize GPU utilization. A well-tuned pipeline maintains all GPU compute units busy throughout training: physics kernels execute on CUDA cores, rendering operations leverage texture units and rasterization hardware, and neural network forward/backward passes occupy tensor cores. Achieving this utilization requires prefetching the next batch of observations while the current batch undergoes policy evaluation, pipelining physics simulation of the next timestep with rendering of the current timestep, and overlapping neural network gradient computation with parameter updates. The resulting system sustains throughput exceeding one million environment steps per second on modern data center GPUs, compressing months of physical robot experience into hours of wall-clock training time.
 
-```
+```text
 Parallel Simulation Pipeline (Per-Training-Step Data Flow)
 
 [Environment State Storage - GPU Memory]

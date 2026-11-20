@@ -64,7 +64,7 @@ When a 3mm bar enters an anti-stud cavity, it does not contact the outer 6.5mm d
 
 The geometry of three-point contact creates a statically determinate system where forces balance without requiring material deformation beyond the initial insertion compliance:
 
-```
+```text
         Anti-Stud Cavity (plan view)
               
          Outer wall ⌀6.5mm

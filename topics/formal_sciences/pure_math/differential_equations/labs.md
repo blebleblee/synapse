@@ -8,7 +8,7 @@ The mathematical substrate of this guide is the standard theory of ordinary diff
 
 Before any exercise, verify your environment satisfies the following requirements. Python 3.11 or later is required; SymPy 1.12+ provides the symbolic ODE solver, Wronskian computation, and series expansion machinery you will use throughout. SageMath 10.x supplies desolve for independent cross-verification. NumPy handles all numerical sanity checks.
 
-```
+```text
 python -c "import sympy; print(sympy.__version__)"
 python -c "import numpy; print(numpy.__version__)"
 sage --version
@@ -16,7 +16,7 @@ sage --version
 
 If SageMath is not available as a command-line tool, the exercises designate SageMath blocks explicitly; SymPy covers all core verification steps independently. Install dependencies with:
 
-```
+```text
 pip install sympy numpy scipy
 ```
 

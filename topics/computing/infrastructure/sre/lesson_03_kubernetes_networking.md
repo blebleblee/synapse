@@ -76,7 +76,7 @@ Calico's native routing mode is architecturally superior in environments where t
 
 When Pod A (`10.0.1.5`) on Node 1 sends a packet to Pod B (`10.0.2.7`) on Node 2, the kernel path is:
 
-```
+```text
 Pod A eth0 → veth pair → Node 1 root netns → routing decision →
   [Calico BGP native: direct IP forward to Node 2]
   [Flannel VXLAN: encap in UDP/8472, send to Node 2 VTEP]
@@ -85,7 +85,7 @@ Pod A eth0 → veth pair → Node 1 root netns → routing decision →
 
 Calico assigns each pod a `/32` host route on the node, with the veth peer as the nexthop. The node's routing table looks like:
 
-```
+```text
 10.0.1.5/32 dev cali3f4a2b1  scope link
 10.0.2.0/24 via 192.168.1.102 dev eth0 proto bird  # BGP-learned
 ```
@@ -193,7 +193,7 @@ The original `Endpoints` API stores all pod IPs for a service in a single object
 
 An Ingress resource describes L7 routing rules; an Ingress Controller implements them. The controller runs a reconcile loop:
 
-```
+```text
 Watch(Ingress, Service, Secret) → diff desired vs actual → update proxy config → reload/hot-patch
 ```
 

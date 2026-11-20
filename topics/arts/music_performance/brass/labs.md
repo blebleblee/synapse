@@ -149,7 +149,7 @@ Press lips loosely together, blow a "BRRR," aim for a steady recognizable pitch.
 **Drill 2 — Mouthpiece long tones:**
 On the mouthpiece alone (concert pitches below, trumpet mouthpiece; scale proportionally for horn/tuba):
 
-```
+```text
 Low G (sounds like C below the staff)   → 60 BPM, 8 counts
 Middle C (middle of the staff)          → 60 BPM, 8 counts
 G above the staff                       → 60 BPM, 8 counts
@@ -172,7 +172,7 @@ Long tones are non-negotiable at any skill level — they're the fastest diagnos
 **Daily protocol:** quarter note = 60 BPM, 8 counts per pitch, rest 2 counts between. Tuner running throughout. Target: every pitch within ±5 cents.
 
 **Trumpet sequence (written pitch), one octave down then back up:**
-```
+```text
 G4 - F#4 - F4 - E4 - Eb4 - D4 - Db4 - C4 - (ascend back to G4)
 ```
 
@@ -197,7 +197,7 @@ Every note on a brass instrument belongs to a harmonic series set by your tube's
 
 Bb trumpet, open (no valves):
 
-```
+```text
 Partial:    1     2     3     4     5     6     7     8
 Concert:    Bb1   Bb2   F3    Bb3   D4    F4    Ab4*  Bb4
 Written:    C2    C3    G3    C4    E4    G4    Bb4*  C5
@@ -228,7 +228,7 @@ Lip slurs move between partials with no tongue — the core tool for building fl
 | 1+2+3 | F#, C#, F#, A#, C#, E, F# |
 
 **Drill 1 — Two-partial slur (beginner), open fingering:**
-```
+```text
 C4 — G4 — C4 — G4 — C4
 Tempo: 60 BPM, 1 beat per note
 Tongue the first note only ("Tu"), slur everything after
@@ -237,14 +237,14 @@ Tongue the first note only ("Tu"), slur everything after
 Keep the air moving continuously — the only change between the two notes is a small bump in lip tension and air speed going up.
 
 **Drill 2 — Three-partial slur (intermediate), open fingering:**
-```
+```text
 C4 — G4 — C5 — G4 — C4   (2nd -> 3rd -> 4th -> 3rd -> 2nd partial)
 Tempo: 60 -> 80 -> 100 BPM, 4 reps per fingering
 Run on all 7 fingerings before moving to Drill 3
 ```
 
 **Drill 3 — Four-partial slur with valve changes (advanced):**
-```
+```text
 Bar 1 (open):    C4 — G4 — C5 — E5
 Bar 2 (valve 2): Bb3 — F4 — Bb4 — D5
 Bar 3 (valve 1): B3 — F#4 — B4 — D#5
@@ -272,7 +272,7 @@ Play a chromatic scale up from the middle register. Mark the note where tone sta
 
 **Step 2 — Pedal tones.**
 Counterintuitively, pedal tones (below the fundamental, below the staff) build the strength needed up top. They force full, slow aperture control under low resistance.
-```
+```text
 F#2 — F2 — E2 — Eb2 — D2 — Db2 — C2 (written trumpet)
 Tempo: 60 BPM, 4 counts each, full centered tone — not airy
 Play once before every high-register session
@@ -280,7 +280,7 @@ Play once before every high-register session
 
 **Step 3 — Extend one half step at a time.**
 Don't lunge for the top of the range. Add exactly one note per week.
-```
+```text
 Example, ceiling = Bb5 (written):
 Week 1: lip slur C5 — G5 — C6 (stop here)
 Week 2: add D6 → C5 — G5 — C6 — D6
@@ -369,7 +369,7 @@ Legato breath accent, used for sfp/fp"]
 ### 3.2 Single-Tongue Speed Building
 
 **Drill 1 — Tongue speed on a single pitch:**
-```
+```text
 Pitch: Bb4, repeated staccato notes
 Week 1: 60 BPM (2 tongues/beat)
 Week 2: 80 BPM
@@ -380,7 +380,7 @@ Focus: perfectly even spacing — resist the urge to rush ("machine-gunning")
 ```
 
 **Drill 2 — Accent patterns on a scale (musical tonguing):**
-```
+```text
 Bb major scale, up and down, 4/4, 60 -> 100 BPM
 
 Pattern A (downbeat accent): > . . .  > . . .
@@ -397,7 +397,7 @@ Essential for fast repeated-note passages: the Haydn Trumpet Concerto's finale, 
 **The real problem is the K, not the T.** Most players' "K" attack is noticeably weaker because the back-of-tongue mechanism gets far less daily practice than the front. Isolate it directly.
 
 **K isolation drill (mouthpiece only):**
-```
+```text
 Day 1-3:   Buzz "Ka Ka Ka Ka" only, no T. 60 BPM, 4 K's/beat, 2 min.
 Day 4-7:   Steady "Ka" stream at 80 BPM, 4 K's/beat, 2 min.
 Day 8-14:  Alternate "Tu-Ku Tu-Ku Tu-Ku Tu-Ku" at 80 BPM.
@@ -407,14 +407,14 @@ Day 15+:   Move to the instrument — scales and arpeggios, double tongue.
 ```
 
 **Triple tongue, Pattern 1 (T-T-K), for triplets:**
-```
+```text
 Quarter = 60 BPM, triplet subdivision
 "Tu-Tu-Ku / Tu-Tu-Ku / Tu-Tu-Ku / Tu-Tu-Ku"
 Bb arpeggio: Bb4-D5-F5 / Bb4-D5-F5 / ...
 ```
 
 **Triple tongue, Pattern 2 (T-K-T), for continuous runs:**
-```
+```text
 "Tu-Ku-Tu / Ku-Tu-Ku / Tu-Ku-Tu / Ku-Tu-Ku"
 Scale run: Bb4-C5-D5 / Eb5-F5-G5 / ...
 ```
@@ -424,19 +424,19 @@ Scale run: Bb4-C5-D5 / Eb5-F5-G5 / ...
 ### 3.4 Articulation in Repertoire
 
 **Stravinsky, Petrushka (Bb trumpet, fig. 1):** aggressive, dry staccato in the upper register. Use "Ti." Hold each note to exactly 50% of its written value, no decay, clean cutoff.
-```
+```text
 Target tempo: 126 BPM. Build: 80 -> 100 -> 116 -> 126 BPM.
 Isolate bars 1-4 on a single pitch (Bb5) in staccato rhythm before adding real pitches.
 ```
 
 **Mahler, Symphony No. 5 (Bb trumpet opening solo):** funeral-march weight, not staccato. Use "Tah" with full note value. The opening D (concert Db) needs gravitas, not brightness — keep the aperture slightly wider than your normal forte setting to darken the tone.
-```
+```text
 Key: D minor written (Db minor concert). Tempo: 76 BPM.
 Practice bars 1-8 alone. Felt attack length per note: roughly 30-50 ms, not metered — judged by ear and feel.
 ```
 
 **Brahms, Symphony No. 1 (Horn in F, mvt. IV solo):** lyrical and legato, articulated only on the first note of each phrase. Breath support must stay rock-steady through the whole slurred line — any dip and the pitch sags audibly.
-```
+```text
 Isolate bars 1-4 at half tempo first.
 Sing the passage, then match your instrumental tone to the sung version — that's the target color and phrasing.
 Return to full tempo: 72 BPM.
@@ -452,7 +452,7 @@ Knowing the mechanism stops you from fighting the wrong problem.
 
 **The additive-tubing issue:** each valve adds a fixed length of tubing to lower pitch by a set interval. That fixed length is calculated to be correct starting from open tubing. When you stack a second or third valve, the added tubing is still sized as if starting from open — but the horn is now already longer because of the first valve. The result is that combined fingerings come out systematically sharp, and the sharper the combination, the worse it gets.
 
-```
+```text
 Bb trumpet, typical cumulative sharpness:
   Open            -> ~2 cents (excellent)
   Valve 2 alone   -> +2 to +5 cents
@@ -507,7 +507,7 @@ This isn't a manufacturing flaw, it's geometry. You compensate with alternate fi
 
 Covers embouchure activation, flexibility, intonation, and articulation in one efficient run. Use before every practice session and before every performance.
 
-```
+```text
 0-2 min   Mouthpiece buzzing
           Long tones, C4-G4 range (mouthpiece pitch reference)
           Glissando up a 5th and back, 10 reps
@@ -613,7 +613,7 @@ flowchart TD
 
 ### Daily Practice Priority Ladder
 
-```
+```text
 Every day, non-negotiable:
   Mouthpiece buzzing        5 min
   Long tones with tuner     5 min

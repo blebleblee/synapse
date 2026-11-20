@@ -26,7 +26,7 @@ System 2 operates serially, with sharply limited attentional capacity, capable o
 
 The availability heuristic's retrieval mechanism depends on memory accessibility, itself determined by recency, frequency, emotional intensity, and encoding specificity. When estimating the divorce rate among Hollywood celebrities versus the general population, salient examples of celebrity breakups flood consciousness effortlessly, while base rate statistics about population-level divorce remain abstract and psychologically distant. The substitution occurs unconsciously: the query "How common is X?" becomes "How easily do examples of X come to mind?" The mechanistic pathway runs from judgment prompt through associative memory networks to retrieval fluency assessment to probability estimate, bypassing deliberate statistical reasoning entirely.
 
-```
+```text
 Availability Heuristic Execution Flow:
 
 Query: "How likely is event X?"
@@ -57,7 +57,7 @@ The formal structure reveals the error: Let F denote feminist and B denote bank 
 
 Anchoring-and-adjustment unfolds as a serial process: an anchor value enters working memory, System 2 initiates adjustment in the appropriate direction (higher or lower), and adjustment continues until a plausibility boundary is reached or cognitive resources are exhausted. The insufficient adjustment stems from satisficing dynamics—the search for a plausible answer rather than an optimal one. Once a candidate estimate crosses the threshold from implausible to defensible, the adjustment process terminates even if further refinement would improve accuracy. Cognitive load intensifies anchoring by depleting System 2 resources available for adjustment, while expertise attenuates it by providing independent knowledge structures that resist arbitrary starting points.
 
-```
+```text
 Anchoring-Adjustment Mechanism:
 
 Anchor value enters working memory
@@ -88,7 +88,7 @@ The mechanistic failure occurs at the evidence integration stage. Case-specific 
 
 Framing effects exploit the value function's reference-dependent structure. The same outcome generates different subjective values depending on whether it is encoded as a gain or a loss relative to a reference point. When a medical treatment is described as having a ninety percent survival rate, it activates the gain frame, producing risk aversion and preference for certainty. When described as having a ten percent mortality rate, it activates the loss frame, producing risk seeking and preference for gambles that might avoid the loss entirely. The information content is identical, but the subjective representation differs fundamentally.
 
-```
+```text
 Framing Effect Architecture:
 
 Information presentation
@@ -125,7 +125,7 @@ For high-stakes decisions, practitioners can implement reference class forecasti
 
 Representativeness errors require recognizing that similarity to stereotypes does not equal probability given base rates. The diagnostic pattern is high confidence in categorical judgments based on personality sketches or small samples. The forcing function is mandatory base rate integration using a structured Bayesian template. When evaluating whether an individual with certain characteristics belongs to category A or category B, the practitioner must explicitly state: (1) base rate of A in the relevant population, (2) base rate of B, (3) likelihood of the observed characteristics given membership in A, (4) likelihood given membership in B, and (5) posterior probability via Bayes' rule. The structured template prevents pure representativeness reasoning by making base rate neglect visible and embarrassing.
 
-```
+```text
 Bayesian Integration Template for Categorical Judgment:
 
 Prior probabilities:
@@ -154,7 +154,7 @@ For critical decisions, sequential anchoring-and-adjustment can be replaced with
 
 Base rate integration requires transforming abstract statistics into causally meaningful narratives that engage System 1. Frequency formats prove more intuitive than probability percentages: saying "ten out of one thousand patients with positive tests actually have the disease" activates clearer mental models than "the positive predictive value is one percent given a ninety-five percent sensitivity, ninety-five percent specificity, and one percent prevalence." Natural frequency formats align with the sequential learning format under which human statistical intuition evolved, making Bayesian reasoning accessible without formal calculation.
 
-```
+```text
 Natural Frequency Translation Protocol:
 
 Probability format (opaque):

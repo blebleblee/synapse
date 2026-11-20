@@ -26,7 +26,7 @@ These invariants are not independent. The collapse of authentication implies tha
 
 The Internet Protocol packet is the atomic unit of network communication. At the IPv4 layer, it consists of a 20-byte fixed header (plus options) and a variable-length payload. At the IPv6 layer, the fixed header is 40 bytes. The header contains the source and destination IP addresses, the protocol identifier (TCP=6, UDP=17, etc.), the TTL/Hop Limit, and a header checksum (IPv4 only; IPv6 removed the per-hop checksum by design for performance). The payload carries the transport-layer segment.
 
-```
+```text
 IPv4 Packet Layout (RFC 791):
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -128,7 +128,7 @@ sequenceDiagram
 
 The key derivation in TLS 1.3 uses HKDF (HMAC-based Key Derivation Function, RFC 5869) in a hierarchical schedule:
 
-```
+```text
 HKDF-Extract(salt=0, IKM=0)      → Early Secret
 HKDF-Extract(salt=ES, IKM=DHE)   → Handshake Secret
 HKDF-Extract(salt=HS, IKM=0)     → Master Secret
@@ -150,7 +150,7 @@ Each secret is bound to the full transcript hash up to that point, providing **t
 
 Application data is encapsulated in `TLSCiphertext` records:
 
-```
+```text
 struct {
     ContentType opaque_type = application_data; /* 0x17, always */
     ProtocolVersion legacy_record_version = 0x0303; /* TLS 1.2 for compatibility */
@@ -395,7 +395,7 @@ IPsec uses two sub-protocols: **AH** (Authentication Header, protocol 51) provid
 
 **WireGuard** (RFC draft, now in Linux kernel 5.6+) is architecturally simpler than IPsec. Its protocol stack is fixed: X25519 for key exchange, ChaCha20-Poly1305 for AEAD, BLAKE2s for hashing, SipHash for hashtable keys, and HKDF for key derivation. This cryptographic agility absence is a security property, not a limitation — it eliminates cipher negotiation as an attack surface. The handshake uses a 1.5-RTT Noise Protocol Framework (IKpsk2 pattern) with a 1-minute session key rotation.
 
-```
+```text
 WireGuard Handshake (Noise IKpsk2):
   Initiator → Responder: msg_type=1, sender_index, ephemeral_pub, encrypted_static, encrypted_timestamp, mac1, mac2
   Responder → Initiator: msg_type=2, sender_index, receiver_index, ephemeral_pub, empty_encrypted, mac1, mac2
@@ -644,7 +644,7 @@ For TLS 1.3 over TCP, **HelloRetryRequest** can be used to validate client reach
 
 A stateful firewall tracks the state of TCP/UDP connections in a flow table and permits only packets that are part of established or expected connections:
 
-```
+```text
 Connection state machine (TCP firewall):
   SYN received from outside → NEW: allow, create state entry (SYN_SENT)
   SYN-ACK from server → ESTABLISHED: allow, update state
@@ -655,7 +655,7 @@ Connection state machine (TCP firewall):
 
 Linux `nftables` (successor to `iptables`, using the netfilter framework) provides a native state tracking mechanism:
 
-```
+```bash
 # /etc/nftables.conf — minimal stateful firewall ruleset
 table inet filter {
     chain input {

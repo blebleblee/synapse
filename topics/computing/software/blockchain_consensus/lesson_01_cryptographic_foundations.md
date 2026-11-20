@@ -40,7 +40,7 @@ Private keys are random integers $d \in [1, n-1]$ sampled from a cryptographical
 
 The ECDSA signature generation process demonstrates how cryptographic protocols compose mathematical primitives with hash functions and random nonces to achieve security properties. To sign message $m$ with private key $d$:
 
-```
+```text
 1. Compute message hash: e = H(m) truncated to bit length of n
 2. Generate random nonce: k ← [1, n-1] from CSPRNG
 3. Compute curve point: (x, y) = kG
@@ -53,7 +53,7 @@ The nonce $k$ must be uniformly random and never reused. Nonce reuse across two 
 
 Signature verification reverses the signing process without requiring knowledge of $k$ or $d$. Given public key $Q$, message $m$, and signature $(r, s)$:
 
-```
+```text
 1. Compute message hash: e = H(m) truncated to bit length of n
 2. Compute modular inverse: w = s^(-1) mod n
 3. Compute scalars: u1 = ew mod n, u2 = rw mod n
@@ -67,7 +67,7 @@ Implementing these operations securely requires constant-time arithmetic to prev
 
 Hash functions in blockchain systems must provide collision resistance beyond simple security guarantees—they serve as computational puzzles for proof-of-work consensus. SHA-256 processes input in 512-bit blocks through 64 rounds of mixing operations. Each round updates eight 32-bit state variables using bitwise operations (rotation, XOR, AND, addition) and a round constant derived from the cube roots of prime numbers. The final hash is the concatenation of state variables after processing all message blocks.
 
-```
+```text
 SHA-256 State Update (per round):
 S0 = (a >>> 2) ⊕ (a >>> 13) ⊕ (a >>> 22)
 Maj = (a ∧ b) ⊕ (a ∧ c) ⊕ (b ∧ c)
@@ -92,7 +92,7 @@ Bitcoin's proof-of-work requirement demands finding a block header whose double-
 
 Merkle trees provide the bridge between individual transactions and block commitments. Consider a block with four transactions $\{tx_0, tx_1, tx_2, tx_3\}$. The Merkle tree construction proceeds bottom-up:
 
-```
+```text
          root = H(H01 || H23)
         /                    \
     H01 = H(H0 || H1)    H23 = H(H2 || H3)
@@ -149,7 +149,7 @@ The collision resistance requirement for addresses is weaker than for hash funct
 
 Hierarchical Deterministic (HD) wallets, standardized in BIP32, extend basic key derivation to support key trees generated from a single seed. The construction uses HMAC-SHA512 to derive child keys:
 
-```
+```text
 (IL, IR) = HMAC-SHA512(key=chain_code, data=parent_pubkey || index)
 child_privkey = (IL + parent_privkey) mod n
 child_chain_code = IR
@@ -159,7 +159,7 @@ The chain code acts as additional entropy, ensuring that knowledge of a child pr
 
 The interaction between these cryptographic components in a full blockchain transaction demonstrates the complete protocol flow. Consider a Bitcoin transaction spending a previous output:
 
-```
+```text
 Transaction Structure:
 version: 4 bytes
 input_count: varint
@@ -229,7 +229,7 @@ Elliptic curve scalar multiplication dominates signature verification cost. A na
 
 Batch signature verification amortizes elliptic curve operations across multiple signatures. Instead of verifying each signature $(r_i, s_i)$ for message $m_i$ and public key $Q_i$ independently, batch verification combines them into a single multi-exponentiation:
 
-```
+```text
 Generate random coefficients: α_i ← [1, 2^128] for i = 1..n
 Compute combined point: P = Σ α_i(u_{1,i}·G + u_{2,i}·Q_i)
 Accept all signatures if P_x mod n = Σ α_i·r_i mod n

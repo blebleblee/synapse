@@ -28,7 +28,7 @@ Applying these principles to photographic composition means designing visual rel
 
 The rule of thirds grid partitions the rectangular frame into nine equal regions through two horizontal and two vertical lines, each positioned one-third of the distance from the frame edge. This produces four intersection points at coordinates (1/3, 1/3), (2/3, 1/3), (1/3, 2/3), and (2/3, 2/3) when measured from the bottom-left origin. These power points serve as ideal placement zones for high-value compositional elements because they balance asymmetry with stability, avoiding both the static deadness of absolute centering and the precarious instability of extreme edge placement.
 
-```
+```text
 ┌─────────────────────────────────┐
 │         │         │         │
 │    A    │    B    │    C    │

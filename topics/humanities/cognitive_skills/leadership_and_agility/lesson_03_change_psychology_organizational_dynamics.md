@@ -44,7 +44,7 @@ The transition process begins with **disruption awareness**, when environmental 
 
 The timeline for traversing this pipeline varies dramatically based on the complexity of the required change and the individual's baseline cognitive flexibility. Simple procedural changes may consolidate within weeks. Changes requiring new conceptual frameworks or value realignments may require months or years.
 
-```
+```text
 Individual Cognitive Transition Pipeline:
 
 [Stable State]

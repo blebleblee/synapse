@@ -148,20 +148,20 @@ We can model the core mechanism as an optimization problem:
 - E(t) = emotional valence
 
 **Default State (Untrained)**:
-```
+```text
 A(t) → M(t) when |E(M(t))| > threshold
 ```
 Attention automatically gravitates toward high-valence mental content (rumination on threats).
 
 **Trained State (Mindfulness)**:
-```
+```text
 A(t) → S(t) with probability p(practice)
 where p increases with practice hours
 ```
 Voluntary allocation overrides automatic capture.
 
 **Optimization Objective**:
-```
+```text
 Maximize: ∫[present-moment awareness] dt
 Subject to: attentional capacity constraint
            metabolic cost constraint
@@ -174,7 +174,7 @@ Subject to: attentional capacity constraint
 **Entropy of Mental States**:  
 In default processing, mental states have high temporal autocorrelation—rumination creates "sticky" attractor states with low entropy. Mindfulness increases entropy by preventing sustained dwelling:
 
-```
+```text
 H(mental_state) = -Σ p(state_i) log p(state_i)
 ```
 
@@ -289,7 +289,7 @@ Default mode processing shows low mutual information I(internal; external) becau
 **Correction**: "Bright awareness"—maintaining high alertness along with equanimity. Use cognitive markers: Can you recall details of the session? Are you making discriminations in sensory experience? If not, increase arousal (open eyes, stand, focus on more stimulating object).
 
 **Diagnostic Tool**: Attention stability with clarity. Chart both on separate axes:
-```
+```text
 High Stability + High Clarity = Optimal mindfulness
 High Stability + Low Clarity = Dullness/dissociation
 Low Stability + High Clarity = Agitation (workable)

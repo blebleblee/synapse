@@ -195,7 +195,7 @@ VCA faders control gain *without* summing audio through a shared bus — unlike 
 
 Run through this checklist before any client delivery, film scoring stage delivery, or mastering handoff. Each line is something that has actually caused a rejected delivery in professional practice — not theoretical caution.
 
-```
+```text
 [ ] Export Path: File -> Export -> Audio Mixdown -> Channel Selection = 'Multiple Channels'
 [ ] Stem Groups Checked: 'Dry Channels' (unprocessed sources), 'Group Busses' (sub-mixes), 'Full Master' (reference mix)
 [ ] Broadcast Wave Format (BWF): BWF metadata chunk enabled, embedding correct Project SMPTE start timecode

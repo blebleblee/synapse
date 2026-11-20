@@ -30,7 +30,7 @@ Peer group construction begins with industry classification screening using GICS
 
 The mechanical construction of Enterprise Value requires careful attention to all components of the capital structure. The formula assembles equity market capitalization (share price multiplied by fully-diluted shares outstanding including in-the-money options and warrants using treasury stock method), plus total debt (short-term borrowings, current portion of long-term debt, and long-term debt at book value), plus preferred stock at liquidation value, plus minority interest, minus cash and cash equivalents. The treatment of cash deserves particular scrutiny: the standard practice subtracts all cash, but when a company maintains substantial operating cash balances necessary to conduct daily operations—common in payment processors or retail businesses—the analyst should subtract only excess cash above operational minimums. Pension liabilities, operating lease obligations (now capitalized under ASC 842), and unfunded post-retirement benefits represent additional quasi-debt claims that warrant inclusion in a comprehensively constructed Enterprise Value.
 
-```
+```text
 Enterprise Value Calculation:
 
 Market Capitalization (Equity Value)
@@ -58,7 +58,7 @@ The denominator construction requires parallel diligence to ensure consistency a
 
 The normalization process adjusts reported financials to reflect sustainable run-rate performance. For companies with recent acquisitions, the analyst pro-formas revenue and EBITDA as if the acquisition occurred at the beginning of the measurement period, ensuring the numerator (Enterprise Value, which includes consideration paid) and denominator (EBITDA, which should include acquired earnings) maintain temporal alignment. Divestitures require the inverse adjustment: subtracting divested revenue and EBITDA from historical results and removing proceeds from Enterprise Value. Companies in transition may exhibit depressed margins due to integration costs, product launch investments, or facility relocations; the analyst must judge whether these represent temporary margin compression that should be normalized to steady-state levels or permanent efficiency deterioration that accurately reflects forward economics.
 
-```
+```text
 Normalized EBITDA Reconciliation:
 
 Reported EBITDA (LTM or Forward)

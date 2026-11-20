@@ -34,7 +34,7 @@ The Kubernetes scheduler implements a two-phase algorithm: filtering followed by
 
 **Filtering Phase Pipeline**:
 
-```
+```text
 Pod (Pending, nodeName="")
     ↓
   Cache Snapshot (Nodes, Pods, PVs, PVCs)
@@ -64,7 +64,7 @@ If the candidate set is empty after filtering, the scheduler marks the pod as `U
 
 The scoring phase assigns numerical weights to each candidate node by evaluating priority functions. Each function returns a score in [0, 100], which the scheduler normalizes and combines using configurable weights.
 
-```
+```text
 For each candidate node n:
   score(n) = Σ [weight_i × priorityFunc_i(n, pod)]
 
@@ -93,7 +93,7 @@ After computing scores, the scheduler selects the highest-scoring node and perfo
 
 Kubelet translates Kubernetes resource specifications into Linux cgroup hierarchies on each node:
 
-```
+```text
 /sys/fs/cgroup/
 ├── cpu/
 │   └── kubepods/
@@ -129,13 +129,13 @@ Memory limits map directly to `memory.limit_in_bytes`. When a container exceeds 
 
 HPA implements a proportional controller that adjusts replica counts based on observed metric values:
 
-```
+```text
 desiredReplicas = ceil(currentReplicas × (currentMetric / targetMetric))
 ```
 
 For CPU utilization-based scaling:
 
-```
+```text
 currentMetricValue = Σ(pod CPU usage) / Σ(pod CPU requests)
 desiredReplicas = ceil(currentReplicas × (currentMetricValue / targetUtilization))
 ```
@@ -148,7 +148,7 @@ Cluster Autoscaler runs as a Deployment in the cluster, watching for unschedulab
 
 **Scale-Up Logic**:
 
-```
+```text
 For each unschedulable pod p:
   For each node pool (Azure VMSS):
     Simulate: if we added a node from this pool, could p schedule?
@@ -165,7 +165,7 @@ CA batches expansion requests to reduce Azure API call overhead and improve prov
 
 **Scale-Down Logic**:
 
-```
+```text
 For each node n:
   If node utilization > threshold (default 50%): skip
   If node age < 10 minutes: skip (prevent flapping)
@@ -182,7 +182,7 @@ For each node n:
 
 CA calculates node utilization as:
 
-```
+```text
 utilization = max(
   Σ(pod CPU requests) / node.allocatable.cpu,
   Σ(pod memory requests) / node.allocatable.memory
@@ -195,7 +195,7 @@ Critically, CA uses resource requests, not actual consumption, to evaluate utili
 
 Azure AKS clusters consist of one or more node pools, each backed by a Virtual Machine Scale Set:
 
-```
+```text
 AKS Cluster
 ├── System Node Pool (tainted CriticalAddonsOnly=true:NoSchedule)
 │   └── VMSS: Standard_D4s_v5 × 3 nodes
@@ -215,7 +215,7 @@ System node pools host cluster infrastructure and should not autoscale to zero t
 
 **Taints and Tolerations Workflow**:
 
-```
+```bash
 # Node with GPU, tainted to prevent general workload placement
 Node: gpu-node-01
   Taints:
@@ -292,7 +292,7 @@ spec:
 
 When Cluster Autoscaler evaluates a node for scale-down:
 
-```
+```text
 Node: workload-node-05
 Running Pods:
   - redis-cache-1 (app=redis-cache)
@@ -320,7 +320,7 @@ If evicting pods from the node would leave fewer than two `redis-cache` replicas
 
 AKS node pools map directly to Azure Virtual Machine Scale Sets, and Cluster Autoscaler interacts with VMSS via the Azure Resource Manager API:
 
-```
+```text
 CA observes unschedulable pod → determine required VM SKU
 CA API call: PUT /subscriptions/{sub}/resourceGroups/{rg}/providers/
              Microsoft.Compute/virtualMachineScaleSets/{vmss-name}
@@ -341,7 +341,7 @@ VMSS supports multiple scaling modes: uniform (all VMs identical, common for AKS
 
 When kubelet detects node memory pressure (available memory falls below `memory.available` threshold), it triggers eviction:
 
-```
+```text
 Memory Pressure Thresholds:
   - Soft: memory.available < 1.5Gi for 90s → evict BestEffort pods
   - Hard: memory.available < 750Mi → immediate eviction cascade
@@ -358,7 +358,7 @@ Within each QoS tier, evict pods with highest:
 
 Kubelet also adjusts OOM scores for processes in each cgroup:
 
-```
+```text
 BestEffort:     oom_score_adj = 1000 (highest, killed first)
 Burstable:      oom_score_adj = min(1000, 1000 - (request/limit × 1000))
 Guaranteed:     oom_score_adj = -998 (lowest, killed last)
@@ -520,7 +520,7 @@ data:
 
 Configure CA command-line flags for aggressive scaling:
 
-```
+```text
 --scale-down-delay-after-add=1m         # Scale down 1 min after scale-up
 --scale-down-unneeded-time=2m           # Mark node unneeded after 2 min underutilization
 --scale-down-utilization-threshold=0.5  # Scale down if utilization < 50%
@@ -567,7 +567,7 @@ When PodDisruptionBudgets are too restrictive, Cluster Autoscaler cannot scale d
 
 **Example**:
 
-```
+```text
 Node Pool: 10 nodes
 Workload: Redis StatefulSet with 10 replicas (one per node)
 PDB: minAvailable: 10
@@ -629,7 +629,7 @@ Azure VM SKUs present a discrete optimization problem: selecting the optimal SKU
 
 **Example Analysis**:
 
-```
+```text
 Workload Profile:
   - API Pods: 2 CPU, 4 GiB memory (CPU-heavy)
   - Cache Pods: 0.5 CPU, 16 GiB memory (memory-heavy)
@@ -770,7 +770,7 @@ This configuration packs jobs onto the fewest nodes, allowing Cluster Autoscaler
 
 Effective capacity planning requires continuous monitoring of scheduler decisions, autoscaler actions, and resource utilization. Key metrics to track:
 
-```
+```text
 Scheduler Metrics (from kube-scheduler):
   - scheduler_pending_pods: unscheduled pod count
   - scheduler_schedule_attempts_total: total scheduling attempts

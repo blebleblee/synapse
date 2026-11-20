@@ -32,7 +32,7 @@ The 180-degree parallel twin, conversely, positions the crankpins 180 degrees ap
 
 The 270-degree parallel twin represents a contemporary compromise, positioning crankpins 90 degrees apart to generate firing intervals of 270 degrees and 450 degrees (measured across the full 720-degree four-stroke cycle). One cylinder fires, followed 270 degrees later by the second cylinder, then a 450-degree gap before the cycle repeats. This uneven firing order produces a torque pulse characteristic reminiscent of a 90-degree V-twin, with its syncopated exhaust note and muscular low-end torque delivery, while maintaining the compact packaging of the parallel-twin layout. The Yamaha MT-07, Triumph Street Twin, and numerous other modern naked and adventure motorcycles employ 270-degree parallel twins specifically for their distinctive power delivery character and perceived sportiness. From a vibration standpoint, the 270-degree crank generates both primary and secondary imbalance forces that vary sinusoidally with crankshaft angle, necessitating a balance shaft system for acceptable refinement in street applications.
 
-```
+```text
 Parallel-Twin Crankshaft Configurations:
 
 360° Twin:

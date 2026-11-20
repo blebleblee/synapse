@@ -1010,7 +1010,7 @@ echo "halt; mdw 0x08000000 64; resume; exit" | nc localhost 4444
 
 When successfully exploiting a fault injection vulnerability, record parameters for reproducibility:
 
-```
+```text
 Target: [STM32F407 / ESP32 / ...]
 Firmware: [version, hash]
 Attack: [Voltage glitch / Clock glitch / EMI]

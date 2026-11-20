@@ -74,7 +74,7 @@ The challenge emerges in determining where the top edges of the cube converge. I
 
 Two-point perspective construction introduces orthogonal complexity by requiring simultaneous convergence to two vanishing points positioned at the left and right extremes of the horizon line. The cube's base now has no edge parallel to the picture plane; instead, one set of edges converges to the left vanishing point while the perpendicular set converges to the right vanishing point. The angular relationship between these two convergence systems is determined by the cube's rotation relative to the viewer—a cube angled 45 degrees to the picture plane will have both vanishing points equidistant from the viewer's central axis, while a cube angled 30/60 degrees will have one vanishing point closer and one farther.
 
-```
+```text
 Two-Point Perspective Cube Construction
 
 VPL                                                               VPR

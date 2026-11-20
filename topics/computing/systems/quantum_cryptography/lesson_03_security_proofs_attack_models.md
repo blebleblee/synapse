@@ -380,7 +380,7 @@ int main(void) {
 
 Compile and run this with:
 
-```
+```text
 gcc -O2 -std=c11 -lm -o qkd_keyrate qkd_keyrate.c && ./qkd_keyrate
 ```
 

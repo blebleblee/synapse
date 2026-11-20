@@ -74,7 +74,7 @@ This three-equation system forms the minimal New Keynesian model. Solving it req
 
 The medium-scale DSGE models used in policy institutions elaborate this core with numerous additional features. The consumption Euler equation incorporates habit formation: $c_t - hc_{t-1}$ enters utility rather than $c_t$ alone, generating consumption smoothing dynamics that better match data. Investment responds to Tobin's Q with adjustment costs: $I_t = I_{t-1} + \frac{1}{\varphi}(Q_t - 1)K_t$, where $Q_t$ is the shadow value of installed capital and $\varphi$ parameterizes adjustment costs. Wage stickiness via Calvo wage-setting generates sluggish wage adjustment in addition to price stickiness. Capital utilization is endogenously chosen, allowing the capital stock to be used more or less intensively in response to shocks at the cost of higher depreciation. Multiple shocks—technology, preference, cost-push, monetary policy, investment-specific, government spending—drive dynamics, with shock processes estimated from data.
 
-```
+```text
 State Space Representation of NK DSGE:
 
 Predetermined States: k_{t-1}, z_t, g_t, ...

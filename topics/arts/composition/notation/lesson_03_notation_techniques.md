@@ -36,7 +36,7 @@ The clef's job is to keep the instrument's working range centered on the staff w
 Beaming exists so a performer can see the beat structure without counting flags. Get this wrong and you create a sight-reading trap.
 
 **4/4 beaming — correct vs. trap:**
-```
+```text
 Correct (shows beat 1, beat 2 clearly):
 ♫♫ ♫♫ | two beamed pairs, beat divisions visible at a glance
 
@@ -48,7 +48,7 @@ Trap (hides the beat 2 downbeat):
 **6/8 beaming rule:** always beam in groups of 3 (shows the two dotted-quarter pulses). Never beam 6/8 as two groups of... anything else. This single rule is why jigs and compound-time grooves read instantly once you've drilled it.
 
 **Rest placement rule:** a half rest starting on beat 2 of 4/4 is wrong notation even though it's rhythmically "correct" — it obscures beat 3. Always write beat-2 and beat-3 as separate rests/notes so the beat grid stays visible:
-```
+```text
 Wrong:  [half rest spanning beats 2-3]
 Right:  [quarter rest, beat 2][quarter note, beat 3]
 ```
@@ -87,7 +87,7 @@ Right:  [quarter rest, beat 2][quarter note, beat 3]
 
 Stem direction is not decorative — it lets a pianist's eye track two independent lines without re-reading note-by-note.
 
-```
+```text
 Rule: Upper voice = stems up, always, regardless of actual pitch position
       Lower voice = stems down, always
       Shared pitch, same rhythm = one notehead, stems both directions
@@ -97,7 +97,7 @@ Rule: Upper voice = stems up, always, regardless of actual pitch position
 
 ### Orchestral score order — read it top to bottom, every time
 
-```
+```text
 Woodwinds (Fl, Ob, Cl, Bsn)
 Brass (Hn, Tpt, Trb, Tba)
 Percussion
@@ -165,7 +165,7 @@ A quintuplet where each note subdivides into a triplet = 15 notes in the space o
 
 ### Polymeter drill: 3/4 against 4/4 (LCM = 12 quarter notes)
 
-```
+```text
 Voice 1 (3/4): | 1 2 3 | 1 2 3 | 1 2 3 | 1 2 3 |
 Voice 2 (4/4): | 1 2 3 4 | 1 2 3 4 | 1 2 3 4 |
 Realignment point: beat 1 of measure 4 (voice 1) = beat 1 of measure 3 (voice 2)
@@ -236,7 +236,7 @@ Graphic notation legends must define, with zero ambiguity, the physical action f
 **Procedure:**
 
 1. **Compose the subject (4 measures, C major base):**
-```
+```text
 Measure 1: C4 (q) – D4+50¢ (q) – E4 (q) – F4-50¢ (q)
 Measure 2: G4 (q) – A4+50¢ (q) – B4 (q) – C5 (q)
 Measure 3: C5-50¢ (q) – B4 (q) – A4 (q) – G4+50¢ (q)
@@ -272,7 +272,7 @@ Simple rhythm on purpose — quarters and halves only, so intonation is the enti
 **Procedure:**
 
 1. **Left hand — 5/8 ostinato, 8 measures, continuous:**
-```
+```text
 Beat:   1   2   3   4   5  (eighth notes)
 Note:   C2  G2  C3  G2  E2
 ```
@@ -321,7 +321,7 @@ Lock this into muscle memory alone first — metronome at ♪=120, repeat until 
 2. **Layout:** proportional timeline, 1 inch = 2 seconds, timeline marked at every 2-second interval across the page. Vertical position on the page = relative pitch height (higher on page = higher pitch, no exact pitch implied).
 
 3. **Build a 10-second excerpt** following the timeline:
-```
+```text
 0-2s:  rising diagonal, bottom-left to mid-right
 2-4s:  solid black rectangle, mid-range
 4-6s:  wavy horizontal line, top of page

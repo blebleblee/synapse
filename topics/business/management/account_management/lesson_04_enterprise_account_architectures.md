@@ -52,7 +52,7 @@ The orchestration challenge is synchronizing these specialized roles without fra
 
 The account plan's structural components include customer intelligence (organizational chart, stakeholder profiles, strategic initiatives, competitive landscape), commercial objectives (expansion opportunities, contract renewal timeline, revenue forecast), engagement history (meeting notes, deliverables, commitments tracking), and action plan (sequenced activities with ownership and deadlines). The discipline of maintaining an updated account plan transforms the account manager from a relationship coordinator into an orchestration layer that ensures every team member operates from a shared understanding of customer context and strategic priorities.
 
-```
+```text
 Account Plan Structure
 
 Customer Intelligence
@@ -85,7 +85,7 @@ The second scaled process is the health scoring algorithm, a quantitative model 
 
 A representative health score formula assigns weights across engagement, adoption, and commercial dimensions. Engagement score aggregates executive touchpoints, QBR completion, and response time to outreach. Adoption score tracks daily active users as a percentage of licensed seats, feature utilization depth, and integration completeness. Commercial score factors payment history, expansion pipeline value, and renewal risk assessment. The composite health score = (0.3 × Engagement) + (0.4 × Adoption) + (0.3 × Commercial), scaled to a zero-to-one-hundred range where seventy represents stable health, scores below fifty trigger intervention protocols, and scores above eighty-five indicate expansion readiness.
 
-```
+```text
 Account Health Score Model
 
 Engagement Score (0-100)

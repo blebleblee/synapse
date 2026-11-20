@@ -223,7 +223,7 @@ where $s_{-i}^* = (s_1^*, \ldots, s_{i-1}^*, s_{i+1}^*, \ldots, s_n^*)$ denotes 
 
 Consider the prisoner's dilemma in matrix form. Payoffs $(u_1, u_2)$ are:
 
-```
+```text
                Player 2
                C       D
 Player 1   C  (-1,-1) (-5, 0)

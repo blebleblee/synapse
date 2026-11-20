@@ -258,7 +258,7 @@ The dual-write phase ends when you have verified — through shadow traffic comp
 
 A complete migration sequence looks like this:
 
-```
+```text
 Phase 1 — Identify and Isolate:
   - Run EventStorming on the target subdomain.
   - Define the new service's schema and API contract.

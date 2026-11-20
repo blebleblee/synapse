@@ -115,7 +115,7 @@ This consolidated message transmits over WiFi, cellular LTE-M, or LoRaWAN depend
 
 The following diagram illustrates the complete data flow:
 
-```
+```text
 Sensor → AFE Filter → ADC → FIR Decimator → Feature Extract → TinyML
           (analog)    (10kHz)  (1kHz)         (100 Hz)         (10 Hz)
                                                     ↓

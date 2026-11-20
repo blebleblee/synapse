@@ -32,7 +32,7 @@ The practical implications of shutter speed relate to motion. A slow shutter spe
 
 The three variables are linked through the exposure equation. If the scene brightness is constant, any one-stop increase in one variable must be compensated by a one-stop decrease in another to maintain the same overall exposure. This creates a matrix of possible exposures, each with different characteristics:
 
-```
+```text
 Scene requiring: f/8 at 1/60 at ISO 100
 
 To freeze fast motion (1/1000):

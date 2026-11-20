@@ -26,7 +26,7 @@ Delay creates perceived space and rhythm without the frequency-smearing of rever
 
 Never dial in "500ms" blind. Sync to tempo using note-division math:
 
-```
+```text
 delay_ms = 60000 / BPM × note_division_multiplier
 
 Quarter note   = 60000 / BPM

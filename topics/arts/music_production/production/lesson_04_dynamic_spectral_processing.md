@@ -30,7 +30,7 @@ Phase relationships between bands in multiband processing and between processed 
 
 The signal flow architecture of a multiband compressor begins with an analysis/synthesis filter bank that decomposes the incoming audio into discrete frequency bands. Two primary topologies exist: crossover networks using Linkwitz-Riley or Butterworth filters, and FFT-based spectral decomposition. Crossover networks operate in the time domain, splitting the signal at specified cutoff frequencies using cascaded high-pass and low-pass filters. A fourth-order Linkwitz-Riley crossover ensures the magnitude response remains flat when bands recombine—the 24 dB/octave slopes of the high-pass and low-pass filters align such that the amplitude at the crossover point sums to 0 dB rather than +3 dB or -3 dB. This requires precise phase alignment between filter outputs.
 
-```
+```text
 Input Signal (full bandwidth)
     │
     ├─────────────────────────────────────────┐

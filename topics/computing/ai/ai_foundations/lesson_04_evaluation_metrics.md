@@ -10,7 +10,7 @@ A supervised model learns a function `f: X → Y`. The ground truth is a joint d
 
 The fundamental decomposition of prediction error is:
 
-```
+```text
 E[(y - f̂(x))²] = Bias²[f̂(x)] + Var[f̂(x)] + σ²
 ```
 
@@ -79,7 +79,7 @@ graph LR
 
 **Accuracy** measures the fraction of correct predictions:
 
-```
+```text
 Accuracy = (TP + TN) / (TP + TN + FP + FN)
 ```
 
@@ -89,19 +89,19 @@ Accuracy is **misleading on imbalanced datasets**. For a fraud detection dataset
 
 **Precision** (Positive Predictive Value) measures what fraction of *predicted* positives are real:
 
-```
+```text
 Precision = TP / (TP + FP)
 ```
 
 **Recall** (Sensitivity, True Positive Rate) measures what fraction of *actual* positives were found:
 
-```
+```text
 Recall = TP / (TP + FN)
 ```
 
 **F1-Score** is the harmonic mean of precision and recall:
 
-```
+```text
 F1 = 2 · (Precision · Recall) / (Precision + Recall)
    = 2·TP / (2·TP + FP + FN)
 ```
@@ -110,7 +110,7 @@ The harmonic mean is used rather than the arithmetic mean because it penalizes e
 
 The generalized **Fβ-score** weights recall β times more than precision:
 
-```
+```text
 Fβ = (1 + β²) · (Precision · Recall) / (β² · Precision + Recall)
 ```
 
@@ -118,7 +118,7 @@ Use β > 1 when missing true positives is more costly (medical screening). Use �
 
 **Matthews Correlation Coefficient (MCC)** is the most informative single-number metric for binary classification on imbalanced data, as it uses all four cells of the confusion matrix symmetrically:
 
-```
+```text
 MCC = (TP·TN - FP·FN) / sqrt((TP+FP)(TP+FN)(TN+FP)(TN+FN))
 ```
 
@@ -130,7 +130,7 @@ Most classifiers output a score or probability, not a hard label. The classifica
 
 **ROC Curve** plots True Positive Rate (Recall) vs. False Positive Rate at each threshold:
 
-```
+```text
 FPR = FP / (FP + TN)   [x-axis]
 TPR = TP / (TP + FN)   [y-axis]
 ```
@@ -164,31 +164,31 @@ graph TD
 For continuous output `ŷ ∈ ℝ`:
 
 **Mean Squared Error (MSE)** and **Root MSE (RMSE)**:
-```
+```text
 MSE  = (1/n) Σᵢ (yᵢ - ŷᵢ)²
 RMSE = √MSE
 ```
 RMSE is in the same units as the target variable. It penalizes large errors quadratically — a prediction off by 10 contributes 100x more than one off by 1.
 
 **Mean Absolute Error (MAE)**:
-```
+```text
 MAE = (1/n) Σᵢ |yᵢ - ŷᵢ|
 ```
 MAE is more robust to outliers. If your target contains extreme values you don't want to influence the metric, prefer MAE.
 
 **R² (Coefficient of Determination)**:
-```
+```text
 R² = 1 - SS_res/SS_tot
    = 1 - Σ(yᵢ - ŷᵢ)² / Σ(yᵢ - ȳ)²
 ```
 R² measures the proportion of variance in `y` explained by the model. R² = 1 is a perfect fit; R² = 0 means the model is no better than predicting the mean; **R² can be negative** when the model is worse than predicting the mean (e.g., a model trained on different data than it's tested on).
 
 **Mean Absolute Percentage Error (MAPE)**:
-```
+```text
 MAPE = (100%/n) Σᵢ |yᵢ - ŷᵢ| / |yᵢ|
 ```
 Undefined when `yᵢ = 0`. Asymmetric: over-predictions and under-predictions are penalized differently. Use Symmetric MAPE (sMAPE) to correct the asymmetry:
-```
+```text
 sMAPE = (200%/n) Σᵢ |yᵢ - ŷᵢ| / (|yᵢ| + |ŷᵢ|)
 ```
 
@@ -729,7 +729,7 @@ graph TD
 
 **Metric-Objective Mismatch**: Optimizing cross-entropy during training but reporting accuracy at evaluation can mask systematic miscalibration. A model can achieve high accuracy with severely miscalibrated probabilities. Use **Expected Calibration Error (ECE)** alongside accuracy when probability estimates matter:
 
-```
+```text
 ECE = Σ_b (|B_b| / n) · |acc(B_b) - conf(B_b)|
 ```
 

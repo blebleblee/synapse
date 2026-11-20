@@ -260,7 +260,7 @@ perf stat -e cycles,instructions,cache-references,cache-misses,L1-dcache-loads,L
 
 Let the application run for 10-15 seconds to accumulate sufficient samples, interacting with the widgets periodically to exercise different code paths. Terminate the application (Ctrl+C) and examine the output:
 
-```
+```text
 Performance counter stats for './target/release/ui_verification_lab':
 
     15,234,782,091      cycles                    #    3.128 GHz
@@ -293,7 +293,7 @@ perf report --stdio
 
 The `--stdio` flag produces a textual report suitable for scripting; omit it for an ncurses-based interactive viewer. The report lists functions in descending order of cache miss attribution:
 
-```
+```bash
 # Samples: 234K of event 'cache-misses'
 # Event count (approx.): 89234123
 #
@@ -340,13 +340,13 @@ perf stat -e cycles,instructions,mem_load_retired.l3_miss,mem_inst_retired.all_l
 
 Run the application for 15 seconds and examine the results. The `mem_load_retired.l3_miss` event counts memory loads that missed all cache levels and retrieved data from DRAM. Divide this count by the run duration to compute DRAM accesses per second, then multiply by the cache line size (64 bytes) to estimate memory bandwidth:
 
-```
+```text
 DRAM bandwidth = (L3_misses / duration_seconds) * 64 bytes
 ```
 
 For example, if you observe 5,000,000 L3 misses over 10 seconds:
 
-```
+```text
 DRAM bandwidth = (5,000,000 / 10) * 64 = 32,000,000 bytes/sec = 32 MB/s
 ```
 
@@ -677,7 +677,7 @@ Once the build completes, execute the instrumented binary:
 
 Interact with the application for 5-10 seconds to allow the race condition to manifest. When TSan detects the race, it will print a detailed report to stderr:
 
-```
+```text
 ==================
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7f8a4c0012a0 by thread T1:
@@ -763,7 +763,7 @@ Execute the instrumented binary:
 
 Let the application run briefly, then exit cleanly (close the window). AddressSanitizer performs leak detection at program termination and prints a report:
 
-```
+```text
 =================================================================
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 
@@ -799,7 +799,7 @@ The `--leak-check=full` flag enables comprehensive leak analysis, `--show-leak-k
 
 Open `valgrind_output.txt` and search for the leak summary:
 
-```
+```text
 ==12345== HEAP SUMMARY:
 ==12345==     in use at exit: 11,264 bytes in 11 blocks
 ==12345==   total heap usage: 45,678 allocs, 45,667 frees, 8,234,567 bytes allocated
@@ -1013,7 +1013,7 @@ rust-gdb ./target/release/binary_name
 ```
 
 Common LLDB commands for UI debugging:
-```
+```text
 (lldb) breakpoint set --name main
 (lldb) run
 (lldb) frame variable          # inspect locals

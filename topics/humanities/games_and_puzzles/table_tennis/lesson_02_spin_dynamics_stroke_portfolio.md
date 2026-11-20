@@ -28,7 +28,7 @@ This friction force has two effects: it decelerates the ball's forward motion (r
 
 The outgoing spin S_out depends on the integral of this torque over the contact duration (typically 3–5 milliseconds). The relationship is governed by:
 
-```
+```text
 S_out = S_in + (τ / I) × Δt
 ```
 

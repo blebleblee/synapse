@@ -35,7 +35,7 @@ The specific choice of 5 and 6 is deliberate: it avoids the pathological case of
 
 The architecture of this proof is worth making fully explicit because every future diagonalization inherits the same skeleton. The structure can be rendered precisely:
 
-```
+```text
 Assumed enumeration (rows = elements, columns = digits/attributes):
 
          col 1     col 2     col 3     col 4   ...

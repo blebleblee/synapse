@@ -18,7 +18,7 @@ The concept of scale itself bifurcates into absolute scale (the physical size of
 
 The load-bearing skeleton of any substantial Lego architectural model begins with foundation design that addresses both gravitational loads and lateral stability. A simple baseplate provides adequate support for lightweight structures but deflects visibly under concentrated loads exceeding five hundred grams per square decimeter. Advanced foundation systems employ double-thickness baseplate layers with perpendicular orientation, creating a rigid grid that resists both bending and torsional deformation. The junction between foundation and vertical elements requires careful attention to connection density: a sixteen-stud-wide wall section should engage no fewer than twelve studs along its base to prevent tipping under lateral loads from accidental impacts or seismic disturbance during transport.
 
-```
+```text
 Foundation Cross-Section (Side View, 1 unit = 1 plate height):
 
 Ground Level ═══════════════════════════════════

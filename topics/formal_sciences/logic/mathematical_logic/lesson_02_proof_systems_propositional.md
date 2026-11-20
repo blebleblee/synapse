@@ -100,7 +100,7 @@ We work using ${\to}\mathsf{I}$, ${\to}\mathsf{E}$, and $\mathsf{RAA}$. By ${\to
 
 The Fitch-style column form of this derivation makes the discharge structure visually transparent:
 
-```
+```text
 1  | (φ→ψ)→φ          [assumption H1, opens subproof for →I]
 2  | | ¬φ             [assumption H2, opens subproof for RAA]
 3  | | | φ            [assumption H3, opens subproof for →I]

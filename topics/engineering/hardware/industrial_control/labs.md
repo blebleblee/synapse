@@ -52,7 +52,7 @@ The integral time constant is $T_i = K_p / K_i = 1.28 / 38.1 \approx 33.6 \, \te
 
 Implement this discrete-time PID controller in an Allen-Bradley CompactLogix L16ER PLC using Structured Text programming language in Studio 5000 Logix Designer. Create a new Add-On Instruction named `PID_Position` with the following input/output tag structure: `Setpoint` (REAL, position command in radians), `ProcessValue` (REAL, measured position from encoder), `Output` (REAL, control voltage command in volts), `Kp` (REAL, proportional gain), `Ki` (REAL, integral gain), `Kd` (REAL, derivative gain), `ScanTime` (REAL, controller execution period in seconds), `IntegratorState` (REAL, internal integral accumulator), and `PrevError` (REAL, previous error for derivative calculation). The Structured Text logic implements a velocity-form PID algorithm with anti-windup clamping:
 
-```
+```text
 // Compute position error
 Error := Setpoint - ProcessValue;
 
@@ -211,7 +211,7 @@ fprintf('Gain scheduling polynomial: Kp = %.4f*B^2 + %.4f*B + %.4f\n', ...
 
 The resulting polynomial $K_p(B) = 0.0012 B^2 + 0.85 B + 0.65$ provides a real-time gain adaptation law implementable in PLC Structured Text. Add the following logic to the `PID_Position` Add-On Instruction:
 
-```
+```text
 // Estimate damping coefficient from steady-state velocity error
 // During constant velocity commands, B ≈ Kt * I_ss / omega_ss
 IF CommandVelocity > 0.1 THEN  // Avoid division by zero at standstill
@@ -266,7 +266,7 @@ Production industrial control systems operate under failure modes that laborator
 
 Begin with sensor fault injection testing using a hardware-in-the-loop configuration that physically interrupts the encoder signal path. Wire a double-pole-double-throw (DPDT) relay in series with the encoder's differential A/B quadrature outputs, controlled by a spare PLC digital output. When the relay de-energizes, the encoder signals float to mid-rail voltage levels (typically 2.5V on a 5V supply) which the PLC's differential line receiver interprets as invalid states oscillating between logic high and low at MHz rates. Implement the fault injection sequence in a new PLC subroutine:
 
-```
+```text
 // Sensor fault injection test routine
 // Inject open-circuit fault for 500ms during steady-state tracking
 
@@ -291,7 +291,7 @@ Observe the controller behavior during the 500ms fault window on the oscilloscop
 
 Implement sensor validation logic using a rate-limit plausibility check that flags encoder readings changing faster than the motor's maximum physical acceleration capability. Add this diagnostic block at the start of the PID controller execution:
 
-```
+```text
 // Sensor validation via rate-limit plausibility check
 EncoderVelocity := (ProcessValue - PrevProcessValue) / ScanTime;
 MaxPhysicalVelocity := 100.0;  // Maximum motor speed [rad/s]
@@ -327,7 +327,7 @@ Rerun the sensor fault injection test with validation logic enabled. The oscillo
 
 Proceed to actuator saturation stress testing by commanding a series of aggressive position moves that deliberately exceed the motor's torque capability. Configure a trapezoidal motion profile with 200 rad/s² acceleration, 50 rad/s maximum velocity, and 5-radian move distance—parameters requiring peak torque approximately 3× the motor's continuous rating. Implement the profile generator in Structured Text:
 
-```
+```text
 // Trapezoidal motion profile generator
 IF ProfileActive THEN
     TimeInProfile := SystemTimer - ProfileStartTime;
@@ -365,7 +365,7 @@ Execute the profile and monitor the control output on the oscilloscope. The volt
 
 Implement anti-windup logic using the "back-calculation" method, which prevents integrator accumulation whenever the actuator saturates. Modify the PID controller as follows:
 
-```
+```text
 // Anti-windup via back-calculation method
 Output_Ideal := P_Term + I_Term + D_Term;
 
@@ -390,7 +390,7 @@ The back-calculation gain $K_b = 1/K_i$ ensures that the integrator unwinds at e
 
 Test fieldbus communication robustness by injecting Modbus RTU frame errors using a bus traffic generator connected to the RS-485 network. Configure the generator to transmit corrupted frames (invalid CRC checksums) at a rate of 5% during normal operation, simulating electrical noise from variable frequency drives or arc welders. Monitor the PLC's Modbus diagnostic counters via the controller status tags:
 
-```
+```text
 // Modbus communication health monitoring
 CommTimeout := ModbusNode[1].Timeout_Count;
 CommCRC_Error := ModbusNode[1].CRC_Error_Count;
@@ -417,7 +417,7 @@ This adaptive logic gracefully degrades controller aggressiveness when communica
 
 Perform power supply brownout testing by injecting a 200ms voltage sag to 18VDC (from nominal 24VDC) using a programmable DC power supply in series with the PLC power input. Monitor the PLC's internal supply voltage via the diagnostic status word and implement brownout detection:
 
-```
+```text
 // Power supply monitoring and brownout recovery
 SupplyVoltage := ControllerDiagnostic.SupplyVoltage_mV / 1000.0;  // Convert to volts
 
@@ -572,7 +572,7 @@ Industrial control systems require periodic re-verification to detect degraded p
 
 **Stability Margin Measurement (15 minutes per loop):**
 1. Inject a pseudo-random binary signal (PRBS) excitation on the setpoint input using the PLC's random number generator seeded with a known value for repeatability:
-   ```
+   ```text
    IF SystemTimer MOD 0.1 < 0.05 THEN
        Setpoint := Setpoint_Nominal + 0.05 * (RAND(42) - 0.5);
    END_IF;

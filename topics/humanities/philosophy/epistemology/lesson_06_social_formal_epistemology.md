@@ -48,7 +48,7 @@ The third axis is identity-based credibility. This is the dimension most directl
 
 The architecture of epistemic authority can be visualized as a lattice structure in which these three axes intersect:
 
-```
+```text
 EPISTEMIC AUTHORITY STRUCTURE
 
                     Institutional Position

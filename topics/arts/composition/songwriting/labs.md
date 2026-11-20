@@ -48,13 +48,13 @@ graph LR
 
 **Progression (C major), two beats per chord, repeated for all 8 bars of the verse:**
 
-```
+```text
 | Cmaj7  Am7   | Fmaj7  G7   |  (x2, then repeat whole thing once more = 8 bars)
   I       vi      IV      V
 ```
 
 **Guitar voicings (open position, capo-friendly):**
-```
+```text
 Cmaj7:  x32000   (C-E-G-B)
 Am7:    x02010   (A-C-E-G)
 Fmaj7:  xx3210   (or use Dm7 shape barred, or just play Fmaj as x33210)
@@ -62,7 +62,7 @@ G7:     320001
 ```
 
 **Piano voicings (right hand, rootless — left hand plays the root an octave below):**
-```
+```text
 Cmaj7:  E4-G4-B4-C5   (fingers 1-2-3-5 if spread, or 1-2-4-5)
 Am7:    A3-C4-E4-G4
 Fmaj7:  F3-A3-C4-E4
@@ -76,7 +76,7 @@ G7:     G3-B3-D4-F4
 The craft rule that matters more than any scale: **put chord tones on strong beats (1 and 3), and connect them with stepwise motion.** This is why melodies sound "right" even when you can't explain why — the ear hears the chord tone land exactly where the harmony needs it, and the passing notes in between feel like motion, not accident.
 
 **Melody over Cmaj7 → Am7 (bars 1–2), sung or played on a lead instrument:**
-```
+```text
 Beat:    1    2    3    4   |  1    2    3    4
 Note:    E5   D5   C5   B4  |  C5   D5   E5   C5
           (E,C = Cmaj7 tones)   (C = Am7 tone)
@@ -85,7 +85,7 @@ Note:    E5   D5   C5   B4  |  C5   D5   E5   C5
 **Drill:** Sing this phrase with a metronome at 70 BPM. Nail the pitch and rhythm cold before moving to 90, then 110 BPM. If your voice cracks reaching for E5, drop the whole phrase down an octave — melody *shape* matters more than absolute register at the writing stage. You can always transpose later to fit a singer's range (see Part 2).
 
 **Over Fmaj7 → G7 (bars 3–4):**
-```
+```text
 Beat:    1    2    3    4   |  1    2    3    4
 Note:    A4   G4   F4   E4  |  D4   E4   F4   G4
 ```
@@ -99,7 +99,7 @@ Notice the melody here descends in bar 3 then rises into bar 4, ending on G — 
 A chorus needs to feel like "more" than the verse along at least two of these three axes: **range** (go higher), **rhythm** (move faster — add eighth notes), **harmonic motion** (land on I more often, more directly).
 
 **Progression — simpler and more repetitive than the verse, on purpose:**
-```
+```text
 | Cmaj7 . . . | G7  . Cmaj7 . |  (x2 = 8 bars)
     I            V      I
 ```
@@ -107,7 +107,7 @@ A chorus needs to feel like "more" than the verse along at least two of these th
 Repetition in the chorus progression is a feature. A listener should be able to predict the chorus harmony by the second time they hear it — predictability at this structural level is what lets the *melody and lyric* carry the surprise and interest instead.
 
 **Melody — eighth notes, wider range, arching up then settling:**
-```
+```text
 Bar 1 (Cmaj7):
 Beat:  1   &   2   &   3   &   4   &
 Note: G4  A4  B4  C5  D5  E5  G5  E5
@@ -130,7 +130,7 @@ Repeat the verse music exactly. Change only the lyric. This is deliberate — th
 The bridge's entire job is contrast. If verse and chorus are both in the "home" key area, send the bridge somewhere else emotionally — a new chord outside the main progression, a melodic shape that moves opposite to the chorus (descending instead of arching), or a shift from "about a situation" to "about a feeling" lyrically.
 
 **Progression (4 bars, borrowing the relative minor as the bridge's temporary home):**
-```
+```text
 | Am7  | Dm7  | Fmaj7 | G7  |
   vi     ii      IV     V
 ```
@@ -138,7 +138,7 @@ The bridge's entire job is contrast. If verse and chorus are both in the "home" 
 Starting the bridge on **vi (Am7)** instead of **I (Cmaj7)** is the single cheapest, most reliable way to create harmonic contrast without leaving the key — same seven notes, completely different center of gravity.
 
 **Melody — descending sequence (opposite contour to the chorus's arch):**
-```
+```text
 Bar 1 (Am7):  A4  G4  F4  E4
 Bar 2 (Dm7):  F4  E4  D4  C4
 Bar 3 (Fmaj7): C4  D4  E4  F4   (turn the corner, start climbing)
@@ -226,7 +226,7 @@ Modulating up a whole step or half step for a final chorus is a genuinely effect
 
 **How to execute it cleanly:** Insert a short pivot — often just the last chord of the bridge reinterpreted as the V of the new key — then land the final chorus a whole step higher.
 
-```
+```text
 Original key: C major, final bridge ends on G7 (V of C)
 Pivot: reinterpret / reharmonize that G7 briefly as a secondary dominant leading to D
 New key: D major, final chorus
@@ -364,7 +364,7 @@ This single exercise — borrow a chord, find the clash, decide whether to fix i
 
 ### Guitar Voicing Library (Open Position)
 
-```
+```text
 C:    x32010      Cmaj7: x32000      C7: x32310
 D:    xx0232      Dmaj7: xx0222      D7: xx0212
 Em:   022000      Em7:   022030      E7: 020100
@@ -375,7 +375,7 @@ Am:   x02210      Am7:   x02010
 
 ### Piano Voicing Library (Rootless Jazz Voicings, "A form" and "B form")
 
-```
+```text
 Cmaj7 (A form): E4-G4-B4-C5
 Cmaj7 (B form): B3-C4-E4-G4
 Dm7   (A form): F4-A4-C5-D5

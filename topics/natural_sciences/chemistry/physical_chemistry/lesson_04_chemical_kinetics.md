@@ -69,7 +69,7 @@ The experimental architecture for chemical kinetics centers on time-resolved con
 
 UV-Vis absorption spectroscopy exploits Beer-Lambert attenuation $A = \varepsilon bc$ to transduce concentration $c$ (mol L$^{-1}$) into measurable absorbance $A$ at wavelength $\lambda$, where $\varepsilon$ denotes molar absorptivity (L mol$^{-1}$ cm$^{-1}$) and $b$ represents path length. For kinetic monitoring:
 
-```
+```text
 Light Source (Deuterium/Tungsten) → Monochromator (λ selection) 
   → Sample Cuvette (thermostated) → Photodetector (PMT/Photodiode) 
   → ADC → Data Acquisition (timestamped A(t) series)

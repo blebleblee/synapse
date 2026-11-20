@@ -38,7 +38,7 @@ $$\text{Glucose} + 2\text{NAD}^+ + 2\text{ADP} + 2\text{P}_i \rightarrow 2\text{
 
 Under aerobic conditions, pyruvate enters mitochondria for complete oxidation. Under anaerobic conditions or in cells lacking mitochondria, pyruvate undergoes fermentation to regenerate NAD⁺ and maintain glycolytic flux.
 
-```
+```text
 GLYCOLYSIS PATHWAY MAP
 
 Glucose
@@ -414,7 +414,7 @@ This corresponds to a requirement of two NADPH and three ATP per CO₂ fixed. Th
 
 The G3P produced exits the chloroplast via the triose phosphate/phosphate translocator, which exchanges cytoplasmic phosphate for stromal triose phosphate, maintaining stromal phosphate levels required for continued ATP synthesis. In the cytoplasm, two G3P molecules condense to form fructose-6-phosphate, which can be converted to glucose-6-phosphate and then to glucose-1-phosphate for starch synthesis, or isomerized to glucose-6-phosphate for entry into glycolysis or the oxidative pentose phosphate pathway. Plants synthesize starch in chloroplasts during the day when photosynthesis exceeds immediate metabolic demands, then mobilize this starch at night to support respiration and biosynthesis.
 
-```
+```text
 CALVIN CYCLE (SIMPLIFIED OVERVIEW)
 
 CO₂ Fixation:

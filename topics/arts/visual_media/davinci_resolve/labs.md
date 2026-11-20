@@ -10,7 +10,7 @@ Before beginning these labs, establish your studio environment with the followin
 
 Install DaVinci Resolve Studio (paid version required for Fairlight professional features; the free version lacks critical tools for this workflow). Create a dedicated project folder with the following structure:
 
-```
+```text
 Project_Name/
 ├── Video/
 │   └── source_footage.mov (ProRes 422 HQ or DNxHR HQX, minimum)
@@ -102,7 +102,7 @@ As your orchestral underscore develops, create a detailed dynamic range and orch
 
 Document these specifications in a plain-text file within your project folder:
 
-```
+```text
 ORCHESTRAL_BALANCE_CHART.txt
 
 Section 1 (0:00–0:15) — Opening Theme / Establishing

@@ -613,7 +613,7 @@ This cache implementation intentionally violates thread safety by exposing a raw
 
 Detect the data race using ThreadSanitizer. Build the test binary with TSan instrumentation: `RUSTFLAGS="-Z sanitizer=thread" cargo +nightly test --target x86_64-unknown-linux-gnu test_concurrent_access`. ThreadSanitizer instruments all memory accesses and synchronization operations at runtime, maintaining shadow state to track happens-before relationships. When the test executes, TSan detects the race and emits a report:
 
-```
+```text
 WARNING: ThreadSanitizer: data race (pid=12345)
   Write of size 8 at 0x7b0400000000 by thread T2:
     #0 hashbrown::raw::RawTable::insert
@@ -728,7 +728,7 @@ fn compile_pattern_leaky(pattern: &str) -> NFA {
 
 Detect the leak using AddressSanitizer's leak detection. Build with LeakSanitizer enabled: `RUSTFLAGS="-Z sanitizer=address" cargo +nightly test --target x86_64-unknown-linux-gnu -- --test-threads=1`. ASan tracks all heap allocations and reports unreachable memory at process exit. When the test terminates, LSan emits a report:
 
-```
+```text
 ==12345==ERROR: LeakSanitizer: detected memory leaks
 
 Direct leak of 96 byte(s) in 1 object(s) allocated from:
@@ -742,7 +742,7 @@ The report confirms that the Box::leak call prevents the NFA from being dealloca
 
 Use Valgrind's Memcheck for comprehensive leak detection including reachable-but-not-freed memory. Run `valgrind --leak-check=full --show-leak-kinds=all ./target/debug/deps/regex_lab-* test_concurrent_access`. Memcheck categorizes leaks as definitely lost (no pointers remaining), indirectly lost (pointed to by other leaked memory), possibly lost (interior pointers exist), or still reachable (pointers remain but not freed). The output distinguishes intentional leaks like static allocations from genuine bugs:
 
-```
+```text
 ==12345== HEAP SUMMARY:
 ==12345==     in use at exit: 96 bytes in 1 blocks
 ==12345==   total heap usage: 1,543 allocs, 1,542 frees, 125,432 bytes allocated
