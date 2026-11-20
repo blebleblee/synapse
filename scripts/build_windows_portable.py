@@ -49,14 +49,7 @@ def main():
         desc="Compiling Electron Windows Portable and Installer Executables"
     )
 
-    import json
-    pkg_ver = "1.1.1"
-    pkg_file = desktop_dir / "package.json"
-    if pkg_file.exists():
-        try:
-            pkg_ver = json.loads(pkg_file.read_text(encoding="utf-8")).get("version", "1.1.1")
-        except Exception:
-            pass
+    from learning_engine.version import __version__ as pkg_ver
 
     portable_exe = desktop_dist / f"Synapse-Workbench-Portable-{pkg_ver}.exe"
     if not portable_exe.exists():

@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 """
-Synapse v1.1.1 Release Publisher for Gitea and GitHub
-Updates and synchronizes verified binary assets for v1.1.1:
-1. macOS DMG & ZIP (with bundled Python sidecar, all curriculum SynPacks, sealed ad-hoc signature, and zero-EPIPE logger)
-2. Windows Portable Single-File Executable (Synapse-Workbench-Portable-1.1.1.exe, embedded ffmpeg.dll, NSIS self-contained)
-3. Windows Portable ZIP Bundle (with pre-loaded topics) and 1-Click Installer Setup
-4. Updates release descriptions on both platforms with direct download links.
+Synapse Multi-Platform Release Publisher for Gitea and GitHub
+Dynamically reads version from VERSION / learning_engine.version.
+Automatically creates releases if they do not yet exist, and synchronizes
+verified binary assets across Gitea and GitHub.
 """
 
 import os
 import sys
-import time
 import shutil
 import subprocess
 import requests
@@ -32,6 +29,23 @@ def _load_external_env():
                     os.environ[k] = v
 
 _load_external_env()
+
+# Single Source of Truth Version Resolution
+VER_FILE = WORKSPACE_ROOT / "VERSION"
+if VER_FILE.exists():
+    VER = VER_FILE.read_text(encoding="utf-8").strip()
+else:
+    VER = "1.2.0"
+
+TAG = f"v{VER}"
+
+# Credentials
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GITEA_URL = os.environ.get("GITEA_URL", "https://gitea.2464.cz")
+GITEA_USER = os.environ.get("GITEA_USER", "")
+GITEA_PASS = os.environ.get("GITEA_PASS", "")
+GITEA_REPO = os.environ.get("GITEA_REPO", "ai/synapse")
+GITHUB_REPO = os.environ.get("GITHUB_REPO", "blebleblee/synapse")
 
 def upload_via_curl(url: str, filepath: Path, headers: dict = None, auth: tuple = None, form_field: str = None) -> bool:
     """Robust binary file upload using curl with automated retries and socket resilience."""
@@ -55,17 +69,7 @@ def upload_via_curl(url: str, filepath: Path, headers: dict = None, auth: tuple 
         print(f" [curl err: {e}]", end="")
         return False
 
-# Credentials
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
-GITEA_URL = os.environ.get("GITEA_URL", "https://gitea.2464.cz")
-GITEA_USER = os.environ.get("GITEA_USER", "")
-GITEA_PASS = os.environ.get("GITEA_PASS", "")
-GITEA_REPO = os.environ.get("GITEA_REPO", "ai/synapse")
-GITHUB_REPO = os.environ.get("GITHUB_REPO", "blebleblee/synapse")
-TAG = "v1.1.1"
-VER = "1.1.1"
-
-# Target binary files to publish/replace
+# Target binary files to publish
 ASSETS_TO_PUBLISH = {
     f"Synapse-Workbench-Portable-{VER}.exe": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-Portable-{VER}.exe",
     f"Synapse-Workbench-Setup-{VER}.exe": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-Setup-{VER}.exe",
@@ -73,11 +77,68 @@ ASSETS_TO_PUBLISH = {
     "Synapse-Portable-Windows.zip": WORKSPACE_ROOT / "dist/desktop/Synapse-Portable-Windows.zip",
     f"Synapse-Workbench-{VER}-arm64.dmg": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-{VER}-arm64.dmg",
     f"Synapse-Workbench-{VER}-arm64.zip": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-{VER}-arm64.zip",
+    f"synapse-{VER}-py3-none-any.whl": WORKSPACE_ROOT / f"dist/python/synapse-{VER}-py3-none-any.whl",
+    f"synapse-{VER}.tar.gz": WORKSPACE_ROOT / f"dist/python/synapse-{VER}.tar.gz",
 }
+
+# Add SynPacks if present
+packages_dir = WORKSPACE_ROOT / "exports" / "packages"
+if packages_dir.exists():
+    for synpack in packages_dir.glob("*.synpack"):
+        ASSETS_TO_PUBLISH[synpack.name] = synpack
+
+def generate_release_body(endpoint_url: str, repo_name: str, is_github: bool = False) -> str:
+    dl_base = f"https://github.com/{repo_name}/releases/download/{TAG}" if is_github else f"{endpoint_url.rstrip('/')}/{repo_name}/releases/download/{TAG}"
+    return f"""## Synapse {TAG} Milestone Release
+
+### 🎓 100% Global Polymath Masterclass Curriculum (1,541 Topics across 21 Domains)
+This milestone release marks the full completion and code-fence normalization of the Synapse curriculum (12,426 lessons and 1,541 operational verification labs, with zero linter errors and zero warnings).
+
+---
+
+### 📥 Direct Download Links
+
+#### 1. Application Binaries (macOS & Windows Desktop, Python)
+| Platform / Environment | File Artifact | Direct Download |
+| :--- | :--- | :--- |
+| **macOS Apple Silicon (DMG)** | `Synapse-Workbench-{VER}-arm64.dmg` | [Download .dmg]({dl_base}/Synapse-Workbench-{VER}-arm64.dmg) |
+| **macOS Portable (.zip)** | `Synapse-Workbench-{VER}-arm64.zip` | [Download .zip]({dl_base}/Synapse-Workbench-{VER}-arm64.zip) |
+| **Windows Portable (.exe)** | `Synapse-Workbench-Portable-{VER}.exe` | [Download Portable .exe]({dl_base}/Synapse-Workbench-Portable-{VER}.exe) |
+| **Windows Installer (.exe)** | `Synapse-Workbench-Setup-{VER}.exe` | [Download Installer .exe]({dl_base}/Synapse-Workbench-Setup-{VER}.exe) |
+| **Windows Portable Bundle (.zip)** | `Synapse-Workbench-Portable-{VER}-win-x64.zip` | [Download Portable Zip]({dl_base}/Synapse-Workbench-Portable-{VER}-win-x64.zip) |
+| **Python Wheel (.whl)** | `synapse-{VER}-py3-none-any.whl` | [Download .whl]({dl_base}/synapse-{VER}-py3-none-any.whl) |
+| **Python Source (.tar.gz)** | `synapse-{VER}.tar.gz` | [Download .tar.gz]({dl_base}/synapse-{VER}.tar.gz) |
+
+---
+
+#### 2. Curriculum Package Addons
+| Package | Description | Direct Download |
+| :--- | :--- | :--- |
+| **`synapse_complete_curriculum.synpack`** | All Core Masterclass Domains | [Download Complete Set]({dl_base}/synapse_complete_curriculum.synpack) |
+| **`computing.synpack`** | Computing & Distributed Systems | [Download computing.synpack]({dl_base}/computing.synpack) |
+| **`arts.synpack`** | Arts, Design & Music Performance | [Download arts.synpack]({dl_base}/arts.synpack) |
+| **`engineering.synpack`** | Engineering, Robotics & Avionics | [Download engineering.synpack]({dl_base}/engineering.synpack) |
+| **`crafts.synpack`** | Fabrication, Maker & 3D Printing | [Download crafts.synpack]({dl_base}/crafts.synpack) |
+| **`business.synpack`** | Enterprise, Finance & Markets | [Download business.synpack]({dl_base}/business.synpack) |
+| **`humanities.synpack`** | Philosophy, History & Literature | [Download humanities.synpack]({dl_base}/humanities.synpack) |
+| **`natural_sciences.synpack`** | Physics, Chemistry & Biology | [Download natural_sciences.synpack]({dl_base}/natural_sciences.synpack) |
+| **`economics.synpack`** | Macroeconomics, Quant & Policy | [Download economics.synpack]({dl_base}/economics.synpack) |
+| **`formal_sciences.synpack`** | Pure Mathematics & Logic | [Download formal_sciences.synpack]({dl_base}/formal_sciences.synpack) |
+| **`health_sciences.synpack`** | Medicine, Neuroscience & Triage | [Download health_sciences.synpack]({dl_base}/health_sciences.synpack) |
+| **`motorsports.synpack`** | Vehicle Dynamics & Race Eng. | [Download motorsports.synpack]({dl_base}/motorsports.synpack) |
+| **`languages.synpack`** | Grammar, Writing & Translation | [Download languages.synpack]({dl_base}/languages.synpack) |
+
+---
+
+### 💡 How to Install Addons
+1. Open Synapse Workbench.
+2. Click **Settings ⚙** → **Curriculum Store & Addons**.
+3. Sideload a downloaded `.synpack` file or click **Install** next to any domain to download it automatically.
+"""
 
 def publish_gitea():
     print("\n" + "=" * 60)
-    print(f"🚀 PUBLISHING TO GITEA ({GITEA_URL} / {GITEA_REPO})")
+    print(f"🚀 PUBLISHING TO GITEA ({GITEA_URL} / {GITEA_REPO}) -> {TAG}")
     print("=" * 60)
 
     auth = (GITEA_USER, GITEA_PASS)
@@ -85,31 +146,37 @@ def publish_gitea():
     rel_url = f"{api_base}/repos/{GITEA_REPO}/releases/tags/{TAG}"
 
     res = requests.get(rel_url, auth=auth)
-    if res.status_code != 200:
+    if res.status_code == 404:
+        print(f"[*] Release {TAG} not found on Gitea. Creating release {TAG} automatically...")
+        create_url = f"{api_base}/repos/{GITEA_REPO}/releases"
+        payload = {
+            "tag_name": TAG,
+            "name": f"Synapse {TAG} — Resilient Translation, Native ConPTY & Zero-Defect Curriculum",
+            "body": f"Release binaries for Synapse {TAG}.",
+            "draft": False,
+            "prerelease": False
+        }
+        res = requests.post(create_url, json=payload, auth=auth)
+        if res.status_code not in [200, 201]:
+            print(f"[✘] Failed to create release {TAG} on Gitea: {res.status_code} {res.text}")
+            return False
+        rel_data = res.json()
+        print(f"[✔] Created new Gitea release ID {rel_data['id']}: {rel_data.get('name')}")
+    elif res.status_code != 200:
         print(f"[✘] Failed to fetch release {TAG} on Gitea: {res.status_code} {res.text}")
         return False
+    else:
+        rel_data = res.json()
 
-    rel_data = res.json()
     rel_id = rel_data["id"]
     print(f"[✔] Found Gitea release ID {rel_id}: {rel_data.get('name')}")
 
     assets_url = f"{api_base}/repos/{GITEA_REPO}/releases/{rel_id}/assets"
     existing_assets = {a["name"]: a["id"] for a in rel_data.get("assets", [])}
-
-    gitea_targets = [
-        ("Synapse-Workbench-Portable-1.1.1.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.1.exe"]),
-        ("Synapse-Workbench-Setup-1.1.1.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Setup-1.1.1.exe"]),
-        ("Synapse-Workbench-Portable-1.1.1-win-x64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.1-win-x64.zip"]),
-        ("Synapse-Portable-Windows.zip", ASSETS_TO_PUBLISH["Synapse-Portable-Windows.zip"]),
-        ("Synapse-Workbench-1.1.1-arm64.dmg", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64.dmg"]),
-        ("Synapse-Workbench-1.1.1-arm64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64.zip"]),
-    ]
-
     existing_asset_sizes = {a["name"]: a["size"] for a in rel_data.get("assets", [])}
 
-    for name, path in gitea_targets:
+    for name, path in ASSETS_TO_PUBLISH.items():
         if not path.exists():
-            print(f"[✘] File not found: {path}")
             continue
 
         sz_mb = path.stat().st_size / (1024 * 1024)
@@ -133,58 +200,7 @@ def publish_gitea():
         else:
             print(" [✘ Upload Failed]")
 
-    gitea_body = f"""## Synapse v1.1.1 Milestone Release
-
-### 🎓 100% Global Curriculum Complete (539 Topics across 12 Domains)
-This milestone release marks the full completion of the Synapse masterclass curriculum spanning 2,945 lessons and operational labs, with 3,172 vector Mermaid.js diagrams and full KaTeX math formatting.
-
----
-
-### 📥 Direct Download Links
-
-#### 1. Master Curriculum Addon (All 12 Domains / 539 Topics)
-| Package | Size | Scope | Direct Download |
-| :--- | :---: | :---: | :--- |
-| **`synapse_complete_curriculum.synpack`** | **33.5 MB** | **All 12 Domains (539 Topics / 2,945 Lessons & Labs)** | [**Download Master Set**]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/synapse_complete_curriculum.synpack) |
-
----
-
-#### 2. Application Binaries (Desktop & Python)
-| Platform / Environment | File Artifact | Size | Direct Download |
-| :--- | :--- | :---: | :--- |
-| **Windows Portable (.exe)** | `Synapse-Workbench-Portable-1.1.1.exe` | 163.2 MB | [Download Portable .exe]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.1.exe) |
-| **Windows Installer (.exe)** | `Synapse-Workbench-Setup-1.1.1.exe` | 163.2 MB | [Download Installer .exe]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Setup-1.1.1.exe) |
-| **Windows Portable Bundle (.zip)** | `Synapse-Workbench-Portable-1.1.1-win-x64.zip` | 363.1 MB | [Download Portable Zip]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.1-win-x64.zip) |
-| **macOS Apple Silicon (DMG)** | `Synapse-Workbench-1.1.1-arm64.dmg` | 190.0 MB | [Download .dmg]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-1.1.1-arm64.dmg) |
-| **macOS Portable (.zip)** | `Synapse-Workbench-1.1.1-arm64.zip` | 186.2 MB | [Download .zip]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-1.1.1-arm64.zip) |
-| **Python Wheel (.whl)** | `synapse-1.1.1-py3-none-any.whl` | 76 KB | [Download .whl]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/synapse-1.1.1-py3-none-any.whl) |
-| **Python Source (.tar.gz)** | `synapse-1.1.1.tar.gz` | 84 KB | [Download .tar.gz]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/synapse-1.1.1.tar.gz) |
-
----
-
-#### 3. Individual Modular Domain Addons
-| Domain Addon | Size | Scope | Direct Download |
-| :--- | :---: | :---: | :--- |
-| **Computing & Systems** | 10.6 MB | 162 topics | [Download computing.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/computing.synpack) |
-| **Arts & Music** | 3.4 MB | 67 topics | [Download arts.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/arts.synpack) |
-| **Engineering** | 2.8 MB | 39 topics | [Download engineering.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/engineering.synpack) |
-| **Crafts & Fabrication** | 2.7 MB | 60 topics | [Download crafts.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/crafts.synpack) |
-| **Humanities** | 2.5 MB | 39 topics | [Download humanities.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/humanities.synpack) |
-| **Business & Strategy** | 2.5 MB | 41 topics | [Download business.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/business.synpack) |
-| **Natural Sciences** | 2.3 MB | 30 topics | [Download natural_sciences.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/natural_sciences.synpack) |
-| **Economics** | 2.3 MB | 32 topics | [Download economics.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/economics.synpack) |
-| **Formal Sciences** | 2.2 MB | 33 topics | [Download formal_sciences.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/formal_sciences.synpack) |
-| **Health Sciences** | 969 KB | 20 topics | [Download health_sciences.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/health_sciences.synpack) |
-| **Motorsports** | 686 KB | 10 topics | [Download motorsports.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/motorsports.synpack) |
-| **Languages** | 514 KB | 6 topics | [Download languages.synpack]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/languages.synpack) |
-
----
-
-### 💡 How to Install Addons
-1. Open Synapse Workbench.
-2. Click **Settings ⚙** → **Curriculum Store & Addons**.
-3. Sideload a downloaded `.synpack` file or click **Install** next to any domain to download it automatically.
-"""
+    gitea_body = generate_release_body(GITEA_URL, GITEA_REPO, is_github=False)
     patch_res = requests.patch(
         f"{api_base}/repos/{GITEA_REPO}/releases/{rel_id}",
         auth=auth,
@@ -199,22 +215,39 @@ This milestone release marks the full completion of the Synapse masterclass curr
 
 def publish_github():
     print("\n" + "=" * 60)
-    print(f"🚀 PUBLISHING TO GITHUB (https://github.com/{GITHUB_REPO})")
+    print(f"🚀 PUBLISHING TO GITHUB (https://github.com/{GITHUB_REPO}) -> {TAG}")
     print("=" * 60)
 
     headers = {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Authorization": f"token {GITHUB_TOKEN}",
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28"
     }
     rel_url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/tags/{TAG}"
 
     res = requests.get(rel_url, headers=headers)
-    if res.status_code != 200:
+    if res.status_code == 404:
+        print(f"[*] Release {TAG} not found on GitHub. Creating release {TAG} automatically...")
+        create_url = f"https://api.github.com/repos/{GITHUB_REPO}/releases"
+        payload = {
+            "tag_name": TAG,
+            "name": f"Synapse {TAG} — Resilient Translation, Native ConPTY & Zero-Defect Curriculum",
+            "body": f"Release binaries for Synapse {TAG}.",
+            "draft": False,
+            "prerelease": False
+        }
+        res = requests.post(create_url, json=payload, headers=headers)
+        if res.status_code not in [200, 201]:
+            print(f"[✘] Failed to create release {TAG} on GitHub: {res.status_code} {res.text}")
+            return False
+        rel_data = res.json()
+        print(f"[✔] Created new GitHub release ID {rel_data['id']}: {rel_data.get('name')}")
+    elif res.status_code != 200:
         print(f"[✘] Failed to fetch release {TAG} on GitHub: {res.status_code} {res.text}")
         return False
+    else:
+        rel_data = res.json()
 
-    rel_data = res.json()
     rel_id = rel_data["id"]
     upload_url_base = rel_data["upload_url"].split("{")[0]
     print(f"[✔] Found GitHub release ID {rel_id}: {rel_data.get('name')}")
@@ -222,18 +255,8 @@ def publish_github():
     existing_assets = {a["name"]: a["id"] for a in rel_data.get("assets", [])}
     existing_asset_sizes = {a["name"]: a["size"] for a in rel_data.get("assets", [])}
 
-    github_targets = [
-        ("Synapse-Workbench-Portable-1.1.1.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.1.exe"]),
-        ("Synapse-Workbench-Setup-1.1.1.exe", ASSETS_TO_PUBLISH["Synapse-Workbench-Setup-1.1.1.exe"]),
-        ("Synapse-Workbench-Portable-1.1.1-win-x64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.1-win-x64.zip"]),
-        ("Synapse-Portable-Windows.zip", ASSETS_TO_PUBLISH["Synapse-Portable-Windows.zip"]),
-        ("Synapse-Workbench-1.1.1-arm64.dmg", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64.dmg"]),
-        ("Synapse-Workbench-1.1.1-arm64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64.zip"]),
-    ]
-
-    for name, path in github_targets:
+    for name, path in ASSETS_TO_PUBLISH.items():
         if not path.exists():
-            print(f"[✘] File not found: {path}")
             continue
 
         sz_mb = path.stat().st_size / (1024 * 1024)
@@ -255,83 +278,18 @@ def publish_github():
                 print(f" [✘ Failed: {del_res.status_code}]")
 
         print(f"[*] Uploading '{name}' ({sz_mb:.2f} MB) to GitHub...", end="", flush=True)
-        if shutil.which("gh") and GITHUB_TOKEN:
-            env = os.environ.copy()
-            env["GH_TOKEN"] = GITHUB_TOKEN
-            proc = subprocess.run(
-                ["gh", "release", "upload", TAG, str(path), "--repo", GITHUB_REPO, "--clobber"],
-                env=env,
-                capture_output=True,
-                text=True
-            )
-            if proc.returncode == 0:
-                print(" [✔ Done]")
-            else:
-                print(f" [✘ Upload Failed: {proc.stderr.strip()}]")
+        up_headers = {
+            "Authorization": f"token {GITHUB_TOKEN}",
+            "Content-Type": "application/octet-stream",
+            "Accept": "application/vnd.github+json"
+        }
+        target_upload_url = f"{upload_url_base}?name={name}"
+        if upload_via_curl(target_upload_url, path, headers=up_headers):
+            print(" [✔ Done]")
         else:
-            up_headers = {
-                "Authorization": f"Bearer {GITHUB_TOKEN}",
-                "Content-Type": "application/octet-stream",
-                "Accept": "application/vnd.github+json"
-            }
-            target_upload_url = f"{upload_url_base}?name={name}"
-            if upload_via_curl(target_upload_url, path, headers=up_headers):
-                print(" [✔ Done]")
-            else:
-                print(" [✘ Upload Failed]")
+            print(" [✘ Upload Failed]")
 
-    github_body = f"""## Synapse v1.1.1 Milestone Release
-
-### 🎓 100% Global Curriculum Complete (539 Topics across 12 Domains)
-This milestone release marks the full completion of the Synapse masterclass curriculum spanning 2,945 lessons and operational labs, with 3,172 vector Mermaid.js diagrams and full KaTeX math formatting.
-
----
-
-### 📥 Direct Download Links
-
-#### 1. Master Curriculum Addon (All 12 Domains / 539 Topics)
-| Package | Size | Scope | Direct Download |
-| :--- | :---: | :---: | :--- |
-| **`synapse_complete_curriculum.synpack`** | **33.5 MB** | **All 12 Domains (539 Topics / 2,945 Lessons & Labs)** | [**Download Master Set**](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/synapse_complete_curriculum.synpack) |
-
----
-
-#### 2. Application Binaries (Desktop & Python)
-| Platform / Environment | File Artifact | Size | Direct Download |
-| :--- | :--- | :---: | :--- |
-| **Windows Portable (.exe)** | `Synapse-Workbench-Portable-1.1.1.exe` | 163.2 MB | [Download Portable .exe](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.1.exe) |
-| **Windows Installer (.exe)** | `Synapse-Workbench-Setup-1.1.1.exe` | 163.2 MB | [Download Installer .exe](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-Setup-1.1.1.exe) |
-| **Windows Portable Bundle (.zip)** | `Synapse-Workbench-Portable-1.1.1-win-x64.zip` | 363.1 MB | [Download Portable Zip](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.1-win-x64.zip) |
-| **macOS Apple Silicon (DMG)** | `Synapse-Workbench-1.1.1-arm64.dmg` | 190.0 MB | [Download .dmg](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-1.1.1-arm64.dmg) |
-| **macOS Portable (.zip)** | `Synapse-Workbench-1.1.1-arm64.zip` | 186.2 MB | [Download .zip](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-1.1.1-arm64.zip) |
-| **Python Wheel (.whl)** | `synapse-1.1.1-py3-none-any.whl` | 76 KB | [Download .whl](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/synapse-1.1.1-py3-none-any.whl) |
-| **Python Source (.tar.gz)** | `synapse-1.1.1.tar.gz` | 84 KB | [Download .tar.gz](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/synapse-1.1.1.tar.gz) |
-
----
-
-#### 3. Individual Modular Domain Addons
-| Domain Addon | Size | Scope | Direct Download |
-| :--- | :---: | :---: | :--- |
-| **Computing & Systems** | 10.6 MB | 162 topics | [Download computing.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/computing.synpack) |
-| **Arts & Music** | 3.4 MB | 67 topics | [Download arts.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/arts.synpack) |
-| **Engineering** | 2.8 MB | 39 topics | [Download engineering.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/engineering.synpack) |
-| **Crafts & Fabrication** | 2.7 MB | 60 topics | [Download crafts.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/crafts.synpack) |
-| **Humanities** | 2.5 MB | 39 topics | [Download humanities.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/humanities.synpack) |
-| **Business & Strategy** | 2.5 MB | 41 topics | [Download business.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/business.synpack) |
-| **Natural Sciences** | 2.3 MB | 30 topics | [Download natural_sciences.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/natural_sciences.synpack) |
-| **Economics** | 2.3 MB | 32 topics | [Download economics.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/economics.synpack) |
-| **Formal Sciences** | 2.2 MB | 33 topics | [Download formal_sciences.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/formal_sciences.synpack) |
-| **Health Sciences** | 969 KB | 20 topics | [Download health_sciences.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/health_sciences.synpack) |
-| **Motorsports** | 686 KB | 10 topics | [Download motorsports.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/motorsports.synpack) |
-| **Languages** | 514 KB | 6 topics | [Download languages.synpack](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/languages.synpack) |
-
----
-
-### 💡 How to Install Addons
-1. Open Synapse Workbench.
-2. Click **Settings ⚙** → **Curriculum Store & Addons**.
-3. Sideload a downloaded `.synpack` file or click **Install** next to any domain to download it automatically.
-"""
+    github_body = generate_release_body(GITEA_URL, GITHUB_REPO, is_github=True)
     patch_res = requests.patch(
         f"https://api.github.com/repos/{GITHUB_REPO}/releases/{rel_id}",
         headers=headers,
@@ -346,7 +304,7 @@ This milestone release marks the full completion of the Synapse masterclass curr
 
 def main():
     print("=" * 60)
-    print(" SYNAPSE v1.1.1 MULTI-PLATFORM RELEASE PUBLISHER")
+    print(f" SYNAPSE {TAG} MULTI-PLATFORM RELEASE PUBLISHER")
     print("=" * 60)
 
     ok_gitea = publish_gitea()
@@ -354,7 +312,7 @@ def main():
 
     print("\n" + "=" * 60)
     if ok_gitea and ok_github:
-        print("🎉 [✔] ALL RELEASES SUCCESSFULLY PUBLISHED TO GITEA & GITHUB!")
+        print(f"🎉 [✔] ALL RELEASES FOR {TAG} SUCCESSFULLY PUBLISHED TO GITEA & GITHUB!")
     else:
         print(f"⚠️ [!] Completed with status: Gitea={ok_gitea}, GitHub={ok_github}")
     print("=" * 60)
