@@ -1625,7 +1625,7 @@ async def terminal_websocket(websocket: WebSocket):
     if not pty_available or sys.platform == "win32":
         if sys.platform == "win32":
             shell = os.environ.get("COMSPEC", "cmd.exe")
-            args = []
+            args = ["/K", "chcp 65001"]
         else:
             shell = "/bin/bash" if os.path.exists("/bin/bash") else "/bin/sh"
             args = ["-i"]

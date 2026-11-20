@@ -127,7 +127,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     const term = new Terminal({
       cursorBlink: true,
       fontSize: 13,
-      fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+      fontFamily: 'Menlo, Monaco, "Cascadia Code", "Fira Code", Consolas, "Courier New", monospace',
       theme: {
         background: '#0d1117',
         foreground: '#c9d1d9',

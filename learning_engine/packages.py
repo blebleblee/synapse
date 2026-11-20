@@ -32,9 +32,13 @@ def export_topic_pack(domain: str, output_dir: Optional[Path] = None) -> Path:
 
     if domain.lower() in ["all", "complete", "global"]:
         pack_path = out_dir / "synapse_complete_curriculum.synpack"
-        lesson_count = len(list(TOPICS_DIR.rglob("lesson_*.md")))
-        lab_count = len(list(TOPICS_DIR.rglob("labs.md")))
-        topic_dirs = [p for p in TOPICS_DIR.glob("*/*/*") if (p / "labs.md").exists()]
+        core_domains = {"arts", "business", "computing", "crafts", "economics", 
+                        "engineering", "formal_sciences", "health_sciences", 
+                        "humanities", "languages", "motorsports", "natural_sciences"}
+        
+        topic_dirs = [p for p in TOPICS_DIR.glob("*/*/*") if (p / "labs.md").exists() and p.parts[-3] in core_domains]
+        lesson_count = sum(len(list(d.glob("lesson_*.md"))) for d in topic_dirs)
+        lab_count = len(topic_dirs)
 
         manifest = {
             "format": "synpack/v1",
@@ -50,8 +54,12 @@ def export_topic_pack(domain: str, output_dir: Optional[Path] = None) -> Path:
         manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
         with tarfile.open(pack_path, "w:gz") as tar:
+            # Core domain whitelist from git
+            core_domains = ["arts", "business", "computing", "crafts", "economics", 
+                            "engineering", "formal_sciences", "health_sciences", 
+                            "humanities", "languages", "motorsports", "natural_sciences"]
             for d in TOPICS_DIR.iterdir():
-                if d.is_dir() and not d.name.startswith("."):
+                if d.is_dir() and d.name in core_domains:
                     tar.add(d, arcname=f"topics/{d.name}")
             tar.add(manifest_path, arcname="manifest.json")
 
