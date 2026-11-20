@@ -458,12 +458,21 @@ function terminateBackend() {
   if (backendProcess) {
     console.log('[Desktop] Terminating backend child process...');
     try {
-      backendProcess.kill('SIGTERM');
-      setTimeout(() => {
-        if (backendProcess) {
-          backendProcess.kill('SIGKILL');
+      if (process.platform === 'win32') {
+        const { execSync } = require('child_process');
+        try {
+          execSync(`taskkill /pid ${backendProcess.pid} /T /F`, { stdio: 'ignore' });
+        } catch (_) {
+          backendProcess.kill();
         }
-      }, 2000);
+      } else {
+        backendProcess.kill('SIGTERM');
+        setTimeout(() => {
+          if (backendProcess) {
+            backendProcess.kill('SIGKILL');
+          }
+        }, 2000);
+      }
     } catch (e) {
       console.error('[Desktop] Error terminating backend:', e);
     }

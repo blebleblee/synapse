@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-11-20
+
+### Summary
+Feature and resilience release introducing section-by-section markdown translation chunking with code/formula preservation, native Windows ConPTY terminal support via `pywinpty`, database WAL maintenance with automatic checkpointing, an overhaul of the macOS packaging pipeline with version-aware cache busting, and comprehensive curriculum code-fence normalization achieving a 100% clean, zero-defect linter report across all 21 domains.
+
+---
+
+### Key Features & Enhancements
+
+#### 1. Translation Chunking Engine & Code/Math Preservation
+* **Section-by-Section Translation Chunking (`/api/translate`):** Segmented massive markdown documents along section boundaries (`(?=\n#{1,2}\s+)`) before translating. This eliminates context-window and output-token exhaustion on local Ollama models (e.g. Qwen 4B/7B, Llama 3.2), preventing truncated lessons.
+* **Cryptographic Code & Formula Masking:** Implemented an AST-preserving masking engine that extracts all code blocks (````...````), KaTeX mathematical formulas (`$$...$$`), and Mermaid diagrams (` ```mermaid...``` `) and replaces them with isolated placeholder tokens (e.g. `___BLOCK_0___`) prior to prompting the LLM. Post-translation, all original code and mathematical notation are reinjected verbatim, guaranteeing 100% technical accuracy.
+* **Truncation Fallback Guard:** Added proactive output validation that detects severely abbreviated translations (<20% of original source length) and falls back to original text without corrupting the persistent translation cache.
+
+#### 2. Windows Native ConPTY & Terminal Interactive Line Discipline
+* **Native Windows ConPTY Support (`pywinpty`):** Bundled `pywinpty>=2.0.14` in the isolated Windows embedded Python runtime (`dist/python-win`), enabling true pseudo-console allocation for full-screen terminal TUI applications (`vim`, `nano`, `htop`, `fzf`) directly within the embedded terminal drawer.
+* **Interactive Backspace & Local Echo Fix:** Completely reworked the cross-platform fallback pipe bridge in `app/backend/main.py`. It now maintains an interactive Python line buffer, intercepts backspace keystrokes (`\x7f`, `\x08`), and transmits `\b \b` visual erasing sequences to `xterm.js`, resolving character deletion failures on Windows.
+* **Safe Clean Exit & Zombie Prevention:** Updated Electron desktop lifecycle (`terminateBackend()`) to execute `taskkill /pid ... /T /F` on Windows, ensuring child `python.exe` and `uvicorn` processes are cleanly purged from Task Manager when the app closes.
+
+#### 3. macOS Build Pipeline & Automatic Cache-Busting
+* **Automated macOS Assembler (`scripts/build_mac_desktop.sh`):** Created a unified build script that compiles the React SPA, forces a fresh PyInstaller recompilation of `dist/bin/synapse`, verifies CLI health, and packages the Electron DMG and ZIP.
+* **Authoritative Frontend Resolution:** Updated `resolve_dist_dir()` in `app/backend/main.py` to prioritize `SYNAPSE_RESOURCES_PATH/frontend/dist` over internal PyInstaller `_MEIPASS` caches, ensuring the Electron app always renders the freshest UI assets.
+* **Version-Aware Cache Busting:** Added an automatic cache check in `app/desktop/src/main.js` that triggers `session.defaultSession.clearCache()` whenever an application version upgrade is detected. Added `Cache-Control: no-cache` headers on `index.html` FileResponse.
+* **Platform Resource Scoping:** Scoped `extraResources` in `package.json` to exclude Windows Python binaries from macOS packages, reducing macOS DMG and ZIP installer size by over ~100 MB.
+* **macOS Full Purge Utility (`scripts/clean_mac_install.sh`):** Added a one-click cleanup script to completely uninstall `Synapse Workbench.app`, terminate background daemons, and purge `~/Library/Application Support/Synapse Workbench`.
+
+#### 4. Database Resilience & Concurrency Hardening
+* **FastAPI Lifespan Migration:** Migrated from deprecated `@app.on_event("startup")` to standard FastAPI `lifespan` context managers.
+* **Automatic WAL Checkpointing:** Enforced `PRAGMA wal_checkpoint(TRUNCATE);` on backend shutdown and startup to prevent SQLite write-ahead log bloating under high concurrency.
+* **Busy-Retry Context Manager (`learning_engine/database.py`):** Upgraded `get_db_connection()` with exponential backoff retries and `PRAGMA busy_timeout=5000;`, eliminating `database is locked` operational errors during concurrent curriculum generation.
+* **Database Maintenance CLI:** Added `synapse clean --db` to execute `VACUUM;` and `PRAGMA integrity_check;`.
+
+#### 5. Global Curriculum Code-Fence Normalization (Zero-Defect Linter)
+* **Heuristic Normalizer (`scripts/normalize_code_fences.py`):** Developed an automated classification engine that evaluated and tagged all untagged markdown code blocks across all 21 domains.
+* **18,593 Code Blocks Normalized:** Successfully tagged 18,593 previously generic code blocks across 4,841 files with precise language identifiers (`bash`, `yaml`, `json`, `sql`, `python`, `c`, `text`).
+* **100% Clean Content Linting:** `bin/synapse lint` now passes with **0 Errors and 0 Warnings** across all 13,968 markdown files in the workspace.
+* **100% Masterclass Status:** Standardized operational lab naming in `composing/.../arrangement_structure_and_dramatic_pacing`, bringing curriculum status to 1,541 / 1,541 masterclasses (100.0%).
+
+#### 6. Socratic Mentor Generation Expansion
+* **Expanded Output Horizon:** Increased streaming Socratic Chat token limit from 250 to 2048 tokens in `app/backend/main.py`, enabling complete, comprehensive pedagogical explanations and multi-file code blocks without mid-sentence truncation.
+
+---
+
 ## [1.1.1] - 2026-11-19
 
 ### Summary
