@@ -228,7 +228,7 @@ def publish_github():
         ("Synapse-Workbench-Portable-1.1.1-win-x64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.1-win-x64.zip"]),
         ("Synapse-Portable-Windows.zip", ASSETS_TO_PUBLISH["Synapse-Portable-Windows.zip"]),
         ("Synapse-Workbench-1.1.1-arm64.dmg", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64.dmg"]),
-        ("Synapse-Workbench-1.1.1-arm64-mac.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64-mac.zip"]),
+        ("Synapse-Workbench-1.1.1-arm64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64.zip"]),
     ]
 
     for name, path in github_targets:
