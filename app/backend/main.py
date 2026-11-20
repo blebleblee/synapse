@@ -679,6 +679,8 @@ class TranslateRequest(BaseModel):
     text: str
     target_lang: str
     model: Optional[str] = None
+    provider: Optional[str] = None
+    host: Optional[str] = None
 
 LANGUAGE_NAMES = {
     "cs": "Czech (Čeština)",
@@ -703,7 +705,11 @@ async def api_translate_content(req: TranslateRequest):
         return {"translated": cache_file.read_text(encoding="utf-8"), "cached": True}
 
     import asyncio
-    provider, used_model = get_translation_provider(model=req.model)
+    provider, used_model = get_translation_provider(
+        model=req.model,
+        provider_type=req.provider,
+        host=req.host
+    )
 
     def mask_and_extract(text: str):
         # Mask code blocks and math to preserve integrity

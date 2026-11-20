@@ -64,6 +64,8 @@ interface LessonViewerProps {
   isRegeneratingSummary: boolean;
   onOpenFlashcards: () => void;
   targetLanguage?: string;
+  preferredModel?: string;
+  ollamaHost?: string;
   onNavigateBreadcrumb?: (type: 'domain' | 'category' | 'subtopic', path: string) => void;
   onSelectLesson?: (lessonId: string) => void;
 }
@@ -92,6 +94,8 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   isRegeneratingSummary,
   onOpenFlashcards,
   targetLanguage,
+  preferredModel,
+  ollamaHost,
   onNavigateBreadcrumb,
   onSelectLesson,
   onToggleLessonCompletion,
@@ -197,7 +201,12 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       const res = await fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: rawMarkdown, target_lang: lang }),
+        body: JSON.stringify({
+          text: rawMarkdown,
+          target_lang: lang,
+          model: preferredModel || undefined,
+          host: ollamaHost || undefined,
+        }),
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -838,7 +847,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <span>Translating section to {readingLang === 'cs' ? 'Čeština' : readingLang === 'de' ? 'Deutsch' : 'Español'} with Claude...</span>
+                <span>Translating section to {readingLang === 'cs' ? 'Čeština' : readingLang === 'de' ? 'Deutsch' : 'Español'}{preferredModel ? ` with ${preferredModel.split(':')[0]}` : (ollamaHost ? ' with Local AI' : '')}...</span>
               </div>
             )}
             {translationError && (

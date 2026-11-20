@@ -897,39 +897,82 @@ def get_provider(provider_type: Optional[str] = None, model: Optional[str] = Non
     chosen_model = model or "gemini-2.5-flash"
     return GeminiProvider(model=chosen_model)
 
-def get_translation_provider(model: Optional[str] = None) -> Tuple[LLMProvider, str]:
+def get_translation_provider(
+    model: Optional[str] = None,
+    provider_type: Optional[str] = None,
+    host: Optional[str] = None
+) -> Tuple[LLMProvider, str]:
     """
-    Returns an LLM provider optimized for high-context technical curriculum translation.
-    Prioritizes Anthropic Claude Sonnet and Gemini when configured, as their large context
-    windows (200k+ tokens) translate multi-page chapters in ~2-4 seconds without truncation.
-    Fails fast with an informative error if no cloud keys or local Ollama instance are detected.
+    Returns an LLM provider for technical curriculum translation.
+    Respects explicit user model/host request and local AI configuration in Settings,
+    falling back to reachable Ollama cluster nodes or cloud providers.
     """
     settings = get_settings()
+
+    # 1. Determine if local AI is explicitly requested or configured as primary/mentor model
+    cfg_primary = settings.get("primary_model", "")
+    cfg_mentor = settings.get("mentor_model", "")
+    is_local_requested = (
+        provider_type == "ollama" or
+        bool(host and ("11434" in host or "8080" in host or "localhost" in host or "127.0.0.1" in host)) or
+        bool(model and any(m in model.lower() for m in ["qwen", "llama", "deepseek", "gemma", "mistral", "phi"]))
+    )
+    is_local_configured = any(
+        m in (cfg_primary.lower() if cfg_primary else "") or m in (cfg_mentor.lower() if cfg_mentor else "")
+        for m in ["qwen", "llama", "deepseek", "gemma", "mistral", "phi"]
+    )
+
+    # 2. If Local AI is requested or configured as primary
+    if is_local_requested or (is_local_configured and not provider_type):
+        target_model = model or cfg_mentor or cfg_primary or "qwen2.5-coder:32b"
+        
+        # Check explicit host if given
+        if host and OllamaProvider.is_available(host):
+            avail_models = OllamaProvider.list_models(host)
+            chosen = target_model if target_model in avail_models else (avail_models[0] if avail_models else target_model)
+            return OllamaProvider(host=host, model=chosen), chosen
+
+        # Check configured Ollama cluster hosts
+        for h in get_configured_hosts():
+            if OllamaProvider.is_available(h):
+                avail_models = OllamaProvider.list_models(h)
+                if avail_models:
+                    chosen = target_model if target_model in avail_models else avail_models[0]
+                    return OllamaProvider(host=h, model=chosen), chosen
+
+    # 3. Check Anthropic Claude if explicitly requested or if keys exist and no local AI was chosen
     anthropic_key = (
         os.environ.get("ANTHROPIC_API_KEY") or
         os.environ.get("ANTHROPIC_API_KEY_2") or
         os.environ.get("VNAIPRO_API_KEY") or
-        settings.get("anthropic_api_key")
+        settings.get("anthropic_api_key") or
+        settings.get("anthropic", {}).get("api_key")
     )
-    if anthropic_key:
+    if anthropic_key and (provider_type == "anthropic" or not is_local_configured or (model and "claude" in model.lower())):
         chosen_model = model or os.environ.get("ANTHROPIC_MODEL") or "claude-sonnet-5"
         return AnthropicProvider(model=chosen_model, api_key=anthropic_key), chosen_model
 
+    # 4. Check Gemini
     gemini_key = os.environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key")
-    if gemini_key:
+    if gemini_key and (provider_type == "gemini" or (model and "gemini" in model.lower())):
         chosen_model = model or "gemini-2.5-flash"
         return GeminiProvider(model=chosen_model, api_key=gemini_key), chosen_model
 
-    # Check for immediately reachable local Ollama instance without slow cluster scan
-    local_host = "http://127.0.0.1:11434"
-    if OllamaProvider.is_available(local_host):
-        models = OllamaProvider.list_models(local_host)
-        if models:
-            selected_model = model if (model and model in models) else models[0]
-            return OllamaProvider(model=selected_model, host=local_host), selected_model
+    # 5. Fallback to any reachable Ollama node in the cluster
+    for h in get_configured_hosts():
+        if OllamaProvider.is_available(h):
+            avail_models = OllamaProvider.list_models(h)
+            if avail_models:
+                chosen = model if (model and model in avail_models) else avail_models[0]
+                return OllamaProvider(host=h, model=chosen), chosen
+
+    # 6. Fallback to Anthropic if key exists even if local AI was preferred but unreachable
+    if anthropic_key:
+        chosen_model = os.environ.get("ANTHROPIC_MODEL") or "claude-sonnet-5"
+        return AnthropicProvider(model=chosen_model, api_key=anthropic_key), chosen_model
 
     raise RuntimeError(
-        "Translation requires an active LLM provider. Configure Claude/Gemini in Settings (or ~/.config/synapse/env), or start local Ollama."
+        "Translation requires an active LLM provider. Start local Ollama, or configure Claude/Gemini in Settings."
     )
 
 def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -> Tuple[LLMProvider, str]:

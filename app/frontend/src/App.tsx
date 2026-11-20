@@ -705,6 +705,8 @@ export function App() {
           isRegeneratingSummary={isRegeneratingSummary}
           onOpenFlashcards={() => setFlashcardModalOpen(true)}
           targetLanguage={settings.language}
+          preferredModel={settings.mentorModel || settings.primaryModel}
+          ollamaHost={settings.ollamaHost}
           onNavigateBreadcrumb={handleNavigateBreadcrumb}
           onSelectLesson={handleSelectLesson}
           onToggleLessonCompletion={handleToggleLessonCompletion}
