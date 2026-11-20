@@ -247,11 +247,22 @@ async function ensureBackendRunning() {
 
   const spawnEnv = {
     ...process.env,
+    LANG: process.env.LANG || 'en_US.UTF-8',
+    LC_ALL: process.env.LC_ALL || 'en_US.UTF-8',
     PYTHONUNBUFFERED: '1',
     SYNAPSE_WORKSPACE: workspaceDir,
     SYNAPSE_TOPICS_DIR: topicsDir,
     SYNAPSE_RESOURCES_PATH: process.resourcesPath || '',
   };
+
+  if (process.platform === 'darwin') {
+    const defaultMacPaths = ['/opt/homebrew/bin', '/usr/local/bin', '/usr/bin', '/bin', '/usr/sbin', '/sbin'];
+    const currentPath = process.env.PATH || '';
+    const missing = defaultMacPaths.filter((p) => !currentPath.includes(p));
+    if (missing.length > 0) {
+      spawnEnv.PATH = `${missing.join(':')}:${currentPath}`;
+    }
+  }
 
   if (spawnCmd) {
     const pyDir = path.dirname(spawnCmd);

@@ -127,7 +127,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     const term = new Terminal({
       cursorBlink: true,
       fontSize: 13,
-      fontFamily: 'Menlo, Monaco, "Cascadia Code", "Fira Code", Consolas, "Courier New", monospace',
+      fontFamily: '"MesloLGS NF", "JetBrainsMono Nerd Font", "JetBrains Mono", "FiraCode Nerd Font", "Fira Code", "Hack Nerd Font", Menlo, Monaco, "Cascadia Code", Consolas, "Courier New", monospace',
       theme: {
         background: '#0d1117',
         foreground: '#c9d1d9',
@@ -143,6 +143,8 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
         white: '#b1bac4',
       },
       convertEol: true,
+      customGlyphs: true,
+      rescaleOverlappingGlyphs: true,
     });
 
     const fitAddon = new FitAddon();

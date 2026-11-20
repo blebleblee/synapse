@@ -1727,9 +1727,14 @@ async def terminal_websocket(websocket: WebSocket):
     zdot_dir.mkdir(exist_ok=True)
     zshrc_path = zdot_dir / ".zshrc"
     zshrc_path.write_text(
+        'if [ -f "/etc/zprofile" ]; then source "/etc/zprofile"; fi\n'
+        'if [ -f "$HOME/.zprofile" ]; then source "$HOME/.zprofile"; fi\n'
+        'if [ -f "$HOME/.zshenv" ]; then source "$HOME/.zshenv"; fi\n'
         'if [ -f "$HOME/.zshrc" ]; then source "$HOME/.zshrc"; fi\n'
         'export PROMPT_EOL_MARK=""\n'
         'unsetopt PROMPT_SP 2>/dev/null\n'
+        'export LANG="${LANG:-en_US.UTF-8}"\n'
+        'export LC_ALL="${LC_ALL:-en_US.UTF-8}"\n'
         'alias ps="ps -ww"\n'
         'alias rm="rm -i"\n'
         'alias cp="cp -i"\n'
@@ -1739,7 +1744,11 @@ async def terminal_websocket(websocket: WebSocket):
 
     bashrc_path = cache_dir / "bashrc"
     bashrc_path.write_text(
+        'if [ -f "/etc/profile" ]; then source "/etc/profile"; fi\n'
+        'if [ -f "$HOME/.bash_profile" ]; then source "$HOME/.bash_profile"; elif [ -f "$HOME/.profile" ]; then source "$HOME/.profile"; fi\n'
         'if [ -f "$HOME/.bashrc" ]; then source "$HOME/.bashrc"; fi\n'
+        'export LANG="${LANG:-en_US.UTF-8}"\n'
+        'export LC_ALL="${LC_ALL:-en_US.UTF-8}"\n'
         'alias ps="ps -ww"\n'
         'alias rm="rm -i"\n'
         'alias cp="cp -i"\n'
@@ -1832,6 +1841,14 @@ async def terminal_websocket(websocket: WebSocket):
         os.chdir(str(term_cwd))
         env = os.environ.copy()
         env["TERM"] = "xterm-256color"
+        env["LANG"] = env.get("LANG") or "en_US.UTF-8"
+        env["LC_ALL"] = env.get("LC_ALL") or "en_US.UTF-8"
+        if sys.platform == "darwin":
+            default_paths = ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin", "/usr/sbin", "/sbin"]
+            current_path = env.get("PATH", "")
+            missing = [p for p in default_paths if p not in current_path]
+            if missing:
+                env["PATH"] = ":".join(missing) + (":" + current_path if current_path else "")
         env["ZDOTDIR"] = str(zdot_dir)
         env["PROMPT_COMMAND"] = ""
         env["PAGER"] = "cat"
