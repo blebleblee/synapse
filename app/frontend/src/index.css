@@ -1,3 +1,16 @@
+@font-face {
+  font-family: 'PowerlineSymbols';
+  src: url('/fonts/PowerlineSymbols.otf') format('opentype');
+  unicode-range: U+E0A0-E0A3, U+E0B0-E0B3, U+E0C0-E0C7, U+E0CA, U+E0CC-E0CF, U+E0D2, U+E0D4;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SymbolsNerdFontMono';
+  src: url('/fonts/SymbolsNerdFontMono-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

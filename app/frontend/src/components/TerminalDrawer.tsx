@@ -127,7 +127,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     const term = new Terminal({
       cursorBlink: true,
       fontSize: 13,
-      fontFamily: '"MesloLGS NF", "JetBrainsMono Nerd Font", "JetBrains Mono", "FiraCode Nerd Font", "Fira Code", "Hack Nerd Font", Menlo, Monaco, "Cascadia Code", Consolas, "Courier New", monospace',
+      fontFamily: '"Hack Nerd Font Mono", "Hack Nerd Font", "Inconsolata for Powerline", "MesloLGS NF", "JetBrainsMono Nerd Font", "JetBrains Mono", "FiraCode Nerd Font", "Fira Code", PowerlineSymbols, SymbolsNerdFontMono, Menlo, Monaco, "Cascadia Code", Consolas, "Courier New", monospace',
       theme: {
         background: '#0d1117',
         foreground: '#c9d1d9',
@@ -153,6 +153,15 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
 
     termRef.current = term;
     fitAddonRef.current = fitAddon;
+
+    if (typeof document !== 'undefined' && document.fonts?.ready) {
+      document.fonts.ready.then(() => {
+        if (!isUnmountedRef.current && isOpen) {
+          fitTerminal();
+          term.refresh(0, term.rows - 1);
+        }
+      });
+    }
 
     term.onData((data) => {
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
