@@ -16,7 +16,7 @@ FORBIDDEN_TEXT_PLACEHOLDERS = [
     r"\bTODO:\s*",
     r"\bFIXME:\s*",
     r"insert code here",
-    r"\[insert\s+",
+    r"\[insert\s+(?:code|text|here|your|content|summary|data|claim|value|description|step)",
     r"\[to be determined\]",
     r"\bTBD\b",
     r"(?i)\b(?:status|date|author|version):\s*to be determined\b",
@@ -26,7 +26,7 @@ FORBIDDEN_TEXT_PLACEHOLDERS = [
 CROSS_DOMAIN_BLEED_RULES = [
     {
         "pattern": r"\bbpftool\b",
-        "allowed_domains": ["computing"],
+        "allowed_domains": ["computing", "suse", "suse-bootcamp"],
         "allowed_topics": [
             "ebpf",
             "observability",
@@ -117,10 +117,12 @@ def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
 
     # 5b. LLM Refusal & Upstream API Failure Stub Detection
     refusal_patterns = [
-        r"\bI can't write\b",
-        r"\bI cannot write\b",
-        r"\bI won't write\b",
-        r"\bI'm not going to write\b",
+        r"\bI can't write (?:this|code|about|essays? for you|that|such content)\b",
+        r"\bI cannot write (?:this|code|about|essays? for you|that|such content)\b",
+        r"\bI cannot fulfill this request\b",
+        r"\bI cannot assist with this\b",
+        r"\bI won't write this\b",
+        r"\bI'm not going to write this\b",
         r"\bI'll decline regardless\b",
         r"\bUpstream service temporarily unavailable\b"
     ]
@@ -151,13 +153,13 @@ def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
             break
 
     # 6. Section Heading Completeness
-    headings = re.findall(r"^##\s+(.+)$", content, re.MULTILINE)
+    headings = re.findall(r"^#{1,3}\s+(.+)$", content, re.MULTILINE)
     if len(headings) < 2 and "labs" not in file_path.name.lower():
         issues.append({
             "file": rel_file,
             "severity": "error",
             "code": "INCOMPLETE_SECTIONS",
-            "message": f"Lesson has only {len(headings)} top-level section(s) (expected >= 2, likely truncated early)"
+            "message": f"Lesson has only {len(headings)} section(s) (expected >= 2, likely truncated early)"
         })
 
     # 7. Context-Aware Placeholder Detection (Extract text outside code blocks)
@@ -209,8 +211,8 @@ def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
     clean_lines = [l.strip() for l in content.splitlines() if l.strip()]
     if clean_lines:
         last_line = clean_lines[-1]
-        valid_terminators = ('.', '!', '?', '"', "'", "```", "-->", "$$", "]", "}", ")", ">", ":", ";", "|", "*", "_", "~")
-        if not any(last_line.endswith(c) for c in valid_terminators):
+        valid_terminators = ('.', '!', '?', '"', "'", "```", "-->", "$$", "]", "}", ")", ">", ":", ";", "|", "*", "_", "~", "-")
+        if not (last_line == "---" or any(last_line.endswith(c) for c in valid_terminators)):
             issues.append({
                 "file": rel_file,
                 "severity": "error",

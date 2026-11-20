@@ -63,6 +63,7 @@ import site
         "python-multipart>=0.0.12",
         "edge-tts>=7.0.0",
         "msvc-runtime>=14.40.0",
+        "pywinpty>=2.0.14",
     ]
 
     print("[*] Cross-installing Windows x64 binary dependencies into site-packages...")

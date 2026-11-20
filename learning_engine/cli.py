@@ -389,10 +389,12 @@ def cmd_clean(args):
 
     clean_sessions = args.sessions or args.all
     clean_exports = args.exports or args.all
+    clean_db = args.db or args.all
 
-    if not clean_sessions and not clean_exports:
+    if not clean_sessions and not clean_exports and not clean_db:
         clean_sessions = True
         clean_exports = True
+        clean_db = True
 
     cleaned_count = 0
 
@@ -410,7 +412,18 @@ def cmd_clean(args):
                 print(f"[*] Removed exported artifact: {p.relative_to(WORKSPACE_ROOT)}")
                 cleaned_count += 1
 
-    print(f"[✔] Cleaned {cleaned_count} transient artifacts. Authored curriculum is 100% intact.")
+    if clean_db:
+        try:
+            from learning_engine.database import vacuum_db, checkpoint_db
+            print("[*] Running SQLite database maintenance (VACUUM & Checkpoint)...")
+            checkpoint_db(truncate=True)
+            vacuum_db()
+            print("[✔] Database optimization complete.")
+            cleaned_count += 1
+        except Exception as e:
+            print(f"[!] Database optimization skipped: {e}")
+
+    print(f"[✔] Cleaned {cleaned_count} transient artifacts/subsystems. Authored curriculum is 100% intact.")
 
 def cmd_pack(args):
     from learning_engine.packages import install_topic_pack, list_installed_packs, uninstall_topic_pack
@@ -453,6 +466,7 @@ def main():
     p_clean = subparsers.add_parser("clean", help="Clean transient chat sessions and export files")
     p_clean.add_argument("--sessions", action="store_true", help="Remove transient Socratic chat sessions")
     p_clean.add_argument("--exports", action="store_true", help="Remove generated .synpack and handbook exports")
+    p_clean.add_argument("--db", action="store_true", help="Vacuum and checkpoint the SQLite database to reclaim space")
     p_clean.add_argument("--all", action="store_true", help="Clean all transient runtime artifacts")
     p_clean.set_defaults(func=cmd_clean)
 

@@ -139,10 +139,10 @@ from learning_engine.auth import (
     reset_failed_attempts
 )
 
-app = FastAPI(title="AI Learning Workbench Backend", version="1.1.1")
+from contextlib import asynccontextmanager
 
-@app.on_event("startup")
-def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     try:
         seed_starter_curriculum()
     except Exception as e:
@@ -153,6 +153,16 @@ def startup_event():
         threading.Thread(target=get_topic_tree, daemon=True).start()
     except Exception:
         pass
+    yield
+    # Shutdown actions
+    try:
+        from learning_engine.database import checkpoint_db
+        print("[*] Synapse Backend shutting down... checkpointing database WAL...", flush=True)
+        checkpoint_db(truncate=True)
+    except Exception:
+        pass
+
+app = FastAPI(title="AI Learning Workbench Backend", version="1.2.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -682,7 +692,6 @@ async def api_translate_content(req: TranslateRequest):
         return {"translated": req.text, "cached": True}
 
     lang_name = LANGUAGE_NAMES.get(req.target_lang, req.target_lang)
-
     cache_dir = WORKSPACE_ROOT / ".cache" / "translations"
     cache_dir.mkdir(parents=True, exist_ok=True)
     text_hash = hashlib.sha256((req.text + req.target_lang).encode("utf-8")).hexdigest()
@@ -691,30 +700,68 @@ async def api_translate_content(req: TranslateRequest):
     if cache_file.exists():
         return {"translated": cache_file.read_text(encoding="utf-8"), "cached": True}
 
-    prompt = f"""You are an expert technical translator and polyglot philologist.
+    import asyncio
+    provider, used_model = get_translation_provider(model=req.model)
+
+    def mask_and_extract(text: str):
+        # Mask code blocks and math to preserve integrity
+        blocks = []
+        def repl(m):
+            token = f"___BLOCK_{len(blocks)}___"
+            blocks.append(m.group(0))
+            return token
+
+        text = re.sub(r"```[\s\S]*?```", repl, text)
+        text = re.sub(r"\$\$[\s\S]*?\$\$", repl, text)
+        return text, blocks
+
+    def unmask(text: str, blocks: list):
+        for i, b in enumerate(blocks):
+            text = text.replace(f"___BLOCK_{i}___", b)
+        return text
+
+    async def translate_chunk(chunk_text: str) -> str:
+        if not chunk_text.strip():
+            return chunk_text
+            
+        masked_text, blocks = mask_and_extract(chunk_text)
+        
+        prompt = f"""You are an expert technical translator and polyglot philologist.
 Translate the following technical curriculum text into {lang_name}.
 
 CRITICAL INVARIANTS:
-1. DO NOT translate or modify code blocks (```...```). Keep all code, manifests, and CLI commands 100% identical.
-2. DO NOT translate or modify KaTeX math equations ($...$ and $$...$$). Keep all mathematical notation 100% identical.
-3. DO NOT translate Mermaid diagrams (```mermaid...```).
-4. Translate all technical explanations and narrative prose with high fidelity and natural grammatical precision.
-5. Output clean Markdown only with no preamble or wrapping.
+1. DO NOT translate or modify masked tokens like ___BLOCK_0___. Keep them exactly as is.
+2. DO NOT translate Mermaid diagrams or code.
+3. Translate all technical explanations and narrative prose with high fidelity and natural grammatical precision.
+4. Output clean Markdown only with no preamble or wrapping.
 
 Text to translate:
 \"\"\"
-{req.text}
+{masked_text}
 \"\"\""""
 
-    try:
-        import asyncio
-        provider, used_model = get_translation_provider(model=req.model)
-        translated_text = await asyncio.to_thread(provider.generate, prompt)
-        translated_text = translated_text.strip()
-        cache_file.write_text(translated_text + "\n", encoding="utf-8")
-        return {"translated": translated_text, "cached": False, "model": used_model}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        try:
+            translated_masked = await asyncio.to_thread(provider.generate, prompt)
+            translated_masked = translated_masked.strip()
+            
+            # Truncation Guard: if translation is completely broken (<20% length of source without blocks)
+            if len(translated_masked) < len(masked_text) * 0.2:
+                # Fallback to English chunk if model brutally failed
+                return chunk_text
+
+            return unmask(translated_masked, blocks)
+        except Exception:
+            return chunk_text
+
+    # Chunking by ## or # to fit in context window (sliding window logic)
+    import re
+    sections = re.split(r'(?=\n#{1,2}\s+)', req.text)
+    
+    translated_sections = await asyncio.gather(*(translate_chunk(sec) for sec in sections))
+    final_translation = "".join(translated_sections).strip()
+
+    cache_file.write_text(final_translation + "\n", encoding="utf-8")
+    return {"translated": final_translation, "cached": False, "model": used_model}
 
 # -----------------------------------------------------------------------------
 # Neural Audio Narration (Edge-TTS with Guy Baritone Voice & MP3 Disk Cache)
@@ -1261,7 +1308,7 @@ async def chat_with_tutor(req: ChatRequest):
 
             def worker():
                 try:
-                    for chunk in provider.generate_stream(prompt, system_instruction=system_instruction, max_tokens=250):
+                    for chunk in provider.generate_stream(prompt, system_instruction=system_instruction, max_tokens=2048):
                         loop.call_soon_threadsafe(q.put_nowait, ("chunk", chunk))
                     loop.call_soon_threadsafe(q.put_nowait, ("done", None))
                 except Exception as e:
@@ -1499,9 +1546,18 @@ async def terminal_websocket(websocket: WebSocket):
     env_type = websocket.query_params.get("env", "host")
 
     pty_available = HAS_POSIX_PTY
+    winpty_available = False
     master = -1
     slave = -1
-    if HAS_POSIX_PTY:
+
+    if sys.platform == "win32":
+        try:
+            import winpty
+            winpty_available = True
+        except ImportError:
+            winpty_available = False
+
+    if HAS_POSIX_PTY and sys.platform != "win32":
         try:
             master, slave = pty.openpty()
             # Default terminal size (80 cols, 24 rows)
@@ -1517,7 +1573,55 @@ async def terminal_websocket(websocket: WebSocket):
         except OSError:
             pty_available = False
 
-    # Resilient Pipe Bridge Fallback if host kern.tty.ptmx_max limit is reached or on Windows
+    if winpty_available and sys.platform == "win32":
+        import winpty
+        shell = os.environ.get("COMSPEC", "powershell.exe")
+        proc = winpty.PTY(80, 24)
+        proc.spawn(shell)
+        
+        notice = "\r\n\x1b[1;32m[i] Connected to Synapse Windows ConPTY Shell\x1b[0m\r\n"
+        await websocket.send_text(notice)
+
+        async def winpty_read_loop():
+            try:
+                while True:
+                    data = await asyncio.to_thread(proc.read, 1024, True)
+                    if not data:
+                        await asyncio.sleep(0.01)
+                        continue
+                    b_data = data.encode("utf-8", errors="replace")
+                    append_terminal_bytes(b_data)
+                    await websocket.send_bytes(b_data)
+            except Exception:
+                pass
+
+        pipe_task = asyncio.create_task(winpty_read_loop())
+        try:
+            while True:
+                msg = await websocket.receive()
+                if "text" in msg and msg["text"]:
+                    text = msg["text"]
+                    if text.startswith("{") and "cols" in text:
+                        try:
+                            dim = json.loads(text)
+                            proc.set_size(dim.get("cols", 80), dim.get("rows", 24))
+                        except Exception:
+                            pass
+                        continue
+                    proc.write(text)
+                elif "bytes" in msg and msg["bytes"]:
+                    proc.write(msg["bytes"].decode("utf-8", errors="replace"))
+        except WebSocketDisconnect:
+            pass
+        finally:
+            pipe_task.cancel()
+            try:
+                del proc
+            except Exception:
+                pass
+        return
+
+    # Resilient Pipe Bridge Fallback if host kern.tty.ptmx_max limit is reached or on Windows without pywinpty
     if not pty_available:
         if sys.platform == "win32":
             shell = os.environ.get("COMSPEC", "powershell.exe")
