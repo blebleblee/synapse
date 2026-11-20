@@ -79,16 +79,17 @@ bin/synapse lint --render
 Once verification passes cleanly, compile fresh binaries and export the modular curriculum addons:
 
 ```bash
-# 1. Rebuild React Frontend SPA
-cd app/frontend && npm run build && cd ../..
-
-# 2. Rebuild macOS Apple Silicon Desktop Installer (.dmg and .zip)
-cd app/desktop && npm run build:mac && cd ../..
+# 1. Rebuild React Frontend SPA, PyInstaller Sidecar & macOS Desktop Installer
+bash scripts/build_mac_desktop.sh
 # Artifacts created in: dist/desktop/
-# - dist/desktop/Synapse Workbench-1.0.0-arm64.dmg (~99 MB)
-# - dist/desktop/Synapse Workbench-1.0.0-arm64-mac.zip (~95 MB)
+# - dist/desktop/Synapse-Workbench-1.1.1-arm64.dmg
+# - dist/desktop/Synapse-Workbench-1.1.1-arm64-mac.zip
 
-# 3. Rebuild Python Wheel and Source Distribution
+# Note on macOS App Updates & Cleanup:
+# If you are updating a local installation, macOS caches Chromium app state.
+# Run `bash scripts/clean_mac_install.sh` to purge old app caches before installing the new DMG.
+
+# 2. Rebuild Python Wheel and Source Distribution
 .venv/bin/python -m build --outdir dist/python
 # Artifacts created in: dist/python/
 # - dist/python/synapse-1.0.0-py3-none-any.whl (~74 KB)

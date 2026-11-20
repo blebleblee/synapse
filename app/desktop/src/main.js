@@ -92,14 +92,24 @@ function checkBackendHealth(timeoutMs = 4000) {
     for (const url of urls) {
       try {
         const req = http.get(url, { timeout: timeoutMs }, (res) => {
-          res.resume();
-          if (!settled && res.statusCode === 200) {
-            settled = true;
-            resolve(true);
-          } else {
+          let body = '';
+          res.on('data', (chunk) => { body += chunk; });
+          res.on('end', () => {
+            if (!settled && res.statusCode === 200) {
+              try {
+                const data = JSON.parse(body);
+                if (data.status === 'ok' && data.version === app.getVersion()) {
+                  settled = true;
+                  resolve(true);
+                  return;
+                } else {
+                  console.log(`[Desktop] Found backend at ${url} but version mismatch (expected ${app.getVersion()}, got ${data.version}). Ignoring.`);
+                }
+              } catch (_) {}
+            }
             attemptsLeft -= 1;
             if (attemptsLeft === 0 && !settled) resolve(false);
-          }
+          });
         });
         req.on('error', () => {
           attemptsLeft -= 1;
@@ -397,6 +407,14 @@ function setupNativeMenu() {
       submenu: [
         { role: 'reload' },
         { role: 'forceReload' },
+        {
+          label: 'Clear Cache & Hard Reload',
+          click: async () => {
+            const { session } = require('electron');
+            await session.defaultSession.clearCache();
+            if (mainWindow) mainWindow.reload();
+          }
+        },
         { role: 'toggleDevTools' },
         { type: 'separator' },
         { role: 'resetZoom' },
@@ -471,6 +489,21 @@ ipcMain.on('toggle-devtools', () => {
 // App Lifecycle
 app.whenReady().then(async () => {
   app.setName('Synapse Workbench');
+
+  // Automatic Cache Busting on Version Upgrade
+  const { session } = require('electron');
+  const versionFile = path.join(app.getPath('userData'), 'last-version.txt');
+  const currentVersion = app.getVersion();
+  try {
+    const lastVersion = fs.existsSync(versionFile) ? fs.readFileSync(versionFile, 'utf8').trim() : '';
+    if (lastVersion !== currentVersion) {
+      console.log(`[Desktop] App version changed from '${lastVersion}' to '${currentVersion}'. Clearing Chromium cache...`);
+      await session.defaultSession.clearCache();
+      fs.writeFileSync(versionFile, currentVersion, 'utf8');
+    }
+  } catch (err) {
+    console.error('[Desktop] Cache clear check failed:', err);
+  }
 
   // Set dock icon on macOS
   if (process.platform === 'darwin' && app.dock) {

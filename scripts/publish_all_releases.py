@@ -68,11 +68,11 @@ VER = "1.1.1"
 # Target binary files to publish/replace
 ASSETS_TO_PUBLISH = {
     f"Synapse-Workbench-Portable-{VER}.exe": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-Portable-{VER}.exe",
-    f"Synapse-Workbench-Setup-{VER}.exe": WORKSPACE_ROOT / f"dist/desktop/Synapse Workbench Setup {VER}.exe",
+    f"Synapse-Workbench-Setup-{VER}.exe": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-Setup-{VER}.exe",
     f"Synapse-Workbench-Portable-{VER}-win-x64.zip": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-Portable-{VER}-win-x64.zip",
     "Synapse-Portable-Windows.zip": WORKSPACE_ROOT / "dist/desktop/Synapse-Portable-Windows.zip",
     f"Synapse-Workbench-{VER}-arm64.dmg": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-{VER}-arm64.dmg",
-    f"Synapse-Workbench-{VER}-arm64-mac.zip": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-{VER}-arm64-mac.zip",
+    f"Synapse-Workbench-{VER}-arm64.zip": WORKSPACE_ROOT / f"dist/desktop/Synapse-Workbench-{VER}-arm64.zip",
 }
 
 def publish_gitea():
@@ -102,7 +102,7 @@ def publish_gitea():
         ("Synapse-Workbench-Portable-1.1.1-win-x64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-Portable-1.1.1-win-x64.zip"]),
         ("Synapse-Portable-Windows.zip", ASSETS_TO_PUBLISH["Synapse-Portable-Windows.zip"]),
         ("Synapse-Workbench-1.1.1-arm64.dmg", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64.dmg"]),
-        ("Synapse-Workbench-1.1.1-arm64-mac.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64-mac.zip"]),
+        ("Synapse-Workbench-1.1.1-arm64.zip", ASSETS_TO_PUBLISH["Synapse-Workbench-1.1.1-arm64.zip"]),
     ]
 
     existing_asset_sizes = {a["name"]: a["size"] for a in rel_data.get("assets", [])}
@@ -155,8 +155,8 @@ This milestone release marks the full completion of the Synapse masterclass curr
 | **Windows Portable (.exe)** | `Synapse-Workbench-Portable-1.1.1.exe` | 163.2 MB | [Download Portable .exe]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.1.exe) |
 | **Windows Installer (.exe)** | `Synapse-Workbench-Setup-1.1.1.exe` | 163.2 MB | [Download Installer .exe]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Setup-1.1.1.exe) |
 | **Windows Portable Bundle (.zip)** | `Synapse-Workbench-Portable-1.1.1-win-x64.zip` | 363.1 MB | [Download Portable Zip]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.1-win-x64.zip) |
-| **macOS Apple Silicon (DMG)** | `Synapse-Workbench-1.1.1-arm64.dmg` | 190.0 MB | [Download .dmg]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse%20Workbench-1.1.1-arm64.dmg) |
-| **macOS Portable (.zip)** | `Synapse-Workbench-1.1.1-arm64-mac.zip` | 186.2 MB | [Download .zip]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse%20Workbench-1.1.1-arm64-mac.zip) |
+| **macOS Apple Silicon (DMG)** | `Synapse-Workbench-1.1.1-arm64.dmg` | 190.0 MB | [Download .dmg]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-1.1.1-arm64.dmg) |
+| **macOS Portable (.zip)** | `Synapse-Workbench-1.1.1-arm64.zip` | 186.2 MB | [Download .zip]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/Synapse-Workbench-1.1.1-arm64.zip) |
 | **Python Wheel (.whl)** | `synapse-1.1.1-py3-none-any.whl` | 76 KB | [Download .whl]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/synapse-1.1.1-py3-none-any.whl) |
 | **Python Source (.tar.gz)** | `synapse-1.1.1.tar.gz` | 84 KB | [Download .tar.gz]({GITEA_URL}/{GITEA_REPO}/releases/download/{TAG}/synapse-1.1.1.tar.gz) |
 
@@ -303,7 +303,7 @@ This milestone release marks the full completion of the Synapse masterclass curr
 | **Windows Installer (.exe)** | `Synapse-Workbench-Setup-1.1.1.exe` | 163.2 MB | [Download Installer .exe](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-Setup-1.1.1.exe) |
 | **Windows Portable Bundle (.zip)** | `Synapse-Workbench-Portable-1.1.1-win-x64.zip` | 363.1 MB | [Download Portable Zip](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-Portable-1.1.1-win-x64.zip) |
 | **macOS Apple Silicon (DMG)** | `Synapse-Workbench-1.1.1-arm64.dmg` | 190.0 MB | [Download .dmg](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-1.1.1-arm64.dmg) |
-| **macOS Portable (.zip)** | `Synapse-Workbench-1.1.1-arm64-mac.zip` | 186.2 MB | [Download .zip](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-1.1.1-arm64-mac.zip) |
+| **macOS Portable (.zip)** | `Synapse-Workbench-1.1.1-arm64.zip` | 186.2 MB | [Download .zip](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/Synapse-Workbench-1.1.1-arm64.zip) |
 | **Python Wheel (.whl)** | `synapse-1.1.1-py3-none-any.whl` | 76 KB | [Download .whl](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/synapse-1.1.1-py3-none-any.whl) |
 | **Python Source (.tar.gz)** | `synapse-1.1.1.tar.gz` | 84 KB | [Download .tar.gz](https://github.com/{GITHUB_REPO}/releases/download/{TAG}/synapse-1.1.1.tar.gz) |
 

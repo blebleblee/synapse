@@ -42,15 +42,11 @@ echo "[*] [Step 3/5] Executing automated pytest suite..."
 # STEP 4: Rebuilding Production Application Binaries
 # -----------------------------------------------------------------------------
 echo ""
-echo "[*] [Step 4/5] Compiling production React frontend SPA..."
-(cd app/frontend && npm run build)
+echo "[*] [Step 4/5] Running macOS Desktop Build Pipeline (Frontend + PyInstaller + Electron)..."
+bash scripts/build_mac_desktop.sh
 
 echo ""
-echo "[*] [Step 4b/5] Packaging macOS Apple Silicon desktop app (DMG & Zip)..."
-(cd app/desktop && npm run build:mac)
-
-echo ""
-echo "[*] [Step 4c/5] Building Python distribution wheel and source tarball..."
+echo "[*] [Step 4b/5] Building Python distribution wheel and source tarball..."
 .venv/bin/python -m build --outdir dist/python
 
 # -----------------------------------------------------------------------------

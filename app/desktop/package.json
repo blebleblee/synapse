@@ -38,6 +38,7 @@
     "mac": {
       "icon": "assets/icon.icns",
       "category": "public.app-category.education",
+      "artifactName": "Synapse-Workbench-${version}-${arch}.${ext}",
       "target": [
         "dmg",
         "zip"
@@ -45,42 +46,58 @@
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist"
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "extraResources": [
+        {
+          "from": "../../dist/bin",
+          "to": "bin",
+          "filter": [
+            "synapse*"
+          ]
+        },
+        {
+          "from": "../../app/frontend/dist",
+          "to": "frontend/dist"
+        },
+        {
+          "from": "../../exports/packages",
+          "to": "packages",
+          "filter": [
+            "*.synpack"
+          ]
+        }
+      ]
     },
     "win": {
       "target": [
         "portable",
         "nsis"
+      ],
+      "extraResources": [
+        {
+          "from": "../../dist/python-win",
+          "to": "python"
+        },
+        {
+          "from": "../../app/frontend/dist",
+          "to": "frontend/dist"
+        },
+        {
+          "from": "../../exports/packages",
+          "to": "packages",
+          "filter": [
+            "*.synpack"
+          ]
+        }
       ]
     },
     "portable": {
       "artifactName": "Synapse-Workbench-Portable-${version}.exe"
     },
+    "nsis": {
+      "artifactName": "Synapse-Workbench-Setup-${version}.${ext}"
+    },
     "afterPack": "scripts/after-pack.js",
-    "extraResources": [
-      {
-        "from": "../../dist/bin",
-        "to": "bin",
-        "filter": [
-          "synapse*"
-        ]
-      },
-      {
-        "from": "../../dist/python-win",
-        "to": "python"
-      },
-      {
-        "from": "../../app/frontend/dist",
-        "to": "frontend/dist"
-      },
-      {
-        "from": "../../exports/packages",
-        "to": "packages",
-        "filter": [
-          "*.synpack"
-        ]
-      }
-    ],
     "linux": {
       "target": [
         "AppImage",

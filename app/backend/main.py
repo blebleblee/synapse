@@ -1549,30 +1549,63 @@ async def terminal_websocket(websocket: WebSocket):
                 pass
 
         pipe_task = asyncio.create_task(pipe_read_loop())
+        input_buffer: List[str] = []
         try:
             while True:
                 msg = await websocket.receive()
-                if "bytes" in msg and msg["bytes"]:
-                    proc.stdin.write(msg["bytes"])
-                    await proc.stdin.drain()
-                elif "text" in msg and msg["text"]:
-                    text = msg["text"]
-                    if text.startswith("{") and "cols" in text:
-                        continue
-                    
-                    if sys.platform == "win32":
-                        # Echo back for visual feedback since we lack a PTY
-                        # and map carriage return to CRLF for cmd/powershell
-                        if text == "\r":
-                            await websocket.send_text("\r\n")
-                            proc.stdin.write(b"\r\n")
-                        else:
-                            await websocket.send_text(text)
-                            proc.stdin.write(text.encode("utf-8"))
-                    else:
-                        proc.stdin.write(text.encode("utf-8"))
-                        
-                    await proc.stdin.drain()
+                raw_text = ""
+                if "text" in msg and msg["text"]:
+                    raw_text = msg["text"]
+                elif "bytes" in msg and msg["bytes"]:
+                    raw_text = msg["bytes"].decode("utf-8", errors="replace")
+
+                if not raw_text:
+                    continue
+
+                if raw_text.startswith("{") and "cols" in raw_text:
+                    continue
+
+                # Filter out raw terminal escape sequences in pipe mode to avoid cursor displacement
+                if raw_text.startswith("\x1b"):
+                    continue
+
+                # Normalize CRLF and CR to LF so Enter triggers cleanly once
+                normalized = raw_text.replace("\r\n", "\n").replace("\r", "\n")
+
+                for ch in normalized:
+                    if ch == "\n":
+                        cmd_line = "".join(input_buffer)
+                        input_buffer.clear()
+                        if cmd_line.strip():
+                            LAST_TERMINAL_COMMAND = cmd_line.strip()
+
+                        await websocket.send_text("\r\n")
+                        eol = b"\r\n" if sys.platform == "win32" else b"\n"
+                        proc.stdin.write(cmd_line.encode("utf-8") + eol)
+                        await proc.stdin.drain()
+                    elif ch in ("\x7f", "\x08", "\b"):  # Backspace key (ASCII 127 DEL, ASCII 8 BS)
+                        if input_buffer:
+                            input_buffer.pop()
+                            # In VT100/ANSI/xterm: \b moves left, space clears character, \b moves left again
+                            await websocket.send_text("\b \b")
+                    elif ch == "\x03":  # Ctrl+C
+                        input_buffer.clear()
+                        await websocket.send_text("^C\r\n")
+                        try:
+                            if sys.platform != "win32":
+                                proc.send_signal(signal.SIGINT)
+                            else:
+                                proc.stdin.write(b"\x03\r\n")
+                                await proc.stdin.drain()
+                        except Exception:
+                            pass
+                    elif ch == "\x15":  # Ctrl+U (clear line)
+                        if input_buffer:
+                            await websocket.send_text("\b \b" * len(input_buffer))
+                            input_buffer.clear()
+                    elif ord(ch) >= 32 or ch == "\t":
+                        input_buffer.append(ch)
+                        await websocket.send_text(ch)
         except WebSocketDisconnect:
             pass
         finally:
@@ -1869,27 +1902,32 @@ async def terminal_websocket(websocket: WebSocket):
 from fastapi.staticfiles import StaticFiles
 
 def resolve_dist_dir() -> Optional[Path]:
-    # 1. PyInstaller frozen onefile mode
+    # 1. Electron packaged resources (authoritative in production desktop shell)
+    env_res = os.environ.get("SYNAPSE_RESOURCES_PATH")
+    if env_res:
+        electron_dist = Path(env_res) / "frontend" / "dist"
+        if electron_dist.exists() and (electron_dist / "index.html").exists():
+            return electron_dist
+
+    # 2. PyInstaller frozen onefile mode
     if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
         p = Path(sys._MEIPASS) / "app" / "frontend" / "dist"
-        if p.exists():
+        if p.exists() and (p / "index.html").exists():
             return p
 
-    # 2. Bundled in site-packages/app/frontend/dist (e.g. Windows embedded Python sidecar)
+    # 3. Bundled in site-packages/app/frontend/dist (e.g. Windows embedded Python sidecar)
     app_pkg_dist = Path(__file__).resolve().parent.parent / "frontend" / "dist"
-    if app_pkg_dist.exists():
+    if app_pkg_dist.exists() and (app_pkg_dist / "index.html").exists():
         return app_pkg_dist
 
-    # 3. Electron resources path or development workspace root
-    env_res = os.environ.get("SYNAPSE_RESOURCES_PATH")
+    # 4. Fallback relative to executable, workspace root, or cwd
     candidates = [
-        Path(env_res) / "frontend" / "dist" if env_res else None,
         Path(sys.executable).resolve().parent.parent / "frontend" / "dist",
         WORKSPACE_ROOT / "app" / "frontend" / "dist",
         Path.cwd() / "app" / "frontend" / "dist",
     ]
     for c in candidates:
-        if c and c.exists():
+        if c and c.exists() and (c / "index.html").exists():
             return c
     return None
 
@@ -1900,7 +1938,15 @@ def get_spa_root():
     dist = resolve_dist_dir()
     if dist and (dist / "index.html").exists():
         from fastapi.responses import FileResponse
-        return FileResponse(str(dist / "index.html"), media_type="text/html")
+        return FileResponse(
+            str(dist / "index.html"),
+            media_type="text/html",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            }
+        )
     return {"detail": "Synapse Workbench Backend Online. Initializing frontend assets..."}
 
 if DIST_DIR and DIST_DIR.exists():
