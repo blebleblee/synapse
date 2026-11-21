@@ -9,7 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.1] - 2026-11-21
 
+### Security
+- **Localhost-only by default:** without `SYNAPSE_PASSWORD`, the server only answers requests addressed to `localhost`, which blocks other machines and DNS-rebinding attacks. Use `SYNAPSE_ALLOWED_HOSTS` to allow more hosts.
+- **Terminal WebSocket:** checks the `Origin` header (blocks cross-site WebSocket hijacking) and uses single-use 30-second tickets instead of `?token=` in the URL.
+- **Settings API** never returns secrets or the token-signing key; API keys come back redacted.
+- **Rendered lessons and chat** are sanitized (DOMPurify), and Mermaid runs in strict mode.
+- **Hardened paths and requests:** topic rename and delete paths are validated, uploads are capped at 500 MB, the login rate limit no longer grows without bound, and `SYNAPSE_TRUST_PROXY` handles reverse proxies.
+- **Docker:** the image runs as a non-root user, `--privileged` sandboxes are gone, and the build context excludes private and local files.
+
+### Privacy
+- **Packs and builds contain only the 12 core domains.** Chat sessions, blueprints and git-ignored tracks are never included. A release guard (`scripts/check_release_packs.py`) blocks uploads that would publish anything else. Earlier release assets that contained such files have been withdrawn.
+
 ### Fixed
+- **Lesson rewrites no longer truncate lessons.** Review auto-fix and the generator's refine step now work section by section, and a rewrite is accepted only if every heading and code block survives and the length doesn't shrink. An unparseable review is reported as failed instead of "verified".
+- **Claude:** retired model IDs are replaced (the cloud fallback works again); `temperature` is no longer sent, since current models reject it; Haiku is no longer silently mapped to Fable; refusals surface as errors; keys entered in Settings are used; requests identify as `Synapse-Workbench/<version>`.
+- **Search** uses a self-updating SQLite FTS5 index: about 0.2 s per query instead of seconds, and it no longer blocks the server. Stale responses no longer overwrite newer results.
 - **macOS Desktop**: Fixed an issue where the background proxy service remained running in the background after the UI window was closed.
 - **UI Navigation**: Lesson titles in the sidebar now gracefully truncate (ellipsis) instead of overflowing into multiline blocks, reducing clutter.
 - **Settings & Addons**: Added clear documentation within the Addons pane regarding how uninstalled core modules are generated or fetched.

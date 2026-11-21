@@ -287,10 +287,12 @@ def resolve_or_download_pack(domain: str) -> Path:
     if custom_registry:
         remote_urls.append(f"{custom_registry.rstrip('/')}/{pack_name}")
         
-    remote_urls.extend([
-        f"https://github.com/blebleblee/synapse/releases/download/v1.2.0/{pack_name}",
-        f"https://gitea.2464.cz/ai/synapse/releases/download/v1.2.0/{pack_name}",
-    ])
+    # This version's release first, then the last release known to carry packs.
+    for tag in dict.fromkeys([f"v{__version__}", "v1.2.0"]):
+        remote_urls.extend([
+            f"https://github.com/blebleblee/synapse/releases/download/{tag}/{pack_name}",
+            f"https://gitea.2464.cz/ai/synapse/releases/download/{tag}/{pack_name}",
+        ])
 
     import urllib.request
     last_err = None

@@ -11,4 +11,4 @@ _VERSION_FILE = _ROOT / "VERSION"
 if _VERSION_FILE.exists():
     __version__ = _VERSION_FILE.read_text(encoding="utf-8").strip()
 else:
-    __version__ = "1.2.0"
+    __version__ = "1.2.1"
