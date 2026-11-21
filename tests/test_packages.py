@@ -141,3 +141,80 @@ def test_install_pack_corrupted_manifest_fallback(tmp_path):
     assert res["domain"] == "woodcraft"
     assert (TOPICS_DIR / "woodcraft" / "SYLLABUS.md").exists()
 
+def test_install_pack_symlink_rejected(tmp_path):
+    """Packages containing symbolic links must be rejected as unsafe members."""
+    pack_path = tmp_path / "symlink_attack.synpack"
+    with tarfile.open(pack_path, "w:gz") as tar:
+        ti = tarfile.TarInfo(name="topics/attack/evil_symlink")
+        ti.type = tarfile.SYMTYPE
+        ti.linkname = "/etc/passwd"
+        tar.addfile(ti)
+
+    with pytest.raises(ValueError, match="unsafe link or device member"):
+        install_topic_pack(pack_path)
+
+def test_install_pack_hardlink_rejected(tmp_path):
+    """Packages containing hard links must be rejected as unsafe members."""
+    pack_path = tmp_path / "hardlink_attack.synpack"
+    with tarfile.open(pack_path, "w:gz") as tar:
+        ti = tarfile.TarInfo(name="topics/attack/evil_hardlink")
+        ti.type = tarfile.LNKTYPE
+        ti.linkname = "/etc/shadow"
+        tar.addfile(ti)
+
+    with pytest.raises(ValueError, match="unsafe link or device member"):
+        install_topic_pack(pack_path)
+
+def test_install_pack_unexpected_manifest_json_type(tmp_path):
+    """
+    If manifest.json contains valid JSON that is not an object (e.g. array or string),
+    it must not crash with AttributeError and must fall back to the package filename.
+    """
+    pack_path = tmp_path / "safe_array_domain.synpack"
+    with tarfile.open(pack_path, "w:gz") as tar:
+        array_json = b'["not", "a", "dict"]'
+        ti = tarfile.TarInfo(name="manifest.json")
+        ti.size = len(array_json)
+        tar.addfile(ti, io.BytesIO(array_json))
+
+        content = b"# Safe Array Domain\n"
+        ti2 = tarfile.TarInfo(name="topics/safe_array_domain/SYLLABUS.md")
+        ti2.size = len(content)
+        tar.addfile(ti2, io.BytesIO(content))
+
+    res = install_topic_pack(pack_path)
+    assert res["status"] == "installed"
+    assert res["domain"] == "safe_array_domain"
+    assert (TOPICS_DIR / "safe_array_domain" / "SYLLABUS.md").exists()
+
+def test_install_pack_malicious_domain_name_rejected(tmp_path):
+    """
+    A manifest containing directory traversal or slashes in its domain field
+    must be rejected with ValueError before any backup or directory operations.
+    """
+    pack_path = tmp_path / "malicious_domain.synpack"
+    with tarfile.open(pack_path, "w:gz") as tar:
+        bad_manifest = json.dumps({"domain": "../traversal_domain"}).encode("utf-8")
+        ti = tarfile.TarInfo(name="manifest.json")
+        ti.size = len(bad_manifest)
+        tar.addfile(ti, io.BytesIO(bad_manifest))
+
+    with pytest.raises(ValueError, match="Invalid domain identifier"):
+        install_topic_pack(pack_path)
+
+def test_install_pack_filename_domain_traversal_rejected(tmp_path):
+    """
+    When manifest is absent, a filename with path traversal characters
+    must be rejected with ValueError.
+    """
+    pack_path = tmp_path / "..traversal_filename.synpack"
+    with tarfile.open(pack_path, "w:gz") as tar:
+        content = b"# Dummy\n"
+        ti = tarfile.TarInfo(name="topics/dummy/SYLLABUS.md")
+        ti.size = len(content)
+        tar.addfile(ti, io.BytesIO(content))
+
+    with pytest.raises(ValueError, match="Invalid domain identifier"):
+        install_topic_pack(pack_path)
+
+

@@ -5,6 +5,7 @@ Handles packaging, verification, installation, and management of modular topic a
 
 import os
 import sys
+import re
 import json
 import tarfile
 import hashlib
@@ -110,22 +111,31 @@ def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
     manifest = {}
 
     with tarfile.open(pack_path, "r:gz") as tar:
-        # Security: verify no path traversal in tar members
+        # Security: verify no path traversal, unsafe links, or device nodes in tar members
         for member in tar.getmembers():
             if member.name.startswith("/") or ".." in member.name:
                 raise ValueError(f"Malicious package detected with path traversal member: {member.name}")
+            if member.issym() or member.islnk() or member.isdev():
+                raise ValueError(f"Malicious package detected with unsafe link or device member: {member.name}")
 
         try:
             manifest_member = tar.extractfile("manifest.json")
             if manifest_member:
-                manifest = json.loads(manifest_member.read().decode("utf-8"))
+                raw_manifest = json.loads(manifest_member.read().decode("utf-8"))
+                if isinstance(raw_manifest, dict):
+                    manifest = raw_manifest
         except (KeyError, json.JSONDecodeError, UnicodeDecodeError):
             pass
-            
-        domain = manifest.get("domain") or pack_path.stem.replace(".synpack", "")
-        
-        # Backup existing domain if it exists
+
+        raw_domain = manifest.get("domain") or pack_path.stem.replace(".synpack", "")
+        if not raw_domain or not isinstance(raw_domain, str) or not re.match(r'^[a-zA-Z0-9_-]+$', raw_domain):
+            raise ValueError(f"Invalid domain identifier '{raw_domain}' in package manifest or filename.")
+
+        domain = raw_domain
         target_domain_dir = TOPICS_DIR / domain
+        validate_workspace_path(TOPICS_DIR, target_domain_dir)
+
+        # Backup existing domain if it exists
         if target_domain_dir.exists() and target_domain_dir.is_dir():
             import time, shutil
             backup_dir = WORKSPACE_ROOT / "exports" / "backups"
@@ -148,6 +158,7 @@ def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
                 continue
 
             target_path = TOPICS_DIR / rel_name
+            validate_workspace_path(TOPICS_DIR, target_path)
 
             if member.isdir():
                 target_path.mkdir(parents=True, exist_ok=True)
@@ -159,7 +170,6 @@ def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
                         import shutil
                         shutil.copyfileobj(src, dst)
 
-    domain = manifest.get("domain", pack_path.stem)
     # Record installed package in database
     with get_db_connection() as conn:
         conn.execute("""
