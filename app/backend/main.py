@@ -95,7 +95,8 @@ from learning_engine.topic_manager import (
     delete_subtopic,
     rename_subtopic,
     scan_subtopic_status,
-    get_unit_lessons
+    get_unit_lessons,
+    invalidate_topic_tree_cache
 )
 from learning_engine.utils import perform_cleanup
 from learning_engine.generator import generate_subtopic_content
@@ -117,7 +118,9 @@ from learning_engine.mastery import (
     get_mastery_summary,
     get_subtopic_mastery,
     get_completed_lessons,
-    toggle_lesson_completion
+    toggle_lesson_completion,
+    normalize_topic_path,
+    resolve_topic_state
 )
 from learning_engine.security import validate_workspace_path, sanitize_query, is_dangerous_host_command
 from learning_engine.config_manager import get_settings, save_settings
@@ -512,8 +515,19 @@ def get_mastery():
     conn = get_connection()
     rows = conn.execute("SELECT path, state, completed_lessons FROM mastery").fetchall()
     conn.close()
-    topics = {row["path"]: {"state": row["state"], "completed_lessons": json.loads(row["completed_lessons"])} for row in rows}
-    
+
+    grouped: Dict[str, List[Any]] = {}
+    for row in rows:
+        canon_path = normalize_topic_path(row["path"])
+        grouped.setdefault(canon_path, []).append(row)
+
+    topics = {}
+    for canon_path, r_list in grouped.items():
+        c_row = next((r for r in r_list if normalize_topic_path(r["path"]) == r["path"]), None)
+        l_row = next((r for r in r_list if str(r["path"]).startswith("topics/")), None)
+        state, completed = resolve_topic_state(c_row, l_row)
+        topics[canon_path] = {"state": state, "completed_lessons": completed}
+
     return {
         "summary": get_mastery_summary(),
         "topics": topics
@@ -521,11 +535,15 @@ def get_mastery():
 
 @app.post("/api/mastery")
 def update_mastery(req: MasteryUpdateRequest):
-    return set_subtopic_mastery(req.path, req.state)
+    res = set_subtopic_mastery(req.path, req.state)
+    invalidate_topic_tree_cache()
+    return res
 
 @app.post("/api/mastery/lesson")
 def update_lesson_mastery(req: LessonMasteryRequest):
-    return toggle_lesson_completion(req.path, req.lesson_id, req.completed)
+    res = toggle_lesson_completion(req.path, req.lesson_id, req.completed)
+    invalidate_topic_tree_cache()
+    return res
 
 @app.get("/api/settings")
 def get_app_settings():
@@ -1020,7 +1038,7 @@ async def get_topic_details(
         "course_title": course_final_title,
         "subtopic": sub,
         "display_title": unit_display_title or display_title,
-        "path": str(sub_path.relative_to(WORKSPACE_ROOT)),
+        "path": f"{domain}/{cat}/{sub}",
         "persona": persona,
         "mastery": get_subtopic_mastery(f"{domain}/{cat}/{sub}"),
         "completed_lessons": get_completed_lessons(f"{domain}/{cat}/{sub}"),

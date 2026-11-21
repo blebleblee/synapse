@@ -223,4 +223,130 @@ def test_dangerous_command_detection():
     assert not is_dangerous_host_command("cat file.txt")
     assert not is_dangerous_host_command("echo 'hello world'")
 
+def test_api_lesson_completion_prefixed_and_canonical_sync():
+    """
+    API-level regression test exercising the completion endpoint, warm-cache invalidation,
+    and subsequent topic/tree reads using the actual request formats:
+    1. GET /api/tree BEFORE initial completion to warm the cache and assert initial incomplete state.
+    2. POST /api/mastery/lesson with path='topics/computing/data/postgresql' (as sent by LessonViewer) to toggle ON.
+    3. Assert updated tree state (cache was invalidated) and topic-detail state.
+    4. POST /api/mastery/lesson with completed=false to toggle OFF.
+    5. Assert updated tree state (cache was invalidated again) and topic-detail state.
+    """
+    prefixed_path = "topics/computing/data/postgresql"
+    canonical_query = "computing/data/postgresql"
+    test_lesson = "lesson_01_foundations_and_invariants"
+
+    # 1. Warm cache: GET /api/tree BEFORE initial completion and assert initial incomplete state
+    tree_warm = client.get("/api/tree")
+    assert tree_warm.status_code == 200
+    pg_unit_warm = tree_warm.json()["computing"]["disciplines"]["data"]["courses"]["postgresql"]["units"]["core"]
+    assert test_lesson not in pg_unit_warm.get("completed_lessons", []), (
+        f"Expected {test_lesson} to not be completed initially in /api/tree"
+    )
+
+    # 2. Mark lesson completed (toggle ON) using prefixed path from LessonViewer
+    post_res = client.post("/api/mastery/lesson", json={
+        "path": prefixed_path,
+        "lesson_id": test_lesson,
+        "completed": True
+    })
+    assert post_res.status_code == 200
+    assert test_lesson in post_res.json()["completed_lessons"]
+
+    # 3. Assert updated tree state and topic-detail state (warm cache was invalidated!)
+    tree_res = client.get("/api/tree")
+    assert tree_res.status_code == 200
+    pg_unit = tree_res.json()["computing"]["disciplines"]["data"]["courses"]["postgresql"]["units"]["core"]
+    assert test_lesson in pg_unit["completed_lessons"], (
+        f"Expected {test_lesson} in /api/tree unit completed_lessons after cache invalidation"
+    )
+
+    topic_res = client.get(f"/api/topic?query={canonical_query}")
+    assert topic_res.status_code == 200
+    topic_data = topic_res.json()
+    assert test_lesson in topic_data["completed_lessons"], (
+        f"Expected {test_lesson} in /api/topic completed_lessons, got: {topic_data.get('completed_lessons')}"
+    )
+
+    # 4. Toggle completion OFF via API
+    off_res = client.post("/api/mastery/lesson", json={
+        "path": canonical_query,
+        "lesson_id": test_lesson,
+        "completed": False
+    })
+    assert off_res.status_code == 200
+    assert test_lesson not in off_res.json()["completed_lessons"]
+
+    # 5. Assert updated tree state and topic-detail state again (cache invalidated on toggle OFF!)
+    tree_res2 = client.get("/api/tree")
+    assert tree_res2.status_code == 200
+    pg_unit2 = tree_res2.json()["computing"]["disciplines"]["data"]["courses"]["postgresql"]["units"]["core"]
+    assert test_lesson not in pg_unit2["completed_lessons"], (
+        f"Expected {test_lesson} to not be in /api/tree completed_lessons after toggle OFF"
+    )
+
+    topic_res2 = client.get(f"/api/topic?query={canonical_query}")
+    assert topic_res2.status_code == 200
+    assert test_lesson not in topic_res2.json()["completed_lessons"]
+
+def test_api_mastery_independent_of_sql_row_order():
+    """
+    Verifies that /api/mastery returns the exact same resolved state and merged lessons
+    independent of SQL row order when canonical and legacy rows coexist.
+    """
+    from learning_engine.database import get_connection
+    import json
+
+    canonical_path = "computing/data/postgresql"
+    legacy_path = f"topics/{canonical_path}"
+
+    # Scenario A: Canonical row inserted first, Legacy row inserted second
+    conn = get_connection()
+    with conn:
+        conn.execute("DELETE FROM mastery WHERE path = ? OR path = ?", (canonical_path, legacy_path))
+        conn.execute(
+            "INSERT INTO mastery (path, state, completed_lessons) VALUES (?, ?, ?)",
+            (canonical_path, "mastered", json.dumps(["lesson_01", "lesson_03"]))
+        )
+        conn.execute(
+            "INSERT INTO mastery (path, state, completed_lessons) VALUES (?, ?, ?)",
+            (legacy_path, "studying", json.dumps(["lesson_02", "lesson_03"]))
+        )
+    conn.close()
+
+    res_a = client.get("/api/mastery")
+    assert res_a.status_code == 200
+    data_a = res_a.json()["topics"][canonical_path]
+    assert data_a["state"] == "mastered"
+    assert data_a["completed_lessons"] == ["lesson_01", "lesson_02", "lesson_03"]
+
+    # Scenario B: Legacy row inserted first, Canonical row inserted second
+    conn = get_connection()
+    with conn:
+        conn.execute("DELETE FROM mastery WHERE path = ? OR path = ?", (canonical_path, legacy_path))
+        conn.execute(
+            "INSERT INTO mastery (path, state, completed_lessons) VALUES (?, ?, ?)",
+            (legacy_path, "studying", json.dumps(["lesson_02", "lesson_03"]))
+        )
+        conn.execute(
+            "INSERT INTO mastery (path, state, completed_lessons) VALUES (?, ?, ?)",
+            (canonical_path, "mastered", json.dumps(["lesson_01", "lesson_03"]))
+        )
+    conn.close()
+
+    res_b = client.get("/api/mastery")
+    assert res_b.status_code == 200
+    data_b = res_b.json()["topics"][canonical_path]
+    assert data_b["state"] == "mastered"
+    assert data_b["completed_lessons"] == ["lesson_01", "lesson_02", "lesson_03"]
+
+    # Clean up
+    conn = get_connection()
+    with conn:
+        conn.execute("DELETE FROM mastery WHERE path = ? OR path = ?", (canonical_path, legacy_path))
+    conn.close()
+
+
+
 
