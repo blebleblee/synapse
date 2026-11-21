@@ -97,3 +97,13 @@ This backlog documents prioritized, actionable findings from the user-facing fun
   - `app/frontend/src/components/TerminalDrawer.tsx:112-118`: `ws.onclose` unconditionally schedules reconnection without inspecting close codes.
   - `app/backend/main.py:1591`: Backend sends `await websocket.close(code=1008, reason="Authentication required")`.
 - **Status:** **COMPLETED** (Halted automatic terminal WebSocket reconnection loops on code 1008 Policy Violation / Unauthorized and code 1000 Normal Closure in `TerminalDrawer.tsx` and `app/frontend/src/utils/terminalHelpers.ts`. Reconnects upon `synapse:authenticated` event. Added unit tests in `terminalReconnect.test.ts`).
+
+
+---
+
+### FIND-10: Corrupted Package Manifest Crashes Installer Instead of Using Filename Fallback
+- **User-Visible Impact:** When importing or installing a `.synpack` archive that contains a malformed, truncated, or unparseable `manifest.json`, `install_topic_pack` crashed with an unhandled `json.JSONDecodeError` rather than falling back to the package archive name as intended.
+- **Evidence:**
+  - `learning_engine/packages.py:121`: `json.loads(manifest_member.read().decode("utf-8"))` caught only `KeyError`, letting `JSONDecodeError` crash execution.
+  - `learning_engine/packages.py:124`: `domain = manifest.get("domain") or pack_path.stem.replace(".synpack", "")` fallback was unreachable on malformed JSON.
+- **Status:** **COMPLETED** (Caught `(KeyError, json.JSONDecodeError, UnicodeDecodeError)` in `install_topic_pack`, allowing clean fallback to `pack_path.stem`. Verified with `test_install_pack_corrupted_manifest_fallback` in `tests/test_packages.py`).

@@ -2,7 +2,7 @@
 
 ## 1. Saved Checkpoint
 
-- **Latest Checkpoint Hash:** `11ecd95` (`fix: stop terminal reconnect loop on auth failure (code 1008)`)
+- **Latest Checkpoint Hash:** `07d27a1` (`test: add curriculum generation partial-persistence and quality gate acceptance tests`)
 - **Completed Backlog Tasks:**
   - **FIND-02:** Removed automatic `git add -A`, `git commit`, `git push` workspace side effects from `topic_manager.py`, `summary.py`, and `main.py`. Added `tests/test_git_isolation.py`.
   - **FIND-01:** Repaired `GenerateRequest` payload schema mismatch causing HTTP 422 errors on curriculum generation.
@@ -13,6 +13,11 @@
   - **FIND-04:** Prevented failed or untranslated English fallback text from poisoning the disk translation cache (`should_cache = not any_chunk_failed and not is_identical_to_source and bool(final_translation)`). Added regression tests in `tests/test_api.py`.
   - **FIND-08:** Forwarded configured AI model (`settings.mentorModel || settings.primaryModel`) and cluster host (`settings.ollamaHost`) to `/api/quiz` and `/api/summary/regenerate` endpoints and provider routing. Added regression test in `tests/test_api.py`.
   - **FIND-09:** Stopped terminal WebSocket reconnection loop upon authentication failure (`event.code === 1008`) or deliberate closure (`event.code === 1000`). Reconnects upon `synapse:authenticated` event. Added helper and unit tests in `app/frontend/src/utils/terminalHelpers.ts` and `app/frontend/src/components/terminalReconnect.test.ts`.
+  - **FIND-10:** Fixed unhandled `JSONDecodeError` on corrupted `.synpack` `manifest.json`, falling back gracefully to package filename in `learning_engine/packages.py:122`.
+- **Newly Added Acceptance Test Coverage:**
+  - **Package Security & Lifecycle (`tests/test_packages.py`):** Added tests covering missing file handling, corrupted archive rejection (`tarfile.ReadError`), malicious path traversal rejection (`ValueError`), corrupted manifest fallback, and full export -> uninstall -> reinstall round-trip.
+  - **Terminal Auth & Protected API Surface (`tests/test_auth.py`):** Added tests covering `/ws/terminal` auth rejection (`code=1008`) without opening a real PTY, plus complete protected route coverage across `/api/tree`, `/api/topic`, `/api/mastery`, `/api/quiz`, `/api/packages`, and `/api/settings`.
+  - **Curriculum Generation Resilience (`tests/test_generator_acceptance.py`):** Added acceptance tests covering full generation, partial-failure persistence, resuming (`force=False`), force purge regeneration (`force=True`), and quality gate invariants (refusal, minimum length, terminal punctuation).
 - **Verification Script:** Verified `scripts/verify_all.sh` runs reliably from root, halts on failure via `set -eo pipefail`, and passes all 5 verification phases.
 
 ---
@@ -20,7 +25,7 @@
 ## 2. Audit Summary & Remaining Backlog
 
 A systematic audit was conducted across all 8 functional areas, recorded in `docs/backlog.md`:
-- **Completed:** ALL 9 FINDINGS RESOLVED (FIND-01 through FIND-09).
+- **Completed:** ALL 10 FINDINGS RESOLVED (FIND-01 through FIND-10).
 - **Remaining Open Findings:** None. Backlog is fully cleared and verified.
 
 ---
@@ -39,28 +44,19 @@ A systematic audit was conducted across all 8 functional areas, recorded in `doc
 ==================================================
 
 [*] [1/5] Running frontend unit tests...
-✔ 16 tests passed in 144.7ms (0 failed)
+✔ 16 tests passed in 147.1ms (0 failed)
 
 [*] [2/5] Running frontend linter...
 oxlint: 0 errors, 25 non-blocking warnings
 
 [*] [3/5] Building frontend production bundle...
-tsc -b && vite build: 3646 modules transformed in 381ms (0 errors)
+tsc -b && vite build: 3646 modules transformed in 400ms (0 errors)
 
 [*] [4/5] Running backend test suite...
-pytest tests/: 84 passed in 36.24s (0 failed)
+pytest tests/: 95 passed in 56.71s (0 failed)
 
 [*] [5/5] Running Chromium E2E browser tests...
-pytest e2e/test_learner_journey.py: 8 passed in 40.80s (0 failed)
-
-==================================================
- [✔] ALL 5 VERIFICATION PHASES PASSED             
-==================================================
-```
-pytest tests/: 81 passed in 32.86s (0 failed)
-
-[*] [5/5] Running Chromium E2E browser tests...
-pytest e2e/test_learner_journey.py: 8 passed in 40.62s (0 failed)
+pytest e2e/test_learner_journey.py: 8 passed in 40.45s (0 failed)
 
 ==================================================
  [✔] ALL 5 VERIFICATION PHASES PASSED             
