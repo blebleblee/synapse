@@ -23,9 +23,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
   - `app/frontend/src/App.tsx:280`: Frontend sends `body: JSON.stringify({ query, force })`.
   - `app/backend/main.py:251-255`: `GenerateRequest` requires `domain: str`, `category: str`, `subtopic: str` as mandatory fields.
   - `app/backend/main.py:1057`: `generate_topic` endpoint accesses `req.query`, `req.provider`, `req.model`, which do not exist on `GenerateRequest`.
-- **Status:** Runtime verified (TestClient produces HTTP 422).
-- **Proposed Acceptance Criteria:** POST `/api/generate` accepts `{ query: str, force: bool = False, provider?: str, model?: str }`, resolves the target path, invokes generation, and returns HTTP 200 without validation errors.
-- **Small Proposed Repair Task:** Update `GenerateRequest` in `app/backend/main.py` to match the frontend payload (`query`, `force`, optional `provider`, optional `model`), and populate `domain`, `category`, `subtopic` via `resolve_subtopic(req.query)`.
+- **Status:** **COMPLETED** (Replaced `domain`, `category`, `subtopic` with `query`, `provider`, `model`, `force` in `GenerateRequest`, and added `/api/generate` regression test).
 
 ---
 
@@ -35,9 +33,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
   - `learning_engine/topic_manager.py:363-366`: `delete_subtopic` runs `git add -A`, `git commit`, and `git push origin main`.
   - `app/backend/main.py:1570-1574`: `compile_guide` runs `git add`, `git commit`, and `git push origin main`.
   - `learning_engine/summary.py:120-123`: `regenerate_summary` runs `git add`, `git commit`, and `git push origin main`.
-- **Status:** Confirmed by code.
-- **Proposed Acceptance Criteria:** Topic deletion, guide compilation, and summary regeneration stage only the specific modified artifact (never `-A`), and automatic `git push` is disabled or made opt-in via explicit configuration.
-- **Small Proposed Repair Task:** Remove `git add -A` from `learning_engine/topic_manager.py:363` (stage only `SYLLABUS.md`), and gate `git push` behind an explicit environment variable or configuration flag.
+- **Status:** **COMPLETED** (Removed automatic `git add/commit/push` side effects from `topic_manager.py`, `summary.py`, and `main.py`, and added `tests/test_git_isolation.py`).
 
 ---
 
@@ -46,9 +42,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Evidence:**
   - `app/frontend/src/components/LessonViewer.tsx:878`: `{topic.lessons && topic.lessons.length > 1 && activeLessonId !== 'all' ? (` restricts bottom bar to multi-lesson topics.
   - `app/frontend/src/components/TopicTree.tsx:507`: `const hasMultiLessons = Boolean(singleUnit.lessons && singleUnit.lessons.length > 1);` hides lesson checkboxes for single-lesson units.
-- **Status:** Confirmed by code.
-- **Proposed Acceptance Criteria:** For topics with `lessons.length === 1`, `LessonViewer.tsx` renders the "Mark Complete" / "Completed ✓" button, and clicking it updates completion state and sidebar progress badges.
-- **Small Proposed Repair Task:** Change condition in `app/frontend/src/components/LessonViewer.tsx:878` from `topic.lessons.length > 1` to `topic.lessons.length >= 1`.
+- **Status:** **COMPLETED** (Updated conditionals to `length >= 1` in `LessonViewer.tsx` and `TopicTree.tsx`).
 
 ---
 
@@ -68,9 +62,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Evidence:**
   - `app/frontend/src/components/SearchModal.tsx:111`: `onSelectTopic(r.path)` passes only the course path, omitting the lesson identifier.
   - `learning_engine/search.py:73`: `search_curriculum` returns `"file": md_path.name` (e.g. `lesson_02_indexing.md`), which contains the exact lesson identifier.
-- **Status:** Confirmed by code.
-- **Proposed Acceptance Criteria:** Clicking a search result item extracts the lesson ID from `r.file` and invokes `onSelectTopic(r.path, lessonId)`, immediately opening the specific lesson containing the match.
-- **Small Proposed Repair Task:** In `SearchModal.tsx`, derive `lessonId = r.file ? r.file.replace(/\.md$/, '') : undefined` and invoke `onSelectTopic(r.path, lessonId)`.
+- **Status:** **COMPLETED** (Extracted `lessonId` from `r.file` in `SearchModal.tsx` and updated `onSelectTopic`).
 
 ---
 
@@ -78,9 +70,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **User-Visible Impact:** Deleting an active topic from the sidebar deletes the files on disk, but `handleDeleteTopic` in `App.tsx` does not clear `synapse_active_selection` from `localStorage` or reset `activeLessonId`. On the next browser reload, `initApp()` attempts to restore the deleted topic, causing an unnecessary 404 request. If backend deletion fails, the UI provides no error feedback.
 - **Evidence:**
   - `app/frontend/src/App.tsx:321-325`: `handleDeleteTopic` clears `selectedPath` and `topicDetails` but omits `clearStoredSelection()`, `setActiveLessonId(null)`, and error notification on `!res.ok`.
-- **Status:** Confirmed by code.
-- **Proposed Acceptance Criteria:** When the active topic is deleted, `clearStoredSelection()` and `setActiveLessonId(null)` are invoked, and if `!res.ok`, the learner receives an error alert.
-- **Small Proposed Repair Task:** Update `handleDeleteTopic` in `App.tsx` to call `clearStoredSelection()` and `setActiveLessonId(null)` within the `res.ok` block, and show an error alert if `!res.ok`.
+- **Status:** **COMPLETED** (Updated `handleDeleteTopic` to invoke `clearStoredSelection()`, `setActiveLessonId(null)`, and `window.alert` on backend failure).
 
 ---
 
@@ -89,9 +79,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Evidence:**
   - `app/frontend/src/App.tsx:708-713`: `handleUpdateMastery` updates `topicDetails.mastery` in state but omits `fetchTree()`.
   - Contrast with `handleToggleLessonCompletion` at `App.tsx:378`, which correctly calls `await fetchTree()`.
-- **Status:** Confirmed by code.
-- **Proposed Acceptance Criteria:** Updating mastery level via `handleUpdateMastery` invokes `await fetchTree()` upon HTTP 200, instantly synchronizing the sidebar indicators with the reader.
-- **Small Proposed Repair Task:** Add `await fetchTree();` inside the `if (res.ok)` block of `handleUpdateMastery` in `App.tsx`.
+- **Status:** **COMPLETED** (Added `await fetchTree()` and `await fetchStatus()` inside `handleUpdateMastery`).
 
 ---
 

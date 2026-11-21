@@ -1,28 +1,27 @@
-# Milestone Status Report: Keyboard Navigation, Unified Verification & Functionality Audit
+# Milestone Status Report: Autonomous Maintenance & Verification
 
 ## 1. Saved Checkpoint
 
-- **Commit Hash:** `323a087` (`fix: stabilize lesson shortcuts and add unified verification`)
-- **Self-Review:** Verified strict adherence to the keyboard navigation contract (`[` and `]` navigation, no boundary wrapping, "all lessons" default, "labs" isolation, modifier/target guards, and selection persistence).
+- **Latest Checkpoint Hash:** `913c1ae` (`fix: refresh topic tree upon manual mastery update`)
+- **Completed Backlog Tasks:**
+  - **FIND-02:** Removed automatic `git add -A`, `git commit`, `git push` workspace side effects from `topic_manager.py`, `summary.py`, and `main.py`. Added `tests/test_git_isolation.py`.
+  - **FIND-01:** Repaired `GenerateRequest` payload schema mismatch causing HTTP 422 errors on curriculum generation.
+  - **FIND-03:** Allowed single-lesson topics to be marked complete from the reader and sidebar (`topic.lessons.length >= 1`).
+  - **FIND-05:** Extracted lesson ID from search result file for direct navigation to matched lesson.
+  - **FIND-06:** Cleared active selection from memory and localStorage upon topic deletion, with UI error alert on failure.
+  - **FIND-07:** Refreshed sidebar tree state dynamically upon manual mastery level updates in reader header (`await fetchTree()`, `await fetchStatus()`).
 - **Verification Script:** Verified `scripts/verify_all.sh` runs reliably from root, halts on failure via `set -eo pipefail`, and passes all 5 verification phases.
 
 ---
 
-## 2. Audit Summary
+## 2. Audit Summary & Remaining Backlog
 
-A systematic audit of user-facing workbench functionality was conducted across 8 core areas:
-1. **Curriculum Selection & Navigation:** Selection and reload-and-resume work reliably. However, search result cards navigate only to Lesson 1 instead of the matched lesson (`FIND-05`), and deleting an active topic leaves stale state in memory/localStorage (`FIND-06`).
-2. **Lesson Rendering & Reader Controls:** KaTeX math, Mermaid diagrams, and code fences render cleanly. However, topics with only 1 lesson suppress the entire bottom navigation bar, preventing learners from marking single-lesson courses as complete (`FIND-03`).
-3. **Curriculum Generation:** **Critically broken.** Clicking "Generate Masterclass Curriculum Units" or "Regenerate Content" fails with HTTP 422 Unprocessable Entity due to a mismatch between frontend JSON (`query`, `force`) and backend `GenerateRequest` (`domain`, `category`, `subtopic`) (`FIND-01`).
-4. **Mentor Chat:** Fully functional; streams responses with active lesson and terminal buffer context.
-5. **Settings & Provider Configuration:** Hardware discovery, Ollama node probing, and SQLite settings persistence operate reliably. However, quiz and summary generation ignore configured preferred models (`FIND-08`).
-6. **Package Import/Export:** Package listing, `.synpack` export, and installation operate as expected.
-7. **Terminal Controls:** WebSocket PTY bridge works for interactive shell commands. However, WebSocket reconnection loops endlessly on HTTP 1008 auth rejection (`FIND-09`).
-8. **Progress / Mastery Controls:** Lesson completion toggling and tree progress badges operate reliably. However, manual mastery level updates in the reader header omit `fetchTree()`, leaving sidebar progress badges stale until reload (`FIND-07`).
-9. **Data Integrity & Operations:** Topic deletion, guide compilation, and summary generation invoke unconstrained `git add -A` across `WORKSPACE_ROOT` and attempt `git push origin main`, risking accidental commit of private or uncommitted workspace files (`FIND-02`).
-10. **Translation Caching:** Failed translations cache fallback English text permanently, locking users out of future translations (`FIND-04`).
-
-Detailed findings, evidence, status, and acceptance criteria are documented in `docs/backlog.md`.
+A systematic audit was conducted across all 8 functional areas, recorded in `docs/backlog.md`:
+- **Completed:** FIND-01, FIND-02, FIND-03, FIND-05, FIND-06, FIND-07.
+- **Remaining Open Findings:**
+  - **FIND-04:** Failed translations are permanently cached as valid English content.
+  - **FIND-08:** Quiz and summary generation endpoints ignore user's configured preferred AI model and cluster host.
+  - **FIND-09:** Terminal WebSocket reconnect loop floods disconnected endpoint when unauthenticated (code 1008).
 
 ---
 
@@ -40,19 +39,19 @@ Detailed findings, evidence, status, and acceptance criteria are documented in `
 ==================================================
 
 [*] [1/5] Running frontend unit tests...
-✔ 13 tests passed in 137.9ms (0 failed)
+✔ 13 tests passed in 137.6ms (0 failed)
 
 [*] [2/5] Running frontend linter...
 oxlint: 0 errors, 25 non-blocking warnings
 
 [*] [3/5] Building frontend production bundle...
-tsc -b && vite build: 3645 modules transformed in 369ms (0 errors)
+tsc -b && vite build: 3645 modules transformed in 364ms (0 errors)
 
 [*] [4/5] Running backend test suite...
-pytest tests/: 79 passed in 32.18s
+pytest tests/: 81 passed in 32.86s (0 failed)
 
 [*] [5/5] Running Chromium E2E browser tests...
-pytest e2e/test_learner_journey.py: 8 passed in 11.19s
+pytest e2e/test_learner_journey.py: 8 passed in 40.62s (0 failed)
 
 ==================================================
  [✔] ALL 5 VERIFICATION PHASES PASSED             
@@ -61,12 +60,36 @@ pytest e2e/test_learner_journey.py: 8 passed in 11.19s
 
 ---
 
-## 4. Single Highest-Priority Recommended Next Milestone
+## 4. Daily Usage Guide
 
-**Milestone: Restore Curriculum Generation & Sanitize Git Workspace Side-Effects (FIND-01 & FIND-02)**
+### How to Start Maintenance
+From any directory, run the continuation launcher:
+```bash
+./scripts/continue.sh
+```
+This script resolves the repository root, verifies the `gemini` CLI is installed, inspects existing sessions via `gemini --list-sessions`, and launches an interactive session supplying the prompt from `.gemini/prompts/continue-maintenance.md`. If prior sessions exist, it automatically resumes the latest session (`--resume latest`); otherwise, it begins a clean interactive session.
 
-- **Objective:** Fix the HTTP 422 schema mismatch in `/api/generate` so learners can generate and regenerate curriculum units from the UI, and eliminate unconstrained `git add -A` and automatic `git push origin main` from topic deletion, summary regeneration, and guide compilation.
-- **Scope:**
-  1. Align `GenerateRequest` in `app/backend/main.py` with the frontend `{ query, force, provider?, model? }` payload and resolve path components dynamically.
-  2. Add unit and integration tests for `/api/generate` with mocked provider.
-  3. Replace `git add -A` with targeted file staging (or disable automatic git mutations) in `learning_engine/topic_manager.py`, `learning_engine/summary.py`, and `app/backend/main.py`.
+### How to Request a Safe Stop
+- Type *"stop after current task"*, *"wrap up batch"*, or *"stop"* in the CLI prompt.
+- The agent finishes its current atomic task, runs `./scripts/verify_all.sh`, records the handoff state in `docs/status.md`, and exits with a clean working tree.
+- In terminal, pressing `Ctrl+C` halts the CLI cleanly between turns.
+
+### What Happens After Quota Exhaustion
+- If the AI model quota is exhausted during a maintenance batch, the session pauses.
+- Because all verified work is committed locally and the handoff state is continuously saved in `docs/status.md` and `docs/backlog.md`, zero progress is lost.
+- Once quota resets, simply re-run `./scripts/continue.sh` to resume seamlessly.
+
+### Operational Limitations
+- **Interactive Mode Preservation:** `scripts/continue.sh` intentionally launches in interactive mode rather than headless mode so you retain full control over batch progress.
+- **Strictly Local Commits:** Maintenance batches never push to remote git repositories (`git push` is blocked).
+- **Test Provider Mocking:** Automated verification suites use deterministic mocks for AI generation; real model output quality must be evaluated through manual review.
+
+---
+
+## 5. Recommended Next Milestone
+
+**Milestone: Socratic Configuration Mapping and Edge-Case Synchronization (FIND-04, FIND-07, FIND-08, FIND-09)**
+- Map active AI model and host preferences to quiz and summary generation (`FIND-08`).
+- Prevent fallback English text from poisoning the translation cache on network failure (`FIND-04`).
+- Trigger `fetchTree()` and `fetchStatus()` upon reader header mastery change (`FIND-07`).
+- Terminate terminal WebSocket reconnection attempts upon HTTP 1008 authorization failure (`FIND-09`).
