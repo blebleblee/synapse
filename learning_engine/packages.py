@@ -103,7 +103,7 @@ def export_topic_pack(domain: str, output_dir: Optional[Path] = None) -> Path:
     The complete pack contains only the core domains and names only them; packs
     never contain chat sessions, blueprints, or git-ignored private tracks.
     """
-    out_dir = output_dir or get_packs_dir()
+    out_dir = Path(output_dir) if output_dir else get_packs_dir()
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if domain.lower() in ["all", "complete", "global"]:
