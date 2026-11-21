@@ -4,7 +4,7 @@
   <p><strong>AI Learning Workspace & Socratic Curriculum Engine</strong></p>
 
   <a href="CHANGELOG.md">
-    <img src="https://img.shields.io/badge/version-1.1.1-emerald?style=flat" alt="Version 1.1.1">
+    <img src="https://img.shields.io/badge/version-1.2.1-emerald?style=flat" alt="Version 1.2.1">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
@@ -37,7 +37,7 @@ Once the curriculum is assembled, Synapse provides a native **Socratic Workbench
 ## 🎯 Key Features & Capabilities
 
 ### 1. Autonomous Masterclass Curriculum Engine
-- **Textbook-Grade Depth:** Automatically authors sequential, multi-module masterclasses following the rigorous O'Reilly / MIT Press standard:
+- **Textbook-Grade Depth:** Automatically authors sequential, multi-module masterclasses at textbook depth:
   - *Foundations & Invariants:* First-principles mathematical and theoretical groundwork.
   - *Architecture & Mechanics:* Internal data structures, execution pipelines, and clean ASCII/Mermaid diagrams.
   - *Deep Dive & Concurrency:* Memory models, locking mechanisms, failure modes, and mitigation patterns.
@@ -111,34 +111,28 @@ graph TB
 
 ## 🚀 Quick Start & Installation
 
-### Option 1: 1-Click Desktop App (Zero Build Required)
-Download the standalone, zero-dependency desktop application from the project releases:
+### Option 1: Desktop App (no build required)
+Download the latest version from the [Releases page](https://github.com/blebleblee/synapse/releases/latest):
 
-| Platform | Download | Instructions |
+| Platform | File | How to start |
 | :--- | :--- | :--- |
-| **Windows (Portable)** | **`Synapse-Workbench-Portable-1.1.1.exe`** | Standalone portable `.exe` (no Python or installation required). Place `./topics/` alongside the executable and launch! |
-| **macOS (Apple Silicon)** | **`Synapse-Workbench-1.1.1-arm64.dmg`** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
-| **macOS (Portable)** | **`Synapse-Workbench-1.1.1-arm64-mac.zip`** | Unzip and launch **Synapse Workbench.app** directly. |
-| **Linux (CLI / Server)** | **`synapse-1.1.1-py3-none-any.whl`** | See Python Wheel Installation below. |
-| **Any Platform** | **Docker Compose** | See Docker Deployment below. |
+| **macOS (Apple Silicon)** | `Synapse-Workbench-<version>-arm64.dmg` | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, launch it. |
+| **Windows** | `Synapse-Workbench-Setup-<version>.exe` | Run the installer. |
+| **Windows (no install)** | `Synapse-Workbench-Portable-<version>.exe` | Run it directly. |
+| **Windows (offline bundle)** | `Synapse-Workbench-Portable-<version>-win-x64.zip` | Unzip and run the `.exe`. Includes the curriculum as a `topics/` folder next to it. |
+| **Linux / any OS** | `synapse-<version>-py3-none-any.whl` | See Option 2 below. |
 
----
-
-### Windows Portable App & Modular Topics Addon
-The Windows desktop distribution is packaged as a **standalone portable binary** (`Synapse-Workbench-Portable-1.0.0.exe`).
-- **Zero Dependencies:** Bundles the native Electron desktop shell and Python backend sidecar. No Python installation or build tools required.
-- **External Topics Addon:** Curriculum topics remain pure, platform-independent Markdown files. Keep the `topics/` folder directly alongside `Synapse-Workbench-Portable.exe`. You can edit, update, or drop in new topic packs without touching or rebuilding the executable.
-- **Cross-Platform Shell Bridge:** Features native Windows shell integration (`powershell.exe`/`cmd.exe`) for terminal drawer execution.
+The desktop apps include the Python backend; you don't need Python installed. Curriculum packs come bundled, and you can install more from inside the app.
 
 ---
 
 ## 📦 How Synapse Works: App Shell + Modular `.synpack` Addons
 
-Synapse separates the **Application Engine** (the reader, Socratic AI mentor, KaTeX math engine, and terminal) from the **Curriculum Knowledge Base**. The desktop installer is a lightweight, zero-dependency binary (~90 MB), while masterclasses are packaged as modular `.synpack` curriculum archives.
+Synapse separates the **Application Engine** (the reader, Socratic AI mentor, KaTeX math engine, and terminal) from the **Curriculum Knowledge Base**. The desktop app is self-contained, while masterclasses are packaged as modular `.synpack` curriculum archives.
 
 ```mermaid
 flowchart TD
-    subgraph App ["Synapse Workbench Core (~90 MB)"]
+    subgraph App ["Synapse Workbench Core"]
         SHELL["Electron Shell & FastAPI Backend<br/>(Reader · Socratic Mentor · KaTeX Math · PTY Terminal)"]
     end
 
@@ -156,19 +150,13 @@ flowchart TD
 
 ### How to Install Curriculum Addons
 
-#### Option 1: 1-Click Master Pack (Recommended)
-Download the complete global curriculum from the [Project Releases](https://github.com/blebleblee/synapse/releases):
-1. Download **`synapse_complete_curriculum.synpack`** (33.5 MB).
-2. Open Synapse Workbench $\rightarrow$ Click **Settings ⚙** $\rightarrow$ **Curriculum Store & Addons**.
-3. Under **Sideload Local Package**, drop or select `synapse_complete_curriculum.synpack`.
-4. *Done!* All 12 domains and 539 masterclass topics will immediately appear in your sidebar.
+#### From inside the app (recommended)
+Open **Settings ⚙ → Curriculum Store & Addons** and click **Install** next to a domain. Synapse downloads the pack for you. The complete pack installs all 12 domains and 539 topics at once.
 
-#### Option 2: Individual Modular Domain Packs
-If you only need specific subjects (e.g., just Computing or Engineering):
-- Download only the `.synpack` files you want from Releases (`computing.synpack`, `engineering.synpack`, etc.).
-- Sideload them via Settings ⚙ $\rightarrow$ Curriculum Store.
+#### Sideloading a downloaded pack
+Download `.synpack` files from [Releases](https://github.com/blebleblee/synapse/releases), then drop or select them under **Settings ⚙ → Curriculum Store & Addons → Sideload Local Package**.
 
-#### Option 3: Command Line / Air-Gapped Sideloading
+#### Command line / air-gapped
 For server, Docker, or headless environments:
 ```bash
 # Sideload any .synpack package from the terminal
@@ -178,8 +166,8 @@ synapse pack install path/to/synapse_complete_curriculum.synpack
 synapse pack list
 ```
 
-#### Option 4: Portable Desktop (Drop & Go)
-If using the portable Windows binary (`Synapse-Workbench-Portable.exe`) or macOS `.app`, you can place an uncompressed `topics/` folder directly alongside the executable. Synapse detects local topics automatically without installation.
+#### Portable folder
+With the Windows offline bundle, the curriculum is a plain `topics/` folder next to the executable. You can edit it or add topic folders without reinstalling.
 
 ---
 
@@ -193,12 +181,14 @@ python3 -m venv synapse-env
 source synapse-env/bin/activate
 
 # 2. Install the official wheel
-pip install dist/python/synapse-1.1.1-py3-none-any.whl
+pip install synapse-<version>-py3-none-any.whl   # downloaded from Releases
 
 # 3. Launch the Socratic Workbench
 synapse serve --port 8000
 # Open http://localhost:8000 in your browser
 ```
+
+> **Tip: use it like a desktop app.** In Chrome or Edge, choose **Install app** (address-bar icon or ⋮ menu); in Safari, **File → Add to Dock**. Synapse then opens in its own window with a Dock or taskbar icon.
 
 * **Linux:** 100% native support out of the box with embedded POSIX PTY terminal drivers.
 * **Windows:** Use the Portable Windows Binary above for native execution, or WSL2 (`wsl --install`) for POSIX environments.
@@ -255,6 +245,19 @@ npm --prefix app/frontend run dev
 
 ---
 
+### Stopping Synapse
+
+There is no separate `stop` command. How you stop Synapse depends on how you started it:
+
+| Started with | Stop with |
+| :--- | :--- |
+| Desktop app | Quit the app (**⌘Q** on macOS, close the window on Windows). The backend stops with it. |
+| `synapse serve` / `uvicorn` | **Ctrl+C** in that terminal. |
+| Docker Compose | `docker compose down` |
+| macOS LaunchAgent ([deploy/](deploy/README.md)) | `launchctl unload ~/Library/LaunchAgents/com.synapse.workbench.plist` |
+
+---
+
 ## 🧠 Curriculum Generation & Enhancement
 
 Synapse can autonomously research, author, or deeply enhance curriculum units using Claude Opus 5.5 or local Ollama clusters.
@@ -287,7 +290,8 @@ python3 scripts/monitor.py
 
 ## 🛡️ Security, Host Safety & Credential Isolation
 
-- **Hosted Instance Protection:** Secure cloud/VPS deployments by defining `SYNAPSE_PASSWORD`. Unauthenticated users are gated by a styled login modal, while API endpoints and the interactive `/ws/terminal` PTY bridge enforce signed 30-day HMAC token verification with brute-force rate-limiting.
+- **Localhost-only by default:** without `SYNAPSE_PASSWORD`, Synapse answers only requests addressed to `localhost`. Other machines (and malicious websites using DNS rebinding) are refused.
+- **Hosted Instance Protection:** set `SYNAPSE_PASSWORD` to serve other machines. All API endpoints then require a login (signed 30-day tokens, brute-force rate limiting). The terminal uses single-use 30-second tickets and accepts only connections from the app's own origin. See [Configuration & Security](docs/CONFIG_AND_SECURITY.md).
 - **Isolated Credentials:** Cloud API keys (Anthropic, Gemini) are stored strictly outside the repository tree in `~/.config/synapse/env` with restricted `600` file permissions. They are never committed to git.
 - **Host Safety Guard:** The integrated PTY terminal actively intercepts destructive command patterns (`rm -rf /`, `mkfs`, raw block writes, fork bombs) and pauses execution until you explicitly type `CONFIRM`.
 - **Root-Anchored Runtime DB:** Runtime caches and SQLite databases (`/data/`, `/exports/`) are anchored to root in `.gitignore`, guaranteeing authored topics in `topics/computing/data/` are never accidentally ignored.

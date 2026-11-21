@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- **Terminal:** no longer retries every 2.5 seconds before you log in; it shows "Login required" and connects after login. The server now closes unauthenticated terminal connections with code 1008, which browsers can see.
+- **First-run setup:** keyboard shortcuts such as ⌘K no longer open search behind the setup wizard or the login screen.
+- **CLI:** added `synapse pack export <domain…|all>`, which the docs and the post-generation pipeline already used. The pipeline now also builds the complete pack and runs the release guard.
+- **macOS build:** corrected misspelled hidden imports (`uvicorn.lifespan`) in `synapse.spec`.
+
+### Documentation
+- README and installation guide: version-free download instructions, a "Stopping Synapse" section, using Synapse as an installed web app, and current security behaviour. The release runbook now describes the real build and publish steps.
+
 ## [1.2.1] - 2026-11-21
 
 ### Security
@@ -18,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Docker:** the image runs as a non-root user, `--privileged` sandboxes are gone, and the build context excludes private and local files.
 
 ### Privacy
-- **Packs and builds contain only the 12 core domains.** Chat sessions, blueprints and git-ignored tracks are never included. A release guard (`scripts/check_release_packs.py`) blocks uploads that would publish anything else. Earlier release assets that contained such files have been withdrawn.
+- **Packs and builds contain only the 12 core domains.** Chat sessions, blueprints and git-ignored tracks are never included. A release guard (`scripts/check_release_packs.py`) blocks uploads that would publish anything else. Installers for 1.1.0–1.2.0 have been withdrawn; please use 1.2.1.
 
 ### Fixed
 - **Lesson rewrites no longer truncate lessons.** Review auto-fix and the generator's refine step now work section by section, and a rewrite is accepted only if every heading and code block survives and the length doesn't shrink. An unparseable review is reported as failed instead of "verified".
@@ -32,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.0] - 2026-11-20
 
 ### Summary
-Feature and resilience release introducing section-by-section markdown translation chunking with code/formula preservation, native Windows ConPTY terminal support via `pywinpty`, database WAL maintenance with automatic checkpointing, an overhaul of the macOS packaging pipeline with version-aware cache busting, and comprehensive curriculum code-fence normalization achieving a 100% clean, zero-defect linter report across all 12 core domains.
+Feature and resilience release introducing section-by-section markdown translation chunking with code/formula preservation, native Windows ConPTY terminal support via `pywinpty`, database WAL maintenance with automatic checkpointing, an overhaul of the macOS packaging pipeline with version-aware cache busting, and code-fence normalization across the 12 core domains, with the content linter now reporting no errors.
 
 ---
 
@@ -40,7 +51,7 @@ Feature and resilience release introducing section-by-section markdown translati
 
 #### 1. Translation Chunking Engine & Code/Math Preservation
 * **Section-by-Section Translation Chunking (`/api/translate`):** Segmented massive markdown documents along section boundaries (`(?=\n#{1,2}\s+)`) before translating. This eliminates context-window and output-token exhaustion on local Ollama models (e.g. Qwen 4B/7B, Llama 3.2), preventing truncated lessons.
-* **Cryptographic Code & Formula Masking:** Implemented an AST-preserving masking engine that extracts all code blocks (````...````), KaTeX mathematical formulas (`$$...$$`), and Mermaid diagrams (` ```mermaid...``` `) and replaces them with isolated placeholder tokens (e.g. `___BLOCK_0___`) prior to prompting the LLM. Post-translation, all original code and mathematical notation are reinjected verbatim, guaranteeing 100% technical accuracy.
+* **Code & Formula Masking:** Code blocks, KaTeX formulas (`$$...$$`) and Mermaid diagrams are replaced with placeholder tokens (e.g. `___BLOCK_0___`) before translation and put back unchanged afterwards, so translation never alters code or math.
 * **Truncation Fallback Guard:** Added proactive output validation that detects severely abbreviated translations (<20% of original source length) and falls back to original text without corrupting the persistent translation cache.
 
 #### 2. Windows Native ConPTY & Terminal Interactive Line Discipline
@@ -61,10 +72,9 @@ Feature and resilience release introducing section-by-section markdown translati
 * **Busy-Retry Context Manager (`learning_engine/database.py`):** Upgraded `get_db_connection()` with exponential backoff retries and `PRAGMA busy_timeout=5000;`, eliminating `database is locked` operational errors during concurrent curriculum generation.
 * **Database Maintenance CLI:** Added `synapse clean --db` to execute `VACUUM;` and `PRAGMA integrity_check;`.
 
-#### 5. Global Curriculum Code-Fence Normalization (Zero-Defect Linter)
-* **Heuristic Normalizer (`scripts/normalize_code_fences.py`):** Developed an automated classification engine that evaluated and tagged all untagged markdown code blocks across all 12 core domains.
-* **18,593 Code Blocks Normalized:** Successfully tagged 18,593 previously generic code blocks across 4,841 files with precise language identifiers (`bash`, `yaml`, `json`, `sql`, `python`, `c`, `text`).
-* **100% Clean Content Linting:** `bin/synapse lint` now passes with **0 Errors and 0 Warnings** across all markdown files in the workspace.
+#### 5. Curriculum Code-Fence Normalization
+* **Heuristic Normalizer (`scripts/normalize_code_fences.py`):** Tags previously untagged code blocks in the 12 core domains with a language (`bash`, `yaml`, `json`, `sql`, `python`, `c`, `text`), so they get correct syntax highlighting.
+* **Content Linting:** `bin/synapse lint` reports no errors or warnings for the core domains.
 * **100% Masterclass Status:** Standardized operational lab naming, bringing canonical curriculum status to 539 / 539 masterclasses (100.0%).
 
 #### 6. Socratic Mentor Generation Expansion
@@ -141,7 +151,7 @@ Milestone release marking the full 100.0% completion of the **Synapse Global Mas
 * **Visual Documentation:** Added a comprehensive visual guide in `README.md` explaining the App Shell + Modular SynPack architecture and 4 distinct installation paths.
 
 #### 4. Infrastructure & Verification
-* **Zero-Defect Quality Linter:** Scanned all 2,945 curriculum files with 0 errors, validating terminal sentence completion, multi-section invariants, and balanced code blocks.
+* **Content Linter:** All 2,945 curriculum files pass the linter (complete final sentences, required sections, balanced code blocks).
 * **Headless Render Validation:** Verified 133,544 KaTeX math formulas and 3,172 Mermaid diagrams through headless browser parsers (`validate_render.mjs`).
 * **Automated Test Suite:** 59 / 59 Pytest tests passing (100%).
 
@@ -150,7 +160,7 @@ Milestone release marking the full 100.0% completion of the **Synapse Global Mas
 ## [1.0.0] - 2026-11-13
 
 ### Summary
-Initial production release of **Synapse** — the AI-native engineering and polymath learning workbench. Synapse combines textbook-grade masterclass curricula (O'Reilly / MIT Press depth) with an interactive Socratic AI Mentor, an embedded PTY terminal with host and sandbox execution modes, a responsive Cytoscape knowledge graph, and distributed multi-node inference clustering.
+Initial production release of **Synapse** — the AI-native engineering and polymath learning workbench. Synapse combines textbook-depth masterclass curricula with an interactive Socratic AI Mentor, an embedded PTY terminal with host and sandbox execution modes, a responsive Cytoscape knowledge graph, and distributed multi-node inference clustering.
 
 Curriculum domains are distributed modularly via the Synapse Package Manager (`synpack/v1`), shipping with the complete core Computing masterclass suite and enabling additional domain and localized language bundles as modular add-ons.
 
@@ -188,14 +198,8 @@ Curriculum domains are distributed modularly via the Synapse Package Manager (`s
   * Cross-domain bleed and template stub detection blocking generic boilerplate or misplaced toolchains.
 
 #### 3. Curriculum & Package Store Architecture
-* **Computing Masterclass Suite:** 45 complete courses (238 files) written to O'Reilly and MIT Press standards, featuring C/Rust kernel diagnostics, distributed Raft consensus, and production Kubernetes manifests.
+* **Computing Masterclass Suite:** 45 complete courses (238 files) at textbook depth, featuring C/Rust kernel diagnostics, distributed Raft consensus, and production Kubernetes manifests.
 * **Dedicated Infrastructure Labs:** Custom operational verification labs for Cloud Native (`containerd`, OCI, Envoy), SRE (SLI/SLO error budgets, Prometheus, Chaos Mesh), DevOps (BuildKit, Trivy, Argo CD), and Systems Automation (Ansible, Terraform).
 * **Modular Add-On Store (`synpack/v1`):** Complete decoupling of curriculum data from the workbench runtime, enabling curriculum expansion packs and localized translation trees to be packaged, verified, and installed via Synapse Package Manager.
 
 ---
-
-### Packaging & Binaries Included
-* **Windows Portable Desktop App:** `Synapse-Workbench-Portable-1.0.0.exe` (Zero-dependency portable executable with embedded backend sidecar; curriculum topics loaded as an external, platform-independent addon folder `./topics` alongside the `.exe`).
-* **macOS Desktop App:** `Synapse Workbench-1.0.0-arm64.dmg` & `Synapse Workbench-1.0.0-arm64-mac.zip`
-* **Python Distribution:** `synapse-1.0.0-py3-none-any.whl` & `synapse-1.0.0.tar.gz`
-* **CLI Utility:** `bin/synapse` (`serve`, `status`, `lint`, `review`, `search`, `export`, `flashcards`, `mastery`)

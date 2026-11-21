@@ -29,7 +29,7 @@ my_private_domain.synpack (tar.gz)
 
 ## 2. Creating Private SynPacks
 
-You can compile any domain folder or your complete private curriculum into a `.synpack` distribution archive:
+You can compile any domain folder into a `.synpack` archive, including your own private domains. The complete pack (`synapse_complete_curriculum.synpack`) contains only the 12 core domains. Packs never include chat sessions, `CURRICULUM_BLUEPRINT.md` files, or tracks that git ignores.
 
 ### Via Workbench UI
 1. Navigate to **Settings ⚙ → Curriculum Store & Addons** (or the `<Package />` icon).
@@ -43,10 +43,19 @@ from learning_engine.packages import export_topic_pack
 # Export an individual domain to exports/packages/{domain}.synpack
 pack_path = export_topic_pack("computing")
 
-# Export all 12 domains as a single global master bundle:
+# Export the 12 core domains as one bundle:
 # exports/packages/synapse_complete_curriculum.synpack
-global_pack = export_topic_pack("complete")
+global_pack = export_topic_pack("all")
 ```
+
+### Via the command line
+```bash
+bin/synapse pack export computing              # one domain
+bin/synapse pack export my_private_domain      # works for private domains too
+bin/synapse pack export all -o /tmp/packs      # complete core pack, custom folder
+```
+
+> **Publishing:** private packs are for your own use or a private registry (`SYNAPSE_PACKAGE_REGISTRY`). The project's release scripts run `scripts/check_release_packs.py`, which refuses any pack that contains non-core domains or files not committed to git.
 
 ---
 

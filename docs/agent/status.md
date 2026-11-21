@@ -2,13 +2,13 @@
 
 ## 1. Saved Checkpoint & Synchronization State
 
-- **Branch:** `security/audit-hardening` (PR #1 on Gitea, not merged into `main` yet).
-- **Work on the branch (2026-11-21):** security hardening (host/origin checks, localhost-only default, WebSocket tickets, settings redaction, HTML sanitization, non-root Docker); safe chunked lesson rewriting in review and refine; private domains kept out of packs, Docker and portable builds, with a release guard (`scripts/check_release_packs.py`); current Claude model IDs and no sampling parameters; an indexed full-text search (SQLite FTS5); agent rules consolidated into `AGENTS.md`.
-- **Verification:** `./scripts/verify_all.sh`. All 5 phases must pass before merging.
+- **Released:** v1.2.1 on Gitea and GitHub (2026-11-21), built from `main` and scanned clean of private content. Installers for v1.1.0–v1.2.0 were withdrawn because they contained private content; their notes say so. v1.0.0 is clean.
+- **On `main` since 1.2.1 (see CHANGELOG "Unreleased"):** terminal login-loop fix, setup-wizard shortcut fix, `synapse pack export`, spec import fix, documentation refresh.
+- **Decisions taken:** keep Electron (browser mode is documented as an alternative); leave git history as is (the old chat sessions are harmless test chats).
 - **NEEDS DECISION:**
-  - Chat-session files are still in git history, which is public on GitHub. Removing them requires rewriting history and force-pushing.
-  - Whether to replace Electron (Tauri v2, or a browser/PWA launcher).
-- **Next Milestone:** Real-use Manual Acceptance Testing (see `docs/manual-acceptance.md`).
+  - A separate `curriculum` release for packs, so unchanged packs aren't re-uploaded with every app release.
+  - `scripts/generate_all.py` auto-commits and runs `git push origin main` (no `origin` remote exists; conflicts with AGENTS.md).
+- **Verification:** `./scripts/verify_all.sh`. All 5 phases must pass.
 
 ---
 

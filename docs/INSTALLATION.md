@@ -8,42 +8,42 @@ Comprehensive guide for installing, running, and building **Synapse** across **m
 
 The easiest way to run Synapse. No Python, Node.js, or package compilation required.
 
-Download pre-compiled Release Candidate binaries from the project releases:
+Download the latest version from the [Releases page](https://github.com/blebleblee/synapse/releases/latest):
 
-| Platform | Download Format | Installation Instructions |
+| Platform | File | How to start |
 | :--- | :--- | :--- |
-| **Windows (Portable)** | **`.exe` (Standalone Portable App)** | Download `Synapse-Workbench-Portable-1.0.0.exe`. Place your `./topics/` curriculum folder alongside the executable and double-click to launch! No Python or installation required. |
-| **macOS (Apple Silicon)** | **`.dmg` (Disk Image Installer)** | Open `Synapse-Workbench-1.0.0-arm64.dmg`, drag **Synapse Workbench** to `/Applications`, and launch from Spotlight or Launchpad. |
-| **macOS (Portable Bundle)** | **`.zip` (App Archive)** | Decompress `Synapse-Workbench-1.0.0-arm64-mac.zip` and launch **Synapse Workbench.app** directly. |
-| **Linux (CLI / Server)** | **`.whl` (Python Wheel)** | See Python Wheel Installation below. |
-| **Any Platform** | **Docker Compose** | See Docker Deployment below. |
+| **macOS (Apple Silicon)** | `Synapse-Workbench-<version>-arm64.dmg` | Open it, drag **Synapse Workbench** to `/Applications`, launch it. (`…-arm64.zip` contains the same app without an installer.) |
+| **Windows** | `Synapse-Workbench-Setup-<version>.exe` | Run the installer. |
+| **Windows (no install)** | `Synapse-Workbench-Portable-<version>.exe` | Run it directly. |
+| **Windows (offline bundle)** | `Synapse-Workbench-Portable-<version>-win-x64.zip` | Unzip and run the `.exe`. The curriculum is a `topics/` folder next to it. |
+| **Linux / any OS** | `synapse-<version>-py3-none-any.whl` | See the Python wheel section below. |
+| **Any platform** | Docker Compose | See the Docker section below. |
 
-*The native desktop shell includes automatic background sidecar lifecycle management, native window framing, and connects automatically to your local Ollama cluster on `127.0.0.1:11434` or cloud inference gateways.*
+The desktop apps include the Python backend and start and stop it with the window. They connect to Ollama on `127.0.0.1:11434` or to a configured cloud provider.
 
 ---
 
-## 🪟 2. Windows Portable Binary & Topics Addon Architecture
+## 🪟 2. Windows Offline Bundle
 
-The Windows distribution is fully decoupled from Python environments:
+The offline bundle keeps the curriculum outside the executable:
 
-1. **Executable Structure:**
-   ```text
-   Synapse-Portable-Windows/
-   ├── Synapse-Workbench-Portable-1.0.0.exe
-   ├── README.txt
-   └── topics/                   <-- Curriculum Addon (Pure Markdown)
-       ├── arts/
-       ├── computing/
-       └── ...
-   ```
-2. **Platform-Independent Addon:** The curriculum content is strictly externalized. Synapse discovers `./topics/` next to the executable (or via `SYNAPSE_TOPICS_DIR`). You can upgrade or add topics without updating the `.exe`.
-3. **Native Shell Execution:** The terminal drawer features built-in Windows PowerShell/CMD bridging, allowing commands and labs to be executed directly without requiring WSL.
+```text
+Synapse-Workbench-Portable-<version>-win-x64/
+├── Synapse-Workbench-Portable.exe
+├── README.txt
+└── topics/            <-- curriculum as plain Markdown
+    ├── arts/
+    ├── computing/
+    └── ...
+```
+
+Synapse finds `topics/` next to the executable (or uses `SYNAPSE_TOPICS_DIR`), so you can update or add topics without a new `.exe`. The terminal uses PowerShell/CMD; WSL isn't required.
 
 ---
 
 ## 📦 3. Python Wheel (`.whl`) Installation (Linux, macOS & Windows WSL2)
 
-The `.whl` package (`synapse-1.0.0-py3-none-any.whl`) is pure Python and runs across **Linux**, **macOS**, and **Windows (via WSL2)**.
+The `.whl` package (`synapse-<version>-py3-none-any.whl`) is pure Python and runs across **Linux**, **macOS**, and **Windows (via WSL2)**.
 
 ### A. Linux Installation (Ubuntu, Debian, Fedora, Arch, SUSE)
 Linux is a first-class citizen with 100% native POSIX PTY terminal support:
@@ -58,7 +58,7 @@ python3 -m venv ~/synapse-env
 source ~/synapse-env/bin/activate
 
 # 3. Install the official Synapse wheel
-pip install dist/python/synapse-1.0.0-py3-none-any.whl
+pip install synapse-<version>-py3-none-any.whl
 
 # 4. Launch Synapse Workbench
 synapse serve --port 8000
@@ -76,7 +76,7 @@ For full native terminal drawer support on Windows, run inside **WSL2** (Windows
    ```bash
    python3 -m venv ~/synapse-env
    source ~/synapse-env/bin/activate
-   pip install dist/python/synapse-1.0.0-py3-none-any.whl
+   pip install synapse-<version>-py3-none-any.whl
    synapse serve --port 8000
    ```
 3. Open **`http://localhost:8000`** in Chrome, Edge, or Firefox in Windows.

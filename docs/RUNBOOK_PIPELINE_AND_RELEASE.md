@@ -74,42 +74,39 @@ bin/synapse lint --render
 
 ---
 
-## 5. Rebuilding Desktop Binaries & Exporting SynPack Addons
+## 5. Building and Publishing a Release
 
-Once verification passes cleanly, compile fresh binaries and export the modular curriculum addons:
+Run these from a clean checkout of `main` after `./scripts/verify_all.sh` passes. Bump `VERSION` first (`python scripts/bump_version.py`) and add a `## [x.y.z]` section to `CHANGELOG.md`: the release notes are taken from it.
 
 ```bash
-# 1. Rebuild React Frontend SPA, PyInstaller Sidecar & macOS Desktop Installer
-bash scripts/build_mac_desktop.sh
-# Artifacts created in: dist/desktop/
-# - dist/desktop/Synapse-Workbench-1.1.1-arm64.dmg
-# - dist/desktop/Synapse-Workbench-1.1.1-arm64-mac.zip
+# 1. Curriculum packs (core domains only; private and session files are excluded)
+bin/synapse pack export arts business computing crafts economics engineering \
+  formal_sciences health_sciences humanities languages motorsports natural_sciences all
+python scripts/check_release_packs.py        # must pass: blocks private/uncommitted content
 
-# Note on macOS App Updates & Cleanup:
-# If you are updating a local installation, macOS caches Chromium app state.
-# Run `bash scripts/clean_mac_install.sh` to purge old app caches before installing the new DMG.
+# 2. macOS app (React build, PyInstaller backend, Electron DMG + ZIP)
+bash scripts/build_mac_desktop.sh            # -> dist/desktop/Synapse-Workbench-<ver>-arm64.{dmg,zip}
 
-# 2. Rebuild Python Wheel and Source Distribution
+# 3. Windows apps (embedded Python with current code, then installer, portable .exe, portable .zip)
+.venv/bin/python scripts/build_windows_python_env.py
+.venv/bin/python scripts/build_windows_portable.py
+
+# 4. Python wheel and source package
 .venv/bin/python -m build --outdir dist/python
-# Artifacts created in: dist/python/
-# - dist/python/synapse-1.0.0-py3-none-any.whl (~74 KB)
-# - dist/python/synapse-1.0.0.tar.gz (~81 KB)
 
-# 4. Export Modular .synpack Addons for All 12 Domains
-mkdir -p exports/packages
-bin/synapse pack export computing
-bin/synapse pack export arts
-bin/synapse pack export crafts
-bin/synapse pack export business
-bin/synapse pack export engineering
-bin/synapse pack export motorsports
-bin/synapse pack export formal_sciences
-bin/synapse pack export humanities
-bin/synapse pack export languages
-bin/synapse pack export economics
-bin/synapse pack export natural_sciences
-bin/synapse pack export health_sciences
+# 5. Publish to Gitea and GitHub (push main to both remotes first, so the tag points at this code)
+git push gitea main && git push github main
+.venv/bin/python scripts/publish_all_releases.py
 ```
+
+`publish_all_releases.py` refuses to run if any pack fails the release guard. It creates the `v<ver>` release on both hosts, uploads the files and sets the notes from `CHANGELOG.md`. To fix the notes of an existing release later, edit `CHANGELOG.md` and run:
+
+```bash
+.venv/bin/python scripts/update_release_notes.py 1.2.1                # title + notes
+.venv/bin/python scripts/update_release_notes.py 1.1.0 --keep-title   # notes only
+```
+
+If you're updating a local macOS install, run `bash scripts/clean_mac_install.sh` first to clear cached app state.
 
 ---
 

@@ -37,5 +37,6 @@ Synapse includes a built-in clean command to clear chat logs, flashcard caches, 
 
 Before creating a release candidate or pushing to a public repository, verify:
 1. `git status` shows no untracked `.db`, `.log`, or `sessions/` directories.
-2. `tests/test_taxonomy_compliance.py` passes completely with `pytest tests/`.
-3. Private API keys and local IPs are stored solely in your private `.env` or local SQLite database, never in source files.
+2. `python scripts/check_release_packs.py` passes for every pack you plan to publish (no private domains, sessions or uncommitted files).
+3. `tests/test_taxonomy_compliance.py` passes completely with `pytest tests/`.
+4. Private API keys and local IPs are stored solely in your private `.env` or local SQLite database, never in source files.
