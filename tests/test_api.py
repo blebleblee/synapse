@@ -52,6 +52,47 @@ def test_api_quiz_validation():
     res = client.post("/api/quiz", json={"query": "non_existent_topic_xyz"})
     assert res.status_code == 404
 
+def test_api_quiz_and_summary_forward_model_and_host(monkeypatch):
+    """
+    FIND-08: /api/quiz and /api/summary/regenerate must forward configured model
+    and cluster host parameters to their respective generation providers.
+    """
+    captured_quiz = {}
+    class MockQuizProvider:
+        def generate(self, prompt, **kwargs):
+            return '[{"id": 1, "question": "Q?", "options": ["A", "B"], "correctIndex": 0, "explanation": "E"}]'
+
+    def mock_get_provider(**kwargs):
+        captured_quiz.update(kwargs)
+        return MockQuizProvider()
+
+    monkeypatch.setattr("app.backend.main.get_provider", mock_get_provider)
+
+    quiz_res = client.post("/api/quiz", json={
+        "query": "computing/data/postgresql",
+        "model": "qwen2.5-coder:32b",
+        "host": "http://192.168.1.50:11434"
+    })
+    assert quiz_res.status_code == 200
+    assert captured_quiz.get("model") == "qwen2.5-coder:32b"
+    assert captured_quiz.get("host") == "http://192.168.1.50:11434"
+
+    captured_summary = {}
+    def mock_regenerate_summary(query, **kwargs):
+        captured_summary.update({"query": query, **kwargs})
+        return "# Mock Summary"
+
+    monkeypatch.setattr("app.backend.main.regenerate_summary", mock_regenerate_summary)
+
+    sum_res = client.post("/api/summary/regenerate", json={
+        "query": "computing/data/postgresql",
+        "model": "deepseek-r1:32b",
+        "host": "http://192.168.1.100:11434"
+    })
+    assert sum_res.status_code == 200
+    assert captured_summary.get("model") == "deepseek-r1:32b"
+    assert captured_summary.get("host") == "http://192.168.1.100:11434"
+
 def test_api_generate(monkeypatch):
     # Mock get_provider to bypass Ollama cluster checks
     class MockProvider:

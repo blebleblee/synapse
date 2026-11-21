@@ -1421,16 +1421,18 @@ class SummaryRequest(BaseModel):
     query: str
     provider: Optional[str] = None
     model: Optional[str] = None
+    host: Optional[str] = None
 
 @app.post("/api/summary/regenerate")
 def api_regenerate_summary(req: SummaryRequest):
-    new_summary = regenerate_summary(req.query, provider_type=req.provider, model=req.model)
+    new_summary = regenerate_summary(req.query, provider_type=req.provider, model=req.model, host=req.host)
     return {"summary": new_summary}
 
 class QuizRequest(BaseModel):
     query: str
     provider: Optional[str] = None
     model: Optional[str] = None
+    host: Optional[str] = None
 
 class SaveSessionRequest(BaseModel):
     query: str
@@ -1473,7 +1475,7 @@ Curriculum Context:
 
 Output valid JSON only with no markdown backticks or commentary."""
 
-    provider = get_provider(provider_type=req.provider, model=req.model)
+    provider = get_provider(provider_type=req.provider, model=req.model, host=req.host, domain=domain)
     raw = provider.generate(prompt, system_instruction=system_instruction).strip()
 
     # Clean markdown code block if present

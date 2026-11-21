@@ -881,11 +881,19 @@ class AnthropicProvider(LLMProvider):
         except Exception as e:
             raise RuntimeError(f"Anthropic stream failed: {e}")
 
-def get_provider(provider_type: Optional[str] = None, model: Optional[str] = None, domain: Optional[str] = None) -> LLMProvider:
+def get_provider(
+    provider_type: Optional[str] = None,
+    model: Optional[str] = None,
+    domain: Optional[str] = None,
+    host: Optional[str] = None
+) -> LLMProvider:
     """
     Selects provider or clustered Ollama nodes.
     Supports domain-specialized model routing (coding models for computing, reasoning models for math/physics).
     """
+    if host and not provider_type:
+        provider_type = "ollama"
+
     if provider_type == "anthropic" or (not provider_type and os.environ.get("ANTHROPIC_API_KEY") and model and "claude" in model):
         chosen_model = model or "claude-3-5-sonnet-20241022"
         return AnthropicProvider(model=chosen_model)
@@ -894,13 +902,16 @@ def get_provider(provider_type: Optional[str] = None, model: Optional[str] = Non
     cluster_status = cluster.get_cluster_status()
     any_ollama_up = any(data["online"] for data in cluster_status.values())
 
-    if provider_type == "ollama" or (not provider_type and any_ollama_up):
+    if provider_type == "ollama" or (not provider_type and any_ollama_up) or host:
         chosen_model = model
         if not chosen_model and domain:
             if domain == "computing_and_engineering":
                 chosen_model = "qwen2.5-coder:32b"
             elif domain in ["formal_sciences", "natural_sciences"]:
                 chosen_model = "deepseek-r1:32b"
+
+        if host:
+            return OllamaProvider(host=host, model=chosen_model or "qwen2.5-coder:32b")
 
         host, selected_model = cluster.select_node_for_model(chosen_model)
         return OllamaProvider(host=host, model=selected_model)

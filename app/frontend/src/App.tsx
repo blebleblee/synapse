@@ -677,7 +677,11 @@ export function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: abortCtrl.signal,
-        body: JSON.stringify({ query: selectedPath }),
+        body: JSON.stringify({
+          query: selectedPath,
+          model: settings.mentorModel || settings.primaryModel || undefined,
+          host: settings.ollamaHost || undefined,
+        }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -742,7 +746,11 @@ export function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: abortCtrl.signal,
-        body: JSON.stringify({ query: selectedPath }),
+        body: JSON.stringify({
+          query: selectedPath,
+          model: settings.primaryModel || undefined,
+          host: settings.ollamaHost || undefined,
+        }),
       });
       if (res.ok) {
         const data = await res.json();

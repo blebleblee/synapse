@@ -56,7 +56,12 @@ Output clean, publication-grade Markdown only."""
     out_file.write_text(summary_text + "\n", encoding="utf-8")
     return summary_text
 
-def regenerate_summary(query: str, provider_type: Optional[str] = None, model: Optional[str] = None) -> str:
+def regenerate_summary(
+    query: str,
+    provider_type: Optional[str] = None,
+    model: Optional[str] = None,
+    host: Optional[str] = None
+) -> str:
     target = resolve_subtopic(query)
     if not target:
         raise ValueError(f"Topic '{query}' not found.")
@@ -107,7 +112,7 @@ Discussion Session Transcripts:
 
 Output clean, publication-grade Markdown only."""
 
-    provider = get_provider(provider_type=provider_type, model=model, domain=domain)
+    provider = get_provider(provider_type=provider_type, model=model, domain=domain, host=host)
     summary_text = provider.generate(prompt, system_instruction=persona).strip()
 
     out_file = sub_path / "SUMMARY.md"
