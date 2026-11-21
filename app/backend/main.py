@@ -480,8 +480,9 @@ def api_discovered_models():
 
     # Cloud models
     for cm in [
-        "claude-3-5-sonnet-20241022",
-        "claude-3-5-haiku-20241022",
+        "claude-sonnet-5",
+        "claude-opus-5-5",
+        "claude-haiku-5-5",
         "gemini-2.5-flash",
         "gemini-2.5-pro"
     ]:
@@ -512,7 +513,10 @@ def api_set_cluster_hosts(req: ClusterHostsRequest):
     return {"hosts": updated, "saved": True}
 
 @app.get("/api/search")
-async def api_search(q: str = Query(..., min_length=2)):
+def api_search(q: str = Query(..., min_length=2)):
+    # Plain `def`: FastAPI runs it in a worker thread. The full-text scan takes
+    # seconds on a large workspace and must not block the event loop (which
+    # would freeze every other request and all terminal WebSockets).
     return {"results": search_curriculum(q)}
 
 @app.get("/api/graph")

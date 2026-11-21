@@ -110,7 +110,9 @@ def cmd_status(args):
         print(f"    - [{name:10s}] {status_str} | Model: {pref_model}{pin_label}")
     
     if os.environ.get("ANTHROPIC_API_KEY"):
-        print(f"    - [ANTHROPIC] ONLINE    | Tier: cloud    | Model: claude-3-5-sonnet-20241022")
+        from learning_engine.models import DEFAULT_CLAUDE_MODEL
+        claude_model = os.environ.get("ANTHROPIC_MODEL") or DEFAULT_CLAUDE_MODEL
+        print(f"    - [ANTHROPIC] KEY SET   | Tier: cloud    | Model: {claude_model}")
 
     print("==================================================")
 

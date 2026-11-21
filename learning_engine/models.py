@@ -696,6 +696,10 @@ class GeminiProvider(LLMProvider):
         )
         return response.text or ""
 
+# Default Claude model when none is configured (override with ANTHROPIC_MODEL).
+DEFAULT_CLAUDE_MODEL = "claude-sonnet-5"
+
+
 class AnthropicProvider(LLMProvider):
     """
     Anthropic Claude 3.5 Sonnet / Haiku / Opus Provider.
@@ -712,6 +716,7 @@ class AnthropicProvider(LLMProvider):
             os.environ.get("VNAIPRO_BASE_URL") or
             anthropic_cfg.get("base_url") or 
             settings.get("anthropic_base_url") or
+            settings.get("anthropicBaseUrl") or
             "https://api.anthropic.com"
         ).rstrip("/")
 
@@ -721,7 +726,8 @@ class AnthropicProvider(LLMProvider):
             os.environ.get("VNAIPRO_API_KEY") or
             os.environ.get("ANTHROPIC_AUTH_TOKEN") or 
             anthropic_cfg.get("api_key") or
-            settings.get("anthropic_api_key")
+            settings.get("anthropic_api_key") or
+            settings.get("anthropicApiKey")
         )
 
         # Automatic fallback if legacy AIAPIFLOW URL is still referenced
@@ -740,8 +746,10 @@ class AnthropicProvider(LLMProvider):
             m_lower = model.lower()
             if "opus" in m_lower:
                 return "claude-opus-5-5"
-            if "fable" in m_lower or "haiku" in m_lower:
+            if "fable" in m_lower:
                 return "claude-fable-5"
+            if "haiku" in m_lower:
+                return "claude-haiku-5-5"
             if "sonnet" in m_lower:
                 return "claude-sonnet-5"
             return "claude-sonnet-5"
@@ -828,8 +836,9 @@ class AnthropicProvider(LLMProvider):
             "stream": True,
             "messages": [
                 {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.2
+            ]
+            # No temperature/top_p/top_k: current Claude models reject sampling
+            # parameters with HTTP 400.
         }
         if system_instruction and system_instruction.strip():
             # Enable Anthropic ephemeral prompt caching (90% input discount + faster TTFT)
@@ -871,6 +880,8 @@ class AnthropicProvider(LLMProvider):
                                 delta = event.get("delta", {})
                                 if delta.get("stop_reason") == "max_tokens":
                                     raise RuntimeError("TruncationError: Anthropic hit max_tokens ceiling before completing chapter.")
+                                if delta.get("stop_reason") == "refusal":
+                                    raise RuntimeError("Anthropic declined the request (stop_reason: refusal).")
                         except RuntimeError:
                             raise
                         except Exception:
@@ -895,7 +906,7 @@ def get_provider(
         provider_type = "ollama"
 
     if provider_type == "anthropic" or (not provider_type and os.environ.get("ANTHROPIC_API_KEY") and model and "claude" in model):
-        chosen_model = model or "claude-3-5-sonnet-20241022"
+        chosen_model = model or os.environ.get("ANTHROPIC_MODEL") or DEFAULT_CLAUDE_MODEL
         return AnthropicProvider(model=chosen_model)
 
     cluster = OllamaCluster()
@@ -968,6 +979,7 @@ def get_translation_provider(
         os.environ.get("ANTHROPIC_API_KEY_2") or
         os.environ.get("VNAIPRO_API_KEY") or
         settings.get("anthropic_api_key") or
+        settings.get("anthropicApiKey") or
         settings.get("anthropic", {}).get("api_key")
     )
     if anthropic_key and (provider_type == "anthropic" or not is_local_configured or (model and "claude" in model.lower())):
@@ -975,7 +987,7 @@ def get_translation_provider(
         return AnthropicProvider(model=chosen_model, api_key=anthropic_key), chosen_model
 
     # 4. Check Gemini
-    gemini_key = os.environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key")
+    gemini_key = os.environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key") or settings.get("geminiApiKey")
     if gemini_key and (provider_type == "gemini" or (model and "gemini" in model.lower())):
         chosen_model = model or "gemini-2.5-flash"
         return GeminiProvider(model=chosen_model, api_key=gemini_key), chosen_model
@@ -1010,7 +1022,8 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
         os.environ.get("ANTHROPIC_API_KEY") or
         os.environ.get("ANTHROPIC_API_KEY_2") or
         os.environ.get("VNAIPRO_API_KEY") or
-        settings.get("anthropic_api_key")
+        settings.get("anthropic_api_key") or
+        settings.get("anthropicApiKey")
     )
 
     # 0. If Claude / Anthropic is explicitly requested or set as preferred primary/mentor model
@@ -1018,7 +1031,7 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
         chosen_model = configured_model
         return AnthropicProvider(model=chosen_model, api_key=anthropic_key), chosen_model
 
-    gemini_key = os.environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key")
+    gemini_key = os.environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key") or settings.get("geminiApiKey")
     if gemini_key and configured_model and "gemini" in configured_model.lower():
         return GeminiProvider(model=configured_model, api_key=gemini_key), configured_model
 
@@ -1087,7 +1100,7 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
 
     # 4. Cloud fallbacks if no specific model was configured and Ollama is offline
     if anthropic_key:
-        claude_model = "claude-3-5-sonnet-20241022"
+        claude_model = os.environ.get("ANTHROPIC_MODEL") or DEFAULT_CLAUDE_MODEL
         return AnthropicProvider(model=claude_model, api_key=anthropic_key), claude_model
 
     if gemini_key:
