@@ -249,10 +249,10 @@ class ChatRequest(BaseModel):
         return v
 
 class GenerateRequest(BaseModel):
-    domain: str = Field(..., pattern=r'^[a-z0-9_-]+$')
-    category: str = Field(..., pattern=r'^[a-z0-9_/-]+$')
-    subtopic: str = Field(..., pattern=r'^[a-z0-9_-]+$')
+    query: str
     force: bool = False
+    provider: Optional[str] = None
+    model: Optional[str] = None
 
 class TranslateRequest(BaseModel):
     text: str = Field(..., max_length=50000)

@@ -52,6 +52,37 @@ def test_api_quiz_validation():
     res = client.post("/api/quiz", json={"query": "non_existent_topic_xyz"})
     assert res.status_code == 404
 
+def test_api_generate(monkeypatch):
+    # Mock get_provider to bypass Ollama cluster checks
+    class MockProvider:
+        def generate(self, prompt, **kwargs):
+            return "Mocked generated curriculum content"
+            
+    monkeypatch.setattr("app.backend.main.get_provider", lambda **kwargs: MockProvider())
+    
+    # Mock generation function to prevent real LLM calls
+    monkeypatch.setattr("app.backend.main.generate_subtopic_content", lambda **kwargs: "Mocked generated curriculum content")
+
+    
+    # Test valid query
+    res = client.post("/api/generate", json={
+        "query": "computing/data/postgresql",
+        "force": False,
+        "provider": "ollama",
+        "model": "dummy-model"
+    })
+    
+    assert res.status_code == 200
+    data = res.json()
+    assert data["domain"] == "computing"
+    assert data["category"] == "data"
+    assert data["subtopic"] == "postgresql"
+    assert data["results"] == "Mocked generated curriculum content"
+
+    # Test invalid query (404 Not Found)
+    res_404 = client.post("/api/generate", json={"query": "non_existent/fake/topic"})
+    assert res_404.status_code == 404
+
 def test_api_topic_not_found():
     res = client.get("/api/topic?query=fake_non_existent_topic_123")
     assert res.status_code == 404
