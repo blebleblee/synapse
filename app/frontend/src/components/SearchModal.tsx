@@ -35,26 +35,34 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       return;
     }
 
+    // Each keystroke cancels the previous request, and a response that arrives
+    // after the query changed is ignored, so older results never overwrite newer ones.
+    const controller = new AbortController();
     const timer = setTimeout(async () => {
       if (query.trim().length >= 2) {
         setIsSearching(true);
         try {
-          const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
-          if (res.ok) {
+          const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`, {
+            signal: controller.signal,
+          });
+          if (res.ok && !controller.signal.aborted) {
             const data = await res.json();
-            setResults(data.results || []);
+            if (!controller.signal.aborted) setResults(data.results || []);
           }
         } catch (err) {
-          console.error('Search error:', err);
+          if (!controller.signal.aborted) console.error('Search error:', err);
         } finally {
-          setIsSearching(false);
+          if (!controller.signal.aborted) setIsSearching(false);
         }
       } else {
         setResults([]);
       }
-    }, 250);
+    }, 400);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [query, isOpen]);
 
   // Global Cmd+K keyboard shortcut
