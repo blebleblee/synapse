@@ -9,6 +9,15 @@
   - A separate `curriculum` release for packs, so unchanged packs aren't re-uploaded with every app release.
   - `scripts/generate_all.py` auto-commits and runs `git push origin main` (no `origin` remote exists; conflicts with AGENTS.md).
 - **Verification:** `./scripts/verify_all.sh`. All 5 phases must pass.
+- **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, which are public on GitHub. Owner must rotate it (preferably to a scoped token) and update the `gitea` remote and `GITEA_PASS`. No other secrets found in GitHub history, release files or notes.
+- **Pending owner actions:** rotate Gitea password; top up proxy credit; `git push github main`; send the Safari diagram case.
+- **Next steps (proposed, awaiting go-ahead):**
+  1. CI on Gitea: `verify_all.sh`, `check_release_packs.py`, secret scanning (gitleaks) on every push.
+  2. Separate `curriculum` release for packs; installers bundle only the complete pack.
+  3. Remove auto-commit/push from `scripts/generate_all.py`.
+  4. Release 1.2.2 with the "Unreleased" changes.
+- **Improvement ideas:** clear mentor provider errors and model indicator; send only the current lesson section to the mentor (faster local models); search highlighting, domain filter and jump-to-section; first-run health check; menu-bar Quit or idle shutdown for `synapse serve`; spaced-repetition review queue; pre-commit secret and private-path hook; release from CI; protected `main` with PR-only changes.
+
 
 ---
 
