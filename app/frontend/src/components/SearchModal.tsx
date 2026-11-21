@@ -16,7 +16,7 @@ interface SearchResult {
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectTopic: (path: string) => void;
+  onSelectTopic: (path: string, lessonId?: string) => void;
 }
 
 export const SearchModal: React.FC<SearchModalProps> = ({
@@ -107,7 +107,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
               key={idx}
               className="search-result-item"
               onClick={() => {
-                onSelectTopic(r.path);
+                const lessonId = r.file ? r.file.replace(/\.md$/, '') : undefined;
+                onSelectTopic(r.path, lessonId);
                 onClose();
               }}
             >
