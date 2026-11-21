@@ -405,8 +405,9 @@ export function App() {
         return;
       }
 
-      // Do not trigger single-key or navigation shortcuts while actively typing in input/textarea
-      if (isTyping) return;
+      // Do not trigger single-key or navigation shortcuts while actively typing in input/textarea or terminal
+      const isTerminal = Boolean(target.closest('.terminal-drawer') || target.closest('.xterm') || target.closest('.terminal-body'));
+      if (isTyping || isTerminal) return;
 
       // Cmd/Ctrl + 1 / 2 / 3: Switch Tabs
       if (isMod && e.key === '1') {
@@ -425,36 +426,48 @@ export function App() {
         return;
       }
 
-      // [ or Cmd+[: Previous Lesson
-      if (e.key === '[' || (isMod && e.key === 'ArrowLeft')) {
+      // Lesson Navigation Shortcuts: [ and ]
+      if (e.key === '[' || e.key === ']') {
+        // Ignore if any modifier key (Ctrl, Cmd, Alt, Shift) is held
+        if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+
+        // In "labs", neither shortcut changes the view
+        if (activeTab === 'labs') return;
+
         const lessons = topicDetails?.lessons || [];
-        if (lessons.length > 1 && activeLessonId) {
-          const idx = lessons.findIndex((l) => l.id === activeLessonId);
+        if (lessons.length === 0) return;
+
+        // In "all lessons", ] opens the first lesson; [ does nothing
+        if (!activeLessonId || activeLessonId === 'all') {
+          if (e.key === ']') {
+            e.preventDefault();
+            handleSelectLesson(lessons[0].id);
+          }
+          return;
+        }
+
+        // In an individual lesson, [ goes to previous and ] to next (without wrapping)
+        const idx = lessons.findIndex((l) => l.id === activeLessonId);
+        if (e.key === '[') {
           if (idx > 0) {
             e.preventDefault();
             handleSelectLesson(lessons[idx - 1].id);
           }
+          return;
         }
-        return;
-      }
-
-      // ] or Cmd+J or Cmd+Right: Next Lesson
-      if (e.key === ']' || (isMod && (e.key.toLowerCase() === 'j' || e.key === 'ArrowRight'))) {
-        const lessons = topicDetails?.lessons || [];
-        if (lessons.length > 1 && activeLessonId) {
-          const idx = lessons.findIndex((l) => l.id === activeLessonId);
+        if (e.key === ']') {
           if (idx >= 0 && idx < lessons.length - 1) {
             e.preventDefault();
             handleSelectLesson(lessons[idx + 1].id);
           }
+          return;
         }
-        return;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [topicDetails, activeLessonId]);
+  }, [topicDetails, activeLessonId, activeTab]);
 
   const handleSendMessage = async (msg: string) => {
     const newStudentMsg: ChatMessage = { role: 'student', content: msg };

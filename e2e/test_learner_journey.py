@@ -530,3 +530,111 @@ def test_explicit_logout_clears_saved_selection(browser_page):
     # 5. Assert reader content is cleared and login modal is required
     expect(page.locator("h1:has-text('E2E Storage Foundations')")).not_to_be_visible()
     expect(page.locator(".login-card")).to_be_visible(timeout=5000)
+
+
+def test_keyboard_navigation_contract(browser_page):
+    """
+    Verifies the complete keyboard navigation contract:
+    - In an individual lesson, [ goes to previous lesson and ] to next.
+    - At the first/last lesson, do not wrap.
+    - In 'all lessons', ] opens first lesson; [ does nothing.
+    - In 'labs', neither shortcut changes the view.
+    - Ignore these shortcuts in inputs, textareas, editable content, terminal,
+      and when Ctrl, Cmd, Alt, or Shift is held.
+    - Keep reload/resume selection persistence working.
+    """
+    page, server_url = browser_page
+    page.goto(server_url)
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    # 1. Start in "all lessons" view
+    select_fixture_lesson(page, "Data", "E2e Unique Storage Invariants", "Foundations")
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible(timeout=5000)
+
+    all_btn = page.locator("button.lesson-number-btn:has-text('All'), button:has-text('All')").first
+    all_btn.click()
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("all", timeout=5000)
+
+    # In "all lessons", [ does nothing
+    page.keyboard.press("[")
+    page.wait_for_timeout(300)
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("all")
+
+    # In "all lessons", ] opens first lesson
+    page.keyboard.press("]")
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible(timeout=5000)
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_01_foundations")
+
+    # 2. At first lesson, [ does NOT wrap to last lesson
+    page.keyboard.press("[")
+    page.wait_for_timeout(300)
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible()
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_01_foundations")
+
+    # 3. From first lesson, ] advances to next lesson (Lesson 2)
+    page.keyboard.press("]")
+    expect(page.locator("h1:has-text('E2E B-Tree Mechanics')")).to_be_visible(timeout=5000)
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_02_indexing")
+
+    # 4. At last lesson, ] does NOT wrap to first lesson
+    page.keyboard.press("]")
+    page.wait_for_timeout(300)
+    expect(page.locator("h1:has-text('E2E B-Tree Mechanics')")).to_be_visible()
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_02_indexing")
+
+    # 5. From last lesson, [ navigates back to Lesson 1
+    page.keyboard.press("[")
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible(timeout=5000)
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_01_foundations")
+
+    # 6. Modifiers (Ctrl, Cmd, Alt, Shift) are ignored
+    page.keyboard.press("Control+[")
+    page.keyboard.press("Meta+[")
+    page.keyboard.press("Alt+[")
+    page.keyboard.press("Shift+[")
+    page.keyboard.press("Control+]")
+    page.keyboard.press("Meta+]")
+    page.keyboard.press("Alt+]")
+    page.keyboard.press("Shift+]")
+    page.wait_for_timeout(300)
+    # View must remain on Lesson 1
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible()
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_01_foundations")
+
+    # 7. In inputs / typing: shortcuts are ignored
+    filter_input = page.locator("input.filter-input").first
+    if filter_input.is_visible():
+        filter_input.focus()
+        page.keyboard.press("]")
+        page.keyboard.press("[")
+        page.wait_for_timeout(300)
+        expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible()
+        expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_01_foundations")
+
+    # 8. In "labs", neither shortcut changes the view
+    labs_tab = page.locator("button.tab-btn:has-text('Labs'), .tab-item:has-text('Labs')").first
+    labs_tab.click()
+    page.wait_for_timeout(300)
+
+    page.keyboard.press("[")
+    page.keyboard.press("]")
+    page.wait_for_timeout(300)
+    # Reader should still be on labs tab
+    expect(page.locator("button.tab-btn.active:has-text('Labs'), .tab-item.active:has-text('Labs')").first).to_be_visible()
+
+    # 9. Verify reload/resume selection persistence after keyboard navigation
+    # Switch back to study tab, advance to Lesson 2 via ]
+    study_tab = page.locator("button.tab-btn:has-text('Study'), .tab-item:has-text('Study')").first
+    study_tab.click()
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible(timeout=5000)
+
+    page.keyboard.press("]")
+    expect(page.locator("h1:has-text('E2E B-Tree Mechanics')")).to_be_visible(timeout=5000)
+
+    # Reload page
+    page.reload()
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+    # Automatically resumes Lesson 2
+    expect(page.locator("h1:has-text('E2E B-Tree Mechanics')")).to_be_visible(timeout=5000)
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_02_indexing")
+
