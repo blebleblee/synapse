@@ -2,7 +2,7 @@
 
 ## 1. Saved Checkpoint & Synchronization State
 
-- **Latest Checkpoint Hash:** `a87ce87` (`docs: record evidence-gap audit results, repaired defects, and deferred decisions`)
+- **Latest Checkpoint Hash:** `513d8d4` (`docs: establish manual acceptance milestone and configure Gitea workflow`)
 - **Remote Synchronization:** Fully synchronized. Branch `main` has been successfully pushed to the `gitea` development remote. 
 - **Status:** **Automated stabilization is complete for the current known backlog.** All known, confirmed defects have been verified, repaired, committed, and pushed to Gitea.
 - **Next Milestone:** Real-use Manual Acceptance Testing (see `docs/manual-acceptance.md`).
