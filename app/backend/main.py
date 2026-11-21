@@ -123,7 +123,7 @@ from learning_engine.mastery import (
     resolve_topic_state
 )
 from learning_engine.security import validate_workspace_path, sanitize_query, is_dangerous_host_command, is_allowed_host, is_allowed_origin
-from learning_engine.config_manager import get_settings, save_settings
+from learning_engine.config_manager import get_settings, save_settings, redact_settings, filter_client_settings, ConfigError
 from learning_engine.exporter import export_handbook
 from learning_engine.flashcards import generate_flashcards
 from learning_engine.summary import regenerate_summary, generate_initial_summary
@@ -137,6 +137,9 @@ from learning_engine.packages import (
     seed_starter_curriculum
 )
 from learning_engine.auth import (
+    get_client_ip,
+    issue_ws_ticket,
+    consume_ws_ticket,
     is_auth_enabled,
     verify_password,
     generate_auth_token,
@@ -211,8 +214,8 @@ async def auth_middleware(request: Request, call_next):
             token = auth_header[7:].strip()
         if not token:
             token = request.headers.get("X-Synapse-Token")
-        if not token:
-            token = request.query_params.get("token")
+        # Tokens in query strings are not accepted: they leak into access logs,
+        # proxy logs and browser history.
 
         if not verify_auth_token(token):
             from fastapi.responses import JSONResponse
@@ -291,8 +294,6 @@ def get_auth_status(request: Request):
         token = auth_header[7:].strip()
     if not token:
         token = request.headers.get("X-Synapse-Token")
-    if not token:
-        token = request.query_params.get("token")
 
     auth_required = is_auth_enabled()
     authenticated = verify_auth_token(token) if auth_required else True
@@ -303,7 +304,7 @@ def get_auth_status(request: Request):
 
 @app.post("/api/auth/login")
 def api_login(req: LoginRequest, request: Request):
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = get_client_ip(request)
     if is_rate_limited(client_ip):
         raise HTTPException(
             status_code=429,
@@ -320,6 +321,11 @@ def api_login(req: LoginRequest, request: Request):
     reset_failed_attempts(client_ip)
     token = generate_auth_token()
     return {"token": token, "status": "authenticated", "auth_required": True}
+
+@app.post("/api/auth/ws-ticket")
+def api_ws_ticket():
+    """One-time, 30-second ticket for /ws/terminal (requires a valid bearer token via middleware)."""
+    return {"ticket": issue_ws_ticket()}
 
 @app.get("/api/health")
 async def get_health():
@@ -563,11 +569,15 @@ def update_lesson_mastery(req: LessonMasteryRequest):
 
 @app.get("/api/settings")
 def get_app_settings():
-    return get_settings()
+    # Never return the token signing key or secret values to the client.
+    return redact_settings(get_settings())
 
 @app.post("/api/settings")
 def update_app_settings(settings: Dict[str, Any]):
-    save_settings(settings)
+    try:
+        save_settings(filter_client_settings(settings))
+    except ConfigError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     return {"status": "success"}
 
 @app.get("/api/packages")
@@ -1620,8 +1630,9 @@ async def terminal_websocket(websocket: WebSocket):
         await websocket.close(code=1008, reason="Host not allowed")
         return
 
-    token = websocket.query_params.get("token")
-    if is_auth_enabled() and not verify_auth_token(token):
+    # Browsers cannot set headers on WebSockets, so authenticate with a
+    # one-time ticket from POST /api/auth/ws-ticket instead of the bearer token.
+    if is_auth_enabled() and not consume_ws_ticket(websocket.query_params.get("ticket")):
         await websocket.close(code=1008, reason="Authentication required")
         return
 

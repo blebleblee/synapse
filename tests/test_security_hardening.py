@@ -187,3 +187,132 @@ def test_fallback_secret_is_random_not_hardcoded(monkeypatch):
     assert secret != "synapse-instance-ephemeral-secret-key"
     assert len(secret) >= 64
     assert auth.get_server_secret() == secret  # stable within the process
+
+
+# --- #9: no tokens in URLs; one-time WebSocket tickets -----------------------
+
+def test_query_string_token_not_accepted_for_http(monkeypatch):
+    monkeypatch.setenv("SYNAPSE_PASSWORD", "pw-query")
+    token = auth.generate_auth_token()
+    client = TestClient(app)
+    assert client.get(f"/api/status?token={token}").status_code == 401
+    assert client.get("/api/status", headers={"Authorization": f"Bearer {token}"}).status_code == 200
+    status = client.get(f"/api/auth/status?token={token}").json()
+    assert status["authenticated"] is False
+
+
+def test_ws_ticket_requires_auth_and_is_single_use(monkeypatch):
+    monkeypatch.setenv("SYNAPSE_PASSWORD", "pw-ticket")
+    client = TestClient(app)
+    assert client.post("/api/auth/ws-ticket").status_code == 401
+
+    token = auth.generate_auth_token()
+    res = client.post("/api/auth/ws-ticket", headers={"Authorization": f"Bearer {token}"})
+    assert res.status_code == 200
+    ticket = res.json()["ticket"]
+    assert auth.consume_ws_ticket(ticket) is True
+    assert auth.consume_ws_ticket(ticket) is False
+    assert auth.consume_ws_ticket(None) is False
+    assert auth.consume_ws_ticket("forged") is False
+
+
+def test_ws_ticket_expires(monkeypatch):
+    ticket = auth.issue_ws_ticket()
+    real_time = auth.time.time
+    monkeypatch.setattr(auth.time, "time", lambda: real_time() + auth.WS_TICKET_TTL_SECONDS + 1)
+    assert auth.consume_ws_ticket(ticket) is False
+
+
+def test_terminal_ws_rejects_bearer_token_in_url(monkeypatch):
+    monkeypatch.setenv("SYNAPSE_PASSWORD", "pw-ws")
+    token = auth.generate_auth_token()
+    client = TestClient(app)
+    with pytest.raises(WebSocketDisconnect) as exc:
+        with client.websocket_connect(f"/ws/terminal?token={token}"):
+            pass
+    assert exc.value.code == 1008
+
+
+# --- #10: rate limiter ---------------------------------------------------------
+
+def test_rate_limit_check_does_not_grow_state():
+    auth._FAILED_ATTEMPTS.clear()
+    for i in range(50):
+        assert auth.is_rate_limited(f"10.0.0.{i}") is False
+    assert auth._FAILED_ATTEMPTS == {}
+
+
+def test_rate_limit_prunes_expired_entries(monkeypatch):
+    auth._FAILED_ATTEMPTS.clear()
+    now = auth.time.time()
+    for i in range(5):
+        auth._FAILED_ATTEMPTS[f"old-{i}"] = (1, now - auth.LOCKOUT_WINDOW_SECONDS - 5)
+    monkeypatch.setattr(auth, "_MAX_TRACKED_IPS", 5)
+    auth.record_failed_attempt("fresh")
+    assert set(auth._FAILED_ATTEMPTS) == {"fresh"}
+    auth._FAILED_ATTEMPTS.clear()
+
+
+class _FakeRequest:
+    def __init__(self, peer, xff=None):
+        self.client = type("C", (), {"host": peer})()
+        self.headers = {"x-forwarded-for": xff} if xff else {}
+
+
+def test_client_ip_ignores_forwarded_header_by_default(monkeypatch):
+    monkeypatch.delenv("SYNAPSE_TRUST_PROXY", raising=False)
+    assert auth.get_client_ip(_FakeRequest("10.1.1.1", "6.6.6.6")) == "10.1.1.1"
+
+
+def test_client_ip_uses_proxy_appended_entry_when_trusted(monkeypatch):
+    monkeypatch.setenv("SYNAPSE_TRUST_PROXY", "1")
+    # Client spoofs the first entry; the proxy appends the real address last.
+    assert auth.get_client_ip(_FakeRequest("10.1.1.1", "1.2.3.4, 203.0.113.9")) == "203.0.113.9"
+    assert auth.get_client_ip(_FakeRequest("10.1.1.1")) == "10.1.1.1"
+
+
+# --- #11: settings never expose secrets ---------------------------------------
+
+def test_settings_api_redacts_secrets_and_hides_signing_key():
+    from learning_engine.config_manager import save_settings, get_settings, REDACTED_PLACEHOLDER
+    auth.get_server_secret()  # ensure auth:server_secret exists in the DB
+    save_settings({"anthropicApiKey": "sk-real-anthropic", "auth_password": "pw-real", "theme": "dracula"})
+
+    # Saving auth_password enables protection, so authenticate the request.
+    headers = {"Authorization": f"Bearer {auth.generate_auth_token()}"}
+    client = TestClient(app)
+    res = client.get("/api/settings", headers=headers)
+    assert res.status_code == 200
+    body = res.json()
+    assert not any(k.startswith("auth:") for k in body)
+    assert body["anthropicApiKey"] == REDACTED_PLACEHOLDER
+    assert body["auth_password"] == REDACTED_PLACEHOLDER
+    assert body["theme"] == "dracula"
+    assert "sk-real-anthropic" not in str(body)
+
+
+def test_settings_roundtrip_with_placeholder_keeps_stored_secret():
+    from learning_engine.config_manager import save_settings, get_settings
+    save_settings({"geminiApiKey": "gm-real", "theme": "nord"})
+
+    client = TestClient(app)
+    body = client.get("/api/settings").json()
+    body["theme"] = "monokai"
+    assert client.post("/api/settings", json=body).status_code == 200
+
+    stored = get_settings()
+    assert stored["geminiApiKey"] == "gm-real"
+    assert stored["theme"] == "monokai"
+
+    assert client.post("/api/settings", json={"geminiApiKey": "gm-new"}).status_code == 200
+    assert get_settings()["geminiApiKey"] == "gm-new"
+
+
+def test_settings_api_cannot_overwrite_signing_key():
+    from learning_engine.config_manager import get_settings
+    before = auth.get_server_secret()
+    client = TestClient(app)
+    res = client.post("/api/settings", json={"auth:server_secret": "attacker-known"})
+    assert res.status_code == 400
+    assert auth.get_server_secret() == before
+    assert get_settings().get("auth:server_secret") != "attacker-known"

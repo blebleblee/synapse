@@ -40,6 +40,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
   const isDraggingRef = useRef(false);
   const reconnectTimerRef = useRef<any>(null);
   const isUnmountedRef = useRef(false);
+  const connectGenerationRef = useRef(0);
   const lastSizeRef = useRef<{ cols: number; rows: number }>({ cols: 0, rows: 0 });
 
   const fitTerminal = () => {
@@ -79,11 +80,33 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       wsRef.current.close();
     }
 
+    // The bearer token never goes into the WebSocket URL: exchange it for a
+    // one-time ticket first (the global fetch wrapper adds the Authorization header).
+    const generation = ++connectGenerationRef.current;
+    let token: string | null = null;
+    try {
+      token = localStorage.getItem('synapse_auth_token');
+    } catch {
+      token = null;
+    }
+    if (!token) {
+      openWs(env, null);
+      return;
+    }
+    fetch('/api/auth/ws-ticket', { method: 'POST' })
+      .then((res) => (res.ok ? res.json() : null))
+      .catch(() => null)
+      .then((data: { ticket?: string } | null) => {
+        if (generation !== connectGenerationRef.current || isUnmountedRef.current) return;
+        openWs(env, data?.ticket ?? null);
+      });
+  };
+
+  const openWs = (env: 'host' | 'docker' | 'k8s', ticket: string | null) => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
-    const token = localStorage.getItem('synapse_auth_token');
-    const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
-    const wsUrl = `${protocol}//${host}/ws/terminal?env=${env}${tokenParam}`;
+    const ticketParam = ticket ? `&ticket=${encodeURIComponent(ticket)}` : '';
+    const wsUrl = `${protocol}//${host}/ws/terminal?env=${encodeURIComponent(env)}${ticketParam}`;
 
     const ws = new WebSocket(wsUrl);
     ws.binaryType = 'arraybuffer';

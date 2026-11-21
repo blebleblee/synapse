@@ -740,14 +740,36 @@ export function App() {
     }
   };
 
+  // Downloads go through fetch (which carries the Authorization header) rather
+  // than window.open, so they work on password-protected instances.
+  const downloadFile = async (url: string, fallbackName: string) => {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const disposition = res.headers.get('Content-Disposition') || '';
+      const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition);
+      const filename = match ? decodeURIComponent(match[1]) : fallbackName;
+      const blobUrl = URL.createObjectURL(await res.blob());
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (err) {
+      console.error('Download failed:', err);
+    }
+  };
+
   const handleDownloadFlashcards = () => {
     if (!selectedPath) return;
-    window.open(`/api/flashcards?query=${encodeURIComponent(selectedPath)}`, '_blank');
+    void downloadFile(`/api/flashcards?query=${encodeURIComponent(selectedPath)}`, 'flashcards.csv');
   };
 
   const handleDownloadHandbook = () => {
     if (!topicDetails) return;
-    window.open(`/api/export?domain=${encodeURIComponent(topicDetails.domain)}`, '_blank');
+    void downloadFile(`/api/export?domain=${encodeURIComponent(topicDetails.domain)}`, `${topicDetails.domain}.md`);
   };
 
   const handleRegenerateSummary = async () => {
