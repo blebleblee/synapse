@@ -33,6 +33,13 @@ COPY topics/ ./topics/
 # Copy compiled frontend assets from Stage 1
 COPY --from=frontend-builder /build/app/frontend/dist ./app/frontend/dist
 
+# Run as an unprivileged user (the in-app terminal executes as this user).
+RUN useradd --create-home --uid 1000 synapse && chown -R synapse:synapse /workspace
+USER synapse
+
+# Without SYNAPSE_PASSWORD the server only answers requests addressed to
+# localhost (e.g. http://localhost:8000 via the published port). Set
+# SYNAPSE_PASSWORD to allow access from other machines.
 EXPOSE 8000
 
 CMD ["python3", "-m", "uvicorn", "app.backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -20,6 +20,7 @@ from .config_manager import get_settings
 _FAILED_ATTEMPTS: Dict[str, Tuple[int, float]] = defaultdict(lambda: (0, 0.0))
 MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_WINDOW_SECONDS = 60
+_EPHEMERAL_SECRET: Optional[str] = None
 
 def get_server_secret() -> str:
     """
@@ -43,8 +44,12 @@ def get_server_secret() -> str:
             )
             return new_secret
     except Exception:
-        # Memory fallback if DB is uninitialized
-        return "synapse-instance-ephemeral-secret-key"
+        # DB unavailable: use a random per-process secret. Tokens will not
+        # survive a restart, but they can never be forged from a known key.
+        global _EPHEMERAL_SECRET
+        if _EPHEMERAL_SECRET is None:
+            _EPHEMERAL_SECRET = secrets.token_hex(32)
+        return _EPHEMERAL_SECRET
 
 def get_configured_password() -> Optional[str]:
     """

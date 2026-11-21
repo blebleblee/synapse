@@ -48,6 +48,9 @@ _INITIAL_RUN_DB = _SEED_WORKSPACE / "data" / "early_synapse.db"
 os.environ["SYNAPSE_DB_PATH"] = str(_INITIAL_RUN_DB)
 os.environ["SYNAPSE_WORKSPACE"] = str(_SEED_WORKSPACE)
 os.environ["SYNAPSE_TOPICS_DIR"] = str(_SEED_TOPICS_DIR)
+# Starlette's TestClient sends "Host: testserver"; allow it explicitly so the
+# localhost-only guard for password-less instances does not reject test requests.
+os.environ["SYNAPSE_ALLOWED_HOSTS"] = "testserver"
 
 _CORE_DOMAINS = [
     "arts", "business", "computing", "crafts", "economics", "engineering",
