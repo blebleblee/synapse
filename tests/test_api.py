@@ -118,6 +118,53 @@ def test_api_translate_en_passthrough():
     data = res.json()
     assert data["translated"] == "# Hello World"
 
+def test_api_translate_failure_does_not_cache_english_fallback():
+    """
+    FIND-04: When an AI provider fails or is blocked during translation,
+    the endpoint returns the English fallback but MUST NOT cache it to disk.
+    A subsequent request must still attempt translation (cached=False).
+    """
+    raw_text = "# Microservices Architecture\nService mesh proxies intercept traffic."
+    res1 = client.post("/api/translate", json={"text": raw_text, "target_lang": "cs"})
+    assert res1.status_code == 200
+    data1 = res1.json()
+    assert data1["cached"] is False
+    assert data1["fallback"] is True
+    assert data1["translated"] == raw_text
+
+    res2 = client.post("/api/translate", json={"text": raw_text, "target_lang": "cs"})
+    assert res2.status_code == 200
+    data2 = res2.json()
+    assert data2["cached"] is False, "Failed translation was incorrectly cached to disk!"
+    assert data2["fallback"] is True
+
+def test_api_translate_successful_translation_caches_result(monkeypatch):
+    """
+    FIND-04: When translation succeeds, the translated text is cached to disk.
+    Subsequent requests return cached=True.
+    """
+    from unittest.mock import MagicMock
+    mock_provider = MagicMock()
+    mock_provider.generate.return_value = "# Architektura mikroslužeb\nProxy proxy sítě zachycují provoz."
+
+    import app.backend.main as be_main
+    monkeypatch.setattr(be_main, "get_translation_provider", lambda **kwargs: (mock_provider, "mock-translator"))
+
+    raw_text = "# Microservices Architecture\nProxies intercept network traffic."
+    res1 = client.post("/api/translate", json={"text": raw_text, "target_lang": "cs"})
+    assert res1.status_code == 200
+    data1 = res1.json()
+    assert data1["cached"] is False
+    assert data1["fallback"] is False
+    assert "mikroslužeb" in data1["translated"]
+
+    # Second request should be served from disk cache
+    res2 = client.post("/api/translate", json={"text": raw_text, "target_lang": "cs"})
+    assert res2.status_code == 200
+    data2 = res2.json()
+    assert data2["cached"] is True
+    assert "mikroslužeb" in data2["translated"]
+
 def test_path_traversal_prevention():
     res = client.get("/api/topic?query=../../etc/passwd")
     assert res.status_code in [400, 404]

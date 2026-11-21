@@ -751,8 +751,10 @@ async def api_translate_content(req: TranslateRequest):
         return text
 
     sem = asyncio.Semaphore(2)
+    any_chunk_failed = False
 
     async def translate_chunk(chunk_text: str) -> str:
+        nonlocal any_chunk_failed
         if not chunk_text.strip():
             return chunk_text
             
@@ -781,10 +783,16 @@ Text to translate:
                 # Truncation Guard: if translation is completely broken (<20% length of source without blocks)
                 if len(translated_masked) < len(masked_text) * 0.2:
                     # Fallback to English chunk if model brutally failed
+                    any_chunk_failed = True
+                    return chunk_text
+
+                if not translated_masked:
+                    any_chunk_failed = True
                     return chunk_text
 
                 return unmask(translated_masked, blocks)
             except Exception:
+                any_chunk_failed = True
                 return chunk_text
 
     # Chunking by ## or # to fit in context window (sliding window logic)
@@ -794,8 +802,19 @@ Text to translate:
     translated_sections = await asyncio.gather(*(translate_chunk(sec) for sec in sections))
     final_translation = "".join(translated_sections).strip()
 
-    cache_file.write_text(final_translation + "\n", encoding="utf-8")
-    return {"translated": final_translation, "cached": False, "model": used_model}
+    # Never cache failed or untranslated fallback English content
+    is_identical_to_source = (final_translation == req.text.strip())
+    should_cache = not any_chunk_failed and not is_identical_to_source and bool(final_translation)
+
+    if should_cache:
+        cache_file.write_text(final_translation + "\n", encoding="utf-8")
+
+    return {
+        "translated": final_translation,
+        "cached": False,
+        "model": used_model,
+        "fallback": any_chunk_failed or is_identical_to_source
+    }
 
 # -----------------------------------------------------------------------------
 # Neural Audio Narration (Edge-TTS with Guy Baritone Voice & MP3 Disk Cache)
