@@ -2,7 +2,7 @@
 
 ## 1. Saved Checkpoint
 
-- **Latest Checkpoint Hash:** `9bf0dac` (`fix: forward configured model and cluster host to quiz and summary endpoints`)
+- **Latest Checkpoint Hash:** `11ecd95` (`fix: stop terminal reconnect loop on auth failure (code 1008)`)
 - **Completed Backlog Tasks:**
   - **FIND-02:** Removed automatic `git add -A`, `git commit`, `git push` workspace side effects from `topic_manager.py`, `summary.py`, and `main.py`. Added `tests/test_git_isolation.py`.
   - **FIND-01:** Repaired `GenerateRequest` payload schema mismatch causing HTTP 422 errors on curriculum generation.
@@ -12,6 +12,7 @@
   - **FIND-07:** Refreshed sidebar tree state dynamically upon manual mastery level updates in reader header (`await fetchTree()`, `await fetchStatus()`).
   - **FIND-04:** Prevented failed or untranslated English fallback text from poisoning the disk translation cache (`should_cache = not any_chunk_failed and not is_identical_to_source and bool(final_translation)`). Added regression tests in `tests/test_api.py`.
   - **FIND-08:** Forwarded configured AI model (`settings.mentorModel || settings.primaryModel`) and cluster host (`settings.ollamaHost`) to `/api/quiz` and `/api/summary/regenerate` endpoints and provider routing. Added regression test in `tests/test_api.py`.
+  - **FIND-09:** Stopped terminal WebSocket reconnection loop upon authentication failure (`event.code === 1008`) or deliberate closure (`event.code === 1000`). Reconnects upon `synapse:authenticated` event. Added helper and unit tests in `app/frontend/src/utils/terminalHelpers.ts` and `app/frontend/src/components/terminalReconnect.test.ts`.
 - **Verification Script:** Verified `scripts/verify_all.sh` runs reliably from root, halts on failure via `set -eo pipefail`, and passes all 5 verification phases.
 
 ---
@@ -19,9 +20,8 @@
 ## 2. Audit Summary & Remaining Backlog
 
 A systematic audit was conducted across all 8 functional areas, recorded in `docs/backlog.md`:
-- **Completed:** FIND-01, FIND-02, FIND-03, FIND-04, FIND-05, FIND-06, FIND-07, FIND-08.
-- **Remaining Open Findings:**
-  - **FIND-09:** Terminal WebSocket reconnect loop floods disconnected endpoint when unauthenticated (code 1008).
+- **Completed:** ALL 9 FINDINGS RESOLVED (FIND-01 through FIND-09).
+- **Remaining Open Findings:** None. Backlog is fully cleared and verified.
 
 ---
 
@@ -39,15 +39,24 @@ A systematic audit was conducted across all 8 functional areas, recorded in `doc
 ==================================================
 
 [*] [1/5] Running frontend unit tests...
-✔ 13 tests passed in 137.6ms (0 failed)
+✔ 16 tests passed in 144.7ms (0 failed)
 
 [*] [2/5] Running frontend linter...
 oxlint: 0 errors, 25 non-blocking warnings
 
 [*] [3/5] Building frontend production bundle...
-tsc -b && vite build: 3645 modules transformed in 364ms (0 errors)
+tsc -b && vite build: 3646 modules transformed in 381ms (0 errors)
 
 [*] [4/5] Running backend test suite...
+pytest tests/: 84 passed in 36.24s (0 failed)
+
+[*] [5/5] Running Chromium E2E browser tests...
+pytest e2e/test_learner_journey.py: 8 passed in 40.80s (0 failed)
+
+==================================================
+ [✔] ALL 5 VERIFICATION PHASES PASSED             
+==================================================
+```
 pytest tests/: 81 passed in 32.86s (0 failed)
 
 [*] [5/5] Running Chromium E2E browser tests...

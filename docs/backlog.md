@@ -96,6 +96,4 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Evidence:**
   - `app/frontend/src/components/TerminalDrawer.tsx:112-118`: `ws.onclose` unconditionally schedules reconnection without inspecting close codes.
   - `app/backend/main.py:1591`: Backend sends `await websocket.close(code=1008, reason="Authentication required")`.
-- **Status:** Confirmed by code.
-- **Proposed Acceptance Criteria:** `ws.onclose` does not schedule an automatic reconnection if the close code indicates authentication failure (`event.code === 1008`) or deliberate closure (`event.code === 1000`).
-- **Small Proposed Repair Task:** In `TerminalDrawer.tsx`, check `if (event.code !== 1008 && event.code !== 1000)` before scheduling `reconnectTimerRef.current`.
+- **Status:** **COMPLETED** (Halted automatic terminal WebSocket reconnection loops on code 1008 Policy Violation / Unauthorized and code 1000 Normal Closure in `TerminalDrawer.tsx` and `app/frontend/src/utils/terminalHelpers.ts`. Reconnects upon `synapse:authenticated` event. Added unit tests in `terminalReconnect.test.ts`).
