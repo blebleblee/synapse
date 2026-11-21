@@ -14,6 +14,7 @@ import {
   HelpCircle,
   X
 } from 'lucide-react';
+import { shouldReconnectTerminal } from '../utils/terminalHelpers';
 
 export interface TerminalDrawerHandle {
   runCommand: (command: string) => void;
@@ -104,9 +105,17 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       }
     };
 
-    ws.onclose = () => {
+    ws.onclose = (event: CloseEvent) => {
       setConnected(false);
       onConnectionChange?.(false);
+
+      if (!shouldReconnectTerminal(event.code)) {
+        if (event.code === 1008 && termRef.current) {
+          termRef.current.writeln('\r\n\x1b[31m[Authentication Required]\x1b[0m Terminal access requires authentication. Please log in.');
+        }
+        return;
+      }
+
       if (!isUnmountedRef.current) {
         reconnectTimerRef.current = setTimeout(() => {
           connectWs(env);
@@ -199,6 +208,13 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
 
+    const handleAuthEvent = () => {
+      if (!isUnmountedRef.current) {
+        connectWs(terminalEnv);
+      }
+    };
+    window.addEventListener('synapse:authenticated', handleAuthEvent);
+
     return () => {
       isUnmountedRef.current = true;
       if (reconnectTimerRef.current) {
@@ -207,6 +223,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       resizeObserver.disconnect();
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('synapse:authenticated', handleAuthEvent);
       if (wsRef.current) wsRef.current.close();
       term.dispose();
     };

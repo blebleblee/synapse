@@ -230,6 +230,7 @@ export function App() {
 
   const handleLoginSuccess = async () => {
     setIsAuthenticated(true);
+    window.dispatchEvent(new CustomEvent('synapse:authenticated'));
     await fetchTree();
     fetchStatus();
 
