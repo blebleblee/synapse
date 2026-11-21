@@ -1,14 +1,15 @@
 import shutil
 from pathlib import Path
 from typing import Dict, Any, List
+from .security import get_workspace_root, get_topics_dir
 
 def perform_cleanup(clean_sessions: bool = True, clean_exports: bool = True, clean_mastery: bool = False) -> int:
     """
     Cleans transient runtime artifacts (chat sessions, export bundles, temp logs)
     and optionally resets lesson completion records without touching authored curriculum files.
     """
-    WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-    topics_dir = WORKSPACE_ROOT / "topics"
+    WORKSPACE_ROOT = get_workspace_root()
+    topics_dir = get_topics_dir()
     exports_dir = WORKSPACE_ROOT / "exports"
 
     cleaned_count = 0

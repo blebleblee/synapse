@@ -10,8 +10,9 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 from .models import get_provider, LLMProvider
 from .topic_manager import resolve_subtopic, get_domain_persona
+from .security import get_workspace_root
 
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+WORKSPACE_ROOT = get_workspace_root()
 
 DEFAULT_REVIEWER_MODEL = "deepseek-r1:32b"
 

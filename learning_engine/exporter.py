@@ -5,22 +5,27 @@ Stitches canonical masterclass topics and lessons into unified printable handboo
 
 from pathlib import Path
 from typing import Optional, List, Dict, Any
-from .security import WORKSPACE_ROOT, TOPICS_DIR
+from .security import WORKSPACE_ROOT, TOPICS_DIR, get_workspace_root
 from .topic_manager import get_topic_tree, get_unit_lessons
 
-EXPORTS_DIR = WORKSPACE_ROOT / "exports"
+def get_exports_dir() -> Path:
+    return get_workspace_root() / "exports"
+
+EXPORTS_DIR = get_exports_dir()
 
 def export_handbook(domain: str, level: Optional[str] = None) -> Path:
     """
     Compiles an entire curriculum domain into a cohesive, textbook-grade Markdown handbook.
     """
-    EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    out_dir = get_exports_dir()
+    out_dir.mkdir(parents=True, exist_ok=True)
     domain_dir = TOPICS_DIR / domain
     if not domain_dir.exists():
         raise ValueError(f"Domain '{domain}' does not exist.")
 
-    domain_title = domain.replace("_", " ").title()
-    out_file = EXPORTS_DIR / f"{domain}_handbook.md"
+    domain_title = domain.replace('_', ' ').title()
+    book_title = f"Synapse Masterclass: {domain_title}"
+    output_path = out_dir / f"{domain}_handbook.md"
 
     lines = [
         f"# {domain_title}: Comprehensive Engineering & Socratic Handbook\n",
@@ -76,5 +81,5 @@ def export_handbook(domain: str, level: Optional[str] = None) -> Path:
                     break
 
     full_text = "\n".join(lines) + "\n" + "\n".join(toc_entries) + "\n\n" + "\n".join(chapter_content)
-    out_file.write_text(full_text, encoding="utf-8")
-    return out_file
+    output_path.write_text(full_text, encoding="utf-8")
+    return output_path

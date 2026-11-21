@@ -8,8 +8,9 @@ from pathlib import Path
 from typing import Optional
 from .models import get_provider, LLMProvider
 from .topic_manager import resolve_subtopic, get_domain_persona, get_unit_lessons
+from .security import get_workspace_root
 
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+WORKSPACE_ROOT = get_workspace_root()
 
 def generate_initial_summary(domain: str, category: str, subtopic_id: str, subtopic_dir: Path, provider: Optional[LLMProvider] = None) -> str:
     if not provider:

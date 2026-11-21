@@ -10,10 +10,13 @@ import tarfile
 import hashlib
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from .security import validate_workspace_path, WORKSPACE_ROOT, TOPICS_DIR
+from .security import validate_workspace_path, WORKSPACE_ROOT, TOPICS_DIR, get_workspace_root
 from .database import get_db_connection
 
-PACKS_DIR = WORKSPACE_ROOT / "exports" / "packages"
+def get_packs_dir() -> Path:
+    return get_workspace_root() / "exports" / "packages"
+
+PACKS_DIR = get_packs_dir()
 
 def compute_checksum(file_path: Path) -> str:
     """Computes SHA256 checksum of a file."""
@@ -27,7 +30,7 @@ def export_topic_pack(domain: str, output_dir: Optional[Path] = None) -> Path:
     """
     Exports an entire domain or the complete global curriculum into a modular .synpack distribution archive.
     """
-    out_dir = output_dir or PACKS_DIR
+    out_dir = output_dir or get_packs_dir()
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if domain.lower() in ["all", "complete", "global"]:
@@ -186,7 +189,7 @@ def resolve_or_download_pack(domain: str) -> Path:
     4. Downloads from GitHub / Gitea release.
     """
     pack_name = "synapse_complete_curriculum.synpack" if domain in ("complete", "all", "synapse_complete_curriculum") else f"{domain}.synpack"
-    out_dir = PACKS_DIR
+    out_dir = get_packs_dir()
     out_dir.mkdir(parents=True, exist_ok=True)
     local_pack = out_dir / pack_name
     if local_pack.exists() and local_pack.stat().st_size > 1000:
@@ -323,8 +326,8 @@ def seed_starter_curriculum():
     candidate_paths = [
         Path(env_res) / "packages" / "synapse_complete_curriculum.synpack" if env_res else None,
         Path(sys.executable).resolve().parent.parent / "packages" / "synapse_complete_curriculum.synpack" if getattr(sys, "frozen", False) else None,
-        PACKS_DIR / "synapse_complete_curriculum.synpack",
-        WORKSPACE_ROOT / "exports" / "packages" / "synapse_complete_curriculum.synpack",
+        get_packs_dir() / "synapse_complete_curriculum.synpack",
+        get_workspace_root() / "exports" / "packages" / "synapse_complete_curriculum.synpack",
     ]
     for p in candidate_paths:
         if p and p.exists() and p.stat().st_size > 1000:

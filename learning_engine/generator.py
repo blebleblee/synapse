@@ -27,13 +27,13 @@ from .models import (
     AnthropicProvider
 )
 from .topic_manager import get_domain_persona
-from .security import validate_canonical_topic_path
+from .security import validate_canonical_topic_path, get_workspace_root
 from .domain_strategies import build_topic_modules, GLOBAL_REGISTRY
 
 # Global semaphore to limit concurrent LLM requests and avoid rate limits
 _LLM_SEMAPHORE = threading.Semaphore(24)
 
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+WORKSPACE_ROOT = get_workspace_root()
 
 def purge_legacy_topic_files(topic_dir: Path):
     """

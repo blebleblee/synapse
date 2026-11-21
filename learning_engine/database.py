@@ -1,17 +1,25 @@
+import os
 import sqlite3
 import time
 from pathlib import Path
 from typing import Optional
 from contextlib import contextmanager
-from .security import WORKSPACE_ROOT
+from .security import WORKSPACE_ROOT, get_workspace_root
 
-DB_PATH = WORKSPACE_ROOT / "data" / "synapse.db"
+def get_db_path() -> Path:
+    custom = os.environ.get("SYNAPSE_DB_PATH")
+    if custom:
+        return Path(custom).resolve()
+    return get_workspace_root() / "data" / "synapse.db"
+
+DB_PATH = get_db_path()
 
 def get_connection() -> sqlite3.Connection:
-    CONFIG_DIR = DB_PATH.parent
+    db_path = get_db_path()
+    CONFIG_DIR = db_path.parent
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     # Higher timeout for concurrency
-    conn = sqlite3.connect(DB_PATH, timeout=20.0, check_same_thread=False)
+    conn = sqlite3.connect(db_path, timeout=20.0, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL;")
     conn.execute("PRAGMA synchronous=NORMAL;")

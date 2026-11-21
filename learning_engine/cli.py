@@ -10,7 +10,8 @@ import subprocess
 import shutil
 from pathlib import Path
 
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+from learning_engine.security import get_workspace_root, get_topics_dir
+WORKSPACE_ROOT = get_workspace_root()
 from learning_engine.topic_manager import (
     get_topic_tree,
     list_domains,
@@ -384,8 +385,8 @@ def cmd_clean(args):
     Cleans transient runtime artifacts (chat sessions, export bundles, temp logs)
     without touching authored curriculum files.
     """
-    topics_dir = WORKSPACE_ROOT / "topics"
-    exports_dir = WORKSPACE_ROOT / "exports"
+    topics_dir = get_topics_dir()
+    exports_dir = get_workspace_root() / "exports"
 
     clean_sessions = args.sessions or args.all
     clean_exports = args.exports or args.all

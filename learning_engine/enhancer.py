@@ -1,6 +1,7 @@
 from pathlib import Path
 import time
 from .models import LLMProvider, validate_generation_output
+from .security import get_topics_dir
 
 def enhance_markdown_file(provider: LLMProvider, file_path: Path, domain: str, subtopic_id: str):
     """Feeds existing markdown to Claude for high-end academic/engineering review and enhancement."""
@@ -9,7 +10,7 @@ def enhance_markdown_file(provider: LLMProvider, file_path: Path, domain: str, s
     if len(content.strip()) < 50:
         return False
         
-    domain_gemini = Path(__file__).resolve().parent.parent / "topics" / domain / "GEMINI.md"
+    domain_gemini = get_topics_dir() / domain / "GEMINI.md"
     domain_instructions = ""
     if domain_gemini.exists():
         try:

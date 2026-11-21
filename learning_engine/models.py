@@ -13,8 +13,9 @@ import itertools
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
 from .config_manager import get_settings
+from .security import get_workspace_root
 
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+WORKSPACE_ROOT = get_workspace_root()
 
 DEFAULT_OLLAMA_HOSTS = [
     "http://127.0.0.1:11434"
@@ -158,8 +159,14 @@ def load_env_file():
 
 load_env_file()
 
-CLUSTER_CONFIG_PATH = WORKSPACE_ROOT / ".synapse_cluster.json"
-NODE_PINS_CONFIG_PATH = WORKSPACE_ROOT / ".synapse_node_pins.json"
+def get_cluster_config_path() -> Path:
+    return get_workspace_root() / ".synapse_cluster.json"
+
+def get_node_pins_config_path() -> Path:
+    return get_workspace_root() / ".synapse_node_pins.json"
+
+CLUSTER_CONFIG_PATH = get_cluster_config_path()
+NODE_PINS_CONFIG_PATH = get_node_pins_config_path()
 
 def normalize_host_key(host: str) -> str:
     """Normalizes host string to hostname:port or hostname without protocol."""
@@ -177,9 +184,10 @@ def get_configured_node_pins() -> Dict[str, str]:
         "192.168.1.100": "qwen2.5-coder:32b",
     }
 
-    if NODE_PINS_CONFIG_PATH.exists():
+    cfg_path = get_node_pins_config_path()
+    if cfg_path.exists():
         try:
-            data = json.loads(NODE_PINS_CONFIG_PATH.read_text(encoding="utf-8"))
+            data = json.loads(cfg_path.read_text(encoding="utf-8"))
             if isinstance(data, dict):
                 for k, v in data.items():
                     if k and v:
@@ -228,7 +236,8 @@ def get_node_pin(host: str) -> Optional[str]:
 
 def save_configured_node_pins(pins: Dict[str, str]) -> Dict[str, str]:
     cleaned = {normalize_host_key(k): str(v).strip() for k, v in pins.items() if k and v}
-    NODE_PINS_CONFIG_PATH.write_text(json.dumps(cleaned, indent=2) + "\n", encoding="utf-8")
+    cfg_path = get_node_pins_config_path()
+    cfg_path.write_text(json.dumps(cleaned, indent=2) + "\n", encoding="utf-8")
     try:
         from .config_manager import get_settings, save_settings
         st = get_settings()
@@ -244,9 +253,10 @@ def get_configured_hosts() -> List[str]:
     if env_hosts:
         return [h.strip().rstrip("/") for h in env_hosts.split(",") if h.strip()]
 
-    if CLUSTER_CONFIG_PATH.exists():
+    cfg_path = get_cluster_config_path()
+    if cfg_path.exists():
         try:
-            data = json.loads(CLUSTER_CONFIG_PATH.read_text(encoding="utf-8"))
+            data = json.loads(cfg_path.read_text(encoding="utf-8"))
             if isinstance(data, list) and data:
                 return [h.strip().rstrip("/") for h in data if h and isinstance(h, str) and h.strip()]
         except Exception:
@@ -267,7 +277,8 @@ def save_configured_hosts(hosts: List[str]) -> List[str]:
     cleaned = [h.strip().rstrip("/") for h in hosts if h and isinstance(h, str) and h.strip()]
     if not cleaned:
         cleaned = DEFAULT_OLLAMA_HOSTS
-    CLUSTER_CONFIG_PATH.write_text(json.dumps(cleaned, indent=2) + "\n", encoding="utf-8")
+    cfg_path = get_cluster_config_path()
+    cfg_path.write_text(json.dumps(cleaned, indent=2) + "\n", encoding="utf-8")
     try:
         from .config_manager import get_settings, save_settings
         st = get_settings()
