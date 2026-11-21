@@ -1513,15 +1513,6 @@ def save_session(req: SaveSessionRequest):
 
     file_path.write_text("\n".join(content_lines), encoding="utf-8")
 
-    # Git commit and push
-    try:
-        import subprocess
-        subprocess.run(["git", "add", str(file_path)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
-        subprocess.run(["git", "commit", "-m", f"session({sub}): save tutor study log for {timestamp}"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
-        subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
-    except Exception:
-        pass
-
     return {
         "success": True,
         "filename": filename,
@@ -1564,15 +1555,6 @@ Output clean, production-ready Markdown."""
 
     output_file = artifacts_dir / "MASTERED_GUIDE.md"
     output_file.write_text(compiled_guide.strip() + "\n", encoding="utf-8")
-
-    # Git commit and push
-    try:
-        import subprocess
-        subprocess.run(["git", "add", str(output_file)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
-        subprocess.run(["git", "commit", "-m", f"artifacts({sub}): compile mastered field guide"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
-        subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
-    except Exception:
-        pass
 
     return {
         "success": True,

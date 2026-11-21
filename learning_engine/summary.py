@@ -113,13 +113,4 @@ Output clean, publication-grade Markdown only."""
     out_file = sub_path / "SUMMARY.md"
     out_file.write_text(summary_text + "\n", encoding="utf-8")
 
-    # Git commit and push
-    try:
-        import subprocess
-        subprocess.run(["git", "add", str(out_file)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
-        subprocess.run(["git", "commit", "-m", f"summary({sub}): regenerate executive topic summary"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
-        subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
-    except Exception:
-        pass
-
     return summary_text

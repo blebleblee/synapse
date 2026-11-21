@@ -359,15 +359,6 @@ def delete_subtopic(rel_path: str) -> bool:
     except Exception:
         pass
 
-    # Git commit and push
-    try:
-        import subprocess
-        subprocess.run(["git", "add", "-A"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
-        subprocess.run(["git", "commit", "-m", f"chore(topics): remove topic {clean_rel}"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
-        subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
-    except Exception:
-        pass
-
     invalidate_topic_tree_cache()
     return True
 
@@ -398,15 +389,6 @@ def rename_subtopic(rel_path: str, new_title: str) -> bool:
             new_lines.append(l)
 
     syllabus_file.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
-
-    # Git commit and push
-    try:
-        import subprocess
-        subprocess.run(["git", "add", str(syllabus_file)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
-        subprocess.run(["git", "commit", "-m", f"chore(topics): rename topic {clean_rel} to '{new_title}'"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
-        subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
-    except Exception:
-        pass
 
     invalidate_topic_tree_cache()
     return True
