@@ -94,10 +94,18 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       return;
     }
     fetch('/api/auth/ws-ticket', { method: 'POST' })
-      .then((res) => (res.ok ? res.json() : null))
+      .then((res) => (res.status === 401 ? 'unauthorized' : res.ok ? res.json() : null))
       .catch(() => null)
-      .then((data: { ticket?: string } | null) => {
+      .then((data: { ticket?: string } | 'unauthorized' | null) => {
         if (generation !== connectGenerationRef.current || isUnmountedRef.current) return;
+        if (data === 'unauthorized') {
+          // Not logged in (or the session expired): don't open a socket that
+          // will be refused. The 'synapse:authenticated' event reconnects.
+          setConnected(false);
+          onConnectionChange?.(false);
+          termRef.current?.writeln('\r\n\x1b[33m[Login required]\x1b[0m The terminal connects after you log in.');
+          return;
+        }
         openWs(env, data?.ticket ?? null);
       });
   };

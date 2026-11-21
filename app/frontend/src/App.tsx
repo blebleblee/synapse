@@ -402,6 +402,10 @@ export function App() {
       const target = e.target as HTMLElement;
       const isTyping = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
 
+      // A blocking dialog (first-run setup, login) owns the keyboard: don't
+      // open search or other panels behind it.
+      if (setupWizardOpen || (authRequired && !isAuthenticated)) return;
+
       // Cmd/Ctrl + K: Open Search anywhere
       if (isMod && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -478,7 +482,7 @@ export function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [topicDetails, activeLessonId, activeTab]);
+  }, [topicDetails, activeLessonId, activeTab, setupWizardOpen, authRequired, isAuthenticated]);
 
   const handleSendMessage = async (msg: string) => {
     const currentChatId = ++chatRequestIdRef.current;

@@ -70,22 +70,34 @@ from starlette.websockets import WebSocketDisconnect
 def test_terminal_websocket_auth_rejection(monkeypatch):
     """
     Verifies that /ws/terminal rejects unauthenticated connections with code 1008
-    before opening a PTY or accepting the connection.
+    without opening a PTY or sending any data. (The socket is accepted and then
+    closed immediately, so browsers receive code 1008 instead of a bare
+    handshake 403, which they report as 1006.)
     """
     monkeypatch.setenv("SYNAPSE_PASSWORD", "SuperSecretPass123!")
     client = TestClient(app)
 
-    # 1. Connecting without token raises WebSocketDisconnect with code 1008
+    import pty
+    spawned = []
+
+    def _no_pty(*args, **kwargs):
+        spawned.append(1)
+        raise AssertionError("PTY opened for an unauthenticated connection")
+
+    monkeypatch.setattr(pty, "openpty", _no_pty)
+
+    # 1. No ticket: the first thing received is the 1008 close, no data
     with pytest.raises(WebSocketDisconnect) as exc1:
-        with client.websocket_connect("/ws/terminal"):
-            pass
+        with client.websocket_connect("/ws/terminal") as ws:
+            ws.receive_text()
     assert exc1.value.code == 1008
 
-    # 2. Connecting with invalid token raises WebSocketDisconnect with code 1008
+    # 2. Bearer token in the URL is not a ticket: same result
     with pytest.raises(WebSocketDisconnect) as exc2:
-        with client.websocket_connect("/ws/terminal?token=invalid_bogus_token"):
-            pass
+        with client.websocket_connect("/ws/terminal?token=invalid_bogus_token") as ws:
+            ws.receive_text()
     assert exc2.value.code == 1008
+    assert spawned == []
 
 def test_protected_endpoints_surface(monkeypatch):
     """

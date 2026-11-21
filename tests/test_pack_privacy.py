@@ -96,3 +96,12 @@ def test_release_guard_accepts_clean_pack(monkeypatch, tmp_path):
     topics = Path(sec.TOPICS_DIR)
     tracked = {f"topics/{f.relative_to(topics).as_posix()}" for f in packages.iter_pack_files("languages")}
     assert check_release_packs.check_pack(pack, tracked) == []
+
+
+def test_cli_pack_export(tmp_path, monkeypatch):
+    """`synapse pack export` exists (runbook, pipeline and release guard rely on it)."""
+    import sys
+    from learning_engine import cli
+    monkeypatch.setattr(sys, "argv", ["synapse", "pack", "export", "computing", "-o", str(tmp_path)])
+    cli.main()
+    assert (tmp_path / "computing.synpack").exists()

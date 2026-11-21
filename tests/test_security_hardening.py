@@ -228,9 +228,21 @@ def test_terminal_ws_rejects_bearer_token_in_url(monkeypatch):
     token = auth.generate_auth_token()
     client = TestClient(app)
     with pytest.raises(WebSocketDisconnect) as exc:
-        with client.websocket_connect(f"/ws/terminal?token={token}"):
-            pass
+        with client.websocket_connect(f"/ws/terminal?token={token}") as ws:
+            ws.receive_text()
     assert exc.value.code == 1008
+
+
+def test_terminal_ws_without_ticket_closes_with_policy_code(monkeypatch):
+    """Missing ticket must reach the browser as close code 1008, not a bare
+    handshake 403 (seen as 1006), so the terminal stops reconnecting."""
+    monkeypatch.setenv("SYNAPSE_PASSWORD", "pw-ws")
+    client = TestClient(app)
+    with pytest.raises(WebSocketDisconnect) as exc:
+        with client.websocket_connect("/ws/terminal?env=host") as ws:
+            ws.receive_text()
+    assert exc.value.code == 1008
+    assert exc.value.reason == "Authentication required"
 
 
 # --- #10: rate limiter ---------------------------------------------------------

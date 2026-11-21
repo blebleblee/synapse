@@ -1643,6 +1643,11 @@ async def terminal_websocket(websocket: WebSocket):
     # Browsers cannot set headers on WebSockets, so authenticate with a
     # one-time ticket from POST /api/auth/ws-ticket instead of the bearer token.
     if is_auth_enabled() and not consume_ws_ticket(websocket.query_params.get("ticket")):
+        # Accept, then close with 1008: a close before accept reaches the browser
+        # as a bare HTTP 403 (close code 1006), which the terminal treats as a
+        # network error and retries forever. Nothing is sent before the close.
+        # (Bad origins/hosts above are still refused without accepting.)
+        await websocket.accept()
         await websocket.close(code=1008, reason="Authentication required")
         return
 

@@ -462,6 +462,19 @@ def cmd_pack(args):
         for p in packs:
             print(f"    - {p.get('domain')} ({p.get('title', 'No title')}) - {p.get('lesson_count', 0)} lessons")
             
+    elif args.pack_cmd == "export":
+        from learning_engine.packages import export_topic_pack
+        failed = False
+        for domain in args.domains:
+            try:
+                out = export_topic_pack(domain, output_dir=Path(args.output) if args.output else None)
+                print(f"[+] Exported {domain} -> {out}")
+            except Exception as e:
+                print(f"[-] Export of {domain} failed: {e}")
+                failed = True
+        if failed:
+            sys.exit(1)
+
     elif args.pack_cmd == "uninstall":
         print(f"[*] Uninstalling package: {args.domain}")
         try:
@@ -498,6 +511,10 @@ def main():
     p_pack_inst = pack_subs.add_parser("install", help="Install a .synpack file or from URL")
     p_pack_inst.add_argument("source", help="Path to .synpack file")
     p_pack_list = pack_subs.add_parser("list", help="List installed packages")
+    p_pack_exp = pack_subs.add_parser(
+        "export", help="Export domains to .synpack files (use 'all' for the complete core pack)")
+    p_pack_exp.add_argument("domains", nargs="+", help="Domain name(s), or 'all'")
+    p_pack_exp.add_argument("--output", "-o", default=None, help="Output directory (default: exports/packages)")
     p_pack_uninst = pack_subs.add_parser("uninstall", help="Uninstall a package")
     p_pack_uninst.add_argument("domain", help="Domain to uninstall")
     p_pack.set_defaults(func=cmd_pack)

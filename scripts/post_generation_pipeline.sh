@@ -75,6 +75,10 @@ for dom in "${DOMAINS[@]}"; do
     echo "  • Exporting $dom.synpack..."
     python3 -m learning_engine.cli pack export "$dom"
 done
+echo "  • Exporting synapse_complete_curriculum.synpack (all core domains)..."
+python3 -m learning_engine.cli pack export all
+echo "  • Checking packs for private or uncommitted content..."
+python3 scripts/check_release_packs.py
 
 echo ""
 echo "================================================================="
