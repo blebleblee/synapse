@@ -1030,7 +1030,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                 <div className="store-packages-grid">
                   {packagesData.installed
-                    .filter((p) => !storeSearch || p.domain.toLowerCase().includes(storeSearch.toLowerCase()))
+                    .filter((p) => p.domain !== 'complete' && p.domain !== 'synapse_complete_curriculum' && (!storeSearch || p.domain.toLowerCase().includes(storeSearch.toLowerCase())))
                     .map((pkg) => (
                       <div key={pkg.domain} className="store-package-card installed">
                         <div className="package-card-header">

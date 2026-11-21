@@ -277,7 +277,8 @@ def list_installed_packs() -> List[Dict[str, Any]]:
                     })
                     tracked_domains.add(d.name)
 
-    return packs
+    # Filter out master complete bundle from individual domain list
+    return [p for p in packs if p.get("domain") not in ("complete", "synapse_complete_curriculum")]
 
 def uninstall_topic_pack(domain: str) -> Dict[str, Any]:
     """

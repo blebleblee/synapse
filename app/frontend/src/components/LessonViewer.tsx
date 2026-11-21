@@ -66,7 +66,7 @@ interface LessonViewerProps {
   ollamaHost?: string;
   onNavigateBreadcrumb?: (type: 'domain' | 'category' | 'subtopic', path: string) => void;
   onSelectLesson?: (lessonId: string) => void;
-  onTranslationStatusChange?: (isTranslating: boolean, langName?: string) => void;
+  onTranslationStatusChange?: (isTranslating: boolean, langName?: string, cancelFn?: () => void) => void;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -196,12 +196,17 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     if (!rawMarkdown) return;
 
     const langName = lang === 'cs' ? 'Čeština' : lang === 'de' ? 'Deutsch' : 'Español';
+    const abortCtrl = new AbortController();
     setIsTranslating(true);
-    onTranslationStatusChange?.(true, langName);
+    onTranslationStatusChange?.(true, langName, () => {
+      abortCtrl.abort();
+      setIsTranslating(false);
+    });
     try {
       const res = await fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: abortCtrl.signal,
         body: JSON.stringify({
           text: rawMarkdown,
           target_lang: lang,
@@ -218,6 +223,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
         setTranslatedMarkdown(data.translated);
       }
     } catch (err: any) {
+      if (err.name === 'AbortError') {
+        return;
+      }
       console.error('Translation error:', err);
       setTranslationError(err.message || 'Translation failed');
     } finally {

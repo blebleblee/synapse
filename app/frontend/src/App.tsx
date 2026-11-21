@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Square, Terminal as TerminalIcon } from 'lucide-react';
 import { TopicTree } from './components/TopicTree';
 import { LessonViewer } from './components/LessonViewer';
 import { TutorChat } from './components/TutorChat';
@@ -32,6 +32,7 @@ export function App() {
   const [unifiedChatHistory, setUnifiedChatHistory] = useState<ChatMessage[]>([]);
   const [quizQuestions, setQuizQuestions] = useState<{ [key: string]: QuizQuestion[] }>({});
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
+  const activeCancelHandler = useRef<(() => void) | null>(null);
   const [terminalOpen, setTerminalOpen] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
   const [graphOpen, setGraphOpen] = useState(false);
@@ -194,12 +195,32 @@ export function App() {
     setIsAuthenticated(false);
   };
 
+  const handleCancelAI = () => {
+    if (activeCancelHandler.current) {
+      try {
+        activeCancelHandler.current();
+      } catch (e) {
+        console.error('Error canceling AI task:', e);
+      }
+      activeCancelHandler.current = null;
+    }
+    setIsGenerating(false);
+    setIsTranslating(false);
+    setIsChatting(false);
+    setIsLoadingQuiz(false);
+    setIsRegeneratingSummary(false);
+    setIsCompilingGuide(false);
+  };
+
   const handleGenerate = async (query: string, force = false) => {
+    const abortCtrl = new AbortController();
+    activeCancelHandler.current = () => abortCtrl.abort();
     setIsGenerating(true);
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: abortCtrl.signal,
         body: JSON.stringify({ query, force }),
       });
       if (res.ok) {
@@ -207,8 +228,10 @@ export function App() {
         await fetchTree();
         await fetchStatus();
       }
-    } catch (err) {
-      console.error('Failed to generate topic content:', err);
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        console.error('Failed to generate topic content:', err);
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -417,9 +440,13 @@ export function App() {
         lessonContent = topicDetails?.lesson || topicDetails?.full_content || topicDetails?.foundation || '';
       }
 
+      const abortCtrl = new AbortController();
+      activeCancelHandler.current = () => abortCtrl.abort();
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: abortCtrl.signal,
         body: JSON.stringify({
           query: selectedPath || '',
           lesson_id: activeLessonId,
@@ -502,19 +529,24 @@ export function App() {
   const handleCompileGuide = async () => {
     if (!selectedPath) return;
 
+    const abortCtrl = new AbortController();
+    activeCancelHandler.current = () => abortCtrl.abort();
     setIsCompilingGuide(true);
     try {
       const res = await fetch('/api/artifacts/compile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: abortCtrl.signal,
         body: JSON.stringify({ query: selectedPath }),
       });
       if (res.ok) {
         const data = await res.json();
         alert(`Mastered Field Guide compiled to ${data.path} and committed to Git!`);
       }
-    } catch (err) {
-      console.error('Failed to compile guide:', err);
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        console.error('Failed to compile guide:', err);
+      }
     } finally {
       setIsCompilingGuide(false);
     }
@@ -559,12 +591,16 @@ export function App() {
   const handleRefreshQuiz = async () => {
     if (!selectedPath) return;
 
+    const abortCtrl = new AbortController();
+    activeCancelHandler.current = () => abortCtrl.abort();
+
     const quizKey = selectedPath;
     setIsLoadingQuiz(true);
     try {
       const res = await fetch('/api/quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: abortCtrl.signal,
         body: JSON.stringify({ query: selectedPath }),
       });
       if (res.ok) {
@@ -574,8 +610,10 @@ export function App() {
           [quizKey]: data.questions || [],
         }));
       }
-    } catch (err) {
-      console.error('Failed to fetch quiz:', err);
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        console.error('Failed to fetch quiz:', err);
+      }
     } finally {
       setIsLoadingQuiz(false);
     }
@@ -618,11 +656,14 @@ export function App() {
 
   const handleRegenerateSummary = async () => {
     if (!selectedPath) return;
+    const abortCtrl = new AbortController();
+    activeCancelHandler.current = () => abortCtrl.abort();
     setIsRegeneratingSummary(true);
     try {
       const res = await fetch('/api/summary/regenerate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: abortCtrl.signal,
         body: JSON.stringify({ query: selectedPath }),
       });
       if (res.ok) {
@@ -631,8 +672,10 @@ export function App() {
           setTopicDetails({ ...topicDetails, summary: data.summary });
         }
       }
-    } catch (err) {
-      console.error('Failed to regenerate summary:', err);
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        console.error('Failed to regenerate summary:', err);
+      }
     } finally {
       setIsRegeneratingSummary(false);
     }
@@ -716,19 +759,57 @@ export function App() {
           onNavigateBreadcrumb={handleNavigateBreadcrumb}
           onSelectLesson={handleSelectLesson}
           onToggleLessonCompletion={handleToggleLessonCompletion}
-          onTranslationStatusChange={(busy, lang) => {
+          onTranslationStatusChange={(busy, lang, cancelFn) => {
             setIsTranslating(busy);
             if (lang) setTranslatingLanguage(lang);
+            activeCancelHandler.current = cancelFn || null;
           }}
         />
 
-        {globalAITask && (
-          <div className="global-ai-status-bar" title="AI Worker Active">
-            <Loader2 size={13} className="animate-spin" />
-            <span className="global-ai-task-text">{globalAITask}...</span>
-            <span className="global-ai-queue-hint">Sequential LLM worker active</span>
+        <div className="workbench-bottom-bar">
+          <div className="bottom-bar-left">
+            {globalAITask ? (
+              <div className="ai-active-status">
+                <Loader2 size={12} className="animate-spin text-accent" />
+                <span className="ai-status-text">{globalAITask}...</span>
+                <button
+                  type="button"
+                  className="ai-stop-btn"
+                  onClick={handleCancelAI}
+                  title="Stop AI inference and restore idle state"
+                >
+                  <Square size={9} className="fill-current" />
+                  <span>Stop</span>
+                </button>
+              </div>
+            ) : (
+              <div className="ai-idle-status">
+                <span className="idle-indicator-dot" />
+                <span>Synapse Ready</span>
+              </div>
+            )}
           </div>
-        )}
+
+          <div className="bottom-bar-right">
+            <span
+              className={`mentor-status-pill ${mentorConnected}`}
+              title={`Socratic Mentor: ${mentorConnected === 'connected' ? 'Online' : mentorConnected === 'checking' ? 'Connecting' : 'Offline'}`}
+            >
+              <span className={`status-dot ${mentorConnected === 'connected' ? 'online' : 'offline'}`} />
+              <span>Mentor {mentorConnected === 'connected' ? 'Online' : 'Offline'}</span>
+            </span>
+
+            <button
+              type="button"
+              className={`terminal-toggle-pill ${terminalConnected ? 'connected' : 'disconnected'}`}
+              onClick={() => setTerminalOpen((prev: boolean) => !prev)}
+              title="Toggle PTY Terminal Drawer"
+            >
+              <TerminalIcon size={11} />
+              <span>Terminal</span>
+            </button>
+          </div>
+        </div>
 
         <TerminalDrawer
           ref={terminalRef}
@@ -745,9 +826,7 @@ export function App() {
         isChatting={isChatting}
         onSendMessage={handleSendMessage}
         onClearChat={() => setUnifiedChatHistory([])}
-        isTerminalConnected={terminalConnected}
         mentorConnected={mentorConnected}
-        onToggleTerminal={() => setTerminalOpen((prev: boolean) => !prev)}
         targetLanguage={settings.language}
       />
 

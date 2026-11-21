@@ -9,7 +9,6 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
-  Terminal,
   Trash2,
   BookOpen,
   HelpCircle
@@ -24,9 +23,7 @@ interface TutorChatProps {
   isChatting: boolean;
   onSendMessage: (message: string) => Promise<void>;
   onClearChat?: () => void;
-  isTerminalConnected?: boolean;
   mentorConnected: 'checking' | 'connected' | 'error';
-  onToggleTerminal?: () => void;
   targetLanguage?: string;
 }
 
@@ -37,9 +34,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   isChatting,
   onSendMessage,
   onClearChat,
-  isTerminalConnected = false,
   mentorConnected,
-  onToggleTerminal,
   targetLanguage,
 }) => {
   const ui = getUIStrings(targetLanguage);
@@ -157,12 +152,14 @@ export const TutorChat: React.FC<TutorChatProps> = ({
             </div>
             <div className="persona-text">
               <div className="persona-label-row">
-                <span className="persona-label">{ui.mentorTitle}</span>
+                <span className="persona-label" title={personaRole}>Socratic Mentor</span>
+                {topic?.domain && (
+                  <span className="persona-topic-tag" title={`Domain: ${topic.domain}`}>
+                    {topic.domain.replace(/_/g, ' ')}
+                  </span>
+                )}
                 {personaExpanded ? <ChevronUp size={12} className="persona-chevron" /> : <ChevronDown size={12} className="persona-chevron" />}
               </div>
-              <span className="persona-role" title={personaRole}>
-                {personaRole}
-              </span>
             </div>
           </div>
 
@@ -192,34 +189,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({
               </button>
             )}
           </div>
-        </div>
-
-        {/* Stacked Meta & Status Badges Row */}
-        <div className="chat-header-badges-row">
-          <span className="persona-badge" title={topic?.domain ? topic.domain.replace('_', ' ') : 'Polymath'}>
-            {topic?.domain ? topic.domain.replace('_', ' ') : 'Polymath'}
-          </span>
-          <span
-            className={`mentor-status-badge ${mentorConnected}`}
-            title={
-              mentorConnected === 'connected'
-                ? ui.mentorOnline
-                : mentorConnected === 'checking'
-                ? ui.mentorConnecting
-                : ui.mentorOffline
-            }
-          >
-            {mentorConnected === 'connected' ? `● ${ui.mentorOnline}` : mentorConnected === 'checking' ? `○ ${ui.mentorConnecting}` : `○ ${ui.mentorOffline}`}
-          </span>
-          <button
-            type="button"
-            className={`terminal-link-badge ${isTerminalConnected ? 'online' : 'offline'}`}
-            onClick={onToggleTerminal}
-            title={ui.terminalConnected}
-          >
-            <Terminal size={11} />
-            <span>{isTerminalConnected ? ui.terminalConnected : ui.terminal}</span>
-          </button>
         </div>
 
         {/* Active Lesson Context Bar */}

@@ -76,31 +76,110 @@ body, html, #root {
   position: relative;
 }
 
-.global-ai-status-bar {
+/* Consolidated Bottom Status Bar */
+.workbench-bottom-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: rgba(79, 143, 255, 0.12);
-  border-top: 1px solid rgba(79, 143, 255, 0.25);
-  padding: 6px 16px;
+  justify-content: space-between;
+  height: 28px;
+  background-color: var(--bg-tertiary);
+  border-top: 1px solid var(--border-color);
+  padding: 0 14px;
   font-size: 11px;
-  color: #79b8ff;
   font-family: var(--font-mono);
-  animation: fadeIn 0.2s ease-in-out;
   flex-shrink: 0;
   z-index: 10;
 }
 
-.global-ai-task-text {
-  font-weight: 600;
-  color: #d1d5db;
+.bottom-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.global-ai-queue-hint {
-  margin-left: auto;
+.ai-active-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #79b8ff;
+}
+
+.ai-status-text {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ai-stop-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #f87171;
   font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.ai-stop-btn:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.ai-idle-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   color: var(--text-muted);
-  opacity: 0.8;
+}
+
+.idle-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.bottom-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mentor-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.terminal-toggle-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.terminal-toggle-pill:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.terminal-toggle-pill.connected {
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #10b981;
 }
 
 .center-workspace-column .lesson-viewer {
@@ -1371,6 +1450,18 @@ body, html, #root {
   letter-spacing: 0.2px;
 }
 
+.persona-topic-tag {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--accent-gold);
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
 .persona-badge {
   font-size: 9px;
   font-weight: 700;
@@ -1491,9 +1582,8 @@ body, html, #root {
 .context-bar-header .context-title {
   font-weight: 600;
   color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.35;
+  word-break: break-word;
   flex: 1;
 }
 
@@ -3989,6 +4079,78 @@ body, html, #root {
   color: var(--text-secondary);
   margin: 0;
   line-height: 1.4;
+}
+
+/* Curriculum Store & Addons Grid */
+.store-packages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.store-package-card {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.store-package-card.installed {
+  border-color: rgba(16, 185, 129, 0.25);
+  background-color: rgba(16, 185, 129, 0.03);
+}
+
+.package-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.package-domain {
+  font-size: 11px;
+  color: var(--text-muted);
+  background-color: var(--bg-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.package-installed-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.package-card-header h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.package-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.package-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
 }
 
 /* Setup Wizard Modal */
