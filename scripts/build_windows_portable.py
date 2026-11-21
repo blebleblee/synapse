@@ -79,11 +79,21 @@ def main():
         print("[*] Bundling embedded Python environment into portable bundle...")
         shutil.copytree(python_win_src, portable_bundle / "python", dirs_exist_ok=True)
 
-    # Copy curriculum topics directory
+    # Copy only the committed public curriculum. Private sideloaded domains,
+    # git-ignored tracks and chat sessions in the working copy must never ship.
     topics_src = WORKSPACE_ROOT / "topics"
     if topics_src.exists():
-        print("[*] Bundling curriculum topics into portable bundle...")
-        shutil.copytree(topics_src, portable_bundle / "topics", dirs_exist_ok=True)
+        print("[*] Bundling committed curriculum topics into portable bundle...")
+        tracked = subprocess.run(
+            ["git", "-C", str(WORKSPACE_ROOT), "ls-files", "-z", "topics"],
+            capture_output=True, text=True, check=True,
+        ).stdout.split("\0")
+        for rel in filter(None, tracked):
+            src = WORKSPACE_ROOT / rel
+            if src.is_file():
+                dst = portable_bundle / rel
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
 
     # Add comprehensive README
     readme_content = """================================================================================

@@ -27,46 +27,107 @@ def compute_checksum(file_path: Path) -> str:
             sha256.update(chunk)
     return sha256.hexdigest()
 
+# The 12 public curriculum domains shipped with this repository. Any other
+# domain under topics/ is a private sideloaded pack: it works locally but must
+# never be named in, or bundled into, a public pack.
+CORE_DOMAINS = (
+    "arts", "business", "computing", "crafts", "economics", "engineering",
+    "formal_sciences", "health_sciences", "humanities", "languages",
+    "motorsports", "natural_sciences",
+)
+
+# Personal, transient or private files that never belong in any pack.
+_ALWAYS_EXCLUDED_DIRS = {"sessions", ".workspace_sessions", "__pycache__"}
+_ALWAYS_EXCLUDED_FILES = {"active_session.md", "chat_history.json", "CURRICULUM_BLUEPRINT.md", ".DS_Store"}
+
+
+def _git_ignored(paths: List[Path]) -> set:
+    """
+    Returns the subset of paths that git ignores, or an empty set if TOPICS_DIR
+    is not inside a git work tree. Lets public packs honour .gitignore, which
+    is where private sideloaded tracks inside core domains are declared.
+    """
+    if not paths:
+        return set()
+    import subprocess
+    try:
+        root = subprocess.run(
+            ["git", "-C", str(TOPICS_DIR), "rev-parse", "--show-toplevel"],
+            capture_output=True, text=True, timeout=10,
+        )
+        if root.returncode != 0:
+            return set()
+        res = subprocess.run(
+            ["git", "-C", root.stdout.strip(), "check-ignore", "--stdin", "-z"],
+            input="\0".join(str(p) for p in paths), capture_output=True, text=True, timeout=120,
+        )
+    except Exception:
+        # No usable git (installed app, sandbox): nothing is treated as ignored.
+        # Release packs are still verified by scripts/check_release_packs.py.
+        return set()
+    return {Path(x) for x in res.stdout.split("\0") if x}
+
+
+def iter_pack_files(domain: str) -> List[Path]:
+    """
+    Files of a domain that may go into a pack. Session/chat files and private
+    blueprints are always excluded. For the public core domains, files that git
+    ignores (private sideloaded tracks) are excluded as well.
+    """
+    domain_dir = TOPICS_DIR / domain
+    files = []
+    for f in sorted(domain_dir.rglob("*")):
+        if not f.is_file() or f.is_symlink():
+            continue
+        rel_parts = f.relative_to(domain_dir).parts
+        if any(part in _ALWAYS_EXCLUDED_DIRS for part in rel_parts[:-1]):
+            continue
+        if f.name in _ALWAYS_EXCLUDED_FILES:
+            continue
+        files.append(f)
+    if domain in CORE_DOMAINS:
+        ignored = _git_ignored(files)
+        files = [f for f in files if f not in ignored]
+    return files
+
+
+def _add_files(tar: tarfile.TarFile, files: List[Path]) -> None:
+    for f in files:
+        tar.add(f, arcname=f"topics/{f.relative_to(TOPICS_DIR).as_posix()}", recursive=False)
+
+
 def export_topic_pack(domain: str, output_dir: Optional[Path] = None) -> Path:
     """
-    Exports an entire domain or the complete global curriculum into a modular .synpack distribution archive.
+    Exports a domain, or the complete public curriculum, into a .synpack archive.
+    The complete pack contains only the core domains and names only them; packs
+    never contain chat sessions, blueprints, or git-ignored private tracks.
     """
     out_dir = output_dir or get_packs_dir()
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if domain.lower() in ["all", "complete", "global"]:
         pack_path = out_dir / "synapse_complete_curriculum.synpack"
-        core_domains = {"arts", "business", "computing", "crafts", "economics", 
-                        "engineering", "formal_sciences", "health_sciences", 
-                        "humanities", "languages", "motorsports", "natural_sciences"}
-        
-        topic_dirs = [p for p in TOPICS_DIR.glob("*/*/*") if (p / "labs.md").exists() and p.parts[-3] in core_domains]
-        lesson_count = sum(len(list(d.glob("lesson_*.md"))) for d in topic_dirs)
-        lab_count = len(topic_dirs)
+        included = [d for d in CORE_DOMAINS if (TOPICS_DIR / d).is_dir()]
+        files_by_domain = {d: iter_pack_files(d) for d in included}
+        all_files = [f for fs in files_by_domain.values() for f in fs]
+        file_set = set(all_files)
+        topic_dirs = [p for p in TOPICS_DIR.glob("*/*/*")
+                      if p.parts[-3] in included and (p / "labs.md") in file_set]
 
         manifest = {
             "format": "synpack/v1",
             "domain": "complete",
             "title": "Synapse Master Global Curriculum (All 12 Domains)",
             "topic_count": len(topic_dirs),
-            "lesson_count": lesson_count,
-            "lab_count": lab_count,
-            "domains": [d.name for d in TOPICS_DIR.iterdir() if d.is_dir() and not d.name.startswith(".")]
+            "lesson_count": sum(1 for f in all_files if f.name.startswith("lesson_") and f.suffix == ".md"),
+            "lab_count": len(topic_dirs),
+            "domains": included,
         }
-
         manifest_path = out_dir / "complete_manifest.json"
         manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-
         with tarfile.open(pack_path, "w:gz") as tar:
-            # Core domain whitelist from git
-            core_domains = ["arts", "business", "computing", "crafts", "economics", 
-                            "engineering", "formal_sciences", "health_sciences", 
-                            "humanities", "languages", "motorsports", "natural_sciences"]
-            for d in TOPICS_DIR.iterdir():
-                if d.is_dir() and d.name in core_domains:
-                    tar.add(d, arcname=f"topics/{d.name}")
+            _add_files(tar, all_files)
             tar.add(manifest_path, arcname="manifest.json")
-
         manifest_path.unlink(missing_ok=True)
         return pack_path
 
@@ -75,24 +136,21 @@ def export_topic_pack(domain: str, output_dir: Optional[Path] = None) -> Path:
         raise ValueError(f"Domain '{domain}' does not exist.")
 
     pack_path = out_dir / f"{domain}.synpack"
-
-    # Count topics and lessons in this domain
-    lesson_count = len(list(domain_dir.rglob("lesson_*.md")))
-    lab_count = len(list(domain_dir.rglob("labs.md")))
+    files = iter_pack_files(domain)
 
     manifest = {
         "format": "synpack/v1",
         "domain": domain,
         "title": domain.replace("_", " ").title(),
-        "lesson_count": lesson_count,
-        "lab_count": lab_count,
+        "lesson_count": sum(1 for f in files if f.name.startswith("lesson_") and f.suffix == ".md"),
+        "lab_count": sum(1 for f in files if f.name == "labs.md"),
     }
 
     manifest_path = out_dir / f"{domain}_manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     with tarfile.open(pack_path, "w:gz") as tar:
-        tar.add(domain_dir, arcname=f"topics/{domain}")
+        _add_files(tar, files)
         tar.add(manifest_path, arcname="manifest.json")
 
     manifest_path.unlink(missing_ok=True)

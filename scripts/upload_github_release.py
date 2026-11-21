@@ -49,12 +49,23 @@ ASSETS = [
     WORKSPACE_ROOT / "dist/python/synapse-1.1.1.tar.gz"
 ]
 
+
+def _require_clean_packs(paths=None):
+    """Refuses to publish if any pack contains private or uncommitted content."""
+    import subprocess as _sp
+    checker = Path(__file__).resolve().parent / "check_release_packs.py"
+    args = [sys.executable, str(checker)] + [str(p) for p in (paths or []) if str(p).endswith(".synpack")]
+    if _sp.run(args).returncode != 0:
+        print("[✘] Aborting release: pack privacy check failed (see above).")
+        sys.exit(1)
+
 def main():
     parser = argparse.ArgumentParser(description="Upload Synapse v1.1.0 Release Assets to GitHub")
     parser.add_argument("--token", default=os.environ.get("GITHUB_TOKEN"), help="GitHub Personal Access Token (or set GITHUB_TOKEN)")
     parser.add_argument("--repo", default="blebleblee/synapse", help="Target GitHub repo (default: blebleblee/synapse)")
     parser.add_argument("--tag", default="v1.1.1", help="Release tag (default: v1.1.1)")
     args = parser.parse_args()
+    _require_clean_packs(ASSETS if 'ASSETS' in globals() else None)
 
     token = args.token
     if not token:
