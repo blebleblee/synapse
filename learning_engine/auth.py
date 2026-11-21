@@ -12,14 +12,21 @@ import base64
 import hashlib
 import secrets
 from typing import Optional, Dict, Tuple
-from collections import defaultdict
 from .database import get_db_connection
 from .config_manager import get_settings
 
 # Rate limiting for failed login attempts: {ip: (failed_count, first_fail_time)}
-_FAILED_ATTEMPTS: Dict[str, Tuple[int, float]] = defaultdict(lambda: (0, 0.0))
+_FAILED_ATTEMPTS: Dict[str, Tuple[int, float]] = {}
 MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_WINDOW_SECONDS = 60
+_MAX_TRACKED_IPS = 10_000
+
+# One-time, short-lived tickets for the terminal WebSocket, so the long-lived
+# bearer token never appears in a URL (proxy/access logs, history).
+_WS_TICKETS: Dict[str, float] = {}
+WS_TICKET_TTL_SECONDS = 30
+_MAX_WS_TICKETS = 1_000
+_EPHEMERAL_SECRET: Optional[str] = None
 
 def get_server_secret() -> str:
     """
@@ -43,8 +50,12 @@ def get_server_secret() -> str:
             )
             return new_secret
     except Exception:
-        # Memory fallback if DB is uninitialized
-        return "synapse-instance-ephemeral-secret-key"
+        # DB unavailable: use a random per-process secret. Tokens will not
+        # survive a restart, but they can never be forged from a known key.
+        global _EPHEMERAL_SECRET
+        if _EPHEMERAL_SECRET is None:
+            _EPHEMERAL_SECRET = secrets.token_hex(32)
+        return _EPHEMERAL_SECRET
 
 def get_configured_password() -> Optional[str]:
     """
@@ -75,22 +86,42 @@ def verify_password(password: str) -> bool:
         return True
     return hmac.compare_digest(password.strip(), configured)
 
+def get_client_ip(request) -> str:
+    """
+    Returns the client IP used for rate limiting. Behind a reverse proxy, set
+    SYNAPSE_TRUST_PROXY=1 to use the address the proxy appended to
+    X-Forwarded-For (the right-most entry); otherwise the socket peer is used,
+    since the header is client-controlled.
+    """
+    if os.environ.get("SYNAPSE_TRUST_PROXY", "").strip().lower() in ("1", "true", "yes"):
+        xff = request.headers.get("x-forwarded-for", "")
+        hops = [h.strip() for h in xff.split(",") if h.strip()]
+        if hops:
+            return hops[-1]
+    return request.client.host if request.client else "unknown"
+
+def _prune_failed_attempts(now: float) -> None:
+    expired = [ip for ip, (_, first) in _FAILED_ATTEMPTS.items() if now - first >= LOCKOUT_WINDOW_SECONDS]
+    for ip in expired:
+        del _FAILED_ATTEMPTS[ip]
+
 def is_rate_limited(client_ip: str) -> bool:
     """Checks if client IP is currently locked out due to excessive failed attempts."""
     now = time.time()
-    count, first_time = _FAILED_ATTEMPTS[client_ip]
+    count, first_time = _FAILED_ATTEMPTS.get(client_ip, (0, 0.0))
     if count >= MAX_FAILED_ATTEMPTS:
         if now - first_time < LOCKOUT_WINDOW_SECONDS:
             return True
-        else:
-            # Window expired, reset
-            del _FAILED_ATTEMPTS[client_ip]
+        # Window expired, reset
+        _FAILED_ATTEMPTS.pop(client_ip, None)
     return False
 
 def record_failed_attempt(client_ip: str):
     """Records a failed login attempt for rate-limiting."""
     now = time.time()
-    count, first_time = _FAILED_ATTEMPTS[client_ip]
+    if len(_FAILED_ATTEMPTS) >= _MAX_TRACKED_IPS:
+        _prune_failed_attempts(now)
+    count, first_time = _FAILED_ATTEMPTS.get(client_ip, (0, 0.0))
     if now - first_time >= LOCKOUT_WINDOW_SECONDS:
         _FAILED_ATTEMPTS[client_ip] = (1, now)
     else:
@@ -139,3 +170,23 @@ def verify_auth_token(token: Optional[str]) -> bool:
         return True
     except Exception:
         return False
+
+def issue_ws_ticket() -> str:
+    """Issues a one-time ticket for opening the terminal WebSocket."""
+    now = time.time()
+    if len(_WS_TICKETS) >= _MAX_WS_TICKETS:
+        for t, exp in list(_WS_TICKETS.items()):
+            if exp < now:
+                del _WS_TICKETS[t]
+        if len(_WS_TICKETS) >= _MAX_WS_TICKETS:
+            _WS_TICKETS.pop(next(iter(_WS_TICKETS)))
+    ticket = secrets.token_urlsafe(32)
+    _WS_TICKETS[ticket] = now + WS_TICKET_TTL_SECONDS
+    return ticket
+
+def consume_ws_ticket(ticket: Optional[str]) -> bool:
+    """Validates and invalidates a WebSocket ticket. Tickets work exactly once."""
+    if not ticket:
+        return False
+    exp = _WS_TICKETS.pop(ticket, None)
+    return exp is not None and exp >= time.time()

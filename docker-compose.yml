@@ -12,6 +12,8 @@ services:
       - OLLAMA_HOSTS=${OLLAMA_HOSTS:-http://host.docker.internal:11434}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      # Required for access from other machines; without it only localhost is served.
+      - SYNAPSE_PASSWORD=${SYNAPSE_PASSWORD:-}
     volumes:
       - ./topics:/workspace/topics
       - ./data:/workspace/data

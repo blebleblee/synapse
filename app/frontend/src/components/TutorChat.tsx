@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
+import { sanitizeHtml } from '../utils/markdownRenderer';
 import {
   Send,
   Bot,
@@ -306,7 +307,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
               </div>
               <div
                 className="bubble-content"
-                dangerouslySetInnerHTML={{ __html: marked.parse(msg.content) as string }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(msg.content) as string) }}
               />
             </div>
           ))

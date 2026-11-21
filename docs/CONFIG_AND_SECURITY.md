@@ -19,6 +19,10 @@ ANTHROPIC_MODEL=claude-opus-5-5
 GEMINI_API_KEY=AIza...
 ```
 
+Keys entered in **Settings ⚙** are used when no environment variable is set. Requests to Claude identify themselves as `Synapse-Workbench/<version>`; if your gateway requires a specific User-Agent, set `SYNAPSE_ANTHROPIC_USER_AGENT`. Current Claude models reject sampling parameters, so Synapse never sends `temperature`.
+
+**Search index:** full-text search uses a SQLite FTS5 index stored next to the database (`data/search_index.db`, or `SYNAPSE_SEARCH_INDEX_PATH`). It is built in the background at startup (a few seconds) and updates changed files automatically before each search. It matches word prefixes, so `sql` finds `SQLite`. Delete the file to force a rebuild, or set `SYNAPSE_SEARCH_INDEX=0` to search by scanning files instead.
+
 The Python learning engine automatically loads credentials from `~/.config/synapse/env` at startup. Because this file lives in your home directory, it is **physically impossible for git to stage, diff, or commit your private keys**.
 
 ---
@@ -98,8 +102,12 @@ synapse serve --host 0.0.0.0 --port 8000
 
 ### Security Architecture:
 1. **Zero-Dependency Token Signing:** Generates HMAC-SHA256 bearer tokens signed with a persistent SQLite-backed server secret key (`auth:server_secret`), ensuring sessions persist across server restarts for 30 days.
-2. **API Gating:** FastAPI HTTP middleware intercepts all `/api/*` endpoints (except `/api/auth/*` and `/api/health`), returning `401 Unauthorized` unless a valid token is provided in `Authorization: Bearer <token>` or `X-Synapse-Token`.
-3. **PTY Terminal Handshake Verification:** The `/ws/terminal` WebSocket checks `?token=<token>` before accepting the connection, rejecting unauthenticated shell requests with WebSocket code `1008`.
-4. **Brute-Force Protection:** Automatically locks out client IPs after 5 failed password attempts within a 60-second window.
-5. **Open Local Default:** When `SYNAPSE_PASSWORD` is omitted, Synapse runs without authentication prompts, preserving instant offline startup for local desktop use.
+2. **API Gating:** FastAPI HTTP middleware intercepts all `/api/*` endpoints (except `/api/auth/status`, `/api/auth/login` and `/api/health`), returning `401 Unauthorized` unless a valid token is provided in `Authorization: Bearer <token>` or `X-Synapse-Token`. Tokens in query strings (`?token=`) are not accepted, because URLs end up in access logs, proxy logs and browser history.
+3. **PTY Terminal Handshake Verification:** Browsers cannot send headers on WebSockets, so the client first calls `POST /api/auth/ws-ticket` (with its bearer token) and connects to `/ws/terminal?ticket=<ticket>`. Tickets are random, single-use and expire after 30 seconds. Missing, reused or expired tickets are rejected with WebSocket code `1008`.
+4. **Origin Check:** `/ws/terminal` rejects connections whose `Origin` is not the backend itself, the Vite dev server (`localhost:5173`) or an entry in `SYNAPSE_ALLOWED_ORIGINS`. This stops other websites from opening a shell (cross-site WebSocket hijacking). CORS uses the same allow-list.
+5. **Brute-Force Protection:** Locks out a client IP after 5 failed password attempts within a 60-second window. Behind a reverse proxy, set `SYNAPSE_TRUST_PROXY=1` so the client address is taken from the entry the proxy appends to `X-Forwarded-For`; otherwise every user shares the proxy's address.
+6. **Secrets Are Never Returned:** `GET /api/settings` omits internal `auth:*` keys (including the token signing secret) and returns API keys and passwords as a placeholder. Saving the placeholder back keeps the stored value; `auth:*` keys cannot be written through the API.
+7. **Localhost-Only Default:** When `SYNAPSE_PASSWORD` is omitted, Synapse runs without a login prompt but only answers requests addressed to `localhost`, `127.0.0.1` or `[::1]` (HTTP `403` otherwise, WebSocket code `1008`). This blocks access from other machines and DNS-rebinding attacks from websites. To serve other hosts, set `SYNAPSE_PASSWORD`; to deliberately allow a host without a password, list it in `SYNAPSE_ALLOWED_HOSTS` (comma-separated).
+
+> **Note on precedence:** values in `~/.config/synapse/env` override variables already set in your shell. If that file defines `SYNAPSE_PASSWORD`, running `SYNAPSE_PASSWORD=other synapse serve` still uses the file's password.
 

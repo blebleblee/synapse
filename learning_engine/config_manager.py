@@ -13,6 +13,48 @@ _KEY_VALIDATOR = re.compile(r'^[a-zA-Z0-9_\-\.\:]+$')
 class ConfigError(Exception):
     pass
 
+# Placeholder returned to API clients instead of secret values. When a client
+# saves settings with this value unchanged, the stored secret is kept.
+REDACTED_PLACEHOLDER = "__synapse_redacted__"
+
+# Keys never exposed to or writable by API clients (server-internal state).
+_INTERNAL_KEY_PREFIXES = ("auth:",)
+_SECRET_KEY_RE = re.compile(r"(api_?key|password|secret|token)$", re.IGNORECASE)
+
+def _is_internal_key(key: str) -> bool:
+    return key.startswith(_INTERNAL_KEY_PREFIXES)
+
+def _is_secret_key(key: str) -> bool:
+    return bool(_SECRET_KEY_RE.search(key))
+
+def redact_settings(settings: Dict[str, Any]) -> Dict[str, Any]:
+    """Settings safe to return over the API: internal keys dropped, secrets masked."""
+    out = {}
+    for key, value in settings.items():
+        if _is_internal_key(key):
+            continue
+        if _is_secret_key(key) and isinstance(value, str) and value:
+            out[key] = REDACTED_PLACEHOLDER
+        else:
+            out[key] = value
+    return out
+
+def filter_client_settings(settings: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Settings an API client may write: internal keys rejected, and secrets left
+    at the redaction placeholder are dropped so the stored value is preserved.
+    """
+    if not isinstance(settings, dict):
+        raise ConfigError("Settings must be a dictionary")
+    out = {}
+    for key, value in settings.items():
+        if not isinstance(key, str) or _is_internal_key(key):
+            raise ConfigError(f"Setting key is reserved: {key}")
+        if value == REDACTED_PLACEHOLDER:
+            continue
+        out[key] = value
+    return out
+
 def _validate_key(key: str) -> None:
     if not isinstance(key, str):
         raise ConfigError("Setting key must be string")

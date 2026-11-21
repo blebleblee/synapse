@@ -122,8 +122,8 @@ from learning_engine.mastery import (
     normalize_topic_path,
     resolve_topic_state
 )
-from learning_engine.security import validate_workspace_path, sanitize_query, is_dangerous_host_command
-from learning_engine.config_manager import get_settings, save_settings
+from learning_engine.security import validate_workspace_path, sanitize_query, is_dangerous_host_command, is_allowed_host, is_allowed_origin
+from learning_engine.config_manager import get_settings, save_settings, redact_settings, filter_client_settings, ConfigError
 from learning_engine.exporter import export_handbook
 from learning_engine.flashcards import generate_flashcards
 from learning_engine.summary import regenerate_summary, generate_initial_summary
@@ -137,6 +137,9 @@ from learning_engine.packages import (
     seed_starter_curriculum
 )
 from learning_engine.auth import (
+    get_client_ip,
+    issue_ws_ticket,
+    consume_ws_ticket,
     is_auth_enabled,
     verify_password,
     generate_auth_token,
@@ -160,6 +163,12 @@ async def lifespan(app: FastAPI):
         threading.Thread(target=get_topic_tree, daemon=True).start()
     except Exception:
         pass
+    try:
+        # Build or refresh the full-text search index in the background.
+        from learning_engine.search import warm_index_in_background
+        warm_index_in_background()
+    except Exception:
+        pass
     yield
     # Shutdown actions
     try:
@@ -173,9 +182,13 @@ from learning_engine.version import __version__
 
 app = FastAPI(title="AI Learning Workbench Backend", version=__version__, lifespan=lifespan)
 
+_CORS_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"] + [
+    o.strip() for o in os.environ.get("SYNAPSE_ALLOWED_ORIGINS", "").split(",") if o.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -184,7 +197,19 @@ app.add_middleware(
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
     path = request.url.path
-    if is_auth_enabled() and path.startswith("/api/"):
+    auth_enabled = is_auth_enabled()
+
+    # Without a password, the instance is only served to localhost. This blocks
+    # LAN/Internet access to an open instance and DNS-rebinding from websites.
+    if not auth_enabled and not is_allowed_host(request.headers.get("host")):
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=403,
+            content={"detail": "This Synapse instance has no password and only accepts localhost connections. "
+                               "Set SYNAPSE_PASSWORD to allow remote access, or add the host to SYNAPSE_ALLOWED_HOSTS."},
+        )
+
+    if auth_enabled and path.startswith("/api/"):
         # Public endpoints that don't require authorization
         if path in ["/api/auth/status", "/api/auth/login", "/api/health"]:
             return await call_next(request)
@@ -195,8 +220,8 @@ async def auth_middleware(request: Request, call_next):
             token = auth_header[7:].strip()
         if not token:
             token = request.headers.get("X-Synapse-Token")
-        if not token:
-            token = request.query_params.get("token")
+        # Tokens in query strings are not accepted: they leak into access logs,
+        # proxy logs and browser history.
 
         if not verify_auth_token(token):
             from fastapi.responses import JSONResponse
@@ -275,8 +300,6 @@ def get_auth_status(request: Request):
         token = auth_header[7:].strip()
     if not token:
         token = request.headers.get("X-Synapse-Token")
-    if not token:
-        token = request.query_params.get("token")
 
     auth_required = is_auth_enabled()
     authenticated = verify_auth_token(token) if auth_required else True
@@ -287,7 +310,7 @@ def get_auth_status(request: Request):
 
 @app.post("/api/auth/login")
 def api_login(req: LoginRequest, request: Request):
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = get_client_ip(request)
     if is_rate_limited(client_ip):
         raise HTTPException(
             status_code=429,
@@ -304,6 +327,11 @@ def api_login(req: LoginRequest, request: Request):
     reset_failed_attempts(client_ip)
     token = generate_auth_token()
     return {"token": token, "status": "authenticated", "auth_required": True}
+
+@app.post("/api/auth/ws-ticket")
+def api_ws_ticket():
+    """One-time, 30-second ticket for /ws/terminal (requires a valid bearer token via middleware)."""
+    return {"ticket": issue_ws_ticket()}
 
 @app.get("/api/health")
 async def get_health():
@@ -458,8 +486,9 @@ def api_discovered_models():
 
     # Cloud models
     for cm in [
-        "claude-3-5-sonnet-20241022",
-        "claude-3-5-haiku-20241022",
+        "claude-sonnet-5",
+        "claude-opus-5-5",
+        "claude-haiku-5-5",
         "gemini-2.5-flash",
         "gemini-2.5-pro"
     ]:
@@ -490,7 +519,10 @@ def api_set_cluster_hosts(req: ClusterHostsRequest):
     return {"hosts": updated, "saved": True}
 
 @app.get("/api/search")
-async def api_search(q: str = Query(..., min_length=2)):
+def api_search(q: str = Query(..., min_length=2)):
+    # Plain `def`: FastAPI runs it in a worker thread. The full-text scan takes
+    # seconds on a large workspace and must not block the event loop (which
+    # would freeze every other request and all terminal WebSockets).
     return {"results": search_curriculum(q)}
 
 @app.get("/api/graph")
@@ -547,11 +579,15 @@ def update_lesson_mastery(req: LessonMasteryRequest):
 
 @app.get("/api/settings")
 def get_app_settings():
-    return get_settings()
+    # Never return the token signing key or secret values to the client.
+    return redact_settings(get_settings())
 
 @app.post("/api/settings")
 def update_app_settings(settings: Dict[str, Any]):
-    save_settings(settings)
+    try:
+        save_settings(filter_client_settings(settings))
+    except ConfigError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     return {"status": "success"}
 
 @app.get("/api/packages")
@@ -597,6 +633,8 @@ def api_export_package(domain: str = Query(...)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+MAX_PACKAGE_UPLOAD_BYTES = 500 * 1024 * 1024
+
 @app.post("/api/packages/install")
 async def api_install_package(
     domain: Optional[str] = Query(None),
@@ -608,7 +646,10 @@ async def api_install_package(
         import tempfile
         with tempfile.NamedTemporaryFile(suffix=".synpack", delete=False) as tmp:
             tmp_path = Path(tmp.name)
-            content = await file.read()
+            content = await file.read(MAX_PACKAGE_UPLOAD_BYTES + 1)
+            if len(content) > MAX_PACKAGE_UPLOAD_BYTES:
+                tmp_path.unlink(missing_ok=True)
+                raise HTTPException(status_code=413, detail="Package exceeds the 500 MB upload limit.")
             tmp_path.write_bytes(content)
         try:
             result = install_topic_pack(tmp_path)
@@ -1589,8 +1630,19 @@ Output clean, production-ready Markdown."""
 @app.websocket("/ws/terminal")
 async def terminal_websocket(websocket: WebSocket):
     global LAST_TERMINAL_COMMAND
-    token = websocket.query_params.get("token")
-    if is_auth_enabled() and not verify_auth_token(token):
+    # Browsers do not apply CORS to WebSockets: reject cross-site origins
+    # (cross-site WebSocket hijacking) and non-local hosts on open instances.
+    ws_host = websocket.headers.get("host")
+    if not is_allowed_origin(websocket.headers.get("origin"), ws_host):
+        await websocket.close(code=1008, reason="Origin not allowed")
+        return
+    if not is_auth_enabled() and not is_allowed_host(ws_host):
+        await websocket.close(code=1008, reason="Host not allowed")
+        return
+
+    # Browsers cannot set headers on WebSockets, so authenticate with a
+    # one-time ticket from POST /api/auth/ws-ticket instead of the bearer token.
+    if is_auth_enabled() and not consume_ws_ticket(websocket.query_params.get("ticket")):
         await websocket.close(code=1008, reason="Authentication required")
         return
 
@@ -1829,7 +1881,6 @@ async def terminal_websocket(websocket: WebSocket):
         if docker_ok:
             exec_cmd = [
                 docker_bin, "run", "-it", "--rm",
-                "--privileged",
                 "-v", f"{WORKSPACE_ROOT}:/workspace",
                 "-w", "/workspace",
                 "ubuntu:24.04", "/bin/bash"

@@ -22,12 +22,14 @@ from .models import (
     OllamaProvider,
     LLMProvider,
     validate_generation_output,
+    repair_mermaid_diagrams,
     validate_lesson_completeness,
     CLUSTER_HOST_SPECS,
     AnthropicProvider
 )
 from .topic_manager import get_domain_persona
 from .security import validate_canonical_topic_path, get_workspace_root
+from .rewrite_safety import split_markdown_chunks, check_rewrite, clean_model_markdown
 from .domain_strategies import build_topic_modules, GLOBAL_REGISTRY
 
 # Global semaphore to limit concurrent LLM requests and avoid rate limits
@@ -639,8 +641,22 @@ def generate_topic_parallel(
                 else:
                     latex_constraint = "3. FORMATTING: Use LaTeX ($...$) for mathematical formulas where appropriate."
 
-                refine_prompt = f"""You are a master technical author and rigorous adversarial auditor.
+                # Refine the draft part by part: a long chapter does not fit a
+                # local model's context, and a reply covering only a prefix must
+                # never replace the full draft.
+                chunks = split_markdown_chunks(content.strip() + "\n")
+                refined_chunks = []
+                kept_original = 0
+                for ci, chunk in enumerate(chunks):
+                    part_note = (
+                        f"This is part {ci + 1} of {len(chunks)} of the chapter. Rewrite ONLY this part, "
+                        "keeping every heading exactly as written and in the same order."
+                        if len(chunks) > 1 else
+                        "Keep every heading exactly as written and in the same order."
+                    )
+                    refine_prompt = f"""You are a master technical author and rigorous adversarial auditor.
 Audit and rewrite this masterclass chapter for '{mod_item['title']}' on '{subtopic_title}'.
+{part_note}
 
 AUDIT & REFINE REQUIREMENTS:
 1. FACT-CHECK: Fix any fabricated APIs, hallucinated invariants, or technical inaccuracies.
@@ -653,19 +669,36 @@ AUDIT & REFINE REQUIREMENTS:
      - `graph TD; A -->| "Start" | B; B -->| "End" | C;`
      - `sequenceDiagram; participant A; participant B; A->>B: "Request"; B-->>A: "Response";`
 5. PLACEHOLDERS: Eliminate all lazy placeholders (// TODO, ..., TBD) and bullet-point lists. Convert to rich narrative paragraphs.
+6. COMPLETENESS: Do not shorten, summarize or omit any part of the text.
 
 DRAFT TO AUDIT & REFINE:
 \"\"\"
-{content[:7000]}
+{chunk}
 \"\"\"
 
 Output the fully corrected, publication-grade, raw Markdown only."""
 
-                refinement_res = ""
-                with _LLM_SEMAPHORE:
-                    refinement_res = r_provider.generate(refine_prompt, system_instruction="You are a master technical author and ruthless peer reviewer.")
-                final_content = validate_generation_output(refinement_res)
-                audit_note = f"Audited & Refined by [{r_name}]"
+                    try:
+                        with _LLM_SEMAPHORE:
+                            refinement_res = r_provider.generate(refine_prompt, system_instruction="You are a master technical author and ruthless peer reviewer.")
+                        candidate = clean_model_markdown(refinement_res)
+                        ok, reason = check_rewrite(chunk, candidate)
+                    except Exception as chunk_err:
+                        ok, reason = False, str(chunk_err)
+                    if ok:
+                        refined_chunks.append(repair_mermaid_diagrams(candidate).rstrip() + "\n\n")
+                    else:
+                        kept_original += 1
+                        print(f"      [!] {fname} part {ci + 1}/{len(chunks)}: kept draft text ({reason})", flush=True)
+                        refined_chunks.append(chunk.rstrip() + "\n\n")
+
+                final_content = "".join(refined_chunks)
+                if kept_original == len(chunks):
+                    audit_note = f"Refinement rejected by safety checks [{r_name}]; draft kept"
+                elif kept_original:
+                    audit_note = f"Audited & Refined by [{r_name}] ({kept_original}/{len(chunks)} parts kept as drafted)"
+                else:
+                    audit_note = f"Audited & Refined by [{r_name}]"
             except Exception as e:
                 audit_note = f"Audit/Refine failed: {e}"
 

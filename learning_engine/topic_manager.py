@@ -27,6 +27,21 @@ def sanitize_rel_path(rel_path: str) -> Path:
     """Deprecated: Use validate_workspace_path instead."""
     return validate_workspace_path(TOPICS_DIR, TOPICS_DIR / rel_path)
 
+_SEGMENT_RE = re.compile(r"^[a-zA-Z0-9_\-]+$")
+
+def _split_topic_rel_path(rel_path: str) -> Optional[list]:
+    """
+    Splits a topic-relative path into strictly validated segments.
+    Returns None if any segment is empty, '.', '..', or contains characters
+    outside [A-Za-z0-9_-], or if fewer than 2 segments are present.
+    """
+    if not isinstance(rel_path, str):
+        return None
+    parts = rel_path.strip().strip("/").split("/")
+    if len(parts) < 2 or not all(_SEGMENT_RE.match(p) for p in parts):
+        return None
+    return parts
+
 DOMAIN_ORDER = [
     "computing",
     "engineering",
@@ -327,12 +342,17 @@ def add_subtopic(domain: str, category: str, subtopic_id: str, display_name: Opt
     return target_dir
 
 def delete_subtopic(rel_path: str) -> bool:
-    # Strict validation
-    target_dir = validate_workspace_path(TOPICS_DIR, TOPICS_DIR / rel_path)
-    
-    clean_rel = rel_path.strip("/")
-    parts = clean_rel.split("/")
-    if len(parts) < 2:
+    # Strict validation: whitelist every segment before touching the filesystem.
+    parts = _split_topic_rel_path(rel_path)
+    if parts is None:
+        return False
+    clean_rel = "/".join(parts)
+    try:
+        target_dir = validate_workspace_path(TOPICS_DIR, TOPICS_DIR / clean_rel)
+    except ValueError:
+        return False
+    # Never delete the topics root or a whole domain via this endpoint.
+    if len(target_dir.relative_to(TOPICS_DIR.resolve()).parts) < 2:
         return False
 
     domain = parts[0]
@@ -363,14 +383,17 @@ def delete_subtopic(rel_path: str) -> bool:
     return True
 
 def rename_subtopic(rel_path: str, new_title: str) -> bool:
-    try:
-        sanitize_rel_path(rel_path)
-    except ValueError:
+    parts = _split_topic_rel_path(rel_path)
+    if parts is None:
         return False
+    clean_rel = "/".join(parts)
 
-    clean_rel = rel_path.strip("/")
-    parts = clean_rel.split("/")
-    if len(parts) < 2:
+    # Titles are written into SYLLABUS.md markdown; keep them to a single line
+    # without characters that would break the `- **title** (`path/`)` structure.
+    if not isinstance(new_title, str):
+        return False
+    new_title = re.sub(r"\s+", " ", re.sub(r"[`*]", " ", new_title)).strip()
+    if not new_title or len(new_title) > 200:
         return False
 
     domain = parts[0]

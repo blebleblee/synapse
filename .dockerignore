@@ -1,0 +1,59 @@
+# Keep the build context to what the image needs, and never ship private or
+# personal content. Mirrors the private-content rules in .gitignore.
+
+# VCS, secrets, local state
+.git
+.env
+.env.*
+*.local
+data/
+exports/
+*.db
+*.db-journal
+*.db-wal
+.synapse_cluster*.json
+*.log
+
+# Dependencies and build output (rebuilt inside the image)
+**/node_modules
+**/__pycache__
+.venv
+dist/
+build/
+app/frontend/dist
+*.egg-info
+
+# Private sideloaded domains: only the 12 public domains go into the image
+topics/*
+!topics/arts
+!topics/business
+!topics/computing
+!topics/crafts
+!topics/economics
+!topics/engineering
+!topics/formal_sciences
+!topics/health_sciences
+!topics/humanities
+!topics/languages
+!topics/motorsports
+!topics/natural_sciences
+
+# Private tracks, blueprints and chat sessions inside public domains
+topics/languages/czech
+topics/languages/english
+topics/languages/german
+**/CURRICULUM_BLUEPRINT.md
+**/sessions
+topics/.workspace_sessions
+
+# Local-only files (git-ignored): notes, logs, caches, build output
+.cache/
+.claude/
+.pytest_cache/
+BACKLOG.md
+*.log
+.workbench.pid
+e2e/artifacts/
+app/desktop/build/
+app/desktop/dist/
+*.egg-info/

@@ -1,10 +1,36 @@
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import 'katex/dist/contrib/mhchem.mjs';
 import { synthesizeTerminalCommand } from './commandSynthesizer';
 
 let mermaidInitialized = false;
+
+/** Escapes text for safe interpolation into HTML element content or quoted attributes. */
+export function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
+ * Sanitizes rendered HTML before it is injected into the DOM.
+ * Lesson and chat markdown comes from LLM output and third-party topic packs,
+ * so it must never be able to run script in the app's origin (which can reach
+ * the terminal WebSocket). Keeps KaTeX (MathML + styled spans), data-* attributes
+ * used by the code-block buttons, and the Mermaid source containers.
+ */
+export function sanitizeHtml(html: string): string {
+  return DOMPurify.sanitize(html, {
+    USE_PROFILES: { html: true, svg: true, mathMl: true },
+    FORBID_TAGS: ['style', 'form', 'input', 'textarea', 'select', 'iframe', 'object', 'embed'],
+    ADD_ATTR: ['target'],
+  });
+}
 
 function isLightHexColor(hexStr: string): boolean {
   const clean = hexStr.replace('#', '').trim();
@@ -149,44 +175,44 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string, enableMath
   renderer.code = function ({ text, lang }) {
     const language = (lang || '').trim().toLowerCase();
 
+    const safeLang = language.replace(/[^a-z0-9_+#.-]/g, '');
+
     if (language === 'mermaid') {
       const cleanText = sanitizeAndRepairMermaid(text);
       const encodedRaw = encodeURIComponent(cleanText);
       return `<div class="mermaid-container" title="Click to zoom and inspect diagram">
         <div class="diagram-zoom-hint"><span>🔍</span> Click to zoom</div>
-        <pre class="mermaid" data-raw="${encodedRaw}">${cleanText}</pre>
+        <pre class="mermaid" data-raw="${encodedRaw}">${escapeHtml(cleanText)}</pre>
       </div>`;
     }
 
     const synth = synthesizeTerminalCommand(text, language);
-    const escapedCode = text
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+    const escapedCode = escapeHtml(text);
 
     const copyBtn = `<button class="btn-copy-code" data-code="${escapedCode}" title="Copy code snippet to clipboard">
       <span class="btn-icon">📋</span> Copy
     </button>`;
 
     const runBtn = synth.isExecutable
-      ? `<button class="btn-run-code" data-code="${escapedCode}" data-lang="${language}" title="${synth.explanation}">
-          <span class="btn-icon">${synth.displayLabel}</span>
+      ? `<button class="btn-run-code" data-code="${escapedCode}" data-lang="${safeLang}" title="${escapeHtml(synth.explanation)}">
+          <span class="btn-icon">${escapeHtml(synth.displayLabel)}</span>
         </button>`
       : '';
 
     return `<div class="code-block-wrapper">
       <div class="code-block-header">
-        <span class="code-lang">${language || 'code'}</span>
+        <span class="code-lang">${safeLang || 'code'}</span>
         <div class="code-block-actions">
           ${copyBtn}
           ${runBtn}
         </div>
       </div>
-      <pre><code class="language-${language}">${text}</code></pre>
+      <pre><code class="language-${safeLang}">${escapedCode}</code></pre>
     </div>`;
   };
 
   const html = marked.parse(processed, { renderer }) as string;
-  return html;
+  return sanitizeHtml(html);
 }
 
 let diagramIdCounter = 0;
@@ -201,7 +227,7 @@ export async function renderMermaidDiagramsInElement(container: HTMLElement) {
       mermaid.initialize({
         startOnLoad: false,
         theme: 'base',
-        securityLevel: 'loose',
+        securityLevel: 'strict',
         suppressErrorRendering: true,
         fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         fontSize: 13,

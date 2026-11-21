@@ -110,7 +110,9 @@ def cmd_status(args):
         print(f"    - [{name:10s}] {status_str} | Model: {pref_model}{pin_label}")
     
     if os.environ.get("ANTHROPIC_API_KEY"):
-        print(f"    - [ANTHROPIC] ONLINE    | Tier: cloud    | Model: claude-3-5-sonnet-20241022")
+        from learning_engine.models import DEFAULT_CLAUDE_MODEL
+        claude_model = os.environ.get("ANTHROPIC_MODEL") or DEFAULT_CLAUDE_MODEL
+        print(f"    - [ANTHROPIC] KEY SET   | Tier: cloud    | Model: {claude_model}")
 
     print("==================================================")
 
@@ -308,14 +310,21 @@ def cmd_review(args):
         res = review_and_fix_unit(sub_path, reviewer_provider=args.provider, reviewer_model=args.model, auto_fix=args.fix)
         for r in res["reports"]:
             badge = "[✔] VERIFIED" if r.get("verdict") == "VERIFIED" else "[!] " + str(r.get("verdict"))
-            print(f"\n{badge} :: {r.get('file')} (Score: {r.get('score', 0)}/100)")
+            score = r.get("score")
+            score_str = f"{score}/100" if score is not None else "n/a"
+            print(f"\n{badge} :: {r.get('file')} (Score: {score_str})")
+            if r.get("error"):
+                print(f"    - Review error: {r.get('error')}")
             if r.get("hallucinations"):
                 print(f"    - Hallucinations: {r.get('hallucinations')}")
             if r.get("factual_errors"):
                 print(f"    - Errors: {r.get('factual_errors')}")
-            print(f"    - Critique: {r.get('critique')}")
+            if r.get("critique"):
+                print(f"    - Critique: {r.get('critique')}")
             if r.get("fixed"):
-                print(f"    - [FIXED]: Document rewritten and verified.")
+                print(f"    - [REWRITTEN]: {r.get('fixed_parts')} part(s) rewritten (not re-reviewed; run review again).")
+            for rej in r.get("rejected_rewrites", []):
+                print(f"    - [KEPT ORIGINAL] {rej}")
     else:
         print("==================================================")
         print(f"[*] RUNNING CROSS-MODEL PEER AUDIT ACROSS UNITS   ")
@@ -323,6 +332,7 @@ def cmd_review(args):
         print("==================================================")
         tree = get_topic_tree()
         verified_count = 0
+        review_failed_count = 0
         total_audited = 0
         for domain, ddata in tree.items():
             for disc, disc_data in ddata["disciplines"].items():
@@ -332,12 +342,18 @@ def cmd_review(args):
                             total_audited += 1
                             u_path = Path(u_data["full_path"])
                             res = review_and_fix_unit(u_path, reviewer_provider=args.provider, reviewer_model=args.model, auto_fix=args.fix)
-                            status_str = "[✔] PASS" if not res["has_issues"] else "[!] ISSUES"
-                            print(f"{status_str} :: {u_data['rel_path']}")
-                            if not res["has_issues"]:
+                            if res["has_issues"]:
+                                status_str = "[!] ISSUES"
+                            elif res.get("review_failed"):
+                                status_str = "[?] REVIEW FAILED"
+                                review_failed_count += 1
+                            else:
+                                status_str = "[✔] PASS"
                                 verified_count += 1
+                            print(f"{status_str} :: {u_data['rel_path']}")
         print("==================================================")
-        print(f"[*] Peer Review Summary: {verified_count} / {total_audited} Units Verified")
+        print(f"[*] Peer Review Summary: {verified_count} / {total_audited} Units Verified"
+              f" ({review_failed_count} could not be reviewed)")
         print("==================================================")
 
 def cmd_serve(args):

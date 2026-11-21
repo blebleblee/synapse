@@ -84,12 +84,15 @@ def validate_workspace_path(base_dir: Path, target_path: Path) -> Path:
         resolved_base = base_dir.resolve()
         resolved_target = target_path.resolve()
         
-        if not str(resolved_target).startswith(str(resolved_base)):
-            raise ValueError(f"Security Violation: Path traversal attempt blocked: {target_path}")
-            
-        return resolved_target
     except Exception as e:
         raise ValueError(f"Invalid path structure: {e}")
+
+    # Component-wise containment check (a string prefix check would accept
+    # sibling directories such as 'topics_backup' for base 'topics').
+    if not resolved_target.is_relative_to(resolved_base):
+        raise ValueError(f"Security Violation: Path traversal attempt blocked: {target_path}")
+
+    return resolved_target
 
 def validate_canonical_topic_path(target_path: Path, base_topics_dir: Optional[Path] = None) -> Path:
     """
@@ -101,7 +104,7 @@ def validate_canonical_topic_path(target_path: Path, base_topics_dir: Optional[P
     base = (base_topics_dir or TOPICS_DIR).resolve()
     resolved = target_path.resolve()
     
-    if not str(resolved).startswith(str(base)):
+    if not resolved.is_relative_to(base):
         raise ValueError(f"Security Violation: Path traversal attempt: {target_path}")
 
     rel = resolved.relative_to(base)
@@ -124,6 +127,64 @@ def validate_canonical_topic_path(target_path: Path, base_topics_dir: Optional[P
             )
 
     return resolved
+
+_LOOPBACK_HOSTNAMES = {"localhost", "127.0.0.1", "::1"}
+
+# Browser origins of the bundled frontends (Vite dev server and Electron dev mode).
+_DEFAULT_ALLOWED_ORIGINS = {
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+}
+
+
+def _split_env_list(name: str) -> set[str]:
+    raw = os.environ.get(name, "")
+    return {item.strip().lower() for item in raw.split(",") if item.strip()}
+
+
+def _hostname_of(host_header: str) -> str:
+    """Strips the port from a Host header value, handling bracketed IPv6."""
+    h = (host_header or "").strip().lower()
+    if h.startswith("["):
+        return h[1:h.find("]")] if "]" in h else h
+    if h.count(":") == 1:
+        return h.split(":", 1)[0]
+    return h
+
+
+def is_allowed_host(host_header: Optional[str]) -> bool:
+    """
+    True if the request's Host header names this machine's loopback interface,
+    or a host explicitly allowed via SYNAPSE_ALLOWED_HOSTS (comma-separated).
+
+    Used when instance password protection is disabled, so that an
+    unauthenticated instance is only reachable as localhost. This blocks
+    LAN access to an open instance and DNS-rebinding attacks from websites.
+    """
+    if not host_header:
+        return False
+    name = _hostname_of(host_header)
+    return name in _LOOPBACK_HOSTNAMES or name in _split_env_list("SYNAPSE_ALLOWED_HOSTS")
+
+
+def is_allowed_origin(origin: Optional[str], host_header: Optional[str]) -> bool:
+    """
+    Validates a browser Origin header for state-changing / shell endpoints.
+    Non-browser clients send no Origin and are allowed (they are still subject
+    to Host and token checks). Browser requests must be same-origin with the
+    backend, or come from a known frontend origin / SYNAPSE_ALLOWED_ORIGINS.
+    """
+    if origin is None:
+        return True
+    o = origin.strip().lower().rstrip("/")
+    if o in _DEFAULT_ALLOWED_ORIGINS or o in _split_env_list("SYNAPSE_ALLOWED_ORIGINS"):
+        return True
+    if host_header:
+        h = host_header.strip().lower()
+        if o in (f"http://{h}", f"https://{h}"):
+            return True
+    return False
+
 
 DANGEROUS_HOST_PATTERNS = [
     # Recursive deletion of root, home, current dir, wildcards, system dirs
