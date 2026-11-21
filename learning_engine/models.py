@@ -696,6 +696,14 @@ class GeminiProvider(LLMProvider):
         )
         return response.text or ""
 
+def _synapse_user_agent() -> str:
+    try:
+        from .version import __version__
+    except Exception:
+        __version__ = "0"
+    return f"Synapse-Workbench/{__version__}"
+
+
 # Default Claude model when none is configured (override with ANTHROPIC_MODEL).
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-5"
 
@@ -765,7 +773,9 @@ class AnthropicProvider(LLMProvider):
             "anthropic-version": "2023-06-01",
             "anthropic-beta": "prompt-caching-2024-07-31",
             "content-type": "application/json",
-            "User-Agent": "claude-cli/1.0.0 (darwin; arm64)"
+            # Identify as this app, not as another client. Override only if your
+            # gateway requires something specific (SYNAPSE_ANTHROPIC_USER_AGENT).
+            "User-Agent": os.environ.get("SYNAPSE_ANTHROPIC_USER_AGENT") or _synapse_user_agent()
         }
         if self.api_key:
             headers["x-api-key"] = self.api_key

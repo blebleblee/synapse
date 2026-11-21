@@ -90,3 +90,19 @@ def test_settings_ui_api_key_is_used(monkeypatch):
     p = models.AnthropicProvider(model="claude-sonnet-5")
     assert p.api_key == "ui-key"
     assert p.base_url == "https://proxy.example"
+
+
+def test_user_agent_identifies_synapse(monkeypatch):
+    seen = {}
+
+    def fake_urlopen(req, timeout=None):
+        seen.update({k.lower(): v for k, v in req.header_items()})
+        return _sse([{"type": "message_delta", "delta": {"stop_reason": "end_turn"}}])
+
+    monkeypatch.setattr(models.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(models.AnthropicProvider, "generate_stream", _REAL_GENERATE_STREAM)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    monkeypatch.delenv("SYNAPSE_ANTHROPIC_USER_AGENT", raising=False)
+    list(models.AnthropicProvider(model="claude-sonnet-5", base_url="https://api.anthropic.com").generate_stream("hi"))
+    assert seen["user-agent"].startswith("Synapse-Workbench/")
+    assert "claude-cli" not in seen["user-agent"]

@@ -8,6 +8,7 @@ import sys
 import re
 import json
 import tarfile
+from .version import __version__
 import hashlib
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -296,7 +297,7 @@ def resolve_or_download_pack(domain: str) -> Path:
     for url in remote_urls:
         try:
             print(f"[*] Downloading curriculum pack for '{domain}' from {url}...")
-            req = urllib.request.Request(url, headers={"User-Agent": "Synapse-Workbench/1.1.1"})
+            req = urllib.request.Request(url, headers={"User-Agent": f"Synapse-Workbench/{__version__}"})
             
             # Allow basic token auth for private registries if provided
             if "github.com" not in url.lower() and os.environ.get("SYNAPSE_PACKAGE_TOKEN"):

@@ -45,3 +45,15 @@ topics/languages/german
 **/CURRICULUM_BLUEPRINT.md
 **/sessions
 topics/.workspace_sessions
+
+# Local-only files (git-ignored): notes, logs, caches, build output
+.cache/
+.claude/
+.pytest_cache/
+BACKLOG.md
+*.log
+.workbench.pid
+e2e/artifacts/
+app/desktop/build/
+app/desktop/dist/
+*.egg-info/
