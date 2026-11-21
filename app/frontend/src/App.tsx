@@ -320,9 +320,14 @@ export function App() {
         if (selectedPath === path || selectedPath?.startsWith(path)) {
           setSelectedPath(null);
           setTopicDetails(null);
+          setActiveLessonId(null);
+          clearStoredSelection();
         }
         await fetchTree();
         await fetchStatus();
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        window.alert(`Failed to delete topic: ${errData.detail || res.statusText}`);
       }
     } catch (err) {
       console.error('Failed to delete topic:', err);
