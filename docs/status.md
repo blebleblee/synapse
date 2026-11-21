@@ -2,7 +2,7 @@
 
 ## 1. Saved Checkpoint
 
-- **Latest Checkpoint Hash:** `c057f17` (`fix: do not cache failed or fallback English translations to disk`)
+- **Latest Checkpoint Hash:** `9bf0dac` (`fix: forward configured model and cluster host to quiz and summary endpoints`)
 - **Completed Backlog Tasks:**
   - **FIND-02:** Removed automatic `git add -A`, `git commit`, `git push` workspace side effects from `topic_manager.py`, `summary.py`, and `main.py`. Added `tests/test_git_isolation.py`.
   - **FIND-01:** Repaired `GenerateRequest` payload schema mismatch causing HTTP 422 errors on curriculum generation.
@@ -11,6 +11,7 @@
   - **FIND-06:** Cleared active selection from memory and localStorage upon topic deletion, with UI error alert on failure.
   - **FIND-07:** Refreshed sidebar tree state dynamically upon manual mastery level updates in reader header (`await fetchTree()`, `await fetchStatus()`).
   - **FIND-04:** Prevented failed or untranslated English fallback text from poisoning the disk translation cache (`should_cache = not any_chunk_failed and not is_identical_to_source and bool(final_translation)`). Added regression tests in `tests/test_api.py`.
+  - **FIND-08:** Forwarded configured AI model (`settings.mentorModel || settings.primaryModel`) and cluster host (`settings.ollamaHost`) to `/api/quiz` and `/api/summary/regenerate` endpoints and provider routing. Added regression test in `tests/test_api.py`.
 - **Verification Script:** Verified `scripts/verify_all.sh` runs reliably from root, halts on failure via `set -eo pipefail`, and passes all 5 verification phases.
 
 ---
@@ -18,9 +19,8 @@
 ## 2. Audit Summary & Remaining Backlog
 
 A systematic audit was conducted across all 8 functional areas, recorded in `docs/backlog.md`:
-- **Completed:** FIND-01, FIND-02, FIND-03, FIND-04, FIND-05, FIND-06, FIND-07.
+- **Completed:** FIND-01, FIND-02, FIND-03, FIND-04, FIND-05, FIND-06, FIND-07, FIND-08.
 - **Remaining Open Findings:**
-  - **FIND-08:** Quiz and summary generation endpoints ignore user's configured preferred AI model and cluster host.
   - **FIND-09:** Terminal WebSocket reconnect loop floods disconnected endpoint when unauthenticated (code 1008).
 
 ---

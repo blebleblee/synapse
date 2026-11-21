@@ -87,9 +87,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
   - `app/frontend/src/App.tsx:675`: `body: JSON.stringify({ query: selectedPath })`.
   - `app/frontend/src/App.tsx:738`: `body: JSON.stringify({ query: selectedPath })`.
   - `app/backend/main.py:1411-1420`: `QuizRequest` accepts `provider` and `model`, but receives none from the frontend.
-- **Status:** Confirmed by code.
-- **Proposed Acceptance Criteria:** `handleRefreshQuiz` and `handleRegenerateSummary` forward `model` and `provider` parameters matching the user's active preferences.
-- **Small Proposed Repair Task:** Include `model: settings.mentorModel || settings.primaryModel` and `host: settings.ollamaHost` in the POST bodies for `/api/quiz` and `/api/summary/regenerate`.
+- **Status:** **COMPLETED** (Forwarded configured `model` and `host` from `App.tsx` to `/api/quiz` and `/api/summary/regenerate`, added `host` support to `get_provider` and `regenerate_summary` in `learning_engine/models.py` and `summary.py`. Verified with tests in `tests/test_api.py`).
 
 ---
 
