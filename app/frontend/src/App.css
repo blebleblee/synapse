@@ -5730,6 +5730,54 @@ body, html, #root {
   background-color: var(--bg-tertiary);
 }
 
+/* Cluster Nodes Horizontal Row Layout */
+.cluster-node-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 12px;
+  transition: all 0.15s ease;
+}
+
+.cluster-node-row:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.cluster-node-url-field {
+  flex: 1;
+  min-width: 180px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+}
+
+.node-pin-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.node-pin-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.node-pin-select {
+  padding: 3px 8px;
+  font-size: 11px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 4px;
+  max-width: 180px;
+}
+
 .cluster-node-item {
   display: flex;
   align-items: center;

@@ -180,14 +180,15 @@ def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
 def resolve_or_download_pack(domain: str) -> Path:
     """
     Finds or downloads a .synpack archive for the given domain.
-    1. Checks local PACKS_DIR / f"{domain}.synpack".
+    1. Checks local PACKS_DIR / pack_name.
     2. Checks bundled Electron resources/packages directory.
     3. If domain is already on disk, exports it.
-    4. Downloads from GitHub / Gitea v1.1.0 release.
+    4. Downloads from GitHub / Gitea release.
     """
+    pack_name = "synapse_complete_curriculum.synpack" if domain in ("complete", "all", "synapse_complete_curriculum") else f"{domain}.synpack"
     out_dir = PACKS_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
-    local_pack = out_dir / f"{domain}.synpack"
+    local_pack = out_dir / pack_name
     if local_pack.exists() and local_pack.stat().st_size > 1000:
         return local_pack
 
@@ -200,23 +201,23 @@ def resolve_or_download_pack(domain: str) -> Path:
     ]
     for res_dir in candidate_res:
         if res_dir and res_dir.exists():
-            bundled = res_dir / f"{domain}.synpack"
+            bundled = res_dir / pack_name
             if bundled.exists() and bundled.stat().st_size > 1000:
                 return bundled
 
     # If domain directory already exists in TOPICS_DIR, export it
-    if (TOPICS_DIR / domain).exists() and (TOPICS_DIR / domain).is_dir():
+    if domain not in ("complete", "all", "synapse_complete_curriculum") and (TOPICS_DIR / domain).exists() and (TOPICS_DIR / domain).is_dir():
         return export_topic_pack(domain, output_dir=out_dir)
 
     # Download from remote release (GitHub primary, Gitea fallback)
     remote_urls = []
     custom_registry = os.environ.get("SYNAPSE_PACKAGE_REGISTRY")
     if custom_registry:
-        remote_urls.append(f"{custom_registry.rstrip('/')}/{domain}.synpack")
+        remote_urls.append(f"{custom_registry.rstrip('/')}/{pack_name}")
         
     remote_urls.extend([
-        f"https://github.com/blebleblee/synapse/releases/download/v1.1.1/{domain}.synpack",
-        f"https://gitea.2464.cz/ai/synapse/releases/download/v1.1.1/{domain}.synpack",
+        f"https://github.com/blebleblee/synapse/releases/download/v1.2.0/{pack_name}",
+        f"https://gitea.2464.cz/ai/synapse/releases/download/v1.2.0/{pack_name}",
     ])
 
     import urllib.request

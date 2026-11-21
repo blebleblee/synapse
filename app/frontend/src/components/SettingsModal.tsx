@@ -4,7 +4,6 @@ import {
   Palette,
   Cpu,
   X,
-  Check,
   Plus,
   Trash2,
   RefreshCw,
@@ -82,24 +81,6 @@ interface SettingsModalProps {
   onLaunchSetupWizard?: () => void;
 }
 
-const THEME_OPTIONS = [
-  { id: 'studio', name: 'Studio Obsidian', baseColor: '#0c0d0f', accentColor: '#fbbf24' },
-  { id: 'github_dimmed', name: 'GitHub Dimmed', baseColor: '#1c2128', accentColor: '#539bf5' },
-  { id: 'nordic', name: 'Nordic Frost', baseColor: '#0f131a', accentColor: '#2dd4bf' },
-  { id: 'monokai', name: 'Monokai Pro', baseColor: '#19181a', accentColor: '#ffd866' },
-  { id: 'dracula', name: 'Dracula Noir', baseColor: '#1e1f29', accentColor: '#bd93f9' },
-  { id: 'solarized', name: 'Solarized Dark', baseColor: '#00212b', accentColor: '#b58900' },
-  { id: 'titanium', name: 'Titanium Daybreak', baseColor: '#101114', accentColor: '#e5e7eb' },
-];
-
-const ACCENT_OPTIONS = [
-  { id: 'gold', name: 'Amber Gold', hex: '#fbbf24' },
-  { id: 'cyan', name: 'Electric Cyan', hex: '#06b6d4' },
-  { id: 'emerald', name: 'Matrix Emerald', hex: '#10b981' },
-  { id: 'amethyst', name: 'Royal Amethyst', hex: '#a855f7' },
-  { id: 'rose', name: 'Crimson Rose', hex: '#f43f5e' },
-];
-
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
@@ -127,10 +108,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   }, [isOpen, initialTab]);
 
   const [formData, setFormData] = useState<AppSettings>(settings);
-  const [savedMessage, setSavedMessage] = useState(false);
   const [showAnthropicKey, setShowAnthropicKey] = useState(false);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
-  const [showClusterAdvanced, setShowClusterAdvanced] = useState(false);
+  const [showClusterAdvanced, setShowClusterAdvanced] = useState(true);
 
   const [clusterNodes, setClusterNodes] = useState<string[]>(
     settings.clusterHosts || DEFAULT_SETTINGS.clusterHosts || []
@@ -429,8 +409,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       ollamaHost: clusterNodes[0] || formData.ollamaHost,
     };
     onSaveSettings(updated);
-    setSavedMessage(true);
-    setTimeout(() => setSavedMessage(false), 2500);
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -444,7 +423,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         <div className="settings-sidebar">
           <div className="settings-sidebar-header">
             <Settings size={18} className="settings-header-icon" />
-            <span className="settings-sidebar-title">Workbench Settings</span>
+            <span className="settings-sidebar-title">Settings</span>
           </div>
 
           <nav className="settings-nav-list">
@@ -497,9 +476,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {activeTab === 'storage' && 'Curriculum Store & Maintenance'}
               </h3>
               <p className="settings-tab-desc">
-                {activeTab === 'appearance' && 'Customize theme palettes, typography sizing, and reader geometry.'}
-                {activeTab === 'ai' && 'Manage your local Ollama cluster, primary models, or cloud fallback API keys.'}
-                {activeTab === 'storage' && 'Download complete masterclass packs, export custom domains, and vacuum local cache.'}
+                {activeTab === 'appearance' && 'Customize theme palettes, typography sizing, and reader viewing geometry.'}
+                {activeTab === 'ai' && 'Manage local Ollama models, distributed LAN GPU workers, or cloud fallback API keys.'}
+                {activeTab === 'storage' && 'Manage installed course packs, export .synpack archives, and vacuum local cache.'}
               </p>
             </div>
             <button className="icon-btn" onClick={onClose} title="Close Settings">
@@ -511,44 +490,39 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {/* TAB 1: APPEARANCE */}
             {activeTab === 'appearance' && (
               <div className="settings-section">
-                {/* Visual Theme Cards */}
+                {/* Visual Color Palette Dropdowns */}
                 <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Visual Color Scheme</h4>
-                  <div className="theme-cards-grid">
-                    {THEME_OPTIONS.map((th) => (
-                      <div
-                        key={th.id}
-                        className={`theme-card ${formData.theme === th.id ? 'active' : ''}`}
-                        onClick={() => setFormData({ ...formData, theme: th.id as any })}
+                  <h4 className="panel-box-heading">Visual Color Palette</h4>
+                  <div className="settings-row-2col">
+                    <div className="form-group compact">
+                      <label>Color Theme</label>
+                      <select
+                        value={formData.theme}
+                        onChange={(e) => setFormData({ ...formData, theme: e.target.value as any })}
                       >
-                        <div className="theme-preview-swatch">
-                          <div className="swatch-base" style={{ backgroundColor: th.baseColor }} />
-                          <div className="swatch-accent" style={{ backgroundColor: th.accentColor }} />
-                        </div>
-                        <div className="theme-card-info">
-                          <span className="theme-card-name">{th.name}</span>
-                          {formData.theme === th.id && <Check size={13} className="theme-check-icon" />}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                        <option value="studio">⬛ Studio Obsidian (Dark Carbon & Gold)</option>
+                        <option value="github_dimmed">🌑 GitHub Dimmed (Slate Navy & Blue)</option>
+                        <option value="nordic">❄️ Nordic Frost (Polar Night & Cyan)</option>
+                        <option value="monokai">☕ Monokai Pro (Espresso & Pastels)</option>
+                        <option value="dracula">🧛 Dracula Noir (Deep Violet & Pink)</option>
+                        <option value="solarized">🌊 Solarized Dark (Teal Oceanic & Amber)</option>
+                        <option value="titanium">⚪ Titanium Daybreak (Light & High Contrast)</option>
+                      </select>
+                    </div>
 
-                {/* Accent Color Swatches */}
-                <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Accent Highlights</h4>
-                  <div className="accent-chips-row">
-                    {ACCENT_OPTIONS.map((ac) => (
-                      <button
-                        key={ac.id}
-                        type="button"
-                        className={`accent-chip-btn ${formData.accentColor === ac.id ? 'active' : ''}`}
-                        onClick={() => setFormData({ ...formData, accentColor: ac.id as any })}
+                    <div className="form-group compact">
+                      <label>Accent Color Highlight</label>
+                      <select
+                        value={formData.accentColor || 'gold'}
+                        onChange={(e) => setFormData({ ...formData, accentColor: e.target.value as any })}
                       >
-                        <span className="chip-circle" style={{ backgroundColor: ac.hex }} />
-                        <span>{ac.name}</span>
-                      </button>
-                    ))}
+                        <option value="gold">🟡 Amber Gold (#fbbf24)</option>
+                        <option value="cyan">🔵 Electric Cyan (#06b6d4)</option>
+                        <option value="emerald">🟢 Matrix Emerald (#10b981)</option>
+                        <option value="amethyst">🟣 Royal Amethyst (#a855f7)</option>
+                        <option value="rose">🔴 Crimson Rose (#f43f5e)</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
@@ -701,61 +675,61 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </div>
                     </div>
 
+                    {/* Standard Dropdowns for Models (No confusing quick chips!) */}
                     <div className="settings-panel-box">
                       <h4 className="panel-box-heading">Active Model Assignment</h4>
                       <div className="settings-row-2col">
                         <div className="form-group compact">
-                          <label>Primary Masterclass Generation Model</label>
-                          <input
-                            type="text"
-                            list="discovered-models-list"
+                          <label>Primary Generation Model</label>
+                          <select
                             value={formData.primaryModel}
                             onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
-                            placeholder="e.g. qwen2.5-coder:32b"
                             className="font-mono"
-                          />
+                          >
+                            {discoveredModels.length > 0 ? (
+                              discoveredModels.map((m) => (
+                                <option key={m} value={m}>{m}</option>
+                              ))
+                            ) : (
+                              <option value={formData.primaryModel}>{formData.primaryModel}</option>
+                            )}
+                          </select>
                         </div>
 
                         <div className="form-group compact">
                           <label>Socratic Mentor Model</label>
-                          <input
-                            type="text"
-                            list="discovered-models-list"
-                            value={formData.mentorModel || ''}
+                          <select
+                            value={formData.mentorModel || formData.primaryModel}
                             onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
-                            placeholder="Default to Primary Model"
                             className="font-mono"
-                          />
+                          >
+                            <option value="">Use Primary Model ({formData.primaryModel})</option>
+                            {discoveredModels.map((m) => (
+                              <option key={m} value={m}>{m}</option>
+                            ))}
+                          </select>
                         </div>
                       </div>
 
-                      <datalist id="discovered-models-list">
-                        {discoveredModels.map((m) => (
-                          <option key={m} value={m} />
-                        ))}
-                      </datalist>
-
-                      {discoveredModels.length > 0 && (
-                        <div style={{ marginTop: '8px' }}>
-                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Quick Select from Local Models:</span>
-                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
-                            {discoveredModels.slice(0, 5).map((m) => (
-                              <button
-                                key={m}
-                                type="button"
-                                className="node-model-chip font-mono"
-                                onClick={() => setFormData({ ...formData, primaryModel: m, mentorModel: m })}
-                                title="Set as primary and mentor"
-                              >
-                                {m}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      <div className="form-group compact" style={{ marginTop: '10px' }}>
+                        <label>Reviewer / Evaluator Model</label>
+                        <select
+                          value={formData.reviewerModel}
+                          onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
+                          className="font-mono"
+                        >
+                          {discoveredModels.length > 0 ? (
+                            discoveredModels.map((m) => (
+                              <option key={m} value={m}>{m}</option>
+                            ))
+                          ) : (
+                            <option value={formData.reviewerModel}>{formData.reviewerModel}</option>
+                          )}
+                        </select>
+                      </div>
                     </div>
 
-                    {/* Advanced: Cluster Nodes */}
+                    {/* Distributed Cluster Nodes (Clean Horizontal Row Layout) */}
                     <div className="settings-panel-box">
                       <div
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
@@ -793,49 +767,49 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               const currentPin = nodePins[cleanKey] || nodePins[nodeUrl] || '__auto__';
 
                               return (
-                                <div key={nodeUrl} className="cluster-node-card">
-                                  <div className="node-card-header">
-                                    <div className="node-status-indicator">
-                                      <span className={`status-dot ${status.online ? 'online' : 'offline'}`} />
-                                      <span className="node-url font-mono">{nodeUrl}</span>
-                                    </div>
-
-                                    <div className="node-actions">
-                                      {status.latency_ms !== undefined && (
-                                        <span className="node-latency">{status.latency_ms} ms</span>
-                                      )}
-                                      <button
-                                        type="button"
-                                        className="icon-btn-sm"
-                                        onClick={() => testNodeConnection(nodeUrl)}
-                                      >
-                                        <RefreshCw size={11} className={status.testing ? 'animate-spin' : ''} />
-                                      </button>
-                                      {clusterNodes.length > 1 && (
-                                        <button
-                                          type="button"
-                                          className="icon-btn-sm danger"
-                                          onClick={() => handleRemoveNode(nodeUrl)}
-                                        >
-                                          <Trash2 size={11} />
-                                        </button>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  <div className="node-pin-row" style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
-                                    <span style={{ color: 'var(--text-muted)' }}>Pin Model:</span>
+                                <div key={nodeUrl} className="cluster-node-row">
+                                  <span className={`status-dot ${status.online ? 'online' : 'offline'}`} />
+                                  <input
+                                    type="text"
+                                    value={nodeUrl}
+                                    readOnly
+                                    className="cluster-node-url-field font-mono"
+                                    title={nodeUrl}
+                                  />
+                                  <div className="node-pin-group">
+                                    <span className="node-pin-label">Pin Model:</span>
                                     <select
                                       value={currentPin}
                                       onChange={(e) => handleUpdateNodePin(nodeUrl, e.target.value)}
-                                      style={{ padding: '2px 6px', fontSize: '11px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }}
+                                      className="node-pin-select font-mono"
                                     >
-                                      <option value="__auto__">Auto (Load Balanced)</option>
+                                      <option value="__auto__">Auto (Any Model)</option>
                                       {(status.models || []).map((m) => (
                                         <option key={m} value={m}>{m}</option>
                                       ))}
                                     </select>
                                   </div>
+                                  <span className="node-latency">
+                                    {status.latency_ms !== undefined ? `${status.latency_ms} ms` : status.online ? 'Ready' : 'Offline'}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    className="icon-btn-sm"
+                                    onClick={() => testNodeConnection(nodeUrl)}
+                                    title="Ping node"
+                                  >
+                                    <RefreshCw size={11} className={status.testing ? 'animate-spin' : ''} />
+                                  </button>
+                                  {clusterNodes.length > 1 && (
+                                    <button
+                                      type="button"
+                                      className="icon-btn-sm danger"
+                                      onClick={() => handleRemoveNode(nodeUrl)}
+                                      title="Remove node"
+                                    >
+                                      <Trash2 size={11} />
+                                    </button>
+                                  )}
                                 </div>
                               );
                             })}
@@ -954,32 +928,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {/* TAB 3: CURRICULUM & STORAGE */}
             {activeTab === 'storage' && (
               <div className="settings-section">
-                {/* 1-Click Masterpack Hero Card */}
+                {/* Masterpack Status Card (No confusing error-prone button when all domains are installed!) */}
                 <div className="masterpack-hero-card">
                   <div className="masterpack-info-col">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Package size={18} style={{ color: 'var(--accent-gold)' }} />
-                      <h4>Canonical Master Curriculum Pack</h4>
+                      <CheckCircle size={18} style={{ color: '#10b981' }} />
+                      <h4>Canonical Master Curriculum (All 12 Core Domains)</h4>
                     </div>
                     <p>
-                      The master curriculum bundle includes all 12 core domains and 539 masterclasses.
-                      Currently <strong>{packagesData.installed.length}</strong> domains are installed locally.
+                      {packagesData.installed.length >= 12
+                        ? `All 12 canonical domains and 539 masterclasses are verified and installed locally.`
+                        : `${packagesData.installed.length} of 12 domains installed. Download the complete masterpack to unlock all courses offline.`}
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    className="btn-primary"
-                    onClick={() => handleInstallDomain('complete')}
-                    disabled={actionInProgress === 'install-complete'}
-                  >
-                    {actionInProgress === 'install-complete' ? (
-                      <Loader2 size={13} className="animate-spin" />
-                    ) : (
-                      <Download size={13} />
-                    )}
-                    <span>{packagesData.installed.length >= 12 ? 'Update Full Curriculum Pack' : 'Download Complete Masterpack'}</span>
-                  </button>
+                  {packagesData.installed.length < 12 && (
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      onClick={() => handleInstallDomain('complete')}
+                      disabled={actionInProgress === 'install-complete'}
+                    >
+                      {actionInProgress === 'install-complete' ? (
+                        <Loader2 size={13} className="animate-spin" />
+                      ) : (
+                        <Download size={13} />
+                      )}
+                      <span>Download Complete Curriculum (37 MB)</span>
+                    </button>
+                  )}
                 </div>
 
                 {storeMessage && (
@@ -1012,10 +989,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </label>
                 </div>
 
-                {/* Installed Domains Grid */}
+                {/* Installed Domains Grid (Filtered to prevent 'complete' duplication) */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
                   <h4 className="panel-box-heading" style={{ margin: 0 }}>
-                    Installed Curriculum Domains ({packagesData.installed.length})
+                    Installed Curriculum Domains ({packagesData.installed.filter((p) => p.domain !== 'complete').length})
                   </h4>
                   <button
                     type="button"
@@ -1161,11 +1138,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           <div className="settings-body-actions">
-            {savedMessage && (
-              <span className="save-confirm-inline">
-                <Check size={14} /> Preferences saved successfully
-              </span>
-            )}
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cancel
             </button>

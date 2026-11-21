@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Loader2, Square, Terminal as TerminalIcon } from 'lucide-react';
+import { Loader2, Square } from 'lucide-react';
 import { TopicTree } from './components/TopicTree';
 import { LessonViewer } from './components/LessonViewer';
 import { TutorChat } from './components/TutorChat';
@@ -103,7 +103,6 @@ export function App() {
   };
 
   const terminalRef = useRef<TerminalDrawerHandle>(null);
-  const [terminalConnected, setTerminalConnected] = useState(false);
 
   const fetchTree = async () => {
     try {
@@ -798,16 +797,6 @@ export function App() {
               <span className={`status-dot ${mentorConnected === 'connected' ? 'online' : 'offline'}`} />
               <span>Mentor {mentorConnected === 'connected' ? 'Online' : 'Offline'}</span>
             </span>
-
-            <button
-              type="button"
-              className={`terminal-toggle-pill ${terminalConnected ? 'connected' : 'disconnected'}`}
-              onClick={() => setTerminalOpen((prev: boolean) => !prev)}
-              title="Toggle PTY Terminal Drawer"
-            >
-              <TerminalIcon size={11} />
-              <span>Terminal</span>
-            </button>
           </div>
         </div>
 
@@ -815,7 +804,6 @@ export function App() {
           ref={terminalRef}
           isOpen={terminalOpen}
           onToggle={() => setTerminalOpen((prev: boolean) => !prev)}
-          onConnectionChange={setTerminalConnected}
         />
       </div>
 
