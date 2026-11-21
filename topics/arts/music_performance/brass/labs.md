@@ -227,7 +227,7 @@ Lip slurs move between partials with no tongue — the core tool for building fl
 | 1+3 | G, D, G, B, D, F, G |
 | 1+2+3 | F#, C#, F#, A#, C#, E, F# |
 
-**Drill 1 — Two-partial slur (beginner), open fingering:**
+**Drill 1 — Two-partial slur, open fingering:**
 ```text
 C4 — G4 — C4 — G4 — C4
 Tempo: 60 BPM, 1 beat per note
@@ -236,14 +236,14 @@ Tongue the first note only ("Tu"), slur everything after
 ```
 Keep the air moving continuously — the only change between the two notes is a small bump in lip tension and air speed going up.
 
-**Drill 2 — Three-partial slur (intermediate), open fingering:**
+**Drill 2 — Three-partial slur, open fingering:**
 ```text
 C4 — G4 — C5 — G4 — C4   (2nd -> 3rd -> 4th -> 3rd -> 2nd partial)
 Tempo: 60 -> 80 -> 100 BPM, 4 reps per fingering
 Run on all 7 fingerings before moving to Drill 3
 ```
 
-**Drill 3 — Four-partial slur with valve changes (advanced):**
+**Drill 3 — Four-partial slur with valve changes:**
 ```text
 Bar 1 (open):    C4 — G4 — C5 — E5
 Bar 2 (valve 2): Bb3 — F4 — Bb4 — D5

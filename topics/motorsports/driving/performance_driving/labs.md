@@ -872,7 +872,7 @@ Corrective Actions (Priority Order):
 2. Reduce front tire pressure by 1-2 psi
 3. Increase front negative camber by 0.5°
 4. Reduce front toe-in by 1-2 mm per side
-5. (Advanced) Increase front aero downforce via wing angle or splitter extension
+5. Aerodynamic adjustment: Increase front aero downforce via wing angle or splitter extension
 
 Expected Result:
 - Increased mid-corner lateral acceleration by 0.05-0.10 g
@@ -899,7 +899,7 @@ Corrective Actions:
 2. Reduce rear anti-roll bar stiffness by one position OR increase front bar stiffness
 3. Reduce rear negative camber by 0.5°
 4. Reduce rear brake bias by 1-2%
-5. (Advanced) Increase rear aero downforce via diffuser rake angle
+5. Aerodynamic adjustment: Increase rear aero downforce via diffuser rake angle
 
 Expected Result:
 - Reduced rear damper velocity oscillations during braking
@@ -926,7 +926,7 @@ Corrective Actions:
 2. Optimize rear tire pressure (target even temperature profile)
 3. Reduce differential power-lock ramp angle or preload
 4. Increase rear spring rate to reduce squat under acceleration
-5. (Advanced) Increase rear aero downforce or reduce front downforce for balance
+5. Aerodynamic adjustment: Increase rear aero downforce or reduce front downforce for balance
 
 Expected Result:
 - Improved longitudinal acceleration (reduced wheelspin)

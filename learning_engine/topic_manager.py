@@ -254,6 +254,14 @@ def resolve_subtopic(query: str) -> Optional[Tuple[str, str, str, Path]]:
     query = query.strip("/").lower()
     tree = get_topic_tree()
 
+    # 0. Support 4+ segment queries (e.g. domain/discipline/topic/lesson_id)
+    q_parts = query.split("/")
+    if len(q_parts) >= 4:
+        trimmed_query = "/".join(q_parts[:3])
+        match = resolve_subtopic(trimmed_query)
+        if match:
+            return match
+
     # 1. Exact relative match or exact course/unit slug match
     for domain, ddata in tree.items():
         for disc, disc_data in ddata["disciplines"].items():

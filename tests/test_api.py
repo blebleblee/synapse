@@ -45,6 +45,12 @@ def test_api_topic_valid():
     assert "domain" in data
     assert data["domain"] == "computing"
     assert "lesson" in data
+    assert "available_levels" not in data
+
+def test_api_quiz_validation():
+    # Verify 404 on invalid topic
+    res = client.post("/api/quiz", json={"query": "non_existent_topic_xyz"})
+    assert res.status_code == 404
 
 def test_api_topic_not_found():
     res = client.get("/api/topic?query=fake_non_existent_topic_123")
@@ -107,6 +113,16 @@ def test_api_multi_lesson_discovery_and_selection():
     data_l3 = res_l3.json()
     assert data_l3["active_lesson_id"] == "lesson_03_mvcc_wal_and_vacuum"
     assert "MVCC" in data_l3["lesson"] or "Multiversion" in data_l3["lesson"] or "Multi-Version" in data_l3["lesson"]
+
+def test_api_four_segment_path_and_lesson_resolution():
+    # Test 4-segment pathway link from Skills Graph
+    res = client.get("/api/topic?query=computing/ai/deep_learning/04_transformer_attention_mechanisms")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["domain"] == "computing"
+    assert data["category"] == "ai"
+    assert data["subtopic"] == "deep_learning"
+    assert data["active_lesson_id"] == "lesson_04_optimization_techniques"
 
 def test_api_cluster_status():
     res = client.get("/api/settings/cluster-status")

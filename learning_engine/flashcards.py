@@ -22,25 +22,15 @@ def generate_flashcards(query: str, provider_type: Optional[str] = None, model: 
     persona = get_domain_persona(domain)
 
     context_parts = []
-    if (sub_path / "FOUNDATION.md").exists():
-        context_parts.append((sub_path / "FOUNDATION.md").read_text(encoding="utf-8")[:3000])
-
     discovered = get_unit_lessons(sub_path)
     for l in discovered[:4]:
         p = Path(l["path"])
         if p.exists():
             context_parts.append(p.read_text(encoding="utf-8")[:2000])
 
-    if not context_parts:
-        # Check leveled subfolders
-        for lvl in ["beginner", "intermediate", "advanced"]:
-            lvl_dir = sub_path / lvl
-            if (lvl_dir / "FOUNDATION.md").exists():
-                context_parts.append((lvl_dir / "FOUNDATION.md").read_text(encoding="utf-8")[:1500])
-            for l in get_unit_lessons(lvl_dir)[:2]:
-                p = Path(l["path"])
-                if p.exists():
-                    context_parts.append(p.read_text(encoding="utf-8")[:1500])
+    labs_file = sub_path / "labs.md"
+    if labs_file.exists():
+        context_parts.append(labs_file.read_text(encoding="utf-8")[:2000])
 
     prompt = f"""You are creating an Anki spaced-repetition active recall flashcard deck for '{sub.replace('_', ' ').title()}'.
 Based on the curriculum text below, generate 8 high-impact active recall flashcards.

@@ -44,14 +44,12 @@ interface LessonViewerProps {
   contentRef: React.RefObject<HTMLDivElement>;
   isLoading: boolean;
   isGenerating: boolean;
-  onGenerate: (query: string, force?: boolean, level?: string) => void;
+  onGenerate: (query: string, force?: boolean) => void;
   onRunInTerminal: (command: string) => void;
   activeTab: 'study' | 'labs' | 'quiz';
   setActiveTab: (tab: 'study' | 'labs' | 'quiz') => void;
   activeLessonId?: string | null;
   onToggleLessonCompletion?: (path: string, lessonId: string, completed?: boolean) => Promise<void>;
-  currentLevel: string;
-  onSelectLevel: (level: string) => void;
   quizQuestions: QuizQuestion[];
   isLoadingQuiz: boolean;
   onRefreshQuiz: () => void;
@@ -68,6 +66,7 @@ interface LessonViewerProps {
   ollamaHost?: string;
   onNavigateBreadcrumb?: (type: 'domain' | 'category' | 'subtopic', path: string) => void;
   onSelectLesson?: (lessonId: string) => void;
+  onTranslationStatusChange?: (isTranslating: boolean, langName?: string) => void;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -80,8 +79,6 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   activeTab,
   setActiveTab,
   activeLessonId,
-  currentLevel,
-  onSelectLevel,
   quizQuestions,
   isLoadingQuiz,
   onRefreshQuiz,
@@ -99,6 +96,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onNavigateBreadcrumb,
   onSelectLesson,
   onToggleLessonCompletion,
+  onTranslationStatusChange,
 }) => {
   const [isSpeakingVoice, setIsSpeakingVoice] = useState(false);
   const [readingLang, setReadingLang] = useState<'en' | 'cs' | 'de' | 'es'>('en');
@@ -170,8 +168,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     setReadingLang('en');
     setTranslatedMarkdown(null);
     setIsTranslating(false);
+    onTranslationStatusChange?.(false);
     setTranslationError(null);
-  }, [topic?.path, activeTab, currentLevel, activeLessonId]);
+  }, [topic?.path, activeTab, activeLessonId, onTranslationStatusChange]);
 
   const rawMarkdown = useMemo(() => {
     if (!topic) return '';
@@ -196,7 +195,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     setReadingLang(lang);
     if (!rawMarkdown) return;
 
+    const langName = lang === 'cs' ? 'Čeština' : lang === 'de' ? 'Deutsch' : 'Español';
     setIsTranslating(true);
+    onTranslationStatusChange?.(true, langName);
     try {
       const res = await fetch('/api/translate', {
         method: 'POST',
@@ -221,6 +222,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       setTranslationError(err.message || 'Translation failed');
     } finally {
       setIsTranslating(false);
+      onTranslationStatusChange?.(false);
     }
   };
 
@@ -440,28 +442,11 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           <span className="crumb-subtopic">{toTitleCase(topic.display_title || topic.subtopic)}</span>
         </div>
 
-        {/* Top Right: Difficulty Tier Selector + Mastery Selector */}
+        {/* Top Right: Curriculum Badge + Mastery Selector */}
         <div className="viewer-header-right">
-          {topic.available_levels && topic.available_levels.length > 0 ? (
-            <div className="header-tier-pills" title="Difficulty Tier">
-              {['beginner', 'intermediate', 'advanced']
-                .filter((lvl) => topic.available_levels?.includes(lvl))
-                .map((lvl) => (
-                  <button
-                    key={lvl}
-                    className={`header-tier-btn ${currentLevel === lvl ? 'active' : ''}`}
-                    onClick={() => onSelectLevel(lvl)}
-                    title={`Switch difficulty tier to ${lvl}`}
-                  >
-                    {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
-                  </button>
-                ))}
-            </div>
-          ) : (
-            <div className="header-curriculum-badge" title="Comprehensive Unified Curriculum">
-              <span className="badge-pill-unified">Unified Masterclass</span>
-            </div>
-          )}
+          <div className="header-curriculum-badge" title="Comprehensive Unified Curriculum">
+            <span className="badge-pill-unified">Unified Masterclass</span>
+          </div>
 
           <div className="mastery-selector">
             <Award size={13} className={`mastery-icon ${masteryState}`} />
@@ -684,7 +669,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                   onClick={() => {
                     setOptionsMenuOpen(false);
                     if (window.confirm(`Are you sure you want to regenerate '${topic.subtopic}' with AI? This will re-synthesize content.`)) {
-                      onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, true, currentLevel);
+                      onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, true);
                     }
                   }}
                   disabled={isGenerating}
@@ -784,7 +769,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
 
         {activeTab === 'quiz' ? (
           <SocraticQuizView
-            subtopicTitle={`${topic.subtopic.replace(/_/g, ' ')} (${currentLevel.toUpperCase()})`}
+            subtopicTitle={topic.display_title || toTitleCase(topic.subtopic)}
             questions={quizQuestions}
             isLoading={isLoadingQuiz}
             onRefreshQuiz={onRefreshQuiz}
@@ -794,11 +779,11 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             <Sparkles size={36} className="missing-icon" />
             <h3>No Content Generated Yet</h3>
             <p>
-              Generate the curriculum units (Foundation, Lesson, and Labs) for this topic.
+              Generate the curriculum units (Masterclass Lessons and Labs) for this topic.
             </p>
             <button
               className="btn-primary"
-              onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, false, currentLevel)}
+              onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, false)}
               disabled={isGenerating}
             >
               <Sparkles size={16} />

@@ -1048,7 +1048,7 @@ Environmental Conditions:
 - Verify JTAG/SWD pin connections with multimeter continuity test
 - Check that target is powered and clocked (measure XTAL with oscilloscope)
 - Try lower JTAG clock speed: `adapter speed 100` in OpenOCD config
-- Read target's JTAG IDCODE manually by toggling pins (advanced)
+- Read target's JTAG IDCODE manually by bit-banging GPIO pins
 
 **Symptom: Flashrom reports "No EEPROM/flash device found"**
 - Verify SPI wiring: swap MOSI/MISO if incorrect

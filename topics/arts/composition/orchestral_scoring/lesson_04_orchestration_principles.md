@@ -588,7 +588,7 @@ Set a metronome to ♩=60 and name the sounding pitch for each written pitch wit
 | 11 | Double bass | C3 | C2 |
 | 12 | Glockenspiel | C5 | C7 |
 
-### 11.2 Drill 1: Chorale orchestration (beginner, 45 minutes)
+### 11.2 Drill 1: Chorale orchestration (45 minutes)
 
 **Material:** any 8-bar Bach chorale from the public-domain 371 Harmonized Chorales (IMSLP), in C major or G major, ♩=60.
 
@@ -598,7 +598,7 @@ Set a metronome to ♩=60 and name the sounding pitch for each written pitch wit
 
 **Pass test:** every note within instrument range, no complete triads below C3, soprano clearly dominant when you play the parts separately, and brass at least one dynamic step under strings.
 
-### 11.3 Drill 2: Melody and accompaniment (intermediate, 60 minutes)
+### 11.3 Drill 2: Melody and accompaniment (60 minutes)
 
 **Material:** an 8-bar lyrical melody in Bb major, range F4 to Bb5, mf, I-IV-V-I.
 
@@ -608,7 +608,7 @@ Set a metronome to ♩=60 and name the sounding pitch for each written pitch wit
 
 **Pass test:** melody is audible in all three, and accompaniment sits at least one dynamic step lower or a sixth away in register.
 
-### 11.4 Drill 3: Additive crescendo (advanced, 90 minutes)
+### 11.4 Drill 3: Additive crescendo (90 minutes)
 
 **Material:** a D major triad sustained for 16 bars, pp to fff.
 
@@ -618,13 +618,13 @@ Set a metronome to ♩=60 and name the sounding pitch for each written pitch wit
 
 **Pass test:** at no point do more than two new instrument types enter at once, and the lowest register and percussion enter in the last quarter.
 
-### 11.5 Drill 4: Reverse orchestration (advanced, 60 minutes)
+### 11.5 Drill 4: Reverse orchestration (60 minutes)
 
 Choose 8 bars from a published orchestral score. Reduce it to a 3-staff short score (melody, harmony, bass) and play it at the keyboard. Then list which instruments carry each role.
 
 **Pass test:** you can name the melody, bass, and harmony instruments, and the doublings, for every bar.
 
-### 11.6 Drill 5: Instrumental synthesis (expert, 2 hours)
+### 11.6 Drill 5: Instrumental synthesis (2 hours)
 
 Reconstruct a piano note with orchestral instruments, using the real spectrum.
 

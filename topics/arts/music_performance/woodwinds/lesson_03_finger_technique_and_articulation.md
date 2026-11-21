@@ -215,7 +215,7 @@ Each drill below states its goal, the exact procedure, what to listen for, and a
 
 **Mastery target**: staccato scales and arpeggios at ♩ = 120 (eighths or sixteenths depending on instrument facility) with zero audible scoop, crack, or ghost on playback.
 
-### Drill 4 — Polyrhythmic Independence (Advanced)
+### Drill 4 — Polyrhythmic Independence
 
 **Goal**: break residual tendon coupling between fingers for independence needed in contemporary repertoire (Berio, Ferneyhough, Lachenmann) and fast bebop lines that cross hand groupings awkwardly.
 

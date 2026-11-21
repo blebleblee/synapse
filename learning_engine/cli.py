@@ -173,10 +173,10 @@ def cmd_generate(args):
 
     provider = get_provider(provider_type=args.provider, model=args.model, domain=domain)
     print(f"[*] Active LLM Provider: {provider.__class__.__name__} (Model: {getattr(provider, 'model', 'default')})")
-    print(f"[*] Target Level: {args.level or 'ALL (Beginner, Intermediate, Advanced)'}")
-    print("[*] Generating Foundation, Lesson, and Labs...")
+    print("[*] Target Curriculum: Masterclass Units (Lessons and Labs)")
+    print("[*] Generating Lessons and Labs...")
 
-    results = generate_subtopic_content(domain, cat, sub, sub_path, provider=provider, force=args.force, level=args.level)
+    results = generate_subtopic_content(domain, cat, sub, sub_path, provider=provider, force=args.force)
     print(f"\n[✔] Learning modules updated at: {sub_path}")
 
 def cmd_chat(args):
@@ -270,7 +270,7 @@ def cmd_lint(args):
         subprocess.run(["node", str(script_path), target])
 
 def cmd_export(args):
-    out_file = export_handbook(domain=args.domain, level=args.level)
+    out_file = export_handbook(domain=args.domain)
     print(f"[✔] Successfully exported {args.domain} handbook to: {out_file}")
 
 def cmd_flashcards(args):

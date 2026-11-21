@@ -290,13 +290,13 @@ A/B `rich_220hz.wav` against `comb_filtered_2ms.wav`. This hollow, nasal, "under
 
 ## Part 7: Lab Exercises — Progressive Build
 
-### Lab 7.1 (Beginner): Room Mode Hunt
+### Lab 7.1: Room Mode Hunt
 1. Run the sweep generator from Drill 2.2.
 2. Walk your room, log every frequency that swells, within ±5 Hz.
 3. Compare against `f1 = 172/L` for your room's length, width, and height.
 4. Deliverable: a simple table of predicted vs. heard modes, and a photo of where you'd place a bass trap based on the result.
 
-### Lab 7.2 (Intermediate): RT60 Map
+### Lab 7.2: RT60 Map
 1. Record balloon-pop impulses at 4 positions in your room (center, 2 corners, near a reflective wall).
 2. Run `estimate_rt60()` on each.
 3. Deliverable: a bar chart (matplotlib) of RT60 by position, with a one-paragraph explanation of why corners usually read higher at low frequency.
@@ -314,7 +314,7 @@ plt.legend()
 plt.show()
 ```
 
-### Lab 7.3 (Advanced): Fix a Comb Filter by Ear
+### Lab 7.3: Comb Filter Phase Alignment
 1. Record a snare drum (or any percussive source — even a tabletop tap) with two mics: one close, one 1–1.5 meters back.
 2. Sum them in your DAW and listen — you should hear the hollow comb-filtered quality.
 3. Nudge the far mic's track earlier/later in small increments (try 0.5ms steps) while listening to the sum. Find the position that sounds fullest (reflections reinforcing, not canceling) — this is the "3:1 rule" distance engineers use as a starting point, now verified by ear instead of just assumed.

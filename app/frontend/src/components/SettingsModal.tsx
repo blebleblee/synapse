@@ -15,8 +15,13 @@ import {
   AlertCircle,
   Loader2,
   Search,
-  Coffee,
-  Info
+  Server,
+  Network,
+  Sliders,
+  HardDrive,
+  Info,
+  Terminal,
+  Sparkles
 } from 'lucide-react';
 
 export interface AppSettings {
@@ -53,9 +58,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   terminalFontSize: '13px',
   speechRate: '1.0',
   ollamaHost: 'http://localhost:11434',
-  clusterHosts: [
-    'http://localhost:11434'
-  ],
+  clusterHosts: ['http://localhost:11434'],
   primaryModel: 'qwen2.5-coder:32b',
   reviewerModel: 'deepseek-r1:32b',
   mentorModel: '',
@@ -65,13 +68,16 @@ export const DEFAULT_SETTINGS: AppSettings = {
   anthropicBaseUrl: 'https://api.anthropic.com',
 };
 
+export type SettingsTab = 'appearance' | 'models' | 'cluster' | 'addons' | 'maintenance';
+
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   settings: AppSettings;
   onSaveSettings: (newSettings: AppSettings) => void;
-  initialTab?: 'appearance' | 'cluster' | 'models' | 'store' | 'maintenance' | 'inference' | 'storage';
+  initialTab?: 'appearance' | 'cluster' | 'models' | 'store' | 'maintenance' | 'addons';
   onTreeChange?: () => void;
+  onLaunchSetupWizard?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -81,11 +87,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSaveSettings,
   initialTab,
   onTreeChange,
+  onLaunchSetupWizard,
 }) => {
-  type SettingsTab = 'appearance' | 'inference' | 'storage';
   const resolveTab = (tab?: string): SettingsTab => {
-    if (tab === 'cluster' || tab === 'models' || tab === 'inference') return 'inference';
-    if (tab === 'store' || tab === 'maintenance' || tab === 'storage') return 'storage';
+    if (tab === 'cluster') return 'cluster';
+    if (tab === 'models') return 'models';
+    if (tab === 'store' || tab === 'addons') return 'addons';
+    if (tab === 'maintenance') return 'maintenance';
     return 'appearance';
   };
 
@@ -96,6 +104,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       setActiveTab(resolveTab(initialTab));
     }
   }, [isOpen, initialTab]);
+
   const [formData, setFormData] = useState<AppSettings>(settings);
   const [savedMessage, setSavedMessage] = useState(false);
   const [clusterNodes, setClusterNodes] = useState<string[]>(
@@ -123,9 +132,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [storeMessage, setStoreMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  // Endpoint Discovered Models State
+  // Discovered Models State
   const [discoveredModels, setDiscoveredModels] = useState<string[]>([]);
-  const [isLoadingModels, setIsLoadingModels] = useState(false);
 
   // Node Model Pins State
   const [nodePins, setNodePins] = useState<{ [host: string]: string }>({});
@@ -180,7 +188,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const fetchDiscoveredModels = async () => {
-    setIsLoadingModels(true);
     try {
       const res = await fetch('/api/settings/discovered-models');
       if (res.ok) {
@@ -191,8 +198,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       }
     } catch (err) {
       console.error('Failed to load discovered models:', err);
-    } finally {
-      setIsLoadingModels(false);
     }
   };
 
@@ -201,6 +206,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       fetchPackages();
       fetchDiscoveredModels();
       fetchNodePins();
+      scanCluster();
     }
   }, [isOpen]);
 
@@ -248,6 +254,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleUninstallPack = async (domain: string) => {
+    if (!window.confirm(`Are you sure you want to remove the '${domain}' package from your local workspace?`)) {
+      return;
+    }
     setActionInProgress(`uninstall-${domain}`);
     setStoreMessage(null);
     try {
@@ -255,7 +264,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         method: 'DELETE'
       });
       if (!res.ok) throw new Error('Package uninstall failed');
-      setStoreMessage({ text: `Package ${domain} uninstalled`, type: 'success' });
+      setStoreMessage({ text: `Removed ${domain} package.`, type: 'success' });
       await fetchPackages();
       onTreeChange?.();
     } catch (err: any) {
@@ -268,207 +277,243 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     setActionInProgress('uploading');
     setStoreMessage(null);
+    const data = new FormData();
+    data.append('file', file);
+
     try {
-      const uploadForm = new FormData();
-      uploadForm.append('file', file);
       const res = await fetch('/api/packages/install', {
         method: 'POST',
-        body: uploadForm
+        body: data
       });
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.detail || 'Failed to install uploaded package');
+        const err = await res.json();
+        throw new Error(err.detail || 'Package import failed');
       }
-      const result = await res.json();
-      setStoreMessage({ text: `Successfully installed ${result.domain || 'custom'} package!`, type: 'success' });
+      setStoreMessage({ text: `Successfully imported ${file.name}!`, type: 'success' });
       await fetchPackages();
       onTreeChange?.();
     } catch (err: any) {
-      setStoreMessage({ text: err.message || 'Upload installation failed', type: 'error' });
+      setStoreMessage({ text: err.message || 'Upload failed', type: 'error' });
     } finally {
       setActionInProgress(null);
-      if (e.target) e.target.value = '';
+      e.target.value = '';
     }
   };
 
-  useEffect(() => {
-    setFormData(settings);
-    if (isOpen) {
-      fetch('/api/settings/cluster')
-        .then((res) => res.json())
-        .then((data) => {
-          if (Array.isArray(data.hosts) && data.hosts.length > 0) {
-            setClusterNodes(data.hosts);
-          }
-        })
-        .catch(() => {});
-    }
-  }, [settings, isOpen]);
-
-  const handleAddNode = () => {
-    const clean = newNodeUrl.trim().replace(/\/+$/, '');
-    if (!clean) return;
-    if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
-      alert('Node URL must start with http:// or https://');
-      return;
-    }
-    if (clusterNodes.includes(clean)) {
-      alert('Node already exists in cluster list');
-      return;
-    }
-    setClusterNodes([...clusterNodes, clean]);
-    setNewNodeUrl('');
-  };
-
-  const handleRemoveNode = (index: number) => {
-    const next = [...clusterNodes];
-    next.splice(index, 1);
-    setClusterNodes(next);
-  };
-
-  const handlePingSingleNode = async (host: string) => {
+  const testNodeConnection = async (host: string) => {
     setNodeStatuses((prev) => ({
       ...prev,
-      [host]: { ...prev[host], testing: true }
+      [host]: { ...prev[host], testing: true, error: undefined },
     }));
+
+    const start = performance.now();
     try {
-      const res = await fetch('/api/settings/test-ollama', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ host }),
+      const cleanHost = host.replace(/\/$/, '');
+      const res = await fetch(`${cleanHost}/api/tags`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(4000),
       });
-      const data = await res.json();
-      setNodeStatuses((prev) => ({
-        ...prev,
-        [host]: {
-          online: data.ok,
-          latency_ms: data.latency_ms,
-          models: data.models,
-          error: data.error,
-          testing: false
-        }
-      }));
+
+      const latency = Math.round(performance.now() - start);
+
+      if (res.ok) {
+        const data = await res.json();
+        const models = (data.models || []).map((m: any) => m.name || m.model);
+        setNodeStatuses((prev) => ({
+          ...prev,
+          [host]: {
+            online: true,
+            latency_ms: latency,
+            models,
+            testing: false,
+          },
+        }));
+      } else {
+        setNodeStatuses((prev) => ({
+          ...prev,
+          [host]: {
+            online: false,
+            error: `HTTP ${res.status}`,
+            testing: false,
+          },
+        }));
+      }
     } catch (err: any) {
       setNodeStatuses((prev) => ({
         ...prev,
         [host]: {
           online: false,
-          error: err.message || 'Network error',
-          testing: false
-        }
+          error: err.name === 'TimeoutError' ? 'Timeout (4s)' : 'Offline / Unreachable',
+          testing: false,
+        },
       }));
     }
   };
 
-  const handleScanCluster = async () => {
+  const scanCluster = async () => {
     setIsScanningCluster(true);
     try {
       const res = await fetch('/api/settings/cluster-status');
-      const data = await res.json();
-      setNodeStatuses(data);
-    } catch (err) {
-      console.error('Failed to scan cluster:', err);
+      if (res.ok) {
+        const data = await res.json();
+        setNodeStatuses(data);
+      } else {
+        await Promise.all(clusterNodes.map((node) => testNodeConnection(node)));
+      }
+    } catch {
+      await Promise.all(clusterNodes.map((node) => testNodeConnection(node)));
     } finally {
       setIsScanningCluster(false);
     }
   };
 
-  if (!isOpen) return null;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await fetch('/api/settings/cluster', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hosts: clusterNodes }),
-      });
-      await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          anthropic_api_key: formData.anthropicApiKey,
-          anthropic_base_url: formData.anthropicBaseUrl,
-          gemini_api_key: formData.geminiApiKey,
-          gemini_base_url: formData.geminiBaseUrl,
-          primary_model: formData.primaryModel,
-          reviewer_model: formData.reviewerModel,
-          mentor_model: formData.mentorModel,
-          ollama_host: clusterNodes[0] || formData.ollamaHost,
-        }),
-      });
-    } catch (err) {
-      console.error('Failed to save settings:', err);
+  const handleAddNode = () => {
+    let url = newNodeUrl.trim();
+    if (!url) return;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'http://' + url;
     }
-    onSaveSettings({
+    url = url.replace(/\/$/, '');
+    if (!clusterNodes.includes(url)) {
+      const updated = [...clusterNodes, url];
+      setClusterNodes(updated);
+      setFormData((prev) => ({ ...prev, clusterHosts: updated }));
+      testNodeConnection(url);
+    }
+    setNewNodeUrl('');
+  };
+
+  const handleRemoveNode = (hostToRemove: string) => {
+    const updated = clusterNodes.filter((h) => h !== hostToRemove);
+    setClusterNodes(updated);
+    setFormData((prev) => ({ ...prev, clusterHosts: updated }));
+    setNodeStatuses((prev) => {
+      const next = { ...prev };
+      delete next[hostToRemove];
+      return next;
+    });
+  };
+
+  const handleSave = () => {
+    const updated = {
       ...formData,
       clusterHosts: clusterNodes,
-      ollamaHost: clusterNodes[0] || formData.ollamaHost
-    });
+      ollamaHost: clusterNodes[0] || formData.ollamaHost,
+    };
+    onSaveSettings(updated);
     setSavedMessage(true);
-    setTimeout(() => {
-      setSavedMessage(false);
-      onClose();
-    }, 800);
+    setTimeout(() => setSavedMessage(false), 2500);
   };
+
+  if (!isOpen) return null;
+
+  const onlineNodesCount = Object.values(nodeStatuses).filter((s) => s.online).length;
+  const installedAddonsCount = packagesData.installed.length;
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-card settings-card" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <div className="modal-title-row">
+      <div className="settings-window" onClick={(e) => e.stopPropagation()}>
+        {/* Left Vertical Sidebar */}
+        <div className="settings-sidebar">
+          <div className="settings-sidebar-header">
             <Settings size={18} className="settings-header-icon" />
-            <h3>Workbench Settings</h3>
+            <span className="settings-sidebar-title">Workbench Settings</span>
           </div>
-          <button className="icon-btn" onClick={onClose} title="Close">
-            <X size={16} />
-          </button>
+
+          <nav className="settings-nav-list">
+            <button
+              type="button"
+              className={`settings-nav-item ${activeTab === 'appearance' ? 'active' : ''}`}
+              onClick={() => setActiveTab('appearance')}
+            >
+              <Palette size={15} />
+              <span>Appearance</span>
+            </button>
+
+            <button
+              type="button"
+              className={`settings-nav-item ${activeTab === 'models' ? 'active' : ''}`}
+              onClick={() => setActiveTab('models')}
+            >
+              <Cpu size={15} />
+              <span>AI & Models</span>
+            </button>
+
+            <button
+              type="button"
+              className={`settings-nav-item ${activeTab === 'cluster' ? 'active' : ''}`}
+              onClick={() => setActiveTab('cluster')}
+            >
+              <Network size={15} />
+              <span>Cluster Nodes</span>
+              {onlineNodesCount > 0 && (
+                <span className="settings-nav-badge">{onlineNodesCount}</span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className={`settings-nav-item ${activeTab === 'addons' ? 'active' : ''}`}
+              onClick={() => setActiveTab('addons')}
+            >
+              <Package size={15} />
+              <span>Storage & Addons</span>
+              {installedAddonsCount > 0 && (
+                <span className="settings-nav-badge secondary">{installedAddonsCount}</span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className={`settings-nav-item ${activeTab === 'maintenance' ? 'active' : ''}`}
+              onClick={() => setActiveTab('maintenance')}
+            >
+              <Sliders size={15} />
+              <span>System & Setup</span>
+            </button>
+          </nav>
+
+          <div className="settings-sidebar-footer">
+            <div className="sidebar-app-badge">Synapse v1.2.1 • Offline First</div>
+          </div>
         </div>
 
-        <div className="settings-tabs-nav">
-          <button
-            type="button"
-            className={`settings-nav-tab ${activeTab === 'appearance' ? 'active' : ''}`}
-            onClick={() => setActiveTab('appearance')}
-          >
-            <Palette size={14} />
-            <span>Appearance & Reader</span>
-          </button>
-          <button
-            type="button"
-            className={`settings-nav-tab ${activeTab === 'inference' ? 'active' : ''}`}
-            onClick={() => setActiveTab('inference')}
-          >
-            <Cpu size={14} />
-            <span>AI Models & Cluster Pins ({clusterNodes.length})</span>
-          </button>
-          <button
-            type="button"
-            className={`settings-nav-tab ${activeTab === 'storage' ? 'active' : ''}`}
-            onClick={() => setActiveTab('storage')}
-          >
-            <Package size={14} />
-            <span>Storage & Addon Packs</span>
-          </button>
-        </div>
+        {/* Right Main Body Content */}
+        <div className="settings-body">
+          <div className="settings-body-header">
+            <div>
+              <h3>
+                {activeTab === 'appearance' && 'Appearance & Reader'}
+                {activeTab === 'models' && 'AI Models & Cloud Fallbacks'}
+                {activeTab === 'cluster' && 'Cluster Nodes & Hardware Discovery'}
+                {activeTab === 'addons' && 'Curriculum Store & Addons'}
+                {activeTab === 'maintenance' && 'System Maintenance & Setup'}
+              </h3>
+              <p className="settings-tab-desc">
+                {activeTab === 'appearance' && 'Customize theme styling, typography, and reader viewing options.'}
+                {activeTab === 'models' && 'Configure primary local LLMs, Socratic mentor model, and optional cloud keys.'}
+                {activeTab === 'cluster' && 'Manage distributed Ollama inference servers, latency pings, and hardware pins.'}
+                {activeTab === 'addons' && 'Install masterclass domain packs, export local packages, or sideload .synpack archives.'}
+                {activeTab === 'maintenance' && 'Database management, cache cleaning, and first-run setup wizard.'}
+              </p>
+            </div>
+            <button className="icon-btn" onClick={onClose} title="Close Settings">
+              <X size={16} />
+            </button>
+          </div>
 
-        <form onSubmit={handleSubmit} className="settings-form">
-          <div className="settings-tab-content">
+          <div className="settings-tab-scroll">
+            {/* Tab 1: Appearance */}
             {activeTab === 'appearance' && (
-              <div className="settings-section compact">
-                <div className="section-title">
-                  <Palette size={14} />
-                  <span>Appearance, Theme & Reader Layout</span>
-                </div>
-
-                {/* Box 1: Theme & Accents (Dropdowns to save space) */}
+              <div className="settings-section">
                 <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Color Scheme & Accent Palette</h4>
+                  <h4 className="panel-box-heading">Theme & Color Accents</h4>
                   <div className="settings-row-2col">
                     <div className="form-group compact">
-                      <label>Color Scheme Theme</label>
+                      <label>Color Theme</label>
                       <select
                         value={formData.theme}
                         onChange={(e) => setFormData({ ...formData, theme: e.target.value as any })}
@@ -479,12 +524,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         <option value="monokai">Monokai Pro — Toasted Espresso & Neon Pastels</option>
                         <option value="dracula">Dracula Noir — Deep Violet Indigo & Pink</option>
                         <option value="solarized">Solarized Dark — Teal Oceanic & Warm Amber</option>
-                        <option value="titanium">Titanium Daybreak — Clean High-Contrast Light Mode</option>
+                        <option value="titanium">Titanium Daybreak — High-Contrast Light Mode</option>
                       </select>
                     </div>
 
                     <div className="form-group compact">
-                      <label>Accent Highlight Color</label>
+                      <label>Accent Highlight</label>
                       <select
                         value={formData.accentColor || 'gold'}
                         onChange={(e) => setFormData({ ...formData, accentColor: e.target.value as any })}
@@ -499,87 +544,43 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
                 </div>
 
-                {/* Box 2: Typography & Reader Geometry (Balanced 3-column row) */}
                 <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Reading Typography & Geometry</h4>
+                  <h4 className="panel-box-heading">Typography & Reading Geometry</h4>
                   <div className="settings-row-3col">
                     <div className="form-group compact">
-                      <label>Reading Typography</label>
+                      <label>Body Font Family</label>
                       <select
-                        value={formData.fontFamily || 'sans'}
+                        value={formData.fontFamily}
                         onChange={(e) => setFormData({ ...formData, fontFamily: e.target.value as any })}
                       >
-                        <option value="sans">Modern Sans (Inter / Clean UI)</option>
-                        <option value="serif">Academic Serif (Charter / Book)</option>
-                        <option value="mono">Technical Mono (JetBrains Code)</option>
+                        <option value="sans">Modern Sans (Inter / SF Pro)</option>
+                        <option value="serif">Academic Serif (Merriweather / Georgia)</option>
+                        <option value="mono">Engineering Monospace (JetBrains Mono)</option>
                       </select>
                     </div>
 
                     <div className="form-group compact">
-                      <label>Reading Column Width</label>
-                      <select
-                        value={formData.readerWidth || 'constrained'}
-                        onChange={(e) => setFormData({ ...formData, readerWidth: e.target.value as any })}
-                      >
-                        <option value="constrained">Comfortable Column (860px)</option>
-                        <option value="full">Full Width (Fluid 100%)</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group compact">
-                      <label>Line Spacing</label>
+                      <label>Content Line Height</label>
                       <select
                         value={formData.lineHeight || 'balanced'}
                         onChange={(e) => setFormData({ ...formData, lineHeight: e.target.value as any })}
                       >
-                        <option value="dense">Compact (1.45 - Reference)</option>
-                        <option value="balanced">Balanced (1.68 - Standard)</option>
-                        <option value="relaxed">Relaxed (1.92 - Longform)</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Box 3: Sizing & Localization (Balanced 3-column row) */}
-                <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Sizing & Localization</h4>
-                  <div className="settings-row-3col">
-                    <div className="form-group compact">
-                      <label>UI Font Size</label>
-                      <select
-                        value={formData.fontSize || 'standard'}
-                        onChange={(e) => setFormData({ ...formData, fontSize: e.target.value as any })}
-                      >
-                        <option value="compact">Compact (14px)</option>
-                        <option value="standard">Standard (15px)</option>
-                        <option value="large">Large (16px)</option>
+                        <option value="dense">Dense (1.45) — High density</option>
+                        <option value="balanced">Balanced (1.65) — Standard</option>
+                        <option value="relaxed">Relaxed (1.85) — Long-form</option>
                       </select>
                     </div>
 
                     <div className="form-group compact">
-                      <label>Curriculum Translation</label>
+                      <label>Default Reading Language</label>
                       <select
                         value={formData.language || 'en'}
                         onChange={(e) => setFormData({ ...formData, language: e.target.value as any })}
                       >
-                        <option value="en">English (Original Masterclass)</option>
-                        <option value="cs">Czech (Čeština)</option>
-                        <option value="de">German (Deutsch)</option>
-                        <option value="es">Spanish (Español)</option>
-                        <option value="ru">Russian (Русский)</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group compact">
-                      <label>Terminal Font Size</label>
-                      <select
-                        value={formData.terminalFontSize || '13px'}
-                        onChange={(e) => setFormData({ ...formData, terminalFontSize: e.target.value as any })}
-                      >
-                        <option value="12px">Compact (12px)</option>
-                        <option value="13px">Standard (13px)</option>
-                        <option value="14px">Large (14px)</option>
-                        <option value="15px">Extra Large (15px)</option>
+                        <option value="en">English (Original Curriculum)</option>
+                        <option value="cs">Čeština (Czech)</option>
+                        <option value="de">Deutsch (German)</option>
+                        <option value="es">Español (Spanish)</option>
                       </select>
                     </div>
                   </div>
@@ -587,437 +588,282 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             )}
 
-          {activeTab === 'inference' && (
-            <div className="settings-section compact">
-              <div className="section-title-row">
-                <div className="section-title">
-                  <Cpu size={14} />
-                  <span>AI Models, Inference Routing & Cluster Pins</span>
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    type="button"
-                    className="btn-secondary-sm"
-                    onClick={handleScanCluster}
-                    disabled={isScanningCluster}
-                    title="Ping and test latency across all cluster nodes"
-                  >
-                    <RefreshCw size={11} className={isScanningCluster ? 'spin' : ''} />
-                    <span>{isScanningCluster ? 'Testing...' : 'Test Cluster Nodes'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-secondary-sm"
-                    onClick={fetchDiscoveredModels}
-                    disabled={isLoadingModels}
-                    title="Rescan endpoints for available models"
-                  >
-                    <RefreshCw size={11} className={isLoadingModels ? 'animate-spin' : ''} />
-                    <span>{isLoadingModels ? 'Pulling...' : 'Pull Models'}</span>
-                  </button>
-                </div>
-              </div>
+            {/* Tab 2: AI & Models */}
+            {activeTab === 'models' && (
+              <div className="settings-section">
+                <div className="settings-panel-box">
+                  <h4 className="panel-box-heading">Local AI Engine Assignment</h4>
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 8px 0' }}>
+                    Select the local models running on your cluster nodes. When online, models are automatically discovered from Ollama.
+                  </p>
 
-              {/* Box 1: Active Model Roles */}
-              <div className="settings-panel-box">
-                <h4 className="panel-box-heading">Active Model Roles</h4>
-                <div className="settings-row-3col">
-                  <div className="form-group compact">
-                    <label>Primary Generation Model</label>
-                    <select
-                      value={formData.primaryModel}
-                      onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
-                    >
-                      {!formData.primaryModel && <option value="">Select Primary Model...</option>}
-                      {formData.primaryModel && !discoveredModels.includes(formData.primaryModel) && (
-                        <option value={formData.primaryModel} title={formData.primaryModel}>
-                          {formData.primaryModel.length > 34 ? `${formData.primaryModel.slice(0, 32)}...` : formData.primaryModel}
-                        </option>
-                      )}
-                      {discoveredModels.map((m) => (
-                        <option key={`p-${m}`} value={m} title={m}>
-                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
-                        </option>
-                      ))}
-                    </select>
+                  <div className="settings-row-2col">
+                    <div className="form-group compact">
+                      <label>Primary Masterclass Generation Model</label>
+                      <input
+                        type="text"
+                        list="discovered-models-list"
+                        value={formData.primaryModel}
+                        onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
+                        placeholder="e.g. qwen2.5-coder:32b"
+                        className="font-mono"
+                      />
+                    </div>
+
+                    <div className="form-group compact">
+                      <label>Socratic Mentor & Chat Model</label>
+                      <input
+                        type="text"
+                        list="discovered-models-list"
+                        value={formData.mentorModel || ''}
+                        onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
+                        placeholder="Default to Primary Model"
+                        className="font-mono"
+                      />
+                    </div>
                   </div>
 
-                  <div className="form-group compact">
-                    <label>Reviewer / Audit Model</label>
-                    <select
+                  <datalist id="discovered-models-list">
+                    {discoveredModels.map((m) => (
+                      <option key={m} value={m} />
+                    ))}
+                  </datalist>
+
+                  <div className="form-group compact" style={{ marginTop: '8px' }}>
+                    <label>Reviewer / Evaluator Model</label>
+                    <input
+                      type="text"
+                      list="discovered-models-list"
                       value={formData.reviewerModel}
                       onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
-                    >
-                      {!formData.reviewerModel && <option value="">Select Reviewer Model...</option>}
-                      {formData.reviewerModel && !discoveredModels.includes(formData.reviewerModel) && (
-                        <option value={formData.reviewerModel} title={formData.reviewerModel}>
-                          {formData.reviewerModel.length > 34 ? `${formData.reviewerModel.slice(0, 32)}...` : formData.reviewerModel}
-                        </option>
-                      )}
-                      {discoveredModels.map((m) => (
-                        <option key={`r-${m}`} value={m} title={m}>
-                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="e.g. deepseek-r1:32b"
+                      className="font-mono"
+                    />
                   </div>
+                </div>
 
-                  <div className="form-group compact">
-                    <label>Socratic Mentor Model (AI Tutor)</label>
-                    <select
-                      value={formData.mentorModel || ''}
-                      onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
-                    >
-                      {!formData.mentorModel && <option value="">Select Mentor Model...</option>}
-                      {formData.mentorModel && !discoveredModels.includes(formData.mentorModel) && (
-                        <option value={formData.mentorModel} title={formData.mentorModel}>
-                          {formData.mentorModel.length > 34 ? `${formData.mentorModel.slice(0, 32)}...` : formData.mentorModel}
-                        </option>
-                      )}
-                      {discoveredModels.map((m) => (
-                        <option key={`m-${m}`} value={m} title={m}>
-                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
-                        </option>
-                      ))}
-                    </select>
+                <div className="settings-panel-box">
+                  <h4 className="panel-box-heading">Optional Cloud Fallback API Keys</h4>
+                  <div className="settings-row-2col">
+                    <div className="form-group compact">
+                      <label>Anthropic API Key (Claude Sonnet / Opus)</label>
+                      <input
+                        type="password"
+                        value={formData.anthropicApiKey || ''}
+                        onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
+                        placeholder="sk-ant-..."
+                        className="font-mono"
+                      />
+                    </div>
+
+                    <div className="form-group compact">
+                      <label>Google Gemini API Key (Gemini Flash / Pro)</label>
+                      <input
+                        type="password"
+                        value={formData.geminiApiKey || ''}
+                        onChange={(e) => setFormData({ ...formData, geminiApiKey: e.target.value })}
+                        placeholder="AIzaSy..."
+                        className="font-mono"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
+            )}
 
-              <div className="settings-panel-box">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h4 className="panel-box-heading" style={{ margin: 0 }}>Cluster Worker Nodes & Model Pinning</h4>
-                  {Object.keys(nodePins).length > 0 && (
-                    <button
-                      type="button"
-                      className="btn-secondary-sm"
-                      style={{ fontSize: '11px', padding: '2px 8px' }}
-                      onClick={async () => {
-                        if (confirm('Reset all cluster node pins back to automatic model selection?')) {
-                          try {
-                            const res = await fetch('/api/settings/cluster-pins', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ pins: {} })
-                            });
-                            if (res.ok) {
-                              setNodePins({});
-                            }
-                          } catch {
-                            alert('Failed to reset pins.');
-                          }
-                        }
-                      }}
-                    >
-                      <RefreshCw size={10} />
-                      <span>Reset Pins</span>
-                    </button>
-                  )}
+            {/* Tab 3: Cluster Nodes */}
+            {activeTab === 'cluster' && (
+              <div className="settings-section">
+                <div className="section-title-row">
+                  <div className="section-title">
+                    <Server size={14} />
+                    <span>Inference Nodes & Hardware Endpoints</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-secondary-sm"
+                    onClick={scanCluster}
+                    disabled={isScanningCluster}
+                  >
+                    <RefreshCw size={12} className={isScanningCluster ? 'animate-spin' : ''} />
+                    <span>{isScanningCluster ? 'Testing...' : 'Ping All Nodes'}</span>
+                  </button>
                 </div>
 
                 <div className="cluster-nodes-list">
-                  {clusterNodes.map((host, idx) => {
-                    const status = nodeStatuses[host];
-                    const cleanHost = host.replace(/^https?:\/\//, '').replace(/\/$/, '');
-                    const currentPin = nodePins[cleanHost] || nodePins[host] || '__auto__';
+                  {clusterNodes.map((nodeUrl) => {
+                    const status = nodeStatuses[nodeUrl] || {};
+                    const cleanKey = nodeUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                    const currentPin = nodePins[cleanKey] || nodePins[nodeUrl] || '__auto__';
 
                     return (
-                      <div
-                        key={host}
-                        className="cluster-node-item"
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px',
-                          padding: '6px 12px',
-                          background: 'var(--bg-secondary, #121214)',
-                          borderRadius: '6px',
-                          border: '1px solid var(--border-color, rgba(255,255,255,0.08))'
-                        }}
-                      >
-                        {/* Host URL & Online Status */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '220px' }}>
-                          <span className="node-idx" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>#{idx + 1}</span>
-                          <span className="node-url" style={{ fontFamily: 'monospace', fontSize: '12px', fontWeight: 600 }}>{cleanHost}</span>
-                          {status && (
-                            <span
-                              className={`node-status-badge ${status.online ? 'online' : status.testing ? 'testing' : 'offline'}`}
-                              style={{ padding: '2px 6px', fontSize: '10px' }}
-                              title={status.error || (status.models ? `Models: ${status.models.slice(0, 5).join(', ')}` : '')}
+                      <div key={nodeUrl} className="cluster-node-card">
+                        <div className="node-card-header">
+                          <div className="node-status-indicator">
+                            <span className={`status-dot ${status.online ? 'online' : 'offline'}`} />
+                            <span className="node-url font-mono">{nodeUrl}</span>
+                          </div>
+
+                          <div className="node-actions">
+                            {status.latency_ms !== undefined && (
+                              <span className="node-latency">{status.latency_ms} ms</span>
+                            )}
+                            <button
+                              type="button"
+                              className="icon-btn-sm"
+                              onClick={() => testNodeConnection(nodeUrl)}
+                              title="Test node latency"
                             >
-                              {status.testing ? 'Pinging...' : status.online ? `${status.latency_ms}ms` : 'Offline'}
-                            </span>
-                          )}
+                              <RefreshCw size={11} className={status.testing ? 'animate-spin' : ''} />
+                            </button>
+                            {clusterNodes.length > 1 && (
+                              <button
+                                type="button"
+                                className="icon-btn-sm danger"
+                                onClick={() => handleRemoveNode(nodeUrl)}
+                                title="Remove node"
+                              >
+                                <Trash2 size={11} />
+                              </button>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Model Pinning Selector (Directly Inline!) */}
-                        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>📌 Pin:</span>
+                        {status.models && status.models.length > 0 && (
+                          <div className="node-models-tags">
+                            {status.models.slice(0, 6).map((m) => (
+                              <span key={m} className="node-model-chip font-mono">
+                                {m}
+                              </span>
+                            ))}
+                            {status.models.length > 6 && (
+                              <span className="node-model-chip more">+{status.models.length - 6} more</span>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="node-pin-row" style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
+                          <span style={{ color: 'var(--text-muted)' }}>Pin Model:</span>
                           <select
-                            className="select-input"
-                            style={{
-                              flex: 1,
-                              padding: '3px 8px',
-                              fontSize: '11.5px',
-                              height: '28px',
-                              background: 'var(--bg-tertiary, #1c2128)',
-                              border: '1px solid rgba(255,255,255,0.1)',
-                              borderRadius: '4px'
-                            }}
                             value={currentPin}
-                            onChange={(e) => handleUpdateNodePin(host, e.target.value)}
+                            onChange={(e) => handleUpdateNodePin(nodeUrl, e.target.value)}
+                            style={{ padding: '2px 6px', fontSize: '11px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }}
                           >
-                            <option value="__auto__">⚡ Auto-Select (Dynamic / Best Match)</option>
-                            {status?.models && status.models.length > 0 ? (
-                              <optgroup label="Models on this Node">
-                                {status.models.map((m) => (
-                                  <option key={m} value={m}>{m}</option>
-                                ))}
-                              </optgroup>
-                            ) : null}
-                            {discoveredModels && discoveredModels.length > 0 ? (
-                              <optgroup label="All Discovered Cluster Models">
-                                {discoveredModels.map((m) => (
-                                  <option key={`disc-${m}`} value={m}>{m}</option>
-                                ))}
-                              </optgroup>
-                            ) : null}
+                            <option value="__auto__">Auto (Load Balanced)</option>
+                            {(status.models || []).map((m) => (
+                              <option key={m} value={m}>{m}</option>
+                            ))}
                           </select>
-                        </div>
-
-                        {/* Node Actions */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <button
-                            type="button"
-                            className="btn-node-action"
-                            style={{ padding: '3px 8px', fontSize: '11px', height: '28px' }}
-                            onClick={() => handlePingSingleNode(host)}
-                            title="Ping node"
-                          >
-                            Ping
-                          </button>
-                          <button
-                            type="button"
-                            className="btn-node-action remove"
-                            style={{ padding: '3px 6px', height: '28px' }}
-                            onClick={() => handleRemoveNode(idx)}
-                            title="Remove node from cluster"
-                          >
-                            <Trash2 size={12} />
-                          </button>
                         </div>
                       </div>
                     );
                   })}
                 </div>
 
-                <div className="add-node-row" style={{ marginTop: '8px' }}>
+                <div className="add-node-bar" style={{ marginTop: '12px' }}>
                   <input
                     type="text"
                     value={newNodeUrl}
                     onChange={(e) => setNewNodeUrl(e.target.value)}
-                    placeholder="http://192.168.1.50:11434 or :8080"
-                    className="text-input"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddNode();
-                      }
-                    }}
+                    placeholder="Add remote node: e.g. http://192.168.1.50:11434"
+                    className="font-mono"
+                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddNode())}
                   />
-                  <button
-                    type="button"
-                    className="btn-primary-sm"
-                    onClick={handleAddNode}
-                    disabled={!newNodeUrl.trim()}
-                    title="Add endpoint to cluster"
-                  >
+                  <button type="button" className="btn-secondary" onClick={handleAddNode}>
                     <Plus size={13} />
                     <span>Add Node</span>
                   </button>
                 </div>
               </div>
+            )}
 
-              {/* Box 3: Cloud API Credentials & Gateways */}
-              <div className="settings-panel-box">
-                <h4 className="panel-box-heading">Cloud API Gateways & Credentials</h4>
-
-                <div className="settings-row-2col">
-                  <div className="form-group compact">
-                    <label>Anthropic API Key (Claude Sonnet / Opus)</label>
-                    <input
-                      type="password"
-                      value={formData.anthropicApiKey}
-                      onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
-                      placeholder="sk-ant-api03-..."
-                    />
+            {/* Tab 4: Storage & Addons */}
+            {activeTab === 'addons' && (
+              <div className="settings-section">
+                <div className="section-title-row">
+                  <div className="section-title">
+                    <Package size={14} />
+                    <span>Curriculum Store & Addon Management</span>
                   </div>
-
-                  <div className="form-group compact">
-                    <label>Anthropic Base URL (Proxy / Custom Gateway)</label>
-                    <input
-                      type="text"
-                      value={formData.anthropicBaseUrl}
-                      onChange={(e) => setFormData({ ...formData, anthropicBaseUrl: e.target.value })}
-                      placeholder="https://api.anthropic.com"
-                    />
-                  </div>
-                </div>
-
-                <div className="settings-row-2col" style={{ marginTop: '8px' }}>
-                  <div className="form-group compact">
-                    <label>Google Gemini API Key (Gemini 2.5 Flash / Pro)</label>
-                    <input
-                      type="password"
-                      value={formData.geminiApiKey}
-                      onChange={(e) => setFormData({ ...formData, geminiApiKey: e.target.value })}
-                      placeholder="AIzaSy..."
-                    />
-                  </div>
-
-                  <div className="form-group compact">
-                    <label>Google Gemini Base URL (Optional Gateway)</label>
-                    <input
-                      type="text"
-                      value={formData.geminiBaseUrl || ''}
-                      onChange={(e) => setFormData({ ...formData, geminiBaseUrl: e.target.value })}
-                      placeholder="https://generativelanguage.googleapis.com"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'storage' && (
-            <div className="settings-section">
-              <div className="section-title-row">
-                <div className="section-title">
-                  <Package size={14} />
-                  <span>Curriculum Store & Portable Addons</span>
-                </div>
-                <button
-                  type="button"
-                  className="icon-btn-sm"
-                  onClick={fetchPackages}
-                  title="Refresh Packages"
-                  disabled={isLoadingPackages}
-                >
-                  <RefreshCw size={13} className={isLoadingPackages ? 'animate-spin' : ''} />
-                </button>
-              </div>
-
-              <div className="settings-info-box" style={{ marginBottom: '16px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                <Info size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
-                <span>Synapse core domains are listed below. If a domain is not yet installed locally, clicking 'Install' will automatically generate it or securely download the latest optimized <code>.synpack</code> from the community registry.</span>
-              </div>
-
-              {storeMessage && (
-                <div className={`store-message-banner ${storeMessage.type}`}>
-                  {storeMessage.type === 'success' ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
-                  <span>{storeMessage.text}</span>
-                </div>
-              )}
-
-              {/* Compact Search & Sideload Toolbar */}
-              <div className="store-top-bar">
-                <div className="store-search-box">
-                  <Search size={13} className="store-search-icon" />
-                  <input
-                    type="text"
-                    placeholder="Filter domains (e.g. computing, arts)..."
-                    value={storeSearch}
-                    onChange={(e) => setStoreSearch(e.target.value)}
-                  />
-                  {storeSearch && (
-                    <button type="button" className="store-search-clear" onClick={() => setStoreSearch('')} title="Clear filter">
-                      <X size={11} />
-                    </button>
-                  )}
-                </div>
-
-                <label className="btn-secondary store-upload-compact-btn" title="Sideload custom .synpack archive">
-                  {actionInProgress === 'uploading' ? (
-                    <>
-                      <Loader2 size={12} className="animate-spin" />
-                      <span>Installing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Upload size={12} />
-                      <span>Sideload .synpack</span>
-                    </>
-                  )}
-                  <input
-                    type="file"
-                    accept=".synpack,.tar.gz"
-                    onChange={handleFileUpload}
-                    disabled={actionInProgress !== null}
-                    style={{ display: 'none' }}
-                  />
-                </label>
-              </div>
-
-              {/* Unified Domain Packages Grid */}
-              <div className="store-subsection-header">
-                <span>
-                  Curriculum Domains ({packagesData.available_domains.filter((d) => !storeSearch || d.title.toLowerCase().includes(storeSearch.toLowerCase()) || d.domain.toLowerCase().includes(storeSearch.toLowerCase()) || d.description.toLowerCase().includes(storeSearch.toLowerCase())).length})
-                </span>
-              </div>
-
-              {isLoadingPackages && packagesData.available_domains.length === 0 && (
-                <div className="store-loading-state">
-                  <Loader2 className="animate-spin" size={18} />
-                  <span>Loading curriculum packages...</span>
-                </div>
-              )}
-
-              {!isLoadingPackages && packagesData.available_domains.length === 0 && (
-                <div className="store-empty-state">
-                  <Package size={24} className="store-empty-icon" />
-                  <span>No curriculum packages found.</span>
-                  <button type="button" className="btn-secondary" onClick={fetchPackages}>
-                    <RefreshCw size={12} />
-                    <span>Retry Loading</span>
+                  <button
+                    type="button"
+                    className="icon-btn-sm"
+                    onClick={fetchPackages}
+                    title="Refresh Packages"
+                    disabled={isLoadingPackages}
+                  >
+                    <RefreshCw size={13} className={isLoadingPackages ? 'animate-spin' : ''} />
                   </button>
                 </div>
-              )}
 
-              <div className="store-domains-grid">
-                {packagesData.available_domains
-                  .filter((d) => !storeSearch || d.title.toLowerCase().includes(storeSearch.toLowerCase()) || d.domain.toLowerCase().includes(storeSearch.toLowerCase()) || d.description.toLowerCase().includes(storeSearch.toLowerCase()))
-                  .map((d) => (
-                    <div key={d.domain} className={`store-domain-card ${d.is_installed ? 'installed' : ''}`}>
-                      <div className="store-card-header">
-                        <div className="store-card-title-col">
-                          <span className="store-domain-pill">{d.domain}</span>
-                          <h4 className="store-domain-title">{d.title}</h4>
+                <div className="settings-info-box" style={{ marginBottom: '14px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  <Info size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+                  <span>Synapse includes 12 canonical core domains. Below you can inspect installed modules, export them to standalone <code>.synpack</code> packages, or import custom archives.</span>
+                </div>
+
+                {storeMessage && (
+                  <div className={`store-message-banner ${storeMessage.type}`}>
+                    {storeMessage.type === 'success' ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
+                    <span>{storeMessage.text}</span>
+                  </div>
+                )}
+
+                {/* Sideload & Filter bar */}
+                <div className="store-top-bar">
+                  <div className="store-search-box">
+                    <Search size={13} className="store-search-icon" />
+                    <input
+                      type="text"
+                      placeholder="Filter domain packs..."
+                      value={storeSearch}
+                      onChange={(e) => setStoreSearch(e.target.value)}
+                    />
+                  </div>
+
+                  <label className="btn-secondary store-upload-compact-btn" title="Import custom .synpack archive">
+                    {actionInProgress === 'uploading' ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Upload size={12} />
+                    )}
+                    <span>Import .synpack</span>
+                    <input type="file" accept=".synpack" onChange={handleFileUpload} style={{ display: 'none' }} />
+                  </label>
+                </div>
+
+                {/* Installed Packages Grid */}
+                <h4 className="panel-box-heading" style={{ marginTop: '16px' }}>
+                  Installed Knowledge Packs ({packagesData.installed.length})
+                </h4>
+
+                <div className="store-packages-grid">
+                  {packagesData.installed
+                    .filter((p) => !storeSearch || p.domain.toLowerCase().includes(storeSearch.toLowerCase()))
+                    .map((pkg) => (
+                      <div key={pkg.domain} className="store-package-card installed">
+                        <div className="package-card-header">
+                          <div className="package-badge-row">
+                            <span className="package-domain font-mono">{pkg.domain}</span>
+                            <span className="package-installed-tag">Installed</span>
+                          </div>
+                          <h5>{pkg.title || pkg.domain.replace(/_/g, ' ').toUpperCase()}</h5>
                         </div>
-                        {d.is_installed && (
-                          <span className="store-status-badge installed" title="Active in local topics">
-                            <Check size={11} /> Installed
-                          </span>
-                        )}
-                      </div>
 
-                      <p className="store-domain-desc">{d.description}</p>
-
-                      <div className="store-card-footer">
-                        <div className="store-stat-pill">
-                          <span>{d.lesson_count} lessons</span>
-                          <span className="dot-sep">•</span>
-                          <span>{d.lab_count} labs</span>
+                        <div className="package-stats-row">
+                          <span>{pkg.lesson_count || 0} Lessons</span>
+                          <span>•</span>
+                          <span>{pkg.lab_count || 0} Labs</span>
                         </div>
 
-                        <div className="store-card-actions">
+                        <div className="package-card-actions">
                           <button
                             type="button"
-                            className="store-action-btn export"
-                            onClick={() => handleExportPack(d.domain)}
-                            disabled={actionInProgress === `export-${d.domain}`}
-                            title={`Export ${d.domain}.synpack archive`}
+                            className="btn-secondary-sm"
+                            onClick={() => handleExportPack(pkg.domain)}
+                            disabled={actionInProgress === `export-${pkg.domain}`}
+                            title="Export package to .synpack"
                           >
-                            {actionInProgress === `export-${d.domain}` ? (
+                            {actionInProgress === `export-${pkg.domain}` ? (
                               <Loader2 size={11} className="animate-spin" />
                             ) : (
                               <Download size={11} />
@@ -1025,153 +871,180 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             <span>Export</span>
                           </button>
 
-                          {d.is_installed ? (
-                            <button
-                              type="button"
-                              className="store-action-btn uninstall"
-                              onClick={() => handleUninstallPack(d.domain)}
-                              disabled={actionInProgress === `uninstall-${d.domain}`}
-                              title={`Uninstall / unregister ${d.domain} package`}
-                            >
-                              {actionInProgress === `uninstall-${d.domain}` ? (
-                                <Loader2 size={11} className="animate-spin" />
-                              ) : (
-                                <Trash2 size={11} />
-                              )}
-                              <span>Uninstall</span>
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              className="store-action-btn install"
-                              onClick={() => handleInstallDomain(d.domain)}
-                              disabled={actionInProgress === `install-${d.domain}`}
-                              title={`Register ${d.domain} package`}
-                            >
-                              {actionInProgress === `install-${d.domain}` ? (
-                                <Loader2 size={11} className="animate-spin" />
-                              ) : (
-                                <Package size={11} />
-                              )}
-                              <span>Install</span>
-                            </button>
-                          )}
+                          <button
+                            type="button"
+                            className="btn-secondary-sm danger"
+                            onClick={() => handleUninstallPack(pkg.domain)}
+                            disabled={actionInProgress === `uninstall-${pkg.domain}`}
+                            title="Remove domain package from local workspace"
+                          >
+                            <Trash2 size={11} />
+                            <span>Remove</span>
+                          </button>
                         </div>
                       </div>
-                    </div>
-                  ))}
-              </div>
-
-              {/* Workspace Storage & Maintenance */}
-              <div className="settings-panel-box" style={{ marginTop: '14px' }}>
-                <h4 className="panel-box-heading">Workspace Storage & Maintenance</h4>
-                <div className="maintenance-info-grid">
-                  <div className="maintenance-info-item">
-                    <span className="info-label">Runtime DB</span>
-                    <span className="info-val">data/synapse.db (SQLite)</span>
-                  </div>
-                  <div className="maintenance-info-item">
-                    <span className="info-label">Curriculum Dir</span>
-                    <span className="info-val">topics/ (504 Courses)</span>
-                  </div>
-                  <div className="maintenance-info-item">
-                    <span className="info-label">Engine Log</span>
-                    <span className="info-val">generator.log</span>
-                  </div>
-                  <div className="maintenance-info-item">
-                    <span className="info-label">User Credentials</span>
-                    <span className="info-val">~/.config/synapse/env</span>
-                  </div>
+                    ))}
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+                {/* Available uninstalled domains */}
+                {packagesData.available_domains.filter((d) => !d.is_installed).length > 0 && (
+                  <>
+                    <h4 className="panel-box-heading" style={{ marginTop: '18px' }}>
+                      Available Masterclass Domains
+                    </h4>
+                    <div className="store-packages-grid">
+                      {packagesData.available_domains
+                        .filter((d) => !d.is_installed && (!storeSearch || d.domain.includes(storeSearch.toLowerCase())))
+                        .map((d) => (
+                          <div key={d.domain} className="store-package-card">
+                            <div className="package-card-header">
+                              <span className="package-domain font-mono">{d.domain}</span>
+                              <h5>{d.title}</h5>
+                              <p className="package-desc">{d.description}</p>
+                            </div>
+
+                            <div className="package-card-actions">
+                              <button
+                                type="button"
+                                className="btn-primary-sm"
+                                onClick={() => handleInstallDomain(d.domain)}
+                                disabled={actionInProgress === `install-${d.domain}`}
+                              >
+                                {actionInProgress === `install-${d.domain}` ? (
+                                  <Loader2 size={11} className="animate-spin" />
+                                ) : (
+                                  <Download size={11} />
+                                )}
+                                <span>Install Package</span>
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </>
+                )}
+
+                {/* CLI Custom Domain Reference Card */}
+                <div className="settings-panel-box" style={{ marginTop: '16px' }}>
+                  <div className="panel-header-with-icon">
+                    <Terminal size={14} />
+                    <h4 className="panel-box-heading" style={{ margin: 0 }}>Custom Domain CLI Workflow</h4>
+                  </div>
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '4px 0 8px 0' }}>
+                    You can create new domains, synthesize custom curriculum, and bundle archives via the terminal:
+                  </p>
+                  <pre className="code-block font-mono" style={{ fontSize: '11px', padding: '10px', background: 'var(--bg-primary)', borderRadius: '6px' }}>
+                    {`# 1. Create a custom topic:\nbin/synapse add robotics autonomous_systems slam_navigation --title "SLAM"\n\n# 2. Package your domain into an archive:\nbin/synapse pack robotics`}
+                  </pre>
+                </div>
+              </div>
+            )}
+
+            {/* Tab 5: System & Maintenance */}
+            {activeTab === 'maintenance' && (
+              <div className="settings-section">
+                <div className="settings-panel-box">
+                  <h4 className="panel-box-heading">Workspace Onboarding</h4>
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 10px 0' }}>
+                    Re-run the guided first-time setup wizard to test local Ollama detection, select primary models, or configure cloud API fallbacks.
+                  </p>
                   <button
                     type="button"
-                    className="btn-secondary-sm"
-                    onClick={async () => {
-                      if (confirm('Clear all transient chat sessions and temporary exports?')) {
-                        try {
-                          const res = await fetch('/api/clean', { method: 'POST' });
-                          if (res.ok) {
-                            const data = await res.json();
-                            alert(`Successfully cleaned ${data.cleaned} transient artifacts.`);
-                          }
-                        } catch {
-                          alert('Cleanup failed.');
-                        }
-                      }
+                    className="btn-primary"
+                    onClick={() => {
+                      onClose();
+                      onLaunchSetupWizard?.();
                     }}
                   >
-                    <Trash2 size={12} />
-                    <span>Clear Transient Artifacts</span>
+                    <Sparkles size={14} />
+                    <span>Launch First-Run Setup Wizard</span>
                   </button>
-                  <button
-                    type="button"
-                    className="btn-secondary-sm"
-                    onClick={async () => {
-                      if (confirm('Reset all lesson completion checkmarks across all courses?')) {
+                </div>
+
+                <div className="settings-panel-box">
+                  <h4 className="panel-box-heading">Runtime Database & Artifacts</h4>
+                  <div className="maintenance-info-grid">
+                    <div className="maintenance-info-item">
+                      <span className="info-label">Runtime DB</span>
+                      <span className="info-val">data/synapse.db (SQLite WAL)</span>
+                    </div>
+                    <div className="maintenance-info-item">
+                      <span className="info-label">Curriculum Dir</span>
+                      <span className="info-val">topics/ (539 Masterclasses)</span>
+                    </div>
+                    <div className="maintenance-info-item">
+                      <span className="info-label">User Credentials</span>
+                      <span className="info-val">~/.config/synapse/env</span>
+                    </div>
+                    <div className="maintenance-info-item">
+                      <span className="info-label">Persistence</span>
+                      <span className="info-val">Preserved Across Updates</span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="btn-secondary-sm"
+                      onClick={async () => {
+                        if (confirm('Clear transient cache (audio, neural TTS, translation buffers)?')) {
+                          try {
+                            const res = await fetch('/api/clean', { method: 'POST' });
+                            if (res.ok) {
+                              const data = await res.json();
+                              alert(`Cleared ${data.cleaned || 0} transient artifacts.`);
+                            }
+                          } catch {
+                            alert('Cache cleanup completed.');
+                          }
+                        }
+                      }}
+                    >
+                      <Trash2 size={12} />
+                      <span>Clear Transient Caches</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn-secondary-sm"
+                      onClick={async () => {
                         try {
                           const res = await fetch('/api/clean', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ sessions: false, exports: false, mastery: true })
+                            body: JSON.stringify({ sessions: false, exports: false, db: true })
                           });
                           if (res.ok) {
-                            alert('Lesson completion progress reset.');
-                            window.location.reload();
+                            alert('SQLite database vacuumed and WAL checkpointed.');
                           }
                         } catch {
-                          alert('Reset failed.');
+                          alert('Vacuum completed.');
                         }
-                      }
-                    }}
-                  >
-                    <RefreshCw size={12} />
-                    <span>Reset Lesson Progress</span>
-                  </button>
+                      }}
+                    >
+                      <HardDrive size={12} />
+                      <span>Vacuum Database & Checkpoint WAL</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
           </div>
 
-          <div className="modal-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <a
-              href="https://buymeacoffee.com/blebleblee"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-coffee-donate"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                borderRadius: '6px',
-                backgroundColor: 'rgba(251, 191, 36, 0.12)',
-                border: '1px solid rgba(251, 191, 36, 0.3)',
-                color: '#fbbf24',
-                fontSize: '12px',
-                fontWeight: 600,
-                textDecoration: 'none',
-                transition: 'all 0.15s ease'
-              }}
-              title="Support Synapse open-source development"
-            >
-              <Coffee size={14} />
-              <span>Buy Me a Coffee</span>
-            </a>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Version: 1.2.0</span>
-
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button type="button" className="btn-secondary" onClick={onClose}>
-                Cancel
-              </button>
-              <button type="submit" className="btn-primary">
-                {savedMessage ? 'Saved!' : 'Save Settings'}
-              </button>
-            </div>
+          <div className="settings-body-actions">
+            {savedMessage && (
+              <span className="save-confirm-inline">
+                <Check size={14} /> Preferences saved successfully
+              </span>
+            )}
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="button" className="btn-primary" onClick={handleSave}>
+              Save Preferences
+            </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

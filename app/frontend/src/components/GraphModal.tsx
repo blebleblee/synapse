@@ -391,7 +391,7 @@ export const GraphModal: React.FC<GraphModalProps> = ({
             <div>
               <h3>Socratic Learning Pathways Guide</h3>
               <p className="pathway-subtitle">
-                Clear progressive study tracks: what to learn first to build unshakeable intuition for complex topics later.
+                Clear progressive study tracks: what to learn first to build unshakeable intuition for complex topics. All installed domains and custom addons are also searchable via <code>Cmd+K</code>.
               </p>
             </div>
           </div>

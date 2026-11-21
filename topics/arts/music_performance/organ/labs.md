@@ -362,7 +362,7 @@ The Tierce (1⅗′) is the signature color — the major third two octaves up g
 | Great to Pedal | Pedal plays Great's stops | Strengthen/unify pedal bass |
 | Swell to Pedal | Pedal plays Swell's stops | Soft pedal with expression control |
 | Octave couplers (4′) | Adds the octave above | Extra brilliance — use sparingly |
-| Unison Off | Mutes the division's own pitch | Couplers-only textures (advanced) |
+| Unison Off | Mutes the division's own pitch | Couplers-only textures |
 
 **Caution:** couplers add key weight on tracker organs and can cause ciphering on neglected instruments. Engage them one at a time and listen before stacking more.
 
@@ -438,7 +438,7 @@ Steps 5 and 6 (hand + pedal) are the hardest and the most commonly skipped. Skip
 
 ### Progressive Coordination Drills
 
-**Drill 1 — Static pedal point (beginner)**
+**Drill 1 — Static pedal point**
 
 ```text
 RH: C major scale ascending, quarter notes, one octave
@@ -448,7 +448,7 @@ Tempo: ♩=50 → 60 → 72 → 84
 Reps: 4×
 ```
 
-**Drill 2 — Contrary motion (intermediate)**
+**Drill 2 — Contrary motion**
 
 ```text
 RH: C major scale ascending, quarter notes
@@ -458,7 +458,7 @@ Tempo: ♩=40 → 50 → 60 → 72
 Reps: 4×
 ```
 
-**Drill 3 — Moving pedal, static hands (intermediate)**
+**Drill 3 — Moving pedal, static hands**
 
 ```text
 RH: hold C-E-G, whole notes
@@ -469,7 +469,7 @@ Reps: 4×
 Purpose: feet move independently while hands hold — guards against the common fault of hands unconsciously following the feet
 ```
 
-**Drill 4 — Full SATB hymn texture (intermediate)**
+**Drill 4 — Full SATB hymn texture**
 
 First phrase of "Amazing Grace," G major:
 
@@ -488,7 +488,7 @@ Bass (pedal)
 8. Build to performance tempo — ♩=72-84
 ```
 
-**Drill 5 — Rhythmic independence (advanced)**
+**Drill 5 — Rhythmic independence**
 
 ```text
 RH: quarter notes

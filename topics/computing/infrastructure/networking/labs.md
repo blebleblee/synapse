@@ -572,7 +572,7 @@ ip neigh show
 
 ---
 
-## Exercise 5: eBPF Socket Inspection (Advanced)
+## Exercise 5: eBPF Socket Inspection
 
 For production systems where `ss` overhead is too high or where you need streaming telemetry, eBPF programs attached to `cgroup/sock` or `kprobe` hooks provide zero-overhead, in-kernel inspection.
 

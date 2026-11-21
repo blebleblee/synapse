@@ -147,7 +147,7 @@ Left:   |--1--|--2--|--3--|
 Right:  |-1-|-2-|
 ```
 
-**Drill 3.9: 4-Against-3 Polyrhythm (Advanced)**
+**Drill 3.9: 4-Against-3 Polyrhythm**
 
 1. Metronome at 60 BPM.
 2. Tap left hand in groups of 4 sixteenth-notes.

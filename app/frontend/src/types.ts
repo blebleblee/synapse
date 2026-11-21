@@ -64,8 +64,6 @@ export interface TopicDetails {
   display_title?: string;
   path: string;
   persona: string;
-  level?: string;
-  available_levels?: string[];
   mastery?: string;
   completed_lessons?: string[];
   summary?: string;

@@ -870,6 +870,25 @@ def get_topic_details(
     raw_lesson_id = lesson_id.default if hasattr(lesson_id, "default") else lesson_id
     target_lesson_id = raw_lesson_id
 
+    # If no explicit lesson_id provided, check if query contains a 4th segment matching a lesson
+    if not target_lesson_id:
+        q_parts = query.split("/")
+        if len(q_parts) >= 4:
+            lesson_candidate = q_parts[3].lower()
+            for item in discovered_lessons:
+                item_id = item["id"].lower()
+                if item_id == lesson_candidate or item_id == f"lesson_{lesson_candidate}" or lesson_candidate in item_id:
+                    target_lesson_id = item["id"]
+                    break
+            if not target_lesson_id:
+                cand_num = lesson_candidate.split("_")[0] if "_" in lesson_candidate else lesson_candidate
+                if cand_num.isdigit():
+                    prefix = f"lesson_{int(cand_num):02d}_"
+                    for item in discovered_lessons:
+                        if item["id"].lower().startswith(prefix):
+                            target_lesson_id = item["id"]
+                            break
+
     if discovered_lessons:
         # Default to first lesson if not specified or not found
         valid_ids = [item["id"] for item in discovered_lessons]
@@ -893,10 +912,7 @@ def get_topic_details(
     # Fallback to single LESSON.md if not populated via discovered_lessons
     if not lesson:
         for fname in ["LESSON.md", "lesson.md"]:
-            if (target_dir / fname).exists():
-                lesson = (target_dir / fname).read_text(encoding="utf-8")
-                break
-            elif (sub_path / fname).exists():
+            if (sub_path / fname).exists():
                 lesson = (sub_path / fname).read_text(encoding="utf-8")
                 break
         if not lesson and (sub_path / "artifacts").exists():

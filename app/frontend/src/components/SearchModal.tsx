@@ -16,7 +16,7 @@ interface SearchResult {
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectTopic: (path: string, level?: string) => void;
+  onSelectTopic: (path: string) => void;
 }
 
 export const SearchModal: React.FC<SearchModalProps> = ({
@@ -107,7 +107,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
               key={idx}
               className="search-result-item"
               onClick={() => {
-                onSelectTopic(r.path, r.level && r.level !== 'root' ? r.level : undefined);
+                onSelectTopic(r.path);
                 onClose();
               }}
             >

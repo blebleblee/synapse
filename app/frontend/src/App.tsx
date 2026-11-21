@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Loader2 } from 'lucide-react';
 import { TopicTree } from './components/TopicTree';
 import { LessonViewer } from './components/LessonViewer';
 import { TutorChat } from './components/TutorChat';
@@ -6,6 +7,7 @@ import { TerminalDrawer } from './components/TerminalDrawer';
 import { SearchModal } from './components/SearchModal';
 import { GraphModal } from './components/GraphModal';
 import { SettingsModal, DEFAULT_SETTINGS, type AppSettings } from './components/SettingsModal';
+import { SetupWizardModal } from './components/SetupWizardModal';
 import { FlashcardStudyModal } from './components/FlashcardStudyModal';
 import { LoginModal } from './components/LoginModal';
 import type { TerminalDrawerHandle } from './components/TerminalDrawer';
@@ -18,11 +20,12 @@ export function App() {
   const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceStatus | null>(null);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [topicDetails, setTopicDetails] = useState<TopicDetails | null>(null);
-  const [currentLevel, setCurrentLevel] = useState<string>('beginner');
   const [activeTab, setActiveTab] = useState<'study' | 'labs' | 'quiz'>('study');
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [isLoadingTopic, setIsLoadingTopic] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translatingLanguage, setTranslatingLanguage] = useState<string>('');
   const [isChatting, setIsChatting] = useState(false);
   const [isCompilingGuide, setIsCompilingGuide] = useState(false);
   const [isRegeneratingSummary, setIsRegeneratingSummary] = useState(false);
@@ -33,6 +36,9 @@ export function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [graphOpen, setGraphOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [setupWizardOpen, setSetupWizardOpen] = useState<boolean>(() => {
+    return localStorage.getItem('synapse_onboarding_completed') !== 'true' && !localStorage.getItem('synapse_app_settings');
+  });
   const [settingsTab, setSettingsTab] = useState<'appearance' | 'cluster' | 'models' | 'store'>('appearance');
   const [flashcardModalOpen, setFlashcardModalOpen] = useState(false);
   const [authRequired, setAuthRequired] = useState(false);
@@ -122,10 +128,10 @@ export function App() {
     }
   };
 
-  const loadTopic = async (query: string, level = currentLevel, preserveTab = false, lessonId?: string) => {
+  const loadTopic = async (query: string, preserveTab = false, lessonId?: string) => {
     setIsLoadingTopic(true);
     try {
-      let url = `/api/topic?query=${encodeURIComponent(query)}&level=${level}`;
+      let url = `/api/topic?query=${encodeURIComponent(query)}`;
       if (lessonId && lessonId !== 'all' && lessonId !== 'labs') {
         url += `&lesson_id=${encodeURIComponent(lessonId)}`;
       }
@@ -134,7 +140,6 @@ export function App() {
         const data = await res.json();
         setTopicDetails(data);
         setSelectedPath(query);
-        setCurrentLevel(level);
         setUnifiedChatHistory(data.chat_history || []);
 
         if (lessonId === 'labs') {
@@ -189,16 +194,16 @@ export function App() {
     setIsAuthenticated(false);
   };
 
-  const handleGenerate = async (query: string, force = false, level = currentLevel) => {
+  const handleGenerate = async (query: string, force = false) => {
     setIsGenerating(true);
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, force, level }),
+        body: JSON.stringify({ query, force }),
       });
       if (res.ok) {
-        await loadTopic(query, level);
+        await loadTopic(query);
         await fetchTree();
         await fetchStatus();
       }
@@ -219,7 +224,7 @@ export function App() {
       await fetchTree();
       await fetchStatus();
       const newRel = `${domain}/${category}/${subtopic}`;
-      await loadTopic(newRel, 'beginner');
+      await loadTopic(newRel);
     }
   };
 
@@ -259,15 +264,8 @@ export function App() {
     }
   };
 
-  const handleSelectLevel = (level: string) => {
-    setCurrentLevel(level);
-    if (selectedPath) {
-      loadTopic(selectedPath, level, true);
-    }
-  };
-
   const handleSelectSubtopic = (query: string, lessonId?: string) => {
-    loadTopic(query, currentLevel, false, lessonId);
+    loadTopic(query, false, lessonId);
   };
 
   const handleSelectLesson = (lessonId: string) => {
@@ -277,7 +275,7 @@ export function App() {
         setActiveTab('labs');
       } else {
         setActiveTab('study');
-        loadTopic(selectedPath, currentLevel, true, lessonId);
+        loadTopic(selectedPath, true, lessonId);
       }
     }
   };
@@ -524,7 +522,7 @@ export function App() {
 
   const handleNavigateBreadcrumb = (type: 'domain' | 'category' | 'subtopic', path: string) => {
     if (type === 'subtopic') {
-      loadTopic(path, currentLevel);
+      loadTopic(path);
       return;
     }
 
@@ -534,7 +532,7 @@ export function App() {
           for (const cData of Object.values((discData as any).courses || {})) {
             const units = Object.values((cData as any).units || {});
             if (units.length > 0) {
-              loadTopic((units[0] as any).rel_path, currentLevel);
+              loadTopic((units[0] as any).rel_path);
               return;
             }
           }
@@ -548,7 +546,7 @@ export function App() {
             if (path === courseKey || path === discKey) {
               const units = Object.values((cData as any).units || {});
               if (units.length > 0) {
-                loadTopic((units[0] as any).rel_path, currentLevel);
+                loadTopic((units[0] as any).rel_path);
                 return;
               }
             }
@@ -561,7 +559,7 @@ export function App() {
   const handleRefreshQuiz = async () => {
     if (!selectedPath) return;
 
-    const quizKey = `${selectedPath}/${currentLevel}`;
+    const quizKey = selectedPath;
     setIsLoadingQuiz(true);
     try {
       const res = await fetch('/api/quiz', {
@@ -615,7 +613,7 @@ export function App() {
 
   const handleDownloadHandbook = () => {
     if (!topicDetails) return;
-    window.open(`/api/export?domain=${encodeURIComponent(topicDetails.domain)}&level=${currentLevel}`, '_blank');
+    window.open(`/api/export?domain=${encodeURIComponent(topicDetails.domain)}`, '_blank');
   };
 
   const handleRegenerateSummary = async () => {
@@ -640,7 +638,7 @@ export function App() {
     }
   };
 
-  const currentQuiz = selectedPath ? quizQuestions[`${selectedPath}/${currentLevel}`] || [] : [];
+  const currentQuiz = selectedPath ? quizQuestions[selectedPath] || [] : [];
 
   const activeLessonTitle = useMemo(() => {
     if (!topicDetails) return null;
@@ -651,6 +649,16 @@ export function App() {
     }
     return topicDetails.active_lesson_title || (topicDetails.subtopic ? topicDetails.subtopic.replace(/_/g, ' ') : 'Complete Masterclass');
   }, [topicDetails, activeTab, activeLessonId]);
+
+  const globalAITask = useMemo(() => {
+    if (isGenerating) return 'Synthesizing Masterclass Curriculum Units';
+    if (isTranslating) return `Translating Content to ${translatingLanguage || 'Target Language'}`;
+    if (isChatting) return 'Socratic Mentor Generating Response';
+    if (isLoadingQuiz) return 'Generating Socratic Scenario Quiz';
+    if (isRegeneratingSummary) return 'Regenerating Executive Architecture Summary';
+    if (isCompilingGuide) return 'Compiling Unified Masterclass Guide';
+    return null;
+  }, [isGenerating, isTranslating, translatingLanguage, isChatting, isLoadingQuiz, isRegeneratingSummary, isCompilingGuide]);
 
   return (
     <div className="workbench-layout">
@@ -681,6 +689,13 @@ export function App() {
       />
 
       <div className="center-workspace-column">
+        {globalAITask && (
+          <div className="global-ai-status-bar" title="AI Worker Active">
+            <Loader2 size={13} className="animate-spin" />
+            <span className="global-ai-task-text">{globalAITask}...</span>
+            <span className="global-ai-queue-hint">Sequential LLM worker active</span>
+          </div>
+        )}
         <LessonViewer
           topic={topicDetails}
           contentRef={contentRef as React.RefObject<HTMLDivElement>}
@@ -691,8 +706,6 @@ export function App() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           activeLessonId={activeLessonId}
-          currentLevel={currentLevel}
-          onSelectLevel={handleSelectLevel}
           quizQuestions={currentQuiz}
           isLoadingQuiz={isLoadingQuiz}
           onRefreshQuiz={handleRefreshQuiz}
@@ -710,6 +723,10 @@ export function App() {
           onNavigateBreadcrumb={handleNavigateBreadcrumb}
           onSelectLesson={handleSelectLesson}
           onToggleLessonCompletion={handleToggleLessonCompletion}
+          onTranslationStatusChange={(busy, lang) => {
+            setIsTranslating(busy);
+            if (lang) setTranslatingLanguage(lang);
+          }}
         />
 
         <TerminalDrawer
@@ -736,13 +753,13 @@ export function App() {
       <SearchModal
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
-        onSelectTopic={(path, lvl) => loadTopic(path, lvl || currentLevel)}
+        onSelectTopic={(path) => loadTopic(path)}
       />
 
       <GraphModal
         isOpen={graphOpen}
         onClose={() => setGraphOpen(false)}
-        onSelectTopic={(path) => loadTopic(path, currentLevel)}
+        onSelectTopic={(path) => loadTopic(path)}
       />
 
       <SettingsModal
@@ -759,6 +776,14 @@ export function App() {
           fetchTree();
           fetchStatus();
         }}
+        onLaunchSetupWizard={() => setSetupWizardOpen(true)}
+      />
+
+      <SetupWizardModal
+        isOpen={setupWizardOpen}
+        onClose={() => setSetupWizardOpen(false)}
+        currentSettings={settings}
+        onSaveSettings={handleSaveSettings}
       />
 
       <FlashcardStudyModal
