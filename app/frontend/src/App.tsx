@@ -714,6 +714,8 @@ export function App() {
         if (topicDetails) {
           setTopicDetails({ ...topicDetails, mastery: state });
         }
+        await fetchTree();
+        await fetchStatus();
       }
     } catch (err) {
       console.error('Failed to update mastery:', err);
