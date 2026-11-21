@@ -1000,10 +1000,12 @@ def get_translation_provider(
 def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -> Tuple[LLMProvider, str]:
     """
     Returns a model provider optimized for interactive Socratic mentoring.
-    Respects explicit user-specified host/model, falling back to auto-discovery
-    or cloud services if necessary.
+    Respects explicit user-specified host/model and database settings,
+    falling back to auto-discovery or cloud services if necessary.
     """
     settings = get_settings()
+    configured_model = model or settings.get("mentor_model") or settings.get("primary_model")
+
     anthropic_key = (
         os.environ.get("ANTHROPIC_API_KEY") or
         os.environ.get("ANTHROPIC_API_KEY_2") or
@@ -1012,24 +1014,25 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
     )
 
     # 0. If Claude / Anthropic is explicitly requested or set as preferred primary/mentor model
-    if anthropic_key and (
-        (model and any(c in model.lower() for c in ["claude", "sonnet", "opus", "anthropic"])) or
-        (not model and not host and settings.get("primary_model") in ["claude-sonnet-5", "claude-3-5-sonnet-20241022"])
-    ):
-        chosen_model = model or settings.get("primary_model") or os.environ.get("ANTHROPIC_MODEL") or "claude-sonnet-5"
+    if anthropic_key and configured_model and any(c in configured_model.lower() for c in ["claude", "sonnet", "opus", "anthropic"]):
+        chosen_model = configured_model
         return AnthropicProvider(model=chosen_model, api_key=anthropic_key), chosen_model
 
+    gemini_key = os.environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key")
+    if gemini_key and configured_model and "gemini" in configured_model.lower():
+        return GeminiProvider(model=configured_model, api_key=gemini_key), configured_model
+
     # 1. Validate explicitly requested configuration
-    if host and model:
-        if OllamaProvider.check_connectivity(host, model):
-            return OllamaProvider(model=model, host=host), model
+    if host and configured_model:
+        if OllamaProvider.check_connectivity(host, configured_model):
+            return OllamaProvider(model=configured_model, host=host), configured_model
     elif host:
         # Host requested, but model auto-selection needed
         if OllamaProvider.is_available(host):
             pinned = get_node_pin(host)
             models = OllamaProvider.list_models(host)
             # Use pinned model if available, else requested model, else first available
-            selected_model = model if (model and model in models) else (pinned if pinned else (models[0] if models else "qwen2.5-coder:7b"))
+            selected_model = configured_model if (configured_model and configured_model in models) else (pinned if pinned else (models[0] if models else "qwen2.5-coder:7b"))
             return OllamaProvider(model=selected_model, host=host), selected_model
 
     # 2. Check cluster status if no valid explicit config
@@ -1045,10 +1048,10 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
     status = cluster.get_cluster_status()
 
     # Specific model request across cluster
-    if model:
+    if configured_model:
         for h, h_data in status.items():
-            if h_data.get("online") and model in h_data.get("models", []):
-                return OllamaProvider(model=model, host=h), model
+            if h_data.get("online") and configured_model in h_data.get("models", []):
+                return OllamaProvider(model=configured_model, host=h), configured_model
 
     # Pinned model on online cluster node priority
     for h, h_data in status.items():
@@ -1077,21 +1080,19 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
             if models:
                 return OllamaProvider(model=models[0], host=h), models[0]
 
-    # 3. Cloud fallbacks if Ollama is offline
-    anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
-    settings = get_settings()
-    if not anthropic_key and settings.get("anthropic_api_key"):
-        anthropic_key = settings["anthropic_api_key"]
+    # 3. If a specific model was configured/requested, preserve it on best cluster node
+    if configured_model:
+        node, mod = cluster.select_node_for_model(model=configured_model)
+        return OllamaProvider(model=mod, host=node), mod
+
+    # 4. Cloud fallbacks if no specific model was configured and Ollama is offline
     if anthropic_key:
-        claude_model = model if (model and "claude" in model) else "claude-3-5-sonnet-20241022"
+        claude_model = "claude-3-5-sonnet-20241022"
         return AnthropicProvider(model=claude_model, api_key=anthropic_key), claude_model
 
-    gemini_key = os.environ.get("GEMINI_API_KEY")
-    if not gemini_key and settings.get("gemini_api_key"):
-        gemini_key = settings["gemini_api_key"]
     if gemini_key:
         return GeminiProvider(model="gemini-2.5-flash", api_key=gemini_key), "gemini-2.5-flash"
 
-    # 4. Fallback to cluster best selection
-    node, mod = cluster.select_node_for_model(model=model or "qwen2.5-coder:7b")
+    # 5. Default cluster selection
+    node, mod = cluster.select_node_for_model(model="qwen2.5-coder:7b")
     return OllamaProvider(model=mod, host=node), mod
