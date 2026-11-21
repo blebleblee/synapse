@@ -12,6 +12,7 @@ import { FlashcardStudyModal } from './components/FlashcardStudyModal';
 import { LoginModal } from './components/LoginModal';
 import type { TerminalDrawerHandle } from './components/TerminalDrawer';
 import type { TopicTreeData, TopicDetails, ChatMessage, WorkspaceStatus, QuizQuestion } from './types';
+import { getStoredSelection, saveStoredSelection, clearStoredSelection } from './utils/selectionStorage';
 import './App.css';
 
 export function App() {
@@ -23,6 +24,8 @@ export function App() {
   const [activeTab, setActiveTab] = useState<'study' | 'labs' | 'quiz'>('study');
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [isLoadingTopic, setIsLoadingTopic] = useState(false);
+  const loadRequestIdRef = useRef<number>(0);
+  const userInteractedRef = useRef<boolean>(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [translatingLanguage, setTranslatingLanguage] = useState<string>('');
@@ -128,7 +131,14 @@ export function App() {
     }
   };
 
-  const loadTopic = async (query: string, preserveTab = false, lessonId?: string) => {
+  const loadTopic = async (query: string, preserveTab = false, lessonId?: string, isRestore = false) => {
+    const currentRequestId = ++loadRequestIdRef.current;
+    if (!isRestore) {
+      userInteractedRef.current = true;
+    } else if (userInteractedRef.current) {
+      return;
+    }
+
     setIsLoadingTopic(true);
     try {
       let url = `/api/topic?query=${encodeURIComponent(query)}`;
@@ -136,32 +146,55 @@ export function App() {
         url += `&lesson_id=${encodeURIComponent(lessonId)}`;
       }
       const res = await fetch(url);
+      if (currentRequestId !== loadRequestIdRef.current) return;
+      if (isRestore && userInteractedRef.current) return;
+
       if (res.ok) {
-        const data = await res.json();
+        const data: TopicDetails = await res.json();
+        if (currentRequestId !== loadRequestIdRef.current) return;
+        if (isRestore && userInteractedRef.current) return;
+
         setTopicDetails(data);
         setSelectedPath(query);
         setUnifiedChatHistory(data.chat_history || []);
 
+        let effectiveLessonId = 'all';
         if (lessonId === 'labs') {
           setActiveTab('labs');
           setActiveLessonId('labs');
+          effectiveLessonId = 'labs';
         } else if (lessonId === 'all') {
           setActiveLessonId('all');
           if (!preserveTab) setActiveTab('study');
+          effectiveLessonId = 'all';
         } else if (lessonId) {
-          setActiveLessonId(lessonId);
+          const matched = Boolean(data.lessons && data.lessons.some((l) => l.id === lessonId));
+          effectiveLessonId = matched ? lessonId : (data.active_lesson_id || 'all');
+          setActiveLessonId(effectiveLessonId);
           if (!preserveTab) setActiveTab('study');
         } else {
-          setActiveLessonId(data.active_lesson_id || null);
+          effectiveLessonId = data.active_lesson_id || 'all';
+          setActiveLessonId(effectiveLessonId);
           if (!preserveTab) {
             setActiveTab('study');
           }
+        }
+
+        saveStoredSelection(query, effectiveLessonId);
+      } else if (res.status === 404) {
+        clearStoredSelection();
+        if (currentRequestId === loadRequestIdRef.current) {
+          setSelectedPath(null);
+          setTopicDetails(null);
+          setActiveLessonId(null);
         }
       }
     } catch (err) {
       console.error('Failed to load topic details:', err);
     } finally {
-      setIsLoadingTopic(false);
+      if (currentRequestId === loadRequestIdRef.current) {
+        setIsLoadingTopic(false);
+      }
     }
   };
 
@@ -169,29 +202,54 @@ export function App() {
     const initApp = async () => {
       const ok = await checkAuth();
       if (ok) {
-        fetchTree();
+        await fetchTree();
         fetchStatus();
+
+        if (!userInteractedRef.current) {
+          const saved = getStoredSelection();
+          if (saved && saved.path) {
+            await loadTopic(saved.path, false, saved.lessonId, true);
+          }
+        }
       }
     };
     initApp();
 
     const handleUnauthorized = () => {
+      loadRequestIdRef.current += 1;
       setIsAuthenticated(false);
       setAuthRequired(true);
+      setSelectedPath(null);
+      setTopicDetails(null);
+      setActiveLessonId(null);
+      userInteractedRef.current = false;
     };
     window.addEventListener('synapse:unauthorized', handleUnauthorized);
     return () => window.removeEventListener('synapse:unauthorized', handleUnauthorized);
   }, [checkAuth]);
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = async () => {
     setIsAuthenticated(true);
-    fetchTree();
+    await fetchTree();
     fetchStatus();
+
+    if (!userInteractedRef.current) {
+      const saved = getStoredSelection();
+      if (saved && saved.path) {
+        await loadTopic(saved.path, false, saved.lessonId, true);
+      }
+    }
   };
 
   const handleLogout = () => {
+    loadRequestIdRef.current += 1;
+    clearStoredSelection();
     localStorage.removeItem('synapse_auth_token');
     setIsAuthenticated(false);
+    setSelectedPath(null);
+    setTopicDetails(null);
+    setActiveLessonId(null);
+    userInteractedRef.current = false;
   };
 
   const handleCancelAI = () => {
@@ -295,6 +353,7 @@ export function App() {
       setActiveLessonId(lessonId);
       if (lessonId === 'labs') {
         setActiveTab('labs');
+        saveStoredSelection(selectedPath, 'labs');
       } else {
         setActiveTab('study');
         loadTopic(selectedPath, true, lessonId);
@@ -732,7 +791,7 @@ export function App() {
 
       <div className="center-workspace-column">
         <LessonViewer
-          topic={topicDetails}
+          topic={authRequired && !isAuthenticated ? null : topicDetails}
           contentRef={contentRef as React.RefObject<HTMLDivElement>}
           isLoading={isLoadingTopic}
           isGenerating={isGenerating}

@@ -1,14 +1,14 @@
 """
-End-to-End Browser Journey Test for Synapse Learner Progression.
+End-to-End Browser Journey & Resume Selection Verification Tests.
 Exercises:
-1. Open isolated application in Chromium.
-2. Select fixture curriculum and its first lesson.
-3. Assert initially incomplete.
-4. Mark complete.
-5. Assert lesson control and sidebar progress update.
-6. Reload, reselect topic/lesson, and verify completion persisted.
-7. Mark incomplete and verify control and sidebar progress revert.
-8. Reload and reopen again to verify incomplete state persisted.
+1. Core learner journey with automatic reload-and-resume (NO manual reselection).
+2. Selection and restoration of different specific lessons and 'all lessons' view.
+3. Resilient handling of malformed stored data and 404 missing topics.
+4. Fallback replacement for stale lesson IDs.
+5. Race handling: user selection and logout supersede in-flight restore requests.
+6. Unauthorized (401) handling: clears protected reader content and requires login,
+   while preserving saved selection in localStorage.
+7. Explicit logout clears saved selection and resets active state.
 """
 
 import sys
@@ -36,16 +36,21 @@ def get_free_loopback_port() -> int:
 
 def seed_minimal_e2e_fixture(topics_dir: Path):
     """
-    Seeds a minimal fixture curriculum with a unique title to verify server identity.
+    Seeds a minimal fixture curriculum with unique titles for identity verification
+    and multi-topic/multi-lesson navigation tests.
     """
     comp_dir = topics_dir / "computing"
     pg_dir = comp_dir / "data" / "postgresql"
+    bash_dir = comp_dir / "systems" / "bash"
+
     pg_dir.mkdir(parents=True, exist_ok=True)
+    bash_dir.mkdir(parents=True, exist_ok=True)
 
     # Unique fixture syllabus title
     (comp_dir / "SYLLABUS.md").write_text(
         "# Computing Syllabus\n\n"
-        "- **E2E Unique Storage Invariants** (`data/postgresql/`)\n",
+        "- **E2E Unique Storage Invariants** (`data/postgresql/`)\n"
+        "- **E2E Shell Invariants** (`systems/bash/`)\n",
         encoding="utf-8"
     )
 
@@ -61,13 +66,20 @@ def seed_minimal_e2e_fixture(topics_dir: Path):
         encoding="utf-8"
     )
 
+    (bash_dir / "lesson_01_syntax.md").write_text(
+        "# E2E Shell Syntax\n\n"
+        "Process substitution and file descriptor redirection.\n",
+        encoding="utf-8"
+    )
 
-def test_learner_core_journey(tmp_path):
+
+@pytest.fixture(scope="module")
+def e2e_server(tmp_path_factory):
     """
-    Executes the full automated browser journey against a dedicated child server
-    using Playwright Chromium with observable UI assertions.
+    Spawns an isolated test server instance on 127.0.0.1 on an ephemeral port.
+    Verifies unique fixture identity before yielding and terminates safely.
     """
-    # 1. Setup isolated directories
+    tmp_path = tmp_path_factory.mktemp("synapse_e2e_server")
     tmp_workspace = tmp_path / "workspace"
     tmp_topics = tmp_workspace / "topics"
     tmp_data = tmp_workspace / "data"
@@ -76,11 +88,9 @@ def test_learner_core_journey(tmp_path):
 
     seed_minimal_e2e_fixture(tmp_topics)
 
-    # 2. Allocate dedicated port
     port = get_free_loopback_port()
     server_url = f"http://127.0.0.1:{port}"
 
-    # 3. Environment configuration: curated, minimal, no leaked cloud keys or passwords
     child_env = {
         "PATH": os.environ.get("PATH", ""),
         "PYTHONPATH": str(REPO_ROOT),
@@ -92,7 +102,6 @@ def test_learner_core_journey(tmp_path):
     if "VIRTUAL_ENV" in os.environ:
         child_env["VIRTUAL_ENV"] = os.environ["VIRTUAL_ENV"]
 
-    # 4. Spawn isolated child server
     launcher_script = REPO_ROOT / "e2e" / "server_launcher.py"
     server_log_file = tmp_path / "server_e2e.log"
     log_fp = open(server_log_file, "w+", encoding="utf-8")
@@ -105,14 +114,7 @@ def test_learner_core_journey(tmp_path):
         stderr=subprocess.STDOUT
     )
 
-    playwright = None
-    browser = None
-    context = None
-    page = None
-    test_failed = False
-
     try:
-        # 5. Wait for readiness with bounded timeout and verify unique fixture identity
         ready = False
         start_time = time.time()
         timeout_seconds = 15.0
@@ -123,7 +125,7 @@ def test_learner_core_journey(tmp_path):
                 log_fp.seek(0)
                 output = log_fp.read()
                 raise RuntimeError(
-                    f"Child server process exited prematurely with code {exit_code}. Server log:\n{output}"
+                    f"Child server process exited prematurely with code {exit_code}. Log:\n{output}"
                 )
 
             try:
@@ -145,154 +147,12 @@ def test_learner_core_journey(tmp_path):
             log_fp.seek(0)
             output = log_fp.read()
             raise TimeoutError(
-                f"Server failed readiness verification within {timeout_seconds}s at {server_url}. Server log:\n{output}"
+                f"Server failed readiness verification within {timeout_seconds}s at {server_url}. Log:\n{output}"
             )
 
-        # 6. Launch browser and trace context
-        playwright = sync_playwright().start()
-        browser = playwright.chromium.launch(headless=True)
-        context = browser.new_context(
-            viewport={"width": 1280, "height": 800}
-        )
-        context.tracing.start(screenshots=True, snapshots=True, sources=True)
+        yield server_url
 
-        page = context.new_page()
-
-        # Pre-seed localStorage to bypass onboarding wizard without mutating code
-        page.add_init_script("""
-            localStorage.setItem('synapse_onboarding_completed', 'true');
-            localStorage.setItem('synapse_app_settings', JSON.stringify({
-                theme: 'midnight',
-                fontSize: 'standard',
-                readerWidth: 'full',
-                language: 'en'
-            }));
-        """)
-
-        # Helper to navigate through sidebar to first lesson
-        def select_fixture_lesson():
-            # Expand domain if not already open
-            domain_hdr = page.locator(".domain-header:has-text('Computing')").first
-            expect(domain_hdr).to_be_visible(timeout=10000)
-            cat_hdr = page.locator(".category-header:has-text('Data')").first
-            if not cat_hdr.is_visible():
-                domain_hdr.click()
-
-            # Expand category if not already open
-            expect(cat_hdr).to_be_visible(timeout=5000)
-            course_hdr = page.locator(".course-header:has-text('E2e Unique Storage Invariants')").first
-            if not course_hdr.is_visible():
-                cat_hdr.click()
-
-            # Expand course / unit if not already open
-            expect(course_hdr).to_be_visible(timeout=5000)
-            lesson_item = page.locator(".unit-lesson-subitem:has-text('Foundations')").first
-            if not lesson_item.is_visible():
-                course_hdr.click()
-
-            expect(lesson_item).to_be_visible(timeout=5000)
-            lesson_item.click()
-
-        # Step 1: Open the isolated app
-        page.goto(server_url)
-        expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
-
-        # Step 2: Select the fixture curriculum and first lesson
-        select_fixture_lesson()
-
-        # Step 3: Assert initially incomplete
-        btn_toggle = page.locator(".btn-toggle-complete").first
-        expect(btn_toggle).to_be_visible(timeout=5000)
-        expect(btn_toggle).to_have_text("Mark Complete")
-        expect(btn_toggle).not_to_have_class(re.compile(r"\bcompleted\b"))
-
-        sidebar_badge = page.locator(".course-progress").first
-        expect(sidebar_badge).to_be_visible()
-        expect(sidebar_badge).to_have_text("2L")
-
-        # Step 4: Mark complete
-        btn_toggle.click()
-
-        # Step 5: Assert lesson control and visible sidebar progress update
-        expect(btn_toggle).to_have_text("Completed ✓", timeout=5000)
-        expect(btn_toggle).to_have_class(re.compile(r"\bcompleted\b"))
-
-        expect(sidebar_badge).to_have_text("1/2", timeout=5000)
-
-        # Step 6: Reload, reselect topic/lesson, and verify completion persisted
-        page.reload()
-        expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
-
-        select_fixture_lesson()
-
-        btn_toggle = page.locator(".btn-toggle-complete").first
-        expect(btn_toggle).to_be_visible(timeout=5000)
-        expect(btn_toggle).to_have_text("Completed ✓")
-        expect(btn_toggle).to_have_class(re.compile(r"\bcompleted\b"))
-
-        sidebar_badge = page.locator(".course-progress").first
-        expect(sidebar_badge).to_have_text("1/2")
-
-        # Step 7: Mark incomplete and verify control and sidebar progress revert
-        btn_toggle.click()
-
-        expect(btn_toggle).to_have_text("Mark Complete", timeout=5000)
-        expect(btn_toggle).not_to_have_class(re.compile(r"\bcompleted\b"))
-
-        expect(sidebar_badge).to_have_text("2L", timeout=5000)
-
-        # Step 8: Reload and reopen again to verify incomplete state persisted
-        page.reload()
-        expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
-
-        select_fixture_lesson()
-
-        btn_toggle = page.locator(".btn-toggle-complete").first
-        expect(btn_toggle).to_be_visible(timeout=5000)
-        expect(btn_toggle).to_have_text("Mark Complete")
-        expect(btn_toggle).not_to_have_class(re.compile(r"\bcompleted\b"))
-
-        sidebar_badge = page.locator(".course-progress").first
-        expect(sidebar_badge).to_have_text("2L")
-
-    except Exception:
-        test_failed = True
-        ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
-        if page:
-            try:
-                page.screenshot(path=str(ARTIFACTS_DIR / "failure_screenshot.png"), full_page=True)
-            except Exception:
-                pass
-        if context:
-            try:
-                context.tracing.stop(path=str(ARTIFACTS_DIR / "failure_trace.zip"))
-            except Exception:
-                pass
-        try:
-            log_fp.seek(0)
-            (ARTIFACTS_DIR / "server_output.log").write_text(log_fp.read(), encoding="utf-8")
-        except Exception:
-            pass
-        raise
     finally:
-        # Teardown browser
-        if context and not test_failed:
-            try:
-                context.tracing.stop()
-            except Exception:
-                pass
-        if browser:
-            try:
-                browser.close()
-            except Exception:
-                pass
-        if playwright:
-            try:
-                playwright.stop()
-            except Exception:
-                pass
-
-        # Teardown server: terminate only the child process owned by this test
         if server_proc.poll() is None:
             server_proc.terminate()
             try:
@@ -301,3 +161,372 @@ def test_learner_core_journey(tmp_path):
                 server_proc.kill()
                 server_proc.wait(timeout=2.0)
         log_fp.close()
+
+
+@pytest.fixture
+def browser_page(e2e_server):
+    """
+    Launches headless Chromium with failure tracing and pre-seeded onboarding.
+    """
+    playwright = sync_playwright().start()
+    browser = playwright.chromium.launch(headless=True)
+    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    context.tracing.start(screenshots=True, snapshots=True, sources=True)
+
+    page = context.new_page()
+
+    # Pre-seed standard onboarding completion
+    page.add_init_script("""
+        localStorage.setItem('synapse_onboarding_completed', 'true');
+        localStorage.setItem('synapse_app_settings', JSON.stringify({
+            theme: 'midnight',
+            fontSize: 'standard',
+            readerWidth: 'full',
+            language: 'en'
+        }));
+    """)
+
+    test_failed = False
+    try:
+        yield page, e2e_server
+    except Exception:
+        test_failed = True
+        ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+        try:
+            page.screenshot(path=str(ARTIFACTS_DIR / "failure_screenshot.png"), full_page=True)
+        except Exception:
+            pass
+        try:
+            context.tracing.stop(path=str(ARTIFACTS_DIR / "failure_trace.zip"))
+        except Exception:
+            pass
+        raise
+    finally:
+        if not test_failed:
+            try:
+                context.tracing.stop()
+            except Exception:
+                pass
+        context.close()
+        browser.close()
+        playwright.stop()
+
+
+def expand_all_topics(page):
+    """Expands all domains and categories in the sidebar tree."""
+    expand_btn = page.locator("button[title*='Expand'], button[title*='expand']").first
+    if expand_btn.is_visible():
+        expand_btn.click()
+
+
+def select_fixture_lesson(page, cat_text="Data", course_text="E2e Unique Storage Invariants", lesson_text="Foundations"):
+    """Helper to navigate sidebar tree to a specific course and lesson."""
+    domain_hdr = page.locator(".domain-header:has-text('Computing')").first
+    expect(domain_hdr).to_be_visible(timeout=10000)
+
+    cat_hdr = page.locator(f".category-header:has-text('{cat_text}')").first
+    if not cat_hdr.is_visible():
+        domain_hdr.click()
+
+    expect(cat_hdr).to_be_visible(timeout=5000)
+    item = page.locator(f".course-header:has-text('{course_text}'), .subtopic-item:has-text('{course_text}')").first
+    if not item.is_visible():
+        cat_hdr.click()
+
+    expect(item).to_be_visible(timeout=5000)
+    item.click()
+
+    lesson_item = page.locator(f".unit-lesson-subitem:has-text('{lesson_text}')").first
+    if lesson_item.is_visible():
+        lesson_item.click()
+
+
+def test_learner_core_journey_with_automatic_resume(browser_page):
+    """
+    Requirement 1: Verify full learner journey and automatic reload-and-resume
+    WITHOUT manual reselection.
+    """
+    page, server_url = browser_page
+
+    # 1. Open app
+    page.goto(server_url)
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    # 2. Select fixture curriculum and first lesson
+    select_fixture_lesson(page, "Data", "E2e Unique Storage Invariants", "Foundations")
+
+    # 3. Assert initially incomplete
+    btn_toggle = page.locator(".btn-toggle-complete").first
+    expect(btn_toggle).to_be_visible(timeout=5000)
+    expect(btn_toggle).to_have_text("Mark Complete")
+    expect(btn_toggle).not_to_have_class(re.compile(r"\bcompleted\b"))
+
+    sidebar_badge = page.locator(".course-progress").first
+    expect(sidebar_badge).to_have_text("2L")
+
+    # 4. Mark complete
+    btn_toggle.click()
+
+    # 5. Assert update
+    expect(btn_toggle).to_have_text("Completed ✓", timeout=5000)
+    expect(btn_toggle).to_have_class(re.compile(r"\bcompleted\b"))
+    expect(sidebar_badge).to_have_text("1/2", timeout=5000)
+
+    # 6. RELOAD and verify AUTOMATIC RESUME without manual reselection!
+    page.reload()
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    # Assert content and lesson control automatically restored
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible(timeout=5000)
+    btn_toggle = page.locator(".btn-toggle-complete").first
+    expect(btn_toggle).to_be_visible(timeout=5000)
+    expect(btn_toggle).to_have_text("Completed ✓")
+    expect(btn_toggle).to_have_class(re.compile(r"\bcompleted\b"))
+
+    # Expand sidebar to verify persisted progress badge
+    expand_all_topics(page)
+    expect(page.locator(".course-progress:has-text('1/2')").first).to_be_visible(timeout=5000)
+
+    # 7. Mark incomplete
+    btn_toggle.click()
+    expect(btn_toggle).to_have_text("Mark Complete", timeout=5000)
+    expect(btn_toggle).not_to_have_class(re.compile(r"\bcompleted\b"))
+    expect(page.locator(".course-progress:has-text('2L')").first).to_be_visible(timeout=5000)
+
+    # 8. RELOAD again and verify incomplete state persisted automatically!
+    page.reload()
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible(timeout=5000)
+    btn_toggle = page.locator(".btn-toggle-complete").first
+    expect(btn_toggle).to_be_visible(timeout=5000)
+    expect(btn_toggle).to_have_text("Mark Complete")
+    expect(btn_toggle).not_to_have_class(re.compile(r"\bcompleted\b"))
+
+    expand_all_topics(page)
+    expect(page.locator(".course-progress:has-text('2L')").first).to_be_visible(timeout=5000)
+
+
+def test_resume_different_lesson_and_all_lessons_view(browser_page):
+    """
+    Requirements 2 & 3:
+    - Verify selecting a different lesson (Lesson 2) is saved and restored on reload.
+    - Verify selecting 'all lessons' is saved and restored on reload.
+    """
+    page, server_url = browser_page
+    page.goto(server_url)
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    # Select Lesson 2 ("B-Tree Mechanics")
+    select_fixture_lesson(page, "Data", "E2e Unique Storage Invariants", "B-Tree Mechanics")
+    expect(page.locator("h1:has-text('E2E B-Tree Mechanics')")).to_be_visible(timeout=5000)
+
+    # Reload without manual reselection
+    page.reload()
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    # Assert Lesson 2 was automatically resumed
+    expect(page.locator("h1:has-text('E2E B-Tree Mechanics')")).to_be_visible(timeout=5000)
+
+    # Now select "Complete Guide" via reader "All" button
+    all_btn = page.locator("button.lesson-number-btn:has-text('All'), button:has-text('All')").first
+    expect(all_btn).to_be_visible(timeout=5000)
+    all_btn.click()
+
+    # In all lessons view, dropdown shows 'all' and full guide is visible
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("all")
+
+    # Reload without manual reselection
+    page.reload()
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    # Assert Complete Guide view automatically resumed
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("all", timeout=5000)
+
+
+def test_resume_malformed_and_missing_topic_error_handling(browser_page):
+    """
+    Requirement 4:
+    - Verify malformed saved data does not crash startup and shows empty reader.
+    - Verify missing topic (404) clears saved selection and shows empty reader.
+    """
+    page, server_url = browser_page
+
+    # Scenario A: Malformed saved JSON
+    page.goto(server_url)
+    page.evaluate("localStorage.setItem('synapse_active_selection', '{ broken malformed json')")
+    page.reload()
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    # Reader displays empty placeholder without crashing
+    expect(page.locator(".viewer-empty")).to_be_visible(timeout=5000)
+    expect(page.locator("h2:has-text('Select a Topic to Begin')")).to_be_visible()
+
+    # Scenario B: Missing topic (404)
+    page.evaluate("""
+        localStorage.setItem('synapse_active_selection', JSON.stringify({
+            path: 'computing/data/nonexistent_course_404',
+            lessonId: 'lesson_01'
+        }))
+    """)
+    with page.expect_response(lambda res: "nonexistent_course_404" in res.url and res.status == 404):
+        page.reload()
+
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+    expect(page.locator(".viewer-empty")).to_be_visible(timeout=5000)
+
+    # Wait for localStorage to be cleared upon 404 handling
+    page.wait_for_function("() => localStorage.getItem('synapse_active_selection') === null", timeout=5000)
+    saved = page.evaluate("localStorage.getItem('synapse_active_selection')")
+    assert saved is None, f"Expected stale 404 topic selection to be cleared, got: {saved}"
+
+
+def test_resume_stale_lesson_id_fallback(browser_page):
+    """
+    Requirement 5:
+    - Verify missing lesson falls back to normal topic default and replaces stale saved ID.
+    """
+    page, server_url = browser_page
+    page.goto(server_url)
+
+    # Seed valid topic with deleted / stale lesson ID
+    page.evaluate("""
+        localStorage.setItem('synapse_active_selection', JSON.stringify({
+            path: 'computing/data/postgresql',
+            lessonId: 'deleted_lesson_99'
+        }))
+    """)
+    page.reload()
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    # Reader automatically falls back to Lesson 1: Foundations
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible(timeout=5000)
+
+    # Verify localStorage now holds the valid fallback lesson ID, not deleted_lesson_99
+    saved_raw = page.evaluate("localStorage.getItem('synapse_active_selection')")
+    assert saved_raw is not None
+    saved = json.loads(saved_raw)
+    assert saved["path"] == "computing/data/postgresql"
+    assert saved["lessonId"] == "lesson_01_foundations"
+
+
+def test_late_restore_superseded_by_user_selection(browser_page):
+    """
+    Requirement 6:
+    - Verify late restore response does NOT overwrite a newer explicit user selection.
+    """
+    page, server_url = browser_page
+
+    page.goto(server_url)
+    page.evaluate("""
+        localStorage.setItem('synapse_active_selection', JSON.stringify({
+            path: 'computing/data/postgresql',
+            lessonId: 'lesson_01_foundations'
+        }))
+    """)
+
+    # Delay /api/topic response for topic A (restore request)
+    page.route("**/api/topic?query=computing%2Fdata%2Fpostgresql*", lambda route: (
+        time.sleep(1.0),
+        route.continue_()
+    ))
+
+    page.reload()
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    # User immediately selects topic B before delayed restore arrives
+    select_fixture_lesson(page, "Systems", "E2e Shell Invariants", "Shell Syntax")
+    expect(page.locator("h1:has-text('E2E Shell Syntax')")).to_be_visible(timeout=5000)
+
+    # Wait for in-flight restore response to fulfill
+    page.wait_for_timeout(1500)
+
+    # Assert topic B remains displayed and was NOT overwritten by late restore of topic A
+    expect(page.locator("h1:has-text('E2E Shell Syntax')")).to_be_visible()
+
+
+def test_unauthorized_response_clears_content_but_preserves_saved_selection(browser_page):
+    """
+    Focused regression test for unauthorized (401) handling:
+    1. Start with a saved topic and lesson.
+    2. Trigger unauthorized handling through an actual application request receiving a controlled 401 response.
+    3. Verify protected reader content is cleared and login modal is required.
+    4. Verify the saved topic/lesson identifiers remain in localStorage.
+    """
+    page, server_url = browser_page
+
+    # 1. Start with valid saved selection in storage and open app
+    page.goto(server_url)
+    page.evaluate("""
+        localStorage.setItem('synapse_active_selection', JSON.stringify({
+            path: 'computing/data/postgresql',
+            lessonId: 'lesson_01_foundations'
+        }))
+    """)
+    page.reload()
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible(timeout=5000)
+
+    # 2. Configure controlled 401 response on application API requests
+    page.route("**/api/topic?query=computing%2Fsystems%2Fbash*", lambda route: route.fulfill(
+        status=401,
+        content_type="application/json",
+        body=json.dumps({"detail": "Authentication required"})
+    ))
+
+    # Trigger actual application request by selecting a different topic in the sidebar
+    select_fixture_lesson(page, "Systems", "E2e Shell Invariants", "Shell Syntax")
+
+    # 3. Verify protected reader content is cleared and login is required
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).not_to_be_visible(timeout=5000)
+    expect(page.locator("h1:has-text('E2E Shell Syntax')")).not_to_be_visible()
+    expect(page.locator(".login-card")).to_be_visible(timeout=5000)
+
+    # 4. Verify saved topic/lesson identifiers REMAIN in localStorage (not cleared by 401)
+    saved_raw = page.evaluate("localStorage.getItem('synapse_active_selection')")
+    assert saved_raw is not None, "Expected saved selection to be preserved in localStorage upon 401"
+    saved = json.loads(saved_raw)
+    assert saved["path"] == "computing/data/postgresql"
+    assert saved["lessonId"] == "lesson_01_foundations"
+
+
+def test_explicit_logout_clears_saved_selection(browser_page):
+    """
+    Verifies that explicit logout clears saved selection and resets active state.
+    """
+    page, server_url = browser_page
+    page.goto(server_url)
+
+    # 1. Seed saved selection and configure auth required + authenticated
+    page.evaluate("""
+        localStorage.setItem('synapse_active_selection', JSON.stringify({
+            path: 'computing/data/postgresql',
+            lessonId: 'lesson_01_foundations'
+        }));
+        localStorage.setItem('synapse_auth_token', 'test_bearer_token');
+    """)
+
+    page.route("**/api/auth/status", lambda route: route.fulfill(
+        status=200,
+        content_type="application/json",
+        body=json.dumps({"auth_required": True, "authenticated": True, "token": "test_bearer_token"})
+    ))
+
+    page.reload()
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).to_be_visible(timeout=5000)
+
+    # 2. In authenticated protected mode, the Logout button is visible and active in the sidebar
+    logout_btn = page.locator("button[title*='Logout'], button[title*='Lock']").first
+    expect(logout_btn).to_be_visible(timeout=5000)
+
+    # 3. Explicitly click Logout
+    logout_btn.click()
+
+    # 4. Assert saved selection is cleared from localStorage
+    saved = page.evaluate("localStorage.getItem('synapse_active_selection')")
+    assert saved is None, f"Expected explicit logout to clear saved selection, but got: {saved}"
+
+    # 5. Assert reader content is cleared and login modal is required
+    expect(page.locator("h1:has-text('E2E Storage Foundations')")).not_to_be_visible()
+    expect(page.locator(".login-card")).to_be_visible(timeout=5000)
