@@ -114,13 +114,23 @@ def release_title() -> str:
     return f"Synapse {TAG}"
 
 
-def generate_release_body(endpoint_url: str = "", repo_name: str = "", is_github: bool = False) -> str:
+def generate_release_body(endpoint_url: str = "", repo_name: str = "", is_github: bool = False,
+                          has_installers: bool = True) -> str:
     """Release notes from CHANGELOG.md plus short install guidance.
 
     Files are not listed or linked here: the release page already shows every
     attached file, and hand-written tables go stale or point at missing files.
     """
     notes = extract_changelog_notes(VER) or "See CHANGELOG.md for details."
+    notes = notes.rstrip().removesuffix("---").rstrip()  # sections end with their own divider
+    if not has_installers:
+        return f"""{notes}
+
+---
+
+### Installing
+The desktop installers and portable builds for this version have been withdrawn. Please install the latest release instead. The Python package and the curriculum packs attached here are still available.
+"""
     return f"""{notes}
 
 ---
@@ -134,30 +144,37 @@ Curriculum packs (`.synpack`) can be installed from inside the app (**Settings �
 """
 
 
-def update_release_text(title: str, body: str) -> bool:
-    """Sets the title and notes of the existing TAG release on Gitea and GitHub."""
+def _has_installers(assets) -> bool:
+    return any(a["name"].endswith((".dmg", ".exe", "-mac.zip", "-arm64.zip", "-win-x64.zip")) for a in assets)
+
+
+def update_release_text(title, body_for=None) -> bool:
+    """Rewrites the notes (and, if `title` is given, the title) of the TAG release
+    on Gitea and GitHub. Notes are generated per host, so they mention installers
+    only where that host still has them. A host without the release is skipped."""
+    body_for = body_for or (lambda has_installers: generate_release_body(has_installers=has_installers))
     ok = True
+    gitea_api = f"{GITEA_URL.rstrip('/')}/api/v1/repos/{GITEA_REPO}/releases"
+    gh_api = f"https://api.github.com/repos/{GITHUB_REPO}/releases"
     gitea_auth = (GITEA_USER, GITEA_PASS)
-    g = requests.get(f"{GITEA_URL.rstrip('/')}/api/v1/repos/{GITEA_REPO}/releases/tags/{TAG}", auth=gitea_auth)
-    if g.status_code == 200:
-        r = requests.patch(f"{GITEA_URL.rstrip('/')}/api/v1/repos/{GITEA_REPO}/releases/{g.json()['id']}",
-                           json={"name": title, "body": body}, auth=gitea_auth)
-        print(f"[{'✔' if r.ok else '✘'}] Gitea {TAG} notes: HTTP {r.status_code}")
-        ok &= r.ok
-    else:
-        print(f"[✘] Gitea release {TAG} not found (HTTP {g.status_code})")
-        ok = False
     gh_headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github+json",
                   "X-GitHub-Api-Version": "2022-11-28"}
-    h = requests.get(f"https://api.github.com/repos/{GITHUB_REPO}/releases/tags/{TAG}", headers=gh_headers)
-    if h.status_code == 200:
-        r = requests.patch(f"https://api.github.com/repos/{GITHUB_REPO}/releases/{h.json()['id']}",
-                           json={"name": title, "body": body}, headers=gh_headers)
-        print(f"[{'✔' if r.ok else '✘'}] GitHub {TAG} notes: HTTP {r.status_code}")
+    for host, api, kw in (("Gitea", gitea_api, {"auth": gitea_auth}), ("GitHub", gh_api, {"headers": gh_headers})):
+        got = requests.get(f"{api}/tags/{TAG}", **kw)
+        if got.status_code == 404:
+            print(f"[-] {host}: no {TAG} release, skipped")
+            continue
+        if not got.ok:
+            print(f"[✘] {host}: HTTP {got.status_code} reading {TAG}")
+            ok = False
+            continue
+        rel = got.json()
+        payload = {"body": body_for(_has_installers(rel.get("assets", [])))}
+        if title:
+            payload["name"] = title
+        r = requests.patch(f"{api}/{rel['id']}", json=payload, **kw)
+        print(f"[{'✔' if r.ok else '✘'}] {host} {TAG} notes updated: HTTP {r.status_code}")
         ok &= r.ok
-    else:
-        print(f"[✘] GitHub release {TAG} not found (HTTP {h.status_code})")
-        ok = False
     return ok
 
 

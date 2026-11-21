@@ -6,6 +6,7 @@ CHANGELOG.md, without touching its files.
 Usage:
   python scripts/update_release_notes.py            # current VERSION
   python scripts/update_release_notes.py 1.2.1 --dry-run
+  python scripts/update_release_notes.py 1.1.0 --keep-title   # older release: notes only
 """
 import importlib.util
 import sys
@@ -19,17 +20,17 @@ _spec.loader.exec_module(publish)
 
 def main(argv):
     dry = "--dry-run" in argv
+    keep_title = "--keep-title" in argv
     args = [a for a in argv if not a.startswith("--")]
     if args:
         publish.VER = args[0].lstrip("v")
         publish.TAG = f"v{publish.VER}"
-    title = publish.release_title()
-    body = publish.generate_release_body()
-    print(f"[*] {publish.TAG}: title '{title}', notes {len(body)} chars")
+    title = None if keep_title else publish.release_title()
+    print(f"[*] {publish.TAG}: title {'unchanged' if keep_title else repr(title)}")
     if dry:
-        print(body)
+        print(publish.generate_release_body(has_installers=True))
         return 0
-    return 0 if publish.update_release_text(title, body) else 1
+    return 0 if publish.update_release_text(title) else 1
 
 
 if __name__ == "__main__":
