@@ -689,13 +689,6 @@ export function App() {
       />
 
       <div className="center-workspace-column">
-        {globalAITask && (
-          <div className="global-ai-status-bar" title="AI Worker Active">
-            <Loader2 size={13} className="animate-spin" />
-            <span className="global-ai-task-text">{globalAITask}...</span>
-            <span className="global-ai-queue-hint">Sequential LLM worker active</span>
-          </div>
-        )}
         <LessonViewer
           topic={topicDetails}
           contentRef={contentRef as React.RefObject<HTMLDivElement>}
@@ -728,6 +721,14 @@ export function App() {
             if (lang) setTranslatingLanguage(lang);
           }}
         />
+
+        {globalAITask && (
+          <div className="global-ai-status-bar" title="AI Worker Active">
+            <Loader2 size={13} className="animate-spin" />
+            <span className="global-ai-task-text">{globalAITask}...</span>
+            <span className="global-ai-queue-hint">Sequential LLM worker active</span>
+          </div>
+        )}
 
         <TerminalDrawer
           ref={terminalRef}

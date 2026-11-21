@@ -248,13 +248,35 @@ def list_installed_packs() -> List[Dict[str, Any]]:
     Lists all installed topic packages tracked in database or disk.
     """
     packs = []
+    tracked_domains = set()
+
     with get_db_connection() as conn:
         rows = conn.execute("SELECT key, value FROM settings WHERE key LIKE 'pack:%'").fetchall()
         for r in rows:
             try:
-                packs.append(json.loads(r["value"]))
+                data = json.loads(r["value"])
+                packs.append(data)
+                if data.get("domain"):
+                    tracked_domains.add(data.get("domain"))
             except Exception:
                 pass
+
+    # Discover physical domains present in TOPICS_DIR with generated curriculum
+    if TOPICS_DIR.exists():
+        for d in sorted(TOPICS_DIR.iterdir()):
+            if d.is_dir() and not d.name.startswith((".", "_")) and d.name not in tracked_domains:
+                stats = get_domain_pack_info(d.name)
+                if stats["lesson_count"] > 0:
+                    packs.append({
+                        "domain": d.name,
+                        "title": d.name.replace("_", " ").title(),
+                        "lesson_count": stats["lesson_count"],
+                        "lab_count": stats["lab_count"],
+                        "format": "v1.2",
+                        "status": "installed"
+                    })
+                    tracked_domains.add(d.name)
+
     return packs
 
 def uninstall_topic_pack(domain: str) -> Dict[str, Any]:

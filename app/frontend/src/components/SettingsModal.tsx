@@ -17,11 +17,13 @@ import {
   Search,
   Server,
   Network,
-  Sliders,
   HardDrive,
-  Info,
   Terminal,
-  Sparkles
+  Sparkles,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 export interface AppSettings {
@@ -68,17 +70,35 @@ export const DEFAULT_SETTINGS: AppSettings = {
   anthropicBaseUrl: 'https://api.anthropic.com',
 };
 
-export type SettingsTab = 'appearance' | 'models' | 'cluster' | 'addons' | 'maintenance';
+export type SettingsTab = 'appearance' | 'ai' | 'storage';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   settings: AppSettings;
   onSaveSettings: (newSettings: AppSettings) => void;
-  initialTab?: 'appearance' | 'cluster' | 'models' | 'store' | 'maintenance' | 'addons';
+  initialTab?: string;
   onTreeChange?: () => void;
   onLaunchSetupWizard?: () => void;
 }
+
+const THEME_OPTIONS = [
+  { id: 'studio', name: 'Studio Obsidian', baseColor: '#0c0d0f', accentColor: '#fbbf24' },
+  { id: 'github_dimmed', name: 'GitHub Dimmed', baseColor: '#1c2128', accentColor: '#539bf5' },
+  { id: 'nordic', name: 'Nordic Frost', baseColor: '#0f131a', accentColor: '#2dd4bf' },
+  { id: 'monokai', name: 'Monokai Pro', baseColor: '#19181a', accentColor: '#ffd866' },
+  { id: 'dracula', name: 'Dracula Noir', baseColor: '#1e1f29', accentColor: '#bd93f9' },
+  { id: 'solarized', name: 'Solarized Dark', baseColor: '#00212b', accentColor: '#b58900' },
+  { id: 'titanium', name: 'Titanium Daybreak', baseColor: '#101114', accentColor: '#e5e7eb' },
+];
+
+const ACCENT_OPTIONS = [
+  { id: 'gold', name: 'Amber Gold', hex: '#fbbf24' },
+  { id: 'cyan', name: 'Electric Cyan', hex: '#06b6d4' },
+  { id: 'emerald', name: 'Matrix Emerald', hex: '#10b981' },
+  { id: 'amethyst', name: 'Royal Amethyst', hex: '#a855f7' },
+  { id: 'rose', name: 'Crimson Rose', hex: '#f43f5e' },
+];
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
@@ -90,14 +110,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onLaunchSetupWizard,
 }) => {
   const resolveTab = (tab?: string): SettingsTab => {
-    if (tab === 'cluster') return 'cluster';
-    if (tab === 'models') return 'models';
-    if (tab === 'store' || tab === 'addons') return 'addons';
-    if (tab === 'maintenance') return 'maintenance';
+    if (tab === 'models' || tab === 'cluster' || tab === 'ai') return 'ai';
+    if (tab === 'store' || tab === 'storage' || tab === 'maintenance' || tab === 'addons') return 'storage';
     return 'appearance';
   };
 
   const [activeTab, setActiveTab] = useState<SettingsTab>(resolveTab(initialTab));
+  const [providerMode, setProviderMode] = useState<'local' | 'cloud'>(() => {
+    return settings.anthropicApiKey || settings.geminiApiKey ? 'cloud' : 'local';
+  });
 
   useEffect(() => {
     if (isOpen && initialTab) {
@@ -107,6 +128,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const [formData, setFormData] = useState<AppSettings>(settings);
   const [savedMessage, setSavedMessage] = useState(false);
+  const [showAnthropicKey, setShowAnthropicKey] = useState(false);
+  const [showGeminiKey, setShowGeminiKey] = useState(false);
+  const [showClusterAdvanced, setShowClusterAdvanced] = useState(false);
+
   const [clusterNodes, setClusterNodes] = useState<string[]>(
     settings.clusterHosts || DEFAULT_SETTINGS.clusterHosts || []
   );
@@ -201,108 +226,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchPackages();
-      fetchDiscoveredModels();
-      fetchNodePins();
-      scanCluster();
-    }
-  }, [isOpen]);
-
-  const handleExportPack = async (domain: string) => {
-    setActionInProgress(`export-${domain}`);
-    setStoreMessage(null);
-    try {
-      const res = await fetch(`/api/packages/export?domain=${encodeURIComponent(domain)}`, {
-        method: 'POST'
-      });
-      if (!res.ok) throw new Error('Package export failed');
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${domain}.synpack`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-      setStoreMessage({ text: `Successfully exported ${domain}.synpack`, type: 'success' });
-    } catch (err: any) {
-      setStoreMessage({ text: err.message || 'Export failed', type: 'error' });
-    } finally {
-      setActionInProgress(null);
-    }
-  };
-
-  const handleInstallDomain = async (domain: string) => {
-    setActionInProgress(`install-${domain}`);
-    setStoreMessage(null);
-    try {
-      const res = await fetch(`/api/packages/install?domain=${encodeURIComponent(domain)}`, {
-        method: 'POST'
-      });
-      if (!res.ok) throw new Error('Package installation failed');
-      setStoreMessage({ text: `Package for ${domain} installed and registered!`, type: 'success' });
-      await fetchPackages();
-      onTreeChange?.();
-    } catch (err: any) {
-      setStoreMessage({ text: err.message || 'Install failed', type: 'error' });
-    } finally {
-      setActionInProgress(null);
-    }
-  };
-
-  const handleUninstallPack = async (domain: string) => {
-    if (!window.confirm(`Are you sure you want to remove the '${domain}' package from your local workspace?`)) {
-      return;
-    }
-    setActionInProgress(`uninstall-${domain}`);
-    setStoreMessage(null);
-    try {
-      const res = await fetch(`/api/packages/${encodeURIComponent(domain)}`, {
-        method: 'DELETE'
-      });
-      if (!res.ok) throw new Error('Package uninstall failed');
-      setStoreMessage({ text: `Removed ${domain} package.`, type: 'success' });
-      await fetchPackages();
-      onTreeChange?.();
-    } catch (err: any) {
-      setStoreMessage({ text: err.message || 'Uninstall failed', type: 'error' });
-    } finally {
-      setActionInProgress(null);
-    }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setActionInProgress('uploading');
-    setStoreMessage(null);
-    const data = new FormData();
-    data.append('file', file);
-
-    try {
-      const res = await fetch('/api/packages/install', {
-        method: 'POST',
-        body: data
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || 'Package import failed');
-      }
-      setStoreMessage({ text: `Successfully imported ${file.name}!`, type: 'success' });
-      await fetchPackages();
-      onTreeChange?.();
-    } catch (err: any) {
-      setStoreMessage({ text: err.message || 'Upload failed', type: 'error' });
-    } finally {
-      setActionInProgress(null);
-      e.target.value = '';
-    }
-  };
-
   const testNodeConnection = async (host: string) => {
     setNodeStatuses((prev) => ({
       ...prev,
@@ -346,7 +269,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         ...prev,
         [host]: {
           online: false,
-          error: err.name === 'TimeoutError' ? 'Timeout (4s)' : 'Offline / Unreachable',
+          error: err.name === 'TimeoutError' ? 'Timeout (4s)' : 'Offline',
           testing: false,
         },
       }));
@@ -367,6 +290,108 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       await Promise.all(clusterNodes.map((node) => testNodeConnection(node)));
     } finally {
       setIsScanningCluster(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchPackages();
+      fetchDiscoveredModels();
+      fetchNodePins();
+      scanCluster();
+    }
+  }, [isOpen]);
+
+  const handleExportPack = async (domain: string) => {
+    setActionInProgress(`export-${domain}`);
+    setStoreMessage(null);
+    try {
+      const res = await fetch(`/api/packages/export?domain=${encodeURIComponent(domain)}`, {
+        method: 'POST'
+      });
+      if (!res.ok) throw new Error('Package export failed');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${domain}.synpack`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setStoreMessage({ text: `Exported ${domain}.synpack successfully`, type: 'success' });
+    } catch (err: any) {
+      setStoreMessage({ text: err.message || 'Export failed', type: 'error' });
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  const handleInstallDomain = async (domain: string) => {
+    setActionInProgress(`install-${domain}`);
+    setStoreMessage(null);
+    try {
+      const res = await fetch(`/api/packages/install?domain=${encodeURIComponent(domain)}`, {
+        method: 'POST'
+      });
+      if (!res.ok) throw new Error('Package installation failed');
+      setStoreMessage({ text: `Package for ${domain} installed and verified!`, type: 'success' });
+      await fetchPackages();
+      onTreeChange?.();
+    } catch (err: any) {
+      setStoreMessage({ text: err.message || 'Install failed', type: 'error' });
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  const handleUninstallPack = async (domain: string) => {
+    if (!window.confirm(`Are you sure you want to remove '${domain}' from your local workspace?`)) {
+      return;
+    }
+    setActionInProgress(`uninstall-${domain}`);
+    setStoreMessage(null);
+    try {
+      const res = await fetch(`/api/packages/${encodeURIComponent(domain)}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) throw new Error('Package uninstall failed');
+      setStoreMessage({ text: `Removed ${domain} package.`, type: 'success' });
+      await fetchPackages();
+      onTreeChange?.();
+    } catch (err: any) {
+      setStoreMessage({ text: err.message || 'Uninstall failed', type: 'error' });
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setActionInProgress('uploading');
+    setStoreMessage(null);
+    const data = new FormData();
+    data.append('file', file);
+
+    try {
+      const res = await fetch('/api/packages/install', {
+        method: 'POST',
+        body: data
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Package import failed');
+      }
+      setStoreMessage({ text: `Imported ${file.name} successfully!`, type: 'success' });
+      await fetchPackages();
+      onTreeChange?.();
+    } catch (err: any) {
+      setStoreMessage({ text: err.message || 'Upload failed', type: 'error' });
+    } finally {
+      setActionInProgress(null);
+      e.target.value = '';
     }
   };
 
@@ -410,13 +435,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   if (!isOpen) return null;
 
-  const onlineNodesCount = Object.values(nodeStatuses).filter((s) => s.online).length;
-  const installedAddonsCount = packagesData.installed.length;
+  const currentHostStatus = nodeStatuses[formData.ollamaHost] || {};
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="settings-window" onClick={(e) => e.stopPropagation()}>
-        {/* Left Vertical Sidebar */}
+        {/* Left Vertical Sidebar (Only 3 clean, purposeful tabs) */}
         <div className="settings-sidebar">
           <div className="settings-sidebar-header">
             <Settings size={18} className="settings-header-icon" />
@@ -429,50 +453,32 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               className={`settings-nav-item ${activeTab === 'appearance' ? 'active' : ''}`}
               onClick={() => setActiveTab('appearance')}
             >
-              <Palette size={15} />
+              <Palette size={16} />
               <span>Appearance</span>
             </button>
 
             <button
               type="button"
-              className={`settings-nav-item ${activeTab === 'models' ? 'active' : ''}`}
-              onClick={() => setActiveTab('models')}
+              className={`settings-nav-item ${activeTab === 'ai' ? 'active' : ''}`}
+              onClick={() => setActiveTab('ai')}
             >
-              <Cpu size={15} />
-              <span>AI & Models</span>
-            </button>
-
-            <button
-              type="button"
-              className={`settings-nav-item ${activeTab === 'cluster' ? 'active' : ''}`}
-              onClick={() => setActiveTab('cluster')}
-            >
-              <Network size={15} />
-              <span>Cluster Nodes</span>
-              {onlineNodesCount > 0 && (
-                <span className="settings-nav-badge">{onlineNodesCount}</span>
+              <Cpu size={16} />
+              <span>AI Engine</span>
+              {currentHostStatus.online && (
+                <span className="settings-nav-badge">Online</span>
               )}
             </button>
 
             <button
               type="button"
-              className={`settings-nav-item ${activeTab === 'addons' ? 'active' : ''}`}
-              onClick={() => setActiveTab('addons')}
+              className={`settings-nav-item ${activeTab === 'storage' ? 'active' : ''}`}
+              onClick={() => setActiveTab('storage')}
             >
-              <Package size={15} />
-              <span>Storage & Addons</span>
-              {installedAddonsCount > 0 && (
-                <span className="settings-nav-badge secondary">{installedAddonsCount}</span>
+              <Package size={16} />
+              <span>Curriculum & Packs</span>
+              {packagesData.installed.length > 0 && (
+                <span className="settings-nav-badge secondary">{packagesData.installed.length}</span>
               )}
-            </button>
-
-            <button
-              type="button"
-              className={`settings-nav-item ${activeTab === 'maintenance' ? 'active' : ''}`}
-              onClick={() => setActiveTab('maintenance')}
-            >
-              <Sliders size={15} />
-              <span>System & Setup</span>
             </button>
           </nav>
 
@@ -481,23 +487,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         </div>
 
-        {/* Right Main Body Content */}
+        {/* Right Content Area */}
         <div className="settings-body">
           <div className="settings-body-header">
             <div>
               <h3>
-                {activeTab === 'appearance' && 'Appearance & Reader'}
-                {activeTab === 'models' && 'AI Models & Cloud Fallbacks'}
-                {activeTab === 'cluster' && 'Cluster Nodes & Hardware Discovery'}
-                {activeTab === 'addons' && 'Curriculum Store & Addons'}
-                {activeTab === 'maintenance' && 'System Maintenance & Setup'}
+                {activeTab === 'appearance' && 'Appearance & Reading Design'}
+                {activeTab === 'ai' && 'AI Engine & Inference Models'}
+                {activeTab === 'storage' && 'Curriculum Store & Maintenance'}
               </h3>
               <p className="settings-tab-desc">
-                {activeTab === 'appearance' && 'Customize theme styling, typography, and reader viewing options.'}
-                {activeTab === 'models' && 'Configure primary local LLMs, Socratic mentor model, and optional cloud keys.'}
-                {activeTab === 'cluster' && 'Manage distributed Ollama inference servers, latency pings, and hardware pins.'}
-                {activeTab === 'addons' && 'Install masterclass domain packs, export local packages, or sideload .synpack archives.'}
-                {activeTab === 'maintenance' && 'Database management, cache cleaning, and first-run setup wizard.'}
+                {activeTab === 'appearance' && 'Customize theme palettes, typography sizing, and reader geometry.'}
+                {activeTab === 'ai' && 'Manage your local Ollama cluster, primary models, or cloud fallback API keys.'}
+                {activeTab === 'storage' && 'Download complete masterclass packs, export custom domains, and vacuum local cache.'}
               </p>
             </div>
             <button className="icon-btn" onClick={onClose} title="Close Settings">
@@ -506,49 +508,56 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           <div className="settings-tab-scroll">
-            {/* Tab 1: Appearance */}
+            {/* TAB 1: APPEARANCE */}
             {activeTab === 'appearance' && (
               <div className="settings-section">
+                {/* Visual Theme Cards */}
                 <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Theme & Color Accents</h4>
-                  <div className="settings-row-2col">
-                    <div className="form-group compact">
-                      <label>Color Theme</label>
-                      <select
-                        value={formData.theme}
-                        onChange={(e) => setFormData({ ...formData, theme: e.target.value as any })}
+                  <h4 className="panel-box-heading">Visual Color Scheme</h4>
+                  <div className="theme-cards-grid">
+                    {THEME_OPTIONS.map((th) => (
+                      <div
+                        key={th.id}
+                        className={`theme-card ${formData.theme === th.id ? 'active' : ''}`}
+                        onClick={() => setFormData({ ...formData, theme: th.id as any })}
                       >
-                        <option value="studio">Studio Obsidian — Deep OLED Carbon & Gold</option>
-                        <option value="github_dimmed">GitHub Dimmed — Slate Navy & High Contrast</option>
-                        <option value="nordic">Nordic Frost — Polar Night & Arctic Cyan</option>
-                        <option value="monokai">Monokai Pro — Toasted Espresso & Neon Pastels</option>
-                        <option value="dracula">Dracula Noir — Deep Violet Indigo & Pink</option>
-                        <option value="solarized">Solarized Dark — Teal Oceanic & Warm Amber</option>
-                        <option value="titanium">Titanium Daybreak — High-Contrast Light Mode</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group compact">
-                      <label>Accent Highlight</label>
-                      <select
-                        value={formData.accentColor || 'gold'}
-                        onChange={(e) => setFormData({ ...formData, accentColor: e.target.value as any })}
-                      >
-                        <option value="gold">🟡 Amber Gold (#fbbf24)</option>
-                        <option value="cyan">🔵 Electric Cyan (#06b6d4)</option>
-                        <option value="emerald">🟢 Matrix Emerald (#10b981)</option>
-                        <option value="amethyst">🟣 Royal Amethyst (#a855f7)</option>
-                        <option value="rose">🔴 Crimson Rose (#f43f5e)</option>
-                      </select>
-                    </div>
+                        <div className="theme-preview-swatch">
+                          <div className="swatch-base" style={{ backgroundColor: th.baseColor }} />
+                          <div className="swatch-accent" style={{ backgroundColor: th.accentColor }} />
+                        </div>
+                        <div className="theme-card-info">
+                          <span className="theme-card-name">{th.name}</span>
+                          {formData.theme === th.id && <Check size={13} className="theme-check-icon" />}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
+                {/* Accent Color Swatches */}
+                <div className="settings-panel-box">
+                  <h4 className="panel-box-heading">Accent Highlights</h4>
+                  <div className="accent-chips-row">
+                    {ACCENT_OPTIONS.map((ac) => (
+                      <button
+                        key={ac.id}
+                        type="button"
+                        className={`accent-chip-btn ${formData.accentColor === ac.id ? 'active' : ''}`}
+                        onClick={() => setFormData({ ...formData, accentColor: ac.id as any })}
+                      >
+                        <span className="chip-circle" style={{ backgroundColor: ac.hex }} />
+                        <span>{ac.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Typography & Sizing */}
                 <div className="settings-panel-box">
                   <h4 className="panel-box-heading">Typography & Reading Geometry</h4>
                   <div className="settings-row-3col">
                     <div className="form-group compact">
-                      <label>Body Font Family</label>
+                      <label>Font Family</label>
                       <select
                         value={formData.fontFamily}
                         onChange={(e) => setFormData({ ...formData, fontFamily: e.target.value as any })}
@@ -560,14 +569,53 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
 
                     <div className="form-group compact">
-                      <label>Content Line Height</label>
+                      <label>Reading Font Size</label>
+                      <select
+                        value={formData.fontSize || 'standard'}
+                        onChange={(e) => setFormData({ ...formData, fontSize: e.target.value as any })}
+                      >
+                        <option value="compact">Compact (13px) — High Density</option>
+                        <option value="standard">Standard (15px) — Balanced</option>
+                        <option value="large">Large (17px) — Relaxed</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group compact">
+                      <label>Line Spacing</label>
                       <select
                         value={formData.lineHeight || 'balanced'}
                         onChange={(e) => setFormData({ ...formData, lineHeight: e.target.value as any })}
                       >
-                        <option value="dense">Dense (1.45) — High density</option>
-                        <option value="balanced">Balanced (1.65) — Standard</option>
-                        <option value="relaxed">Relaxed (1.85) — Long-form</option>
+                        <option value="dense">Dense (1.45)</option>
+                        <option value="balanced">Balanced (1.65)</option>
+                        <option value="relaxed">Relaxed (1.85)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Live Typography Preview Box */}
+                  <div className="typography-preview-box">
+                    <p
+                      className="preview-sample-text"
+                      style={{
+                        fontFamily: formData.fontFamily === 'serif' ? 'var(--font-serif)' : formData.fontFamily === 'mono' ? 'var(--font-mono)' : 'var(--font-sans)',
+                        fontSize: formData.fontSize === 'compact' ? '13px' : formData.fontSize === 'large' ? '17px' : '15px',
+                        lineHeight: formData.lineHeight === 'dense' ? 1.45 : formData.lineHeight === 'relaxed' ? 1.85 : 1.65,
+                      }}
+                    >
+                      "The first principle of engineering is that you must not fool yourself, and you are the easiest person to fool."
+                    </p>
+                  </div>
+
+                  <div className="settings-row-2col" style={{ marginTop: '12px' }}>
+                    <div className="form-group compact">
+                      <label>Reader View Width</label>
+                      <select
+                        value={formData.readerWidth || 'full'}
+                        onChange={(e) => setFormData({ ...formData, readerWidth: e.target.value as any })}
+                      >
+                        <option value="full">Full Width (Adapts to Window)</option>
+                        <option value="constrained">Focused Editorial Column (780px Max)</option>
                       </select>
                     </div>
 
@@ -588,217 +636,350 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             )}
 
-            {/* Tab 2: AI & Models */}
-            {activeTab === 'models' && (
+            {/* TAB 2: AI ENGINE (Unified Local vs Cloud) */}
+            {activeTab === 'ai' && (
               <div className="settings-section">
-                <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Local AI Engine Assignment</h4>
-                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 8px 0' }}>
-                    Select the local models running on your cluster nodes. When online, models are automatically discovered from Ollama.
-                  </p>
-
-                  <div className="settings-row-2col">
-                    <div className="form-group compact">
-                      <label>Primary Masterclass Generation Model</label>
-                      <input
-                        type="text"
-                        list="discovered-models-list"
-                        value={formData.primaryModel}
-                        onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
-                        placeholder="e.g. qwen2.5-coder:32b"
-                        className="font-mono"
-                      />
-                    </div>
-
-                    <div className="form-group compact">
-                      <label>Socratic Mentor & Chat Model</label>
-                      <input
-                        type="text"
-                        list="discovered-models-list"
-                        value={formData.mentorModel || ''}
-                        onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
-                        placeholder="Default to Primary Model"
-                        className="font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  <datalist id="discovered-models-list">
-                    {discoveredModels.map((m) => (
-                      <option key={m} value={m} />
-                    ))}
-                  </datalist>
-
-                  <div className="form-group compact" style={{ marginTop: '8px' }}>
-                    <label>Reviewer / Evaluator Model</label>
-                    <input
-                      type="text"
-                      list="discovered-models-list"
-                      value={formData.reviewerModel}
-                      onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
-                      placeholder="e.g. deepseek-r1:32b"
-                      className="font-mono"
-                    />
-                  </div>
-                </div>
-
-                <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Optional Cloud Fallback API Keys</h4>
-                  <div className="settings-row-2col">
-                    <div className="form-group compact">
-                      <label>Anthropic API Key (Claude Sonnet / Opus)</label>
-                      <input
-                        type="password"
-                        value={formData.anthropicApiKey || ''}
-                        onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
-                        placeholder="sk-ant-..."
-                        className="font-mono"
-                      />
-                    </div>
-
-                    <div className="form-group compact">
-                      <label>Google Gemini API Key (Gemini Flash / Pro)</label>
-                      <input
-                        type="password"
-                        value={formData.geminiApiKey || ''}
-                        onChange={(e) => setFormData({ ...formData, geminiApiKey: e.target.value })}
-                        placeholder="AIzaSy..."
-                        className="font-mono"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Tab 3: Cluster Nodes */}
-            {activeTab === 'cluster' && (
-              <div className="settings-section">
-                <div className="section-title-row">
-                  <div className="section-title">
-                    <Server size={14} />
-                    <span>Inference Nodes & Hardware Endpoints</span>
-                  </div>
+                {/* Segmented Mode Switcher */}
+                <div className="provider-mode-segmented">
                   <button
                     type="button"
-                    className="btn-secondary-sm"
-                    onClick={scanCluster}
-                    disabled={isScanningCluster}
+                    className={`provider-segment-btn ${providerMode === 'local' ? 'active' : ''}`}
+                    onClick={() => setProviderMode('local')}
                   >
-                    <RefreshCw size={12} className={isScanningCluster ? 'animate-spin' : ''} />
-                    <span>{isScanningCluster ? 'Testing...' : 'Ping All Nodes'}</span>
+                    <Server size={15} />
+                    <span>Local AI Engine (Ollama / Local Cluster)</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`provider-segment-btn ${providerMode === 'cloud' ? 'active' : ''}`}
+                    onClick={() => setProviderMode('cloud')}
+                  >
+                    <Cpu size={15} />
+                    <span>Cloud Providers (Anthropic Claude / Google Gemini)</span>
                   </button>
                 </div>
 
-                <div className="cluster-nodes-list">
-                  {clusterNodes.map((nodeUrl) => {
-                    const status = nodeStatuses[nodeUrl] || {};
-                    const cleanKey = nodeUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
-                    const currentPin = nodePins[cleanKey] || nodePins[nodeUrl] || '__auto__';
-
-                    return (
-                      <div key={nodeUrl} className="cluster-node-card">
-                        <div className="node-card-header">
-                          <div className="node-status-indicator">
-                            <span className={`status-dot ${status.online ? 'online' : 'offline'}`} />
-                            <span className="node-url font-mono">{nodeUrl}</span>
-                          </div>
-
-                          <div className="node-actions">
-                            {status.latency_ms !== undefined && (
-                              <span className="node-latency">{status.latency_ms} ms</span>
-                            )}
-                            <button
-                              type="button"
-                              className="icon-btn-sm"
-                              onClick={() => testNodeConnection(nodeUrl)}
-                              title="Test node latency"
-                            >
-                              <RefreshCw size={11} className={status.testing ? 'animate-spin' : ''} />
-                            </button>
-                            {clusterNodes.length > 1 && (
-                              <button
-                                type="button"
-                                className="icon-btn-sm danger"
-                                onClick={() => handleRemoveNode(nodeUrl)}
-                                title="Remove node"
-                              >
-                                <Trash2 size={11} />
-                              </button>
-                            )}
-                          </div>
+                {/* Local Engine Panel */}
+                {providerMode === 'local' && (
+                  <>
+                    <div className="settings-panel-box">
+                      <div className="probe-header-row">
+                        <div className="probe-host-label">
+                          <Server size={14} />
+                          <span>Local Ollama Endpoint:</span>
+                          <input
+                            type="text"
+                            value={formData.ollamaHost}
+                            onChange={(e) => setFormData({ ...formData, ollamaHost: e.target.value })}
+                            className="wizard-input font-mono"
+                            style={{ padding: '3px 8px', fontSize: '12px', width: '240px' }}
+                          />
                         </div>
+                        <button
+                          type="button"
+                          className="btn-secondary-sm"
+                          onClick={() => testNodeConnection(formData.ollamaHost)}
+                          disabled={currentHostStatus.testing}
+                        >
+                          <RefreshCw size={12} className={currentHostStatus.testing ? 'animate-spin' : ''} />
+                          <span>{currentHostStatus.testing ? 'Testing...' : 'Test Connection'}</span>
+                        </button>
+                      </div>
 
-                        {status.models && status.models.length > 0 && (
-                          <div className="node-models-tags">
-                            {status.models.slice(0, 6).map((m) => (
-                              <span key={m} className="node-model-chip font-mono">
-                                {m}
-                              </span>
-                            ))}
-                            {status.models.length > 6 && (
-                              <span className="node-model-chip more">+{status.models.length - 6} more</span>
-                            )}
+                      <div className="probe-status-row" style={{ marginTop: '8px' }}>
+                        {currentHostStatus.online ? (
+                          <div className="probe-badge online">
+                            <CheckCircle size={13} />
+                            <span>Online ({currentHostStatus.latency_ms || 12} ms) • {discoveredModels.length} models detected</span>
+                          </div>
+                        ) : (
+                          <div className="probe-badge offline">
+                            <AlertCircle size={13} />
+                            <span>Offline or unreachable on {formData.ollamaHost}. Ensure <code>ollama serve</code> is running.</span>
                           </div>
                         )}
+                      </div>
+                    </div>
 
-                        <div className="node-pin-row" style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
-                          <span style={{ color: 'var(--text-muted)' }}>Pin Model:</span>
-                          <select
-                            value={currentPin}
-                            onChange={(e) => handleUpdateNodePin(nodeUrl, e.target.value)}
-                            style={{ padding: '2px 6px', fontSize: '11px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }}
-                          >
-                            <option value="__auto__">Auto (Load Balanced)</option>
-                            {(status.models || []).map((m) => (
-                              <option key={m} value={m}>{m}</option>
-                            ))}
-                          </select>
+                    <div className="settings-panel-box">
+                      <h4 className="panel-box-heading">Active Model Assignment</h4>
+                      <div className="settings-row-2col">
+                        <div className="form-group compact">
+                          <label>Primary Masterclass Generation Model</label>
+                          <input
+                            type="text"
+                            list="discovered-models-list"
+                            value={formData.primaryModel}
+                            onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
+                            placeholder="e.g. qwen2.5-coder:32b"
+                            className="font-mono"
+                          />
+                        </div>
+
+                        <div className="form-group compact">
+                          <label>Socratic Mentor Model</label>
+                          <input
+                            type="text"
+                            list="discovered-models-list"
+                            value={formData.mentorModel || ''}
+                            onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
+                            placeholder="Default to Primary Model"
+                            className="font-mono"
+                          />
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
 
-                <div className="add-node-bar" style={{ marginTop: '12px' }}>
-                  <input
-                    type="text"
-                    value={newNodeUrl}
-                    onChange={(e) => setNewNodeUrl(e.target.value)}
-                    placeholder="Add remote node: e.g. http://192.168.1.50:11434"
-                    className="font-mono"
-                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddNode())}
-                  />
-                  <button type="button" className="btn-secondary" onClick={handleAddNode}>
-                    <Plus size={13} />
-                    <span>Add Node</span>
-                  </button>
-                </div>
+                      <datalist id="discovered-models-list">
+                        {discoveredModels.map((m) => (
+                          <option key={m} value={m} />
+                        ))}
+                      </datalist>
+
+                      {discoveredModels.length > 0 && (
+                        <div style={{ marginTop: '8px' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Quick Select from Local Models:</span>
+                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                            {discoveredModels.slice(0, 5).map((m) => (
+                              <button
+                                key={m}
+                                type="button"
+                                className="node-model-chip font-mono"
+                                onClick={() => setFormData({ ...formData, primaryModel: m, mentorModel: m })}
+                                title="Set as primary and mentor"
+                              >
+                                {m}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Advanced: Cluster Nodes */}
+                    <div className="settings-panel-box">
+                      <div
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                        onClick={() => setShowClusterAdvanced((prev) => !prev)}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Network size={14} />
+                          <h4 className="panel-box-heading" style={{ margin: 0 }}>Distributed Cluster Nodes ({clusterNodes.length})</h4>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <button
+                            type="button"
+                            className="btn-secondary-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              scanCluster();
+                            }}
+                            disabled={isScanningCluster}
+                          >
+                            <RefreshCw size={11} className={isScanningCluster ? 'animate-spin' : ''} />
+                            <span>{isScanningCluster ? 'Testing...' : 'Ping Nodes'}</span>
+                          </button>
+                          <button type="button" className="icon-btn-sm">
+                            {showClusterAdvanced ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {showClusterAdvanced && (
+                        <div style={{ marginTop: '12px' }}>
+                          <div className="cluster-nodes-list">
+                            {clusterNodes.map((nodeUrl) => {
+                              const status = nodeStatuses[nodeUrl] || {};
+                              const cleanKey = nodeUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                              const currentPin = nodePins[cleanKey] || nodePins[nodeUrl] || '__auto__';
+
+                              return (
+                                <div key={nodeUrl} className="cluster-node-card">
+                                  <div className="node-card-header">
+                                    <div className="node-status-indicator">
+                                      <span className={`status-dot ${status.online ? 'online' : 'offline'}`} />
+                                      <span className="node-url font-mono">{nodeUrl}</span>
+                                    </div>
+
+                                    <div className="node-actions">
+                                      {status.latency_ms !== undefined && (
+                                        <span className="node-latency">{status.latency_ms} ms</span>
+                                      )}
+                                      <button
+                                        type="button"
+                                        className="icon-btn-sm"
+                                        onClick={() => testNodeConnection(nodeUrl)}
+                                      >
+                                        <RefreshCw size={11} className={status.testing ? 'animate-spin' : ''} />
+                                      </button>
+                                      {clusterNodes.length > 1 && (
+                                        <button
+                                          type="button"
+                                          className="icon-btn-sm danger"
+                                          onClick={() => handleRemoveNode(nodeUrl)}
+                                        >
+                                          <Trash2 size={11} />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="node-pin-row" style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
+                                    <span style={{ color: 'var(--text-muted)' }}>Pin Model:</span>
+                                    <select
+                                      value={currentPin}
+                                      onChange={(e) => handleUpdateNodePin(nodeUrl, e.target.value)}
+                                      style={{ padding: '2px 6px', fontSize: '11px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }}
+                                    >
+                                      <option value="__auto__">Auto (Load Balanced)</option>
+                                      {(status.models || []).map((m) => (
+                                        <option key={m} value={m}>{m}</option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          <div className="add-node-bar" style={{ marginTop: '10px' }}>
+                            <input
+                              type="text"
+                              value={newNodeUrl}
+                              onChange={(e) => setNewNodeUrl(e.target.value)}
+                              placeholder="Add LAN GPU node: e.g. http://192.168.1.50:11434"
+                              className="font-mono"
+                            />
+                            <button type="button" className="btn-secondary" onClick={handleAddNode}>
+                              <Plus size={13} />
+                              <span>Add Node</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {/* Cloud Providers Panel */}
+                {providerMode === 'cloud' && (
+                  <div className="settings-section">
+                    <div className="settings-panel-box">
+                      <div className="panel-header-with-icon">
+                        <Cpu size={15} />
+                        <h4 className="panel-box-heading" style={{ margin: 0 }}>Anthropic Claude</h4>
+                      </div>
+
+                      <div className="form-group compact" style={{ marginTop: '8px' }}>
+                        <label>Anthropic API Key</label>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <input
+                            type={showAnthropicKey ? 'text' : 'password'}
+                            value={formData.anthropicApiKey || ''}
+                            onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
+                            placeholder="sk-ant-api03-..."
+                            className="font-mono"
+                            style={{ flex: 1 }}
+                          />
+                          <button
+                            type="button"
+                            className="icon-btn-sm"
+                            onClick={() => setShowAnthropicKey((p) => !p)}
+                            title={showAnthropicKey ? 'Hide key' : 'Show key'}
+                          >
+                            {showAnthropicKey ? <EyeOff size={13} /> : <Eye size={13} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="form-group compact" style={{ marginTop: '8px' }}>
+                        <label>Base URL Override (Optional)</label>
+                        <input
+                          type="text"
+                          value={formData.anthropicBaseUrl}
+                          onChange={(e) => setFormData({ ...formData, anthropicBaseUrl: e.target.value })}
+                          placeholder="https://api.anthropic.com"
+                          className="font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="settings-panel-box">
+                      <div className="panel-header-with-icon">
+                        <Sparkles size={15} />
+                        <h4 className="panel-box-heading" style={{ margin: 0 }}>Google Gemini</h4>
+                      </div>
+
+                      <div className="form-group compact" style={{ marginTop: '8px' }}>
+                        <label>Gemini API Key</label>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <input
+                            type={showGeminiKey ? 'text' : 'password'}
+                            value={formData.geminiApiKey || ''}
+                            onChange={(e) => setFormData({ ...formData, geminiApiKey: e.target.value })}
+                            placeholder="AIzaSy..."
+                            className="font-mono"
+                            style={{ flex: 1 }}
+                          />
+                          <button
+                            type="button"
+                            className="icon-btn-sm"
+                            onClick={() => setShowGeminiKey((p) => !p)}
+                            title={showGeminiKey ? 'Hide key' : 'Show key'}
+                          >
+                            {showGeminiKey ? <EyeOff size={13} /> : <Eye size={13} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="form-group compact" style={{ marginTop: '8px' }}>
+                        <label>Base URL Override (Optional)</label>
+                        <input
+                          type="text"
+                          value={formData.geminiBaseUrl || ''}
+                          onChange={(e) => setFormData({ ...formData, geminiBaseUrl: e.target.value })}
+                          placeholder="https://generativelanguage.googleapis.com"
+                          className="font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="wizard-info-note">
+                      Cloud keys are saved securely in your personal local environment configuration (<code>~/.config/synapse/env</code>) and are never sent to external telemetry services.
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Tab 4: Storage & Addons */}
-            {activeTab === 'addons' && (
+            {/* TAB 3: CURRICULUM & STORAGE */}
+            {activeTab === 'storage' && (
               <div className="settings-section">
-                <div className="section-title-row">
-                  <div className="section-title">
-                    <Package size={14} />
-                    <span>Curriculum Store & Addon Management</span>
+                {/* 1-Click Masterpack Hero Card */}
+                <div className="masterpack-hero-card">
+                  <div className="masterpack-info-col">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Package size={18} style={{ color: 'var(--accent-gold)' }} />
+                      <h4>Canonical Master Curriculum Pack</h4>
+                    </div>
+                    <p>
+                      The master curriculum bundle includes all 12 core domains and 539 masterclasses.
+                      Currently <strong>{packagesData.installed.length}</strong> domains are installed locally.
+                    </p>
                   </div>
+
                   <button
                     type="button"
-                    className="icon-btn-sm"
-                    onClick={fetchPackages}
-                    title="Refresh Packages"
-                    disabled={isLoadingPackages}
+                    className="btn-primary"
+                    onClick={() => handleInstallDomain('complete')}
+                    disabled={actionInProgress === 'install-complete'}
                   >
-                    <RefreshCw size={13} className={isLoadingPackages ? 'animate-spin' : ''} />
+                    {actionInProgress === 'install-complete' ? (
+                      <Loader2 size={13} className="animate-spin" />
+                    ) : (
+                      <Download size={13} />
+                    )}
+                    <span>{packagesData.installed.length >= 12 ? 'Update Full Curriculum Pack' : 'Download Complete Masterpack'}</span>
                   </button>
-                </div>
-
-                <div className="settings-info-box" style={{ marginBottom: '14px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                  <Info size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
-                  <span>Synapse includes 12 canonical core domains. Below you can inspect installed modules, export them to standalone <code>.synpack</code> packages, or import custom archives.</span>
                 </div>
 
                 {storeMessage && (
@@ -808,13 +989,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
                 )}
 
-                {/* Sideload & Filter bar */}
-                <div className="store-top-bar">
+                {/* Filter & Import Bar */}
+                <div className="store-top-bar" style={{ marginTop: '14px' }}>
                   <div className="store-search-box">
                     <Search size={13} className="store-search-icon" />
                     <input
                       type="text"
-                      placeholder="Filter domain packs..."
+                      placeholder="Filter installed courses..."
                       value={storeSearch}
                       onChange={(e) => setStoreSearch(e.target.value)}
                     />
@@ -831,10 +1012,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </label>
                 </div>
 
-                {/* Installed Packages Grid */}
-                <h4 className="panel-box-heading" style={{ marginTop: '16px' }}>
-                  Installed Knowledge Packs ({packagesData.installed.length})
-                </h4>
+                {/* Installed Domains Grid */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
+                  <h4 className="panel-box-heading" style={{ margin: 0 }}>
+                    Installed Curriculum Domains ({packagesData.installed.length})
+                  </h4>
+                  <button
+                    type="button"
+                    className="icon-btn-sm"
+                    onClick={fetchPackages}
+                    title="Refresh packages"
+                    disabled={isLoadingPackages}
+                  >
+                    <RefreshCw size={12} className={isLoadingPackages ? 'animate-spin' : ''} />
+                  </button>
+                </div>
 
                 <div className="store-packages-grid">
                   {packagesData.installed
@@ -861,7 +1053,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             className="btn-secondary-sm"
                             onClick={() => handleExportPack(pkg.domain)}
                             disabled={actionInProgress === `export-${pkg.domain}`}
-                            title="Export package to .synpack"
+                            title="Export to .synpack archive"
                           >
                             {actionInProgress === `export-${pkg.domain}` ? (
                               <Loader2 size={11} className="animate-spin" />
@@ -876,7 +1068,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             className="btn-secondary-sm danger"
                             onClick={() => handleUninstallPack(pkg.domain)}
                             disabled={actionInProgress === `uninstall-${pkg.domain}`}
-                            title="Remove domain package from local workspace"
+                            title="Remove from workspace"
                           >
                             <Trash2 size={11} />
                             <span>Remove</span>
@@ -886,108 +1078,45 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     ))}
                 </div>
 
-                {/* Available uninstalled domains */}
-                {packagesData.available_domains.filter((d) => !d.is_installed).length > 0 && (
-                  <>
-                    <h4 className="panel-box-heading" style={{ marginTop: '18px' }}>
-                      Available Masterclass Domains
-                    </h4>
-                    <div className="store-packages-grid">
-                      {packagesData.available_domains
-                        .filter((d) => !d.is_installed && (!storeSearch || d.domain.includes(storeSearch.toLowerCase())))
-                        .map((d) => (
-                          <div key={d.domain} className="store-package-card">
-                            <div className="package-card-header">
-                              <span className="package-domain font-mono">{d.domain}</span>
-                              <h5>{d.title}</h5>
-                              <p className="package-desc">{d.description}</p>
-                            </div>
-
-                            <div className="package-card-actions">
-                              <button
-                                type="button"
-                                className="btn-primary-sm"
-                                onClick={() => handleInstallDomain(d.domain)}
-                                disabled={actionInProgress === `install-${d.domain}`}
-                              >
-                                {actionInProgress === `install-${d.domain}` ? (
-                                  <Loader2 size={11} className="animate-spin" />
-                                ) : (
-                                  <Download size={11} />
-                                )}
-                                <span>Install Package</span>
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </>
-                )}
-
-                {/* CLI Custom Domain Reference Card */}
+                {/* CLI Custom Domain Guide */}
                 <div className="settings-panel-box" style={{ marginTop: '16px' }}>
                   <div className="panel-header-with-icon">
                     <Terminal size={14} />
                     <h4 className="panel-box-heading" style={{ margin: 0 }}>Custom Domain CLI Workflow</h4>
                   </div>
                   <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '4px 0 8px 0' }}>
-                    You can create new domains, synthesize custom curriculum, and bundle archives via the terminal:
+                    Author new courses, synthesize curriculum with AI, and package archives via the terminal:
                   </p>
                   <pre className="code-block font-mono" style={{ fontSize: '11px', padding: '10px', background: 'var(--bg-primary)', borderRadius: '6px' }}>
-                    {`# 1. Create a custom topic:\nbin/synapse add robotics autonomous_systems slam_navigation --title "SLAM"\n\n# 2. Package your domain into an archive:\nbin/synapse pack robotics`}
+                    {`# 1. Add a new domain/topic:\nbin/synapse add robotics autonomous_systems slam_navigation --title "SLAM"\n\n# 2. Package into a portable .synpack archive:\nbin/synapse pack robotics`}
                   </pre>
                 </div>
-              </div>
-            )}
 
-            {/* Tab 5: System & Maintenance */}
-            {activeTab === 'maintenance' && (
-              <div className="settings-section">
-                <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Workspace Onboarding</h4>
-                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 10px 0' }}>
-                    Re-run the guided first-time setup wizard to test local Ollama detection, select primary models, or configure cloud API fallbacks.
-                  </p>
-                  <button
-                    type="button"
-                    className="btn-primary"
-                    onClick={() => {
-                      onClose();
-                      onLaunchSetupWizard?.();
-                    }}
-                  >
-                    <Sparkles size={14} />
-                    <span>Launch First-Run Setup Wizard</span>
-                  </button>
-                </div>
-
-                <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Runtime Database & Artifacts</h4>
-                  <div className="maintenance-info-grid">
-                    <div className="maintenance-info-item">
-                      <span className="info-label">Runtime DB</span>
-                      <span className="info-val">data/synapse.db (SQLite WAL)</span>
-                    </div>
-                    <div className="maintenance-info-item">
-                      <span className="info-label">Curriculum Dir</span>
-                      <span className="info-val">topics/ (539 Masterclasses)</span>
-                    </div>
-                    <div className="maintenance-info-item">
-                      <span className="info-label">User Credentials</span>
-                      <span className="info-val">~/.config/synapse/env</span>
-                    </div>
-                    <div className="maintenance-info-item">
-                      <span className="info-label">Persistence</span>
-                      <span className="info-val">Preserved Across Updates</span>
-                    </div>
+                {/* Practical Workspace Maintenance */}
+                <div className="settings-panel-box" style={{ marginTop: '16px' }}>
+                  <div className="panel-header-with-icon">
+                    <HardDrive size={14} />
+                    <h4 className="panel-box-heading" style={{ margin: 0 }}>Workspace Maintenance & Setup</h4>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="btn-secondary-sm"
+                      onClick={() => {
+                        onClose();
+                        onLaunchSetupWizard?.();
+                      }}
+                    >
+                      <Sparkles size={12} />
+                      <span>Launch Setup Wizard</span>
+                    </button>
+
                     <button
                       type="button"
                       className="btn-secondary-sm"
                       onClick={async () => {
-                        if (confirm('Clear transient cache (audio, neural TTS, translation buffers)?')) {
+                        if (confirm('Clear transient cache (audio TTS and translation buffers)?')) {
                           try {
                             const res = await fetch('/api/clean', { method: 'POST' });
                             if (res.ok) {
@@ -1001,7 +1130,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       }}
                     >
                       <Trash2 size={12} />
-                      <span>Clear Transient Caches</span>
+                      <span>Clear Transient Cache</span>
                     </button>
 
                     <button
@@ -1023,7 +1152,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       }}
                     >
                       <HardDrive size={12} />
-                      <span>Vacuum Database & Checkpoint WAL</span>
+                      <span>Vacuum SQLite Database</span>
                     </button>
                   </div>
                 </div>

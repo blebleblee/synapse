@@ -34,9 +34,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
+import concurrent.futures
 import threading
 from collections import deque
 from typing import Dict, List, Optional, Any
+
+# Dedicated isolated threadpool for LLM execution to prevent blocking HTTP endpoints
+AI_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=2, thread_name_prefix="synapse_ai_worker")
 
 ANSI_ESCAPE_RE = re.compile(r'\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 MAX_TERMINAL_LINE_LENGTH = 10000
@@ -299,11 +303,11 @@ def api_login(req: LoginRequest, request: Request):
     return {"token": token, "status": "authenticated", "auth_required": True}
 
 @app.get("/api/health")
-def get_health():
+async def get_health():
     return {"status": "ok", "app": "synapse-backend", "version": __version__}
 
 @app.get("/api/status")
-def get_status():
+async def get_status():
     tree = get_topic_tree()
     total_domains = len(tree)
     total_categories = 0
@@ -349,7 +353,7 @@ def get_status():
     }
 
 @app.get("/api/tree")
-def get_tree():
+async def get_tree():
     return get_topic_tree()
 
 class TestOllamaRequest(BaseModel):
@@ -483,11 +487,11 @@ def api_set_cluster_hosts(req: ClusterHostsRequest):
     return {"hosts": updated, "saved": True}
 
 @app.get("/api/search")
-def api_search(q: str = Query(..., min_length=2)):
+async def api_search(q: str = Query(..., min_length=2)):
     return {"results": search_curriculum(q)}
 
 @app.get("/api/graph")
-def api_graph():
+async def api_graph():
     return get_prerequisite_graph()
 
 @app.get("/api/topic/dependencies")
@@ -533,7 +537,7 @@ def update_app_settings(settings: Dict[str, Any]):
     return {"status": "success"}
 
 @app.get("/api/packages")
-def api_list_packages():
+async def api_list_packages():
     domains = [
         {"domain": "arts", "title": "Arts & Music Production", "description": "Composition, acoustic DSP, synthesizers, visual arts, and performance."},
         {"domain": "business", "title": "Business & Strategy", "description": "Financial modeling, negotiation, organizational design, operations."},
@@ -728,13 +732,16 @@ async def api_translate_content(req: TranslateRequest):
             text = text.replace(f"___BLOCK_{i}___", b)
         return text
 
+    sem = asyncio.Semaphore(2)
+
     async def translate_chunk(chunk_text: str) -> str:
         if not chunk_text.strip():
             return chunk_text
             
-        masked_text, blocks = mask_and_extract(chunk_text)
-        
-        prompt = f"""You are an expert technical translator and polyglot philologist.
+        async with sem:
+            masked_text, blocks = mask_and_extract(chunk_text)
+            
+            prompt = f"""You are an expert technical translator and polyglot philologist.
 Translate the following technical curriculum text into {lang_name}.
 
 CRITICAL INVARIANTS:
@@ -748,18 +755,19 @@ Text to translate:
 {masked_text}
 \"\"\""""
 
-        try:
-            translated_masked = await asyncio.to_thread(provider.generate, prompt)
-            translated_masked = translated_masked.strip()
-            
-            # Truncation Guard: if translation is completely broken (<20% length of source without blocks)
-            if len(translated_masked) < len(masked_text) * 0.2:
-                # Fallback to English chunk if model brutally failed
-                return chunk_text
+            try:
+                loop = asyncio.get_running_loop()
+                translated_masked = await loop.run_in_executor(AI_EXECUTOR, provider.generate, prompt)
+                translated_masked = translated_masked.strip()
+                
+                # Truncation Guard: if translation is completely broken (<20% length of source without blocks)
+                if len(translated_masked) < len(masked_text) * 0.2:
+                    # Fallback to English chunk if model brutally failed
+                    return chunk_text
 
-            return unmask(translated_masked, blocks)
-        except Exception:
-            return chunk_text
+                return unmask(translated_masked, blocks)
+            except Exception:
+                return chunk_text
 
     # Chunking by ## or # to fit in context window (sliding window logic)
     import re
@@ -840,7 +848,7 @@ async def api_audio_narrate(req: AudioNarrateRequest):
         raise HTTPException(status_code=500, detail=f"Neural speech synthesis error: {e}")
 
 @app.get("/api/topic")
-def get_topic_details(
+async def get_topic_details(
     query: str = Query(..., description="Subtopic query e.g. 'ebpf'"),
     lesson_id: Optional[str] = Query(None, description="Optional specific lesson ID e.g. 'lesson_01_introduction'")
 ):
