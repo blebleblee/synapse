@@ -71,3 +71,6 @@ topics/**/CURRICULUM_BLUEPRINT.md
 topics/languages/czech/
 topics/languages/english/
 topics/languages/german/
+
+# E2E Test Failure Artifacts
+e2e/artifacts/
