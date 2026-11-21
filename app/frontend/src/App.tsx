@@ -26,6 +26,7 @@ export function App() {
   const [isLoadingTopic, setIsLoadingTopic] = useState(false);
   const loadRequestIdRef = useRef<number>(0);
   const userInteractedRef = useRef<boolean>(false);
+  const chatRequestIdRef = useRef<number>(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [translatingLanguage, setTranslatingLanguage] = useState<string>('');
@@ -135,6 +136,8 @@ export function App() {
     const currentRequestId = ++loadRequestIdRef.current;
     if (!isRestore) {
       userInteractedRef.current = true;
+      activeCancelHandler.current?.();
+      chatRequestIdRef.current += 1;
     } else if (userInteractedRef.current) {
       return;
     }
@@ -244,6 +247,8 @@ export function App() {
 
   const handleLogout = () => {
     loadRequestIdRef.current += 1;
+    chatRequestIdRef.current += 1;
+    activeCancelHandler.current?.();
     clearStoredSelection();
     localStorage.removeItem('synapse_auth_token');
     setIsAuthenticated(false);
@@ -476,6 +481,7 @@ export function App() {
   }, [topicDetails, activeLessonId, activeTab]);
 
   const handleSendMessage = async (msg: string) => {
+    const currentChatId = ++chatRequestIdRef.current;
     const newStudentMsg: ChatMessage = { role: 'student', content: msg };
     const updatedHistory = [...unifiedChatHistory, newStudentMsg];
     setUnifiedChatHistory(updatedHistory);
@@ -552,12 +558,13 @@ export function App() {
 
         while (true) {
           const { done, value } = await reader.read();
-          if (done) break;
+          if (done || currentChatId !== chatRequestIdRef.current) break;
 
           const textChunk = decoder.decode(value, { stream: true });
           const lines = textChunk.split('\n');
 
           for (const line of lines) {
+            if (currentChatId !== chatRequestIdRef.current) break;
             if (line.startsWith('data: ')) {
               try {
                 const parsed = JSON.parse(line.slice(6));
@@ -582,6 +589,7 @@ export function App() {
           }
         }
       } else {
+        if (currentChatId !== chatRequestIdRef.current) return;
         const data = await res.json();
         setUnifiedChatHistory([
           ...updatedHistory,
@@ -589,6 +597,9 @@ export function App() {
         ]);
       }
     } catch (err: any) {
+      if (err.name === 'AbortError' || currentChatId !== chatRequestIdRef.current) {
+        return;
+      }
       console.error('Chat error:', err);
       const detail = err.message || 'Connection failed';
       setUnifiedChatHistory([
@@ -599,7 +610,9 @@ export function App() {
         }
       ]);
     } finally {
-      setIsChatting(false);
+      if (currentChatId === chatRequestIdRef.current) {
+        setIsChatting(false);
+      }
     }
   };
 

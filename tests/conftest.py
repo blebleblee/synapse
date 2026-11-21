@@ -216,19 +216,7 @@ def global_test_isolation(tmp_path, monkeypatch):
     except (ImportError, AttributeError):
         pass
 
-    # 8. Isolate chat session logging to temp directory
-    import app.backend.main as be_main
-    session_dir = test_ws / "sessions"
-    session_dir.mkdir(parents=True, exist_ok=True)
-
-    def _safe_save_chat_session(sub_path, user_msg, tutor_reply, history):
-        entry_file = session_dir / "active_session.md"
-        with open(entry_file, "a", encoding="utf-8") as f:
-            f.write(f"Student: {user_msg}\nTutor: {tutor_reply}\n")
-
-    monkeypatch.setattr(be_main, "save_chat_session", _safe_save_chat_session)
-
-    # 9. Pre-test snapshot of real repository data and topics
+    # 8. Pre-test snapshot of real repository data and topics
     real_data = _REPO_ROOT / "data"
     real_topics = _REPO_ROOT / "topics"
     data_files_before = {p: p.stat().st_mtime_ns for p in real_data.rglob("*") if p.is_file()} if real_data.exists() else {}
