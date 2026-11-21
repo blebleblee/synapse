@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.1] - 2026-11-21
+
+### Fixed
+- **macOS Desktop**: Fixed an issue where the background proxy service remained running in the background after the UI window was closed.
+- **UI Navigation**: Lesson titles in the sidebar now gracefully truncate (ellipsis) instead of overflowing into multiline blocks, reducing clutter.
+- **Settings & Addons**: Added clear documentation within the Addons pane regarding how uninstalled core modules are generated or fetched.
+- **Status Reporting**: Dynamic translation model attribution now correctly reflects the active model (this was fixed in the codebase but previously unreleased in macOS DMG).
+
 ## [1.2.0] - 2026-11-20
 
 ### Summary

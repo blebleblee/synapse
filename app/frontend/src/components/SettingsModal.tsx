@@ -15,7 +15,8 @@ import {
   AlertCircle,
   Loader2,
   Search,
-  Coffee
+  Coffee,
+  Info
 } from 'lucide-react';
 
 export interface AppSettings {
@@ -904,6 +905,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 >
                   <RefreshCw size={13} className={isLoadingPackages ? 'animate-spin' : ''} />
                 </button>
+              </div>
+
+              <div className="settings-info-box" style={{ marginBottom: '16px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                <Info size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+                <span>Synapse core domains are listed below. If a domain is not yet installed locally, clicking 'Install' will automatically generate it or securely download the latest optimized <code>.synpack</code> from the community registry.</span>
               </div>
 
               {storeMessage && (

@@ -273,7 +273,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             <circle cx="24" cy="24" r="2.5" fill="#ffffff"/>
           </svg>
           <span className="brand-title">Synapse</span>
-          <span className="brand-dot" title="Cluster Active (4/4 Nodes Online)" />
         </div>
 
         <div className="sidebar-header-actions">
