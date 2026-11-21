@@ -1,16 +1,16 @@
 # Baseline Verification Report
 
 Conducted on: November 21, 2026
-Workspace: `/Users/radovan.varga/repos/synapse`
+Workspace: `<repo>`
 
 ## Summary Table
 
 | Check | Command | Working Directory | Status | Result / Diagnostics |
 | :--- | :--- | :--- | :--- | :--- |
-| **Backend Tests** | `.venv/bin/python -m pytest` | `/Users/radovan.varga/repos/synapse` | **PASS** | 72 tests passed, 0 failed (30.24s) |
-| **Frontend Tests** | `npm run test` (`node --test 'src/**/*.test.ts'`) | `/Users/radovan.varga/repos/synapse/app/frontend` | **PASS** | 7 tests passed, 0 failed (128ms) |
-| **Frontend Lint** | `npm run lint` (`oxlint`) | `/Users/radovan.varga/repos/synapse/app/frontend` | **PASS** | 0 errors, 25 warnings |
-| **Frontend Build** | `npm run build` (`tsc -b && vite build`) | `/Users/radovan.varga/repos/synapse/app/frontend` | **PASS** | 0 errors, built in 408ms (3644 modules) |
+| **Backend Tests** | `.venv/bin/python -m pytest` | `<repo>` | **PASS** | 72 tests passed, 0 failed (30.24s) |
+| **Frontend Tests** | `npm run test` (`node --test 'src/**/*.test.ts'`) | `<repo>/app/frontend` | **PASS** | 7 tests passed, 0 failed (128ms) |
+| **Frontend Lint** | `npm run lint` (`oxlint`) | `<repo>/app/frontend` | **PASS** | 0 errors, 25 warnings |
+| **Frontend Build** | `npm run build` (`tsc -b && vite build`) | `<repo>/app/frontend` | **PASS** | 0 errors, built in 408ms (3644 modules) |
 
 ---
 
@@ -19,7 +19,7 @@ Workspace: `/Users/radovan.varga/repos/synapse`
 ### 1. Backend Tests
 - **Status:** **PASS**
 - **Command:** `.venv/bin/python -m pytest`
-- **Working Directory:** `/Users/radovan.varga/repos/synapse`
+- **Working Directory:** `<repo>`
 - **Results:**
   - 72 tests collected, 72 passed, 0 failed, 0 skipped in 30.24s.
   - Test suites executed:
@@ -106,19 +106,19 @@ During independent review, two regressions were identified and repaired:
 ### 2. Frontend Tests
 - **Status:** **PASS**
 - **Command:** `npm run test` (executes `node --test 'src/**/*.test.ts'`)
-- **Working Directory:** `/Users/radovan.varga/repos/synapse/app/frontend`
+- **Working Directory:** `<repo>/app/frontend`
 - **Results:** 7 passed (128ms).
 
 ### 3. Frontend Lint
 - **Status:** **PASS** (with warnings)
 - **Command:** `npm run lint` (executes `oxlint`)
-- **Working Directory:** `/Users/radovan.varga/repos/synapse/app/frontend`
+- **Working Directory:** `<repo>/app/frontend`
 - **Results:** 0 errors, 25 warnings.
 
 ### 4. Frontend Production Build
 - **Status:** **PASS**
 - **Command:** `npm run build` (executes `tsc -b && vite build`)
-- **Working Directory:** `/Users/radovan.varga/repos/synapse/app/frontend`
+- **Working Directory:** `<repo>/app/frontend`
 - **Results:** 0 errors, built in 408ms.
 
 ---
