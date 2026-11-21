@@ -51,9 +51,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Evidence:**
   - `app/backend/main.py:791-794`: Exception in translation returns original English chunk text.
   - `app/backend/main.py:803`: `cache_file.write_text(final_translation + "\n", encoding="utf-8")` unconditionally caches the result.
-- **Status:** Confirmed by code.
-- **Proposed Acceptance Criteria:** If any chunk fails translation or the translated text is identical to the English source, do not write to `cache_file`. Return the fallback with a `cached: false` flag and warning.
-- **Small Proposed Repair Task:** Track a boolean `translation_failed` during chunk processing; only execute `cache_file.write_text(...)` if all chunks succeeded and produced translated content.
+- **Status:** **COMPLETED** (Prevented failed chunks, empty translations, and source-identical fallbacks from writing to disk cache in `app/backend/main.py`. Added regression tests in `tests/test_api.py`).
 
 ---
 
