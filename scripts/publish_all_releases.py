@@ -109,54 +109,57 @@ if packages_dir.exists():
         if synpack.name in CORE_SYNPACKS:
             ASSETS_TO_PUBLISH[synpack.name] = synpack
 
-def generate_release_body(endpoint_url: str, repo_name: str, is_github: bool = False) -> str:
-    dl_base = f"https://github.com/{repo_name}/releases/download/{TAG}" if is_github else f"{endpoint_url.rstrip('/')}/{repo_name}/releases/download/{TAG}"
-    notes = extract_changelog_notes(VER)
+def release_title() -> str:
+    """Plain version title; the notes say what changed."""
+    return f"Synapse {TAG}"
 
-    body = f"## Synapse {TAG} Release Notes\n\n"
-    if notes:
-        body += f"{notes}\n\n---\n\n"
 
-    body += f"""### 📥 Verified Direct Download Links
+def generate_release_body(endpoint_url: str = "", repo_name: str = "", is_github: bool = False) -> str:
+    """Release notes from CHANGELOG.md plus short install guidance.
 
-#### 1. Native Application Binaries (Desktop & Python)
-| Platform / Environment | File Artifact | Direct Download |
-| :--- | :--- | :--- |
-| **macOS Apple Silicon (DMG)** | `Synapse-Workbench-{VER}-arm64.dmg` | [Download .dmg]({dl_base}/Synapse-Workbench-{VER}-arm64.dmg) |
-| **macOS Portable (.zip)** | `Synapse-Workbench-{VER}-arm64.zip` | [Download .zip]({dl_base}/Synapse-Workbench-{VER}-arm64.zip) |
-| **Windows Portable (.exe)** | `Synapse-Workbench-Portable-{VER}.exe` | [Download Portable .exe]({dl_base}/Synapse-Workbench-Portable-{VER}.exe) |
-| **Windows Installer (.exe)** | `Synapse-Workbench-Setup-{VER}.exe` | [Download Installer .exe]({dl_base}/Synapse-Workbench-Setup-{VER}.exe) |
-| **Windows Complete Bundle (.zip)** | `Synapse-Workbench-Portable-{VER}-win-x64.zip` | [Download Portable Zip]({dl_base}/Synapse-Workbench-Portable-{VER}-win-x64.zip) |
-| **Python Wheel (.whl)** | `synapse-{VER}-py3-none-any.whl` | [Download .whl]({dl_base}/synapse-{VER}-py3-none-any.whl) |
-| **Python Source (.tar.gz)** | `synapse-{VER}.tar.gz` | [Download .tar.gz]({dl_base}/synapse-{VER}.tar.gz) |
+    Files are not listed or linked here: the release page already shows every
+    attached file, and hand-written tables go stale or point at missing files.
+    """
+    notes = extract_changelog_notes(VER) or "See CHANGELOG.md for details."
+    return f"""{notes}
 
 ---
 
-#### 2. Curriculum Package Addons
-| Package | Scope | Direct Download |
-| :--- | :--- | :--- |
-| **`synapse_complete_curriculum.synpack`** | All Core Masterclass Domains | [Download Complete Set]({dl_base}/synapse_complete_curriculum.synpack) |
-| **`computing.synpack`** | Computing & Distributed Systems | [Download computing.synpack]({dl_base}/computing.synpack) |
-| **`arts.synpack`** | Arts, Design & Music Performance | [Download arts.synpack]({dl_base}/arts.synpack) |
-| **`engineering.synpack`** | Engineering, Robotics & Avionics | [Download engineering.synpack]({dl_base}/engineering.synpack) |
-| **`crafts.synpack`** | Fabrication, Maker & 3D Printing | [Download crafts.synpack]({dl_base}/crafts.synpack) |
-| **`business.synpack`** | Enterprise, Finance & Markets | [Download business.synpack]({dl_base}/business.synpack) |
-| **`humanities.synpack`** | Philosophy, History & Literature | [Download humanities.synpack]({dl_base}/humanities.synpack) |
-| **`natural_sciences.synpack`** | Physics, Chemistry & Biology | [Download natural_sciences.synpack]({dl_base}/natural_sciences.synpack) |
-| **`economics.synpack`** | Macroeconomics, Quant & Policy | [Download economics.synpack]({dl_base}/economics.synpack) |
-| **`formal_sciences.synpack`** | Pure Mathematics & Logic | [Download formal_sciences.synpack]({dl_base}/formal_sciences.synpack) |
-| **`health_sciences.synpack`** | Medicine, Neuroscience & Triage | [Download health_sciences.synpack]({dl_base}/health_sciences.synpack) |
-| **`motorsports.synpack`** | Vehicle Dynamics & Race Eng. | [Download motorsports.synpack]({dl_base}/motorsports.synpack) |
-| **`languages.synpack`** | Grammar, Writing & Translation | [Download languages.synpack]({dl_base}/languages.synpack) |
+### Installing
+- **macOS (Apple Silicon):** download the `.dmg` from the files below.
+- **Windows:** use the installer, or the portable build if you can't install software.
+- **Python:** `pip install` the wheel, then run `synapse serve`.
 
----
-
-### 💡 How to Install Addons
-1. Open Synapse Workbench.
-2. Click **Settings ⚙** → **Curriculum Store & Addons**.
-3. Sideload a downloaded `.synpack` file or click **Install** next to any domain to download it automatically.
+Curriculum packs (`.synpack`) can be installed from inside the app (**Settings ⚙ → Curriculum Store & Addons**). You don't need to download them by hand.
 """
-    return body
+
+
+def update_release_text(title: str, body: str) -> bool:
+    """Sets the title and notes of the existing TAG release on Gitea and GitHub."""
+    ok = True
+    gitea_auth = (GITEA_USER, GITEA_PASS)
+    g = requests.get(f"{GITEA_URL.rstrip('/')}/api/v1/repos/{GITEA_REPO}/releases/tags/{TAG}", auth=gitea_auth)
+    if g.status_code == 200:
+        r = requests.patch(f"{GITEA_URL.rstrip('/')}/api/v1/repos/{GITEA_REPO}/releases/{g.json()['id']}",
+                           json={"name": title, "body": body}, auth=gitea_auth)
+        print(f"[{'✔' if r.ok else '✘'}] Gitea {TAG} notes: HTTP {r.status_code}")
+        ok &= r.ok
+    else:
+        print(f"[✘] Gitea release {TAG} not found (HTTP {g.status_code})")
+        ok = False
+    gh_headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28"}
+    h = requests.get(f"https://api.github.com/repos/{GITHUB_REPO}/releases/tags/{TAG}", headers=gh_headers)
+    if h.status_code == 200:
+        r = requests.patch(f"https://api.github.com/repos/{GITHUB_REPO}/releases/{h.json()['id']}",
+                           json={"name": title, "body": body}, headers=gh_headers)
+        print(f"[{'✔' if r.ok else '✘'}] GitHub {TAG} notes: HTTP {r.status_code}")
+        ok &= r.ok
+    else:
+        print(f"[✘] GitHub release {TAG} not found (HTTP {h.status_code})")
+        ok = False
+    return ok
+
 
 def publish_gitea():
     print("\n" + "=" * 60)
@@ -173,7 +176,7 @@ def publish_gitea():
         create_url = f"{api_base}/repos/{GITEA_REPO}/releases"
         payload = {
             "tag_name": TAG,
-            "name": f"Synapse {TAG} — Resilient Translation, Native ConPTY & Zero-Defect Curriculum",
+            "name": release_title(),
             "body": f"Release binaries for Synapse {TAG}.",
             "draft": False,
             "prerelease": False
@@ -253,7 +256,7 @@ def publish_github():
         create_url = f"https://api.github.com/repos/{GITHUB_REPO}/releases"
         payload = {
             "tag_name": TAG,
-            "name": f"Synapse {TAG} — Resilient Translation, Native ConPTY & Zero-Defect Curriculum",
+            "name": release_title(),
             "body": f"Release binaries for Synapse {TAG}.",
             "draft": False,
             "prerelease": False
