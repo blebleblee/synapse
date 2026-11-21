@@ -42,9 +42,10 @@ Execute autonomous maintenance using this iterative 9-step cycle:
      - **API tests:** Request/response schemas, error status codes, and path traversal guards.
      - **Browser/E2E tests:** Interactive DOM state, rendering, and cross-tab/reload persistence.
      - **Mock vs. Real Providers:** Keep automated tests strictly deterministic using mocks. Honestly report real-provider execution as unverified when mocks are used.
-8. **Create Local Checkpoint:**
+8. **Create Local Checkpoint & Synchronize:**
    - Stage explicit modified files only (`git add <file>...`).
-   - Create a focused local commit (`git commit -m "..."`). Never push to remote.
+   - Create a focused local commit (`git commit -m "..."`).
+   - Push to the development remote strictly according to the authoritative remote policy defined in root `GEMINI.md`.
 9. **Update Handoff & Monitor Batch Limits:**
    - Update `docs/status.md` and `docs/backlog.md` with the new commit hash and remaining tasks.
    - Track elapsed time against the two-hour batch budget.

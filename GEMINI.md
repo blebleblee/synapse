@@ -34,7 +34,7 @@ When conducting autonomous maintenance or stabilization batches, follow this wor
      ```bash
      ./scripts/verify_all.sh
      ```
-   - **Commit:** Create a focused, local Git commit only after all checks pass cleanly. Never push to remote.
+   - **Commit & Push:** Create a focused, local Git commit only after all checks pass cleanly. After creating the local commit, pushing the `main` branch to the explicitly approved `gitea` remote (`https://gitea.2464.cz/ai/synapse.git`) is authorized.
    - **Update Handoff:** Update `docs/status.md` and `docs/backlog.md` after completing or blocking each task before moving to the next.
 4. **Time and Attempt Limits:**
    - Limit autonomous batches to a maximum of **two hours**, monitoring elapsed time between tasks.
@@ -46,7 +46,11 @@ When conducting autonomous maintenance or stabilization batches, follow this wor
 
 The following boundaries must be maintained in every session:
 
-- **No Remote Mutations:** Never push to git remotes (`git push`), trigger external deployments, or publish release assets.
+- **Source Control & Remote Synchronization:**
+  - **Gitea Development Remote:** The `gitea` remote (`https://gitea.2464.cz/ai/synapse.git`) is the authorized development and checkpoint destination. Routine pushes of the `main` branch to `gitea` are authorized *only* after a task is fully verified and committed locally. Use explicit push commands (e.g., `git push gitea main`).
+  - **GitHub Publication Remote:** The `github` remote is for publication only. Pushing to GitHub, publishing releases, or deploying assets requires explicit user approval.
+  - **Divergence & Unavailability:** Never force-push (`git push -f`), delete remote branches, or blindly merge diverging histories. If the `gitea` remote diverges, authentication fails, or the destination changes, stop synchronization and report the issue. If Gitea is temporarily unavailable, preserve local commits and record the unsynced state in `docs/status.md` without endless retries.
+  - **Agent vs. Application:** Git mutation authorizations apply strictly to the development agent workflow. The Synapse application runtime (UI/endpoints) must never perform automatic Git commits or pushes.
 - **Zero Real Provider Calls in Tests:** Automated test suites must use mocked providers or in-process stubs. Do not make live LLM API calls or probe unconfigured external networks.
 - **Test Isolation:** Backend and browser tests must run against isolated temporary databases, ephemeral loopback ports, and temporary workspaces (`tmp_path`). Never mutate production data in `data/synapse.db` or topics in `topics/`.
 - **No Background Daemons or Shell Sessions:** Do not start persistent background services, terminal daemons, or unconstrained PTY sessions during test runs.

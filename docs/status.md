@@ -1,9 +1,11 @@
 # Milestone Status Report: Autonomous Maintenance & Verification
 
-## 1. Saved Checkpoint
+## 1. Saved Checkpoint & Synchronization State
 
-- **Latest Checkpoint Hash:** `5ce7d46` (`test: add settings consumer acceptance tests and repair get_chat_provider routing`)
-- **Completed Backlog Tasks:** All 10 explicitly identified backlog findings (FIND-01 through FIND-10) have been resolved, verified, and committed.
+- **Latest Checkpoint Hash:** `a87ce87` (`docs: record evidence-gap audit results, repaired defects, and deferred decisions`)
+- **Remote Synchronization:** Fully synchronized. Branch `main` has been successfully pushed to the `gitea` development remote. 
+- **Status:** **Automated stabilization is complete for the current known backlog.** All known, confirmed defects have been verified, repaired, committed, and pushed to Gitea.
+- **Next Milestone:** Real-use Manual Acceptance Testing (see `docs/manual-acceptance.md`).
 
 ---
 
@@ -38,9 +40,9 @@ A targeted acceptance audit was performed to close critical evidence gaps in pre
 
 ---
 
-## 3. Remaining Unverified Behavior & Deferred Decisions
+## 3. Unverified Behavior (Not Confirmed Defects) & Deferred Decisions
 
-This verification suite asserts explicit paths, but does not provide complete coverage over all operational mechanics:
+This verification suite asserts explicit paths, but does not provide complete coverage over all operational mechanics. These are **unverified behaviors** or deferred design decisions, not confirmed bugs:
 
 1. **Package Content Injection (Decision Needed):**
    - The extraction process validates paths, but writes directly into `TOPICS_DIR` sequentially. If a package is rejected mid-extraction due to an unexpected file type, previously extracted files remain on disk. It is deferred whether to extract into a temporary directory and atomically rename upon complete success.

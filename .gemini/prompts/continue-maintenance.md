@@ -20,13 +20,14 @@ Continue autonomous maintenance and stabilization of the Synapse repository in a
      - Implement the minimal, surgical change.
      - Self-review the actual diff, including untracked files.
      - Verify with targeted checks and `./scripts/verify_all.sh`.
-     - Create a focused local commit (`git commit`) only after verification passes. Never push to remote.
+     - Create a focused local commit (`git commit`) only after verification passes.
+     - Push to the development remote strictly according to the authoritative remote policy defined in `GEMINI.md`.
      - Update `docs/status.md` and `docs/backlog.md` after completing or blocking each task before proceeding to the next.
 
 3. **Decision & Escalation Protocol:**
    - Make routine engineering and test decisions autonomously.
    - Stop only for genuine blockers or architectural decisions requiring human clarification; record `NEEDS DECISION` in `docs/status.md` and `docs/backlog.md` and continue with other safe tasks.
-   - Follow all strict safety boundaries: no git pushes, no real AI/network calls in tests, strict database and browser test isolation, no dependency changes, no weakening of test assertions.
+   - Follow all strict safety boundaries: push to remotes only as authorized in `GEMINI.md`, no real AI/network calls in tests, strict database and browser test isolation, no dependency changes, no weakening of test assertions.
 
 4. **Batch Handoff Report:**
    - At the conclusion of the batch or if the safe backlog is exhausted, provide a concise summary:
