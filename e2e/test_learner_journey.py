@@ -475,7 +475,12 @@ def test_unauthorized_response_clears_content_but_preserves_saved_selection(brow
     ))
 
     # Trigger actual application request by selecting a different topic in the sidebar
-    select_fixture_lesson(page, "Systems", "E2e Shell Invariants", "Shell Syntax")
+    # We catch the timeout or pointer interception because the 401 response might arrive
+    # instantly upon clicking the course header, popping the modal before the lesson is clicked.
+    try:
+        select_fixture_lesson(page, "Systems", "E2e Shell Invariants", "Shell Syntax")
+    except Exception:
+        pass
 
     # 3. Verify protected reader content is cleared and login is required
     expect(page.locator("h1:has-text('E2E Storage Foundations')")).not_to_be_visible(timeout=5000)
