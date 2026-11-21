@@ -107,3 +107,28 @@ This backlog documents prioritized, actionable findings from the user-facing fun
   - `learning_engine/packages.py:121`: `json.loads(manifest_member.read().decode("utf-8"))` caught only `KeyError`, letting `JSONDecodeError` crash execution.
   - `learning_engine/packages.py:124`: `domain = manifest.get("domain") or pack_path.stem.replace(".synpack", "")` fallback was unreachable on malformed JSON.
 - **Status:** **COMPLETED** (Caught `(KeyError, json.JSONDecodeError, UnicodeDecodeError)` in `install_topic_pack`, allowing clean fallback to `pack_path.stem`. Verified with `test_install_pack_corrupted_manifest_fallback` in `tests/test_packages.py`).
+
+---
+
+### FIND-11: In-Flight Chat Streams Leak Stale Responses Across Topic Navigation
+- **User-Visible Impact:** If the learner asks the mentor a question and immediately navigates to a new topic while the response is streaming, the chunks from the first topic continue to append to the unified chat history of the newly selected topic.
+- **Status:** **COMPLETED** (Added `chatRequestIdRef` to `App.tsx` to invalidate chat streams on topic change. Added `test_chat_and_mentor.py` disk persistence tests).
+
+---
+
+### FIND-12: Package Installer Vulnerable to Unsafe Archive Links and Domain Traversal
+- **User-Visible Impact:** The package installer did not validate `domain` identifiers against safe slugs, nor did it reject symlinks (`member.issym()`), hardlinks (`member.islnk()`), or device nodes. This allowed malicious `.synpack` archives to potentially escape `TOPICS_DIR`.
+- **Status:** **COMPLETED** (Enforced `re.match(r"^[a-zA-Z0-9_-]+$")` on domain identifiers and strictly rejected unsafe archive links before extraction in `packages.py`. Added security acceptance tests in `test_packages.py`).
+
+---
+
+### FIND-13: Mentor Routing Silently Falls Back to Cloud on Local Cluster Outage
+- **User-Visible Impact:** If a user explicitly configured a Local AI model for the Socratic Mentor (e.g. `custom-chat-model:14b`), but the Ollama cluster was offline, the router silently fell back to Anthropic Claude (if keys were present in the environment), ignoring the user`s preference and potentially transmitting local curriculum context to cloud servers.
+- **Status:** **COMPLETED** (Refactored `get_chat_provider()` in `models.py` to respect explicit user model selections and raise connection errors rather than silently fallback to cloud. Verified with mock cluster tests in `test_settings_consumers.py`).
+
+---
+
+## Deferred Decisions & Unverified Behavior
+
+- **Package Content Injection:** Extraction occurs sequentially into `TOPICS_DIR`. A rejection mid-extraction (e.g., encountering a corrupted file) leaves previously extracted files on disk. *Decision Needed:* Should extraction write to a temporary directory and atomically rename upon complete success?
+- **Terminal PTY Concurrency:** Real PTY process allocation and signaling remain mocked in the test environment to prevent host shell execution.
