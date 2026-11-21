@@ -875,7 +875,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
         {/* Sequential Study Progression Navigation Footer */}
         {activeTab === 'study' && (
           <div className="lesson-bottom-nav">
-            {topic.lessons && topic.lessons.length > 1 && activeLessonId !== 'all' ? (
+            {topic.lessons && topic.lessons.length >= 1 && activeLessonId !== 'all' ? (
               <>
                 <button
                   className="btn-secondary-sm"

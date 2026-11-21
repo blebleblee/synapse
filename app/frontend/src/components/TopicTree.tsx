@@ -490,7 +490,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                               if (units.length === 1 && units[0].unit === 'core') {
                                 const singleUnit = units[0];
                                 const isSelected = selectedSubtopic === singleUnit.rel_path;
-                                const hasMultiLessons = Boolean(singleUnit.lessons && singleUnit.lessons.length > 1);
+                                const hasMultiLessons = Boolean(singleUnit.lessons && singleUnit.lessons.length >= 1);
                                 const isUnitOpen = openUnits[singleUnit.rel_path] ?? isSelected;
                                 const unitTitle = toTitleCase(singleUnit.display_name);
 
