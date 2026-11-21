@@ -119,7 +119,7 @@ def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
             manifest_member = tar.extractfile("manifest.json")
             if manifest_member:
                 manifest = json.loads(manifest_member.read().decode("utf-8"))
-        except KeyError:
+        except (KeyError, json.JSONDecodeError, UnicodeDecodeError):
             pass
             
         domain = manifest.get("domain") or pack_path.stem.replace(".synpack", "")
