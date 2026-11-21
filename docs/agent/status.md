@@ -2,9 +2,12 @@
 
 ## 1. Saved Checkpoint & Synchronization State
 
-- **Latest Checkpoint Hash:** `513d8d4` (`docs: establish manual acceptance milestone and configure Gitea workflow`)
-- **Remote Synchronization:** Fully synchronized. Branch `main` has been successfully pushed to the `gitea` development remote. 
-- **Status:** **Automated stabilization is complete for the current known backlog.** All known, confirmed defects have been verified, repaired, committed, and pushed to Gitea.
+- **Branch:** `security/audit-hardening` (PR #1 on Gitea, not merged into `main` yet).
+- **Work on the branch (2026-11-21):** security hardening (host/origin checks, localhost-only default, WebSocket tickets, settings redaction, HTML sanitization, non-root Docker); safe chunked lesson rewriting in review and refine; private domains kept out of packs, Docker and portable builds, with a release guard (`scripts/check_release_packs.py`); current Claude model IDs and no sampling parameters; an indexed full-text search (SQLite FTS5); agent rules consolidated into `AGENTS.md`.
+- **Verification:** `./scripts/verify_all.sh`. All 5 phases must pass before merging.
+- **NEEDS DECISION:**
+  - Chat-session files are still in git history, which is public on GitHub. Removing them requires rewriting history and force-pushing.
+  - Whether to replace Electron (Tauri v2, or a browser/PWA launcher).
 - **Next Milestone:** Real-use Manual Acceptance Testing (see `docs/manual-acceptance.md`).
 
 ---

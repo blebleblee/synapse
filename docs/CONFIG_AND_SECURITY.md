@@ -19,6 +19,10 @@ ANTHROPIC_MODEL=claude-opus-5-5
 GEMINI_API_KEY=AIza...
 ```
 
+Keys entered in **Settings ⚙** are used when no environment variable is set. Requests to Claude identify themselves as `Synapse-Workbench/<version>`; if your gateway requires a specific User-Agent, set `SYNAPSE_ANTHROPIC_USER_AGENT`. Current Claude models reject sampling parameters, so Synapse never sends `temperature`.
+
+**Search index:** full-text search uses a SQLite FTS5 index stored next to the database (`data/search_index.db`, or `SYNAPSE_SEARCH_INDEX_PATH`). It is built in the background at startup (a few seconds) and updates changed files automatically before each search. It matches word prefixes, so `sql` finds `SQLite`. Delete the file to force a rebuild, or set `SYNAPSE_SEARCH_INDEX=0` to search by scanning files instead.
+
 The Python learning engine automatically loads credentials from `~/.config/synapse/env` at startup. Because this file lives in your home directory, it is **physically impossible for git to stage, diff, or commit your private keys**.
 
 ---

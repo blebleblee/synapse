@@ -163,6 +163,12 @@ async def lifespan(app: FastAPI):
         threading.Thread(target=get_topic_tree, daemon=True).start()
     except Exception:
         pass
+    try:
+        # Build or refresh the full-text search index in the background.
+        from learning_engine.search import warm_index_in_background
+        warm_index_in_background()
+    except Exception:
+        pass
     yield
     # Shutdown actions
     try:
