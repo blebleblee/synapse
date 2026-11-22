@@ -1,0 +1,77 @@
+# CI on the Gitea runner: full verification, release-pack guard and secret
+# scan on every push and pull request. Change `runs-on` if the runner was
+# registered with other labels (act_runner's default is `ubuntu-latest`).
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install Python environment
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -q -r requirements.txt pytest httpx playwright pytest-playwright
+          .venv/bin/python -m playwright install --with-deps chromium
+      - name: Install frontend dependencies
+        run: cd app/frontend && npm ci
+      - name: Verify (unit, lint, build, backend, E2E)
+        run: ./scripts/verify_all.sh
+
+  release-packs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Build packs and check them for private content
+        run: |
+          python -m pip install -q -r requirements.txt
+          out="$RUNNER_TEMP/packs"
+          python - "$out" <<'EOF'
+          import sys
+          from pathlib import Path
+          from learning_engine.packages import CORE_DOMAINS, TOPICS_DIR, export_topic_pack
+          out = Path(sys.argv[1])
+          for d in CORE_DOMAINS:
+              if (TOPICS_DIR / d).is_dir():
+                  export_topic_pack(d, output_dir=out)
+          export_topic_pack("complete", output_dir=out)
+          EOF
+          python scripts/check_release_packs.py "$out"/*.synpack
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan pushed commits with gitleaks
+        env:
+          GITLEAKS_VERSION: 8.21.2
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C "$RUNNER_TEMP" gitleaks
+          # Only the new commits: older history holds a known, accepted finding.
+          if [ -n "$BEFORE" ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            range="$BEFORE..$SHA"
+          else
+            range="-1 $SHA"
+          fi
+          "$RUNNER_TEMP/gitleaks" git --redact --no-banner --log-opts="$range" .

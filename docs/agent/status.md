@@ -11,13 +11,13 @@
 - **Done 2026-11-22 (`4e598ee`):** pack installs are confined to their declared domain. A domain pack can no longer write into other domains or the `topics/` root; a complete pack writes only into the domains its manifest lists. Tests in `tests/test_packages.py`.
 - **NEEDS DECISION:** installing the complete pack overwrites every listed domain without a backup (the backup step only looks for a `topics/complete` folder). Back up each listed domain, or only warn?
 - **Verification:** `./scripts/verify_all.sh`. All 5 phases must pass (2026-11-22: 199 backend, 8 E2E).
-- **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, which are public on GitHub. Owner must rotate it (preferably to a scoped token) and update the `gitea` remote and `GITEA_PASS`. No other secrets found in GitHub history, release files or notes.
-- **Pending owner actions:** rotate Gitea password; top up proxy credit; send the Safari diagram case.
-- **GitHub sync (2026-11-22):** `main` pushed to `github` at `8bbac78`.
+- **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, which are public on GitHub. **Decision (2026-11-22):** no rotation; the Gitea server is local-only. No other secrets found in GitHub history, release files or notes.
+- **Pending owner actions:** top up proxy credit; send the Safari diagram case.
+- **GitHub sync (2026-11-22):** `main` pushed to `github` at `f532968`.
+- **CI (2026-11-22):** `.gitea/workflows/ci.yml` runs `verify_all.sh`, builds and checks release packs, and runs gitleaks on the pushed commits only (older history holds the accepted finding above). It targets the runner label `ubuntu-latest`; first run not yet confirmed.
 - **Next steps (proposed, awaiting go-ahead):**
-  1. CI on Gitea: `verify_all.sh`, `check_release_packs.py`, secret scanning (gitleaks) on every push.
-  2. Separate `curriculum` release for packs; installers bundle only the complete pack.
-  3. Release 1.2.2 with the "Unreleased" changes.
+  1. Separate `curriculum` release for packs; installers bundle only the complete pack.
+  2. Release 1.2.2 with the "Unreleased" changes.
 - **Improvement ideas:** clear mentor provider errors and model indicator; send only the current lesson section to the mentor (faster local models); search highlighting, domain filter and jump-to-section; first-run health check; menu-bar Quit or idle shutdown for `synapse serve`; spaced-repetition review queue; pre-commit secret and private-path hook; release from CI; protected `main` with PR-only changes.
 
 
