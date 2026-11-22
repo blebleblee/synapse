@@ -708,6 +708,8 @@ class GeminiProvider(LLMProvider):
         self.api_key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         self.project = project or os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("GCP_PROJECT")
         self.base_url = base_url or os.environ.get("GEMINI_BASE_URL")
+        # Set by get_provider when Gemini is only the last-resort fallback.
+        self.unavailable_reason: Optional[str] = None
 
         try:
             from google import genai
@@ -725,7 +727,7 @@ class GeminiProvider(LLMProvider):
 
     def generate(self, prompt: str, system_instruction: str = "") -> str:
         if not self.client:
-            raise RuntimeError("Google GenAI client not initialized. Set GEMINI_API_KEY or GOOGLE_CLOUD_PROJECT.")
+            raise RuntimeError(self.unavailable_reason or "Google GenAI client not initialized. Set GEMINI_API_KEY or GOOGLE_CLOUD_PROJECT.")
 
         from google.genai import types
         config = types.GenerateContentConfig(
@@ -981,7 +983,14 @@ def get_provider(
         return OllamaProvider(host=host, model=selected_model)
 
     chosen_model = model or "gemini-2.5-flash"
-    return GeminiProvider(model=chosen_model)
+    gemini = GeminiProvider(model=chosen_model)
+    if not provider_type and not gemini.client:
+        hosts = ", ".join(cluster_status) or "none configured"
+        gemini.unavailable_reason = (
+            f"No AI model is reachable: no Ollama node answered ({hosts}) and no cloud key is set "
+            "(GEMINI_API_KEY or GOOGLE_CLOUD_PROJECT). Start Ollama or add a key in Settings."
+        )
+    return gemini
 
 def get_translation_provider(
     model: Optional[str] = None,

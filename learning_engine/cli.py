@@ -29,6 +29,7 @@ from learning_engine.mastery import get_mastery_summary, set_subtopic_mastery
 from learning_engine.flashcards import generate_flashcards
 from learning_engine.reviewer import review_and_fix_unit, audit_content
 from learning_engine.database import get_connection
+from learning_engine.utils import vacuum_database
 import json
 
 def format_status_badge(status: dict) -> str:
@@ -351,10 +352,17 @@ def cmd_review(args):
                                 status_str = "[✔] PASS"
                                 verified_count += 1
                             print(f"{status_str} :: {u_data['rel_path']}")
+                            # No reviewer reachable: don't walk the whole curriculum.
+                            if review_failed_count == total_audited == 3:
+                                reason = next((r.get("error") for r in res.get("reports", []) if r.get("error")), "unknown error")
+                                print(f"[!] Stopping: the first 3 units could not be reviewed ({reason}).", file=sys.stderr)
+                                sys.exit(1)
         print("==================================================")
         print(f"[*] Peer Review Summary: {verified_count} / {total_audited} Units Verified"
               f" ({review_failed_count} could not be reviewed)")
         print("==================================================")
+        if review_failed_count:
+            sys.exit(1)
 
 def cmd_serve(args):
     import uvicorn
@@ -441,10 +449,8 @@ def cmd_clean(args):
 
     if clean_db:
         try:
-            from learning_engine.database import vacuum_db, checkpoint_db
             print("[*] Running SQLite database maintenance (VACUUM & Checkpoint)...")
-            checkpoint_db(truncate=True)
-            vacuum_db()
+            vacuum_database()
             print("[✔] Database optimization complete.")
             cleaned_count += 1
         except Exception as e:
@@ -497,7 +503,7 @@ def cmd_pack(args):
 def main():
     load_env_file()
     parser = argparse.ArgumentParser(
-        prog="learning",
+        prog="synapse",
         description="AI Learning Workspace Content Engine & Socratic Workbench"
     )
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
@@ -620,7 +626,18 @@ def main():
         parser.print_help()
         sys.exit(0)
 
-    args.func(args)
+    try:
+        args.func(args)
+    except KeyboardInterrupt:
+        sys.exit(130)
+    except SystemExit:
+        raise
+    except Exception as e:
+        if os.environ.get("SYNAPSE_DEBUG"):
+            raise
+        print(f"[!] synapse {args.command} failed: {e}", file=sys.stderr)
+        print("    (set SYNAPSE_DEBUG=1 for the full traceback)", file=sys.stderr)
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
