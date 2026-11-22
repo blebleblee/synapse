@@ -218,24 +218,30 @@ def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
             allowed = set(listed)
         elif not is_complete:
             allowed = {domain}
+        touched_domains = set()
         for member in tar.getmembers():
             rel = _pack_relative_name(member.name)
             if rel is None:
                 continue
             parts = rel.split("/")
             top = parts[0]
+            touched_domains.add(top)
             in_domain = (allowed is None and _SLUG_RE.match(top)) or (allowed is not None and top in allowed)
             if not in_domain or (len(parts) == 1 and not member.isdir()):
                 raise ValueError(f"Package member '{member.name}' is outside its domain '{domain}'.")
 
-        # Backup existing domain if it exists
-        if target_domain_dir.exists() and target_domain_dir.is_dir():
-            import time, shutil
-            backup_dir = WORKSPACE_ROOT / "exports" / "backups"
-            backup_dir.mkdir(parents=True, exist_ok=True)
-            backup_path = backup_dir / f"{domain}_backup_{int(time.time())}"
-            shutil.copytree(target_domain_dir, backup_path)
-            print(f"[i] Backed up existing domain '{domain}' to {backup_path}")
+        # Back up every existing domain this pack writes into (a complete pack
+        # replaces all of them), so local edits survive the install.
+        import time, shutil
+        stamp = int(time.time())
+        for name in sorted(touched_domains):
+            existing = TOPICS_DIR / name
+            if existing.is_dir():
+                backup_dir = WORKSPACE_ROOT / "exports" / "backups"
+                backup_dir.mkdir(parents=True, exist_ok=True)
+                backup_path = backup_dir / f"{name}_backup_{stamp}"
+                shutil.copytree(existing, backup_path, dirs_exist_ok=True)
+                print(f"[i] Backed up existing domain '{name}' to {backup_path}")
 
         # Extract topics directly into TOPICS_DIR
         for member in tar.getmembers():

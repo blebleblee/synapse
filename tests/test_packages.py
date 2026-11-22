@@ -291,3 +291,23 @@ def test_exported_complete_pack_installs(tmp_path):
     pack = export_topic_pack("complete", output_dir=tmp_path)
     res = install_topic_pack(pack)
     assert res["domain"] == "complete"
+
+
+def test_install_complete_pack_backs_up_each_listed_domain(tmp_path):
+    """Installing the complete pack saves a copy of every domain it replaces."""
+    from learning_engine.packages import WORKSPACE_ROOT as PKG_WS
+    existing = TOPICS_DIR / "arts" / "local" / "edit" / "labs.md"
+    existing.parent.mkdir(parents=True, exist_ok=True)
+    existing.write_text("# my local edit\n")
+
+    pack_path = tmp_path / "synapse_complete_curriculum.synpack"
+    _write_pack(pack_path, {"format": "synpack/v1", "domain": "complete", "domains": ["arts", "crafts"]}, {
+        "topics/arts/p/q/labs.md": b"# arts\n",
+        "topics/crafts/p/q/labs.md": b"# crafts\n",
+    })
+    install_topic_pack(pack_path)
+
+    backups = PKG_WS / "exports" / "backups"
+    arts_backups = sorted(backups.glob("arts_backup_*"))
+    assert arts_backups, "arts was replaced without a backup"
+    assert (arts_backups[-1] / "local" / "edit" / "labs.md").read_text() == "# my local edit\n"
