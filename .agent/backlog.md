@@ -186,11 +186,25 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Chat "Clear conversation" deletes saved sessions of every topic** (`TutorChat.tsx` sends `sessions: true`, which removes all `sessions/` dirs). The chat history is shared across topics in the UI, so this may be intended. Options: keep; or clear only the active topic's session.
 - **`/api/tree` returns absolute `full_path`s** (server home directory) to the browser. Harmless on localhost; with a password and remote access it reveals the server layout. Check whether the frontend needs it before removing.
 
-## Next Candidates (UI pass, not yet verified)
+### FIND-24: Locked First Run Showed Wizard and Login Together, Polled 401s
+- **Status:** **COMPLETED** (`35b0705`). E2E: `test_locked_first_run_shows_only_login_and_stays_quiet`.
 
-- First run with a password: setup wizard and login modal are shown at the same time.
-- Before login, the UI polls `/api/translate/jobs`, cluster status and mentor connectivity, producing 401s in the console.
-- Setup wizard welcome text hard-codes "539 Unified Masterclasses across 12 domains" regardless of installed content.
+### FIND-25: Flashcards Silent for ~46 s, Failures Blamed on Lessons; Start-up Before Server
+- **Status:** **COMPLETED** (`59c4e86`). Tests: `tests/test_api.py` deck tests; E2E `test_startup_waits_for_backend`.
+
+### FIND-26: No Escape-to-Close; Dead Learning-Pathway Link
+- **Status:** **COMPLETED** (`5576c11`). Tests: `tests/test_learning_pathways.py`; E2E `test_escape_closes_dialogs`.
+
+### FIND-27: Terminal Closed the PTY Slave fd Twice
+- **Impact:** the second close hit whatever socket had reused the fd number, breaking the reconnecting terminal or an HTTP request.
+- **Status:** **COMPLETED** (`771c769`). Test: `test_terminal_closes_each_pty_fd_exactly_once`.
+
+## Next Candidates (not yet verified)
+
+- **Curriculum:** a Mermaid diagram in `computing/systems/systemd` fails to parse in the browser (line 25, `offset→DATA, …`). Sweep all public topics with `scripts/validate_render.mjs`.
+- **UI not yet exercised in this pass:** Quiz tab, Labs tab, Export menu, Listen (TTS), lesson translation (EN ▾), Add Topic, rename/delete unit, Curriculum Store.
+- **CLI:** `bin/synapse` commands not yet checked.
+- Only 1 of 539 courses ships `flashcards.csv`; every other deck is generated on first open (tens of seconds). Consider shipping decks or pre-generating in the curriculum pipeline (product decision).
 
 ---
 
