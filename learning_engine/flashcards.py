@@ -68,17 +68,29 @@ Output valid JSON only with no markdown formatting."""
     except Exception:
         pass
 
-    if not cards or not isinstance(cards, list):
-        cards = [
-            {"front": f"What is the foundational invariant of {sub.replace('_', ' ').title()}?", "back": "Refer to Foundation documentation for core structural axioms."}
-        ]
+    cards = [c for c in cards if isinstance(c, dict) and c.get("front") and c.get("back")] if isinstance(cards, list) else []
+    if not cards:
+        # Don't cache a placeholder deck: the next open should try again.
+        raise ValueError("The AI model did not return any flashcards. Try again or pick another model.")
 
     out_csv = sub_path / "flashcards.csv"
     with open(out_csv, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(["#separator:Comma", "#html:true", f"#tags:{domain} {cat} {sub}"])
+        # Anki file headers: one "#key:value" per line, before the CSV rows.
+        f.write("#separator:Comma\n#html:true\n")
+        f.write(f"#tags:{domain} {cat} {sub}\n#tags column:3\n")
+        writer = csv.writer(f, lineterminator="\n")
         for c in cards:
-            if isinstance(c, dict):
-                writer.writerow([c.get("front", ""), c.get("back", ""), f"{domain}::{sub}"])
+            writer.writerow([c["front"], c["back"], f"{domain}::{sub}"])
 
     return out_csv
+
+
+def anki_csv_text(text: str) -> str:
+    """Returns deck text with Anki headers one per line. Decks written before
+    this fix put them on one CSV row ("#separator:Comma,#html:true,#tags:..."),
+    which Anki reads as a single, invalid separator value."""
+    lines = text.splitlines()
+    if lines and lines[0].startswith("#separator:") and ",#" in lines[0]:
+        headers = lines[0].split(",#")
+        lines[0:1] = [headers[0]] + ["#" + h for h in headers[1:]] + ["#tags column:3"]
+    return "\n".join(lines) + "\n"

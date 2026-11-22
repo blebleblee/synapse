@@ -127,7 +127,7 @@ from learning_engine.mastery import (
 from learning_engine.security import validate_workspace_path, sanitize_query, is_dangerous_host_command, is_allowed_host, is_allowed_origin
 from learning_engine.config_manager import get_settings, save_settings, redact_settings, filter_client_settings, ConfigError
 from learning_engine.exporter import export_handbook
-from learning_engine.flashcards import generate_flashcards
+from learning_engine.flashcards import generate_flashcards, anki_csv_text
 from learning_engine.summary import regenerate_summary, generate_initial_summary
 from learning_engine.packages import (
     export_topic_pack,
@@ -766,15 +766,22 @@ def download_export(domain: str, level: Optional[str] = None):
 
 @app.get("/api/flashcards")
 def download_flashcards(query: str):
-    try:
-        csv_file = generate_flashcards(query)
-        return FileResponse(
-            str(csv_file),
-            media_type="text/csv",
-            filename=f"{query.replace('/', '_')}_flashcards.csv"
-        )
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    """Anki export. Serves the topic's deck; generates one only if it has none."""
+    target = resolve_subtopic(query)
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Topic '{query}' not found")
+    csv_file = target[3] / "flashcards.csv"
+    if not csv_file.exists():
+        try:
+            csv_file = generate_flashcards(query)
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=f"Could not generate flashcards with the AI model: {e}")
+    from fastapi.responses import Response
+    return Response(
+        content=anki_csv_text(csv_file.read_text(encoding="utf-8")),
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{query.replace("/", "_")}_flashcards.csv"'},
+    )
 
 @app.get("/api/flashcards/deck")
 def get_flashcards_deck(query: str):
