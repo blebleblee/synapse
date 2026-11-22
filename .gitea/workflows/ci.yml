@@ -13,12 +13,18 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      # Prebuilt tools (Python builds, Vite's bundler) need x86-64-v2 or newer;
-      # this shows what the runner's CPU offers when one of them crashes.
-      - name: Report CPU level
+      # Vite's bundler (Rolldown) ships a native binary that dies with
+      # "Illegal instruction" on CPUs below x86-64-v3 (this runner: Ivy
+      # Bridge). There, use its WebAssembly build: slower, same output.
+      - name: Check CPU level
         run: |
           grep -m1 'model name' /proc/cpuinfo || true
-          /lib64/ld-linux-x86-64.so.2 --help 2>/dev/null | grep -E 'x86-64-v[0-9]' || true
+          levels=$(/lib64/ld-linux-x86-64.so.2 --help 2>/dev/null | grep -E 'x86-64-v[0-9]' || true)
+          echo "$levels"
+          if ! echo "$levels" | grep -q 'x86-64-v3 (supported'; then
+            echo "No x86-64-v3: the bundler will use its WebAssembly build."
+            echo "NAPI_RS_FORCE_WASI=true" >> "$GITHUB_ENV"
+          fi
       # The image's own Python, not actions/setup-python: its prebuilt Python
       # for this Ubuntu needs a newer x86 ISA level than the runner's CPU
       # ("CPU ISA level is lower than required").
@@ -37,7 +43,10 @@ jobs:
           .venv/bin/python -m pip install -q -r requirements.txt pytest httpx playwright pytest-playwright
           .venv/bin/python -m playwright install --with-deps chromium
       - name: Install frontend dependencies
-        run: cd app/frontend && npm ci
+        run: |
+          cd app/frontend && npm ci
+          # The WebAssembly bundler must match Rolldown's version exactly.
+          node -e "const a = require('rolldown/package.json').version, b = require('@rolldown/binding-wasm32-wasi/package.json').version; if (a !== b) { console.error('Update @rolldown/binding-wasm32-wasi to ' + a + ' (it is ' + b + ')'); process.exit(1) }"
       - name: Verify (unit, lint, build, backend, E2E)
         run: ./scripts/verify_all.sh
 
