@@ -111,7 +111,7 @@ sequenceDiagram
     participant TK as Tokenizer
     participant DC as DataCollator
     participant TR as Trainer Loop
-    participant OPT as AdamW Optimizer
+    participant OPTIM as AdamW Optimizer
     participant LR as LR Scheduler
     participant EVAL as Evaluation
 
@@ -119,9 +119,9 @@ sequenceDiagram
     TK->>DC: input_ids, attention_mask, labels
     DC->>TR: padded batch tensor
     loop Every step
-        TR->>OPT: forward pass → loss
-        OPT->>TR: backward pass → gradients
-        OPT->>LR: step() — update weights
+        TR->>OPTIM: forward pass → loss
+        OPTIM->>TR: backward pass → gradients
+        OPTIM->>LR: step() — update weights
         LR->>TR: decayed learning rate
     end
     TR->>EVAL: end of epoch checkpoint

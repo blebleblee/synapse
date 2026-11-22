@@ -486,7 +486,7 @@ graph TD
 
     subgraph sub_egress_layer ["Egress Layer"]
         POLL["Polling Endpoint<br/>GET /jobs/{job_id}"]
-        WEBHOOK["Webhook Dispatcher<br/>POST client_url"
+        WEBHOOK["Webhook Dispatcher<br/>POST client_url"]
         STATE --> POLL
         STATE --> WEBHOOK
         POLL -->|"Result"| CL

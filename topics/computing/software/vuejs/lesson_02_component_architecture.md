@@ -428,7 +428,7 @@ flowchart TD
     J --> K
     K --> L
     
-    L -->|row[column.key]| K
+    L -->|"row[column.key]"| K
     
     M --> N
     N --> C

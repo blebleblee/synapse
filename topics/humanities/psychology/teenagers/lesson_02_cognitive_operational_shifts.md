@@ -43,8 +43,8 @@ flowchart TD
         VisualCx["Visual Cortex<br/>Feature extraction"]
         AuditoryCx["Auditory Cortex"]
         SomatoCx["Somatosensory Cortex<br/>Perceptual binding"]
-        VisualCx ---|---AuditoryCx
-        AuditoryCx ---|---SomatoCx
+        VisualCx --- AuditoryCx
+        AuditoryCx --- SomatoCx
     end
     
     Percept -->|"Bottom-up signals"| Assoc
@@ -54,8 +54,8 @@ flowchart TD
         InfPar["Inferior Parietal<br/>Symbol manipulation"]
         TempCx["Temporal Cortex<br/>Semantic networks"]
         Premotor["Premotor Cortex<br/>Action planning"]
-        InfPar ---|---TempCx
-        TempCx ---|---Premotor
+        InfPar --- TempCx
+        TempCx --- Premotor
     end
     
     Assoc -->|"Bottom-up signals"| Exec
@@ -65,8 +65,8 @@ flowchart TD
         DlPFC["Dorsolateral PFC<br/>Working memory<br/>Rule maintenance"]
         VmPFC["Ventromedial PFC<br/>Value integration<br/>Emotional regulation"]
         ACC["Anterior Cingulate<br/>Conflict monitoring<br/>Error detection"]
-        DlPFC ---|---VmPFC
-        VmPFC ---|---ACC
+        DlPFC --- VmPFC
+        VmPFC --- ACC
     end
     
     Exec --> Output

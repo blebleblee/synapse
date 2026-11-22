@@ -47,9 +47,9 @@ The mechanism of conversational implicature derivation operates through systemat
 ```mermaid
 flowchart TD
     A["Utterance\n'Some students passed the exam.'"]
-    B["Semantic Content\n∃x["student(x) ∧ passed(x)"]"]
+    B["Semantic Content\n∃x[student(x) ∧ passed(x)]"]
     C["Activate Horn Scale\n⟨all, most, many, some⟩\nordered by entailment strength"]
-    D["Reasoning\n• Speaker said 'some' (weaker term)\n• If speaker knew 'all' (stronger) held\n• Maxim of Quantity requires 'all'\n• Therefore: speaker believes ¬∀x["student(x) → passed(x)"]"]
+    D["Reasoning\n• Speaker said 'some' (weaker term)\n• If speaker knew 'all' (stronger) held\n• Maxim of Quantity requires 'all'\n• Therefore: speaker believes ¬∀x[student(x) → passed(x)]"]
     E["Implicated Content\n'Not all students passed'"]
 
     A --> B

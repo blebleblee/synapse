@@ -98,9 +98,9 @@ For security audit logs, regulatory compliance mandates immutable append-only st
 ```mermaid
 graph LR
     A["Raw Metrics\n1s granularity"] -->|"72h retention\nNVMe local"| B["5min Rollup\nWarm Tier"]
-    B -->|"30d retention\nSSD / S3"]| C["1hr Rollup\nCool Tier"]
-    C -->|"365d retention\nHDD / S3"]| D["1day Rollup\nCold Tier"]
-    D -->|"7yr retention\nS3 Glacier"]| E["Expire / Archive"]
+    B -->|"30d retention\nSSD / S3"| C["1hr Rollup\nCool Tier"]
+    C -->|"365d retention\nHDD / S3"| D["1day Rollup\nCold Tier"]
+    D -->|"7yr retention\nS3 Glacier"| E["Expire / Archive"]
 
     F["Application Logs\nStructured JSON"] --> G["Log Aggregator\nFluentBit / Vector"]
     G -->|"Hot path: 7d"| H["OpenSearch\nFull-text index"]

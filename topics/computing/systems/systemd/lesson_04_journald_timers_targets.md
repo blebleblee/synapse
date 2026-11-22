@@ -43,8 +43,17 @@ flowchart TD
     end
 
     subgraph entries ["Entry Objects"]
-        E1["OBJECT_ENTRY: entry #1
-        [offset→DATA, offset→DATA, offset→DATA, …
+        E1["OBJECT_ENTRY: entry 1
+        offset→DATA, offset→DATA, offset→DATA"]
+    end
+
+    HDR --> E1
+    E1 --> D1
+    E1 --> D2
+    E1 --> D3
+    D1 -.-> F1
+    D2 -.-> F2
+    D3 -.-> F3
 ```
 
 The hash table uses chaining with open addressing fallback. When a hash collision occurs, the journal implementation walks the chain of data objects linked through the `next_hash_offset` field. The hash function is a Jenkins hash variant, chosen for its uniform distribution and incremental computation properties. When the hash table load factor exceeds a threshold, `journald` allocates a new, larger hash table and rehashes, updating the header offsets atomically. The file is designed for concurrent append-only writes with a single writer, and crash consistency is maintained through the `seqnum` counter and the `tail_entry_array_offset` pointer, which allows recovery to the last consistent entry on unclean shutdown.

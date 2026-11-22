@@ -108,7 +108,7 @@ flowchart TD
     
     T --> V
     T --> W
-    V -->|[·]_B| F_n
+    V -->|"[·]_B"| F_n
     W -->|[·]_C| F_m
     F_n -->|"[T]_B^C · (–)"| F_m
 ```

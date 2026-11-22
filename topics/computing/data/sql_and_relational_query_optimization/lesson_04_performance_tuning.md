@@ -17,7 +17,7 @@ To better understand the performance characteristics of a system, it's essential
 ```mermaid
 graph LR
     subgraph sub_storage_layer ["Storage Layer"]
-        Storage Engine[Storage Engine]
+        StorageEngine[Storage Engine]
         Disk[Disk]
     end
     subgraph sub_query_execution_layer ["Query Execution Layer"]
@@ -26,14 +26,14 @@ graph LR
         Executor[Executor]
     end
     subgraph sub_memory_management_layer ["Memory Management Layer"]
-        Buffer Pool[Buffer Pool]
-        Page Cache[Page Cache]
+        BufferPool[Buffer Pool]
+        PageCache[Page Cache]
     end
-    Storage Engine -->|\"Disk I/O\"| Disk
-    Parser -->|\"Query Plan\"| Optimizer
-    Optimizer -->|\"Execution Plan\"| Executor
-    Executor -->|\"Result Set\"| Buffer Pool
-    Buffer Pool -->|\"Page Cache\"| Page Cache
+    StorageEngine -->|"Disk I/O"| Disk
+    Parser -->|"Query Plan"| Optimizer
+    Optimizer -->|"Execution Plan"| Executor
+    Executor -->|"Result Set"| BufferPool
+    BufferPool -->|"Page Cache"| PageCache
 ```
 
 In this simplified architecture, we can see the key components involved in query execution:

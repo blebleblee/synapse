@@ -116,14 +116,14 @@ flowchart TD
     end
     
     Revenue --> RecRev
-    RecRev ◄--> AR
-    RecRev ◄--> DR
-    RecRev ◄--> PE
+    RecRev <--> AR
+    RecRev <--> DR
+    RecRev <--> PE
     
     Expenses --> COGS
-    COGS ◄--> Inv
-    COGS ◄--> AP
-    COGS ◄--> AE
+    COGS <--> Inv
+    COGS <--> AP
+    COGS <--> AE
     
     NI --> DA
     DA --> CAR

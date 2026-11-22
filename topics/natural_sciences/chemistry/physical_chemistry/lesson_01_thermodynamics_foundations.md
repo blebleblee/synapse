@@ -71,7 +71,7 @@ flowchart TD
     E["Na⁺(g) + Cl⁻(g)"]
     F["NaCl(s)"]
     
-    A -->|ΔHat[Na]| B
+    A -->|"ΔHat[Na]"| B
     B -->|½ΔHat[Cl₂]| C
     C -->|IE[Na]| D
     D -->|EA[Cl]| E

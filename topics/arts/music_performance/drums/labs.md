@@ -218,17 +218,17 @@ Typical starting ceilings: beginners land around 100–120 BPM, intermediate pla
 ```mermaid
 flowchart TD
     Root["GRIP"]
-    Root --> G1["Fulcrum: thumb + index, ~1.5\" from tip"]
+    Root --> G1["Fulcrum: thumb + index, ~1.5 in from tip"]
     Root --> G2["Secondary fingers: light contact only, never squeezing"]
     Root --> G3["Drop test: stick falls vertical in 0.5-1.0 sec when released"]
     
     Impact["IMPACT"]
     Impact --> I1["Angle: 45° (default), up to 60° for softer playing"]
-    Impact --> I2["Strike zone: 2-3\" from drum center"]
+    Impact --> I2["Strike zone: 2-3 in from drum center"]
     Impact --> I3["Straight-line trajectory into the head, not an arc"]
     
     Rebound["REBOUND"]
-    Rebound --> R1["Target height: 5-6\" at 90 BPM"]
+    Rebound --> R1["Target height: 5-6 in at 90 BPM"]
     Rebound --> R2["Double-stroke R1→R2: R2 slightly quieter, never forced"]
     Rebound --> R3["Let the stick finish rising before you ask for the next stroke"]
     

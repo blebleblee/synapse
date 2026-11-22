@@ -83,7 +83,7 @@ flowchart TD
     C --> D["Complex Time Series<br/>I(t) + iQ(t)"]
     D --> E["Windowed FID"]
     E --> F["Extended time array"]
-    F --> G["Frequency-domain spectrum<br/>Real["S(ω)"] and Imag["S(ω)"]"]
+    F --> G["Frequency-domain spectrum<br/>Real[S(ω)] and Imag[S(ω)]"]
     G --> H["Absorption-mode spectrum"]
     H --> I["Final NMR spectrum<br/>δ (ppm) vs. Intensity"]
     

@@ -129,12 +129,12 @@ graph TD
     EVAL["eval_report_v12.json\n(hash: 6d2b...)"]
     DEPLOY["deployed_model_xgb_v12\n(hash: 3c7e...)"]
 
-    RAW -->|"transform: clean()" "| CLEAN
-    CLEAN -->|"transform: featurize()" "| FEAT
-    FEAT -->|"transform: train_test_split()" "| SPLIT
-    SPLIT -->|"transform: train_xgboost()" "| TRAIN
-    TRAIN -->|"transform: evaluate()" "| EVAL
-    TRAIN -->|"deploy: canary 10%" "| DEPLOY
+    RAW -->|"transform: clean()"| CLEAN
+    CLEAN -->|"transform: featurize()"| FEAT
+    FEAT -->|"transform: train_test_split()"| SPLIT
+    SPLIT -->|"transform: train_xgboost()"| TRAIN
+    TRAIN -->|"transform: evaluate()"| EVAL
+    TRAIN -->|"deploy: canary 10%"| DEPLOY
 ```
 
 The lineage graph is stored as an edge table in the metadata database. Each edge records: source artifact hash, destination artifact hash, transformation type (e.g., "train_xgboost", "clean"), the code commit that executed the transformation, and a timestamp. The graph can be queried to answer provenance questions: "which models were trained on data containing this specific row?" or "what is the full lineage of the model currently serving traffic?"

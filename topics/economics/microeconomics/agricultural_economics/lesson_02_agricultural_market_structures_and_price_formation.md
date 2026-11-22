@@ -54,52 +54,52 @@ flowchart TD
         subgraph regionA["Region A"]
             farmsupplyA["Farm Supply<br/>S_A(p_A)"]
             localdemandA["Local Demand<br/>D_A(p_A)"]
-            farmsupplyA ↔ localdemandA
+            farmsupplyA <--> localdemandA
         end
         
         subgraph regionB["Region B"]
             farmsupplyB["Farm Supply<br/>S_B(p_B)"]
             localdemandB["Local Demand<br/>D_B(p_B)"]
-            farmsupplyB ↔ localdemandB
+            farmsupplyB <--> localdemandB
         end
         
-        farmsupplyA ←→|τ_AB<br/>Transport Cost| farmsupplyB
+        farmsupplyA <-->|"τ_AB<br/>Transport Cost"| farmsupplyB
         
         subgraph processingA["Region A Processing"]
             marginA["Marketing Margin m_A"]
             processorA["Processing Oligopsony<br/>p_f = p_A"]
-            marginA → processorA
+            marginA --> processorA
         end
         
         subgraph processingB["Region B Processing"]
             marginB["Marketing Margin m_B"]
             processorB["Processing Oligopsony<br/>p_f = p_B"]
-            marginB → processorB
+            marginB --> processorB
         end
         
-        localdemandA → marginA
-        localdemandB → marginB
+        localdemandA --> marginA
+        localdemandB --> marginB
         
         subgraph retailA["Region A Retail"]
             transformA["Transformation g(q_f, m)"]
             retailerA["Retail Oligopoly<br/>p_r = p_f/a + w_m/b"]
-            transformA → retailerA
+            transformA --> retailerA
         end
         
         subgraph retailB["Region B Retail"]
             transformB["Transformation g(q_f, m)"]
             retailerB["Retail Oligopoly<br/>p_r = p_f/a + w_m/b"]
-            transformB → retailerB
+            transformB --> retailerB
         end
         
-        processorA → transformA
-        processorB → transformB
+        processorA --> transformA
+        processorB --> transformB
         
         demandRetailA["Consumer Demand<br/>D_A^retail(p_r)"]
         demandRetailB["Consumer Demand<br/>D_B^retail(p_r)"]
         
-        retailerA → demandRetailA
-        retailerB → demandRetailB
+        retailerA --> demandRetailA
+        retailerB --> demandRetailB
     end
     
     subgraph intertemporal["Intertemporal Storage Arbitrage"]
@@ -110,15 +110,15 @@ flowchart TD
         storageZero["If I_t = 0:<br/>p_t+1^e ≤ 1+r × p_t + c"]
         harvestTPlus1["Period t+1: Harvest Q_t+1"]
         
-        harvestT → priceT
-        priceT → storageDecision
-        storageDecision → storagePositive
-        storageDecision → storageZero
-        storagePositive → harvestTPlus1
-        storageZero → harvestTPlus1
+        harvestT --> priceT
+        priceT --> storageDecision
+        storageDecision --> storagePositive
+        storageDecision --> storageZero
+        storagePositive --> harvestTPlus1
+        storageZero --> harvestTPlus1
     end
     
-    spatial ↔ intertemporal
+    spatial <--> intertemporal
 ```
 
 The price transmission mechanism from farm to retail operates through both vertical (supply chain stage) and temporal (lag structure) dimensions. Empirical estimation of transmission dynamics typically employs vector error correction models (VECM) that capture both long-run cointegration relationships and short-run adjustment dynamics. The general transmission equation takes the form:

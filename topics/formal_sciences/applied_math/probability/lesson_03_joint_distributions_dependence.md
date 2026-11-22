@@ -86,7 +86,7 @@ flowchart TD
     B["f<sub>X</sub>(x) = ∫f(x,y)dy<br/>(Marginalize over Y)"]
     C["f<sub>Y</sub>(y) = ∫f(x,y)dx<br/>(Marginalize over X)"]
     D["f<sub>Y|X</sub>(y|x) = f(x,y)/f<sub>X</sub>(x)<br/>(Bayes Ratio)"]
-    E["E["Y|X=x"] = ∫y·f<sub>Y|X</sub>(y|x)dy<br/>(Conditional Expectation)"]
+    E["E[Y|X=x] = ∫y·f<sub>Y|X</sub>(y|x)dy<br/>(Conditional Expectation)"]
     F["Cov(X,Y) = E[XY] - E[X]E[Y]<br/>(Covariance extraction)"]
     
     A --> B

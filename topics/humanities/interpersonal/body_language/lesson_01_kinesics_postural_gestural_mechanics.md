@@ -99,7 +99,7 @@ flowchart TD
         MN["Mirror Neuron<br/>Activation<br/>(IFG, IPL)"]
         PF["Prefrontal<br/>Analytical<br/>Processing"]
         
-        IU["Implicit<br/>Understanding<br/>(\"Gut Feeling\")"]
+        IU["Implicit<br/>Understanding<br/>('Gut Feeling')"]
         EI["Explicit<br/>Interpretation<br/>+ Hypothesis Test"]
         
         OO -->|Automatic| MN

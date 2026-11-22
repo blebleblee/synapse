@@ -137,10 +137,6 @@ flowchart TD
     Origin --- RD_Curve --- PStar
 
     %% Layout alignment
-    { rank=same; BAutarky; RS_H1; }
-    { rank=same; PStar; RS_V; RD_Curve; }
-    { rank=same; AAutarky; RS_H2; }
-    { rank=same; Origin; Q1AQ2B; Q1Q2; }
 ```
 
 The intersection at $p^*$ and $Q_1^A/Q_2^B$ represents the unique free trade equilibrium with complete specialization. Shifts in relative demand (preference changes favoring good 1) push the RD curve rightward, raising $p^*$ and improving Country A's terms of trade. Changes in labor endowments or productivity alter the relative supply, shifting the vertical segment and adjusting both terms of trade and trade volumes.

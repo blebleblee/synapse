@@ -44,7 +44,7 @@ flowchart TD
     WS -->|"View Matrix (V)"| VS
     VS -->|"Projection Matrix (P)"| CS
     CS -->|"Perspective Divide (÷w)"| NDC
-    CS -->|""| CC
+    CS --> CC
     NDC -->|"Viewport Transform"| SS
     SS -->|"Rasterization"| FS
     FS -->|"Fragment Shader + Tests"| FB

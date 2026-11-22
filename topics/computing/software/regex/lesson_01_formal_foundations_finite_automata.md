@@ -34,7 +34,7 @@ Transitions:
 flowchart LR
     q0(["q0"])
     q1(["q1"])
-    q2([["q2"]])
+    q2((("q2")))
 
     q0 -->|"a"| q1
     q1 -->|"b"| q2

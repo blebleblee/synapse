@@ -332,7 +332,7 @@ flowchart LR
     SC --> IL[Update Free Space Map\nFSM: track reclaimable space]
     IL --> RM[Remove index entries\npointing to dead tuples]
     RM --> RH[Reclaim heap slots:\nmark dead line pointers LP_DEAD\ntruncate trailing empty pages]
-    RH --> FZ{XID age >\nautovacuum_freeze_max_age\n(default 200M)}
+    RH --> FZ{"XID age >\nautovacuum_freeze_max_age\n(default 200M)"}
     FZ -->|Yes| FR[Freeze old tuples:\nreplace xmin with FrozenXID\nadvance relfrozenxid]
     FZ -->|No| AN[ANALYZE: sample rows\nupdate pg_statistic\nfor query planner]
     FR --> AN

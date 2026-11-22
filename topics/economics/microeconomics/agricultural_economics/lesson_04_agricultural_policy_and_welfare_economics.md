@@ -78,7 +78,7 @@ flowchart TD
     O["Inventory disposal:<br/>export subsidy, food aid, or destruction"]
     
     P["Welfare Accounting (P_m < p_f case)"]
-    Q["ΔCS = -["(p_f - p*)·Q_d + ½(p_f - p*)·(Q* - Q_d)"]<br/>(Consumer surplus loss)"]
+    Q["ΔCS = -[(p_f - p*)·Q_d + ½(p_f - p*)·(Q* - Q_d)]<br/>(Consumer surplus loss)"]
     R["ΔPS = +[(p_f - p*)·Q_d + rectangle on expanded production]<br/>(Producer surplus gain)"]
     S["Government cost = p_f·Q_surplus + s·Q_surplus"]
     T["DWL = consumption triangle +<br/>production triangle + storage costs"]
@@ -193,7 +193,7 @@ flowchart TD
     
     Phase2 --> Constraint["Each producer i faces quota constraint:<br/>q_i ≤ Q_i_quota"]
     
-    Constraint --> ProfitMax["Profit maximization:<br/>max["p_q · q_i - C_i(q_i)"]<br/>subject to q_i ≤ Q_i_quota"]
+    Constraint --> ProfitMax["Profit maximization:<br/>max[p_q · q_i - C_i(q_i)]<br/>subject to q_i ≤ Q_i_quota"]
     
     ProfitMax --> Condition1{"MC_i(Q_i_quota) < p_q ?"}
     ProfitMax --> Condition2{"MC_i(Q_i_quota) ≥ p_q ?"}

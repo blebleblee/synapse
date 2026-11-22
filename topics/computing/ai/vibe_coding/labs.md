@@ -957,18 +957,18 @@ mindmap
       DataLoader worker deadlock on SIGKILL
       Disk exhaustion from unbounded checkpoint saves
     Input Adversaria
-      Empty strings → [CLS][SEP] only, no content tokens
+      Empty strings → only CLS and SEP tokens, no content
       Sequences longer than max_position_embeddings=512
       Unicode edge cases: null bytes, RTL markers, lone surrogates
       fp16 overflow → NaN logits from extreme input magnitudes
       Homoglyph attacks: Cyrillic 'а' replacing ASCII 'a'
-      Tokenizer OOV: unknown tokens collapsing to [UNK] at high rate
+      Tokenizer OOV: unknown tokens collapsing to UNK at high rate
     Concurrency
       Race conditions on shared mutable model state
       Non-determinism from parallel CUDA stream execution
       DataLoader worker spawn/join overhead under fork semantics
     Distribution Shift
-      Domain shift between training (movie reviews) and production text
+      Domain shift between training on movie reviews and production text
       Label drift: class priors shifting over time
       Tokenizer vocabulary mismatch after model update
     Numerical Instability
@@ -1624,7 +1624,7 @@ sequenceDiagram
     OLLAMA->>LCPP: Prefill: process full prompt tokens in parallel
     Note over LCPP: KV cache populated for all prompt tokens\n(compute-bound: O(prompt_len² × d_model))
     LCPP-->>OLLAMA: Prefill complete → first token generated
-    OLLAMA-->>BENCH: (streaming) first token\n[\"TTFT = prompt_eval_duration\"]
+    OLLAMA-->>BENCH: (streaming) first token (TTFT = prompt_eval_duration)
     loop Decode: one token per step
         LCPP->>LCPP: Attend to KV cache\n(memory-bandwidth-bound)
         LCPP-->>OLLAMA: next token

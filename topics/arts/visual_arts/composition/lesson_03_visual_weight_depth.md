@@ -83,12 +83,12 @@ flowchart TD
         balance["<b>Asymmetric Balance</b><br/>Top-Left ↔ Bottom-Right<br/>Heavy counterweights<br/>Medium & Light fill remaining"]
     end
     
-    TL -.→ balance
-    BR -.→ balance
-    TM → MM
-    ML → MM
-    MR → MM
-    BM → MM
+    TL -.-> balance
+    BR -.-> balance
+    TM --> MM
+    ML --> MM
+    MR --> MM
+    BM --> MM
 
     style TL fill:#d32f2f,stroke:#000,stroke-width:2px,color:#fff
     style TR fill:#d32f2f,stroke:#000,stroke-width:2px,color:#fff

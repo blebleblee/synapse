@@ -126,12 +126,12 @@ After all expansions, **Quote Removal** strips the remaining quoting characters 
 
 ```mermaid
 flowchart TD
-    A["Raw Input String\ne.g: cp ~/{a,b}.txt \"$DEST\""]
-    B["Token Stream\n[WORD:'cp'] [WORD:'~/{a,b}.txt'] [WORD:'\"$DEST\"']"]
-    C["Abstract Syntax Tree\nSimpleCommand: cp\n  args: [~/{a,b}.txt] [\"$DEST\"]"]
-    D["Brace Expansion\n~/a.txt  ~/b.txt  \"$DEST\""]
-    E["Tilde Expansion\n/home/user/a.txt  /home/user/b.txt  \"$DEST\""]
-    F["Parameter Expansion\n/home/user/a.txt  /home/user/b.txt  \"/tmp/out\""]
+    A["Raw Input String\ne.g: cp ~/{a,b}.txt '$DEST'"]
+    B["Token Stream\n[WORD:'cp'] [WORD:'~/{a,b}.txt'] [WORD:'#quot;$DEST#quot;']"]
+    C["Abstract Syntax Tree\nSimpleCommand: cp\n  args: [~/{a,b}.txt] ['$DEST']"]
+    D["Brace Expansion\n~/a.txt  ~/b.txt  '$DEST'"]
+    E["Tilde Expansion\n/home/user/a.txt  /home/user/b.txt  '$DEST'"]
+    F["Parameter Expansion\n/home/user/a.txt  /home/user/b.txt  '/tmp/out'"]
     G["Command Substitution\n(none in this example)"]
     H["Arithmetic Expansion\n(none in this example)"]
     I["Word Splitting\n(double-quoted $DEST: no split)\n3 words total"]

@@ -50,7 +50,7 @@ flowchart TD
     TemplateCheck -->|"Equals 'cart'"| CartPage["Cart Page"]
     TemplateCheck -->|"Other"| CheckCheckout{First Time<br/>Accessed?}
     
-    ProductPage --> ViewItem["gtag('event', 'view_item')<br/>• currency<br/>• value<br/>• items["sku, name, brand, category, price, qty=1"]"]
+    ProductPage --> ViewItem["gtag('event', 'view_item')<br/>• currency<br/>• value<br/>• items[sku, name, brand, category, price, qty=1]"]
     
     CartPage --> ViewCart["gtag('event', 'view_cart')<br/>• currency<br/>• value (cart total)<br/>• items[] (all cart items)"]
     

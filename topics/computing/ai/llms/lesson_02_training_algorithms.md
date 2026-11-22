@@ -57,7 +57,7 @@ graph TD
     B --> C[Activation a1]
     C --> D[Pre-activation z2]
     D --> E[Activation y_hat]
-    E --> F[\"Loss L(y_hat, y)\"]
+    E --> F["Loss L(y_hat, y)"]
     F --> G[Gradient delta2]
     G --> H[Gradient delta1]
     H --> I[Gradient dW1]

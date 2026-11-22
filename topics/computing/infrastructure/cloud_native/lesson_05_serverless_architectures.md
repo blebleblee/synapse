@@ -236,7 +236,7 @@ graph LR
     subgraph sub_durable_functions_extension ["Durable Functions Extension"]
         ORCH["Orchestrator Function\n(deterministic replay)"]
         ACT["Activity Functions\n(actual side effects)"]
-        HIST[("History Table\n(Azure Storage / Netherite)"]
+        HIST[("History Table\n(Azure Storage / Netherite)")]
     end
 
     TM -->|"Trigger event"| HOST_GRPC

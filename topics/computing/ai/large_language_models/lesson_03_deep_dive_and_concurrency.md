@@ -188,8 +188,8 @@ graph LR
     end
 
     subgraph sub_tensor_parallelism__megatron_lm ["Tensor Parallelism (Megatron-LM style)"]
-        GPU1["GPU 0\nW_col[\":, 0:N/2\"]"]
-        GPU2["GPU 1\nW_col[\":, N/2:N\"]"]
+        GPU1["GPU 0\nW_col[:, 0:N/2]"]
+        GPU2["GPU 1\nW_col[:, N/2:N]"]
         AG["AllReduce / AllGather\nafter each layer"]
         GPU1 --> AG
         GPU2 --> AG

@@ -72,7 +72,7 @@ flowchart TD
         R1["Both: Exchange parity check syndromes"]
         R2["Both: Error correction using CASCADE or LDPC<br/>Reconciled key length: n_reconciled"]
         P1["Both: Privacy amplification<br/>Select universal hash function h with output length ℓ<br/>based on observed QBER, leaked information, and security parameter ε"]
-        P2["Both: Final key K = h(reconciled_key)<br/>|K| = ℓ bits with Pr["I(Eve:K) > 0"] < ε"]
+        P2["Both: Final key K = h(reconciled_key)<br/>|K| = ℓ bits with Pr[I(Eve:K) > 0] < ε"]
         
         R1 --> R2 --> P1 --> P2
     end

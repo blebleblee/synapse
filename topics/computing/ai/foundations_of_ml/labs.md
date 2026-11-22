@@ -38,7 +38,7 @@ flowchart TD
     D --> D3["Dimensionality Reduction\n Low-dim manifold of P(X)"]
     D --> D4["Generative Models\n Sample from P(X)"]
 
-    C1 --> F["Optimization Target:\n Minimize E[\"loss(f(x), y)\"]"]
+    C1 --> F["Optimization Target:\n Minimize E[loss(f(x), y)]"]
     C2 --> F
     D1 --> G["Optimization Target:\n Minimize intra-cluster variance\nor maximize log P(X)"]
     D2 --> G

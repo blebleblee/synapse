@@ -26,12 +26,12 @@ The monitoring system will track pipeline performance metrics, such as throughpu
 
 ```mermaid
 graph LR
-    A[Workflow Engine] -->|\"DAG\"| B[Graph Data Structure]
-    B -->|\"Topological Sorting\"| C[Prioritized Task Queue]
-    C -->|\"Task Scheduling\"| D[Task Manager]
-    D -->|\"Task Execution\"| E[Task Manager]
-    E -->|\"Monitoring\"| F[Monitoring System]
-    F -->|\"Anomaly Detection\"| G[Alerting System]
+    A[Workflow Engine] -->|"DAG"| B[Graph Data Structure]
+    B -->|"Topological Sorting"| C[Prioritized Task Queue]
+    C -->|"Task Scheduling"| D[Task Manager]
+    D -->|"Task Execution"| E[Task Manager]
+    E -->|"Monitoring"| F[Monitoring System]
+    F -->|"Anomaly Detection"| G[Alerting System]
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

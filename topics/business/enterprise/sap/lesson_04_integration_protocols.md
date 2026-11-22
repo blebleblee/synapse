@@ -85,7 +85,7 @@ flowchart TD
     Adapter --> AdapterDesc
     AdapterDesc --> Engine
     Engine --> ReceiverDet
-    ReceiverDet -.->|Receiver System(s)<br/>resolved| Engine
+    ReceiverDet -.->|"Receiver System(s)<br/>resolved"| Engine
     Engine --> InterfaceDet
     InterfaceDet -.->|Target interface<br/>selected| Engine
     Engine --> Mapping

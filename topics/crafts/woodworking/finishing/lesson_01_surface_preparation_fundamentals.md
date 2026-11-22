@@ -22,7 +22,7 @@ The practical mechanics of surface preparation can be understood as a linear red
 flowchart TD
     START["RAW STOCK"]
     
-    S1["Stage 1: Machine Marks Removal<br/>Tool: Random-orbit sander (5") or hand scraper<br/>Grit: 80 or 100<br/>Goal: Eliminate planer mill marks, tearout, and<br/>cup/twist artifacts from milling"]
+    S1["Stage 1: Machine Marks Removal<br/>Tool: Random-orbit sander (5 in) or hand scraper<br/>Grit: 80 or 100<br/>Goal: Eliminate planer mill marks, tearout, and<br/>cup/twist artifacts from milling"]
     
     S2["Stage 2: Coarse Scratch Removal<br/>Tool: Random-orbit sander<br/>Grit: 120 → 150<br/>Goal: Replace coarse scratch pattern with finer,<br/>uniform scratch field; check under raking light"]
     

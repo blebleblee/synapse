@@ -62,7 +62,7 @@ flowchart TD
         W["Four-dimensional whole W"]
 
         subgraph fusion ["Fusion Law"]
-            F["W = σx["∃t TP(x, W, t)"]"]
+            F["W = σx[∃t TP(x, W, t)]"]
         end
 
         subgraph composition ["Composition"]

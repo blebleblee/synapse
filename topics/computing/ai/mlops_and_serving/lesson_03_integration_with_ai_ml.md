@@ -620,10 +620,10 @@ graph TB
 
     subgraph sub_tensor_parallel___4_gpus__single ["Tensor Parallel — 4 GPUs (single layer)"]
         direction LR
-        TG0["GPU 0\nW[\":, 0:k/4\"]"]
-        TG1["GPU 1\nW[\":, k/4:k/2\"]"]
-        TG2["GPU 2\nW[\":, k/2:3k/4\"]"]
-        TG3["GPU 3\nW[\":, 3k/4:k\"]"]
+        TG0["GPU 0\nW[:, 0:k/4]"]
+        TG1["GPU 1\nW[:, k/4:k/2]"]
+        TG2["GPU 2\nW[:, k/2:3k/4]"]
+        TG3["GPU 3\nW[:, 3k/4:k]"]
         TG0 <-->|"AllGather\npartial outputs"| TG1
         TG1 <-->|"AllGather\npartial outputs"| TG2
         TG2 <-->|"AllGather\npartial outputs"| TG3

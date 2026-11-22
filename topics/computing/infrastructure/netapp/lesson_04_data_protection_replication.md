@@ -50,7 +50,7 @@ flowchart TD
         DestWAFL --> UserSnapA_Dst
     end
     
-    SnapN_Src <-.."Common snapshot".-> SnapN_Dst
+    SnapN_Src <-.->|"Common snapshot"| SnapN_Dst
     
     SnapN1_Src -->|"Delta blocks:<br/>SM_snap_N → SM_snap_N+1<br/>via TCP/TLS"| DestWAFL
     

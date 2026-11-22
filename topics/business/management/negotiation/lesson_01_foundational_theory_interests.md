@@ -40,7 +40,7 @@ flowchart TD
     A -->|"Generate Position"| C["Party A Position<br/>$380M max price<br/>+ board seat<br/>+ IP rights"]
     B -->|"Generate Position"| D["Party B Position<br/>$270M min price<br/>+ earnout<br/>+ retention"]
     
-    C ↔ D
+    C <--> D
     
     C -->|"Constrained by"| E["Party A BATNA<br/>Next-best target<br/>NPV: $340M"]
     D -->|"Constrained by"| F["Party B BATNA<br/>Standalone plan<br/>NPV: $270M"]

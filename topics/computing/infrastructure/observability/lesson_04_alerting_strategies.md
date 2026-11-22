@@ -896,10 +896,11 @@ flowchart TD
     J --> K{Error Rate<br/>Elevated?}
     K -->|"All Instances"| L["Incident: System-wide"]
     K -->|Subset| M["Incident: Isolated Instances"]
+```
 ```promql
 sum by (instance) (rate(http_requests_total{job="api-server", status=~"5.."}[5m]))
 / sum by (instance) (rate(http_requests_total{job="api-server"}[5m]))
-```text
+```
 
 - **All instances elevated** → likely a code deployment or shared dependency issue. Proceed to Step 2.
 - **Single instance elevated** → likely a node-level failure. Proceed to Step 3.
@@ -908,7 +909,7 @@ sum by (instance) (rate(http_requests_total{job="api-server", status=~"5.."}[5m]
 ```bash
 # List the last 5 deployments to api-server in the last 2 hours
 kubectl rollout history deployment/api-server -n production | tail -5
-```text
+```
 - If a deployment occurred in the last 30 minutes → **Rollback** (see Remediation A).
 - If no recent deployment → Proceed to Step 4.
 
@@ -918,7 +919,7 @@ kubectl rollout history deployment/api-server -n production | tail -5
 kubectl annotate pod <pod-name> -n production "service.kubernetes.io/drain=true"
 # Verify the pod is removed from Endpoints
 kubectl get endpoints api-server -n production
-```text
+```
 Monitor the error rate for 2 minutes. If it recovers, the problem is node-local.
 File a P2 ticket and drain/reschedule the pod.
 
@@ -927,7 +928,7 @@ File a P2 ticket and drain/reschedule the pod.
 # Check error rate for each downstream service called by api-server
 sum by (target_service) (rate(grpc_client_handled_total{job="api-server", grpc_code!="OK"}[5m]))
 / sum by (target_service) (rate(grpc_client_handled_total{job="api-server"}[5m]))
-```text
+```
 If a downstream dependency shows > 10% error rate, escalate to the owning team
 (see Escalation Path).
 
@@ -947,14 +948,14 @@ kubectl rollout undo deployment/api-server -n production
 kubectl rollout status deployment/api-server -n production --timeout=5m
 
 # Verify error rate recovers (wait 3–5 minutes for Prometheus to reflect change)
-```text
+```
 
 ### B: Restart a CrashLooping pod
 ```bash
 kubectl delete pod <pod-name> -n production
 # Kubernetes will reschedule automatically. Monitor the new pod's logs:
 kubectl logs -f deployment/api-server -n production --since=2m
-```yaml
+```
 
 ---
 
@@ -973,7 +974,6 @@ kubectl logs -f deployment/api-server -n production --since=2m
 - [ ] Runbook updated if any procedure was inaccurate or incomplete
 - [ ] SLO impact calculated and reported to stakeholders if error budget
       consumption exceeded 5%
-```
 
 ---
 

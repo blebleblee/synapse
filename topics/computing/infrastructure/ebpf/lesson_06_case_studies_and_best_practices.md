@@ -205,7 +205,7 @@ graph TD
         KEY2 --> V3
     end
 
-    USERSPACE["User-space:\nbpf_map_lookup_elem(fd, &key, values_array)\nreturns values_array["num_possible_cpus()"]"]
+    USERSPACE["User-space:\nbpf_map_lookup_elem(fd, &key, values_array)\nreturns values_array[num_possible_cpus()]"]
     V0 --> USERSPACE
     V1 --> USERSPACE
     V2 --> USERSPACE

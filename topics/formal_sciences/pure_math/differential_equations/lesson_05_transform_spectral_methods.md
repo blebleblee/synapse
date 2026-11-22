@@ -244,7 +244,7 @@ flowchart TD
         
         subgraph FOURIER["FOURIER/STURM-LIOUVILLE PATH"]
             F1["BVP on [a,b]"]
-            F2["-d/dx["p·d/dx"] + q ───► λ_n · φ_n"]
+            F2["-d/dx[p·d/dx] + q ───► λ_n · φ_n"]
             F3["Expand: f = Σ c_n φ_n<br/>c_n = ⟨f, φ_n⟩_w / ‖φ_n‖²_w"]
             F4["λ_n ↔ decay/oscillation rates<br/>Completeness in L²_w"]
             F5["Convergence: uniform if f ∈ C²,<br/>L² (norm) in general;<br/>pointwise a.e. (Carleson '66)"]

@@ -199,7 +199,7 @@ graph TD
 
     subgraph sub_stage_3__rlhf ["Stage 3: RLHF"]
         SFT_MODEL --> RM_DATA["Human rankings<br/>of model outputs"]
-        RM_DATA --> RM["Train Reward Model<br/>(predicts human preference)"
+        RM_DATA --> RM["Train Reward Model<br/>(predicts human preference)"]
         RM --> PPO["PPO optimization<br/>maximize reward subject<br/>to KL penalty vs SFT"]
         PPO --> RLHF_MODEL["RLHF model<br/>(aligned ChatGPT)"]
     end
