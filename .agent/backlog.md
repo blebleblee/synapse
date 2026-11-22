@@ -205,12 +205,31 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-29: Anki Export Regenerated Decks; Placeholder Decks Cached; Bad Anki Header
 - **Status:** **COMPLETED** (`7ff4d93`). Tests in `tests/test_search.py`. The only shipped deck was a leaked test mock and was removed.
 
+### FIND-30: CLI Tracebacks, Exit Codes, Endless Review
+- **Status:** **COMPLETED** (`149820c`). Tests: `tests/test_cli.py`.
+
+### FIND-31: Math Rendered in Two Domains Only; "<" Escaped Inside Code
+- **Status:** **COMPLETED** (`01855bc`). Tests: `app/frontend/src/utils/mathSpans.test.ts`.
+
+### FIND-32: Duplicate Course Titles in the Sidebar
+- **Status:** **COMPLETED** (`7f65a0c`). Test: `tests/test_syllabus_titles.py`.
+
+### FIND-33: Mermaid Repair Corrupted Quoted Labels
+- **Status:** **COMPLETED** (`496bc60`, `103c111`, `417c42a`). Tests: `app/frontend/src/utils/mermaidRepair.test.ts`.
+
+### FIND-34: Mentor Model Shown Twice (User Request)
+- **Status:** **COMPLETED** (`a1cbac2`).
+
+### FIND-35: 47 Broken Diagrams and a Runaway Code Block in Public Lessons
+- **Status:** **COMPLETED** (`1f8dad2`). `scripts/validate_render.mjs` reports 0 broken Mermaid diagrams in tracked public lessons.
+
 ## Next Candidates (not yet verified)
 
-- **Curriculum:** a Mermaid diagram in `computing/systems/systemd` fails to parse in the browser (line 25, `offset→DATA, …`). Sweep all public topics with `scripts/validate_render.mjs`.
+- **Curriculum:** ~100 KaTeX errors now visible to learners (95 formal/natural sciences, 5 business/economics). Run `node scripts/validate_render.mjs topics/<domain>` per public domain and filter to `git ls-files topics`.
+
 - **UI not yet exercised in this pass:** Listen (TTS), lesson translation (EN ▾), Add Topic, rename/delete unit, Curriculum Store. (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
 - Labs "Run" buttons say "Executes shell command directly in your sandbox terminal" even when the Host Shell profile is active.
-- **CLI:** `bin/synapse` commands not yet checked.
+- **CLI:** checked in batch 2 (FIND-30). Not yet exercised: `add`, `generate`, `chat`, `pack install/uninstall` (they write or need a model).
 - No course ships `flashcards.csv` (the one that did was a test artifact); every deck is generated on first open (tens of seconds). Consider shipping decks or pre-generating in the curriculum pipeline (product decision).
 
 ---
