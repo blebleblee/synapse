@@ -19,6 +19,7 @@ import './App.css';
 
 export function App() {
   const [tree, setTree] = useState<TopicTreeData>({});
+  const [treeLoaded, setTreeLoaded] = useState(false);
   const [mentorConnected, setMentorConnected] = useState<'checking' | 'connected' | 'error'>('checking');
   const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceStatus | null>(null);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
@@ -140,6 +141,7 @@ export function App() {
       if (res.ok) {
         const data = await res.json();
         setTree(data);
+        setTreeLoaded(true);
       } else if (res.status !== 401) {
         notify('error', await failureMessage(res, 'Loading the curriculum'));
       }
@@ -902,6 +904,7 @@ export function App() {
     <div className="workbench-layout">
       <TopicTree
         tree={tree}
+        treeLoaded={treeLoaded}
         selectedSubtopic={selectedPath}
         activeLessonId={activeLessonId}
         activeTab={activeTab}

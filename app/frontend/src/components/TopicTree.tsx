@@ -33,6 +33,8 @@ import type { TopicTreeData, UnitNode, WorkspaceStatus } from '../types';
 
 interface TopicTreeProps {
   tree: TopicTreeData;
+  /** False until the first tree response; an empty tree before then is not "nothing installed". */
+  treeLoaded?: boolean;
   selectedSubtopic: string | null;
   activeLessonId?: string | null;
   activeTab?: string;
@@ -73,6 +75,7 @@ import { getUIStrings } from '../utils/i18n';
 
 export const TopicTree: React.FC<TopicTreeProps> = ({
   tree,
+  treeLoaded = true,
   selectedSubtopic,
   activeLessonId,
   activeTab,
@@ -361,7 +364,11 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
       </div>
 
       <div className="tree-content">
-        {sortedDomainEntries.length === 0 ? (
+        {!treeLoaded && sortedDomainEntries.length === 0 ? (
+          <div className="empty-tree-state" style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '12px' }}>
+            Loading curriculum…
+          </div>
+        ) : sortedDomainEntries.length === 0 ? (
           <div className="empty-tree-state" style={{ padding: '32px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
             <Package size={32} style={{ opacity: 0.4, color: 'var(--text-muted)' }} />
             <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>No Curriculum Installed Yet</div>
