@@ -697,7 +697,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
               ? 'Stop audio playback'
               : voiceState === 'preparing'
                 ? 'Preparing audio for this lesson (the first listen can take a minute). Click to cancel.'
-                : 'Listen to this lesson'}
+                : 'Listen to this lesson. The text is sent to Microsoft\'s online speech service to make the audio.'}
           >
             {voiceState === 'speaking'
               ? <VolumeX size={13} className="voice-pulse" />

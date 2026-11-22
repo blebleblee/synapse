@@ -112,3 +112,12 @@ synapse serve --host 0.0.0.0 --port 8000
 
 > **Note on precedence:** values in `~/.config/synapse/env` override variables already set in your shell. If that file defines `SYNAPSE_PASSWORD`, running `SYNAPSE_PASSWORD=other synapse serve` still uses the file's password.
 
+
+---
+
+## 6. What Leaves Your Computer
+
+- **Local models (Ollama):** lessons, questions and terminal output stay on the machines in your Ollama list.
+- **Cloud providers (Claude, Gemini):** when you configure a key and a cloud model answers, the prompt (lesson excerpt, your question, recent terminal output) goes to that provider.
+- **Listen (narration):** the lesson text is sent to Microsoft's Edge text-to-speech service to produce the audio, which is then cached locally. If that service is unreachable, the browser's built-in speech is used instead and nothing is sent.
+- **Course downloads:** packs are downloaded from the project's release pages.

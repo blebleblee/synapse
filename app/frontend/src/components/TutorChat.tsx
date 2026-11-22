@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
 import { sanitizeHtml } from '../utils/markdownRenderer';
 import { toTitleCase } from '../utils/text';
+import { mentorSuggestions } from '../utils/mentorSuggestions';
 import {
   Send,
   Bot,
@@ -110,32 +111,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
     }
   };
 
-  const getDomainMentorRole = (domain?: string) => {
-    switch (domain) {
-      case 'computing':
-        return 'Systems Software & Kernel Architect';
-      case 'formal_sciences':
-        return 'Pure Mathematics & Formal Logic Mentor';
-      case 'natural_sciences':
-        return 'Physics & Scientific Reasoning Specialist';
-      case 'engineering':
-        return 'Robotics & Hardware Systems Engineer';
-      case 'crafts':
-        return 'Mechanism Design & CAD Specialist';
-      case 'arts':
-        return 'Music Theory & Audio DSP Specialist';
-      case 'business':
-        return 'Economics & Systems Thinking Mentor';
-      case 'humanities':
-        return 'Cognitive Science & Epistemology Mentor';
-      default:
-        return 'Socratic Technical Mentor';
-    }
-  };
-
-  const personaRole = topic?.domain
-    ? getDomainMentorRole(topic.domain)
-    : 'Universal Socratic Mentor';
+  const suggestions = mentorSuggestions(topic?.domain, topicName);
 
   return (
     <aside className="chat-sidebar" style={{ width: `${chatWidth}px` }}>
@@ -159,7 +135,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
             </div>
             <div className="persona-text">
               <div className="persona-label-row">
-                <span className="persona-label" title={personaRole}>Socratic Mentor</span>
+                <span className="persona-label" title={topicName ? `Socratic Mentor for ${topicName}` : 'Socratic Mentor'}>Socratic Mentor</span>
                 {topic?.domain && (
                   <span className="persona-topic-tag" title={`Domain: ${topic.domain}`}>
                     {topic.domain.replace(/_/g, ' ')}
@@ -258,7 +234,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
               <h3>Socratic Inquiry</h3>
             </div>
             <p>
-              Ask deep questions, test operational edge-cases, or request counter-examples.
+              Ask about anything in the lesson, try out your own ideas, or ask for examples and exercises.
               {topic ? ` Current context: ${topicName}.` : ' Open any topic to explore with context.'}
             </p>
 
@@ -266,30 +242,11 @@ export const TutorChat: React.FC<TutorChatProps> = ({
               <span className="suggestions-title">
                 <Lightbulb size={12} /> Suggested Prompts:
               </span>
-              <button
-                className="suggestion-chip"
-                onClick={() => handleSuggestionClick("Inspect my live terminal output and diagnose what caused my last error or command failure.")}
-              >
-                Inspect my live terminal output and diagnose my last error
-              </button>
-              <button
-                className="suggestion-chip"
-                onClick={() => handleSuggestionClick(topic ? `What are the core architectural invariants of ${topicName} and where does it break in production?` : "Explain the core architectural invariants of modern distributed systems.")}
-              >
-                Explain the core architectural invariants and failure modes
-              </button>
-              <button
-                className="suggestion-chip"
-                onClick={() => handleSuggestionClick(topic ? `Give me a challenging real-world debugging scenario on ${topicName} to test my mental model.` : "Give me a challenging real-world debugging scenario to test my mental model.")}
-              >
-                Give me a challenging real-world debugging scenario
-              </button>
-              <button
-                className="suggestion-chip"
-                onClick={() => handleSuggestionClick(topic ? `What are the subtle misconceptions most engineers have about ${topicName}?` : "What are the subtle misconceptions most engineers have about this topic?")}
-              >
-                What are the subtle misconceptions most engineers have?
-              </button>
+              {suggestions.map((s) => (
+                <button key={s.label} className="suggestion-chip" onClick={() => handleSuggestionClick(s.prompt)}>
+                  {s.label}
+                </button>
+              ))}
             </div>
           </div>
         ) : (
