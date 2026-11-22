@@ -7,7 +7,7 @@
 - **Tests are isolated from the host:** `tests/conftest.py` clears provider keys and hosts (`ANTHROPIC_API_KEY*`, `VNAIPRO_*`, `GEMINI_*`, `OLLAMA_HOSTS`, …); app shutdown waits for the start-up warm-up threads. Both hid failures until CI ran.
 - **Decisions taken:** keep Electron; leave git history as is; no Gitea password rotation (server is local-only); agent notes live in `.agent/`; pushes to GitHub only with owner approval per push.
 - **Curriculum release (2026-11-22, `606f85e`):** packs live on the `curriculum` release on both hosts, published with `scripts/publish_all_releases.py --curriculum`; only packs whose content digest changed are replaced (`curriculum.json` on the release). The app downloads from `curriculum` first, then v<version>/v1.2.0. App releases carry no packs and no longer the duplicate `Synapse-Portable-Windows.zip` (owner decision; the win-x64 zip, the macOS .zip and the 13 packs bundled in installers were kept on purpose). Gitea has no "not latest" flag, so its UI may show `curriculum` as the newest release; nothing in the app relies on "latest".
-- **Verification:** `./scripts/verify_all.sh`, all 6 phases (2026-11-22 evening: 257 backend, 23 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean). Latest checkpoint: `771c769` pushed to `gitea/main`. `main` is 30+ commits ahead of `github/main` (unreleased; push needs owner approval).
+- **Verification:** `./scripts/verify_all.sh`, all 6 phases (2026-11-22 evening: 262 backend, 23 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean). Latest checkpoint: `7ff4d93` pushed to `gitea/main`. `main` is 30+ commits ahead of `github/main` (unreleased; push needs owner approval).
 - **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, public on GitHub. No rotation (local-only server). Never print it.
 - **Pending owner actions:** top up proxy credit; send the Safari diagram case.
 - **Improvement ideas (completed 1–7):** release from CI; protected `main` with PR-only changes.
@@ -60,7 +60,7 @@ Owner asked for a continuous loop: UI bugs first (verified in the real app with 
 
 UI testing setup (not committed): isolated server on 127.0.0.1:8765 with `env -i`, `HOME`, `SYNAPSE_WORKSPACE`, `SYNAPSE_TOPICS_DIR` and `SYNAPSE_DB_PATH` in the session scratchpad, topics from `git archive` of three public domains. Note: the variable is `SYNAPSE_WORKSPACE`, not `SYNAPSE_WORKSPACE_ROOT`. Playwright MCP snapshots land in `.playwright-mcp/` (now git-ignored).
 
-Commits (all pushed to `gitea/main`; CI #49–#54 green, #55+ pending at handoff):
+Commits (all pushed to `gitea/main`; CI #49–#56 green, #57+ queued at handoff (slow runner)):
 - `997c975` cross-origin POST/PUT/DELETE rejected (no-cors CSRF). FIND-20.
 - `8dbc84d` UI shows the model that actually answers; fallback marked amber. FIND-21.
 - `932a30a` "Clear Transient Cache" deleted all chats; "Vacuum" was a no-op. FIND-22.
@@ -69,7 +69,9 @@ Commits (all pushed to `gitea/main`; CI #49–#54 green, #55+ pending at handoff
 - `59c4e86` flashcards: generation hint, 503 on failure, real title; start-up waits for the server. FIND-25.
 - `5576c11` Escape closes Search/Settings/Graph/Flashcards; dead "Propositional Logic" pathway link. FIND-26.
 - `771c769` terminal PTY slave fd closed twice → killed unrelated sockets ("Invalid frame header"). FIND-27.
+- `b14085c` course-path links read "Kubernetes: Kubernetes" (301 doubled graph labels). FIND-28.
+- `7ff4d93` Anki export regenerated/overwrote decks; placeholder decks cached; Anki headers on one row; leaked test deck removed from kubernetes. FIND-29.
 
 False alarm recorded so nobody repeats it: "flashcard keys go to the terminal" only happens with a scripted `.click()`; a real click moves focus to the button. A regression test for the keyboard review flow was kept.
 
-Verification: `./scripts/verify_all.sh` all 6 phases (257 backend, 23 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean).
+Verification: `./scripts/verify_all.sh` all 6 phases (262 backend, 23 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean).

@@ -199,12 +199,19 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Impact:** the second close hit whatever socket had reused the fd number, breaking the reconnecting terminal or an HTTP request.
 - **Status:** **COMPLETED** (`771c769`). Test: `test_terminal_closes_each_pty_fd_exactly_once`.
 
+### FIND-28: Course-Path Links Repeated the Course Name
+- **Status:** **COMPLETED** (`b14085c`). Test: `test_node_labels_do_not_repeat_the_course_name`.
+
+### FIND-29: Anki Export Regenerated Decks; Placeholder Decks Cached; Bad Anki Header
+- **Status:** **COMPLETED** (`7ff4d93`). Tests in `tests/test_search.py`. The only shipped deck was a leaked test mock and was removed.
+
 ## Next Candidates (not yet verified)
 
 - **Curriculum:** a Mermaid diagram in `computing/systems/systemd` fails to parse in the browser (line 25, `offset→DATA, …`). Sweep all public topics with `scripts/validate_render.mjs`.
-- **UI not yet exercised in this pass:** Quiz tab, Labs tab, Export menu, Listen (TTS), lesson translation (EN ▾), Add Topic, rename/delete unit, Curriculum Store.
+- **UI not yet exercised in this pass:** Listen (TTS), lesson translation (EN ▾), Add Topic, rename/delete unit, Curriculum Store. (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
+- Labs "Run" buttons say "Executes shell command directly in your sandbox terminal" even when the Host Shell profile is active.
 - **CLI:** `bin/synapse` commands not yet checked.
-- Only 1 of 539 courses ships `flashcards.csv`; every other deck is generated on first open (tens of seconds). Consider shipping decks or pre-generating in the curriculum pipeline (product decision).
+- No course ships `flashcards.csv` (the one that did was a test artifact); every deck is generated on first open (tens of seconds). Consider shipping decks or pre-generating in the curriculum pipeline (product decision).
 
 ---
 
