@@ -232,21 +232,31 @@ def expand_all_topics(page):
         expand_btn.click()
 
 
+def _open_until_visible(header, child, attempts=3):
+    """Clicks `header` until `child` shows. The app also opens the tree by
+    itself (restoring a saved topic), and that can land between our visibility
+    check and our click, closing the level again, so check again after each click."""
+    for _ in range(attempts):
+        if child.is_visible():
+            return
+        header.click()
+        try:
+            expect(child).to_be_visible(timeout=1500)
+            return
+        except AssertionError:
+            continue
+    expect(child).to_be_visible(timeout=1000)
+
+
 def select_fixture_lesson(page, cat_text="Data", course_text="E2e Unique Storage Invariants", lesson_text="Foundations"):
     """Helper to navigate sidebar tree to a specific course and lesson."""
     domain_hdr = page.locator(".domain-header:has-text('Computing')").first
     expect(domain_hdr).to_be_visible(timeout=10000)
 
     cat_hdr = page.locator(f".category-header:has-text('{cat_text}')").first
-    if not cat_hdr.is_visible():
-        domain_hdr.click()
-
-    expect(cat_hdr).to_be_visible(timeout=5000)
+    _open_until_visible(domain_hdr, cat_hdr)
     item = page.locator(f".course-header:has-text('{course_text}'), .subtopic-item:has-text('{course_text}')").first
-    if not item.is_visible():
-        cat_hdr.click()
-
-    expect(item).to_be_visible(timeout=5000)
+    _open_until_visible(cat_hdr, item)
     item.click()
 
     lesson_item = page.locator(f".unit-lesson-subitem:has-text('{lesson_text}')").first
@@ -762,3 +772,19 @@ def test_mentor_model_indicator_and_error_dismissal(browser_page):
 
 
 
+
+
+def test_sidebar_reveals_restored_topic_after_reload(browser_page):
+    """After a reload restores the saved topic, the sidebar opens the domain,
+    category and unit that contain it instead of showing a collapsed tree."""
+    page, server_url = browser_page
+    page.goto(server_url)
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+    select_fixture_lesson(page, "Systems", "E2e Shell Invariants", "Shell Syntax")
+    expect(page.locator(".unit-lesson-subitem.active:has-text('Shell Syntax')")).to_be_visible(timeout=5000)
+
+    page.reload()
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+    # No manual expanding: the restored lesson is visible and marked active.
+    expect(page.locator(".unit-lesson-subitem.active:has-text('Shell Syntax')")).to_be_visible(timeout=5000)
+    expect(page.locator(".category-header:has-text('Systems')")).to_be_visible()

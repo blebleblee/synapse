@@ -1036,7 +1036,7 @@ function App() {
               title={`Socratic Mentor: ${mentorConnected === 'connected' ? 'Online' : mentorConnected === 'checking' ? 'Connecting' : 'Offline'}${shownMentorModel ? ` (${shownMentorModel})` : ''}${mentorFallback ? `. ${configuredMentorModel} is not available, so ${shownMentorModel} answers instead.` : ''}`}
             >
               <span className={`status-dot ${mentorConnected === 'connected' ? (mentorFallback ? 'fallback' : 'online') : 'offline'}`} />
-              <span>Mentor {mentorConnected === 'connected' ? 'Online' : 'Offline'}</span>
+              <span>Mentor {mentorConnected === 'connected' ? 'Online' : mentorConnected === 'checking' ? 'Connecting…' : 'Offline'}</span>
               {shownMentorModel && (
                 <span className="mentor-model-badge">({shownMentorModel.split(':')[0]}{mentorFallback ? ', fallback' : ''})</span>
               )}

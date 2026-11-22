@@ -131,6 +131,24 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
     }
   };
 
+  // Reveal the selected topic (e.g. restored after a reload): open its domain,
+  // category and course. Done once per selection change (React's "adjust state
+  // when a prop changes" pattern), so the learner can still collapse them.
+  const [revealedPath, setRevealedPath] = useState<string | null>(null);
+  if (selectedSubtopic && selectedSubtopic !== revealedPath) {
+    setRevealedPath(selectedSubtopic);
+    const [domain, disc, course] = selectedSubtopic.split('/');
+    if (domain && disc) {
+      const discKey = `${domain}/${disc}`;
+      setOpenDomains((prev) => (prev[domain] ? prev : { ...prev, [domain]: true }));
+      setOpenDisciplines((prev) => (prev[discKey] ? prev : { ...prev, [discKey]: true }));
+      if (course) {
+        const courseKey = `${discKey}/${course}`;
+        setOpenCourses((prev) => (prev[courseKey] ? prev : { ...prev, [courseKey]: true }));
+      }
+    }
+  }
+
   const toggleDomain = (domain: string) => {
     setOpenDomains((prev) => ({ ...prev, [domain]: !prev[domain] }));
   };

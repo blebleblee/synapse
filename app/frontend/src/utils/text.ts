@@ -1,11 +1,18 @@
 // Display helpers for curriculum names and search highlighting.
 
+// Slug words that read wrong when only the first letter is capitalized.
+const UPPERCASE_WORDS = new Set(['ai', 'ml', 'llm', 'api', 'ui', 'ux', 'sql', 'os', 'cpu', 'gpu', 'vfs', 'posix', '2d', '3d']);
+
 export function toTitleCase(str: string): string {
   if (!str) return '';
   return str
     .replace(/_/g, ' ')
     .split(' ')
-    .map((w) => (w.length > 0 ? w.charAt(0).toUpperCase() + w.slice(1) : ''))
+    .map((w) => {
+      if (w.length === 0) return '';
+      if (UPPERCASE_WORDS.has(w.toLowerCase())) return w.toUpperCase();
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    })
     .join(' ');
 }
 

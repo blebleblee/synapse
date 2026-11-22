@@ -8,6 +8,13 @@ test('toTitleCase - replaces underscores and capitalizes words', () => {
   assert.equal(toTitleCase(''), '');
 });
 
+test('toTitleCase - keeps acronyms and unit prefixes upper case', () => {
+  assert.equal(toTitleCase('ai'), 'AI');
+  assert.equal(toTitleCase('3d_graphics'), '3D Graphics');
+  assert.equal(toTitleCase('3d_printing'), '3D Printing');
+  assert.equal(toTitleCase('aid_workers'), 'Aid Workers');
+});
+
 test('cleanLessonTitle - strips leading numbers and prefixes', () => {
   assert.equal(cleanLessonTitle('Lesson 01: Foundations'), 'Foundations');
   assert.equal(cleanLessonTitle('02 - Indexing Strategies'), 'Indexing Strategies');
