@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Search, X, BookOpen } from 'lucide-react';
 import { splitHighlight } from '../utils/text';
 
@@ -47,7 +47,31 @@ const SearchPanel: React.FC<Omit<SearchModalProps, 'isOpen'>> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [selectedDomain, setSelectedDomain] = useState<string>('all');
   const [isSearching, setIsSearching] = useState(false);
+
+  const [prevQuery, setPrevQuery] = useState(query);
+  if (query !== prevQuery) {
+    setPrevQuery(query);
+    setSelectedDomain('all');
+  }
+
+  const domainCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const r of results) {
+      if (r.domain) {
+        counts[r.domain] = (counts[r.domain] || 0) + 1;
+      }
+    }
+    return counts;
+  }, [results]);
+
+  const availableDomains = useMemo(() => Object.keys(domainCounts).sort(), [domainCounts]);
+
+  const filteredResults = useMemo(() => {
+    if (selectedDomain === 'all') return results;
+    return results.filter((r) => r.domain === selectedDomain);
+  }, [results, selectedDomain]);
 
   useEffect(() => {
     // Each keystroke cancels the previous request, and a response that arrives
@@ -107,6 +131,28 @@ const SearchPanel: React.FC<Omit<SearchModalProps, 'isOpen'>> = ({
           <button className="icon-btn" onClick={onClose}><X size={16} /></button>
         </div>
 
+        {availableDomains.length > 1 && (
+          <div className="search-domain-filters">
+            <button
+              type="button"
+              className={`search-filter-chip ${selectedDomain === 'all' ? 'active' : ''}`}
+              onClick={() => setSelectedDomain('all')}
+            >
+              All ({results.length})
+            </button>
+            {availableDomains.map((domain) => (
+              <button
+                key={domain}
+                type="button"
+                className={`search-filter-chip ${selectedDomain === domain ? 'active' : ''}`}
+                onClick={() => setSelectedDomain(selectedDomain === domain ? 'all' : domain)}
+              >
+                {domain.replace(/_/g, ' ')} ({domainCounts[domain]})
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="search-modal-results">
           {isSearching && (
             <div className="search-loading">
@@ -115,13 +161,17 @@ const SearchPanel: React.FC<Omit<SearchModalProps, 'isOpen'>> = ({
             </div>
           )}
 
-          {!isSearching && query.trim().length >= 2 && results.length === 0 && (
+          {!isSearching && query.trim().length >= 2 && filteredResults.length === 0 && (
             <div className="search-empty">
-              <p>No content matches found for "{query}".</p>
+              <p>
+                {selectedDomain === 'all'
+                  ? `No content matches found for "${query}".`
+                  : `No matches in ${selectedDomain.replace(/_/g, ' ')} for "${query}".`}
+              </p>
             </div>
           )}
 
-          {!isSearching && results.map((r, idx) => (
+          {!isSearching && filteredResults.map((r, idx) => (
             <div
               key={idx}
               className="search-result-item"

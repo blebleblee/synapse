@@ -72,6 +72,19 @@ def seed_minimal_e2e_fixture(topics_dir: Path):
         encoding="utf-8"
     )
 
+    formal_dir = topics_dir / "formal_sciences" / "logic" / "proofs"
+    formal_dir.mkdir(parents=True, exist_ok=True)
+    (topics_dir / "formal_sciences" / "SYLLABUS.md").write_text(
+        "# Formal Sciences Syllabus\n\n"
+        "- **E2E Formal Proofs** (`logic/proofs/`)\n",
+        encoding="utf-8"
+    )
+    (formal_dir / "lesson_01_invariants.md").write_text(
+        "# E2E Formal Invariants\n\n"
+        "Inductive proofs and invariants across finite state transitions.\n",
+        encoding="utf-8"
+    )
+
 
 @pytest.fixture(scope="module")
 def e2e_server(tmp_path_factory):
@@ -646,23 +659,40 @@ def test_keyboard_navigation_contract(browser_page):
 
 def test_search_navigation_to_matched_lesson(browser_page):
     """
-    Verifies that clicking a search result navigates directly to the matched
-    lesson instead of falling back to Lesson 1.
+    Verifies that search highlights query keywords, domain filter chips allow
+    narrowing multi-domain results, and clicking a result navigates directly
+    to the matched lesson instead of falling back to Lesson 1.
     """
     page, server_url = browser_page
     page.goto(server_url)
     expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
 
-    # Open search modal via sidebar action button
+    # 1. Open search modal via sidebar action button
     search_btn = page.locator("button[title*='Search']").first
     expect(search_btn).to_be_visible(timeout=5000)
     search_btn.click()
 
-    # Search input should be visible and focused
     search_input = page.locator(".search-modal-header input")
     expect(search_input).to_be_visible(timeout=5000)
 
-    # Type query matching Lesson 2 ("B-Tree Mechanics")
+    # 2. Search multi-domain query "invariants" (matches Computing and Formal Sciences)
+    search_input.fill("invariants")
+
+    # Domain filter chips should appear for multi-domain results
+    expect(page.locator(".search-filter-chip:has-text('Computing')")).to_be_visible(timeout=5000)
+    expect(page.locator(".search-filter-chip:has-text('Formal Sciences')")).to_be_visible(timeout=5000)
+
+    # Filter to Formal Sciences only
+    page.locator(".search-filter-chip:has-text('Formal Sciences')").click()
+    expect(page.locator(".search-result-item:has-text('Formal Invariants')")).to_be_visible(timeout=5000)
+    expect(page.locator(".search-result-item:has-text('Storage Foundations')")).not_to_be_visible()
+
+    # Reset filter back to All
+    page.locator(".search-filter-chip:has-text('All')").click()
+    expect(page.locator(".search-result-item:has-text('Storage Foundations')")).to_be_visible(timeout=5000)
+    expect(page.locator(".search-result-item:has-text('Formal Invariants')")).to_be_visible()
+
+    # 3. Type query matching Lesson 2 ("B-Tree Mechanics")
     search_input.fill("B-Tree")
 
     # Expect matching result item to appear with highlighted search terms
