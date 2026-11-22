@@ -2,28 +2,16 @@
 
 ## 1. Saved Checkpoint & Synchronization State
 
-- **Released:** v1.2.1 on Gitea and GitHub (2026-11-21), built from `main` and scanned clean of private content. Installers for v1.1.0–v1.2.0 were withdrawn because they contained private content; their notes say so. v1.0.0 is clean.
-- **On `main` since 1.2.1 (see CHANGELOG "Unreleased"):** terminal login-loop fix, setup-wizard shortcut fix, `synapse pack export`, spec import fix, documentation refresh.
-- **Decisions taken:** keep Electron (browser mode is documented as an alternative); leave git history as is (the old chat sessions are harmless test chats).
+- **Released:** v1.2.2 (2026-11-22) from `8670418`, `main` pushed to `gitea` and `github` (owner approved; `.gitea/` is on GitHub too, inert there). Packs passed `check_release_packs.py`; the macOS app bundles no curriculum, the Windows bundle only git-tracked core-domain files (checked). Earlier: v1.2.1 (2026-11-21); installers for v1.1.0–v1.2.0 were withdrawn for private content.
+- **CI (green since run #15):** `.gitea/workflows/ci.yml` runs `verify_all.sh`, builds and checks release packs, and runs gitleaks on pushed commits. The runner is a Xeon E3-1265L v2 (x86-64-v2, no AVX2), so CI uses the image's python3 (setup-python's build needs v3) and Rolldown's WebAssembly binding (`NAPI_RS_FORCE_WASI` when the CPU lacks v3). `@rolldown/binding-wasm32-wasi` must match Rolldown's version; CI says so if it drifts. Check runs with `scripts/ci_status.py --wait` / `--log <job>`.
+- **Tests are isolated from the host:** `tests/conftest.py` clears provider keys and hosts (`ANTHROPIC_API_KEY*`, `VNAIPRO_*`, `GEMINI_*`, `OLLAMA_HOSTS`, …); app shutdown waits for the start-up warm-up threads. Both hid failures until CI ran.
+- **Decisions taken:** keep Electron; leave git history as is; no Gitea password rotation (server is local-only); agent notes live in `.agent/`; pushes to GitHub only with owner approval per push.
 - **NEEDS DECISION:**
   - A separate `curriculum` release for packs, so unchanged packs aren't re-uploaded with every app release.
-- **Done 2026-11-22:** `scripts/generate_all.py` no longer commits or pushes by default. `--commit` makes local commits for core domains only and never pushes. Test: `tests/test_generate_all_git.py`. Note: `--enhance` skips topics by looking for `enhance(<id>):` commits, so enhancements that were never committed are redone on the next run.
-- **Done 2026-11-22 (`4e598ee`):** pack installs are confined to their declared domain. A domain pack can no longer write into other domains or the `topics/` root; a complete pack writes only into the domains its manifest lists. Tests in `tests/test_packages.py`.
-- **Done 2026-11-22:** background translation queue: one job at a time, progress, Stop aborts the Ollama request mid-section, jobs survive lesson changes and end with the server (`c250027`). Every domain a pack replaces is backed up, complete pack included (`2779454`). Mentor header restyled to match the reader header (`754d9e4`). Agent notes moved from `docs/agent/` to `.agent/` (owner decision: keep them in this repo for agentic coding and testing).
-- **Done 2026-11-22 (owner's app feedback):** quit now stops the backend and its local-model work (`13be1a7`); every action shows a result or failure notice, translation shows progress and stops when the reader leaves, terminal-type switching works and finds Rancher Desktop tools, settings model dropdowns show the saved model (`780c4cc`); mentor status re-checks by itself, slimmer course-path line and mentor lesson title (`377e972`); loading state for the tree (`1e76550`).
-- **Done 2026-11-22 (`222b287`):** settings flattened, node probes go through the backend (`/api/settings/cluster-status?hosts=`); reader toolbars fit the centre column (container queries on `.lesson-viewer`; default 1280 px window gives a 480 px centre).
-- **Done 2026-11-22 (`1f2ca86`):** mentor questions pause a running translation (local Ollama serves one request at a time); before, the mentor timed out with "unable to connect" while showing online.
-- **CI — NEEDS DECISION:** the Gitea runner's CPU is a Xeon E3-1265L v2 (Ivy Bridge, x86-64-v2, no AVX2). setup-python's 26.04 build failed ("CPU ISA level is lower than required"), so CI now uses the image's python3 in a venv; run #11: release-packs and secret-scan pass, verify passes unit tests and lint, then `vite build` dies with "Illegal instruction" (most likely Rolldown's native binary). Options: runner on a newer machine, a WASM bundler fallback (new dependency), or skip build/E2E in CI.
-- **Verification:** `./scripts/verify_all.sh`. All 5 phases must pass (2026-11-22: 202 backend, 17 frontend unit, 8 E2E).
-- **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, which are public on GitHub. **Decision (2026-11-22):** no rotation; the Gitea server is local-only. No other secrets found in GitHub history, release files or notes.
+- **Verification:** `./scripts/verify_all.sh`, all 5 phases (2026-11-22: 220 backend, 17 frontend unit, 8 E2E).
+- **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, public on GitHub. No rotation (local-only server). Never print it.
 - **Pending owner actions:** top up proxy credit; send the Safari diagram case.
-- **GitHub sync (2026-11-22):** `main` pushed to `github` at `f532968`.
-- **CI (2026-11-22):** `.gitea/workflows/ci.yml` runs `verify_all.sh`, builds and checks release packs, and runs gitleaks on the pushed commits only (older history holds the accepted finding above). It targets the runner label `ubuntu-latest`; first run not yet confirmed.
-- **Next steps (proposed, awaiting go-ahead):**
-  1. Separate `curriculum` release for packs; installers bundle only the complete pack.
-  2. Release 1.2.2 with the "Unreleased" changes.
 - **Improvement ideas:** clear mentor provider errors and model indicator; send only the current lesson section to the mentor (faster local models); search highlighting, domain filter and jump-to-section; first-run health check; menu-bar Quit or idle shutdown for `synapse serve`; spaced-repetition review queue; pre-commit secret and private-path hook; release from CI; protected `main` with PR-only changes.
-
 
 ---
 

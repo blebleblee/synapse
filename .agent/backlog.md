@@ -140,6 +140,29 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 ---
 
+### FIND-16: Mentor Times Out While a Translation Runs
+- **User-Visible Impact:** "Unable to connect" from the mentor during a translation, although it showed online; local Ollama serves one request at a time.
+- **Status:** **COMPLETED** (`1f2ca86`): mentor requests pause the translation, which retries its section afterwards. Test: `tests/test_translation_jobs.py`.
+
+---
+
+### FIND-17: Tests Depended on the Developer's Shell and Leaked Threads
+- **User-Visible Impact:** none for users; CI failed where local runs passed. A "provider fails" test only passed with a real API key (`ANTHROPIC_API_KEY_2`) in the shell; start-up warm-up threads wrote into the next test's database.
+- **Status:** **COMPLETED** (`499138c`): conftest clears provider keys and hosts; shutdown joins the warm-up threads; `/api/translate` returns 503 without a provider.
+
+---
+
+### FIND-18: Settings Showed a Running Local Ollama as "Offline"
+- **User-Visible Impact:** Ollama nodes were probed from the browser, which Ollama's CORS rules reject, and statuses were looked up under a different host spelling.
+- **Status:** **COMPLETED** (`222b287`): `/api/settings/cluster-status?hosts=` probes from the backend, in parallel, under the names as typed.
+
+---
+
+### FIND-19: `bump_version.py` Silently Skipped the Settings Version Label
+- **Status:** **COMPLETED** (`8670418`): matches `Synapse vX.Y.Z`, fails when absent, and updates the npm lock files.
+
+---
+
 ## Deferred Decisions & Unverified Behavior
 
 - **Package Content Injection:** Extraction occurs sequentially into `TOPICS_DIR`. A rejection mid-extraction (e.g., encountering a corrupted file) leaves previously extracted files on disk. *Decision Needed:* Should extraction write to a temporary directory and atomically rename upon complete success?
