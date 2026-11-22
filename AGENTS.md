@@ -55,7 +55,10 @@ use it locally.
    (including new files and affected callers) → run targeted tests, then
    `./scripts/verify_all.sh` → commit → update `.agent/status.md` and
    `.agent/backlog.md`.
-4. **Limits:** batches last at most two hours. Allow at most two
+4. **After pushing to `gitea`:** check CI with `scripts/ci_status.py --wait`
+   (`--log <job>` shows a failed job's log, secrets removed). A red run is
+   part of the task, not a follow-up.
+5. **Limits:** batches last at most two hours. Allow at most two
    fix-and-retest cycles per task; if it still fails, leave the tree clean,
    record the blocker and move on.
 
