@@ -131,6 +131,8 @@ export interface TranslationJobInfo {
   error?: string | null;
   fallback?: boolean;
   stopping?: boolean;
+  /** Waiting while the mentor uses the model. */
+  paused?: boolean;
   cached?: boolean;
   translated?: string;
 }

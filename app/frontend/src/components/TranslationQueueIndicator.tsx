@@ -58,7 +58,7 @@ export function TranslationQueueIndicator() {
   };
 
   const summary = running
-    ? `Translating ${running.title}${running.total ? ` (${Math.min(running.done + 1, running.total)}/${running.total})` : ''}`
+    ? `${running.paused ? 'Paused' : 'Translating'} ${running.title}${running.total ? ` (${Math.min(running.done + 1, running.total)}/${running.total})` : ''}`
     : 'Translations queued';
 
   return (
@@ -82,7 +82,7 @@ export function TranslationQueueIndicator() {
                 <span className="translation-queue-meta">
                   {LANG_NAMES[j.target_lang] || j.target_lang} ·{' '}
                   {j.status === 'running'
-                    ? j.stopping ? 'stopping after this section' : `section ${Math.min(j.done + 1, j.total)} of ${j.total}`
+                    ? j.stopping ? 'stopping' : `${j.paused ? 'paused for the mentor · ' : ''}section ${Math.min(j.done + 1, j.total)} of ${j.total}`
                     : `queued${j.position ? ` #${j.position}` : ''}`}
                 </span>
               </div>

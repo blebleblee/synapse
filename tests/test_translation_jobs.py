@@ -139,3 +139,40 @@ def test_stop_aborts_cancellable_model_call_mid_section(monkeypatch):
         client.delete(f"/api/translate/jobs/{job['id']}")
         wait_for(client, job["id"], lambda j: j["status"] == "stopped", timeout=2)
         assert time.time() - t0 < 2
+
+
+def test_mentor_request_pauses_translation_and_it_resumes(monkeypatch):
+    """A local model runs one request at a time: the mentor goes first."""
+    from learning_engine.models import GenerationStopped
+    from app.backend.translation_jobs import interactive_ai
+
+    class StreamingProvider:
+        calls = 0
+        aborted = 0
+
+        def generate_cancellable(self, prompt, should_stop):
+            self.calls += 1
+            for _ in range(30):
+                if should_stop():
+                    self.aborted += 1
+                    raise GenerationStopped()
+                time.sleep(0.01)
+            return "# Přeložená sekce s dostatečně dlouhým textem pro kontrolu"
+
+    provider = StreamingProvider()
+    monkeypatch.setattr(be_main, "get_translation_provider", lambda **kw: (provider, "mock-model"))
+    monkeypatch.setattr(be_main, "TRANSLATIONS", be_main.TranslationQueue(
+        get_provider=lambda **kw: be_main.get_translation_provider(**kw),
+        executor=be_main.AI_EXECUTOR,
+        cache_dir=be_main.translation_cache_dir,
+    ))
+    with TestClient(be_main.app) as client:
+        job = client.post("/api/translate/jobs", json={"text": TEXT, "target_lang": "cs"}).json()
+        wait_for(client, job["id"], lambda j: j["status"] == "running" and provider.calls >= 1)
+        with interactive_ai():
+            paused = wait_for(client, job["id"], lambda j: j["paused"] is True)
+            assert paused["status"] == "running"
+            assert provider.aborted >= 1
+        done = wait_for(client, job["id"], lambda j: j["status"] == "done")
+        assert done["paused"] is False
+        assert "Přeložená" in done["translated"]

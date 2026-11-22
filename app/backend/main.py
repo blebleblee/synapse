@@ -184,7 +184,8 @@ async def lifespan(app: FastAPI):
 
 from learning_engine.version import __version__
 from app.backend.translation_jobs import (
-    LANGUAGE_NAMES, TranslationQueue, cache_file_for, read_cached, split_sections, translate_section,
+    LANGUAGE_NAMES, TranslationQueue, cache_file_for, interactive_ai, read_cached, split_sections,
+    translate_section,
 )
 
 app = FastAPI(title="AI Learning Workbench Backend", version=__version__, lifespan=lifespan)
@@ -1422,8 +1423,10 @@ async def chat_with_tutor(req: ChatRequest):
 
             def worker():
                 try:
-                    for chunk in provider.generate_stream(prompt, system_instruction=system_instruction, max_tokens=2048):
-                        loop.call_soon_threadsafe(q.put_nowait, ("chunk", chunk))
+                    # Background translations pause while the mentor answers.
+                    with interactive_ai():
+                        for chunk in provider.generate_stream(prompt, system_instruction=system_instruction, max_tokens=2048):
+                            loop.call_soon_threadsafe(q.put_nowait, ("chunk", chunk))
                     loop.call_soon_threadsafe(q.put_nowait, ("done", None))
                 except Exception as e:
                     loop.call_soon_threadsafe(q.put_nowait, ("error", e))
@@ -1450,7 +1453,8 @@ async def chat_with_tutor(req: ChatRequest):
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
 
     try:
-        response_text = provider.generate(prompt, system_instruction=system_instruction)
+        with interactive_ai():
+            response_text = provider.generate(prompt, system_instruction=system_instruction)
         reply = response_text.strip()
     except Exception as gen_err:
         reply = f"⚠️ Socratic Mentor error ({used_model}): {gen_err}. Please verify your cluster node in Settings ⚙."

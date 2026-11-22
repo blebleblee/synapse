@@ -11,7 +11,9 @@ import asyncio
 import hashlib
 import itertools
 import re
+import threading
 import time
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -83,6 +85,29 @@ class TranslationStopped(Exception):
     pass
 
 
+# Interactive AI requests (the mentor) in flight. Translations step aside for
+# them: a local model answers one request at a time, so a mentor question
+# would otherwise wait behind a whole translation section.
+_interactive_count = 0
+_interactive_lock = threading.Lock()
+
+
+@contextmanager
+def interactive_ai():
+    global _interactive_count
+    with _interactive_lock:
+        _interactive_count += 1
+    try:
+        yield
+    finally:
+        with _interactive_lock:
+            _interactive_count -= 1
+
+
+def interactive_ai_active() -> bool:
+    return _interactive_count > 0
+
+
 
 async def translate_section(provider, executor, section: str, lang_name: str,
                             should_stop: Optional[Callable[[], bool]] = None) -> Tuple[str, bool, str]:
@@ -134,6 +159,7 @@ class TranslationJob:
         self.error: Optional[str] = None
         self.model: Optional[str] = None
         self.stop_requested = False
+        self.paused = False  # waiting while the mentor uses the model
         self.created = time.time()
         self.finished: Optional[float] = None
 
@@ -155,6 +181,7 @@ class TranslationJob:
             "error": self.error,
             "fallback": self.fallback,
             "stopping": self.stop_requested and self.status == "running",
+            "paused": self.paused and self.status == "running",
         }
         if position is not None:
             d["position"] = position
@@ -269,16 +296,25 @@ class TranslationQueue:
         out: List[str] = []
         all_ok = True
         last_error = ""
+        yield_or_stop = lambda: job.stop_requested or interactive_ai_active()
         for section in split_sections(job.text):
-            if job.stop_requested:
-                self._finish(job, "stopped")
-                return
-            try:
-                text, ok, err = await translate_section(provider, self._executor, section, lang_name,
-                                                   should_stop=lambda: job.stop_requested)
-            except TranslationStopped:
-                self._finish(job, "stopped")
-                return
+            while True:
+                if job.stop_requested:
+                    job.paused = False
+                    self._finish(job, "stopped")
+                    return
+                # The mentor goes first: a local model answers one request at a time.
+                if interactive_ai_active():
+                    job.paused = True
+                    await asyncio.sleep(0.3)
+                    continue
+                job.paused = False
+                try:
+                    text, ok, err = await translate_section(provider, self._executor, section, lang_name,
+                                                            should_stop=yield_or_stop)
+                except TranslationStopped:
+                    continue  # stopped by the user, or paused for the mentor: re-check above
+                break
             out.append(text)
             all_ok = all_ok and ok
             last_error = err or last_error

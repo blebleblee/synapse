@@ -498,7 +498,9 @@ class OllamaProvider(LLMProvider):
 
         try:
             has_streamed = False
-            with urllib.request.urlopen(req, timeout=40) as resp:
+            # Generous: Ollama may first have to load the model or finish
+            # a request it already accepted.
+            with urllib.request.urlopen(req, timeout=120) as resp:
                 for line in resp:
                     if not line:
                         continue

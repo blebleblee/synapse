@@ -320,7 +320,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     : translationJob.status === 'queued'
       ? `Queued for ${langLabel}${translationJob.position && translationJob.position > 1 ? ` (${translationJob.position - 1} ahead)` : ''}. It runs in the background, so you can keep reading.`
       : translationJob.stopping
-        ? 'Stopping after the current section…'
+        ? 'Stopping…'
+        : translationJob.paused
+          ? `Translation to ${langLabel} paused while the mentor answers · section ${Math.min(translationJob.done + 1, translationJob.total)} of ${translationJob.total}`
         : `Translating to ${langLabel}${translationJob.model ? ` with ${translationJob.model.split(':')[0]}` : ''} · section ${Math.min(translationJob.done + 1, translationJob.total)} of ${translationJob.total}`;
 
   type TranslationViewMode = 'translated' | 'original' | 'split';
