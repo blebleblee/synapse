@@ -36,13 +36,59 @@ def test_build_chat_system_instruction_with_language_mandate():
     assert "Czech" in instruction
     assert "Čeština" in instruction
 
-def test_api_check_mentor_connectivity():
-    """Functional check for /api/check-mentor-connectivity endpoint."""
-    res = client.post("/api/check-mentor-connectivity", json={"host": "http://127.0.0.1:11434"})
+def test_api_check_mentor_connectivity_direct_match():
+    """The configured model is on the configured host: report it as the active model."""
+    with patch("app.backend.main.OllamaProvider.check_connectivity", return_value=True):
+        res = client.post("/api/check-mentor-connectivity",
+                          json={"host": "http://127.0.0.1:11434", "model": "qwen2.5-coder:32b"})
     assert res.status_code == 200
     data = res.json()
-    assert "connected" in data
-    assert isinstance(data["connected"], bool)
+    assert data["connected"] is True
+    assert data["model"] == "qwen2.5-coder:32b"
+    assert "warning" not in data
+
+
+def test_api_check_mentor_connectivity_reports_fallback_model():
+    """The configured model is missing but another node is online: the chat would
+    answer with a different model, and the response must say which one."""
+    status = {"http://127.0.0.1:11434": {"online": True, "models": ["inkling-2-mini:latest"]}}
+    with patch("app.backend.main.OllamaProvider.check_connectivity", return_value=False), \
+         patch("app.backend.main.OllamaCluster.get_cluster_status", return_value=status), \
+         patch("app.backend.main.get_chat_provider", return_value=(MagicMock(), "inkling-2-mini:latest")):
+        res = client.post("/api/check-mentor-connectivity",
+                          json={"host": "http://127.0.0.1:11434", "model": "qwen2.5-coder:32b"})
+    data = res.json()
+    assert data["connected"] is True
+    assert data["model"] == "inkling-2-mini:latest"
+    assert "qwen2.5-coder:32b" in data["warning"]
+
+
+def test_api_check_mentor_connectivity_offline():
+    status = {"http://127.0.0.1:11434": {"online": False, "models": []}}
+    with patch("app.backend.main.OllamaProvider.check_connectivity", return_value=False), \
+         patch("app.backend.main.OllamaCluster.get_cluster_status", return_value=status):
+        res = client.post("/api/check-mentor-connectivity", json={"host": "http://127.0.0.1:11434"})
+    data = res.json()
+    assert data["connected"] is False
+    assert "model" not in data
+
+
+def test_api_chat_stream_reports_answering_model():
+    mock_provider = MagicMock()
+    mock_provider.generate_stream.return_value = ["Hi"]
+    with patch("app.backend.main.get_chat_provider", return_value=(mock_provider, "inkling-2-mini:latest")):
+        res = client.post("/api/chat", json={"message": "hello", "stream": True})
+    assert res.status_code == 200
+    assert res.headers["x-synapse-model"] == "inkling-2-mini:latest"
+
+
+def test_api_chat_non_streaming_reports_answering_model():
+    mock_provider = MagicMock()
+    mock_provider.generate.return_value = "Hi"
+    with patch("app.backend.main.get_chat_provider", return_value=(mock_provider, "mock-model")):
+        res = client.post("/api/chat", json={"message": "hello", "stream": False})
+    assert res.json()["model"] == "mock-model"
+
 
 def test_api_chat_with_dictionary_history_and_lesson_content():
     """

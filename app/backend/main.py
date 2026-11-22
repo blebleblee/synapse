@@ -469,14 +469,23 @@ def api_check_mentor_connectivity(req: CheckConnectivityRequest):
     
     # 1. Direct check
     if OllamaProvider.check_connectivity(host, model):
-        return {"connected": True}
-        
-    # 2. Check if cluster has any node online if no specific model/host match
+        return {"connected": True, "model": model} if model else {"connected": True}
+
+    # 2. Check if cluster has any node online if no specific model/host match.
+    # The chat then answers with another model; report which one.
     cluster = OllamaCluster()
     status = cluster.get_cluster_status()
     if any(d.get("online") for d in status.values()):
-        return {"connected": True, "warning": "Specified host/model unreachable, but cluster has other active nodes."}
-        
+        result = {
+            "connected": True,
+            "warning": f"Model '{model or 'auto'}' is not available on {host}; the mentor uses another model.",
+        }
+        try:
+            _, result["model"] = get_chat_provider(model=model, host=host)
+        except Exception:
+            pass
+        return result
+
     return {"connected": False, "error": "Unable to connect to Ollama/LocalAI cluster."}
 
 @app.get("/api/settings/cluster-status")
@@ -1553,7 +1562,9 @@ async def chat_with_tutor(req: ChatRequest):
             save_chat_session(sub_path, req.message, reply_text, req.history)
             yield f"data: {json.dumps({'done': True, 'full_reply': reply_text, 'model': used_model})}\n\n"
 
-        return StreamingResponse(stream_generator(), media_type="text/event-stream")
+        # The mentor may answer with a fallback model; tell the UI which one.
+        return StreamingResponse(stream_generator(), media_type="text/event-stream",
+                                 headers={"X-Synapse-Model": used_model})
 
     try:
         with interactive_ai():

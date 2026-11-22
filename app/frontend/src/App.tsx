@@ -19,7 +19,11 @@ import { TranslationQueueIndicator } from './components/TranslationQueueIndicato
 import { failureMessage, networkFailure } from './utils/failureMessage';
 import './App.css';
 
-async function mentorStatus(host: string, model?: string): Promise<'connected' | 'error'> {
+type MentorCheck = { status: 'connected' | 'error'; model?: string };
+
+// `model` is the model the mentor will actually answer with, which can be a
+// fallback when the configured one is not installed.
+async function mentorStatus(host: string, model?: string): Promise<MentorCheck> {
   try {
     const res = await fetch('/api/check-mentor-connectivity', {
       method: 'POST',
@@ -27,9 +31,11 @@ async function mentorStatus(host: string, model?: string): Promise<'connected' |
       body: JSON.stringify({ host, model }),
     });
     const data = await res.json();
-    return data.connected ? 'connected' : 'error';
+    return data.connected
+      ? { status: 'connected', model: typeof data.model === 'string' ? data.model : undefined }
+      : { status: 'error' };
   } catch {
-    return 'error';
+    return { status: 'error' };
   }
 }
 
@@ -37,6 +43,7 @@ function App() {
   const [tree, setTree] = useState<TopicTreeData>({});
   const [treeLoaded, setTreeLoaded] = useState(false);
   const [mentorConnected, setMentorConnected] = useState<'checking' | 'connected' | 'error'>('checking');
+  const [mentorActiveModel, setMentorActiveModel] = useState<string | undefined>(undefined);
   const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceStatus | null>(null);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [topicDetails, setTopicDetails] = useState<TopicDetails | null>(null);
@@ -104,7 +111,9 @@ function App() {
   // Keeps the current status until the answer arrives; callers that want
   // "checking" shown (saving a new host or model) set it themselves.
   const checkConnectivity = useCallback(async () => {
-    setMentorConnected(await mentorStatus(settings.ollamaHost, settings.mentorModel));
+    const check = await mentorStatus(settings.ollamaHost, settings.mentorModel);
+    setMentorConnected(check.status);
+    setMentorActiveModel(check.model);
   }, [settings.ollamaHost, settings.mentorModel]);
 
   useEffect(() => {
@@ -120,7 +129,11 @@ function App() {
   // Quiet: the status starts as 'checking', and saving new settings sets it.
   useEffect(() => {
     let live = true;
-    mentorStatus(settings.ollamaHost, settings.mentorModel).then((s) => { if (live) setMentorConnected(s); });
+    mentorStatus(settings.ollamaHost, settings.mentorModel).then((check) => {
+      if (!live) return;
+      setMentorConnected(check.status);
+      setMentorActiveModel(check.model);
+    });
     return () => { live = false; };
   }, [settings.ollamaHost, settings.mentorModel]);
 
@@ -630,6 +643,9 @@ function App() {
         throw new Error(errorData.detail || `Server returned ${res.status}`);
       }
 
+      const answeringModel = res.headers.get('X-Synapse-Model');
+      if (answeringModel && currentChatId === chatRequestIdRef.current) setMentorActiveModel(answeringModel);
+
       if (res.body) {
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
@@ -922,6 +938,13 @@ function App() {
     return null;
   }, [isGenerating, isChatting, isLoadingQuiz, isRegeneratingSummary, isCompilingGuide]);
 
+  const configuredMentorModel = settings.mentorModel || settings.primaryModel;
+  // While connected, show the model that actually answers.
+  const shownMentorModel = (mentorConnected === 'connected' && mentorActiveModel) || configuredMentorModel;
+  const mentorFallback = Boolean(
+    mentorConnected === 'connected' && mentorActiveModel && configuredMentorModel && mentorActiveModel !== configuredMentorModel
+  );
+
   return (
     <div className="workbench-layout">
       <TopicTree
@@ -1010,12 +1033,12 @@ function App() {
             <TranslationQueueIndicator />
             <span
               className={`mentor-status-pill ${mentorConnected}`}
-              title={`Socratic Mentor: ${mentorConnected === 'connected' ? 'Online' : mentorConnected === 'checking' ? 'Connecting' : 'Offline'}${(settings.mentorModel || settings.primaryModel) ? ` (${settings.mentorModel || settings.primaryModel})` : ''}`}
+              title={`Socratic Mentor: ${mentorConnected === 'connected' ? 'Online' : mentorConnected === 'checking' ? 'Connecting' : 'Offline'}${shownMentorModel ? ` (${shownMentorModel})` : ''}${mentorFallback ? `. ${configuredMentorModel} is not available, so ${shownMentorModel} answers instead.` : ''}`}
             >
-              <span className={`status-dot ${mentorConnected === 'connected' ? 'online' : 'offline'}`} />
+              <span className={`status-dot ${mentorConnected === 'connected' ? (mentorFallback ? 'fallback' : 'online') : 'offline'}`} />
               <span>Mentor {mentorConnected === 'connected' ? 'Online' : 'Offline'}</span>
-              {(settings.mentorModel || settings.primaryModel) && (
-                <span className="mentor-model-badge">({(settings.mentorModel || settings.primaryModel).split(':')[0]})</span>
+              {shownMentorModel && (
+                <span className="mentor-model-badge">({shownMentorModel.split(':')[0]}{mentorFallback ? ', fallback' : ''})</span>
               )}
             </span>
           </div>
@@ -1037,7 +1060,8 @@ function App() {
         onClearChat={() => setUnifiedChatHistory([])}
         mentorConnected={mentorConnected}
         targetLanguage={settings.language}
-        mentorModel={settings.mentorModel || settings.primaryModel}
+        mentorModel={shownMentorModel}
+        mentorFallback={mentorFallback}
         onDismissMessage={(idx) => setUnifiedChatHistory((prev) => prev.filter((_, i) => i !== idx))}
       />
 

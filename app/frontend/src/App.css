@@ -2147,6 +2147,11 @@ body, html, #root {
   background-color: var(--accent-red);
 }
 
+/* Online, but answering with a fallback model */
+.status-dot.fallback {
+  background-color: var(--accent-orange);
+}
+
 .terminal-actions {
   display: flex;
   align-items: center;
