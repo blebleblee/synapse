@@ -49,15 +49,17 @@ export function sanitizeAndRepairMermaid(diagramText: string): string {
   cleaned = cleaned.replace(/;\s*$/gm, '');
 
   // Fix malformed arrows like -->|label|--> or -->|label|> into -->|"label"|
-  cleaned = cleaned.replace(/-->\s*\|\s*([^|\n]+?)\s*\|\s*-->/g, '-->|"$1"|');
-  cleaned = cleaned.replace(/-->\s*\|\s*([^|\n]+?)\s*\|\s*>/g, '-->|"$1"|');
-  cleaned = cleaned.replace(/--\s*\|\s*([^|\n]+?)\s*\|\s*-->/g, '-->|"$1"|');
+  // (an already quoted label is not quoted twice: |"a" |> -> |"a"|, not |""a""|)
+  cleaned = cleaned.replace(/-->\s*\|\s*"?([^"|\n]+?)"?\s*\|\s*-->/g, '-->|"$1"|');
+  cleaned = cleaned.replace(/-->\s*\|\s*"?([^"|\n]+?)"?\s*\|\s*>/g, '-->|"$1"|');
+  cleaned = cleaned.replace(/--\s*\|\s*"?([^"|\n]+?)"?\s*\|\s*-->/g, '-->|"$1"|');
 
   // Enclose unquoted multi-word edge labels with double quotes: -->|Some Label Text| -> -->|"Some Label Text"|
-  cleaned = cleaned.replace(/-->\s*\|\s*([^"|\n]+?)\s*\|\s*/g, (match, label) => {
+  // Also for dotted/thick arrows, and labels with brackets ("|row[key]|", "|[·]_B|").
+  cleaned = cleaned.replace(/(-->|-\.->|==>)\s*\|\s*([^"|\n]+?)\s*\|\s*/g, (match, arrow: string, label: string) => {
     const trimmed = label.trim();
-    if ((trimmed.includes(' ') || trimmed.includes('(')) && !trimmed.startsWith('"')) {
-      return `-->|"${trimmed}"| `;
+    if (/[ ([\]{}]/.test(trimmed)) {
+      return `${arrow}|"${trimmed}"| `;
     }
     return match;
   });
@@ -75,10 +77,15 @@ export function sanitizeAndRepairMermaid(diagramText: string): string {
   });
 
   // Enclose unquoted node labels with special characters in double quotes safely
-  cleaned = cleaned.replace(/([A-Za-z0-9_-]+)\[([^"\]\n]*[()/+=*&][^"\]\n]*)\]/g, (match, id, text) => {
-    if (text.startsWith('"') && text.endsWith('"')) return match;
-    return `${id}["${text.replace(/"/g, "'")}"]`;
-  });
+  // Only outside "...": inside a quoted label, "W[:, 0:d/2]" is text, and
+  // quoting it produced nested quotes that broke the whole diagram.
+  cleaned = cleaned
+    .split('"')
+    .map((part, i) => (i % 2 === 1 ? part : part.replace(
+      /([A-Za-z0-9_-]+)\[([^"\]\n]*[()/+=*&][^"\]\n]*)\]/g,
+      (_, id: string, text: string) => `${id}["${text}"]`,
+    )))
+    .join('"');
 
   return cleaned;
 }
