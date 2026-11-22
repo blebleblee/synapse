@@ -54,3 +54,15 @@ def test_get_topic_dependencies_non_existent():
     deps = get_topic_dependencies("non_existent_domain/fake/path")
     assert deps["prerequisites"] == []
     assert deps["unlocks"] == []
+
+
+def test_node_labels_do_not_repeat_the_course_name():
+    """Single-unit courses showed "Kubernetes: Kubernetes" in the course-path
+    links; the course part also lost its capitalization ("Ebpf")."""
+    graph = get_prerequisite_graph()
+    doubled = []
+    for n in graph["nodes"]:
+        head, sep, tail = n["label"].partition(": ")
+        if sep and head.strip().lower() == tail.strip().lower():
+            doubled.append(n["label"])
+    assert doubled == [], f"{len(doubled)} doubled labels, e.g. {doubled[:3]}"

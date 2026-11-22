@@ -189,12 +189,20 @@ def get_prerequisite_graph() -> Dict[str, Any]:
         for disc, disc_data in (ddata.get("disciplines") or {}).items():
             for course, c_data in disc_data.get("courses", {}).items():
                 course_key = f"{domain}/{disc}/{course}"
-                for unit, u_data in c_data.get("units", {}).items():
+                units = c_data.get("units", {})
+                course_title = c_data.get("display_name") or course.replace('_', ' ').title()
+                for unit, u_data in units.items():
                     rel = u_data["rel_path"]
                     status = u_data["status"]
+                    unit_title = u_data.get("display_name") or unit.replace('_', ' ').title()
+                    # Single-unit courses: the unit is the course, don't repeat it.
+                    if len(units) == 1 or unit_title.strip().lower() == course_title.strip().lower():
+                        label = unit_title
+                    else:
+                        label = f"{course_title}: {unit_title}"
                     node_obj = {
                         "id": rel,
-                        "label": f"{course.replace('_', ' ').title()}: {u_data['display_name']}",
+                        "label": label,
                         "domain": domain,
                         "category": f"{disc}/{course}",
                         "subtopic": unit,
