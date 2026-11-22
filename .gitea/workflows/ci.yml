@@ -13,6 +13,12 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      # Prebuilt tools (Python builds, Vite's bundler) need x86-64-v2 or newer;
+      # this shows what the runner's CPU offers when one of them crashes.
+      - name: Report CPU level
+        run: |
+          grep -m1 'model name' /proc/cpuinfo || true
+          /lib64/ld-linux-x86-64.so.2 --help 2>/dev/null | grep -E 'x86-64-v[0-9]' || true
       # The image's own Python, not actions/setup-python: its prebuilt Python
       # for this Ubuntu needs a newer x86 ISA level than the runner's CPU
       # ("CPU ISA level is lower than required").
