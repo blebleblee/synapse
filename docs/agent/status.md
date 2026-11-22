@@ -10,7 +10,8 @@
 - **Done 2026-11-22:** `scripts/generate_all.py` no longer commits or pushes by default. `--commit` makes local commits for core domains only and never pushes. Test: `tests/test_generate_all_git.py`. Note: `--enhance` skips topics by looking for `enhance(<id>):` commits, so enhancements that were never committed are redone on the next run.
 - **Verification:** `./scripts/verify_all.sh`. All 5 phases must pass (2026-11-22: 194 backend, 8 E2E).
 - **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, which are public on GitHub. Owner must rotate it (preferably to a scoped token) and update the `gitea` remote and `GITEA_PASS`. No other secrets found in GitHub history, release files or notes.
-- **Pending owner actions:** rotate Gitea password; top up proxy credit; `git push github main`; send the Safari diagram case.
+- **Pending owner actions:** rotate Gitea password; top up proxy credit; send the Safari diagram case.
+- **GitHub sync (2026-11-22):** `main` pushed to `github` at `8bbac78`.
 - **Next steps (proposed, awaiting go-ahead):**
   1. CI on Gitea: `verify_all.sh`, `check_release_packs.py`, secret scanning (gitleaks) on every push.
   2. Separate `curriculum` release for packs; installers bundle only the complete pack.
