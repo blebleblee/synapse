@@ -92,7 +92,9 @@ def _result_for(md_path: Path, content: str, regex_pattern, query: str) -> Optio
 
 def _iter_markdown(root: Path):
     for md_path in root.glob("**/*.md"):
-        if md_path.name not in SKIP_FILES:
+        # Hidden folders (e.g. a pack install's staging area) are not curriculum.
+        if md_path.name not in SKIP_FILES and not any(
+                part.startswith(".") for part in md_path.relative_to(root).parts):
             yield md_path
 
 

@@ -358,3 +358,72 @@ def test_pack_download_tries_the_curriculum_release_first(monkeypatch, tmp_path)
     assert tried[1] == "https://gitea.2464.cz/ai/synapse/releases/download/curriculum/synapse_complete_curriculum.synpack"
     # Older app-release locations stay as fallbacks.
     assert any("/download/v1.2.0/" in u for u in tried[2:])
+
+
+def test_failed_install_leaves_existing_domain_untouched(tmp_path, monkeypatch):
+    """A write failure partway through must not leave a half-updated domain."""
+    import shutil as _shutil
+    import learning_engine.packages as pk
+
+    lesson = TOPICS_DIR / "arts" / "c" / "t" / "lesson_1.md"
+    lesson.parent.mkdir(parents=True, exist_ok=True)
+    lesson.write_text("# old lesson\n")
+    mine = TOPICS_DIR / "arts" / "c" / "t" / "my_notes.md"
+    mine.write_text("# my notes\n")
+
+    pack_path = tmp_path / "arts.synpack"
+    _write_pack(pack_path, {"format": "synpack/v1", "domain": "arts"}, {
+        "topics/arts/c/t/lesson_1.md": b"# new lesson\n",
+        "topics/arts/c/t/labs.md": b"# new labs\n",
+        "topics/arts/c/u/lesson_1.md": b"# another\n",
+    })
+
+    real_copy = _shutil.copyfileobj
+    calls = {"n": 0}
+    def flaky_copy(src, dst, *a, **kw):
+        calls["n"] += 1
+        if calls["n"] == 2:
+            raise OSError("disk full")
+        return real_copy(src, dst, *a, **kw)
+    monkeypatch.setattr(pk.shutil, "copyfileobj", flaky_copy)
+
+    with pytest.raises(OSError, match="disk full"):
+        install_topic_pack(pack_path)
+
+    assert lesson.read_text() == "# old lesson\n"
+    assert mine.read_text() == "# my notes\n"
+    assert not (TOPICS_DIR / "arts" / "c" / "t" / "labs.md").exists()
+    assert not (TOPICS_DIR / "arts" / "c" / "u").exists()
+    assert not [p for p in TOPICS_DIR.iterdir() if p.name.startswith(".")], "staging left behind"
+
+
+def test_install_merges_pack_into_existing_domain(tmp_path):
+    """Pack files replace their counterparts; the learner's other files stay."""
+    lesson = TOPICS_DIR / "arts" / "c" / "t" / "lesson_1.md"
+    lesson.parent.mkdir(parents=True, exist_ok=True)
+    lesson.write_text("# old lesson\n")
+    mine = TOPICS_DIR / "arts" / "c" / "t" / "my_notes.md"
+    mine.write_text("# my notes\n")
+
+    pack_path = tmp_path / "arts.synpack"
+    _write_pack(pack_path, {"format": "synpack/v1", "domain": "arts"}, {
+        "topics/arts/c/t/lesson_1.md": b"# new lesson\n",
+    })
+    install_topic_pack(pack_path)
+
+    assert lesson.read_text() == "# new lesson\n"
+    assert mine.read_text() == "# my notes\n"
+    assert not [p for p in TOPICS_DIR.iterdir() if p.name.startswith(".")]
+
+
+def test_search_skips_hidden_staging_folders():
+    from learning_engine.search import _iter_markdown
+    hidden = TOPICS_DIR / ".install-1-1" / "pack" / "arts" / "c" / "t" / "lesson_1.md"
+    hidden.parent.mkdir(parents=True, exist_ok=True)
+    hidden.write_text("# staged\n")
+    visible = TOPICS_DIR / "arts" / "c" / "t" / "lesson_1.md"
+    visible.parent.mkdir(parents=True, exist_ok=True)
+    visible.write_text("# live\n")
+    found = list(_iter_markdown(TOPICS_DIR))
+    assert visible in found
+    assert hidden not in found

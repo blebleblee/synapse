@@ -10,6 +10,8 @@ import json
 import tarfile
 from .version import __version__
 import hashlib
+import shutil
+import time
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from .security import validate_workspace_path, WORKSPACE_ROOT, TOPICS_DIR, get_workspace_root
@@ -195,8 +197,11 @@ def _pack_relative_name(name: str) -> Optional[str]:
 def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
     """
     Installs a .synpack archive into the local topics workspace.
-    Extracts directly into TOPICS_DIR, preserving directory structure.
-    Backs up existing domains prior to extraction to prevent data loss.
+
+    Pack files replace their counterparts; other files in the domain stay.
+    Every touched domain is backed up first. The pack is extracted into a
+    hidden staging folder and each domain is swapped in by rename, so a
+    failure while writing leaves the existing domains as they were.
     """
     if not pack_path.exists():
         raise FileNotFoundError(f"Package file '{pack_path}' not found.")
@@ -253,7 +258,6 @@ def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
 
         # Back up every existing domain this pack writes into (a complete pack
         # replaces all of them), so local edits survive the install.
-        import time, shutil
         stamp = int(time.time())
         for name in sorted(touched_domains):
             existing = TOPICS_DIR / name
@@ -264,24 +268,53 @@ def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
                 shutil.copytree(existing, backup_path, dirs_exist_ok=True)
                 print(f"[i] Backed up existing domain '{name}' to {backup_path}")
 
-        # Extract topics directly into TOPICS_DIR
-        for member in tar.getmembers():
-            rel_name = _pack_relative_name(member.name)
-            if rel_name is None:
-                continue
+        # Stage inside TOPICS_DIR (same filesystem, so the swap is a rename;
+        # dot-folders are ignored by the topic tree).
+        staging = TOPICS_DIR / f".install-{stamp}-{os.getpid()}"
+        try:
+            pack_root = staging / "pack"
+            for member in tar.getmembers():
+                rel_name = _pack_relative_name(member.name)
+                if rel_name is None:
+                    continue
+                target_path = pack_root / rel_name
+                validate_workspace_path(pack_root, target_path)
+                if member.isdir():
+                    target_path.mkdir(parents=True, exist_ok=True)
+                elif member.isfile():
+                    target_path.parent.mkdir(parents=True, exist_ok=True)
+                    src = tar.extractfile(member)
+                    if src:
+                        with src, open(target_path, "wb") as dst:
+                            shutil.copyfileobj(src, dst)
 
-            target_path = TOPICS_DIR / rel_name
-            validate_workspace_path(TOPICS_DIR, target_path)
+            # Merge each domain in staging: current content plus the pack's files.
+            merged_root = staging / "merged"
+            for name in sorted(touched_domains):
+                merged = merged_root / name
+                if (TOPICS_DIR / name).is_dir():
+                    shutil.copytree(TOPICS_DIR / name, merged)
+                if (pack_root / name).is_dir():
+                    shutil.copytree(pack_root / name, merged, dirs_exist_ok=True)
 
-            if member.isdir():
-                target_path.mkdir(parents=True, exist_ok=True)
-            elif member.isfile():
-                target_path.parent.mkdir(parents=True, exist_ok=True)
-                src = tar.extractfile(member)
-                if src:
-                    with src, open(target_path, "wb") as dst:
-                        import shutil
-                        shutil.copyfileobj(src, dst)
+            # Swap the merged domains in; put the old one back if a rename fails.
+            old_root = staging / "old"
+            old_root.mkdir(parents=True, exist_ok=True)
+            for name in sorted(touched_domains):
+                merged, live, old = merged_root / name, TOPICS_DIR / name, old_root / name
+                if not merged.exists():
+                    continue
+                had_live = live.exists()
+                if had_live:
+                    os.replace(live, old)
+                try:
+                    os.replace(merged, live)
+                except OSError:
+                    if had_live:
+                        os.replace(old, live)
+                    raise
+        finally:
+            shutil.rmtree(staging, ignore_errors=True)
 
     # Record installed package in database
     with get_db_connection() as conn:
