@@ -223,12 +223,31 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-35: 47 Broken Diagrams and a Runaway Code Block in Public Lessons
 - **Status:** **COMPLETED** (`1f8dad2`). `scripts/validate_render.mjs` reports 0 broken Mermaid diagrams in tracked public lessons.
 
+### FIND-36: Listen Gave No Feedback and Could Play a Lesson Already Left
+- **Status:** **COMPLETED** (`fd5ea6d`). Test: `app/frontend/src/utils/speech.test.ts`.
+
+### FIND-37: Mentor Showed the Folder Name in Lowercase
+- **Status:** **COMPLETED** (`98d1cfd`).
+
+### FIND-38: "Sandbox" Terminal Fell Back to a Host Shell; Run Executed Snippets on the Host
+- **Status:** **COMPLETED** (`540c518`). Test: `tests/test_security_hardening.py::test_unreachable_sandbox_does_not_fall_back_to_a_host_shell`.
+
+### FIND-39: Settings Hard to Read; Main Window Crowded (User Request)
+- **Status:** **COMPLETED** (`ce3c065`). The `reviewerModel` setting is no longer shown (unused by the app); the field stays in `settingsDefaults.ts` for stored settings.
+
+### FIND-40: Mentor Failed on Long Lessons and Saw Only Their Start
+- **Status:** **COMPLETED** (`1dec52e`). Tests: `tests/test_lesson_context.py`, `tests/test_generation_output.py`.
+
 ## Next Candidates (not yet verified)
+
+- **Curriculum hallucinations (owner question, proposal):** (1) `synapse review` with a reviewer from a different model family than the generator; (2) run lesson/lab code blocks in the sandbox in CI and flag failures; (3) extract checkable claims (versions, defaults, flags, API names) and verify against docs or installed tools; (4) a "Report a mistake" button in the reader feeding a review queue. (1) and (2) are cheapest. NEEDS DECISION on which to build.
+- **Run buttons:** shown on every bash block, including illustrations like `cmd > file`. Consider showing Run only in labs or on blocks marked runnable (product decision).
+- **Mentor:** terminal buffer and last command are injected twice (system instruction and prompt) under a "you MUST inspect" directive, even for unrelated questions; consider once, and only when relevant. Lesson-generation cleanup (`validate_generation_output`) still runs on chat replies; a chat-specific path would be cleaner.
+- **Listen privacy:** narration sends the lesson text to Microsoft's Edge TTS service (`edge_tts`); say so in the UI or docs.
 
 - **Curriculum:** ~100 KaTeX errors now visible to learners (95 formal/natural sciences, 5 business/economics). Run `node scripts/validate_render.mjs topics/<domain>` per public domain and filter to `git ls-files topics`.
 
 - **UI not yet exercised in this pass:** Listen (TTS), lesson translation (EN ▾), Add Topic, rename/delete unit, Curriculum Store. (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
-- Labs "Run" buttons say "Executes shell command directly in your sandbox terminal" even when the Host Shell profile is active.
 - **CLI:** checked in batch 2 (FIND-30). Not yet exercised: `add`, `generate`, `chat`, `pack install/uninstall` (they write or need a model).
 - No course ships `flashcards.csv` (the one that did was a test artifact); every deck is generated on first open (tens of seconds). Consider shipping decks or pre-generating in the curriculum pipeline (product decision).
 

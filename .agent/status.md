@@ -7,7 +7,7 @@
 - **Tests are isolated from the host:** `tests/conftest.py` clears provider keys and hosts (`ANTHROPIC_API_KEY*`, `VNAIPRO_*`, `GEMINI_*`, `OLLAMA_HOSTS`, …); app shutdown waits for the start-up warm-up threads. Both hid failures until CI ran.
 - **Decisions taken:** keep Electron; leave git history as is; no Gitea password rotation (server is local-only); agent notes live in `.agent/`; pushes to GitHub only with owner approval per push.
 - **Curriculum release (2026-11-22, `606f85e`):** packs live on the `curriculum` release on both hosts, published with `scripts/publish_all_releases.py --curriculum`; only packs whose content digest changed are replaced (`curriculum.json` on the release). The app downloads from `curriculum` first, then v<version>/v1.2.0. App releases carry no packs and no longer the duplicate `Synapse-Portable-Windows.zip` (owner decision; the win-x64 zip, the macOS .zip and the 13 packs bundled in installers were kept on purpose). Gitea has no "not latest" flag, so its UI may show `curriculum` as the newest release; nothing in the app relies on "latest".
-- **Verification:** `./scripts/verify_all.sh`, all 6 phases (2026-11-22 late evening: 268 backend, 38 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean). Latest checkpoint: `1f8dad2` pushed to `gitea/main`. `main` is 30+ commits ahead of `github/main` (unreleased; push needs owner approval).
+- **Verification:** `./scripts/verify_all.sh`, all 6 phases (2026-11-23 night: 279 backend, 41 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean). Latest checkpoint: `1dec52e` pushed to `gitea/main`. `main` is 30+ commits ahead of `github/main` (unreleased; push needs owner approval).
 - **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, public on GitHub. No rotation (local-only server). Never print it.
 - **Pending owner actions:** top up proxy credit; send the Safari diagram case.
 - **Improvement ideas (completed 1–7):** release from CI; protected `main` with PR-only changes.
@@ -71,6 +71,19 @@ Commits (all pushed to `gitea/main`; CI #49–#56 green, #57+ queued at handoff 
 - `771c769` terminal PTY slave fd closed twice → killed unrelated sockets ("Invalid frame header"). FIND-27.
 - `b14085c` course-path links read "Kubernetes: Kubernetes" (301 doubled graph labels). FIND-28.
 - `7ff4d93` Anki export regenerated/overwrote decks; placeholder decks cached; Anki headers on one row; leaked test deck removed from kubernetes. FIND-29.
+
+### Batch 3 (2026-11-22 23:00 – 2026-11-23): user feedback on UI, terminal safety, mentor
+
+Commits (pushed to `gitea/main`; CI #65–#68 green, #69 onward queued behind the single runner at handoff):
+- `fd5ea6d` Listen shows "Preparing…" (first synthesis takes ~1 min) and can be cancelled; audio for a lesson already left no longer starts later. FIND-36.
+- `98d1cfd` mentor panel shows the course name in correct case ("Artificial Intelligence", not "ai foundations"). FIND-37.
+- `540c518` **safety:** with Docker or k3s unreachable, "Linux Sandbox"/"Kubernetes Pod" started a host shell under the Sandbox label, so lesson Run buttons ran on the real machine. Now no shell opens; on Host Shell, Run only types the command (no Enter); zsh accepts `#` comments. FIND-38.
+- `ce3c065` Settings rebuilt from titled groups with hints and one control size; the unused "Reviewer / Evaluator Model" select removed; 6px gutter between the three panels (user request). FIND-39.
+- `1dec52e` mentor: lessons over 50,000 chars got 422 (351 public files); it saw only the first 5,000 chars; replies lost text before a `# comment` in code; "2-4 sentences" cap replaced by right-sized answers with lesson-first grounding and an accuracy rule. FIND-40.
+
+Mentor check (qwen2.5-coder:32b, bash lesson 1, four real questions): all correct and grounded after the fix. Note: the server's own fallback mentor model is qwen2.5-coder:7b when the client sends none; 7b answers more accurately when kept very short. Script: scratchpad only, not committed.
+
+Also deleted the merged `security/audit-hardening` branch on gitea and locally (owner approved; never on GitHub).
 
 ### Batch 2 (2026-11-22, ~22:00–22:50): CLI, rendering, curriculum
 
