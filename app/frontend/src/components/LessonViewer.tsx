@@ -406,23 +406,24 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     }
   };
 
-  const isMathDomain = topic?.domain === 'formal_sciences' || topic?.domain === 'natural_sciences';
+  // Math renders in every domain: economics, ML, engineering... lessons use
+  // LaTeX too, and showed raw "$$\frac{...}$$" when only two domains rendered it.
 
   const htmlContent = useMemo(() => {
     if (!activeMarkdown) return '';
-    return renderMarkdownWithMathAndMermaid(activeMarkdown, isMathDomain);
-  }, [activeMarkdown, isMathDomain]);
+    return renderMarkdownWithMathAndMermaid(activeMarkdown, true);
+  }, [activeMarkdown]);
 
   const originalHtmlContent = useMemo(() => {
     if (!rawMarkdown) return '';
-    return renderMarkdownWithMathAndMermaid(rawMarkdown, isMathDomain);
-  }, [rawMarkdown, isMathDomain]);
+    return renderMarkdownWithMathAndMermaid(rawMarkdown, true);
+  }, [rawMarkdown]);
 
   const translatedHtmlContent = useMemo(() => {
     const md = translatedMarkdown || rawMarkdown;
     if (!md) return '';
-    return renderMarkdownWithMathAndMermaid(md, isMathDomain);
-  }, [translatedMarkdown, rawMarkdown, isMathDomain]);
+    return renderMarkdownWithMathAndMermaid(md, true);
+  }, [translatedMarkdown, rawMarkdown]);
 
   useEffect(() => {
     if (contentRef.current) {

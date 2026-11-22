@@ -31,6 +31,11 @@ try {
   // Graceful fallback if dompurify is already bundled or unavailable
 }
 
+// The reader's own Mermaid repair and math detection (Node strips the TS types),
+// so this validates what learners actually see.
+const { sanitizeAndRepairMermaid } = await import(path.resolve(WORKSPACE_ROOT, 'app/frontend/src/utils/mermaidRepair.ts'));
+const { transformOutsideCode, findInlineMath } = await import(path.resolve(WORKSPACE_ROOT, 'app/frontend/src/utils/mathSpans.ts'));
+
 // 2. Load Rendering Engines from Frontend node_modules
 let marked, katex, mermaid;
 
@@ -64,47 +69,6 @@ try {
   process.exit(1);
 }
 
-/**
- * Sanitizes and repairs common Mermaid syntax variations (mirrors frontend markdownRenderer.ts)
- */
-function sanitizeAndRepairMermaid(diagramText) {
-  let cleaned = diagramText.trim();
-  cleaned = cleaned.replace(/^(\s*(?:graph|flowchart)\s+[A-Za-z]+)\s*;/gim, '$1');
-  cleaned = cleaned.replace(/;\s*$/gm, '');
-  cleaned = cleaned.replace(/-->\s*\|\s*([^|\n]+?)\s*\|\s*-->/g, '-->|"$1"|');
-  cleaned = cleaned.replace(/-->\s*\|\s*([^|\n]+?)\s*\|\s*>/g, '-->|"$1"|');
-  cleaned = cleaned.replace(/--\s*\|\s*([^|\n]+?)\s*\|\s*-->/g, '-->|"$1"|');
-
-  cleaned = cleaned.replace(/-->\s*\|\s*([^|\n]+?)\s*\|\s*/g, (match, label) => {
-    const trimmed = label.trim();
-    if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-      return `-->|"${trimmed.slice(1, -1).trim()}"| `;
-    }
-    if (trimmed.includes(' ') || trimmed.includes('(') || trimmed.includes('/') || trimmed.includes(',')) {
-      return `-->|"${trimmed.replace(/"/g, "'")}"| `;
-    }
-    return match;
-  });
-
-  cleaned = cleaned.replace(/subgraph\s+"([^"\n]+)"/g, (_, title) => {
-    const id = 'sub_' + title.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 30);
-    return `subgraph ${id} ["${title}"]`;
-  });
-  cleaned = cleaned.replace(/subgraph\s+([A-Za-z0-9_-]+[ \t]+[^\n[]+)(?=\n|$)/g, (match, title) => {
-    const trimmed = title.trim();
-    if (trimmed.startsWith('"')) return match;
-    const id = 'sub_' + trimmed.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 30);
-    return `subgraph ${id} ["${trimmed}"]`;
-  });
-
-  // Enclose unquoted node labels with special characters in double quotes safely
-  cleaned = cleaned.replace(/([A-Za-z0-9_-]+)\[([^"\]\n]*[\(\)\/\+\=\*\&][^"\]\n]*)\]/g, (match, id, text) => {
-    if (text.startsWith('"') && text.endsWith('"')) return match;
-    return `${id}["${text.replace(/"/g, "'")}"]`;
-  });
-
-  return cleaned;
-}
 
 /**
  * Validates rendering of a single Markdown file across Marked, KaTeX, and Mermaid.js
@@ -127,9 +91,9 @@ export async function validateFile(filePath) {
   }
 
   // 2. KaTeX Math Equations Validation
-  // Mask code blocks and inline code so code syntax isn't mistaken for math
-  let contentNoCode = content.replace(/(```[\s\S]*?```)/g, '');
-  contentNoCode = contentNoCode.replace(/(`[^`\n]+?`)/g, '');
+  // Prose only, exactly as the reader masks code before rendering math.
+  let contentNoCode = '';
+  transformOutsideCode(content, (prose) => { contentNoCode = prose; return prose; });
 
   // Extract display math: $$...$$
   const displayMathRegex = /\$\$([\s\S]*?)\$\$/g;
@@ -139,7 +103,7 @@ export async function validateFile(filePath) {
     const math = match[1].trim();
     if (!math) continue;
     try {
-      katex.renderToString(math, { displayMode: true, throwOnError: true, strict: 'ignore' });
+      katex.renderToString(math, { displayMode: true, throwOnError: true, strict: 'ignore', trust: true });
     } catch (err) {
       errors.push({
         type: 'KATEX_MATH_ERROR',
@@ -148,17 +112,11 @@ export async function validateFile(filePath) {
     }
   }
 
-  // Extract inline math: $...$ (avoiding escaped \$ or currency like $120,000 or $20M)
-  const inlineMathRegex = /(?<!\\)\$(?!\s|\d[\d,]*(?:\.\d+)?(?:[KMBkmb]|(?:\s*(?:million|billion|trillion|USD|EUR)))?\b)([^$\n]+?)(?<!\s)\$/gi;
-  while ((match = inlineMathRegex.exec(contentNoCode)) !== null) {
-    const math = match[1].trim();
-    // Heuristic: ignore simple standalone currency amounts like $50 or $100
-    if (/^\d+(?:,\d+)*(?:\.\d+)?$/.test(math)) continue;
-    // Ignore empty or whitespace
-    if (!math) continue;
+  // Inline math: the same $...$ spans the reader renders.
+  for (const math of findInlineMath(contentNoCode)) {
     mathCount++;
     try {
-      katex.renderToString(math, { displayMode: false, throwOnError: true, strict: 'ignore' });
+      katex.renderToString(math, { displayMode: false, throwOnError: true, strict: 'ignore', trust: true });
     } catch (err) {
       errors.push({
         type: 'KATEX_MATH_ERROR',
