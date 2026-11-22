@@ -41,7 +41,7 @@ SECRET_PATTERNS = [
 
 # Patterns that indicate safe placeholder values in tests or examples
 SAFE_PLACEHOLDER_REGEX = re.compile(
-    r"(?:dummy|test|fake|mock|example|placeholder|your[-_]api[-_]key|<[^>]+>|AIzaSy[0-9A-Za-z_-]{10}XXX)",
+    r"(?:dummy|test|fake|mock|example|placeholder|your[-_]api[-_]key|<[^>]+>)",
     re.IGNORECASE
 )
 

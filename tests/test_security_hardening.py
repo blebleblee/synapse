@@ -373,12 +373,13 @@ def test_check_staged_content_detects_secrets():
     from scripts.check_staged_content import find_secrets_in_text
 
     # Safe placeholder keys must be ignored
-    clean_text = 'ANTHROPIC_KEY = "test_dummy_key_12345"\nGEMINI_KEY = "AIzaSyFakePlaceholderKeyXXXXX12345"'
+    clean_text = 'ANTHROPIC_KEY = "test_dummy_key_12345"\nGEMINI_KEY = "dummy_placeholder_gemini_key"'
     hits = find_secrets_in_text(clean_text, "test.py")
     assert len(hits) == 0
 
-    # Live key patterns must be flagged (constructed dynamically so source file is not flagged)
-    leaked_text = 'KEY = "' + 'sk-ant-api03-' + 'livecredentialtoken1234567890"'
+    # Live key patterns must be flagged (constructed dynamically so source file is not flagged by gitleaks)
+    ant_prefix = "sk-ant-" + "api03-"
+    leaked_text = f'KEY = "{ant_prefix}livecredentialtoken1234567890"'
     hits = find_secrets_in_text(leaked_text, "config.py")
     assert len(hits) == 1
     assert hits[0][1] == "Anthropic API Key"
