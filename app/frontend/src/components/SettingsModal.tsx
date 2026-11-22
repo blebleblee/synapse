@@ -23,7 +23,8 @@ import {
   Eye,
   EyeOff,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Power
 } from 'lucide-react';
 
 
@@ -1068,6 +1069,25 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                     >
                       <HardDrive size={12} />
                       <span>Vacuum SQLite Database</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn-secondary-sm"
+                      style={{ color: '#ef4444', borderColor: '#ef444440' }}
+                      onClick={async () => {
+                        if (!confirm('Shut down Synapse Workbench server?')) return;
+                        try {
+                          await fetch('/api/system/shutdown', { method: 'POST' });
+                          alert('Synapse Workbench server is shutting down. You may close this browser tab.');
+                        } catch {
+                          alert('Shutdown request sent.');
+                        }
+                      }}
+                      title="Gracefully stop the local Synapse server process"
+                    >
+                      <Power size={12} />
+                      <span>Shut Down Server</span>
                     </button>
                   </div>
                 </div>

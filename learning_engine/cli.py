@@ -360,6 +360,9 @@ def cmd_serve(args):
     import uvicorn
     host = args.host or "127.0.0.1"
     port = args.port or 8000
+    if getattr(args, "idle_timeout", 0) and args.idle_timeout > 0:
+        os.environ["SYNAPSE_IDLE_TIMEOUT"] = str(args.idle_timeout * 60)
+        print(f"[*] Idle shutdown active: server will stop after {args.idle_timeout}m of inactivity.")
     print("==================================================")
     print(f"[*] Starting AI Learning Workbench at http://{host}:{port}")
     print(f"[*] Tree Explorer, Lesson Reader, AI Chat, and PTY Terminal are ready.")
@@ -531,6 +534,7 @@ def main():
     p_serve.add_argument("--port", "-p", type=int, default=8000, help="Port to listen on (default: 8000)")
     p_serve.add_argument("--host", default="127.0.0.1", help="Host address (default: 127.0.0.1)")
     p_serve.add_argument("--reload", "-r", action="store_true", help="Enable auto-reload for development")
+    p_serve.add_argument("--idle-timeout", type=int, default=0, help="Automatically shut down after N minutes of inactivity (default: 0 = disabled)")
     p_serve.set_defaults(func=cmd_serve)
 
     # status

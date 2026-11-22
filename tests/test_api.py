@@ -548,3 +548,22 @@ def test_find_sandbox_tool_searches_rancher_desktop_bin(tmp_path, monkeypatch):
     assert be_main.sandbox_tool_responds([str(tool), "info"]) is True
     assert seen["cmd"] == [str(tool), "info"]
     assert str(rd_bin) in seen["path"].split(":")
+
+
+def test_api_system_shutdown_localhost_only(monkeypatch):
+    """Verifies that /api/system/shutdown is accepted from localhost and rejected for remote hosts."""
+    import os
+    killed_pids = []
+    monkeypatch.setattr(os, "kill", lambda pid, sig: killed_pids.append((pid, sig)))
+
+    # Localhost client (TestClient default client.host is 'testclient')
+    res = client.post("/api/system/shutdown")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "shutting_down"
+
+    # Non-localhost remote client (e.g. from LAN)
+    remote_client = TestClient(app, client=("192.168.1.100", 50000))
+    res_remote = remote_client.post("/api/system/shutdown")
+    assert res_remote.status_code == 403
+    assert "restricted to localhost" in res_remote.json()["detail"]

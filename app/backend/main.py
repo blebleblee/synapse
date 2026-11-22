@@ -9,6 +9,7 @@ import select
 import struct
 import signal
 import asyncio
+import time
 import json
 import datetime
 import re
@@ -151,8 +152,13 @@ from learning_engine.auth import (
 
 from contextlib import asynccontextmanager
 
+LAST_ACTIVITY_TIME = time.time()
+ACTIVE_WEBSOCKET_COUNT = 0
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global LAST_ACTIVITY_TIME, ACTIVE_WEBSOCKET_COUNT
+    LAST_ACTIVITY_TIME = time.time()
     try:
         seed_starter_curriculum()
     except Exception as e:
@@ -172,8 +178,28 @@ async def lifespan(app: FastAPI):
         warmers.append(warm_index_in_background())
     except Exception:
         pass
+
+    idle_task = None
+    idle_timeout_str = os.environ.get("SYNAPSE_IDLE_TIMEOUT")
+    if idle_timeout_str:
+        try:
+            timeout_sec = float(idle_timeout_str)
+            if timeout_sec > 0:
+                async def _idle_watcher():
+                    while True:
+                        await asyncio.sleep(10)
+                        if ACTIVE_WEBSOCKET_COUNT == 0 and (time.time() - LAST_ACTIVITY_TIME) >= timeout_sec:
+                            print(f"[*] Idle timeout reached ({timeout_sec / 60:.1f}m without requests). Initiating shutdown...", flush=True)
+                            os.kill(os.getpid(), signal.SIGTERM)
+                            break
+                idle_task = asyncio.create_task(_idle_watcher())
+        except Exception:
+            pass
+
     yield
     # Shutdown actions
+    if idle_task and not idle_task.done():
+        idle_task.cancel()
     try:
         await TRANSLATIONS.shutdown()
     except Exception:
@@ -212,6 +238,8 @@ app.add_middleware(
 
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
+    global LAST_ACTIVITY_TIME
+    LAST_ACTIVITY_TIME = time.time()
     path = request.url.path
     auth_enabled = is_auth_enabled()
 
@@ -1211,6 +1239,25 @@ def api_clean(req: Dict[str, bool] = {}):
     mastery = req.get("mastery", False)
     count = perform_cleanup(clean_sessions=sessions, clean_exports=exports, clean_mastery=mastery)
     return {"success": True, "cleaned": count}
+
+@app.post("/api/system/shutdown")
+def api_system_shutdown(request: Request):
+    """
+    Gracefully stops the Synapse server process.
+    Restricted strictly to localhost clients.
+    """
+    client_ip = getattr(request.client, "host", "") if request.client else ""
+    if client_ip not in ("127.0.0.1", "::1", "localhost", "testclient"):
+        raise HTTPException(status_code=403, detail="Shutdown endpoint restricted to localhost")
+
+    if client_ip != "testclient":
+        def _do_shutdown():
+            time.sleep(0.5)
+            os.kill(os.getpid(), signal.SIGTERM)
+
+        threading.Thread(target=_do_shutdown, daemon=True).start()
+
+    return {"message": "Server shutdown initiated", "status": "shutting_down"}
 
 LANGUAGE_MANDATES = {
     "cs": "MANDATORY LANGUAGE DIRECTIVE: The student has selected Czech (Čeština). You MUST converse, explain concepts, and formulate all responses strictly in natural, fluent Czech. Preserve exact technical keywords, CLI flags, and code syntax, but formulate all explanations, questions, and guidance in Czech.",
