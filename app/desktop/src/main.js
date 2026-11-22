@@ -277,7 +277,9 @@ async function ensureBackendRunning() {
       cwd: workspaceDir,
       env: spawnEnv,
       stdio: ['ignore', 'pipe', 'pipe'],
-      detached: false,
+      // Own process group on POSIX, so quitting can stop the backend together
+      // with any child it started (the packaged sidecar is a launcher + child).
+      detached: process.platform !== 'win32',
     });
 
     backendProcess.stdout.on('data', (data) => {
@@ -463,32 +465,42 @@ function setupNativeMenu() {
 }
 
 /**
- * Graceful termination of backend child process.
+ * Stops the backend and everything it started. Resolves once it has exited:
+ * SIGTERM first, SIGKILL after 3 s if it is still busy (for example, waiting
+ * on a long local-model request).
  */
 function terminateBackend() {
-  if (backendProcess) {
-    console.log('[Desktop] Terminating backend child process...');
-    try {
-      if (process.platform === 'win32') {
-        const { execSync } = require('child_process');
-        try {
-          execSync(`taskkill /pid ${backendProcess.pid} /T /F`, { stdio: 'ignore' });
-        } catch (_) {
-          backendProcess.kill();
-        }
-      } else {
-        backendProcess.kill('SIGTERM');
-        setTimeout(() => {
-          if (backendProcess) {
-            backendProcess.kill('SIGKILL');
-          }
-        }, 2000);
-      }
-    } catch (e) {
-      console.error('[Desktop] Error terminating backend:', e);
-    }
+  const proc = backendProcess;
+  if (!proc || proc.exitCode !== null || proc.signalCode !== null) {
     backendProcess = null;
+    return Promise.resolve();
   }
+  console.log('[Desktop] Terminating backend child process...');
+  return new Promise((resolve) => {
+    let killTimer = null;
+    proc.once('exit', () => {
+      if (killTimer) clearTimeout(killTimer);
+      resolve();
+    });
+    const signalTree = (sig) => {
+      try {
+        if (process.platform === 'win32') {
+          const { execSync } = require('child_process');
+          execSync(`taskkill /pid ${proc.pid} /T /F`, { stdio: 'ignore' });
+        } else {
+          process.kill(-proc.pid, sig);
+        }
+      } catch (_) {
+        try { proc.kill(sig); } catch (_) { /* already gone */ }
+      }
+    };
+    signalTree('SIGTERM');
+    killTimer = setTimeout(() => {
+      console.log('[Desktop] Backend still running; sending SIGKILL');
+      signalTree('SIGKILL');
+      setTimeout(resolve, 500);
+    }, 3000);
+  });
 }
 
 // IPC Handlers
@@ -554,9 +566,16 @@ app.whenReady().then(async () => {
   });
 });
 
-app.on('before-quit', () => {
+let backendStopped = false;
+app.on('before-quit', (event) => {
   isQuitting = true;
-  terminateBackend();
+  if (backendStopped || !backendProcess) return;
+  // Hold the quit until the backend (and any local-model work it is doing) has stopped.
+  event.preventDefault();
+  terminateBackend().finally(() => {
+    backendStopped = true;
+    app.quit();
+  });
 });
 
 app.on('window-all-closed', () => {

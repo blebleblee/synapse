@@ -364,7 +364,14 @@ def cmd_serve(args):
     print(f"[*] Starting AI Learning Workbench at http://{host}:{port}")
     print(f"[*] Tree Explorer, Lesson Reader, AI Chat, and PTY Terminal are ready.")
     print("==================================================")
-    uvicorn.run("app.backend.main:app", host=host, port=port, reload=args.reload)
+    # Don't wait for long model calls (translation, generation) on shutdown:
+    # give open requests 3 s, then exit without joining busy AI worker threads.
+    uvicorn.run("app.backend.main:app", host=host, port=port, reload=args.reload,
+                timeout_graceful_shutdown=3)
+    if not args.reload:
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os._exit(0)
 
 def cmd_desktop(args):
     """
