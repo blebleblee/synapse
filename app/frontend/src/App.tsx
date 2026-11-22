@@ -1083,8 +1083,6 @@ function App() {
         onClearChat={() => setUnifiedChatHistory([])}
         mentorConnected={mentorConnected}
         targetLanguage={settings.language}
-        mentorModel={shownMentorModel}
-        mentorFallback={mentorFallback}
         onDismissMessage={(idx) => setUnifiedChatHistory((prev) => prev.filter((_, i) => i !== idx))}
       />
 

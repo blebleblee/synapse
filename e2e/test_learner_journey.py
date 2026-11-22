@@ -724,23 +724,22 @@ def test_search_navigation_to_matched_lesson(browser_page):
 
 def test_mentor_model_indicator_and_error_dismissal(browser_page):
     """
-    Verifies that the active mentor model is displayed in the header and
-    bottom status bar, and that connection error notices can be dismissed
-    inline without losing student conversation history.
+    Verifies that the active mentor model is shown once, in the bottom status
+    bar (not repeated in the chat header), and that connection error notices
+    can be dismissed inline without losing student conversation history.
     """
     page, server_url = browser_page
     page.goto(server_url)
     expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
 
-    # 1. Verify mentor model indicator pill in the chat header
-    model_pill = page.locator(".persona-model-pill").first
-    expect(model_pill).to_be_visible(timeout=5000)
-    expect(model_pill).to_have_text("qwen2.5-coder")
-
-    # 2. Verify mentor model badge in the bottom status bar
+    # 1. The mentor model badge is in the bottom status bar...
     bottom_badge = page.locator(".mentor-model-badge").first
     expect(bottom_badge).to_be_visible(timeout=5000)
     expect(bottom_badge).to_have_text("(qwen2.5-coder)")
+
+    # 2. ...and not repeated in the chat header next to the topic.
+    expect(page.locator(".chat-header")).to_be_visible()
+    expect(page.locator(".chat-header")).not_to_contain_text("qwen2.5-coder")
 
     # 3. Intercept /api/chat with a simulated provider connection failure (503)
     page.route("**/api/chat", lambda route: route.fulfill(

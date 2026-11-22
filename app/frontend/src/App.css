@@ -1450,20 +1450,6 @@ body, html, #root {
   margin-right: 6px;
 }
 
-.persona-model-pill {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  background: var(--bg-tertiary);
-  color: var(--accent-blue);
-  border: 1px solid var(--border-color);
-  padding: 1px 5px;
-  border-radius: 4px;
-  font-weight: 600;
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 .mentor-model-badge {
   font-size: 11px;

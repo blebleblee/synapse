@@ -27,8 +27,6 @@ interface TutorChatProps {
   onClearChat?: () => void;
   mentorConnected: 'checking' | 'connected' | 'error';
   targetLanguage?: string;
-  mentorModel?: string;
-  mentorFallback?: boolean;
   onDismissMessage?: (index: number) => void;
 }
 
@@ -41,8 +39,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   onClearChat,
   mentorConnected,
   targetLanguage,
-  mentorModel,
-  mentorFallback = false,
   onDismissMessage,
 }) => {
   const ui = getUIStrings(targetLanguage);
@@ -164,16 +160,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({
                 {topic?.domain && (
                   <span className="persona-topic-tag" title={`Domain: ${topic.domain}`}>
                     {topic.domain.replace(/_/g, ' ')}
-                  </span>
-                )}
-                {mentorModel && (
-                  <span
-                    className="persona-model-pill"
-                    title={mentorFallback
-                      ? `Active Mentor Model: ${mentorModel} (fallback: the configured model is not available)`
-                      : `Active Mentor Model: ${mentorModel}`}
-                  >
-                    {mentorModel.split(':')[0]}{mentorFallback ? ' (fallback)' : ''}
                   </span>
                 )}
                 {personaExpanded ? <ChevronUp size={12} className="persona-chevron" /> : <ChevronDown size={12} className="persona-chevron" />}
