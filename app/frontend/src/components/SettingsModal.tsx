@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DEFAULT_SETTINGS, type AppSettings, type SettingsTab } from './settingsDefaults';
+import { useEscapeToClose } from '../utils/useEscapeToClose';
 import {
   Settings,
   Palette,
@@ -92,6 +93,7 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
   onTreeChange,
   onLaunchSetupWizard,
 }) => {
+  useEscapeToClose(onClose);
   const resolveTab = (tab?: string): SettingsTab => {
     if (tab === 'models' || tab === 'cluster' || tab === 'ai') return 'ai';
     if (tab === 'store' || tab === 'storage' || tab === 'maintenance' || tab === 'addons') return 'storage';

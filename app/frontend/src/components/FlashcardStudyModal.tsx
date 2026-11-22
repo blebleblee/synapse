@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Layers, RotateCcw, CheckCircle2, X, Sparkles, Award } from 'lucide-react';
 import { failureMessage, networkFailure } from '../utils/failureMessage';
+import { useEscapeToClose } from '../utils/useEscapeToClose';
 
 export interface Flashcard {
   id: number;
@@ -43,6 +44,7 @@ const FlashcardStudyPanel: React.FC<Omit<FlashcardStudyModalProps, 'isOpen'>> = 
   topicPath,
   topicTitle,
 }) => {
+  useEscapeToClose(onClose);
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);

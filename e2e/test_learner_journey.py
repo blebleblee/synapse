@@ -860,3 +860,32 @@ def test_flashcard_keyboard_review_after_using_terminal(browser_page):
     assert json.loads(reviews[0])["interval_days"] == 7
     focused_in_terminal = page.evaluate("document.activeElement?.classList.contains('xterm-helper-textarea')")
     assert not focused_in_terminal
+
+
+def test_escape_closes_dialogs(browser_page):
+    """Escape closes Search, Settings and Flashcards, also while the terminal
+    has keyboard focus."""
+    page, server_url = browser_page
+    page.route("**/api/flashcards/deck*", lambda route: route.fulfill(
+        status=200, content_type="application/json",
+        body=json.dumps({"topic": "E2E", "cards": [{"id": 0, "front": "Q", "back": "A", "tag": ""}]}),
+    ))
+    page.goto(server_url)
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    page.locator("button[title^='Search Curriculum']").click()
+    expect(page.locator(".modal-backdrop")).to_be_visible(timeout=3000)
+    page.keyboard.press("Escape")
+    expect(page.locator(".modal-backdrop")).to_have_count(0, timeout=3000)
+
+    page.locator("button[title='Settings']").click()
+    expect(page.locator(".modal-backdrop")).to_be_visible(timeout=3000)
+    page.keyboard.press("Escape")
+    expect(page.locator(".modal-backdrop")).to_have_count(0, timeout=3000)
+
+    select_fixture_lesson(page, "Data", "E2e Unique Storage Invariants", "Foundations")
+    page.locator("button:has-text('Flashcards')").first.click()
+    expect(page.locator(".flashcard-modal-card")).to_be_visible(timeout=5000)
+    page.locator(".xterm-helper-textarea").focus()
+    page.keyboard.press("Escape")
+    expect(page.locator(".flashcard-modal-card")).to_have_count(0, timeout=3000)

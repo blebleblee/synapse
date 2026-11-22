@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Compass, X, ArrowRight, Search, GitBranch, Layers } from 'lucide-react';
+import { useEscapeToClose } from '../utils/useEscapeToClose';
 
 interface PathwayStep {
   step: number;
@@ -263,7 +264,7 @@ const CURATED_PATHWAYS: PathwayTrack[] = [
       {
         step: 1,
         title: 'Propositional Logic & Natural Deduction',
-        path: 'formal_sciences/discrete_math/logic/01_propositional_logic_and_natural_deduction',
+        path: 'formal_sciences/logic/mathematical_logic/01_propositional_logic',
         domain: 'formal_sciences',
         whyLearnFirst: 'Build deductive reasoning and valid inference rules before analyzing strategic payoffs.',
       },
@@ -357,6 +358,10 @@ function getDomainColor(domain: string): string {
   }
 }
 
+// Pathway steps name a lesson after the course; open the course itself so the
+// sidebar can highlight it (the lesson part is not a lesson id).
+const coursePath = (path: string) => path.split('/').slice(0, 3).join('/');
+
 export const GraphModal: React.FC<GraphModalProps> = ({
   isOpen,
   onClose,
@@ -365,6 +370,7 @@ export const GraphModal: React.FC<GraphModalProps> = ({
   const [selectedDomain, setSelectedDomain] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'dag' | 'timeline'>('dag');
+  useEscapeToClose(onClose, isOpen);
 
   if (!isOpen) return null;
 
@@ -474,7 +480,7 @@ export const GraphModal: React.FC<GraphModalProps> = ({
                               className="dag-node-card"
                               style={{ borderTop: `3px solid ${getDomainColor(st.domain)}` }}
                               onClick={() => {
-                                onSelectTopic(st.path);
+                                onSelectTopic(coursePath(st.path));
                                 onClose();
                               }}
                               title={`Click to open lesson: ${st.title}`}
@@ -528,7 +534,7 @@ export const GraphModal: React.FC<GraphModalProps> = ({
                             <button
                               className="btn btn-secondary-sm step-study-btn"
                               onClick={() => {
-                                onSelectTopic(st.path);
+                                onSelectTopic(coursePath(st.path));
                                 onClose();
                               }}
                               title={`Jump directly to study ${st.title}`}

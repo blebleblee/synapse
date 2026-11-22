@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, X, BookOpen } from 'lucide-react';
-import { splitHighlight } from '../utils/text';
+import { splitHighlight, toTitleCase } from '../utils/text';
+import { useEscapeToClose } from '../utils/useEscapeToClose';
 
 interface SearchResult {
   domain: string;
@@ -45,6 +46,7 @@ const SearchPanel: React.FC<Omit<SearchModalProps, 'isOpen'>> = ({
   onClose,
   onSelectTopic,
 }) => {
+  useEscapeToClose(onClose);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>('all');
@@ -182,11 +184,11 @@ const SearchPanel: React.FC<Omit<SearchModalProps, 'isOpen'>> = ({
               }}
             >
               <div className="result-meta">
-                <span className="result-domain">{r.domain}</span>
+                <span className="result-domain">{toTitleCase(r.domain)}</span>
                 <span className="result-sep">/</span>
-                <span className="result-cat">{r.category}</span>
+                <span className="result-cat">{toTitleCase(r.category)}</span>
                 <span className="result-sep">/</span>
-                <span className="result-sub">{r.subtopic}</span>
+                <span className="result-sub">{toTitleCase(r.subtopic)}</span>
                 {r.level && r.level !== 'root' && (
                   <span className="result-level-tag">{r.level.toUpperCase()}</span>
                 )}
