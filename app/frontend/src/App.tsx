@@ -84,6 +84,9 @@ function App() {
   const [flashcardModalOpen, setFlashcardModalOpen] = useState(false);
   const [authRequired, setAuthRequired] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
+  // False until the first /api/auth/status answer: until then we don't know
+  // whether protected endpoints would only answer 401.
+  const [authChecked, setAuthChecked] = useState(false);
 
   const checkAuth = useCallback(async () => {
     try {
@@ -96,9 +99,12 @@ function App() {
       }
     } catch {
       // ignore
+    } finally {
+      setAuthChecked(true);
     }
     return true;
   }, []);
+  const apiUnlocked = authChecked && !(authRequired && !isAuthenticated);
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
       const saved = localStorage.getItem('synapse_app_settings');
@@ -111,10 +117,11 @@ function App() {
   // Keeps the current status until the answer arrives; callers that want
   // "checking" shown (saving a new host or model) set it themselves.
   const checkConnectivity = useCallback(async () => {
+    if (!apiUnlocked) return;
     const check = await mentorStatus(settings.ollamaHost, settings.mentorModel);
     setMentorConnected(check.status);
     setMentorActiveModel(check.model);
-  }, [settings.ollamaHost, settings.mentorModel]);
+  }, [settings.ollamaHost, settings.mentorModel, apiUnlocked]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', settings.theme);
@@ -128,6 +135,7 @@ function App() {
   // Re-check the mentor when its host or model changes (not on theme changes).
   // Quiet: the status starts as 'checking', and saving new settings sets it.
   useEffect(() => {
+    if (!apiUnlocked) return;
     let live = true;
     mentorStatus(settings.ollamaHost, settings.mentorModel).then((check) => {
       if (!live) return;
@@ -135,7 +143,7 @@ function App() {
       setMentorActiveModel(check.model);
     });
     return () => { live = false; };
-  }, [settings.ollamaHost, settings.mentorModel]);
+  }, [settings.ollamaHost, settings.mentorModel, apiUnlocked]);
 
   // The startup check can miss a local model that is still starting or busy.
   // While offline, re-check quietly every 15 s and when the window regains focus.
@@ -1030,7 +1038,7 @@ function App() {
           </div>
 
           <div className="bottom-bar-right">
-            <TranslationQueueIndicator />
+            <TranslationQueueIndicator enabled={apiUnlocked} />
             <span
               className={`mentor-status-pill ${mentorConnected}`}
               title={`Socratic Mentor: ${mentorConnected === 'connected' ? 'Online' : mentorConnected === 'checking' ? 'Connecting' : 'Offline'}${shownMentorModel ? ` (${shownMentorModel})` : ''}${mentorFallback ? `. ${configuredMentorModel} is not available, so ${shownMentorModel} answers instead.` : ''}`}
@@ -1095,7 +1103,7 @@ function App() {
       />
 
       <SetupWizardModal
-        isOpen={setupWizardOpen}
+        isOpen={setupWizardOpen && apiUnlocked}
         onClose={() => setSetupWizardOpen(false)}
         currentSettings={settings}
         onSaveSettings={handleSaveSettings}

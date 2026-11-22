@@ -8,12 +8,14 @@ const LANG_NAMES: Record<string, string> = { cs: 'Čeština', de: 'Deutsch', es:
  * Status-bar entry for background lesson translations: what is running, what
  * is queued, and a Stop button for each. Hidden when nothing is active.
  */
-export function TranslationQueueIndicator() {
+export function TranslationQueueIndicator({ enabled = true }: { enabled?: boolean }) {
   const [jobs, setJobs] = useState<TranslationJobInfo[]>([]);
   const [open, setOpen] = useState(false);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
+    // Locked instance: the queue endpoint would only answer 401.
+    if (!enabled) return;
     let alive = true;
     let lastActive = false;
     const refresh = async (): Promise<boolean> => {
@@ -42,7 +44,7 @@ export function TranslationQueueIndicator() {
       if (timerRef.current) window.clearTimeout(timerRef.current);
       window.removeEventListener('synapse:translations-changed', onChanged);
     };
-  }, []);
+  }, [enabled]);
 
   const active = jobs.filter((j) => j.status === 'queued' || j.status === 'running');
   const running = active.find((j) => j.status === 'running');

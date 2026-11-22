@@ -788,3 +788,29 @@ def test_sidebar_reveals_restored_topic_after_reload(browser_page):
     # No manual expanding: the restored lesson is visible and marked active.
     expect(page.locator(".unit-lesson-subitem.active:has-text('Shell Syntax')")).to_be_visible(timeout=5000)
     expect(page.locator(".category-header:has-text('Systems')")).to_be_visible()
+
+
+def test_locked_first_run_shows_only_login_and_stays_quiet(browser_page):
+    """On a password-protected instance, a first-time visitor sees only the
+    login card (not the setup wizard behind it), and the UI does not poll
+    protected endpoints that can only answer 401 until the user logs in."""
+    page, server_url = browser_page
+    # Runs after the fixture's init script: behave like a first visit.
+    page.add_init_script("""
+        localStorage.removeItem('synapse_onboarding_completed');
+        localStorage.removeItem('synapse_app_settings');
+    """)
+    page.route("**/api/auth/status", lambda route: route.fulfill(
+        status=200, content_type="application/json",
+        body=json.dumps({"auth_required": True, "authenticated": False}),
+    ))
+    protected_calls = []
+    page.on("request", lambda req: protected_calls.append(req.url) if any(
+        p in req.url for p in ("/api/translate/jobs", "/api/check-mentor-connectivity", "/api/settings/cluster-status")
+    ) else None)
+
+    page.goto(server_url)
+    expect(page.locator(".login-card")).to_be_visible(timeout=10000)
+    page.wait_for_timeout(2500)
+    expect(page.locator("h3:has-text('Welcome to Synapse Workbench')")).not_to_be_visible()
+    assert protected_calls == [], f"polled before login: {protected_calls}"
