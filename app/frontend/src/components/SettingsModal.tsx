@@ -650,7 +650,7 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                             {modelOptions(formData.primaryModel)}
                           </select>
                         </Field>
-                        <Field label="Mentor model" hint="Mentor chat and quizzes. A smaller model answers faster.">
+                        <Field label="Mentor model" hint="Mentor chat and quizzes. A smaller model answers faster but makes more mistakes.">
                           <select
                             value={formData.mentorModel || ''}
                             onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}

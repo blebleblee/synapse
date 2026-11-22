@@ -218,6 +218,7 @@ async def lifespan(app: FastAPI):
         pass
 
 from learning_engine.version import __version__
+from app.backend.lesson_context import lesson_excerpt
 from app.backend.translation_jobs import (
     LANGUAGE_NAMES, TranslationQueue, cache_file_for, interactive_ai, read_cached, split_sections,
     translate_section,
@@ -309,7 +310,8 @@ class ChatRequest(BaseModel):
     section_title: Optional[str] = Field(None, max_length=200)
     terminal_context: Optional[str] = Field(None, max_length=50000)
     last_terminal_command: Optional[str] = Field(None, max_length=1000)
-    lesson_content: Optional[str] = Field(None, max_length=50000)
+    # Whole lessons/labs run up to ~115k characters; lesson_excerpt() picks what the model sees.
+    lesson_content: Optional[str] = Field(None, max_length=400_000)
     language: Optional[str] = Field("en", max_length=10)
     stream: Optional[bool] = False
     provider: Optional[str] = None
@@ -1327,22 +1329,12 @@ def build_chat_system_instruction(
     last_command: Optional[str] = None,
     language: Optional[str] = "en"
 ) -> str:
-    domain_titles = {
-        "computing": "Systems Software, Kernel Architecture & Distributed Systems",
-        "formal_sciences": "Pure Mathematics, Formal Logic & Discrete Structures",
-        "natural_sciences": "Physics, Chemistry & Foundations of Science",
-        "engineering": "Robotics, Electronics & Embedded Hardware",
-        "crafts": "Engineering Mechanisms, CAD & Digital Prototyping",
-        "arts": "Music Theory, Composition & Audio DSP",
-        "business": "Economics, System Dynamics & Strategic Decision Making",
-        "humanities": "Cognitive Science, Epistemology & Socratic Philosophy",
-    }
-    specialty = domain_titles.get(domain, domain.replace("_", " ").title())
     sub_title = subtopic.replace("_", " ").title()
 
     prompt_lines = [
-        f"You are a concise, high-signal Socratic Mentor specializing in {specialty}.",
-        f"The student is actively working on: '{sub_title}' (Discipline: {category}).",
+        f"You are a Socratic Mentor for the course '{sub_title}' "
+        f"({domain.replace('_', ' ').title()} / {category.replace('_', ' ').title()}).",
+        f"The student is actively working on: '{sub_title}'.",
     ]
 
     lang_code = (language or "en").lower()
@@ -1355,11 +1347,12 @@ def build_chat_system_instruction(
 
     prompt_lines.extend([
         "\n### Core Directives for Socratic Dialogue:",
-        "1. ULTRA-CONCISE: Limit answers strictly to 2-4 sentences max. Never lecture or dump long text.",
-        "2. SOCRATIC GUIDANCE: Provide the single most direct intuition immediately, then follow with ONE targeted question to test or deepen their understanding.",
+        "1. RIGHT-SIZED ANSWERS: Match the length to the request. A quick conceptual question gets 2-5 sentences. When the student asks you to explain, compare, walk through code, or give a scenario or exercise, give a complete, focused answer (short paragraphs, a list or a code block; usually under 250 words). Never pad.",
+        "2. SOCRATIC GUIDANCE: Lead with the most direct intuition, then, when it helps learning, ask ONE targeted question that tests or deepens understanding.",
         "3. CASUAL GREETINGS: If greeted (e.g. 'hi', 'hello'), respond warmly in 1-2 friendly sentences and ask what specific concept or intuition from the lesson they want to discuss.",
         "4. FIRST-PRINCIPLES: Use accurate technical terminology without conversational fluff.",
-        "5. ACTIVE LESSON GROUNDING: Always refer to the specific definitions, formulas, or architecture presented in the active lesson on screen."
+        "5. ACTIVE LESSON GROUNDING: First look for the answer in the active lesson excerpt. When it covers the question, base your answer on it: use its explanation, its examples and the fixes it recommends.",
+        "6. ACCURACY: Do not invent commands, flags, APIs, numbers or citations. Only when the excerpt does not cover the question, say so briefly and answer from well-established knowledge; if you are unsure, say that plainly."
     ])
 
     if last_command and last_command.strip():
@@ -1392,10 +1385,11 @@ def build_neutral_workspace_instruction(
 
     lines.extend([
         "\n### Core Directives:",
-        "1. ULTRA-CONCISE: Limit answers strictly to 2-4 sentences max. Never lecture or dump long text.",
+        "1. RIGHT-SIZED ANSWERS: Match the length to the request. A quick conceptual question gets 2-5 sentences. When the student asks you to explain, compare, walk through code, or give a scenario or exercise, give a complete, focused answer (short paragraphs, a list or a code block; usually under 250 words). Never pad.",
         "2. NEUTRAL & MULTIDISCIPLINARY: Answer questions across any engineering, mathematical, or scientific subject with first-principles rigor.",
         "3. TOPIC SELECTION: If the student asks what to study, guide them to pick a domain or topic from the sidebar tree.",
-        "4. CASUAL GREETINGS: If greeted ('hi', 'hello'), respond warmly in 1-2 friendly sentences and ask what engineering, computing, or science subject they would like to explore or troubleshoot."
+        "4. CASUAL GREETINGS: If greeted ('hi', 'hello'), respond warmly in 1-2 friendly sentences and ask what engineering, computing, or science subject they would like to explore or troubleshoot.",
+        "5. ACCURACY: Do not invent commands, flags, APIs, numbers or citations. If you are unsure, say that plainly."
     ])
     if last_command and last_command.strip():
         lines.append(f"\n### Student's Last Executed Terminal Command: `{last_command.strip()}`")
@@ -1501,12 +1495,7 @@ async def chat_with_tutor(req: ChatRequest):
 
     # Inject active lesson context prominently at top of prompt
     if lesson_text and lesson_text.strip():
-        if req.section_title:
-            clean_sec = re.escape(req.section_title.replace("#", "").strip())
-            sec_match = re.search(rf"(?:^|\n)(#{{1,4}}\s*{clean_sec}[\s\S]*?)(?=\n#{{1,4}}\s|\Z)", lesson_text, re.IGNORECASE)
-            clean_excerpt = sec_match.group(1).strip()[:4000] if sec_match else lesson_text.strip()[:5000]
-        else:
-            clean_excerpt = lesson_text.strip()[:5000]
+        clean_excerpt = lesson_excerpt(lesson_text, req.message, req.section_title)
 
         section_label = f" - Section: '{req.section_title.replace('#', '').strip()}'" if req.section_title else ""
         conversation_text.append(

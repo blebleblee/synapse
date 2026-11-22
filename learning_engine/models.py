@@ -118,15 +118,26 @@ def validate_generation_output(content: str) -> str:
     elif cleaned.startswith("```\n") and not cleaned.startswith("```mermaid"):
         cleaned = cleaned[4:].strip()
 
-    if cleaned.endswith("\n```"):
-        cleaned = cleaned[:-4].strip()
-    elif cleaned.endswith("```"):
-        cleaned = cleaned[:-3].strip()
+    # A trailing fence with no opener is left over from an outer wrapper; a
+    # balanced one closes the reply's last code block and stays.
+    fences = sum(1 for ln in cleaned.splitlines() if ln.lstrip().startswith("```"))
+    if fences % 2 == 1:
+        if cleaned.endswith("\n```"):
+            cleaned = cleaned[:-4].strip()
+        elif cleaned.endswith("```") and not cleaned.startswith("```"):
+            cleaned = cleaned[:-3].strip()
 
-    # Strip conversational preambles/meta-commentary before first heading (# or ##)
+    # Strip conversational preambles/meta-commentary before the first heading
+    # (# or ##). Lines inside code blocks ("# comment" in bash) are not headings.
     lines = cleaned.splitlines()
+    in_fence = False
     for i, line in enumerate(lines):
         st = line.strip()
+        if st.startswith("```") or st.startswith("~~~"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
         if st.startswith("# ") or st.startswith("## ") or st.startswith("**Lesson") or st.startswith("**Capstone"):
             cleaned = "\n".join(lines[i:]).strip()
             break
