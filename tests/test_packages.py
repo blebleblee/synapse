@@ -311,3 +311,50 @@ def test_install_complete_pack_backs_up_each_listed_domain(tmp_path):
     arts_backups = sorted(backups.glob("arts_backup_*"))
     assert arts_backups, "arts was replaced without a backup"
     assert (arts_backups[-1] / "local" / "edit" / "labs.md").read_text() == "# my local edit\n"
+
+
+def test_pack_content_digest_ignores_timestamps_but_not_content(tmp_path):
+    """Re-exporting unchanged content must give the same digest, so the curriculum
+    release only re-uploads packs whose lessons actually changed."""
+    import os
+    import time
+    from learning_engine.packages import pack_content_digest
+
+    def make(path, body, mtime):
+        src = tmp_path / f"src-{mtime}"
+        f = src / "topics" / "arts" / "x" / "y" / "lesson_1.md"
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(body, encoding="utf-8")
+        os.utime(f, (mtime, mtime))
+        with tarfile.open(path, "w:gz") as tar:
+            tar.add(f, arcname="topics/arts/x/y/lesson_1.md")
+        return path
+
+    a = make(tmp_path / "a.synpack", "# Lesson\n", 1_000_000)
+    time.sleep(1.1)  # gzip header carries the write time
+    b = make(tmp_path / "b.synpack", "# Lesson\n", 2_000_000)
+    c = make(tmp_path / "c.synpack", "# Lesson changed\n", 1_000_000)
+    assert a.read_bytes() != b.read_bytes()
+    assert pack_content_digest(a) == pack_content_digest(b)
+    assert pack_content_digest(a) != pack_content_digest(c)
+
+
+def test_pack_download_tries_the_curriculum_release_first(monkeypatch, tmp_path):
+    import urllib.request
+    import learning_engine.packages as pk
+
+    monkeypatch.setattr(pk, "get_packs_dir", lambda: tmp_path / "packs")
+    monkeypatch.setenv("SYNAPSE_RESOURCES_PATH", str(tmp_path / "no-resources"))
+    monkeypatch.delenv("SYNAPSE_PACKAGE_REGISTRY", raising=False)
+    tried = []
+    def fake_urlopen(req, timeout=None):
+        tried.append(req.full_url)
+        raise OSError("offline")
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+
+    with pytest.raises(FileNotFoundError):
+        pk.resolve_or_download_pack("complete")
+    assert tried[0] == "https://github.com/blebleblee/synapse/releases/download/curriculum/synapse_complete_curriculum.synpack"
+    assert tried[1] == "https://gitea.2464.cz/ai/synapse/releases/download/curriculum/synapse_complete_curriculum.synpack"
+    # Older app-release locations stay as fallbacks.
+    assert any("/download/v1.2.0/" in u for u in tried[2:])

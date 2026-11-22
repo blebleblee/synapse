@@ -78,8 +78,10 @@ bin/synapse lint --render
 
 Run these from a clean checkout of `main` after `./scripts/verify_all.sh` passes. Bump `VERSION` first (`python scripts/bump_version.py`) and add a `## [x.y.z]` section to `CHANGELOG.md`: the release notes are taken from it.
 
+Curriculum packs are not part of app releases. They live on the separate `curriculum` release (see below). The installers still bundle the packs, so export them first:
+
 ```bash
-# 1. Curriculum packs (core domains only; private and session files are excluded)
+# 1. Curriculum packs for the installers (core domains only; private and session files are excluded)
 bin/synapse pack export arts business computing crafts economics engineering \
   formal_sciences health_sciences humanities languages motorsports natural_sciences all
 python scripts/check_release_packs.py        # must pass: blocks private/uncommitted content
@@ -99,7 +101,19 @@ git push gitea main && git push github main
 .venv/bin/python scripts/publish_all_releases.py
 ```
 
-`publish_all_releases.py` refuses to run if any pack fails the release guard. It creates the `v<ver>` release on both hosts, uploads the files and sets the notes from `CHANGELOG.md`. To fix the notes of an existing release later, edit `CHANGELOG.md` and run:
+`publish_all_releases.py` creates the `v<ver>` release on both hosts, uploads the installers, portable builds and Python packages, and sets the notes from `CHANGELOG.md`. It exits non-zero if any upload fails.
+
+### Curriculum release
+
+When lessons change, publish the packs (independent of app releases):
+
+```bash
+.venv/bin/python scripts/publish_all_releases.py --curriculum
+```
+
+It exports the 12 core domains and the complete pack into a temporary folder, runs the release guard on them, and compares each pack's content digest (file names and contents, not timestamps) with `curriculum.json` on the `curriculum` release. Only changed packs are replaced; `curriculum.json` and the notes table are always refreshed. The release is never marked "Latest" on GitHub. The app downloads packs from `curriculum` first, then from older app releases.
+
+To fix the notes of an existing app release later, edit `CHANGELOG.md` and run:
 
 ```bash
 .venv/bin/python scripts/update_release_notes.py 1.2.1                # title + notes

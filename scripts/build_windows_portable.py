@@ -6,7 +6,7 @@ Builds and packages the complete standalone Windows application suite:
    - Self-contained single-file executable containing all Electron runtime DLLs (ffmpeg.dll, etc.)
 2. Bundles SynPack curriculum addons in resources/packages
 3. Assembles portable distribution directory with external topics/
-4. Creates Synapse-Workbench-Portable-1.1.0-win-x64.zip and Synapse-Portable-Windows.zip
+4. Creates Synapse-Workbench-Portable-<version>-win-x64.zip
 """
 
 import os
@@ -122,11 +122,9 @@ DATA & MASTERY STORAGE:
     print(f"\n[*] Creating Windows portable app archives...")
     target_zip = desktop_dist / bundle_name
     shutil.make_archive(str(target_zip), "zip", root_dir=dist_dir, base_dir=bundle_name)
-    shutil.copy2(f"{target_zip}.zip", desktop_dist / "Synapse-Portable-Windows.zip")
 
     final_size_mb = Path(f"{target_zip}.zip").stat().st_size / (1024 * 1024)
     print(f"[✔] Archive created: {target_zip}.zip ({final_size_mb:.2f} MB)")
-    print(f"[✔] Synced alias: {desktop_dist / 'Synapse-Portable-Windows.zip'}")
 
     print("\n==================================================")
     print("[✔] PORTABLE WINDOWS BUILD COMPLETE & VERIFIED!")

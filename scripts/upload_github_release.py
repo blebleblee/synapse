@@ -44,7 +44,6 @@ ASSETS = [
     WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.1-arm64.dmg",
     WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.1-arm64-mac.zip",
     WORKSPACE_ROOT / "dist/desktop/Synapse-Workbench-Portable-1.1.1.exe",
-    WORKSPACE_ROOT / "dist/desktop/Synapse-Portable-Windows.zip",
     WORKSPACE_ROOT / "dist/python/synapse-1.1.1-py3-none-any.whl",
     WORKSPACE_ROOT / "dist/python/synapse-1.1.1.tar.gz"
 ]

@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Curriculum packs have their own release** (`curriculum`), updated only when a pack's content changes. The app downloads packs from there first and still falls back to older app releases. App releases no longer carry packs.
+- **Releases no longer include `Synapse-Portable-Windows.zip`**, which was an identical copy of `Synapse-Workbench-Portable-<version>-win-x64.zip`.
+
 ## [1.2.2] - 2026-11-22
 
 ### Added

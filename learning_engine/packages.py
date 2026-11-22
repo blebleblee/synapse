@@ -92,6 +92,27 @@ def iter_pack_files(domain: str) -> List[Path]:
     return files
 
 
+CURRICULUM_RELEASE_TAG = "curriculum"
+
+
+def pack_content_digest(pack_path: Path) -> str:
+    """SHA-256 over member names and file contents, in name order.
+
+    Timestamps, ownership and gzip headers are left out, so re-exporting
+    unchanged lessons gives the same digest even though the archive bytes differ.
+    """
+    h = hashlib.sha256()
+    with tarfile.open(pack_path, "r:gz") as tar:
+        for member in sorted(tar.getmembers(), key=lambda m: m.name):
+            h.update(member.name.encode("utf-8") + b"\0")
+            if member.isfile():
+                data = tar.extractfile(member).read()
+                h.update(len(data).to_bytes(8, "big") + data)
+            else:
+                h.update(b"D" if member.isdir() else b"?")
+    return h.hexdigest()
+
+
 def _add_files(tar: tarfile.TarFile, files: List[Path]) -> None:
     for f in files:
         tar.add(f, arcname=f"topics/{f.relative_to(TOPICS_DIR).as_posix()}", recursive=False)
@@ -320,8 +341,9 @@ def resolve_or_download_pack(domain: str) -> Path:
     if custom_registry:
         remote_urls.append(f"{custom_registry.rstrip('/')}/{pack_name}")
         
-    # This version's release first, then the last release known to carry packs.
-    for tag in dict.fromkeys([f"v{__version__}", "v1.2.0"]):
+    # The `curriculum` release holds the current packs. App releases up to
+    # 1.2.2 carried packs too; they stay as fallbacks.
+    for tag in dict.fromkeys([CURRICULUM_RELEASE_TAG, f"v{__version__}", "v1.2.0"]):
         remote_urls.extend([
             f"https://github.com/blebleblee/synapse/releases/download/{tag}/{pack_name}",
             f"https://gitea.2464.cz/ai/synapse/releases/download/{tag}/{pack_name}",

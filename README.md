@@ -154,7 +154,7 @@ flowchart TD
 Open **Settings ⚙ → Curriculum Store & Addons** and click **Install** next to a domain. Synapse downloads the pack for you. The complete pack installs all 12 domains and 539 topics at once.
 
 #### Sideloading a downloaded pack
-Download `.synpack` files from [Releases](https://github.com/blebleblee/synapse/releases), then drop or select them under **Settings ⚙ → Curriculum Store & Addons → Sideload Local Package**.
+Download `.synpack` files from the [curriculum release](https://github.com/blebleblee/synapse/releases/tag/curriculum), then drop or select them under **Settings ⚙ → Curriculum Store & Addons → Sideload Local Package**.
 
 #### Command line / air-gapped
 For server, Docker, or headless environments:

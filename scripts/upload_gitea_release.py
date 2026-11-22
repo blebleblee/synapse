@@ -44,7 +44,6 @@ ASSETS = [
     WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.1-arm64.dmg",
     WORKSPACE_ROOT / "dist/desktop/Synapse Workbench-1.1.1-arm64-mac.zip",
     WORKSPACE_ROOT / "dist/desktop/Synapse-Workbench-Portable-1.1.1.exe",
-    WORKSPACE_ROOT / "dist/desktop/Synapse-Portable-Windows.zip",
     WORKSPACE_ROOT / "dist/python/synapse-1.1.1-py3-none-any.whl",
     WORKSPACE_ROOT / "dist/python/synapse-1.1.1.tar.gz"
 ]
@@ -107,7 +106,7 @@ Download and sideload curriculum addons via Settings ⚙ → Sideload, or drop i
 
 ### 💻 Application Binaries
 - **macOS Apple Silicon**: `Synapse Workbench-1.1.0-arm64.dmg` / `.zip`
-- **Windows Portable**: `Synapse-Portable-Windows.zip`
+- **Windows Portable**: `Synapse-Workbench-Portable-<version>-win-x64.zip`
 - **Python Distribution**: `synapse-1.1.0-py3-none-any.whl` / `.tar.gz`
 """,
             "draft": False,
