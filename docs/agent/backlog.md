@@ -134,7 +134,14 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 ---
 
+### FIND-15: Packs Could Write Outside Their Declared Domain
+- **Impact:** `install_topic_pack` checked paths for traversal but not which domain they belong to. A pack declaring `arts` could add or overwrite files in any other domain or in the `topics/` root, and only the declared domain was backed up first.
+- **Status:** **COMPLETED** (2026-11-22, `4e598ee`). Every member is checked before backup and extraction. Tests: `tests/test_packages.py`.
+
+---
+
 ## Deferred Decisions & Unverified Behavior
 
 - **Package Content Injection:** Extraction occurs sequentially into `TOPICS_DIR`. A rejection mid-extraction (e.g., encountering a corrupted file) leaves previously extracted files on disk. *Decision Needed:* Should extraction write to a temporary directory and atomically rename upon complete success?
 - **Terminal PTY Concurrency:** Real PTY process allocation and signaling remain mocked in the test environment to prevent host shell execution.
+- **Complete Pack Backup (NEEDS DECISION):** Installing the complete pack overwrites each listed domain without a backup, because the backup step only looks for `topics/complete`. Should each listed domain be backed up first?
