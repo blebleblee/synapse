@@ -158,15 +158,18 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"[!] Startup curriculum seed note: {e}")
 
+    warmers = []
     try:
         # Pre-warm topic tree cache at startup so initial browser GET /api/tree returns in 1ms
-        threading.Thread(target=get_topic_tree, daemon=True).start()
+        tree_warmer = threading.Thread(target=get_topic_tree, name="tree-warm", daemon=True)
+        tree_warmer.start()
+        warmers.append(tree_warmer)
     except Exception:
         pass
     try:
         # Build or refresh the full-text search index in the background.
         from learning_engine.search import warm_index_in_background
-        warm_index_in_background()
+        warmers.append(warm_index_in_background())
     except Exception:
         pass
     yield
@@ -175,6 +178,11 @@ async def lifespan(app: FastAPI):
         await TRANSLATIONS.shutdown()
     except Exception:
         pass
+    # Let start-up warmers finish before the database is checkpointed; left
+    # running, they would write into whatever database comes next.
+    for t in warmers:
+        if t is not None:
+            await asyncio.to_thread(t.join, 15)
     try:
         from learning_engine.database import checkpoint_db
         print("[*] Synapse Backend shutting down... checkpointing database WAL...", flush=True)
@@ -827,7 +835,10 @@ async def api_translate_content(req: TranslateRequest, request: Request):
     if cached is not None:
         return {"translated": cached, "cached": True}
 
-    provider, used_model = get_translation_provider(model=req.model, provider_type=req.provider, host=req.host)
+    try:
+        provider, used_model = get_translation_provider(model=req.model, provider_type=req.provider, host=req.host)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
     lang_name = LANGUAGE_NAMES.get(req.target_lang, req.target_lang)
     sections = split_sections(req.text)
     total = sum(1 for s in sections if s.strip())

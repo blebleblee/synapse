@@ -160,16 +160,23 @@ def test_api_translate_en_passthrough():
     data = res.json()
     assert data["translated"] == "# Hello World"
 
-def test_api_translate_failure_does_not_cache_english_fallback():
+def test_api_translate_failure_does_not_cache_english_fallback(monkeypatch):
     """
     FIND-04: When an AI provider fails or is blocked during translation,
     the endpoint returns the English fallback but MUST NOT cache it to disk.
     A subsequent request must still attempt translation (cached=False).
     """
+    from unittest.mock import MagicMock
+    import app.backend.main as be_main
+    failing = MagicMock(spec=["generate"])
+    failing.generate.side_effect = RuntimeError("provider rejected the request")
+    monkeypatch.setattr(be_main, "get_translation_provider", lambda **kwargs: (failing, "mock-translator"))
+
     raw_text = "# Microservices Architecture\nService mesh proxies intercept traffic."
     res1 = client.post("/api/translate", json={"text": raw_text, "target_lang": "cs"})
     assert res1.status_code == 200
     data1 = res1.json()
+    assert failing.generate.called
     assert data1["cached"] is False
     assert data1["fallback"] is True
     assert data1["translated"] == raw_text
@@ -179,6 +186,12 @@ def test_api_translate_failure_does_not_cache_english_fallback():
     data2 = res2.json()
     assert data2["cached"] is False, "Failed translation was incorrectly cached to disk!"
     assert data2["fallback"] is True
+
+def test_api_translate_without_provider_returns_503():
+    """No reachable or configured AI provider: a clear 503, not a server error."""
+    res = client.post("/api/translate", json={"text": "# Title\nBody.", "target_lang": "cs"})
+    assert res.status_code == 503
+    assert "active LLM provider" in res.json()["detail"]
 
 def test_api_translate_successful_translation_caches_result(monkeypatch):
     """
@@ -518,7 +531,11 @@ def test_find_sandbox_tool_searches_rancher_desktop_bin(tmp_path, monkeypatch):
     tool.write_text("#!/bin/sh\nexit 0\n")
     tool.chmod(0o755)
     monkeypatch.setattr(be_main.Path, "home", classmethod(lambda cls: tmp_path))
-    monkeypatch.setenv("PATH", "/usr/bin:/bin")
+    # Only an empty directory on PATH: a docker installed on the host (CI
+    # runners have /usr/bin/docker) must not be found before ~/.rd/bin.
+    empty = tmp_path / "empty-path"
+    empty.mkdir()
+    monkeypatch.setenv("PATH", str(empty))
 
     assert be_main.find_sandbox_tool("docker") == str(tool)
 

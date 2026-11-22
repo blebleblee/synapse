@@ -98,6 +98,14 @@ def isolate_test_auth(monkeypatch):
     """
     monkeypatch.delenv("SYNAPSE_PASSWORD", raising=False)
     monkeypatch.delenv("SYNAPSE_AUTH_PASSWORD", raising=False)
+    # Provider keys and hosts from the developer's shell must not leak into
+    # tests: a test passing only because a real API key is set fails in CI.
+    for var in ("ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY_2", "ANTHROPIC_API_KEY_3", "ANTHROPIC_API_KEY_4",
+                "VNAIPRO_API_KEY_2", "VNAIPRO_API_KEY_3", "VNAIPRO_API_KEY_4", "ANTHROPIC_MODEL", "ANTHROPIC_BASE_URL", "VNAIPRO_API_KEY",
+                "VNAIPRO_BASE_URL", "GEMINI_API_KEY", "GEMINI_BASE_URL", "GOOGLE_API_KEY",
+                "GOOGLE_CLOUD_PROJECT", "GOOGLE_CLOUD_LOCATION", "GCP_PROJECT", "OLLAMA_HOSTS",
+                "OLLAMA_NODE_PINS"):
+        monkeypatch.delenv(var, raising=False)
 
 
 @pytest.fixture(autouse=True)

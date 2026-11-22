@@ -188,8 +188,8 @@ def refresh_index(path: Optional[Path] = None) -> Dict[str, int]:
         conn.close()
 
 
-def warm_index_in_background() -> None:
-    """Build/refresh the index without blocking startup."""
+def warm_index_in_background() -> threading.Thread:
+    """Build/refresh the index without blocking startup; returns the thread."""
     def _run():
         try:
             with _lock:
@@ -197,7 +197,9 @@ def warm_index_in_background() -> None:
                 _ready.add(str(index_path()))
         except Exception as e:
             print(f"[!] Search index build failed, falling back to full scans: {e}", flush=True)
-    threading.Thread(target=_run, name="search-index", daemon=True).start()
+    thread = threading.Thread(target=_run, name="search-index", daemon=True)
+    thread.start()
+    return thread
 
 
 def _fts_query(raw_tokens: List[str]) -> str:
