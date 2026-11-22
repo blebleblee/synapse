@@ -575,7 +575,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="Read curriculum lessons and course guide"
           >
             <BookOpen size={14} />
-            <span>{ui.study || 'Study'}</span>
+            <span className="btn-label">{ui.study || 'Study'}</span>
             {Boolean(topic.has_content || topic.lesson || topic.foundation) && <span className="tab-dot" />}
           </button>
 
@@ -585,7 +585,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="Hands-on operational lab exercises and terminal verification"
           >
             <FlaskConical size={14} />
-            <span>{ui.labs}</span>
+            <span className="btn-label">{ui.labs}</span>
             {topic.labs && <span className="tab-dot" />}
           </button>
 
@@ -595,7 +595,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="Socratic multiple-choice comprehension check"
           >
             <HelpCircle size={14} />
-            <span>{ui.quiz}</span>
+            <span className="btn-label">{ui.quiz}</span>
           </button>
         </div>
 
@@ -669,7 +669,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title={isSpeakingVoice ? 'Stop audio playback' : 'Listen to this section (Speech Synthesis)'}
           >
             {isSpeakingVoice ? <VolumeX size={13} className="voice-pulse" /> : <Volume2 size={13} />}
-            <span>{isSpeakingVoice ? 'Stop' : 'Listen'}</span>
+            <span className="btn-label">{isSpeakingVoice ? 'Stop' : 'Listen'}</span>
           </button>
 
           {/* 2. Interactive Study Flashcards */}
@@ -679,7 +679,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="Interactive in-app spaced repetition flashcards"
           >
             <Layers size={13} />
-            <span>Flashcards</span>
+            <span className="btn-label">Flashcards</span>
           </button>
 
           {/* 3. Consolidated Export Menu */}
@@ -694,7 +694,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
               title="Export curriculum documents and flashcards"
             >
               <Download size={13} />
-              <span>Export</span>
+              <span className="btn-label">Export</span>
               <span className="dropdown-arrow">▾</span>
             </button>
             {exportMenuOpen && (

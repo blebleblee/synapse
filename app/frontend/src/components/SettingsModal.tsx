@@ -225,68 +225,45 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
-  const testNodeConnection = async (host: string) => {
-    setNodeStatuses((prev) => ({
-      ...prev,
-      [host]: { ...prev[host], testing: true, error: undefined },
-    }));
-
-    const start = performance.now();
+  // Nodes are probed by the backend: Ollama refuses browser requests from
+  // other origins, and the answer comes back under the host name as typed.
+  const probeHosts = async (hosts: string[]) => {
+    const list = Array.from(new Set(hosts.map((h) => h.trim().replace(/\/$/, '')).filter(Boolean)));
+    if (list.length === 0) return;
+    setNodeStatuses((prev) => {
+      const next = { ...prev };
+      list.forEach((h) => { next[h] = { ...prev[h], testing: true, error: undefined }; });
+      return next;
+    });
     try {
-      const cleanHost = host.replace(/\/$/, '');
-      const res = await fetch(`${cleanHost}/api/tags`, {
-        method: 'GET',
-        signal: AbortSignal.timeout(4000),
+      const res = await fetch(`/api/settings/cluster-status?hosts=${encodeURIComponent(list.join(','))}`);
+      const data = res.ok ? await res.json() : {};
+      const detail = res.ok ? undefined : (await res.json().catch(() => ({}))).detail || `HTTP ${res.status}`;
+      setNodeStatuses((prev) => {
+        const next = { ...prev };
+        list.forEach((h) => {
+          const s = data[h];
+          next[h] = s
+            ? { online: s.online, latency_ms: s.latency_ms ?? undefined, models: s.models || [], testing: false, error: s.online ? undefined : 'Offline' }
+            : { online: false, testing: false, error: detail || 'Offline' };
+        });
+        return next;
       });
-
-      const latency = Math.round(performance.now() - start);
-
-      if (res.ok) {
-        const data = await res.json();
-        const models = (data.models || []).map((m: any) => m.name || m.model);
-        setNodeStatuses((prev) => ({
-          ...prev,
-          [host]: {
-            online: true,
-            latency_ms: latency,
-            models,
-            testing: false,
-          },
-        }));
-      } else {
-        setNodeStatuses((prev) => ({
-          ...prev,
-          [host]: {
-            online: false,
-            error: `HTTP ${res.status}`,
-            testing: false,
-          },
-        }));
-      }
-    } catch (err: any) {
-      setNodeStatuses((prev) => ({
-        ...prev,
-        [host]: {
-          online: false,
-          error: err.name === 'TimeoutError' ? 'Timeout (4s)' : 'Offline',
-          testing: false,
-        },
-      }));
+    } catch {
+      setNodeStatuses((prev) => {
+        const next = { ...prev };
+        list.forEach((h) => { next[h] = { online: false, testing: false, error: 'Backend unreachable' }; });
+        return next;
+      });
     }
   };
+
+  const testNodeConnection = (host: string) => probeHosts([host]);
 
   const scanCluster = async () => {
     setIsScanningCluster(true);
     try {
-      const res = await fetch('/api/settings/cluster-status');
-      if (res.ok) {
-        const data = await res.json();
-        setNodeStatuses(data);
-      } else {
-        await Promise.all(clusterNodes.map((node) => testNodeConnection(node)));
-      }
-    } catch {
-      await Promise.all(clusterNodes.map((node) => testNodeConnection(node)));
+      await probeHosts([formData.ollamaHost, ...clusterNodes]);
     } finally {
       setIsScanningCluster(false);
     }
@@ -555,9 +532,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         value={formData.fontFamily}
                         onChange={(e) => setFormData({ ...formData, fontFamily: e.target.value as any })}
                       >
-                        <option value="sans">Modern Sans (Inter / SF Pro)</option>
-                        <option value="serif">Academic Serif (Merriweather / Georgia)</option>
-                        <option value="mono">Engineering Monospace (JetBrains Mono)</option>
+                        <option value="sans">Sans (Inter / SF Pro)</option>
+                        <option value="serif">Serif (Merriweather)</option>
+                        <option value="mono">Monospace (JetBrains Mono)</option>
                       </select>
                     </div>
 
@@ -567,9 +544,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         value={formData.fontSize || 'standard'}
                         onChange={(e) => setFormData({ ...formData, fontSize: e.target.value as any })}
                       >
-                        <option value="compact">Compact (13px) — High Density</option>
-                        <option value="standard">Standard (15px) — Balanced</option>
-                        <option value="large">Large (17px) — Relaxed</option>
+                        <option value="compact">Compact (13px)</option>
+                        <option value="standard">Standard (15px)</option>
+                        <option value="large">Large (17px)</option>
                       </select>
                     </div>
 
@@ -640,7 +617,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => setProviderMode('local')}
                   >
                     <Server size={15} />
-                    <span>Local AI Engine (Ollama / Local Cluster)</span>
+                    <span>Local (Ollama)</span>
                   </button>
                   <button
                     type="button"
@@ -648,7 +625,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => setProviderMode('cloud')}
                   >
                     <Cpu size={15} />
-                    <span>Cloud Providers (Anthropic Claude / Google Gemini)</span>
+                    <span>Cloud (Claude, Gemini)</span>
                   </button>
                 </div>
 
@@ -697,7 +674,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     {/* Standard Dropdowns for Models (No confusing quick chips!) */}
                     <div className="settings-panel-box">
                       <h4 className="panel-box-heading">Active Model Assignment</h4>
-                      <div className="settings-row-2col">
+                      <div className="settings-row-3col">
                         <div className="form-group compact">
                           <label>Primary Generation Model</label>
                           <select
@@ -716,22 +693,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
                             className="font-mono"
                           >
-                            <option value="">Same as primary ({formData.primaryModel})</option>
+                            <option value="">Same as primary</option>
                             {modelOptions(formData.mentorModel, false)}
+                          </select>
+                        </div>
+                        <div className="form-group compact">
+                          <label>Reviewer / Evaluator Model</label>
+                          <select
+                            value={formData.reviewerModel}
+                            onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
+                            className="font-mono"
+                          >
+                            {modelOptions(formData.reviewerModel)}
                           </select>
                         </div>
                       </div>
 
-                      <div className="form-group compact" style={{ marginTop: '10px' }}>
-                        <label>Reviewer / Evaluator Model</label>
-                        <select
-                          value={formData.reviewerModel}
-                          onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
-                          className="font-mono"
-                        >
-                          {modelOptions(formData.reviewerModel)}
-                        </select>
-                      </div>
                     </div>
 
                     {/* Distributed Cluster Nodes (Clean Horizontal Row Layout) */}
@@ -1061,7 +1038,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 {/* CLI Custom Domain Guide */}
-                <div className="settings-panel-box" style={{ marginTop: '16px' }}>
+                <div className="settings-panel-box">
                   <div className="panel-header-with-icon">
                     <Terminal size={14} />
                     <h4 className="panel-box-heading" style={{ margin: 0 }}>Custom Domain CLI Workflow</h4>
@@ -1075,7 +1052,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 {/* Practical Workspace Maintenance */}
-                <div className="settings-panel-box" style={{ marginTop: '16px' }}>
+                <div className="settings-panel-box">
                   <div className="panel-header-with-icon">
                     <HardDrive size={14} />
                     <h4 className="panel-box-heading" style={{ margin: 0 }}>Workspace Maintenance & Setup</h4>

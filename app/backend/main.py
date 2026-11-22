@@ -435,24 +435,36 @@ def api_check_mentor_connectivity(req: CheckConnectivityRequest):
     return {"connected": False, "error": "Unable to connect to Ollama/LocalAI cluster."}
 
 @app.get("/api/settings/cluster-status")
-def api_cluster_status():
+def api_cluster_status(hosts: Optional[str] = Query(None, max_length=4000)):
+    """Probes Ollama nodes from the backend (browsers are blocked by Ollama's CORS rules).
+
+    With `hosts` (comma-separated), probes exactly those and answers under the
+    same names the caller used; otherwise the configured cluster.
+    """
     import time
+    from concurrent.futures import ThreadPoolExecutor
     from learning_engine.models import get_node_pin
-    hosts = get_configured_hosts()
-    results = {}
-    for h in hosts:
+    if hosts:
+        targets = list(dict.fromkeys(h.strip().rstrip("/") for h in hosts.split(",") if h.strip()))[:16]
+        bad = [h for h in targets if not re.match(r"^https?://[^\s/]+$", h)]
+        if bad:
+            raise HTTPException(status_code=400, detail=f"Not an http(s) host: {bad[0]}")
+    else:
+        targets = get_configured_hosts()
+
+    def probe(h: str):
         start = time.time()
-        up = OllamaProvider.is_available(h)
+        up = OllamaProvider.is_available(h, timeout=4.0)
         elapsed_ms = int((time.time() - start) * 1000)
-        models = OllamaProvider.list_models(h) if up else []
-        pin = get_node_pin(h)
-        results[h] = {
+        return h, {
             "online": up,
             "latency_ms": elapsed_ms if up else None,
-            "models": models,
-            "pinned_model": pin
+            "models": OllamaProvider.list_models(h) if up else [],
+            "pinned_model": get_node_pin(h),
         }
-    return results
+
+    with ThreadPoolExecutor(max_workers=max(1, min(8, len(targets)))) as pool:
+        return dict(pool.map(probe, targets))
 
 @app.get("/api/settings/cluster-pins")
 def api_get_cluster_pins():

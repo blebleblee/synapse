@@ -4477,22 +4477,19 @@ body, html, #root {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-top: 6px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+.settings-panel-box:first-child {
+  border-top: none;
+  padding-top: 4px;
 }
 
 .panel-box-heading {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
   margin: 0 0 2px 0;
-  padding-bottom: 5px;
-  border-bottom: 1px solid var(--border-color);
 }
 
 .settings-models-grid {
@@ -4551,7 +4548,7 @@ body, html, #root {
 
 .settings-row-3col {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
   min-width: 0;
   max-width: 100%;
@@ -4645,7 +4642,7 @@ body, html, #root {
 
 .settings-row-2col {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
   min-width: 0;
   max-width: 100%;
@@ -4688,12 +4685,11 @@ body, html, #root {
   gap: 10px;
 }
 
+/* Settings: one flat level. Groups are separated by a line, not boxed. */
 .settings-section {
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 16px;
-  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
 }
 
 .section-title {
@@ -5715,10 +5711,6 @@ body, html, #root {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 6px;
-  background-color: var(--bg-tertiary);
 }
 
 /* Cluster Nodes Horizontal Row Layout */
@@ -6203,3 +6195,83 @@ body, html, #root {
 .translation-queue-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .translation-queue-title { font-size: 12px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .translation-queue-meta { font-size: 11px; color: var(--text-muted); }
+
+/* Reader toolbars fit the centre column, which is much narrower than the
+   window once the sidebar and mentor are open: titles shorten with an
+   ellipsis and action labels collapse to icons (each button keeps a title). */
+.lesson-viewer {
+  container: reader / inline-size;
+}
+.viewer-header {
+  gap: 12px;
+}
+.breadcrumbs {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.breadcrumbs > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.breadcrumbs > .crumb-sep {
+  flex-shrink: 0;
+}
+.breadcrumbs > .crumb-domain,
+.breadcrumbs > .crumb-discipline,
+.breadcrumbs > .crumb-category {
+  flex-shrink: 4; /* the course title keeps its room longest */
+}
+.viewer-header-right,
+.tabs-group,
+.tabs-actions-group {
+  flex-shrink: 0;
+}
+.tabs-bar {
+  gap: 8px;
+}
+.selector-dropdown-box {
+  flex: 1 1 160px;
+  min-width: 120px;
+}
+.study-lesson-dropdown {
+  min-width: 0;
+  width: 100%;
+}
+.selector-pills-box {
+  min-width: 0; /* scrolls sideways when the lessons don't fit */
+}
+@container reader (max-width: 820px) {
+  .header-curriculum-badge,
+  .nav-action-btn .btn-label {
+    display: none;
+  }
+}
+@container reader (max-width: 600px) {
+  .selector-label {
+    display: none;
+  }
+}
+@container reader (max-width: 520px) {
+  .tab-btn .btn-label,
+  .nav-action-divider {
+    display: none;
+  }
+}
+@container reader (max-width: 420px) {
+  /* Last resort: the actions move to a second line rather than off-screen. */
+  .tabs-bar {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 42px;
+    padding: 6px 12px;
+    row-gap: 6px;
+  }
+  .tabs-actions-group {
+    flex-shrink: 1;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 6px;
+  }
+}
