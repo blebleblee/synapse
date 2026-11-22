@@ -2106,8 +2106,10 @@ async def terminal_websocket(websocket: WebSocket):
         env["PAGER"] = "cat"
         os.execvpe(exec_cmd[0], exec_cmd, env)
 
-    # Parent process
+    # Parent process. Forget the fd after closing it: the number is soon reused
+    # by another socket, and closing it again on disconnect would kill that one.
     os.close(slave)
+    slave = -1
 
     # Set non-blocking on master
     flags = fcntl.fcntl(master, fcntl.F_GETFL)

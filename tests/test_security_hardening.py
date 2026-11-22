@@ -428,3 +428,45 @@ def test_shutdown_has_no_test_client_bypass(monkeypatch):
     res = TestClient(app).post("/api/system/shutdown")  # client host 'testclient'
     assert res.status_code == 403
     assert calls == []
+
+
+# --- Terminal PTY file descriptors ------------------------------------------------
+
+def test_terminal_closes_each_pty_fd_exactly_once(monkeypatch):
+    """The parent closed the PTY slave after fork and again on disconnect. By
+    then the fd number is usually reused by another socket, so the second
+    close killed an unrelated connection ("Invalid frame header" in the
+    browser, "Bad file descriptor" in the server log)."""
+    import os
+    import app.backend.main as backend
+
+    master_r, master_w = os.pipe()
+    slave_r, slave_w = os.pipe()
+    monkeypatch.setattr(backend.pty, "openpty", lambda: (master_r, slave_w))
+    monkeypatch.setattr(backend.fcntl, "ioctl", lambda *a, **k: None)
+    monkeypatch.setattr(backend.os, "fork", lambda: 424242)  # parent side only, no real child
+    monkeypatch.setattr(backend.os, "kill", lambda *a: None)
+    monkeypatch.setattr(backend.os, "waitpid", lambda *a: (0, 0))
+
+    real_close = os.close
+    closes = []
+
+    def recording_close(fd):
+        if fd in (master_r, slave_w):
+            closes.append(fd)
+        real_close(fd)
+
+    monkeypatch.setattr(backend.os, "close", recording_close)
+    try:
+        client = TestClient(app)
+        with client.websocket_connect("/ws/terminal?env=host"):
+            pass
+    finally:
+        monkeypatch.setattr(backend.os, "close", real_close)
+        for fd in (master_w, slave_r):
+            try:
+                real_close(fd)
+            except OSError:
+                pass
+
+    assert sorted(closes) == sorted([master_r, slave_w]), f"close calls: {closes}"
