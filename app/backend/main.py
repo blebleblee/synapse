@@ -253,6 +253,14 @@ async def auth_middleware(request: Request, call_next):
                                "Set SYNAPSE_PASSWORD to allow remote access, or add the host to SYNAPSE_ALLOWED_HOSTS."},
         )
 
+    # Browsers send state-changing "simple" requests cross-site without a CORS
+    # preflight (e.g. a no-cors POST from any website). Reject foreign origins.
+    if request.method not in ("GET", "HEAD", "OPTIONS") and not is_allowed_origin(
+        request.headers.get("origin"), request.headers.get("host")
+    ):
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=403, content={"detail": "Cross-origin request rejected"})
+
     if auth_enabled and path.startswith("/api/"):
         # Public endpoints that don't require authorization
         if path in ["/api/auth/status", "/api/auth/login", "/api/health"]:
@@ -1255,6 +1263,14 @@ def api_clean(req: Dict[str, bool] = {}):
     count = perform_cleanup(clean_sessions=sessions, clean_exports=exports, clean_mastery=mastery)
     return {"success": True, "cleaned": count}
 
+def _schedule_shutdown():
+    """Sends SIGTERM to this process shortly after the response is sent."""
+    def _do_shutdown():
+        time.sleep(0.5)
+        os.kill(os.getpid(), signal.SIGTERM)
+
+    threading.Thread(target=_do_shutdown, daemon=True).start()
+
 @app.post("/api/system/shutdown")
 def api_system_shutdown(request: Request):
     """
@@ -1262,16 +1278,10 @@ def api_system_shutdown(request: Request):
     Restricted strictly to localhost clients.
     """
     client_ip = getattr(request.client, "host", "") if request.client else ""
-    if client_ip not in ("127.0.0.1", "::1", "localhost", "testclient"):
+    if client_ip not in ("127.0.0.1", "::1", "::ffff:127.0.0.1"):
         raise HTTPException(status_code=403, detail="Shutdown endpoint restricted to localhost")
 
-    if client_ip != "testclient":
-        def _do_shutdown():
-            time.sleep(0.5)
-            os.kill(os.getpid(), signal.SIGTERM)
-
-        threading.Thread(target=_do_shutdown, daemon=True).start()
-
+    _schedule_shutdown()
     return {"message": "Server shutdown initiated", "status": "shutting_down"}
 
 LANGUAGE_MANDATES = {

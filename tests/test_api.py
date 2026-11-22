@@ -552,21 +552,23 @@ def test_find_sandbox_tool_searches_rancher_desktop_bin(tmp_path, monkeypatch):
 
 def test_api_system_shutdown_localhost_only(monkeypatch):
     """Verifies that /api/system/shutdown is accepted from localhost and rejected for remote hosts."""
-    import os
-    killed_pids = []
-    monkeypatch.setattr(os, "kill", lambda pid, sig: killed_pids.append((pid, sig)))
+    import app.backend.main as backend
+    scheduled = []
+    monkeypatch.setattr(backend, "_schedule_shutdown", lambda: scheduled.append(1))
 
-    # Localhost client (TestClient default client.host is 'testclient')
-    res = client.post("/api/system/shutdown")
+    local_client = TestClient(app, client=("127.0.0.1", 50000))
+    res = local_client.post("/api/system/shutdown")
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "shutting_down"
+    assert scheduled == [1]
 
     # Non-localhost remote client (e.g. from LAN)
     remote_client = TestClient(app, client=("192.168.1.100", 50000))
     res_remote = remote_client.post("/api/system/shutdown")
     assert res_remote.status_code == 403
     assert "restricted to localhost" in res_remote.json()["detail"]
+    assert scheduled == [1]
 
 
 def test_api_flashcards_queue_and_review():

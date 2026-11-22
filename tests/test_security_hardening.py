@@ -384,3 +384,47 @@ def test_check_staged_content_detects_secrets():
     assert len(hits) == 1
     assert hits[0][1] == "Anthropic API Key"
 
+
+
+# --- Cross-site requests to state-changing HTTP endpoints ---------------------
+
+def test_cross_site_post_is_rejected(monkeypatch):
+    """A website must not trigger state changes through the browser (CSRF):
+    a no-cors POST carries a foreign Origin but a valid localhost Host header."""
+    import app.backend.main as backend
+    calls = []
+    monkeypatch.setattr(backend, "_schedule_shutdown", lambda: calls.append(1))
+    local = TestClient(app, client=("127.0.0.1", 50000))
+    res = local.post("/api/system/shutdown", headers={"Origin": "https://evil.example"})
+    assert res.status_code == 403
+    assert calls == []
+    res = local.post("/api/system/shutdown", headers={"Origin": "null"})
+    assert res.status_code == 403
+    assert calls == []
+
+
+def test_same_origin_and_dev_frontend_posts_allowed(monkeypatch):
+    import app.backend.main as backend
+    calls = []
+    monkeypatch.setattr(backend, "_schedule_shutdown", lambda: calls.append(1))
+    local = TestClient(app, client=("127.0.0.1", 50000), base_url="http://127.0.0.1:8000")
+    assert local.post("/api/system/shutdown", headers={"Origin": "http://127.0.0.1:8000"}).status_code == 200
+    assert local.post("/api/system/shutdown", headers={"Origin": "http://localhost:5173"}).status_code == 200
+    assert local.post("/api/system/shutdown").status_code == 200  # non-browser client, no Origin
+    assert len(calls) == 3
+
+
+def test_cross_site_get_still_allowed():
+    """Safe methods are not blocked (CORS already keeps responses unreadable)."""
+    local = TestClient(app, client=("127.0.0.1", 50000))
+    assert local.get("/api/health", headers={"Origin": "https://evil.example"}).status_code == 200
+
+
+def test_shutdown_has_no_test_client_bypass(monkeypatch):
+    """The localhost check must not trust Starlette's 'testclient' pseudo-host."""
+    import app.backend.main as backend
+    calls = []
+    monkeypatch.setattr(backend, "_schedule_shutdown", lambda: calls.append(1))
+    res = TestClient(app).post("/api/system/shutdown")  # client host 'testclient'
+    assert res.status_code == 403
+    assert calls == []
