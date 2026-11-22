@@ -1032,15 +1032,18 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                       type="button"
                       className="btn-secondary-sm"
                       onClick={async () => {
-                        if (confirm('Clear transient cache (audio TTS and translation buffers)?')) {
+                        if (confirm('Clear cached narration audio and translations? Chat history is kept.')) {
                           try {
-                            const res = await fetch('/api/clean', { method: 'POST' });
-                            if (res.ok) {
-                              const data = await res.json();
-                              alert(`Cleared ${data.cleaned || 0} transient artifacts.`);
-                            }
-                          } catch {
-                            alert('Cache cleanup completed.');
+                            const res = await fetch('/api/clean', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ sessions: false, exports: false, caches: true })
+                            });
+                            if (!res.ok) throw new Error(`Server returned ${res.status}`);
+                            const data = await res.json();
+                            alert(`Removed ${data.cleaned || 0} cached files.`);
+                          } catch (err) {
+                            alert(`Clearing the cache failed: ${err instanceof Error ? err.message : err}`);
                           }
                         }
                       }}
@@ -1059,11 +1062,13 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ sessions: false, exports: false, db: true })
                           });
-                          if (res.ok) {
-                            alert('SQLite database vacuumed and WAL checkpointed.');
+                          if (!res.ok) {
+                            const data = await res.json().catch(() => ({}));
+                            throw new Error(data.detail || `Server returned ${res.status}`);
                           }
-                        } catch {
-                          alert('Vacuum completed.');
+                          alert('SQLite database vacuumed and WAL checkpointed.');
+                        } catch (err) {
+                          alert(`Vacuum failed: ${err instanceof Error ? err.message : err}`);
                         }
                       }}
                     >
@@ -1078,10 +1083,14 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                       onClick={async () => {
                         if (!confirm('Shut down Synapse Workbench server?')) return;
                         try {
-                          await fetch('/api/system/shutdown', { method: 'POST' });
+                          const res = await fetch('/api/system/shutdown', { method: 'POST' });
+                          if (!res.ok) {
+                            const data = await res.json().catch(() => ({}));
+                            throw new Error(data.detail || `Server returned ${res.status}`);
+                          }
                           alert('Synapse Workbench server is shutting down. You may close this browser tab.');
-                        } catch {
-                          alert('Shutdown request sent.');
+                        } catch (err) {
+                          alert(`Shutdown failed: ${err instanceof Error ? err.message : err}`);
                         }
                       }}
                       title="Gracefully stop the local Synapse server process"

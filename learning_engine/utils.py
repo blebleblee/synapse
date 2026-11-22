@@ -3,10 +3,12 @@ from pathlib import Path
 from typing import Dict, Any, List
 from .security import get_workspace_root, get_topics_dir
 
-def perform_cleanup(clean_sessions: bool = True, clean_exports: bool = True, clean_mastery: bool = False) -> int:
+def perform_cleanup(clean_sessions: bool = True, clean_exports: bool = True, clean_mastery: bool = False,
+                    clean_caches: bool = False) -> int:
     """
     Cleans transient runtime artifacts (chat sessions, export bundles, temp logs)
     and optionally resets lesson completion records without touching authored curriculum files.
+    `clean_caches` empties the translation and narration audio caches.
     """
     WORKSPACE_ROOT = get_workspace_root()
     topics_dir = get_topics_dir()
@@ -26,6 +28,14 @@ def perform_cleanup(clean_sessions: bool = True, clean_exports: bool = True, cle
                 p.unlink()
                 cleaned_count += 1
 
+    if clean_caches:
+        for cache_dir in (WORKSPACE_ROOT / ".cache" / "translations", WORKSPACE_ROOT / "data" / "audio_cache"):
+            if cache_dir.is_dir():
+                for p in cache_dir.rglob("*"):
+                    if p.is_file():
+                        p.unlink()
+                        cleaned_count += 1
+
     if clean_mastery:
         try:
             from .database import get_connection
@@ -38,6 +48,18 @@ def perform_cleanup(clean_sessions: bool = True, clean_exports: bool = True, cle
             pass
 
     return cleaned_count
+
+
+def vacuum_database() -> None:
+    """Checkpoints the WAL into the main file and rebuilds it to reclaim space."""
+    from .database import get_connection
+    conn = get_connection()
+    try:
+        # In WAL mode VACUUM writes into the WAL, so checkpoint afterwards.
+        conn.execute("VACUUM")
+        conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    finally:
+        conn.close()
 
 def get_unit_lessons(unit_dir: Path) -> List[Dict[str, str]]:
     if not unit_dir.exists():

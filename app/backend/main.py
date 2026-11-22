@@ -6,6 +6,7 @@ Provides REST APIs for topics/curricula, AI persona chat, and a WebSocket PTY te
 import sys
 import os
 import select
+import sqlite3
 import struct
 import signal
 import asyncio
@@ -99,7 +100,7 @@ from learning_engine.topic_manager import (
     get_unit_lessons,
     invalidate_topic_tree_cache
 )
-from learning_engine.utils import perform_cleanup
+from learning_engine.utils import perform_cleanup, vacuum_database
 from learning_engine.generator import generate_subtopic_content
 from learning_engine.models import (
     get_provider,
@@ -1269,8 +1270,17 @@ def api_clean(req: Dict[str, bool] = {}):
     sessions = req.get("sessions", True)
     exports = req.get("exports", True)
     mastery = req.get("mastery", False)
-    count = perform_cleanup(clean_sessions=sessions, clean_exports=exports, clean_mastery=mastery)
-    return {"success": True, "cleaned": count}
+    caches = req.get("caches", False)
+    count = perform_cleanup(clean_sessions=sessions, clean_exports=exports, clean_mastery=mastery,
+                            clean_caches=caches)
+    vacuumed = False
+    if req.get("db", False):
+        try:
+            vacuum_database()
+            vacuumed = True
+        except sqlite3.Error as e:
+            raise HTTPException(status_code=500, detail=f"Database vacuum failed: {e}")
+    return {"success": True, "cleaned": count, "vacuumed": vacuumed}
 
 def _schedule_shutdown():
     """Sends SIGTERM to this process shortly after the response is sent."""
