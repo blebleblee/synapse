@@ -311,3 +311,39 @@ def test_mastery_toggle_off_directly_seeded_legacy_progress():
     assert rows[0]["path"] == canonical_path
     assert json.loads(rows[0]["completed_lessons"]) == ["lesson_01", "lesson_02"]
 
+
+def test_flashcard_spaced_repetition_review_workflow():
+    from learning_engine.mastery import (
+        record_flashcard_review,
+        get_flashcard_review_status,
+        get_due_flashcard_reviews,
+        set_subtopic_mastery,
+    )
+
+    test_path = "computing/data/postgresql"
+    set_subtopic_mastery(test_path, "studying")
+
+    # Record first review with interval of 3 days
+    res1 = record_flashcard_review(test_path, interval_days=3)
+    assert res1["path"] == test_path
+    assert res1["interval_days"] == 3
+    assert "next_review_at" in res1
+
+    status1 = get_flashcard_review_status(test_path)
+    assert status1 is not None
+    assert status1["review_count"] == 1
+    assert status1["interval_days"] == 3
+
+    # Record second review with interval of 7 days
+    res2 = record_flashcard_review(test_path, interval_days=7)
+    assert res2["interval_days"] == 7
+
+    status2 = get_flashcard_review_status(test_path)
+    assert status2["review_count"] == 2
+    assert status2["interval_days"] == 7
+
+    # Queue check returns a list of due items
+    queue = get_due_flashcard_reviews()
+    assert isinstance(queue, list)
+
+

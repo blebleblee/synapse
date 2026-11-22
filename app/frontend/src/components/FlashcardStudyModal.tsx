@@ -76,16 +76,24 @@ const FlashcardStudyPanel: React.FC<Omit<FlashcardStudyModalProps, 'isOpen'>> = 
     setIsFlipped((prev) => !prev);
   };
 
-  const handleRate = useCallback((_intervalDays: number) => {
+  const handleRate = useCallback((intervalDays: number) => {
     setIsFlipped(false);
     setReviewedCount((prev) => prev + 1);
+
+    if (topicPath) {
+      fetch('/api/flashcards/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: topicPath, interval_days: intervalDays }),
+      }).catch((err) => console.error('Failed to record flashcard review interval:', err));
+    }
 
     if (currentIndex + 1 < cards.length) {
       setCurrentIndex((prev) => prev + 1);
     } else {
       setIsCompleted(true);
     }
-  }, [currentIndex, cards.length]);
+  }, [currentIndex, cards.length, topicPath]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

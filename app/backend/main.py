@@ -789,6 +789,21 @@ def get_flashcards_deck(query: str):
 
     return {"topic": sub.replace("_", " ").title(), "cards": cards}
 
+class FlashcardReviewRequest(BaseModel):
+    path: str = Field(..., max_length=500)
+    interval_days: int = Field(default=1, ge=1, le=365)
+
+@app.get("/api/flashcards/queue")
+def api_flashcards_queue():
+    from learning_engine.mastery import get_due_flashcard_reviews
+    return {"queue": get_due_flashcard_reviews()}
+
+@app.post("/api/flashcards/review")
+def api_record_flashcard_review(req: FlashcardReviewRequest):
+    from learning_engine.mastery import record_flashcard_review
+    res = record_flashcard_review(req.path, interval_days=req.interval_days)
+    return res
+
 import hashlib
 
 class TranslateRequest(BaseModel):

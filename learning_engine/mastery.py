@@ -199,3 +199,106 @@ def get_mastery_summary() -> Dict[str, Any]:
         "mastered_count": mastered_count,
         "percentage": percentage
     }
+
+
+def record_flashcard_review(path_or_str: str, interval_days: int = 1, ease_factor: float = 2.5) -> Dict[str, Any]:
+    """
+    Records a completed active-recall review session for a topic, updating the
+    spaced-repetition interval and scheduling the next review timestamp.
+    """
+    import datetime
+    canon_path = normalize_topic_path(path_or_str)
+    interval_days = max(1, min(365, int(interval_days)))
+
+    now = datetime.datetime.now(datetime.timezone.utc)
+    next_review = now + datetime.timedelta(days=interval_days)
+
+    now_iso = now.strftime("%Y-%m-%d %H:%M:%S")
+    next_iso = next_review.strftime("%Y-%m-%d %H:%M:%S")
+
+    conn = get_connection()
+    conn.execute("""
+        INSERT INTO flashcard_reviews (topic_path, review_count, interval_days, ease_factor, last_reviewed_at, next_review_at)
+        VALUES (?, 1, ?, ?, ?, ?)
+        ON CONFLICT(topic_path) DO UPDATE SET
+            review_count = review_count + 1,
+            interval_days = ?,
+            ease_factor = ?,
+            last_reviewed_at = ?,
+            next_review_at = ?
+    """, (canon_path, interval_days, ease_factor, now_iso, next_iso, interval_days, ease_factor, now_iso, next_iso))
+    conn.commit()
+    conn.close()
+
+    return {
+        "path": canon_path,
+        "interval_days": interval_days,
+        "last_reviewed_at": now_iso,
+        "next_review_at": next_iso
+    }
+
+
+def get_flashcard_review_status(path_or_str: str) -> Optional[Dict[str, Any]]:
+    """
+    Fetches the current spaced-repetition status for a specific topic.
+    """
+    canon_path = normalize_topic_path(path_or_str)
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT topic_path, review_count, interval_days, ease_factor, last_reviewed_at, next_review_at FROM flashcard_reviews WHERE topic_path = ?",
+        (canon_path,)
+    ).fetchone()
+    conn.close()
+
+    if not row:
+        return None
+
+    return {
+        "path": row["topic_path"],
+        "review_count": row["review_count"],
+        "interval_days": row["interval_days"],
+        "ease_factor": row["ease_factor"],
+        "last_reviewed_at": row["last_reviewed_at"],
+        "next_review_at": row["next_review_at"],
+    }
+
+
+def get_due_flashcard_reviews() -> List[Dict[str, Any]]:
+    """
+    Returns topics tracked in mastery ('studying', 'lab_verified', 'mastered')
+    that are due for spaced-repetition review.
+    """
+    conn = get_connection()
+    query = """
+        SELECT m.path, m.state, r.review_count, r.interval_days, r.last_reviewed_at, r.next_review_at
+        FROM mastery m
+        LEFT JOIN flashcard_reviews r ON m.path = r.topic_path
+        WHERE m.state IN ('studying', 'lab_verified', 'mastered')
+          AND (r.next_review_at IS NULL OR r.next_review_at <= datetime('now'))
+        ORDER BY r.next_review_at ASC, m.updated_at DESC
+    """
+    rows = conn.execute(query).fetchall()
+    conn.close()
+
+    results = []
+    seen = set()
+    for row in rows:
+        canon_path = normalize_topic_path(row["path"])
+        if canon_path in seen:
+            continue
+        seen.add(canon_path)
+        parts = canon_path.split("/")
+        title = parts[-1].replace("_", " ").title() if parts else canon_path
+        results.append({
+            "path": canon_path,
+            "title": title,
+            "domain": parts[0] if parts else "",
+            "state": row["state"],
+            "review_count": row["review_count"] or 0,
+            "interval_days": row["interval_days"] or 1,
+            "last_reviewed_at": row["last_reviewed_at"],
+            "next_review_at": row["next_review_at"],
+            "is_due": True,
+        })
+
+    return results

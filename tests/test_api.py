@@ -567,3 +567,17 @@ def test_api_system_shutdown_localhost_only(monkeypatch):
     res_remote = remote_client.post("/api/system/shutdown")
     assert res_remote.status_code == 403
     assert "restricted to localhost" in res_remote.json()["detail"]
+
+
+def test_api_flashcards_queue_and_review():
+    """Verifies that GET /api/flashcards/queue and POST /api/flashcards/review respond correctly."""
+    res_queue = client.get("/api/flashcards/queue")
+    assert res_queue.status_code == 200
+    assert "queue" in res_queue.json()
+    assert isinstance(res_queue.json()["queue"], list)
+
+    res_review = client.post("/api/flashcards/review", json={"path": "computing/systems/bash", "interval_days": 3})
+    assert res_review.status_code == 200
+    data = res_review.json()
+    assert data["path"] == "computing/systems/bash"
+    assert data["interval_days"] == 3

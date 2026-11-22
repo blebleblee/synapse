@@ -87,5 +87,15 @@ def init_db():
                 value TEXT NOT NULL
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS flashcard_reviews (
+                topic_path TEXT PRIMARY KEY,
+                review_count INTEGER DEFAULT 0,
+                interval_days INTEGER DEFAULT 1,
+                ease_factor REAL DEFAULT 2.5,
+                last_reviewed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                next_review_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
 
 init_db()
