@@ -33,6 +33,16 @@ export function sanitizeAndRepairMermaid(diagramText: string): string {
     return match;
   });
 
+  // Sequence diagrams end a statement at ";", so "A->>B: BEGIN; UPDATE" broke
+  // the diagram. Keep semicolons in message and note text as the #59; entity.
+  if (/^sequenceDiagram\b/.test(cleaned)) {
+    cleaned = cleaned.replace(/^(\s*(?:Note\s+[^:\n]+|[^:\n]*(?:->>|->|-x|-\))[^:\n]*)):([^\n]*)$/gm,
+      (_, head: string, text: string) => `${head}:${text.replace(/;(?=.*\S)/g, '#59;')}`);
+  }
+
+  // A quoted edge label must touch its pipes: -->| "label" | -> -->|"label"|
+  cleaned = cleaned.replace(/\|[ \t]*("[^"|\n]*")[ \t]*\|/g, '|$1|');
+
   // Strip trailing semicolons after graph header or statements: graph TD; -> graph TD
   cleaned = cleaned.replace(/^(\s*(?:graph|flowchart)\s+[A-Za-z]+)\s*;/gim, '$1');
   cleaned = cleaned.replace(/;\s*$/gm, '');
