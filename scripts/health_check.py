@@ -30,7 +30,7 @@ def check_python_environment() -> dict:
     valid_version = version >= (3, 10)
     
     missing_deps = []
-    required_modules = ["fastapi", "uvicorn", "pydantic", "jinja2", "sqlite3"]
+    required_modules = ["fastapi", "uvicorn", "pydantic", "sqlite3"]
     for mod in required_modules:
         try:
             __import__(mod)
