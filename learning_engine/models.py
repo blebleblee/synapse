@@ -11,7 +11,7 @@ import urllib.request
 import urllib.error
 import itertools
 from pathlib import Path
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Callable, Optional, Dict, Any, List, Tuple
 from .config_manager import get_settings
 from .security import get_workspace_root
 
@@ -292,6 +292,10 @@ class LLMProvider:
     def generate(self, prompt: str, system_instruction: str = "") -> str:
         raise NotImplementedError
 
+class GenerationStopped(Exception):
+    """Raised by generate_cancellable() when the caller asked it to stop."""
+
+
 class OllamaProvider(LLMProvider):
     def __init__(self, host: str = "http://localhost:11434", model: str = "qwen2.5-coder:32b"):
         self.host = host.rstrip("/")
@@ -438,6 +442,43 @@ class OllamaProvider(LLMProvider):
                 raise RuntimeError(f"Unexpected response structure from {self.host}: {res_json}")
         except urllib.error.URLError as e:
             raise RuntimeError(f"Ollama/LocalAI request to {self.host} failed: {e}")
+
+    def generate_cancellable(self, prompt: str, should_stop: Callable[[], bool], system_instruction: str = "") -> str:
+        """Like generate(), but stops within a token or two once should_stop() is true.
+
+        Streams from the native Ollama API; leaving the read loop closes the
+        connection, and Ollama aborts the generation when its client goes away.
+        """
+        url = f"{self.host.rstrip('/')}/api/generate"
+        payload = {
+            "model": self.model,
+            "prompt": prompt,
+            "system": system_instruction,
+            "stream": True,
+            "options": {"temperature": 0.2},
+        }
+        req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"),
+                                     headers={"Content-Type": "application/json"})
+        parts: List[str] = []
+        try:
+            with urllib.request.urlopen(req, timeout=600) as resp:
+                for line in resp:
+                    if should_stop():
+                        raise GenerationStopped()
+                    if not line.strip():
+                        continue
+                    chunk = json.loads(line.decode("utf-8"))
+                    if chunk.get("error"):
+                        raise RuntimeError(f"Ollama: {chunk['error']}")
+                    parts.append(chunk.get("response", ""))
+                    if chunk.get("done"):
+                        break
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode("utf-8", errors="replace")[:300]
+            raise RuntimeError(f"Ollama request to {self.host} failed ({e.code}): {detail}")
+        except urllib.error.URLError as e:
+            raise RuntimeError(f"Ollama request to {self.host} failed: {e}")
+        return validate_generation_output("".join(parts))
 
     def generate_stream(self, prompt: str, system_instruction: str = "", max_tokens: int = 250):
         # Native Ollama API streaming

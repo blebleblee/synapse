@@ -14,6 +14,7 @@ import type { TerminalDrawerHandle } from './components/TerminalDrawer';
 import type { TopicTreeData, TopicDetails, ChatMessage, WorkspaceStatus, QuizQuestion } from './types';
 import { getStoredSelection, saveStoredSelection, clearStoredSelection } from './utils/selectionStorage';
 import { NoticeStack, type Notice, type NoticeKind } from './components/NoticeStack';
+import { TranslationQueueIndicator } from './components/TranslationQueueIndicator';
 import { failureMessage, networkFailure } from './utils/failureMessage';
 import './App.css';
 
@@ -31,8 +32,6 @@ export function App() {
   const userInteractedRef = useRef<boolean>(false);
   const chatRequestIdRef = useRef<number>(0);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [translatingLanguage, setTranslatingLanguage] = useState<string>('');
   const [isChatting, setIsChatting] = useState(false);
   const [isCompilingGuide, setIsCompilingGuide] = useState(false);
   const [isRegeneratingSummary, setIsRegeneratingSummary] = useState(false);
@@ -303,7 +302,6 @@ export function App() {
       activeCancelHandler.current = null;
     }
     setIsGenerating(false);
-    setIsTranslating(false);
     setIsChatting(false);
     setIsLoadingQuiz(false);
     setIsRegeneratingSummary(false);
@@ -892,13 +890,12 @@ export function App() {
 
   const globalAITask = useMemo(() => {
     if (isGenerating) return 'Synthesizing Masterclass Curriculum Units';
-    if (isTranslating) return `Translating Content to ${translatingLanguage || 'Target Language'}`;
     if (isChatting) return 'Socratic Mentor Generating Response';
     if (isLoadingQuiz) return 'Generating Socratic Scenario Quiz';
     if (isRegeneratingSummary) return 'Regenerating Executive Architecture Summary';
     if (isCompilingGuide) return 'Compiling Unified Masterclass Guide';
     return null;
-  }, [isGenerating, isTranslating, translatingLanguage, isChatting, isLoadingQuiz, isRegeneratingSummary, isCompilingGuide]);
+  }, [isGenerating, isChatting, isLoadingQuiz, isRegeneratingSummary, isCompilingGuide]);
 
   return (
     <div className="workbench-layout">
@@ -957,11 +954,6 @@ export function App() {
           onNavigateBreadcrumb={handleNavigateBreadcrumb}
           onSelectLesson={handleSelectLesson}
           onToggleLessonCompletion={handleToggleLessonCompletion}
-          onTranslationStatusChange={(busy, lang, cancelFn) => {
-            setIsTranslating(busy);
-            if (lang) setTranslatingLanguage(lang);
-            activeCancelHandler.current = cancelFn || null;
-          }}
         />
 
         <div className="workbench-bottom-bar">
@@ -989,6 +981,7 @@ export function App() {
           </div>
 
           <div className="bottom-bar-right">
+            <TranslationQueueIndicator />
             <span
               className={`mentor-status-pill ${mentorConnected}`}
               title={`Socratic Mentor: ${mentorConnected === 'connected' ? 'Online' : mentorConnected === 'checking' ? 'Connecting' : 'Offline'}`}

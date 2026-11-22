@@ -29,6 +29,8 @@ import { synthesizeTerminalCommand } from '../utils/commandSynthesizer';
 import { SocraticQuizView } from './SocraticQuizView';
 import { speakText, stopSpeaking } from '../utils/speech';
 import { getUIStrings } from '../utils/i18n';
+import { failureMessage, networkFailure } from '../utils/failureMessage';
+import type { TranslationJobInfo } from '../types';
 
 function toTitleCase(str: string): string {
   if (!str) return '';
@@ -66,7 +68,6 @@ interface LessonViewerProps {
   ollamaHost?: string;
   onNavigateBreadcrumb?: (type: 'domain' | 'category' | 'subtopic', path: string) => void;
   onSelectLesson?: (lessonId: string) => void;
-  onTranslationStatusChange?: (isTranslating: boolean, langName?: string, cancelFn?: () => void) => void;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -96,7 +97,6 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onNavigateBreadcrumb,
   onSelectLesson,
   onToggleLessonCompletion,
-  onTranslationStatusChange,
 }) => {
   const [isSpeakingVoice, setIsSpeakingVoice] = useState(false);
   const [readingLang, setReadingLang] = useState<'en' | 'cs' | 'de' | 'es'>('en');
@@ -104,9 +104,10 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   const [translatedMarkdown, setTranslatedMarkdown] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationError, setTranslationError] = useState<string | null>(null);
-  const [translationProgress, setTranslationProgress] = useState<{ done: number; total: number } | null>(null);
+  // The lesson's job in the server's translation queue (runs in the background).
+  const [translationJob, setTranslationJob] = useState<TranslationJobInfo | null>(null);
   const [translationNotice, setTranslationNotice] = useState<string | null>(null);
-  const translationAbortRef = useRef<AbortController | null>(null);
+  const translationRequestRef = useRef(0);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [optionsMenuOpen, setOptionsMenuOpen] = useState(false);
 
@@ -169,18 +170,60 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     stopSpeaking();
     setIsSpeakingVoice(false);
     setReadingLang('en');
-    // Leaving the lesson cancels its translation, so the local model stops working on it.
-    translationAbortRef.current?.abort();
-    translationAbortRef.current = null;
+    // Leaving the lesson only stops watching its translation: the job keeps
+    // running in the queue (see the status bar) and lands in the cache.
+    translationRequestRef.current += 1;
     setTranslatedMarkdown(null);
     setIsTranslating(false);
-    setTranslationProgress(null);
+    setTranslationJob(null);
     setTranslationNotice(null);
-    onTranslationStatusChange?.(false);
     setTranslationError(null);
-  }, [topic?.path, activeTab, activeLessonId, onTranslationStatusChange]);
+  }, [topic?.path, activeTab, activeLessonId]);
 
-  useEffect(() => () => translationAbortRef.current?.abort(), []);
+  // Follow the queued job until it finishes.
+  const watchedJobId = translationJob?.id;
+  useEffect(() => {
+    if (!watchedJobId) return;
+    let alive = true;
+    const poll = async () => {
+      try {
+        const res = await fetch(`/api/translate/jobs/${watchedJobId}`);
+        if (!alive) return;
+        if (!res.ok) {
+          setTranslationError(await failureMessage(res, 'Translation'));
+          setTranslationJob(null);
+          setIsTranslating(false);
+          return;
+        }
+        const job: TranslationJobInfo = await res.json();
+        if (!alive) return;
+        if (job.status === 'done') {
+          setTranslatedMarkdown(job.translated ?? null);
+          if (job.fallback) {
+            setTranslationNotice('Some sections could not be translated and are shown in English.');
+          }
+        } else if (job.status === 'failed') {
+          setTranslationError(job.error || 'Translation failed.');
+        } else if (job.status === 'stopped') {
+          setTranslationNotice('Translation stopped.');
+          setReadingLang('en');
+        } else {
+          setTranslationJob(job);
+          return;
+        }
+        setTranslationJob(null);
+        setIsTranslating(false);
+        window.dispatchEvent(new Event('synapse:translations-changed'));
+      } catch {
+        /* backend busy or restarting: try again on the next tick */
+      }
+    };
+    const timer = window.setInterval(poll, 1500);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, [watchedJobId]);
 
   const rawMarkdown = useMemo(() => {
     if (!topic) return '';
@@ -194,103 +237,91 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     return '';
   }, [topic, activeTab, activeLessonId]);
 
+  const lessonLabel = useMemo(() => {
+    if (!topic) return '';
+    const course = toTitleCase(topic.display_title || topic.subtopic);
+    return currentLesson && activeLessonId !== 'all' ? `${course}: ${currentLesson.title}` : course;
+  }, [topic, currentLesson, activeLessonId]);
+
   const handleSelectLanguage = async (lang: 'en' | 'cs' | 'de' | 'es') => {
     setLangMenuOpen(false);
     setTranslationError(null);
     setTranslationNotice(null);
-    translationAbortRef.current?.abort();
-    translationAbortRef.current = null;
-    if (lang === 'en') {
-      setReadingLang('en');
-      setTranslatedMarkdown(null);
-      setIsTranslating(false);
-      setTranslationProgress(null);
-      onTranslationStatusChange?.(false);
-      return;
-    }
+    setTranslationJob(null);
+    setIsTranslating(false);
+    const requestId = ++translationRequestRef.current;
     setReadingLang(lang);
     setTranslatedMarkdown(null);
-    if (!rawMarkdown) return;
+    if (lang === 'en' || !rawMarkdown) return;
 
-    const langName = lang === 'cs' ? 'Čeština' : lang === 'de' ? 'Deutsch' : 'Español';
-    const abortCtrl = new AbortController();
-    translationAbortRef.current = abortCtrl;
-    const isCurrent = () => translationAbortRef.current === abortCtrl;
     setIsTranslating(true);
-    setTranslationProgress(null);
-    onTranslationStatusChange?.(true, langName, () => {
-      abortCtrl.abort();
-      setIsTranslating(false);
-      setTranslationProgress(null);
-    });
     try {
-      const res = await fetch('/api/translate', {
+      const res = await fetch('/api/translate/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        signal: abortCtrl.signal,
         body: JSON.stringify({
           text: rawMarkdown,
           target_lang: lang,
           model: preferredModel || undefined,
           host: ollamaHost || undefined,
-          stream: true,
+          title: lessonLabel,
+          path: topic?.path,
+          lesson_id: activeLessonId || undefined,
         }),
       });
+      if (requestId !== translationRequestRef.current) return;
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.detail || `Translation service error (${res.status})`);
-      }
-      // Newline-delimited JSON: progress events, then the result.
-      let data: any = null;
-      const handleLine = (line: string) => {
-        if (!line.trim()) return;
-        const evt = JSON.parse(line);
-        if (typeof evt.progress === 'number') {
-          if (isCurrent()) setTranslationProgress({ done: evt.progress, total: evt.total ?? 0 });
-        } else {
-          data = evt;
-        }
-      };
-      if (res.body) {
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        let buf = '';
-        for (;;) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          buf += decoder.decode(value, { stream: true });
-          const lines = buf.split('\n');
-          buf = lines.pop() ?? '';
-          lines.forEach(handleLine);
-        }
-        handleLine(buf + decoder.decode());
-      } else {
-        handleLine(await res.text());
-      }
-      if (!isCurrent()) return;
-      if (data?.translated) {
-        setTranslatedMarkdown(data.translated);
-        if (data.fallback) {
-          setTranslationNotice('Some sections could not be translated and are shown in English. Check that the AI model is reachable, then select the language again.');
-        }
-      } else {
-        throw new Error('The translation service returned no text.');
-      }
-    } catch (err: any) {
-      if (err.name === 'AbortError' || !isCurrent()) {
+        setTranslationError(await failureMessage(res, 'Translation'));
+        setIsTranslating(false);
         return;
       }
-      console.error('Translation error:', err);
-      setTranslationError(err.message || 'Translation failed');
-    } finally {
-      if (isCurrent()) {
-        translationAbortRef.current = null;
+      const job: TranslationJobInfo = await res.json();
+      if (requestId !== translationRequestRef.current) return;
+      if (job.status === 'done') {
+        setTranslatedMarkdown(job.translated ?? null);
         setIsTranslating(false);
-        setTranslationProgress(null);
-        onTranslationStatusChange?.(false);
+        return;
       }
+      setTranslationJob(job);
+      window.dispatchEvent(new Event('synapse:translations-changed'));
+    } catch (err) {
+      if (requestId !== translationRequestRef.current) return;
+      setTranslationError(networkFailure('Translation', err));
+      setIsTranslating(false);
     }
   };
+
+  const handleStopTranslation = async () => {
+    if (!translationJob) return;
+    try {
+      const res = await fetch(`/api/translate/jobs/${translationJob.id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        setTranslationError(await failureMessage(res, 'Stopping the translation'));
+        return;
+      }
+      const job: TranslationJobInfo = await res.json();
+      if (job.status === 'stopped') {
+        setTranslationJob(null);
+        setIsTranslating(false);
+        setReadingLang('en');
+        setTranslationNotice('Translation stopped.');
+      } else {
+        setTranslationJob(job);
+      }
+      window.dispatchEvent(new Event('synapse:translations-changed'));
+    } catch (err) {
+      setTranslationError(networkFailure('Stopping the translation', err));
+    }
+  };
+
+  const langLabel = readingLang === 'cs' ? 'Čeština' : readingLang === 'de' ? 'Deutsch' : readingLang === 'es' ? 'Español' : 'English';
+  const translationStatusText = !translationJob
+    ? `Starting translation to ${langLabel}…`
+    : translationJob.status === 'queued'
+      ? `Queued for ${langLabel}${translationJob.position && translationJob.position > 1 ? ` (${translationJob.position - 1} ahead)` : ''}. It runs in the background, so you can keep reading.`
+      : translationJob.stopping
+        ? 'Stopping after the current section…'
+        : `Translating to ${langLabel}${translationJob.model ? ` with ${translationJob.model.split(':')[0]}` : ''} · section ${Math.min(translationJob.done + 1, translationJob.total)} of ${translationJob.total}`;
 
   type TranslationViewMode = 'translated' | 'original' | 'split';
   const [translationViewMode, setTranslationViewMode] = useState<TranslationViewMode>(() => {
@@ -896,10 +927,12 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <span>Translating to {readingLang === 'cs' ? 'Čeština' : readingLang === 'de' ? 'Deutsch' : 'Español'}{preferredModel ? ` with ${preferredModel.split(':')[0]}` : (ollamaHost ? ' with Local AI' : '')}{translationProgress && translationProgress.total > 0 ? ` · section ${Math.min(translationProgress.done + 1, translationProgress.total)} of ${translationProgress.total}` : '…'}</span>
-                <button type="button" className="translating-cancel-btn" onClick={() => handleSelectLanguage('en')} style={{ marginLeft: 'auto', background: 'none', border: '1px solid currentColor', borderRadius: '4px', color: 'inherit', fontSize: '11px', padding: '2px 8px', cursor: 'pointer' }}>
-                  Cancel
-                </button>
+                <span>{translationStatusText}</span>
+                {translationJob && !translationJob.stopping && (
+                  <button type="button" className="translating-cancel-btn" onClick={handleStopTranslation} style={{ marginLeft: 'auto', background: 'none', border: '1px solid currentColor', borderRadius: '4px', color: 'inherit', fontSize: '11px', padding: '2px 8px', cursor: 'pointer' }}>
+                    Stop
+                  </button>
+                )}
               </div>
             )}
             {translationNotice && !isTranslating && (

@@ -172,6 +172,10 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown actions
     try:
+        await TRANSLATIONS.shutdown()
+    except Exception:
+        pass
+    try:
         from learning_engine.database import checkpoint_db
         print("[*] Synapse Backend shutting down... checkpointing database WAL...", flush=True)
         checkpoint_db(truncate=True)
@@ -179,6 +183,9 @@ async def lifespan(app: FastAPI):
         pass
 
 from learning_engine.version import __version__
+from app.backend.translation_jobs import (
+    LANGUAGE_NAMES, TranslationQueue, cache_file_for, read_cached, split_sections, translate_section,
+)
 
 app = FastAPI(title="AI Learning Workbench Backend", version=__version__, lifespan=lifespan)
 
@@ -278,10 +285,6 @@ class GenerateRequest(BaseModel):
     force: bool = False
     provider: Optional[str] = None
     model: Optional[str] = None
-
-class TranslateRequest(BaseModel):
-    text: str = Field(..., max_length=50000)
-    target_lang: str = Field(..., pattern=r'^[a-z]{2}$')
 
 class LoginRequest(BaseModel):
     password: str = Field(..., min_length=1, max_length=512)
@@ -739,123 +742,104 @@ def get_flashcards_deck(query: str):
 import hashlib
 
 class TranslateRequest(BaseModel):
-    text: str
-    target_lang: str
+    # A complete multi-lesson guide can be a few hundred KB of Markdown.
+    text: str = Field(..., max_length=600_000)
+    target_lang: str = Field(..., pattern=r'^[a-z]{2}$')
     model: Optional[str] = None
     provider: Optional[str] = None
     host: Optional[str] = None
     stream: bool = False
 
-LANGUAGE_NAMES = {
-    "cs": "Czech (Čeština)",
-    "de": "German (Deutsch)",
-    "es": "Spanish (Español)",
-    "ru": "Russian (Русский)",
-    "en": "English"
-}
+
+class TranslateJobRequest(TranslateRequest):
+    title: Optional[str] = Field(None, max_length=300)
+    path: Optional[str] = Field(None, max_length=500)
+    lesson_id: Optional[str] = Field(None, max_length=200)
+
+
+def translation_cache_dir() -> Path:
+    return WORKSPACE_ROOT / ".cache" / "translations"
+
+
+TRANSLATIONS = TranslationQueue(
+    get_provider=lambda **kw: get_translation_provider(**kw),
+    executor=AI_EXECUTOR,
+    cache_dir=translation_cache_dir,
+)
+
+
+@app.post("/api/translate/jobs")
+async def api_translate_job_submit(req: TranslateJobRequest):
+    """Queues a lesson translation, or returns it at once when cached."""
+    if req.target_lang == "en" or not req.text.strip():
+        return {"status": "done", "cached": True, "translated": req.text}
+    cached = read_cached(translation_cache_dir(), req.text, req.target_lang)
+    if cached is not None:
+        return {"status": "done", "cached": True, "translated": cached}
+    job = TRANSLATIONS.submit(
+        req.text, req.target_lang, title=req.title or "", path=req.path, lesson_id=req.lesson_id,
+        model=req.model, provider_type=req.provider, host=req.host,
+    )
+    return TRANSLATIONS.describe(job)
+
+
+@app.get("/api/translate/jobs")
+async def api_translate_jobs_list():
+    return {"jobs": TRANSLATIONS.list()}
+
+
+@app.get("/api/translate/jobs/{job_id}")
+async def api_translate_job_get(job_id: str):
+    job = TRANSLATIONS.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Translation job not found.")
+    return TRANSLATIONS.describe(job, include_result=True)
+
+
+@app.delete("/api/translate/jobs/{job_id}")
+async def api_translate_job_stop(job_id: str):
+    job = TRANSLATIONS.stop(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Translation job not found.")
+    return TRANSLATIONS.describe(job)
+
 
 @app.post("/api/translate")
 async def api_translate_content(req: TranslateRequest, request: Request):
+    """Translates in the request (used by scripts and tests). The app uses the queue."""
     if req.target_lang == "en" or not req.text.strip():
         return {"translated": req.text, "cached": True}
+    cache_dir = translation_cache_dir()
+    cached = read_cached(cache_dir, req.text, req.target_lang)
+    if cached is not None:
+        return {"translated": cached, "cached": True}
 
+    provider, used_model = get_translation_provider(model=req.model, provider_type=req.provider, host=req.host)
     lang_name = LANGUAGE_NAMES.get(req.target_lang, req.target_lang)
-    cache_dir = WORKSPACE_ROOT / ".cache" / "translations"
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    text_hash = hashlib.sha256((req.text + req.target_lang).encode("utf-8")).hexdigest()
-    cache_file = cache_dir / f"{text_hash}_{req.target_lang}.md"
-
-    if cache_file.exists():
-        return {"translated": cache_file.read_text(encoding="utf-8"), "cached": True}
-
-    import asyncio
-    provider, used_model = get_translation_provider(
-        model=req.model,
-        provider_type=req.provider,
-        host=req.host
-    )
-
-    def mask_and_extract(text: str):
-        # Mask code blocks and math to preserve integrity
-        blocks = []
-        def repl(m):
-            token = f"___BLOCK_{len(blocks)}___"
-            blocks.append(m.group(0))
-            return token
-
-        text = re.sub(r"```[\s\S]*?```", repl, text)
-        text = re.sub(r"\$\$[\s\S]*?\$\$", repl, text)
-        return text, blocks
-
-    def unmask(text: str, blocks: list):
-        for i, b in enumerate(blocks):
-            text = text.replace(f"___BLOCK_{i}___", b)
-        return text
-
-    sem = asyncio.Semaphore(2)
-    any_chunk_failed = False
-
-    async def translate_chunk(chunk_text: str) -> str:
-        nonlocal any_chunk_failed
-        if not chunk_text.strip():
-            return chunk_text
-
-        async with sem:
-            # The reader left or cancelled: don't start more local-model work.
-            if await request.is_disconnected():
-                raise asyncio.CancelledError()
-            masked_text, blocks = mask_and_extract(chunk_text)
-
-            prompt = f"""You are an expert technical translator and polyglot philologist.
-Translate the following technical curriculum text into {lang_name}.
-
-CRITICAL INVARIANTS:
-1. DO NOT translate or modify masked tokens like ___BLOCK_0___. Keep them exactly as is.
-2. DO NOT translate Mermaid diagrams or code.
-3. Translate all technical explanations and narrative prose with high fidelity and natural grammatical precision.
-4. Output clean Markdown only with no preamble or wrapping.
-
-Text to translate:
-\"\"\"
-{masked_text}
-\"\"\""""
-
-            try:
-                loop = asyncio.get_running_loop()
-                translated_masked = await loop.run_in_executor(AI_EXECUTOR, provider.generate, prompt)
-                translated_masked = translated_masked.strip()
-
-                # Truncation Guard: if translation is completely broken (<20% length of source without blocks)
-                if not translated_masked or len(translated_masked) < len(masked_text) * 0.2:
-                    any_chunk_failed = True
-                    return chunk_text
-
-                return unmask(translated_masked, blocks)
-            except asyncio.CancelledError:
-                raise
-            except Exception:
-                any_chunk_failed = True
-                return chunk_text
-
-    # Chunking by ## or # to fit in context window (sliding window logic)
-    sections = re.split(r'(?=\n#{1,2}\s+)', req.text)
+    sections = split_sections(req.text)
     total = sum(1 for s in sections if s.strip())
+    sem = asyncio.Semaphore(2)
+    failed = False
 
-    def finish(translated_sections: list) -> dict:
-        final_translation = "".join(translated_sections).strip()
-        # Never cache failed or untranslated fallback English content
-        is_identical_to_source = (final_translation == req.text.strip())
-        if not any_chunk_failed and not is_identical_to_source and final_translation:
-            cache_file.write_text(final_translation + "\n", encoding="utf-8")
-        return {
-            "translated": final_translation,
-            "cached": False,
-            "model": used_model,
-            "fallback": any_chunk_failed or is_identical_to_source
-        }
+    async def one(section: str) -> str:
+        nonlocal failed
+        async with sem:
+            if section.strip() and await request.is_disconnected():
+                raise asyncio.CancelledError()
+            text, ok, _ = await translate_section(provider, AI_EXECUTOR, section, lang_name)
+            failed = failed or not ok
+            return text
 
+    def finish(parts: list) -> dict:
+        final = "".join(parts).strip()
+        identical = final == req.text.strip()
+        if not failed and not identical and final:
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            cache_file_for(cache_dir, req.text, req.target_lang).write_text(final + "\n", encoding="utf-8")
+        return {"translated": final, "cached": False, "model": used_model, "fallback": failed or identical}
+
+    tasks = [asyncio.ensure_future(one(s)) for s in sections]
     if not req.stream:
-        tasks = [asyncio.ensure_future(translate_chunk(sec)) for sec in sections]
         try:
             return finish(await asyncio.gather(*tasks))
         finally:
@@ -863,7 +847,6 @@ Text to translate:
                 task.cancel()
 
     async def progress_stream():
-        tasks = [asyncio.ensure_future(translate_chunk(sec)) for sec in sections]
         try:
             yield json.dumps({"progress": 0, "total": total, "model": used_model}) + "\n"
             done = 0
@@ -873,7 +856,6 @@ Text to translate:
                 yield json.dumps({"progress": done, "total": total}) + "\n"
             yield json.dumps(finish([t.result() for t in tasks])) + "\n"
         finally:
-            # Client gone (closed lesson, switched language, quit): drop queued sections.
             for task in tasks:
                 task.cancel()
 

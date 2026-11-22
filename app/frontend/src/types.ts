@@ -115,3 +115,22 @@ export interface WorkspaceStatus {
   ollama_models?: string[];
   cluster?: { [host: string]: ClusterHostStatus };
 }
+
+/** A lesson translation in the server's background queue (/api/translate/jobs). */
+export interface TranslationJobInfo {
+  id: string;
+  status: 'queued' | 'running' | 'done' | 'failed' | 'stopped';
+  target_lang: string;
+  title: string;
+  path?: string | null;
+  lesson_id?: string | null;
+  done: number;
+  total: number;
+  position?: number;
+  model?: string | null;
+  error?: string | null;
+  fallback?: boolean;
+  stopping?: boolean;
+  cached?: boolean;
+  translated?: string;
+}

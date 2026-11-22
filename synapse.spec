@@ -40,6 +40,7 @@ hiddenimports = [
     "sqlite3",
     "websockets",
     "app.backend.main",
+    "app.backend.translation_jobs",
     "learning_engine",
     "learning_engine.cli",
     "learning_engine.models",
