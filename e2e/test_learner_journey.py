@@ -711,3 +711,53 @@ def test_search_navigation_to_matched_lesson(browser_page):
     expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_02_indexing")
 
 
+def test_mentor_model_indicator_and_error_dismissal(browser_page):
+    """
+    Verifies that the active mentor model is displayed in the header and
+    bottom status bar, and that connection error notices can be dismissed
+    inline without losing student conversation history.
+    """
+    page, server_url = browser_page
+    page.goto(server_url)
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    # 1. Verify mentor model indicator pill in the chat header
+    model_pill = page.locator(".persona-model-pill").first
+    expect(model_pill).to_be_visible(timeout=5000)
+    expect(model_pill).to_have_text("qwen2.5-coder")
+
+    # 2. Verify mentor model badge in the bottom status bar
+    bottom_badge = page.locator(".mentor-model-badge").first
+    expect(bottom_badge).to_be_visible(timeout=5000)
+    expect(bottom_badge).to_have_text("(qwen2.5-coder)")
+
+    # 3. Intercept /api/chat with a simulated provider connection failure (503)
+    page.route("**/api/chat", lambda route: route.fulfill(
+        status=503,
+        content_type="application/json",
+        body=json.dumps({"detail": "Ollama cluster node unreachable"})
+    ))
+
+    # Send a question from student
+    chat_input = page.locator(".chat-input-bar input")
+    expect(chat_input).to_be_visible(timeout=5000)
+    chat_input.fill("What is the B-Tree leaf node page layout?")
+    page.locator(".chat-input-bar button[type='submit']").click()
+
+    # 4. Verify student message and error bubble appear
+    expect(page.locator(".chat-bubble.student:has-text('What is the B-Tree leaf node page layout?')")).to_be_visible(timeout=5000)
+    error_bubble = page.locator(".chat-bubble.error-bubble")
+    expect(error_bubble).to_be_visible(timeout=5000)
+    expect(error_bubble).to_contain_text("Unable to connect to AI Mentor")
+
+    # 5. Click Dismiss button on error bubble
+    dismiss_btn = page.locator(".chat-dismiss-btn")
+    expect(dismiss_btn).to_be_visible(timeout=5000)
+    dismiss_btn.click()
+
+    # 6. Error bubble is removed, while student message remains intact
+    expect(page.locator(".chat-bubble.error-bubble")).not_to_be_visible(timeout=5000)
+    expect(page.locator(".chat-bubble.student:has-text('What is the B-Tree leaf node page layout?')")).to_be_visible()
+
+
+

@@ -12,7 +12,8 @@ import {
   Sparkles,
   Trash2,
   BookOpen,
-  HelpCircle
+  HelpCircle,
+  X
 } from 'lucide-react';
 import type { ChatMessage, TopicDetails } from '../types';
 import { getUIStrings } from '../utils/i18n';
@@ -26,6 +27,8 @@ interface TutorChatProps {
   onClearChat?: () => void;
   mentorConnected: 'checking' | 'connected' | 'error';
   targetLanguage?: string;
+  mentorModel?: string;
+  onDismissMessage?: (index: number) => void;
 }
 
 export const TutorChat: React.FC<TutorChatProps> = ({
@@ -37,6 +40,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   onClearChat,
   mentorConnected,
   targetLanguage,
+  mentorModel,
+  onDismissMessage,
 }) => {
   const ui = getUIStrings(targetLanguage);
   // ... existing component logic ...
@@ -157,6 +162,11 @@ export const TutorChat: React.FC<TutorChatProps> = ({
                 {topic?.domain && (
                   <span className="persona-topic-tag" title={`Domain: ${topic.domain}`}>
                     {topic.domain.replace(/_/g, ' ')}
+                  </span>
+                )}
+                {mentorModel && (
+                  <span className="persona-model-pill" title={`Active Mentor Model: ${mentorModel}`}>
+                    {mentorModel.split(':')[0]}
                   </span>
                 )}
                 {personaExpanded ? <ChevronUp size={12} className="persona-chevron" /> : <ChevronDown size={12} className="persona-chevron" />}
@@ -287,29 +297,43 @@ export const TutorChat: React.FC<TutorChatProps> = ({
             </div>
           </div>
         ) : (
-          history.map((msg, idx) => (
-            <div key={idx} className={`chat-bubble ${msg.role}`}>
-              <div className="bubble-header">
-                <div className="bubble-author">
-                  {msg.role === 'student' ? (
-                    <>
-                      <User size={13} />
-                      <span>You</span>
-                    </>
-                  ) : (
-                    <>
-                      <Bot size={13} />
-                      <span>Tutor</span>
-                    </>
+          history.map((msg, idx) => {
+            const isError = msg.content.includes('⚠️ **Unable to connect to AI Mentor**');
+            return (
+              <div key={idx} className={`chat-bubble ${msg.role} ${isError ? 'error-bubble' : ''}`}>
+                <div className="bubble-header">
+                  <div className="bubble-author">
+                    {msg.role === 'student' ? (
+                      <>
+                        <User size={13} />
+                        <span>You</span>
+                      </>
+                    ) : (
+                      <>
+                        <Bot size={13} />
+                        <span>Tutor</span>
+                      </>
+                    )}
+                  </div>
+                  {isError && onDismissMessage && (
+                    <button
+                      type="button"
+                      className="chat-dismiss-btn"
+                      onClick={() => onDismissMessage(idx)}
+                      title="Dismiss error notice"
+                    >
+                      <X size={12} />
+                      <span>Dismiss</span>
+                    </button>
                   )}
                 </div>
+                <div
+                  className="bubble-content"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(msg.content) as string) }}
+                />
               </div>
-              <div
-                className="bubble-content"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(msg.content) as string) }}
-              />
-            </div>
-          ))
+            );
+          })
         )}
 
         {isChatting && (

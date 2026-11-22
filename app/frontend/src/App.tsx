@@ -94,7 +94,7 @@ function App() {
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
       const saved = localStorage.getItem('synapse_app_settings');
-      return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
+      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
     } catch {
       return DEFAULT_SETTINGS;
     }
@@ -1005,10 +1005,13 @@ function App() {
             <TranslationQueueIndicator />
             <span
               className={`mentor-status-pill ${mentorConnected}`}
-              title={`Socratic Mentor: ${mentorConnected === 'connected' ? 'Online' : mentorConnected === 'checking' ? 'Connecting' : 'Offline'}`}
+              title={`Socratic Mentor: ${mentorConnected === 'connected' ? 'Online' : mentorConnected === 'checking' ? 'Connecting' : 'Offline'}${(settings.mentorModel || settings.primaryModel) ? ` (${settings.mentorModel || settings.primaryModel})` : ''}`}
             >
               <span className={`status-dot ${mentorConnected === 'connected' ? 'online' : 'offline'}`} />
               <span>Mentor {mentorConnected === 'connected' ? 'Online' : 'Offline'}</span>
+              {(settings.mentorModel || settings.primaryModel) && (
+                <span className="mentor-model-badge">({(settings.mentorModel || settings.primaryModel).split(':')[0]})</span>
+              )}
             </span>
           </div>
         </div>
@@ -1029,6 +1032,8 @@ function App() {
         onClearChat={() => setUnifiedChatHistory([])}
         mentorConnected={mentorConnected}
         targetLanguage={settings.language}
+        mentorModel={settings.mentorModel || settings.primaryModel}
+        onDismissMessage={(idx) => setUnifiedChatHistory((prev) => prev.filter((_, i) => i !== idx))}
       />
 
       <SearchModal
