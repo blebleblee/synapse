@@ -61,6 +61,7 @@ interface LessonViewerProps {
   ollamaHost?: string;
   onNavigateBreadcrumb?: (type: 'domain' | 'category' | 'subtopic', path: string) => void;
   onSelectLesson?: (lessonId: string) => void;
+  targetSection?: string | null;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -90,6 +91,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onNavigateBreadcrumb,
   onSelectLesson,
   onToggleLessonCompletion,
+  targetSection,
 }) => {
   const [isSpeakingVoice, setIsSpeakingVoice] = useState(false);
   const [readingLang, setReadingLang] = useState<'en' | 'cs' | 'de' | 'es'>('en');
@@ -243,6 +245,24 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     const course = toTitleCase(topic.display_title || topic.subtopic);
     return currentLesson && activeLessonId !== 'all' ? `${course}: ${currentLesson.title}` : course;
   }, [topic, currentLesson, activeLessonId]);
+
+  useEffect(() => {
+    if (targetSection && contentRef?.current) {
+      const cleanTitle = targetSection.replace(/^[#\s]+/, '').trim().toLowerCase();
+      const slug = cleanTitle.replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+
+      const timer = window.setTimeout(() => {
+        const el = document.getElementById(slug) || Array.from(contentRef.current?.querySelectorAll('h1, h2, h3, h4, h5, h6') || []).find(
+          (h) => h.textContent?.trim().toLowerCase() === cleanTitle
+        );
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+
+      return () => window.clearTimeout(timer);
+    }
+  }, [topic, activeLessonId, targetSection, contentRef]);
 
   const handleSelectLanguage = async (lang: 'en' | 'cs' | 'de' | 'es') => {
     setLangMenuOpen(false);

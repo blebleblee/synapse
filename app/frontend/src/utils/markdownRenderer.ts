@@ -28,7 +28,7 @@ export function sanitizeHtml(html: string): string {
   return DOMPurify.sanitize(html, {
     USE_PROFILES: { html: true, svg: true, mathMl: true },
     FORBID_TAGS: ['style', 'form', 'input', 'textarea', 'select', 'iframe', 'object', 'embed'],
-    ADD_ATTR: ['target'],
+    ADD_ATTR: ['target', 'id'],
   });
 }
 
@@ -169,8 +169,17 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string, enableMath
     processed = processed.replace(/%%SYNAPSE_CODEBLOCK_(\d+)%%/g, (_, idx) => codeBlocks[Number(idx)]);
   }
 
-  // 3. Custom marked renderer for mermaid and executable sandbox code blocks
+  // 3. Custom marked renderer for mermaid, executable sandbox code blocks, and heading anchor IDs
   const renderer = new marked.Renderer();
+
+  renderer.heading = function ({ depth, text }) {
+    const slug = text
+      .toLowerCase()
+      .replace(/<[^>]*>/g, '')
+      .replace(/[^a-z0-9_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    return `<h${depth} id="${slug}">${text}</h${depth}>\n`;
+  };
 
   renderer.code = function ({ text, lang }) {
     const language = (lang || '').trim().toLowerCase();

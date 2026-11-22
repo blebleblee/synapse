@@ -17,7 +17,7 @@ interface SearchResult {
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectTopic: (path: string, lessonId?: string) => void;
+  onSelectTopic: (path: string, lessonId?: string, sectionTitle?: string) => void;
 }
 
 function HighlightedText({ text, query }: { text: string; query: string }) {
@@ -177,7 +177,7 @@ const SearchPanel: React.FC<Omit<SearchModalProps, 'isOpen'>> = ({
               className="search-result-item"
               onClick={() => {
                 const lessonId = r.file ? r.file.replace(/\.md$/, '') : undefined;
-                onSelectTopic(r.path, lessonId);
+                onSelectTopic(r.path, lessonId, r.section);
                 onClose();
               }}
             >

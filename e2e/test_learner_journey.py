@@ -706,8 +706,9 @@ def test_search_navigation_to_matched_lesson(browser_page):
     # Verify modal is closed
     expect(page.locator(".search-modal-header input")).not_to_be_visible(timeout=5000)
 
-    # Verify reader opens Lesson 2 directly (not Lesson 1)
+    # Verify reader opens Lesson 2 directly (not Lesson 1) and heading anchor ID is present
     expect(page.locator("h1:has-text('E2E B-Tree Mechanics')")).to_be_visible(timeout=5000)
+    expect(page.locator("h1#e2e-b-tree-mechanics")).to_be_visible()
     expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_02_indexing")
 
 

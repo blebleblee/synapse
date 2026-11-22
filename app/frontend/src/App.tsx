@@ -42,6 +42,7 @@ function App() {
   const [topicDetails, setTopicDetails] = useState<TopicDetails | null>(null);
   const [activeTab, setActiveTab] = useState<'study' | 'labs' | 'quiz'>('study');
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
+  const [targetSection, setTargetSection] = useState<string | null>(null);
   const [isLoadingTopic, setIsLoadingTopic] = useState(false);
   const loadRequestIdRef = useRef<number>(0);
   const userInteractedRef = useRef<boolean>(false);
@@ -385,11 +386,13 @@ function App() {
     return false;
   };
 
-  const handleSelectSubtopic = (query: string, lessonId?: string) => {
+  const handleSelectSubtopic = (query: string, lessonId?: string, sectionTitle?: string) => {
+    setTargetSection(sectionTitle || null);
     loadTopic(query, false, lessonId);
   };
 
   const handleSelectLesson = (lessonId: string) => {
+    setTargetSection(null);
     if (selectedPath) {
       setActiveLessonId(lessonId);
       if (lessonId === 'labs') {
@@ -975,6 +978,7 @@ function App() {
           onNavigateBreadcrumb={handleNavigateBreadcrumb}
           onSelectLesson={handleSelectLesson}
           onToggleLessonCompletion={handleToggleLessonCompletion}
+          targetSection={targetSection}
         />
 
         <div className="workbench-bottom-bar">
