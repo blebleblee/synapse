@@ -197,7 +197,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({
           <div className="chat-lesson-context-bar">
             <div className="context-bar-header">
               <BookOpen size={11} className="context-icon" />
-              <span className="context-label">Active Lesson:</span>
               <span className="context-title" title={activeLessonTitle}>{activeLessonTitle}</span>
             </div>
             <div className="context-quick-chips">

@@ -298,11 +298,11 @@ class OllamaProvider(LLMProvider):
         self.model = model
 
     @classmethod
-    def is_available(cls, host: str = "http://localhost:11434") -> bool:
+    def is_available(cls, host: str = "http://localhost:11434", timeout: float = 1.5) -> bool:
         # Check native Ollama /api/tags
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/api/tags", headers={"User-Agent": "LearningEngine"})
-            with urllib.request.urlopen(req, timeout=1.5) as resp:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
                 if resp.status == 200:
                     return True
         except Exception:
@@ -311,7 +311,7 @@ class OllamaProvider(LLMProvider):
         # Check LocalAI / OpenAI compatible /v1/models
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/v1/models", headers={"User-Agent": "LearningEngine"})
-            with urllib.request.urlopen(req, timeout=1.5) as resp:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
                 return resp.status == 200
         except Exception:
             return False
@@ -372,8 +372,8 @@ class OllamaProvider(LLMProvider):
     def check_connectivity(cls, host: str, model: Optional[str] = None) -> bool:
         """Verifies if a specific Ollama/LocalAI node and model are available."""
         try:
-            # Check if host is up
-            if not cls.is_available(host):
+            # Check if host is up (a busy Ollama can take a few seconds to answer)
+            if not cls.is_available(host, timeout=4.0):
                 return False
             
             # If a model is specified, verify it's available on that host

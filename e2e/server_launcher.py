@@ -44,7 +44,7 @@ os.environ.pop("SYNAPSE_AUTH_PASSWORD", None)
 # Confine Ollama probe suppression to this child process with matching return types
 import learning_engine.models as le_models
 le_models.OllamaProvider.check_connectivity = lambda host, model=None: False
-le_models.OllamaProvider.is_available = lambda host="": False
+le_models.OllamaProvider.is_available = lambda host="", timeout=1.5: False
 le_models.OllamaCluster.get_cluster_status = lambda self: {
     "http://127.0.0.1:0": {"online": False, "models": []}
 }

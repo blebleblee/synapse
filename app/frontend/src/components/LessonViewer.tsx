@@ -799,41 +799,36 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       )}
 
       <div className="viewer-scroll-body" ref={contentRef} onClick={handleContentClick}>
-        {/* In-Lesson Real-Time Dependency Navigation Bar */}
+        {/* Course path: one quiet line, like previous/next links in a book */}
         {(dependencies.prerequisites.length > 0 || dependencies.unlocks.length > 0) && (
-          <div className="in-lesson-deps-bar">
-            {dependencies.prerequisites.length > 0 && (
-              <div className="deps-group prereqs">
-                <span className="deps-label">Prerequisite:</span>
-                {dependencies.prerequisites.map((p) => (
-                  <button
-                    key={p.id}
-                    className="dep-chip prereq-chip"
-                    onClick={() => onNavigateBreadcrumb && onNavigateBreadcrumb('subtopic', p.id)}
-                    title={`Prerequisite topic: ${p.label}`}
-                  >
-                    <span>⬅ {p.label}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {dependencies.unlocks.length > 0 && (
-              <div className="deps-group unlocks">
-                <span className="deps-label">Unlocks:</span>
-                {dependencies.unlocks.map((u) => (
-                  <button
-                    key={u.id}
-                    className="dep-chip unlock-chip"
-                    onClick={() => onNavigateBreadcrumb && onNavigateBreadcrumb('subtopic', u.id)}
-                    title={`Unlocked next: ${u.label}`}
-                  >
-                    <span>{u.label} ➡</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <nav className="lesson-path-line" aria-label="Course path">
+            <div className="lesson-path-side prereqs">
+              {dependencies.prerequisites.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className="lesson-path-link"
+                  onClick={() => onNavigateBreadcrumb && onNavigateBreadcrumb('subtopic', p.id)}
+                  title={`Prerequisite: ${p.label}`}
+                >
+                  ← {p.label}
+                </button>
+              ))}
+            </div>
+            <div className="lesson-path-side unlocks">
+              {dependencies.unlocks.map((u) => (
+                <button
+                  key={u.id}
+                  type="button"
+                  className="lesson-path-link"
+                  onClick={() => onNavigateBreadcrumb && onNavigateBreadcrumb('subtopic', u.id)}
+                  title={`Unlocks: ${u.label}`}
+                >
+                  {u.label} →
+                </button>
+              ))}
+            </div>
+          </nav>
         )}
 
         {activeTab === 'quiz' ? (

@@ -174,7 +174,7 @@ def global_test_isolation(tmp_path, monkeypatch):
 
     # Simulated Ollama connectivity: safe mock without opening external network sockets
     monkeypatch.setattr(le_models.OllamaProvider, "check_connectivity", lambda host, model=None: False)
-    monkeypatch.setattr(le_models.OllamaProvider, "is_available", lambda host: False)
+    monkeypatch.setattr(le_models.OllamaProvider, "is_available", lambda host, timeout=1.5: False)
     monkeypatch.setattr(
         le_models.OllamaCluster,
         "get_cluster_status",

@@ -85,8 +85,8 @@ export function App() {
     }
   });
 
-  const checkConnectivity = useCallback(async () => {
-    setMentorConnected('checking');
+  const checkConnectivity = useCallback(async (quiet = false) => {
+    if (!quiet) setMentorConnected('checking');
     try {
       const res = await fetch('/api/check-mentor-connectivity', {
         method: 'POST',
@@ -114,6 +114,19 @@ export function App() {
     checkConnectivity();
   }, [settings, checkConnectivity]);
 
+  // The startup check can miss a local model that is still starting or busy.
+  // While offline, re-check quietly every 15 s and when the window regains focus.
+  useEffect(() => {
+    if (mentorConnected !== 'error') return;
+    const recheck = () => { void checkConnectivity(true); };
+    const timer = window.setInterval(recheck, 15000);
+    window.addEventListener('focus', recheck);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('focus', recheck);
+    };
+  }, [mentorConnected, checkConnectivity]);
+
   const handleSaveSettings = (newSettings: AppSettings) => {
     setSettings(newSettings);
     localStorage.setItem('synapse_app_settings', JSON.stringify(newSettings));
@@ -127,9 +140,12 @@ export function App() {
       if (res.ok) {
         const data = await res.json();
         setTree(data);
+      } else if (res.status !== 401) {
+        notify('error', await failureMessage(res, 'Loading the curriculum'));
       }
     } catch (err) {
       console.error('Failed to load topic tree:', err);
+      notify('error', networkFailure('Loading the curriculum', err));
     }
   };
 
