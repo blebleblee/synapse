@@ -269,6 +269,7 @@ class ChatRequest(BaseModel):
     history: List[Any] = []
     lesson_id: Optional[str] = Field(None, pattern=r'^[a-z0-9_-]*$')
     lesson_title: Optional[str] = Field(None, max_length=200)
+    section_title: Optional[str] = Field(None, max_length=200)
     terminal_context: Optional[str] = Field(None, max_length=50000)
     last_terminal_command: Optional[str] = Field(None, max_length=1000)
     lesson_content: Optional[str] = Field(None, max_length=50000)
@@ -1402,9 +1403,16 @@ async def chat_with_tutor(req: ChatRequest):
 
     # Inject active lesson context prominently at top of prompt
     if lesson_text and lesson_text.strip():
-        clean_excerpt = lesson_text.strip()[:8000]
+        if req.section_title:
+            clean_sec = re.escape(req.section_title.replace("#", "").strip())
+            sec_match = re.search(rf"(?:^|\n)(#{{1,4}}\s*{clean_sec}[\s\S]*?)(?=\n#{{1,4}}\s|\Z)", lesson_text, re.IGNORECASE)
+            clean_excerpt = sec_match.group(1).strip()[:4000] if sec_match else lesson_text.strip()[:5000]
+        else:
+            clean_excerpt = lesson_text.strip()[:5000]
+
+        section_label = f" - Section: '{req.section_title.replace('#', '').strip()}'" if req.section_title else ""
         conversation_text.append(
-            f"[Active Lesson in Reader Window - '{req.lesson_title or req.lesson_id or 'Current Lesson'}']:\n```markdown\n{clean_excerpt}\n```\n(INSTRUCTION: The student is looking at this lesson right now. If they ask 'explain this' or inquire about concepts, code, or formulas, ground your explanation in this lesson text.)"
+            f"[Active Lesson in Reader Window - '{req.lesson_title or req.lesson_id or 'Current Lesson'}'{section_label}]:\n```markdown\n{clean_excerpt}\n```\n(INSTRUCTION: The student is looking at this lesson right now. If they ask 'explain this' or inquire about concepts, code, or formulas, ground your explanation in this lesson text.)"
         )
 
     for m in req.history[-6:]:

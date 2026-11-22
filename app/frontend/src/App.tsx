@@ -612,6 +612,7 @@ function App() {
           query: selectedPath || '',
           lesson_id: activeLessonId,
           lesson_title: lessonTitle,
+          section_title: targetSection || undefined,
           message: msg,
           history: unifiedChatHistory,
           terminal_context: terminalOutput,
@@ -619,7 +620,7 @@ function App() {
           lesson_content: lessonContent,
           language: settings.language,
           stream: true,
-          model: settings.mentorModel || undefined,
+          model: settings.mentorModel || settings.primaryModel || undefined,
           host: settings.ollamaHost || undefined,
         }),
       });

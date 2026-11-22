@@ -185,3 +185,39 @@ def test_save_chat_session_real_disk_persistence(tmp_path):
     assert history_data[0]["role"] == "student"
     assert history_data[1]["role"] == "tutor"
 
+
+def test_api_chat_extracts_targeted_section():
+    """
+    Verifies that when section_title is supplied, chat_with_tutor extracts
+    only the target section instead of dumping the entire lesson markdown.
+    """
+    mock_provider = MagicMock()
+    mock_provider.generate_stream.return_value = ["Slotted ", "pages."]
+    mock_provider.generate.return_value = "Slotted pages."
+
+    lesson_markdown = (
+        "# Foundations\n\nIntroductory concepts.\n\n"
+        "## Page Layout Invariants\n\nPages are 8KB slotted blocks with line pointers.\n\n"
+        "## Write-Ahead Logging\n\nWAL records all page mutations before flushing to disk.\n"
+    )
+
+    with patch("app.backend.main.get_chat_provider", return_value=(mock_provider, "mock-model")):
+        payload = {
+            "query": "computing/data/postgresql",
+            "lesson_id": "lesson_01_foundations",
+            "lesson_title": "Storage Foundations",
+            "section_title": "Page Layout Invariants",
+            "message": "Explain slotted pages",
+            "lesson_content": lesson_markdown,
+            "stream": False
+        }
+        res = client.post("/api/chat", json=payload)
+        assert res.status_code == 200
+
+        call_args = mock_provider.generate.call_args
+        prompt_passed = call_args[0][0]
+        assert "Page Layout Invariants" in prompt_passed
+        assert "slotted blocks" in prompt_passed
+        assert "WAL records all page mutations" not in prompt_passed
+
+
