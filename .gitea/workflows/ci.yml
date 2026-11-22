@@ -13,21 +13,21 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      # setup-python picks its download by $ImageOS, which GitHub's runners
-      # set and Gitea's runner image does not. Use the Ubuntu 24.04 build even
-      # on a newer image: the 26.04 build needs a newer x86 ISA level than the
-      # runner's CPU has ("CPU ISA level is lower than required").
-      - name: Tell setup-python which Python build to use
-        run: echo "ImageOS=ubuntu24" >> "$GITHUB_ENV"
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
+      # The image's own Python, not actions/setup-python: its prebuilt Python
+      # for this Ubuntu needs a newer x86 ISA level than the runner's CPU
+      # ("CPU ISA level is lower than required").
+      - name: Python from the runner image
+        run: |
+          if ! python3 -c 'import venv, ensurepip' 2>/dev/null; then
+            apt-get update -qq && apt-get install -y -qq python3 python3-venv
+          fi
+          python3 -m venv .venv
+          .venv/bin/python --version
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
       - name: Install Python environment
         run: |
-          python -m venv .venv
           .venv/bin/python -m pip install -q -r requirements.txt pytest httpx playwright pytest-playwright
           .venv/bin/python -m playwright install --with-deps chromium
       - name: Install frontend dependencies
@@ -40,20 +40,21 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      # setup-python picks its download by $ImageOS, which GitHub's runners
-      # set and Gitea's runner image does not. Use the Ubuntu 24.04 build even
-      # on a newer image: the 26.04 build needs a newer x86 ISA level than the
-      # runner's CPU has ("CPU ISA level is lower than required").
-      - name: Tell setup-python which Python build to use
-        run: echo "ImageOS=ubuntu24" >> "$GITHUB_ENV"
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
+      # The image's own Python, not actions/setup-python: its prebuilt Python
+      # for this Ubuntu needs a newer x86 ISA level than the runner's CPU
+      # ("CPU ISA level is lower than required").
+      - name: Python from the runner image
+        run: |
+          if ! python3 -c 'import venv, ensurepip' 2>/dev/null; then
+            apt-get update -qq && apt-get install -y -qq python3 python3-venv
+          fi
+          python3 -m venv .venv
+          .venv/bin/python --version
       - name: Build packs and check them for private content
         run: |
-          python -m pip install -q -r requirements.txt
+          .venv/bin/python -m pip install -q -r requirements.txt
           out="$RUNNER_TEMP/packs"
-          python - "$out" <<'EOF'
+          .venv/bin/python - "$out" <<'EOF'
           import sys
           from pathlib import Path
           from learning_engine.packages import CORE_DOMAINS, TOPICS_DIR, export_topic_pack
@@ -63,7 +64,7 @@ jobs:
                   export_topic_pack(d, output_dir=out)
           export_topic_pack("complete", output_dir=out)
           EOF
-          python scripts/check_release_packs.py "$out"/*.synpack
+          .venv/bin/python scripts/check_release_packs.py "$out"/*.synpack
 
   secret-scan:
     runs-on: ubuntu-latest
