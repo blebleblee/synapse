@@ -163,6 +163,37 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 ---
 
+### FIND-20: Websites Could Trigger State Changes on a Password-less Instance (CSRF)
+- **Impact:** a no-cors POST from any site reached e.g. `/api/system/shutdown` (valid localhost Host, loopback IP). CORS does not stop simple requests.
+- **Status:** **COMPLETED** (`997c975`): middleware rejects non-GET/HEAD/OPTIONS with a foreign `Origin`. Tests: `tests/test_security_hardening.py`.
+
+### FIND-21: Mentor Status Named a Model That Was Not Answering
+- **Impact:** with the configured model missing, the chat fell back to another local model while the UI kept showing the configured one.
+- **Status:** **COMPLETED** (`8dbc84d`): connectivity check returns the resolved model; chat sends `X-Synapse-Model`; UI marks fallback. Tests: `tests/test_chat_and_mentor.py`.
+
+### FIND-22: Settings Maintenance Buttons Did the Wrong Thing
+- **Impact:** "Clear Transient Cache" deleted every saved chat session and no cache; "Vacuum SQLite Database" was a no-op that reported success; Shut Down reported success on 403.
+- **Status:** **COMPLETED** (`932a30a`). Tests: `tests/test_cleanup.py`.
+
+### FIND-23: Sidebar Collapsed After Reload
+- **Impact:** the restored lesson was hidden in a collapsed tree.
+- **Status:** **COMPLETED** (`a0b89d2`). E2E: `test_sidebar_reveals_restored_topic_after_reload`.
+
+---
+
+## Needs Decision
+
+- **Chat "Clear conversation" deletes saved sessions of every topic** (`TutorChat.tsx` sends `sessions: true`, which removes all `sessions/` dirs). The chat history is shared across topics in the UI, so this may be intended. Options: keep; or clear only the active topic's session.
+- **`/api/tree` returns absolute `full_path`s** (server home directory) to the browser. Harmless on localhost; with a password and remote access it reveals the server layout. Check whether the frontend needs it before removing.
+
+## Next Candidates (UI pass, not yet verified)
+
+- First run with a password: setup wizard and login modal are shown at the same time.
+- Before login, the UI polls `/api/translate/jobs`, cluster status and mentor connectivity, producing 401s in the console.
+- Setup wizard welcome text hard-codes "539 Unified Masterclasses across 12 domains" regardless of installed content.
+
+---
+
 ## Deferred Decisions & Unverified Behavior
 
 - **Package Content Injection:** **COMPLETED** (`2779454`, `4e598ee`): extraction stages into `.install-{stamp}-{pid}`, validates all members, merges safely, and atomically swaps via `os.replace` with automatic rollback.
