@@ -50,10 +50,15 @@ echo "[*] [4/5] Running backend test suite..."
 
 # Phase 5: Chromium E2E Browser Journey Tests
 echo ""
-echo "[*] [5/5] Running Chromium E2E browser tests..."
+echo "[*] [5/6] Running Chromium E2E browser tests..."
 "${VENV_PYTHON}" -m pytest e2e/test_learner_journey.py
+
+# Phase 6: Repository Security & Privacy Audit
+echo ""
+echo "[*] [6/6] Auditing tracked repository files for private content and secrets..."
+"${VENV_PYTHON}" scripts/check_staged_content.py --audit-tracked
 
 echo ""
 echo "=================================================="
-echo " [✔] ALL 5 VERIFICATION PHASES PASSED             "
+echo " [✔] ALL 6 VERIFICATION PHASES PASSED             "
 echo "=================================================="

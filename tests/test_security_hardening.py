@@ -328,3 +328,58 @@ def test_settings_api_cannot_overwrite_signing_key():
     assert res.status_code == 400
     assert auth.get_server_secret() == before
     assert get_settings().get("auth:server_secret") != "attacker-known"
+
+
+# --- Pre-commit staged content & privacy guard tests ------------------------
+
+def test_check_staged_content_detects_private_domains():
+    from scripts.check_staged_content import is_private_path
+
+    # Core public domain files must pass
+    ok, _ = is_private_path("topics/computing/data/postgresql/lesson_01.md")
+    assert ok is False
+
+    ok, _ = is_private_path("topics/engineering/hardware/fpga/lesson_01.md")
+    assert ok is False
+
+    # Private domains must be detected and rejected
+    private, reason = is_private_path("topics/chemistry/organic/lesson_01.md")
+    assert private is True
+    assert "chemistry" in reason
+
+    private, reason = is_private_path("topics/composing/harmony/lesson_01.md")
+    assert private is True
+    assert "composing" in reason
+
+    # Private language tracks must be detected and rejected
+    private, reason = is_private_path("topics/languages/czech/lesson_01.md")
+    assert private is True
+
+    private, reason = is_private_path("topics/languages/german/lesson_01.md")
+    assert private is True
+
+    # Sessions and blueprints must be detected and rejected
+    private, reason = is_private_path("topics/computing/sessions/active_session.md")
+    assert private is True
+
+    private, reason = is_private_path("topics/computing/chat_history.json")
+    assert private is True
+
+    private, reason = is_private_path("topics/computing/CURRICULUM_BLUEPRINT.md")
+    assert private is True
+
+
+def test_check_staged_content_detects_secrets():
+    from scripts.check_staged_content import find_secrets_in_text
+
+    # Safe placeholder keys must be ignored
+    clean_text = 'ANTHROPIC_KEY = "test_dummy_key_12345"\nGEMINI_KEY = "AIzaSyFakePlaceholderKeyXXXXX12345"'
+    hits = find_secrets_in_text(clean_text, "test.py")
+    assert len(hits) == 0
+
+    # Live key patterns must be flagged (constructed dynamically so source file is not flagged)
+    leaked_text = 'KEY = "' + 'sk-ant-api03-' + 'livecredentialtoken1234567890"'
+    hits = find_secrets_in_text(leaked_text, "config.py")
+    assert len(hits) == 1
+    assert hits[0][1] == "Anthropic API Key"
+
