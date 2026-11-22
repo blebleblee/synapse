@@ -949,7 +949,7 @@ function App() {
       const cur = topicDetails.lessons.find((l) => l.id === activeLessonId);
       return cur?.title || topicDetails.active_lesson_title || 'Active Lesson';
     }
-    return topicDetails.active_lesson_title || (topicDetails.subtopic ? topicDetails.subtopic.replace(/_/g, ' ') : 'Complete Masterclass');
+    return topicDetails.active_lesson_title || toTitleCase(topicDetails.display_title || topicDetails.subtopic || 'Complete Masterclass');
   }, [topicDetails, activeTab, activeLessonId]);
 
   const globalAITask = useMemo(() => {

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
 import { sanitizeHtml } from '../utils/markdownRenderer';
+import { toTitleCase } from '../utils/text';
 import {
   Send,
   Bot,
@@ -43,6 +44,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({
 }) => {
   const ui = getUIStrings(targetLanguage);
   // ... existing component logic ...
+  // The course as the sidebar names it ("AI Foundations"), not its folder name.
+  const topicName = topic ? toTitleCase(topic.display_title || topic.subtopic) : '';
   const [input, setInput] = useState('');
   const [personaExpanded, setPersonaExpanded] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -256,7 +259,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
             </div>
             <p>
               Ask deep questions, test operational edge-cases, or request counter-examples.
-              {topic ? ` Current context: ${topic.subtopic.replace(/_/g, ' ')}.` : ' Open any topic to explore with context.'}
+              {topic ? ` Current context: ${topicName}.` : ' Open any topic to explore with context.'}
             </p>
 
             <div className="chat-suggestions">
@@ -271,19 +274,19 @@ export const TutorChat: React.FC<TutorChatProps> = ({
               </button>
               <button
                 className="suggestion-chip"
-                onClick={() => handleSuggestionClick(topic ? `What are the core architectural invariants of ${topic.subtopic.replace(/_/g, ' ')} and where does it break in production?` : "Explain the core architectural invariants of modern distributed systems.")}
+                onClick={() => handleSuggestionClick(topic ? `What are the core architectural invariants of ${topicName} and where does it break in production?` : "Explain the core architectural invariants of modern distributed systems.")}
               >
                 Explain the core architectural invariants and failure modes
               </button>
               <button
                 className="suggestion-chip"
-                onClick={() => handleSuggestionClick(topic ? `Give me a challenging real-world debugging scenario on ${topic.subtopic.replace(/_/g, ' ')} to test my mental model.` : "Give me a challenging real-world debugging scenario to test my mental model.")}
+                onClick={() => handleSuggestionClick(topic ? `Give me a challenging real-world debugging scenario on ${topicName} to test my mental model.` : "Give me a challenging real-world debugging scenario to test my mental model.")}
               >
                 Give me a challenging real-world debugging scenario
               </button>
               <button
                 className="suggestion-chip"
-                onClick={() => handleSuggestionClick(topic ? `What are the subtle misconceptions most engineers have about ${topic.subtopic.replace(/_/g, ' ')}?` : "What are the subtle misconceptions most engineers have about this topic?")}
+                onClick={() => handleSuggestionClick(topic ? `What are the subtle misconceptions most engineers have about ${topicName}?` : "What are the subtle misconceptions most engineers have about this topic?")}
               >
                 What are the subtle misconceptions most engineers have?
               </button>
