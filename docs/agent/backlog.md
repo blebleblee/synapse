@@ -128,6 +128,12 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 ---
 
+### FIND-14: Bulk Generator Auto-Commits and Pushes
+- **Impact:** `scripts/generate_all.py` committed every generated topic, including topics in non-core domains, and ran `git push origin main`. The retry loop called `time.sleep` without importing `time`, and importing the script redirected stdout.
+- **Status:** **COMPLETED** (2026-11-22). No git writes by default. `--commit` makes local commits for core domains only and never pushes. Test: `tests/test_generate_all_git.py`.
+
+---
+
 ## Deferred Decisions & Unverified Behavior
 
 - **Package Content Injection:** Extraction occurs sequentially into `TOPICS_DIR`. A rejection mid-extraction (e.g., encountering a corrupted file) leaves previously extracted files on disk. *Decision Needed:* Should extraction write to a temporary directory and atomically rename upon complete success?

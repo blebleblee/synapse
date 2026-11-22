@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **First-run setup:** keyboard shortcuts such as ⌘K no longer open search behind the setup wizard or the login screen.
 - **CLI:** added `synapse pack export <domain…|all>`, which the docs and the post-generation pipeline already used. The pipeline now also builds the complete pack and runs the release guard.
 - **macOS build:** corrected misspelled hidden imports (`uvicorn.lifespan`) in `synapse.spec`.
+- **Bulk generator (`scripts/generate_all.py`):** no longer commits or runs `git push origin main` on its own. Pass `--commit` to commit each finished topic locally; it only commits core domains and never pushes. Fixed a crash in the old retry loop (`time` was not imported), and importing the script no longer redirects output into `generator.log`.
 
 ### Documentation
 - README and installation guide: version-free download instructions, a "Stopping Synapse" section, using Synapse as an installed web app, and current security behaviour. The release runbook now describes the real build and publish steps.

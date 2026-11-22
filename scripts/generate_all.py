@@ -2,12 +2,15 @@
 """
 Multi-Topic Parallel Curriculum Generator
 Uses a work-stealing queue to saturate all Ollama cluster nodes simultaneously.
+
+The script only writes topic files. It never pushes. With --commit it commits
+each finished topic locally (core domains only); review and push yourself.
 """
 
 import os
 import sys
 import argparse
-import threading
+import re
 import subprocess
 from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
@@ -48,69 +51,41 @@ class TeeLogger:
         except Exception:
             pass
 
-sys.stdout = TeeLogger(LOG_FILE)
-sys.stderr = sys.stdout
-
 from learning_engine.topic_manager import get_topic_tree
 from learning_engine.generator import generate_subtopic_content
 from learning_engine.models import OllamaCluster, AnthropicProvider, load_env_file
 from learning_engine.enhancer import enhance_existing_topic
-load_env_file()
+from learning_engine.packages import CORE_DOMAINS
 TOPICS_DIR = WORKSPACE_ROOT / "topics"
-GIT_QUEUE = Queue()
+SAFE_ID = re.compile(r"^[a-zA-Z0-9_\-]+$")
 
-import re
-
-def git_worker():
-    while True:
-        task = GIT_QUEUE.get()
-        if task is None:
-            GIT_QUEUE.task_done()
-            break
-        try:
-            subtopic_dir, subtopic_id, prefix = task
-            
-            # Security: validate subtopic_id to prevent commit message injection
-            if not re.match(r"^[a-zA-Z0-9_\-]+$", subtopic_id):
-                print(f"[✘] Git error: Invalid subtopic_id '{subtopic_id}'")
-                continue
-
-            published = False
-            for attempt in range(5):
-                try:
-                    # Add a timeout to prevent hanging git processes
-                    subprocess.run(["git", "add", str(subtopic_dir)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True, timeout=15)
-                    
-                    # Check=False on commit because it fails if there are no changes, which is fine
-                    subprocess.run(
-                        ["git", "commit", "-m", f"{prefix}({subtopic_id}): masterclass curriculum"],
-                        check=False, cwd=str(WORKSPACE_ROOT), capture_output=True, timeout=15
-                    )
-                    
-                    # Push with check=True so we actually detect failures
-                    res = subprocess.run(
-                        ["git", "push", "origin", "main"],
-                        check=True, cwd=str(WORKSPACE_ROOT), capture_output=True, timeout=30, text=True
-                    )
-                    print(f"[✔] Published & Pushed: {subtopic_id}")
-                    published = True
-                    break
-                except subprocess.TimeoutExpired:
-                    print(f"      [!] Git operation timed out for {subtopic_id} (attempt {attempt+1}/5)")
-                    time.sleep(2)
-                except subprocess.CalledProcessError:
-                    # Could be remote rejection, fast-forward error, etc.
-                    time.sleep(2)
-                except Exception as e:
-                    print(f"      [!] Unexpected Git error for {subtopic_id}: {e}")
-                    time.sleep(2)
-                    
-            if not published:
-                print(f"[✘] Git error for {subtopic_id}: Failed to publish after 5 attempts")
-        except Exception as e:
-            print(f"[✘] Git worker encountered unhandled error: {e}")
-        finally:
-            GIT_QUEUE.task_done()
+def commit_topic(subtopic_dir: Path, domain: str, subtopic_id: str, prefix: str, enabled: bool) -> bool:
+    """Commit one finished topic locally when --commit was given. Never pushes."""
+    if not enabled:
+        return False
+    if domain not in CORE_DOMAINS:
+        print(f"[!] Not committing {subtopic_id}: its domain is not a public core domain")
+        return False
+    if not SAFE_ID.match(subtopic_id):
+        print(f"[✘] Not committing: invalid subtopic_id '{subtopic_id}'")
+        return False
+    try:
+        subprocess.run(["git", "add", "--", str(subtopic_dir)], check=True,
+                       cwd=str(WORKSPACE_ROOT), capture_output=True, timeout=15)
+        res = subprocess.run(
+            ["git", "commit", "-m", f"{prefix}({subtopic_id}): masterclass curriculum", "--", str(subtopic_dir)],
+            check=False, cwd=str(WORKSPACE_ROOT), capture_output=True, timeout=15, text=True,
+        )
+    except (subprocess.SubprocessError, OSError) as e:
+        print(f"[✘] Git commit failed for {subtopic_id}: {e}")
+        return False
+    if res.returncode != 0:
+        # Non-zero also means "nothing to commit", which is fine.
+        detail = (res.stdout or res.stderr or "").strip().splitlines()
+        print(f"[i] No commit for {subtopic_id}: {detail[-1] if detail else 'git commit returned ' + str(res.returncode)}")
+        return False
+    print(f"[✔] Committed locally: {subtopic_id}")
+    return True
 
 def is_topic_complete(subtopic_dir: Path) -> bool:
     """
@@ -140,7 +115,7 @@ def is_topic_enhanced(subtopic_id: str) -> bool:
     except Exception:
         return False
 
-def worker(task_queue: Queue, total_tasks: int, progress_counter: list, provider_override=None, enhance_mode=False):
+def worker(task_queue: Queue, total_tasks: int, progress_counter: list, provider_override=None, enhance_mode=False, commit=False):
     while True:
         task = task_queue.get()
         if task is None:
@@ -160,7 +135,7 @@ def worker(task_queue: Queue, total_tasks: int, progress_counter: list, provider
                 if enhance_mode:
                     success = enhance_existing_topic(domain, subtopic_id, subtopic_dir, provider_override)
                     if success:
-                        GIT_QUEUE.put((subtopic_dir, subtopic_id, "enhance"))
+                        commit_topic(subtopic_dir, domain, subtopic_id, "enhance", commit)
                 else:
                     generate_subtopic_content(
                         domain=domain,
@@ -170,8 +145,8 @@ def worker(task_queue: Queue, total_tasks: int, progress_counter: list, provider
                         provider=provider_override,
                         force=False
                     )
-                    GIT_QUEUE.put((subtopic_dir, subtopic_id, "gen"))
                     print(f"[✔] Successfully generated topic: {subtopic_id}")
+                    commit_topic(subtopic_dir, domain, subtopic_id, "gen", commit)
             except Exception as e:
                 print(f"[✘] Failed {subtopic_id}: {e}")
         except Exception as e:
@@ -186,7 +161,12 @@ def main():
     parser.add_argument("--domain", type=str, default=None, help="Target specific domain only")
     parser.add_argument("--enhance", action="store_true", help="Enhance existing (completed) topics instead of generating new ones")
     parser.add_argument("--force", action="store_true", help="Force re-processing even if already completed or enhanced")
+    parser.add_argument("--commit", action="store_true", help="Commit each finished core-domain topic locally (never pushes)")
     args = parser.parse_args()
+
+    sys.stdout = TeeLogger(LOG_FILE)
+    sys.stderr = sys.stdout
+    load_env_file()
 
     provider_override = None
     if args.provider == "anthropic" or (args.provider == "auto" and (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("VNAIPRO_API_KEY"))):
@@ -227,22 +207,20 @@ def main():
     # Use 1 worker for Claude to avoid extreme rate limit saturation, or standard logic for Ollama
     num_workers = 1
     progress_counter = [0]
-    threading.Thread(target=git_worker, daemon=True).start()
-    
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
         for _ in range(num_workers):
-            executor.submit(worker, task_queue, total_tasks, progress_counter, provider_override, args.enhance)
+            executor.submit(worker, task_queue, total_tasks, progress_counter, provider_override, args.enhance, args.commit)
         
         task_queue.join()
         
         for _ in range(num_workers):
             task_queue.put(None)
     
-    GIT_QUEUE.put(None)
-    GIT_QUEUE.join()
-
-    subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT))
-    print(f"[✔] All topics processed and pushed.")
+    print("[✔] All topics processed.")
+    if args.commit:
+        print("[i] Commits are local only. Review them, then push yourself.")
+    else:
+        print("[i] Nothing was committed. Review the changes under topics/ and commit them yourself.")
 
 if __name__ == "__main__":
     main()
