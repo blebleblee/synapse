@@ -14,9 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       # setup-python picks its download by $ImageOS, which GitHub's runners
-      # set and Gitea's runner image does not.
-      - name: Tell setup-python which OS this is
-        run: echo "ImageOS=ubuntu$(. /etc/os-release && echo "${VERSION_ID%%.*}")" >> "$GITHUB_ENV"
+      # set and Gitea's runner image does not. Use the Ubuntu 24.04 build even
+      # on a newer image: the 26.04 build needs a newer x86 ISA level than the
+      # runner's CPU has ("CPU ISA level is lower than required").
+      - name: Tell setup-python which Python build to use
+        run: echo "ImageOS=ubuntu24" >> "$GITHUB_ENV"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
@@ -39,9 +41,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       # setup-python picks its download by $ImageOS, which GitHub's runners
-      # set and Gitea's runner image does not.
-      - name: Tell setup-python which OS this is
-        run: echo "ImageOS=ubuntu$(. /etc/os-release && echo "${VERSION_ID%%.*}")" >> "$GITHUB_ENV"
+      # set and Gitea's runner image does not. Use the Ubuntu 24.04 build even
+      # on a newer image: the 26.04 build needs a newer x86 ISA level than the
+      # runner's CPU has ("CPU ISA level is lower than required").
+      - name: Tell setup-python which Python build to use
+        run: echo "ImageOS=ubuntu24" >> "$GITHUB_ENV"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
