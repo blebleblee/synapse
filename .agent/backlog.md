@@ -144,4 +144,4 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 - **Package Content Injection:** Extraction occurs sequentially into `TOPICS_DIR`. A rejection mid-extraction (e.g., encountering a corrupted file) leaves previously extracted files on disk. *Decision Needed:* Should extraction write to a temporary directory and atomically rename upon complete success?
 - **Terminal PTY Concurrency:** Real PTY process allocation and signaling remain mocked in the test environment to prevent host shell execution.
-- **Complete Pack Backup (NEEDS DECISION):** Installing the complete pack overwrites each listed domain without a backup, because the backup step only looks for `topics/complete`. Should each listed domain be backed up first?
+- **Complete Pack Backup:** DONE (`2779454`): every domain a pack writes into is backed up first.
