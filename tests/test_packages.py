@@ -218,3 +218,76 @@ def test_install_pack_filename_domain_traversal_rejected(tmp_path):
         install_topic_pack(pack_path)
 
 
+
+
+def _write_pack(pack_path, manifest, members):
+    with tarfile.open(pack_path, "w:gz") as tar:
+        if manifest is not None:
+            data = json.dumps(manifest).encode("utf-8")
+            ti = tarfile.TarInfo(name="manifest.json")
+            ti.size = len(data)
+            tar.addfile(ti, io.BytesIO(data))
+        for name, payload in members.items():
+            ti = tarfile.TarInfo(name=name)
+            ti.size = len(payload)
+            tar.addfile(ti, io.BytesIO(payload))
+
+
+def test_install_domain_pack_cannot_write_into_other_domain(tmp_path):
+    """A domain pack may only write inside its own domain folder."""
+    pack_path = tmp_path / "arts.synpack"
+    _write_pack(pack_path, {"format": "synpack/v1", "domain": "arts"}, {
+        "topics/arts/ok/course/labs.md": b"# ok\n",
+        "topics/crafts/injected.md": b"# injected\n",
+    })
+
+    with pytest.raises(ValueError, match="outside its domain"):
+        install_topic_pack(pack_path)
+
+    assert not (TOPICS_DIR / "crafts" / "injected.md").exists()
+    assert not (TOPICS_DIR / "arts" / "ok" / "course" / "labs.md").exists()
+
+
+def test_install_domain_pack_cannot_write_topics_root(tmp_path):
+    pack_path = tmp_path / "arts.synpack"
+    _write_pack(pack_path, {"format": "synpack/v1", "domain": "arts"}, {
+        "topics/stray.md": b"# stray\n",
+    })
+
+    with pytest.raises(ValueError, match="outside its domain"):
+        install_topic_pack(pack_path)
+
+    assert not (TOPICS_DIR / "stray.md").exists()
+
+
+def test_install_complete_pack_limited_to_listed_domains(tmp_path):
+    pack_path = tmp_path / "synapse_complete_curriculum.synpack"
+    _write_pack(pack_path, {"format": "synpack/v1", "domain": "complete", "domains": ["arts"]}, {
+        "topics/arts/a/b/labs.md": b"# a\n",
+        "topics/unlisted/x.md": b"# x\n",
+    })
+
+    with pytest.raises(ValueError, match="outside its domain"):
+        install_topic_pack(pack_path)
+
+    assert not (TOPICS_DIR / "unlisted").exists()
+
+
+def test_install_complete_pack_writes_listed_domains(tmp_path):
+    pack_path = tmp_path / "synapse_complete_curriculum.synpack"
+    _write_pack(pack_path, {"format": "synpack/v1", "domain": "complete", "domains": ["arts", "crafts"]}, {
+        "topics/arts/p/q/labs.md": b"# arts\n",
+        "topics/crafts/p/q/labs.md": b"# crafts\n",
+    })
+
+    res = install_topic_pack(pack_path)
+    assert res["domain"] == "complete"
+    assert (TOPICS_DIR / "arts" / "p" / "q" / "labs.md").read_bytes() == b"# arts\n"
+    assert (TOPICS_DIR / "crafts" / "p" / "q" / "labs.md").read_bytes() == b"# crafts\n"
+
+
+def test_exported_complete_pack_installs(tmp_path):
+    """The complete pack built by export_topic_pack passes the domain check."""
+    pack = export_topic_pack("complete", output_dir=tmp_path)
+    res = install_topic_pack(pack)
+    assert res["domain"] == "complete"

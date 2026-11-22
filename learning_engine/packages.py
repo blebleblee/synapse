@@ -157,6 +157,20 @@ def export_topic_pack(domain: str, output_dir: Optional[Path] = None) -> Path:
     manifest_path.unlink(missing_ok=True)
     return pack_path
 
+_SLUG_RE = re.compile(r'^[a-zA-Z0-9_-]+$')
+
+
+def _pack_relative_name(name: str) -> Optional[str]:
+    """Archive member name relative to TOPICS_DIR, or None for the manifest and the root entry."""
+    rel = name[2:] if name.startswith("./") else name
+    rel = rel.rstrip("/")
+    if rel in ("manifest.json", "topics", "."):
+        return None
+    if rel.startswith("topics/"):
+        rel = rel[len("topics/"):]
+    return rel or None
+
+
 def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
     """
     Installs a .synpack archive into the local topics workspace.
@@ -187,12 +201,32 @@ def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
             pass
 
         raw_domain = manifest.get("domain") or pack_path.stem.replace(".synpack", "")
-        if not raw_domain or not isinstance(raw_domain, str) or not re.match(r'^[a-zA-Z0-9_-]+$', raw_domain):
+        if not raw_domain or not isinstance(raw_domain, str) or not _SLUG_RE.match(raw_domain):
             raise ValueError(f"Invalid domain identifier '{raw_domain}' in package manifest or filename.")
 
         domain = raw_domain
         target_domain_dir = TOPICS_DIR / domain
         validate_workspace_path(TOPICS_DIR, target_domain_dir)
+
+        # A pack may only write inside the domain(s) it declares: a domain pack
+        # into its own folder, a complete pack into its listed domains (any
+        # slug-named domain if an older manifest has no list).
+        is_complete = domain.lower() in ("complete", "all", "global")
+        listed = manifest.get("domains") if is_complete else None
+        allowed = None
+        if isinstance(listed, list) and all(isinstance(d, str) and _SLUG_RE.match(d) for d in listed):
+            allowed = set(listed)
+        elif not is_complete:
+            allowed = {domain}
+        for member in tar.getmembers():
+            rel = _pack_relative_name(member.name)
+            if rel is None:
+                continue
+            parts = rel.split("/")
+            top = parts[0]
+            in_domain = (allowed is None and _SLUG_RE.match(top)) or (allowed is not None and top in allowed)
+            if not in_domain or (len(parts) == 1 and not member.isdir()):
+                raise ValueError(f"Package member '{member.name}' is outside its domain '{domain}'.")
 
         # Backup existing domain if it exists
         if target_domain_dir.exists() and target_domain_dir.is_dir():
@@ -205,15 +239,8 @@ def install_topic_pack(pack_path: Path) -> Dict[str, Any]:
 
         # Extract topics directly into TOPICS_DIR
         for member in tar.getmembers():
-            if member.name == "manifest.json":
-                continue
-
-            # Strip leading "topics/" prefix if present in the archive
-            rel_name = member.name
-            if rel_name.startswith("topics/"):
-                rel_name = rel_name[len("topics/"):]
-
-            if not rel_name:
+            rel_name = _pack_relative_name(member.name)
+            if rel_name is None:
                 continue
 
             target_path = TOPICS_DIR / rel_name
