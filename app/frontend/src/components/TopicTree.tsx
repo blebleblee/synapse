@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { toTitleCase, cleanLessonTitle } from '../utils/text';
 import {
   Folder,
   FolderOpen,
@@ -52,23 +53,6 @@ interface TopicTreeProps {
   onRenameTopic?: (path: string, newTitle: string) => Promise<boolean | void>;
   onToggleLessonCompletion?: (path: string, lessonId: string, completed?: boolean) => Promise<void>;
   targetLanguage?: string;
-}
-
-export function toTitleCase(str: string): string {
-  if (!str) return '';
-  return str
-    .replace(/_/g, ' ')
-    .split(' ')
-    .map((w) => (w.length > 0 ? w.charAt(0).toUpperCase() + w.slice(1) : ''))
-    .join(' ');
-}
-
-export function cleanLessonTitle(raw: string): string {
-  if (!raw) return '';
-  return raw
-    .replace(/^Lesson\s*\d+\s*[:.-]\s*/i, '')
-    .replace(/^\d+\s*[:.-]\s*/, '')
-    .trim();
 }
 
 import { getUIStrings } from '../utils/i18n';

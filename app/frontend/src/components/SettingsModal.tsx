@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DEFAULT_SETTINGS, type AppSettings, type SettingsTab } from './settingsDefaults';
 import {
   Settings,
   Palette,
@@ -25,51 +26,6 @@ import {
   ChevronUp
 } from 'lucide-react';
 
-export interface AppSettings {
-  theme: 'studio' | 'titanium' | 'monokai' | 'nordic' | 'github_dimmed' | 'dracula' | 'solarized';
-  fontFamily: 'sans' | 'serif' | 'mono';
-  accentColor: 'gold' | 'cyan' | 'emerald' | 'amethyst' | 'rose';
-  lineHeight: 'dense' | 'balanced' | 'relaxed';
-  fontSize: 'compact' | 'standard' | 'large';
-  readerWidth: 'full' | 'constrained';
-  language: 'en' | 'cs' | 'de' | 'es' | 'ru';
-  codeLigatures?: boolean;
-  terminalFontSize?: '12px' | '13px' | '14px' | '15px';
-  speechRate?: '0.85' | '1.0' | '1.15' | '1.3';
-  ollamaHost: string;
-  clusterHosts?: string[];
-  primaryModel: string;
-  reviewerModel: string;
-  mentorModel?: string;
-  geminiApiKey: string;
-  geminiBaseUrl?: string;
-  anthropicApiKey: string;
-  anthropicBaseUrl: string;
-}
-
-export const DEFAULT_SETTINGS: AppSettings = {
-  theme: 'studio',
-  fontFamily: 'sans',
-  accentColor: 'gold',
-  lineHeight: 'balanced',
-  fontSize: 'standard',
-  readerWidth: 'full',
-  language: 'en',
-  codeLigatures: true,
-  terminalFontSize: '13px',
-  speechRate: '1.0',
-  ollamaHost: 'http://localhost:11434',
-  clusterHosts: ['http://localhost:11434'],
-  primaryModel: 'qwen2.5-coder:32b',
-  reviewerModel: 'deepseek-r1:32b',
-  mentorModel: '',
-  geminiApiKey: '',
-  geminiBaseUrl: '',
-  anthropicApiKey: '',
-  anthropicBaseUrl: 'https://api.anthropic.com',
-};
-
-export type SettingsTab = 'appearance' | 'ai' | 'storage';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -81,8 +37,53 @@ interface SettingsModalProps {
   onLaunchSetupWizard?: () => void;
 }
 
-export const SettingsModal: React.FC<SettingsModalProps> = ({
-  isOpen,
+type NodeStatus = {
+  online?: boolean;
+  latency_ms?: number;
+  models?: string[];
+  error?: string;
+  testing?: boolean;
+};
+
+const uniqueHosts = (hosts: string[]) =>
+  Array.from(new Set(hosts.map((h) => h.trim().replace(/\/$/, '')).filter(Boolean)));
+
+// Nodes are probed by the backend: Ollama refuses browser requests from
+// other origins, and the answer comes back under the host name as typed.
+async function probeStatuses(list: string[]): Promise<Record<string, NodeStatus>> {
+  const out: Record<string, NodeStatus> = {};
+  try {
+    const res = await fetch(`/api/settings/cluster-status?hosts=${encodeURIComponent(list.join(','))}`);
+    const data = res.ok ? await res.json() : {};
+    const detail = res.ok ? undefined : (await res.json().catch(() => ({}))).detail || `HTTP ${res.status}`;
+    list.forEach((h) => {
+      const s = data[h];
+      out[h] = s
+        ? { online: s.online, latency_ms: s.latency_ms ?? undefined, models: s.models || [], testing: false, error: s.online ? undefined : 'Offline' }
+        : { online: false, testing: false, error: detail || 'Offline' };
+    });
+  } catch {
+    list.forEach((h) => { out[h] = { online: false, testing: false, error: 'Backend unreachable' }; });
+  }
+  return out;
+}
+
+async function fetchJson<T>(url: string): Promise<T | null> {
+  try {
+    const res = await fetch(url);
+    return res.ok ? ((await res.json()) as T) : null;
+  } catch (err) {
+    console.error(`Failed to load ${url}:`, err);
+    return null;
+  }
+}
+
+// Mounted only while open: each opening starts from the saved settings
+// (unsaved edits are dropped on close) and loads fresh data.
+export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, ...props }) =>
+  isOpen ? <SettingsPanel {...props} /> : null;
+
+const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
   onClose,
   settings,
   onSaveSettings,
@@ -101,12 +102,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     return settings.anthropicApiKey || settings.geminiApiKey ? 'cloud' : 'local';
   });
 
-  useEffect(() => {
-    if (isOpen && initialTab) {
-      setActiveTab(resolveTab(initialTab));
-    }
-  }, [isOpen, initialTab]);
-
   const [formData, setFormData] = useState<AppSettings>(settings);
   const [showAnthropicKey, setShowAnthropicKey] = useState(false);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
@@ -116,23 +111,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     settings.clusterHosts || DEFAULT_SETTINGS.clusterHosts || []
   );
   const [newNodeUrl, setNewNodeUrl] = useState('');
-  const [nodeStatuses, setNodeStatuses] = useState<{
-    [host: string]: {
-      online?: boolean;
-      latency_ms?: number;
-      models?: string[];
-      error?: string;
-      testing?: boolean;
-    };
-  }>({});
-  const [isScanningCluster, setIsScanningCluster] = useState(false);
+  // Hosts checked when the dialog opens; they show as "testing" until answered.
+  const [initialHosts] = useState(() => uniqueHosts([settings.ollamaHost, ...(settings.clusterHosts || DEFAULT_SETTINGS.clusterHosts || [])]));
+  const [nodeStatuses, setNodeStatuses] = useState<Record<string, NodeStatus>>(
+    () => Object.fromEntries(initialHosts.map((h) => [h, { testing: true }])),
+  );
+  const [isScanningCluster, setIsScanningCluster] = useState(true);
 
   // Curriculum Store & Addons State
   const [packagesData, setPackagesData] = useState<{
     installed: { domain: string; format?: string; title?: string; lesson_count?: number; lab_count?: number }[];
     available_domains: { domain: string; title: string; description: string; lesson_count: number; lab_count: number; is_installed: boolean }[];
   }>({ installed: [], available_domains: [] });
-  const [isLoadingPackages, setIsLoadingPackages] = useState(false);
+  const [isLoadingPackages, setIsLoadingPackages] = useState(true);
   const [storeSearch, setStoreSearch] = useState('');
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [storeMessage, setStoreMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -161,18 +152,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   // Node Model Pins State
   const [nodePins, setNodePins] = useState<{ [host: string]: string }>({});
-
-  const fetchNodePins = async () => {
-    try {
-      const res = await fetch('/api/settings/cluster-pins');
-      if (res.ok) {
-        const data = await res.json();
-        setNodePins(data.pins || {});
-      }
-    } catch (err) {
-      console.error('Failed to load node pins:', err);
-    }
-  };
 
   const handleUpdateNodePin = async (host: string, modelName: string) => {
     const cleanHost = host.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -211,51 +190,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
-  const fetchDiscoveredModels = async () => {
-    try {
-      const res = await fetch('/api/settings/discovered-models');
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data.models)) {
-          setDiscoveredModels(data.models);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to load discovered models:', err);
-    }
-  };
-
-  // Nodes are probed by the backend: Ollama refuses browser requests from
-  // other origins, and the answer comes back under the host name as typed.
   const probeHosts = async (hosts: string[]) => {
-    const list = Array.from(new Set(hosts.map((h) => h.trim().replace(/\/$/, '')).filter(Boolean)));
+    const list = uniqueHosts(hosts);
     if (list.length === 0) return;
     setNodeStatuses((prev) => {
       const next = { ...prev };
       list.forEach((h) => { next[h] = { ...prev[h], testing: true, error: undefined }; });
       return next;
     });
-    try {
-      const res = await fetch(`/api/settings/cluster-status?hosts=${encodeURIComponent(list.join(','))}`);
-      const data = res.ok ? await res.json() : {};
-      const detail = res.ok ? undefined : (await res.json().catch(() => ({}))).detail || `HTTP ${res.status}`;
-      setNodeStatuses((prev) => {
-        const next = { ...prev };
-        list.forEach((h) => {
-          const s = data[h];
-          next[h] = s
-            ? { online: s.online, latency_ms: s.latency_ms ?? undefined, models: s.models || [], testing: false, error: s.online ? undefined : 'Offline' }
-            : { online: false, testing: false, error: detail || 'Offline' };
-        });
-        return next;
-      });
-    } catch {
-      setNodeStatuses((prev) => {
-        const next = { ...prev };
-        list.forEach((h) => { next[h] = { online: false, testing: false, error: 'Backend unreachable' }; });
-        return next;
-      });
-    }
+    const result = await probeStatuses(list);
+    setNodeStatuses((prev) => ({ ...prev, ...result }));
   };
 
   const testNodeConnection = (host: string) => probeHosts([host]);
@@ -269,14 +213,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
+  // Opening load. Buttons reuse the handlers above; this runs once per opening.
   useEffect(() => {
-    if (isOpen) {
-      fetchPackages();
-      fetchDiscoveredModels();
-      fetchNodePins();
-      scanCluster();
-    }
-  }, [isOpen]);
+    let live = true;
+    fetchJson<typeof packagesData>('/api/packages').then((data) => {
+      if (!live) return;
+      if (data) setPackagesData(data);
+      setIsLoadingPackages(false);
+    });
+    fetchJson<{ models?: unknown }>('/api/settings/discovered-models').then((data) => {
+      if (live && data && Array.isArray(data.models)) setDiscoveredModels(data.models as string[]);
+    });
+    fetchJson<{ pins?: Record<string, string> }>('/api/settings/cluster-pins').then((data) => {
+      if (live && data) setNodePins(data.pins || {});
+    });
+    probeStatuses(initialHosts).then((result) => {
+      if (!live) return;
+      setNodeStatuses((prev) => ({ ...prev, ...result }));
+      setIsScanningCluster(false);
+    });
+    return () => { live = false; };
+  }, [initialHosts]);
 
   const handleExportPack = async (domain: string) => {
     setActionInProgress(`export-${domain}`);
@@ -408,7 +365,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     onClose();
   };
 
-  if (!isOpen) return null;
 
   const currentHostStatus = nodeStatuses[formData.ollamaHost] || {};
 

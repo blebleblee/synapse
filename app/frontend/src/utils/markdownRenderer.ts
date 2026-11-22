@@ -93,7 +93,7 @@ export function sanitizeAndRepairMermaid(diagramText: string): string {
   });
 
   // Enclose unquoted node labels with special characters in double quotes safely
-  cleaned = cleaned.replace(/([A-Za-z0-9_-]+)\[([^"\]\n]*[\(\)\/\+\=\*\&][^"\]\n]*)\]/g, (match, id, text) => {
+  cleaned = cleaned.replace(/([A-Za-z0-9_-]+)\[([^"\]\n]*[()/+=*&][^"\]\n]*)\]/g, (match, id, text) => {
     if (text.startsWith('"') && text.endsWith('"')) return match;
     return `${id}["${text.replace(/"/g, "'")}"]`;
   });

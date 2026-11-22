@@ -19,8 +19,11 @@ interface SearchModalProps {
   onSelectTopic: (path: string, lessonId?: string) => void;
 }
 
-export const SearchModal: React.FC<SearchModalProps> = ({
-  isOpen,
+// Mounted only while open, so every opening starts with an empty query.
+export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, ...props }) =>
+  isOpen ? <SearchPanel {...props} /> : null;
+
+const SearchPanel: React.FC<Omit<SearchModalProps, 'isOpen'>> = ({
   onClose,
   onSelectTopic,
 }) => {
@@ -29,12 +32,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
-    if (!isOpen) {
-      setQuery('');
-      setResults([]);
-      return;
-    }
-
     // Each keystroke cancels the previous request, and a response that arrives
     // after the query changed is ignored, so older results never overwrite newer ones.
     const controller = new AbortController();
@@ -63,23 +60,19 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [query, isOpen]);
+  }, [query]);
 
   // Global Cmd+K keyboard shortcut
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        if (isOpen) {
-          onClose();
-        }
+        onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
+  }, [onClose]);
 
   return (
     <div className="modal-backdrop" onClick={onClose}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Layers, RotateCcw, CheckCircle2, X, Sparkles, Award } from 'lucide-react';
 import { failureMessage, networkFailure } from '../utils/failureMessage';
 
@@ -16,8 +16,29 @@ interface FlashcardStudyModalProps {
   topicTitle: string;
 }
 
-export const FlashcardStudyModal: React.FC<FlashcardStudyModalProps> = ({
-  isOpen,
+type DeckResult = { cards: Flashcard[]; error: string | null };
+
+async function fetchDeck(topicPath: string): Promise<DeckResult> {
+  try {
+    const res = await fetch(`/api/flashcards/deck?query=${encodeURIComponent(topicPath)}`);
+    if (!res.ok) return { cards: [], error: await failureMessage(res, 'Loading flashcards') };
+    const data = await res.json();
+    const cards: Flashcard[] = data.cards || [];
+    return {
+      cards,
+      error: cards.length ? null : 'No cards could be made from this topic yet. Its lessons need key terms or review questions.',
+    };
+  } catch (err) {
+    console.error('Failed to load flashcard deck:', err);
+    return { cards: [], error: networkFailure('Loading flashcards', err) };
+  }
+}
+
+// Mounted only while open and keyed by topic: each session starts fresh.
+export const FlashcardStudyModal: React.FC<FlashcardStudyModalProps> = ({ isOpen, ...props }) =>
+  isOpen ? <FlashcardStudyPanel key={props.topicPath} {...props} /> : null;
+
+const FlashcardStudyPanel: React.FC<Omit<FlashcardStudyModalProps, 'isOpen'>> = ({
   onClose,
   topicPath,
   topicTitle,
@@ -25,53 +46,37 @@ export const FlashcardStudyModal: React.FC<FlashcardStudyModalProps> = ({
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(Boolean(topicPath));
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [reviewedCount, setReviewedCount] = useState(0);
 
+  const applyDeck = useCallback((deck: DeckResult) => {
+    setCards(deck.cards);
+    setLoadError(deck.error);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setIsCompleted(false);
+    setIsLoading(false);
+  }, []);
+
   const loadDeck = async () => {
     setIsLoading(true);
-    setLoadError(null);
-    try {
-      const res = await fetch(`/api/flashcards/deck?query=${encodeURIComponent(topicPath)}`);
-      if (res.ok) {
-        const data = await res.json();
-        setCards(data.cards || []);
-        setCurrentIndex(0);
-        setIsFlipped(false);
-        setIsCompleted(false);
-        if (!data.cards?.length) {
-          setLoadError('No cards could be made from this topic yet. Its lessons need key terms or review questions.');
-        }
-      } else {
-        setLoadError(await failureMessage(res, 'Loading flashcards'));
-      }
-    } catch (err) {
-      console.error('Failed to load flashcard deck:', err);
-      setLoadError(networkFailure('Loading flashcards', err));
-    } finally {
-      setIsLoading(false);
-    }
+    applyDeck(await fetchDeck(topicPath));
   };
 
   useEffect(() => {
-    if (isOpen && topicPath) {
-      loadDeck();
-    } else {
-      setCards([]);
-      setCurrentIndex(0);
-      setIsFlipped(false);
-      setIsCompleted(false);
-      setReviewedCount(0);
-    }
-  }, [isOpen, topicPath]);
+    if (!topicPath) return;
+    let live = true;
+    fetchDeck(topicPath).then((deck) => { if (live) applyDeck(deck); });
+    return () => { live = false; };
+  }, [topicPath, applyDeck]);
 
   const handleFlip = () => {
     setIsFlipped((prev) => !prev);
   };
 
-  const handleRate = (_intervalDays: number) => {
+  const handleRate = useCallback((_intervalDays: number) => {
     setIsFlipped(false);
     setReviewedCount((prev) => prev + 1);
 
@@ -80,11 +85,11 @@ export const FlashcardStudyModal: React.FC<FlashcardStudyModalProps> = ({
     } else {
       setIsCompleted(true);
     }
-  };
+  }, [currentIndex, cards.length]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen || cards.length === 0 || isCompleted) return;
+      if (cards.length === 0 || isCompleted) return;
       if (e.code === 'Space') {
         e.preventDefault();
         handleFlip();
@@ -98,9 +103,7 @@ export const FlashcardStudyModal: React.FC<FlashcardStudyModalProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, isFlipped, cards, currentIndex, isCompleted]);
-
-  if (!isOpen) return null;
+  }, [isFlipped, cards, isCompleted, handleRate]);
 
   const currentCard = cards[currentIndex];
   const progressPercent = cards.length > 0 ? ((currentIndex + (isCompleted ? 1 : 0)) / cards.length) * 100 : 0;

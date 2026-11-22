@@ -43,8 +43,18 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
   const connectGenerationRef = useRef(0);
   const lastSizeRef = useRef<{ cols: number; rows: number }>({ cols: 0, rows: 0 });
 
+  // Latest props and helpers for the long-lived terminal setup and its event
+  // handlers, which are created once at mount and would otherwise keep the
+  // first render's values (e.g. a drawer that started closed never refitting).
+  const latest = useRef({
+    isOpen,
+    terminalEnv,
+    fitTerminal: () => {},
+    connectWs: (_env?: 'host' | 'docker' | 'k8s') => {},
+  });
+
   const fitTerminal = () => {
-    if (!termRef.current || !containerRef.current || !isOpen || !fitAddonRef.current) return;
+    if (!termRef.current || !containerRef.current || !latest.current.isOpen || !fitAddonRef.current) return;
 
     try {
       fitAddonRef.current.fit();
@@ -70,7 +80,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     }
   };
 
-  const connectWs = (env = terminalEnv) => {
+  const connectWs = (env = latest.current.terminalEnv) => {
     if (reconnectTimerRef.current) {
       clearTimeout(reconnectTimerRef.current);
       reconnectTimerRef.current = null;
@@ -163,6 +173,10 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
   };
 
   useEffect(() => {
+    latest.current = { isOpen, terminalEnv, fitTerminal, connectWs };
+  });
+
+  useEffect(() => {
     if (!containerRef.current) return;
 
     const term = new Terminal({
@@ -197,8 +211,8 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
 
     if (typeof document !== 'undefined' && document.fonts?.ready) {
       document.fonts.ready.then(() => {
-        if (!isUnmountedRef.current && isOpen) {
-          fitTerminal();
+        if (!isUnmountedRef.current && latest.current.isOpen) {
+          latest.current.fitTerminal();
           term.refresh(0, term.rows - 1);
         }
       });
@@ -210,11 +224,11 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       }
     });
 
-    connectWs('host');
+    latest.current.connectWs('host');
 
     const resizeObserver = new ResizeObserver(() => {
-      if (isOpen) {
-        fitTerminal();
+      if (latest.current.isOpen) {
+        latest.current.fitTerminal();
       }
     });
 
@@ -234,7 +248,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     const handleMouseUp = () => {
       isDraggingRef.current = false;
       document.body.style.cursor = '';
-      fitTerminal();
+      latest.current.fitTerminal();
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -242,7 +256,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
 
     const handleAuthEvent = () => {
       if (!isUnmountedRef.current) {
-        connectWs(terminalEnv);
+        latest.current.connectWs(latest.current.terminalEnv);
       }
     };
     window.addEventListener('synapse:authenticated', handleAuthEvent);
@@ -264,7 +278,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
   useEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {
-        fitTerminal();
+        latest.current.fitTerminal();
         termRef.current?.focus();
       }, 50);
       return () => clearTimeout(timer);

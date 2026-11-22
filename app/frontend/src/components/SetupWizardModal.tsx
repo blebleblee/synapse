@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Sparkles,
   CheckCircle,
@@ -13,7 +13,7 @@ import {
   RefreshCw,
   HardDrive
 } from 'lucide-react';
-import type { AppSettings } from './SettingsModal';
+import type { AppSettings } from './settingsDefaults';
 
 interface SetupWizardModalProps {
   isOpen: boolean;
@@ -22,8 +22,27 @@ interface SetupWizardModalProps {
   onSaveSettings: (settings: AppSettings) => void;
 }
 
-export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({
-  isOpen,
+type ProbeResult = { online: boolean; models: string[] };
+
+// Asks the backend to probe exactly this host (browsers can't reach Ollama
+// directly), so the answer comes back under the host name as typed.
+async function probeHost(host: string): Promise<ProbeResult> {
+  const clean = host.trim().replace(/\/$/, '');
+  try {
+    const res = await fetch(`/api/settings/cluster-status?hosts=${encodeURIComponent(clean)}`);
+    if (!res.ok) return { online: false, models: [] };
+    const node = (await res.json())[clean];
+    return node?.online ? { online: true, models: node.models || [] } : { online: false, models: [] };
+  } catch {
+    return { online: false, models: [] };
+  }
+}
+
+// Mounted only while open: each opening probes once and starts at step 1.
+export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({ isOpen, ...props }) =>
+  isOpen ? <SetupWizardPanel {...props} /> : null;
+
+const SetupWizardPanel: React.FC<Omit<SetupWizardModalProps, 'isOpen'>> = ({
   onClose,
   currentSettings,
   onSaveSettings,
@@ -31,7 +50,7 @@ export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [localOllamaOnline, setLocalOllamaOnline] = useState<boolean | null>(null);
   const [discoveredModels, setDiscoveredModels] = useState<string[]>([]);
-  const [isProbing, setIsProbing] = useState(false);
+  const [isProbing, setIsProbing] = useState(true);
   const [selectedModel, setSelectedModel] = useState<string>(
     currentSettings.primaryModel || 'qwen2.5-coder:32b'
   );
@@ -41,45 +60,27 @@ export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({
   const [anthropicKey, setAnthropicKey] = useState<string>(currentSettings.anthropicApiKey || '');
   const [geminiKey, setGeminiKey] = useState<string>(currentSettings.geminiApiKey || '');
 
+  const applyProbe = useCallback((result: ProbeResult) => {
+    setLocalOllamaOnline(result.online);
+    setDiscoveredModels(result.models);
+    if (result.models.length > 0) {
+      setSelectedModel((cur) => (result.models.includes(cur) ? cur : result.models[0]));
+    }
+    setIsProbing(false);
+  }, []);
+
   const probeOllama = async (host = ollamaHost) => {
     setIsProbing(true);
-    try {
-      const res = await fetch('/api/settings/cluster-status');
-      if (res.ok) {
-        const data = await res.json();
-        const normHost = host.replace(/\/$/, '');
-        const hostKey = Object.keys(data).find(
-          (k) => k.replace(/\/$/, '') === normHost || k.includes('11434')
-        );
-        const node = hostKey ? data[hostKey] : null;
-
-        if (node && node.online) {
-          setLocalOllamaOnline(true);
-          const models = node.models || [];
-          setDiscoveredModels(models);
-          if (models.length > 0 && !models.includes(selectedModel)) {
-            setSelectedModel(models[0]);
-          }
-        } else {
-          setLocalOllamaOnline(false);
-        }
-      } else {
-        setLocalOllamaOnline(false);
-      }
-    } catch {
-      setLocalOllamaOnline(false);
-    } finally {
-      setIsProbing(false);
-    }
+    applyProbe(await probeHost(host));
   };
 
+  const initialHost = currentSettings.ollamaHost || 'http://localhost:11434';
   useEffect(() => {
-    if (isOpen) {
-      probeOllama();
-    }
-  }, [isOpen]);
+    let live = true;
+    probeHost(initialHost).then((result) => { if (live) applyProbe(result); });
+    return () => { live = false; };
+  }, [initialHost, applyProbe]);
 
-  if (!isOpen) return null;
 
   const handleFinish = () => {
     const updated: AppSettings = {

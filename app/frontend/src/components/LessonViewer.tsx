@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useState, useRef } from 'react';
+import { toTitleCase } from '../utils/text';
 import {
   BookOpen,
   FlaskConical,
@@ -32,14 +33,6 @@ import { getUIStrings } from '../utils/i18n';
 import { failureMessage, networkFailure } from '../utils/failureMessage';
 import type { TranslationJobInfo } from '../types';
 
-function toTitleCase(str: string): string {
-  if (!str) return '';
-  return str
-    .replace(/_/g, ' ')
-    .split(' ')
-    .map((w) => (w.length > 0 ? w.charAt(0).toUpperCase() + w.slice(1) : ''))
-    .join(' ');
-}
 
 interface LessonViewerProps {
   topic: TopicDetails | null;
@@ -166,19 +159,27 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   const nextLesson = topic?.lessons && currentLessonIndex < topic.lessons.length - 1 ? topic.lessons[currentLessonIndex + 1] : null;
   const currentLesson = topic?.lessons && topic.lessons.length > 0 ? topic.lessons[currentLessonIndex] : null;
 
-  useEffect(() => {
-    stopSpeaking();
+  // A different topic, tab or lesson starts in English with no translation
+  // state (reset during render, React's pattern for state that follows props).
+  const viewKey = `${topic?.path}|${activeTab}|${activeLessonId}`;
+  const [shownViewKey, setShownViewKey] = useState(viewKey);
+  if (viewKey !== shownViewKey) {
+    setShownViewKey(viewKey);
     setIsSpeakingVoice(false);
     setReadingLang('en');
-    // Leaving the lesson only stops watching its translation: the job keeps
-    // running in the queue (see the status bar) and lands in the cache.
-    translationRequestRef.current += 1;
     setTranslatedMarkdown(null);
     setIsTranslating(false);
     setTranslationJob(null);
     setTranslationNotice(null);
     setTranslationError(null);
-  }, [topic?.path, activeTab, activeLessonId]);
+  }
+
+  useEffect(() => {
+    stopSpeaking();
+    // Leaving the lesson only stops watching its translation: the job keeps
+    // running in the queue (see the status bar) and lands in the cache.
+    translationRequestRef.current += 1;
+  }, [viewKey]);
 
   // Follow the queued job until it finishes.
   const watchedJobId = translationJob?.id;
@@ -407,7 +408,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     if (contentRef.current) {
       renderMermaidDiagramsInElement(contentRef.current);
     }
-  }, [htmlContent, originalHtmlContent, translatedHtmlContent, activeTab, translationViewMode]);
+  }, [contentRef, htmlContent, originalHtmlContent, translatedHtmlContent, activeTab, translationViewMode]);
 
   const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;

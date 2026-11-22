@@ -6,7 +6,8 @@ import { TutorChat } from './components/TutorChat';
 import { TerminalDrawer } from './components/TerminalDrawer';
 import { SearchModal } from './components/SearchModal';
 import { GraphModal } from './components/GraphModal';
-import { SettingsModal, DEFAULT_SETTINGS, type AppSettings } from './components/SettingsModal';
+import { SettingsModal } from './components/SettingsModal';
+import { DEFAULT_SETTINGS, type AppSettings } from './components/settingsDefaults';
 import { SetupWizardModal } from './components/SetupWizardModal';
 import { FlashcardStudyModal } from './components/FlashcardStudyModal';
 import { LoginModal } from './components/LoginModal';
@@ -18,7 +19,21 @@ import { TranslationQueueIndicator } from './components/TranslationQueueIndicato
 import { failureMessage, networkFailure } from './utils/failureMessage';
 import './App.css';
 
-export function App() {
+async function mentorStatus(host: string, model?: string): Promise<'connected' | 'error'> {
+  try {
+    const res = await fetch('/api/check-mentor-connectivity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ host, model }),
+    });
+    const data = await res.json();
+    return data.connected ? 'connected' : 'error';
+  } catch {
+    return 'error';
+  }
+}
+
+function App() {
   const [tree, setTree] = useState<TopicTreeData>({});
   const [treeLoaded, setTreeLoaded] = useState(false);
   const [mentorConnected, setMentorConnected] = useState<'checking' | 'connected' | 'error'>('checking');
@@ -85,22 +100,10 @@ export function App() {
     }
   });
 
-  const checkConnectivity = useCallback(async (quiet = false) => {
-    if (!quiet) setMentorConnected('checking');
-    try {
-      const res = await fetch('/api/check-mentor-connectivity', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          host: settings.ollamaHost,
-          model: settings.mentorModel
-        }),
-      });
-      const data = await res.json();
-      setMentorConnected(data.connected ? 'connected' : 'error');
-    } catch {
-      setMentorConnected('error');
-    }
+  // Keeps the current status until the answer arrives; callers that want
+  // "checking" shown (saving a new host or model) set it themselves.
+  const checkConnectivity = useCallback(async () => {
+    setMentorConnected(await mentorStatus(settings.ollamaHost, settings.mentorModel));
   }, [settings.ollamaHost, settings.mentorModel]);
 
   useEffect(() => {
@@ -110,15 +113,21 @@ export function App() {
     document.documentElement.setAttribute('data-fontfamily', settings.fontFamily || 'sans');
     document.documentElement.setAttribute('data-accent', settings.accentColor || 'gold');
     document.documentElement.setAttribute('data-lineheight', settings.lineHeight || 'balanced');
-    
-    checkConnectivity();
-  }, [settings, checkConnectivity]);
+  }, [settings]);
+
+  // Re-check the mentor when its host or model changes (not on theme changes).
+  // Quiet: the status starts as 'checking', and saving new settings sets it.
+  useEffect(() => {
+    let live = true;
+    mentorStatus(settings.ollamaHost, settings.mentorModel).then((s) => { if (live) setMentorConnected(s); });
+    return () => { live = false; };
+  }, [settings.ollamaHost, settings.mentorModel]);
 
   // The startup check can miss a local model that is still starting or busy.
   // While offline, re-check quietly every 15 s and when the window regains focus.
   useEffect(() => {
     if (mentorConnected !== 'error') return;
-    const recheck = () => { void checkConnectivity(true); };
+    const recheck = () => { void checkConnectivity(); };
     const timer = window.setInterval(recheck, 15000);
     window.addEventListener('focus', recheck);
     return () => {
@@ -128,6 +137,9 @@ export function App() {
   }, [mentorConnected, checkConnectivity]);
 
   const handleSaveSettings = (newSettings: AppSettings) => {
+    if (newSettings.ollamaHost !== settings.ollamaHost || newSettings.mentorModel !== settings.mentorModel) {
+      setMentorConnected('checking');
+    }
     setSettings(newSettings);
     localStorage.setItem('synapse_app_settings', JSON.stringify(newSettings));
   };
@@ -235,35 +247,6 @@ export function App() {
     }
   };
 
-  useEffect(() => {
-    const initApp = async () => {
-      const ok = await checkAuth();
-      if (ok) {
-        await fetchTree();
-        fetchStatus();
-
-        if (!userInteractedRef.current) {
-          const saved = getStoredSelection();
-          if (saved && saved.path) {
-            await loadTopic(saved.path, false, saved.lessonId, true);
-          }
-        }
-      }
-    };
-    initApp();
-
-    const handleUnauthorized = () => {
-      loadRequestIdRef.current += 1;
-      setIsAuthenticated(false);
-      setAuthRequired(true);
-      setSelectedPath(null);
-      setTopicDetails(null);
-      setActiveLessonId(null);
-      userInteractedRef.current = false;
-    };
-    window.addEventListener('synapse:unauthorized', handleUnauthorized);
-    return () => window.removeEventListener('synapse:unauthorized', handleUnauthorized);
-  }, [checkAuth]);
 
   const handleLoginSuccess = async () => {
     setIsAuthenticated(true);
@@ -419,6 +402,44 @@ export function App() {
     }
   };
 
+  // Latest handlers for effects that subscribe once (start-up, keyboard), so
+  // they never call a stale copy. Refreshed after every render, before them.
+  const latestActions = useRef({ fetchTree, loadTopic, handleSelectLesson });
+  useEffect(() => {
+    latestActions.current = { fetchTree, loadTopic, handleSelectLesson };
+  });
+
+  useEffect(() => {
+    const initApp = async () => {
+      const ok = await checkAuth();
+      if (ok) {
+        await latestActions.current.fetchTree();
+        fetchStatus();
+
+        if (!userInteractedRef.current) {
+          const saved = getStoredSelection();
+          if (saved && saved.path) {
+            await latestActions.current.loadTopic(saved.path, false, saved.lessonId, true);
+          }
+        }
+      }
+    };
+    initApp();
+
+    const handleUnauthorized = () => {
+      loadRequestIdRef.current += 1;
+      setIsAuthenticated(false);
+      setAuthRequired(true);
+      setSelectedPath(null);
+      setTopicDetails(null);
+      setActiveLessonId(null);
+      userInteractedRef.current = false;
+    };
+    window.addEventListener('synapse:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('synapse:unauthorized', handleUnauthorized);
+  }, [checkAuth]);
+
+
   const handleToggleLessonCompletion = async (path: string, lessonId: string, completed?: boolean) => {
     try {
       const res = await fetch('/api/mastery/lesson', {
@@ -506,7 +527,7 @@ export function App() {
         if (!activeLessonId || activeLessonId === 'all') {
           if (e.key === ']') {
             e.preventDefault();
-            handleSelectLesson(lessons[0].id);
+            latestActions.current.handleSelectLesson(lessons[0].id);
           }
           return;
         }
@@ -516,14 +537,14 @@ export function App() {
         if (e.key === '[') {
           if (idx > 0) {
             e.preventDefault();
-            handleSelectLesson(lessons[idx - 1].id);
+            latestActions.current.handleSelectLesson(lessons[idx - 1].id);
           }
           return;
         }
         if (e.key === ']') {
           if (idx >= 0 && idx < lessons.length - 1) {
             e.preventDefault();
-            handleSelectLesson(lessons[idx + 1].id);
+            latestActions.current.handleSelectLesson(lessons[idx + 1].id);
           }
           return;
         }
