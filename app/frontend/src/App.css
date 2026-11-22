@@ -6358,3 +6358,141 @@ body, html, #root {
     row-gap: 6px;
   }
 }
+
+/* ── Settings: one control size, titled groups, hints under fields ───────── */
+.settings-tab-scroll { gap: 0; padding: 8px 28px 24px; }
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border-color);
+}
+.settings-group:first-child,
+.provider-mode-segmented + .settings-group,
+.store-message-banner + .settings-group { border-top: none; }
+.provider-mode-segmented { margin-top: 16px; }
+.settings-group-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.settings-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.settings-group-desc {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+.settings-group-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+.settings-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.settings-field-label { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); }
+.settings-field-hint { font-size: 12px; line-height: 1.4; color: var(--text-muted); }
+
+.settings-input-row { display: flex; gap: 8px; align-items: center; min-width: 0; }
+.settings-input-row > input { flex: 1; min-width: 0; }
+
+/* Every text field, select and button in the settings body is 34px tall. */
+.settings-body input[type='text'],
+.settings-body input[type='password'],
+.settings-body select {
+  height: 34px;
+  padding: 0 10px;
+  font-size: 13px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  outline: none;
+}
+.settings-body input:focus,
+.settings-body select:focus { border-color: var(--border-focus); }
+.settings-body .btn-primary,
+.settings-body .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  font-size: 13px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.settings-body .btn-secondary.icon-only { width: 34px; padding: 0; }
+.settings-body .btn-secondary.danger { color: #f87171; }
+.settings-body .btn-secondary.danger:hover { border-color: rgba(248, 113, 113, 0.5); }
+.settings-body label.btn-secondary { cursor: pointer; }
+
+.settings-body .probe-badge { align-self: flex-start; }
+.settings-body .store-search-box { padding: 0 10px; }
+.settings-body .store-search-box input { border: none; background: transparent; padding: 0; }
+.settings-body .store-package-card h5 { margin: 0 0 4px; font-size: 14px; }
+.settings-body .package-card-actions { margin-top: 12px; display: flex; gap: 8px; }
+.settings-body .cluster-nodes-list { display: flex; flex-direction: column; gap: 8px; }
+.settings-body .cluster-node-row { padding: 6px 6px 6px 12px; }
+.settings-body .cluster-node-url-field { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.settings-body .node-pin-select { width: 180px; flex-shrink: 0; }
+.settings-body .node-latency { width: 56px; text-align: right; font-size: 12px; color: var(--text-muted); }
+
+.settings-button-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.settings-code {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+}
+.settings-note { margin: 16px 0 0; font-size: 12px; line-height: 1.45; color: var(--text-muted); }
+
+.settings-action-list { display: flex; flex-direction: column; }
+.settings-action-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+.settings-action-item:first-child { border-top: none; padding-top: 0; }
+.settings-action-item > div > strong { display: block; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.settings-action-item > div > span { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+.settings-action-item .btn-secondary { min-width: 128px; }
+
+/* ── Breathing room: the three panels sit as separate cards on a darker gutter. */
+.workbench-layout {
+  gap: 6px;
+  padding: 6px;
+  background-color: color-mix(in srgb, var(--bg-primary) 55%, #000);
+}
+.workbench-layout > .tree-sidebar,
+.workbench-layout > .center-workspace-column,
+.workbench-layout > .chat-sidebar {
+  height: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+.workbench-layout > .center-workspace-column { background-color: var(--bg-primary); }
+/* The drag handle sits in the gutter between the centre and the mentor. */
+.workbench-layout > .chat-sidebar { position: relative; overflow: visible; }
+.workbench-layout > .chat-sidebar > :not(.chat-resize-handle) { border-radius: inherit; }
+.workbench-layout .chat-resize-handle { left: -7px; width: 8px; border-radius: 4px; }

@@ -17,7 +17,6 @@ import {
   Loader2,
   Search,
   Server,
-  Network,
   HardDrive,
   Terminal,
   Sparkles,
@@ -28,6 +27,35 @@ import {
   Power
 } from 'lucide-react';
 
+
+/** One titled group of settings, separated from the next by a line. */
+const SettingsGroup: React.FC<{
+  title: string;
+  description?: string;
+  icon?: React.ReactNode;
+  actions?: React.ReactNode;
+  children?: React.ReactNode;
+}> = ({ title, description, icon, actions, children }) => (
+  <section className="settings-group">
+    <header className="settings-group-header">
+      <div>
+        <h4 className="settings-group-title">{icon}{title}</h4>
+        {description && <p className="settings-group-desc">{description}</p>}
+      </div>
+      {actions && <div className="settings-group-actions">{actions}</div>}
+    </header>
+    {children}
+  </section>
+);
+
+/** A labelled control with an optional one-line hint under it. */
+const Field: React.FC<{ label: string; hint?: string; children: React.ReactNode }> = ({ label, hint, children }) => (
+  <label className="settings-field">
+    <span className="settings-field-label">{label}</span>
+    {children}
+    {hint && <span className="settings-field-hint">{hint}</span>}
+  </label>
+);
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -136,6 +164,11 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
 
   // Options for a model <select>. The saved model always stays listed, so the
   // dropdown never shows a different model than the one the app will use.
+  // The "complete" masterpack is a download bundle, not a subject area.
+  const installedDomains = packagesData.installed.filter(
+    (p) => p.domain !== 'complete' && p.domain !== 'synapse_complete_curriculum'
+  );
+
   const modelOptions = (current: string | undefined, required = true) => {
     const missing = current && !discoveredModels.includes(current);
     return (
@@ -374,7 +407,6 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="settings-window" onClick={(e) => e.stopPropagation()}>
-        {/* Left Vertical Sidebar (Only 3 clean, purposeful tabs) */}
         <div className="settings-sidebar">
           <div className="settings-sidebar-header">
             <Settings size={18} className="settings-header-icon" />
@@ -397,10 +429,7 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
               onClick={() => setActiveTab('ai')}
             >
               <Cpu size={16} />
-              <span>AI Engine</span>
-              {currentHostStatus.online && (
-                <span className="settings-nav-badge">Online</span>
-              )}
+              <span>AI models</span>
             </button>
 
             <button
@@ -409,10 +438,7 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
               onClick={() => setActiveTab('storage')}
             >
               <Package size={16} />
-              <span>Curriculum & Packs</span>
-              {packagesData.installed.length > 0 && (
-                <span className="settings-nav-badge secondary">{packagesData.installed.length}</span>
-              )}
+              <span>Courses</span>
             </button>
           </nav>
 
@@ -426,14 +452,14 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
           <div className="settings-body-header">
             <div>
               <h3>
-                {activeTab === 'appearance' && 'Appearance & Reading Design'}
-                {activeTab === 'ai' && 'AI Engine & Inference Models'}
-                {activeTab === 'storage' && 'Curriculum Store & Maintenance'}
+                {activeTab === 'appearance' && 'Appearance'}
+                {activeTab === 'ai' && 'AI models'}
+                {activeTab === 'storage' && 'Courses and maintenance'}
               </h3>
               <p className="settings-tab-desc">
-                {activeTab === 'appearance' && 'Customize theme palettes, typography sizing, and reader viewing geometry.'}
-                {activeTab === 'ai' && 'Manage local Ollama models, distributed LAN GPU workers, or cloud fallback API keys.'}
-                {activeTab === 'storage' && 'Manage installed course packs, export .synpack archives, and vacuum local cache.'}
+                {activeTab === 'appearance' && 'Colors, lesson text and layout. Saved in this browser.'}
+                {activeTab === 'ai' && 'Where the AI runs and which model does what.'}
+                {activeTab === 'storage' && 'Install, share and remove courses; keep the app tidy.'}
               </p>
             </div>
             <button className="icon-btn" onClick={onClose} title="Close Settings">
@@ -444,85 +470,72 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
           <div className="settings-tab-scroll">
             {/* TAB 1: APPEARANCE */}
             {activeTab === 'appearance' && (
-              <div className="settings-section">
-                {/* Visual Color Palette Dropdowns */}
-                <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Visual Color Palette</h4>
+              <>
+                <SettingsGroup title="Colors" description="The color theme for the whole app and the highlight color for links, buttons and the active lesson.">
                   <div className="settings-row-2col">
-                    <div className="form-group compact">
-                      <label>Color Theme</label>
+                    <Field label="Theme">
                       <select
                         value={formData.theme}
                         onChange={(e) => setFormData({ ...formData, theme: e.target.value as any })}
                       >
-                        <option value="studio">⬛ Studio Obsidian (Dark Carbon & Gold)</option>
-                        <option value="github_dimmed">🌑 GitHub Dimmed (Slate Navy & Blue)</option>
-                        <option value="nordic">❄️ Nordic Frost (Polar Night & Cyan)</option>
-                        <option value="monokai">☕ Monokai Pro (Espresso & Pastels)</option>
-                        <option value="dracula">🧛 Dracula Noir (Deep Violet & Pink)</option>
-                        <option value="solarized">🌊 Solarized Dark (Teal Oceanic & Amber)</option>
-                        <option value="titanium">⚪ Titanium Daybreak (Light & High Contrast)</option>
+                        <option value="studio">Studio Obsidian (dark, gold)</option>
+                        <option value="github_dimmed">GitHub Dimmed (dark, blue)</option>
+                        <option value="nordic">Nordic Frost (dark, cyan)</option>
+                        <option value="monokai">Monokai Pro (dark, pastel)</option>
+                        <option value="dracula">Dracula Noir (dark, violet)</option>
+                        <option value="solarized">Solarized Dark (dark, teal)</option>
+                        <option value="titanium">Titanium Daybreak (light)</option>
                       </select>
-                    </div>
-
-                    <div className="form-group compact">
-                      <label>Accent Color Highlight</label>
+                    </Field>
+                    <Field label="Accent color">
                       <select
                         value={formData.accentColor || 'gold'}
                         onChange={(e) => setFormData({ ...formData, accentColor: e.target.value as any })}
                       >
-                        <option value="gold">🟡 Amber Gold (#fbbf24)</option>
-                        <option value="cyan">🔵 Electric Cyan (#06b6d4)</option>
-                        <option value="emerald">🟢 Matrix Emerald (#10b981)</option>
-                        <option value="amethyst">🟣 Royal Amethyst (#a855f7)</option>
-                        <option value="rose">🔴 Crimson Rose (#f43f5e)</option>
+                        <option value="gold">Amber gold</option>
+                        <option value="cyan">Electric cyan</option>
+                        <option value="emerald">Emerald green</option>
+                        <option value="amethyst">Amethyst purple</option>
+                        <option value="rose">Crimson rose</option>
                       </select>
-                    </div>
+                    </Field>
                   </div>
-                </div>
+                </SettingsGroup>
 
-                {/* Typography & Sizing */}
-                <div className="settings-panel-box">
-                  <h4 className="panel-box-heading">Typography & Reading Geometry</h4>
+                <SettingsGroup title="Lesson text" description="How lessons read in the middle panel. The sample below updates as you change these.">
                   <div className="settings-row-3col">
-                    <div className="form-group compact">
-                      <label>Font Family</label>
+                    <Field label="Font">
                       <select
                         value={formData.fontFamily}
                         onChange={(e) => setFormData({ ...formData, fontFamily: e.target.value as any })}
                       >
-                        <option value="sans">Sans (Inter / SF Pro)</option>
-                        <option value="serif">Serif (Merriweather)</option>
-                        <option value="mono">Monospace (JetBrains Mono)</option>
+                        <option value="sans">Sans serif</option>
+                        <option value="serif">Serif</option>
+                        <option value="mono">Monospace</option>
                       </select>
-                    </div>
-
-                    <div className="form-group compact">
-                      <label>Reading Font Size</label>
+                    </Field>
+                    <Field label="Text size">
                       <select
                         value={formData.fontSize || 'standard'}
                         onChange={(e) => setFormData({ ...formData, fontSize: e.target.value as any })}
                       >
-                        <option value="compact">Compact (13px)</option>
-                        <option value="standard">Standard (15px)</option>
-                        <option value="large">Large (17px)</option>
+                        <option value="compact">Small (13 px)</option>
+                        <option value="standard">Medium (15 px)</option>
+                        <option value="large">Large (17 px)</option>
                       </select>
-                    </div>
-
-                    <div className="form-group compact">
-                      <label>Line Spacing</label>
+                    </Field>
+                    <Field label="Line spacing">
                       <select
                         value={formData.lineHeight || 'balanced'}
                         onChange={(e) => setFormData({ ...formData, lineHeight: e.target.value as any })}
                       >
-                        <option value="dense">Dense (1.45)</option>
-                        <option value="balanced">Balanced (1.65)</option>
-                        <option value="relaxed">Relaxed (1.85)</option>
+                        <option value="dense">Tight</option>
+                        <option value="balanced">Normal</option>
+                        <option value="relaxed">Relaxed</option>
                       </select>
-                    </div>
+                    </Field>
                   </div>
 
-                  {/* Live Typography Preview Box */}
                   <div className="typography-preview-box">
                     <p
                       className="preview-sample-text"
@@ -535,107 +548,100 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                       "The first principle of engineering is that you must not fool yourself, and you are the easiest person to fool."
                     </p>
                   </div>
+                </SettingsGroup>
 
-                  <div className="settings-row-2col" style={{ marginTop: '12px' }}>
-                    <div className="form-group compact">
-                      <label>Reader View Width</label>
+                <SettingsGroup title="Layout and language">
+                  <div className="settings-row-2col">
+                    <Field label="Lesson width" hint="A narrow column is easier to read on wide screens.">
                       <select
                         value={formData.readerWidth || 'full'}
                         onChange={(e) => setFormData({ ...formData, readerWidth: e.target.value as any })}
                       >
-                        <option value="full">Full Width (Adapts to Window)</option>
-                        <option value="constrained">Focused Editorial Column (780px Max)</option>
+                        <option value="full">Fill the panel</option>
+                        <option value="constrained">Narrow column (780 px)</option>
                       </select>
-                    </div>
-
-                    <div className="form-group compact">
-                      <label>Default Reading Language</label>
+                    </Field>
+                    <Field label="Lesson language" hint="Other languages are machine-translated by the AI model.">
                       <select
                         value={formData.language || 'en'}
                         onChange={(e) => setFormData({ ...formData, language: e.target.value as any })}
                       >
-                        <option value="en">English (Original Curriculum)</option>
+                        <option value="en">English (original)</option>
                         <option value="cs">Čeština (Czech)</option>
                         <option value="de">Deutsch (German)</option>
                         <option value="es">Español (Spanish)</option>
                       </select>
-                    </div>
+                    </Field>
                   </div>
-                </div>
-              </div>
+                </SettingsGroup>
+              </>
             )}
 
-            {/* TAB 2: AI ENGINE (Unified Local vs Cloud) */}
+            {/* TAB 2: AI MODELS (local Ollama or cloud keys) */}
             {activeTab === 'ai' && (
-              <div className="settings-section">
-                {/* Segmented Mode Switcher */}
-                <div className="provider-mode-segmented">
+              <>
+                <div className="provider-mode-segmented" role="tablist" aria-label="Where the AI models run">
                   <button
                     type="button"
+                    role="tab"
+                    aria-selected={providerMode === 'local'}
                     className={`provider-segment-btn ${providerMode === 'local' ? 'active' : ''}`}
                     onClick={() => setProviderMode('local')}
                   >
                     <Server size={15} />
-                    <span>Local (Ollama)</span>
+                    <span>On this network (Ollama)</span>
                   </button>
                   <button
                     type="button"
+                    role="tab"
+                    aria-selected={providerMode === 'cloud'}
                     className={`provider-segment-btn ${providerMode === 'cloud' ? 'active' : ''}`}
                     onClick={() => setProviderMode('cloud')}
                   >
                     <Cpu size={15} />
-                    <span>Cloud (Claude, Gemini)</span>
+                    <span>Cloud API keys</span>
                   </button>
                 </div>
 
-                {/* Local Engine Panel */}
                 {providerMode === 'local' && (
                   <>
-                    <div className="settings-panel-box">
-                      <div className="probe-header-row">
-                        <div className="probe-host-label">
-                          <Server size={14} />
-                          <span>Local Ollama Endpoint:</span>
+                    <SettingsGroup title="Ollama server" description="The Ollama server Synapse talks to first.">
+                      <Field label="Server address">
+                        <div className="settings-input-row">
                           <input
                             type="text"
                             value={formData.ollamaHost}
                             onChange={(e) => setFormData({ ...formData, ollamaHost: e.target.value })}
-                            className="wizard-input font-mono"
-                            style={{ padding: '3px 8px', fontSize: '12px', width: '240px' }}
+                            className="font-mono"
+                            placeholder="http://localhost:11434"
                           />
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            onClick={() => testNodeConnection(formData.ollamaHost)}
+                            disabled={currentHostStatus.testing}
+                          >
+                            <RefreshCw size={13} className={currentHostStatus.testing ? 'animate-spin' : ''} />
+                            <span>{currentHostStatus.testing ? 'Testing…' : 'Test connection'}</span>
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          className="btn-secondary-sm"
-                          onClick={() => testNodeConnection(formData.ollamaHost)}
-                          disabled={currentHostStatus.testing}
-                        >
-                          <RefreshCw size={12} className={currentHostStatus.testing ? 'animate-spin' : ''} />
-                          <span>{currentHostStatus.testing ? 'Testing...' : 'Test Connection'}</span>
-                        </button>
-                      </div>
+                      </Field>
+                      {currentHostStatus.online ? (
+                        <div className="probe-badge online">
+                          <CheckCircle size={13} />
+                          <span>Connected ({currentHostStatus.latency_ms ?? '?'} ms), {discoveredModels.length} models available</span>
+                        </div>
+                      ) : (
+                        <div className="probe-badge offline">
+                          <AlertCircle size={13} />
+                          <span>No answer from {formData.ollamaHost}. Check that <code>ollama serve</code> is running there.</span>
+                        </div>
+                      )}
+                    </SettingsGroup>
 
-                      <div className="probe-status-row" style={{ marginTop: '8px' }}>
-                        {currentHostStatus.online ? (
-                          <div className="probe-badge online">
-                            <CheckCircle size={13} />
-                            <span>Online ({currentHostStatus.latency_ms || 12} ms) • {discoveredModels.length} models detected</span>
-                          </div>
-                        ) : (
-                          <div className="probe-badge offline">
-                            <AlertCircle size={13} />
-                            <span>Offline or unreachable on {formData.ollamaHost}. Ensure <code>ollama serve</code> is running.</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Standard Dropdowns for Models (No confusing quick chips!) */}
-                    <div className="settings-panel-box">
-                      <h4 className="panel-box-heading">Active Model Assignment</h4>
-                      <div className="settings-row-3col">
-                        <div className="form-group compact">
-                          <label>Primary Generation Model</label>
+                    <SettingsGroup title="Models" description="Which installed model does which job.">
+                      <div className="settings-row-2col">
+                        <Field label="Main model" hint="Lesson summaries, and the mentor when it uses the main model.">
                           <select
                             value={formData.primaryModel}
                             onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
@@ -643,64 +649,48 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                           >
                             {modelOptions(formData.primaryModel)}
                           </select>
-                        </div>
-
-                        <div className="form-group compact">
-                          <label>Socratic Mentor Model</label>
+                        </Field>
+                        <Field label="Mentor model" hint="Mentor chat and quizzes. A smaller model answers faster.">
                           <select
                             value={formData.mentorModel || ''}
                             onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
                             className="font-mono"
                           >
-                            <option value="">Same as primary</option>
+                            <option value="">Same as main model</option>
                             {modelOptions(formData.mentorModel, false)}
                           </select>
-                        </div>
-                        <div className="form-group compact">
-                          <label>Reviewer / Evaluator Model</label>
-                          <select
-                            value={formData.reviewerModel}
-                            onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
-                            className="font-mono"
-                          >
-                            {modelOptions(formData.reviewerModel)}
-                          </select>
-                        </div>
+                        </Field>
                       </div>
+                    </SettingsGroup>
 
-                    </div>
-
-                    {/* Distributed Cluster Nodes (Clean Horizontal Row Layout) */}
-                    <div className="settings-panel-box">
-                      <div
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-                        onClick={() => setShowClusterAdvanced((prev) => !prev)}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <Network size={14} />
-                          <h4 className="panel-box-heading" style={{ margin: 0 }}>Distributed Cluster Nodes ({clusterNodes.length})</h4>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <SettingsGroup
+                      title={`Other Ollama computers (${clusterNodes.length})`}
+                      description="Optional: more machines on your network with Ollama. Requests go to whichever is free."
+                      actions={
+                        <>
                           <button
                             type="button"
-                            className="btn-secondary-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              scanCluster();
-                            }}
+                            className="btn-secondary"
+                            onClick={scanCluster}
                             disabled={isScanningCluster}
                           >
-                            <RefreshCw size={11} className={isScanningCluster ? 'animate-spin' : ''} />
-                            <span>{isScanningCluster ? 'Testing...' : 'Ping Nodes'}</span>
+                            <RefreshCw size={13} className={isScanningCluster ? 'animate-spin' : ''} />
+                            <span>{isScanningCluster ? 'Checking…' : 'Check all'}</span>
                           </button>
-                          <button type="button" className="icon-btn-sm">
+                          <button
+                            type="button"
+                            className="btn-secondary icon-only"
+                            onClick={() => setShowClusterAdvanced((prev) => !prev)}
+                            aria-expanded={showClusterAdvanced}
+                            title={showClusterAdvanced ? 'Hide computers' : 'Show computers'}
+                          >
                             {showClusterAdvanced ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                           </button>
-                        </div>
-                      </div>
-
+                        </>
+                      }
+                    >
                       {showClusterAdvanced && (
-                        <div style={{ marginTop: '12px' }}>
+                        <>
                           <div className="cluster-nodes-list">
                             {clusterNodes.map((nodeUrl) => {
                               const status = nodeStatuses[nodeUrl] || {};
@@ -709,46 +699,39 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
 
                               return (
                                 <div key={nodeUrl} className="cluster-node-row">
-                                  <span className={`status-dot ${status.online ? 'online' : 'offline'}`} />
-                                  <input
-                                    type="text"
-                                    value={nodeUrl}
-                                    readOnly
-                                    className="cluster-node-url-field font-mono"
-                                    title={nodeUrl}
-                                  />
-                                  <div className="node-pin-group">
-                                    <span className="node-pin-label">Pin Model:</span>
-                                    <select
-                                      value={currentPin}
-                                      onChange={(e) => handleUpdateNodePin(nodeUrl, e.target.value)}
-                                      className="node-pin-select font-mono"
-                                    >
-                                      <option value="__auto__">Auto (Any Model)</option>
-                                      {(status.models || []).map((m) => (
-                                        <option key={m} value={m}>{m}</option>
-                                      ))}
-                                    </select>
-                                  </div>
+                                  <span className={`status-dot ${status.online ? 'online' : 'offline'}`} title={status.online ? 'Online' : 'Offline'} />
+                                  <span className="cluster-node-url-field font-mono" title={nodeUrl}>{nodeUrl}</span>
                                   <span className="node-latency">
                                     {status.latency_ms !== undefined ? `${status.latency_ms} ms` : status.online ? 'Ready' : 'Offline'}
                                   </span>
+                                  <select
+                                    value={currentPin}
+                                    onChange={(e) => handleUpdateNodePin(nodeUrl, e.target.value)}
+                                    className="node-pin-select font-mono"
+                                    title="Only send this model to this computer"
+                                    aria-label={`Model for ${nodeUrl}`}
+                                  >
+                                    <option value="__auto__">Any model</option>
+                                    {(status.models || []).map((m) => (
+                                      <option key={m} value={m}>Only {m}</option>
+                                    ))}
+                                  </select>
                                   <button
                                     type="button"
-                                    className="icon-btn-sm"
+                                    className="btn-secondary icon-only"
                                     onClick={() => testNodeConnection(nodeUrl)}
-                                    title="Ping node"
+                                    title="Check this computer"
                                   >
-                                    <RefreshCw size={11} className={status.testing ? 'animate-spin' : ''} />
+                                    <RefreshCw size={13} className={status.testing ? 'animate-spin' : ''} />
                                   </button>
                                   {clusterNodes.length > 1 && (
                                     <button
                                       type="button"
-                                      className="icon-btn-sm danger"
+                                      className="btn-secondary icon-only danger"
                                       onClick={() => handleRemoveNode(nodeUrl)}
-                                      title="Remove node"
+                                      title="Remove this computer"
                                     >
-                                      <Trash2 size={11} />
+                                      <Trash2 size={13} />
                                     </button>
                                   )}
                                 </div>
@@ -756,150 +739,105 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                             })}
                           </div>
 
-                          <div className="add-node-bar" style={{ marginTop: '10px' }}>
+                          <div className="settings-input-row">
                             <input
                               type="text"
                               value={newNodeUrl}
                               onChange={(e) => setNewNodeUrl(e.target.value)}
-                              placeholder="Add LAN GPU node: e.g. http://192.168.1.50:11434"
+                              placeholder="http://192.168.1.50:11434"
                               className="font-mono"
+                              aria-label="Address of another Ollama computer"
                             />
                             <button type="button" className="btn-secondary" onClick={handleAddNode}>
                               <Plus size={13} />
-                              <span>Add Node</span>
+                              <span>Add computer</span>
                             </button>
                           </div>
-                        </div>
+                        </>
                       )}
-                    </div>
+                    </SettingsGroup>
                   </>
                 )}
 
-                {/* Cloud Providers Panel */}
                 {providerMode === 'cloud' && (
-                  <div className="settings-section">
-                    <div className="settings-panel-box">
-                      <div className="panel-header-with-icon">
-                        <Cpu size={15} />
-                        <h4 className="panel-box-heading" style={{ margin: 0 }}>Anthropic Claude</h4>
-                      </div>
-
-                      <div className="form-group compact" style={{ marginTop: '8px' }}>
-                        <label>Anthropic API Key</label>
-                        <div style={{ display: 'flex', gap: '6px' }}>
+                  <>
+                    <SettingsGroup title="Anthropic Claude" icon={<Cpu size={14} />}>
+                      <div className="settings-row-2col">
+                        <Field label="API key">
+                          <div className="settings-input-row">
+                            <input
+                              type={showAnthropicKey ? 'text' : 'password'}
+                              value={formData.anthropicApiKey || ''}
+                              onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
+                              placeholder="sk-ant-api03-..."
+                              className="font-mono"
+                            />
+                            <button
+                              type="button"
+                              className="btn-secondary icon-only"
+                              onClick={() => setShowAnthropicKey((p) => !p)}
+                              title={showAnthropicKey ? 'Hide key' : 'Show key'}
+                            >
+                              {showAnthropicKey ? <EyeOff size={13} /> : <Eye size={13} />}
+                            </button>
+                          </div>
+                        </Field>
+                        <Field label="Base URL (optional)">
                           <input
-                            type={showAnthropicKey ? 'text' : 'password'}
-                            value={formData.anthropicApiKey || ''}
-                            onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
-                            placeholder="sk-ant-api03-..."
+                            type="text"
+                            value={formData.anthropicBaseUrl}
+                            onChange={(e) => setFormData({ ...formData, anthropicBaseUrl: e.target.value })}
+                            placeholder="https://api.anthropic.com"
                             className="font-mono"
-                            style={{ flex: 1 }}
                           />
-                          <button
-                            type="button"
-                            className="icon-btn-sm"
-                            onClick={() => setShowAnthropicKey((p) => !p)}
-                            title={showAnthropicKey ? 'Hide key' : 'Show key'}
-                          >
-                            {showAnthropicKey ? <EyeOff size={13} /> : <Eye size={13} />}
-                          </button>
-                        </div>
+                        </Field>
                       </div>
+                    </SettingsGroup>
 
-                      <div className="form-group compact" style={{ marginTop: '8px' }}>
-                        <label>Base URL Override (Optional)</label>
-                        <input
-                          type="text"
-                          value={formData.anthropicBaseUrl}
-                          onChange={(e) => setFormData({ ...formData, anthropicBaseUrl: e.target.value })}
-                          placeholder="https://api.anthropic.com"
-                          className="font-mono"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="settings-panel-box">
-                      <div className="panel-header-with-icon">
-                        <Sparkles size={15} />
-                        <h4 className="panel-box-heading" style={{ margin: 0 }}>Google Gemini</h4>
-                      </div>
-
-                      <div className="form-group compact" style={{ marginTop: '8px' }}>
-                        <label>Gemini API Key</label>
-                        <div style={{ display: 'flex', gap: '6px' }}>
+                    <SettingsGroup title="Google Gemini" icon={<Sparkles size={14} />}>
+                      <div className="settings-row-2col">
+                        <Field label="API key">
+                          <div className="settings-input-row">
+                            <input
+                              type={showGeminiKey ? 'text' : 'password'}
+                              value={formData.geminiApiKey || ''}
+                              onChange={(e) => setFormData({ ...formData, geminiApiKey: e.target.value })}
+                              placeholder="AIzaSy..."
+                              className="font-mono"
+                            />
+                            <button
+                              type="button"
+                              className="btn-secondary icon-only"
+                              onClick={() => setShowGeminiKey((p) => !p)}
+                              title={showGeminiKey ? 'Hide key' : 'Show key'}
+                            >
+                              {showGeminiKey ? <EyeOff size={13} /> : <Eye size={13} />}
+                            </button>
+                          </div>
+                        </Field>
+                        <Field label="Base URL (optional)">
                           <input
-                            type={showGeminiKey ? 'text' : 'password'}
-                            value={formData.geminiApiKey || ''}
-                            onChange={(e) => setFormData({ ...formData, geminiApiKey: e.target.value })}
-                            placeholder="AIzaSy..."
+                            type="text"
+                            value={formData.geminiBaseUrl || ''}
+                            onChange={(e) => setFormData({ ...formData, geminiBaseUrl: e.target.value })}
+                            placeholder="https://generativelanguage.googleapis.com"
                             className="font-mono"
-                            style={{ flex: 1 }}
                           />
-                          <button
-                            type="button"
-                            className="icon-btn-sm"
-                            onClick={() => setShowGeminiKey((p) => !p)}
-                            title={showGeminiKey ? 'Hide key' : 'Show key'}
-                          >
-                            {showGeminiKey ? <EyeOff size={13} /> : <Eye size={13} />}
-                          </button>
-                        </div>
+                        </Field>
                       </div>
+                    </SettingsGroup>
 
-                      <div className="form-group compact" style={{ marginTop: '8px' }}>
-                        <label>Base URL Override (Optional)</label>
-                        <input
-                          type="text"
-                          value={formData.geminiBaseUrl || ''}
-                          onChange={(e) => setFormData({ ...formData, geminiBaseUrl: e.target.value })}
-                          placeholder="https://generativelanguage.googleapis.com"
-                          className="font-mono"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="wizard-info-note">
-                      Cloud keys are saved securely in your personal local environment configuration (<code>~/.config/synapse/env</code>) and are never sent to external telemetry services.
-                    </div>
-                  </div>
+                    <p className="settings-note">
+                      Keys are stored on this computer in <code>~/.config/synapse/env</code>. They are sent only to the provider you use.
+                    </p>
+                  </>
                 )}
-              </div>
+              </>
             )}
 
-            {/* TAB 3: CURRICULUM & STORAGE */}
+            {/* TAB 3: COURSES */}
             {activeTab === 'storage' && (
-              <div className="settings-section">
-                {/* Masterpack Status Card (No confusing error-prone button when all domains are installed!) */}
-                <div className="masterpack-hero-card">
-                  <div className="masterpack-info-col">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <CheckCircle size={18} style={{ color: '#10b981' }} />
-                      <h4>Canonical Master Curriculum (All 12 Core Domains)</h4>
-                    </div>
-                    <p>
-                      {packagesData.installed.length >= 12
-                        ? `All 12 core domains are installed locally.`
-                        : `${packagesData.installed.length} of 12 domains installed. Download the complete masterpack to unlock all courses offline.`}
-                    </p>
-                  </div>
-
-                  {packagesData.installed.length < 12 && (
-                    <button
-                      type="button"
-                      className="btn-primary"
-                      onClick={() => handleInstallDomain('complete')}
-                      disabled={actionInProgress === 'install-complete'}
-                    >
-                      {actionInProgress === 'install-complete' ? (
-                        <Loader2 size={13} className="animate-spin" />
-                      ) : (
-                        <Download size={13} />
-                      )}
-                      <span>Download Complete Curriculum (37 MB)</span>
-                    </button>
-                  )}
-                </div>
-
+              <>
                 {storeMessage && (
                   <div className={`store-message-banner ${storeMessage.type}`}>
                     {storeMessage.type === 'success' ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
@@ -907,202 +845,222 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                   </div>
                 )}
 
-                {/* Filter & Import Bar */}
-                <div className="store-top-bar" style={{ marginTop: '14px' }}>
-                  <div className="store-search-box">
-                    <Search size={13} className="store-search-icon" />
-                    <input
-                      type="text"
-                      placeholder="Filter installed courses..."
-                      value={storeSearch}
-                      onChange={(e) => setStoreSearch(e.target.value)}
-                    />
-                  </div>
-
-                  <label className="btn-secondary store-upload-compact-btn" title="Import custom .synpack archive">
-                    {actionInProgress === 'uploading' ? (
-                      <Loader2 size={12} className="animate-spin" />
-                    ) : (
-                      <Upload size={12} />
-                    )}
-                    <span>Import .synpack</span>
-                    <input type="file" accept=".synpack" onChange={handleFileUpload} style={{ display: 'none' }} />
-                  </label>
-                </div>
-
-                {/* Installed Domains Grid (Filtered to prevent 'complete' duplication) */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
-                  <h4 className="panel-box-heading" style={{ margin: 0 }}>
-                    Installed Curriculum Domains ({packagesData.installed.filter((p) => p.domain !== 'complete').length})
-                  </h4>
-                  <button
-                    type="button"
-                    className="icon-btn-sm"
-                    onClick={fetchPackages}
-                    title="Refresh packages"
-                    disabled={isLoadingPackages}
-                  >
-                    <RefreshCw size={12} className={isLoadingPackages ? 'animate-spin' : ''} />
-                  </button>
-                </div>
-
-                <div className="store-packages-grid">
-                  {packagesData.installed
-                    .filter((p) => p.domain !== 'complete' && p.domain !== 'synapse_complete_curriculum' && (!storeSearch || p.domain.toLowerCase().includes(storeSearch.toLowerCase())))
-                    .map((pkg) => (
-                      <div key={pkg.domain} className="store-package-card installed">
-                        <div className="package-card-header">
-                          <div className="package-badge-row">
-                            <span className="package-domain font-mono">{pkg.domain}</span>
-                            <span className="package-installed-tag">Installed</span>
-                          </div>
-                          <h5>{pkg.title || pkg.domain.replace(/_/g, ' ').toUpperCase()}</h5>
-                        </div>
-
-                        <div className="package-stats-row">
-                          <span>{pkg.lesson_count || 0} Lessons</span>
-                          <span>•</span>
-                          <span>{pkg.lab_count || 0} Labs</span>
-                        </div>
-
-                        <div className="package-card-actions">
-                          <button
-                            type="button"
-                            className="btn-secondary-sm"
-                            onClick={() => handleExportPack(pkg.domain)}
-                            disabled={actionInProgress === `export-${pkg.domain}`}
-                            title="Export to .synpack archive"
-                          >
-                            {actionInProgress === `export-${pkg.domain}` ? (
-                              <Loader2 size={11} className="animate-spin" />
-                            ) : (
-                              <Download size={11} />
-                            )}
-                            <span>Export</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            className="btn-secondary-sm danger"
-                            onClick={() => handleUninstallPack(pkg.domain)}
-                            disabled={actionInProgress === `uninstall-${pkg.domain}`}
-                            title="Remove from workspace"
-                          >
-                            <Trash2 size={11} />
-                            <span>Remove</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-
-                {/* CLI Custom Domain Guide */}
-                <div className="settings-panel-box">
-                  <div className="panel-header-with-icon">
-                    <Terminal size={14} />
-                    <h4 className="panel-box-heading" style={{ margin: 0 }}>Custom Domain CLI Workflow</h4>
-                  </div>
-                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '4px 0 8px 0' }}>
-                    Author new courses, synthesize curriculum with AI, and package archives via the terminal:
-                  </p>
-                  <pre className="code-block font-mono" style={{ fontSize: '11px', padding: '10px', background: 'var(--bg-primary)', borderRadius: '6px' }}>
-                    {`# 1. Add a new domain/topic:\nbin/synapse add robotics autonomous_systems slam_navigation --title "SLAM"\n\n# 2. Package into a portable .synpack archive:\nbin/synapse pack robotics`}
-                  </pre>
-                </div>
-
-                {/* Practical Workspace Maintenance */}
-                <div className="settings-panel-box">
-                  <div className="panel-header-with-icon">
-                    <HardDrive size={14} />
-                    <h4 className="panel-box-heading" style={{ margin: 0 }}>Workspace Maintenance & Setup</h4>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
+                <SettingsGroup
+                  title={`Installed courses (${installedDomains.length} of 12 subject areas)`}
+                  actions={
                     <button
                       type="button"
-                      className="btn-secondary-sm"
-                      onClick={() => {
-                        onClose();
-                        onLaunchSetupWizard?.();
-                      }}
+                      className="btn-secondary icon-only"
+                      onClick={fetchPackages}
+                      title="Refresh the list"
+                      disabled={isLoadingPackages}
                     >
-                      <Sparkles size={12} />
-                      <span>Launch Setup Wizard</span>
+                      <RefreshCw size={13} className={isLoadingPackages ? 'animate-spin' : ''} />
                     </button>
+                  }
+                >
+                  {installedDomains.length > 3 && (
+                    <div className="store-search-box">
+                      <Search size={13} className="store-search-icon" />
+                      <input
+                        type="text"
+                        placeholder="Filter subject areas…"
+                        value={storeSearch}
+                        onChange={(e) => setStoreSearch(e.target.value)}
+                      />
+                    </div>
+                  )}
+                  <div className="store-packages-grid">
+                    {installedDomains
+                      .filter((p) => !storeSearch || `${p.domain} ${p.title || ''}`.toLowerCase().includes(storeSearch.toLowerCase()))
+                      .map((pkg) => (
+                        <div key={pkg.domain} className="store-package-card installed">
+                          <h5>{pkg.title || pkg.domain.replace(/_/g, ' ')}</h5>
+                          <div className="package-stats-row">
+                            <span>{pkg.lesson_count || 0} lessons</span>
+                            <span>·</span>
+                            <span>{pkg.lab_count || 0} labs</span>
+                          </div>
+                          <div className="package-card-actions">
+                            <button
+                              type="button"
+                              className="btn-secondary"
+                              onClick={() => handleExportPack(pkg.domain)}
+                              disabled={actionInProgress === `export-${pkg.domain}`}
+                              title="Save this subject area as a .synpack file"
+                            >
+                              {actionInProgress === `export-${pkg.domain}` ? (
+                                <Loader2 size={13} className="animate-spin" />
+                              ) : (
+                                <Download size={13} />
+                              )}
+                              <span>Export</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-secondary danger"
+                              onClick={() => handleUninstallPack(pkg.domain)}
+                              disabled={actionInProgress === `uninstall-${pkg.domain}`}
+                              title="Remove from this computer"
+                            >
+                              <Trash2 size={13} />
+                              <span>Remove</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </SettingsGroup>
 
-                    <button
-                      type="button"
-                      className="btn-secondary-sm"
-                      onClick={async () => {
-                        if (confirm('Clear cached narration audio and translations? Chat history is kept.')) {
+                <SettingsGroup title="Add courses" description="Download all 12 subject areas, or import a .synpack file someone shared with you.">
+                  <div className="settings-button-row">
+                    {installedDomains.length < 12 ? (
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        onClick={() => handleInstallDomain('complete')}
+                        disabled={actionInProgress === 'install-complete'}
+                      >
+                        {actionInProgress === 'install-complete' ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <Download size={13} />
+                        )}
+                        <span>Download all courses (37 MB)</span>
+                      </button>
+                    ) : (
+                      <span className="probe-badge online">
+                        <CheckCircle size={13} />
+                        <span>All 12 subject areas are installed.</span>
+                      </span>
+                    )}
+                    <label className="btn-secondary" title="Import a .synpack file">
+                      {actionInProgress === 'uploading' ? (
+                        <Loader2 size={13} className="animate-spin" />
+                      ) : (
+                        <Upload size={13} />
+                      )}
+                      <span>Import .synpack file</span>
+                      <input type="file" accept=".synpack" onChange={handleFileUpload} style={{ display: 'none' }} />
+                    </label>
+                  </div>
+                </SettingsGroup>
+
+                <SettingsGroup title="Write your own course" icon={<Terminal size={14} />} description="Courses are created in a terminal with the synapse command:">
+                  <pre className="settings-code font-mono">
+                    {`# Create a course and let the AI write its lessons\nbin/synapse add robotics autonomous_systems slam_navigation --title "SLAM"\n\n# Package it as a .synpack file to share\nbin/synapse pack robotics`}
+                  </pre>
+                </SettingsGroup>
+
+                <SettingsGroup title="Maintenance" icon={<HardDrive size={14} />}>
+                  <div className="settings-action-list">
+                    <div className="settings-action-item">
+                      <div>
+                        <strong>Setup wizard</strong>
+                        <span>Walk through the first-run setup again.</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={() => {
+                          onClose();
+                          onLaunchSetupWizard?.();
+                        }}
+                      >
+                        <Sparkles size={13} />
+                        <span>Open wizard</span>
+                      </button>
+                    </div>
+
+                    <div className="settings-action-item">
+                      <div>
+                        <strong>Clear cache</strong>
+                        <span>Deletes saved narration audio and translations. They are made again when needed. Chat history is kept.</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={async () => {
+                          if (confirm('Clear cached narration audio and translations? Chat history is kept.')) {
+                            try {
+                              const res = await fetch('/api/clean', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ sessions: false, exports: false, caches: true })
+                              });
+                              if (!res.ok) throw new Error(`Server returned ${res.status}`);
+                              const data = await res.json();
+                              alert(`Removed ${data.cleaned || 0} cached files.`);
+                            } catch (err) {
+                              alert(`Clearing the cache failed: ${err instanceof Error ? err.message : err}`);
+                            }
+                          }
+                        }}
+                      >
+                        <Trash2 size={13} />
+                        <span>Clear cache</span>
+                      </button>
+                    </div>
+
+                    <div className="settings-action-item">
+                      <div>
+                        <strong>Compact database</strong>
+                        <span>Shrinks the progress database file. Nothing is deleted.</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={async () => {
                           try {
                             const res = await fetch('/api/clean', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ sessions: false, exports: false, caches: true })
+                              body: JSON.stringify({ sessions: false, exports: false, db: true })
                             });
-                            if (!res.ok) throw new Error(`Server returned ${res.status}`);
-                            const data = await res.json();
-                            alert(`Removed ${data.cleaned || 0} cached files.`);
+                            if (!res.ok) {
+                              const data = await res.json().catch(() => ({}));
+                              throw new Error(data.detail || `Server returned ${res.status}`);
+                            }
+                            alert('Database compacted.');
                           } catch (err) {
-                            alert(`Clearing the cache failed: ${err instanceof Error ? err.message : err}`);
+                            alert(`Compacting the database failed: ${err instanceof Error ? err.message : err}`);
                           }
-                        }
-                      }}
-                    >
-                      <Trash2 size={12} />
-                      <span>Clear Transient Cache</span>
-                    </button>
+                        }}
+                      >
+                        <HardDrive size={13} />
+                        <span>Compact</span>
+                      </button>
+                    </div>
 
-                    <button
-                      type="button"
-                      className="btn-secondary-sm"
-                      onClick={async () => {
-                        try {
-                          const res = await fetch('/api/clean', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ sessions: false, exports: false, db: true })
-                          });
-                          if (!res.ok) {
-                            const data = await res.json().catch(() => ({}));
-                            throw new Error(data.detail || `Server returned ${res.status}`);
+                    <div className="settings-action-item">
+                      <div>
+                        <strong>Stop Synapse</strong>
+                        <span>Stops the Synapse server on this computer. Start it again with bin/synapse.</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-secondary danger"
+                        onClick={async () => {
+                          if (!confirm('Stop the Synapse server?')) return;
+                          try {
+                            const res = await fetch('/api/system/shutdown', { method: 'POST' });
+                            if (!res.ok) {
+                              const data = await res.json().catch(() => ({}));
+                              throw new Error(data.detail || `Server returned ${res.status}`);
+                            }
+                            alert('Synapse is stopping. You can close this tab.');
+                          } catch (err) {
+                            alert(`Stopping the server failed: ${err instanceof Error ? err.message : err}`);
                           }
-                          alert('SQLite database vacuumed and WAL checkpointed.');
-                        } catch (err) {
-                          alert(`Vacuum failed: ${err instanceof Error ? err.message : err}`);
-                        }
-                      }}
-                    >
-                      <HardDrive size={12} />
-                      <span>Vacuum SQLite Database</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      className="btn-secondary-sm"
-                      style={{ color: '#ef4444', borderColor: '#ef444440' }}
-                      onClick={async () => {
-                        if (!confirm('Shut down Synapse Workbench server?')) return;
-                        try {
-                          const res = await fetch('/api/system/shutdown', { method: 'POST' });
-                          if (!res.ok) {
-                            const data = await res.json().catch(() => ({}));
-                            throw new Error(data.detail || `Server returned ${res.status}`);
-                          }
-                          alert('Synapse Workbench server is shutting down. You may close this browser tab.');
-                        } catch (err) {
-                          alert(`Shutdown failed: ${err instanceof Error ? err.message : err}`);
-                        }
-                      }}
-                      title="Gracefully stop the local Synapse server process"
-                    >
-                      <Power size={12} />
-                      <span>Shut Down Server</span>
-                    </button>
+                        }}
+                      >
+                        <Power size={13} />
+                        <span>Stop server</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </SettingsGroup>
+              </>
             )}
           </div>
 
