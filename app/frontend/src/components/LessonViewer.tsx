@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
 import {
   BookOpen,
   FlaskConical,
@@ -104,6 +104,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   const [translatedMarkdown, setTranslatedMarkdown] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationError, setTranslationError] = useState<string | null>(null);
+  const [translationProgress, setTranslationProgress] = useState<{ done: number; total: number } | null>(null);
+  const [translationNotice, setTranslationNotice] = useState<string | null>(null);
+  const translationAbortRef = useRef<AbortController | null>(null);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [optionsMenuOpen, setOptionsMenuOpen] = useState(false);
 
@@ -166,11 +169,18 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     stopSpeaking();
     setIsSpeakingVoice(false);
     setReadingLang('en');
+    // Leaving the lesson cancels its translation, so the local model stops working on it.
+    translationAbortRef.current?.abort();
+    translationAbortRef.current = null;
     setTranslatedMarkdown(null);
     setIsTranslating(false);
+    setTranslationProgress(null);
+    setTranslationNotice(null);
     onTranslationStatusChange?.(false);
     setTranslationError(null);
   }, [topic?.path, activeTab, activeLessonId, onTranslationStatusChange]);
+
+  useEffect(() => () => translationAbortRef.current?.abort(), []);
 
   const rawMarkdown = useMemo(() => {
     if (!topic) return '';
@@ -187,20 +197,31 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   const handleSelectLanguage = async (lang: 'en' | 'cs' | 'de' | 'es') => {
     setLangMenuOpen(false);
     setTranslationError(null);
+    setTranslationNotice(null);
+    translationAbortRef.current?.abort();
+    translationAbortRef.current = null;
     if (lang === 'en') {
       setReadingLang('en');
       setTranslatedMarkdown(null);
+      setIsTranslating(false);
+      setTranslationProgress(null);
+      onTranslationStatusChange?.(false);
       return;
     }
     setReadingLang(lang);
+    setTranslatedMarkdown(null);
     if (!rawMarkdown) return;
 
     const langName = lang === 'cs' ? 'Čeština' : lang === 'de' ? 'Deutsch' : 'Español';
     const abortCtrl = new AbortController();
+    translationAbortRef.current = abortCtrl;
+    const isCurrent = () => translationAbortRef.current === abortCtrl;
     setIsTranslating(true);
+    setTranslationProgress(null);
     onTranslationStatusChange?.(true, langName, () => {
       abortCtrl.abort();
       setIsTranslating(false);
+      setTranslationProgress(null);
     });
     try {
       const res = await fetch('/api/translate', {
@@ -212,25 +233,62 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           target_lang: lang,
           model: preferredModel || undefined,
           host: ollamaHost || undefined,
+          stream: true,
         }),
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.detail || `Translation service error (${res.status})`);
       }
-      const data = await res.json();
+      // Newline-delimited JSON: progress events, then the result.
+      let data: any = null;
+      const handleLine = (line: string) => {
+        if (!line.trim()) return;
+        const evt = JSON.parse(line);
+        if (typeof evt.progress === 'number') {
+          if (isCurrent()) setTranslationProgress({ done: evt.progress, total: evt.total ?? 0 });
+        } else {
+          data = evt;
+        }
+      };
+      if (res.body) {
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = '';
+        for (;;) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          const lines = buf.split('\n');
+          buf = lines.pop() ?? '';
+          lines.forEach(handleLine);
+        }
+        handleLine(buf + decoder.decode());
+      } else {
+        handleLine(await res.text());
+      }
+      if (!isCurrent()) return;
       if (data?.translated) {
         setTranslatedMarkdown(data.translated);
+        if (data.fallback) {
+          setTranslationNotice('Some sections could not be translated and are shown in English. Check that the AI model is reachable, then select the language again.');
+        }
+      } else {
+        throw new Error('The translation service returned no text.');
       }
     } catch (err: any) {
-      if (err.name === 'AbortError') {
+      if (err.name === 'AbortError' || !isCurrent()) {
         return;
       }
       console.error('Translation error:', err);
       setTranslationError(err.message || 'Translation failed');
     } finally {
-      setIsTranslating(false);
-      onTranslationStatusChange?.(false);
+      if (isCurrent()) {
+        translationAbortRef.current = null;
+        setIsTranslating(false);
+        setTranslationProgress(null);
+        onTranslationStatusChange?.(false);
+      }
     }
   };
 
@@ -334,6 +392,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
         }, 1800);
       }).catch((err) => {
         console.warn('Clipboard write failed:', err);
+        const originalHtml = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<span class="btn-icon">✕</span> Copy blocked';
+        setTimeout(() => { copyBtn.innerHTML = originalHtml; }, 2500);
       });
       return;
     }
@@ -840,7 +901,23 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <span>Translating section to {readingLang === 'cs' ? 'Čeština' : readingLang === 'de' ? 'Deutsch' : 'Español'}{preferredModel ? ` with ${preferredModel.split(':')[0]}` : (ollamaHost ? ' with Local AI' : '')}...</span>
+                <span>Translating to {readingLang === 'cs' ? 'Čeština' : readingLang === 'de' ? 'Deutsch' : 'Español'}{preferredModel ? ` with ${preferredModel.split(':')[0]}` : (ollamaHost ? ' with Local AI' : '')}{translationProgress && translationProgress.total > 0 ? ` · section ${Math.min(translationProgress.done + 1, translationProgress.total)} of ${translationProgress.total}` : '…'}</span>
+                <button type="button" className="translating-cancel-btn" onClick={() => handleSelectLanguage('en')} style={{ marginLeft: 'auto', background: 'none', border: '1px solid currentColor', borderRadius: '4px', color: 'inherit', fontSize: '11px', padding: '2px 8px', cursor: 'pointer' }}>
+                  Cancel
+                </button>
+              </div>
+            )}
+            {translationNotice && !isTranslating && (
+              <div className="translating-notice-banner" role="status" style={{
+                padding: '8px 14px',
+                marginBottom: '14px',
+                borderRadius: '6px',
+                background: 'rgba(234, 179, 8, 0.12)',
+                border: '1px solid rgba(234, 179, 8, 0.35)',
+                color: '#ca8a04',
+                fontSize: '12px'
+              }}>
+                {translationNotice}
               </div>
             )}
             {translationError && (

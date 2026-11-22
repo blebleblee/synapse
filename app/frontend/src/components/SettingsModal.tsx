@@ -140,6 +140,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   // Discovered Models State
   const [discoveredModels, setDiscoveredModels] = useState<string[]>([]);
 
+  // Options for a model <select>. The saved model always stays listed, so the
+  // dropdown never shows a different model than the one the app will use.
+  const modelOptions = (current: string | undefined, required = true) => {
+    const missing = current && !discoveredModels.includes(current);
+    return (
+      <>
+        {missing && (
+          <option value={current}>
+            {current}{discoveredModels.length > 0 ? ' (not found on any node)' : ''}
+          </option>
+        )}
+        {!current && required && <option value="">Select a model</option>}
+        {discoveredModels.map((m) => (
+          <option key={m} value={m}>{m}</option>
+        ))}
+      </>
+    );
+  };
+
   // Node Model Pins State
   const [nodePins, setNodePins] = useState<{ [host: string]: string }>({});
 
@@ -462,7 +481,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </nav>
 
           <div className="settings-sidebar-footer">
-            <div className="sidebar-app-badge">Synapse v1.2.1 • Offline First</div>
+            <div className="sidebar-app-badge">Synapse v1.2.1</div>
           </div>
         </div>
 
@@ -686,27 +705,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
                             className="font-mono"
                           >
-                            {discoveredModels.length > 0 ? (
-                              discoveredModels.map((m) => (
-                                <option key={m} value={m}>{m}</option>
-                              ))
-                            ) : (
-                              <option value={formData.primaryModel}>{formData.primaryModel}</option>
-                            )}
+                            {modelOptions(formData.primaryModel)}
                           </select>
                         </div>
 
                         <div className="form-group compact">
                           <label>Socratic Mentor Model</label>
                           <select
-                            value={formData.mentorModel || formData.primaryModel}
+                            value={formData.mentorModel || ''}
                             onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
                             className="font-mono"
                           >
-                            <option value="">Use Primary Model ({formData.primaryModel})</option>
-                            {discoveredModels.map((m) => (
-                              <option key={m} value={m}>{m}</option>
-                            ))}
+                            <option value="">Same as primary ({formData.primaryModel})</option>
+                            {modelOptions(formData.mentorModel, false)}
                           </select>
                         </div>
                       </div>
@@ -718,13 +729,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
                           className="font-mono"
                         >
-                          {discoveredModels.length > 0 ? (
-                            discoveredModels.map((m) => (
-                              <option key={m} value={m}>{m}</option>
-                            ))
-                          ) : (
-                            <option value={formData.reviewerModel}>{formData.reviewerModel}</option>
-                          )}
+                          {modelOptions(formData.reviewerModel)}
                         </select>
                       </div>
                     </div>

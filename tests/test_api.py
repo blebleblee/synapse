@@ -1,3 +1,4 @@
+import json
 """
 Tests for app.backend.main FastAPI Endpoints
 Verifies REST API contracts, path sanitization, and error responses.
@@ -205,6 +206,43 @@ def test_api_translate_successful_translation_caches_result(monkeypatch):
     data2 = res2.json()
     assert data2["cached"] is True
     assert "mikroslužeb" in data2["translated"]
+
+def test_api_translate_stream_reports_progress(monkeypatch):
+    """With stream=true the endpoint reports per-section progress, then the result."""
+    from unittest.mock import MagicMock
+    mock_provider = MagicMock()
+    mock_provider.generate.side_effect = lambda prompt: "# Přeložená sekce s dostatečnou délkou textu"
+
+    import app.backend.main as be_main
+    monkeypatch.setattr(be_main, "get_translation_provider", lambda **kwargs: (mock_provider, "mock-translator"))
+
+    raw_text = "# One\nFirst section text.\n## Two\nSecond section text.\n## Three\nThird section text."
+    res = client.post("/api/translate", json={"text": raw_text, "target_lang": "cs", "stream": True})
+    assert res.status_code == 200
+    assert res.headers["content-type"].startswith("application/x-ndjson")
+    events = [json.loads(line) for line in res.text.splitlines() if line.strip()]
+
+    assert events[0] == {"progress": 0, "total": 3, "model": "mock-translator"}
+    assert [e["progress"] for e in events[1:-1]] == [1, 2, 3]
+    final = events[-1]
+    assert final["cached"] is False
+    assert final["fallback"] is False
+    assert "Přeložená" in final["translated"]
+
+
+def test_api_translate_stream_cached_result_is_single_event(monkeypatch):
+    from unittest.mock import MagicMock
+    mock_provider = MagicMock()
+    mock_provider.generate.return_value = "# Nadpis a dostatečně dlouhý přeložený text"
+    import app.backend.main as be_main
+    monkeypatch.setattr(be_main, "get_translation_provider", lambda **kwargs: (mock_provider, "m"))
+
+    body = {"text": "# Heading\nSome text to translate.", "target_lang": "de"}
+    assert client.post("/api/translate", json=body).status_code == 200
+    res = client.post("/api/translate", json={**body, "stream": True})
+    events = [json.loads(line) for line in res.text.splitlines() if line.strip()]
+    assert len(events) == 1 and events[0]["cached"] is True
+
 
 def test_path_traversal_prevention():
     res = client.get("/api/topic?query=../../etc/passwd")
@@ -469,3 +507,27 @@ def test_api_mastery_independent_of_sql_row_order():
 
 
 
+
+
+def test_find_sandbox_tool_searches_rancher_desktop_bin(tmp_path, monkeypatch):
+    """Rancher Desktop installs docker/kubectl in ~/.rd/bin, which a Dock-launched app's PATH lacks."""
+    import app.backend.main as be_main
+    rd_bin = tmp_path / ".rd" / "bin"
+    rd_bin.mkdir(parents=True)
+    tool = rd_bin / "docker"
+    tool.write_text("#!/bin/sh\nexit 0\n")
+    tool.chmod(0o755)
+    monkeypatch.setattr(be_main.Path, "home", classmethod(lambda cls: tmp_path))
+    monkeypatch.setenv("PATH", "/usr/bin:/bin")
+
+    assert be_main.find_sandbox_tool("docker") == str(tool)
+
+    import subprocess
+    seen = {}
+    def fake_run(cmd, **kwargs):
+        seen["cmd"], seen["path"] = cmd, kwargs["env"]["PATH"]
+        return subprocess.CompletedProcess(cmd, 0)
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    assert be_main.sandbox_tool_responds([str(tool), "info"]) is True
+    assert seen["cmd"] == [str(tool), "info"]
+    assert str(rd_bin) in seen["path"].split(":")

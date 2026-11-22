@@ -6059,3 +6059,75 @@ body, html, #root {
 .node-pill.offline .node-dot {
   background-color: var(--accent-red);
 }
+
+/* Action results and failures (NoticeStack) */
+.notice-stack {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(420px, calc(100vw - 32px));
+}
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  border-left-width: 3px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.45;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.notice-error { border-left-color: var(--accent-red); }
+.notice-success { border-left-color: var(--accent-green); }
+.notice-info { border-left-color: var(--accent-blue); }
+.notice-text { flex: 1; overflow-wrap: anywhere; }
+.notice-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  line-height: 0;
+}
+.notice-close:hover { color: var(--text-primary); }
+
+/* Settings: cluster node row status and the add-node bar had no styles */
+.node-latency {
+  min-width: 52px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.add-node-bar {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.add-node-bar input {
+  flex: 1;
+  min-width: 0;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 7px 10px;
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+}
+.add-node-bar input::placeholder { color: var(--text-muted); }
+.add-node-bar input:focus { border-color: var(--border-focus); }
+.add-node-bar .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}

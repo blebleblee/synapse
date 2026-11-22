@@ -13,6 +13,8 @@ import { LoginModal } from './components/LoginModal';
 import type { TerminalDrawerHandle } from './components/TerminalDrawer';
 import type { TopicTreeData, TopicDetails, ChatMessage, WorkspaceStatus, QuizQuestion } from './types';
 import { getStoredSelection, saveStoredSelection, clearStoredSelection } from './utils/selectionStorage';
+import { NoticeStack, type Notice, type NoticeKind } from './components/NoticeStack';
+import { failureMessage, networkFailure } from './utils/failureMessage';
 import './App.css';
 
 export function App() {
@@ -37,6 +39,17 @@ export function App() {
   const [quizQuestions, setQuizQuestions] = useState<{ [key: string]: QuizQuestion[] }>({});
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
   const activeCancelHandler = useRef<(() => void) | null>(null);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const noticeIdRef = useRef(0);
+  const dismissNotice = useCallback((id: number) => {
+    setNotices((prev) => prev.filter((n) => n.id !== id));
+  }, []);
+  // Every user action ends visibly: a result, or a reason it failed.
+  const notify = useCallback((kind: NoticeKind, text: string) => {
+    const id = ++noticeIdRef.current;
+    setNotices((prev) => [...prev.slice(-3), { id, kind, text }]);
+    window.setTimeout(() => dismissNotice(id), kind === 'error' ? 12000 : 5000);
+  }, [dismissNotice]);
   const [terminalOpen, setTerminalOpen] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
   const [graphOpen, setGraphOpen] = useState(false);
@@ -184,7 +197,10 @@ export function App() {
         }
 
         saveStoredSelection(query, effectiveLessonId);
-      } else if (res.status === 404) {
+      } else if (res.status !== 404 && currentRequestId === loadRequestIdRef.current) {
+        notify('error', await failureMessage(res, 'Opening the topic'));
+      }
+      if (res.status === 404) {
         clearStoredSelection();
         if (currentRequestId === loadRequestIdRef.current) {
           setSelectedPath(null);
@@ -194,6 +210,7 @@ export function App() {
       }
     } catch (err) {
       console.error('Failed to load topic details:', err);
+      if (currentRequestId === loadRequestIdRef.current) notify('error', networkFailure('Opening the topic', err));
     } finally {
       if (currentRequestId === loadRequestIdRef.current) {
         setIsLoadingTopic(false);
@@ -290,10 +307,13 @@ export function App() {
         await loadTopic(query);
         await fetchTree();
         await fetchStatus();
+      } else {
+        notify('error', await failureMessage(res, 'Generating content'));
       }
     } catch (err: any) {
       if (err.name !== 'AbortError') {
         console.error('Failed to generate topic content:', err);
+        notify('error', networkFailure('Generating content', err));
       }
     } finally {
       setIsGenerating(false);
@@ -301,17 +321,24 @@ export function App() {
   };
 
   const handleAddSubtopic = async (domain: string, category: string, subtopic: string, title?: string) => {
-    const res = await fetch('/api/add', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ domain, category, subtopic, title, generate: true }),
-    });
-    if (res.ok) {
-      await fetchTree();
-      await fetchStatus();
-      const newRel = `${domain}/${category}/${subtopic}`;
-      await loadTopic(newRel);
+    try {
+      const res = await fetch('/api/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain, category, subtopic, title, generate: true }),
+      });
+      if (res.ok) {
+        await fetchTree();
+        await fetchStatus();
+        const newRel = `${domain}/${category}/${subtopic}`;
+        await loadTopic(newRel);
+        return true;
+      }
+      notify('error', await failureMessage(res, 'Adding the topic'));
+    } catch (err) {
+      notify('error', networkFailure('Adding the topic', err));
     }
+    return false;
   };
 
   const handleDeleteTopic = async (path: string) => {
@@ -332,11 +359,11 @@ export function App() {
         await fetchTree();
         await fetchStatus();
       } else {
-        const errData = await res.json().catch(() => ({}));
-        window.alert(`Failed to delete topic: ${errData.detail || res.statusText}`);
+        notify('error', await failureMessage(res, 'Deleting the topic'));
       }
     } catch (err) {
       console.error('Failed to delete topic:', err);
+      notify('error', networkFailure('Deleting the topic', err));
     }
   };
 
@@ -349,10 +376,14 @@ export function App() {
       });
       if (res.ok) {
         await fetchTree();
+        return true;
       }
+      notify('error', await failureMessage(res, 'Renaming the topic'));
     } catch (err) {
       console.error('Failed to rename topic:', err);
+      notify('error', networkFailure('Renaming the topic', err));
     }
+    return false;
   };
 
   const handleSelectSubtopic = (query: string, lessonId?: string) => {
@@ -387,9 +418,12 @@ export function App() {
           mastery: data.state
         } : null);
         await fetchTree();
+      } else {
+        notify('error', await failureMessage(res, 'Marking the lesson'));
       }
     } catch (err) {
       console.error('Failed to toggle lesson completion:', err);
+      notify('error', networkFailure('Marking the lesson', err));
     }
   };
 
@@ -635,11 +669,14 @@ export function App() {
       });
       if (res.ok) {
         const data = await res.json();
-        alert(`Mastered Field Guide compiled to ${data.path} and committed to Git!`);
+        notify('success', `Field guide saved to ${data.path}`);
+      } else {
+        notify('error', await failureMessage(res, 'Compiling the field guide'));
       }
     } catch (err: any) {
       if (err.name !== 'AbortError') {
         console.error('Failed to compile guide:', err);
+        notify('error', networkFailure('Compiling the field guide', err));
       }
     } finally {
       setIsCompilingGuide(false);
@@ -707,10 +744,16 @@ export function App() {
           ...prev,
           [quizKey]: data.questions || [],
         }));
+        if (!data.questions?.length) {
+          notify('error', 'The AI model returned no quiz questions. Try again or pick another model in Settings.');
+        }
+      } else {
+        notify('error', await failureMessage(res, 'Generating the quiz'));
       }
     } catch (err: any) {
       if (err.name !== 'AbortError') {
         console.error('Failed to fetch quiz:', err);
+        notify('error', networkFailure('Generating the quiz', err));
       }
     } finally {
       setIsLoadingQuiz(false);
@@ -738,9 +781,12 @@ export function App() {
         }
         await fetchTree();
         await fetchStatus();
+      } else {
+        notify('error', await failureMessage(res, 'Updating mastery'));
       }
     } catch (err) {
       console.error('Failed to update mastery:', err);
+      notify('error', networkFailure('Updating mastery', err));
     }
   };
 
@@ -749,7 +795,10 @@ export function App() {
   const downloadFile = async (url: string, fallbackName: string) => {
     try {
       const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        notify('error', await failureMessage(res, 'Download'));
+        return;
+      }
       const disposition = res.headers.get('Content-Disposition') || '';
       const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition);
       const filename = match ? decodeURIComponent(match[1]) : fallbackName;
@@ -763,6 +812,7 @@ export function App() {
       setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
     } catch (err) {
       console.error('Download failed:', err);
+      notify('error', networkFailure('Download', err));
     }
   };
 
@@ -797,10 +847,13 @@ export function App() {
         if (topicDetails) {
           setTopicDetails({ ...topicDetails, summary: data.summary });
         }
+      } else {
+        notify('error', await failureMessage(res, 'Regenerating the summary'));
       }
     } catch (err: any) {
       if (err.name !== 'AbortError') {
         console.error('Failed to regenerate summary:', err);
+        notify('error', networkFailure('Regenerating the summary', err));
       }
     } finally {
       setIsRegeneratingSummary(false);
@@ -992,6 +1045,8 @@ export function App() {
         isOpen={authRequired && !isAuthenticated}
         onLoginSuccess={handleLoginSuccess}
       />
+
+      <NoticeStack notices={notices} onDismiss={dismissNotice} />
     </div>
   );
 }

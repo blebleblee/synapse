@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layers, RotateCcw, CheckCircle2, X, Sparkles, Award } from 'lucide-react';
+import { failureMessage, networkFailure } from '../utils/failureMessage';
 
 export interface Flashcard {
   id: number;
@@ -25,11 +26,13 @@ export const FlashcardStudyModal: React.FC<FlashcardStudyModalProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [reviewedCount, setReviewedCount] = useState(0);
 
   const loadDeck = async () => {
     setIsLoading(true);
+    setLoadError(null);
     try {
       const res = await fetch(`/api/flashcards/deck?query=${encodeURIComponent(topicPath)}`);
       if (res.ok) {
@@ -38,9 +41,15 @@ export const FlashcardStudyModal: React.FC<FlashcardStudyModalProps> = ({
         setCurrentIndex(0);
         setIsFlipped(false);
         setIsCompleted(false);
+        if (!data.cards?.length) {
+          setLoadError('No cards could be made from this topic yet. Its lessons need key terms or review questions.');
+        }
+      } else {
+        setLoadError(await failureMessage(res, 'Loading flashcards'));
       }
     } catch (err) {
       console.error('Failed to load flashcard deck:', err);
+      setLoadError(networkFailure('Loading flashcards', err));
     } finally {
       setIsLoading(false);
     }
@@ -122,6 +131,7 @@ export const FlashcardStudyModal: React.FC<FlashcardStudyModalProps> = ({
             <Sparkles size={36} className="empty-icon" />
             <h4>No Flashcards Generated Yet</h4>
             <p>Generate or study this topic to synthesize active recall cards.</p>
+            {loadError && <p className="flashcard-load-error" role="alert" style={{ color: 'var(--accent-red)' }}>{loadError}</p>}
             <button className="btn-primary" onClick={loadDeck}>
               Generate Cards Now
             </button>

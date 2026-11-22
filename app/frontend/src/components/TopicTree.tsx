@@ -39,14 +39,15 @@ interface TopicTreeProps {
   status?: WorkspaceStatus | null;
   completedLessons?: string[];
   onSelectSubtopic: (query: string, lessonId?: string) => void;
-  onAddSubtopic: (domain: string, category: string, subtopic: string, title?: string) => Promise<void>;
+  /** Resolves false when adding failed (the app has already shown why). */
+  onAddSubtopic: (domain: string, category: string, subtopic: string, title?: string) => Promise<boolean | void>;
   onOpenSearch: () => void;
   onOpenGraph: () => void;
   onOpenSettings: () => void;
   onOpenStore?: () => void;
   onLogout?: () => void;
   onDeleteTopic?: (path: string) => Promise<void>;
-  onRenameTopic?: (path: string, newTitle: string) => Promise<void>;
+  onRenameTopic?: (path: string, newTitle: string) => Promise<boolean | void>;
   onToggleLessonCompletion?: (path: string, lessonId: string, completed?: boolean) => Promise<void>;
   targetLanguage?: string;
 }
@@ -198,7 +199,8 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
       const categoryPath = `${disc}/${course}`;
       const title = addTitle.trim() || undefined;
 
-      await onAddSubtopic(addDomain, categoryPath, unit, title);
+      const added = await onAddSubtopic(addDomain, categoryPath, unit, title);
+      if (added === false) return; // keep the dialog open so nothing typed is lost
       setShowAddModal(false);
       setAddCourse('');
       setAddUnitSlug('');
@@ -214,7 +216,8 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
     e.preventDefault();
     if (!renameTarget || !renameInput.trim() || !onRenameTopic) return;
     try {
-      await onRenameTopic(renameTarget.path, renameInput.trim());
+      const renamed = await onRenameTopic(renameTarget.path, renameInput.trim());
+      if (renamed === false) return;
       setRenameTarget(null);
       setRenameInput('');
     } catch (err) {

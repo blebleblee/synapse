@@ -14,7 +14,7 @@ import {
   HelpCircle,
   X
 } from 'lucide-react';
-import { shouldReconnectTerminal } from '../utils/terminalHelpers';
+import { shouldReconnectTerminal, retireSocket } from '../utils/terminalHelpers';
 
 export interface TerminalDrawerHandle {
   runCommand: (command: string) => void;
@@ -77,7 +77,8 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     }
 
     if (wsRef.current) {
-      wsRef.current.close();
+      retireSocket(wsRef.current);
+      wsRef.current = null;
     }
 
     // The bearer token never goes into the WebSocket URL: exchange it for a
@@ -255,7 +256,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('synapse:authenticated', handleAuthEvent);
-      if (wsRef.current) wsRef.current.close();
+      if (wsRef.current) retireSocket(wsRef.current);
       term.dispose();
     };
   }, []);

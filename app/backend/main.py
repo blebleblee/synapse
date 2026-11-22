@@ -744,6 +744,7 @@ class TranslateRequest(BaseModel):
     model: Optional[str] = None
     provider: Optional[str] = None
     host: Optional[str] = None
+    stream: bool = False
 
 LANGUAGE_NAMES = {
     "cs": "Czech (Čeština)",
@@ -754,7 +755,7 @@ LANGUAGE_NAMES = {
 }
 
 @app.post("/api/translate")
-async def api_translate_content(req: TranslateRequest):
+async def api_translate_content(req: TranslateRequest, request: Request):
     if req.target_lang == "en" or not req.text.strip():
         return {"translated": req.text, "cached": True}
 
@@ -798,10 +799,13 @@ async def api_translate_content(req: TranslateRequest):
         nonlocal any_chunk_failed
         if not chunk_text.strip():
             return chunk_text
-            
+
         async with sem:
+            # The reader left or cancelled: don't start more local-model work.
+            if await request.is_disconnected():
+                raise asyncio.CancelledError()
             masked_text, blocks = mask_and_extract(chunk_text)
-            
+
             prompt = f"""You are an expert technical translator and polyglot philologist.
 Translate the following technical curriculum text into {lang_name}.
 
@@ -820,42 +824,60 @@ Text to translate:
                 loop = asyncio.get_running_loop()
                 translated_masked = await loop.run_in_executor(AI_EXECUTOR, provider.generate, prompt)
                 translated_masked = translated_masked.strip()
-                
-                # Truncation Guard: if translation is completely broken (<20% length of source without blocks)
-                if len(translated_masked) < len(masked_text) * 0.2:
-                    # Fallback to English chunk if model brutally failed
-                    any_chunk_failed = True
-                    return chunk_text
 
-                if not translated_masked:
+                # Truncation Guard: if translation is completely broken (<20% length of source without blocks)
+                if not translated_masked or len(translated_masked) < len(masked_text) * 0.2:
                     any_chunk_failed = True
                     return chunk_text
 
                 return unmask(translated_masked, blocks)
+            except asyncio.CancelledError:
+                raise
             except Exception:
                 any_chunk_failed = True
                 return chunk_text
 
     # Chunking by ## or # to fit in context window (sliding window logic)
-    import re
     sections = re.split(r'(?=\n#{1,2}\s+)', req.text)
-    
-    translated_sections = await asyncio.gather(*(translate_chunk(sec) for sec in sections))
-    final_translation = "".join(translated_sections).strip()
+    total = sum(1 for s in sections if s.strip())
 
-    # Never cache failed or untranslated fallback English content
-    is_identical_to_source = (final_translation == req.text.strip())
-    should_cache = not any_chunk_failed and not is_identical_to_source and bool(final_translation)
+    def finish(translated_sections: list) -> dict:
+        final_translation = "".join(translated_sections).strip()
+        # Never cache failed or untranslated fallback English content
+        is_identical_to_source = (final_translation == req.text.strip())
+        if not any_chunk_failed and not is_identical_to_source and final_translation:
+            cache_file.write_text(final_translation + "\n", encoding="utf-8")
+        return {
+            "translated": final_translation,
+            "cached": False,
+            "model": used_model,
+            "fallback": any_chunk_failed or is_identical_to_source
+        }
 
-    if should_cache:
-        cache_file.write_text(final_translation + "\n", encoding="utf-8")
+    if not req.stream:
+        tasks = [asyncio.ensure_future(translate_chunk(sec)) for sec in sections]
+        try:
+            return finish(await asyncio.gather(*tasks))
+        finally:
+            for task in tasks:
+                task.cancel()
 
-    return {
-        "translated": final_translation,
-        "cached": False,
-        "model": used_model,
-        "fallback": any_chunk_failed or is_identical_to_source
-    }
+    async def progress_stream():
+        tasks = [asyncio.ensure_future(translate_chunk(sec)) for sec in sections]
+        try:
+            yield json.dumps({"progress": 0, "total": total, "model": used_model}) + "\n"
+            done = 0
+            for fut in asyncio.as_completed([t for t, s in zip(tasks, sections) if s.strip()]):
+                await fut
+                done += 1
+                yield json.dumps({"progress": done, "total": total}) + "\n"
+            yield json.dumps(finish([t.result() for t in tasks])) + "\n"
+        finally:
+            # Client gone (closed lesson, switched language, quit): drop queued sections.
+            for task in tasks:
+                task.cancel()
+
+    return StreamingResponse(progress_stream(), media_type="application/x-ndjson")
 
 # -----------------------------------------------------------------------------
 # Neural Audio Narration (Edge-TTS with Guy Baritone Voice & MP3 Disk Cache)
@@ -1627,6 +1649,32 @@ Output clean, production-ready Markdown."""
 # WebSocket Interactive Terminal (PTY Bridge)
 # -----------------------------------------------------------------------------
 
+def sandbox_tool_search_path() -> str:
+    """PATH for finding docker/kubectl. Apps started from the Dock get a minimal
+    PATH, and Rancher Desktop installs its tools in ~/.rd/bin."""
+    extra = [str(Path.home() / ".rd" / "bin"), "/opt/homebrew/bin", "/usr/local/bin",
+             "/Applications/Docker.app/Contents/Resources/bin"]
+    current = os.environ.get("PATH", "")
+    parts = current.split(os.pathsep) if current else []
+    return os.pathsep.join(parts + [p for p in extra if p not in parts])
+
+
+def find_sandbox_tool(name: str) -> Optional[str]:
+    return shutil.which(name, path=sandbox_tool_search_path())
+
+
+def sandbox_tool_responds(cmd: list) -> bool:
+    """True if the daemon/cluster behind the tool answers (5 s budget: a
+    starting Rancher VM is slow)."""
+    import subprocess
+    env = {**os.environ, "PATH": sandbox_tool_search_path()}
+    try:
+        return subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                              timeout=5, env=env).returncode == 0
+    except Exception:
+        return False
+
+
 @app.websocket("/ws/terminal")
 async def terminal_websocket(websocket: WebSocket):
     global LAST_TERMINAL_COMMAND
@@ -1872,16 +1920,8 @@ async def terminal_websocket(websocket: WebSocket):
         exec_cmd = [shell, "-i"]
 
     if env_type == "docker":
-        docker_bin = shutil.which("docker")
-        docker_ok = False
-        if docker_bin:
-            try:
-                import subprocess
-                p = subprocess.run([docker_bin, "info"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=1.5)
-                if p.returncode == 0:
-                    docker_ok = True
-            except Exception:
-                docker_ok = False
+        docker_bin = find_sandbox_tool("docker")
+        docker_ok = bool(docker_bin) and await asyncio.to_thread(sandbox_tool_responds, [docker_bin, "info"])
 
         if docker_ok:
             exec_cmd = [
@@ -1903,16 +1943,8 @@ async def terminal_websocket(websocket: WebSocket):
             exec_cmd = ["/bin/bash", "-c", notice]
 
     elif env_type == "k8s":
-        kubectl_bin = shutil.which("kubectl")
-        k8s_ok = False
-        if kubectl_bin:
-            try:
-                import subprocess
-                p = subprocess.run([kubectl_bin, "cluster-info"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=1.5)
-                if p.returncode == 0:
-                    k8s_ok = True
-            except Exception:
-                k8s_ok = False
+        kubectl_bin = find_sandbox_tool("kubectl")
+        k8s_ok = bool(kubectl_bin) and await asyncio.to_thread(sandbox_tool_responds, [kubectl_bin, "cluster-info"])
 
         if k8s_ok:
             exec_cmd = [
@@ -1956,6 +1988,9 @@ async def terminal_websocket(websocket: WebSocket):
             missing = [p for p in default_paths if p not in current_path]
             if missing:
                 env["PATH"] = ":".join(missing) + (":" + current_path if current_path else "")
+        if env_type in ("docker", "k8s"):
+            env["PATH"] = sandbox_tool_search_path() if not env.get("PATH") else os.pathsep.join(
+                [env["PATH"]] + [p for p in sandbox_tool_search_path().split(os.pathsep) if p not in env["PATH"].split(os.pathsep)])
         env["ZDOTDIR"] = str(zdot_dir)
         env["PROMPT_COMMAND"] = ""
         env["PAGER"] = "cat"
