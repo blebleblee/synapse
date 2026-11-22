@@ -12,6 +12,7 @@ import {
   Download,
   Volume2,
   VolumeX,
+  Loader2,
   Columns,
   FileText,
   Globe,
@@ -93,7 +94,8 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onToggleLessonCompletion,
   targetSection,
 }) => {
-  const [isSpeakingVoice, setIsSpeakingVoice] = useState(false);
+  // 'preparing': the server is synthesizing the lesson audio (first listen can take a minute).
+  const [voiceState, setVoiceState] = useState<'idle' | 'preparing' | 'speaking'>('idle');
   const [readingLang, setReadingLang] = useState<'en' | 'cs' | 'de' | 'es'>('en');
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [translatedMarkdown, setTranslatedMarkdown] = useState<string | null>(null);
@@ -167,7 +169,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   const [shownViewKey, setShownViewKey] = useState(viewKey);
   if (viewKey !== shownViewKey) {
     setShownViewKey(viewKey);
-    setIsSpeakingVoice(false);
+    setVoiceState('idle');
     setReadingLang('en');
     setTranslatedMarkdown(null);
     setIsTranslating(false);
@@ -394,14 +396,16 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   }, [readingLang, translationViewMode, translatedMarkdown, rawMarkdown]);
 
   const handleToggleVoice = () => {
-    if (isSpeakingVoice) {
+    if (voiceState !== 'idle') {
+      // Stop playback, or cancel audio that is still being prepared.
       stopSpeaking();
-      setIsSpeakingVoice(false);
+      setVoiceState('idle');
     } else if (activeMarkdown) {
       speakText(
         activeMarkdown,
-        () => setIsSpeakingVoice(true),
-        () => setIsSpeakingVoice(false)
+        () => setVoiceState('speaking'),
+        () => setVoiceState('idle'),
+        () => setVoiceState('preparing')
       );
     }
   };
@@ -685,13 +689,22 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
 
           {/* 1. Audio Reader */}
           <button
-            className={`nav-action-btn ${isSpeakingVoice ? 'active-voice' : ''}`}
+            className={`nav-action-btn ${voiceState !== 'idle' ? 'active-voice' : ''}`}
             onClick={handleToggleVoice}
             disabled={!rawMarkdown}
-            title={isSpeakingVoice ? 'Stop audio playback' : 'Listen to this section (Speech Synthesis)'}
+            aria-busy={voiceState === 'preparing'}
+            title={voiceState === 'speaking'
+              ? 'Stop audio playback'
+              : voiceState === 'preparing'
+                ? 'Preparing audio for this lesson (the first listen can take a minute). Click to cancel.'
+                : 'Listen to this lesson'}
           >
-            {isSpeakingVoice ? <VolumeX size={13} className="voice-pulse" /> : <Volume2 size={13} />}
-            <span className="btn-label">{isSpeakingVoice ? 'Stop' : 'Listen'}</span>
+            {voiceState === 'speaking'
+              ? <VolumeX size={13} className="voice-pulse" />
+              : voiceState === 'preparing'
+                ? <Loader2 size={13} className="spin" />
+                : <Volume2 size={13} />}
+            <span className="btn-label">{voiceState === 'speaking' ? 'Stop' : voiceState === 'preparing' ? 'Preparing…' : 'Listen'}</span>
           </button>
 
           {/* 2. Interactive Study Flashcards */}

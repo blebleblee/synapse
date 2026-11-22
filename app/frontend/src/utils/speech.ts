@@ -7,6 +7,9 @@
 let activeAudio: HTMLAudioElement | null = null;
 let activeAudioUrl: string | null = null;
 let activeUtterance: SpeechSynthesisUtterance | null = null;
+// The narration request in flight; stopSpeaking() aborts it so audio for a
+// lesson the learner already left (or stopped) never starts playing later.
+let activeRequest: AbortController | null = null;
 
 function fallbackWebSpeech(
   text: string,
@@ -75,9 +78,14 @@ function fallbackWebSpeech(
 export const speakText = async (
   text: string,
   onStart?: () => void,
-  onEnd?: () => void
+  onEnd?: () => void,
+  onPreparing?: () => void
 ) => {
   stopSpeaking();
+  const request = new AbortController();
+  activeRequest = request;
+  // The first listen of a lesson is synthesized on the server (can take a minute).
+  if (onPreparing) onPreparing();
 
   const preferredVoice = typeof window !== 'undefined'
     ? localStorage.getItem('synapse_narrator_voice') || 'en-US-GuyNeural'
@@ -92,7 +100,8 @@ export const speakText = async (
         voice: preferredVoice,
         pitch: '-10Hz',
         rate: '-4%'
-      })
+      }),
+      signal: request.signal
     });
 
     if (!response.ok) {
@@ -100,9 +109,11 @@ export const speakText = async (
     }
 
     const blob = await response.blob();
+    if (request.signal.aborted) return;
     if (blob.size < 500) {
       throw new Error('Received invalid audio response');
     }
+    activeRequest = null;
 
     const audioUrl = URL.createObjectURL(blob);
     activeAudioUrl = audioUrl;
@@ -126,12 +137,18 @@ export const speakText = async (
 
     await audio.play();
   } catch (err) {
+    if (request.signal.aborted) return;
+    activeRequest = null;
     console.warn('[Audio] Backend neural speech unavailable, falling back:', err);
     fallbackWebSpeech(text, onStart, onEnd);
   }
 };
 
 export const stopSpeaking = () => {
+  if (activeRequest) {
+    activeRequest.abort();
+    activeRequest = null;
+  }
   if (activeAudio) {
     activeAudio.pause();
     activeAudio.currentTime = 0;

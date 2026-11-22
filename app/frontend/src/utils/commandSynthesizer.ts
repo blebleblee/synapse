@@ -22,7 +22,7 @@ export function synthesizeTerminalCommand(code: string, lang: string): Synthesiz
       command: trimmed,
       displayLabel: '▶ Run Command',
       isExecutable: true,
-      explanation: 'Executes shell command directly in your sandbox terminal.'
+      explanation: 'Runs this command in the terminal panel (the profile selected there: sandbox or host shell).'
     };
   }
 

@@ -57,3 +57,9 @@ test('synthesizeTerminalCommand - Non-executable languages fallback safely', () 
   const result = synthesizeTerminalCommand(text, 'markdown');
   assert.equal(result.isExecutable, false);
 });
+
+test('shell run tooltip does not claim a sandbox (the Host Shell profile may be active)', () => {
+  const synth = synthesizeTerminalCommand('ls -la', 'bash');
+  assert.ok(!/sandbox terminal/.test(synth.explanation));
+  assert.match(synth.explanation, /terminal panel/);
+});
