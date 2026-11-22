@@ -1034,7 +1034,7 @@ function App() {
       <SearchModal
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
-        onSelectTopic={(path) => loadTopic(path)}
+        onSelectTopic={handleSelectSubtopic}
       />
 
       <GraphModal

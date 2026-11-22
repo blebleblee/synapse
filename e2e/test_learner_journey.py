@@ -643,3 +643,40 @@ def test_keyboard_navigation_contract(browser_page):
     expect(page.locator("h1:has-text('E2E B-Tree Mechanics')")).to_be_visible(timeout=5000)
     expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_02_indexing")
 
+
+def test_search_navigation_to_matched_lesson(browser_page):
+    """
+    Verifies that clicking a search result navigates directly to the matched
+    lesson instead of falling back to Lesson 1.
+    """
+    page, server_url = browser_page
+    page.goto(server_url)
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    # Open search modal via sidebar action button
+    search_btn = page.locator("button[title*='Search']").first
+    expect(search_btn).to_be_visible(timeout=5000)
+    search_btn.click()
+
+    # Search input should be visible and focused
+    search_input = page.locator(".search-modal-header input")
+    expect(search_input).to_be_visible(timeout=5000)
+
+    # Type query matching Lesson 2 ("B-Tree Mechanics")
+    search_input.fill("B-Tree")
+
+    # Expect matching result item to appear
+    result_item = page.locator(".search-result-item:has-text('B-Tree Mechanics')").first
+    expect(result_item).to_be_visible(timeout=5000)
+
+    # Click the search result item
+    result_item.click()
+
+    # Verify modal is closed
+    expect(page.locator(".search-modal-header input")).not_to_be_visible(timeout=5000)
+
+    # Verify reader opens Lesson 2 directly (not Lesson 1)
+    expect(page.locator("h1:has-text('E2E B-Tree Mechanics')")).to_be_visible(timeout=5000)
+    expect(page.locator(".study-lesson-dropdown")).to_have_value("lesson_02_indexing")
+
+
