@@ -470,3 +470,21 @@ def test_terminal_closes_each_pty_fd_exactly_once(monkeypatch):
                 pass
 
     assert sorted(closes) == sorted([master_r, slave_w]), f"close calls: {closes}"
+
+
+def test_unreachable_sandbox_does_not_fall_back_to_a_host_shell(monkeypatch):
+    """With Docker or the cluster down, "Linux Sandbox" / "Kubernetes Pod"
+    used to print setup steps and then start /bin/bash on the host while the
+    UI still said "Sandbox", so lesson Run buttons executed on the real
+    machine. The terminal now explains and opens no shell."""
+    import asyncio
+    import app.backend.main as backend
+    monkeypatch.setattr(backend, "find_sandbox_tool", lambda name: None)
+    host_shell = ["/bin/zsh", "-i"]
+    for env_type in ("docker", "k8s"):
+        cmd = asyncio.run(backend.terminal_command(env_type, host_shell))
+        script = " ".join(cmd)
+        assert cmd != host_shell
+        assert "exec /bin/bash" not in script and "exec /bin/zsh" not in script
+        assert "Host Shell" in script  # tells the learner how to get a shell on purpose
+    assert asyncio.run(backend.terminal_command("host", host_shell)) == host_shell

@@ -38,6 +38,8 @@ Rather than forcing users to blindly copy-paste complex multi-line snippets into
 | **JSON** | `{"cluster": {"nodes": 3}}` | Writes to `/tmp/synapse_data.json` and pretty-prints with `jq .` | `▶ Inspect JSON` |
 | **Bash / Shell** | `docker ps -a` | Executes directly in active terminal PTY session | `▶ Run in Terminal` |
 
+In a sandbox profile the synthesized command runs at once. On **Host Shell (Local)** it is only typed in at the prompt (bracketed paste, no Enter): lesson snippets are often illustrations, so you review the command and press Enter yourself.
+
 ---
 
 ## 3. Socratic AI Mentor & Multilingual Engine

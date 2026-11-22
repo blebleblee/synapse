@@ -12,6 +12,8 @@ Synapse provides an integrated WebSocket PTY terminal designed for executing han
 | **Docker (Ubuntu 24.04)** | Container Sandbox | Docker / Rancher Desktop | macOS, Windows, Linux | Linux labs, package installations, root experiments |
 | **Kubernetes (k3s / Netshoot)** | Ephemeral Pod | k3s / Minikube / Rancher | macOS, Windows, Linux | Cloud-native, network tracing, eBPF |
 
+If the Docker daemon or the Kubernetes cluster is not reachable, choosing that profile shows the setup steps and opens **no shell**. Synapse never falls back to a host shell behind a "Sandbox" label; choose **Host Shell (Local)** to work on your own machine on purpose.
+
 ---
 
 ## 2. Setting Up Rancher Desktop (Recommended for Mac & Windows)

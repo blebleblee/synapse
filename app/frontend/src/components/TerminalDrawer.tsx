@@ -288,7 +288,14 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
   useImperativeHandle(ref, () => ({
     runCommand(command: string) {
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(command.trim() + '\n');
+        if (terminalEnv === 'host') {
+          // On this computer's own shell a lesson snippet is only typed in
+          // (bracketed paste, no Enter): the learner reviews it and presses
+          // Enter. Snippets are often illustrations ("cmd > file").
+          wsRef.current.send('\x1b[200~' + command.trim() + '\x1b[201~');
+        } else {
+          wsRef.current.send(command.trim() + '\n');
+        }
         if (!isOpen) {
           onToggle();
         }

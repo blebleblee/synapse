@@ -1792,6 +1792,66 @@ def sandbox_tool_responds(cmd: list) -> bool:
         return False
 
 
+def _sandbox_unavailable(title: str, steps: list[str]) -> list[str]:
+    """A terminal that explains why the sandbox is unavailable and opens no
+    shell. Falling back to a host shell here meant the panel said "Sandbox"
+    while commands (and lesson Run buttons) ran on the real machine."""
+    yellow, red, green, reset = "\033[1;33m", "\033[1;31m", "\033[1;32m", "\033[0m"
+    lines = [
+        f"{yellow}[!] {title}{reset}",
+        "",
+        *steps,
+        "",
+        f"{red}No shell was opened: commands here would have run on this computer, not in a sandbox.{reset}",
+        f'{green}[i] Start the sandbox and reconnect, or choose "Host Shell (Local)" to work on this computer on purpose.{reset}',
+    ]
+    # Lines go in as arguments (no shell quoting); the panel stays open without
+    # a shell, so typed input goes nowhere.
+    script = 'printf "%s\\n" "$@"; stty -echo 2>/dev/null; exec tail -f /dev/null'
+    return ["/bin/sh", "-c", script, "synapse-sandbox-unavailable", *lines]
+
+
+async def terminal_command(env_type: str, host_cmd: list[str]) -> list[str]:
+    """The process to run in the terminal PTY for the selected profile."""
+    if env_type == "docker":
+        docker_bin = find_sandbox_tool("docker")
+        if docker_bin and await asyncio.to_thread(sandbox_tool_responds, [docker_bin, "info"]):
+            return [
+                docker_bin, "run", "-it", "--rm",
+                "-v", f"{WORKSPACE_ROOT}:/workspace",
+                "-w", "/workspace",
+                "ubuntu:24.04", "/bin/bash",
+            ]
+        return _sandbox_unavailable(
+            "Linux Sandbox: the Docker daemon (Rancher Desktop / Docker) is not running or not reachable.",
+            [
+                "\033[1;36mSetup on macOS:\033[0m",
+                "  1. Start Rancher Desktop (or install it: brew install --cask rancher)",
+                "  2. Rancher Desktop -> Preferences -> Container Engine: dockerd (moby)",
+                "  3. Check it in a terminal: docker info",
+            ],
+        )
+    if env_type == "k8s":
+        kubectl_bin = find_sandbox_tool("kubectl")
+        if kubectl_bin and await asyncio.to_thread(sandbox_tool_responds, [kubectl_bin, "cluster-info"]):
+            return [
+                kubectl_bin, "run", f"synapse-lab-{os.getpid()}",
+                "-it", "--rm", "--restart=Never",
+                "--image=nicolaka/netshoot",
+                "--namespace=default", "--", "bash",
+            ]
+        return _sandbox_unavailable(
+            "Kubernetes Pod: the cluster (k3s / Rancher Desktop) is not reachable.",
+            [
+                "\033[1;36mSetup on macOS:\033[0m",
+                "  1. Rancher Desktop -> Preferences -> Kubernetes: Enable Kubernetes",
+                "  2. Wait until the cluster is Running",
+                "  3. Check it in a terminal: kubectl get nodes",
+            ],
+        )
+    return host_cmd
+
+
 @app.websocket("/ws/terminal")
 async def terminal_websocket(websocket: WebSocket):
     global LAST_TERMINAL_COMMAND
@@ -2006,6 +2066,7 @@ async def terminal_websocket(websocket: WebSocket):
         'if [ -f "$HOME/.zshrc" ]; then source "$HOME/.zshrc"; fi\n'
         'export PROMPT_EOL_MARK=""\n'
         'unsetopt PROMPT_SP 2>/dev/null\n'
+        'setopt interactivecomments\n'
         'export LANG="${LANG:-en_US.UTF-8}"\n'
         'export LC_ALL="${LC_ALL:-en_US.UTF-8}"\n'
         'alias ps="ps -ww"\n'
@@ -2036,51 +2097,7 @@ async def terminal_websocket(websocket: WebSocket):
     else:
         exec_cmd = [shell, "-i"]
 
-    if env_type == "docker":
-        docker_bin = find_sandbox_tool("docker")
-        docker_ok = bool(docker_bin) and await asyncio.to_thread(sandbox_tool_responds, [docker_bin, "info"])
-
-        if docker_ok:
-            exec_cmd = [
-                docker_bin, "run", "-it", "--rm",
-                "-v", f"{WORKSPACE_ROOT}:/workspace",
-                "-w", "/workspace",
-                "ubuntu:24.04", "/bin/bash"
-            ]
-        else:
-            notice = (
-                'echo -e "\\033[1;33m[!] Rancher Desktop / Docker daemon is not running or socket is unreachable.\\033[0m\\n" && '
-                'echo -e "\\033[1;36mRancher Desktop Setup Instructions for macOS:\\033[0m" && '
-                'echo -e "  1. Start Rancher Desktop (or install via: brew install --cask rancher)" && '
-                'echo -e "  2. In Rancher Preferences -> Container Engine, select dockerd (moby)" && '
-                'echo -e "  3. Verify connection in your terminal: docker info\\n" && '
-                'echo -e "\\033[1;32m[i] Active in Local Host Shell (/bin/bash)...\\033[0m\\n" && '
-                'exec /bin/bash'
-            )
-            exec_cmd = ["/bin/bash", "-c", notice]
-
-    elif env_type == "k8s":
-        kubectl_bin = find_sandbox_tool("kubectl")
-        k8s_ok = bool(kubectl_bin) and await asyncio.to_thread(sandbox_tool_responds, [kubectl_bin, "cluster-info"])
-
-        if k8s_ok:
-            exec_cmd = [
-                kubectl_bin, "run", f"synapse-lab-{os.getpid()}",
-                "-it", "--rm", "--restart=Never",
-                "--image=nicolaka/netshoot",
-                "--namespace=default", "--", "bash"
-            ]
-        else:
-            notice = (
-                'echo -e "\\033[1;33m[!] Kubernetes cluster (k3s / Rancher Desktop) is not reachable.\\033[0m\\n" && '
-                'echo -e "\\033[1;36mk3s Cluster Setup Instructions for macOS:\\033[0m" && '
-                'echo -e "  1. In Rancher Desktop -> Preferences -> Kubernetes, check [Enable Kubernetes]" && '
-                'echo -e "  2. Wait for k3s cluster to reach Running status" && '
-                'echo -e "  3. Verify cluster nodes: kubectl get nodes\\n" && '
-                'echo -e "\\033[1;32m[i] Active in Local Host Shell (/bin/bash)...\\033[0m\\n" && '
-                'exec /bin/bash'
-            )
-            exec_cmd = ["/bin/bash", "-c", notice]
+    exec_cmd = await terminal_command(env_type, exec_cmd)
 
     pid = os.fork()
 
