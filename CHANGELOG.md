@@ -9,7 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-11-22
+
+### Added
+- **Background translation queue.** Choosing a language queues the lesson and translates it in the background, one lesson at a time, with "section x of y" progress in the lesson and in the status bar. Every job can be stopped; stopping takes a few seconds, not a whole section. Jobs keep running when you switch lessons, and selecting the lesson again shows its progress.
+- **The mentor goes first.** Asking the mentor during a translation pauses it ("paused while the mentor answers") and resumes it afterwards. Before, the mentor timed out with "unable to connect" while showing online.
+
+### Security
+- **Pack installs are confined:** a domain pack can only write into its own domain, and the complete pack only into the domains its manifest lists. Every domain a pack replaces, including with the complete pack, is backed up to `exports/backups/` first.
+
 ### Fixed
+- **Quitting the desktop app stops the backend and any local-model work.** Before, Ollama could stay busy for minutes after quitting.
+- **Buttons always give feedback:** actions that failed silently now show an error, and dialogs stay open when something goes wrong.
+- **Mentor status** recovers by itself when Ollama starts after the app, instead of showing offline until a manual ping.
+- **Settings:** one flat layout with readable option labels; the saved model stays selected (marked if no node has it); Ollama nodes are checked by the backend, so a running local Ollama no longer shows "Offline". Removed the unexplained "Offline First" label.
+- **Terminal:** switching between host shell, Docker and Kubernetes works; Rancher Desktop's tools in `~/.rd/bin` are found.
+- **Reader:** the toolbar fits narrow centre columns (labels collapse to icons instead of being cut off); a one-line course path replaces the large prerequisites box; the mentor header is compact and shows the lesson name without wrapping; "Loading curriculum…" instead of "No curriculum installed" while the tree loads.
+- **Translation API:** `/api/translate` answers 503 with the reason when no AI provider is available, instead of a server error.
 - **Terminal:** no longer retries every 2.5 seconds before you log in; it shows "Login required" and connects after login. The server now closes unauthenticated terminal connections with code 1008, which browsers can see.
 - **First-run setup:** keyboard shortcuts such as ⌘K no longer open search behind the setup wizard or the login screen.
 - **CLI:** added `synapse pack export <domain…|all>`, which the docs and the post-generation pipeline already used. The pipeline now also builds the complete pack and runs the release guard.

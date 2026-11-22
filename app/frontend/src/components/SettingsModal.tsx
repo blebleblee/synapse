@@ -458,7 +458,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </nav>
 
           <div className="settings-sidebar-footer">
-            <div className="sidebar-app-badge">Synapse v1.2.1</div>
+            <div className="sidebar-app-badge">Synapse v1.2.2</div>
           </div>
         </div>
 

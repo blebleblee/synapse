@@ -7,6 +7,7 @@ Atomically synchronizes release version across all workspace configuration files
 - app/desktop/package.json
 - app/frontend/package.json
 - app/frontend/src/components/SettingsModal.tsx
+- app/desktop/package-lock.json, app/frontend/package-lock.json
 """
 
 import sys
@@ -57,9 +58,23 @@ def bump_version(new_ver: str):
     settings_modal = WORKSPACE_ROOT / "app" / "frontend" / "src" / "components" / "SettingsModal.tsx"
     if settings_modal.exists():
         content = settings_modal.read_text(encoding="utf-8")
-        updated = re.sub(r'Version:\s*[\d\.]+', f'Version: {new_ver}', content)
+        updated, n = re.subn(r'Synapse v\d+\.\d+\.\d+', f'Synapse v{new_ver}', content)
+        if n == 0:
+            print(f"[✘] No 'Synapse vX.Y.Z' label found in {settings_modal.relative_to(WORKSPACE_ROOT)}")
+            sys.exit(1)
         settings_modal.write_text(updated, encoding="utf-8")
         print(f" [✔] Updated {settings_modal.relative_to(WORKSPACE_ROOT)}")
+
+    # 6. npm lock files carry the package's own version too
+    for lock in (WORKSPACE_ROOT / "app" / "desktop" / "package-lock.json",
+                 WORKSPACE_ROOT / "app" / "frontend" / "package-lock.json"):
+        if lock.exists():
+            data = json.loads(lock.read_text(encoding="utf-8"))
+            data["version"] = new_ver
+            if "" in data.get("packages", {}):
+                data["packages"][""]["version"] = new_ver
+            lock.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+            print(f" [✔] Updated {lock.relative_to(WORKSPACE_ROOT)}")
 
     print(f"\n[✔] Synapse version successfully synchronized to v{new_ver} across all subsystems!")
 
