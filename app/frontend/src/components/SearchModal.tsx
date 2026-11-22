@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, BookOpen } from 'lucide-react';
+import { splitHighlight } from '../utils/text';
 
 interface SearchResult {
   domain: string;
@@ -17,6 +18,23 @@ interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectTopic: (path: string, lessonId?: string) => void;
+}
+
+function HighlightedText({ text, query }: { text: string; query: string }) {
+  const parts = splitHighlight(text, query);
+  return (
+    <>
+      {parts.map((p, idx) =>
+        p.isMatch ? (
+          <mark key={idx} className="search-highlight">
+            {p.text}
+          </mark>
+        ) : (
+          p.text
+        )
+      )}
+    </>
+  );
 }
 
 // Mounted only while open, so every opening starts with an empty query.
@@ -126,10 +144,10 @@ const SearchPanel: React.FC<Omit<SearchModalProps, 'isOpen'>> = ({
 
               <div className="result-section">
                 <BookOpen size={13} />
-                <span>{r.section}</span>
+                <span><HighlightedText text={r.section} query={query} /></span>
               </div>
 
-              <p className="result-snippet">{r.snippet}</p>
+              <p className="result-snippet"><HighlightedText text={r.snippet} query={query} /></p>
             </div>
           ))}
 

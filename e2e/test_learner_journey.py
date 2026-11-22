@@ -665,9 +665,10 @@ def test_search_navigation_to_matched_lesson(browser_page):
     # Type query matching Lesson 2 ("B-Tree Mechanics")
     search_input.fill("B-Tree")
 
-    # Expect matching result item to appear
+    # Expect matching result item to appear with highlighted search terms
     result_item = page.locator(".search-result-item:has-text('B-Tree Mechanics')").first
     expect(result_item).to_be_visible(timeout=5000)
+    expect(result_item.locator(".search-highlight:has-text('B-Tree')").first).to_be_visible()
 
     # Click the search result item
     result_item.click()

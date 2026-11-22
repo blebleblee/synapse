@@ -2903,6 +2903,14 @@ body, html, #root {
   line-height: 1.4;
 }
 
+.search-highlight {
+  background-color: rgba(234, 179, 8, 0.25);
+  color: var(--accent-gold, #eab308);
+  padding: 1px 3px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
 .search-hint {
   display: flex;
   align-items: center;
