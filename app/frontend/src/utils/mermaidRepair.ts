@@ -34,10 +34,11 @@ export function sanitizeAndRepairMermaid(diagramText: string): string {
   });
 
   // Sequence diagrams end a statement at ";", so "A->>B: BEGIN; UPDATE" broke
-  // the diagram. Keep semicolons in message and note text as the #59; entity.
+  // the diagram. Message and note text gets U+037E, which looks the same as
+  // ";" (Mermaid's "#59;" entity cuts the rest of the label off when rendered).
   if (/^sequenceDiagram\b/.test(cleaned)) {
     cleaned = cleaned.replace(/^(\s*(?:Note\s+[^:\n]+|[^:\n]*(?:->>|->|-x|-\))[^:\n]*)):([^\n]*)$/gm,
-      (_, head: string, text: string) => `${head}:${text.replace(/;(?=.*\S)/g, '#59;')}`);
+      (_, head: string, text: string) => `${head}:${text.replace(/(?<!#\w{1,8});(?=.*\S)/g, '\u037e')}`);
   }
 
   // A quoted edge label must touch its pipes: -->| "label" | -> -->|"label"|

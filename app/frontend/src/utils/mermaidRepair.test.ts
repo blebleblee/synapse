@@ -12,10 +12,14 @@ test('quoted edge labels lose the spaces Mermaid rejects around them', () => {
 test('semicolons in sequence messages and notes are kept as text', () => {
   assert.equal(
     sanitizeAndRepairMermaid('sequenceDiagram\n  A->>B: BEGIN; UPDATE row\n  Note over A,B: fsync; then ack\n  B-->>A: ok'),
-    'sequenceDiagram\n  A->>B: BEGIN#59; UPDATE row\n  Note over A,B: fsync#59; then ack\n  B-->>A: ok',
+    'sequenceDiagram\n  A->>B: BEGIN\u037e UPDATE row\n  Note over A,B: fsync\u037e then ack\n  B-->>A: ok',
   );
 });
 
 test('flowcharts keep their statement semicolons handling', () => {
   assert.equal(sanitizeAndRepairMermaid('graph TD;\n  A --> B;'), 'graph TD\n  A --> B');
+});
+
+test('sequence text keeps existing entities such as #9829;', () => {
+  assert.equal(sanitizeAndRepairMermaid('sequenceDiagram\n  A->>B: I #9829; you'), 'sequenceDiagram\n  A->>B: I #9829; you');
 });
