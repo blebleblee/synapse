@@ -38,7 +38,7 @@
 
 ### Music Performance
 - **Piano Performance** (`music_performance/piano/`)
-- **Acoustic Guitar** (`music_performance/guitar/`)
+- **Guitar** (`music_performance/guitar/`)
 - **Electric Guitar** (`music_performance/electric_guitar/`)
 
 ### Music Performance: Piano

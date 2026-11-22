@@ -29,7 +29,7 @@
 
 ### Ai
 - **Artificial Intelligence** (`ai/ai_foundations/`)
-- **Large Language Models** (`ai/llms/`)
+- **Neural Network Training & Evaluation** (`ai/llms/`)
 - **Machine Learning Operations** (`ai/mlops/`)
 
 ### Data
