@@ -814,3 +814,49 @@ def test_locked_first_run_shows_only_login_and_stays_quiet(browser_page):
     page.wait_for_timeout(2500)
     expect(page.locator("h3:has-text('Welcome to Synapse Workbench')")).not_to_be_visible()
     assert protected_calls == [], f"polled before login: {protected_calls}"
+
+
+def test_startup_waits_for_backend(browser_page):
+    """If the server is still starting (or restarting) when the page loads,
+    the app retries instead of staying on "Loading curriculum…" forever."""
+    page, server_url = browser_page
+    page.route("**/api/**", lambda route: route.abort())
+    page.goto(server_url)
+    page.wait_for_timeout(2500)
+    page.unroute("**/api/**")
+    expect(page.locator(".domain-header:has-text('Computing')").first).to_be_visible(timeout=10000)
+
+
+def test_flashcard_keyboard_review_after_using_terminal(browser_page):
+    """Keyboard review flow: after typing in the terminal, the learner opens
+    the deck with the mouse; Space flips and 1-4 rate (and record) cards
+    instead of going to the shell."""
+    page, server_url = browser_page
+    page.route("**/api/flashcards/deck*", lambda route: route.fulfill(
+        status=200, content_type="application/json",
+        body=json.dumps({"topic": "E2E", "cards": [
+            {"id": 0, "front": "Q one", "back": "A one", "tag": ""},
+            {"id": 1, "front": "Q two", "back": "A two", "tag": ""},
+        ]}),
+    ))
+    reviews = []
+    page.route("**/api/flashcards/review", lambda route: (reviews.append(route.request.post_data), route.fulfill(
+        status=200, content_type="application/json", body="{}")))
+
+    page.goto(server_url)
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+    select_fixture_lesson(page, "Data", "E2e Unique Storage Invariants", "Foundations")
+    terminal_input = page.locator(".xterm-helper-textarea")
+    expect(terminal_input).to_be_attached(timeout=5000)
+    terminal_input.focus()
+
+    page.locator("button:has-text('Flashcards')").first.click()
+    expect(page.locator(".flashcard-modal-card")).to_contain_text("Card 1 of 2", timeout=5000)
+    page.keyboard.press("Space")
+    expect(page.locator(".flashcard-3d-card.flipped")).to_be_visible()
+    page.keyboard.press("3")
+    expect(page.locator(".flashcard-modal-card")).to_contain_text("Card 2 of 2", timeout=3000)
+    assert len(reviews) == 1
+    assert json.loads(reviews[0])["interval_days"] == 7
+    focused_in_terminal = page.evaluate("document.activeElement?.classList.contains('xterm-helper-textarea')")
+    assert not focused_in_terminal

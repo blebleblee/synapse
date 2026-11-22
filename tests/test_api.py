@@ -146,13 +146,44 @@ def test_api_mastery_get_and_post():
     assert post_res.status_code == 200
     assert post_res.json()["state"] == "studying"
 
-def test_api_flashcards_deck():
+def test_api_flashcards_deck(monkeypatch):
+    """A topic without a deck gets one generated on first open."""
+    import app.backend.main as backend
     test_path = "computing/infrastructure/kubernetes"
+    target = backend.resolve_subtopic(test_path)
+    assert target, "fixture topic missing"
+    csv_file = target[3] / "flashcards.csv"
+    if csv_file.exists():
+        csv_file.unlink()
+
+    def fake_generate(query, **kwargs):
+        csv_file.write_text("What schedules pods?,The kube-scheduler,core\n", encoding="utf-8")
+        return csv_file
+
+    monkeypatch.setattr(backend, "generate_flashcards", fake_generate)
     res = client.get(f"/api/flashcards/deck?query={test_path}")
     assert res.status_code == 200
-    data = res.json()
-    assert "cards" in data
-    assert isinstance(data["cards"], list)
+    cards = res.json()["cards"]
+    assert cards == [{"id": 0, "front": "What schedules pods?", "back": "The kube-scheduler", "tag": "core"}]
+
+
+def test_api_flashcards_deck_generation_failure_is_reported(monkeypatch):
+    """When the AI cannot make a deck, say so (503) instead of returning an
+    empty deck that the UI blames on the lesson content."""
+    import app.backend.main as backend
+    test_path = "computing/infrastructure/kubernetes"
+    target = backend.resolve_subtopic(test_path)
+    csv_file = target[3] / "flashcards.csv"
+    if csv_file.exists():
+        csv_file.unlink()
+
+    def failing_generate(query, **kwargs):
+        raise ConnectionError("no AI provider reachable")
+
+    monkeypatch.setattr(backend, "generate_flashcards", failing_generate)
+    res = client.get(f"/api/flashcards/deck?query={test_path}")
+    assert res.status_code == 503
+    assert "no AI provider reachable" in res.json()["detail"]
 
 def test_api_translate_en_passthrough():
     res = client.post("/api/translate", json={"text": "# Hello World", "target_lang": "en"})

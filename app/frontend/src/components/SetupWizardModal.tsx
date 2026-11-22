@@ -150,7 +150,7 @@ const SetupWizardPanel: React.FC<Omit<SetupWizardModalProps, 'isOpen'>> = ({
               <div className="wizard-feature-list">
                 <div className="feature-item">
                   <CheckCircle size={15} className="feature-icon" />
-                  <span>539 Unified Masterclasses across 12 canonical engineering and science domains</span>
+                  <span>Masterclasses across 12 core domains, from computing and engineering to the arts, installable for offline use</span>
                 </div>
                 <div className="feature-item">
                   <CheckCircle size={15} className="feature-icon" />

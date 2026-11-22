@@ -787,8 +787,8 @@ def get_flashcards_deck(query: str):
     if not csv_file.exists():
         try:
             csv_file = generate_flashcards(query)
-        except Exception:
-            pass
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=f"Could not generate flashcards with the AI model: {e}")
 
     import csv
     cards = []

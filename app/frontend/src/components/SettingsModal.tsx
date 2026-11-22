@@ -876,7 +876,7 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                     </div>
                     <p>
                       {packagesData.installed.length >= 12
-                        ? `All 12 canonical domains and 539 masterclasses are verified and installed locally.`
+                        ? `All 12 core domains are installed locally.`
                         : `${packagesData.installed.length} of 12 domains installed. Download the complete masterpack to unlock all courses offline.`}
                     </p>
                   </div>

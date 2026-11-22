@@ -17,7 +17,21 @@ import { getStoredSelection, saveStoredSelection, clearStoredSelection } from '.
 import { NoticeStack, type Notice, type NoticeKind } from './components/NoticeStack';
 import { TranslationQueueIndicator } from './components/TranslationQueueIndicator';
 import { failureMessage, networkFailure } from './utils/failureMessage';
+import { toTitleCase } from './utils/text';
 import './App.css';
+
+// The page can load before the server answers (desktop start-up, a server
+// restart). Wait for it, up to about a minute, before loading anything.
+async function waitForBackend(attempts = 40, delayMs = 1500): Promise<void> {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      await fetch('/api/health');
+      return;
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+}
 
 type MentorCheck = { status: 'connected' | 'error'; model?: string };
 
@@ -435,6 +449,7 @@ function App() {
 
   useEffect(() => {
     const initApp = async () => {
+      await waitForBackend();
       const ok = await checkAuth();
       if (ok) {
         await latestActions.current.fetchTree();
@@ -1113,7 +1128,7 @@ function App() {
         isOpen={flashcardModalOpen}
         onClose={() => setFlashcardModalOpen(false)}
         topicPath={selectedPath || ''}
-        topicTitle={topicDetails?.subtopic.replace(/_/g, ' ') || 'Flashcard Deck'}
+        topicTitle={topicDetails ? toTitleCase(topicDetails.display_title || topicDetails.subtopic) : 'Flashcard Deck'}
       />
 
       <LoginModal
