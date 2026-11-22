@@ -48,7 +48,7 @@ audit_*.py
 audit_*.txt
 
 # Private Local Planning & Task Scratchpads
-BACKLOG.md
+/BACKLOG.md
 *.backlog.md
 
 # Sideloaded & Private SynPacks (preserve core 12 curriculum domains)
