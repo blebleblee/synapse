@@ -60,7 +60,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Evidence:**
   - `app/frontend/src/components/SearchModal.tsx:111`: `onSelectTopic(r.path)` passes only the course path, omitting the lesson identifier.
   - `learning_engine/search.py:73`: `search_curriculum` returns `"file": md_path.name` (e.g. `lesson_02_indexing.md`), which contains the exact lesson identifier.
-- **Status:** **COMPLETED** (Extracted `lessonId` from `r.file` in `SearchModal.tsx` and updated `onSelectTopic`).
+- **Status:** **COMPLETED** (Extracted `lessonId` from `r.file` in `SearchModal.tsx`, wired `handleSelectSubtopic` in `App.tsx`, and verified with `test_search_navigation_to_matched_lesson` in `e2e/test_learner_journey.py`).
 
 ---
 
