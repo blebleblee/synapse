@@ -1,10 +1,13 @@
 """scripts/sync_addons.py copies only allowed files, never over newer ones, never deletes."""
 import importlib.util
+import sys
 import os
 from pathlib import Path
 
 spec = importlib.util.spec_from_file_location("sync_addons", Path(__file__).resolve().parent.parent / "scripts" / "sync_addons.py")
 sync = importlib.util.module_from_spec(spec)
+# dataclasses resolve their module through sys.modules on older Pythons.
+sys.modules[spec.name] = sync
 spec.loader.exec_module(sync)
 
 
