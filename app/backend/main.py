@@ -110,7 +110,8 @@ from learning_engine.models import (
     OllamaCluster,
     get_configured_hosts,
     save_configured_hosts,
-    CLUSTER_HOST_SPECS
+    CLUSTER_HOST_SPECS,
+    GenerationStopped,
 )
 from learning_engine.search import search_curriculum
 from learning_engine.graph import get_prerequisite_graph, get_topic_dependencies
@@ -1211,6 +1212,27 @@ async def get_topic_details(
         "has_content": bool(lesson or labs or lessons_list)
     }
 
+# Stop in the UI only aborted the browser request; the server kept drafting
+# and published minutes later. Running generations can now be cancelled.
+_generation_cancel: Dict[str, threading.Event] = {}
+_generation_cancel_lock = threading.Lock()
+
+
+class CancelGenerateRequest(BaseModel):
+    query: str
+
+
+@app.post("/api/generate/cancel")
+def cancel_generation(req: CancelGenerateRequest):
+    target = resolve_subtopic(req.query)
+    key = str(target[3]) if target else req.query
+    with _generation_cancel_lock:
+        event = _generation_cancel.get(key)
+    if event:
+        event.set()
+    return {"cancelled": bool(event)}
+
+
 @app.post("/api/generate")
 def generate_topic(req: GenerateRequest):
     target = resolve_subtopic(req.query)
@@ -1218,16 +1240,28 @@ def generate_topic(req: GenerateRequest):
         raise HTTPException(status_code=404, detail=f"Topic '{req.query}' not found")
 
     domain, cat, sub, sub_path = target
-    provider = get_provider(provider_type=req.provider, model=req.model)
-
-    results = generate_subtopic_content(
-        domain=domain,
-        category=cat,
-        subtopic_id=sub,
-        subtopic_dir=sub_path,
-        provider=provider,
-        force=req.force
-    )
+    key = str(sub_path)
+    with _generation_cancel_lock:
+        if key in _generation_cancel:
+            raise HTTPException(status_code=409, detail="This course is already being generated.")
+        stop_event = threading.Event()
+        _generation_cancel[key] = stop_event
+    try:
+        provider = get_provider(provider_type=req.provider, model=req.model)
+        results = generate_subtopic_content(
+            domain=domain,
+            category=cat,
+            subtopic_id=sub,
+            subtopic_dir=sub_path,
+            provider=provider,
+            force=req.force,
+            should_stop=stop_event.is_set,
+        )
+    except GenerationStopped:
+        raise HTTPException(status_code=409, detail="Generation stopped; the course was not changed.")
+    finally:
+        with _generation_cancel_lock:
+            _generation_cancel.pop(key, None)
 
     return {
         "domain": domain,

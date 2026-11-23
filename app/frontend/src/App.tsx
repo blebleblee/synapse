@@ -329,7 +329,17 @@ function App() {
 
   const handleGenerate = async (query: string, force = false) => {
     const abortCtrl = new AbortController();
-    activeCancelHandler.current = () => abortCtrl.abort();
+    activeCancelHandler.current = () => {
+      abortCtrl.abort();
+      // Aborting only drops the request; tell the server to stop too, or it
+      // keeps drafting and publishes minutes later.
+      fetch('/api/generate/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      }).catch(() => {});
+      notify('info', 'Generation stopped. The course was not changed.');
+    };
     setIsGenerating(true);
     try {
       const res = await fetch('/api/generate', {

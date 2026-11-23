@@ -14,7 +14,7 @@ import subprocess
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Callable, Optional, Dict, Any, List, Tuple
 
 from .models import (
     get_provider,
@@ -25,7 +25,8 @@ from .models import (
     repair_mermaid_diagrams,
     validate_lesson_completeness,
     CLUSTER_HOST_SPECS,
-    AnthropicProvider
+    AnthropicProvider,
+    GenerationStopped,
 )
 from .topic_manager import get_domain_persona
 from .security import validate_canonical_topic_path, get_workspace_root
@@ -36,24 +37,6 @@ from .domain_strategies import build_topic_modules, GLOBAL_REGISTRY
 _LLM_SEMAPHORE = threading.Semaphore(24)
 
 WORKSPACE_ROOT = get_workspace_root()
-
-def purge_legacy_topic_files(topic_dir: Path):
-    """
-    Aggressively purges everything in the topic directory to allow clean regeneration 
-    with the canonical masterclass pipeline.
-    """
-    if not topic_dir.exists():
-        return
-
-    # Delete all markdown files and subdirectories
-    for item in topic_dir.iterdir():
-        if item.is_file() and item.suffix == ".md" and item.name != "TOPIC_OUTLINE.md":
-            try:
-                item.unlink()
-            except Exception:
-                pass
-        elif item.is_dir():
-            shutil.rmtree(item, ignore_errors=True)
 
 BOOK_STYLE_DIRECTIVE = """CRITICAL STYLE & TONE DIRECTIVE:
 - This is a masterclass textbook chapter, NOT a slide-deck presentation or outline.
@@ -524,6 +507,9 @@ Output publication-grade Markdown only."""
 
     return fallback_modules
 
+STAGING_DIRNAME = ".regen"
+
+
 def generate_topic_parallel(
     domain: str,
     category: str,
@@ -531,14 +517,72 @@ def generate_topic_parallel(
     subtopic_dir: Path,
     force: bool = False,
     workers: Optional[List[Tuple[str, str, OllamaProvider]]] = None,
-    fallback_provider: Optional[LLMProvider] = None
+    fallback_provider: Optional[LLMProvider] = None,
+    should_stop: Optional[Callable[[], bool]] = None,
 ) -> Dict[str, Any]:
     """
     Generates a dynamically-scoped multi-lesson masterclass curriculum unit across all active
     Ollama cluster engines in parallel with cross-node adversarial fact-checking.
+
+    Regeneration (force) used to delete the course's lessons and every
+    subfolder, including the learner's chat sessions, before drafting, so a
+    failure or Stop left the course empty. It now writes into a staging folder
+    and replaces the old lesson files only when every file succeeded (a course
+    with no lessons yet keeps the files that succeeded); subfolders are never
+    touched. `should_stop` cancels: no further files are written and
+    GenerationStopped is raised; a regeneration publishes nothing.
     """
     subtopic_dir = validate_canonical_topic_path(subtopic_dir)
     subtopic_dir.mkdir(parents=True, exist_ok=True)
+    stop = should_stop or (lambda: False)
+    if not force:
+        results = _generate_topic_parallel(domain, category, subtopic_id, subtopic_dir, subtopic_dir,
+                                           False, workers, fallback_provider, stop)
+        if stop():
+            raise GenerationStopped()
+        return results
+
+    def lesson_files():
+        return [f for f in subtopic_dir.iterdir()
+                if f.is_file() and f.suffix == ".md" and f.name != "TOPIC_OUTLINE.md"]
+
+    had_lessons = bool(lesson_files())
+    staging = subtopic_dir / STAGING_DIRNAME
+    shutil.rmtree(staging, ignore_errors=True)
+    staging.mkdir()
+    try:
+        results = _generate_topic_parallel(domain, category, subtopic_id, subtopic_dir, staging,
+                                           True, workers, fallback_provider, stop)
+        if stop():
+            raise GenerationStopped()
+        staged = sorted(f for f in staging.iterdir() if f.is_file() and f.suffix == ".md")
+        complete = bool(staged) and bool(results) and all(results.values())
+        if not complete and had_lessons:
+            print("      [!] Regeneration incomplete: the existing lessons were kept unchanged.", flush=True)
+            return results
+        # Every file succeeded: replace the old lesson files. A new course
+        # keeps whatever succeeded, so a rerun only generates what is missing.
+        if complete:
+            for old in lesson_files():
+                old.unlink()
+        for f in staged:
+            os.replace(f, subtopic_dir / f.name)
+        return results
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
+
+
+def _generate_topic_parallel(
+    domain: str,
+    category: str,
+    subtopic_id: str,
+    subtopic_dir: Path,
+    out_dir: Path,
+    force: bool,
+    workers: Optional[List[Tuple[str, str, OllamaProvider]]],
+    fallback_provider: Optional[LLMProvider],
+    stop: Callable[[], bool],
+) -> Dict[str, Any]:
     subtopic_title = subtopic_id.replace("_", " ").title()
     domain_title = domain.replace("_", " ").title()
     category_title = category.replace("_", " ").title()
@@ -554,9 +598,6 @@ def generate_topic_parallel(
 
     tasks_to_run = []
     results = {}
-
-    if force:
-        purge_legacy_topic_files(subtopic_dir)
 
     for mod in modules:
         out_path = subtopic_dir / mod["filename"]
@@ -590,6 +631,8 @@ def generate_topic_parallel(
             active_label = host_label
 
             for attempt in range(1, 4):
+                if stop():
+                    return mod_item["filename"], False, None, mod_item, active_label, w_host, time.time() - t0, "stopped"
                 try:
                     with _LLM_SEMAPHORE:
                         content = active_provider.generate(mod_item["prompt"], system_instruction=system_instruction, max_tokens=8192)
@@ -634,6 +677,9 @@ def generate_topic_parallel(
                     print(f"      [✘] Failed future for {fname}: {e}", flush=True)
                     results[fname] = False
 
+        if stop():
+            return results
+
         if is_cloud:
             # Single-pass masterclass authoring for cloud frontier models:
             # Direct publication eliminates redundant full-text re-drafting, cutting time and costs by 50%.
@@ -642,7 +688,9 @@ def generate_topic_parallel(
                 fence_count = sum(1 for line in clean_content.splitlines() if line.strip().startswith("```"))
                 if fence_count % 2 != 0:
                     clean_content += "\n```"
-                target_file = subtopic_dir / fname
+                if stop():
+                    return results
+                target_file = out_dir / fname
                 target_file.write_text(clean_content + "\n", encoding="utf-8")
                 print(f"      [✔] {fname} published ({host_label} -> Masterclass Draft in {elapsed:.1f}s)", flush=True)
                 results[fname] = True
@@ -658,6 +706,8 @@ def generate_topic_parallel(
 
         def run_audit_and_refine_job(item):
             fname, (content, mod_item, host_label, author_host, elapsed) = item
+            if stop():
+                return fname, False
             r_host, r_model, r_provider = get_auditor_for_host(author_host)
             r_name = CLUSTER_HOST_SPECS.get(r_host, {}).get("name", r_host).upper()
             
@@ -732,7 +782,9 @@ Output the fully corrected, publication-grade, raw Markdown only."""
             except Exception as e:
                 audit_note = f"Audit/Refine failed: {e}"
 
-            target_file = subtopic_dir / fname
+            if stop():
+                return fname, False
+            target_file = out_dir / fname
             target_file.write_text(final_content.strip() + "\n", encoding="utf-8")
             print(f"      [✔] {fname} published ({host_label} -> {audit_note})", flush=True)
             return fname, True
@@ -746,10 +798,14 @@ Output the fully corrected, publication-grade, raw Markdown only."""
     else:
         provider = get_provider(domain=domain)
         for mod in tasks_to_run:
+            if stop():
+                return results
             try:
                 content = provider.generate(mod["prompt"], system_instruction=system_instruction)
                 validated = validate_generation_output(content)
-                (subtopic_dir / mod["filename"]).write_text(validated.strip() + "\n", encoding="utf-8")
+                if stop():
+                    return results
+                (out_dir / mod["filename"]).write_text(validated.strip() + "\n", encoding="utf-8")
                 results[mod["filename"]] = True
             except Exception:
                 results[mod["filename"]] = False
@@ -763,7 +819,8 @@ def generate_subtopic_content(
     subtopic_dir: Path,
     provider: Optional[LLMProvider] = None,
     force: bool = False,
-    level: Optional[str] = None
+    level: Optional[str] = None,
+    should_stop: Optional[Callable[[], bool]] = None,
 ) -> Dict[str, Any]:
     """
     Standardized entrypoint for curriculum unit generation.
@@ -837,5 +894,6 @@ def generate_subtopic_content(
         subtopic_dir=subtopic_dir,
         force=force,
         workers=workers,
-        fallback_provider=provider
+        fallback_provider=provider,
+        should_stop=should_stop,
     )
