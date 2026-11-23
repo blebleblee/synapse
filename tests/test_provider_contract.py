@@ -62,3 +62,19 @@ def test_ollama_cluster_forwards_max_tokens():
          patch.object(OllamaProvider, "generate", return_value="ok") as gen:
         assert REAL_GENERATE[OllamaCluster](cluster, "p", system_instruction="s", max_tokens=123) == "ok"
     assert gen.call_args.kwargs["max_tokens"] == 123
+
+
+def test_every_chat_provider_can_stream():
+    """/api/chat always streams; GeminiProvider (returned by get_chat_provider
+    for a configured Gemini mentor model) had no generate_stream, so every
+    answer was "'GeminiProvider' object has no attribute 'generate_stream'"."""
+    from learning_engine.models import LLMProvider
+
+    class OnlyGenerate(LLMProvider):
+        def generate(self, prompt, system_instruction="", max_tokens=None):
+            return f"answer to {prompt} ({max_tokens})"
+
+    chunks = list(OnlyGenerate().generate_stream("q", system_instruction="s", max_tokens=2048))
+    assert "".join(chunks) == "answer to q (2048)"
+    for cls in (OllamaProvider, OllamaCluster, GeminiProvider, AnthropicProvider):
+        assert callable(getattr(cls, "generate_stream", None)), cls.__name__

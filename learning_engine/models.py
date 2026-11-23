@@ -305,6 +305,11 @@ class LLMProvider:
     def generate(self, prompt: str, system_instruction: str = "", max_tokens: Optional[int] = None) -> str:
         raise NotImplementedError
 
+    def generate_stream(self, prompt: str, system_instruction: str = "", max_tokens: Optional[int] = None):
+        """Providers without real streaming answer in one chunk (the chat
+        endpoint always streams)."""
+        yield self.generate(prompt, system_instruction=system_instruction, max_tokens=max_tokens)
+
 class GenerationStopped(Exception):
     """Raised by generate_cancellable() when the caller asked it to stop."""
 
