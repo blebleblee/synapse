@@ -1,6 +1,6 @@
 # Operational Verification Labs: Sketching
 
-## Objective & DAW / Studio Setup
+## Objective & Studio Setup
 
 Sketching in visual arts operates as the composer's score draft or the producer's rough mix: a low-friction medium for capturing gesture, structure, and spatial relationships before committing to final rendering. In the same way a pianist works out voice leading on manuscript paper before recording, the visual practitioner uses rapid graphite or charcoal marks to solve proportion, perspective, and compositional balance. This lab treats sketching as a real-time performance discipline where hand mechanics, mark vocabulary, and iterative refinement mirror the rehearsal-to-performance pipeline of music production.
 

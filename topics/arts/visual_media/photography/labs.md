@@ -1,6 +1,6 @@
 # Operational Verification Labs: Photography
 
-## Objective & DAW / Studio Setup
+## Objective & Studio Setup
 
 Photography operates as a time-based compositional medium wherein light becomes the primary sonic material, exposure duration functions as rhythmic articulation, and tonal range maps directly onto dynamic range compression principles familiar to any practitioner versed in audio mastering. The photographer's histogram is functionally equivalent to the mixing engineer's spectral analyzer: both reveal the distribution of energy across a continuous domain, whether measured in luminance stops or frequency bands. This lab sequence trains you to approach photographic capture, processing, and printing with the same rigor you apply to tracking, mixing, and mastering audio projects. You will operate cameras as precision instruments requiring calibration, execute exposure bracketing as you would stem bouncing, and analyze tonal distribution curves with the same critical eye you apply to EQ shelving and multiband compression.
 

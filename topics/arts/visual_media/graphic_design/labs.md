@@ -1,6 +1,6 @@
 # Operational Verification Labs: Graphic Design
 
-## Objective & DAW / Studio Setup
+## Objective & Studio Setup
 
 These operational verification labs bridge the disciplinary gap between audio production practice and visual communication design by treating graphic design outputs as compositional artifacts requiring the same iterative refinement, systematic analysis, and technical precision musicians apply to mixing sessions. Just as a composer orchestrates harmonic tension and release through voice leading, a graphic designer orchestrates visual hierarchy through typographic scale, spatial rhythm, and color contrast. Both disciplines demand acute sensitivity to perceptual physics—whether acoustic resonance curves or optical weight distribution—and both require rigorous technical execution within constraint systems, whether sample rate headroom or print color gamut boundaries.
 
