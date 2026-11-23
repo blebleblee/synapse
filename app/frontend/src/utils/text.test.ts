@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { toTitleCase, cleanLessonTitle, splitHighlight } from './text.ts';
+import { toTitleCase, cleanLessonTitle, splitHighlight, toSlug } from './text.ts';
 
 test('toTitleCase - replaces underscores and capitalizes words', () => {
   assert.equal(toTitleCase('postgresql_internals'), 'Postgresql Internals');
@@ -48,4 +48,12 @@ test('splitHighlight - handles empty query or no matches cleanly', () => {
     { text: 'No matches here', isMatch: false },
   ]);
   assert.deepEqual(splitHighlight('', 'test'), []);
+});
+
+test('toSlug - makes a folder-safe course or category name', () => {
+  assert.equal(toSlug('Rust Internals'), 'rust_internals');
+  assert.equal(toSlug('  Prompt Engineering & Spec-Driven  '), 'prompt_engineering_spec-driven');
+  assert.equal(toSlug('Účetnictví 101'), 'ucetnictvi_101');
+  assert.equal(toSlug('infra/structure'), 'infra_structure');
+  assert.equal(toSlug('!!!'), '');
 });

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { toTitleCase, cleanLessonTitle } from '../utils/text';
+import { toTitleCase, cleanLessonTitle, toSlug } from '../utils/text';
 import {
   Folder,
   FolderOpen,
@@ -96,7 +96,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   const [addDomain, setAddDomain] = useState('computing');
   const [addDiscipline, setAddDiscipline] = useState('infrastructure');
   const [addCourse, setAddCourse] = useState('');
-  const [addUnitSlug, setAddUnitSlug] = useState('');
   const [addTitle, setAddTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -194,21 +193,22 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
   const handleCreateTopic = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!addCourse.trim() || !addDiscipline.trim()) return;
+    // Courses live at <domain>/<category>/<course>, the same layout as the
+    // curriculum and `bin/synapse add`. The dialog used to send
+    // "<category>/<course>" as the category plus a unit folder, which the
+    // server rejects, so adding a course always failed.
+    const category = toSlug(addDiscipline);
+    const course = toSlug(addCourse);
+    if (!category || !course) return;
 
     setIsSubmitting(true);
     try {
-      const disc = addDiscipline.trim();
-      const course = addCourse.trim().replace(/\s+/g, '_');
-      const unit = addUnitSlug.trim() ? addUnitSlug.trim().replace(/\s+/g, '_') : '01_fundamentals';
-      const categoryPath = `${disc}/${course}`;
       const title = addTitle.trim() || undefined;
 
-      const added = await onAddSubtopic(addDomain, categoryPath, unit, title);
+      const added = await onAddSubtopic(addDomain, category, course, title);
       if (added === false) return; // keep the dialog open so nothing typed is lost
       setShowAddModal(false);
       setAddCourse('');
-      setAddUnitSlug('');
       setAddTitle('');
     } catch (err) {
       console.error(err);
@@ -826,7 +826,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         <div className="modal-backdrop" onClick={() => setShowAddModal(false)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Add New Course or Study Unit</h3>
+              <h3>Add a course</h3>
               <button className="icon-btn" onClick={() => setShowAddModal(false)}>✕</button>
             </div>
             <form onSubmit={handleCreateTopic}>
@@ -853,7 +853,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
               </div>
 
               <div className="form-group">
-                <label>3. Course Slug</label>
+                <label>3. Course</label>
                 <input
                   type="text"
                   placeholder="e.g. vibe_coding, kubernetes, rust_internals"
@@ -864,17 +864,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
               </div>
 
               <div className="form-group">
-                <label>4. Unit Slug (Optional)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. 01_prompt_engineering (default: 01_fundamentals)"
-                  value={addUnitSlug}
-                  onChange={(e) => setAddUnitSlug(e.target.value)}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>5. Display Title</label>
+                <label>4. Display Title</label>
                 <input
                   type="text"
                   placeholder="e.g. Prompt Engineering & Spec-Driven Development"
@@ -888,7 +878,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                   Cancel
                 </button>
                 <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                  {isSubmitting ? 'Creating...' : 'Create Unit'}
+                  {isSubmitting ? 'Creating…' : 'Create course'}
                 </button>
               </div>
             </form>

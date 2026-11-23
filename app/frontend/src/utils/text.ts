@@ -47,3 +47,14 @@ export function splitHighlight(text: string, query: string): HighlightPart[] {
       isMatch: regex.test(part),
     }));
 }
+
+/** Folder-safe slug for a new course or category: "Rust Internals!" -> "rust_internals". */
+export function toSlug(input: string): string {
+  return input
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^[_-]+|[_-]+$/g, '');
+}
