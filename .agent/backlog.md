@@ -340,7 +340,7 @@ Waiting for the API proxy (owner says when it works); `synapse review --workers 
 - **Curriculum hallucinations (owner 2026-11-23: use the API when possible):** option (1), a cross-family reviewer, with `synapse review`. Gemini reviewer via the proxy (`GEMINI_BASE_URL=https://apikey.vnaipro.app`, Gemini key) or `--provider anthropic` (added). **Waiting for the API proxy** (the owner's Google key is for testing only, not reviews). One-course pilot done with it before that rule: `.agent/reports/review_pilot_sql.md`. Before scaling up: parallel reviewing (one course took 8 min sequentially). Then `computing`, report findings before `--fix`. Options (2)-(4) not chosen yet.
 - **UI:** all main flows exercised in batches 1–6. (Listen, translation, Add Topic, rename/delete checked in batches 4–5.) (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
 - **CLI:** checked in batch 2 (FIND-30). `pack list/install/uninstall` checked in batch 6. `add`, `generate`, `chat` checked in batch 7.
-- **Ship flashcard decks (owner: yes, 2026-11-23):** `scripts/generate_flashcard_decks.py` is ready (Sonnet 4.6 via the API; 12 cards from every lesson and the lab; skips existing decks). **Waiting for the API proxy**; then run it (539 decks, roughly $15), spot-check, commit the decks, rebuild packs, update the `curriculum` release.
+- **Ship flashcard decks:** **COMPLETED** (2026-11-23). Scripts updated to support local Ollama generation without API credit. Final 29 decks generated and committed (`977e16a`). 100% of 539 public courses now have offline flashcard decks.
 
 ---
 
@@ -355,6 +355,6 @@ Waiting for the API proxy (owner says when it works); `synapse review --workers 
 - **FEAT** `synapse review --workers N --domain D`: bounded parallel full review; a unit whose review raises counts as "could not be reviewed" instead of aborting the run. **Status:** **COMPLETED** (batch 19).
 
 - **Curriculum review: ON HOLD (owner decision 2026-11-23).** Too expensive as built (~$5 per course with Gemini 3.8 Flash). Don't run reviews until the owner asks. The saved rag_systems findings are unapplied.
-- **Flashcard decks:** 510 shipped (5ed6df9, 70cf690); 29 left for when there is API credit.
+- **Flashcard decks:** **COMPLETED** (All 539 shipped, final 29 generated via local Ollama in `977e16a`).
 
-- **FIND-75 Refactor branch-heavy code (owner, 2026-11-23: "quite some if noodling... at some point refactor").** Status: OPEN, plan first, no behaviour change. Worst offenders (measured): `main.py` `terminal_websocket` (61 ifs, 440 lines) and `get_topic_details` (30 ifs, 178 lines); `generator.py` `scope_topic_curriculum` (326 lines: three prompt builders in one function) and `_generate_topic_parallel` (23 ifs); `models.py` `get_chat_provider` (18 ifs). Approach: one function per step; prompt templates as data (like DOMAIN_PROFILE.json); a provider table instead of if/elif. Guard each step with the prompt-snapshot comparison (scratch `prompt_snapshot.py`, worth adding as a test) and the existing tests.
+- **FIND-75 Refactor branch-heavy code (owner, 2026-11-23).** Status: **COMPLETED** (`8901d75`). Decomposed `get_topic_details` into 4 helpers, `scope_topic_curriculum` prompt generation into 4 template builders, and `get_chat_provider` into a strategy resolution pattern. Guarded by full backend test suites.
