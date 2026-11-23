@@ -259,14 +259,20 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-47: Pack Uninstall of "" or "." Deleted the Whole Curriculum
 - **Status:** **COMPLETED** (`4fe4d9a`). Tests in `tests/test_packages.py`, `tests/test_cli.py`.
 
+### FIND-48: Generation Failed on Ollama/Gemini; CLI chat Crashed; Failures Exited 0
+- **Status:** **COMPLETED** (`a6cfa24`). Tests: `tests/test_provider_contract.py`, `tests/test_cli.py`.
+
 ## Next Candidates (not yet verified)
+
+- **Tests:** conftest's autouse blocker replaces provider `generate` with `(*args, **kwargs)`, so signature mismatches between callers and real providers cannot fail a test. `test_provider_contract.py` covers `generate`; consider the same for `generate_stream`/`generate_cancellable` callers.
+- **Chat with non-Ollama providers:** `/api/chat` streaming calls `provider.generate_stream`, which `OllamaCluster` and `GeminiProvider` do not define; check what `get_chat_provider` can return.
 
 - **Curriculum hallucinations (owner question, proposal):** (1) `synapse review` with a reviewer from a different model family than the generator; (2) run lesson/lab code blocks in the sandbox in CI and flag failures; (3) extract checkable claims (versions, defaults, flags, API names) and verify against docs or installed tools; (4) a "Report a mistake" button in the reader feeding a review queue. (1) and (2) are cheapest. NEEDS DECISION on which to build.
 - **Run buttons:** shown on every bash block, including illustrations like `cmd > file`. Consider showing Run only in labs or on blocks marked runnable (product decision).
 - **Mentor:** lesson-generation cleanup (`validate_generation_output`) still runs on chat replies; a chat-specific path would be cleaner.
 
 - **UI:** all main flows exercised in batches 1–6. (Listen, translation, Add Topic, rename/delete checked in batches 4–5.) (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
-- **CLI:** checked in batch 2 (FIND-30). `pack list/install/uninstall` checked in batch 6. Not yet exercised: `add`, `generate`, `chat` (need a model).
+- **CLI:** checked in batch 2 (FIND-30). `pack list/install/uninstall` checked in batch 6. `add`, `generate`, `chat` checked in batch 7.
 - No course ships `flashcards.csv` (the one that did was a test artifact); every deck is generated on first open (tens of seconds). Consider shipping decks or pre-generating in the curriculum pipeline (product decision).
 
 ---
