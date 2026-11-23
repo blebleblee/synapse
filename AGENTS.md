@@ -74,8 +74,8 @@ deletes. Push edits made to the private copy here back before the next pull.
 3. **For each task:** plan briefly → reproduce with a failing test where
    practical → make the smallest coherent fix → review your own `git diff`
    (including new files and affected callers) → run targeted tests, then
-   `./scripts/verify_all.sh` → commit → update `.agent/status.md` and
-   `.agent/backlog.md`.
+   `./scripts/verify_all.sh` → commit on a branch → update
+   `.agent/status.md` and `.agent/backlog.md` → land it (step 4).
    **Commit only when `./scripts/verify_all.sh` exits 0 and prints
    "ALL 6 VERIFICATION PHASES PASSED".** Run it with the project venv
    (`.venv/bin/python`), not the system Python. Paste its last lines into
@@ -84,10 +84,15 @@ deletes. Push edits made to the private copy here back before the next pull.
    shown it fails on the previous commit too, and even then it blocks the
    push. Refactors must not change behaviour: keep regexes, string formats
    and return values byte-for-byte unless the task is to change them.
-4. **After pushing to `gitea`:** check CI with `scripts/ci_status.py --wait`
-   (`--log <job>` shows a failed job's log, secrets removed). A red run is
-   part of the task, not a follow-up: fix it before the next commit or
-   push, and before marking anything done. CI has only what
+4. **Land through a pull request.** `main` on `gitea` is protected: direct
+   pushes are refused, and a PR merges only when CI passed on its head
+   commit. Work on a branch (`git switch -c fix/<topic>`), push it
+   (`git push gitea HEAD`), then run `scripts/gitea_pr.py "<title>"`: it
+   opens (or reuses) the PR, waits for CI and merges only when green, then fast-forwards
+   local `main`. `scripts/ci_status.py` (`--log <job>` shows a failed job's
+   log, secrets removed) shows any run. A red run is
+   part of the task, not a follow-up: fix it on the same branch and run the
+   script again, before marking anything done. CI has only what
    `requirements*.txt` installs; a test that needs an optional package
    (e.g. `google-genai`) must skip or stub it when it is missing.
    **Never bump the version, tag or publish a release while the latest CI
@@ -103,8 +108,9 @@ deletes. Push edits made to the private copy here back before the next pull.
 
 - **Git remotes:**
   - `gitea` (`https://gitea.2464.cz/ai/synapse.git`) is the development
-    remote. Pushing the branch you are working on to `gitea` is allowed after
-    the work is verified and committed.
+    remote. Pushing your working branch to `gitea` and merging its PR with
+    `scripts/gitea_pr.py` is allowed after the work is verified and
+    committed. Don't change branch protection.
   - `github` is the public publication remote. Pushing to it, publishing
     releases or uploading, replacing or deleting release assets requires
     explicit approval from the user for that specific action.

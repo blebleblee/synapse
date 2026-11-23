@@ -6,8 +6,10 @@ Run one bounded maintenance batch exactly as described in `AGENTS.md`
 real git state, then check CI with `scripts/ci_status.py`: a red latest run
 is the first thing to fix. Never assume interrupted work passed; re-run
 verification. Commit only after `./scripts/verify_all.sh` passes all 6
-phases; after each push run `scripts/ci_status.py --wait` and do not commit,
-push, bump the version or release again until that run is green.
+phases. Work on a branch, `git push gitea HEAD`, then land it with
+`scripts/gitea_pr.py "<title>"`
+(main is protected; the PR merges only on green CI). Do not bump the
+version or release while CI is red.
 
 When the batch ends, report: completed tasks with commit hashes, the
 verification command and its exact result, blocked items and `NEEDS DECISION`
