@@ -28,7 +28,10 @@ health_sciences, humanities, languages, motorsports, natural_sciences`.
 Every other folder under `topics/`, plus the git-ignored tracks
 `topics/languages/{czech,english,german}`, is **private**. It lives in a
 separate private repository and is copied into the working tree so the app can
-use it locally.
+use it locally. Copy it with `python scripts/sync_addons.py --addons <path>`
+(report only; `--pull` or `--push` to copy, `--only <folder>` to limit): it
+touches only git-ignored files, never overwrites a newer copy and never
+deletes. Push edits made to the private copy here back before the next pull.
 
 - Never commit, publish, bundle (packs, Docker images, desktop or portable
   builds) or list private domains, and never name them in public text.
