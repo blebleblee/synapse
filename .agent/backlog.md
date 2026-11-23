@@ -275,11 +275,19 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-52: Regenerate Deleted the Course (and Chat Sessions); Stop Did Not Stop
 - **Status:** **COMPLETED** (`d4fa183`). Tests: `tests/test_regeneration_safety.py`.
 
+### FIND-53: Generation Gave No Feedback; Skipped Files Counted as Failures
+- **Status:** **COMPLETED** (`e203fd9`). Tests: `generation.test.ts`, `test_regeneration_safety.py`, `test_cli.py`.
+
+### FIND-54: Quiz Showed a Canned Question When the Model Reply Did Not Parse
+- **Status:** **COMPLETED** (`9613e54`). Tests in `tests/test_api.py`.
+
+### FIND-55: One Broken Flashcard Lost the Whole Deck
+- **Status:** **COMPLETED** (`425c29d`). Tests: `tests/test_json_salvage.py`, `test_search.py`.
+
 ## Next Candidates (not yet verified)
 
 - **Export menu → field guide:** done in `8041726` (downloads; clearer label).
 - **Stop latency:** a cancel takes effect only after in-flight model calls return (~4 min on 32b). `OllamaProvider.generate_cancellable` (used by translation jobs) could abort them; the drafting path would need it plus `max_tokens`.
-- **CLI exit code:** `report_generation` treats skipped files (already on disk, result `False`) as failures, so `generate` without `--force` on a partly built course exits 1. Results should distinguish skipped from failed.
 
 - **Tests:** conftest's autouse blocker replaces provider `generate` with `(*args, **kwargs)`, so signature mismatches between callers and real providers cannot fail a test. `test_provider_contract.py` covers `generate`; consider the same for `generate_stream`/`generate_cancellable` callers.
 - **Chat with non-Ollama providers:** fixed in `427af10` (base `generate_stream`); not checked against the live Gemini API.

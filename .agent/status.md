@@ -7,7 +7,7 @@
 - **Tests are isolated from the host:** `tests/conftest.py` clears provider keys and hosts (`ANTHROPIC_API_KEY*`, `VNAIPRO_*`, `GEMINI_*`, `OLLAMA_HOSTS`, …); app shutdown waits for the start-up warm-up threads. Both hid failures until CI ran.
 - **Decisions taken:** keep Electron; leave git history as is; no Gitea password rotation (server is local-only); agent notes live in `.agent/`; pushes to GitHub only with owner approval per push.
 - **Curriculum release (2026-11-22, `606f85e`):** packs live on the `curriculum` release on both hosts, published with `scripts/publish_all_releases.py --curriculum`; only packs whose content digest changed are replaced (`curriculum.json` on the release). The app downloads from `curriculum` first, then v<version>/v1.2.0. App releases carry no packs and no longer the duplicate `Synapse-Portable-Windows.zip` (owner decision; the win-x64 zip, the macOS .zip and the 13 packs bundled in installers were kept on purpose). Gitea has no "not latest" flag, so its UI may show `curriculum` as the newest release; nothing in the app relies on "latest".
-- **Verification:** `./scripts/verify_all.sh`, all 6 phases (2026-11-23 ~05:55: 310 backend, 49 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean). Latest checkpoint: `d4fa183` pushed to `gitea/main` (CI #98 green). `github/main` is at the v1.3.0 release commit `7239c83`; the commits after it are on gitea only (GitHub push needs owner approval).
+- **Verification:** `./scripts/verify_all.sh`, all 6 phases (2026-11-23 ~07:10: 324 backend, 53 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean). Latest checkpoint: `425c29d` pushed to `gitea/main` (CI #102 green). `github/main` is at the v1.3.0 release commit `7239c83`; the commits after it are on gitea only (GitHub push needs owner approval).
 - **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, public on GitHub. No rotation (local-only server). Never print it.
 - **Pending owner actions:** top up proxy credit; send the Safari diagram case.
 - **Improvement ideas (completed 1–7):** release from CI; protected `main` with PR-only changes.
@@ -71,6 +71,13 @@ Commits (all pushed to `gitea/main`; CI #49–#56 green, #57+ queued at handoff 
 - `771c769` terminal PTY slave fd closed twice → killed unrelated sockets ("Invalid frame header"). FIND-27.
 - `b14085c` course-path links read "Kubernetes: Kubernetes" (301 doubled graph labels). FIND-28.
 - `7ff4d93` Anki export regenerated/overwrote decks; placeholder decks cached; Anki headers on one row; leaked test deck removed from kubernetes. FIND-29.
+
+### Batch 11 (2026-11-23, 06:26–07:15): AI feedback, quiz, flashcards
+
+- `e203fd9` (CI #100): the UI ignored `/api/generate` results, so a run where every file failed (no model) just reloaded silently; it now says what was generated/failed and whether the old lessons were kept. Skipped files (already on disk) are `results.skipped`, not failures: the CLI prints "Kept N existing file(s)" and exits 0; the API returns `skipped`. After a generation finished, reloading the course fired the stale cancel handler ("Generation stopped" notice + a server cancel); only the Stop button stops the server now. FIND-53.
+- `9613e54` (CI #101): **the quiz showed a hard-coded question** ("what is the primary architectural trade-off?", generic options) whenever the model's reply did not parse; now a 502 with a clear message. Cause in practice: qwen2.5-coder:32b put unescaped quotes in one question, invalidating the whole array; questions are now parsed one by one and malformed ones dropped. Checked in the app: the Bash quiz shows 2 real questions. FIND-54.
+- `425c29d` (CI #102): flashcards had the same all-or-nothing parse; shared helper `learning_engine/json_salvage.py`. Checked in the app: Bash deck, 8 cards. FIND-55.
+- Note for UI checks: the UI sends the Ollama host from Settings, so the scratch server reaches the local Ollama even when started with an unreachable `OLLAMA_HOSTS`.
 
 ### Batch 10 (2026-11-23, 05:26–06:00): Export, Regenerate/Stop
 
