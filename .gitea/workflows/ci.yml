@@ -1,10 +1,14 @@
 # CI on the Gitea runner: full verification, release-pack guard and secret
-# scan on every push and pull request. Change `runs-on` if the runner was
-# registered with other labels (act_runner's default is `ubuntu-latest`).
+# scan on every pull request and on main. `main` is protected: changes land
+# through PRs (scripts/gitea_pr.py) and merge only when these checks pass on
+# the PR. Branch pushes run CI once, through their PR, not twice.
+# Change `runs-on` if the runner was registered with other labels
+# (act_runner's default is `ubuntu-latest`).
 name: ci
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 jobs:
