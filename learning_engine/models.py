@@ -4,6 +4,7 @@ Supports clustered Ollama nodes (localhost, remote nodes, custom clusters) and G
 """
 
 import os
+import sys
 import json
 import re
 import time
@@ -875,7 +876,11 @@ class GeminiProvider(LLMProvider):
             else:
                 self.client = None
         except ImportError:
+            # Not a missing key: this Python lacks the package (bin/synapse
+            # runs the system python3, which may not have it).
             self.client = None
+            self.unavailable_reason = (f"The google-genai package is not installed for {sys.executable}; "
+                                       "install it there or run Synapse from its virtualenv.")
 
     def generate(self, prompt: str, system_instruction: str = "", max_tokens: Optional[int] = None) -> str:
         if not self.client:
