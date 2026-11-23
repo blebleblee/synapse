@@ -33,7 +33,7 @@ def test_music_strategy_is_domain_native():
     assert isinstance(strategy, ArtsMusicStrategy)
     toolchain = strategy.get_toolchain()
     assert toolchain.environment_type == LabEnvironmentType.SOFTWARE_GUI
-    assert any("DAW" in f for f in toolchain.frameworks)
+    assert any("DAW" in f for f in toolchain.frameworks)  # not-a-domain: the music term
 
     blueprint = strategy.get_blueprint("Counterpoint", "Composition")
     modules = build_topic_modules("arts", "composition", "counterpoint", "Counterpoint")
@@ -87,7 +87,7 @@ def test_generic_domain_strategy_dispatch():
     assert strategy_econ.domain == "economics"
 
 
-MUSIC_TERMS = ["daw", "voice-leading", "composer", "audio engineer", "timbre", "mixdown", "orchestration", "musician"]
+MUSIC_TERMS = ["daw", "voice-leading", "composer", "audio engineer", "timbre", "mixdown", "orchestration", "musician"]  # not-a-domain: the music term
 
 
 def test_visual_arts_courses_do_not_get_the_music_blueprint():

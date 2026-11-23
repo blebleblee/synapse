@@ -84,7 +84,54 @@ def find_secrets_in_text(text: str, filename: str) -> List[Tuple[int, str, str]]
     return issues
 
 
-def scan_file(path: Path, rel_str: str) -> List[str]:
+def local_private_domains(topics_dir: Path = REPO_ROOT / "topics") -> List[str]:
+    """Private domain folders present on this machine: the synced copies here,
+    plus the private repository itself when SYNAPSE_ADDONS_DIR points to it
+    (some private domains are never synced). Their names are never stored in
+    this repository; CI has none, so there the check finds nothing to compare."""
+    import os
+    dirs = [topics_dir]
+    if os.environ.get("SYNAPSE_ADDONS_DIR"):
+        dirs.append(Path(os.environ["SYNAPSE_ADDONS_DIR"]) / "topics")
+    names = set()
+    for base in dirs:
+        try:
+            names.update(d.name for d in base.iterdir()
+                         if d.is_dir() and not d.name.startswith((".", "_")) and d.name not in CORE_DOMAINS)
+        except OSError:
+            pass
+    return sorted(names)
+
+
+def public_slugs(tracked: List[str]) -> set:
+    """Category and course folder names of the public domains."""
+    out = set()
+    for f in tracked:
+        parts = f.split("/")
+        if len(parts) >= 4 and parts[0] == "topics" and parts[1] in CORE_DOMAINS:
+            out.update(parts[2:4])
+    return out
+
+
+def find_private_domain_names(text: str, names: List[str], ambiguous: set) -> List[int]:
+    """Line numbers where code names a private domain: as a quoted string
+    ("name") or a topics path (topics/name/). Names that are also public
+    category or course names (physics) are checked as paths only; lines
+    marked "not-a-domain" are skipped."""
+    pats = []
+    for n in names:
+        e = re.escape(n)
+        pats.append(rf"topics/{e}/")
+        if n not in ambiguous:
+            pats.append(rf"[\"']{e}[\"']")
+    if not pats:
+        return []
+    rx = re.compile("|".join(pats), re.IGNORECASE)
+    # A line marked "not-a-domain" uses the word itself (e.g. "daw" as a term).
+    return [i for i, line in enumerate(text.splitlines(), 1) if rx.search(line) and "not-a-domain" not in line]
+
+
+def scan_file(path: Path, rel_str: str, private_names=None, ambiguous=frozenset()) -> List[str]:
     errors = []
 
     # 1. Path privacy check
@@ -104,6 +151,12 @@ def scan_file(path: Path, rel_str: str) -> List[str]:
     secret_hits = find_secrets_in_text(content, rel_str)
     for line_num, secret_type, redacted in secret_hits:
         errors.append(f"[✘] Secret Leak Warning: '{rel_str}:{line_num}' contains {secret_type} ({redacted})")
+
+    # 3. Public files must not name private domains (AGENTS.md section 2).
+    if private_names and not rel_str.startswith("topics/"):
+        for line_num in find_private_domain_names(content, private_names, ambiguous):
+            errors.append(f"[✘] Private Domain Name: '{rel_str}:{line_num}' names a private domain "
+                          "(move it to that domain's DOMAIN_PROFILE.json or use a made-up name in tests)")
 
     return errors
 
@@ -151,10 +204,12 @@ def main():
         print("[✔] No files to scan.")
         sys.exit(0)
 
+    private_names = local_private_domains()
+    ambiguous = public_slugs(get_tracked_files()) if private_names else set()
     all_errors = []
     for f in files_to_scan:
         full_path = REPO_ROOT / f
-        errors = scan_file(full_path, f)
+        errors = scan_file(full_path, f, private_names, ambiguous)
         all_errors.extend(errors)
 
     if all_errors:

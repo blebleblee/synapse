@@ -353,3 +353,6 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Package Content Injection:** **COMPLETED** (`2779454`, `4e598ee`): extraction stages into `.install-{stamp}-{pid}`, validates all members, merges safely, and atomically swaps via `os.replace` with automatic rollback.
 - **Terminal PTY Concurrency:** Real PTY process allocation and signaling remain mocked in the test environment to prevent host shell execution.
 - **Complete Pack Backup:** **COMPLETED** (`2779454`): every domain a pack writes into is backed up first.
+
+- **FIND-73** Private domain names in public code (generator branches, linter list, test fixtures, scope script). **Status:** **COMPLETED** (batch 18): moved to per-domain DOMAIN_PROFILE.json; guard added.
+- **FIND-74** `synapse lint` fails on topics outside the workspace (`relative_to(WORKSPACE_ROOT)` in linter.py). **Status:** OPEN, small.

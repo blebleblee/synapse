@@ -185,3 +185,16 @@ Next in line: about 100 KaTeX errors that learners now see (95 in formal/natural
 False alarm recorded so nobody repeats it: "flashcard keys go to the terminal" only happens with a scripted `.click()`; a real click moves focus to the button. A regression test for the keyboard review flow was kept.
 
 Verification: `./scripts/verify_all.sh` all 6 phases (268 backend, 38 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean).
+
+## Batch 18 (2026-11-23): private names out of public code
+- DONE: private-domain prompt templates, linter exception and syllabus aliases
+  moved to `DOMAIN_PROFILE.json` in the private repo (loaded by
+  `learning_engine/domain_profiles.py`). Prompt snapshots identical before and
+  after (outline path 996 prompts; scoped path 60 domain/category pairs).
+  `check_staged_content.py` now rejects public files naming a local private
+  domain. Test fixtures use made-up names. verify_all: 580 + 15 passed.
+- NEXT: parallel reviewing for `synapse review`; tidy stale backlog lines.
+- WAITING ON PROXY (owner says when it works): flashcard decks (539, ~$15)
+  -> sample check -> commit -> rebuild packs -> curriculum release (needs
+  approval); computing review pilot, report before `--fix`.
+- Google key: testing only, never reviews/generation.

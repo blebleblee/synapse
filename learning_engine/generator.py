@@ -33,6 +33,7 @@ from .security import validate_canonical_topic_path, get_workspace_root
 from .rewrite_safety import split_markdown_chunks, check_rewrite, clean_model_markdown
 from .code_fences import tag_untagged_fences
 from .domain_strategies import build_topic_modules, GLOBAL_REGISTRY
+from .domain_profiles import domain_profile, render_profile_template
 
 # Global semaphore to limit concurrent LLM requests and avoid rate limits
 _LLM_SEMAPHORE = threading.Semaphore(24)
@@ -47,11 +48,11 @@ BOOK_STYLE_DIRECTIVE = """CRITICAL STYLE & TONE DIRECTIVE:
 - Use lists ONLY when providing sequential step-by-step commands or parameter reference tables. All conceptual and architectural explanations must be written in full narrative prose.
 - RAW OUTPUT ONLY: Do NOT include conversational preambles (e.g., 'Here is your lesson', 'Sure', etc.), HTML tags, or code fences (e.g. ```markdown ... ```) around the entire output. Output the raw Markdown text directly."""
 
-def _is_music_course(domain: str, category: str, subtopic_id: str = "") -> bool:
-    """Music courses: the music-like domains of the outline flow, and arts
-    categories other than the visual ones."""
+def _is_music_course(domain: str, category: str, subtopic_id: str = "", subtopic_dir: Optional[Path] = None) -> bool:
+    """Music courses: domains whose profile says so, and arts categories
+    other than the visual ones."""
     from .domain_strategies import VISUAL_ARTS_CATEGORIES, VISUAL_ARTS_COURSES
-    if domain in ("composing", "songwriting", "daw", "music"):
+    if domain_profile(domain, subtopic_dir).get("music_style"):
         return True
     return (domain == "arts" and category.lower() not in VISUAL_ARTS_CATEGORIES
             and subtopic_id.lower() not in VISUAL_ARTS_COURSES)
@@ -76,6 +77,7 @@ def scope_topic_curriculum(
     category_title = category.replace("_", " ").title()
 
     fallback_modules = build_topic_modules(domain, category, subtopic_id, subtopic_title)
+    profile = domain_profile(domain, subtopic_dir)
 
     if subtopic_dir:
         outline_path = subtopic_dir / "TOPIC_OUTLINE.md"
@@ -112,45 +114,10 @@ def scope_topic_curriculum(
                         focus = l["focus"]
                         hands_on = l["hands_on"]
 
-                        if domain in ["suse", "suse-bootcamp"] or "suse" in domain.lower():
-                            structure_text = f"""ENTERPRISE MASTERCLASS CHAPTER BLUEPRINT:
-Author a full-length, authoritative, deeply technical masterclass chapter (~1,800 to 2,400 words) on '{title}'.
-Write like a Senior SUSE Enterprise Solutions Architect and Linux Systems Specialist: deeply articulate, intellectually rigorous, and immediately practical.
-
-CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
-- Blend rich, insightful narrative prose with clean, scannable bullet points, numbered step-by-step procedures, and actionable checklists.
-- DO NOT write an unbroken wall of dense text. Break down concepts with clear bullet points, comparative tables, YAML/CLI blocks, and bold highlights.
-- Structure your chapter with these organic, topic-specific headings (DO NOT use generic numbered labels like 'Section 1' or 'The Enterprise Problem'):
-  1. The Enterprise Context & Architectural Foundations: Deep systems-level exposition explaining why this technology/subsystem matters. Explain the problem space, official SUSE documentation invariants, and core concepts in plain, precise technical English.
-  2. Subsystem Architecture & Low-Level Mechanics: Clear narrative exposition on daemon lifecycles, kernel/systemd interactions, network datapath, or resource reconciliation. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing the component topology, state transitions, or dataflow.
-  3. Step-by-Step Command Walkthrough & Configuration: Numbered step-by-step procedures with exact CLI commands, configuration stanzas (/etc/ configs, systemd units, zypper, yast2, kubectl, crmsh), and detailed explanations of all flags and parameters.
-  4. Core Reference Matrix Table: Include a clear Markdown table summarizing configuration parameters, CLI flags, port numbers, or system states.
-  5. Practical Hands-On Terminal Lab: A concrete 15-minute terminal lab ({hands_on}) with exact commands, expected output blocks, and verification commands.
-  6. Production Hardening & Troubleshooting Pro-Tips: Conclude with 4-5 memorable 'Golden Rules' of production administration, common failure signatures, and log debugging."""
-                            relevance_mandate = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
-- Focus 80% on actionable, hands-on Linux system administration, Kubernetes orchestration, and official SUSE documentation workflows for '{subtopic_title}' in '{category_title}'.
-- STRICT TOOLCHAIN ISOLATION: Utilize ONLY official Linux, SUSE, and Kubernetes tools, commands, and configuration schemas native to '{category_title}'. ABSOLUTELY NEVER mention music production, DAWs, Ableton, Cubase, or audio engineering."""
-
-                        elif domain == "studio_equipment" or category in ["hardware_synthesizers", "drum_machines_and_grooveboxes", "audio_interfaces_and_mixers", "guitar_pedals_and_outboard_fx", "midi_controllers_and_sequencers", "studio_monitors_and_acoustics", "studio_routing_and_utilities"]:
-                            structure_text = f"""HARDWARE MASTERCLASS CHAPTER BLUEPRINT:
-Author a full-length, authoritative, highly engaging hardware masterclass chapter (~1,800 to 2,400 words) on '{title}'.
-Write like a Senior Recording Studio Hardware Technician and Audio Engineer: deeply articulate, passionate, and immediately practical.
-
-CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
-- Blend rich, insightful narrative prose with clean, scannable bullet points, numbered step-by-step procedures, and actionable checklists.
-- DO NOT write an unbroken wall of dense text.
-- Structure your chapter with these organic, topic-specific headings:
-  1. The Hardware Dilemma & Circuit Foundations: Plain-English exposition of what this hardware circuit/engine does, demystifying audio engineering jargon.
-  2. Circuit Topography & Signal Flow Mechanics: Dissect physical controls, signal path from inputs to converters, or DSP engine. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing signal flow or routing.
-  3. Step-by-Step Physical Controls & Menu Navigation: Numbered steps detailing exact knob names, switch positions, and secondary shift-functions.
-  4. Core Hardware Parameter Reference Table: A clear Markdown table summarizing knob functions, dB ranges, I/O levels, or MIDI CCs.
-  5. Hybrid Studio Rig Integration (Mackie, Apollo & Midihub): Dedicated cabling and routing steps connecting this unit into the Mackie 1202 mixer, UAD Apollo Twin, and Blokas Midihub.
-  6. Hands-On Studio Lab & Calibration: A concrete 15-minute patching and calibration drill ({hands_on}).
-  7. Technician Golden Rules & Traps: 4-5 bulleted pro-tips on gain staging, +22 dBu headroom, and ground loops."""
-                            relevance_mandate = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
-- Focus 80% on physical hardware manipulation, analog/digital signal flow, and authentic studio routing for '{subtopic_title}' in '{category_title}'.
-- STRICT TOOLCHAIN ISOLATION: Utilize ONLY physical hardware controls, jacks, and circuits native to this specific unit. NEVER mention enterprise software or IT infrastructure."""
-
+                        outline_tpl = profile.get("outline_lesson")
+                        if outline_tpl:
+                            structure_text = render_profile_template(outline_tpl.get("structure", ""), dict(title=title, hands_on=hands_on, focus=focus, subtopic_title=subtopic_title, category_title=category_title, domain_title=domain_title, default_audience=default_audience))
+                            relevance_mandate = render_profile_template(outline_tpl.get("relevance", ""), dict(title=title, hands_on=hands_on, focus=focus, subtopic_title=subtopic_title, category_title=category_title, domain_title=domain_title, default_audience=default_audience))
                         elif domain == "languages":
                             structure_text = f"""LINGUISTIC MASTERCLASS CHAPTER BLUEPRINT:
 Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}'.
@@ -169,34 +136,7 @@ CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
 - Focus 80% on authentic language acquisition, phonetic accuracy, and conversational fluency for '{subtopic_title}' in '{category_title}'.
 - Contrast directly against Czech native speaker patterns. NEVER mention unrelated IT or audio tools."""
 
-                        elif domain in ["mathematics", "physics", "chemistry"]:
-                            domain_cz = {"mathematics": "matematika", "physics": "fyzika", "chemistry": "chemie"}.get(domain, domain)
-                            teacher_cz = {
-                                "mathematics": "špičkový český gymnaziální profesor matematiky a autor gymnaziálních sbírek úloh",
-                                "physics": "špičkový český gymnaziální profesor fyziky a autor učebnic pro gymnázia",
-                                "chemistry": "špičkový český gymnaziální profesor chemie a autor gymnaziálních učebnic"
-                            }.get(domain, "český středoškolský profesor a didaktik")
-
-                            structure_text = f"""ČESKÁ GYMNAZIÁLNÍ UČEBNICE – STRUKTURA LEKCE:
-Napište plnohodnotnou, autoritativní a didakticky propracovanou kapitolu gymnaziální učebnice (~1,800 až 2,400 slov) na téma '{title}'.
-Pište jako {teacher_cz}: spisovnou češtinou, srozumitelně, pedagogicky poutavě a s maximální odbornou přesností podle RVP pro gymnázia v ČR.
-
-KRITICKÁ PRAVIDLA PRO DYNAMICKOU ROVNOVÁHU A STRUKTURU:
-- Pište bohatým, souvislým výkladovým textem v odstavcích, doplněným o přehledné odrážky, rámečky s definicemi, tabulky a detailně komentované vzorové příklady.
-- NEPIŠTE pouze heslovitý přehled ani suché shrnutí. Každý pojem důkladně vysvětlete na reálné a geometrické intuici.
-- Každou lekci strukturuujte podle následujících tematických sekcí (v češtině):
-  1. Motivace a reálná/geometrická intuice: Proč tento koncept potřebujeme, kde vzniká v praxi nebo v přírodě a jaký problém řeší.
-  2. Přesná vědecká teorie, definice a vzorce: Formální matematické/fyzikální/chemické definice, věty, předpoklady platnosti, význam všech symbolů a jednotek SI / názvosloví.
-  3. Názorné schéma / Myšlenková mapa (Mermaid diagram): Přehledný diagram (```mermaid ... ```) znázorňující rozhodovací strom řešení, silový rozklad, reakční mechanismus nebo myšlenkový postup.
-  4. Krok za krokem řešené vzorové příklady: Detailní didaktický rozbor (zadání, podmínky řešitelnosti / zápis veličin, algebraické odvození / výpočet, kontrolní zkouška, grafická či věcná interpretace).
-  5. Samostatná cvičení s výsledky: Sada úloh od základních po maturitní chytáky s uvedenými výsledky pro sebekontrolu ({hands_on}).
-  6. Časté chyby u písemek a maturitní chytáky: 4-5 konkrétních varování před typickými omyly studentů (znaménka, dělení nulou, jednotky, oxidační čísla)."""
-
-                            relevance_mandate = f"""KRITICKÝ MANDÁT PRO ČISTOTU OBORU A JAZYKA:
-- Pište VÝHRADNĚ 100% SPISOVNOU ČEŠTINOU s použitím standardního českého názvosloví pro obor {domain_cz} (RVP pro gymnázia v ČR).
-- STRIKTNÍ IZOLACE OBORU: Zaměřte se výhradně na {domain_cz} pro téma '{subtopic_title}' v okruhu '{category_title}'.
-- ABSOLUTNĚ ZAKÁZÁNO: Jakýkoliv IT žargon (Linux, servery, Kubernetes, Docker, kódování) a jakýkoliv hudební žargon (hudba, DAW, Berklee, syntezátory, kytary)."""
-                        elif not _is_music_course(domain, category, subtopic_id):
+                        elif not _is_music_course(domain, category, subtopic_id, subtopic_dir):
                             # Every other course used to fall through to the music
                             # template below (Berklee professor, DAW shortcuts).
                             structure_text = f"""MASTERCLASS CHAPTER BLUEPRINT:
@@ -217,7 +157,7 @@ CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
                             relevance_mandate = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
 - Focus 80% on actionable, hands-on practice of '{subtopic_title}' in '{category_title}'.
 - STRICT TOOLCHAIN ISOLATION: Use ONLY tools, techniques, and vocabulary native to '{category_title}'. Do not borrow examples, tools or jargon from unrelated fields."""
-                        else: # composing, music, daw
+                        else: # music courses (profile music_style, arts music categories)
                             structure_text = f"""MUSIC PRODUCTION MASTERCLASS CHAPTER BLUEPRINT:
 Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}'.
 Write like a world-class Berklee professor and master producer: deeply articulate, passionate, intellectually rigorous, and immediately practical.
@@ -270,41 +210,9 @@ Output publication-grade Markdown only."""
                         cap_obj = f"Deploy and verify {subtopic_title} in a realistic production scenario."
                         cap_del = "Verifiable implementation passing diagnostic health checks."
 
-                    if domain in ["mathematics", "physics", "chemistry"]:
-                        domain_cz = {"mathematics": "matematika", "physics": "fyzika", "chemistry": "chemie"}.get(domain, domain)
-                        capstone_prompt = f"""Napište průvodce praktickým maturitním projektem / laboratorní výzvou: '{cap_title}' pro '{subtopic_title}'.
-Obor: '{domain_title}' | Okruh: '{category_title}'.
-
-Cílová skupina: Studenti a maturanti gymnázií v ČR
-Cíl výzvy: {cap_obj}
-Požadovaný výstup: {cap_del}
-
-STRUKTURA ZADÁNÍ MATURITNÍHO / LABORATORNÍHO PROJEKTU (~1,000 až 1,400 slov):
-Navrhněte ucelený, didakticky promyšlený praktický projekt / laboratorní měření ověřující hluboké zvládnutí látky.
-
-Struktura dokumentu v češtině:
-# Praktický projekt / Maturitní sprint: {cap_title}
-
-## 1. Cíl projektu, kontext a teoretická východiska
-(Formulace problému, význam v praxi/přírodě, myšlenková mapa / schéma v Mermaid (```mermaid ... ```) a předpoklady)
-
-## 2. Krok za krokem řešený postup a metodika
-(Podrobný metodický postup řešení, odvození vztahů, bilance, laboratorní postup měření bez vynechání kroků)
-
-## 3. Komentované vzorové řešení a výpočetní protokol
-(Kompletní numerické či algebraické řešení s dosazením, jednotkami SI / chemickými rovnicemi a mezivýpočty)
-
-## 4. Analýza chyb, mezních stavů a diskuze výsledků
-(Rozbor možných nepřesností, diskuze fyzikálního/chemického/matematického smyslu výsledku, zkouška správnosti)
-
-## 5. Závěrečná hodnoticí kritéria a kontrolní přehled
-(Přehledná tabulka v Markdownu s kritérii úspěšného splnění a ověřovacími body)
-
-KRITICKÝ MANDÁT:
-- Pište výhradně 100% spisovnou češtinou s platným českým názvoslovím pro {domain_cz}.
-- Žádný IT žargon (žádný Linux, Kubernetes, skripty), žádný hudební žargon.
-Rozpočet: cca 1,000 až 1,400 slov s čistým formátováním.
-Výstupem je pouze čistý Markdown."""
+                    cap_tpl = profile.get("outline_capstone")
+                    if cap_tpl:
+                        capstone_prompt = render_profile_template(cap_tpl, dict(cap_title=cap_title, cap_obj=cap_obj, cap_del=cap_del, subtopic_title=subtopic_title, category_title=category_title, domain_title=domain_title, default_audience=default_audience))
                     else:
                         capstone_prompt = f"""Author the Practical Capstone Challenge Guide: '{cap_title}' for '{subtopic_title}'.
 Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
@@ -405,40 +313,9 @@ Output JSON only in this exact format:
                 title = l.get("title") or f"Lesson {num}"
                 focus = l.get("focus") or ""
 
-                if domain in ["composing", "songwriting", "daw", "music"] or category in ["songwriting", "orchestral_composing", "daw_arrangement", "music_theory", "film_and_game_scoring"]:
-                    structure_text = f"""MASTERCLASS CHAPTER BLUEPRINT:
-Author a full-length, deeply authoritative textbook chapter (~2,800 to 3,500 words) on '{title}'.
-Write like a world-class Berklee professor and master producer: deeply articulate, passionate, intellectually rigorous, and immediately practical.
-
-MANDATORY SECTIONS TO DEVELOP WITH ORGANIC, BESPOKE HEADINGS (DO NOT use generic numbered labels like 'Section 1' or 'The Creative Problem'):
-1. The Core Creative Dilemma & Human Perception: Deep psychoacoustic exposition on auditory habituation, emotional narrative, and why naive approaches fail. Demystify all jargon in plain English.
-2. The Acoustic & Musical Mechanics: Deep narrative exposition on voice-leading, frequency real estate, internal velocity, and arrangement dynamics. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing the musical structure or decision tree.
-3. Measure-by-Measure Commercial Case Studies: Provide exhaustive, multi-paragraph breakdowns of 2-3 well-known commercial records across genres with exact timestamps, tracking measure-by-measure what stems enter/exit and why it works.
-4. Comprehensive Reference Matrix Table: Include a detailed Markdown reference table summarizing parameters, frequency allocations, or structural metrics.
-5. Compact DAW Quick Reference Box: A concise 10-12 line bullet cheat-sheet giving the exact shortcuts and track setups for Ableton Live (e.g. [A] for Automation, Utility Gain/Width) and Steinberg Cubase (e.g. Marker Track, [V] Volume Automation, Draw tool [8]). Keep this compact so software steps never overshadow the musical lesson.
-6. Practical Listening & Production Lab: A concrete 15-minute auditory audit drill on the student's own project.
-7. Mentor Invariants: Conclude with 4-5 memorable 'Golden Rules' of the craft."""
-                elif domain == "studio_equipment" or category in ["hardware_synthesizers", "drum_machines_and_grooveboxes", "audio_interfaces_and_mixers", "guitar_pedals_and_outboard_fx", "midi_controllers_and_sequencers", "studio_monitors_and_acoustics", "studio_routing_and_utilities"]:
-                    structure_text = f"""Structure:
-# {title}
-
-## 1. The Hardware Dilemma & The "Why"
-(Plain-English exposition of what this hardware function or circuit does, demystifying any technical audio engineering jargon, and explaining why it matters in a modern studio workflow)
-
-## 2. Circuit Architecture & Signal Flow Mechanics
-(Dissect the physical hardware controls, signal path from input/oscillators to output converters, or DSP engine. You MUST include an authoritative, richly styled Mermaid diagram (```mermaid ... ```) showing signal flow, knob routing, or patch architecture. NEVER use raw ASCII art boxes)
-
-## 3. Physical Control Walkthrough & Menu Navigation
-(Exact knob names, button combinations, secondary shift-functions, and display menu paths)
-
-## 4. Hybrid Studio Rig Integration (Apollo, Mackie & Midihub)
-(Explicit step-by-step instructions on patching and routing into the Mackie 1202 mixer, UAD Apollo Twin audio interface, and Blokas Midihub MIDI matrix)
-
-## 5. Hands-On Hardware Lab & Calibration
-(A concrete 15-minute patching/calibration exercise with verification steps and auditory checks)
-
-## 6. Technician Advice & Common Traps
-(Highlight the #1 mistake users make with this unit, ground loop / gain staging warnings, and maintenance tips)"""
+                scoped_tpl = profile.get("scoped_lesson")
+                if scoped_tpl:
+                    structure_text = render_profile_template(scoped_tpl.get("structure", ""), dict(title=title, focus=focus, subtopic_title=subtopic_title, category_title=category_title, domain_title=domain_title, default_audience=default_audience))
                 elif domain == "languages":
                     structure_text = f"""Structure:
 # {title}

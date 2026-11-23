@@ -24,8 +24,11 @@ if str(WORKSPACE_ROOT) not in sys.path:
 from learning_engine.models import AnthropicProvider, load_env_file
 load_env_file()
 
-def parse_syllabus(syllabus_path: Path) -> Dict[str, List[str]]:
-    """Parses disciplines and topic slugs from a SYLLABUS.md file."""
+def parse_syllabus(syllabus_path: Path, discipline_aliases=()) -> Dict[str, List[str]]:
+    """Parses disciplines and topic slugs from a SYLLABUS.md file.
+
+    `discipline_aliases` (from the domain's DOMAIN_PROFILE.json,
+    "syllabus_discipline_aliases") maps long heading names to folder slugs."""
     if not syllabus_path.exists():
         raise FileNotFoundError(f"Syllabus file not found: {syllabus_path}")
 
@@ -41,17 +44,11 @@ def parse_syllabus(syllabus_path: Path) -> Dict[str, List[str]]:
             clean_disc = re.sub(r"[^a-zA-Z0-9_]+", "_", raw_title.lower()).strip("_")
             if clean_disc in ("disciplines", "discipline"):
                 continue
-            if "sles" in clean_disc: clean_disc = "sles"
-            elif "opensuse" in clean_disc: clean_disc = "opensuse"
-            elif "rancher" in clean_disc and "rke2" not in clean_disc: clean_disc = "rancher"
-            elif "rke2" in clean_disc: clean_disc = "rke2"
-            elif "k3s" in clean_disc: clean_disc = "k3s"
-            elif "harvester" in clean_disc: clean_disc = "harvester"
-            elif "longhorn" in clean_disc: clean_disc = "longhorn"
-            elif "suse_ai" in clean_disc: clean_disc = "suse_ai"
-            elif "observability" in clean_disc: clean_disc = "observability"
-            elif "security" in clean_disc or "neuvector" in clean_disc: clean_disc = "security"
-            elif "edge" in clean_disc: clean_disc = "edge"
+            for rule in discipline_aliases:
+                # [substring, slug] or [substring, slug, unless-substring]; first match wins.
+                if rule[0] in clean_disc and not (len(rule) > 2 and rule[2] in clean_disc):
+                    clean_disc = rule[1]
+                    break
             current_disc = clean_disc
             disciplines[current_disc] = []
             continue
@@ -64,14 +61,18 @@ def parse_syllabus(syllabus_path: Path) -> Dict[str, List[str]]:
 
     return disciplines
 
+DEFAULT_AUDIENCE = "Tier 3 support escalation engineers, field architects and cloud-native SREs"
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate comprehensive topic outlines and curriculum blueprint without drafting lessons.")
-    parser.add_argument("--domain", required=True, help="Domain name (e.g. suse)")
-    parser.add_argument("--discipline", default=None, help="Specific discipline to scope (e.g. sles, rancher)")
+    parser.add_argument("--domain", required=True, help="Domain name (e.g. computing)")
+    parser.add_argument("--discipline", default=None, help="Specific discipline to scope (e.g. infrastructure)")
     parser.add_argument("--topic", default=None, help="Specific topic slug to scope")
     parser.add_argument("--topics-dir", default=None, help="Root topics directory (defaults to ./topics or SYNAPSE_TOPICS_DIR)")
     parser.add_argument("--model", default="claude-sonnet-5", help="Scoping LLM model")
     parser.add_argument("--workers", type=int, default=3, help="Concurrent scoping workers")
+    parser.add_argument("--audience", default=DEFAULT_AUDIENCE, help="Who the lessons are for (written into each blueprint)")
     args = parser.parse_args()
 
     topics_root = Path(args.topics_dir or os.environ.get("SYNAPSE_TOPICS_DIR") or (WORKSPACE_ROOT / "topics")).resolve()
@@ -83,7 +84,11 @@ def main():
         print(f"[✘] Syllabus not found at {syllabus_path}")
         sys.exit(1)
 
-    disciplines = parse_syllabus(syllabus_path)
+    try:
+        profile = json.loads((domain_dir / "DOMAIN_PROFILE.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        profile = {}
+    disciplines = parse_syllabus(syllabus_path, profile.get("syllabus_discipline_aliases", ()))
     total_topics = sum(len(topics) for topics in disciplines.values())
     print(f"[*] Parsed {len(disciplines)} disciplines with {total_topics} topics in domain '{args.domain}' from {syllabus_path}")
 
@@ -140,7 +145,7 @@ def main():
             print(f"  [{curr:03d}/{len(tasks):03d}] [{w_label:9s}] Cached: {disc_slug}/{topic_slug} [✔]", flush=True)
             return disc_slug, topic_slug, None
 
-        prompt = f"""You are a Principal Technical Curriculum Architect and SUSE Tier 3 Escalation Engineer.
+        prompt = f"""You are a Principal Technical Curriculum Architect and senior escalation engineer for '{args.domain}'.
 Domain Mandate:
 {domain_instructions}
 
@@ -155,7 +160,7 @@ Output valid JSON only in this exact schema:
   "topic_title": "{topic_title}",
   "tier": "Tier-3 Pro Services Masterclass",
   "rationale": "<2 sentence architectural justification of the depth and real-world failure space>",
-  "target_audience": "SUSE Tier 3 Support Escalation Engineers, Field Architects, Cloud Native SREs",
+  "target_audience": "{args.audience}",
   "primary_toolchains": ["<tool 1>", "<tool 2>", "<tool 3>", "<tool 4>"],
   "lessons": [
     {{
@@ -196,7 +201,7 @@ Output valid JSON only in this exact schema:
             f"",
             f"**Discipline:** `{disc_title}` | **Domain:** `{args.domain}`  ",
             f"**Curriculum Tier:** {data.get('tier', 'Tier-3 Pro Services Masterclass')} ({lesson_count} In-Depth Lessons + Operational Labs)  ",
-            f"**Target Audience:** {data.get('target_audience', 'SUSE Tier 3 Support Escalation Engineers, Field Architects, Cloud Native SREs')}  ",
+            f"**Target Audience:** {data.get('target_audience', args.audience)}  ",
             f"**Primary Toolchains:** {', '.join(data.get('primary_toolchains', []))}  ",
             f"",
             f"## Architectural Scope & Rationale",

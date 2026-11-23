@@ -342,14 +342,15 @@ def test_check_staged_content_detects_private_domains():
     ok, _ = is_private_path("topics/engineering/hardware/fpga/lesson_01.md")
     assert ok is False
 
-    # Private domains must be detected and rejected
-    private, reason = is_private_path("topics/chemistry/organic/lesson_01.md")
+    # Any domain outside the core list is private (made-up names: the real
+    # private domains are never named in public files).
+    private, reason = is_private_path("topics/unlisted_domain_a/organic/lesson_01.md")
     assert private is True
-    assert "chemistry" in reason
+    assert "unlisted_domain_a" in reason
 
-    private, reason = is_private_path("topics/composing/harmony/lesson_01.md")
+    private, reason = is_private_path("topics/unlisted_domain_b/harmony/lesson_01.md")
     assert private is True
-    assert "composing" in reason
+    assert "unlisted_domain_b" in reason
 
     # Private language tracks must be detected and rejected
     private, reason = is_private_path("topics/languages/czech/lesson_01.md")

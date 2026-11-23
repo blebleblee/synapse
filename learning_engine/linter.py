@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 from typing import Dict, List, Any
 from .security import WORKSPACE_ROOT, TOPICS_DIR
+from .domain_profiles import domain_profile
 
 FORBIDDEN_TEXT_PLACEHOLDERS = [
     r"//\s*TODO",
@@ -25,8 +26,10 @@ FORBIDDEN_TEXT_PLACEHOLDERS = [
 
 CROSS_DOMAIN_BLEED_RULES = [
     {
+        "id": "bpftool",
         "pattern": r"\bbpftool\b",
-        "allowed_domains": ["computing", "suse", "suse-bootcamp"],
+        # Other domains allow it in their DOMAIN_PROFILE.json ("linter_allow").
+        "allowed_domains": ["computing"],
         "allowed_topics": [
             "ebpf",
             "observability",
@@ -94,7 +97,8 @@ def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
     for rule in CROSS_DOMAIN_BLEED_RULES:
         allowed_domains = rule.get("allowed_domains", [])
         allowed_topics = rule.get("allowed_topics", [])
-        is_allowed = (domain in allowed_domains) or (subtopic_id in allowed_topics)
+        is_allowed = ((domain in allowed_domains) or (subtopic_id in allowed_topics)
+                      or (rule.get("id") and rule["id"] in domain_profile(domain).get("linter_allow", [])))
         if not is_allowed:
             if re.search(rule["pattern"], content, re.IGNORECASE):
                 issues.append({

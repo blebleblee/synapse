@@ -37,6 +37,12 @@ deletes. Push edits made to the private copy here back before the next pull.
   builds) or list private domains, and never name them in public text.
 - Never use private content as examples, test fixtures or statistics; measure
   only what `git ls-files topics` returns.
+- Behaviour specific to a private domain (prompt templates, linter
+  exceptions, syllabus aliases) lives in that domain's `DOMAIN_PROFILE.json`
+  in the private repository (see `learning_engine/domain_profiles.py`), not in
+  public code. `scripts/check_staged_content.py` rejects public files that
+  name a local private domain (quoted or as a `topics/` path); set
+  `SYNAPSE_ADDONS_DIR` to include domains that are not synced.
 - Chat sessions (`sessions/`, `active_session.md`, `chat_history.json`),
   leftover `artifacts/MASTERED_GUIDE.md` and course `SUMMARY.md` files
   (written from them by features that have been removed) and
