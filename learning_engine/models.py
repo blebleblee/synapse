@@ -865,7 +865,7 @@ class GeminiProvider(LLMProvider):
             contents=prompt,
             config=config
         )
-        return response.text or ""
+        return check_model_reply(response.text or "")
 
 def _synapse_user_agent() -> str:
     try:

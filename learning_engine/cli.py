@@ -245,7 +245,12 @@ def cmd_chat(args):
                 break
 
             prompt = "\n".join(history + [f"Student: {user_input}", "Tutor:"])
-            response = provider.generate(prompt, system_instruction=system_instruction)
+            try:
+                response = provider.generate(prompt, system_instruction=system_instruction)
+            except Exception as e:
+                # One failed turn (timeout, empty reply) must not end the session.
+                print(f"\n[!] The model did not answer: {e}. Ask again or type 'exit'.\n")
+                continue
             print(f"\nTutor > {response.strip()}\n")
             history.append(f"Student: {user_input}")
             history.append(f"Tutor: {response.strip()}")

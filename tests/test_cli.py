@@ -158,3 +158,26 @@ def test_lint_exits_non_zero_when_it_finds_errors(monkeypatch, capsys):
     monkeypatch.setattr(cli, "lint_curriculum", lambda domain_filter="": {
         "scanned_files": 1, "error_count": 0, "warning_count": 2, "passed": True, "issues": []})
     assert run_cli(monkeypatch, "lint") == 0
+
+
+def test_chat_survives_a_failed_model_call(monkeypatch, capsys):
+    """One timeout or empty reply ended the whole `synapse chat` session (and
+    its history). The turn now reports the error and the session goes on."""
+    calls = iter([RuntimeError("timed out"), "A Service gives pods a stable address."])
+
+    class Flaky:
+        model = "fake"
+
+        def generate(self, prompt, system_instruction=""):
+            r = next(calls)
+            if isinstance(r, Exception):
+                raise r
+            return r
+
+    answers = iter(["What is a Service?", "What is a Service?", "exit"])
+    monkeypatch.setattr(cli, "get_provider", lambda **k: Flaky())
+    monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
+    assert run_cli(monkeypatch, "chat", "computing/infrastructure/kubernetes") == 0
+    out = capsys.readouterr().out
+    assert "timed out" in out
+    assert "Tutor > A Service gives pods a stable address." in out

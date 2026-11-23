@@ -128,3 +128,18 @@ def test_translation_drops_a_model_preamble():
     with ThreadPoolExecutor(1) as ex:
         out, ok, _ = asyncio.run(translate_section(P(), ex, "## Intro\nThis is the lesson paragraph.", "Czech"))
     assert ok and out.startswith("## Úvod")
+
+
+def test_gemini_empty_reply_is_an_error_like_the_other_providers():
+    """Gemini returned "" (e.g. a safety block); the mentor then showed and
+    saved a blank answer instead of an error."""
+    class _Models:
+        def generate_content(self, **kw):
+            return type("R", (), {"text": None})()
+
+    provider = GeminiProvider.__new__(GeminiProvider)
+    provider.model, provider.unavailable_reason = "g", None
+    provider.client = type("C", (), {"models": _Models()})()
+    pytest.importorskip("google.genai")
+    with pytest.raises(ValueError, match="empty"):
+        REAL_GENERATE[GeminiProvider](provider, "p", system_instruction="s")
