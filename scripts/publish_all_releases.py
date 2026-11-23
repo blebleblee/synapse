@@ -472,8 +472,16 @@ def _require_clean_packs(paths=None):
         print("[✘] Aborting release: pack privacy check failed (see above).")
         sys.exit(1)
 
-def main():
-    if "--curriculum" in sys.argv[1:]:
+def main(argv=None):
+    import argparse
+    # Explicit parsing: an unknown flag (even --help before this existed)
+    # used to fall through to a full app publish on both hosts.
+    parser = argparse.ArgumentParser(
+        description="Publish Synapse releases on Gitea and GitHub (both hosts; GitHub needs owner approval).")
+    parser.add_argument("--curriculum", action="store_true",
+                        help="update the `curriculum` release (core-domain packs) instead of the app release")
+    args = parser.parse_args(argv)
+    if args.curriculum:
         sys.exit(0 if publish_curriculum() else 1)
     print("=" * 60)
     print(f" SYNAPSE {TAG} MULTI-PLATFORM RELEASE PUBLISHER")

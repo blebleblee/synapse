@@ -315,6 +315,9 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-66: Mentor Replies Lost Their Opening Paragraph; `synapse chat` Died on One Error
 - **Status:** **COMPLETED** (`05e1923`, `73b6ca8`). Providers ran lesson cleanup on every reply; now only `check_model_reply`. Gemini empty reply raises. Contract tests for `generate_stream` / `generate_cancellable`.
 
+### FIND-67: Release Scripts Published on Any Unknown Flag
+- **Status:** **COMPLETED** (2026-11-23). `publish_all_releases.py --help` ran a full v1.3.1 publish to both hosts (every asset skipped as up to date; notes rewritten with the unchanged `[1.3.1]` CHANGELOG text, so nothing visible changed). `update_release_notes.py --help` or a mistyped `--dry-run` would rewrite notes the same way. Both now use argparse; tests in `tests/test_publish_curriculum.py`.
+
 ## Next Candidates (not yet verified)
 
 - **Thin computing lessons:** `computing/infrastructure/monitoring_prometheus_grafana` lesson 4 (472 words) and its labs (641), `computing/data/sql_and_relational_query_optimization` lesson 4 (658). Regenerate.

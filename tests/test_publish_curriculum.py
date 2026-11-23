@@ -58,3 +58,26 @@ def test_curriculum_notes_list_every_pack(publish, tmp_path):
     body = publish.curriculum_body(index)
     assert "| Arts | 7 | 1 |" in body
     assert "curriculum.json" in body
+
+
+@pytest.mark.parametrize("argv", [["--help"], ["--bogus"], ["--curriculm"]])
+def test_publisher_unknown_or_help_flag_publishes_nothing(publish, monkeypatch, argv):
+    # Before argparse, any flag other than --curriculum fell through to a full
+    # app publish on Gitea and GitHub.
+    def boom(*a, **k):
+        raise AssertionError("must not publish")
+    for name in ("publish_gitea", "publish_github", "publish_curriculum"):
+        monkeypatch.setattr(publish, name, boom)
+    with pytest.raises(SystemExit):
+        publish.main(argv)
+
+
+@pytest.mark.parametrize("argv", [["--help"], ["1.3.1", "--dryrun"]])
+def test_update_release_notes_bad_flag_changes_nothing(monkeypatch, tmp_path, argv):
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    spec = importlib.util.spec_from_file_location("notes_under_test", ROOT / "scripts" / "update_release_notes.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    monkeypatch.setattr(mod.publish, "update_release_text", lambda *a, **k: (_ for _ in ()).throw(AssertionError("must not update")))
+    with pytest.raises(SystemExit):
+        mod.main(argv)
