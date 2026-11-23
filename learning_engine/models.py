@@ -849,8 +849,13 @@ class OllamaCluster(LLMProvider):
         provider = OllamaProvider(host=host, model=model)
         return provider.generate(prompt, system_instruction=system_instruction, max_tokens=max_tokens)
 
+# Default Gemini model. gemini-2.5-flash/-pro answer 404 "no longer available
+# to new users" (checked 2026-11-23); this is the model Google points to.
+DEFAULT_GEMINI_MODEL = "gemini-3.8-flash"
+
+
 class GeminiProvider(LLMProvider):
-    def __init__(self, model: str = "gemini-2.5-flash", api_key: Optional[str] = None, project: Optional[str] = None, base_url: Optional[str] = None):
+    def __init__(self, model: str = DEFAULT_GEMINI_MODEL, api_key: Optional[str] = None, project: Optional[str] = None, base_url: Optional[str] = None):
         self.model = model
         self.api_key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         self.project = project or os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("GCP_PROJECT")
@@ -876,18 +881,56 @@ class GeminiProvider(LLMProvider):
         if not self.client:
             raise RuntimeError(self.unavailable_reason or "Google GenAI client not initialized. Set GEMINI_API_KEY or GOOGLE_CLOUD_PROJECT.")
 
+        response = self._with_thinking_fallback(
+            lambda cfg: self.client.models.generate_content(model=self.model, contents=prompt, config=cfg),
+            system_instruction, max_tokens, temperature=0.2)
+        return check_model_reply(response.text or "")
+
+    def _config(self, system_instruction: str, max_tokens: Optional[int], temperature: float, no_thinking: bool):
         from google.genai import types
-        config = types.GenerateContentConfig(
-            temperature=0.2,
+        return types.GenerateContentConfig(
+            temperature=temperature,
             system_instruction=system_instruction if system_instruction else None,
             max_output_tokens=max_tokens,
+            # Gemini 3 thinks before answering and the thinking counts against
+            # max_output_tokens: with 200 tokens the reply was "`set -".
+            thinking_config=types.ThinkingConfig(thinking_budget=0) if no_thinking else None,
         )
-        response = self.client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=config
-        )
-        return check_model_reply(response.text or "")
+
+    def _with_thinking_fallback(self, call, system_instruction, max_tokens, temperature):
+        """Short calls (<= SHORT_REPLY_TOKENS) ask for no thinking; a model that
+        rejects that (gemini-3.5-flash-lite: 400) is asked again without it."""
+        short = bool(max_tokens) and max_tokens <= SHORT_REPLY_TOKENS
+        if short:
+            try:
+                return call(self._config(system_instruction, max_tokens, temperature, True))
+            except Exception as e:
+                if "400" not in str(e) and "INVALID_ARGUMENT" not in str(e):
+                    raise
+        return call(self._config(system_instruction, max_tokens, temperature, False))
+
+    def generate_stream(self, prompt: str, system_instruction: str = "", max_tokens: Optional[int] = None):
+        """Real streaming (the base class answered in one chunk)."""
+        if not self.client:
+            raise RuntimeError(self.unavailable_reason or "Google GenAI client not initialized. Set GEMINI_API_KEY or GOOGLE_CLOUD_PROJECT.")
+        # The config fallback must happen before the first chunk: open the
+        # stream and read its first chunk inside the retry.
+        def start(cfg):
+            it = iter(self.client.models.generate_content_stream(model=self.model, contents=prompt, config=cfg))
+            return it, next(it, None)
+
+        it, first = self._with_thinking_fallback(start, system_instruction, max_tokens, temperature=0.3)
+        streamed = False
+        for chunk in ([first] if first is not None else []):
+            if chunk.text:
+                streamed = True
+                yield chunk.text
+        for chunk in it:
+            if chunk.text:
+                streamed = True
+                yield chunk.text
+        if not streamed:
+            check_model_reply("")  # raises: an empty reply is an error, as in generate()
 
 def _synapse_user_agent() -> str:
     try:
@@ -1130,7 +1173,7 @@ def get_provider(
         host, selected_model = cluster.select_node_for_model(chosen_model)
         return OllamaProvider(host=host, model=selected_model)
 
-    chosen_model = model or "gemini-2.5-flash"
+    chosen_model = model or DEFAULT_GEMINI_MODEL
     gemini = GeminiProvider(model=chosen_model)
     if not provider_type and not gemini.client:
         hosts = ", ".join(cluster_status) or "none configured"
@@ -1199,7 +1242,7 @@ def get_translation_provider(
     # 4. Check Gemini
     gemini_key = os.environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key") or settings.get("geminiApiKey")
     if gemini_key and (provider_type == "gemini" or (model and "gemini" in model.lower())):
-        chosen_model = model or "gemini-2.5-flash"
+        chosen_model = model or DEFAULT_GEMINI_MODEL
         return GeminiProvider(model=chosen_model, api_key=gemini_key), chosen_model
 
     # 5. Fallback to any reachable Ollama node in the cluster
@@ -1314,7 +1357,7 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
         return AnthropicProvider(model=claude_model, api_key=anthropic_key), claude_model
 
     if gemini_key:
-        return GeminiProvider(model="gemini-2.5-flash", api_key=gemini_key), "gemini-2.5-flash"
+        return GeminiProvider(model=DEFAULT_GEMINI_MODEL, api_key=gemini_key), DEFAULT_GEMINI_MODEL
 
     # 5. Default cluster selection
     node, mod = cluster.select_node_for_model(model="qwen2.5-coder:7b")

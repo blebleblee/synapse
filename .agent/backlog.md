@@ -330,12 +330,14 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-71: Language and Tool Courses Got Compiler Labs
 - **Status:** **COMPLETED** (2026-11-23). Found while checking FIND-70: a Bash lab came out as a C++ AST/IR exercise. `software`/`systems`/unmatched computing categories used the compiler blueprint. New `GeneralSoftwareStrategy`; four low-level courses keep the old one. Existing labs unaffected (checked: Bash's lab is on-topic). Tests: `tests/test_computing_blueprints.py`.
 
+### FIND-72: Gemini Did Not Work for New Accounts; Short Replies Cut Off
+- **Status:** **COMPLETED** (2026-11-23, live key from the owner). (1) Default `gemini-2.5-flash` (and 2.5-pro) answer 404 "no longer available to new users": default now `gemini-3.8-flash`, model list 3.8-flash / 3.5-flash / 3.5-flash-lite. (2) Gemini 3 thinking counts against `max_output_tokens`: a 200-token reply was "`set -"; short calls (≤ `SHORT_REPLY_TOKENS`) send `thinking_budget=0`, retried without it on 400 (3.5-flash-lite rejects it). (3) Mentor chat now really streams (`generate_content_stream`). Checked live: all three models; mentor chat in the app, streamed and not. Tests: `tests/test_gemini_provider.py`.
+
 ## Next Candidates (not yet verified)
 
 
 - **Export menu → field guide:** done in `8041726` (downloads; clearer label).
 
-- **Chat with non-Ollama providers:** fixed in `427af10` (base `generate_stream`); not checked against the live Gemini API.
 
 - **Curriculum hallucinations (owner 2026-11-23: use the API when possible):** option (1), a cross-family reviewer, with `synapse review`. Gemini reviewer via the proxy (`GEMINI_BASE_URL=https://apikey.vnaipro.app`, Gemini key) or `--provider anthropic` (added). **Waiting for the API proxy.** Pilot: `computing`, then report findings before `--fix`. Options (2)-(4) not chosen yet.
 - **Run buttons:** renamed to "Send to terminal" (owner decision 2026-11-23).

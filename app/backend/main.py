@@ -576,8 +576,9 @@ def api_discovered_models():
         "claude-sonnet-5",
         "claude-opus-5-5",
         "claude-haiku-5-5",
-        "gemini-2.5-flash",
-        "gemini-2.5-pro"
+        "gemini-3.8-flash",
+        "gemini-3.5-flash",
+        "gemini-3.5-flash-lite"
     ]:
         if cm not in seen:
             seen.add(cm)
