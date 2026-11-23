@@ -337,7 +337,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 - **Chat with non-Ollama providers:** fixed in `427af10` (base `generate_stream`); not checked against the live Gemini API.
 
-- **Curriculum hallucinations (owner question, proposal):** (1) `synapse review` with a reviewer from a different model family than the generator; (2) run lesson/lab code blocks in the sandbox in CI and flag failures; (3) extract checkable claims (versions, defaults, flags, API names) and verify against docs or installed tools; (4) a "Report a mistake" button in the reader feeding a review queue. (1) and (2) are cheapest. NEEDS DECISION on which to build.
+- **Curriculum hallucinations (owner 2026-11-23: use the API when possible):** option (1), a cross-family reviewer, with `synapse review`. Gemini reviewer via the proxy (`GEMINI_BASE_URL=https://apikey.vnaipro.app`, Gemini key) or `--provider anthropic` (added). **Waiting for the API proxy.** Pilot: `computing`, then report findings before `--fix`. Options (2)-(4) not chosen yet.
 - **Run buttons:** renamed to "Send to terminal" (owner decision 2026-11-23).
 
 - **UI:** all main flows exercised in batches 1–6. (Listen, translation, Add Topic, rename/delete checked in batches 4–5.) (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)

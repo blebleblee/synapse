@@ -622,7 +622,7 @@ def main():
     p_rev = subparsers.add_parser("review", help="Independent cross-model quality & hallucination audit")
     p_rev.add_argument("query", nargs="?", default=None, help="Target unit name or path")
     p_rev.add_argument("--model", "-m", default="deepseek-r1:32b", help="Reviewer model (default: deepseek-r1:32b)")
-    p_rev.add_argument("--provider", "-p", choices=["ollama", "gemini"], help="Reviewer LLM provider")
+    p_rev.add_argument("--provider", "-p", choices=["ollama", "gemini", "anthropic"], help="Reviewer LLM provider (pick a family other than the one that wrote the lesson)")
     p_rev.add_argument("--fix", "-f", action="store_true", help="Auto-fix detected hallucinations and rewrite units")
     p_rev.set_defaults(func=cmd_review)
 

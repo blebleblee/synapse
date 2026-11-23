@@ -181,3 +181,17 @@ def test_chat_survives_a_failed_model_call(monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "timed out" in out
     assert "Tutor > A Service gives pods a stable address." in out
+
+
+def test_review_accepts_an_anthropic_reviewer(monkeypatch):
+    # A reviewer from another model family than the lesson's author.
+    seen = {}
+
+    def review(path, **kwargs):
+        seen.update(kwargs)
+        return {"has_issues": False, "reports": []}
+
+    monkeypatch.setattr(cli, "review_and_fix_unit", review)
+    run_cli(monkeypatch, "review", "computing/systems/bash", "--provider", "anthropic", "--model", "claude-sonnet-4-6")
+    assert seen.get("reviewer_provider") == "anthropic"
+    assert seen.get("reviewer_model") == "claude-sonnet-4-6"
