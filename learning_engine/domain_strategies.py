@@ -862,6 +862,9 @@ class GenericDomainStrategy(DomainStrategy):
 # Arts categories that are not music (see topics/arts/). creative_software stays
 # with music: most of its courses are DAWs (Ableton, Cubase, Logic Pro).
 VISUAL_ARTS_CATEGORIES = {"visual_arts", "visual_media", "design", "3d_graphics"}
+# Visual courses that sit inside a music category (creative_software also holds
+# Ableton, Cubase and Logic). Without this they got the music blueprint.
+VISUAL_ARTS_COURSES = {"adobe_creative_cloud"}
 
 
 class StrategyRegistry:
@@ -897,12 +900,12 @@ class StrategyRegistry:
             "motorsports": MotorsportsStrategy(),
         }
 
-    def get_strategy(self, domain: str, category: str) -> DomainStrategy:
+    def get_strategy(self, domain: str, category: str, subtopic_id: str = "") -> DomainStrategy:
         domain_lower = domain.lower()
         cat_lower = category.lower()
 
         # Arts: music categories keep the music strategy; visual ones do not.
-        if domain_lower == "arts" and cat_lower in VISUAL_ARTS_CATEGORIES:
+        if domain_lower == "arts" and (cat_lower in VISUAL_ARTS_CATEGORIES or subtopic_id.lower() in VISUAL_ARTS_COURSES):
             return ArtsVisualStrategy()
 
         # 1. Specialized computing strategies
@@ -1019,7 +1022,7 @@ def build_topic_modules(domain: str, category: str, subtopic_id: str, subtopic_t
     domain_title = domain.replace("_", " ").title()
     category_title = category.replace("_", " ").title()
 
-    strategy = GLOBAL_REGISTRY.get_strategy(domain, category)
+    strategy = GLOBAL_REGISTRY.get_strategy(domain, category, subtopic_id)
     blueprint = strategy.get_blueprint(subtopic_title, category_title)
 
     modules = []

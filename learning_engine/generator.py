@@ -46,13 +46,14 @@ BOOK_STYLE_DIRECTIVE = """CRITICAL STYLE & TONE DIRECTIVE:
 - Use lists ONLY when providing sequential step-by-step commands or parameter reference tables. All conceptual and architectural explanations must be written in full narrative prose.
 - RAW OUTPUT ONLY: Do NOT include conversational preambles (e.g., 'Here is your lesson', 'Sure', etc.), HTML tags, or code fences (e.g. ```markdown ... ```) around the entire output. Output the raw Markdown text directly."""
 
-def _is_music_course(domain: str, category: str) -> bool:
+def _is_music_course(domain: str, category: str, subtopic_id: str = "") -> bool:
     """Music courses: the music-like domains of the outline flow, and arts
     categories other than the visual ones."""
-    from .domain_strategies import VISUAL_ARTS_CATEGORIES
+    from .domain_strategies import VISUAL_ARTS_CATEGORIES, VISUAL_ARTS_COURSES
     if domain in ("composing", "songwriting", "daw", "music"):
         return True
-    return domain == "arts" and category.lower() not in VISUAL_ARTS_CATEGORIES
+    return (domain == "arts" and category.lower() not in VISUAL_ARTS_CATEGORIES
+            and subtopic_id.lower() not in VISUAL_ARTS_COURSES)
 
 
 def scope_topic_curriculum(
@@ -99,7 +100,7 @@ def scope_topic_curriculum(
                         parsed_lessons.append({"num": num, "title": f"Lesson {num}: {raw_title}", "filename": filename, "focus": focus, "hands_on": hands_on})
 
                     print(f"      [★] Using Blueprint Outline: {len(parsed_lessons)} Curated Lessons from TOPIC_OUTLINE.md", flush=True)
-                    strategy = GLOBAL_REGISTRY.get_strategy(domain, category)
+                    strategy = GLOBAL_REGISTRY.get_strategy(domain, category, subtopic_id)
                     blueprint = strategy.get_blueprint(subtopic_title, category_title)
                     default_audience = blueprint.lessons[0].audience if blueprint.lessons else f"Practitioners and specialists in {category_title}"
 
@@ -194,7 +195,7 @@ KRITICKÁ PRAVIDLA PRO DYNAMICKOU ROVNOVÁHU A STRUKTURU:
 - Pište VÝHRADNĚ 100% SPISOVNOU ČEŠTINOU s použitím standardního českého názvosloví pro obor {domain_cz} (RVP pro gymnázia v ČR).
 - STRIKTNÍ IZOLACE OBORU: Zaměřte se výhradně na {domain_cz} pro téma '{subtopic_title}' v okruhu '{category_title}'.
 - ABSOLUTNĚ ZAKÁZÁNO: Jakýkoliv IT žargon (Linux, servery, Kubernetes, Docker, kódování) a jakýkoliv hudební žargon (hudba, DAW, Berklee, syntezátory, kytary)."""
-                        elif not _is_music_course(domain, category):
+                        elif not _is_music_course(domain, category, subtopic_id):
                             # Every other course used to fall through to the music
                             # template below (Berklee professor, DAW shortcuts).
                             structure_text = f"""MASTERCLASS CHAPTER BLUEPRINT:
@@ -387,7 +388,7 @@ Output JSON only in this exact format:
         if len(parsed_lessons) >= 2:
             print(f"      [★] Pre-Flight Scoping: {tier} ({len(parsed_lessons)} Lessons + Labs) -> {rationale}", flush=True)
             
-            strategy = GLOBAL_REGISTRY.get_strategy(domain, category)
+            strategy = GLOBAL_REGISTRY.get_strategy(domain, category, subtopic_id)
             blueprint = strategy.get_blueprint(subtopic_title, category_title)
             default_audience = blueprint.lessons[0].audience if blueprint.lessons else f"Practitioners and specialists in {category_title}"
 

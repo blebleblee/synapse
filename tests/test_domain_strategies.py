@@ -137,3 +137,16 @@ def test_topic_outline_lessons_use_the_music_template_only_for_music(tmp_path):
         for m in lessons:
             assert ("MUSIC PRODUCTION MASTERCLASS" in m["prompt"]) is music, (domain, category)
             assert ("Ableton" in m["prompt"]) is music, (domain, category)
+
+
+def test_visual_course_inside_a_music_category_gets_the_visual_blueprint():
+    """creative_software holds Ableton, Cubase and Logic, but also Adobe Creative
+    Cloud; that course was generated with the music blueprint (its lab had 23
+    music and audio references)."""
+    from learning_engine.domain_strategies import ArtsVisualStrategy
+    assert isinstance(GLOBAL_REGISTRY.get_strategy("arts", "creative_software", "adobe_creative_cloud"), ArtsVisualStrategy)
+    assert isinstance(GLOBAL_REGISTRY.get_strategy("arts", "creative_software", "ableton_live"), ArtsMusicStrategy)
+    modules = build_topic_modules("arts", "creative_software", "adobe_creative_cloud", "Adobe Creative Cloud")
+    for m in modules:
+        for term in MUSIC_TERMS:
+            assert term not in m["prompt"].lower(), f"music term {term!r} in {m['filename']} prompt"
