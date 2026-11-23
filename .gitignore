@@ -34,6 +34,8 @@ Thumbs.db
 # Transient Chat Sessions
 topics/**/sessions/
 topics/.workspace_sessions/
+# "Mastered Field Guide" output, written from the learner's chat sessions
+topics/**/artifacts/MASTERED_GUIDE.md
 
 # Runtime Database & State
 /data/

@@ -105,3 +105,14 @@ def test_cli_pack_export(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv", ["synapse", "pack", "export", "computing", "-o", str(tmp_path)])
     cli.main()
     assert (tmp_path / "computing.synpack").exists()
+
+
+def test_mastered_field_guide_is_never_packed(monkeypatch, tmp_path):
+    """"Mastered Field Guide" writes artifacts/MASTERED_GUIDE.md into the
+    course folder, synthesized from the learner's chat sessions. It was not
+    git-ignored, so exporting the domain to share it included it."""
+    _seed(monkeypatch)
+    _write(Path(sec.TOPICS_DIR) / "languages" / "linguistics" / "phonology" / "artifacts" / "MASTERED_GUIDE.md", "my notes\n")
+    names, _ = _members(packages.export_topic_pack("languages", output_dir=tmp_path))
+    assert not any(n.endswith("MASTERED_GUIDE.md") for n in names)
+    assert "topics/languages/linguistics/phonology/lesson_01.md" in names

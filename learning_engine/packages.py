@@ -41,7 +41,8 @@ CORE_DOMAINS = (
 
 # Personal, transient or private files that never belong in any pack.
 _ALWAYS_EXCLUDED_DIRS = {"sessions", ".workspace_sessions", "__pycache__"}
-_ALWAYS_EXCLUDED_FILES = {"active_session.md", "chat_history.json", "CURRICULUM_BLUEPRINT.md", ".DS_Store"}
+# MASTERED_GUIDE.md: the "Mastered Field Guide" (artifacts/), written from chat sessions.
+_ALWAYS_EXCLUDED_FILES = {"active_session.md", "chat_history.json", "CURRICULUM_BLUEPRINT.md", "MASTERED_GUIDE.md", ".DS_Store"}
 
 
 def _git_ignored(paths: List[Path]) -> set:
