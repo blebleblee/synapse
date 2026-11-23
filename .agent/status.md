@@ -7,7 +7,7 @@
 - **Tests are isolated from the host:** `tests/conftest.py` clears provider keys and hosts (`ANTHROPIC_API_KEY*`, `VNAIPRO_*`, `GEMINI_*`, `OLLAMA_HOSTS`, …); app shutdown waits for the start-up warm-up threads. Both hid failures until CI ran.
 - **Decisions taken:** keep Electron; leave git history as is; no Gitea password rotation (server is local-only); agent notes live in `.agent/`; pushes to GitHub only with owner approval per push.
 - **Curriculum release (2026-11-22, `606f85e`):** packs live on the `curriculum` release on both hosts, published with `scripts/publish_all_releases.py --curriculum`; only packs whose content digest changed are replaced (`curriculum.json` on the release). The app downloads from `curriculum` first, then v<version>/v1.2.0. App releases carry no packs and no longer the duplicate `Synapse-Portable-Windows.zip` (owner decision; the win-x64 zip, the macOS .zip and the 13 packs bundled in installers were kept on purpose). Gitea has no "not latest" flag, so its UI may show `curriculum` as the newest release; nothing in the app relies on "latest".
-- **Verification:** `./scripts/verify_all.sh`, all 6 phases (2026-11-23 ~04:45: 303 backend, 49 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean). Latest checkpoint: `d32f356` pushed to `gitea/main`. `github/main` is at the v1.3.0 release commit `7239c83`; the commits after it are on gitea only (GitHub push needs owner approval).
+- **Verification:** `./scripts/verify_all.sh`, all 6 phases (2026-11-23 ~05:15: 304 backend, 49 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean). Latest checkpoint: `6a896c3` pushed to `gitea/main`. `github/main` is at the v1.3.0 release commit `7239c83`; the commits after it are on gitea only (GitHub push needs owner approval).
 - **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, public on GitHub. No rotation (local-only server). Never print it.
 - **Pending owner actions:** top up proxy credit; send the Safari diagram case.
 - **Improvement ideas (completed 1–7):** release from CI; protected `main` with PR-only changes.
@@ -71,6 +71,14 @@ Commits (all pushed to `gitea/main`; CI #49–#56 green, #57+ queued at handoff 
 - `771c769` terminal PTY slave fd closed twice → killed unrelated sockets ("Invalid frame header"). FIND-27.
 - `b14085c` course-path links read "Kubernetes: Kubernetes" (301 doubled graph labels). FIND-28.
 - `7ff4d93` Anki export regenerated/overwrote decks; placeholder decks cached; Anki headers on one row; leaked test deck removed from kubernetes. FIND-29.
+
+### Batch 9 (2026-11-23, 04:48–05:15): UI sweep, privacy
+
+- Curriculum scan: the arts music-template mix-up (FIND-49) is the only cross-discipline template problem in public content (IT/lab-science headings checked).
+- `148d15b`: mentor replies had no Markdown styles (bullets outside the text column, code blocks without background); checked in the app. FIND-50.
+- `6a896c3` **privacy:** "Mastered Field Guide" writes `<course>/artifacts/MASTERED_GUIDE.md` from the learner's chat sessions; it was neither git-ignored nor excluded from packs. Now both, and listed as private in AGENTS.md. FIND-51.
+- Progress select (Not Started / Studying / Lab Verified / Mastered) persists across reload. Export menu items checked.
+- Note: while checking the ignore rule I created and removed `topics/computing/systems/bash/artifacts/` in the real tree without first checking whether it existed. No `artifacts/` folder or guide exists in any course, so nothing was likely lost, but it cannot be proven. Use `git check-ignore --no-index` on non-existent paths instead.
 
 ### Batch 8 (2026-11-23, 04:15–04:50): arts generator, curriculum audit
 
