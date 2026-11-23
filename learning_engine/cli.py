@@ -364,31 +364,61 @@ def cmd_review(args):
         print(f"[*] Reviewer Model: {args.model or 'deepseek-r1:32b'}")
         print("==================================================")
         tree = get_topic_tree()
+        units = [u_data
+                 for domain, ddata in tree.items() if not args.domain or domain == args.domain
+                 for disc_data in ddata["disciplines"].values()
+                 for c_data in disc_data["courses"].values()
+                 for u_data in c_data["units"].values()
+                 if u_data["status"]["complete"]]
         verified_count = 0
         review_failed_count = 0
         total_audited = 0
-        for domain, ddata in tree.items():
-            for disc, disc_data in ddata["disciplines"].items():
-                for course, c_data in disc_data["courses"].items():
-                    for unit, u_data in c_data["units"].items():
-                        if u_data["status"]["complete"]:
-                            total_audited += 1
-                            u_path = Path(u_data["full_path"])
-                            res = review_and_fix_unit(u_path, reviewer_provider=args.provider, reviewer_model=args.model, auto_fix=args.fix)
-                            if res["has_issues"]:
-                                status_str = "[!] ISSUES"
-                            elif res.get("review_failed"):
-                                status_str = "[?] REVIEW FAILED"
-                                review_failed_count += 1
-                            else:
-                                status_str = "[✔] PASS"
-                                verified_count += 1
-                            print(f"{status_str} :: {u_data['rel_path']}")
-                            # No reviewer reachable: don't walk the whole curriculum.
-                            if review_failed_count == total_audited == 3:
-                                reason = next((r.get("error") for r in res.get("reports", []) if r.get("error")), "unknown error")
-                                print(f"[!] Stopping: the first 3 units could not be reviewed ({reason}).", file=sys.stderr)
-                                sys.exit(1)
+        workers = max(1, args.workers)
+
+        def review(u_data):
+            return review_and_fix_unit(Path(u_data["full_path"]), reviewer_provider=args.provider,
+                                       reviewer_model=args.model, auto_fix=args.fix)
+
+        # At most `workers` units are in flight, so an unreachable reviewer is
+        # noticed after a few calls rather than after the whole queue.
+        from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
+        pending_units = iter(units)
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            running = {}
+            for u_data in pending_units:
+                running[pool.submit(review, u_data)] = u_data
+                if len(running) >= workers:
+                    break
+            while running:
+                done, _ = wait(running, return_when=FIRST_COMPLETED)
+                for fut in done:
+                    u_data = running.pop(fut)
+                    total_audited += 1
+                    try:
+                        res = fut.result()
+                    except Exception as e:
+                        res = {"has_issues": False, "review_failed": True,
+                               "reports": [{"verdict": "REVIEW_FAILED", "error": str(e)[:200]}]}
+                    if res["has_issues"]:
+                        status_str = "[!] ISSUES"
+                    elif res.get("review_failed"):
+                        status_str = "[?] REVIEW FAILED"
+                        review_failed_count += 1
+                    else:
+                        status_str = "[✔] PASS"
+                        verified_count += 1
+                    print(f"{status_str} :: {u_data['rel_path']}", flush=True)
+                    # No reviewer reachable: don't walk the whole curriculum.
+                    if review_failed_count == total_audited == 3:
+                        reason = next((r.get("error") for r in res.get("reports", []) if r.get("error")), "unknown error")
+                        print(f"[!] Stopping: the first 3 units could not be reviewed ({reason}).", file=sys.stderr)
+                        for f in running:
+                            f.cancel()
+                        pool.shutdown(wait=True, cancel_futures=True)
+                        sys.exit(1)
+                    nxt = next(pending_units, None)
+                    if nxt is not None:
+                        running[pool.submit(review, nxt)] = nxt
         print("==================================================")
         print(f"[*] Peer Review Summary: {verified_count} / {total_audited} Units Verified"
               f" ({review_failed_count} could not be reviewed)")
@@ -624,6 +654,8 @@ def main():
     p_rev.add_argument("--model", "-m", default="deepseek-r1:32b", help="Reviewer model (default: deepseek-r1:32b)")
     p_rev.add_argument("--provider", "-p", choices=["ollama", "gemini", "anthropic"], help="Reviewer LLM provider (pick a family other than the one that wrote the lesson)")
     p_rev.add_argument("--fix", "-f", action="store_true", help="Auto-fix detected hallucinations and rewrite units")
+    p_rev.add_argument("--workers", "-w", type=int, default=1, help="Units reviewed at once in a full review (default: 1)")
+    p_rev.add_argument("--domain", "-d", default=None, help="Full review of one domain only")
     p_rev.set_defaults(func=cmd_review)
 
     # add

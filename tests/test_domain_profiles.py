@@ -127,3 +127,14 @@ def test_guard_reads_private_names_from_local_folders(tmp_path, monkeypatch):
     (tmp_path / "addons" / "topics" / "unlisted_w").mkdir(parents=True)
     monkeypatch.setenv("SYNAPSE_ADDONS_DIR", str(tmp_path / "addons"))
     assert g.local_private_domains(tmp_path / "topics") == ["unlisted_w", "unlisted_z"]
+
+
+def test_lint_works_on_topics_outside_the_workspace(tmp_path, monkeypatch):
+    topics = tmp_path / "outside" / "topics"
+    f = topics / "unlisted_out" / "cat" / "course" / "lesson_01_a.md"
+    f.parent.mkdir(parents=True)
+    f.write_text("# Lesson 1: A\n\nText.\n", encoding="utf-8")
+    monkeypatch.setattr(linter, "TOPICS_DIR", topics)
+    issues = linter.lint_markdown_file(f)
+    assert all(i["file"] == "topics/unlisted_out/cat/course/lesson_01_a.md" for i in issues)
+    assert linter._display_path(f) == "topics/unlisted_out/cat/course/lesson_01_a.md"

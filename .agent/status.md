@@ -198,3 +198,11 @@ Verification: `./scripts/verify_all.sh` all 6 phases (268 backend, 38 frontend u
   -> sample check -> commit -> rebuild packs -> curriculum release (needs
   approval); computing review pilot, report before `--fix`.
 - Google key: testing only, never reviews/generation.
+
+## Batch 19 (2026-11-23, after quota reset)
+- DONE: FIND-74 (`synapse lint` works with SYNAPSE_TOPICS_DIR outside the
+  workspace); `synapse review --workers N --domain D`; backlog tidied
+  (resolved-decisions section renamed, done lines removed).
+- CI: run #144 (ac3fd6a) was still queued on the Gitea runner at 16:05;
+  check it and this batch's run next session.
+- Still WAITING ON PROXY: flashcard decks, computing review pilot.

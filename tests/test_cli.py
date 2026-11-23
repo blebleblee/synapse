@@ -195,3 +195,48 @@ def test_review_accepts_an_anthropic_reviewer(monkeypatch):
     run_cli(monkeypatch, "review", "computing/systems/bash", "--provider", "anthropic", "--model", "claude-sonnet-4-6")
     assert seen.get("reviewer_provider") == "anthropic"
     assert seen.get("reviewer_model") == "claude-sonnet-4-6"
+
+
+def _review_tree(n=10, domains=("computing",)):
+    return {d: {"disciplines": {"systems": {"courses": {
+        f"c{i}": {"units": {"core": {"rel_path": f"{d}/systems/c{i}", "full_path": f"/tmp/{d}{i}",
+                                       "status": {"complete": True}}}}
+        for i in range(n)}}}} for d in domains}
+
+
+def test_parallel_review_covers_every_unit_once(monkeypatch, capsys):
+    import threading
+    import time
+    calls, active, peak = [], [0], [0]
+    lock = threading.Lock()
+
+    def review(path, **kwargs):
+        with lock:
+            calls.append(str(path))
+            active[0] += 1
+            peak[0] = max(peak[0], active[0])
+        time.sleep(0.02)
+        with lock:
+            active[0] -= 1
+        return {"has_issues": False, "reports": []}
+
+    monkeypatch.setattr(cli, "review_and_fix_unit", review)
+    monkeypatch.setattr(cli, "get_topic_tree", lambda: _review_tree(12, ("computing", "arts")))
+    run_cli(monkeypatch, "review", "--workers", "4", "--domain", "computing")
+    assert sorted(calls) == sorted(f"/tmp/computing{i}" for i in range(12))
+    assert 1 < peak[0] <= 4
+    assert "12 / 12 Units Verified" in capsys.readouterr().out
+
+
+def test_parallel_review_still_stops_early_when_reviewer_is_unreachable(monkeypatch, capsys):
+    calls = []
+
+    def failing(path, **kwargs):
+        calls.append(path)
+        raise RuntimeError("connection refused")
+
+    monkeypatch.setattr(cli, "review_and_fix_unit", failing)
+    monkeypatch.setattr(cli, "get_topic_tree", lambda: _review_tree(40))
+    assert run_cli(monkeypatch, "review", "--workers", "4") == 1
+    assert len(calls) <= 3 + 4
+    assert "connection refused" in capsys.readouterr().err

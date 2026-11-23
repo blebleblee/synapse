@@ -181,7 +181,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 ---
 
-## Needs Decision
+## Resolved Decisions (history)
 
 
 ### FIND-24: Locked First Run Showed Wizard and Login Together, Polled 401s
@@ -335,13 +335,9 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 ## Next Candidates (not yet verified)
 
-
-- **Export menu → field guide:** done in `8041726` (downloads; clearer label).
-
+Waiting for the API proxy (owner says when it works); `synapse review --workers N --domain computing` is ready for the pilot.
 
 - **Curriculum hallucinations (owner 2026-11-23: use the API when possible):** option (1), a cross-family reviewer, with `synapse review`. Gemini reviewer via the proxy (`GEMINI_BASE_URL=https://apikey.vnaipro.app`, Gemini key) or `--provider anthropic` (added). **Waiting for the API proxy** (the owner's Google key is for testing only, not reviews). One-course pilot done with it before that rule: `.agent/reports/review_pilot_sql.md`. Before scaling up: parallel reviewing (one course took 8 min sequentially). Then `computing`, report findings before `--fix`. Options (2)-(4) not chosen yet.
-- **Run buttons:** renamed to "Send to terminal" (owner decision 2026-11-23).
-
 - **UI:** all main flows exercised in batches 1–6. (Listen, translation, Add Topic, rename/delete checked in batches 4–5.) (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
 - **CLI:** checked in batch 2 (FIND-30). `pack list/install/uninstall` checked in batch 6. `add`, `generate`, `chat` checked in batch 7.
 - **Ship flashcard decks (owner: yes, 2026-11-23):** `scripts/generate_flashcard_decks.py` is ready (Sonnet 4.6 via the API; 12 cards from every lesson and the lab; skips existing decks). **Waiting for the API proxy**; then run it (539 decks, roughly $15), spot-check, commit the decks, rebuild packs, update the `curriculum` release.
@@ -355,4 +351,5 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Complete Pack Backup:** **COMPLETED** (`2779454`): every domain a pack writes into is backed up first.
 
 - **FIND-73** Private domain names in public code (generator branches, linter list, test fixtures, scope script). **Status:** **COMPLETED** (batch 18): moved to per-domain DOMAIN_PROFILE.json; guard added.
-- **FIND-74** `synapse lint` fails on topics outside the workspace (`relative_to(WORKSPACE_ROOT)` in linter.py). **Status:** OPEN, small.
+- **FIND-74** `synapse lint` failed on topics outside the workspace (`relative_to(WORKSPACE_ROOT)` in linter.py). **Status:** **COMPLETED** (batch 19): report paths fall back to the topics folder's parent.
+- **FEAT** `synapse review --workers N --domain D`: bounded parallel full review; a unit whose review raises counts as "could not be reviewed" instead of aborting the run. **Status:** **COMPLETED** (batch 19).

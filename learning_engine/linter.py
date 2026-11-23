@@ -49,6 +49,17 @@ CROSS_DOMAIN_BLEED_RULES = [
     }
 ]
 
+def _display_path(path: Path) -> str:
+    """Path for reports: relative to the workspace, or to the topics folder's
+    parent when SYNAPSE_TOPICS_DIR points outside the workspace."""
+    for base in (WORKSPACE_ROOT, Path(TOPICS_DIR).parent):
+        try:
+            return str(path.relative_to(base))
+        except ValueError:
+            continue
+    return str(path)
+
+
 def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
     issues = []
     file_path = file_path.resolve()
@@ -57,7 +68,7 @@ def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
     except Exception as e:
         return [{"file": str(file_path), "severity": "error", "message": f"Read error: {e}"}]
 
-    rel_file = str(file_path.relative_to(WORKSPACE_ROOT))
+    rel_file = _display_path(file_path)
     parts = file_path.relative_to(TOPICS_DIR).parts if file_path.is_relative_to(TOPICS_DIR) else ()
     domain = parts[0] if len(parts) >= 1 else ""
     category = parts[1] if len(parts) >= 2 else ""
@@ -283,7 +294,7 @@ def lint_curriculum(domain_filter: str = "") -> Dict[str, Any]:
                 numbers.append(n)
                 num_counts[n] = num_counts.get(n, 0) + 1
 
-        rel_dir = str(topic_dir.relative_to(WORKSPACE_ROOT))
+        rel_dir = _display_path(topic_dir)
 
         # Check for duplicate lesson numbers
         duplicates = [n for n, c in num_counts.items() if c > 1]
