@@ -145,7 +145,9 @@ def validate_generation_output(content: str) -> str:
     return repair_mermaid_diagrams(cleaned)
 
 def load_env_file():
-    # User-level private config takes precedence over inherited shell env vars
+    # Variables exported in the shell win; the files only fill in what is unset.
+    # An exported but empty value counts as unset, so a blank SYNAPSE_PASSWORD
+    # cannot cancel the password stored in the file.
     user_env = Path.home() / ".config" / "synapse" / "env"
     if user_env.exists():
         for line in user_env.read_text(encoding="utf-8").splitlines():
@@ -154,7 +156,7 @@ def load_env_file():
                 k, v = line.split("=", 1)
                 k = k.strip()
                 v = v.strip().strip("'\"")
-                if k:
+                if k and not os.environ.get(k):
                     os.environ[k] = v
 
     workspace_env = WORKSPACE_ROOT / ".env"
@@ -165,7 +167,7 @@ def load_env_file():
                 k, v = line.split("=", 1)
                 k = k.strip()
                 v = v.strip().strip("'\"")
-                if k and k not in os.environ:
+                if k and not os.environ.get(k):
                     os.environ[k] = v
 
 load_env_file()

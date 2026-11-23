@@ -110,7 +110,7 @@ synapse serve --host 0.0.0.0 --port 8000
 7. **Secrets Are Never Returned:** `GET /api/settings` omits internal `auth:*` keys (including the token signing secret) and returns API keys and passwords as a placeholder. Saving the placeholder back keeps the stored value; `auth:*` keys cannot be written through the API.
 8. **Localhost-Only Default:** When `SYNAPSE_PASSWORD` is omitted, Synapse runs without a login prompt but only answers requests addressed to `localhost`, `127.0.0.1` or `[::1]` (HTTP `403` otherwise, WebSocket code `1008`). This blocks access from other machines and DNS-rebinding attacks from websites. To serve other hosts, set `SYNAPSE_PASSWORD`; to deliberately allow a host without a password, list it in `SYNAPSE_ALLOWED_HOSTS` (comma-separated).
 
-> **Note on precedence:** values in `~/.config/synapse/env` override variables already set in your shell. If that file defines `SYNAPSE_PASSWORD`, running `SYNAPSE_PASSWORD=other synapse serve` still uses the file's password.
+> **Note on precedence:** variables already set in your shell win over `~/.config/synapse/env` (and over a workspace `.env`); the files only fill in what is unset. `SYNAPSE_PASSWORD=other synapse serve` uses `other` even if the file defines a password. An exported but empty value counts as unset, so `SYNAPSE_PASSWORD= synapse serve` still uses the file's password.
 
 
 ---

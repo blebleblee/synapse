@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Variables exported in your shell now win over `~/.config/synapse/env`; the file only fills in what is unset. Before, the file silently replaced them, so `ANTHROPIC_API_KEY=… synapse …` used the file's key. An empty exported value still counts as unset, so a blank `SYNAPSE_PASSWORD` cannot cancel the file's password.
+- `scripts/scope_domain_curriculum.py` no longer commits and pushes after writing outlines.
+
+### Added
+- `scripts/sync_addons.py` compares and copies the private curriculum checkout and the git-ignored copy in `topics/`, without overwriting newer files or deleting anything.
+- Labs for eight visual-arts courses; music analogies removed from visual-arts lessons.
+
 ## [1.3.1] - 2026-11-23
 
 ### Security
