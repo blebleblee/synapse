@@ -9,13 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- Variables exported in your shell now win over `~/.config/synapse/env`; the file only fills in what is unset. Before, the file silently replaced them, so `ANTHROPIC_API_KEY=… synapse …` used the file's key. An empty exported value still counts as unset, so a blank `SYNAPSE_PASSWORD` cannot cancel the file's password.
-- `scripts/scope_domain_curriculum.py` no longer commits and pushes after writing outlines.
+## [1.3.2] - 2026-11-23
 
 ### Added
-- `scripts/sync_addons.py` compares and copies the private curriculum checkout and the git-ignored copy in `topics/`, without overwriting newer files or deleting anything.
-- Labs for eight visual-arts courses; music analogies removed from visual-arts lessons.
+- **Full Curriculum Flashcard Coverage:** Pre-generated active recall flashcard decks (`flashcards.csv`) now ship across all 539 public courses, removing on-demand generation delays for learners.
+- **Provider Choice for Flashcard CLI:** `scripts/generate_flashcard_decks.py` now supports `--provider` (including local Ollama) to allow generating decks offline without API credentials.
+- **Topic Conversation Scoping:** Mentor "Clear conversation" clears the active topic session only; global chat history can be reset via Settings.
+
+### Fixed
+- **Ollama Thinking Models:** Short replies (mentor chats, probes) now send `think: false` on thinking models (such as `gemma4:26b`), preventing empty responses caused by budget exhaustion.
+- **Immediate Generation Cancellation:** Course generation now uses cancellable model invocation; clicking Stop halts in-flight generation within seconds instead of blocking on pending completions.
+- **Gemini 3 Compatibility:** Default provider updated to `gemini-3.8-flash` with zero-budget thinking flags on short prompts and native streaming support.
+- **Consistent Course Planning:** "Generate missing files" reuses saved `.generation_plan.json` plans, eliminating duplicate lesson naming collisions.
+- **Domain Strategy Accuracy:** Language and tooling courses now use `GeneralSoftwareStrategy` instead of compiler blueprints.
+- **Path Resolution in CLI Linting:** `synapse lint` now supports curricula located outside the active workspace directory.
+
+### Changed
+- **Codebase Simplification (FIND-75):** Decomposed high-cyclomatic-complexity branching logic across `main.py` (`get_topic_details`), `generator.py` (`scope_topic_curriculum`), and `models.py` (`get_chat_provider`) into clean, single-responsibility helpers and dispatch strategies.
+- **Domain Privacy Hardening:** Domain profiles isolated to external `DOMAIN_PROFILE.json` configs; repository guard prevents private domain references from being staged or committed.
 
 ## [1.3.1] - 2026-11-23
 
