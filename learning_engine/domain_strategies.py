@@ -500,6 +500,78 @@ class ArtsMusicStrategy(DomainStrategy):
         )
 
 
+class ArtsVisualStrategy(DomainStrategy):
+    """Strategy for Visual Arts, Visual Media, Design, and 3D Graphics.
+
+    Arts used to have only the music strategy, so drawing, design and 3D courses
+    were written for "composers and audio engineers" and got DAW labs."""
+
+    def get_toolchain(self) -> Toolchain:
+        return Toolchain(
+            environment_type=LabEnvironmentType.SOFTWARE_GUI,
+            frameworks=["Traditional media (pencil, charcoal, paint, clay)", "Raster / vector editors (Krita, GIMP, Inkscape, Photoshop, Illustrator)", "3D suites (Blender, Maya)", "Design tools (Figma, Penpot)", "Camera and editing software (DaVinci Resolve)"],
+            diagnostic_tools=["Value / greyscale check", "Histogram and waveform scopes", "Colour picker and contrast checker", "Mirror / flip-canvas check", "Critique rubric"],
+            verification_commands=[],
+            setup_instructions="Visual studio: sketchbook or canvas and drawing/painting materials, or the relevant digital tool (image editor, 3D suite, design tool, camera), with reference images and a critique rubric"
+        )
+
+    def get_blueprint(self, subtopic_title: str, category_title: str) -> CurriculumBlueprint:
+        return CurriculumBlueprint(
+            lessons=[
+                LessonTemplate(
+                    filename="lesson_01_foundations_and_principles.md",
+                    title="Lesson 1: Foundations, Visual Principles & Core Vocabulary",
+                    audience=f"Artists, designers and visual practitioners learning {subtopic_title}, from motivated beginners upward",
+                    goal="Establish the core visual principles, vocabulary and perceptual foundations the craft is built on",
+                    sections=[
+                        "## Curriculum Roadmap",
+                        "## 1. Why It Works: Perception, History & the Problem the Craft Solves",
+                        "## 2. Core Principles, Vocabulary & Rules of Thumb",
+                        "## 3. How a Piece Comes Together: Workflow Overview (include clean Mermaid diagram)"
+                    ]
+                ),
+                LessonTemplate(
+                    filename="lesson_02_techniques_and_process.md",
+                    title="Lesson 2: Techniques, Tools & Working Process",
+                    audience=f"Practitioners building hands-on skill in {subtopic_title}",
+                    goal="Teach the concrete techniques, tool settings and step-by-step process, with common mistakes and how to correct them",
+                    sections=[
+                        "## 1. Essential Techniques, Step by Step",
+                        "## 2. Tools, Materials & Settings That Matter",
+                        "## 3. Common Mistakes, Why They Happen & How to Fix Them"
+                    ]
+                ),
+                LessonTemplate(
+                    filename="lesson_03_composition_and_critique.md",
+                    title="Lesson 3: Composition, Style & Critique",
+                    audience=f"Practitioners refining their {subtopic_title} work toward a personal, finished standard",
+                    goal="Develop composition, intent and style, and a repeatable way to critique and improve finished work",
+                    sections=[
+                        "## 1. Composition, Hierarchy & Visual Storytelling",
+                        "## 2. Style, Intent & Studying Master Works",
+                        "## 3. Critique Method, Iteration & Presenting Work"
+                    ]
+                ),
+                LessonTemplate(
+                    filename="labs.md",
+                    title="Studio Practice Labs",
+                    audience=f"Hands-on {category_title} learner working in a studio or with the relevant digital tool",
+                    goal=f"Practical exercises that build {subtopic_title} skill through making, observing and critiquing real work",
+                    sections=[
+                        "## Objective & Studio Setup",
+                        "## Exercise 1: Observation & Fundamentals Drill",
+                        "## Exercise 2: Technique Study, Step by Step",
+                        "## Exercise 3: Finished Piece & Self-Critique",
+                        "## Critique Checklist & Common Fixes"
+                    ]
+                )
+            ],
+            toolchain=self.get_toolchain(),
+            style_directives=self.get_base_style_directive(),
+            latex_policy="optional"
+        )
+
+
 class NaturalSciencesStrategy(DomainStrategy):
     """Strategy for Physics, Chemistry, Biology, Astronomy, and Earth Sciences."""
 
@@ -787,6 +859,11 @@ class GenericDomainStrategy(DomainStrategy):
 # STRATEGY REGISTRY & DISPATCHER
 # ============================================================================
 
+# Arts categories that are not music (see topics/arts/). creative_software stays
+# with music: most of its courses are DAWs (Ableton, Cubase, Logic Pro).
+VISUAL_ARTS_CATEGORIES = {"visual_arts", "visual_media", "design", "3d_graphics"}
+
+
 class StrategyRegistry:
     """Central registry mapping domain/discipline pairs to dedicated strategies."""
 
@@ -823,6 +900,10 @@ class StrategyRegistry:
     def get_strategy(self, domain: str, category: str) -> DomainStrategy:
         domain_lower = domain.lower()
         cat_lower = category.lower()
+
+        # Arts: music categories keep the music strategy; visual ones do not.
+        if domain_lower == "arts" and cat_lower in VISUAL_ARTS_CATEGORIES:
+            return ArtsVisualStrategy()
 
         # 1. Specialized computing strategies
         if domain_lower == "computing":

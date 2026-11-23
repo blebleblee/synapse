@@ -63,6 +63,15 @@ BOOK_STYLE_DIRECTIVE = """CRITICAL STYLE & TONE DIRECTIVE:
 - Use lists ONLY when providing sequential step-by-step commands or parameter reference tables. All conceptual and architectural explanations must be written in full narrative prose.
 - RAW OUTPUT ONLY: Do NOT include conversational preambles (e.g., 'Here is your lesson', 'Sure', etc.), HTML tags, or code fences (e.g. ```markdown ... ```) around the entire output. Output the raw Markdown text directly."""
 
+def _is_music_course(domain: str, category: str) -> bool:
+    """Music courses: the music-like domains of the outline flow, and arts
+    categories other than the visual ones."""
+    from .domain_strategies import VISUAL_ARTS_CATEGORIES
+    if domain in ("composing", "songwriting", "daw", "music"):
+        return True
+    return domain == "arts" and category.lower() not in VISUAL_ARTS_CATEGORIES
+
+
 def scope_topic_curriculum(
     domain: str,
     category: str,
@@ -202,6 +211,27 @@ KRITICKÁ PRAVIDLA PRO DYNAMICKOU ROVNOVÁHU A STRUKTURU:
 - Pište VÝHRADNĚ 100% SPISOVNOU ČEŠTINOU s použitím standardního českého názvosloví pro obor {domain_cz} (RVP pro gymnázia v ČR).
 - STRIKTNÍ IZOLACE OBORU: Zaměřte se výhradně na {domain_cz} pro téma '{subtopic_title}' v okruhu '{category_title}'.
 - ABSOLUTNĚ ZAKÁZÁNO: Jakýkoliv IT žargon (Linux, servery, Kubernetes, Docker, kódování) a jakýkoliv hudební žargon (hudba, DAW, Berklee, syntezátory, kytary)."""
+                        elif not _is_music_course(domain, category):
+                            # Every other course used to fall through to the music
+                            # template below (Berklee professor, DAW shortcuts).
+                            structure_text = f"""MASTERCLASS CHAPTER BLUEPRINT:
+Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}' in {category_title}.
+Write like an experienced practitioner and teacher of {category_title}: articulate, rigorous, and immediately practical.
+
+CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
+- Blend rich, insightful narrative prose with clean, scannable bullet points, numbered step-by-step procedures, and actionable checklists.
+- DO NOT write an unbroken wall of dense text. Break down concepts with clear bullet points, comparative tables, and bold highlights.
+- Structure your chapter with these organic, topic-specific headings:
+  1. Why It Matters: The problem this concept solves and the intuition behind it, with all jargon explained in plain English.
+  2. How It Works: Clear exposition of the core mechanics and principles. Include a Mermaid diagram (```mermaid ... ```) when a process or structure is easier to see than to read.
+  3. Worked Examples: Two concrete, realistic examples worked through step by step.
+  4. Reference Table: A clear Markdown table summarizing the key parameters, options or distinctions.
+  5. Common Mistakes & How to Fix Them.
+  6. Practice Exercise: A concrete exercise the learner can do now ({hands_on}).
+  7. Key Takeaways: Conclude with 4-5 memorable rules of thumb."""
+                            relevance_mandate = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
+- Focus 80% on actionable, hands-on practice of '{subtopic_title}' in '{category_title}'.
+- STRICT TOOLCHAIN ISOLATION: Use ONLY tools, techniques, and vocabulary native to '{category_title}'. Do not borrow examples, tools or jargon from unrelated fields."""
                         else: # composing, music, daw
                             structure_text = f"""MUSIC PRODUCTION MASTERCLASS CHAPTER BLUEPRINT:
 Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}'.

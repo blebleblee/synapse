@@ -85,3 +85,55 @@ def test_generic_domain_strategy_dispatch():
     strategy_econ = GLOBAL_REGISTRY.get_strategy("economics", "macroeconomics")
     assert isinstance(strategy_econ, GenericDomainStrategy)
     assert strategy_econ.domain == "economics"
+
+
+MUSIC_TERMS = ["daw", "voice-leading", "composer", "audio engineer", "timbre", "mixdown", "orchestration", "musician"]
+
+
+def test_visual_arts_courses_do_not_get_the_music_blueprint():
+    """Every arts course got the music blueprint: visual lessons were written
+    for "composers, music producers, audio engineers", and the labs of 18
+    visual-arts, design and 3D courses were DAW / voice-leading / mixing
+    exercises (e.g. UX Design labs: "Timbre Synthesis, Waveform Shaping")."""
+    for category, subtopic in [("visual_arts", "sculpture"), ("design", "ux_design"),
+                               ("visual_media", "photography"), ("3d_graphics", "blender")]:
+        strategy = GLOBAL_REGISTRY.get_strategy("arts", category)
+        assert not isinstance(strategy, ArtsMusicStrategy), category
+        blueprint = strategy.get_blueprint(subtopic.replace("_", " ").title(), category.replace("_", " ").title())
+        assert blueprint.lessons[0].audience
+        modules = build_topic_modules("arts", category, subtopic, subtopic.replace("_", " ").title())
+        assert [m["filename"] for m in modules][-1] == "labs.md"
+        for m in modules:
+            text = m["prompt"].lower()
+            for term in MUSIC_TERMS:
+                assert term not in text, f"music term {term!r} in {category}/{m['filename']} prompt"
+        for lesson in blueprint.lessons:
+            for term in MUSIC_TERMS:
+                assert term not in lesson.audience.lower()
+
+
+def test_music_categories_keep_the_music_blueprint():
+    for category in ["music_production", "music_performance", "composition", "creative_software"]:
+        assert isinstance(GLOBAL_REGISTRY.get_strategy("arts", category), ArtsMusicStrategy), category
+
+
+def test_topic_outline_lessons_use_the_music_template_only_for_music(tmp_path):
+    """With a TOPIC_OUTLINE.md, every course that was not SUSE, studio
+    hardware, languages or maths got the "MUSIC PRODUCTION MASTERCLASS"
+    chapter template (Berklee professor, DAW shortcuts, commercial records)."""
+    from learning_engine.generator import scope_topic_curriculum
+    outline = "\n".join(
+        f"* **Lesson {i}: Topic {i}**\n    * *Focus:* focus {i}\n    * *Hands-On:* exercise {i}\n" for i in (1, 2, 3)
+    )
+    cases = [("computing", "infrastructure", False), ("arts", "visual_arts", False),
+             ("business", "markets", False), ("arts", "music_production", True)]
+    for domain, category, music in cases:
+        d = tmp_path / domain / category / "course"
+        d.mkdir(parents=True)
+        (d / "TOPIC_OUTLINE.md").write_text(outline, encoding="utf-8")
+        modules = scope_topic_curriculum(domain, category, "course", "Course", subtopic_dir=d)
+        lessons = [m for m in modules if m["filename"].startswith("lesson_")]
+        assert len(lessons) == 3, (domain, category)
+        for m in lessons:
+            assert ("MUSIC PRODUCTION MASTERCLASS" in m["prompt"]) is music, (domain, category)
+            assert ("Ableton" in m["prompt"]) is music, (domain, category)
