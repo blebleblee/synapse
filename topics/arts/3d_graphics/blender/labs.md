@@ -152,7 +152,7 @@ Connect the **Principled BSDF** output (the green "BSDF" port on the right) to t
 
 Your node graph should now look like this (in ASCII representation):
 
-```
+```text
 Principled BSDF node:
   Base Color: RGB(0.42, 0.40, 0.39)
   Metallic: 0.0
@@ -219,7 +219,7 @@ Render a final frame at 512 samples. Compare it to your reference photograph sid
 
 Document your final shader parameters in a text file:
 
-```
+```text
 Ceramic Mug - Material Parameters:
 Base Color: RGB(0.42, 0.40, 0.39) [sRGB-linear]
 Metallic: 0.0
@@ -277,7 +277,7 @@ Add the following nodes (Shift+A in the Compositor):
 
 Connect the nodes in this order:
 
-```
+```text
 Render Layers
   [Diffuse] ──→ Mix RGB (Factor: 0.7)
   [Specular] ──┘
@@ -316,7 +316,7 @@ To isolate the mug from the background, use **Cryptomatte Object** to create a m
 
 Connect:
 
-```
+```text
 Render Layers [Image] ──→ Viewer (temporary preview)
 Render Layers [Cryptomatte Object] ──→ Cryptomatte Object node
 Cryptomatte Object [Matte] ──→ Mix [Factor]
@@ -352,7 +352,7 @@ Also export a **PNG** for quick viewing and critique: **Image > Save As**, choos
 Create a final critique document with the following sections:
 
 **Render Specifications:**
-```
+```text
 File: mug_render_final.png
 Resolution: 1920 × 1080 pixels
 Render Engine: Cycles
@@ -362,7 +362,7 @@ Render Time: [insert actual time in minutes/hours]
 ```
 
 **Material Parameters (Final):**
-```
+```text
 Base Color: RGB(0.42, 0.40, 0.39)
 Metallic: 0.0
 Specular: 0.5
@@ -372,7 +372,7 @@ Normal Map: None
 ```
 
 **Lighting Setup:**
-```
+```text
 Key Light: Sun, Energy 2.0, Rotation (X: 45°, Z: 0°)
 Fill Light: Sun, Energy 1.0, Rotation (X: 30°, Z: 90°)
 Back Light: Sun, Energy 0.8, Rotation (X: 45°, Z: 225°)
@@ -535,7 +535,7 @@ Print and use this rubric to score your finished render on a scale of 1 (poor) t
 
 By the end of all three exercises, your project folder should contain:
 
-```
+```text
 project_folder/
 ├── mug_model_exercise1.blend          (Orthographic blocking, topology check)
 ├── mug_model_exercise2.blend          (Shaded model, viewport render)

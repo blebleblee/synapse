@@ -130,7 +130,7 @@ Materials carry meaning. A space lined in exposed concrete and steel reads as in
 
 Create a material legend for your reference space. Using your color-coded annotations from Part A, list each distinct material:
 
-```
+```text
 FLOORING:
   - Light oak strip flooring (horizontal grain, matte finish)
   - Ceramic tile at entry (gray, 400 × 400 mm modules, slight sheen)
@@ -630,7 +630,7 @@ Create an A2-sized (420 × 594 mm) or digital equivalent (3000 × 4200 pixels) a
 - Add typography: Use a sans-serif typeface (Helvetica, Roboto, or Inter) in 36 pt for a headline and 18 pt for 2–3 descriptive words.
 
 **Example layout:**
-```
+```text
 [Large primary interior image—60% left]  [Material swatches—top right, 3 × 3 grid]
 [Detail: texture close-up—bottom left]   [Secondary interior reference—middle right]
 [Light study image—bottom center]        [Abstract color composition—bottom right]

@@ -68,7 +68,7 @@ Create a document (Google Docs, Markdown file, or PDF) with the following struct
 
 **Mental Model Sketch:** On a single page, hand-draw a simple flow diagram showing how they currently think about the process. This need not be a formal flowchart. It can be boxes and arrows, or a hand-written series of steps. The goal is to externalize their internal logic, not to create a perfect diagram. Example:
 
-```
+```text
 Need appointment
    ↓
 Find practice contact info (Google)
@@ -121,7 +121,7 @@ Before opening your design tool, map the entire information architecture on pape
 
 On a single large sheet (or multiple taped sheets), draw a tree diagram showing every screen the user will need to reach. Begin with a root node labeled "Entry Point" and branch downward. For the appointment-booking example, your map might look like this:
 
-```
+```text
                         Entry Point (App Home)
                                |
                     ___________|___________
@@ -169,7 +169,7 @@ For each sketch, establish a consistent **spatial grid.** Most interfaces use a 
 
 Example for the "New Patient Form" screen (mobile, 8-column grid):
 
-```
+```text
 ┌────────────────────┐
 │   [App Logo / Back]│  Header: 1 row
 ├────────────────────┤
@@ -306,7 +306,7 @@ Wireframes are not specifications until you annotate them. Add text labels and n
 For each screen, add a text box at the bottom (or in a separate layer called "Annotations") with the following information:
 
 **For Entry Point:**
-```
+```text
 Screen: Entry Point
 Purpose: User determines whether they are new or existing patient.
 Decision: This branching must be immediately clear. The question phrasing 
@@ -316,7 +316,7 @@ Fallback: "Help" link connects to FAQ or chat support.
 ```
 
 **For New Patient Form:**
-```
+```text
 Screen: New Patient Form
 Purpose: Collect required information before booking.
 Validation: All fields are required. Show error state if user attempts 
@@ -328,7 +328,7 @@ On continue, navigate to Review screen.
 ```
 
 **For Review Screen:**
-```
+```text
 Screen: Appointment Review
 Purpose: User confirms all information before final booking.
 Read-only: All fields display user input but are not editable on this screen.
@@ -337,7 +337,7 @@ On confirm, navigate to Confirmation screen and trigger backend booking.
 ```
 
 **For Confirmation Screen:**
-```
+```text
 Screen: Confirmation
 Purpose: Confirm booking is complete and provide next steps.
 Calendar export: "Add to Calendar" button exports appointment as .ics file 
@@ -398,7 +398,7 @@ A usability test is a structured observation in which a user attempts to complet
 
 Create a **screening questionnaire** (Google Form or Typeform) to verify participants match your persona:
 
-```
+```text
 1. Have you booked a medical appointment online in the past 6 months?
 2. What device do you use most often: smartphone, tablet, or computer?
 3. What operating system: iOS, Android, macOS, Windows, or Linux?
@@ -411,7 +411,7 @@ Recruit participants who answer "yes" to questions 1 and 4, as they have relevan
 
 **Write a test script** to ensure consistency across participants. Example:
 
-```
+```text
 Greeting & Consent (2 minutes):
 "Thank you for coming. I'm testing a new appointment-booking interface. 
 I want to watch you try to use it and hear your thoughts. There are no 
@@ -450,7 +450,7 @@ As the participant works, observe and note:
 
 Example observation note:
 
-```
+```text
 Participant 1 (Marcus, 35, busy parent):
 - Arrived at Entry Point. Immediately saw "New Patient" button. Clicked it—correct choice.
 - On Form screen, filled Name and DOB fields without issue. 
@@ -471,7 +471,7 @@ Participant 1 (Marcus, 35, busy parent):
 
 Conduct 3–5 tests. After each test, review your notes and jot one-line summaries of key issues. Example:
 
-```
+```text
 Participant 1: Ambiguous "Reason for Visit" label; unclear field purpose.
 Participant 2: Same issue with "Reason for Visit." Also, didn't see the 
   "Help" link at bottom of Entry Point (scrolled past without noticing).
@@ -491,7 +491,7 @@ After testing, synthesize your findings into a **issues report** with three cate
 
 Each critical issue has: description, number of participants affected, severity (why it matters), and location (which screen).
 
-```
+```text
 Issue 1: "Reason for Visit" label is ambiguous.
 Affected: 3 of 5 participants (60%).
 Severity: User is unsure whether they should enter the reason (symptom) 
@@ -503,7 +503,7 @@ or for scheduling purposes?" (Participant 1)
 
 **Minor Issues (create friction but do not block completion):**
 
-```
+```text
 Issue 2: "Help" link is not discovered by users.
 Affected: 2 of 5 participants (40%).
 Severity: Provides fallback support for confused users, but placement is 
@@ -515,7 +515,7 @@ see or interact with the link.
 
 **Positive Observations (what worked well):**
 
-```
+```text
 Positive 1: "Add to Calendar" button was immediately understood and accessed.
 Affected: 4 of 5 participants (80%).
 Severity: Calendar integration is a key success metric. High success here 
@@ -529,7 +529,7 @@ Create a prioritized list of changes. Address critical issues first, then minor 
 
 **Priority Score = (Number of Participants Affected / Total Participants) × Severity (1–5)**
 
-```
+```text
 Issue 1 (Reason for Visit): (3/5) × 5 = 3.0 — Highest priority.
 Issue 2 (Help link): (2/5) × 2 = 0.8 — Lower priority.
 Positive 1: Continue.
@@ -542,7 +542,7 @@ Based on your priority list, make specific changes to your wireframes. Document 
 **Revision 1: "Reason for Visit" label clarity**
 
 **Before:**
-```
+```text
 Label: "Reason for Visit"
 Field type: Dropdown
 Options: "Annual Exam," "Acute Problem," "Referral Follow-up"
@@ -550,7 +550,7 @@ Helper text: None
 ```
 
 **After:**
-```
+```text
 Label: "Reason for Visit"
 Field type: Dropdown
 Helper text: "Select the type of appointment you need. This helps us schedule 
@@ -572,14 +572,14 @@ In Figma, update the wireframe:
 **Revision 2: "Help" link visibility**
 
 **Before:**
-```
+```text
 Location: Bottom of Entry Point screen (requires scroll on mobile)
 Styling: 12px blue link text, standard
 Visibility: Below fold (60% of users scrolled past without seeing)
 ```
 
 **After:**
-```
+```text
 Location: Entry Point screen, below buttons but before footer
 Styling: Same (12px blue link, maintains visual hierarchy)
 Visibility: Include in a small "Need help?" section with a question icon (?) 
@@ -597,13 +597,13 @@ Change: Move the help link slightly higher and contextualize it with a question-
 **Revision 3: Confirmation number visibility**
 
 **Before:**
-```
+```text
 Confirmation number is displayed in a text field: 
 "APT-2024-567890" (12px gray text, left-aligned within card)
 ```
 
 **After:**
-```
+```text
 Confirmation number is displayed in a larger, more prominent code block:
 - Background: Light gray (#F5F5F5)
 - Border: 1px solid #CCCCCC
@@ -627,7 +627,7 @@ With revisions made, conduct a second round of testing with 2–3 new participan
 
 Document the second round of results in a brief report comparing to the first round. Example:
 
-```
+```text
 Revision Validation:
 
 Issue 1 (Reason for Visit) — Revised:
@@ -656,7 +656,7 @@ Create a final version of your wireframes incorporating all revisions. In Figma,
 
 For each revised screen, add an annotation layer with the revision rationale:
 
-```
+```text
 Screen: New Patient Form (Revised)
 Changes from original:
 1. "Reason for Visit" field: Added helper text clarifying field purpose. 
@@ -734,7 +734,7 @@ Write a summary report (2–3 pages) documenting your complete design process fo
 
 Example excerpt:
 
-```
+```text
 Research Summary:
 User persona: Sarah, 38, busy parent. Goal: Book pediatrician appointment 
 in under 3 minutes. Key pain point: Unclear new vs. existing patient flow. 

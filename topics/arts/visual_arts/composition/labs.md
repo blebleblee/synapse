@@ -282,7 +282,7 @@ If working with color, develop a cohesive palette using your chosen harmonious r
 - Triadic (three hues equally spaced, 120 degrees apart; use one as dominant, two as secondary/accents).
 
 Document your palette: on a 5×7-inch card or digital document, paint or display five color swatches, labeled by hue name and RGB/HSV values. Example:
-```
+```text
 Primary (Focal): Deep Red (RGB: 170, 20, 30 | HSV: 356°, 82%, 67%)
 Secondary (Mid-ground): Orange-Red (RGB: 215, 100, 50 | HSV: 20°, 77%, 84%)
 Tertiary (Background): Pale Orange (RGB: 240, 180, 120 | HSV: 30°, 50%, 94%)
@@ -508,7 +508,7 @@ Conduct peer reviews in small groups (2–3 artists) using this framework:
 
 ### Critique Form (Printable or Digital)
 
-```
+```text
 CRITIQUE FORM: Visual Composition and Harmonic Framing
 
 Artist: ________________________     Date: ____________

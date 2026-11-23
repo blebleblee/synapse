@@ -243,7 +243,7 @@ As each render completes, stand back and observe from arm's length. Where is lig
 
 Export and examine your light path passes. In the Compositor (Shift+F3), create a node setup to view each pass:
 
-```
+```text
 File Input (renders/03_scene_final_512.exr)
 ├─ Combined → Viewer (displays final image)
 ├─ Diffuse Direct → Viewer (direct illumination on diffuse surfaces)

@@ -42,7 +42,7 @@ For each timestamp, right-click on the frame in the viewer and select **Capture 
 
 Write a one-paragraph observation in `Exposure_Log.txt` for each frame:
 
-```
+```text
 Timestamp: 00:01:23:15
 Type: Overexposed Highlight
 Analysis: The waveform peak at this window reaches 950 IRE. The bright area is a south-facing window at midday. 
@@ -86,7 +86,7 @@ Compare the log waveform to the LUT-corrected waveform by toggling the LUT on an
 
 Write in `Exposure_Log.txt`:
 
-```
+```text
 Timestamp: (timestamp of your log clip start)
 Log Space vs. Display-Referred Comparison
 Raw log appearance: washed, greenish, low saturation
@@ -131,7 +131,7 @@ Ingest all three shots into DaVinci Resolve. Create a timeline named `Capture_An
 
 For each shot, pause at the midpoint and document in a file named `Capture_Report.txt`:
 
-```
+```text
 SHOT 1: Daytime Interior with Bright Window
 Duration: 10 seconds
 Subject metering: ~45% brightness (healthy)
@@ -187,7 +187,7 @@ In a new version, try **creating rhythm through repetition**: **WS → MS → CU
 
 Document your three edits in a file named `Editorial_Decisions.txt`:
 
-```
+```text
 EDIT 1: Continuity Order
 Sequence: WS → MS → CU Hands → Reaction CU → Insert CU
 Cut timing: 3 sec / 3 sec / 2 sec / 2 sec / 2 sec
@@ -221,7 +221,7 @@ If you don't have this footage, find a **TED Talk, interview clip, or dramatic m
 
 Place the monologue into the timeline as follows, cutting every 10–15 seconds:
 
-```
+```text
 Timeline version 1: Static Wide Shot
 One continuous 60-second wide shot. No cuts. The actor speaks the entire monologue at the same scale.
 
@@ -238,7 +238,7 @@ cut to close-up to magnify that moment. Where the actor is contemplative, cut to
 
 For each version, play it at full resolution and assess in `Editorial_Decisions.txt`:
 
-```
+```text
 VERSION 1: Static Wide Shot
 Duration: 60 seconds, one cut-free take
 Effect: Meditative, distant. The viewer observes the actor as though watching from across a room. 
@@ -296,7 +296,7 @@ Collect **five disparate still images or short clips** (5–10 seconds each). Th
 
 Place Sequence A into the timeline with **1-second cuts** between each image:
 
-```
+```text
 Clock 6 AM (1 sec) → Morning doorway (1 sec) → Shortening shadows (1 sec) → Coffee pour (1 sec) → High sun (1 sec)
 Total: 5 seconds
 Effect: Compressed time; the viewer reconstructs the passage of time from visual cues (sun position, shadows, coffee ritual).
@@ -305,7 +305,7 @@ No single image *shows* time passing; the *rhythm of cuts* implies time passing.
 
 Now place Sequence B with **varying cut lengths**:
 
-```
+```text
 Car arriving (2 sec) → Footsteps (1.5 sec) → Doorway (1 sec) → Hallway (0.5 sec) → Office door (1 sec)
 Total: 6 seconds
 Effect: Accelerating rhythm (stretching time for the approach, compressing time as destination nears). 
@@ -314,7 +314,7 @@ The viewer feels building momentum and tension.
 
 Finally, place Sequence C with **alternating shot lengths to emphasize conflict**:
 
-```
+```text
 Hands with object A (0.5 sec) → Hands with object B (0.5 sec) → Object A (0.5 sec) → Object B (0.5 sec) → 
 Face indecision (1.5 sec) → Split-screen juxtaposition (2 sec) → Single object chosen (1 sec)
 Total: 7.5 seconds
@@ -324,7 +324,7 @@ provide moments of reflection. The final single object feels resolved.
 
 Document in `Editorial_Decisions.txt`:
 
-```
+```text
 MONTAGE SEQUENCE A: Compressed Time
 Principle: Soviet montage of time. Each shot is a visual marker of temporal progression. 
 The cuts do not show continuous action; they show *discrete moments* that the viewer's brain combines into the experience of time passing.
@@ -421,7 +421,7 @@ Play the timeline with all three shots in sequence. The viewer will see **three 
 
 This demonstrates that **color grading is not uniform application of correction**; each shot is a *distinct aesthetic choice* based on its content and narrative role. Document in a file named `Grade_Notes.txt`:
 
-```
+```text
 SHOT 1: Primary Balance Application
 Input LUT: Rec.709 (or skipped if already corrected)
 Lift: +10 (opens shadow detail without crushing)
@@ -503,7 +503,7 @@ The result: the color split is now *designed*, not accidental. Each side of the 
 
 Document in `Grade_Notes.txt`:
 
-```
+```text
 SECONDARY CORRECTIONS: HSL Qualifier Workflow
 
 SHOT 1 - Skin Tone Adjustment (Node 4)
@@ -564,7 +564,7 @@ Switch to the **Fairlight Audio Mixer** (menu option in top right: Fairlight). T
 
 For the three-shot sequence (Daylight Interior, Low-Key Interior, Mixed Lighting), plan the audio as follows:
 
-```
+```text
 SHOT 1 (Daylight Interior, 10 seconds):
 Audio layer 1 (Ambience): Room tone (ventilation hum, distant street sound) at -18 dB (quiet background)
 Audio layer 2 (Dialogue): Actor greeting ("Good morning, I'm here to meet with you") timed to match mouth movement
@@ -603,7 +603,7 @@ Set a **click track** (metronome) at 60 BPM. Play the timeline and record new di
 
 Document the audio mix in a file named `Audio_Mix_Notes.txt`:
 
-```
+```text
 AUDIO SYNCHRONIZATION LOG
 
 SHOT 1: Daylight Interior (00:00:00:00 to 00:00:10:00)
@@ -680,7 +680,7 @@ Repeat the export process with:
 
 After all exports complete, you will have three files:
 
-```
+```text
 Lab_03_Sequence_Master_ProRes422HQ.mov        (~2–4 GB, 10-bit, lossless quality)
 Lab_03_Sequence_Web_H264_1080p.mp4            (~150–300 MB, 8-bit, web quality)
 Lab_03_Sequence_Mobile_H264_720p.mp4          (~40–80 MB, 8-bit, mobile quality)
@@ -688,7 +688,7 @@ Lab_03_Sequence_Mobile_H264_720p.mp4          (~40–80 MB, 8-bit, mobile qualit
 
 Document the export settings in a file named `Export_Log.txt`:
 
-```
+```text
 EXPORT SETTINGS AND DELIVERY FORMATS
 
 MASTER FILE (Archival and Professional Use)

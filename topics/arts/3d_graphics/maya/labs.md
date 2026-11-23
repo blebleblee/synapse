@@ -12,7 +12,7 @@ You will need Autodesk Maya 2024 or later (the principles hold for 2022 and 2023
 
 Create a project directory structure that mirrors professional studios:
 
-```
+```text
 ProjectName/
 ├── scenes/
 │   ├── 01_model_base.mb
@@ -109,7 +109,7 @@ Repeat for legs: create a hip-to-knee-to-ankle-to-toe chain on the left, rename 
 
 Your skeleton should now look like this in the Outliner:
 
-```
+```text
 Spine_1_Jnt
 ├── Spine_2_Jnt
 │   └── Spine_3_Jnt (or Neck_Base_Jnt)
@@ -581,7 +581,7 @@ After completing all three exercises, perform a final review:
 
 A production rig is never "finished"—it evolves as animators discover edge cases or new requirements. Document all changes in a text file: `data/rig_changelog.txt`. Each time you refine the rig, note the date, the change, and the revised file version:
 
-```
+```text
 RIG CHANGELOG
 =============
 

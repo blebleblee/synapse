@@ -115,7 +115,7 @@ For example, a red error message on a white background has adequate luminance se
 
 Create a systematic color palette using Figma's color styles. On a new artboard called `Color System`, organize your palette into named groups:
 
-```
+```text
 Primary
 ├── Primary-50 (#EFF6FF)
 ├── Primary-100 (#DBEAFE)
@@ -212,7 +212,7 @@ Create a new Figma file called `typographic-system-build-[date]`. Invite no coll
 
 On the first page (name it `Scale Reference`), establish your modular scale. For this exercise, use the **Major Third ratio (1.25)** starting from a 16px body baseline. Generate the full scale:
 
-```
+```text
 Display Large:  16 × 1.25^5 = 49px (rounded)
 Display:        16 × 1.25^4 = 39px (rounded)
 Heading Large:  16 × 1.25^3 = 31px (rounded)
@@ -305,7 +305,7 @@ Work in the same Figma file or a new file called `color-system-build-[date]`. On
 
 From your primary color (#3B82F6), generate a ramp of lighter (tints) and darker (shades) versions. The goal is to have multiple intensities for use in different contexts (hover states, disabled states, backgrounds, text). Use a tool like **Chroma.js** or manually adjust in Figma's color picker:
 
-```
+```text
 Primary-50:   #EFF6FF (lightest tint, background use)
 Primary-100:  #DBEAFE
 Primary-200:  #BFDBFE
@@ -322,7 +322,7 @@ Create 100×100px swatches for each, stacked vertically on the canvas. Label eac
 
 Repeat for a secondary accent color (optional) and your neutral grayscale:
 
-```
+```text
 Gray-50:      #F9FAFB
 Gray-100:     #F3F4F6
 Gray-200:     #E5E7EB
@@ -337,7 +337,7 @@ Gray-900:     #111827 (darkest, body text on white)
 
 Create semantic status colors:
 
-```
+```text
 Success:      #10B981 (green, pass, confirmed)
 Warning:      #F59E0B (amber, caution, pending)
 Error:        #EF4444 (red, failure, alert)
@@ -368,7 +368,7 @@ In the Assets panel, create color styles for each palette entry. For Primary-500
 
 Repeat for every color in your palette. You will end up with a hierarchical structure:
 
-```
+```text
 Colors
 ├── Primary
 │   ├── Primary / 50
@@ -397,7 +397,7 @@ Now, if you change the central "Neutral / Gray-900" style to a different hex, al
 
 On a page called `Color System Guide`, create a written reference:
 
-```
+```text
 COLOR SYSTEM GUIDE
 
 Base Color: Blue (#3B82F6)
@@ -435,7 +435,7 @@ Work in a new Figma file called `grid-system-build-[date]`. On the first page, n
 
 Web design typically uses breakpoints at standard viewport widths where the layout changes significantly. Define yours:
 
-```
+```text
 BREAKPOINT CONFIGURATION
 
 Mobile:         375–569px  (single column, 4-column grid option)
@@ -453,7 +453,7 @@ For each breakpoint, specify:
 
 Calculate these values. Begin with the **base unit** of 8px. All spacing must be a multiple of 8px.
 
-```
+```text
 MOBILE (375px viewport):
   Columns:      4
   Margin:       16px (2 units)
@@ -502,7 +502,7 @@ Verify the calculated column width matches what Figma shows. If not, adjust manu
 
 On a new page called `Spacing System`, establish a spacing scale. Use multiples of 8px:
 
-```
+```text
 space-1:  4px   (half unit, rare use)
 space-2:  8px   (1 unit, default component margin)
 space-3:  12px  (1.5 units)
@@ -584,7 +584,7 @@ Build this layout showing the responsive transformation.
 
 On a final page called `Responsive Rules`, write plain-language rules for how layouts adapt:
 
-```
+```text
 RESPONSIVE LAYOUT RULES
 
 1. At tablet (570px), multi-column grids collapse:
@@ -633,7 +633,7 @@ A card is a contained content unit. Define its variants based on use case:
 
 On your 1440px desktop artboard, create a frame 400px wide, auto-height called `Card – Article – Base`:
 
-```
+```text
 Frame: Card – Article – Base
   Width: 400px
   Height: auto (measure after content is placed)
@@ -723,7 +723,7 @@ You now have one `Card – Article` component with three breakpoint variants. Wh
 
 On your artboards, create a second card type for displaying metrics. This card is typically smaller and more graphical:
 
-```
+```text
 Frame: Card – Data – Base
   Width: 200px
   Height: 180px (fixed height for dashboard grid)
@@ -945,7 +945,7 @@ Place all three mockups side-by-side on a new page called `Responsive Review`. A
 
 Add a legend:
 
-```
+```text
 RESPONSIVE ANNOTATIONS:
 
 Mobile (375px):

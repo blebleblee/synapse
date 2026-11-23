@@ -94,7 +94,7 @@ Create a new document in a text editor or spreadsheet. List each key frame and r
 
 For example:
 
-```
+```text
 Frame 0: Release (ball at shoulder height)
 Frame 24: Contact (ball lowest, fully compressed)
 Duration: 24 frames = 1.0 second (fall from shoulder height)
@@ -144,7 +144,7 @@ The key poses in a walk are not evenly spaced. The **contact-to-passing** phase 
 
 Draw a simple stick-figure timeline on paper:
 
-```
+```text
 Frame 0 (Contact L):  |  ||
                        |/  \
                        

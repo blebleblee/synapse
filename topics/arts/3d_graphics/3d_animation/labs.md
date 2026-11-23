@@ -18,7 +18,7 @@ By the end of this lab cycle, you will have shipped a fully rigged and animated 
 **File Organization:**
 Create a project folder with this structure:
 
-```
+```text
 project_character/
 ├── 01_references/
 │   ├── motion_video.mp4
@@ -503,7 +503,7 @@ Export to `04_exports/character_final.fbx`.
 
 Create a text file `RIG_DOCUMENTATION.txt`:
 
-```
+```text
 CHARACTER RIG: [Character Name]
 Rig Date: [Date]
 Animator/Rigger: [Your Name]

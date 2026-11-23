@@ -71,7 +71,7 @@ Compare the graded version (`Lab1_graded.mp4`) to your original source (`lab1_so
 
 Write down three observations in a text file called `Lab1_observations.txt`. Example:
 
-```
+```text
 Observation 1: The shadows lifted nicely with the gamma adjustment, 
 but the highlights now look slightly blown in the bright window area. 
 Consider pulling down the top-right of the curves to control highlights.
@@ -109,7 +109,7 @@ Play the timeline from start to finish. Watch the waveform closely. You will not
 
 After marking, examine each shot individually. Click on a marker, and Resolve will jump to that frame. Hover over the clip in the timeline and look at the **clip selector** (the frame counter at the bottom center of the Edit page) to see the exact timecode. Take screenshots or notes of the color characteristics of each shot. Example notes:
 
-```
+```text
 Shot 1 (00:00:00 - 00:00:45): Indoor tungsten lighting, warm cast, dim
 Shot 2 (00:00:45 - 00:01:30): Outdoor daylight, cool cast, bright
 ```
@@ -145,7 +145,7 @@ Once complete, play the rendered file in a media player fullscreen. Focus on the
 
 Create a document `Lab2_continuity_check.txt` and log the transition quality:
 
-```
+```text
 Transition 1 (Shot 1 to Shot 2 at 00:00:45):
 - Brightness: Smooth, well-matched
 - Color temperature: Slight warm-to-cool shift, expected for interior-to-exterior
@@ -217,7 +217,7 @@ Play the Fusion timeline by pressing spacebar in the node editor. You will see t
 
 Now add a third input for credits text. Create a text file called `credits.txt`:
 
-```
+```text
 Directed by [Your Name]
 Produced by [Your Name]
 Cinematography by [Your Name]
@@ -261,7 +261,7 @@ Click **Add to Render Queue** and **Start Render**. Resolve will encode the Fusi
 
 Verify the composite:
 
-```
+```text
 Checkpoint 1: Base footage visibility and color
 - Is the base graded footage visible beneath overlays?
 - Does the color grading from Lab 2 carry through?
@@ -284,7 +284,7 @@ Checkpoint 4: Overall polish
 
 Create a file `Lab3_composite_verification.txt` and log your findings. Example:
 
-```
+```text
 Checkpoint 1: PASS—base footage is visible and color-graded throughout
 Checkpoint 2: PASS—watermark is centered and 40% opaque, readable
 Checkpoint 3: PASS—credits scroll smoothly, white text is readable against black
