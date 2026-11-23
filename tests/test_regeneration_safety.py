@@ -121,3 +121,27 @@ def test_api_cancel_stops_a_running_generation():
     assert cancel.json() == {"cancelled": True}
     assert out["res"].status_code == 409
     assert "not changed" in out["res"].json()["detail"]
+
+
+def test_files_already_on_disk_are_reported_as_skipped(course):
+    (course / "lesson_01_new.md").write_text(LESSON, encoding="utf-8")
+    (course / "labs.md").unlink()
+    results = generator.generate_topic_parallel("computing", "regen_cat", "regen_topic", course,
+                                                force=False, workers=_workers(Node()))
+    assert results == {"lesson_01_new.md": False, "labs.md": True}
+    assert results.skipped == {"lesson_01_new.md"}
+
+
+def test_api_generate_lists_skipped_files():
+    from unittest.mock import patch
+    from fastapi.testclient import TestClient
+    from app.backend.main import app
+
+    res_obj = generator.GenerationResults({"lesson_01.md": False, "labs.md": True})
+    res_obj.skipped.add("lesson_01.md")
+    with patch("app.backend.main.generate_subtopic_content", lambda *a, **k: res_obj), \
+         patch("app.backend.main.get_provider", lambda **k: object()):
+        res = TestClient(app).post("/api/generate", json={"query": "computing/infrastructure/kubernetes"})
+    assert res.status_code == 200
+    assert res.json()["skipped"] == ["lesson_01.md"]
+    assert res.json()["results"] == {"lesson_01.md": False, "labs.md": True}

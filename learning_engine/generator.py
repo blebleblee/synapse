@@ -510,6 +510,16 @@ Output publication-grade Markdown only."""
 STAGING_DIRNAME = ".regen"
 
 
+class GenerationResults(dict):
+    """{filename: written?}. Files that were already on disk (and so not
+    generated) are False too, for compatibility; `skipped` names them so
+    callers can tell them apart from failures."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.skipped = set()
+
+
 def generate_topic_parallel(
     domain: str,
     category: str,
@@ -597,7 +607,7 @@ def _generate_topic_parallel(
     modules = scope_topic_curriculum(domain, category, subtopic_id, subtopic_title, subtopic_dir=subtopic_dir, scoping_provider=scoping_prov)
 
     tasks_to_run = []
-    results = {}
+    results = GenerationResults()
 
     for mod in modules:
         out_path = subtopic_dir / mod["filename"]
@@ -605,6 +615,7 @@ def _generate_topic_parallel(
             tasks_to_run.append(mod)
         else:
             results[mod["filename"]] = False
+            results.skipped.add(mod["filename"])
 
     if not tasks_to_run:
         return results

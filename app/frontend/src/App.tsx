@@ -15,6 +15,7 @@ import type { TerminalDrawerHandle } from './components/TerminalDrawer';
 import type { TopicTreeData, TopicDetails, ChatMessage, WorkspaceStatus, QuizQuestion } from './types';
 import { getStoredSelection, saveStoredSelection, clearStoredSelection } from './utils/selectionStorage';
 import { NoticeStack, type Notice, type NoticeKind } from './components/NoticeStack';
+import { summarizeGeneration } from './utils/generation';
 import { TranslationQueueIndicator } from './components/TranslationQueueIndicator';
 import { failureMessage, networkFailure } from './utils/failureMessage';
 import { toTitleCase } from './utils/text';
@@ -76,6 +77,7 @@ function App() {
   const [quizQuestions, setQuizQuestions] = useState<{ [key: string]: QuizQuestion[] }>({});
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
   const activeCancelHandler = useRef<(() => void) | null>(null);
+  const serverCancelRef = useRef<(() => void) | null>(null);
   const [notices, setNotices] = useState<Notice[]>([]);
   const noticeIdRef = useRef(0);
   const dismissNotice = useCallback((id: number) => {
@@ -312,6 +314,8 @@ function App() {
   };
 
   const handleCancelAI = () => {
+    serverCancelRef.current?.();
+    serverCancelRef.current = null;
     if (activeCancelHandler.current) {
       try {
         activeCancelHandler.current();
@@ -329,10 +333,11 @@ function App() {
 
   const handleGenerate = async (query: string, force = false) => {
     const abortCtrl = new AbortController();
-    activeCancelHandler.current = () => {
-      abortCtrl.abort();
-      // Aborting only drops the request; tell the server to stop too, or it
-      // keeps drafting and publishes minutes later.
+    // Opening another course only stops waiting here; the server finishes
+    // the course in the background. Stop (handleCancelAI) also stops the server.
+    const cancelThis = () => abortCtrl.abort();
+    activeCancelHandler.current = cancelThis;
+    serverCancelRef.current = () => {
       fetch('/api/generate/cancel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -349,6 +354,11 @@ function App() {
         body: JSON.stringify({ query, force }),
       });
       if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const summary = summarizeGeneration(data.results, data.skipped, force);
+        notify(summary.kind, summary.text);
+        activeCancelHandler.current = null;
+        serverCancelRef.current = null;
         await loadTopic(query);
         await fetchTree();
         await fetchStatus();
@@ -361,6 +371,8 @@ function App() {
         notify('error', networkFailure('Generating content', err));
       }
     } finally {
+      if (activeCancelHandler.current === cancelThis) activeCancelHandler.current = null;
+      serverCancelRef.current = null;
       setIsGenerating(false);
     }
   };

@@ -1267,7 +1267,9 @@ def generate_topic(req: GenerateRequest):
         "domain": domain,
         "category": cat,
         "subtopic": sub,
-        "results": results
+        "results": results,
+        # Already on disk, so not generated; the UI must not call them failures.
+        "skipped": sorted(getattr(results, "skipped", ())),
     }
 
 @app.post("/api/add")

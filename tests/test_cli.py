@@ -131,3 +131,18 @@ def test_generation_failure_is_reported_and_exits_non_zero(monkeypatch, capsys, 
     out = capsys.readouterr().out
     assert "1 file(s) could not be generated: labs.md" in out
     assert "Wrote 1 file(s)" in out
+
+
+def test_files_already_on_disk_are_kept_not_failed(monkeypatch, capsys):
+    """`generate` without --force on a partly built course exited 1 and called
+    the lessons it left alone "could not be generated"."""
+    from learning_engine.generator import GenerationResults
+    res = GenerationResults({"lesson_01_x.md": False, "lesson_02_y.md": True})
+    res.skipped.add("lesson_01_x.md")
+    monkeypatch.setattr(cli, "get_provider", lambda **k: object())
+    monkeypatch.setattr(cli, "generate_subtopic_content", lambda *a, **k: res)
+    assert run_cli(monkeypatch, "generate", "computing/infrastructure/kubernetes") == 0
+    out = capsys.readouterr().out
+    assert "Wrote 1 file(s)" in out
+    assert "Kept 1 existing file(s)" in out and "lesson_01_x.md" in out
+    assert "could not be generated" not in out

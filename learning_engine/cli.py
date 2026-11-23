@@ -189,15 +189,19 @@ def report_generation(results, where) -> None:
     (It used to print the raw dict, or "updated", and exit 0 even when every
     file had failed.)"""
     results = results if isinstance(results, dict) else {}
+    skipped = getattr(results, "skipped", set())
     ok = [name for name, done in results.items() if done]
-    failed = [name for name, done in results.items() if not done]
+    kept = [name for name, done in results.items() if not done and name in skipped]
+    failed = [name for name, done in results.items() if not done and name not in skipped]
     if ok:
         print(f"\n[✔] Wrote {len(ok)} file(s) in {where}: {', '.join(ok)}")
+    if kept:
+        print(f"[*] Kept {len(kept)} existing file(s) (use --force to regenerate): {', '.join(kept)}")
     if failed:
         print(f"[✘] {len(failed)} file(s) could not be generated: {', '.join(failed)}")
         print("    Check that an AI model is reachable (synapse status) and see the messages above.")
         sys.exit(1)
-    if not ok:
+    if not ok and not kept:
         print(f"\n[*] Nothing to generate in {where}.")
 
 
