@@ -28,6 +28,10 @@ interface TutorChatProps {
   onSendMessage: (message: string) => Promise<void>;
   onClearChat?: () => void;
   mentorConnected: 'checking' | 'connected' | 'error';
+  /** Model that answers; differs from configuredMentorModel when it is a fallback. */
+  mentorModel?: string | null;
+  mentorFallback?: boolean;
+  configuredMentorModel?: string | null;
   targetLanguage?: string;
   onDismissMessage?: (index: number) => void;
 }
@@ -40,6 +44,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   onSendMessage,
   onClearChat,
   mentorConnected,
+  mentorModel,
+  mentorFallback = false,
+  configuredMentorModel,
   targetLanguage,
   onDismissMessage,
 }) => {
@@ -129,9 +136,12 @@ export const TutorChat: React.FC<TutorChatProps> = ({
             onClick={() => setPersonaExpanded((prev) => !prev)}
             title={personaExpanded ? "Collapse Socratic mentor directives" : "Expand full Socratic mentor directives"}
           >
-            <div className="persona-avatar-wrapper">
+            <div
+              className="persona-avatar-wrapper"
+              title={`Mentor ${mentorConnected === 'connected' ? 'online' : mentorConnected === 'checking' ? 'connecting' : 'offline'}${mentorModel ? ` (${mentorModel})` : ''}${mentorFallback ? `. ${configuredMentorModel} is not available, so ${mentorModel} answers instead.` : ''}`}
+            >
               <Bot size={16} className="persona-icon" />
-              <span className={`persona-online-dot ${mentorConnected}`} />
+              <span className={`persona-online-dot ${mentorConnected}${mentorConnected === 'connected' && mentorFallback ? ' fallback' : ''}`} />
             </div>
             <div className="persona-text">
               <div className="persona-label-row">
@@ -140,6 +150,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({
                   <span className="persona-topic-tag" title={`Domain: ${topic.domain}`}>
                     {topic.domain.replace(/_/g, ' ')}
                   </span>
+                )}
+                {mentorModel && (
+                  <span className="mentor-model-badge">({mentorModel.split(':')[0]}{mentorFallback ? ', fallback' : ''})</span>
                 )}
                 {personaExpanded ? <ChevronUp size={12} className="persona-chevron" /> : <ChevronDown size={12} className="persona-chevron" />}
               </div>
