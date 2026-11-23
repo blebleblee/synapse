@@ -114,6 +114,7 @@ from learning_engine.models import (
     GenerationStopped,
 )
 from learning_engine.search import search_curriculum
+from learning_engine.json_salvage import json_object_list
 from learning_engine.graph import get_prerequisite_graph, get_topic_dependencies
 from learning_engine.database import get_connection
 from learning_engine.mastery import (
@@ -1691,33 +1692,9 @@ Output valid JSON only with no markdown backticks or commentary."""
 
 def parse_quiz_questions(raw: str) -> List[Dict[str, Any]]:
     """The model's reply as quiz questions; malformed questions are dropped."""
-    text = raw.strip()
-    start, end = text.find("["), text.rfind("]")
-    if start == -1 or end <= start:
-        return []
-    try:
-        data = json.loads(text[start:end + 1])
-    except ValueError:
-        # Local models often break one question (e.g. unescaped quotes in a
-        # shell command), which made the whole array invalid. Keep the others.
-        data = []
-        depth, obj_start = 0, None
-        for i, ch in enumerate(text[start:end + 1], start):
-            if ch == "{":
-                if depth == 0:
-                    obj_start = i
-                depth += 1
-            elif ch == "}" and depth:
-                depth -= 1
-                if depth == 0 and obj_start is not None:
-                    try:
-                        data.append(json.loads(text[obj_start:i + 1]))
-                    except ValueError:
-                        pass
+    data = json_object_list(raw)
     questions = []
-    for item in data if isinstance(data, list) else []:
-        if not isinstance(item, dict):
-            continue
+    for item in data:
         question, options, correct = item.get("question"), item.get("options"), item.get("correctIndex")
         if not (isinstance(question, str) and question.strip()):
             continue

@@ -143,3 +143,19 @@ def test_anki_download_fixes_old_single_line_header(monkeypatch):
         "Q,A,computing::kubernetes",
     ]
     assert 'filename="computing_infrastructure_kubernetes_flashcards.csv"' in res.headers["content-disposition"]
+
+
+def test_generate_flashcards_keeps_cards_around_a_broken_one(monkeypatch):
+    """One card with unescaped quotes made the whole reply invalid JSON, so
+    the deck failed to generate."""
+    mock_provider = MagicMock()
+    mock_provider.generate.return_value = (
+        '```json\n[{"front": "What does $? hold?", "back": "The last exit status."},\n'
+        ' {"front": "Output of echo "hi"?", "back": "hi"},\n'
+        ' {"front": "What is ${#var}?", "back": "The length of var."}]\n```')
+    monkeypatch.setattr("learning_engine.flashcards.get_provider", lambda **kwargs: mock_provider)
+
+    content = generate_flashcards("computing/infrastructure/kubernetes").read_text(encoding="utf-8")
+    assert "What does $? hold?" in content
+    assert "What is ${#var}?" in content
+    assert "echo" not in content

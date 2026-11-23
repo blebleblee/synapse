@@ -4,11 +4,11 @@ Synthesizes active-recall flashcard decks (CSV format) from Foundation and Lesso
 """
 
 import csv
-import json
 import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from .models import get_provider
+from .json_salvage import json_object_list
 from .topic_manager import resolve_subtopic, get_domain_persona, get_unit_lessons
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
@@ -52,23 +52,9 @@ Output valid JSON only with no markdown formatting."""
     provider = get_provider(provider_type=provider_type, model=model, domain=domain)
     raw = provider.generate(prompt, system_instruction=persona).strip()
 
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-        raw = raw.strip()
-
-    cards = []
-    try:
-        parsed = json.loads(raw)
-        if isinstance(parsed, dict):
-            cards = parsed.get("flashcards", parsed.get("cards", []))
-        elif isinstance(parsed, list):
-            cards = parsed
-    except Exception:
-        pass
-
-    cards = [c for c in cards if isinstance(c, dict) and c.get("front") and c.get("back")] if isinstance(cards, list) else []
+    # One broken card (bad quotes in a command) no longer loses the deck.
+    cards = json_object_list(raw, list_keys=("flashcards", "cards"))
+    cards = [c for c in cards if c.get("front") and c.get("back")]
     if not cards:
         # Don't cache a placeholder deck: the next open should try again.
         raise ValueError("The AI model did not return any flashcards. Try again or pick another model.")
