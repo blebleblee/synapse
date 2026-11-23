@@ -324,6 +324,12 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-69: Thinking Models Returned Empty Replies on Short Budgets
 - **Status:** **COMPLETED** (owner chose `think: false` for short calls, 2026-11-23). Ollama counts thinking against `num_predict`: `gemma4:26b` with 10 tokens replied "" (all thinking). `OllamaProvider` now sends `think: false` when the budget is ≤ `SHORT_REPLY_TOKENS` (2,048: mentor chat, short probes); unbounded calls (quiz, flashcards) and 8,192-token drafts keep the model's default. Plain models accept the flag (`qwen2.5:3b`, Ollama 0.40.17). Mentor chat with gemma4:26b checked on the isolated server. Tests: `tests/test_ollama_think.py`.
 
+### FIND-70: Filling In Missing Files Added Duplicate Lessons
+- **Status:** **COMPLETED** (2026-11-23). Without `--force` the generator re-planned the course with AI, so new names sat next to old lessons. The plan is saved (`.generation_plan.json`, git-ignored, not packed) and reused; lessons without a plan get only `labs.md`. Course menu: "Generate missing files". Checked in the app. Tests: `tests/test_course_plan.py`.
+
+### FIND-71: Language and Tool Courses Got Compiler Labs
+- **Status:** **COMPLETED** (2026-11-23). Found while checking FIND-70: a Bash lab came out as a C++ AST/IR exercise. `software`/`systems`/unmatched computing categories used the compiler blueprint. New `GeneralSoftwareStrategy`; four low-level courses keep the old one. Existing labs unaffected (checked: Bash's lab is on-topic). Tests: `tests/test_computing_blueprints.py`.
+
 ## Next Candidates (not yet verified)
 
 
@@ -333,7 +339,6 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 - **Curriculum hallucinations (owner question, proposal):** (1) `synapse review` with a reviewer from a different model family than the generator; (2) run lesson/lab code blocks in the sandbox in CI and flag failures; (3) extract checkable claims (versions, defaults, flags, API names) and verify against docs or installed tools; (4) a "Report a mistake" button in the reader feeding a review queue. (1) and (2) are cheapest. NEEDS DECISION on which to build.
 - **Run buttons:** renamed to "Send to terminal" (owner decision 2026-11-23).
-- **Labs for the 15 arts courses without labs (FIND-49 follow-up):** generate visual labs with the fixed blueprint. The UI only offers "Regenerate with AI" (whole course); a "generate missing files only" action would fit (`generate` without `--force` already skips existing files, but scoping may pick different lesson names; verify first).
 
 - **UI:** all main flows exercised in batches 1–6. (Listen, translation, Add Topic, rename/delete checked in batches 4–5.) (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
 - **CLI:** checked in batch 2 (FIND-30). `pack list/install/uninstall` checked in batch 6. `add`, `generate`, `chat` checked in batch 7.
