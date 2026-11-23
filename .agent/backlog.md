@@ -272,9 +272,14 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-51: Mastered Field Guide (From Chat Sessions) Could Be Packed
 - **Status:** **COMPLETED** (`6a896c3`). Test: `tests/test_pack_privacy.py::test_mastered_field_guide_is_never_packed`.
 
+### FIND-52: Regenerate Deleted the Course (and Chat Sessions); Stop Did Not Stop
+- **Status:** **COMPLETED** (`d4fa183`). Tests: `tests/test_regeneration_safety.py`.
+
 ## Next Candidates (not yet verified)
 
 - **Export menu → field guide:** done in `8041726` (downloads; clearer label).
+- **Stop latency:** a cancel takes effect only after in-flight model calls return (~4 min on 32b). `OllamaProvider.generate_cancellable` (used by translation jobs) could abort them; the drafting path would need it plus `max_tokens`.
+- **CLI exit code:** `report_generation` treats skipped files (already on disk, result `False`) as failures, so `generate` without `--force` on a partly built course exits 1. Results should distinguish skipped from failed.
 
 - **Tests:** conftest's autouse blocker replaces provider `generate` with `(*args, **kwargs)`, so signature mismatches between callers and real providers cannot fail a test. `test_provider_contract.py` covers `generate`; consider the same for `generate_stream`/`generate_cancellable` callers.
 - **Chat with non-Ollama providers:** fixed in `427af10` (base `generate_stream`); not checked against the live Gemini API.
