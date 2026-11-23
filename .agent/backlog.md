@@ -333,6 +333,15 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-72: Gemini Did Not Work for New Accounts; Short Replies Cut Off
 - **Status:** **COMPLETED** (2026-11-23, live key from the owner). (1) Default `gemini-2.5-flash` (and 2.5-pro) answer 404 "no longer available to new users": default now `gemini-3.8-flash`, model list 3.8-flash / 3.5-flash / 3.5-flash-lite. (2) Gemini 3 thinking counts against `max_output_tokens`: a 200-token reply was "`set -"; short calls (≤ `SHORT_REPLY_TOKENS`) send `thinking_budget=0`, retried without it on 400 (3.5-flash-lite rejects it). (3) Mentor chat now really streams (`generate_content_stream`). Checked live: all three models; mentor chat in the app, streamed and not. Tests: `tests/test_gemini_provider.py`.
 
+### FIND-76: FIND-75 Refactor Broke Outline Lesson Names; CI Red, v1.3.2 Released on Red
+- **Status:** **COMPLETED** (2026-11-23, `11300a1`). `\**` in the TOPIC_OUTLINE.md regex made outline courses produce `lesson_01_.md`; CI red runs #153–#158, v1.3.2 tagged from `94148e4` (red). The same refactor made `get_chat_provider` probe the cluster before a cloud mentor and swap models on an unreachable host; restored (`85f2e3b`, `tests/test_chat_provider_routing.py`). `/api/topic` before/after compared on 14 public courses: identical. AGENTS.md §3 now requires green verify + CI before commit/push/release (`46d606a`).
+
+### FIND-77: Gateways Got the Wrong Model
+- **Status:** **COMPLETED** (2026-11-23, `85f2e3b`, `19c2fed`). On a non-Anthropic base URL every model became one fixed name per family (`claude-sonnet-5`, which the new gateway lacks: 404), and `gpt-5.5` became Claude. Exact IDs now pass through. App env switched to `aeroai.aerolink.ink`, `claude-sonnet-5-5` (checked live).
+
+### Review pilot with GPT 5.5: NEEDS DECISION
+- Gateway serves `gpt-5.5` / `deepseek-v4-*` on `/v1/messages` (cross-family reviewer for Claude-written lessons). One-course pilot (`synapse review computing/data/sql_and_relational_query_optimization -p anthropic -m gpt-5.5`, read-only) was blocked pending the owner's cost decision (review on hold). Gateway reports `usage.tokens` ≈1,200–1,600 for a 16-token call; cost per course unknown.
+
 ## Next Candidates (not yet verified)
 
 Waiting for the API proxy (owner says when it works); `synapse review --workers N --domain computing` is ready for the pilot.
