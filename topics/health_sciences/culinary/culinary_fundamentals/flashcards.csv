@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:health_sciences culinary culinary_fundamentals
+#tags column:3
+What temperature range is required at the surface of food for the Maillard reaction to occur?,"140°C–165°C, achievable only after surface moisture has been driven off.",health_sciences::culinary_fundamentals
+Why does water boiling at 100°C make poaching an inherently gentle and predictable cooking method?,"In an open system at sea level, water cannot exceed 100°C regardless of flame intensity, capping the thermal energy transferred to the food.",health_sciences::culinary_fundamentals
+What is the approximate smoke point of refined avocado oil vs. unrefined extra-virgin olive oil?,Refined avocado oil ≈ 270°C; unrefined extra-virgin olive oil ≈ 160°C.,health_sciences::culinary_fundamentals
+What is the central invariant of flavor chemistry stated in Lesson 2?,"Cooking is controlled molecular transformation, and flavor is the perceptual output of that transformation.",health_sciences::culinary_fundamentals
+What is the 'volatility threshold invariant' and why does cold roast beef taste flat?,"Aroma compounds must be in vapor phase at serving temperature to stimulate olfactory receptors; cold food keeps high-boiling-point volatiles from reaching the nose, so cold roast beef tastes flat.",health_sciences::culinary_fundamentals
+"What percentage of perceived 'taste' is actually retronasal olfaction, and what are the five primary tastes detected by the tongue?","Roughly 80% of flavor is retronasal olfaction; the five primary tastes are sweet, salty, sour, bitter, and umami.",health_sciences::culinary_fundamentals
+"What temperature range causes collagen to hydrolyze into gelatin, and why is this important for tough cuts?","71°C–82°C; prolonged exposure in this range breaks triple-helix collagen into soluble gelatin chains, tenderizing fibrous connective tissue.",health_sciences::culinary_fundamentals
+What is the governing invariant that differentiates dry heat from moist heat cooking methods?,"Dry heat requires surface temperatures above 140°C to sustain Maillard browning; moist heat is capped at 100°C (water's boiling point) and cannot produce Maillard browning, requiring temperature precision instead of intensity.",health_sciences::culinary_fundamentals
+What temperature range defines the microbial 'danger zone' and how fast can bacteria populations double within it?,4°C to 60°C; bacterial populations can double every 20–40 minutes under optimal conditions within this range.,health_sciences::culinary_fundamentals
+Define the D-value in food safety thermal processing.,The D-value (decimal reduction time) is the time required at a specific temperature to reduce a bacterial population by 90% (one log order of magnitude).,health_sciences::culinary_fundamentals
+"What does the Z-value describe, and what is its typical range for most pathogens?",The Z-value is the temperature change required to alter the D-value by a factor of 10; it typically ranges from 4°C to 6°C for most pathogens.,health_sciences::culinary_fundamentals
+"What water activity (aw) thresholds generally prevent growth of bacteria, yeasts, and molds respectively?","Bacteria need aw above ~0.90; yeasts can tolerate down to ~0.88; molds can tolerate down to ~0.80. Below these thresholds, microbial growth is inhibited.",health_sciences::culinary_fundamentals
