@@ -14,7 +14,7 @@
 - **Curriculum release (2026-11-22, `606f85e`):** packs live on the `curriculum` release on both hosts, published with `scripts/publish_all_releases.py --curriculum`; only packs whose content digest changed are replaced (`curriculum.json` on the release). The app downloads from `curriculum` first, then v<version>/v1.2.0. App releases carry no packs and no longer the duplicate `Synapse-Portable-Windows.zip` (owner decision; the win-x64 zip, the macOS .zip and the 13 packs bundled in installers were kept on purpose). Gitea has no "not latest" flag, so its UI may show `curriculum` as the newest release; nothing in the app relies on "latest".
 - **Verification:** `./scripts/verify_all.sh`, all 6 phases (2026-11-23 ~09:00: 325 backend, 56 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean). Release checkpoint: `05c4f22` on `gitea/main` and `github/main` (CI #113 green). Handoff commits after it are on gitea only.
 - **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, public on GitHub. No rotation (local-only server). Never print it.
-- **Pending owner actions:** top up proxy credit; send the Safari diagram case.
+- **Pending owner actions:** top up proxy credit (Safari confirmed working fine).
 - **Improvement ideas (completed 1–7):** release from CI; protected `main` with PR-only changes.
 
 ---
