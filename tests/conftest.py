@@ -203,6 +203,17 @@ def global_test_isolation(tmp_path, monkeypatch):
     if hasattr(le_models.OllamaProvider, "generate_stream"):
         monkeypatch.setattr(le_models.OllamaProvider, "generate_stream", _blocked_ai_generate)
 
+    # generate_cancellable streams from Ollama itself: route it through the
+    # (blocked or test-patched) generate, keeping its Stop check.
+    def _cancellable_via_generate(self, prompt, should_stop, system_instruction="", max_tokens=None):
+        if should_stop():
+            raise le_models.GenerationStopped()
+        if max_tokens:
+            return self.generate(prompt, system_instruction=system_instruction, max_tokens=max_tokens)
+        return self.generate(prompt, system_instruction=system_instruction)
+
+    monkeypatch.setattr(le_models.OllamaProvider, "generate_cancellable", _cancellable_via_generate)
+
     # 7. Test-process subprocess protections: block real shell launches and subprocess executions
     def _blocked_subprocess(*args, **kwargs):
         cmd = args[0] if args else kwargs.get("args", "unknown")

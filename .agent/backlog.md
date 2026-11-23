@@ -318,12 +318,14 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-67: Release Scripts Published on Any Unknown Flag
 - **Status:** **COMPLETED** (2026-11-23). `publish_all_releases.py --help` ran a full v1.3.1 publish to both hosts (every asset skipped as up to date; notes rewritten with the unchanged `[1.3.1]` CHANGELOG text, so nothing visible changed). `update_release_notes.py --help` or a mistyped `--dry-run` would rewrite notes the same way. Both now use argparse; tests in `tests/test_publish_curriculum.py`.
 
+### FIND-68: Stop Waited for Every Model Call in Progress
+- **Status:** **COMPLETED** (2026-11-23). Course generation called the uninterruptible `generate()`; Stop took effect only after in-flight calls returned (~4 min on a 32B model). Draft, refine and sequential calls now go through `_call_model`, which uses `OllamaProvider.generate_cancellable` (now with `max_tokens`, and `generate()` fallback on a 404 from servers without the native API). Checked in the app: Stop during a `qwen2.5-coder:32b` draft answered in 4 s, course unchanged, no staging leftovers. Conftest now routes `generate_cancellable` through the blocked `generate` (it streamed from a real Ollama before). Cloud providers still finish their call first.
+
 ## Next Candidates (not yet verified)
 
 - **Thinking models on Ollama (e.g. gemma4):** `OllamaProvider` never sets `think`, and Ollama counts thinking tokens against `num_predict`. A 5-token probe came back empty; the 250-token `generate_stream` default and short quiz/flashcard budgets could too. Options: `think: false` for short structured calls, or larger budgets. Needs a check against the Settings models; behaviour choice, so not changed unasked.
 
 - **Export menu → field guide:** done in `8041726` (downloads; clearer label).
-- **Stop latency:** a cancel takes effect only after in-flight model calls return (~4 min on 32b). `OllamaProvider.generate_cancellable` (used by translation jobs) could abort them; the drafting path would need it plus `max_tokens`.
 
 - **Chat with non-Ollama providers:** fixed in `427af10` (base `generate_stream`); not checked against the live Gemini API.
 

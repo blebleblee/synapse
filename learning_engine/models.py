@@ -568,12 +568,17 @@ class OllamaProvider(LLMProvider):
         except urllib.error.URLError as e:
             raise RuntimeError(f"Ollama/LocalAI request to {self.host} failed: {e}")
 
-    def generate_cancellable(self, prompt: str, should_stop: Callable[[], bool], system_instruction: str = "") -> str:
+    def generate_cancellable(self, prompt: str, should_stop: Callable[[], bool], system_instruction: str = "",
+                             max_tokens: Optional[int] = None) -> str:
         """Like generate(), but stops within a token or two once should_stop() is true.
 
         Streams from the native Ollama API; leaving the read loop closes the
         connection, and Ollama aborts the generation when its client goes away.
+        A server without the native API (LocalAI: 404) gets the uncancellable
+        generate(), as before.
         """
+        if should_stop():
+            raise GenerationStopped()
         url = f"{self.host.rstrip('/')}/api/generate"
         payload = {
             "model": self.model,
@@ -582,6 +587,8 @@ class OllamaProvider(LLMProvider):
             "stream": True,
             "options": {"temperature": 0.2},
         }
+        if max_tokens:
+            payload["options"]["num_predict"] = max_tokens
         req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"),
                                      headers={"Content-Type": "application/json"})
         parts: List[str] = []
@@ -599,6 +606,8 @@ class OllamaProvider(LLMProvider):
                     if chunk.get("done"):
                         break
         except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return self.generate(prompt, system_instruction=system_instruction, max_tokens=max_tokens)
             detail = e.read().decode("utf-8", errors="replace")[:300]
             raise RuntimeError(f"Ollama request to {self.host} failed ({e.code}): {detail}")
         except urllib.error.URLError as e:

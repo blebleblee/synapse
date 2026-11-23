@@ -648,13 +648,15 @@ def _generate_topic_parallel(
                     return mod_item["filename"], False, None, mod_item, active_label, w_host, time.time() - t0, "stopped"
                 try:
                     with _LLM_SEMAPHORE:
-                        content = active_provider.generate(mod_item["prompt"], system_instruction=system_instruction, max_tokens=8192)
+                        content = _call_model(active_provider, mod_item["prompt"], system_instruction, stop, max_tokens=8192)
                     validated = validate_lesson_completeness(content)
                     elapsed = time.time() - t0
                     w_count = len(validated.split())
                     kb_size = len(validated.encode("utf-8")) / 1024
                     print(f"          [✔] [{active_label:10s}] Drafted {mod_item['filename']} ({w_count} words, {kb_size:.1f} KB) in {elapsed:.1f}s", flush=True)
                     return mod_item["filename"], True, validated, mod_item, active_label, w_host, elapsed, None
+                except GenerationStopped:
+                    return mod_item["filename"], False, None, mod_item, active_label, w_host, time.time() - t0, "stopped"
                 except Exception as e:
                     print(f"          [!] [{active_label:10s}] Quality Gate Reject on {mod_item['filename']} (Attempt {attempt}/3): {e}", flush=True)
                     # Gateway failover: if active provider fails and fallback is available, failover immediately
@@ -773,9 +775,11 @@ Output the fully corrected, publication-grade, raw Markdown only."""
 
                     try:
                         with _LLM_SEMAPHORE:
-                            refinement_res = r_provider.generate(refine_prompt, system_instruction="You are a master technical author and ruthless peer reviewer.")
+                            refinement_res = _call_model(r_provider, refine_prompt, "You are a master technical author and ruthless peer reviewer.", stop)
                         candidate = clean_model_markdown(refinement_res)
                         ok, reason = check_rewrite(chunk, candidate)
+                    except GenerationStopped:
+                        return fname, False
                     except Exception as chunk_err:
                         ok, reason = False, str(chunk_err)
                     if ok:
@@ -814,16 +818,36 @@ Output the fully corrected, publication-grade, raw Markdown only."""
             if stop():
                 return results
             try:
-                content = provider.generate(mod["prompt"], system_instruction=system_instruction)
+                content = _call_model(provider, mod["prompt"], system_instruction, stop)
                 validated = validate_generation_output(content)
                 if stop():
                     return results
                 (out_dir / mod["filename"]).write_text(tag_untagged_fences(validated.strip())[0] + "\n", encoding="utf-8")
                 results[mod["filename"]] = True
+            except GenerationStopped:
+                return results
             except Exception:
                 results[mod["filename"]] = False
 
     return results
+
+def _call_model(provider, prompt: str, system_instruction: str, stop: Callable[[], bool],
+                max_tokens: Optional[int] = None) -> str:
+    """One model call that Stop can interrupt.
+
+    A provider class with `generate_cancellable` (Ollama) aborts the request
+    within a token or two of Stop; without this, Stop waited for every
+    in-flight call to finish (minutes on a large local model). Other
+    providers use `generate`, so Stop takes effect after the call.
+    """
+    if stop():
+        raise GenerationStopped()
+    if callable(getattr(type(provider), "generate_cancellable", None)):
+        return provider.generate_cancellable(prompt, stop, system_instruction=system_instruction, max_tokens=max_tokens)
+    if max_tokens:
+        return provider.generate(prompt, system_instruction=system_instruction, max_tokens=max_tokens)
+    return provider.generate(prompt, system_instruction=system_instruction)
+
 
 def generate_subtopic_content(
     domain: str,
