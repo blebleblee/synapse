@@ -72,6 +72,13 @@ Commits (all pushed to `gitea/main`; CI #49–#56 green, #57+ queued at handoff 
 - `b14085c` course-path links read "Kubernetes: Kubernetes" (301 doubled graph labels). FIND-28.
 - `7ff4d93` Anki export regenerated/overwrote decks; placeholder decks cached; Anki headers on one row; leaked test deck removed from kubernetes. FIND-29.
 
+### Batch 13 (2026-11-23, 08:30–09:00): owner decisions
+
+- `04a85ad` (CI #107): owner: the field guide and the course summary are leftovers of an earlier design. Both features removed (UI items, `/api/artifacts/compile`, `/api/summary/regenerate`, `learning_engine/summary.py`, SUMMARY.md in the topic payload and handbook). Privacy guards kept for old copies on disk. Earlier batch work on them (`8041726`, `5285157`) is superseded.
+- Owner: Run buttons make sense only on runnable code, which cannot be told reliably, so rename. Done: "⇥ Send to terminal" (+ wrapper in brackets); behaviour unchanged.
+- Owner (FIND-49): the 18 music-exercise labs are valid content but belong in the private addons repo as a "songs" topic, excluded from the public courses. NEEDS DECISION on layout (see backlog) before moving.
+- CHANGELOG `[Unreleased]` lists only the removal; the fixes since v1.3.0 (FIND-52..57) still need entries before the next release.
+
 ### Batch 12 (2026-11-23, 07:38–08:05): privacy, summary, terminal
 
 - `9bbb200` privacy: `<course>/SUMMARY.md` ("Regenerate summary") is written partly from the learner's chat sessions and was neither git-ignored nor excluded from packs. Now both, listed private in AGENTS.md; the pre-commit guard blocks it and `MASTERED_GUIDE.md` (missed in FIND-51). FIND-56.
