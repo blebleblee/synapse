@@ -417,6 +417,13 @@ class GenerationStopped(Exception):
     """Raised by generate_cancellable() when the caller asked it to stop."""
 
 
+# Ollama counts a thinking model's reasoning (gemma4, qwen3, deepseek-r1)
+# against num_predict, so a short budget can end before any answer: a reply
+# of "" plus hidden thinking. Calls with a budget this small or smaller ask
+# for no thinking; models that cannot think accept and ignore the flag.
+SHORT_REPLY_TOKENS = 2048
+
+
 class OllamaProvider(LLMProvider):
     def __init__(self, host: str = "http://localhost:11434", model: str = "qwen2.5-coder:32b"):
         self.host = host.rstrip("/")
@@ -528,6 +535,8 @@ class OllamaProvider(LLMProvider):
         }
         if max_tokens:
             ollama_payload["options"]["num_predict"] = max_tokens
+            if max_tokens <= SHORT_REPLY_TOKENS:
+                ollama_payload["think"] = False
         data = json.dumps(ollama_payload).encode("utf-8")
         req = urllib.request.Request(ollama_url, data=data, headers={"Content-Type": "application/json"})
 
@@ -589,6 +598,8 @@ class OllamaProvider(LLMProvider):
         }
         if max_tokens:
             payload["options"]["num_predict"] = max_tokens
+            if max_tokens <= SHORT_REPLY_TOKENS:
+                payload["think"] = False
         req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"),
                                      headers={"Content-Type": "application/json"})
         parts: List[str] = []
@@ -627,6 +638,8 @@ class OllamaProvider(LLMProvider):
                 "num_predict": max_tokens
             }
         }
+        if max_tokens <= SHORT_REPLY_TOKENS:
+            ollama_payload["think"] = False
         data = json.dumps(ollama_payload).encode("utf-8")
         req = urllib.request.Request(ollama_url, data=data, headers={"Content-Type": "application/json"})
 

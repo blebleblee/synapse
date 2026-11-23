@@ -321,9 +321,11 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-68: Stop Waited for Every Model Call in Progress
 - **Status:** **COMPLETED** (2026-11-23). Course generation called the uninterruptible `generate()`; Stop took effect only after in-flight calls returned (~4 min on a 32B model). Draft, refine and sequential calls now go through `_call_model`, which uses `OllamaProvider.generate_cancellable` (now with `max_tokens`, and `generate()` fallback on a 404 from servers without the native API). Checked in the app: Stop during a `qwen2.5-coder:32b` draft answered in 4 s, course unchanged, no staging leftovers. Conftest now routes `generate_cancellable` through the blocked `generate` (it streamed from a real Ollama before). Cloud providers still finish their call first.
 
+### FIND-69: Thinking Models Returned Empty Replies on Short Budgets
+- **Status:** **COMPLETED** (owner chose `think: false` for short calls, 2026-11-23). Ollama counts thinking against `num_predict`: `gemma4:26b` with 10 tokens replied "" (all thinking). `OllamaProvider` now sends `think: false` when the budget is ≤ `SHORT_REPLY_TOKENS` (2,048: mentor chat, short probes); unbounded calls (quiz, flashcards) and 8,192-token drafts keep the model's default. Plain models accept the flag (`qwen2.5:3b`, Ollama 0.40.17). Mentor chat with gemma4:26b checked on the isolated server. Tests: `tests/test_ollama_think.py`.
+
 ## Next Candidates (not yet verified)
 
-- **Thinking models on Ollama (e.g. gemma4):** `OllamaProvider` never sets `think`, and Ollama counts thinking tokens against `num_predict`. A 5-token probe came back empty; the 250-token `generate_stream` default and short quiz/flashcard budgets could too. Options: `think: false` for short structured calls, or larger budgets. Needs a check against the Settings models; behaviour choice, so not changed unasked.
 
 - **Export menu → field guide:** done in `8041726` (downloads; clearer label).
 
