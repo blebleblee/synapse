@@ -427,6 +427,81 @@ class SoftwareEngineeringStrategy(DomainStrategy):
         )
 
 
+class GeneralSoftwareStrategy(DomainStrategy):
+    """Programming languages, frameworks, developer tools and shells (Bash, Git,
+    React, Swift...). These courses used to get SoftwareEngineeringStrategy,
+    whose fixed compiler sections (AST/IR disassembly, cache-miss profiling,
+    data-race sanitizers) produced labs unrelated to the course."""
+
+    def get_toolchain(self, subtopic_title: str = "the course's subject") -> Toolchain:
+        return Toolchain(
+            environment_type=LabEnvironmentType.CODE,
+            primary_language=f"The language, CLI and tooling that {subtopic_title} itself uses",
+            frameworks=[f"The official {subtopic_title} toolchain, package manager and documentation"],
+            diagnostic_tools=[f"The debugging, logging, linting and testing tools {subtopic_title} practitioners use"],
+            verification_commands=[],
+            setup_instructions=f"Install {subtopic_title} and its standard tools on a typical developer machine; "
+                               "every command must exist in that toolchain and run as written"
+        )
+
+    def get_blueprint(self, subtopic_title: str, category_title: str) -> CurriculumBlueprint:
+        t = subtopic_title
+        return CurriculumBlueprint(
+            lessons=[
+                LessonTemplate(
+                    filename="lesson_01_foundations_and_invariants.md",
+                    title=f"Lesson 1: {t} Foundations & Mental Model",
+                    audience=f"Developers who want to use {t} correctly and confidently",
+                    goal=f"Build an accurate mental model of how {t} works and why it is designed that way",
+                    sections=[
+                        "## Curriculum Roadmap",
+                        f"## 1. The Problem {t} Solves & Its Design Choices",
+                        f"## 2. The Core Model: How {t} Represents and Executes Your Work",
+                        f"## 3. A First Complete Example, Explained Step by Step (include clean Mermaid diagram)"
+                    ]
+                ),
+                LessonTemplate(
+                    filename="lesson_02_architecture_and_mechanics.md",
+                    title=f"Lesson 2: {t} Mechanics & Everyday Workflows",
+                    audience=f"Practitioners using {t} in real projects",
+                    goal=f"Master the mechanisms and workflows used daily with {t}",
+                    sections=[
+                        f"## 1. Key Mechanisms of {t} in Depth",
+                        f"## 2. Everyday Workflows, Commands and Idioms",
+                        f"## 3. Configuration, Project Structure & Integration With Other Tools"
+                    ]
+                ),
+                LessonTemplate(
+                    filename="lesson_03_deep_dive_and_concurrency.md",
+                    title=f"Lesson 3: Advanced {t}: Performance, Pitfalls & Production Practice",
+                    audience=f"Senior engineers responsible for {t} in production",
+                    goal=f"Diagnose and avoid the failure modes, performance problems and security issues of {t}",
+                    sections=[
+                        f"## 1. Performance and Scaling Characteristics of {t}",
+                        f"## 2. Common Pitfalls, Subtle Bugs & How to Debug Them",
+                        f"## 3. Security, Maintainability & Production Practices"
+                    ]
+                ),
+                LessonTemplate(
+                    filename="labs.md",
+                    title="Operational Verification Labs",
+                    audience=f"Hands-on developer working with {t}",
+                    goal=f"Concrete exercises with real {t} code and commands that the learner runs and verifies",
+                    sections=[
+                        "## Objective & Environment Setup",
+                        f"## Exercise 1: Build Something Small With {t}",
+                        f"## Exercise 2: Inspect, Measure & Explain {t}'s Behaviour",
+                        f"## Exercise 3: Break It on Purpose, Diagnose & Fix",
+                        "## Cheat Sheet & Verification Checklist"
+                    ]
+                )
+            ],
+            toolchain=self.get_toolchain(t),
+            style_directives=self.get_base_style_directive(),
+            latex_policy="optional"
+        )
+
+
 # ============================================================================
 # NON-COMPUTING DOMAIN STRATEGIES
 # ============================================================================
@@ -865,6 +940,10 @@ VISUAL_ARTS_CATEGORIES = {"visual_arts", "visual_media", "design", "3d_graphics"
 # Visual courses that sit inside a music category (creative_software also holds
 # Ableton, Cubase and Logic). Without this they got the music blueprint.
 VISUAL_ARTS_COURSES = {"adobe_creative_cloud"}
+# Computing courses that really are about compilers and low-level runtimes keep
+# the compiler/sanitizer blueprint; every other language or tool course gets
+# GeneralSoftwareStrategy.
+LOW_LEVEL_COMPUTING_COURSES = {"compilers", "rust_systems", "systems_programming", "performance_engineering"}
 
 
 class StrategyRegistry:
@@ -888,7 +967,6 @@ class StrategyRegistry:
             "data": DatabaseStrategy(),
             "database": DatabaseStrategy(),
             "postgresql": DatabaseStrategy(),
-            "systems": SoftwareEngineeringStrategy(),
             "compilers": SoftwareEngineeringStrategy(),
             "rust_systems": SoftwareEngineeringStrategy(),
         }
@@ -910,10 +988,13 @@ class StrategyRegistry:
 
         # 1. Specialized computing strategies
         if domain_lower == "computing":
+            if subtopic_id.lower() in LOW_LEVEL_COMPUTING_COURSES:
+                return SoftwareEngineeringStrategy()
             for key, strategy in self._computing_strategies.items():
                 if key in cat_lower:
                     return strategy
-            return SoftwareEngineeringStrategy()
+            # Languages, frameworks and tools (software, systems, graphics...).
+            return GeneralSoftwareStrategy()
 
         # 2. Specialized non-computing domain strategies
         if domain_lower in self._domain_strategies:
