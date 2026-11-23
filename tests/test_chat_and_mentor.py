@@ -267,3 +267,26 @@ def test_api_chat_extracts_targeted_section():
         assert "WAL records all page mutations" not in prompt_passed
 
 
+
+
+@pytest.mark.parametrize("query", [None, "computing/systems/bash"])
+def test_api_chat_sends_terminal_output_to_the_model_once(query):
+    """The terminal buffer used to go into both the system instruction and the
+    prompt (up to 6,500 chars, twice) under a "you MUST inspect" directive,
+    which pulled answers to unrelated questions toward the terminal."""
+    mock_provider = MagicMock()
+    mock_provider.generate.return_value = "ok"
+    marker = "zsh: command not found: kubectl-UNIQUE"
+    payload = {"message": "What is a closure?", "stream": False,
+               "terminal_context": f"$ kubectl-UNIQUE\n{marker}",
+               "last_terminal_command": "kubectl-UNIQUE get pods"}
+    if query:
+        payload.update(query=query, lesson_content="Closures capture variables.")
+    with patch("app.backend.main.get_chat_provider", return_value=(mock_provider, "mock-model")):
+        res = client.post("/api/chat", json=payload)
+    assert res.status_code == 200
+    args, kwargs = mock_provider.generate.call_args
+    sent = (args[0] if args else kwargs["prompt"]) + "\n" + kwargs["system_instruction"]
+    assert sent.count(marker) == 1
+    assert sent.count("kubectl-UNIQUE get pods") == 1
+    assert "MUST" not in kwargs["system_instruction"].split("Terminal")[-1]

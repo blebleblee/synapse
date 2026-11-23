@@ -1319,6 +1319,29 @@ LANGUAGE_MANDATES = {
     "ru": "MANDATORY LANGUAGE DIRECTIVE: The student has selected Russian (Русский). You MUST converse, explain concepts, and formulate all responses strictly in natural, fluent Russian. Preserve exact technical keywords, CLI flags, and code syntax, but formulate all explanations, questions, and guidance in Russian.",
 }
 
+def terminal_section(terminal_context: Optional[str], last_command: Optional[str]) -> List[str]:
+    """The student's terminal, once, for the system instruction. It is only
+    relevant when the question is about it, so the model is told to leave it
+    alone otherwise (it used to be sent twice under a "you MUST inspect" rule)."""
+    lines: List[str] = []
+    if last_command and last_command.strip():
+        lines.append(f"\n### Student's Last Executed Terminal Command: `{last_command.strip()}`")
+    if terminal_context and terminal_context.strip():
+        lines.extend([
+            "\n### Live Student Terminal Output & Workspace Session (Commands & Results):",
+            "```text",
+            terminal_context.strip()[-3500:],
+            "```",
+        ])
+    if lines:
+        lines.append(
+            "TERMINAL: The student has a terminal open next to the lesson. When they ask about a command they "
+            "ran, an error, an exit code or other terminal output, read the terminal text and last command above, "
+            "explain what happened and what to do next. When the question is not about the terminal, ignore it."
+        )
+    return lines
+
+
 def build_chat_system_instruction(
     domain: str,
     category: str,
@@ -1355,17 +1378,7 @@ def build_chat_system_instruction(
         "6. ACCURACY: Do not invent commands, flags, APIs, numbers or citations. Only when the excerpt does not cover the question, say so briefly and answer from well-established knowledge; if you are unsure, say that plainly."
     ])
 
-    if last_command and last_command.strip():
-        prompt_lines.append(f"\n### Student's Last Executed Terminal Command: `{last_command.strip()}`")
-
-    if terminal_context and terminal_context.strip():
-        prompt_lines.extend([
-            "\n### Live Student Terminal Output & Workspace Session (Commands & Results):",
-            "```text",
-            terminal_context.strip()[-3500:],
-            "```",
-            "CRITICAL TERMINAL DIRECTIVE: The student has an integrated terminal open in their workspace. If the student asks about what they typed, a command they ran (such as their last command noted above), an error, exit code, or terminal output, you MUST directly inspect the terminal text and last command above, identify the command/output, explain it clearly, and guide them on what to do next with first-principles clarity."
-        ])
+    prompt_lines.extend(terminal_section(terminal_context, last_command))
 
     return "\n".join(prompt_lines)
 
@@ -1391,17 +1404,7 @@ def build_neutral_workspace_instruction(
         "4. CASUAL GREETINGS: If greeted ('hi', 'hello'), respond warmly in 1-2 friendly sentences and ask what engineering, computing, or science subject they would like to explore or troubleshoot.",
         "5. ACCURACY: Do not invent commands, flags, APIs, numbers or citations. If you are unsure, say that plainly."
     ])
-    if last_command and last_command.strip():
-        lines.append(f"\n### Student's Last Executed Terminal Command: `{last_command.strip()}`")
-
-    if terminal_context and terminal_context.strip():
-        lines.extend([
-            "\n### Live Student Terminal Output & Workspace Session (Commands & Results):",
-            "```text",
-            terminal_context.strip()[-3500:],
-            "```",
-            "CRITICAL TERMINAL DIRECTIVE: The student has an integrated terminal open in their workspace. If the student asks about what they typed, a command they ran (such as their last command noted above), an error, exit code, or terminal output, you MUST directly inspect the terminal text and last command above, identify the command/output, explain it clearly, and guide them on what to do next with first-principles clarity."
-        ])
+    lines.extend(terminal_section(terminal_context, last_command))
     return "\n".join(lines)
 
 def save_chat_session(sub_path: Optional[Path], user_msg: str, tutor_reply: str, history: List[Any]):
@@ -1516,15 +1519,7 @@ async def chat_with_tutor(req: ChatRequest):
     if conversation_text and conversation_text[-1].strip() == f"Student: {req.message}".strip():
         conversation_text.pop()
 
-    # Inject last command and terminal buffer directly into prompt so LLM sees it immediately
-    if last_cmd and last_cmd.strip():
-        conversation_text.append(
-            f"[Student's Most Recent Terminal Command]: `{last_cmd.strip()}`"
-        )
-    if terminal_ctx and terminal_ctx.strip():
-        conversation_text.append(
-            f"[Live Student Terminal Session]:\n```text\n{terminal_ctx.strip()[-3000:]}\n```\n(The student's terminal session shows their recent commands and output above. If the student refers to what they typed or command results, reference this block directly.)"
-        )
+    # The terminal and last command are in the system instruction (terminal_section).
 
     conversation_text.append(f"Student: {req.message}")
     conversation_text.append("Tutor:")
