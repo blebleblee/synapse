@@ -1005,7 +1005,8 @@ class AnthropicProvider(LLMProvider):
                 return "claude-haiku-5-5"
             if "sonnet" in m_lower:
                 return "claude-sonnet-5"
-            return "claude-sonnet-5"
+            # Other families a gateway serves (gpt-5.5, deepseek-...) pass through.
+            return model
         return model
 
     def _get_url(self) -> str:

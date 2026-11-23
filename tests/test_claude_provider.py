@@ -119,3 +119,10 @@ def test_proxy_keeps_full_model_ids(model):
 def test_proxy_still_maps_bare_family_names():
     p = models.AnthropicProvider(model="sonnet", base_url="https://proxy.example")
     assert p.model == "claude-sonnet-5"
+
+
+def test_proxy_keeps_other_families_for_cross_family_review():
+    # `synapse review --provider anthropic -m gpt-5.5` on a gateway must ask
+    # for GPT, not silently review Claude-written lessons with Claude.
+    p = models.AnthropicProvider(model="gpt-5.5", base_url="https://proxy.example")
+    assert p.model == "gpt-5.5"
