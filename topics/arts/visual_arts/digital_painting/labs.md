@@ -4,7 +4,7 @@
 
 Digital painting is the art of creating visual imagery through software-based brushwork, layering, color theory application, and compositional refinement. For the audio practitioner transitioning into visual arts—particularly one engaged in album artwork design, music video conceptualization, or multimedia scoring—digital painting demands the same disciplined workflow as audio production: precise tool mastery, systematic layer organization, critical listening (or in this case, critical *seeing*), and iterative refinement against reference materials and established principles of form, value, and color.
 
-This operational verification lab sequence positions digital painting as a complementary creative discipline for the music producer. Just as mixing reveals harmonic relationships through spectrum analysis and critical listening, digital painting reveals compositional structure through value studies, color temperature shifts, and gestural mark-making. The hand-eye coordination developed through gesture drawing directly informs rhythmic phrasing in composition; the understanding of atmospheric perspective mirrors the use of reverb and delay in spatial audio design.
+This operational verification lab sequence positions digital painting as a complementary creative discipline for visual artists and designers. Just as value studies reveal compositional structure through careful observation and critical analysis, digital painting develops understanding of form, light, and spatial relationships through layered mark-making and color temperature shifts. The hand-eye coordination developed through gesture drawing directly informs confident brushwork and expressive line quality; the understanding of atmospheric perspective mirrors the use of depth cues and color saturation in spatial composition.
 
 ### Required Software & Hardware Setup
 
@@ -30,7 +30,7 @@ This operational verification lab sequence positions digital painting as a compl
 
 Before color enters the visual field, a painter must master *value*—the grayscale relationship between light and dark. Value is the most powerful compositional and atmospheric tool in visual arts; it reads at a distance before color registers. In audio terms, value functions like dynamic range and frequency balance: proper value distribution creates clarity and hierarchy, just as proper gain staging and EQ creates mixing clarity.
 
-A gesture block is the rapid, intuitive placement of compositional masses without refinement of detail. This is analogous to sketching drum patterns and harmonic progressions before orchestration. The goal of this exercise is to develop perceptual accuracy, hand-eye coordination, and decision-making speed under time pressure—all essential for responsive musical performance.
+A gesture block is the rapid, intuitive placement of compositional masses without refinement of detail. This is analogous to blocking in basic values or laying down rough compositional scaffolding before resolving specific forms and details. The goal of this exercise is to develop perceptual accuracy, hand-eye coordination, and decision-making speed under time pressure—all essential for responsive visual practice.
 
 ### Lab Protocol: 30-Minute Value Study Sprint
 
@@ -67,7 +67,7 @@ A gesture block is the rapid, intuitive placement of compositional masses withou
 
 Color in digital painting operates through three simultaneous dimensions: *hue* (the color wheel position—red, yellow, green, blue, etc.), *saturation* (intensity of color versus gray), and *value* (lightness to darkness, independent of hue). The perceptual power of color rests not in saturation but in *temperature shift* and *saturation contrast*. A painter who understands that a shadow under a warm light source becomes cool (blue-shifted) will create far more luminous, believable work than one who simply darkens a color using the slider.
 
-For the audio practitioner, color harmony parallels harmonic function: a dominant chord feels energetic and requires resolution, just as a highly saturated orange-red demands resolution in a cool shadow. Analogous color schemes (adjacent on the color wheel) feel consonant; complementary schemes feel tense and dynamic. Triadic schemes (three colors equidistant on the wheel) feel balanced and vibrant—identical to the function of major/minor triads in harmony.
+For the visual practitioner, color harmony operates through consistent principles: a highly saturated orange-red appears energetic and demands resolution in a cool shadow. Analogous color schemes (adjacent on the color wheel) feel unified and harmonious; complementary schemes feel tense and dynamic. Triadic schemes (three colors equidistant on the wheel) feel balanced and vibrant, creating visual rhythm through their spatial relationship on the wheel.
 
 ### Lab Protocol: Systematic Palette Construction & Application
 

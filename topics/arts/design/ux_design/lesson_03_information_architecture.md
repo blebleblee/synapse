@@ -2,17 +2,17 @@
 
 ## 1. First-Principles Intuition & Invariants
 
-Information architecture exists because human cognition operates within strict constraints. Working memory holds approximately seven discrete chunks of information at any given moment, a limitation first documented by cognitive psychologist George Miller in 1956 and refined through decades of subsequent research to a more conservative estimate of four to five chunks. When a user encounters a digital interface—whether a streaming music platform, a DAW plugin browser, or a portfolio website—they must construct a mental model of where things are, how to reach them, and what relationships exist between elements. If the architecture violates their expectations or exceeds their cognitive load threshold, disorientation follows. The user stops thinking about their creative goal and starts thinking about the interface itself, a context switch that bleeds momentum and trust.
+Information architecture exists because human cognition operates within strict constraints. Working memory holds approximately seven discrete chunks of information at any given moment, a limitation first documented by cognitive psychologist George Miller in 1956 and refined through decades of subsequent research to a more conservative estimate of four to five chunks. When a user encounters a digital interface—whether a design system documentation site, a component library browser, or a portfolio website—they must construct a mental model of where things are, how to reach them, and what relationships exist between elements. If the architecture violates their expectations or exceeds their cognitive load threshold, disorientation follows. The user stops thinking about their creative goal and starts thinking about the interface itself, a context switch that bleeds momentum and trust.
 
-The foundational invariant of information architecture is that structure must mirror the user's mental model, not the system's internal data structure. A music production software suite might store stems, MIDI sequences, audio effects, and project metadata in separate database tables optimized for query performance, but presenting that raw technical structure to a composer would be catastrophic. The composer thinks in terms of workflow stages: sketching ideas, arranging sections, mixing tracks, mastering output. Effective information architecture translates the system's technical reality into navigational pathways that align with these human task models. This alignment is not cosmetic—it determines whether the user can offload cognitive burden to the interface or must hold the entire system map in working memory while simultaneously executing creative work.
+The foundational invariant of information architecture is that structure must mirror the user's mental model, not the system's internal data structure. A design software suite might store layers, vector objects, effects, and project metadata in separate database tables optimized for query performance, but presenting that raw technical structure to a designer would be catastrophic. The designer thinks in terms of workflow stages: conceptualizing ideas, compositing elements, refining visuals, preparing output. Effective information architecture translates the system's technical reality into navigational pathways that align with these human task models. This alignment is not cosmetic—it determines whether the user can offload cognitive burden to the interface or must hold the entire system map in working memory while simultaneously executing creative work.
 
-Navigation systems extend from this cognitive foundation. Every navigation pattern—hierarchical trees, hub-and-spoke architectures, linear sequences, or networked graphs—imposes a mental cost. Hierarchical navigation maps cleanly to taxonomic thinking: genres contain subgenres, albums contain tracks, folders contain files. Users navigate by progressively narrowing scope, a pattern that works exceptionally well when categories are mutually exclusive and the hierarchy is shallow. Beyond three levels of nesting, however, hierarchical navigation triggers the "click fatigue" failure mode. Users forget where they entered the hierarchy, lose track of sibling categories, and resort to search functions or abandon the task entirely. Hub-and-spoke architectures, where all sections radiate from a central dashboard, reduce navigation depth but demand that the hub itself remains cognitively scannable. A DAW's mixer window exemplifies this: channel strips radiate from a central control surface, but if the track count exceeds screen real estate, the hub collapses into a scrolling list and the spatial advantage evaporates.
+Navigation systems extend from this cognitive foundation. Every navigation pattern—hierarchical trees, hub-and-spoke architectures, linear sequences, or networked graphs—imposes a mental cost. Hierarchical navigation maps cleanly to taxonomic thinking: projects contain components, components contain elements, elements contain properties. Users navigate by progressively narrowing scope, a pattern that works exceptionally well when categories are mutually exclusive and the hierarchy is shallow. Beyond three levels of nesting, however, hierarchical navigation triggers the "click fatigue" failure mode. Users forget where they entered the hierarchy, lose track of sibling categories, and resort to search functions or abandon the task entirely. Hub-and-spoke architectures, where all sections radiate from a central dashboard, reduce navigation depth but demand that the hub itself remains cognitively scannable. A design tool's layers panel exemplifies this: controls radiate from a central interface, but if the item count exceeds screen real estate, the hub collapses into a scrolling list and the spatial advantage evaporates.
 
 The concept of wayfinding, borrowed from environmental psychology and physical architecture, reveals how users orient themselves within information spaces. Kevin Lynch's work on urban legibility identified five elements that help people navigate cities: paths, edges, districts, nodes, and landmarks. Digital information architecture employs direct analogs. Paths are navigation flows—the sequence of clicks or gestures required to reach a destination. Edges are boundaries between content types or functional zones, often marked by visual separators, color shifts, or typographic hierarchy changes. Districts are thematic clusters: the "browse" section of a music app versus the "library" section. Nodes are decision points where multiple paths converge, such as a search results page or a contextual menu. Landmarks are distinctive UI elements that persist across views, providing constant spatial reference—a fixed top navigation bar, a persistent playback control strip, or an always-visible project timeline.
 
-Users construct cognitive maps of these elements through repeated interaction, a process that relies on consistency. If a landmark shifts position between screens, if district boundaries blur, or if paths change behavior based on hidden state, the cognitive map fractures. The user must rebuild their mental model from scratch with each session, preventing the formation of procedural memory. Procedural memory is the deep, automatic knowledge that allows a pianist to execute a complex passage without conscious attention to individual finger movements. In interface terms, procedural memory allows a power user to navigate a complex tool purely through muscle memory and spatial intuition, freeing conscious thought for creative decision-making. Information architecture that disrupts procedural memory formation—through inconsistent patterns, context-dependent behavior, or unpredictable state changes—condemns users to perpetual novice status.
+Users construct cognitive maps of these elements through repeated interaction, a process that relies on consistency. If a landmark shifts position between screens, if district boundaries blur, or if paths change behavior based on hidden state, the cognitive map fractures. The user must rebuild their mental model from scratch with each session, preventing the formation of procedural memory. Procedural memory is the deep, automatic knowledge that allows a graphic designer to execute a complex layout without conscious attention to individual tool controls. In interface terms, procedural memory allows a power user to navigate a complex tool purely through muscle memory and spatial intuition, freeing conscious thought for creative decision-making. Information architecture that disrupts procedural memory formation—through inconsistent patterns, context-dependent behavior, or unpredictable state changes—condemns users to perpetual novice status.
 
-Taxonomies and classification schemes form the substrate upon which navigation systems operate. A taxonomy is a controlled vocabulary organized into hierarchical relationships. Music metadata taxonomies, for instance, impose structure on inherently fuzzy cultural concepts. Is a track "electronic" or "ambient"? Does it belong in "chill" or "downtempo"? Rigid taxonomies force binary decisions that collapse nuance, while overly permissive tagging systems generate noise. The optimal approach depends on use case. A music discovery platform prioritizes findability over precision, so it employs broad, overlapping tags and accepts some classification ambiguity. A sample library for professional composers demands surgical precision, so it enforces strict taxonomies with controlled vocabularies: instrument family, articulation type, dynamic layer, and tonal center must be explicitly tagged and mutually exclusive.
+Taxonomies and classification schemes form the substrate upon which navigation systems operate. A taxonomy is a controlled vocabulary organized into hierarchical relationships. Visual design taxonomies, for instance, impose structure on inherently fuzzy stylistic concepts. Is a typeface "geometric" or "organic"? Does it belong in "playful" or "formal"? Rigid taxonomies force binary decisions that collapse nuance, while overly permissive tagging systems generate noise. The optimal approach depends on use case. A design inspiration platform prioritizes findability over precision, so it employs broad, overlapping tags and accepts some classification ambiguity. A component library for professional designers demands surgical precision, so it enforces strict taxonomies with controlled vocabularies: color palette, composition type, visual weight, and contrast level must be explicitly tagged and mutually exclusive.
 
 Faceted classification systems offer a middle path. Instead of forcing a single hierarchical position, faceted taxonomies decompose items into multiple independent dimensions. A sound effect might be classified simultaneously by source (acoustic, synthesized, recorded), emotional quality (tense, calm, chaotic), temporal characteristic (sustained, percussive, evolving), and frequency range (sub-bass, mid-range, high-frequency). Users navigate by progressively applying filters across these facets, narrowing results without traversing a rigid tree. This approach maps naturally to how audio professionals think: "I need a dark, evolving pad with sub-bass presence" translates directly into facet selections. The cognitive cost shifts from "where is this item in the hierarchy?" to "which attributes describe what I need?", a question that aligns with creative intent.
 
@@ -24,65 +24,65 @@ The invariant principle underlying all scaling strategies is that human attentio
 
 Information architecture operates through four primary structural models: hierarchical trees, network graphs, sequential flows, and matrix organizations. Each model encodes different assumptions about content relationships and imposes distinct cognitive demands. Selecting the appropriate model depends on the inherent structure of the content, the user's mental model, and the frequency of different access patterns.
 
-Hierarchical trees organize content into parent-child relationships where each item has exactly one parent. This structure excels when content exhibits natural taxonomic boundaries. A music education platform might organize lessons into a hierarchy: instrument family at the top level, specific instruments at the second level, technique categories at the third level, and individual lessons at the leaves. Users navigate by progressively narrowing scope, a pattern that maps cleanly to how humans categorize knowledge. The tree structure guarantees that users can always answer "where am I?" by tracing the path from root to current node. This spatial certainty is the tree's primary cognitive advantage.
+Hierarchical trees organize content into parent-child relationships where each item has exactly one parent. This structure excels when content exhibits natural taxonomic boundaries. An art education platform might organize lessons into a hierarchy: discipline at the top level, specific practices at the second level, technique categories at the third level, and individual lessons at the leaves. Users navigate by progressively narrowing scope, a pattern that maps cleanly to how humans categorize knowledge. The tree structure guarantees that users can always answer "where am I?" by tracing the path from root to current node. This spatial certainty is the tree's primary cognitive advantage.
 
 ```mermaid
 flowchart TD
-    root["All Instruments"]
+    root["All Disciplines"]
 
-    root --> strings["Strings"]
-    root --> keyboards["Keyboards"]
+    root --> drawing["Drawing"]
+    root --> digital["Digital Art"]
 
-    strings --> bass_guitar["Bass Guitar"]
-    strings --> guitar["Guitar"]
+    drawing --> figure["Figure Drawing"]
+    drawing --> perspective["Perspective"]
 
-    bass_guitar --> technique_fundamentals["Technique Fundamentals"]
-    bass_guitar --> theory_harmony["Theory & Harmony"]
-    bass_guitar --> rhythm_time["Rhythm & Time Feel"]
+    figure --> fundamentals["Fundamentals"]
+    figure --> anatomy["Anatomy & Form"]
+    figure --> gesture_time["Gesture & Timing"]
 
-    technique_fundamentals --> lesson_floating_thumb["Lesson: Floating Thumb Muting"]
-    technique_fundamentals --> lesson_simandl["Lesson: Simandl 1-2-4 Fingering"]
-    technique_fundamentals --> lesson_string_crossing["Lesson: String Crossing Economy"]
+    fundamentals --> lesson_line["Lesson: Line Weight Control"]
+    fundamentals --> lesson_proportion["Lesson: Head-Unit Proportions"]
+    fundamentals --> lesson_contour["Lesson: Blind Contour Drawing"]
 
-    theory_harmony --> lesson_walking_bass["Lesson: Walking Bass Lines"]
-    theory_harmony --> lesson_modal["Lesson: Modal Fingerings"]
+    anatomy --> lesson_torso["Lesson: Torso Landmarks"]
+    anatomy --> lesson_hands["Lesson: Simplified Hand Forms"]
 
-    rhythm_time --> lesson_odd_meters["Lesson: Subdividing Odd Meters"]
+    gesture_time --> lesson_quick_poses["Lesson: 30-Second Gesture Poses"]
 
-    guitar --> fingerstyle["Fingerstyle Technique"]
-    guitar --> caged["CAGED System Theory"]
+    perspective --> one_point["One-Point Perspective"]
+    perspective --> two_point["Two-Point Perspective"]
 
-    keyboards --> piano["Piano"]
-    keyboards --> synths["Synthesizers"]
+    digital --> painting["Digital Painting"]
+    digital --> vector["Vector Illustration"]
 
-    piano --> hand_position["Hand Position Mechanics"]
-    piano --> chord_voicings["Chord Voicings"]
-    piano --> sight_reading["Sight Reading Drills"]
+    painting --> brush_setup["Brush Setup"]
+    painting --> color_blocking["Color Blocking"]
+    painting --> rendering["Rendering Light"]
 
-    synths --> subtractive["Subtractive Synthesis"]
-    synths --> modular["Modular Eurorack Patching"]
+    vector --> pen_tool["Pen Tool Paths"]
+    vector --> shape_builder["Shape Builder Workflows"]
 ```
 
-The failure modes of hierarchical architecture emerge when content relationships resist strict categorization. A lesson on "syncopated slap bass rhythms" could reasonably live under "Technique Fundamentals" or "Rhythm & Time Feel." Forcing a single hierarchical position requires the architect to predict which path users will most likely follow, a prediction that may diverge from actual user behavior. Cross-referencing—placing the same content in multiple branches—appears to solve this problem but violates the tree structure and introduces maintenance burden. If the lesson is updated, every instance must be synchronized. Alternatively, the architect can place the lesson in one location and provide a link from the other, but this transforms the pure tree into a hybrid structure and introduces the "where is the canonical version?" ambiguity.
+The failure modes of hierarchical architecture emerge when content relationships resist strict categorization. A lesson on "quick gesture poses" could reasonably live under "Fundamentals" or "Gesture & Timing." Forcing a single hierarchical position requires the architect to predict which path users will most likely follow, a prediction that may diverge from actual user behavior. Cross-referencing—placing the same content in multiple branches—appears to solve this problem but violates the tree structure and introduces maintenance burden. If the lesson is updated, every instance must be synchronized. Alternatively, the architect can place the lesson in one location and provide a link from the other, but this transforms the pure tree into a hybrid structure and introduces the "where is the canonical version?" ambiguity.
 
-Network graphs abandon strict hierarchy in favor of many-to-many relationships. Each node can connect to any other node, and users navigate by following links between related content. Wikipedia exemplifies this structure: articles link bidirectionally to related concepts, allowing users to explore knowledge associatively rather than taxonomically. For creative disciplines, network navigation maps naturally to conceptual relationships. A lesson on "modal interchange" might link to lessons on "functional harmony," "borrowed chords," "parallel major-minor tonality," and "Bill Evans voicings," reflecting the actual conceptual web that musicians navigate when learning this topic. Network architectures excel at supporting exploratory learning and serendipitous discovery.
+Network graphs abandon strict hierarchy in favor of many-to-many relationships. Each node can connect to any other node, and users navigate by following links between related content. Wikipedia exemplifies this structure: articles link bidirectionally to related concepts, allowing users to explore knowledge associatively rather than taxonomically. For creative disciplines, network navigation maps naturally to conceptual relationships. A lesson on "color theory" might link to lessons on "complementary colors," "saturation and value," "perceptual contrast," and "cultural color symbolism," reflecting the actual conceptual web that designers navigate when learning this topic. Network architectures excel at supporting exploratory learning and serendipitous discovery.
 
 ```mermaid
 flowchart TD
-    A["Modal Interchange<br/>(Current Node)"]
-    
-    B["Borrowed Chords"]
-    C["Secondary Dominants"]
-    D["Parallel Major/Minor"]
-    E["Bill Evans Voicings"]
-    
-    F["Functional Harmony<br/>(Root Context)"]
-    
+    A["Complementary Colors<br/>(Current Node)"]
+
+    B["Simultaneous Contrast"]
+    C["Split-Complementary Schemes"]
+    D["Warm/Cool Temperature"]
+    E["Impressionist Shadows"]
+
+    F["Color Wheel Theory<br/>(Root Context)"]
+
     A --> B
     A --> C
     A --> D
     A --> E
-    
+
     B --> F
     C --> F
     D --> F
@@ -159,13 +159,13 @@ Hybrid architectures combine multiple models to leverage their respective streng
 
 Labeling and nomenclature constitute a critical but often underestimated architectural component. Every navigation element—menu item, button label, section header—requires a text label that clearly communicates its destination or function. Effective labels balance specificity and brevity. "Synthesizer Tutorials" is more specific than "Tutorials" but less specific than "Subtractive Synthesis Patch Programming for Hardware Modular Systems." The optimal label depends on context. If the label appears within a section already titled "Synthesizers," the redundancy can be dropped. If it appears in a global navigation menu alongside other instrument categories, the specificity is necessary for disambiguation.
 
-Controlled vocabularies enforce consistency in labeling across an entire system. A DAW might standardize on "Track" rather than allowing "Channel," "Strip," or "Lane" to appear interchangeably. Inconsistent terminology forces users to learn that multiple labels refer to the same concept, a cognitive tax that scales poorly. Large systems require explicit style guides that document approved terms, prohibited synonyms, and capitalization conventions. Without governance, labels drift over time as different designers and content authors introduce their own variations.
+Controlled vocabularies enforce consistency in labeling across an entire system. A design system might standardize on "Component" rather than allowing "Element," "Module," or "Part" to appear interchangeably. Inconsistent terminology forces users to learn that multiple labels refer to the same concept, a cognitive tax that scales poorly. Large systems require explicit style guides that document approved terms, prohibited synonyms, and capitalization conventions. Without governance, labels drift over time as different designers and content authors introduce their own variations.
 
 Search functionality serves as a bypass mechanism for users who know exactly what they want and find navigation too slow. Search architecture involves three components: the query interface, the indexing strategy, and the results ranking algorithm. Query interfaces range from simple single-field text boxes to advanced search forms with multiple filter fields. The simplicity of a single field reduces cognitive load but limits precision. Advanced forms improve precision but require users to understand the underlying data schema. The trade-off depends on user sophistication and content complexity.
 
-Indexing strategy determines what content is searchable and at what granularity. A music education platform might index lesson titles only, or it might index full transcripts of video lessons, allowing users to search for specific phrases spoken in a tutorial. Deeper indexing improves findability but increases computational cost and storage requirements. For user-generated content platforms, indexing must handle misspellings, alternate phrasings, and ambiguous terminology. A search for "piano voicings" should ideally also return results for "chord structures" and "harmonic voicings," requiring synonym expansion or semantic search capabilities.
+Indexing strategy determines what content is searchable and at what granularity. A visual-arts education platform might index lesson titles only, or it might index full transcripts of video lessons, allowing users to search for specific phrases spoken in a tutorial. Deeper indexing improves findability but increases computational cost and storage requirements. For user-generated content platforms, indexing must handle misspellings, alternate phrasings, and ambiguous terminology. A search for "color palettes" should ideally also return results for "color schemes" and "color harmonies," requiring synonym expansion or semantic search capabilities.
 
-Results ranking algorithms determine which results appear first. Relevance ranking typically combines text matching scores with contextual factors: user behavior data, content popularity, recency, and user profile attributes. A composer searching for "reverb" might receive results biased toward acoustic space simulation plugins, while a mixing engineer searching the same term might see results biased toward technical reverb algorithm documentation. Personalized ranking improves precision but introduces opacity—users cannot always predict why certain results rank highly, which can undermine trust if the ranking appears arbitrary or misaligned with intent.
+Results ranking algorithms determine which results appear first. Relevance ranking typically combines text matching scores with contextual factors: user behavior data, content popularity, recency, and user profile attributes. A photographer searching for "blur" might receive results biased toward camera lens and software effects plugins, while a UX designer searching the same term might see results biased toward motion blur documentation for design systems. Personalized ranking improves precision but introduces opacity—users cannot always predict why certain results rank highly, which can undermine trust if the ranking appears arbitrary or misaligned with intent.
 
 ## 3. High-Performance Optimization & Failure Modes
 
@@ -175,7 +175,7 @@ Shallow hierarchies reduce navigation steps but increase breadth at each level. 
 
 Persistent navigation elements—menus, sidebars, breadcrumbs, and global search—reduce the need for users to memorize paths. A fixed top navigation bar that remains visible during scrolling allows users to pivot between sections at any time without backtracking. This reduces navigation latency but consumes screen real estate. On mobile devices where vertical space is limited, persistent navigation must collapse into a hamburger menu or slide-out drawer, trading visibility for space. The optimal choice depends on usage frequency. If navigation happens constantly, the visibility trade-off favors persistence. If users typically enter a section and remain there for extended sessions, the space trade-off favors hiding navigation until explicitly invoked.
 
-Anticipatory design reduces decision time by predicting user intent and pre-loading likely next steps. A DAW might observe that users frequently open the mixer window immediately after recording a take, so it could automatically surface a "Go to Mixer" prompt after recording stops. Anticipatory patterns work well when behavior is predictable and the suggestion aligns with actual intent. When anticipation misfires—offering a prompt the user does not want—it becomes an interruption that breaks flow and trains users to ignore future prompts. The architect must balance anticipation with user control, ensuring that suggestions remain non-intrusive and easily dismissed.
+Anticipatory design reduces decision time by predicting user intent and pre-loading likely next steps. A design tool might observe that users frequently open the layers panel immediately after creating a new object, so it could automatically surface a "Go to Layers" prompt after the object is placed. Anticipatory patterns work well when behavior is predictable and the suggestion aligns with actual intent. When anticipation misfires—offering a prompt the user does not want—it becomes an interruption that breaks flow and trains users to ignore future prompts. The architect must balance anticipation with user control, ensuring that suggestions remain non-intrusive and easily dismissed.
 
 Keyboard shortcuts and command palettes provide expert-level direct-access patterns. A command palette—popularized by tools like Spotlight on macOS and Cmd+K interfaces in web applications—allows users to type a few characters of a command name and jump directly to that function without navigating through menus. This pattern is extraordinarily efficient for users who have memorized command names but useless for novices who do not yet know what commands exist. Effective command palette implementations include fuzzy matching, synonym expansion, and inline documentation that appears as users type, balancing expert efficiency with novice discoverability.
 
@@ -189,7 +189,7 @@ Brittle taxonomies break when content evolves beyond the original classification
 
 Search failure occurs when users know content exists but cannot construct a query that retrieves it. Common causes include vocabulary mismatch (the user searches for "tremolo" but the content is labeled "vibrato"), insufficient indexing depth (the term exists in the content but was not indexed), or poor ranking that buries relevant results below dozens of irrelevant ones. Mitigating search failure requires synonym expansion, full-text indexing, and continuous refinement of ranking algorithms based on user behavior data. If users frequently click result number seven rather than result number one, the ranking algorithm is failing to predict relevance accurately.
 
-Cognitive overload failure occurs when the architecture presents too many choices simultaneously. A DAW with two hundred visible menu items across multiple nested submenus overwhelms working memory. Users cannot build a mental map of where functionality lives, so they resort to trial-and-error exploration or external documentation. Mitigating cognitive overload requires progressive disclosure, contextual menus that show only relevant options for the current task, and search-driven interfaces that bypass navigation entirely. The principle is to reveal complexity on demand rather than displaying it all simultaneously.
+Cognitive overload failure occurs when the interface presents too many choices simultaneously. A design tool with two hundred visible menu items across multiple nested submenus overwhelms working memory. Users cannot build a mental map of where functionality lives, so they resort to trial-and-error exploration or external documentation. Mitigating cognitive overload requires progressive disclosure, contextual menus that show only relevant options for the current task, and search-driven interfaces that bypass navigation entirely. The principle is to reveal complexity on demand rather than displaying it all simultaneously.
 
 Inconsistent navigation patterns force users to learn multiple mental models within a single system. If the hierarchical browse section uses left-sidebar navigation, the search results use top-tab navigation, and the library uses a matrix grid, users must context-switch between different spatial logic systems. Consistency does not mean every section must use identical layouts—it means that similar tasks should employ similar patterns. All content browsing interfaces should use related navigation paradigms, all configuration interfaces should follow related conventions, and transitions between contexts should be explicitly marked so users recognize when mental model shifts are required.
 

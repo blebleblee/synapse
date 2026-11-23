@@ -52,7 +52,7 @@ Execute this construction protocol three times using different source photograph
 
 ## Exercise 3: Value Structure, Directional Lighting & Form Rendering
 
-Value control—the orchestration of light and shadow to describe three-dimensional form—separates technical draftsmanship from finished illustration. This exercise constructs a five-value lighting scheme on geometric primitives, establishing the perceptual foundation for rendering complex organic forms, environments, and product visualization.
+Value control—the arrangement of light and shadow to describe three-dimensional form—separates technical draftsmanship from finished illustration. This exercise constructs a five-value lighting scheme on geometric primitives, establishing the perceptual foundation for rendering complex organic forms, environments, and product visualization.
 
 Create a new 2000×2000 pixel canvas at 300 DPI. Configure your brush engine with a soft round brush at 200-pixel diameter, pressure opacity enabled, and flow set to 40% for gradual value buildup. Establish a grayscale value scale by creating five swatches in a reference layer: pure white (HSV: 0°, 0%, 100%), highlight (0°, 0%, 80%), midtone (0°, 0%, 50%), shadow (0°, 0%, 25%), and core shadow (0°, 0%, 10%). This five-step compression mirrors the human visual system's limited simultaneous contrast discrimination—paintings and illustrations that exceed five distinct values without transitional gradients appear posterized and lose spatial cohesion.
 
