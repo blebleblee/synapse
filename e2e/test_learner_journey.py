@@ -724,22 +724,25 @@ def test_search_navigation_to_matched_lesson(browser_page):
 
 def test_mentor_model_indicator_and_error_dismissal(browser_page):
     """
-    Verifies that the active mentor model is shown once, in the bottom status
-    bar (not repeated in the chat header), and that connection error notices
-    can be dismissed inline without losing student conversation history.
+    Verifies that the active mentor model is shown once, in the mentor panel
+    header next to its online dot (owner, 2026-11-23: the bottom bar keeps only
+    app status and background work), and that connection error notices can be
+    dismissed inline without losing student conversation history.
     """
     page, server_url = browser_page
     page.goto(server_url)
     expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
 
-    # 1. The mentor model badge is in the bottom status bar...
-    bottom_badge = page.locator(".mentor-model-badge").first
-    expect(bottom_badge).to_be_visible(timeout=5000)
-    expect(bottom_badge).to_have_text("(qwen2.5-coder)")
+    # 1. The mentor model badge is in the mentor panel header...
+    header_badge = page.locator(".chat-header .mentor-model-badge")
+    expect(header_badge).to_have_count(1)
+    expect(header_badge).to_be_visible(timeout=5000)
+    expect(header_badge).to_have_text("(qwen2.5-coder)")
 
-    # 2. ...and not repeated in the chat header next to the topic.
-    expect(page.locator(".chat-header")).to_be_visible()
-    expect(page.locator(".chat-header")).not_to_contain_text("qwen2.5-coder")
+    # 2. ...and not repeated in the bottom status bar.
+    expect(page.locator(".workbench-bottom-bar")).to_be_visible()
+    expect(page.locator(".workbench-bottom-bar")).not_to_contain_text("qwen2.5-coder")
+    expect(page.locator(".workbench-bottom-bar")).not_to_contain_text("Mentor")
 
     # 3. Intercept /api/chat with a simulated provider connection failure (503)
     page.route("**/api/chat", lambda route: route.fulfill(
@@ -888,3 +891,57 @@ def test_escape_closes_dialogs(browser_page):
     page.locator(".xterm-helper-textarea").focus()
     page.keyboard.press("Escape")
     expect(page.locator(".flashcard-modal-card")).to_have_count(0, timeout=3000)
+
+
+def test_status_bar_during_background_translation(browser_page):
+    """While a translation runs in the background, the learner keeps using the
+    app (owner request, 2026-11-23). The bottom bar shows app status and the
+    running translation side by side on the left, no mentor pill, and both
+    survive navigation, dialogs, lesson switching and the terminal."""
+    page, server_url = browser_page
+    errors = []
+    page.on("pageerror", lambda e: errors.append(str(e)))
+    job = {"id": "t1", "status": "running", "title": "E2E Unique Storage Invariants",
+           "target_lang": "cs", "done": 1, "total": 4, "paused": False}
+    page.route("**/api/translate/jobs", lambda route: route.fulfill(
+        status=200, content_type="application/json", body=json.dumps({"jobs": [job]})))
+    page.goto(server_url)
+    expect(page.locator("aside.tree-sidebar")).to_be_visible(timeout=10000)
+
+    bar_left = page.locator(".workbench-bottom-bar .bottom-bar-left")
+    queue = bar_left.locator(".translation-queue")
+
+    def status_bar_is_intact():
+        expect(bar_left.locator(".ai-idle-status")).to_contain_text("Synapse Ready")
+        expect(queue).to_be_visible(timeout=5000)
+        expect(queue).to_contain_text("Translating E2E Unique Storage Invariants (2/4)")
+        expect(page.locator(".workbench-bottom-bar")).not_to_contain_text("Mentor")
+
+    status_bar_is_intact()
+    # Status and translation sit together on the left half of the bar.
+    status_box = bar_left.locator(".ai-idle-status").bounding_box()
+    queue_box = queue.bounding_box()
+    bar_box = page.locator(".workbench-bottom-bar").bounding_box()
+    assert queue_box["x"] > status_box["x"]
+    assert queue_box["x"] < bar_box["x"] + bar_box["width"] / 2
+
+    # Use the app while the job runs.
+    select_fixture_lesson(page, "Data", "E2e Unique Storage Invariants", "Foundations")
+    status_bar_is_intact()
+    page.locator("button[title^='Search Curriculum']").click()
+    page.keyboard.press("Escape")
+    page.locator("button[title='Settings']").click()
+    page.keyboard.press("Escape")
+    expect(page.locator(".modal-backdrop")).to_have_count(0, timeout=3000)
+    page.keyboard.press("]")
+    page.locator(".xterm-helper-textarea").focus()
+    status_bar_is_intact()
+
+    # The queue panel opens inside the window (it now sits on the left).
+    queue.locator(".translation-queue-toggle").click()
+    panel = page.locator(".translation-queue-panel")
+    expect(panel).to_be_visible(timeout=3000)
+    box = panel.bounding_box()
+    assert box["x"] >= 0 and box["x"] + box["width"] <= page.viewport_size["width"]
+
+    assert errors == []

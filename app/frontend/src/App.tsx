@@ -1003,20 +1003,7 @@ function App() {
                 <span>Synapse Ready</span>
               </div>
             )}
-          </div>
-
-          <div className="bottom-bar-right">
             <TranslationQueueIndicator enabled={apiUnlocked} />
-            <span
-              className={`mentor-status-pill ${mentorConnected}`}
-              title={`Socratic Mentor: ${mentorConnected === 'connected' ? 'Online' : mentorConnected === 'checking' ? 'Connecting' : 'Offline'}${shownMentorModel ? ` (${shownMentorModel})` : ''}${mentorFallback ? `. ${configuredMentorModel} is not available, so ${shownMentorModel} answers instead.` : ''}`}
-            >
-              <span className={`status-dot ${mentorConnected === 'connected' ? (mentorFallback ? 'fallback' : 'online') : 'offline'}`} />
-              <span>Mentor {mentorConnected === 'connected' ? 'Online' : mentorConnected === 'checking' ? 'Connecting…' : 'Offline'}</span>
-              {shownMentorModel && (
-                <span className="mentor-model-badge">({shownMentorModel.split(':')[0]}{mentorFallback ? ', fallback' : ''})</span>
-              )}
-            </span>
           </div>
         </div>
 
@@ -1035,6 +1022,9 @@ function App() {
         onSendMessage={handleSendMessage}
         onClearChat={() => setUnifiedChatHistory([])}
         mentorConnected={mentorConnected}
+        mentorModel={shownMentorModel}
+        mentorFallback={mentorFallback}
+        configuredMentorModel={configuredMentorModel}
         targetLanguage={settings.language}
         onDismissMessage={(idx) => setUnifiedChatHistory((prev) => prev.filter((_, i) => i !== idx))}
       />
