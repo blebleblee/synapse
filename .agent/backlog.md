@@ -342,6 +342,18 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### Curriculum review: UNBLOCKED (owner 2026-11-23), sample running
 - Gateway serves `gpt-5.5` / `deepseek-v4-*` on `/v1/messages` (cross-family reviewer for Claude-written lessons). One-course pilot (`synapse review computing/data/sql_and_relational_query_optimization -p anthropic -m gpt-5.5`, read-only) was blocked pending the owner's cost decision (review on hold). Gateway reports `usage.tokens` ≈1,200–1,600 for a 16-token call; cost per course unknown.
 
+### FIND-78: Translation State Was Invisible
+- **Status:** **COMPLETED** (2026-11-23, PR #5). Each lesson opened in English; a queued or finished translation showed only after re-picking the language, and the owner could not tell whether revisiting lost it (it did not: submit reuses the active job, the cache keeps results; a server restart drops queued jobs). Now: `GET /api/translate/status`, remembered reading language, auto-open of cached/queued lessons, Translate button otherwise, sidebar markers. Tests: `tests/test_translation_jobs.py`, E2E `test_translations_are_visible_per_lesson_in_the_remembered_language`.
+
+### FIND-79: Status Bar Split App Status From the Running Translation
+- **Status:** **COMPLETED** (2026-11-23, PR #4). E2E `test_status_bar_during_background_translation` uses the app while a translation runs.
+
+### Curriculum review (focused): IN PROGRESS, NEEDS DECISION
+- 26 of 1,399 courses reviewed (`.agent/reports/review_focused_2026-11-23.md`). Next: choose a reviewer model with credit; then fix findings section by section (Claude), public via PR. Also fix the lint warnings `PYTHON_SYNTAX_ERROR` / `MISSING_IMPORT` (free to find). 2 public decks have under 6 cards (regenerate).
+
+### Queued translations are lost on server restart
+- Candidate (not verified as a problem for the owner yet): the queue lives in memory. Persisting pending jobs would make restarts safe.
+
 ## Next Candidates (not yet verified)
 
 Waiting for the API proxy (owner says when it works); `synapse review --workers N --domain computing` is ready for the pilot.
