@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Dict, List, Any
 from .security import WORKSPACE_ROOT, TOPICS_DIR
 from .domain_profiles import domain_profile
+from .code_checks import check_python_blocks
 
 FORBIDDEN_TEXT_PLACEHOLDERS = [
     r"//\s*TODO",
@@ -253,6 +254,10 @@ def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
                 "code": "ABRUPT_TRUNCATION",
                 "message": f"File appears cut off mid-sentence or mid-word (ends with '{last_line[-40:]}')"
             })
+
+    # 11. Python blocks: syntax and missing imports (static, no model calls)
+    for code, message in check_python_blocks(content):
+        issues.append({"file": rel_file, "severity": "warning", "code": code, "message": message})
 
     return issues
 
