@@ -945,3 +945,61 @@ def test_status_bar_during_background_translation(browser_page):
     assert box["x"] >= 0 and box["x"] + box["width"] <= page.viewport_size["width"]
 
     assert errors == []
+
+
+def test_translations_are_visible_per_lesson_in_the_remembered_language(browser_page):
+    """Owner, 2026-11-23: queued and finished translations must be visible when
+    a lesson is revisited, without picking the language again each time."""
+    page, server_url = browser_page
+    page.add_init_script("localStorage.setItem('synapse_reading_lang', 'cs')")
+    states = {"lesson_01_foundations": {"state": "cached"},
+              "lesson_02_indexing": {"state": "running", "job_id": "t9"}}
+    posted = []
+    page.route("**/api/translate/status*", lambda route: route.fulfill(
+        status=200, content_type="application/json",
+        body=json.dumps({"lang": "cs", "lessons": states, "labs": None})))
+    running = {"id": "t9", "status": "running", "target_lang": "cs", "title": "B-Tree", "done": 0, "total": 2}
+
+    def jobs(route):
+        if route.request.method == "POST":
+            body = json.loads(route.request.post_data or "{}")
+            posted.append(body.get("text", "")[:40])
+            if states["lesson_01_foundations"]["state"] == "cached" and "B-Tree" not in body.get("text", ""):
+                return route.fulfill(status=200, content_type="application/json", body=json.dumps(
+                    {"status": "done", "cached": True, "translated": "# Základy úložiště\n\nPřeložený text."}))
+            return route.fulfill(status=200, content_type="application/json", body=json.dumps(running))
+        return route.fulfill(status=200, content_type="application/json", body=json.dumps({"jobs": [running]}))
+    page.route("**/api/translate/jobs", jobs)
+    page.route("**/api/translate/jobs/t9", lambda route: route.fulfill(
+        status=200, content_type="application/json", body=json.dumps(running)))
+
+    page.goto(server_url)
+    select_fixture_lesson(page, "Data", "E2e Unique Storage Invariants", "Foundations")
+
+    # Cached: opens translated by itself; the sidebar marks it.
+    expect(page.locator(".markdown-body")).to_contain_text("Přeložený text", timeout=5000)
+    foundations = page.locator(".unit-lesson-subitem:has-text('Foundations')").first
+    expect(foundations.locator(".sublesson-translation.cached")).to_have_text("CS")
+    btree = page.locator(".unit-lesson-subitem:has-text('B-Tree Mechanics')").first
+    expect(btree.locator(".sublesson-translation.pending")).to_be_visible()
+
+    # Running: the reader follows the job instead of showing plain English.
+    btree.click()
+    expect(page.locator(".translating-banner")).to_be_visible(timeout=5000)
+    expect(page.locator(".translation-offer-banner")).to_have_count(0)
+
+    # Not translated: an offer, and nothing starts until it is clicked.
+    states["lesson_02_indexing"] = {"state": "none"}
+    page.evaluate("window.dispatchEvent(new Event('synapse:translations-changed'))")  # as Stop does
+    page.locator(".unit-lesson-subitem:has-text('Foundations')").first.click()
+    expect(page.locator(".markdown-body")).to_contain_text("Přeložený text", timeout=5000)
+    before = len(posted)
+    page.locator(".unit-lesson-subitem:has-text('B-Tree Mechanics')").first.click()
+    offer = page.locator(".translation-offer-banner")
+    expect(offer).to_be_visible(timeout=5000)
+    expect(offer).to_contain_text("Not translated to Čeština yet")
+    page.wait_for_timeout(500)
+    assert len(posted) == before
+    offer.locator("button").click()
+    expect(page.locator(".translating-banner")).to_be_visible(timeout=5000)
+    assert len(posted) == before + 1

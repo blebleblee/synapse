@@ -895,6 +895,46 @@ async def api_translate_jobs_list():
     return {"jobs": TRANSLATIONS.list()}
 
 
+@app.get("/api/translate/status")
+async def api_translate_status(
+    query: str = Query(..., description="Course query, as for /api/topic"),
+    lang: str = Query(..., pattern=r"^[a-z]{2}$"),
+):
+    """Translation state of each lesson (and the labs) of a course in one
+    language: cached, queued, running or none. Reads the cache and the queue
+    only; it never starts a translation."""
+    try:
+        query = sanitize_query(query)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    target = resolve_subtopic(query)
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Topic '{query}' not found")
+    sub_path = target[3]
+
+    def state_of(text: str) -> Dict[str, Any]:
+        if lang == "en" or not text.strip():
+            return {"state": "none"}
+        if read_cached(translation_cache_dir(), text, lang) is not None:
+            return {"state": "cached"}
+        job = TRANSLATIONS.find_active(text, lang)
+        if job:
+            return {"state": job.status, "job_id": job.id}
+        return {"state": "none"}
+
+    lessons = {}
+    for item in get_unit_lessons(sub_path):
+        p = Path(item["path"]) if item.get("path") else None
+        if p and p.exists():
+            lessons[item["id"]] = state_of(p.read_text(encoding="utf-8"))
+    labs = None
+    for fname in ("LABS.md", "labs.md"):
+        if (sub_path / fname).exists():
+            labs = state_of((sub_path / fname).read_text(encoding="utf-8"))
+            break
+    return {"lang": lang, "lessons": lessons, "labs": labs}
+
+
 @app.get("/api/translate/jobs/{job_id}")
 async def api_translate_job_get(job_id: str):
     job = TRANSLATIONS.get(job_id)

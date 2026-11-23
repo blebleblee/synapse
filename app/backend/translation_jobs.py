@@ -223,6 +223,11 @@ class TranslationQueue:
         self._prune()
         return job
 
+    def find_active(self, text: str, target_lang: str) -> Optional[TranslationJob]:
+        """The queued or running job for this text, as submit() would reuse it."""
+        key = hashlib.sha256((text + target_lang).encode("utf-8")).hexdigest()
+        return next((j for j in self._jobs.values() if j.key == key and j.active), None)
+
     def get(self, job_id: str) -> Optional[TranslationJob]:
         return self._jobs.get(job_id)
 

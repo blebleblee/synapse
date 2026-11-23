@@ -6520,3 +6520,45 @@ body, html, #root {
 .bubble-content table { border-collapse: collapse; margin: 6px 0 10px; font-size: 12.5px; display: block; overflow-x: auto; }
 .bubble-content th,
 .bubble-content td { border: 1px solid var(--border-color); padding: 4px 8px; }
+
+/* Reader: the remembered language has no translation for this lesson yet. */
+.translation-offer-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
+  border-radius: 6px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.translation-offer-banner button {
+  margin-left: auto;
+  background: none;
+  border: 1px solid #3b82f6;
+  border-radius: 4px;
+  color: #3b82f6;
+  font-size: 11px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+.translation-offer-banner button:hover { background: rgba(59, 130, 246, 0.15); }
+
+/* Sidebar: a lesson's translation in the reading language. */
+.sublesson-translation {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: #3b82f6;
+}
+.sublesson-translation.cached {
+  padding: 0 3px;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: 3px;
+}

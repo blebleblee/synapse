@@ -28,7 +28,8 @@ import {
   Activity,
   Check,
   Zap,
-  LogOut
+  LogOut,
+  Loader2
 } from 'lucide-react';
 import type { TopicTreeData, UnitNode, WorkspaceStatus } from '../types';
 
@@ -53,9 +54,32 @@ interface TopicTreeProps {
   onRenameTopic?: (path: string, newTitle: string) => Promise<boolean | void>;
   onToggleLessonCompletion?: (path: string, lessonId: string, completed?: boolean) => Promise<void>;
   targetLanguage?: string;
+  /** Translation state of the selected course's lessons in the reading language. */
+  translationStatus?: CourseTranslationStatus | null;
 }
 
 import { getUIStrings } from '../utils/i18n';
+import { READING_LANG_BADGE, READING_LANG_NAMES, isPending } from '../utils/translationStatus';
+import type { CourseTranslationStatus, LessonTranslation } from '../utils/translationStatus';
+
+/** Marker after a lesson of the selected course: translating, queued or translated. */
+function TranslationMark({ t, status }: { t?: LessonTranslation | null; status: CourseTranslationStatus | null }) {
+  if (!t || !status || t.state === 'none') return null;
+  const lang = READING_LANG_NAMES[status.lang];
+  if (isPending(t)) {
+    const label = t.state === 'running' ? `Translating to ${lang}` : `Queued for translation to ${lang}`;
+    return (
+      <span className="sublesson-translation pending" title={label} aria-label={label}>
+        <Loader2 size={10} className={t.state === 'running' ? 'animate-spin' : ''} />
+      </span>
+    );
+  }
+  return (
+    <span className="sublesson-translation cached" title={`Translated to ${lang}`} aria-label={`Translated to ${lang}`}>
+      {READING_LANG_BADGE[status.lang]}
+    </span>
+  );
+}
 
 export const TopicTree: React.FC<TopicTreeProps> = ({
   tree,
@@ -76,6 +100,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   onRenameTopic,
   onToggleLessonCompletion,
   targetLanguage,
+  translationStatus = null,
 }) => {
   const ui = getUIStrings(targetLanguage);
   const [searchTerm, setSearchTerm] = useState('');
@@ -597,6 +622,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                                   {isCompleted ? '✓' : lIdx + 1}
                                                 </span>
                                                 <span className="sublesson-title">{displayTitle}</span>
+                                                {isSelected && <TranslationMark t={translationStatus?.lessons[lesson.id]} status={translationStatus} />}
                                                 {onToggleLessonCompletion && (
                                                   <button
                                                     className={`sublesson-check-btn ${isCompleted ? 'checked' : ''}`}
@@ -624,6 +650,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                             >
                                               <FlaskConical size={11} className="sublesson-icon" />
                                               <span className="sublesson-title">Operational Labs</span>
+                                              {isSelected && <TranslationMark t={translationStatus?.labs} status={translationStatus} />}
                                             </div>
                                           )}
                                         </div>
@@ -769,6 +796,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                                         {isCompleted ? '✓' : lIdx + 1}
                                                       </span>
                                                       <span className="sublesson-title">{displayTitle}</span>
+                                                      {isSelected && <TranslationMark t={translationStatus?.lessons[lesson.id]} status={translationStatus} />}
                                                       {onToggleLessonCompletion && (
                                                         <button
                                                           className={`sublesson-check-btn ${isCompleted ? 'checked' : ''}`}
@@ -796,6 +824,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                                   >
                                                     <FlaskConical size={11} className="sublesson-icon" />
                                                     <span className="sublesson-title">Operational Labs</span>
+                                                    {isSelected && <TranslationMark t={translationStatus?.labs} status={translationStatus} />}
                                                   </div>
                                                 )}
                                               </div>
