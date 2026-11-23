@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences chemistry analytical_chemistry
+#tags column:3
+What is the fundamental invariant of analytical measurement?,"Every reported number carries inherent uncertainty, arising from random variation, systematic bias, sample inhomogeneity, and device resolution.",natural_sciences::analytical_chemistry
+Define the difference between accuracy and precision in measurement science.,"Precision describes the reproducibility of repeated measurements (low standard deviation), while accuracy describes proximity to the true value (unbiased results).",natural_sciences::analytical_chemistry
+How many significant figures are in the measurement 0.00450 M?,Three significant figures.,natural_sciences::analytical_chemistry
+What is the relationship between the equilibrium constant K and the standard Gibbs free energy change ΔG°?,"ΔG° = -RT ln K, where R is the universal gas constant, T is the absolute temperature, and K is the equilibrium constant.",natural_sciences::analytical_chemistry
+Calculate the molar solubility of BaSO₄ given Ksp = 1.1 × 10⁻¹⁰ at 25°C.,s = √(1.1 × 10⁻¹⁰) ≈ 1.05 × 10⁻⁵ mol/L.,natural_sciences::analytical_chemistry
+What is the Beer-Lambert law and its equation?,"The Beer-Lambert law states that absorbance A = εbc, where ε is the molar absorptivity, b is the path length, and c is the molar concentration.",natural_sciences::analytical_chemistry
+What is the Lorentz force law and how does it apply to mass spectrometry?,"F = q(E + v × B), where q is charge, E is electric field, v is velocity, and B is magnetic field. In mass spectrometry, it governs ion trajectories in magnetic fields.",natural_sciences::analytical_chemistry
+What is the relationship between the radius of curvature r and m/z in magnetic sector mass spectrometry?,"r = (1/B)√(2mV/q), where m/z = r²B²e/(2V), with e as the elementary charge and z as the charge state.",natural_sciences::analytical_chemistry
+Define the distribution coefficient Kd in chromatography and its significance.,"Kd = [analyte in stationary phase] / [analyte in mobile phase], quantifying the equilibrium partitioning of analytes between phases.",natural_sciences::analytical_chemistry
+What is the retention factor k in chromatography and how is it calculated?,"k = Kd(Vs/Vm) = (tR - t0) / t0, where tR is retention time, t0 is dead time, and Vs/Vm is the phase ratio.",natural_sciences::analytical_chemistry
+State the Nernst equation and its simplified form at 25°C.,"E = E° + (RT/nF) ln([oxidized]/[reduced]), simplified to E = E° + (0.05916/n) log([oxidized]/[reduced]) at 25°C.",natural_sciences::analytical_chemistry
+What are the key components of a laboratory bench setup for analytical chemistry?,"UV-Vis spectrophotometer, precision analytical balance, calibrated volumetric glassware, pH meter with combination glass electrode, and scientific Python environment with NumPy, SciPy, and Matplotlib.",natural_sciences::analytical_chemistry

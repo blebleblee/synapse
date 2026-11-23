@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences physics cosmology
+#tags column:3
+What is the Einstein field equation in its full form?,G_{\mu\nu} + \Lambda g_{\mu\nu} = \frac{8\pi G}{c^4} T_{\mu\nu},natural_sciences::cosmology
+What does the Friedmann equation describe?,The Friedmann equation describes the expansion of the universe and relates the scale factor $a(t)$ to the energy density $\rho$ and the cosmological constant $\Lambda$.,natural_sciences::cosmology
+What is the Hubble parameter $H(t)$?,"The Hubble parameter $H(t) = \frac{\dot{a}}{a}$ describes the rate of expansion of the universe at time $t$. At the present epoch $t_0$, it is $H_0$.",natural_sciences::cosmology
+How is redshift $z$ related to the scale factor $a(t)$?,Redshift $z$ is related to the scale factor by $1 + z = \frac{a(t_0)}{a(t_e)} = \frac{\lambda_{\text{obs}}}{\lambda_{\text{rest}}}$.,natural_sciences::cosmology
+What is Hubble's law for nearby galaxies?,"Hubble's law for nearby galaxies is $v_r = H_0 d$, where $v_r = cz$ is the recession velocity and $d$ is the proper distance.",natural_sciences::cosmology
+What is the luminosity distance $d_L$ for a universe with matter and dark energy?,The luminosity distance $d_L$ is given by $d_L = \frac{c(1+z)}{H_0} \int_0^z \frac{dz'}{\sqrt{\Omega_m(1+z')^3 + \Omega_\Lambda}}$.,natural_sciences::cosmology
+What does the cosmic microwave background (CMB) power spectrum encode?,The CMB power spectrum encodes a snapshot of acoustic oscillations in the photon-baryon plasma at the surface of last scattering ($z \approx 1100$).,natural_sciences::cosmology
+What is the first acoustic peak in the CMB power spectrum?,The first acoustic peak in the CMB power spectrum corresponds to the sound horizon $r_s$ at multipole $\ell \approx 220$.,natural_sciences::cosmology
+What is the noise-equivalent power (NEP) for a photon-noise-limited detector?,The NEP for a photon-noise-limited detector is $\text{NEP}_{\text{photon}} = \sqrt{2 P h\nu + 2 P^2 / \Delta\nu}$.,natural_sciences::cosmology
+What is the thermal fluctuation noise in a bolometric receiver?,"The thermal fluctuation noise in a bolometric receiver is $\sqrt{4 k_B T^2 G}$, where $G$ is the thermal conductance of the support legs.",natural_sciences::cosmology
+What is the primary role of systematic error budgets in observational cosmology?,"Systematic error budgets in observational cosmology are crucial for understanding and mitigating biases and uncertainties in measurements, ensuring the reliability of cosmological parameters.",natural_sciences::cosmology
+What is the significance of the Planck satellite data in cosmology?,"Planck satellite data provides high-precision measurements of the cosmic microwave background, which are essential for constraining cosmological parameters and testing cosmological models.",natural_sciences::cosmology

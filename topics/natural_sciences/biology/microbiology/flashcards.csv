@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences biology microbiology
+#tags column:3
+What is the primary difference between prokaryotic and eukaryotic cells in terms of cellular organization?,"Prokaryotic cells lack a membrane-bound nucleus and complex endomembrane systems, while eukaryotic cells have a nucleus and various membrane-bound organelles.",natural_sciences::microbiology
+How does the absence of a nuclear membrane in bacteria affect gene expression?,"In bacteria, transcription and translation occur simultaneously in the cytoplasm, allowing for rapid response to environmental changes.",natural_sciences::microbiology
+What is the role of the replisome in bacterial DNA replication?,"The replisome, a molecular assembly containing DNA polymerase III holoenzyme, helicase, primase, and single-strand binding proteins, coordinates the precise replication of the bacterial chromosome.",natural_sciences::microbiology
+What is the significance of the sigma factor in bacterial transcription initiation?,"The sigma factor dictates promoter specificity, allowing RNA polymerase to recognize and initiate transcription at specific promoter sequences.",natural_sciences::microbiology
+What is the primary invariant that holds true for all viruses?,Viruses cannot replicate outside a permissive host cell.,natural_sciences::microbiology
+What are the four competing pressures that shape viral design?,"Genome stability, information density, host range, and immune escape.",natural_sciences::microbiology
+What is the role of pathogen-associated molecular patterns (PAMPs) in the immune system?,PAMPs are conserved structural motifs on pathogens recognized by pattern recognition receptors (PRRs) to initiate an immune response.,natural_sciences::microbiology
+What is the difference between PAMPs and DAMPs in the context of immune response?,"PAMPs are derived from pathogens, while DAMPs are released by damaged or dying host cells, both triggering an immune response.",natural_sciences::microbiology
+What is the Monod equation and what does it describe?,"The Monod equation, μ = μₘₐₓ(S/(Kₛ + S)), describes the relationship between the specific growth rate (μ) of a microbial population and the concentration of a limiting substrate (S).",natural_sciences::microbiology
+What is the significance of the chemostat in microbial ecology?,"The chemostat reveals ecological invariants by decoupling growth rate from physiological potential, allowing steady-state conditions to be established and studied.",natural_sciences::microbiology
+What is the governing invariant of microbial growth in a chemostat?,"In a chemostat, the growth rate (μ) equals the dilution rate (D) at steady state, and the residual substrate concentration is determined by the Monod equation.",natural_sciences::microbiology
+What is the role of the maintenance coefficient (m) in microbial growth?,"The maintenance coefficient (m) represents the ATP consumed for osmoregulation, macromolecule turnover, and proton leak, becoming increasingly dominant at low growth rates.",natural_sciences::microbiology

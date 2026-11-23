@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences space_and_flight cosmic_frontiers_and_astrobiology
+#tags column:3
+What is the principle of conservation of energy in the context of cosmic frontiers?,"Energy cannot be created or destroyed, only transformed from one form to another.",natural_sciences::cosmic_frontiers_and_astrobiology
+What is the principle of conservation of momentum in cosmic systems?,The total momentum of a closed system remains constant unless acted upon by an external force.,natural_sciences::cosmic_frontiers_and_astrobiology
+What is the principle of conservation of angular momentum in astrophysical phenomena?,The total angular momentum of a system remains constant if no external torque acts on it.,natural_sciences::cosmic_frontiers_and_astrobiology
+What is the governing equation for the motion of a spacecraft in an inertial reference frame?,m\frac{d^2\vec{r}}{dt^2} = \sum_i \frac{Gm_im}{\|\vec{r} - \vec{r}_i\|^3}(\vec{r}_i - \vec{r}) + \vec{F}_{\text{thrust}} + \vec{F}_{\text{drag}} + \vec{F}_{\text{radiation}},natural_sciences::cosmic_frontiers_and_astrobiology
+What is the gravitational constant (G) and its units?,The gravitational constant (G) is 6.674 × 10⁻¹¹ m³ kg⁻¹ s⁻².,natural_sciences::cosmic_frontiers_and_astrobiology
+What is the adaptive step size mechanism in Runge-Kutta integration?,"The step size is adjusted based on the error estimate, halving when the error exceeds tolerance and doubling when it falls well below tolerance.",natural_sciences::cosmic_frontiers_and_astrobiology
+What is the formula for the total noise in a CCD detector?,\sigma_{\text{total}} = \sqrt{N_{\text{photon}} + N_{\text{dark}} t_{\text{exp}} + \sigma_{\text{read}}^2},natural_sciences::cosmic_frontiers_and_astrobiology
+What is the Richardson-Dushman thermionic emission model used for?,It is used to map the exponential dependence of dark current on temperature in CCD detectors.,natural_sciences::cosmic_frontiers_and_astrobiology
+What is the Stefan-Boltzmann law for blackbody radiation?,j^* = \sigma T^4,natural_sciences::cosmic_frontiers_and_astrobiology
+What is the inverse-square law for electromagnetic flux?,F = \frac{L}{4\pi d^2},natural_sciences::cosmic_frontiers_and_astrobiology
+What is the Beer-Lambert absorption spectroscopy formula?,A = \epsilon \ell c,natural_sciences::cosmic_frontiers_and_astrobiology
+What is the primary role of a spectrophotometer in astrobiology research?,It is used to measure absorption cross-sections of candidate biosignature gases.,natural_sciences::cosmic_frontiers_and_astrobiology

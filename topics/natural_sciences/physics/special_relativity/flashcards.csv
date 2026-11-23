@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences physics special_relativity
+#tags column:3
+What are the two postulates of special relativity?,"The two postulates are: 1) The laws of physics are identical in all inertial reference frames. 2) The speed of light in vacuum is constant and the same for all observers, regardless of their relative motion.",natural_sciences::special_relativity
+"What is the speed of light in vacuum, denoted as $c$?","The speed of light in vacuum is approximately $2.998 \times 10^8 \, \text{m/s}$.",natural_sciences::special_relativity
+What is the significance of the Michelson-Morley experiment?,"The Michelson-Morley experiment demonstrated that the speed of light is constant regardless of the motion of the light source or the observer, implying the non-existence of a luminiferous aether.",natural_sciences::special_relativity
+What is the metric tensor $\eta_{\mu\nu}$ in special relativity?,"The metric tensor $\eta_{\mu\nu}$ is a diagonal matrix with values $(-1, 1, 1, 1)$, representing the signature $(-,+,+,+)$ in special relativity.",natural_sciences::special_relativity
+What is the spacetime interval $\Delta s^2$ between two events?,The spacetime interval $\Delta s^2 = -c^2 \Delta t^2 + \Delta x^2 + \Delta y^2 + \Delta z^2$ is a Lorentz-invariant quantity that measures the separation between two events in spacetime.,natural_sciences::special_relativity
+What are the Lorentz transformations?,"Lorentz transformations are the unique linear transformations that preserve the constancy of the speed of light and the principle of relativity, relating the coordinates of events in one inertial frame to another moving at a constant velocity relative to the first.",natural_sciences::special_relativity
+How do time dilation and length contraction relate to the Lorentz factor $\gamma$?,"Time dilation is given by $\Delta t' = \gamma \Delta t$ and length contraction by $L' = L/\gamma$, where $\gamma = 1/\sqrt{1 - v^2/c^2}$ is the Lorentz factor.",natural_sciences::special_relativity
+What is the four-velocity $u^\mu$?,"The four-velocity $u^\mu = \gamma(c, \vec{v})$ is the derivative of the spacetime position four-vector $x^\mu$ with respect to proper time $\tau$, where $\gamma = 1/\sqrt{1 - v^2/c^2}$ is the Lorentz factor.",natural_sciences::special_relativity
+What is the four-momentum $p^\mu$?,"The four-momentum $p^\mu = m \gamma(c, \vec{v}) = (E/c, \vec{p})$ is the product of the rest mass $m$ and the four-velocity $u^\mu$, where $E$ is the total energy and $\vec{p}$ is the three-momentum.",natural_sciences::special_relativity
+What is the mass-energy equivalence formula?,"The mass-energy equivalence formula is $E = mc^2$, where $E$ is the total energy, $m$ is the rest mass, and $c$ is the speed of light.",natural_sciences::special_relativity
+How does the four-momentum transform under Lorentz transformations?,"The four-momentum $p^\mu$ transforms as a four-vector, meaning it transforms under Lorentz boosts in the same way as the spacetime position four-vector $x^\mu$.",natural_sciences::special_relativity
+What is the invariant quantity of the four-momentum?,"The invariant quantity of the four-momentum is $p^\mu p_\mu = -m^2c^2$, which is the same in all inertial reference frames.",natural_sciences::special_relativity

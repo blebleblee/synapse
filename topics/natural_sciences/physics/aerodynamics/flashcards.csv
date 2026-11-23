@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences physics aerodynamics
+#tags column:3
+What is the continuity equation for a compressible fluid?,\(\frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \mathbf{u}) = 0\),natural_sciences::aerodynamics
+What does the term \(\nabla \cdot (\rho \mathbf{u})\) represent in the continuity equation?,It represents the net mass flux diverging out of an infinitesimal volume element.,natural_sciences::aerodynamics
+What is the incompressibility approximation for the continuity equation?,\(\nabla \cdot \mathbf{u} = 0\),natural_sciences::aerodynamics
+How is the local Mach number defined?,"\(M = \frac{|\mathbf{u}|}{a}\), where \(a = \sqrt{\gamma R T}\) is the local speed of sound.",natural_sciences::aerodynamics
+What is the Navier-Stokes momentum equation for an incompressible Newtonian fluid?,\(\rho \left( \frac{\partial \vec{u}}{\partial t} + (\vec{u} \cdot \nabla)\vec{u} \right) = -\nabla p + \mu \nabla^2 \vec{u} + \rho \vec{g}\),natural_sciences::aerodynamics
+What is the definition of the Reynolds number?,"\(Re = \frac{\rho u L}{\mu}\), where \(L\) is a characteristic length scale.",natural_sciences::aerodynamics
+What is the typical range for laminar flow?,Below \(Re \approx 10^3\),natural_sciences::aerodynamics
+What is the typical range for turbulent transition for bluff bodies?,Above \(Re \approx 10^5\),natural_sciences::aerodynamics
+What is the typical range for turbulent transition along flat plates?,Above \(Re \approx 5 \times 10^5\),natural_sciences::aerodynamics
+What is the quantization noise floor for a typical piezoresistive pressure transducer with a full-scale range of 1000 Pa and 16-bit analog-to-digital conversion?,\(\Delta P_{\text{quant}} \approx 0.015\) Pa,natural_sciences::aerodynamics
+What is the thermal noise voltage across a measurement bandwidth of 1 kHz for a strain gauge bridge with \(R = 350\) Ω at room temperature?,\(V_{\text{noise}} \approx 2.4\) nV/√Hz,natural_sciences::aerodynamics
+What is the resulting pressure noise floor for a typical strain gauge bridge with a gain of 1000 and a transducer sensitivity of 1 mV/Pa?,\(P_{\text{noise}} \approx 2.4\) mPa,natural_sciences::aerodynamics

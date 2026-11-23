@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences physics electromagnetism
+#tags column:3
+What is the fundamental entity in electrostatics?,Electric charge,natural_sciences::electromagnetism
+What is the mathematical definition of the electric field at position \(\vec{r}\)?,\(\vec{E}(\vec{r}) = \lim_{{q_{{\text{{test}}}} \to 0}} \frac{\vec{F}}{q_{{\text{{test}}}}}\),natural_sciences::electromagnetism
+What is Coulomb's law?,The force between two point charges \(q_1\) and \(q_2\) separated by a displacement vector \(\vec{r}\) is given by \(\vec{F} = \frac{1}{4\pi\epsilon_0} \frac{q_1 q_2}{r^2} \hat{r}\),natural_sciences::electromagnetism
+What is the first invariant of magnetostatics?,\(\nabla \cdot \vec{B} = 0\),natural_sciences::electromagnetism
+What is the Biot-Savart law?,\(d\vec{B}(\vec{r}) = \frac{\mu_0}{4\pi} \frac{I d\vec{l}' \times (\vec{r} - \vec{r}')}{|\vec{r} - \vec{r}'|^3}\),natural_sciences::electromagnetism
+What is Faraday's law of induction in integral form?,\(\mathcal{E} = -\frac{d\Phi_B}{dt}\),natural_sciences::electromagnetism
+What is the differential form of Faraday's law?,\(\nabla \times \vec{E} = -\frac{\partial \vec{B}}{\partial t}\),natural_sciences::electromagnetism
+What is the displacement current density?,\(\vec{J}_d = \epsilon_0 \frac{\partial \vec{E}}{\partial t}\),natural_sciences::electromagnetism
+What is the wave equation for electromagnetic waves?,\(\nabla^2 \vec{E} - \frac{1}{c^2} \frac{\partial^2 \vec{E}}{\partial t^2} = 0\) and \(\nabla^2 \vec{B} - \frac{1}{c^2} \frac{\partial^2 \vec{B}}{\partial t^2} = 0\),natural_sciences::electromagnetism
+What is Poynting's theorem?,\(\frac{\partial \vec{S}}{\partial t} + \nabla \cdot \vec{S} = -\vec{J} \cdot \vec{E} - \vec{E} \cdot \nabla \cdot \vec{D} - \vec{B} \cdot \nabla \cdot \vec{H}\),natural_sciences::electromagnetism
+What is the electromagnetic field tensor \(F^{\mu\nu}\)?,\(F^{\mu\nu} = \partial^\mu A^\nu - \partial^\nu A^\mu\),natural_sciences::electromagnetism
+What is the speed of light in vacuum?,\(c = \frac{1}{\sqrt{\mu_0 \epsilon_0}} = 299792458\) m/s,natural_sciences::electromagnetism

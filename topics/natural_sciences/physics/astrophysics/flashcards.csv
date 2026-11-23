@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences physics astrophysics
+#tags column:3
+What are the two fundamental postulates of special relativity?,"The laws of physics are identical in all inertial reference frames, and the speed of light in vacuum is constant for all observers regardless of their relative motion.",natural_sciences::astrophysics
+What is the Lorentz transformation for time dilation?,"t' = \gamma\left(t - \frac{vx}{c^2}\right), \quad \gamma = \frac{1}{\sqrt{1 - v^2/c^2}}",natural_sciences::astrophysics
+What is the equation for hydrostatic equilibrium in stellar structure?,\frac{dP}{dr} = -\frac{G M(r) \rho(r)}{r^2},natural_sciences::astrophysics
+What is the equation for mass accumulation in stellar structure?,\frac{dM}{dr} = 4\pi r^2 \rho(r),natural_sciences::astrophysics
+What is the Chandrasekhar limit?,"The Chandrasekhar limit is approximately 1.4 solar masses, above which electron degeneracy pressure cannot halt gravitational collapse, leading to the formation of a neutron star or black hole.",natural_sciences::astrophysics
+What is the Tolman-Oppenheimer-Volkoff (TOV) equation?,\frac{dP}{dr} = -\frac{G(\rho + P/c^2)(m + 4\pi r^3 P/c^2)}{r(r - 2Gm/c^2)},natural_sciences::astrophysics
+What is the collisionless Boltzmann equation?,\frac{\partial f}{\partial t} + \vec{v} \cdot \nabla_{\vec{r}} f - \nabla_{\vec{r}} \Phi \cdot \nabla_{\vec{v}} f = 0,natural_sciences::astrophysics
+What is Poisson's equation in the context of galactic dynamics?,"\nabla^2 \Phi = 4\pi G \rho(\vec{r}, t)",natural_sciences::astrophysics
+What is the virial theorem for a system in statistical equilibrium?,2\langle T \rangle + \langle U \rangle = 0,natural_sciences::astrophysics
+What is the Larmor formula for the power radiated by a non-relativistic accelerated charge?,P = \frac{2 e^2 a^2}{3 c^3},natural_sciences::astrophysics
+What is the Liénard formula for the power radiated by a relativistic accelerated charge?,P = \frac{2 e^2 \gamma^6}{3 c^3} \left[ a_\perp^2 + \gamma^2 a_\parallel^2 \right],natural_sciences::astrophysics
+What is the radiative transfer equation?,\frac{dI_\nu}{ds} = -\kappa_\nu I_\nu + j_\nu,natural_sciences::astrophysics

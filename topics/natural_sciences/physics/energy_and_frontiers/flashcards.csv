@@ -1,0 +1,7 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences physics energy_and_frontiers
+#tags column:3
+What did James Prescott Joule's 1843 paddle-wheel calorimetry experiment demonstrate?,"Joule's experiment demonstrated that a precise quantity of mechanical work produced a reproducible temperature rise in water, establishing the mechanical equivalent of heat at approximately 4.184 joules per calorie.",natural_sciences::energy_and_frontiers
+What is the minimum acceptable version of NumPy for the Python scientific stack?,The minimum acceptable version of NumPy is 1.24.,natural_sciences::energy_and_frontiers
+What is the minimum acceptable version of Matplotlib for the Python scientific stack?,The minimum acceptable version of Matplotlib is 3.7.,natural_sciences::energy_and_frontiers

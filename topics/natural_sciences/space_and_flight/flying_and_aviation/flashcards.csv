@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences space_and_flight flying_and_aviation
+#tags column:3
+What are the three conservation laws that form the foundation of aerodynamics?,"The three conservation laws are mass, momentum, and energy.",natural_sciences::flying_and_aviation
+What is the continuity equation in incompressible flow?,The continuity equation in incompressible flow is \(\nabla \cdot \vec{u} = 0\).,natural_sciences::flying_and_aviation
+What does the term \((\vec{u} \cdot \nabla)\vec{u}\) represent in the momentum equation?,"The term \((\vec{u} \cdot \nabla)\vec{u}\) represents the nonlinear convective acceleration, which is a source of aerodynamic complexity.",natural_sciences::flying_and_aviation
+What is the role of the term \(\mu \nabla^2 \vec{u}\) in the momentum equation?,"The term \(\mu \nabla^2 \vec{u}\) represents viscous diffusion of momentum, responsible for the no-slip condition at a solid wall and boundary layer formation.",natural_sciences::flying_and_aviation
+What is the dynamic pressure formula used in the pitot-static system?,The dynamic pressure formula is \(q = P_t - P_s = \frac{1}{2}\rho V^2\).,natural_sciences::flying_and_aviation
+What is the resolution floor of a typical solid-state differential pressure transducer used in modern flight test instrumentation?,The resolution floor is about 12.5 Pa.,natural_sciences::flying_and_aviation
+How does the airspeed uncertainty change with speed in the pitot-static system?,"At 50 m/s, the airspeed uncertainty balloons to \(\delta V \approx 0.25\) m/s, compared to \(\delta V \approx 0.10\) m/s at 100 m/s.",natural_sciences::flying_and_aviation
+What is the purpose of a deadweight tester in characterizing a pressure transducer's noise floor?,A deadweight tester provides a stable pressure source to characterize the noise floor of a pressure transducer.,natural_sciences::flying_and_aviation
+What is the required sensitivity of the differential pressure transducers in the laboratory setup?,The differential pressure transducers should have a sensitivity of 0.1 Pascal.,natural_sciences::flying_and_aviation
+What is the purpose of a digital angle-of-attack protractor in the laboratory setup?,A digital angle-of-attack protractor is used to sweep airfoil inclination through ±30 degrees with 0.1-degree precision.,natural_sciences::flying_and_aviation
+What is the minimum sampling rate required for the data acquisition system in the laboratory setup?,The minimum sampling rate required is 1 kHz.,natural_sciences::flying_and_aviation
+What is the purpose of flow visualization in the laboratory setup?,Flow visualization is used to capture and analyze the airflow patterns around the test section.,natural_sciences::flying_and_aviation

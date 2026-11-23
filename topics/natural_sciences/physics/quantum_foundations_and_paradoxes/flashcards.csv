@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences physics quantum_foundations_and_paradoxes
+#tags column:3
+What is the energy of a photon with a frequency of 5.0 x 10^14 Hz?,3.313 x 10^-19 J,natural_sciences::quantum_foundations_and_paradoxes
+What is the de Broglie wavelength of an electron with momentum 1.0 x 10^-24 kg·m/s?,6.626 x 10^-9 m,natural_sciences::quantum_foundations_and_paradoxes
+State the Heisenberg uncertainty principle and explain what it means.,"Δx · Δp ≥ ħ/2, where Δx is the uncertainty in position, Δp is the uncertainty in momentum, and ħ is the reduced Planck constant. It means that the more precisely the position of a particle is determined, the less precisely its momentum can be known, and vice versa.",natural_sciences::quantum_foundations_and_paradoxes
+What is the time-dependent Schrödinger equation?,"iħ ∂ψ/∂t = Ĥψ, where i is the imaginary unit, ħ is the reduced Planck constant, ψ is the wave function, and Ĥ is the Hamiltonian operator.",natural_sciences::quantum_foundations_and_paradoxes
+What is the energy of a photon with a wavelength of 500 nm?,3.974 x 10^-19 J,natural_sciences::quantum_foundations_and_paradoxes
+What is the de Broglie wavelength of an electron with a kinetic energy of 10 eV?,1.227 x 10^-9 m,natural_sciences::quantum_foundations_and_paradoxes
+What is the minimum uncertainty in momentum if the position uncertainty is 1 nm?,5.273 x 10^-26 kg·m/s,natural_sciences::quantum_foundations_and_paradoxes
+What is the minimum uncertainty in position if the momentum uncertainty is 1 x 10^-24 kg·m/s?,1.055 x 10^-9 m,natural_sciences::quantum_foundations_and_paradoxes
+What is the energy of a photon with a wavelength of 365 nm?,5.514 x 10^-19 J,natural_sciences::quantum_foundations_and_paradoxes
+What is the de Broglie wavelength of a proton with a kinetic energy of 100 keV?,1.227 x 10^-14 m,natural_sciences::quantum_foundations_and_paradoxes
+What is the energy of a photon with a frequency of 6.0 x 10^14 Hz?,3.976 x 10^-19 J,natural_sciences::quantum_foundations_and_paradoxes
+What is the de Broglie wavelength of an electron with a kinetic energy of 50 eV?,5.485 x 10^-10 m,natural_sciences::quantum_foundations_and_paradoxes

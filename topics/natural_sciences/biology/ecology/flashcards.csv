@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences biology ecology
+#tags column:3
+What is the primary role of ecology as a scientific discipline?,"Ecology investigates the distribution and abundance of organisms across spatial and temporal gradients, examining interactions between living systems and their abiotic environment.",natural_sciences::ecology
+What are the six levels of ecological organization?,"The six levels are: individual organism, population, community, ecosystem, biome, and biosphere.",natural_sciences::ecology
+What is the population growth equation?,"The population growth equation is \(\frac{dN}{dt} = B - D + I - E\), where \(B\) is births, \(D\) is deaths, \(I\) is immigration, and \(E\) is emigration.",natural_sciences::ecology
+How is the per capita growth rate defined?,"The per capita growth rate \(r\) is defined as \(r = \frac{1}{N}\frac{dN}{dt} = b - d\), where \(b\) is the per capita birth rate and \(d\) is the per capita death rate.",natural_sciences::ecology
+What does the competitive exclusion principle state?,The competitive exclusion principle states that two species cannot indefinitely coexist on a single limiting resource when demographic parameters and resource utilization curves are identical.,natural_sciences::ecology
+What are the Lotka-Volterra competition equations?,The equations are \(\frac{dN_i}{dt} = r_i N_i \left(1 - \frac{N_i + \alpha_{ij} N_j}{K_i}\right)\) and \(\frac{dN_j}{dt} = r_j N_j \left(1 - \frac{N_j + \alpha_{ji} N_i}{K_j}\right)\).,natural_sciences::ecology
+What is primary productivity in ecosystem ecology?,Primary productivity quantifies the rate at which autotrophic organisms convert electromagnetic radiation into chemical bond energy stored in reduced carbon compounds.,natural_sciences::ecology
+How is Net Primary Productivity (NPP) calculated?,"NPP is calculated as \(\text{NPP} = \text{GPP} - R_{\text{autotroph}}\), where GPP is Gross Primary Productivity and \(R_{\text{autotroph}}\) is autotrophic respiration.",natural_sciences::ecology
+What is the species-area relationship in island biogeography?,"The species-area relationship is \(S = cA^z\), where \(S\) is species richness, \(A\) is area, \(c\) encodes local diversity, and \(z\) is the scaling exponent typically ranging from 0.20 to 0.35.",natural_sciences::ecology
+What does the Levins metapopulation model describe?,"The Levins metapopulation model describes a population of populations inhabiting discrete patches connected by dispersal, with the fraction of occupied patches evolving according to \(\frac{dp}{dt} = cp(1-p) - ep\).",natural_sciences::ecology
+What is the HIPPO framework in the context of extinction drivers?,"The HIPPO framework orders the five primary drivers of extinction by their current destructive magnitude: Habitat destruction, Invasive species, Pollution, Population (human overexploitation), and climate change.",natural_sciences::ecology
+What is the difference between habitat destruction and fragmentation?,"Habitat destruction reduces total habitat area and eliminates species requiring it, while fragmentation severs nominally intact habitat into isolated patches.",natural_sciences::ecology

@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences biology genetics
+#tags column:3
+What is the primary role of DNA in the molecular basis of heredity?,"DNA encodes genetic information in the linear sequence of nucleotides, which can be faithfully replicated and transmitted across cellular generations.",natural_sciences::genetics
+What is the structure of DNA and how does it provide stability?,DNA exists as an antiparallel double helix with hydrogen bonds between complementary base pairs and hydrophobic base stacking interactions contributing to its stability.,natural_sciences::genetics
+What is the central dogma of molecular biology?,The central dogma states that genetic information flows from DNA to RNA to protein.,natural_sciences::genetics
+What is the role of chromatin architecture in gene expression regulation?,"Chromatin architecture determines which genomic regions are accessible to the transcriptional machinery, influencing gene expression.",natural_sciences::genetics
+What is the principle of segregation in Mendelian genetics?,"The principle of segregation states that paired hereditary factors (alleles) separate during gamete formation, with each gamete receiving one allele from each pair.",natural_sciences::genetics
+What is the principle of independent assortment in Mendelian genetics?,"The principle of independent assortment states that alleles at different genetic loci segregate independently during gamete formation, generating combinatorial diversity.",natural_sciences::genetics
+What is incomplete dominance in genetics?,"Incomplete dominance occurs when a single functional allele produces insufficient gene product to generate the wild-type phenotype, resulting in an intermediate phenotype in heterozygotes.",natural_sciences::genetics
+What is codominance in genetics?,"Codominance occurs when different allelic variants produce structurally distinct, simultaneously detectable gene products, allowing both to be visible in heterozygotes.",natural_sciences::genetics
+What is the spontaneous mutation rate in most organisms?,The spontaneous mutation rate in most organisms is approximately one mutation per $10^8$ to $10^{10}$ base pairs per cell division.,natural_sciences::genetics
+What is the Hardy-Weinberg equilibrium and its assumptions?,"Hardy-Weinberg equilibrium states that allele frequencies remain constant in a population that is infinitely large, randomly mating, free from mutation, free from migration, and subject to no selection.",natural_sciences::genetics
+What are the five forces that perturb a population away from Hardy-Weinberg equilibrium?,"The five forces are mutation, genetic drift, gene flow, non-random mating, and natural selection.",natural_sciences::genetics
+What is the significance of the Hardy-Weinberg principle in population genetics?,"The Hardy-Weinberg principle serves as a null hypothesis, and deviations from it indicate that one or more evolutionary forces are acting on the population.",natural_sciences::genetics

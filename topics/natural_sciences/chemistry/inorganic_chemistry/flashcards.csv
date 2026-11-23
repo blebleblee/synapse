@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences chemistry inorganic_chemistry
+#tags column:3
+What is the time-independent Schrödinger equation for the hydrogen atom in atomic units?,\hat{H}\psi = E\psi,natural_sciences::inorganic_chemistry
+What is the Hamiltonian operator for a single electron in the Coulomb potential of a nucleus with charge Z?,\hat{H} = -\frac{1}{2}\nabla^2 - \frac{Z}{r},natural_sciences::inorganic_chemistry
+What are the three quantum numbers that characterize hydrogen-like wavefunctions?,"The principal quantum number n, the azimuthal quantum number \ell, and the magnetic quantum number m_\ell.",natural_sciences::inorganic_chemistry
+What is the energy eigenvalue formula for hydrogen-like atoms?,"E_n = -\frac{Z^2}{2n^2} \text{ hartrees} = -13.6\,\text{eV} \cdot \frac{Z^2}{n^2}",natural_sciences::inorganic_chemistry
+What is the lattice energy U_L for an ionic solid?,U_L is the enthalpy change when one mole of a gaseous ionic compound is assembled from its constituent gaseous ions at infinite separation.,natural_sciences::inorganic_chemistry
+How is lattice energy U_L related to the standard enthalpy of formation \Delta H_f^\circ?,\Delta H_f^\circ = \Delta H_\text{sub} + \frac{1}{2} D_\text{X-X} + IE_1 + EA + (-U_L),natural_sciences::inorganic_chemistry
+What is the effective nuclear charge Z_{\text{eff}}?,"Z_{\text{eff}} is the net positive charge experienced by the valence electrons in an atom, accounting for shielding by inner electrons.",natural_sciences::inorganic_chemistry
+How does the atomic radius change across a period and down a group?,"Atomic radius decreases across a period as Z_{\text{eff}} increases, and increases down a group as additional electron shells are added.",natural_sciences::inorganic_chemistry
+What is the primary difference between ionic and covalent bonding?,"Ionic bonding involves complete electron transfer between atoms, while covalent bonding involves the sharing of electron pairs.",natural_sciences::inorganic_chemistry
+What is the 18-electron rule in organometallic chemistry?,The 18-electron rule states that a metal center with 18 valence electrons achieves a closed-shell configuration resembling the nearest noble gas.,natural_sciences::inorganic_chemistry
+What is the Born-Landé equation for lattice energy?,U = -\frac{N_A \alpha z_+ z_- e^2}{4\pi\varepsilon_0 r_0} \left(1 - \frac{1}{n}\right),natural_sciences::inorganic_chemistry
+What is the principle of space-filling efficiency in solid-state chemistry?,The principle of space-filling efficiency coupled with electrostatic energy minimization governs the architecture of crystalline lattices.,natural_sciences::inorganic_chemistry

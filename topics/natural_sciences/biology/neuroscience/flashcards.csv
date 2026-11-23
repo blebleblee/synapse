@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:natural_sciences biology neuroscience
+#tags column:3
+What is the Nernst potential for potassium ions in a typical mammalian neuron with extracellular [K+] = 5 mM and intracellular [K+] = 140 mM?,-90 mV,natural_sciences::neuroscience
+What is the simplified form of the Nernst equation using the decadic logarithm?,E_{\text{K}} = \frac{61.5\text{ mV}}{z} \log_{10}\left(\frac{[\text{K}^+]_{\text{out}}}{[\text{K}^+]_{\text{in}}}\right),natural_sciences::neuroscience
+What does the Goldman-Hodgkin-Katz equation formalize?,It formalizes the multi-ion equilibrium potential of the resting membrane potential.,natural_sciences::neuroscience
+What is the first invariant of neural systems architecture?,Hierarchical integration.,natural_sciences::neuroscience
+What is the second invariant of neural systems architecture?,Topographic mapping.,natural_sciences::neuroscience
+What is the third invariant of neural systems architecture?,Parallel pathway segregation with convergence.,natural_sciences::neuroscience
+What principle governs sensory transduction?,Specialized receptor proteins convert specific forms of physical energy into electrical signals through conformational changes that modulate ion channel conductance.,natural_sciences::neuroscience
+What is the fundamental invariant of neuroscience regarding memory?,"Information is encoded in the spatial-temporal patterns of action potentials, and memory is the persistent modification of the synaptic weights that route those patterns.",natural_sciences::neuroscience
+What is the mathematical abstraction of Spike-Timing-Dependent Plasticity (STDP)?,\Delta w = \begin{cases} A_+ \exp\left(-\frac{\Delta t}{\tau_+}\right) & \text{if } \Delta t > 0 \\ -A_- \exp\left(\frac{\Delta t}{\tau_-}\right) & \text{if } \Delta t < 0 \end{cases},natural_sciences::neuroscience
+What is the role of neuromodulators in the nervous system?,"Neuromodulators act as gain controllers, adjusting the signal-to-noise ratio of neuronal populations and biasing behavioral states toward specific modes of attention, arousal, motivation, and affective tone.",natural_sciences::neuroscience
+What is the foundational invariant governing neuronal electrical behavior?,"The cable equation, which describes how voltage propagates along a dendrite or axon.",natural_sciences::neuroscience
+What does the Hodgkin-Huxley model describe?,It models the conductances of voltage-gated sodium and potassium channels and describes how the membrane voltage evolves.,natural_sciences::neuroscience
