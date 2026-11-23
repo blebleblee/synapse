@@ -614,3 +614,18 @@ def test_api_flashcards_queue_and_review():
     data = res_review.json()
     assert data["path"] == "computing/systems/bash"
     assert data["interval_days"] == 3
+
+
+def test_field_guide_is_returned_for_download(tmp_path):
+    """Export → field guide used to only save into the course folder; the UI
+    now downloads it, so the response carries the text and a file name."""
+    from unittest.mock import MagicMock, patch
+    fake = MagicMock()
+    fake.generate.return_value = "# Mastered Field Guide: Kubernetes\n\nNotes."
+    with patch("app.backend.main.get_provider", return_value=fake):
+        res = client.post("/api/artifacts/compile", json={"query": "computing/infrastructure/kubernetes"})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["filename"] == "kubernetes_field_guide.md"
+    assert data["content"].startswith("# Mastered Field Guide: Kubernetes")
+    assert data["path"].endswith("artifacts/MASTERED_GUIDE.md")

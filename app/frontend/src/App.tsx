@@ -749,7 +749,10 @@ function App() {
       });
       if (res.ok) {
         const data = await res.json();
-        notify('success', `Field guide saved to ${data.path}`);
+        if (typeof data.content === 'string') {
+          saveBlob(new Blob([data.content], { type: 'text/markdown' }), data.filename || 'field_guide.md');
+        }
+        notify('success', `Field guide downloaded (a copy is kept in ${data.path})`);
       } else {
         notify('error', await failureMessage(res, 'Compiling the field guide'));
       }
@@ -870,6 +873,17 @@ function App() {
     }
   };
 
+  const saveBlob = (blob: Blob, filename: string) => {
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+  };
+
   // Downloads go through fetch (which carries the Authorization header) rather
   // than window.open, so they work on password-protected instances.
   const downloadFile = async (url: string, fallbackName: string) => {
@@ -882,14 +896,7 @@ function App() {
       const disposition = res.headers.get('Content-Disposition') || '';
       const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition);
       const filename = match ? decodeURIComponent(match[1]) : fallbackName;
-      const blobUrl = URL.createObjectURL(await res.blob());
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      saveBlob(await res.blob(), filename);
     } catch (err) {
       console.error('Download failed:', err);
       notify('error', networkFailure('Download', err));

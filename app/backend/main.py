@@ -1743,7 +1743,10 @@ Output clean, production-ready Markdown."""
 
     return {
         "success": True,
-        "path": str(output_file.relative_to(WORKSPACE_ROOT))
+        "path": str(output_file.relative_to(WORKSPACE_ROOT)),
+        # The UI offers the guide as a download, like the other Export items.
+        "filename": f"{sub}_field_guide.md",
+        "content": output_file.read_text(encoding="utf-8"),
     }
 
 # -----------------------------------------------------------------------------

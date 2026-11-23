@@ -752,10 +752,10 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                     onCompileGuide();
                   }}
                   disabled={isCompiling}
-                  title="Compile mastered summary guide to artifacts/"
+                  title="The AI writes a personal summary from this course and your mentor chats (takes a few minutes), then downloads it"
                 >
                   <FileCheck2 size={13} />
-                  <span>{isCompiling ? 'Compiling Guide...' : 'Mastered Field Guide (.md)'}</span>
+                  <span>{isCompiling ? 'Writing field guide…' : 'My Field Guide (.md, AI)'}</span>
                 </button>
                 <button
                   className="dropdown-item"
