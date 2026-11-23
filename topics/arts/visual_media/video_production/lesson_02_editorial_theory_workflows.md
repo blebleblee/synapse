@@ -136,7 +136,7 @@ Violations can be motivated by:
 
 4. **Sound Bridge**: Audio continues across visual cut
    - Diegetic: sound from one scene leads into next
-   - Non-diegetic: music or narration spans scenes
+- Non-diegetic: music or narration spans scenes
    - Principle: audio continuity reduces perceived disruption
 
 ### 2.3 Transition Mechanics
@@ -398,7 +398,7 @@ Performance bottlenecks:
 **Pattern: The Montage Sequence**
 - Structure: rapid succession of brief shots (0.5-2s each)
 - Function: compress time, show process, emotional crescendo
-- Audio: typically non-diegetic music driving rhythm
+- Audio: typically non-diegetic music structuring the edit's pacing
 - Risk: can feel clichéd or manipulative if overused
 - Execution: strong geometric or thematic continuity between shots
 
@@ -421,7 +421,7 @@ Performance bottlenecks:
   - Dissolve transition
   - Desaturation or color shift
   - Vignetting or aspect ratio change
-  - Audio cue (echo, reverb)
+- Audio cue (echo, reverb)
 - Risk: confusion if not clearly marked
 - Solution: bookend with return to present and maintain visual distinction
 

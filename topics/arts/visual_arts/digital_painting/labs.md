@@ -2,7 +2,7 @@
 
 ## Objective & Studio Setup
 
-Digital painting is the art of creating visual imagery through software-based brushwork, layering, color theory application, and compositional refinement. For the audio practitioner transitioning into visual arts—particularly one engaged in album artwork design, music video conceptualization, or multimedia scoring—digital painting demands the same disciplined workflow as audio production: precise tool mastery, systematic layer organization, critical listening (or in this case, critical *seeing*), and iterative refinement against reference materials and established principles of form, value, and color.
+Digital painting is the art of creating visual imagery through software-based brushwork, layering, color theory application, and compositional refinement. For the traditional artist or designer moving into digital painting—particularly one engaged in editorial illustration, concept art, or multimedia design—digital painting demands a disciplined workflow: precise tool mastery, systematic layer organization, critical *seeing*, and iterative refinement against reference materials and established principles of form, value, and color.
 
 This operational verification lab sequence positions digital painting as a complementary creative discipline for visual artists and designers. Just as value studies reveal compositional structure through careful observation and critical analysis, digital painting develops understanding of form, light, and spatial relationships through layered mark-making and color temperature shifts. The hand-eye coordination developed through gesture drawing directly informs confident brushwork and expressive line quality; the understanding of atmospheric perspective mirrors the use of depth cues and color saturation in spatial composition.
 
@@ -28,7 +28,7 @@ This operational verification lab sequence positions digital painting as a compl
 
 ### Conceptual Foundation
 
-Before color enters the visual field, a painter must master *value*—the grayscale relationship between light and dark. Value is the most powerful compositional and atmospheric tool in visual arts; it reads at a distance before color registers. In audio terms, value functions like dynamic range and frequency balance: proper value distribution creates clarity and hierarchy, just as proper gain staging and EQ creates mixing clarity.
+Before color enters the visual field, a painter must master *value*—the grayscale relationship between light and dark. Value is the most powerful compositional and atmospheric tool in visual arts; it reads at a distance before color registers. Thoughtful value distribution creates visual clarity and hierarchy, guiding the viewer's eye through the composition and establishing the structure that holds a painting together.
 
 A gesture block is the rapid, intuitive placement of compositional masses without refinement of detail. This is analogous to blocking in basic values or laying down rough compositional scaffolding before resolving specific forms and details. The goal of this exercise is to develop perceptual accuracy, hand-eye coordination, and decision-making speed under time pressure—all essential for responsive visual practice.
 
@@ -146,9 +146,9 @@ Warm coral with cool blue shadow:
 
 ### Conceptual Foundation
 
-Rendering is the final phase of image creation, where broad strokes crystallize into tactile surfaces, atmospheric effects, and focal point emphasis. In audio production, rendering parallels the mastering phase: all mixing decisions are locked, and the only variables remaining are loudness optimization, dithering, and file format export. In painting, rendering locks composition, color, and value decisions, and refines them through brushwork, texture application, and selective detail emphasis.
+Rendering is the final phase of image creation, where broad strokes crystallize into tactile surfaces, atmospheric effects, and focal point emphasis. In drawing, rendering locks line, composition, and value decisions, and refines them through line weight, hatching, and selective detail emphasis. In painting, rendering locks composition, color, and value decisions, and refines them through brushwork, texture application, and selective detail emphasis.
 
-The principle of *differential rendering* states that focal points receive maximum detail and edge clarity; peripheral areas receive progressively less detail and softer edges. This mimics human visual attention and creates psychological hierarchy. For the audio practitioner, this parallels panning and volume automation in a mix: the vocal or lead instrument occupies center and highest loudness; supporting elements recede.
+The principle of *differential rendering* states that focal points receive maximum detail and edge clarity; peripheral areas receive progressively less detail and softer edges. This mimics human visual attention and creates psychological hierarchy. In visual composition, this manifests through contrast and emphasis: the focal point receives the brightest color, sharpest focus, or largest form; supporting elements recede through desaturation, blur, or reduced scale.
 
 ### Lab Protocol: Detailed Rendering with Strategic Edge Control (120 minutes)
 
@@ -205,9 +205,9 @@ Export as 16-bit PNG at 300 DPI (maintains maximum color depth). Open in a secon
 
 ### Conceptual Foundation
 
-Composition is the arrangement of visual elements (forms, values, colors, lines) to guide viewer attention and create psychological meaning. The foundations of composition are universal across visual arts and music: hierarchy (some elements matter more than others), balance (asymmetrical or symmetrical equilibrium), rhythm (repetition with variation), and contrast (opposition creating visual tension and release).
+Composition is the arrangement of visual elements (forms, values, colors, lines) to guide viewer attention and create psychological meaning. The foundations of composition are universal across visual arts: hierarchy (some elements matter more than others), balance (asymmetrical or symmetrical equilibrium), rhythm (repetition with variation), and contrast (opposition creating visual tension and release).
 
-For the audio practitioner, compositional analysis parallels arrangement analysis: Does the mix have a clear focal element (lead vocal, lead instrument) with supporting elements in subordinate roles? Is the frequency spectrum balanced, or does one region dominate uncomfortably? Does the arrangement have rhythmic variety, or is it repetitive? These questions map directly to visual composition.
+For the visual artist, compositional analysis involves: Does the composition have a clear focal point (primary subject, dominant element) with supporting elements in secondary roles? Is the visual space balanced across the frame, or does one area dominate uncomfortably? Does the composition have variety in shapes, values, or movement, or is it repetitive? These are the fundamental questions of visual design.
 
 ### Lab Protocol: Compositional Structure Mapping (90 minutes)
 
@@ -233,7 +233,7 @@ Use directional lines (implied lines created by edges, gazes, or gesture) to tra
 
 **Part B: Contrast Mapping & Hierarchy Verification (30 minutes)**
 
-Export your painting as a grayscale image (Layer > Convert to Grayscale) to isolate tonal contrast from chromatic complexity. Examine the grayscale version: Does the focal point exhibit the highest contrast (darkest dark against lightest light), or is contrast distributed evenly across the image? In classical composition, the area of highest contrast *must* coincide with the primary focal point. If you discover high contrast in peripheral regions, those regions will compete for attention, fragmenting the viewer's focus. Mark contrast hotspots on your analysis overlay and evaluate whether they support or undermine the intended hierarchy. For audio practitioners, this is equivalent to identifying frequency masking: if the kick drum and bass guitar both occupy 80-120 Hz with equal intensity, they mask each other and destroy clarity. Similarly, if two regions of a painting both exhibit maximum contrast, they cancel each other's impact.
+Export your painting as a grayscale image (Layer > Convert to Grayscale) to isolate tonal contrast from chromatic complexity. Examine the grayscale version: Does the focal point exhibit the highest contrast (darkest dark against lightest light), or is contrast distributed evenly across the image? In classical composition, the area of highest contrast *must* coincide with the primary focal point. If you discover high contrast in peripheral regions, those regions will compete for attention, fragmenting the viewer's focus. Mark contrast hotspots on your analysis overlay and evaluate whether they support or undermine the intended hierarchy. Think of it as competing focal points in a composition: if two elements carry equal visual weight and sit at similar contrast levels, neither reads as dominant and the hierarchy collapses. Similarly, if two regions of a painting both exhibit maximum contrast, they cancel each other's impact.
 
 **Part C: Compositional Armature Construction (30 minutes)**
 

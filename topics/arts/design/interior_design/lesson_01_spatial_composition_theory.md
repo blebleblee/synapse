@@ -60,7 +60,7 @@ This hierarchical thinking extends to multi-room sequences. If an entry foyer le
 
 ### Symmetry, Asymmetry & Visual Weight Distribution
 
-Classical design often employs bilateral symmetry—mirror-image arrangement across a central axis. A fireplace mantle with identical sconces on either side, a dining table centered in a room with equal seating on both sides, or a bed positioned with mirrored nightstands all follow this principle. Symmetry reads instantly as intentional, formal, and controlled. It is the compositional equivalent of perfect unison in music.
+Classical design often employs bilateral symmetry—mirror-image arrangement across a central axis. A fireplace mantle with identical sconces on either side, a dining table centered in a room with equal seating on both sides, or a bed positioned with mirrored nightstands all follow this principle. Symmetry reads instantly as intentional, formal, and controlled. It is the most legible and direct form of visual order.
 
 However, contemporary interior design increasingly favors asymmetrical balance. This is the principle of visual weight equilibrium without mirror-image repetition. Imagine a console table positioned on one side of a living room, with a substantial artwork above it, balanced on the opposite side by a tall bookcase filled with books. The two elements are not identical, but they possess equivalent visual weight—the artwork commands attention through color and scale, while the bookcase commands attention through mass and detail complexity. The room feels balanced, but dynamic.
 

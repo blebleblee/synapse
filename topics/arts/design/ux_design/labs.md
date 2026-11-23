@@ -30,7 +30,7 @@ The first drill teaches you to think like a user researcher. You will observe re
 
 ### Part A: Contextual Observation & Interview
 
-Choose a task-specific context and a person who performs that task regularly. Examples: a parent booking a pediatrician appointment, a musician scheduling rehearsals, a student selecting courses for the next semester, a photographer organizing a portfolio. The task should be specific enough that it has measurable friction points—moments where the person hesitates, backtracks, or expresses frustration.
+Choose a task-specific context and a person who performs that task regularly. Examples: a parent booking a pediatrician appointment, a dancer scheduling rehearsals, a student selecting courses for the next semester, a photographer organizing a portfolio. The task should be specific enough that it has measurable friction points—moments where the person hesitates, backtracks, or expresses frustration.
 
 Arrange a 30-minute observation session. This is best done in person, but remote observation via screen-sharing works. Ask the person to show you how they currently accomplish this task on their phone or computer. Do not lead them. Do not say "now go to X." Instead, ask open-ended questions: "Walk me through what you need to do to accomplish X. Talk me through what you're thinking." Sit quietly and listen. Take notes in a document or notebook. Capture not just what they do, but what they say about why they do it.
 

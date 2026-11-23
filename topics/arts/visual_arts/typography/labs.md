@@ -2,17 +2,17 @@
 
 ## Objective & Studio Setup
 
-Typography for the music composer and audio practitioner operates at the intersection of visual communication and sonic identity. Where a mixing engineer uses spectral analysis to verify frequency balance, a typographer uses letterform geometry, optical spacing, and hierarchical contrast to verify compositional clarity in score layout, album artwork, and production documentation. This lab series treats typography as a **precision instrument for audio branding, score legibility, and visual-sonic coherence**.
+Typography for visual designers and graphic practitioners operates at the intersection of visual communication and brand identity. Where a designer uses grid systems and proportional spacing to verify visual balance, a typographer uses letterform geometry, optical spacing, and hierarchical contrast to verify compositional clarity in page design, visual systems, and design documentation. This lab series treats typography as a **precision instrument for brand identity, legibility, and visual coherence**.
 
 Your studio setup for these exercises requires:
 
-**Core Software Stack:** A vector graphics editor (Adobe Illustrator, Affinity Designer, or open-source Inkscape) paired with your DAW of choice (Ableton Live, Logic Pro, Reaper, or Studio One). A reference display calibrated to 100–120 cd/m² with accurate color rendering (ideally sRGB or Adobe RGB). A type reference library: download free metric-rich typefaces from Google Fonts or commercial foundries like FontFont or Hoefler & Co. A MIDI mockup session in your DAW with tempo and key signature locked to your composition.
+**Core Software Stack:** A vector graphics editor (Adobe Illustrator, Affinity Designer, or open-source Inkscape) paired with your raster image editor of choice (Adobe Photoshop, Affinity Photo, or open-source GIMP). A reference display calibrated to 100–120 cd/m² with accurate color rendering (ideally sRGB or Adobe RGB). A type reference library: download free metric-rich typefaces from Google Fonts or commercial foundries like FontFont or Hoefler & Co. A working layout mockup in your editor with artboard dimensions and color mode locked to your final design.
 
-**Physical Reference Materials:** Print samples of professional album artwork (jazz standards, electronic music releases, classical scores). A type specimen sheet template (downloadable from TypeTogether or Monotype). A ruler calibrated in both points (pt, 1/72 inch) and millimeters. A neutral-gray viewing booth or diffused daylight for color-critical work.
+**Physical Reference Materials:** Print samples of professional graphic design (magazine spreads, book covers, posters). A type specimen sheet template (downloadable from TypeTogether or Monotype). A ruler calibrated in both points (pt, 1/72 inch) and millimeters. A neutral-gray viewing booth or diffused daylight for color-critical work.
 
 **Diagnostic Instruments:** A screen color picker tool (native to most vector editors, or the free Pixel Color Picker browser extension). A type metrics plugin or ruler overlay in your vector editor. A PDF proof-reader with annotation capability (Acrobat Pro or Preview on macOS with markup tools).
 
-The strategic goal is to develop **typographic literacy**—the ability to perceive and control micro-adjustments in letterform rhythm, weight distribution, and spatial relationships that directly impact how a listener processes visual information (liner notes, score notation, social media assets) alongside your audio product. Just as a mixing engineer trains their ear to detect 1 dB of gain imbalance, a typographer trains their eye to detect 5% variations in letter spacing that collapse under magnification or expand under reduction.
+The strategic goal is to develop **typographic literacy**—the ability to perceive and control micro-adjustments in letterform rhythm, weight distribution, and spatial relationships that directly impact how a reader processes visual information (exhibition catalogues, data tables, social media assets). Just as a graphic designer trains their eye to detect subtle shifts in proportion and alignment, a typographer trains their eye to detect 5% variations in letter spacing that collapse under magnification or expand under reduction.
 
 ---
 
@@ -20,7 +20,7 @@ The strategic goal is to develop **typographic literacy**—the ability to perce
 
 ### Objective
 
-Master the geometric and proportional language of typography—the **x-height, baseline, cap height, descenders, and ascenders**—and learn to apply optical spacing corrections that compensate for the human eye's perceptual biases. By the end of this exercise, you will construct a custom type specimen sheet with proven optical adjustments, and you will apply those principles to a score title page mock-up in your DAW's score notation software.
+Master the geometric and proportional language of typography—the **x-height, baseline, cap height, descenders, and ascenders**—and learn to apply optical spacing corrections that compensate for the human eye's perceptual biases. By the end of this exercise, you will construct a custom type specimen sheet with proven optical adjustments, and you will apply those principles to a typographic layout mock-up in a design application or page layout software.
 
 ### Part A: Letterform Anatomy & Metric Grid Construction
 
@@ -87,19 +87,19 @@ Examine each size and note where **optical distortions** appear. At very small s
 
 **Section 4 – Numerical & Punctuation Reference (Columns 1–12, spanning 40 mm):** Set all numerals (0–9), common punctuation (. , ; : ! ? – — " " ' '), currency symbols ($ € £ ¥), and mathematical symbols (+ − × ÷ = %) at 24 pt. This reference confirms that numerals are proportionally consistent and punctuation marks align properly with letterforms.
 
-Export this specimen sheet as both a **PDF** (for print reference) and a **high-resolution PNG** (for screen reference and DAW album artwork mockups).
+Export this specimen sheet as both a **PDF** (for print reference) and a **high-resolution PNG** (for screen reference and design mockups).
 
-### Part D: Applying Optical Spacing to Score Notation
+### Part D: Applying Optical Spacing to Tabular Figures in Data Tables
 
-Open your DAW's score notation software (MuseScore or Dorico if you're using Reaper; Logic's built-in score editor if you're in Logic Pro; or Finale if you have access). Create a new score with a simple melodic phrase: 8 bars of 4/4 time in the key of C major, with a basic rhythmic pattern.
+Open your design software (InDesign, Affinity Publisher, or Figma). Create a new document with a standard A4 page size and 12 mm margins. Set up a 12-column grid with 8 mm column widths and 4 mm gutters.
 
-Add a **title** to the score. In MuseScore, right-click the score and select **Text > Title**. In Dorico, navigate to **Setup > Title Page** or add text via **Engrave > Text**. Type your composition's name: for this exercise, use "Optical Spacing Study in C Major".
+Create a **data table** with timetable information. In InDesign, use **Table > Insert Table** and set it to 6 columns × 8 rows. In Affinity Publisher, insert a table via **Insert > Table**. In Figma, use the community plugin for tables or construct the grid manually with rectangles and text frames. Populate the table with sample data: a weekly transit schedule with times (08:00, 09:15, 10:30) and location names.
 
-Set the title text size to **24 pt** and select a typeface from your DAW's available fonts. Most DAWs ship with a limited font library; select **Times New Roman** or **Garamond** (classic, serif fonts with proven readability in scores) as your baseline.
+Set the table's **header row** text size to **14 pt** with **18 pt leading**. Select a **tabular-figure typeface** such as **IBM Plex Mono** or **Courier Prime** (monospace fonts with consistent character widths, essential for numerical alignment). Set the body rows to **11 pt** with **14 pt leading** and apply **−20 tracking** to tighten the overall column density.
 
-Now, export the score as a **PDF** and open it in your vector editor. Use the **Type Tool** to select the title text and inspect its **kerning pairs**. Look for any letter pairs that feel visually loose or tight. In the title "Optical Spacing Study in C Major", examine the pairs: "Op", "al", "Sp", "ng", "dy", "in", and "or".
+Now, examine the table in your design software and inspect the **optical spacing** between numerals and location labels. Look for visual inconsistencies in the alignment of numeric columns: "08:00", "09:15", "10:30", and check letter pairs in location names like "St", "nd", "th", and "or" across rows.
 
-For any pair that feels optically unbalanced, use the **Adjust Kerning** feature in your vector editor (usually accessed via **Text > Kerning** or **Character > Kerning** panels) to fine-tune the spacing. Record your adjustments and re-export the corrected PDF as a reference.
+For any numerals or letter pairs that feel optically unbalanced due to tabular-figure constraints, use the **manual kerning** feature in your design software (InDesign: **Window > Type & Tables > Character**; Affinity Publisher: **Character panel**; Figma: **Text settings**) to fine-tune spacing at **±5 to ±15 units** per pair. Adjust tracking to **−15 to −25** for improved visual cohesion. Record your adjustments, apply a **1.5× modular-scale ratio** to secondary headings, and export the refined table as a reference PDF.
 
 ### Verification Checkpoint
 
@@ -118,7 +118,7 @@ Document your findings in a brief written note (100–150 words). This becomes y
 
 ### Objective
 
-Learn to construct a **modular typographic scale**—a mathematical ratio applied to font sizes to create proportional relationships that feel harmonious and functional. This principle mirrors the **harmonic series** in music: just as overtones follow predictable frequency ratios (2:1, 3:2, 4:3), type sizes follow predictable ratios (1.25, 1.33, 1.618). By the end of this exercise, you will build a typographic scale for a full album liner notes document, and you will verify that your scale remains legible at multiple print sizes and screen resolutions.
+Learn to construct a **modular typographic scale**—a mathematical ratio applied to font sizes to create proportional relationships that feel harmonious and functional. This principle mirrors the logic of **grid-based layout systems**: just as column widths follow predictable proportional ratios (2:1, 3:2, 4:3), type sizes follow predictable ratios (1.25, 1.33, 1.618). By the end of this exercise, you will build a typographic scale for a full exhibition catalogue booklet, and you will verify that your scale remains legible at multiple print sizes and screen resolutions.
 
 ### Part A: Understanding Modular Scale Ratios
 
@@ -168,49 +168,49 @@ Type the sentence: "The quick brown fox jumps over the lazy dog." at 16 pt in ea
 
 Record your observations and finalize your weight choices.
 
-### Part C: Constructing a Full Album Liner Notes Document
+### Part C: Constructing a Full Exhibition Catalogue Booklet
 
-Now apply your modular scale and type selections to a real project: **album liner notes**. Liner notes typically include: artist name, album title, track list, musician credits, production credits, copyright information, and optional artist statement or track-by-track notes.
+Now apply your modular scale and type selections to a real project: **exhibition catalogue booklet**. Exhibition catalogues typically include: exhibition title, artist name, artwork list with medium and dimensions, curatorial statement, artist statement, exhibition credits, copyright information, and artwork captions.
 
-Open your DAW's score software or a document editor (Microsoft Word, Google Docs, or preferably a layout program like Adobe InDesign or Affinity Publisher). Create a new document set to **A4 size (210 × 297 mm)** with the following margins: **top 20 mm, bottom 20 mm, left 15 mm, right 15 mm**. This leaves a content area of approximately **180 × 257 mm**, which accommodates a 2- or 3-column grid comfortably.
+Open a document editor (Microsoft Word, Google Docs, or preferably a layout program like Adobe InDesign or Affinity Publisher). Create a new document set to **A4 size (210 × 297 mm)** with the following margins: **top 20 mm, bottom 20 mm, left 15 mm, right 15 mm**. This leaves a content area of approximately **180 × 257 mm**, which accommodates a 2- or 3-column grid comfortably.
 
-Structure your liner notes as follows:
+Structure your catalogue as follows:
 
 **Page 1 – Cover (Title Page):**
 
-- **Artist Name (Top):** Heading 1 (64 pt, Bold, Inter or IBM Plex). Set in all caps: "CHAMBER ENSEMBLE X". Align center. Apply 0 pt letter spacing (default).
-- **Album Title (Center):** Subheading 1 (40 pt, Bold). Set in Title Case: "Variations on a Theme". Align center. Add 1 mm vertical spacing below the artist name.
-- **Tagline/Subtitle (Below Title):** Lead text (20 pt, Regular, italic). "A study in chromatic modulation and microtonality." Align center.
+- **Exhibition Title (Top):** Heading 1 (64 pt, Bold, Inter or IBM Plex). Set in all caps: "FORMAL GEOMETRIES". Align center. Apply 0 pt letter spacing (default).
+- **Artist Name (Center):** Subheading 1 (40 pt, Bold). Set in Title Case: "Emma Richardson". Align center. Add 1 mm vertical spacing below.
+- **Curatorial Note (Below):** Lead text (20 pt, Regular, italic). "Paintings and sculptures exploring the intersection of space and form." Align center.
 
-**Page 2 – Track List:**
+**Page 2 – Artwork List:**
 
-- **"Track List" Section Header:** Heading 2 (32 pt, Bold, all caps). Align left. Add 1 cm vertical space below.
-- **Track Entries:** Body text (16 pt, Regular). Format each track as: **"1. Title of Composition [Duration]"**. Use a monospaced font (Courier or IBM Plex Mono) for the duration to ensure right-alignment. Set line spacing to 1.5 (relaxed spacing for readability). Add 0.5 cm space between each track.
+- **"Artworks" Section Header:** Heading 2 (32 pt, Bold, all caps). Align left. Add 1 cm vertical space below.
+- **Artwork Entries:** Body text (16 pt, Regular). Format each work as: **"Title, [Year] | Medium | Dimensions (H × W × D)"**. Use a monospaced font (Courier or IBM Plex Mono) for dimensions to ensure consistency. Set line spacing to 1.5 (relaxed spacing for readability). Add 0.5 cm space between each entry.
 
 Example:
 
 ```text
-1. Prelude in D Minor [3:47]
-2. Nocturne: Variations I–III [7:22]
-3. Cadenza for Solo Cello [5:11]
+1. Untitled (Blue Series 1), 2023 | Oil on canvas | 120 × 90 cm
+2. Geometric Study IV, 2024 | Mixed media on paper | 42 × 29.7 cm
+3. Monolith, 2023 | Stainless steel | 180 × 60 × 45 cm
 ```
 
 **Page 3 – Credits & Information:**
 
-- **"Musicians" Section Header:** Heading 2 (32 pt, Bold, all caps). Align left.
-- **Musician List:** Body text (14 pt, Regular). Format as: **"Instrument: Musician Name"**. Set line spacing to 1.25 (slightly tighter for credits).
-- **"Production Notes" Section Header:** Heading 2 (32 pt, Bold, all caps). Align left. Add 1 cm space above.
-- **Production Notes:** Body text (13 pt, Regular). Justify text left. Add 0.5 cm space after this section.
+- **"Exhibition Credits" Section Header:** Heading 2 (32 pt, Bold, all caps). Align left.
+- **Credits List:** Body text (14 pt, Regular). Format as: **"Role: Name/Organization"**. Set line spacing to 1.25 (slightly tighter for credits).
+- **"Exhibition Notes" Section Header:** Heading 2 (32 pt, Bold, all caps). Align left. Add 1 cm space above.
+- **Exhibition Notes:** Body text (13 pt, Regular). Justify text left. Add 0.5 cm space after this section.
 - **Copyright Information:** Micro text (13 pt, Regular, 50% gray). Justify left.
 
-**Page 4 – Optional Artist Statement:**
+**Page 4 – Artist Statement:**
 
-- **"About This Album" Section Header:** Heading 2 (32 pt, Bold, all caps). Align left.
-- **Artist Statement:** Body text (16 pt, Regular). 2–3 paragraphs (approximately 250–400 words). Justify text. Set line spacing to 1.5 for comfortable reading. Apply 0.5 cm paragraph indent (first line indent) to each paragraph.
+- **"Artist Statement" Section Header:** Heading 2 (32 pt, Bold, all caps). Align left.
+- **Statement Text:** Body text (16 pt, Regular). 2–3 paragraphs (approximately 250–400 words). Justify text. Set line spacing to 1.5 for comfortable reading. Apply 0.5 cm paragraph indent (first line indent) to each paragraph.
 
 ### Part D: Verifying the Document at Multiple Scales
 
-Export your liner notes as a high-resolution **PDF (300 DPI)** and a **web-optimized PDF (72 DPI)**. Print the 300 DPI version at full size (A4). On screen, open the 72 DPI version and zoom to 100%.
+Export your catalogue as a high-resolution **PDF (300 DPI)** and a **web-optimized PDF (72 DPI)**. Print the 300 DPI version at full size (A4). On screen, open the 72 DPI version and zoom to 100%.
 
 Assess the following:
 
@@ -229,7 +229,7 @@ Assess the following:
 
 ### Verification Checkpoint
 
-From 2 meters away, view your printed liner notes. Can you scan the document and instantly locate: (1) the album title, (2) the track list, and (3) the production credits? If yes, your hierarchy is working. If not, increase the size or weight of key headings.
+From 2 meters away, view your printed catalogue. Can you scan the document and instantly locate: (1) the exhibition title, (2) the list of works, and (3) the credits? If yes, your hierarchy is working. If not, increase the size or weight of key headings.
 
 Document your findings: Did the modular scale produce a harmonious visual result? Did any sizes feel awkward or redundant? This assessment informs refinements to your scale for future projects.
 
@@ -268,20 +268,20 @@ Enable **View > Guides > Show Guides** (or press Ctrl+' or Cmd+' depending on yo
 
 The power of a grid system lies in its **modularity**. Instead of placing text and images arbitrarily, you place them in **multiples of grid units**. This creates visual order and alignment.
 
-For your album liner notes document, map each content block to grid columns:
+For your publication document, map each content block to grid columns:
 
 - **Page Title (Artist Name):** Spans columns 2–11 (10 columns wide, centered), with 1-column margins on left and right.
 - **Track List:** Spans columns 1–6 (left half of page, 6 columns wide) for track numbers and titles; spans columns 7–12 (right half of page, 6 columns wide) for durations.
-- **Credits Section:** Spans columns 1–7 (left half, 7 columns) for musician names; spans columns 8–12 (right half, 5 columns) for instrument descriptions, using a smaller font size.
+- **Credits Section:** Spans columns 1–7 (left half, 7 columns) for contributor names; spans columns 8–12 (right half, 5 columns) for role descriptions, using a smaller font size.
 - **Artist Statement:** Spans columns 2–11 (10 columns wide, centered), with 1-column margins.
 
 Create a **visual grid overlay** by printing or exporting your page with the grid visible (most layout software allows **View > Show Frame Edges** or similar). Label each grid unit with its column number for reference.
 
 ### Part C: Multi-Page Document & Grid Consistency
 
-Extend your liner notes to **4 pages** and verify that the grid aligns consistently across pages. Add a **header and footer** to reinforce visual continuity:
+Extend your catalogue to **4 pages** and verify that the grid aligns consistently across pages. Add a **header and footer** to reinforce visual continuity:
 
-- **Header:** Album title in 13 pt, Regular, centered. Positioned 5 mm below the top margin (inside the margin area, not in the content area).
+- **Header:** Publication title in 13 pt, Regular, centered. Positioned 5 mm below the top margin (inside the margin area, not in the content area).
 - **Footer:** Page number in 13 pt, Regular, centered.
 
 Positioned 5 mm below the top margin (inside the margin area, not in the content area).

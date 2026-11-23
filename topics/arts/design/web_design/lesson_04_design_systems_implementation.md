@@ -141,7 +141,7 @@ The mitigation is design QA as a mandatory gate. Before a design enters the deve
 
 Accessibility is not a feature; it is a constraint that must be enforced at every layer. A common failure is that accessible components are built initially, but as features are added or components are refactored, accessibility properties—focus management, ARIA labels, keyboard navigation—are inadvertently removed or broken. Manual testing cannot scale; regressions slip through.
 
-The mitigation is automated accessibility testing integrated into CI/CD. Tools like Axe, Pa11y, and Lighthouse audit every Storybook story, failing the build if violations are detected. Additionally, manual testing protocols using screen readers (NVDA, JAWS, VoiceOver) are incorporated into the definition of done for component updates. Accessibility is not a backlog item; it is a blocking requirement. This mirrors the discipline of audio engineering: you do not compress vocals and promise to check for distortion later. You check in real time, as part of the workflow.
+The mitigation is automated accessibility testing integrated into CI/CD. Tools like Axe, Pa11y, and Lighthouse audit every Storybook story, failing the build if violations are detected. Additionally, manual testing protocols using screen readers (NVDA, JAWS, VoiceOver) are incorporated into the definition of done for component updates. Accessibility is not a backlog item; it is a blocking requirement. This mirrors the discipline of design refinement: you do not adjust color contrast and promise to check readability later. You check in real time, as part of the workflow.
 
 ### Optimization: Lazy-Loading and Code-Splitting Component Libraries
 

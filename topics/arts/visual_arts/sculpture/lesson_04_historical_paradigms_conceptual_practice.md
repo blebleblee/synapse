@@ -2,7 +2,7 @@
 
 ## 1. First-Principles Intuition & Invariants
 
-Sculpture exists at the intersection of material resistance and human intention. Unlike painting, which operates within the flat picture plane, or music, which unfolds across time, sculpture occupies three-dimensional space and demands the viewer's physical navigation. This fundamental constraint—that a sculpture must be *walked around*, viewed from multiple angles, and experienced in relation to the body in space—has shaped every major paradigm shift in sculptural practice across history.
+Sculpture exists at the intersection of material resistance and human intention. Unlike painting, which operates within the flat picture plane, or drawing, which exists primarily on a surface, sculpture occupies three-dimensional space and demands the viewer's physical navigation. This fundamental constraint—that a sculpture must be *walked around*, viewed from multiple angles, and experienced in relation to the body in space—has shaped every major paradigm shift in sculptural practice across history.
 
 The evolution from representational to abstract to contemporary sculpture is not a simple linear march toward "progress." Rather, it reflects successive recalibrations of what sculpture *can mean*: first, sculpture as a faithful record of the visible world and the sacred; then, sculpture as an exploration of form, material, and spatial relationships independent of reference; finally, sculpture as a vessel for conceptual content, institutional critique, and phenomenological investigation. Each paradigm carried within it a different answer to the fundamental sculptural question: *What is the sculpture actually about?*
 
