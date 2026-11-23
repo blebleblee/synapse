@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from learning_engine.models import GenerationStopped
+from learning_engine.rewrite_safety import clean_model_markdown
 
 LANGUAGE_NAMES = {
     "cs": "Czech (Čeština)",
@@ -127,7 +128,8 @@ async def translate_section(provider, executor, section: str, lang_name: str,
             call = lambda: provider.generate_cancellable(prompt, should_stop)
         else:
             call = lambda: provider.generate(prompt)
-        out = (await loop.run_in_executor(executor, call)).strip()
+        # Drops a "Here is the translation:" line or an outer ```markdown wrapper.
+        out = clean_model_markdown(await loop.run_in_executor(executor, call))
     except asyncio.CancelledError:
         raise
     except GenerationStopped:

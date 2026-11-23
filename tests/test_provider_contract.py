@@ -1,6 +1,8 @@
 """
-Every provider must accept the call the lesson generator makes:
-`generate(prompt, system_instruction=..., max_tokens=8192)`.
+Every provider must accept the calls the app makes:
+`generate(prompt, system_instruction=..., max_tokens=8192)` (lesson generator),
+`generate_stream(..., max_tokens=2048)` (mentor chat) and, where present,
+`generate_cancellable(prompt, should_stop)` (translation jobs).
 Only AnthropicProvider did, so generation with Ollama, an Ollama cluster or
 Gemini failed every attempt with "unexpected keyword argument 'max_tokens'"
 (the test fakes and conftest's network blocker take **kwargs, which hid it).
@@ -19,12 +21,33 @@ from learning_engine.models import (
 )
 
 REAL_GENERATE = {c: c.__dict__["generate"] for c in (OllamaProvider, OllamaCluster, GeminiProvider, AnthropicProvider)}
+# Resolved through the class hierarchy: providers without real streaming use
+# LLMProvider.generate_stream.
+REAL_STREAM = {c: getattr(c, "generate_stream") for c in (OllamaProvider, OllamaCluster, GeminiProvider, AnthropicProvider)}
+REAL_CANCELLABLE = {c: c.__dict__["generate_cancellable"] for c in (OllamaProvider,) if "generate_cancellable" in c.__dict__}
 
 
 @pytest.mark.parametrize("cls", [OllamaProvider, OllamaCluster, GeminiProvider, AnthropicProvider])
 def test_generate_accepts_the_generator_call(cls):
     import inspect
     inspect.signature(REAL_GENERATE[cls]).bind(object(), "prompt", system_instruction="sys", max_tokens=8192)
+
+
+@pytest.mark.parametrize("cls", [OllamaProvider, OllamaCluster, GeminiProvider, AnthropicProvider])
+def test_generate_stream_accepts_the_chat_call(cls):
+    """The mentor chat streams with `generate_stream(prompt,
+    system_instruction=..., max_tokens=2048)` (app/backend/main.py)."""
+    import inspect
+    inspect.signature(REAL_STREAM[cls]).bind(object(), "prompt", system_instruction="sys", max_tokens=2048)
+
+
+def test_generate_cancellable_accepts_the_translation_call():
+    """Translation jobs call `generate_cancellable(prompt, should_stop)`
+    (app/backend/translation_jobs.py)."""
+    import inspect
+    assert REAL_CANCELLABLE, "OllamaProvider.generate_cancellable is gone; translation jobs check for it"
+    for fn in REAL_CANCELLABLE.values():
+        inspect.signature(fn).bind(object(), "prompt", lambda: False)
 
 
 class _Resp:
@@ -78,3 +101,30 @@ def test_every_chat_provider_can_stream():
     assert "".join(chunks) == "answer to q (2048)"
     for cls in (OllamaProvider, OllamaCluster, GeminiProvider, AnthropicProvider):
         assert callable(getattr(cls, "generate_stream", None)), cls.__name__
+
+
+def test_ollama_reply_keeps_text_before_the_first_heading():
+    """Providers ran the lesson cleanup on every reply, which drops everything
+    before the first heading. A mentor answer ("Good question! ... ## A hint")
+    lost its opening paragraph in `synapse chat` and non-streaming /api/chat.
+    Lesson-writing callers clean their own output."""
+    reply = "Good question! What do you think a Pod is?\n\n## A hint\nContainers share a network namespace."
+    with patch("urllib.request.urlopen", lambda req, timeout=None: _Resp({"response": reply})):
+        provider = OllamaProvider(host="http://127.0.0.1:9", model="m")
+        assert REAL_GENERATE[OllamaProvider](provider, "p", system_instruction="s") == reply
+
+
+def test_translation_drops_a_model_preamble():
+    """Translation relied on that provider cleanup to drop "Here is the
+    translation:"; it now cleans the reply itself."""
+    import asyncio
+    from concurrent.futures import ThreadPoolExecutor
+    from app.backend.translation_jobs import translate_section
+
+    class P:
+        def generate(self, prompt):
+            return "Here is the translation:\n\n## Úvod\nToto je přeložený odstavec lekce."
+
+    with ThreadPoolExecutor(1) as ex:
+        out, ok, _ = asyncio.run(translate_section(P(), ex, "## Intro\nThis is the lesson paragraph.", "Czech"))
+    assert ok and out.startswith("## Úvod")

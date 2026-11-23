@@ -190,17 +190,26 @@ def validate_lesson_completeness(content: str) -> str:
     return cleaned
 
 
-def validate_generation_output(content: str) -> str:
-    """
-    Validates LLM output before persisting to disk.
-    Rejects empty output or raw model runner metadata/loading payloads.
-    Unwraps outer markdown code block if the entire response is fenced.
-    """
+def check_model_reply(content: str) -> str:
+    """What every provider returns: the reply, stripped. Rejects an empty reply
+    or raw model-runner metadata. Nothing else is removed: a mentor answer may
+    open with a paragraph before its first heading. Callers that write lessons
+    run validate_generation_output() / validate_lesson_completeness()."""
     cleaned = (content or "").strip()
     if not cleaned:
         raise ValueError("LLM returned an empty response.")
     if cleaned.startswith("{") and '"done":true' in cleaned.replace(" ", ""):
         raise ValueError(f"LLM returned raw model metadata instead of generated content: {cleaned[:120]}")
+    return cleaned
+
+
+def validate_generation_output(content: str) -> str:
+    """
+    Cleans a reply that becomes lesson or lab Markdown (check_model_reply plus):
+    unwraps an outer markdown code block, drops chat before the first heading
+    and repairs Mermaid diagrams. Not for chat replies.
+    """
+    cleaned = check_model_reply(content)
 
     # Strip outer markdown fencing even if truncated at max_tokens or missing closing fence
     if cleaned.startswith("```markdown\n"):
@@ -527,7 +536,7 @@ class OllamaProvider(LLMProvider):
                 res_json = json.loads(resp.read().decode("utf-8"))
                 res_text = res_json.get("response", "")
                 if res_text:
-                    return validate_generation_output(res_text)
+                    return check_model_reply(res_text)
         except Exception:
             pass
 
@@ -554,7 +563,7 @@ class OllamaProvider(LLMProvider):
                 choices = res_json.get("choices", [])
                 if choices:
                     text = choices[0].get("message", {}).get("content", "")
-                    return validate_generation_output(text)
+                    return check_model_reply(text)
                 raise RuntimeError(f"Unexpected response structure from {self.host}: {res_json}")
         except urllib.error.URLError as e:
             raise RuntimeError(f"Ollama/LocalAI request to {self.host} failed: {e}")
@@ -594,7 +603,7 @@ class OllamaProvider(LLMProvider):
             raise RuntimeError(f"Ollama request to {self.host} failed ({e.code}): {detail}")
         except urllib.error.URLError as e:
             raise RuntimeError(f"Ollama request to {self.host} failed: {e}")
-        return validate_generation_output("".join(parts))
+        return check_model_reply("".join(parts))
 
     def generate_stream(self, prompt: str, system_instruction: str = "", max_tokens: int = 250):
         # Native Ollama API streaming
@@ -955,7 +964,7 @@ class AnthropicProvider(LLMProvider):
                 chunks = []
                 for chunk in self.generate_stream(prompt, system_instruction=system_instruction, max_tokens=max_tokens):
                     chunks.append(chunk)
-                return validate_generation_output("".join(chunks))
+                return check_model_reply("".join(chunks))
             except Exception as e:
                 last_err = e
                 err_str = str(e)
