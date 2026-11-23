@@ -257,3 +257,21 @@ def test_refine_step_processes_full_draft_and_keeps_rejected_parts(monkeypatch):
     assert "Section 6 body lorem" in out             # truncated refinement rejected, draft kept
     assert len(out) > 0.9 * len(draft)
     assert count_fences(out) % 2 == 0
+
+
+@pytest.mark.parametrize("raw", [
+    "Here is the fully corrected, publication-grade, raw Markdown:\n\n# Lesson 1: X\n\n## A\n\ntext",
+    "Sure! Here's the lesson:\n# Lesson 1: X\n\n## A\n\ntext",
+    "Here is the fully corrected, publication-grade, raw Markdown:\n\n```markdown\n# Lesson 1: X\n\n## A\n\ntext\n```",
+    "``markdown\n# Lesson 1: X\n\n## A\n\ntext",
+])
+def test_clean_model_markdown_drops_chat_preambles_and_broken_openers(raw):
+    """Three public lessons began with "Here is the fully corrected, publication-grade,
+    raw Markdown:" and one with a stray "``markdown" line, because the cleaner only
+    removed a fence that wrapped the whole reply."""
+    assert clean_model_markdown(raw) == "# Lesson 1: X\n\n## A\n\ntext"
+
+
+def test_clean_model_markdown_keeps_real_opening_prose():
+    body = "Here is a question every painter faces: where does the light come from?\n\n## A\n\ntext"
+    assert clean_model_markdown(body) == body

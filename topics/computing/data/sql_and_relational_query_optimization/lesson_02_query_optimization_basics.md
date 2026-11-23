@@ -1,4 +1,4 @@
-# SQL and Relational Query Optimization
+# Lesson 2: Query Optimization Basics
 
 ## 1. First-Principles Intuition & Invariants
 

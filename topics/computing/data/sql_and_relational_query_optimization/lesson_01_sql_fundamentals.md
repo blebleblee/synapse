@@ -1,4 +1,4 @@
-# SQL and Relational Query Optimization
+# Lesson 1: SQL Fundamentals
 
 ## 1. First-Principles Foundations
 

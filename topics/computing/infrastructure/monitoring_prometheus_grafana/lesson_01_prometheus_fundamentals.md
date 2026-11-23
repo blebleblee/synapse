@@ -1,5 +1,3 @@
-Here is the fully corrected, publication-grade, raw Markdown:
-
 # Lesson 1: Prometheus Fundamentals
 
 ## First-Principles Intuition & Invariants

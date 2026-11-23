@@ -1,4 +1,3 @@
-``markdown
 # Lesson 6: Advanced Cloud Native Practices
 
 ## 1. First-Principles Intuition & Invariants

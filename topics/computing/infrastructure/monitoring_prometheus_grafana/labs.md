@@ -1,5 +1,4 @@
-Operational Verification Labs: Monitoring Prometheus Grafana
-=====================================================
+# Operational Verification Labs: Monitoring Prometheus Grafana
 
 ### Objective and Environment Setup
 

@@ -1,5 +1,3 @@
-Here is the fully corrected, publication-grade, raw Markdown:
-
 # Lesson 4: Customizing Grafana for Prometheus
 
 ## Establishing a Solid Foundation

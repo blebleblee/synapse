@@ -98,11 +98,23 @@ def split_markdown_chunks(text: str, max_chars: int = DEFAULT_CHUNK_CHARS) -> Li
     return chunks
 
 
+_CHAT_PREAMBLE = re.compile(r"^(here is|here's|here are|sure|certainly|of course|absolutely|below is)\b.{0,200}:$", re.I)
+
+
 def clean_model_markdown(raw: str) -> str:
-    """Strips reasoning tags and a single wrapping code fence from a model reply."""
+    """Strips reasoning tags, a chat preamble line ("Here is the corrected
+    Markdown:"), a broken "``markdown" opener and a single wrapping code fence
+    from a model reply."""
     text = (raw or "").strip()
     if "</think>" in text:
         text = text.split("</think>")[-1].strip()
+    first, _, rest = text.partition("\n")
+    if _CHAT_PREAMBLE.match(first.strip()) and rest.lstrip().startswith(("#", "```", "``markdown", "``md")):
+        text = rest.strip()
+    if re.match(r"^``(?:markdown|md)[ \t]*\n", text):
+        text = text.split("\n", 1)[1].strip()
+        if count_fences(text) % 2 and text.rstrip().endswith("\n```"):
+            text = text.rstrip()[:-3].rstrip()
     m = re.match(r"^```(?:markdown|md)?[ \t]*\n(.*)\n```\s*$", text, re.DOTALL)
     if m and count_fences(m.group(1)) % 2 == 0:
         text = m.group(1).strip()
