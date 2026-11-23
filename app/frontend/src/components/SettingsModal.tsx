@@ -65,6 +65,7 @@ interface SettingsModalProps {
   initialTab?: string;
   onTreeChange?: () => void;
   onLaunchSetupWizard?: () => void;
+  onChatsCleared?: () => void;
 }
 
 type NodeStatus = {
@@ -120,6 +121,7 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
   initialTab,
   onTreeChange,
   onLaunchSetupWizard,
+  onChatsCleared,
 }) => {
   useEscapeToClose(onClose);
   const resolveTab = (tab?: string): SettingsTab => {
@@ -1009,6 +1011,36 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                       >
                         <Trash2 size={13} />
                         <span>Clear cache</span>
+                      </button>
+                    </div>
+
+                    <div className="settings-action-item">
+                      <div>
+                        <strong>Clear all chat history</strong>
+                        <span>Deletes the saved mentor conversations of every course. "Clear conversation" in the mentor window clears only the open course.</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={async () => {
+                          if (confirm('Delete the saved mentor conversations of every course?')) {
+                            try {
+                              const res = await fetch('/api/clean', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ sessions: true, exports: false })
+                              });
+                              if (!res.ok) throw new Error(`Server returned ${res.status}`);
+                              onChatsCleared?.();
+                              alert('All chat history cleared.');
+                            } catch (err) {
+                              alert(`Clearing chat history failed: ${err instanceof Error ? err.message : err}`);
+                            }
+                          }
+                        }}
+                      >
+                        <Trash2 size={13} />
+                        <span>Clear chats</span>
                       </button>
                     </div>
 

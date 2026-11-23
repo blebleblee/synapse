@@ -1066,6 +1066,7 @@ function App() {
           fetchStatus();
         }}
         onLaunchSetupWizard={() => setSetupWizardOpen(true)}
+        onChatsCleared={() => setUnifiedChatHistory([])}
       />
 
       <SetupWizardModal

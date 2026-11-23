@@ -98,3 +98,37 @@ def test_vacuum_truncates_wal():
         assert wal.stat().st_size == 0
     finally:
         conn.close()
+
+
+def _session(rel):
+    s = get_topics_dir() / rel / "sessions" / "active_session.md"
+    s.parent.mkdir(parents=True, exist_ok=True)
+    s.write_text("chat", encoding="utf-8")
+    return s
+
+
+def test_mentor_clear_removes_only_the_current_topics_session():
+    """Owner decision: "Clear conversation" in the mentor window clears that
+    topic's chat; Settings clears everything. The mentor button used to delete
+    every topic's saved sessions."""
+    bash = _session("computing/systems/bash")
+    k8s = _session("computing/infrastructure/kubernetes")
+    res = client.delete("/api/chat/session", params={"query": "computing/systems/bash"})
+    assert res.status_code == 200
+    assert not bash.exists()
+    assert k8s.exists()
+
+
+def test_mentor_clear_without_a_topic_clears_the_workspace_session_only():
+    k8s = _session("computing/infrastructure/kubernetes")
+    ws = get_topics_dir() / ".workspace_sessions" / "active_session.md"
+    ws.parent.mkdir(parents=True, exist_ok=True)
+    ws.write_text("chat", encoding="utf-8")
+    assert client.delete("/api/chat/session").status_code == 200
+    assert not ws.exists() and k8s.exists()
+
+
+def test_mentor_clear_rejects_an_unknown_topic():
+    k8s = _session("computing/infrastructure/kubernetes")
+    assert client.delete("/api/chat/session", params={"query": "../../etc"}).status_code in (400, 404)
+    assert k8s.exists()

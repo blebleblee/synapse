@@ -1334,6 +1334,27 @@ def api_clean(req: Dict[str, bool] = {}):
             raise HTTPException(status_code=500, detail=f"Database vacuum failed: {e}")
     return {"success": True, "cleaned": count, "vacuumed": vacuumed}
 
+@app.delete("/api/chat/session")
+def api_clear_chat_session(query: Optional[str] = Query(None, description="Topic path; empty for the workspace chat")):
+    """Clears one topic's saved mentor chat (the mentor window's "Clear
+    conversation"). Settings → Clear chat sessions still clears every topic."""
+    if query and query.strip():
+        try:
+            query = sanitize_query(query)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        target = resolve_subtopic(query)
+        if not target:
+            raise HTTPException(status_code=404, detail=f"Unknown topic '{query}'")
+        sessions_dir = target[3] / "sessions"
+    else:
+        sessions_dir = TOPICS_DIR / ".workspace_sessions"
+    removed = sessions_dir.is_dir()
+    if removed:
+        shutil.rmtree(sessions_dir)
+    return {"success": True, "removed": removed}
+
+
 def _schedule_shutdown():
     """Sends SIGTERM to this process shortly after the response is sent."""
     def _do_shutdown():

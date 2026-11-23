@@ -154,11 +154,10 @@ export const TutorChat: React.FC<TutorChatProps> = ({
                 onClick={async () => {
                   if (confirm(ui.clearChat + '?')) {
                     try {
-                      await fetch('/api/clean', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ sessions: true, exports: false })
-                      });
+                      // Only this topic's saved chat (owner decision); Settings
+                      // → Clear chat sessions removes every topic's.
+                      const qs = topic?.path ? `?query=${encodeURIComponent(topic.path)}` : '';
+                      await fetch(`/api/chat/session${qs}`, { method: 'DELETE' });
                       onClearChat();
                     } catch (err) {
                       console.error('Failed to clear sessions:', err);

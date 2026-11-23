@@ -183,7 +183,6 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 ## Needs Decision
 
-- **Chat "Clear conversation" deletes saved sessions of every topic** (`TutorChat.tsx` sends `sessions: true`, which removes all `sessions/` dirs). The chat history is shared across topics in the UI, so this may be intended. Options: keep; or clear only the active topic's session.
 
 ### FIND-24: Locked First Run Showed Wizard and Login Together, Polled 401s
 - **Status:** **COMPLETED** (`35b0705`). E2E: `test_locked_first_run_shows_only_login_and_stays_quiet`.
@@ -310,9 +309,16 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-64: Mermaid Repair Broke Quoted Labels
 - **Status:** **COMPLETED** (`bb354eb`). The node-label regex in `repair_mermaid_diagrams()` rewrote brackets inside quoted labels (`"W[:, 0:d/2]"` → `W[":, 0:d/2"]`); applied to the public curriculum it broke 15 working diagrams. Replaced by a quote-aware scanner (flowcharts only) that also quotes brackets/quotes inside labels. Regression run: 0 render errors over every public diagram; 9 of 11 failing local diagrams repaired automatically. Tests in `tests/test_generation_output.py`.
 
+### FIND-65: Mentor "Clear conversation" Deleted Every Topic's Chats
+- **Status:** **COMPLETED** (owner decision 2026-11-23: mentor window clears the open topic, Settings clears everything). New `DELETE /api/chat/session?query=`; Settings → Courses → "Clear all chat history". Checked in the app (isolated server, Playwright). Tests in `tests/test_cleanup.py`.
+
+### FIND-66: Mentor Replies Lost Their Opening Paragraph; `synapse chat` Died on One Error
+- **Status:** **COMPLETED** (`05e1923`, `73b6ca8`). Providers ran lesson cleanup on every reply; now only `check_model_reply`. Gemini empty reply raises. Contract tests for `generate_stream` / `generate_cancellable`.
+
 ## Next Candidates (not yet verified)
 
 - **Thin computing lessons:** `computing/infrastructure/monitoring_prometheus_grafana` lesson 4 (472 words) and its labs (641), `computing/data/sql_and_relational_query_optimization` lesson 4 (658). Regenerate.
+- **Thinking models on Ollama (e.g. gemma4):** `OllamaProvider` never sets `think`, and Ollama counts thinking tokens against `num_predict`. A 5-token probe came back empty; the 250-token `generate_stream` default and short quiz/flashcard budgets could too. Options: `think: false` for short structured calls, or larger budgets. Needs a check against the Settings models; behaviour choice, so not changed unasked.
 - **Arts Adobe Creative Cloud lab** is an audio post-production exercise; regenerate with the visual blueprint (queued locally).
 
 - **Export menu → field guide:** done in `8041726` (downloads; clearer label).
