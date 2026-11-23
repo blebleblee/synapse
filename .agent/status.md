@@ -218,3 +218,8 @@ Verification: `./scripts/verify_all.sh` all 6 phases (268 backend, 38 frontend u
   issues; results not saved, the pilot writes JSON only at the end). A full
   computing review with Sonnet 5.5 is ~$50; a cross-family Gemini reviewer
   needs an OpenAI-format provider (not built).
+- Batch 20 update: 133 more decks (70cf690); 29 left (haimaker budget cap
+  $20 reached). Gemini 3.8 Flash review of one course (rag_systems, 224 KB,
+  65k in / 45k out tokens, 90% of output thinking) cost the owner ~$5 on
+  the Google key: a full review is not affordable as built. Findings were
+  real (scores 100/82/75/68/68); not applied.
