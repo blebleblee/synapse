@@ -353,3 +353,6 @@ Waiting for the API proxy (owner says when it works); `synapse review --workers 
 - **FIND-73** Private domain names in public code (generator branches, linter list, test fixtures, scope script). **Status:** **COMPLETED** (batch 18): moved to per-domain DOMAIN_PROFILE.json; guard added.
 - **FIND-74** `synapse lint` failed on topics outside the workspace (`relative_to(WORKSPACE_ROOT)` in linter.py). **Status:** **COMPLETED** (batch 19): report paths fall back to the topics folder's parent.
 - **FEAT** `synapse review --workers N --domain D`: bounded parallel full review; a unit whose review raises counts as "could not be reviewed" instead of aborting the run. **Status:** **COMPLETED** (batch 19).
+
+- **Curriculum review: ON HOLD (owner decision 2026-11-23).** Too expensive as built (~$5 per course with Gemini 3.8 Flash). Don't run reviews until the owner asks. The saved rag_systems findings are unapplied.
+- **Flashcard decks:** 510 shipped (5ed6df9, 70cf690); 29 left for when there is API credit.
