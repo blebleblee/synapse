@@ -30,13 +30,13 @@ Rather than forcing users to blindly copy-paste complex multi-line snippets into
 
 | Language | Raw Snippet | Synthesized Execution Wrap | Button Label |
 | :--- | :--- | :--- | :--- |
-| **SQL** | `SELECT * FROM pg_stat_activity;` | Wraps in `psql -c "..."` or `sqlite3` temporary file runner | `▶ Execute SQL` |
-| **Kubernetes YAML** | `apiVersion: apps/v1\nkind: Deployment...` | Writes to `/tmp/synapse_manifest.yaml` and executes `kubectl apply -f /tmp/synapse_manifest.yaml` | `▶ Apply Manifest` |
-| **Python** | `import torch\nprint(torch.cuda.is_available())` | Executes via active virtual environment `.venv/bin/python3 -c "..."` | `▶ Run Python` |
-| **C / C++** | `#include <stdio.h>\nint main()...` | Saves to `/tmp/synapse_prog.c`, compiles with `gcc -O2`, and executes `/tmp/synapse_prog` | `▶ Compile & Run` |
-| **Rust** | `fn main() { println!("ok"); }` | Saves to `/tmp/synapse_prog.rs`, compiles with `rustc -O`, and runs | `▶ Compile & Run` |
-| **JSON** | `{"cluster": {"nodes": 3}}` | Writes to `/tmp/synapse_data.json` and pretty-prints with `jq .` | `▶ Inspect JSON` |
-| **Bash / Shell** | `docker ps -a` | Executes directly in active terminal PTY session | `▶ Run in Terminal` |
+| **SQL** | `SELECT * FROM pg_stat_activity;` | Wraps in `psql -c "..."` or `sqlite3` temporary file runner | `⇥ Send to terminal (SQL)` |
+| **Kubernetes YAML** | `apiVersion: apps/v1\nkind: Deployment...` | Writes to `/tmp/synapse_manifest.yaml` and executes `kubectl apply -f /tmp/synapse_manifest.yaml` | `⇥ Send to terminal (kubectl apply)` |
+| **Python** | `import torch\nprint(torch.cuda.is_available())` | Executes via active virtual environment `.venv/bin/python3 -c "..."` | `⇥ Send to terminal (Python)` |
+| **C / C++** | `#include <stdio.h>\nint main()...` | Saves to `/tmp/synapse_prog.c`, compiles with `gcc -O2`, and executes `/tmp/synapse_prog` | `⇥ Send to terminal (C: compile & run)` |
+| **Rust** | `fn main() { println!("ok"); }` | Saves to `/tmp/synapse_prog.rs`, compiles with `rustc -O`, and runs | `⇥ Send to terminal (Rust: compile & run)` |
+| **JSON** | `{"cluster": {"nodes": 3}}` | Writes to `/tmp/synapse_data.json` and pretty-prints with `jq .` | `⇥ Send to terminal (jq)` |
+| **Bash / Shell** | `docker ps -a` | Executes directly in active terminal PTY session | `⇥ Send to terminal` |
 
 In a sandbox profile the synthesized command runs at once. On **Host Shell (Local)** it is only typed in at the prompt (bracketed paste, no Enter): lesson snippets are often illustrations, so you review the command and press Enter yourself.
 

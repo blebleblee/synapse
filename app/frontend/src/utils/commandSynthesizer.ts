@@ -20,7 +20,7 @@ export function synthesizeTerminalCommand(code: string, lang: string): Synthesiz
   if (['bash', 'sh', 'zsh', 'shell'].includes(language)) {
     return {
       command: trimmed,
-      displayLabel: '▶ Run Command',
+      displayLabel: '⇥ Send to terminal',
       isExecutable: true,
       explanation: 'Sends this command to the terminal panel: a sandbox runs it; on Host Shell it is only typed in, press Enter to run.'
     };
@@ -31,7 +31,7 @@ export function synthesizeTerminalCommand(code: string, lang: string): Synthesiz
     const wrapped = `cat << 'EOF' > /tmp/synapse_query.sql\n${trimmed}\nEOF\nif command -v psql >/dev/null 2>&1; then\n  psql -U postgres -d postgres -f /tmp/synapse_query.sql 2>/dev/null || psql -f /tmp/synapse_query.sql\nelif command -v sqlite3 >/dev/null 2>&1; then\n  sqlite3 /tmp/synapse.db < /tmp/synapse_query.sql\nelse\n  echo "[✔] Saved SQL query to /tmp/synapse_query.sql (Run with: psql -f /tmp/synapse_query.sql)"\nfi`;
     return {
       command: wrapped,
-      displayLabel: '▶ Run SQL',
+      displayLabel: '⇥ Send to terminal (SQL)',
       isExecutable: true,
       explanation: 'Saves query to /tmp/synapse_query.sql and executes against active database.'
     };
@@ -44,7 +44,7 @@ export function synthesizeTerminalCommand(code: string, lang: string): Synthesiz
       const wrapped = `cat << 'EOF' > /tmp/synapse_manifest.yaml\n${trimmed}\nEOF\nif command -v kubectl >/dev/null 2>&1; then\n  kubectl apply -f /tmp/synapse_manifest.yaml\nelse\n  echo "[✔] Saved Kubernetes manifest to /tmp/synapse_manifest.yaml (Apply with: kubectl apply -f /tmp/synapse_manifest.yaml)"\nfi`;
       return {
         command: wrapped,
-        displayLabel: '▶ Apply K8s Manifest',
+        displayLabel: '⇥ Send to terminal (kubectl apply)',
         isExecutable: true,
         explanation: 'Saves manifest to /tmp/synapse_manifest.yaml and applies via kubectl.'
       };
@@ -52,7 +52,7 @@ export function synthesizeTerminalCommand(code: string, lang: string): Synthesiz
       const wrapped = `cat << 'EOF' > /tmp/synapse_config.yaml\n${trimmed}\nEOF\necho "[✔] Saved YAML configuration to /tmp/synapse_config.yaml"`;
       return {
         command: wrapped,
-        displayLabel: '▶ Save YAML',
+        displayLabel: '⇥ Send to terminal (save YAML)',
         isExecutable: true,
         explanation: 'Saves YAML configuration to /tmp/synapse_config.yaml.'
       };
@@ -64,7 +64,7 @@ export function synthesizeTerminalCommand(code: string, lang: string): Synthesiz
     const wrapped = `cat << 'EOF' > /tmp/synapse_script.py\n${trimmed}\nEOF\nif [ -f "$PWD/.venv/bin/python3" ]; then\n  "$PWD/.venv/bin/python3" /tmp/synapse_script.py\nelse\n  python3 /tmp/synapse_script.py\nfi`;
     return {
       command: wrapped,
-      displayLabel: '▶ Run Python',
+      displayLabel: '⇥ Send to terminal (Python)',
       isExecutable: true,
       explanation: 'Saves script to /tmp/synapse_script.py and executes via virtualenv Python.'
     };
@@ -75,7 +75,7 @@ export function synthesizeTerminalCommand(code: string, lang: string): Synthesiz
     const wrapped = `cat << 'EOF' > /tmp/synapse_app.c\n${trimmed}\nEOF\ngcc -O2 /tmp/synapse_app.c -o /tmp/synapse_app -lm && /tmp/synapse_app`;
     return {
       command: wrapped,
-      displayLabel: '▶ Compile & Run C',
+      displayLabel: '⇥ Send to terminal (C: compile & run)',
       isExecutable: true,
       explanation: 'Compiles /tmp/synapse_app.c with gcc and runs the resulting binary.'
     };
@@ -86,7 +86,7 @@ export function synthesizeTerminalCommand(code: string, lang: string): Synthesiz
     const wrapped = `cat << 'EOF' > /tmp/synapse_app.rs\n${trimmed}\nEOF\nrustc /tmp/synapse_app.rs -o /tmp/synapse_app_rs && /tmp/synapse_app_rs`;
     return {
       command: wrapped,
-      displayLabel: '▶ Compile & Run Rust',
+      displayLabel: '⇥ Send to terminal (Rust: compile & run)',
       isExecutable: true,
       explanation: 'Compiles /tmp/synapse_app.rs with rustc and executes the binary.'
     };
@@ -97,7 +97,7 @@ export function synthesizeTerminalCommand(code: string, lang: string): Synthesiz
     const wrapped = `cat << 'EOF' > /tmp/synapse_data.json\n${trimmed}\nEOF\nif command -v jq >/dev/null 2>&1; then\n  jq . /tmp/synapse_data.json\nelse\n  python3 -m json.tool /tmp/synapse_data.json\nfi`;
     return {
       command: wrapped,
-      displayLabel: '▶ Inspect JSON',
+      displayLabel: '⇥ Send to terminal (jq)',
       isExecutable: true,
       explanation: 'Saves to /tmp/synapse_data.json and formats with jq.'
     };
@@ -105,7 +105,7 @@ export function synthesizeTerminalCommand(code: string, lang: string): Synthesiz
 
   return {
     command: trimmed,
-    displayLabel: '▶ Send to Terminal',
+    displayLabel: '⇥ Send to terminal',
     isExecutable: false,
     explanation: 'Sends raw snippet to the terminal.'
   };
