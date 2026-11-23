@@ -339,7 +339,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Export menu → field guide:** done in `8041726` (downloads; clearer label).
 
 
-- **Curriculum hallucinations (owner 2026-11-23: use the API when possible):** option (1), a cross-family reviewer, with `synapse review`. Gemini reviewer via the proxy (`GEMINI_BASE_URL=https://apikey.vnaipro.app`, Gemini key) or `--provider anthropic` (added). **Waiting for the API proxy.** Pilot: `computing`, then report findings before `--fix`. Options (2)-(4) not chosen yet.
+- **Curriculum hallucinations (owner 2026-11-23: use the API when possible):** option (1), a cross-family reviewer, with `synapse review`. Gemini reviewer via the proxy (`GEMINI_BASE_URL=https://apikey.vnaipro.app`, Gemini key) or `--provider anthropic` (added). **Waiting for the API proxy** (the owner's Google key is for testing only, not reviews). One-course pilot done with it before that rule: `.agent/reports/review_pilot_sql.md`. Before scaling up: parallel reviewing (one course took 8 min sequentially). Then `computing`, report findings before `--fix`. Options (2)-(4) not chosen yet.
 - **Run buttons:** renamed to "Send to terminal" (owner decision 2026-11-23).
 
 - **UI:** all main flows exercised in batches 1–6. (Listen, translation, Add Topic, rename/delete checked in batches 4–5.) (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
