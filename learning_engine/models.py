@@ -29,12 +29,94 @@ def get_node_name(host: str) -> str:
 # Retained as empty dict for backwards compatibility
 CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {}
 
+_MERMAID_CLOSERS = {"[": "]", "{": "}", "(": ")"}
+
+
+def _escape_label(inner: str):
+    """Quoted form of a flowchart label Mermaid would reject, or None.
+
+    A label wrapped in one pair of quotes is fine whatever it holds. A label
+    with quotes inside it, or unquoted brackets or braces, is wrapped in quotes
+    with the inner quotes written as #quot;. Unquoted parens, slashes and
+    operators count too (the rule the old A[f(x)] regex covered)."""
+    if inner.startswith('"') and inner.endswith('"') and inner.count('"') == 2:
+        return None
+    if '"' not in inner and not re.search(r"[\[\]{}()/+=*&]", inner):
+        return None
+    return '"' + inner.replace('"', "#quot;") + '"'
+
+
+def _quote_flowchart_labels(line: str) -> str:
+    """Quote awkward labels in a flowchart block. Takes the whole block: a
+    quoted label may span lines, and its text must not be scanned as syntax."""
+    line = line.replace('\\"', '"')
+    out, i, n = [], 0, len(line)
+    while i < n:
+        ch = line[i]
+        # Edge label: -->|text| or -->|"text"|
+        if ch == "|" and line[i + 1:i + 2] != "|":
+            eol = line.find("\n", i)
+            eol = n if eol < 0 else eol
+            m = re.compile(r'"[ \t]*\|').search(line, i + 2, eol) if line[i + 1:i + 2] == '"' else None
+            if m:
+                end, after = m.start() + 1, m.end()
+            else:
+                end = line.find("|", i + 1, eol)
+                after = end + 1
+            if end > 0:
+                inner = line[i + 1:end]
+                out.append("|" + (_escape_label(inner) or inner) + line[end:after])
+                i = after
+                continue
+        # Node label: ID[...], ID{...}, ID(...), and double shapes like ID((...)).
+        if ch in _MERMAID_CLOSERS and i > 0 and re.match(r"[A-Za-z0-9_]", line[i - 1]):
+            opener = ch
+            if line[i + 1:i + 2] in _MERMAID_CLOSERS:
+                opener += line[i + 1]
+            if line[i + len(opener):i + len(opener) + 1] in ("/", "\\"):
+                out.append(ch); i += 1; continue  # trapezoid shapes: leave alone
+            closer = "".join(_MERMAID_CLOSERS[c] for c in reversed(opener))
+            start = i + len(opener)
+            if line[start:start + 1] == '"':
+                end = line.find('"' + closer, start + 1)
+                end = end + 1 if end >= 0 else -1
+            else:
+                depth, j, end = 0, start, -1
+                while j < n and line[j] != "\n":
+                    if line[j] == opener[-1]:
+                        depth += 1
+                    elif line[j] == closer[0]:
+                        if depth == 0:
+                            end = j
+                            break
+                        depth -= 1
+                    j += 1
+                if end >= 0 and line[end:end + len(closer)] != closer:
+                    end = -1
+            if end >= 0:
+                inner = line[start:end]
+                out.append(opener + (_escape_label(inner) or inner) + closer)
+                i = end + len(closer)
+                continue
+        if ch == '"':
+            # A stray quoted string outside a label: copy it as is.
+            j = line.find('"', i + 1)
+            if j > 0:
+                out.append(line[i:j + 1]); i = j + 1; continue
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
 def repair_mermaid_diagrams(content: str) -> str:
     """
     Normalizes Mermaid diagram code blocks to ensure strict syntax compliance:
     - Normalizes subgraphs: subgraph "Title" -> subgraph sub_id ["Title"]
     - Normalizes edge labels with spaces or parens: -->|Text (parens)| -> -->|"Text (parens)"|
-    - Normalizes node labels with parens: A[Text (parens)] -> A["Text (parens)"]
+    - Flowcharts: quotes node and edge labels holding brackets, parens, quotes
+      or operators (A[f(x)] -> A["f(x)"], H{Has [r]?} -> H{"Has [r]?"}), writes
+      inner quotes as #quot;, and leaves already-quoted labels and double-
+      delimited shapes such as ((circle)) and [(db)] as they are.
     """
     def sanitize_block(match):
         block = match.group(1)
@@ -56,7 +138,17 @@ def repair_mermaid_diagrams(content: str) -> str:
             return m.group(0)
 
         block = re.sub(r'-->\s*\|\s*([^"|\n]+?)\s*\|\s*', repl_edge_label, block)
-        block = re.sub(r'([A-Za-z0-9_-]+)\[([^"\]\n]*[\(\)\/\+\=\*\&][^"\]\n]*)\]', r'\1["\2"]', block)
+        # Node and edge labels holding brackets, parens, quotes or operators
+        # (`H{Contains [r]?}`, `D["a"<br/>"b"]`, `A[f(x)]`, `-->|\\"x\\"|`): quote
+        # the label and escape inner quotes. The scanner skips labels that are
+        # already quoted; a regex used here before rewrote brackets inside them
+        # (`"W[:, 0:d/2]"` -> `W[":, 0:d/2"]`) and broke working diagrams.
+        # Flowcharts only; class and sequence diagrams use brackets as syntax.
+        if re.match(r"\s*(graph|flowchart)\b", block):
+            # `X["... → [tsm̩"]]`: the label's closing quote typed inside a
+            # trailing phonetic bracket. Move it back out.
+            block = re.sub(r'\[([^\[\]"\n]*)"\]\]', r'[\1]"]', block)
+            block = _quote_flowchart_labels(block)
         return f"```mermaid\n{block.strip()}\n```"
 
     return re.sub(r'```mermaid\n([\s\S]*?)```', sanitize_block, content)
