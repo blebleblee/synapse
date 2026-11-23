@@ -7,6 +7,8 @@ Found with a live key (2026-11-23):
 - gemini-3.5-flash-lite rejects thinking_budget=0 with 400 INVALID_ARGUMENT;
 - mentor chat did not stream (one chunk from the base class).
 """
+import sys
+import types as pytypes
 from types import SimpleNamespace
 
 import pytest
@@ -14,6 +16,35 @@ import pytest
 from learning_engine.models import DEFAULT_GEMINI_MODEL, SHORT_REPLY_TOKENS, GeminiProvider
 
 REAL_GENERATE = GeminiProvider.__dict__["generate"]
+
+
+@pytest.fixture(autouse=True)
+def genai_types(monkeypatch):
+    """google-genai is optional (not in requirements.txt, so not in CI). When
+    it is missing, stand in for the two config classes the provider builds;
+    these tests check the provider's logic, not the SDK."""
+    try:
+        from google.genai import types  # noqa: F401
+        return
+    except ImportError:
+        pass
+
+    class _Cfg:
+        def __init__(self, **kw):
+            self.thinking_config = None
+            self.__dict__.update(kw)
+
+    fake = pytypes.ModuleType("google.genai.types")
+    fake.GenerateContentConfig = _Cfg
+    fake.ThinkingConfig = _Cfg
+    genai = pytypes.ModuleType("google.genai")
+    genai.types = fake
+    google = sys.modules.get("google") or pytypes.ModuleType("google")
+    monkeypatch.setitem(sys.modules, "google", google)
+    monkeypatch.setattr(google, "genai", genai, raising=False)
+    monkeypatch.setitem(sys.modules, "google.genai", genai)
+    monkeypatch.setitem(sys.modules, "google.genai.types", fake)
+
 REAL_STREAM = GeminiProvider.__dict__["generate_stream"]
 
 
