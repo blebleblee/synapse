@@ -71,6 +71,7 @@ def main(argv=None, files=None):
     ap.add_argument("--only", choices=PUBLIC_DOMAINS, help="one domain")
     ap.add_argument("--limit", type=int, help="at most this many decks")
     ap.add_argument("--model", default="claude-sonnet-4-6")
+    ap.add_argument("--provider", default="anthropic", help="Provider (e.g. anthropic, ollama)")
     ap.add_argument("--dry-run", action="store_true", help="list the courses, call no model")
     args = ap.parse_args(argv)
 
@@ -84,12 +85,12 @@ def main(argv=None, files=None):
             print(f"  {c}")
         return 0
 
-    if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("VNAIPRO_API_KEY")):
+    if args.provider == "anthropic" and not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("VNAIPRO_API_KEY")):
         print("[✘] No API key: set ANTHROPIC_API_KEY or VNAIPRO_API_KEY (and VNAIPRO_BASE_URL).")
         return 2
     from learning_engine.models import get_provider
     from learning_engine.flashcards import generate_flashcards
-    provider = get_provider(provider_type="anthropic", model=args.model)
+    provider = get_provider(provider_type=args.provider, model=args.model)
     done, failed = run(todo, provider, generate_flashcards)
     print(f"\n{len(done)} deck(s) written, {len(failed)} failed.")
     return 1 if failed else 0

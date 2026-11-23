@@ -58,6 +58,140 @@ def _is_music_course(domain: str, category: str, subtopic_id: str = "", subtopic
             and subtopic_id.lower() not in VISUAL_ARTS_COURSES)
 
 
+
+def _build_outline_prompt_for_languages(title: str, hands_on: str, focus: str, subtopic_title: str, category_title: str, domain_title: str, default_audience: str) -> tuple[str, str]:
+    structure = f"""LINGUISTIC MASTERCLASS CHAPTER BLUEPRINT:
+Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}'.
+Write like a Senior Applied Linguist and Native-Speaker Coach: articulate, culturally grounded, and immediately practical for a native Czech speaker.
+
+CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
+- Blend rich, insightful narrative prose with clean, scannable bullet points, grammatical tables, and conversational dialogues.
+- Structure your chapter with these organic, topic-specific headings:
+  1. The Communicative Challenge & Czech Contrastive Foundations: Explain the communicative problem, demystify grammatical jargon, and contrast directly with Czech linguistic patterns and Slavic traps.
+  2. Phonetic & Grammatical Mechanics: Dissect the phonetic articulation, morphological declension, or syntactic word order. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing the grammatical decision tree or phonological map.
+  3. Authentic Conversational Dialogues & Register Nuance: Realistic colloquial and professional dialogues demonstrating the concept in action with side-by-side translations.
+  4. Core Declension / Conjugation / Vocabulary Reference Table: Comprehensive Markdown reference table.
+  5. Practical Oral & Written Lab: A concrete 15-minute active recall drill ({hands_on}).
+  6. Linguist Golden Rules & Slavic Traps: 4-5 bulleted pro-tips on false friends, word order (slovosled), and pronunciation."""
+    relevance = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
+- Focus 80% on authentic language acquisition, phonetic accuracy, and conversational fluency for '{subtopic_title}' in '{category_title}'.
+- Contrast directly against Czech native speaker patterns. NEVER mention unrelated IT or audio tools."""
+    return structure, relevance
+
+def _build_outline_prompt_for_music(title: str, hands_on: str, focus: str, subtopic_title: str, category_title: str, domain_title: str, default_audience: str) -> tuple[str, str]:
+    structure = f"""MUSIC PRODUCTION MASTERCLASS CHAPTER BLUEPRINT:
+Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}'.
+Write like a world-class Berklee professor and master producer: deeply articulate, passionate, intellectually rigorous, and immediately practical.
+
+CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
+- Blend rich, insightful narrative prose with clean, scannable bullet points, numbered step-by-step procedures, and actionable checklists.
+- DO NOT write an unbroken wall of dense text. Break down concepts with clear bullet points, comparative tables, and bold highlights.
+- Structure your chapter with these organic, topic-specific headings:
+  1. The Core Creative Dilemma & Human Perception: Deep psychoacoustic and emotional exposition explaining why this concept matters. Demystify all jargon in plain English.
+  2. The Acoustic & Musical Mechanics: Clear narrative exposition on voice-leading, frequency real estate, rhythm, or arrangement dynamics. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing the musical structure or decision tree.
+  3. Measure-by-Measure Commercial Case Studies: Multi-paragraph breakdowns of 2 real-world commercial records with exact timestamps, tracking measure-by-measure what stems enter/exit and why it works.
+  4. Core Reference Matrix Table: Include a clear Markdown table summarizing parameters, frequency allocations, or structural metrics.
+  5. Compact DAW Quick Reference Box: A concise 10-line bullet cheat-sheet giving exact shortcuts and track setups for Ableton Live (e.g. [A] for Automation, Utility) and Steinberg Cubase (e.g. [V] Volume Automation, Draw tool [8]). Keep this compact so software steps never overshadow the musical lesson.
+  6. Practical Listening & Production Lab: A concrete 15-minute auditory audit drill on the student's own project ({hands_on}).
+  7. Golden Mentor Invariants: Conclude with 4-5 memorable 'Golden Rules' of the craft."""
+    relevance = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
+- Focus 80% on actionable, hands-on music production, arrangement, and audio engineering workflows for '{subtopic_title}' in '{category_title}'.
+- STRICT TOOLCHAIN ISOLATION: Utilize ONLY musical instruments, composition techniques, and DAW tools native to '{category_title}'. NEVER mention Linux, Kubernetes, or enterprise IT software."""
+    return structure, relevance
+
+def _build_outline_prompt_for_default(title: str, hands_on: str, focus: str, subtopic_title: str, category_title: str, domain_title: str, default_audience: str) -> tuple[str, str]:
+    structure = f"""MASTERCLASS CHAPTER BLUEPRINT:
+Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}' in {category_title}.
+Write like an experienced practitioner and teacher of {category_title}: articulate, rigorous, and immediately practical.
+
+CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
+- Blend rich, insightful narrative prose with clean, scannable bullet points, numbered step-by-step procedures, and actionable checklists.
+- DO NOT write an unbroken wall of dense text. Break down concepts with clear bullet points, comparative tables, and bold highlights.
+- Structure your chapter with these organic, topic-specific headings:
+  1. Why It Matters: The problem this concept solves and the intuition behind it, with all jargon explained in plain English.
+  2. How It Works: Clear exposition of the core mechanics and principles. Include a Mermaid diagram (```mermaid ... ```) when a process or structure is easier to see than to read.
+  3. Worked Examples: Two concrete, realistic examples worked through step by step.
+  4. Reference Table: A clear Markdown table summarizing the key parameters, options or distinctions.
+  5. Common Mistakes & How to Fix Them.
+  6. Practice Exercise: A concrete exercise the learner can do now ({hands_on}).
+  7. Key Takeaways: Conclude with 4-5 memorable rules of thumb."""
+    relevance = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
+- Focus 80% on actionable, hands-on practice of '{subtopic_title}' in '{category_title}'.
+- STRICT TOOLCHAIN ISOLATION: Use ONLY tools, techniques, and vocabulary native to '{category_title}'. Do not borrow examples, tools or jargon from unrelated fields."""
+    return structure, relevance
+
+def _build_scoped_prompt_for_languages(title: str, focus: str, subtopic_title: str, category_title: str, domain_title: str, default_audience: str) -> str:
+    return f"""Structure:
+# {title}
+
+## 1. The Linguistic Challenge & The "Why"
+(Plain-English exposition of the communicative problem, demystifying linguistic jargon, and explaining why this concept is vital for natural fluency, framed specifically for a native Czech speaker)
+
+## 2. Phonetic & Grammatical Mechanics (Czech Contrastive Framework)
+(Deep narrative exposition dissecting the phonetic articulation, morphological declension, or syntactic word order. Contrast directly against Czech patterns, highlighting Slavic false friends and common traps. You MUST include an authoritative Mermaid diagram (```mermaid ... ```) illustrating the grammatical decision tree or phonological map)
+
+## 3. Authentic Conversational Dialogues & Contexts
+(Rich, realistic colloquial and professional dialogues demonstrating the concept in action with side-by-side translations and register notes)
+
+## 4. Guided Spoken & Written Lab
+(Concrete 15-minute active recall exercise, minimal pair drills, and sentence reconstruction tasks)
+
+## 5. Linguist Advice & Slavic Native Traps
+(Highlight the #1 mistake Czech speakers make with this concept and mnemonic tricks to internalize native pronunciation and syntax)"""
+
+def _build_scoped_prompt_for_default(title: str, focus: str, subtopic_title: str, category_title: str, domain_title: str, default_audience: str) -> str:
+    return f"""Structure:
+# {title}
+
+## 1. Enterprise Problem & Architectural Foundations
+(Deep narrative exposition establishing theoretical grounding, problem space, and official documentation invariants)
+
+## 2. Core Architecture & Mechanics
+(Dissect internal data structures, daemon lifecycles, or execution models. You MUST include an authoritative, richly styled Mermaid diagram (```mermaid ... ```) showing component topology, dataflow, or state transitions)
+
+## 3. Step-by-Step Command Walkthrough & Configuration
+(Exact CLI commands, configuration stanzas, and verification procedures with detailed explanations of flags and parameters)
+
+## 4. Guided Hands-On Lab
+(A concrete hands-on terminal exercise with verification commands, expected outputs, and triage steps)
+
+## 5. Administrator Pro-Tips & Production Hardening
+(Production guidelines, common gotchas, and security/performance hardening recommendations)"""
+
+def _build_capstone_prompt_default(cap_title: str, cap_obj: str, cap_del: str, subtopic_title: str, category_title: str, domain_title: str, default_audience: str) -> str:
+    return f"""Author the Practical Capstone Challenge Guide: '{cap_title}' for '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
+
+Target Audience: {default_audience}
+Challenge Objective: {cap_obj}
+Required Deliverable: {cap_del}
+
+CAPSTONE LAB BLUEPRINT (~1,000 to 1,400 words):
+Design a focused, hands-on 15–20 minute implementation sprint that allows the practitioner to prove mastery of {subtopic_title}.
+
+Structure your capstone lab guide with these organic headings:
+# Capstone Challenge: {cap_title}
+
+## 1. Challenge Architecture & Objective
+(Provide a crisp, realistic production scenario, the architectural topology diagram (```mermaid ... ```), and prerequisites)
+
+## 2. Step-by-Step Implementation Procedure
+(Numbered step-by-step CLI commands, YAML stanzas, or routing patches with exact flags and zero placeholders)
+
+## 3. Automated Verification & Diagnostic Health Checks
+(Concrete verification commands and expected terminal output blocks proving the system is healthy)
+
+## 4. Failure Injection & Resilience Triage
+(Inject a realistic edge failure, demonstrate the triage command, and restore the service)
+
+## 5. Production Sign-Off Checklist
+(A clean Markdown table with verification criteria and pass/fail indicators)
+
+CRITICAL BUDGETING & TERMINAL INVARIANT:
+- Budget your response to approximately 1,000 to 1,400 words so that all 5 sections are cleanly concluded BEFORE reaching output limits.
+- ABSOLUTELY NEVER cut off mid-sentence. You MUST cleanly conclude with valid terminal punctuation.
+Output publication-grade Markdown only."""
+
 def scope_topic_curriculum(
     domain: str,
     category: str,
@@ -84,7 +218,7 @@ def scope_topic_curriculum(
         if outline_path.exists():
             try:
                 content = outline_path.read_text(encoding="utf-8")
-                pattern = r"\*\s+\*\*Lesson\s+(\d+):\s+(.*?)(?:\s+\(.*?\))?\*\*"
+                pattern = r"\*\s+\**Lesson\s+(\d+):\s+(.*?)(?:\s+\(.*?\))?\**"
                 matches = list(re.finditer(pattern, content))
                 if len(matches) >= 3:
                     parsed_lessons = []
@@ -119,63 +253,11 @@ def scope_topic_curriculum(
                             structure_text = render_profile_template(outline_tpl.get("structure", ""), dict(title=title, hands_on=hands_on, focus=focus, subtopic_title=subtopic_title, category_title=category_title, domain_title=domain_title, default_audience=default_audience))
                             relevance_mandate = render_profile_template(outline_tpl.get("relevance", ""), dict(title=title, hands_on=hands_on, focus=focus, subtopic_title=subtopic_title, category_title=category_title, domain_title=domain_title, default_audience=default_audience))
                         elif domain == "languages":
-                            structure_text = f"""LINGUISTIC MASTERCLASS CHAPTER BLUEPRINT:
-Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}'.
-Write like a Senior Applied Linguist and Native-Speaker Coach: articulate, culturally grounded, and immediately practical for a native Czech speaker.
-
-CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
-- Blend rich, insightful narrative prose with clean, scannable bullet points, grammatical tables, and conversational dialogues.
-- Structure your chapter with these organic, topic-specific headings:
-  1. The Communicative Challenge & Czech Contrastive Foundations: Explain the communicative problem, demystify grammatical jargon, and contrast directly with Czech linguistic patterns and Slavic traps.
-  2. Phonetic & Grammatical Mechanics: Dissect the phonetic articulation, morphological declension, or syntactic word order. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing the grammatical decision tree or phonological map.
-  3. Authentic Conversational Dialogues & Register Nuance: Realistic colloquial and professional dialogues demonstrating the concept in action with side-by-side translations.
-  4. Core Declension / Conjugation / Vocabulary Reference Table: Comprehensive Markdown reference table.
-  5. Practical Oral & Written Lab: A concrete 15-minute active recall drill ({hands_on}).
-  6. Linguist Golden Rules & Slavic Traps: 4-5 bulleted pro-tips on false friends, word order (slovosled), and pronunciation."""
-                            relevance_mandate = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
-- Focus 80% on authentic language acquisition, phonetic accuracy, and conversational fluency for '{subtopic_title}' in '{category_title}'.
-- Contrast directly against Czech native speaker patterns. NEVER mention unrelated IT or audio tools."""
-
+                            structure_text, relevance_mandate = _build_outline_prompt_for_languages(title, hands_on, focus, subtopic_title, category_title, domain_title, default_audience)
                         elif not _is_music_course(domain, category, subtopic_id, subtopic_dir):
-                            # Every other course used to fall through to the music
-                            # template below (Berklee professor, DAW shortcuts).
-                            structure_text = f"""MASTERCLASS CHAPTER BLUEPRINT:
-Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}' in {category_title}.
-Write like an experienced practitioner and teacher of {category_title}: articulate, rigorous, and immediately practical.
-
-CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
-- Blend rich, insightful narrative prose with clean, scannable bullet points, numbered step-by-step procedures, and actionable checklists.
-- DO NOT write an unbroken wall of dense text. Break down concepts with clear bullet points, comparative tables, and bold highlights.
-- Structure your chapter with these organic, topic-specific headings:
-  1. Why It Matters: The problem this concept solves and the intuition behind it, with all jargon explained in plain English.
-  2. How It Works: Clear exposition of the core mechanics and principles. Include a Mermaid diagram (```mermaid ... ```) when a process or structure is easier to see than to read.
-  3. Worked Examples: Two concrete, realistic examples worked through step by step.
-  4. Reference Table: A clear Markdown table summarizing the key parameters, options or distinctions.
-  5. Common Mistakes & How to Fix Them.
-  6. Practice Exercise: A concrete exercise the learner can do now ({hands_on}).
-  7. Key Takeaways: Conclude with 4-5 memorable rules of thumb."""
-                            relevance_mandate = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
-- Focus 80% on actionable, hands-on practice of '{subtopic_title}' in '{category_title}'.
-- STRICT TOOLCHAIN ISOLATION: Use ONLY tools, techniques, and vocabulary native to '{category_title}'. Do not borrow examples, tools or jargon from unrelated fields."""
-                        else: # music courses (profile music_style, arts music categories)
-                            structure_text = f"""MUSIC PRODUCTION MASTERCLASS CHAPTER BLUEPRINT:
-Author a full-length, authoritative, highly engaging masterclass chapter (~1,800 to 2,400 words) on '{title}'.
-Write like a world-class Berklee professor and master producer: deeply articulate, passionate, intellectually rigorous, and immediately practical.
-
-CRITICAL DYNAMIC BALANCE & STRUCTURE MANDATE:
-- Blend rich, insightful narrative prose with clean, scannable bullet points, numbered step-by-step procedures, and actionable checklists.
-- DO NOT write an unbroken wall of dense text. Break down concepts with clear bullet points, comparative tables, and bold highlights.
-- Structure your chapter with these organic, topic-specific headings:
-  1. The Core Creative Dilemma & Human Perception: Deep psychoacoustic and emotional exposition explaining why this concept matters. Demystify all jargon in plain English.
-  2. The Acoustic & Musical Mechanics: Clear narrative exposition on voice-leading, frequency real estate, rhythm, or arrangement dynamics. You MUST include a richly styled Mermaid diagram (```mermaid ... ```) visualizing the musical structure or decision tree.
-  3. Measure-by-Measure Commercial Case Studies: Multi-paragraph breakdowns of 2 real-world commercial records with exact timestamps, tracking measure-by-measure what stems enter/exit and why it works.
-  4. Core Reference Matrix Table: Include a clear Markdown table summarizing parameters, frequency allocations, or structural metrics.
-  5. Compact DAW Quick Reference Box: A concise 10-line bullet cheat-sheet giving exact shortcuts and track setups for Ableton Live (e.g. [A] for Automation, Utility) and Steinberg Cubase (e.g. [V] Volume Automation, Draw tool [8]). Keep this compact so software steps never overshadow the musical lesson.
-  6. Practical Listening & Production Lab: A concrete 15-minute auditory audit drill on the student's own project ({hands_on}).
-  7. Golden Mentor Invariants: Conclude with 4-5 memorable 'Golden Rules' of the craft."""
-                            relevance_mandate = f"""CRITICAL RELEVANCE & DOMAIN ISOLATION MANDATE:
-- Focus 80% on actionable, hands-on music production, arrangement, and audio engineering workflows for '{subtopic_title}' in '{category_title}'.
-- STRICT TOOLCHAIN ISOLATION: Utilize ONLY musical instruments, composition techniques, and DAW tools native to '{category_title}'. NEVER mention Linux, Kubernetes, or enterprise IT software."""
+                            structure_text, relevance_mandate = _build_outline_prompt_for_default(title, hands_on, focus, subtopic_title, category_title, domain_title, default_audience)
+                        else:
+                            structure_text, relevance_mandate = _build_outline_prompt_for_music(title, hands_on, focus, subtopic_title, category_title, domain_title, default_audience)
 
                         lesson_prompt = f"""Write {title} for the masterclass curriculum on '{subtopic_title}'.
 Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
@@ -199,8 +281,7 @@ Output publication-grade Markdown only."""
                             "prompt": lesson_prompt
                         })
 
-                    # Extract focused Capstone Challenge directly from TOPIC_OUTLINE.md
-                    cap_match = re.search(r"##\s+🏁\s+Capstone Challenge:\s+(.*?)\n\*\s+\*\*Objective:\*\*\s+(.*?)\n\*\s+\*\*Deliverable:\*\*\s+(.*?)(?=\n\n|\Z)", content, re.DOTALL)
+                    cap_match = re.search(r"##\s+🏁\s+Capstone Challenge:\s+(.*?)\n\*\s+\**Objective:\**\s+(.*?)\n\*\s+\**Deliverable:\**\s+(.*?)(?=\n\n|\Z)", content, re.DOTALL)
                     if cap_match:
                         cap_title = cap_match.group(1).strip()
                         cap_obj = cap_match.group(2).strip()
@@ -214,38 +295,7 @@ Output publication-grade Markdown only."""
                     if cap_tpl:
                         capstone_prompt = render_profile_template(cap_tpl, dict(cap_title=cap_title, cap_obj=cap_obj, cap_del=cap_del, subtopic_title=subtopic_title, category_title=category_title, domain_title=domain_title, default_audience=default_audience))
                     else:
-                        capstone_prompt = f"""Author the Practical Capstone Challenge Guide: '{cap_title}' for '{subtopic_title}'.
-Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
-
-Target Audience: {default_audience}
-Challenge Objective: {cap_obj}
-Required Deliverable: {cap_del}
-
-CAPSTONE LAB BLUEPRINT (~1,000 to 1,400 words):
-Design a focused, hands-on 15–20 minute implementation sprint that allows the practitioner to prove mastery of {subtopic_title}.
-
-Structure your capstone lab guide with these organic headings:
-# Capstone Challenge: {cap_title}
-
-## 1. Challenge Architecture & Objective
-(Provide a crisp, realistic production scenario, the architectural topology diagram (```mermaid ... ```), and prerequisites)
-
-## 2. Step-by-Step Implementation Procedure
-(Numbered step-by-step CLI commands, YAML stanzas, or routing patches with exact flags and zero placeholders)
-
-## 3. Automated Verification & Diagnostic Health Checks
-(Concrete verification commands and expected terminal output blocks proving the system is healthy)
-
-## 4. Failure Injection & Resilience Triage
-(Inject a realistic edge failure, demonstrate the triage command, and restore the service)
-
-## 5. Production Sign-Off Checklist
-(A clean Markdown table with verification criteria and pass/fail indicators)
-
-CRITICAL BUDGETING & TERMINAL INVARIANT:
-- Budget your response to approximately 1,000 to 1,400 words so that all 5 sections are cleanly concluded BEFORE reaching output limits.
-- ABSOLUTELY NEVER cut off mid-sentence. You MUST cleanly conclude with valid terminal punctuation.
-Output publication-grade Markdown only."""
+                        capstone_prompt = _build_capstone_prompt_default(cap_title, cap_obj, cap_del, subtopic_title, category_title, domain_title, default_audience)
 
                     dynamic_modules.append({
                         "filename": "labs.md",
@@ -258,6 +308,100 @@ Output publication-grade Markdown only."""
 
     if not scoping_provider:
         return fallback_modules
+
+    scoping_prompt = f"""You are a Principal Technical Curriculum Architect.
+Analyze the subject: '{subtopic_title}' (Domain: '{domain_title}', Discipline/Course: '{category_title}').
+
+Determine the exact number of theoretical masterclass lessons required to provide exhaustive coverage WITHOUT superficial padding or unnecessary filler:
+- Tier 1 (Focused Primitives / Narrow Tools): 2 Lessons
+- Tier 2 (Standard Engines / Frameworks / Core Protocols): 3-4 Lessons
+- Tier 3 (Flagship Architectures / Massive Distributed Systems): 5-6 Lessons
+
+Output JSON only in this exact format:
+{{
+  "scope_tier": "focused|standard|flagship",
+  "lesson_count": <int between 2 and 6>,
+  "rationale": "<1 sentence justifying the chosen depth>",
+  "lessons": [
+    {{
+      "filename": "lesson_01_<clean_slug>.md",
+      "title": "Lesson 1: <Descriptive Title without 'and'>",
+      "focus": "<Core theoretical focus, mechanisms, and invariants>"
+    }}
+  ]
+}}"""
+
+    try:
+        raw_res = scoping_provider.generate(scoping_prompt, system_instruction="Output valid JSON only.")
+        clean_json = raw_res.strip()
+        if "```json" in clean_json:
+            clean_json = clean_json.split("```json")[-1].split("```")[0].strip()
+        elif clean_json.startswith("```") and clean_json.endswith("```"):
+            clean_json = clean_json.split("```")[1].strip()
+
+        parsed = json.loads(clean_json)
+        tier = parsed.get("scope_tier", "standard").upper()
+        rationale = parsed.get("rationale", "")
+        parsed_lessons = parsed.get("lessons", [])
+
+        if len(parsed_lessons) >= 2:
+            print(f"      [★] Pre-Flight Scoping: {tier} ({len(parsed_lessons)} Lessons + Labs) -> {rationale}", flush=True)
+            
+            strategy = GLOBAL_REGISTRY.get_strategy(domain, category, subtopic_id)
+            blueprint = strategy.get_blueprint(subtopic_title, category_title)
+            default_audience = blueprint.lessons[0].audience if blueprint.lessons else f"Practitioners and specialists in {category_title}"
+
+            dynamic_modules = []
+            for i, l in enumerate(parsed_lessons):
+                num = i + 1
+                fname = l.get("filename") or f"lesson_{num:02d}.md"
+                clean_name = fname.replace(".md", "")
+                if not re.match(r"^lesson_\d{2}_", clean_name):
+                    clean_slug = re.sub(r"^(?:lesson_)?\d*_*", "", clean_name).strip("_")
+                    fname = f"lesson_{num:02d}_{clean_slug}.md" if clean_slug else f"lesson_{num:02d}.md"
+
+                title = l.get("title") or f"Lesson {num}"
+                focus = l.get("focus") or ""
+
+                scoped_tpl = profile.get("scoped_lesson")
+                if scoped_tpl:
+                    structure_text = render_profile_template(scoped_tpl.get("structure", ""), dict(title=title, focus=focus, subtopic_title=subtopic_title, category_title=category_title, domain_title=domain_title, default_audience=default_audience))
+                elif domain == "languages":
+                    structure_text = _build_scoped_prompt_for_languages(title, focus, subtopic_title, category_title, domain_title, default_audience)
+                else:
+                    structure_text = _build_scoped_prompt_for_default(title, focus, subtopic_title, category_title, domain_title, default_audience)
+
+                lesson_prompt = f"""Write {title} for the masterclass curriculum on '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
+
+Target Audience: {default_audience}
+Lesson Focus: {focus}
+
+CRITICAL RELEVANCE & ANTI-BLEED MANDATE:
+- Focus 80% on actionable, hands-on practitioner execution, physical/software mechanics, and authentic workflows for '{subtopic_title}' in '{category_title}'.
+- STRICT TOOLCHAIN ISOLATION: Utilize ONLY tools, software, instruments, and concepts native to '{category_title}'. ABSOLUTELY NEVER mention bpftool, eBPF, Linux kernel tracing, or unrelated software boilerplate in arts, music, visual media, or business topics.
+
+{structure_text}
+
+CRITICAL BUDGETING & TERMINAL INVARIANT:
+- Budget your response to approximately 2,800 to 3,500 words so that all sections and the final mentor rules are completely and cleanly finished BEFORE reaching output limits.
+- ABSOLUTELY NEVER cut off mid-sentence. You MUST cleanly conclude with valid terminal punctuation.
+Remember: Write in rich, continuous book prose like an O'Reilly or MIT Press author. Avoid lazy bullet point lists.
+Output publication-grade Markdown only."""
+
+                dynamic_modules.append({
+                    "filename": fname,
+                    "title": title,
+                    "prompt": lesson_prompt
+                })
+
+            lab_mod = fallback_modules[-1]
+            dynamic_modules.append(lab_mod)
+            return dynamic_modules
+    except Exception as e:
+        print(f"      [!] Pre-flight scoping note ({e}), using standard adaptive template.", flush=True)
+
+    return fallback_modules
 
     scoping_prompt = f"""You are a Principal Technical Curriculum Architect.
 Analyze the subject: '{subtopic_title}' (Domain: '{domain_title}', Discipline/Course: '{category_title}').

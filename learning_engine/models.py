@@ -1267,70 +1267,51 @@ def get_translation_provider(
         "Translation requires an active LLM provider. Start local Ollama, or configure Claude/Gemini in Settings."
     )
 
-def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -> Tuple[LLMProvider, str]:
-    """
-    Returns a model provider optimized for interactive Socratic mentoring.
-    Respects explicit user-specified host/model and database settings,
-    falling back to auto-discovery or cloud services if necessary.
-    """
-    settings = get_settings()
-    configured_model = model or settings.get("mentor_model") or settings.get("primary_model")
 
+def _resolve_cloud_provider(configured_model: str, host: str, settings: dict, status: dict):
     anthropic_key = (
-        os.environ.get("ANTHROPIC_API_KEY") or
-        os.environ.get("ANTHROPIC_API_KEY_2") or
-        os.environ.get("VNAIPRO_API_KEY") or
+        __import__("os").environ.get("ANTHROPIC_API_KEY") or
+        __import__("os").environ.get("ANTHROPIC_API_KEY_2") or
+        __import__("os").environ.get("VNAIPRO_API_KEY") or
         settings.get("anthropic_api_key") or
         settings.get("anthropicApiKey")
     )
-
-    # 0. If Claude / Anthropic is explicitly requested or set as preferred primary/mentor model
     if anthropic_key and configured_model and any(c in configured_model.lower() for c in ["claude", "sonnet", "opus", "anthropic"]):
-        chosen_model = configured_model
-        return AnthropicProvider(model=chosen_model, api_key=anthropic_key), chosen_model
+        return AnthropicProvider(model=configured_model, api_key=anthropic_key), configured_model
 
-    gemini_key = os.environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key") or settings.get("geminiApiKey")
+    gemini_key = __import__("os").environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key") or settings.get("geminiApiKey")
     if gemini_key and configured_model and "gemini" in configured_model.lower():
         return GeminiProvider(model=configured_model, api_key=gemini_key), configured_model
+    return None
 
-    # 1. Validate explicitly requested configuration
-    if host and configured_model:
+def _resolve_explicit_host(configured_model: str, host: str, settings: dict, status: dict):
+    if not host: return None
+    if configured_model:
         if OllamaProvider.check_connectivity(host, configured_model):
             return OllamaProvider(model=configured_model, host=host), configured_model
-    elif host:
-        # Host requested, but model auto-selection needed
-        if OllamaProvider.is_available(host):
-            pinned = get_node_pin(host)
-            models = OllamaProvider.list_models(host)
-            # Use pinned model if available, else requested model, else first available
-            selected_model = configured_model if (configured_model and configured_model in models) else (pinned if pinned else (models[0] if models else "qwen2.5-coder:7b"))
-            return OllamaProvider(model=selected_model, host=host), selected_model
+    if OllamaProvider.is_available(host):
+        pinned = get_node_pin(host)
+        models = OllamaProvider.list_models(host)
+        selected_model = configured_model if (configured_model and configured_model in models) else (pinned if pinned else (models[0] if models else "qwen2.5-coder:7b"))
+        return OllamaProvider(model=selected_model, host=host), selected_model
+    return None
 
-    # 2. Check cluster status if no valid explicit config
-    fast_models = [
-        "qwen2.5-coder:7b",
-        "llama3.1:8b",
-        "meta-llama-3.1-8b-instruct:latest",
-        "qwen3:4b",
-        "qwen2.5:3b",
-        "qwen2.5-coder:32b"
-    ]
-    cluster = OllamaCluster()
-    status = cluster.get_cluster_status()
+def _resolve_cluster_model(configured_model: str, host: str, settings: dict, status: dict):
+    if not configured_model: return None
+    for h, h_data in status.items():
+        if h_data.get("online") and configured_model in h_data.get("models", []):
+            return OllamaProvider(model=configured_model, host=h), configured_model
+    return None
 
-    # Specific model request across cluster
-    if configured_model:
-        for h, h_data in status.items():
-            if h_data.get("online") and configured_model in h_data.get("models", []):
-                return OllamaProvider(model=configured_model, host=h), configured_model
-
-    # Pinned model on online cluster node priority
+def _resolve_cluster_pinned(configured_model: str, host: str, settings: dict, status: dict):
     for h, h_data in status.items():
         if h_data.get("online") and h_data.get("pinned_model"):
             pinned = h_data["pinned_model"]
             return OllamaProvider(model=pinned, host=h), pinned
+    return None
 
-    # Localhost priority
+def _resolve_localhost_fast_model(configured_model: str, host: str, settings: dict, status: dict):
+    fast_models = ["qwen2.5-coder:7b", "llama3.1:8b", "meta-llama-3.1-8b-instruct:latest", "qwen3:4b", "qwen2.5:3b", "qwen2.5-coder:32b"]
     local_key = "http://127.0.0.1:11434"
     local_data = status.get(local_key) or status.get("http://localhost:11434") or {}
     if local_data.get("online"):
@@ -1340,8 +1321,10 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
         models = local_data.get("models", [])
         if models:
             return OllamaProvider(model=models[0], host=local_key), models[0]
+    return None
 
-    # Any online cluster node
+def _resolve_any_cluster_fast_model(configured_model: str, host: str, settings: dict, status: dict):
+    fast_models = ["qwen2.5-coder:7b", "llama3.1:8b", "meta-llama-3.1-8b-instruct:latest", "qwen3:4b", "qwen2.5:3b", "qwen2.5-coder:32b"]
     for h, h_data in status.items():
         if h_data.get("online"):
             for fm in fast_models:
@@ -1350,11 +1333,60 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
             models = h_data.get("models", [])
             if models:
                 return OllamaProvider(model=models[0], host=h), models[0]
+    return None
 
-    # 3. If a specific model was configured/requested, preserve it on best cluster node
+def _resolve_configured_model_on_best_node(configured_model: str, host: str, settings: dict, status: dict):
     if configured_model:
+        cluster = OllamaCluster()
         node, mod = cluster.select_node_for_model(model=configured_model)
         return OllamaProvider(model=mod, host=node), mod
+    return None
+
+def _resolve_cloud_fallback(configured_model: str, host: str, settings: dict, status: dict):
+    anthropic_key = (
+        __import__("os").environ.get("ANTHROPIC_API_KEY") or
+        __import__("os").environ.get("ANTHROPIC_API_KEY_2") or
+        __import__("os").environ.get("VNAIPRO_API_KEY") or
+        settings.get("anthropic_api_key") or
+        settings.get("anthropicApiKey")
+    )
+    if anthropic_key:
+        claude_model = __import__("os").environ.get("ANTHROPIC_MODEL") or DEFAULT_CLAUDE_MODEL
+        return AnthropicProvider(model=claude_model, api_key=anthropic_key), claude_model
+    gemini_key = __import__("os").environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key") or settings.get("geminiApiKey")
+    if gemini_key:
+        return GeminiProvider(model=DEFAULT_GEMINI_MODEL, api_key=gemini_key), DEFAULT_GEMINI_MODEL
+    return None
+
+def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -> Tuple[LLMProvider, str]:
+    """
+    Returns a model provider optimized for interactive Socratic mentoring.
+    Respects explicit user-specified host/model and database settings,
+    falling back to auto-discovery or cloud services if necessary.
+    """
+    settings = get_settings()
+    configured_model = model or settings.get("mentor_model") or settings.get("primary_model")
+    
+    strategies = [
+        _resolve_cloud_provider,
+        _resolve_explicit_host,
+        _resolve_cluster_model,
+        _resolve_cluster_pinned,
+        _resolve_localhost_fast_model,
+        _resolve_any_cluster_fast_model,
+        _resolve_configured_model_on_best_node,
+        _resolve_cloud_fallback
+    ]
+    
+    status = OllamaCluster().get_cluster_status()
+    for strategy in strategies:
+        result = strategy(configured_model, host, settings, status)
+        if result:
+            return result
+
+    cluster = OllamaCluster()
+    node, mod = cluster.select_node_for_model(model="qwen2.5-coder:7b")
+    return OllamaProvider(model=mod, host=node), mod
 
     # 4. Cloud fallbacks if no specific model was configured and Ollama is offline
     if anthropic_key:

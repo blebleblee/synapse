@@ -1039,6 +1039,127 @@ async def api_audio_narrate(req: AudioNarrateRequest):
         print(f"[!] Neural TTS generation failed: {e}")
         raise HTTPException(status_code=500, detail=f"Neural speech synthesis error: {e}")
 
+
+def _find_target_lesson_id(query: str, raw_lesson_id: str, discovered_lessons: list) -> str:
+    target_lesson_id = raw_lesson_id
+    if not target_lesson_id:
+        q_parts = query.split("/")
+        if len(q_parts) >= 4:
+            lesson_candidate = q_parts[3].lower()
+            for item in discovered_lessons:
+                item_id = item["id"].lower()
+                if item_id == lesson_candidate or item_id == f"lesson_{lesson_candidate}" or lesson_candidate in item_id:
+                    target_lesson_id = item["id"]
+                    break
+            if not target_lesson_id:
+                cand_num = lesson_candidate.split("_")[0] if "_" in lesson_candidate else lesson_candidate
+                if cand_num.isdigit():
+                    prefix = f"lesson_{int(cand_num):02d}_"
+                    for item in discovered_lessons:
+                        if item["id"].lower().startswith(prefix):
+                            target_lesson_id = item["id"]
+                            break
+    if discovered_lessons:
+        valid_ids = [item["id"] for item in discovered_lessons]
+        if not target_lesson_id or target_lesson_id not in valid_ids:
+            target_lesson_id = discovered_lessons[0]["id"]
+    return target_lesson_id
+
+def _gather_lessons_and_summary(sub_path, discovered_lessons: list, target_lesson_id: str) -> tuple:
+    lessons_list = []
+    lesson = ""
+    if discovered_lessons:
+        for item in discovered_lessons:
+            content_text = ""
+            p = Path(item.get("path")) if item.get("path") else None
+            if p and p.exists():
+                content_text = p.read_text(encoding="utf-8")
+            if item["id"] == target_lesson_id:
+                lesson = content_text
+            lessons_list.append({
+                "id": item["id"],
+                "title": item["title"],
+                "filename": item["filename"],
+                "content": content_text
+            })
+    if not lesson:
+        for fname in ["LESSON.md", "lesson.md"]:
+            if (sub_path / fname).exists():
+                lesson = (sub_path / fname).read_text(encoding="utf-8")
+                break
+        if not lesson and (sub_path / "artifacts").exists():
+            artifacts = list((sub_path / "artifacts").glob("lesson_*.md"))
+            if artifacts:
+                lesson = artifacts[0].read_text(encoding="utf-8")
+    summary = ""
+    for l_item in lessons_list:
+        if "summary" in l_item["id"]:
+            summary = l_item["content"]
+            break
+    return lesson, lessons_list, summary
+
+def _determine_display_titles(domain: str, cat: str, sub: str, sub_path, tree: dict) -> dict:
+    unit_display_title = None
+    course_display_title = None
+    discipline_display_title = None
+    domain_display_title = domain.replace("_", " ").title()
+
+    domain_data = tree.get(domain, {})
+    for disc_slug, disc_data in domain_data.get("disciplines", {}).items():
+        for c_slug, c_info in disc_data.get("courses", {}).items():
+            for u_slug, u_info in c_info.get("units", {}).items():
+                if u_info.get("full_path") and Path(u_info["full_path"]).resolve() == sub_path.resolve():
+                    unit_display_title = u_info.get("display_name")
+                    discipline_display_title = disc_slug.replace("_", " ").title()
+                    if u_slug != "core":
+                        course_display_title = c_info.get("display_name")
+                    break
+
+    course_final_title = None
+    if course_display_title and course_display_title != unit_display_title:
+        course_final_title = course_display_title
+    elif "/" in cat and sub != "core":
+        course_final_title = cat.split("/")[1].replace("_", " ").title()
+
+    return {
+        "domain_title": domain_display_title,
+        "discipline_title": discipline_display_title or cat.split("/")[0].replace("_", " ").title(),
+        "course_title": course_final_title,
+        "display_title": unit_display_title or sub.replace('_', ' ').title()
+    }
+
+def _assemble_full_content(lessons_list: list, lesson: str, labs: str) -> str:
+    full_sections = []
+    if lessons_list and len(lessons_list) > 1:
+        toc_lines = ["## Course Table of Contents\n"]
+        for idx, item in enumerate(lessons_list):
+            toc_lines.append(f"{idx + 1}. [{item['title']}](#section-{item['id']})")
+        if labs:
+            toc_lines.append(f"{len(lessons_list) + 1}. [Operational Labs & Hands-on Verification](#section-labs)")
+        full_sections.append("\n".join(toc_lines))
+
+    if lessons_list:
+        for idx, item in enumerate(lessons_list):
+            l_content = item.get("content", "").strip()
+            if l_content.startswith("# "):
+                full_sections.append(f'<div id="section-{item["id"]}">\n\n---\n\n{l_content}\n\n</div>')
+            else:
+                l_title = item.get("title", f"Lesson {idx + 1}")
+                full_sections.append(f'<div id="section-{item["id"]}">\n\n---\n\n# {l_title}\n\n{l_content}\n\n</div>')
+    elif lesson:
+        if lesson.strip().startswith("# "):
+            full_sections.append(f'<div id="section-lesson">\n\n---\n\n{lesson.strip()}\n\n</div>')
+        else:
+            full_sections.append(f'<div id="section-lesson">\n\n---\n\n# Technical Lesson\n\n{lesson.strip()}\n\n</div>')
+
+    if labs:
+        if labs.strip().startswith("# "):
+            full_sections.append(f'<div id="section-labs">\n\n---\n\n{labs.strip()}\n\n</div>')
+        else:
+            full_sections.append(f'<div id="section-labs">\n\n---\n\n# Operational Labs\n\n{labs.strip()}\n\n</div>')
+
+    return "\n\n".join(full_sections)
+
 @app.get("/api/topic")
 async def get_topic_details(
     query: str = Query(..., description="Subtopic query e.g. 'ebpf'"),
@@ -1062,150 +1183,31 @@ async def get_topic_details(
             labs = (sub_path / fname).read_text(encoding="utf-8")
             break
 
-    # Multi-lesson discovery (e.g. lesson_01_*.md, lessons/*.md, or LESSON.md)
     discovered_lessons = get_unit_lessons(sub_path)
-
-    lessons_list = []
-    lesson = ""
     raw_lesson_id = lesson_id.default if hasattr(lesson_id, "default") else lesson_id
-    target_lesson_id = raw_lesson_id
+    
+    target_lesson_id = _find_target_lesson_id(query, raw_lesson_id, discovered_lessons)
+    lesson, lessons_list, summary = _gather_lessons_and_summary(sub_path, discovered_lessons, target_lesson_id)
 
-    # If no explicit lesson_id provided, check if query contains a 4th segment matching a lesson
-    if not target_lesson_id:
-        q_parts = query.split("/")
-        if len(q_parts) >= 4:
-            lesson_candidate = q_parts[3].lower()
-            for item in discovered_lessons:
-                item_id = item["id"].lower()
-                if item_id == lesson_candidate or item_id == f"lesson_{lesson_candidate}" or lesson_candidate in item_id:
-                    target_lesson_id = item["id"]
-                    break
-            if not target_lesson_id:
-                cand_num = lesson_candidate.split("_")[0] if "_" in lesson_candidate else lesson_candidate
-                if cand_num.isdigit():
-                    prefix = f"lesson_{int(cand_num):02d}_"
-                    for item in discovered_lessons:
-                        if item["id"].lower().startswith(prefix):
-                            target_lesson_id = item["id"]
-                            break
-
-    if discovered_lessons:
-        # Default to first lesson if not specified or not found
-        valid_ids = [item["id"] for item in discovered_lessons]
-        if not target_lesson_id or target_lesson_id not in valid_ids:
-            target_lesson_id = discovered_lessons[0]["id"]
-
-        for item in discovered_lessons:
-            content = ""
-            p = Path(item["path"])
-            if p.exists():
-                content = p.read_text(encoding="utf-8")
-            if item["id"] == target_lesson_id:
-                lesson = content
-            lessons_list.append({
-                "id": item["id"],
-                "title": item["title"],
-                "filename": item["filename"],
-                "content": content
-            })
-
-    # Fallback to single LESSON.md if not populated via discovered_lessons
-    if not lesson:
-        for fname in ["LESSON.md", "lesson.md"]:
-            if (sub_path / fname).exists():
-                lesson = (sub_path / fname).read_text(encoding="utf-8")
-                break
-        if not lesson and (sub_path / "artifacts").exists():
-            artifacts = list((sub_path / "artifacts").glob("lesson_*.md"))
-            if artifacts:
-                lesson = artifacts[0].read_text(encoding="utf-8")
-
-    # A lesson file named like "*summary*" doubles as the course summary.
-    summary = ""
-    for l_item in lessons_list:
-        if "summary" in l_item["id"]:
-            summary = l_item["content"]
-            break
-
-    # Load persistent chat history for this topic
     saved_chat_history = []
     history_file = sub_path / "sessions" / "chat_history.json"
     if history_file.exists():
         try:
             saved_chat_history = json.loads(history_file.read_text(encoding="utf-8"))
         except Exception:
-            saved_chat_history = []
+            pass
 
-    # Preserve sequential numbered prefixes for course progression (e.g. 01 HCI Architecture)
-    display_title = sub.replace('_', ' ').title()
-
-    # Look up human-friendly titles from topic tree
-    tree = get_topic_tree()
-    unit_display_title = None
-    course_display_title = None
-    discipline_display_title = None
-    domain_display_title = domain.replace("_", " ").title()
-
-    domain_data = tree.get(domain, {})
-    for disc_slug, disc_data in domain_data.get("disciplines", {}).items():
-        for c_slug, c_info in disc_data.get("courses", {}).items():
-            for u_slug, u_info in c_info.get("units", {}).items():
-                if Path(u_info["full_path"]).resolve() == sub_path.resolve():
-                    unit_display_title = u_info.get("display_name")
-                    discipline_display_title = disc_slug.replace("_", " ").title()
-                    if u_slug != "core":
-                        course_display_title = c_info.get("display_name")
-                    break
-
-    course_final_title = None
-    if course_display_title and course_display_title != unit_display_title:
-        course_final_title = course_display_title
-    elif "/" in cat and sub != "core":
-        course_final_title = cat.split("/")[1].replace("_", " ").title()
-
-    # Build complete continuous curriculum document
-    full_sections = []
-
-    # Quick navigation table of contents at the top of Complete Guide
-    if lessons_list and len(lessons_list) > 1:
-        toc_lines = ["## Course Table of Contents\n"]
-        for idx, item in enumerate(lessons_list):
-            toc_lines.append(f"{idx + 1}. [{item['title']}](#section-{item['id']})")
-        if labs:
-            toc_lines.append(f"{len(lessons_list) + 1}. [Operational Labs & Hands-on Verification](#section-labs)")
-        full_sections.append("\n".join(toc_lines))
-
-    if lessons_list:
-        for idx, item in enumerate(lessons_list):
-            l_content = item.get("content", "").strip()
-            # If the lesson content already begins with an H1 (# ), do NOT duplicate header
-            if l_content.startswith("# "):
-                full_sections.append(f'<div id="section-{item["id"]}">\n\n---\n\n{l_content}\n\n</div>')
-            else:
-                l_title = item.get("title", f"Lesson {idx + 1}")
-                full_sections.append(f'<div id="section-{item["id"]}">\n\n---\n\n# {l_title}\n\n{l_content}\n\n</div>')
-    elif lesson:
-        if lesson.strip().startswith("# "):
-            full_sections.append(f'<div id="section-lesson">\n\n---\n\n{lesson.strip()}\n\n</div>')
-        else:
-            full_sections.append(f'<div id="section-lesson">\n\n---\n\n# Technical Lesson\n\n{lesson.strip()}\n\n</div>')
-
-    if labs:
-        if labs.strip().startswith("# "):
-            full_sections.append(f'<div id="section-labs">\n\n---\n\n{labs.strip()}\n\n</div>')
-        else:
-            full_sections.append(f'<div id="section-labs">\n\n---\n\n# Operational Labs\n\n{labs.strip()}\n\n</div>')
-
-    full_content = "\n\n".join(full_sections)
+    titles = _determine_display_titles(domain, cat, sub, sub_path, get_topic_tree())
+    full_content = _assemble_full_content(lessons_list, lesson, labs)
 
     return {
         "domain": domain,
-        "domain_title": domain_display_title,
+        "domain_title": titles["domain_title"],
         "category": cat,
-        "discipline_title": discipline_display_title or cat.split("/")[0].replace("_", " ").title(),
-        "course_title": course_final_title,
+        "discipline_title": titles["discipline_title"],
+        "course_title": titles["course_title"],
         "subtopic": sub,
-        "display_title": unit_display_title or display_title,
+        "display_title": titles["display_title"],
         "path": f"{domain}/{cat}/{sub}",
         "persona": persona,
         "mastery": get_subtopic_mastery(f"{domain}/{cat}/{sub}"),
