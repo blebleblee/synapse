@@ -113,7 +113,10 @@ Discussion Session Transcripts:
 Output clean, publication-grade Markdown only."""
 
     provider = get_provider(provider_type=provider_type, model=model, domain=domain, host=host)
-    summary_text = provider.generate(prompt, system_instruction=persona).strip()
+    summary_text = (provider.generate(prompt, system_instruction=persona) or "").strip()
+    if not summary_text:
+        # Keep the existing summary rather than replacing it with nothing.
+        raise RuntimeError("the model returned an empty reply")
 
     out_file = sub_path / "SUMMARY.md"
     out_file.write_text(summary_text + "\n", encoding="utf-8")

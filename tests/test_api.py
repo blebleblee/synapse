@@ -683,3 +683,21 @@ def test_quiz_keeps_the_questions_a_broken_one_would_have_taken_down():
     qs = parse_quiz_questions(raw)
     assert [q["explanation"] for q in qs] == ["E1", "E3 uses ${HOME}"]
     assert [q["id"] for q in qs] == [1, 2]
+
+
+@pytest.mark.parametrize("behaviour", ["raise", "empty"])
+def test_summary_regeneration_failure_is_reported_and_keeps_the_old_summary(monkeypatch, behaviour):
+    from learning_engine.topic_manager import resolve_subtopic
+    class Fake:
+        def generate(self, prompt, **kwargs):
+            if behaviour == "raise":
+                raise ConnectionError("connection refused")
+            return "   "
+    monkeypatch.setattr("learning_engine.summary.get_provider", lambda **k: Fake())
+    summary = resolve_subtopic("computing/data/postgresql")[3] / "SUMMARY.md"
+    before = summary.read_text(encoding="utf-8") if summary.exists() else None
+    res = client.post("/api/summary/regenerate", json={"query": "computing/data/postgresql"})
+    assert res.status_code == 502
+    assert "summary" in res.json()["detail"]
+    after = summary.read_text(encoding="utf-8") if summary.exists() else None
+    assert after == before

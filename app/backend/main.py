@@ -1626,7 +1626,12 @@ class SummaryRequest(BaseModel):
 
 @app.post("/api/summary/regenerate")
 def api_regenerate_summary(req: SummaryRequest):
-    new_summary = regenerate_summary(req.query, provider_type=req.provider, model=req.model, host=req.host)
+    try:
+        new_summary = regenerate_summary(req.query, provider_type=req.provider, model=req.model, host=req.host)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"The AI model could not write the summary ({e}). Check Settings → AI models.")
     return {"summary": new_summary}
 
 class QuizRequest(BaseModel):
