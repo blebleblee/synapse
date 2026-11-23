@@ -22,7 +22,8 @@ import {
   ZoomOut,
   Maximize2,
   X,
-  Check
+  Check,
+  FilePlus
 } from 'lucide-react';
 import type { TopicDetails, QuizQuestion } from '../types';
 import { renderMarkdownWithMathAndMermaid, renderMermaidDiagramsInElement } from '../utils/markdownRenderer';
@@ -766,6 +767,18 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             </button>
             {optionsMenuOpen && (
               <div className="nav-dropdown-menu right-aligned">
+                <button
+                  className="dropdown-item"
+                  onClick={() => {
+                    setOptionsMenuOpen(false);
+                    onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, false);
+                  }}
+                  disabled={isGenerating}
+                  title="Generate only the files this course is missing (for example after a failed run). Existing lessons are not changed."
+                >
+                  <FilePlus size={13} />
+                  <span>Generate missing files</span>
+                </button>
                 <button
                   className="dropdown-item danger"
                   onClick={() => {

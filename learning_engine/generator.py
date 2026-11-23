@@ -515,11 +515,64 @@ STAGING_DIRNAME = ".regen"
 class GenerationResults(dict):
     """{filename: written?}. Files that were already on disk (and so not
     generated) are False too, for compatibility; `skipped` names them so
-    callers can tell them apart from failures."""
+    callers can tell them apart from failures. `plan` is the list of
+    modules the run worked from."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.skipped = set()
+        self.plan: List[Dict[str, str]] = []
+
+
+# The course plan (file names, titles, prompts) a generation run worked from.
+# Without it, a run that fills in missing files asked the AI for a new plan,
+# whose file names differ, and added duplicate lessons next to the old ones.
+PLAN_FILENAME = ".generation_plan.json"
+_PLAN_FILE_RE = re.compile(r"^[a-z0-9_]+\.md$")
+
+
+def _save_plan(subtopic_dir: Path, modules: List[Dict[str, str]]) -> None:
+    keep = [{k: m[k] for k in ("filename", "title", "prompt") if k in m} for m in modules]
+    (subtopic_dir / PLAN_FILENAME).write_text(json.dumps({"version": 1, "modules": keep}, indent=1), encoding="utf-8")
+
+
+def _load_plan(subtopic_dir: Path) -> Optional[List[Dict[str, str]]]:
+    """The saved plan, or None if there is none or it is not usable."""
+    try:
+        data = json.loads((subtopic_dir / PLAN_FILENAME).read_text(encoding="utf-8"))
+        modules = data["modules"]
+        if modules and all(isinstance(m.get("filename"), str) and _PLAN_FILE_RE.match(m["filename"])
+                           and isinstance(m.get("prompt"), str) for m in modules):
+            return modules
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        pass
+    return None
+
+
+def plan_course_modules(domain: str, category: str, subtopic_id: str, subtopic_title: str,
+                        subtopic_dir: Path, scoping_provider, force: bool) -> Tuple[List[Dict[str, str]], bool]:
+    """(modules, freshly_scoped). Which files this course consists of.
+
+    - TOPIC_OUTLINE.md: its lessons (deterministic names).
+    - A full regeneration (force): a new plan.
+    - Otherwise the saved plan, so a rerun fills in exactly what is missing.
+    - Lessons on disk but no saved plan: only the fixed-name files (labs.md);
+      new lessons would get names the existing ones do not have.
+    - A course with no lessons: a new plan.
+    """
+    has_outline = (subtopic_dir / "TOPIC_OUTLINE.md").exists()
+    if not force and not has_outline:
+        saved = _load_plan(subtopic_dir)
+        if saved:
+            return saved, False
+        if any(subtopic_dir.glob("lesson_*.md")):
+            fixed = [m for m in build_topic_modules(domain, category, subtopic_id, subtopic_title)
+                     if not m["filename"].startswith("lesson_")]
+            print("      [*] No saved course plan: only fixed files (labs) are filled in, never new lessons.", flush=True)
+            return fixed, False
+    modules = scope_topic_curriculum(domain, category, subtopic_id, subtopic_title,
+                                     subtopic_dir=subtopic_dir, scoping_provider=scoping_provider)
+    return modules, not has_outline
 
 
 def generate_topic_parallel(
@@ -579,6 +632,8 @@ def generate_topic_parallel(
                 old.unlink()
         for f in staged:
             os.replace(f, subtopic_dir / f.name)
+        if results.plan and not (subtopic_dir / "TOPIC_OUTLINE.md").exists():
+            _save_plan(subtopic_dir, results.plan)
         return results
     finally:
         shutil.rmtree(staging, ignore_errors=True)
@@ -606,10 +661,16 @@ def _generate_topic_parallel(
         workers = cluster.get_parallel_workers()
 
     scoping_prov = (workers[0][2] if workers else fallback_provider)
-    modules = scope_topic_curriculum(domain, category, subtopic_id, subtopic_title, subtopic_dir=subtopic_dir, scoping_provider=scoping_prov)
+    modules, fresh = plan_course_modules(domain, category, subtopic_id, subtopic_title,
+                                         subtopic_dir, scoping_prov, force)
+    if fresh and not force:
+        # Saved before drafting, so files that fail can be filled in later.
+        # A regeneration saves its plan only once it replaces the course.
+        _save_plan(subtopic_dir, modules)
 
     tasks_to_run = []
     results = GenerationResults()
+    results.plan = modules
 
     for mod in modules:
         out_path = subtopic_dir / mod["filename"]

@@ -82,3 +82,6 @@ e2e/artifacts/
 
 # Playwright MCP snapshots from agent UI sessions
 .playwright-mcp/
+
+# Course plan the generator reuses to fill in missing files (local only)
+.generation_plan.json

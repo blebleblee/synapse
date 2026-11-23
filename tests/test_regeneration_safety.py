@@ -55,7 +55,7 @@ def test_successful_regeneration_replaces_lessons_and_keeps_sessions(course):
                                                 force=True, workers=_workers(Node()))
     assert results == {"lesson_01_new.md": True, "labs.md": True}
     names = sorted(p.name for p in course.iterdir())
-    assert names == ["labs.md", "lesson_01_new.md", "sessions"]
+    assert names == [".generation_plan.json", "labs.md", "lesson_01_new.md", "sessions"]
     assert (course / "sessions" / "active_session.md").read_text() == "my chat\n"
     assert "Old" not in (course / "labs.md").read_text()
 
@@ -84,7 +84,8 @@ def test_new_course_keeps_the_lessons_that_succeeded(course):
     results = generator.generate_topic_parallel("computing", "regen_cat", "regen_topic", course,
                                                 force=True, workers=_workers(Node(fail_on="write labs")))
     assert results == {"lesson_01_new.md": True, "labs.md": False}
-    assert sorted(p.name for p in course.iterdir()) == ["lesson_01_new.md", "sessions"]
+    # The plan stays so that a rerun generates labs.md under the same plan.
+    assert sorted(p.name for p in course.iterdir()) == [".generation_plan.json", "lesson_01_new.md", "sessions"]
 
 
 def test_api_cancel_stops_a_running_generation():
@@ -126,6 +127,8 @@ def test_api_cancel_stops_a_running_generation():
 def test_files_already_on_disk_are_reported_as_skipped(course):
     (course / "lesson_01_new.md").write_text(LESSON, encoding="utf-8")
     (course / "labs.md").unlink()
+    # The course was generated from this plan (saved by that run).
+    generator._save_plan(course, generator.scope_topic_curriculum())
     results = generator.generate_topic_parallel("computing", "regen_cat", "regen_topic", course,
                                                 force=False, workers=_workers(Node()))
     assert results == {"lesson_01_new.md": False, "labs.md": True}

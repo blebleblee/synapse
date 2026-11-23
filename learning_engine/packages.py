@@ -43,7 +43,7 @@ CORE_DOMAINS = (
 _ALWAYS_EXCLUDED_DIRS = {"sessions", ".workspace_sessions", "__pycache__"}
 # MASTERED_GUIDE.md, SUMMARY.md: outputs of removed features, written from chat
 # sessions; old copies may still be on disk.
-_ALWAYS_EXCLUDED_FILES = {"active_session.md", "chat_history.json", "CURRICULUM_BLUEPRINT.md", "MASTERED_GUIDE.md", "SUMMARY.md", "summary.md", ".DS_Store"}
+_ALWAYS_EXCLUDED_FILES = {"active_session.md", "chat_history.json", "CURRICULUM_BLUEPRINT.md", "MASTERED_GUIDE.md", "SUMMARY.md", "summary.md", ".DS_Store", ".generation_plan.json"}
 
 
 def _git_ignored(paths: List[Path]) -> set:
