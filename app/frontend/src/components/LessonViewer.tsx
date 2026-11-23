@@ -33,6 +33,8 @@ import { speakText, stopSpeaking } from '../utils/speech';
 import { getUIStrings } from '../utils/i18n';
 import { failureMessage, networkFailure } from '../utils/failureMessage';
 import type { TranslationJobInfo } from '../types';
+import { READING_LANG_NAMES, saveReadingLang } from '../utils/translationStatus';
+import type { CourseTranslationStatus, LessonTranslation, ReadingLang } from '../utils/translationStatus';
 
 
 interface LessonViewerProps {
@@ -59,6 +61,10 @@ interface LessonViewerProps {
   onNavigateBreadcrumb?: (type: 'domain' | 'category' | 'subtopic', path: string) => void;
   onSelectLesson?: (lessonId: string) => void;
   targetSection?: string | null;
+  /** Language the learner last chose to read in (remembered across lessons). */
+  preferredLang?: ReadingLang;
+  /** Translation state of this course's lessons in preferredLang. */
+  translationStatus?: CourseTranslationStatus | null;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -85,6 +91,8 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onSelectLesson,
   onToggleLessonCompletion,
   targetSection,
+  preferredLang = 'en',
+  translationStatus = null,
 }) => {
   // 'preparing': the server is synthesizing the lesson audio (first listen can take a minute).
   const [voiceState, setVoiceState] = useState<'idle' | 'preparing' | 'speaking'>('idle');
@@ -328,6 +336,30 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       setTranslationError(networkFailure('Stopping the translation', err));
     }
   };
+
+  // This view's translation in the remembered language: cached or already
+  // queued/running translations open by themselves (no new job, no cost: the
+  // server answers a cached text at once and reuses an active job); anything
+  // else waits for the learner's click.
+  const viewTranslation: LessonTranslation | null | undefined =
+    !translationStatus || translationStatus.lang !== preferredLang ? undefined
+      : activeTab === 'labs' ? translationStatus.labs
+        : activeTab === 'study' && activeLessonId !== 'all' && currentLesson ? translationStatus.lessons[currentLesson.id]
+          : undefined;
+  const viewTranslationState = viewTranslation?.state;
+  const autoOpenedRef = useRef<string | null>(null);
+  const selectLanguageRef = useRef(handleSelectLanguage);
+  useEffect(() => { selectLanguageRef.current = handleSelectLanguage; });
+  useEffect(() => {
+    if (preferredLang === 'en' || readingLang !== 'en' || isTranslating) return;
+    if (!viewTranslationState || viewTranslationState === 'none') return;
+    // Once per view: choosing English afterwards is not undone.
+    if (autoOpenedRef.current === viewKey) return;
+    autoOpenedRef.current = viewKey;
+    void selectLanguageRef.current(preferredLang);
+  }, [viewKey, viewTranslationState, preferredLang, readingLang, isTranslating]);
+  const offerTranslation = preferredLang !== 'en' && readingLang === 'en' && !isTranslating
+    && viewTranslation?.state === 'none' && Boolean(rawMarkdown);
 
   const langLabel = readingLang === 'cs' ? 'Čeština' : readingLang === 'de' ? 'Deutsch' : readingLang === 'es' ? 'Español' : 'English';
   const translationStatusText = !translationJob
@@ -635,7 +667,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                   <button 
                     key={lang} 
                     className={`dropdown-item ${readingLang === lang ? 'active-lang' : ''}`}
-                    onClick={() => handleSelectLanguage(lang)}
+                    onClick={() => { saveReadingLang(lang); void handleSelectLanguage(lang); }}
                   >
                     {lang === 'en' ? '🇬🇧 English (Original)' : lang === 'cs' ? '🇨🇿 Čeština' : lang === 'de' ? '🇩🇪 Deutsch' : '🇪🇸 Español'}
                   </button>
@@ -948,6 +980,14 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                     Stop
                   </button>
                 )}
+              </div>
+            )}
+            {offerTranslation && (
+              <div className="translation-offer-banner" role="status">
+                <span>Not translated to {READING_LANG_NAMES[preferredLang]} yet.</span>
+                <button type="button" onClick={() => void handleSelectLanguage(preferredLang)}>
+                  Translate to {READING_LANG_NAMES[preferredLang]}
+                </button>
               </div>
             )}
             {translationNotice && !isTranslating && (

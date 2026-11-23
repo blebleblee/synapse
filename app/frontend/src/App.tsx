@@ -16,6 +16,7 @@ import type { TopicTreeData, TopicDetails, ChatMessage, WorkspaceStatus, QuizQue
 import { getStoredSelection, saveStoredSelection, clearStoredSelection } from './utils/selectionStorage';
 import { NoticeStack, type Notice, type NoticeKind } from './components/NoticeStack';
 import { summarizeGeneration } from './utils/generation';
+import { useCourseTranslationStatus, useReadingLang } from './utils/translationStatus';
 import { TranslationQueueIndicator } from './components/TranslationQueueIndicator';
 import { failureMessage, networkFailure } from './utils/failureMessage';
 import { toTitleCase } from './utils/text';
@@ -119,6 +120,9 @@ function App() {
     return true;
   }, []);
   const apiUnlocked = authChecked && !(authRequired && !isAuthenticated);
+  // Reading language and the open course's translations (sidebar markers, reader).
+  const readingLang = useReadingLang();
+  const courseTranslations = useCourseTranslationStatus(selectedPath, readingLang, apiUnlocked);
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
       const saved = localStorage.getItem('synapse_app_settings');
@@ -952,6 +956,7 @@ function App() {
         onToggleLessonCompletion={handleToggleLessonCompletion}
         onLogout={authRequired ? handleLogout : undefined}
         targetLanguage={settings.language}
+        translationStatus={courseTranslations}
       />
 
       <div className="center-workspace-column">
@@ -979,6 +984,8 @@ function App() {
           onSelectLesson={handleSelectLesson}
           onToggleLessonCompletion={handleToggleLessonCompletion}
           targetSection={targetSection}
+          preferredLang={readingLang}
+          translationStatus={courseTranslations}
         />
 
         <div className="workbench-bottom-bar">

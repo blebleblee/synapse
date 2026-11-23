@@ -176,3 +176,51 @@ def test_mentor_request_pauses_translation_and_it_resumes(monkeypatch):
         done = wait_for(client, job["id"], lambda j: j["status"] == "done")
         assert done["paused"] is False
         assert "Přeložená" in done["translated"]
+
+
+def _course(name):
+    from pathlib import Path
+    import learning_engine.security as sec
+    course = Path(sec.TOPICS_DIR) / "unlisted_tr" / "cat_a" / name
+    course.mkdir(parents=True, exist_ok=True)
+    texts = {
+        "lesson_01_alpha": "# Alpha\nFirst lesson, long enough to be translated.\n",
+        "lesson_02_beta": "# Beta\nSecond lesson, long enough to be translated.\n",
+        "lesson_03_gamma": "# Gamma\nThird lesson, long enough to be translated.\n",
+    }
+    for lesson_id, text in texts.items():
+        (course / f"{lesson_id}.md").write_text(text, encoding="utf-8")
+    (course / "labs.md").write_text("# Labs\nHands-on work for this course.\n", encoding="utf-8")
+    return "unlisted_tr/cat_a/" + name, texts
+
+
+def test_status_reports_cached_running_queued_and_none_without_starting_jobs(queue_client):
+    # Owner, 2026-11-23: a lesson in the queue must be visible when revisited,
+    # without re-picking the language for every lesson.
+    client, provider = queue_client
+    query, texts = _course("status_course")
+    be_main.cache_file_for(be_main.translation_cache_dir(), texts["lesson_02_beta"], "cs").parent.mkdir(parents=True, exist_ok=True)
+    be_main.cache_file_for(be_main.translation_cache_dir(), texts["lesson_02_beta"], "cs").write_text("# Beta CS", encoding="utf-8")
+    running = client.post("/api/translate/jobs", json={"text": texts["lesson_01_alpha"], "target_lang": "cs"}).json()
+    wait_for(client, running["id"], lambda j: j["status"] == "running")
+    queued = client.post("/api/translate/jobs", json={"text": texts["lesson_03_gamma"], "target_lang": "cs"}).json()
+    calls_before = provider.calls
+
+    status = client.get("/api/translate/status", params={"query": query, "lang": "cs"}).json()
+    assert status["lessons"]["lesson_01_alpha"] == {"state": "running", "job_id": running["id"]}
+    assert status["lessons"]["lesson_02_beta"] == {"state": "cached"}
+    assert status["lessons"]["lesson_03_gamma"] == {"state": "queued", "job_id": queued["id"]}
+    assert status["labs"] == {"state": "none"}
+    # Another language knows nothing of these.
+    de = client.get("/api/translate/status", params={"query": query, "lang": "de"}).json()
+    assert {v["state"] for v in de["lessons"].values()} == {"none"}
+    # Asking never queues or runs anything.
+    assert len(client.get("/api/translate/jobs").json()["jobs"]) == 2
+    assert provider.calls == calls_before
+
+
+def test_status_rejects_unknown_course_and_bad_language(queue_client):
+    client, _ = queue_client
+    assert client.get("/api/translate/status", params={"query": "no/such/course", "lang": "cs"}).status_code == 404
+    query, _ = _course("status_course_2")
+    assert client.get("/api/translate/status", params={"query": query, "lang": "../x"}).status_code == 422
