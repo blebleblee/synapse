@@ -1275,16 +1275,16 @@ def get_translation_provider(
 
 def _resolve_cloud_provider(configured_model: str, host: str, settings: dict, status: dict):
     anthropic_key = (
-        __import__("os").environ.get("ANTHROPIC_API_KEY") or
-        __import__("os").environ.get("ANTHROPIC_API_KEY_2") or
-        __import__("os").environ.get("VNAIPRO_API_KEY") or
+        os.environ.get("ANTHROPIC_API_KEY") or
+        os.environ.get("ANTHROPIC_API_KEY_2") or
+        os.environ.get("VNAIPRO_API_KEY") or
         settings.get("anthropic_api_key") or
         settings.get("anthropicApiKey")
     )
     if anthropic_key and configured_model and any(c in configured_model.lower() for c in ["claude", "sonnet", "opus", "anthropic"]):
         return AnthropicProvider(model=configured_model, api_key=anthropic_key), configured_model
 
-    gemini_key = __import__("os").environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key") or settings.get("geminiApiKey")
+    gemini_key = os.environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key") or settings.get("geminiApiKey")
     if gemini_key and configured_model and "gemini" in configured_model.lower():
         return GeminiProvider(model=configured_model, api_key=gemini_key), configured_model
     return None
@@ -1352,16 +1352,16 @@ def _resolve_configured_model_on_best_node(configured_model: str, host: str, set
 
 def _resolve_cloud_fallback(configured_model: str, host: str, settings: dict, status: dict):
     anthropic_key = (
-        __import__("os").environ.get("ANTHROPIC_API_KEY") or
-        __import__("os").environ.get("ANTHROPIC_API_KEY_2") or
-        __import__("os").environ.get("VNAIPRO_API_KEY") or
+        os.environ.get("ANTHROPIC_API_KEY") or
+        os.environ.get("ANTHROPIC_API_KEY_2") or
+        os.environ.get("VNAIPRO_API_KEY") or
         settings.get("anthropic_api_key") or
         settings.get("anthropicApiKey")
     )
     if anthropic_key:
-        claude_model = __import__("os").environ.get("ANTHROPIC_MODEL") or DEFAULT_CLAUDE_MODEL
+        claude_model = os.environ.get("ANTHROPIC_MODEL") or DEFAULT_CLAUDE_MODEL
         return AnthropicProvider(model=claude_model, api_key=anthropic_key), claude_model
-    gemini_key = __import__("os").environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key") or settings.get("geminiApiKey")
+    gemini_key = os.environ.get("GEMINI_API_KEY") or settings.get("gemini_api_key") or settings.get("geminiApiKey")
     if gemini_key:
         return GeminiProvider(model=DEFAULT_GEMINI_MODEL, api_key=gemini_key), DEFAULT_GEMINI_MODEL
     return None

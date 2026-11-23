@@ -237,7 +237,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Status:** **COMPLETED** (`1dec52e`). Tests: `tests/test_lesson_context.py`, `tests/test_generation_output.py`.
 
 ### FIND-41: Mentor Prompts and Arts Generator Assumed Engineers / Musicians
-- **Status:** **COMPLETED** (batch 4). Suggested prompts depend on the domain (`utils/mentorSuggestions.ts`, tested); `topics/arts/GEMINI.md` scopes the music persona to music courses. Follow-up: 62 of 134 visual-arts lessons still address the reader as a musician (`grep -il musician` over `visual_arts`, `3d_graphics`, `design`, `visual_media`); regenerate or edit.
+- **Status:** **COMPLETED** (batch 4). Suggested prompts depend on the domain (`utils/mentorSuggestions.ts`, tested); `topics/arts/GEMINI.md` scopes the music persona to music courses. Follow-up resolved by FIND-60 (2026-11-23 check: the only remaining "musician" hits are in music_production courses, where they are correct).
 
 ### FIND-42: ~100 Formulas Showed as Red Source Text
 - **Status:** **COMPLETED** (`301045e`). Test: `app/frontend/src/utils/katexMacros.test.ts`.
@@ -261,7 +261,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Status:** **COMPLETED** (`a6cfa24`). Tests: `tests/test_provider_contract.py`, `tests/test_cli.py`.
 
 ### FIND-49: Visual Arts Courses Generated From the Music Blueprint
-- **Status:** **GENERATOR FIXED** (`d32f356`). **Content resolved (owner decision 2026-11-23):** 15 labs were music-production exercises; moved to the private addons repo and removed from the public courses. 3 labs (visual_arts/sketching, visual_media/graphic_design, visual_media/photography) are real visual labs and stay (heading fixed). Open: 42 visual-arts files still carry musician/audio-engineer analogies (233 lines) — hand-edit or regenerate; new labs for the 15 courses (see Next Candidates).
+- **Status:** **GENERATOR FIXED** (`d32f356`). **Content resolved (owner decision 2026-11-23):** 15 labs were music-production exercises; moved to the private addons repo and removed from the public courses. 3 labs (visual_arts/sketching, visual_media/graphic_design, visual_media/photography) are real visual labs and stay (heading fixed). Musician analogies fixed by FIND-60. Open: new labs for the 15 courses whose music labs moved to addons.
 - **Related (not fixed):** in the TOPIC_OUTLINE path the capstone lab for every non-maths course is IT-flavoured (CLI, YAML, failure injection). No public course uses TOPIC_OUTLINE.md.
 
 ### FIND-50: Mentor Replies Rendered Lists and Code Without Styles
@@ -339,7 +339,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-77: Gateways Got the Wrong Model
 - **Status:** **COMPLETED** (2026-11-23, `85f2e3b`, `19c2fed`). On a non-Anthropic base URL every model became one fixed name per family (`claude-sonnet-5`, which the new gateway lacks: 404), and `gpt-5.5` became Claude. Exact IDs now pass through. App env switched to `aeroai.aerolink.ink`, `claude-sonnet-5-5` (checked live).
 
-### Review pilot with GPT 5.5: NEEDS DECISION
+### Curriculum review: UNBLOCKED (owner 2026-11-23), sample running
 - Gateway serves `gpt-5.5` / `deepseek-v4-*` on `/v1/messages` (cross-family reviewer for Claude-written lessons). One-course pilot (`synapse review computing/data/sql_and_relational_query_optimization -p anthropic -m gpt-5.5`, read-only) was blocked pending the owner's cost decision (review on hold). Gateway reports `usage.tokens` ≈1,200–1,600 for a 16-token call; cost per course unknown.
 
 ## Next Candidates (not yet verified)
