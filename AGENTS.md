@@ -66,6 +66,8 @@ deletes. Push edits made to the private copy here back before the next pull.
    real git state (`git status --short`, `git diff HEAD`, `git log -n 3`) and
    reconcile it with the handoff note. Keep unrelated or in-flight changes;
    never run `git checkout -f`, `git reset --hard` or `git clean -fd`.
+   Then run `scripts/ci_status.py`. If the latest run is red, fixing it is
+   the first task of the batch, before anything from the backlog.
 2. **Pick a task:** take the highest-priority safe item. Re-check the finding in
    the code first. If it needs an architectural or product decision, mark it
    `NEEDS DECISION` in status and backlog and move on.
@@ -74,9 +76,23 @@ deletes. Push edits made to the private copy here back before the next pull.
    (including new files and affected callers) → run targeted tests, then
    `./scripts/verify_all.sh` → commit → update `.agent/status.md` and
    `.agent/backlog.md`.
+   **Commit only when `./scripts/verify_all.sh` exits 0 and prints
+   "ALL 6 VERIFICATION PHASES PASSED".** Run it with the project venv
+   (`.venv/bin/python`), not the system Python. Paste its last lines into
+   the status note; don't write "verified" or "COMPLETED" from a targeted
+   run, from memory, or for an earlier commit. A failing test is never "unrelated" until you have
+   shown it fails on the previous commit too, and even then it blocks the
+   push. Refactors must not change behaviour: keep regexes, string formats
+   and return values byte-for-byte unless the task is to change them.
 4. **After pushing to `gitea`:** check CI with `scripts/ci_status.py --wait`
    (`--log <job>` shows a failed job's log, secrets removed). A red run is
-   part of the task, not a follow-up.
+   part of the task, not a follow-up: fix it before the next commit or
+   push, and before marking anything done. CI has only what
+   `requirements*.txt` installs; a test that needs an optional package
+   (e.g. `google-genai`) must skip or stub it when it is missing.
+   **Never bump the version, tag or publish a release while the latest CI
+   run is red or still running**, even when the owner asked for the
+   release. Report the red run instead.
 5. **Limits:** batches last at most two hours. Allow at most two
    fix-and-retest cycles per task; if it still fails, leave the tree clean,
    record the blocker and move on.
