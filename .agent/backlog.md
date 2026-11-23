@@ -184,7 +184,6 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ## Needs Decision
 
 - **Chat "Clear conversation" deletes saved sessions of every topic** (`TutorChat.tsx` sends `sessions: true`, which removes all `sessions/` dirs). The chat history is shared across topics in the UI, so this may be intended. Options: keep; or clear only the active topic's session.
-- **`/api/tree` returns absolute `full_path`s** (server home directory) to the browser. Harmless on localhost; with a password and remote access it reveals the server layout. Check whether the frontend needs it before removing.
 
 ### FIND-24: Locked First Run Showed Wizard and Login Together, Polled 401s
 - **Status:** **COMPLETED** (`35b0705`). E2E: `test_locked_first_run_shows_only_login_and_stays_quiet`.
@@ -290,7 +289,31 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-57: Host-Shell Paste Could Be Escaped by a Snippet
 - **Status:** **COMPLETED** (`2aa0ee6`). Tests: `terminalText.test.ts`.
 
+### FIND-58: Bulk Scoping Script Committed and Pushed
+- **Status:** **COMPLETED** (`b67d6f6`). `scripts/scope_domain_curriculum.py` ran `git add`/`commit`/`push` itself. Test: `tests/test_no_auto_push.py` scans scripts, learning_engine, app/backend and bin.
+
+### FIND-59: Env File Overrode Exported Variables
+- **Status:** **COMPLETED** (`51e5c14`). `load_env_file()` now lets exported variables win (an empty export counts as unset). Test: `tests/test_env_precedence.py`; documented in `docs/CONFIG_AND_SECURITY.md`.
+
+### FIND-60: Visual Courses in Music-Named Categories Got the Music Blueprint
+- **Status:** **COMPLETED** (`2ad7872`). Course-level override in `domain_strategies.py`; the generator passes `subtopic_id` at all three `get_strategy` call sites. Root cause of the musician framing: the arts persona assumed musicians until `c48ab00`; content predates it. Content fixed in `f36f3d4`, `6ab5e64` (15 visual labs, ~400 paragraphs). Guard: `tests/test_visual_arts_audience.py`. FIND-49 is fully resolved.
+
+### FIND-61: Model Preambles and Broken Fence Openers Reached Lessons
+- **Status:** **COMPLETED** (`4f7fced`). `clean_model_markdown()` strips "Here is the …:" lines and `` ``markdown `` openers. 4 computing lessons cleaned by hand.
+
+### FIND-62: `/api/tree` Sent Absolute Server Paths
+- **Status:** **COMPLETED** (`60b343b`). Every course's `full_path` and every lesson's `path` were absolute; the browser read neither. Dropped from the response only; other GET endpoints probed clean. Test: `test_api.py::test_api_tree_does_not_reveal_server_paths`.
+
+### FIND-63: `synapse lint` Missed Preambles and Titles, Exited 0 on FAILED
+- **Status:** **COMPLETED** (`aa17a57`). New checks MODEL_PREAMBLE, MISSING_TITLE, DUPLICATE_LESSON_TITLE; `lint` and `lint --render` exit 1 on errors; CI lints the public curriculum. The generator now labels bare code fences (`learning_engine/code_fences.py`), so new courses no longer come back with UNTAGGED_CODE_BLOCK warnings. Tests: `tests/test_curriculum_linter.py`, `test_cli.py`.
+
+### FIND-64: Mermaid Repair Broke Quoted Labels
+- **Status:** **COMPLETED** (`bb354eb`). The node-label regex in `repair_mermaid_diagrams()` rewrote brackets inside quoted labels (`"W[:, 0:d/2]"` → `W[":, 0:d/2"]`); applied to the public curriculum it broke 15 working diagrams. Replaced by a quote-aware scanner (flowcharts only) that also quotes brackets/quotes inside labels. Regression run: 0 render errors over every public diagram; 9 of 11 failing local diagrams repaired automatically. Tests in `tests/test_generation_output.py`.
+
 ## Next Candidates (not yet verified)
+
+- **Thin computing lessons:** `computing/infrastructure/monitoring_prometheus_grafana` lesson 4 (472 words) and its labs (641), `computing/data/sql_and_relational_query_optimization` lesson 4 (658). Regenerate.
+- **Arts Adobe Creative Cloud lab** is an audio post-production exercise; regenerate with the visual blueprint (queued locally).
 
 - **Export menu → field guide:** done in `8041726` (downloads; clearer label).
 - **Stop latency:** a cancel takes effect only after in-flight model calls return (~4 min on 32b). `OllamaProvider.generate_cancellable` (used by translation jobs) could abort them; the drafting path would need it plus `max_tokens`.

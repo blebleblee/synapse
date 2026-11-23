@@ -49,7 +49,7 @@ A targeted acceptance audit was performed to close critical evidence gaps in pre
 
 - **Terminal PTY:** real PTY allocation, signaling and backpressure are only exercised with mocks (tests never spawn host shells). A bounded real-PTY test in `tmp_path` was proposed; awaiting owner answer.
 - **Frontend mentor streaming reconnection:** abrupt TCP drops during streaming are not covered by E2E.
-- **Needs owner decision:** see "Needs Decision" in `backlog.md` (chat "Clear conversation" scope, absolute paths in `/api/tree`).
+- **Needs owner decision:** see "Needs Decision" in `backlog.md` (chat "Clear conversation" scope).
 - **Pending owner questions (asked 2026-11-22):** scope of unattended runs once the backlog is empty; ship the unreleased commits as v1.3.0; delete the merged `security/audit-hardening` branch. Until answered: no GitHub push, no release, no branch deletion.
 
 ---
@@ -71,6 +71,16 @@ Commits (all pushed to `gitea/main`; CI #49–#56 green, #57+ queued at handoff 
 - `771c769` terminal PTY slave fd closed twice → killed unrelated sockets ("Invalid frame header"). FIND-27.
 - `b14085c` course-path links read "Kubernetes: Kubernetes" (301 doubled graph labels). FIND-28.
 - `7ff4d93` Anki export regenerated/overwrote decks; placeholder decks cached; Anki headers on one row; leaked test deck removed from kubernetes. FIND-29.
+
+### Batch 15 (2026-11-23, 09:45–12:30): visual labs, root-cause fixes, review
+
+Owner: labs for the 15 arts courses and music analogies fixed (API key for generation only, until its credit ran out: it did, twice); then "review the code and topics again". All commits on `gitea/main`, not on GitHub.
+- Content: `f36f3d4`, `6ab5e64` (15 visual labs, music framing removed), `05143f4` (fence labels).
+- Fixes: FIND-58…64 in `backlog.md` (auto-push script, env precedence, blueprint mapping, preamble cleaner, `/api/tree` paths, linter checks + exit code + CI step, Mermaid repair).
+- `scripts/sync_addons.py` (`8a34d59`) copies the private curriculum both ways (git-ignored files only, never deletes, newest wins).
+- Verify: 348 backend, 15 E2E, all 6 phases (12:20). CI was queued behind the slow runner (#121–#124 at handoff; #120 green).
+- Owner approved a curriculum release after the content work; not yet published (packs to rebuild and check first).
+- In progress locally: UX paragraph rewrites (Gemma), then course retitling for private tracks and the Adobe lab.
 
 ### Batch 14 (2026-11-23, 09:00–09:45): content move, v1.3.1, loop end
 
