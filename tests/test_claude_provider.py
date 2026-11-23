@@ -106,3 +106,16 @@ def test_user_agent_identifies_synapse(monkeypatch):
     list(models.AnthropicProvider(model="claude-sonnet-5", base_url="https://api.anthropic.com").generate_stream("hi"))
     assert seen["user-agent"].startswith("Synapse-Workbench/")
     assert "claude-cli" not in seen["user-agent"]
+
+
+@pytest.mark.parametrize("model", ["claude-sonnet-5-5", "claude-opus-4-5", "claude-fable-5-1"])
+def test_proxy_keeps_full_model_ids(model):
+    # A gateway's /v1/models lists exact IDs; rewriting them to one fixed name
+    # per family sent requests for models the gateway does not have (404).
+    p = models.AnthropicProvider(model=model, base_url="https://proxy.example")
+    assert p.model == model
+
+
+def test_proxy_still_maps_bare_family_names():
+    p = models.AnthropicProvider(model="sonnet", base_url="https://proxy.example")
+    assert p.model == "claude-sonnet-5"

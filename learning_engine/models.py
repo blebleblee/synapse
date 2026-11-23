@@ -993,6 +993,10 @@ class AnthropicProvider(LLMProvider):
     def _resolve_model_name(self, model: str) -> str:
         if not self.base_url.startswith("https://api.anthropic.com"):
             m_lower = model.lower()
+            # Exact IDs (as a gateway's /v1/models lists them) pass through;
+            # only bare family names ("sonnet", "opus") are mapped.
+            if re.match(r"^claude-[a-z]+-\d", m_lower):
+                return model
             if "opus" in m_lower:
                 return "claude-opus-5-5"
             if "fable" in m_lower:
@@ -1287,8 +1291,11 @@ def _resolve_cloud_provider(configured_model: str, host: str, settings: dict, st
 def _resolve_explicit_host(configured_model: str, host: str, settings: dict, status: dict):
     if not host: return None
     if configured_model:
+        # The requested model must answer here; otherwise look for it on the
+        # cluster (later strategies) rather than switching models on this host.
         if OllamaProvider.check_connectivity(host, configured_model):
             return OllamaProvider(model=configured_model, host=host), configured_model
+        return None
     if OllamaProvider.is_available(host):
         pinned = get_node_pin(host)
         models = OllamaProvider.list_models(host)
@@ -1378,7 +1385,20 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
         _resolve_cloud_fallback
     ]
     
-    status = OllamaCluster().get_cluster_status()
+    # Probe the cluster only once a strategy needs it: a cloud mentor must not
+    # wait for every Ollama node to answer first.
+    class _LazyStatus(dict):
+        loaded = False
+        def _load(self):
+            if not self.loaded:
+                self.loaded = True
+                self.update(OllamaCluster().get_cluster_status())
+        def items(self):
+            self._load(); return super().items()
+        def get(self, *a):
+            self._load(); return super().get(*a)
+
+    status = _LazyStatus()
     for strategy in strategies:
         result = strategy(configured_model, host, settings, status)
         if result:
