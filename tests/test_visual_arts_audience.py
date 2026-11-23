@@ -16,7 +16,8 @@ SOUND_FOR_PICTURE = re.compile(r"fairlight|audio_design|output_formats|render_de
 AUDIENCE = re.compile(
     r"\b(composers?|musicians?|audio engineers?|mixing engineers?|mastering engineers?|music producers?|"
     r"voice[- ]leading|counterpoint|symphon\w*|chord progressions?|DAWs?|digital audio workstations?|"
-    r"Ableton|Pro Tools|Logic Pro|Cubase|sample librar\w*|synthesi[sz]ers?|liner notes)\b", re.I)
+    r"Ableton|Pro Tools|Logic Pro|Cubase|sample librar\w*|synthesi[sz]ers?|liner notes|"
+    r"modular synth\w*|Eurorack|envelope generators?|oscillators and envelopes)\b", re.I)
 
 
 def visual_files():

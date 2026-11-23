@@ -57,7 +57,7 @@ Component definitions must specify:
 
 **Responsive Adaptation:** How the component scales across viewport widths and density breakpoints. Does the button maintain fixed padding, or does it grow proportionally? Does the font size remain constant, or does it step down on mobile?
 
-The component library is not a flat catalog but a hierarchical taxonomy. Atomic components—buttons, input fields, icons—combine into molecular patterns: a search bar is an input field, a button, and an icon. Molecular patterns compose into organisms: a navigation header is a logo, a search bar, and a menu. This compositional hierarchy mirrors the principles of modular synthesis: oscillators and envelopes (atoms) combine into voices (molecules), and voices combine into patches (organisms).
+The component library is not a flat catalog but a hierarchical taxonomy. Atomic components—buttons, input fields, icons—combine into molecular patterns: a search bar is an input field, a button, and an icon. Molecular patterns compose into organisms: a navigation header is a logo, a search bar, and a menu. The hierarchy works like a printed type specimen: glyphs combine into words set in one style, words combine into the page layouts that the specimen shows, and each level can be inspected and changed on its own.
 
 ### Layer 3: Documentation & Governance — The Living Specification
 
