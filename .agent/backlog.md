@@ -320,20 +320,16 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 ## Next Candidates (not yet verified)
 
-- **Thin computing lessons:** `computing/infrastructure/monitoring_prometheus_grafana` lesson 4 (472 words) and its labs (641), `computing/data/sql_and_relational_query_optimization` lesson 4 (658). Regenerate.
 - **Thinking models on Ollama (e.g. gemma4):** `OllamaProvider` never sets `think`, and Ollama counts thinking tokens against `num_predict`. A 5-token probe came back empty; the 250-token `generate_stream` default and short quiz/flashcard budgets could too. Options: `think: false` for short structured calls, or larger budgets. Needs a check against the Settings models; behaviour choice, so not changed unasked.
-- **Arts Adobe Creative Cloud lab** is an audio post-production exercise; regenerate with the visual blueprint (queued locally).
 
 - **Export menu → field guide:** done in `8041726` (downloads; clearer label).
 - **Stop latency:** a cancel takes effect only after in-flight model calls return (~4 min on 32b). `OllamaProvider.generate_cancellable` (used by translation jobs) could abort them; the drafting path would need it plus `max_tokens`.
 
-- **Tests:** conftest's autouse blocker replaces provider `generate` with `(*args, **kwargs)`, so signature mismatches between callers and real providers cannot fail a test. `test_provider_contract.py` covers `generate`; consider the same for `generate_stream`/`generate_cancellable` callers.
 - **Chat with non-Ollama providers:** fixed in `427af10` (base `generate_stream`); not checked against the live Gemini API.
 
 - **Curriculum hallucinations (owner question, proposal):** (1) `synapse review` with a reviewer from a different model family than the generator; (2) run lesson/lab code blocks in the sandbox in CI and flag failures; (3) extract checkable claims (versions, defaults, flags, API names) and verify against docs or installed tools; (4) a "Report a mistake" button in the reader feeding a review queue. (1) and (2) are cheapest. NEEDS DECISION on which to build.
 - **Run buttons:** renamed to "Send to terminal" (owner decision 2026-11-23).
 - **Labs for the 15 arts courses without labs (FIND-49 follow-up):** generate visual labs with the fixed blueprint. The UI only offers "Regenerate with AI" (whole course); a "generate missing files only" action would fit (`generate` without `--force` already skips existing files, but scoping may pick different lesson names; verify first).
-- **Mentor:** lesson-generation cleanup (`validate_generation_output`) still runs on chat replies; a chat-specific path would be cleaner.
 
 - **UI:** all main flows exercised in batches 1–6. (Listen, translation, Add Topic, rename/delete checked in batches 4–5.) (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
 - **CLI:** checked in batch 2 (FIND-30). `pack list/install/uninstall` checked in batch 6. `add`, `generate`, `chat` checked in batch 7.
