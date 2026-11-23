@@ -31,6 +31,7 @@ from .models import (
 from .topic_manager import get_domain_persona
 from .security import validate_canonical_topic_path, get_workspace_root
 from .rewrite_safety import split_markdown_chunks, check_rewrite, clean_model_markdown
+from .code_fences import tag_untagged_fences
 from .domain_strategies import build_topic_modules, GLOBAL_REGISTRY
 
 # Global semaphore to limit concurrent LLM requests and avoid rate limits
@@ -703,7 +704,7 @@ def _generate_topic_parallel(
                 if stop():
                     return results
                 target_file = out_dir / fname
-                target_file.write_text(clean_content + "\n", encoding="utf-8")
+                target_file.write_text(tag_untagged_fences(clean_content)[0] + "\n", encoding="utf-8")
                 print(f"      [✔] {fname} published ({host_label} -> Masterclass Draft in {elapsed:.1f}s)", flush=True)
                 results[fname] = True
             return results
@@ -797,7 +798,7 @@ Output the fully corrected, publication-grade, raw Markdown only."""
             if stop():
                 return fname, False
             target_file = out_dir / fname
-            target_file.write_text(final_content.strip() + "\n", encoding="utf-8")
+            target_file.write_text(tag_untagged_fences(final_content.strip())[0] + "\n", encoding="utf-8")
             print(f"      [✔] {fname} published ({host_label} -> {audit_note})", flush=True)
             return fname, True
 
@@ -817,7 +818,7 @@ Output the fully corrected, publication-grade, raw Markdown only."""
                 validated = validate_generation_output(content)
                 if stop():
                     return results
-                (out_dir / mod["filename"]).write_text(validated.strip() + "\n", encoding="utf-8")
+                (out_dir / mod["filename"]).write_text(tag_untagged_fences(validated.strip())[0] + "\n", encoding="utf-8")
                 results[mod["filename"]] = True
             except Exception:
                 results[mod["filename"]] = False

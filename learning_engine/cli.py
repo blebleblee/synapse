@@ -293,7 +293,12 @@ def cmd_lint(args):
         print("=" * 50)
         script_path = WORKSPACE_ROOT / "scripts" / "validate_render.mjs"
         target = f"topics/{args.domain}" if args.domain else "topics"
-        subprocess.run(["node", str(script_path), target])
+        if subprocess.run(["node", str(script_path), target]).returncode != 0:
+            sys.exit(1)
+
+    # Exit non-zero on errors so scripts and CI can use lint as a gate.
+    if not report["passed"]:
+        sys.exit(1)
 
 def cmd_export(args):
     out_file = export_handbook(domain=args.domain)

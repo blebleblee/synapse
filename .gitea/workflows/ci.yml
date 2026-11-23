@@ -49,6 +49,11 @@ jobs:
           node -e "const a = require('rolldown/package.json').version, b = require('@rolldown/binding-wasm32-wasi/package.json').version; if (a !== b) { console.error('Update @rolldown/binding-wasm32-wasi to ' + a + ' (it is ' + b + ')'); process.exit(1) }"
       - name: Verify (unit, lint, build, backend, E2E)
         run: ./scripts/verify_all.sh
+      # The checkout holds only the public curriculum, so this lints exactly
+      # what ships (model preambles, missing titles, duplicate titles,
+      # unclosed fences, refusals...). Locally, private copies would be linted too.
+      - name: Curriculum lint (public topics)
+        run: .venv/bin/python bin/synapse lint
 
   release-packs:
     runs-on: ubuntu-latest

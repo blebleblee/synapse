@@ -146,3 +146,15 @@ def test_files_already_on_disk_are_kept_not_failed(monkeypatch, capsys):
     assert "Wrote 1 file(s)" in out
     assert "Kept 1 existing file(s)" in out and "lesson_01_x.md" in out
     assert "could not be generated" not in out
+
+
+def test_lint_exits_non_zero_when_it_finds_errors(monkeypatch, capsys):
+    """`synapse lint` printed "FAILED" but exited 0, so no script or CI step
+    could use it as a gate."""
+    monkeypatch.setattr(cli, "lint_curriculum", lambda domain_filter="": {
+        "scanned_files": 1, "error_count": 1, "warning_count": 0, "passed": False,
+        "issues": [{"file": "topics/x/y/z/lesson_01_a.md", "severity": "error", "message": "bad"}]})
+    assert run_cli(monkeypatch, "lint") == 1
+    monkeypatch.setattr(cli, "lint_curriculum", lambda domain_filter="": {
+        "scanned_files": 1, "error_count": 0, "warning_count": 2, "passed": True, "issues": []})
+    assert run_cli(monkeypatch, "lint") == 0

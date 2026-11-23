@@ -136,6 +136,25 @@ def lint_markdown_file(file_path: Path) -> List[Dict[str, Any]]:
             })
             break
 
+    # 5b2. Chat preamble before the content, and a missing "# " title. The
+    # sidebar takes a lesson's title from its first "# " line, so a reply that
+    # starts "Here is the fully corrected Markdown:" shows that as the title.
+    first_line = next((l.strip() for l in content.splitlines() if l.strip()), "")
+    if re.match(r"^(here is|here's|here are|sure|certainly|of course|absolutely|below is)\b.{0,200}:$", first_line, re.IGNORECASE):
+        issues.append({
+            "file": rel_file,
+            "severity": "error",
+            "code": "MODEL_PREAMBLE",
+            "message": f"File starts with a model preamble instead of content: '{first_line[:80]}'"
+        })
+    elif (file_path.name.startswith("lesson_") or file_path.name == "labs.md") and not first_line.startswith("# "):
+        issues.append({
+            "file": rel_file,
+            "severity": "error",
+            "code": "MISSING_TITLE",
+            "message": "File does not start with a '# ' title line"
+        })
+
     # 5c. Prompt / Context Echo Leak Detection
     context_leak_patterns = [
         r"--- Newly Discovered Project Context ---",
@@ -282,6 +301,25 @@ def lint_curriculum(domain_filter: str = "") -> Dict[str, Any]:
                     "severity": "error",
                     "code": "MISSING_LESSON_IN_SEQUENCE",
                     "message": f"Topic directory has missing lesson number(s) in sequence: {sorted(list(missing))}"
+                })
+
+        # Two lessons with the same title look like one lesson listed twice.
+        titles = {}
+        for f in lesson_files:
+            try:
+                head = f.read_text(encoding="utf-8").lstrip().split("\n", 1)[0]
+            except OSError:
+                continue
+            if head.startswith("# "):
+                key = re.sub(r"^#\s+Lesson\s+\d+\s*:\s*", "", head).strip().lower()
+                titles.setdefault(key, []).append(f.name)
+        for title, names in titles.items():
+            if len(names) > 1:
+                all_issues.append({
+                    "file": rel_dir,
+                    "severity": "error",
+                    "code": "DUPLICATE_LESSON_TITLE",
+                    "message": f"Lessons {', '.join(sorted(names))} share the title '{title}'"
                 })
 
         # Check for labs.md presence in active topics
