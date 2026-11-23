@@ -274,7 +274,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 ## Next Candidates (not yet verified)
 
-- **Export menu → "Mastered Field Guide (.md)":** sits among downloads but downloads nothing; it runs the AI for minutes (qwen2.5-coder:32b) and then says "saved to topics/…/artifacts/MASTERED_GUIDE.md". Consider downloading the result (and/or a clearer label such as "Write a field guide from my sessions"). Small UI change.
+- **Export menu → field guide:** done in `8041726` (downloads; clearer label).
 
 - **Tests:** conftest's autouse blocker replaces provider `generate` with `(*args, **kwargs)`, so signature mismatches between callers and real providers cannot fail a test. `test_provider_contract.py` covers `generate`; consider the same for `generate_stream`/`generate_cancellable` callers.
 - **Chat with non-Ollama providers:** fixed in `427af10` (base `generate_stream`); not checked against the live Gemini API.
