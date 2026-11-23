@@ -1676,36 +1676,63 @@ Curriculum Context:
 Output valid JSON only with no markdown backticks or commentary."""
 
     provider = get_provider(provider_type=req.provider, model=req.model, host=req.host, domain=domain)
-    raw = provider.generate(prompt, system_instruction=system_instruction).strip()
-
-    # Clean markdown code block if present
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-        raw = raw.strip()
-
     try:
-        quiz_data = json.loads(raw)
-        return {"questions": quiz_data}
-    except Exception:
-        # Fallback structured question
-        return {
-            "questions": [
-                {
-                    "id": 1,
-                    "question": f"In {sub.replace('_', ' ').title()}, what is the primary architectural trade-off?",
-                    "options": [
-                        "Latency vs. throughput optimization",
-                        "Consistency vs. availability",
-                        "Memory footprint vs. cache coherence",
-                        "Control plane overhead vs. fault isolation"
-                    ],
-                    "correctIndex": 0,
-                    "explanation": "Systems optimization requires balancing critical resource constraints."
-                }
-            ]
-        }
+        raw = provider.generate(prompt, system_instruction=system_instruction) or ""
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"The AI model could not write the quiz ({e}). Check Settings → AI models.")
+    questions = parse_quiz_questions(raw)
+    if not questions:
+        # This used to return a canned question ("what is the primary
+        # architectural trade-off?") with made-up options, shown as if it
+        # were the course quiz.
+        raise HTTPException(status_code=502, detail="The AI model did not return usable quiz questions. Try again or pick another model in Settings → AI models.")
+    return {"questions": questions}
+
+
+def parse_quiz_questions(raw: str) -> List[Dict[str, Any]]:
+    """The model's reply as quiz questions; malformed questions are dropped."""
+    text = raw.strip()
+    start, end = text.find("["), text.rfind("]")
+    if start == -1 or end <= start:
+        return []
+    try:
+        data = json.loads(text[start:end + 1])
+    except ValueError:
+        # Local models often break one question (e.g. unescaped quotes in a
+        # shell command), which made the whole array invalid. Keep the others.
+        data = []
+        depth, obj_start = 0, None
+        for i, ch in enumerate(text[start:end + 1], start):
+            if ch == "{":
+                if depth == 0:
+                    obj_start = i
+                depth += 1
+            elif ch == "}" and depth:
+                depth -= 1
+                if depth == 0 and obj_start is not None:
+                    try:
+                        data.append(json.loads(text[obj_start:i + 1]))
+                    except ValueError:
+                        pass
+    questions = []
+    for item in data if isinstance(data, list) else []:
+        if not isinstance(item, dict):
+            continue
+        question, options, correct = item.get("question"), item.get("options"), item.get("correctIndex")
+        if not (isinstance(question, str) and question.strip()):
+            continue
+        if not (isinstance(options, list) and len(options) >= 2 and all(isinstance(o, str) and o.strip() for o in options)):
+            continue
+        if isinstance(correct, bool) or not isinstance(correct, int) or not 0 <= correct < len(options):
+            continue
+        questions.append({
+            "id": len(questions) + 1,
+            "question": question.strip(),
+            "options": options,
+            "correctIndex": correct,
+            "explanation": str(item.get("explanation") or ""),
+        })
+    return questions
 
 @app.post("/api/session/save")
 def save_session(req: SaveSessionRequest):

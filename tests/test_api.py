@@ -629,3 +629,57 @@ def test_field_guide_is_returned_for_download(tmp_path):
     assert data["filename"] == "kubernetes_field_guide.md"
     assert data["content"].startswith("# Mastered Field Guide: Kubernetes")
     assert data["path"].endswith("artifacts/MASTERED_GUIDE.md")
+
+
+@pytest.mark.parametrize("reply", [
+    "Error: could not connect to http://127.0.0.1:9",
+    "Sure! Here are some questions about Bash.",
+    '[{"question": "Q?", "options": ["A", "B"], "correctIndex": 5}]',
+])
+def test_quiz_without_usable_questions_is_an_error_not_a_canned_quiz(monkeypatch, reply):
+    """With no model reachable the quiz showed a hard-coded generic question
+    ("what is the primary architectural trade-off?") as if it were real."""
+    class Fake:
+        def generate(self, prompt, **kwargs):
+            return reply
+    monkeypatch.setattr("app.backend.main.get_provider", lambda **k: Fake())
+    res = client.post("/api/quiz", json={"query": "computing/data/postgresql"})
+    assert res.status_code == 502
+    assert "quiz" in res.json()["detail"]
+
+
+def test_quiz_failing_model_is_an_error(monkeypatch):
+    class Down:
+        def generate(self, prompt, **kwargs):
+            raise ConnectionError("connection refused")
+    monkeypatch.setattr("app.backend.main.get_provider", lambda **k: Down())
+    res = client.post("/api/quiz", json={"query": "computing/data/postgresql"})
+    assert res.status_code == 502
+    assert "connection refused" in res.json()["detail"]
+
+
+def test_quiz_keeps_valid_questions_from_a_chatty_reply(monkeypatch):
+    class Fake:
+        def generate(self, prompt, **kwargs):
+            return ('Here you go:\n```json\n[{"question": "Q1?", "options": ["A", "B", "C"], "correctIndex": 2, "explanation": "E"},'
+                    ' {"question": "", "options": ["A"], "correctIndex": 0}]\n```')
+    monkeypatch.setattr("app.backend.main.get_provider", lambda **k: Fake())
+    res = client.post("/api/quiz", json={"query": "computing/data/postgresql"})
+    assert res.status_code == 200
+    qs = res.json()["questions"]
+    assert [q["question"] for q in qs] == ["Q1?"]
+    assert qs[0]["correctIndex"] == 2
+
+
+def test_quiz_keeps_the_questions_a_broken_one_would_have_taken_down():
+    """qwen2.5-coder put unescaped quotes in one question (a shell command), so
+    the whole array failed to parse and the learner got no quiz at all."""
+    from app.backend.main import parse_quiz_questions
+    raw = """[
+  {"id": 1, "question": "Which file does a login shell read first?", "options": ["/etc/profile", "~/.bashrc"], "correctIndex": 0, "explanation": "E1"},
+  {"id": 2, "question": "Scenario: `var=$(echo "Hello World" | tr ' ' '_')`. Value?", "options": ["Hello_World", "x"], "correctIndex": 0, "explanation": "E2"},
+  {"id": 3, "question": "What does `bash -c 'echo $0'` print?", "options": ["bash", "-c"], "correctIndex": 0, "explanation": "E3 uses ${HOME}"}
+]"""
+    qs = parse_quiz_questions(raw)
+    assert [q["explanation"] for q in qs] == ["E1", "E3 uses ${HOME}"]
+    assert [q["id"] for q in qs] == [1, 2]
