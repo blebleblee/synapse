@@ -265,7 +265,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ## Next Candidates (not yet verified)
 
 - **Tests:** conftest's autouse blocker replaces provider `generate` with `(*args, **kwargs)`, so signature mismatches between callers and real providers cannot fail a test. `test_provider_contract.py` covers `generate`; consider the same for `generate_stream`/`generate_cancellable` callers.
-- **Chat with non-Ollama providers:** `/api/chat` streaming calls `provider.generate_stream`, which `OllamaCluster` and `GeminiProvider` do not define; check what `get_chat_provider` can return.
+- **Chat with non-Ollama providers:** fixed in `427af10` (base `generate_stream`); not checked against the live Gemini API.
 
 - **Curriculum hallucinations (owner question, proposal):** (1) `synapse review` with a reviewer from a different model family than the generator; (2) run lesson/lab code blocks in the sandbox in CI and flag failures; (3) extract checkable claims (versions, defaults, flags, API names) and verify against docs or installed tools; (4) a "Report a mistake" button in the reader feeding a review queue. (1) and (2) are cheapest. NEEDS DECISION on which to build.
 - **Run buttons:** shown on every bash block, including illustrations like `cmd > file`. Consider showing Run only in labs or on blocks marked runnable (product decision).
