@@ -448,12 +448,19 @@ def uninstall_topic_pack(domain: str) -> Dict[str, Any]:
     Uninstalls a topic package by removing its files from TOPICS_DIR
     and unregistering it from the database.
     """
+    import re
     import shutil
+    # One folder name only. "" or "." resolve to TOPICS_DIR itself, which the
+    # containment check accepts, so they used to delete every course.
+    if not isinstance(domain, str) or not re.fullmatch(r"[A-Za-z0-9_-]+", domain):
+        raise ValueError(f"Invalid domain name {domain!r}: use letters, digits, '_' or '-' only.")
     domain_dir = TOPICS_DIR / domain
 
     # Safely remove domain directory from disk
     if domain_dir.exists() and domain_dir.is_dir():
-        validate_workspace_path(TOPICS_DIR, domain_dir)
+        resolved = validate_workspace_path(TOPICS_DIR, domain_dir)
+        if resolved.parent != TOPICS_DIR.resolve():
+            raise ValueError(f"Refusing to remove {domain_dir}: not a domain folder.")
         shutil.rmtree(domain_dir)
 
     # Clean up settings and mastery tracking

@@ -495,7 +495,7 @@ def cmd_pack(args):
         print(f"[*] Uninstalling package: {args.domain}")
         try:
             res = uninstall_topic_pack(args.domain)
-            print(f"[+] {res['message']}")
+            print(f"[+] Uninstalled: {res['domain']}")
         except Exception as e:
             print(f"[-] Uninstall failed: {e}")
             sys.exit(1)

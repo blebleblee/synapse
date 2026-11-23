@@ -77,3 +77,21 @@ def test_no_ai_available_error_names_the_real_cause(monkeypatch):
     assert provider.client is None
     assert "No AI model is reachable" in provider.unavailable_reason
     assert "127.0.0.1:11434" in provider.unavailable_reason
+
+
+def test_pack_uninstall_reports_success(monkeypatch, capsys):
+    """It removed the domain, then printed "Uninstall failed: 'message'" and
+    exited 1, because the result has no "message" key."""
+    import learning_engine.packages as packages
+    (packages.TOPICS_DIR / "cli_probe").mkdir()
+    assert run_cli(monkeypatch, "pack", "uninstall", "cli_probe") == 0
+    out = capsys.readouterr().out
+    assert "[+] Uninstalled: cli_probe" in out and "failed" not in out
+    assert not (packages.TOPICS_DIR / "cli_probe").exists()
+
+
+def test_pack_uninstall_dot_is_refused(monkeypatch, capsys):
+    import learning_engine.packages as packages
+    before = sorted(p.name for p in packages.TOPICS_DIR.iterdir())
+    assert run_cli(monkeypatch, "pack", "uninstall", ".") == 1
+    assert sorted(p.name for p in packages.TOPICS_DIR.iterdir()) == before

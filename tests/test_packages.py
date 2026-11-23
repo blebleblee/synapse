@@ -427,3 +427,26 @@ def test_search_skips_hidden_staging_folders():
     found = list(_iter_markdown(TOPICS_DIR))
     assert visible in found
     assert hidden not in found
+
+
+@pytest.mark.parametrize("bad", ["", ".", "./", "arts/..", "../topics", "arts/ai"])
+def test_uninstall_rejects_anything_but_a_domain_name(bad):
+    """`uninstall_topic_pack(".")` resolved to the topics folder itself, which
+    the containment check accepts, and deleted every course."""
+    import learning_engine.packages as packages
+    topics = packages.TOPICS_DIR
+    before = sorted(p.name for p in topics.iterdir())
+    assert before
+    with pytest.raises(ValueError):
+        uninstall_topic_pack(bad)
+    assert sorted(p.name for p in topics.iterdir()) == before
+
+
+def test_api_uninstall_dot_does_not_delete_the_curriculum():
+    from fastapi.testclient import TestClient
+    from app.backend.main import app
+    import learning_engine.packages as packages
+    before = sorted(p.name for p in packages.TOPICS_DIR.iterdir())
+    res = TestClient(app).delete("/api/packages/%2E")
+    assert res.status_code in (400, 404, 405)
+    assert sorted(p.name for p in packages.TOPICS_DIR.iterdir()) == before
