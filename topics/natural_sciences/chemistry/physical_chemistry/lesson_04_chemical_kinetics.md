@@ -197,7 +197,7 @@ $$
 \end{aligned}
 $$
 
-The intermediate B reaches maximum concentration at $t_\max = \ln(k_2/k_1)/(k_2 - k_1)$. If monitoring B formation, premature plateau suggests onward reaction. Diagnosis: monitor multiple wavelengths simultaneously—if $A$ decays exponentially but product absorbance deviates from first-order rise, suspect consecutive pathways. Global fitting to the full mechanism extracts both $k_1$ and $k_2$.
+The intermediate B reaches maximum concentration at $t_{\max} = \ln(k_2/k_1)/(k_2 - k_1)$. If monitoring B formation, premature plateau suggests onward reaction. Diagnosis: monitor multiple wavelengths simultaneously—if $A$ decays exponentially but product absorbance deviates from first-order rise, suspect consecutive pathways. Global fitting to the full mechanism extracts both $k_1$ and $k_2$.
 
 ### Solvent and Ionic Strength Effects
 

@@ -96,7 +96,7 @@ The first law of thermodynamics applied to a fluid element gives the energy equa
 
 $$h_0 = c_p T + \frac{1}{2}u^2 = c_p T_0 = \text{const along a streamline}$$
 
-where $T$ is the static temperature in Kelvin, $T_0$ is the stagnation temperature, $c_p$ is the specific heat at constant pressure in $\text{J/(kg \cdot K)}$, and $u$ is the flow speed in $\text{m/s}$. This form of energy conservation is essential for compressible aerodynamics. At Mach numbers above 0.3, the temperature rise at the stagnation point becomes non-negligible and affects both the local speed of sound and the structural heating of the vehicle.
+where $T$ is the static temperature in Kelvin, $T_0$ is the stagnation temperature, $c_p$ is the specific heat at constant pressure in $\text{J/(kg}\cdot\text{K)}$, and $u$ is the flow speed in $\text{m/s}$. This form of energy conservation is essential for compressible aerodynamics. At Mach numbers above 0.3, the temperature rise at the stagnation point becomes non-negligible and affects both the local speed of sound and the structural heating of the vehicle.
 
 The relationship between static and stagnation conditions for a calorically perfect gas is given by the isentropic relations:
 
@@ -190,7 +190,7 @@ Before running the tunnel, calibrate the differential pressure transducer by app
 
 Mount the Pitot-static probe on a traversing mechanism aligned with the tunnel centerline. Set the probe yaw angle to zero degrees relative to the nominal flow direction using a clinometer; misalignment beyond $\pm 3°$ introduces a cosine error in the stagnation pressure reading of roughly 0.1%, which is small but non-negligible at high precision. With the tunnel running at a stable set point, record differential pressure $\Delta p = p_0 - p_s$ at traverse increments of 2 mm across the full test section height. Simultaneously record the ambient static pressure $p_\infty$ from a Betz manometer or a precision barometer and the ambient temperature $T_\infty$ from a thermistor probe upstream of the contraction. Compute the local flow velocity at each traverse position as:
 
-$$V_i = \sqrt{\frac{2 \Delta p_i}{\rho_\infty}}, \quad \rho_\infty = \frac{p_\infty}{R_{\text{air}} T_\infty}, \quad R_{\text{air}} = 287.058 \, \text{J/(kg \cdot K)}$$
+$$V_i = \sqrt{\frac{2 \Delta p_i}{\rho_\infty}}, \quad \rho_\infty = \frac{p_\infty}{R_{\text{air}} T_\infty}, \quad R_{\text{air}} = 287.058 \, \text{J/(kg}\cdot\text{K)}$$
 
 Integrate the velocity profile across the test section to obtain the volumetric flow rate $\dot{V} = \int\!\int V \, dA$, and verify that it matches the volumetric flow rate computed from the contraction inlet velocity (measured with a separate manometer on the settling chamber total pressure port) multiplied by the contraction area ratio. Agreement within 1–2% confirms that the continuity equation and Bernoulli's equation are operating consistently across the facility, and that the measurement system is free from significant systematic errors.
 

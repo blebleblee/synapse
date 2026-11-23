@@ -291,7 +291,7 @@ A direct proof would assume $n^2$ is even and attempt to deduce $n$ is even, but
 
 $$n^2 = (2k + 1)^2 = 4k^2 + 4k + 1 = 2(2k^2 + 2k) + 1$$
 
-Thus, $n^2$ is odd. Since we have proven $\neg(\text{$n$ is even}) \implies \neg(\text{$n^2$ is even})$, the contrapositive equivalence establishes that if $n^2$ is even, then $n$ is even. ∎
+Thus, $n^2$ is odd. Since we have proven $\neg(n \text{ is even}) \implies \neg(n^2 \text{ is even})$, the contrapositive equivalence establishes that if $n^2$ is even, then $n$ is even. ∎
 
 This result is instrumental in proving the irrationality of $\sqrt{2}$, as we shall see.
 

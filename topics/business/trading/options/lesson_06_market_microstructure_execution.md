@@ -74,7 +74,7 @@ The relationship between realized volatility and market-making profitability ill
 
 In formal terms, the profit or loss from market-making an option and delta hedging is approximately:
 
-$$P&L \approx \frac{1}{2} \gamma \cdot (\sigma_{realized}^2 - \sigma_{implied}^2) \cdot (S)^2 \cdot t$$
+$$\text{P\&L} \approx \frac{1}{2} \gamma \cdot (\sigma_{realized}^2 - \sigma_{implied}^2) \cdot (S)^2 \cdot t$$
 
 where $\gamma$ (gamma) is the curvature of the option price (the rate of change of delta with respect to the underlying price), $\sigma_{realized}$ is the actual volatility of the underlying asset that occurs, $\sigma_{implied}$ is the volatility implied by the option's market price, $S$ is the underlying asset price, and $t$ is time. This formula reveals that a market maker profits when realized volatility exceeds implied volatility (the market maker has sold overpriced options) and loses when realized volatility is lower than implied volatility (they have sold underpriced options).
 

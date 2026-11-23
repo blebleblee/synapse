@@ -230,7 +230,7 @@ Subgroup attacks exploit weak parameter choices. In Diffie-Hellman over $\mathbb
 
 NFAs with $\epsilon$-transitions require careful computation of $\epsilon$-closures. Missing transitive closure (failing to iterate until convergence) leads to incorrect acceptance. In implementations, represent $\epsilon$-closures using worklists or union-find structures for efficiency.
 
-Regular expression anchors (start $\hat{}$, end $\$$) and lookaheads require augmenting automata with boundary conditions. Multiline modes interpret $\hat{}$ and $\$$ as line boundaries, complicating the state machine. Efficient implementations use DFA simulation with boundary checks at designated states.
+Regular expression anchors (start `^`, end `$`) and lookaheads require augmenting automata with boundary conditions. Multiline modes interpret `^` and `$` as line boundaries, complicating the state machine. Efficient implementations use DFA simulation with boundary checks at designated states.
 
 Unicode support in regular expressions introduces variable-length encodings (UTF-8) and large character classes. Naively encoding each Unicode codepoint as a separate alphabet symbol explodes state space. Techniques include encoding by byte sequences, using range-based transitions, or employing layered automata (byte-level DFA feeding a codepoint-level NFA).
 

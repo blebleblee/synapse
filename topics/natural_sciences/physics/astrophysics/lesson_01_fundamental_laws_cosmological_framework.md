@@ -70,7 +70,7 @@ where $\Omega_k = -kc^2/(a^2 H^2)$ represents curvature. Current observations fr
 
 Cosmological redshift arises not from Doppler motion through space but from the expansion of space itself. A photon emitted at cosmic time $t_e$ with wavelength $\lambda_e$ travels through expanding space and is observed at time $t_0$ with wavelength $\lambda_0$. The ratio of wavelengths equals the ratio of scale factors:
 
-$$1 + z = \frac{\lambda_0}}{\lambda_e} = \frac{a(t_0)}{a(t_e)}$$
+$$1 + z = \frac{\lambda_0}{\lambda_e} = \frac{a(t_0)}{a(t_e)}$$
 
 where $z$ is the redshift parameter. For nearby objects where $(t_0 - t_e)$ is small, Taylor expansion gives $z \approx H_0 d/c$ (Hubble's law), but for distant objects the relationship between redshift and distance becomes nonlinear and depends on the full expansion history $a(t)$.
 

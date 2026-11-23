@@ -35,6 +35,7 @@ try {
 // so this validates what learners actually see.
 const { sanitizeAndRepairMermaid } = await import(path.resolve(WORKSPACE_ROOT, 'app/frontend/src/utils/mermaidRepair.ts'));
 const { transformOutsideCode, findInlineMath } = await import(path.resolve(WORKSPACE_ROOT, 'app/frontend/src/utils/mathSpans.ts'));
+const { KATEX_MACROS } = await import(path.resolve(WORKSPACE_ROOT, 'app/frontend/src/utils/katexMacros.ts'));
 
 // 2. Load Rendering Engines from Frontend node_modules
 let marked, katex, mermaid;
@@ -103,7 +104,7 @@ export async function validateFile(filePath) {
     const math = match[1].trim();
     if (!math) continue;
     try {
-      katex.renderToString(math, { displayMode: true, throwOnError: true, strict: 'ignore', trust: true });
+      katex.renderToString(math, { displayMode: true, throwOnError: true, strict: 'ignore', trust: true, macros: { ...KATEX_MACROS } });
     } catch (err) {
       errors.push({
         type: 'KATEX_MATH_ERROR',
@@ -116,7 +117,7 @@ export async function validateFile(filePath) {
   for (const math of findInlineMath(contentNoCode)) {
     mathCount++;
     try {
-      katex.renderToString(math, { displayMode: false, throwOnError: true, strict: 'ignore', trust: true });
+      katex.renderToString(math, { displayMode: false, throwOnError: true, strict: 'ignore', trust: true, macros: { ...KATEX_MACROS } });
     } catch (err) {
       errors.push({
         type: 'KATEX_MATH_ERROR',

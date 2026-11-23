@@ -48,7 +48,6 @@ $$\alpha_A : F(A) \to G(A)$$
 
 called the **component** of $\alpha$ at $A$, subject to the **naturality condition**: for every morphism $f : A \to B$ in $\mathcal{C}$, the following square commutes:
 
-$$\require{AMScd}$$
 
 $$\begin{array}{ccc} F(A) & \xrightarrow{\alpha_A} & G(A) \\ {\scriptstyle F(f)}\downarrow & & \downarrow{\scriptstyle G(f)} \\ F(B) & \xrightarrow{\alpha_B} & G(B) \end{array}$$
 

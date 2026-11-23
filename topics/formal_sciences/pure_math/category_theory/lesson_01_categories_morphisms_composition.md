@@ -80,7 +80,7 @@ The associativity axiom states that the two paths from $A$ to $D$ — composing 
 
 **Commutative Diagrams.** The working language of category theory is the commutative diagram. A diagram of objects and morphisms in $\mathcal{C}$ is said to *commute* if every pair of directed paths between the same two objects yields the same composite morphism. The square
 
-$$\require{AMScd} \begin{CD} A @>{f}>> B \\ @V{h}VV @V{k}VV \\ C @>{g}>> D \end{CD}$$
+$$\begin{CD} A @>{f}>> B \\ @V{h}VV @V{k}VV \\ C @>{g}>> D \end{CD}$$
 
 commutes if and only if $k \circ f = g \circ h$. The categorical proof style consists almost entirely of constructing and verifying commutative diagrams, and proficiency in this style is the central practical skill the working mathematician must develop.
 

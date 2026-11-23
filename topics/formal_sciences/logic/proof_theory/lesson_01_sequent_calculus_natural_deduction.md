@@ -96,7 +96,7 @@ The Curry-Howard correspondence establishes a three-way isomorphism between intu
 
 The normalization process eliminates detours: subproofs where an introduction rule is immediately followed by an elimination rule for the same connective. For implication, a $\beta$-redex arises when we apply $\to\text{-elim}$ to a proof constructed by $\to\text{-intro}$:
 
-$$\frac{\displaystyle\frac{\vdots}{\Gamma, A \vdash B}}{\Gamma \vdash A \to B} \to\text{-intro}^{[A]} \qquad \frac{\vdots}{\Gamma \vdash A}}{\Gamma \vdash B} \to\text{-elim}$$
+$$\frac{\displaystyle\frac{\vdots}{\Gamma, A \vdash B}}{\Gamma \vdash A \to B} \to\text{-intro}^{[A]} \qquad \frac{\Gamma \vdash A \to B \qquad \Gamma \vdash A}{\Gamma \vdash B} \to\text{-elim}$$
 
 Normalization replaces this with a direct derivation of $\Gamma \vdash B$ by substituting the proof of $A$ for the discharged hypothesis in the derivation of $B$. This operation is precisely $\beta$-reduction in the lambda calculus: $(\lambda x. M) N \to_\beta M[N/x]$. The strong normalization theorem for intuitionistic propositional logic asserts that every reduction sequence terminates in a unique normal form, corresponding to the fact that every typed lambda term has a unique normal form under $\beta$-reduction. This property is the logical foundation of type safety in functional programming languages.
 

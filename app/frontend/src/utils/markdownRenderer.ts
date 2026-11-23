@@ -1,6 +1,7 @@
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import katex from 'katex';
+import { KATEX_MACROS } from './katexMacros';
 import 'katex/dist/katex.min.css';
 import 'katex/dist/contrib/mhchem.mjs';
 import { synthesizeTerminalCommand } from './commandSynthesizer';
@@ -66,8 +67,8 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string, enableMath
     if (enableMath) {
       prose = replaceMath(
         prose,
-        (math) => `<div class="katex-display">${katex.renderToString(math, { displayMode: true, throwOnError: false, trust: true })}</div>`,
-        (math) => katex.renderToString(math, { displayMode: false, throwOnError: false, trust: true }),
+        (math) => `<div class="katex-display">${katex.renderToString(math, { displayMode: true, throwOnError: false, trust: true, macros: { ...KATEX_MACROS } })}</div>`,
+        (math) => katex.renderToString(math, { displayMode: false, throwOnError: false, trust: true, macros: { ...KATEX_MACROS } }),
       );
     }
     return prose.replace(/<(?=\d)/g, '&lt;');

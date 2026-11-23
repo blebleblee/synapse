@@ -70,7 +70,7 @@ A feedwater pump compresses liquid from condenser pressure to boiler pressure th
 
 Rankine cycle efficiency is expressed as:
 
-$$\eta_{\text{Rankine}} = \frac{W_{\text{turbine}} - W_{\text{pump}}{Q_{\text{in}}} = \frac{(h_3 - h_4) - (h_2 - h_1)}{h_3 - h_2}$$
+$$\eta_{\text{Rankine}} = \frac{W_{\text{turbine}} - W_{\text{pump}}}{Q_{\text{in}}} = \frac{(h_3 - h_4) - (h_2 - h_1)}{h_3 - h_2}$$
 
 where subscripts denote states: 1 (condenser exit), 2 (pump exit/boiler inlet), 3 (boiler exit/turbine inlet), 4 (turbine exit/condenser inlet), and $h$ represents specific enthalpy.
 

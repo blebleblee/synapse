@@ -100,7 +100,7 @@ For the helium atom with Hamiltonian $\hat{H} = -(\hbar^2/2m)(\nabla_1^2 + \nabl
 
 $$\psi_{\text{trial}}(\vec{r}_1, \vec{r}_2) = \frac{Z_{\text{eff}}^3}{\pi a_0^3}\exp\left[-\frac{Z_{\text{eff}}(r_1 + r_2)}{a_0}\right]$$
 
-Evaluating the energy functional yields kinetic energy contributions $(Z_{\text{eff}}^2)(13.6\text{ eV})$ per electron, nuclear attraction $-2Z_{\text{eff}}(2)(13.6\text{ eV})$, and electron-electron repulsion $(5Z_{\text{eff}/8)(13.6\text{ eV})$. Minimizing $E(Z_{\text{eff}})$ with respect to $Z_{\text{eff}}$ gives $Z_{\text{eff}} = 27/16 = 1.6875$. The resulting energy $E_{\text{var}} = -77.5$ eV compares favorably with the experimental value $E_{\text{exp}} = -79.0$ eV, achieving 98% accuracy with a one-parameter trial function. The optimal $Z_{\text{eff}}$ less than $Z = 2$ reflects electron screening: each electron partially shields the nuclear charge from the other.
+Evaluating the energy functional yields kinetic energy contributions $(Z_{\text{eff}}^2)(13.6\text{ eV})$ per electron, nuclear attraction $-2Z_{\text{eff}}(2)(13.6\text{ eV})$, and electron-electron repulsion $(5Z_{\text{eff}}/8)(13.6\text{ eV})$. Minimizing $E(Z_{\text{eff}})$ with respect to $Z_{\text{eff}}$ gives $Z_{\text{eff}} = 27/16 = 1.6875$. The resulting energy $E_{\text{var}} = -77.5$ eV compares favorably with the experimental value $E_{\text{exp}} = -79.0$ eV, achieving 98% accuracy with a one-parameter trial function. The optimal $Z_{\text{eff}}$ less than $Z = 2$ reflects electron screening: each electron partially shields the nuclear charge from the other.
 
 **Experimental Protocol: Quantum Monte Carlo Validation**
 
