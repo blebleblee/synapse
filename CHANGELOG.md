@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-11-23
+
 ### Security
 - **A lesson snippet can no longer run itself on your computer.** "Send to terminal" types into the Host Shell as a paste you review; a code block from an imported pack could end that paste early and run the rest. Control characters are now removed.
 - **Uninstalling a pack can no longer delete the whole curriculum** (an empty or "." name used to remove every course).
@@ -16,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **"▶ Run" buttons on code blocks are now "⇥ Send to terminal"**: there is no reliable way to tell a runnable snippet from an illustration, and on Host Shell the command is only typed in.
 - **Visual arts, design and 3D courses get their own blueprint** when generated (they used the music one, so labs became music-production exercises).
+- **15 arts courses (3D, design, visual arts and media) no longer carry music-production labs** that the old blueprint had put there; they have no labs until new ones are generated. The sketching, graphic design and photography labs were real visual exercises and stay.
 
 ### Fixed
 - **Regenerate never empties a course.** It deleted the lessons and your chat sessions before writing new ones, so a failed model call or Stop left the course empty. Old lessons are now replaced only when every new file succeeds, and Stop really stops the server.

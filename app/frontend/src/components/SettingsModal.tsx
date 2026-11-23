@@ -446,7 +446,7 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
           </nav>
 
           <div className="settings-sidebar-footer">
-            <div className="sidebar-app-badge">Synapse v1.3.0</div>
+            <div className="sidebar-app-badge">Synapse v1.3.1</div>
           </div>
         </div>
 
