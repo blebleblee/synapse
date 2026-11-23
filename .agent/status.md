@@ -77,7 +77,7 @@ Commits (all pushed to `gitea/main`; CI #49–#56 green, #57+ queued at handoff 
 - `04a85ad` (CI #107): owner: the field guide and the course summary are leftovers of an earlier design. Both features removed (UI items, `/api/artifacts/compile`, `/api/summary/regenerate`, `learning_engine/summary.py`, SUMMARY.md in the topic payload and handbook). Privacy guards kept for old copies on disk. Earlier batch work on them (`8041726`, `5285157`) is superseded.
 - Owner: Run buttons make sense only on runnable code, which cannot be told reliably, so rename. Done: "⇥ Send to terminal" (+ wrapper in brackets); behaviour unchanged.
 - Owner (FIND-49): the 18 music-exercise labs are valid content but belong in the private addons repo as a "songs" topic, excluded from the public courses. NEEDS DECISION on layout (see backlog) before moving.
-- CHANGELOG `[Unreleased]` lists only the removal; the fixes since v1.3.0 (FIND-52..57) still need entries before the next release.
+- `becebff`: CHANGELOG `[Unreleased]` now covers everything since v1.3.0 (ready for a v1.3.1 if the owner wants one; GitHub push/release needs approval).
 
 ### Batch 12 (2026-11-23, 07:38–08:05): privacy, summary, terminal
 
