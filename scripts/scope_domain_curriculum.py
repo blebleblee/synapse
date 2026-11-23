@@ -11,7 +11,6 @@ import re
 import json
 import time
 import argparse
-import subprocess
 import threading
 from pathlib import Path
 from queue import Queue
@@ -282,19 +281,13 @@ Output valid JSON only in this exact schema:
     blueprint_path.write_text("\n".join(master_lines), encoding="utf-8")
     print(f"[✔] Master Blueprint successfully written!")
 
-    # Auto commit and push to git if in synapse-addons repo
-    try:
-        repo_dir = domain_dir.parent.parent
-        if (repo_dir / ".git").exists():
-            print(f"[*] Committing and pushing blueprints to git in {repo_dir}...")
-            subprocess.run(["git", "add", "topics/"], cwd=str(repo_dir), check=True, capture_output=True)
-            subprocess.run(["git", "commit", "-m", f"docs({args.domain}): complete full set of TOPIC_OUTLINE.md blueprints"], cwd=str(repo_dir), check=True, capture_output=True)
-            subprocess.run(["git", "push", "origin", "main"], cwd=str(repo_dir), check=True, capture_output=True, timeout=30)
-            print(f"[✔] Successfully pushed full blueprint suite to remote git repository!")
-    except Exception as e:
-        print(f"[!] Git push note: {e}")
+    # It used to `git add topics/`, commit and push to origin from here. Run
+    # against synapse's own tree that commits onto synapse's main (private
+    # blueprints included if the ignore rules ever slip). Committing is the
+    # maintainer's job: review and stage explicit paths yourself.
+    print("[*] Review the outlines, then commit them yourself (explicit paths only).")
 
-    print(f"\n[✔] ALL {len(tasks)} TOPICS OUTLINED & PUSHED SUCCESSFULLY!")
+    print(f"\n[✔] ALL {len(tasks)} TOPICS OUTLINED.")
 
 if __name__ == "__main__":
     main()
