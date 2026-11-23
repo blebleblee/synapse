@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:engineering circuits active_components
+#tags column:3
+"What is the fundamental current-control mechanism of a BJT, and how does it differ from a MOSFET?",A BJT is a current-controlled current source: minority carrier injection across the thin neutral base modulates collector current via base current. A MOSFET is voltage-controlled: gate voltage electrostatically induces channel charge that modulates drain current.,engineering::active_components
+What are the bias conditions on the EBJ and CBJ that define the forward-active region of a BJT?,"Emitter-base junction (EBJ) forward-biased, collector-base junction (CBJ) reverse-biased.",engineering::active_components
+State the Shockley diode equation and the thermal voltage at room temperature.,I = I_S(e^(qV/kT) - 1); thermal voltage V_T = kT/q ≈ 26 mV at 300 K.,engineering::active_components
+By how many mV must forward bias increase to produce a tenfold increase in junction current at 300 K?,60 mV per decade of current increase.,engineering::active_components
+"What single physical truth underlies all MOSFET operating regimes (threshold voltage, saturation current, channel length modulation, body effect)?",The MOSFET is an electrostatically controlled resistor: channel conductivity is modulated by charge induced at the oxide-semiconductor interface (the MOS capacitor).,engineering::active_components
+Give the formula for oxide capacitance per unit area and its approximate value for a 5 nm SiO2 gate oxide.,"C_ox = ε_ox / t_ox, where ε_ox ≈ 3.9ε_0 for SiO2. For t_ox = 5 nm, C_ox ≈ 6.9 fF/μm².",engineering::active_components
+"What surface potential condition defines strong inversion in a MOS capacitor, and what is the formula for the Fermi potential φ_F?","Strong inversion occurs when φ_s = 2φ_F, where φ_F = (kT/q) ln(N_A / n_i).",engineering::active_components
+Derive the small-signal transconductance g_m for a BJT in forward-active mode starting from I_C = I_S e^(V_BE/V_T).,"g_m = ∂I_C/∂V_BE = I_C / V_T — transconductance depends only on DC bias current, not signal excursion.",engineering::active_components
+"What is the MOSFET square-law transconductance formula in saturation, and what does it scale with?",g_m = μ_n C_ox (W/L)(V_GS − V_th); it scales proportionally with gate overdrive voltage.,engineering::active_components
+"What physical effect does the finite output resistance r_o of a transistor model, in both BJTs and FETs?","It models the Early effect in BJTs and channel-length modulation in FETs — a finite slope in output I-V characteristics instead of an ideal flat current source, caused by output voltage modulating the effective base/channel width or length.",engineering::active_components
+State the three ideal axioms of an op-amp and the two operating rules derived from them under negative feedback.,"Axioms: infinite open-loop gain, infinite input impedance, zero output impedance. Operating rules under negative feedback: (1) Virtual short — V+ = V− ; (2) No input current — I_in = 0.",engineering::active_components
+Derive the closed-loop gain of an inverting op-amp amplifier with input resistor R1 and feedback resistor RF.,"Using virtual ground (V− = 0) and KCL: V_in/R1 + V_out/RF = 0, giving A_CL = −RF/R1 — gain set entirely by resistor ratio, independent of A_OL.",engineering::active_components

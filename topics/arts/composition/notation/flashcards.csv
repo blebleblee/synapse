@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:arts composition notation
+#tags column:3
+What two axes does standard music notation map pitch and time onto?,Vertical position on the staff = pitch (frequency); horizontal position = time.,arts::notation
+"What note does the treble clef (G-clef) anchor, and where?",G4 — the clef's spiral center curls around the 2nd line from the bottom of the staff.,arts::notation
+"What note does the bass clef (F-clef) anchor, and where?",F3 — the two dots of the clef straddle the 4th line from the bottom of the staff.,arts::notation
+Where does Middle C (C4) sit relative to the treble and bass staves?,"On a ledger line: the 1st ledger line below the treble staff, which is the same pitch as the 1st ledger line above the bass staff — the hinge connecting both hands on the grand staff.",arts::notation
+Why is 'letter-counting' from a known note considered a beginner mistake in sight-reading?,"It's too slow for performance tempo; trained readers recognize staff positions as shapes/intervals relative to memorized anchor notes, not by counting line-space-line-space.",arts::notation
+"What do the treble clef space names spell, bottom to top?","FACE (F4, A4, C5, E5).",arts::notation
+"What mnemonic is used for the treble clef line names bottom to top, and what are they?","""Good Boys Do Fine Always"" — E4, G4, B4, D5, F5.",arts::notation
+What is the core rule for how beaming eighth notes conveys metric information?,"Beams show subdivision structure, not decoration: in 4/4 eighths beam in groups of 2 (marking the beat); in 6/8 they beam in groups of 3 (marking the compound beat). Oddly-beamed notes signal an irregular beat structure.",arts::notation
+What is the practical rule for choosing a clef for an instrument's part?,"Choose the clef that centers the instrument's working range on the staff with the fewest ledger lines, since ledger lines are where sight-reading errors occur (e.g., cello switches to tenor clef in high/thumb position to avoid 4+ ledger lines above bass clef).",arts::notation
+"What does transposing a melody up a perfect fifth mean spatially on the staff, and what else must be adjusted?","Shift every notehead up 4 staff positions and adjust the key signature accordingly — it's a spatial/fingering shift, not a frequency calculation.",arts::notation
+What is the relationship between keys a fifth apart on the circle of fifths?,"They differ by exactly one accidental (e.g., C major has none, G major has one sharp, F major has one flat) — this is the mechanical backbone of modulation and transposition.",arts::notation
+What is the single governing rule for whether a notation choice is 'correct' according to the Advanced Notational Techniques lesson?,"A trained performer must be able to look at the symbol once and know exactly what to do with their hands, at tempo, without re-reading it; if it forces a second look, simplify it or add a legend.",arts::notation

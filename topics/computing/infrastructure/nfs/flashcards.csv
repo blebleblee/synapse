@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:computing infrastructure nfs
+#tags column:3
+What founding invariant did NFSv2 embrace regarding server-side client context?,Complete statelessness—the server maintains zero per-client context; every request is a self-contained transaction carrying a file handle and all parameters needed for atomic execution.,computing::nfs
+Why does complete statelessness in NFSv2 prevent byte-range locking and write deferral optimizations?,"Because the server never tracks which files clients have opened, it cannot coordinate exclusive access or safely delay writes for disk scheduling optimization.",computing::nfs
+What three components does the default Linux nfsd file handle encoding pack together?,"A filesystem UUID, an inode number, and a generation counter.",computing::nfs
+Why does the inode generation counter matter for file handle correctness after deletion/recreation?,"When a file is deleted and a new file reuses the same inode number, the generation counter increments, so stale handles trigger NFS3ERR_STALE instead of silently accessing the wrong data.",computing::nfs
+What are the three NFSv4 filehandle types and their validity guarantees?,"Persistent (must remain valid across server restarts), volatile (may become invalid, flagged accordingly), and anonymous (used only for initial PUTROOTFH/PUTPUBFH operations).",computing::nfs
+Why do most production NFS servers advertise persistent filehandles rather than volatile ones?,"Because volatile handles would require clients to re-traverse the entire directory tree after a server reboot, which is operationally catastrophic at scale.",computing::nfs
+What is the NFS client file handle opacity invariant?,"The client neither parses nor constructs file handles; it only stores and caches them, treating them as opaque tokens minted entirely by the server.",computing::nfs
+"What consistency model does NFS implement for caching, and what does it guarantee?",Close-to-open consistency: changes made by one client become visible to another when files are explicitly closed and reopened; no guarantee exists for concurrent readers observing writes before synchronization boundaries.,computing::nfs
+What three distinct layers does NFS client-side caching operate across?,"Data blocks (page cache), metadata attributes (attribute cache), and directory entries (DNLC - Directory Name Lookup Cache).",computing::nfs
+What is the validation-on-timeout protocol for NFS cached attributes?,"When a cache timeout expires, the client issues a GETATTR RPC and compares returned mtime/ctime against cached values; a mismatch forces discarding stale cached data and refetching from the server.",computing::nfs
+What is the core security weakness of AUTH_SYS (AUTH_UNIX) authentication in NFS?,"It transmits numeric UID/GID in cleartext within RPC headers without cryptographic proof, relying entirely on network perimeter security—allowing any attacker with network access to forge arbitrary UIDs.",computing::nfs
+"How does RPCSEC_GSS (via Kerberos v5) improve on AUTH_SYS, and what does it establish?","It introduces cryptographic challenge-response authentication via a trusted KDC issuing time-limited tickets, establishing mutual authentication and enabling per-RPC integrity (MACs) or confidentiality (encryption).",computing::nfs

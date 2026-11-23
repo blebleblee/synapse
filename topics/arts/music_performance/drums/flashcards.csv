@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:arts music_performance drums
+#tags column:3
+"In drumming, what is the fundamental principle governing rebound control?","Drumming is energy transfer, not muscle force — the head stores kinetic energy on impact and releases it back into the stick; grip should be loose enough to let rebound happen but firm enough to redirect it.",arts::drums
+What happens when a drummer uses a choked (too tight) grip on impact?,"The grip absorbs the returning energy in the fingers instead of letting it re-launch the stick, producing a 'dead' stop at the head instead of rebound.",arts::drums
+"In matched grip, which two fingers form the fulcrum, and what is their job?","Thumb and index finger pad form the fulcrum; they do the steering of the stick, while middle, ring, and pinky close gently to catch the rebound and reopen to let it fly.",arts::drums
+Where should the fulcrum be positioned relative to the stick's balance point?,"Forward of the balance point, toward the tip — approximately 1.5 inches (about four finger-widths) forward of the balance mark.",arts::drums
+Approximately how far from the butt end does a drumstick's natural balance point fall on a standard 5A/5B stick?,"About 5–7 cm (2–3 inches) from the butt end, or roughly 40–45% up from the butt end.",arts::drums
+What is the approximate tempo threshold above which wrist motion alone can no longer keep up with 16th-note rebound control?,"Roughly 140 BPM (140–160 BPM) of 16th notes — above this, fingers must take over rebound control or the hands will lock up.",arts::drums
+"In the 'kinetic chain' model of drumming, what distinct role does each of forearm, wrist, and fingers play?","Forearm: gross positioning/power for accents (rotation). Wrist: primary engine for strokes below ~140 BPM sixteenths (flexion/extension, like a loose hinge). Fingers: fine control, catching rebound, adding late 'whip' speed, and executing doubles/buzz strokes.",arts::drums
+"Using the 'transmission' analogy, what are the wrist and fingers each compared to, and what is the consequence of relying on only one?","Wrist = engine, fingers = clutch and throttle. Wrist-only playing hits a speed ceiling around 140–160 BPM sixteenths; finger-only playing has no power behind it.",arts::drums
+Approximately what percentage of impact velocity does a well-tuned drumhead return to the stick as rebound?,60–80% of the impact velocity is returned as rebound.,arts::drums
+How does stroke volume relate to impact velocity in drumming physics?,"Stroke volume tracks impact velocity, but acoustic energy scales roughly with the square of velocity — doubling stick speed roughly quadruples the acoustic energy.",arts::drums
+What is the practical target grip pressure for the thumb-index fulcrum when gripping a stick (if measured on a scale)?,"Roughly half a pound, about 220–250 grams, measured with thumb and index only.",arts::drums
+"Why is mentally subdividing the beat down to the 16th-note (or finer) grid important for a drummer, even when playing quarter notes?","It lets the drummer place ghost notes, flams, and syncopations exactly where they belong rather than approximating them — this constant internal subdivision is what makes playing feel 'locked in'.",arts::drums

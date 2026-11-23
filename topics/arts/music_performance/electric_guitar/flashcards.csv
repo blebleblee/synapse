@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:arts music_performance electric_guitar
+#tags column:3
+"In standard tuning, what is the interval between adjacent strings, and where does the exception occur?","A perfect fourth (5 semitones) between each adjacent string pair, except between the G (3rd) and B (2nd) strings, which is a major third (4 semitones).",arts::electric_guitar
+Why does the G-to-B string transition matter so much for fretboard shapes?,"It's the single asymmetry in standard tuning's otherwise uniform fourths-based layout; it causes every scale shape, chord voicing, and CAGED pattern to 'bend' or shift by one fret when crossing that string boundary.",arts::electric_guitar
+What is correct fret-hand thumb placement for the electric guitar?,"Behind the neck, roughly opposite the middle finger, centered on the back of the neck profile — never hooked over the top.",arts::electric_guitar
+What does it mean if your palm touches the back of the guitar neck while fretting?,"The wrist has collapsed, compromising reach — the wrist should float slightly away from the neck.",arts::electric_guitar
+Where exactly should you press a string when fretting a note?,Just behind the fret wire (on the nut side) — never directly on top of the fret and never floating between two frets.,arts::electric_guitar
+What is the memory sentence for the six guitar string names (low to high)?,"Eddie Ate Dynamite, Good Bye Eddie → E (low), A, D, G, B, E (high).",arts::electric_guitar
+"What causes 'string hopping' in alternate picking, and what speed ceiling does it impose?","The pick escapes in the same direction after both the downstroke and upstroke, creating an inefficient double-bounce motion that caps speed around 130–140 BPM 16th notes.",arts::electric_guitar
+What is the difference between Downward Pick Slanting (DPS) and Upward Pick Slanting (UPS)?,DPS: upstrokes naturally escape above the string plane (downstrokes stay low). UPS: downstrokes escape upward instead. Two-Way Pick Slanting (TWPS) uses forearm rotation to switch between both as needed.,arts::electric_guitar
+How does 'edge picking' (rotating the pick 20–30°) affect tone?,"It creates a smoother string displacement curve, producing a warmer tone and easier release, compared to a perpendicular pick attack which is brighter and harmonically denser.",arts::electric_guitar
+"What are the scale degrees of the minor and major pentatonic scales, and what interval do they both deliberately omit?","Minor pentatonic: 1, ♭3, 4, 5, ♭7. Major pentatonic: 1, 2, 3, 5, 6. Both omit the notes that would form a tritone (the 4th-to-7th degree interval in the full major scale), making the scale broadly consonant over many chords.",arts::electric_guitar
+What is the 'relative duality' between A minor pentatonic and C major pentatonic?,"They contain the exact same five notes (A-C-D-E-G); only the perceived tonal center differs (a minor third apart), so one fingering shape serves both scales.",arts::electric_guitar
+"What is the most common technical error when playing an E-shape barre chord, and its fix?",The barre collapses at the B string because players press with the fleshy pad of the index finger instead of using firm pressure along the edge/side of the finger closer to the bone.,arts::electric_guitar

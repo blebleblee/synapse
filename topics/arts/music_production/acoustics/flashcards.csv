@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:arts music_production acoustics
+#tags column:3
+"Why does a sine wave sound like ""pure pitch"" with no color?",It contains only the fundamental frequency with no harmonics/overtones to add timbral color.,arts::acoustics
+"What harmonics does a square wave contain, and what does this produce sonically?","Only odd harmonics (1st, 3rd, 5th...) with moderate rolloff (1/n), producing a hollow, woody, clarinet-like character.",arts::acoustics
+"What distinguishes a sawtooth wave's harmonic content from a square wave's, and why does it sound denser/brighter?","A sawtooth stacks ALL harmonics (odd and even) at full strength with slow rolloff (1/n), vs square's odd-only harmonics — giving it a denser, brighter character.",arts::acoustics
+"What is the key difference between the power-ratio dB formula and the amplitude-ratio dB formula, and why does the factor differ (10 vs 20)?","Power: dB = 10log10(P/P0); Amplitude/voltage: dB = 20log10(V/V0). The factor doubles because power ∝ amplitude², and squaring a ratio doubles its log value.",arts::acoustics
+"When you move a fader or read a peak level meter, are you working in the 10-log or 20-log dB world?","The 20-log (amplitude/voltage) world — fader moves and peak levels are voltage ratios, not power ratios.",arts::acoustics
+How many dB increase in SPL is perceived as roughly a doubling of loudness?,+10 dB (power) — the empirical basis of the phon/sone loudness scale.,arts::acoustics
+"What amplitude ratio corresponds to a +6 dB change, and what does this mean in practice?","×2 amplitude ratio — it represents doubling a fader's voltage swing, perceived as noticeably louder.",arts::acoustics
+"What is RT60, and what does Sabine's equation (T60 = 0.161V / Sα) tell you practically about absorption?","RT60 is the time for sound pressure to drop 60 dB after the source stops. Practically: double the absorption on your walls, and you halve the reverb time.",arts::acoustics
+"What causes room modes, and where is the best placement for bass traps to address them?","Room modes are standing waves where sound resonates like a closed pipe because the wavelength fits an integer number of times between opposing walls. Bass traps belong in corners, where all three axial modes reinforce.",arts::acoustics
+Why do pressure mics (omnidirectional) exhibit no proximity effect?,Omnis have a sealed/minimally-vented back and respond to absolute air pressure from any direction — there's no rear entry path for phase/path-length differences to create a bass boost as the source gets close.,arts::acoustics
+What physically creates a cardioid or figure-eight polar pattern in a pressure-gradient microphone?,"Sound reaches the diaphragm from both front and rear through a path that's acoustically delayed on one side; where the delayed rear path cancels the front path you get a null, and where it reinforces you get the lobe. The polar pattern is a map of phase cancellation geometry, not a mode switch.",arts::acoustics
+"Why does bass ""get everywhere"" while treble is directional and easily blocked?","Because of wavelength: λ = speed of sound / frequency. Long bass wavelengths (e.g., ~3.4 m at 100 Hz) bend around obstacles and build up in corners, while short treble wavelengths (e.g., ~3.4 cm at 10 kHz) reflect like light off a mirror.",arts::acoustics

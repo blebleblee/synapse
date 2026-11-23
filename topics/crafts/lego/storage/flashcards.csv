@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:crafts lego storage
+#tags column:3
+What is the standard LEGO stud pitch (horizontal grid unit)?,"8 mm center-to-center, the foundational horizontal invariant governing all System element dimensions.",crafts::storage
+"What is the height of one standard LEGO plate, and how does it relate to a full brick's height?","One plate = 3.2 mm tall; a standard brick = 9.6 mm tall (3 plates), yielding the 3:1 plate-to-brick ratio that makes SNOT geometry possible.",crafts::storage
+What are the four fundamental LEGO connectivity classes?,"1) Stud-to-anti-stud press-fit, 2) Axle connections (5mm square-profile shafts), 3) Pin connections (3.18mm cylindrical Technic pins), 4) Ball-and-socket joints (e.g., Mixel ball).",crafts::storage
+Why is the axle connection system classified as dimensionally separate from the stud-based System grid?,"Axles use a 5mm diameter square-profile hole system independent of the 8mm stud pitch, making them a distinct dimensional family that doesn't directly co-stack with stud geometry.",crafts::storage
+What is 'dimensional resonance' in container architecture?,"The invariant that a storage container's interior cavity should be a whole-number multiple of the 8mm stud pitch in every axis, ensuring clean integration with stored bricks.",crafts::storage
+What tolerance clearance is recommended when designing a tightly fitted channel for a 2x4 plate (15.8mm actual width)?,"A nominal 0.1 mm clearance per side, fitting within a 16mm (two stud pitch) channel.",crafts::storage
+What is 'gravity coherence' as a container architecture invariant?,"The requirement that a storage system bear full collection weight (a loaded tray can exceed 500g) without deflection causing part migration, loosening connections, or base cracking — load distribution must be designed bottom-up.",crafts::storage
+What is 'modular composability' in storage system design?,"The invariant that every container must inter-operate with every other container via consistent external geometry, predictable stacking interfaces, and a labeling scheme that survives reorganization.",crafts::storage
+"In display framework construction, why must shelf depths and divider spacing be tuned to multiples of 8mm?","To honor dimensional determinism, allowing models to be rearranged and restocked with zero interference fitting; ignoring this causes models to overhang or clash by small margins (e.g., 6mm).",crafts::storage
+"What three combined loading conditions does a shelved Lego model experience, and what is the key display framework rule?","Gravitational compression, bending moment at cantilevers, and lateral shear. The rule: never point-load a model at a single connection stud — fully support baseplates across their area.",crafts::storage
+What is the first invariant of LEGO inventory granularity?,"The minimum trackable unit must be the part-color pair (not individual elements), since identical geometry with different color IDs represents distinct inventory entities; bulk elements are tracked at batch level.",crafts::storage
+What are 'phantom inventory' and 'orphaned elements' in LEGO inventory tracking?,Phantom inventory = database records claiming elements that no longer physically exist. Orphaned elements = physical pieces with no corresponding catalog entry.,crafts::storage

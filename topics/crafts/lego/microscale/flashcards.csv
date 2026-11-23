@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:crafts lego microscale
+#tags column:3
+What stud dimension range typically defines microscale Lego construction?,Approximately 8 to 30 studs in any primary dimension for a complete assembly.,crafts::microscale
+At what scale ratios does microscale Lego construction typically operate?,Roughly 1:200 down to 1:500 or beyond.,crafts::microscale
+What is the fundamental cognitive shift required to build effectively at microscale?,"The builder must see through individual parts to the aggregate volumetric impression they create, rather than mapping parts one-to-one to real objects.",crafts::microscale
+What is the core invariant governing all microscale work regarding proportion?,Preservation of recognizable proportion despite radical reduction in geometric fidelity—communicating architectural identity through massing and silhouette rather than literal detail replication.,crafts::microscale
+How does real-world dimension per stud change between 1:200 and 1:500 scale?,"At 1:200, one stud ≈ 1.6 meters of real space; at 1:500, one stud ≈ 4 meters, since the stud is 8mm on center (7.8mm pitch).",crafts::microscale
+"At 1:500 scale, how must a standard 2-meter doorway be represented, and why?","Through color contrast or negative space rather than literal void geometry, because the doorway compresses to only two-fifths of a stud width—sub-stud scale and unrepresentable as physical geometry.",crafts::microscale
+What three hierarchical visual cues does the human visual system rely on for recognition at distance/reduced scale?,"Overall silhouette geometry, proportional relationships between major volumes, and high-contrast boundaries between forms.",crafts::microscale
+"In microscale building, how does the priority of surface detail vs. compositional density invert compared to minifigure-scale building?","Minifigure-scale prioritizes surface detail, texture, and ornament; microscale demands compositional density—strategic layering of primitives for volumetric mass and silhouette recognition before any surface detail.",crafts::microscale
+What is the core dimensional invariant (the 5:2 relationship) in LEGO plate-to-stud geometry?,Five standard plates equal precisely two LEGO studs in height.,crafts::microscale
+What is 'dimensional anisotropy' in the context of LEGO microscale building?,"The directional dependence of resolution—horizontal resolution (measured in studs) operates at a fundamentally different granularity than vertical resolution (measured in plates), unlike a uniform digital pixel grid.",crafts::microscale
+How are smooth curves and diagonal slopes represented in LEGO microscale geometry?,"Through discrete stepping functions, since LEGO's quantized geometry cannot natively produce smooth curves; offsets are approximated via half-plate adjustments, jumper plates, or bracket elements.",crafts::microscale
+What question distinguishes a builder with internalized 'silhouette thinking' from a less advanced microscale builder?,"Instead of asking 'how can I represent this window?', they ask 'does this volume read correctly as the intended shape?'—prioritizing overall form recognition over literal feature replication.",crafts::microscale

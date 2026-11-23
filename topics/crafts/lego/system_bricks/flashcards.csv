@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:crafts lego system_bricks
+#tags column:3
+"What is the exact standard stud pitch (center-to-center spacing) in the Lego System grid, and in which axes does it apply?","8 mm, applied uniformly in both the X and Y horizontal axes.",crafts::system_bricks
+"What is the height of a standard System brick, and how is it measured?","9.6 mm, measured from the bottom of the brick's wall to the top of its stud.",crafts::system_bricks
+"What is the plate-to-brick height ratio, and why is this invariant critical?","3:1 — three stacked plates (3.2 mm each) always equal exactly one brick (9.6 mm) in height, enabling vertical alignment between plate-based and brick-based columns.",crafts::system_bricks
+Why does the stud itself add no height to a stacked column of bricks/plates?,"Because the stud inserts into the tube or anti-stud cavity of the element above, disappearing into the coupling geometry rather than contributing to stack height.",crafts::system_bricks
+What mechanical phenomenon produces 'clutch power' in a Lego stud-tube connection?,"Elastic interference fit: the tapered 4.8mm stud presses into the tube cavity, deforming the tube walls outward by a few hundredths of a millimeter; ABS's elastic recovery generates radial clamping force.",crafts::system_bricks
+What is the approximate friction coefficient between two clean ABS surfaces in a Lego joint?,Approximately 0.4 to 0.5.,crafts::system_bricks
+Compare the approximate pull-apart (tensile) strength versus shear strength of a single new stud-tube joint.,"Tensile (pull-apart): ~2–3 newtons. Shear (sliding): ~5–10 newtons — shear is substantially stronger because the tube wall engages the stud along its full 1.7mm height, creating broader contact area and mechanical interlock.",crafts::system_bricks
+What is the key structural design implication of the shear-vs-tensile strength asymmetry in Lego joints?,"Builders must arrange elements so anticipated loads (wind, bumping, lateral pressure) act through the strong shear axis rather than the weak tensile/peel axis (lifting, bending, cantilever tipping).",crafts::system_bricks
+Where do Lego structural failures actually occur — within the ABS plastic or at the joints?,"At the interfaces between elements (studs peeling, tubes slipping, shear planes delaminating) — never within the ABS material itself, which can withstand extraordinary compressive loads (400+ kg for a single 2×2 brick).",crafts::system_bricks
+"What is the first structural invariant of System building regarding overlap, and what happens if it's violated?",A brick must engage at least two studs on the element beneath it to form a structural joint rather than a pivot; a single-stud connection allows rotation/tipping around that one point.,crafts::system_bricks
+"What are the nominal stud outer diameter and anti-stud inner diameter values, and what interference do they create?",Stud outer diameter: 4.80 mm; anti-stud inner diameter: 4.90 mm — creating a nominal 0.05 mm per-side diametric interference that produces clutch power.,crafts::system_bricks
+"What dimensions does a standard 2×4 brick occupy in the horizontal plane, and from what invariant is this derived?","16 mm × 32 mm, derived directly from the 8 mm stud pitch invariant (2 studs × 8mm = 16mm; 4 studs × 8mm = 32mm).",crafts::system_bricks

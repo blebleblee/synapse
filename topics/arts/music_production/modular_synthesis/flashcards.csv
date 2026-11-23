@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:arts music_production modular_synthesis
+#tags column:3
+What is the 1V/Octave standard in modular synthesis?,"A control voltage standard where each 1-volt increase doubles the output frequency of a VCO, raising pitch by exactly one musical octave (linear voltage → exponential frequency).",arts::modular_synthesis
+What is the fundamental difference between audio-rate signals and control voltages (CV)?,Audio signals (~20Hz–20kHz) carry the actual waveform that becomes sound; CVs (DC to ~50Hz) modulate parameters of other modules but are never heard directly themselves.,arts::modular_synthesis
+What circuit converts linear control voltage into exponential frequency change in an analog VCO?,"An exponential converter, typically built from matched transistor pairs in a temperature-compensated configuration, which charges a timing capacitor to set oscillator frequency.",arts::modular_synthesis
+"How many millivolts correspond to one semitone under the 1V/Oct standard, and why?","Approximately 83.33 mV, because one octave (1V) divides into 12 equal semitones (1V/12) under equal-temperament tuning.",arts::modular_synthesis
+What is 'through-zero linear FM' and who pioneered it?,An oscillator architecture allowing frequency modulation to pass smoothly through 0 Hz without discontinuity; pioneered by Don Buchla as an alternative to exponential FM.,arts::modular_synthesis
+How does filter order relate to rolloff slope in a VCF?,"Each filter order (pole) adds 6 dB/octave of attenuation: a 2nd-order filter gives 12 dB/octave, a 4th-order filter gives 24 dB/octave.",arts::modular_synthesis
+"What is quality factor (Q) in a resonant filter, and what does Q = 0.707 represent?",Q is the ratio of center frequency to bandwidth; Q = 0.707 produces a maximally flat passband with no resonant peak (the Butterworth response).,arts::modular_synthesis
+"Mechanically, how does resonance arise in a voltage-controlled filter?","A portion of the filter's output is fed back into its input in correct phase alignment, causing energy to accumulate at the cutoff frequency and creating a resonant peak.",arts::modular_synthesis
+What is a Buchla-style Low-Pass Gate (LPG) and what two functions does it combine?,"An LPG combines lowpass filtering and amplitude (VCA) control in a single module, typically using a vactrol for natural, percussive decay response.",arts::modular_synthesis
+"In Eurorack, what are the standard voltage levels for gate and trigger signals?","Gates and triggers conventionally use 5V for 'high' and 0V for 'low'; gates sustain the high state for a note's duration, while triggers are brief pulses.",arts::modular_synthesis
+Why does Eurorack sample modulation signals at full audio rate (e.g. 48kHz) even for slow LFOs?,"It eliminates the architectural distinction between control-rate and audio-rate signals, letting an LFO be smoothly sped up into the audio spectrum (e.g. 0.1Hz to 100Hz) using the same circuit, unifying modulation and sound generation.",arts::modular_synthesis
+What happens if the exponential converter in a VCO/CV circuit loses thermal stability?,"It introduces pitch drift, since matched transistor pairs generating the exponential response depend on precise thermal equilibrium to maintain accurate 1V/Oct tracking.",arts::modular_synthesis

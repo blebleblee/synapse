@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:computing systems bash
+#tags column:3
+What four distinct phases make up Bash's deterministic transformation pipeline for executing a command?,"Tokenization → expansion (brace, tilde, parameter, command substitution, arithmetic) → word splitting → pathname globbing, followed by quote removal and execution.",computing::bash
+How does Bash determine it is running as a login shell?,"Invoked via `bash -l`, via `/bin/login`, or when `argv[0][0] == '-'`.",computing::bash
+"Which initialization files does a login shell source, in order?","`/etc/profile`, then the first found of `~/.bash_profile`, `~/.bash_login`, `~/.profile`.",computing::bash
+What distinguishes a non-interactive script execution from interactive shell modes regarding environment setup?,"A non-interactive shell (e.g., `bash script.sh`) sources no profile or rc files; it inherits its environment as-is, and `$-` will not contain `i`.",computing::bash
+"In the fork() system call, how do the parent and child processes distinguish their roles from the single call?",fork() returns the child's PID to the parent and returns 0 to the child; this return value is the only point of divergence between the two process images.,computing::bash
+Why can't a crashing child process bring down the shell that spawned it?,Each process has its own virtual address space enforced by the MMU/page tables; hardware-level process isolation contains faults like segfaults within the crashing process.,computing::bash
+"What is a file descriptor, architecturally, in the Linux kernel model?","A non-negative integer index into a per-process file descriptor table, which points to an entry in a process-global open file table tracking offset, flags, and an inode reference.",computing::bash
+"After a fork(), do parent and child processes share file offsets for inherited file descriptors?","Yes. The child's FD table entries point to the same open file table entries as the parent, so both share the same seek offset until one closes or re-opens the descriptor.",computing::bash
+"What are the three file descriptors every process receives at startup, and their fd numbers?","stdin (fd 0), stdout (fd 1), stderr (fd 2).",computing::bash
+What is the critical semantic difference between Bash's `[ ]` and `[[ ]]` conditional constructs?,"`[ ]` is an actual command subject to word splitting and pathname expansion of its arguments, while `[[ ]]` is a shell keyword with special parsing rules that avoids those pitfalls.",computing::bash
+Why is Bash function variable scoping described as 'dynamic' rather than 'lexical'?,"A variable assigned inside a function (without `local`) modifies the variable in the caller's scope rather than being confined to the function's own block, unlike lexical scoping in compiled languages.",computing::bash
+What is the fundamental execution difference between a Bash builtin and an external utility?,"A builtin executes directly within the shell process without a fork-exec cycle, whereas an external utility requires the shell to fork a child process and exec the program image.",computing::bash

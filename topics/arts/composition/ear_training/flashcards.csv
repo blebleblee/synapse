@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:arts composition ear_training
+#tags column:3
+"In ear training, what three anchors should be attached to every interval to speed recognition under pressure?","A reference song, a physical shape on the instrument (fret/key distance), and a felt emotion.",arts::ear_training
+"What frequency ratio corresponds to a Perfect Fifth, and why does it sound stable?","3:2 — it's a simple whole-number ratio, which the ear perceives as consonant/stable.",arts::ear_training
+Why does a major triad (C-E-G) sound 'resolved' and 'locked in' acoustically?,"Because it mirrors overtones 4, 5, and 6 of the harmonic series already present in a single vibrating string, compressed into one octave.",arts::ear_training
+What makes a dominant 7th chord sound restless and want to resolve?,"It adds the flat 7th partial from the harmonic series, which is naturally out-of-tune relative to equal temperament, creating acoustic tension.",arts::ear_training
+What is the formula and character of a half-diminished 7th chord?,"Diminished triad + minor 7th (e.g., C-Eb-Gb-Bb); functions as ii° in minor keys, sounds unresolved.",arts::ear_training
+Why is a fully diminished 7th chord described as 'symmetrical' and 'maximally tense'?,"Because it's built entirely of stacked minor thirds (C-Eb-Gb-A), making every inversion sound identical in interval structure.",arts::ear_training
+What is the Four-Step Listening Procedure for identifying an unknown chord by ear?,"1) Isolate the bass note, 2) Identify triad quality (maj/min/dim/aug), 3) Check for an added 7th, 4) Determine inversion from bass-to-root distance (then confirm function in context).",arts::ear_training
+"What is the difference in stability between 2nd inversion and root position triads, and why does this matter in classical cadences?",2nd inversion (5th in bass) is unstable and wants to resolve down to root position — this is the basis of the classical cadential 6/4 progression.,arts::ear_training
+"What is the optimal tempo range (BPM) for steady beat perception, and what happens outside it?",80–140 BPM (IOI 430–750ms). Below 40 BPM beats feel disconnected; above 200 BPM the pulse blurs into a single texture.,arts::ear_training
+What is an Inter-Onset Interval (IOI) and what does the brain use it for?,"The time between consecutive rhythmic event onsets; the brain tracks IOI patterns to construct and predict the pulse — steady IOIs create a strong pulse, variable IOIs create syncopation/rubato.",arts::ear_training
+Why does melodic contour survive transposition while exact intervals do not?,"Pitch-direction detectors in the brain respond to relative change in basilar membrane activation location, not absolute frequency, so the up/down/same shape remains identical regardless of starting pitch.",arts::ear_training
+"What are the three primitive symbols used in contour training, and what question does contour answer vs. interval?","↑ (ascending), ↓ (descending), → (static/repeated). Contour answers 'which way?' while interval answers 'how far, what quality?'",arts::ear_training

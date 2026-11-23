@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:arts visual_arts typography
+#tags column:3
+"What is the foundational invariant that allows disparate glyph shapes (e.g., 'a' and 'x') to coexist harmoniously on the same line of text?",All glyphs in a typeface family share a common measurement system and baseline reference.,arts::typography
+What is a stroke's 'terminal' in glyph anatomy?,"The endpoint of a stroke—where a letterform's mark ends, often styled (e.g., ball, flared, or cut) to define the typeface's character.",arts::typography
+"What is the 'stress axis' in typeface classification, and what does it represent historically?","The invisible line through a curved stroke where thick-to-thin transition occurs; diagonal stress reflects a calligrapher's broad-nib pen angle (humanist), while vertical stress reflects mechanical engraving precision (rationalist/modern).",arts::typography
+"Who developed the Vox-ATypI typeface classification system, and in what year?",Maximilien Vox developed it in 1954; it was later adopted by the Association Typographique Internationale (ATypI).,arts::typography
+What four structural features does the Vox-ATypI system use to classify typefaces?,"Axis of stress, serif construction, degree of thick-thin contrast, and overall letterform proportions.",arts::typography
+"What is the core perceptual principle governing typographic spatial composition, called 'optical evenness'?","The human visual system judges spacing by perceived balance of white space between/within letterforms, not by mathematical/geometric uniformity.",arts::typography
+"What is kerning, and in what unit is it measured within a font?","Kerning is the spacing adjustment between specific letter pairs (e.g., 'AV', 'To') to correct problematic adjacencies; it is measured in units of the font's em square (typically 1000 or 2048 units per em).",arts::typography
+How does tracking differ from kerning?,"Tracking applies a uniform spacing adjustment across an entire word, line, or text block (a global multiplier), whereas kerning makes surgical, pair-by-pair local corrections.",arts::typography
+Why does placing a capital 'I' and a capital 'W' at equal fixed distances (naive metric spacing) fail visually?,"Because the eye perceives horizontal space nonlinearly—the narrow 'I' creates tight collisions while the wide 'W' creates gaping chasms, producing visual arrhythmia instead of even rhythm.",arts::typography
+What is the fundamental invariant that governs all typographic hierarchy?,"Contrast—without contrast across dimensions like size, weight, color, and spacing, there is no hierarchy, only visual noise.",arts::typography
+"What is a modular scale in typographic hierarchy, and why is it used instead of arbitrary size jumps?","A modular scale is a mathematically coherent set of proportional size relationships (e.g., ratios like 1:1.25 or 1:1.618); it is used because human perception is tuned to recognize ratios, so coherent ratios create visual harmony while arbitrary ratios feel subtly 'off'.",arts::typography
+"Besides the primary contrast dimension of size, what other dimensions does typographic contrast operate across to create hierarchy?","Weight, color, spacing, and stylistic differentiation—these interact systematically rather than acting as independent variables.",arts::typography

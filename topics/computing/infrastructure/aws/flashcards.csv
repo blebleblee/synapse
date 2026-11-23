@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:computing infrastructure aws
+#tags column:3
+"What architectural innovation does the AWS Nitro System provide, and why does it matter?","Nitro offloads virtualization functions (networking, storage I/O, hypervisor control plane) to dedicated hardware/ASICs, reclaiming nearly 100% of server CPU/memory for customer workloads while hardening tenant isolation.",computing::aws
+Decode the EC2 instance type `m6i.2xlarge` into its component meanings.,"m = general-purpose family; 6 = 6th generation (Intel Ice Lake); i = Intel processor variant; 2xlarge = size multiplier (8 vCPUs, 32 GiB memory).",computing::aws
+"What determines an AWS storage service's durability guarantee, per the 'acknowledgment chain' model?",How far along the write path (network stack → storage protocol → physical/virtual drive → optional replication channel) the system waits before returning an acknowledgment to the caller.,computing::aws
+What is the key difference in write-acknowledgment semantics between RDS Multi-AZ and standard EBS?,RDS Multi-AZ waits for a synchronous standby replica to confirm the write before acknowledging the transaction; EBS (io2) waits only for the write to land on NVMe SSD on the host side.,computing::aws
+"When did S3 achieve strong read-after-write consistency, and what was the scope of that guarantee?","2020 — initially for new object PUTs, later extended to cover overwrites and deletes as well.",computing::aws
+What is the core invariant that establishes VPC boundaries as hard security perimeters?,No packet can traverse from one VPC to another without explicit configuration (peering or transit gateway); the boundary is enforced by the hypervisor's virtual switch.,computing::aws
+What is the difference in statefulness between Security Groups and Network ACLs in AWS VPCs?,Security Groups are stateful (instance-level firewalls — return traffic is automatically allowed); NACLs are stateless (subnet-level filters — both inbound and outbound rules must be explicitly defined).,computing::aws
+What five-tuple does a Network ACL use to filter traffic?,"Source IP, destination IP, source port, destination port, and protocol.",computing::aws
+Contrast Layer 4 (NLB) vs Layer 7 (ALB) load balancing in terms of routing basis.,"Layer 4 (NLB) routes based on the IP quintuple (source/dest IP, source/dest port, protocol) treating TCP/UDP streams as opaque; Layer 7 (ALB) terminates HTTP/gRPC sessions and routes on semantic content (URI paths, headers, cookies, JWT claims).",computing::aws
+Why must applications be designed as stateless to work correctly with Auto Scaling Groups?,"Because the ASG control loop can terminate instances without ceremony during scale-in events; any persistent state must be externalized (e.g., to RDS, ElastiCache, or S3) to avoid data loss.",computing::aws
+"What does the CAP theorem force every distributed system to choose, and why?","Since network partitions are a physical inevitability, systems must choose Partition tolerance, forcing an explicit tradeoff between Consistency and Availability (per Gilbert & Lynch's proof of Brewer's conjecture).",computing::aws
+"What is the Raft consensus quorum formula, and what quorum size does a 5-node cluster require?","Q = ⌊N/2⌋ + 1; for N=5, Q=3 nodes must acknowledge a write before it commits.",computing::aws

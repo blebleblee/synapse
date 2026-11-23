@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:crafts lego mechanisms
+#tags column:3
+What are the three irreducible dimensional invariants of the LEGO system?,"8.0mm stud pitch, 3.2mm plate height, and 9.6mm brick height (with a 3:1 ratio between plate and brick height).",crafts::mechanisms
+What is the SNOT ratio and why is it significant?,"Five plates stack to 16.0mm (5 × 3.2mm), which equals exactly two stud pitches (2 × 8.0mm). This convergence allows sideways-facing studs to align with the vertical stud grid.",crafts::mechanisms
+What are the key mechanical properties of ABS plastic used in LEGO elements?,"Young's modulus ≈ 2.3 GPa, tensile strength 40–50 MPa, glass transition temperature ≈105°C, and friction coefficient ≈0.3 (ABS-on-ABS, comparable to nylon-on-nylon).",crafts::mechanisms
+What is the gear ratio formula and what does it mean if R = 1/3?,"R = N_driven / N_driver. If R = 1/3 (e.g., 8-tooth driving 24-tooth), speed is divided by 3 while torque is multiplied by 3 (driver to driven direction).",crafts::mechanisms
+Why must torque increase when angular velocity decreases in a gear mesh?,"Because power P = τ·ω is conserved across a lossless mesh; if ω decreases by a factor, τ must increase by the same factor to keep P constant.",crafts::mechanisms
+Why do Lego builders minimize the number of gear mesh stages in load-bearing drivetrains?,"Each mesh introduces frictional loss, and this penalty compounds multiplicatively across stages, significantly reducing output torque below the ideal calculation.",crafts::mechanisms
+"What is the mechanical advantage formula for a lever, and what does it reveal?","MA = F_out/F_in = d_in/d_out. It shows that distance sacrificed at the input translates directly into force gained at the output (from conservation of energy, F_in×d_in = F_out×d_out).",crafts::mechanisms
+"How do first-class, second-class, and third-class levers differ in component arrangement?","First-class: fulcrum between effort and load (seesaw). Second-class: load between fulcrum and effort, always MA > 1 (wheelbarrow). Third-class: effort between fulcrum and load, sacrifices force for speed/range (tweezers, forearm).",crafts::mechanisms
+By how much does real-world friction typically degrade the ideal mechanical advantage of a Lego lever/linkage?,"Approximately 15–30%, depending on construction rigidity and pin-joint friction.",crafts::mechanisms
+"What is the overall efficiency of a 10-stage transmission with 95% efficiency per stage, and what principle does this illustrate?","About 60% (0.95^10 ≈ 0.599). This illustrates that overall system efficiency is the multiplicative product of per-stage efficiencies, so losses cascade significantly across many stages.",crafts::mechanisms
+How can an 'impossible' 7:1 gear ratio be achieved using compound gear trains in Lego's quantized system?,"By factoring it into achievable stages, e.g., decomposing 7:1 into a 2:1 stage followed by a 3.5:1 stage (itself realized as 7:2).",crafts::mechanisms
+What is the first principle of systematic mechanical debugging in integrated Lego systems?,"Isolation: partition the complex assembly into testable subsections (e.g., motor no-load speed, first gear stage backlash, linkage range of motion) and verify each independently before assessing the whole system.",crafts::mechanisms

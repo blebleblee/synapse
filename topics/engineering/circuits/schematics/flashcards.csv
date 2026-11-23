@@ -1,0 +1,16 @@
+#separator:Comma
+#html:true
+#tags:engineering circuits schematics
+#tags column:3
+What is the foundational invariant of a schematic diagram regarding physical layout?,"A schematic represents electrical connectivity and functional relationships, NOT physical layout, spatial arrangement, or dimensional accuracy.",engineering::schematics
+"In schematic graph theory, what do nodes and edges represent?",Nodes represent electrical potentials (equipotential surfaces); edges represent current paths (nets/wires connecting component terminals).,engineering::schematics
+What design rule error occurs when a wire segment connects to only one component terminal?,"A floating net—it violates Kirchhoff's Current Law (KCL) since no current path exists, and EDA tools flag it as a DRC error.",engineering::schematics
+"What do reference designator prefixes R, C, L, Q, U, D represent per IEEE 315/IEC 60617?","R=Resistor, C=Capacitor, L=Inductor, Q=Transistor (BJT/FET), U=Integrated Circuit, D=Diode.",engineering::schematics
+What fundamental energy constraint distinguishes passive from active components?,"Passive components (R, L, C) cannot inject net energy into a circuit over a complete cycle; active components (diodes, BJTs, FETs, op-amps) can amplify/switch by drawing energy from an external power supply.",engineering::schematics
+What two constitutive equations govern ideal resistor behavior in schematics?,"Ohm's Law: V = IR, and Power dissipation: P = I²R = V²/R. The schematic symbol omits parasitic inductance/capacitance effects.",engineering::schematics
+What does a wire connecting two component terminals assert mathematically?,"That both terminals share identical electric potential at every instant (an equipotential assertion), forming the basis of nodal analysis in SPICE simulation.",engineering::schematics
+"What is the function of a junction dot in schematic diagrams, and why is it necessary?","A filled circle (1/3 to 1/2 wire thickness diameter) at a wire intersection explicitly declares electrical connection; without it, crossing orthogonal lines are ambiguous (could be non-connected crossovers).",engineering::schematics
+What is the typical snap radius tolerance for automatic pin-to-wire connection in modern CAD tools?,Typically 50–100 mils (Imperial) or 1.27–2.54 mm (metric); any pin centroid within this capture zone merges into the wire's electrical node.,engineering::schematics
+"According to the Reading Analysis Techniques lesson, what question must precede any schematic trace analysis?",'What problem does this circuit solve?'—identifying the actual thermodynamic/informational design intent before tracing signal paths.,engineering::schematics
+"What is 'temporal coupling' in schematic reading, and why does it matter?","A schematic is a static snapshot of dynamic behavior; parasitic inductances, ground plane impedance, overshoot, and ringing emerge transiently when power is applied—reading must infer these beyond DC steady-state.",engineering::schematics
+What three verification tiers does the operational lab methodology use to validate a schematic before fabrication?,"1) Symbolic interpretation & netlist extraction, 2) Quantitative parametric analysis (KVL/KCL, Thévenin, AC impedance), 3) Empirical stress-testing (voltage extremes, tolerance stacking, thermal derating, failure-mode analysis).",engineering::schematics
