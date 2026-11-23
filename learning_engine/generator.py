@@ -218,7 +218,7 @@ def scope_topic_curriculum(
         if outline_path.exists():
             try:
                 content = outline_path.read_text(encoding="utf-8")
-                pattern = r"\*\s+\**Lesson\s+(\d+):\s+(.*?)(?:\s+\(.*?\))?\**"
+                pattern = r"\*\s+\*\*Lesson\s+(\d+):\s+(.*?)(?:\s+\(.*?\))?\*\*"
                 matches = list(re.finditer(pattern, content))
                 if len(matches) >= 3:
                     parsed_lessons = []
