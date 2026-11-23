@@ -41,7 +41,21 @@ echo "[*] [2/5] Running frontend linter..."
 # Phase 3: Frontend Production Build
 echo ""
 echo "[*] [3/5] Building frontend production bundle..."
-(cd app/frontend && npm run build)
+# On CPUs without x86-64-v3 (the CI runner) the bundler runs as WebAssembly,
+# which now and then panics ("Parking not supported on this platform", a
+# Rolldown bug, CI run #83). Retry once for that panic only; any other build
+# failure still fails here.
+build_log=$(mktemp)
+if ! (cd app/frontend && npm run build) 2>&1 | tee "$build_log"; then
+  if grep -q "Rolldown panicked" "$build_log"; then
+    echo "[!] Rolldown (WebAssembly) panicked; retrying the build once."
+    (cd app/frontend && npm run build)
+  else
+    rm -f "$build_log"
+    exit 1
+  fi
+fi
+rm -f "$build_log"
 
 # Phase 4: Backend Test Suite
 echo ""
