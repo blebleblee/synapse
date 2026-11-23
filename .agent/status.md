@@ -206,3 +206,15 @@ Verification: `./scripts/verify_all.sh` all 6 phases (268 backend, 38 frontend u
 - CI: run #144 (ac3fd6a) was still queued on the Gitea runner at 16:05;
   check it and this batch's run next session.
 - Still WAITING ON PROXY: flashcard decks, computing review pilot.
+
+## Batch 20 (2026-11-23): API via api.haimaker.ai (user's key, scratch only)
+- Gateway: Anthropic /v1/messages with `anthropic/` model ids; Gemini only in
+  OpenAI chat format (native path 404); no batch API (404).
+- DONE: 377 flashcard decks (Sonnet 5.5) committed in 5ed6df9 (its message
+  says 160 remaining; actually 162). Stopped when the user's credit ran low.
+- REMAINING: 162 decks (rerun the script; it skips existing decks), then
+  rebuild packs and update the curriculum release (needs approval).
+- Review pilot: stopped after 3 of 27 sampled computing units (all 3 had
+  issues; results not saved, the pilot writes JSON only at the end). A full
+  computing review with Sonnet 5.5 is ~$50; a cross-family Gemini reviewer
+  needs an OpenAI-format provider (not built).
