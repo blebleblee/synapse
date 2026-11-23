@@ -15,6 +15,7 @@ import {
   X
 } from 'lucide-react';
 import { shouldReconnectTerminal, retireSocket } from '../utils/terminalHelpers';
+import { terminalSafeText } from '../utils/terminalText';
 
 export interface TerminalDrawerHandle {
   runCommand: (command: string) => void;
@@ -292,9 +293,9 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
           // On this computer's own shell a lesson snippet is only typed in
           // (bracketed paste, no Enter): the learner reviews it and presses
           // Enter. Snippets are often illustrations ("cmd > file").
-          wsRef.current.send('\x1b[200~' + command.trim() + '\x1b[201~');
+          wsRef.current.send('\x1b[200~' + terminalSafeText(command) + '\x1b[201~');
         } else {
-          wsRef.current.send(command.trim() + '\n');
+          wsRef.current.send(terminalSafeText(command) + '\n');
         }
         if (!isOpen) {
           onToggle();
