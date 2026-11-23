@@ -71,8 +71,6 @@ function App() {
   const chatRequestIdRef = useRef<number>(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isChatting, setIsChatting] = useState(false);
-  const [isCompilingGuide, setIsCompilingGuide] = useState(false);
-  const [isRegeneratingSummary, setIsRegeneratingSummary] = useState(false);
   const [unifiedChatHistory, setUnifiedChatHistory] = useState<ChatMessage[]>([]);
   const [quizQuestions, setQuizQuestions] = useState<{ [key: string]: QuizQuestion[] }>({});
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
@@ -327,8 +325,6 @@ function App() {
     setIsGenerating(false);
     setIsChatting(false);
     setIsLoadingQuiz(false);
-    setIsRegeneratingSummary(false);
-    setIsCompilingGuide(false);
   };
 
   const handleGenerate = async (query: string, force = false) => {
@@ -756,38 +752,6 @@ function App() {
     }
   };
 
-  const handleCompileGuide = async () => {
-    if (!selectedPath) return;
-
-    const abortCtrl = new AbortController();
-    activeCancelHandler.current = () => abortCtrl.abort();
-    setIsCompilingGuide(true);
-    try {
-      const res = await fetch('/api/artifacts/compile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: abortCtrl.signal,
-        body: JSON.stringify({ query: selectedPath }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (typeof data.content === 'string') {
-          saveBlob(new Blob([data.content], { type: 'text/markdown' }), data.filename || 'field_guide.md');
-        }
-        notify('success', `Field guide downloaded (a copy is kept in ${data.path})`);
-      } else {
-        notify('error', await failureMessage(res, 'Compiling the field guide'));
-      }
-    } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        console.error('Failed to compile guide:', err);
-        notify('error', networkFailure('Compiling the field guide', err));
-      }
-    } finally {
-      setIsCompilingGuide(false);
-    }
-  };
-
   const handleNavigateBreadcrumb = (type: 'domain' | 'category' | 'subtopic', path: string) => {
     if (type === 'subtopic') {
       loadTopic(path);
@@ -935,40 +899,6 @@ function App() {
     void downloadFile(`/api/export?domain=${encodeURIComponent(topicDetails.domain)}`, `${topicDetails.domain}.md`);
   };
 
-  const handleRegenerateSummary = async () => {
-    if (!selectedPath) return;
-    const abortCtrl = new AbortController();
-    activeCancelHandler.current = () => abortCtrl.abort();
-    setIsRegeneratingSummary(true);
-    try {
-      const res = await fetch('/api/summary/regenerate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: abortCtrl.signal,
-        body: JSON.stringify({
-          query: selectedPath,
-          model: settings.primaryModel || undefined,
-          host: settings.ollamaHost || undefined,
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (topicDetails) {
-          setTopicDetails({ ...topicDetails, summary: data.summary });
-        }
-      } else {
-        notify('error', await failureMessage(res, 'Regenerating the summary'));
-      }
-    } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        console.error('Failed to regenerate summary:', err);
-        notify('error', networkFailure('Regenerating the summary', err));
-      }
-    } finally {
-      setIsRegeneratingSummary(false);
-    }
-  };
-
   const currentQuiz = selectedPath ? quizQuestions[selectedPath] || [] : [];
 
   const activeLessonTitle = useMemo(() => {
@@ -985,10 +915,8 @@ function App() {
     if (isGenerating) return 'Synthesizing Masterclass Curriculum Units';
     if (isChatting) return 'Socratic Mentor Generating Response';
     if (isLoadingQuiz) return 'Generating Socratic Scenario Quiz';
-    if (isRegeneratingSummary) return 'Regenerating Executive Architecture Summary';
-    if (isCompilingGuide) return 'Compiling Unified Masterclass Guide';
     return null;
-  }, [isGenerating, isChatting, isLoadingQuiz, isRegeneratingSummary, isCompilingGuide]);
+  }, [isGenerating, isChatting, isLoadingQuiz]);
 
   const configuredMentorModel = settings.mentorModel || settings.primaryModel;
   // While connected, show the model that actually answers.
@@ -1040,13 +968,9 @@ function App() {
           quizQuestions={currentQuiz}
           isLoadingQuiz={isLoadingQuiz}
           onRefreshQuiz={handleRefreshQuiz}
-          onCompileGuide={handleCompileGuide}
-          isCompiling={isCompilingGuide}
           onUpdateMastery={handleUpdateMastery}
           onDownloadFlashcards={handleDownloadFlashcards}
           onDownloadHandbook={handleDownloadHandbook}
-          onRegenerateSummary={handleRegenerateSummary}
-          isRegeneratingSummary={isRegeneratingSummary}
           onOpenFlashcards={() => setFlashcardModalOpen(true)}
           targetLanguage={settings.language}
           preferredModel={settings.mentorModel || settings.primaryModel}

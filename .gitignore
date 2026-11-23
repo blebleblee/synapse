@@ -34,9 +34,9 @@ Thumbs.db
 # Transient Chat Sessions
 topics/**/sessions/
 topics/.workspace_sessions/
-# "Mastered Field Guide" output, written from the learner's chat sessions
+# Outputs of removed features (field guide, course summary), written from the
+# learner's chat sessions; old copies may still be on disk.
 topics/**/artifacts/MASTERED_GUIDE.md
-# Course summary (More options → Regenerate summary), also written from the chat sessions
 topics/**/SUMMARY.md
 topics/**/summary.md
 

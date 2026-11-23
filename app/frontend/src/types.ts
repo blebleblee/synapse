@@ -19,7 +19,6 @@ export interface UnitNode {
   status: SubtopicStatus;
   lessons?: LessonItem[];
   completed_lessons?: string[];
-  has_summary?: boolean;
 }
 
 export interface CourseNode {

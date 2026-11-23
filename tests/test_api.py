@@ -53,10 +53,10 @@ def test_api_quiz_validation():
     res = client.post("/api/quiz", json={"query": "non_existent_topic_xyz"})
     assert res.status_code == 404
 
-def test_api_quiz_and_summary_forward_model_and_host(monkeypatch):
+def test_api_quiz_forwards_model_and_host(monkeypatch):
     """
-    FIND-08: /api/quiz and /api/summary/regenerate must forward configured model
-    and cluster host parameters to their respective generation providers.
+    FIND-08: /api/quiz must forward the configured model and cluster host
+    to its generation provider. (/api/summary/regenerate was removed.)
     """
     captured_quiz = {}
     class MockQuizProvider:
@@ -77,22 +77,6 @@ def test_api_quiz_and_summary_forward_model_and_host(monkeypatch):
     assert quiz_res.status_code == 200
     assert captured_quiz.get("model") == "qwen2.5-coder:32b"
     assert captured_quiz.get("host") == "http://192.168.1.50:11434"
-
-    captured_summary = {}
-    def mock_regenerate_summary(query, **kwargs):
-        captured_summary.update({"query": query, **kwargs})
-        return "# Mock Summary"
-
-    monkeypatch.setattr("app.backend.main.regenerate_summary", mock_regenerate_summary)
-
-    sum_res = client.post("/api/summary/regenerate", json={
-        "query": "computing/data/postgresql",
-        "model": "deepseek-r1:32b",
-        "host": "http://192.168.1.100:11434"
-    })
-    assert sum_res.status_code == 200
-    assert captured_summary.get("model") == "deepseek-r1:32b"
-    assert captured_summary.get("host") == "http://192.168.1.100:11434"
 
 def test_api_generate(monkeypatch):
     # Mock get_provider to bypass Ollama cluster checks
@@ -616,21 +600,6 @@ def test_api_flashcards_queue_and_review():
     assert data["interval_days"] == 3
 
 
-def test_field_guide_is_returned_for_download(tmp_path):
-    """Export → field guide used to only save into the course folder; the UI
-    now downloads it, so the response carries the text and a file name."""
-    from unittest.mock import MagicMock, patch
-    fake = MagicMock()
-    fake.generate.return_value = "# Mastered Field Guide: Kubernetes\n\nNotes."
-    with patch("app.backend.main.get_provider", return_value=fake):
-        res = client.post("/api/artifacts/compile", json={"query": "computing/infrastructure/kubernetes"})
-    assert res.status_code == 200
-    data = res.json()
-    assert data["filename"] == "kubernetes_field_guide.md"
-    assert data["content"].startswith("# Mastered Field Guide: Kubernetes")
-    assert data["path"].endswith("artifacts/MASTERED_GUIDE.md")
-
-
 @pytest.mark.parametrize("reply", [
     "Error: could not connect to http://127.0.0.1:9",
     "Sure! Here are some questions about Bash.",
@@ -683,21 +652,3 @@ def test_quiz_keeps_the_questions_a_broken_one_would_have_taken_down():
     qs = parse_quiz_questions(raw)
     assert [q["explanation"] for q in qs] == ["E1", "E3 uses ${HOME}"]
     assert [q["id"] for q in qs] == [1, 2]
-
-
-@pytest.mark.parametrize("behaviour", ["raise", "empty"])
-def test_summary_regeneration_failure_is_reported_and_keeps_the_old_summary(monkeypatch, behaviour):
-    from learning_engine.topic_manager import resolve_subtopic
-    class Fake:
-        def generate(self, prompt, **kwargs):
-            if behaviour == "raise":
-                raise ConnectionError("connection refused")
-            return "   "
-    monkeypatch.setattr("learning_engine.summary.get_provider", lambda **k: Fake())
-    summary = resolve_subtopic("computing/data/postgresql")[3] / "SUMMARY.md"
-    before = summary.read_text(encoding="utf-8") if summary.exists() else None
-    res = client.post("/api/summary/regenerate", json={"query": "computing/data/postgresql"})
-    assert res.status_code == 502
-    assert "summary" in res.json()["detail"]
-    after = summary.read_text(encoding="utf-8") if summary.exists() else None
-    assert after == before

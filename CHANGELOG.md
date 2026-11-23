@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- **"Mastered Field Guide" (Export menu) and "Update Curriculum Summary" (More options)**, leftovers of an earlier design, together with their endpoints (`/api/artifacts/compile`, `/api/summary/regenerate`). Old `MASTERED_GUIDE.md` / `SUMMARY.md` files stay private: git-ignored and never packed.
+
 ## [1.3.0] - 2026-11-23
 
 ### Security

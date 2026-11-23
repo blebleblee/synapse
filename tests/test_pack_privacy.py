@@ -108,7 +108,7 @@ def test_cli_pack_export(tmp_path, monkeypatch):
 
 
 def test_mastered_field_guide_is_never_packed(monkeypatch, tmp_path):
-    """"Mastered Field Guide" writes artifacts/MASTERED_GUIDE.md into the
+    """The removed "Mastered Field Guide" wrote artifacts/MASTERED_GUIDE.md into the
     course folder, synthesized from the learner's chat sessions. It was not
     git-ignored, so exporting the domain to share it included it."""
     _seed(monkeypatch)
@@ -119,7 +119,7 @@ def test_mastered_field_guide_is_never_packed(monkeypatch, tmp_path):
 
 
 def test_course_summary_is_never_packed(monkeypatch, tmp_path):
-    """More options → Regenerate summary writes <course>/SUMMARY.md with a
+    """The removed "Regenerate summary" wrote <course>/SUMMARY.md with a
     "Discussion Insights" section taken from the learner's chat sessions."""
     _seed(monkeypatch)
     _write(Path(sec.TOPICS_DIR) / "languages" / "linguistics" / "phonology" / "SUMMARY.md", "what I asked the tutor\n")

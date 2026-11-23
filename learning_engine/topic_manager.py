@@ -162,8 +162,7 @@ def get_topic_tree(force_refresh: bool = False) -> Dict[str, Any]:
                     "full_path": str(full_path),
                     "status": status,
                     "lessons": utils_get_lessons(full_path),
-                    "completed_lessons": get_completed_lessons(f"{domain}/{clean_rel}"),
-                    "has_summary": (full_path / "SUMMARY.md").exists()
+                    "completed_lessons": get_completed_lessons(f"{domain}/{clean_rel}")
                 }
 
                 tree[domain]["disciplines"][disc]["courses"][course]["units"][unit] = node_data
@@ -204,8 +203,7 @@ def get_topic_tree(force_refresh: bool = False) -> Dict[str, Any]:
                             "full_path": str(disc_dir),
                             "status": utils_scan(disc_dir),
                             "lessons": utils_get_lessons(disc_dir),
-                            "completed_lessons": get_completed_lessons(f"{domain}/{clean_rel}"),
-                            "has_summary": (disc_dir / "SUMMARY.md").exists()
+                            "completed_lessons": get_completed_lessons(f"{domain}/{clean_rel}")
                         }
                         tree[domain]["disciplines"][disc]["courses"][course]["units"]["core"] = node_data
                         tree[domain]["categories"][disc][course] = node_data
@@ -247,8 +245,7 @@ def get_topic_tree(force_refresh: bool = False) -> Dict[str, Any]:
                         "full_path": str(course_dir),
                         "status": utils_scan(course_dir),
                         "lessons": utils_get_lessons(course_dir),
-                        "completed_lessons": get_completed_lessons(f"{domain}/{clean_rel}"),
-                        "has_summary": (course_dir / "SUMMARY.md").exists()
+                        "completed_lessons": get_completed_lessons(f"{domain}/{clean_rel}")
                     }
 
                     tree[domain]["disciplines"][disc]["courses"][course]["units"]["core"] = node_data

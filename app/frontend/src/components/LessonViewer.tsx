@@ -6,7 +6,6 @@ import {
   HelpCircle,
   Sparkles,
   RefreshCw,
-  FileCheck2,
   Award,
   Layers,
   Download,
@@ -49,13 +48,9 @@ interface LessonViewerProps {
   quizQuestions: QuizQuestion[];
   isLoadingQuiz: boolean;
   onRefreshQuiz: () => void;
-  onCompileGuide: () => void;
-  isCompiling: boolean;
   onUpdateMastery: (state: string) => void;
   onDownloadFlashcards: () => void;
   onDownloadHandbook: () => void;
-  onRegenerateSummary: () => Promise<void>;
-  isRegeneratingSummary: boolean;
   onOpenFlashcards: () => void;
   targetLanguage?: string;
   preferredModel?: string;
@@ -78,13 +73,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   quizQuestions,
   isLoadingQuiz,
   onRefreshQuiz,
-  onCompileGuide,
-  isCompiling,
   onUpdateMastery,
   onDownloadFlashcards,
   onDownloadHandbook,
-  onRegenerateSummary,
-  isRegeneratingSummary,
   onOpenFlashcards,
   targetLanguage,
   preferredModel,
@@ -522,7 +513,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           onSelectLesson?.(lessonId);
         } else if (cleanFile === 'LABS.md') {
           setActiveTab('labs');
-        } else if (cleanFile === 'FOUNDATION.md' || cleanFile === 'SUMMARY.md') {
+        } else if (cleanFile === 'FOUNDATION.md') {
           setActiveTab('study');
           onSelectLesson?.('all');
         }
@@ -749,18 +740,6 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                   className="dropdown-item"
                   onClick={() => {
                     setExportMenuOpen(false);
-                    onCompileGuide();
-                  }}
-                  disabled={isCompiling}
-                  title="The AI writes a personal summary from this course and your mentor chats (takes a few minutes), then downloads it"
-                >
-                  <FileCheck2 size={13} />
-                  <span>{isCompiling ? 'Writing field guide…' : 'My Field Guide (.md, AI)'}</span>
-                </button>
-                <button
-                  className="dropdown-item"
-                  onClick={() => {
-                    setExportMenuOpen(false);
                     onDownloadFlashcards();
                   }}
                   title="Download Anki flashcards (.csv)"
@@ -787,20 +766,6 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             </button>
             {optionsMenuOpen && (
               <div className="nav-dropdown-menu right-aligned">
-                {topic.summary && (
-                  <button
-                    className="dropdown-item"
-                    onClick={() => {
-                      setOptionsMenuOpen(false);
-                      onRegenerateSummary();
-                    }}
-                    disabled={isRegeneratingSummary}
-                    title="Regenerate curriculum summary with latest session insights"
-                  >
-                    <RefreshCw size={13} className={isRegeneratingSummary ? 'spin' : ''} />
-                    <span>Update Curriculum Summary</span>
-                  </button>
-                )}
                 <button
                   className="dropdown-item danger"
                   onClick={() => {

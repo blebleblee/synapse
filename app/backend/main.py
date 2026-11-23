@@ -130,7 +130,6 @@ from learning_engine.security import validate_workspace_path, sanitize_query, is
 from learning_engine.config_manager import get_settings, save_settings, redact_settings, filter_client_settings, ConfigError
 from learning_engine.exporter import export_handbook
 from learning_engine.flashcards import generate_flashcards, anki_csv_text
-from learning_engine.summary import regenerate_summary, generate_initial_summary
 from learning_engine.packages import (
     export_topic_pack,
     install_topic_pack,
@@ -1107,18 +1106,12 @@ async def get_topic_details(
             if artifacts:
                 lesson = artifacts[0].read_text(encoding="utf-8")
 
-    # Load summary non-blocking
+    # A lesson file named like "*summary*" doubles as the course summary.
     summary = ""
-    for fname in ["SUMMARY.md", "summary.md"]:
-        summary_file = sub_path / fname
-        if summary_file.exists():
-            summary = summary_file.read_text(encoding="utf-8")
+    for l_item in lessons_list:
+        if "summary" in l_item["id"]:
+            summary = l_item["content"]
             break
-    if not summary:
-        for l_item in lessons_list:
-            if "summary" in l_item["id"]:
-                summary = l_item["content"]
-                break
 
     # Load persistent chat history for this topic
     saved_chat_history = []
@@ -1618,22 +1611,6 @@ async def chat_with_tutor(req: ChatRequest):
         "model": used_model
     }
 
-class SummaryRequest(BaseModel):
-    query: str
-    provider: Optional[str] = None
-    model: Optional[str] = None
-    host: Optional[str] = None
-
-@app.post("/api/summary/regenerate")
-def api_regenerate_summary(req: SummaryRequest):
-    try:
-        new_summary = regenerate_summary(req.query, provider_type=req.provider, model=req.model, host=req.host)
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"The AI model could not write the summary ({e}). Check Settings → AI models.")
-    return {"summary": new_summary}
-
 class QuizRequest(BaseModel):
     query: str
     provider: Optional[str] = None
@@ -1747,51 +1724,6 @@ def save_session(req: SaveSessionRequest):
         "success": True,
         "filename": filename,
         "path": str(file_path.relative_to(WORKSPACE_ROOT))
-    }
-
-@app.post("/api/artifacts/compile")
-def compile_artifacts(req: QuizRequest):
-    target = resolve_subtopic(req.query)
-    if not target:
-        raise HTTPException(status_code=404, detail=f"Topic '{req.query}' not found")
-
-    domain, cat, sub, sub_path = target
-    artifacts_dir = sub_path / "artifacts"
-    artifacts_dir.mkdir(parents=True, exist_ok=True)
-
-    persona = get_domain_persona(domain)
-    sessions_dir = sub_path / "sessions"
-    session_texts = []
-    if sessions_dir.exists():
-        for sfile in sessions_dir.glob("*.md"):
-            session_texts.append(sfile.read_text(encoding="utf-8")[:2000])
-
-    prompt = f"""Synthesize all learning sessions, core theorems, and operational best practices for '{sub.replace('_', ' ').title()}' into an exhaustive Mastered Field Reference Guide.
-
-Structure:
-# Mastered Field Guide: {sub.replace('_', ' ').title()}
-## 1. Executive Summary & Core Invariants
-## 2. Essential Architecture & Cheatsheet
-## 3. High-Value Production Snippets / Formulas
-## 4. Troubleshooting Playbook & Critical Pitfalls
-
-Sessions History:
-{"".join(session_texts) if session_texts else "No prior session logs."}
-
-Output clean, production-ready Markdown."""
-
-    provider = get_provider(provider_type=req.provider, model=req.model)
-    compiled_guide = provider.generate(prompt, system_instruction=persona)
-
-    output_file = artifacts_dir / "MASTERED_GUIDE.md"
-    output_file.write_text(compiled_guide.strip() + "\n", encoding="utf-8")
-
-    return {
-        "success": True,
-        "path": str(output_file.relative_to(WORKSPACE_ROOT)),
-        # The UI offers the guide as a download, like the other Export items.
-        "filename": f"{sub}_field_guide.md",
-        "content": output_file.read_text(encoding="utf-8"),
     }
 
 # -----------------------------------------------------------------------------

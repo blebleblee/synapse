@@ -53,16 +53,7 @@ def export_handbook(domain: str, level: Optional[str] = None) -> Path:
             sub_path = Path(sdata["full_path"])
             chapter_content.append(f"\n---\n\n<a id='{anchor}'></a>\n# {sub_title} ({cat_title})\n")
 
-            # 1. Summary if present
-            for sum_name in ["SUMMARY.md", "summary.md"]:
-                sum_path = sub_path / sum_name
-                if sum_path.exists():
-                    chapter_content.append("### Executive Summary\n")
-                    chapter_content.append(sum_path.read_text(encoding="utf-8").strip())
-                    chapter_content.append("\n\n")
-                    break
-
-            # 2. Sequential Masterclass Lessons
+            # Sequential masterclass lessons
             lessons = get_unit_lessons(sub_path)
             for l in lessons:
                 p = Path(l["path"])
