@@ -95,3 +95,39 @@ def test_pack_uninstall_dot_is_refused(monkeypatch, capsys):
     before = sorted(p.name for p in packages.TOPICS_DIR.iterdir())
     assert run_cli(monkeypatch, "pack", "uninstall", ".") == 1
     assert sorted(p.name for p in packages.TOPICS_DIR.iterdir()) == before
+
+
+def test_chat_loads_the_course_and_answers(monkeypatch, capsys):
+    """`synapse chat` crashed at once: get_unit_lessons was never imported."""
+    seen = {}
+
+    class Fake:
+        model = "fake"
+
+        def generate(self, prompt, system_instruction=""):
+            seen["system"] = system_instruction
+            return "Pods are scheduled by the scheduler."
+
+    answers = iter(["What schedules pods?", "exit"])
+    monkeypatch.setattr(cli, "get_provider", lambda **k: Fake())
+    monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
+    assert run_cli(monkeypatch, "chat", "computing/infrastructure/kubernetes") == 0
+    out = capsys.readouterr().out
+    assert "Tutor > Pods are scheduled by the scheduler." in out
+    assert "--- lesson_" in seen["system"]
+
+
+@pytest.mark.parametrize("argv", [
+    ["add", "computing", "infrastructure", "cli_gen_probe", "-g"],
+    ["generate", "computing/infrastructure/kubernetes"],
+])
+def test_generation_failure_is_reported_and_exits_non_zero(monkeypatch, capsys, argv):
+    """Every file failed, yet `add -g` printed the raw result dict and `generate`
+    said "Learning modules updated", both with exit code 0."""
+    monkeypatch.setattr(cli, "get_provider", lambda **k: object())
+    monkeypatch.setattr(cli, "generate_subtopic_content",
+                        lambda *a, **k: {"lesson_01_x.md": True, "labs.md": False})
+    assert run_cli(monkeypatch, *argv) == 1
+    out = capsys.readouterr().out
+    assert "1 file(s) could not be generated: labs.md" in out
+    assert "Wrote 1 file(s)" in out

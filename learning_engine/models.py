@@ -300,7 +300,9 @@ def save_configured_hosts(hosts: List[str]) -> List[str]:
     return cleaned
 
 class LLMProvider:
-    def generate(self, prompt: str, system_instruction: str = "") -> str:
+    # Every generate() accepts max_tokens: the lesson generator passes it to
+    # whichever provider is configured (tests/test_provider_contract.py).
+    def generate(self, prompt: str, system_instruction: str = "", max_tokens: Optional[int] = None) -> str:
         raise NotImplementedError
 
 class GenerationStopped(Exception):
@@ -400,7 +402,7 @@ class OllamaProvider(LLMProvider):
         except Exception:
             return False
 
-    def generate(self, prompt: str, system_instruction: str = "", host: Optional[str] = None, model: Optional[str] = None) -> str:
+    def generate(self, prompt: str, system_instruction: str = "", host: Optional[str] = None, model: Optional[str] = None, max_tokens: Optional[int] = None) -> str:
         # Use provided overrides if available, otherwise use instance defaults
         target_host = host or self.host
         target_model = model or self.model
@@ -416,6 +418,8 @@ class OllamaProvider(LLMProvider):
                 "temperature": 0.2
             }
         }
+        if max_tokens:
+            ollama_payload["options"]["num_predict"] = max_tokens
         data = json.dumps(ollama_payload).encode("utf-8")
         req = urllib.request.Request(ollama_url, data=data, headers={"Content-Type": "application/json"})
 
@@ -440,6 +444,8 @@ class OllamaProvider(LLMProvider):
             "messages": messages,
             "temperature": 0.2
         }
+        if max_tokens:
+            v1_payload["max_tokens"] = max_tokens
         data = json.dumps(v1_payload).encode("utf-8")
         req = urllib.request.Request(v1_url, data=data, headers={"Content-Type": "application/json"})
 
@@ -708,10 +714,10 @@ class OllamaCluster(LLMProvider):
 
         return active_workers
 
-    def generate(self, prompt: str, system_instruction: str = "") -> str:
+    def generate(self, prompt: str, system_instruction: str = "", max_tokens: Optional[int] = None) -> str:
         host, model = self.select_node_for_model(self.preferred_model)
         provider = OllamaProvider(host=host, model=model)
-        return provider.generate(prompt, system_instruction=system_instruction)
+        return provider.generate(prompt, system_instruction=system_instruction, max_tokens=max_tokens)
 
 class GeminiProvider(LLMProvider):
     def __init__(self, model: str = "gemini-2.5-flash", api_key: Optional[str] = None, project: Optional[str] = None, base_url: Optional[str] = None):
@@ -736,14 +742,15 @@ class GeminiProvider(LLMProvider):
         except ImportError:
             self.client = None
 
-    def generate(self, prompt: str, system_instruction: str = "") -> str:
+    def generate(self, prompt: str, system_instruction: str = "", max_tokens: Optional[int] = None) -> str:
         if not self.client:
             raise RuntimeError(self.unavailable_reason or "Google GenAI client not initialized. Set GEMINI_API_KEY or GOOGLE_CLOUD_PROJECT.")
 
         from google.genai import types
         config = types.GenerateContentConfig(
             temperature=0.2,
-            system_instruction=system_instruction if system_instruction else None
+            system_instruction=system_instruction if system_instruction else None,
+            max_output_tokens=max_tokens,
         )
         response = self.client.models.generate_content(
             model=self.model,

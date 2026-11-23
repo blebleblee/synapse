@@ -17,7 +17,8 @@ from learning_engine.topic_manager import (
     list_domains,
     resolve_subtopic,
     add_subtopic,
-    get_domain_persona
+    get_domain_persona,
+    get_unit_lessons,
 )
 from learning_engine.models import get_provider, OllamaProvider, OllamaCluster, load_env_file, get_node_name
 from learning_engine.generator import generate_subtopic_content
@@ -145,7 +146,7 @@ def cmd_add(args):
             print("[*] Generating learning units (Foundation, Lesson, Labs)...")
             provider = get_provider(provider_type=args.provider, model=args.model, domain=args.domain)
             results = generate_subtopic_content(args.domain, args.category, args.subtopic, path, provider=provider)
-            print(f"[✔] Generation results: {results}")
+            report_generation(results, path)
 
     except Exception as e:
         print(f"[✘] Error adding subtopic: {e}")
@@ -181,7 +182,24 @@ def cmd_generate(args):
     print("[*] Generating Lessons and Labs...")
 
     results = generate_subtopic_content(domain, cat, sub, sub_path, provider=provider, force=args.force)
-    print(f"\n[✔] Learning modules updated at: {sub_path}")
+    report_generation(results, sub_path)
+
+def report_generation(results, where) -> None:
+    """Say which files were written and which failed; exit 1 if any failed.
+    (It used to print the raw dict, or "updated", and exit 0 even when every
+    file had failed.)"""
+    results = results if isinstance(results, dict) else {}
+    ok = [name for name, done in results.items() if done]
+    failed = [name for name, done in results.items() if not done]
+    if ok:
+        print(f"\n[✔] Wrote {len(ok)} file(s) in {where}: {', '.join(ok)}")
+    if failed:
+        print(f"[✘] {len(failed)} file(s) could not be generated: {', '.join(failed)}")
+        print("    Check that an AI model is reachable (synapse status) and see the messages above.")
+        sys.exit(1)
+    if not ok:
+        print(f"\n[*] Nothing to generate in {where}.")
+
 
 def cmd_chat(args):
     target = resolve_subtopic(args.query)
