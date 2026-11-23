@@ -436,9 +436,22 @@ async def get_status():
         "ollama_models": ollama_models
     }
 
+def _without_server_paths(node):
+    """Copy of the topic tree without absolute paths (`full_path`, and each
+    lesson's `path`). They are for server-side use (exports, search); the
+    browser never reads them, and they reveal the server's folder layout to
+    remote clients. Relative paths, which the UI uses, stay."""
+    if isinstance(node, dict):
+        return {k: _without_server_paths(v) for k, v in node.items()
+                if k != "full_path" and not (k == "path" and isinstance(v, str) and Path(v).is_absolute())}
+    if isinstance(node, list):
+        return [_without_server_paths(v) for v in node]
+    return node
+
+
 @app.get("/api/tree")
 async def get_tree():
-    return get_topic_tree()
+    return _without_server_paths(get_topic_tree())
 
 class TestOllamaRequest(BaseModel):
     host: str

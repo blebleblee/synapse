@@ -24,6 +24,16 @@ def test_api_tree():
     assert "computing" in data
     assert "engineering" in data
 
+def test_api_tree_does_not_reveal_server_paths():
+    """/api/tree sent every course's absolute path (the server's home folder) to
+    the browser, which never used it. With a password and remote access that
+    leaks the server layout."""
+    from learning_engine.topic_manager import WORKSPACE_ROOT
+    text = client.get("/api/tree").text
+    assert "full_path" not in text
+    assert str(WORKSPACE_ROOT) not in text
+
+
 def test_api_graph():
     res = client.get("/api/graph")
     assert res.status_code == 200

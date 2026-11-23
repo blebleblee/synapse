@@ -15,7 +15,6 @@ export interface UnitNode {
   course_title?: string;
   unit: string;
   rel_path: string;
-  full_path: string;
   status: SubtopicStatus;
   lessons?: LessonItem[];
   completed_lessons?: string[];
