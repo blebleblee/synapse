@@ -30,6 +30,9 @@ PRIVATE_FILE_PATTERNS = [
     re.compile(r"(?:^|/)active_session\.md$", re.IGNORECASE),
     re.compile(r"(?:^|/)chat_history\.json$", re.IGNORECASE),
     re.compile(r"(?:^|/)CURRICULUM_BLUEPRINT\.md$", re.IGNORECASE),
+    # Written by the app from the learner's chat sessions.
+    re.compile(r"(?:^|/)MASTERED_GUIDE\.md$", re.IGNORECASE),
+    re.compile(r"^topics/.*/SUMMARY\.md$", re.IGNORECASE),
 ]
 
 SECRET_PATTERNS = [

@@ -488,3 +488,13 @@ def test_unreachable_sandbox_does_not_fall_back_to_a_host_shell(monkeypatch):
         assert "exec /bin/bash" not in script and "exec /bin/zsh" not in script
         assert "Host Shell" in script  # tells the learner how to get a shell on purpose
     assert asyncio.run(backend.terminal_command("host", host_shell)) == host_shell
+
+
+def test_check_staged_content_blocks_files_written_from_chat_sessions():
+    """The field guide and the course summary are written from the learner's
+    mentor chats; the pre-commit guard did not know about either."""
+    from scripts.check_staged_content import is_private_path
+    assert is_private_path("topics/computing/systems/bash/artifacts/MASTERED_GUIDE.md")[0] is True
+    assert is_private_path("topics/computing/systems/bash/SUMMARY.md")[0] is True
+    assert is_private_path("SUMMARY.md")[0] is False
+    assert is_private_path("docs/SUMMARY.md")[0] is False

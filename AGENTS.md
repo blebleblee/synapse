@@ -35,7 +35,8 @@ use it locally.
 - Never use private content as examples, test fixtures or statistics; measure
   only what `git ls-files topics` returns.
 - Chat sessions (`sessions/`, `active_session.md`, `chat_history.json`),
-  `artifacts/MASTERED_GUIDE.md` (written from them) and
+  `artifacts/MASTERED_GUIDE.md` and course `SUMMARY.md` (both written from
+  them) and
   `CURRICULUM_BLUEPRINT.md` files are private too.
 - Release packs must pass `python scripts/check_release_packs.py`; the upload
   scripts run it and refuse to publish if it fails.
