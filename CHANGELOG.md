@@ -9,9 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-23
+
+### Security
+- **The sandbox is never a host shell in disguise.** With Docker or the Kubernetes cluster unreachable, "Linux Sandbox" and "Kubernetes Pod" used to open a shell on your own computer while still saying "Sandbox", so lesson Run buttons ran there. They now show the setup steps and open no shell.
+- **Run on Host Shell only types the command;** you review it and press Enter. Sandboxes still run it directly.
+- Cross-origin state-changing requests are rejected; a pre-commit guard blocks private content and secrets.
+
+### Added
+- **Flashcard review queue** with spaced-repetition intervals that persist between sessions.
+- **Search:** domain filter chips, highlighted matches, and results that open the matched lesson and section.
+- **Reader:** headings get anchors, so links can jump to a section.
+- **Idle shutdown** and a localhost-only shutdown endpoint; a first-run health check script (`scripts/health_check.py`).
+
 ### Changed
+- **Settings, redesigned:** titled groups with plain labels and hints, one control size, and a clear split into Appearance, AI models and Courses. The unused "Reviewer / Evaluator Model" setting is gone.
+- **Breathing room:** the topic tree, lesson and mentor panels sit as separate cards with a small gap.
+- **Mentor answers fit the question:** short for quick questions, complete for explanations, walkthroughs and exercises (it was capped at 2-4 sentences). It answers from the lesson first and says when it is unsure.
+- **Mentor suggestions fit the course:** terminal and debugging prompts only in technical courses; other courses get explain / exercise / common mistakes / quiz prompts.
+- The mentor model is shown once, in the status bar.
 - **Curriculum packs have their own release** (`curriculum`), updated only when a pack's content changes. The app downloads packs from there first and still falls back to older app releases. App releases no longer carry packs.
 - **Releases no longer include `Synapse-Portable-Windows.zip`**, which was an identical copy of `Synapse-Workbench-Portable-<version>-win-x64.zip`.
+
+### Fixed
+- **The mentor works on long lessons.** Lessons and labs over 50,000 characters (351 of them) made every mentor request fail. It also saw only the first 5,000 characters; it now gets the sections your question is about.
+- Mentor replies no longer lose their opening when the answer contains a `# comment` in a code block, or the closing fence of a final code block.
+- **Math renders in every subject** (it did only in formal and natural sciences); prices like $5 stay text, and `<` inside code is no longer escaped.
+- **Diagrams:** every Mermaid diagram in the public lessons renders; the reader's repair no longer corrupts quoted labels or cuts sequence-diagram labels at `;`.
+- **Listen** shows "Preparing…" while the audio is made (the first time can take a minute), can be cancelled, and never starts playing a lesson you already left. The tooltip says the text goes to an online speech service.
+- Course names show in correct case in the mentor panel; two courses no longer carry another course's title.
+- Escape closes dialogs; the restored topic is revealed after a reload; flashcard generation gives feedback; the Anki export reuses the deck; maintenance buttons do what they say.
+- **Terminal:** `# comment` lines work in zsh; a PTY file descriptor is no longer closed twice (which broke an unrelated connection).
+- **CLI:** one-line errors with exit code 1 instead of tracebacks; `review` stops when no AI model answers; `clean --db` really compacts the database.
 
 ## [1.2.2] - 2026-11-22
 
