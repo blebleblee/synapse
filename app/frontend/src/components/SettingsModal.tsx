@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DEFAULT_SETTINGS, type AppSettings, type SettingsTab } from './settingsDefaults';
 import { useEscapeToClose } from '../utils/useEscapeToClose';
 import {
@@ -165,9 +165,10 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
   // Options for a model <select>. The saved model always stays listed, so the
   // dropdown never shows a different model than the one the app will use.
   // The "complete" masterpack is a download bundle, not a subject area.
-  const installedDomains = packagesData.installed.filter(
-    (p) => p.domain !== 'complete' && p.domain !== 'synapse_complete_curriculum'
-  );
+  // Alphabetical, so a course does not jump to the top after it is imported.
+  const installedDomains = packagesData.installed
+    .filter((p) => p.domain !== 'complete' && p.domain !== 'synapse_complete_curriculum')
+    .sort((a, b) => a.domain.localeCompare(b.domain));
 
   const modelOptions = (current: string | undefined, required = true) => {
     const missing = current && !discoveredModels.includes(current);
@@ -334,6 +335,8 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
       setActionInProgress(null);
     }
   };
+
+  const packFileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -934,15 +937,22 @@ const SettingsPanel: React.FC<Omit<SettingsModalProps, 'isOpen'>> = ({
                         <span>All 12 subject areas are installed.</span>
                       </span>
                     )}
-                    <label className="btn-secondary" title="Import a .synpack file">
+                    {/* A real button (a <label> around a hidden input cannot be reached with Tab). */}
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      title="Import a .synpack file"
+                      onClick={() => packFileInputRef.current?.click()}
+                      disabled={actionInProgress === 'uploading'}
+                    >
                       {actionInProgress === 'uploading' ? (
                         <Loader2 size={13} className="animate-spin" />
                       ) : (
                         <Upload size={13} />
                       )}
                       <span>Import .synpack file</span>
-                      <input type="file" accept=".synpack" onChange={handleFileUpload} style={{ display: 'none' }} />
-                    </label>
+                    </button>
+                    <input ref={packFileInputRef} type="file" accept=".synpack" onChange={handleFileUpload} style={{ display: 'none' }} />
                   </div>
                 </SettingsGroup>
 
