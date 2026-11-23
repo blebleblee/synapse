@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **A lesson snippet can no longer run itself on your computer.** "Send to terminal" types into the Host Shell as a paste you review; a code block from an imported pack could end that paste early and run the rest. Control characters are now removed.
+- **Uninstalling a pack can no longer delete the whole curriculum** (an empty or "." name used to remove every course).
+
+### Changed
+- **"▶ Run" buttons on code blocks are now "⇥ Send to terminal"**: there is no reliable way to tell a runnable snippet from an illustration, and on Host Shell the command is only typed in.
+- **Visual arts, design and 3D courses get their own blueprint** when generated (they used the music one, so labs became music-production exercises).
+
+### Fixed
+- **Regenerate never empties a course.** It deleted the lessons and your chat sessions before writing new ones, so a failed model call or Stop left the course empty. Old lessons are now replaced only when every new file succeeds, and Stop really stops the server.
+- **Generating says what happened**: which files were written, which failed (e.g. no model reachable), and that existing lessons were kept. Before, a failed run just reloaded the course. The CLI no longer reports files already on disk as failures.
+- **The quiz never shows a made-up question.** When the model's reply could not be read, a built-in generic question was shown as the course quiz; now you see an error. One malformed question (or flashcard) no longer loses the others.
+- **Add Topic creates the course** (it always failed).
+- **Mentor:** a Gemini model answers instead of erroring; replies render lists, code and tables; the terminal output is sent once and only used when the question is about it.
+- **Lesson generation works with Ollama and Gemini again; `synapse chat` works;** `synapse add -g` / `generate` report failures and exit 1.
+- **Every formula in the public lessons renders** (100 KaTeX errors fixed).
+- Settings: the course list stays alphabetical and Import is a real, keyboard-usable button.
+
 ### Removed
 - **"Mastered Field Guide" (Export menu) and "Update Curriculum Summary" (More options)**, leftovers of an earlier design, together with their endpoints (`/api/artifacts/compile`, `/api/summary/regenerate`). Old `MASTERED_GUIDE.md` / `SUMMARY.md` files stay private: git-ignored and never packed.
 
