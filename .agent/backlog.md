@@ -342,7 +342,7 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 
 - **UI:** all main flows exercised in batches 1–6. (Listen, translation, Add Topic, rename/delete checked in batches 4–5.) (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
 - **CLI:** checked in batch 2 (FIND-30). `pack list/install/uninstall` checked in batch 6. `add`, `generate`, `chat` checked in batch 7.
-- No course ships `flashcards.csv` (the one that did was a test artifact); every deck is generated on first open (tens of seconds). Consider shipping decks or pre-generating in the curriculum pipeline (product decision).
+- **Ship flashcard decks (owner: yes, 2026-11-23):** `scripts/generate_flashcard_decks.py` is ready (Sonnet 4.6 via the API; 12 cards from every lesson and the lab; skips existing decks). **Waiting for the API proxy**; then run it (539 decks, roughly $15), spot-check, commit the decks, rebuild packs, update the `curriculum` release.
 
 ---
 

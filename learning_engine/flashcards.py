@@ -13,7 +13,12 @@ from .topic_manager import resolve_subtopic, get_domain_persona, get_unit_lesson
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
-def generate_flashcards(query: str, provider_type: Optional[str] = None, model: Optional[str] = None) -> Path:
+def generate_flashcards(query: str, provider_type: Optional[str] = None, model: Optional[str] = None,
+                        provider=None, cards: int = 8, max_lessons: int = 4,
+                        per_file_chars: int = 2000, context_chars: int = 6000) -> Path:
+    """Writes the course's flashcards.csv. The defaults suit the small local
+    model the app uses on first open; scripts/generate_flashcard_decks.py
+    (decks shipped with the curriculum) passes a larger budget."""
     target = resolve_subtopic(query)
     if not target:
         raise ValueError(f"Topic '{query}' not found.")
@@ -23,17 +28,17 @@ def generate_flashcards(query: str, provider_type: Optional[str] = None, model: 
 
     context_parts = []
     discovered = get_unit_lessons(sub_path)
-    for l in discovered[:4]:
+    for l in discovered[:max_lessons]:
         p = Path(l["path"])
         if p.exists():
-            context_parts.append(p.read_text(encoding="utf-8")[:2000])
+            context_parts.append(p.read_text(encoding="utf-8")[:per_file_chars])
 
     labs_file = sub_path / "labs.md"
     if labs_file.exists():
-        context_parts.append(labs_file.read_text(encoding="utf-8")[:2000])
+        context_parts.append(labs_file.read_text(encoding="utf-8")[:per_file_chars])
 
     prompt = f"""You are creating an Anki spaced-repetition active recall flashcard deck for '{sub.replace('_', ' ').title()}'.
-Based on the curriculum text below, generate 8 high-impact active recall flashcards.
+Based on the curriculum text below, generate {cards} high-impact active recall flashcards.
 Each flashcard must test a single core invariant, architectural mechanism, formula, or common misconception.
 
 Return strictly a valid JSON array of objects with 'front' (question) and 'back' (clear, concise answer):
@@ -45,11 +50,11 @@ Return strictly a valid JSON array of objects with 'front' (question) and 'back'
 ]
 
 Curriculum Context:
-{"".join(context_parts)[:6000]}
+{"".join(context_parts)[:context_chars]}
 
 Output valid JSON only with no markdown formatting."""
 
-    provider = get_provider(provider_type=provider_type, model=model, domain=domain)
+    provider = provider or get_provider(provider_type=provider_type, model=model, domain=domain)
     raw = provider.generate(prompt, system_instruction=persona).strip()
 
     # One broken card (bad quotes in a command) no longer loses the deck.
