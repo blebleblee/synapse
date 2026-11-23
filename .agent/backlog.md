@@ -356,3 +356,5 @@ Waiting for the API proxy (owner says when it works); `synapse review --workers 
 
 - **Curriculum review: ON HOLD (owner decision 2026-11-23).** Too expensive as built (~$5 per course with Gemini 3.8 Flash). Don't run reviews until the owner asks. The saved rag_systems findings are unapplied.
 - **Flashcard decks:** 510 shipped (5ed6df9, 70cf690); 29 left for when there is API credit.
+
+- **FIND-75 Refactor branch-heavy code (owner, 2026-11-23: "quite some if noodling... at some point refactor").** Status: OPEN, plan first, no behaviour change. Worst offenders (measured): `main.py` `terminal_websocket` (61 ifs, 440 lines) and `get_topic_details` (30 ifs, 178 lines); `generator.py` `scope_topic_curriculum` (326 lines: three prompt builders in one function) and `_generate_topic_parallel` (23 ifs); `models.py` `get_chat_provider` (18 ifs). Approach: one function per step; prompt templates as data (like DOMAIN_PROFILE.json); a provider table instead of if/elif. Guard each step with the prompt-snapshot comparison (scratch `prompt_snapshot.py`, worth adding as a test) and the existing tests.

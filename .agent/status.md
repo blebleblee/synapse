@@ -223,3 +223,6 @@ Verification: `./scripts/verify_all.sh` all 6 phases (268 backend, 38 frontend u
   65k in / 45k out tokens, 90% of output thinking) cost the owner ~$5 on
   the Google key: a full review is not affordable as built. Findings were
   real (scores 100/82/75/68/68); not applied.
+- CI: runs #144-#150 failed (Gemini provider tests needed the optional
+  google-genai package); fixed in 8204463. Agent docs rule added to
+  AGENTS.md; manual acceptance checklist moved to `.agent/`.
