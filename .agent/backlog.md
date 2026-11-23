@@ -247,14 +247,26 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-43: Add Topic Dialog Always Failed
 - **Status:** **COMPLETED** (`ae8b7f5`). Test: `toSlug` in `app/frontend/src/utils/text.test.ts`.
 
+### FIND-44: CI Build Flaked on the WebAssembly Bundler
+- **Status:** **COMPLETED** (`b7ae6db`).
+
+### FIND-45: Mentor Got the Terminal Twice Under a "MUST Inspect" Rule
+- **Status:** **COMPLETED** (`8933d73`). Test: `test_api_chat_sends_terminal_output_to_the_model_once`.
+
+### FIND-46: Course List Order Jumped; Import Not Keyboard-Reachable
+- **Status:** **COMPLETED** (`1092748`).
+
+### FIND-47: Pack Uninstall of "" or "." Deleted the Whole Curriculum
+- **Status:** **COMPLETED** (`4fe4d9a`). Tests in `tests/test_packages.py`, `tests/test_cli.py`.
+
 ## Next Candidates (not yet verified)
 
 - **Curriculum hallucinations (owner question, proposal):** (1) `synapse review` with a reviewer from a different model family than the generator; (2) run lesson/lab code blocks in the sandbox in CI and flag failures; (3) extract checkable claims (versions, defaults, flags, API names) and verify against docs or installed tools; (4) a "Report a mistake" button in the reader feeding a review queue. (1) and (2) are cheapest. NEEDS DECISION on which to build.
 - **Run buttons:** shown on every bash block, including illustrations like `cmd > file`. Consider showing Run only in labs or on blocks marked runnable (product decision).
-- **Mentor:** terminal buffer and last command are injected twice (system instruction and prompt) under a "you MUST inspect" directive, even for unrelated questions; consider once, and only when relevant. Lesson-generation cleanup (`validate_generation_output`) still runs on chat replies; a chat-specific path would be cleaner.
+- **Mentor:** lesson-generation cleanup (`validate_generation_output`) still runs on chat replies; a chat-specific path would be cleaner.
 
-- **UI not yet exercised in this pass:** Curriculum Store. (Listen, translation, Add Topic, rename/delete checked in batches 4–5.) (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
-- **CLI:** checked in batch 2 (FIND-30). Not yet exercised: `add`, `generate`, `chat`, `pack install/uninstall` (they write or need a model).
+- **UI:** all main flows exercised in batches 1–6. (Listen, translation, Add Topic, rename/delete checked in batches 4–5.) (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
+- **CLI:** checked in batch 2 (FIND-30). `pack list/install/uninstall` checked in batch 6. Not yet exercised: `add`, `generate`, `chat` (need a model).
 - No course ships `flashcards.csv` (the one that did was a test artifact); every deck is generated on first open (tens of seconds). Consider shipping decks or pre-generating in the curriculum pipeline (product decision).
 
 ---
