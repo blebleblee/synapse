@@ -7,7 +7,7 @@
 - **Tests are isolated from the host:** `tests/conftest.py` clears provider keys and hosts (`ANTHROPIC_API_KEY*`, `VNAIPRO_*`, `GEMINI_*`, `OLLAMA_HOSTS`, …); app shutdown waits for the start-up warm-up threads. Both hid failures until CI ran.
 - **Decisions taken:** keep Electron; leave git history as is; no Gitea password rotation (server is local-only); agent notes live in `.agent/`; pushes to GitHub only with owner approval per push.
 - **Curriculum release (2026-11-22, `606f85e`):** packs live on the `curriculum` release on both hosts, published with `scripts/publish_all_releases.py --curriculum`; only packs whose content digest changed are replaced (`curriculum.json` on the release). The app downloads from `curriculum` first, then v<version>/v1.2.0. App releases carry no packs and no longer the duplicate `Synapse-Portable-Windows.zip` (owner decision; the win-x64 zip, the macOS .zip and the 13 packs bundled in installers were kept on purpose). Gitea has no "not latest" flag, so its UI may show `curriculum` as the newest release; nothing in the app relies on "latest".
-- **Verification:** `./scripts/verify_all.sh`, all 6 phases (2026-11-23 ~07:10: 324 backend, 53 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean). Latest checkpoint: `425c29d` pushed to `gitea/main` (CI #102 green). `github/main` is at the v1.3.0 release commit `7239c83`; the commits after it are on gitea only (GitHub push needs owner approval).
+- **Verification:** `./scripts/verify_all.sh`, all 6 phases (2026-11-23 ~08:00: 328 backend, 56 frontend unit, 15 E2E, oxlint 0 warnings, repo audit clean). Latest checkpoint: `2aa0ee6` pushed to `gitea/main` (CI #105 green). `github/main` is at the v1.3.0 release commit `7239c83`; the commits after it are on gitea only (GitHub push needs owner approval).
 - **Security finding (2026-11-21):** the Gitea password was hard-coded in `scripts/upload_gitea_release.py` in commits `b99e525`..`b1fd437`, public on GitHub. No rotation (local-only server). Never print it.
 - **Pending owner actions:** top up proxy credit; send the Safari diagram case.
 - **Improvement ideas (completed 1–7):** release from CI; protected `main` with PR-only changes.
@@ -71,6 +71,13 @@ Commits (all pushed to `gitea/main`; CI #49–#56 green, #57+ queued at handoff 
 - `771c769` terminal PTY slave fd closed twice → killed unrelated sockets ("Invalid frame header"). FIND-27.
 - `b14085c` course-path links read "Kubernetes: Kubernetes" (301 doubled graph labels). FIND-28.
 - `7ff4d93` Anki export regenerated/overwrote decks; placeholder decks cached; Anki headers on one row; leaked test deck removed from kubernetes. FIND-29.
+
+### Batch 12 (2026-11-23, 07:38–08:05): privacy, summary, terminal
+
+- `9bbb200` privacy: `<course>/SUMMARY.md` ("Regenerate summary") is written partly from the learner's chat sessions and was neither git-ignored nor excluded from packs. Now both, listed private in AGENTS.md; the pre-commit guard blocks it and `MASTERED_GUIDE.md` (missed in FIND-51). FIND-56.
+- `5285157` (CI #104): summary regeneration reports model errors (502) and never replaces SUMMARY.md with an empty reply. Not clicked in the app (button only shows once a summary exists; error path uses the existing notice).
+- `2aa0ee6` (CI #105) **security:** Run on Host Shell sends a bracketed paste; snippet text was not cleaned, so an `ESC[201~` in an imported (untrusted) pack's code block could end the paste and run the rest without review. Control characters are now stripped. Checked in the app: a six-line lab command is typed into zsh, not run. FIND-57.
+- Translation failure handling reviewed (already guarded: errors and truncation keep the English section).
 
 ### Batch 11 (2026-11-23, 06:26–07:15): AI feedback, quiz, flashcards
 

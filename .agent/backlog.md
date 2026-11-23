@@ -284,6 +284,12 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-55: One Broken Flashcard Lost the Whole Deck
 - **Status:** **COMPLETED** (`425c29d`). Tests: `tests/test_json_salvage.py`, `test_search.py`.
 
+### FIND-56: Course SUMMARY.md (From Chat Sessions) Could Be Packed or Committed
+- **Status:** **COMPLETED** (`9bbb200`). Tests: `test_pack_privacy.py::test_course_summary_is_never_packed`, `test_security_hardening.py::test_check_staged_content_blocks_files_written_from_chat_sessions`.
+
+### FIND-57: Host-Shell Paste Could Be Escaped by a Snippet
+- **Status:** **COMPLETED** (`2aa0ee6`). Tests: `terminalText.test.ts`.
+
 ## Next Candidates (not yet verified)
 
 - **Export menu → field guide:** done in `8041726` (downloads; clearer label).
