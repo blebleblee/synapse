@@ -262,6 +262,10 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-48: Generation Failed on Ollama/Gemini; CLI chat Crashed; Failures Exited 0
 - **Status:** **COMPLETED** (`a6cfa24`). Tests: `tests/test_provider_contract.py`, `tests/test_cli.py`.
 
+### FIND-49: Visual Arts Courses Generated From the Music Blueprint
+- **Status:** **GENERATOR FIXED** (`d32f356`, tests in `tests/test_domain_strategies.py`). **Content NEEDS DECISION:** 18 public labs are music-production exercises (DAW setup, voice-leading, timbre synthesis, mixing) under visual-arts, design and 3D courses: 3d_graphics/3d_animation, 3d_graphics/3d_rendering, 3d_graphics/blender, 3d_graphics/maya, design/interior_design, design/ux_design, design/web_design, visual_arts/2d_animation, visual_arts/art_history, visual_arts/color_theory, visual_arts/composition, visual_arts/sculpture, visual_arts/sketching, visual_media/content_creation, visual_media/davinci_resolve, visual_media/graphic_design, visual_media/photography, visual_media/video_production. 42 visual-arts files also contain musician/audio-engineer analogies (233 lines). Options: (a) regenerate the 18 labs with the fixed blueprint (cloud model via `bin/synapse generate --force`, cost; or local qwen2.5-coder:32b, ~4 min/file, lower quality), then review; (b) hide those labs until regenerated; (c) hand-edit the analogies in lessons. Regenerated content needs the owner's hallucination policy (see the hallucination proposal below).
+- **Related (not fixed):** in the TOPIC_OUTLINE path the capstone lab for every non-maths course is IT-flavoured (CLI, YAML, failure injection). No public course uses TOPIC_OUTLINE.md.
+
 ## Next Candidates (not yet verified)
 
 - **Tests:** conftest's autouse blocker replaces provider `generate` with `(*args, **kwargs)`, so signature mismatches between callers and real providers cannot fail a test. `test_provider_contract.py` covers `generate`; consider the same for `generate_stream`/`generate_cancellable` callers.
