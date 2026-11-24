@@ -23,7 +23,7 @@ Rootless voicings exist because in a trio or combo, the bassist already plays th
 **A Form (7th on the bottom of the LH shape):**
 
 ```text
-Dm7     F – A – C – E      (♭7 – 9 – 11 – 5)
+Dm7     F – A – C – E      (♭3 – 5 – ♭7 – 9)
 G7      F – A – B – E      (♭7 – 9 – 3 – 13)
 Cmaj7   E – G – B – D      (3 – 5 – 7 – 9)
 ```

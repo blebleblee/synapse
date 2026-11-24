@@ -92,7 +92,7 @@ A motive is a 2–4 note cell, usually spanning 1–2 bars, that's distinctive e
 
 **What it is:** Reverse the sign of every interval. A rising third becomes a falling third.
 
-**At the piano:** Original: C(60) → D(+2) → C(−2) → F(+5) → C(−3). Inverted: C(60) → Bb(−2) → C(+2) → G(−5) → Bb(+3)... play through it slowly and you'll feel the mirror-image shape: where the original reached up, the inversion reaches down.
+**At the piano:** Original: C(60) → D(+2) → C(−2) → F(+5) → D(−3). Inverted: C(60) → Bb(−2) → C(+2) → G(−5) → Bb(+3)... play through it slowly and you'll feel the mirror-image shape: where the original reached up, the inversion reaches down.
 
 **Where you'll use it:** Write your verse motif rising (hopeful), then invert it for the bridge so it falls (introspective) — same DNA, opposite emotional color. This is a fast way to write a contrasting bridge that still feels connected to the rest of the song instead of randomly different.
 
@@ -278,11 +278,11 @@ The verse ("Now I've heard there was a secret chord...") sits in a comfortable m
 
 ### 7.2 *Someone Like You* (Adele) — The Octave Leap as Climax
 
-The verse stays mid-register and mostly stepwise (intimate, conversational). The chorus's defining moment is a leap from a low 1̂ up to a high 1̂ an octave above — the single largest registral jump in the song, placed exactly at the emotional peak of the lyric ("Never mind, I'll find someone like you"). This is Rule 3 from Section 1 in action: a leap this large momentarily breaks the sense of "one smooth voice," and that break *is* the catharsis — the melody itself enacts the emotional rupture the lyric describes. The bridge modulates up a whole step and repeats the same melodic shape at the new, higher pitch level (transposition as escalation, Section 3.1), so the listener recognizes the tune but perceives it as more intense.
+The verse stays mid-register and mostly stepwise (intimate, conversational). The chorus's defining moment is a leap from a low 1̂ up to a high 1̂ an octave above — the single largest registral jump in the song, placed exactly at the emotional peak of the lyric ("Never mind, I'll find someone like you"). This is Rule 3 from Section 1 in action: a leap this large momentarily breaks the sense of "one smooth voice," and that break *is* the catharsis — the melody itself enacts the emotional rupture the lyric describes. The bridge builds dynamic intensity using a contrasting chord progression while remaining in the same key, rather than modulating. (transposition as escalation, Section 3.1), so the listener recognizes the tune but perceives it as more intense.
 
 ### 7.3 *Yesterday* (The Beatles) — Restraint as the Hook
 
-Every verse is close to 100% stepwise motion with zero large leaps — an unusually pure demonstration that a melody doesn't need surprise devices to be memorable; sheer melodic cleanliness and lyrical pairing can carry a song. The bridge shifts the harmonic center (F major to D major, a modal/key contrast) and lifts the register slightly without introducing any new rhythmic or intervallic complexity — contrast comes entirely from harmonic color and register, not melodic invention. The lesson: expectancy violation (Section 5.1) is one tool among several, not a requirement. A melody built entirely on Rule 1 and Rule 2 — nearly all steps, clean cadences on 1̂ — can be just as unforgettable when the restraint itself becomes the distinguishing feature.
+Every verse is close to 100% stepwise motion with zero large leaps — an unusually pure demonstration that a melody doesn't need surprise devices to be memorable; sheer melodic cleanliness and lyrical pairing can carry a song. The bridge shifts the harmonic center (F major to D minor, a modal/key contrast) and lifts the register slightly without introducing any new rhythmic or intervallic complexity — contrast comes entirely from harmonic color and register, not melodic invention. The lesson: expectancy violation (Section 5.1) is one tool among several, not a requirement. A melody built entirely on Rule 1 and Rule 2 — nearly all steps, clean cadences on 1̂ — can be just as unforgettable when the restraint itself becomes the distinguishing feature.
 
 ---
 

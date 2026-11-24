@@ -119,7 +119,7 @@ Constraints in 3ds Max include:
 
 **Orientation constraints** match a bone's rotation to a target, again with weighted blending support.
 
-**Pole Vector constraints** control the plane in which an IK chain bends by specifying a secondary target that the chain's middle joint tries to point toward.
+**Swivel angle targets** (set in the HI Solver's IK Solver Properties) control the plane in which an IK chain bends by naming a target object that orients the chain's bend plane.
 
 **Attachment constraints** bind a bone to a moving surface (useful for characters standing on deforming terrain).
 

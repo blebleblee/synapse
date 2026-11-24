@@ -84,7 +84,7 @@ Every melody on earth is a sentence written in these three letters. Fluent conto
 | Wave Down-Up-Down | ↓↑↓ | E–C–D–A | Syncopated, jazzy |
 
 **Landmark melodies as contour fingerprints** — memorize these as reference shapes you can recall instantly:
-- **"Somewhere Over the Rainbow":** → ↑(octave) ↓ ↓ → — huge leap, then settle down stepwise.
+- **"Somewhere Over the Rainbow":** ↑(octave) ↓ ↓ ↑ ↑ ↑ — huge leap on the first two notes, then a stepwise descent and recovery. — huge leap, then settle down stepwise.
 - **"Twinkle Twinkle Little Star":** → ↑ → ↑ → ↑ ↓ — repeated-note pairs climbing by step.
 - **"My Bonnie Lies Over the Ocean":** ↑(major 6th) ↓ ↓ → — wide leap, gentle stepwise descent.
 - **Beethoven's 5th motif:** → → ↓ — plateau then a single decisive drop.

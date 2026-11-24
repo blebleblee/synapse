@@ -8,7 +8,7 @@ Consider what happens when you train a model on a single GPU. The forward pass c
 
 Synchronous SGD—the invariant that `DistributedDataParallel` enforces—demands that before any replica takes an optimizer step, all replicas must agree on the same averaged gradient. Each GPU computes gradients on its local micro-batch, the system aggregates gradients across all GPUs by averaging, and every replica updates its weights using this globally averaged gradient. The result is mathematically equivalent to having computed the forward and backward pass on the concatenated union of all local batches, assuming batch normalization is handled correctly across replicas. This is the synchronization invariant: the gradient that each optimizer step consumes must be the mean of all per-replica gradients, and every replica must take the same step from the same weights. Violating this invariant—through a communication fault, a race condition, or a buggy custom gradient hook—produces silent model divergence that manifests as degraded convergence or NaN losses hours into training.
 
-The communication primitive that makes this aggregation efficient is ring-allreduce, an algorithm originally developed for MPI collectives and adapted by NVIDIA's NCCL (Northbridge Communication Collectives Library) as the default backend for PyTorch distributed operations. In a naïve all-reduce, every GPU sends its full gradient tensor to every other GPU, producing O(N²) traffic that saturates interconnects at scale. Ring-allreduce arranges GPUs in a logical ring. Each GPU sends a chunk of its gradient to its neighbor and receives a different chunk from its other neighbor, performing a partial reduction at each step. After N-1 scatter-reduce steps, every GPU holds a fully reduced chunk, and a second N-1 all-gather phase disseminates the complete result. The total data transferred per GPU is (2 × N - 2) × (gradient_size / N), which is bandwidth-optimal: the per-GPU traffic is independent of the number of GPUs, bounded by 2 × gradient_size regardless of cluster size. This is what makes synchronous distributed training practical at scale, and it is why NCCL is the only production-grade backend for multi-GPU PyTorch workloads.
+The communication primitive that makes this aggregation efficient is ring-allreduce, an algorithm originally developed for MPI collectives and adapted by NVIDIA's NCCL (NVIDIA Collective Communications Library) as the default backend for PyTorch distributed operations. In a naïve all-reduce, every GPU sends its full gradient tensor to every other GPU, producing O(N²) traffic that saturates interconnects at scale. Ring-allreduce arranges GPUs in a logical ring. Each GPU sends a chunk of its gradient to its neighbor and receives a different chunk from its other neighbor, performing a partial reduction at each step. After N-1 scatter-reduce steps, every GPU holds a fully reduced chunk, and a second N-1 all-gather phase disseminates the complete result. The total data transferred per GPU is (2 × N - 2) × (gradient_size / N), which is bandwidth-optimal: the per-GPU traffic is independent of the number of GPUs, bounded by 2 × gradient_size regardless of cluster size. This is what makes synchronous distributed training practical at scale, and it is why NCCL is the only production-grade backend for multi-GPU PyTorch workloads.
 
 Mixed precision training addresses a different physical constraint: the arithmetic throughput and memory bandwidth of modern GPUs is dramatically higher at 16-bit precision than at 32-bit. On an NVIDIA H100, FP16 matrix multiplication throughput exceeds FP32 by roughly 2x to 4x depending on tensor core utilization, and FP16 tensors consume half the HBM bandwidth for every load and store. The challenge is that 16-bit floating-point numbers have a narrow dynamic range. FP16 can represent values from approximately 6×10⁻⁵ to 65504, with diminishing precision near the extremes. Many gradient values in deep networks fall below 6×10⁻⁵, and when multiplied by a learning rate, they underflow to zero. If gradients become zero, those parameters stop learning permanently. The solution—Automatic Mixed Precision, or AMP—maintains a master copy of weights in FP32, performs the forward and backward pass in FP16 (or BF16 on Ampere and later), and uses a loss scaler to shift gradients into the representable range before the backward pass produces them. The GradScaler multiplies the loss by a large factor before backpropagation, which scales every gradient up proportionally, preventing underflow. After the optimizer reads the scaled gradients, it divides them back by the same factor before applying the update to the FP32 master weights.
 
@@ -314,7 +314,7 @@ The `torchrun` launcher sets `RANK`, `WORLD_SIZE`, `LOCAL_RANK`, and `MASTER_ADD
 
 ### The DDP Gradient Synchronization Pipeline
 
-To understand why DDP is fast, consider the exact sequence of operations during a single training step. When `loss.backward()` is called, PyTorch's autograd engine begins computing gradients in reverse topological order. DDP registers gradient hooks on every parameter via `Reductor` objects that wrap NCCL all-reduce calls. The internal data flow looks like this:
+To understand why DDP is fast, consider the exact sequence of operations during a single training step. When `loss.backward()` is called, PyTorch's autograd engine begins computing gradients in reverse topological order. DDP registers gradient hooks on every parameter via `Reducer` objects that wrap NCCL all-reduce calls. The internal data flow looks like this:
 
 ```mermaid
 flowchart TD
@@ -492,7 +492,7 @@ def save_distributed_checkpoint(path: str, model, optimizer, scaler, epoch, step
         "step": torch.tensor(step),
     }
     writer = FileSystemWriter(Path(path))
-    dcp.save(state, writer)
+    dcp.save(state, storage_writer=writer)
 
 def load_distributed_checkpoint(path: str, model, optimizer, scaler):
     """Load a sharded checkpoint. Each rank reads only its own shard."""
@@ -504,7 +504,7 @@ def load_distributed_checkpoint(path: str, model, optimizer, scaler):
         "step": torch.tensor(0, dtype=torch.long),
     }
     reader = FileSystemReader(Path(path))
-    dcp.load(state, reader)
+    dcp.load(state, storage_reader=reader)
     return int(state["epoch"]), int(state["step"])
 ```
 

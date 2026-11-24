@@ -317,7 +317,7 @@ Interval:   M6 – P8
 Take: `CF: D–E–F–E–D` / `CP: D–C–D–C–D` (D Dorian) and rebuild it, from the interval logic up, in:
 1. **E Phrygian**: `E–F–G–F–E` — notice E to F is a half-step, which changes which notes above E count as thirds and sixths compared to Dorian's whole-step D to E. Re-derive your consonance table, don't just shift letter names.
 2. **F Lydian**: `F–G–A–G–F`
-3. **G Mixolydian**: `G–A–Bb–A–G`
+3. **G Mixolydian**: `G–A–B–A–G``
 
 This matters because real modal repertoire (and a lot of modern film/game modal writing) depends on exactly these half-step placements for its color — if you only ever practice in Dorian, your ear won't generalize.
 
@@ -469,7 +469,7 @@ Re-check Upper/Lower: P5, m6, P5, M3, P5 — still parallel fifths between bars 
 
 ### Lab B: Suspension Chain in Minor
 
-CF (A Aeolian): `A – B – C – B – A`. Write fourth species below the CF, targeting a 7–6 suspension at bar 2 and a 4–3 at bar 4. Check your chain against the validator logic in §9 by hand-tracing each prepare/suspend/resolve triplet.
+CF (A Aeolian): `A – B – C – B – A`. Write fourth species above the CF to target a 7–6 suspension, or change the target to a 2–3 suspension if writing below the CF. and a 4–3 at bar 4. Check your chain against the validator logic in §9 by hand-tracing each prepare/suspend/resolve triplet.
 
 ### Lab C: Florid Counterpoint with Imitation
 

@@ -80,7 +80,7 @@ Double Bass (unis.):  A2 tremolo, pp → ff over 4 bars
 |---|---|---|---|
 | Flute | C4 → C7 (D7 for advanced players) | Concert pitch | Low (C4–C5): breathy, intimate, easily covered by other instruments; mid (C#5–C6): clear, singing, the workhorse register; high (C#6+): bright, piercing, cuts through full orchestra |
 | Oboe | Bb3 → A6 | Concert pitch | Low (Bb3–Eb4): reedy, dark, slightly difficult to control softly; mid (E4–G5): the signature plaintive oboe color, best for exposed melody; high (Ab5+): thin, pinched, strained — use sparingly |
-| Bb Clarinet | E3 → C7 | Sounds a major 2nd lower than written | Chalumeau (E3–Bb4): warm, hollow, rich; throat tones (B4–Bb5): weak and stuffy, avoid exposing melodically; clarion (B5–C7): brilliant, the clarinet's "singing" register |
+| Bb Clarinet | E3 → C7 | Sounds a major 2nd lower than written | Chalumeau (E3–Bb4): warm, hollow, rich; Change to: Throat tones (G4–Bb4): weak and stuffy, avoid exposing melodically; clarion (B4–C6): brilliant, the clarinet's 'singing' register. |
 | Bassoon | Bb1 → Eb5 | Concert pitch | Low (Bb1–Bb2): growling — comic in fast rhythms, ominous when sustained; tenor (C3–Eb4): vocal, exposed-melody register; high (E4+): reedy, effortful, strained above F4 |
 
 #### Articulation & Tonguing
@@ -211,7 +211,7 @@ Soft mallets = warm/round, hard mallets = bright/articulate. State mallet hardne
 
 1. Write transposing instruments in their transposed key in the parts — never concert pitch in a Bb trumpet or F horn part.
 2. Match articulation across doubled lines (if violins are slurred, winds doubling them should phrase identically).
-3. Standard engraving convention: dynamics below the staff for winds/brass, above the staff for strings.
+3. Standard engraving convention: dynamics below the staff for all instruments (including strings), and above the staff for vocal lines.
 4. Insert breath commas for winds every 8–12 seconds of continuous playing.
 5. Give brass 2–4 bars rest for mute insertion/removal.
 6. State initial timpani tuning at the top of the movement ("Timp. in D–A–D").
@@ -372,7 +372,7 @@ graph TB
 
 **Assignment 1 — Timbre Analysis.** Score: Ravel, *Daphnis et Chloé* Suite No. 2, "Lever du jour." Identify every doubling in the sunrise crescendo (Rehearsal 154–161). Note which instrument enters at which dynamic. Chart the blend strategy bar by bar.
 
-**Assignment 2 — Register Mapping.** Score: Stravinsky, *The Rite of Spring*, "Sacrificial Dance." Map the opening bassoon solo onto the instrument's range chart and identify exactly why it sits in a strained register for that instrument. Catalogue all brass entrances and mark each as "sweet spot" or "extreme."
+**Assignment 2 — Register Mapping.** Score: Stravinsky, *The Rite of Spring*, "Introduction" (Part 1). Map the opening bassoon solo onto the instrument's range chart and identify exactly why it sits in a strained register for that instrument. Catalogue all brass entrances and mark each as "sweet spot" or "extreme."
 
 **Assignment 3 — Orchestration Transcription.** Score: Mussorgsky/Ravel, *Pictures at an Exhibition*, "The Great Gate of Kiev." Reduce the final tutti climax to a 3–4 stave short score, identifying which instruments carry melody, harmony, and rhythm. Then re-orchestrate the same passage for 2 Flutes, 2 Clarinets, 2 Horns, and strings, preserving the dramatic arc with a fraction of the forces.
 

@@ -116,7 +116,7 @@ The interplay between LazyMouse radius, brush radius, and intensity creates thre
 
 **Deformation Appearing on Unintended Mesh Elements:** This typically occurs when multisubject mode is enabled and you accidentally brush across multiple visible objects. The brush applies to all intersected meshes simultaneously. Resolution: verify that only your intended sculpting target is visible by toggling visibility on other objects, or disable multisubject mode if you need strict single-object sculpting.
 
-**Mask Boundaries Appearing as Hard Edges:** If masked regions show visible deformation discontinuities, the mask feather is set to zero (hard mask). Resolution: select the mask and apply feathering (Mask > Feather) to create smooth transitions. Feather radius should be proportional to brush radius—typically 10–30% of brush radius prevents discontinuities while maintaining sharp mask definition.
+**Mask Boundaries Appearing as Hard Edges:** If masked regions show visible deformation discontinuities, the mask feather is set to zero (hard mask). Resolution: blur the mask by Ctrl-clicking on the masked mesh or using Tool > Masking > BlurMask to create smooth transitions. Feather radius should be proportional to brush radius—typically 10–30% of brush radius prevents discontinuities while maintaining sharp mask definition.
 
 **Brush Deformation Reversing or Inverting Unexpectedly:** This occurs when brush settings change mid-sculpting session, most commonly when negative intensity is accidentally enabled. Resolution: verify that brush intensity is positive in the Brush > Modifiers panel. Alternatively, if using inverted modes (Invert toggle), confirm the toggle is in the intended state.
 

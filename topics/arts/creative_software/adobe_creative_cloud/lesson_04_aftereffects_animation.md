@@ -184,7 +184,7 @@ Generic advice ("minimize layers") doesn't help you fix a slow project today. He
 
 ### 8.1 Diagnose first: use the flame graph
 
-`Composition > Comp Flowchart` or, better, enable the **Timeline Flame Graph** (Timeline panel menu → Show Flame Graph, AE 2024+) — it visually shows which layer/effect is consuming render time per frame. Don't guess; measure.
+`Composition > Comp Flowchart` or, better, enable the **Composition Profiler** (click the snail icon in the lower-left of the Timeline panel to reveal the Render Time column). — it visually shows which layer/effect is consuming render time per frame. Don't guess; measure.
 
 ### 8.2 Concrete fixes, by cause
 
@@ -194,7 +194,7 @@ Generic advice ("minimize layers") doesn't help you fix a slow project today. He
 | Scrubbing lags on comps with many effects | Effects recalculated per-frame, uncached | Pre-render problem sections via `Composition > Pre-render`, swap in a proxy |
 | Expression-heavy rig is sluggish | `wiggle()`/loop expressions on many layers evaluate every frame | Bake expressions: select property → right-click → Keyframe Assistant → Convert Expression to Keyframes |
 | 4K footage chokes playback | No proxy workflow | `File > Create Proxy > Movie`, render a half-res ProRes proxy; toggle proxy on/off per layer via the Timeline switch |
-| GPU-accelerated effects cause visual corruption/crashes | Outdated drivers or unsupported Mercury GPU acceleration path | `Edit > Preferences > Previews` → switch Renderer from Mercury GPU to **Mercury Software Only** to isolate; update GPU drivers; verify under Help → About for supported CUDA/Metal version |
+| GPU-accelerated effects cause visual corruption/crashes | Outdated drivers or unsupported Mercury GPU acceleration path | ``File > Project Settings` → under Video Rendering and Effects, switch Use to **Mercury Software Only** to isolate; update GPU drivers; verify under Help → About for supported CUDA/Metal version to isolate; update GPU drivers; verify under Help → About for supported CUDA/Metal version |
 | Final export looks washed out/flat vs. preview | Project working color space (e.g., Rec.709 vs sRGB) mismatched with export settings | `File > Project Settings > Color Management` — match working space intentionally, enable "Linearize Working Space" only if you understand the blending implications |
 
 ### 8.3 Pre-compose discipline

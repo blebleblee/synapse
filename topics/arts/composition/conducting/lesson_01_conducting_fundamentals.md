@@ -104,7 +104,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     subgraph pattern_3 ["3-Pattern: Rotational Path"]
-        T1["Beat 1: down, emphatic"] --> T2["Beat 2: left/out"]
+        T1["Beat 1: down, emphatic"] --> T2["Beat 2: right/out"]
         T2 --> T3["Beat 3: up, curving back to center"]
         T3 --> T1
     end

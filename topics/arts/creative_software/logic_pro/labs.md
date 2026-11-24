@@ -28,7 +28,7 @@ At 48 kHz with a 64-sample buffer: `(64/48000) × 2 × 1000 ≈ 2.7 ms` one-way 
 | Overdubs with heavy plugin monitoring | 128–256 samples | Balances latency against plugin headroom on armed tracks |
 | Mixing / mastering (no live input) | 512–1024 samples | Maximizes headroom; latency is irrelevant since nothing is being played live |
 
-`Settings -> Audio -> General`:
+`Settings -> Audio -> Devices`:
 1. **Processing Threads**: `Automatic`. Logic distributes DSP load across Performance cores on Apple Silicon and intentionally avoids loading Efficiency cores, which are reserved for UI responsiveness and background OS tasks. Manually pinning threads rarely beats Automatic on M-series chips — only override if you're on an Intel Mac with a known core-parking issue.
 2. **Process Buffer Range**: `Small` for tracking (lower internal plugin latency, faster transport response), `Large` for mixing (better multicore load balancing, higher plugin throughput headroom).
 3. **Multithreading**: `Playback & Live Tracks`. This spreads the DSP load of *armed/record-enabled* tracks across multiple cores instead of parking them all on one thread — critical when you have 8 live inputs each running a tuner, de-esser, and amp sim for monitoring.

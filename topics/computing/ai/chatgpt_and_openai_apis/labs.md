@@ -570,3 +570,691 @@ class FunctionCallingAgent:
         logger.warning("Agent stopped after reaching max_iterations")
         return "Stopped: maximum number of iterations reached without a final answer."
 ```
+
+
+### Verification
+
+Run the agent with a calculator tool to confirm the loop terminates correctly:
+
+```python
+if __name__ == "__main__":
+    agent = FunctionCallingAgent(model="gpt-4o-mini")
+
+    agent.register_tool(Tool(
+        name="calculate",
+        description="Evaluate a mathematical expression and return the numeric result.",
+        parameters={
+            "type": "object",
+            "properties": {
+                "expression": {
+                    "type": "string",
+                    "description": "A mathematical expression, e.g. '2**10 + 3'"
+                }
+            },
+            "required": ["expression"]
+        },
+        # Demo only: never eval() model-supplied text in production; use a real expression parser.
+        function=lambda expression: eval(expression, {"__builtins__": {}}, {"abs": abs, "round": round})
+    ))
+
+    answer = agent.run(
+        user_message="What is 2 to the power of 10, plus 3?",
+        system_message="You are a precise math assistant. Use the calculate tool for any arithmetic."
+    )
+    print(answer)
+```
+
+Expected behaviour: the model emits a `tool_call` for `calculate` with `{"expression": "2**10 + 3"}`, the agent executes it, appends the result as a `tool`-role message, and on the next iteration the model produces a plain-text final answer. If the model never stops calling tools, the loop halts at `max_iterations` and returns the sentinel string.
+
+---
+
+## Lab 3: Streaming Responses and Structured Outputs
+
+### Objective
+
+By the end of this lab you will:
+
+1. Implement a streaming client that shows partial JSON fragments as they arrive and parses them into a Python object once the stream ends.
+2. Use the `response_format` parameter to constrain the model to a JSON schema, eliminating the need for post-hoc regex extraction.
+3. Combine streaming with structured output so that a downstream consumer receives validated objects as soon as the final token arrives, while still benefiting from low time-to-first-token.
+
+### Architecture
+
+Two concerns interact here: **incremental delivery** (streaming) and **schema enforcement** (structured output). The OpenAI API supports both simultaneously—`stream=True` together with `response_format={"type": "json_schema", ...}`—but the client must accumulate the JSON string across chunks and parse only when the stream closes.
+
+```mermaid
+graph LR
+    subgraph Client
+        S[Stream Iterator] --> B[Buffer: str]
+        B --> P{Stream Done?}
+        P -->|No| S
+        P -->|Yes| V[json.loads + Schema Validate]
+        V --> O[Typed Object]
+    end
+
+    subgraph Server
+        M[Model] -->|SSE chunks| S
+    end
+```
+
+Key invariant: the buffer is a **prefix-closed** string. At any point during streaming, `buffer` is a valid prefix of the final JSON document, but not necessarily valid JSON itself. Parsing must be deferred until `finish_reason == "stop"`.
+
+### Implementation: Streaming Structured-Output Client
+
+```python
+import json
+import logging
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any, Callable, Dict, Optional
+
+from openai import OpenAI
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class StructuredResponse:
+    """Wrapper that pairs a parsed object with usage metadata."""
+    data: Any
+    finish_reason: str
+    usage: Optional[Dict[str, int]] = None
+
+
+class StructuredStreamClient:
+    """
+    Streams a chat completion constrained to a JSON schema, passes each
+    fragment to an optional callback, and returns the parsed object.
+    """
+
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o-mini"):
+        self.client = OpenAI(api_key=api_key)
+        self.model = model
+
+    def stream_structured(
+        self,
+        messages: list[Dict[str, str]],
+        schema: Dict[str, Any],
+        schema_name: str = "response",
+        temperature: float = 0.0,
+        max_tokens: int = 1024,
+        on_fragment: Optional[Callable[[str], None]] = None,
+    ) -> StructuredResponse:
+        """
+        Stream a JSON-schema-constrained completion.
+
+        on_fragment receives each partial JSON fragment (for progress display).
+        Returns the fully parsed object.
+        """
+        stream = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": schema_name,
+                    "schema": schema,
+                    "strict": True,
+                },
+            },
+            stream=True,
+            stream_options={"include_usage": True},  # final chunk carries usage
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+
+        buffer = ""
+        finish_reason = ""
+        usage: Optional[Dict[str, int]] = None
+
+        for chunk in stream:
+            delta = chunk.choices[0].delta if chunk.choices else None
+            if delta and delta.content:
+                buffer += delta.content
+                if on_fragment:
+                    on_fragment(delta.content)
+
+            if chunk.choices and chunk.choices[0].finish_reason:
+                finish_reason = chunk.choices[0].finish_reason
+
+            # The usage-only final chunk has an empty choices list
+            if chunk.usage:
+                usage = {
+                    "prompt_tokens": chunk.usage.prompt_tokens,
+                    "completion_tokens": chunk.usage.completion_tokens,
+                    "total_tokens": chunk.usage.total_tokens,
+                }
+
+        if finish_reason != "stop":
+            raise RuntimeError(
+                f"Stream ended with finish_reason={finish_reason!r}; "
+                "response may be truncated or invalid."
+            )
+
+        try:
+            parsed = json.loads(buffer)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(
+                f"Model produced malformed JSON despite schema constraint: {exc}"
+            ) from exc
+
+        return StructuredResponse(data=parsed, finish_reason=finish_reason, usage=usage)
+
+
+# ---------------------------------------------------------------------------
+# Example schema: a "diagnosis" object for a medical triage assistant
+# ---------------------------------------------------------------------------
+
+DIAGNOSIS_SCHEMA: Dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "symptoms": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "List of symptoms the patient reported.",
+        },
+        "severity": {
+            "type": "string",
+            "enum": ["low", "moderate", "high", "critical"],
+        },
+        "recommended_action": {
+            "type": "string",
+            "description": "One-sentence recommendation.",
+        },
+        "confidence": {
+            "type": "number",
+            "description": "Between 0 and 1.",
+        },
+    },
+    "required": ["symptoms", "severity", "recommended_action", "confidence"],
+    "additionalProperties": False,
+}
+
+
+def example_streaming_structured():
+    """Triage a patient report with a streaming, schema-constrained response."""
+    client = StructuredStreamClient(model="gpt-4o-mini")
+
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a medical triage assistant. "
+                "Return a JSON object matching the provided schema. "
+                "Do not include any text outside the JSON."
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                "Patient reports: persistent headache for 3 days, mild nausea, "
+                "sensitivity to light, no fever. Blood pressure 130/85."
+            ),
+        },
+    ]
+
+    print("Streaming JSON (partial fragments):")
+    result: StructuredResponse = client.stream_structured(
+        messages=messages,
+        schema=DIAGNOSIS_SCHEMA,
+        schema_name="triage_diagnosis",
+        temperature=0.0,
+        on_fragment=lambda s: print(s, end="", flush=True),
+    )
+
+    print(f"\n--- Parsed result ---")
+    print(f"  Severity:   {result.data['severity']}")
+    print(f"  Symptoms:   {result.data['symptoms']}")
+    print(f"  Action:     {result.data['recommended_action']}")
+    print(f"  Confidence: {result.data['confidence']:.2f}")
+    print(f"  Tokens:     {result.usage['total_tokens'] if result.usage else 'N/A'}")
+
+
+if __name__ == "__main__":
+    example_streaming_structured()
+```
+
+### Verification
+
+1. **Schema conformance.** Because `strict: True` is set, the model is constrained to emit only the keys declared in `DIAGNOSIS_SCHEMA` with the correct types. Run the example multiple times; `json.loads` must succeed every time and the parsed dict must contain exactly the four required keys.
+
+2. **Truncation detection.** Set `max_tokens=5` and confirm that `finish_reason` becomes `"length"` and the client raises `RuntimeError` rather than silently returning a partial object.
+
+3. **Streaming semantics.** Pass `on_fragment=lambda s: print(repr(s))` to observe that fragments arrive as partial JSON (e.g. `"{\"symptoms\": [\"headache`, `\", \"nausea\"`), confirming that no single chunk is a complete JSON document.
+
+4. **Negative test.** Change the schema to `"additionalProperties": True` and keep `strict: True`: the API rejects the request with a 400 error, because strict mode requires every object to set `additionalProperties: false` and list all its keys in `required`. Then set `strict: False` and ask for a fifth field: the model may add it, since the schema is now only a hint. This shows where enforcement ends.
+
+---
+
+## Lab 4: Cost, Rate Limits, and Evaluation in Production
+
+### Objective
+
+By the end of this lab you will:
+
+1. Implement a **cost tracker** that accumulates token usage across a batch of requests and raises a budget alert when a threshold is exceeded.
+2. Implement a **rate-limit-aware client** that reads the `x-ratelimit-*` response headers and applies exponential backoff with jitter, respecting both RPM (requests-per-minute) and TPM (tokens-per-minute) ceilings.
+3. Build a lightweight **evaluation harness** that scores model outputs against a reference using an LLM-as-judge pattern, enabling regression detection when prompts or models change.
+
+### Architecture
+
+```mermaid
+graph TB
+    subgraph Production Pipeline
+        REQ[Incoming Request] --> RL[Rate-Limit Gate]
+        RL --> CT[Cost Tracker]
+        CT --> API[OpenAI API Call]
+        API --> RL
+        API --> EVAL[Evaluation Harness]
+        EVAL --> LOG[Results Store]
+    end
+
+    subgraph Rate-Limit Gate
+        RL --> H[Read x-ratelimit-* Headers]
+        H --> C{Within Budget?}
+        C -->|Yes| API
+        C -->|No| W[Sleep + Jitter]
+        W --> H
+    end
+
+    subgraph Cost Tracker
+        CT --> ACC[Accumulate Tokens]
+        ACC --> B{Budget Exceeded?}
+        B -->|Yes| ALERT[Raise BudgetAlert]
+        B -->|No| API
+    end
+
+    subgraph Evaluation Harness
+        EVAL --> JUDGE[LLM-as-Judge]
+        JUDGE --> SCORE[Score 0-10]
+        SCORE --> REG[Compare to Baseline]
+        REG -->|Regression| FAIL[Flag for Review]
+    end
+```
+
+### Implementation: Cost Tracker, Rate-Limit Gate, and Evaluation Harness
+
+```python
+import json
+import logging
+import math
+import random
+import time
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional
+
+from openai import OpenAI, APIStatusError, APIConnectionError, RateLimitError
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# 1. Cost Tracker
+# ---------------------------------------------------------------------------
+
+# Approximate USD per 1 M tokens (input / output). Update periodically.
+# Source: OpenAI pricing page. Values here are illustrative; verify before
+# deploying to production.
+PRICING_PER_MILLION: Dict[str, Dict[str, float]] = {
+    "gpt-4o-mini": {"input": 0.15, "output": 0.60},
+    "gpt-4o":      {"input": 2.50, "output": 10.00},
+}
+
+
+class BudgetExceededError(Exception):
+    """Raised when accumulated spend crosses the configured ceiling."""
+    pass
+
+
+@dataclass
+class CostTracker:
+    """
+    Accumulates token usage and enforces a per-session budget.
+
+    Usage:
+        tracker = CostTracker(budget_usd=5.0)
+        tracker.record("gpt-4o-mini", prompt_tokens=120, completion_tokens=80)
+        assert tracker.total_usd < tracker.budget_usd
+    """
+    budget_usd: float
+    _spend: float = field(default=0.0, init=False)
+    _call_count: int = field(default=0, init=False)
+    _per_model: Dict[str, float] = field(default_factory=dict, init=False)
+
+    def record(self, model: str, prompt_tokens: int, completion_tokens: int) -> float:
+        """Record a single call and return the incremental cost in USD."""
+        pricing = PRICING_PER_MILLION.get(model)
+        if pricing is None:
+            logger.warning("No pricing entry for %r; skipping cost accounting.", model)
+            return 0.0
+
+        cost = (
+            prompt_tokens * pricing["input"] / 1_000_000
+            + completion_tokens * pricing["output"] / 1_000_000
+        )
+        self._spend += cost
+        self._call_count += 1
+        self._per_model[model] = self._per_model.get(model, 0.0) + cost
+
+        if self._spend > self.budget_usd:
+            raise BudgetExceededError(
+                f"Budget ${self.budget_usd:.4f} exceeded "
+                f"(current spend: ${self._spend:.6f} over {self._call_count} calls)"
+            )
+        return cost
+
+    @property
+    def total_usd(self) -> float:
+        return self._spend
+
+    @property
+    def remaining_usd(self) -> float:
+        return max(0.0, self.budget_usd - self._spend)
+
+    def summary(self) -> str:
+        lines = [f"Total spend: ${self._spend:.6f} / ${self.budget_usd:.4f}"]
+        for model, cost in sorted(self._per_model.items()):
+            lines.append(f"  {model}: ${cost:.6f}")
+        return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# 2. Rate-Limit-Aware Client
+# ---------------------------------------------------------------------------
+
+@dataclass
+class RateLimitState:
+    """Tracks remaining quota from the most recent response headers."""
+    requests_remaining: int = 0
+    tokens_remaining: int = 0
+    requests_reset: str = ""   # duration until reset, e.g. "1s" or "6m0s"
+    tokens_reset: str = ""
+
+
+class RateLimitAwareClient:
+    """
+    Wraps an OpenAI client and enforces RPM/TPM limits using the
+    x-ratelimit-* headers returned by the API.
+
+    Backoff strategy: exponential backoff with full jitter.
+    """
+
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        model: str = "gpt-4o-mini",
+        max_retries: int = 5,
+        base_delay: float = 1.0,
+        max_delay: float = 60.0,
+    ):
+        self.client = OpenAI(api_key=api_key)
+        self.model = model
+        self.max_retries = max_retries
+        self.base_delay = base_delay
+        self.max_delay = max_delay
+        self.state = RateLimitState()
+
+    def _parse_rate_limit_headers(self, headers) -> None:
+        """Update internal state from response headers."""
+        try:
+            self.state.requests_remaining = int(headers.get("x-ratelimit-remaining-requests", 0))
+            self.state.tokens_remaining = int(headers.get("x-ratelimit-remaining-tokens", 0))
+            self.state.requests_reset = headers.get("x-ratelimit-reset-requests", "")
+            self.state.tokens_reset = headers.get("x-ratelimit-reset-tokens", "")
+        except (ValueError, TypeError):
+            pass  # headers may be absent on error responses
+
+    def _compute_backoff(self, attempt: int) -> float:
+        """Exponential backoff with full jitter."""
+        exp_delay = min(self.max_delay, self.base_delay * (2 ** attempt))
+        return random.uniform(0, exp_delay)
+
+    def chat(
+        self,
+        messages: List[Dict[str, str]],
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        """
+        Send a chat completion with automatic rate-limit handling.
+
+        Returns the parsed response dict. Raises after max_retries.
+        """
+        for attempt in range(self.max_retries):
+            try:
+                # with_raw_response exposes the HTTP headers next to the parsed body
+                raw = self.client.chat.completions.with_raw_response.create(
+                    model=self.model,
+                    messages=messages,
+                    **kwargs,
+                )
+                self._parse_rate_limit_headers(raw.headers)
+                if self.state.tokens_remaining and self.state.tokens_remaining < 1000:
+                    logger.info("Token quota nearly used up; resets in %s", self.state.tokens_reset)
+                return raw.parse().model_dump()
+
+            except RateLimitError as exc:
+                delay = self._compute_backoff(attempt)
+                logger.warning(
+                    "Rate limited (attempt %d/%d). Sleeping %.2fs.",
+                    attempt + 1, self.max_retries, delay,
+                )
+                time.sleep(delay)
+
+            except APIStatusError as exc:
+                if exc.status_code >= 500:
+                    delay = self._compute_backoff(attempt)
+                    logger.warning(
+                    "Server error %d (attempt %d/%d). Sleeping %.2fs.",
+                    exc.status_code, attempt + 1, self.max_retries, delay,
+                )
+                    time.sleep(delay)
+                else:
+                    raise  # 4xx (except 429) is not retryable
+
+            except APIConnectionError:
+                delay = self._compute_backoff(attempt)
+                logger.warning("Connection error (attempt %d/%d). Sleeping %.2fs.",
+                              attempt + 1, self.max_retries, delay)
+                time.sleep(delay)
+
+        raise RuntimeError(
+            f"All {self.max_retries} retries exhausted. "
+            f"Last state: req_remaining={self.state.requests_remaining}, "
+            f"tok_remaining={self.state.tokens_remaining}"
+        )
+
+
+# ---------------------------------------------------------------------------
+# 3. Evaluation Harness (LLM-as-Judge)
+# ---------------------------------------------------------------------------
+
+@dataclass
+class EvalResult:
+    prompt_id: str
+    model_output: str
+    reference: str
+    score: float          # 0.0 – 10.0
+    rationale: str
+    passed: bool
+
+
+JUDGE_SYSTEM_PROMPT = """\
+You are an impartial evaluator. Score the model's response on a scale of 0-10 \
+where 10 means the response is fully correct, complete, and well-structured, \
+and 0 means it is entirely wrong or missing. \
+Return ONLY a JSON object with keys "score" (float) and "rationale" (string). \
+Do not include any text outside the JSON."""
+
+
+def llm_judge(
+    client: OpenAI,
+    prompt: str,
+    model_output: str,
+    reference: str,
+    judge_model: str = "gpt-4o",
+) -> EvalResult:
+    """
+    Score a model output against a reference using an LLM-as-judge.
+
+    The judge is asked to return a JSON object; we parse it and extract
+    the numeric score.
+    """
+    user_msg = (
+        f"Prompt: {prompt}\n\n"
+        f"Model output: {model_output}\n\n"
+        f"Reference answer: {reference}\n\n"
+        "Score the model output. Return JSON: {\"score\": <float>, \"rationale\": \"<str>\"}"
+    )
+
+    response = client.chat.completions.create(
+        model=judge_model,
+        messages=[
+            {"role": "system", "content": JUDGE_SYSTEM_PROMPT},
+            {"role": "user", "content": user_msg},
+        ],
+        temperature=0.0,
+        max_tokens=256,
+        response_format={"type": "json_object"},
+    )
+
+    raw = response.choices[0].message.content or "{}"
+    try:
+        parsed = json.loads(raw)
+        score = float(parsed.get("score", 0.0))
+        rationale = parsed.get("rationale", "")
+    except (json.JSONDecodeError, ValueError):
+        score = 0.0
+        rationale = f"Judge output was not valid JSON: {raw[:120]}"
+
+    return EvalResult(
+        prompt_id="",  # caller should set this
+        model_output=model_output,
+        reference=reference,
+        score=score,
+        rationale=rationale,
+        passed=score >= 7.0,
+    )
+
+
+def run_eval_suite(
+    client: OpenAI,
+    test_cases: List[Dict[str, str]],
+    model_under_test: str = "gpt-4o-mini",
+    judge_model: str = "gpt-4o",
+    pass_threshold: float = 7.0,
+) -> List[EvalResult]:
+    """
+    Run a batch of prompt/reference pairs through the model under test,
+    then score each with the judge.
+
+    Args:
+        test_cases: List of dicts with keys "id", "prompt", "reference".
+        model_under_test: The model being evaluated.
+        judge_model: The model acting as evaluator.
+        pass_threshold: Minimum score for a case to pass.
+
+    Returns:
+        List of EvalResult objects.
+    """
+    results: List[EvalResult] = []
+
+    for case in test_cases:
+        # 1. Get the model-under-test response
+        resp = client.chat.completions.create(
+            model=model_under_test,
+            messages=[{"role": "user", "content": case["prompt"]}],
+            temperature=0.0,
+            max_tokens=512,
+        )
+        output = resp.choices[0].message.content or ""
+
+        # 2. Judge it
+        result = llm_judge(
+            client=client,
+            prompt=case["prompt"],
+            model_output=output,
+            reference=case["reference"],
+            judge_model=judge_model,
+        )
+        result.prompt_id = case["id"]
+        result.passed = result.score >= pass_threshold
+        results.append(result)
+
+        status = "PASS" if result.passed else "FAIL"
+        logger.info("[%s] %s  score=%.1f  %s", status, case["id"], result.score, result.rationale[:80])
+
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Example usage
+# ---------------------------------------------------------------------------
+
+def example_cost_tracking():
+    tracker = CostTracker(budget_usd=0.05)
+    tracker.record("gpt-4o-mini", prompt_tokens=500, completion_tokens=300)
+    tracker.record("gpt-4o-mini", prompt_tokens=200, completion_tokens=150)
+    print(tracker.summary())
+    print(f"Remaining budget: ${tracker.remaining_usd:.6f}")
+
+
+def example_eval_suite():
+    client = OpenAI()  # uses OPENAI_API_KEY env var
+
+    test_cases = [
+        {
+            "id": "math-001",
+            "prompt": "What is 17 * 23? Answer with just the number.",
+            "reference": "391",
+        },
+        {
+            "id": "geo-001",
+            "prompt": "What is the capital of Australia? One word.",
+            "reference": "Canberra",
+        },
+        {
+            "id": "code-001",
+            "prompt": "Write a Python one-liner to reverse a string 'hello'.",
+            "reference": "s[::-1]",
+        },
+    ]
+
+    results = run_eval_suite(
+        client=client,
+        test_cases=test_cases,
+        model_under_test="gpt-4o-mini",
+        judge_model="gpt-4o",
+    )
+
+    passed = sum(1 for r in results if r.passed)
+    print(f"\nSuite: {passed}/{len(results)} passed")
+    for r in results:
+        print(f"  {r.prompt_id}: {r.score:.1f}  ({'PASS' if r.passed else 'FAIL'})")
+
+
+if __name__ == "__main__":
+    example_cost_tracking()
+    # Uncomment to run the eval suite (requires API key and network):
+    # example_eval_suite()
+```
+
+### Verification
+
+1. **Cost tracker.** Instantiate `CostTracker(budget_usd=0.001)` and call `record("gpt-4o-mini", 1000, 1000)`. The cost is `1000 * 0.15 / 1e6 + 1000 * 0.60 / 1e6 = 0.00075`, which is under budget. A second identical call pushes spend to `0.0015`, exceeding the `0.001` ceiling and raising `BudgetExceededError`.
+
+2. **Rate-limit backoff.** Mock the `OpenAI` client so that the first two calls raise `RateLimitError` and the third succeeds. Confirm that the client sleeps (use `unittest.mock.patch("time.sleep")` to avoid real delays) and that the sleep durations follow the jittered exponential pattern: `delay_1 ∈ [0, base_delay]`, `delay_2 ∈ [0, 2 * base_delay]`.
+
+3. **Eval harness determinism.** Run `run_eval_suite` with `temperature=0.0` for both the model under test and the judge. Execute the suite twice; scores should be identical (or within ±0.5 due to judge non-determinism on borderline cases). This confirms the harness is reproducible enough for CI gating.
+
+4. **Regression detection.** Intentionally corrupt one reference answer (e.g., change `"391"` to `"392"`) and re-run. The corresponding `EvalResult.passed` should flip to `False`, demonstrating that the harness catches prompt or model regressions.
+
+---
+
+## Closing Remarks
+
+The four labs in this module trace a progression from **single-call integration** (Lab 1) through **agentic tool use** (Lab 2), **structured streaming** (Lab 3), to **production-grade operational concerns** (Lab 4). Several cross-cutting themes deserve emphasis:
+
+- **Treat the API as a contract, not a black box.** Every response carries usage metadata, rate-limit headers, and a `finish_reason`. Ignoring any of these fields is a latent production bug.
+- **Schema constraints reduce post-processing.** The `response_format` parameter with `strict: True` eliminates an entire class of parsing failures that would otherwise require regex extraction and defensive `try/except` blocks.
+- **Evaluation is a first-class concern.** A prompt that works in a notebook can regress silently after a model update. The LLM-as-judge pattern, combined with a fixed test suite and a pass threshold, provides a lightweight but effective regression gate suitable for CI pipelines.
+- **Cost is a design parameter, not an afterthought.** The `CostTracker` pattern should be embedded in every production service that calls an LLM API. A single unbounded agent loop can exhaust a monthly budget in minutes; a per-session ceiling with an alert threshold prevents that failure mode.
+
+When extending these patterns to multi-agent systems, batch inference, or fine-tuned model endpoints, the same invariants hold: validate inputs against a schema, account for every token, respect rate limits, and evaluate before shipping.

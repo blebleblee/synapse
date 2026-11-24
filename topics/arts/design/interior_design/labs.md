@@ -240,7 +240,7 @@ Compare the three options and select one based on:
 
 Interior spaces are strengthened when their proportions follow a coherent system. You will design using a **modular grid** based on the Golden Section (1 : 1.618).
 
-Your room is approximately 5.0 m × 5.5 m (25–30 m² divided by ceiling height 2.8 m = roughly square to slightly rectangular). Use this grid:
+Your room is approximately 5.0 m × 5.5 m (Your room is approximately 5.0 m × 5.5 m (giving a floor area of 27.5 m², which is roughly square to slightly rectangular).). Use this grid:
 
 - **Module width**: 500 mm (a human-scale unit; 2.5 modules = 1250 mm, typical seating depth).
 - **Grid interval**: 500 mm lines across the entire floor.
@@ -465,13 +465,13 @@ You will model your designed space in Blender at 1:1 scale (actual millimeters),
 Launch Blender 3.6 or later (free, open-source). Create a new General project (File > New > General).
 
 **Units and world setup:**
-- Set Blender units to millimeters: Scroll to Scene Properties (camera icon in right sidebar) → Units → Length, set to Metric and Scale to 1 mm.
+- Set Blender units to millimeters: Scroll to Scene Properties (cone-and-sphere icon in right sidebar) → Units → Length, set to Metric and Scale to 1 mm.
 - Set the world background to a neutral gray for consistent rendering: World Properties (sphere icon) → Background → Color = RGB (128, 128, 128) (hex #808080).
 
 **Create the room geometry:**
 
 1. **Floor**: Delete the default cube (X, confirm). Add a plane (Shift + A > Mesh > Plane). Scale it to room dimensions:
-   - Press S (scale), then X (constrain to X-axis), type 2500 (half of 5000 mm width), Enter.
+   - Press S (scale), then X (constrain to X-axis), type 2.5 (the default 2 m plane becomes 5 m, i.e. 5000 mm wide), Enter.
    - Press S, then Y, type 2750 (half of 5500 mm depth), Enter.
    - In the properties panel (N key to show), set Location Z to 0 mm (floor surface at world origin).
 

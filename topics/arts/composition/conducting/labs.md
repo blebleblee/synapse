@@ -378,7 +378,7 @@ Conductors are judged far more by how they recover from an ensemble problem than
 |---|---|---|---|
 | 2/4, 2/2 | Two-pattern | Vertical down–up mirror | Uneven down/up stroke lengths |
 | 3/4, 3/8 | Three-pattern | Down–right–up triangle | Beat 2 doesn't travel far enough right |
-| 4/4, 4/8 | Four-pattern | Down–right–left–up square | Beats 3 and 4 collapse into the same shape |
+| 4/4, 4/8 | Four-pattern | Down–left–right–up (Down, In, Out, Up) | Beats 3 and 4 collapse into the same shape |
 | 5/4 (3+2) | Five-pattern | Three-pattern + small two | Beats 4–5 drawn too large |
 | 6/8 (fast) | Two-pattern (dotted-quarter pulse) | Vertical down–up | Subdividing when tempo doesn't need it |
 | 6/8 (slow) | Six-pattern | Two large beats, each inwardly subdivided into 3 | Losing the primary down/up pulse under the subdivisions |

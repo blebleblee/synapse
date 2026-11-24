@@ -203,7 +203,7 @@ Run through this checklist before any client delivery, film scoring stage delive
       without re-export
 [ ] Bit Depth / Sample Rate: 24-bit/48kHz for broadcast and game audio; 32-bit float/48kHz (or session native rate)
       for film scoring stage deliveries where downstream dubbing stages need maximum headroom
-[ ] Sample Rate Match: Export rate MATCHES project rate -- check Project Setup (Shift+F5) BEFORE export.
+[ ] Sample Rate Match: Export rate MATCHES project rate -- check Project Setup (Shift+S) BEFORE export..
       A 44.1kHz project exported to a 48kHz target without proper SRC produces audible resampling artifacts;
       if a rate conversion is required, use an external high-quality SRC tool, not an on-the-fly mismatch.
 [ ] Phase Correlation Safety: Stereo Phase Correlation meter (Control Room or Master Insert) reads positive

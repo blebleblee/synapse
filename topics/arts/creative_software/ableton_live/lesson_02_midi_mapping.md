@@ -24,7 +24,7 @@ No typing CC numbers manually required — this is "learn mode," the standard wo
 - Open the **MIDI Mappings** browser: in Map Mode, the bottom-left Help/Info panel is replaced by a list of every active mapping in the current Set (control name → CC/Note → channel).
 - Click any row to jump directly to that control, useful when you inherited a Set and need to audit what's bound.
 - To remove a single mapping: enter Map Mode, click the control, press `Delete`.
-- To clear **everything** at once: `Options > MIDI Mappings... (or the Mappings list) > right-click > Delete All`. Use this when a Set has accumulated stale mappings from a controller you no longer use.
+- To clear **everything** at once: `select all mappings in the MIDI Mappings browser list in Map Mode and press Delete`. Use this when a Set has accumulated stale mappings from a controller you no longer use.
 
 ### 2.3 Channel and port discipline
 
@@ -78,7 +78,7 @@ A typical 4x4 pad grid + 8 knobs + transport controller should be laid out like 
 | Pad 9–16 (row 2) | Scene Launch buttons, Scenes A–H | Launch whole arrangement sections |
 | Knob 1–8 | Track Volume, Tracks 1–8 | Live mix control without the mouse |
 | Shift + Knob 1–8 (via controller's own shift layer) | Track Send A, Tracks 1–8 | Reverb/delay send riding, hands-free |
-| Transport buttons | Play / Stop / Record (map via Options, not MIDI Map Mode — these are "Key/MIDI Map" global commands) | Hands never leave the controller |
+| Transport buttons | Play / Stop / Record (map directly in MIDI Map Mode by clicking the Play, Stop, or Record buttons on the Control Bar) | Hands never leave the controller |
 
 Map order matters for sanity: map all pads first (Map Mode stays on, click next control, move next hardware control — Live does not require you to exit between mappings), then all knobs, then save as a **Default Set template** (`File > Save Live Set` into your User Library template slot) so every new project opens pre-wired.
 

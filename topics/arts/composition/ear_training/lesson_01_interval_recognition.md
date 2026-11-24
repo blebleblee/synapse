@@ -164,7 +164,7 @@ Each fret is one semitone, and interval shapes stay identical anywhere on the ne
 | Interval | Shape |
 |---|---|
 | P4 | Same fret, next string up (e.g., low E fret 5 = A string fret 0... actually: open A = low E fret 5) |
-| P5 | Next string up, 2 frets back (E string fret 5 → A string fret 3... verify by ear, don't trust diagrams blindly) |
+| P5 | Next string up, 2 frets forward (E string fret 5 → A string fret 7) verify by ear, don't trust diagrams blindly) |
 | P8 | Next string up, 2 frets forward from unison position |
 
 **Drill:**

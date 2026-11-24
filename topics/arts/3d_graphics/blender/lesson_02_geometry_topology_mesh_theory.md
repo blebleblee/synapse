@@ -28,7 +28,7 @@ At the heart of Blender's mesh representation is BMesh, a half-edge data structu
 
 Consider a simple quad face with four vertices arranged clockwise: A → B → C → D → A. The half-edge structure stores four half-edge objects corresponding to these directed segments. Each half-edge, say A→B, contains a reference to its twin (B→A), its next half-edge in the face loop (B→C), its previous (D→A), and the face it belongs to. To find all faces adjacent to a given edge, you simply follow the twin half-edge to the opposite face. To find all edges incident to a vertex, you iterate through all half-edges emanating from that vertex.
 
-This structure is radically more efficient than naive coordinate lists or edge-indexed arrays, and it is why Blender can handle millions of polygons interactively. When you select an edge loop in Edit Mode and press Alt+L (or use the Select Edge Loop function), Blender is traversing the half-edge structure, jumping from face to face along the twin relationships, until it finds the loop.
+This structure is radically more efficient than naive coordinate lists or edge-indexed arrays, and it is why Blender can handle millions of polygons interactively. When you select an edge loop in Edit Mode and press Alt + Left Click (or use the Select Edge Loop function), Blender is traversing the half-edge structure, jumping from face to face along the twin relationships, until it finds the loop.
 
 ### Manifoldness and Topology Validity
 
@@ -36,7 +36,7 @@ A mesh is *manifold* if it satisfies two conditions. First, every edge must be b
 
 A non-manifold edge often arises when two separate surface patches meet at a single edge without actually being connected topologically. For example, if you have two separate cubes that share a single edge, that edge has three faces meeting it (two from one cube, one from the other), making it non-manifold. A non-manifold vertex occurs when faces spiral around a vertex in multiple disconnected loops—imagine a vertex where three separate surface cones meet at a point without merging.
 
-Blender provides a built-in diagnostic tool for detecting non-manifold geometry. In Edit Mode, pressing Shift+Alt+M selects all non-manifold edges and vertices. Many modifiers will refuse to operate on non-manifold geometry, and booleans will fail silently or produce corrupt results. This is not a limitation of Blender, but rather a mathematical reality: many geometric algorithms assume manifoldness because it provides the guarantee that the surface has a well-defined inside and outside.
+Blender provides a built-in diagnostic tool for detecting non-manifold geometry. In Edit Mode, pressing Ctrl+Shift+Alt+M selects all non-manifold edges and vertices. Many modifiers will refuse to operate on non-manifold geometry, and booleans will fail silently or produce corrupt results. This is not a limitation of Blender, but rather a mathematical reality: many geometric algorithms assume manifoldness because it provides the guarantee that the surface has a well-defined inside and outside.
 
 However, non-manifold geometry is not always an error. Intersecting planes, wire frames, and open surfaces (like cloth or paper) are legitimately non-manifold. The key is to be intentional: if your model is non-manifold, you should understand why and ensure that subsequent operations work correctly with that constraint.
 
@@ -82,7 +82,7 @@ The Array modifier duplicates geometry along a specified axis (or offset pattern
 
 The Mirror modifier is conceptually similar, but specifically designed for bilateral symmetry. You specify an axis (X, Y, or Z) and an optional offset, and the modifier creates a mirrored copy of the mesh across that axis. If your model is a character's torso built on one side only, mirroring it creates the full bilateral form. The Mirror modifier is often combined with Array to create symmetric repeating patterns.
 
-The Instance modifier (new in Blender 4.0+) goes further: instead of duplicating geometry, it creates lightweight instances—references to the same underlying mesh data. This is even more memory efficient than Array, especially when creating large crowds or forests of repeated objects. The instances are rendered, but they share the same vertex and face data as the original.
+In Blender, lightweight geometry instancing across scenes or grids is performed using Geometry Nodes or linked duplicates (Alt+D) rather than a built-in 'Instance modifier'. This is even more memory efficient than Array, especially when creating large crowds or forests of repeated objects. The instances are rendered, but they share the same vertex and face data as the original.
 
 These modifiers are foundational to procedural modeling because they allow you to build complex structures without manually modeling each repetition. Combined with other modifiers further down the stack, they create emergent complexity from simple rules.
 
@@ -92,7 +92,7 @@ These modifiers are foundational to procedural modeling because they allow you t
 
 As your models grow in complexity, non-manifold geometry often sneaks in, usually through boolean operations or merging imported meshes. Blender provides diagnostic tools: in Edit Mode, Mesh → Cleanup → Merge by Distance identifies and merges vertices that are extremely close together (often a source of non-manifoldness), and Mesh → Cleanup → Degenerate Dissolve removes zero-area faces.
 
-More directly, Select → All Linked or Mesh → Select All with the "Non-Manifold" filter (Shift+Alt+M) highlights problematic geometry. Once identified, you have several strategies. If the non-manifoldness is at the junction of two surfaces that should be merged, you can manually weld the edges by selecting them and pressing F (make face) or X (merge). If it is a stray floating edge or vertex, you can simply delete it. In some cases, applying a Remesh modifier with "Voxel" mode will automatically reconstruct the topology as a clean manifold mesh, though you will lose fine detail in the process.
+More directly, Select → All Linked or Select → Select All by Trait → Non Manifold (Shift+Ctrl+Alt+M) highlights problematic geometry. Once identified, you have several strategies. If the non-manifoldness is at the junction of two surfaces that should be merged, you can manually weld the edges by selecting them and pressing F (make face) or X (merge). If it is a stray floating edge or vertex, you can simply delete it. In some cases, applying a Remesh modifier with "Voxel" mode will automatically reconstruct the topology as a clean manifold mesh, though you will lose fine detail in the process.
 
 The key to preventing non-manifold geometry is to understand where it comes from. Boolean operations are the most common culprit: when two meshes interpenetrate, Blender must compute the intersection, and if the input meshes have non-planar faces or touching edges, the boolean can fail to construct valid topology. The solution is to ensure that your input meshes are manifold, planar, and properly oriented (faces pointing the right direction) before performing a boolean.
 

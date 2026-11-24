@@ -100,8 +100,8 @@ The choice of interpolation curve is not arbitrary; it encodes the animator's in
 Animating a full 4×4 transformation matrix requires careful decomposition and recomposition each frame. The standard approach is:
 
 1. Extract translation (the rightmost column of the matrix).
-2. Extract rotation (the upper-left 3×3 submatrix, but only after removing scale).
-3. Extract scale (the magnitude of each row of the rotated matrix).
+2. Extract scale (the magnitude of the column/row vectors of the upper-left 3×3 submatrix).
+3. Extract rotation (by normalizing the upper-left 3×3 submatrix to remove the scale).
 4. Interpolate each component separately using appropriate curve types.
 5. Recompose: create a rotation matrix from the interpolated rotation, scale it by the interpolated scale, and add the interpolated translation.
 

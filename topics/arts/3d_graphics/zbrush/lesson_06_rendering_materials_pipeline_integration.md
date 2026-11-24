@@ -108,7 +108,7 @@ MatCap materials represent a unique rendering mode where illumination derives en
 The mathematical transformation from surface normal to MatCap UV coordinates proceeds through view-space normal mapping:
 
 ```text
-N_view = ModelViewMatrix × N_world
+N_view = ViewMatrix × N_world (or N_view = ModelViewMatrix × N_model).
 u = (N_view.x + 1.0) × 0.5
 v = (N_view.y + 1.0) × 0.5
 color = texture(matcap_texture, vec2(u, v))
@@ -198,7 +198,7 @@ The optimization strategy involves progressive channel disabling during iterativ
 
 Lighting computation overhead concentrates in shadow map generation and screen-space ambient occlusion. Shadow mapping requires rendering the scene from each light's perspective into a depth buffer, then sampling these buffers during the main shading pass to determine occlusion. Each active shadow-casting light adds a complete scene rasterization pass, multiplicatively increasing total geometry processing load. A scene with three shadow-casting lights performs four complete geometry rasterizations per frame: one for the camera view and three for light-space depth buffers.
 
-The mitigation protocol prioritizes shadow casting assignments to primary key lights while disabling shadows for fill and rim lights. The Light palette's Shadow control panel allows per-light shadow enable/disable toggling. Artists should activate shadows only for the dominant light source establishing primary occlusion relationships, relegating secondary lights to shadow-free contributions. Additionally, reducing shadow map resolution from the default 2048×2048 to 1024×1024 halves shadow rendering cost with acceptable quality loss for preview rendering scenarios.
+The mitigation protocol prioritizes shadow casting assignments to primary key lights while disabling shadows for fill and rim lights. The Light palette's Shadow control panel allows per-light shadow enable/disable toggling. Artists should activate shadows only for the dominant light source establishing primary occlusion relationships, relegating secondary lights to shadow-free contributions. Additionally, reducing shadow map resolution from the default 2048×2048 to 1024×1024 reduces shadow map rendering cost to one-quarter with acceptable quality loss for preview rendering scenarios.
 
 Screen-space ambient occlusion (SSAO) presents a distinct performance challenge due to its per-pixel ray marching requirements. The algorithm samples multiple points in a hemisphere surrounding each pixel, testing occlusion via depth buffer comparison. Ray counts typically range from eight to thirty-two, with higher counts producing smoother, less noisy occlusion approximations. Each ray incurs depth buffer texture fetch and comparison operations, scaling total SSAO cost proportionally with ray count and viewport resolution.
 
@@ -234,7 +234,7 @@ GoZ bridge failures typically stem from plugin version mismatches or filesystem 
 
 First, confirm that the target application's GoZ plugin version matches the installed ZBrush version. Plugin version numbers typically encode the compatible ZBrush major version: GoZ_Maya_2024.3 indicates compatibility with ZBrush 2024.3. Installing ZBrush 2025.1 without updating the Maya GoZ plugin breaks bidirectional transfer.
 
-Second, inspect the `.GoZ` temporary directory location. On Windows, this resides at `%USERPROFILE%\.GoZ`, on macOS at `~/.GoZ`, and on Linux at `~/.GoZ`. The directory must possess read-write permissions for both ZBrush and the target application. Corporate IT policies sometimes restrict hidden directory access, breaking GoZ functionality. Testing requires manually creating a dummy file in the `.GoZ` directory from a command prompt and verifying that both applications can read it.
+Second, inspect the `.GoZ` temporary directory location. On Windows, this resides at `%USERPROFILE%\.GoZ`, and on macOS at `~/.GoZ`. The directory must possess read-write permissions for both ZBrush and the target application. Corporate IT policies sometimes restrict hidden directory access, breaking GoZ functionality. Testing requires manually creating a dummy file in the `.GoZ` directory from a command prompt and verifying that both applications can read it.
 
 Third, verify that no file locks persist from previous crashed sessions. If ZBrush or the target application terminates unexpectedly during a GoZ transfer, the temporary `.GoZ` file may retain an exclusive access lock preventing subsequent operations. The diagnostic involves deleting all files in the `.GoZ` directory while both applications remain closed, then reattempting the transfer.
 
@@ -246,7 +246,7 @@ Material channel baking for PBR workflows requires establishing semantic mapping
 
 This mapping reflects the physical principle that surface recesses accumulate moisture and contaminants increasing roughness, while exposed peaks weather to smooth glossiness. However, the relationship remains non-linear and material-dependent. Metal surfaces exhibit opposite behavior under certain weathering conditions: crevices retain smooth protective coatings while exposed areas oxidize to roughness. Artists must calibrate cavity-to-roughness conversion curves per material type, validating results through visual comparison renders in both ZBrush BPR and the target PBR engine.
 
-Subsurface scattering export requires baking thickness maps that subsequent renderers can interpret for volumetric scattering calculations. ZBrush's Masking system provides thickness extraction via the Masking > Mask by Cavity operation with inverted polarity: the masking algorithm computes local surface thickness by casting rays inward from each vertex and measuring intersection distance with opposite surface regions. The resulting mask values encode thickness, which artists transfer to vertex colors or bake to texture maps for export.
+Subsurface scattering export requires baking thickness maps that subsequent renderers can interpret for volumetric scattering calculations. ZBrush's Mask by Cavity operation isolates surface curvature and concave recesses rather than volumetric wall thickness, which typically requires baking dedicated thickness maps via ray-casting tools (such as Substance Painter or XNormal) or custom ZBrush mesh extraction. The resulting mask values encode thickness, which artists transfer to vertex colors or bake to texture maps for export.
 
 Game engine integration of thickness maps varies significantly. Unreal Engine's subsurface scattering materials accept opacity masks that modulate scattering intensity but do not parameterize actual thickness. Unity's HDRP subsurface materials require explicit thickness maps input to the Thickness Map slot, with values interpreted in world-space units. This unit dependency necessitates calibrating ZBrush's thickness extraction to match target engine scale: if the engine scene unit is one centimeter, a 0.5 thickness value must represent 0.5 centimeters of actual material depth. ZBrush operates in unitless space, requiring artists to establish scale conventions early in the production pipeline and maintain them consistently across exports.
 

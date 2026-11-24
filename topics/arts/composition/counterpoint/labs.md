@@ -92,7 +92,7 @@ One counterpoint (CP) note per CF note. This is where you learn the consonance v
 
 **Opening**: P1, P5, or P8 only.
 **Closing**: P1 or P8, approached by contrary stepwise motion (one voice steps up, the other steps down, landing together on the unison/octave).
-**Penultimate interval**: m6 expanding out to P8, or m3 contracting in to P1. In Dorian, raise the 6th degree (B♭→B♮) at the very end to create a leading-tone pull into the cadence — this is the one chromatic alteration first species tolerates.
+**Penultimate interval**: m6 expanding out to P8, or m3 contracting in to P1. In Dorian, raise the 7th degree (C→C♯) at the very end to create a leading-tone pull into the cadence — this is the one chromatic alteration first species tolerates.
 
 **Motion types, ranked by how much you should use them**:
 1. **Contrary** (voices move opposite directions) — your default, target 50%+ of all motion.
@@ -133,14 +133,14 @@ allowed = {'P1','m3','M3','P5','m6','M6','P8'}
 
 print("Dissonance check:")
 for i, (c, p) in enumerate(zip(cf_notes, cp_notes)):
-    iv = interval.Interval(c, p).simpleName
+    iv = interval.Interval(c, p).semiSimpleName
     flag = "" if iv in allowed else "  <-- VIOLATION"
     print(f"  {i}: {c.nameWithOctave}-{p.nameWithOctave} = {iv}{flag}")
 
 print("\nParallel perfect check:")
 for i in range(len(cf_notes) - 1):
-    a = interval.Interval(cf_notes[i], cp_notes[i]).simpleName
-    b = interval.Interval(cf_notes[i+1], cp_notes[i+1]).simpleName
+    a = interval.Interval(cf_notes[i], cp_notes[i]).semiSimpleName
+    b = interval.Interval(cf_notes[i+1], cp_notes[i+1]).semiSimpleName
     if a == b and a in ('P5', 'P8', 'P1'):
         print(f"  VIOLATION: parallel {a} at steps {i}->{i+1}")
 
@@ -235,7 +235,7 @@ This is the single most important contrapuntal device in the entire tradition �
 | 7-6 | 7th resolving down to 6th | Most common, usable almost anywhere |
 | 4-3 | 4th (dissonant, CP above) resolving to 3rd | Very common, strong pull |
 | 9-8 | Compound 2nd resolving to octave | Cadential, powerful |
-| 2-3 | 2nd resolving *up* to 3rd, when CP is the bass | Only upward-resolving type in strict style |
+| 2-3 | 2nd expanding to 3rd (bass steps down) | Only bass suspension type in strict style |
 
 ```text
 CF:   D4   —   | E4   —   | F4   —   | G4   —   | A4   —   | G4   —   | F4   —   | E4   —   | D4
@@ -336,7 +336,7 @@ from music21 import note, interval
 def analyze_intervals(cf_notes, cp_notes):
     counts = {k: 0 for k in ['P1','m3','M3','P5','m6','M6','P8']}
     for c, p in zip(cf_notes, cp_notes):
-        iv = interval.Interval(c, p).simpleName
+        iv = interval.Interval(c, p).semiSimpleName
         if iv in counts:
             counts[iv] += 1
     return counts
@@ -353,8 +353,8 @@ def analyze_motion(cf_notes, cp_notes):
         elif (cf_delta > 0) != (cp_delta > 0):
             counts['contrary'] += 1
         else:
-            iv1 = interval.Interval(cf_notes[i], cp_notes[i]).simpleName
-            iv2 = interval.Interval(cf_notes[i+1], cp_notes[i+1]).simpleName
+            iv1 = interval.Interval(cf_notes[i], cp_notes[i]).semiSimpleName
+            iv2 = interval.Interval(cf_notes[i+1], cp_notes[i+1]).semiSimpleName
             counts['parallel' if iv1 == iv2 else 'similar'] += 1
     return counts
 
@@ -420,7 +420,7 @@ Play it. The sound: flat, static, like the harmony stalled. Fix: change the seco
 ```text
 CF:  D4 - E4 - ...
 CP:  D5 - F5 - ...
-Int: P8 - M2   (VIOLATION)
+Int: P8 - m2   (VIOLATION)
 ```
 Sound: jarring, unresolved clash with no stepwise justification. Fix: move F5 to C5 (m6) or G5 (m3).
 

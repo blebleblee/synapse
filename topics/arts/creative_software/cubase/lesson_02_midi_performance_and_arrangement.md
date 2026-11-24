@@ -17,7 +17,7 @@ One timing fact you need memorized: MIDI data itself is not "slow" — the old 3
 4. **Precount tempo match:** if you're importing a reference track (a demo, a drum loop) first, use **Project > Tempo Detection** or manually tap tempo with Project > Tempo Track, then lock it before recording MIDI on top. Changing tempo after recording MIDI is fine (MIDI is tick-based and rescales automatically); changing tempo after recording *audio* is not free and requires time-stretching.
 
 ### 2.2 Recording Modes That Matter
-In the Editors > Preferences > Record > MIDI panel, set **MIDI Record Mode**:
+In Edit > Preferences > Record > MIDI (or Cubase > Preferences > Record > MIDI on macOS), set MIDI Record Mode:, set **MIDI Record Mode**:
 - **Normal** — new takes replace old ones. Use for your first pass.
 - **Merge** — layers new notes onto existing ones on the same track. Use when overdubbing a second voice (e.g., adding a bass note under an existing chord part) without erasing what's there.
 - **Cycle Record (loop recording)** set to **Mix** — every loop pass is merged, building up a groove hit by hit. This is how professional drum/percussion MIDI programming is actually done: record a 2-bar loop, add the kick on pass 1, hats on pass 2, snare ghost notes on pass 3, punching in live each time rather than programming by hand.

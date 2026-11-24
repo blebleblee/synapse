@@ -85,7 +85,7 @@ CP (treble): C5  B4  G4  A4  G4  F4  C5
 - Bar 2→3: CF up (D→E), CP down (B4→G4, a 3rd) → contrary, with a small leap recovered next by step (G4→A4). Fine.
 - Bar 3→4: CF up (E→F), CP up (G4→A4) → similar motion into a M3 (not perfect), no restriction applies.
 - Bar 4→5: CF down (F→E), CP down (A4→G4) → parallel motion, but the interval is m3, an imperfect consonance — parallel motion is *allowed* here. Only parallel motion into **perfect** intervals is banned.
-- Bar 6→7: CF down (D→C), CP up (F4→C5, a 4th leap) → contrary motion into the final octave. Leaps into a strong cadential arrival are idiomatic.
+- Bar 6→7: CF down (D→C), CP up (F4→C5, a 5th leap) → contrary motion into the final octave. Leaps into a strong cadential arrival are idiomatic.
 
 No parallel fifths, no parallel octaves, both lines singable. **This passes.**
 
@@ -178,7 +178,7 @@ CP:    C5 — B4    A4 — B4    C5 — B4    A4 — G4    G4 — A4    F4 — G
 | 2 | D3–A4 | P5 | D3–B4 | M6 | Consonant, no issue |
 | 3 | E3–C5 | m6 | E3–B4 | P5 | Consonant |
 | 4 | F3–A4 | M3 | F3–G4 | M2 (dissonant) | Check: A4→G4→G4(next bar) — not continuing stepwise in direction, this is a **neighbor figure**, acceptable only if next note truly returns; verify against bar 5 |
-| 5 | E3–G4 | m3 | E3–A4 | P4→reduce: M6 over E3 is fine | Consonant |
+| 5 | E3–G4 | m3 | E3–A4 | P4 (dissonant) | Weak-beat passing tone moving towards B4 in the next measure |
 | 6 | D3–F4 | m3 | D3–G4 | P4 (dissonant as 2-voice interval) | G4 approached by step from F4, left by step to E4 (bar 7) — valid passing tone |
 | 7 | C3–E4 | M3 | C3–C5 | P8 | Final bar, consonant close |
 
@@ -199,7 +199,7 @@ CP:  D4 — E4     F4 — E4     D4 — C4
 
 Same weak/strong logic as 2nd species, but now you have four quarter notes per CF whole note, with beats 1 and 3 carrying more weight than 2 and 4. New device: the **cambiata** (changing-note figure) — a licensed exception that lets you leave a dissonance by skip instead of step.
 
-**Cambiata shape:** step down, skip down a 3rd, step up. Example in C major: **E–D–B–C**. The dissonant note is the second one (D, if approached as a passing tone) — actually the licensed dissonance sits on the note left by skip (commonly the third note of the figure), which resolves the tension retroactively once the line steps back up. Practice this shape in isolation on your instrument until it's automatic:
+**Cambiata shape:** step down, skip down a 3rd, step up. Example in C major: **E–D–B–C**. The dissonant note is the second one (D, if approached as a passing tone) — actually the licensed dissonance sits on the note left by skip (the second note of the figure), which resolves the tension retroactively once the line steps back up., which resolves the tension retroactively once the line steps back up. Practice this shape in isolation on your instrument until it's automatic:
 
 ```text
 Quarter notes: E4 – D4 – B3 – C4   (over a sustained C or similar CF note)

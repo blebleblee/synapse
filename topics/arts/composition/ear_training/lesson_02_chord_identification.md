@@ -92,7 +92,7 @@ With the bass anchored, shift attention to the *interval between bass and the ne
 Once quality is locked, ask: *is the bass note the root, or something else?*
 
 **Fast heuristic — the "gap and squeeze" test:**
-- Root position: the two intervals above the bass are a 3rd then a 4th (stacked as 3rd+5th from the root) — sounds "stacked evenly."
+- Root position: the two intervals above the bass are a 3rd then another 3rd (stacked as 3rd+5th from the root) — sounds "stacked evenly." (stacked as 3rd+5th from the root) — sounds "stacked evenly."
 - 1st inversion: bass-to-next is a 3rd, then a 4th up to the octave of the bass — has a "leaning forward" quality, common in walking bass lines and pop ballad verses.
 - 2nd inversion: bass-to-next is a 4th (the widest, most open-sounding gap at the bottom) — sounds suspended, like it's hovering and needs to drop.
 
@@ -179,7 +179,7 @@ Use these as instant quality checks when you're unsure what you just heard:
 
 | Sound | Reference |
 |---|---|
-| Major 3rd (bright) | "Happy Birthday," first two notes |
+| Major 3rd (bright) | "When the Saints Go Marching In," first two notes |
 | Perfect 5th | "Star Wars" main theme opening leap |
 | Minor tonality | "Greensleeves" opening phrase |
 | Diminished 5th tension | "Maria" from *West Side Story* (the leap IS the tritone) |

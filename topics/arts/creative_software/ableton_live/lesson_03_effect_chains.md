@@ -134,7 +134,7 @@ This is the single biggest workflow decision for time-based effects (reverb, del
 - CPU efficiency: one Reverb instance on a Return handles 20 tracks; twenty Insert Reverbs cost 20x the CPU.
 
 **Procedure — building a shared reverb return:**
-1. Open the Session or Arrangement view, right-click any empty Return track slot → **Insert Return Track** (or `Ctrl/Cmd+Alt+R`). Live gives you Return A by default.
+1. Open the Session or Arrangement view, right-click any empty Return track slot → **Insert Return Track** (or `Ctrl/Cmd+Alt+T`). Live gives you Return A by default.
 2. On Return A, insert a **Reverb** device. Set Decay Time to 2.5s, Room Size to Medium, Dry/Wet should be irrelevant here — set the **Return track's device to 100% wet** (most Live reverbs default to wet-only on returns automatically; verify the Dry/Wet knob is at 100%).
 3. On your snare track, find the **Sends** section in the track's mixer strip (View → expand Sends if hidden). Turn Send A up to around -12 to -8 dB.
 4. Repeat for vocals, guitars, and any instrument you want sharing that same room.

@@ -132,7 +132,7 @@ Four-part voice leading rules that keep this sounding like real orchestration ra
 
 ```text
 Bar 1 (C major):    Vln I = C5   Vla = E4   Cello = C3
-Bar 2 (F major):    Vln I = F5   Vla = C5   Cello = F3   (soprano leaps 4th, alto moves up step)
+Bar 2 (F major):    Vln I = F5   Vla = C5   Cello = F3   (soprano leaps 4th, alto leaps 6th)
 Bar 3 (G major):    Vln I = G5   Vla = B4   Cello = G3
 Bar 4 (C major):    Vln I = C5   Vla = E4   Cello = C3   (resolution, mirrors bar 1)
 ```

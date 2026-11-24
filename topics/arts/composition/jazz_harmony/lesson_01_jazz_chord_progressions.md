@@ -105,7 +105,7 @@ A guide-tone line strips the progression down to one note per chord — just the
 ```text
 Dm7 → G7 → Cmaj7 → Am7 → Dm7 → G7 → Cmaj7
  C  →  B →  E    →  C  →  F  →  F →  E
-     (½ up)  (whole up) (6th down) (4th up) (same)  (½ down)
+     (½ down)  (4th up) (3rd down) (4th up) (same)  (½ down)
 ```
 
 ### Drill 2: Guide-Tone Solo, Right Hand Only

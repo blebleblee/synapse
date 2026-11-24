@@ -221,7 +221,7 @@ Now translate your sketches into a digital wireframe system. Open **Figma** (fig
 **Initial setup:**
 
 1. Create a new file named "Appointment Booking – Wireframes."
-2. Set up a **base grid.** In Figma: File → Preferences → Guides → Grids. Create a grid with 12 columns (web) or 8 columns (mobile), 16 or 20 pixel gutter width, and 20 pixel row height. For mobile, typical dimensions are 375×812 pixels (iPhone); for web, 1440×900 pixels (common breakpoint).
+2. Set up a **base grid.** In Figma: select a Frame, then in the right sidebar click '+' next to 'Layout grid' and configure columns, gutters, and rows. Create a grid with 12 columns (web) or 8 columns (mobile), 16 or 20 pixel gutter width, and 20 pixel row height. For mobile, typical dimensions are 375×812 pixels (iPhone); for web, 1440×900 pixels (common breakpoint).
 3. Create a **color palette** for wireframing. Use only three colors: dark gray (#333333) for text and primary UI, light gray (#EEEEEE) for backgrounds and secondary zones, and a single accent color (#0066CC) for primary interactive elements. Wireframes should not look "pretty"—they should look functional and testable.
 4. Create a **typography scale** with one font family (use system fonts like Inter, Roboto, or Helvetica). Define: body text (14px, regular), small text (12px, regular), headings (20px, bold), buttons (14px, bold). Do not vary beyond this. Consistency is clarity.
 

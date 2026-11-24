@@ -86,7 +86,7 @@ Think of it as a stack, bottom to top: **7 – 3 – 5 – 9**. For Dm7: C – F
 
 **B-Form — 3rd on the bottom, 7th above it:** bottom to top: **3 – 5 – 9 – 7** (or 3–7–9–5 depending on the extension you want on top). For Cmaj7: E – G – D – B.
 
-**The rule that keeps your hand still: ii chords and V chords in the same key use the SAME shape (A-form), and the I chord uses the OTHER shape (B-form).** That's why Dm7 and G7 both sit in A-form above, and Cmaj7 flips to B-form — the hand barely moves.
+**The rule that keeps your hand still: adjacent chords in a ii–V–I alternate between A-form and B-form (e.g., ii in A-form → V in B-form → I in A-form).** That's why Dm7 and G7 both sit in A-form above, and Cmaj7 flips to B-form — the hand barely moves.
 
 **Voice leading across ii–V–I, written as stacks (bottom to top):**
 
@@ -144,7 +144,7 @@ Beat 4 of Dm7 (F#) is a chromatic approach from below into G. Beat 4 of G7 uses 
 ```text
 Dm7: D(5th fret A) - F(8th fret A) - A(5th fret D)  - F#(4th fret D)
 A|---5-------8-------------------------------------|
-D|-----------------------12----------4--------------|
+D|-----------------------7-----------4--------------|
      1       4            4          2
 
 G7:  G(5th fret D or 3rd fret E) - B(2nd fret A) - D(5th fret A) - Bb(1st fret G)
@@ -192,8 +192,8 @@ E|--8--  (C, root)
 
 Second inversion (5th on bottom):
 G|--12-- (G, 5th)
-B|--13-- (E, 3rd... recheck against 1st inversion shape, see below)
-E|--13-- (C, root)
+B|--13-- (C, root)
+E|--12-- (E, 3rd)
 ```
 
 Practical approach: learn **one movable shape** — root position with root on the G-string — and slide it. C at fret 5, Dm would need the minor 3rd adjustment (flatten the B-string note by one fret relative to the major shape), and so on. Memorize the major and minor versions of this one shape before chasing all six CAGED positions; it covers most chord-melody work on the top three strings.
@@ -450,7 +450,7 @@ Guide tones: Em7 (G,D) → A7 (C♯,G) → Dmaj7 (F♯,C♯) → Gmaj7 (B,F♯)
 | Dmaj7     | Gmaj7      | C#m7b5 F#7| Bm7         |
 ```
 
-Guide tones of the insertions: F♯m7 (A,E) and B7 (D♯,A) set up Em7 cleanly by descending step into G and D♯→E; C♯m7♭5 (E♭,B♭) and F♯7 (A♯,E) set up Bm7 the same way. Every inserted ii–V is chosen because its guide tones step smoothly into the guide tones of the chord that follows — that's the entire selection criterion, not chord-scale theory.
+Guide tones of the insertions: F♯m7 (A,E) and B7 (D♯,A) set up Em7 cleanly by descending step into G and D♯→E; C♯m7♭5 (E,B) and F♯7 (A♯,E) set up Bm7 the same way. Every inserted ii–V is chosen because its guide tones step smoothly into the guide tones of the chord that follows — that's the entire selection criterion, not chord-scale theory.
 
 ### Practice Drill 7 — Reharmonization With Guide Tones
 

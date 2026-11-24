@@ -116,7 +116,7 @@ Keep this as a living spreadsheet (one row per cue) with columns for cue number,
 PRIMARY STATEMENT (strings, mf, moderate tempo):
 Bar 1: C4 - E4 - G4 - A4      (stepwise rise toward dominant color)
 Bar 2: G4 - F4 - E4 - D4      (descending resolution)
-Bar 3: E4 - G4 - C5           (octave leap — the "triumph" gesture, the hook)
+Bar 3: C4 - G4 - C5           (octave leap — the "triumph" gesture, the hook)
 Bar 4: C5 - B4 - A4 - G4      (stepwise descent, half cadence, breathes before repeat)
 
 VARIATION A — "Defeat" (same pitches, new harmonic context):

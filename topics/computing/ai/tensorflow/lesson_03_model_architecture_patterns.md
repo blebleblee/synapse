@@ -305,3 +305,219 @@ class TransformerEncoder(tf.keras.Model):
 
         return self.classifier(self.pool(x))                # logits
 ```
+
+
+## 3. High-Performance Optimization & Failure Modes
+
+### 3.1 Mixed-Precision Training
+
+Both the ResNet-small and the Transformer encoder described above are compute-bound at batch sizes typical of GPU training (≥ 64). The dominant cost in the residual blocks is the 3 × 3 convolution; in the Transformer it is the `tf.matmul` calls inside `MultiHeadAttentionBlock.call`. Enabling mixed precision lets TensorFlow cast these operations to `float16` (or `bfloat16` on Ampere+ GPUs) while keeping the master weights in `float32`, roughly halving memory bandwidth and doubling throughput on Tensor Cores.
+
+```python
+import tensorflow as tf
+
+# Must be called before any model is built or compiled.
+tf.keras.mixed_precision.set_global_policy('mixed_float16')
+
+# Re-build the model so that all layers adopt the new policy.
+model = build_resnet_small()
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy'],
+)
+
+# With model.compile()/fit(), Keras wraps the optimizer in a
+# LossScaleOptimizer automatically. A custom training loop must wrap it
+# itself: tf.keras.mixed_precision.LossScaleOptimizer(optimizer).
+# Keep the final softmax in float32: Dense(..., dtype='float32').
+```
+
+The critical invariant is that **loss values must remain finite in `float32`**.  When the policy is `mixed_float16`, the `LossScaleOptimizer` multiplies the loss by a dynamic scale factor before back-propagation and divides the gradients back, preventing subnormal `float16` gradients from underflowing to zero.  If you observe `NaN` losses after enabling mixed precision, the first diagnostic is to print `tf.keras.mixed_precision.global_policy().name` and confirm that the loss is not being computed in `float16` directly.
+
+For the Transformer, the softmax inside `MultiHeadAttentionBlock` is the most sensitive operation: `float16` has a maximum representable value of 65 504, so the pre-softmax scores `Q Kᵀ / √d` can overflow when `d` is large or when attention weights concentrate.  The standard mitigation is to compute the softmax in `float32` explicitly:
+
+```python
+# Inside MultiHeadAttentionBlock.call, replace the softmax line with:
+weights = tf.nn.softmax(tf.cast(scores, tf.float32), axis=-1)
+weights = tf.cast(weights, scores.dtype)
+```
+
+### 3.2 XLA Compilation and Graph Optimisation
+
+`tf.function` with `jit_compile=True` (or the `@tf.function(jit_compile=True)` decorator) lowers the traced graph to HLO and then to the target backend (GPU or CPU).  For the residual blocks, this fuses the `Conv2D → BatchNormalization → ReLU` triple into a single kernel launch, eliminating two intermediate tensor materialisations per block.  For the Transformer, it fuses the `matmul → scale → mask → softmax → matmul` sequence, which is the single largest source of kernel-launch overhead at small sequence lengths.
+
+```python
+import tensorflow as tf
+
+# Wrap the training step so that the entire forward + backward pass
+# is compiled once and replayed.
+@tf.function(jit_compile=True)
+def train_step(model, x_batch, y_batch, optimizer):
+    with tf.GradientTape() as tape:
+        logits = model(x_batch, training=True)   # TransformerEncoder returns logits
+        loss = tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(
+            y_batch, logits, from_logits=True
+        ))
+    grads = tape.gradient(loss, model.trainable_variables)
+    optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    return loss
+```
+
+A practical caveat: `jit_compile=True` increases the first-iteration latency by 10–60 s (XLA compilation) but reduces steady-state step time by 15–35 % on GPU.  For short training runs (< 500 steps) the amortisation may not pay off; profile with `tf.profiler` before committing.
+
+### 3.3 Failure Modes Specific to Residual Architectures
+
+| Symptom | Root cause | Diagnostic | Fix |
+|---|---|---|---|
+| Training loss plateaus at ~ ln(C) for C classes | Identity shortcut dominates; residual branch contributes ≈ 0 | Plot `‖residual‖ / ‖shortcut‖` per block; if < 0.01 the block is effectively a pass-through | Increase learning rate, add weight decay, or replace `glorot_uniform` with `he_normal` for the residual convolutions |
+| Gradient norm explodes past step 500 in a 20-layer variant | No gradient clipping; deep stacks amplify the Jacobian | Log `tf.linalg.global_norm(grads)` with `tf.summary.scalar` in the training step | Add `clipnorm=1.0` to the optimizer, or insert a `tf.keras.layers.Lambda(lambda x: tf.clip_by_norm(x, 5.0))` after the final block |
+| `Add` layer raises `InvalidArgumentError: Shapes are not broadcastable` | Projection shortcut missing when `stride > 1` or channel count changes | Inspect `model.summary()` for the `Add` layer's input shapes | Ensure the `proj_conv` path exists in every block where `in_channels ≠ out_channels` or `stride ≠ 1` |
+
+The third row is the most common implementation error.  In the `residual_block` shown in § 2, the projection path is created only when `stride != 1 or in_channels != out_channels`.  If a developer copies the block and hard-codes `stride=1` for a stage that actually needs `stride=2`, the skip tensor retains the old spatial resolution and the `Add` layer fails at graph-construction time (functional API) or at the first `call` (subclassing API).
+
+### 3.4 Failure Modes Specific to Transformer Encoders
+
+**Attention-pattern collapse.**  When all heads converge to the same attention distribution (often uniform or fully-attentive), the model effectively reduces to a single-head network.  Detect this by computing the entropy of each head's weight matrix:
+
+```python
+import tensorflow as tf
+import numpy as np
+
+def head_entropy(model, x_batch):
+    """Per-head attention entropy (nats) of the first attention block.
+
+    Deeper blocks need the output of the blocks before them as input."""
+    attn_block = model.attn_blocks[0]
+    batch_size = tf.shape(x_batch)[0]
+    x = model.embedding(x_batch)
+    x *= tf.math.sqrt(tf.cast(model.d_model, tf.float32))
+    x += model.pos_encoding[:, :tf.shape(x_batch)[1], :]
+
+    q = attn_block.split_heads(attn_block.wq(x), batch_size)
+    k = attn_block.split_heads(attn_block.wk(x), batch_size)
+    scale = tf.math.sqrt(tf.cast(attn_block.depth, tf.float32))
+    scores = tf.matmul(q, k, transpose_b=True) / scale
+    weights = tf.nn.softmax(scores, axis=-1)  # (B, H, T, T)
+
+    # Entropy per head, averaged over batch and query positions
+    entropy = -tf.reduce_sum(weights * tf.math.log(weights + 1e-10), axis=-1)
+    return tf.reduce_mean(entropy, axis=[0, 2]).numpy()  # shape (num_heads,)
+```
+
+If two or more heads report entropy within 0.05 nats of each other across 100+ steps, the heads are redundant.  Remedies include increasing `d_model`, adding a relative-position bias to the scores, or initialising the `W_Q`, `W_K`, `W_V` matrices with a smaller variance so that early-training scores are more peaked.
+
+**Positional-encoding imbalance.**  The sinusoidal encoding in `TransformerEncoder.positional_encoding` produces values in [−1, 1], while the `x *= √d_model` scaling multiplies the token embeddings by about 11 for `d_model = 128` and 32 for `d_model = 1024`.  That scaling is applied *before* the positional encoding is added (as in § 2) so that position information neither drowns the token signal nor disappears in it.  If you change the embedding initialisation or `d_model`, compare `tf.math.reduce_std` of the scaled embeddings with that of `pos_encoding`: when one is orders of magnitude larger, the model effectively loses either word identity or word order.
+
+### 3.5 Checkpointing, Distributed Training, and Model Export
+
+For production pipelines the model must survive process restarts and be deployable to inference runtimes.  The following pattern covers all three (create the checkpoint after the model is built inside the strategy scope, so it tracks the replicated variables):
+
+```python
+import tensorflow as tf
+import os
+
+# --- Distributed strategy ----------------------------------------------------
+strategy = tf.distribute.MirroredStrategy()  # multi-GPU on one node
+# For multi-node: tf.distribute.MultiWorkerMirroredStrategy()
+
+with strategy.scope():
+    model = build_resnet_small()
+    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
+    model.compile(optimizer=optimizer,
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+
+# The `with strategy.scope()` block ensures that all layers are replicated
+# across devices.  For subclassed models (TransformerEncoder), the same
+# pattern applies, but you must call model.build() inside the scope so that
+# the replicated variables are created:
+#
+#   with strategy.scope():
+#       model = TransformerEncoder(num_layers=4, d_model=128, num_heads=4,
+#                                  vocab_size=10000, max_seq_len=128,
+#                                  num_classes=10)
+#       model.build(input_shape=(None, 128))   # forces variable creation
+#       optimizer = tf.keras.optimizers.Adam(1e-3)
+
+# --- Checkpointing -----------------------------------------------------------
+ckpt_dir = "./checkpoints/resnet_small"
+ckpt = tf.train.Checkpoint(model=model, optimizer=optimizer, step=tf.Variable(0))
+ckpt_manager = tf.train.CheckpointManager(ckpt, ckpt_dir, max_to_keep=3)
+
+# Restore the latest checkpoint if it exists.
+if ckpt_manager.latest_checkpoint:
+    ckpt.restore(ckpt_manager.latest_checkpoint)
+    print(f"Restored from step {ckpt.step.numpy()}")
+
+# --- Export for inference ----------------------------------------------------
+# SavedModel is the canonical format for TFServing, TF Lite, and Keras
+# production serving.
+export_dir = "./exported/resnet_small"
+tf.saved_model.save(model, export_dir)
+
+# For TF Lite (mobile / edge), convert with a representative dataset:
+# converter = tf.lite.TFLiteConverter.from_saved_model(export_dir)
+# converter.optimizations = [tf.lite.Optimize.DEFAULT]
+# tflite_model = converter.convert()
+```
+
+A subtle correctness issue with `MirroredStrategy` and subclassed models: the `call` method must be **deterministic with respect to the batch dimension**.  The `MultiHeadAttentionBlock.call` uses `tf.shape(x)[0]` to obtain the batch size, which is a *symbolic* value during tracing.  Under `MirroredStrategy` the per-replica batch size is `global_batch // num_replicas`, so the reshape in `split_heads` must use the *local* batch size, not a hard-coded global one.  Using `tf.shape(x)[0]` (as shown in § 2) is correct; hard-coding `batch_size = 64` would break when the strategy splits the batch.
+
+### 3.6 Validation and Sanity Checks Before Training
+
+Before launching a multi-hour training run, execute the following checks:
+
+```python
+import tensorflow as tf
+import numpy as np
+
+def pre_train_checks(model, dummy_input, num_classes=10):
+    """Run a forward pass and verify output shape, finiteness, and gradient flow."""
+    # 1. Output shape
+    out = model(dummy_input, training=False)
+    assert out.shape[1] == num_classes, f"Expected {num_classes} classes, got {out.shape[1]}"
+
+    # 2. Finiteness
+    assert tf.reduce_all(tf.math.is_finite(out)), "Non-finite values in output"
+
+    # 3. Gradient flow: every trainable variable must receive a non-zero gradient
+    with tf.GradientTape() as tape:
+        logits = model(dummy_input, training=True)
+        loss = tf.reduce_mean(tf.square(logits))
+    grads = tape.gradient(loss, model.trainable_variables)
+    dead = [v.name for v, g in zip(model.trainable_variables, grads)
+            if g is None or tf.reduce_all(g == 0)]
+    if dead:
+        print(f"WARNING: {len(dead)} variables received zero gradient: {dead[:5]}")
+    else:
+        print("All trainable variables received non-zero gradients.")
+
+    # 4. Parameter count sanity
+    total = sum(np.prod(v.shape) for v in model.trainable_variables)
+    print(f"Total trainable parameters: {total:,}")
+```
+
+Running this on a single dummy batch (e.g., `tf.random.normal((2, 32, 32, 3))` for the ResNet or `tf.random.uniform((2, 128), 0, 10000, dtype=tf.int32)` for the Transformer) catches shape mismatches, missing projection shortcuts, and dead layers before any GPU time is consumed.
+
+---
+
+## Summary
+
+This lesson established the two dominant model-construction patterns in TensorFlow Keras—**functional API** for statically-defined graphs (ResNet-small) and **subclassing API** for dynamic computation (Transformer encoder)—and showed how the residual connection, the projection shortcut, and the multi-head attention mechanism are implemented as concrete layer compositions.  The key invariants are: (1) every residual block must have a shape-compatible skip path; (2) the projection convolution uses `kernel_size=1` to avoid spatial mixing; (3) the `call` method of a subclassed layer must be deterministic in the batch dimension for distributed strategies; and (4) mixed-precision training requires explicit `float32` softmax in attention to prevent `float16` overflow.  The failure-mode tables and pre-training checks in § 3 provide a diagnostic checklist that separates architectural bugs (shape mismatches, dead gradients) from optimisation bugs (learning-rate mismatch, attention collapse) before they manifest as non-converging training curves.
+
+## Key Terms
+
+| Term | Definition |
+|---|---|
+| **Residual block** | A sub-network that computes `y = F(x) + x` (or `y = F(x) + W·x` when shapes differ), enabling gradient flow through an identity path. |
+| **Projection shortcut** | A 1 × 1 convolution (optionally with stride > 1) that maps the skip-connection tensor to the same shape as the residual branch, used when channel count or spatial resolution changes. |
+| **Functional API** | Keras model construction by composing `tf.keras.layers` objects into a directed acyclic graph; the graph is fixed at build time. |
+| **Subclassing API** | Keras model construction by overriding `call()` in a `tf.keras.Model` subclass; the computation graph is determined at runtime. |
+| **Multi-head attention** | Parallel attention sub-spaces (`num_heads` copies of `Q Kᵀ V / √d`) that are concatenated and projected, allowing the model to attend to different representation subspaces simultaneously. |
+| **Sinusoidal positional encoding** | Fixed, non-learned position embeddings using `sin`/`cos` at geometrically-spaced frequencies (Vaswani et al., 2017), added to token embeddings before the first attention layer. |
+| **Mixed precision** | Training with `float16` (or `bfloat16`) activations and `float32` master weights, coordinated by a loss-scaling mechanism to prevent gradient underflow. |
+| **XLA (Accelerated Linear Algebra)** | A compiler that lowers a traced `tf.function` graph to HLO IR and then to the target hardware, enabling kernel fusion and vectorisation. |
+| **MirroredStrategy** | A `tf.distribute.Strategy` that replicates the model across multiple GPUs on a single node, synchronising gradients via an all-reduce. |
+| **Attention-pattern collapse** | A degenerate training regime in which multiple attention heads converge to identical (often uniform) weight distributions, reducing effective model capacity. |
+| **SavedModel** | The canonical TensorFlow serialization format (a directory of `saved_model.pb` + `variables/`) for serving, TF Lite conversion, and cross-language inference. |

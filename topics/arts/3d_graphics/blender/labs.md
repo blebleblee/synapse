@@ -28,7 +28,7 @@ You will block out a simple organic form (a ceramic mug, a stone, or a piece of 
 
 Open your reference images in Blender using **Image Editor** or **UV Editor**. If your reference is a single photograph, decompose it into orthographic projections by opening the image in a graphics editor (Krita or GIMP) and manually cropping front, side, and top views. Save each as a 2048×2048 PNG with consistent perspective scaling. For example, if your subject is a mug that is 100 mm tall in reality, measure the pixel height on each orthographic view and calculate the scale factor: **mm per pixel** = **100 / pixel_height_at_ref_view**.
 
-Import these images into Blender as reference objects: in the **Properties Panel** (N-key), navigate to **Scene Properties**. Under **Background Images**, click **Add Background Image**. Load your front-view orthographic reference and set its **Offset Y** to 0, **Offset X** to 0, **Scale** to 1.0. Enable **Flip X** if necessary to match your viewport's handedness. Repeat for side and top views, assigning each to its corresponding orthographic camera view using the **Camera** selector in the Background Image properties.
+Import these images into Blender as reference objects: press **Shift+A > Image > Reference** in the 3D Viewport (for a camera background instead, select the camera and use **Object Data Properties > Background Images > Add Image**). Load your front-view orthographic reference and set its **Offset Y** to 0, **Offset X** to 0, **Scale** to 1.0. Enable **Flip X** if necessary to match your viewport's handedness. Repeat for side and top views, assigning each to its corresponding orthographic camera view using the **Camera** selector in the Background Image properties.
 
 Switch to **Camera > Front Orthographic** view (Numpad 1 for front, Numpad 7 for top, Numpad 3 for side). Your reference image should now fill the viewport. Lock all three orthographic views to your reference images using the **Lock Camera to View** toggle (Numpad /), then disable this toggle so you can orbit freely but your background remains fixed.
 
@@ -60,11 +60,11 @@ Check the following **topological rules**:
 
 4. **Pole Avoidance**: A pole is a vertex where more or fewer than four edges meet (e.g., a vertex with 5 or 3 edges). Poles create pinching artefacts in subdivision. In your mug model, the top rim should have poles only at the handle attachment points (which is acceptable). Everywhere else, every vertex should have exactly four edges. If you see poles in the body or base, delete vertices or merge edges to restore quad flow.
 
-Rotate the model in the viewport and visually inspect for poles. If you spot one, select that vertex (Alt+click on a face, or select the vertex directly), then delete it using **X > Merge** or by collapsing nearby edges.
+Rotate the model in the viewport and visually inspect for poles. If you spot one, select that vertex (Alt+click on a face, or select the vertex directly), then merge it using **M > By Distance** or by collapsing nearby edges.
 
 ### Part 1D: Finishing and File Save
 
-Apply a **Bevel** modifier after the Subdivision Surface modifier to add realistic edge hardness. Click **Add Modifier > Bevel** in the Modifiers panel. Set **Width** to 0.2 mm (a very small value; Blender's default unit is millimeters). Set **Segments** to 2 (fewer segments for hard edges, more for soft transitions). Enable **Clamp Overlap** to prevent intersecting geometry.
+Apply a **Bevel** modifier after the Subdivision Surface modifier to add realistic edge hardness. Click **Add Modifier > Bevel** in the Modifiers panel. Set **Width** to 0.2 mm (a very small value; Blender's default unit is meters, so type `0.2mm` (a bare 0.2 would mean 20 cm)). Set **Segments** to 2 (fewer segments for hard edges, more for soft transitions). Enable **Clamp Overlap** to prevent intersecting geometry.
 
 In **Solid** shading mode (Z-key > Solid), your mug should now appear as a smooth, beveled form. The silhouette in front and side views should match your reference images within 5% error.
 

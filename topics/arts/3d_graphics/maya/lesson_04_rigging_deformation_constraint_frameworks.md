@@ -110,7 +110,7 @@ Inverse kinematics solves the problem: given a goal position, compute joint rota
 
 The **IKRPSolver** (Rotate-Plane solver) works for chains of three or fewer joints. It solves the two-bone IK problem analytically—computing exact joint angles without iteration. For a two-bone chain (upper and lower arm), given an end-effector goal and a pole vector, the solver computes the exact angles that position the wrist at the goal while keeping the elbow in the plane defined by the pole vector. This is fast and stable.
 
-The **IKSCsolver** (Single Chain solver) uses iterative methods (FABRIK-like algorithms) and can handle longer chains. It is more flexible but slower and can exhibit oscillation if chain parameters are misconfigured.
+The **IKSCsolver** (Single-Chain solver) is an analytical IK solver that directly solves joint rotations for a chain without using a pole vector plane. It is more flexible but slower and can exhibit oscillation if chain parameters are misconfigured.
 
 The **Bullet solver** integrates physics constraints and is used for destructive simulations, not character animation.
 

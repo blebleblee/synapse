@@ -1269,7 +1269,7 @@ class CorruptionEvaluator:
             for severity in results[corruption]:
                 all_accuracies.append(results[corruption][severity])
 
-        mean_accuracy = np.mean(all_accuracies)
+        mean_accuracy = float(np.mean(all_accuracies))
         results["mean_corruption_accuracy"] = mean_accuracy
 
         print("\n" + "=" * 60)

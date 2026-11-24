@@ -713,7 +713,7 @@ In Figma, select the desktop card (`Card – Article – Base`) and right-click 
 
 Right-click again and select "Create component set." You will be prompted to name the base; keep it `Card – Article`. Figma will recognize this as a main component.
 
-Now, right-click on the tablet card and select "Create component" as well. In the design panel, change the "Main component" dropdown to link it as a variant of `Card – Article` with property "Breakpoint: tablet."
+Now, right-click on the tablet card and select "Create component" as well. In the design panel, Select the desktop, tablet, and mobile card components together and choose "Combine as variants" (then set the property to Breakpoint with values desktop/tablet/mobile). of `Card – Article` with property "Breakpoint: tablet."
 
 Do the same for mobile: "Breakpoint: mobile."
 
@@ -1001,7 +1001,7 @@ Use this rubric to evaluate your work after Exercise 3. Grade yourself on a scal
 - **2 (Weak):** Multiple elements below 4.5:1. Grayscale rendering reveals legibility failures.
 - **1 (Failing):** Widespread contrast failures; text is hard to read on background.
 
-**Common Fix:** Use Figma's accessibility checker on every text layer. If contrast < 4.5:1, darken the text or lighten the background. For color-dependent UI (e.g., status indicators), add an icon or label in addition to color.
+**Common Fix:** Check contrast in Figma's color picker ratio readout (or a plugin such as Stark/Able) for every text layer. If contrast < 4.5:1, darken the text or lighten the background. For color-dependent UI (e.g., status indicators), add an icon or label in addition to color.
 
 **Criterion 3: Line Length & Readability (5 points)**
 - **5 (Exemplary):** Body text line length is 50–75 characters (at max width). Leading (line height) is 1.5× font size or greater. Paragraph spacing is consistent (24px gaps).
@@ -1050,7 +1050,7 @@ Use this rubric to evaluate your work after Exercise 3. Grade yourself on a scal
 - **2 (Weak):** Grayscale loses meaningful information. Some red/green confusion possible.
 - **1 (Failing):** Critical information is color-only; grayscale renders the page unusable.
 
-**Common Fix:** Export a grayscale version of your page (Image → Desaturate in GIMP/Photoshop, or use Figma's export with color profile adjustment). Check that all UI elements (buttons, form states, alerts) are still distinguishable. Add icons or text labels to color-dependent UI (e.g., status indicators).
+**Common Fix:** Export a grayscale version of your page (Use Colors → Desaturate in GIMP, or Image → Adjustments → Desaturate in Photoshop., or Desaturate the exported PNG in an image editor (or apply a grayscale filter) instead of relying on Figma export settings.). Check that all UI elements (buttons, form states, alerts) are still distinguishable. Add icons or text labels to color-dependent UI (e.g., status indicators).
 
 ---
 
@@ -1164,7 +1164,7 @@ Use this rubric to evaluate your work after Exercise 3. Grade yourself on a scal
 
 **Mistake 2: Poor Contrast (Failing WCAG AA)**
 - Symptoms: Light gray text (#999999) on white background; unreadable in brightness-challenged environments.
-- Fix: Use Figma's contrast checker. All body text must be 4.5:1+. Use Gray-900 or Gray-700 for body on light backgrounds.
+- Fix: Use a contrast-checking plugin (e.g. Stark or Contrast) or an external WCAG contrast tool to verify the 4.5:1 ratio. All body text must be 4.5:1+. Use Gray-900 or Gray-700 for body on light backgrounds.
 
 **Mistake 3: Unresponsive Images**
 - Symptoms: Hero image is 1200px wide; on mobile, it's cropped or causes horizontal scroll.
